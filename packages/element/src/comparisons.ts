@@ -46,5 +46,6 @@ export const canChangeRoundness = (type: ElementOrToolType) =>
   type === "image";
 
 export const toolIsArrow = (type: ElementOrToolType) => type === "arrow";
+export const toolIsEraser = (type: ElementOrToolType) => type === "eraser";
 
 export const canHaveArrowheads = (type: ElementOrToolType) => type === "arrow";

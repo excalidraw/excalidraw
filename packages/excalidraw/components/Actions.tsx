@@ -20,6 +20,7 @@ import {
   isArrowElement,
   hasStrokeColor,
   toolIsArrow,
+  toolIsEraser,
 } from "@excalidraw/element";
 
 import type {
@@ -146,7 +147,7 @@ export const SelectedShapeActions = ({
   app: AppClassProperties;
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
-
+  const isToolEraser = toolIsEraser(appState.activeTool.type);
   let isSingleElementBoundContainer = false;
   if (
     targetElements.length === 2 &&
@@ -223,6 +224,11 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeArrowType")}</>
       )}
 
+      {(isToolEraser ||
+        targetElements.some((element) => toolIsEraser(element.type))) && (
+        <>{renderAction("changeEraserType")}</>
+      )}
+
       {(appState.activeTool.type === "text" ||
         targetElements.some(isTextElement)) && (
         <>
@@ -241,17 +247,19 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeArrowhead")}</>
       )}
 
-      {renderAction("changeOpacity")}
+      {!isToolEraser && renderAction("changeOpacity")}
 
-      <fieldset>
-        <legend>{t("labels.layers")}</legend>
-        <div className="buttonList">
-          {renderAction("sendToBack")}
-          {renderAction("sendBackward")}
-          {renderAction("bringForward")}
-          {renderAction("bringToFront")}
-        </div>
-      </fieldset>
+      {!isToolEraser && (
+        <fieldset>
+          <legend>{t("labels.layers")}</legend>
+          <div className="buttonList">
+            {renderAction("sendToBack")}
+            {renderAction("sendBackward")}
+            {renderAction("bringForward")}
+            {renderAction("bringToFront")}
+          </div>
+        </fieldset>
+      )}
 
       {showAlignActions && !isSingleElementBoundContainer && (
         <fieldset>
@@ -339,7 +347,6 @@ const CombinedShapeProperties = ({
   const shouldShowCombinedProperties =
     targetElements.length > 0 ||
     (appState.activeTool.type !== "selection" &&
-      appState.activeTool.type !== "eraser" &&
       appState.activeTool.type !== "hand" &&
       appState.activeTool.type !== "laser" &&
       appState.activeTool.type !== "lasso");
@@ -408,7 +415,12 @@ const CombinedShapeProperties = ({
                   canChangeRoundness(element.type),
                 )) &&
                 renderAction("changeRoundness")}
-              {renderAction("changeOpacity")}
+              {(toolIsEraser(appState.activeTool.type) ||
+                targetElements.some((element) =>
+                  toolIsEraser(element.type),
+                )) && <>{renderAction("changeEraserType")}</>}
+              {!toolIsEraser(appState.activeTool.type) &&
+                renderAction("changeOpacity")}
             </div>
           </PropertiesPopover>
         )}

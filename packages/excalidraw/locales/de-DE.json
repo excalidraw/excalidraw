@@ -171,7 +171,10 @@
     "linkToElement": "Link zum Objekt",
     "wrapSelectionInFrame": "Auswahl in Rahmen einbetten",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "eraserType": "Radierer Typ",
+    "eraserPen": "Stiftradierer",
+    "eraserDefault": "Radierer"
   },
   "elementLink": {
     "title": "Link zum Objekt",

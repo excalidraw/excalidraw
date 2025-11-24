@@ -171,7 +171,10 @@
     "linkToElement": "Link to object",
     "wrapSelectionInFrame": "Wrap selection in frame",
     "tab": "Tab",
-    "shapeSwitch": "Switch shape"
+    "shapeSwitch": "Switch shape",
+    "eraserType": "Eraser Type",
+    "eraserPen": "Pen-strokes eraser",
+    "eraserDefault": "Default eraser"
   },
   "elementLink": {
     "title": "Link to object",

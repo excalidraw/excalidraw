@@ -124,6 +124,8 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  PenOnlyEraserIcon,
+  EraserIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -1698,6 +1700,54 @@ export const actionChangeArrowProperties = register({
         {renderAction("changeArrowhead")}
         {renderAction("changeArrowType")}
       </div>
+    );
+  },
+});
+
+export const actionChangeEraserType = register({
+  name: "changeEraserType",
+  label: "Change eraser type",
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    return {
+      appState: { ...appState, eraserPenOnlyMode: value === "penOnly" },
+      elements,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    return (
+      <>
+        <fieldset>
+          <legend>{t("labels.eraserType")}</legend>
+          <div className="buttonList">
+            <RadioSelection
+              group="edges"
+              options={[
+                {
+                  value: "default",
+                  text: t("labels.eraserDefault"),
+                  icon: EraserIcon,
+                },
+                {
+                  value: "penOnly",
+                  text: t("labels.eraserPen"),
+                  icon: PenOnlyEraserIcon,
+                },
+              ]}
+              value={getFormValue(
+                elements,
+                app,
+                () => "default",
+                () => false,
+                () => (appState.eraserPenOnlyMode ? "penOnly" : "default"),
+              )}
+              onChange={(value) => updateData(value)}
+            />
+            {}
+          </div>
+        </fieldset>
+      </>
     );
   },
 });

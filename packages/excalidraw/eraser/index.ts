@@ -24,14 +24,17 @@ import {
 
 import { getElementsInGroup } from "@excalidraw/element";
 
-import { shouldTestInside } from "@excalidraw/element";
-import { hasBoundTextElement, isBoundToContainer } from "@excalidraw/element";
-import { getBoundTextElementId } from "@excalidraw/element";
+import {
+  getBoundTextElementId,
+  hasBoundTextElement,
+  isBoundToContainer,
+  shouldTestInside,
+} from "@excalidraw/element";
 
 import type { Bounds } from "@excalidraw/element";
 
-import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
 
 import { AnimatedTrail } from "../animated-trail";
 
@@ -107,6 +110,9 @@ export class EraserTrail extends AnimatedTrail {
     const candidateElementsMap = arrayToMap(candidateElements);
 
     for (const element of candidateElements) {
+      if (this.app.state.eraserPenOnlyMode && element.type !== "freedraw") {
+        continue;
+      }
       // restore only if already added to the to-be-erased set
       if (restoreToErase && this.elementsToErase.has(element.id)) {
         const intersects = eraserTest(
