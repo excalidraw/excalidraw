@@ -6,7 +6,7 @@ import {
   type LocalPoint,
 } from "@excalidraw/math";
 
-import { isBounds } from "@excalidraw/element";
+import { isBounds } from "@excalidraw/math";
 
 import type { Curve } from "@excalidraw/math";
 import type { LineSegment } from "@excalidraw/utils";
@@ -103,7 +103,9 @@ export const debugDrawBounds = (
     permanent?: boolean;
   },
 ) => {
-  (isBounds(box) ? [box] : box).forEach((bbox) =>
+  const boxes = (isBounds(box) ? [box] : box) as readonly Bounds[];
+
+  boxes.forEach((bbox) =>
     debugDrawLine(
       [
         lineSegment(
@@ -130,6 +132,8 @@ export const debugDrawBounds = (
     ),
   );
 };
+
+
 
 export const debugDrawPoints = (
   {
