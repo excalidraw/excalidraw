@@ -159,23 +159,20 @@ export const actionSaveToActiveFile = register({
   },
   perform: async (elements, appState, value, app) => {
     const fileHandleExists = !!appState.fileHandle;
-    const newName = `${t("labels.untitled")}-${getDateTime()}`;
-    const newAppState = { ...appState, name: newName };
     try {
       const { fileHandle } = isImageFileHandle(appState.fileHandle)
         ? await resaveAsImageWithScene(
             elements,
-            newAppState,
+            appState,
             app.files,
-            newName,
+            app.getName(),
           )
-        : await saveAsJSON(elements, newAppState, app.files, newName);
+        : await saveAsJSON(elements, appState, app.files, app.getName());
 
       return {
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
-          ...newAppState,
-          name: newName,
+          ...appState,
           fileHandle,
           toast: fileHandleExists
             ? {
