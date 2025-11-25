@@ -17,6 +17,8 @@ import { intersectElementWithLineSegment } from "@excalidraw/element/collision";
 import { lineSegment } from "@excalidraw/math";
 import { getLineHeightInPx } from "@excalidraw/element";
 
+import { getHostPlugin } from "@excalidraw/common/commonObsidianUtils";
+
 import type { FontMetadata } from "@excalidraw/common";
 import type {
   ElementsMap,
@@ -32,32 +34,6 @@ import type { AppClassProperties, AppState } from "./types";
 
 import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/common";
 
-//zsviczian, my dirty little secrets. These are hacks I am not proud of...
-export let hostPlugin: any = null;
-
-export function destroyObsidianUtils() {
-  hostPlugin = null;
-}
-
-export function initializeObsidianUtils() {
-  //@ts-ignore
-  hostPlugin = app.plugins.plugins["obsidian-excalidraw-plugin"];
-}
-
-function getHostPlugin() {
-  if (!hostPlugin) {
-    initializeObsidianUtils();
-  }
-  return hostPlugin;
-}
-
-export function getAreaLimit() {
-  return getHostPlugin().excalidrawConfig.areaLimit ?? 16777216;
-}
-
-export function getWidthHeightLimit() {
-  return getHostPlugin().excalidrawConfig.widthHeightLimit ?? 32767;
-}
 
 export function allowDoubleTapEraser() {
   return getHostPlugin().settings.penModeDoubleTapEraser;

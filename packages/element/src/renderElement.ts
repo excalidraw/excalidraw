@@ -22,6 +22,8 @@ import {
   isRTL,
   getVerticalOffset,
   invariant,
+  getAreaLimit,
+  getWidthHeightLimit,
 } from "@excalidraw/common";
 
 import type {
@@ -80,7 +82,6 @@ import type {
 
 import type { StrokeOptions } from "perfect-freehand";
 import type { RoughCanvas } from "roughjs/bin/canvas";
-import { getAreaLimit, getWidthHeightLimit } from "@excalidraw/excalidraw/obsidianUtils";
 import { isIframeLikeElement } from "@excalidraw/element/typeChecks";
 import easingsFunctions from "./easingFunctions";
 
@@ -101,7 +102,7 @@ const isPendingImageElement = (
 const shouldResetImageFilter = (
   element: ExcalidrawElement,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
   return (
     appState.theme === THEME.DARK &&
@@ -228,7 +229,7 @@ const generateElementCanvas = (
   elementsMap: NonDeletedSceneElementsMap,
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ): ExcalidrawElementWithCanvas | null => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -280,7 +281,7 @@ const generateElementCanvas = (
     context.filter = IMAGE_INVERT_FILTER;
   }
 
-  drawElementOnCanvas(element, rc, context, renderConfig, appState);
+  drawElementOnCanvas(element, rc, context, renderConfig);
 
   context.restore();
 
@@ -415,7 +416,6 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
 ) => {
   switch (element.type) {
     case "rectangle":
@@ -571,7 +571,7 @@ const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
   const zoom: Zoom = renderConfig
     ? appState.zoom
@@ -628,7 +628,7 @@ const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
   allElementsMap: NonDeletedSceneElementsMap,
 ) => {
   const element = elementWithCanvas.element;
@@ -747,7 +747,7 @@ export const renderElement = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
   const reduceAlphaForSelection =
     appState.openDialog?.name === "elementLinkSelector" &&
@@ -833,7 +833,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig, appState);
+        drawElementOnCanvas(element, rc, context, renderConfig);
         context.restore();
       } else {
         const elementWithCanvas = generateElementWithCanvas(
@@ -926,13 +926,7 @@ export const renderElement = (
 
           tempCanvasContext.translate(-shiftX, -shiftY);
 
-          drawElementOnCanvas(
-            element,
-            tempRc,
-            tempCanvasContext,
-            renderConfig,
-            appState,
-          );
+          drawElementOnCanvas(element, tempRc, tempCanvasContext, renderConfig);
 
           tempCanvasContext.translate(shiftX, shiftY);
 
@@ -971,7 +965,7 @@ export const renderElement = (
           }
 
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig, appState);
+          drawElementOnCanvas(element, rc, context, renderConfig);
         }
 
         context.restore();
@@ -1152,7 +1146,7 @@ export function getFreedrawOutlinePoints(element: ExcalidrawFreeDrawElement) {
         simulatePressure:
           customOptions.simulatePressure ?? element.simulatePressure,
         size: element.strokeWidth * 4.25, //override size with stroke width
-        last: !!element.lastCommittedPoint,
+        last: true,
         easing: easingsFunctions[customOptions.easing] ?? ((t) => t),
         ...(customOptions.start?.easing
           ? {
@@ -1180,7 +1174,7 @@ export function getFreedrawOutlinePoints(element: ExcalidrawFreeDrawElement) {
         smoothing: 0.5,
         streamline: 0.5,
         easing: easingsFunctions.easeOutSine, //zsviczian
-        last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
+        last: true,
       };
 
   return getStroke(inputPoints as number[][], options) as [number, number][];

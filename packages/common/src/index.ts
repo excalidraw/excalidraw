@@ -12,3 +12,4 @@ export * from "./utils";
 export * from "./emitter";
 export * from "./visualdebug";
 export * from "./editorInterface";
+export * from "./commonObsidianUtils";
