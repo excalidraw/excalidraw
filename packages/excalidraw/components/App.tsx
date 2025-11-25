@@ -6349,7 +6349,7 @@ class App extends React.Component<AppProps, AppState> {
 
   // set touch moving for mobile context menu
   private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
-    invalidateContextMenu = true;
+    this.resetContextMenuTimer();
   };
 
   handleHoverSelectedLinearElement(
@@ -10745,6 +10745,10 @@ class App extends React.Component<AppProps, AppState> {
           event.button !== POINTER_BUTTON.SECONDARY)) &&
       this.state.activeTool.type !== this.state.preferredSelectionTool.type
     ) {
+      return;
+    }
+
+    if (this.state.isResizing) {
       return;
     }
 
