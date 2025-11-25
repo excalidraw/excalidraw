@@ -1,4 +1,5 @@
 @import "open-color/open-color.scss";
+@import "variables.module.scss";
 
 .visually-hidden {
   position: absolute !important;
@@ -6,7 +7,7 @@
   width: 1px;
   overflow: hidden;
   clip: rect(1px, 1px, 1px, 1px);
-  white-space: nowrap; /* added line */
+  white-space: nowrap;
   user-select: none;
 }
 
@@ -36,4 +37,47 @@
 .LoadingMessage--dark {
   background-color: #121212;
   color: #ced4da;
+}
+
+/* ----------------------------------------------------
+   TOOLBAR ALIGNMENT FIXES
+   ---------------------------------------------------- */
+
+.toolbar {
+  display: flex;
+  align-items: center;         /* Centers icons/text vertically */
+  justify-content: space-between; /* Distribute items evenly */
+  padding: var(--toolbar-padding, 0.5rem 1rem);
+  height: var(--toolbar-height, 56px);
+  background-color: var(--toolbar-bg, var(--oc-gray-0));
+  border-bottom: 1px solid var(--toolbar-border, var(--oc-gray-3));
+  gap: var(--toolbar-gap, 0.5rem);
+  box-sizing: border-box;
+}
+
+/* Toolbar groups — like left, center, right sections */
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: var(--toolbar-gap, 0.5rem);
+}
+
+/* Buttons inside toolbar */
+.toolbar-button {
+  @include outlineButtonStyles;  /* Uses your shared button mixin */
+  @include buttonNoHighlight;
+  padding: var(--toolbar-button-padding, 0.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--toolbar-button-size, 40px);
+  width: var(--toolbar-button-size, 40px);
+  box-sizing: border-box;
+}
+
+/* Icons inside toolbar buttons */
+.toolbar-button svg {
+  width: var(--toolbar-icon-size, 20px);
+  height: var(--toolbar-icon-size, 20px);
+  vertical-align: middle;
 }
