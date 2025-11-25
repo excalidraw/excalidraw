@@ -11,6 +11,7 @@ exports[`given element A and group of elements B and given both are selected whe
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -112,7 +113,7 @@ exports[`given element A and group of elements B and given both are selected whe
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -439,6 +440,7 @@ exports[`given element A and group of elements B and given both are selected whe
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -542,7 +544,7 @@ exports[`given element A and group of elements B and given both are selected whe
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -857,6 +859,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -951,7 +954,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -1425,6 +1428,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -1519,7 +1523,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -1634,6 +1638,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -1733,7 +1738,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -2020,6 +2025,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -2116,7 +2122,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -2267,6 +2273,7 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -2361,7 +2368,7 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -2449,6 +2456,7 @@ exports[`regression tests > can drag element that covers another element, while 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -2545,7 +2553,7 @@ exports[`regression tests > can drag element that covers another element, while 
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -2776,6 +2784,7 @@ exports[`regression tests > change the properties of a shape > [end of test] app
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -2870,7 +2879,7 @@ exports[`regression tests > change the properties of a shape > [end of test] app
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -3033,6 +3042,7 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -3129,7 +3139,7 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -3276,6 +3286,7 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -3372,7 +3383,7 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -3514,6 +3525,7 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -3610,7 +3622,7 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -3774,6 +3786,7 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -3871,7 +3884,7 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -4090,6 +4103,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -4186,7 +4200,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -4528,6 +4542,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -4651,7 +4666,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -4813,6 +4828,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -4908,7 +4924,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -5091,6 +5107,7 @@ exports[`regression tests > deselects selected element on pointer down when poin
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -5213,7 +5230,7 @@ exports[`regression tests > deselects selected element on pointer down when poin
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -5301,6 +5318,7 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -5395,7 +5413,7 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -5503,6 +5521,7 @@ exports[`regression tests > double click to edit a group > [end of test] appStat
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -5597,7 +5616,7 @@ exports[`regression tests > double click to edit a group > [end of test] appStat
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -5898,6 +5917,7 @@ exports[`regression tests > drags selected elements from point inside common bou
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -5996,7 +6016,7 @@ exports[`regression tests > drags selected elements from point inside common bou
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -6197,6 +6217,7 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
     "locked": false,
     "type": "freedraw",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -6289,7 +6310,7 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -6305,7 +6326,7 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
 
 exports[`regression tests > draw every type of shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `31`;
+exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `35`;
 
 exports[`regression tests > draw every type of shape > [end of test] redo stack 1`] = `[]`;
 
@@ -6509,7 +6530,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "height": 10,
             "index": "a3",
             "isDeleted": false,
-            "lastCommittedPoint": null,
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -6588,7 +6608,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "height": 10,
             "index": "a4",
             "isDeleted": false,
-            "lastCommittedPoint": null,
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -6633,7 +6652,10 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
           "selectedElementIds": {
             "id15": true,
           },
-          "selectedLinearElement": null,
+          "selectedLinearElement": {
+            "elementId": "id15",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {
@@ -6664,10 +6686,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "height": 10,
             "index": "a5",
             "isDeleted": false,
-            "lastCommittedPoint": [
-              50,
-              10,
-            ],
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -6691,14 +6709,14 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 6,
+            "version": 4,
             "width": 50,
             "x": 310,
             "y": -10,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 5,
+            "version": 3,
           },
         },
       },
@@ -6720,10 +6738,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
         "id15": {
           "deleted": {
             "height": 20,
-            "lastCommittedPoint": [
-              80,
-              20,
-            ],
             "points": [
               [
                 0,
@@ -6738,15 +6752,11 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 20,
               ],
             ],
-            "version": 8,
+            "version": 5,
             "width": 80,
           },
           "inserted": {
             "height": 10,
-            "lastCommittedPoint": [
-              50,
-              10,
-            ],
             "points": [
               [
                 0,
@@ -6757,7 +6767,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 10,
               ],
             ],
-            "version": 6,
+            "version": 4,
             "width": 50,
           },
         },
@@ -6769,31 +6779,13 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
+          "selectedElementIds": {
+            "id20": true,
+          },
           "selectedLinearElement": {
-            "elementId": "id15",
+            "elementId": "id20",
             "isEditing": false,
           },
-        },
-        "inserted": {
-          "selectedLinearElement": null,
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id21",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedElementIds": {
-            "id22": true,
-          },
-          "selectedLinearElement": null,
         },
         "inserted": {
           "selectedElementIds": {
@@ -6809,7 +6801,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
     "elements": {
       "added": {},
       "removed": {
-        "id22": {
+        "id20": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -6823,10 +6815,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "height": 10,
             "index": "a6",
             "isDeleted": false,
-            "lastCommittedPoint": [
-              50,
-              10,
-            ],
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -6849,20 +6837,20 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "line",
-            "version": 6,
+            "version": 4,
             "width": 50,
             "x": 430,
             "y": -10,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 5,
+            "version": 3,
           },
         },
       },
       "updated": {},
     },
-    "id": "id24",
+    "id": "id22",
   },
   {
     "appState": AppStateDelta {
@@ -6875,13 +6863,9 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       "added": {},
       "removed": {},
       "updated": {
-        "id22": {
+        "id20": {
           "deleted": {
             "height": 20,
-            "lastCommittedPoint": [
-              80,
-              20,
-            ],
             "points": [
               [
                 0,
@@ -6896,15 +6880,11 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 20,
               ],
             ],
-            "version": 8,
+            "version": 5,
             "width": 80,
           },
           "inserted": {
             "height": 10,
-            "lastCommittedPoint": [
-              50,
-              10,
-            ],
             "points": [
               [
                 0,
@@ -6915,44 +6895,28 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 10,
               ],
             ],
-            "version": 6,
+            "version": 4,
             "width": 50,
           },
         },
       },
     },
-    "id": "id26",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedLinearElement": {
-            "elementId": "id22",
-            "isEditing": false,
-          },
-        },
-        "inserted": {
-          "selectedLinearElement": null,
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id28",
+    "id": "id24",
   },
   {
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {},
+          "selectedLinearElement": null,
         },
         "inserted": {
           "selectedElementIds": {
-            "id22": true,
+            "id20": true,
+          },
+          "selectedLinearElement": {
+            "elementId": "id20",
+            "isEditing": false,
           },
         },
       },
@@ -6962,26 +6926,19 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       "removed": {},
       "updated": {},
     },
-    "id": "id30",
+    "id": "id26",
   },
   {
     "appState": AppStateDelta {
       "delta": Delta {
-        "deleted": {
-          "selectedLinearElement": null,
-        },
-        "inserted": {
-          "selectedLinearElement": {
-            "elementId": "id22",
-            "isEditing": false,
-          },
-        },
+        "deleted": {},
+        "inserted": {},
       },
     },
     "elements": {
       "added": {},
       "removed": {
-        "id31": {
+        "id27": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -6993,10 +6950,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "height": 10,
             "index": "a7",
             "isDeleted": false,
-            "lastCommittedPoint": [
-              50,
-              10,
-            ],
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -7039,7 +6992,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       },
       "updated": {},
     },
-    "id": "id33",
+    "id": "id29",
   },
 ]
 `;
@@ -7055,6 +7008,7 @@ exports[`regression tests > given a group of selected elements with an element t
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -7152,7 +7106,7 @@ exports[`regression tests > given a group of selected elements with an element t
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -7391,6 +7345,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -7488,7 +7443,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -7672,6 +7627,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -7768,7 +7724,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -7909,6 +7865,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -8005,7 +7962,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -8151,6 +8108,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -8245,7 +8203,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -8333,6 +8291,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -8427,7 +8386,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -8515,6 +8474,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -8609,7 +8569,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -8697,6 +8657,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -8784,13 +8745,10 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
     "customLineAngle": null,
     "elbowed": false,
     "elementId": "id0",
-    "endBindingElement": "keep",
     "hoverPointIndex": -1,
-    "isDragging": false,
-    "isEditing": false,
-    "lastUncommittedPoint": null,
-    "pointerDownState": {
-      "lastClickedIsEndPoint": false,
+    "initialState": {
+      "altFocusPoint": null,
+      "arrowStartIsInside": false,
       "lastClickedPoint": -1,
       "origin": null,
       "prevSelectedPointsIndices": null,
@@ -8800,13 +8758,17 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
         "value": null,
       },
     },
+    "isDragging": false,
+    "isEditing": false,
+    "lastCommittedPoint": null,
+    "lastUncommittedPoint": null,
+    "pointerDownState": undefined,
     "pointerOffset": {
       "x": 0,
       "y": 0,
     },
     "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
-    "startBindingElement": "keep",
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
@@ -8818,7 +8780,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -8834,7 +8796,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
 
 exports[`regression tests > key 5 selects arrow tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key 5 selects arrow tool > [end of test] number of renders 1`] = `6`;
+exports[`regression tests > key 5 selects arrow tool > [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests > key 5 selects arrow tool > [end of test] redo stack 1`] = `[]`;
 
@@ -8876,7 +8838,6 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] undo stack 
             "height": 30,
             "index": "a0",
             "isDeleted": false,
-            "lastCommittedPoint": null,
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -8929,6 +8890,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -9016,13 +8978,10 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
     "customLineAngle": null,
     "elbowed": false,
     "elementId": "id0",
-    "endBindingElement": "keep",
     "hoverPointIndex": -1,
-    "isDragging": false,
-    "isEditing": false,
-    "lastUncommittedPoint": null,
-    "pointerDownState": {
-      "lastClickedIsEndPoint": false,
+    "initialState": {
+      "altFocusPoint": null,
+      "arrowStartIsInside": false,
       "lastClickedPoint": -1,
       "origin": null,
       "prevSelectedPointsIndices": null,
@@ -9032,13 +8991,17 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
         "value": null,
       },
     },
+    "isDragging": false,
+    "isEditing": false,
+    "lastCommittedPoint": null,
+    "lastUncommittedPoint": null,
+    "pointerDownState": undefined,
     "pointerOffset": {
       "x": 0,
       "y": 0,
     },
     "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
-    "startBindingElement": "keep",
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
@@ -9050,7 +9013,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -9066,7 +9029,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
 
 exports[`regression tests > key 6 selects line tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key 6 selects line tool > [end of test] number of renders 1`] = `6`;
+exports[`regression tests > key 6 selects line tool > [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests > key 6 selects line tool > [end of test] redo stack 1`] = `[]`;
 
@@ -9107,7 +9070,6 @@ exports[`regression tests > key 6 selects line tool > [end of test] undo stack 1
             "height": 30,
             "index": "a0",
             "isDeleted": false,
-            "lastCommittedPoint": null,
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -9159,6 +9121,7 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] appState
     "locked": false,
     "type": "freedraw",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -9251,7 +9214,7 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] appState
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -9295,10 +9258,6 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] undo sta
             "height": 30,
             "index": "a0",
             "isDeleted": false,
-            "lastCommittedPoint": [
-              30,
-              30,
-            ],
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -9357,6 +9316,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -9444,13 +9404,10 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
     "customLineAngle": null,
     "elbowed": false,
     "elementId": "id0",
-    "endBindingElement": "keep",
     "hoverPointIndex": -1,
-    "isDragging": false,
-    "isEditing": false,
-    "lastUncommittedPoint": null,
-    "pointerDownState": {
-      "lastClickedIsEndPoint": false,
+    "initialState": {
+      "altFocusPoint": null,
+      "arrowStartIsInside": false,
       "lastClickedPoint": -1,
       "origin": null,
       "prevSelectedPointsIndices": null,
@@ -9460,13 +9417,17 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
         "value": null,
       },
     },
+    "isDragging": false,
+    "isEditing": false,
+    "lastCommittedPoint": null,
+    "lastUncommittedPoint": null,
+    "pointerDownState": undefined,
     "pointerOffset": {
       "x": 0,
       "y": 0,
     },
     "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
-    "startBindingElement": "keep",
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
@@ -9478,7 +9439,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -9494,7 +9455,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
 
 exports[`regression tests > key a selects arrow tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key a selects arrow tool > [end of test] number of renders 1`] = `6`;
+exports[`regression tests > key a selects arrow tool > [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests > key a selects arrow tool > [end of test] redo stack 1`] = `[]`;
 
@@ -9536,7 +9497,6 @@ exports[`regression tests > key a selects arrow tool > [end of test] undo stack 
             "height": 30,
             "index": "a0",
             "isDeleted": false,
-            "lastCommittedPoint": null,
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -9589,6 +9549,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -9683,7 +9644,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -9771,6 +9732,7 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -9858,13 +9820,10 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
     "customLineAngle": null,
     "elbowed": false,
     "elementId": "id0",
-    "endBindingElement": "keep",
     "hoverPointIndex": -1,
-    "isDragging": false,
-    "isEditing": false,
-    "lastUncommittedPoint": null,
-    "pointerDownState": {
-      "lastClickedIsEndPoint": false,
+    "initialState": {
+      "altFocusPoint": null,
+      "arrowStartIsInside": false,
       "lastClickedPoint": -1,
       "origin": null,
       "prevSelectedPointsIndices": null,
@@ -9874,13 +9833,17 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
         "value": null,
       },
     },
+    "isDragging": false,
+    "isEditing": false,
+    "lastCommittedPoint": null,
+    "lastUncommittedPoint": null,
+    "pointerDownState": undefined,
     "pointerOffset": {
       "x": 0,
       "y": 0,
     },
     "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
-    "startBindingElement": "keep",
   },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
@@ -9892,7 +9855,7 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -9908,7 +9871,7 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
 
 exports[`regression tests > key l selects line tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key l selects line tool > [end of test] number of renders 1`] = `6`;
+exports[`regression tests > key l selects line tool > [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests > key l selects line tool > [end of test] redo stack 1`] = `[]`;
 
@@ -9949,7 +9912,6 @@ exports[`regression tests > key l selects line tool > [end of test] undo stack 1
             "height": 30,
             "index": "a0",
             "isDeleted": false,
-            "lastCommittedPoint": null,
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -10001,6 +9963,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -10095,7 +10058,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -10183,6 +10146,7 @@ exports[`regression tests > key p selects freedraw tool > [end of test] appState
     "locked": false,
     "type": "freedraw",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -10275,7 +10239,7 @@ exports[`regression tests > key p selects freedraw tool > [end of test] appState
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -10319,10 +10283,6 @@ exports[`regression tests > key p selects freedraw tool > [end of test] undo sta
             "height": 30,
             "index": "a0",
             "isDeleted": false,
-            "lastCommittedPoint": [
-              30,
-              30,
-            ],
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -10381,6 +10341,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -10475,7 +10436,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -10563,6 +10524,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -10665,7 +10627,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -11096,6 +11058,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -11192,7 +11155,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -11378,6 +11341,7 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -11470,7 +11434,7 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -11503,6 +11467,7 @@ exports[`regression tests > shift click on selected element should deselect it o
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -11597,7 +11562,7 @@ exports[`regression tests > shift click on selected element should deselect it o
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -11705,6 +11670,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -11803,7 +11769,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -12026,6 +11992,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -12126,7 +12093,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -12457,6 +12424,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -12561,7 +12529,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -13099,6 +13067,7 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -13194,7 +13163,7 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -13227,6 +13196,7 @@ exports[`regression tests > supports nested groups > [end of test] appState 1`] 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -13323,7 +13293,7 @@ exports[`regression tests > supports nested groups > [end of test] appState 1`] 
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -13860,6 +13830,7 @@ exports[`regression tests > switches from group of selected elements to another 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -13985,7 +13956,7 @@ exports[`regression tests > switches from group of selected elements to another 
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -14201,6 +14172,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -14325,7 +14297,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -14467,6 +14439,7 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -14559,7 +14532,7 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -14592,6 +14565,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -14686,7 +14660,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -14709,27 +14683,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
   {
     "appState": AppStateDelta {
       "delta": Delta {
-        "deleted": {
-          "selectedLinearElement": null,
-        },
-        "inserted": {
-          "selectedLinearElement": {
-            "elementId": "id6",
-            "isEditing": false,
-          },
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id13",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
         "deleted": {},
         "inserted": {},
       },
@@ -14741,10 +14694,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
         "id6": {
           "deleted": {
             "height": 10,
-            "lastCommittedPoint": [
-              60,
-              10,
-            ],
             "points": [
               [
                 0,
@@ -14755,15 +14704,11 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
                 10,
               ],
             ],
-            "version": 9,
+            "version": 6,
             "width": 60,
           },
           "inserted": {
             "height": 20,
-            "lastCommittedPoint": [
-              100,
-              20,
-            ],
             "points": [
               [
                 0,
@@ -14778,13 +14723,13 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
                 20,
               ],
             ],
-            "version": 8,
+            "version": 5,
             "width": 100,
           },
         },
       },
     },
-    "id": "id14",
+    "id": "id11",
   },
   {
     "appState": AppStateDelta {
@@ -14793,10 +14738,15 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
           "selectedElementIds": {
             "id3": true,
           },
+          "selectedLinearElement": null,
         },
         "inserted": {
           "selectedElementIds": {
             "id6": true,
+          },
+          "selectedLinearElement": {
+            "elementId": "id6",
+            "isEditing": false,
           },
         },
       },
@@ -14806,7 +14756,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
         "id6": {
           "deleted": {
             "isDeleted": true,
-            "version": 10,
+            "version": 7,
           },
           "inserted": {
             "angle": 0,
@@ -14822,10 +14772,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
             "height": 10,
             "index": "a2",
             "isDeleted": false,
-            "lastCommittedPoint": [
-              60,
-              10,
-            ],
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -14849,7 +14795,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 9,
+            "version": 6,
             "width": 60,
             "x": 130,
             "y": 10,
@@ -14859,7 +14805,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
       "removed": {},
       "updated": {},
     },
-    "id": "id15",
+    "id": "id12",
   },
 ]
 `;
@@ -14970,7 +14916,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] undo st
       },
       "updated": {},
     },
-    "id": "id17",
+    "id": "id14",
   },
 ]
 `;
@@ -14986,6 +14932,7 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
     "locked": false,
     "type": "text",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -15078,7 +15025,7 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -15111,6 +15058,7 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -15206,7 +15154,7 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
     "open": false,
     "panels": 3,
   },
-  "suggestedBindings": [],
+  "suggestedBinding": null,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
