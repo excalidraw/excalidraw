@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
     "target": "ESNext",
+    "lib": [
+      "es2019",
+      "dom"
+    ],
     "strict": true,
     "skipLibCheck": true,
     "declaration": true,
