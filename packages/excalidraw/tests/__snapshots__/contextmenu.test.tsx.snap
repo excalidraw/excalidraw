@@ -3236,7 +3236,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 1359939303,
+  "versionNonce": 2004587015,
   "width": 20,
   "x": -10,
   "y": 0,
@@ -3261,14 +3261,14 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "opacity": 60,
   "roughness": 2,
   "roundness": null,
-  "seed": 640725609,
+  "seed": 406373543,
   "strokeColor": "#e03131",
   "strokeStyle": "dotted",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 9,
-  "versionNonce": 908564423,
+  "versionNonce": 1402203177,
   "width": 20,
   "x": 20,
   "y": 30,
@@ -3277,7 +3277,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
 
 exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of renders 1`] = `16`;
+exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of renders 1`] = `18`;
 
 exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] redo stack 1`] = `[]`;
 

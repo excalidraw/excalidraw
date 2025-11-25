@@ -6297,7 +6297,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 
 exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] number of elements 1`] = `3`;
 
-exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] number of renders 1`] = `17`;
+exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] number of renders 1`] = `18`;
 
 exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] redo stack 1`] = `[]`;
 
@@ -7672,7 +7672,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 
 exports[`history > multiplayer undo/redo > should iterate through the history when when element change relates to remotely deleted element > [end of test] number of elements 1`] = `1`;
 
-exports[`history > multiplayer undo/redo > should iterate through the history when when element change relates to remotely deleted element > [end of test] number of renders 1`] = `9`;
+exports[`history > multiplayer undo/redo > should iterate through the history when when element change relates to remotely deleted element > [end of test] number of renders 1`] = `10`;
 
 exports[`history > multiplayer undo/redo > should iterate through the history when when element change relates to remotely deleted element > [end of test] redo stack 1`] = `[]`;
 
@@ -9607,7 +9607,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
 
 exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] number of elements 1`] = `2`;
 
-exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] number of renders 1`] = `10`;
+exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] number of renders 1`] = `11`;
 
 exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] redo stack 1`] = `
 [
@@ -9844,7 +9844,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
 
 exports[`history > multiplayer undo/redo > should not override remote changes on different properties > [end of test] number of elements 1`] = `1`;
 
-exports[`history > multiplayer undo/redo > should not override remote changes on different properties > [end of test] number of renders 1`] = `9`;
+exports[`history > multiplayer undo/redo > should not override remote changes on different properties > [end of test] number of renders 1`] = `10`;
 
 exports[`history > multiplayer undo/redo > should not override remote changes on different properties > [end of test] redo stack 1`] = `[]`;
 
@@ -11416,7 +11416,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
 
 exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] number of elements 1`] = `1`;
 
-exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] number of renders 1`] = `15`;
+exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] number of renders 1`] = `16`;
 
 exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] redo stack 1`] = `
 [
@@ -15770,7 +15770,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
 
 exports[`history > singleplayer undo/redo > should not override appstate changes when redo stack is not cleared > [end of test] number of elements 1`] = `1`;
 
-exports[`history > singleplayer undo/redo > should not override appstate changes when redo stack is not cleared > [end of test] number of renders 1`] = `15`;
+exports[`history > singleplayer undo/redo > should not override appstate changes when redo stack is not cleared > [end of test] number of renders 1`] = `16`;
 
 exports[`history > singleplayer undo/redo > should not override appstate changes when redo stack is not cleared > [end of test] redo stack 1`] = `
 [
