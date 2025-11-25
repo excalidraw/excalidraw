@@ -45,7 +45,14 @@ export const getExecutionInfoLines = (
     const inTok = usage.input_tokens ?? 0;
     const outTok = usage.output_tokens ?? 0;
     const reasoningTok = usage.reasoning_tokens ?? 0;
-    lines.push(`tokens: total=${usage.total_tokens} (in=${inTok}, out=${outTok}${reasoningTok ? `, reasoning=${reasoningTok}` : ''})`);
+    const detailParts = [
+      `in=${inTok}`,
+      ...(usage.image_tokens != null ? [`images=${usage.image_tokens}`] : []),
+      ...(usage.text_tokens != null ? [`text=${usage.text_tokens}`] : []),
+      `out=${outTok}`,
+      ...(reasoningTok ? [`reasoning=${reasoningTok}`] : []),
+    ];
+    lines.push(`tokens: total=${usage.total_tokens} (${detailParts.join(', ')})`);
   }
   return lines;
 };
