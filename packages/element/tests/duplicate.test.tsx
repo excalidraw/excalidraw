@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import { pointFrom } from "@excalidraw/math";
 
 import {

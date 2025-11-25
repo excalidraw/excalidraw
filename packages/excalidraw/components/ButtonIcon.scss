@@ -1,8 +1,9 @@
-@import "../css/theme";
+@use "../css/theme";
+@use "../css/variables.module";
 
 .excalidraw {
   button.standalone {
-    @include outlineButtonIconStyles;
+    @include variables.outlineButtonIconStyles;
 
     & > * {
       // dissalow pointer events on children, so we always have event.target on the button itself

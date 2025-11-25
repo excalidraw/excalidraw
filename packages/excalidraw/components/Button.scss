@@ -1,7 +1,8 @@
-@import "../css/theme";
+@use "../css/theme";
+@use "../css/variables.module";
 
 .excalidraw {
   .excalidraw-button {
-    @include outlineButtonStyles;
+    @include variables.outlineButtonStyles;
   }
 }

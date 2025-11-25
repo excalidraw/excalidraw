@@ -1,4 +1,4 @@
-@import "../css/variables.module.scss";
+@use "../css/variables.module.scss";
 
 .excalidraw {
   --ImageExportModal-preview-border: #d6d6d6;
@@ -23,7 +23,7 @@
       padding: 0;
       margin: 0;
 
-      @include isMobile {
+      @include variables.isMobile {
         display: none;
       }
     }
@@ -31,12 +31,12 @@
     & > h3 {
       display: none;
 
-      @include isMobile {
+      @include variables.isMobile {
         display: block;
       }
     }
 
-    @include isMobile {
+    @include variables.isMobile {
       flex-direction: column;
       height: calc(100vh - 5rem);
     }
@@ -51,7 +51,7 @@
 
       margin-right: 1.5rem;
 
-      @include isMobile {
+      @include variables.isMobile {
         max-width: unset;
         margin-right: unset;
 
@@ -90,12 +90,12 @@
 
           filter: none !important;
 
-          @include isMobile {
+          @include variables.isMobile {
             max-height: 100%;
           }
         }
 
-        @include isMobile {
+        @include variables.isMobile {
           margin-top: 24px;
           max-width: unset;
         }
@@ -108,7 +108,7 @@
       flex-wrap: wrap;
       gap: 18px;
 
-      @include isMobile {
+      @include variables.isMobile {
         margin-left: unset;
         margin-top: 1rem;
         flex-direction: row;
@@ -123,7 +123,7 @@
         justify-content: space-between;
         align-items: center;
 
-        @include isMobile {
+        @include variables.isMobile {
           flex-direction: column;
           align-items: start;
           justify-content: unset;
@@ -164,7 +164,7 @@
         align-items: flex-end;
         align-content: flex-end;
 
-        @include isMobile {
+        @include variables.isMobile {
           padding-top: 32px;
           flex-basis: 100%;
           justify-content: center;

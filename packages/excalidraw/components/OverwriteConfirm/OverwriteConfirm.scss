@@ -1,4 +1,4 @@
-@import "../../css/variables.module.scss";
+@use "../../css/variables.module.scss";
 
 .excalidraw {
   .OverwriteConfirm {
@@ -28,7 +28,7 @@
       width: 100%;
       gap: 1rem;
 
-      @include isMobile {
+      @include variables.isMobile {
         flex-direction: column;
         text-align: center;
       }
@@ -92,7 +92,7 @@
       justify-content: center;
       gap: 1.5rem;
 
-      @include isMobile {
+      @include variables.isMobile {
         flex-direction: column;
       }
 

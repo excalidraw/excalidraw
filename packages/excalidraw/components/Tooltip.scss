@@ -1,9 +1,11 @@
-@import "../css/variables.module.scss";
+@use "../css/variables.module.scss";
+@use "open-color/open-color";
 
 // container in body where the actual tooltip is appended to
 .excalidraw-tooltip {
-  --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
-    Roboto, Helvetica, Arial, sans-serif;
+  --ui-font:
+    Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI, Roboto,
+    Helvetica, Arial, sans-serif;
   font-family: var(--ui-font);
   position: fixed;
   z-index: var(--zIndex-popup);
@@ -14,13 +16,13 @@
   pointer-events: none;
   word-wrap: break-word;
 
-  background: $oc-black;
+  background: open-color.$oc-black;
 
   line-height: 1.5;
   text-align: center;
   font-size: 13px;
   font-weight: 500;
-  color: $oc-white;
+  color: open-color.$oc-white;
 
   display: none;
 
@@ -41,7 +43,7 @@
   margin-top: 1px;
   display: flex;
 
-  @include isMobile {
+  @include variables.isMobile {
     display: none;
   }
 }

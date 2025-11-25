@@ -12,14 +12,17 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "14.1",
-    "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "@types/node": "24.10.0",
+    "@types/react": "19.2.3",
+    "next": "16.0.1",
+    "path2d-polyfill": "3.2.1",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "19.0.10",
-    "@types/react-dom": "19.0.4",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
     "path2d-polyfill": "2.0.1",
     "typescript": "^5"
   }
