@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import * as Popover from "@radix-ui/react-popover";
 
 import {
@@ -94,6 +94,7 @@ import type {
   AppState,
 } from "../types";
 import type { ActionManager } from "../actions/manager";
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 // Common CSS class combinations
 const PROPERTIES_CLASSES = clsx([
@@ -139,11 +140,15 @@ export const SelectedShapeActions = ({
   elementsMap,
   renderAction,
   app,
+  setAppState,
+  actionManager,
 }: {
   appState: UIAppState;
   elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
   renderAction: ActionManager["renderAction"];
   app: AppClassProperties;
+  setAppState?: React.Component<any, AppState>["setState"];
+  actionManager?: ActionManager;
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
 
@@ -306,13 +311,14 @@ export const SelectedShapeActions = ({
             {renderAction("group")}
             {renderAction("ungroup")}
             {showLinkIcon && renderAction("hyperlink")}
-            {showCropEditorAction && renderAction("cropEditor")}
-            {showLineEditorAction && renderAction("toggleLinearEditor")}
-          </div>
-        </fieldset>
-      )}
+      {targetElements.length === 1 && renderAction("changeMetadata")}
+      {showCropEditorAction && renderAction("cropEditor")}
+      {showLineEditorAction && renderAction("toggleLinearEditor")}
     </div>
-  );
+  </fieldset>
+)}
+</div>
+);
 };
 
 const CombinedShapeProperties = ({
@@ -745,6 +751,7 @@ const CombinedExtraActions = ({
                   {renderAction("group")}
                   {renderAction("ungroup")}
                   {showLinkIcon && renderAction("hyperlink")}
+                  {targetElements.length === 1 && renderAction("changeMetadata")}
                   {showCropEditorAction && renderAction("cropEditor")}
                   {showDuplicate && renderAction("duplicateSelection")}
                   {showDelete && renderAction("deleteSelectedElements")}
@@ -842,14 +849,14 @@ export const CompactShapeActions = ({
         container={container}
         app={app}
       />
-      {/* Linear Editor */}
+      {/* Linear Element Editor trigger. */}
       {showLineEditorAction && (
         <div className="compact-action-item">
           {renderAction("toggleLinearEditor")}
         </div>
       )}
 
-      {/* Text Properties */}
+      {/* Text Element Properties. */}
       {(appState.activeTool.type === "text" ||
         targetElements.some(isTextElement)) && (
         <>
@@ -867,17 +874,24 @@ export const CompactShapeActions = ({
         </>
       )}
 
-      {/* Dedicated Copy Button */}
+      {/* Duplicate Selection trigger. */}
       {!isEditingTextOrNewElement && targetElements.length > 0 && (
         <div className="compact-action-item">
           {renderAction("duplicateSelection")}
         </div>
       )}
 
-      {/* Dedicated Delete Button */}
+      {/* Delete Selection trigger. */}
       {!isEditingTextOrNewElement && targetElements.length > 0 && (
         <div className="compact-action-item">
           {renderAction("deleteSelectedElements")}
+        </div>
+      )}
+
+      {/* Trigger for Metadata Modal (single element only). */}
+      {!isEditingTextOrNewElement && targetElements.length === 1 && (
+        <div className="compact-action-item">
+          {renderAction("changeMetadata")}
         </div>
       )}
 
@@ -889,6 +903,8 @@ export const CompactShapeActions = ({
         container={container}
         app={app}
       />
+
+
     </div>
   );
 };

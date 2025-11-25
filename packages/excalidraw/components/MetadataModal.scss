@@ -1,0 +1,179 @@
+.MetadataModal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.MetadataModal__tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--default-border-color);
+  padding-bottom: 8px;
+}
+
+.MetadataModal__tab {
+  background: none;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-primary-color);
+  border-radius: 4px;
+  opacity: 0.7;
+}
+
+.MetadataModal__tab:hover {
+  background-color: var(--color-surface-primary-container);
+  opacity: 1;
+}
+
+.MetadataModal__tab.active {
+  background-color: var(--color-surface-primary-container);
+  font-weight: bold;
+  opacity: 1;
+  color: var(--color-primary);
+}
+
+.MetadataModal__content {
+  min-height: 200px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.MetadataModal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.MetadataModal__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.MetadataModal__input {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--default-border-color);
+  background-color: var(--color-surface-primary-container);
+  color: var(--text-primary-color);
+  font-family: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.MetadataModal__input:focus {
+  outline: 2px solid var(--color-primary);
+  border-color: transparent;
+}
+
+.MetadataModal__delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary-color);
+  opacity: 0.6;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.MetadataModal__delete-btn:hover {
+  opacity: 1;
+  color: var(--color-danger);
+}
+
+.MetadataModal__add-btn {
+  align-self: flex-start;
+  background: none;
+  border: 1px dashed var(--default-border-color);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text-primary-color);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.MetadataModal__add-btn:hover {
+  background-color: var(--color-surface-primary-container);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.MetadataModal__textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 10px;
+  background: var(--color-surface-primary-container);
+  color: var(--text-primary-color);
+  border: 1px solid var(--default-border-color);
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.MetadataModal__textarea:focus {
+  outline: 2px solid var(--color-primary);
+  border-color: transparent;
+}
+
+.MetadataModal__error {
+  color: var(--color-danger);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.MetadataModal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--default-border-color);
+}
+
+.MetadataModal__cancel-btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid var(--default-border-color);
+  background-color: transparent;
+  color: var(--text-primary-color);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.MetadataModal__cancel-btn:hover {
+  background-color: var(--color-surface-primary-container);
+}
+
+.MetadataModal__save-btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  background-color: var(--color-primary);
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.MetadataModal__save-btn:hover {
+  opacity: 0.9;
+}
+
+.MetadataModal__save-btn:disabled {
+  background-color: var(--color-surface-secondary);
+  cursor: not-allowed;
+  opacity: 0.7;
+}

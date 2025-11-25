@@ -450,6 +450,104 @@ export const hideHyperlinkToolip = () => {
   }
 };
 
+// Metadata tooltip functions
+let METADATA_TOOLTIP_TIMEOUT_ID: number | null = null;
+let IS_METADATA_TOOLTIP_VISIBLE = false;
+
+export const showMetadataTooltip = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+  elementsMap: ElementsMap,
+  pointerCoords: { clientX: number; clientY: number },
+) => {
+  if (!element.customData || Object.keys(element.customData).length === 0) {
+    return;
+  }
+
+  if (METADATA_TOOLTIP_TIMEOUT_ID) {
+    clearTimeout(METADATA_TOOLTIP_TIMEOUT_ID);
+  }
+
+  METADATA_TOOLTIP_TIMEOUT_ID = window.setTimeout(
+    () => renderMetadataTooltip(element, appState, elementsMap, pointerCoords),
+    HYPERLINK_TOOLTIP_DELAY,
+  );
+};
+
+const renderMetadataTooltip = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+  elementsMap: ElementsMap,
+  pointerCoords: { clientX: number; clientY: number },
+) => {
+  if (!element.customData || Object.keys(element.customData).length === 0) {
+    return;
+  }
+
+  const tooltipDiv = getTooltipDiv();
+  tooltipDiv.classList.add("excalidraw-tooltip--visible");
+  tooltipDiv.style.maxWidth = "20rem";
+  tooltipDiv.style.backgroundColor = "rgba(0, 0, 0, 0.75)";
+  tooltipDiv.style.color = "white";
+  tooltipDiv.style.padding = "6px 10px";
+  tooltipDiv.style.borderRadius = "4px";
+  tooltipDiv.style.fontSize = "12px";
+  tooltipDiv.style.lineHeight = "1.4";
+  tooltipDiv.style.whiteSpace = "pre-wrap";
+  tooltipDiv.style.zIndex = "10000";
+  tooltipDiv.style.pointerEvents = "none";
+  tooltipDiv.style.position = "absolute";
+
+  // Format customData as key-value pairs
+  const formattedMetadata = Object.entries(element.customData)
+    .map(([key, value]) => {
+      if (value === null || value === undefined) {
+        return `${key}: null`;
+      }
+      const valueStr =
+        typeof value === "object" ? JSON.stringify(value) : String(value);
+      return `${key}: ${valueStr}`;
+    })
+    .join("\n");
+
+  tooltipDiv.textContent = formattedMetadata;
+
+  // Position tooltip near pointer
+  updateTooltipPosition(
+    tooltipDiv,
+    {
+      left: pointerCoords.clientX,
+      top: pointerCoords.clientY,
+      width: 0,
+      height: 0,
+    },
+    "top",
+  );
+
+  IS_METADATA_TOOLTIP_VISIBLE = true;
+};
+
+export const hideMetadataTooltip = () => {
+  if (METADATA_TOOLTIP_TIMEOUT_ID) {
+    clearTimeout(METADATA_TOOLTIP_TIMEOUT_ID);
+  }
+  if (IS_METADATA_TOOLTIP_VISIBLE) {
+    IS_METADATA_TOOLTIP_VISIBLE = false;
+    const tooltipDiv = getTooltipDiv();
+    tooltipDiv.classList.remove("excalidraw-tooltip--visible");
+    // Reset styles
+    tooltipDiv.style.backgroundColor = "";
+    tooltipDiv.style.color = "";
+    tooltipDiv.style.padding = "";
+    tooltipDiv.style.borderRadius = "";
+    tooltipDiv.style.fontSize = "";
+    tooltipDiv.style.lineHeight = "";
+    tooltipDiv.style.whiteSpace = "";
+    tooltipDiv.style.pointerEvents = "";
+    tooltipDiv.style.position = "";
+  }
+};
+
 const shouldHideLinkPopup = (
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,

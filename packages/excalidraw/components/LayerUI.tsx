@@ -18,7 +18,7 @@ import { ShapeCache } from "@excalidraw/element";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import { actionToggleStats } from "../actions";
+import { actionToggleStats, actionChangeMetadata } from "../actions";
 import { trackEvent } from "../analytics";
 import { isHandToolActive } from "../appState";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
@@ -62,6 +62,7 @@ import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
+import { MetadataModal } from "./MetadataModal";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
@@ -278,6 +279,8 @@ const LayerUI = ({
               elementsMap={app.scene.getNonDeletedElementsMap()}
               renderAction={actionManager.renderAction}
               app={app}
+              setAppState={setAppState}
+              actionManager={actionManager}
             />
           </Island>
         )}
@@ -560,6 +563,17 @@ const LayerUI = ({
           scene={app.scene}
           appState={appState}
           generateLinkForSelection={generateLinkForSelection}
+        />
+      )}
+      {appState.openDialog?.name === "metadata" && (
+        <MetadataModal
+          elements={app.scene.getSelectedElements(appState)}
+          appState={appState}
+          onClose={() => setAppState({ openDialog: null })}
+          onSave={(customData) => {
+            actionManager.executeAction(actionChangeMetadata, "ui", { customData });
+            setAppState({ openDialog: null });
+          }}
         />
       )}
       <tunnels.OverwriteConfirmDialogTunnel.Out />
