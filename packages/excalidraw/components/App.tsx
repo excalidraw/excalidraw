@@ -408,6 +408,8 @@ import { EraserTrail } from "../eraser";
 
 import { getShortcutKey } from "../shortcut";
 
+import { ThreeDView } from "./ThreeDView";
+
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
   convertElementTypePopupAtom,
@@ -1611,6 +1613,13 @@ class App extends React.Component<AppProps, AppState> {
                       <ExcalidrawActionManagerContext.Provider
                         value={this.actionManager}
                       >
+                        {this.state.threeDModeEnabled && (
+                          <ThreeDView
+                            appState={this.state}
+                            elements={this.scene.getNonDeletedElements()}
+                            app={this}
+                          />
+                        )}
                         <LayerUI
                           canvas={this.canvas}
                           appState={this.state}

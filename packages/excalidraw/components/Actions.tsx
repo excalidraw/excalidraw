@@ -1287,6 +1287,7 @@ export const ZoomActions = ({
       {renderAction("resetZoom")}
       {renderAction("zoomIn")}
     </Stack.Row>
+    <Stack.Row align="center">{renderAction("threeDMode")}</Stack.Row>
   </Stack.Col>
 );
 
