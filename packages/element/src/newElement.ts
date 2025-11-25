@@ -48,6 +48,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
+  ExcalidrawSprayElement,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -452,6 +453,19 @@ export const newFreeDrawElement = (
     points: opts.points || [],
     pressures: opts.pressures || [],
     simulatePressure: opts.simulatePressure,
+    lastCommittedPoint: null,
+  };
+};
+
+export const newSprayElement = (
+  opts: {
+    type: "spray";
+    points?: ExcalidrawSprayElement["points"];
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawSprayElement> => {
+  return {
+    ..._newElementBase<ExcalidrawSprayElement>(opts.type, opts),
+    points: opts.points || [],
     lastCommittedPoint: null,
   };
 };

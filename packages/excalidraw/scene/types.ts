@@ -156,6 +156,7 @@ export type ElementShapes = {
   iframe: Drawable;
   embeddable: Drawable;
   freedraw: Drawable | null;
+  spray: Drawable | null;
   arrow: Drawable[];
   line: Drawable[];
   text: null;

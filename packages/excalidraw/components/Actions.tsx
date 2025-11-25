@@ -7,6 +7,7 @@ import {
   KEYS,
   capitalizeString,
   isTransparent,
+  COLOR_PALETTE,
 } from "@excalidraw/common";
 
 import {
@@ -82,6 +83,7 @@ import {
   DotsHorizontalIcon,
   SelectionIcon,
   pencilIcon,
+  SprayIcon,
 } from "./icons";
 
 import { Island } from "./Island";
@@ -1067,6 +1069,14 @@ export const ShapesSwitcher = ({
     },
   ] as const;
 
+  const SPRAY_COLORS = [
+    { color: "#1e1e1e", label: "Black" },
+    { color: "#e03131", label: "Red" },
+    { color: "#2f9e44", label: "Green" },
+    { color: "#1971c2", label: "Blue" },
+    { color: "#f59f00", label: "Yellow" },
+  ] as const;
+
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const lassoToolSelected =
@@ -1099,6 +1109,60 @@ export const ShapesSwitcher = ({
           const shortcut = letter
             ? `${letter} ${t("helpDialog.or")} ${numericKey}`
             : `${numericKey}`;
+
+          // Spray tool with color picker popover
+          if (value === "spray") {
+            const sprayOptions = SPRAY_COLORS.map((c) => ({
+              type: `spray-${c.color}`,
+              icon: (
+                <div
+                  style={{
+                    width: "20px",
+                    height: "20px",
+                    borderRadius: "50%",
+                    backgroundColor: c.color,
+                    border: "2px solid var(--color-gray-30)",
+                  }}
+                />
+              ),
+              title: `${capitalizeString(label)} — ${c.label}`,
+            }));
+
+            const currentColor =
+              app.state.currentItemStrokeColor ||
+              COLOR_PALETTE.black;
+            const displayedOption =
+              sprayOptions.find((opt) =>
+                opt.type.includes(currentColor),
+              ) || sprayOptions[0];
+
+            return (
+              <ToolPopover
+                key="spray-popover"
+                app={app}
+                options={sprayOptions}
+                activeTool={activeTool}
+                defaultOption={sprayOptions[0].type}
+                namePrefix="sprayColor"
+                title={capitalizeString(label)}
+                data-testid="toolbar-spray"
+                onToolChange={(type: string) => {
+                  const selectedColor = SPRAY_COLORS.find((c) =>
+                    type.includes(c.color),
+                  );
+                  if (selectedColor) {
+                    setAppState({ currentItemStrokeColor: selectedColor.color });
+                  }
+                  if (app.state.activeTool.type !== "spray") {
+                    app.setActiveTool({ type: "spray" });
+                  }
+                }}
+                displayedOption={displayedOption}
+                fillable={false}
+              />
+            );
+          }
+
           // when in compact styles panel mode (tablet)
           // use a ToolPopover for selection/lasso toggle as well
           if (

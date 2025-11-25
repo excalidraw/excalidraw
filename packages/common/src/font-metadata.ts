@@ -111,6 +111,14 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
     },
     private: true,
   },
+  [FONT_FAMILY.Poppins]: {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 1050,
+      descender: -350,
+      lineHeight: 1.25,
+    },
+  },
   [FONT_FAMILY_FALLBACKS.Xiaolai]: {
     metrics: {
       unitsPerEm: 1000,

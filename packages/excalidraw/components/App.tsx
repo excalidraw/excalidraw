@@ -131,6 +131,7 @@ import {
   newImageElement,
   newLinearElement,
   newTextElement,
+  newSprayElement,
   refreshTextDimensions,
   deepCopyElement,
   duplicateElements,
@@ -267,6 +268,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   SceneElementsMap,
+  ExcalidrawSprayElement,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
@@ -6820,6 +6822,12 @@ class App extends React.Component<AppProps, AppState> {
         this.state.activeTool.type,
         pointerDownState,
       );
+    } else if (this.state.activeTool.type === "spray") {
+      this.handleSprayElementOnPointerDown(
+        event,
+        this.state.activeTool.type,
+        pointerDownState,
+      );
     } else if (this.state.activeTool.type === "custom") {
       setCursorForShape(this.interactiveCanvas, this.state);
     } else if (
@@ -7710,6 +7718,52 @@ class App extends React.Component<AppProps, AppState> {
         }),
       });
     }
+  };
+
+  private handleSprayElementOnPointerDown = (
+    event: React.PointerEvent<HTMLElement>,
+    elementType: ExcalidrawSprayElement["type"],
+    pointerDownState: PointerDownState,
+  ) => {
+    // Begin a mark capture. This does not have to update state yet.
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      null,
+    );
+
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+      x: gridX,
+      y: gridY,
+    });
+
+    const element = newSprayElement({
+      type: elementType,
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      frameId: topLayerFrame?.id ?? null,
+    });
+
+    this.setState((prevState) => ({
+      newElement: element,
+      selectedElementIds: {
+        [element.id]: true,
+      },
+      selectedGroupIds: {},
+    }));
+
+    // We need to add the element to the scene so that it's rendered
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted(),
+      element,
+    ]);
   };
 
   private handleFreeDrawElementOnPointerDown = (
@@ -8940,6 +8994,37 @@ class App extends React.Component<AppProps, AppState> {
               newElement,
             });
           }
+        } else if (newElement.type === "spray") {
+          const points = newElement.points;
+          const dx = pointerCoords.x - newElement.x;
+          const dy = pointerCoords.y - newElement.y;
+
+          const sprayPoints: LocalPoint[] = [];
+          const density = 5;
+          const spread = 20 / this.state.zoom.value;
+
+          for (let i = 0; i < density; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.random() * spread;
+            const x = dx + radius * Math.cos(angle);
+            const y = dy + radius * Math.sin(angle);
+            sprayPoints.push(pointFrom<LocalPoint>(x, y));
+          }
+
+          this.scene.mutateElement(
+            newElement,
+            {
+              points: [...points, ...sprayPoints],
+            },
+            {
+              informMutation: false,
+              isDragging: false,
+            },
+          );
+
+          this.setState({
+            newElement,
+          });
         } else if (isLinearElement(newElement)) {
           pointerDownState.drag.hasOccurred = true;
           const points = newElement.points;
