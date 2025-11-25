@@ -1522,7 +1522,7 @@ export const actionChangeRoundness = register({
   },
 });
 
-const getArrowheadOptions = (flip: boolean) => {
+export const getArrowheadOptions = (flip: boolean) => {
   return [
     {
       value: null,
