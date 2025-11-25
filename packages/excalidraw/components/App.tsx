@@ -550,6 +550,8 @@ let tappedTwiceTimer = 0;
 let firstTapPosition: { x: number; y: number } | null = null;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
+let isHoldingZ: boolean = false;
+let isZooming: boolean = false;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
@@ -4596,6 +4598,14 @@ class App extends React.Component<AppProps, AppState> {
         event.preventDefault();
       }
 
+      if (event.key === KEYS.Z && gesture.pointers.size === 0) {
+        isHoldingZ = true;
+        if (!isHoldingSpace) {
+          setCursor(this.interactiveCanvas, CURSOR_TYPE.ZOOM_IN);
+        }
+        event.preventDefault();
+      }
+
       if (
         (event.key === KEYS.G || event.key === KEYS.S) &&
         !event.altKey &&
@@ -4687,7 +4697,9 @@ class App extends React.Component<AppProps, AppState> {
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
-      if (
+      if (isHoldingZ === true) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.ZOOM_IN);
+      } else if (
         this.state.viewModeEnabled ||
         this.state.openDialog?.name === "elementLinkSelector"
       ) {
@@ -4707,6 +4719,22 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
       isHoldingSpace = false;
+    }
+    if (event.key === KEYS.Z) {
+      if (this.state.viewModeEnabled) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+      } else if (this.state.activeTool.type === "selection") {
+        resetCursor(this.interactiveCanvas);
+      } else {
+        setCursorForShape(this.interactiveCanvas, this.state);
+        this.setState({
+          selectedElementIds: makeNextSelectedElementIds({}, this.state),
+          selectedGroupIds: {},
+          editingGroupId: null,
+          activeEmbeddable: null,
+        });
+      }
+      isHoldingZ = false;
     }
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
       this.setState({ isBindingEnabled: true });
@@ -4808,7 +4836,7 @@ class App extends React.Component<AppProps, AppState> {
     const nextActiveTool = updateActiveTool(this.state, tool);
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-    } else if (!isHoldingSpace) {
+    } else if (!isHoldingSpace && !isHoldingZ) {
       setCursorForShape(this.interactiveCanvas, {
         ...this.state,
         activeTool: nextActiveTool,
@@ -5866,6 +5894,8 @@ class App extends React.Component<AppProps, AppState> {
     if (
       isHoldingSpace ||
       isPanning ||
+      isHoldingZ ||
+      isZooming ||
       isDraggingScrollBar ||
       isHandToolActive(this.state)
     ) {
@@ -6577,7 +6607,7 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    if (isPanning) {
+    if (isPanning || isZooming) {
       return;
     }
 
@@ -6587,6 +6617,10 @@ class App extends React.Component<AppProps, AppState> {
     // else it will send pointer state & laser pointer events in collab when
     // panning
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+      return;
+    }
+
+    if (this.handleCanvasZoomUsingZDrag(event)) {
       return;
     }
 
@@ -7107,6 +7141,74 @@ class App extends React.Component<AppProps, AppState> {
       passive: true,
     });
     window.addEventListener(EVENT.POINTER_UP, teardown);
+    return true;
+  };
+
+  // Returns whether the event is a zooming
+  public handleCanvasZoomUsingZDrag = (
+    event: React.PointerEvent<HTMLElement> | MouseEvent,
+  ): boolean => {
+    if (
+      event.button === POINTER_BUTTON.WHEEL || !isHoldingZ
+    ) {
+      return false;
+    }
+    isZooming = true;
+    event.preventDefault();
+
+    let { clientX: lastX, clientY: lastY } = event;
+    const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
+      const deltaX = lastX - event.clientX;
+      const deltaY = lastY - event.clientY;
+
+      lastX = event.clientX;
+      lastY = event.clientY;
+
+      const newZoom =
+        this.state.zoom.value +
+        (deltaY / 500) * this.state.zoom.value -
+        (deltaX / 500) * this.state.zoom.value;
+
+      this.translateCanvas((state) => ({
+        ...getStateForZoom(
+          {
+            viewportX: this.lastViewportPosition.x,
+            viewportY: this.lastViewportPosition.y,
+            nextZoom: getNormalizedZoom(newZoom),
+          },
+          state,
+        ),
+        shouldCacheIgnoreZoom: true,
+      }));
+      this.resetShouldCacheIgnoreZoomDebounced();
+    });
+    const teardown = withBatchedUpdates(
+      (lastPointerUp = () => {
+        lastPointerUp = null;
+        isZooming = false;
+        if (!isHoldingZ) {
+          if (this.state.viewModeEnabled) {
+            setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+          } else {
+            setCursorForShape(this.interactiveCanvas, this.state);
+          }
+        }
+        this.setState({
+          cursorButton: "up",
+        });
+        this.savePointer(event.clientX, event.clientY, "up");
+        window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+        window.removeEventListener(EVENT.POINTER_UP, teardown);
+        window.removeEventListener(EVENT.BLUR, teardown);
+        onPointerMove.flush();
+      }),
+    );
+    window.addEventListener(EVENT.BLUR, teardown);
+    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
+      passive: true,
+    });
+    window.addEventListener(EVENT.POINTER_UP, teardown);
+
     return true;
   };
 
@@ -11273,7 +11375,7 @@ class App extends React.Component<AppProps, AppState> {
 
       event.preventDefault();
 
-      if (isPanning) {
+      if (isPanning || isZooming) {
         return;
       }
 
