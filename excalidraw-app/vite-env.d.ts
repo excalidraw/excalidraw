@@ -33,6 +33,7 @@ interface ImportMetaEnv {
   VITE_APP_ENABLE_PWA: string;
 
   VITE_APP_PLUS_LP: string;
+  VITE_APP_PLUS_TRIAL: string;
 
   VITE_APP_PLUS_APP: string;
 
