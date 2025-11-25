@@ -894,6 +894,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -1095,6 +1096,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -1311,6 +1313,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -1644,6 +1647,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -1977,6 +1981,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -2193,6 +2198,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -2436,6 +2442,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -2736,6 +2743,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -3110,6 +3118,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "currentItemBackgroundColor": "#a5d8ff",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "cross-hatch",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 60,
@@ -3118,7 +3127,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#e03131",
   "currentItemStrokeStyle": "dotted",
-  "currentItemStrokeWidth": 2,
+  "currentItemStrokeWidth": 4,
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
@@ -3232,11 +3241,11 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "seed": 449462985,
   "strokeColor": "#e03131",
   "strokeStyle": "dotted",
-  "strokeWidth": 2,
+  "strokeWidth": 4,
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 1359939303,
+  "versionNonce": 2004587015,
   "width": 20,
   "x": -10,
   "y": 0,
@@ -3261,14 +3270,14 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "opacity": 60,
   "roughness": 2,
   "roundness": null,
-  "seed": 640725609,
+  "seed": 941653321,
   "strokeColor": "#e03131",
   "strokeStyle": "dotted",
-  "strokeWidth": 2,
+  "strokeWidth": 4,
   "type": "rectangle",
   "updated": 1,
-  "version": 9,
-  "versionNonce": 908564423,
+  "version": 10,
+  "versionNonce": 1359939303,
   "width": 20,
   "x": 20,
   "y": 30,
@@ -3277,7 +3286,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
 
 exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of renders 1`] = `16`;
+exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of renders 1`] = `17`;
 
 exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] redo stack 1`] = `[]`;
 
@@ -3477,11 +3486,11 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
       "updated": {
         "id3": {
           "deleted": {
-            "strokeStyle": "dotted",
+            "strokeWidth": 4,
             "version": 7,
           },
           "inserted": {
-            "strokeStyle": "solid",
+            "strokeWidth": 2,
             "version": 6,
           },
         },
@@ -3502,11 +3511,11 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
       "updated": {
         "id3": {
           "deleted": {
-            "roughness": 2,
+            "strokeStyle": "dotted",
             "version": 8,
           },
           "inserted": {
-            "roughness": 1,
+            "strokeStyle": "solid",
             "version": 7,
           },
         },
@@ -3527,17 +3536,42 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
       "updated": {
         "id3": {
           "deleted": {
-            "opacity": 60,
+            "roughness": 2,
             "version": 9,
           },
           "inserted": {
-            "opacity": 100,
+            "roughness": 1,
             "version": 8,
           },
         },
       },
     },
     "id": "id17",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id3": {
+          "deleted": {
+            "opacity": 60,
+            "version": 10,
+          },
+          "inserted": {
+            "opacity": 100,
+            "version": 9,
+          },
+        },
+      },
+    },
+    "id": "id19",
   },
   {
     "appState": AppStateDelta {
@@ -3566,6 +3600,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
             "roughness": 2,
             "strokeColor": "#e03131",
             "strokeStyle": "dotted",
+            "strokeWidth": 4,
             "version": 4,
           },
           "inserted": {
@@ -3575,12 +3610,13 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
             "roughness": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
+            "strokeWidth": 2,
             "version": 3,
           },
         },
       },
     },
-    "id": "id19",
+    "id": "id21",
   },
 ]
 `;
@@ -3605,6 +3641,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -3930,6 +3967,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -4255,6 +4293,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -5542,6 +5581,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -6761,6 +6801,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -7698,6 +7739,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -8700,6 +8742,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
@@ -9693,6 +9736,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,

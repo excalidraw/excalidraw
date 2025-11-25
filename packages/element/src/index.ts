@@ -94,6 +94,7 @@ export * from "./embeddable";
 export * from "./flowchart";
 export * from "./fractionalIndex";
 export * from "./frame";
+export * from "./freedraw";
 export * from "./groups";
 export * from "./heading";
 export * from "./image";

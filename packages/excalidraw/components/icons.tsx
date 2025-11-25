@@ -1160,7 +1160,7 @@ export const StrokeWidthBaseIcon = createIcon(
   modifiedTablerIconProps,
 );
 
-export const StrokeWidthBoldIcon = createIcon(
+export const StrokeWidthMediumIcon = createIcon(
   <path
     d="M5 10h10"
     stroke="currentColor"
@@ -1171,11 +1171,22 @@ export const StrokeWidthBoldIcon = createIcon(
   modifiedTablerIconProps,
 );
 
-export const StrokeWidthExtraBoldIcon = createIcon(
+export const StrokeWidthBoldIcon = createIcon(
   <path
     d="M5 10h10"
     stroke="currentColor"
     strokeWidth="3.75"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const StrokeWidthExtraBoldIcon = createIcon(
+  <path
+    d="M5 10h10"
+    stroke="currentColor"
+    strokeWidth="5"
     strokeLinecap="round"
     strokeLinejoin="round"
   />,
@@ -2294,11 +2305,79 @@ export const elementLinkIcon = createIcon(
   tablerIconProps,
 );
 
+export const strokeWidthFixedIcon = createIcon(
+  <g>
+    <path
+      d="M4 12 C 5 8, 6 8, 8 12"
+      fill="none"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 12 C 9 16, 10 16, 12 12"
+      fill="none"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12 12 C 14 8, 15 8, 16 12"
+      fill="none"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M16 12 C 17 16, 18 16, 19 12"
+      fill="none"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </g>,
+  tablerIconProps,
+);
+
 export const resizeIcon = createIcon(
   <g strokeWidth={1.5}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M4 11v8a1 1 0 0 0 1 1h8m-9 -14v-1a1 1 0 0 1 1 -1h1m5 0h2m5 0h1a1 1 0 0 1 1 1v1m0 5v2m0 5v1a1 1 0 0 1 -1 1h-1" />
     <path d="M4 12h7a1 1 0 0 1 1 1v7" />
+  </g>,
+  tablerIconProps,
+);
+
+export const strokeWidthVariableIcon = createIcon(
+  <g>
+    <path
+      d="M4 12 C 5 8, 6 8, 8 12"
+      fill="none"
+      stroke-width="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 12 C 9 16, 10 16, 12 12"
+      fill="none"
+      stroke-width="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12 12 C 14 8, 15 8, 16 12"
+      fill="none"
+      stroke-width="2.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M16 12 C 17 16, 18 16, 19 12"
+      fill="none"
+      stroke-width="3.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </g>,
   tablerIconProps,
 );
