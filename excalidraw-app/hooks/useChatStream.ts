@@ -3,12 +3,13 @@ import type { ChatMessage, StreamingState } from '../lib/chat/types';
 import { getLLMBaseURL, isStreamingSupported, isDev } from '../lib/chat/config';
 import { getCollaborationLinkData } from '../data';
 import type { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types';
+import type { SnapshotsResult } from './useSnapshots';
 
 export interface UseChatStreamProps {
   excalidrawAPI: ExcalidrawImperativeAPI;
   onMessagesUpdate: (updater: (prev: ChatMessage[]) => ChatMessage[]) => void;
   onError: (error: string | null) => void;
-  generateSnapshots: (needsSnapshot?: boolean) => Promise<{ fullCanvas?: string; selection?: string; thumbnail?: string; thumbnailHash?: string }>;
+  generateSnapshots: (needsSnapshot?: boolean) => Promise<SnapshotsResult>;
   getToken?: () => Promise<string | null>;
   collabAPI?: any;
 }
@@ -72,12 +73,22 @@ export const useChatStream = ({
     const outputTokens = usage.output_tokens ?? usage.completion_tokens ?? usage.total_completion_tokens ?? usage.response_tokens ?? 0;
     const totalTokens = usage.total_tokens ?? (inputTokens + outputTokens);
     const reasoningTokens = usage.reasoning_tokens ?? usage.output_tokens_details?.reasoning_tokens ?? 0;
+    const imageTokens =
+      usage.image_tokens ??
+      usage.input_tokens_details?.image_tokens ??
+      usage.input_token_details?.image_tokens;
+    const textTokens =
+      usage.text_tokens ??
+      usage.input_tokens_details?.text_tokens ??
+      usage.input_token_details?.text_tokens;
 
     return {
       input_tokens: inputTokens,
       output_tokens: outputTokens,
       total_tokens: totalTokens,
-      reasoning_tokens: reasoningTokens
+      reasoning_tokens: reasoningTokens,
+      ...(typeof imageTokens === 'number' ? { image_tokens: imageTokens } : {}),
+      ...(typeof textTokens === 'number' ? { text_tokens: textTokens } : {}),
     };
   };
 

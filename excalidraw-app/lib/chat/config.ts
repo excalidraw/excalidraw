@@ -25,6 +25,40 @@ export const getThumbnailQuality = (): number =>
 export const getMaxThumbnailBytes = (): number =>
   Number(import.meta.env.VITE_LLM_THUMBNAIL_MAX_BYTES ?? 300000);
 
+// Full canvas snapshot configuration
+export const getFullCanvasMaxDim = (): number =>
+  Number(import.meta.env.VITE_LLM_FULL_CANVAS_MAX_DIM ?? 400);
+
+export const getFullCanvasQuality = (): number =>
+  Number(import.meta.env.VITE_LLM_FULL_CANVAS_JPEG_QUALITY ?? 0.75);
+
+export const getFullCanvasMaxBytes = (): number | undefined => {
+  const val = Number(import.meta.env.VITE_LLM_FULL_CANVAS_MAX_BYTES ?? NaN);
+  return Number.isFinite(val) ? val : undefined;
+};
+
+// Selection snapshot configuration
+export const getSelectionMaxDim = (): number =>
+  Number(import.meta.env.VITE_LLM_SELECTION_MAX_DIM ?? 800);
+
+export const getSelectionQuality = (): number =>
+  Number(import.meta.env.VITE_LLM_SELECTION_JPEG_QUALITY ?? 0.75);
+
+export const getSelectionMaxBytes = (): number | undefined => {
+  const val = Number(import.meta.env.VITE_LLM_SELECTION_MAX_BYTES ?? NaN);
+  return Number.isFinite(val) ? val : undefined;
+};
+
+// Viewport snapshot configuration
+export const getMaxViewportDim = (): number =>
+  Number(import.meta.env.VITE_LLM_VIEWPORT_MAX_DIM ?? 900);
+
+export const getViewportQuality = (): number =>
+  Number(import.meta.env.VITE_LLM_VIEWPORT_JPEG_QUALITY ?? 0.8);
+
+export const getMaxViewportBytes = (): number =>
+  Number(import.meta.env.VITE_LLM_VIEWPORT_MAX_BYTES ?? 900000);
+
 // Development mode check
 export const isDev = (): boolean => Boolean(import.meta.env.DEV);
 

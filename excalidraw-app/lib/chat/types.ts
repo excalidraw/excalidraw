@@ -48,6 +48,8 @@ export interface ChatMessage {
     output_tokens: number;
     total_tokens: number;
     reasoning_tokens?: number;
+    image_tokens?: number;
+    text_tokens?: number;
   };
   responseId?: string;
   finishReason?: string;

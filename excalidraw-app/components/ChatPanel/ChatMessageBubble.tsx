@@ -62,9 +62,16 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
       const inTok = message.usage.input_tokens ?? 0;
       const outTok = message.usage.output_tokens ?? 0;
       const reasoningTok = message.usage.reasoning_tokens ?? 0;
-      const tokenDetail = `tokens ${fmtK(message.usage.total_tokens)} (in ${fmtK(inTok)}, out ${fmtK(outTok)}${
-        reasoningTok ? `, reasoning ${fmtK(reasoningTok)}` : ''
-      })`;
+      const imageTok = message.usage.image_tokens;
+      const textTok = message.usage.text_tokens;
+      const detailParts = [
+        `in ${fmtK(inTok)}`,
+        ...(typeof imageTok === 'number' ? [`images ${fmtK(imageTok)}`] : []),
+        ...(typeof textTok === 'number' ? [`text ${fmtK(textTok)}`] : []),
+        `out ${fmtK(outTok)}`,
+        ...(reasoningTok ? [`reasoning ${fmtK(reasoningTok)}`] : []),
+      ];
+      const tokenDetail = `tokens ${fmtK(message.usage.total_tokens)} (${detailParts.join(', ')})`;
       timingParts.push(tokenDetail);
     }
 
