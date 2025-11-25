@@ -261,6 +261,7 @@ const getRelevantAppStateProps = (
   activeLockedId: appState.activeLockedId,
   hoveredElementIds: appState.hoveredElementIds,
   frameRendering: appState.frameRendering,
+  frameColor: appState.frameColor, //zsviczian
   shouldCacheIgnoreZoom: appState.shouldCacheIgnoreZoom,
   exportScale: appState.exportScale,
 });
