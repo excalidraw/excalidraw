@@ -450,6 +450,9 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
+
+  /** which arrowhead picker should be auto-focused when opening the menu */
+  focusedArrowheadPicker: "start" | "end" | null;
 }
 
 export type SearchMatch = {

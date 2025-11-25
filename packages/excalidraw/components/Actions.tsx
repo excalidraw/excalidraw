@@ -449,7 +449,7 @@ const CombinedArrowProperties = ({
           if (open) {
             setAppState({ openPopup: "compactArrowProperties" });
           } else {
-            setAppState({ openPopup: null });
+            setAppState({ openPopup: null, focusedArrowheadPicker: null });
           }
         }}
       >

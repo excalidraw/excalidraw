@@ -1606,8 +1606,22 @@ export const actionChangeArrowhead = register({
   perform: (
     elements,
     appState,
-    value: { position: "start" | "end"; type: Arrowhead },
+    value:
+      | { position: "start" | "end"; type: Arrowhead }
+      | { resetFocusedPicker: true },
   ) => {
+    // Handle reset of focused picker
+    if ("resetFocusedPicker" in value) {
+      return {
+        elements,
+        appState: {
+          ...appState,
+          focusedArrowheadPicker: null,
+        },
+        captureUpdate: CaptureUpdateAction.NEVER,
+      };
+    }
+
     return {
       elements: changeProperty(elements, appState, (el) => {
         if (isLinearElement(el)) {
@@ -1659,6 +1673,8 @@ export const actionChangeArrowhead = register({
             )}
             onChange={(value) => updateData({ position: "start", type: value })}
             numberOfOptionsToAlwaysShow={4}
+            autoOpen={appState.focusedArrowheadPicker === "start"}
+            onAutoClose={() => updateData({ resetFocusedPicker: true })}
           />
           <IconPicker
             label="arrowhead_end"
@@ -1676,6 +1692,8 @@ export const actionChangeArrowhead = register({
             )}
             onChange={(value) => updateData({ position: "end", type: value })}
             numberOfOptionsToAlwaysShow={4}
+            autoOpen={appState.focusedArrowheadPicker === "end"}
+            onAutoClose={() => updateData({ resetFocusedPicker: true })}
           />
         </div>
       </fieldset>

@@ -196,6 +196,8 @@ export function IconPicker<T>({
   onChange,
   group = "",
   numberOfOptionsToAlwaysShow,
+  autoOpen = false,
+  onAutoClose,
 }: {
   label: string;
   value: T;
@@ -208,13 +210,42 @@ export function IconPicker<T>({
   onChange: (value: T) => void;
   numberOfOptionsToAlwaysShow?: number;
   group?: string;
+  autoOpen?: boolean;
+  onAutoClose?: () => void;
 }) {
   const [isActive, setActive] = React.useState(false);
   const rPickerButton = React.useRef<any>(null);
+  const wasAutoOpened = React.useRef(false);
+
+  // Auto-open the picker when autoOpen is true
+  useEffect(() => {
+    if (autoOpen && !isActive) {
+      setActive(true);
+      wasAutoOpened.current = true;
+    }
+  }, [autoOpen, isActive]);
+
+  const handleClose = () => {
+    setActive(false);
+    // Call onAutoClose if this picker was auto-opened
+    if (wasAutoOpened.current && onAutoClose) {
+      onAutoClose();
+      wasAutoOpened.current = false;
+    }
+  };
 
   return (
     <div>
-      <Popover.Root open={isActive} onOpenChange={(open) => setActive(open)}>
+      <Popover.Root
+        open={isActive}
+        onOpenChange={(open) => {
+          if (!open) {
+            handleClose();
+          } else {
+            setActive(open);
+          }
+        }}
+      >
         <Popover.Trigger
           name={group}
           type="button"
@@ -231,9 +262,7 @@ export function IconPicker<T>({
             value={value}
             label={label}
             onChange={onChange}
-            onClose={() => {
-              setActive(false);
-            }}
+            onClose={handleClose}
             numberOfOptionsToAlwaysShow={numberOfOptionsToAlwaysShow}
           />
         )}
