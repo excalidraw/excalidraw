@@ -13,6 +13,25 @@ export type ObsidianDeviceType = {
 
 let ObsidianDevice: ObsidianDeviceType | null = null;
 
+//zsviczian, my dirty little secrets. These are hacks I am not proud of...
+export let hostPlugin: any = null;
+
+export function destroyObsidianUtils() {
+  hostPlugin = null;
+}
+
+export function initializeObsidianUtils() {
+  //@ts-ignore
+  hostPlugin = app.plugins.plugins["obsidian-excalidraw-plugin"];
+}
+
+export function getHostPlugin() {
+  if (!hostPlugin) {
+    initializeObsidianUtils();
+  }
+  return hostPlugin;
+}
+
 export const getObsidianDeviceInfo = () => {
   if (ObsidianDevice) {
     return ObsidianDevice;
@@ -34,5 +53,15 @@ export const getDesktopUIMode = () => {
     return "tray";
   }
   const desktopUIMode = obsidianPlugin.settings.desktopUIMode;
-  return ["tray", "full", "compact"].includes(desktopUIMode) ? desktopUIMode : "tray";
+  return ["tray", "full", "compact"].includes(desktopUIMode)
+    ? desktopUIMode
+    : "tray";
 };
+
+export function getAreaLimit() {
+  return getHostPlugin().excalidrawConfig.areaLimit ?? 16777216;
+}
+
+export function getWidthHeightLimit() {
+  return getHostPlugin().excalidrawConfig.widthHeightLimit ?? 32767;
+}
