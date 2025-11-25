@@ -6,7 +6,7 @@ import {
   type LocalPoint,
 } from "@excalidraw/math";
 
-import { isBounds } from "@excalidraw/element";
+import { isBounds } from "@excalidraw/math";
 
 import type { Curve } from "@excalidraw/math";
 import type { LineSegment } from "@excalidraw/utils";

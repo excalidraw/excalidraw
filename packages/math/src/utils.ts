@@ -1,3 +1,5 @@
+import { Bounds } from "@excalidraw/element";
+
 export const PRECISION = 10e-5;
 
 export const clamp = (value: number, min: number, max: number) => {
@@ -31,3 +33,11 @@ export const isFiniteNumber = (value: any): value is number => {
 
 export const isCloseTo = (a: number, b: number, precision = PRECISION) =>
   Math.abs(a - b) < precision;
+
+export const isBounds = (box: unknown): box is Bounds =>
+  Array.isArray(box) &&
+  box.length === 4 &&
+  typeof box[0] === "number" &&
+  typeof box[1] === "number" &&
+  typeof box[2] === "number" &&
+  typeof box[3] === "number";
