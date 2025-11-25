@@ -2,6 +2,7 @@ import {
   TEXT_AUTOWRAP_THRESHOLD,
   getGridPoint,
   getFontString,
+  DRAGGING_THRESHOLD,
 } from "@excalidraw/common";
 
 import type {
@@ -13,7 +14,7 @@ import type {
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import { updateBoundElements } from "./binding";
+import { unbindBindingElement, updateBoundElements } from "./binding";
 import { getCommonBounds } from "./bounds";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { getBoundTextElement } from "./textElement";
@@ -102,9 +103,26 @@ export const dragSelectedElements = (
     gridSize,
   );
 
+  const elementsToUpdateIds = new Set(
+    Array.from(elementsToUpdate, (el) => el.id),
+  );
+
   elementsToUpdate.forEach((element) => {
-    updateElementCoords(pointerDownState, element, scene, adjustedOffset);
+    const isArrow = !isArrowElement(element);
+    const isStartBoundElementSelected =
+      isArrow ||
+      (element.startBinding
+        ? elementsToUpdateIds.has(element.startBinding.elementId)
+        : false);
+    const isEndBoundElementSelected =
+      isArrow ||
+      (element.endBinding
+        ? elementsToUpdateIds.has(element.endBinding.elementId)
+        : false);
+
     if (!isArrowElement(element)) {
+      updateElementCoords(pointerDownState, element, scene, adjustedOffset);
+
       // skip arrow labels since we calculate its position during render
       const textElement = getBoundTextElement(
         element,
@@ -121,6 +139,33 @@ export const dragSelectedElements = (
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: Array.from(elementsToUpdate),
       });
+    } else if (
+      // NOTE: Add a little initial drag to the arrow dragging when the arrow
+      // is the single element being dragged to avoid accidentally unbinding
+      // the arrow when the user just wants to select it.
+
+      elementsToUpdate.size > 1 ||
+      Math.max(Math.abs(adjustedOffset.x), Math.abs(adjustedOffset.y)) >
+        DRAGGING_THRESHOLD ||
+      (!element.startBinding && !element.endBinding)
+    ) {
+      updateElementCoords(pointerDownState, element, scene, adjustedOffset);
+
+      const shouldUnbindStart =
+        element.startBinding && !isStartBoundElementSelected;
+      const shouldUnbindEnd = element.endBinding && !isEndBoundElementSelected;
+      if (shouldUnbindStart || shouldUnbindEnd) {
+        // NOTE: Moving the bound arrow should unbind it, otherwise we would
+        // have weird situations, like 0 lenght arrow when the user moves
+        // the arrow outside a filled shape suddenly forcing the arrow start
+        // and end point to jump "outside" the shape.
+        if (shouldUnbindStart) {
+          unbindBindingElement(element, "start", scene);
+        }
+        if (shouldUnbindEnd) {
+          unbindBindingElement(element, "end", scene);
+        }
+      }
     }
   });
 };

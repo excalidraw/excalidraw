@@ -28,8 +28,6 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
-  PointBinding,
-  FixedPointBinding,
   ExcalidrawFlowchartNodeElement,
   ExcalidrawLinearElementSubType,
 } from "./types";
@@ -163,7 +161,7 @@ export const isLinearElementType = (
 export const isBindingElement = (
   element?: ExcalidrawElement | null,
   includeLocked = true,
-): element is ExcalidrawLinearElement => {
+): element is ExcalidrawArrowElement => {
   return (
     element != null &&
     (!element.locked || includeLocked === true) &&
@@ -356,15 +354,6 @@ export const getDefaultRoundnessTypeForElement = (
   }
 
   return null;
-};
-
-export const isFixedPointBinding = (
-  binding: PointBinding | FixedPointBinding,
-): binding is FixedPointBinding => {
-  return (
-    Object.hasOwn(binding, "fixedPoint") &&
-    (binding as FixedPointBinding).fixedPoint != null
-  );
 };
 
 // TODO: Move this to @excalidraw/math

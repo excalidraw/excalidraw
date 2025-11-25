@@ -1,4 +1,4 @@
-import { isTransparent } from "@excalidraw/common";
+import { invariant, isTransparent } from "@excalidraw/common";
 import {
   curveIntersectLineSegment,
   isPointWithinBounds,
@@ -34,10 +34,14 @@ import {
   elementCenterPoint,
   getCenterForBounds,
   getCubicBezierCurveBound,
+  getDiamondPoints,
   getElementBounds,
+  pointInsideBounds,
 } from "./bounds";
 import {
   hasBoundTextElement,
+  isBindableElement,
+  isFrameLikeElement,
   isFreeDrawElement,
   isIframeLikeElement,
   isImageElement,
@@ -58,12 +62,17 @@ import { distanceToElement } from "./distance";
 
 import type {
   ElementsMap,
+  ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+  Ordered,
 } from "./types";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
@@ -94,6 +103,7 @@ export type HitTestArgs = {
   threshold: number;
   elementsMap: ElementsMap;
   frameNameBound?: FrameNameBounds | null;
+  overrideShouldTestInside?: boolean;
 };
 
 export const hitElementItself = ({
@@ -102,6 +112,7 @@ export const hitElementItself = ({
   threshold,
   elementsMap,
   frameNameBound = null,
+  overrideShouldTestInside = false,
 }: HitTestArgs) => {
   // Hit test against a frame's name
   const hitFrameName = frameNameBound
@@ -134,7 +145,9 @@ export const hitElementItself = ({
   }
 
   // Do the precise (and relatively costly) hit test
-  const hitElement = shouldTestInside(element)
+  const hitElement = (
+    overrideShouldTestInside ? true : shouldTestInside(element)
+  )
     ? // Since `inShape` tests STRICTLY againt the insides of a shape
       // we would need `onShape` as well to include the "borders"
       isPointInElement(point, element, elementsMap) ||
@@ -191,6 +204,116 @@ export const hitElementBoundText = (
     : boundTextElementCandidate;
 
   return isPointInElement(point, boundTextElement, elementsMap);
+};
+
+const bindingBorderTest = (
+  element: NonDeleted<ExcalidrawBindableElement>,
+  [x, y]: Readonly<GlobalPoint>,
+  elementsMap: NonDeletedSceneElementsMap,
+  tolerance: number = 0,
+): boolean => {
+  const p = pointFrom<GlobalPoint>(x, y);
+  const shouldTestInside =
+    // disable fullshape snapping for frame elements so we
+    // can bind to frame children
+    !isFrameLikeElement(element);
+
+  // PERF: Run a cheap test to see if the binding element
+  // is even close to the element
+  const t = Math.max(1, tolerance);
+  const bounds = [x - t, y - t, x + t, y + t] as Bounds;
+  const elementBounds = getElementBounds(element, elementsMap);
+  if (!doBoundsIntersect(bounds, elementBounds)) {
+    return false;
+  }
+
+  // If the element is inside a frame, we should clip the element
+  if (element.frameId) {
+    const enclosingFrame = elementsMap.get(element.frameId);
+    if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
+      const enclosingFrameBounds = getElementBounds(
+        enclosingFrame,
+        elementsMap,
+      );
+      if (!pointInsideBounds(p, enclosingFrameBounds)) {
+        return false;
+      }
+    }
+  }
+
+  // Do the intersection test against the element since it's close enough
+  const intersections = intersectElementWithLineSegment(
+    element,
+    elementsMap,
+    lineSegment(elementCenterPoint(element, elementsMap), p),
+  );
+  const distance = distanceToElement(element, elementsMap, p);
+
+  return shouldTestInside
+    ? intersections.length === 0 || distance <= tolerance
+    : intersections.length > 0 && distance <= t;
+};
+
+export const getAllHoveredElementAtPoint = (
+  point: Readonly<GlobalPoint>,
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elementsMap: NonDeletedSceneElementsMap,
+  toleranceFn?: (element: ExcalidrawBindableElement) => number,
+): NonDeleted<ExcalidrawBindableElement>[] => {
+  const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
+  // We need to to hit testing from front (end of the array) to back (beginning of the array)
+  // because array is ordered from lower z-index to highest and we want element z-index
+  // with higher z-index
+  for (let index = elements.length - 1; index >= 0; --index) {
+    const element = elements[index];
+
+    invariant(
+      !element.isDeleted,
+      "Elements in the function parameter for getAllElementsAtPositionForBinding() should not contain deleted elements",
+    );
+
+    if (
+      isBindableElement(element, false) &&
+      bindingBorderTest(element, point, elementsMap, toleranceFn?.(element))
+    ) {
+      candidateElements.push(element);
+
+      if (!isTransparent(element.backgroundColor)) {
+        break;
+      }
+    }
+  }
+
+  return candidateElements;
+};
+
+export const getHoveredElementForBinding = (
+  point: Readonly<GlobalPoint>,
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elementsMap: NonDeletedSceneElementsMap,
+  toleranceFn?: (element: ExcalidrawBindableElement) => number,
+): NonDeleted<ExcalidrawBindableElement> | null => {
+  const candidateElements = getAllHoveredElementAtPoint(
+    point,
+    elements,
+    elementsMap,
+    toleranceFn,
+  );
+
+  if (!candidateElements || candidateElements.length === 0) {
+    return null;
+  }
+
+  if (candidateElements.length === 1) {
+    return candidateElements[0];
+  }
+
+  // Prefer smaller shapes
+  return candidateElements
+    .sort(
+      (a, b) => b.width ** 2 + b.height ** 2 - (a.width ** 2 + a.height ** 2),
+    )
+    .pop() as NonDeleted<ExcalidrawBindableElement>;
 };
 
 /**
@@ -553,4 +676,62 @@ export const isPointInElement = (
   ).filter((p, pos, arr) => arr.findIndex((q) => pointsEqual(q, p)) === pos);
 
   return intersections.length % 2 === 1;
+};
+
+export const isBindableElementInsideOtherBindable = (
+  innerElement: ExcalidrawBindableElement,
+  outerElement: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+): boolean => {
+  // Get corner points of the inner element based on its type
+  const getCornerPoints = (
+    element: ExcalidrawElement,
+    offset: number,
+  ): GlobalPoint[] => {
+    const { x, y, width, height, angle } = element;
+    const center = elementCenterPoint(element, elementsMap);
+
+    if (element.type === "diamond") {
+      // Diamond has 4 corner points at the middle of each side
+      const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
+        getDiamondPoints(element);
+      const corners: GlobalPoint[] = [
+        pointFrom(x + topX, y + topY - offset), // top
+        pointFrom(x + rightX + offset, y + rightY), // right
+        pointFrom(x + bottomX, y + bottomY + offset), // bottom
+        pointFrom(x + leftX - offset, y + leftY), // left
+      ];
+      return corners.map((corner) => pointRotateRads(corner, center, angle));
+    }
+    if (element.type === "ellipse") {
+      // For ellipse, test points at the extremes (top, right, bottom, left)
+      const cx = x + width / 2;
+      const cy = y + height / 2;
+      const rx = width / 2;
+      const ry = height / 2;
+      const corners: GlobalPoint[] = [
+        pointFrom(cx, cy - ry - offset), // top
+        pointFrom(cx + rx + offset, cy), // right
+        pointFrom(cx, cy + ry + offset), // bottom
+        pointFrom(cx - rx - offset, cy), // left
+      ];
+      return corners.map((corner) => pointRotateRads(corner, center, angle));
+    }
+    // Rectangle and other rectangular shapes (image, text, etc.)
+    const corners: GlobalPoint[] = [
+      pointFrom(x - offset, y - offset), // top-left
+      pointFrom(x + width + offset, y - offset), // top-right
+      pointFrom(x + width + offset, y + height + offset), // bottom-right
+      pointFrom(x - offset, y + height + offset), // bottom-left
+    ];
+    return corners.map((corner) => pointRotateRads(corner, center, angle));
+  };
+
+  const offset = (-1 * Math.max(innerElement.width, innerElement.height)) / 20; // 5% offset
+  const innerCorners = getCornerPoints(innerElement, offset);
+
+  // Check if all corner points of the inner element are inside the outer element
+  return innerCorners.every((corner) =>
+    isPointInElement(corner, outerElement, elementsMap),
+  );
 };

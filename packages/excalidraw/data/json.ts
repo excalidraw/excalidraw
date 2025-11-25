@@ -6,11 +6,6 @@ import {
   VERSIONS,
 } from "@excalidraw/common";
 
-import {
-  clearElementsForDatabase,
-  clearElementsForExport,
-} from "@excalidraw/element";
-
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
@@ -57,10 +52,7 @@ export const serializeAsJSON = (
     type: EXPORT_DATA_TYPES.excalidraw,
     version: VERSIONS.excalidraw,
     source: getExportSource(),
-    elements:
-      type === "local"
-        ? clearElementsForExport(elements)
-        : clearElementsForDatabase(elements),
+    elements,
     appState:
       type === "local"
         ? cleanAppStateForExport(appState)

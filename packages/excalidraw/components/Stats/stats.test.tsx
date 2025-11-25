@@ -114,7 +114,7 @@ describe("binding with linear elements", () => {
     mouse.up(200, 100);
 
     UI.clickTool("arrow");
-    mouse.down(5, 0);
+    mouse.down(-5, 0);
     mouse.up(300, 50);
 
     elementStats = stats?.querySelector("#elementStats");
@@ -135,18 +135,7 @@ describe("binding with linear elements", () => {
     ) as HTMLInputElement;
     expect(linear.startBinding).not.toBe(null);
     expect(inputX).not.toBeNull();
-    UI.updateInput(inputX, String("204"));
-    expect(linear.startBinding).not.toBe(null);
-  });
-
-  it("should remain bound to linear element on small angle change", async () => {
-    const linear = h.elements[1] as ExcalidrawLinearElement;
-    const inputAngle = UI.queryStatsProperty("A")?.querySelector(
-      ".drag-input",
-    ) as HTMLInputElement;
-
-    expect(linear.startBinding).not.toBe(null);
-    UI.updateInput(inputAngle, String("1"));
+    UI.updateInput(inputX, String("186"));
     expect(linear.startBinding).not.toBe(null);
   });
 
@@ -159,17 +148,6 @@ describe("binding with linear elements", () => {
     expect(linear.startBinding).not.toBe(null);
     expect(inputX).not.toBeNull();
     UI.updateInput(inputX, String("254"));
-    expect(linear.startBinding).toBe(null);
-  });
-
-  it("should remain bound to linear element on small angle change", async () => {
-    const linear = h.elements[1] as ExcalidrawLinearElement;
-    const inputAngle = UI.queryStatsProperty("A")?.querySelector(
-      ".drag-input",
-    ) as HTMLInputElement;
-
-    expect(linear.startBinding).not.toBe(null);
-    UI.updateInput(inputAngle, String("45"));
     expect(linear.startBinding).toBe(null);
   });
 });

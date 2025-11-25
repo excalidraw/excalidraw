@@ -31,7 +31,9 @@ import "../components/ToolIcon.scss";
 
 import { register } from "./register";
 
-export const actionChangeProjectName = register({
+import type { AppState } from "../types";
+
+export const actionChangeProjectName = register<AppState["name"]>({
   name: "changeProjectName",
   label: "labels.fileTitle",
   trackEvent: false,
@@ -51,7 +53,7 @@ export const actionChangeProjectName = register({
   ),
 });
 
-export const actionChangeExportScale = register({
+export const actionChangeExportScale = register<AppState["exportScale"]>({
   name: "changeExportScale",
   label: "imageExportDialog.scale",
   trackEvent: { category: "export", action: "scale" },
@@ -101,7 +103,9 @@ export const actionChangeExportScale = register({
   },
 });
 
-export const actionChangeExportBackground = register({
+export const actionChangeExportBackground = register<
+  AppState["exportBackground"]
+>({
   name: "changeExportBackground",
   label: "imageExportDialog.label.withBackground",
   trackEvent: { category: "export", action: "toggleBackground" },
@@ -121,7 +125,9 @@ export const actionChangeExportBackground = register({
   ),
 });
 
-export const actionChangeExportEmbedScene = register({
+export const actionChangeExportEmbedScene = register<
+  AppState["exportEmbedScene"]
+>({
   name: "changeExportEmbedScene",
   label: "imageExportDialog.tooltip.embedScene",
   trackEvent: { category: "export", action: "embedScene" },
@@ -288,7 +294,9 @@ export const actionLoadScene = register({
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
 });
 
-export const actionExportWithDarkMode = register({
+export const actionExportWithDarkMode = register<
+  AppState["exportWithDarkMode"]
+>({
   name: "exportWithDarkMode",
   label: "imageExportDialog.label.darkMode",
   trackEvent: { category: "export", action: "toggleTheme" },
