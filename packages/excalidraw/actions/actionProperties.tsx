@@ -1,3 +1,4 @@
+import { isValidHexColor } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -371,21 +372,38 @@ export const actionChangeBackgroundColor = register({
   label: "labels.changeBackground",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    if (!value.currentItemBackgroundColor) {
+    const val = value as any;
+    const effectiveValue = typeof val === "string" 
+      ? { currentItemBackgroundColor: val } 
+      : val;
+
+    const colorToCheck = effectiveValue.currentItemBackgroundColor;
+
+    if (colorToCheck && !isValidHexColor(colorToCheck)) {
+      return { 
+        elements, 
+        appState, 
+        commitToHistory: false,
+        captureUpdate: CaptureUpdateAction.NEVER, 
+      };
+    }
+    
+    if (!effectiveValue.currentItemBackgroundColor) {
       return {
         appState: {
           ...appState,
-          ...value,
+          ...effectiveValue,
         },
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
+        elements,
+        commitToHistory: false,
       };
     }
 
     let nextElements;
-
     const selectedElements = app.scene.getSelectedElements(appState);
     const shouldEnablePolygon =
-      !isTransparent(value.currentItemBackgroundColor) &&
+      !isTransparent(effectiveValue.currentItemBackgroundColor) &&
       selectedElements.every(
         (el) => isLineElement(el) && canBecomePolygon(el.points),
       );
@@ -395,7 +413,7 @@ export const actionChangeBackgroundColor = register({
       nextElements = elements.map((el) => {
         if (selectedElementsMap.has(el.id) && isLineElement(el)) {
           return newElementWith(el, {
-            backgroundColor: value.currentItemBackgroundColor,
+            backgroundColor: effectiveValue.currentItemBackgroundColor,
             ...toggleLinePolygonState(el, true),
           });
         }
@@ -404,7 +422,7 @@ export const actionChangeBackgroundColor = register({
     } else {
       nextElements = changeProperty(elements, appState, (el) =>
         newElementWith(el, {
-          backgroundColor: value.currentItemBackgroundColor,
+          backgroundColor: effectiveValue.currentItemBackgroundColor,
         }),
       );
     }
@@ -413,9 +431,10 @@ export const actionChangeBackgroundColor = register({
       elements: nextElements,
       appState: {
         ...appState,
-        ...value,
+        ...effectiveValue,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      commitToHistory: true,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => {

@@ -2886,7 +2886,7 @@ exports[`regression tests > change the properties of a shape > [end of test] app
 
 exports[`regression tests > change the properties of a shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > change the properties of a shape > [end of test] number of renders 1`] = `9`;
+exports[`regression tests > change the properties of a shape > [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests > change the properties of a shape > [end of test] redo stack 1`] = `[]`;
 
@@ -7504,7 +7504,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
 
 exports[`regression tests > given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection > [end of test] number of renders 1`] = `12`;
+exports[`regression tests > given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection > [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests > given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection > [end of test] redo stack 1`] = `[]`;
 
