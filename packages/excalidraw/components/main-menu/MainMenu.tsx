@@ -60,6 +60,7 @@ const MainMenu = Object.assign(
               }
             >
               {children}
+              <DefaultItems.LanguageSetting />
               {editorInterface.formFactor === "phone" &&
                 appState.collaborators.size > 0 && (
                   <fieldset className="UserList-Wrapper">
