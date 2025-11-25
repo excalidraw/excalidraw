@@ -607,6 +607,7 @@ class App extends React.Component<AppProps, AppState> {
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
   private iFrameRefs = new Map<ExcalidrawElement["id"], HTMLIFrameElement>();
+  public initialAppState: Partial<AppState> | null = null;
   /**
    * Indicates whether the embeddable's url has been validated for rendering.
    * If value not set, indicates that the validation is pending.
@@ -2424,6 +2425,8 @@ class App extends React.Component<AppProps, AppState> {
       };
     }
 
+    this.initialAppState = scene.appState;
+
     this.resetStore();
     this.resetHistory();
     this.syncActionResult({
@@ -2558,6 +2561,12 @@ class App extends React.Component<AppProps, AppState> {
         fonts: {
           configurable: true,
           value: this.fonts,
+        },
+        initialAppState: {
+          configurable: true,
+          get: () => {
+            return this.initialAppState;
+          },
         },
       });
     }
@@ -11477,6 +11486,7 @@ declare global {
       app: InstanceType<typeof App>;
       history: History;
       store: Store;
+      initialAppState: Partial<AppState> | null;
     };
   }
 }
