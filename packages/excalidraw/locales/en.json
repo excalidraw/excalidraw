@@ -237,7 +237,8 @@
     "publishLibrary": "Rename or publish",
     "submit": "Submit",
     "confirm": "Confirm",
-    "embeddableInteractionButton": "Click to interact"
+    "embeddableInteractionButton": "Click to interact",
+    "exportToPDF": "Export to PDF"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",
