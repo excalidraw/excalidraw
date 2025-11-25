@@ -365,6 +365,14 @@ export const ArrowIcon = createIcon(
   tablerIconProps,
 );
 
+export const ArrowDownIcon = createIcon(
+  <g strokeWidth="1.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 9l6 6 6-6" />
+  </g>,
+  tablerIconProps,
+);
+
+
 // custom?
 export const LineIcon = createIcon(
   <path d="M4.167 10h11.666" strokeWidth="1.5" />,
