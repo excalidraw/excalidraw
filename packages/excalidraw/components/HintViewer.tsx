@@ -70,6 +70,12 @@ const getHints = ({
       });
     }
     if (activeTool.type === "arrow") {
+      if (appState.suggestedBinding) {
+        return t("hints.arrowBindModifiers", {
+          shortcut_1: getTaggedShortcutKey("Ctrl"),
+          shortcut_2: getTaggedShortcutKey("Alt"),
+        });
+      }
       return t("hints.arrowTool", {
         shortcut: getTaggedShortcutKey("A"),
       });
