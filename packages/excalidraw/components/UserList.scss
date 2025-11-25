@@ -1,4 +1,4 @@
-@import "../css/variables.module.scss";
+@use "../css/variables.module.scss";
 
 .excalidraw {
   --avatar-size: 1.75rem;
@@ -49,7 +49,7 @@
   }
 
   .UserList__more {
-    @include avatarStyles;
+    @include variables.avatarStyles;
     background-color: var(--color-gray-20);
     border: 0 !important;
     font-size: 0.625rem;

@@ -305,6 +305,7 @@ export const SelectedShapeActions = ({
               renderAction("deleteSelectedElements")}
             {renderAction("group")}
             {renderAction("ungroup")}
+            {renderAction("vennDiagram")}
             {showLinkIcon && renderAction("hyperlink")}
             {showCropEditorAction && renderAction("cropEditor")}
             {showLineEditorAction && renderAction("toggleLinearEditor")}
@@ -479,8 +480,8 @@ const CombinedArrowProperties = ({
                     return element.elbowed
                       ? "elbow"
                       : element.roundness
-                      ? "round"
-                      : "sharp";
+                        ? "round"
+                        : "sharp";
                   }
                   return null;
                 },
@@ -744,6 +745,7 @@ const CombinedExtraActions = ({
                 <div className="buttonList">
                   {renderAction("group")}
                   {renderAction("ungroup")}
+                  {renderAction("vennDiagram")}
                   {showLinkIcon && renderAction("hyperlink")}
                   {showCropEditorAction && renderAction("cropEditor")}
                   {showDuplicate && renderAction("duplicateSelection")}
@@ -1199,12 +1201,12 @@ export const ShapesSwitcher = ({
           {frameToolSelected
             ? frameToolIcon
             : embeddableToolSelected
-            ? EmbedIcon
-            : laserToolSelected && !app.props.isCollaborating
-            ? laserPointerToolIcon
-            : lassoToolSelected
-            ? LassoIcon
-            : extraToolsIcon}
+              ? EmbedIcon
+              : laserToolSelected && !app.props.isCollaborating
+                ? laserPointerToolIcon
+                : lassoToolSelected
+                  ? LassoIcon
+                  : extraToolsIcon}
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           onClickOutside={() => setIsExtraToolsMenuOpen(false)}

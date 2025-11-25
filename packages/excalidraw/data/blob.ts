@@ -1,3 +1,4 @@
+/* eslint-disable no-async-promise-executor */
 import { nanoid } from "nanoid";
 
 import {
@@ -315,7 +316,7 @@ export const resizeImageFile = async (
   file: File,
   opts: {
     /** undefined indicates auto */
-    outputType?: typeof MIME_TYPES["jpg"];
+    outputType?: (typeof MIME_TYPES)["jpg"];
     maxWidthOrHeight: number;
   },
 ): Promise<File> => {
@@ -352,7 +353,7 @@ export const resizeImageFile = async (
   }
 
   return new File(
-    [await reduce.toBlob(file, { max: opts.maxWidthOrHeight, alpha: true })],
+    [await reduce.toBlob(file, { max: opts.maxWidthOrHeight })],
     file.name,
     {
       type: opts.outputType || file.type,
@@ -373,7 +374,7 @@ export const ImageURLToFile = async (
   let response;
   try {
     response = await fetch(imageUrl);
-  } catch (error: any) {
+  } catch {
     throw new Error("Error: failed to fetch image", { cause: "FETCH_ERROR" });
   }
 

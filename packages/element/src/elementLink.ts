@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Create and link between shapes.
  */
@@ -98,7 +99,9 @@ export const parseElementLinkFromURL = (url: string) => {
       const id = searchParams.get(ELEMENT_LINK_KEY);
       return id;
     }
-  } catch {}
+  } catch {
+    // ignore invalid URLs
+  }
 
   return null;
 };
