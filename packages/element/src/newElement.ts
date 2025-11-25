@@ -49,6 +49,7 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
 } from "./types";
+import SnappingManager from "./SnappingManager";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,

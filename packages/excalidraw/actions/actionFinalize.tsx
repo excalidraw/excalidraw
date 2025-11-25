@@ -137,6 +137,7 @@ export const actionFinalize = register({
               : undefined,
           appState: {
             ...appState,
+            selectionElement: null,
             cursorButton: "up",
             selectedLinearElement: new LinearElementEditor(
               element,
