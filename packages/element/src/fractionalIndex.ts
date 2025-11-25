@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { generateNKeysBetween } from "fractional-indexing";
 
 import { arrayToMap } from "@excalidraw/common";

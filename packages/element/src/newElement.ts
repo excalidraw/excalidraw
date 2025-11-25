@@ -230,8 +230,8 @@ const getTextElementPositionOffsets = (
       opts.textAlign === "center"
         ? metrics.width / 2
         : opts.textAlign === "right"
-        ? metrics.width
-        : 0,
+          ? metrics.width
+          : 0,
     y: opts.verticalAlign === "middle" ? metrics.height / 2 : 0,
   };
 };

@@ -1,20 +1,17 @@
 import {
-  fileOpen as _fileOpen,
-  fileSave as _fileSave,
   supported as nativeFileSystemSupported,
+  type FileSystemHandle,
 } from "browser-fs-access";
 
-import { EVENT, MIME_TYPES, debounce } from "@excalidraw/common";
+import { MIME_TYPES } from "@excalidraw/common";
 
 import { AbortError } from "../errors";
 
 import { normalizeFile } from "./blob";
 
-import type { FileSystemHandle } from "browser-fs-access";
+import { openFileSafe, saveFileSafe } from "./fs-adapter";
 
 type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
-
-const INPUT_CHANGE_INTERVAL_MS = 5000;
 
 export const fileOpen = async <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
@@ -37,46 +34,17 @@ export const fileOpen = async <M extends boolean | undefined = false>(opts: {
     return acc.concat(`.${ext}`);
   }, [] as string[]);
 
-  const files = await _fileOpen({
+  const files = await openFileSafe({
     description: opts.description,
     extensions,
     mimeTypes,
     multiple: opts.multiple ?? false,
-    legacySetup: (resolve, reject, input) => {
-      const scheduleRejection = debounce(reject, INPUT_CHANGE_INTERVAL_MS);
-      const focusHandler = () => {
-        checkForFile();
-        document.addEventListener(EVENT.KEYUP, scheduleRejection);
-        document.addEventListener(EVENT.POINTER_UP, scheduleRejection);
-        scheduleRejection();
-      };
-      const checkForFile = () => {
-        // this hack might not work when expecting multiple files
-        if (input.files?.length) {
-          const ret = opts.multiple ? [...input.files] : input.files[0];
-          resolve(ret as RetType);
-        }
-      };
-      requestAnimationFrame(() => {
-        window.addEventListener(EVENT.FOCUS, focusHandler);
-      });
-      const interval = window.setInterval(() => {
-        checkForFile();
-      }, INPUT_CHANGE_INTERVAL_MS);
-      return (rejectPromise) => {
-        clearInterval(interval);
-        scheduleRejection.cancel();
-        window.removeEventListener(EVENT.FOCUS, focusHandler);
-        document.removeEventListener(EVENT.KEYUP, scheduleRejection);
-        document.removeEventListener(EVENT.POINTER_UP, scheduleRejection);
-        if (rejectPromise) {
-          // so that something is shown in console if we need to debug this
-          console.warn("Opening the file was canceled (legacy-fs).");
-          rejectPromise(new AbortError());
-        }
-      };
-    },
   });
+
+  // User canceled - throw AbortError to maintain backward compatibility
+  if (files === null) {
+    throw new AbortError();
+  }
 
   if (Array.isArray(files)) {
     return (await Promise.all(
@@ -86,7 +54,7 @@ export const fileOpen = async <M extends boolean | undefined = false>(opts: {
   return (await normalizeFile(files)) as RetType;
 };
 
-export const fileSave = (
+export const fileSave = async (
   blob: Blob | Promise<Blob>,
   opts: {
     /** supply without the extension */
@@ -99,7 +67,7 @@ export const fileSave = (
     fileHandle?: FileSystemHandle | null;
   },
 ) => {
-  return _fileSave(
+  const handle = await saveFileSafe(
     blob,
     {
       fileName: `${opts.name}.${opts.extension}`,
@@ -109,6 +77,10 @@ export const fileSave = (
     },
     opts.fileHandle,
   );
+
+  // User canceled - return null to maintain backward compatibility
+  // Caller can check for null to detect cancel
+  return handle;
 };
 
 export { nativeFileSystemSupported };

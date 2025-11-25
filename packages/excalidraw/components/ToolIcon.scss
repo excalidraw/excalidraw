@@ -1,5 +1,5 @@
-@import "open-color/open-color.scss";
-@import "../css/variables.module.scss";
+@use "open-color/open-color.scss";
+@use "../css/variables.module.scss";
 
 .excalidraw {
   .ToolIcon {
@@ -15,7 +15,7 @@
       display: none !important;
     }
 
-    @include toolbarButtonColorStates;
+    @include variables.toolbarButtonColorStates;
   }
 
   .ToolIcon--plain {

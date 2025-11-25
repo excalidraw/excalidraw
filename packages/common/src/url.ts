@@ -11,7 +11,7 @@ export const normalizeLink = (link: string) => {
 };
 
 export const isLocalLink = (link: string | null) => {
-  return !!(link?.includes(location.origin) || link?.startsWith("/"));
+  return !!(link?.includes(window.location.origin) || link?.startsWith("/"));
 };
 
 /**
@@ -23,7 +23,7 @@ export const toValidURL = (link: string) => {
 
   // make relative links into fully-qualified urls
   if (link.startsWith("/")) {
-    return `${location.origin}${link}`;
+    return `${window.location.origin}${link}`;
   }
 
   try {

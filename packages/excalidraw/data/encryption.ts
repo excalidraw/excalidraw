@@ -54,14 +54,17 @@ export const encryptData = async (
   const importedKey =
     typeof key === "string" ? await getCryptoKey(key, "encrypt") : key;
   const iv = createIV();
-  const buffer: ArrayBuffer | Uint8Array =
-    typeof data === "string"
-      ? new TextEncoder().encode(data)
-      : data instanceof Uint8Array
-      ? data
-      : data instanceof Blob
-      ? await blobToArrayBuffer(data)
-      : data;
+  let buffer: ArrayBuffer | Uint8Array;
+
+  if (typeof data === "string") {
+    buffer = new TextEncoder().encode(data);
+  } else if (data instanceof Uint8Array) {
+    buffer = data;
+  } else if (data instanceof Blob) {
+    buffer = await blobToArrayBuffer(data);
+  } else {
+    buffer = data;
+  }
 
   // We use symmetric encryption. AES-GCM is the recommended algorithm and
   // includes checks that the ciphertext has not been modified by an attacker.
@@ -71,7 +74,7 @@ export const encryptData = async (
       iv,
     },
     importedKey,
-    buffer as ArrayBuffer | Uint8Array,
+    buffer as BufferSource,
   );
 
   return { encryptedBuffer, iv };
@@ -79,16 +82,16 @@ export const encryptData = async (
 
 export const decryptData = async (
   iv: Uint8Array,
-  encrypted: Uint8Array | ArrayBuffer,
+  encrypted: ArrayBuffer | Uint8Array,
   privateKey: string,
 ): Promise<ArrayBuffer> => {
   const key = await getCryptoKey(privateKey, "decrypt");
   return window.crypto.subtle.decrypt(
     {
       name: "AES-GCM",
-      iv,
+      iv: iv as BufferSource,
     },
     key,
-    encrypted,
+    encrypted as BufferSource,
   );
 };

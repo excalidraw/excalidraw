@@ -1,3 +1,4 @@
+/* eslint-disable no-loss-of-precision */
 export const PRECISION = 10e-5;
 
 // Legendre-Gauss abscissae (x values) and weights for n=24

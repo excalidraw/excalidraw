@@ -1,4 +1,4 @@
-@import "../css/variables.module.scss";
+@use "../css/variables.module.scss";
 
 // this is loosely based on the longest hint text
 $wide-viewport-width: 1000px;
@@ -20,7 +20,7 @@ $wide-viewport-width: 1000px;
     color: var(--color-gray-40);
     font-size: 0.75rem;
 
-    @include isMobile {
+    @include variables.isMobile {
       position: static;
       padding-right: 2rem;
     }

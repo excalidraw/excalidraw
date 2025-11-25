@@ -46,7 +46,7 @@ export const exportToExcalidrawPlus = async (
   );
 
   const blob = new Blob(
-    [encryptedData.iv, new Uint8Array(encryptedData.encryptedBuffer)],
+    [encryptedData.iv.buffer as ArrayBuffer, encryptedData.encryptedBuffer],
     {
       type: MIME_TYPES.binary,
     },
