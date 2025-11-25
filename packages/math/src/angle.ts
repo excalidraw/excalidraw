@@ -1,5 +1,7 @@
 import { PRECISION } from "./utils";
 
+import { vectorFromPoint, vectorDot } from "./vector";
+
 import type {
   Degrees,
   GlobalPoint,
@@ -75,3 +77,35 @@ export function radiansDifference(a: Radians, b: Radians): Radians {
 
   return Math.abs(diff) as Radians;
 }
+/** * Calculates the angle between three points in radians.
+ * The angle is calculated at the first point (p0) using the second (p1) and third (p2) points.
+ * The angle is measured in radians and is always positive.
+ * The function uses the dot product and the arccosine function to calculate the angle. * The result is clamped to the range [-1, 1] to avoid precision errors.
+ * @param p0 The first point used to form the angle.
+ * @param p1 The vertex point where the angle is calculated.
+ * @param p2 The second point used to form the angle.
+ * @returns The angle in radians between the three points.
+ **/
+
+export const angleBetween = <P extends GlobalPoint | LocalPoint>(
+  p0: P,
+  p1: P,
+  p2: P,
+): Radians => {
+  const v1 = vectorFromPoint(p0, p1);
+  const v2 = vectorFromPoint(p1, p2);
+
+  // dot and cross product
+  const magnitude1 = Math.hypot(v1[0], v1[1]);
+  const magnitude2 = Math.hypot(v2[0], v2[1]);
+  if (magnitude1 === 0 || magnitude2 === 0) {
+    return 0 as Radians;
+  }
+
+  const dot = vectorDot(v1, v2);
+
+  let cos = dot / (magnitude1 * magnitude2);
+  // Clamp cos to [-1,1] to avoid precision errors
+  cos = Math.max(-1, Math.min(1, cos));
+  return Math.acos(cos) as Radians;
+};

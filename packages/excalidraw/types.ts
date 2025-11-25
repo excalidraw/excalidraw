@@ -342,6 +342,7 @@ export interface AppState {
   currentHoveredFontFamily: FontFamilyValues | null;
   currentItemRoundness: StrokeRoundness;
   currentItemArrowType: "sharp" | "round" | "elbow";
+  isConvertToShapeEnabled: boolean;
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
@@ -954,3 +955,17 @@ export type Offsets = Partial<{
   bottom: number;
   left: number;
 }>;
+
+export type ShapeDetectionType =
+  | "rectangle"
+  | "ellipse"
+  | "diamond"
+  | "arrow"
+  | "line"
+  | "freedraw";
+
+export interface ShapeDetectionResult {
+  type: ShapeDetectionType;
+  points: readonly (readonly [number, number])[];
+  confidence: number;
+}

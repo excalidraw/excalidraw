@@ -138,6 +138,7 @@ import {
   isArrowElement,
   isBindingElement,
   isBindingElementType,
+  isFreeDrawElementType,
   isBoundToContainer,
   isFrameLikeElement,
   isImageElement,
@@ -237,6 +238,9 @@ import {
   hitElementBoundingBox,
   isLineElement,
   isSimpleArrow,
+  convertToShape,
+  maybeBindLinearElement,
+  isFreeDrawElement,
   StoreDelta,
   type ApplyToOptions,
   positionElementsOnGrid,
@@ -5982,10 +5986,14 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    if (isBindingElementType(this.state.activeTool.type)) {
+    if (
+      isBindingElementType(this.state.activeTool.type) ||
+      isFreeDrawElementType(this.state.activeTool.type)
+    ) {
       // Hovering with a selected tool or creating new linear element via click
       // and point
       const { newElement } = this.state;
+
       if (isBindingElement(newElement, false)) {
         this.setState({
           suggestedBindings: maybeSuggestBindingsForLinearElementAtCoords(
@@ -5996,6 +6004,24 @@ class App extends React.Component<AppProps, AppState> {
             this.state.startBoundElement,
           ),
         });
+      } else if (newElement && isFreeDrawElement(newElement)) {
+        const detectedElement = convertToShape(newElement);
+        if (isBindingElement(detectedElement, false)) {
+          const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            detectedElement,
+            1,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          this.setState({
+            suggestedBindings: maybeSuggestBindingsForLinearElementAtCoords(
+              detectedElement,
+              [{ x, y }],
+              this.scene,
+              this.state.zoom,
+              this.state.startBoundElement,
+            ),
+          });
+        }
       } else {
         this.maybeSuggestBindingAtCursor(scenePointer, false);
       }
@@ -9353,6 +9379,45 @@ class App extends React.Component<AppProps, AppState> {
           pressures,
           lastCommittedPoint: pointFrom<LocalPoint>(dx, dy),
         });
+
+        if (this.state.isConvertToShapeEnabled) {
+          const detectedElement = convertToShape(newElement);
+
+          if (detectedElement !== newElement) {
+            if (detectedElement.type === "arrow") {
+              const [x, y] =
+                LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                  detectedElement,
+                  1,
+                  this.scene.getNonDeletedElementsMap(),
+                );
+
+              maybeBindLinearElement(
+                detectedElement,
+                this.state,
+                { x, y },
+                this.scene,
+              );
+
+              this.scene.mutateElement(detectedElement, {
+                startArrowhead: this.state.currentItemStartArrowhead,
+                endArrowhead: this.state.currentItemEndArrowhead,
+              });
+            }
+
+            this.scene.replaceAllElements([
+              ...this.scene
+                .getElementsIncludingDeleted()
+                .filter((el) => el.id !== newElement.id),
+              detectedElement,
+            ]);
+
+            makeNextSelectedElementIds(
+              { [detectedElement.id]: true },
+              this.state,
+            );
+          }
+        }
 
         this.actionManager.executeAction(actionFinalize);
 
