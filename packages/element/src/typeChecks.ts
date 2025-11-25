@@ -240,7 +240,11 @@ export const isTextBindableContainer = (
     (element.type === "rectangle" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
-      isArrowElement(element))
+      element.type === "image" ||
+      element.type === "frame" ||
+      element.type === "magicframe" ||
+      isArrowElement(element) ||
+      isLineElement(element))
   );
 };
 

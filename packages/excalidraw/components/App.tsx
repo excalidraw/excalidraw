@@ -238,6 +238,7 @@ import {
   isLineElement,
   isSimpleArrow,
   StoreDelta,
+  getElementBounds,
   type ApplyToOptions,
   positionElementsOnGrid,
 } from "@excalidraw/element";
@@ -4492,6 +4493,9 @@ class App extends React.Component<AppProps, AppState> {
           updateBoundElements(element, this.scene, {
             simultaneouslyUpdated: selectedElements,
           });
+          
+          // Update edge-positioned text associated with this element
+          this.updateEdgePositionedText(element);
         });
 
         this.setState({
@@ -5294,7 +5298,6 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.getNonDeletedElementsMap(),
       );
       if (
-        isArrowElement(elements[index]) &&
         hitElementItself({
           point: pointFrom(x, y),
           element: elements[index],
@@ -5304,14 +5307,212 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         hitElement = elements[index];
         break;
-      } else if (x1 < x && x < x2 && y1 < y && y < y2) {
-        hitElement = elements[index];
-        break;
       }
     }
 
     return isTextBindableContainer(hitElement, false) ? hitElement : null;
   }
+
+  private updateEdgePositionedText = (movedElement: ExcalidrawElement) => {
+    const elements = this.scene.getNonDeletedElements();
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+    
+    elements.forEach(element => {
+      if (element.type === "text" && element.customData?.associatedShapeId === movedElement.id) {
+        const edgePosition = element.customData.edgePosition;
+        const textPosition = this.getTextPositionAtEdge(
+          movedElement as ExcalidrawTextContainer,
+          edgePosition,
+          element.width,
+          element.height
+        );
+        
+        this.scene.mutateElement(element, {
+          x: textPosition.x,
+          y: textPosition.y,
+        });
+      }
+    });
+  };
+
+  private detectClickedEdge = (
+    container: ExcalidrawTextContainer,
+    clickX: number,
+    clickY: number,
+  ): 'top' | 'bottom' | 'left' | 'right' | 'center' => {
+    const { x, y, width, height } = container;
+    const centerX = x + width / 2;
+    const centerY = y + height / 2;
+    
+    // Calculate distances from click point to each edge
+    const distanceToTop = Math.abs(clickY - y);
+    const distanceToBottom = Math.abs(clickY - (y + height));
+    const distanceToLeft = Math.abs(clickX - x);
+    const distanceToRight = Math.abs(clickX - (x + width));
+    
+    // Calculate distance to center
+    const distanceToCenter = Math.sqrt(
+      Math.pow(clickX - centerX, 2) + Math.pow(clickY - centerY, 2)
+    );
+    
+    console.log('Edge detection:', {
+      container: container.type,
+      click: { x: clickX, y: clickY },
+      containerBounds: { x, y, width, height },
+      center: { x: centerX, y: centerY },
+      distances: { top: distanceToTop, bottom: distanceToBottom, left: distanceToLeft, right: distanceToRight, center: distanceToCenter }
+    });
+    
+    // If click is very close to center, use center positioning
+    if (distanceToCenter < Math.min(width, height) * 0.3) {
+      console.log('Using center positioning');
+      return 'center';
+    }
+    
+    // Find the closest edge
+    const minDistance = Math.min(
+      distanceToTop,
+      distanceToBottom,
+      distanceToLeft,
+      distanceToRight
+    );
+    
+    let edge: 'top' | 'bottom' | 'left' | 'right' | 'center' = 'center';
+    if (minDistance === distanceToTop) edge = 'top';
+    else if (minDistance === distanceToBottom) edge = 'bottom';
+    else if (minDistance === distanceToLeft) edge = 'left';
+    else if (minDistance === distanceToRight) edge = 'right';
+    
+    console.log('Detected edge:', edge);
+    return edge;
+  };
+
+  private getTextPositionAtEdge = (
+    container: ExcalidrawTextContainer,
+    edge: 'top' | 'bottom' | 'left' | 'right' | 'center',
+    textWidth: number = 100,
+    textHeight: number = 20,
+  ): { x: number; y: number } => {
+    const padding = 10; // Distance from edge
+    
+    switch (edge) {
+      case 'top':
+        return {
+          x: container.x + container.width / 2,
+          y: container.y - textHeight - padding,
+        };
+      case 'bottom':
+        return {
+          x: container.x + container.width / 2,
+          y: container.y + container.height + padding,
+        };
+      case 'left':
+        return {
+          x: container.x - textWidth - padding,
+          y: container.y + container.height / 2,
+        };
+      case 'right':
+        return {
+          x: container.x + container.width + padding,
+          y: container.y + container.height / 2,
+        };
+      case 'center':
+      default:
+        // Center text within the shape bounds
+        return {
+          x: container.x + container.width / 2 - textWidth / 2,
+          y: container.y + container.height / 2 - textHeight / 2,
+        };
+    }
+  };
+
+  private findOptimalTextPosition = (
+    sceneX: number,
+    sceneY: number,
+    fontSize: number = this.state.currentItemFontSize,
+  ): { x: number; y: number } => {
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+    const elements = this.scene.getNonDeletedElements();
+    
+    // Estimate text dimensions (approximate)
+    const estimatedTextWidth = fontSize * 4; // Rough estimate
+    const estimatedTextHeight = fontSize * 1.2;
+    
+    // Check for collisions with nearby elements
+    const collisionMargin = 10; // Minimum distance from other elements
+    
+    // Try the original position first
+    let bestX = sceneX;
+    let bestY = sceneY;
+    
+    // Check if there's a collision at the original position
+    const hasCollision = elements.some(element => {
+      if (element.type === "text") return false; // Don't avoid other text elements
+      
+      const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
+      
+      // Check if text bounds would overlap with element bounds
+      const textLeft = bestX - estimatedTextWidth / 2;
+      const textRight = bestX + estimatedTextWidth / 2;
+      const textTop = bestY - estimatedTextHeight / 2;
+      const textBottom = bestY + estimatedTextHeight / 2;
+      
+      return !(
+        textRight < x1 - collisionMargin ||
+        textLeft > x2 + collisionMargin ||
+        textBottom < y1 - collisionMargin ||
+        textTop > y2 + collisionMargin
+      );
+    });
+    
+    if (!hasCollision) {
+      return { x: bestX, y: bestY };
+    }
+    
+    // If there's a collision, try to find a nearby position
+    const searchRadius = 50;
+    const stepSize = 20;
+    
+    for (let radius = stepSize; radius <= searchRadius; radius += stepSize) {
+      const positions = [
+        { x: sceneX + radius, y: sceneY }, // Right
+        { x: sceneX - radius, y: sceneY }, // Left
+        { x: sceneX, y: sceneY - radius }, // Above
+        { x: sceneX, y: sceneY + radius }, // Below
+        { x: sceneX + radius, y: sceneY - radius }, // Top-right
+        { x: sceneX - radius, y: sceneY - radius }, // Top-left
+        { x: sceneX + radius, y: sceneY + radius }, // Bottom-right
+        { x: sceneX - radius, y: sceneY + radius }, // Bottom-left
+      ];
+      
+      for (const pos of positions) {
+        const hasCollisionAtPos = elements.some(element => {
+          if (element.type === "text") return false;
+          
+          const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
+          
+          const textLeft = pos.x - estimatedTextWidth / 2;
+          const textRight = pos.x + estimatedTextWidth / 2;
+          const textTop = pos.y - estimatedTextHeight / 2;
+          const textBottom = pos.y + estimatedTextHeight / 2;
+          
+          return !(
+            textRight < x1 - collisionMargin ||
+            textLeft > x2 + collisionMargin ||
+            textBottom < y1 - collisionMargin ||
+            textTop > y2 + collisionMargin
+          );
+        });
+        
+        if (!hasCollisionAtPos) {
+          return pos;
+        }
+      }
+    }
+    
+    // If no good position found, return original position
+    return { x: bestX, y: bestY };
+  };
 
   private startTextEditing = ({
     sceneX,
@@ -5348,6 +5549,36 @@ class App extends React.Component<AppProps, AppState> {
         shouldBindToContainer = true;
       }
     }
+    
+    // Force text binding for images and shapes when container is provided
+    // Only bind if text is positioned at center or if it's an arrow/line
+    if (container && !shouldBindToContainer) {
+      const boundTextElementToContainer = getBoundTextElement(
+        container,
+        this.scene.getNonDeletedElementsMap(),
+      );
+      if (!boundTextElementToContainer && (
+        container.type === "image" ||
+        container.type === "rectangle" ||
+        container.type === "diamond" ||
+        container.type === "ellipse" ||
+        container.type === "frame" ||
+        container.type === "magicframe"
+      )) {
+        // Check if text is positioned at center (for binding) or at edges (for loose association)
+        const centerX = container.x + container.width / 2;
+        const centerY = container.y + container.height / 2;
+        const distanceFromCenter = Math.sqrt(
+          Math.pow(sceneX - centerX, 2) + Math.pow(sceneY - centerY, 2)
+        );
+        
+        // Only bind if text is close to center (within 20% of shape size)
+        const threshold = Math.min(container.width, container.height) * 0.2;
+        if (distanceFromCenter < threshold) {
+          shouldBindToContainer = true;
+        }
+      }
+    }
     let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
 
     const selectedElements = this.scene.getSelectedElements(this.state);
@@ -5378,7 +5609,8 @@ class App extends React.Component<AppProps, AppState> {
       !existingTextElement &&
       shouldBindToContainer &&
       container &&
-      !isArrowElement(container)
+      !isArrowElement(container) &&
+      !isLineElement(container)
     ) {
       const fontString = {
         fontSize,
@@ -5418,7 +5650,9 @@ class App extends React.Component<AppProps, AppState> {
         x: parentCenterPosition ? parentCenterPosition.elementCenterX : sceneX,
         y: parentCenterPosition ? parentCenterPosition.elementCenterY : sceneY,
         strokeColor: this.state.currentItemStrokeColor,
-        backgroundColor: this.state.currentItemBackgroundColor,
+        backgroundColor: (container && (isArrowElement(container) || isLineElement(container))) 
+          ? "#ffffff" 
+          : this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
         strokeWidth: this.state.currentItemStrokeWidth,
         strokeStyle: this.state.currentItemStrokeStyle,
@@ -5427,17 +5661,22 @@ class App extends React.Component<AppProps, AppState> {
         text: "",
         fontSize,
         fontFamily,
-        textAlign: parentCenterPosition
+        textAlign: (parentCenterPosition || container) 
           ? "center"
           : this.state.currentItemTextAlign,
-        verticalAlign: parentCenterPosition
+        verticalAlign: (parentCenterPosition || container)
           ? VERTICAL_ALIGN.MIDDLE
           : DEFAULT_VERTICAL_ALIGN,
         containerId: shouldBindToContainer ? container?.id : undefined,
         groupIds: container?.groupIds ?? [],
+        // Add custom data to track edge-positioned text
+        customData: container && !shouldBindToContainer ? {
+          associatedShapeId: container.id,
+          edgePosition: 'center'
+        } : undefined,
         lineHeight,
         angle: container
-          ? isArrowElement(container)
+          ? isArrowElement(container) || isLineElement(container)
             ? (0 as Radians)
             : container.angle
           : (0 as Radians),
@@ -5515,8 +5754,7 @@ class App extends React.Component<AppProps, AppState> {
       const selectedLinearElement: ExcalidrawLinearElement =
         selectedElements[0];
       if (
-        ((event[KEYS.CTRL_OR_CMD] && isSimpleArrow(selectedLinearElement)) ||
-          isLineElement(selectedLinearElement)) &&
+        (event[KEYS.CTRL_OR_CMD] && isSimpleArrow(selectedLinearElement)) &&
         (!this.state.selectedLinearElement?.isEditing ||
           this.state.selectedLinearElement.elementId !==
             selectedLinearElement.id)
@@ -5590,15 +5828,75 @@ class App extends React.Component<AppProps, AppState> {
         this.state.selectedLinearElement?.isEditing &&
         this.state.selectedLinearElement.elementId ===
           selectedLinearElement.id &&
-        isLineElement(selectedLinearElement)
+        isArrowElement(selectedLinearElement)
       ) {
+        return;
+      }
+      
+      // For lines, allow text creation on double-click
+      if (isLineElement(selectedLinearElement)) {
+        const container = this.getTextBindableContainerAtPosition(
+          sceneX,
+          sceneY,
+        );
+        
+        if (container) {
+          const midPoint = getContainerCenter(
+            container,
+            this.state,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          
+          sceneX = midPoint.x;
+          sceneY = midPoint.y;
+        }
+        
+        this.startTextEditing({
+          sceneX,
+          sceneY,
+          insertAtParentCenter: !event.altKey,
+          container,
+        });
         return;
       }
     }
 
     if (selectedElements.length === 1 && isImageElement(selectedElements[0])) {
-      this.startImageCropping(selectedElements[0]);
+      // For images, insert text bound to the image instead of cropping
+      const imageElement = selectedElements[0];
+      // Force text binding by ensuring we're close to the center
+      const centerX = imageElement.x + imageElement.width / 2;
+      const centerY = imageElement.y + imageElement.height / 2;
+      this.startTextEditing({
+        sceneX: centerX,
+        sceneY: centerY,
+        insertAtParentCenter: true,
+        container: imageElement,
+      });
       return;
+    }
+
+    // Handle double-click on any shape (rectangle, diamond, ellipse, etc.) to insert text
+    if (selectedElements.length === 1) {
+      const selectedElement = selectedElements[0];
+      if (
+        selectedElement.type === "rectangle" ||
+        selectedElement.type === "diamond" ||
+        selectedElement.type === "ellipse" ||
+        selectedElement.type === "frame" ||
+        selectedElement.type === "magicframe"
+      ) {
+        // Always center text within the shape
+        const textPosition = this.getTextPositionAtEdge(selectedElement, 'center');
+        
+        this.startTextEditing({
+          sceneX: textPosition.x,
+          sceneY: textPosition.y,
+          insertAtParentCenter: false, // We're positioning manually
+          container: selectedElement,
+        });
+        return;
+      }
     }
 
     resetCursor(this.interactiveCanvas);
@@ -5660,21 +5958,41 @@ class App extends React.Component<AppProps, AppState> {
               threshold: this.getElementHitThreshold(container),
             })
           ) {
-            const midPoint = getContainerCenter(
-              container,
-              this.state,
-              this.scene.getNonDeletedElementsMap(),
-            );
-
-            sceneX = midPoint.x;
-            sceneY = midPoint.y;
+            // For all shapes, detect edge and position text accordingly
+            if (
+              container.type === "rectangle" ||
+              container.type === "diamond" ||
+              container.type === "ellipse" ||
+              container.type === "image" ||
+              container.type === "frame" ||
+              container.type === "magicframe"
+            ) {
+              const edge = this.detectClickedEdge(container, sceneX, sceneY);
+              const textPosition = this.getTextPositionAtEdge(container, edge);
+              sceneX = textPosition.x;
+              sceneY = textPosition.y;
+            } else {
+              // For lines/arrows, use center position
+              const midPoint = getContainerCenter(
+                container,
+                this.state,
+                this.scene.getNonDeletedElementsMap(),
+              );
+              if (midPoint) {
+                sceneX = midPoint.x;
+                sceneY = midPoint.y;
+              }
+            }
           }
         }
 
+        // Use optimal positioning when there's no container to avoid collisions
+        const finalPosition = container ? { x: sceneX, y: sceneY } : this.findOptimalTextPosition(sceneX, sceneY);
+        
         this.startTextEditing({
-          sceneX,
-          sceneY,
-          insertAtParentCenter: !event.altKey,
+          sceneX: finalPosition.x,
+          sceneY: finalPosition.y,
+          insertAtParentCenter: !event.altKey && container != null,
           container,
         });
       }
@@ -11467,19 +11785,6 @@ class App extends React.Component<AppProps, AppState> {
 // -----------------------------------------------------------------------------
 // TEST HOOKS
 // -----------------------------------------------------------------------------
-declare global {
-  interface Window {
-    h: {
-      scene: Scene;
-      elements: readonly ExcalidrawElement[];
-      state: AppState;
-      setState: React.Component<any, AppState>["setState"];
-      app: InstanceType<typeof App>;
-      history: History;
-      store: Store;
-    };
-  }
-}
 
 export const createTestHook = () => {
   if (isTestEnv() || isDevEnv()) {

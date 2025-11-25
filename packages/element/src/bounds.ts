@@ -41,6 +41,7 @@ import {
   isArrowElement,
   isBoundToContainer,
   isFreeDrawElement,
+  isLineElement,
   isLinearElement,
   isLineElement,
   isTextElement,
@@ -273,9 +274,9 @@ export const getElementAbsoluteCoords = (
     const container = elementsMap
       ? getContainerElement(element, elementsMap)
       : null;
-    if (isArrowElement(container)) {
+    if (container && (isArrowElement(container) || isLineElement(container))) {
       const { x, y } = LinearElementEditor.getBoundTextElementPosition(
-        container,
+        container as ExcalidrawLinearElement,
         element as ExcalidrawTextElementWithContainer,
         elementsMap,
       );

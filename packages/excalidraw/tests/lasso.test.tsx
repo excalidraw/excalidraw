@@ -67,7 +67,7 @@ const updatePath = (startPoint: GlobalPoint, points: LocalPoint[]) => {
       lassoPath:
         h.app.lassoTrail
           .getCurrentTrail()
-          ?.originalPoints?.map((p) => pointFrom<GlobalPoint>(p[0], p[1])) ??
+          ?.originalPoints?.map((p: any) => pointFrom<GlobalPoint>(p[0], p[1])) ??
         [],
       elements: h.elements,
       elementsMap: h.scene.getNonDeletedElementsMap(),

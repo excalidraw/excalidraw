@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Line Text Binding</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .instructions {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions">
+        <h2>Test Line Text Binding</h2>
+        <p>To test the new line text binding functionality:</p>
+        <ol>
+            <li>Draw a line using the line tool</li>
+            <li>Double-click on the line to add text</li>
+            <li>The text should appear in the middle of the line</li>
+            <li>The text should be centered and have angle 0 (horizontal)</li>
+        </ol>
+        <p><strong>Expected behavior:</strong> Text should be positioned at the midpoint of the line segment, similar to how it works with arrows.</p>
+    </div>
+    
+    <div id="excalidraw"></div>
+    
+    <script type="module">
+        import { Excalidraw } from './packages/excalidraw/index.js';
+        
+        const excalidraw = new Excalidraw({
+            target: document.getElementById('excalidraw'),
+            width: 800,
+            height: 600,
+        });
+    </script>
+</body>
+</html>
