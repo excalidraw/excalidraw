@@ -176,8 +176,8 @@ const TechnicalDrawingConfig = {
   },
   arc: {
     innerRadius: 20,
-    outerRadius: 32,
-    lineWidth: 1.5,
+    outerRadius: 30,
+    lineWidth: 1,
   },
   label: {
     fontSize: 11,
@@ -276,6 +276,65 @@ const renderSegmentLength = (
   const labelY = midY + perpY * offsetDist * offsetSign;
 
   drawTechnicalLabel(context, text, labelX, labelY, colors, zoom);
+};
+
+/**
+ * Renders the angle of a line segment relative to the horizontal axis.
+ * Shows a dashed horizontal reference line and an arc from 0° to the line angle.
+ */
+const renderHorizontalReferenceAngle = (
+  context: CanvasRenderingContext2D,
+  elementX: number,
+  elementY: number,
+  startPoint: readonly [number, number],
+  endPoint: readonly [number, number],
+  colors: TechnicalDrawingColors,
+  zoom: number,
+) => {
+  const dx = endPoint[0] - startPoint[0];
+  const dy = endPoint[1] - startPoint[1];
+
+  if (dx * dx + dy * dy < 1) {
+    return;
+  }
+
+  // Angle from horizontal (0 = right, positive = counterclockwise)
+  const lineAngle = Math.atan2(dy, dx);
+
+  // Convert to degrees (absolute value to match the arc being drawn)
+  const angleDeg = Math.abs(Math.round((lineAngle * 180) / Math.PI));
+
+  const originX = elementX + startPoint[0];
+  const originY = elementY + startPoint[1];
+
+  const arcRadius = TechnicalDrawingConfig.arc.innerRadius / zoom;
+  const refLineLength = arcRadius * 3;
+
+  context.strokeStyle = colors.stroke;
+
+  // Draw dashed horizontal reference line (thinner than arc)
+  context.lineWidth = 1 / zoom;
+  context.setLineDash([4 / zoom, 4 / zoom]);
+  context.beginPath();
+  context.moveTo(originX, originY);
+  context.lineTo(originX + refLineLength, originY);
+  context.stroke();
+  context.setLineDash([]);
+
+  // Draw arc from horizontal (0) to line angle
+  // Always draw the smaller arc (the one that represents the angle shown)
+  context.lineWidth = TechnicalDrawingConfig.arc.lineWidth / zoom;
+  const counterclockwise = lineAngle < 0;
+  context.beginPath();
+  context.arc(originX, originY, arcRadius, 0, lineAngle, counterclockwise);
+  context.stroke();
+
+  // Position label at arc midpoint
+  const midAngle = lineAngle / 2;
+  const labelX = originX + Math.cos(midAngle) * arcRadius;
+  const labelY = originY + Math.sin(midAngle) * arcRadius;
+
+  drawTechnicalLabel(context, `${angleDeg}°`, labelX, labelY, colors, zoom);
 };
 
 /**
@@ -408,6 +467,19 @@ const renderTechnicalDrawingHints = (
     colors,
     appState.zoom.value,
   );
+
+  // Render horizontal reference angle for first segment
+  if (numPoints === 2) {
+    renderHorizontalReferenceAngle(
+      context,
+      multiElement.x,
+      multiElement.y,
+      points[0],
+      points[1],
+      colors,
+      appState.zoom.value,
+    );
+  }
 
   // Render angle arcs if we have at least 3 points
   if (numPoints >= 3) {
