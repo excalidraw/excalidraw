@@ -108,6 +108,7 @@ export const getDefaultAppState = (): Omit<
     toast: null,
     viewBackgroundColor: COLOR_PALETTE.white,
     zenModeEnabled: false,
+    technicalDrawingMode: false,
     zoom: {
       value: 1 as NormalizedZoomValue,
     },
@@ -239,6 +240,7 @@ const APP_STATE_STORAGE_CONF = (<
   viewBackgroundColor: { browser: true, export: true, server: true },
   width: { browser: false, export: false, server: false },
   zenModeEnabled: { browser: true, export: false, server: false },
+  technicalDrawingMode: { browser: true, export: false, server: false },
   zoom: { browser: true, export: false, server: false },
   viewModeEnabled: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },

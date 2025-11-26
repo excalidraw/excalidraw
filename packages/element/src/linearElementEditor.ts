@@ -284,6 +284,64 @@ export class LinearElementEditor {
     });
   }
 
+  // Snap configuration for technical drawing mode
+  // Note: tolerance here (1px) is tighter than visual guides (2px) in interactiveScene.ts
+  // so users see the guide before the actual snap occurs
+  private static readonly SNAP_CONFIG = {
+    tolerance: 1,
+    angleInterval: 15,
+  } as const;
+
+  /**
+   * Snaps cursor to angle alignments with previous points if within tolerance.
+   * Returns original coordinates if no snap applies.
+   */
+  private static applyTechnicalDrawingSnap(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    cursorX: number,
+    cursorY: number,
+  ): { x: number; y: number } {
+    const { points, x: ox, y: oy } = element;
+    const n = points.length;
+
+    // Need at least 3 points (2 committed + 1 being placed)
+    if (n < 3) {
+      return { x: cursorX, y: cursorY };
+    }
+
+    const { tolerance, angleInterval } = LinearElementEditor.SNAP_CONFIG;
+    const RAD_TO_DEG = 180 / Math.PI;
+
+    // Check previous points (excluding immediate predecessor and current)
+    for (let i = 0; i < n - 2; i++) {
+      const [refLocalX, refLocalY] = points[i];
+      const refX = ox + refLocalX;
+      const refY = oy + refLocalY;
+
+      const dx = cursorX - refX;
+      const dy = cursorY - refY;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist < 1) {
+        continue;
+      }
+
+      const angle = Math.atan2(dy, dx) * RAD_TO_DEG;
+      const snapAngle = Math.round(angle / angleInterval) * angleInterval;
+      const angleTolerance = Math.atan(tolerance / dist) * RAD_TO_DEG;
+
+      if (Math.abs(angle - snapAngle) <= angleTolerance) {
+        const rad = (snapAngle * Math.PI) / 180;
+        return {
+          x: refX + Math.cos(rad) * dist,
+          y: refY + Math.sin(rad) * dist,
+        };
+      }
+    }
+
+    return { x: cursorX, y: cursorY };
+  }
+
   static handlePointerMove(
     event: PointerEvent,
     app: AppClassProperties,
@@ -300,6 +358,16 @@ export class LinearElementEditor {
     invariant(element, "Element being dragged must exist in the scene");
     invariant(element.points.length > 1, "Element must have at least 2 points");
 
+    // Apply technical drawing mode snap if enabled
+    const { x: effectivePointerX, y: effectivePointerY } = app.state
+      .technicalDrawingMode
+      ? LinearElementEditor.applyTechnicalDrawingSnap(
+          element,
+          scenePointerX,
+          scenePointerY,
+        )
+      : { x: scenePointerX, y: scenePointerY };
+
     const idx = element.points.length - 1;
     const point = element.points[idx];
     const pivotPoint = element.points[idx - 1];
@@ -307,7 +375,7 @@ export class LinearElementEditor {
       linearElementEditor.customLineAngle ??
       determineCustomLinearAngle(pivotPoint, element.points[idx]);
     const hoveredElement = getHoveredElementForBinding(
-      pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+      pointFrom<GlobalPoint>(effectivePointerX, effectivePointerY),
       elements,
       elementsMap,
     );
@@ -325,7 +393,7 @@ export class LinearElementEditor {
         element,
         elementsMap,
         pivotPoint,
-        pointFrom(scenePointerX, scenePointerY),
+        pointFrom(effectivePointerX, effectivePointerY),
         event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
         customLineAngle,
       );
@@ -340,8 +408,8 @@ export class LinearElementEditor {
       const newDraggingPointPosition = LinearElementEditor.createPointAt(
         element,
         elementsMap,
-        scenePointerX - linearElementEditor.pointerOffset.x,
-        scenePointerY - linearElementEditor.pointerOffset.y,
+        effectivePointerX - linearElementEditor.pointerOffset.x,
+        effectivePointerY - linearElementEditor.pointerOffset.y,
         event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
       );
       deltaX = newDraggingPointPosition[0] - point[0];
