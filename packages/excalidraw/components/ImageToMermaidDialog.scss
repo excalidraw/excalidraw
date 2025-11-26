@@ -1,0 +1,180 @@
+.image-to-mermaid-dialog {
+  .dialog-content {
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .upload-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--color-gray-30);
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: var(--color-primary);
+      background: var(--color-gray-10);
+    }
+
+    .upload-label {
+      cursor: pointer;
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .upload-text {
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: var(--color-gray-80);
+
+      strong {
+        color: var(--color-primary);
+      }
+    }
+
+    .upload-hint {
+      font-size: 14px;
+      color: var(--color-gray-60);
+    }
+  }
+
+  .preview-area {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-gray-10);
+    border-radius: 8px;
+    overflow: hidden;
+
+    .image-preview {
+      max-width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+    }
+
+    .progress-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 16px;
+      color: white;
+
+      .progress-bar {
+        height: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 8px;
+
+        .progress-fill {
+          height: 100%;
+          background: var(--color-primary);
+          transition: width 0.3s;
+        }
+      }
+
+      .progress-message {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .result-area {
+    flex: 1;
+
+    h3 {
+      margin-bottom: 12px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .mermaid-code {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--color-gray-30);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+      resize: vertical;
+      background: var(--color-surface-primary);
+      color: var(--color-text-primary);
+
+      &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+      }
+    }
+  }
+
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    margin-top: 16px;
+    background: var(--color-danger-light);
+    color: var(--color-danger-dark);
+    border: 1px solid var(--color-danger);
+    border-radius: 4px;
+    font-size: 14px;
+
+    .error-icon {
+      font-size: 18px;
+    }
+  }
+
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-gray-20);
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &.btn-secondary {
+        background: var(--color-gray-20);
+        color: var(--color-gray-80);
+
+        &:hover {
+          background: var(--color-gray-30);
+        }
+      }
+
+      &.btn-primary {
+        background: var(--color-primary);
+        color: white;
+
+        &:hover:not(:disabled) {
+          background: var(--color-primary-dark);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}

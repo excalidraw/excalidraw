@@ -10,7 +10,7 @@ import {
 } from "jotai";
 import { useLayoutEffect } from "react";
 
-export const appJotaiStore = createStore();
+export const appJotaiStore = createStore() as ReturnType<typeof createStore>;
 
 export { atom, Provider, useAtom, useAtomValue, useSetAtom };
 
@@ -35,3 +35,22 @@ export const useAtomWithInitialValue = <
 
   return [value, setValue] as const;
 };
+
+// AI Configuration Atoms moved to packages/excalidraw/editor-jotai.ts
+
+// Re-export AI atoms from editor-jotai for use in app
+export {
+  aiConfigDialogOpenAtom,
+  aiConfiguredProvidersAtom,
+  aiSelectedProviderAtom,
+  aiSelectedModelAtom,
+  aiAvailableModelsAtom,
+  aiConfigurationStatusAtom,
+  imageToMermaidDialogOpenAtom,
+  conversionProgressAtom,
+  conversionResultAtom,
+  conversionStatusAtom,
+  conversionErrorAtom,
+  processingImageAtom,
+  showConfigPromptAtom,
+} from "@excalidraw/excalidraw/editor-jotai";

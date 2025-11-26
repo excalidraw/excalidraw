@@ -2,6 +2,7 @@ import {
   Excalidraw,
   LiveCollaborationTrigger,
   TTDDialogTrigger,
+  ImageToMermaidDialogTrigger,
   CaptureUpdateAction,
   reconcileElements,
   useEditorInterface,
@@ -74,6 +75,9 @@ import type {
 import type { ResolutionType } from "@excalidraw/common/utility-types";
 import type { ResolvablePromise } from "@excalidraw/common/utils";
 
+import { AIConfigurationDialog } from "../packages/excalidraw/components/AIConfigurationDialog";
+import { ImageToMermaidDialog } from "../packages/excalidraw/components/ImageToMermaidDialog";
+
 import CustomStats from "./CustomStats";
 import {
   Provider,
@@ -101,7 +105,7 @@ import {
   exportToExcalidrawPlus,
 } from "./components/ExportToExcalidrawPlus";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
-
+import { AIComponents } from "./components/AI";
 import {
   exportToBackend,
   getCollaborationLinkData,
@@ -133,7 +137,6 @@ import DebugCanvas, {
   isVisualDebuggerEnabled,
   loadSavedDebugState,
 } from "./components/DebugCanvas";
-import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 
 import "./index.scss";
@@ -914,9 +917,9 @@ const ExcalidrawWrapper = () => {
           )}
         </OverwriteConfirmDialog>
         <AppFooter onChange={() => excalidrawAPI?.refresh()} />
-        {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
 
         <TTDDialogTrigger />
+        <ImageToMermaidDialogTrigger jotaiStore={appJotaiStore} />
         {isCollaborating && isOffline && (
           <div className="alertalert--warning">
             {t("alerts.collabOfflineWarning")}
@@ -937,6 +940,7 @@ const ExcalidrawWrapper = () => {
         {excalidrawAPI && !isCollabDisabled && (
           <Collab excalidrawAPI={excalidrawAPI} />
         )}
+        {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
 
         <ShareDialog
           collabAPI={collabAPI}
@@ -1159,6 +1163,55 @@ const ExcalidrawWrapper = () => {
             ref={debugCanvasRef}
           />
         )}
+        <AIConfigurationDialog />
+        <ImageToMermaidDialog
+          onInsertMermaid={async (mermaidCode: string) => {
+            if (!excalidrawAPI) {
+              return;
+            }
+
+            try {
+              // Clean up the Mermaid code first - remove markdown code fences
+              let cleanCode = mermaidCode.trim();
+              cleanCode = cleanCode.replace(/^```mermaid\s*/i, "");
+              cleanCode = cleanCode.replace(/^```\s*/m, "");
+              cleanCode = cleanCode.replace(/```\s*$/m, "");
+              cleanCode = cleanCode.trim();
+
+              // Use Excalidraw's built-in Mermaid-to-Excalidraw converter!
+              const { parseMermaidToExcalidraw } = await import(
+                "@excalidraw/mermaid-to-excalidraw"
+              );
+
+              // Convert Mermaid to Excalidraw elements using the official converter
+              const { elements } = await parseMermaidToExcalidraw(cleanCode);
+
+              // Convert to Excalidraw elements with regenerated IDs
+              const { convertToExcalidrawElements } = await import(
+                "@excalidraw/excalidraw"
+              );
+              const newElements = convertToExcalidrawElements(elements, {
+                regenerateIds: true,
+              });
+
+              // Add elements to canvas
+              const existingElements = excalidrawAPI.getSceneElements();
+              excalidrawAPI.updateScene({
+                elements: [...existingElements, ...newElements],
+              });
+            } catch (error) {
+              console.error("Failed to convert Mermaid diagram:", error);
+
+              // Fallback: show error message
+              excalidrawAPI.updateScene({
+                appState: {
+                  errorMessage:
+                    "Unable to convert Mermaid diagram. Please check the syntax.",
+                },
+              });
+            }
+          }}
+        />
       </Excalidraw>
     </div>
   );
