@@ -28,14 +28,15 @@
     "eslint-plugin-prettier": "3.3.1",
     "http-server": "14.1.1",
     "husky": "7.0.4",
+    "jest": "30.2.0",
     "jsdom": "22.1.0",
     "lint-staged": "12.3.7",
     "pepjs": "0.5.3",
     "prettier": "2.6.2",
-    "rewire": "6.0.0",
+    "rewire": "9.0.1",
     "rimraf": "^5.0.0",
     "typescript": "4.9.4",
-    "vite": "5.0.12",
+    "vite": "5.4.21",
     "vite-plugin-checker": "0.7.2",
     "vite-plugin-ejs": "1.7.0",
     "vite-plugin-pwa": "0.21.1",
@@ -90,5 +91,10 @@
   },
   "resolutions": {
     "strip-ansi": "6.0.1"
+  },
+  "dependencies": {
+    "esbuild": "0.27.0",
+    "next": "14.2.33",
+    "react-device-detect": "2.2.3"
   }
 }

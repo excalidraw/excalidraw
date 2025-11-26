@@ -100,6 +100,7 @@
     "lodash.debounce": "4.0.8",
     "lodash.throttle": "4.1.1",
     "nanoid": "3.3.3",
+    "next": "14.2.33",
     "open-color": "1.9.1",
     "pako": "2.0.3",
     "perfect-freehand": "1.2.0",
@@ -109,12 +110,14 @@
     "png-chunks-extract": "1.0.0",
     "points-on-curve": "1.0.1",
     "pwacompat": "2.0.17",
+    "rewire": "9.0.1",
     "roughjs": "4.6.4",
     "sass": "1.51.0",
-    "tunnel-rat": "0.1.2"
+    "tunnel-rat": "0.1.2",
+    "vite": "5.4.21"
   },
   "devDependencies": {
-    "@size-limit/preset-big-lib": "9.0.0",
+    "@size-limit/preset-big-lib": "11.2.0",
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.2.0",
@@ -126,7 +129,7 @@
     "autoprefixer": "10.4.7",
     "cross-env": "7.0.3",
     "dotenv": "16.0.1",
-    "esbuild": "0.19.10",
+    "esbuild": "0.27.0",
     "esbuild-sass-plugin": "2.16.0",
     "eslint-plugin-react": "7.32.2",
     "fake-indexeddb": "3.1.7",
