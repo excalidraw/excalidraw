@@ -1202,23 +1202,26 @@ export const bindPointToSnapToElementOutline = (
   customIntersector?: LineSegment<GlobalPoint>,
 ): GlobalPoint => {
   const elbowed = isElbowArrow(arrowElement);
-  const point =
-    customIntersector && !elbowed
-      ? customIntersector[0]
-      : LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          arrowElement,
-          startOrEnd === "start" ? 0 : -1,
-          elementsMap,
-        );
+  const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrowElement,
+    startOrEnd === "start" ? 0 : -1,
+    elementsMap,
+  );
 
   if (arrowElement.points.length < 2) {
     // New arrow creation, so no snapping
     return point;
   }
 
-  const edgePoint = isRectanguloidElement(bindableElement)
-    ? avoidRectangularCorner(arrowElement, bindableElement, elementsMap, point)
-    : point;
+  const edgePoint =
+    isRectanguloidElement(bindableElement) && elbowed
+      ? avoidRectangularCorner(
+          arrowElement,
+          bindableElement,
+          elementsMap,
+          point,
+        )
+      : point;
   const adjacentPoint =
     customIntersector && !elbowed
       ? customIntersector[1]
