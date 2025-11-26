@@ -6396,12 +6396,15 @@ class App extends React.Component<AppProps, AppState> {
       setCursorForShape(this.interactiveCanvas, this.state);
 
       if (lastPoint === lastCommittedPoint) {
-        const hoveredElement = getHoveredElementForBinding(
-          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-          this.scene.getNonDeletedElements(),
-          this.scene.getNonDeletedElementsMap(),
-          (el) => maxBindingDistance_simple(this.state.zoom),
-        );
+        const hoveredElement =
+          isArrowElement(this.state.newElement) &&
+          isBindingEnabled(this.state) &&
+          getHoveredElementForBinding(
+            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+            this.scene.getNonDeletedElements(),
+            this.scene.getNonDeletedElementsMap(),
+            (el) => maxBindingDistance_simple(this.state.zoom),
+          );
         if (hoveredElement) {
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: event.nativeEvent,
@@ -8464,16 +8467,18 @@ class App extends React.Component<AppProps, AppState> {
       const { x: rx, y: ry } = multiElement;
       const { lastCommittedPoint } = selectedLinearElement;
 
-      const hoveredElementForBinding = getHoveredElementForBinding(
-        pointFrom<GlobalPoint>(
-          this.lastPointerMoveCoords?.x ??
-            rx + multiElement.points[multiElement.points.length - 1][0],
-          this.lastPointerMoveCoords?.y ??
-            ry + multiElement.points[multiElement.points.length - 1][1],
-        ),
-        this.scene.getNonDeletedElements(),
-        this.scene.getNonDeletedElementsMap(),
-      );
+      const hoveredElementForBinding =
+        isBindingEnabled(this.state) &&
+        getHoveredElementForBinding(
+          pointFrom<GlobalPoint>(
+            this.lastPointerMoveCoords?.x ??
+              rx + multiElement.points[multiElement.points.length - 1][0],
+            this.lastPointerMoveCoords?.y ??
+              ry + multiElement.points[multiElement.points.length - 1][1],
+          ),
+          this.scene.getNonDeletedElements(),
+          this.scene.getNonDeletedElementsMap(),
+        );
 
       // clicking inside commit zone → finalize arrow
       if (
