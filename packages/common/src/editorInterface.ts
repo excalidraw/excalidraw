@@ -73,10 +73,22 @@ export const isTabletBreakpoint = (
   editorWidth: number,
   editorHeight: number,
 ) => {
-  const minSide = Math.min(editorWidth, editorHeight);
-  const maxSide = Math.max(editorWidth, editorHeight);
+  const width = editorWidth;
+  const height = editorHeight;
+  const maxSide = Math.max(width, height);
 
-  return minSide >= MQ_MIN_TABLET && maxSide <= MQ_MAX_TABLET;
+  // Tablet / compact layout:
+  // - wide enough to not be phone
+  // - not wider than tablet max
+  // - HEIGHT is the limiting factor: compact only when height < 600px
+  // - and we don't classify phones as tablets
+  return (
+    !isMobileBreakpoint(width, height) &&
+    width >= MQ_MIN_TABLET &&
+    width <= MQ_MAX_TABLET &&
+    height < MQ_MIN_TABLET &&
+    maxSide <= MQ_MAX_TABLET
+  );
 };
 
 const isMobileOrTablet = (): boolean => {
