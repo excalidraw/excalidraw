@@ -2,10 +2,6 @@ import {
   clamp,
   pointFrom,
   pointsEqual,
-  radiansToDegrees,
-  vectorDot,
-  vectorFromPoint,
-  vectorMagnitude,
   type GlobalPoint,
   type LocalPoint,
   type Radians,
@@ -163,7 +159,7 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
 
 /**
  * Renders the angle between the last two segments of a multiElement line/polygon
- * being drawn. The angle is displayed near the vertex where the segments meet.
+ * being drawn. Both inner and outer angles are displayed on their respective arcs.
  */
 const renderMultiElementAngleHint = (
   context: CanvasRenderingContext2D,
@@ -180,101 +176,148 @@ const renderMultiElementAngleHint = (
   const numPoints = points.length;
 
   // Get the last three points to calculate the angle
-  // p1 -> p2 is the second-to-last segment
-  // p2 -> p3 is the last segment (being drawn)
   const p1 = points[numPoints - 3];
   const p2 = points[numPoints - 2]; // vertex where angle is measured
   const p3 = points[numPoints - 1];
 
-  // Create vectors from the vertex (p2)
-  // v1 points from p2 to p1 (reversed direction of first segment)
-  // v2 points from p2 to p3 (direction of second segment)
-  const v1 = vectorFromPoint(p1, p2);
-  const v2 = vectorFromPoint(p3, p2);
+  // Calculate vectors from vertex (p2)
+  const v1x = p1[0] - p2[0];
+  const v1y = p1[1] - p2[1];
+  const v2x = p3[0] - p2[0];
+  const v2y = p3[1] - p2[1];
 
-  const mag1 = vectorMagnitude(v1);
-  const mag2 = vectorMagnitude(v2);
-
-  // Avoid division by zero for very short segments
-  if (mag1 < 0.001 || mag2 < 0.001) {
+  // Early exit for very short segments
+  if (v1x * v1x + v1y * v1y < 1 || v2x * v2x + v2y * v2y < 1) {
     return;
   }
 
-  // Calculate angle using dot product: cos(θ) = (v1 · v2) / (|v1| * |v2|)
-  const dot = vectorDot(v1, v2);
-  const cosAngle = clamp(dot / (mag1 * mag2), -1, 1);
-  const angleRadians = Math.acos(cosAngle) as Radians;
-  const angleDegrees = Math.round(radiansToDegrees(angleRadians));
+  // Get angles using atan2 - needed for arc drawing
+  const angle1 = Math.atan2(v1y, v1x);
+  const angle2 = Math.atan2(v2y, v2x);
 
-  // Calculate position for the angle label (near the vertex, offset outward)
-  // Use the angle bisector direction to position the label
+  // Calculate angle between vectors from atan2 difference
+  let angleDiff = angle2 - angle1;
+  // Normalize to [-π, π]
+  if (angleDiff > Math.PI) {
+    angleDiff -= 2 * Math.PI;
+  } else if (angleDiff < -Math.PI) {
+    angleDiff += 2 * Math.PI;
+  }
+
+  // Inner angle is the absolute difference, outer is the complement
+  const innerAngleDeg = Math.round((Math.abs(angleDiff) * 180) / Math.PI);
+  const outerAngleDeg = 360 - innerAngleDeg;
+
+  // Determine winding: if angleDiff > 0, inner arc goes counterclockwise
+  const innerIsCounterclockwise = angleDiff > 0;
+
   const vertexX = multiElement.x + p2[0];
   const vertexY = multiElement.y + p2[1];
 
-  // Offset distance from the vertex (in scene coordinates)
-  const offsetDistance = 25 / appState.zoom.value;
+  // Fixed arc radii (no magnitude calculation needed)
+  const innerArcRadius = 20 / appState.zoom.value;
+  const outerArcRadius = 32 / appState.zoom.value;
 
-  // Calculate bisector direction (normalized sum of normalized vectors)
-  const norm1X = v1[0] / mag1;
-  const norm1Y = v1[1] / mag1;
-  const norm2X = v2[0] / mag2;
-  const norm2Y = v2[1] / mag2;
+  // Inner arc midpoint angle: start from angle1, go halfway through angleDiff
+  const innerMidAngle = angle1 + angleDiff / 2;
+  // Outer arc midpoint is on the opposite side
+  const outerMidAngle = innerMidAngle + Math.PI;
 
-  let bisectorX = norm1X + norm2X;
-  let bisectorY = norm1Y + norm2Y;
-  const bisectorMag = Math.sqrt(bisectorX * bisectorX + bisectorY * bisectorY);
+  const innerBisectorX = Math.cos(innerMidAngle);
+  const innerBisectorY = Math.sin(innerMidAngle);
+  const outerBisectorX = Math.cos(outerMidAngle);
+  const outerBisectorY = Math.sin(outerMidAngle);
 
-  if (bisectorMag > 0.001) {
-    bisectorX /= bisectorMag;
-    bisectorY /= bisectorMag;
-  } else {
-    // If vectors are opposite, use perpendicular direction
-    bisectorX = -norm1Y;
-    bisectorY = norm1X;
-  }
-
-  const labelX = vertexX + bisectorX * offsetDistance;
-  const labelY = vertexY + bisectorY * offsetDistance;
-
-  // Render the angle label
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 
-  const fontSize = 12 / appState.zoom.value;
+  // Subtle arc colors with transparency
+  const arcColor =
+    appState.theme === THEME.DARK
+      ? "rgba(165, 160, 255, 0.5)"
+      : "rgba(94, 90, 216, 0.4)";
+
+  context.strokeStyle = arcColor;
+  context.lineWidth = 1.5 / appState.zoom.value;
+
+  // Draw inner arc
+  context.beginPath();
+  context.arc(
+    vertexX,
+    vertexY,
+    innerArcRadius,
+    angle1,
+    angle2,
+    innerIsCounterclockwise,
+  );
+  context.stroke();
+
+  // Draw outer arc (opposite winding direction)
+  context.beginPath();
+  context.arc(
+    vertexX,
+    vertexY,
+    outerArcRadius,
+    angle1,
+    angle2,
+    !innerIsCounterclockwise,
+  );
+  context.stroke();
+
+  // Draw angle labels
+  const fontSize = 11 / appState.zoom.value;
   context.font = `${fontSize}px Cascadia, monospace`;
   context.textAlign = "center";
   context.textBaseline = "middle";
 
-  // Draw background for better readability
-  const text = `${angleDegrees}°`;
-  const textMetrics = context.measureText(text);
-  const padding = 4 / appState.zoom.value;
-  const bgWidth = textMetrics.width + padding * 2;
-  const bgHeight = fontSize + padding * 2;
+  const padding = 3 / appState.zoom.value;
+  const bgRadius = 2 / appState.zoom.value;
 
-  context.fillStyle =
-    appState.theme === THEME.DARK
-      ? "rgba(30, 30, 30, 0.9)"
-      : "rgba(255, 255, 255, 0.9)";
-  context.beginPath();
-  context.roundRect?.(
-    labelX - bgWidth / 2,
-    labelY - bgHeight / 2,
-    bgWidth,
-    bgHeight,
-    3 / appState.zoom.value,
-  );
-  context.fill();
+  // Helper to draw a label on an arc
+  const drawAngleLabel = (
+    angle: number,
+    bisectorX: number,
+    bisectorY: number,
+    arcRadius: number,
+  ) => {
+    const text = `${angle}°`;
+    const textMetrics = context.measureText(text);
+    const bgWidth = textMetrics.width + padding * 2;
+    const bgHeight = fontSize + padding * 2;
 
-  // Draw border
-  context.strokeStyle =
-    appState.theme === THEME.DARK ? "rgba(255, 255, 255, 0.3)" : "#5e5ad8";
-  context.lineWidth = 1 / appState.zoom.value;
-  context.stroke();
+    // Position label on the arc
+    const labelDistance = arcRadius;
+    const labelX = vertexX + bisectorX * labelDistance;
+    const labelY = vertexY + bisectorY * labelDistance;
 
-  // Draw text
-  context.fillStyle = appState.theme === THEME.DARK ? "#fff" : "#1e1e1e";
-  context.fillText(text, labelX, labelY);
+    // Background
+    context.fillStyle =
+      appState.theme === THEME.DARK
+        ? "rgba(30, 30, 30, 0.85)"
+        : "rgba(255, 255, 255, 0.85)";
+    context.beginPath();
+    context.roundRect?.(
+      labelX - bgWidth / 2,
+      labelY - bgHeight / 2,
+      bgWidth,
+      bgHeight,
+      bgRadius,
+    );
+    context.fill();
+
+    // Text
+    context.fillStyle =
+      appState.theme === THEME.DARK
+        ? "rgba(255, 255, 255, 0.9)"
+        : "rgba(30, 30, 30, 0.9)";
+    context.fillText(text, labelX, labelY);
+  };
+
+  // Draw inner angle label
+  drawAngleLabel(innerAngleDeg, innerBisectorX, innerBisectorY, innerArcRadius);
+
+  // Draw outer angle label
+  drawAngleLabel(outerAngleDeg, outerBisectorX, outerBisectorY, outerArcRadius);
 
   context.restore();
 };
