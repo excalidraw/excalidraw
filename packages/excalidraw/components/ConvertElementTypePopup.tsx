@@ -844,7 +844,7 @@ const convertElementType = <
       }),
     ) as typeof element;
 
-    updateBindings(nextElement, app.scene);
+    updateBindings(nextElement, app.scene, app.state);
 
     return nextElement;
   }

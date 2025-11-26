@@ -143,7 +143,7 @@ export const debugDrawPoints = (
   }: {
     x: number;
     y: number;
-    points: LocalPoint[];
+    points: readonly LocalPoint[];
   },
   options?: any,
 ) => {

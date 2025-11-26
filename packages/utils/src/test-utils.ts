@@ -6,11 +6,11 @@ expect.extend({
       throw new Error("expected and received are not point arrays");
     }
 
-    const COMPARE = 1 / Math.pow(10, precision || 2);
+    const COMPARE = 1 / precision === 0 ? 1 : Math.pow(10, precision ?? 2);
     const pass = expected.every(
       (point, idx) =>
-        Math.abs(received[idx]?.[0] - point[0]) < COMPARE &&
-        Math.abs(received[idx]?.[1] - point[1]) < COMPARE,
+        Math.abs(received[idx][0] - point[0]) < COMPARE &&
+        Math.abs(received[idx][1] - point[1]) < COMPARE,
     );
 
     if (!pass) {
