@@ -234,16 +234,13 @@ const renderSegmentLength = (
 ) => {
   const dx = p2[0] - p1[0];
   const dy = p2[1] - p1[1];
-  const lenSq = dx * dx + dy * dy;
-  if (lenSq < 1) {
+  const len = Math.hypot(dx, dy);
+
+  if (len < 1) {
     return;
   }
 
-  const len = Math.sqrt(lenSq);
-  const midX = ox + (p1[0] + p2[0]) / 2;
-  const midY = oy + (p1[1] + p2[1]) / 2;
-
-  // Perpendicular offset for label
+  // Perpendicular offset for label positioning
   const perpX = -dy / len;
   const perpY = dx / len;
   const offset = TechnicalDrawing.label.offsetDistance / zoom;
@@ -252,8 +249,8 @@ const renderSegmentLength = (
   drawLabel(
     ctx,
     `${Math.round(len)}px`,
-    midX + perpX * offset * sign,
-    midY + perpY * offset * sign,
+    ox + (p1[0] + p2[0]) / 2 + perpX * offset * sign,
+    oy + (p1[1] + p2[1]) / 2 + perpY * offset * sign,
     colors,
     zoom,
   );
@@ -270,7 +267,8 @@ const renderHorizontalAngle = (
 ) => {
   const dx = p2[0] - p1[0];
   const dy = p2[1] - p1[1];
-  if (dx * dx + dy * dy < 1) {
+
+  if (Math.hypot(dx, dy) < 1) {
     return;
   }
 
@@ -278,31 +276,32 @@ const renderHorizontalAngle = (
   const originX = ox + p1[0];
   const originY = oy + p1[1];
   const radius = TechnicalDrawing.arc.innerRadius / zoom;
+  const dashPattern = [4 / zoom, 4 / zoom];
 
   ctx.strokeStyle = colors.stroke;
 
   // Dashed horizontal reference line
   ctx.lineWidth = 1 / zoom;
-  ctx.setLineDash([4 / zoom, 4 / zoom]);
+  ctx.setLineDash(dashPattern);
   ctx.beginPath();
   ctx.moveTo(originX, originY);
   ctx.lineTo(originX + radius * 3, originY);
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // Arc from 0 to angle
+  // Arc from 0° to angle
   ctx.lineWidth = TechnicalDrawing.arc.lineWidth / zoom;
   ctx.beginPath();
   ctx.arc(originX, originY, radius, 0, angle, angle < 0);
   ctx.stroke();
 
   // Label at arc midpoint
-  const mid = angle / 2;
+  const midAngle = angle / 2;
   drawLabel(
     ctx,
     `${Math.abs(Math.round(angle * RAD_TO_DEG))}°`,
-    originX + Math.cos(mid) * radius,
-    originY + Math.sin(mid) * radius,
+    originX + Math.cos(midAngle) * radius,
+    originY + Math.sin(midAngle) * radius,
     colors,
     zoom,
   );
@@ -318,19 +317,20 @@ const renderAngleArcs = (
   colors: Colors,
   zoom: number,
 ) => {
+  // Vectors from vertex to adjacent points
   const v1x = p1[0] - vertex[0];
   const v1y = p1[1] - vertex[1];
   const v2x = p2[0] - vertex[0];
   const v2y = p2[1] - vertex[1];
 
-  if (v1x * v1x + v1y * v1y < 1 || v2x * v2x + v2y * v2y < 1) {
+  if (Math.hypot(v1x, v1y) < 1 || Math.hypot(v2x, v2y) < 1) {
     return;
   }
 
   const a1 = Math.atan2(v1y, v1x);
   const a2 = Math.atan2(v2y, v2x);
 
-  // Normalize to [-π, π]
+  // Normalize angle difference to [-π, π]
   let diff = a2 - a1;
   if (diff > Math.PI) {
     diff -= 2 * Math.PI;
@@ -344,39 +344,39 @@ const renderAngleArcs = (
 
   const vx = ox + vertex[0];
   const vy = oy + vertex[1];
-  const r1 = TechnicalDrawing.arc.innerRadius / zoom;
-  const r2 = TechnicalDrawing.arc.outerRadius / zoom;
+  const innerRadius = TechnicalDrawing.arc.innerRadius / zoom;
+  const outerRadius = TechnicalDrawing.arc.outerRadius / zoom;
 
   ctx.strokeStyle = colors.stroke;
   ctx.lineWidth = TechnicalDrawing.arc.lineWidth / zoom;
 
-  // Inner arc
+  // Inner arc (smaller, shows the angle between segments)
   ctx.beginPath();
-  ctx.arc(vx, vy, r1, a1, a2, ccw);
+  ctx.arc(vx, vy, innerRadius, a1, a2, ccw);
   ctx.stroke();
 
-  // Outer arc
+  // Outer arc (larger, shows the reflex angle)
   ctx.beginPath();
-  ctx.arc(vx, vy, r2, a1, a2, !ccw);
+  ctx.arc(vx, vy, outerRadius, a1, a2, !ccw);
   ctx.stroke();
 
-  // Labels
-  const innerMid = a1 + diff / 2;
-  const outerMid = innerMid + Math.PI;
+  // Labels at arc midpoints
+  const innerMidAngle = a1 + diff / 2;
+  const outerMidAngle = innerMidAngle + Math.PI;
 
   drawLabel(
     ctx,
     `${innerDeg}°`,
-    vx + Math.cos(innerMid) * r1,
-    vy + Math.sin(innerMid) * r1,
+    vx + Math.cos(innerMidAngle) * innerRadius,
+    vy + Math.sin(innerMidAngle) * innerRadius,
     colors,
     zoom,
   );
   drawLabel(
     ctx,
     `${outerDeg}°`,
-    vx + Math.cos(outerMid) * r2,
-    vy + Math.sin(outerMid) * r2,
+    vx + Math.cos(outerMidAngle) * outerRadius,
+    vy + Math.sin(outerMidAngle) * outerRadius,
     colors,
     zoom,
   );
@@ -395,43 +395,48 @@ const renderSnapGuides = (
     return;
   }
 
-  const cursor = points[n - 1];
-  const cx = ox + cursor[0];
-  const cy = oy + cursor[1];
+  const [cursorLocalX, cursorLocalY] = points[n - 1];
+  const cursorX = ox + cursorLocalX;
+  const cursorY = oy + cursorLocalY;
 
   const { tolerance, angleInterval, lineWidth, extension } =
     TechnicalDrawing.snap;
-  const tolScaled = tolerance / zoom;
-  const extScaled = extension / zoom;
+  const scaledTolerance = tolerance / zoom;
+  const scaledExtension = extension / zoom;
+  const dashPattern = [4 / zoom, 4 / zoom];
 
+  // Check each previous point (excluding immediate predecessor)
   for (let i = 0; i < n - 2; i++) {
-    const ref = points[i];
-    const rx = ox + ref[0];
-    const ry = oy + ref[1];
+    const [refLocalX, refLocalY] = points[i];
+    const refX = ox + refLocalX;
+    const refY = oy + refLocalY;
 
-    const dx = cx - rx;
-    const dy = cy - ry;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    const dx = cursorX - refX;
+    const dy = cursorY - refY;
+    const dist = Math.hypot(dx, dy);
+
     if (dist < 1) {
       continue;
     }
 
     const angle = Math.atan2(dy, dx) * RAD_TO_DEG;
     const snapAngle = Math.round(angle / angleInterval) * angleInterval;
-    const angleTol = Math.atan(tolScaled / dist) * RAD_TO_DEG;
+    const angleTolerance = Math.atan(scaledTolerance / dist) * RAD_TO_DEG;
 
-    if (Math.abs(angle - snapAngle) <= angleTol) {
+    if (Math.abs(angle - snapAngle) <= angleTolerance) {
       const rad = snapAngle * DEG_TO_RAD;
-      const endX = rx + Math.cos(rad) * (dist + extScaled);
-      const endY = ry + Math.sin(rad) * (dist + extScaled);
+      const lineLength = dist + scaledExtension;
 
       ctx.save();
       ctx.strokeStyle = colors.snapGuide;
       ctx.lineWidth = lineWidth / zoom;
-      ctx.setLineDash([4 / zoom, 4 / zoom]);
+      ctx.setLineDash(dashPattern);
       ctx.beginPath();
-      ctx.moveTo(rx, ry);
-      ctx.lineTo(endX, endY);
+      ctx.moveTo(refX, refY);
+      ctx.lineTo(
+        refX + Math.cos(rad) * lineLength,
+        refY + Math.sin(rad) * lineLength,
+      );
       ctx.stroke();
       ctx.restore();
     }
@@ -451,34 +456,35 @@ const renderTechnicalDrawingHints = (
     return;
   }
 
-  const pts = multiElement.points;
-  const n = pts.length;
-  const ox = multiElement.x;
-  const oy = multiElement.y;
+  const { points, x: ox, y: oy } = multiElement;
+  const n = points.length;
   const colors = getColors(appState.theme === THEME.DARK);
   const zoom = appState.zoom.value;
 
   ctx.save();
   ctx.translate(appState.scrollX, appState.scrollY);
 
-  renderSegmentLength(ctx, ox, oy, pts[n - 2], pts[n - 1], colors, zoom);
+  // Always show current segment length
+  renderSegmentLength(ctx, ox, oy, points[n - 2], points[n - 1], colors, zoom);
 
+  // Show angle measurement (horizontal reference for first segment, arc for subsequent)
   if (n === 2) {
-    renderHorizontalAngle(ctx, ox, oy, pts[0], pts[1], colors, zoom);
+    renderHorizontalAngle(ctx, ox, oy, points[0], points[1], colors, zoom);
   } else {
     renderAngleArcs(
       ctx,
       ox,
       oy,
-      pts[n - 3],
-      pts[n - 2],
-      pts[n - 1],
+      points[n - 3],
+      points[n - 2],
+      points[n - 1],
       colors,
       zoom,
     );
   }
 
-  renderSnapGuides(ctx, ox, oy, pts, colors, zoom);
+  // Show snap alignment guides to previous points
+  renderSnapGuides(ctx, ox, oy, points, colors, zoom);
 
   ctx.restore();
 };
