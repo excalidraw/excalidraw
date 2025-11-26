@@ -6396,12 +6396,15 @@ class App extends React.Component<AppProps, AppState> {
       setCursorForShape(this.interactiveCanvas, this.state);
 
       if (lastPoint === lastCommittedPoint) {
-        const hoveredElement = getHoveredElementForBinding(
-          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-          this.scene.getNonDeletedElements(),
-          this.scene.getNonDeletedElementsMap(),
-          (el) => maxBindingDistance_simple(this.state.zoom),
-        );
+        const hoveredElement =
+          isArrowElement(this.state.newElement) &&
+          isBindingEnabled(this.state) &&
+          getHoveredElementForBinding(
+            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+            this.scene.getNonDeletedElements(),
+            this.scene.getNonDeletedElementsMap(),
+            (el) => maxBindingDistance_simple(this.state.zoom),
+          );
         if (hoveredElement) {
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: event.nativeEvent,
@@ -8477,7 +8480,9 @@ class App extends React.Component<AppProps, AppState> {
 
       // clicking inside commit zone → finalize arrow
       if (
-        (isBindingElement(multiElement) && hoveredElementForBinding) ||
+        (isBindingElement(multiElement) &&
+          hoveredElementForBinding &&
+          isBindingEnabled(this.state)) ||
         (multiElement.points.length > 1 &&
           lastCommittedPoint &&
           pointDistance(
