@@ -157,211 +157,270 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   );
 };
 
-// Light grey colors for technical drawing mode
-const TECHNICAL_DRAWING_COLORS = {
-  stroke: {
-    light: "rgba(140, 140, 140, 0.6)",
-    dark: "rgba(180, 180, 180, 0.6)",
+// ---------------------------------------------------------------------------
+// Technical Drawing Mode - Rendering helpers for angles and segment lengths
+// ---------------------------------------------------------------------------
+
+const TechnicalDrawingConfig = {
+  colors: {
+    light: {
+      stroke: "rgba(140, 140, 140, 0.6)",
+      text: "rgba(80, 80, 80, 0.9)",
+      background: "rgba(255, 255, 255, 0.85)",
+    },
+    dark: {
+      stroke: "rgba(180, 180, 180, 0.6)",
+      text: "rgba(220, 220, 220, 0.9)",
+      background: "rgba(40, 40, 40, 0.85)",
+    },
   },
-  text: {
-    light: "rgba(80, 80, 80, 0.9)",
-    dark: "rgba(220, 220, 220, 0.9)",
+  arc: {
+    innerRadius: 20,
+    outerRadius: 32,
+    lineWidth: 1.5,
   },
-  background: {
-    light: "rgba(255, 255, 255, 0.85)",
-    dark: "rgba(40, 40, 40, 0.85)",
+  label: {
+    fontSize: 11,
+    padding: 3,
+    borderRadius: 2,
+    offsetDistance: 15,
   },
+} as const;
+
+type TechnicalDrawingColors = {
+  stroke: string;
+  text: string;
+  background: string;
+};
+
+const getTechnicalDrawingColors = (isDark: boolean): TechnicalDrawingColors =>
+  isDark
+    ? TechnicalDrawingConfig.colors.dark
+    : TechnicalDrawingConfig.colors.light;
+
+/**
+ * Draws a label with background at the specified position
+ */
+const drawTechnicalLabel = (
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  colors: TechnicalDrawingColors,
+  zoom: number,
+) => {
+  const fontSize = TechnicalDrawingConfig.label.fontSize / zoom;
+  const padding = TechnicalDrawingConfig.label.padding / zoom;
+  const bgRadius = TechnicalDrawingConfig.label.borderRadius / zoom;
+
+  context.font = `${fontSize}px Cascadia, monospace`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+
+  const textMetrics = context.measureText(text);
+  const bgWidth = textMetrics.width + padding * 2;
+  const bgHeight = fontSize + padding * 2;
+
+  // Background
+  context.fillStyle = colors.background;
+  context.beginPath();
+  context.roundRect?.(
+    x - bgWidth / 2,
+    y - bgHeight / 2,
+    bgWidth,
+    bgHeight,
+    bgRadius,
+  );
+  context.fill();
+
+  // Text
+  context.fillStyle = colors.text;
+  context.fillText(text, x, y);
 };
 
 /**
- * Renders technical drawing hints for multiElement lines/polygons:
- * - Angle arcs and measurements between segments
- * - Line length for the current segment being drawn
+ * Renders the length of the current line segment being drawn
  */
-const renderMultiElementAngleHint = (
+const renderSegmentLength = (
+  context: CanvasRenderingContext2D,
+  elementX: number,
+  elementY: number,
+  startPoint: readonly [number, number],
+  endPoint: readonly [number, number],
+  colors: TechnicalDrawingColors,
+  zoom: number,
+) => {
+  const dx = endPoint[0] - startPoint[0];
+  const dy = endPoint[1] - startPoint[1];
+  const lengthSq = dx * dx + dy * dy;
+
+  if (lengthSq < 1) {
+    return;
+  }
+
+  const length = Math.sqrt(lengthSq);
+  const text = `${Math.round(length)}px`;
+
+  // Position at segment midpoint
+  const midX = elementX + (startPoint[0] + endPoint[0]) / 2;
+  const midY = elementY + (startPoint[1] + endPoint[1]) / 2;
+
+  // Offset perpendicular to line
+  const perpX = -dy / length;
+  const perpY = dx / length;
+  const offsetDist = TechnicalDrawingConfig.label.offsetDistance / zoom;
+
+  // Prefer upward/leftward offset for visibility
+  const offsetSign = perpY < 0 || (perpY === 0 && perpX < 0) ? 1 : -1;
+  const labelX = midX + perpX * offsetDist * offsetSign;
+  const labelY = midY + perpY * offsetDist * offsetSign;
+
+  drawTechnicalLabel(context, text, labelX, labelY, colors, zoom);
+};
+
+/**
+ * Renders angle arcs and measurements between two line segments
+ */
+const renderAngleArcs = (
+  context: CanvasRenderingContext2D,
+  elementX: number,
+  elementY: number,
+  p1: readonly [number, number],
+  vertex: readonly [number, number],
+  p3: readonly [number, number],
+  colors: TechnicalDrawingColors,
+  zoom: number,
+) => {
+  // Vectors from vertex
+  const v1x = p1[0] - vertex[0];
+  const v1y = p1[1] - vertex[1];
+  const v2x = p3[0] - vertex[0];
+  const v2y = p3[1] - vertex[1];
+
+  // Check minimum segment length
+  if (v1x * v1x + v1y * v1y < 1 || v2x * v2x + v2y * v2y < 1) {
+    return;
+  }
+
+  // Calculate angles using atan2
+  const angle1 = Math.atan2(v1y, v1x);
+  const angle2 = Math.atan2(v2y, v2x);
+
+  // Normalize angle difference to [-π, π]
+  let angleDiff = angle2 - angle1;
+  if (angleDiff > Math.PI) {
+    angleDiff -= 2 * Math.PI;
+  } else if (angleDiff < -Math.PI) {
+    angleDiff += 2 * Math.PI;
+  }
+
+  const innerAngleDeg = Math.round((Math.abs(angleDiff) * 180) / Math.PI);
+  const outerAngleDeg = 360 - innerAngleDeg;
+  const innerIsCounterclockwise = angleDiff > 0;
+
+  const vertexX = elementX + vertex[0];
+  const vertexY = elementY + vertex[1];
+
+  const innerRadius = TechnicalDrawingConfig.arc.innerRadius / zoom;
+  const outerRadius = TechnicalDrawingConfig.arc.outerRadius / zoom;
+
+  // Arc midpoint angles for label positioning
+  const innerMidAngle = angle1 + angleDiff / 2;
+  const outerMidAngle = innerMidAngle + Math.PI;
+
+  // Draw arcs
+  context.strokeStyle = colors.stroke;
+  context.lineWidth = TechnicalDrawingConfig.arc.lineWidth / zoom;
+
+  context.beginPath();
+  context.arc(
+    vertexX,
+    vertexY,
+    innerRadius,
+    angle1,
+    angle2,
+    innerIsCounterclockwise,
+  );
+  context.stroke();
+
+  context.beginPath();
+  context.arc(
+    vertexX,
+    vertexY,
+    outerRadius,
+    angle1,
+    angle2,
+    !innerIsCounterclockwise,
+  );
+  context.stroke();
+
+  // Draw angle labels
+  drawTechnicalLabel(
+    context,
+    `${innerAngleDeg}°`,
+    vertexX + Math.cos(innerMidAngle) * innerRadius,
+    vertexY + Math.sin(innerMidAngle) * innerRadius,
+    colors,
+    zoom,
+  );
+
+  drawTechnicalLabel(
+    context,
+    `${outerAngleDeg}°`,
+    vertexX + Math.cos(outerMidAngle) * outerRadius,
+    vertexY + Math.sin(outerMidAngle) * outerRadius,
+    colors,
+    zoom,
+  );
+};
+
+/**
+ * Main entry point for technical drawing mode rendering.
+ * Displays segment lengths and angle measurements for multiElement lines.
+ */
+const renderTechnicalDrawingHints = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
 ) => {
-  // Only render when technical drawing mode is enabled
   if (!appState.technicalDrawingMode) {
     return;
   }
 
   const { multiElement } = appState;
-
-  // Need at least 2 points to show length
   if (!multiElement || multiElement.points.length < 2) {
     return;
   }
 
   const points = multiElement.points;
   const numPoints = points.length;
-  const isDark = appState.theme === THEME.DARK;
-
-  const colors = {
-    stroke: isDark
-      ? TECHNICAL_DRAWING_COLORS.stroke.dark
-      : TECHNICAL_DRAWING_COLORS.stroke.light,
-    text: isDark
-      ? TECHNICAL_DRAWING_COLORS.text.dark
-      : TECHNICAL_DRAWING_COLORS.text.light,
-    background: isDark
-      ? TECHNICAL_DRAWING_COLORS.background.dark
-      : TECHNICAL_DRAWING_COLORS.background.light,
-  };
+  const colors = getTechnicalDrawingColors(appState.theme === THEME.DARK);
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 
-  const fontSize = 11 / appState.zoom.value;
-  context.font = `${fontSize}px Cascadia, monospace`;
-  context.textAlign = "center";
-  context.textBaseline = "middle";
+  // Render current segment length
+  renderSegmentLength(
+    context,
+    multiElement.x,
+    multiElement.y,
+    points[numPoints - 2],
+    points[numPoints - 1],
+    colors,
+    appState.zoom.value,
+  );
 
-  const padding = 3 / appState.zoom.value;
-  const bgRadius = 2 / appState.zoom.value;
-
-  // Helper to draw a label
-  const drawLabel = (text: string, x: number, y: number) => {
-    const textMetrics = context.measureText(text);
-    const bgWidth = textMetrics.width + padding * 2;
-    const bgHeight = fontSize + padding * 2;
-
-    // Background
-    context.fillStyle = colors.background;
-    context.beginPath();
-    context.roundRect?.(
-      x - bgWidth / 2,
-      y - bgHeight / 2,
-      bgWidth,
-      bgHeight,
-      bgRadius,
-    );
-    context.fill();
-
-    // Text
-    context.fillStyle = colors.text;
-    context.fillText(text, x, y);
-  };
-
-  // --- Draw line length for current segment ---
-  const pPrev = points[numPoints - 2];
-  const pCurr = points[numPoints - 1];
-
-  const dx = pCurr[0] - pPrev[0];
-  const dy = pCurr[1] - pPrev[1];
-  const lengthSq = dx * dx + dy * dy;
-
-  if (lengthSq >= 1) {
-    const length = Math.sqrt(lengthSq);
-    const lengthText = `${Math.round(length)}px`;
-
-    // Position label at midpoint of the segment, offset perpendicular to line
-    const midX = multiElement.x + (pPrev[0] + pCurr[0]) / 2;
-    const midY = multiElement.y + (pPrev[1] + pCurr[1]) / 2;
-
-    // Perpendicular offset (normalized perpendicular vector)
-    const perpX = -dy / length;
-    const perpY = dx / length;
-    const offsetDist = 15 / appState.zoom.value;
-
-    // Choose offset direction that's more likely to be visible (prefer upward/leftward)
-    const offsetSign = perpY < 0 || (perpY === 0 && perpX < 0) ? 1 : -1;
-    const labelX = midX + perpX * offsetDist * offsetSign;
-    const labelY = midY + perpY * offsetDist * offsetSign;
-
-    drawLabel(lengthText, labelX, labelY);
-  }
-
-  // --- Draw angle arcs if we have at least 3 points ---
+  // Render angle arcs if we have at least 3 points
   if (numPoints >= 3) {
-    const p1 = points[numPoints - 3];
-    const p2 = points[numPoints - 2]; // vertex where angle is measured
-    const p3 = points[numPoints - 1];
-
-    // Calculate vectors from vertex (p2)
-    const v1x = p1[0] - p2[0];
-    const v1y = p1[1] - p2[1];
-    const v2x = p3[0] - p2[0];
-    const v2y = p3[1] - p2[1];
-
-    const mag1Sq = v1x * v1x + v1y * v1y;
-    const mag2Sq = v2x * v2x + v2y * v2y;
-
-    // Only draw angle if both segments have sufficient length
-    if (mag1Sq >= 1 && mag2Sq >= 1) {
-      // Get angles using atan2 - needed for arc drawing
-      const angle1 = Math.atan2(v1y, v1x);
-      const angle2 = Math.atan2(v2y, v2x);
-
-      // Calculate angle between vectors from atan2 difference
-      let angleDiff = angle2 - angle1;
-      // Normalize to [-π, π]
-      if (angleDiff > Math.PI) {
-        angleDiff -= 2 * Math.PI;
-      } else if (angleDiff < -Math.PI) {
-        angleDiff += 2 * Math.PI;
-      }
-
-      // Inner angle is the absolute difference, outer is the complement
-      const innerAngleDeg = Math.round((Math.abs(angleDiff) * 180) / Math.PI);
-      const outerAngleDeg = 360 - innerAngleDeg;
-
-      // Determine winding: if angleDiff > 0, inner arc goes counterclockwise
-      const innerIsCounterclockwise = angleDiff > 0;
-
-      const vertexX = multiElement.x + p2[0];
-      const vertexY = multiElement.y + p2[1];
-
-      // Fixed arc radii
-      const innerArcRadius = 20 / appState.zoom.value;
-      const outerArcRadius = 32 / appState.zoom.value;
-
-      // Arc midpoint angles for label positioning
-      const innerMidAngle = angle1 + angleDiff / 2;
-      const outerMidAngle = innerMidAngle + Math.PI;
-
-      context.strokeStyle = colors.stroke;
-      context.lineWidth = 1.5 / appState.zoom.value;
-
-      // Draw inner arc
-      context.beginPath();
-      context.arc(
-        vertexX,
-        vertexY,
-        innerArcRadius,
-        angle1,
-        angle2,
-        innerIsCounterclockwise,
-      );
-      context.stroke();
-
-      // Draw outer arc (opposite winding direction)
-      context.beginPath();
-      context.arc(
-        vertexX,
-        vertexY,
-        outerArcRadius,
-        angle1,
-        angle2,
-        !innerIsCounterclockwise,
-      );
-      context.stroke();
-
-      // Draw inner angle label
-      drawLabel(
-        `${innerAngleDeg}°`,
-        vertexX + Math.cos(innerMidAngle) * innerArcRadius,
-        vertexY + Math.sin(innerMidAngle) * innerArcRadius,
-      );
-
-      // Draw outer angle label
-      drawLabel(
-        `${outerAngleDeg}°`,
-        vertexX + Math.cos(outerMidAngle) * outerArcRadius,
-        vertexY + Math.sin(outerMidAngle) * outerArcRadius,
-      );
-    }
+    renderAngleArcs(
+      context,
+      multiElement.x,
+      multiElement.y,
+      points[numPoints - 3],
+      points[numPoints - 2],
+      points[numPoints - 1],
+      colors,
+      appState.zoom.value,
+    );
   }
 
   context.restore();
@@ -1772,8 +1831,8 @@ const _renderInteractiveScene = ({
 
   renderSnaps(context, appState);
 
-  // Render angle hint when drawing multi-point lines/polygons
-  renderMultiElementAngleHint(context, appState);
+  // Technical drawing mode: render segment lengths and angle measurements
+  renderTechnicalDrawingHints(context, appState);
 
   context.restore();
 
