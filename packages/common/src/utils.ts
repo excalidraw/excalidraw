@@ -1311,3 +1311,7 @@ export const setFeatureFlag = <F extends keyof FEATURE_FLAGS>(
     console.error("unable to set feature flag", e);
   }
 };
+
+export function isCanvasFilterSupported() {
+  return "filter" in (CanvasRenderingContext2D.prototype || {});
+}
