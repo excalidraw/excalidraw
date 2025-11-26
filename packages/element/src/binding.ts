@@ -1213,9 +1213,15 @@ export const bindPointToSnapToElementOutline = (
     return point;
   }
 
-  const edgePoint = isRectanguloidElement(bindableElement)
-    ? avoidRectangularCorner(arrowElement, bindableElement, elementsMap, point)
-    : point;
+  const edgePoint =
+    isRectanguloidElement(bindableElement) && elbowed
+      ? avoidRectangularCorner(
+          arrowElement,
+          bindableElement,
+          elementsMap,
+          point,
+        )
+      : point;
   const adjacentPoint =
     customIntersector && !elbowed
       ? customIntersector[1]
