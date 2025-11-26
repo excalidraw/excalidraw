@@ -1,14 +1,6 @@
-const { CLIEngine } = require("eslint");
-
-// see https://github.com/okonet/lint-staged#how-can-i-ignore-files-from-eslintignore-
-// for explanation
-const cli = new CLIEngine({});
-
+// ESLint 9 with flat config handles ignores automatically
+// No need to manually filter ignored files
 module.exports = {
-  "*.{js,ts,tsx}": files => {
-    return (
-      "eslint --max-warnings=0 --fix " + files.filter(file => !cli.isPathIgnored(file)).join(" ")
-    );
-  },
-  "*.{css,scss,json,md,html,yml}": ["prettier --write"],
+  "*.{js,ts,tsx}": "eslint --max-warnings=0 --fix",
+  "*.{css,scss,json,md,html,yml}": "prettier --write",
 };

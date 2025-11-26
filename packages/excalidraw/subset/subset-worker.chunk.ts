@@ -29,7 +29,7 @@ if (typeof window === "undefined" && typeof self !== "undefined") {
     };
   }) => {
     switch (e.data.command) {
-      case Commands.Subset:
+      case Commands.Subset: {
         const buffer = await subsetToBinary(
           e.data.arrayBuffer,
           e.data.codePoints,
@@ -37,6 +37,7 @@ if (typeof window === "undefined" && typeof self !== "undefined") {
 
         self.postMessage(buffer, { transfer: [buffer] });
         break;
+      }
     }
   };
 }

@@ -7511,7 +7511,7 @@ class App extends React.Component<AppProps, AppState> {
 
     let nextPastePrevented = false;
     const isLinux =
-      typeof window === undefined
+      typeof window === "undefined"
         ? false
         : /Linux/.test(window.navigator.platform);
 
@@ -10845,60 +10845,62 @@ class App extends React.Component<AppProps, AppState> {
       this.files[fileId]?.dataURL || (await getDataURL(imageFile));
 
     return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
-      async (resolve, reject) => {
-        try {
-          let initializedImageElement = this.getLatestInitializedImageElement(
-            placeholderImageElement,
-            fileId,
-          );
-
-          this.addMissingFiles([
-            {
-              mimeType,
-              id: fileId,
-              dataURL,
-              created: Date.now(),
-              lastRetrieved: Date.now(),
-            },
-          ]);
-
-          if (!this.imageCache.get(fileId)) {
-            this.addNewImagesToImageCache();
-
-            const { erroredFiles } = await this.updateImageCache([
-              initializedImageElement,
-            ]);
-
-            if (erroredFiles.size) {
-              throw new Error("Image cache update resulted with an error.");
-            }
-          }
-
-          const imageHTML = await this.imageCache.get(fileId)?.image;
-
-          if (
-            imageHTML &&
-            this.state.newElement?.id !== initializedImageElement.id
-          ) {
-            initializedImageElement = this.getLatestInitializedImageElement(
+      (resolve, reject) => {
+        (async () => {
+          try {
+            let initializedImageElement = this.getLatestInitializedImageElement(
               placeholderImageElement,
               fileId,
             );
 
-            const naturalDimensions = this.getImageNaturalDimensions(
-              initializedImageElement,
-              imageHTML,
-            );
+            this.addMissingFiles([
+              {
+                mimeType,
+                id: fileId,
+                dataURL,
+                created: Date.now(),
+                lastRetrieved: Date.now(),
+              },
+            ]);
 
-            // no need to create a new instance anymore, just assign the natural dimensions
-            Object.assign(initializedImageElement, naturalDimensions);
+            if (!this.imageCache.get(fileId)) {
+              this.addNewImagesToImageCache();
+
+              const { erroredFiles } = await this.updateImageCache([
+                initializedImageElement,
+              ]);
+
+              if (erroredFiles.size) {
+                throw new Error("Image cache update resulted with an error.");
+              }
+            }
+
+            const imageHTML = await this.imageCache.get(fileId)?.image;
+
+            if (
+              imageHTML &&
+              this.state.newElement?.id !== initializedImageElement.id
+            ) {
+              initializedImageElement = this.getLatestInitializedImageElement(
+                placeholderImageElement,
+                fileId,
+              );
+
+              const naturalDimensions = this.getImageNaturalDimensions(
+                initializedImageElement,
+                imageHTML,
+              );
+
+              // no need to create a new instance anymore, just assign the natural dimensions
+              Object.assign(initializedImageElement, naturalDimensions);
+            }
+
+            resolve(initializedImageElement);
+          } catch (error: any) {
+            console.error(error);
+            reject(new Error(t("errors.imageInsertError")));
           }
-
-          resolve(initializedImageElement);
-        } catch (error: any) {
-          console.error(error);
-          reject(new Error(t("errors.imageInsertError")));
-        }
+        })();
       },
     );
   };
@@ -12136,9 +12138,7 @@ export const createTestHook = () => {
           return this.app?.scene.getElementsIncludingDeleted();
         },
         set(elements: ExcalidrawElement[]) {
-          return this.app?.scene.replaceAllElements(
-            syncInvalidIndices(elements),
-          );
+          this.app?.scene.replaceAllElements(syncInvalidIndices(elements));
         },
       },
       scene: {
