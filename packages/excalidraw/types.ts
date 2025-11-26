@@ -474,11 +474,7 @@ export type SearchMatch = {
 
 export type UIAppState = Omit<
   AppState,
-  | "suggestedBinding"
-  | "startBoundElement"
-  | "cursorButton"
-  | "scrollX"
-  | "scrollY"
+  "startBoundElement" | "cursorButton" | "scrollX" | "scrollY"
 >;
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };

@@ -203,7 +203,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
       0,
     ],
     [
-      79,
+      "79.00000",
       "124.16785",
     ],
   ],
@@ -228,7 +228,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "updated": 1,
   "version": 12,
   "versionNonce": 2066753033,
-  "width": 79,
+  "width": "79.00000",
   "x": 111,
   "y": "6.14995",
 }
