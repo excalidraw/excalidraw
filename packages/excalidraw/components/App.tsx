@@ -8467,22 +8467,22 @@ class App extends React.Component<AppProps, AppState> {
       const { x: rx, y: ry } = multiElement;
       const { lastCommittedPoint } = selectedLinearElement;
 
-      const hoveredElementForBinding = getHoveredElementForBinding(
-        pointFrom<GlobalPoint>(
-          this.lastPointerMoveCoords?.x ??
-            rx + multiElement.points[multiElement.points.length - 1][0],
-          this.lastPointerMoveCoords?.y ??
-            ry + multiElement.points[multiElement.points.length - 1][1],
-        ),
-        this.scene.getNonDeletedElements(),
-        this.scene.getNonDeletedElementsMap(),
-      );
+      const hoveredElementForBinding =
+        isBindingEnabled(this.state) &&
+        getHoveredElementForBinding(
+          pointFrom<GlobalPoint>(
+            this.lastPointerMoveCoords?.x ??
+              rx + multiElement.points[multiElement.points.length - 1][0],
+            this.lastPointerMoveCoords?.y ??
+              ry + multiElement.points[multiElement.points.length - 1][1],
+          ),
+          this.scene.getNonDeletedElements(),
+          this.scene.getNonDeletedElementsMap(),
+        );
 
       // clicking inside commit zone → finalize arrow
       if (
-        (isBindingElement(multiElement) &&
-          hoveredElementForBinding &&
-          isBindingEnabled(this.state)) ||
+        (isBindingElement(multiElement) && hoveredElementForBinding) ||
         (multiElement.points.length > 1 &&
           lastCommittedPoint &&
           pointDistance(
