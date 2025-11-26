@@ -131,6 +131,17 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
     local: true,
     fallback: true,
   },
+  [FONT_FAMILY_FALLBACKS["Segoe UI Symbol"]]: {
+    metrics: {
+      // conservative metrics similar to Segoe UI Emoji / Excalifont
+      unitsPerEm: 1000,
+      ascender: 886,
+      descender: -374,
+      lineHeight: 1.25,
+    },
+    local: true,
+    fallback: true,
+  },
 };
 
 /** Unicode ranges defined by google fonts */
