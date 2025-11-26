@@ -46,9 +46,9 @@
     "arrowhead_triangle_outline": "三角 (中抜き)",
     "arrowhead_diamond": "ひし形",
     "arrowhead_diamond_outline": "ひし形 (中抜き)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_crowfoot_many": "鳥の足記法（多対多）",
+    "arrowhead_crowfoot_one": "鳥の足記法（一対一）",
+    "arrowhead_crowfoot_one_or_many": "鳥の足記法（一対多）",
     "more_options": "詳細設定",
     "arrowtypes": "矢印の種類",
     "arrowtype_sharp": "鋭い矢印",
@@ -142,8 +142,8 @@
       "editArrow": "矢印を編集"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "ポリゴンを分割",
+      "convertToPolygon": "ポリゴンに変換"
     },
     "elementLock": {
       "lock": "ロック",
@@ -160,33 +160,33 @@
     "prompt": "プロンプト",
     "followUs": "フォローする",
     "discordChat": "Discord チャット",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": "",
-    "installPWA": "",
-    "autoResize": "",
-    "imageCropping": "",
+    "zoomToFitViewport": "表寿範囲に合わせてズーム",
+    "zoomToFitSelection": "選択範囲に合わせてズーム",
+    "zoomToFit": "すべての要素が収まるようにズーム",
+    "installPWA": "Excalidrawをローカルにインストール(PWA)",
+    "autoResize": "テキストの自動サイズ変更を有効化",
+    "imageCropping": "画像のトリミング",
     "unCroppedDimension": "",
     "copyElementLink": "",
-    "linkToElement": "",
-    "wrapSelectionInFrame": "",
-    "tab": "",
-    "shapeSwitch": ""
+    "linkToElement": "オブジェクトにリンク",
+    "wrapSelectionInFrame": "選択範囲を枠で折り返す",
+    "tab": "Tab",
+    "shapeSwitch": "図形形状を変更"
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "オブジェクトにリンク",
+    "desc": "キャンバス上の図形をクリックするか、リンクを貼り付けます。",
+    "notFound": "リンクされたオブジェクトがキャンバス上に見つかりませんでした。"
   },
   "library": {
     "noItems": "まだアイテムが追加されていません…",
     "hint_emptyLibrary": "キャンバス上のアイテムを選択してここに追加するか、以下の公開リポジトリからライブラリをインストールしてください。",
     "hint_emptyPrivateLibrary": "キャンバス上のアイテムを選択すると、ここに追加されます。",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "ライブラリを検索",
+      "heading": "ライブラリと一致",
+      "noResults": "一致するアイテムが見つかりませんでした…",
+      "clearSearch": "検索のクリア"
     }
   },
   "search": {
@@ -195,8 +195,8 @@
     "singleResult": "結果",
     "multipleResults": "結果数",
     "placeholder": "キャンバス内のテキストを検索…",
-    "frames": "",
-    "texts": ""
+    "frames": "フレーム",
+    "texts": "テキスト"
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -230,11 +230,11 @@
     "objectsSnapMode": "オブジェクトにスナップ",
     "exitZenMode": "集中モードをやめる",
     "cancel": "キャンセル",
-    "saveLibNames": "",
+    "saveLibNames": "保存して終了",
     "clear": "消去",
     "remove": "削除",
     "embed": "埋め込みの切り替え",
-    "publishLibrary": "",
+    "publishLibrary": "名前の変更または公開",
     "submit": "送信",
     "confirm": "確認",
     "embeddableInteractionButton": "クリックして操作"
@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "クリックすると複数の頂点からなる曲線を開始、ドラッグすると直線",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "クリックしてドラッグします。離すと終了します",
     "text": "ヒント: 選択ツールを使用して任意の場所をダブルクリックしてテキストを追加することもできます",
     "embeddable": "クリックしてドラッグし、ウェブサイトを埋め込む",

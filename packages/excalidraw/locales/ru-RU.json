@@ -142,8 +142,8 @@
       "editArrow": "Изменить стрелку"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Разбить полигон",
+      "convertToPolygon": "Преобразовать в полигон"
     },
     "elementLock": {
       "lock": "Блокировать",
@@ -170,8 +170,8 @@
     "copyElementLink": "Скопировать ссылку на объект",
     "linkToElement": "Ссылка на объект",
     "wrapSelectionInFrame": "Поместить выделенное в фрейм",
-    "tab": "",
-    "shapeSwitch": ""
+    "tab": "Вкладка",
+    "shapeSwitch": "Сменить форму"
   },
   "elementLink": {
     "title": "Ссылка на объект",
@@ -183,10 +183,10 @@
     "hint_emptyLibrary": "Выберите объект на холсте, чтобы добавить его сюда, или установите библиотеку из публичного репозитория ниже.",
     "hint_emptyPrivateLibrary": "Выберите объект на холсте, чтобы добавить его сюда.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Поиск в библиотеке",
+      "heading": "Совпадения в библиотеке",
+      "noResults": "Совпадения не найдены...",
+      "clearSearch": "Очистить поиск"
     }
   },
   "search": {
@@ -195,8 +195,8 @@
     "singleResult": "результат",
     "multipleResults": "результатов",
     "placeholder": "Найти текст на холсте...",
-    "frames": "",
-    "texts": ""
+    "frames": "Рамки",
+    "texts": "Текст"
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -230,11 +230,11 @@
     "objectsSnapMode": "Привязка к объектам",
     "exitZenMode": "Отключить режим «Дзен»",
     "cancel": "Отменить",
-    "saveLibNames": "",
+    "saveLibNames": "Сохранить названия и выйти",
     "clear": "Очистить",
     "remove": "Удалить",
     "embed": "Включить встраивание",
-    "publishLibrary": "",
+    "publishLibrary": "Переименовать или опубликовать",
     "submit": "Отправить",
     "confirm": "Подтвердить",
     "embeddableInteractionButton": "Нажмите для взаимодействия"
@@ -261,7 +261,7 @@
     "removeItemsFromsLibrary": "Удалить объекты ({{count}}) из библиотеки?",
     "invalidEncryptionKey": "Ключ шифрования должен состоять из 22 символов. Одновременное редактирование отключено.",
     "collabOfflineWarning": "Отсутствует интернет-соединение.\nВаши изменения не будут сохранены!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Превышена квота хранения браузера. Изменения не будут сохранены."
   },
   "errors": {
     "unsupportedFileType": "Неподдерживаемый тип файла.",
@@ -292,7 +292,7 @@
   },
   "toolBar": {
     "selection": "Выделение области",
-    "lasso": "",
+    "lasso": "Выделение лассо",
     "image": "Вставить изображение",
     "rectangle": "Прямоугольник",
     "diamond": "Ромб",
@@ -313,7 +313,7 @@
     "hand": "Рука (перемещение холста)",
     "extraTools": "Дополнительные инструменты",
     "mermaidToExcalidraw": "Mermaid в Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "Переключение типа формы"
   },
   "element": {
     "rectangle": "Прямоугольник",
@@ -337,33 +337,34 @@
     "shapes": "Фигуры"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} — отменить поиск",
+    "canvasPanning": "Чтобы переместить холст, удерживайте {{shortcut_1}} или {{shortcut_2}} во время перетаскивания или используйте инструмент «Рука»",
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
-    "arrowTool": "",
+    "arrowTool": "Нажмите, чтобы начать рисование нескольких точек, перетащите для одной линии. Нажмите {{shortcut}} снова, чтобы изменить тип стрелки.",
+    "arrowBindModifiers": "",
     "freeDraw": "Нажмите и перетаскивайте, отпустите по завершении",
     "text": "Совет: при выбранном инструменте выделения дважды щёлкните в любом месте, чтобы добавить текст",
     "embeddable": "Перетащите для встраивания веб-сайта",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "text_selected": "Дважды щёлкните или нажмите {{shortcut}}, чтобы отредактировать текст",
+    "text_editing": "Нажмите {{shortcut_1}} или {{shortcut_2}}, чтобы завершить редактирование",
+    "linearElementMulti": "Нажмите на последнюю точку или нажмите {{shortcut_1}} или {{shortcut_2}}, чтобы завершить",
+    "lockAngle": "Вы можете ограничить угол, удерживая {{shortcut}}",
+    "resize": "Вы можете ограничить пропорции, удерживая {{shortcut_1}} во время изменения размера,\nудерживайте {{shortcut_2}}, чтобы изменить размер от центра",
+    "resizeImage": "Вы можете свободно изменять размер, удерживая {{shortcut_1}},\nудерживайте {{shortcut_2}}, чтобы изменить размер от центра",
+    "rotate": "Вы можете ограничить углы, удерживая {{shortcut}} во время поворота",
+    "lineEditor_info": "Удерживайте {{shortcut_1}} и дважды щёлкните или нажмите {{shortcut_2}}, чтобы отредактировать точки",
+    "lineEditor_line_info": "Дважды щёлкните или нажмите {{shortcut}}, чтобы отредактировать точки",
+    "lineEditor_pointSelected": "Нажмите {{shortcut_1}}, чтобы удалить точки,\n{{shortcut_2}} для дублирования или перетащите",
+    "lineEditor_nothingSelected": "Выберите точку для редактирования (удерживайте {{shortcut_1}}, чтобы выбрать несколько),\nили удерживайте {{shortcut_2}} и щёлкните, чтобы добавить новые точки",
     "publishLibrary": "Опубликовать свою собственную библиотеку",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} — добавить текст",
+    "createFlowchart": "{{shortcut}} — создать блок-схему",
+    "deepBoxSelect": "Удерживайте {{shortcut}} для глубокого выделения и предотвращения перетаскивания",
+    "eraserRevert": "Удерживайте {{shortcut}}, чтобы восстановить элементы, помеченные для удаления",
     "firefox_clipboard_write": "Эта функция может быть включена при изменении значения флага «dom.events.asyncClipboard.clipboardItem» на «true». Чтобы изменить флаги браузера в Firefox, зайдите на страницу «about:config».",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Удерживайте {{shortcut}}, чтобы отключить привязку",
+    "enterCropEditor": "Дважды щёлкните по изображению или нажмите {{shortcut}}, чтобы обрезать изображение",
+    "leaveCropEditor": "Щёлкните за пределами изображения или нажмите {{shortcut_1}} или {{shortcut_2}}, чтобы завершить кадрирование"
   },
   "canvasError": {
     "cannotShowPreview": "Не удалось отобразить предпросмотр",
@@ -568,7 +569,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Цвет",
     "mostUsedCustomColors": "Часто используемые пользовательские цвета",
     "colors": "Цвета",
     "shades": "Оттенки",
@@ -650,15 +651,15 @@
     "shortcutHint": "Используйте {{shortcut}} для командной палитры"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Пробел",
+    "delete": "Delete",
+    "mmb": "Колёсико мыши"
   }
 }

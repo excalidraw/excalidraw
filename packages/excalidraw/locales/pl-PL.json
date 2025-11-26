@@ -341,6 +341,7 @@
     "canvasPanning": "Aby przesunąć płótno, przytrzymaj {{shortcut_1}} lub {{shortcut_2}} podczas przeciągania, albo użyj narzędzia ręki",
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "arrowTool": "Kliknij, aby rozpocząć rysowanie wielu punktów; przeciągnij, aby narysować pojedynczą linię. Naciśnij ponownie {{shortcut}}, aby zmienić typ strzałki.",
+    "arrowBindModifiers": "",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
     "embeddable": "Kliknij i przeciągnij, aby stworzyć osadzenie strony",

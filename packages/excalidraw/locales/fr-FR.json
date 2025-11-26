@@ -341,6 +341,7 @@
     "canvasPanning": "Pour déplacer le canevas, maintenez {{shortcut_1}} ou {{shortcut_2}} enfoncé tout en faisant glisser, ou utilisez l'outil main",
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "arrowTool": "Cliquez pour démarrer plusieurs points, faites glisser pour une ligne unique. Appuyez à nouveau sur {{shortcut}} pour changer le type de flèche.",
+    "arrowBindModifiers": "",
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
     "embeddable": "Cliquez et glissez pour créer une intégration de site web",

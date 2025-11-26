@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Paspaudimai sukurs papildomus taškus, nepertraukiamas tempimas sukurs liniją",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Spausk ir tempk, paleisk kai norėsi pabaigti",
     "text": "Užuomina: tekstą taip pat galima pridėti bet kur su dvigubu pelės paspaudimu, kol parinkas žymėjimo įrankis",
     "embeddable": "",
