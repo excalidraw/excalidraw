@@ -89,6 +89,7 @@ export const getDefaultAppState = (): Omit<
     scrolledOutside: false,
     scrollX: 0,
     scrollY: 0,
+    waypoints: [],
     selectedElementIds: {},
     hoveredElementIds: {},
     selectedGroupIds: {},
@@ -254,6 +255,7 @@ const APP_STATE_STORAGE_CONF = (<
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
   bindMode: { browser: true, export: false, server: false },
+  waypoints: { browser: true, export: false, server: false }
 });
 
 const _clearAppStateForStorage = <

@@ -263,7 +263,13 @@ export type ObservedElementsAppState = {
   lockedMultiSelections: AppState["lockedMultiSelections"];
   activeLockedId: AppState["activeLockedId"];
 };
-
+export interface Waypoint {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  zoom: number;
+}
 export interface AppState {
   contextMenu: {
     items: ContextMenuItems;
@@ -351,6 +357,7 @@ export interface AppState {
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
+  waypoints: Waypoint[];
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string | null;

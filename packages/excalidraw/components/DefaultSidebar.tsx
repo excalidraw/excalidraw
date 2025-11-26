@@ -18,6 +18,13 @@ import { useExcalidrawSetAppState } from "./App";
 import { LibraryMenu } from "./LibraryMenu";
 import { SearchMenu } from "./SearchMenu";
 import { Sidebar } from "./Sidebar/Sidebar";
+import { WaypointsPanel } from "./WaypointsSidebar";
+import {
+  addWaypointFromCurrentView,
+  renameWaypoint,
+  deleteWaypoint,
+  jumpToWaypoint,
+} from "./Waypoints";
 import { withInternalFallback } from "./hoc/withInternalFallback";
 import { LibraryIcon, searchIcon } from "./icons";
 
@@ -75,7 +82,22 @@ export const DefaultSidebar = Object.assign(
       const { DefaultSidebarTabTriggersTunnel } = useTunnels();
 
       const isForceDocked = appState.openSidebar?.tab === CANVAS_SEARCH_TAB;
+      
+      const handleAddWaypoint = () => {
+        setAppState((prev) => addWaypointFromCurrentView(prev));
+      };
 
+      const handleRenameWaypoint = (id: string, name: string) => {
+        setAppState((prev) => renameWaypoint(prev, id, name));
+      };
+
+      const handleDeleteWaypoint = (id: string) => {
+        setAppState((prev) => deleteWaypoint(prev, id));
+      };
+
+      const handleJumpToWaypoint = (id: string) => {
+        setAppState((prev) => jumpToWaypoint(prev, id));
+      };
       return (
         <Sidebar
           {...rest}
@@ -105,6 +127,9 @@ export const DefaultSidebar = Object.assign(
                 <Sidebar.TabTrigger tab={LIBRARY_SIDEBAR_TAB}>
                   {LibraryIcon}
                 </Sidebar.TabTrigger>
+                <Sidebar.TabTrigger tab="waypoints">
+                  WP
+                </Sidebar.TabTrigger>
                 <DefaultSidebarTabTriggersTunnel.Out />
               </Sidebar.TabTriggers>
             </Sidebar.Header>
@@ -113,6 +138,15 @@ export const DefaultSidebar = Object.assign(
             </Sidebar.Tab>
             <Sidebar.Tab tab={CANVAS_SEARCH_TAB}>
               <SearchMenu />
+            </Sidebar.Tab>
+            <Sidebar.Tab tab="waypoints">
+              <WaypointsPanel
+                waypoints={appState.waypoints}
+                onAdd={handleAddWaypoint}
+                onJump={handleJumpToWaypoint}
+                onRename={handleRenameWaypoint}
+                onDelete={handleDeleteWaypoint}
+              />
             </Sidebar.Tab>
             {children}
           </Sidebar.Tabs>
