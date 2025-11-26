@@ -2,6 +2,10 @@ import {
   clamp,
   pointFrom,
   pointsEqual,
+  radiansToDegrees,
+  vectorDot,
+  vectorFromPoint,
+  vectorMagnitude,
   type GlobalPoint,
   type LocalPoint,
   type Radians,
@@ -155,6 +159,124 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
     LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value,
     false,
   );
+};
+
+/**
+ * Renders the angle between the last two segments of a multiElement line/polygon
+ * being drawn. The angle is displayed near the vertex where the segments meet.
+ */
+const renderMultiElementAngleHint = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+) => {
+  const { multiElement } = appState;
+
+  // Need at least 3 points to have 2 segments and calculate an angle between them
+  if (!multiElement || multiElement.points.length < 3) {
+    return;
+  }
+
+  const points = multiElement.points;
+  const numPoints = points.length;
+
+  // Get the last three points to calculate the angle
+  // p1 -> p2 is the second-to-last segment
+  // p2 -> p3 is the last segment (being drawn)
+  const p1 = points[numPoints - 3];
+  const p2 = points[numPoints - 2]; // vertex where angle is measured
+  const p3 = points[numPoints - 1];
+
+  // Create vectors from the vertex (p2)
+  // v1 points from p2 to p1 (reversed direction of first segment)
+  // v2 points from p2 to p3 (direction of second segment)
+  const v1 = vectorFromPoint(p1, p2);
+  const v2 = vectorFromPoint(p3, p2);
+
+  const mag1 = vectorMagnitude(v1);
+  const mag2 = vectorMagnitude(v2);
+
+  // Avoid division by zero for very short segments
+  if (mag1 < 0.001 || mag2 < 0.001) {
+    return;
+  }
+
+  // Calculate angle using dot product: cos(θ) = (v1 · v2) / (|v1| * |v2|)
+  const dot = vectorDot(v1, v2);
+  const cosAngle = clamp(dot / (mag1 * mag2), -1, 1);
+  const angleRadians = Math.acos(cosAngle) as Radians;
+  const angleDegrees = Math.round(radiansToDegrees(angleRadians));
+
+  // Calculate position for the angle label (near the vertex, offset outward)
+  // Use the angle bisector direction to position the label
+  const vertexX = multiElement.x + p2[0];
+  const vertexY = multiElement.y + p2[1];
+
+  // Offset distance from the vertex (in scene coordinates)
+  const offsetDistance = 25 / appState.zoom.value;
+
+  // Calculate bisector direction (normalized sum of normalized vectors)
+  const norm1X = v1[0] / mag1;
+  const norm1Y = v1[1] / mag1;
+  const norm2X = v2[0] / mag2;
+  const norm2Y = v2[1] / mag2;
+
+  let bisectorX = norm1X + norm2X;
+  let bisectorY = norm1Y + norm2Y;
+  const bisectorMag = Math.sqrt(bisectorX * bisectorX + bisectorY * bisectorY);
+
+  if (bisectorMag > 0.001) {
+    bisectorX /= bisectorMag;
+    bisectorY /= bisectorMag;
+  } else {
+    // If vectors are opposite, use perpendicular direction
+    bisectorX = -norm1Y;
+    bisectorY = norm1X;
+  }
+
+  const labelX = vertexX + bisectorX * offsetDistance;
+  const labelY = vertexY + bisectorY * offsetDistance;
+
+  // Render the angle label
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
+  const fontSize = 12 / appState.zoom.value;
+  context.font = `${fontSize}px Cascadia, monospace`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+
+  // Draw background for better readability
+  const text = `${angleDegrees}°`;
+  const textMetrics = context.measureText(text);
+  const padding = 4 / appState.zoom.value;
+  const bgWidth = textMetrics.width + padding * 2;
+  const bgHeight = fontSize + padding * 2;
+
+  context.fillStyle =
+    appState.theme === THEME.DARK
+      ? "rgba(30, 30, 30, 0.9)"
+      : "rgba(255, 255, 255, 0.9)";
+  context.beginPath();
+  context.roundRect?.(
+    labelX - bgWidth / 2,
+    labelY - bgHeight / 2,
+    bgWidth,
+    bgHeight,
+    3 / appState.zoom.value,
+  );
+  context.fill();
+
+  // Draw border
+  context.strokeStyle =
+    appState.theme === THEME.DARK ? "rgba(255, 255, 255, 0.3)" : "#5e5ad8";
+  context.lineWidth = 1 / appState.zoom.value;
+  context.stroke();
+
+  // Draw text
+  context.fillStyle = appState.theme === THEME.DARK ? "#fff" : "#1e1e1e";
+  context.fillText(text, labelX, labelY);
+
+  context.restore();
 };
 
 const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
@@ -1561,6 +1683,9 @@ const _renderInteractiveScene = ({
   });
 
   renderSnaps(context, appState);
+
+  // Render angle hint when drawing multi-point lines/polygons
+  renderMultiElementAngleHint(context, appState);
 
   context.restore();
 
