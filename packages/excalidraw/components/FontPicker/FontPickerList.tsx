@@ -14,11 +14,14 @@ import {
   debounce,
   FONT_FAMILY,
   getFontFamilyString,
+  FONT_METADATA as COMMON_FONT_METADATA,
 } from "@excalidraw/common";
 
 import type { ValueOf } from "@excalidraw/common/utility-types";
 
 import { Fonts } from "../../fonts";
+import { ExcalidrawFontFace } from "../../fonts/ExcalidrawFontFace";
+import { FONT_METADATA } from "@excalidraw/common";
 import { t } from "../../i18n";
 import {
   useApp,
@@ -39,6 +42,7 @@ import {
   FontFamilyHeadingIcon,
   FontFamilyNormalIcon,
   FreedrawIcon,
+  LoadIcon,
 } from "../icons";
 
 import { fontPickerKeyHandler } from "./keyboardNavHandlers";
@@ -102,6 +106,9 @@ export const FontPickerList = React.memo(
 
     const [searchTerm, setSearchTerm] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
+      // bump this to force re-evaluation of registered fonts list after
+      // registering new local fonts
+      const [registeredVersion, setRegisteredVersion] = useState(0);
     const allFonts = useMemo(
       () =>
         Array.from(Fonts.registered.entries())
@@ -130,7 +137,7 @@ export const FontPickerList = React.memo(
           .sort((a, b) =>
             a.text.toLowerCase() > b.text.toLowerCase() ? 1 : -1,
           ),
-      [],
+      [registeredVersion],
     );
 
     const sceneFamilies = useMemo(
@@ -357,6 +364,118 @@ export const FontPickerList = React.memo(
         >
           {groups.length ? groups : null}
         </ScrollableList>
+        {/* Import local fonts button - opens file picker to load fonts into document.fonts */}
+        <div style={{ padding: "0.25rem 0.5rem" }}>
+          <input
+            id="font-import-input"
+            type="file"
+            accept=".ttf,.otf,.woff,.woff2"
+            style={{ display: "none" }}
+            multiple
+            onChange={async (e) => {
+              const files = e.target.files;
+              if (!files || files.length === 0) return;
+              const loadedFamilies: string[] = [];
+
+              for (const file of Array.from(files)) {
+                try {
+                  const url = URL.createObjectURL(file);
+                  const family = file.name.replace(/\.[^/.]+$/, "");
+                  // @ts-ignore
+                  const fontFace = new FontFace(family, `url(${url})`);
+                  await fontFace.load();
+                  // add to document fonts so CSS/canvas can use it
+                  (document as any).fonts.add(fontFace);
+                  loadedFamilies.push(family);
+                  // Register in Excalidraw internal registry so it shows up in the
+                  // font picker. We create an ExcalidrawFontFace backed by the
+                  // object URL and add it to Fonts.registered under a new id.
+                  try {
+                    const registered = Fonts.registered;
+                    const existingKeys = Array.from(registered.keys());
+                    const maxKey = existingKeys.length ? Math.max(...existingKeys) : 0;
+                    const newKey = maxKey + 1;
+
+                    // Use Excalifont metadata as a reasonable default for local fonts
+                    // FALLBACK: try to reuse existing Excalifont metadata if present
+                    const defaultMetadata =
+                      COMMON_FONT_METADATA[FONT_FAMILY.Excalifont] ||
+                      // last resort: pick the first metadata entry
+                      (COMMON_FONT_METADATA[Object.keys(COMMON_FONT_METADATA)[0] as unknown as number] as any);
+
+                    const metadata = {
+                      ...defaultMetadata,
+                      // mark as local so we don't inline it for export
+                      local: true,
+                    } as typeof defaultMetadata;
+
+                    // register in Fonts.registered under a fresh numeric id
+                    registered.set(newKey, {
+                      metadata,
+                      fontFaces: [new ExcalidrawFontFace(family, url)],
+                    });
+
+                    // ensure FONT_FAMILY maps the new family name -> newKey so
+                    // getFontFamilyString can resolve CSS family strings for UI
+                    try {
+                      // mutate runtime mapping
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      (FONT_FAMILY as any)[family] = newKey;
+                    } catch (e) {
+                      // ignore
+                    }
+
+                    // also ensure common font metadata has an entry for this id
+                    try {
+                      // @ts-ignore - extend runtime mapping
+                      COMMON_FONT_METADATA[newKey] = metadata;
+                    } catch {}
+
+                    // bump version so the list recomputes and shows the new font
+                    setRegisteredVersion((v) => v + 1);
+                  } catch (err) {
+                    // eslint-disable-next-line no-console
+                    console.error("Failed to register font in internal registry", err);
+                  }
+                } catch (err) {
+                  // eslint-disable-next-line no-console
+                  console.error("Failed to load font", file.name, err);
+                }
+              }
+
+              if (loadedFamilies.length) {
+                try {
+                  const key = "excalidraw:localFonts";
+                  const prev = JSON.parse(localStorage.getItem(key) || "[]");
+                  const merged = Array.from(new Set([...prev, ...loadedFamilies]));
+                  localStorage.setItem(key, JSON.stringify(merged));
+                } catch (e) {
+                  // ignore
+                }
+
+                // simple feedback (can be replaced with toast later)
+                // eslint-disable-next-line no-alert
+                window.alert(
+                  t("labels.importFontsSuccess", { count: loadedFamilies.length }) ||
+                    `${loadedFamilies.length} font(s) loaded`,
+                );
+              }
+
+              // clear input so selecting same files again triggers change
+              (e.target as HTMLInputElement).value = "";
+            }}
+          />
+          <DropdownMenuItem
+            icon={LoadIcon}
+            onSelect={() => {
+              const input = document.getElementById("font-import-input") as HTMLInputElement | null;
+              input?.click();
+            }}
+            aria-label={t("labels.importFonts")}
+          >
+            {t("labels.importFonts")}
+          </DropdownMenuItem>
+        </div>
       </PropertiesPopover>
     );
   },

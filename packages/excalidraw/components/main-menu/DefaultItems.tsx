@@ -393,3 +393,5 @@ export const LiveCollaborationTrigger = ({
 };
 
 LiveCollaborationTrigger.displayName = "LiveCollaborationTrigger";
+// ImportLocalFonts intentionally moved into the FontPicker so it appears
+// next to other font controls in the text tool. Keep no-op here.
