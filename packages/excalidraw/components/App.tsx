@@ -3836,6 +3836,9 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: this.state.currentItemFontFamily,
       textAlign: DEFAULT_TEXT_ALIGN,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
+      bold: this.state.currentItemBold,
+      italic: this.state.currentItemItalic,
+      underline: this.state.currentItemUnderline,
       locked: false,
     };
     const fontString = getFontString({
@@ -5370,6 +5373,9 @@ class App extends React.Component<AppProps, AppState> {
             return newElementWith(_element, {
               originalText: nextOriginalText,
               isDeleted: isDeleted ?? _element.isDeleted,
+              bold: _element.bold,
+              italic: _element.italic,
+              underline: _element.underline,
               // returns (wrapped) text and new dimensions
               ...refreshTextDimensions(
                 _element,
@@ -5816,6 +5822,9 @@ class App extends React.Component<AppProps, AppState> {
         text: "",
         fontSize,
         fontFamily,
+        bold: this.state.currentItemBold,
+        italic: this.state.currentItemItalic,
+        underline: this.state.currentItemUnderline,
         textAlign: parentCenterPosition
           ? "center"
           : this.state.currentItemTextAlign,
