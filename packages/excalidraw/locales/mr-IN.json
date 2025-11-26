@@ -142,8 +142,8 @@
       "editArrow": "बाण संपादन"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "बहुभुज तोडा",
+      "convertToPolygon": "बहुभुज मध्ये रूपांतरित करा"
     },
     "elementLock": {
       "lock": "कुलूपात ठेवा",
@@ -170,8 +170,8 @@
     "copyElementLink": "वस्तू ह्याचा दुवा कॉपी करावे",
     "linkToElement": "वस्तू ह्याचा दुवा",
     "wrapSelectionInFrame": "चौकटित निवडलेले गुंडाळा",
-    "tab": "",
-    "shapeSwitch": ""
+    "tab": "टॅब",
+    "shapeSwitch": "आकार बदला"
   },
   "elementLink": {
     "title": "वस्तू ह्याचा दुवा",
@@ -183,10 +183,10 @@
     "hint_emptyLibrary": "पटल वर एक वस्तु निवडुन एथे जोडा, किव्हा एक संग्रह जन कोष कडुन खाली स्थापित करा.",
     "hint_emptyPrivateLibrary": "ईथे जोडण्या साठी पटल वरून एक वस्तु निवडा.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "संग्रह शोधा",
+      "heading": "संग्रह परिणाम",
+      "noResults": "काहीही सापडले नाही...",
+      "clearSearch": "शोध पुसा"
     }
   },
   "search": {
@@ -195,8 +195,8 @@
     "singleResult": "निकाल",
     "multipleResults": "निकाल",
     "placeholder": "पटल वर पाठ्य शोधा...",
-    "frames": "",
-    "texts": ""
+    "frames": "चौकटी",
+    "texts": "मजकूर"
   },
   "buttons": {
     "clearReset": "पटल पुसा",
@@ -230,11 +230,11 @@
     "objectsSnapMode": "वस्तूंपासून पकड़ा",
     "exitZenMode": "ध्यानग्र स्थितितून बाहेर",
     "cancel": "रद्द",
-    "saveLibNames": "",
+    "saveLibNames": "नाव जतन करा आणि बाहेर पडा",
     "clear": "स्वछ",
     "remove": "हटवा",
     "embed": "रुतवणे पलटे करा",
-    "publishLibrary": "",
+    "publishLibrary": "नाव बदला किंवा प्रकाशित करा",
     "submit": "जमा करा",
     "confirm": "पुष्टि करा",
     "embeddableInteractionButton": "संवादा साठी क्लिक करा"
@@ -261,7 +261,7 @@
     "removeItemsFromsLibrary": "संग्रहातून {{count}} तत्व (एक किव्हा अनेक) काढू?",
     "invalidEncryptionKey": "कूटबद्धन कुंजी 22 अक्षरांची असणे आवश्यक आहे. थेट सहयोग अक्षम केले आहे.",
     "collabOfflineWarning": "इंटरनेट कनेक्शन उपलब्ध नाही.\nतुमचे बदल जतन केले जाणार नाहीत!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "ब्राउझर स्टोरेज कोटा ओलांडला. बदल जतन केले जाणार नाहीत."
   },
   "errors": {
     "unsupportedFileType": "असमर्थित फाइल प्रकार.",
@@ -292,7 +292,7 @@
   },
   "toolBar": {
     "selection": "निवड",
-    "lasso": "",
+    "lasso": "लॅसो निवड",
     "image": "प्रतिमा आत घाला",
     "rectangle": "आयत",
     "diamond": "चौकोन आकाराचा",
@@ -313,7 +313,7 @@
     "hand": "हात ( सरकवण्या चे उपकरण)",
     "extraTools": "आणिक यंत्रे",
     "mermaidToExcalidraw": "मर्मेड पासून एक्सकाली मधे",
-    "convertElementType": ""
+    "convertElementType": "आकार प्रकार बदला"
   },
   "element": {
     "rectangle": "आयत",
@@ -337,33 +337,33 @@
     "shapes": "आकार"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "शोध बंद करण्यासाठी {{shortcut}}",
+    "canvasPanning": "कॅनव्हास हलवण्यासाठी, ड्रॅग करताना {{shortcut_1}} किंवा {{shortcut_2}} दाबून ठेवा, किंवा हात साधन वापरा",
     "linearElement": "अनेक बिंदु साठी क्लिक करा, रेघे साठी ड्रैग करा",
-    "arrowTool": "",
+    "arrowTool": "अनेक बिंदू सुरू करण्यासाठी क्लिक करा, एका रेषेसाठी ड्रॅग करा. बाण प्रकार बदलण्यासाठी पुन्हा {{shortcut}} दाबा.",
     "freeDraw": "क्लिक आणि ड्रैग करा, झालं तेव्हा सोडा",
     "text": "टीप: तुम्हीं निवड यंत्रानी कोठेही दुहेरी क्लिक करून टेक्स्ट जोडू शकता",
     "embeddable": "वेबसाइट रुतोण्या साठी दाबून-खेचा (क्लिक-ड्रैग करा)",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "text_selected": "मजकूर संपादित करण्यासाठी डबल-क्लिक करा किंवा {{shortcut}} दाबा",
+    "text_editing": "संपादन पूर्ण करण्यासाठी {{shortcut_1}} किंवा {{shortcut_2}} दाबा",
+    "linearElementMulti": "शेवटच्या बिंदूवर क्लिक करा किंवा पूर्ण करण्यासाठी {{shortcut_1}} किंवा {{shortcut_2}} दाबा",
+    "lockAngle": "तुम्ही {{shortcut}} दाबून कोन मर्यादित करू शकता",
+    "resize": "रिसाइज करताना {{shortcut_1}} दाबून तुम्ही प्रमाण मर्यादित करू शकता,\nकेंद्रापासून रिसाइज करण्यासाठी {{shortcut_2}} दाबून ठेवा",
+    "resizeImage": "तुम्ही {{shortcut_1}} दाबून मुक्तपणे रिसाइज करू शकता,\nकेंद्रापासून रिसाइज करण्यासाठी {{shortcut_2}} दाबून ठेवा",
+    "rotate": "फिरवताना {{shortcut}} दाबून तुम्ही कोन मर्यादित करू शकता",
+    "lineEditor_info": "बिंदू संपादित करण्यासाठी {{shortcut_1}} दाबून ठेवा आणि डबल-क्लिक करा किंवा {{shortcut_2}} दाबा",
+    "lineEditor_line_info": "बिंदू संपादित करण्यासाठी डबल-क्लिक करा किंवा {{shortcut}} दाबा",
+    "lineEditor_pointSelected": "बिंदू काढण्यासाठी {{shortcut_1}} दाबा,\nडुप्लिकेट करण्यासाठी {{shortcut_2}}, किंवा हलवण्यासाठी ड्रॅग करा",
+    "lineEditor_nothingSelected": "संपादित करण्यासाठी बिंदू निवडा (अनेक निवडण्यासाठी {{shortcut_1}} दाबून ठेवा),\nकिंवा नवीन बिंदू जोडण्यासाठी {{shortcut_2}} दाबून ठेवा आणि क्लिक करा",
     "publishLibrary": "आपला खाजगी संग्रह प्रकाशित करा",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "मजकूर जोडण्यासाठी {{shortcut}}",
+    "createFlowchart": "फ्लोचार्ट तयार करण्यासाठी {{shortcut}}",
+    "deepBoxSelect": "खोल निवडण्यासाठी, आणि ड्रॅगिंग टाळण्यासाठी {{shortcut}} दाबून ठेवा",
+    "eraserRevert": "हटवण्यासाठी चिन्हांकित केलेले घटक परत आणण्यासाठी {{shortcut}} दाबून ठेवा",
     "firefox_clipboard_write": "हे वैशिष्ट्य \"dom.events.asyncClipboard.clipboardItem\" फ्लॅग \"सत्य\" वर सेट करून शक्यतो सक्षम केले जाऊ शकते. Firefox मध्ये ब्राउझर फ्लॅग बदलण्यासाठी, \"about:config\" पृष्ठावर जा.",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "स्नॅपिंग अक्षम करण्यासाठी {{shortcut}} दाबून ठेवा",
+    "enterCropEditor": "प्रतिमा क्रॉप करण्यासाठी डबल क्लिक करा किंवा {{shortcut}} दाबा",
+    "leaveCropEditor": "क्रॉपिंग पूर्ण करण्यासाठी प्रतिमेच्या बाहेर क्लिक करा किंवा {{shortcut_1}} किंवा {{shortcut_2}} दाबा"
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन दाखवू शकत नाही",
@@ -568,7 +568,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "रंग",
     "mostUsedCustomColors": "सर्वात जास्त वापरणीस रंग",
     "colors": "रंग",
     "shades": "रंगछटा",
@@ -650,15 +650,15 @@
     "shortcutHint": "आदेश फलक साठी, {{shortcut}} वापरा"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Space",
+    "delete": "Delete",
+    "mmb": "Scroll wheel"
   }
 }
