@@ -325,6 +325,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                     ]
               }
             />
+            <Shortcut
+              label={t("buttons.technicalDrawingMode")}
+              shortcuts={[getShortcutKey("Alt+Shift+T")]}
+            />
           </ShortcutIsland>
           <ShortcutIsland
             className="HelpDialog__island--editor"

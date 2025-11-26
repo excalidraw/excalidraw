@@ -165,6 +165,11 @@ const renderMultiElementAngleHint = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
 ) => {
+  // Only render when technical drawing mode is enabled
+  if (!appState.technicalDrawingMode) {
+    return;
+  }
+
   const { multiElement } = appState;
 
   // Need at least 3 points to have 2 segments and calculate an angle between them
