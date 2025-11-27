@@ -1,4 +1,3 @@
-// Waypoints.test.ts
 import {
   addWaypointFromCurrentView,
   renameWaypoint,
@@ -9,12 +8,10 @@ import type { AppState, Waypoint } from "@excalidraw/excalidraw/types";
 
 const makeBaseState = (overrides: Partial<AppState> = {}): AppState => {
   return {
-    // just the fields we care about + minimal required stuff
     scrollX: 10,
     scrollY: 20,
     zoom: { value: 1 } as AppState["zoom"],
     waypoints: [],
-    // everything else stubbed out:
     contextMenu: null,
     showWelcomeScreen: false,
     isLoading: false,

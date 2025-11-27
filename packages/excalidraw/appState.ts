@@ -89,6 +89,7 @@ export const getDefaultAppState = (): Omit<
     scrolledOutside: false,
     scrollX: 0,
     scrollY: 0,
+    //Save the camera bookmarks used by the Waypoints sidebar
     waypoints: [],
     selectedElementIds: {},
     hoveredElementIds: {},
@@ -255,6 +256,7 @@ const APP_STATE_STORAGE_CONF = (<
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
   bindMode: { browser: true, export: false, server: false },
+  //Persist waypoints only in the browser (local state)
   waypoints: { browser: true, export: false, server: false }
 });
 

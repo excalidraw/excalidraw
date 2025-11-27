@@ -1,4 +1,3 @@
-// WaypointsPanel.test.tsx
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { WaypointsPanel } from "./WaypointsSidebar";
@@ -43,11 +42,9 @@ describe("WaypointsPanel", () => {
       />,
     );
 
-    // names visible
     expect(screen.getByText("Intro")).toBeInTheDocument();
     expect(screen.getByText("Details")).toBeInTheDocument();
 
-    // click name calls onJump with id
     fireEvent.click(screen.getByText("Intro"));
     expect(onJump).toHaveBeenCalledWith("1");
   });
@@ -83,7 +80,6 @@ describe("WaypointsPanel", () => {
       />,
     );
 
-    // click pencil
     const renameBtn = screen.getByLabelText("Rename waypoint");
     fireEvent.click(renameBtn);
 
