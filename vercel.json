@@ -67,6 +67,5 @@
   ],
   "outputDirectory": "excalidraw-app/build",
   "installCommand": "yarn install",
-  "buildCommand": "yarn build:packages && yarn build",
-  "framework": null
+  "buildCommand": "yarn build:packages && yarn build"
 }
