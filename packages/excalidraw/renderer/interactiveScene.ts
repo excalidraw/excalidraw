@@ -192,7 +192,6 @@ const renderBindingHighlightForBindableElement_simple = (
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
   appState: InteractiveCanvasAppState,
-  highlightedColor: string, //zsviczian
 ) => {
   const enclosingFrame = element.frameId && elementsMap.get(element.frameId);
   if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
@@ -201,7 +200,7 @@ const renderBindingHighlightForBindableElement_simple = (
       enclosingFrame.y + appState.scrollY,
     );
 
-  context.fillStyle = highlightedColor ?? "rgba(0,0,0,.05)"; //zsviczian
+    context.fillStyle = appState.gridColor.Bold ?? "rgba(0,0,0,.05)"; //zsviczian
     context.beginPath();
 
     if (FRAME_STYLE.radius && context.roundRect) {
@@ -229,17 +228,17 @@ const renderBindingHighlightForBindableElement_simple = (
     case "frame":
       context.save();
 
-      context.strokeStyle = highlightedColor ?? "rgba(0,0,0,.05)"; //zsviczian
+      context.strokeStyle = appState.gridColor.Bold ?? "rgba(0,0,0,.05)"; //zsviczian
       context.translate(
         element.x + appState.scrollX,
         element.y + appState.scrollY,
       );
 
       context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-      context.strokeStyle =
-        appState.theme === THEME.DARK
+      context.strokeStyle = appState.gridColor.Bold.replace(/[^ ]+\)$/, "1)") ?? //zsviczian
+        (appState.theme === THEME.DARK
           ? `rgba(3, 93, 161, 1)`
-          : `rgba(106, 189, 252, 1)`;
+          : `rgba(106, 189, 252, 1)`);
 
       if (FRAME_STYLE.radius && context.roundRect) {
         context.beginPath();
@@ -272,10 +271,10 @@ const renderBindingHighlightForBindableElement_simple = (
       context.lineWidth =
         clamp(1.75, element.strokeWidth, 4) /
         Math.max(0.25, appState.zoom.value);
-      context.strokeStyle =
-        appState.theme === THEME.DARK
+      context.strokeStyle = appState.gridColor.Bold.replace(/[^ ]+\)$/, "1)") ?? //zsviczian
+        (appState.theme === THEME.DARK
           ? `rgba(3, 93, 161, 1)`
-          : `rgba(106, 189, 252, 1)`;
+          : `rgba(106, 189, 252, 1)`);
 
       switch (element.type) {
         case "ellipse":
@@ -379,7 +378,6 @@ const renderBindingHighlightForBindableElement_complex = (
   allElementsMap: NonDeletedSceneElementsMap,
   appState: InteractiveCanvasAppState,
   deltaTime: number,
-  highlightedColor: string, //zsviczian
   state?: { runtime: number },
 ) => {
   const countdownInProgress =
@@ -431,10 +429,10 @@ const renderBindingHighlightForBindableElement_complex = (
       );
 
       context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-      context.strokeStyle =
-        appState.theme === THEME.DARK
+      context.strokeStyle = appState.gridColor.Bold.replace(/[^ ]+\)$/, `${opacity})`) ?? //zsviczian
+        (appState.theme === THEME.DARK
           ? `rgba(3, 93, 161, ${opacity})`
-          : `rgba(106, 189, 252, ${opacity})`;
+          : `rgba(106, 189, 252, ${opacity})`);
 
       if (FRAME_STYLE.radius && context.roundRect) {
         context.beginPath();
@@ -472,10 +470,10 @@ const renderBindingHighlightForBindableElement_complex = (
       context.lineWidth =
         clamp(2.5, element.strokeWidth * 1.75, 4) /
         Math.max(0.25, appState.zoom.value);
-      context.strokeStyle =
-        appState.theme === THEME.DARK
+      context.strokeStyle = appState.gridColor.Bold.replace(/[^ ]+\)$/, `${opacity / 2})`) ?? //zsviczian
+        (appState.theme === THEME.DARK
           ? `rgba(3, 93, 161, ${opacity / 2})`
-          : `rgba(106, 189, 252, ${opacity / 2})`;
+          : `rgba(106, 189, 252, ${opacity / 2})`);
 
       switch (element.type) {
         case "ellipse":
@@ -618,7 +616,7 @@ const renderBindingHighlightForBindableElement_complex = (
     context.stroke();
 
     // context.strokeStyle = "transparent";
-    context.fillStyle = highlightedColor ?? "rgba(128,128,128,.1)"; //zsviczian "rgba(0, 0, 0, 0.04)";
+    context.fillStyle = appState.gridColor.Bold ?? "rgba(128,128,128,.1)"; //zsviczian "rgba(0, 0, 0, 0.04)";
     context.beginPath();
     context.ellipse(
       element.width / 2,
@@ -647,7 +645,6 @@ const renderBindingHighlightForBindableElement = (
   allElementsMap: NonDeletedSceneElementsMap,
   appState: InteractiveCanvasAppState,
   deltaTime: number,
-  highlightedColor: string, //zsviczian
   state?: { runtime: number },
 ) => {
   if (getFeatureFlag("COMPLEX_BINDINGS")) {
@@ -658,7 +655,6 @@ const renderBindingHighlightForBindableElement = (
       allElementsMap,
       appState,
       deltaTime,
-      highlightedColor, //zsviczian
       state,
     );
   }
@@ -670,7 +666,6 @@ const renderBindingHighlightForBindableElement = (
     element,
     allElementsMap,
     appState,
-    highlightedColor, //zsviczian
   );
   context.restore();
 };
@@ -1224,7 +1219,6 @@ const _renderInteractiveScene = ({
         allElementsMap,
         appState,
         deltaTime,
-        appState.gridColor.Bold, //zsviczian
         animationState?.bindingHighlight,
       ),
     };
@@ -1626,6 +1620,7 @@ export const renderInteractiveScene = <
 >(
   renderConfig: InteractiveSceneRenderConfig,
 ): ReturnType<U> => {
+  renderConfig.renderConfig.selectionColor = renderConfig.appState.gridColor.Bold; //zsviczian
   const ret = _renderInteractiveScene(renderConfig);
   renderConfig.callback(ret);
   return ret as ReturnType<U>;
