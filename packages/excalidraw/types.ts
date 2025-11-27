@@ -439,6 +439,7 @@ export interface AppState {
   userToFollow: UserToFollow | null;
   /** the socket ids of the users following the current user */
   followedBy: Set<SocketId>;
+  scrollConstraints: ScrollConstraints | null;
 
   /** image cropping */
   isCropping: boolean;
@@ -621,6 +622,7 @@ export interface ExcalidrawProps {
   onScrollChange?: (scrollX: number, scrollY: number, zoom: Zoom) => void;
   onUserFollow?: (payload: OnUserFollowedPayload) => void;
   children?: React.ReactNode;
+  scrollConstraints?: AppState["scrollConstraints"];
   validateEmbeddable?:
     | boolean
     | string[]
@@ -894,6 +896,7 @@ export interface ExcalidrawImperativeAPI {
   onUserFollow: (
     callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
+  setScrollConstraints: InstanceType<typeof App>["setScrollConstraints"];
 }
 
 export type FrameNameBounds = {
@@ -915,6 +918,12 @@ export type FrameNameBoundsCache = {
       versionNonce: ExcalidrawFrameLikeElement["versionNonce"];
     }
   >;
+};
+
+export type AnimateTranslateCanvasValues = {
+  scrollX: AppState["scrollX"];
+  scrollY: AppState["scrollY"];
+  zoom: AppState["zoom"]["value"];
 };
 
 export type KeyboardModifiersObject = {
@@ -942,6 +951,29 @@ export type EmbedsValidationStatus = Map<
 
 export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;
 
+export type ScrollConstraints = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  animateOnNextUpdate?: boolean;
+  /**
+   * a facotr <0-1> that determines how much you can zoom out beyond the scroll
+   * constraints.
+   */
+  viewportZoomFactor?: number;
+  /**
+   * If true, the user will not be able to zoom out beyond the scroll
+   * constraints (taking into account the viewportZoomFactor).
+   */
+  lockZoom?: boolean;
+  /**
+   * <0-1> - how much can you scroll beyond the constrained area within the
+   * timeout window. Note you will still be snapped back to the constrained area
+   * after the timeout.
+   */
+  overscrollAllowance?: number;
+};
 export type PendingExcalidrawElements = ExcalidrawElement[];
 
 /** Runtime gridSize value. Null indicates disabled grid. */
