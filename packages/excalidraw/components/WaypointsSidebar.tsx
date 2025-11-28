@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 import type { Waypoint } from "@excalidraw/excalidraw/types";
 
+//styles specific to waypoints panel
 import "./WaypointsSidebar.scss";
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
   onDelete: (id: string) => void;
 };
 
+//sidebar to list and edit waypoints
 export const WaypointsPanel: React.FC<Props> = ({
   waypoints,
   onAdd,
@@ -27,6 +29,7 @@ export const WaypointsPanel: React.FC<Props> = ({
     setEditingName(currentName);
   };
 
+  //commit current edit and reset local state
   const commitEditing = () => {
     if (editingId) {
       onRename(editingId, editingName.trim() || editingName);
@@ -35,6 +38,7 @@ export const WaypointsPanel: React.FC<Props> = ({
     setEditingName("");
   };
 
+  // waypoints panel (title and button to add a waypoint from the current view)
   return (
     <div className="waypoints-panel">
       <div className="waypoints-panel__header">
@@ -52,10 +56,12 @@ export const WaypointsPanel: React.FC<Props> = ({
           No waypoints yet. Use “Add current view”.
         </p>
       ) : (
+        //list of existing waypoints
         <ul className="waypoints-panel__list">
           {waypoints.map((w) => (
             <li key={w.id} className="waypoints-panel__item">
               {editingId === w.id ? (
+                //show input for waypoint renaming 
                 <input
                   className="waypoints-panel__input"
                   autoFocus
@@ -81,6 +87,7 @@ export const WaypointsPanel: React.FC<Props> = ({
                 </button>
               )}
 
+          {/*action buttons:rename and delete*/}
               <div className="waypoints-panel__actions">
                 <button
                   className="waypoints-panel__icon-btn"
