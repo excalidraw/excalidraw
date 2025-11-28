@@ -1,4 +1,4 @@
-import type { UserIdleState } from "@excalidraw/common";
+import type { UserIdleState, EditorInterface } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
   NonDeletedElementsMap,
@@ -16,7 +16,6 @@ import type {
   InteractiveCanvasAppState,
   StaticCanvasAppState,
   SocketId,
-  Device,
   PendingExcalidrawElements,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
@@ -66,6 +65,7 @@ export type InteractiveCanvasRenderConfig = {
   remotePointerUsernames: Map<SocketId, string>;
   remotePointerButton: Map<SocketId, string | undefined>;
   selectionColor: string;
+  lastViewportPosition: { x: number; y: number };
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   renderScrollbars?: boolean;
@@ -88,7 +88,12 @@ export type StaticSceneRenderConfig = {
   renderConfig: StaticCanvasRenderConfig;
 };
 
+export type InteractiveSceneRenderAnimationState = {
+  bindingHighlight: { runtime: number } | undefined;
+};
+
 export type InteractiveSceneRenderConfig = {
+  app: AppClassProperties;
   canvas: HTMLCanvasElement | null;
   elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
@@ -97,8 +102,10 @@ export type InteractiveSceneRenderConfig = {
   scale: number;
   appState: InteractiveCanvasAppState;
   renderConfig: InteractiveCanvasRenderConfig;
-  device: Device;
+  editorInterface: EditorInterface;
   callback: (data: RenderInteractiveSceneCallback) => void;
+  animationState?: InteractiveSceneRenderAnimationState;
+  deltaTime: number;
 };
 
 export type NewElementSceneRenderConfig = {

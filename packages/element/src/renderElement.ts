@@ -1,7 +1,14 @@
 import rough from "roughjs/bin/rough";
 import { getStroke } from "perfect-freehand";
 
-import { isRightAngleRads } from "@excalidraw/math";
+import {
+  type GlobalPoint,
+  isRightAngleRads,
+  lineSegment,
+  pointFrom,
+  pointRotateRads,
+  type Radians,
+} from "@excalidraw/math";
 
 import {
   BOUND_TEXT_PADDING,
@@ -14,6 +21,7 @@ import {
   getFontString,
   isRTL,
   getVerticalOffset,
+  invariant,
 } from "@excalidraw/common";
 
 import type {
@@ -32,7 +40,7 @@ import type {
   InteractiveCanvasRenderConfig,
 } from "@excalidraw/excalidraw/scene/types";
 
-import { getElementAbsoluteCoords } from "./bounds";
+import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
@@ -90,7 +98,7 @@ const isPendingImageElement = (
 const shouldResetImageFilter = (
   element: ExcalidrawElement,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
   return (
     appState.theme === THEME.DARK &&
@@ -217,7 +225,7 @@ const generateElementCanvas = (
   elementsMap: NonDeletedSceneElementsMap,
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ): ExcalidrawElementWithCanvas | null => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -269,7 +277,7 @@ const generateElementCanvas = (
     context.filter = IMAGE_INVERT_FILTER;
   }
 
-  drawElementOnCanvas(element, rc, context, renderConfig, appState);
+  drawElementOnCanvas(element, rc, context, renderConfig);
 
   context.restore();
 
@@ -404,7 +412,6 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
 ) => {
   switch (element.type) {
     case "rectangle":
@@ -550,7 +557,7 @@ const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
   const zoom: Zoom = renderConfig
     ? appState.zoom
@@ -607,7 +614,7 @@ const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
   allElementsMap: NonDeletedSceneElementsMap,
 ) => {
   const element = elementWithCanvas.element;
@@ -725,7 +732,7 @@ export const renderElement = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
   const reduceAlphaForSelection =
     appState.openDialog?.name === "elementLinkSelector" &&
@@ -795,7 +802,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig, appState);
+        drawElementOnCanvas(element, rc, context, renderConfig);
         context.restore();
       } else {
         const elementWithCanvas = generateElementWithCanvas(
@@ -888,13 +895,7 @@ export const renderElement = (
 
           tempCanvasContext.translate(-shiftX, -shiftY);
 
-          drawElementOnCanvas(
-            element,
-            tempRc,
-            tempCanvasContext,
-            renderConfig,
-            appState,
-          );
+          drawElementOnCanvas(element, tempRc, tempCanvasContext, renderConfig);
 
           tempCanvasContext.translate(shiftX, shiftY);
 
@@ -933,7 +934,7 @@ export const renderElement = (
           }
 
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig, appState);
+          drawElementOnCanvas(element, rc, context, renderConfig);
         }
 
         context.restore();
@@ -1039,6 +1040,66 @@ export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement) {
 }
 
 export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
+  return getSvgPathFromStroke(getFreedrawOutlinePoints(element));
+}
+
+export function getFreedrawOutlineAsSegments(
+  element: ExcalidrawFreeDrawElement,
+  points: [number, number][],
+  elementsMap: ElementsMap,
+) {
+  const bounds = getElementBounds(
+    {
+      ...element,
+      angle: 0 as Radians,
+    },
+    elementsMap,
+  );
+  const center = pointFrom<GlobalPoint>(
+    (bounds[0] + bounds[2]) / 2,
+    (bounds[1] + bounds[3]) / 2,
+  );
+
+  invariant(points.length >= 2, "Freepath outline must have at least 2 points");
+
+  return points.slice(2).reduce(
+    (acc, curr) => {
+      acc.push(
+        lineSegment<GlobalPoint>(
+          acc[acc.length - 1][1],
+          pointRotateRads(
+            pointFrom<GlobalPoint>(curr[0] + element.x, curr[1] + element.y),
+            center,
+            element.angle,
+          ),
+        ),
+      );
+      return acc;
+    },
+    [
+      lineSegment<GlobalPoint>(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            points[0][0] + element.x,
+            points[0][1] + element.y,
+          ),
+          center,
+          element.angle,
+        ),
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            points[1][0] + element.x,
+            points[1][1] + element.y,
+          ),
+          center,
+          element.angle,
+        ),
+      ),
+    ],
+  );
+}
+
+export function getFreedrawOutlinePoints(element: ExcalidrawFreeDrawElement) {
   // If input points are empty (should they ever be?) return a dot
   const inputPoints = element.simulatePressure
     ? element.points
@@ -1054,10 +1115,10 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     smoothing: 0.5,
     streamline: 0.5,
     easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
-    last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
+    last: true,
   };
 
-  return getSvgPathFromStroke(getStroke(inputPoints as number[][], options));
+  return getStroke(inputPoints as number[][], options) as [number, number][];
 }
 
 function med(A: number[], B: number[]) {

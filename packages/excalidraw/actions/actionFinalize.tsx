@@ -1,11 +1,11 @@
 import { pointFrom } from "@excalidraw/math";
 
+import { bindOrUnbindBindingElement } from "@excalidraw/element/binding";
 import {
-  maybeBindLinearElement,
-  bindOrUnbindLinearElement,
-  isBindingEnabled,
-} from "@excalidraw/element/binding";
-import { isValidPolygon, LinearElementEditor } from "@excalidraw/element";
+  isValidPolygon,
+  LinearElementEditor,
+  newElementWith,
+} from "@excalidraw/element";
 
 import {
   isBindingElement,
@@ -17,7 +17,7 @@ import {
 import {
   KEYS,
   arrayToMap,
-  tupleToCoors,
+  invariant,
   updateActiveTool,
 } from "@excalidraw/common";
 import { isPathALoop } from "@excalidraw/element";
@@ -26,11 +26,12 @@ import { isInvisiblySmallElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { LocalPoint } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   NonDeleted,
+  PointsPositionUpdates,
 } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
@@ -42,20 +43,37 @@ import { register } from "./register";
 
 import type { AppState } from "../types";
 
-export const actionFinalize = register({
+type FormData = {
+  event: PointerEvent;
+  sceneCoords: { x: number; y: number };
+};
+
+export const actionFinalize = register<FormData>({
   name: "finalize",
   label: "",
   trackEvent: false,
   perform: (elements, appState, data, app) => {
+    let newElements = elements;
     const { interactiveCanvas, focusContainer, scene } = app;
-    const { event, sceneCoords } =
-      (data as {
-        event?: PointerEvent;
-        sceneCoords?: { x: number; y: number };
-      }) ?? {};
     const elementsMap = scene.getNonDeletedElementsMap();
 
-    if (event && appState.selectedLinearElement) {
+    if (data && appState.selectedLinearElement) {
+      const { event, sceneCoords } = data;
+      const element = LinearElementEditor.getElement(
+        appState.selectedLinearElement.elementId,
+        elementsMap,
+      );
+
+      invariant(
+        element,
+        "Arrow element should exist if selectedLinearElement is set",
+      );
+
+      invariant(
+        sceneCoords,
+        "sceneCoords should be defined if actionFinalize is called with event",
+      );
+
       const linearElementEditor = LinearElementEditor.handlePointerUp(
         event,
         appState.selectedLinearElement,
@@ -63,77 +81,95 @@ export const actionFinalize = register({
         app.scene,
       );
 
-      const { startBindingElement, endBindingElement } = linearElementEditor;
-      const element = app.scene.getElement(linearElementEditor.elementId);
       if (isBindingElement(element)) {
-        bindOrUnbindLinearElement(
-          element,
-          startBindingElement,
-          endBindingElement,
-          app.scene,
-        );
-      }
+        const newArrow = !!appState.newElement;
 
-      if (linearElementEditor !== appState.selectedLinearElement) {
-        let newElements = elements;
-        if (element && isInvisiblySmallElement(element)) {
-          // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
-          newElements = newElements.filter((el) => el.id !== element!.id);
-        }
-        return {
-          elements: newElements,
-          appState: {
-            selectedLinearElement: {
-              ...linearElementEditor,
-              selectedPointsIndices: null,
-            },
-            suggestedBindings: [],
-          },
-          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-        };
-      }
-    }
+        const selectedPointsIndices =
+          newArrow || !appState.selectedLinearElement.selectedPointsIndices
+            ? [element.points.length - 1] // New arrow creation
+            : appState.selectedLinearElement.selectedPointsIndices;
 
-    if (appState.selectedLinearElement?.isEditing) {
-      const { elementId, startBindingElement, endBindingElement } =
-        appState.selectedLinearElement;
-      const element = LinearElementEditor.getElement(elementId, elementsMap);
+        const draggedPoints: PointsPositionUpdates =
+          selectedPointsIndices.reduce((map, index) => {
+            map.set(index, {
+              point: LinearElementEditor.pointFromAbsoluteCoords(
+                element,
+                pointFrom<GlobalPoint>(sceneCoords.x, sceneCoords.y),
+                elementsMap,
+              ),
+            });
 
-      if (element) {
-        if (isBindingElement(element)) {
-          bindOrUnbindLinearElement(
-            element,
-            startBindingElement,
-            endBindingElement,
-            scene,
-          );
-        }
-        if (isLineElement(element) && !isValidPolygon(element.points)) {
+            return map;
+          }, new Map()) ?? new Map();
+
+        bindOrUnbindBindingElement(element, draggedPoints, scene, appState, {
+          newArrow,
+          altKey: event.altKey,
+        });
+      } else if (isLineElement(element)) {
+        if (
+          appState.selectedLinearElement?.isEditing &&
+          !appState.newElement &&
+          !isValidPolygon(element.points)
+        ) {
           scene.mutateElement(element, {
             polygon: false,
           });
         }
+      }
+
+      if (linearElementEditor !== appState.selectedLinearElement) {
+        // `handlePointerUp()` updated the linear element instance,
+        // so filter out this element if it is too small,
+        // but do an update to all new elements anyway for undo/redo purposes.
+
+        if (element && isInvisiblySmallElement(element)) {
+          // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
+          newElements = newElements.map((el) => {
+            if (el.id === element.id) {
+              return newElementWith(el, {
+                isDeleted: true,
+              });
+            }
+            return el;
+          });
+        }
+
+        const activeToolLocked = appState.activeTool?.locked;
 
         return {
           elements:
             element.points.length < 2 || isInvisiblySmallElement(element)
-              ? elements.filter((el) => el.id !== element.id)
-              : undefined,
+              ? elements.map((el) => {
+                  if (el.id === element.id) {
+                    return newElementWith(el, { isDeleted: true });
+                  }
+                  return el;
+                })
+              : newElements,
           appState: {
             ...appState,
             cursorButton: "up",
-            selectedLinearElement: new LinearElementEditor(
-              element,
-              arrayToMap(elementsMap),
-              false, // exit editing mode
-            ),
+            selectedLinearElement: activeToolLocked
+              ? null
+              : {
+                  ...linearElementEditor,
+                  selectedPointsIndices: null,
+                  isEditing: false,
+                  initialState: {
+                    ...linearElementEditor.initialState,
+                    lastClickedPoint: -1,
+                  },
+                },
+            selectionElement: null,
+            suggestedBinding: null,
+            newElement: null,
+            multiElement: null,
           },
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         };
       }
     }
-
-    let newElements = elements;
 
     if (window.document.activeElement instanceof HTMLElement) {
       focusContainer();
@@ -158,8 +194,14 @@ export const actionFinalize = register({
 
     if (element) {
       // pen and mouse have hover
-      if (appState.multiElement && element.type !== "freedraw") {
-        const { points, lastCommittedPoint } = element;
+      if (
+        appState.selectedLinearElement &&
+        appState.multiElement &&
+        element.type !== "freedraw" &&
+        appState.lastPointerDownWith !== "touch"
+      ) {
+        const { points } = element;
+        const { lastCommittedPoint } = appState.selectedLinearElement;
         if (
           !lastCommittedPoint ||
           points[points.length - 1] !== lastCommittedPoint
@@ -172,7 +214,12 @@ export const actionFinalize = register({
 
       if (element && isInvisiblySmallElement(element)) {
         // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
-        newElements = newElements.filter((el) => el.id !== element!.id);
+        newElements = newElements.map((el) => {
+          if (el.id === element?.id) {
+            return newElementWith(el, { isDeleted: true });
+          }
+          return el;
+        });
       }
 
       if (isLinearElement(element) || isFreeDrawElement(element)) {
@@ -206,25 +253,6 @@ export const actionFinalize = register({
             polygon: false,
           });
         }
-
-        if (
-          isBindingElement(element) &&
-          !isLoop &&
-          element.points.length > 1 &&
-          isBindingEnabled(appState)
-        ) {
-          const coords =
-            sceneCoords ??
-            tupleToCoors(
-              LinearElementEditor.getPointAtIndexGlobalCoordinates(
-                element,
-                -1,
-                arrayToMap(elements),
-              ),
-            );
-
-          maybeBindLinearElement(element, appState, coords, scene);
-        }
       }
     }
 
@@ -240,15 +268,34 @@ export const actionFinalize = register({
     if (appState.activeTool.type === "eraser") {
       activeTool = updateActiveTool(appState, {
         ...(appState.activeTool.lastActiveTool || {
-          type: "selection",
+          type: app.state.preferredSelectionTool.type,
         }),
         lastActiveToolBeforeEraser: null,
       });
     } else {
       activeTool = updateActiveTool(appState, {
-        type: "selection",
+        type: app.state.preferredSelectionTool.type,
       });
     }
+
+    let selectedLinearElement =
+      element && isLinearElement(element)
+        ? new LinearElementEditor(element, arrayToMap(newElements)) // To select the linear element when user has finished mutipoint editing
+        : appState.selectedLinearElement;
+
+    selectedLinearElement = selectedLinearElement
+      ? {
+          ...selectedLinearElement,
+          isEditing: appState.newElement
+            ? false
+            : selectedLinearElement.isEditing,
+          initialState: {
+            ...selectedLinearElement.initialState,
+            lastClickedPoint: -1,
+            origin: null,
+          },
+        }
+      : selectedLinearElement;
 
     return {
       elements: newElements,
@@ -267,7 +314,7 @@ export const actionFinalize = register({
         multiElement: null,
         editingTextElement: null,
         startBoundElement: null,
-        suggestedBindings: [],
+        suggestedBinding: null,
         selectedElementIds:
           element &&
           !appState.activeTool.locked &&
@@ -277,11 +324,8 @@ export const actionFinalize = register({
                 [element.id]: true,
               }
             : appState.selectedElementIds,
-        // To select the linear element when user has finished mutipoint editing
-        selectedLinearElement:
-          element && isLinearElement(element)
-            ? new LinearElementEditor(element, arrayToMap(newElements))
-            : appState.selectedLinearElement,
+
+        selectedLinearElement,
       },
       // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,

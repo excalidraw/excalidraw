@@ -20,7 +20,12 @@ import type { ValueOf } from "@excalidraw/common/utility-types";
 
 import { Fonts } from "../../fonts";
 import { t } from "../../i18n";
-import { useApp, useAppProps, useExcalidrawContainer } from "../App";
+import {
+  useApp,
+  useAppProps,
+  useExcalidrawContainer,
+  useStylesPanelMode,
+} from "../App";
 import { PropertiesPopover } from "../PropertiesPopover";
 import { QuickSearch } from "../QuickSearch";
 import { ScrollableList } from "../ScrollableList";
@@ -90,8 +95,10 @@ export const FontPickerList = React.memo(
     onClose,
   }: FontPickerListProps) => {
     const { container } = useExcalidrawContainer();
-    const { fonts } = useApp();
+    const app = useApp();
+    const { fonts } = app;
     const { showDeprecatedFonts } = useAppProps();
+    const stylesPanelMode = useStylesPanelMode();
 
     const [searchTerm, setSearchTerm] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
@@ -187,6 +194,42 @@ export const FontPickerList = React.memo(
       onLeave,
     ]);
 
+    // Create a wrapped onSelect function that preserves caret position
+    const wrappedOnSelect = useCallback(
+      (fontFamily: FontFamilyValues) => {
+        // Save caret position before font selection if editing text
+        let savedSelection: { start: number; end: number } | null = null;
+        if (app.state.editingTextElement) {
+          const textEditor = document.querySelector(
+            ".excalidraw-wysiwyg",
+          ) as HTMLTextAreaElement;
+          if (textEditor) {
+            savedSelection = {
+              start: textEditor.selectionStart,
+              end: textEditor.selectionEnd,
+            };
+          }
+        }
+
+        onSelect(fontFamily);
+
+        // Restore caret position after font selection if editing text
+        if (app.state.editingTextElement && savedSelection) {
+          setTimeout(() => {
+            const textEditor = document.querySelector(
+              ".excalidraw-wysiwyg",
+            ) as HTMLTextAreaElement;
+            if (textEditor && savedSelection) {
+              textEditor.focus();
+              textEditor.selectionStart = savedSelection.start;
+              textEditor.selectionEnd = savedSelection.end;
+            }
+          }, 0);
+        }
+      },
+      [onSelect, app.state.editingTextElement],
+    );
+
     const onKeyDown = useCallback<KeyboardEventHandler<HTMLDivElement>>(
       (event) => {
         const handled = fontPickerKeyHandler({
@@ -194,7 +237,7 @@ export const FontPickerList = React.memo(
           inputRef,
           hoveredFont,
           filteredFonts,
-          onSelect,
+          onSelect: wrappedOnSelect,
           onHover,
           onClose,
         });
@@ -204,7 +247,7 @@ export const FontPickerList = React.memo(
           event.stopPropagation();
         }
       },
-      [hoveredFont, filteredFonts, onSelect, onHover, onClose],
+      [hoveredFont, filteredFonts, wrappedOnSelect, onHover, onClose],
     );
 
     useEffect(() => {
@@ -240,7 +283,7 @@ export const FontPickerList = React.memo(
         // allow to tab between search and selected font
         tabIndex={font.value === selectedFontFamily ? 0 : -1}
         onClick={(e) => {
-          onSelect(Number(e.currentTarget.value));
+          wrappedOnSelect(Number(e.currentTarget.value));
         }}
         onMouseMove={() => {
           if (hoveredFont?.value !== font.value) {
@@ -282,15 +325,32 @@ export const FontPickerList = React.memo(
         className="properties-content"
         container={container}
         style={{ width: "15rem" }}
-        onClose={onClose}
+        onClose={() => {
+          onClose();
+
+          // Refocus text editor when font picker closes if we were editing text
+          if (app.state.editingTextElement) {
+            setTimeout(() => {
+              const textEditor = document.querySelector(
+                ".excalidraw-wysiwyg",
+              ) as HTMLTextAreaElement;
+              if (textEditor) {
+                textEditor.focus();
+              }
+            }, 0);
+          }
+        }}
         onPointerLeave={onLeave}
         onKeyDown={onKeyDown}
+        preventAutoFocusOnTouch={!!app.state.editingTextElement}
       >
-        <QuickSearch
-          ref={inputRef}
-          placeholder={t("quickSearch.placeholder")}
-          onChange={debounce(setSearchTerm, 20)}
-        />
+        {stylesPanelMode === "full" && (
+          <QuickSearch
+            ref={inputRef}
+            placeholder={t("quickSearch.placeholder")}
+            onChange={debounce(setSearchTerm, 20)}
+          />
+        )}
         <ScrollableList
           className="dropdown-menu fonts manual-hover"
           placeholder={t("fontList.empty")}

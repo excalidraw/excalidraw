@@ -1,10 +1,6 @@
 import { average } from "@excalidraw/math";
 
-import type {
-  ExcalidrawBindableElement,
-  FontFamilyValues,
-  FontString,
-} from "@excalidraw/element/types";
+import type { FontFamilyValues, FontString } from "@excalidraw/element/types";
 
 import type {
   ActiveTool,
@@ -20,7 +16,6 @@ import {
   ENV,
   FONT_FAMILY,
   getFontFamilyFallbacks,
-  isDarwin,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 
@@ -91,7 +86,8 @@ export const isWritableElement = (
   (target instanceof HTMLInputElement &&
     (target.type === "text" ||
       target.type === "number" ||
-      target.type === "password"));
+      target.type === "password" ||
+      target.type === "search"));
 
 export const getFontFamilyString = ({
   fontFamily,
@@ -117,6 +113,11 @@ export const getFontString = ({
   fontFamily: FontFamilyValues;
 }) => {
   return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
+};
+
+/** executes callback in the frame that's after the current one */
+export const nextAnimationFrame = async (cb: () => any) => {
+  requestAnimationFrame(() => requestAnimationFrame(cb));
 };
 
 export const debounce = <T extends any[]>(
@@ -377,6 +378,10 @@ export const removeSelection = () => {
 
 export const distance = (x: number, y: number) => Math.abs(x - y);
 
+export const isSelectionLikeTool = (type: ToolType | "custom") => {
+  return type === "selection" || type === "lasso";
+};
+
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: ((
@@ -417,19 +422,6 @@ export const allowFullScreen = () =>
   document.documentElement.requestFullscreen();
 
 export const exitFullScreen = () => document.exitFullscreen();
-
-export const getShortcutKey = (shortcut: string): string => {
-  shortcut = shortcut
-    .replace(/\bAlt\b/i, "Alt")
-    .replace(/\bShift\b/i, "Shift")
-    .replace(/\b(Enter|Return)\b/i, "Enter");
-  if (isDarwin) {
-    return shortcut
-      .replace(/\bCtrlOrCmd\b/gi, "Cmd")
-      .replace(/\bAlt\b/i, "Option");
-  }
-  return shortcut.replace(/\bCtrlOrCmd\b/gi, "Ctrl");
-};
 
 export const viewportCoordsToSceneCoords = (
   { clientX, clientY }: { clientX: number; clientY: number },
@@ -565,9 +557,6 @@ export const isTransparent = (color: string) => {
     color === COLOR_PALETTE.transparent
   );
 };
-
-export const isBindingFallthroughEnabled = (el: ExcalidrawBindableElement) =>
-  el.fillStyle !== "solid" || isTransparent(el.backgroundColor);
 
 export type ResolvablePromise<T> = Promise<T> & {
   resolve: [T] extends [undefined]
@@ -1277,4 +1266,48 @@ export const reduceToCommonValue = <T, R = T>(
   }
 
   return commonValue;
+};
+
+type FEATURE_FLAGS = {
+  COMPLEX_BINDINGS: boolean;
+};
+
+const FEATURE_FLAGS_STORAGE_KEY = "excalidraw-feature-flags";
+const DEFAULT_FEATURE_FLAGS: FEATURE_FLAGS = {
+  COMPLEX_BINDINGS: false,
+};
+let featureFlags: FEATURE_FLAGS | null = null;
+
+export const getFeatureFlag = <F extends keyof FEATURE_FLAGS>(
+  flag: F,
+): FEATURE_FLAGS[F] => {
+  if (!featureFlags) {
+    try {
+      const serializedFlags = localStorage.getItem(FEATURE_FLAGS_STORAGE_KEY);
+      if (serializedFlags) {
+        const flags = JSON.parse(serializedFlags);
+        featureFlags = flags ?? DEFAULT_FEATURE_FLAGS;
+      }
+    } catch {}
+  }
+
+  return (featureFlags || DEFAULT_FEATURE_FLAGS)[flag];
+};
+
+export const setFeatureFlag = <F extends keyof FEATURE_FLAGS>(
+  flag: F,
+  value: FEATURE_FLAGS[F],
+) => {
+  try {
+    featureFlags = {
+      ...(featureFlags || DEFAULT_FEATURE_FLAGS),
+      [flag]: value,
+    };
+    localStorage.setItem(
+      FEATURE_FLAGS_STORAGE_KEY,
+      JSON.stringify(featureFlags),
+    );
+  } catch (e) {
+    console.error("unable to set feature flag", e);
+  }
 };
