@@ -1,9 +1,9 @@
 import { pointFrom } from "./point";
 import { lineSegment, lineSegmentIntersectionPoints } from "./segment";
 
-import type { GlobalPoint, LineSegment, LocalPoint, Rectangle } from "./types";
+import type { GenericPoint, LineSegment, Rectangle } from "./types";
 
-export function rectangle<P extends GlobalPoint | LocalPoint>(
+export function rectangle<P extends GenericPoint>(
   topLeft: P,
   bottomRight: P,
 ): Rectangle<P> {
@@ -11,13 +11,13 @@ export function rectangle<P extends GlobalPoint | LocalPoint>(
 }
 
 export function rectangleFromNumberSequence<
-  Point extends LocalPoint | GlobalPoint,
+  Point extends GenericPoint,
 >(minX: number, minY: number, maxX: number, maxY: number) {
   return rectangle(pointFrom<Point>(minX, minY), pointFrom<Point>(maxX, maxY));
 }
 
 export function rectangleIntersectLineSegment<
-  Point extends LocalPoint | GlobalPoint,
+  Point extends GenericPoint,
 >(r: Rectangle<Point>, l: LineSegment<Point>): Point[] {
   return [
     lineSegment(r[0], pointFrom(r[1][0], r[0][1])),
@@ -30,7 +30,7 @@ export function rectangleIntersectLineSegment<
 }
 
 export function rectangleIntersectRectangle<
-  Point extends LocalPoint | GlobalPoint,
+  Point extends GenericPoint,
 >(rectangle1: Rectangle<Point>, rectangle2: Rectangle<Point>): boolean {
   const [[minX1, minY1], [maxX1, maxY1]] = rectangle1;
   const [[minX2, minY2], [maxX2, maxY2]] = rectangle2;
