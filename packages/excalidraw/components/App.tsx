@@ -1,3 +1,7 @@
+import { WaypointCanvasOverlay } from "./WaypointCanvasOverlay";
+import "./WaypointCanvasOverlay.css";
+import { jumpToWaypoint } from "./Waypoints";
+
 import clsx from "clsx";
 import throttle from "lodash.throttle";
 import React, { useContext } from "react";
@@ -1921,6 +1925,11 @@ class App extends React.Component<AppProps, AppState> {
         onPointerEnter={this.toggleOverscrollBehavior}
         onPointerLeave={this.toggleOverscrollBehavior}
       >
+        <WaypointCanvasOverlay
+          appState={this.state}
+          onJump={(id) => this.setState((prev) => jumpToWaypoint(prev, id))}
+        />
+
         <AppContext.Provider value={this}>
           <AppPropsContext.Provider value={this.props}>
             <ExcalidrawContainerContext.Provider
