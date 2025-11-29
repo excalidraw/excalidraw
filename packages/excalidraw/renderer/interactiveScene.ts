@@ -195,10 +195,7 @@ const renderBindingHighlightForBindableElement_simple = (
 ) => {
   const enclosingFrame = element.frameId && elementsMap.get(element.frameId);
   if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
-    context.translate(
-      enclosingFrame.x + appState.scrollX,
-      enclosingFrame.y + appState.scrollY,
-    );
+    context.translate(enclosingFrame.x, enclosingFrame.y);
 
     context.beginPath();
 
@@ -216,10 +213,7 @@ const renderBindingHighlightForBindableElement_simple = (
 
     context.clip();
 
-    context.translate(
-      -(enclosingFrame.x + appState.scrollX),
-      -(enclosingFrame.y + appState.scrollY),
-    );
+    context.translate(-enclosingFrame.x, -enclosingFrame.y);
   }
 
   switch (element.type) {
@@ -227,10 +221,7 @@ const renderBindingHighlightForBindableElement_simple = (
     case "frame":
       context.save();
 
-      context.translate(
-        element.x + appState.scrollX,
-        element.y + appState.scrollY,
-      );
+      context.translate(element.x, element.y);
 
       context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
       context.strokeStyle =
@@ -389,10 +380,7 @@ const renderBindingHighlightForBindableElement_complex = (
 
   const enclosingFrame = element.frameId && allElementsMap.get(element.frameId);
   if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
-    context.translate(
-      enclosingFrame.x + appState.scrollX,
-      enclosingFrame.y + appState.scrollY,
-    );
+    context.translate(enclosingFrame.x, enclosingFrame.y);
 
     context.beginPath();
 
@@ -410,10 +398,7 @@ const renderBindingHighlightForBindableElement_complex = (
 
     context.clip();
 
-    context.translate(
-      -(enclosingFrame.x + appState.scrollX),
-      -(enclosingFrame.y + appState.scrollY),
-    );
+    context.translate(-enclosingFrame.x, -enclosingFrame.y);
   }
 
   switch (element.type) {
@@ -421,10 +406,7 @@ const renderBindingHighlightForBindableElement_complex = (
     case "frame":
       context.save();
 
-      context.translate(
-        element.x + appState.scrollX,
-        element.y + appState.scrollY,
-      );
+      context.translate(element.x, element.y);
 
       context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
       context.strokeStyle =
