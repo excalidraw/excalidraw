@@ -14,6 +14,7 @@ import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
   getFeatureFlag,
+  getHighlightColor,
   invariant,
   THEME,
 } from "@excalidraw/common";
@@ -200,7 +201,11 @@ const renderBindingHighlightForBindableElement_simple = (
       enclosingFrame.y + appState.scrollY,
     );
 
-    context.fillStyle = appState.gridColor.Bold ?? "rgba(0,0,0,.05)"; //zsviczian
+    const highlightColor = getHighlightColor(
+      appState.frameColor.stroke,
+      appState.viewBackgroundColor,
+    ); //zsviczian
+    context.fillStyle = highlightColor ?? "rgba(0,0,0,.05)"; //zsviczian
     context.beginPath();
 
     if (FRAME_STYLE.radius && context.roundRect) {
@@ -228,14 +233,18 @@ const renderBindingHighlightForBindableElement_simple = (
     case "frame":
       context.save();
 
-      context.strokeStyle = appState.gridColor.Bold ?? "rgba(0,0,0,.05)"; //zsviczian
+      const highlightColor = getHighlightColor(
+        appState.frameColor.stroke,
+        appState.viewBackgroundColor,
+      ); //zsviczian
+
       context.translate(
         element.x + appState.scrollX,
         element.y + appState.scrollY,
       );
 
       context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-      context.strokeStyle = appState.gridColor.Bold.replace(/[^ ]+\)$/, "1)") ?? //zsviczian
+      context.strokeStyle = highlightColor ?? //zsviczian
         (appState.theme === THEME.DARK
           ? `rgba(3, 93, 161, 1)`
           : `rgba(106, 189, 252, 1)`);
@@ -260,6 +269,11 @@ const renderBindingHighlightForBindableElement_simple = (
     default:
       context.save();
 
+      const highlightColor2 = getHighlightColor(
+        isTextElement(element) ? appState.viewBackgroundColor : element.strokeColor,
+        appState.viewBackgroundColor,
+      ); //zsviczian
+
       const center = elementCenterPoint(element, elementsMap);
 
       context.translate(center[0], center[1]);
@@ -269,9 +283,9 @@ const renderBindingHighlightForBindableElement_simple = (
       context.translate(element.x, element.y);
 
       context.lineWidth =
-        clamp(1.75, element.strokeWidth, 4) /
+        clamp(1.75, element.strokeWidth, 10) / //zsviczian was max was 4
         Math.max(0.25, appState.zoom.value);
-      context.strokeStyle = appState.gridColor.Bold.replace(/[^ ]+\)$/, "1)") ?? //zsviczian
+      context.strokeStyle = highlightColor2 ?? //zsviczian
         (appState.theme === THEME.DARK
           ? `rgba(3, 93, 161, 1)`
           : `rgba(106, 189, 252, 1)`);
@@ -427,9 +441,13 @@ const renderBindingHighlightForBindableElement_complex = (
         element.x + appState.scrollX,
         element.y + appState.scrollY,
       );
-
+      const highlightColor = getHighlightColor(
+        appState.frameColor.stroke,
+        appState.viewBackgroundColor,
+        opacity,
+      ); //zsviczian
       context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-      context.strokeStyle = appState.gridColor.Bold.replace(/[^ ]+\)$/, `${opacity})`) ?? //zsviczian
+      context.strokeStyle = highlightColor ?? //zsviczian
         (appState.theme === THEME.DARK
           ? `rgba(3, 93, 161, ${opacity})`
           : `rgba(106, 189, 252, ${opacity})`);
@@ -467,10 +485,16 @@ const renderBindingHighlightForBindableElement_complex = (
         element.y + appState.scrollY - offset,
       );
 
+      const highlightColor2 = getHighlightColor(
+        isTextElement(element) ? appState.viewBackgroundColor : element.strokeColor,
+        appState.viewBackgroundColor,
+        opacity / 2,
+      ); //zsviczian
+
       context.lineWidth =
-        clamp(2.5, element.strokeWidth * 1.75, 4) /
+        clamp(2.5, element.strokeWidth * 1.75, 10) / //zsviczian max was 4
         Math.max(0.25, appState.zoom.value);
-      context.strokeStyle = appState.gridColor.Bold.replace(/[^ ]+\)$/, `${opacity / 2})`) ?? //zsviczian
+      context.strokeStyle = highlightColor2 ?? //zsviczian
         (appState.theme === THEME.DARK
           ? `rgba(3, 93, 161, ${opacity / 2})`
           : `rgba(106, 189, 252, ${opacity / 2})`);
@@ -615,8 +639,13 @@ const renderBindingHighlightForBindableElement_complex = (
     );
     context.stroke();
 
+    const highlightColor = getHighlightColor(
+      isTextElement(element) ? appState.viewBackgroundColor : element.strokeColor,
+      appState.viewBackgroundColor,
+    ); //zsviczian
+
     // context.strokeStyle = "transparent";
-    context.fillStyle = appState.gridColor.Bold ?? "rgba(128,128,128,.1)"; //zsviczian "rgba(0, 0, 0, 0.04)";
+    context.fillStyle = highlightColor ?? "rgba(128,128,128,.1)"; //zsviczian "rgba(0, 0, 0, 0.04)";
     context.beginPath();
     context.ellipse(
       element.width / 2,
@@ -714,7 +743,7 @@ const renderSelectionBorder = (
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
   const thick = activeEmbeddable || appState.highlightSearchResult; //zsviczian
-  context.lineWidth = (thick ? 4 : 1) / appState.zoom.value; //zsviczian
+  context.lineWidth = (thick ? 4 : 1.5) / appState.zoom.value; //zsviczian was 1 / appState.zoom.value;
 
   const count = selectionColors.length;
   for (let index = 0; index < count; ++index) {
@@ -776,7 +805,11 @@ const renderElementsBoxHighlight = (
   elements: NonDeleted<ExcalidrawElement>[],
   config?: { colors?: string[]; dashed?: boolean },
 ) => {
-  const { colors = [appState.gridColor.Bold ?? "rgb(0,118,255)"], dashed = false } = config || {}; //zsviczian
+  const highlightColor = getHighlightColor(
+    appState.viewBackgroundColor,
+    appState.viewBackgroundColor,
+  ); //zsviczian
+  const { colors = [highlightColor], dashed = false } = config || {}; //zsviczian
   const individualElements = elements.filter(
     (element) => element.groupIds.length === 0,
   );
@@ -955,7 +988,7 @@ const renderTransformHandles = (
       const [x, y, width, height] = transformHandle;
 
       context.save();
-      context.lineWidth = 1 / appState.zoom.value;
+      context.lineWidth = 1.5 / appState.zoom.value; //zsviczian changed from 1 to 1.5
       if (renderConfig.selectionColor) {
         context.strokeStyle = renderConfig.selectionColor;
       }
@@ -1106,7 +1139,7 @@ const renderTextBox = (
   const shiftY = -(height / 2 + padding);
   context.translate(cx + appState.scrollX, cy + appState.scrollY);
   context.rotate(text.angle);
-  context.lineWidth = 1 / appState.zoom.value;
+  context.lineWidth = 1.5 / appState.zoom.value; //zsviczian changed from 1 to 1.5
   context.strokeStyle = selectionColor;
   context.strokeRect(shiftX, shiftY, width, height);
   context.restore();
@@ -1620,7 +1653,10 @@ export const renderInteractiveScene = <
 >(
   renderConfig: InteractiveSceneRenderConfig,
 ): ReturnType<U> => {
-  renderConfig.renderConfig.selectionColor = renderConfig.appState.gridColor.Bold; //zsviczian
+  renderConfig.renderConfig.selectionColor = getHighlightColor(
+    renderConfig.appState.viewBackgroundColor,
+    renderConfig.appState.viewBackgroundColor,
+  ); //zsviczian
   const ret = _renderInteractiveScene(renderConfig);
   renderConfig.callback(ret);
   return ret as ReturnType<U>;

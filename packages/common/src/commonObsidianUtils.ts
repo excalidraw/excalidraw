@@ -65,3 +65,10 @@ export function getAreaLimit() {
 export function getWidthHeightLimit() {
   return getHostPlugin().excalidrawConfig.widthHeightLimit ?? 32767;
 }
+
+export function getHighlightColor(color: string, sceneBgColor: string, opacity: number = 1): string {
+  return (
+    getHostPlugin().getHighlightColor(color, sceneBgColor, opacity) ??
+    `rgba(0,118,255,${opacity})`
+  );
+}

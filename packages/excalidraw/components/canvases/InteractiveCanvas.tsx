@@ -252,6 +252,7 @@ const getRelevantAppStateProps = (
   snapLines: appState.snapLines,
   zenModeEnabled: appState.zenModeEnabled,
   editingTextElement: appState.editingTextElement,
+  viewBackgroundColor: appState.viewBackgroundColor, //zsviczian
   gridColor: appState.gridColor, //zsviczian
   gridDirection: appState.gridDirection, //zsviczian
   highlightSearchResult: appState.highlightSearchResult, //zsviczian

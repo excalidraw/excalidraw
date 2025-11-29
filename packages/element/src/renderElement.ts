@@ -733,7 +733,7 @@ export const renderSelectionElement = (
   const offset = 0.5 / appState.zoom.value;
 
   context.fillRect(offset, offset, element.width, element.height);
-  context.lineWidth = 1 / appState.zoom.value;
+  context.lineWidth = 1.5 / appState.zoom.value; //zsviczian changed from 1 to 1.5
   context.strokeStyle = selectionColor;
   context.strokeRect(offset, offset, element.width, element.height);
 

@@ -236,6 +236,7 @@ export type InteractiveCanvasAppState = Readonly<
     snapLines: AppState["snapLines"];
     zenModeEnabled: AppState["zenModeEnabled"];
     editingTextElement: AppState["editingTextElement"];
+    viewBackgroundColor: AppState["viewBackgroundColor"]; //zsviczian
     gridColor: AppState["gridColor"]; //zsviczian
     gridDirection: AppState["gridDirection"]; //zsviczian
     highlightSearchResult: AppState["highlightSearchResult"]; //zsviczian
