@@ -196,13 +196,11 @@ const renderBindingHighlightForBindableElement_simple = (
 ) => {
   const enclosingFrame = element.frameId && elementsMap.get(element.frameId);
   if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
-    context.translate(
-      enclosingFrame.x + appState.scrollX,
-      enclosingFrame.y + appState.scrollY,
-    );
+    context.translate(enclosingFrame.x, enclosingFrame.y);
 
     const highlightColor = getHighlightColor(
-      appState.frameColor.stroke,
+      enclosingFrame.customData?.frameColor?.stroke ??
+        appState.frameColor.stroke,
       appState.viewBackgroundColor,
     ); //zsviczian
     context.fillStyle = highlightColor ?? "rgba(0,0,0,.05)"; //zsviczian
@@ -222,10 +220,7 @@ const renderBindingHighlightForBindableElement_simple = (
 
     context.clip();
 
-    context.translate(
-      -(enclosingFrame.x + appState.scrollX),
-      -(enclosingFrame.y + appState.scrollY),
-    );
+    context.translate(-enclosingFrame.x, -enclosingFrame.y);
   }
 
   switch (element.type) {
@@ -238,10 +233,7 @@ const renderBindingHighlightForBindableElement_simple = (
         appState.viewBackgroundColor,
       ); //zsviczian
 
-      context.translate(
-        element.x + appState.scrollX,
-        element.y + appState.scrollY,
-      );
+      context.translate(element.x, element.y);
 
       context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
       context.strokeStyle = highlightColor ?? //zsviczian
@@ -270,7 +262,9 @@ const renderBindingHighlightForBindableElement_simple = (
       context.save();
 
       const highlightColor2 = getHighlightColor(
-        isTextElement(element) ? appState.viewBackgroundColor : element.strokeColor,
+        isTextElement(element)
+          ? appState.viewBackgroundColor
+          : element.strokeColor,
         appState.viewBackgroundColor,
       ); //zsviczian
 
@@ -405,10 +399,7 @@ const renderBindingHighlightForBindableElement_complex = (
 
   const enclosingFrame = element.frameId && allElementsMap.get(element.frameId);
   if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
-    context.translate(
-      enclosingFrame.x + appState.scrollX,
-      enclosingFrame.y + appState.scrollY,
-    );
+    context.translate(enclosingFrame.x, enclosingFrame.y);
 
     context.beginPath();
 
@@ -426,10 +417,7 @@ const renderBindingHighlightForBindableElement_complex = (
 
     context.clip();
 
-    context.translate(
-      -(enclosingFrame.x + appState.scrollX),
-      -(enclosingFrame.y + appState.scrollY),
-    );
+    context.translate(-enclosingFrame.x, -enclosingFrame.y);
   }
 
   switch (element.type) {
@@ -437,12 +425,9 @@ const renderBindingHighlightForBindableElement_complex = (
     case "frame":
       context.save();
 
-      context.translate(
-        element.x + appState.scrollX,
-        element.y + appState.scrollY,
-      );
+      context.translate(element.x, element.y);
       const highlightColor = getHighlightColor(
-        appState.frameColor.stroke,
+        element.customData?.frameColor?.stroke ?? appState.frameColor.stroke,
         appState.viewBackgroundColor,
         opacity,
       ); //zsviczian
@@ -486,7 +471,9 @@ const renderBindingHighlightForBindableElement_complex = (
       );
 
       const highlightColor2 = getHighlightColor(
-        isTextElement(element) ? appState.viewBackgroundColor : element.strokeColor,
+        isTextElement(element)
+          ? appState.viewBackgroundColor
+          : element.strokeColor,
         appState.viewBackgroundColor,
         opacity / 2,
       ); //zsviczian
@@ -640,7 +627,9 @@ const renderBindingHighlightForBindableElement_complex = (
     context.stroke();
 
     const highlightColor = getHighlightColor(
-      isTextElement(element) ? appState.viewBackgroundColor : element.strokeColor,
+      isTextElement(element)
+        ? appState.viewBackgroundColor
+        : element.strokeColor,
       appState.viewBackgroundColor,
     ); //zsviczian
 
