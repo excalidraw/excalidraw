@@ -511,7 +511,7 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
   frame: ExcalidrawFrameLikeElement,
   appState: AppState,
 ): T => {
-  if(frame.frameRole === "marker") return allElements; //zsviczian
+  if (frame.frameRole === "marker") { return allElements; } //zsviczian
   const elementsMap = arrayToMap(allElements);
   const currTargetFrameChildrenMap = new Map<ExcalidrawElement["id"], true>();
   for (const element of allElements.values()) {

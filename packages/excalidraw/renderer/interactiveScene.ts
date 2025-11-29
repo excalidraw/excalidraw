@@ -768,7 +768,11 @@ const renderFrameHighlight = (
   const width = x2 - x1;
   const height = y2 - y1;
 
-  context.strokeStyle = "rgb(0,118,255)";
+  const highlightColor = getHighlightColor(
+    frame.customData?.frameColor?.stroke ?? appState.frameColor.stroke,
+    appState.viewBackgroundColor,
+  ); //zsviczian
+  context.strokeStyle = highlightColor ?? "rgb(0,118,255)"; //zsviczian
   context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
 
   context.save();
