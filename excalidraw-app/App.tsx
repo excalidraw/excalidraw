@@ -135,6 +135,7 @@ import DebugCanvas, {
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+import { excalidrawAPI as excalidrawApiHandler } from "./api-handler";
 
 import "./index.scss";
 
@@ -371,6 +372,105 @@ const ExcalidrawWrapper = () => {
 
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
+
+  // Initialize API for programmatic access
+  useEffect(() => {
+    excalidrawApiHandler.setExcalidrawRef(excalidrawAPI ?? null);
+  }, [excalidrawAPI]);
+
+  // Handle postMessage API requests from parent window
+  useEffect(() => {
+    const handleMessage = async (event: MessageEvent) => {
+      // Allow messages from any origin in development for testing
+      // In production, you should validate event.origin
+
+      const { type, elements, appState } = event.data;
+
+      if (!type) {
+        return;
+      }
+
+      try {
+        let response;
+
+        switch (type) {
+          case "CREATE_ELEMENTS":
+            response = await excalidrawApiHandler.handleRequest({
+              action: "create",
+              elements,
+            });
+            break;
+
+          case "EXPORT_SVG":
+          case "EXPORT_PNG":
+          case "EXPORT_CLIPBOARD":
+            const exportFormat =
+              type === "EXPORT_SVG"
+                ? "svg"
+                : type === "EXPORT_PNG"
+                ? "png"
+                : "clipboard";
+            const currentElements = excalidrawAPI?.getSceneElements() || [];
+            const currentFiles = excalidrawAPI?.getFiles() || {};
+            response = await excalidrawApiHandler.handleRequest({
+              action: "export",
+              elements: [...currentElements],
+              appState: excalidrawAPI?.getAppState(),
+              files: currentFiles,
+              format: exportFormat,
+            });
+            break;
+
+          case "CLEAR_CANVAS":
+            response = await excalidrawApiHandler.handleRequest({
+              action: "create",
+              elements: [],
+            });
+            break;
+
+          case "IMPORT_ELEMENTS":
+            response = await excalidrawApiHandler.handleRequest({
+              action: "import",
+              elements,
+              appState,
+            });
+            break;
+
+          default:
+            response = {
+              success: false,
+              error: `Unknown message type: ${type}`,
+            };
+        }
+
+        // Send response back to parent
+        if (event.source) {
+          (event.source as WindowProxy).postMessage(
+            { type: `${type}_RESPONSE`, ...response },
+            event.origin === "null" ? "*" : event.origin,
+          );
+        }
+      } catch (error: any) {
+        // Send error response
+        if (event.source) {
+          (event.source as WindowProxy).postMessage(
+            {
+              type: `${type}_RESPONSE`,
+              success: false,
+              error: error?.message || "Unknown error",
+            },
+            event.origin === "null" ? "*" : event.origin,
+          );
+        }
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [excalidrawAPI]);
 
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);
