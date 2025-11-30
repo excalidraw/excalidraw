@@ -5,7 +5,7 @@ import { composeEventHandlers } from "@excalidraw/common";
 import { useTunnels } from "../../context/tunnels";
 import { useUIAppState } from "../../context/ui-appState";
 import { t } from "../../i18n";
-import { useDevice, useExcalidrawSetAppState } from "../App";
+import { useEditorInterface, useExcalidrawSetAppState } from "../App";
 import { UserList } from "../UserList";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";
 import { withInternalFallback } from "../hoc/withInternalFallback";
@@ -27,12 +27,9 @@ const MainMenu = Object.assign(
       onSelect?: (event: Event) => void;
     }) => {
       const { MainMenuTunnel } = useTunnels();
-      const device = useDevice();
+      const editorInterface = useEditorInterface();
       const appState = useUIAppState();
       const setAppState = useExcalidrawSetAppState();
-      const onClickOutside = device.editor.isMobile
-        ? undefined
-        : () => setAppState({ openMenu: null });
 
       return (
         <MainMenuTunnel.In>
@@ -41,6 +38,8 @@ const MainMenu = Object.assign(
               onToggle={() => {
                 setAppState({
                   openMenu: appState.openMenu === "canvas" ? null : "canvas",
+                  openPopup: null,
+                  openDialog: null,
                 });
               }}
               data-testid="main-menu-trigger"
@@ -49,22 +48,29 @@ const MainMenu = Object.assign(
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
-              onClickOutside={onClickOutside}
+              onClickOutside={() => setAppState({ openMenu: null })}
               onSelect={composeEventHandlers(onSelect, () => {
                 setAppState({ openMenu: null });
               })}
+              placement="bottom"
+              className={
+                editorInterface.formFactor === "phone"
+                  ? "main-menu-dropdown"
+                  : ""
+              }
             >
               {children}
-              {device.editor.isMobile && appState.collaborators.size > 0 && (
-                <fieldset className="UserList-Wrapper">
-                  <legend>{t("labels.collaborators")}</legend>
-                  <UserList
-                    mobile={true}
-                    collaborators={appState.collaborators}
-                    userToFollow={appState.userToFollow?.socketId || null}
-                  />
-                </fieldset>
-              )}
+              {editorInterface.formFactor === "phone" &&
+                appState.collaborators.size > 0 && (
+                  <fieldset className="UserList-Wrapper">
+                    <legend>{t("labels.collaborators")}</legend>
+                    <UserList
+                      mobile={true}
+                      collaborators={appState.collaborators}
+                      userToFollow={appState.userToFollow?.socketId || null}
+                    />
+                  </fieldset>
+                )}
             </DropdownMenu.Content>
           </DropdownMenu>
         </MainMenuTunnel.In>

@@ -12,6 +12,12 @@
   --zIndex-eyeDropperPreview: 6;
   --zIndex-hyperlinkContainer: 7;
 
+  --zIndex-ui-bottom: 60;
+  --zIndex-ui-context-menu: 90;
+  --zIndex-ui-styles-popup: 100;
+  --zIndex-ui-top: 100;
+  --zIndex-ui-library: 120;
+
   --zIndex-modal: 1000;
   --zIndex-popup: 1001;
   --zIndex-toast: 999999;
@@ -43,6 +49,16 @@ body.excalidraw-cursor-resize * {
   right: 0;
   height: 100%;
   width: 100%;
+
+  button {
+    // browser default. Looks kinda good on low-dpi.
+    font-size: 0.8333rem;
+  }
+
+  button,
+  label {
+    @include buttonNoHighlight;
+  }
 
   button {
     cursor: pointer;
@@ -232,30 +248,35 @@ body.excalidraw-cursor-resize * {
   }
 
   .App-top-bar {
-    z-index: var(--zIndex-layerUI);
+    z-index: var(--zIndex-ui-top);
     display: flex;
     flex-direction: column;
-    align-items: center;
+  }
+
+  .App-welcome-screen {
+    z-index: var(--zIndex-layerUI);
   }
 
   .App-bottom-bar {
     position: absolute;
-    top: 0;
+    // account for margins
+    width: calc(100% - 28px);
+    max-width: 450px;
     bottom: 0;
-    left: 0;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
     --bar-padding: calc(4 * var(--space-factor));
-    z-index: 4;
+    z-index: var(--zIndex-ui-bottom);
     display: flex;
-    align-items: flex-end;
+    flex-direction: column;
+
     pointer-events: none;
+    justify-content: center;
 
     > .Island {
-      width: 100%;
-      max-width: 100%;
-      min-width: 100%;
       box-sizing: border-box;
       max-height: 100%;
+      padding: 4px;
       display: flex;
       flex-direction: column;
       pointer-events: var(--ui-pointerEvents);
@@ -263,7 +284,8 @@ body.excalidraw-cursor-resize * {
   }
 
   .App-toolbar {
-    width: 100%;
+    display: flex;
+    justify-content: center;
 
     .eraser {
       &.ToolIcon:hover {
@@ -276,15 +298,21 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .App-toolbar-content {
+  .excalidraw-ui-top-left,
+  .excalidraw-ui-top-right {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 8px;
+    gap: 0.5rem;
+  }
 
-    .dropdown-menu--mobile {
-      bottom: 55px;
-      top: auto;
+  .App-toolbar-content {
+    display: flex;
+    flex-direction: column;
+
+    pointer-events: none;
+
+    & > * {
+      pointer-events: var(--ui-pointerEvents);
     }
   }
 
@@ -317,7 +345,7 @@ body.excalidraw-cursor-resize * {
 
   .App-menu_top {
     grid-template-columns: 1fr 2fr 1fr;
-    grid-gap: 2rem;
+    grid-gap: 1rem;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
@@ -334,6 +362,14 @@ body.excalidraw-cursor-resize * {
 
   .App-menu_top > *:first-child {
     justify-self: flex-start;
+  }
+
+  .selected-shape-actions-container {
+    width: fit-content;
+
+    &--compact {
+      min-width: 48px;
+    }
   }
 
   .App-menu_top > *:last-child {
@@ -498,7 +534,7 @@ body.excalidraw-cursor-resize * {
       display: none;
     }
     .scroll-back-to-content {
-      bottom: calc(80px + var(--sab, 0));
+      bottom: calc(100px + var(--sab, 0));
       z-index: -1;
     }
   }
@@ -676,6 +712,11 @@ body.excalidraw-cursor-resize * {
     .excalidraw__paragraph + .excalidraw__paragraph {
       margin-top: 0rem;
     }
+  }
+
+  .link-button {
+    display: flex;
+    text-decoration: none !important;
   }
 }
 
