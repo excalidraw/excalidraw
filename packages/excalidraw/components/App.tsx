@@ -4922,6 +4922,34 @@ startLineEditor = (
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
+
+      /*zsviczian logging for debugging keyboard issues*/ //Enter and CTRL+V getting swallowed when editing text
+      const isEditingText = !!this.state.editingTextElement;
+      if (
+        isEditingText &&
+        !isWritableElement(event.target) &&
+        (event.key === KEYS.BACKSPACE ||
+          (event[KEYS.CTRL_OR_CMD] && event.key.toLowerCase() === KEYS.V))
+      ) {
+        console.info("editing text but shortcut intercepted", {
+          activeElement: document.activeElement,
+          target: event.target,
+        });
+      }
+
+      const targetIsWysiwyg =
+        isWritableElement(event.target) ||
+        (event.target instanceof Element &&
+          event.target.closest("[data-type='wysiwyg']"));
+
+      if (isEditingText && targetIsWysiwyg) {
+        // allow textarea to handle everything except Escape (submit) or the custom Tab logic
+        if (event.key !== KEYS.ESCAPE && event.key !== KEYS.TAB) {
+          return;
+        }
+      }
+      /*zsviczian end logging*/
+
       if (
         this.state.activeTool.type === "selection" &&
         this.state.resizingElement &&
