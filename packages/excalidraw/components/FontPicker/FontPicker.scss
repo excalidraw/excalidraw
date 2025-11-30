@@ -11,5 +11,10 @@
         2rem + 4 * var(--default-button-size)
       ); // 4 gaps + 4 buttons
     }
+
+    &--compact {
+      display: block;
+      grid-template-columns: none;
+    }
   }
 }

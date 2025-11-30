@@ -7,8 +7,6 @@ import {
   isPromiseLike,
 } from "@excalidraw/common";
 
-import { clearElementsForExport } from "@excalidraw/element";
-
 import type { ValueOf } from "@excalidraw/common/utility-types";
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 
@@ -25,7 +23,7 @@ import { restore, restoreLibraryItems } from "./restore";
 
 import type { AppState, DataURL, LibraryItem } from "../types";
 
-import type { FileSystemHandle } from "./filesystem";
+import type { FileSystemHandle } from "browser-fs-access";
 import type { ImportedLibraryData } from "./types";
 
 const parseFileContents = async (blob: Blob | File): Promise<string> => {
@@ -96,6 +94,8 @@ export const getMimeType = (blob: Blob | string): string => {
     return MIME_TYPES.jpg;
   } else if (/\.svg$/.test(name)) {
     return MIME_TYPES.svg;
+  } else if (/\.excalidrawlib$/.test(name)) {
+    return MIME_TYPES.excalidrawlib;
   }
   return "";
 };
@@ -157,7 +157,7 @@ export const loadSceneOrLibraryFromBlob = async (
         type: MIME_TYPES.excalidraw,
         data: restore(
           {
-            elements: clearElementsForExport(data.elements || []),
+            elements: data.elements || [],
             appState: {
               theme: localAppState?.theme,
               fileHandle: fileHandle || blob.handle || null,
@@ -170,7 +170,11 @@ export const loadSceneOrLibraryFromBlob = async (
           },
           localAppState,
           localElements,
-          { repairBindings: true, refreshDimensions: false },
+          {
+            repairBindings: true,
+            refreshDimensions: false,
+            deleteInvisibleElements: true,
+          },
         ),
       };
     } else if (isValidLibrary(data)) {
@@ -385,23 +389,18 @@ export const ImageURLToFile = async (
   throw new Error("Error: unsupported file type", { cause: "UNSUPPORTED" });
 };
 
-export const getFileFromEvent = async (
-  event: React.DragEvent<HTMLDivElement>,
-) => {
-  const file = event.dataTransfer.files.item(0);
-  const fileHandle = await getFileHandle(event);
-
-  return { file: file ? await normalizeFile(file) : null, fileHandle };
-};
-
 export const getFileHandle = async (
-  event: React.DragEvent<HTMLDivElement>,
+  event: DragEvent | React.DragEvent | DataTransferItem,
 ): Promise<FileSystemHandle | null> => {
   if (nativeFileSystemSupported) {
     try {
-      const item = event.dataTransfer.items[0];
+      const dataTransferItem =
+        event instanceof DataTransferItem
+          ? event
+          : (event as DragEvent).dataTransfer?.items?.[0];
+
       const handle: FileSystemHandle | null =
-        (await (item as any).getAsFileSystemHandle()) || null;
+        (await (dataTransferItem as any).getAsFileSystemHandle()) || null;
 
       return handle;
     } catch (error: any) {
@@ -415,37 +414,42 @@ export const getFileHandle = async (
 /**
  * attempts to detect if a buffer is a valid image by checking its leading bytes
  */
-const getActualMimeTypeFromImage = (buffer: ArrayBuffer) => {
-  let mimeType: ValueOf<Pick<typeof MIME_TYPES, "png" | "jpg" | "gif">> | null =
-    null;
+const getActualMimeTypeFromImage = async (file: Blob | File) => {
+  let mimeType: ValueOf<
+    Pick<typeof MIME_TYPES, "png" | "jpg" | "gif" | "webp">
+  > | null = null;
 
-  const first8Bytes = `${[...new Uint8Array(buffer).slice(0, 8)].join(" ")} `;
+  const leadingBytes = [
+    ...new Uint8Array(await blobToArrayBuffer(file.slice(0, 15))),
+  ].join(" ");
 
   // uint8 leading bytes
-  const headerBytes = {
+  const bytes = {
     // https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_header
-    png: "137 80 78 71 13 10 26 10 ",
+    png: /^137 80 78 71 13 10 26 10\b/,
     // https://en.wikipedia.org/wiki/JPEG#Syntax_and_structure
     // jpg is a bit wonky. Checking the first three bytes should be enough,
     // but may yield false positives. (https://stackoverflow.com/a/23360709/927631)
-    jpg: "255 216 255 ",
+    jpg: /^255 216 255\b/,
     // https://en.wikipedia.org/wiki/GIF#Example_GIF_file
-    gif: "71 73 70 56 57 97 ",
+    gif: /^71 73 70 56 57 97\b/,
+    // 4 bytes for RIFF + 4 bytes for chunk size + WEBP identifier
+    webp: /^82 73 70 70 \d+ \d+ \d+ \d+ 87 69 66 80 86 80 56\b/,
   };
 
-  if (first8Bytes === headerBytes.png) {
-    mimeType = MIME_TYPES.png;
-  } else if (first8Bytes.startsWith(headerBytes.jpg)) {
-    mimeType = MIME_TYPES.jpg;
-  } else if (first8Bytes.startsWith(headerBytes.gif)) {
-    mimeType = MIME_TYPES.gif;
+  for (const type of Object.keys(bytes) as (keyof typeof bytes)[]) {
+    if (leadingBytes.match(bytes[type])) {
+      mimeType = MIME_TYPES[type];
+      break;
+    }
   }
-  return mimeType;
+
+  return mimeType || file.type || null;
 };
 
 export const createFile = (
   blob: File | Blob | ArrayBuffer,
-  mimeType: ValueOf<typeof MIME_TYPES>,
+  mimeType: string,
   name: string | undefined,
 ) => {
   return new File([blob], name || "", {
@@ -453,39 +457,32 @@ export const createFile = (
   });
 };
 
+const normalizedFileSymbol = Symbol("fileNormalized");
+
 /** attempts to detect correct mimeType if none is set, or if an image
  * has an incorrect extension.
  * Note: doesn't handle missing .excalidraw/.excalidrawlib extension  */
 export const normalizeFile = async (file: File) => {
-  if (!file.type) {
-    if (file?.name?.endsWith(".excalidrawlib")) {
-      file = createFile(
-        await blobToArrayBuffer(file),
-        MIME_TYPES.excalidrawlib,
-        file.name,
-      );
-    } else if (file?.name?.endsWith(".excalidraw")) {
-      file = createFile(
-        await blobToArrayBuffer(file),
-        MIME_TYPES.excalidraw,
-        file.name,
-      );
-    } else {
-      const buffer = await blobToArrayBuffer(file);
-      const mimeType = getActualMimeTypeFromImage(buffer);
-      if (mimeType) {
-        file = createFile(buffer, mimeType, file.name);
-      }
-    }
+  // to prevent double normalization (perf optim)
+  if ((file as any)[normalizedFileSymbol]) {
+    return file;
+  }
+
+  if (file?.name?.endsWith(".excalidrawlib")) {
+    file = createFile(file, MIME_TYPES.excalidrawlib, file.name);
+  } else if (file?.name?.endsWith(".excalidraw")) {
+    file = createFile(file, MIME_TYPES.excalidraw, file.name);
+  } else if (!file.type || file.type?.startsWith("image/")) {
     // when the file is an image, make sure the extension corresponds to the
-    // actual mimeType (this is an edge case, but happens sometime)
-  } else if (isSupportedImageFile(file)) {
-    const buffer = await blobToArrayBuffer(file);
-    const mimeType = getActualMimeTypeFromImage(buffer);
+    // actual mimeType (this is an edge case, but happens - especially
+    // with AI generated images)
+    const mimeType = await getActualMimeTypeFromImage(file);
     if (mimeType && mimeType !== file.type) {
-      file = createFile(buffer, mimeType, file.name);
+      file = createFile(file, mimeType, file.name);
     }
   }
+
+  (file as any)[normalizedFileSymbol] = true;
 
   return file;
 };

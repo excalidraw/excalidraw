@@ -1,7 +1,6 @@
 import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
-  isAndroid,
-  isIOS,
+  type EditorInterface,
 } from "@excalidraw/common";
 
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
@@ -9,7 +8,6 @@ import { pointFrom, pointRotateRads } from "@excalidraw/math";
 import type { Radians } from "@excalidraw/math";
 
 import type {
-  Device,
   InteractiveCanvasAppState,
   Zoom,
 } from "@excalidraw/excalidraw/types";
@@ -111,20 +109,21 @@ const generateTransformHandle = (
   return [xx - width / 2, yy - height / 2, width, height];
 };
 
-export const canResizeFromSides = (device: Device) => {
-  if (device.viewport.isMobile) {
-    return false;
-  }
-
-  if (device.isTouchScreen && (isAndroid || isIOS)) {
+export const canResizeFromSides = (editorInterface: EditorInterface) => {
+  if (
+    editorInterface.formFactor === "phone" &&
+    editorInterface.userAgent.isMobileDevice
+  ) {
     return false;
   }
 
   return true;
 };
 
-export const getOmitSidesForDevice = (device: Device) => {
-  if (canResizeFromSides(device)) {
+export const getOmitSidesForEditorInterface = (
+  editorInterface: EditorInterface,
+) => {
+  if (canResizeFromSides(editorInterface)) {
     return DEFAULT_OMIT_SIDES;
   }
 
@@ -326,11 +325,15 @@ export const getTransformHandles = (
   );
 };
 
-export const shouldShowBoundingBox = (
+export const hasBoundingBox = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: InteractiveCanvasAppState,
+  editorInterface: EditorInterface,
 ) => {
-  if (appState.editingLinearElement) {
+  if (
+    appState.selectedLinearElement?.isEditing ||
+    appState.selectedLinearElement?.isDragging
+  ) {
     return false;
   }
   if (elements.length > 1) {
@@ -345,5 +348,7 @@ export const shouldShowBoundingBox = (
     return true;
   }
 
-  return element.points.length > 2;
+  // on mobile/tablet we currently don't show bbox because of resize issues
+  // (also prob best for simplicity's sake)
+  return element.points.length > 2 && !editorInterface.userAgent.isMobileDevice;
 };

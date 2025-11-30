@@ -6,11 +6,14 @@ import React, {
   useState,
 } from "react";
 
-import { MIME_TYPES, arrayToMap } from "@excalidraw/common";
+import { MIME_TYPES, arrayToMap, nextAnimationFrame } from "@excalidraw/common";
 
 import { duplicateElements } from "@excalidraw/element";
 
-import { serializeLibraryAsJSON } from "../data/json";
+import clsx from "clsx";
+
+import { deburr } from "../deburr";
+
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { useScrollPosition } from "../hooks/useScrollPosition";
 import { t } from "../i18n";
@@ -26,6 +29,14 @@ import Spinner from "./Spinner";
 import Stack from "./Stack";
 
 import "./LibraryMenuItems.scss";
+
+import { TextField } from "./TextField";
+
+import { useEditorInterface } from "./App";
+
+import { Button } from "./Button";
+
+import type { ExcalidrawLibraryIds } from "../data/types";
 
 import type {
   ExcalidrawProps,
@@ -64,6 +75,7 @@ export default function LibraryMenuItems({
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
 }) {
+  const editorInterface = useEditorInterface();
   const libraryContainerRef = useRef<HTMLDivElement>(null);
   const scrollPosition = useScrollPosition<HTMLDivElement>(libraryContainerRef);
 
@@ -75,6 +87,30 @@ export default function LibraryMenuItems({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { svgCache } = useLibraryCache();
+  const [lastSelectedItem, setLastSelectedItem] = useState<
+    LibraryItem["id"] | null
+  >(null);
+
+  const [searchInputValue, setSearchInputValue] = useState("");
+
+  const IS_LIBRARY_EMPTY = !libraryItems.length && !pendingElements.length;
+
+  const IS_SEARCHING = !IS_LIBRARY_EMPTY && !!searchInputValue.trim();
+
+  const filteredItems = useMemo(() => {
+    const searchQuery = deburr(searchInputValue.trim().toLowerCase());
+    if (!searchQuery) {
+      return [];
+    }
+
+    return libraryItems.filter((item) => {
+      const itemName = item.name || "";
+      return (
+        itemName.trim() && deburr(itemName.toLowerCase()).includes(searchQuery)
+      );
+    });
+  }, [libraryItems, searchInputValue]);
+
   const unpublishedItems = useMemo(
     () => libraryItems.filter((item) => item.status !== "published"),
     [libraryItems],
@@ -85,23 +121,10 @@ export default function LibraryMenuItems({
     [libraryItems],
   );
 
-  const showBtn = !libraryItems.length && !pendingElements.length;
-
-  const isLibraryEmpty =
-    !pendingElements.length &&
-    !unpublishedItems.length &&
-    !publishedItems.length;
-
-  const [lastSelectedItem, setLastSelectedItem] = useState<
-    LibraryItem["id"] | null
-  >(null);
-
   const onItemSelectToggle = useCallback(
     (id: LibraryItem["id"], event: React.MouseEvent) => {
       const shouldSelect = !selectedItems.includes(id);
-
       const orderedItems = [...unpublishedItems, ...publishedItems];
-
       if (shouldSelect) {
         if (event.shiftKey && lastSelectedItem) {
           const rangeStart = orderedItems.findIndex(
@@ -115,10 +138,13 @@ export default function LibraryMenuItems({
           }
 
           const selectedItemsMap = arrayToMap(selectedItems);
+          // Support both top-down and bottom-up selection by using min/max
+          const minRange = Math.min(rangeStart, rangeEnd);
+          const maxRange = Math.max(rangeStart, rangeEnd);
           const nextSelectedIds = orderedItems.reduce(
             (acc: LibraryItem["id"][], item, idx) => {
               if (
-                (idx >= rangeStart && idx <= rangeEnd) ||
+                (idx >= minRange && idx <= maxRange) ||
                 selectedItemsMap.has(item.id)
               ) {
                 acc.push(item.id);
@@ -127,7 +153,6 @@ export default function LibraryMenuItems({
             },
             [],
           );
-
           onSelectItems(nextSelectedIds);
         } else {
           onSelectItems([...selectedItems, id]);
@@ -146,6 +171,14 @@ export default function LibraryMenuItems({
       unpublishedItems,
     ],
   );
+
+  useEffect(() => {
+    // if selection is removed (e.g. via esc), reset last selected item
+    // so that subsequent shift+clicks don't select a large range
+    if (!selectedItems.length) {
+      setLastSelectedItem(null);
+    }
+  }, [selectedItems]);
 
   const getInsertedElements = useCallback(
     (id: string) => {
@@ -175,12 +208,17 @@ export default function LibraryMenuItems({
 
   const onItemDrag = useCallback(
     (id: LibraryItem["id"], event: React.DragEvent) => {
+      // we want to serialize just the ids so the operation is fast and there's
+      // no race condition if people drop the library items on canvas too fast
+      const data: ExcalidrawLibraryIds = {
+        itemIds: selectedItems.includes(id) ? selectedItems : [id],
+      };
       event.dataTransfer.setData(
-        MIME_TYPES.excalidrawlib,
-        serializeLibraryAsJSON(getInsertedElements(id)),
+        MIME_TYPES.excalidrawlibIds,
+        JSON.stringify(data),
       );
     },
-    [getInsertedElements],
+    [selectedItems],
   );
 
   const isItemSelected = useCallback(
@@ -188,7 +226,6 @@ export default function LibraryMenuItems({
       if (!id) {
         return false;
       }
-
       return selectedItems.includes(id);
     },
     [selectedItems],
@@ -208,9 +245,135 @@ export default function LibraryMenuItems({
   );
 
   const itemsRenderedPerBatch =
-    svgCache.size >= libraryItems.length
+    svgCache.size >=
+    (filteredItems.length ? filteredItems : libraryItems).length
       ? CACHED_ITEMS_RENDERED_PER_BATCH
       : ITEMS_RENDERED_PER_BATCH;
+
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    // focus could be stolen by tab trigger button
+    nextAnimationFrame(() => {
+      searchInputRef.current?.focus();
+    });
+  }, []);
+
+  const JSX_whenNotSearching = !IS_SEARCHING && (
+    <>
+      {!IS_LIBRARY_EMPTY && (
+        <div className="library-menu-items-container__header">
+          {t("labels.personalLib")}
+        </div>
+      )}
+      {!pendingElements.length && !unpublishedItems.length ? (
+        <div className="library-menu-items__no-items">
+          {!publishedItems.length && (
+            <div className="library-menu-items__no-items__label">
+              {t("library.noItems")}
+            </div>
+          )}
+          <div className="library-menu-items__no-items__hint">
+            {publishedItems.length > 0
+              ? t("library.hint_emptyPrivateLibrary")
+              : t("library.hint_emptyLibrary")}
+          </div>
+        </div>
+      ) : (
+        <LibraryMenuSectionGrid>
+          {pendingElements.length > 0 && (
+            <LibraryMenuSection
+              itemsRenderedPerBatch={itemsRenderedPerBatch}
+              items={[{ id: null, elements: pendingElements }]}
+              onItemSelectToggle={onItemSelectToggle}
+              onItemDrag={onItemDrag}
+              onClick={onAddToLibraryClick}
+              isItemSelected={isItemSelected}
+              svgCache={svgCache}
+            />
+          )}
+          <LibraryMenuSection
+            itemsRenderedPerBatch={itemsRenderedPerBatch}
+            items={unpublishedItems}
+            onItemSelectToggle={onItemSelectToggle}
+            onItemDrag={onItemDrag}
+            onClick={onItemClick}
+            isItemSelected={isItemSelected}
+            svgCache={svgCache}
+          />
+        </LibraryMenuSectionGrid>
+      )}
+
+      {publishedItems.length > 0 && (
+        <div
+          className="library-menu-items-container__header"
+          style={{ marginTop: "0.75rem" }}
+        >
+          {t("labels.excalidrawLib")}
+        </div>
+      )}
+      {publishedItems.length > 0 && (
+        <LibraryMenuSectionGrid>
+          <LibraryMenuSection
+            itemsRenderedPerBatch={itemsRenderedPerBatch}
+            items={publishedItems}
+            onItemSelectToggle={onItemSelectToggle}
+            onItemDrag={onItemDrag}
+            onClick={onItemClick}
+            isItemSelected={isItemSelected}
+            svgCache={svgCache}
+          />
+        </LibraryMenuSectionGrid>
+      )}
+    </>
+  );
+
+  const JSX_whenSearching = IS_SEARCHING && (
+    <>
+      <div className="library-menu-items-container__header">
+        {t("library.search.heading")}
+        {!isLoading && (
+          <div
+            className="library-menu-items-container__header__hint"
+            style={{ cursor: "pointer" }}
+            onPointerDown={(e) => e.preventDefault()}
+            onClick={(event) => {
+              setSearchInputValue("");
+            }}
+          >
+            <kbd>esc</kbd> to clear
+          </div>
+        )}
+      </div>
+      {filteredItems.length > 0 ? (
+        <LibraryMenuSectionGrid>
+          <LibraryMenuSection
+            itemsRenderedPerBatch={itemsRenderedPerBatch}
+            items={filteredItems}
+            onItemSelectToggle={onItemSelectToggle}
+            onItemDrag={onItemDrag}
+            onClick={onItemClick}
+            isItemSelected={isItemSelected}
+            svgCache={svgCache}
+          />
+        </LibraryMenuSectionGrid>
+      ) : (
+        <div className="library-menu-items__no-items">
+          <div className="library-menu-items__no-items__hint">
+            {t("library.search.noResults")}
+          </div>
+          <Button
+            onPointerDown={(e) => e.preventDefault()}
+            onSelect={() => {
+              setSearchInputValue("");
+            }}
+            style={{ width: "auto", marginTop: "1rem" }}
+          >
+            {t("library.search.clearSearch")}
+          </Button>
+        </div>
+      )}
+    </>
+  );
 
   return (
     <div
@@ -223,127 +386,58 @@ export default function LibraryMenuItems({
           : { borderBottom: 0 }
       }
     >
-      {!isLibraryEmpty && (
+      <div className="library-menu-items-header">
+        {!IS_LIBRARY_EMPTY && (
+          <TextField
+            ref={searchInputRef}
+            type="search"
+            className={clsx("library-menu-items-container__search", {
+              hideCancelButton: editorInterface.formFactor !== "phone",
+            })}
+            placeholder={t("library.search.inputPlaceholder")}
+            value={searchInputValue}
+            onChange={(value) => setSearchInputValue(value)}
+          />
+        )}
         <LibraryDropdownMenu
           selectedItems={selectedItems}
           onSelectItems={onSelectItems}
           className="library-menu-dropdown-container--in-heading"
         />
-      )}
+      </div>
       <Stack.Col
         className="library-menu-items-container__items"
         align="start"
         gap={1}
         style={{
           flex: publishedItems.length > 0 ? 1 : "0 1 auto",
-          marginBottom: 0,
+          margin: IS_LIBRARY_EMPTY ? "auto" : 0,
         }}
         ref={libraryContainerRef}
       >
-        <>
-          {!isLibraryEmpty && (
-            <div className="library-menu-items-container__header">
-              {t("labels.personalLib")}
-            </div>
-          )}
-          {isLoading && (
-            <div
-              style={{
-                position: "absolute",
-                top: "var(--container-padding-y)",
-                right: "var(--container-padding-x)",
-                transform: "translateY(50%)",
-              }}
-            >
-              <Spinner />
-            </div>
-          )}
-          {!pendingElements.length && !unpublishedItems.length ? (
-            <div className="library-menu-items__no-items">
-              <div className="library-menu-items__no-items__label">
-                {t("library.noItems")}
-              </div>
-              <div className="library-menu-items__no-items__hint">
-                {publishedItems.length > 0
-                  ? t("library.hint_emptyPrivateLibrary")
-                  : t("library.hint_emptyLibrary")}
-              </div>
-            </div>
-          ) : (
-            <LibraryMenuSectionGrid>
-              {pendingElements.length > 0 && (
-                <LibraryMenuSection
-                  itemsRenderedPerBatch={itemsRenderedPerBatch}
-                  items={[{ id: null, elements: pendingElements }]}
-                  onItemSelectToggle={onItemSelectToggle}
-                  onItemDrag={onItemDrag}
-                  onClick={onAddToLibraryClick}
-                  isItemSelected={isItemSelected}
-                  svgCache={svgCache}
-                />
-              )}
-              <LibraryMenuSection
-                itemsRenderedPerBatch={itemsRenderedPerBatch}
-                items={unpublishedItems}
-                onItemSelectToggle={onItemSelectToggle}
-                onItemDrag={onItemDrag}
-                onClick={onItemClick}
-                isItemSelected={isItemSelected}
-                svgCache={svgCache}
-              />
-            </LibraryMenuSectionGrid>
-          )}
-        </>
+        {isLoading && (
+          <div
+            style={{
+              position: "absolute",
+              top: "var(--container-padding-y)",
+              right: "var(--container-padding-x)",
+              transform: "translateY(50%)",
+            }}
+          >
+            <Spinner />
+          </div>
+        )}
 
-        <>
-          {(publishedItems.length > 0 ||
-            pendingElements.length > 0 ||
-            unpublishedItems.length > 0) && (
-            <div className="library-menu-items-container__header library-menu-items-container__header--excal">
-              {t("labels.excalidrawLib")}
-            </div>
-          )}
-          {publishedItems.length > 0 ? (
-            <LibraryMenuSectionGrid>
-              <LibraryMenuSection
-                itemsRenderedPerBatch={itemsRenderedPerBatch}
-                items={publishedItems}
-                onItemSelectToggle={onItemSelectToggle}
-                onItemDrag={onItemDrag}
-                onClick={onItemClick}
-                isItemSelected={isItemSelected}
-                svgCache={svgCache}
-              />
-            </LibraryMenuSectionGrid>
-          ) : unpublishedItems.length > 0 ? (
-            <div
-              style={{
-                margin: "1rem 0",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "100%",
-                fontSize: ".9rem",
-              }}
-            >
-              {t("library.noItems")}
-            </div>
-          ) : null}
-        </>
+        {JSX_whenNotSearching}
+        {JSX_whenSearching}
 
-        {showBtn && (
+        {IS_LIBRARY_EMPTY && (
           <LibraryMenuControlButtons
             style={{ padding: "16px 0", width: "100%" }}
             id={id}
             libraryReturnUrl={libraryReturnUrl}
             theme={theme}
-          >
-            <LibraryDropdownMenu
-              selectedItems={selectedItems}
-              onSelectItems={onSelectItems}
-            />
-          </LibraryMenuControlButtons>
+          />
         )}
       </Stack.Col>
     </div>

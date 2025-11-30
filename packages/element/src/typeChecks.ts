@@ -1,5 +1,7 @@
 import { ROUNDNESS, assertNever } from "@excalidraw/common";
 
+import { pointsEqual } from "@excalidraw/math";
+
 import type { ElementOrToolType } from "@excalidraw/excalidraw/types";
 
 import type { MarkNonNullable } from "@excalidraw/common/utility-types";
@@ -25,8 +27,7 @@ import type {
   ExcalidrawMagicFrameElement,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
-  PointBinding,
-  FixedPointBinding,
+  ExcalidrawLineElement,
   ExcalidrawFlowchartNodeElement,
   ExcalidrawLinearElementSubType,
 } from "./types";
@@ -108,6 +109,12 @@ export const isLinearElement = (
   return element != null && isLinearElementType(element.type);
 };
 
+export const isLineElement = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawLineElement => {
+  return element != null && element.type === "line";
+};
+
 export const isArrowElement = (
   element?: ExcalidrawElement | null,
 ): element is ExcalidrawArrowElement => {
@@ -118,6 +125,15 @@ export const isElbowArrow = (
   element?: ExcalidrawElement,
 ): element is ExcalidrawElbowArrowElement => {
   return isArrowElement(element) && element.elbowed;
+};
+
+/**
+ * sharp or curved arrow, but not elbow
+ */
+export const isSimpleArrow = (
+  element?: ExcalidrawElement,
+): element is ExcalidrawArrowElement => {
+  return isArrowElement(element) && !element.elbowed;
 };
 
 export const isSharpArrow = (
@@ -145,7 +161,7 @@ export const isLinearElementType = (
 export const isBindingElement = (
   element?: ExcalidrawElement | null,
   includeLocked = true,
-): element is ExcalidrawLinearElement => {
+): element is ExcalidrawArrowElement => {
   return (
     element != null &&
     (!element.locked || includeLocked === true) &&
@@ -340,15 +356,6 @@ export const getDefaultRoundnessTypeForElement = (
   return null;
 };
 
-export const isFixedPointBinding = (
-  binding: PointBinding | FixedPointBinding,
-): binding is FixedPointBinding => {
-  return (
-    Object.hasOwn(binding, "fixedPoint") &&
-    (binding as FixedPointBinding).fixedPoint != null
-  );
-};
-
 // TODO: Move this to @excalidraw/math
 export const isBounds = (box: unknown): box is Bounds =>
   Array.isArray(box) &&
@@ -371,4 +378,27 @@ export const getLinearElementSubType = (
     return "elbowArrow";
   }
   return "line";
+};
+
+/**
+ * Checks if current element points meet all the conditions for polygon=true
+ * (this isn't a element type check, for that use isLineElement).
+ *
+ * If you want to check if points *can* be turned into a polygon, use
+ *  canBecomePolygon(points).
+ */
+export const isValidPolygon = (
+  points: ExcalidrawLineElement["points"],
+): boolean => {
+  return points.length > 3 && pointsEqual(points[0], points[points.length - 1]);
+};
+
+export const canBecomePolygon = (
+  points: ExcalidrawLineElement["points"],
+): boolean => {
+  return (
+    points.length > 3 ||
+    // 3-point polygons can't have all points in a single line
+    (points.length === 3 && !pointsEqual(points[0], points[points.length - 1]))
+  );
 };

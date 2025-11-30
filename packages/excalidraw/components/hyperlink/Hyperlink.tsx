@@ -41,7 +41,7 @@ import { getTooltipDiv, updateTooltipPosition } from "../../components/Tooltip";
 
 import { t } from "../../i18n";
 
-import { useAppProps, useDevice, useExcalidrawAppState } from "../App";
+import { useAppProps, useEditorInterface, useExcalidrawAppState } from "../App";
 import { ToolButton } from "../ToolButton";
 import { FreedrawIcon, TrashIcon, elementLinkIcon } from "../icons";
 import { getSelectedElements } from "../../scene";
@@ -88,7 +88,7 @@ export const Hyperlink = ({
   const elementsMap = scene.getNonDeletedElementsMap();
   const appState = useExcalidrawAppState();
   const appProps = useAppProps();
-  const device = useDevice();
+  const editorInterface = useEditorInterface();
 
   const linkVal = element.link || "";
 
@@ -189,11 +189,11 @@ export const Hyperlink = ({
     if (
       isEditing &&
       inputRef?.current &&
-      !(device.viewport.isMobile || device.isTouchScreen)
+      !(editorInterface.formFactor === "phone" || editorInterface.isTouchScreen)
     ) {
       inputRef.current.select();
     }
-  }, [isEditing, device.viewport.isMobile, device.isTouchScreen]);
+  }, [isEditing, editorInterface.formFactor, editorInterface.isTouchScreen]);
 
   useEffect(() => {
     let timeoutId: number | null = null;
@@ -463,7 +463,7 @@ const shouldHideLinkPopup = (
 
   const threshold = 15 / appState.zoom.value;
   // hitbox to prevent hiding when hovered in element bounding box
-  if (hitElementBoundingBox(sceneX, sceneY, element, elementsMap)) {
+  if (hitElementBoundingBox(pointFrom(sceneX, sceneY), element, elementsMap)) {
     return false;
   }
   const [x1, y1, x2] = getElementAbsoluteCoords(element, elementsMap);

@@ -1,7 +1,11 @@
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
-import { getBoundTextElement } from "@excalidraw/element";
-import { isFrameLikeElement, isTextElement } from "@excalidraw/element";
+import {
+  getBoundTextElement,
+  isBindingElement,
+  unbindBindingElement,
+} from "@excalidraw/element";
+import { isFrameLikeElement } from "@excalidraw/element";
 
 import {
   getSelectedGroupIds,
@@ -12,6 +16,7 @@ import {
 import { getFrameChildren } from "@excalidraw/element";
 
 import { updateBindings } from "@excalidraw/element";
+import { DRAGGING_THRESHOLD } from "@excalidraw/common";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -41,12 +46,6 @@ export const isPropertyEditable = (
   element: ExcalidrawElement,
   property: keyof ExcalidrawElement,
 ) => {
-  if (property === "height" && isTextElement(element)) {
-    return false;
-  }
-  if (property === "width" && isTextElement(element)) {
-    return false;
-  }
   if (property === "angle" && isFrameLikeElement(element)) {
     return false;
   }
@@ -116,9 +115,25 @@ export const moveElement = (
   newTopLeftY: number,
   originalElement: ExcalidrawElement,
   scene: Scene,
+  appState: AppState,
   originalElementsMap: ElementsMap,
   shouldInformMutation = true,
 ) => {
+  if (
+    isBindingElement(originalElement) &&
+    (originalElement.startBinding || originalElement.endBinding)
+  ) {
+    if (
+      Math.abs(newTopLeftX - originalElement.x) < DRAGGING_THRESHOLD &&
+      Math.abs(newTopLeftY - originalElement.y) < DRAGGING_THRESHOLD
+    ) {
+      return;
+    }
+
+    unbindBindingElement(originalElement, "start", scene);
+    unbindBindingElement(originalElement, "end", scene);
+  }
+
   const elementsMap = scene.getNonDeletedElementsMap();
   const latestElement = elementsMap.get(originalElement.id);
   if (!latestElement) {
@@ -151,7 +166,7 @@ export const moveElement = (
     },
     { informMutation: shouldInformMutation, isDragging: false },
   );
-  updateBindings(latestElement, scene);
+  updateBindings(latestElement, scene, appState);
 
   const boundTextElement = getBoundTextElement(
     originalElement,
@@ -209,7 +224,7 @@ export const moveElement = (
         },
         { informMutation: shouldInformMutation, isDragging: false },
       );
-      updateBindings(latestChildElement, scene, {
+      updateBindings(latestChildElement, scene, appState, {
         simultaneouslyUpdated: originalChildren,
       });
     });

@@ -7,7 +7,7 @@ import type {
   PendingExcalidrawElements,
 } from "@excalidraw/excalidraw/types";
 
-import { bindLinearElement } from "./binding";
+import { bindBindingElement } from "./binding";
 import { updateElbowArrowPoints } from "./elbowArrow";
 import {
   HEADING_DOWN,
@@ -21,7 +21,7 @@ import {
 import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
 import { newArrowElement, newElement } from "./newElement";
-import { aabbForElement } from "./shapes";
+import { aabbForElement } from "./bounds";
 import { elementsAreInFrameBounds, elementOverlapsWithFrame } from "./frame";
 import {
   isBindableElement,
@@ -95,10 +95,11 @@ const getNodeRelatives = (
           type === "predecessors" ? el.points[el.points.length - 1] : [0, 0]
         ) as Readonly<LocalPoint>;
 
-        const heading = headingForPointFromElement(node, aabbForElement(node), [
-          edgePoint[0] + el.x,
-          edgePoint[1] + el.y,
-        ] as Readonly<GlobalPoint>);
+        const heading = headingForPointFromElement(
+          node,
+          aabbForElement(node, elementsMap),
+          [edgePoint[0] + el.x, edgePoint[1] + el.y] as Readonly<GlobalPoint>,
+        );
 
         acc.push({
           relative,
@@ -445,8 +446,14 @@ const createBindingArrow = (
 
   const elementsMap = scene.getNonDeletedElementsMap();
 
-  bindLinearElement(bindingArrow, startBindingElement, "start", scene);
-  bindLinearElement(bindingArrow, endBindingElement, "end", scene);
+  bindBindingElement(
+    bindingArrow,
+    startBindingElement,
+    "orbit",
+    "start",
+    scene,
+  );
+  bindBindingElement(bindingArrow, endBindingElement, "orbit", "end", scene);
 
   const changedElements = new Map<string, OrderedExcalidrawElement>();
   changedElements.set(

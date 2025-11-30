@@ -6,7 +6,10 @@ import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "@excalidraw/common";
 import { newElementWith } from "@excalidraw/element";
 import * as sizeHelpers from "@excalidraw/element";
 
+import type { LocalPoint } from "@excalidraw/math";
+
 import type {
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
@@ -57,7 +60,11 @@ describe("restoreElements", () => {
     const rectElement = API.createElement({ type: "rectangle" });
     mockSizeHelper.mockImplementation(() => true);
 
-    expect(restore.restoreElements([rectElement], null).length).toBe(0);
+    expect(
+      restore.restoreElements([rectElement], null, {
+        deleteInvisibleElements: true,
+      }),
+    ).toEqual([expect.objectContaining({ isDeleted: true })]);
   });
 
   it("should restore text element correctly passing value for each attribute", () => {
@@ -82,6 +89,23 @@ describe("restoreElements", () => {
     });
   });
 
+  it("should not delete empty text element when opts.deleteInvisibleElements is not defined", () => {
+    const textElement = API.createElement({
+      type: "text",
+      text: "",
+      isDeleted: false,
+    });
+
+    const restoredElements = restore.restoreElements([textElement], null);
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: textElement.id,
+        isDeleted: false,
+      }),
+    ]);
+  });
+
   it("should restore text element correctly with unknown font family, null text and undefined alignment", () => {
     const textElement: any = API.createElement({
       type: "text",
@@ -94,10 +118,9 @@ describe("restoreElements", () => {
     textElement.font = "10 unknown";
 
     expect(textElement.isDeleted).toBe(false);
-    const restoredText = restore.restoreElements(
-      [textElement],
-      null,
-    )[0] as ExcalidrawTextElement;
+    const restoredText = restore.restoreElements([textElement], null, {
+      deleteInvisibleElements: true,
+    })[0] as ExcalidrawTextElement;
     expect(restoredText.isDeleted).toBe(true);
     expect(restoredText).toMatchSnapshot({
       seed: expect.any(Number),
@@ -161,6 +184,112 @@ describe("restoreElements", () => {
       seed: expect.any(Number),
       versionNonce: expect.any(Number),
     });
+  });
+
+  it("should remove imperceptibly small elements", () => {
+    const arrowElement = API.createElement({
+      type: "arrow",
+      points: [
+        [0, 0],
+        [0.02, 0.05],
+      ] as LocalPoint[],
+      x: 0,
+      y: 0,
+    });
+
+    const restoredElements = restore.restoreElements([arrowElement], null, {
+      deleteInvisibleElements: true,
+    });
+
+    const restoredArrow = restoredElements[0] as
+      | ExcalidrawArrowElement
+      | undefined;
+
+    expect(restoredArrow).not.toBeUndefined();
+    expect(restoredArrow?.isDeleted).toBe(true);
+  });
+
+  it("should keep 'imperceptibly' small freedraw/line elements", () => {
+    const freedrawElement = API.createElement({
+      type: "freedraw",
+      points: [
+        [0, 0],
+        [0.0001, 0.0001],
+      ] as LocalPoint[],
+      x: 0,
+      y: 0,
+    });
+    const lineElement = API.createElement({
+      type: "line",
+      points: [
+        [0, 0],
+        [0.0001, 0.0001],
+      ] as LocalPoint[],
+      x: 0,
+      y: 0,
+    });
+
+    const restoredElements = restore.restoreElements(
+      [freedrawElement, lineElement],
+      null,
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({ id: freedrawElement.id }),
+      expect.objectContaining({ id: lineElement.id }),
+    ]);
+  });
+
+  it("should restore loop linears correctly", () => {
+    const linearElement = API.createElement({
+      type: "line",
+      points: [
+        [0, 0],
+        [100, 100],
+        [100, 200],
+        [0, 0],
+      ] as LocalPoint[],
+      x: 0,
+      y: 0,
+    });
+    const arrowElement = API.createElement({
+      type: "arrow",
+      points: [
+        [0, 0],
+        [100, 100],
+        [100, 200],
+        [0, 0],
+      ] as LocalPoint[],
+      x: 500,
+      y: 500,
+    });
+
+    const restoredElements = restore.restoreElements(
+      [linearElement, arrowElement],
+      null,
+    );
+
+    const restoredLinear = restoredElements[0] as
+      | ExcalidrawLinearElement
+      | undefined;
+    const restoredArrow = restoredElements[1] as
+      | ExcalidrawArrowElement
+      | undefined;
+
+    expect(restoredLinear?.type).toBe("line");
+    expect(restoredLinear?.points).toEqual([
+      [0, 0],
+      [100, 100],
+      [100, 200],
+      [0, 0],
+    ] as LocalPoint[]);
+    expect(restoredArrow?.type).toBe("arrow");
+    expect(restoredArrow?.points).toEqual([
+      [0, 0],
+      [100, 100],
+      [100, 200],
+      [0, 0],
+    ] as LocalPoint[]);
   });
 
   it('should set arrow element endArrowHead as "arrow" when arrow element endArrowHead is null', () => {
@@ -742,12 +871,18 @@ describe("repairing bindings", () => {
     let restoredElements = restore.restoreElements(
       [container, invisibleBoundElement, boundElement],
       null,
+      { deleteInvisibleElements: true },
     );
 
     expect(restoredElements).toEqual([
       expect.objectContaining({
         id: container.id,
         boundElements: [obsoleteBinding, invisibleBinding, nonExistentBinding],
+      }),
+      expect.objectContaining({
+        id: invisibleBoundElement.id,
+        containerId: container.id,
+        isDeleted: true,
       }),
       expect.objectContaining({
         id: boundElement.id,
@@ -758,13 +893,18 @@ describe("repairing bindings", () => {
     restoredElements = restore.restoreElements(
       [container, invisibleBoundElement, boundElement],
       null,
-      { repairBindings: true },
+      { repairBindings: true, deleteInvisibleElements: true },
     );
 
     expect(restoredElements).toEqual([
       expect.objectContaining({
         id: container.id,
         boundElements: [],
+      }),
+      expect.objectContaining({
+        id: invisibleBoundElement.id,
+        containerId: container.id,
+        isDeleted: true,
       }),
       expect.objectContaining({
         id: boundElement.id,

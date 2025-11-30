@@ -37,7 +37,9 @@ const trackAction = (
           trackEvent(
             action.trackEvent.category,
             action.trackEvent.action || action.name,
-            `${source} (${app.device.editor.isMobile ? "mobile" : "desktop"})`,
+            `${source} (${
+              app.editorInterface.formFactor === "phone" ? "mobile" : "desktop"
+            })`,
           );
         }
       }
@@ -179,6 +181,7 @@ export class ActionManager {
           appProps={this.app.props}
           app={this.app}
           data={data}
+          renderAction={this.renderAction}
         />
       );
     }

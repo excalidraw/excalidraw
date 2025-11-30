@@ -28,6 +28,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     excalidrawAPI,
     isCollaborating = false,
     onPointerUpdate,
+    renderTopLeftUI,
     renderTopRightUI,
     langCode = defaultLang.code,
     viewModeEnabled,
@@ -120,6 +121,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           excalidrawAPI={excalidrawAPI}
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
+          renderTopLeftUI={renderTopLeftUI}
           renderTopRightUI={renderTopRightUI}
           langCode={langCode}
           viewModeEnabled={viewModeEnabled}
@@ -229,6 +231,7 @@ export { defaultLang, useI18n, languages } from "./i18n";
 export {
   restore,
   restoreAppState,
+  restoreElement,
   restoreElements,
   restoreLibraryItems,
 } from "./data/restore";
@@ -260,6 +263,9 @@ export {
   DEFAULT_LASER_COLOR,
   UserIdleState,
   normalizeLink,
+  sceneCoordsToViewportCoords,
+  viewportCoordsToSceneCoords,
+  getFormFactor,
 } from "@excalidraw/common";
 
 export {
@@ -272,16 +278,12 @@ export { CaptureUpdateAction } from "@excalidraw/element";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 
-export {
-  sceneCoordsToViewportCoords,
-  viewportCoordsToSceneCoords,
-} from "@excalidraw/common";
-
 export { Sidebar } from "./components/Sidebar/Sidebar";
 export { Button } from "./components/Button";
 export { Footer };
 export { MainMenu };
-export { useDevice } from "./components/App";
+export { Ellipsify } from "./components/Ellipsify";
+export { useEditorInterface, useStylesPanelMode } from "./components/App";
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
 export { Stats } from "./components/Stats";

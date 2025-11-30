@@ -16,7 +16,7 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import { bindLinearElement } from "@excalidraw/element";
+import { bindBindingElement } from "@excalidraw/element";
 import {
   newArrowElement,
   newElement,
@@ -330,9 +330,10 @@ const bindLinearElementToElement = (
         }
       }
 
-      bindLinearElement(
+      bindBindingElement(
         linearElement,
         startBoundElement as ExcalidrawBindableElement,
+        "orbit",
         "start",
         scene,
       );
@@ -405,9 +406,10 @@ const bindLinearElementToElement = (
         }
       }
 
-      bindLinearElement(
+      bindBindingElement(
         linearElement,
         endBoundElement as ExcalidrawBindableElement,
+        "orbit",
         "end",
         scene,
       );
@@ -466,7 +468,7 @@ const bindLinearElementToElement = (
 
   Object.assign(
     linearElement,
-    LinearElementEditor.getNormalizedPoints({
+    LinearElementEditor.getNormalizeElementPointsAndCoords({
       ...linearElement,
       points: newPoints,
     }),
