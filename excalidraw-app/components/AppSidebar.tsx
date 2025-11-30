@@ -13,7 +13,7 @@ export const AppSidebar = () => {
 
   return (
     <DefaultSidebar>
-      <DefaultSidebar.TabTriggers>
+      {/* <DefaultSidebar.TabTriggers>
         <Sidebar.TabTrigger
           tab="comments"
           style={{ opacity: openSidebar?.tab === "comments" ? 1 : 0.4 }}
@@ -73,7 +73,7 @@ export const AppSidebar = () => {
             Sign up now
           </LinkButton>
         </div>
-      </Sidebar.Tab>
+      </Sidebar.Tab> */}
     </DefaultSidebar>
   );
 };
