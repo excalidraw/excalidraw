@@ -235,7 +235,7 @@ const renderBindingHighlightForBindableElement_simple = (
 
       context.translate(element.x, element.y);
 
-      context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
+      context.lineWidth = 1.5 * FRAME_STYLE.strokeWidth / appState.zoom.value; //zsviczian was 1
       context.strokeStyle = highlightColor ?? //zsviczian
         (appState.theme === THEME.DARK
           ? `rgba(3, 93, 161, 1)`
@@ -276,7 +276,7 @@ const renderBindingHighlightForBindableElement_simple = (
 
       context.translate(element.x, element.y);
 
-      context.lineWidth =
+      context.lineWidth = 1.5 * //zsviczian was 1
         clamp(1.75, element.strokeWidth, 10) / //zsviczian was max was 4
         Math.max(0.25, appState.zoom.value);
       context.strokeStyle = highlightColor2 ?? //zsviczian
@@ -431,7 +431,7 @@ const renderBindingHighlightForBindableElement_complex = (
         appState.viewBackgroundColor,
         opacity,
       ); //zsviczian
-      context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
+      context.lineWidth = 1.5 * FRAME_STYLE.strokeWidth / appState.zoom.value; //zsviczian was 1
       context.strokeStyle = highlightColor ?? //zsviczian
         (appState.theme === THEME.DARK
           ? `rgba(3, 93, 161, ${opacity})`
@@ -478,7 +478,7 @@ const renderBindingHighlightForBindableElement_complex = (
         opacity / 2,
       ); //zsviczian
 
-      context.lineWidth =
+      context.lineWidth = 1.5 * //zsviczian was 1
         clamp(2.5, element.strokeWidth * 1.75, 10) / //zsviczian max was 4
         Math.max(0.25, appState.zoom.value);
       context.strokeStyle = highlightColor2 ?? //zsviczian
