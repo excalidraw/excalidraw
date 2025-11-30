@@ -83,18 +83,22 @@ export const DefaultSidebar = Object.assign(
 
       const isForceDocked = appState.openSidebar?.tab === CANVAS_SEARCH_TAB;
       
+      // Add a new waypoint based on the current canvas view
       const handleAddWaypoint = () => {
         setAppState((prev) => addWaypointFromCurrentView(prev));
       };
-
+      
+      // Rename an existing waypoint
       const handleRenameWaypoint = (id: string, name: string) => {
         setAppState((prev) => renameWaypoint(prev, id, name));
       };
 
+      // Delete a waypoint from the list
       const handleDeleteWaypoint = (id: string) => {
         setAppState((prev) => deleteWaypoint(prev, id));
       };
 
+      // Jump the canvas to a waypoint’s stored camera view
       const handleJumpToWaypoint = (id: string) => {
         setAppState((prev) => jumpToWaypoint(prev, id));
       };
@@ -141,11 +145,11 @@ export const DefaultSidebar = Object.assign(
             </Sidebar.Tab>
             <Sidebar.Tab tab="waypoints">
               <WaypointsPanel
-                waypoints={appState.waypoints}
-                onAdd={handleAddWaypoint}
-                onJump={handleJumpToWaypoint}
-                onRename={handleRenameWaypoint}
-                onDelete={handleDeleteWaypoint}
+                waypoints={appState.waypoints} // the waypoint list
+                onAdd={handleAddWaypoint} // adding waypoint
+                onJump={handleJumpToWaypoint} // jump to waypoint
+                onRename={handleRenameWaypoint} // rename waypoint
+                onDelete={handleDeleteWaypoint} // delete waypoint
               />
             </Sidebar.Tab>
             {children}
