@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Feu clic per a dibuixar múltiples punts; arrossegueu per a una sola línia",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Feu clic i arrossegueu, deixeu anar per a finalitzar",
     "text": "Consell: també podeu afegir text fent doble clic en qualsevol lloc amb l'eina de selecció",
     "embeddable": "Feu clic i arrossegueu per crear una Incrustació Web",

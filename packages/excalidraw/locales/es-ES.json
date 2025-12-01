@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Haz clic para dibujar múltiples puntos, arrastrar para solo una línea",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
     "embeddable": "Haga clic y arrastre para crear un sitio web incrustado",

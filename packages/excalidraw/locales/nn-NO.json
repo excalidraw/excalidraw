@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Klikk for å starte linje med fleire punkt, eller drag for ei enkel linje",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Klikk og drag, slepp når du er ferdig",
     "text": "Tips: du kan òg leggje til tekst ved å dobbeltklikke kor som helst med utvalgsverktyet",
     "embeddable": "",

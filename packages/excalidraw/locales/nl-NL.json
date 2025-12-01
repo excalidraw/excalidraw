@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
     "embeddable": "Klink-sleep om een website-insluiting te maken",

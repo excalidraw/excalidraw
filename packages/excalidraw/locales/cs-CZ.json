@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Kliknutím pro více bodů, táhnutím pro jednu čáru",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Klikněte a táhněte, pro ukončení pusťte",
     "text": "Tip: Text můžete také přidat dvojitým kliknutím kdekoli pomocí nástroje pro výběr",
     "embeddable": "",

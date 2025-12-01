@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Egin klik hainbat puntu hasteko, arrastatu lerro bakarrerako",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Egin klik eta arrastatu, askatu amaitutakoan",
     "text": "Aholkua: testua gehitu dezakezu edozein lekutan klik bikoitza eginez hautapen tresnarekin",
     "embeddable": "Egin klik eta arrastatu webgunea kapsulatzeko",

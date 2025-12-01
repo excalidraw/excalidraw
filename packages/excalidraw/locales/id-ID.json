@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Pencet untuk membuat titik-titik, seret untuk satu garis",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
     "embeddable": "Pencet-seret untuk membuat sematan situs",

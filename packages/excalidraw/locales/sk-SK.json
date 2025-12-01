@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Kliknite na vloženie viacerých bodov, potiahnite na vytvorenie jednej priamky",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
     "embeddable": "Kliknite a ťahajte pre zapustenie webovej stránky",
