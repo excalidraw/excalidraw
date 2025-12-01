@@ -38,7 +38,7 @@ export const actionSendBackward = register({
     event[KEYS.CTRL_OR_CMD] &&
     !event.shiftKey &&
     event.code === CODES.BRACKET_LEFT,
-  PanelComponent: ({ updateData, appState }) => (
+  PanelComponent: ({ updateData }) => (
     <button
       type="button"
       className="zIndexButton"
@@ -68,7 +68,7 @@ export const actionBringForward = register({
     event[KEYS.CTRL_OR_CMD] &&
     !event.shiftKey &&
     event.code === CODES.BRACKET_RIGHT,
-  PanelComponent: ({ updateData, appState }) => (
+  PanelComponent: ({ updateData }) => (
     <button
       type="button"
       className="zIndexButton"
@@ -101,7 +101,7 @@ export const actionSendToBack = register({
       : event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
         event.code === CODES.BRACKET_LEFT,
-  PanelComponent: ({ updateData, appState }) => (
+  PanelComponent: ({ updateData }) => (
     <button
       type="button"
       className="zIndexButton"
@@ -139,11 +139,11 @@ export const actionBringToFront = register({
       : event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
         event.code === CODES.BRACKET_RIGHT,
-  PanelComponent: ({ updateData, appState }) => (
+  PanelComponent: ({ updateData }) => (
     <button
       type="button"
       className="zIndexButton"
-      onClick={(event) => updateData(null)}
+      onClick={() => updateData(null)}
       title={`${t("labels.bringToFront")} — ${
         isDarwin
           ? getShortcutKey("CtrlOrCmd+Alt+]")
@@ -151,6 +151,78 @@ export const actionBringToFront = register({
       }`}
     >
       {BringToFrontIcon}
+    </button>
+  ),
+});
+
+// NEW: bring selected elements to the middle of the stacking order
+export const actionBringToMiddle = register({
+  name: "bringToMiddle",
+  label: "labels.bringToMiddle",
+  keywords: ["move middle", "zindex", "layer"],
+  icon: BringForwardIcon,
+  trackEvent: { category: "element" },
+  perform: (elements, appState) => {
+    // selected element ids
+    const selectedIds = new Set(
+      Object.keys(appState.selectedElementIds).filter(
+        (id) => appState.selectedElementIds[id],
+      ),
+    );
+
+    if (!selectedIds.size) {
+      return {
+        elements,
+        appState,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      };
+    }
+
+    // split deleted / non-deleted
+    const nonDeleted = elements.filter((el) => !el.isDeleted);
+    const deleted = elements.filter((el) => el.isDeleted);
+
+    // separate selected vs remaining WITHOUT mutating readonly arrays
+    const selected = nonDeleted.filter((el) => selectedIds.has(el.id));
+    const remaining = nonDeleted.filter((el) => !selectedIds.has(el.id));
+
+    if (!selected.length) {
+      return {
+        elements,
+        appState,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      };
+    }
+
+    // compute middle index
+    const middleIndex = Math.floor(remaining.length / 2);
+    const before = remaining.slice(0, middleIndex);
+    const after = remaining.slice(middleIndex);
+
+    const reorderedNonDeleted = [...before, ...selected, ...after];
+    const nextElements = [...reorderedNonDeleted, ...deleted];
+
+    return {
+      elements: nextElements,
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  keyPriority: 40,
+  // Ctrl/Cmd + M
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    !event.shiftKey &&
+    !event.altKey &&
+    event.key.toLowerCase() === "m",
+  PanelComponent: ({ updateData }) => (
+    <button
+      type="button"
+      className="zIndexButton"
+      onClick={() => updateData(null)}
+      title={`${t("labels.bringToMiddle")} — ${getShortcutKey("CtrlOrCmd+M")}`}
+    >
+      MID
     </button>
   ),
 });
