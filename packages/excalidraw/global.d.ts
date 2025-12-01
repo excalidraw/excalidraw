@@ -42,7 +42,7 @@ declare module "png-chunk-text" {
   function decode(data: Uint8Array): { keyword: string; text: string };
 }
 declare module "png-chunks-encode" {
-  function encode(chunks: TEXtChunk[]): Uint8Array;
+  function encode(chunks: TEXtChunk[]): Uint8Array<ArrayBuffer>;
   export = encode;
 }
 declare module "png-chunks-extract" {
