@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Kliknite za začetek več točk, povlecite za posamezno črto",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Kliknite in povlecite, spustite, ko končate",
     "text": "Namig: besedilo lahko dodate tudi z dvoklikom kjer koli z orodjem za izbiro",
     "embeddable": "Kliknite in povlecite, da ustvarite spletno vdelavo",

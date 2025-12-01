@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Ấn để bắt đầu nhiểm điểm vẽ, kéo để vẽ một đường thẳng",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Ấn bà kéo, thả khi bạn xong",
     "text": "Mẹo: bạn có thể thêm văn bản tại bất cứ đâu bằng cách ấn hai lần bằng tool lựa chọn",
     "embeddable": "Nhấp và kéo để tạo nội dung nhúng từ website.",

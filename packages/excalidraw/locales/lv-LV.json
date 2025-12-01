@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Klikšķiniet, lai sāktu zīmēt vairākus punktus; velciet, lai zīmētu līniju",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Spiediet un velciet; atlaidiet, kad pabeidzat",
     "text": "Ieteikums: lai pievienotu tekstu, varat arī jebkur dubultklikšķināt ar atlases rīku",
     "embeddable": "",
