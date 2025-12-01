@@ -133,6 +133,6 @@
     "fonteditor-core": "2.4.1",
     "harfbuzzjs": "0.3.6",
     "jest-diff": "29.7.0",
-    "typescript": "4.9.4"
+    "typescript": "5.9.3"
   }
 }
