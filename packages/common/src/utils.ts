@@ -1,10 +1,6 @@
 import { average } from "@excalidraw/math";
 
-import type {
-  ExcalidrawBindableElement,
-  FontFamilyValues,
-  FontString,
-} from "@excalidraw/element/types";
+import type { FontFamilyValues, FontString } from "@excalidraw/element/types";
 
 import type {
   ActiveTool,
@@ -20,8 +16,6 @@ import {
   ENV,
   FONT_FAMILY,
   getFontFamilyFallbacks,
-  isAndroid,
-  isIOS,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 
@@ -384,6 +378,10 @@ export const removeSelection = () => {
 
 export const distance = (x: number, y: number) => Math.abs(x - y);
 
+export const isSelectionLikeTool = (type: ToolType | "custom") => {
+  return type === "selection" || type === "lasso";
+};
+
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: ((
@@ -559,9 +557,6 @@ export const isTransparent = (color: string) => {
     color === COLOR_PALETTE.transparent
   );
 };
-
-export const isBindingFallthroughEnabled = (el: ExcalidrawBindableElement) =>
-  el.fillStyle !== "solid" || isTransparent(el.backgroundColor);
 
 export type ResolvablePromise<T> = Promise<T> & {
   resolve: [T] extends [undefined]
@@ -1273,58 +1268,46 @@ export const reduceToCommonValue = <T, R = T>(
   return commonValue;
 };
 
-export const isMobileOrTablet = (): boolean => {
-  const ua = navigator.userAgent || "";
-  const platform = navigator.platform || "";
-  const uaData = (navigator as any).userAgentData as
-    | { mobile?: boolean; platform?: string }
-    | undefined;
+type FEATURE_FLAGS = {
+  COMPLEX_BINDINGS: boolean;
+};
 
-  // --- 1) chromium: prefer ua client hints -------------------------------
-  if (uaData) {
-    const plat = (uaData.platform || "").toLowerCase();
-    const isDesktopOS =
-      plat === "windows" ||
-      plat === "macos" ||
-      plat === "linux" ||
-      plat === "chrome os";
-    if (uaData.mobile === true) {
-      return true;
-    }
-    if (uaData.mobile === false && plat === "android") {
-      const looksTouchTablet =
-        matchMedia?.("(hover: none)").matches &&
-        matchMedia?.("(pointer: coarse)").matches;
-      return looksTouchTablet;
-    }
-    if (isDesktopOS) {
-      return false;
-    }
+const FEATURE_FLAGS_STORAGE_KEY = "excalidraw-feature-flags";
+const DEFAULT_FEATURE_FLAGS: FEATURE_FLAGS = {
+  COMPLEX_BINDINGS: false,
+};
+let featureFlags: FEATURE_FLAGS | null = null;
+
+export const getFeatureFlag = <F extends keyof FEATURE_FLAGS>(
+  flag: F,
+): FEATURE_FLAGS[F] => {
+  if (!featureFlags) {
+    try {
+      const serializedFlags = localStorage.getItem(FEATURE_FLAGS_STORAGE_KEY);
+      if (serializedFlags) {
+        const flags = JSON.parse(serializedFlags);
+        featureFlags = flags ?? DEFAULT_FEATURE_FLAGS;
+      }
+    } catch {}
   }
 
-  // --- 2) ios (includes ipad) --------------------------------------------
-  if (isIOS) {
-    return true;
-  }
+  return (featureFlags || DEFAULT_FEATURE_FLAGS)[flag];
+};
 
-  // --- 3) android legacy ua fallback -------------------------------------
-  if (isAndroid) {
-    const isAndroidPhone = /Mobile/i.test(ua);
-    const isAndroidTablet = !isAndroidPhone;
-    if (isAndroidPhone || isAndroidTablet) {
-      const looksTouchTablet =
-        matchMedia?.("(hover: none)").matches &&
-        matchMedia?.("(pointer: coarse)").matches;
-      return looksTouchTablet;
-    }
+export const setFeatureFlag = <F extends keyof FEATURE_FLAGS>(
+  flag: F,
+  value: FEATURE_FLAGS[F],
+) => {
+  try {
+    featureFlags = {
+      ...(featureFlags || DEFAULT_FEATURE_FLAGS),
+      [flag]: value,
+    };
+    localStorage.setItem(
+      FEATURE_FLAGS_STORAGE_KEY,
+      JSON.stringify(featureFlags),
+    );
+  } catch (e) {
+    console.error("unable to set feature flag", e);
   }
-
-  // --- 4) last resort desktop exclusion ----------------------------------
-  const looksDesktopPlatform =
-    /Win|Linux|CrOS|Mac/.test(platform) ||
-    /Windows NT|X11|CrOS|Macintosh/.test(ua);
-  if (looksDesktopPlatform) {
-    return false;
-  }
-  return false;
 };

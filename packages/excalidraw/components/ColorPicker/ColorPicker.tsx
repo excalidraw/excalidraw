@@ -15,7 +15,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
-import { useExcalidrawContainer } from "../App";
+import { useExcalidrawContainer, useStylesPanelMode } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
@@ -73,7 +73,6 @@ interface ColorPickerProps {
   palette?: ColorPaletteCustom | null;
   topPicks?: ColorTuple;
   updateData: (formData?: any) => void;
-  compactMode?: boolean;
 }
 
 const ColorPickerPopupContent = ({
@@ -100,6 +99,9 @@ const ColorPickerPopupContent = ({
   getOpenPopup: () => AppState["openPopup"];
 }) => {
   const { container } = useExcalidrawContainer();
+  const stylesPanelMode = useStylesPanelMode();
+  const isCompactMode = stylesPanelMode !== "full";
+  const isMobileMode = stylesPanelMode === "mobile";
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
@@ -216,11 +218,8 @@ const ColorPickerPopupContent = ({
           type={type}
           elements={elements}
           updateData={updateData}
-          showTitle={
-            appState.stylesPanelMode === "compact" ||
-            appState.stylesPanelMode === "mobile"
-          }
-          showHotKey={appState.stylesPanelMode !== "mobile"}
+          showTitle={isCompactMode}
+          showHotKey={!isMobileMode}
         >
           {colorInputJSX}
         </Picker>
@@ -235,7 +234,6 @@ const ColorPickerTrigger = ({
   label,
   color,
   type,
-  stylesPanelMode,
   mode = "background",
   onToggle,
   editingTextElement,
@@ -243,11 +241,13 @@ const ColorPickerTrigger = ({
   color: string | null;
   label: string;
   type: ColorPickerType;
-  stylesPanelMode?: AppState["stylesPanelMode"];
   mode?: "background" | "stroke";
   onToggle: () => void;
   editingTextElement?: boolean;
 }) => {
+  const stylesPanelMode = useStylesPanelMode();
+  const isCompactMode = stylesPanelMode !== "full";
+  const isMobileMode = stylesPanelMode === "mobile";
   const handleClick = (e: React.MouseEvent) => {
     // use pointerdown so we run before outside-close logic
     e.preventDefault();
@@ -268,9 +268,8 @@ const ColorPickerTrigger = ({
         "is-transparent": !color || color === "transparent",
         "has-outline":
           !color || !isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD),
-        "compact-sizing":
-          stylesPanelMode === "compact" || stylesPanelMode === "mobile",
-        "mobile-border": stylesPanelMode === "mobile",
+        "compact-sizing": isCompactMode,
+        "mobile-border": isMobileMode,
       })}
       aria-label={label}
       style={color ? { "--swatch-color": color } : undefined}
@@ -283,22 +282,20 @@ const ColorPickerTrigger = ({
       onClick={handleClick}
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
-      {(stylesPanelMode === "compact" || stylesPanelMode === "mobile") &&
-        color &&
-        mode === "stroke" && (
-          <div className="color-picker__button-background">
-            <span
-              style={{
-                color:
-                  color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
-                    ? "#fff"
-                    : "#111",
-              }}
-            >
-              {strokeIcon}
-            </span>
-          </div>
-        )}
+      {isCompactMode && color && mode === "stroke" && (
+        <div className="color-picker__button-background">
+          <span
+            style={{
+              color:
+                color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
+                  ? "#fff"
+                  : "#111",
+            }}
+          >
+            {strokeIcon}
+          </span>
+        </div>
+      )}
     </Popover.Trigger>
   );
 };
@@ -318,10 +315,8 @@ export const ColorPicker = ({
   useEffect(() => {
     openRef.current = appState.openPopup;
   }, [appState.openPopup]);
-  const compactMode =
-    type !== "canvasBackground" &&
-    (appState.stylesPanelMode === "compact" ||
-      appState.stylesPanelMode === "mobile");
+  const stylesPanelMode = useStylesPanelMode();
+  const isCompactMode = stylesPanelMode !== "full";
 
   return (
     <div>
@@ -329,10 +324,10 @@ export const ColorPicker = ({
         role="dialog"
         aria-modal="true"
         className={clsx("color-picker-container", {
-          "color-picker-container--no-top-picks": compactMode,
+          "color-picker-container--no-top-picks": isCompactMode,
         })}
       >
-        {!compactMode && (
+        {!isCompactMode && (
           <TopPicks
             activeColor={color}
             onChange={onChange}
@@ -340,7 +335,7 @@ export const ColorPicker = ({
             topPicks={topPicks}
           />
         )}
-        {!compactMode && <ButtonSeparator />}
+        {!isCompactMode && <ButtonSeparator />}
         <Popover.Root
           open={appState.openPopup === type}
           onOpenChange={(open) => {
@@ -354,7 +349,6 @@ export const ColorPicker = ({
             color={color}
             label={label}
             type={type}
-            stylesPanelMode={appState.stylesPanelMode}
             mode={type === "elementStroke" ? "stroke" : "background"}
             editingTextElement={!!appState.editingTextElement}
             onToggle={() => {

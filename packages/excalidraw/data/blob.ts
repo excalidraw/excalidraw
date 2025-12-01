@@ -7,8 +7,6 @@ import {
   isPromiseLike,
 } from "@excalidraw/common";
 
-import { clearElementsForExport } from "@excalidraw/element";
-
 import type { ValueOf } from "@excalidraw/common/utility-types";
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 
@@ -159,7 +157,7 @@ export const loadSceneOrLibraryFromBlob = async (
         type: MIME_TYPES.excalidraw,
         data: restore(
           {
-            elements: clearElementsForExport(data.elements || []),
+            elements: data.elements || [],
             appState: {
               theme: localAppState?.theme,
               fileHandle: fileHandle || blob.handle || null,

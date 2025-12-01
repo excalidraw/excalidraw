@@ -11,6 +11,8 @@ import {
 
 import { isNodeInFlowchart } from "@excalidraw/element";
 
+import type { EditorInterface } from "@excalidraw/common";
+
 import { t } from "../i18n";
 import { getShortcutKey } from "../shortcut";
 import { isEraserActive } from "../appState";
@@ -18,12 +20,12 @@ import { isGridModeEnabled } from "../snapping";
 
 import "./HintViewer.scss";
 
-import type { AppClassProperties, Device, UIAppState } from "../types";
+import type { AppClassProperties, UIAppState } from "../types";
 
 interface HintViewerProps {
   appState: UIAppState;
   isMobile: boolean;
-  device: Device;
+  editorInterface: EditorInterface;
   app: AppClassProperties;
 }
 
@@ -35,7 +37,7 @@ const getTaggedShortcutKey = (key: string | string[]) =>
 const getHints = ({
   appState,
   isMobile,
-  device,
+  editorInterface,
   app,
 }: HintViewerProps): null | string | string[] => {
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
@@ -51,7 +53,7 @@ const getHints = ({
     });
   }
 
-  if (appState.openSidebar && !device.editor.canFitSidebar) {
+  if (appState.openSidebar && !editorInterface.canFitSidebar) {
     return null;
   }
 
@@ -60,6 +62,20 @@ const getHints = ({
       shortcut: getTaggedShortcutKey("Alt"),
     });
   }
+
+  const selectedElements = app.scene.getSelectedElements(appState);
+
+  // creating or dragging arrow point
+  if (
+    appState.selectedLinearElement?.isDragging &&
+    selectedElements[0]?.type === "arrow"
+  ) {
+    return t("hints.arrowBindModifiers", {
+      shortcut_1: getTaggedShortcutKey("Ctrl"),
+      shortcut_2: getTaggedShortcutKey("Alt"),
+    });
+  }
+
   if (activeTool.type === "arrow" || activeTool.type === "line") {
     if (multiMode) {
       return t("hints.linearElementMulti", {
@@ -86,8 +102,6 @@ const getHints = ({
   if (activeTool.type === "embeddable") {
     return t("hints.embeddable");
   }
-
-  const selectedElements = app.scene.getSelectedElements(appState);
 
   if (
     isResizing &&
@@ -225,13 +239,13 @@ const getHints = ({
 export const HintViewer = ({
   appState,
   isMobile,
-  device,
+  editorInterface,
   app,
 }: HintViewerProps) => {
   const hints = getHints({
     appState,
     isMobile,
-    device,
+    editorInterface,
     app,
   });
 

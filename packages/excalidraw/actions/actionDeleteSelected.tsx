@@ -30,6 +30,8 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { TrashIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 
+import { useStylesPanelMode } from "..";
+
 import { register } from "./register";
 
 import type { AppClassProperties, AppState } from "../types";
@@ -210,12 +212,8 @@ export const actionDeleteSelected = register({
   trackEvent: { category: "element", action: "delete" },
   perform: (elements, appState, formData, app) => {
     if (appState.selectedLinearElement?.isEditing) {
-      const {
-        elementId,
-        selectedPointsIndices,
-        startBindingElement,
-        endBindingElement,
-      } = appState.selectedLinearElement;
+      const { elementId, selectedPointsIndices } =
+        appState.selectedLinearElement;
       const elementsMap = app.scene.getNonDeletedElementsMap();
       const linearElement = LinearElementEditor.getElement(
         elementId,
@@ -252,19 +250,6 @@ export const actionDeleteSelected = register({
         };
       }
 
-      // We cannot do this inside `movePoint` because it is also called
-      // when deleting the uncommitted point (which hasn't caused any binding)
-      const binding = {
-        startBindingElement: selectedPointsIndices?.includes(0)
-          ? null
-          : startBindingElement,
-        endBindingElement: selectedPointsIndices?.includes(
-          linearElement.points.length - 1,
-        )
-          ? null
-          : endBindingElement,
-      };
-
       LinearElementEditor.deletePoints(
         linearElement,
         app,
@@ -277,7 +262,6 @@ export const actionDeleteSelected = register({
           ...appState,
           selectedLinearElement: {
             ...appState.selectedLinearElement,
-            ...binding,
             selectedPointsIndices:
               selectedPointsIndices?.[0] > 0
                 ? [selectedPointsIndices[0] - 1]
@@ -306,6 +290,7 @@ export const actionDeleteSelected = register({
           type: app.state.preferredSelectionTool.type,
         }),
         multiElement: null,
+        newElement: null,
         activeEmbeddable: null,
         selectedLinearElement: null,
       },
@@ -320,22 +305,25 @@ export const actionDeleteSelected = register({
   keyTest: (event, appState, elements) =>
     (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) &&
     !event[KEYS.CTRL_OR_CMD],
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <ToolButton
-      type="button"
-      icon={TrashIcon}
-      title={t("labels.delete")}
-      aria-label={t("labels.delete")}
-      onClick={() => updateData(null)}
-      disabled={
-        !isSomeElementSelected(getNonDeletedElements(elements), appState)
-      }
-      style={{
-        ...(appState.stylesPanelMode === "mobile" &&
-        appState.openPopup !== "compactOtherProperties"
-          ? MOBILE_ACTION_BUTTON_BG
-          : {}),
-      }}
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const isMobile = useStylesPanelMode() === "mobile";
+
+    return (
+      <ToolButton
+        type="button"
+        icon={TrashIcon}
+        title={t("labels.delete")}
+        aria-label={t("labels.delete")}
+        onClick={() => updateData(null)}
+        disabled={
+          !isSomeElementSelected(getNonDeletedElements(elements), appState)
+        }
+        style={{
+          ...(isMobile && appState.openPopup !== "compactOtherProperties"
+            ? MOBILE_ACTION_BUTTON_BG
+            : {}),
+        }}
+      />
+    );
+  },
 });
