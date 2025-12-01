@@ -248,7 +248,7 @@ import {
   doBoundsIntersect,
   isPointInElement,
   maxBindingDistance_simple,
-  convertToExcalidrawElements
+  convertToExcalidrawElements,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
