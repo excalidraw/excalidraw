@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Clique e arraste, largue quando terminar",
     "text": "Dica: também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
     "embeddable": "Clique e arraste para criar uma incorporação do site",

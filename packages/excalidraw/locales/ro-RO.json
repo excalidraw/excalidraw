@@ -341,6 +341,7 @@
     "canvasPanning": "Pentru a muta pânză, ține {{shortcut_1}} sau {{shortcut_2}} în timp ce glisezi sau folosește instrumentul în formă de mână",
     "linearElement": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie",
     "arrowTool": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie. Apasă {{shortcut}} din nou pentru a modifica tipul săgeții.",
+    "arrowBindModifiers": "Ține apăsat {{shortcut_1}} pentru a dezactivarea legarea sau {{shortcut_2}} pentru a efectua legarea la un punct fix",
     "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selecție",
     "embeddable": "Dă clic și trage pentru a crea un cod de încorporare de pagină web",
