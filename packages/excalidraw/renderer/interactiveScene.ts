@@ -225,7 +225,6 @@ const renderBindingHighlightForBindableElement_simple = (
       context.save();
 
       const highlightColor = getHighlightColor(appState.viewBackgroundColor); //zsviczian
-
       context.translate(element.x, element.y);
 
       context.lineWidth = 1.5 * FRAME_STYLE.strokeWidth / appState.zoom.value; //zsviczian was 1
