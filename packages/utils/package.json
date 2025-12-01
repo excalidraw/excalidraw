@@ -62,7 +62,7 @@
   "devDependencies": {
     "cross-env": "7.0.3",
     "fonteditor-core": "2.4.0",
-    "typescript": "4.9.4",
+    "typescript": "5.9.3",
     "wawoff2": "2.0.1",
     "which": "4.0.0"
   },
