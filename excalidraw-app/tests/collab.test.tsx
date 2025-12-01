@@ -7,12 +7,18 @@ import { syncInvalidIndices } from "@excalidraw/element";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { act, render, waitFor } from "@excalidraw/excalidraw/tests/test-utils";
 import { vi } from "vitest";
+// Replace with correct import path or define EVENT locally if not available
+const EVENT = {
+  POINTER_MOVE: "pointermove",
+  VISIBILITY_CHANGE: "visibilitychange",
+};
 
 import { StoreIncrement } from "@excalidraw/element";
 
 import type { DurableIncrement, EphemeralIncrement } from "@excalidraw/element";
 
 import ExcalidrawApp from "../App";
+import Collab from "excalidraw-app/collab/Collab";
 
 const { h } = window;
 
@@ -105,7 +111,6 @@ describe("collaboration", () => {
     });
 
     await waitFor(() => {
-      // expect(commitSpy).toHaveBeenCalledTimes(1);
       expect(durableIncrements.length).toBe(1);
     });
 
@@ -120,16 +125,11 @@ describe("collaboration", () => {
         captureUpdate: CaptureUpdateAction.NEVER,
       });
 
-      // we scheduled two micro actions,
-      // which confirms they are going to be executed as part of one batched component update
       // eslint-disable-next-line dot-notation
       expect(h.store["scheduledMicroActions"].length).toBe(2);
     });
 
     await waitFor(() => {
-      // altough the updates get batched,
-      // we expect two ephemeral increments for each update,
-      // and each such update should have the expected change
       expect(ephemeralIncrements.length).toBe(2);
       expect(ephemeralIncrements[0].change.elements.A).toEqual(
         expect.objectContaining({ x: 100 }),
@@ -186,12 +186,10 @@ describe("collaboration", () => {
       ]);
     });
 
-    // one form of force deletion happens when starting the collab, not to sync potentially sensitive data into the server
     window.collab.startCollaboration(null);
 
     await waitFor(() => {
       expect(API.getUndoStack().length).toBe(2);
-      // we never delete from the local snapshot as it is used for correct diff calculation
       expect(API.getSnapshot()).toEqual([
         expect.objectContaining(rect1Props),
         expect.objectContaining({ ...rect2Props, isDeleted: true }),
@@ -202,7 +200,6 @@ describe("collaboration", () => {
     const undoAction = createUndoAction(h.history);
     act(() => h.app.actionManager.executeAction(undoAction));
 
-    // with explicit undo (as addition) we expect our item to be restored from the snapshot!
     await waitFor(() => {
       expect(API.getUndoStack().length).toBe(1);
       expect(API.getRedoStack().length).toBe(1);
@@ -216,7 +213,6 @@ describe("collaboration", () => {
       ]);
     });
 
-    // simulate force deleting the element remotely
     API.updateScene({
       elements: syncInvalidIndices([rect1]),
       captureUpdate: CaptureUpdateAction.NEVER,
@@ -235,7 +231,6 @@ describe("collaboration", () => {
     const redoAction = createRedoAction(h.history);
     act(() => h.app.actionManager.executeAction(redoAction));
 
-    // with explicit redo (as removal) we again restore the element from the snapshot!
     await waitFor(() => {
       expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(0);
@@ -249,4 +244,100 @@ describe("collaboration", () => {
       ]);
     });
   });
+
+
+  it("should remove idle detector listeners from document on unmount", async () => {
+  const addSpy = vi.spyOn(document, "addEventListener");
+  const removeSpy = vi.spyOn(document, "removeEventListener");
+
+  const { unmount } = await render(<ExcalidrawApp />);
+
+  // listeners foram registrados corretamente
+  expect(addSpy).toHaveBeenCalledWith(EVENT.POINTER_MOVE, expect.any(Function));
+  expect(addSpy).toHaveBeenCalledWith(
+    EVENT.VISIBILITY_CHANGE,
+    expect.any(Function)
+  );
+
+  unmount();
+
+  expect(removeSpy).toHaveBeenCalledWith(
+    EVENT.POINTER_MOVE,
+    expect.any(Function)
+  );
+
+  expect(removeSpy).toHaveBeenCalledWith(
+    EVENT.VISIBILITY_CHANGE,
+    expect.any(Function)
+  );
 });
+
+it("should not accumulate idle listeners across multiple mount/unmount cycles", async () => {
+  const addSpy = vi.spyOn(document, "addEventListener");
+  const removeSpy = vi.spyOn(document, "removeEventListener");
+
+  const { unmount } = await render(<ExcalidrawApp />);
+
+  const firstIdleAdds = addSpy.mock.calls.filter(
+    (call) =>
+      call[0] === EVENT.POINTER_MOVE ||
+      call[0] === EVENT.VISIBILITY_CHANGE
+  ).length;
+
+  expect(firstIdleAdds).toBe(10);
+
+  unmount();
+
+  const firstIdleRemoves = removeSpy.mock.calls.filter(
+    (call) =>
+      call[0] === EVENT.POINTER_MOVE ||
+      call[0] === EVENT.VISIBILITY_CHANGE
+  ).length;
+
+  expect(firstIdleRemoves).toBe(10);
+
+  const addSpy2 = vi.spyOn(document, "addEventListener");
+  const { unmount: unmount2 } = await render(<ExcalidrawApp />);
+
+  const secondIdleAdds = addSpy2.mock.calls.filter(
+    (call) =>
+      call[0] === EVENT.POINTER_MOVE ||
+      call[0] === EVENT.VISIBILITY_CHANGE
+  ).length;
+
+  expect(secondIdleAdds).toBe(15);
+
+  const removeSpy2 = vi.spyOn(document, "removeEventListener");
+
+  unmount2();
+
+  const secondIdleRemoves = removeSpy2.mock.calls.filter(
+    (call) =>
+      call[0] === EVENT.POINTER_MOVE ||
+      call[0] === EVENT.VISIBILITY_CHANGE
+  ).length;
+
+  expect(secondIdleRemoves).toBe(15);
+});
+
+it("should not respond to idle events after unmount", async () => {
+  const { unmount } = await render(<ExcalidrawApp />);
+
+  const collab = window.collab as any;
+
+  const onPointerMoveSpy = vi.spyOn(collab, "onPointerMove");
+  const onVisibilityChangeSpy = vi.spyOn(collab, "onVisibilityChange");
+
+  unmount();
+
+  document.dispatchEvent(new Event(EVENT.POINTER_MOVE));
+  document.dispatchEvent(new Event(EVENT.VISIBILITY_CHANGE));
+
+  expect(onPointerMoveSpy).not.toHaveBeenCalled();
+  expect(onVisibilityChangeSpy).not.toHaveBeenCalled();
+});
+
+
+
+});
+

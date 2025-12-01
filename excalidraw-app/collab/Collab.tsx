@@ -108,6 +108,7 @@ export const activeRoomLinkAtom = atom<string | null>(null);
 
 type CollabInstance = InstanceType<typeof Collab>;
 
+
 export interface CollabAPI {
   /** function so that we can access the latest value from stale callbacks */
   isCollaborating: () => boolean;
@@ -136,6 +137,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
   private collaborators = new Map<SocketId, Collaborator>();
+  private idleListenersInitialized = false;
 
   constructor(props: CollabProps) {
     super(props);
@@ -254,25 +256,28 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   componentWillUnmount() {
-    window.removeEventListener("online", this.onOfflineStatusToggle);
-    window.removeEventListener("offline", this.onOfflineStatusToggle);
-    window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
-    window.removeEventListener(EVENT.UNLOAD, this.onUnload);
-    window.removeEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
-    window.removeEventListener(
-      EVENT.VISIBILITY_CHANGE,
-      this.onVisibilityChange,
-    );
-    if (this.activeIntervalId) {
-      window.clearInterval(this.activeIntervalId);
-      this.activeIntervalId = null;
-    }
-    if (this.idleTimeoutId) {
-      window.clearTimeout(this.idleTimeoutId);
-      this.idleTimeoutId = null;
-    }
-    this.onUmmount?.();
+  window.removeEventListener("online", this.onOfflineStatusToggle);
+  window.removeEventListener("offline", this.onOfflineStatusToggle);
+  window.removeEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
+  window.removeEventListener(EVENT.UNLOAD, this.onUnload);
+
+  // ✔️ Correção: remover do document (não do window)
+  document.removeEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
+  document.removeEventListener(EVENT.VISIBILITY_CHANGE, this.onVisibilityChange);
+
+  if (this.activeIntervalId) {
+    window.clearInterval(this.activeIntervalId);
+    this.activeIntervalId = null;
   }
+  if (this.idleTimeoutId) {
+    window.clearTimeout(this.idleTimeoutId);
+    this.idleTimeoutId = null;
+  }
+
+  this.onUmmount?.();
+  this.idleListenersInitialized = false;
+}
+
 
   isCollaborating = () => appJotaiStore.get(isCollaboratingAtom)!;
 
@@ -839,10 +844,16 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.onIdleStateChange(UserIdleState.ACTIVE);
   };
 
-  private initializeIdleDetector = () => {
-    document.addEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
-    document.addEventListener(EVENT.VISIBILITY_CHANGE, this.onVisibilityChange);
-  };
+private initializeIdleDetector = () => {
+  if (this.idleListenersInitialized) {
+    return;
+  }
+
+  document.addEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
+  document.addEventListener(EVENT.VISIBILITY_CHANGE, this.onVisibilityChange);
+
+  this.idleListenersInitialized = true;
+};
 
   setCollaborators(sockets: SocketId[]) {
     const collaborators: InstanceType<typeof Collab>["collaborators"] =
