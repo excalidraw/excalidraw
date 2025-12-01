@@ -1648,7 +1648,7 @@ export const actionChangeContainerBehavior = register<
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         };
       }
-      const nextElements = changeProperty(elements, appState, (el) =>
+      const nextElements = elements.map((el) =>
         containerIdsToUpdate.has(el.id)
           ? newElementWith(el, {
               containerBehavior: {
@@ -1686,7 +1686,7 @@ export const actionChangeContainerBehavior = register<
       };
     }
     const textFlow = value.textFlow;
-    const nextElements = changeProperty(elements, appState, (el) =>
+    const nextElements = elements.map((el) =>
       containerIdsToUpdate.has(el.id)
         ? newElementWith(el, {
             containerBehavior: {
