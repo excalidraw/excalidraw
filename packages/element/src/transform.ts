@@ -16,7 +16,9 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import { bindBindingElement } from "@excalidraw/element";
+import type { MarkOptional } from "@excalidraw/common/utility-types";
+
+import { bindBindingElement } from "./binding";
 import {
   newArrowElement,
   newElement,
@@ -25,189 +27,31 @@ import {
   newLinearElement,
   newMagicFrameElement,
   newTextElement,
-} from "@excalidraw/element";
-import { measureText, normalizeText } from "@excalidraw/element";
-import { isArrowElement } from "@excalidraw/element";
+  type ElementConstructorOpts,
+} from "./newElement";
+import { measureText, normalizeText } from "./textMeasurements";
+import { isArrowElement } from "./typeChecks";
 
-import { syncInvalidIndices } from "@excalidraw/element";
+import { syncInvalidIndices } from "./fractionalIndex";
 
-import { redrawTextBoundingBox } from "@excalidraw/element";
+import { redrawTextBoundingBox } from "./textElement";
 
-import { LinearElementEditor } from "@excalidraw/element";
+import { LinearElementEditor } from "./linearElementEditor";
 
-import { getCommonBounds } from "@excalidraw/element";
+import { getCommonBounds } from "./bounds";
 
-import { Scene } from "@excalidraw/element";
-
-import type { ElementConstructorOpts } from "@excalidraw/element";
+import { Scene } from "./Scene";
 
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
-  ExcalidrawFrameElement,
-  ExcalidrawFreeDrawElement,
-  ExcalidrawGenericElement,
-  ExcalidrawIframeLikeElement,
-  ExcalidrawImageElement,
+  ExcalidrawElementSkeleton,
   ExcalidrawLinearElement,
-  ExcalidrawMagicFrameElement,
-  ExcalidrawSelectionElement,
   ExcalidrawTextElement,
-  FileId,
-  FontFamilyValues,
   NonDeletedSceneElementsMap,
-  TextAlign,
-  VerticalAlign,
-} from "@excalidraw/element/types";
-
-import type { MarkOptional } from "@excalidraw/common/utility-types";
-
-export type ValidLinearElement = {
-  type: "arrow" | "line";
-  x: number;
-  y: number;
-  label?: {
-    text: string;
-    fontSize?: number;
-    fontFamily?: FontFamilyValues;
-    textAlign?: TextAlign;
-    verticalAlign?: VerticalAlign;
-  } & MarkOptional<ElementConstructorOpts, "x" | "y">;
-  end?:
-    | (
-        | (
-            | {
-                type: Exclude<
-                  ExcalidrawBindableElement["type"],
-                  | "image"
-                  | "text"
-                  | "frame"
-                  | "magicframe"
-                  | "embeddable"
-                  | "iframe"
-                >;
-                id?: ExcalidrawGenericElement["id"];
-              }
-            | {
-                id: ExcalidrawGenericElement["id"];
-                type?: Exclude<
-                  ExcalidrawBindableElement["type"],
-                  | "image"
-                  | "text"
-                  | "frame"
-                  | "magicframe"
-                  | "embeddable"
-                  | "iframe"
-                >;
-              }
-          )
-        | ((
-            | {
-                type: "text";
-                text: string;
-              }
-            | {
-                type?: "text";
-                id: ExcalidrawTextElement["id"];
-                text: string;
-              }
-          ) &
-            Partial<ExcalidrawTextElement>)
-      ) &
-        MarkOptional<ElementConstructorOpts, "x" | "y">;
-  start?:
-    | (
-        | (
-            | {
-                type: Exclude<
-                  ExcalidrawBindableElement["type"],
-                  | "image"
-                  | "text"
-                  | "frame"
-                  | "magicframe"
-                  | "embeddable"
-                  | "iframe"
-                >;
-                id?: ExcalidrawGenericElement["id"];
-              }
-            | {
-                id: ExcalidrawGenericElement["id"];
-                type?: Exclude<
-                  ExcalidrawBindableElement["type"],
-                  | "image"
-                  | "text"
-                  | "frame"
-                  | "magicframe"
-                  | "embeddable"
-                  | "iframe"
-                >;
-              }
-          )
-        | ((
-            | {
-                type: "text";
-                text: string;
-              }
-            | {
-                type?: "text";
-                id: ExcalidrawTextElement["id"];
-                text: string;
-              }
-          ) &
-            Partial<ExcalidrawTextElement>)
-      ) &
-        MarkOptional<ElementConstructorOpts, "x" | "y">;
-} & Partial<ExcalidrawLinearElement>;
-
-export type ValidContainer =
-  | {
-      type: Exclude<ExcalidrawGenericElement["type"], "selection">;
-      id?: ExcalidrawGenericElement["id"];
-      label?: {
-        text: string;
-        fontSize?: number;
-        fontFamily?: FontFamilyValues;
-        textAlign?: TextAlign;
-        verticalAlign?: VerticalAlign;
-      } & MarkOptional<ElementConstructorOpts, "x" | "y">;
-    } & ElementConstructorOpts;
-
-export type ExcalidrawElementSkeleton =
-  | Extract<
-      Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-      ExcalidrawIframeLikeElement | ExcalidrawFreeDrawElement
-    >
-  | ({
-      type: Extract<ExcalidrawLinearElement["type"], "line">;
-      x: number;
-      y: number;
-    } & Partial<ExcalidrawLinearElement>)
-  | ValidContainer
-  | ValidLinearElement
-  | ({
-      type: "text";
-      text: string;
-      x: number;
-      y: number;
-      id?: ExcalidrawTextElement["id"];
-    } & Partial<ExcalidrawTextElement>)
-  | ({
-      type: Extract<ExcalidrawImageElement["type"], "image">;
-      x: number;
-      y: number;
-      fileId: FileId;
-    } & Partial<ExcalidrawImageElement>)
-  | ({
-      type: "frame";
-      children: readonly ExcalidrawElement["id"][];
-      name?: string;
-    } & Partial<ExcalidrawFrameElement>)
-  | ({
-      type: "magicframe";
-      children: readonly ExcalidrawElement["id"][];
-      name?: string;
-    } & Partial<ExcalidrawMagicFrameElement>);
+  ValidLinearElement,
+} from "./types";
 
 const DEFAULT_LINEAR_ELEMENT_PROPS = {
   width: 100,

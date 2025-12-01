@@ -248,6 +248,7 @@ import {
   doBoundsIntersect,
   isPointInElement,
   maxBindingDistance_simple,
+  convertToExcalidrawElements
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -276,6 +277,7 @@ import type {
   ExcalidrawElbowArrowElement,
   SceneElementsMap,
   ExcalidrawBindableElement,
+  ExcalidrawElementSkeleton,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
@@ -395,7 +397,6 @@ import {
   SnapCache,
   isGridModeEnabled,
 } from "../snapping";
-import { convertToExcalidrawElements } from "../data/transform";
 import { Renderer } from "../scene/Renderer";
 import {
   setEraserCursor,
@@ -457,7 +458,7 @@ import type { ClipboardData, PastedMixedContent } from "../clipboard";
 import type { ExportedElements } from "../data";
 import type { ContextMenuItems } from "./ContextMenu";
 import type { FileSystemHandle } from "../data/filesystem";
-import type { ExcalidrawElementSkeleton } from "../data/transform";
+
 import type {
   AppClassProperties,
   AppProps,
