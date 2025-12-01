@@ -198,11 +198,7 @@ const renderBindingHighlightForBindableElement_simple = (
   if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
     context.translate(enclosingFrame.x, enclosingFrame.y);
 
-    const highlightColor = getHighlightColor(
-      enclosingFrame.customData?.frameColor?.stroke ??
-        appState.frameColor.stroke,
-      appState.viewBackgroundColor,
-    ); //zsviczian
+    const highlightColor = getHighlightColor(appState.viewBackgroundColor); //zsviczian
     context.fillStyle = highlightColor ?? "rgba(0,0,0,.05)"; //zsviczian
     context.beginPath();
 
@@ -228,10 +224,7 @@ const renderBindingHighlightForBindableElement_simple = (
     case "frame":
       context.save();
 
-      const highlightColor = getHighlightColor(
-        appState.frameColor.stroke,
-        appState.viewBackgroundColor,
-      ); //zsviczian
+      const highlightColor = getHighlightColor(appState.viewBackgroundColor); //zsviczian
 
       context.translate(element.x, element.y);
 
@@ -261,12 +254,7 @@ const renderBindingHighlightForBindableElement_simple = (
     default:
       context.save();
 
-      const highlightColor2 = getHighlightColor(
-        isTextElement(element)
-          ? appState.viewBackgroundColor
-          : element.strokeColor,
-        appState.viewBackgroundColor,
-      ); //zsviczian
+      const highlightColor2 = getHighlightColor(appState.viewBackgroundColor); //zsviczian
 
       const center = elementCenterPoint(element, elementsMap);
 
@@ -427,7 +415,6 @@ const renderBindingHighlightForBindableElement_complex = (
 
       context.translate(element.x, element.y);
       const highlightColor = getHighlightColor(
-        element.customData?.frameColor?.stroke ?? appState.frameColor.stroke,
         appState.viewBackgroundColor,
         opacity,
       ); //zsviczian
@@ -471,9 +458,6 @@ const renderBindingHighlightForBindableElement_complex = (
       );
 
       const highlightColor2 = getHighlightColor(
-        isTextElement(element)
-          ? appState.viewBackgroundColor
-          : element.strokeColor,
         appState.viewBackgroundColor,
         opacity / 2,
       ); //zsviczian
@@ -626,12 +610,7 @@ const renderBindingHighlightForBindableElement_complex = (
     );
     context.stroke();
 
-    const highlightColor = getHighlightColor(
-      isTextElement(element)
-        ? appState.viewBackgroundColor
-        : element.strokeColor,
-      appState.viewBackgroundColor,
-    ); //zsviczian
+    const highlightColor = getHighlightColor(appState.viewBackgroundColor); //zsviczian
 
     // context.strokeStyle = "transparent";
     context.fillStyle = highlightColor ?? "rgba(128,128,128,.1)"; //zsviczian "rgba(0, 0, 0, 0.04)";
@@ -768,10 +747,7 @@ const renderFrameHighlight = (
   const width = x2 - x1;
   const height = y2 - y1;
 
-  const highlightColor = getHighlightColor(
-    frame.customData?.frameColor?.stroke ?? appState.frameColor.stroke,
-    appState.viewBackgroundColor,
-  ); //zsviczian
+  const highlightColor = getHighlightColor(appState.viewBackgroundColor); //zsviczian
   context.strokeStyle = highlightColor ?? "rgb(0,118,255)"; //zsviczian
   context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
 
@@ -798,10 +774,7 @@ const renderElementsBoxHighlight = (
   elements: NonDeleted<ExcalidrawElement>[],
   config?: { colors?: string[]; dashed?: boolean },
 ) => {
-  const highlightColor = getHighlightColor(
-    appState.viewBackgroundColor,
-    appState.viewBackgroundColor,
-  ); //zsviczian
+  const highlightColor = getHighlightColor(appState.viewBackgroundColor); //zsviczian
   const { colors = [highlightColor], dashed = false } = config || {}; //zsviczian
   const individualElements = elements.filter(
     (element) => element.groupIds.length === 0,
@@ -1647,7 +1620,6 @@ export const renderInteractiveScene = <
   renderConfig: InteractiveSceneRenderConfig,
 ): ReturnType<U> => {
   renderConfig.renderConfig.selectionColor = getHighlightColor(
-    renderConfig.appState.viewBackgroundColor,
     renderConfig.appState.viewBackgroundColor,
   ); //zsviczian
   const ret = _renderInteractiveScene(renderConfig);
