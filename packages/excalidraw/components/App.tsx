@@ -11465,8 +11465,7 @@ class App extends React.Component<AppProps, AppState> {
     const pointerCoords = pointerDownState.lastCoords;
     const selectedElements = this.scene.getSelectedElements(this.state);
     const onlyBindingElementSelected =
-      (selectedElements?.length ?? 0) === 1 &&
-      isBindingElement(selectedElements[0]);
+      selectedElements?.length === 1 && isBindingElement(selectedElements[0]);
     if (
       selectionElement &&
       this.state.activeTool.type !== "eraser" &&
