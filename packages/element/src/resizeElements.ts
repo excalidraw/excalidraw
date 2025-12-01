@@ -44,8 +44,8 @@ import {
 import {
   getMinTextElementWidth,
   measureText,
-  getApproxMinLineWidth,
-  getApproxMinLineHeight,
+  getApproxMinContainerWidth,
+  getApproxMinContainerHeight,
 } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import {
@@ -781,11 +781,11 @@ export const resizeSingleElement = (
         fontSize: nextFont.size,
       };
     } else {
-      const minWidth = getApproxMinLineWidth(
+      const minWidth = getApproxMinContainerWidth(
         getFontString(boundTextElement),
         boundTextElement.lineHeight,
       );
-      const minHeight = getApproxMinLineHeight(
+      const minHeight = getApproxMinContainerHeight(
         boundTextElement.fontSize,
         boundTextElement.lineHeight,
       );
