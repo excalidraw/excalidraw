@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "คลิกเพื่อเริ่มหลายจุด ลากสำหรับเส้นเดียว",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "",
     "text": "",
     "embeddable": "คลิกและลากเพื่อสร้างการฝังสำหรับเว็บไซต์",
