@@ -1597,10 +1597,7 @@ export const actionChangeContainerBehavior = register<
   label: "labels.container",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    invariant(
-      value,
-      "actionChangeContainerBehavior: value must be defined",
-    );
+    invariant(value, "actionChangeContainerBehavior: value must be defined");
     const elementsMap = app.scene.getNonDeletedElementsMap();
     let selected = getSelectedElements(elements, appState, {
       includeBoundTextElement: true,
