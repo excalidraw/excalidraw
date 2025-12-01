@@ -135,9 +135,9 @@ describe("getElementBounds", () => {
     } as ExcalidrawLinearElement;
 
     const [x1, y1, x2, y2] = getElementBounds(element, arrayToMap([element]));
-    expect(x1).toEqual(360.3176068760539);
-    expect(y1).toEqual(185.90654264413516);
-    expect(x2).toEqual(480.87005902729743);
-    expect(y2).toEqual(320.4751269334226);
+    expect(x1).toEqual(360.9291017525165);
+    expect(y1).toEqual(185.24770129343722);
+    expect(x2).toEqual(481.4815539037601);
+    expect(y2).toEqual(319.8162855827246);
   });
 });

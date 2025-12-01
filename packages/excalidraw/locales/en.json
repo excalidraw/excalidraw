@@ -181,7 +181,13 @@
   "library": {
     "noItems": "No items added yet...",
     "hint_emptyLibrary": "Select an item on canvas to add it here, or install a library from the public repository, below.",
-    "hint_emptyPrivateLibrary": "Select an item on canvas to add it here."
+    "hint_emptyPrivateLibrary": "Select an item on canvas to add it here.",
+    "search": {
+      "inputPlaceholder": "Search library",
+      "heading": "Library matches",
+      "noResults": "No matching items found...",
+      "clearSearch": "Clear search"
+    }
   },
   "search": {
     "title": "Find on canvas",
@@ -224,10 +230,11 @@
     "objectsSnapMode": "Snap to objects",
     "exitZenMode": "Exit zen mode",
     "cancel": "Cancel",
+    "saveLibNames": "Save name(s) and exit",
     "clear": "Clear",
     "remove": "Remove",
     "embed": "Toggle embedding",
-    "publishLibrary": "Publish",
+    "publishLibrary": "Rename or publish",
     "submit": "Submit",
     "confirm": "Confirm",
     "embeddableInteractionButton": "Click to interact"
@@ -253,7 +260,8 @@
     "resetLibrary": "This will clear your library. Are you sure?",
     "removeItemsFromsLibrary": "Delete {{count}} item(s) from library?",
     "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled.",
-    "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!"
+    "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!",
+    "localStorageQuotaExceeded": "Browser storage quota exceeded. Changes will not be saved."
   },
   "errors": {
     "unsupportedFileType": "Unsupported file type.",
@@ -329,33 +337,34 @@
     "shapes": "Shapes"
   },
   "hints": {
-    "dismissSearch": "Escape to dismiss search",
-    "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging, or use the hand tool",
+    "dismissSearch": "{{shortcut}} to dismiss search",
+    "canvasPanning": "To move canvas, hold {{shortcut_1}} or {{shortcut_2}} while dragging, or use the hand tool",
     "linearElement": "Click to start multiple points, drag for single line",
-    "arrowTool": "Click to start multiple points, drag for single line. Press {{arrowShortcut}} again to change arrow type.",
+    "arrowTool": "Click to start multiple points, drag for single line. Press {{shortcut}} again to change arrow type.",
+    "arrowBindModifiers": "Hold {{shortcut_1}} to disable binding, or {{shortcut_2}} to bind at a fixed point",
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
     "embeddable": "Click-drag to create a website embed",
-    "text_selected": "Double-click or press ENTER to edit text",
-    "text_editing": "Press Escape or CtrlOrCmd+ENTER to finish editing",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
-    "lockAngle": "You can constrain angle by holding SHIFT",
-    "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
-    "resizeImage": "You can resize freely by holding SHIFT,\nhold ALT to resize from the center",
-    "rotate": "You can constrain angles by holding SHIFT while rotating",
-    "lineEditor_info": "Hold CtrlOrCmd and Double-click or press CtrlOrCmd + Enter to edit points",
-    "lineEditor_line_info": "Double-click or press Enter to edit points",
-    "lineEditor_pointSelected": "Press Delete to remove point(s),\nCtrlOrCmd+D to duplicate, or drag to move",
-    "lineEditor_nothingSelected": "Select a point to edit (hold SHIFT to select multiple),\nor hold Alt and click to add new points",
+    "text_selected": "Double-click or press {{shortcut}} to edit text",
+    "text_editing": "Press {{shortcut_1}} or {{shortcut_2}} to finish editing",
+    "linearElementMulti": "Click on last point or press {{shortcut_1}} or {{shortcut_2}} to finish",
+    "lockAngle": "You can constrain angle by holding {{shortcut}}",
+    "resize": "You can constrain proportions by holding {{shortcut_1}} while resizing,\nhold {{shortcut_2}} to resize from the center",
+    "resizeImage": "You can resize freely by holding {{shortcut_1}},\nhold {{shortcut_2}} to resize from the center",
+    "rotate": "You can constrain angles by holding {{shortcut}} while rotating",
+    "lineEditor_info": "Hold {{shortcut_1}} and Double-click or press {{shortcut_2}} to edit points",
+    "lineEditor_line_info": "Double-click or press {{shortcut}} to edit points",
+    "lineEditor_pointSelected": "Press {{shortcut_1}} to remove point(s),\n{{shortcut_2}} to duplicate, or drag to move",
+    "lineEditor_nothingSelected": "Select a point to edit (hold {{shortcut_1}} to select multiple),\nor hold {{shortcut_2}} and click to add new points",
     "publishLibrary": "Publish your own library",
-    "bindTextToElement": "Press enter to add text",
-    "createFlowchart": "Hold CtrlOrCmd and Arrow key to create a flowchart",
-    "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
-    "eraserRevert": "Hold Alt to revert the elements marked for deletion",
+    "bindTextToElement": "{{shortcut}} to add text",
+    "createFlowchart": "{{shortcut}} to create a flowchart",
+    "deepBoxSelect": "Hold {{shortcut}} to deep select, and to prevent dragging",
+    "eraserRevert": "Hold {{shortcut}} to revert the elements marked for deletion",
     "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
-    "disableSnapping": "Hold CtrlOrCmd to disable snapping",
-    "enterCropEditor": "Double click the image or press ENTER to crop the image",
-    "leaveCropEditor": "Click outside the image or press ENTER or ESCAPE to finish cropping"
+    "disableSnapping": "Hold {{shortcut}} to disable snapping",
+    "enterCropEditor": "Double click the image or press {{shortcut}} to crop the image",
+    "leaveCropEditor": "Click outside the image or press {{shortcut_1}} or {{shortcut_2}} to finish cropping"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
@@ -640,5 +649,17 @@
     },
     "itemNotAvailable": "Command is not available...",
     "shortcutHint": "For Command palette, use {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Space",
+    "delete": "Delete",
+    "mmb": "Scroll wheel"
   }
 }

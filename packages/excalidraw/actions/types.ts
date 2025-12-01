@@ -32,10 +32,10 @@ export type ActionResult =
     }
   | false;
 
-type ActionFn = (
+type ActionFn<TData = any> = (
   elements: readonly OrderedExcalidrawElement[],
   appState: Readonly<AppState>,
-  formData: any,
+  formData: TData | undefined,
   app: AppClassProperties,
 ) => ActionResult | Promise<ActionResult>;
 
@@ -72,8 +72,6 @@ export type ActionName =
   | "changeArrowProperties"
   | "changeOpacity"
   | "changeFontSize"
-  | "toggleCanvasMenu"
-  | "toggleEditMenu"
   | "undo"
   | "redo"
   | "finalize"
@@ -159,7 +157,7 @@ export type PanelComponentProps = {
   ) => React.JSX.Element | null;
 };
 
-export interface Action {
+export interface Action<TData = any> {
   name: ActionName;
   label:
     | string
@@ -176,7 +174,7 @@ export interface Action {
         elements: readonly ExcalidrawElement[],
       ) => React.ReactNode);
   PanelComponent?: React.FC<PanelComponentProps>;
-  perform: ActionFn;
+  perform: ActionFn<TData>;
   keyPriority?: number;
   keyTest?: (
     event: React.KeyboardEvent | KeyboardEvent,

@@ -452,7 +452,6 @@ export const newFreeDrawElement = (
     points: opts.points || [],
     pressures: opts.pressures || [],
     simulatePressure: opts.simulatePressure,
-    lastCommittedPoint: null,
   };
 };
 
@@ -466,7 +465,7 @@ export const newLinearElement = (
   const element = {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: opts.points || [],
-    lastCommittedPoint: null,
+
     startBinding: null,
     endBinding: null,
     startArrowhead: null,
@@ -501,7 +500,6 @@ export const newArrowElement = <T extends boolean>(
     return {
       ..._newElementBase<ExcalidrawElbowArrowElement>(opts.type, opts),
       points: opts.points || [],
-      lastCommittedPoint: null,
       startBinding: null,
       endBinding: null,
       startArrowhead: opts.startArrowhead || null,
@@ -516,7 +514,6 @@ export const newArrowElement = <T extends boolean>(
   return {
     ..._newElementBase<ExcalidrawArrowElement>(opts.type, opts),
     points: opts.points || [],
-    lastCommittedPoint: null,
     startBinding: null,
     endBinding: null,
     startArrowhead: opts.startArrowhead || null,

@@ -414,7 +414,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       </div>
     </button>
     <div
-      style="height: 1px; margin: .5rem 0px;"
+      style="height: 1px; margin: .5rem 0px; flex: 0 0 auto;"
     />
     <div
       class="dropdown-menu-group "
@@ -558,7 +558,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       </a>
     </div>
     <div
-      style="height: 1px; margin: .5rem 0px;"
+      style="height: 1px; margin: .5rem 0px; flex: 0 0 auto;"
     />
     <button
       aria-label="Dark mode"

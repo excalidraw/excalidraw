@@ -518,7 +518,7 @@ const PublishLibrary = ({
           </div>
           <div className="publish-library__buttons">
             <DialogActionButton
-              label={t("buttons.cancel")}
+              label={t("buttons.saveLibNames")}
               onClick={onDialogClose}
               data-testid="cancel-clear-canvas-button"
             />

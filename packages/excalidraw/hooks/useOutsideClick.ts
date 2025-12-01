@@ -5,7 +5,7 @@ import { EVENT } from "@excalidraw/common";
 export function useOutsideClick<T extends HTMLElement>(
   ref: React.RefObject<T | null>,
   /** if performance is of concern, memoize the callback */
-  callback: (event: Event) => void,
+  callback: (event: Event & { target: T }) => void,
   /**
    * Optional callback which is called on every click.
    *
