@@ -1,10 +1,13 @@
 {
   "labels": {
+    "defaultFrameName": "Frame",
+    "defaultAiFrameName": "AI Frame",
     "paste": "Paste",
     "pasteAsPlaintext": "Paste as plaintext",
     "pasteCharts": "Paste charts",
     "selectAll": "Select all",
     "multiSelect": "Add element to selection",
+    "toClear": "to clear",
     "moveCanvas": "Move canvas",
     "cut": "Cut",
     "copy": "Copy",
@@ -196,9 +199,17 @@
     "multipleResults": "results",
     "placeholder": "Find text on canvas...",
     "frames": "Frames",
-    "texts": "Texts"
+    "texts": "Text",
+    "search": "Search",
+    "noResults": "No results",
+    "tabs": {
+      "shapes": "Shapes",
+      "actions": "Actions",
+      "properties": "Properties"
+    }
   },
   "buttons": {
+    "escape": "Esc",
     "clearReset": "Reset the canvas",
     "exportJSON": "Export to file",
     "exportImage": "Export image...",
@@ -646,6 +657,15 @@
     "search": {
       "placeholder": "Search menus, commands, and discover hidden gems",
       "noMatch": "No matching commands..."
+    },
+    "categories": {
+      "app": "App",
+      "export": "Export",
+      "tools": "Tools",
+      "editor": "Editor",
+      "elements": "Elements",
+      "links": "Links",
+      "library": "Library"
     },
     "itemNotAvailable": "Command is not available...",
     "shortcutHint": "For Command palette, use {{shortcut}}"

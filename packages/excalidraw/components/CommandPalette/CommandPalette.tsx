@@ -84,13 +84,13 @@ import type { Action } from "../../actions/types";
 const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
 
 export const DEFAULT_CATEGORIES = {
-  app: "App",
-  export: "Export",
-  tools: "Tools",
-  editor: "Editor",
-  elements: "Elements",
-  links: "Links",
-  library: "Library",
+  app: "app",
+  export: "export",
+  tools: "tools",
+  editor: "editor",
+  elements: "elements",
+  links: "links",
+  library: "library",
 };
 
 const getCategoryOrder = (category: string) => {
@@ -234,8 +234,8 @@ function CommandPaletteInner({
               elements={libraryItem.elements}
             />
           ),
-          category: "Library",
-          order: getCategoryOrder("Library"),
+          category: DEFAULT_CATEGORIES.library,
+          order: getCategoryOrder(DEFAULT_CATEGORIES.library),
           haystack: deburr(libraryItem.name),
           perform: () => {
             app.onInsertElements(
@@ -347,12 +347,12 @@ function CommandPaletteInner({
             predicate: action.predicate
               ? action.predicate
               : (elements, appState, appProps, app) => {
-                  const selectedElements = getSelectedElements(
-                    elements,
-                    appState,
-                  );
-                  return selectedElements.length > 0;
-                },
+                const selectedElements = getSelectedElements(
+                  elements,
+                  appState,
+                );
+                return selectedElements.length > 0;
+              },
           }),
         ),
       );
@@ -518,10 +518,10 @@ function CommandPaletteInner({
 
           if (
             appProps.UIOptions.tools?.[
-              value as Extract<
-                typeof value,
-                keyof AppProps["UIOptions"]["tools"]
-              >
+            value as Extract<
+              typeof value,
+              keyof AppProps["UIOptions"]["tools"]
+            >
             ] === false
           ) {
             return acc;
@@ -617,9 +617,8 @@ function CommandPaletteInner({
           ...command,
           icon: command.icon || boltIcon,
           order: command.order ?? getCategoryOrder(command.category),
-          haystack: `${deburr(command.label.toLocaleLowerCase())} ${
-            command.keywords?.join(" ") || ""
-          }`,
+          haystack: `${deburr(command.label.toLocaleLowerCase())} ${command.keywords?.join(" ") || ""
+            }`,
         };
       });
 
@@ -685,11 +684,11 @@ function CommandPaletteInner({
 
       return typeof command.predicate === "function"
         ? command.predicate(
-            app.scene.getNonDeletedElements(),
-            uiAppState as AppState,
-            appProps,
-            app,
-          )
+          app.scene.getNonDeletedElements(),
+          uiAppState as AppState,
+          appProps,
+          app,
+        )
         : command.predicate === undefined || command.predicate;
     },
   );
@@ -838,14 +837,14 @@ function CommandPaletteInner({
     let matchingCommands =
       commandSearch?.length > 1
         ? [
-            ...allCommands
-              .filter(isCommandAvailable)
-              .sort((a, b) => a.order - b.order),
-            ...libraryCommands,
-          ]
-        : allCommands
+          ...allCommands
             .filter(isCommandAvailable)
-            .sort((a, b) => a.order - b.order);
+            .sort((a, b) => a.order - b.order),
+          ...libraryCommands,
+        ]
+        : allCommands
+          .filter(isCommandAvailable)
+          .sort((a, b) => a.order - b.order);
 
     const showLastUsed =
       !commandSearch && lastUsed && isCommandAvailable(lastUsed);
@@ -855,8 +854,8 @@ function CommandPaletteInner({
         getNextCommandsByCategory(
           showLastUsed
             ? matchingCommands.filter(
-                (command) => command.label !== lastUsed?.label,
-              )
+              (command) => command.label !== lastUsed?.label,
+            )
             : matchingCommands,
         ),
       );
@@ -947,7 +946,7 @@ function CommandPaletteInner({
           Object.keys(commandsByCategory).map((category, idx) => {
             return (
               <div className="command-category" key={category}>
-                <div className="command-category-title">{category}</div>
+                <div className="command-category-title">{t(`commandPalette.categories.${category}` as TranslationKeys)}</div>
                 {commandsByCategory[category].map((command) => (
                   <CommandItem
                     key={command.label}
@@ -957,7 +956,7 @@ function CommandPaletteInner({
                     onMouseMove={() => setCurrentCommand(command)}
                     showShortcut={app.editorInterface.formFactor !== "phone"}
                     appState={uiAppState}
-                    size={category === "Library" ? "large" : "small"}
+                    size={category === DEFAULT_CATEGORIES.library ? "large" : "small"}
                   />
                 ))}
               </div>
@@ -1007,7 +1006,7 @@ const CommandItem = ({
   appState: UIAppState;
   size?: "small" | "large";
 }) => {
-  const noop = () => {};
+  const noop = () => { };
 
   return (
     <div

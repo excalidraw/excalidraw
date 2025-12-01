@@ -91,9 +91,9 @@ export const DefaultSidebar = Object.assign(
             isForceDocked || onDock === false || (!onDock && docked != null)
               ? undefined
               : // compose to allow the host app to listen on default behavior
-                composeEventHandlers(onDock, (docked) => {
-                  setAppState({ defaultSidebarDockedPreference: docked });
-                })
+              composeEventHandlers(onDock, (docked) => {
+                setAppState({ defaultSidebarDockedPreference: docked });
+              })
           }
         >
           <Sidebar.Tabs>
