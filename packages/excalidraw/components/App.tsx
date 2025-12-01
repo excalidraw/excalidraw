@@ -1,5 +1,5 @@
 import { WaypointCanvasOverlay } from "./WaypointCanvasOverlay";
-import "./WaypointCanvasOverlay.css";
+import "./WaypointCanvasOverlay.scss";
 import { jumpToWaypoint } from "./Waypoints";
 
 import clsx from "clsx";
