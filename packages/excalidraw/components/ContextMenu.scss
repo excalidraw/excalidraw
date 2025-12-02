@@ -99,4 +99,42 @@
     border: none;
     border-top: 1px solid $oc-gray-5;
   }
+
+  .context-menu-item-submenu {
+    position: relative;
+  }
+
+  .context-menu-item--has-submenu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-width: 9.5rem;
+    padding: 0.25rem 1rem 0.25rem 1.25rem;
+    text-align: start;
+    border-radius: 0;
+    background-color: transparent;
+    border: none;
+    white-space: nowrap;
+    font-family: inherit;
+    color: var(--popup-text-color);
+
+    &:hover {
+      color: var(--popup-bg-color);
+      background-color: var(--select-highlight-color);
+    }
+
+    .context-menu-item__arrow {
+      font-size: 0.6rem;
+      margin-left: 0.5rem;
+    }
+  }
+
+  .context-menu--submenu {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    min-width: 8rem;
+    margin-left: 0.125rem;
+  }
 }

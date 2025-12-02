@@ -1,5 +1,7 @@
 import clsx from "clsx";
-import React from "react";
+import React, { useState } from "react";
+
+import type { Layer, LayerId } from "@excalidraw/element/types";
 
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { t } from "../i18n";
@@ -19,6 +21,60 @@ import type { TranslationKeys } from "../i18n";
 export type ContextMenuItem = typeof CONTEXT_MENU_SEPARATOR | Action;
 
 export type ContextMenuItems = (ContextMenuItem | false | null | undefined)[];
+
+/**
+ * Submenu component for moving elements to a different layer.
+ */
+const MoveToLayerSubmenu = ({
+  layers,
+  onSelect,
+  onClose,
+}: {
+  layers: readonly Layer[];
+  onSelect: (layerId: LayerId) => void;
+  onClose: () => void;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Sort layers by order (higher order = top of list)
+  const sortedLayers = [...layers].sort((a, b) => b.order - a.order);
+
+  return (
+    <li
+      className="context-menu-item-submenu"
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
+      <button
+        type="button"
+        className="context-menu-item context-menu-item--has-submenu"
+      >
+        <div className="context-menu-item__label">
+          {t("labels.moveToLayer")}
+        </div>
+        <span className="context-menu-item__arrow">▶</span>
+      </button>
+      {isOpen && (
+        <ul className="context-menu context-menu--submenu">
+          {sortedLayers.map((layer) => (
+            <li
+              key={layer.id}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelect(layer.id);
+                onClose();
+              }}
+            >
+              <button type="button" className="context-menu-item">
+                <div className="context-menu-item__label">{layer.name}</div>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+};
 
 type ContextMenuProps = {
   actionManager: ActionManager;
@@ -82,6 +138,23 @@ export const ContextMenu = React.memo(
             }
 
             const actionName = item.name;
+
+            // Special handling for moveToLayer action - render as submenu
+            if (actionName === "moveToLayer" && appState.layers.length > 1) {
+              return (
+                <MoveToLayerSubmenu
+                  key={idx}
+                  layers={appState.layers}
+                  onSelect={(layerId) => {
+                    onClose(() => {
+                      actionManager.executeAction(item, "contextMenu", layerId);
+                    });
+                  }}
+                  onClose={() => onClose()}
+                />
+              );
+            }
+
             let label = "";
             if (item.label) {
               if (typeof item.label === "function") {

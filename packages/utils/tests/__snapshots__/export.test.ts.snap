@@ -3,6 +3,7 @@
 exports[`exportToSvg > with default arguments 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLayerId": "default-layer",
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
@@ -62,6 +63,15 @@ exports[`exportToSvg > with default arguments 1`] = `
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "layers": [
+    {
+      "id": "default-layer",
+      "locked": false,
+      "name": "Layer 1",
+      "order": 0,
+      "visible": true,
+    },
+  ],
   "lockedMultiSelections": {},
   "multiElement": null,
   "name": "name",
@@ -94,6 +104,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
+  "selectedLayerIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,

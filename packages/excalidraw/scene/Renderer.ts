@@ -1,9 +1,13 @@
-import { isElementInViewport } from "@excalidraw/element";
+import {
+  isElementInViewport,
+  isElementInVisibleLayer,
+} from "@excalidraw/element";
 
 import { memoize, toBrandedType } from "@excalidraw/common";
 
 import type {
   ExcalidrawElement,
+  Layer,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -70,15 +74,22 @@ export class Renderer {
       elements,
       editingTextElement,
       newElementId,
+      layers,
     }: {
       elements: readonly NonDeletedExcalidrawElement[];
       editingTextElement: AppState["editingTextElement"];
       newElementId: ExcalidrawElement["id"] | undefined;
+      layers: readonly Layer[];
     }) => {
       const elementsMap = toBrandedType<RenderableElementsMap>(new Map());
 
       for (const element of elements) {
         if (newElementId === element.id) {
+          continue;
+        }
+
+        // Skip elements on hidden layers
+        if (!isElementInVisibleLayer(element, layers)) {
           continue;
         }
 
@@ -106,6 +117,7 @@ export class Renderer {
         width,
         editingTextElement,
         newElementId,
+        layers,
         // cache-invalidation nonce
         sceneNonce: _sceneNonce,
       }: {
@@ -120,6 +132,7 @@ export class Renderer {
         /** note: first render of newElement will always bust the cache
          * (we'd have to prefilter elements outside of this function) */
         newElementId: ExcalidrawElement["id"] | undefined;
+        layers: AppState["layers"];
         sceneNonce: ReturnType<InstanceType<typeof Scene>["getSceneNonce"]>;
       }) => {
         const elements = this.scene.getNonDeletedElements();
@@ -128,6 +141,7 @@ export class Renderer {
           elements,
           editingTextElement,
           newElementId,
+          layers,
         });
 
         const visibleElements = getVisibleCanvasElements({

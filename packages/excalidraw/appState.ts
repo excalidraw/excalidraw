@@ -10,6 +10,8 @@ import {
   STATS_PANELS,
   THEME,
   DEFAULT_GRID_STEP,
+  DEFAULT_LAYER,
+  DEFAULT_LAYER_ID,
   isTestEnv,
 } from "@excalidraw/common";
 
@@ -128,6 +130,10 @@ export const getDefaultAppState = (): Omit<
     lockedMultiSelections: {},
     activeLockedId: null,
     bindMode: "orbit",
+    // Layers
+    layers: [DEFAULT_LAYER],
+    activeLayerId: DEFAULT_LAYER_ID,
+    selectedLayerIds: {},
   };
 };
 
@@ -254,6 +260,10 @@ const APP_STATE_STORAGE_CONF = (<
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
   bindMode: { browser: true, export: false, server: false },
+  // Layers - persisted to browser and export for full restoration
+  layers: { browser: true, export: true, server: true },
+  activeLayerId: { browser: true, export: false, server: false },
+  selectedLayerIds: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <
