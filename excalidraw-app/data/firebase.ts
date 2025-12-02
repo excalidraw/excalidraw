@@ -105,8 +105,8 @@ const decryptElements = async (
   data: FirebaseStoredScene,
   roomKey: string,
 ): Promise<readonly ExcalidrawElement[]> => {
-  const ciphertext = data.ciphertext.toUint8Array();
-  const iv = data.iv.toUint8Array();
+  const ciphertext = data.ciphertext.toUint8Array() as Uint8Array<ArrayBuffer>;
+  const iv = data.iv.toUint8Array() as Uint8Array<ArrayBuffer>;
 
   const decrypted = await decryptData(iv, ciphertext, roomKey);
   const decodedData = new TextDecoder("utf-8").decode(
