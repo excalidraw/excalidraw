@@ -27,7 +27,7 @@ import {
 
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { exportToCanvas, exportToSvg } from "../scene/export";
+import { exportToCanvas, exportToSvg, exportToPdf } from "../scene/export";
 
 import { canvasToBlob } from "./blob";
 import { fileSave } from "./filesystem";
@@ -59,12 +59,12 @@ export const prepareElementsForExport = (
   let exportingFrame: ExcalidrawFrameLikeElement | null = null;
   let exportedElements = isExportingSelection
     ? getSelectedElements(
-        elements,
-        { selectedElementIds },
-        {
-          includeBoundTextElement: true,
-        },
-      )
+      elements,
+      { selectedElementIds },
+      {
+        includeBoundTextElement: true,
+      },
+    )
     : elements;
 
   if (isExportingSelection) {
@@ -158,6 +158,28 @@ export const exportCanvas = async (
       }
       return;
     }
+  } else if (type === "pdf") {
+    const pdfPromise = exportToPdf(elements, appState, files, {
+      exportBackground,
+      viewBackgroundColor,
+      exportPadding,
+      exportingFrame,
+    });
+
+    return fileSave(
+      pdfPromise.then((pdf) => {
+        return new Blob([pdf.output('arraybuffer')], {
+          type: "application/pdf",
+        });
+      }),
+      {
+        description: "Export to PDF",
+        name,
+        extension: "pdf",
+        mimeTypes: ["application/pdf"],
+        fileHandle,
+      },
+    );
   }
 
   const tempCanvas = exportToCanvas(elements, appState, files, {

@@ -180,20 +180,26 @@ const ImageExportModal = ({
         </div>
         <div className="ImageExportModal__preview__filename">
           {!nativeFileSystemSupported && (
-            <input
-              type="text"
-              className="TextInput"
-              value={projectName}
-              style={{ width: "30ch" }}
-              onChange={(event) => {
-                setProjectName(event.target.value);
-                actionManager.executeAction(
-                  actionChangeProjectName,
-                  "ui",
-                  event.target.value,
-                );
-              }}
-            />
+            <>
+              <label htmlFor="project-name" className="sr-only">
+                {t("imageExportDialog.filename")}
+              </label>
+              <input
+                id="project-name"
+                type="text"
+                className="TextInput"
+                value={projectName}
+                placeholder={t("imageExportDialog.filenamePlaceholder")}
+                onChange={(event) => {
+                  setProjectName(event.target.value);
+                  actionManager.executeAction(
+                    actionChangeProjectName,
+                    "ui",
+                    event.target.value,
+                  );
+                }}
+              />
+            </>
           )}
         </div>
       </div>
@@ -309,6 +315,18 @@ const ImageExportModal = ({
             icon={downloadIcon}
           >
             {t("imageExportDialog.button.exportToSvg")}
+          </FilledButton>
+          <FilledButton
+            className="ImageExportModal__settings__buttons__button"
+            label={t("imageExportDialog.title.exportToPdf")}
+            onClick={() =>
+              onExportImage(EXPORT_IMAGE_TYPES.pdf, exportedElements, {
+                exportingFrame,
+              })
+            }
+            icon={downloadIcon}
+          >
+            {t("imageExportDialog.button.exportToPdf")}
           </FilledButton>
           {(probablySupportsClipboardBlob || isFirefox) && (
             <FilledButton
