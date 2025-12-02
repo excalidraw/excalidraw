@@ -493,11 +493,13 @@
     "title": {
       "exportToPng": "Export to PNG",
       "exportToSvg": "Export to SVG",
+      "exportToJpg": "Export as JPG",
       "copyPngToClipboard": "Copy PNG to clipboard"
     },
     "button": {
       "exportToPng": "PNG",
       "exportToSvg": "SVG",
+      "exportToJpg": "JPG",
       "copyPngToClipboard": "Copy to clipboard"
     }
   },

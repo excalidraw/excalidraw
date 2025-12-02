@@ -300,6 +300,18 @@ const ImageExportModal = ({
           </FilledButton>
           <FilledButton
             className="ImageExportModal__settings__buttons__button"
+            label={t("imageExportDialog.title.exportToJpg")}
+            onClick={() =>
+              onExportImage("jpg", exportedElements, { // ← use string if no type
+                exportingFrame,
+              })
+            }
+            icon={downloadIcon}
+          >
+            {t("imageExportDialog.button.exportToJpg")}
+          </FilledButton>
+          <FilledButton
+            className="ImageExportModal__settings__buttons__button"
             label={t("imageExportDialog.title.exportToSvg")}
             onClick={() =>
               onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements, {
