@@ -25,7 +25,9 @@ const polyfill = () => {
 
   if (!Element.prototype.replaceChildren) {
     Element.prototype.replaceChildren = function (...nodes) {
-      this.innerHTML = "";
+      while (this.firstChild) {
+        this.removeChild(this.firstChild);
+      }
       this.append(...nodes);
     };
   }
