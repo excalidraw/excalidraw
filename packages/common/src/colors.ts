@@ -117,7 +117,8 @@ export const DEFAULT_CANVAS_BACKGROUND_PICKS = [
   "#fffce8",
   // radix bronze2
   "#fdf8f6",
-] as ColorTuple;
+  "grid",
+];
 
 // -----------------------------------------------------------------------------
 // palette defaults
