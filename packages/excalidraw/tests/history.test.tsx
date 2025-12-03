@@ -315,6 +315,7 @@ describe("history", () => {
       ]);
 
       mouse.downAt(0, 0);
+      mouse.moveTo(25, 25);
       mouse.moveTo(50, 50);
       mouse.upAt(50, 50);
       expect(API.getUndoStack().length).toBe(3);
