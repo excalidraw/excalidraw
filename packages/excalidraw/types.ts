@@ -18,6 +18,8 @@ import type {
   TextAlign,
   ExcalidrawElement,
   GroupId,
+  LayerId,
+  Layer,
   ExcalidrawBindableElement,
   Arrowhead,
   ChartType,
@@ -458,6 +460,14 @@ export interface AppState {
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
   bindMode: BindMode;
+
+  // Layers
+  /** Array of layer definitions. Always contains at least the default layer. */
+  layers: readonly Layer[];
+  /** ID of the layer where new elements will be created */
+  activeLayerId: LayerId | null;
+  /** IDs of selected layers for multi-selection (e.g., for merging) */
+  selectedLayerIds: Readonly<{ [id: string]: true }>;
 }
 
 export type SearchMatch = {
@@ -726,6 +736,7 @@ export type AppClassProperties = {
   editorInterface: App["editorInterface"];
   scene: App["scene"];
   syncActionResult: App["syncActionResult"];
+  actionManager: App["actionManager"];
   fonts: App["fonts"];
   pasteFromClipboard: App["pasteFromClipboard"];
   id: App["id"];

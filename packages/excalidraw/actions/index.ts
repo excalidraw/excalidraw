@@ -48,6 +48,13 @@ export { actionShortcuts } from "./actionMenu";
 
 export { actionGroup, actionUngroup } from "./actionGroup";
 
+export {
+  actionMoveToLayer,
+  actionMergeSelectedLayers,
+  actionMergeAllLayers,
+  getElementLayerName,
+} from "./actionLayer";
+
 export { actionGoToCollaborator } from "./actionNavigate";
 
 export { actionAddToLibrary } from "./actionAddToLibrary";
