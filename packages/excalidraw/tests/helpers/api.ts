@@ -4,7 +4,7 @@ import util from "util";
 
 import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 
-import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
+import { BOUND_TEXT_PADDING, DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
 
 import {
   newArrowElement,
@@ -217,6 +217,10 @@ export class API {
       : never;
     elbowed?: boolean;
     fixedSegments?: FixedSegment[] | null;
+    containerBehavior?: T extends "rectangle" | "diamond" | "ellipse"
+      ? ExcalidrawGenericElement["containerBehavior"]
+      : never;
+  } = {
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
@@ -282,6 +286,10 @@ export class API {
         element = newElement({
           type: type as "rectangle" | "diamond" | "ellipse",
           ...base,
+          containerBehavior: {
+            textFlow: rest.containerBehavior?.textFlow ?? "growing",
+            margin: rest.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
+          },  
         });
         break;
       case "embeddable":
