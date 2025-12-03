@@ -23,7 +23,7 @@ import {
 } from "@excalidraw/common";
 
 import { newTextElement } from "@excalidraw/element";
-import { isTextElement, isFrameLikeElement } from "@excalidraw/element";
+import { isTextElement, isFrameLikeElement, isFrameElement } from "@excalidraw/element";
 
 import { getDefaultFrameName } from "@excalidraw/element/frame";
 
@@ -50,7 +50,7 @@ import {
 
 import "./SearchMenu.scss";
 
-import type { AppClassProperties, SearchMatch } from "../types";
+import type { AppClassProperties, SearchMatch, UIAppState } from "../types";
 
 const searchQueryAtom = atom<string>("");
 export const searchItemInFocusAtom = atom<number | null>(null);
@@ -107,7 +107,7 @@ export const SearchMenu = () => {
       app.scene.getSceneNonce() !== lastSceneNonceRef.current
     ) {
       searchedQueryRef.current = null;
-      handleSearch(searchQuery, app, (matchItems, index) => {
+      handleSearch(searchQuery, app, (matchItems: SearchMatchItem[], index: number | null) => {
         setSearchMatches({
           nonce: randomInteger(),
           items: matchItems,
@@ -117,13 +117,13 @@ export const SearchMenu = () => {
         setAppState({
           searchMatches: matchItems.length
             ? {
-                focusedId: null,
-                matches: matchItems.map((searchMatch) => ({
-                  id: searchMatch.element.id,
-                  focus: false,
-                  matchedLines: searchMatch.matchedLines,
-                })),
-              }
+              focusedId: null,
+              matches: matchItems.map((searchMatch: SearchMatchItem) => ({
+                id: searchMatch.element.id,
+                focus: false,
+                matchedLines: searchMatch.matchedLines,
+              })),
+            }
             : null,
         });
       });
@@ -140,7 +140,7 @@ export const SearchMenu = () => {
 
   const goToNextItem = () => {
     if (searchMatches.items.length > 0) {
-      setFocusIndex((focusIndex) => {
+      setFocusIndex((focusIndex: number | null) => {
         if (focusIndex === null) {
           return 0;
         }
@@ -152,7 +152,7 @@ export const SearchMenu = () => {
 
   const goToPreviousItem = () => {
     if (searchMatches.items.length > 0) {
-      setFocusIndex((focusIndex) => {
+      setFocusIndex((focusIndex: number | null) => {
         if (focusIndex === null) {
           return 0;
         }
@@ -165,7 +165,7 @@ export const SearchMenu = () => {
   };
 
   useEffect(() => {
-    setAppState((state) => {
+    setAppState((state: UIAppState) => {
       if (!state.searchMatches) {
         return null;
       }
@@ -178,7 +178,7 @@ export const SearchMenu = () => {
       return {
         searchMatches: {
           focusedId,
-          matches: state.searchMatches.matches.map((match, index) => {
+          matches: state.searchMatches.matches.map((match: any, index: number) => {
             if (index === focusIndex) {
               return { ...match, focus: true };
             }
@@ -341,11 +341,10 @@ export const SearchMenu = () => {
     });
   }, [setAppState, stableState, app]);
 
-  const matchCount = `${searchMatches.items.length} ${
-    searchMatches.items.length === 1
-      ? t("search.singleResult")
-      : t("search.multipleResults")
-  }`;
+  const matchCount = `${searchMatches.items.length} ${searchMatches.items.length === 1
+    ? t("search.singleResult")
+    : t("search.multipleResults")
+    }`;
 
   return (
     <div className="layer-ui__search">
@@ -356,11 +355,11 @@ export const SearchMenu = () => {
           ref={searchInputRef}
           placeholder={t("search.placeholder")}
           icon={searchIcon}
-          onChange={(value) => {
+          onChange={(value: string) => {
             setInputValue(value);
             setIsSearching(true);
             const searchQuery = value.trim() as SearchQuery;
-            handleSearch(searchQuery, app, (matchItems, index) => {
+            handleSearch(searchQuery, app, (matchItems: SearchMatchItem[], index: number | null) => {
               setSearchMatches({
                 nonce: randomInteger(),
                 items: matchItems,
@@ -371,13 +370,13 @@ export const SearchMenu = () => {
               setAppState({
                 searchMatches: matchItems.length
                   ? {
-                      focusedId: null,
-                      matches: matchItems.map((searchMatch) => ({
-                        id: searchMatch.element.id,
-                        focus: false,
-                        matchedLines: searchMatch.matchedLines,
-                      })),
-                    }
+                    focusedId: null,
+                    matches: matchItems.map((searchMatch: SearchMatchItem) => ({
+                      id: searchMatch.element.id,
+                      focus: false,
+                      matchedLines: searchMatch.matchedLines,
+                    })),
+                  }
                   : null,
               });
 
@@ -462,7 +461,7 @@ const ListItem = (props: {
         active: props.highlighted,
       })}
       onClick={props.onClick}
-      ref={(ref) => {
+      ref={(ref: HTMLDivElement | null) => {
         if (props.highlighted) {
           ref?.scrollIntoView({ behavior: "auto", block: "nearest" });
         }
@@ -504,7 +503,7 @@ const MatchListBase = (props: MatchListProps) => {
             <div className="title-icon">{frameToolIcon}</div>
             <div>{t("search.frames")}</div>
           </div>
-          {frameNameMatches.map((searchMatch, index) => (
+          {frameNameMatches.map((searchMatch: SearchMatchItem, index: number) => (
             <ListItem
               key={searchMatch.element.id + searchMatch.index}
               searchQuery={props.searchQuery}
@@ -524,7 +523,7 @@ const MatchListBase = (props: MatchListProps) => {
             <div className="title-icon">{TextIcon}</div>
             <div>{t("search.texts")}</div>
           </div>
-          {textMatches.map((searchMatch, index) => (
+          {textMatches.map((searchMatch: SearchMatchItem, index: number) => (
             <ListItem
               key={searchMatch.element.id + searchMatch.index}
               searchQuery={props.searchQuery}

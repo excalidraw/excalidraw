@@ -246,7 +246,7 @@ export default function LibraryMenuItems({
 
   const itemsRenderedPerBatch =
     svgCache.size >=
-    (filteredItems.length ? filteredItems : libraryItems).length
+      (filteredItems.length ? filteredItems : libraryItems).length
       ? CACHED_ITEMS_RENDERED_PER_BATCH
       : ITEMS_RENDERED_PER_BATCH;
 
@@ -340,7 +340,7 @@ export default function LibraryMenuItems({
               setSearchInputValue("");
             }}
           >
-            <kbd>esc</kbd> to clear
+            <kbd>{t("buttons.escape")}</kbd> {t("labels.toClear")}
           </div>
         )}
       </div>
@@ -380,8 +380,8 @@ export default function LibraryMenuItems({
       className="library-menu-items-container"
       style={
         pendingElements.length ||
-        unpublishedItems.length ||
-        publishedItems.length
+          unpublishedItems.length ||
+          publishedItems.length
           ? { justifyContent: "flex-start" }
           : { borderBottom: 0 }
       }
