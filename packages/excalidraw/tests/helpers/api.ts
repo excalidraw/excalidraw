@@ -23,6 +23,8 @@ import { isLinearElementType } from "@excalidraw/element";
 import { getSelectedElements } from "@excalidraw/element";
 import { selectGroupsForSelectedElements } from "@excalidraw/element";
 
+import { FONT_SIZES } from "@excalidraw/common";
+
 import type {
   ExcalidrawElement,
   ExcalidrawGenericElement,
@@ -406,7 +408,7 @@ export class API {
       text: opts?.label?.text || "sample-text",
       width: 50,
       height: 20,
-      fontSize: 16,
+      fontSize: FONT_SIZES.sm,
       containerId: rectangle.id,
       frameId:
         opts?.label?.frameId === undefined

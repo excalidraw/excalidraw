@@ -22,6 +22,7 @@ import {
   isTransparent,
   reduceToCommonValue,
   invariant,
+  FONT_SIZES,
 } from "@excalidraw/common";
 
 import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
@@ -758,25 +759,25 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
               group="font-size"
               options={[
                 {
-                  value: 16,
+                  value: FONT_SIZES.sm,
                   text: t("labels.small"),
                   icon: FontSizeSmallIcon,
                   testId: "fontSize-small",
                 },
                 {
-                  value: 20,
+                  value: FONT_SIZES.md,
                   text: t("labels.medium"),
                   icon: FontSizeMediumIcon,
                   testId: "fontSize-medium",
                 },
                 {
-                  value: 28,
+                  value: FONT_SIZES.lg,
                   text: t("labels.large"),
                   icon: FontSizeLargeIcon,
                   testId: "fontSize-large",
                 },
                 {
-                  value: 36,
+                  value: FONT_SIZES.xl,
                   text: t("labels.veryLarge"),
                   icon: FontSizeExtraLargeIcon,
                   testId: "fontSize-veryLarge",
