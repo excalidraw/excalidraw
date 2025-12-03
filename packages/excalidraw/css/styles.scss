@@ -802,3 +802,30 @@ body.excalidraw-cursor-resize * {
     font-family: "Assistant";
   }
 }
+
+.corner-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+  padding: 8px 0;
+  width: 100%;
+  
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    input {
+    padding: 8px 10px;
+    width: 100%; 
+    box-sizing: border-box;  
+    font-size:75%;
+
+    ::-webkit-inner-spin-button,
+    ::-webkit-outer-spin-button {
+        appearance: none;
+      }
+    }
+  }
+}

@@ -23,7 +23,7 @@ export type Theme = typeof THEME[keyof typeof THEME];
 export type FontString = string & { _brand: "fontString" };
 export type GroupId = string;
 export type PointerType = "mouse" | "pen" | "touch";
-export type StrokeRoundness = "round" | "sharp";
+export type StrokeRoundness = "round" | "sharp" | "custom";
 export type RoundnessType = ValueOf<typeof ROUNDNESS>;
 export type StrokeStyle = "solid" | "dashed" | "dotted";
 export type TextAlign = typeof TEXT_ALIGN[keyof typeof TEXT_ALIGN];
@@ -46,7 +46,17 @@ type _ExcalidrawElementBase = Readonly<{
   fillStyle: FillStyle;
   strokeWidth: number;
   strokeStyle: StrokeStyle;
-  roundness: null | { type: RoundnessType; value?: number };
+  roundness: null | { 
+    type: RoundnessType;
+    value?: number;
+    corners? :{
+      topLeft : number;
+      topRight : number;
+      bottomLeft : number;
+      bottomRight : number;
+    },
+    cornerLink?: boolean,
+  };
   roughness: number;
   opacity: number;
   width: number;
