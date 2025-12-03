@@ -10,9 +10,9 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
       - name: "Install Node"
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v6
         with:
           node-version: "18.x"
       - name: "Install Deps"

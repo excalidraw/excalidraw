@@ -10,9 +10,9 @@ jobs:
       CI_JOB_NUMBER: 1
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
       - name: Setup Node.js 18.x
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: 18.x
       - name: Install in packages/excalidraw
