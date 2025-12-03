@@ -9,7 +9,7 @@ import {
   isWritableElement,
 } from "@excalidraw/common";
 
-import type { ColorTuple, ColorPaletteCustom } from "@excalidraw/common";
+import type { ColorPaletteCustom } from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -55,8 +55,8 @@ export const getColor = (color: string): string | null => {
   return isValidColor(`#${color}`)
     ? `#${color}`
     : isValidColor(color)
-    ? color
-    : null;
+      ? color
+      : null;
 };
 
 interface ColorPickerProps {
@@ -71,7 +71,7 @@ interface ColorPickerProps {
   elements: readonly ExcalidrawElement[];
   appState: AppState;
   palette?: ColorPaletteCustom | null;
-  topPicks?: ColorTuple;
+  topPicks?: readonly string[];
   updateData: (formData?: any) => void;
 }
 
@@ -201,10 +201,10 @@ const ColorPickerPopupContent = ({
               return force === false || state
                 ? null
                 : {
-                    keepOpenOnAlt: false,
-                    onSelect: onChange,
-                    colorPickerType: type,
-                  };
+                  keepOpenOnAlt: false,
+                  onSelect: onChange,
+                  colorPickerType: type,
+                };
             });
           }}
           onEscape={(event) => {

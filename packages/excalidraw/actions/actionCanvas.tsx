@@ -70,15 +70,22 @@ export const actionChangeViewBackgroundColor = register<Partial<AppState>>({
     };
   },
   PanelComponent: ({ elements, appState, updateData, appProps, data }) => {
-    // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
       <ColorPicker
         palette={null}
         topPicks={DEFAULT_CANVAS_BACKGROUND_PICKS}
         label={t("labels.canvasBackground")}
         type="canvasBackground"
-        color={appState.viewBackgroundColor}
-        onChange={(color) => updateData({ viewBackgroundColor: color })}
+        color={
+          appState.gridModeEnabled ? "grid" : appState.viewBackgroundColor
+        }
+        onChange={(color) => {
+          if (color === "grid") {
+            updateData({ gridModeEnabled: true });
+          } else {
+            updateData({ viewBackgroundColor: color, gridModeEnabled: false });
+          }
+        }}
         data-testid="canvas-background-picker"
         elements={elements}
         appState={appState}
@@ -122,9 +129,9 @@ export const actionClearCanvas = register({
         activeTool:
           appState.activeTool.type === "image"
             ? {
-                ...appState.activeTool,
-                type: app.state.preferredSelectionTool.type,
-              }
+              ...appState.activeTool,
+              type: app.state.preferredSelectionTool.type,
+            }
             : appState.activeTool,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
