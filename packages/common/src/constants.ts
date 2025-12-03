@@ -234,6 +234,7 @@ export const IMAGE_MIME_TYPES = {
   ico: "image/x-icon",
   avif: "image/avif",
   jfif: "image/jfif",
+  pdf: "application/pdf",
 } as const;
 
 export const STRING_MIME_TYPES = {
@@ -268,6 +269,7 @@ export const ALLOWED_PASTE_MIME_TYPES = [
 export const EXPORT_IMAGE_TYPES = {
   png: "png",
   svg: "svg",
+  pdf: "pdf",
   clipboard: "clipboard",
 } as const;
 

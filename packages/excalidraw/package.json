@@ -97,6 +97,7 @@
     "image-blob-reduce": "3.0.1",
     "jotai": "2.11.0",
     "jotai-scope": "0.7.2",
+    "jspdf": "3.0.4",
     "lodash.debounce": "4.0.8",
     "lodash.throttle": "4.1.1",
     "nanoid": "3.3.3",
