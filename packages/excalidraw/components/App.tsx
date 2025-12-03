@@ -12368,13 +12368,10 @@ startLineEditor = (
   ): void => {
     const selectionElement = this.state.selectionElement;
     const pointerCoords = pointerDownState.lastCoords;
-    const selectedElements = this.scene.getSelectedElements(this.state);
-    const onlyBindingElementSelected =
-      selectedElements?.length === 1 && isBindingElement(selectedElements[0]);
     if (
       selectionElement &&
-      this.state.activeTool.type !== "eraser" &&
-      !onlyBindingElementSelected
+      pointerDownState.boxSelection.hasOccurred &&
+      this.state.activeTool.type !== "eraser"
     ) {
       dragNewElement({
         newElement: selectionElement,

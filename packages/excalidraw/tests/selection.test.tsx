@@ -65,6 +65,7 @@ describe("box-selection", () => {
     API.setElements([rect1, rect2]);
 
     mouse.downAt(175, -20);
+    mouse.move(-1000, -1000);
     mouse.moveTo(85, 70);
     mouse.up();
 
@@ -72,6 +73,7 @@ describe("box-selection", () => {
 
     Keyboard.withModifierKeys({ shift: true }, () => {
       mouse.downAt(75, -20);
+      mouse.move(-1000, -1000);
       mouse.moveTo(-15, 70);
       mouse.up();
     });
@@ -93,6 +95,7 @@ describe("box-selection", () => {
     API.setElements([rect1]);
 
     mouse.downAt(75, -20);
+    mouse.move(-1000, -1000);
     mouse.moveTo(-15, 70);
 
     assertSelectedElements([rect1.id]);
@@ -138,6 +141,7 @@ describe("inner box-selection", () => {
     API.setElements([rect1, rect2, rect3]);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       mouse.downAt(40, 40);
+      mouse.move(-1000, -1000);
       mouse.moveTo(290, 290);
       mouse.up();
 
@@ -175,6 +179,7 @@ describe("inner box-selection", () => {
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       mouse.downAt(40, 40);
+      mouse.move(-1000, -1000);
       mouse.moveTo(rect2.x + rect2.width + 10, rect2.y + rect2.height + 10);
       mouse.up();
 
@@ -212,6 +217,7 @@ describe("inner box-selection", () => {
     API.setElements([rect1, rect2, rect3]);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       mouse.downAt(rect2.x - 20, rect2.y - 20);
+      mouse.move(-1000, -1000);
       mouse.moveTo(rect2.x + rect2.width + 10, rect2.y + rect2.height + 10);
       assertSelectedElements([rect2.id, rect3.id]);
       expect(h.state.selectedGroupIds).toEqual({ A: true });
@@ -253,9 +259,10 @@ describe("selection element", () => {
 
     const canvas = container.querySelector("canvas.interactive")!;
     fireEvent.pointerDown(canvas, { clientX: 60, clientY: 100 });
+    fireEvent.pointerMove(canvas, { clientX: -1000, clientY: -1000 });
     fireEvent.pointerMove(canvas, { clientX: 150, clientY: 30 });
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(4);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
     expect(renderStaticScene).toHaveBeenCalledTimes(3);
     const selectionElement = h.state.selectionElement!;
     expect(selectionElement).not.toBeNull();
@@ -275,10 +282,11 @@ describe("selection element", () => {
 
     const canvas = container.querySelector("canvas.interactive")!;
     fireEvent.pointerDown(canvas, { clientX: 60, clientY: 100 });
+    fireEvent.pointerMove(canvas, { clientX: -1000, clientY: -1000 });
     fireEvent.pointerMove(canvas, { clientX: 150, clientY: 30 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
     expect(renderStaticScene).toHaveBeenCalledTimes(3);
     expect(h.state.selectionElement).toBeNull();
   });
@@ -303,6 +311,7 @@ describe("select single element on the scene", () => {
       const tool = getByToolName("rectangle");
       fireEvent.click(tool);
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+      fireEvent.pointerMove(canvas, { clientX: -1000, clientY: -1000 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
       fireEvent.keyDown(document, {
@@ -335,6 +344,7 @@ describe("select single element on the scene", () => {
       const tool = getByToolName("diamond");
       fireEvent.click(tool);
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+      fireEvent.pointerMove(canvas, { clientX: -1000, clientY: -1000 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
       fireEvent.keyDown(document, {
@@ -367,6 +377,7 @@ describe("select single element on the scene", () => {
       const tool = getByToolName("ellipse");
       fireEvent.click(tool);
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+      fireEvent.pointerMove(canvas, { clientX: -1000, clientY: -1000 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
       fireEvent.keyDown(document, {
@@ -399,6 +410,7 @@ describe("select single element on the scene", () => {
       const tool = getByToolName("arrow");
       fireEvent.click(tool);
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+      fireEvent.pointerMove(canvas, { clientX: -1000, clientY: -1000 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
       fireEvent.keyDown(document, {
@@ -425,8 +437,8 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 40, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(7);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(10);
+    expect(renderStaticScene).toHaveBeenCalledTimes(8);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -443,6 +455,7 @@ describe("select single element on the scene", () => {
       const tool = getByToolName("line");
       fireEvent.click(tool);
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+      fireEvent.pointerMove(canvas, { clientX: -1000, clientY: -1000 });
       fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
       fireEvent.pointerUp(canvas);
       fireEvent.keyDown(document, {
@@ -469,8 +482,8 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 40, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(7);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(10);
+    expect(renderStaticScene).toHaveBeenCalledTimes(8);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -525,6 +538,7 @@ describe("selectedElementIds stability", () => {
     expect(h.state.selectedElementIds).toBe(selectedElementIds_1);
 
     mouse.downAt(-50, -50);
+    mouse.move(-1000, -1000);
     mouse.moveTo(50, 50);
 
     const selectedElementIds_2 = h.state.selectedElementIds;
