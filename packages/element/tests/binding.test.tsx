@@ -493,6 +493,7 @@ describe("binding for simple arrows", () => {
       expect(arrow.endBinding?.elementId).toBe(rectRight.id);
 
       mouse.downAt(-100, -100);
+      mouse.moveTo(0, 0);
       mouse.moveTo(650, 750);
       mouse.up(0, 0);
 
