@@ -62,6 +62,20 @@ const getHints = ({
       shortcut: getTaggedShortcutKey("Alt"),
     });
   }
+
+  const selectedElements = app.scene.getSelectedElements(appState);
+
+  // creating or dragging arrow point
+  if (
+    appState.selectedLinearElement?.isDragging &&
+    selectedElements[0]?.type === "arrow"
+  ) {
+    return t("hints.arrowBindModifiers", {
+      shortcut_1: getTaggedShortcutKey("Ctrl"),
+      shortcut_2: getTaggedShortcutKey("Alt"),
+    });
+  }
+
   if (activeTool.type === "arrow" || activeTool.type === "line") {
     if (multiMode) {
       return t("hints.linearElementMulti", {
@@ -88,8 +102,6 @@ const getHints = ({
   if (activeTool.type === "embeddable") {
     return t("hints.embeddable");
   }
-
-  const selectedElements = app.scene.getSelectedElements(appState);
 
   if (
     isResizing &&

@@ -6,8 +6,6 @@ import type {
   EditorInterface,
 } from "@excalidraw/common";
 
-import type { SuggestedBinding } from "@excalidraw/element";
-
 import type { LinearElementEditor } from "@excalidraw/element";
 
 import type { MaybeTransformHandleType } from "@excalidraw/element";
@@ -34,6 +32,7 @@ import type {
   ExcalidrawIframeLikeElement,
   OrderedExcalidrawElement,
   ExcalidrawNonSelectionElement,
+  BindMode,
 } from "@excalidraw/element/types";
 
 import type {
@@ -205,6 +204,7 @@ export type StaticCanvasAppState = Readonly<
     frameRendering: AppState["frameRendering"];
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
     hoveredElementIds: AppState["hoveredElementIds"];
+    suggestedBinding: AppState["suggestedBinding"];
     // Cropping
     croppingElementId: AppState["croppingElementId"];
   }
@@ -218,8 +218,9 @@ export type InteractiveCanvasAppState = Readonly<
     selectedGroupIds: AppState["selectedGroupIds"];
     selectedLinearElement: AppState["selectedLinearElement"];
     multiElement: AppState["multiElement"];
+    newElement: AppState["newElement"];
     isBindingEnabled: AppState["isBindingEnabled"];
-    suggestedBindings: AppState["suggestedBindings"];
+    suggestedBinding: AppState["suggestedBinding"];
     isRotating: AppState["isRotating"];
     elementsToHighlight: AppState["elementsToHighlight"];
     // Collaborators
@@ -234,6 +235,11 @@ export type InteractiveCanvasAppState = Readonly<
     // Search matches
     searchMatches: AppState["searchMatches"];
     activeLockedId: AppState["activeLockedId"];
+    // Non-used but needed in binding highlight arrow overdraw
+    hoveredElementIds: AppState["hoveredElementIds"];
+    frameRendering: AppState["frameRendering"];
+    shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
+    exportScale: AppState["exportScale"];
   }
 >;
 
@@ -293,7 +299,7 @@ export interface AppState {
   selectionElement: NonDeletedExcalidrawElement | null;
   isBindingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
-  suggestedBindings: SuggestedBinding[];
+  suggestedBinding: NonDeleted<ExcalidrawBindableElement> | null;
   frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
   frameRendering: {
     enabled: boolean;
@@ -368,6 +374,7 @@ export interface AppState {
     | { name: "imageExport" | "help" | "jsonExport" }
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
     | { name: "commandPalette" }
+    | { name: "settings" }
     | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] };
   /**
    * Reflects user preference for whether the default sidebar should be docked.
@@ -450,6 +457,7 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
+  bindMode: BindMode;
 }
 
 export type SearchMatch = {
@@ -466,11 +474,7 @@ export type SearchMatch = {
 
 export type UIAppState = Omit<
   AppState,
-  | "suggestedBindings"
-  | "startBoundElement"
-  | "cursorButton"
-  | "scrollX"
-  | "scrollY"
+  "startBoundElement" | "cursorButton" | "scrollX" | "scrollY"
 >;
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
@@ -750,6 +754,8 @@ export type AppClassProperties = {
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
   onPointerDownEmitter: App["onPointerDownEmitter"];
+
+  bindModeHandler: App["bindModeHandler"];
 };
 
 export type PointerDownState = Readonly<{
