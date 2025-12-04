@@ -314,6 +314,7 @@ export const LibraryMenu = memo(() => {
   const onInsertLibraryItems = useCallback(
     (libraryItems: LibraryItems) => {
       onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
+      app.setActiveTool({ type: "selection" });
       app.focusContainer();
     },
     [onInsertElements, app],
