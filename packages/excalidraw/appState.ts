@@ -13,7 +13,7 @@ import {
   isTestEnv,
 } from "@excalidraw/common";
 
-import type { AppState, NormalizedZoomValue } from "./types";
+import { GridType, type AppState, type NormalizedZoomValue } from "./types";
 
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
   ? devicePixelRatio
@@ -69,6 +69,7 @@ export const getDefaultAppState = (): Omit<
     fileHandle: null,
     gridSize: DEFAULT_GRID_SIZE,
     gridStep: DEFAULT_GRID_STEP,
+    gridType: GridType.DEFAULT,
     gridModeEnabled: false,
     isBindingEnabled: true,
     defaultSidebarDockedPreference: false,
@@ -191,6 +192,7 @@ const APP_STATE_STORAGE_CONF = (<
   fileHandle: { browser: false, export: false, server: false },
   gridSize: { browser: true, export: true, server: true },
   gridStep: { browser: true, export: true, server: true },
+  gridType: { browser: true, export: false, server: false },
   gridModeEnabled: { browser: true, export: true, server: true },
   height: { browser: false, export: false, server: false },
   isBindingEnabled: { browser: false, export: false, server: false },
