@@ -122,4 +122,3 @@ If you like the project, you can become a sponsor at [Open Collective](https://o
 Last but not least, we're thankful to these companies for offering their services for free:
 
 [![Vercel](./.github/assets/vercel.svg)](https://vercel.com) [![Sentry](./.github/assets/sentry.svg)](https://sentry.io) [![Crowdin](./.github/assets/crowdin.svg)](https://crowdin.com)
-

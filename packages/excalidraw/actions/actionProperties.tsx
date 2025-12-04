@@ -85,6 +85,7 @@ import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { FontPicker } from "../components/FontPicker/FontPicker";
 import { IconPicker } from "../components/IconPicker";
 import { Range } from "../components/Range";
+import { CornerRadiusSlider } from "../components/CornerRadiusSlider";
 import {
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
@@ -1468,7 +1469,9 @@ export const actionChangeVerticalAlign = register<VerticalAlign>({
   },
 });
 
-export const actionChangeRoundness = register<"sharp" | "round">({
+export const actionChangeRoundness = register<
+  "sharp" | "round" | { radius: number }
+>({
   name: "changeRoundness",
   label: "Change edge roundness",
   trackEvent: false,
@@ -1479,20 +1482,37 @@ export const actionChangeRoundness = register<"sharp" | "round">({
           return el;
         }
 
-        return newElementWith(el, {
-          roundness:
-            value === "round"
-              ? {
-                  type: isUsingAdaptiveRadius(el.type)
-                    ? ROUNDNESS.ADAPTIVE_RADIUS
-                    : ROUNDNESS.PROPORTIONAL_RADIUS,
-                }
-              : null,
-        });
+        // Handle sharp
+        if (value === "sharp") {
+          return newElementWith(el, { roundness: null });
+        }
+
+        // Handle round toggle (use default radius)
+        if (value === "round") {
+          return newElementWith(el, {
+            roundness: {
+              type: isUsingAdaptiveRadius(el.type)
+                ? ROUNDNESS.ADAPTIVE_RADIUS
+                : ROUNDNESS.PROPORTIONAL_RADIUS,
+            },
+          });
+        }
+
+        // Handle radius slider value
+        if (typeof value === "object" && "radius" in value) {
+          return newElementWith(el, {
+            roundness: {
+              type: ROUNDNESS.ADAPTIVE_RADIUS,
+              value: value.radius,
+            },
+          });
+        }
+
+        return el;
       }),
       appState: {
         ...appState,
-        currentItemRoundness: value,
+        currentItemRoundness: typeof value === "object" ? "round" : value,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -1506,6 +1526,27 @@ export const actionChangeRoundness = register<"sharp" | "round">({
     const hasLegacyRoundness = targetElements.some(
       (el) => el.roundness?.type === ROUNDNESS.LEGACY,
     );
+
+    const currentRoundness = getFormValue(
+      elements,
+      app,
+      (element) =>
+        hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
+      (element) =>
+        !isArrowElement(element) && element.hasOwnProperty("roundness"),
+      (hasSelection) => (hasSelection ? null : appState.currentItemRoundness),
+    );
+
+    // Filter elements that can use the corner radius slider
+    const adaptiveRadiusElements = targetElements.filter(
+      (el) =>
+        !isArrowElement(el) &&
+        el.hasOwnProperty("roundness") &&
+        isUsingAdaptiveRadius(el.type),
+    );
+
+    const showCornerRadiusSlider =
+      currentRoundness === "round" && adaptiveRadiusElements.length > 0;
 
     return (
       <fieldset>
@@ -1525,24 +1566,18 @@ export const actionChangeRoundness = register<"sharp" | "round">({
                 icon: EdgeRoundIcon,
               },
             ]}
-            value={getFormValue(
-              elements,
-              app,
-              (element) =>
-                hasLegacyRoundness
-                  ? null
-                  : element.roundness
-                  ? "round"
-                  : "sharp",
-              (element) =>
-                !isArrowElement(element) && element.hasOwnProperty("roundness"),
-              (hasSelection) =>
-                hasSelection ? null : appState.currentItemRoundness,
-            )}
+            value={currentRoundness}
             onChange={(value) => updateData(value)}
           />
           {renderAction("togglePolygon")}
         </div>
+        {showCornerRadiusSlider && (
+          <CornerRadiusSlider
+            elements={adaptiveRadiusElements}
+            updateData={(radius) => updateData({ radius })}
+            app={app}
+          />
+        )}
       </fieldset>
     );
   },

@@ -384,8 +384,8 @@ export const ROUNDNESS = {
   // radius visually similar across differnt element sizes, especially
   // very large and very small elements.
   //
-  // NOTE right now we don't allow configuration and use a constant radius
-  // (see DEFAULT_ADAPTIVE_RADIUS constant)
+  // NOTE: This radius is user-configurable via the corner radius slider
+  // in the properties panel (for rectangles, images, iframes, embeddables)
   ADAPTIVE_RADIUS: 3,
 } as const;
 
