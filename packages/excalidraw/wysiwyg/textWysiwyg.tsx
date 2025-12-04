@@ -286,8 +286,6 @@ export const textWysiwyg = ({
   editable.classList.add("excalidraw-wysiwyg");
   // add spellcheck
   editable.spellcheck = true;
-  // add autocorrect for safari browser
-  editable.autocorrect = true;
 
   let whiteSpace = "pre";
   let wordBreak = "normal";
