@@ -84,7 +84,7 @@ export const DefaultSidebar = Object.assign(
       const isForceDocked = appState.openSidebar?.tab === CANVAS_SEARCH_TAB;
       
       const handleAddWaypoint = () => {
-        setAppState((prev) => addWaypointFromCurrentView(prev));
+        setAppState((prev) => ({ ...prev, isPlacingWaypoint: true }));
       };
 
       const handleRenameWaypoint = (id: string, name: string) => {

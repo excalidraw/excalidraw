@@ -6,6 +6,8 @@ import type { AppState, Waypoint } from "../types";
 interface WaypointCanvasOverlayProps {
   appState: AppState;
   onJump: (id: string) => void;
+  onPlaceWaypoint: (canvasX: number, canvasY: number) => void;
+  onCancelPlacement: () => void;
 }
 
 interface WaypointMarkerProps {
@@ -28,17 +30,9 @@ function waypointToScreenPosition(
   canvasWidth: number,
   canvasHeight: number,
 ): { x: number; y: number } {
-  // Calculates where the saved viewport center appears in current viewport
-  // When scrollX values match, the marker should be at screen center
-  
-  // Difference in scroll positions
-  const deltaX = waypoint.x - appState.scrollX;
-  const deltaY = waypoint.y - appState.scrollY;
-  
-  // The marker appears at screen center offset by the scroll difference
-  // scaled by the current zoom level
-  const screenX = canvasWidth / 2 + deltaX * appState.zoom.value;
-  const screenY = canvasHeight / 2 + deltaY * appState.zoom.value;
+  // Converting canvas coordinates to screen position
+  const screenX = canvasWidth / 2 + (waypoint.x + appState.scrollX) * appState.zoom.value;
+  const screenY = canvasHeight / 2 + (waypoint.y + appState.scrollY) * appState.zoom.value;
 
   return { x: screenX, y: screenY };
 }
@@ -101,12 +95,10 @@ const WaypointMarker: React.FC<WaypointMarkerProps> = ({
 export const WaypointCanvasOverlay: React.FC<WaypointCanvasOverlayProps> = ({
   appState,
   onJump,
+  onPlaceWaypoint,
+  onCancelPlacement,
 }) => {
-  const { waypoints } = appState;
-
-  if (!waypoints || waypoints.length === 0) {
-    return null;
-  }
+  const { waypoints, isPlacingWaypoint } = appState;
 
   // Gets viewport dimensions
   const canvasWidth = window.innerWidth;
@@ -118,17 +110,66 @@ export const WaypointCanvasOverlay: React.FC<WaypointCanvasOverlayProps> = ({
     left: 0,
     width: "100%",
     height: "100%",
-    pointerEvents: "none",
+    pointerEvents: isPlacingWaypoint ? "auto" : "none",
     overflow: "visible",
     zIndex: 10,
+    cursor: isPlacingWaypoint ? "crosshair" : "default",
   };
 
   const markerGroupStyle: React.CSSProperties = {
     pointerEvents: "auto",
   };
 
+  // Handles click on canvas during placement mode
+  const handleCanvasClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (!isPlacingWaypoint) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const screenX = e.clientX - rect.left;
+    const screenY = e.clientY - rect.top;
+
+    // Converts screen position to canvas coordinates
+    const canvasX = (screenX - canvasWidth / 2) / appState.zoom.value - appState.scrollX;
+    const canvasY = (screenY - canvasHeight / 2) / appState.zoom.value - appState.scrollY;
+
+    onPlaceWaypoint(canvasX, canvasY);
+  };
+
+  // Handles right-click to cancel placement
+  const handleContextMenu = (e: React.MouseEvent) => {
+    if (isPlacingWaypoint) {
+      e.preventDefault();
+      onCancelPlacement();
+    }
+  };
+
+  // Ensuring we only render when there are waypoints or placement mode is active
+  if ((!waypoints || waypoints.length === 0) && !isPlacingWaypoint) {
+    return null;
+  }
+
   return (
-    <svg className="waypoint-canvas-overlay" style={overlayStyle}>
+    <svg
+      className="waypoint-canvas-overlay"
+      style={overlayStyle}
+      onClick={handleCanvasClick}
+      onContextMenu={handleContextMenu}
+    >
+      {/* Placement mode indicator */}
+      {isPlacingWaypoint && (
+        <text
+          x={canvasWidth / 2}
+          y={125}
+          textAnchor="middle"
+          fill="#6965db"
+          fontSize={14}
+          fontWeight="bold"
+          style={{ pointerEvents: "none" }}
+        >
+          Click on canvas to place waypoint (right-click to cancel)
+        </text>
+      )}
+
       <g style={markerGroupStyle}>
         {waypoints.map((waypoint) => {
           const { x, y } = waypointToScreenPosition(
