@@ -58,6 +58,7 @@ export type ActionName =
   | "pasteStyles"
   | "gridMode"
   | "zenMode"
+  | "technicalDrawingMode"
   | "objectsSnapMode"
   | "stats"
   | "changeStrokeColor"

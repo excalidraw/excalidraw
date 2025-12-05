@@ -228,6 +228,7 @@ export type InteractiveCanvasAppState = Readonly<
     // SnapLines
     snapLines: AppState["snapLines"];
     zenModeEnabled: AppState["zenModeEnabled"];
+    technicalDrawingMode: AppState["technicalDrawingMode"];
     editingTextElement: AppState["editingTextElement"];
     // Cropping
     isCropping: AppState["isCropping"];
@@ -393,6 +394,7 @@ export interface AppState {
   shouldCacheIgnoreZoom: boolean;
   toast: { message: string; closable?: boolean; duration?: number } | null;
   zenModeEnabled: boolean;
+  technicalDrawingMode: boolean;
   theme: Theme;
   /** grid cell px size */
   gridSize: number;
