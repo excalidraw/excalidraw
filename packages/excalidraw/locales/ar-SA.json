@@ -46,9 +46,9 @@
     "arrowhead_triangle_outline": "مثلث (مخطط)",
     "arrowhead_diamond": "ألماسة",
     "arrowhead_diamond_outline": "ألماسة (مخططة)",
-    "arrowhead_crowfoot_many": "Crow's foot (many)",
-    "arrowhead_crowfoot_one": "Crow's foot (one)",
-    "arrowhead_crowfoot_one_or_many": "Crow's foot (one or many)",
+    "arrowhead_crowfoot_many": "قدم الغراب (متعدد)",
+    "arrowhead_crowfoot_one": "قدم الغراب (واحد)",
+    "arrowhead_crowfoot_one_or_many": "قدم الغراب (واحد أو متعدد)",
     "more_options": "خيارات إضافية",
     "arrowtypes": "نوع السهم",
     "arrowtype_sharp": "سهم حاد",
@@ -142,8 +142,8 @@
       "editArrow": "تحرير السهم"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "كسر المضلع",
+      "convertToPolygon": "تحويل إلى مضلع"
     },
     "elementLock": {
       "lock": "قفل",
@@ -170,8 +170,8 @@
     "copyElementLink": "نسخ رابط الكائن",
     "linkToElement": "رابط إلى الكائن",
     "wrapSelectionInFrame": "تغليف التحديد في إطار",
-    "tab": "",
-    "shapeSwitch": ""
+    "tab": "علامة تبويب",
+    "shapeSwitch": "تبديل الشكل"
   },
   "elementLink": {
     "title": "رابط إلى الكائن",
@@ -183,10 +183,10 @@
     "hint_emptyLibrary": "حدد عنصر على القماش لإضافته هنا، أو تثبيت مكتبة من المستودع العام أدناه.",
     "hint_emptyPrivateLibrary": "حدد عنصر على القماش لإضافته هنا.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "بحث في المكتبة",
+      "heading": "مطابقات المكتبة",
+      "noResults": "لم يتم العثور على عناصر مطابقة...",
+      "clearSearch": "مسح البحث"
     }
   },
   "search": {
@@ -195,8 +195,8 @@
     "singleResult": "نتيجة",
     "multipleResults": "نتائج",
     "placeholder": "ابحث عن نص على اللوحة...",
-    "frames": "",
-    "texts": ""
+    "frames": "إطارات",
+    "texts": "نصوص"
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -230,11 +230,11 @@
     "objectsSnapMode": "التقاط إلى العناصر",
     "exitZenMode": "إلغاء وضع التأمل",
     "cancel": "إلغاء",
-    "saveLibNames": "",
+    "saveLibNames": "حفظ الاسم (الأسماء) والخروج",
     "clear": "مسح",
     "remove": "إزالة",
     "embed": "تبديل الإدراج",
-    "publishLibrary": "",
+    "publishLibrary": "إعادة تسمية أو نشر",
     "submit": "إرسال",
     "confirm": "تأكيد",
     "embeddableInteractionButton": "اضغط للتفاعل"
@@ -261,7 +261,7 @@
     "removeItemsFromsLibrary": "حذف {{count}} عنصر (عناصر) من المكتبة؟",
     "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفًا. التعاون المباشر معطل.",
     "collabOfflineWarning": "لا يوجد اتصال بالإنترنت.\nلن يتم حفظ التغييرات التي قمت بها!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "تم تجاوز حصة تخزين المتصفح. لن يتم حفظ التغييرات."
   },
   "errors": {
     "unsupportedFileType": "نوع الملف غير مدعوم.",
@@ -292,7 +292,7 @@
   },
   "toolBar": {
     "selection": "تحديد",
-    "lasso": "",
+    "lasso": "تحديد حر",
     "image": "إدراج صورة",
     "rectangle": "مستطيل",
     "diamond": "مضلع",
@@ -313,7 +313,7 @@
     "hand": "يد (أداة الإزاحة)",
     "extraTools": "المزيد من الأدوات",
     "mermaidToExcalidraw": "من Mermaid إلى Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "تبديل نوع الشكل"
   },
   "element": {
     "rectangle": "مستطيل",
@@ -337,34 +337,34 @@
     "shapes": "الأشكال"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} لإلغاء البحث",
+    "canvasPanning": "لتحريك اللوحة، اضغط باستمرار على {{shortcut_1}} أو {{shortcut_2}} أثناء السحب، أو استخدم أداة اليد",
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "انقر لبدء نقاط متعددة، اسحب لخط واحد. اضغط {{shortcut}} مرة أخرى لتغيير نوع السهم.",
+    "arrowBindModifiers": "اضغط باستمرار على {{shortcut_1}} لتعطيل الربط، أو {{shortcut_2}} للربط عند نقطة ثابتة",
     "freeDraw": "انقر واسحب، أفرج عند الانتهاء",
     "text": "نصيحة: يمكنك أيضًا إضافة نص بالنقر المزدوج في أي مكان بأداة الاختيار",
     "embeddable": "اضغط مع السحب لإنشاء موقع ويب مضمّن",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "text_selected": "انقر نقرًا مزدوجًا أو اضغط على {{shortcut}} لتعديل النص",
+    "text_editing": "اضغط على {{shortcut_1}} أو {{shortcut_2}} لإنهاء التعديل",
+    "linearElementMulti": "انقر على النقطة الأخيرة أو اضغط على {{shortcut_1}} أو {{shortcut_2}} للإنهاء",
+    "lockAngle": "يمكنك تقييد الزاوية بالضغط باستمرار على {{shortcut}}",
+    "resize": "يمكنك تقييد النسب بالضغط باستمرار على {{shortcut_1}} أثناء تغيير الحجم،\nاضغط باستمرار على {{shortcut_2}} لتغيير الحجم من المركز",
+    "resizeImage": "يمكنك تغيير الحجم بحرية بالضغط باستمرار على {{shortcut_1}}،\nاضغط باستمرار على {{shortcut_2}} لتغيير الحجم من المركز",
+    "rotate": "يمكنك تقييد الزوايا بالضغط باستمرار على {{shortcut}} أثناء التدوير",
+    "lineEditor_info": "اضغط باستمرار على {{shortcut_1}} وانقر نقرًا مزدوجًا أو اضغط على {{shortcut_2}} لتعديل النقاط",
+    "lineEditor_line_info": "انقر نقرًا مزدوجًا أو اضغط على {{shortcut}} لتعديل النقاط",
+    "lineEditor_pointSelected": "اضغط على {{shortcut_1}} لإزالة النقطة (النقاط)،\n{{shortcut_2}} للتكرار، أو اسحب للنقل",
+    "lineEditor_nothingSelected": "حدد نقطة لتعديلها (اضغط باستمرار على {{shortcut_1}} لتحديد متعدد)،\nأو اضغط باستمرار على {{shortcut_2}} وانقر لإضافة نقاط جديدة",
     "publishLibrary": "نشر مكتبتك",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} لإضافة نص",
+    "createFlowchart": "{{shortcut}} لإنشاء مخطط تدفق",
+    "deepBoxSelect": "اضغط باستمرار على {{shortcut}} للتحديد العميق، ولمنع السحب",
+    "eraserRevert": "اضغط باستمرار على {{shortcut}} لاستعادة العناصر المحددة للحذف",
     "firefox_clipboard_write": "يمكن على الأرجح تمكين هذه الميزة عن طريق تعيين علم \"dom.events.asyncClipboard.clipboardItem\" إلى \"true\". لتغيير أعلام المتصفح في Firefox، قم بزيارة صفحة \"about:config\".",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "اضغط باستمرار على {{shortcut}} لتعطيل المحاذاة",
+    "enterCropEditor": "انقر نقرًا مزدوجًا فوق الصورة أو اضغط على {{shortcut}} لقص الصورة",
+    "leaveCropEditor": "انقر خارج الصورة أو اضغط على {{shortcut_1}} أو {{shortcut_2}} لإنهاء القص"
   },
   "canvasError": {
     "cannotShowPreview": "تعذر عرض المعاينة",
@@ -569,7 +569,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "لون",
     "mostUsedCustomColors": "الألوان المخصصة الأكثر استخدامًا",
     "colors": "الألوان",
     "shades": "الدرجات",
@@ -651,15 +651,15 @@
     "shortcutHint": "للحصول على لوحة الأوامر، استخدم {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Space",
+    "delete": "Delete",
+    "mmb": "عجلة التمرير"
   }
 }
