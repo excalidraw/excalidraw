@@ -458,7 +458,17 @@ export interface AppState {
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
   bindMode: BindMode;
+  indexItems: readonly IndexItem[];
 }
+
+export type IndexItem = {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  elementId?: string;
+  timestamp: number;
+};
 
 export type SearchMatch = {
   id: string;
