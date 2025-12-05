@@ -206,3 +206,59 @@
   --button-hover-bg: #363541;
   --button-bg: var(--color-surface-high);
 }
+
+.override-rounded-button {
+  border-radius: var(--border-radius-lg) !important;
+  margin-inline-start: 0.6em !important;
+}
+
+
+.lock-buttons {
+  display: flex;
+
+  .lock-horizontal-container button {
+    border-top-left-radius: var(--border-radius-lg) !important;
+    border-bottom-left-radius: var(--border-radius-lg) !important;
+    border-right: 0 !important;
+
+    :root[dir="rtl"] & {
+      transform: scaleX(-1);
+    }
+
+    .ToolIcon__icon {
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+  }
+
+  .lock-vertical-container button {
+    border-right: 0 !important;
+
+    :root[dir="rtl"] & {
+      transform: scaleX(-1);
+    }
+
+    .ToolIcon__icon {
+      border-radius: 0 !important;
+    }
+  }
+
+  .lock-diagonal-container button {
+    border-top-right-radius: var(--border-radius-lg) !important;
+    border-bottom-right-radius: var(--border-radius-lg) !important;
+
+    :root[dir="rtl"] & {
+      transform: scaleX(-1);
+    }
+
+    .ToolIcon__icon {
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+    }
+  }
+}
+
+.override-rounded-button {
+  border-radius: 8px !important;
+  margin-inline-start: 0.6em !important;
+}

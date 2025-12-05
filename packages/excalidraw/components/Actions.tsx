@@ -59,6 +59,8 @@ import {
   useEditorInterface,
   useStylesPanelMode,
   useExcalidrawContainer,
+  useExcalidrawAppState,
+  useExcalidrawSetAppState,
 } from "./App";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
@@ -82,6 +84,7 @@ import {
   DotsHorizontalIcon,
   SelectionIcon,
   pencilIcon,
+  LockedIcon,
 } from "./icons";
 
 import { Island } from "./Island";
@@ -1286,9 +1289,97 @@ export const ZoomActions = ({
       {renderAction("zoomOut")}
       {renderAction("resetZoom")}
       {renderAction("zoomIn")}
+      <PanningModeControl />
     </Stack.Row>
   </Stack.Col>
 );
+
+const PanningModeControl = () => {
+  const appState = useExcalidrawAppState();
+  const setAppState = useExcalidrawSetAppState();
+  const [open, setOpen] = useState(false);
+
+  const setMode = (mode: AppState["panningMode"]) => {
+    setAppState({ panningMode: mode });
+    setOpen(false);
+  };
+
+  const CrossArrowsIcon = (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 1v3M8 12v3M1 8h3M12 8h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 1l-1.75 1.75M8 1l1.75 1.75M8 15l-1.75-1.75M8 15l1.75-1.75M1 8l1.75-1.75M1 8l1.75 1.75M15 8l-1.75-1.75M15 8l-1.75 1.75" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity="0.85"/>
+    </svg>
+  );
+
+  const UpDownIcon = (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 2v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M5 5l3-3 3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M5 11l3 3 3-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+
+  const LeftRightIcon = (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 8h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M5 5l-3 3 3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M11 5l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+
+  const NoPanningIcon = (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="8" cy="8" r="5" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M4.5 4.5l7 7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+
+  return (
+    <DropdownMenu open={open} placement="top">
+      <DropdownMenu.Trigger
+        className="ToolIcon ToolIcon_type_button ToolIcon_size_medium zoom-button panning-mode-trigger override-rounded-button"
+        onToggle={() => setOpen((v) => !v)}
+        title={"Panning mode"}
+      >
+        <div className="ToolIcon__icon">{LockedIcon}</div>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content
+        onClickOutside={() => setOpen(false)}
+        onSelect={() => setOpen(false)}
+        className="App-toolbar__panning-mode-dropdown"
+      >
+        <DropdownMenu.Item
+          onSelect={() => setMode("free")}
+          selected={appState.panningMode === "free"}
+          icon={CrossArrowsIcon}
+        >
+          {"Free mode"}
+        </DropdownMenu.Item>
+        <DropdownMenu.Item
+          onSelect={() => setMode("fixed")}
+          selected={appState.panningMode === "fixed"}
+          icon={NoPanningIcon}
+        >
+          {"Fixed (both)"}
+        </DropdownMenu.Item>
+        <DropdownMenu.Item
+          onSelect={() => setMode("horizontalFixed")}
+          selected={appState.panningMode === "horizontalFixed"}
+          icon={UpDownIcon}
+        >
+          {"Horizontally fixed"}
+        </DropdownMenu.Item>
+        <DropdownMenu.Item
+          onSelect={() => setMode("verticalFixed")}
+          selected={appState.panningMode === "verticalFixed"}
+          icon={LeftRightIcon}
+        >
+          {"Vertically fixed"}
+        </DropdownMenu.Item>
+      </DropdownMenu.Content>
+    </DropdownMenu>
+  );
+};
 
 export const UndoRedoActions = ({
   renderAction,
