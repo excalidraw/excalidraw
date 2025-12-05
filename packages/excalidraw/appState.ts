@@ -91,6 +91,7 @@ export const getDefaultAppState = (): Omit<
     scrollY: 0,
     //Save the camera bookmarks used by the Waypoints sidebar
     waypoints: [],
+    isPlacingWaypoint: false,
     selectedElementIds: {},
     hoveredElementIds: {},
     selectedGroupIds: {},
