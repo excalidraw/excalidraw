@@ -1339,7 +1339,7 @@ const PanningModeControl = () => {
       <DropdownMenu.Trigger
         className="ToolIcon ToolIcon_type_button ToolIcon_size_medium zoom-button panning-mode-trigger override-rounded-button"
         onToggle={() => setOpen((v) => !v)}
-        title={"Panning mode"}
+        title={t("labels.panningMode")}
       >
         <div className="ToolIcon__icon">{LockedIcon}</div>
       </DropdownMenu.Trigger>
@@ -1353,28 +1353,28 @@ const PanningModeControl = () => {
           selected={appState.panningMode === "free"}
           icon={CrossArrowsIcon}
         >
-          {"Free mode"}
+          {t("labels.freeMode")}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onSelect={() => setMode("fixed")}
           selected={appState.panningMode === "fixed"}
           icon={NoPanningIcon}
         >
-          {"Fixed (both)"}
+          {t("labels.fixedMode")}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onSelect={() => setMode("horizontalFixed")}
           selected={appState.panningMode === "horizontalFixed"}
           icon={UpDownIcon}
         >
-          {"Horizontally fixed"}
+          {t("labels.horizontalFixedMode")}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onSelect={() => setMode("verticalFixed")}
           selected={appState.panningMode === "verticalFixed"}
           icon={LeftRightIcon}
         >
-          {"Vertically fixed"}
+          {t("labels.horizontalFixedMode")}
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu>
