@@ -210,6 +210,9 @@
     "load": "Open",
     "getShareableLink": "Get shareable link",
     "close": "Close",
+    "add": "Add",
+    "cancel": "Cancel",
+    "delete": "Delete",
     "selectLanguage": "Select language",
     "scrollBackToContent": "Scroll back to content",
     "zoomIn": "Zoom in",
@@ -661,5 +664,15 @@
     "spacebar": "Space",
     "delete": "Delete",
     "mmb": "Scroll wheel"
+  },
+  "indexSection": {
+    "title": "Index",
+    "addPin": "Add Pin",
+    "addItem": "Add index item",
+    "enterName": "Enter pin name...",
+    "empty": "No pins added yet",
+    "help": "Select elements or click 'Add Pin' to create navigation points",
+    "goTo": "Go to location",
+    "rename": "Double-click to rename"
   }
 }
