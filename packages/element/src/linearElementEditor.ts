@@ -317,7 +317,7 @@ export class LinearElementEditor {
     let deltaY = 0;
     if (
       shouldRotateWithDiscreteAngle(event) &&
-      !hoveredElement &&
+      (!isBindingElement(element) || !hoveredElement) &&
       !element.startBinding &&
       !element.endBinding
     ) {
@@ -504,7 +504,7 @@ export class LinearElementEditor {
     if (
       shouldRotateWithDiscreteAngle(event) &&
       singlePointDragged &&
-      !hoveredElement &&
+      (!isBindingElement(element) || !hoveredElement) &&
       !element.startBinding &&
       !element.endBinding
     ) {
