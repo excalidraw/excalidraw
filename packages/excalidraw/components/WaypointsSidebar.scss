@@ -1,0 +1,128 @@
+.waypoints-panel {
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  color: var(--color-text-primary, inherit);
+
+  //title + add button 
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  //'waypoints' text
+  &__title {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  //'add current view' button
+  &__add-btn {
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    border: none;
+    font-size: 0.75rem;
+    cursor: pointer;
+    white-space: nowrap;
+    background: var(--color-primary, #4b6bfb);
+    color: var(--color-bg, #fff);
+    transition: filter 0.12s ease-out, transform 0.05s ease-out;
+
+    &:hover {
+      filter: brightness(1.05);
+    }
+
+    &:active {
+      transform: translateY(1px);
+      filter: brightness(0.97);
+    }
+  }
+  //no waypoints
+  &__empty {
+    margin: 0.5rem 0 0;
+    opacity: 0.7;
+  }
+
+  //list of waypoints
+  &__list {
+    list-style: none;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  //single waypoint row
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    background: var(--color-surface-2, #f5f5f7);
+    min-height: 28px;
+  }
+
+  // waypoint name button
+  &__name {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.85rem;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  //input for waypoint renaming
+  &__input {
+    flex: 1;
+    border-radius: 999px;
+    border: 1px solid var(--color-border-muted, #d0d0d7);
+    padding: 0.15rem 0.5rem;
+    font-size: 0.85rem;
+    outline: none;
+
+    //highlight input when focuses
+    &:focus {
+      border-color: var(--color-primary, #4b6bfb);
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-primary, #4b6bfb) 25%, transparent);
+    }
+  }
+
+  //icon buttons 
+  &__actions {
+    display: flex;
+    gap: 0.15rem;
+    margin-left: 0.4rem;
+  }
+
+  &__icon-btn {
+    border-radius: 999px;
+    border: none;
+    padding: 0.15rem 0.35rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    &--danger:hover {
+      background: rgba(255, 0, 0, 0.06);
+    }
+  }
+}
