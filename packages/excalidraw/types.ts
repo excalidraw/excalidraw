@@ -360,6 +360,7 @@ export interface AppState {
   scrollY: number;
   //List of the saved camera bookmarks for the Waypoints sidebar
   waypoints: Waypoint[];
+  isPlacingWaypoint: boolean;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string | null;

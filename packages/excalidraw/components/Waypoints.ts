@@ -59,3 +59,27 @@ export function jumpToWaypoint(
     zoom: { value: wp.zoom as any },
   };
 }
+
+// Creating a waypoint at a specific canvas position
+export function addWaypointAtPosition(
+  appState: AppState,
+  canvasX: number,
+  canvasY: number,
+): AppState {
+  const id = crypto.randomUUID?.() || `${Date.now()}`;
+  const name = `Waypoint ${appState.waypoints.length + 1}`;
+
+  const newWaypoint = {
+    id,
+    name,
+    x: canvasX,
+    y: canvasY,
+    zoom: appState.zoom.value,
+  };
+
+  return {
+    ...appState,
+    waypoints: [...appState.waypoints, newWaypoint],
+    isPlacingWaypoint: false,
+  };
+}
