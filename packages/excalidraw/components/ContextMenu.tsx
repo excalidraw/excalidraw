@@ -85,13 +85,21 @@ export const ContextMenu = React.memo(
             let label = "";
             if (item.label) {
               if (typeof item.label === "function") {
-                label = t(
-                  item.label(
-                    elements,
-                    appState,
-                    actionManager.app,
-                  ) as unknown as TranslationKeys,
+                const labelResult = item.label(
+                  elements,
+                  appState,
+                  actionManager.app,
                 );
+                // If the result contains a quote, it's likely a custom formatted string
+                // (e.g., "Add to library" "Collection Name"), so use it directly
+                if (
+                  typeof labelResult === "string" &&
+                  labelResult.includes('"')
+                ) {
+                  label = labelResult;
+                } else {
+                  label = t(labelResult as unknown as TranslationKeys);
+                }
               } else {
                 label = t(item.label as unknown as TranslationKeys);
               }

@@ -10,7 +10,7 @@ import { register } from "./register";
 export const actionAddToLibrary = register({
   name: "addToLibrary",
   trackEvent: { category: "element" },
-  perform: (elements, appState, _, app) => {
+  perform: (elements, appState, value, app) => {
     const selectedElements = app.scene.getSelectedElements({
       selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: true,
@@ -29,6 +29,14 @@ export const actionAddToLibrary = register({
       }
     }
 
+    // value can be a collectionId string or an object with collectionId
+    const collectionId =
+      typeof value === "string"
+        ? value
+        : value && typeof value === "object" && "collectionId" in value
+          ? (value as { collectionId: string }).collectionId
+          : undefined;
+
     return app.library
       .getLatestLibrary()
       .then((items) => {
@@ -38,6 +46,7 @@ export const actionAddToLibrary = register({
             status: "unpublished",
             elements: selectedElements.map(deepCopyElement),
             created: Date.now(),
+            collectionId,
           },
           ...items,
         ]);
