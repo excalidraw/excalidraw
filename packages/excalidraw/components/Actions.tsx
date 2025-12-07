@@ -1023,6 +1023,7 @@ export const MobileShapeActions = ({
       >
         <div className="compact-action-item">{renderAction("undo")}</div>
         <div className="compact-action-item">{renderAction("redo")}</div>
+        <div className="compact-action-item">{renderAction("clearHistory")}</div>
         {showDuplicateOutside && (
           <div className="compact-action-item">
             {renderAction("duplicateSelection")}
@@ -1303,6 +1304,19 @@ export const UndoRedoActions = ({
     </div>
     <div className="redo-button-container">
       <Tooltip label={t("buttons.redo")}> {renderAction("redo")}</Tooltip>
+    </div>
+    <div
+      style={{
+        width: "1px",
+        height: "24px",
+        backgroundColor: "var(--color-gray-30)",
+        margin: "0 4px",
+      }}
+    />
+    <div className="clear-history-button-container">
+      <Tooltip label={t("buttons.clearHistory")}>
+        {renderAction("clearHistory")}
+      </Tooltip>
     </div>
   </div>
 );
