@@ -21,7 +21,10 @@ import { libraryCollectionsAtom } from "../data/library";
 import { useAtom } from "../editor-jotai";
 
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
-import { CollectionHeaderDropdown, LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
+import {
+  CollectionHeaderDropdown,
+  LibraryDropdownMenu,
+} from "./LibraryMenuHeaderContent";
 import {
   LibraryMenuSection,
   LibraryMenuSectionGrid,
@@ -45,7 +48,6 @@ import type {
   ExcalidrawProps,
   LibraryItem,
   LibraryItems,
-  LibraryCollection,
   UIAppState,
 } from "../types";
 
@@ -56,9 +58,11 @@ const ITEMS_RENDERED_PER_BATCH = 17;
 // speed it up
 const CACHED_ITEMS_RENDERED_PER_BATCH = 64;
 
-const COLLECTION_COLLAPSE_STATE_KEY = "excalidraw-library-collection-collapse-state";
+const COLLECTION_COLLAPSE_STATE_KEY =
+  "excalidraw-library-collection-collapse-state";
 const PERSONAL_LIBRARY_COLLAPSE_KEY = "excalidraw-library-personal-collapsed";
-const EXCALIDRAW_LIBRARY_COLLAPSE_KEY = "excalidraw-library-excalidraw-collapsed";
+const EXCALIDRAW_LIBRARY_COLLAPSE_KEY =
+  "excalidraw-library-excalidraw-collapsed";
 
 export default function LibraryMenuItems({
   isLoading,
@@ -76,7 +80,10 @@ export default function LibraryMenuItems({
   libraryItems: LibraryItems;
   pendingElements: LibraryItem["elements"];
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
-  onAddToLibrary: (elements: LibraryItem["elements"], collectionId?: string) => void;
+  onAddToLibrary: (
+    elements: LibraryItem["elements"],
+    collectionId?: string,
+  ) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   theme: UIAppState["theme"];
   id: string;
@@ -102,10 +109,10 @@ export default function LibraryMenuItems({
   >(null);
 
   const [searchInputValue, setSearchInputValue] = useState("");
-  
+
   // Load Personal Library collapse state
-  const [isPersonalLibraryCollapsed, setIsPersonalLibraryCollapsed] =
-    useState(() => {
+  const [isPersonalLibraryCollapsed, setIsPersonalLibraryCollapsed] = useState(
+    () => {
       try {
         const saved = localStorage.getItem(PERSONAL_LIBRARY_COLLAPSE_KEY);
         return saved === "true";
@@ -113,8 +120,9 @@ export default function LibraryMenuItems({
         console.warn("Failed to load personal library collapse state:", error);
         return false;
       }
-    });
-  
+    },
+  );
+
   // Load Excalidraw Library collapse state
   const [isExcalidrawLibraryCollapsed, setIsExcalidrawLibraryCollapsed] =
     useState(() => {
@@ -122,13 +130,16 @@ export default function LibraryMenuItems({
         const saved = localStorage.getItem(EXCALIDRAW_LIBRARY_COLLAPSE_KEY);
         return saved === "true";
       } catch (error) {
-        console.warn("Failed to load excalidraw library collapse state:", error);
+        console.warn(
+          "Failed to load excalidraw library collapse state:",
+          error,
+        );
         return false;
       }
     });
-  
+
   const [libraryCollections] = useAtom(libraryCollectionsAtom);
-  
+
   // Load library collections collapse state
   const [customCollectionCollapsed, setCustomCollectionCollapsed] = useState<
     Record<string, boolean>
@@ -186,7 +197,7 @@ export default function LibraryMenuItems({
     const hasStaleKeys = Object.keys(customCollectionCollapsed).some(
       (id) => !collectionIds.has(id),
     );
-    
+
     if (hasStaleKeys) {
       setCustomCollectionCollapsed((prev) => {
         const cleaned: Record<string, boolean> = {};
@@ -198,7 +209,7 @@ export default function LibraryMenuItems({
         return cleaned;
       });
     }
-  }, [libraryCollections]);
+  }, [libraryCollections, customCollectionCollapsed]);
 
   const IS_LIBRARY_EMPTY = !libraryItems.length && !pendingElements.length;
 
@@ -399,14 +410,17 @@ export default function LibraryMenuItems({
   const JSX_whenNotSearching = !IS_SEARCHING && (
     <>
       {!IS_LIBRARY_EMPTY && (
-        <div
-          className="library-menu-items-container__header"
-        >
+        <div className="library-menu-items-container__header">
           <span
             onClick={() =>
               setIsPersonalLibraryCollapsed(!isPersonalLibraryCollapsed)
             }
-            style={{ display: "flex", alignItems: "center", flex: 1, cursor: "pointer" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              flex: 1,
+              cursor: "pointer",
+            }}
           >
             <span>{t("labels.personalLib")}</span>
             <span className="library-menu-items-container__header__arrow">
@@ -419,7 +433,7 @@ export default function LibraryMenuItems({
         (!pendingElements.length && !unpublishedItems.length ? (
           <div className="library-menu-items__no-items">
             {!publishedItems.length && (
-            <div className="library-menu-items__no-items__label">
+              <div className="library-menu-items__no-items__label">
                 {t("library.noItems")}
               </div>
             )}
@@ -491,7 +505,11 @@ export default function LibraryMenuItems({
                     "Rename collection",
                     collection.name,
                   );
-                  if (newName && newName.trim() && newName !== collection.name) {
+                  if (
+                    newName &&
+                    newName.trim() &&
+                    newName !== collection.name
+                  ) {
                     try {
                       await app.library.renameLibraryCollection(
                         collection.id,
@@ -506,9 +524,7 @@ export default function LibraryMenuItems({
                 }}
                 onDelete={async () => {
                   if (
-                    window.confirm(
-                      `Delete "${collection.name}" collection?`,
-                    )
+                    window.confirm(`Delete "${collection.name}" collection?`)
                   ) {
                     try {
                       await app.library.deleteLibraryCollection(collection.id);
@@ -587,7 +603,12 @@ export default function LibraryMenuItems({
             onClick={() =>
               setIsExcalidrawLibraryCollapsed(!isExcalidrawLibraryCollapsed)
             }
-            style={{ display: "flex", alignItems: "center", flex: 1, cursor: "pointer" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              flex: 1,
+              cursor: "pointer",
+            }}
           >
             <span>{t("labels.excalidrawLib")}</span>
             <span className="library-menu-items-container__header__arrow">

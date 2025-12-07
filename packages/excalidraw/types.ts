@@ -527,7 +527,10 @@ export type LibraryCollection = {
 };
 export type LibraryCollections = readonly LibraryCollection[];
 export type LibraryItems = readonly LibraryItem[];
-export type LibraryItems_anyVersion = LibraryItems | LibraryItems_v1 | LibraryCollections;
+export type LibraryItems_anyVersion =
+  | LibraryItems
+  | LibraryItems_v1
+  | LibraryCollections;
 
 export type LibraryItemsSource =
   | ((
@@ -611,7 +614,9 @@ export interface ExcalidrawProps {
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
-  onLibraryCollectionsChange?: (collections: LibraryCollections) => void | Promise<any>; 
+  onLibraryCollectionsChange?: (
+    collections: LibraryCollections,
+  ) => void | Promise<any>;
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
   generateLinkForSelection?: (id: string, type: "element" | "group") => string;
@@ -844,13 +849,21 @@ export interface ExcalidrawImperativeAPI {
   applyDeltas: InstanceType<typeof App>["applyDeltas"];
   mutateElement: InstanceType<typeof App>["mutateElement"];
   updateLibrary: InstanceType<typeof Library>["updateLibrary"];
-  createLibraryCollection: (name: string, color?: string) => Promise<LibraryCollection>;
+  createLibraryCollection: (
+    name: string,
+    color?: string,
+  ) => Promise<LibraryCollection>;
   deleteLibraryCollection: (collectionId: string) => Promise<void>;
-  renameLibraryCollection: (collectionId: string, newName: string) => Promise<void>;
+  renameLibraryCollection: (
+    collectionId: string,
+    newName: string,
+  ) => Promise<void>;
   moveUpCollection: (collectionId: string) => Promise<void>;
   moveDownCollection: (collectionId: string) => Promise<void>;
   getLibraryCollections: () => Promise<LibraryCollections>;
-  setLibraryCollection: (collections: LibraryCollections) => Promise<LibraryCollections>;
+  setLibraryCollection: (
+    collections: LibraryCollections,
+  ) => Promise<LibraryCollections>;
   resetScene: InstanceType<typeof App>["resetScene"];
   getSceneElementsIncludingDeleted: InstanceType<
     typeof App

@@ -5,10 +5,9 @@ import { vi } from "vitest";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
-import { UI } from "./helpers/ui";
 import { fireEvent, render } from "./test-utils";
 
-import type { LibraryItem, LibraryItems } from "../types";
+import type { LibraryItems } from "../types";
 
 const { h } = window;
 
@@ -37,8 +36,10 @@ describe("library collections", () => {
 
   describe("creating collections", () => {
     it("should create a new collection", async () => {
-      const collection = await h.app.library.createLibraryCollection("Test Collection");
-      
+      const collection = await h.app.library.createLibraryCollection(
+        "Test Collection",
+      );
+
       expect(collection).toMatchObject({
         id: expect.any(String),
         name: "Test Collection",
@@ -54,8 +55,8 @@ describe("library collections", () => {
     });
 
     it("should create multiple collections", async () => {
-      const collection1 = await h.app.library.createLibraryCollection("Collection 1");
-      const collection2 = await h.app.library.createLibraryCollection("Collection 2");
+      await h.app.library.createLibraryCollection("Collection 1");
+      await h.app.library.createLibraryCollection("Collection 2");
 
       const collections = await h.app.library.getCollections();
       expect(collections).toHaveLength(2);
@@ -67,8 +68,10 @@ describe("library collections", () => {
 
   describe("deleting collections", () => {
     it("should delete a collection", async () => {
-      const collection = await h.app.library.createLibraryCollection("To Delete");
-      
+      const collection = await h.app.library.createLibraryCollection(
+        "To Delete",
+      );
+
       let collections = await h.app.library.getCollections();
       expect(collections).toHaveLength(1);
 
@@ -79,8 +82,10 @@ describe("library collections", () => {
     });
 
     it("should delete collection and its items", async () => {
-      const collection = await h.app.library.createLibraryCollection("Collection with Items");
-      
+      const collection = await h.app.library.createLibraryCollection(
+        "Collection with Items",
+      );
+
       // Create library items with collectionId
       const rectangle = API.createElement({
         id: "rect1",
@@ -144,8 +149,10 @@ describe("library collections", () => {
 
   describe("adding items to collections", () => {
     it("should add item to collection with collectionId", async () => {
-      const collection = await h.app.library.createLibraryCollection("My Collection");
-      
+      const collection = await h.app.library.createLibraryCollection(
+        "My Collection",
+      );
+
       const rectangle = API.createElement({
         type: "rectangle",
       });
@@ -168,8 +175,10 @@ describe("library collections", () => {
     });
 
     it("should add multiple items to same collection", async () => {
-      const collection = await h.app.library.createLibraryCollection("Shared Collection");
-      
+      const collection = await h.app.library.createLibraryCollection(
+        "Shared Collection",
+      );
+
       const items: LibraryItems = [
         {
           id: "item1",
@@ -191,7 +200,9 @@ describe("library collections", () => {
 
       const allItems = await h.app.library.getLatestLibrary();
       expect(allItems).toHaveLength(2);
-      expect(allItems.every((item) => item.collectionId === collection.id)).toBe(true);
+      expect(
+        allItems.every((item) => item.collectionId === collection.id),
+      ).toBe(true);
     });
   });
 
@@ -213,8 +224,10 @@ describe("library collections", () => {
 
   describe("collection persistence", () => {
     it("should persist collections across app re-renders", async () => {
-      const collection = await h.app.library.createLibraryCollection("Persistent Collection");
-      
+      const collection = await h.app.library.createLibraryCollection(
+        "Persistent Collection",
+      );
+
       // Simulate re-render by getting collections again
       const collections = await h.app.library.getCollections();
       expect(collections).toHaveLength(1);
@@ -223,8 +236,10 @@ describe("library collections", () => {
     });
 
     it("should persist items with collectionId", async () => {
-      const collection = await h.app.library.createLibraryCollection("Collection");
-      
+      const collection = await h.app.library.createLibraryCollection(
+        "Collection",
+      );
+
       const items: LibraryItems = [
         {
           id: "item1",
@@ -247,7 +262,7 @@ describe("library collections", () => {
   describe("UI integration", () => {
     it("should create collection via UI dropdown menu", async () => {
       const { container } = await render(<Excalidraw />);
-      
+
       // Open library sidebar
       const libraryButton = container.querySelector(".sidebar-trigger");
       fireEvent.click(libraryButton!);
@@ -261,7 +276,10 @@ describe("library collections", () => {
       const libraryHeader = container.querySelector(
         ".library-menu-dropdown-container--in-heading",
       ) as HTMLElement;
-      const dropdownButton = queryByTestId(libraryHeader, "dropdown-menu-button");
+      const dropdownButton = queryByTestId(
+        libraryHeader,
+        "dropdown-menu-button",
+      );
       fireEvent.click(dropdownButton!);
 
       // Mock window.prompt to return a collection name
@@ -279,15 +297,21 @@ describe("library collections", () => {
       await waitFor(async () => {
         const collections = await h.app.library.getCollections();
         expect(collections.length).toBeGreaterThan(0);
-        expect(collections.some((c) => c.name === "UI Test Collection")).toBe(true);
+        expect(collections.some((c) => c.name === "UI Test Collection")).toBe(
+          true,
+        );
       });
     });
   });
 
   describe("collection and items relationship", () => {
     it("should filter items by collection", async () => {
-      const collection1 = await h.app.library.createLibraryCollection("Collection 1");
-      const collection2 = await h.app.library.createLibraryCollection("Collection 2");
+      const collection1 = await h.app.library.createLibraryCollection(
+        "Collection 1",
+      );
+      const collection2 = await h.app.library.createLibraryCollection(
+        "Collection 2",
+      );
 
       const items: LibraryItems = [
         {
@@ -337,7 +361,9 @@ describe("library collections", () => {
     });
 
     it("should handle items when collection is deleted", async () => {
-      const collection = await h.app.library.createLibraryCollection("Temp Collection");
+      const collection = await h.app.library.createLibraryCollection(
+        "Temp Collection",
+      );
 
       const items: LibraryItems = [
         {
@@ -367,4 +393,3 @@ describe("library collections", () => {
     });
   });
 });
-

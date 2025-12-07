@@ -34,8 +34,8 @@ export const actionAddToLibrary = register({
       typeof value === "string"
         ? value
         : value && typeof value === "object" && "collectionId" in value
-          ? (value as { collectionId: string }).collectionId
-          : undefined;
+        ? (value as { collectionId: string }).collectionId
+        : undefined;
 
     return app.library
       .getLatestLibrary()

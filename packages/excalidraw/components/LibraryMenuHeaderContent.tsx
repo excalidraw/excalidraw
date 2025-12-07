@@ -6,7 +6,7 @@ import { muteFSAbortError } from "@excalidraw/common";
 import { useUIAppState } from "../context/ui-appState";
 import { fileOpen } from "../data/filesystem";
 import { saveLibraryAsJSON } from "../data/json";
-import { libraryItemsAtom, libraryCollectionsAtom } from "../data/library";
+import { libraryItemsAtom } from "../data/library";
 import { useAtom } from "../editor-jotai";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { t } from "../i18n";
@@ -58,7 +58,6 @@ export const LibraryDropdownMenuButton: React.FC<{
   className,
 }) => {
   const [libraryItemsData] = useAtom(libraryItemsAtom);
-  const [libraryCollections] = useAtom(libraryCollectionsAtom);
   const [isLibraryMenuOpen, setIsLibraryMenuOpen] = useAtom(
     isLibraryMenuOpenAtom,
   );
@@ -304,7 +303,15 @@ export const CollectionHeaderDropdown: React.FC<{
   onMoveDown?: () => void;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
-}> = ({ collectionName, onRename, onDelete, onMoveUp, onMoveDown, canMoveUp = false, canMoveDown = false }) => {
+}> = ({
+  collectionName,
+  onRename,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+  canMoveUp = false,
+  canMoveDown = false,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -348,7 +355,11 @@ export const CollectionHeaderDropdown: React.FC<{
           {onMoveUp && canMoveUp && (
             <DropdownMenu.Item
               onSelect={onMoveUp}
-              icon={<div style={{ transform: "rotate(-90deg)" }}>{ArrowRightIcon}</div>}
+              icon={
+                <div style={{ transform: "rotate(-90deg)" }}>
+                  {ArrowRightIcon}
+                </div>
+              }
               data-testid="collection-dropdown--move-up"
             >
               Move Up
@@ -357,7 +368,11 @@ export const CollectionHeaderDropdown: React.FC<{
           {onMoveDown && canMoveDown && (
             <DropdownMenu.Item
               onSelect={onMoveDown}
-              icon={<div style={{ transform: "rotate(90deg)" }}>{ArrowRightIcon}</div>}
+              icon={
+                <div style={{ transform: "rotate(90deg)" }}>
+                  {ArrowRightIcon}
+                </div>
+              }
               data-testid="collection-dropdown--move-down"
             >
               Move Down
