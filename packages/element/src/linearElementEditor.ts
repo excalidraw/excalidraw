@@ -26,7 +26,6 @@ import {
 
 import {
   deconstructLinearOrFreeDrawElement,
-  getHoveredElementForBinding,
   isPathALoop,
   moveArrowAboveBindable,
   projectFixedPointOntoDiagonal,
@@ -306,21 +305,11 @@ export class LinearElementEditor {
     const customLineAngle =
       linearElementEditor.customLineAngle ??
       determineCustomLinearAngle(pivotPoint, element.points[idx]);
-    const hoveredElement = getHoveredElementForBinding(
-      pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-      elements,
-      elementsMap,
-    );
 
     // Determine if point movement should happen and how much
     let deltaX = 0;
     let deltaY = 0;
-    if (
-      shouldRotateWithDiscreteAngle(event) &&
-      !hoveredElement &&
-      !element.startBinding &&
-      !element.endBinding
-    ) {
+    if (shouldRotateWithDiscreteAngle(event)) {
       const [width, height] = LinearElementEditor._getShiftLockedDelta(
         element,
         elementsMap,
@@ -358,7 +347,7 @@ export class LinearElementEditor {
       element,
       elements,
       app,
-      event.shiftKey,
+      shouldRotateWithDiscreteAngle(event),
       event.altKey,
     );
 
@@ -492,22 +481,11 @@ export class LinearElementEditor {
     const endIsSelected = selectedPointsIndices.includes(
       element.points.length - 1,
     );
-    const hoveredElement = getHoveredElementForBinding(
-      pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-      elements,
-      elementsMap,
-    );
 
     // Determine if point movement should happen and how much
     let deltaX = 0;
     let deltaY = 0;
-    if (
-      shouldRotateWithDiscreteAngle(event) &&
-      singlePointDragged &&
-      !hoveredElement &&
-      !element.startBinding &&
-      !element.endBinding
-    ) {
+    if (shouldRotateWithDiscreteAngle(event) && singlePointDragged) {
       const [width, height] = LinearElementEditor._getShiftLockedDelta(
         element,
         elementsMap,
@@ -545,7 +523,7 @@ export class LinearElementEditor {
       element,
       elements,
       app,
-      event.shiftKey,
+      shouldRotateWithDiscreteAngle(event) && singlePointDragged,
       event.altKey,
     );
 
@@ -2092,7 +2070,7 @@ const pointDraggingUpdates = (
   element: NonDeleted<ExcalidrawLinearElement>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   app: AppClassProperties,
-  shiftKey: boolean,
+  angleLocked: boolean,
   altKey: boolean,
 ): {
   positions: PointsPositionUpdates;
@@ -2133,7 +2111,7 @@ const pointDraggingUpdates = (
     app.state,
     {
       newArrow: !!app.state.newElement,
-      shiftKey,
+      angleLocked,
       altKey,
     },
   );
