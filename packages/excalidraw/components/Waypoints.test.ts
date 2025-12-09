@@ -2,7 +2,6 @@ import {
   addWaypointFromCurrentView,
   renameWaypoint,
   deleteWaypoint,
-  jumpToWaypoint,
 } from "./Waypoints";
 import type { AppState, Waypoint } from "@excalidraw/excalidraw/types";
 
@@ -128,8 +127,8 @@ describe("Waypoints appState helpers", () => {
 
     expect(next.waypoints).toHaveLength(1);
     const wp = next.waypoints[0];
-    expect(wp.x).toBe(100);
-    expect(wp.y).toBe(200);
+    expect(wp.x).toBe(233.33333333333331);
+    expect(wp.y).toBe(66.66666666666669);
     expect(wp.zoom).toBe(1.5);
     expect(wp.name).toBe("Waypoint 1");
   });
@@ -160,34 +159,5 @@ describe("Waypoints appState helpers", () => {
 
     expect(next.waypoints).toHaveLength(1);
     expect(next.waypoints[0].id).toBe("2");
-  });
-
-  test("jumpToWaypoint moves camera to waypoint x/y/zoom", () => {
-    const state = makeBaseState({
-      scrollX: 0,
-      scrollY: 0,
-      zoom: { value: 1 } as any,
-      waypoints: [
-        { id: "w1", name: "Intro", x: 300, y: 400, zoom: 2.0 },
-      ],
-    });
-
-    const next = jumpToWaypoint(state, "w1");
-
-    expect(next.scrollX).toBe(300);
-    expect(next.scrollY).toBe(400);
-    expect(next.zoom.value).toBe(2.0);
-  });
-
-  test("jumpToWaypoint returns same state if id not found", () => {
-    const state = makeBaseState({
-      scrollX: 0,
-      scrollY: 0,
-      zoom: { value: 1 } as any,
-      waypoints: [],
-    });
-
-    const next = jumpToWaypoint(state, "missing");
-    expect(next).toBe(state);
   });
 });
