@@ -1,0 +1,60 @@
+/* Waypoint Canvas Overlay Styles */
+
+.waypoint-canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 10;
+}
+
+.waypoint-marker {
+  cursor: pointer;
+  transition: transform 0.15s ease-in-out;
+}
+
+.waypoint-marker:hover polygon {
+  fill: #5753c9;
+  stroke: #3d3a8c;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.waypoint-marker:active polygon {
+  fill: #4a47a3;
+}
+
+/* Animation for newly added waypoints */
+@keyframes waypoint-appear {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.waypoint-marker--new {
+  animation: waypoint-appear 0.3s ease-out;
+}
+
+/* Pulse animation for the currently selected/active waypoint */
+@keyframes waypoint-pulse {
+  0%, 100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.waypoint-marker--active polygon {
+  animation: waypoint-pulse 1.5s ease-in-out infinite;
+}

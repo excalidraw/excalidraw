@@ -1,6 +1,6 @@
 import { WaypointCanvasOverlay } from "./WaypointCanvasOverlay";
 import "./WaypointCanvasOverlay.css";
-import { jumpToWaypoint } from "./Waypoints";
+import { jumpToWaypoint, updateWaypointPosition } from "./Waypoints";
 
 import clsx from "clsx";
 import throttle from "lodash.throttle";
@@ -1928,6 +1928,9 @@ class App extends React.Component<AppProps, AppState> {
         <WaypointCanvasOverlay
           appState={this.state}
           onJump={(id) => this.setState((prev) => jumpToWaypoint(prev, id))}
+          onUpdate={(id, x, y) =>
+            this.setState((prev) => updateWaypointPosition(prev, id, x, y))
+          }
         />
 
         <AppContext.Provider value={this}>
