@@ -254,6 +254,12 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      *  with font size (using `getLineHeightInPx` helper).
      */
     lineHeight: number & { _brand: "unitlessLineHeight" };
+    /**
+     * Text formatting properties
+     */
+    bold: boolean;
+    italic: boolean;
+    underline: boolean;
   }>;
 
 export type ExcalidrawBindableElement =

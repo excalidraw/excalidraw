@@ -66,4 +66,7 @@ export const textFixture: ExcalidrawElement = {
   containerId: null,
   lineHeight: 1.25 as any,
   autoResize: false,
+  bold: false,
+  italic: false,
+  underline: false,
 };
