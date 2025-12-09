@@ -356,14 +356,14 @@ export const getDefaultRoundnessTypeForElement = (
   return null;
 };
 
-// TODO: Move this to @excalidraw/math
-export const isBounds = (box: unknown): box is Bounds =>
-  Array.isArray(box) &&
-  box.length === 4 &&
-  typeof box[0] === "number" &&
-  typeof box[1] === "number" &&
-  typeof box[2] === "number" &&
-  typeof box[3] === "number";
+export const isFixedPointBinding = (
+  binding: PointBinding | FixedPointBinding,
+): binding is FixedPointBinding => {
+  return (
+    Object.hasOwn(binding, "fixedPoint") &&
+    (binding as FixedPointBinding).fixedPoint != null
+  );
+};
 
 export const getLinearElementSubType = (
   element: ExcalidrawLinearElement,
