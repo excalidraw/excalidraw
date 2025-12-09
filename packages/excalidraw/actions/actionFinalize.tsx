@@ -18,6 +18,7 @@ import {
   KEYS,
   arrayToMap,
   invariant,
+  shouldRotateWithDiscreteAngle,
   updateActiveTool,
 } from "@excalidraw/common";
 import { isPathALoop } from "@excalidraw/element";
@@ -105,6 +106,7 @@ export const actionFinalize = register<FormData>({
         bindOrUnbindBindingElement(element, draggedPoints, scene, appState, {
           newArrow,
           altKey: event.altKey,
+          angleLocked: shouldRotateWithDiscreteAngle(event),
         });
       } else if (isLineElement(element)) {
         if (

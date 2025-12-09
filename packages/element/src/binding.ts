@@ -151,6 +151,7 @@ export const bindOrUnbindBindingElement = (
   opts?: {
     newArrow?: boolean;
     altKey?: boolean;
+    angleLocked?: boolean;
     initialBinding?: boolean;
   },
 ) => {
@@ -561,7 +562,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
   appState: AppState,
   opts?: {
     newArrow?: boolean;
-    shiftKey?: boolean;
+    angleLocked?: boolean;
     altKey?: boolean;
     finalize?: boolean;
     initialBinding?: boolean;
@@ -597,7 +598,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   appState: AppState,
   opts?: {
     newArrow?: boolean;
-    shiftKey?: boolean;
+    angleLocked?: boolean;
     altKey?: boolean;
     finalize?: boolean;
     initialBinding?: boolean;
@@ -770,6 +771,12 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
         }
     : { mode: null };
 
+  const otherEndpoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startDragged ? -1 : 0,
+    elementsMap,
+  );
+
   const other: BindingStrategy =
     otherBindableElement &&
     !otherFocusPointIsInElement &&
@@ -778,6 +785,19 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           mode: "orbit",
           element: otherBindableElement,
           focusPoint: appState.selectedLinearElement.initialState.altFocusPoint,
+        }
+      : opts?.angleLocked && otherBindableElement
+      ? {
+          mode: "orbit",
+          element: otherBindableElement,
+          focusPoint:
+            projectFixedPointOntoDiagonal(
+              arrow,
+              otherEndpoint,
+              otherBindableElement,
+              startDragged ? "end" : "start",
+              elementsMap,
+            ) || otherEndpoint,
         }
       : { mode: undefined };
 
