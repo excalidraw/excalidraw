@@ -41,7 +41,7 @@ function waypointToScreenPosition(
 }
 
 /**
- * Diamond-shaped waypoint marker component
+ * Pin-shaped waypoint marker component
  */
 const WaypointMarker: React.FC<WaypointMarkerProps> = ({
   waypoint,
@@ -51,13 +51,11 @@ const WaypointMarker: React.FC<WaypointMarkerProps> = ({
   onUpdate,
   appState,
 }) => {
-  const size = 24;
-  const halfSize = size / 2;
   const [isDragging, setIsDragging] = useState(false);
   const [hasDragged, setHasDragged] = useState(false);
 
-  // Diamond shape points (rotated square)
-  const points = `${x},${y - halfSize} ${x + halfSize},${y} ${x},${y + halfSize} ${x - halfSize},${y}`;
+  const PIN_PATH =
+    "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z";
 
   const handlePointerDown = (e: React.PointerEvent) => {
     e.stopPropagation();
@@ -112,28 +110,31 @@ const WaypointMarker: React.FC<WaypointMarkerProps> = ({
       onPointerUp={handlePointerUp}
       style={{ cursor: isDragging ? "grabbing" : "grab" }}
     >
-      {/* Diamond shape */}
-      <polygon
-        points={points}
-        fill="#6965db"
-        stroke="#4a47a3"
-        strokeWidth={2}
-        opacity={0.9}
-      />
+      <g transform={`translate(${x}, ${y})`}>
+        <g transform="scale(1.5) translate(-12, -9)">
+          <path
+            d={PIN_PATH}
+            fill="#6965db"
+            stroke="#4a47a3"
+            strokeWidth="1"
+            opacity={0.9}
+          />
+          <circle cx="12" cy="9" r="5.5" fill="white" />
+        </g>
 
-      {/* Waypoint label in center */}
-      <text
-        x={x}
-        y={y}
-        textAnchor="middle"
-        dominantBaseline="central"
-        fill="white"
-        fontSize={10}
-        fontWeight="bold"
-        style={{ pointerEvents: "none", userSelect: "none" }}
-      >
-        {waypoint.name.slice(0, 2).toUpperCase()}
-      </text>
+        <text
+          x={0}
+          y={0}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill="#6965db"
+          fontSize={11}
+          fontWeight="bold"
+          style={{ pointerEvents: "none", userSelect: "none" }}
+        >
+          {waypoint.name.slice(0, 2).toUpperCase()}
+        </text>
+      </g>
 
       {/* Tooltip on hover */}
       <title>{waypoint.name} (click to jump, drag to move)</title>
