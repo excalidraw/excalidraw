@@ -2373,3 +2373,37 @@ export const presentationIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+export const crossArrowsIcon = createIcon(
+  <g transform="translate(1.6 1.6) scale(1.3)">
+    <path d="M8 1v3M8 12v3M1 8h3M12 8h3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M8 1l-1.75 1.75M8 1l1.75 1.75M8 15l-1.75-1.75M8 15l1.75-1.75M1 8l1.75-1.75M1 8l1.75 1.75M15 8l-1.75-1.75M15 8l-1.75 1.75" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity="0.85"/>
+  </g>,
+  tablerIconProps,
+);
+
+export const upDownIcon = createIcon(
+  <g transform="translate(1.6 1.6) scale(1.3)">
+    <path d="M8 2v12" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M5 5l3-3 3 3" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M5 11l3 3 3-3" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+  </g>,
+  tablerIconProps,
+);
+
+export const leftRightIcon = createIcon(
+  <g transform="translate(1.6 1.6) scale(1.3)">
+    <path d="M2 8h12" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M5 5l-3 3 3 3" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M11 5l3 3-3 3" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+  </g>,
+  tablerIconProps,
+);
+
+export const noPanningIcon = createIcon(
+  <g transform="translate(1.6 1.6) scale(1.3)">
+    <circle cx="8" cy="8" r="5" strokeWidth="1.4" />
+    <path d="M4.5 4.5l7 7" strokeWidth="1.4" strokeLinecap="round" />
+  </g>,
+  tablerIconProps,
+);

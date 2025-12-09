@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
+import { noPanningIcon,leftRightIcon, upDownIcon, crossArrowsIcon  } from "./icons";
 
 import {
   CLASSES,
@@ -1304,36 +1305,6 @@ const PanningModeControl = () => {
     setOpen(false);
   };
 
-  const CrossArrowsIcon = (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M8 1v3M8 12v3M1 8h3M12 8h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M8 1l-1.75 1.75M8 1l1.75 1.75M8 15l-1.75-1.75M8 15l1.75-1.75M1 8l1.75-1.75M1 8l1.75 1.75M15 8l-1.75-1.75M15 8l-1.75 1.75" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity="0.85"/>
-    </svg>
-  );
-
-  const UpDownIcon = (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M8 2v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M5 5l3-3 3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M5 11l3 3 3-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-
-  const LeftRightIcon = (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M2 8h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M5 5l-3 3 3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M11 5l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-
-  const NoPanningIcon = (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="8" cy="8" r="5" stroke="currentColor" strokeWidth="1.4" />
-      <path d="M4.5 4.5l7 7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-    </svg>
-  );
-
   return (
     <DropdownMenu open={open} placement="top">
       <DropdownMenu.Trigger
@@ -1351,28 +1322,28 @@ const PanningModeControl = () => {
         <DropdownMenu.Item
           onSelect={() => setMode("free")}
           selected={appState.panningMode === "free"}
-          icon={CrossArrowsIcon}
+          icon={crossArrowsIcon}
         >
           {t("labels.freeMode")}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onSelect={() => setMode("fixed")}
           selected={appState.panningMode === "fixed"}
-          icon={NoPanningIcon}
+          icon={noPanningIcon}
         >
           {t("labels.fixedMode")}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onSelect={() => setMode("horizontalFixed")}
           selected={appState.panningMode === "horizontalFixed"}
-          icon={UpDownIcon}
+          icon={upDownIcon}
         >
           {t("labels.horizontalFixedMode")}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onSelect={() => setMode("verticalFixed")}
           selected={appState.panningMode === "verticalFixed"}
-          icon={LeftRightIcon}
+          icon={leftRightIcon}
         >
           {t("labels.horizontalFixedMode")}
         </DropdownMenu.Item>
