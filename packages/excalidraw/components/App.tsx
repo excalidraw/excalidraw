@@ -9456,7 +9456,12 @@ startLineEditor = (
           ]),
           this.scene,
           this.state,
-          { newArrow: true, altKey: event.altKey, initialBinding: true },
+          {
+            newArrow: true,
+            altKey: event.altKey,
+            initialBinding: true,
+            angleLocked: shouldRotateWithDiscreteAngle(event.nativeEvent),
+          },
         );
       }
 
