@@ -410,6 +410,7 @@ export const DEFAULT_ELEMENT_PROPS: {
   roughness: ExcalidrawElement["roughness"];
   opacity: ExcalidrawElement["opacity"];
   locked: ExcalidrawElement["locked"];
+  containerBehavior: ExcalidrawElement["containerBehavior"];
 } = {
   strokeColor: COLOR_PALETTE.black,
   backgroundColor: COLOR_PALETTE.transparent,
@@ -419,6 +420,10 @@ export const DEFAULT_ELEMENT_PROPS: {
   roughness: ROUGHNESS.artist,
   opacity: 100,
   locked: false,
+  containerBehavior: {
+    textFlow: "growing",
+    margin: BOUND_TEXT_PADDING,
+  },
 };
 
 export const LIBRARY_SIDEBAR_TAB = "library";

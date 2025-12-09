@@ -272,15 +272,12 @@ export const isExcalidrawElement = (
   }
 };
 
+export const isFlowchartType = (type: string): boolean =>
+  ["rectangle", "ellipse", "diamond"].includes(type);
+
 export const isFlowchartNodeElement = (
   element: ExcalidrawElement,
-): element is ExcalidrawFlowchartNodeElement => {
-  return (
-    element.type === "rectangle" ||
-    element.type === "ellipse" ||
-    element.type === "diamond"
-  );
-};
+): element is ExcalidrawFlowchartNodeElement => isFlowchartType(element.type);
 
 export const hasBoundTextElement = (
   element: ExcalidrawElement | null,

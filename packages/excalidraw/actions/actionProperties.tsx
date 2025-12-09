@@ -21,10 +21,16 @@ import {
   getLineHeight,
   isTransparent,
   reduceToCommonValue,
+  BOUND_TEXT_PADDING,
   invariant,
 } from "@excalidraw/common";
 
-import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
+import {
+  canBecomePolygon,
+  getNonDeletedElements,
+  hasContainerBehavior,
+  isFlowchartNodeElement,
+} from "@excalidraw/element";
 
 import {
   bindBindingElement,
@@ -65,6 +71,7 @@ import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
   Arrowhead,
+  ContainerBehavior,
   ElementsMap,
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -126,6 +133,11 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  stickyNoteIcon,
+  growingContainerIcon,
+  marginLargeIcon,
+  marginMediumIcon,
+  marginSmallIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -1542,6 +1554,275 @@ export const actionChangeRoundness = register<"sharp" | "round">({
             onChange={(value) => updateData(value)}
           />
           {renderAction("togglePolygon")}
+        </div>
+      </fieldset>
+    );
+  },
+});
+
+const getMargin = (value: "small" | "medium" | "large") => {
+  switch (value) {
+    case "small":
+      return BOUND_TEXT_PADDING;
+    case "medium":
+      return 15;
+    case "large":
+      return 25;
+    default:
+      return BOUND_TEXT_PADDING;
+  }
+};
+
+const getMarginValue = (margin: number | null) => {
+  if (margin === null) {
+    return null;
+  }
+  switch (margin) {
+    case BOUND_TEXT_PADDING:
+      return "small";
+    case 15:
+      return "medium";
+    case 25:
+      return "large";
+    default:
+      return null;
+  }
+};
+
+export const actionChangeContainerBehavior = register<
+  | { textFlow: ContainerBehavior["textFlow"] }
+  | { margin: NonNullable<ReturnType<typeof getMarginValue>> }
+>({
+  name: "changeContainerBehavior",
+  label: "labels.container",
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    invariant(value, "actionChangeContainerBehavior: value must be defined");
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+    let selected = getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+    });
+
+    if (selected.length === 0 && appState.editingTextElement) {
+      selected = [appState.editingTextElement];
+    }
+
+    const containerIdsToUpdate = new Set<string>();
+
+    // collect directly selected eligible containers
+    for (const el of selected) {
+      if (isFlowchartNodeElement(el)) {
+        containerIdsToUpdate.add(el.id);
+      }
+    }
+
+    // if none, and exactly one selected text element -> use its container if eligible
+    if (
+      containerIdsToUpdate.size === 0 &&
+      selected.length === 1 &&
+      isTextElement(selected[0]) &&
+      selected[0].containerId
+    ) {
+      const container = elementsMap.get(selected[0].containerId);
+      if (
+        container &&
+        isFlowchartNodeElement(container) &&
+        getBoundTextElement(container, elementsMap)
+      ) {
+        containerIdsToUpdate.add(container.id);
+      }
+    }
+
+    if ("margin" in value) {
+      const marginSize = getMargin(value.margin);
+      if (containerIdsToUpdate.size === 0) {
+        return {
+          appState: {
+            ...appState,
+            currentItemContainerBehavior: {
+              textFlow:
+                appState.currentItemContainerBehavior?.textFlow ?? "growing",
+              margin: marginSize,
+            },
+          },
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        };
+      }
+      const nextElements = elements.map((el) =>
+        containerIdsToUpdate.has(el.id)
+          ? newElementWith(el, {
+              containerBehavior: {
+                textFlow: el.containerBehavior?.textFlow ?? "growing",
+                margin: marginSize,
+              },
+            })
+          : el,
+      );
+      // Invalidate containers to trigger re-render
+      containerIdsToUpdate.forEach((id) => {
+        const container = nextElements.find((el) => el.id === id);
+        if (container) {
+          const boundText = getBoundTextElement(
+            container,
+            arrayToMap(nextElements),
+          );
+          if (boundText) {
+            redrawTextBoundingBox(boundText, container, app.scene);
+          }
+        }
+      });
+
+      return {
+        elements: nextElements,
+        appState: {
+          ...appState,
+          currentItemContainerBehavior: {
+            textFlow:
+              appState.currentItemContainerBehavior?.textFlow ?? "growing",
+            margin: marginSize,
+          },
+        },
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      };
+    }
+    const textFlow = value.textFlow;
+    const nextElements = elements.map((el) =>
+      containerIdsToUpdate.has(el.id)
+        ? newElementWith(el, {
+            containerBehavior: {
+              textFlow,
+              margin: el.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
+            },
+          })
+        : el,
+    );
+    return {
+      elements: nextElements,
+      appState: {
+        ...appState,
+        currentItemContainerBehavior: {
+          textFlow,
+          margin:
+            appState.currentItemContainerBehavior?.margin ?? BOUND_TEXT_PADDING,
+        },
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+    let selected = getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+    });
+
+    if (selected.length === 0 && appState.editingTextElement) {
+      selected = [appState.editingTextElement];
+    }
+
+    let targetContainers: ExcalidrawElement[] = [];
+
+    // case 1: one text element selected -> target its container if eligible
+    if (
+      selected.length === 1 &&
+      isTextElement(selected[0]) &&
+      selected[0].containerId
+    ) {
+      const container = elementsMap.get(selected[0].containerId);
+      if (
+        container &&
+        isFlowchartNodeElement(container) &&
+        getBoundTextElement(container, elementsMap)
+      ) {
+        targetContainers = [container];
+      }
+    } else {
+      // case 2: any eligible containers directly selected
+      targetContainers = selected.filter((el) => isFlowchartNodeElement(el));
+    }
+
+    if (
+      targetContainers.length === 0 &&
+      !hasContainerBehavior(appState.activeTool.type)
+    ) {
+      return null;
+    }
+
+    const textFlow =
+      targetContainers.length === 0
+        ? appState.currentItemContainerBehavior?.textFlow ?? "growing"
+        : reduceToCommonValue(
+            targetContainers,
+            (el) => el.containerBehavior?.textFlow ?? "growing",
+          ) ??
+          // mixed selection -> show null so nothing appears selected
+          null;
+
+    const marginValue =
+      targetContainers.length === 0
+        ? appState.currentItemContainerBehavior?.margin ?? BOUND_TEXT_PADDING
+        : reduceToCommonValue(
+            targetContainers,
+            (el) => el.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
+          ) ??
+          // mixed selection -> show null so nothing appears selected
+          null;
+
+    return (
+      <fieldset>
+        <legend>{t("labels.container")}</legend>
+        <div className="buttonList">
+          <RadioSelection
+            group="container"
+            options={[
+              {
+                value: "growing",
+                text: t("labels.container_growing"),
+                icon: growingContainerIcon,
+              },
+              {
+                value: "fixed",
+                text: t("labels.container_fixed"),
+                icon: stickyNoteIcon,
+              },
+            ]}
+            value={
+              textFlow ??
+              (targetContainers.length
+                ? null
+                : appState.currentItemContainerBehavior?.textFlow ?? "growing")
+            }
+            onChange={(val) => updateData({ textFlow: val })}
+          />
+        </div>
+        <div className="buttonList">
+          <RadioSelection
+            group="container"
+            options={[
+              {
+                value: "small",
+                text: t("labels.container_margin_small"),
+                icon: marginSmallIcon,
+              },
+              {
+                value: "medium",
+                text: t("labels.container_margin_medium"),
+                icon: marginMediumIcon,
+              },
+              {
+                value: "large",
+                text: t("labels.container_margin_large"),
+                icon: marginLargeIcon,
+              },
+            ]}
+            value={getMarginValue(
+              marginValue ??
+                (targetContainers.length
+                  ? null
+                  : appState.currentItemContainerBehavior?.margin ??
+                    BOUND_TEXT_PADDING),
+            )}
+            onChange={(val) => updateData({ margin: val })}
+          />
         </div>
       </fieldset>
     );
