@@ -264,11 +264,12 @@ export type ObservedElementsAppState = {
   activeLockedId: AppState["activeLockedId"];
 };
 //Saved camera position that the user can jump back to from the Waypoints sidebar.
+//Stores scene coordinates (like element x/y), not scroll/viewport coordinates
 export interface Waypoint {
   id: string;
   name: string;
-  x: number;
-  y: number;
+  x: number; // scene x coordinate
+  y: number; // scene y coordinate
   zoom: number;
 }
 export interface AppState {
@@ -360,7 +361,6 @@ export interface AppState {
   scrollY: number;
   //List of the saved camera bookmarks for the Waypoints sidebar
   waypoints: Waypoint[];
-  isPlacingWaypoint: boolean;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string | null;

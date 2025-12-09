@@ -85,7 +85,7 @@ export const DefaultSidebar = Object.assign(
       
       // Add a new waypoint based on the current canvas view
       const handleAddWaypoint = () => {
-        setAppState((prev) => ({ ...prev, isPlacingWaypoint: true }));
+        setAppState((prev) => addWaypointFromCurrentView(prev));
       };
       
       // Rename an existing waypoint

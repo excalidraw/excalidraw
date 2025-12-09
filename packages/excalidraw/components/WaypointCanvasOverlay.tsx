@@ -1,13 +1,15 @@
-import React from "react";
-
+import React, { useState } from "react";
+import {
+  sceneCoordsToViewportCoords,
+  viewportCoordsToSceneCoords,
+} from "@excalidraw/common";
 
 import type { AppState, Waypoint } from "../types";
 
 interface WaypointCanvasOverlayProps {
   appState: AppState;
   onJump: (id: string) => void;
-  onPlaceWaypoint: (canvasX: number, canvasY: number) => void;
-  onCancelPlacement: () => void;
+  onUpdate: (id: string, x: number, y: number) => void;
 }
 
 interface WaypointMarkerProps {
@@ -15,75 +17,127 @@ interface WaypointMarkerProps {
   x: number;
   y: number;
   onJump: (id: string) => void;
+  onUpdate: (id: string, x: number, y: number) => void;
+  appState: AppState;
 }
 
 /**
- * Converts a waypoint's scroll position to canvas screen coordinates.
+ * Converts a waypoint's scene position to viewport screen coordinates.
  * 
- * The waypoint stores the scrollX/scrollY when created. To show where that
- * viewport "center" would appear on the current view, we calculate the difference
- * between the saved scroll position and current scroll position.
+ * The waypoint stores scene coordinates (like element x/y). We convert these
+ * to viewport coordinates using the current camera state (scroll and zoom).
  */
 function waypointToScreenPosition(
   waypoint: Waypoint,
   appState: AppState,
-  canvasWidth: number,
-  canvasHeight: number,
 ): { x: number; y: number } {
-  // Converting canvas coordinates to screen position
-  const screenX = canvasWidth / 2 + (waypoint.x + appState.scrollX) * appState.zoom.value;
-  const screenY = canvasHeight / 2 + (waypoint.y + appState.scrollY) * appState.zoom.value;
+  // Convert scene coordinates to viewport coordinates
+  const viewportCoords = sceneCoordsToViewportCoords(
+    { sceneX: waypoint.x, sceneY: waypoint.y },
+    appState,
+  );
 
-  return { x: screenX, y: screenY };
+  return { x: viewportCoords.x, y: viewportCoords.y };
 }
 
 /**
- * Diamond-shaped waypoint marker component
+ * Pin-shaped waypoint marker component
  */
 const WaypointMarker: React.FC<WaypointMarkerProps> = ({
   waypoint,
   x,
   y,
   onJump,
+  onUpdate,
+  appState,
 }) => {
-  const size = 24;
-  const halfSize = size / 2;
+  const [isDragging, setIsDragging] = useState(false);
+  const [hasDragged, setHasDragged] = useState(false);
 
-  // Diamond shape points (rotated square)
-  const points = `${x},${y - halfSize} ${x + halfSize},${y} ${x},${y + halfSize} ${x - halfSize},${y}`;
+  const PIN_PATH =
+    "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z";
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    e.stopPropagation();
+    // Only left click
+    if (e.button !== 0) {
+      return;
+    }
+
+    setIsDragging(true);
+    setHasDragged(false);
+    (e.target as Element).setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDragging) {
+      return;
+    }
+    e.stopPropagation();
+
+    setHasDragged(true);
+
+    const sceneCoords = viewportCoordsToSceneCoords(
+      { clientX: e.clientX, clientY: e.clientY },
+      appState,
+    );
+
+    onUpdate(waypoint.id, sceneCoords.x, sceneCoords.y);
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDragging) {
+      return;
+    }
+    e.stopPropagation();
+    setIsDragging(false);
+    (e.target as Element).releasePointerCapture(e.pointerId);
+  };
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onJump(waypoint.id);
+    if (!hasDragged) {
+      onJump(waypoint.id);
+    }
   };
 
   return (
-    <g className="waypoint-marker" onClick={handleClick} style={{ cursor: "pointer" }}>
-      {/* Diamond shape */}
-      <polygon
-        points={points}
-        fill="#6965db"
-        stroke="#4a47a3"
-        strokeWidth={2}
-        opacity={0.9}
-      />
+    <g
+      className="waypoint-marker"
+      onClick={handleClick}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      style={{ cursor: isDragging ? "grabbing" : "grab" }}
+    >
+      <g transform={`translate(${x}, ${y})`}>
+        <g transform="scale(1.5) translate(-12, -9)">
+          <path
+            d={PIN_PATH}
+            fill="#6965db"
+            stroke="#4a47a3"
+            strokeWidth="1"
+            opacity={0.9}
+          />
+          <circle cx="12" cy="9" r="5.5" fill="white" />
+        </g>
 
-      {/* Waypoint label in center */}
-      <text
-        x={x}
-        y={y}
-        textAnchor="middle"
-        dominantBaseline="central"
-        fill="white"
-        fontSize={10}
-        fontWeight="bold"
-        style={{ pointerEvents: "none", userSelect: "none" }}
-      >
-        {waypoint.name.slice(0, 2).toUpperCase()}
-      </text>
+        <text
+          x={0}
+          y={0}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill="#6965db"
+          fontSize={11}
+          fontWeight="bold"
+          style={{ pointerEvents: "none", userSelect: "none" }}
+        >
+          {waypoint.name.slice(0, 2).toUpperCase()}
+        </text>
+      </g>
 
       {/* Tooltip on hover */}
-      <title>{waypoint.name} (click to jump)</title>
+      <title>{waypoint.name} (click to jump, drag to move)</title>
     </g>
   );
 };
@@ -95,14 +149,13 @@ const WaypointMarker: React.FC<WaypointMarkerProps> = ({
 export const WaypointCanvasOverlay: React.FC<WaypointCanvasOverlayProps> = ({
   appState,
   onJump,
-  onPlaceWaypoint,
-  onCancelPlacement,
+  onUpdate,
 }) => {
-  const { waypoints, isPlacingWaypoint } = appState;
+  const { waypoints } = appState;
 
-  // Gets viewport dimensions
-  const canvasWidth = window.innerWidth;
-  const canvasHeight = window.innerHeight;
+  if (!waypoints || waypoints.length === 0) {
+    return null;
+  }
 
   const overlayStyle: React.CSSProperties = {
     position: "absolute",
@@ -110,82 +163,31 @@ export const WaypointCanvasOverlay: React.FC<WaypointCanvasOverlayProps> = ({
     left: 0,
     width: "100%",
     height: "100%",
-    pointerEvents: isPlacingWaypoint ? "auto" : "none",
+    pointerEvents: "none",
     overflow: "visible",
     zIndex: 10,
-    cursor: isPlacingWaypoint ? "crosshair" : "default",
   };
 
   const markerGroupStyle: React.CSSProperties = {
     pointerEvents: "auto",
   };
 
-  // Handles click on canvas during placement mode
-  const handleCanvasClick = (e: React.MouseEvent<SVGSVGElement>) => {
-    if (!isPlacingWaypoint) return;
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const screenX = e.clientX - rect.left;
-    const screenY = e.clientY - rect.top;
-
-    // Converts screen position to canvas coordinates
-    const canvasX = (screenX - canvasWidth / 2) / appState.zoom.value - appState.scrollX;
-    const canvasY = (screenY - canvasHeight / 2) / appState.zoom.value - appState.scrollY;
-
-    onPlaceWaypoint(canvasX, canvasY);
-  };
-
-  // Handles right-click to cancel placement
-  const handleContextMenu = (e: React.MouseEvent) => {
-    if (isPlacingWaypoint) {
-      e.preventDefault();
-      onCancelPlacement();
-    }
-  };
-
-  // Ensuring we only render when there are waypoints or placement mode is active
-  if ((!waypoints || waypoints.length === 0) && !isPlacingWaypoint) {
-    return null;
-  }
-
   return (
-    <svg
-      className="waypoint-canvas-overlay"
-      style={overlayStyle}
-      onClick={handleCanvasClick}
-      onContextMenu={handleContextMenu}
-    >
-      {/* Placement mode indicator */}
-      {isPlacingWaypoint && (
-        <text
-          x={canvasWidth / 2}
-          y={125}
-          textAnchor="middle"
-          fill="#6965db"
-          fontSize={14}
-          fontWeight="bold"
-          style={{ pointerEvents: "none" }}
-        >
-          Click on canvas to place waypoint (right-click to cancel)
-        </text>
-      )}
-
+    <svg className="waypoint-canvas-overlay" style={overlayStyle}>
       <g style={markerGroupStyle}>
         {waypoints.map((waypoint) => {
           const { x, y } = waypointToScreenPosition(
             waypoint,
             appState,
-            canvasWidth,
-            canvasHeight,
           );
 
           // Only renders if marker is within visible viewport
           const padding = 50;
           if (
             x < -padding ||
-            x > canvasWidth + padding ||
+            x > appState.width + padding ||
             y < -padding ||
-            y > canvasHeight + padding
+            y > appState.height + padding
           ) {
             return null;
           }
@@ -197,6 +199,8 @@ export const WaypointCanvasOverlay: React.FC<WaypointCanvasOverlayProps> = ({
               x={x}
               y={y}
               onJump={onJump}
+              onUpdate={onUpdate}
+              appState={appState}
             />
           );
         })}
