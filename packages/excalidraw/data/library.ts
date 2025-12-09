@@ -15,6 +15,7 @@ import {
   toValidURL,
   Queue,
   Emitter,
+  randomId,
 } from "@excalidraw/common";
 
 import { hashElementsVersion, hashString } from "@excalidraw/element";
@@ -42,6 +43,8 @@ import type {
   ExcalidrawImperativeAPI,
   LibraryItemsSource,
   LibraryItems_anyVersion,
+  LibraryCollections,
+  LibraryCollection,
 } from "../types";
 
 /**
@@ -67,11 +70,20 @@ type LibraryUpdate = {
 
 // an object so that we can later add more properties to it without breaking,
 // such as schema version
-export type LibraryPersistedData = { libraryItems: LibraryItems };
+export type LibraryPersistedData = {
+  libraryItems: LibraryItems;
+  libraryCollections: LibraryCollections;
+};
 
 const onLibraryUpdateEmitter = new Emitter<
   [update: LibraryUpdate, libraryItems: LibraryItems]
 >();
+const onLibraryCollectionsUpdateEmitter = new Emitter<
+  [collections: LibraryCollections]
+>();
+
+let latestLibraryItemsSnapshot: LibraryItems = [];
+let latestLibraryCollectionsSnapshot: LibraryCollections = [];
 
 export type LibraryAdatapterSource = "load" | "save";
 
@@ -89,7 +101,10 @@ export interface LibraryPersistenceAdapter {
      * purposes, in which case host app can implement more aggressive caching.
      */
     source: LibraryAdatapterSource;
-  }): MaybePromise<{ libraryItems: LibraryItems_anyVersion } | null>;
+  }): MaybePromise<{
+    libraryItems: LibraryItems_anyVersion;
+    libraryCollections: LibraryCollections;
+  } | null>;
   /** Should persist to the database as is (do no change the data structure). */
   save(libraryData: LibraryPersistedData): MaybePromise<void>;
 }
@@ -113,8 +128,14 @@ export const libraryItemsAtom = atom<{
   libraryItems: LibraryItems;
 }>({ status: "loaded", isInitialized: false, libraryItems: [] });
 
+export const libraryCollectionsAtom = atom<LibraryCollections>([]);
+
 const cloneLibraryItems = (libraryItems: LibraryItems): LibraryItems =>
   cloneJSON(libraryItems);
+
+const cloneLibraryCollections = (
+  collections: LibraryCollections,
+): LibraryCollections => cloneJSON(collections);
 
 /**
  * checks if library item does not exist already in current library
@@ -201,16 +222,31 @@ class Library {
   /** snapshot of library items since last onLibraryChange call */
   private prevLibraryItems = cloneLibraryItems(this.currLibraryItems);
 
+  private libraryCollections: LibraryCollections = [];
+
   private app: App;
 
   constructor(app: App) {
     this.app = app;
+    this.libraryCollections = [];
+
+    latestLibraryCollectionsSnapshot = cloneLibraryCollections(
+      this.libraryCollections,
+    );
   }
 
   private updateQueue: Promise<LibraryItems>[] = [];
 
+  private collectionsUpdateQueue: Promise<LibraryCollections>[] = [];
+
   private getLastUpdateTask = (): Promise<LibraryItems> | undefined => {
     return this.updateQueue[this.updateQueue.length - 1];
+  };
+
+  private getLastCollectionsUpdateTask = ():
+    | Promise<LibraryCollections>
+    | undefined => {
+    return this.collectionsUpdateQueue[this.collectionsUpdateQueue.length - 1];
   };
 
   private notifyListeners = () => {
@@ -231,6 +267,7 @@ class Library {
         this.prevLibraryItems = cloneLibraryItems(this.currLibraryItems);
 
         const nextLibraryItems = cloneLibraryItems(this.currLibraryItems);
+        latestLibraryItemsSnapshot = nextLibraryItems;
 
         this.app.props.onLibraryChange?.(nextLibraryItems);
 
@@ -248,7 +285,11 @@ class Library {
   /** call on excalidraw instance unmount */
   destroy = () => {
     this.updateQueue = [];
+    this.collectionsUpdateQueue = [];
     this.currLibraryItems = [];
+    this.libraryCollections = [];
+    latestLibraryItemsSnapshot = [];
+    latestLibraryCollectionsSnapshot = [];
     editorJotaiStore.set(libraryItemSvgsCache, new Map());
     // TODO uncomment after/if we make jotai store scoped to each excal instance
     // jotaiStore.set(libraryItemsAtom, {
@@ -260,6 +301,150 @@ class Library {
 
   resetLibrary = () => {
     return this.setLibrary([]);
+  };
+
+  createLibraryCollection = async (
+    name: string,
+    color?: string,
+  ): Promise<LibraryCollection> => {
+    const collection: LibraryCollection = {
+      id: randomId(),
+      name,
+      created: Date.now(),
+      items: [],
+      color: color || "#000000",
+    };
+
+    await this.setCollections((current) => [...current, collection]);
+    return collection;
+  };
+
+  deleteLibraryCollection = async (collectionId: string): Promise<void> => {
+    await this.setCollections((current) =>
+      current.filter((collection) => collection.id !== collectionId),
+    );
+
+    // Also delete all items that belong to this collection
+    const currentItems = await this.getLatestLibrary();
+    const itemsWithoutCollection = currentItems.filter(
+      (item) => item.collectionId !== collectionId,
+    );
+    await this.setLibrary(itemsWithoutCollection);
+  };
+
+  renameLibraryCollection = async (
+    collectionId: string,
+    newName: string,
+  ): Promise<void> => {
+    await this.setCollections((current) =>
+      current.map((collection) =>
+        collection.id === collectionId
+          ? { ...collection, name: newName }
+          : collection,
+      ),
+    );
+  };
+
+  moveUpCollection = async (collectionId: string): Promise<void> => {
+    await this.setCollections((current) => {
+      const index = current.findIndex((c) => c.id === collectionId);
+      if (index <= 0) {
+        return current;
+      }
+      const newCollections = [...current];
+      [newCollections[index - 1], newCollections[index]] = [
+        newCollections[index],
+        newCollections[index - 1],
+      ];
+      return newCollections;
+    });
+  };
+
+  moveDownCollection = async (collectionId: string): Promise<void> => {
+    await this.setCollections((current) => {
+      const index = current.findIndex((c) => c.id === collectionId);
+      if (index === -1 || index >= current.length - 1) {
+        return current;
+      }
+      const newCollections = [...current];
+      [newCollections[index], newCollections[index + 1]] = [
+        newCollections[index + 1],
+        newCollections[index],
+      ];
+      return newCollections;
+    });
+  };
+
+  setCollections = (
+    collections:
+      | LibraryCollections
+      | Promise<LibraryCollections>
+      | ((
+          current: LibraryCollections,
+        ) => LibraryCollections | Promise<LibraryCollections>),
+  ): Promise<LibraryCollections> => {
+    const task = new Promise<LibraryCollections>(async (resolve, reject) => {
+      try {
+        await this.getLastCollectionsUpdateTask();
+
+        if (typeof collections === "function") {
+          collections = collections(this.libraryCollections);
+        }
+
+        this.libraryCollections = cloneLibraryCollections(await collections);
+
+        latestLibraryCollectionsSnapshot = cloneLibraryCollections(
+          this.libraryCollections,
+        );
+
+        editorJotaiStore.set(
+          libraryCollectionsAtom,
+          cloneLibraryCollections(this.libraryCollections),
+        );
+
+        try {
+          const nextCollections = cloneLibraryCollections(
+            this.libraryCollections,
+          );
+          this.app.props.onLibraryCollectionsChange?.(nextCollections);
+        } catch (error) {
+          console.error(error);
+        }
+
+        const collectionsToEmit = cloneLibraryCollections(
+          this.libraryCollections,
+        );
+        onLibraryCollectionsUpdateEmitter.trigger(collectionsToEmit);
+
+        resolve(this.libraryCollections);
+      } catch (error: any) {
+        reject(error);
+      }
+    }).finally(() => {
+      this.collectionsUpdateQueue = this.collectionsUpdateQueue.filter(
+        (_task) => _task !== task,
+      );
+    });
+
+    this.collectionsUpdateQueue.push(task);
+
+    return task;
+  };
+
+  getCollections = async (): Promise<LibraryCollections> => {
+    return new Promise(async (resolve) => {
+      try {
+        const collections = await (this.getLastCollectionsUpdateTask() ||
+          this.libraryCollections);
+        if (this.collectionsUpdateQueue.length > 0) {
+          resolve(this.getCollections());
+        } else {
+          resolve(cloneLibraryCollections(collections));
+        }
+      } catch (error) {
+        return resolve(cloneLibraryCollections(this.libraryCollections));
+      }
+    });
   };
 
   /**
@@ -567,6 +752,28 @@ class AdapterTransaction {
     return task();
   }
 
+  static async getLibraryCollections(
+    adapter: LibraryPersistenceAdapter,
+    source: LibraryAdatapterSource,
+    _queue = true,
+  ): Promise<LibraryCollections> {
+    const task = () =>
+      new Promise<LibraryCollections>(async (resolve, reject) => {
+        try {
+          const data = await adapter.load({ source });
+          resolve(data?.libraryCollections || []);
+        } catch (error: any) {
+          reject(error);
+        }
+      });
+
+    if (_queue) {
+      return AdapterTransaction.queue.push(task);
+    }
+
+    return task();
+  }
+
   static run = async <T>(
     adapter: LibraryPersistenceAdapter,
     fn: (transaction: AdapterTransaction) => Promise<T>,
@@ -662,12 +869,32 @@ const persistLibraryUpdate = async (
       const version = getLibraryItemsHash(nextLibraryItems);
 
       if (version !== lastSavedLibraryItemsHash) {
-        await adapter.save({ libraryItems: nextLibraryItems });
+        await adapter.save({
+          libraryItems: nextLibraryItems,
+          libraryCollections: latestLibraryCollectionsSnapshot,
+        });
       }
 
       lastSavedLibraryItemsHash = version;
 
       return nextLibraryItems;
+    });
+  } finally {
+    librarySaveCounter--;
+  }
+};
+
+const persistLibraryCollections = async (
+  adapter: LibraryPersistenceAdapter,
+  collections: LibraryCollections,
+) => {
+  try {
+    librarySaveCounter++;
+    await AdapterTransaction.run(adapter, async () => {
+      await adapter.save({
+        libraryItems: latestLibraryItemsSnapshot,
+        libraryCollections: collections,
+      });
     });
   } finally {
     librarySaveCounter--;
@@ -838,7 +1065,10 @@ export const useHandleLibrary = (
       const adapter = optsRef.current.adapter;
       const migrationAdapter = optsRef.current.migrationAdapter;
 
-      const initDataPromise = resolvablePromise<LibraryItems | null>();
+      const initDataPromise = resolvablePromise<{
+        items: LibraryItems;
+        collections: LibraryCollections | null;
+      } | null>();
 
       // migrate from old data source if needed
       // (note, if `migrate` function is defined, we always migrate even
@@ -852,11 +1082,23 @@ export const useHandleLibrary = (
             .then(async (libraryData) => {
               let restoredData: LibraryItems | null = null;
               try {
+                // Load collections from the regular adapter
+                const collections =
+                  await AdapterTransaction.getLibraryCollections(
+                    adapter,
+                    "load",
+                    false,
+                  );
+
                 // if no library data to migrate, assume no migration needed
                 // and skip persisting to new data store, as well as well
                 // clearing the old store via `migrationAdapter.clear()`
                 if (!libraryData) {
-                  return AdapterTransaction.getLibraryItems(adapter, "load");
+                  const items = await AdapterTransaction.getLibraryItems(
+                    adapter,
+                    "load",
+                  );
+                  return { items, collections };
                 }
 
                 restoredData = restoreLibraryItems(
@@ -878,33 +1120,72 @@ export const useHandleLibrary = (
                   );
                 }
                 // migration suceeded, load migrated data
-                return nextItems;
+                return { items: nextItems, collections };
               } catch (error: any) {
                 console.error(
                   `couldn't migrate legacy library data: ${error.message}`,
                 );
                 // migration failed, load data from previous store, if any
-                return restoredData;
+                // Still try to load collections from adapter
+                let collections: LibraryCollections = [];
+                try {
+                  collections = await AdapterTransaction.getLibraryCollections(
+                    adapter,
+                    "load",
+                    false,
+                  );
+                } catch {
+                  // ignore errors loading collections
+                }
+                return restoredData
+                  ? { items: restoredData, collections }
+                  : { items: [], collections };
               }
             })
             // errors caught during `migrationAdapter.load()`
-            .catch((error: any) => {
+            .catch(async (error: any) => {
               console.error(`error during library migration: ${error.message}`);
               // as a default, load latest library from current data source
-              return AdapterTransaction.getLibraryItems(adapter, "load");
+              const items = await AdapterTransaction.getLibraryItems(
+                adapter,
+                "load",
+              );
+              // Also load collections from adapter
+              let collections: LibraryCollections = [];
+              try {
+                collections = await AdapterTransaction.getLibraryCollections(
+                  adapter,
+                  "load",
+                  false,
+                );
+              } catch {
+                // ignore errors loading collections
+              }
+              return { items, collections };
             }),
         );
       } else {
         initDataPromise.resolve(
-          promiseTry(AdapterTransaction.getLibraryItems, adapter, "load"),
+          Promise.all([
+            AdapterTransaction.getLibraryItems(adapter, "load"),
+            AdapterTransaction.getLibraryCollections(adapter, "load", false),
+          ]).then(([items, collections]) => ({
+            items,
+            collections,
+          })),
         );
       }
 
       // load initial (or migrated) library
+      const initCollectionsPromise = initDataPromise.then(
+        (data) => data?.collections,
+      );
+
       excalidrawAPI
         .updateLibrary({
-          libraryItems: initDataPromise.then((libraryItems) => {
-            const _libraryItems = libraryItems || [];
+          libraryItems: initDataPromise.then((data) => {
+            const _libraryItems = data?.items || [];
+            latestLibraryItemsSnapshot = cloneLibraryItems(_libraryItems);
             lastSavedLibraryItemsHash = getLibraryItemsHash(_libraryItems);
             return _libraryItems;
           }),
@@ -916,8 +1197,25 @@ export const useHandleLibrary = (
         .finally(() => {
           isLibraryLoadedRef.current = true;
         });
+
+      initCollectionsPromise.then(async (collections) => {
+        if (optsRef.current.excalidrawAPI?.setLibraryCollection) {
+          const loadedCollections = collections || [];
+
+          if (loadedCollections.length > 0) {
+            await optsRef.current.excalidrawAPI
+              .setLibraryCollection(loadedCollections)
+              .catch((error) => console.error(error));
+          } else {
+            // Set empty array to ensure atom is initialized
+            await optsRef.current.excalidrawAPI
+              .setLibraryCollection([])
+              .catch((error) => console.error(error));
+          }
+        }
+      });
     }
-    // ---------------------------------------------- data source datapter -----
+    // ---------------------------------------------- data source adapter -----
 
     window.addEventListener(EVENT.HASHCHANGE, onHashChange);
     return () => {
@@ -979,6 +1277,30 @@ export const useHandleLibrary = (
         },
       );
 
+      const unsubOnLibraryCollectionsUpdate =
+        onLibraryCollectionsUpdateEmitter.on(async (collections) => {
+          const isLoaded = isLibraryLoadedRef.current;
+          const adapter =
+            ("adapter" in optsRef.current && optsRef.current.adapter) || null;
+          if (!adapter) {
+            return;
+          }
+          try {
+            await persistLibraryCollections(adapter, collections);
+          } catch (error: any) {
+            console.error(
+              `couldn't persist library collections update: ${error.message}`,
+            );
+            if (isLoaded && optsRef.current.excalidrawAPI) {
+              optsRef.current.excalidrawAPI.updateScene({
+                appState: {
+                  errorMessage: t("errors.saveLibraryError"),
+                },
+              });
+            }
+          }
+        });
+
       const onUnload = (event: Event) => {
         if (librarySaveCounter) {
           preventUnload(event);
@@ -990,6 +1312,7 @@ export const useHandleLibrary = (
       return () => {
         window.removeEventListener(EVENT.BEFORE_UNLOAD, onUnload);
         unsubOnLibraryUpdate();
+        unsubOnLibraryCollectionsUpdate();
         lastSavedLibraryItemsHash = 0;
         librarySaveCounter = 0;
       };
