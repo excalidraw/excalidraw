@@ -1,7 +1,6 @@
 import {
   KEYS,
   arrayToMap,
-  debugDrawPoint,
   getFeatureFlag,
   invariant,
   isTransparent,
