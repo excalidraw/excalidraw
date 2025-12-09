@@ -1,6 +1,7 @@
 import {
   KEYS,
   arrayToMap,
+  debugDrawPoint,
   getFeatureFlag,
   invariant,
   isTransparent,
@@ -771,24 +772,33 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
         }
     : { mode: null };
 
+  const otherEndpoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startDragged ? -1 : 0,
+    elementsMap,
+  );
+
   const other: BindingStrategy =
-    opts?.angleLocked && otherBindableElement
-      ? {
-          mode: "inside",
-          element: otherBindableElement,
-          focusPoint: LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            arrow,
-            startDragged ? -1 : 0,
-            elementsMap,
-          ),
-        }
-      : otherBindableElement &&
-        !otherFocusPointIsInElement &&
-        appState.selectedLinearElement?.initialState.altFocusPoint
+    otherBindableElement &&
+    !otherFocusPointIsInElement &&
+    appState.selectedLinearElement?.initialState.altFocusPoint
       ? {
           mode: "orbit",
           element: otherBindableElement,
           focusPoint: appState.selectedLinearElement.initialState.altFocusPoint,
+        }
+      : opts?.angleLocked && otherBindableElement
+      ? {
+          mode: "orbit",
+          element: otherBindableElement,
+          focusPoint:
+            projectFixedPointOntoDiagonal(
+              arrow,
+              otherEndpoint,
+              otherBindableElement,
+              startDragged ? "end" : "start",
+              elementsMap,
+            ) || otherEndpoint,
         }
       : { mode: undefined };
 
