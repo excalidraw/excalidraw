@@ -111,7 +111,6 @@ const makeBaseState = (overrides: Partial<AppState> = {}): AppState => {
     activeLockedId: null,
     lockedMultiSelections: {},
     bindMode: "orbit",
-    isPlacingWaypoint: false,
     ...overrides,
   };
 };
@@ -123,7 +122,6 @@ describe("Waypoints appState helpers", () => {
       scrollY: 200,
       zoom: { value: 1.5 } as any,
       waypoints: [],
-      isPlacingWaypoint: false,
     });
 
     const next = addWaypointFromCurrentView(state);
