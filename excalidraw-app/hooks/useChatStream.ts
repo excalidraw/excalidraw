@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import type { ChatMessage, StreamingState } from '../lib/chat/types';
+import type { ChatMessage, StreamingState, ChatCitation } from '../lib/chat/types';
 import { getLLMBaseURL, isStreamingSupported, isDev } from '../lib/chat/config';
 import { getCollaborationLinkData } from '../data';
 import type { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types';
@@ -48,6 +48,7 @@ export const useChatStream = ({
   const activeAssistantMessageIdRef = useRef<string | null>(null);
   const planningAbortControllerRef = useRef<AbortController | null>(null);
   const toolRunsRef = useRef<Array<{ name: string; startTime: number; endTime?: number; durationMs?: number; summary?: string }>>([]);
+  const citationsRef = useRef<Map<string, ChatCitation>>(new Map());
 
   const LLM_BASE_URL = getLLMBaseURL();
 
@@ -240,6 +241,9 @@ export const useChatStream = ({
     let executionStartTs: number | undefined;
     let assistantMessageId: string | null = null;
     let eventSourceRefLocal: EventSource | null = null;
+    
+    // Clear citations for new message
+    citationsRef.current.clear();
     const assignAssistantMessageId = (incomingId?: string | null) => {
       const resolvedId = incomingId ?? `assistant-${Date.now()}`;
       assistantMessageId = resolvedId;
@@ -342,6 +346,7 @@ export const useChatStream = ({
       const eventSource = new EventSource(eventSourceUrl);
       eventSourceRefLocal = eventSource;
       toolRunsRef.current = [];
+      citationsRef.current.clear();
       setStreamingState(prev => ({ ...prev, toolRuns: [] }));
 
       setStreamingState(prev => ({
@@ -410,6 +415,51 @@ export const useChatStream = ({
         try {
           const data = JSON.parse((event as MessageEvent).data);
           const now = Date.now();
+          
+          // Extract citations if this is a search_documents tool call
+          if (data.toolName === 'search_documents' && data.result?.citations) {
+            const citations = data.result.citations as Array<{
+              index: number;
+              chunkId: string;
+              documentId: string;
+              page?: number;
+              snippet?: string;
+            }>;
+            
+            // Add citations to map (deduplicate by chunkId)
+            // Reassign indices sequentially based on order added, not backend index
+            citations.forEach((citation) => {
+              // Only add if not already present (deduplicate by chunkId)
+              if (!citationsRef.current.has(citation.chunkId)) {
+                // Get current count to assign next sequential index
+                const nextIndex = citationsRef.current.size + 1;
+                citationsRef.current.set(citation.chunkId, {
+                  index: nextIndex, // Sequential index: 1, 2, 3, etc.
+                  chunkId: citation.chunkId,
+                  documentId: citation.documentId,
+                  page: citation.page,
+                  snippet: citation.snippet,
+                });
+              }
+            });
+            
+            // Attach citations to assistant message
+            const targetId = assistantMessageId || activeAssistantMessageIdRef.current;
+            if (targetId) {
+              // Convert map to array, sorted by index (should already be sequential)
+              const allCitations = Array.from(citationsRef.current.values())
+                .sort((a, b) => a.index - b.index);
+              
+              onMessagesUpdate(prev =>
+                prev.map(msg =>
+                  msg.id === targetId
+                    ? { ...msg, citations: allCitations }
+                    : msg
+                )
+              );
+            }
+          }
+          
           // If we never saw a start event (backend only emits result), seed a run entry.
           const existingIdx = toolRunsRef.current.findIndex(
             (run) => !run.endTime && run.name === data.toolName
@@ -426,6 +476,8 @@ export const useChatStream = ({
             const summary =
               typeof data.result?.count === 'number'
                 ? `count=${data.result.count}`
+                : typeof data.result?.totalFound === 'number'
+                ? `found=${data.result.totalFound}`
                 : undefined;
             return { ...run, endTime: now, durationMs, summary };
           });
@@ -498,6 +550,10 @@ export const useChatStream = ({
         const executionDurationMs = executionStartTs ? Math.round(endTs - executionStartTs) : undefined;
 
         if (assistantMessageId) {
+          // Preserve citations when finalizing message
+          const allCitations = Array.from(citationsRef.current.values())
+            .sort((a, b) => a.index - b.index);
+          
           onMessagesUpdate(prev => prev.map(msg =>
             msg.id === assistantMessageId ? {
               ...msg,
@@ -505,7 +561,8 @@ export const useChatStream = ({
               durationMs: totalDurationMs,
               planningDurationMs,
               executionDurationMs,
-              toolCalls: mapToolRunsToToolCalls()
+              toolCalls: mapToolRunsToToolCalls(),
+              citations: allCitations.length > 0 ? allCitations : msg.citations
             } : msg
           ));
         }

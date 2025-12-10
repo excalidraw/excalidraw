@@ -57,7 +57,7 @@ export const getViewportQuality = (): number =>
   Number(import.meta.env.VITE_LLM_VIEWPORT_JPEG_QUALITY ?? 0.8);
 
 export const getMaxViewportBytes = (): number =>
-  Number(import.meta.env.VITE_LLM_VIEWPORT_MAX_BYTES ?? 900000);
+  Number(import.meta.env.VITE_LLM_VIEWPORT_MAX_BYTES ?? 153600); // Default 150KB to match backend MAX_SNAPSHOT_SIZE
 
 // Development mode check
 export const isDev = (): boolean => Boolean(import.meta.env.DEV);
