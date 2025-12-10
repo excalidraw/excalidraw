@@ -369,6 +369,9 @@ export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
 export const DEFAULT_PROPORTIONAL_RADIUS = 0.25;
 // Fixed radius for the ADAPTIVE_RADIUS algorithm. In pixels.
 export const DEFAULT_ADAPTIVE_RADIUS = 32;
+// Min and max corner radius for variable corner radius slider
+export const MIN_CORNER_RADIUS = 1;
+export const MAX_CORNER_RADIUS = 100;
 // roundness type (algorithm)
 export const ROUNDNESS = {
   // Used for legacy rounding (rectangles), which currently works the same
