@@ -94,6 +94,33 @@ yarn add react react-dom @excalidraw/excalidraw
 
 Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
 
+## Firebase Setup for Collaboration
+
+This project uses Firebase for real-time collaboration and to save whiteboards. To use your own Firebase project, follow these steps:
+
+### 1. Firestore Security Rules
+
+The project requires specific security rules to allow users to read and write data securely.
+
+-   Find the `firestore.rules` file in the root of this project.
+-   Go to your [Firebase Console](https://console.firebase.google.com/).
+-   Select your project.
+-   Navigate to **Build > Firestore Database**.
+-   Click on the **Rules** tab.
+-   Copy the content from the `firestore.rules` file and paste it into the editor, replacing the existing rules.
+-   Click **Publish**.
+
+### 2. Environment Variables
+
+The application needs your Firebase project's configuration to connect to the service.
+
+-   In the `excalidraw-app` directory, you will find a file named `.env.example`.
+-   Create a copy of this file and rename it to `.env`.
+-   Open the `.env` file and replace the placeholder values with your actual Firebase project configuration. You can find this configuration in your Firebase project settings under "Your apps" > "Web app".
+-   **Important**: The `.env` file should not be committed to version control. It is already included in the `.gitignore` file.
+
+For deployment (e.g., on Vercel), you will need to set the `VITE_APP_FIREBASE_CONFIG` environment variable in your deployment provider's settings, using the same JSON configuration.
+
 ## Contributing
 
 - Missing something or found a bug? [Report here](https://github.com/excalidraw/excalidraw/issues).

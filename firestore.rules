@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Public read access for scenes, but only authenticated users can write.
+    match /scenes/{sceneId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}
