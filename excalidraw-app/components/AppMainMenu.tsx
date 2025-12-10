@@ -4,6 +4,7 @@ import {
   eyeIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
 import React from "react";
 
 import { isDevEnv } from "@excalidraw/common";
@@ -23,6 +24,8 @@ export const AppMainMenu: React.FC<{
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
 }> = React.memo((props) => {
+  const { t } = useI18n();
+
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
@@ -72,6 +75,7 @@ export const AppMainMenu: React.FC<{
             }
             props?.refresh();
           }}
+          aria-label={t("labels.visualDebug")}
         >
           Visual Debug
         </MainMenu.Item>
