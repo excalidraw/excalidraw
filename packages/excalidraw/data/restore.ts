@@ -241,6 +241,7 @@ const restoreElementWithProperties = <
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
     frameId: element.frameId ?? null,
+    layerId: element.layerId ?? null,
     roundness: element.roundness
       ? element.roundness
       : element.strokeSharpness === "round"

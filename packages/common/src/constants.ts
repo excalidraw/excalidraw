@@ -423,10 +423,21 @@ export const DEFAULT_ELEMENT_PROPS: {
 
 export const LIBRARY_SIDEBAR_TAB = "library";
 export const CANVAS_SEARCH_TAB = "search";
+export const LAYERS_SIDEBAR_TAB = "layers";
 
 export const DEFAULT_SIDEBAR = {
   name: "default",
   defaultTab: LIBRARY_SIDEBAR_TAB,
+} as const;
+
+export const DEFAULT_LAYER_ID = "default-layer";
+
+export const DEFAULT_LAYER = {
+  id: DEFAULT_LAYER_ID,
+  name: "Layer 1",
+  visible: true,
+  locked: false,
+  order: 0,
 } as const;
 
 export const LIBRARY_DISABLED_TYPES = new Set([
