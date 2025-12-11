@@ -8617,6 +8617,8 @@ class App extends React.Component<AppProps, AppState> {
               },
             ],
           ]),
+          point[0],
+          point[1],
           this.scene,
           this.state,
           {

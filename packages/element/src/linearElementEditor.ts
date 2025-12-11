@@ -22,6 +22,7 @@ import {
   invariant,
   isShallowEqual,
   getFeatureFlag,
+  debugDrawLine,
 } from "@excalidraw/common";
 
 import {
@@ -343,6 +344,8 @@ export class LinearElementEditor {
       [idx],
       deltaX,
       deltaY,
+      scenePointerX,
+      scenePointerY,
       elementsMap,
       element,
       elements,
@@ -498,7 +501,18 @@ export class LinearElementEditor {
         width + pivotPoint[0],
         height + pivotPoint[1],
       );
-
+      debugDrawLine(
+        lineSegment(
+          pointFrom<GlobalPoint>(
+            element.x + pivotPoint[0],
+            element.y + pivotPoint[1],
+          ),
+          pointFrom<GlobalPoint>(
+            element.x + pivotPoint[0] + width,
+            element.y + pivotPoint[1] + height,
+          ),
+        ),
+      );
       deltaX = target[0] - draggingPoint[0];
       deltaY = target[1] - draggingPoint[1];
     } else {
@@ -519,6 +533,8 @@ export class LinearElementEditor {
       selectedPointsIndices,
       deltaX,
       deltaY,
+      scenePointerX,
+      scenePointerY,
       elementsMap,
       element,
       elements,
@@ -2066,6 +2082,8 @@ const pointDraggingUpdates = (
   selectedPointsIndices: readonly number[],
   deltaX: number,
   deltaY: number,
+  scenePointerX: number,
+  scenePointerY: number,
   elementsMap: NonDeletedSceneElementsMap,
   element: NonDeleted<ExcalidrawLinearElement>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
@@ -2106,6 +2124,8 @@ const pointDraggingUpdates = (
   const { start, end } = getBindingStrategyForDraggingBindingElementEndpoints(
     element,
     naiveDraggingPoints,
+    scenePointerX,
+    scenePointerY,
     elementsMap,
     elements,
     app.state,
