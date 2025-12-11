@@ -4,67 +4,36 @@
     {
       "source": "/(.*)",
       "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "https://excalidraw.com"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Feature-Policy",
-          "value": "*"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "origin"
-        }
+        { "key": "Access-Control-Allow-Origin", "value": "https://excalidraw.com" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Feature-Policy", "value": "*" },
+        { "key": "Referrer-Policy", "value": "origin" }
       ]
     },
     {
       "source": "/:file*.woff2",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "https://excalidraw.com"
-        }
+        { "key": "Cache-Control", "value": "public, max-age=31536000" },
+        { "key": "Access-Control-Allow-Origin", "value": "https://excalidraw.com" }
       ]
     },
     {
       "source": "/(Virgil|Cascadia|Assistant-Regular).woff2",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        }
+        { "key": "Cache-Control", "value": "public, max-age=31536000" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
       ]
     }
   ],
   "redirects": [
-    {
-      "source": "/webex/:match*",
-      "destination": "https://for-webex.excalidraw.com"
-    },
+    { "source": "/webex/:match*", "destination": "https://for-webex.excalidraw.com" },
     {
       "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "vscode.excalidraw.com"
-        }
-      ],
+      "has": [{ "type": "host", "value": "vscode.excalidraw.com" }],
       "destination": "https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor"
     }
   ],
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "installCommand": "yarn install",
   "buildCommand": "yarn build",
   "outputDirectory": "excalidraw-app/build"
