@@ -2228,9 +2228,14 @@ const pointDraggingUpdates = (
   // We need to use a custom intersector to ensure that if there is a big "jump"
   // in the arrow's position, we can position it with outline avoidance
   // pixel-perfectly and avoid "dancing" arrows.
-  const customIntersector =
+  // NOTE: Direction matter here, so we create two intersectors
+  const startCustomIntersector =
     start.focusPoint && end.focusPoint
       ? lineSegment(start.focusPoint, end.focusPoint)
+      : undefined;
+  const endCustomIntersector =
+    start.focusPoint && end.focusPoint
+      ? lineSegment(end.focusPoint, start.focusPoint)
       : undefined;
 
   // Needed to handle a special case where an existing arrow is dragged over
@@ -2268,7 +2273,7 @@ const pointDraggingUpdates = (
         nextArrow.endBinding,
         endBindable,
         elementsMap,
-        customIntersector,
+        endCustomIntersector,
       ) || nextArrow.points[nextArrow.points.length - 1]
     : nextArrow.points[nextArrow.points.length - 1];
 
@@ -2299,7 +2304,7 @@ const pointDraggingUpdates = (
           nextArrow.startBinding,
           startBindable,
           elementsMap,
-          customIntersector,
+          startCustomIntersector,
         ) || nextArrow.points[0]
       : nextArrow.points[0];
 
