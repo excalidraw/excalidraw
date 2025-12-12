@@ -46,11 +46,11 @@
     "arrowhead_triangle_outline": "Driehoek (omtrek)",
     "arrowhead_diamond": "Diamant",
     "arrowhead_diamond_outline": "Diamant (omtrek)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_crowfoot_many": "Crow’s foot (veel)",
+    "arrowhead_crowfoot_one": "Crow’s foot (enkel)",
+    "arrowhead_crowfoot_one_or_many": "Crow’s foot (enkel of veel)",
     "more_options": "Meer opties",
-    "arrowtypes": "",
+    "arrowtypes": "Pijl type",
     "arrowtype_sharp": "Scherpe pijl",
     "arrowtype_round": "Gebogen pijl",
     "arrowtype_elbowed": "Hoek pijl",
@@ -126,7 +126,7 @@
     "increaseFontSize": "Letters vergroten",
     "unbindText": "Ontkoppel tekst",
     "bindText": "Koppel tekst aan de container",
-    "createContainerFromText": "",
+    "createContainerFromText": "Tekst in een container laten doorlopen",
     "link": {
       "edit": "Wijzig link",
       "editEmbed": "Embedbare link bewerken",
@@ -176,27 +176,27 @@
   "elementLink": {
     "title": "Link naar object",
     "desc": "Klik op een vorm op canvas of plak een link.",
-    "notFound": ""
+    "notFound": "Gekoppeld object is niet gevonden op canvas."
   },
   "library": {
     "noItems": "Nog geen items toegevoegd...",
     "hint_emptyLibrary": "Selecteer een item op het canvas om het hier toe te voegen of installeer een bibliotheek uit de openbare repository, hieronder.",
     "hint_emptyPrivateLibrary": "Selecteer een item op het canvas om het hier toe te voegen.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Zoek in bibliotheek",
+      "heading": "Bibliotheek overeenkomsten",
+      "noResults": "Geen items gevonden...",
+      "clearSearch": "Zoekopdracht wissen"
     }
   },
   "search": {
-    "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": "",
-    "frames": "",
-    "texts": ""
+    "title": "Zoek op canvas",
+    "noMatch": "Geen overeenkomsten gevonden...",
+    "singleResult": "resultaat",
+    "multipleResults": "resultaten",
+    "placeholder": "Zoek text op canvas...",
+    "frames": "Frames",
+    "texts": "Teksten"
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -204,7 +204,7 @@
     "exportImage": "Exporteer afbeelding...",
     "export": "Sla op...",
     "copyToClipboard": "Kopieer",
-    "copyLink": "",
+    "copyLink": "Link kopiëren",
     "save": "Opslaan naar huidige bestand",
     "saveAs": "Opslaan als",
     "load": "Open",
@@ -225,16 +225,16 @@
     "fullScreen": "Volledig scherm",
     "darkMode": "Donkere modus",
     "lightMode": "Lichte modus",
-    "systemMode": "",
+    "systemMode": "Systeemmodus",
     "zenMode": "Zen modus",
-    "objectsSnapMode": "",
+    "objectsSnapMode": "Uitlijnen op objecten",
     "exitZenMode": "Verlaat zen modus",
     "cancel": "Annuleren",
-    "saveLibNames": "",
+    "saveLibNames": "Namen opslaan en afsluiten",
     "clear": "Wissen",
     "remove": "Verwijderen",
     "embed": "Insluiten in-/uitschakelen",
-    "publishLibrary": "",
+    "publishLibrary": "Hernoemen of publiceren",
     "submit": "Versturen",
     "confirm": "Bevestigen",
     "embeddableInteractionButton": "Klik voor interactie"
@@ -261,38 +261,38 @@
     "removeItemsFromsLibrary": "Verwijder {{count}} item(s) uit bibliotheek?",
     "invalidEncryptionKey": "Encryptiesleutel moet 22 tekens zijn. Live samenwerking is uitgeschakeld.",
     "collabOfflineWarning": "Geen internetverbinding beschikbaar.\nJe wijzigingen worden niet opgeslagen!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Limiet voor browser opslag overschreden. Wijzigingen worden niet opgeslagen."
   },
   "errors": {
     "unsupportedFileType": "Niet-ondersteund bestandstype.",
     "imageInsertError": "Afbeelding invoegen mislukt. Probeer het later opnieuw...",
     "fileTooBig": "Bestand is te groot. Maximale grootte is {{maxSize}}.",
     "svgImageInsertError": "Kon geen SVG-afbeelding invoegen. De SVG-opmaak ziet er niet geldig uit.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Afbeeldingen ophalen mislukt.",
     "cannotResolveCollabServer": "Kan geen verbinding maken met de collab server. Herlaad de pagina en probeer het opnieuw.",
     "importLibraryError": "Kon bibliotheek niet laden",
-    "saveLibraryError": "",
+    "saveLibraryError": "Kan bibliotheek niet opslaan in opslag. Sla uw bibliotheek op lokaal bestand om ervoor te zorgen dat u geen wijzigingen verliest.",
     "collabSaveFailed": "Kan niet opslaan in de backend database. Als de problemen blijven bestaan, moet u het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
     "collabSaveFailed_sizeExceeded": "Kan de backend database niet opslaan, het canvas lijkt te groot te zijn. U moet het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "Afbeeldingen zijn uitgeschakeld.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
-      "line4": ""
+      "line1": "Het lijkt erop dat je de Brave browser gebruikt met de instelling <bold>Agressief vingerafdrukken blokkeren</bold> ingeschakeld.",
+      "line2": "Dit kan leiden tot het breken van de <bold>Tekst Elementen</bold> in je tekening.",
+      "line3": "We raden sterk aan om deze instelling uit te zetten. Je kan <link>deze stappen</link> volgen om te zien hoe.",
+      "line4": "Als het uitschakelen van deze instelling het weergeven van tekstelementen niet oplost, open dan een <issueLink>issue</issueLink> op onze GitHub, of stuur ons een bericht op <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
       "embeddable": "Ingesloten elementen kunnen niet worden toegevoegd aan de bibliotheek.",
-      "iframe": "",
+      "iframe": "IFrame elementen kunnen niet worden toegevoegd aan de bibliotheek.",
       "image": "Ondersteuning voor het toevoegen van afbeeldingen aan de bibliotheek komt binnenkort!"
     },
-    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnRead": "Plakken mislukt (kan niet van het systeem klembord lezen).",
     "asyncPasteFailedOnParse": "Kon niet plakken.",
     "copyToSystemClipboardFailed": "Kon niet naar klembord kopiëren."
   },
   "toolBar": {
     "selection": "Selectie",
-    "lasso": "",
+    "lasso": "Lasso selectie",
     "image": "Voeg afbeelding in",
     "rectangle": "Rechthoek",
     "diamond": "Ruit",
@@ -304,30 +304,30 @@
     "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen",
     "penMode": "Pen modus - Blokkeer aanraken",
-    "link": "",
+    "link": "Link toevoegen / bijwerken voor een geselecteerde vorm",
     "eraser": "Gum",
     "frame": "Frame tool",
-    "magicframe": "",
+    "magicframe": "Wireframe naar code",
     "embeddable": "Web insluiten",
     "laser": "Laseraanwijzer",
-    "hand": "",
+    "hand": "Hand (panning tool)",
     "extraTools": "Meer tools",
-    "mermaidToExcalidraw": "",
-    "convertElementType": ""
+    "mermaidToExcalidraw": "Mermaid naar Excalidraw",
+    "convertElementType": "Vorm type in- of uitschakelen"
   },
   "element": {
-    "rectangle": "",
-    "diamond": "",
-    "ellipse": "",
-    "arrow": "",
-    "line": "",
-    "freedraw": "",
-    "text": "",
-    "image": "",
-    "group": "",
-    "frame": "",
-    "magicframe": "",
-    "embeddable": "",
+    "rectangle": "Rechthoek",
+    "diamond": "Diamant",
+    "ellipse": "Ovaal",
+    "arrow": "Pijl",
+    "line": "Lijn",
+    "freedraw": "Los tekenen",
+    "text": "Tekst",
+    "image": "Afbeelding",
+    "group": "Groep",
+    "frame": "Kader",
+    "magicframe": "Wireframe naar code",
+    "embeddable": "Web Embed",
     "selection": "Selectie",
     "iframe": "IFrame"
   },
@@ -508,15 +508,15 @@
   },
   "stats": {
     "angle": "Hoek",
-    "shapes": "",
+    "shapes": "Vormen",
     "height": "Hoogte",
     "scene": "Scene",
     "selected": "Geselecteerd",
     "storage": "Opslag",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "Canvas & Vorm eigenschappen",
+    "title": "Eigenschappen",
+    "generalStats": "Algemeen",
+    "elementProperties": "Vorm eigenschappen",
     "total": "Totaal",
     "version": "Versie",
     "versionCopy": "Klik om te kopiëren",
@@ -528,7 +528,7 @@
     "copyStyles": "Stijlen gekopieerd.",
     "copyToClipboard": "Gekopieerd naar het klembord.",
     "copyToClipboardAsPng": "{{exportSelection}} naar klembord gekopieerd als PNG\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "{{exportSelection}} gekopieerd naar klembord als SVG\n({{exportColorScheme}})",
     "fileSaved": "Bestand opgeslagen.",
     "fileSavedToFilename": "Opgeslagen als {filename}",
     "canvas": "canvas",
@@ -536,7 +536,7 @@
     "pasteAsSingleElement": "Gebruik {{shortcut}} om te plakken als een enkel element,\nof plak in een bestaande teksteditor",
     "unableToEmbed": "Het insluiten van deze url is momenteel niet toegestaan. Zet een probleem op GitHub om de URL op de whitelist te zetten",
     "unrecognizedLinkFormat": "De link die u hebt ingesloten komt niet overeen met het verwachte formaat. Probeer de 'embed' string van de bronsite te plakken",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Link gekopieerd naar klembord"
   },
   "colors": {
     "transparent": "Transparant",
@@ -544,22 +544,22 @@
     "white": "Wit",
     "red": "Rood",
     "pink": "Roze",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "grape": "Druif",
+    "violet": "Violet",
+    "gray": "Grijs",
+    "blue": "Blauw",
+    "cyan": "Cyaan",
+    "teal": "Groenblauw",
+    "green": "Groen",
+    "yellow": "Geel",
+    "orange": "Oranje",
+    "bronze": "Brons"
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "Al je data is lokaal opgeslagen in je browser.",
+      "center_heading_plus": "Wil je in plaats daarvan naar Excalidraw+ gaan?",
+      "menuHint": "Exporteren, voorkeuren en meer, ..."
     },
     "defaults": {
       "menuHint": "Exporteren, voorkeuren en meer...",
@@ -569,60 +569,60 @@
     }
   },
   "colorPicker": {
-    "color": "",
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "color": "Kleur",
+    "mostUsedCustomColors": "Meest gebruikte aangepaste kleur",
+    "colors": "Kleuren",
+    "shades": "Tinten",
+    "hexCode": "HEX-code",
+    "noShades": "Geen tinten beschikbaar voor deze kleur"
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Exporteer als afbeelding",
+        "button": "Exporteer als afbeelding",
+        "description": "Exporteer de scènegegevens als een afbeelding die je later weer kunt importeren."
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Opslaan op schijf",
+        "button": "Opslaan op schijf",
+        "description": "Exporteer de scènegegevens als bestand die je later weer kunt importeren."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Exporteer naar Excalidraw+",
+        "description": "Sla de scène op in je Excalidraw+ werkruimte."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Laad vanuit bestand",
+        "button": "Laad vanuit bestand",
+        "description": "Het laden van een bestand zal <bold>je bestaande inhoud vervangen</bold>.<br></br>Je kunt eerst een back-up van je tekening maken via een van de onderstaande opties."
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Laad vanuit link",
+        "button": "Vervang mijn inhoud",
+        "description": "Het laden van externe tekening zal <bold>je bestaande inhoud vervangen</bold>.<br></br>Je kunt eerst een back-up van je tekening maken via een van de onderstaande opties."
       }
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "title": "Mermaid naar Excalidraw",
+    "button": "Invoegen",
+    "description": "Momenteel worden alleen <flowchartLink>Flowchart</flowchartLink>-, <sequenceLink>Sequence</sequenceLink>- en <classLink>Class</classLink>-diagrammen ondersteund. De andere types worden als afbeelding weergegeven in Excalidraw.",
+    "syntax": "Mermaid Syntaxis",
+    "preview": "Voorbeeld"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Snel Zoeken"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "oud"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
+    "sceneFonts": "In deze scène",
+    "availableFonts": "Beschikbare lettertypen",
     "empty": "Geen lettertypes gevonden"
   },
   "userList": {
@@ -644,22 +644,22 @@
     },
     "recents": "Laatst gebruikt",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "Zoek in menu's, commando's en ontdek geheimpjes",
+      "noMatch": "Geen overeenkomende opdrachten..."
     },
-    "itemNotAvailable": "",
-    "shortcutHint": ""
+    "itemNotAvailable": "Opdracht is niet beschikbaar...",
+    "shortcutHint": "Gebruik {{shortcut}} voor het palet"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Optie",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Spatie",
+    "delete": "Delete",
+    "mmb": "Muiswiel"
   }
 }
