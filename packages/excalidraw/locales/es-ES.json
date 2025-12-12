@@ -651,7 +651,7 @@
     "shortcutHint": "Para la paleta de comandos, utilice {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
+    "ctrl": "Control",
     "option": "",
     "cmd": "",
     "alt": "",
