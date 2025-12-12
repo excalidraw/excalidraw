@@ -46,9 +46,9 @@
     "arrowhead_triangle_outline": "Driehoek (omtrek)",
     "arrowhead_diamond": "Diamant",
     "arrowhead_diamond_outline": "Diamant (omtrek)",
-    "arrowhead_crowfoot_many": "Crow’s foot (veel)",
-    "arrowhead_crowfoot_one": "Crow’s foot (enkel)",
-    "arrowhead_crowfoot_one_or_many": "Crow’s foot (enkel of veel)",
+    "arrowhead_crowfoot_many": "Kraaienpoot (veel)",
+    "arrowhead_crowfoot_one": "Kraaienpoot (enkel)",
+    "arrowhead_crowfoot_one_or_many": "Kraaienpoot (enkel of veel)",
     "more_options": "Meer opties",
     "arrowtypes": "Pijl type",
     "arrowtype_sharp": "Scherpe pijl",
@@ -313,7 +313,7 @@
     "hand": "Hand (panning tool)",
     "extraTools": "Meer tools",
     "mermaidToExcalidraw": "Mermaid naar Excalidraw",
-    "convertElementType": "Vorm type in- of uitschakelen"
+    "convertElementType": "Vorm type in-/uitschakelen"
   },
   "element": {
     "rectangle": "Rechthoek",
