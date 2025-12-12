@@ -16,7 +16,7 @@ import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { trackEvent } from "../../analytics";
 import { useUIAppState } from "../../context/ui-appState";
 import { useSetAtom } from "../../editor-jotai";
-import { useI18n } from "../../i18n";
+import { useI18n, languages, setLanguage, getLanguage } from "../../i18n";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import {
   useExcalidrawSetAppState,
@@ -292,6 +292,30 @@ export const ToggleTheme = (
   );
 };
 ToggleTheme.displayName = "ToggleTheme";
+
+export const LanguageSetting = () => {
+  const { t, langCode } = useI18n();
+
+  return (
+    <DropdownMenuItemContentRadio
+      name="language"
+      value={getLanguage().code}
+      onChange={async (code) => {
+        trackEvent("language", code, "ui");
+        const lang = languages.find((lang) => lang.code === code);
+        if (lang) {
+          await setLanguage(lang);
+        }
+      }}
+      choices={languages.map((lang) => ({
+        value: lang.code,
+        label: lang.label,
+      }))}
+    >
+      {t("labels.language")}
+    </DropdownMenuItemContentRadio>
+  );
+};
 
 export const ChangeCanvasBackground = () => {
   const { t } = useI18n();

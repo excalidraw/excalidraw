@@ -51,6 +51,7 @@ export type ShortcutName =
       | "saveToActiveFile"
       | "toggleShortcuts"
       | "wrapSelectionInFrame"
+      | "wrapTextInContainer"
     >
   | "saveScene"
   | "imageExport"
@@ -116,7 +117,8 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   saveToActiveFile: [getShortcutKey("CtrlOrCmd+S")],
   toggleShortcuts: [getShortcutKey("?")],
   searchMenu: [getShortcutKey("CtrlOrCmd+F")],
-  wrapSelectionInFrame: [],
+  wrapSelectionInFrame: [getShortcutKey("Alt+Enter")],
+  wrapTextInContainer: [getShortcutKey("CtrlOrCmd+Enter")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName, idx = 0) => {
