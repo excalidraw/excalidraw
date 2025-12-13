@@ -1670,6 +1670,23 @@ export const actionChangeArrowhead = register<{
     return (
       <fieldset>
         <legend>{t("labels.arrowheads")}</legend>
+        <div className="buttonList" style={{ marginBottom: "0.5rem" }}>
+          <button
+            type="button"
+            className="iconButton"
+            title={t("labels.arrowhead_double")}
+            onClick={() => {
+              // Update both arrowheads for double-headed arrow
+              updateData({ position: "start", type: "arrow" });
+              // Use requestAnimationFrame to ensure the second update happens after the first
+              requestAnimationFrame(() => {
+                updateData({ position: "end", type: "arrow" });
+              });
+            }}
+          >
+            ↔
+          </button>
+        </div>
         <div className="iconSelectList buttonList">
           <IconPicker
             label="arrowhead_start"
