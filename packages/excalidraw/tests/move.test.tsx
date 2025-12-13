@@ -67,8 +67,8 @@ describe("move element", () => {
     fireEvent.pointerMove(canvas, { clientX: 20, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`3`);
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`2`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`2`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`1`);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect([h.elements[0].x, h.elements[0].y]).toEqual([0, 40]);
@@ -166,8 +166,8 @@ describe("duplicate element on move when ALT is clicked", () => {
     fireEvent.pointerMove(canvas, { clientX: 10, clientY: 60 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`4`);
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`3`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`2`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`1`);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(2);
 

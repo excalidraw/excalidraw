@@ -1535,7 +1535,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
 
 exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] number of renders 1`] = `10`;
+exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] redo stack 1`] = `[]`;
 
@@ -2561,7 +2561,7 @@ exports[`regression tests > can drag element that covers another element, while 
 
 exports[`regression tests > can drag element that covers another element, while another elem is selected > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > can drag element that covers another element, while another elem is selected > [end of test] number of renders 1`] = `15`;
+exports[`regression tests > can drag element that covers another element, while another elem is selected > [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests > can drag element that covers another element, while another elem is selected > [end of test] redo stack 1`] = `[]`;
 
@@ -3177,7 +3177,7 @@ exports[`regression tests > click on an element and drag it > [dragged] element 
 
 exports[`regression tests > click on an element and drag it > [dragged] number of elements 1`] = `1`;
 
-exports[`regression tests > click on an element and drag it > [dragged] number of renders 1`] = `8`;
+exports[`regression tests > click on an element and drag it > [dragged] number of renders 1`] = `7`;
 
 exports[`regression tests > click on an element and drag it > [dragged] redo stack 1`] = `[]`;
 
@@ -3388,7 +3388,7 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
 
 exports[`regression tests > click on an element and drag it > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > click on an element and drag it > [end of test] number of renders 1`] = `10`;
+exports[`regression tests > click on an element and drag it > [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests > click on an element and drag it > [end of test] redo stack 1`] = `[]`;
 
@@ -6012,7 +6012,7 @@ exports[`regression tests > drags selected elements from point inside common bou
 
 exports[`regression tests > drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging > [end of test] number of renders 1`] = `12`;
+exports[`regression tests > drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging > [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests > drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging > [end of test] redo stack 1`] = `[]`;
 
@@ -8021,7 +8021,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
 
 exports[`regression tests > given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected > [end of test] number of renders 1`] = `8`;
+exports[`regression tests > given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected > [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests > given selected element A with lower z-index than unselected element B and given B is partially over A when dragging on intersection between A and B A should be dragged and keep being selected > [end of test] redo stack 1`] = `[]`;
 
@@ -11819,7 +11819,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
 
 exports[`regression tests > shift-click to multiselect, then drag > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > shift-click to multiselect, then drag > [end of test] number of renders 1`] = `13`;
+exports[`regression tests > shift-click to multiselect, then drag > [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests > shift-click to multiselect, then drag > [end of test] redo stack 1`] = `[]`;
 
