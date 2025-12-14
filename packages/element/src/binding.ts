@@ -1707,13 +1707,7 @@ export const updateBoundPoint = (
       pointFromVector(vectorScale(halfVector, -1), adjacentPoint),
     );
   }
-  // startOrEnd === "endBinding" &&
-  //   console.log({
-  //     mode: binding.mode,
-  //     bindableElement,
-  //     isNested,
-  //     global,
-  //   });
+
   const maybeOutlineGlobal =
     binding.mode === "orbit" && bindableElement
       ? isNested
