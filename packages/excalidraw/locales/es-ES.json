@@ -142,7 +142,7 @@
       "editArrow": "Editar flecha"
     },
     "polygon": {
-      "breakPolygon": "",
+      "breakPolygon": "Abrir polígono",
       "convertToPolygon": ""
     },
     "elementLock": {
