@@ -39,6 +39,7 @@ import type {
   Mutable,
   SameType,
 } from "@excalidraw/common/utility-types";
+import {  getElementBounds } from "./bounds";
 
 import type { AppState } from "../../excalidraw/types";
 
@@ -106,6 +107,7 @@ const hashSelectionOpts = (
 export type ExcalidrawElementsIncludingDeleted = readonly ExcalidrawElement[];
 
 export class Scene {
+  private CELL_SIZE = 500;
   // ---------------------------------------------------------------------------
   // instance methods/props
   // ---------------------------------------------------------------------------
@@ -239,6 +241,103 @@ export class Scene {
     return null;
   }
 
+  /* spartial indexer */
+
+  // cellKey -> Set<elementId>
+  spatialGrid = new Map<string,Set<string>>();
+
+  // elementId -> list of cellKeys (for fast updates)
+  elementToCells = new Map<string,string[]>();
+
+
+  /* ----------- Spartial Index Utiltities----------------start */
+
+
+  insertIntoSpatialIndex(element:ExcalidrawElement) {
+    const [x1, y1, x2, y2] = getElementBounds(
+      element,
+      this.nonDeletedElementsMap
+    );
+
+    const startX = Math.floor(x1 / this.CELL_SIZE);
+    const endX = Math.floor(x2 / this.CELL_SIZE);
+    const startY = Math.floor(y1 / this.CELL_SIZE);
+    const endY = Math.floor(y2 / this.CELL_SIZE);
+
+    const keys:string[] = [];
+
+    for (let cx = startX; cx <= endX; cx++) {
+      for (let cy = startY; cy <= endY; cy++) {
+        const key = `${cx},${cy}`;
+        keys.push(key);
+
+        let bucket = this.spatialGrid.get(key);
+        if (!bucket) {
+          bucket = new Set();
+          this.spatialGrid.set(key, bucket);
+        }
+        bucket.add(element.id);
+      }
+    }
+
+    this.elementToCells.set(element.id, keys);
+  }
+
+  removeFromSpatialIndex(elementId:string) {
+    const keys = this.elementToCells.get(elementId);
+    if (!keys) return;
+
+    for (const key of keys) {
+      const bucket = this.spatialGrid.get(key);
+      if (!bucket) continue;
+
+      bucket.delete(elementId);
+      if (bucket.size === 0) {
+        this.spatialGrid.delete(key);
+      }
+    }
+
+    this.elementToCells.delete(elementId);
+  }
+
+  updateSpatialIndex(element:ExcalidrawElement) {
+    this.removeFromSpatialIndex(element.id);
+    this.insertIntoSpatialIndex(element);
+  }
+
+  rebuildSpatialIndex() {
+  this.spatialGrid.clear();
+  this.elementToCells.clear();
+
+  for (const el of this.nonDeletedElements) {
+    this.insertIntoSpatialIndex(el);
+  }
+}
+
+getCandidateElementsInViewport(bounds:{x1:number,x2:number,y1:number,y2:number}):Set<string> {
+  const startX = Math.floor(bounds.x1 / this.CELL_SIZE);
+  const endX   = Math.floor(bounds.x2 / this.CELL_SIZE);
+  const startY = Math.floor(bounds.y1 / this.CELL_SIZE);
+  const endY   = Math.floor(bounds.y2 / this.CELL_SIZE);
+
+  const resultIds = new Set<string>();
+
+  for (let cx = startX; cx <= endX; cx++) {
+    for (let cy = startY; cy <= endY; cy++) {
+      const bucket = this.spatialGrid.get(`${cx},${cy}`);
+      if (!bucket) continue;
+
+      for (const id of bucket) {
+        resultIds.add(id);
+      }
+    }
+  }
+
+  return resultIds;
+}
+
+  /* ----------- Spartial Index Utiltities----------------end */
+
   /**
    * A utility method to help with updating all scene elements, with the added
    * performance optimization of not renewing the array if no change is made.
@@ -297,6 +396,8 @@ export class Scene {
     this.frames = nextFrameLikes;
     this.nonDeletedFramesLikes = getNonDeletedElements(this.frames).elements;
 
+    // re-create spartial index
+    this.rebuildSpatialIndex();
     this.triggerUpdate();
   }
 
@@ -460,6 +561,8 @@ export class Scene {
       prevVersion !== nextVersion &&
       options.informMutation
     ) {
+      // updating the element in index
+      this.updateSpatialIndex(element);
       this.triggerUpdate();
     }
 
