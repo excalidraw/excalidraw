@@ -858,6 +858,40 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <path
+            d="M3.333 14.167v1.666c0 .92.747 1.667 1.667 1.667h10c.92 0 1.667-.746 1.667-1.667v-1.666M5.833 9.167 10 13.333l4.167-4.166M10 3.333v10"
+            strokeWidth="1.25"
+          />
+        </svg>,
+        "keyTest": [Function],
+        "keywords": [
+          "export",
+          "selection",
+          "download",
+          "png",
+          "image",
+        ],
+        "label": "labels.imageExport",
+        "name": "imageExport",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
+      {
         "PanelComponent": [Function],
         "icon": <svg
           aria-hidden="true"
@@ -5518,6 +5552,40 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <path
+            d="M3.333 14.167v1.666c0 .92.747 1.667 1.667 1.667h10c.92 0 1.667-.746 1.667-1.667v-1.666M5.833 9.167 10 13.333l4.167-4.166M10 3.333v10"
+            strokeWidth="1.25"
+          />
+        </svg>,
+        "keyTest": [Function],
+        "keywords": [
+          "export",
+          "selection",
+          "download",
+          "png",
+          "image",
+        ],
+        "label": "labels.imageExport",
+        "name": "imageExport",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
+      {
         "PanelComponent": [Function],
         "icon": <svg
           aria-hidden="true"
@@ -6730,6 +6798,40 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "keyTest": [Function],
         "label": [Function],
         "name": "toggleElementLock",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <path
+            d="M3.333 14.167v1.666c0 .92.747 1.667 1.667 1.667h10c.92 0 1.667-.746 1.667-1.667v-1.666M5.833 9.167 10 13.333l4.167-4.166M10 3.333v10"
+            strokeWidth="1.25"
+          />
+        </svg>,
+        "keyTest": [Function],
+        "keywords": [
+          "export",
+          "selection",
+          "download",
+          "png",
+          "image",
+        ],
+        "label": "labels.imageExport",
+        "name": "imageExport",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -8679,6 +8781,40 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <path
+            d="M3.333 14.167v1.666c0 .92.747 1.667 1.667 1.667h10c.92 0 1.667-.746 1.667-1.667v-1.666M5.833 9.167 10 13.333l4.167-4.166M10 3.333v10"
+            strokeWidth="1.25"
+          />
+        </svg>,
+        "keyTest": [Function],
+        "keywords": [
+          "export",
+          "selection",
+          "download",
+          "png",
+          "image",
+        ],
+        "label": "labels.imageExport",
+        "name": "imageExport",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
+      {
         "PanelComponent": [Function],
         "icon": <svg
           aria-hidden="true"
@@ -9665,6 +9801,40 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "keyTest": [Function],
         "label": [Function],
         "name": "toggleElementLock",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <path
+            d="M3.333 14.167v1.666c0 .92.747 1.667 1.667 1.667h10c.92 0 1.667-.746 1.667-1.667v-1.666M5.833 9.167 10 13.333l4.167-4.166M10 3.333v10"
+            strokeWidth="1.25"
+          />
+        </svg>,
+        "keyTest": [Function],
+        "keywords": [
+          "export",
+          "selection",
+          "download",
+          "png",
+          "image",
+        ],
+        "label": "labels.imageExport",
+        "name": "imageExport",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
