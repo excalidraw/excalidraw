@@ -22,7 +22,6 @@ import {
   invariant,
   isShallowEqual,
   getFeatureFlag,
-  debugDrawLine,
 } from "@excalidraw/common";
 
 import {
@@ -500,18 +499,6 @@ export class LinearElementEditor {
       const target = pointFrom<LocalPoint>(
         width + pivotPoint[0],
         height + pivotPoint[1],
-      );
-      debugDrawLine(
-        lineSegment(
-          pointFrom<GlobalPoint>(
-            element.x + pivotPoint[0],
-            element.y + pivotPoint[1],
-          ),
-          pointFrom<GlobalPoint>(
-            element.x + pivotPoint[0] + width,
-            element.y + pivotPoint[1] + height,
-          ),
-        ),
       );
       deltaX = target[0] - draggingPoint[0];
       deltaY = target[1] - draggingPoint[1];
@@ -2248,7 +2235,7 @@ const pointDraggingUpdates = (
   // We need to use a custom intersector to ensure that if there is a big "jump"
   // in the arrow's position, we can position it with outline avoidance
   // pixel-perfectly and avoid "dancing" arrows.
-  // NOTE: Direction matter here, so we create two intersectors
+  // NOTE: Direction matters here, so we create two intersectors
   const startCustomIntersector =
     start.focusPoint && end.focusPoint
       ? lineSegment(start.focusPoint, end.focusPoint)
