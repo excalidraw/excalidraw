@@ -460,6 +460,8 @@ export const EDITOR_LS_KEYS = {
   // legacy naming (non)scheme
   MERMAID_TO_EXCALIDRAW: "mermaid-to-excalidraw",
   PUBLISH_LIBRARY: "publish-library-data",
+  OPENROUTER_API_KEY: "excalidraw-openrouter-api-key",
+  OPENROUTER_MODEL: "excalidraw-openrouter-model",
 } as const;
 
 /**

@@ -10,6 +10,7 @@ import { atom, useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
 import { useApp, useExcalidrawSetAppState } from "../App";
 import { Dialog } from "../Dialog";
+import { Button } from "../Button";
 import { InlineIcon } from "../InlineIcon";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { ArrowRightIcon } from "../icons";
@@ -30,6 +31,7 @@ import {
   saveMermaidDataToStorage,
 } from "./common";
 import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
+import { OpenRouterClient } from "../../data/ai/openrouter";
 
 import "./TTDDialog.scss";
 
@@ -55,18 +57,18 @@ type OnTestSubmitRetValue = {
   rateLimit?: number | null;
   rateLimitRemaining?: number | null;
 } & (
-  | { generatedResponse: string | undefined; error?: null | undefined }
-  | {
+    | { generatedResponse: string | undefined; error?: null | undefined }
+    | {
       error: Error;
       generatedResponse?: null | undefined;
     }
-);
+  );
 
 export const TTDDialog = (
   props:
     | {
-        onTextSubmit(value: string): Promise<OnTestSubmitRetValue>;
-      }
+      onTextSubmit(value: string): Promise<OnTestSubmitRetValue>;
+    }
     | { __fallback: true },
 ) => {
   const appState = useUIAppState();
@@ -89,11 +91,11 @@ export const TTDDialogBase = withInternalFallback(
   }: {
     tab: "text-to-diagram" | "mermaid";
   } & (
-    | {
+      | {
         onTextSubmit(value: string): Promise<OnTestSubmitRetValue>;
       }
-    | { __fallback: true }
-  )) => {
+      | { __fallback: true }
+    )) => {
     const app = useApp();
     const setAppState = useExcalidrawSetAppState();
 
@@ -113,6 +115,22 @@ export const TTDDialogBase = withInternalFallback(
         generatedResponse: s?.generatedResponse ?? null,
         prompt: event.target.value,
       }));
+    };
+
+    const [apiKey, setApiKey] = useState(() => OpenRouterClient.getApiKey());
+    const [apiKeyInput, setApiKeyInput] = useState("");
+    const [modelInput, setModelInput] = useState(() => OpenRouterClient.getModel());
+    const [showSettings, setShowSettings] = useState(false);
+
+    const handleApiKeySubmit = () => {
+      if (apiKeyInput.trim()) {
+        OpenRouterClient.setApiKey(apiKeyInput.trim());
+        setApiKey(apiKeyInput.trim());
+      }
+      if (modelInput.trim()) {
+        OpenRouterClient.setModel(modelInput.trim());
+      }
+      setShowSettings(false);
     };
 
     const [onTextSubmitInProgess, setOnTextSubmitInProgess] = useState(false);
@@ -280,118 +298,196 @@ export const TTDDialogBase = withInternalFallback(
           </TTDDialogTab>
           {!("__fallback" in rest) && (
             <TTDDialogTab className="ttd-dialog-content" tab="text-to-diagram">
-              <div className="ttd-dialog-desc">
-                Currently we use Mermaid as a middle step, so you'll get best
-                results if you describe a diagram, workflow, flow chart, and
-                similar.
-              </div>
-              <TTDDialogPanels>
-                <TTDDialogPanel
-                  label={t("labels.prompt")}
-                  panelAction={{
-                    action: onGenerate,
-                    label: "Generate",
-                    icon: ArrowRightIcon,
-                  }}
-                  onTextSubmitInProgess={onTextSubmitInProgess}
-                  panelActionDisabled={
-                    prompt.length > MAX_PROMPT_LENGTH ||
-                    rateLimits?.rateLimitRemaining === 0
-                  }
-                  renderTopRight={() => {
-                    if (!rateLimits) {
-                      return null;
-                    }
-
-                    return (
-                      <div
-                        className="ttd-dialog-rate-limit"
-                        style={{
-                          fontSize: 12,
-                          marginLeft: "auto",
-                          color:
-                            rateLimits.rateLimitRemaining === 0
-                              ? "var(--color-danger)"
-                              : undefined,
-                        }}
+              {!apiKey ? (
+                <TTDDialogPanels>
+                  <TTDDialogPanel label="AI Settings">
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                        padding: "10px 0",
+                      }}
+                    >
+                      <p style={{ fontSize: "14px", lineHeight: "1.5" }}>
+                        To use AI features, please provide your OpenRouter API Key.
+                        <br />
+                        The key is stored locally in your browser.
+                      </p>
+                      <label style={{ fontSize: "12px", fontWeight: 600 }}>API Key</label>
+                      <TTDDialogInput
+                        input={apiKeyInput}
+                        placeholder="sk-or-..."
+                        onChange={(e) => setApiKeyInput(e.target.value)}
+                        onKeyboardSubmit={handleApiKeySubmit}
+                      />
+                      <label style={{ fontSize: "12px", fontWeight: 600, marginTop: "10px" }}>Model (optional)</label>
+                      <TTDDialogInput
+                        input={modelInput}
+                        placeholder="anthropic/claude-sonnet-4.5"
+                        onChange={(e) => setModelInput(e.target.value)}
+                        onKeyboardSubmit={handleApiKeySubmit}
+                      />
+                      <Button
+                        onSelect={handleApiKeySubmit}
+                        style={{ alignSelf: "flex-end", marginTop: "10px" }}
+                        className="ttd-dialog-panel-button"
                       >
-                        {rateLimits.rateLimitRemaining} requests left today
+                        Save Settings
+                      </Button>
+                    </div>
+                  </TTDDialogPanel>
+                </TTDDialogPanels>
+              ) : (
+                <>
+                  <div className="ttd-dialog-desc" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span>
+                      Currently we use Mermaid as a middle step, so you'll get best
+                      results if you describe a diagram, workflow, flow chart, and
+                      similar.
+                    </span>
+                    <span
+                      className="excalidraw-link"
+                      style={{ fontSize: 12, cursor: "pointer", whiteSpace: "nowrap", marginLeft: 10 }}
+                      onClick={() => setShowSettings(true)}
+                    >
+                      ⚙️ Settings
+                    </span>
+                  </div>
+                  {showSettings && (
+                    <div style={{ padding: "10px", background: "var(--color-surface-low)", borderRadius: 8, marginBottom: 10 }}>
+                      <label style={{ fontSize: "12px", fontWeight: 600 }}>Model</label>
+                      <TTDDialogInput
+                        input={modelInput}
+                        placeholder="anthropic/claude-sonnet-4.5"
+                        onChange={(e) => setModelInput(e.target.value)}
+                        onKeyboardSubmit={handleApiKeySubmit}
+                      />
+                      <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+                        <Button
+                          onSelect={handleApiKeySubmit}
+                          className="ttd-dialog-panel-button"
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          onSelect={() => setShowSettings(false)}
+                          className="ttd-dialog-panel-button"
+                        >
+                          Cancel
+                        </Button>
                       </div>
-                    );
-                  }}
-                  renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
-                  renderBottomRight={() => {
-                    if (typeof ttdGeneration?.generatedResponse === "string") {
-                      return (
-                        <div
-                          className="excalidraw-link"
-                          style={{ marginLeft: "auto", fontSize: 14 }}
-                          onClick={() => {
-                            if (
-                              typeof ttdGeneration?.generatedResponse ===
-                              "string"
-                            ) {
-                              saveMermaidDataToStorage(
-                                ttdGeneration.generatedResponse,
-                              );
-                              setAppState({
-                                openDialog: { name: "ttd", tab: "mermaid" },
-                              });
-                            }
-                          }}
-                        >
-                          View as Mermaid
-                          <InlineIcon icon={ArrowRightIcon} />
-                        </div>
-                      );
-                    }
-                    const ratio = prompt.length / MAX_PROMPT_LENGTH;
-                    if (ratio > 0.8) {
-                      return (
-                        <div
-                          style={{
-                            marginLeft: "auto",
-                            fontSize: 12,
-                            fontFamily: "monospace",
-                            color:
-                              ratio > 1 ? "var(--color-danger)" : undefined,
-                          }}
-                        >
-                          Length: {prompt.length}/{MAX_PROMPT_LENGTH}
-                        </div>
-                      );
-                    }
+                    </div>
+                  )}
+                  <TTDDialogPanels>
+                    <TTDDialogPanel
+                      label={t("labels.prompt")}
+                      panelAction={{
+                        action: onGenerate,
+                        label: "Generate",
+                        icon: ArrowRightIcon,
+                      }}
+                      onTextSubmitInProgess={onTextSubmitInProgess}
+                      panelActionDisabled={
+                        prompt.length > MAX_PROMPT_LENGTH ||
+                        rateLimits?.rateLimitRemaining === 0
+                      }
+                      renderTopRight={() => {
+                        if (!rateLimits) {
+                          return null;
+                        }
 
-                    return null;
-                  }}
-                >
-                  <TTDDialogInput
-                    onChange={handleTextChange}
-                    input={text}
-                    placeholder={"Describe what you want to see..."}
-                    onKeyboardSubmit={() => {
-                      refOnGenerate.current();
-                    }}
-                  />
-                </TTDDialogPanel>
-                <TTDDialogPanel
-                  label="Preview"
-                  panelAction={{
-                    action: () => {
-                      console.info("Panel action clicked");
-                      insertToEditor({ app, data });
-                    },
-                    label: "Insert",
-                    icon: ArrowRightIcon,
-                  }}
-                >
-                  <TTDDialogOutput
-                    canvasRef={someRandomDivRef}
-                    error={error}
-                    loaded={mermaidToExcalidrawLib.loaded}
-                  />
-                </TTDDialogPanel>
-              </TTDDialogPanels>
+                        return (
+                          <div
+                            className="ttd-dialog-rate-limit"
+                            style={{
+                              fontSize: 12,
+                              marginLeft: "auto",
+                              color:
+                                rateLimits.rateLimitRemaining === 0
+                                  ? "var(--color-danger)"
+                                  : undefined,
+                            }}
+                          >
+                            {rateLimits.rateLimitRemaining} requests left today
+                          </div>
+                        );
+                      }}
+                      renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
+                      renderBottomRight={() => {
+                        if (typeof ttdGeneration?.generatedResponse === "string") {
+                          return (
+                            <div
+                              className="excalidraw-link"
+                              style={{ marginLeft: "auto", fontSize: 14 }}
+                              onClick={() => {
+                                if (
+                                  typeof ttdGeneration?.generatedResponse ===
+                                  "string"
+                                ) {
+                                  saveMermaidDataToStorage(
+                                    ttdGeneration.generatedResponse,
+                                  );
+                                  setAppState({
+                                    openDialog: { name: "ttd", tab: "mermaid" },
+                                  });
+                                }
+                              }}
+                            >
+                              View as Mermaid
+                              <InlineIcon icon={ArrowRightIcon} />
+                            </div>
+                          );
+                        }
+                        const ratio = prompt.length / MAX_PROMPT_LENGTH;
+                        if (ratio > 0.8) {
+                          return (
+                            <div
+                              style={{
+                                marginLeft: "auto",
+                                fontSize: 12,
+                                fontFamily: "monospace",
+                                color:
+                                  ratio > 1 ? "var(--color-danger)" : undefined,
+                              }}
+                            >
+                              Length: {prompt.length}/{MAX_PROMPT_LENGTH}
+                            </div>
+                          );
+                        }
+
+                        return null;
+                      }}
+                    >
+                      <TTDDialogInput
+                        onChange={handleTextChange}
+                        input={text}
+                        placeholder={"Describe what you want to see..."}
+                        onKeyboardSubmit={() => {
+                          refOnGenerate.current();
+                        }}
+                      />
+                    </TTDDialogPanel>
+                    <TTDDialogPanel
+                      label="Preview"
+                      panelAction={{
+                        action: () => {
+                          console.info("Panel action clicked");
+                          insertToEditor({ app, data });
+                        },
+                        label: "Insert",
+                        icon: ArrowRightIcon,
+                      }}
+                    >
+                      <TTDDialogOutput
+                        canvasRef={someRandomDivRef}
+                        error={error}
+                        loaded={mermaidToExcalidrawLib.loaded}
+                      />
+                    </TTDDialogPanel>
+                  </TTDDialogPanels>
+                </>
+              )}
             </TTDDialogTab>
           )}
         </TTDDialogTabs>

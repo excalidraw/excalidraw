@@ -4,10 +4,9 @@ import {
   getTextFromElements,
   MIME_TYPES,
   TTDDialog,
+  OpenRouterClient,
 } from "@excalidraw/excalidraw";
 import { getDataURL } from "@excalidraw/excalidraw/data/blob";
-import { safelyParseJSON } from "@excalidraw/common";
-
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 export const AIComponents = ({
@@ -20,6 +19,10 @@ export const AIComponents = ({
       <DiagramToCodePlugin
         generate={async ({ frame, children }) => {
           const appState = excalidrawAPI.getAppState();
+
+          if (!OpenRouterClient.getApiKey()) {
+            throw new Error("OpenRouter API Key not found. Please set it in the Text-to-Diagram dialog first.");
+          }
 
           const blob = await exportToBlob({
             elements: children,
@@ -35,123 +38,93 @@ export const AIComponents = ({
 
           const dataURL = await getDataURL(blob);
 
-          const textFromFrameChildren = getTextFromElements(children);
-
-          const response = await fetch(
-            `${
-              import.meta.env.VITE_APP_AI_BACKEND
-            }/v1/ai/diagram-to-code/generate`,
-            {
-              method: "POST",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                texts: textFromFrameChildren,
-                image: dataURL,
-                theme: appState.theme,
-              }),
-            },
-          );
-
-          if (!response.ok) {
-            const text = await response.text();
-            const errorJSON = safelyParseJSON(text);
-
-            if (!errorJSON) {
-              throw new Error(text);
-            }
-
-            if (errorJSON.statusCode === 429) {
-              return {
-                html: `<html>
-                <body style="margin: 0; text-align: center">
-                <div style="display: flex; align-items: center; justify-content: center; flex-direction: column; height: 100vh; padding: 0 60px">
-                  <div style="color:red">Too many requests today,</br>please try again tomorrow!</div>
-                  </br>
-                  </br>
-                  <div>You can also try <a href="${
-                    import.meta.env.VITE_APP_PLUS_LP
-                  }/plus?utm_source=excalidraw&utm_medium=app&utm_content=d2c" target="_blank" rel="noopener">Excalidraw+</a> to get more requests.</div>
-                </div>
-                </body>
-                </html>`,
-              };
-            }
-
-            throw new Error(errorJSON.message || text);
-          }
+          const systemPrompt = `You are an expert web developer specializing in converting wireframes and mockups into pixel-perfect HTML and CSS.
+You will be provided with an image of a UI design. Your task is to generate the HTML and CSS code to reproduce this design as closely as possible.
+Rules:
+- Use standard HTML5 and CSS3.
+- You may use TailwindCSS if it helps, or vanilla CSS.
+- Return ONLY the HTML code. Do not wrap it in backticks or markdown blocks.
+- Ensure the design is responsive and looks good.
+- The output should be a single HTML file with embedded CSS.`;
 
           try {
-            const { html } = await response.json();
+            const response = await OpenRouterClient.generateCompletion([
+              {
+                role: "system",
+                content: systemPrompt
+              },
+              {
+                role: "user",
+                content: [
+                  {
+                    type: "text",
+                    text: "Turn this wireframe into code."
+                  },
+                  {
+                    type: "image_url",
+                    image_url: {
+                      url: dataURL
+                    }
+                  }
+                ]
+              }
+            ], "anthropic/claude-sonnet-4.5"); // Using a vision capable model
 
-            if (!html) {
-              throw new Error("Generation failed (invalid response)");
+            let html = response;
+            // enhanced cleanup
+            if (html.includes("```html")) {
+              html = html.split("```html")[1].split("```")[0];
+            } else if (html.includes("```")) {
+              html = html.split("```")[1].split("```")[0];
             }
-            return {
-              html,
-            };
+
+            return { html: html.trim() };
+
           } catch (error: any) {
-            throw new Error("Generation failed (invalid response)");
+            console.error("AI Generation Error:", error);
+            throw new Error(error.message || "Generation failed");
           }
         }}
       />
 
       <TTDDialog
         onTextSubmit={async (input) => {
+          if (!OpenRouterClient.getApiKey()) {
+            throw new Error("Please set your OpenRouter API Key in the settings.");
+          }
+
+          const systemPrompt = `You are a helpful assistant that generates Mermaid diagram syntax from text descriptions.
+Rules:
+- Return ONLY the Mermaid syntax.
+- Do not output any markdown formatting (backticks).
+- If the user asks for a flowchart, use 'flowchart TD'.
+- If the user asks for a sequence diagram, use 'sequenceDiagram'.
+- If class diagram, use 'classDiagram'.
+- Ensure the syntax is valid.`;
+
           try {
-            const response = await fetch(
-              `${
-                import.meta.env.VITE_APP_AI_BACKEND
-              }/v1/ai/text-to-diagram/generate`,
+            const response = await OpenRouterClient.generateCompletion([
               {
-                method: "POST",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ prompt: input }),
+                role: "system",
+                content: systemPrompt
               },
-            );
-
-            const rateLimit = response.headers.has("X-Ratelimit-Limit")
-              ? parseInt(response.headers.get("X-Ratelimit-Limit") || "0", 10)
-              : undefined;
-
-            const rateLimitRemaining = response.headers.has(
-              "X-Ratelimit-Remaining",
-            )
-              ? parseInt(
-                  response.headers.get("X-Ratelimit-Remaining") || "0",
-                  10,
-                )
-              : undefined;
-
-            const json = await response.json();
-
-            if (!response.ok) {
-              if (response.status === 429) {
-                return {
-                  rateLimit,
-                  rateLimitRemaining,
-                  error: new Error(
-                    "Too many requests today, please try again tomorrow!",
-                  ),
-                };
+              {
+                role: "user",
+                content: input
               }
+            ]);
 
-              throw new Error(json.message || "Generation failed...");
+            let generatedResponse = response;
+            if (generatedResponse.includes("```mermaid")) {
+              generatedResponse = generatedResponse.split("```mermaid")[1].split("```")[0];
+            } else if (generatedResponse.includes("```")) {
+              generatedResponse = generatedResponse.split("```")[1].split("```")[0];
             }
 
-            const generatedResponse = json.generatedResponse;
-            if (!generatedResponse) {
-              throw new Error("Generation failed...");
-            }
-
-            return { generatedResponse, rateLimit, rateLimitRemaining };
+            return { generatedResponse: generatedResponse.trim() };
           } catch (err: any) {
-            throw new Error("Request failed");
+            console.error(err);
+            return { error: new Error(err.message || "Request failed") };
           }
         }}
       />
