@@ -93,7 +93,10 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
           color: message.role === 'user' ? 'white' : '#333',
           fontSize: '14px',
           lineHeight: 1.4,
-          wordWrap: 'break-word'
+          wordWrap: 'break-word',
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+          overflowWrap: 'anywhere'
         }}
       >
         <MessageContentWithRefs
