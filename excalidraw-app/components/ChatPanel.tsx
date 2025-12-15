@@ -17,11 +17,20 @@ import { useCitationFocus } from '../hooks/useCitationFocus';
 import { useChatStream } from '../hooks/useChatStream';
 import { useSnapshots } from '../hooks/useSnapshots';
 import { useInviteAI } from '../hooks/useInviteAI';
+import { useSpeechInput } from '../hooks/useSpeechInput';
+import { useAppLangCode } from '../app-language/language-state';
 import { ChatHeader } from './ChatPanel/ChatHeader';
 import { ChatInputBar } from './ChatPanel/ChatInputBar';
 import { ChatMessagesList } from './ChatPanel/ChatMessagesList';
 import { isAuthShellEnabled } from '../app_constants';
 import { useAuthShell } from '../auth-shell/AuthShellContext';
+
+const concatWithSpace = (base: string, addition: string) => {
+  const trimmedAddition = addition.trim();
+  if (!trimmedAddition) return base;
+  if (!base) return trimmedAddition;
+  return base.endsWith(' ') ? `${base}${trimmedAddition}` : `${base} ${trimmedAddition}`;
+};
 
 const panelContainerStyle: React.CSSProperties = {
   position: 'fixed',
@@ -47,11 +56,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
-
   const chatPanelRef = useRef<HTMLDivElement>(null);
   const collabAPI = useAtomValue(collabAPIAtom);
   const canAccessPremiumFeatures = isAuthShellEnabled;
   const premiumCollabAPI = canAccessPremiumFeatures ? collabAPI : null;
+  const [appLangCode] = useAppLangCode();
+  const speechBaseRef = useRef('');
 
   // Custom hooks
   const { focusCitation } = useCitationFocus({ excalidrawAPI });
@@ -84,6 +94,30 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     generateSnapshots,
     getToken,
     collabAPI: premiumCollabAPI
+  });
+
+  const {
+    supported: speechSupported,
+    status: speechStatus,
+    error: speechError,
+    start: startSpeech,
+    stop: stopSpeech,
+    reset: resetSpeech
+  } = useSpeechInput({
+    lang: appLangCode || 'en-US',
+    onError: (event) => {
+      if (isDev()) {
+        console.warn('[SpeechInput] error', { error: event.error, message: event.message });
+      }
+    },
+    onInterim: (text) => {
+      setInputMessage(concatWithSpace(speechBaseRef.current, text));
+    },
+    onFinal: (text) => {
+      if (!text) return;
+      speechBaseRef.current = concatWithSpace(speechBaseRef.current, text);
+      setInputMessage(speechBaseRef.current);
+    }
   });
 
   const isStreamingMessageActive = messages.some((msg) => msg.isStreaming);
@@ -124,16 +158,34 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     const trimmed = inputMessage.trim();
     if (!trimmed || !canAccessPremiumFeatures) return;
     setInputMessage('');
+    speechBaseRef.current = '';
+    resetSpeech();
     await sendChatMessage(trimmed);
-  }, [inputMessage, canAccessPremiumFeatures, sendChatMessage]);
+  }, [inputMessage, canAccessPremiumFeatures, sendChatMessage, resetSpeech]);
 
   // Cleanup streaming on unmount
   useEffect(() => {
     return () => {
       cleanupStreaming();
+      stopSpeech();
     };
-  }, [cleanupStreaming]);
+  }, [cleanupStreaming, stopSpeech]);
 
+  // Stop speech when panel is hidden (component remains mounted but returns null).
+  useEffect(() => {
+    if (!isVisible) {
+      speechBaseRef.current = '';
+      resetSpeech();
+    }
+  }, [isVisible, resetSpeech]);
+
+  // Stop speech when streaming starts to avoid conflicts
+  useEffect(() => {
+    if (isStreamingMessageActive) {
+      speechBaseRef.current = '';
+      resetSpeech();
+    }
+  }, [isStreamingMessageActive, resetSpeech]);
   
 
   // Clipboard functionality with fallback
@@ -243,10 +295,24 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
       <ChatInputBar
         value={inputMessage}
-        onChange={setInputMessage}
+        onChange={(value) => {
+          if (speechStatus === 'listening') {
+            speechBaseRef.current = '';
+            resetSpeech();
+          }
+          setInputMessage(value);
+        }}
         onSend={sendMessage}
         disabled={!canAccessPremiumFeatures || !isConnected || isLoading}
         placeholder={isConnected ? "Type your message..." : "Service disconnected"}
+        speechSupported={speechSupported}
+        speechStatus={speechStatus}
+        speechError={speechError}
+        onStartSpeech={async () => {
+          speechBaseRef.current = inputMessage.trim();
+          await startSpeech();
+        }}
+        onStopSpeech={stopSpeech}
       />
     </div>
   );

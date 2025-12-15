@@ -40,6 +40,7 @@ export const ChatMessagesList: React.FC<ChatMessagesListProps> = ({
       flex: 1,
       padding: '16px 20px',
       overflowY: 'auto',
+      overflowX: 'hidden',
       display: 'flex',
       flexDirection: 'column',
       gap: '12px'
