@@ -1090,6 +1090,18 @@
   dependencies:
     tslib "^2.1.0"
 
+"@capacitor/filesystem@8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@capacitor/filesystem/-/filesystem-8.0.0.tgz#752bdff67686940cb73459fd94c58cb114098ff7"
+  integrity sha512-RRGNLW9xEqvVVHGyGlfS4Oy0R3Na+bEefwZElKbex22S9eZr5cg8wc750BPPVwbcv5lf5fJymkY8x8y6UwKPyg==
+  dependencies:
+    "@capacitor/synapse" "^1.0.4"
+
+"@capacitor/synapse@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@capacitor/synapse/-/synapse-1.0.4.tgz#c6beb33119d9656b1f04cb7783989fb78933ef6d"
+  integrity sha512-/C1FUo8/OkKuAT4nCIu/34ny9siNHr9qtFezu4kxm6GY1wNFxrCFWjfYx5C1tUhVGz3fxBABegupkpjXvjCHrw==
+
 "@esbuild/aix-ppc64@0.19.10":
   version "0.19.10"
   resolved "https://registry.yarnpkg.com/@esbuild/aix-ppc64/-/aix-ppc64-0.19.10.tgz#fb3922a0183d27446de00cf60d4f7baaadf98d84"

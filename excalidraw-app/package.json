@@ -28,6 +28,7 @@
   "dependencies": {
     "@capacitor/android": "8.0.0",
     "@capacitor/core": "8.0.0",
+    "@capacitor/filesystem": "8.0.0",
     "@excalidraw/random-username": "1.0.0",
     "@sentry/browser": "9.0.1",
     "callsites": "4.2.0",

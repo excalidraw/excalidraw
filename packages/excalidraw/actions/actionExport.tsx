@@ -20,7 +20,7 @@ import { Tooltip } from "../components/Tooltip";
 import { ExportIcon, questionCircle, saveAs } from "../components/icons";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { isImageFileHandle } from "../data/blob";
-import { nativeFileSystemSupported } from "../data/filesystem";
+import { nativeFileSystemSupported, isCapacitorNative } from "../data/filesystem";
 import { resaveAsImageWithScene } from "../data/resave";
 
 import { t } from "../i18n";
@@ -168,11 +168,11 @@ export const actionSaveToActiveFile = register({
     try {
       const { fileHandle } = isImageFileHandle(appState.fileHandle)
         ? await resaveAsImageWithScene(
-            elements,
-            appState,
-            app.files,
-            app.getName(),
-          )
+          elements,
+          appState,
+          app.files,
+          app.getName(),
+        )
         : await saveAsJSON(elements, appState, app.files, app.getName());
 
       return {
@@ -182,13 +182,13 @@ export const actionSaveToActiveFile = register({
           fileHandle,
           toast: fileHandleExists
             ? {
-                message: fileHandle?.name
-                  ? t("toast.fileSavedToFilename").replace(
-                      "{filename}",
-                      `"${fileHandle.name}"`,
-                    )
-                  : t("toast.fileSaved"),
-              }
+              message: fileHandle?.name
+                ? t("toast.fileSavedToFilename").replace(
+                  "{filename}",
+                  `"${fileHandle.name}"`,
+                )
+                : t("toast.fileSaved"),
+            }
             : null,
         },
       };
@@ -249,7 +249,7 @@ export const actionSaveFileToDisk = register({
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
       showAriaLabel={useEditorInterface().formFactor === "phone"}
-      hidden={!nativeFileSystemSupported}
+      hidden={!nativeFileSystemSupported && !isCapacitorNative()}
       onClick={() => updateData(null)}
       data-testid="save-as-button"
     />
