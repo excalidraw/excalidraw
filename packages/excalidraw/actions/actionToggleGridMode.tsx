@@ -32,5 +32,5 @@ export const actionToggleGridMode = register({
   predicate: (element, appState, props) => {
     return props.gridModeEnabled === undefined;
   },
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.code === CODES.QUOTE,
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.code === CODES.BACKQUOTE,
 });
