@@ -103,11 +103,19 @@ export const actionFinalize = register<FormData>({
             return map;
           }, new Map()) ?? new Map();
 
-        bindOrUnbindBindingElement(element, draggedPoints, scene, appState, {
-          newArrow,
-          altKey: event.altKey,
-          angleLocked: shouldRotateWithDiscreteAngle(event),
-        });
+        bindOrUnbindBindingElement(
+          element,
+          draggedPoints,
+          sceneCoords.x,
+          sceneCoords.y,
+          scene,
+          appState,
+          {
+            newArrow,
+            altKey: event.altKey,
+            angleLocked: shouldRotateWithDiscreteAngle(event),
+          },
+        );
       } else if (isLineElement(element)) {
         if (
           appState.selectedLinearElement?.isEditing &&
