@@ -35,3 +35,4 @@ excalidraw-app/android/local.properties
 
 # Docker build output
 output/
+.env.production

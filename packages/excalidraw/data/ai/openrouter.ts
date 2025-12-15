@@ -12,11 +12,19 @@ export interface OpenRouterResponse {
 
 export const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 export const DEFAULT_OPENROUTER_MODEL = "anthropic/claude-sonnet-4.5";
-export const DEFAULT_OPENROUTER_API_KEY = "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";
+
+// Default API key from environment variable (set in .env.local)
+const getDefaultApiKey = (): string | null => {
+    // Check if running in browser with Vite
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+        return import.meta.env.VITE_APP_OPENROUTER_API_KEY || null;
+    }
+    return null;
+};
 
 export class OpenRouterClient {
     static getApiKey(): string | null {
-        return EditorLocalStorage.get(EDITOR_LS_KEYS.OPENROUTER_API_KEY) || DEFAULT_OPENROUTER_API_KEY;
+        return EditorLocalStorage.get(EDITOR_LS_KEYS.OPENROUTER_API_KEY) || getDefaultApiKey();
     }
 
     static setApiKey(key: string) {
