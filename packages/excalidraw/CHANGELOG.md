@@ -445,7 +445,7 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 
 - Unify binding update options for `updateBoundElements()` [#8832](https://github.com/excalidraw/excalidraw/pull/8832)
 
-- Cleanup scripts and support upto node 22 [#8794](https://github.com/excalidraw/excalidraw/pull/8794)
+- Cleanup scripts and support up to node 22 [#8794](https://github.com/excalidraw/excalidraw/pull/8794)
 
 - Usage of `node12 which is deprecated` [#8791](https://github.com/excalidraw/excalidraw/pull/8791)
 
@@ -637,7 +637,7 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 
 - External link not opening [#7859](https://github.com/excalidraw/excalidraw/pull/7859)
 
-- Add safe check for arrow points length in tranformToExcalidrawElements [#7863](https://github.com/excalidraw/excalidraw/pull/7863)
+- Add safe check for arrow points length in transformToExcalidrawElements [#7863](https://github.com/excalidraw/excalidraw/pull/7863)
 
 - Import [#7869](https://github.com/excalidraw/excalidraw/pull/7869)
 
@@ -965,7 +965,7 @@ define: {
 
 ## 0.16.0 (2023-09-19)
 
-- Support creating containers, linear elements, text containers, labelled arrows and arrow bindings programatically [#6546](https://github.com/excalidraw/excalidraw/pull/6546)
+- Support creating containers, linear elements, text containers, labelled arrows and arrow bindings programmatically [#6546](https://github.com/excalidraw/excalidraw/pull/6546)
 - Introducing Web-Embeds (alias iframe element)[#6691](https://github.com/excalidraw/excalidraw/pull/6691)
 - Added [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) to customize embeddable src url validation. [#6691](https://github.com/excalidraw/excalidraw/pull/6691)
 - Add support for `opts.fitToViewport` and `opts.viewportZoomFactor` in the [`ExcalidrawAPI.scrollToContent`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/excalidraw-api#scrolltocontent) API. [#6581](https://github.com/excalidraw/excalidraw/pull/6581).
@@ -999,7 +999,7 @@ define: {
 
 - Partition main canvas vertically [#6759](https://github.com/excalidraw/excalidraw/pull/6759)
 
-- Support creating containers, linear elements, text containers, labelled arrows and arrow bindings programatically [#6546](https://github.com/excalidraw/excalidraw/pull/6546)
+- Support creating containers, linear elements, text containers, labelled arrows and arrow bindings programmatically [#6546](https://github.com/excalidraw/excalidraw/pull/6546)
 
 - Add support for simplePDF in Web-Embeds [#6810](https://github.com/excalidraw/excalidraw/pull/6810)
 
@@ -1017,7 +1017,7 @@ define: {
 
 - Overwrite confirmation dialogs [#6658](https://github.com/excalidraw/excalidraw/pull/6658)
 
-- Simple analitycs [#6683](https://github.com/excalidraw/excalidraw/pull/6683)
+- Simple analytics [#6683](https://github.com/excalidraw/excalidraw/pull/6683)
 
 - Introduce frames [#6123](https://github.com/excalidraw/excalidraw/pull/6123)
 
@@ -1633,7 +1633,7 @@ For more details refer to the [docs](https://docs.excalidraw.com)
 
 - Hide canvas-modifying UI in view mode [#5815](https://github.com/excalidraw/excalidraw/pull/5815)
 
-- Fix vertical/horizntal centering icons [#5812](https://github.com/excalidraw/excalidraw/pull/5812)
+- Fix vertical/horizontal centering icons [#5812](https://github.com/excalidraw/excalidraw/pull/5812)
 
 - Consistent use of ZOOM_STEP [#5801](https://github.com/excalidraw/excalidraw/pull/5801)
 
@@ -2076,7 +2076,7 @@ Check out the [release notes](https://github.com/excalidraw/excalidraw/releases/
 ### Features
 
 - Set the target to `window.name` if present during excalidraw libraries installation so it opens in same tab for the host. If `window.name` is not set it will open in a new tab [#3299](https://github.com/excalidraw/excalidraw/pull/3299).
-- Add `name` prop to indicate the name of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over `intialData.appState.name`, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw [#3273](https://github.com/excalidraw/excalidraw/pull/3273).
+- Add `name` prop to indicate the name of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over `initialData.appState.name`, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw [#3273](https://github.com/excalidraw/excalidraw/pull/3273).
 - Export API `setCanvasOffsets` via `ref` to set the offsets for Excalidraw[#3265](https://github.com/excalidraw/excalidraw/pull/3265).
   #### BREAKING CHANGE
   - `offsetLeft` and `offsetTop` props have been removed now so you have to use the `setCanvasOffsets` via `ref` to achieve the same.
