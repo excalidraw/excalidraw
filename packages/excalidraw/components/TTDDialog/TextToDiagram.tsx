@@ -27,7 +27,6 @@ import { useTextGeneration } from "./hooks/useTextGeneration";
 import { useChatManagement } from "./hooks/useChatManagement";
 import { TTDChatPanel } from "./components/TTDChatPanel";
 import { TTDPreviewPanel } from "./components/TTDPreviewPanel";
-import mockChunks from "./mock";
 
 import {
   addMessages,
@@ -116,6 +115,8 @@ const TextToDiagramContent = ({
 
   // TODO:: just for testing
   const onReplay = async () => {
+    const { default: mockChunks } = await import("./mock");
+
     setChatHistory((prev) => {
       return updateAssistantContent(prev, {
         isGenerating: true,
@@ -284,9 +285,7 @@ const TextToDiagramContent = ({
           loaded={mermaidToExcalidrawLib.loaded}
           onInsert={handleInsertToEditor}
           onReplay={onReplay}
-          isReplayDisabled={
-            lastAssistantMessage?.isGenerating || mockChunks.length === 0
-          }
+          isReplayDisabled={lastAssistantMessage?.isGenerating ?? false}
         />
       )}
     </div>
