@@ -2,6 +2,7 @@ import {
   clearAppStateForLocalStorage,
   getDefaultAppState,
 } from "@excalidraw/excalidraw/appState";
+import { getNonDeletedElements } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppState } from "@excalidraw/excalidraw/types";
@@ -34,13 +35,35 @@ export const importUsernameFromLocalStorage = (): string | null => {
   return null;
 };
 
-export const importFromLocalStorage = () => {
+/**
+ * Get board-specific localStorage key
+ */
+const getBoardStorageKey = (key: string, boardId: string | null): string => {
+  if (!boardId) {
+    return key; // Default shared key
+  }
+  return `${key}_board_${boardId}`; // Board-specific key
+};
+
+/**
+ * Import data from localStorage (supports board-specific keys)
+ */
+export const importFromLocalStorage = (boardId?: string | null) => {
   let savedElements = null;
   let savedState = null;
 
   try {
-    savedElements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
-    savedState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
+    const elementsKey = getBoardStorageKey(
+      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
+      boardId || null,
+    );
+    const stateKey = getBoardStorageKey(
+      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
+      boardId || null,
+    );
+
+    savedElements = localStorage.getItem(elementsKey);
+    savedState = localStorage.getItem(stateKey);
   } catch (error: any) {
     // Unable to access localStorage
     console.error(error);
@@ -71,6 +94,35 @@ export const importFromLocalStorage = () => {
     }
   }
   return { elements, appState };
+};
+
+/**
+ * Save data to board-specific localStorage
+ */
+export const saveToBoardLocalStorage = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  boardId: string | null,
+) => {
+  const elementsKey = getBoardStorageKey(
+    STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
+    boardId,
+  );
+  const stateKey = getBoardStorageKey(
+    STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
+    boardId,
+  );
+
+  try {
+    const _appState = clearAppStateForLocalStorage(appState);
+    localStorage.setItem(
+      elementsKey,
+      JSON.stringify(getNonDeletedElements(elements)),
+    );
+    localStorage.setItem(stateKey, JSON.stringify(_appState));
+  } catch (error: any) {
+    console.error("Failed to save to board localStorage:", error);
+  }
 };
 
 export const getElementsStorageSize = () => {

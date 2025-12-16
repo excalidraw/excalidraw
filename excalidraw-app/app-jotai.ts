@@ -35,3 +35,22 @@ export const useAtomWithInitialValue = <
 
   return [value, setValue] as const;
 };
+
+// Google Drive integration atoms
+export const googleDriveAuthAtom = atom<{
+  isAuthenticated: boolean;
+  accessToken: string | null;
+  userEmail: string | null;
+}>({
+  isAuthenticated: false,
+  accessToken: null,
+  userEmail: null,
+});
+
+export const currentBoardIdAtom = atom<string | null>(null);
+
+export const boardsListAtom = atom<
+  Array<{ id: string; name: string; folderId: string }>
+>([]);
+
+export const excalidrawFolderIdAtom = atom<string | null>(null);

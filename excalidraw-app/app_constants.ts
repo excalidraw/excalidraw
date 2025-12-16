@@ -47,6 +47,9 @@ export const STORAGE_KEYS = {
 
   IDB_LIBRARY: "excalidraw-library",
 
+  // Google Drive board selection persistence
+  GOOGLE_DRIVE_CURRENT_BOARD: "excalidraw_current_board_id",
+
   // do not use apart from migrations
   __LEGACY_LOCAL_STORAGE_LIBRARY: "excalidraw-library",
 } as const;
