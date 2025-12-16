@@ -252,7 +252,6 @@ const TextToDiagramContent = ({
           error={error}
           loaded={mermaidToExcalidrawLib.loaded}
           onInsert={handleInsertToEditor}
-          isReplayDisabled={lastAssistantMessage?.isGenerating ?? false}
         />
       )}
     </div>
