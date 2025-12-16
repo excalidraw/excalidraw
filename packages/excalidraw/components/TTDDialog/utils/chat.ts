@@ -19,6 +19,7 @@ export const updateAssistantContent = (
   }
 
   const lastMessage = messages[lastAssistantIndex];
+
   const updatedMessages = messages.slice();
 
   updatedMessages[lastAssistantIndex] = {
@@ -60,7 +61,7 @@ export const addMessages = (
 };
 
 export const removeLastAssistantMessage = (chatHistory: ChatHistory) => {
-  const lastMsgIdx = (chatHistory.messages ?? []).findIndex(
+  const lastMsgIdx = (chatHistory.messages ?? []).findLastIndex(
     (msg) => msg.type === "assistant",
   );
 
