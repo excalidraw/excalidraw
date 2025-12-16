@@ -53,7 +53,7 @@ $fullScreenModalBreakpoint: 600px;
     font-size: 15px;
     font-style: italic;
     font-weight: 500;
-    margin-bottom: 0.5rem;
+    margin: 0.5rem 0 1.5rem 0;
   }
 
   .ttd-dialog-tabs-root {
@@ -113,6 +113,7 @@ $fullScreenModalBreakpoint: 600px;
     display: flex;
     flex-direction: column;
     overflow: visible;
+    outline: none;
 
     &[hidden] {
       display: none;
