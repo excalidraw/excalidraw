@@ -27,7 +27,7 @@ export const useMermaidRenderer = ({
   mermaidToExcalidrawLib,
   canvasRef,
 }: UseMermaidRendererProps) => {
-  const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom);
+  const [chatHistory] = useAtom(chatHistoryAtom);
   const [, setError] = useAtom(errorAtom);
 
   const [showPreview, setShowPreview] = useAtom(showPreviewAtom);
