@@ -1,5 +1,3 @@
-import { isDevEnv } from "@excalidraw/common";
-
 import { t } from "../../../i18n";
 import { ArrowRightIcon } from "../../icons";
 
@@ -13,8 +11,6 @@ interface TTDPreviewPanelProps {
   error: Error | null;
   loaded: boolean;
   onInsert: () => void;
-  onReplay: () => void;
-  isReplayDisabled: boolean;
   hideErrorDetails?: boolean;
 }
 
@@ -23,27 +19,16 @@ export const TTDPreviewPanel = ({
   error,
   loaded,
   onInsert,
-  onReplay,
-  isReplayDisabled,
   hideErrorDetails,
 }: TTDPreviewPanelProps) => {
-  const actions: TTDPanelAction[] = [];
-
-  if (isDevEnv()) {
-    actions.push({
-      action: onReplay,
-      label: "Replay",
+  const actions: TTDPanelAction[] = [
+    {
+      action: onInsert,
+      label: t("chat.insert"),
+      icon: ArrowRightIcon,
       variant: "button",
-      disabled: isReplayDisabled,
-    });
-  }
-
-  actions.push({
-    action: onInsert,
-    label: t("chat.insert"),
-    icon: ArrowRightIcon,
-    variant: "button",
-  });
+    },
+  ];
 
   return (
     <TTDDialogPanel

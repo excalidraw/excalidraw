@@ -28,11 +28,7 @@ import { useChatManagement } from "./hooks/useChatManagement";
 import { TTDChatPanel } from "./components/TTDChatPanel";
 import { TTDPreviewPanel } from "./components/TTDPreviewPanel";
 
-import {
-  addMessages,
-  getLastAssistantMessage,
-  updateAssistantContent,
-} from "./utils/chat";
+import { addMessages, getLastAssistantMessage } from "./utils/chat";
 
 import type { ChatMessageType } from "../Chat";
 
@@ -112,34 +108,6 @@ const TextToDiagramContent = ({
     chatHistory,
     setChatHistory,
   ]);
-
-  // TODO:: just for testing
-  const onReplay = async () => {
-    const { default: mockChunks } = await import("./mock");
-
-    setChatHistory((prev) => {
-      return updateAssistantContent(prev, {
-        isGenerating: true,
-        content: "",
-      });
-    });
-    for (const chunk of mockChunks) {
-      setChatHistory((prev) => {
-        const lastAssistantMessage = getLastAssistantMessage(prev);
-        return updateAssistantContent(prev, {
-          content: lastAssistantMessage.content + chunk,
-        });
-      });
-      const delay = Math.floor(Math.random() * 5) + 1;
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
-
-    setChatHistory((prev) =>
-      updateAssistantContent(prev, {
-        isGenerating: false,
-      }),
-    );
-  };
 
   const onViewAsMermaid = () => {
     if (typeof lastAssistantMessage?.content === "string") {
@@ -284,7 +252,6 @@ const TextToDiagramContent = ({
           error={error}
           loaded={mermaidToExcalidrawLib.loaded}
           onInsert={handleInsertToEditor}
-          onReplay={onReplay}
           isReplayDisabled={lastAssistantMessage?.isGenerating ?? false}
         />
       )}

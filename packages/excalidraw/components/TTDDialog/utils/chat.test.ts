@@ -1,7 +1,3 @@
-import { vi } from "vitest";
-
-import type { ChatHistory } from "../../Chat";
-
 import {
   addMessages,
   getLastAssistantMessage,
@@ -9,6 +5,8 @@ import {
   removeLastAssistantMessage,
   updateAssistantContent,
 } from "./chat";
+
+import type { ChatHistory } from "../../Chat";
 
 describe("chat utils", () => {
   describe("updateAssistantContent", () => {
