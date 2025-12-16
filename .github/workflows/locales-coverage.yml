@@ -14,10 +14,10 @@ jobs:
         with:
           token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
 
-      - name: Setup Node.js 18.x
+      - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 18.x
+          node-version: 20.x
 
       - name: Create report file
         run: |
