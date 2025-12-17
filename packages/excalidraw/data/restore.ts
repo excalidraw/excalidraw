@@ -56,6 +56,7 @@ import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
   ElementsMap,
+  ElementsMapOrArray,
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
@@ -129,7 +130,8 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
 const repairBinding = <T extends ExcalidrawArrowElement>(
   element: T,
   binding: FixedPointBinding | null,
-  elementsMap: Readonly<ElementsMap>,
+  targetElementsMap: Readonly<ElementsMap>,
+  localElementsMap: Readonly<ElementsMap> | null | undefined,
   startOrEnd: "start" | "end",
 ): FixedPointBinding | null => {
   if (!binding) {
@@ -148,18 +150,27 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
     return fixedPointBinding;
   }
 
-  const boundElement =
-    (elementsMap.get(binding.elementId) as ExcalidrawBindableElement) ||
-    undefined;
-  if (boundElement) {
-    if (binding.mode) {
-      return {
-        elementId: binding.elementId,
-        mode: binding.mode || "orbit",
-        fixedPoint: normalizeFixedPoint(binding.fixedPoint || [0.5, 0.5]),
-      } as FixedPointBinding | null;
-    }
+  // Fallback if the bound element is missing but the binding is at least
+  // looking like a valid one shape-wise
+  if (binding.mode && binding.fixedPoint && binding.elementId) {
+    return {
+      elementId: binding.elementId,
+      mode: binding.mode,
+      fixedPoint: normalizeFixedPoint(binding.fixedPoint || [0.5, 0.5]),
+    } as FixedPointBinding | null;
+  }
 
+  const targetBoundElement =
+    (targetElementsMap.get(binding.elementId) as ExcalidrawBindableElement) ||
+    undefined;
+  const boundElement =
+    targetBoundElement ||
+    (localElementsMap?.get(binding.elementId) as ExcalidrawBindableElement) ||
+    undefined;
+  const elementsMap = targetBoundElement ? targetElementsMap : localElementsMap;
+
+  // migrating legacy focus point bindings
+  if (boundElement && elementsMap) {
     const p = LinearElementEditor.getPointAtIndexGlobalCoordinates(
       element,
       startOrEnd === "start" ? 0 : element.points.length - 1,
@@ -192,6 +203,8 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
       fixedPoint,
     };
   }
+
+  console.error(`could not repair binding for element`);
 
   return null;
 };
@@ -284,7 +297,8 @@ const restoreElementWithProperties = <
 
 export const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-  elementsMap: Readonly<ElementsMap>,
+  targetElementsMap: Readonly<ElementsMap>,
+  localElementsMap: Readonly<ElementsMap> | null | undefined,
   opts?: {
     deleteInvisibleElements?: boolean;
   },
@@ -405,13 +419,15 @@ export const restoreElement = (
         startBinding: repairBinding(
           element as ExcalidrawArrowElement,
           element.startBinding,
-          elementsMap,
+          targetElementsMap,
+          localElementsMap,
           "start",
         ),
         endBinding: repairBinding(
           element as ExcalidrawArrowElement,
           element.endBinding,
-          elementsMap,
+          targetElementsMap,
+          localElementsMap,
           "end",
         ),
         startArrowhead,
@@ -575,7 +591,7 @@ const repairFrameMembership = (
 export const restoreElements = (
   targetElements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
-  localElements: readonly ExcalidrawElement[] | null | undefined,
+  localElements: Readonly<ElementsMapOrArray> | null | undefined,
   opts?:
     | {
         refreshDimensions?: boolean;
@@ -586,7 +602,7 @@ export const restoreElements = (
 ): OrderedExcalidrawElement[] => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
-  const elementsMap = arrayToMap(targetElements || []);
+  const targetElementsMap = arrayToMap(targetElements || []);
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
   const restoredElements = syncInvalidIndices(
     (targetElements || []).reduce((elements, element) => {
@@ -598,7 +614,8 @@ export const restoreElements = (
 
       let migratedElement: ExcalidrawElement | null = restoreElement(
         element,
-        elementsMap,
+        targetElementsMap,
+        localElementsMap,
         {
           deleteInvisibleElements: opts?.deleteInvisibleElements,
         },
