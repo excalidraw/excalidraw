@@ -275,6 +275,9 @@ export const useChatStream = ({
         return;
       }
 
+      // Planning succeeded; clear any previous planning error banner.
+      onError(null);
+
       const planPayload = planData.plan;
       executionStartTs = performance.now ? performance.now() : Date.now();
       setLoadingPhase('executing');
@@ -296,7 +299,7 @@ export const useChatStream = ({
         elements: elements.length > 0 ? elements.slice(0, 50) : [],
         selection: {
           selectedElementIds: appState.selectedElementIds,
-          count: Object.keys(appState.selectedElementIds).length
+          count: Object.values(appState.selectedElementIds).filter(Boolean).length
         }
       };
 
@@ -633,6 +636,9 @@ export const useChatStream = ({
       onError('Streaming is not supported in your browser. Please upgrade to a modern browser.');
       return;
     }
+
+    // Clear any previous error banner when starting a new request.
+    onError(null);
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
