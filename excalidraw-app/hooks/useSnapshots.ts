@@ -55,6 +55,53 @@ export interface UseSnapshotsResult {
   generateSnapshots: (needsSnapshot?: boolean) => Promise<SnapshotsResult>;
 }
 
+export const getSelectionSnapshotElements = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  selectedElementIds: Record<string, boolean>,
+  selectedGroupIds?: Record<string, boolean>,
+): readonly NonDeletedExcalidrawElement[] => {
+  const selectedIds = new Set(Object.keys(selectedElementIds).filter((id) => selectedElementIds[id]));
+  const selectedGroups = new Set(Object.keys(selectedGroupIds ?? {}).filter((id) => selectedGroupIds?.[id]));
+  if (selectedIds.size === 0 && selectedGroups.size === 0) return [];
+
+  // If the user selected a group (e.g. a mindmap), Excalidraw may track it via selectedGroupIds,
+  // while selectedElementIds can be empty or incomplete. Include all elements that belong to selected groups.
+  const idsToInclude = new Set<string>(selectedIds);
+  if (selectedGroups.size > 0) {
+    for (const element of elements) {
+      if (element.groupIds?.some((groupId) => selectedGroups.has(groupId))) {
+        idsToInclude.add(element.id);
+      }
+    }
+  }
+
+  // Add bound text elements when a container is selected.
+  // Excalidraw often stores text as a separate element bound to a container, and the container may be the only
+  // element marked as selected. If we export only selected IDs, the snapshot can look "empty" (shape without text).
+  for (const element of elements) {
+    if (!idsToInclude.has(element.id)) continue;
+
+    const boundElements = (element as any).boundElements as undefined | Array<{ id: string; type: string }>;
+    if (boundElements?.length) {
+      for (const bound of boundElements) {
+        // Only include bound text; bound arrows/lines would pull in surrounding graph edges.
+        if (bound?.id && bound.type === 'text') idsToInclude.add(bound.id);
+      }
+    }
+  }
+
+  // Also include any text elements whose container is selected (reverse link).
+  for (const element of elements) {
+    const containerId = (element as any).containerId as string | undefined;
+    if (containerId && idsToInclude.has(containerId) && (element as any).type === 'text') {
+      idsToInclude.add(element.id);
+    }
+  }
+
+  // Preserve scene order for correct z-index.
+  return elements.filter((el) => idsToInclude.has(el.id));
+};
+
 export const useSnapshots = ({
   excalidrawAPI,
   isVisible = true
@@ -276,8 +323,14 @@ export const useSnapshots = ({
         }
 
         // Generate selection snapshot if elements are selected
-        if (Object.keys(refreshedAppState.selectedElementIds).length > 0) {
-          const selectedElements = elements.filter(el => refreshedAppState.selectedElementIds[el.id]);
+        const hasSelectedElements = Object.values(refreshedAppState.selectedElementIds).some(Boolean);
+        const hasSelectedGroups = Object.values((refreshedAppState as any).selectedGroupIds ?? {}).some(Boolean);
+        if (hasSelectedElements || hasSelectedGroups) {
+          const selectedElements = getSelectionSnapshotElements(
+            elements,
+            refreshedAppState.selectedElementIds,
+            (refreshedAppState as any).selectedGroupIds,
+          );
           if (selectedElements.length > 0) {
             const selectionCanvas = await exportToCanvas({
               elements: selectedElements,
