@@ -150,6 +150,16 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
     return fixedPointBinding;
   }
 
+  // Fallback if the bound element is missing but the binding is at least
+  // looking like a valid one shape-wise
+  if (binding.mode && binding.fixedPoint && binding.elementId) {
+    return {
+      elementId: binding.elementId,
+      mode: binding.mode,
+      fixedPoint: normalizeFixedPoint(binding.fixedPoint || [0.5, 0.5]),
+    } as FixedPointBinding | null;
+  }
+
   const targetBoundElement =
     (targetElementsMap.get(binding.elementId) as ExcalidrawBindableElement) ||
     undefined;
@@ -158,15 +168,9 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
     (localElementsMap?.get(binding.elementId) as ExcalidrawBindableElement) ||
     undefined;
   const elementsMap = targetBoundElement ? targetElementsMap : localElementsMap;
-  if (boundElement && elementsMap) {
-    if (binding.mode) {
-      return {
-        elementId: binding.elementId,
-        mode: binding.mode || "orbit",
-        fixedPoint: normalizeFixedPoint(binding.fixedPoint || [0.5, 0.5]),
-      } as FixedPointBinding | null;
-    }
 
+  // migrating legacy focus point bindings
+  if (boundElement && elementsMap) {
     const p = LinearElementEditor.getPointAtIndexGlobalCoordinates(
       element,
       startOrEnd === "start" ? 0 : element.points.length - 1,
@@ -200,11 +204,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
     };
   }
 
-  // Fallback if the bound element is missing but the binding is at least
-  // looking like a valid one shape-wise
-  if (binding && binding.mode && binding.fixedPoint && binding.elementId) {
-    return binding;
-  }
+  console.error(`could not repair binding for element`);
 
   return null;
 };
