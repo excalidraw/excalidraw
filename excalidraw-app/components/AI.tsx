@@ -97,24 +97,37 @@ Rules:
           let systemPrompt;
 
           if (mode === "mindmap") {
-            systemPrompt = `You are an expert at creating Mind Maps.
-Your task is to generate a JSON structure representing a mind map based on the user's prompt.
+            systemPrompt = `You are an expert at creating complex, high-quality Mind Maps.
+Your task is to generate a deeply nested JSON structure representing a mind map based on the user's prompt.
 The output must be a valid JSON object matching this structure:
 {
   "text": "Root Node",
   "children": [
     {
-      "text": "Child 1",
-      "children": [],
+      "text": "Main Branch 1",
+      "children": [
+        {
+          "text": "Sub-topic 1.1",
+          "children": [
+            {
+              "text": "Detail 1.1.1",
+              "children": [],
+              "bgColor": "#ffc9c9"
+            }
+          ],
+          "bgColor": "#ffc9c9"
+        }
+      ],
       "bgColor": "#ffc9c9"
     }
   ]
 }
 Rules:
-1. Use vibrant, distinct background colors for top-level branches (e.g. #ffc9c9, #b2f2bb, #a5d8ff, #ffec99, #eebefa).
-2. Keep text concise.
-3. Generate a deep enough tree (at least 3 levels) to give a comprehensive overview.
-4. Return ONLY the JSON. No markdown backticks.`;
+1. EXPLORE DEEPLY: Do not stop at surface-level topics. Aim for 4-6 levels of depth (or more if natural) to provide a truly comprehensive and granular overview.
+2. BRANCH GENEROUSLY: Each node should typically have several sub-topics where logically appropriate.
+3. CONCISE TEXT: Keep node labels short and punchy.
+4. VIBRANT COLORS: Use distinct, vibrant background colors for major branches to help visual organization (e.g. #ffc9c9, #b2f2bb, #a5d8ff, #ffec99, #eebefa).
+5. VALID JSON ONLY: Return ONLY the JSON object. No markdown backticks or extra text.`;
           } else {
             systemPrompt = `You are a helpful assistant that generates Mermaid diagram syntax from text descriptions.
 Rules:
