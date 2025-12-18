@@ -88,12 +88,35 @@ Rules:
       />
 
       <TTDDialog
-        onTextSubmit={async (input) => {
+        onTextSubmit={async (input, options) => {
           if (!OpenRouterClient.getApiKey()) {
             throw new Error("Please set your OpenRouter API Key in the settings.");
           }
 
-          const systemPrompt = `You are a helpful assistant that generates Mermaid diagram syntax from text descriptions.
+          const mode = options?.mode || "mermaid";
+          let systemPrompt;
+
+          if (mode === "mindmap") {
+            systemPrompt = `You are an expert at creating Mind Maps.
+Your task is to generate a JSON structure representing a mind map based on the user's prompt.
+The output must be a valid JSON object matching this structure:
+{
+  "text": "Root Node",
+  "children": [
+    {
+      "text": "Child 1",
+      "children": [],
+      "bgColor": "#ffc9c9"
+    }
+  ]
+}
+Rules:
+1. Use vibrant, distinct background colors for top-level branches (e.g. #ffc9c9, #b2f2bb, #a5d8ff, #ffec99, #eebefa).
+2. Keep text concise.
+3. Generate a deep enough tree (at least 3 levels) to give a comprehensive overview.
+4. Return ONLY the JSON. No markdown backticks.`;
+          } else {
+            systemPrompt = `You are a helpful assistant that generates Mermaid diagram syntax from text descriptions.
 Rules:
 - Return ONLY the Mermaid syntax.
 - Do not output any markdown formatting (backticks).
@@ -101,6 +124,7 @@ Rules:
 - If the user asks for a sequence diagram, use 'sequenceDiagram'.
 - If class diagram, use 'classDiagram'.
 - Ensure the syntax is valid.`;
+          }
 
           try {
             const response = await OpenRouterClient.generateCompletion([
@@ -115,10 +139,15 @@ Rules:
             ]);
 
             let generatedResponse = response;
-            if (generatedResponse.includes("```mermaid")) {
-              generatedResponse = generatedResponse.split("```mermaid")[1].split("```")[0];
-            } else if (generatedResponse.includes("```")) {
-              generatedResponse = generatedResponse.split("```")[1].split("```")[0];
+
+            if (generatedResponse.includes("```")) {
+              if (generatedResponse.includes("```json") && mode === "mindmap") {
+                generatedResponse = generatedResponse.split("```json")[1].split("```")[0];
+              } else if (generatedResponse.includes("```mermaid")) {
+                generatedResponse = generatedResponse.split("```mermaid")[1].split("```")[0];
+              } else {
+                generatedResponse = generatedResponse.split("```")[1].split("```")[0];
+              }
             }
 
             return { generatedResponse: generatedResponse.trim() };

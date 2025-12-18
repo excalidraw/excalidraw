@@ -30,6 +30,7 @@ import {
   insertToEditor,
   saveMermaidDataToStorage,
 } from "./common";
+import { convertMindMapToExcalidraw } from "./MindMapUtils";
 import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
 import { OpenRouterClient } from "../../data/ai/openrouter";
 
@@ -67,7 +68,7 @@ type OnTestSubmitRetValue = {
 export const TTDDialog = (
   props:
     | {
-      onTextSubmit(value: string): Promise<OnTestSubmitRetValue>;
+      onTextSubmit(value: string, options?: { mode: "mermaid" | "mindmap" }): Promise<OnTestSubmitRetValue>;
     }
     | { __fallback: true },
 ) => {
@@ -92,7 +93,7 @@ export const TTDDialogBase = withInternalFallback(
     tab: "text-to-diagram" | "mermaid";
   } & (
       | {
-        onTextSubmit(value: string): Promise<OnTestSubmitRetValue>;
+        onTextSubmit(value: string, options?: { mode: "mermaid" | "mindmap" }): Promise<OnTestSubmitRetValue>;
       }
       | { __fallback: true }
     )) => {
@@ -121,6 +122,7 @@ export const TTDDialogBase = withInternalFallback(
     const [apiKeyInput, setApiKeyInput] = useState("");
     const [modelInput, setModelInput] = useState(() => OpenRouterClient.getModel());
     const [showSettings, setShowSettings] = useState(false);
+    const [generationMode, setGenerationMode] = useState<"mermaid" | "mindmap">("mermaid");
 
     const handleApiKeySubmit = () => {
       if (apiKeyInput.trim()) {
@@ -169,7 +171,7 @@ export const TTDDialogBase = withInternalFallback(
         trackEvent("ai", "generate", "ttd");
 
         const { generatedResponse, error, rateLimit, rateLimitRemaining } =
-          await rest.onTextSubmit(prompt);
+          await rest.onTextSubmit(prompt, { mode: generationMode });
 
         if (typeof generatedResponse === "string") {
           setTtdGeneration((s) => ({
@@ -191,30 +193,50 @@ export const TTDDialogBase = withInternalFallback(
           return;
         }
 
-        try {
-          await convertMermaidToExcalidraw({
-            canvasRef: someRandomDivRef,
-            data,
-            mermaidToExcalidrawLib,
-            setError,
-            mermaidDefinition: generatedResponse,
-          });
-          trackEvent("ai", "mermaid parse success", "ttd");
-        } catch (error: any) {
-          console.info(
-            `%cTTD mermaid render errror: ${error.message}`,
-            "color: red",
-          );
-          console.info(
-            `>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nTTD mermaid definition render errror: ${error.message}`,
-            "color: yellow",
-          );
-          trackEvent("ai", "mermaid parse failed", "ttd");
-          setError(
-            new Error(
-              "Generated an invalid diagram :(. You may also try a different prompt.",
-            ),
-          );
+        /* Mind Map Logic */
+        if (generationMode === "mindmap") {
+          try {
+            if (generatedResponse) {
+              const json = JSON.parse(generatedResponse);
+              await convertMindMapToExcalidraw({
+                canvasRef: someRandomDivRef,
+                json,
+                data,
+                setError,
+              });
+              trackEvent("ai", "mindmap parse success", "ttd");
+            }
+          } catch (error: any) {
+            console.error(error);
+            setError(new Error("Failed to parse mind map response."));
+          }
+        } else {
+          /* Mermaid Logic */
+          try {
+            await convertMermaidToExcalidraw({
+              canvasRef: someRandomDivRef,
+              data,
+              mermaidToExcalidrawLib,
+              setError,
+              mermaidDefinition: generatedResponse,
+            });
+            trackEvent("ai", "mermaid parse success", "ttd");
+          } catch (error: any) {
+            console.info(
+              `%cTTD mermaid render errror: ${error.message}`,
+              "color: red",
+            );
+            console.info(
+              `>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nTTD mermaid definition render errror: ${error.message}`,
+              "color: yellow",
+            );
+            trackEvent("ai", "mermaid parse failed", "ttd");
+            setError(
+              new Error(
+                "Generated an invalid diagram :(. You may also try a different prompt.",
+              ),
+            );
+          }
         }
       } catch (error: any) {
         let message: string | undefined = error.message;
@@ -415,7 +437,7 @@ export const TTDDialogBase = withInternalFallback(
                       }}
                       renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
                       renderBottomRight={() => {
-                        if (typeof ttdGeneration?.generatedResponse === "string") {
+                        if (typeof ttdGeneration?.generatedResponse === "string" && generationMode !== "mindmap") {
                           return (
                             <div
                               className="excalidraw-link"
@@ -459,10 +481,42 @@ export const TTDDialogBase = withInternalFallback(
                         return null;
                       }}
                     >
+                      <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+                        <Button
+                          className={generationMode === "mermaid" ? "active-ttd-mode" : ""}
+                          style={{
+                            background: generationMode === "mermaid" ? "var(--color-primary)" : "var(--button-gray-1)",
+                            color: generationMode === "mermaid" ? "#fff" : "inherit",
+                            fontSize: "12px",
+                            padding: "6px 12px",
+                            minWidth: "70px",
+                            height: "auto",
+                            whiteSpace: "nowrap"
+                          }}
+                          onSelect={() => setGenerationMode("mermaid")}
+                        >
+                          Standard
+                        </Button>
+                        <Button
+                          className={generationMode === "mindmap" ? "active-ttd-mode" : ""}
+                          style={{
+                            background: generationMode === "mindmap" ? "var(--color-primary)" : "var(--button-gray-1)",
+                            color: generationMode === "mindmap" ? "#fff" : "inherit",
+                            fontSize: "12px",
+                            padding: "6px 12px",
+                            minWidth: "70px",
+                            height: "auto",
+                            whiteSpace: "nowrap"
+                          }}
+                          onSelect={() => setGenerationMode("mindmap")}
+                        >
+                          Mind Map
+                        </Button>
+                      </div>
                       <TTDDialogInput
                         onChange={handleTextChange}
                         input={text}
-                        placeholder={"Describe what you want to see..."}
+                        placeholder={generationMode === "mindmap" ? "Topic for Mind Map..." : "Describe what you want to see..."}
                         onKeyboardSubmit={() => {
                           refOnGenerate.current();
                         }}
