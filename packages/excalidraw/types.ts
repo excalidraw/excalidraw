@@ -411,6 +411,7 @@ export interface AppState {
   offsetLeft: number;
 
   fileHandle: FileSystemHandle | CapacitorFileHandle | null;
+  pdfFileToImport?: File | null;
   collaborators: Map<SocketId, Collaborator>;
   stats: {
     open: boolean;

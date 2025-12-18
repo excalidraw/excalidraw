@@ -130,6 +130,12 @@ export const isSupportedImageFile = (
   return isSupportedImageFileType(type);
 };
 
+export const isPDFFile = (
+  blob: Blob | null | undefined,
+): boolean => {
+  return blob?.type === MIME_TYPES.pdf;
+};
+
 export const loadSceneOrLibraryFromBlob = async (
   blob: Blob | File,
   /** @see restore.localAppState */

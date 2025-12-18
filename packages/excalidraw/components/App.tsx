@@ -366,6 +366,7 @@ import {
   ImageURLToFile,
   isImageFileHandle,
   isSupportedImageFile,
+  isPDFFile,
   loadSceneOrLibraryFromBlob,
   normalizeFile,
   parseLibraryJSON,
@@ -424,6 +425,7 @@ import ConvertElementTypePopup, {
 } from "./ConvertElementTypePopup";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { PDFImportDialog } from "./PDFImportDialog";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
@@ -2064,6 +2066,17 @@ class App extends React.Component<AppProps, AppState> {
                               />
                             </ElementCanvasButtons>
                           )}
+
+                        {this.state.pdfFileToImport && (
+                          <PDFImportDialog
+                            file={this.state.pdfFileToImport}
+                            onClose={() => this.setState({ pdfFileToImport: null })}
+                            onImport={(files) => {
+                              this.insertImages(files, this.state.width / 2, this.state.height / 2);
+                              this.setState({ pdfFileToImport: null });
+                            }}
+                          />
+                        )}
 
                         {this.state.toast !== null && (
                           <Toast
@@ -10931,15 +10944,26 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       );
 
-      const imageFiles = await fileOpen({
-        description: "Image",
-        extensions: Object.keys(
-          IMAGE_MIME_TYPES,
-        ) as (keyof typeof IMAGE_MIME_TYPES)[],
+      const selectedFiles = await fileOpen({
+        description: "Image or PDF",
+        extensions: [
+          ...(Object.keys(IMAGE_MIME_TYPES) as (keyof typeof IMAGE_MIME_TYPES)[]),
+          "pdf",
+        ],
         multiple: true,
       });
 
-      this.insertImages(imageFiles, x, y);
+      const imageFiles = selectedFiles.filter((f) => !isPDFFile(f));
+      const pdfFiles = selectedFiles.filter((f) => isPDFFile(f));
+
+      if (pdfFiles.length > 0) {
+        this.setState({ pdfFileToImport: pdfFiles[0] });
+        if (imageFiles.length > 0) {
+          this.insertImages(imageFiles, x, y);
+        }
+      } else {
+        this.insertImages(imageFiles, x, y);
+      }
     } catch (error: any) {
       if (error.name !== "AbortError") {
         console.error(error);
@@ -11190,6 +11214,11 @@ class App extends React.Component<AppProps, AppState> {
 
     if (fileItems.length === 1) {
       const { file, fileHandle } = fileItems[0];
+
+      if (file && isPDFFile(file)) {
+        this.setState({ pdfFileToImport: file });
+        return;
+      }
 
       if (
         file &&
