@@ -462,6 +462,7 @@ export const EDITOR_LS_KEYS = {
   PUBLISH_LIBRARY: "publish-library-data",
   OPENROUTER_API_KEY: "excalidraw-openrouter-api-key",
   OPENROUTER_MODEL: "excalidraw-openrouter-model",
+  RECENT_FILES: "excalidraw-recent-files",
 } as const;
 
 /**

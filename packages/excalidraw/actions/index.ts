@@ -43,6 +43,8 @@ export {
   actionLoadScene,
 } from "./actionExport";
 
+export { actionLoadRecentFile } from "./actionLoadRecentFile";
+
 export { actionCopyStyles, actionPasteStyles } from "./actionStyles";
 export { actionShortcuts } from "./actionMenu";
 

@@ -18,7 +18,7 @@ import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import { Tooltip } from "../components/Tooltip";
 import { ExportIcon, questionCircle, saveAs } from "../components/icons";
-import { loadFromJSON, saveAsJSON } from "../data";
+import { loadFromJSON, saveAsJSON, trackRecentFile } from "../data";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported, isCapacitorNative } from "../data/filesystem";
 import { resaveAsImageWithScene } from "../data/resave";
@@ -175,6 +175,10 @@ export const actionSaveToActiveFile = register({
         )
         : await saveAsJSON(elements, appState, app.files, app.getName());
 
+      if (fileHandle) {
+        trackRecentFile(fileHandle);
+      }
+
       return {
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
@@ -222,6 +226,11 @@ export const actionSaveFileToDisk = register({
         app.files,
         app.getName(),
       );
+
+      if (fileHandle) {
+        trackRecentFile(fileHandle);
+      }
+
       return {
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
@@ -272,6 +281,10 @@ export const actionLoadScene = register({
         appState: loadedAppState,
         files,
       } = await loadFromJSON(appState, elements);
+      if (loadedAppState.fileHandle) {
+        trackRecentFile(loadedAppState.fileHandle);
+      }
+
       return {
         elements: loadedElements,
         appState: loadedAppState,

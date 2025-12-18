@@ -30,6 +30,11 @@ export const isCapacitorNative = (): boolean => {
   }
 };
 
+export type CapacitorFileHandle = {
+  uri: string;
+  name: string;
+};
+
 /**
  * Save file using Capacitor Filesystem (for Android/iOS)
  */
@@ -39,9 +44,9 @@ const fileSaveCapacitor = async (
     name: string;
     extension: FILE_EXTENSION;
   },
-): Promise<FileSystemHandle | null> => {
+): Promise<CapacitorFileHandle | null> => {
   const resolvedBlob = await blob;
-  const fileName = `${opts.name}.${opts.extension}`;
+  const fileName = `${opts.name}_${Date.now()}.${opts.extension}`;
 
   try {
     // Dynamically import Capacitor modules to avoid bundling issues on web
@@ -74,7 +79,10 @@ const fileSaveCapacitor = async (
       (window as any).alert(`File saved to Documents/${fileName}`);
     }
 
-    return null; // Capacitor doesn't use FileSystemHandle
+    return {
+      uri: result.uri,
+      name: fileName,
+    };
   } catch (error) {
     console.error("Error saving file with Capacitor:", error);
     throw error;
@@ -161,7 +169,7 @@ export const fileSave = (
     mimeTypes?: string[];
     description: string;
     /** existing FileSystemHandle */
-    fileHandle?: FileSystemHandle | null;
+    fileHandle?: FileSystemHandle | CapacitorFileHandle | null;
   },
 ) => {
   // Use Capacitor filesystem on native platforms (Android/iOS)
@@ -181,7 +189,9 @@ export const fileSave = (
       extensions: [`.${opts.extension}`],
       mimeTypes: opts.mimeTypes,
     },
-    opts.fileHandle,
+    opts.fileHandle && "uri" in opts.fileHandle
+      ? null
+      : opts.fileHandle as FileSystemHandle | null,
   );
 };
 
