@@ -22,6 +22,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Deep link handler for library installation from libraries.excalidraw.com -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Custom URL scheme for library installation -->
+                <data android:scheme="excalidraw" android:host="library" />
+            </intent-filter>
+
         </activity>
 
         <provider

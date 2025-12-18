@@ -99,6 +99,23 @@ if [[ -f "$OUTPUT_DIR/excalidraw-debug.apk" ]]; then
     echo ""
     echo_info "To install on a connected device:"
     echo "  adb install $OUTPUT_DIR/excalidraw-debug.apk"
+
+    # Step 4: Upload to S3
+    echo ""
+    echo_info "Uploading APK to S3..."
+    S3_BUCKET="s3://images.bitslovers.com/android/"
+    APK_FILENAME="excalidraw-$(date +%Y%m%d-%H%M%S).apk"
+    
+    if command -v aws &> /dev/null; then
+        aws s3 cp "$OUTPUT_DIR/excalidraw-debug.apk" "${S3_BUCKET}${APK_FILENAME}"
+        aws s3 cp "$OUTPUT_DIR/excalidraw-debug.apk" "${S3_BUCKET}excalidraw-latest.apk"
+        echo_success "APK uploaded to S3:"
+        echo_success "  ${S3_BUCKET}${APK_FILENAME}"
+        echo_success "  ${S3_BUCKET}excalidraw-latest.apk"
+    else
+        echo_warning "AWS CLI not found. Skipping S3 upload."
+        echo_warning "Install AWS CLI to enable automatic uploads."
+    fi
 else
     echo_error "APK was not generated. Check build logs above."
     exit 1

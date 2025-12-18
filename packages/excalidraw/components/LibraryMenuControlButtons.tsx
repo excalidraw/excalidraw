@@ -3,6 +3,7 @@ import clsx from "clsx";
 import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
 
 import type { ExcalidrawProps, UIAppState } from "../types";
+import type Library from "../data/library";
 
 export const LibraryMenuControlButtons = ({
   libraryReturnUrl,
@@ -11,6 +12,7 @@ export const LibraryMenuControlButtons = ({
   style,
   children,
   className,
+  library,
 }: {
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   theme: UIAppState["theme"];
@@ -18,6 +20,7 @@ export const LibraryMenuControlButtons = ({
   style: React.CSSProperties;
   children?: React.ReactNode;
   className?: string;
+  library: Library;
 }) => {
   return (
     <div
@@ -28,6 +31,7 @@ export const LibraryMenuControlButtons = ({
         id={id}
         libraryReturnUrl={libraryReturnUrl}
         theme={theme}
+        library={library}
       />
       {children}
     </div>

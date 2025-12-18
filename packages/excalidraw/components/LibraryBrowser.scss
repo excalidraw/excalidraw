@@ -1,0 +1,100 @@
+.LibraryBrowser {
+    .Dialog__content {
+        width: 800px;
+        max-width: 90vw;
+        height: 80vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    &__search {
+        padding: 1rem;
+        border-bottom: 1px solid var(--color-gray-20);
+    }
+
+    &__list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+
+    &__item {
+        border: 1px solid var(--color-gray-20);
+        border-radius: 8px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: var(--color-surface-secondary);
+        transition: transform 0.1s ease-in-out;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        &-preview {
+            width: 100%;
+            height: 140px;
+            /* background-image is set inline */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: var(--color-surface-primary);
+            border-radius: 4px;
+            border: 1px solid var(--color-gray-10);
+        }
+
+        &-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        &-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-primary-color);
+        }
+
+        &-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary-color);
+            display: -webkit-box;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        &-author {
+            font-size: 0.8rem;
+            color: var(--text-tertiary-color);
+            margin-top: auto;
+        }
+
+        &-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+    }
+
+    &__loading {
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &__error {
+        padding: 2rem;
+        text-align: center;
+        color: var(--color-danger);
+    }
+}
