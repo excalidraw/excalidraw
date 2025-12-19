@@ -18,6 +18,8 @@
     "bringToFront": "Bring to front",
     "sendBackward": "Send backward",
     "delete": "Delete",
+    "whiteboardMode": "Whiteboard mode",
+    "notesMode": "Notes mode",
     "copyStyles": "Copy styles",
     "pasteStyles": "Paste styles",
     "stroke": "Stroke",

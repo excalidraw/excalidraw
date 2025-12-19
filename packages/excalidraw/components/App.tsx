@@ -4,6 +4,7 @@ import React, { useContext } from "react";
 import { flushSync } from "react-dom";
 import rough from "roughjs/bin/rough";
 import { nanoid } from "nanoid";
+import { NotesPages } from "./NotesPages";
 
 import {
   clamp,
@@ -1908,6 +1909,7 @@ class App extends React.Component<AppProps, AppState> {
             ? POINTER_EVENTS.disabled
             : POINTER_EVENTS.enabled,
           ["--right-sidebar-width" as any]: "302px",
+          backgroundColor: this.state.viewBackgroundColor,
         }}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -2101,6 +2103,7 @@ class App extends React.Component<AppProps, AppState> {
                             }}
                           />
                         )}
+                        <NotesPages appState={this.state} />
                         <StaticCanvas
                           canvas={this.canvas}
                           rc={this.rc}
@@ -2118,7 +2121,9 @@ class App extends React.Component<AppProps, AppState> {
                             isExporting: false,
                             renderGrid: isGridModeEnabled(this),
                             canvasBackgroundColor:
-                              this.state.viewBackgroundColor,
+                              this.state.mode === "notes"
+                                ? "transparent"
+                                : this.state.viewBackgroundColor,
                             embedsValidationStatus: this.embedsValidationStatus,
                             elementsPendingErasure: this.elementsPendingErasure,
                             pendingFlowchartNodes:
@@ -2137,7 +2142,9 @@ class App extends React.Component<AppProps, AppState> {
                               isExporting: false,
                               renderGrid: false,
                               canvasBackgroundColor:
-                                this.state.viewBackgroundColor,
+                                this.state.mode === "notes"
+                                  ? "transparent"
+                                  : this.state.viewBackgroundColor,
                               embedsValidationStatus:
                                 this.embedsValidationStatus,
                               elementsPendingErasure:
@@ -11146,13 +11153,22 @@ class App extends React.Component<AppProps, AppState> {
     sceneY: number,
   ) => {
     const gridPadding = 50 / this.state.zoom.value;
+    const isNotesMode = this.state.mode === "notes";
+
     // Create, position, and insert placeholders
-    const placeholders = positionElementsOnGrid(
-      imageFiles.map(() => this.newImagePlaceholder({ sceneX, sceneY })),
-      sceneX,
-      sceneY,
-      gridPadding,
-    );
+    const placeholders = isNotesMode
+      ? imageFiles.map((_, i) =>
+        this.newImagePlaceholder({
+          sceneX: -297, // Approximate half of A4 width
+          sceneY: (842 + 20) * i,
+        }),
+      )
+      : positionElementsOnGrid(
+        imageFiles.map(() => this.newImagePlaceholder({ sceneX, sceneY })),
+        sceneX,
+        sceneY,
+        gridPadding,
+      );
     placeholders.forEach((el) => this.scene.insertElement(el));
 
     // Create, position, insert and select initialized (replacing placeholders)
@@ -11173,12 +11189,14 @@ class App extends React.Component<AppProps, AppState> {
     );
     const initializedMap = arrayToMap(initialized);
 
-    const positioned = positionElementsOnGrid(
-      initialized.filter((el) => !el.isDeleted),
-      sceneX,
-      sceneY,
-      gridPadding,
-    );
+    const positioned = isNotesMode
+      ? initialized.filter((el) => !el.isDeleted)
+      : positionElementsOnGrid(
+        initialized.filter((el) => !el.isDeleted),
+        sceneX,
+        sceneY,
+        gridPadding,
+      );
     const positionedMap = arrayToMap(positioned);
 
     const nextElements = this.scene

@@ -57,8 +57,9 @@ import type { FileSystemHandle, CapacitorFileHandle } from "./data/filesystem";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
-
 import type { Language } from "./i18n";
+
+export type AppMode = "whiteboard" | "notes";
 import type { isOverScrollBars } from "./scene/scrollbars";
 import type React from "react";
 import type { JSX } from "react";
@@ -272,6 +273,7 @@ export interface AppState {
   } | null;
   showWelcomeScreen: boolean;
   isLoading: boolean;
+  mode: AppMode;
   errorMessage: React.ReactNode;
   activeEmbeddable: {
     element: NonDeletedExcalidrawElement;
