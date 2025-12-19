@@ -16,7 +16,8 @@ export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "freedraw" ||
   type === "arrow" ||
   type === "line" ||
-  type === "text";
+  type === "text" ||
+  type === "embeddable";
 
 export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "rectangle" ||
