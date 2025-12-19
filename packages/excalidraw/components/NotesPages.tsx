@@ -10,7 +10,7 @@ export const NotesPages = ({ appState }: NotesPagesProps) => {
         return null;
     }
 
-    const { zoom, scrollX, scrollY, width, height } = appState;
+    const { zoom, scrollX, scrollY, width, height, offsetLeft, offsetTop } = appState;
 
     // A4 dimensions at 72 DPI (standard for web)
     const PAGE_WIDTH = 595;
@@ -23,14 +23,15 @@ export const NotesPages = ({ appState }: NotesPagesProps) => {
 
     const pages = [];
     for (let i = 0; i < numPages; i++) {
-        const top = (PAGE_HEIGHT + PAGE_GAP) * i;
+        // Scene coordinates (same as elements)
+        const sceneX = -PAGE_WIDTH / 2;
+        const sceneY = (PAGE_HEIGHT + PAGE_GAP) * i;
 
-        // We need to transform these coordinates based on scroll and zoom
-        // Excalidraw coordinates: (0,0) is the "center" or origin.
-        // Elements are rendered with (x * zoom + scrollX, y * zoom + scrollY)
-
-        // We want the pages to be centered horizontally at x=0
-        const left = -PAGE_WIDTH / 2;
+        // Convert scene coordinates to viewport coordinates
+        // This calculates exactly where the page should be drawn on the screen
+        // Formula matches sceneCoordsToViewportCoords from @excalidraw/common
+        const viewportX = (sceneX + scrollX) * zoom.value + offsetLeft;
+        const viewportY = (sceneY + scrollY) * zoom.value + offsetTop;
 
         pages.push(
             <div
@@ -40,8 +41,8 @@ export const NotesPages = ({ appState }: NotesPagesProps) => {
                     position: "absolute",
                     width: PAGE_WIDTH * zoom.value,
                     height: PAGE_HEIGHT * zoom.value,
-                    left: left * zoom.value + scrollX + width / 2,
-                    top: top * zoom.value + scrollY + height / 2,
+                    left: viewportX,
+                    top: viewportY,
                     backgroundColor: "white",
                     boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
                     backgroundImage: `linear-gradient(#e9e9e9 1px, transparent 1px)`,
@@ -52,13 +53,13 @@ export const NotesPages = ({ appState }: NotesPagesProps) => {
                     borderRadius: "2px",
                 }}
             >
-                {/* Optional: Margin line for that classic notebook look */}
+                {/* Margin line for that classic notebook look */}
                 <div style={{
                     position: "absolute",
                     left: 60 * zoom.value,
                     top: 0,
                     bottom: 0,
-                    width: 2 * zoom.value,
+                    width: 1,
                     borderLeft: `${1 * zoom.value}px solid #ffc1c1`,
                 }} />
             </div>

@@ -11190,7 +11190,36 @@ class App extends React.Component<AppProps, AppState> {
     const initializedMap = arrayToMap(initialized);
 
     const positioned = isNotesMode
-      ? initialized.filter((el) => !el.isDeleted)
+      ? initialized
+        .filter((el) => !el.isDeleted)
+        .map((el, i) => {
+          const PAGE_WIDTH = 595;
+          const PAGE_HEIGHT = 842;
+          const MARGIN = 20; // Reduced margin to maximize content size
+          const PAGE_GAP = 20;
+
+          const targetWidth = PAGE_WIDTH - MARGIN * 2;
+          const targetHeight = PAGE_HEIGHT - MARGIN * 2;
+
+          // Calculate scale to fit within page margins (allow upscaling)
+          const scaleX = targetWidth / el.width;
+          const scaleY = targetHeight / el.height;
+          const scale = Math.min(scaleX, scaleY); // Scale to fit, allowing upscale
+
+          const finalWidth = el.width * scale;
+          const finalHeight = el.height * scale;
+
+          // Center on page
+          const pageTop = (PAGE_HEIGHT + PAGE_GAP) * i;
+          const left = -PAGE_WIDTH / 2;
+
+          return newElementWith(el, {
+            x: left + (PAGE_WIDTH - finalWidth) / 2,
+            y: pageTop + (PAGE_HEIGHT - finalHeight) / 2,
+            width: finalWidth,
+            height: finalHeight,
+          });
+        })
       : positionElementsOnGrid(
         initialized.filter((el) => !el.isDeleted),
         sceneX,
