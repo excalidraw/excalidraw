@@ -113,7 +113,6 @@ export const createPasteEvent = ({
       if (typeof value !== "string") {
         files = files || [];
         files.push(value);
-        event.clipboardData?.items.add(value);
         continue;
       }
       try {
