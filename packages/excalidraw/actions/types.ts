@@ -84,6 +84,7 @@ export type ActionName =
   | "loadScene"
   | "duplicateSelection"
   | "deleteSelectedElements"
+  | "unbindAllFromSelectedElements"
   | "changeViewBackgroundColor"
   | "clearCanvas"
   | "zoomIn"

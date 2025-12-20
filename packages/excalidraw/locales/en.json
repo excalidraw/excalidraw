@@ -18,6 +18,7 @@
     "bringToFront": "Bring to front",
     "sendBackward": "Send backward",
     "delete": "Delete",
+    "unsnapAll": "Unsnap all related items",
     "copyStyles": "Copy styles",
     "pasteStyles": "Paste styles",
     "stroke": "Stroke",
