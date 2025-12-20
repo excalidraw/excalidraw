@@ -163,14 +163,14 @@ export const getEmbedLink = (
       case "embed/":
       case "watch?v=":
       case "shorts/":
-        link = `https://www.youtube.com/embed/${ytLink[2]}?enablejsapi=1${time}`;
+        link = `https://releases.obsidian.md/youtube?v=${ytLink[2]}&enablejsapi=1${time}`; //zsviczian
         break;
       case "playlist?list=":
       case "embed/videoseries?list=":
         link = `https://www.youtube.com/embed/videoseries?list=${ytLink[2]}&enablejsapi=1${time}`;
         break;
       default:
-        link = `https://www.youtube.com/embed/${ytLink[2]}?enablejsapi=1${time}`;
+        link = `https://releases.obsidian.md/youtube?v=${ytLink[2]}&enablejsapi=1${time}`; //zsviczian
         break;
     }
     aspectRatio = isPortrait ? { w: 315, h: 560 } : { w: 560, h: 315 };

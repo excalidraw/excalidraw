@@ -1,13 +1,11 @@
-import { type GlobalPoint } from "@excalidraw/math/types";
-
 import {
   FONT_FAMILY,
   getVerticalOffset,
   ZOOM_STEP,
   MAX_ZOOM,
   MIN_ZOOM,
-  TOUCH_CTX_MENU_TIMEOUT,
-  DRAGGING_THRESHOLD,
+  //  TOUCH_CTX_MENU_TIMEOUT,
+  //  DRAGGING_THRESHOLD,
   deriveStylesPanelMode,
 } from "@excalidraw/common";
 
@@ -15,15 +13,30 @@ import { FONT_METADATA } from "@excalidraw/common";
 
 import { intersectElementWithLineSegment } from "@excalidraw/element/collision";
 import { lineSegment } from "@excalidraw/math";
-import { getLineHeightInPx } from "@excalidraw/element";
+
+
+import {
+  getLineHeightInPx,
+  isArrowElement,
+  isBindableElement,
+  LinearElementEditor,
+  ShapeCache,
+  updateBoundPoint,
+} from "@excalidraw/element";
 
 import { getHostPlugin } from "@excalidraw/common/commonObsidianUtils";
+
+import type { Scene, Store } from "@excalidraw/element";
+
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
 import type { FontMetadata } from "@excalidraw/common";
 import type {
   ElementsMap,
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawTextElement,
+  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
@@ -301,8 +314,93 @@ export const shouldDisableZoom = (appState: AppState): boolean => {
 export const isFullPanelMode = (app: AppClassProperties): boolean => {
   const stylesPanelMode = deriveStylesPanelMode(app.editorInterface);
   return stylesPanelMode === "full" || stylesPanelMode === "tray";
-}
+};
 
 export const isContextMenuDisabled = (): boolean => {
   return getHostPlugin().settings.disableContextMenu ?? false;
+};
+
+export const refreshAllArrows = (scene: Scene, store: Store) => {
+  const elements = scene.getNonDeletedElements();
+  const elementsMap = scene.getNonDeletedElementsMap();
+  let didMutate = false;
+
+  for (const el of elements) {
+    if (!isArrowElement(el)) {
+      continue;
+    }
+
+    const startTargetRaw =
+      el.startBinding && elementsMap.get(el.startBinding.elementId);
+    const endTargetRaw =
+      el.endBinding && elementsMap.get(el.endBinding.elementId);
+
+    const startTarget =
+      startTargetRaw && isBindableElement(startTargetRaw)
+        ? startTargetRaw
+        : undefined;
+    const endTarget =
+      endTargetRaw && isBindableElement(endTargetRaw)
+        ? endTargetRaw
+        : undefined;
+
+    if (!startTarget && !endTarget) {
+      continue;
+    }
+
+    const draft = { ...el } as NonDeleted<ExcalidrawArrowElement>;
+    const pointUpdates = new Map<number, { point: LocalPoint }>();
+
+    if (draft.startBinding && startTarget) {
+      const point = updateBoundPoint(
+        draft,
+        "startBinding",
+        draft.startBinding,
+        startTarget,
+        elementsMap,
+      );
+      if (point) {
+        pointUpdates.set(0, { point });
+      }
+    }
+
+    if (draft.endBinding && endTarget) {
+      const point = updateBoundPoint(
+        draft,
+        "endBinding",
+        draft.endBinding,
+        endTarget,
+        elementsMap,
+      );
+      if (point) {
+        pointUpdates.set(draft.points.length - 1, { point });
+      }
+    }
+
+    if (!pointUpdates.size) {
+      continue;
+    }
+
+    const startBindingElement = el.startBinding
+      ? elementsMap.get(el.startBinding.elementId)
+      : null;
+    const endBindingElement = el.endBinding
+      ? startBindingElement?.id === el.endBinding.elementId
+        ? startBindingElement
+        : elementsMap.get(el.endBinding.elementId)
+      : null;
+
+    LinearElementEditor.movePoints(el, scene, pointUpdates, {
+      moveMidPointsWithElement:
+        !!startBindingElement && startBindingElement?.id === endBindingElement?.id,
+    });
+
+    ShapeCache.delete(el);
+    didMutate = true;
+  }
+
+  if (didMutate) {
+    store.scheduleCapture();
+    scene.triggerUpdate();
+  }
 };

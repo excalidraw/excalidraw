@@ -491,7 +491,7 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionName, ActionResult } from "../actions/types";
-import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, isTouchInPenMode, isPanWithRightMouseEnabled, shouldDisableZoom, isContextMenuDisabled } from "../obsidianUtils";
+import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, isTouchInPenMode, isPanWithRightMouseEnabled, shouldDisableZoom, isContextMenuDisabled, refreshAllArrows } from "../obsidianUtils";
 import { initializeObsidianUtils } from "@excalidraw/common";
 import { getTooltipDiv } from "./Tooltip";
 import { getFontSize } from "../actions/actionProperties";
@@ -771,6 +771,7 @@ class App extends React.Component<AppProps, AppState> {
         isTrayModeEnabled: this.isTrayModeEnabled, //zsviczian
         getColorAtScenePoint: this.getColorAtScenePoint, //zsviczian
         startLineEditor: this.startLineEditor, //zsviczian
+        refreshAllArrows: this.refreshAllArrows, //zsviczian
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
@@ -4478,29 +4479,35 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   //zsviczian
-startLineEditor = (
-  el: ExcalidrawLinearElement,
-  selectedPointsIndices: number[] | null = null,
-) => {
-  if (!el || !isLinearElement(el)) {
-    return;
-  }
-  
-  // First select the element
-  this.setState({
-    selectedElementIds: { [el.id]: true }
-  }, () => {
-    // Then set up the editor
-    const linearElementEditor = new LinearElementEditor(el, this.scene.getNonDeletedElementsMap());
-    this.setState({
-      selectedLinearElement: {
-        ...linearElementEditor,
-        isEditing: true,
-        selectedPointsIndices,
-      }
+  startLineEditor = (
+    el: ExcalidrawLinearElement,
+    selectedPointsIndices: number[] | null = null,
+  ) => {
+    if (!el || !isLinearElement(el)) {
+      return;
+    }
+
+    // First select the element
+    this.setState({ selectedElementIds: { [el.id]: true } }, () => {
+      // Then set up the editor
+      const linearElementEditor = new LinearElementEditor(
+        el,
+        this.scene.getNonDeletedElementsMap(),
+      );
+      this.setState({
+        selectedLinearElement: {
+          ...linearElementEditor,
+          isEditing: true,
+          selectedPointsIndices,
+        },
+      });
     });
-  });
-};
+  };
+
+  //zsviczian
+  refreshAllArrows = () => {
+    refreshAllArrows(this.scene, this.store);
+  };
 
   //zsviczian
   updateContainerSize = withBatchedUpdates(

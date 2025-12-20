@@ -926,6 +926,7 @@ export interface ExcalidrawImperativeAPI {
   isTrayModeEnabled: InstanceType<typeof App>["isTrayModeEnabled"]; //zsviczian
   getColorAtScenePoint: InstanceType<typeof App>["getColorAtScenePoint"]; //zsviczian
   startLineEditor: InstanceType<typeof App>["startLineEditor"]; //zsviczian
+  refreshAllArrows: InstanceType<typeof App>["refreshAllArrows"]; //zsviczian
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
