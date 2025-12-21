@@ -2,6 +2,7 @@ import rough from "roughjs/bin/rough";
 
 import {
   arrayToMap,
+  type Bounds,
   invariant,
   rescalePoints,
   sizeOf,
@@ -77,16 +78,6 @@ export type RectangleBox = {
 };
 
 type MaybeQuadraticSolution = [number | null, number | null] | false;
-
-/**
- * x and y position of top left corner, x and y position of bottom right corner
- */
-export type Bounds = readonly [
-  minX: number,
-  minY: number,
-  maxX: number,
-  maxY: number,
-];
 
 export type SceneBounds = readonly [
   sceneX: number,

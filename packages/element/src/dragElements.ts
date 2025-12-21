@@ -1,4 +1,5 @@
 import {
+  type Bounds,
   TEXT_AUTOWRAP_THRESHOLD,
   getGridPoint,
   getFontString,
@@ -29,7 +30,6 @@ import {
 
 import type { Scene } from "./Scene";
 
-import type { Bounds } from "./bounds";
 import type { ExcalidrawElement } from "./types";
 
 export const dragSelectedElements = (

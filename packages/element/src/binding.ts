@@ -22,10 +22,9 @@ import {
 } from "@excalidraw/math";
 
 import type { LineSegment, LocalPoint, Radians } from "@excalidraw/math";
-
 import type { AppState } from "@excalidraw/excalidraw/types";
-
 import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
+import type { Bounds } from "@excalidraw/common";
 
 import {
   doBoundsIntersect,
@@ -64,7 +63,6 @@ import { projectFixedPointOntoDiagonal } from "./utils";
 
 import type { Scene } from "./Scene";
 
-import type { Bounds } from "./bounds";
 import type { ElementUpdate } from "./mutateElement";
 import type {
   BindMode,
