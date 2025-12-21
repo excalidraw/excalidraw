@@ -746,7 +746,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   ): ReconciledExcalidrawElement[] => {
     const localElements = this.getSceneElementsIncludingDeleted();
     const appState = this.excalidrawAPI.getAppState();
-    const restoredRemoteElements = restoreElements(remoteElements, null);
+    const restoredRemoteElements = restoreElements(
+      remoteElements,
+      this.excalidrawAPI.getSceneElementsMapIncludingDeleted(),
+    );
     const reconciledElements = reconcileElements(
       localElements,
       restoredRemoteElements as RemoteExcalidrawElement[],
