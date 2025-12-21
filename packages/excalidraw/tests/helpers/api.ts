@@ -4,7 +4,7 @@ import util from "util";
 
 import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 
-import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
+import { DEFAULT_ADAPTIVE_RADIUS, DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
 
 import {
   newArrowElement,
@@ -259,17 +259,38 @@ export class API {
       fillStyle: rest.fillStyle ?? appState.currentItemFillStyle,
       strokeWidth: rest.strokeWidth ?? appState.currentItemStrokeWidth,
       strokeStyle: rest.strokeStyle ?? appState.currentItemStrokeStyle,
-      roundness: (
-        rest.roundness === undefined
-          ? appState.currentItemRoundness === "round"
-          : rest.roundness
-      )
-        ? {
-            type: isLinearElementType(type)
-              ? ROUNDNESS.PROPORTIONAL_RADIUS
-              : ROUNDNESS.ADAPTIVE_RADIUS,
+      roundness: (() => {
+        if (rest.roundness === undefined) return null;
+        
+        if (rest.roundness) {
+          const correctType = rest.roundness.type === ROUNDNESS.CUSTOMIZED
+            ? ROUNDNESS.CUSTOMIZED
+            : isLinearElementType(type)
+            ? ROUNDNESS.PROPORTIONAL_RADIUS
+            : ROUNDNESS.ADAPTIVE_RADIUS;
+
+          if (correctType === ROUNDNESS.CUSTOMIZED) {
+            return {
+              type: ROUNDNESS.CUSTOMIZED,
+              corners: rest.roundness.corners ?? {
+                topLeft: DEFAULT_ADAPTIVE_RADIUS,
+                topRight: DEFAULT_ADAPTIVE_RADIUS,
+                bottomLeft: DEFAULT_ADAPTIVE_RADIUS,
+                bottomRight: DEFAULT_ADAPTIVE_RADIUS,
+              },
+              cornerLink: rest.roundness.cornerLink ?? true,
+            };
           }
-        : null,
+
+          return { type: correctType };
+        }
+        
+        return {
+          type: isLinearElementType(type)
+            ? ROUNDNESS.PROPORTIONAL_RADIUS
+            : ROUNDNESS.ADAPTIVE_RADIUS,
+        };
+      })(),
       roughness: rest.roughness ?? appState.currentItemRoughness,
       opacity: rest.opacity ?? appState.currentItemOpacity,
       boundElements: rest.boundElements ?? null,
