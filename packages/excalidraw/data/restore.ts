@@ -17,10 +17,12 @@ import {
   getSizeFromPoints,
   normalizeLink,
   getLineHeight,
+  BOUND_TEXT_PADDING,
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
   getNonDeletedElements,
+  isFlowchartType,
   isPointInElement,
   isValidPolygon,
   projectFixedPointOntoDiagonal,
@@ -61,6 +63,7 @@ import type {
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawElement,
+  ExcalidrawElementType,
   ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
@@ -209,14 +212,27 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
   return null;
 };
 
-const restoreElementWithProperties = <
-  T extends Required<Omit<ExcalidrawElement, "customData">> & {
+type _ElementForRestoreBase = Required<
+  Omit<ExcalidrawElement, "customData" | "containerBehavior">
+> &
+  Pick<ExcalidrawElement, "containerBehavior"> & {
     customData?: ExcalidrawElement["customData"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
     /** @deprecated */
     strokeSharpness?: StrokeRoundness;
-  },
+  };
+
+const restoreElementWithProperties = <
+  T extends _ElementForRestoreBase &
+    Omit<
+      any,
+      | keyof ExcalidrawElement
+      | "boundElementIds"
+      | "strokeSharpness"
+      | "customData"
+      | "containerBehavior"
+    >,
   K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
 >(
   element: T,
@@ -228,11 +244,13 @@ const restoreElementWithProperties = <
   > &
     Partial<Pick<ExcalidrawElement, "type" | "x" | "y" | "customData">>,
 ): T => {
+  const nextType = (extra.type || element.type) as ExcalidrawElementType;
+
   const base: Pick<T, keyof ExcalidrawElement> = {
-    type: extra.type || element.type,
+    type: nextType,
+    version: element.version || 1,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
-    version: element.version || 1,
     versionNonce: element.versionNonce ?? 0,
     index: element.index ?? null,
     isDeleted: element.isDeleted ?? false,
@@ -260,7 +278,7 @@ const restoreElementWithProperties = <
       ? {
           // for old elements that would now use adaptive radius algo,
           // use legacy algo instead
-          type: isUsingAdaptiveRadius(element.type)
+          type: isUsingAdaptiveRadius(nextType)
             ? ROUNDNESS.LEGACY
             : ROUNDNESS.PROPORTIONAL_RADIUS,
         }
@@ -271,10 +289,18 @@ const restoreElementWithProperties = <
     updated: element.updated ?? getUpdatedTimestamp(),
     link: element.link ? normalizeLink(element.link) : null,
     locked: element.locked ?? false,
+    ...(isFlowchartType(nextType)
+      ? {
+          containerBehavior: {
+            textFlow: element.containerBehavior?.textFlow ?? "growing",
+            margin: element.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
+          },
+        }
+      : {}),
   };
 
   if ("customData" in element || "customData" in extra) {
-    base.customData =
+    (base as any).customData =
       "customData" in extra ? extra.customData : element.customData;
   }
 
@@ -289,8 +315,8 @@ const restoreElementWithProperties = <
   } as unknown as T;
 
   // strip legacy props (migrated in previous steps)
-  delete ret.strokeSharpness;
-  delete ret.boundElementIds;
+  delete (ret as any).strokeSharpness;
+  delete (ret as any).boundElementIds;
 
   return ret;
 };

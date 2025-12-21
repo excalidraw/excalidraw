@@ -268,6 +268,7 @@ const addNewNode = (
     opacity: element.opacity,
     fillStyle: element.fillStyle,
     strokeStyle: element.strokeStyle,
+    containerBehavior: element.containerBehavior,
   });
 
   invariant(
@@ -346,6 +347,7 @@ export const addNewNodes = (
       opacity: startNode.opacity,
       fillStyle: startNode.fillStyle,
       strokeStyle: startNode.strokeStyle,
+      containerBehavior: startNode.containerBehavior,
     });
 
     invariant(

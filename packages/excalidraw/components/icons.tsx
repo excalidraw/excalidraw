@@ -2373,3 +2373,101 @@ export const presentationIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+export const stickyNoteIcon = createIcon(
+  <g>
+    <path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z" />
+    <path d="M15 3v4a2 2 0 0 0 2 2h4" />
+  </g>,
+  tablerIconProps,
+);
+
+export const marginSmallIcon = createIcon(
+  <g fill="none">
+    <rect
+      x="0"
+      y="0"
+      width="24"
+      height="24"
+      stroke="currentColor"
+      stroke-width="1.5"
+    />
+    <rect
+      x="2"
+      y="2"
+      width="20"
+      height="20"
+      stroke="currentColor"
+      stroke-width="1"
+      stroke-dasharray="1 1"
+    />
+  </g>,
+  tablerIconProps,
+);
+
+export const marginMediumIcon = createIcon(
+  <g fill="none">
+    <rect
+      x="0"
+      y="0"
+      width="24"
+      height="24"
+      stroke="currentColor"
+      stroke-width="1.5"
+    />
+    <rect
+      x="4"
+      y="4"
+      width="16"
+      height="16"
+      stroke="currentColor"
+      stroke-width="1"
+      stroke-dasharray="1 1"
+    />
+  </g>,
+  tablerIconProps,
+);
+
+export const marginLargeIcon = createIcon(
+  <g fill="none">
+    <rect
+      x="0"
+      y="0"
+      width="24"
+      height="24"
+      stroke="currentColor"
+      stroke-width="1.5"
+    />
+    <rect
+      x="6"
+      y="6"
+      width="12"
+      height="12"
+      stroke="currentColor"
+      stroke-width="1"
+      stroke-dasharray="1 1"
+    />
+  </g>,
+  tablerIconProps,
+);
+
+export const growingContainerIcon = createIcon(
+  <g
+    stroke="currentColor"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth={2}
+  >
+    <path d="M14 21h1" />
+    <path d="M21 14v1" />
+    <path d="M21 19a2 2 0 0 1-2 2" />
+    <path d="M21 9v1" />
+    <path d="M3 14v1" />
+    <path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2" />
+    <path d="M3 9v1" />
+    <path d="M5 21a2 2 0 0 1-2-2" />
+    <path d="M9 21h1" />
+  </g>,
+  tablerIconProps,
+);

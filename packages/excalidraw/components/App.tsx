@@ -96,6 +96,7 @@ import {
   MINIMUM_ARROW_SIZE,
   DOUBLE_TAP_POSITION_THRESHOLD,
   BIND_MODE_TIMEOUT,
+  BOUND_TEXT_PADDING,
   invariant,
   getFeatureFlag,
   createUserAgentDescriptor,
@@ -246,6 +247,7 @@ import {
   mutateElement,
   getElementBounds,
   doBoundsIntersect,
+  isFlowchartType,
   isPointInElement,
   maxBindingDistance_simple,
 } from "@excalidraw/element";
@@ -5776,8 +5778,13 @@ class App extends React.Component<AppProps, AppState> {
       const minWidth = getApproxMinLineWidth(
         getFontString(fontString),
         lineHeight,
+        container.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
       );
-      const minHeight = getApproxMinLineHeight(fontSize, lineHeight);
+      const minHeight = getApproxMinLineHeight(
+        fontSize,
+        lineHeight,
+        container.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
+      );
       const newHeight = Math.max(container.height, minHeight);
       const newWidth = Math.max(container.width, minWidth);
       this.scene.mutateElement(container, {
@@ -8728,6 +8735,9 @@ class App extends React.Component<AppProps, AppState> {
       roundness: this.getCurrentItemRoundness(elementType),
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
+      ...(isFlowchartType(elementType) && {
+        containerBehavior: this.state.currentItemContainerBehavior,
+      }),
     } as const;
 
     let element;

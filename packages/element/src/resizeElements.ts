@@ -12,6 +12,7 @@ import {
   SHIFT_LOCKING_ANGLE,
   rescalePoints,
   getFontString,
+  BOUND_TEXT_PADDING,
 } from "@excalidraw/common";
 
 import type { GlobalPoint } from "@excalidraw/math";
@@ -784,10 +785,12 @@ export const resizeSingleElement = (
       const minWidth = getApproxMinLineWidth(
         getFontString(boundTextElement),
         boundTextElement.lineHeight,
+        latestElement.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
       );
       const minHeight = getApproxMinLineHeight(
         boundTextElement.fontSize,
         boundTextElement.lineHeight,
+        latestElement.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
       );
       nextWidth = Math.max(nextWidth, minWidth);
       nextHeight = Math.max(nextHeight, minHeight);

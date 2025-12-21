@@ -2056,11 +2056,14 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     }
   }
 
-  private static stripIrrelevantProps(
-    partial: Partial<OrderedExcalidrawElement>,
-  ): ElementPartial {
-    const { id, updated, ...strippedPartial } = partial;
+  private static stripIrrelevantProps(partial: ElementPartial): ElementPartial {
+    const {
+      id: _id,
+      updated: _updated,
+      seed: _seed,
+      ...strippedPartial
+    } = partial as any;
 
-    return strippedPartial;
+    return strippedPartial as ElementPartial;
   }
 }

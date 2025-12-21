@@ -108,6 +108,7 @@ export const redrawTextBoundingBox = (
       const nextHeight = computeContainerDimensionForBoundText(
         metrics.height,
         container.type,
+        container.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
       );
       scene.mutateElement(container, { height: nextHeight });
       updateOriginalContainerCache(container.id, nextHeight);
@@ -117,6 +118,7 @@ export const redrawTextBoundingBox = (
       const nextWidth = computeContainerDimensionForBoundText(
         metrics.width,
         container.type,
+        container.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
       );
       scene.mutateElement(container, { width: nextWidth });
     }
@@ -187,6 +189,7 @@ export const handleBindTextResize = (
       containerHeight = computeContainerDimensionForBoundText(
         nextHeight,
         container.type,
+        container.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
       );
 
       const diff = containerHeight - container.height;
@@ -353,8 +356,8 @@ export const getContainerCenter = (
 };
 
 export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
-  let offsetX = BOUND_TEXT_PADDING;
-  let offsetY = BOUND_TEXT_PADDING;
+  let offsetX = container.containerBehavior?.margin ?? BOUND_TEXT_PADDING;
+  let offsetY = container.containerBehavior?.margin ?? BOUND_TEXT_PADDING;
 
   if (container.type === "ellipse") {
     // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6172
@@ -446,9 +449,10 @@ export const isValidTextContainer = (element: {
 export const computeContainerDimensionForBoundText = (
   dimension: number,
   containerType: ExtractSetType<typeof VALID_CONTAINER_TYPES>,
+  boundTextPadding: number,
 ) => {
   dimension = Math.ceil(dimension);
-  const padding = BOUND_TEXT_PADDING * 2;
+  const padding = boundTextPadding * 2;
 
   if (containerType === "ellipse") {
     return Math.round(((dimension + padding) / Math.sqrt(2)) * 2);
@@ -467,6 +471,8 @@ export const getBoundTextMaxWidth = (
   boundTextElement: ExcalidrawTextElement | null,
 ) => {
   const { width } = container;
+  const boundTextPadding =
+    container.containerBehavior?.margin ?? BOUND_TEXT_PADDING;
   if (isArrowElement(container)) {
     const minWidth =
       (boundTextElement?.fontSize ?? DEFAULT_FONT_SIZE) *
@@ -477,14 +483,14 @@ export const getBoundTextMaxWidth = (
     // The width of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.width / 2) * Math.sqrt(2)) which is derived from
     // equation of an ellipse -https://github.com/excalidraw/excalidraw/pull/6172
-    return Math.round((width / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
+    return Math.round((width / 2) * Math.sqrt(2)) - boundTextPadding * 2;
   }
   if (container.type === "diamond") {
     // The width of the largest rectangle inscribed inside a rhombus is
     // Math.round(width / 2) - https://github.com/excalidraw/excalidraw/pull/6265
-    return Math.round(width / 2) - BOUND_TEXT_PADDING * 2;
+    return Math.round(width / 2) - boundTextPadding * 2;
   }
-  return width - BOUND_TEXT_PADDING * 2;
+  return width - boundTextPadding * 2;
 };
 
 export const getBoundTextMaxHeight = (
@@ -492,8 +498,10 @@ export const getBoundTextMaxHeight = (
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
   const { height } = container;
+  const boundTextPadding =
+    container.containerBehavior?.margin ?? BOUND_TEXT_PADDING;
   if (isArrowElement(container)) {
-    const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2;
+    const containerHeight = height - boundTextPadding * 8 * 2;
     if (containerHeight <= 0) {
       return boundTextElement.height;
     }
@@ -503,14 +511,14 @@ export const getBoundTextMaxHeight = (
     // The height of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.height / 2) * Math.sqrt(2)) which is derived from
     // equation of an ellipse - https://github.com/excalidraw/excalidraw/pull/6172
-    return Math.round((height / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
+    return Math.round((height / 2) * Math.sqrt(2)) - boundTextPadding * 2;
   }
   if (container.type === "diamond") {
     // The height of the largest rectangle inscribed inside a rhombus is
     // Math.round(height / 2) - https://github.com/excalidraw/excalidraw/pull/6265
-    return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;
+    return Math.round(height / 2) - boundTextPadding * 2;
   }
-  return height - BOUND_TEXT_PADDING * 2;
+  return height - boundTextPadding * 2;
 };
 
 /** retrieves text from text elements and concatenates to a single string */
