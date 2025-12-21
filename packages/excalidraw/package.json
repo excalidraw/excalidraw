@@ -1,6 +1,6 @@
 {
   "name": "@zsviczian/excalidraw",
-  "version": "0.18.0-62",
+  "version": "0.18.0-63",
   "main": "main.js",
   "module": "./dist/prod/index.js",
   "source": "./index.tsx",
@@ -38,6 +38,7 @@
     "types/*"
   ],
   "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
     "access": "public"
   },
   "description": "Excalidraw as a React component",
@@ -68,13 +69,8 @@
       "last 1 safari version"
     ]
   },
-  "repository": "https://github.com/excalidraw/excalidraw",
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
-  "scripts": {
-    "gen:types": "rimraf types && tsc",
-    "build:esm": "rimraf dist && node ../../scripts/buildPackage.js && yarn gen:types"
-  },
   "peerDependencies": {
     "react": "^17.0.2 || ^18.2.0 || ^19.0.0",
     "react-dom": "^17.0.2 || ^18.2.0 || ^19.0.0"
@@ -165,8 +161,6 @@
     "type": "git",
     "url": "git+https://github.com/zsviczian/excalidraw.git"
   },
-  "bugs": "https://github.com/excalidraw/excalidraw/issues",
-  "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
     "gen:types": "rimraf ./types && tsc --project tsconfig-types.json",
     "build:esm": "rimraf ./dist && node ../../scripts/buildPackage.js && yarn gen:types",
@@ -174,6 +168,7 @@
     "start": "node ../../scripts/buildExample.mjs && vite",
     "build:example": "node ../../scripts/buildExample.mjs",
     "size": "yarn build:umd && size-limit",
-    "build:umd": "rimraf ./dist && cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.js && yarn gen:types"
+    "build:umd": "rimraf ./dist && cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.js && yarn gen:types",
+    "prepublishOnly": "node ./scripts/ensure-npm-auth.cjs"
   }
 }
