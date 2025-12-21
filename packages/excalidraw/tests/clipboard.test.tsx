@@ -500,7 +500,7 @@ describe("clipboard - pasting mermaid definition", () => {
                   strokeWidth: 2,
                   label: {
                     groupIds: [],
-                    text: "A",
+                    text: "A<br>B",
                     fontSize: 20,
                   },
                   link: null,
@@ -524,7 +524,10 @@ describe("clipboard - pasting mermaid definition", () => {
       expect(h.elements).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ type: "rectangle" }),
-          expect.objectContaining({ type: "text", text: "A" }),
+          expect.objectContaining({
+            type: "text",
+            text: expect.stringMatching(/^A\n\s*B$/),
+          }),
         ]),
       );
     });
@@ -539,7 +542,10 @@ describe("clipboard - pasting mermaid definition", () => {
       expect(h.elements).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ type: "rectangle" }),
-          expect.objectContaining({ type: "text", text: "A" }),
+          expect.objectContaining({
+            type: "text",
+            text: expect.stringMatching(/^A\n\s*B$/),
+          }),
         ]),
       );
     });
