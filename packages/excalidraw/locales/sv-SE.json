@@ -142,8 +142,8 @@
       "editArrow": "Redigera pil"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Dela polygon",
+      "convertToPolygon": "Konvertera till polygon"
     },
     "elementLock": {
       "lock": "Lås",
@@ -170,7 +170,7 @@
     "copyElementLink": "Kopiera länk till objektet",
     "linkToElement": "Länk till objektet",
     "wrapSelectionInFrame": "Omslut urvaled i ram",
-    "tab": "",
+    "tab": "Flik",
     "shapeSwitch": ""
   },
   "elementLink": {
@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
     "embeddable": "Klicka-dra för att skapa en webbplats-inbäddning",

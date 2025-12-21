@@ -441,7 +441,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   private decryptPayload = async (
-    iv: Uint8Array,
+    iv: Uint8Array<ArrayBuffer>,
     encryptedData: ArrayBuffer,
     decryptionKey: string,
   ): Promise<ValueOf<SocketUpdateDataSource>> => {
@@ -562,7 +562,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     // All socket listeners are moving to Portal
     this.portal.socket.on(
       "client-broadcast",
-      async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
+      async (encryptedData: ArrayBuffer, iv: Uint8Array<ArrayBuffer>) => {
         if (!this.portal.roomKey) {
           return;
         }
@@ -746,7 +746,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   ): ReconciledExcalidrawElement[] => {
     const localElements = this.getSceneElementsIncludingDeleted();
     const appState = this.excalidrawAPI.getAppState();
-    const restoredRemoteElements = restoreElements(remoteElements, null);
+    const restoredRemoteElements = restoreElements(
+      remoteElements,
+      this.excalidrawAPI.getSceneElementsMapIncludingDeleted(),
+    );
     const reconciledElements = reconcileElements(
       localElements,
       restoredRemoteElements as RemoteExcalidrawElement[],

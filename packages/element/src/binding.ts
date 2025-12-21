@@ -146,17 +146,22 @@ export const isBindingEnabled = (appState: AppState): boolean => {
 export const bindOrUnbindBindingElement = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   draggingPoints: PointsPositionUpdates,
+  scenePointerX: number,
+  scenePointerY: number,
   scene: Scene,
   appState: AppState,
   opts?: {
     newArrow?: boolean;
     altKey?: boolean;
+    angleLocked?: boolean;
     initialBinding?: boolean;
   },
 ) => {
   const { start, end } = getBindingStrategyForDraggingBindingElementEndpoints(
     arrow,
     draggingPoints,
+    scenePointerX,
+    scenePointerY,
     scene.getNonDeletedElementsMap(),
     scene.getNonDeletedElements(),
     appState,
@@ -556,12 +561,14 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
 export const getBindingStrategyForDraggingBindingElementEndpoints = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   draggingPoints: PointsPositionUpdates,
+  screenPointerX: number,
+  screenPointerY: number,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   appState: AppState,
   opts?: {
     newArrow?: boolean;
-    shiftKey?: boolean;
+    angleLocked?: boolean;
     altKey?: boolean;
     finalize?: boolean;
     initialBinding?: boolean;
@@ -582,6 +589,8 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
   return getBindingStrategyForDraggingBindingElementEndpoints_simple(
     arrow,
     draggingPoints,
+    screenPointerX,
+    screenPointerY,
     elementsMap,
     elements,
     appState,
@@ -592,12 +601,14 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
 const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   draggingPoints: PointsPositionUpdates,
+  scenePointerX: number,
+  scenePointerY: number,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   appState: AppState,
   opts?: {
     newArrow?: boolean;
-    shiftKey?: boolean;
+    angleLocked?: boolean;
     altKey?: boolean;
     finalize?: boolean;
     initialBinding?: boolean;
@@ -669,7 +680,15 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     elementsMap,
     (e) => maxBindingDistance_simple(appState.zoom),
   );
-  const pointInElement = hit && isPointInElement(globalPoint, hit, elementsMap);
+  const pointInElement =
+    hit &&
+    (opts?.angleLocked
+      ? isPointInElement(
+          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+          hit,
+          elementsMap,
+        )
+      : isPointInElement(globalPoint, hit, elementsMap));
   const otherBindableElement = otherBinding
     ? (elementsMap.get(
         otherBinding.elementId,
@@ -770,6 +789,12 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
         }
     : { mode: null };
 
+  const otherEndpoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startDragged ? -1 : 0,
+    elementsMap,
+  );
+
   const other: BindingStrategy =
     otherBindableElement &&
     !otherFocusPointIsInElement &&
@@ -778,6 +803,19 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           mode: "orbit",
           element: otherBindableElement,
           focusPoint: appState.selectedLinearElement.initialState.altFocusPoint,
+        }
+      : opts?.angleLocked && otherBindableElement
+      ? {
+          mode: "orbit",
+          element: otherBindableElement,
+          focusPoint:
+            projectFixedPointOntoDiagonal(
+              arrow,
+              otherEndpoint,
+              otherBindableElement,
+              startDragged ? "end" : "start",
+              elementsMap,
+            ) || otherEndpoint,
         }
       : { mode: undefined };
 
@@ -924,6 +962,8 @@ export const bindOrUnbindBindingElements = (
     bindOrUnbindBindingElement(
       arrow,
       new Map(), // No dragging points in this case
+      Infinity,
+      Infinity,
       scene,
       appState,
     );
@@ -1126,7 +1166,14 @@ export const updateBindings = (
   },
 ) => {
   if (isArrowElement(latestElement)) {
-    bindOrUnbindBindingElement(latestElement, new Map(), scene, appState);
+    bindOrUnbindBindingElement(
+      latestElement,
+      new Map(),
+      Infinity,
+      Infinity,
+      scene,
+      appState,
+    );
   } else {
     updateBoundElements(latestElement, scene, {
       ...options,

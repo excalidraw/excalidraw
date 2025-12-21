@@ -234,7 +234,7 @@
     "clear": "Limpar",
     "remove": "Remover",
     "embed": "Alternar incorporação",
-    "publishLibrary": "",
+    "publishLibrary": "Renomear ou publicar",
     "submit": "Enviar",
     "confirm": "Confirmar",
     "embeddableInteractionButton": "Clique para interagir"
@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Toque e arraste, solte quando terminar",
     "text": "Dica: você também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
     "embeddable": "Clique e arraste para criar um site incorporado",

@@ -341,6 +341,7 @@
     "canvasPanning": "Tuvali taşımak için {{shortcut_1}} kısayolunu basılı tutun, sürüklerken {{shortcut_2}} kısayolunu veya el aracını kullanın",
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "arrowTool": "Birden çok nokta başlatmak için tıklayın, tek bir çizgi için sürükleyin. Ok türünü değiştirmek için {{shortcut}} kısayoluna basın.",
+    "arrowBindModifiers": "",
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
     "embeddable": "Web sitesi yerleştirmek için sürükle bırak",
