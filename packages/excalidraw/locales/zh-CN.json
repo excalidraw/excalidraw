@@ -1,10 +1,13 @@
 {
   "labels": {
+    "defaultFrameName": "画框",
+    "defaultAiFrameName": "AI 画框",
     "paste": "粘贴",
     "pasteAsPlaintext": "粘贴为纯文本",
     "pasteCharts": "粘贴图表",
-    "selectAll": "全部选中",
-    "multiSelect": "添加元素到选区",
+    "selectAll": "全选",
+    "multiSelect": "将元素添加到选中区域",
+    "toClear": "以清除",
     "moveCanvas": "移动画布",
     "cut": "剪切",
     "copy": "拷贝",
@@ -196,9 +199,17 @@
     "multipleResults": "结果",
     "placeholder": "在画布上查找文本…",
     "frames": "画框",
-    "texts": "文本"
+    "texts": "文本",
+    "search": "搜索",
+    "noResults": "未找到结果",
+    "tabs": {
+      "shapes": "形状",
+      "actions": "操作",
+      "properties": "属性"
+    }
   },
   "buttons": {
+    "escape": "Esc",
     "clearReset": "重置画布",
     "exportJSON": "导出为文件",
     "exportImage": "导出图片...",
@@ -645,9 +656,18 @@
     "recents": "最近使用",
     "search": {
       "placeholder": "搜索菜单、命令、探索隐藏功能",
-      "noMatch": "没有匹配的命令……"
+      "noMatch": "无匹配项…"
     },
-    "itemNotAvailable": "命令不可用……",
+    "categories": {
+      "app": "应用",
+      "export": "导出",
+      "tools": "工具",
+      "editor": "编辑器",
+      "elements": "元素",
+      "links": "链接",
+      "library": "库"
+    },
+    "itemNotAvailable": "命令不可用...",
     "shortcutHint": "用 {{shortcut}} 打开命令面板"
   },
   "keys": {
@@ -660,6 +680,6 @@
     "shift": "Shift",
     "spacebar": "空格",
     "delete": "Delete",
-    "mmb": "鼠标滚轮"
+    "mmb": "鼠标中键"
   }
 }
