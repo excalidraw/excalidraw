@@ -2,6 +2,7 @@ import rough from "roughjs/bin/rough";
 
 import {
   arrayToMap,
+  type Bounds,
   invariant,
   rescalePoints,
   sizeOf,
@@ -77,16 +78,6 @@ export type RectangleBox = {
 };
 
 type MaybeQuadraticSolution = [number | null, number | null] | false;
-
-/**
- * x and y position of top left corner, x and y position of bottom right corner
- */
-export type Bounds = readonly [
-  minX: number,
-  minY: number,
-  maxX: number,
-  maxY: number,
-];
 
 export type SceneBounds = readonly [
   sceneX: number,
@@ -1276,6 +1267,13 @@ export const elementCenterPoint = (
   xOffset: number = 0,
   yOffset: number = 0,
 ) => {
+  if (isLinearElement(element)) {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
+    const [x, y] = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
+
+    return pointFrom<GlobalPoint>(x + xOffset, y + yOffset);
+  }
+
   const [x, y] = getCenterForBounds(getElementBounds(element, elementsMap));
 
   return pointFrom<GlobalPoint>(x + xOffset, y + yOffset);

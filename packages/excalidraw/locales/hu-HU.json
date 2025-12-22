@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "Kattintással görbe, az eger húzásával pedig egyenes nyilat rajzolhatsz",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Kattints és húzd, majd engedd el, amikor végeztél",
     "text": "Tipp: A kijelölés eszközzel a dupla kattintás új szöveget hoz létre",
     "embeddable": "",

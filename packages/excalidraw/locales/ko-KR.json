@@ -341,6 +341,7 @@
     "canvasPanning": "",
     "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
     "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "클릭 후 드래그하세요. 완료되면 놓으세요.",
     "text": "팁: 선택 툴로 아무 곳이나 더블 클릭해 텍스트를 추가할 수도 있습니다.",
     "embeddable": "클릭 및 드래그하여 웹사이트 임베드 만들기",

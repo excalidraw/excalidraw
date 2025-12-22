@@ -6,12 +6,10 @@ import {
   type LocalPoint,
 } from "@excalidraw/math";
 
-import { isBounds } from "@excalidraw/element";
-
 import type { Curve } from "@excalidraw/math";
 import type { LineSegment } from "@excalidraw/utils";
 
-import type { Bounds } from "@excalidraw/element";
+import { type Bounds, isBounds } from "./bounds";
 
 // The global data holder to collect the debug operations
 declare global {
@@ -139,7 +137,7 @@ export const debugDrawPoints = (
   }: {
     x: number;
     y: number;
-    points: LocalPoint[];
+    points: readonly LocalPoint[];
   },
   options?: any,
 ) => {

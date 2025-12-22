@@ -341,6 +341,7 @@
     "canvasPanning": "To move canvas, hold {{shortcut_1}} or {{shortcut_2}} while dragging, or use the hand tool",
     "linearElement": "Click to start multiple points, drag for single line",
     "arrowTool": "Click to start multiple points, drag for single line. Press {{shortcut}} again to change arrow type.",
+    "arrowBindModifiers": "Hold {{shortcut_1}} to disable binding, or {{shortcut_2}} to bind at a fixed point",
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
     "embeddable": "Click-drag to create a website embed",

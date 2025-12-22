@@ -11,6 +11,7 @@ import type {
   InteractiveCanvasAppState,
   Zoom,
 } from "@excalidraw/excalidraw/types";
+import type { Bounds } from "@excalidraw/common";
 
 import { getElementAbsoluteCoords } from "./bounds";
 import {
@@ -20,7 +21,6 @@ import {
   isLinearElement,
 } from "./typeChecks";
 
-import type { Bounds } from "./bounds";
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -330,7 +330,10 @@ export const hasBoundingBox = (
   appState: InteractiveCanvasAppState,
   editorInterface: EditorInterface,
 ) => {
-  if (appState.selectedLinearElement?.isEditing) {
+  if (
+    appState.selectedLinearElement?.isEditing ||
+    appState.selectedLinearElement?.isDragging
+  ) {
     return false;
   }
   if (elements.length > 1) {

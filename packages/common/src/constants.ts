@@ -105,6 +105,7 @@ export const CLASSES = {
   SEARCH_MENU_INPUT_WRAPPER: "layer-ui__search-inputWrapper",
   CONVERT_ELEMENT_TYPE_POPUP: "ConvertElementTypePopup",
   SHAPE_ACTIONS_THEME_SCOPE: "shape-actions-theme-scope",
+  FRAME_NAME: "frame-name",
 };
 
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
@@ -497,6 +498,8 @@ export enum UserIdleState {
 export const LINE_POLYGON_POINT_MERGE_DISTANCE = 20;
 
 export const DOUBLE_TAP_POSITION_THRESHOLD = 35;
+
+export const BIND_MODE_TIMEOUT = 700; // ms
 
 // glass background for mobile action buttons
 export const MOBILE_ACTION_BUTTON_BG = {
