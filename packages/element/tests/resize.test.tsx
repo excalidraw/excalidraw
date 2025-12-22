@@ -2,6 +2,7 @@ import { pointFrom } from "@excalidraw/math";
 
 import { Excalidraw } from "@excalidraw/excalidraw";
 import {
+  type Bounds,
   KEYS,
   getSizeFromPoints,
   reseed,
@@ -22,7 +23,6 @@ import { resizeSingleElement } from "../src/resizeElements";
 import { LinearElementEditor } from "../src/linearElementEditor";
 import { getElementPointsCoords } from "../src/bounds";
 
-import type { Bounds } from "../src/bounds";
 import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawFreeDrawElement,
