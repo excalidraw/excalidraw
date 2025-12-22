@@ -13,6 +13,18 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw Library
 
+## Unreleased
+
+### Features
+
+- Layers system for organizing elements [#7725](https://github.com/excalidraw/excalidraw/issues/7725)
+  - Create, rename, delete, and reorder layers
+  - Toggle layer visibility
+  - Assign elements to layers
+  - Multi-select layers with Cmd/Ctrl + Click
+  - Merge selected layers or merge all layers
+  - Layers panel in the sidebar
+
 ## 0.18.0 (2025-03-11)
 
 ### Highlights

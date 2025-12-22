@@ -9,3 +9,4 @@ packages/excalidraw/types
 examples/**/public
 dev-dist
 coverage
+scripts/
