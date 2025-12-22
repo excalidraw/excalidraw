@@ -51,6 +51,7 @@ import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
   isArrowElement,
   isBindableElement,
+  isBindingElementType,
   isBoundToContainer,
   isElbowArrow,
   isRectanguloidElement,
@@ -2333,4 +2334,25 @@ export const normalizeFixedPoint = <T extends FixedPoint | null>(
     ) as T extends null ? null : FixedPoint;
   }
   return fixedPoint as any as T extends null ? null : FixedPoint;
+};
+
+export const unbindAllFromElement = (
+  sceneElements: readonly ExcalidrawElement[],
+  element: ExcalidrawBindableElement,
+) => {
+  const elements = arrayToMap(sceneElements);
+
+  BindableElement.unbindAffected(elements, element, (element, updates) => {
+    if (!isBindingElementType(element.type)) {
+      return;
+    }
+
+    mutateElement(element, elements, updates);
+  });
+
+  mutateElement(element, elements, {
+    boundElements: element.boundElements?.filter(
+      (bl) => !isBindingElementType(bl.type),
+    ),
+  });
 };

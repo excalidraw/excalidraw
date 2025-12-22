@@ -308,6 +308,7 @@ export const SelectedShapeActions = ({
             {showLinkIcon && renderAction("hyperlink")}
             {showCropEditorAction && renderAction("cropEditor")}
             {showLineEditorAction && renderAction("toggleLinearEditor")}
+            {renderAction("unbindAllFromSelectedElements")}
           </div>
         </fieldset>
       )}

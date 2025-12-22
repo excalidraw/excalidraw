@@ -1,4 +1,5 @@
 export { actionDeleteSelected } from "./actionDeleteSelected";
+export { actionUnbindAll } from "./actionUnbindAll";
 export {
   actionBringForward,
   actionBringToFront,
