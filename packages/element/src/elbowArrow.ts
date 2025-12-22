@@ -9,30 +9,33 @@ import {
   vectorCross,
   vectorFromPoint,
   vectorScale,
+  type GenericPoint,
   type GlobalPoint,
   type LocalPoint,
 } from "@excalidraw/math";
 
 import {
   type Bounds,
+  arrayToMap,
   BinaryHeap,
+  getSizeFromPoints,
   invariant,
   isAnyTrue,
-  getSizeFromPoints,
   isDevEnv,
-  arrayToMap,
 } from "@excalidraw/common";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
 import {
-  bindPointToSnapToElementOutline,
-  getHeadingForElbowArrowSnap,
-  getGlobalFixedPointForBindableElement,
-  getBindingGap,
-  maxBindingDistance_simple,
   BASE_BINDING_GAP_ELBOW,
+  bindPointToSnapToElementOutline,
+  getBindingGap,
+  getGlobalFixedPointForBindableElement,
+  getHeadingForElbowArrowSnap,
+  maxBindingDistance_simple,
 } from "./binding";
+import { aabbForElement, pointInsideBounds } from "./bounds";
+import { getHoveredElementForBinding } from "./collision";
 import { distanceToElement } from "./distance";
 import {
   compareHeading,
@@ -41,10 +44,10 @@ import {
   HEADING_LEFT,
   HEADING_RIGHT,
   HEADING_UP,
+  headingForPoint,
   headingForPointIsHorizontal,
   headingIsHorizontal,
   vectorToHeading,
-  headingForPoint,
 } from "./heading";
 import { type ElementUpdate } from "./mutateElement";
 import { isBindableElement } from "./typeChecks";
@@ -52,8 +55,6 @@ import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
 } from "./types";
-import { aabbForElement, pointInsideBounds } from "./bounds";
-import { getHoveredElementForBinding } from "./collision";
 
 import type { Heading } from "./heading";
 import type {
@@ -1649,7 +1650,7 @@ const pathTo = (start: Node, node: Node) => {
   return path;
 };
 
-const m_dist = (a: GlobalPoint | LocalPoint, b: GlobalPoint | LocalPoint) =>
+const m_dist = (a: GenericPoint, b: GenericPoint) =>
   Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
 
 /**
@@ -2283,7 +2284,7 @@ const getHoveredElement = (
 const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>
   a[0] === b[0] && a[1] === b[1];
 
-export const validateElbowPoints = <P extends GlobalPoint | LocalPoint>(
+export const validateElbowPoints = <P extends GenericPoint>(
   points: readonly P[],
   tolerance: number = DEDUP_TRESHOLD,
 ) =>

@@ -15,6 +15,7 @@ import {
   pointFrom,
   pointFromArray,
   pointRotateRads,
+  type GenericPoint,
 } from "@excalidraw/math";
 
 import { getCurvePathOps } from "@excalidraw/utils/shape";
@@ -34,9 +35,8 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import { generateRoughOptions } from "./shape";
-import { ShapeCache } from "./shape";
 import { LinearElementEditor } from "./linearElementEditor";
+import { generateRoughOptions, ShapeCache } from "./shape";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import {
   isArrowElement,
@@ -55,7 +55,6 @@ import {
 } from "./utils";
 
 import type { Drawable, Op } from "roughjs/bin/core";
-import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type {
   Arrowhead,
   ElementsMap,
@@ -913,10 +912,7 @@ const generateLinearElementShape = (
     return "linearPath";
   })();
 
-  return generator[method](
-    element.points as Mutable<LocalPoint>[] as RoughPoint[],
-    options,
-  );
+  return generator[method](element.points as Mutable<LocalPoint>[], options);
 };
 
 const getLinearElementRotatedBounds = (
@@ -1060,11 +1056,8 @@ export const getResizedElementAbsoluteCoords = (
     // Line
     const gen = rough.generator();
     const curve = !element.roundness
-      ? gen.linearPath(
-          points as [number, number][],
-          generateRoughOptions(element),
-        )
-      : gen.curve(points as [number, number][], generateRoughOptions(element));
+      ? gen.linearPath(points, generateRoughOptions(element))
+      : gen.curve(points, generateRoughOptions(element));
 
     const ops = getCurvePathOps(curve);
     bounds = getMinMaxXYFromCurvePathOps(ops);
@@ -1081,17 +1074,20 @@ export const getResizedElementAbsoluteCoords = (
 
 export const getElementPointsCoords = (
   element: ExcalidrawLinearElement,
-  points: readonly (readonly [number, number])[],
+  points: readonly LocalPoint[],
 ): Bounds => {
   // This might be computationally heavey
   const gen = rough.generator();
   const curve =
     element.roundness == null
       ? gen.linearPath(
-          points as [number, number][],
+          points as Mutable<typeof points>,
           generateRoughOptions(element),
         )
-      : gen.curve(points as [number, number][], generateRoughOptions(element));
+      : gen.curve(
+          points as Mutable<typeof points>,
+          generateRoughOptions(element),
+        );
   const ops = getCurvePathOps(curve);
   const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
   return [
@@ -1241,7 +1237,7 @@ export const aabbForElement = (
   return bounds;
 };
 
-export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
+export const pointInsideBounds = <P extends GenericPoint>(
   p: P,
   bounds: Bounds,
 ): boolean =>

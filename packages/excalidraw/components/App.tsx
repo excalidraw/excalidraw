@@ -16,6 +16,7 @@ import {
   vectorSubtract,
   vectorDot,
   vectorNormalize,
+  pointFromPair,
 } from "@excalidraw/math";
 
 import {
@@ -250,7 +251,12 @@ import {
   maxBindingDistance_simple,
 } from "@excalidraw/element";
 
-import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
+import type {
+  GlobalPoint,
+  LocalPoint,
+  Radians,
+  ViewportPoint,
+} from "@excalidraw/math";
 
 import type {
   ExcalidrawElement,
@@ -5395,10 +5401,10 @@ class App extends React.Component<AppProps, AppState> {
           },
           this.state,
         );
-        return [
+        return pointFromPair<ViewportPoint>([
           viewportX - this.state.offsetLeft,
           viewportY - this.state.offsetTop,
-        ];
+        ]);
       },
       onChange: withBatchedUpdates((nextOriginalText) => {
         updateElement(nextOriginalText, false);

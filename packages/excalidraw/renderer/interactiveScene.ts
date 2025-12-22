@@ -2,8 +2,8 @@ import {
   clamp,
   pointFrom,
   pointsEqual,
+  type GenericPoint,
   type GlobalPoint,
-  type LocalPoint,
   type Radians,
 } from "@excalidraw/math";
 import oc from "open-color";
@@ -141,7 +141,7 @@ const renderLinearElementPointHighlight = (
   context.restore();
 };
 
-const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
+const highlightPoint = <Point extends GenericPoint>(
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -157,7 +157,7 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   );
 };
 
-const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
+const renderSingleLinearPoint = <Point extends GenericPoint>(
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   point: Point,
@@ -809,7 +809,7 @@ const renderLinearPointHandles = (
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
   context.lineWidth = 1 / appState.zoom.value;
-  const points: GlobalPoint[] = LinearElementEditor.getPointsGlobalCoordinates(
+  const points = LinearElementEditor.getPointsGlobalCoordinates(
     element,
     elementsMap,
   );

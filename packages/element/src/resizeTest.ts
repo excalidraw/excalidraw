@@ -2,6 +2,8 @@ import {
   pointFrom,
   pointOnLineSegment,
   pointRotateRads,
+  type GenericPoint,
+  type LineSegment,
   type Radians,
 } from "@excalidraw/math";
 
@@ -10,30 +12,28 @@ import {
   type EditorInterface,
 } from "@excalidraw/common";
 
-import type { GlobalPoint, LineSegment, LocalPoint } from "@excalidraw/math";
-
 import type { AppState, Zoom } from "@excalidraw/excalidraw/types";
 import type { Bounds } from "@excalidraw/common";
 
 import { getElementAbsoluteCoords } from "./bounds";
 import {
-  getTransformHandlesFromCoords,
-  getTransformHandles,
-  getOmitSidesForEditorInterface,
   canResizeFromSides,
+  getOmitSidesForEditorInterface,
+  getTransformHandles,
+  getTransformHandlesFromCoords,
 } from "./transformHandles";
 import { isImageElement, isLinearElement } from "./typeChecks";
 
 import type {
-  TransformHandleType,
-  TransformHandle,
   MaybeTransformHandleType,
+  TransformHandle,
+  TransformHandleType,
 } from "./transformHandles";
 import type {
-  ExcalidrawElement,
-  PointerType,
-  NonDeletedExcalidrawElement,
   ElementsMap,
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+  PointerType,
 } from "./types";
 
 const isInsideTransformHandle = (
@@ -46,7 +46,7 @@ const isInsideTransformHandle = (
   y >= transformHandle[1] &&
   y <= transformHandle[1] + transformHandle[3];
 
-export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
+export const resizeTest = <Point extends GenericPoint>(
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
   appState: AppState,
@@ -155,9 +155,7 @@ export const getElementWithTransformHandleType = (
   }, null as { element: NonDeletedExcalidrawElement; transformHandleType: MaybeTransformHandleType } | null);
 };
 
-export const getTransformHandleTypeFromCoords = <
-  Point extends GlobalPoint | LocalPoint,
->(
+export const getTransformHandleTypeFromCoords = <Point extends GenericPoint>(
   [x1, y1, x2, y2]: Bounds,
   scenePointerX: number,
   scenePointerY: number,
@@ -274,7 +272,7 @@ export const getCursorForResizingElement = (resizingElement: {
   return cursor ? `${cursor}-resize` : "";
 };
 
-const getSelectionBorders = <Point extends LocalPoint | GlobalPoint>(
+const getSelectionBorders = <Point extends GenericPoint>(
   [x1, y1]: Point,
   [x2, y2]: Point,
   center: Point,

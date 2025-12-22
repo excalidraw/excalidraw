@@ -1,27 +1,27 @@
 import {
-  pointCenter,
-  pointFrom,
-  pointRotateRads,
-  pointsEqual,
-  type GlobalPoint,
-  type LocalPoint,
-  pointDistance,
-  vectorFromPoint,
   curveLength,
   curvePointAtLength,
   lineSegment,
+  pointCenter,
+  pointDistance,
+  pointFrom,
+  pointRotateRads,
+  pointsEqual,
+  vectorFromPoint,
+  type GlobalPoint,
+  type LocalPoint,
 } from "@excalidraw/math";
 
 import { getCurvePathOps } from "@excalidraw/utils/shape";
 
 import {
   DRAGGING_THRESHOLD,
-  KEYS,
-  shouldRotateWithDiscreteAngle,
+  getFeatureFlag,
   getGridPoint,
   invariant,
   isShallowEqual,
-  getFeatureFlag,
+  KEYS,
+  shouldRotateWithDiscreteAngle,
 } from "@excalidraw/common";
 
 import {
@@ -32,17 +32,17 @@ import {
   type Store,
 } from "@excalidraw/element";
 
-import type { Radians } from "@excalidraw/math";
+import type { Bounds } from "@excalidraw/common";
+import type { GenericPoint, Radians } from "@excalidraw/math";
 
 import type {
-  AppState,
-  PointerCoords,
-  InteractiveCanvasAppState,
   AppClassProperties,
+  AppState,
+  InteractiveCanvasAppState,
   NullableGridSize,
+  PointerCoords,
   Zoom,
 } from "@excalidraw/excalidraw/types";
-import type { Bounds } from "@excalidraw/common";
 
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -70,19 +70,19 @@ import { isLineElement } from "./typeChecks";
 import type { Scene } from "./Scene";
 
 import type {
-  NonDeleted,
-  ExcalidrawLinearElement,
-  ExcalidrawElement,
-  ExcalidrawTextElementWithContainer,
   ElementsMap,
-  NonDeletedSceneElementsMap,
+  ExcalidrawBindableElement,
+  ExcalidrawElbowArrowElement,
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElementWithContainer,
   FixedPointBinding,
   FixedSegment,
-  ExcalidrawElbowArrowElement,
-  PointsPositionUpdates,
+  NonDeleted,
   NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
   Ordered,
-  ExcalidrawBindableElement,
+  PointsPositionUpdates,
 } from "./types";
 
 /**
@@ -856,7 +856,7 @@ export class LinearElementEditor {
     return null;
   };
 
-  static isSegmentTooShort<P extends GlobalPoint | LocalPoint>(
+  static isSegmentTooShort<P extends GenericPoint>(
     element: NonDeleted<ExcalidrawLinearElement>,
     startPoint: P,
     endPoint: P,
@@ -1116,7 +1116,7 @@ export class LinearElementEditor {
     return ret;
   }
 
-  static arePointsEqual<Point extends LocalPoint | GlobalPoint>(
+  static arePointsEqual<Point extends GenericPoint>(
     point1: Point | null,
     point2: Point | null,
   ) {

@@ -1,14 +1,10 @@
-import {
-  pointFromPair,
-  type GlobalPoint,
-  type LocalPoint,
-} from "@excalidraw/math";
+import { pointFromPair, type GenericPoint } from "@excalidraw/math";
+
+import type { GlobalPoint } from "@excalidraw/math";
 
 import type { NullableGridSize } from "@excalidraw/excalidraw/types";
 
-export const getSizeFromPoints = (
-  points: readonly (GlobalPoint | LocalPoint)[],
-) => {
+export const getSizeFromPoints = (points: readonly GenericPoint[]) => {
   const xs = points.map((point) => point[0]);
   const ys = points.map((point) => point[1]);
   return {
@@ -18,7 +14,7 @@ export const getSizeFromPoints = (
 };
 
 /** @arg dimension, 0 for rescaling only x, 1 for y */
-export const rescalePoints = <Point extends GlobalPoint | LocalPoint>(
+export const rescalePoints = <Point extends GenericPoint>(
   dimension: 0 | 1,
   newSize: number,
   points: readonly Point[],
@@ -32,14 +28,14 @@ export const rescalePoints = <Point extends GlobalPoint | LocalPoint>(
 
   let nextMinCoordinate = Infinity;
 
-  const scaledPoints = points.map((point): Point => {
+  const scaledPoints = points.map((point) => {
     const newCoordinate = point[dimension] * scale;
-    const newPoint = [...point];
+    const newPoint: Point = [...point];
     newPoint[dimension] = newCoordinate;
     if (newCoordinate < nextMinCoordinate) {
       nextMinCoordinate = newCoordinate;
     }
-    return newPoint as Point;
+    return newPoint;
   });
 
   if (!normalize) {
@@ -65,16 +61,16 @@ export const rescalePoints = <Point extends GlobalPoint | LocalPoint>(
 };
 
 // TODO: Rounding this point causes some shake when free drawing
-export const getGridPoint = (
+export const getGridPoint = <Point extends GlobalPoint>(
   x: number,
   y: number,
   gridSize: NullableGridSize,
-): [number, number] => {
+): Point => {
   if (gridSize) {
-    return [
+    return pointFromPair<Point>([
       Math.round(x / gridSize) * gridSize,
       Math.round(y / gridSize) * gridSize,
-    ];
+    ]);
   }
-  return [x, y];
+  return pointFromPair<Point>([x, y]);
 };
