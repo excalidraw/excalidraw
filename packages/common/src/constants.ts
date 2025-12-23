@@ -399,7 +399,9 @@ export const ROUGHNESS = {
 export const STROKE_WIDTH = {
   thin: 1,
   bold: 2,
+  medium: 3,
   extraBold: 4,
+  heavy: 6,
 } as const;
 
 export const DEFAULT_ELEMENT_PROPS: {
