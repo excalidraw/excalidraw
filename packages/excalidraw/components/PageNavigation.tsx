@@ -53,6 +53,16 @@ export const PageNavigation = () => {
                 >
                     <div className="ToolIcon__icon">{PlusIcon}</div>
                 </button>
+
+                <button
+                    type="button"
+                    className="ToolIcon_type_button ToolIcon__delete-page"
+                    onClick={() => app.deletePage(currentPage)}
+                    disabled={numPages <= 1}
+                    title={t("labels.deletePage" as any) || "Delete Page"}
+                >
+                    <div className="ToolIcon__icon">🗑</div>
+                </button>
             </Stack.Row>
         </Island>
     );

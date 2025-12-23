@@ -4097,6 +4097,54 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  public deletePage = (pageIndex: number) => {
+    const { numPages, currentPage } = this.state;
+
+    // Prevent deleting the last remaining page
+    if (numPages <= 1) {
+      return;
+    }
+
+    // Validate pageIndex
+    if (pageIndex < 0 || pageIndex >= numPages) {
+      return;
+    }
+
+    const PAGE_TOTAL_WIDTH = NOTES_PAGE_WIDTH + NOTES_PAGE_GAP;
+
+    const elements = this.scene.getElementsIncludingDeleted();
+    const nextElements = elements.map((el) => {
+      const elMidX = el.x + el.width / 2;
+      const pageIdx = Math.floor(elMidX / PAGE_TOTAL_WIDTH);
+
+      if (pageIdx === pageIndex) {
+        // Mark elements on the deleted page as deleted
+        return newElementWith(el, { isDeleted: true });
+      }
+
+      if (pageIdx > pageIndex) {
+        // Shift elements on subsequent pages to the left
+        return newElementWith(el, { x: el.x - PAGE_TOTAL_WIDTH });
+      }
+
+      return el;
+    });
+
+    this.scene.replaceAllElements(nextElements);
+
+    // Determine which page to navigate to after deletion
+    const nextPage = currentPage >= pageIndex
+      ? Math.max(0, currentPage - 1)
+      : currentPage;
+
+    this.setAppState({
+      numPages: numPages - 1,
+      currentPage: nextPage,
+    }, () => {
+      this.goToPage(nextPage);
+    });
+  };
+
   public reorderPage = (fromIndex: number, toIndex: number) => {
     const { numPages } = this.state;
     const PAGE_WIDTH = 595;

@@ -761,6 +761,7 @@ export type AppClassProperties = {
   onPointerDownEmitter: App["onPointerDownEmitter"];
   goToPage: App["goToPage"];
   addPage: App["addPage"];
+  deletePage: App["deletePage"];
 
   bindModeHandler: App["bindModeHandler"];
 };

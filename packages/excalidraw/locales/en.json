@@ -182,7 +182,8 @@
     "previousPage": "Previous page",
     "nextPage": "Next page",
     "page": "Page",
-    "addPage": "Add page"
+    "addPage": "Add page",
+    "deletePage": "Delete page"
   },
   "elementLink": {
     "title": "Link to object",
