@@ -461,6 +461,8 @@ export interface AppState {
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
   bindMode: BindMode;
+  currentPage: number;
+  numPages: number;
 }
 
 export type SearchMatch = {
@@ -757,6 +759,8 @@ export type AppClassProperties = {
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
   onPointerDownEmitter: App["onPointerDownEmitter"];
+  goToPage: App["goToPage"];
+  addPage: App["addPage"];
 
   bindModeHandler: App["bindModeHandler"];
 };

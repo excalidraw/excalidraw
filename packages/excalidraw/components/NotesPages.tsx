@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 import type { AppState } from "../types";
 
 type NotesPagesProps = {
@@ -10,33 +11,25 @@ export const NotesPages = ({ appState }: NotesPagesProps) => {
         return null;
     }
 
-    const { zoom, scrollX, scrollY, width, height, offsetLeft, offsetTop } = appState;
+    const { zoom, scrollX, scrollY, offsetLeft, offsetTop, currentPage } = appState;
 
     // A4 dimensions at 72 DPI (standard for web)
     const PAGE_WIDTH = 595;
     const PAGE_HEIGHT = 842;
-    const PAGE_GAP = 20;
+    const PAGE_GAP = 40;
 
-    // For POC, we'll render a fixed number of pages (e.g., 10)
-    // In a real implementation, this would be dynamic based on elements
-    const numPages = 10;
+    // Scene coordinates for the current page
+    const sceneX = currentPage * (PAGE_WIDTH + PAGE_GAP);
+    const sceneY = 0;
 
-    const pages = [];
-    for (let i = 0; i < numPages; i++) {
-        // Scene coordinates (same as elements)
-        const sceneX = -PAGE_WIDTH / 2;
-        const sceneY = (PAGE_HEIGHT + PAGE_GAP) * i;
+    // Convert scene coordinates to viewport coordinates
+    const viewportX = (sceneX + scrollX) * zoom.value + offsetLeft;
+    const viewportY = (sceneY + scrollY) * zoom.value + offsetTop;
 
-        // Convert scene coordinates to viewport coordinates
-        // This calculates exactly where the page should be drawn on the screen
-        // Formula matches sceneCoordsToViewportCoords from @excalidraw/common
-        const viewportX = (sceneX + scrollX) * zoom.value + offsetLeft;
-        const viewportY = (sceneY + scrollY) * zoom.value + offsetTop;
-
-        pages.push(
+    return (
+        <div className="notes-pages-container" style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}>
             <div
-                key={i}
-                className="notes-page"
+                className="notes-page is-current"
                 style={{
                     position: "absolute",
                     width: PAGE_WIDTH * zoom.value,
@@ -44,13 +37,15 @@ export const NotesPages = ({ appState }: NotesPagesProps) => {
                     left: viewportX,
                     top: viewportY,
                     backgroundColor: "white",
-                    boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
+                    boxShadow: "0 20px 50px rgba(0,0,0,0.3)",
                     backgroundImage: `linear-gradient(#e9e9e9 1px, transparent 1px)`,
                     backgroundSize: `100% ${30 * zoom.value}px`,
                     pointerEvents: "none",
                     zIndex: 0,
-                    border: "1px solid #dee2e6",
-                    borderRadius: "2px",
+                    border: "2px solid #339af0",
+                    borderRadius: "4px",
+                    transition: "box-shadow 0.3s ease, border 0.3s ease",
+                    opacity: 1,
                 }}
             >
                 {/* Margin line for that classic notebook look */}
@@ -62,9 +57,19 @@ export const NotesPages = ({ appState }: NotesPagesProps) => {
                     width: 1,
                     borderLeft: `${1 * zoom.value}px solid #ffc1c1`,
                 }} />
-            </div>
-        );
-    }
 
-    return <div className="notes-pages-container" style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}>{pages}</div>;
+                {/* Page number indicator */}
+                <div style={{
+                    position: "absolute",
+                    bottom: 20 * zoom.value,
+                    right: 20 * zoom.value,
+                    fontSize: `${14 * zoom.value}px`,
+                    color: "#adb5bd",
+                    fontWeight: "bold",
+                }}>
+                    {currentPage + 1}
+                </div>
+            </div>
+        </div>
+    );
 };

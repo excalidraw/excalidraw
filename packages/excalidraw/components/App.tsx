@@ -562,6 +562,10 @@ let tappedTwiceTimer = 0;
 let firstTapPosition: { x: number; y: number } | null = null;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
+
+const NOTES_PAGE_WIDTH = 595;
+const NOTES_PAGE_HEIGHT = 842;
+const NOTES_PAGE_GAP = 40;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
@@ -1860,6 +1864,18 @@ class App extends React.Component<AppProps, AppState> {
     const { renderTopRightUI, renderTopLeftUI, renderCustomStats } = this.props;
 
     const sceneNonce = this.scene.getSceneNonce();
+    let sceneElements: readonly NonDeletedExcalidrawElement[] | undefined;
+    if (this.state.mode === "notes") {
+      const pageIndex = this.state.currentPage || 0;
+      const pageXStart = pageIndex * (NOTES_PAGE_WIDTH + NOTES_PAGE_GAP);
+      const pageXEnd = pageXStart + NOTES_PAGE_WIDTH;
+
+      sceneElements = this.scene.getNonDeletedElements().filter((el) => {
+        const elMidX = el.x + el.width / 2;
+        return elMidX >= pageXStart && elMidX <= pageXEnd;
+      });
+    }
+
     const { elementsMap, visibleElements } =
       this.renderer.getRenderableElements({
         sceneNonce,
@@ -1872,6 +1888,7 @@ class App extends React.Component<AppProps, AppState> {
         width: this.state.width,
         editingTextElement: this.state.editingTextElement,
         newElementId: this.state.newElement?.id,
+        elements: sceneElements,
       });
     this.visibleElements = visibleElements;
 
@@ -2598,7 +2615,7 @@ class App extends React.Component<AppProps, AppState> {
         editingTextElement = null;
       }
 
-      this.setState((prevAppState) => {
+      this.setAppState((prevAppState) => {
         const actionAppState = actionResult.appState || {};
 
         return {
@@ -3949,7 +3966,76 @@ class App extends React.Component<AppProps, AppState> {
     state,
     callback,
   ) => {
-    this.setState(state, callback);
+    if (this.state && this.state.mode === "notes") {
+      this.setState((prevState, props) => {
+        const nextState =
+          typeof state === "function" ? state(prevState, props) : state;
+        if (!nextState) {
+          return null;
+        }
+
+        const updates: Partial<AppState> = {};
+
+        // Enforce zoom >= 1
+        const zoom =
+          (nextState as any).zoom?.value ??
+          (nextState as any).zoom ??
+          prevState.zoom.value;
+
+        if (zoom < 1) {
+          updates.zoom = {
+            ...((nextState as any).zoom || prevState.zoom),
+            value: getNormalizedZoom(1),
+          };
+        }
+
+        // Intercept scroll updates to keep them centered/clamped
+        const scrollX =
+          (nextState as any).scrollX !== undefined
+            ? (nextState as any).scrollX
+            : prevState.scrollX;
+        const scrollY =
+          (nextState as any).scrollY !== undefined
+            ? (nextState as any).scrollY
+            : prevState.scrollY;
+
+
+
+        const currentZoom = updates.zoom?.value ?? zoom;
+        const currentWidth = (nextState as any).width ?? prevState.width;
+        const currentHeight = (nextState as any).height ?? prevState.height;
+        const currentPage = (nextState as any).currentPage ?? prevState.currentPage;
+
+        const targetScrollX =
+          -(currentPage * (NOTES_PAGE_WIDTH + NOTES_PAGE_GAP)) +
+          currentWidth / 2 -
+          NOTES_PAGE_WIDTH / 2;
+        const targetScrollY = currentHeight / 2 - NOTES_PAGE_HEIGHT / 2;
+
+        if (currentZoom <= 1) {
+          updates.scrollX = targetScrollX;
+          updates.scrollY = targetScrollY;
+        } else {
+          const maxScrollXOffset = (NOTES_PAGE_WIDTH / 2) * (currentZoom - 1);
+          const maxScrollYOffset = (NOTES_PAGE_HEIGHT / 2) * (currentZoom - 1);
+
+          updates.scrollX = clamp(
+            scrollX,
+            targetScrollX - maxScrollXOffset,
+            targetScrollX + maxScrollXOffset,
+          );
+          updates.scrollY = clamp(
+            scrollY,
+            targetScrollY - maxScrollYOffset,
+            targetScrollY + maxScrollYOffset,
+          );
+        }
+
+        return { ...nextState, ...updates } as any;
+      }, callback);
+    } else {
+      this.setState(state, callback);
+    }
   };
 
   removePointer = (event: React.PointerEvent<HTMLElement> | PointerEvent) => {
@@ -3983,6 +4069,71 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     });
+  };
+  public goToPage = (pageIndex: number) => {
+    // Target scrollX is the center of the page relative to scene origin
+    // Correct centering logic: viewport_center - page_center_in_scene
+    const scrollX =
+      -(pageIndex * (NOTES_PAGE_WIDTH + NOTES_PAGE_GAP)) +
+      this.state.width / 2 -
+      NOTES_PAGE_WIDTH / 2;
+    const scrollY = this.state.height / 2 - NOTES_PAGE_HEIGHT / 2;
+
+    this.setAppState({
+      currentPage: pageIndex,
+      scrollX,
+      scrollY,
+      zoom: { value: getNormalizedZoom(1) },
+    });
+  };
+
+  public addPage = () => {
+    const { numPages } = this.state;
+    this.setAppState({
+      numPages: numPages + 1,
+      currentPage: numPages,
+    }, () => {
+      this.goToPage(numPages);
+    });
+  };
+
+  public reorderPage = (fromIndex: number, toIndex: number) => {
+    const { numPages } = this.state;
+    const PAGE_WIDTH = 595;
+    const PAGE_GAP = 40;
+
+    if (fromIndex === toIndex || fromIndex < 0 || fromIndex >= numPages || toIndex < 0 || toIndex >= numPages) {
+      return;
+    }
+
+    const PAGE_TOTAL_WIDTH = PAGE_WIDTH + PAGE_GAP;
+
+    const elements = this.scene.getElementsIncludingDeleted();
+    const nextElements = elements.map((el) => {
+      const pageIdx = Math.floor((el.x + PAGE_WIDTH / 2) / PAGE_TOTAL_WIDTH);
+
+      if (pageIdx === fromIndex) {
+        // Move el from fromIndex to toIndex
+        return newElementWith(el, { x: el.x + (toIndex - fromIndex) * PAGE_TOTAL_WIDTH });
+      }
+
+      if (fromIndex < toIndex) {
+        if (pageIdx > fromIndex && pageIdx <= toIndex) {
+          // Shift pages in between left
+          return newElementWith(el, { x: el.x - PAGE_TOTAL_WIDTH });
+        }
+      } else {
+        if (pageIdx >= toIndex && pageIdx < fromIndex) {
+          // Shift pages in between right
+          return newElementWith(el, { x: el.x + PAGE_TOTAL_WIDTH });
+        }
+      }
+
+      return el;
+    });
+
+    this.scene.replaceAllElements(nextElements);
+    this.goToPage(toIndex);
   };
 
   updateFrameRendering = (
@@ -4194,10 +4345,81 @@ class App extends React.Component<AppProps, AppState> {
   /** use when changing scrollX/scrollY/zoom based on user interaction */
   private translateCanvas: React.Component<any, AppState>["setState"] = (
     state,
+    callback,
   ) => {
     this.cancelInProgressAnimation?.();
     this.maybeUnfollowRemoteUser();
-    this.setState(state);
+
+    if (this.state.mode === "notes") {
+      this.setState((prevState, props) => {
+        const nextState =
+          typeof state === "function" ? state(prevState, props) : state;
+        if (!nextState) {
+          return null;
+        }
+
+        const updates: Partial<AppState> = {};
+        const zoom =
+          (nextState as any).zoom?.value ??
+          (nextState as any).zoom ??
+          prevState.zoom.value;
+        const scrollX =
+          (nextState as any).scrollX !== undefined
+            ? (nextState as any).scrollX
+            : prevState.scrollX;
+        const scrollY =
+          (nextState as any).scrollY !== undefined
+            ? (nextState as any).scrollY
+            : prevState.scrollY;
+
+        const currentWidth = (nextState as any).width ?? prevState.width;
+        const currentHeight = (nextState as any).height ?? prevState.height;
+        const currentPage = (nextState as any).currentPage ?? prevState.currentPage;
+
+        if (zoom <= 1) {
+          const scrollX =
+            -(currentPage * (NOTES_PAGE_WIDTH + NOTES_PAGE_GAP)) +
+            currentWidth / 2 -
+            NOTES_PAGE_WIDTH / 2;
+          const scrollY = currentHeight / 2 - NOTES_PAGE_HEIGHT / 2;
+
+          if (zoom < 1) {
+            updates.zoom = {
+              ...((nextState as any).zoom || prevState.zoom),
+              value: getNormalizedZoom(1),
+            };
+          }
+
+          updates.scrollX = scrollX;
+          updates.scrollY = scrollY;
+        } else {
+          const targetScrollX =
+            -(currentPage * (NOTES_PAGE_WIDTH + NOTES_PAGE_GAP)) +
+            currentWidth / 2 -
+            NOTES_PAGE_WIDTH / 2;
+          const targetScrollY = currentHeight / 2 - NOTES_PAGE_HEIGHT / 2;
+
+          const maxScrollXOffset = (NOTES_PAGE_WIDTH / 2) * (zoom - 1);
+          const maxScrollYOffset = (NOTES_PAGE_HEIGHT / 2) * (zoom - 1);
+
+          updates.scrollX = clamp(
+            scrollX,
+            targetScrollX - maxScrollXOffset,
+            targetScrollX + maxScrollXOffset,
+          );
+          updates.scrollY = clamp(
+            scrollY,
+            targetScrollY - maxScrollYOffset,
+            targetScrollY + maxScrollYOffset,
+          );
+        }
+
+        return { ...nextState, ...updates } as any;
+      }, callback);
+      return;
+    }
+
+    this.setState(state, callback);
   };
 
   setToast = (
@@ -11157,12 +11379,13 @@ class App extends React.Component<AppProps, AppState> {
 
     // Create, position, and insert placeholders
     const placeholders = isNotesMode
-      ? imageFiles.map((_, i) =>
-        this.newImagePlaceholder({
-          sceneX: -297, // Approximate half of A4 width
-          sceneY: (842 + 20) * i,
-        }),
-      )
+      ? imageFiles.map((_, i) => {
+        const pageIndex = (this.state.currentPage || 0) + i;
+        return this.newImagePlaceholder({
+          sceneX: pageIndex * (NOTES_PAGE_WIDTH + NOTES_PAGE_GAP),
+          sceneY: 0,
+        });
+      })
       : positionElementsOnGrid(
         imageFiles.map(() => this.newImagePlaceholder({ sceneX, sceneY })),
         sceneX,
@@ -11193,13 +11416,11 @@ class App extends React.Component<AppProps, AppState> {
       ? initialized
         .filter((el) => !el.isDeleted)
         .map((el, i) => {
-          const PAGE_WIDTH = 595;
-          const PAGE_HEIGHT = 842;
+          const pageIndex = (this.state.currentPage || 0) + i;
           const MARGIN = 20; // Reduced margin to maximize content size
-          const PAGE_GAP = 20;
 
-          const targetWidth = PAGE_WIDTH - MARGIN * 2;
-          const targetHeight = PAGE_HEIGHT - MARGIN * 2;
+          const targetWidth = NOTES_PAGE_WIDTH - MARGIN * 2;
+          const targetHeight = NOTES_PAGE_HEIGHT - MARGIN * 2;
 
           // Calculate scale to fit within page margins (allow upscaling)
           const scaleX = targetWidth / el.width;
@@ -11210,12 +11431,11 @@ class App extends React.Component<AppProps, AppState> {
           const finalHeight = el.height * scale;
 
           // Center on page
-          const pageTop = (PAGE_HEIGHT + PAGE_GAP) * i;
-          const left = -PAGE_WIDTH / 2;
+          const pageLeft = pageIndex * (NOTES_PAGE_WIDTH + NOTES_PAGE_GAP);
 
           return newElementWith(el, {
-            x: left + (PAGE_WIDTH - finalWidth) / 2,
-            y: pageTop + (PAGE_HEIGHT - finalHeight) / 2,
+            x: pageLeft + (NOTES_PAGE_WIDTH - finalWidth) / 2,
+            y: (NOTES_PAGE_HEIGHT - finalHeight) / 2,
             width: finalWidth,
             height: finalHeight,
           });
@@ -12013,6 +12233,12 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         let newZoom = this.state.zoom.value - delta / 100;
+
+        if (this.state.mode === "notes") {
+          // In Notes Mode, we don't allow zooming out further than 100%
+          newZoom = Math.max(1, newZoom);
+        }
+
         // increase zoom steps the more zoomed-in we are (applies to >100% only)
         newZoom +=
           Math.log10(Math.max(1, this.state.zoom.value)) *

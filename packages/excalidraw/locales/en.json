@@ -178,7 +178,11 @@
     "linkToElement": "Link to object",
     "wrapSelectionInFrame": "Wrap selection in frame",
     "tab": "Tab",
-    "shapeSwitch": "Switch shape"
+    "shapeSwitch": "Switch shape",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "page": "Page",
+    "addPage": "Add page"
   },
   "elementLink": {
     "title": "Link to object",

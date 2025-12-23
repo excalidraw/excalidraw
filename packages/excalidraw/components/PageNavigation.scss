@@ -1,0 +1,42 @@
+.excalidraw {
+  .PageNavigation {
+    z-index: 100;
+    pointer-events: all;
+
+    // We remove the absolute positioning here because it will 
+    // be handled by the footer's layout or we'll wrap it in 
+    // a container that doesn't push the header.
+
+    .PageNavigation__display {
+      padding: 0 12px;
+      font-size: 0.9em;
+      font-weight: 500;
+      color: var(--icon-fill-color);
+      user-select: none;
+      min-width: 100px;
+      text-align: center;
+    }
+
+    .PageNavigation__divider {
+      width: 1px;
+      height: 24px;
+      background-color: var(--divider-color);
+      margin: 0 4px;
+    }
+
+    button.ToolIcon_type_button {
+      &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      &.ToolIcon__add-page {
+        color: var(--color-primary);
+
+        .ToolIcon__icon svg {
+          fill: currentColor;
+        }
+      }
+    }
+  }
+}

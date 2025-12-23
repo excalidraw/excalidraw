@@ -63,6 +63,7 @@ import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
 import { ModeToggle } from "./ModeToggle";
+import { PageNavigation } from "./PageNavigation";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
@@ -573,6 +574,9 @@ const LayerUI = ({
         />
       )}
       <tunnels.OverwriteConfirmDialogTunnel.Out />
+      <tunnels.FooterCenterTunnel.In>
+        <PageNavigation />
+      </tunnels.FooterCenterTunnel.In>
       {renderImageExportDialog()}
       {renderJSONExportDialog()}
       {appState.pasteDialog.shown && (

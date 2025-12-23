@@ -106,6 +106,7 @@ export class Renderer {
         width,
         editingTextElement,
         newElementId,
+        elements: elements_prop,
         // cache-invalidation nonce
         sceneNonce: _sceneNonce,
       }: {
@@ -120,9 +121,10 @@ export class Renderer {
         /** note: first render of newElement will always bust the cache
          * (we'd have to prefilter elements outside of this function) */
         newElementId: ExcalidrawElement["id"] | undefined;
+        elements?: readonly NonDeletedExcalidrawElement[];
         sceneNonce: ReturnType<InstanceType<typeof Scene>["getSceneNonce"]>;
       }) => {
-        const elements = this.scene.getNonDeletedElements();
+        const elements = elements_prop || this.scene.getNonDeletedElements();
 
         const elementsMap = getRenderableElements({
           elements,
