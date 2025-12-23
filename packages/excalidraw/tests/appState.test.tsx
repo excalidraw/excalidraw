@@ -85,4 +85,32 @@ describe("appState", () => {
 
     expect((h.elements[0] as ExcalidrawTextElement).fontSize).toBe(16);
   });
+
+  it("switching modes updates appState correctly", async () => {
+    await render(<Excalidraw />);
+
+    expect(h.state.mode).toBe("whiteboard");
+    expect(h.state.viewBackgroundColor).toBe("#ffffff");
+
+    // Switching via setAppState (simulating ModeToggle)
+    h.app.setAppState({
+      mode: "notes",
+      viewBackgroundColor: "#f8f9fa",
+    });
+
+    await waitFor(() => {
+      expect(h.state.mode).toBe("notes");
+      expect(h.state.viewBackgroundColor).toBe("#f8f9fa");
+    });
+
+    h.app.setAppState({
+      mode: "whiteboard",
+      viewBackgroundColor: "#ffffff",
+    });
+
+    await waitFor(() => {
+      expect(h.state.mode).toBe("whiteboard");
+      expect(h.state.viewBackgroundColor).toBe("#ffffff");
+    });
+  });
 });

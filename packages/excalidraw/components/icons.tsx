@@ -1171,11 +1171,35 @@ export const StrokeWidthBoldIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+
+
+export const StrokeWidthMediumIcon = createIcon(
+  <path
+    d="M5 10h10"
+    stroke="currentColor"
+    strokeWidth="3.125"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  modifiedTablerIconProps,
+);
+
 export const StrokeWidthExtraBoldIcon = createIcon(
   <path
     d="M5 10h10"
     stroke="currentColor"
     strokeWidth="3.75"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const StrokeWidthHeavyIcon = createIcon(
+  <path
+    d="M5 10h10"
+    stroke="currentColor"
+    strokeWidth="5"
     strokeLinecap="round"
     strokeLinejoin="round"
   />,

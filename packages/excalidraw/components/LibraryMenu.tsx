@@ -157,6 +157,7 @@ const LibraryMenuContent = memo(
           theme={theme}
           onSelectItems={onSelectItems}
           selectedItems={selectedItems}
+          library={library}
         />
         {showBtn && (
           <LibraryMenuControlButtons
@@ -165,6 +166,7 @@ const LibraryMenuContent = memo(
             id={id}
             libraryReturnUrl={libraryReturnUrl}
             theme={theme}
+            library={library}
           />
         )}
       </LibraryMenuWrapper>

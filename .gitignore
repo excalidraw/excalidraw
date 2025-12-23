@@ -27,3 +27,12 @@ dev-dist
 html
 meta*.json
 .claude
+
+# Capacitor Android
+excalidraw-app/android/app/build/
+excalidraw-app/android/.gradle/
+excalidraw-app/android/local.properties
+
+# Docker build output
+output/
+.env.production

@@ -237,7 +237,7 @@ const _renderStaticScene = ({
     normalizedHeight,
     theme: appState.theme,
     isExporting,
-    viewBackgroundColor: appState.viewBackgroundColor,
+    viewBackgroundColor: renderConfig.canvasBackgroundColor,
   });
 
   // Apply zoom
@@ -387,7 +387,7 @@ const _renderStaticScene = ({
             (isExporting ||
               (isEmbeddableElement(element) &&
                 renderConfig.embedsValidationStatus.get(element.id) !==
-                  true)) &&
+                true)) &&
             element.width &&
             element.height
           ) {

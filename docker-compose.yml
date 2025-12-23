@@ -1,23 +1,24 @@
+version: "3.8"
 services:
   excalidraw:
     build:
       context: .
+      target: build
       args:
         - NODE_ENV=development
-    container_name: excalidraw
+    container_name: excalidraw-dev
     ports:
-      - "3000:80"
-    restart: on-failure
+      - "5173:5173"
+      - "3000:3000"
+    restart: always
     stdin_open: true
-    healthcheck:
-      disable: true
+    tty: true
     environment:
       - NODE_ENV=development
+      - DOCKER=true
+      - VITE_APP_AI_BACKEND=https://oss-ai.excalidraw.com
     volumes:
-      - ./:/opt/node_app/app:delegated
-      - ./package.json:/opt/node_app/package.json
-      - ./yarn.lock:/opt/node_app/yarn.lock
-      - notused:/opt/node_app/app/node_modules
-
-volumes:
-  notused:
+      - ./:/opt/node_app
+      - /opt/node_app/node_modules
+      - /opt/node_app/excalidraw-app/node_modules
+    command: yarn start

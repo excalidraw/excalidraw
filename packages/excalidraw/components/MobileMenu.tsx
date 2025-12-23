@@ -66,6 +66,7 @@ export const MobileMenu = ({
     WelcomeScreenCenterTunnel,
     MainMenuTunnel,
     DefaultSidebarTriggerTunnel,
+    FooterCenterTunnel,
   } = useTunnels();
   const renderAppTopBar = () => {
     if (appState.openDialog?.name === "elementLinkSelector") {
@@ -148,6 +149,7 @@ export const MobileMenu = ({
             app={app}
             setAppState={setAppState}
           />
+          <FooterCenterTunnel.Out />
 
           <Island className="App-toolbar">
             {!appState.viewModeEnabled &&

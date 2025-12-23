@@ -52,6 +52,8 @@ const ITEMS_RENDERED_PER_BATCH = 17;
 // speed it up
 const CACHED_ITEMS_RENDERED_PER_BATCH = 64;
 
+import type Library from "../data/library";
+
 export default function LibraryMenuItems({
   isLoading,
   libraryItems,
@@ -63,6 +65,7 @@ export default function LibraryMenuItems({
   libraryReturnUrl,
   onSelectItems,
   selectedItems,
+  library,
 }: {
   isLoading: boolean;
   libraryItems: LibraryItems;
@@ -74,8 +77,10 @@ export default function LibraryMenuItems({
   id: string;
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
+  library: Library;
 }) {
   const editorInterface = useEditorInterface();
+  // ... (rest of the component)
   const libraryContainerRef = useRef<HTMLDivElement>(null);
   const scrollPosition = useScrollPosition<HTMLDivElement>(libraryContainerRef);
 
@@ -246,7 +251,7 @@ export default function LibraryMenuItems({
 
   const itemsRenderedPerBatch =
     svgCache.size >=
-    (filteredItems.length ? filteredItems : libraryItems).length
+      (filteredItems.length ? filteredItems : libraryItems).length
       ? CACHED_ITEMS_RENDERED_PER_BATCH
       : ITEMS_RENDERED_PER_BATCH;
 
@@ -380,8 +385,8 @@ export default function LibraryMenuItems({
       className="library-menu-items-container"
       style={
         pendingElements.length ||
-        unpublishedItems.length ||
-        publishedItems.length
+          unpublishedItems.length ||
+          publishedItems.length
           ? { justifyContent: "flex-start" }
           : { borderBottom: 0 }
       }
@@ -437,6 +442,7 @@ export default function LibraryMenuItems({
             id={id}
             libraryReturnUrl={libraryReturnUrl}
             theme={theme}
+            library={library}
           />
         )}
       </Stack.Col>

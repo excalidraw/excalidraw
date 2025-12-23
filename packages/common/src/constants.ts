@@ -246,6 +246,7 @@ export const STRING_MIME_TYPES = {
   excalidrawlib: "application/vnd.excalidrawlib+json",
   // list of excalidraw library item ids
   excalidrawlibIds: "application/vnd.excalidrawlib.ids+json",
+  pdf: "application/pdf",
 } as const;
 
 export const MIME_TYPES = {
@@ -398,7 +399,9 @@ export const ROUGHNESS = {
 export const STROKE_WIDTH = {
   thin: 1,
   bold: 2,
+  medium: 3,
   extraBold: 4,
+  heavy: 6,
 } as const;
 
 export const DEFAULT_ELEMENT_PROPS: {
@@ -460,6 +463,9 @@ export const EDITOR_LS_KEYS = {
   // legacy naming (non)scheme
   MERMAID_TO_EXCALIDRAW: "mermaid-to-excalidraw",
   PUBLISH_LIBRARY: "publish-library-data",
+  OPENROUTER_API_KEY: "excalidraw-openrouter-api-key",
+  OPENROUTER_MODEL: "excalidraw-openrouter-model",
+  RECENT_FILES: "excalidraw-recent-files",
 } as const;
 
 /**

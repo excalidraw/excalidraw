@@ -307,3 +307,5 @@ export { getDataURL } from "./data/blob";
 export { isElementLink } from "@excalidraw/element";
 
 export { setCustomTextMetricsProvider } from "@excalidraw/element";
+
+export { OpenRouterClient } from "./data/ai/openrouter";

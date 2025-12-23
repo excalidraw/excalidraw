@@ -35,7 +35,7 @@ import {
 
 import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
 
-import type { FileSystemHandle } from "./data/filesystem";
+import type { FileSystemHandle, CapacitorFileHandle } from "./data/filesystem";
 
 import type { Spreadsheet } from "./charts";
 
@@ -376,20 +376,20 @@ const parseClipboardEventTextData = async (
 
 type AllowedParsedDataTransferItem =
   | {
-      type: ValueOf<typeof IMAGE_MIME_TYPES>;
-      kind: "file";
-      file: File;
-      fileHandle: FileSystemHandle | null;
-    }
+    type: ValueOf<typeof IMAGE_MIME_TYPES>;
+    kind: "file";
+    file: File;
+    fileHandle: FileSystemHandle | CapacitorFileHandle | null;
+  }
   | { type: ValueOf<typeof STRING_MIME_TYPES>; kind: "string"; value: string };
 
 type ParsedDataTransferItem =
   | {
-      type: string;
-      kind: "file";
-      file: File;
-      fileHandle: FileSystemHandle | null;
-    }
+    type: string;
+    kind: "file";
+    file: File;
+    fileHandle: FileSystemHandle | CapacitorFileHandle | null;
+  }
   | { type: string; kind: "string"; value: string };
 
 type ParsedDataTransferItemType<
@@ -551,7 +551,7 @@ export const parseClipboard = async (
         programmaticAPI,
       };
     }
-  } catch {}
+  } catch { }
 
   return { text: parsedEventData.value };
 };

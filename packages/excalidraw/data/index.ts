@@ -33,13 +33,19 @@ import { canvasToBlob } from "./blob";
 import { fileSave } from "./filesystem";
 import { serializeAsJSON } from "./json";
 
-import type { FileSystemHandle } from "./filesystem";
+import type { FileSystemHandle, CapacitorFileHandle } from "./filesystem";
 
 import type { ExportType } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
 
 export { loadFromBlob } from "./blob";
 export { loadFromJSON, saveAsJSON } from "./json";
+export {
+  trackRecentFile,
+  getRecentFiles,
+  getRecentFileHandle,
+  clearRecentFiles,
+} from "./recentFiles";
 
 export type ExportedElements = readonly NonDeletedExcalidrawElement[] & {
   _brand: "exportedElements";
@@ -59,12 +65,12 @@ export const prepareElementsForExport = (
   let exportingFrame: ExcalidrawFrameLikeElement | null = null;
   let exportedElements = isExportingSelection
     ? getSelectedElements(
-        elements,
-        { selectedElementIds },
-        {
-          includeBoundTextElement: true,
-        },
-      )
+      elements,
+      { selectedElementIds },
+      {
+        includeBoundTextElement: true,
+      },
+    )
     : elements;
 
   if (isExportingSelection) {
@@ -110,7 +116,7 @@ export const exportCanvas = async (
     viewBackgroundColor: string;
     /** filename, if applicable */
     name?: string;
-    fileHandle?: FileSystemHandle | null;
+    fileHandle?: FileSystemHandle | CapacitorFileHandle | null;
     exportingFrame: ExcalidrawFrameLikeElement | null;
   },
 ) => {
