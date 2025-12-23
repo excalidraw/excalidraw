@@ -9751,13 +9751,13 @@ class App extends React.Component<AppProps, AppState> {
         croppingElementId,
         multiElement,
         activeTool,
-        isResizing,
+        isScaling,
         isRotating,
         isCropping,
       } = this.state;
 
       this.setState((prevState) => ({
-        isResizing: false,
+        isScaling: false,
         isRotating: false,
         isCropping: false,
         resizingElement: null,
@@ -10570,7 +10570,7 @@ class App extends React.Component<AppProps, AppState> {
         // not dragged
         !pointerDownState.drag.hasOccurred &&
         // not resized
-        !this.state.isResizing &&
+        !this.state.isScaling &&
         // only hitting the bounding box of the previous hit element
         ((hitElement &&
           hitElementBoundingBoxOnly(
@@ -10638,7 +10638,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         (pointerDownState.drag.hasOccurred &&
           !this.state.selectedLinearElement) ||
-        isResizing ||
+        isScaling ||
         isRotating ||
         isCropping
       ) {
@@ -11696,10 +11696,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.setState({
-      // TODO: rename this state field to "isScaling" to distinguish
-      // it from the generic "isResizing" which includes scaling and
-      // rotating
-      isResizing: transformHandleType && transformHandleType !== "rotation",
+      isScaling: transformHandleType && transformHandleType !== "rotation",
       isRotating: transformHandleType === "rotation",
       activeEmbeddable: null,
     });
