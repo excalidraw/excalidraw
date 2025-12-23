@@ -24,7 +24,7 @@ import {
 
 import type { InclusiveRange } from "@excalidraw/math";
 
-import type { Bounds } from "@excalidraw/element";
+import type { Bounds } from "@excalidraw/common";
 import type { MaybeTransformHandleType } from "@excalidraw/element";
 import type {
   ElementsMap,
