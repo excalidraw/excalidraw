@@ -3,6 +3,6 @@
   "compilerOptions": {
     "outDir": "./dist/types"
   },
-  "include": ["**/*", "../element/src/__tests__/transform.test.ts", "../element/src/transform.ts"],
+  "include": ["**/*"],
   "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"]
 }
