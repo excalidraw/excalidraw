@@ -8,15 +8,8 @@
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import { restore } from "@excalidraw/excalidraw/data/restore";
 
-import type {
-  ExcalidrawElement,
-  FileId,
-} from "@excalidraw/element/types";
-import type {
-  AppState,
-  BinaryFileData,
-  BinaryFiles,
-} from "@excalidraw/excalidraw/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
 
 // Google API configuration
@@ -45,10 +38,73 @@ let gapiLoaded = false;
 let gisLoaded = false;
 let tokenClient: google.accounts.oauth2.TokenClient | null = null;
 let accessToken: string | null = null;
+let tokenExpiresAt: number | null = null;
+
+// Token refresh buffer - refresh 5 minutes before expiration
+const TOKEN_REFRESH_BUFFER_MS = 5 * 60 * 1000;
 
 // Callback for when auth state changes
 type AuthStateCallback = (isSignedIn: boolean) => void;
 let authStateCallback: AuthStateCallback | null = null;
+
+/**
+ * Escape a string for use in Google Drive query syntax.
+ * Single quotes must be escaped with backslash.
+ */
+const escapeQueryString = (str: string): string => {
+  return str.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+};
+
+/**
+ * Check if the access token is expired or about to expire
+ */
+const isTokenExpired = (): boolean => {
+  if (!tokenExpiresAt) {
+    return true;
+  }
+  return Date.now() >= tokenExpiresAt - TOKEN_REFRESH_BUFFER_MS;
+};
+
+/**
+ * Ensure we have a valid access token, refreshing if necessary
+ */
+const ensureValidToken = async (): Promise<void> => {
+  if (!accessToken || isTokenExpired()) {
+    if (tokenClient) {
+      // Request new token - this will trigger the callback
+      return new Promise((resolve, reject) => {
+        const originalCallback = authStateCallback;
+        const timeoutId = setTimeout(() => {
+          authStateCallback = originalCallback;
+          reject(new Error("Token refresh timed out"));
+        }, 30000);
+
+        authStateCallback = (isSignedIn) => {
+          clearTimeout(timeoutId);
+          authStateCallback = originalCallback;
+          if (originalCallback) {
+            originalCallback(isSignedIn);
+          }
+          if (isSignedIn) {
+            resolve();
+          } else {
+            reject(new Error("Failed to refresh token"));
+          }
+        };
+        tokenClient!.requestAccessToken({ prompt: "" });
+      });
+    }
+    throw new Error("Not signed in to Google Drive");
+  }
+};
+
+// Clear token on page unload for security
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeunload", () => {
+    accessToken = null;
+    tokenExpiresAt = null;
+  });
+}
 
 /**
  * Check if Google Drive integration is configured
@@ -152,6 +208,10 @@ const initTokenClient = () => {
     callback: (response) => {
       if (response.access_token) {
         accessToken = response.access_token;
+        // Google OAuth tokens typically expire in 1 hour (3600 seconds)
+        // Store expiration time for proactive refresh
+        const expiresIn = (response as any).expires_in || 3600;
+        tokenExpiresAt = Date.now() + expiresIn * 1000;
         if (authStateCallback) {
           authStateCallback(true);
         }
@@ -207,6 +267,7 @@ export const signOut = (): void => {
   if (accessToken) {
     google.accounts.oauth2.revoke(accessToken, () => {
       accessToken = null;
+      tokenExpiresAt = null;
       if (authStateCallback) {
         authStateCallback(false);
       }
@@ -223,6 +284,8 @@ export const getCurrentUserEmail = async (): Promise<string | null> => {
   }
 
   try {
+    // Don't use ensureValidToken here to avoid refresh loops
+    // Just check if we have a token
     const response = await fetch(
       "https://www.googleapis.com/oauth2/v2/userinfo",
       {
@@ -259,11 +322,11 @@ export interface DriveFile {
 export const listExcalidrawFiles = async (
   maxResults: number = 50,
 ): Promise<DriveFile[]> => {
-  if (!accessToken) {
-    throw new Error("Not signed in to Google Drive");
-  }
+  await ensureValidToken();
 
-  const query = `name contains '${EXCALIDRAW_EXTENSION}' and trashed = false`;
+  // Extension is a constant, but escape for safety
+  const escapedExt = escapeQueryString(EXCALIDRAW_EXTENSION);
+  const query = `name contains '${escapedExt}' and trashed = false`;
 
   const response = await gapi.client.drive.files.list({
     q: query,
@@ -283,11 +346,12 @@ export const searchDriveFiles = async (
   searchQuery: string,
   maxResults: number = 50,
 ): Promise<DriveFile[]> => {
-  if (!accessToken) {
-    throw new Error("Not signed in to Google Drive");
-  }
+  await ensureValidToken();
 
-  const query = `name contains '${searchQuery}' and name contains '${EXCALIDRAW_EXTENSION}' and trashed = false`;
+  // Escape user input to prevent query injection
+  const escapedSearch = escapeQueryString(searchQuery);
+  const escapedExt = escapeQueryString(EXCALIDRAW_EXTENSION);
+  const query = `name contains '${escapedSearch}' and name contains '${escapedExt}' and trashed = false`;
 
   const response = await gapi.client.drive.files.list({
     q: query,
@@ -306,13 +370,11 @@ export const searchDriveFiles = async (
 export const loadFromGoogleDrive = async (
   fileId: string,
 ): Promise<ImportedDataState> => {
-  if (!accessToken) {
-    throw new Error("Not signed in to Google Drive");
-  }
+  await ensureValidToken();
 
   // Get file content
   const response = await fetch(
-    `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+    `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -325,7 +387,15 @@ export const loadFromGoogleDrive = async (
   }
 
   const content = await response.text();
-  const data = JSON.parse(content);
+
+  let data;
+  try {
+    data = JSON.parse(content);
+  } catch (parseError) {
+    throw new Error(
+      `Failed to parse file content: ${parseError instanceof Error ? parseError.message : "Invalid JSON"}`,
+    );
+  }
 
   // Restore the scene data
   const restored = restore(
@@ -359,9 +429,7 @@ export const saveToGoogleDrive = async (
   fileId?: string,
   fileName?: string,
 ): Promise<{ fileId: string; webViewLink: string }> => {
-  if (!accessToken) {
-    throw new Error("Not signed in to Google Drive");
-  }
+  await ensureValidToken();
 
   // Serialize the scene
   const content = serializeAsJSON(elements, appState, files, "local");
@@ -393,7 +461,7 @@ export const saveToGoogleDrive = async (
 
   // Upload or update
   const url = fileId
-    ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart&fields=id,webViewLink`
+    ? `https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(fileId)}?uploadType=multipart&fields=id,webViewLink`
     : "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink";
 
   const method = fileId ? "PATCH" : "POST";
@@ -428,9 +496,7 @@ export const createNewFileInDrive = async (
   fileName: string,
   folderId?: string,
 ): Promise<{ fileId: string; webViewLink: string }> => {
-  if (!accessToken) {
-    throw new Error("Not signed in to Google Drive");
-  }
+  await ensureValidToken();
 
   const name = fileName.endsWith(EXCALIDRAW_EXTENSION)
     ? fileName
@@ -490,12 +556,10 @@ export const createNewFileInDrive = async (
  * Delete a file from Google Drive
  */
 export const deleteFromGoogleDrive = async (fileId: string): Promise<void> => {
-  if (!accessToken) {
-    throw new Error("Not signed in to Google Drive");
-  }
+  await ensureValidToken();
 
   const response = await fetch(
-    `https://www.googleapis.com/drive/v3/files/${fileId}`,
+    `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}`,
     {
       method: "DELETE",
       headers: {
@@ -513,9 +577,7 @@ export const deleteFromGoogleDrive = async (fileId: string): Promise<void> => {
  * Get file metadata from Google Drive
  */
 export const getFileMetadata = async (fileId: string): Promise<DriveFile> => {
-  if (!accessToken) {
-    throw new Error("Not signed in to Google Drive");
-  }
+  await ensureValidToken();
 
   const response = await gapi.client.drive.files.get({
     fileId,
@@ -529,12 +591,10 @@ export const getFileMetadata = async (fileId: string): Promise<DriveFile> => {
 /**
  * Open the Google Drive file picker
  */
-export const openFilePicker = (
+export const openFilePicker = async (
   callback: (fileId: string, fileName: string) => void,
-): void => {
-  if (!accessToken) {
-    throw new Error("Not signed in to Google Drive");
-  }
+): Promise<void> => {
+  await ensureValidToken();
 
   const view = new google.picker.DocsView(google.picker.ViewId.DOCS);
   view.setQuery(".excalidraw");
@@ -563,13 +623,11 @@ export const shareFile = async (
   fileId: string,
   role: "reader" | "writer" = "reader",
 ): Promise<string> => {
-  if (!accessToken) {
-    throw new Error("Not signed in to Google Drive");
-  }
+  await ensureValidToken();
 
   // Create permission for anyone with link
   await fetch(
-    `https://www.googleapis.com/drive/v3/files/${fileId}/permissions`,
+    `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}/permissions`,
     {
       method: "POST",
       headers: {
