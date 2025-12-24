@@ -249,6 +249,7 @@ import {
   isPointInElement,
   maxBindingDistance_simple,
   convertToExcalidrawElements,
+  type ExcalidrawElementSkeleton,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -277,7 +278,6 @@ import type {
   ExcalidrawElbowArrowElement,
   SceneElementsMap,
   ExcalidrawBindableElement,
-  ExcalidrawElementSkeleton,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
