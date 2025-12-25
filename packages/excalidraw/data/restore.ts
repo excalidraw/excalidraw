@@ -345,6 +345,9 @@ export const restoreElement = (
         originalText: element.originalText || text,
         autoResize: element.autoResize ?? true,
         lineHeight,
+        bold: element.bold ?? false,
+        italic: element.italic ?? false,
+        underline: element.underline ?? false,
       });
 
       // if empty text, mark as deleted. We keep in array

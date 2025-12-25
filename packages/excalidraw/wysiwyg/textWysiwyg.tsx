@@ -50,6 +50,9 @@ import { parseDataTransferEvent } from "../clipboard";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
+  actionToggleBold,
+  actionToggleItalic,
+  actionToggleUnderline,
 } from "../actions/actionProperties";
 import {
   actionResetZoom,
@@ -127,6 +130,15 @@ export const textWysiwyg = ({
     if (`${updatedTextElement.fontSize}px` !== editable.style.fontSize) {
       return true;
     }
+    if ((updatedTextElement.bold ? "bold" : "normal") !== editable.style.fontWeight) {
+      return true;
+    }
+    if ((updatedTextElement.italic ? "italic" : "normal") !== editable.style.fontStyle) {
+      return true;
+    }
+    if ((updatedTextElement.underline ? "underline" : "none") !== editable.style.textDecoration) {
+      return true;
+    }
     return false;
   };
 
@@ -149,11 +161,21 @@ export const textWysiwyg = ({
 
       let width = updatedTextElement.width;
 
+      // Add extra width for italic text during editing to prevent cutting
+      if (updatedTextElement.italic) {
+        width += width * 0.1;
+      }
+
       // set to element height by default since that's
       // what is going to be used for unbounded text
       let height = updatedTextElement.height;
 
       let maxWidth = updatedTextElement.width;
+      
+      // Add extra width for italic text during editing to prevent cutting
+      if (updatedTextElement.italic) {
+        maxWidth += maxWidth * 0.1;
+      }
       let maxHeight = updatedTextElement.height;
 
       if (container && updatedTextElement.containerId) {
@@ -237,7 +259,12 @@ export const textWysiwyg = ({
       // add 5% buffer otherwise it causes wysiwyg to jump
       height *= 1.05;
 
-      const font = getFontString(updatedTextElement);
+      const font = getFontString({ 
+        fontFamily: updatedTextElement.fontFamily, 
+        fontSize: updatedTextElement.fontSize,
+        bold: updatedTextElement.bold,
+        italic: updatedTextElement.italic
+      });
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
@@ -264,6 +291,9 @@ export const textWysiwyg = ({
         opacity: updatedTextElement.opacity / 100,
         filter: "var(--theme-filter)",
         maxHeight: `${editorMaxHeight}px`,
+        textDecoration: updatedTextElement.underline ? "underline" : "none",
+        fontWeight: updatedTextElement.bold ? "bold" : "normal",
+        fontStyle: updatedTextElement.italic ? "italic" : "normal",
       });
       editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
@@ -335,6 +365,8 @@ export const textWysiwyg = ({
       const font = getFontString({
         fontSize: app.state.currentItemFontSize,
         fontFamily: app.state.currentItemFontFamily,
+        bold: app.state.currentItemBold,
+        italic: app.state.currentItemItalic,
       });
       if (container) {
         const boundTextElement = getBoundTextElement(
@@ -382,6 +414,15 @@ export const textWysiwyg = ({
       app.actionManager.executeAction(actionDecreaseFontSize);
     } else if (actionIncreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionIncreaseFontSize);
+    } else if (actionToggleBold.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionToggleBold);
+    } else if (actionToggleItalic.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionToggleItalic);
+    } else if (actionToggleUnderline.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionToggleUnderline);
     } else if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
       submittedViaKeyboard = true;

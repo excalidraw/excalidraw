@@ -19,6 +19,10 @@ export {
   actionChangeTextAlign,
   actionChangeVerticalAlign,
   actionChangeArrowProperties,
+  actionTextFormatting,
+  actionToggleBold,
+  actionToggleItalic,
+  actionToggleUnderline,
 } from "./actionProperties";
 
 export {

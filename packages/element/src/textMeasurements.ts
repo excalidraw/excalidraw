@@ -20,9 +20,14 @@ export const measureText = (
     // lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
-  const fontSize = parseFloat(font);
+  
+  // Extract font size from font string that might include formatting
+  const fontSizeMatch = font.match(/(\d+(?:\.\d+)?)px/);
+  const fontSize = fontSizeMatch ? parseFloat(fontSizeMatch[1]) : 16;
+  
   const height = getTextHeight(_text, fontSize, lineHeight);
   const width = getTextWidth(_text, font);
+  
   return { width, height };
 };
 
@@ -136,7 +141,12 @@ class CanvasTextMetricsProvider implements TextMetricsProvider {
     const context = this.canvas.getContext("2d")!;
     context.font = fontString;
     const metrics = context.measureText(text);
-    const advanceWidth = metrics.width;
+    let advanceWidth = metrics.width;
+
+    // Add extra width for italic text
+    if (fontString.includes('italic')) {
+      advanceWidth += advanceWidth * 0.1;
+    }
 
     // since in test env the canvas measureText algo
     // doesn't measure text and instead just returns number of
