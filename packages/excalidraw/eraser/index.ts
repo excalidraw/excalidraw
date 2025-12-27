@@ -28,7 +28,7 @@ import { shouldTestInside } from "@excalidraw/element";
 import { hasBoundTextElement, isBoundToContainer } from "@excalidraw/element";
 import { getBoundTextElementId } from "@excalidraw/element";
 
-import type { Bounds } from "@excalidraw/element";
+import type { Bounds } from "@excalidraw/common";
 
 import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";

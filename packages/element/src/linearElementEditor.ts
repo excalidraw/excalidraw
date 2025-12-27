@@ -26,7 +26,6 @@ import {
 
 import {
   deconstructLinearOrFreeDrawElement,
-  getHoveredElementForBinding,
   isPathALoop,
   moveArrowAboveBindable,
   projectFixedPointOntoDiagonal,
@@ -43,6 +42,7 @@ import type {
   NullableGridSize,
   Zoom,
 } from "@excalidraw/excalidraw/types";
+import type { Bounds } from "@excalidraw/common";
 
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -69,7 +69,6 @@ import { isLineElement } from "./typeChecks";
 
 import type { Scene } from "./Scene";
 
-import type { Bounds } from "./bounds";
 import type {
   NonDeleted,
   ExcalidrawLinearElement,
@@ -306,21 +305,11 @@ export class LinearElementEditor {
     const customLineAngle =
       linearElementEditor.customLineAngle ??
       determineCustomLinearAngle(pivotPoint, element.points[idx]);
-    const hoveredElement = getHoveredElementForBinding(
-      pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-      elements,
-      elementsMap,
-    );
 
     // Determine if point movement should happen and how much
     let deltaX = 0;
     let deltaY = 0;
-    if (
-      shouldRotateWithDiscreteAngle(event) &&
-      !hoveredElement &&
-      !element.startBinding &&
-      !element.endBinding
-    ) {
+    if (shouldRotateWithDiscreteAngle(event)) {
       const [width, height] = LinearElementEditor._getShiftLockedDelta(
         element,
         elementsMap,
@@ -354,11 +343,13 @@ export class LinearElementEditor {
       [idx],
       deltaX,
       deltaY,
+      scenePointerX,
+      scenePointerY,
       elementsMap,
       element,
       elements,
       app,
-      event.shiftKey,
+      shouldRotateWithDiscreteAngle(event),
       event.altKey,
     );
 
@@ -492,22 +483,11 @@ export class LinearElementEditor {
     const endIsSelected = selectedPointsIndices.includes(
       element.points.length - 1,
     );
-    const hoveredElement = getHoveredElementForBinding(
-      pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-      elements,
-      elementsMap,
-    );
 
     // Determine if point movement should happen and how much
     let deltaX = 0;
     let deltaY = 0;
-    if (
-      shouldRotateWithDiscreteAngle(event) &&
-      singlePointDragged &&
-      !hoveredElement &&
-      !element.startBinding &&
-      !element.endBinding
-    ) {
+    if (shouldRotateWithDiscreteAngle(event) && singlePointDragged) {
       const [width, height] = LinearElementEditor._getShiftLockedDelta(
         element,
         elementsMap,
@@ -520,7 +500,6 @@ export class LinearElementEditor {
         width + pivotPoint[0],
         height + pivotPoint[1],
       );
-
       deltaX = target[0] - draggingPoint[0];
       deltaY = target[1] - draggingPoint[1];
     } else {
@@ -541,11 +520,13 @@ export class LinearElementEditor {
       selectedPointsIndices,
       deltaX,
       deltaY,
+      scenePointerX,
+      scenePointerY,
       elementsMap,
       element,
       elements,
       app,
-      event.shiftKey,
+      shouldRotateWithDiscreteAngle(event) && singlePointDragged,
       event.altKey,
     );
 
@@ -2088,11 +2069,13 @@ const pointDraggingUpdates = (
   selectedPointsIndices: readonly number[],
   deltaX: number,
   deltaY: number,
+  scenePointerX: number,
+  scenePointerY: number,
   elementsMap: NonDeletedSceneElementsMap,
   element: NonDeleted<ExcalidrawLinearElement>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   app: AppClassProperties,
-  shiftKey: boolean,
+  angleLocked: boolean,
   altKey: boolean,
 ): {
   positions: PointsPositionUpdates;
@@ -2128,12 +2111,14 @@ const pointDraggingUpdates = (
   const { start, end } = getBindingStrategyForDraggingBindingElementEndpoints(
     element,
     naiveDraggingPoints,
+    scenePointerX,
+    scenePointerY,
     elementsMap,
     elements,
     app.state,
     {
       newArrow: !!app.state.newElement,
-      shiftKey,
+      angleLocked,
       altKey,
     },
   );
@@ -2250,9 +2235,14 @@ const pointDraggingUpdates = (
   // We need to use a custom intersector to ensure that if there is a big "jump"
   // in the arrow's position, we can position it with outline avoidance
   // pixel-perfectly and avoid "dancing" arrows.
-  const customIntersector =
+  // NOTE: Direction matters here, so we create two intersectors
+  const startCustomIntersector =
     start.focusPoint && end.focusPoint
       ? lineSegment(start.focusPoint, end.focusPoint)
+      : undefined;
+  const endCustomIntersector =
+    start.focusPoint && end.focusPoint
+      ? lineSegment(end.focusPoint, start.focusPoint)
       : undefined;
 
   // Needed to handle a special case where an existing arrow is dragged over
@@ -2290,7 +2280,7 @@ const pointDraggingUpdates = (
         nextArrow.endBinding,
         endBindable,
         elementsMap,
-        customIntersector,
+        endCustomIntersector,
       ) || nextArrow.points[nextArrow.points.length - 1]
     : nextArrow.points[nextArrow.points.length - 1];
 
@@ -2321,7 +2311,7 @@ const pointDraggingUpdates = (
           nextArrow.startBinding,
           startBindable,
           elementsMap,
-          customIntersector,
+          startCustomIntersector,
         ) || nextArrow.points[0]
       : nextArrow.points[0];
 

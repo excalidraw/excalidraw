@@ -8617,9 +8617,16 @@ class App extends React.Component<AppProps, AppState> {
               },
             ],
           ]),
+          point[0],
+          point[1],
           this.scene,
           this.state,
-          { newArrow: true, altKey: event.altKey, initialBinding: true },
+          {
+            newArrow: true,
+            altKey: event.altKey,
+            initialBinding: true,
+            angleLocked: shouldRotateWithDiscreteAngle(event.nativeEvent),
+          },
         );
       }
 
