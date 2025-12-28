@@ -156,7 +156,7 @@
 
       &__buttons {
         flex-grow: 1;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         display: flex;
         flex-direction: row;
         gap: 11px;
@@ -166,6 +166,7 @@
 
         @include isMobile {
           padding-top: 32px;
+          flex-wrap: wrap;
           flex-basis: 100%;
           justify-content: center;
         }

@@ -167,6 +167,21 @@ export const exportCanvas = async (
     exportingFrame,
   });
 
+  if (type === "pdf") {
+    const blob = tempCanvas.then(async (canvas) => {
+      const { exportToPdf } = await import("./pdf");
+      return exportToPdf(canvas);
+    });
+
+    return fileSave(blob, {
+      description: "Export To PDF",
+      name,
+      extension: "pdf" as any,
+      mimeTypes: ["application/pdf"],
+      fileHandle,
+    });
+  }
+
   if (type === "png") {
     let blob = canvasToBlob(tempCanvas);
 

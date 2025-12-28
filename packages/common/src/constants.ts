@@ -269,6 +269,7 @@ export const EXPORT_IMAGE_TYPES = {
   png: "png",
   svg: "svg",
   clipboard: "clipboard",
+   pdf: "pdf",
 } as const;
 
 export const EXPORT_DATA_TYPES = {
