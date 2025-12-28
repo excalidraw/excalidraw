@@ -1,12 +1,13 @@
 import {
   FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
-  MIME_TYPES,
   SVG_NS,
+  THEME,
   getFontFamilyString,
   isRTL,
   isTestEnv,
   getVerticalOffset,
+  applyDarkModeFilter,
 } from "@excalidraw/common";
 import { normalizeLink, toValidURL } from "@excalidraw/common";
 import { hashString } from "@excalidraw/element";
@@ -31,7 +32,7 @@ import { getCornerRadius, isPathALoop } from "@excalidraw/element";
 
 import { ShapeCache } from "@excalidraw/element";
 
-import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "@excalidraw/element";
+import { getFreeDrawSvgPath } from "@excalidraw/element";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 
@@ -147,7 +148,7 @@ const renderElementToSvg = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
-      const shape = ShapeCache.generateElementShape(element, null);
+      const shape = ShapeCache.generateElementShape(element, renderConfig);
       const node = roughSVGDrawWithPrecision(
         rsvg,
         shape,
@@ -397,7 +398,12 @@ const renderElementToSvg = (
       );
       node.setAttribute("stroke", "none");
       const path = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
-      path.setAttribute("fill", element.strokeColor);
+      path.setAttribute(
+        "fill",
+        renderConfig.theme === THEME.DARK
+          ? applyDarkModeFilter(element.strokeColor)
+          : element.strokeColor,
+      );
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
 
@@ -461,14 +467,6 @@ const renderElementToSvg = (
 
         const use = svgRoot.ownerDocument!.createElementNS(SVG_NS, "use");
         use.setAttribute("href", `#${symbolId}`);
-
-        // in dark theme, revert the image color filter
-        if (
-          renderConfig.exportWithDarkMode &&
-          fileData.mimeType !== MIME_TYPES.svg
-        ) {
-          use.setAttribute("filter", IMAGE_INVERT_FILTER);
-        }
 
         let normalizedCropX = 0;
         let normalizedCropY = 0;
@@ -598,7 +596,12 @@ const renderElementToSvg = (
         rect.setAttribute("ry", FRAME_STYLE.radius.toString());
 
         rect.setAttribute("fill", "none");
-        rect.setAttribute("stroke", FRAME_STYLE.strokeColor);
+        rect.setAttribute(
+          "stroke",
+          renderConfig.theme === THEME.DARK
+            ? applyDarkModeFilter(FRAME_STYLE.strokeColor)
+            : FRAME_STYLE.strokeColor,
+        );
         rect.setAttribute("stroke-width", FRAME_STYLE.strokeWidth.toString());
 
         addToRoot(rect, element);
@@ -649,7 +652,12 @@ const renderElementToSvg = (
           text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
-          text.setAttribute("fill", element.strokeColor);
+          text.setAttribute(
+            "fill",
+            renderConfig.theme === THEME.DARK
+              ? applyDarkModeFilter(element.strokeColor)
+              : element.strokeColor,
+          );
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);

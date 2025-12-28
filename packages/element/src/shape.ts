@@ -17,10 +17,12 @@ import {
 } from "@excalidraw/math";
 import {
   ROUGHNESS,
+  THEME,
   isTransparent,
   assertNever,
   COLOR_PALETTE,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
+  applyDarkModeFilter,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
@@ -117,6 +119,7 @@ export class ShapeCache {
       isExporting: boolean;
       canvasBackgroundColor: AppState["viewBackgroundColor"];
       embedsValidationStatus: EmbedsValidationStatus;
+      theme?: AppState["theme"];
     } | null,
   ) => {
     // when exporting, always regenerated to guarantee the latest shape
@@ -139,12 +142,18 @@ export class ShapeCache {
         isExporting: false,
         canvasBackgroundColor: COLOR_PALETTE.white,
         embedsValidationStatus: null,
+        theme: THEME.LIGHT,
       },
     ) as T["type"] extends keyof ElementShapes
       ? ElementShapes[T["type"]]
       : Drawable | null;
 
-    ShapeCache.cache.set(element, shape);
+    // if weren't not passing renderConfig, we don't have the correct theme
+    // and canvas background color info so we could populate the cahce with
+    // wrong colors in dark mode
+    if (renderConfig) {
+      ShapeCache.cache.set(element, shape);
+    }
 
     return shape;
   };
@@ -180,6 +189,7 @@ function adjustRoughness(element: ExcalidrawElement): number {
 export const generateRoughOptions = (
   element: ExcalidrawElement,
   continuousPath = false,
+  isDarkMode: boolean = false,
 ): Options => {
   const options: Options = {
     seed: element.seed,
@@ -204,7 +214,9 @@ export const generateRoughOptions = (
     fillWeight: element.strokeWidth / 2,
     hachureGap: element.strokeWidth * 4,
     roughness: adjustRoughness(element),
-    stroke: element.strokeColor,
+    stroke: isDarkMode
+      ? applyDarkModeFilter(element.strokeColor)
+      : element.strokeColor,
     preserveVertices:
       continuousPath || element.roughness < ROUGHNESS.cartoonist,
   };
@@ -218,6 +230,8 @@ export const generateRoughOptions = (
       options.fillStyle = element.fillStyle;
       options.fill = isTransparent(element.backgroundColor)
         ? undefined
+        : isDarkMode
+        ? applyDarkModeFilter(element.backgroundColor)
         : element.backgroundColor;
       if (element.type === "ellipse") {
         options.curveFitting = 1;
@@ -231,6 +245,8 @@ export const generateRoughOptions = (
         options.fill =
           element.backgroundColor === "transparent"
             ? undefined
+            : isDarkMode
+            ? applyDarkModeFilter(element.backgroundColor)
             : element.backgroundColor;
       }
       return options;
@@ -284,6 +300,7 @@ const getArrowheadShapes = (
   generator: RoughGenerator,
   options: Options,
   canvasBackgroundColor: string,
+  isDarkMode: boolean,
 ) => {
   const arrowheadPoints = getArrowheadPoints(
     element,
@@ -309,6 +326,10 @@ const getArrowheadShapes = (
     return [generator.line(x3, y3, x4, y4, options)];
   };
 
+  const strokeColor = isDarkMode
+    ? applyDarkModeFilter(element.strokeColor)
+    : element.strokeColor;
+
   switch (arrowhead) {
     case "dot":
     case "circle":
@@ -324,10 +345,10 @@ const getArrowheadShapes = (
           fill:
             arrowhead === "circle_outline"
               ? canvasBackgroundColor
-              : element.strokeColor,
+              : strokeColor,
 
           fillStyle: "solid",
-          stroke: element.strokeColor,
+          stroke: strokeColor,
           roughness: Math.min(0.5, options.roughness || 0),
         }),
       ];
@@ -352,7 +373,7 @@ const getArrowheadShapes = (
             fill:
               arrowhead === "triangle_outline"
                 ? canvasBackgroundColor
-                : element.strokeColor,
+                : strokeColor,
             fillStyle: "solid",
             roughness: Math.min(1, options.roughness || 0),
           },
@@ -380,7 +401,7 @@ const getArrowheadShapes = (
             fill:
               arrowhead === "diamond_outline"
                 ? canvasBackgroundColor
-                : element.strokeColor,
+                : strokeColor,
             fillStyle: "solid",
             roughness: Math.min(1, options.roughness || 0),
           },
@@ -609,12 +630,15 @@ const generateElementShape = (
     isExporting,
     canvasBackgroundColor,
     embedsValidationStatus,
+    theme,
   }: {
     isExporting: boolean;
     canvasBackgroundColor: string;
     embedsValidationStatus: EmbedsValidationStatus | null;
+    theme?: AppState["theme"];
   },
 ): Drawable | Drawable[] | null => {
+  const isDarkMode = theme === THEME.DARK;
   switch (element.type) {
     case "rectangle":
     case "iframe":
@@ -640,6 +664,7 @@ const generateElementShape = (
               embedsValidationStatus,
             ),
             true,
+            isDarkMode,
           ),
         );
       } else {
@@ -655,6 +680,7 @@ const generateElementShape = (
               embedsValidationStatus,
             ),
             false,
+            isDarkMode,
           ),
         );
       }
@@ -692,7 +718,7 @@ const generateElementShape = (
             C ${topX} ${topY}, ${topX} ${topY}, ${topX + verticalRadius} ${
             topY + horizontalRadius
           }`,
-          generateRoughOptions(element, true),
+          generateRoughOptions(element, true, isDarkMode),
         );
       } else {
         shape = generator.polygon(
@@ -702,7 +728,7 @@ const generateElementShape = (
             [bottomX, bottomY],
             [leftX, leftY],
           ],
-          generateRoughOptions(element),
+          generateRoughOptions(element, false, isDarkMode),
         );
       }
       return shape;
@@ -713,14 +739,14 @@ const generateElementShape = (
         element.height / 2,
         element.width,
         element.height,
-        generateRoughOptions(element),
+        generateRoughOptions(element, false, isDarkMode),
       );
       return shape;
     }
     case "line":
     case "arrow": {
       let shape: ElementShapes[typeof element.type];
-      const options = generateRoughOptions(element);
+      const options = generateRoughOptions(element, false, isDarkMode);
 
       // points array can be empty in the beginning, so it is important to add
       // initial position to it
@@ -745,7 +771,7 @@ const generateElementShape = (
           shape = [
             generator.path(
               generateElbowArrowShape(points, 16),
-              generateRoughOptions(element, true),
+              generateRoughOptions(element, true, isDarkMode),
             ),
           ];
         }
@@ -778,6 +804,7 @@ const generateElementShape = (
             generator,
             options,
             canvasBackgroundColor,
+            isDarkMode,
           );
           shape.push(...shapes);
         }
@@ -795,6 +822,7 @@ const generateElementShape = (
             generator,
             options,
             canvasBackgroundColor,
+            isDarkMode,
           );
           shape.push(...shapes);
         }
@@ -812,7 +840,7 @@ const generateElementShape = (
           0.75,
         );
         shape = generator.curve(simplifiedPoints as [number, number][], {
-          ...generateRoughOptions(element),
+          ...generateRoughOptions(element, false, isDarkMode),
           stroke: "none",
         });
       } else {
