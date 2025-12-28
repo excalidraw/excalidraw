@@ -148,7 +148,7 @@ export class ShapeCache {
       ? ElementShapes[T["type"]]
       : Drawable | null;
 
-    // if weren't not passing renderConfig, we don't have the correct theme
+    // if we're not passing renderConfig, we don't have the correct theme
     // and canvas background color info so we could populate the cahce with
     // wrong colors in dark mode
     if (renderConfig) {
