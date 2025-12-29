@@ -22,6 +22,7 @@ import {
   isRTL,
   getVerticalOffset,
   invariant,
+  isCanvasFilterSupported,
 } from "@excalidraw/common";
 
 import type {
@@ -65,6 +66,8 @@ import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
 
 import { ShapeCache } from "./shape";
+
+import { applyFiltersToImage } from "./applyFilterToImage";
 
 import type {
   ExcalidrawElement,
@@ -478,8 +481,22 @@ const drawElementOnCanvas = (
               height: img.naturalHeight,
             };
 
+        const shouldInvertImage =
+          !isCanvasFilterSupported() &&
+          shouldResetImageFilter(element, renderConfig, appState);
+
+        let imageData: CanvasImageSource = img;
+        if (shouldInvertImage) {
+          imageData = applyFiltersToImage(
+            img,
+            img.naturalWidth,
+            img.naturalHeight,
+            IMAGE_INVERT_FILTER,
+          );
+        }
+
         context.drawImage(
-          img,
+          imageData,
           x,
           y,
           width,

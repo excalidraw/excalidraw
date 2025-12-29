@@ -97,3 +97,4 @@ export * from "./transformHandles";
 export * from "./typeChecks";
 export * from "./utils";
 export * from "./zindex";
+export * from "./applyFilterToImage";
