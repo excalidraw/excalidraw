@@ -15,10 +15,9 @@ import {
 
 import type {
   Ellipse,
-  GlobalPoint,
+  GenericPoint,
   Line,
   LineSegment,
-  LocalPoint,
 } from "./types";
 
 /**
@@ -30,7 +29,7 @@ import type {
  * @param halfHeight Half of the height of a non-slanted version of the ellipse
  * @returns The constructed Ellipse object
  */
-export function ellipse<Point extends GlobalPoint | LocalPoint>(
+export function ellipse<Point extends GenericPoint>(
   center: Point,
   halfWidth: number,
   halfHeight: number,
@@ -49,7 +48,7 @@ export function ellipse<Point extends GlobalPoint | LocalPoint>(
  * @param ellipse The ellipse to compare against
  * @returns TRUE if the point is inside or on the outline of the ellipse
  */
-export const ellipseIncludesPoint = <Point extends GlobalPoint | LocalPoint>(
+export const ellipseIncludesPoint = <Point extends GenericPoint>(
   p: Point,
   ellipse: Ellipse<Point>,
 ) => {
@@ -69,7 +68,7 @@ export const ellipseIncludesPoint = <Point extends GlobalPoint | LocalPoint>(
  * @param threshold The distance to consider a point close enough to be "on" the outline
  * @returns TRUE if the point is on the ellise outline
  */
-export const ellipseTouchesPoint = <Point extends GlobalPoint | LocalPoint>(
+export const ellipseTouchesPoint = <Point extends GenericPoint>(
   point: Point,
   ellipse: Ellipse<Point>,
   threshold = PRECISION,
@@ -86,7 +85,7 @@ export const ellipseTouchesPoint = <Point extends GlobalPoint | LocalPoint>(
  * @returns The eucledian distance
  */
 export const ellipseDistanceFromPoint = <
-  Point extends GlobalPoint | LocalPoint,
+  Point extends GenericPoint,
 >(
   p: Point,
   ellipse: Ellipse<Point>,
@@ -141,7 +140,7 @@ export const ellipseDistanceFromPoint = <
  * ellipse.
  */
 export function ellipseSegmentInterceptPoints<
-  Point extends GlobalPoint | LocalPoint,
+  Point extends GenericPoint,
 >(e: Readonly<Ellipse<Point>>, s: Readonly<LineSegment<Point>>): Point[] {
   const rx = e.halfWidth;
   const ry = e.halfHeight;
@@ -195,7 +194,7 @@ export function ellipseSegmentInterceptPoints<
 }
 
 export function ellipseLineIntersectionPoints<
-  Point extends GlobalPoint | LocalPoint,
+  Point extends GenericPoint,
 >(
   { center, halfWidth, halfHeight }: Ellipse<Point>,
   [g, h]: Line<Point>,
