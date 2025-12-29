@@ -67,6 +67,7 @@ const canvas = exportToCanvas(
     offsetLeft: 0,
     width: 0,
     height: 0,
+    scrollConstraints: null,
   },
   {}, // files
   {

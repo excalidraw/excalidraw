@@ -614,7 +614,7 @@ const LayerUI = ({
               showExitZenModeBtn={showExitZenModeBtn}
               renderWelcomeScreen={renderWelcomeScreen}
             />
-            {appState.scrolledOutside && (
+            {appState.scrolledOutside && !appState.scrollConstraints && (
               <button
                 type="button"
                 className="scroll-back-to-content"
