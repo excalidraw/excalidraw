@@ -12,6 +12,40 @@ import { convertToExcalidrawElements, exportToCanvas } from "../../index";
 
 import type { AppClassProperties, BinaryFiles } from "../../types";
 
+/**
+ * Converts HTML <br> tags (and variants) to newline characters
+ */
+const convertBrTagsToNewlines = (text: string): string => {
+  return text.replace(/<br\s*\/?>/gi, "\n");
+};
+
+/**
+ * Pre-processes skeleton elements to convert <br> tags in text to actual newlines
+ * before they are converted to Excalidraw elements
+ */
+const processSkeletonElementsForMultilineText = (
+  elements: MermaidToExcalidrawResult["elements"],
+): MermaidToExcalidrawResult["elements"] => {
+  return elements.map((element) => {
+    const processed = { ...element };
+    
+    // Handle label.text on skeleton elements (containers like rectangles)
+    if (processed.label && typeof processed.label === "object" && "text" in processed.label && typeof processed.label.text === "string") {
+      processed.label = {
+        ...processed.label,
+        text: convertBrTagsToNewlines(processed.label.text),
+      };
+    }
+    
+    // Handle direct text property on skeleton elements
+    if ("text" in processed && typeof processed.text === "string") {
+      (processed as any).text = convertBrTagsToNewlines(processed.text);
+    }
+    
+    return processed;
+  });
+};
+
 const resetPreview = ({
   canvasRef,
   setError,
@@ -87,8 +121,11 @@ export const convertMermaidToExcalidraw = async ({
     const { elements, files } = ret;
     setError(null);
 
+    // Process skeleton elements to convert <br> tags to newlines BEFORE conversion
+    const processedSkeletonElements = processSkeletonElementsForMultilineText(elements);
+
     data.current = {
-      elements: convertToExcalidrawElements(elements, {
+      elements: convertToExcalidrawElements(processedSkeletonElements, {
         regenerateIds: true,
       }),
       files,
