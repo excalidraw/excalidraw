@@ -79,18 +79,26 @@ import type { Point as RoughPoint } from "roughjs/bin/geometry";
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
-  private static cache = new WeakMap<ExcalidrawElement, ElementShape>();
+  private static cache = new WeakMap<
+    ExcalidrawElement,
+    { shape: ElementShape; theme: AppState["theme"] }
+  >();
 
   /**
    * Retrieves shape from cache if available. Use this only if shape
    * is optional and you have a fallback in case it's not cached.
    */
-  public static get = <T extends ExcalidrawElement>(element: T) => {
-    return ShapeCache.cache.get(
-      element,
-    ) as T["type"] extends keyof ElementShapes
-      ? ElementShapes[T["type"]] | undefined
-      : ElementShape | undefined;
+  public static get = <T extends ExcalidrawElement>(
+    element: T,
+    theme: AppState["theme"] | null,
+  ) => {
+    const cached = ShapeCache.cache.get(element);
+    if (cached && (theme === null || cached.theme === theme)) {
+      return cached.shape as T["type"] extends keyof ElementShapes
+        ? ElementShapes[T["type"]] | undefined
+        : ElementShape | undefined;
+    }
+    return undefined;
   };
 
   public static set = <T extends ExcalidrawElement>(
@@ -98,7 +106,8 @@ export class ShapeCache {
     shape: T["type"] extends keyof ElementShapes
       ? ElementShapes[T["type"]]
       : Drawable,
-  ) => ShapeCache.cache.set(element, shape);
+    theme: AppState["theme"],
+  ) => ShapeCache.cache.set(element, { shape, theme });
 
   public static delete = (element: ExcalidrawElement) =>
     ShapeCache.cache.delete(element);
@@ -119,13 +128,13 @@ export class ShapeCache {
       isExporting: boolean;
       canvasBackgroundColor: AppState["viewBackgroundColor"];
       embedsValidationStatus: EmbedsValidationStatus;
-      theme?: AppState["theme"];
+      theme: AppState["theme"];
     } | null,
   ) => {
     // when exporting, always regenerated to guarantee the latest shape
     const cachedShape = renderConfig?.isExporting
       ? undefined
-      : ShapeCache.get(element);
+      : ShapeCache.get(element, renderConfig ? renderConfig.theme : null);
 
     // `null` indicates no rc shape applicable for this element type,
     // but it's considered a valid cache value (= do not regenerate)
@@ -152,7 +161,7 @@ export class ShapeCache {
     // and canvas background color info so we could populate the cahce with
     // wrong colors in dark mode
     if (renderConfig) {
-      ShapeCache.cache.set(element, shape);
+      ShapeCache.cache.set(element, { shape, theme: renderConfig.theme });
     }
 
     return shape;
@@ -954,7 +963,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
     case "arrow":
     case "line": {
       const roughShape =
-        ShapeCache.get(element)?.[0] ??
+        ShapeCache.get(element, null)?.[0] ??
         ShapeCache.generateElementShape(element, null)[0];
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
 

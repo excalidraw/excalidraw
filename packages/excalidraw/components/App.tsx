@@ -3123,11 +3123,6 @@ class App extends React.Component<AppProps, AppState> {
     const elements = this.scene.getElementsIncludingDeleted();
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
 
-    // reset cache on theme change to redraw elements with inverted colors
-    if (prevState.theme !== this.state.theme) {
-      ShapeCache.destroy();
-    }
-
     if (!this.state.showWelcomeScreen && !elements.length) {
       this.setState({ showWelcomeScreen: true });
     }

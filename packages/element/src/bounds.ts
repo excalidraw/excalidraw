@@ -954,7 +954,7 @@ const getLinearElementRotatedBounds = (
   }
 
   // first element is always the curve
-  const cachedShape = ShapeCache.get(element)?.[0];
+  const cachedShape = ShapeCache.get(element, null)?.[0];
   const shape = cachedShape ?? generateLinearElementShape(element);
   const ops = getCurvePathOps(shape);
   const transformXY = ([x, y]: GlobalPoint) =>

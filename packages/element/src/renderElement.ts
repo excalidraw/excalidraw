@@ -397,7 +397,7 @@ const drawElementOnCanvas = (
     case "ellipse": {
       context.lineJoin = "round";
       context.lineCap = "round";
-      rc.draw(ShapeCache.get(element)!);
+      rc.draw(ShapeCache.get(element, renderConfig.theme)!);
       break;
     }
     case "arrow":
@@ -405,7 +405,7 @@ const drawElementOnCanvas = (
       context.lineJoin = "round";
       context.lineCap = "round";
 
-      ShapeCache.get(element)!.forEach((shape) => {
+      ShapeCache.get(element, renderConfig.theme)!.forEach((shape) => {
         rc.draw(shape);
       });
       break;
@@ -420,7 +420,7 @@ const drawElementOnCanvas = (
       context.fillStyle = strokeColor;
 
       const path = getFreeDrawPath2D(element) as Path2D;
-      const fillShape = ShapeCache.get(element);
+      const fillShape = ShapeCache.get(element, renderConfig.theme);
 
       if (fillShape) {
         rc.draw(fillShape);
