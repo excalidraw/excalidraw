@@ -581,12 +581,18 @@ export const convertToExcalidrawElements = (
         const fontSize = element?.fontSize || DEFAULT_FONT_SIZE;
         const lineHeight = element?.lineHeight || getLineHeight(fontFamily);
         const text = element.text ?? "";
-        const normalizedText = normalizeText(text);
-        const metrics = measureText(
-          normalizedText,
-          getFontString({ fontFamily, fontSize }),
-          lineHeight,
-        );
+        const shouldUseProvidedDimensions =
+          element.autoResize === false && element.width && element.height;
+        const metrics = shouldUseProvidedDimensions
+          ? {
+              width: element.width,
+              height: element.height,
+            }
+          : measureText(
+              normalizeText(text),
+              getFontString({ fontFamily, fontSize }),
+              lineHeight,
+            );
 
         excalidrawElement = newTextElement({
           width: metrics.width,

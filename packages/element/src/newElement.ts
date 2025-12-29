@@ -252,12 +252,24 @@ export const newTextElement = (
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
   const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
   const lineHeight = opts.lineHeight || getLineHeight(fontFamily);
-  const text = normalizeText(opts.text);
-  const metrics = measureText(
-    text,
-    getFontString({ fontFamily, fontSize }),
-    lineHeight,
-  );
+  const normalizedText = normalizeText(opts.text);
+  const originalText = opts.originalText ?? normalizedText;
+  const shouldUseProvidedDimensions =
+    opts.autoResize === false && opts.width && opts.height;
+  const text = shouldUseProvidedDimensions
+    ? wrapText(
+        normalizedText,
+        getFontString({ fontFamily, fontSize }),
+        opts.width,
+      )
+    : normalizedText;
+
+  const metrics = shouldUseProvidedDimensions
+    ? {
+        width: opts.width,
+        height: opts.height,
+      }
+    : measureText(text, getFontString({ fontFamily, fontSize }), lineHeight);
   const textAlign = opts.textAlign || DEFAULT_TEXT_ALIGN;
   const verticalAlign = opts.verticalAlign || DEFAULT_VERTICAL_ALIGN;
   const offsets = getTextElementPositionOffsets(
@@ -277,7 +289,7 @@ export const newTextElement = (
     width: metrics.width,
     height: metrics.height,
     containerId: opts.containerId || null,
-    originalText: opts.originalText ?? text,
+    originalText,
     autoResize: opts.autoResize ?? true,
     lineHeight,
   };
