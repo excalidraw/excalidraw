@@ -7496,6 +7496,9 @@ class App extends React.Component<AppProps, AppState> {
       return false;
     }
     isPanning = true;
+    if (!this.state.isPanning) {
+      this.setState({ isPanning: true });
+    }
 
     // due to event.preventDefault below, container wouldn't get focus
     // automatically
@@ -7576,6 +7579,7 @@ class App extends React.Component<AppProps, AppState> {
         }
         this.setState({
           cursorButton: "up",
+          isPanning: false,
         });
         this.savePointer(event.clientX, event.clientY, "up");
         window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
