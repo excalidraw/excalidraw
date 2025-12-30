@@ -87,6 +87,11 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   }
 
   useEffect(() => {
+    // 输出组件被加载的标识，方便二次开发调试
+    console.log("hello11 world from Excalidraw component");
+  }, []);
+
+  useEffect(() => {
     const importPolyfill = async () => {
       //@ts-ignore
       await import("canvas-roundrect-polyfill");

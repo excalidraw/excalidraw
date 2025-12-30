@@ -271,6 +271,7 @@ const restoreElementWithProperties = <
     updated: element.updated ?? getUpdatedTimestamp(),
     link: element.link ? normalizeLink(element.link) : null,
     locked: element.locked ?? false,
+    showResizeHandles: element.showResizeHandles ?? true,
   };
 
   if ("customData" in element || "customData" in extra) {

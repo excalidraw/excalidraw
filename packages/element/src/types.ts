@@ -78,6 +78,11 @@ type _ExcalidrawElementBase = Readonly<{
   updated: number;
   link: string | null;
   locked: boolean;
+  /**
+   * Indicates whether resize handles should be displayed when the element is selected.
+   * Defaults to `true`.
+   */
+  showResizeHandles?: boolean;
   customData?: Record<string, any>;
 }>;
 

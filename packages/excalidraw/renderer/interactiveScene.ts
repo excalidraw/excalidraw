@@ -1410,14 +1410,24 @@ const _renderInteractiveScene = ({
     context.translate(appState.scrollX, appState.scrollY);
 
     if (selectedElements.length === 1) {
+      const activeElement = selectedElements[0];
       context.fillStyle = oc.white;
       const transformHandles = getTransformHandles(
-        selectedElements[0],
+        activeElement,
         appState.zoom,
         elementsMap,
         "mouse", // when we render we don't know which pointer type so use mouse,
         getOmitSidesForEditorInterface(editorInterface),
       );
+      if (activeElement.showResizeHandles === false) {
+        (Object.keys(transformHandles) as TransformHandleType[]).forEach(
+          (handleKey) => {
+            if (handleKey !== "rotation") {
+              delete transformHandles[handleKey];
+            }
+          },
+        );
+      }
       if (
         !appState.viewModeEnabled &&
         showBoundingBox &&
@@ -1431,7 +1441,7 @@ const _renderInteractiveScene = ({
           renderConfig,
           appState,
           transformHandles,
-          selectedElements[0].angle,
+          activeElement.angle,
         );
       }
 
