@@ -684,6 +684,7 @@ export type UIOptions = Partial<{
    */
   formFactor?: EditorInterface["formFactor"];
   desktopUIMode?: EditorInterface["desktopUIMode"];
+  publishLibrary: boolean;
   /** @deprecated does nothing. Will be removed in 0.15 */
   welcomeScreen?: boolean;
 }>;

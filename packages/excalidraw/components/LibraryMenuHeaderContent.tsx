@@ -11,7 +11,7 @@ import { useAtom } from "../editor-jotai";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { t } from "../i18n";
 
-import { useApp, useExcalidrawSetAppState } from "./App";
+import { useApp, useAppProps, useExcalidrawSetAppState } from "./App";
 import ConfirmDialog from "./ConfirmDialog";
 import { Dialog } from "./Dialog";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
@@ -44,6 +44,7 @@ export const LibraryDropdownMenuButton: React.FC<{
   onSelectItems: (items: LibraryItem["id"][]) => void;
   appState: UIAppState;
   className?: string;
+  canPublishLibrary?: boolean;
 }> = ({
   setAppState,
   selectedItems,
@@ -53,6 +54,7 @@ export const LibraryDropdownMenuButton: React.FC<{
   onSelectItems,
   appState,
   className,
+  canPublishLibrary = true,
 }) => {
   const [libraryItemsData] = useAtom(libraryItemsAtom);
   const [isLibraryMenuOpen, setIsLibraryMenuOpen] = useAtom(
@@ -220,11 +222,20 @@ export const LibraryDropdownMenuButton: React.FC<{
               {t("buttons.export")}
             </DropdownMenu.Item>
           )}
-          {itemsSelected && (
+          {!!items.length && (
+            <DropdownMenu.Item
+              onSelect={() => setShowRemoveLibAlert(true)}
+              icon={TrashIcon}
+              data-testid="lib-dropdown--remove"
+            >
+              {resetLabel}
+            </DropdownMenu.Item>
+          )}
+          {itemsSelected && canPublishLibrary && (
             <DropdownMenu.Item
               icon={publishIcon}
               onSelect={() => setShowPublishLibraryDialog(true)}
-              data-testid="lib-dropdown--remove"
+              data-testid="lib-dropdown--publish"
             >
               {t("buttons.publishLibrary")}
             </DropdownMenu.Item>
@@ -284,6 +295,7 @@ export const LibraryDropdownMenu = ({
   className?: string;
 }) => {
   const { library } = useApp();
+  const appProps = useAppProps();
   const { clearLibraryCache, deleteItemsFromLibraryCache } = useLibraryCache();
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
@@ -320,6 +332,7 @@ export const LibraryDropdownMenu = ({
       }
       resetLibrary={resetLibrary}
       className={className}
+      canPublishLibrary={appProps.UIOptions.publishLibrary}
     />
   );
 };
