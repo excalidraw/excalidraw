@@ -34,6 +34,7 @@ import {
   LassoIcon,
   mermaidLogoIcon,
   MagicIcon,
+  PollIcon,
 } from "./icons";
 
 import "./ToolIcon.scss";
@@ -122,6 +123,7 @@ export const MobileToolBar = ({
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
+  const pollToolSelected = activeTool.type === "poll";
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
@@ -159,6 +161,7 @@ export const MobileToolBar = ({
     "text",
     "frame",
     "embeddable",
+    "poll",
     "laser",
     "magicframe",
   ].filter((tool) => {
@@ -181,6 +184,8 @@ export const MobileToolBar = ({
       ? ImageIcon
       : activeTool.type === "frame"
       ? frameToolIcon
+      : activeTool.type === "poll"
+      ? PollIcon
       : activeTool.type === "embeddable"
       ? EmbedIcon
       : activeTool.type === "laser"
@@ -444,6 +449,14 @@ export const MobileToolBar = ({
             selected={embeddableToolSelected}
           >
             {t("toolBar.embeddable")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "poll" })}
+            icon={PollIcon}
+            data-testid="toolbar-poll"
+            selected={pollToolSelected}
+          >
+            {t("toolBar.poll")}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "laser" })}
