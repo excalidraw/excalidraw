@@ -22,10 +22,9 @@ import {
 } from "@excalidraw/math";
 
 import type { LineSegment, LocalPoint, Radians } from "@excalidraw/math";
-
 import type { AppState } from "@excalidraw/excalidraw/types";
-
 import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
+import type { Bounds } from "@excalidraw/common";
 
 import {
   doBoundsIntersect,
@@ -54,17 +53,21 @@ import {
   isBindableElement,
   isBoundToContainer,
   isElbowArrow,
+  isRectangularElement,
   isRectanguloidElement,
   isTextElement,
 } from "./typeChecks";
 
 import { aabbForElement, elementCenterPoint } from "./bounds";
 import { updateElbowArrowPoints } from "./elbowArrow";
-import { projectFixedPointOntoDiagonal } from "./utils";
+import {
+  deconstructDiamondElement,
+  deconstructRectanguloidElement,
+  projectFixedPointOntoDiagonal,
+} from "./utils";
 
 import type { Scene } from "./Scene";
 
-import type { Bounds } from "./bounds";
 import type { ElementUpdate } from "./mutateElement";
 import type {
   BindMode,
@@ -73,6 +76,7 @@ import type {
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawElement,
+  ExcalidrawRectanguloidElement,
   ExcalidrawTextElement,
   FixedPoint,
   FixedPointBinding,
@@ -146,17 +150,22 @@ export const isBindingEnabled = (appState: AppState): boolean => {
 export const bindOrUnbindBindingElement = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   draggingPoints: PointsPositionUpdates,
+  scenePointerX: number,
+  scenePointerY: number,
   scene: Scene,
   appState: AppState,
   opts?: {
     newArrow?: boolean;
     altKey?: boolean;
+    angleLocked?: boolean;
     initialBinding?: boolean;
   },
 ) => {
   const { start, end } = getBindingStrategyForDraggingBindingElementEndpoints(
     arrow,
     draggingPoints,
+    scenePointerX,
+    scenePointerY,
     scene.getNonDeletedElementsMap(),
     scene.getNonDeletedElements(),
     appState,
@@ -556,12 +565,14 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
 export const getBindingStrategyForDraggingBindingElementEndpoints = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   draggingPoints: PointsPositionUpdates,
+  screenPointerX: number,
+  screenPointerY: number,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   appState: AppState,
   opts?: {
     newArrow?: boolean;
-    shiftKey?: boolean;
+    angleLocked?: boolean;
     altKey?: boolean;
     finalize?: boolean;
     initialBinding?: boolean;
@@ -582,6 +593,8 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
   return getBindingStrategyForDraggingBindingElementEndpoints_simple(
     arrow,
     draggingPoints,
+    screenPointerX,
+    screenPointerY,
     elementsMap,
     elements,
     appState,
@@ -592,12 +605,14 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
 const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   draggingPoints: PointsPositionUpdates,
+  scenePointerX: number,
+  scenePointerY: number,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   appState: AppState,
   opts?: {
     newArrow?: boolean;
-    shiftKey?: boolean;
+    angleLocked?: boolean;
     altKey?: boolean;
     finalize?: boolean;
     initialBinding?: boolean;
@@ -669,7 +684,15 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     elementsMap,
     (e) => maxBindingDistance_simple(appState.zoom),
   );
-  const pointInElement = hit && isPointInElement(globalPoint, hit, elementsMap);
+  const pointInElement =
+    hit &&
+    (opts?.angleLocked
+      ? isPointInElement(
+          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+          hit,
+          elementsMap,
+        )
+      : isPointInElement(globalPoint, hit, elementsMap));
   const otherBindableElement = otherBinding
     ? (elementsMap.get(
         otherBinding.elementId,
@@ -770,6 +793,12 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
         }
     : { mode: null };
 
+  const otherEndpoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startDragged ? -1 : 0,
+    elementsMap,
+  );
+
   const other: BindingStrategy =
     otherBindableElement &&
     !otherFocusPointIsInElement &&
@@ -778,6 +807,19 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           mode: "orbit",
           element: otherBindableElement,
           focusPoint: appState.selectedLinearElement.initialState.altFocusPoint,
+        }
+      : opts?.angleLocked && otherBindableElement
+      ? {
+          mode: "orbit",
+          element: otherBindableElement,
+          focusPoint:
+            projectFixedPointOntoDiagonal(
+              arrow,
+              otherEndpoint,
+              otherBindableElement,
+              startDragged ? "end" : "start",
+              elementsMap,
+            ) || otherEndpoint,
         }
       : { mode: undefined };
 
@@ -924,6 +966,8 @@ export const bindOrUnbindBindingElements = (
     bindOrUnbindBindingElement(
       arrow,
       new Map(), // No dragging points in this case
+      Infinity,
+      Infinity,
       scene,
       appState,
     );
@@ -1126,7 +1170,14 @@ export const updateBindings = (
   },
 ) => {
   if (isArrowElement(latestElement)) {
-    bindOrUnbindBindingElement(latestElement, new Map(), scene, appState);
+    bindOrUnbindBindingElement(
+      latestElement,
+      new Map(),
+      Infinity,
+      Infinity,
+      scene,
+      appState,
+    );
   } else {
     updateBoundElements(latestElement, scene, {
       ...options,
@@ -2288,4 +2339,435 @@ export const normalizeFixedPoint = <T extends FixedPoint | null>(
     ) as T extends null ? null : FixedPoint;
   }
   return fixedPoint as any as T extends null ? null : FixedPoint;
+};
+
+type Side =
+  | "top"
+  | "top-right"
+  | "right"
+  | "bottom-right"
+  | "bottom"
+  | "bottom-left"
+  | "left"
+  | "top-left";
+type ShapeType = "rectangle" | "ellipse" | "diamond";
+const getShapeType = (element: ExcalidrawBindableElement): ShapeType => {
+  if (element.type === "ellipse" || element.type === "diamond") {
+    return element.type;
+  }
+  return "rectangle";
+};
+
+interface SectorConfig {
+  // center angle of the sector in degrees
+  centerAngle: number;
+  // width of the sector in degrees
+  sectorWidth: number;
+  side: Side;
+}
+
+// Define sector configurations for different shape types
+const SHAPE_CONFIGS: Record<ShapeType, SectorConfig[]> = {
+  // rectangle: 15° corners, 75° edges
+  rectangle: [
+    { centerAngle: 0, sectorWidth: 75, side: "right" },
+    { centerAngle: 45, sectorWidth: 15, side: "bottom-right" },
+    { centerAngle: 90, sectorWidth: 75, side: "bottom" },
+    { centerAngle: 135, sectorWidth: 15, side: "bottom-left" },
+    { centerAngle: 180, sectorWidth: 75, side: "left" },
+    { centerAngle: 225, sectorWidth: 15, side: "top-left" },
+    { centerAngle: 270, sectorWidth: 75, side: "top" },
+    { centerAngle: 315, sectorWidth: 15, side: "top-right" },
+  ],
+
+  // diamond: 15° vertices, 75° edges
+  diamond: [
+    { centerAngle: 0, sectorWidth: 15, side: "right" },
+    { centerAngle: 45, sectorWidth: 75, side: "bottom-right" },
+    { centerAngle: 90, sectorWidth: 15, side: "bottom" },
+    { centerAngle: 135, sectorWidth: 75, side: "bottom-left" },
+    { centerAngle: 180, sectorWidth: 15, side: "left" },
+    { centerAngle: 225, sectorWidth: 75, side: "top-left" },
+    { centerAngle: 270, sectorWidth: 15, side: "top" },
+    { centerAngle: 315, sectorWidth: 75, side: "top-right" },
+  ],
+
+  // ellipse: 15° cardinal points, 75° diagonals
+  ellipse: [
+    { centerAngle: 0, sectorWidth: 15, side: "right" },
+    { centerAngle: 45, sectorWidth: 75, side: "bottom-right" },
+    { centerAngle: 90, sectorWidth: 15, side: "bottom" },
+    { centerAngle: 135, sectorWidth: 75, side: "bottom-left" },
+    { centerAngle: 180, sectorWidth: 15, side: "left" },
+    { centerAngle: 225, sectorWidth: 75, side: "top-left" },
+    { centerAngle: 270, sectorWidth: 15, side: "top" },
+    { centerAngle: 315, sectorWidth: 75, side: "top-right" },
+  ],
+};
+
+const getSectorBoundaries = (
+  config: SectorConfig[],
+): Array<{ start: number; end: number; side: Side }> => {
+  return config.map((sector, index) => {
+    const halfWidth = sector.sectorWidth / 2;
+    let start = sector.centerAngle - halfWidth;
+    let end = sector.centerAngle + halfWidth;
+
+    // normalize angles to [0, 360) range
+    start = ((start % 360) + 360) % 360;
+    end = ((end % 360) + 360) % 360;
+
+    return { start, end, side: sector.side };
+  });
+};
+
+// determine which side a point falls into using adaptive sectors
+const getShapeSideAdaptive = (
+  fixedPoint: FixedPoint,
+  shapeType: ShapeType,
+): Side => {
+  const [x, y] = fixedPoint;
+
+  // convert to centered coordinates
+  const centerX = x - 0.5;
+  const centerY = y - 0.5;
+
+  // calculate angle
+  let angle = Math.atan2(centerY, centerX);
+  if (angle < 0) {
+    angle += 2 * Math.PI;
+  }
+  const degrees = (angle * 180) / Math.PI;
+
+  // get sector configuration for this shape type
+  const config = SHAPE_CONFIGS[shapeType];
+  const boundaries = getSectorBoundaries(config);
+
+  // find which sector the angle falls into
+  for (const boundary of boundaries) {
+    if (boundary.start <= boundary.end) {
+      // Normal case: sector doesn't cross 0°
+      if (degrees >= boundary.start && degrees <= boundary.end) {
+        return boundary.side;
+      }
+    } else if (degrees >= boundary.start || degrees <= boundary.end) {
+      return boundary.side;
+    }
+  }
+
+  // fallback - find nearest sector center
+  let minDiff = Infinity;
+  let nearestSide = config[0].side;
+
+  for (const sector of config) {
+    let diff = Math.abs(degrees - sector.centerAngle);
+    // handle wraparound
+    if (diff > 180) {
+      diff = 360 - diff;
+    }
+
+    if (diff < minDiff) {
+      minDiff = diff;
+      nearestSide = sector.side;
+    }
+  }
+
+  return nearestSide;
+};
+
+export const getBindingSideMidPoint = (
+  binding: FixedPointBinding,
+  elementsMap: ElementsMap,
+) => {
+  const bindableElement = elementsMap.get(binding.elementId);
+  if (
+    !bindableElement ||
+    bindableElement.isDeleted ||
+    !isBindableElement(bindableElement)
+  ) {
+    return null;
+  }
+
+  const center = elementCenterPoint(bindableElement, elementsMap);
+  const shapeType = getShapeType(bindableElement);
+  const side = getShapeSideAdaptive(
+    normalizeFixedPoint(binding.fixedPoint),
+    shapeType,
+  );
+
+  // small offset to avoid precision issues in elbow
+  const OFFSET = 0.01;
+
+  if (bindableElement.type === "diamond") {
+    const [sides, corners] = deconstructDiamondElement(bindableElement);
+    const [bottomRight, bottomLeft, topLeft, topRight] = sides;
+
+    let x: number;
+    let y: number;
+    switch (side) {
+      case "left": {
+        // left vertex - use the center of the left corner curve
+        if (corners.length >= 3) {
+          const leftCorner = corners[2];
+          const midPoint = leftCorner[1];
+          x = midPoint[0] - OFFSET;
+          y = midPoint[1];
+        } else {
+          // fallback for non-rounded diamond
+          const midPoint = getMidPoint(bottomLeft[1], topLeft[0]);
+          x = midPoint[0] - OFFSET;
+          y = midPoint[1];
+        }
+        break;
+      }
+      case "right": {
+        if (corners.length >= 1) {
+          const rightCorner = corners[0];
+          const midPoint = rightCorner[1];
+          x = midPoint[0] + OFFSET;
+          y = midPoint[1];
+        } else {
+          const midPoint = getMidPoint(topRight[1], bottomRight[0]);
+          x = midPoint[0] + OFFSET;
+          y = midPoint[1];
+        }
+        break;
+      }
+      case "top": {
+        if (corners.length >= 4) {
+          const topCorner = corners[3];
+          const midPoint = topCorner[1];
+          x = midPoint[0];
+          y = midPoint[1] - OFFSET;
+        } else {
+          const midPoint = getMidPoint(topLeft[1], topRight[0]);
+          x = midPoint[0];
+          y = midPoint[1] - OFFSET;
+        }
+        break;
+      }
+      case "bottom": {
+        if (corners.length >= 2) {
+          const bottomCorner = corners[1];
+          const midPoint = bottomCorner[1];
+          x = midPoint[0];
+          y = midPoint[1] + OFFSET;
+        } else {
+          const midPoint = getMidPoint(bottomRight[1], bottomLeft[0]);
+          x = midPoint[0];
+          y = midPoint[1] + OFFSET;
+        }
+        break;
+      }
+      case "top-right": {
+        const midPoint = getMidPoint(topRight[0], topRight[1]);
+
+        x = midPoint[0] + OFFSET * 0.707;
+        y = midPoint[1] - OFFSET * 0.707;
+        break;
+      }
+      case "bottom-right": {
+        const midPoint = getMidPoint(bottomRight[0], bottomRight[1]);
+
+        x = midPoint[0] + OFFSET * 0.707;
+        y = midPoint[1] + OFFSET * 0.707;
+        break;
+      }
+      case "bottom-left": {
+        const midPoint = getMidPoint(bottomLeft[0], bottomLeft[1]);
+        x = midPoint[0] - OFFSET * 0.707;
+        y = midPoint[1] + OFFSET * 0.707;
+        break;
+      }
+      case "top-left": {
+        const midPoint = getMidPoint(topLeft[0], topLeft[1]);
+        x = midPoint[0] - OFFSET * 0.707;
+        y = midPoint[1] - OFFSET * 0.707;
+        break;
+      }
+      default: {
+        return null;
+      }
+    }
+
+    return pointRotateRads(pointFrom(x, y), center, bindableElement.angle);
+  }
+
+  if (bindableElement.type === "ellipse") {
+    const ellipseCenterX = bindableElement.x + bindableElement.width / 2;
+    const ellipseCenterY = bindableElement.y + bindableElement.height / 2;
+    const radiusX = bindableElement.width / 2;
+    const radiusY = bindableElement.height / 2;
+
+    let x: number;
+    let y: number;
+
+    switch (side) {
+      case "top": {
+        x = ellipseCenterX;
+        y = ellipseCenterY - radiusY - OFFSET;
+        break;
+      }
+      case "right": {
+        x = ellipseCenterX + radiusX + OFFSET;
+        y = ellipseCenterY;
+        break;
+      }
+      case "bottom": {
+        x = ellipseCenterX;
+        y = ellipseCenterY + radiusY + OFFSET;
+        break;
+      }
+      case "left": {
+        x = ellipseCenterX - radiusX - OFFSET;
+        y = ellipseCenterY;
+        break;
+      }
+      case "top-right": {
+        const angle = -Math.PI / 4;
+        const ellipseX = radiusX * Math.cos(angle);
+        const ellipseY = radiusY * Math.sin(angle);
+        x = ellipseCenterX + ellipseX + OFFSET * 0.707;
+        y = ellipseCenterY + ellipseY - OFFSET * 0.707;
+        break;
+      }
+      case "bottom-right": {
+        const angle = Math.PI / 4;
+        const ellipseX = radiusX * Math.cos(angle);
+        const ellipseY = radiusY * Math.sin(angle);
+        x = ellipseCenterX + ellipseX + OFFSET * 0.707;
+        y = ellipseCenterY + ellipseY + OFFSET * 0.707;
+        break;
+      }
+      case "bottom-left": {
+        const angle = (3 * Math.PI) / 4;
+        const ellipseX = radiusX * Math.cos(angle);
+        const ellipseY = radiusY * Math.sin(angle);
+        x = ellipseCenterX + ellipseX - OFFSET * 0.707;
+        y = ellipseCenterY + ellipseY + OFFSET * 0.707;
+        break;
+      }
+      case "top-left": {
+        const angle = (-3 * Math.PI) / 4;
+        const ellipseX = radiusX * Math.cos(angle);
+        const ellipseY = radiusY * Math.sin(angle);
+        x = ellipseCenterX + ellipseX - OFFSET * 0.707;
+        y = ellipseCenterY + ellipseY - OFFSET * 0.707;
+        break;
+      }
+      default: {
+        return null;
+      }
+    }
+
+    return pointRotateRads(pointFrom(x, y), center, bindableElement.angle);
+  }
+
+  if (isRectangularElement(bindableElement)) {
+    const [sides, corners] = deconstructRectanguloidElement(
+      bindableElement as ExcalidrawRectanguloidElement,
+    );
+    const [top, right, bottom, left] = sides;
+
+    let x: number;
+    let y: number;
+    switch (side) {
+      case "top": {
+        const midPoint = getMidPoint(top[0], top[1]);
+        x = midPoint[0];
+        y = midPoint[1] - OFFSET;
+        break;
+      }
+      case "right": {
+        const midPoint = getMidPoint(right[0], right[1]);
+        x = midPoint[0] + OFFSET;
+        y = midPoint[1];
+        break;
+      }
+      case "bottom": {
+        const midPoint = getMidPoint(bottom[0], bottom[1]);
+        x = midPoint[0];
+        y = midPoint[1] + OFFSET;
+        break;
+      }
+      case "left": {
+        const midPoint = getMidPoint(left[0], left[1]);
+        x = midPoint[0] - OFFSET;
+        y = midPoint[1];
+        break;
+      }
+      case "top-left": {
+        if (corners.length >= 1) {
+          const corner = corners[0];
+
+          const p1 = corner[0];
+          const p2 = corner[3];
+          const midPoint = getMidPoint(p1, p2);
+
+          x = midPoint[0] - OFFSET * 0.707;
+          y = midPoint[1] - OFFSET * 0.707;
+        } else {
+          x = bindableElement.x - OFFSET;
+          y = bindableElement.y - OFFSET;
+        }
+        break;
+      }
+      case "top-right": {
+        if (corners.length >= 2) {
+          const corner = corners[1];
+          const p1 = corner[0];
+          const p2 = corner[3];
+          const midPoint = getMidPoint(p1, p2);
+
+          x = midPoint[0] + OFFSET * 0.707;
+          y = midPoint[1] - OFFSET * 0.707;
+        } else {
+          x = bindableElement.x + bindableElement.width + OFFSET;
+          y = bindableElement.y - OFFSET;
+        }
+        break;
+      }
+      case "bottom-right": {
+        if (corners.length >= 3) {
+          const corner = corners[2];
+          const p1 = corner[0];
+          const p2 = corner[3];
+          const midPoint = getMidPoint(p1, p2);
+
+          x = midPoint[0] + OFFSET * 0.707;
+          y = midPoint[1] + OFFSET * 0.707;
+        } else {
+          x = bindableElement.x + bindableElement.width + OFFSET;
+          y = bindableElement.y + bindableElement.height + OFFSET;
+        }
+        break;
+      }
+      case "bottom-left": {
+        if (corners.length >= 4) {
+          const corner = corners[3];
+          const p1 = corner[0];
+          const p2 = corner[3];
+          const midPoint = getMidPoint(p1, p2);
+
+          x = midPoint[0] - OFFSET * 0.707;
+          y = midPoint[1] + OFFSET * 0.707;
+        } else {
+          x = bindableElement.x - OFFSET;
+          y = bindableElement.y + bindableElement.height + OFFSET;
+        }
+        break;
+      }
+      default: {
+        return null;
+      }
+    }
+
+    return pointRotateRads(pointFrom(x, y), center, bindableElement.angle);
+  }
+
+  return null;
+};
+
+const getMidPoint = (p1: GlobalPoint, p2: GlobalPoint): GlobalPoint => {
+  return pointFrom((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2);
 };
