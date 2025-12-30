@@ -460,6 +460,7 @@ export const TOOL_TYPE = {
   magicframe: "magicframe",
   embeddable: "embeddable",
   laser: "laser",
+  poll: "poll",
 } as const;
 
 export const EDITOR_LS_KEYS = {
