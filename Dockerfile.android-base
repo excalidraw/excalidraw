@@ -1,0 +1,66 @@
+# Base Docker image for Android Capacitor builds
+# Build once: docker build -t excalidraw-android-base -f Dockerfile.android-base .
+# This image includes Node.js, Yarn, Android SDK, and build tools pre-installed
+
+FROM ubuntu:22.04
+
+# Prevent interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install base dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    unzip \
+    xz-utils \
+    zip \
+    openjdk-21-jdk \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 22.x (required for @capacitor/cli 8.0.0)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Yarn globally
+RUN npm install -g yarn@1.22.22
+
+# Create non-root user for build operations
+RUN useradd -ms /bin/bash builder && \
+    echo "builder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Set environment variables
+ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+ENV ANDROID_SDK_ROOT=/home/builder/android-sdk
+ENV ANDROID_HOME=/home/builder/android-sdk
+ENV PATH="$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin"
+
+WORKDIR /home/builder
+
+# Install Android SDK command line tools
+RUN mkdir -p /home/builder/android-sdk/cmdline-tools && \
+    cd /home/builder/android-sdk/cmdline-tools && \
+    wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip && \
+    unzip -q cmdline-tools.zip && \
+    rm cmdline-tools.zip && \
+    mv cmdline-tools latest && \
+    chown -R builder:builder /home/builder/android-sdk
+
+# Switch to builder user for remaining operations
+USER builder
+
+# Accept licenses and install SDK components
+RUN yes | sdkmanager --licenses && \
+    sdkmanager "platform-tools" \
+               "build-tools;34.0.0" \
+               "build-tools;35.0.0" \
+               "platforms;android-34" \
+               "platforms;android-35"
+
+# Create app directory
+RUN mkdir -p /home/builder/app
+WORKDIR /home/builder/app
+
+# Default command
+CMD ["node", "--version"]

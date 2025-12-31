@@ -1,0 +1,47 @@
+# Excalidraw Android Build Environment
+# Uses the base image with Node.js and Android SDK
+# Build: docker build -t excalidraw-android -f Dockerfile.android .
+# Run: docker run --rm -v $(pwd)/output:/output excalidraw-android
+
+FROM excalidraw-android-base:latest
+
+# Set working directory
+WORKDIR /home/builder/app
+
+# Copy package files first for better layer caching
+USER root
+COPY --chown=builder:builder package.json yarn.lock ./
+COPY --chown=builder:builder excalidraw-app/package.json ./excalidraw-app/
+COPY --chown=builder:builder packages/ ./packages/
+USER builder
+
+# Install dependencies
+RUN yarn install --frozen-lockfile
+
+# Copy the rest of the project
+USER root
+COPY --chown=builder:builder . ./
+USER builder
+
+# Build the web app
+RUN cd excalidraw-app && yarn build:app
+
+# Sync Capacitor (copies web build to android assets)
+RUN cd excalidraw-app && npx cap sync android
+
+# Set Gradle properties for the build
+ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx4g"
+
+# Create output directory
+RUN mkdir -p /home/builder/output
+
+# Build the APK
+WORKDIR /home/builder/app/excalidraw-app/android
+RUN ./gradlew assembleDebug --no-daemon
+
+# Copy APK to output location
+RUN cp app/build/outputs/apk/debug/app-debug.apk /home/builder/output/excalidraw-debug.apk
+
+# Default command - copy APK to mounted volume (needs root for volume permissions)
+USER root
+CMD ["sh", "-c", "cp /home/builder/output/*.apk /output/ && chmod 666 /output/*.apk && echo 'APK exported to ./output/' && ls -la /output/"]

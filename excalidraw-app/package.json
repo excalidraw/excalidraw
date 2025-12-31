@@ -26,6 +26,9 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@capacitor/android": "8.0.0",
+    "@capacitor/core": "8.0.0",
+    "@capacitor/filesystem": "8.0.0",
     "@excalidraw/random-username": "1.0.0",
     "@sentry/browser": "9.0.1",
     "callsites": "4.2.0",
@@ -48,9 +51,13 @@
     "start": "yarn && vite",
     "start:production": "yarn build && yarn serve",
     "serve": "npx http-server build -a localhost -p 5001 -o",
-    "build:preview": "yarn build && vite preview --port 5000"
+    "build:preview": "yarn build && vite preview --port 5000",
+    "cap:sync": "npx cap sync android",
+    "cap:open:android": "npx cap open android",
+    "cap:build:android": "yarn build:app && npx cap sync android"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.0.0",
     "vite-plugin-sitemap": "0.7.1"
   }
 }
