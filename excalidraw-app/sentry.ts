@@ -1,4 +1,4 @@
-import { getFeatureFlag } from "@excalidraw/common";
+import { getFeatureFlag } from "@excalidraw-modify/common";
 import * as Sentry from "@sentry/browser";
 import callsites from "callsites";
 

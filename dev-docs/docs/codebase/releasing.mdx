@@ -1,0 +1,124 @@
+---
+title: Publishing the npm packages
+---
+
+## Overview
+
+Use the monorepo's `scripts/release.js` helper (`yarn release`) whenever you want to publish your fork to npm just like the upstream project. The script builds the core packages (`@excalidraw-modify/common`, `@excalidraw-modify/math`, `@excalidraw-modify/element`, `@excalidraw-modify/excalidraw`), aligns their internal dependency versions, updates the changelog for stable releases, and finally runs `yarn publish` inside each package directory. By default the forked packages live under the `@excalidraw-modify/*` scope.
+
+## Prerequisites
+
+- Node.js 18+ and Yarn 1.22.x (the repo is pinned via `packageManager`).
+- An npm account that owns the target package scope. If you plan to publish under a different scope, rename the `"name"` field in every affected `packages/*/package.json` and update `scripts/release.js`'s `PACKAGES` array if you add/remove packages.
+- Make sure `npm whoami` succeeds locally or configure the `NPM_TOKEN`/`NPM_CONFIG_OTP` environment variables for CI.
+- Keep your working tree clean: commit or stash local edits so the script can safely bump versions and changelog files.
+
+## Release flow
+
+1. **Install dependencies**  
+   ```bash
+   yarn install --frozen-lockfile
+   ```
+   This ensures everyone is building with the exact lockfile.
+
+2. **Optionally validate builds/tests** (recommended before publishing)  
+   ```bash
+   yarn test:all
+   ```
+
+3. **Pick a dist-tag**  
+   `scripts/release.js` supports three tags:
+   - `test` (default) – creates versions suffixed with the current git short hash, useful for internal validation.
+   - `next` – same suffixing as `test`, but npm users install via `@excalidraw-modify/excalidraw@next`.
+   - `latest` – stable releases. You _must_ pass an explicit semantic version via `--version=0.xx.x`.
+
+4. **Run the release script**
+   ```bash
+   # smoke release
+   yarn release --tag=test
+
+   # beta channel (non-interactive CI example)
+   yarn release --tag=next --non-interactive
+
+   # stable release (updates changelog + prompts to commit & publish)
+   yarn release --tag=latest --version=0.21.0
+   ```
+   Behind the scenes the script will:
+   - call `yarn rm:build` to wipe stale build artifacts,
+   - run `yarn run build:esm` inside each package directory,
+   - rewrite every `packages/*/package.json` so the `version` property and internal `@excalidraw-modify/*` dependencies all match,
+   - for `latest`, execute `scripts/updateChangelog.js` and prompt you to commit the bump,
+   - either publish immediately (`--non-interactive`) or ask whether to push to npm.
+
+5. **Verify the publication**  
+   ```bash
+   npm view @your-scope/excalidraw versions
+   npm dist-tag ls @your-scope/excalidraw
+   ```
+   Double-check that all packages share the same version and the expected dist-tag.
+
+## Custom scopes or forks
+
+- If you cannot publish to the default `@excalidraw-modify/*` names, update the `"name"` field in each package (for example `@myteam/excalidraw`). Ensure other packages point to the new names inside their `dependencies`.
+- Adjust `scripts/release.js` so `PACKAGES` lists the packages you actually want to publish; otherwise the script will attempt to release the upstream names.
+- Keep your README and documentation accurate (e.g., describe how to install your scoped build: `npm install @myteam/excalidraw`).
+
+### Step-by-step rename checklist
+
+1. **Pick a scope**  
+   Decide once (e.g., `@myteam`). Consistency matters because dozens of internal references exist.
+
+2. **Rename every package**  
+   Edit `packages/common/package.json`, `packages/element/package.json`, `packages/math/package.json`, and `packages/excalidraw/package.json`:
+   ```json
+   // packages/excalidraw/package.json
+   {
+     "name": "@myteam/excalidraw",
+     …
+   }
+   ```
+
+3. **Update cross-dependencies**  
+   Still inside each package.json, rewrite internal deps so they point to your scope:
+   ```json
+   "dependencies": {
+     "@myteam/common": "0.18.0",
+     "@myteam/element": "0.18.0",
+     "@myteam/math": "0.18.0",
+     …
+   }
+   ```
+   A quick check:
+   ```bash
+   rg -n "@excalidraw-modify/(common|element|math|excalidraw)" packages
+   ```
+   replace matches with the new scope.
+
+4. **Keep tools in sync**  
+   If you later add another publishable package, extend `PACKAGES` in `scripts/release.js`. Otherwise no code changes are needed—the script already operates on directory names, not scopes.
+
+5. **Document install instructions**  
+   Update any README/snippets (`dev-docs`, `examples/*`) so consumers run `npm install @myteam/excalidraw`.
+
+### Automate renaming the scope
+
+To speed up the renaming, use the helper script introduced in this repo:
+
+```bash
+# rename @excalidraw-modify/* -> @myteam/*
+yarn set:scope --scope=@myteam
+
+# if you already renamed once and need to switch scopes again
+yarn set:scope --scope=@another --from=@myteam
+```
+
+The script walks through `packages/common`, `packages/math`, `packages/element`, and `packages/excalidraw`, updates their `"name"` fields, and rewrites any internal dependencies so they reference the new scope. After running it, search the repo for `@excalidraw-modify/` to catch any remaining references (for example, README badges or example apps) before publishing.
+
+## Troubleshooting
+
+- `npm ERR! code E403` – you lack publish permission to that package name; rename the package or request access.
+- `npm ERR! OTP required` – supply the latest 2FA code via the prompt or `$env:NPM_CONFIG_OTP`/`export NPM_CONFIG_OTP`.
+- Build failures usually mean stale artifacts; rerun `yarn rm:build && yarn release ...`.
+
+Following this flow gives you the same release artifacts and dist-tag behavior as the upstream Excalidraw project.
+

@@ -2,7 +2,7 @@ import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
 import React, { useEffect } from "react";
 
-import { isArrowKey, KEYS } from "@excalidraw/common";
+import { isArrowKey, KEYS } from "@excalidraw-modify/common";
 
 import { atom, useAtom } from "../editor-jotai";
 import { getLanguage, t } from "../i18n";

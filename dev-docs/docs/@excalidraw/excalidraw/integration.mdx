@@ -5,7 +5,7 @@
 If you are using a module bundler (for instance, Webpack), you can import it as an ES6 module as shown below
 
 ```js
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { Excalidraw } from "@excalidraw-modify/excalidraw";
 ```
 
 :::info
@@ -38,10 +38,10 @@ If you want to only import `Excalidraw` component you can do :point_down:
 
 ```jsx showLineNumbers
 import dynamic from "next/dynamic";
-import "@excalidraw/excalidraw/index.css";
+import "@excalidraw-modify/excalidraw/index.css";
 
 const Excalidraw = dynamic(
-  async () => (await import("@excalidraw/excalidraw")).Excalidraw,
+  async () => (await import("@excalidraw-modify/excalidraw")).Excalidraw,
   {
     ssr: false,
   },
@@ -60,9 +60,9 @@ If you are using `pages router` then importing the wrapper dynamically would wor
 
   ```jsx showLineNumbers
   "use client";
-  import { Excalidraw, convertToExcalidrawElements } from "@excalidraw/excalidraw";
+  import { Excalidraw, convertToExcalidrawElements } from "@excalidraw-modify/excalidraw";
 
-  import "@excalidraw/excalidraw/index.css";
+  import "@excalidraw-modify/excalidraw/index.css";
 
   const ExcalidrawWrapper: React.FC = () => {
     console.info(convertToExcalidrawElements([{
@@ -133,7 +133,7 @@ If you are using `pages router` then importing the wrapper dynamically would wor
 {/* Link  should be updated to point to the latest! */}
 Here is a [source code](https://github.com/excalidraw/excalidraw/tree/master/examples/with-nextjs) for the example with app and pages router. You you can try it out [here](https://excalidraw-package-example-with-nextjs.vercel.app/).
 
-The `types` are available at `@excalidraw/excalidraw/types`, check [CodeSandbox](https://codesandbox.io/p/sandbox/github/excalidraw/excalidraw/tree/master/examples/with-script-in-browser) example for details.
+The `types` are available at `@excalidraw-modify/excalidraw/types`, check [CodeSandbox](https://codesandbox.io/p/sandbox/github/excalidraw/excalidraw/tree/master/examples/with-script-in-browser) example for details.
 
 ### Preact
 
@@ -176,11 +176,11 @@ import TabItem from "@theme/TabItem";
     <meta charset="UTF-8" />
     <link
       rel="stylesheet"
-      href="https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/dev/index.css"
+      href="https://esm.sh/@excalidraw-modify/excalidraw@0.18.0/dist/dev/index.css"
     />
     <link rel="stylesheet" href="./index.css" />
     <script>
-    	window.EXCALIDRAW_ASSET_PATH = "https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/prod/";
+    	window.EXCALIDRAW_ASSET_PATH = "https://esm.sh/@excalidraw-modify/excalidraw@0.18.0/dist/prod/";
 		</script>
     <script type="importmap">
       {
@@ -207,8 +207,8 @@ import TabItem from "@theme/TabItem";
 <TabItem value="js" label="Javascript">
 
 ```js showLineNumbers
-// See https://www.npmjs.com/package/@excalidraw/excalidraw documentation.
-import * as ExcalidrawLib from 'https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/dev/index.js?external=react,react-dom';
+// See https://www.npmjs.com/package/@excalidraw-modify/excalidraw documentation.
+import * as ExcalidrawLib from 'https://esm.sh/@excalidraw-modify/excalidraw@0.18.0/dist/dev/index.js?external=react,react-dom';
 import React from "https://esm.sh/react@19.0.0";
 import ReactDOM from "https://esm.sh/react-dom@19.0.0"
 

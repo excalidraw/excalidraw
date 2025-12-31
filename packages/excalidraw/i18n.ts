@@ -1,6 +1,6 @@
-import { isDevEnv } from "@excalidraw/common";
+import { isDevEnv } from "@excalidraw-modify/common";
 
-import type { NestedKeyOf } from "@excalidraw/common/utility-types";
+import type { NestedKeyOf } from "@excalidraw-modify/common/utility-types";
 
 import { useAtomValue, editorJotaiStore, atom } from "./editor-jotai";
 import fallbackLangData from "./locales/en.json";

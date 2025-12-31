@@ -1,4 +1,4 @@
-name: "Bundle Size check @excalidraw/excalidraw"
+name: "Bundle Size check @excalidraw-modify/excalidraw"
 on:
   pull_request:
     branches:

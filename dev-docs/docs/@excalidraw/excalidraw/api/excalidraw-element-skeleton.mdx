@@ -4,7 +4,7 @@ We support a simplified API to make it easier to generate Excalidraw elements pr
 
 For this purpose we introduced a new type [`ExcalidrawElementSkeleton`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/transform.ts#L133). This is the simplified version of [`ExcalidrawElement`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L134) type with the minimum possible attributes so that creating elements programmatically is much easier (especially for cases like binding arrows or creating text containers).
 
-The [`ExcalidrawElementSkeleton`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/transform.ts#L133) can be converted to fully qualified Excalidraw elements by using [`convertToExcalidrawElements`](/docs/@excalidraw/excalidraw/api/excalidraw-element-skeleton#converttoexcalidrawelements).
+The [`ExcalidrawElementSkeleton`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/transform.ts#L133) can be converted to fully qualified Excalidraw elements by using [`convertToExcalidrawElements`](/docs/@excalidraw-modify/excalidraw/api/excalidraw-element-skeleton#converttoexcalidrawelements).
 
 ## convertToExcalidrawElements
 
@@ -25,10 +25,10 @@ convertToExcalidrawElements(
 **_How to use_**
 
 ```js
-import { convertToExcalidrawElements } from "@excalidraw/excalidraw";
+import { convertToExcalidrawElements } from "@excalidraw-modify/excalidraw";
 ```
 
-This function converts the Excalidraw Element Skeleton to excalidraw elements which could be then rendered on the canvas. Hence calling this function is necessary before passing it to APIs like [`initialData`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/initialdata), [`updateScene`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/excalidraw-api#updatescene) if you are using the Skeleton API
+This function converts the Excalidraw Element Skeleton to excalidraw elements which could be then rendered on the canvas. Hence calling this function is necessary before passing it to APIs like [`initialData`](https://docs.excalidraw.com/docs/@excalidraw-modify/excalidraw/api/props/initialdata), [`updateScene`](https://docs.excalidraw.com/docs/@excalidraw-modify/excalidraw/api/props/excalidraw-api#updatescene) if you are using the Skeleton API
 
 ## Supported Features
 

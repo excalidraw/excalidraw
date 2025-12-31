@@ -4,9 +4,9 @@ import {
   pointFrom,
   type GlobalPoint,
   type LocalPoint,
-} from "@excalidraw/math";
+} from "@excalidraw-modify/math";
 
-import type { Curve } from "@excalidraw/math";
+import type { Curve } from "@excalidraw-modify/math";
 import type { LineSegment } from "@excalidraw/utils";
 
 import { type Bounds, isBounds } from "./bounds";

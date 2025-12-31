@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { useCallback, useState } from "react";
 
-import { muteFSAbortError } from "@excalidraw/common";
+import { muteFSAbortError } from "@excalidraw-modify/common";
 
 import { useUIAppState } from "../context/ui-appState";
 import { fileOpen } from "../data/filesystem";

@@ -1,4 +1,4 @@
-import { arrayToMapWithIndex } from "@excalidraw/common";
+import { arrayToMapWithIndex } from "@excalidraw-modify/common";
 
 import type { ExcalidrawElement } from "./types";
 

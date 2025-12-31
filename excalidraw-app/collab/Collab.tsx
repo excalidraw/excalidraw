@@ -4,9 +4,9 @@ import {
   restoreElements,
   zoomToFitBounds,
   reconcileElements,
-} from "@excalidraw/excalidraw";
-import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
-import { APP_NAME, EVENT } from "@excalidraw/common";
+} from "@excalidraw-modify/excalidraw";
+import { ErrorDialog } from "@excalidraw-modify/excalidraw/components/ErrorDialog";
+import { APP_NAME, EVENT } from "@excalidraw-modify/common";
 import {
   IDLE_THRESHOLD,
   ACTIVE_THRESHOLD,
@@ -17,14 +17,14 @@ import {
   preventUnload,
   resolvablePromise,
   throttleRAF,
-} from "@excalidraw/common";
-import { decryptData } from "@excalidraw/excalidraw/data/encryption";
-import { getVisibleSceneBounds } from "@excalidraw/element";
-import { newElementWith } from "@excalidraw/element";
-import { isImageElement, isInitializedImageElement } from "@excalidraw/element";
-import { AbortError } from "@excalidraw/excalidraw/errors";
-import { t } from "@excalidraw/excalidraw/i18n";
-import { withBatchedUpdates } from "@excalidraw/excalidraw/reactUtils";
+} from "@excalidraw-modify/common";
+import { decryptData } from "@excalidraw-modify/excalidraw/data/encryption";
+import { getVisibleSceneBounds } from "@excalidraw-modify/element";
+import { newElementWith } from "@excalidraw-modify/element";
+import { isImageElement, isInitializedImageElement } from "@excalidraw-modify/element";
+import { AbortError } from "@excalidraw-modify/excalidraw/errors";
+import { t } from "@excalidraw-modify/excalidraw/i18n";
+import { withBatchedUpdates } from "@excalidraw-modify/excalidraw/reactUtils";
 
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
@@ -32,22 +32,22 @@ import { PureComponent } from "react";
 import type {
   ReconciledExcalidrawElement,
   RemoteExcalidrawElement,
-} from "@excalidraw/excalidraw/data/reconcile";
-import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
+} from "@excalidraw-modify/excalidraw/data/reconcile";
+import type { ImportedDataState } from "@excalidraw-modify/excalidraw/data/types";
 import type {
   ExcalidrawElement,
   FileId,
   InitializedExcalidrawImageElement,
   OrderedExcalidrawElement,
-} from "@excalidraw/element/types";
+} from "@excalidraw-modify/element/types";
 import type {
   BinaryFileData,
   ExcalidrawImperativeAPI,
   SocketId,
   Collaborator,
   Gesture,
-} from "@excalidraw/excalidraw/types";
-import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
+} from "@excalidraw-modify/excalidraw/types";
+import type { Mutable, ValueOf } from "@excalidraw-modify/common/utility-types";
 
 import { appJotaiStore, atom } from "../app-jotai";
 import {

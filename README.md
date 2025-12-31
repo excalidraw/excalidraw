@@ -24,8 +24,8 @@
 <p align="center">
   <a href="https://github.com/excalidraw/excalidraw/blob/master/LICENSE">
     <img alt="Excalidraw is released under the MIT license." src="https://img.shields.io/badge/license-MIT-blue.svg"  /></a>
-  <a href="https://www.npmjs.com/package/@excalidraw/excalidraw">
-    <img alt="npm downloads/month" src="https://img.shields.io/npm/dm/@excalidraw/excalidraw"  /></a>
+  <a href="https://www.npmjs.com/package/@excalidraw-modify/excalidraw">
+    <img alt="npm downloads/month" src="https://img.shields.io/npm/dm/@excalidraw-modify/excalidraw"  /></a>
   <a href="https://docs.excalidraw.com/docs/introduction/contributing">
     <img alt="PRs welcome!" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"  /></a>
   <a href="https://discord.gg/UexuTaE">
@@ -82,17 +82,17 @@ We'll be adding these features as drop-in plugins for the npm package in the fut
 
 ## Quick start
 
-**Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
+**Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw-modify/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
 
 Use `npm` or `yarn` to install the package.
 
 ```bash
-npm install react react-dom @excalidraw/excalidraw
+npm install react react-dom @excalidraw-modify/excalidraw
 # or
-yarn add react react-dom @excalidraw/excalidraw
+yarn add react react-dom @excalidraw-modify/excalidraw
 ```
 
-Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
+Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw-modify/excalidraw/installation) for more details!
 
 ## Contributing
 
@@ -103,7 +103,7 @@ Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excal
 ## Integrations
 
 - [VScode extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor)
-- [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw)
+- [npm package](https://www.npmjs.com/package/@excalidraw-modify/excalidraw)
 
 ## Who's integrating Excalidraw
 

@@ -26,22 +26,22 @@ const sidebars = {
     {
       type: "category",
       label: "Codebase",
-      items: ["codebase/json-schema", "codebase/frames"],
+      items: ["codebase/json-schema", "codebase/frames", "codebase/releasing"],
     },
     {
       type: "category",
-      label: "@excalidraw/excalidraw",
+      label: "@excalidraw-modify/excalidraw",
       collapsed: false,
       items: [
-        "@excalidraw/excalidraw/installation",
-        "@excalidraw/excalidraw/integration",
-        "@excalidraw/excalidraw/customizing-styles",
+        "@excalidraw-modify/excalidraw/installation",
+        "@excalidraw-modify/excalidraw/integration",
+        "@excalidraw-modify/excalidraw/customizing-styles",
         {
           type: "category",
           label: "API",
           link: {
             type: "doc",
-            id: "@excalidraw/excalidraw/api/api-intro",
+            id: "@excalidraw-modify/excalidraw/api/api-intro",
           },
           items: [
             {
@@ -49,13 +49,13 @@ const sidebars = {
               label: "Props",
               link: {
                 type: "doc",
-                id: "@excalidraw/excalidraw/api/props/props",
+                id: "@excalidraw-modify/excalidraw/api/props/props",
               },
               items: [
-                "@excalidraw/excalidraw/api/props/initialdata",
-                "@excalidraw/excalidraw/api/props/excalidraw-api",
-                "@excalidraw/excalidraw/api/props/render-props",
-                "@excalidraw/excalidraw/api/props/ui-options",
+                "@excalidraw-modify/excalidraw/api/props/initialdata",
+                "@excalidraw-modify/excalidraw/api/props/excalidraw-api",
+                "@excalidraw-modify/excalidraw/api/props/render-props",
+                "@excalidraw-modify/excalidraw/api/props/ui-options",
               ],
             },
             {
@@ -63,14 +63,14 @@ const sidebars = {
               label: "Children Components",
               link: {
                 type: "doc",
-                id: "@excalidraw/excalidraw/api/children-components/children-components-intro",
+                id: "@excalidraw-modify/excalidraw/api/children-components/children-components-intro",
               },
               items: [
-                "@excalidraw/excalidraw/api/children-components/main-menu",
-                "@excalidraw/excalidraw/api/children-components/welcome-screen",
-                "@excalidraw/excalidraw/api/children-components/sidebar",
-                "@excalidraw/excalidraw/api/children-components/footer",
-                "@excalidraw/excalidraw/api/children-components/live-collaboration-trigger",
+                "@excalidraw-modify/excalidraw/api/children-components/main-menu",
+                "@excalidraw-modify/excalidraw/api/children-components/welcome-screen",
+                "@excalidraw-modify/excalidraw/api/children-components/sidebar",
+                "@excalidraw-modify/excalidraw/api/children-components/footer",
+                "@excalidraw-modify/excalidraw/api/children-components/live-collaboration-trigger",
               ],
             },
             {
@@ -78,19 +78,19 @@ const sidebars = {
               label: "Utils",
               link: {
                 type: "doc",
-                id: "@excalidraw/excalidraw/api/utils/utils-intro",
+                id: "@excalidraw-modify/excalidraw/api/utils/utils-intro",
               },
               items: [
-                "@excalidraw/excalidraw/api/utils/export",
-                "@excalidraw/excalidraw/api/utils/restore",
+                "@excalidraw-modify/excalidraw/api/utils/export",
+                "@excalidraw-modify/excalidraw/api/utils/restore",
               ],
             },
-            "@excalidraw/excalidraw/api/constants",
-            "@excalidraw/excalidraw/api/excalidraw-element-skeleton",
+            "@excalidraw-modify/excalidraw/api/constants",
+            "@excalidraw-modify/excalidraw/api/excalidraw-element-skeleton",
           ],
         },
-        "@excalidraw/excalidraw/faq",
-        "@excalidraw/excalidraw/development",
+        "@excalidraw-modify/excalidraw/faq",
+        "@excalidraw-modify/excalidraw/development",
       ],
     },
     {

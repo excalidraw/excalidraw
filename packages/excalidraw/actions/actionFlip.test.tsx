@@ -1,4 +1,4 @@
-import { pointFrom } from "@excalidraw/math";
+import { pointFrom } from "@excalidraw-modify/math";
 
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";

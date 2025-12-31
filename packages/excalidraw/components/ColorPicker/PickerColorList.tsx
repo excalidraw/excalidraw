@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { useEffect, useRef } from "react";
 
-import type { ColorPaletteCustom } from "@excalidraw/common";
+import type { ColorPaletteCustom } from "@excalidraw-modify/common";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";

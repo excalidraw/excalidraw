@@ -7,11 +7,11 @@ import {
   COLOR_PALETTE,
   isTransparent,
   isWritableElement,
-} from "@excalidraw/common";
+} from "@excalidraw-modify/common";
 
-import type { ColorTuple, ColorPaletteCustom } from "@excalidraw/common";
+import type { ColorTuple, ColorPaletteCustom } from "@excalidraw-modify/common";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw-modify/element/types";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";

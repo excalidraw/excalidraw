@@ -1,6 +1,6 @@
-import { randomId, reseed } from "@excalidraw/common";
+import { randomId, reseed } from "@excalidraw-modify/common";
 
-import type { FileId } from "@excalidraw/element/types";
+import type { FileId } from "@excalidraw-modify/element/types";
 
 import * as blobModule from "../data/blob";
 import * as filesystemModule from "../data/filesystem";

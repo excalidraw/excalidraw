@@ -5,7 +5,7 @@
 import { version as ReactVersion } from "react";
 import { unstable_batchedUpdates } from "react-dom";
 
-import { throttleRAF } from "@excalidraw/common";
+import { throttleRAF } from "@excalidraw-modify/common";
 
 export const withBatchedUpdates = <
   TFunction extends ((event: any) => void) | (() => void),

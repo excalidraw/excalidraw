@@ -1,4 +1,4 @@
-import { KEYS } from "@excalidraw/common";
+import { KEYS } from "@excalidraw-modify/common";
 
 import { actionSelectAll } from "../actions";
 import { t } from "../i18n";

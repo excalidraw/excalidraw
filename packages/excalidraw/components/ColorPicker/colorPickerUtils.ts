@@ -1,8 +1,8 @@
-import { MAX_CUSTOM_COLORS_USED_IN_CANVAS } from "@excalidraw/common";
+import { MAX_CUSTOM_COLORS_USED_IN_CANVAS } from "@excalidraw-modify/common";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw-modify/element/types";
 
-import type { ColorPickerColor, ColorPaletteCustom } from "@excalidraw/common";
+import type { ColorPickerColor, ColorPaletteCustom } from "@excalidraw-modify/common";
 
 import { atom } from "../../editor-jotai";
 

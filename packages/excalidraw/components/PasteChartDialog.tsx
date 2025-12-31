@@ -1,7 +1,7 @@
 import oc from "open-color";
 import React, { useLayoutEffect, useRef, useState } from "react";
 
-import type { ChartType } from "@excalidraw/element/types";
+import type { ChartType } from "@excalidraw-modify/element/types";
 
 import { trackEvent } from "../analytics";
 import { renderSpreadsheet } from "../charts";

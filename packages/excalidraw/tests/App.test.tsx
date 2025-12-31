@@ -1,7 +1,7 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { reseed } from "@excalidraw/common";
+import { reseed } from "@excalidraw-modify/common";
 
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";

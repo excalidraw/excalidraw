@@ -1,10 +1,10 @@
 ---
-slug: /@excalidraw/excalidraw/api/utils
+slug: /@excalidraw-modify/excalidraw/api/utils
 ---
 
 # Utils
 
-These are pure Javascript functions exported from the @excalidraw/excalidraw [`@excalidraw/excalidraw`](https://npmjs.com/@excalidraw/excalidraw). If you want to export your drawings in different formats eg `png`, `svg` and more you can check out [Export Utilities](/docs/@excalidraw/excalidraw/API/utils/export). If you want to restore your drawings you can check out [Restore Utilities](/docs/@excalidraw/excalidraw/API/utils/restore).
+These are pure Javascript functions exported from the @excalidraw-modify/excalidraw [`@excalidraw-modify/excalidraw`](https://npmjs.com/@excalidraw-modify/excalidraw). If you want to export your drawings in different formats eg `png`, `svg` and more you can check out [Export Utilities](/docs/@excalidraw-modify/excalidraw/API/utils/export). If you want to restore your drawings you can check out [Restore Utilities](/docs/@excalidraw-modify/excalidraw/API/utils/restore).
 
 ### serializeAsJSON
 
@@ -24,7 +24,7 @@ serializeAsJSON(&#123;<br/>&nbsp;
 **How to use**
 
 ```js
-import { serializeAsJSON } from "@excalidraw/excalidraw";
+import { serializeAsJSON } from "@excalidraw-modify/excalidraw";
 ```
 
 ### serializeLibraryAsJSON
@@ -43,7 +43,7 @@ serializeLibraryAsJSON(
 **How to use**
 
 ```js
-import { serializeLibraryAsJSON } from "@excalidraw/excalidraw";
+import { serializeLibraryAsJSON } from "@excalidraw-modify/excalidraw";
 ```
 
 #### isInvisiblySmallElement
@@ -59,7 +59,7 @@ isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalid
 **How to use**
 
 ```js
-import { isInvisiblySmallElement } from "@excalidraw/excalidraw";
+import { isInvisiblySmallElement } from "@excalidraw-modify/excalidraw";
 ```
 
 ### loadFromBlob
@@ -69,7 +69,7 @@ This function loads the scene data from the blob (or file). If you pass `localAp
 **How to use**
 
 ```js
-import { loadFromBlob } from "@excalidraw/excalidraw";
+import { loadFromBlob } from "@excalidraw-modify/excalidraw";
 
 const scene = await loadFromBlob(file, null, null);
 excalidrawAPI.updateScene(scene);
@@ -93,7 +93,7 @@ This function loads the library from the blob. Additonally takes `defaultStatus`
 **How to use **
 
 ```js
-import { loadLibraryFromBlob } from "@excalidraw/excalidraw";
+import { loadLibraryFromBlob } from "@excalidraw-modify/excalidraw";
 ```
 
 **_Signature_**
@@ -115,7 +115,7 @@ Throws if blob doesn't contain valid `scene` data or `library` data.
 **How to use**
 
 ```js showLineNumbers
-import { loadSceneOrLibraryFromBlob, MIME_TYPES } from "@excalidraw/excalidraw";
+import { loadSceneOrLibraryFromBlob, MIME_TYPES } from "@excalidraw-modify/excalidraw";
 
 const contents = await loadSceneOrLibraryFromBlob(file, null, null);
 if (contents.type === MIME_TYPES.excalidraw) {
@@ -143,7 +143,7 @@ This function returns the `free draw` svg path for the element.
 **How to use**
 
 ```js
-import { getFreeDrawSvgPath } from "@excalidraw/excalidraw";
+import { getFreeDrawSvgPath } from "@excalidraw-modify/excalidraw";
 ```
 
 **Signature**
@@ -159,7 +159,7 @@ This function returns true if the element is `linear` type (`arrow` |`line`) els
 **How to use**
 
 ```js
-import { isLinearElement } from "@excalidraw/excalidraw";
+import { isLinearElement } from "@excalidraw-modify/excalidraw";
 ```
 
 **Signature**
@@ -175,7 +175,7 @@ This function returns an array of `deleted` elements.
 **How to use**
 
 ```js
-import { getNonDeletedElements } from "@excalidraw/excalidraw";
+import { getNonDeletedElements } from "@excalidraw-modify/excalidraw";
 ```
 
 **Signature**
@@ -189,7 +189,7 @@ getNonDeletedElements(elements:<a href="https://github.com/excalidraw/excalidraw
 This function merges two `LibraryItems` arrays, where unique items from `otherItems` are sorted first in the returned array.
 
 ```js
-import { mergeLibraryItems } from "@excalidraw/excalidraw";
+import { mergeLibraryItems } from "@excalidraw-modify/excalidraw";
 ```
 
 **_Signature_**
@@ -208,7 +208,7 @@ Parses library parameters from URL if present (expects the `#addLibrary` hash ke
 **How to use**
 
 ```js
-import { parseLibraryTokensFromUrl } from "@excalidraw/excalidraw";
+import { parseLibraryTokensFromUrl } from "@excalidraw-modify/excalidraw";
 ```
 
 **Signature**
@@ -227,7 +227,7 @@ A hook that automatically imports library from url if `#addLibrary` hash key exi
 **How to use**
 
 ```js
-import { useHandleLibrary } from "@excalidraw/excalidraw";
+import { useHandleLibrary } from "@excalidraw-modify/excalidraw";
 
 export const App = () => {
   // ...
@@ -259,7 +259,7 @@ getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blo
 **How to use**
 
 ```js
-import { getSceneVersion } from "@excalidraw/excalidraw";
+import { getSceneVersion } from "@excalidraw-modify/excalidraw";
 ```
 
 ### sceneCoordsToViewportCoords
@@ -267,7 +267,7 @@ import { getSceneVersion } from "@excalidraw/excalidraw";
 This function returns equivalent `viewport` coords for the provided `scene` coords in params.
 
 ```js
-import { sceneCoordsToViewportCoords } from "@excalidraw/excalidraw";
+import { sceneCoordsToViewportCoords } from "@excalidraw-modify/excalidraw";
 ```
 
 **_Signature_**
@@ -282,7 +282,7 @@ sceneCoordsToViewportCoords(&#123; sceneX: number, sceneY: number },<br/>&nbsp;
 This function returns equivalent `scene` coords for the provided `viewport` coords in params.
 
 ```js
-import { viewportCoordsToSceneCoords } from "@excalidraw/excalidraw";
+import { viewportCoordsToSceneCoords } from "@excalidraw-modify/excalidraw";
 ```
 
 **_Signature_**
@@ -362,7 +362,7 @@ To help with localization, we export the following.
 | `useI18n` | [`() => { langCode, t }`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/i18n.ts#L15) |
 
 ```js
-import { defaultLang, languages, useI18n } from "@excalidraw/excalidraw";
+import { defaultLang, languages, useI18n } from "@excalidraw-modify/excalidraw";
 ```
 
 #### defaultLang
@@ -371,7 +371,7 @@ Default language code, `en`.
 
 #### languages
 
-List of supported language codes. You can pass any of these to `Excalidraw`'s [`langCode` prop](/docs/@excalidraw/excalidraw/api/props/#langcode).
+List of supported language codes. You can pass any of these to `Excalidraw`'s [`langCode` prop](/docs/@excalidraw-modify/excalidraw/api/props/#langcode).
 
 #### useI18n
 
@@ -415,7 +415,7 @@ getCommonBounds(
 **_How to use_**
 
 ```js
-import { getCommonBounds } from "@excalidraw/excalidraw";
+import { getCommonBounds } from "@excalidraw-modify/excalidraw";
 ```
 
 ### elementsOverlappingBBox
@@ -444,7 +444,7 @@ elementsOverlappingBBox(<br/>&nbsp;
 **_How to use_**
 
 ```js
-import { elementsOverlappingBBox } from "@excalidraw/excalidraw";
+import { elementsOverlappingBBox } from "@excalidraw-modify/excalidraw";
 ```
 
 ### isElementInsideBBox
@@ -464,7 +464,7 @@ isElementInsideBBox(<br/>&nbsp;
 **_How to use_**
 
 ```js
-import { isElementInsideBBox } from "@excalidraw/excalidraw";
+import { isElementInsideBBox } from "@excalidraw-modify/excalidraw";
 ```
 
 ### elementPartiallyOverlapsWithOrContainsBBox
@@ -483,5 +483,5 @@ elementPartiallyOverlapsWithOrContainsBBox(<br/>&nbsp;
 **_How to use_**
 
 ```js
-import { elementPartiallyOverlapsWithOrContainsBBox } from "@excalidraw/excalidraw";
+import { elementPartiallyOverlapsWithOrContainsBBox } from "@excalidraw-modify/excalidraw";
 ```

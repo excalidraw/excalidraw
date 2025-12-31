@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@excalidraw/excalidraw": "link:../../packages/excalidraw",
+    "@excalidraw-modify/excalidraw": "link:../../packages/excalidraw",
     "browser-fs-access": "0.29.1",
     "react": "19.0.0",
     "react-dom": "19.0.0"

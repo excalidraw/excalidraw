@@ -1,4 +1,4 @@
-import { ORIG_ID } from "@excalidraw/common";
+import { ORIG_ID } from "@excalidraw-modify/common";
 
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";

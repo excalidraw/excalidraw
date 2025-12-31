@@ -1,4 +1,4 @@
-import { KEYS } from "@excalidraw/common";
+import { KEYS } from "@excalidraw-modify/common";
 
 import {
   actionAlignVerticallyCentered,
@@ -8,17 +8,17 @@ import {
   actionAlignBottom,
   actionAlignLeft,
   actionAlignRight,
-} from "@excalidraw/excalidraw/actions";
-import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
-import { Excalidraw } from "@excalidraw/excalidraw";
+} from "@excalidraw-modify/excalidraw/actions";
+import { defaultLang, setLanguage } from "@excalidraw-modify/excalidraw/i18n";
+import { Excalidraw } from "@excalidraw-modify/excalidraw";
 
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { UI, Pointer, Keyboard } from "@excalidraw/excalidraw/tests/helpers/ui";
+import { API } from "@excalidraw-modify/excalidraw/tests/helpers/api";
+import { UI, Pointer, Keyboard } from "@excalidraw-modify/excalidraw/tests/helpers/ui";
 import {
   act,
   unmountComponent,
   render,
-} from "@excalidraw/excalidraw/tests/test-utils";
+} from "@excalidraw-modify/excalidraw/tests/test-utils";
 
 const mouse = new Pointer("mouse");
 

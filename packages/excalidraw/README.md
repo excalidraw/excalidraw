@@ -7,18 +7,18 @@
 Use `npm` or `yarn` to install the package.
 
 ```bash
-npm install react react-dom @excalidraw/excalidraw
+npm install react react-dom @excalidraw-modify/excalidraw
 # or
-yarn add react react-dom @excalidraw/excalidraw
+yarn add react react-dom @excalidraw-modify/excalidraw
 ```
 
-> **Note**: If you don't want to wait for the next stable release and try out the unreleased changes, use `@excalidraw/excalidraw@next`.
+> **Note**: If you don't want to wait for the next stable release and try out the unreleased changes, use `@excalidraw-modify/excalidraw@next`.
 
 #### Self-hosting fonts
 
-By default, Excalidraw will try to download all the used fonts from the [CDN](https://esm.run/@excalidraw/excalidraw/dist/prod).
+By default, Excalidraw will try to download all the used fonts from the [CDN](https://esm.run/@excalidraw-modify/excalidraw/dist/prod).
 
-For self-hosting purposes, you'll have to copy the content of the folder `node_modules/@excalidraw/excalidraw/dist/prod/fonts` to the path where your assets should be served from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
+For self-hosting purposes, you'll have to copy the content of the folder `node_modules/@excalidraw-modify/excalidraw/dist/prod/fonts` to the path where your assets should be served from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
 
 ```js
 <script>window.EXCALIDRAW_ASSET_PATH = "/";</script>
@@ -34,12 +34,12 @@ Go to [CodeSandbox](https://codesandbox.io/p/sandbox/github/excalidraw/excalidra
 
 ## Integration
 
-Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/integration).
+Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw-modify/excalidraw/integration).
 
 ## API
 
-Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api).
+Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw-modify/excalidraw/api).
 
 ## Contributing
 
-Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/contributing).
+Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw-modify/excalidraw/contributing).

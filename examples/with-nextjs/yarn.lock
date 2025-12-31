@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@excalidraw/excalidraw@workspace:^":
+"@excalidraw-modify/excalidraw@workspace:^":
   version "0.17.2"
-  resolved "https://registry.yarnpkg.com/@excalidraw/excalidraw/-/excalidraw-0.17.2.tgz#9a636a1e6bb3c88c5883347d3a7e75e9cce8ab96"
+  resolved "https://registry.yarnpkg.com/@excalidraw-modify/excalidraw/-/excalidraw-0.17.2.tgz#9a636a1e6bb3c88c5883347d3a7e75e9cce8ab96"
   integrity sha512-7pqUWD8+mPjDhF4XxG3gw4rvE2JGaLW3Vss5UZfTbITPxAtFaGEc1K081bncitnaYhUwN9ENJE0i87QB3poDwQ==
 
 "@next/env@14.0.4":

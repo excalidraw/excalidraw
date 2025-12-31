@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import type { Theme } from "@excalidraw/element/types";
+import type { Theme } from "@excalidraw-modify/element/types";
 
 import { defaultLang, languages, setLanguage } from "../i18n";
 

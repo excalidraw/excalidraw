@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-import { MQ_MIN_WIDTH_DESKTOP, type EditorInterface } from "@excalidraw/common";
+import { MQ_MIN_WIDTH_DESKTOP, type EditorInterface } from "@excalidraw-modify/common";
 
 import { t } from "../../i18n";
 import { Button } from "../Button";

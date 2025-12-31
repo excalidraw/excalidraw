@@ -1,12 +1,12 @@
 import { exportToCanvas, exportToSvg } from "@excalidraw/utils";
 
-import { FONT_FAMILY, FRAME_STYLE } from "@excalidraw/common";
+import { FONT_FAMILY, FRAME_STYLE } from "@excalidraw-modify/common";
 
 import type {
   ExcalidrawTextElement,
   FractionalIndex,
   NonDeletedExcalidrawElement,
-} from "@excalidraw/element/types";
+} from "@excalidraw-modify/element/types";
 
 import { prepareElementsForExport } from "../../data";
 import * as exportUtils from "../../scene/export";

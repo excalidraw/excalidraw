@@ -1,4 +1,4 @@
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import { API } from "@excalidraw-modify/excalidraw/tests/helpers/api";
 
 import { hasBoundTextElement } from "../src/typeChecks";
 

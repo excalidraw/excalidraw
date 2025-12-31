@@ -1,8 +1,8 @@
 import clsx from "clsx";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw-modify/element";
 
-import { invariant } from "@excalidraw/common";
+import { invariant } from "@excalidraw-modify/common";
 
 import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";

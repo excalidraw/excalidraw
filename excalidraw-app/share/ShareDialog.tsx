@@ -1,8 +1,8 @@
-import { trackEvent } from "@excalidraw/excalidraw/analytics";
-import { copyTextToSystemClipboard } from "@excalidraw/excalidraw/clipboard";
-import { Dialog } from "@excalidraw/excalidraw/components/Dialog";
-import { FilledButton } from "@excalidraw/excalidraw/components/FilledButton";
-import { TextField } from "@excalidraw/excalidraw/components/TextField";
+import { trackEvent } from "@excalidraw-modify/excalidraw/analytics";
+import { copyTextToSystemClipboard } from "@excalidraw-modify/excalidraw/clipboard";
+import { Dialog } from "@excalidraw-modify/excalidraw/components/Dialog";
+import { FilledButton } from "@excalidraw-modify/excalidraw/components/FilledButton";
+import { TextField } from "@excalidraw-modify/excalidraw/components/TextField";
 import {
   copyIcon,
   LinkIcon,
@@ -11,11 +11,11 @@ import {
   share,
   shareIOS,
   shareWindows,
-} from "@excalidraw/excalidraw/components/icons";
-import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
-import { useCopyStatus } from "@excalidraw/excalidraw/hooks/useCopiedIndicator";
-import { useI18n } from "@excalidraw/excalidraw/i18n";
-import { KEYS, getFrame } from "@excalidraw/common";
+} from "@excalidraw-modify/excalidraw/components/icons";
+import { useUIAppState } from "@excalidraw-modify/excalidraw/context/ui-appState";
+import { useCopyStatus } from "@excalidraw-modify/excalidraw/hooks/useCopiedIndicator";
+import { useI18n } from "@excalidraw-modify/excalidraw/i18n";
+import { KEYS, getFrame } from "@excalidraw-modify/common";
 import { useEffect, useRef, useState } from "react";
 
 import { atom, useAtom, useAtomValue } from "../app-jotai";

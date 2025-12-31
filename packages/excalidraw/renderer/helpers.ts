@@ -1,4 +1,4 @@
-import { THEME, THEME_FILTER } from "@excalidraw/common";
+import { THEME, THEME_FILTER } from "@excalidraw-modify/common";
 
 import type { StaticCanvasRenderConfig } from "../scene/types";
 import type { AppState, StaticCanvasAppState } from "../types";

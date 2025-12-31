@@ -5,22 +5,22 @@
 Use `npm` or `yarn` to install the package.
 
 ```bash
-npm install react react-dom @excalidraw/excalidraw
+npm install react react-dom @excalidraw-modify/excalidraw
 # or
-yarn add react react-dom @excalidraw/excalidraw
+yarn add react react-dom @excalidraw-modify/excalidraw
 ```
 
 :::tip
 
-**If you don't want to wait for the next stable release and try out the unreleased changes you can use `@excalidraw/excalidraw@next`.**
+**If you don't want to wait for the next stable release and try out the unreleased changes you can use `@excalidraw-modify/excalidraw@next`.**
 
 :::
 
 ### Self-hosting fonts
 
-By default, Excalidraw will try to download all the used fonts from the [CDN](https://esm.run/@excalidraw/excalidraw/dist/prod).
+By default, Excalidraw will try to download all the used fonts from the [CDN](https://esm.run/@excalidraw-modify/excalidraw/dist/prod).
 
-For self-hosting purposes, you'll have to copy the content of the folder `node_modules/@excalidraw/excalidraw/dist/prod/fonts` to the path where your assets should be served from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
+For self-hosting purposes, you'll have to copy the content of the folder `node_modules/@excalidraw-modify/excalidraw/dist/prod/fonts` to the path where your assets should be served from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
 
 ```js
 window.EXCALIDRAW_ASSET_PATH = "/";

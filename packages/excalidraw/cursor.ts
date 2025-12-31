@@ -1,6 +1,6 @@
 import OpenColor from "open-color";
 
-import { CURSOR_TYPE, MIME_TYPES, THEME } from "@excalidraw/common";
+import { CURSOR_TYPE, MIME_TYPES, THEME } from "@excalidraw-modify/common";
 
 import { isHandToolActive, isEraserActive } from "./appState";
 

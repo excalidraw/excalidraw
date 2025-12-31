@@ -8,13 +8,13 @@ import {
   KEYS,
   capitalizeString,
   isWritableElement,
-} from "@excalidraw/common";
+} from "@excalidraw-modify/common";
 
-import { actionToggleShapeSwitch } from "@excalidraw/excalidraw/actions/actionToggleShapeSwitch";
+import { actionToggleShapeSwitch } from "@excalidraw-modify/excalidraw/actions/actionToggleShapeSwitch";
 
-import { getShortcutKey } from "@excalidraw/excalidraw/shortcut";
+import { getShortcutKey } from "@excalidraw-modify/excalidraw/shortcut";
 
-import type { MarkRequired } from "@excalidraw/common/utility-types";
+import type { MarkRequired } from "@excalidraw-modify/common/utility-types";
 
 import {
   actionClearCanvas,

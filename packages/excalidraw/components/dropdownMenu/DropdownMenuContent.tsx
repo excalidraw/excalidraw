@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import React, { useEffect, useRef } from "react";
 
-import { EVENT, KEYS } from "@excalidraw/common";
+import { EVENT, KEYS } from "@excalidraw-modify/common";
 
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useStable } from "../../hooks/useStable";

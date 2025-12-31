@@ -10,7 +10,7 @@ import {
   curveLength,
   curvePointAtLength,
   lineSegment,
-} from "@excalidraw/math";
+} from "@excalidraw-modify/math";
 
 import { getCurvePathOps } from "@excalidraw/utils/shape";
 
@@ -22,7 +22,7 @@ import {
   invariant,
   isShallowEqual,
   getFeatureFlag,
-} from "@excalidraw/common";
+} from "@excalidraw-modify/common";
 
 import {
   deconstructLinearOrFreeDrawElement,
@@ -30,9 +30,9 @@ import {
   moveArrowAboveBindable,
   projectFixedPointOntoDiagonal,
   type Store,
-} from "@excalidraw/element";
+} from "@excalidraw-modify/element";
 
-import type { Radians } from "@excalidraw/math";
+import type { Radians } from "@excalidraw-modify/math";
 
 import type {
   AppState,
@@ -41,8 +41,8 @@ import type {
   AppClassProperties,
   NullableGridSize,
   Zoom,
-} from "@excalidraw/excalidraw/types";
-import type { Bounds } from "@excalidraw/common";
+} from "@excalidraw-modify/excalidraw/types";
+import type { Bounds } from "@excalidraw-modify/common";
 
 import {
   calculateFixedPointForNonElbowArrowBinding,

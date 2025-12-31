@@ -1,4 +1,4 @@
-import { promiseTry, LOCAL_FONT_PROTOCOL } from "@excalidraw/common";
+import { promiseTry, LOCAL_FONT_PROTOCOL } from "@excalidraw-modify/common";
 
 import { subsetWoff2GlyphsByCodepoints } from "../subset/subset-main";
 
@@ -11,7 +11,7 @@ export class ExcalidrawFontFace {
   private static readonly ASSETS_FALLBACK_URL = `https://esm.sh/${
     import.meta.env.PKG_NAME
       ? `${import.meta.env.PKG_NAME}@${import.meta.env.PKG_VERSION}` // is provided during package build
-      : "@excalidraw/excalidraw" // fallback to the latest package version (i.e. for app)
+      : "@excalidraw-modify/excalidraw" // fallback to the latest package version (i.e. for app)
   }/dist/prod/`;
 
   constructor(family: string, uri: string, descriptors?: FontFaceDescriptors) {

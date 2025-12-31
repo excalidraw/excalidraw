@@ -1,8 +1,8 @@
 import React from "react";
 
-import { EXPORT_DATA_TYPES, MIME_TYPES } from "@excalidraw/common";
+import { EXPORT_DATA_TYPES, MIME_TYPES } from "@excalidraw-modify/common";
 
-import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+import type { ExcalidrawTextElement } from "@excalidraw-modify/element/types";
 
 import { getDefaultAppState } from "../appState";
 import { Excalidraw } from "../index";

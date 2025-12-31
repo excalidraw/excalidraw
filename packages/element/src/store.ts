@@ -6,13 +6,13 @@ import {
   randomId,
   Emitter,
   toIterable,
-} from "@excalidraw/common";
+} from "@excalidraw-modify/common";
 
-import type App from "@excalidraw/excalidraw/components/App";
+import type App from "@excalidraw-modify/excalidraw/components/App";
 
-import type { DTO, ValueOf } from "@excalidraw/common/utility-types";
+import type { DTO, ValueOf } from "@excalidraw-modify/common/utility-types";
 
-import type { AppState, ObservedAppState } from "@excalidraw/excalidraw/types";
+import type { AppState, ObservedAppState } from "@excalidraw-modify/excalidraw/types";
 
 import { deepCopyElement } from "./duplicate";
 import { newElementWith } from "./mutateElement";

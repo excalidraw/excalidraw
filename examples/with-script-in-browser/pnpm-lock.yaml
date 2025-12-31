@@ -5,13 +5,13 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  excalidraw: link:C:/Users/Administrator/AppData/Local/pnpm/global/5/node_modules/@excalidraw/excalidraw
+  excalidraw: link:C:/Users/Administrator/AppData/Local/pnpm/global/5/node_modules/@excalidraw-modify/excalidraw
 
 importers:
 
   .:
     dependencies:
-      '@excalidraw/excalidraw':
+      '@excalidraw-modify/excalidraw':
         specifier: link:../../packages/excalidraw
         version: link:../../packages/excalidraw
       browser-fs-access:

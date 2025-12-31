@@ -2,7 +2,7 @@ import { queryByText, queryByTestId } from "@testing-library/react";
 import React from "react";
 import { useMemo } from "react";
 
-import { THEME } from "@excalidraw/common";
+import { THEME } from "@excalidraw-modify/common";
 
 import { t } from "../i18n";
 import { Excalidraw, Footer, MainMenu } from "../index";

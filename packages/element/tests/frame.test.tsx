@@ -1,14 +1,14 @@
 import {
   convertToExcalidrawElements,
   Excalidraw,
-} from "@excalidraw/excalidraw";
+} from "@excalidraw-modify/excalidraw";
 
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
+import { API } from "@excalidraw-modify/excalidraw/tests/helpers/api";
+import { Keyboard, Pointer } from "@excalidraw-modify/excalidraw/tests/helpers/ui";
 import {
   getCloneByOrigId,
   render,
-} from "@excalidraw/excalidraw/tests/test-utils";
+} from "@excalidraw-modify/excalidraw/tests/test-utils";
 
 import type { ExcalidrawElement } from "../src/types";
 

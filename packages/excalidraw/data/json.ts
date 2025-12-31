@@ -4,9 +4,9 @@ import {
   getExportSource,
   MIME_TYPES,
   VERSIONS,
-} from "@excalidraw/common";
+} from "@excalidraw-modify/common";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw-modify/element/types";
 
 import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 

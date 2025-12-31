@@ -1,6 +1,6 @@
-import { KEYS } from "@excalidraw/common";
+import { KEYS } from "@excalidraw-modify/common";
 
-import type { Node } from "@excalidraw/common";
+import type { Node } from "@excalidraw-modify/common";
 
 import { type FontDescriptor } from "./FontPickerList";
 

@@ -14,29 +14,29 @@ import {
   pointDistance,
   type LocalPoint,
   pointRotateRads,
-} from "@excalidraw/math";
+} from "@excalidraw-modify/math";
 import {
   ROUGHNESS,
   isTransparent,
   assertNever,
   COLOR_PALETTE,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
-} from "@excalidraw/common";
+} from "@excalidraw-modify/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
 
-import type { GlobalPoint } from "@excalidraw/math";
+import type { GlobalPoint } from "@excalidraw-modify/math";
 
-import type { Mutable } from "@excalidraw/common/utility-types";
+import type { Mutable } from "@excalidraw-modify/common/utility-types";
 
 import type {
   AppState,
   EmbedsValidationStatus,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw-modify/excalidraw/types";
 import type {
   ElementShape,
   ElementShapes,
-} from "@excalidraw/excalidraw/scene/types";
+} from "@excalidraw-modify/excalidraw/scene/types";
 
 import { elementWithCanvasCache } from "./renderElement";
 

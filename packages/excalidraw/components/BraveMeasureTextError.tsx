@@ -19,7 +19,7 @@ const BraveMeasureTextError = () => {
         <Trans
           i18nKey="errors.brave_measure_text_error.line3"
           link={(el) => (
-            <a href="http://docs.excalidraw.com/docs/@excalidraw/excalidraw/faq#turning-off-aggresive-block-fingerprinting-in-brave-browser">
+            <a href="http://docs.excalidraw.com/docs/@excalidraw-modify/excalidraw/faq#turning-off-aggresive-block-fingerprinting-in-brave-browser">
               {el}
             </a>
           )}

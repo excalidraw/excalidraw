@@ -47,7 +47,7 @@ A function which returns the `width`, `height`, and optionally `scale` (defaults
 **How to use**
 
 ```js
-import { exportToCanvas } from "@excalidraw/excalidraw";
+import { exportToCanvas } from "@excalidraw-modify/excalidraw";
 ```
 
 This function returns the canvas with the exported elements, appState and dimensions.
@@ -122,7 +122,7 @@ exportToBlob(<br/>&nbsp;
 **How to use**
 
 ```js
-import { exportToBlob } from "@excalidraw/excalidraw";
+import { exportToBlob } from "@excalidraw-modify/excalidraw";
 ```
 
 Returns a promise which resolves with a [blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob). It internally uses [canvas.ToBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob).
@@ -181,7 +181,7 @@ exportToClipboard(<br/>&nbsp;
 **How to use**
 
 ```js
-import { exportToClipboard } from "@excalidraw/excalidraw";
+import { exportToClipboard } from "@excalidraw-modify/excalidraw";
 ```
 
 Copies the scene data in the specified format (determined by `type`) to clipboard.

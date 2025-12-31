@@ -8,7 +8,7 @@ import {
   pointFrom,
   pointRotateRads,
   type Radians,
-} from "@excalidraw/math";
+} from "@excalidraw-modify/math";
 
 import {
   BOUND_TEXT_PADDING,
@@ -22,7 +22,7 @@ import {
   isRTL,
   getVerticalOffset,
   invariant,
-} from "@excalidraw/common";
+} from "@excalidraw-modify/common";
 
 import type {
   AppState,
@@ -32,13 +32,13 @@ import type {
   ElementsPendingErasure,
   PendingExcalidrawElements,
   NormalizedZoomValue,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw-modify/excalidraw/types";
 
 import type {
   StaticCanvasRenderConfig,
   RenderableElementsMap,
   InteractiveCanvasRenderConfig,
-} from "@excalidraw/excalidraw/scene/types";
+} from "@excalidraw-modify/excalidraw/scene/types";
 
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";

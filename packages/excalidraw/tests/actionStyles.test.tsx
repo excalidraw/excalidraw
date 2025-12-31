@@ -1,6 +1,6 @@
 import React from "react";
 
-import { CODES } from "@excalidraw/common";
+import { CODES } from "@excalidraw-modify/common";
 
 import { copiedStyles } from "../actions/actionStyles";
 import { Excalidraw } from "../index";

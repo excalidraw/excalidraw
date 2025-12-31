@@ -16,12 +16,12 @@ import {
   addEventListener,
   EVENT,
   CLASSES,
-} from "@excalidraw/common";
+} from "@excalidraw-modify/common";
 
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
-} from "@excalidraw/element/types";
+} from "@excalidraw-modify/element/types";
 
 import { trackEvent } from "../analytics";
 import { useUIAppState } from "../context/ui-appState";

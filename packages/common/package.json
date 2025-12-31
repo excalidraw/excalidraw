@@ -1,6 +1,6 @@
 {
-  "name": "@excalidraw/common",
-  "version": "0.18.0",
+  "name": "@excalidraw-modify/common",
+  "version": "0.18.0-8b71db27",
   "type": "module",
   "types": "./dist/types/common/src/index.d.ts",
   "main": "./dist/prod/index.js",

@@ -1,4 +1,4 @@
-import { MIME_TYPES } from "@excalidraw/excalidraw";
+import { MIME_TYPES } from "@excalidraw-modify/excalidraw";
 import { fileOpen as _fileOpen } from "browser-fs-access";
 import { unstable_batchedUpdates } from "react-dom";
 

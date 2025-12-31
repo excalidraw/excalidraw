@@ -1,8 +1,8 @@
 import React from "react";
 
-import { SVG_NS } from "@excalidraw/common";
+import { SVG_NS } from "@excalidraw-modify/common";
 
-import type { FileId } from "@excalidraw/element/types";
+import type { FileId } from "@excalidraw-modify/element/types";
 
 import { getDefaultAppState } from "../appState";
 import { getDataURL } from "../data/blob";

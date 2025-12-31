@@ -18,7 +18,7 @@ At minimum, each sidebar needs to have a unique `name` prop, and render some con
 
 Unless `docked={true}` is passed, the sidebar will close when the user clicks outside of it. It can also be closed using the close button in the header, if you render the `<Sidebar.Header>` component.
 
-Further, if the sidebader doesn't comfortably fit in the editor, it won't be dockable. To decide the breakpoint for docking you can use [UIOptions.dockedSidebarBreakpoint](/docs/@excalidraw/excalidraw/api/props/ui-options#dockedsidebarbreakpoint).
+Further, if the sidebader doesn't comfortably fit in the editor, it won't be dockable. To decide the breakpoint for docking you can use [UIOptions.dockedSidebarBreakpoint](/docs/@excalidraw-modify/excalidraw/api/props/ui-options#dockedsidebarbreakpoint).
 
 To make your sidebar user-dockable, you need to supply `props.docked` (current docked state) alongside `props.onDock` callback (to listen for and handle docked state changes). The component doesn't track local state for the `docked` prop, so you need to manage it yourself.
 
@@ -80,7 +80,7 @@ A given tab trigger button that switches to a given sidebar tab. It must be rend
 | `className` | `string` | No |  |
 | `style` | `React.CSSProperties` | No |  |
 
-You can use the [`ref.toggleSidebar({ name: "custom" })`](/docs/@excalidraw/excalidraw/api/props/excalidraw-api#toggleSidebar) api to control the sidebar, but we export a trigger button to make UI use cases easier.
+You can use the [`ref.toggleSidebar({ name: "custom" })`](/docs/@excalidraw-modify/excalidraw/api/props/excalidraw-api#toggleSidebar) api to control the sidebar, but we export a trigger button to make UI use cases easier.
 
 ## Example
 

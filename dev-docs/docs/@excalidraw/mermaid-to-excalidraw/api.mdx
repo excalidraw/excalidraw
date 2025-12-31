@@ -2,7 +2,7 @@
 
 At the moment the mermaid-to-excalidraw works in two steps. First, you call `parseMermaidToExcalidraw(mermaidSyntax)` on the mermaid diagram definition string, which resolves with elements in a skeleton format — a simplified excalidraw JSON format (docs coming soon). You then pass them to `convertToExcalidrawElements(elements)` to get the fully qualified excalidraw elements you can render in the editor.
 
-The need for these two steps is due to the [@excalidraw/excalidraw](/docs/@excalidraw/excalidraw/installation) being a **UMD** build so we currently cannot import the `convertToExcalidrawElements()` util alone, until we support a tree-shakeable **ESM** build.
+The need for these two steps is due to the [@excalidraw-modify/excalidraw](/docs/@excalidraw-modify/excalidraw/installation) being a **UMD** build so we currently cannot import the `convertToExcalidrawElements()` util alone, until we support a tree-shakeable **ESM** build.
 
 ## parseMermaidToExcalidraw
 
@@ -12,7 +12,7 @@ This API receives the mermaid syntax as the input, and resolves to skeleton Exca
 
 ```ts
 import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
-import { convertToExcalidrawElements}  from "@excalidraw/excalidraw"
+import { convertToExcalidrawElements}  from "@excalidraw-modify/excalidraw"
 try {
   const { elements, files } = await parseMermaidToExcalidraw(mermaidSyntax: string, {
     fontSize: number,
