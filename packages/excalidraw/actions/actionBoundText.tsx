@@ -153,18 +153,26 @@ export const actionBindText = register({
       textElement = selectedElements[1] as ExcalidrawTextElement;
       container = selectedElements[0] as ExcalidrawTextContainer;
     }
+
+    const textLink = textElement.link; //zsviczian
+    const mergedLink = //zsviczian
+      textLink && container.link && container.link !== textLink
+        ? `${container.link} ${textLink}`
+        : textLink ?? container.link ?? null;
     app.scene.mutateElement(textElement, {
       containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
       textAlign: TEXT_ALIGN.CENTER,
       autoResize: true,
       angle: (isArrowElement(container) ? 0 : container?.angle ?? 0) as Radians,
+      link: null, //zsviczian
     });
     app.scene.mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
         type: "text",
         id: textElement.id,
       }),
+      link: mergedLink, //zsviczian
     });
     const originalContainerHeight = container.height;
     redrawTextBoundingBox(textElement, container, app.scene);
@@ -275,6 +283,8 @@ export const actionWrapTextInContainer = register({
           frameId: textElement.frameId,
         });
 
+        (container as Mutable<typeof container>).link = textElement.link; //zsviczian
+
         // update bindings
         if (textElement.boundElements?.length) {
           const linearElementIds = textElement.boundElements
@@ -313,6 +323,7 @@ export const actionWrapTextInContainer = register({
           boundElements: null,
           textAlign: TEXT_ALIGN.CENTER,
           autoResize: true,
+          link: null, //zsviczian
         });
 
         redrawTextBoundingBox(textElement, container, app.scene);

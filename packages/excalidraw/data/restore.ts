@@ -211,7 +211,8 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
 };
 
 const restoreElementWithProperties = <
-  T extends Required<Omit<ExcalidrawElement, "customData">> & {
+  T extends Required<Omit<ExcalidrawElement, "customData" | "hasTextLink">> & {
+    hasTextLink?: ExcalidrawElement["hasTextLink"]; //zsviczian
     customData?: ExcalidrawElement["customData"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
@@ -271,6 +272,7 @@ const restoreElementWithProperties = <
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
     link: element.link ? normalizeLink(element.link) : null,
+    hasTextLink: element.hasTextLink ?? false, //zsviczian
     locked: element.locked ?? false,
   };
 

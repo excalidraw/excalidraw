@@ -704,7 +704,6 @@ export interface ExcalidrawProps {
   ) => JSX.Element | null;
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
-  insertLinkAction?: (linkVal: string) => void; //zsviczian
   renderScrollbars?: boolean;
 }
 

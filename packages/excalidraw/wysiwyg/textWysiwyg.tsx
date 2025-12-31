@@ -59,6 +59,7 @@ import {
 
 import type App from "../components/App";
 import type { AppState } from "../types";
+import { attachInlineLinkSuggester } from "../obsidianUtils";
 
 const getTransform = (
   width: number,
@@ -281,6 +282,7 @@ export const textWysiwyg = ({
   };
 
   const editable = document.createElement("textarea");
+  attachInlineLinkSuggester(editable, undefined, excalidrawContainer); //zsviczian
 
   editable.dir = "auto";
   editable.tabIndex = 0;

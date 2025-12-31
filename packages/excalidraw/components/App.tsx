@@ -491,7 +491,7 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionName, ActionResult } from "../actions/types";
-import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, isTouchInPenMode, isPanWithRightMouseEnabled, shouldDisableZoom, isContextMenuDisabled, refreshAllArrows } from "../obsidianUtils";
+import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, isTouchInPenMode, isPanWithRightMouseEnabled, shouldDisableZoom, isContextMenuDisabled, refreshAllArrows, syncElementLinkWithText } from "../obsidianUtils";
 import { initializeObsidianUtils } from "@excalidraw/common";
 import { getTooltipDiv } from "./Tooltip";
 import { getFontSize } from "../actions/actionProperties";
@@ -5943,6 +5943,7 @@ class App extends React.Component<AppProps, AppState> {
       isDeleted: boolean,
       rawText?: string, //zsviczian
       link?: string, //zsviczian
+      hasTextLink?: boolean, //zsviczian
     ) => {
       this.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
@@ -5952,6 +5953,7 @@ class App extends React.Component<AppProps, AppState> {
               originalText: nextOriginalText,
               rawText: rawText ?? nextOriginalText, //zsviczian
               link, //zsviczian
+              hasTextLink: hasTextLink ?? _element.hasTextLink, //zsviczian
               isDeleted: isDeleted ?? _element.isDeleted,
               // returns (wrapped) text and new dimensions
               ...refreshTextDimensions(
@@ -6022,6 +6024,7 @@ class App extends React.Component<AppProps, AppState> {
         //zsviczian insert start
         const rawText = nextOriginalText; //should this be originalText??
         let link = undefined;
+        let hasTextLink = false;
         if (this.props.onBeforeTextSubmit) {
           const _element = this.scene
             .getElementsIncludingDeleted()
@@ -6043,11 +6046,12 @@ class App extends React.Component<AppProps, AppState> {
                 isDeleted,
               );
             nextOriginalText = updatedNextOriginalText ?? nextOriginalText;
-            link = nextLink;
+            hasTextLink = !!nextLink;
+            link = syncElementLinkWithText() ? nextLink : element.link ?? undefined;
           }
         }
         //zsviczian insert end
-        updateElement(nextOriginalText, isDeleted, rawText, link); //zsviczian (added rawText, link, text)
+        updateElement(nextOriginalText, isDeleted, rawText, link, hasTextLink); //zsviczian (added rawText, link, text)
 
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)

@@ -47,6 +47,7 @@ import { FreedrawIcon, TrashIcon, elementLinkIcon, searchIcon } from "../icons";
 import { getSelectedElements } from "../../scene";
 
 import { getLinkHandleFromCoords } from "./helpers";
+import { attachInlineLinkSuggester } from "../../obsidianUtils"; //zsviczian
 
 import "./Hyperlink.scss";
 
@@ -195,6 +196,16 @@ export const Hyperlink = ({
     }
   }, [isEditing, editorInterface.formFactor, editorInterface.isTouchScreen]);
 
+  //zsviczian - attach link suggester
+  useEffect(() => {
+    if (!isEditing || !inputRef.current) {
+      return;
+    }
+    const keyBlocker = attachInlineLinkSuggester(inputRef.current);
+    return () => keyBlocker?.close();
+  }, [isEditing]);
+  //zsviczian - end
+
   useEffect(() => {
     let timeoutId: number | null = null;
 
@@ -322,24 +333,6 @@ export const Hyperlink = ({
             icon={FreedrawIcon}
           />
         )}
-        {
-          //zsviczian - show the Obsidian search button
-          Boolean(appProps.insertLinkAction) && (
-            <ToolButton
-              type="button"
-              title="Obsidian Search"
-              aria-label="Obsidian Search"
-              label="Obsidian Search"
-              onClick={() => {
-                if (appProps.insertLinkAction) {
-                  setAppState({ showHyperlinkPopup: false });
-                  appProps.insertLinkAction(inputVal);
-                }
-              }}
-              icon={searchIcon}
-            />
-          )
-        }
         {/* //zsviczian - do not show the link to element button
         <ToolButton
           type="button"

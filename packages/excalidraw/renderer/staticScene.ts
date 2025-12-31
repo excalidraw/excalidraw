@@ -161,7 +161,7 @@ const renderLinkIcon = (
   appState: StaticCanvasAppState,
   elementsMap: ElementsMap,
 ) => {
-  if (element.link && !appState.selectedElementIds[element.id]) {
+  if ((element.link || element.hasTextLink) && !appState.selectedElementIds[element.id]) { //zsviczian
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const [x, y, width, height] = getLinkHandleFromCoords(
       [x1, y1, x2, y2],
@@ -174,7 +174,7 @@ const renderLinkIcon = (
     context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
     context.rotate(element.angle);
 
-    const canvasKey = isElementLink(element.link)
+    const canvasKey = !! element.link && isElementLink(element.link) //zsviczian
       ? "elementLink"
       : "regularLink";
 

@@ -404,3 +404,19 @@ export const refreshAllArrows = (scene: Scene, store: Store) => {
     scene.triggerUpdate();
   }
 };
+
+interface KeyBlocker {
+  isBlockingKeys(): boolean;
+  close(): void;
+}
+
+export const attachInlineLinkSuggester = (
+  inputEl: HTMLInputElement|HTMLTextAreaElement,
+  widthWrapper?: HTMLElement,
+  container: HTMLDivElement | null = null,
+): KeyBlocker =>
+  getHostPlugin().attachInlineLinkSuggester(inputEl, widthWrapper, container);
+
+export const syncElementLinkWithText = (): boolean => {
+  return getHostPlugin().settings.syncElementLinkWithText ?? true;
+}
