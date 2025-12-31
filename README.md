@@ -43,7 +43,7 @@
     </a>
     <figcaption>
       <p align="center">
-        Create beautiful hand-drawn like diagrams, wireframes, or whatever you like.
+        Create beautiful hand-drawn-style diagrams, wireframes, or whatever you like.
       </p>
     </figcaption>
   </figure>
