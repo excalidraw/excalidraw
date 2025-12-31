@@ -157,3 +157,33 @@ export type ColorPickerType =
   | "canvasBackground"
   | "elementBackground"
   | "elementStroke";
+
+export const colorToHex = (color: string): string => {
+  if (!color) {
+    return "#000000";
+  }
+
+  if (color.startsWith("#") && color.length === 7) {
+    return color;
+  }
+
+  const node = document.createElement("div");
+  node.style.color = color;
+  document.body.appendChild(node);
+  const computedColor = getComputedStyle(node).color;
+  document.body.removeChild(node);
+
+  const rgb = computedColor
+    .replace(/^(rgb|rgba)\(/, "")
+    .replace(/\)$/, "")
+    .replace(/\s/g, "")
+    .split(",");
+  const r = parseInt(rgb[0]);
+  const g = parseInt(rgb[1]);
+  const b = parseInt(rgb[2]);
+
+  return (
+    "#" +
+    ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()
+  );
+};

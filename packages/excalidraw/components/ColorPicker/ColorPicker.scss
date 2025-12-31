@@ -85,6 +85,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+
       svg {
         color: var(--color-gray-60);
         width: 1.25rem;
@@ -96,6 +97,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+
       svg {
         width: 100%;
         height: 100%;
@@ -150,9 +152,11 @@
 
     &--no-focus-visible {
       border: 0;
+
       &::after {
         display: none;
       }
+
       &:focus-visible {
         outline: none !important;
       }
@@ -206,7 +210,7 @@
     column-gap: 0.5rem;
   }
 
-  .color-picker-control-container + .popover {
+  .color-picker-control-container+.popover {
     position: static;
   }
 
@@ -329,8 +333,7 @@
 
   .color-picker-transparent,
   .color-picker-label-swatch {
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
-      left center;
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==") left center;
   }
 
   .color-picker-hash {
@@ -369,7 +372,7 @@
 
   .color-picker__input-label {
     display: grid;
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: auto 1fr auto auto auto auto;
     gap: 8px;
     align-items: center;
     border: 1px solid var(--default-border-color);
@@ -488,8 +491,36 @@
     .color-picker-type-elementBackground .color-picker-keybinding {
       color: $oc-black;
     }
+
     .color-picker-swatch[aria-label="transparent"] .color-picker-keybinding {
       color: $oc-black;
+    }
+  }
+
+  .color-picker-native-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    height: 100%;
+    padding: 0 4px;
+  }
+
+  .color-picker-native-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    &::-webkit-color-swatch {
+      border: 1px solid var(--default-border-color);
+      border-radius: 4px;
     }
   }
 }

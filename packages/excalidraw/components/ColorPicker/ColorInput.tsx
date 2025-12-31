@@ -11,7 +11,7 @@ import { activeEyeDropperAtom } from "../EyeDropper";
 import { eyeDropperIcon } from "../icons";
 
 import { getColor } from "./ColorPicker";
-import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+import { activeColorPickerSectionAtom, colorToHex } from "./colorPickerUtils";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
@@ -108,6 +108,26 @@ export const ColorInput = ({
               backgroundColor: "var(--default-border-color)",
             }}
           />
+          <label
+            className="color-picker-native-label"
+            title={t("colorPicker.color")}
+          >
+            <input
+              type="color"
+              value={colorToHex(innerValue || color)}
+              onChange={(e) => {
+                onChange(e.target.value);
+              }}
+              className="color-picker-native-input"
+            />
+          </label>
+          <div
+            style={{
+              width: "1px",
+              height: "1.25rem",
+              backgroundColor: "var(--default-border-color)",
+            }}
+          />
           <div
             ref={eyeDropperTriggerRef}
             className={clsx("excalidraw-eye-dropper-trigger", {
@@ -118,10 +138,10 @@ export const ColorInput = ({
                 s
                   ? null
                   : {
-                      keepOpenOnAlt: false,
-                      onSelect: (color) => onChange(color),
-                      colorPickerType,
-                    },
+                    keepOpenOnAlt: false,
+                    onSelect: (color) => onChange(color),
+                    colorPickerType,
+                  },
               )
             }
             title={`${t(
