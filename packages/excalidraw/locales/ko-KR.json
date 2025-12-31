@@ -46,10 +46,10 @@
     "arrowhead_triangle_outline": "삼각형(윤곽선)",
     "arrowhead_diamond": "마름모",
     "arrowhead_diamond_outline": "마름모(윤곽선)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "arrowhead_crowfoot_many": "까마귀발 (다수)",
+    "arrowhead_crowfoot_one": "까마귀발 (하나)",
+    "arrowhead_crowfoot_one_or_many": "까마귀발 (하나 또는 다수)",
+    "more_options": "더 많은 옵션",
     "arrowtypes": "화살표 모양",
     "arrowtype_sharp": "뾰족한 화살표",
     "arrowtype_round": "곡선 화살표",
@@ -129,21 +129,21 @@
     "createContainerFromText": "텍스트를 컨테이너에 담기",
     "link": {
       "edit": "링크 수정하기",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "임베드 링크 수정",
+      "create": "링크 추가",
       "label": "링크",
       "labelEmbed": "링크 & 임베드",
       "empty": "링크를 지정하지 않았습니다",
-      "hint": "",
-      "goToElement": ""
+      "hint": "링크를 입력하거나 붙여넣으세요",
+      "goToElement": "대상 요소로 이동"
     },
     "lineEditor": {
       "edit": "선 수정하기",
       "editArrow": "화살표 수정"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "다각형 끊기",
+      "convertToPolygon": "다각형으로 변환"
     },
     "elementLock": {
       "lock": "잠금",
@@ -165,28 +165,28 @@
     "zoomToFit": "모든 요소가 보이도록 확대/축소",
     "installPWA": "Excalidraw 설치(PWA)",
     "autoResize": "텍스트 크기 자동 조절 켜기",
-    "imageCropping": "",
-    "unCroppedDimension": "",
-    "copyElementLink": "",
-    "linkToElement": "",
-    "wrapSelectionInFrame": "",
-    "tab": "",
-    "shapeSwitch": ""
+    "imageCropping": "이미지 자르기",
+    "unCroppedDimension": "자르기 전 크기",
+    "copyElementLink": "요소 링크 복사",
+    "linkToElement": "요소에 링크",
+    "wrapSelectionInFrame": "선택 영역을 프레임으로 감싸기",
+    "tab": "탭",
+    "shapeSwitch": "도형 전환"
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "요소에 링크",
+    "desc": "캔버스의 도형을 클릭하거나 링크를 붙여넣으세요.",
+    "notFound": "캔버스에서 연결된 요소를 찾을 수 없습니다."
   },
   "library": {
     "noItems": "추가된 아이템 없음",
     "hint_emptyLibrary": "캔버스 위에서 아이템을 선택하여 여기에 추가를 하거나, 아래의 공용 저장소에서 라이브러리를 설치하세요.",
     "hint_emptyPrivateLibrary": "캔버스 위에서 아이템을 선택하여 여기 추가하세요.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "라이브러리 검색",
+      "heading": "라이브러리 검색 결과",
+      "noResults": "일치하는 항목 없음...",
+      "clearSearch": "검색 지우기"
     }
   },
   "search": {
@@ -195,8 +195,8 @@
     "singleResult": "개의 결과",
     "multipleResults": "개의 결과",
     "placeholder": "캔버스에서 텍스트 찾기...",
-    "frames": "",
-    "texts": ""
+    "frames": "프레임",
+    "texts": "텍스트"
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -230,11 +230,11 @@
     "objectsSnapMode": "다른 요소들에 정렬시키기",
     "exitZenMode": "젠 모드 종료하기",
     "cancel": "취소",
-    "saveLibNames": "",
+    "saveLibNames": "이름 저장 및 종료",
     "clear": "지우기",
     "remove": "삭제",
     "embed": "임베딩 토글",
-    "publishLibrary": "",
+    "publishLibrary": "게시 또는 이름 변경",
     "submit": "제출",
     "confirm": "확인",
     "embeddableInteractionButton": "클릭하여 상호작용"
@@ -261,7 +261,7 @@
     "removeItemsFromsLibrary": "{{count}}개의 아이템을 라이브러리에서 삭제하시겠습니까?",
     "invalidEncryptionKey": "암호화 키는 반드시 22글자여야 합니다. 실시간 협업이 비활성화됩니다.",
     "collabOfflineWarning": "인터넷에 연결되어 있지 않습니다.\n변경 사항들이 저장되지 않습니다!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "브라우저 저장 공간이 초과되었습니다. 변경 사항이 저장되지 않습니다."
   },
   "errors": {
     "unsupportedFileType": "지원하지 않는 파일 형식 입니다.",
@@ -292,7 +292,7 @@
   },
   "toolBar": {
     "selection": "선택",
-    "lasso": "",
+    "lasso": "올가미 선택",
     "image": "이미지 삽입",
     "rectangle": "사각형",
     "diamond": "다이아몬드",
@@ -313,7 +313,7 @@
     "hand": "손 (패닝 도구)",
     "extraTools": "다른 도구",
     "mermaidToExcalidraw": "Mermaid를 Excalidraw로",
-    "convertElementType": ""
+    "convertElementType": "도형 종류 변경"
   },
   "element": {
     "rectangle": "직사각형",
@@ -337,34 +337,34 @@
     "shapes": "모양"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} 으로 검색 닫기",
+    "canvasPanning": "캔버스를 이동하려면 {{shortcut_1}} 또는 {{shortcut_2}}를 누른 채 드래그하거나 손 도구를 사용하세요",
     "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요. {{shortcut}}을 눌러 화살표 모양을 변경하세요.",
+    "arrowBindModifiers": "{{shortcut_1}}을 눌러 바인딩을 비활성화하거나, {{shortcut_2}}를 눌러 고정된 지점에 바인딩하세요",
     "freeDraw": "클릭 후 드래그하세요. 완료되면 놓으세요.",
     "text": "팁: 선택 툴로 아무 곳이나 더블 클릭해 텍스트를 추가할 수도 있습니다.",
     "embeddable": "클릭 및 드래그하여 웹사이트 임베드 만들기",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "text_selected": "더블 클릭하거나 {{shortcut}}을 눌러 텍스트 수정",
+    "text_editing": "{{shortcut_1}} 또는 {{shortcut_2}}를 눌러 편집 완료",
+    "linearElementMulti": "마지막 점을 클릭하거나 {{shortcut_1}} 또는 {{shortcut_2}}를 눌러 완료",
+    "lockAngle": "{{shortcut}}을 눌러 각도 제한",
+    "resize": "{{shortcut_1}}을 눌러 비율 유지, {{shortcut_2}}를 눌러 중앙에서 크기 조절",
+    "resizeImage": "{{shortcut_1}}을 눌러 자유롭게 크기 조절, {{shortcut_2}}를 눌러 중앙에서 크기 조절",
+    "rotate": "{{shortcut}}을 눌러 각도 제한",
+    "lineEditor_info": "{{shortcut_1}}을 누르고 더블 클릭하거나 {{shortcut_2}}를 눌러 점 수정",
+    "lineEditor_line_info": "더블 클릭하거나 {{shortcut}}을 눌러 점 수정",
+    "lineEditor_pointSelected": "{{shortcut_1}}을 눌러 점 삭제, {{shortcut_2}}를 눌러 복제, 또는 드래그하여 이동",
+    "lineEditor_nothingSelected": "점을 선택하여 수정(다중 선택은 {{shortcut_1}}), 또는 {{shortcut_2}}를 누르고 클릭하여 새 점 추가",
     "publishLibrary": "당신만의 라이브러리를 게시하기",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}}을 눌러 텍스트 추가",
+    "createFlowchart": "{{shortcut}}을 눌러 순서도 생성",
+    "deepBoxSelect": "{{shortcut}}을 눌러 깊은 선택 및 드래그 방지",
+    "eraserRevert": "{{shortcut}}을 눌러 삭제 표시된 요소 되돌리기",
     "firefox_clipboard_write": "이 기능은 설정에서 \"dom.events.asyncClipboard.clipboardItem\" 플래그를 \"true\"로 설정하여 활성화할 수 있습니다. Firefox에서 브라우저 플래그를 수정하려면, \"about:config\" 페이지에 접속하세요.",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "{{shortcut}}을 눌러 스냅 비활성화",
+    "enterCropEditor": "이미지를 더블 클릭하거나 {{shortcut}}을 눌러 자르기",
+    "leaveCropEditor": "이미지 밖을 클릭하거나 {{shortcut_1}} 또는 {{shortcut_2}}를 눌러 자르기 완료"
   },
   "canvasError": {
     "cannotShowPreview": "미리보기를 볼 수 없습니다",
@@ -383,8 +383,8 @@
     "or": "또는"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "사람들을 초대하여 함께 그리세요.",
+    "desc_privacy": "걱정 마세요, 세션은 종단 간 암호화되며 완전히 비공개입니다. 저희 서버조차도 당신이 무엇을 그리는지 알 수 없습니다.",
     "button_startSession": "세션 시작",
     "button_stopSession": "세션 중단",
     "desc_inProgressIntro": "실시간 협업 세션이 진행 중입니다.",
@@ -411,8 +411,8 @@
     "click": "클릭",
     "deepSelect": "깊게 선택",
     "deepBoxSelect": "영역을 깊게 선택하고, 드래그하지 않도록 하기",
-    "createFlowchart": "",
-    "navigateFlowchart": "",
+    "createFlowchart": "일반 요소에서 순서도 생성",
+    "navigateFlowchart": "순서도 탐색",
     "curvedArrow": "곡선 화살표",
     "curvedLine": "곡선",
     "documentation": "설명서",
@@ -436,8 +436,8 @@
     "toggleElementLock": "선택한 항목을 잠금/잠금 해제",
     "movePageUpDown": "페이지 움직이기 위/아래",
     "movePageLeftRight": "페이지 움직이기 좌/우",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "이미지 자르기",
+    "cropFinish": "이미지 자르기 완료"
   },
   "clearCanvasDialog": {
     "title": "캔버스 지우기"
@@ -497,8 +497,8 @@
       "copyPngToClipboard": "클립보드로 PNG 복사"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": "클립보드로 복사"
     }
   },
@@ -508,15 +508,15 @@
   },
   "stats": {
     "angle": "각도",
-    "shapes": "",
+    "shapes": "도형",
     "height": "높이",
     "scene": "화면",
     "selected": "선택됨",
     "storage": "저장공간",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "캔버스 & 도형 속성",
+    "title": "속성",
+    "generalStats": "일반",
+    "elementProperties": "도형 속성",
     "total": "합계",
     "version": "버전",
     "versionCopy": "복사하려면 클릭",
@@ -528,15 +528,15 @@
     "copyStyles": "스타일 복사.",
     "copyToClipboard": "클립보드로 복사.",
     "copyToClipboardAsPng": "{{exportSelection}}를 클립보드에 PNG로 복사했습니다\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "{{exportSelection}}를 클립보드에 SVG로 복사했습니다\n({{exportColorScheme}})",
     "fileSaved": "파일이 저장되었습니다.",
     "fileSavedToFilename": "{filename} 로 저장되었습니다",
     "canvas": "캔버스",
     "selection": "선택한 요소",
-    "pasteAsSingleElement": "단일 요소로 붙여넣거나, 기존 텍스트 에디터에 붙여넣으려면 {{shortcut}} 을 사용하세요.",
+    "pasteAsSingleElement": "{{shortcut}}을 사용하여 단일 요소로 붙여넣거나,\n기존 텍스트 에디터에 붙여넣으세요",
     "unableToEmbed": "이 URL의 임베딩이 허용되지 않았습니다. GitHub에 이슈를 남겨서 이 URL이 화이트리스트에 등재될 수 있도록 요청하세요",
     "unrecognizedLinkFormat": "임베딩하려는 링크의 형식이 잘못된 것 같습니다. 원본 사이트에서 제공하는 \"임베딩\" 텍스트를 그대로 붙여 넣어 주세요",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "링크가 클립보드로 복사되었습니다"
   },
   "colors": {
     "transparent": "투명",
@@ -569,7 +569,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "색상",
     "mostUsedCustomColors": "가장 많이 사용된 색상들",
     "colors": "색상",
     "shades": "색조",
@@ -589,7 +589,7 @@
         "description": "나중에 다시 불러올 수 있도록 화면 데이터를 내보냅니다."
       },
       "excalidrawPlus": {
-        "title": "",
+        "title": "Excalidraw+",
         "button": "Excalidraw+로 내보내기",
         "description": "화면을 당신의 Excalidraw+ 작업 공간으로 저장합니다."
       }
@@ -608,58 +608,58 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "title": "Mermaid를 Excalidraw로",
+    "button": "삽입",
+    "description": "현재 <flowchartLink>순서도</flowchartLink>,<sequenceLink> 시퀀스, </sequenceLink> 및 <classLink>클래스 </classLink>다이어그램만 지원됩니다. 다른 유형은 Excalidraw에서 이미지로 렌더링됩니다.",
+    "syntax": "Mermaid 문법",
+    "preview": "미리보기"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "빠른 검색"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "구버전"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "이 화면에서 사용됨",
+    "availableFonts": "사용 가능한 글꼴",
+    "empty": "글꼴을 찾을 수 없음"
   },
   "userList": {
-    "empty": "",
+    "empty": "사용자 없음",
     "hint": {
-      "text": "유저를 클릭해서 따라가기",
-      "followStatus": "이 사용자를 따라가고 있습니다",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "text": "사용자를 클릭하여 팔로우",
+      "followStatus": "이 사용자를 팔로우하고 있습니다",
+      "inCall": "사용자가 음성 통화 중입니다",
+      "micMuted": "사용자의 마이크가 음소거되었습니다",
+      "isSpeaking": "사용자가 말하고 있습니다"
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "명령어 팔레트",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "선택",
+      "confirm": "확인",
+      "close": "닫기"
     },
-    "recents": "",
+    "recents": "최근 사용",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "메뉴, 명령어 검색 및 숨겨진 기능 발견",
+      "noMatch": "일치하는 명령어가 없습니다..."
     },
-    "itemNotAvailable": "",
-    "shortcutHint": ""
+    "itemNotAvailable": "명령어를 사용할 수 없습니다...",
+    "shortcutHint": "명령어 팔레트는 {{shortcut}}을 사용하세요"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Space",
+    "delete": "Delete",
+    "mmb": "휠 클릭"
   }
 }
