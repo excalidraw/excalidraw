@@ -25,6 +25,7 @@ import type { LineSegment, LocalPoint, Radians } from "@excalidraw/math";
 import type { AppState } from "@excalidraw/excalidraw/types";
 import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
 import type { Bounds } from "@excalidraw/common";
+import { getArrowheadSize } from "./bounds";
 
 import {
   doBoundsIntersect,
@@ -117,12 +118,10 @@ export const BASE_BINDING_GAP_ELBOW = 5;
 
 export const getBindingGap = (
   bindTarget: ExcalidrawBindableElement,
-  opts: Pick<ExcalidrawArrowElement, "elbowed">,
+  opts: Pick<ExcalidrawArrowElement, "elbowed"> & Partial<Pick<ExcalidrawArrowElement, "startArrowhead" | "endArrowhead">>,
+  startOrEnd?: "start" | "end",
 ): number => {
-  return (
-    (opts.elbowed ? BASE_BINDING_GAP_ELBOW : BASE_BINDING_GAP) +
-    bindTarget.strokeWidth / 2
-  );
+  return bindTarget.strokeWidth / 2;
 };
 
 export const maxBindingDistance_simple = (zoom?: AppState["zoom"]): number => {
@@ -1281,7 +1280,7 @@ export const bindPointToSnapToElementOutline = (
           startOrEnd === "start" ? 1 : -2,
           elementsMap,
         );
-  const bindingGap = getBindingGap(bindableElement, arrowElement);
+  const bindingGap = getBindingGap(bindableElement, arrowElement, startOrEnd);
   const aabb = aabbForElement(bindableElement, elementsMap);
   const bindableCenter = getCenterForBounds(aabb);
 
@@ -1344,20 +1343,19 @@ export const bindPointToSnapToElementOutline = (
   } else {
     let intersector = customIntersector;
     if (!intersector) {
-      const halfVector = vectorScale(
-        vectorNormalize(vectorFromPoint(edgePoint, adjacentPoint)),
-        pointDistance(edgePoint, adjacentPoint) +
-          Math.max(bindableElement.width, bindableElement.height) +
-          bindingGap * 2,
+      const direction = vectorNormalize(vectorFromPoint(adjacentPoint, edgePoint));
+      const lineLength = Math.max(bindableElement.width, bindableElement.height) * 3;
+      const startPoint = pointFromVector(
+        vectorScale(direction, -lineLength),
+        edgePoint
       );
-      intersector =
-        customIntersector ??
-        lineSegment(
-          pointFromVector(halfVector, adjacentPoint),
-          pointFromVector(vectorScale(halfVector, -1), adjacentPoint),
-        );
+      const endPoint = pointFromVector(
+        vectorScale(direction, lineLength),
+        edgePoint
+      );
+      intersector = lineSegment(startPoint, endPoint);
     }
-
+    
     intersection =
       pointDistance(edgePoint, adjacentPoint) < 1
         ? edgePoint
@@ -1397,7 +1395,7 @@ export const avoidRectangularCorner = (
     -bindTarget.angle as Radians,
   );
 
-  const bindingGap = getBindingGap(bindTarget, arrowElement);
+  const bindingGap = getBindingGap(bindTarget, arrowElement, undefined);
 
   if (nonRotatedPoint[0] < bindTarget.x && nonRotatedPoint[1] < bindTarget.y) {
     // Top left
@@ -1486,7 +1484,7 @@ const snapToMid = (
   const center = elementCenterPoint(bindTarget, elementsMap, -0.1, -0.1);
   const nonRotated = pointRotateRads(p, center, -angle as Radians);
 
-  const bindingGap = getBindingGap(bindTarget, arrowElement);
+  const bindingGap = getBindingGap(bindTarget, arrowElement, undefined);
 
   // snap-to-center point is adaptive to element size, but we don't want to go
   // above and below certain px distance
@@ -1699,7 +1697,11 @@ export const updateBoundPoint = (
       center,
       arrow.angle as Radians,
     );
-    const bindingGap = getBindingGap(bindableElement, arrow);
+    const bindingGap = getBindingGap(
+      bindableElement, 
+      arrow, 
+      startOrEnd === "startBinding" ? "start" : "end"
+    );
     const halfVector = vectorScale(
       vectorNormalize(vectorFromPoint(edgePoint, adjacentPoint)),
       pointDistance(edgePoint, adjacentPoint) +
