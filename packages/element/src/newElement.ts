@@ -126,7 +126,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
 
   // assign type to guard against excess properties
   const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> = {
-    id: rest.id || (type === "text" ? obsidianId() : randomId()), //zsviczian
+    id: rest.id || (type === "freedraw" || type === "line" ? randomId() : obsidianId()), //zsviczian
     type,
     x,
     y,
