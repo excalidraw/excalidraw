@@ -8,6 +8,8 @@ import {
   getFontString,
   isProdEnv,
   invariant,
+  DEFAULT_FONT_FAMILY,
+  getLineHeight,
 } from "@excalidraw/common";
 
 import { pointFrom, pointRotateRads, type Radians } from "@excalidraw/math";
@@ -30,6 +32,8 @@ import {
   isTextElement,
 } from "./typeChecks";
 
+import type { NewTextElementOptions } from "./newElement";
+
 import type { Scene } from "./Scene";
 
 import type { MaybeTransformHandleType } from "./transformHandles";
@@ -40,6 +44,7 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
+  FontFamilyValues,
   NonDeletedExcalidrawElement,
 } from "./types";
 
@@ -527,4 +532,25 @@ export const getTextFromElements = (
     }, [])
     .join(separator);
   return text;
+};
+
+/** When text is already measured and wrapped, we want to respect those dimensions */
+export const getInitialTextMetrics = (
+  text: NewTextElementOptions,
+  fontFamily: FontFamilyValues = DEFAULT_FONT_FAMILY,
+  fontSize: number = DEFAULT_FONT_SIZE,
+) => {
+  const shouldUseProvidedDimensions =
+    text.autoResize === false && text.width && text.height;
+
+  return shouldUseProvidedDimensions
+    ? {
+        width: text.width,
+        height: text.height,
+      }
+    : measureText(
+        text.text,
+        getFontString({ fontFamily, fontSize }),
+        text.lineHeight ?? getLineHeight(fontFamily),
+      );
 };
