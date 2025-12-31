@@ -137,6 +137,9 @@ export const FONT_FAMILY = {
   "Comic Shanns": 8,
   "Liberation Sans": 9,
   Assistant: 10,
+  "Tiro Kannada": 11,
+  "Tiro Devanagari Hindi": 12,
+
 };
 
 // Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
