@@ -95,6 +95,36 @@
         margin-top: 2rem;
       }
 
+      &--clickable {
+        cursor: pointer;
+        user-select: none;
+        transition: opacity 0.2s ease-in-out;
+
+        &:hover {
+          opacity: 0.8;
+        }
+
+        &:active {
+          opacity: 0.6;
+        }
+      }
+
+      &__arrow {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.25rem;
+        height: 1.25rem;
+        transition: transform 0.2s ease-in-out;
+
+        svg {
+          width: 1rem;
+          height: 1rem;
+          stroke-width: 2;
+        }
+      }
+
       &__hint {
         margin-left: auto;
         font-size: 10px;
@@ -150,5 +180,71 @@
     // no layout shift (this is hardcoded and works only with ENG locale)
     min-height: 3.75rem;
     width: 100%;
+  }
+
+  .collection-header-dropdown-trigger {
+    margin-left: 0.5rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+    border: none !important;
+    outline: none !important;
+    cursor: pointer;
+    transition: none;
+    color: var(--color-primary);
+    position: relative;
+    z-index: 1;
+
+    /* ensure no visible background on hover/active */
+    background: transparent !important;
+    &:hover,
+    &:active,
+    &:focus {
+      background: transparent !important;
+      box-shadow: none !important;
+      border: none !important;
+      outline: none !important;
+    }
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+      display: block;
+    }
+  }
+
+  &.theme--dark {
+    .collection-header-dropdown-trigger,
+    .collection-header-dropdown-trigger:hover,
+    .collection-header-dropdown-trigger:active,
+    .collection-header-dropdown-trigger:focus {
+      background: transparent !important;
+    }
+  }
+
+  .collection-header-menu {
+    position: relative;
+  }
+
+  .library-menu-items-container__header {
+    .library-menu-dropdown-container {
+      position: relative;
+
+      .dropdown-menu {
+        position: absolute;
+        right: 0;
+        left: auto;
+        top: 100%;
+        margin-top: 0.25rem;
+      }
+
+      // When a collection dropdown is open, give it a higher z-index
+      // so it appears above other collection dropdowns
+      &.collection-dropdown-open {
+        z-index: 2;
+      }
+    }
   }
 }

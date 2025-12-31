@@ -345,7 +345,10 @@ import {
 } from "../clipboard";
 
 import { exportCanvas, loadFromBlob } from "../data";
-import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
+import Library, {
+  distributeLibraryItemsOnSquareGrid,
+  libraryCollectionsAtom,
+} from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
@@ -738,6 +741,13 @@ class App extends React.Component<AppProps, AppState> {
         applyDeltas: this.applyDeltas,
         mutateElement: this.mutateElement,
         updateLibrary: this.library.updateLibrary,
+        createLibraryCollection: this.library.createLibraryCollection,
+        deleteLibraryCollection: this.library.deleteLibraryCollection,
+        renameLibraryCollection: this.library.renameLibraryCollection,
+        moveUpCollection: this.library.moveUpCollection,
+        moveDownCollection: this.library.moveDownCollection,
+        getLibraryCollections: this.library.getCollections,
+        setLibraryCollection: this.library.setCollections,
         addFiles: this.addFiles,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
@@ -11804,6 +11814,27 @@ class App extends React.Component<AppProps, AppState> {
     return false;
   };
 
+  private createAddToCollectionAction = (
+    collectionId: string,
+    collectionName: string,
+  ): Action => {
+    // Create a custom label that includes the collection name
+    // We'll return a function that provides the final translated string
+    const baseLabel = t("labels.addToLibrary");
+    return {
+      ...actionAddToLibrary,
+      label: () => `${baseLabel} "${collectionName}"`,
+      perform: (elements, appState, _, app) => {
+        return actionAddToLibrary.perform(
+          elements,
+          appState,
+          collectionId,
+          app,
+        );
+      },
+    };
+  };
+
   private getContextMenuItems = (
     type: "canvas" | "element",
   ): ContextMenuItems => {
@@ -11863,6 +11894,20 @@ class App extends React.Component<AppProps, AppState> {
           ]
         : [];
 
+    // Get library collections for collection-specific "Add to library" options
+    const libraryCollections = editorJotaiStore.get(libraryCollectionsAtom);
+    const collectionActions: ContextMenuItems = libraryCollections.map(
+      (collection) =>
+        this.createAddToCollectionAction(collection.id, collection.name),
+    );
+
+    const addToLibrarySection: ContextMenuItems = [
+      actionAddToLibrary,
+      ...(collectionActions.length > 0
+        ? ([CONTEXT_MENU_SEPARATOR, ...collectionActions] as ContextMenuItems)
+        : []),
+    ];
+
     return [
       CONTEXT_MENU_SEPARATOR,
       actionCut,
@@ -11887,7 +11932,7 @@ class App extends React.Component<AppProps, AppState> {
       actionWrapTextInContainer,
       actionUngroup,
       CONTEXT_MENU_SEPARATOR,
-      actionAddToLibrary,
+      ...addToLibrarySection,
       ...zIndexActions,
       CONTEXT_MENU_SEPARATOR,
       actionFlipHorizontal,
