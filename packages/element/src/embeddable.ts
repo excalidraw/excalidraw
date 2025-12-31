@@ -56,6 +56,9 @@ const RE_REDDIT =
 const RE_REDDIT_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
 
+const RE_GOOGLE_SLIDES =
+  /^https?:\/\/docs\.google\.com\/presentation\/d\/(e\/[a-zA-Z0-9_-]+|[a-zA-Z0-9_-]+)\/pub\?/;
+
 const parseYouTubeTimestamp = (url: string): number => {
   let timeParam: string | null | undefined;
 
@@ -306,6 +309,23 @@ export const getEmbedLink = (
     };
     embeddedLinkCache.set(link, ret);
     return ret;
+  }
+
+  if (RE_GOOGLE_SLIDES.test(link)) {
+    type = "generic";
+    aspectRatio = { w: 960, h: 569 };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    });
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    };
   }
 
   embeddedLinkCache.set(link, {

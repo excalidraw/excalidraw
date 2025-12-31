@@ -150,4 +150,14 @@ describe("YouTube timestamp parsing", () => {
       expect(result.link).toContain("enablejsapi=1");
     }
   });
+  it("should handle Google Slides publish URLs", () => {
+    const url =
+      "https://docs.google.com/presentation/d/e/2PACX-1vTxBMxE_tg3aiekxcTI3O1lmd28l66unPW5hQuX9CpXPGppZB0nOQODNSiphhG0e4z_mLfH2Ba-Jy4s/pub?start=false&loop=false&delayms=3000";
+    const result = getEmbedLink(url);
+
+    expect(result).toBeTruthy();
+    expect(result?.type).toBe("generic");
+    expect(result?.intrinsicSize).toEqual({ w: 960, h: 569 });
+    expect(result?.link).toBe(url);
+  });
 });
