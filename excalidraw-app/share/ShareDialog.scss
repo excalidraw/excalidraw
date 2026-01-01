@@ -140,6 +140,28 @@
         gap: 0.75rem;
       }
 
+      &__qrcode {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        align-self: center;
+        padding: 1rem;
+        background: #fff;
+        border-radius: 0.5rem;
+        border: 1px solid #e0e0e0;
+
+        & svg {
+          width: 150px;
+          height: 150px;
+        }
+
+        &--loading {
+          min-height: 150px;
+          background: var(--island-bg-color);
+          border: 1px solid var(--dialog-border-color);
+        }
+      }
+
       &__description {
         border-top: 1px solid var(--color-gray-20);
 
