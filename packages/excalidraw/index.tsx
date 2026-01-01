@@ -66,6 +66,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onContextMenu, //zsviczian
     aiEnabled,
     showDeprecatedFonts,
+    insertLinkAction, //zsviczian
     renderScrollbars,
   } = props;
 
@@ -170,6 +171,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onContextMenu={onContextMenu} //zsviczian
           aiEnabled={aiEnabled !== false}
           showDeprecatedFonts={showDeprecatedFonts}
+          insertLinkAction={insertLinkAction} //zsviczian
           renderScrollbars={renderScrollbars}
         >
           {children}
@@ -283,6 +285,7 @@ export {
   registerFontsInCSS,
   getCSSFontDefinition,
   loadSceneFonts,
+  getDefaultColorPalette,
   getSharedMermaidInstance,
   loadMermaid,
   intersectElementWithLine,

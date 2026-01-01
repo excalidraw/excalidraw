@@ -4,6 +4,7 @@ import {
   ZOOM_STEP,
   MAX_ZOOM,
   MIN_ZOOM,
+  DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
   //  TOUCH_CTX_MENU_TIMEOUT,
   //  DRAGGING_THRESHOLD,
   deriveStylesPanelMode,
@@ -163,6 +164,25 @@ export function getFontFamilies(): string[] {
   }
   return Array.from(fontFamilies);
 }
+
+export const getDefaultColorPalette = (): [
+  string,
+  string,
+  string,
+  string,
+  string,
+][] => {
+  const isColorTuple = (
+    value: unknown,
+  ): value is [string, string, string, string, string] =>
+    Array.isArray(value) &&
+    value.length === 5 &&
+    value.every((entry) => typeof entry === "string");
+
+  return Object.values(DEFAULT_ELEMENT_STROKE_COLOR_PALETTE).filter(
+    isColorTuple,
+  );
+};
 
 export async function registerFontsInCSS() {
   const styleId = "ExcalidrawFonts";

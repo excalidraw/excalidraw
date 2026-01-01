@@ -333,6 +333,24 @@ export const Hyperlink = ({
             icon={FreedrawIcon}
           />
         )}
+        {
+          //zsviczian - show the Obsidian search button
+          Boolean(appProps.insertLinkAction) && (
+            <ToolButton
+              type="button"
+              title="Obsidian Search"
+              aria-label="Obsidian Search"
+              label="Obsidian Search"
+              onClick={() => {
+                if (appProps.insertLinkAction) {
+                  setAppState({ showHyperlinkPopup: false });
+                  appProps.insertLinkAction(inputVal);
+                }
+              }}
+              icon={searchIcon}
+            />
+          )
+        }
         {/* //zsviczian - do not show the link to element button
         <ToolButton
           type="button"
