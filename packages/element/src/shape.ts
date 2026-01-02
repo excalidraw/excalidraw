@@ -1,4 +1,5 @@
 import { simplify } from "points-on-curve";
+import { getStroke } from "perfect-freehand";
 
 import {
   type GeometricShape,
@@ -38,6 +39,7 @@ import type {
 import type {
   ElementShape,
   ElementShapes,
+  SVGPathString,
 } from "@excalidraw/excalidraw/scene/types";
 
 import { elementWithCanvasCache } from "./renderElement";
@@ -54,7 +56,6 @@ import { getCornerRadius, isPathALoop } from "./utils";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
-import { generateFreeDrawShape } from "./renderElement";
 import {
   getArrowheadPoints,
   getCenterForBounds,
@@ -101,16 +102,10 @@ export class ShapeCache {
     return undefined;
   };
 
-  public static set = <T extends ExcalidrawElement>(
-    element: T,
-    shape: T["type"] extends keyof ElementShapes
-      ? ElementShapes[T["type"]]
-      : Drawable,
-    theme: AppState["theme"],
-  ) => ShapeCache.cache.set(element, { shape, theme });
-
-  public static delete = (element: ExcalidrawElement) =>
+  public static delete = (element: ExcalidrawElement) => {
     ShapeCache.cache.delete(element);
+    elementWithCanvasCache.delete(element);
+  };
 
   public static destroy = () => {
     ShapeCache.cache = new WeakMap();
@@ -144,7 +139,7 @@ export class ShapeCache {
 
     elementWithCanvasCache.delete(element);
 
-    const shape = generateElementShape(
+    const shape = _generateElementShape(
       element,
       ShapeCache.rg,
       renderConfig || {
@@ -157,11 +152,11 @@ export class ShapeCache {
       ? ElementShapes[T["type"]]
       : Drawable | null;
 
-    // if we're not passing renderConfig, we don't have the correct theme
-    // and canvas background color info so we could populate the cahce with
-    // wrong colors in dark mode
-    if (renderConfig) {
-      ShapeCache.cache.set(element, { shape, theme: renderConfig.theme });
+    if (!renderConfig?.isExporting) {
+      ShapeCache.cache.set(element, {
+        shape,
+        theme: renderConfig?.theme || THEME.LIGHT,
+      });
     }
 
     return shape;
@@ -632,7 +627,7 @@ export const generateLinearCollisionShape = (
  *
  * @private
  */
-const generateElementShape = (
+const _generateElementShape = (
   element: Exclude<NonDeletedExcalidrawElement, ExcalidrawSelectionElement>,
   generator: RoughGenerator,
   {
@@ -646,7 +641,7 @@ const generateElementShape = (
     embedsValidationStatus: EmbedsValidationStatus | null;
     theme?: AppState["theme"];
   },
-): Drawable | Drawable[] | null => {
+): ElementShape => {
   const isDarkMode = theme === THEME.DARK;
   switch (element.type) {
     case "rectangle":
@@ -839,23 +834,28 @@ const generateElementShape = (
       return shape;
     }
     case "freedraw": {
-      let shape: ElementShapes[typeof element.type];
-      generateFreeDrawShape(element);
+      // oredered in terms of z-index [background, stroke]
+      const shapes: ElementShapes[typeof element.type] = [];
 
+      // (1) background fill (rc shape), optional
       if (isPathALoop(element.points)) {
         // generate rough polygon to fill freedraw shape
         const simplifiedPoints = simplify(
           element.points as Mutable<LocalPoint[]>,
           0.75,
         );
-        shape = generator.curve(simplifiedPoints as [number, number][], {
-          ...generateRoughOptions(element, false, isDarkMode),
-          stroke: "none",
-        });
-      } else {
-        shape = null;
+        shapes.push(
+          generator.curve(simplifiedPoints as [number, number][], {
+            ...generateRoughOptions(element, false, isDarkMode),
+            stroke: "none",
+          }),
+        );
       }
-      return shape;
+
+      // (2) stroke
+      shapes.push(getFreeDrawSvgPath(element));
+
+      return shapes;
     }
     case "frame":
     case "magicframe":
@@ -962,9 +962,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
       return getPolygonShape(element);
     case "arrow":
     case "line": {
-      const roughShape =
-        ShapeCache.get(element, null)?.[0] ??
-        ShapeCache.generateElementShape(element, null)[0];
+      const roughShape = ShapeCache.generateElementShape(element, null)[0];
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
 
       return shouldTestInside(element)
@@ -1040,3 +1038,69 @@ export const toggleLinePolygonState = (
 
   return ret;
 };
+
+// -----------------------------------------------------------------------------
+//                         freedraw shape helper
+// -----------------------------------------------------------------------------
+
+// NOTE not cached (-> for SVG export)
+const getFreeDrawSvgPath = (element: ExcalidrawFreeDrawElement) => {
+  return getSvgPathFromStroke(
+    getFreedrawOutlinePoints(element),
+  ) as SVGPathString;
+};
+
+export const getFreedrawOutlinePoints = (
+  element: ExcalidrawFreeDrawElement,
+) => {
+  // If input points are empty (should they ever be?) return a dot
+  const inputPoints = element.simulatePressure
+    ? element.points
+    : element.points.length
+    ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
+    : [[0, 0, 0.5]];
+
+  return getStroke(inputPoints as number[][], {
+    simulatePressure: element.simulatePressure,
+    size: element.strokeWidth * 4.25,
+    thinning: 0.6,
+    smoothing: 0.5,
+    streamline: 0.5,
+    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
+    last: true,
+  }) as [number, number][];
+};
+
+const med = (A: number[], B: number[]) => {
+  return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
+};
+
+// Trim SVG path data so number are each two decimal points. This
+// improves SVG exports, and prevents rendering errors on points
+// with long decimals.
+const TO_FIXED_PRECISION = /(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g;
+
+const getSvgPathFromStroke = (points: number[][]): string => {
+  if (!points.length) {
+    return "";
+  }
+
+  const max = points.length - 1;
+
+  return points
+    .reduce(
+      (acc, point, i, arr) => {
+        if (i === max) {
+          acc.push(point, med(point, arr[0]), "L", arr[0], "Z");
+        } else {
+          acc.push(point, med(point, arr[i + 1]));
+        }
+        return acc;
+      },
+      ["M", points[0], "Q"],
+    )
+    .join(" ")
+    .replace(TO_FIXED_PRECISION, "$1");
+};
+
+// -----------------------------------------------------------------------------

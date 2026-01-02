@@ -897,6 +897,7 @@ export const getArrowheadPoints = (
   return [x2, y2, x3, y3, x4, y4];
 };
 
+// TODO reuse shape.ts
 const generateLinearElementShape = (
   element: ExcalidrawLinearElement,
 ): Drawable => {
