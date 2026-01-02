@@ -1,0 +1,86 @@
+@import "../../css/variables.module.scss";
+
+$verticalBreakpoint: 861px;
+
+.excalidraw {
+  .ttd-dialog-error-toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 250;
+
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    background-color: rgba(#ff6b6b, 0.95);
+    color: $oc-white;
+    padding: 1rem 1.25rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+    max-width: calc(100vw - 2rem);
+    min-width: 280px;
+
+    animation: toast-slide-up 0.3s ease-out;
+
+    @at-root .excalidraw.theme--dark#{&} {
+      background-color: rgba(#ff6b6b, 0.9);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    &__icon {
+      font-size: 1.25rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    &__message {
+      flex: 1;
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 1.4;
+      color: $oc-white;
+    }
+
+    &__close {
+      flex-shrink: 0;
+      padding: 0.25rem;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      color: $oc-white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+      margin: -0.25rem -0.5rem -0.25rem 0;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+      }
+
+      &:active {
+        background-color: rgba(255, 255, 255, 0.25);
+      }
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+  }
+
+  @keyframes toast-slide-up {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+}
