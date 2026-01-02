@@ -12,6 +12,8 @@ export type SvgCache = Map<LibraryItem["id"], SVGSVGElement>;
 export const libraryItemSvgsCache = atom<SvgCache>(new Map());
 
 const exportLibraryItemToSvg = async (elements: LibraryItem["elements"]) => {
+  // TODO should pass theme (appState.exportWithDark) - we're still using
+  // CSS filter here
   return await exportToSvg({
     elements,
     appState: {
