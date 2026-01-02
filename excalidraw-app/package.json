@@ -33,10 +33,10 @@
     "i18next-browser-languagedetector": "6.1.4",
     "idb-keyval": "6.0.3",
     "jotai": "2.11.0",
-    "qrcode-generator": "1.4.4",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "socket.io-client": "4.7.2",
+    "uqr": "0.1.2",
     "vite-plugin-html": "3.2.2"
   },
   "prettier": "@excalidraw/prettier-config",

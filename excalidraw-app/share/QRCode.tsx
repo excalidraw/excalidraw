@@ -3,10 +3,9 @@ import Spinner from "@excalidraw/excalidraw/components/Spinner";
 
 interface QRCodeProps {
   value: string;
-  size?: number;
 }
 
-export const QRCode = ({ value, size = 150 }: QRCodeProps) => {
+export const QRCode = ({ value }: QRCodeProps) => {
   const [svgData, setSvgData] = useState<string | null>(null);
   const [error, setError] = useState<boolean>(false);
 
@@ -17,7 +16,7 @@ export const QRCode = ({ value, size = 150 }: QRCodeProps) => {
       .then(({ generateQRCodeSVG }) => {
         if (mounted) {
           try {
-            setSvgData(generateQRCodeSVG(value, size));
+            setSvgData(generateQRCodeSVG(value));
           } catch {
             setError(true);
           }
@@ -32,7 +31,7 @@ export const QRCode = ({ value, size = 150 }: QRCodeProps) => {
     return () => {
       mounted = false;
     };
-  }, [value, size]);
+  }, [value]);
 
   if (error) {
     return null;

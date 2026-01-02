@@ -150,13 +150,16 @@
         border-radius: 0.5rem;
         border: 1px solid #e0e0e0;
 
+        $size: 150px;
+        width: $size;
+        height: $size;
+
         & svg {
-          width: 150px;
-          height: 150px;
+          width: $size;
+          height: $size;
         }
 
         &--loading {
-          min-height: 150px;
           background: var(--island-bg-color);
           border: 1px solid var(--dialog-border-color);
         }
