@@ -8,6 +8,7 @@ import type { UserIdleState } from "@excalidraw/common";
 import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
 import type {
   OnUserFollowedPayload,
+  PollVotePayload,
   SocketId,
 } from "@excalidraw/excalidraw/types";
 
@@ -211,7 +212,7 @@ class Portal {
           pointer: payload.pointer,
           button: payload.button || "up",
           selectedElementIds:
-            this.collab.excalidrawAPI.getAppState().selectedElementIds,
+          this.collab.excalidrawAPI.getAppState().selectedElementIds,
           username: this.collab.state.username,
         },
       };
@@ -251,6 +252,15 @@ class Portal {
     if (this.socket?.id) {
       this.socket.emit(WS_EVENTS.USER_FOLLOW_CHANGE, payload);
     }
+  };
+
+  broadcastPollVote = (payload: PollVotePayload) => {
+    const data: SocketUpdateDataSource["POLL_VOTE"] = {
+      type: WS_SUBTYPES.POLL_VOTE,
+      payload,
+    };
+
+    return this._broadcastSocketData(data as SocketUpdateData);
   };
 }
 

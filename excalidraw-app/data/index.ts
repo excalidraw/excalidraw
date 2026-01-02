@@ -1,3 +1,4 @@
+
 import {
   compressData,
   decompressData,
@@ -26,6 +27,7 @@ import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
+  PollVotePayload,
   SocketId,
 } from "@excalidraw/excalidraw/types";
 import type { MakeBrand } from "@excalidraw/common/utility-types";
@@ -119,6 +121,10 @@ export type SocketUpdateDataSource = {
       username: string;
     };
   };
+  POLL_VOTE: {
+    type: WS_SUBTYPES.POLL_VOTE;
+    payload: PollVotePayload;
+  };
 };
 
 export type SocketUpdateDataIncoming =
@@ -126,8 +132,8 @@ export type SocketUpdateDataIncoming =
 
 export type SocketUpdateData =
   SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
-    _brand: "socketUpdateData";
-  };
+  _brand: "socketUpdateData";
+};
 
 const RE_COLLAB_LINK = /^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/;
 
@@ -169,9 +175,9 @@ export const getCollaborationLink = (data: {
  * @deprecated
  */
 const legacy_decodeFromBackend = async ({
-  buffer,
-  decryptionKey,
-}: {
+                                          buffer,
+                                          decryptionKey,
+                                        }: {
   buffer: ArrayBuffer;
   decryptionKey: string;
 }) => {

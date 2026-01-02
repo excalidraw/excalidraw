@@ -46,6 +46,7 @@ import type {
   SocketId,
   Collaborator,
   Gesture,
+  PollVotePayload,
 } from "@excalidraw/excalidraw/types";
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
@@ -116,6 +117,7 @@ export interface CollabAPI {
   stopCollaboration: CollabInstance["stopCollaboration"];
   syncElements: CollabInstance["syncElements"];
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
+  broadcastPollVote: CollabInstance["broadcastPollVote"];
   setUsername: CollabInstance["setUsername"];
   getUsername: CollabInstance["getUsername"];
   getActiveRoomLink: CollabInstance["getActiveRoomLink"];
@@ -229,6 +231,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       startCollaboration: this.startCollaboration,
       syncElements: this.syncElements,
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
+      broadcastPollVote: this.broadcastPollVote,
       stopCollaboration: this.stopCollaboration,
       setUsername: this.setUsername,
       getUsername: this.getUsername,
@@ -431,7 +434,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           !element.isDeleted &&
           (opts.forceFetchFiles
             ? element.status !== "pending" ||
-              Date.now() - element.updated > 10000
+            Date.now() - element.updated > 10000
             : element.status === "saved")
         );
       })
@@ -502,7 +505,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
     const { default: socketIOClient } = await import(
       /* webpackChunkName: "socketIoClient" */ "socket.io-client"
-    );
+      );
 
     const fallbackInitializationHandler = () => {
       this.initializeRoom({
@@ -658,6 +661,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
             break;
           }
 
+          case WS_SUBTYPES.POLL_VOTE: {
+            this.excalidrawAPI.applyPollVote(decryptedData.payload);
+            break;
+          }
+
           default: {
             assertNever(decryptedData, null);
           }
@@ -695,14 +703,14 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   private initializeRoom = async ({
-    fetchScene,
-    roomLinkData,
-  }:
-    | {
-        fetchScene: true;
-        roomLinkData: { roomId: string; roomKey: string } | null;
-      }
-    | { fetchScene: false; roomLinkData?: null }) => {
+                                    fetchScene,
+                                    roomLinkData,
+                                  }:
+                                    | {
+                                    fetchScene: true;
+                                    roomLinkData: { roomId: string; roomKey: string } | null;
+                                  }
+                                    | { fetchScene: false; roomLinkData?: null }) => {
     clearTimeout(this.socketInitializationTimer!);
     if (this.portal.socket && this.fallbackInitializationHandler) {
       this.portal.socket.off(
@@ -746,10 +754,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   ): ReconciledExcalidrawElement[] => {
     const localElements = this.getSceneElementsIncludingDeleted();
     const appState = this.excalidrawAPI.getAppState();
-    const restoredRemoteElements = restoreElements(
-      remoteElements,
-      this.excalidrawAPI.getSceneElementsMapIncludingDeleted(),
-    );
+    const restoredRemoteElements = restoreElements(remoteElements, null);
     const reconciledElements = reconcileElements(
       localElements,
       restoredRemoteElements as RemoteExcalidrawElement[],
@@ -899,8 +904,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       pointersMap: Gesture["pointers"];
     }) => {
       payload.pointersMap.size < 2 &&
-        this.portal.socket &&
-        this.portal.broadcastMouseLocation(payload);
+      this.portal.socket &&
+      this.portal.broadcastMouseLocation(payload);
     },
     CURSOR_SYNC_TIMEOUT,
   );
@@ -915,6 +920,12 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         },
         `follow@${this.portal.socket.id}`,
       );
+    }
+  };
+
+  broadcastPollVote = (payload: PollVotePayload) => {
+    if (this.portal.isOpen()) {
+      this.portal.broadcastPollVote(payload);
     }
   };
 
