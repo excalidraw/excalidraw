@@ -409,6 +409,7 @@ import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
+import { restrictPanDelta } from "../scene/panning";
 
 import { isMaybeMermaidDefinition } from "../mermaid";
 
@@ -6241,13 +6242,16 @@ class App extends React.Component<AppProps, AppState> {
           state,
         );
 
+        const { deltaX: restrictedDeltaX, deltaY: restrictedDeltaY } =
+          restrictPanDelta(this.state.panningMode, deltaX, deltaY);
+
         this.translateCanvas({
           zoom: zoomState.zoom,
           // 2x multiplier is just a magic number that makes this work correctly
           // on touchscreen devices (note: if we get report that panning is slower/faster
           // than actual movement, consider swapping with devicePixelRatio)
-          scrollX: zoomState.scrollX + 2 * (deltaX / nextZoom),
-          scrollY: zoomState.scrollY + 2 * (deltaY / nextZoom),
+          scrollX: zoomState.scrollX + 2 * (restrictedDeltaX / nextZoom),
+          scrollY: zoomState.scrollY + 2 * (restrictedDeltaY / nextZoom),
           shouldCacheIgnoreZoom: true,
         });
 
@@ -7558,9 +7562,12 @@ class App extends React.Component<AppProps, AppState> {
         window.addEventListener(EVENT.POINTER_UP, enableNextPaste);
       }
 
+      const { deltaX: restrictedDeltaX, deltaY: restrictedDeltaY } =
+        restrictPanDelta(this.state.panningMode, deltaX, deltaY);
+
       this.translateCanvas({
-        scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
-        scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
+        scrollX: this.state.scrollX - restrictedDeltaX / this.state.zoom.value,
+        scrollY: this.state.scrollY - restrictedDeltaY / this.state.zoom.value,
       });
     });
     const teardown = withBatchedUpdates(
@@ -9710,10 +9717,15 @@ class App extends React.Component<AppProps, AppState> {
     if (pointerDownState.scrollbars.isOverHorizontal) {
       const x = event.clientX;
       const dx = x - pointerDownState.lastCoords.x;
+      const { deltaX: restrictedDeltaX } = restrictPanDelta(
+        this.state.panningMode,
+        dx,
+        0,
+      );
       this.translateCanvas({
         scrollX:
           this.state.scrollX -
-          (dx * (currentScrollBars.horizontal?.deltaMultiplier || 1)) /
+          (restrictedDeltaX * (currentScrollBars.horizontal?.deltaMultiplier || 1)) /
             this.state.zoom.value,
       });
       pointerDownState.lastCoords.x = x;
@@ -9723,10 +9735,15 @@ class App extends React.Component<AppProps, AppState> {
     if (pointerDownState.scrollbars.isOverVertical) {
       const y = event.clientY;
       const dy = y - pointerDownState.lastCoords.y;
+      const { deltaY: restrictedDeltaY } = restrictPanDelta(
+        this.state.panningMode,
+        0,
+        dy,
+      );
       this.translateCanvas({
         scrollY:
           this.state.scrollY -
-          (dy * (currentScrollBars.vertical?.deltaMultiplier || 1)) /
+          (restrictedDeltaY * (currentScrollBars.vertical?.deltaMultiplier || 1)) /
             this.state.zoom.value,
       });
       pointerDownState.lastCoords.y = y;
@@ -11471,11 +11488,7 @@ class App extends React.Component<AppProps, AppState> {
   ): void => {
     const selectionElement = this.state.selectionElement;
     const pointerCoords = pointerDownState.lastCoords;
-    if (
-      selectionElement &&
-      pointerDownState.boxSelection.hasOccurred &&
-      this.state.activeTool.type !== "eraser"
-    ) {
+    if (selectionElement && this.state.activeTool.type !== "eraser") {
       dragNewElement({
         newElement: selectionElement,
         elementType: this.state.activeTool.type,
@@ -11539,27 +11552,25 @@ class App extends React.Component<AppProps, AppState> {
       snapLines,
     });
 
-    if (!isBindingElement(newElement)) {
-      dragNewElement({
-        newElement,
-        elementType: this.state.activeTool.type,
-        originX: pointerDownState.originInGrid.x,
-        originY: pointerDownState.originInGrid.y,
-        x: gridX,
-        y: gridY,
-        width: distance(pointerDownState.originInGrid.x, gridX),
-        height: distance(pointerDownState.originInGrid.y, gridY),
-        shouldMaintainAspectRatio: isImageElement(newElement)
-          ? !shouldMaintainAspectRatio(event)
-          : shouldMaintainAspectRatio(event),
-        shouldResizeFromCenter: shouldResizeFromCenter(event),
-        zoom: this.state.zoom.value,
-        scene: this.scene,
-        widthAspectRatio: aspectRatio,
-        originOffset: this.state.originSnapOffset,
-        informMutation,
-      });
-    }
+    dragNewElement({
+      newElement,
+      elementType: this.state.activeTool.type,
+      originX: pointerDownState.originInGrid.x,
+      originY: pointerDownState.originInGrid.y,
+      x: gridX,
+      y: gridY,
+      width: distance(pointerDownState.originInGrid.x, gridX),
+      height: distance(pointerDownState.originInGrid.y, gridY),
+      shouldMaintainAspectRatio: isImageElement(newElement)
+        ? !shouldMaintainAspectRatio(event)
+        : shouldMaintainAspectRatio(event),
+      shouldResizeFromCenter: shouldResizeFromCenter(event),
+      zoom: this.state.zoom.value,
+      scene: this.scene,
+      widthAspectRatio: aspectRatio,
+      originOffset: this.state.originSnapOffset,
+      informMutation,
+    });
 
     this.setState({
       newElement,
@@ -11968,16 +11979,24 @@ class App extends React.Component<AppProps, AppState> {
 
       // scroll horizontally when shift pressed
       if (event.shiftKey) {
+        const { deltaX: restrictedDeltaX } = restrictPanDelta(
+          this.state.panningMode,
+          deltaY || deltaX,
+          0,
+        );
         this.translateCanvas(({ zoom, scrollX }) => ({
           // on Mac, shift+wheel tends to result in deltaX
-          scrollX: scrollX - (deltaY || deltaX) / zoom.value,
+          scrollX: scrollX - restrictedDeltaX / zoom.value,
         }));
         return;
       }
 
+      const { deltaX: restrictedDeltaX, deltaY: restrictedDeltaY } =
+        restrictPanDelta(this.state.panningMode, deltaX, deltaY);
+
       this.translateCanvas(({ zoom, scrollX, scrollY }) => ({
-        scrollX: scrollX - deltaX / zoom.value,
-        scrollY: scrollY - deltaY / zoom.value,
+        scrollX: scrollX - restrictedDeltaX / zoom.value,
+        scrollY: scrollY - restrictedDeltaY / zoom.value,
       }));
     },
   );
