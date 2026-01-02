@@ -897,6 +897,7 @@ export const getArrowheadPoints = (
   return [x2, y2, x3, y3, x4, y4];
 };
 
+// TODO reuse shape.ts
 const generateLinearElementShape = (
   element: ExcalidrawLinearElement,
 ): Drawable => {
@@ -954,7 +955,7 @@ const getLinearElementRotatedBounds = (
   }
 
   // first element is always the curve
-  const cachedShape = ShapeCache.get(element)?.[0];
+  const cachedShape = ShapeCache.get(element, null)?.[0];
   const shape = cachedShape ?? generateLinearElementShape(element);
   const ops = getCurvePathOps(shape);
   const transformXY = ([x, y]: GlobalPoint) =>

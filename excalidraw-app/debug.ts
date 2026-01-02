@@ -24,34 +24,35 @@ export class Debug {
   private static LAST_DEBUG_LOG_CALL = 0;
   private static DEBUG_LOG_INTERVAL_ID: null | number = null;
 
+  private static LAST_FRAME_TIMESTAMP = 0;
+  private static FRAME_COUNT = 0;
+  private static ANIMATION_FRAME_ID: null | number = null;
+
+  private static scheduleAnimationFrame = () => {
+    if (Debug.DEBUG_LOG_INTERVAL_ID !== null) {
+      Debug.ANIMATION_FRAME_ID = requestAnimationFrame((timestamp) => {
+        if (Debug.LAST_FRAME_TIMESTAMP !== timestamp) {
+          Debug.LAST_FRAME_TIMESTAMP = timestamp;
+          Debug.FRAME_COUNT++;
+        }
+
+        if (Debug.DEBUG_LOG_INTERVAL_ID !== null) {
+          Debug.scheduleAnimationFrame();
+        }
+      });
+    }
+  };
+
   private static setupInterval = () => {
     if (Debug.DEBUG_LOG_INTERVAL_ID === null) {
       console.info("%c(starting perf recording)", "color: lime");
       Debug.DEBUG_LOG_INTERVAL_ID = window.setInterval(Debug.debugLogger, 1000);
+      Debug.scheduleAnimationFrame();
     }
     Debug.LAST_DEBUG_LOG_CALL = Date.now();
   };
 
   private static debugLogger = () => {
-    if (
-      Date.now() - Debug.LAST_DEBUG_LOG_CALL > 600 &&
-      Debug.DEBUG_LOG_INTERVAL_ID !== null
-    ) {
-      window.clearInterval(Debug.DEBUG_LOG_INTERVAL_ID);
-      Debug.DEBUG_LOG_INTERVAL_ID = null;
-      for (const [name, { avg }] of Object.entries(Debug.TIMES_AVG)) {
-        if (avg != null) {
-          console.info(
-            `%c${name} run avg: ${avg}ms (${getFps(avg)} fps)`,
-            "color: blue",
-          );
-        }
-      }
-      console.info("%c(stopping perf recording)", "color: red");
-      Debug.TIMES_AGGR = {};
-      Debug.TIMES_AVG = {};
-      return;
-    }
     if (Debug.DEBUG_LOG_TIMES) {
       for (const [name, { t, times }] of Object.entries(Debug.TIMES_AGGR)) {
         if (times.length) {
@@ -66,7 +67,15 @@ export class Debug {
       for (const [name, { t, times, avg }] of Object.entries(Debug.TIMES_AVG)) {
         if (times.length) {
           const avgFrameTime = getAvgFrameTime(times);
-          console.info(name, `${avgFrameTime}ms (${getFps(avgFrameTime)} fps)`);
+          console.info(
+            name,
+            `${times.length} runs: ${avgFrameTime}ms across ${
+              Debug.FRAME_COUNT
+            } frames (${getFps(avgFrameTime)} fps ~ ${lessPrecise(
+              (avgFrameTime / 16.67) * 100,
+              1,
+            )}% of frame budget)`,
+          );
           Debug.TIMES_AVG[name] = {
             t,
             times: [],
@@ -75,6 +84,24 @@ export class Debug {
           };
         }
       }
+    }
+    Debug.FRAME_COUNT = 0;
+
+    // Check for stop condition after logging
+    if (
+      Date.now() - Debug.LAST_DEBUG_LOG_CALL > 600 &&
+      Debug.DEBUG_LOG_INTERVAL_ID !== null
+    ) {
+      console.info("%c(stopping perf recording)", "color: red");
+      window.clearInterval(Debug.DEBUG_LOG_INTERVAL_ID);
+      window.cancelAnimationFrame(Debug.ANIMATION_FRAME_ID!);
+      Debug.ANIMATION_FRAME_ID = null;
+      Debug.FRAME_COUNT = 0;
+      Debug.LAST_FRAME_TIMESTAMP = 0;
+
+      Debug.DEBUG_LOG_INTERVAL_ID = null;
+      Debug.TIMES_AGGR = {};
+      Debug.TIMES_AVG = {};
     }
   };
 

@@ -5,7 +5,6 @@ import { useRef, useEffect } from "react";
 import {
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
   COLOR_PALETTE,
-  isTransparent,
   isWritableElement,
 } from "@excalidraw/common";
 
@@ -37,27 +36,6 @@ import "./ColorPicker.scss";
 import type { ColorPickerType } from "./colorPickerUtils";
 
 import type { AppState } from "../../types";
-
-const isValidColor = (color: string) => {
-  const style = new Option().style;
-  style.color = color;
-  return !!style.color;
-};
-
-export const getColor = (color: string): string | null => {
-  if (isTransparent(color)) {
-    return color;
-  }
-
-  // testing for `#` first fixes a bug on Electron (more specfically, an
-  // Obsidian popout window), where a hex color without `#` is (incorrectly)
-  // considered valid
-  return isValidColor(`#${color}`)
-    ? `#${color}`
-    : isValidColor(color)
-    ? color
-    : null;
-};
 
 interface ColorPickerProps {
   type: ColorPickerType;

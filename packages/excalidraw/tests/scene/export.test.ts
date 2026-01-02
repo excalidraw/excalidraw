@@ -1,6 +1,10 @@
 import { exportToCanvas, exportToSvg } from "@excalidraw/utils";
 
-import { FONT_FAMILY, FRAME_STYLE } from "@excalidraw/common";
+import {
+  applyDarkModeFilter,
+  FONT_FAMILY,
+  FRAME_STYLE,
+} from "@excalidraw/common";
 
 import type {
   ExcalidrawTextElement,
@@ -116,9 +120,15 @@ describe("exportToSvg", () => {
       null,
     );
 
-    expect(svgElement.getAttribute("filter")).toMatchInlineSnapshot(
-      `"invert(93%) hue-rotate(180deg)"`,
-    );
+    const textElements = svgElement.querySelectorAll("text");
+    expect(textElements.length).toBeGreaterThan(0);
+
+    textElements.forEach((textEl) => {
+      // fill color should be inverted in dark mode
+      expect(textEl.getAttribute("fill")).toBe(
+        applyDarkModeFilter(textFixture.strokeColor),
+      );
+    });
   });
 
   it("with exportPadding", async () => {

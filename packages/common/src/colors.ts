@@ -1,6 +1,120 @@
 import oc from "open-color";
+import tinycolor from "tinycolor2";
+
+import { clamp } from "@excalidraw/math";
+import { degreesToRadians } from "@excalidraw/math";
+
+import type { Degrees } from "@excalidraw/math";
 
 import type { Merge } from "./utility-types";
+
+export { tinycolor };
+
+// Browser-only cache to avoid memory leaks on server
+const DARK_MODE_COLORS_CACHE: Map<string, string> | null =
+  typeof window !== "undefined" ? new Map() : null;
+
+// ---------------------------------------------------------------------------
+// Dark mode color transformation
+// ---------------------------------------------------------------------------
+
+function cssHueRotate(
+  red: number,
+  green: number,
+  blue: number,
+  degrees: Degrees,
+): { r: number; g: number; b: number } {
+  // normalize
+  const r = red / 255;
+  const g = green / 255;
+  const b = blue / 255;
+
+  // Convert degrees to radians
+  const a = degreesToRadians(degrees);
+
+  const c = Math.cos(a);
+  const s = Math.sin(a);
+
+  // rotation matrix
+  const matrix = [
+    0.213 + c * 0.787 - s * 0.213,
+    0.715 - c * 0.715 - s * 0.715,
+    0.072 - c * 0.072 + s * 0.928,
+    0.213 - c * 0.213 + s * 0.143,
+    0.715 + c * 0.285 + s * 0.14,
+    0.072 - c * 0.072 - s * 0.283,
+    0.213 - c * 0.213 - s * 0.787,
+    0.715 - c * 0.715 + s * 0.715,
+    0.072 + c * 0.928 + s * 0.072,
+  ];
+
+  // transform
+  const newR = r * matrix[0] + g * matrix[1] + b * matrix[2];
+  const newG = r * matrix[3] + g * matrix[4] + b * matrix[5];
+  const newB = r * matrix[6] + g * matrix[7] + b * matrix[8];
+
+  // clamp the values to [0, 1] range and convert back to [0, 255]
+  return {
+    r: Math.round(Math.max(0, Math.min(1, newR)) * 255),
+    g: Math.round(Math.max(0, Math.min(1, newG)) * 255),
+    b: Math.round(Math.max(0, Math.min(1, newB)) * 255),
+  };
+}
+
+const cssInvert = (
+  r: number,
+  g: number,
+  b: number,
+  percent: number,
+): { r: number; g: number; b: number } => {
+  const p = clamp(percent, 0, 100) / 100;
+
+  // Function to invert a single color component
+  const invertComponent = (color: number): number => {
+    // Apply the invert formula
+    const inverted = color * (1 - p) + (255 - color) * p;
+    // Round to the nearest integer and clamp to [0, 255]
+    return Math.round(clamp(inverted, 0, 255));
+  };
+
+  // Calculate the inverted RGB components
+  const invertedR = invertComponent(r);
+  const invertedG = invertComponent(g);
+  const invertedB = invertComponent(b);
+
+  return { r: invertedR, g: invertedG, b: invertedB };
+};
+
+export const applyDarkModeFilter = (color: string): string => {
+  const cached = DARK_MODE_COLORS_CACHE?.get(color);
+  if (cached) {
+    return cached;
+  }
+
+  const tc = tinycolor(color);
+  const alpha = tc.getAlpha();
+
+  // order of operations matters
+  // (corresponds to "filter: invert(invertPercent) hue-rotate(hueDegrees)" in css)
+  const rgb = tc.toRgb();
+  const inverted = cssInvert(rgb.r, rgb.g, rgb.b, 93);
+  const rotated = cssHueRotate(
+    inverted.r,
+    inverted.g,
+    inverted.b,
+    180 as Degrees,
+  );
+
+  const result = rgbToHex(rotated.r, rotated.g, rotated.b, alpha);
+
+  if (DARK_MODE_COLORS_CACHE) {
+    DARK_MODE_COLORS_CACHE.set(color, result);
+  }
+
+  return result;
+};
+
+// ---------------------------------------------------------------------------
 
 export const COLOR_OUTLINE_CONTRAST_THRESHOLD = 240;
 
@@ -167,7 +281,22 @@ export const getAllColorsSpecificShade = (index: 0 | 1 | 2 | 3 | 4) =>
     COLOR_PALETTE.red[index],
   ] as const;
 
-export const rgbToHex = (r: number, g: number, b: number) =>
-  `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+export const rgbToHex = (r: number, g: number, b: number, a?: number) => {
+  // (1 << 24) adds 0x1000000 to ensure the hex string is always 7 chars,
+  // then slice(1) removes the leading "1" to get exactly 6 hex digits
+  // e.g. rgb(0,0,0) -> 0x1000000 -> "1000000" -> "000000"
+  const hex6 = `#${((1 << 24) + (r << 16) + (g << 8) + b)
+    .toString(16)
+    .slice(1)}`;
+  if (a !== undefined && a < 1) {
+    // convert alpha from 0-1 float to 0-255 int, then to 2-digit hex
+    // e.g. 0.5 -> 128 -> "80"
+    const alphaHex = Math.round(a * 255)
+      .toString(16)
+      .padStart(2, "0");
+    return `${hex6}${alphaHex}`;
+  }
+  return hex6;
+};
 
 // -----------------------------------------------------------------------------
