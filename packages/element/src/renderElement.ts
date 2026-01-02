@@ -486,10 +486,10 @@ const drawElementOnCanvas = (
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
         context.font = getFontString(element);
-        const isDarkMode = renderConfig.theme === THEME.DARK;
-        context.fillStyle = isDarkMode
-          ? applyDarkModeFilter(element.strokeColor)
-          : element.strokeColor;
+        context.fillStyle =
+          renderConfig.theme === THEME.DARK
+            ? applyDarkModeFilter(element.strokeColor)
+            : element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
 
         // Canvas does not support multiline text by default
