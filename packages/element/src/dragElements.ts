@@ -1,10 +1,12 @@
 import {
   type Bounds,
-  TEXT_AUTOWRAP_THRESHOLD,
-  getGridPoint,
-  getFontString,
   DRAGGING_THRESHOLD,
+  TEXT_AUTOWRAP_THRESHOLD,
+  getFontString,
+  getGridPoint,
 } from "@excalidraw/common";
+
+import { vector } from "@excalidraw/math";
 
 import type {
   AppState,
@@ -225,7 +227,7 @@ export const getDragOffsetXY = (
   y: number,
 ): [number, number] => {
   const [x1, y1] = getCommonBounds(selectedElements);
-  return [x - x1, y - y1];
+  return vector(x, y, x1, y1);
 };
 
 export const dragNewElement = ({

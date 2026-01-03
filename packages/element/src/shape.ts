@@ -10,36 +10,37 @@ import {
 } from "@excalidraw/utils/shape";
 
 import {
-  pointFrom,
-  pointDistance,
-  type LocalPoint,
-  pointRotateRads,
-} from "@excalidraw/math";
-import {
-  ROUGHNESS,
-  isTransparent,
   assertNever,
   COLOR_PALETTE,
+  isTransparent,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
+  ROUGHNESS,
 } from "@excalidraw/common";
+import {
+  type LocalPoint,
+  pointDistance,
+  pointFrom,
+  pointRotateRads,
+} from "@excalidraw/math";
 
 import { RoughGenerator } from "roughjs/bin/generator";
 
-import type { GlobalPoint } from "@excalidraw/math";
+import type { GenericPoint, GlobalPoint } from "@excalidraw/math";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import type {
-  AppState,
-  EmbedsValidationStatus,
-} from "@excalidraw/excalidraw/types";
-import type {
   ElementShape,
   ElementShapes,
 } from "@excalidraw/excalidraw/scene/types";
+import type {
+  AppState,
+  EmbedsValidationStatus,
+} from "@excalidraw/excalidraw/types";
 
 import { elementWithCanvasCache } from "./renderElement";
 
+import { headingForPointIsHorizontal } from "./heading";
 import {
   canBecomePolygon,
   isElbowArrow,
@@ -49,10 +50,7 @@ import {
   isLinearElement,
 } from "./typeChecks";
 import { getCornerRadius, isPathALoop } from "./utils";
-import { headingForPointIsHorizontal } from "./heading";
 
-import { canChangeRoundness } from "./comparisons";
-import { generateFreeDrawShape } from "./renderElement";
 import {
   getArrowheadPoints,
   getCenterForBounds,
@@ -60,16 +58,18 @@ import {
   getElementAbsoluteCoords,
 } from "./bounds";
 import { shouldTestInside } from "./collision";
+import { canChangeRoundness } from "./comparisons";
+import { generateFreeDrawShape } from "./renderElement";
 
 import type {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-  ExcalidrawSelectionElement,
-  ExcalidrawLinearElement,
   Arrowhead,
-  ExcalidrawFreeDrawElement,
   ElementsMap,
+  ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawLinearElement,
   ExcalidrawLineElement,
+  ExcalidrawSelectionElement,
+  NonDeletedExcalidrawElement,
 } from "./types";
 
 import type { Drawable, Options } from "roughjs/bin/core";
@@ -538,7 +538,7 @@ export const generateLinearCollisionShape = (
       );
 
       return generator
-        .curve(simplifiedPoints as [number, number][], options)
+        .curve(simplifiedPoints, options)
         .sets[0].ops.slice(0, element.points.length)
         .map((op, i) => {
           if (i === 0) {
@@ -811,7 +811,7 @@ const generateElementShape = (
           element.points as Mutable<LocalPoint[]>,
           0.75,
         );
-        shape = generator.curve(simplifiedPoints as [number, number][], {
+        shape = generator.curve(simplifiedPoints, {
           ...generateRoughOptions(element),
           stroke: "none",
         });
@@ -843,7 +843,7 @@ const generateElbowArrowShape = (
   points: readonly LocalPoint[],
   radius: number,
 ) => {
-  const subpoints = [] as [number, number][];
+  const subpoints: [number, number][] = [];
   for (let i = 1; i < points.length - 1; i += 1) {
     const prev = points[i - 1];
     const next = points[i + 1];
@@ -871,7 +871,7 @@ const generateElbowArrowShape = (
       subpoints.push([points[i][0], points[i][1] + corner]);
     }
 
-    subpoints.push(points[i] as [number, number]);
+    subpoints.push(points[i]);
 
     if (nextIsHorizontal) {
       if (next[0] < point[0]) {
@@ -908,7 +908,7 @@ const generateElbowArrowShape = (
  * get the pure geometric shape of an excalidraw elementw
  * which is then used for hit detection
  */
-export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
+export const getElementShape = <Point extends GenericPoint>(
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
 ): GeometricShape<Point> => {

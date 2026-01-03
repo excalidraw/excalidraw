@@ -1,17 +1,14 @@
 import {
   vectorCross,
   vectorFromPoint,
-  type GlobalPoint,
-  type LocalPoint,
+  type GenericPoint,
 } from "@excalidraw/math";
 
 import type { Bounds } from "@excalidraw/common";
 
-export type LineSegment<P extends LocalPoint | GlobalPoint> = [P, P];
+export type LineSegment<P extends GenericPoint> = [P, P];
 
-export function getBBox<P extends LocalPoint | GlobalPoint>(
-  line: LineSegment<P>,
-): Bounds {
+export function getBBox<P extends GenericPoint>(line: LineSegment<P>): Bounds {
   return [
     Math.min(line[0][0], line[1][0]),
     Math.min(line[0][1], line[1][1]),
@@ -26,10 +23,7 @@ export function doBBoxesIntersect(a: Bounds, b: Bounds) {
 
 const EPSILON = 0.000001;
 
-export function isPointOnLine<P extends GlobalPoint | LocalPoint>(
-  l: LineSegment<P>,
-  p: P,
-) {
+export function isPointOnLine<P extends GenericPoint>(l: LineSegment<P>, p: P) {
   const p1 = vectorFromPoint(l[1], l[0]);
   const p2 = vectorFromPoint(p, l[0]);
 
@@ -38,7 +32,7 @@ export function isPointOnLine<P extends GlobalPoint | LocalPoint>(
   return Math.abs(r) < EPSILON;
 }
 
-export function isPointRightOfLine<P extends GlobalPoint | LocalPoint>(
+export function isPointRightOfLine<P extends GenericPoint>(
   l: LineSegment<P>,
   p: P,
 ) {
@@ -48,9 +42,10 @@ export function isPointRightOfLine<P extends GlobalPoint | LocalPoint>(
   return vectorCross(p1, p2) < 0;
 }
 
-export function isLineSegmentTouchingOrCrossingLine<
-  P extends GlobalPoint | LocalPoint,
->(a: LineSegment<P>, b: LineSegment<P>) {
+export function isLineSegmentTouchingOrCrossingLine<P extends GenericPoint>(
+  a: LineSegment<P>,
+  b: LineSegment<P>,
+) {
   return (
     isPointOnLine(a, b[0]) ||
     isPointOnLine(a, b[1]) ||
@@ -61,7 +56,7 @@ export function isLineSegmentTouchingOrCrossingLine<
 }
 
 // https://martin-thoma.com/how-to-check-if-two-line-segments-intersect/
-export function doLineSegmentsIntersect<P extends GlobalPoint | LocalPoint>(
+export function doLineSegmentsIntersect<P extends GenericPoint>(
   a: LineSegment<P>,
   b: LineSegment<P>,
 ) {

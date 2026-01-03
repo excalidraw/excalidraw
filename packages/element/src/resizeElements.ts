@@ -2,6 +2,7 @@ import {
   pointCenter,
   normalizeRadians,
   pointFrom,
+  pointFromPair,
   pointRotateRads,
   type Radians,
   type LocalPoint,
@@ -493,7 +494,7 @@ export const getResizeOffsetXY = (
   elementsMap: ElementsMap,
   x: number,
   y: number,
-): [number, number] => {
+): GlobalPoint => {
   const [x1, y1, x2, y2] =
     selectedElements.length === 1
       ? getElementAbsoluteCoords(selectedElements[0], elementsMap)
@@ -542,7 +543,7 @@ export const getResizeOffsetXY = (
     case "se":
       return pointRotateRads(pointFrom(x - x2, y - y2), pointFrom(0, 0), angle);
     default:
-      return [0, 0];
+      return pointFromPair<GlobalPoint>([0, 0]);
   }
 };
 

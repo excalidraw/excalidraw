@@ -44,6 +44,8 @@ import type {
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
+import type { ViewportPoint } from "@excalidraw/math";
+
 import { actionSaveToActiveFile } from "../actions";
 
 import { parseDataTransferEvent } from "../clipboard";
@@ -103,7 +105,7 @@ export const textWysiwyg = ({
    */
   onChange?: (nextOriginalText: string) => void;
   onSubmit: (data: { viaKeyboard: boolean; nextOriginalText: string }) => void;
-  getViewportCoords: (x: number, y: number) => [number, number];
+  getViewportCoords: (x: number, y: number) => ViewportPoint;
   element: ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
   excalidrawContainer: HTMLDivElement | null;
