@@ -26,7 +26,7 @@ const clampTimer = (value: number) => {
   if (Number.isNaN(value) || value <= 0) {
     return null;
   }
-  return Math.max(5, Math.min(value, 3600));
+  return Math.max(1, Math.min(value, 3600));
 };
 
 const getTotalVotes = (counts: Record<string, number>) => {
@@ -34,16 +34,16 @@ const getTotalVotes = (counts: Record<string, number>) => {
 };
 
 const PollOptionsList = ({
-  metadata,
-  editable,
-  optionsEditable,
-  voteSelection,
-  counts,
-  displayResults,
-  onChange,
-  onVote,
-  canVote,
-}: {
+                           metadata,
+                           editable,
+                           optionsEditable,
+                           voteSelection,
+                           counts,
+                           displayResults,
+                           onChange,
+                           onVote,
+                           canVote,
+                         }: {
   metadata: PollMetadata;
   editable: boolean;
   optionsEditable: boolean;
@@ -185,20 +185,20 @@ const PollOptionsList = ({
 };
 
 export const PollCard = ({
-  metadata,
-  isSelected,
-  canEdit,
-  canVote,
-  isOwner,
-  voteSelection,
-  counts,
-  onChange,
-  onVote,
-  onStart,
-  onStop,
-  onReveal,
-  now,
-}: PollCardProps) => {
+                           metadata,
+                           isSelected,
+                           canEdit,
+                           canVote,
+                           isOwner,
+                           voteSelection,
+                           counts,
+                           onChange,
+                           onVote,
+                           onStart,
+                           onStop,
+                           onReveal,
+                           now,
+                         }: PollCardProps) => {
   const isLive = metadata.status.state === "open";
   const editable = canEdit && isSelected && !isLive;
   const isLocked = metadata.status.state !== "idle";
@@ -408,7 +408,7 @@ export const PollCard = ({
             <input
               type="number"
               className="excalidraw__poll-input"
-              min={5}
+              min={1}
               max={3600}
               value={metadata.settings.timerSeconds ?? ""}
               onChange={(event) =>
