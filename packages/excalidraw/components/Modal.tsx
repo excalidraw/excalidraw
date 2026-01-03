@@ -49,7 +49,6 @@ export const Modal: React.FC<{
       aria-modal="true"
       onKeyDown={handleKeydown}
       aria-labelledby={props.labelledBy}
-      data-prevent-outside-click
     >
       <div
         className="Modal__background"

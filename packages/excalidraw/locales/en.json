@@ -612,7 +612,54 @@
     "button": "Insert",
     "description": "Currently only <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Sequence, </sequenceLink> and <classLink>Class </classLink>Diagrams are supported. The other types will be rendered as image in Excalidraw.",
     "syntax": "Mermaid Syntax",
-    "preview": "Preview"
+    "preview": "Preview",
+    "label": "Mermaid",
+    "inputPlaceholder": "Write Mermaid diagram defintion here..."
+  },
+  "ttd": {
+    "error": "Error!",
+    "errorMermaidSyntax": "Mermaid syntax error"
+  },
+  "chat": {
+    "inputPlaceholder": "Start typing your diagram idea here...",
+    "inputPlaceholderWithMessages": "Continue refining your diagram...",
+    "rateLimitRemaining": "{{count}} requests left today",
+    "role": {
+      "user": "You",
+      "assistant": "AI Assistant",
+      "system": "System"
+    },
+    "aiBeta": "AI Beta",
+    "label": "Chat",
+    "helpTooltip": "Currently we use Mermaid as a middle step, so you'll get best results if you describe a diagram, workflow, flow chart, and similar.",
+    "helpAriaLabel": "Text-to-diagram help",
+    "menu": "Menu",
+    "newChat": "New Chat",
+    "deleteChat": "Delete chat",
+    "deleteMessage": "Delete message",
+    "viewAsMermaid": "View as Mermaid",
+    "placeholder": {
+      "title": "Let's design your diagram",
+      "description": "Describe the diagram you want to create, and I'll generate it for you.",
+      "hint": "Currently we use Mermaid as a middle step, so you'll get best results if you describe a diagram, workflow, flow chart, and similar."
+    },
+    "preview": "Preview",
+    "insert": "Insert",
+    "retry": "Retry",
+    "errors": {
+      "promptTooShort": "Prompt is too short (min {{min}} characters)",
+      "promptTooLong": "Prompt is too long (max {{max}} characters)",
+      "generationFailed": "Generation failed",
+      "invalidDiagram": "Generated an invalid diagram :(. You may also try a different prompt.",
+      "fixInMermaid": "Edit Mermaid manually →",
+      "aiRepair": "Regenerate →",
+      "requestAborted": "Request aborted",
+      "requestFailed": "Request failed"
+    },
+    "rateLimit": {
+      "message": "You’ve hit your daily AI limit on the free plan. Unlock more power with our most advanced AI or come back tomorrow when your limit resets."
+    },
+    "upsellBtnLabel": "Upgrade to Plus"
   },
   "quickSearch": {
     "placeholder": "Quick search"

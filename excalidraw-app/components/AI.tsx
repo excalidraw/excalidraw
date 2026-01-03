@@ -10,6 +10,8 @@ import { safelyParseJSON } from "@excalidraw/common";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
+import { streamFetch } from "../utils/streamFetch";
+
 export const AIComponents = ({
   excalidrawAPI,
 }: {
@@ -99,60 +101,22 @@ export const AIComponents = ({
       />
 
       <TTDDialog
-        onTextSubmit={async (input) => {
-          try {
-            const response = await fetch(
-              `${
-                import.meta.env.VITE_APP_AI_BACKEND
-              }/v1/ai/text-to-diagram/generate`,
-              {
-                method: "POST",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ prompt: input }),
-              },
-            );
+        onTextSubmit={async (payload) => {
+          const { onChunk, onStreamCreated, signal, ...requestPayload } =
+            payload;
 
-            const rateLimit = response.headers.has("X-Ratelimit-Limit")
-              ? parseInt(response.headers.get("X-Ratelimit-Limit") || "0", 10)
-              : undefined;
+          const result = await streamFetch({
+            url: `${
+              import.meta.env.VITE_APP_AI_BACKEND
+            }/v1/ai/text-to-diagram/chat-streaming`,
+            payload: requestPayload,
+            onChunk,
+            onStreamCreated,
+            extractRateLimits: true,
+            signal,
+          });
 
-            const rateLimitRemaining = response.headers.has(
-              "X-Ratelimit-Remaining",
-            )
-              ? parseInt(
-                  response.headers.get("X-Ratelimit-Remaining") || "0",
-                  10,
-                )
-              : undefined;
-
-            const json = await response.json();
-
-            if (!response.ok) {
-              if (response.status === 429) {
-                return {
-                  rateLimit,
-                  rateLimitRemaining,
-                  error: new Error(
-                    "Too many requests today, please try again tomorrow!",
-                  ),
-                };
-              }
-
-              throw new Error(json.message || "Generation failed...");
-            }
-
-            const generatedResponse = json.generatedResponse;
-            if (!generatedResponse) {
-              throw new Error("Generation failed...");
-            }
-
-            return { generatedResponse, rateLimit, rateLimitRemaining };
-          } catch (err: any) {
-            throw new Error("Request failed");
-          }
+          return result;
         }}
       />
     </>
