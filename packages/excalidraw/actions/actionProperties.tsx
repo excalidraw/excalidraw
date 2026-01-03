@@ -731,8 +731,8 @@ export const actionChangeOpacity = register<ExcalidrawElement["opacity"]>({
   ),
 });
 
-export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
-  {
+export const actionChangeFontSize =
+  register<ExcalidrawTextElement["fontSize"]>({
     name: "changeFontSize",
     label: "labels.fontSize",
     trackEvent: false,
@@ -742,7 +742,10 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
         appState,
         app,
         () => {
-          invariant(value, "actionChangeFontSize: Expected a font size value");
+          invariant(
+            value,
+            "actionChangeFontSize: Expected a font size value",
+          );
           return value;
         },
         value,
@@ -750,6 +753,46 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
     },
     PanelComponent: ({ elements, appState, updateData, app, data }) => {
       const { isCompact } = getStylesPanelInfo(app);
+
+      const currentFontSize = getFormValue(
+        elements,
+        app,
+        (element) => {
+          if (isTextElement(element)) {
+            return element.fontSize;
+          }
+          const boundTextElement = getBoundTextElement(
+            element,
+            app.scene.getNonDeletedElementsMap(),
+          );
+          if (boundTextElement) {
+            return boundTextElement.fontSize;
+          }
+          return null;
+        },
+        (element) =>
+          isTextElement(element) ||
+          getBoundTextElement(
+            element,
+            app.scene.getNonDeletedElementsMap(),
+          ) !== null,
+        (hasSelection) =>
+          hasSelection
+            ? null
+            : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+      );
+
+      const applyFontSize = (size: number) => {
+        if (!Number.isFinite(size) || size <= 0) {
+          return;
+        }
+        withCaretPositionPreservation(
+          () => updateData(size as ExcalidrawTextElement["fontSize"]),
+          isCompact,
+          !!appState.editingTextElement,
+          data?.onPreventClose,
+        );
+      };
 
       return (
         <fieldset>
@@ -783,48 +826,36 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
                   testId: "fontSize-veryLarge",
                 },
               ]}
-              value={getFormValue(
-                elements,
-                app,
-                (element) => {
-                  if (isTextElement(element)) {
-                    return element.fontSize;
-                  }
-                  const boundTextElement = getBoundTextElement(
-                    element,
-                    app.scene.getNonDeletedElementsMap(),
-                  );
-                  if (boundTextElement) {
-                    return boundTextElement.fontSize;
-                  }
-                  return null;
-                },
-                (element) =>
-                  isTextElement(element) ||
-                  getBoundTextElement(
-                    element,
-                    app.scene.getNonDeletedElementsMap(),
-                  ) !== null,
-                (hasSelection) =>
-                  hasSelection
-                    ? null
-                    : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
-              )}
+              value={currentFontSize}
               onChange={(value) => {
-                withCaretPositionPreservation(
-                  () => updateData(value),
-                  isCompact,
-                  !!appState.editingTextElement,
-                  data?.onPreventClose,
-                );
+                applyFontSize(value);
+              }}
+            />
+          </div>
+
+          {/* exact numeric control */}
+          <div className="font-size-input">
+            <div className="font-size-input__label">
+              {t("labels.fontSize")}
+            </div>
+            <input
+              className="font-size-input__control"
+              type="number"
+              min={1}
+              max={500}
+              step={1}
+              value={currentFontSize ?? DEFAULT_FONT_SIZE}
+              onChange={(event) => {
+                const next = Number(event.target.value);
+                applyFontSize(next);
               }}
             />
           </div>
         </fieldset>
       );
     },
-  },
-);
+  });
+
 
 export const actionDecreaseFontSize = register({
   name: "decreaseFontSize",
