@@ -27,6 +27,7 @@ import {
   isArrowKey,
   KEYS,
   APP_NAME,
+  EDITOR_LS_KEYS,
   CURSOR_TYPE,
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
   DEFAULT_VERTICAL_ALIGN,
@@ -344,6 +345,7 @@ import {
 } from "../clipboard";
 
 import { exportCanvas, loadFromBlob } from "../data";
+import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
@@ -629,7 +631,7 @@ class App extends React.Component<AppProps, AppState> {
   /** embeds that have been inserted to DOM (as a perf optim, we don't want to
    * insert to DOM before user initially scrolls to them) */
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
-  private pollSessionId = nanoid();
+  private pollSessionId = string;
   private pollVotes = new Map<
     string,
     Map<string, { optionIds: string[]; updatedAt: number }>
@@ -696,6 +698,19 @@ class App extends React.Component<AppProps, AppState> {
   >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
+  private getOrCreatePollSessionId(): string {
+    const storedId = EditorLocalStorage.get<string>(
+      EDITOR_LS_KEYS.POLL_SESSION_ID,
+    );
+    if (typeof storedId === "string" && storedId.length > 0) {
+      return storedId;
+    }
+    const nextId = nanoid();
+    EditorLocalStorage.set(EDITOR_LS_KEYS.POLL_SESSION_ID, nextId);
+    return nextId;
+  }
+
+
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -742,6 +757,8 @@ class App extends React.Component<AppProps, AppState> {
 
     this.store = new Store(this);
     this.history = new History(this.store);
+
+        this.pollSessionId = this.getOrCreatePollSessionId();
 
     if (excalidrawAPI) {
       const api: ExcalidrawImperativeAPI = {

@@ -108,12 +108,6 @@ export const CLASSES = {
   FRAME_NAME: "frame-name",
 };
 
-export const FONT_SIZES = {
-  sm: 16,
-  md: 20,
-  lg: 28,
-  xl: 36,
-} as const;
 
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
@@ -468,6 +462,7 @@ export const EDITOR_LS_KEYS = {
   // legacy naming (non)scheme
   MERMAID_TO_EXCALIDRAW: "mermaid-to-excalidraw",
   PUBLISH_LIBRARY: "publish-library-data",
+  POLL_SESSION_ID: "excalidraw-poll-session-id",
 } as const;
 
 /**
