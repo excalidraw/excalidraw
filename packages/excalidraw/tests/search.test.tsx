@@ -194,4 +194,59 @@ describe("search", () => {
       expect(h.app.state.searchMatches?.matches.length).toBe(3);
     });
   });
+
+  it("should maintain stable search results order when dragging elements", async () => {
+    const scrollIntoViewMock = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+    // Create two text elements with "test" in their text at different y positions
+    const text1 = API.createElement({
+      type: "text",
+      text: "test 1",
+      x: 0,
+      y: 100,
+    });
+    const text2 = API.createElement({
+      type: "text",
+      text: "test 2",
+      x: 0,
+      y: 0,
+    });
+
+    API.setElements([text1, text2]);
+
+    // Open search
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+
+    const searchInput = await querySearchInput();
+    updateTextEditor(searchInput, "test");
+
+    // Wait for search results
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(2);
+    });
+
+    // Capture initial order of results
+    const initialOrder = h.app.state.searchMatches!.matches.map(
+      (match) => match.id,
+    );
+
+    // Move text2 to a different y position (simulating drag)
+    // This would change the y-coordinate and trigger a re-search
+    API.updateElement(text2, {
+      y: 200,
+    });
+
+    // Wait for search to re-run after element move
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(2);
+      // Verify the order hasn't changed
+      const newOrder = h.app.state.searchMatches!.matches.map(
+        (match) => match.id,
+      );
+      expect(newOrder).toEqual(initialOrder);
+    });
+  });
 });
