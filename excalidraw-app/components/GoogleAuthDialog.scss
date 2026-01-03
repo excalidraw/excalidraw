@@ -1,0 +1,11 @@
+@import "@excalidraw/excalidraw/css/variables.module.scss";
+
+.excalidraw {
+  .google-auth-dialog-buttons {
+    display: flex;
+    column-gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
+}
+

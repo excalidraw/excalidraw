@@ -2,11 +2,13 @@ import { DefaultSidebar, Sidebar, THEME } from "@excalidraw/excalidraw";
 import {
   messageCircleIcon,
   presentationIcon,
+  LibraryIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { LinkButton } from "@excalidraw/excalidraw/components/LinkButton";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 
 import "./AppSidebar.scss";
+import { BoardManagementSidebar } from "./BoardManagementSidebar";
 
 export const AppSidebar = () => {
   const { theme, openSidebar } = useUIAppState();
@@ -14,6 +16,12 @@ export const AppSidebar = () => {
   return (
     <DefaultSidebar>
       <DefaultSidebar.TabTriggers>
+        <Sidebar.TabTrigger
+          tab="boards"
+          style={{ opacity: openSidebar?.tab === "boards" ? 1 : 0.4 }}
+        >
+          {LibraryIcon}
+        </Sidebar.TabTrigger>
         <Sidebar.TabTrigger
           tab="comments"
           style={{ opacity: openSidebar?.tab === "comments" ? 1 : 0.4 }}
@@ -27,6 +35,7 @@ export const AppSidebar = () => {
           {presentationIcon}
         </Sidebar.TabTrigger>
       </DefaultSidebar.TabTriggers>
+      <BoardManagementSidebar />
       <Sidebar.Tab tab="comments">
         <div className="app-sidebar-promo-container">
           <div
