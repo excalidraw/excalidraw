@@ -408,8 +408,7 @@ export const exportToSvg = async (
       const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
       rect.setAttribute(
         "transform",
-        `translate(${frame.x + offsetX} ${frame.y + offsetY}) rotate(${
-          frame.angle
+        `translate(${frame.x + offsetX} ${frame.y + offsetY}) rotate(${frame.angle
         } ${cx} ${cy})`,
       );
       rect.setAttribute("width", `${frame.width}`);
@@ -483,10 +482,10 @@ export const exportToSvg = async (
       canvasBackgroundColor: viewBackgroundColor,
       embedsValidationStatus: renderEmbeddables
         ? new Map(
-            elementsForRender
-              .filter((element) => isFrameLikeElement(element))
-              .map((element) => [element.id, true]),
-          )
+          elementsForRender
+            .filter((element) => isFrameLikeElement(element))
+            .map((element) => [element.id, true]),
+        )
         : new Map(),
       reuseImages: opts?.reuseImages ?? true,
     },
@@ -574,4 +573,43 @@ export const getExportSize = (
   );
 
   return [width, height];
+};
+
+export const exportToPdf = async (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+  files: BinaryFiles,
+  {
+    exportBackground,
+    exportPadding = DEFAULT_EXPORT_PADDING,
+    viewBackgroundColor,
+    exportingFrame,
+  }: {
+    exportBackground: boolean;
+    exportPadding?: number;
+    viewBackgroundColor: string;
+    exportingFrame?: ExcalidrawFrameLikeElement | null;
+  },
+) => {
+  // First render the scene to canvas
+  const canvas = await exportToCanvas(elements, appState, files, {
+    exportBackground,
+    exportPadding,
+    viewBackgroundColor,
+    exportingFrame,
+  });
+
+  // Use jsPDF to convert canvas to PDF
+  const { jsPDF } = await import("jspdf");
+  const pdf = new jsPDF({
+    orientation: canvas.width > canvas.height ? "landscape" : "portrait",
+    unit: "px",
+    format: [canvas.width, canvas.height],
+  });
+
+  // Add canvas to PDF
+  const imgData = canvas.toDataURL("image/png");
+  pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+
+  return pdf;
 };
