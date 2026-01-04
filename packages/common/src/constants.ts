@@ -108,7 +108,6 @@ export const CLASSES = {
   FRAME_NAME: "frame-name",
 };
 
-
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
@@ -424,6 +423,7 @@ export const DEFAULT_ELEMENT_PROPS: {
 
 export const LIBRARY_SIDEBAR_TAB = "library";
 export const CANVAS_SEARCH_TAB = "search";
+export const POLL_SIDEBAR_TAB = "polls";
 
 export const DEFAULT_SIDEBAR = {
   name: "default",
