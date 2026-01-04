@@ -19,7 +19,7 @@ import {
   throttleRAF,
 } from "@excalidraw/common";
 import { decryptData } from "@excalidraw/excalidraw/data/encryption";
-import { getVisibleSceneBounds } from "@excalidraw/element";
+import { getVisibleSceneBounds, hashString } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element";
 import { isImageElement, isInitializedImageElement } from "@excalidraw/element";
 import { AbortError } from "@excalidraw/excalidraw/errors";
@@ -41,6 +41,7 @@ import type {
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 import type {
+  AppState,
   BinaryFileData,
   ExcalidrawImperativeAPI,
   SocketId,
@@ -137,6 +138,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
+  private lastBroadcastedOrReceivedPollsHash: number | null = null;
   private collaborators = new Map<SocketId, Collaborator>();
 
   constructor(props: CollabProps) {
@@ -402,6 +404,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   private destroySocketClient = (opts?: { isUnload: boolean }) => {
     this.lastBroadcastedOrReceivedSceneVersion = -1;
+    this.lastBroadcastedOrReceivedPollsHash = null;
     this.portal.close();
     this.fileManager.reset();
     if (!opts?.isUnload) {
@@ -583,12 +586,22 @@ class Collab extends PureComponent<CollabProps, CollabState> {
             if (!this.portal.socketInitialized) {
               this.initializeRoom({ fetchScene: false });
               const remoteElements = decryptedData.payload.elements;
+              const remotePolls = decryptedData.payload.appState?.polls;
               const reconciledElements =
                 this._reconcileElements(remoteElements);
               this.handleRemoteSceneUpdate(reconciledElements);
+              if (remotePolls) {
+                this.excalidrawAPI.updateScene({
+                  appState: { polls: remotePolls },
+                  captureUpdate: CaptureUpdateAction.NEVER,
+                });
+                this.lastBroadcastedOrReceivedPollsHash =
+                  this.getPollsHash(remotePolls);
+              }
               // noop if already resolved via init from firebase
               scenePromise.resolve({
                 elements: reconciledElements,
+                appState: remotePolls ? { polls: remotePolls } : undefined,
                 scrollToContent: true,
               });
             }
@@ -598,6 +611,15 @@ class Collab extends PureComponent<CollabProps, CollabState> {
             this.handleRemoteSceneUpdate(
               this._reconcileElements(decryptedData.payload.elements),
             );
+            if (decryptedData.payload.appState?.polls) {
+              const remotePolls = decryptedData.payload.appState.polls;
+              this.excalidrawAPI.updateScene({
+                appState: { polls: remotePolls },
+                captureUpdate: CaptureUpdateAction.NEVER,
+              });
+              this.lastBroadcastedOrReceivedPollsHash =
+                this.getPollsHash(remotePolls);
+            }
             break;
           case WS_SUBTYPES.MOUSE_LOCATION: {
             const { pointer, button, username, selectedElementIds } =
@@ -722,18 +744,24 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.excalidrawAPI.resetScene();
 
       try {
-        const elements = await loadFromFirebase(
+        const sceneData = await loadFromFirebase(
           roomLinkData.roomId,
           roomLinkData.roomKey,
           this.portal.socket,
         );
-        if (elements) {
+        if (sceneData) {
           this.setLastBroadcastedOrReceivedSceneVersion(
-            getSceneVersion(elements),
+            getSceneVersion(sceneData.elements),
           );
+          if (sceneData.appState?.polls) {
+            this.lastBroadcastedOrReceivedPollsHash = this.getPollsHash(
+              sceneData.appState.polls,
+            );
+          }
 
           return {
-            elements,
+            elements: sceneData.elements,
+            appState: sceneData.appState,
             scrollToContent: true,
           };
         }
@@ -897,6 +925,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     return this.excalidrawAPI.getSceneElementsIncludingDeleted();
   };
 
+  private getPollsHash = (polls: AppState["polls"]) => {
+    return hashString(JSON.stringify(polls));
+  };
+
   onPointerUpdate = throttle(
     (payload: {
       pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
@@ -934,14 +966,28 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   broadcastElements = (elements: readonly OrderedExcalidrawElement[]) => {
-    if (
-      getSceneVersion(elements) >
-      this.getLastBroadcastedOrReceivedSceneVersion()
-    ) {
-      this.portal.broadcastScene(WS_SUBTYPES.UPDATE, elements, false);
-      this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(elements);
+    const sceneVersion = getSceneVersion(elements);
+    const appState = this.excalidrawAPI.getAppState();
+    const pollsHash = this.getPollsHash(appState.polls);
+    const shouldBroadcastElements =
+      sceneVersion > this.getLastBroadcastedOrReceivedSceneVersion();
+    const shouldBroadcastPolls =
+      this.lastBroadcastedOrReceivedPollsHash !== pollsHash;
+
+    if (!shouldBroadcastElements && !shouldBroadcastPolls) {
+      return;
+    }
+
+    this.portal.broadcastScene(WS_SUBTYPES.UPDATE, elements, false, {
+      polls: appState.polls,
+    });
+
+    if (shouldBroadcastElements) {
+      this.lastBroadcastedOrReceivedSceneVersion = sceneVersion;
       this.queueBroadcastAllElements();
     }
+
+    this.lastBroadcastedOrReceivedPollsHash = pollsHash;
   };
 
   syncElements = (elements: readonly OrderedExcalidrawElement[]) => {
@@ -950,10 +996,12 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   queueBroadcastAllElements = throttle(() => {
+    const appState = this.excalidrawAPI.getAppState();
     this.portal.broadcastScene(
       WS_SUBTYPES.UPDATE,
       this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       true,
+      { polls: appState.polls },
     );
     const currentVersion = this.getLastBroadcastedOrReceivedSceneVersion();
     const newVersion = Math.max(
@@ -961,6 +1009,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       getSceneVersion(this.getSceneElementsIncludingDeleted()),
     );
     this.setLastBroadcastedOrReceivedSceneVersion(newVersion);
+    this.lastBroadcastedOrReceivedPollsHash = this.getPollsHash(appState.polls);
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
   queueSaveToFirebase = throttle(

@@ -351,6 +351,8 @@ describe("AppStateDelta", () => {
         selectedLinearElementIsEditing: null,
         lockedMultiSelections: {},
         activeLockedId: null,
+        polls: [],
+        selectedPollId: null,
       };
 
       const prevAppState1: ObservedAppState = {
@@ -393,6 +395,8 @@ describe("AppStateDelta", () => {
         selectedLinearElement: null,
         activeLockedId: null,
         lockedMultiSelections: {},
+        polls: [],
+        selectedPollId: null,
       };
 
       const prevAppState1: ObservedAppState = {
@@ -439,6 +443,8 @@ describe("AppStateDelta", () => {
         selectedLinearElement: null,
         activeLockedId: null,
         lockedMultiSelections: {},
+        polls: [],
+        selectedPollId: null,
       };
 
       const prevAppState1: ObservedAppState = {

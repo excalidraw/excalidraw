@@ -82,6 +82,8 @@ export const getDefaultAppState = (): Omit<
     openMenu: null,
     openPopup: null,
     openSidebar: null,
+    polls: [],
+    selectedPollId: null,
     openDialog: null,
     pasteDialog: { shown: false, data: null },
     previousSelectedElementIds: {},
@@ -211,6 +213,8 @@ const APP_STATE_STORAGE_CONF = (<
   openMenu: { browser: true, export: false, server: false },
   openPopup: { browser: false, export: false, server: false },
   openSidebar: { browser: true, export: false, server: false },
+  polls: { browser: true, export: true, server: true },
+  selectedPollId: { browser: true, export: false, server: false },
   openDialog: { browser: false, export: false, server: false },
   pasteDialog: { browser: false, export: false, server: false },
   previousSelectedElementIds: { browser: true, export: false, server: false },
@@ -293,14 +297,14 @@ export const clearAppStateForDatabase = (appState: Partial<AppState>) => {
 };
 
 export const isEraserActive = ({
-  activeTool,
-}: {
+                                 activeTool,
+                               }: {
   activeTool: AppState["activeTool"];
 }) => activeTool.type === "eraser";
 
 export const isHandToolActive = ({
-  activeTool,
-}: {
+                                   activeTool,
+                                 }: {
   activeTool: AppState["activeTool"];
 }) => {
   return activeTool.type === "hand";

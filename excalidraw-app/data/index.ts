@@ -1,4 +1,3 @@
-
 import {
   compressData,
   decompressData,
@@ -79,6 +78,8 @@ export type EncryptedData = {
   iv: Uint8Array;
 };
 
+type SceneAppState = Pick<AppState, "polls">;
+
 export type SocketUpdateDataSource = {
   INVALID_RESPONSE: {
     type: WS_SUBTYPES.INVALID_RESPONSE;
@@ -87,12 +88,14 @@ export type SocketUpdateDataSource = {
     type: WS_SUBTYPES.INIT;
     payload: {
       elements: readonly ExcalidrawElement[];
+      appState?: SceneAppState;
     };
   };
   SCENE_UPDATE: {
     type: WS_SUBTYPES.UPDATE;
     payload: {
       elements: readonly ExcalidrawElement[];
+      appState?: SceneAppState;
     };
   };
   MOUSE_LOCATION: {

@@ -17,6 +17,7 @@ export type PollBallot = {
 
 export type PollMetadata = {
   id: string;
+  createdAt: number;
   question: string;
   options: PollOption[];
   results?: Record<string, number>;

@@ -14,6 +14,7 @@ export const createDefaultPoll = (createdBy: string): PollMetadata => {
 
   return {
     id: nanoid(),
+    createdAt: Date.now(),
     question: "New Poll",
     options,
     results: options.reduce<Record<string, number>>((acc, option) => {
