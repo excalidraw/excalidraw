@@ -74,7 +74,6 @@ const getConfig = (outdir) => ({
   alias: {
     "@excalidraw/utils": path.resolve(__dirname, "../packages/utils/src"),
   },
-  external: ["@excalidraw/common", "@excalidraw/element", "@excalidraw/math"],
   loader: {
     ".woff2": "file",
   },

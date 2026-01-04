@@ -170,6 +170,7 @@ const renderLinkIcon = (
   context: CanvasRenderingContext2D,
   appState: StaticCanvasAppState,
   elementsMap: ElementsMap,
+  renderConfig: StaticCanvasRenderConfig,
 ) => {
   if (element.link && !appState.selectedElementIds[element.id]) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
@@ -204,7 +205,8 @@ const renderLinkIcon = (
         window.devicePixelRatio * appState.zoom.value,
         window.devicePixelRatio * appState.zoom.value,
       );
-      linkCanvasCacheContext.fillStyle = appState.viewBackgroundColor || "#fff";
+      linkCanvasCacheContext.fillStyle =
+        renderConfig.canvasBackgroundColor || "#fff";
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
       if (canvasKey === "elementLink") {
@@ -370,7 +372,7 @@ const _renderStaticScene = ({
         context.restore();
 
         if (!isExporting) {
-          renderLinkIcon(element, context, appState, elementsMap);
+          renderLinkIcon(element, context, appState, elementsMap, renderConfig);
         }
       } catch (error: any) {
         console.error(
@@ -421,7 +423,13 @@ const _renderStaticScene = ({
             );
           }
           if (!isExporting) {
-            renderLinkIcon(element, context, appState, elementsMap);
+            renderLinkIcon(
+              element,
+              context,
+              appState,
+              elementsMap,
+              renderConfig,
+            );
           }
         };
         // - when exporting the whole canvas, we DO NOT apply clipping

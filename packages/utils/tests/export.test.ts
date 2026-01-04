@@ -1,4 +1,3 @@
-import { MIME_TYPES } from "@excalidraw/common";
 import * as mockedSceneExportUtils from "@excalidraw/excalidraw/scene/export";
 import { diagramFactory } from "@excalidraw/excalidraw/tests/fixtures/diagramFixture";
 import { vi } from "vitest";
@@ -6,6 +5,7 @@ import { vi } from "vitest";
 import { exportToCanvas } from "@excalidraw/excalidraw/scene/export";
 
 import * as utils from "../src";
+import { exportToCanvas, MIME_TYPES } from "../src";
 
 const exportToSvgSpy = vi.spyOn(mockedSceneExportUtils, "exportToSvg");
 

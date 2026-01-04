@@ -83,11 +83,13 @@ describe("export", () => {
   });
 
   it("export svg-embedded scene", async () => {
-    const svg = await exportToSvg(
-      testElements,
-      { ...getDefaultAppState(), exportEmbedScene: true },
-      {},
-    );
+    const svg = await exportToSvg({
+      data: {
+        elements: testElements,
+        appState: { ...getDefaultAppState(), exportEmbedScene: true },
+        files: null,
+      },
+    });
     const svgText = svg.outerHTML;
 
     expect(svgText).toMatchSnapshot(`svg-embdedded scene export output`);

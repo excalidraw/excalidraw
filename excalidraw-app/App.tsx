@@ -851,7 +851,7 @@ const ExcalidrawWrapper = () => {
     type: string;
     locked?: boolean;
     prevLockState?: boolean;
-  }>({ type: "selection", locked: false, prevLockState: false });
+  }>({ type: "selection" });
 
   const toggleCommentTool = useCallback(() => {
     const nextType =

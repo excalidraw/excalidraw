@@ -1,4 +1,8 @@
-import { loginIcon, eyeIcon } from "@excalidraw/excalidraw/components/icons";
+import {
+  loginIcon,
+  eyeIcon,
+  ExcalLogo,
+} from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
 
@@ -37,6 +41,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
       <MainMenu.ItemLink
+        icon={ExcalLogo}
         href={`${
           import.meta.env.VITE_APP_PLUS_LP
         }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}

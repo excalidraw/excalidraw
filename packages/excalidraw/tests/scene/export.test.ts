@@ -68,22 +68,24 @@ describe("exportToSvg", () => {
   });
 
   it("with a CJK font", async () => {
-    const svgElement = await exportUtils.exportToSvg(
-      [
-        ...ELEMENTS,
-        {
-          ...textFixture,
-          height: ELEMENT_HEIGHT,
-          width: ELEMENT_WIDTH,
-          text: "中国你好！这是一个测试。中国你好！日本こんにちは！これはテストです。한국 안녕하세요! 이것은 테스트입니다.",
-          originalText:
-            "中国你好！这是一个测试。中国你好！日本こんにちは！これはテストです。한국 안녕하세요! 이것은 테스트입니다.",
-          index: "a4" as FractionalIndex,
-        } as ExcalidrawTextElement,
-      ],
-      DEFAULT_OPTIONS,
-      null,
-    );
+    const svgElement = await exportUtils.exportToSvg({
+      data: {
+        elements: [
+          ...ELEMENTS,
+          {
+            ...textFixture,
+            height: ELEMENT_HEIGHT,
+            width: ELEMENT_WIDTH,
+            text: "中国你好！这是一个测试。中国你好！日本こんにちは！これはテストです。한국 안녕하세요! 이것은 테스트입니다.",
+            originalText:
+              "中国你好！这是一个测试。中国你好！日本こんにちは！これはテストです。한국 안녕하세요! 이것은 테스트입니다.",
+            index: "a4" as FractionalIndex,
+          } as ExcalidrawTextElement,
+        ],
+        appState: DEFAULT_OPTIONS,
+        files: null,
+      },
+    });
 
     expect(svgElement).toMatchSnapshot();
     // extend the timeout, as it needs to first load the fonts from disk and then perform whole woff2 decode, subset and encode (without workers)

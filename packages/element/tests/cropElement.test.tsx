@@ -330,22 +330,28 @@ describe("Cropping and other features", async () => {
     const widthToHeightRatio = image.width / image.height;
 
     const canvas = await exportToCanvas({
-      elements: [image],
-      // @ts-ignore
-      appState: h.state,
-      files: h.app.files,
-      exportPadding: 0,
+      data: {
+        elements: [image],
+        // @ts-ignore
+        appState: h.state,
+        files: h.app.files,
+      },
+      config: { padding: 0 },
     });
     const exportedCanvasRatio = canvas.width / canvas.height;
 
     expect(widthToHeightRatio).toBeCloseTo(exportedCanvasRatio);
 
     const svg = await exportToSvg({
-      elements: [image],
-      // @ts-ignore
-      appState: h.state,
-      files: h.app.files,
-      exportPadding: 0,
+      data: {
+        elements: [image],
+        // @ts-ignore
+        appState: h.state,
+        files: h.app.files,
+      },
+      config: {
+        padding: 0,
+      },
     });
     const svgWidth = svg.getAttribute("width");
     const svgHeight = svg.getAttribute("height");

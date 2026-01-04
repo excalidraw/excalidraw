@@ -1,4 +1,3 @@
-import React from "react";
 import {
   queryByText,
   fireEvent,
@@ -19,6 +18,7 @@ import {
   COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
+  COLOR_CHARCOAL_BLACK,
   reseed,
   randomId,
 } from "@excalidraw/common";
@@ -111,7 +111,7 @@ const checkpoint = (name: string) => {
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
 const transparent = COLOR_PALETTE.transparent;
-const black = COLOR_PALETTE.black;
+const black = COLOR_CHARCOAL_BLACK;
 const red = COLOR_PALETTE.red[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
 const blue = COLOR_PALETTE.blue[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
 const yellow = COLOR_PALETTE.yellow[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];

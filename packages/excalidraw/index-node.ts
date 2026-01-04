@@ -1,6 +1,7 @@
+import { COLOR_WHITE } from "../common/src";
+
 import { getDefaultAppState } from "./appState";
 import { exportToCanvas } from "./scene/export";
-import { COLOR_WHITE } from "./constants";
 
 const fs = require("fs");
 

@@ -231,7 +231,10 @@ const LayerUI = ({
     <div style={{ position: "relative" }}>
       {/* wrapping to Fragment stops React from occasionally complaining
                 about identical Keys */}
-      <tunnels.MainMenuTunnel.Out />
+      <div className="excalidraw-ui-top-left">
+        {renderTopLeftUI?.(false, appState)}
+        <tunnels.MainMenuTunnel.Out />
+      </div>
       {renderWelcomeScreen && <tunnels.WelcomeScreenMenuHintTunnel.Out />}
     </div>
   );
