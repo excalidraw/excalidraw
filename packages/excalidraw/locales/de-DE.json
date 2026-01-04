@@ -196,7 +196,7 @@
     "multipleResults": "Ergebnisse",
     "placeholder": "Text auf Zeichenfläche suchen...",
     "frames": "",
-    "texts": ""
+    "texts": "Texte"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -569,7 +569,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Farbe",
     "mostUsedCustomColors": "Beliebteste benutzerdefinierte Farben",
     "colors": "Farben",
     "shades": "Schattierungen",
@@ -651,15 +651,15 @@
     "shortcutHint": "Benutze {{shortcut}} für Befehlspalette"
   },
   "keys": {
-    "ctrl": "",
+    "ctrl": "Strg",
     "option": "",
     "cmd": "",
     "alt": "",
     "escape": "",
     "enter": "",
     "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "spacebar": "Leertaste",
+    "delete": "Löschen",
+    "mmb": "Mausrad"
   }
 }

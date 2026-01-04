@@ -341,7 +341,7 @@
     "canvasPanning": "Per spostare la tela, tieni premuto {{shortcut_1}} o {{shortcut_2}} durante il trascinamento, oppure usa lo strumento della mano",
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "arrowTool": "Fai clic per iniziare più punti, trascina per una singola linea. Premi di nuovo {{shortcut}} per cambiare il tipo di freccia.",
-    "arrowBindModifiers": "",
+    "arrowBindModifiers": "Tieni premuto {{shortcut_1}} per disabilitare il binding, oppure {{shortcut_2}} per il binding a un punto fisso",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
     "embeddable": "Fare click e trascina per creare un incorporamento web",
