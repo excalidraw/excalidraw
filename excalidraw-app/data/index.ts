@@ -8,7 +8,6 @@ import {
   IV_LENGTH_BYTES,
 } from "@excalidraw/excalidraw/data/encryption";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
-import { restore } from "@excalidraw/excalidraw/data/restore";
 import { isInvisiblySmallElement } from "@excalidraw/element";
 import { isInitializedImageElement } from "@excalidraw/element";
 import { t } from "@excalidraw/excalidraw/i18n";
@@ -84,13 +83,13 @@ export type SocketUpdateDataSource = {
   SCENE_INIT: {
     type: WS_SUBTYPES.INIT;
     payload: {
-      elements: readonly ExcalidrawElement[];
+      elements: readonly OrderedExcalidrawElement[];
     };
   };
   SCENE_UPDATE: {
     type: WS_SUBTYPES.UPDATE;
     payload: {
-      elements: readonly ExcalidrawElement[];
+      elements: readonly OrderedExcalidrawElement[];
     };
   };
   MOUSE_LOCATION: {
@@ -200,7 +199,7 @@ const legacy_decodeFromBackend = async ({
   };
 };
 
-const importFromBackend = async (
+export const importFromBackend = async (
   id: string,
   decryptionKey: string,
 ): Promise<ImportedDataState> => {
@@ -240,45 +239,6 @@ const importFromBackend = async (
     console.error(error);
     return {};
   }
-};
-
-export const loadScene = async (
-  id: string | null,
-  privateKey: string | null,
-  // Supply local state even if importing from backend to ensure we restore
-  // localStorage user settings which we do not persist on server.
-  // Non-optional so we don't forget to pass it even if `undefined`.
-  localDataState: ImportedDataState | undefined | null,
-) => {
-  let data;
-  if (id != null && privateKey != null) {
-    // the private key is used to decrypt the content from the server, take
-    // extra care not to leak it
-    data = restore(
-      await importFromBackend(id, privateKey),
-      localDataState?.appState,
-      localDataState?.elements,
-      {
-        repairBindings: true,
-        refreshDimensions: false,
-        deleteInvisibleElements: true,
-      },
-    );
-  } else {
-    data = restore(localDataState || null, null, null, {
-      repairBindings: true,
-      deleteInvisibleElements: true,
-    });
-  }
-
-  return {
-    elements: data.elements,
-    appState: data.appState,
-    // note: this will always be empty because we're not storing files
-    // in the scene database/localStorage, and instead fetch them async
-    // from a different database
-    files: data.files,
-  };
 };
 
 type ExportToBackendResult =
