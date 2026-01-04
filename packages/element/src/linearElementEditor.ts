@@ -42,6 +42,7 @@ import type {
   NullableGridSize,
   Zoom,
 } from "@excalidraw/excalidraw/types";
+import type { Bounds } from "@excalidraw/common";
 
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -68,7 +69,6 @@ import { isLineElement } from "./typeChecks";
 
 import type { Scene } from "./Scene";
 
-import type { Bounds } from "./bounds";
 import type {
   NonDeleted,
   ExcalidrawLinearElement,

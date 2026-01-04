@@ -10,7 +10,7 @@ import type {
   Zoom,
 } from "@excalidraw/excalidraw/types";
 
-import { COLOR_PALETTE } from "./colors";
+import { tinycolor } from "./colors";
 import {
   DEFAULT_VERSION,
   ENV,
@@ -549,13 +549,7 @@ export const mapFind = <T, K>(
 };
 
 export const isTransparent = (color: string) => {
-  const isRGBTransparent = color.length === 5 && color.substr(4, 1) === "0";
-  const isRRGGBBTransparent = color.length === 9 && color.substr(7, 2) === "00";
-  return (
-    isRGBTransparent ||
-    isRRGGBBTransparent ||
-    color === COLOR_PALETTE.transparent
-  );
+  return tinycolor(color).getAlpha() === 0;
 };
 
 export type ResolvablePromise<T> = Promise<T> & {
@@ -1157,39 +1151,69 @@ export const normalizeEOL = (str: string) => {
 };
 
 // -----------------------------------------------------------------------------
-type HasBrand<T> = {
+export type HasBrand<T> = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  [K in keyof T]: K extends `~brand${infer _}` ? true : never;
+  [K in keyof T]: K extends `~brand${infer _}` | "_brand" ? true : never;
 }[keyof T];
 
 type RemoveAllBrands<T> = HasBrand<T> extends true
   ? {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      [K in keyof T as K extends `~brand~${infer _}` ? never : K]: T[K];
+      [K in keyof T as K extends `~brand~${infer _}` | "_brand"
+        ? never
+        : K]: T[K];
     }
-  : never;
+  : T;
 
-// adapted from https://github.com/colinhacks/zod/discussions/1994#discussioncomment-6068940
-// currently does not cover all types (e.g. tuples, promises...)
-type Unbrand<T> = T extends Map<infer E, infer F>
-  ? Map<E, F>
+// For accepting values - uses loose matching for branded types
+// Preserves readonly modifier: mutable array requires mutable input
+type UnbrandForValue<T> = T extends Map<infer E, infer F>
+  ? Map<UnbrandForValue<E>, UnbrandForValue<F>>
   : T extends Set<infer E>
-  ? Set<E>
-  : T extends Array<infer E>
-  ? Array<E>
+  ? Set<UnbrandForValue<E>>
+  : T extends readonly any[]
+  ? T extends any[]
+    ? unknown[] // mutable array - require mutable input
+    : readonly unknown[] // readonly array - accept readonly input
   : RemoveAllBrands<T>;
+
+// For return types - preserves array element unbranding
+export type Unbrand<T> = T extends Map<infer E, infer F>
+  ? Map<Unbrand<E>, Unbrand<F>>
+  : T extends Set<infer E>
+  ? Set<Unbrand<E>>
+  : T extends readonly (infer E)[]
+  ? Array<Unbrand<E>>
+  : RemoveAllBrands<T>;
+
+export type CombineBrands<BrandedType, CurrentType> =
+  BrandedType extends readonly (infer BE)[]
+    ? CurrentType extends readonly (infer CE)[]
+      ? Array<CE & BE>
+      : CurrentType & BrandedType
+    : CurrentType & BrandedType;
+
+export type CombineBrandsIfNeeded<T, Required> = [T] extends [Required]
+  ? T[]
+  : HasBrand<T> extends true
+  ? CombineBrands<T, Required>[]
+  : Required[];
 
 /**
  * Makes type into a branded type, ensuring that value is assignable to
- * the base ubranded type. Optionally you can explicitly supply current value
+ * the base unbranded type. Optionally you can explicitly supply current value
  * type to combine both (useful for composite branded types. Make sure you
  * compose branded types which are not composite themselves.)
  */
-export const toBrandedType = <BrandedType, CurrentType = BrandedType>(
-  value: Unbrand<BrandedType>,
-) => {
-  return value as CurrentType & BrandedType;
-};
+export function toBrandedType<BrandedType>(
+  value: UnbrandForValue<BrandedType>,
+): BrandedType;
+export function toBrandedType<BrandedType, CurrentType>(
+  value: CurrentType,
+): CombineBrands<BrandedType, CurrentType>;
+export function toBrandedType(value: unknown) {
+  return value;
+}
 
 // -----------------------------------------------------------------------------
 

@@ -1,4 +1,9 @@
-import { FRAME_STYLE, throttleRAF } from "@excalidraw/common";
+import {
+  applyDarkModeFilter,
+  FRAME_STYLE,
+  THEME,
+  throttleRAF,
+} from "@excalidraw/common";
 import { isElementLink } from "@excalidraw/element";
 import { createPlaceholderEmbeddableLabel } from "@excalidraw/element";
 import { getBoundTextElement } from "@excalidraw/element";
@@ -38,8 +43,14 @@ import type {
 import type { StaticCanvasAppState, Zoom } from "../types";
 
 const GridLineColor = {
-  Bold: "#dddddd",
-  Regular: "#e5e5e5",
+  [THEME.LIGHT]: {
+    bold: "#dddddd",
+    regular: "#e5e5e5",
+  },
+  [THEME.DARK]: {
+    bold: applyDarkModeFilter("#dddddd"),
+    regular: applyDarkModeFilter("#e5e5e5"),
+  },
 } as const;
 
 const strokeGrid = (
@@ -51,6 +62,7 @@ const strokeGrid = (
   scrollX: number,
   scrollY: number,
   zoom: Zoom,
+  theme: StaticCanvasRenderConfig["theme"],
   width: number,
   height: number,
 ) => {
@@ -86,7 +98,9 @@ const strokeGrid = (
 
     context.beginPath();
     context.setLineDash(isBold ? [] : lineDash);
-    context.strokeStyle = isBold ? GridLineColor.Bold : GridLineColor.Regular;
+    context.strokeStyle = isBold
+      ? GridLineColor[theme].bold
+      : GridLineColor[theme].regular;
     context.moveTo(x, offsetY - gridSize);
     context.lineTo(x, Math.ceil(offsetY + height + gridSize * 2));
     context.stroke();
@@ -105,7 +119,9 @@ const strokeGrid = (
 
     context.beginPath();
     context.setLineDash(isBold ? [] : lineDash);
-    context.strokeStyle = isBold ? GridLineColor.Bold : GridLineColor.Regular;
+    context.strokeStyle = isBold
+      ? GridLineColor[theme].bold
+      : GridLineColor[theme].regular;
     context.moveTo(offsetX - gridSize, y);
     context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
     context.stroke();
@@ -252,6 +268,7 @@ const _renderStaticScene = ({
       appState.scrollX,
       appState.scrollY,
       appState.zoom,
+      renderConfig.theme,
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,
     );

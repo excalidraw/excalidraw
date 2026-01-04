@@ -97,6 +97,12 @@ export const convertMermaidToExcalidraw = async ({
       maxWidthOrHeight:
         Math.max(parent.offsetWidth, parent.offsetHeight) *
         window.devicePixelRatio,
+      appState: {
+        // TODO hack (will be refactored in TTD v2)
+        exportWithDarkMode: document
+          .querySelector(".excalidraw-container")
+          ?.classList.contains("theme--dark"),
+      },
     });
 
     parent.style.background = "var(--default-bg-color)";

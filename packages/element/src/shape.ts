@@ -1,4 +1,5 @@
 import { simplify } from "points-on-curve";
+import { getStroke } from "perfect-freehand";
 
 import {
   type GeometricShape,
@@ -17,10 +18,12 @@ import {
 } from "@excalidraw/math";
 import {
   ROUGHNESS,
+  THEME,
   isTransparent,
   assertNever,
   COLOR_PALETTE,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
+  applyDarkModeFilter,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
@@ -36,6 +39,7 @@ import type {
 import type {
   ElementShape,
   ElementShapes,
+  SVGPathString,
 } from "@excalidraw/excalidraw/scene/types";
 
 import { elementWithCanvasCache } from "./renderElement";
@@ -52,7 +56,6 @@ import { getCornerRadius, isPathALoop } from "./utils";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
-import { generateFreeDrawShape } from "./renderElement";
 import {
   getArrowheadPoints,
   getCenterForBounds,
@@ -77,29 +80,32 @@ import type { Point as RoughPoint } from "roughjs/bin/geometry";
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
-  private static cache = new WeakMap<ExcalidrawElement, ElementShape>();
+  private static cache = new WeakMap<
+    ExcalidrawElement,
+    { shape: ElementShape; theme: AppState["theme"] }
+  >();
 
   /**
    * Retrieves shape from cache if available. Use this only if shape
    * is optional and you have a fallback in case it's not cached.
    */
-  public static get = <T extends ExcalidrawElement>(element: T) => {
-    return ShapeCache.cache.get(
-      element,
-    ) as T["type"] extends keyof ElementShapes
-      ? ElementShapes[T["type"]] | undefined
-      : ElementShape | undefined;
+  public static get = <T extends ExcalidrawElement>(
+    element: T,
+    theme: AppState["theme"] | null,
+  ) => {
+    const cached = ShapeCache.cache.get(element);
+    if (cached && (theme === null || cached.theme === theme)) {
+      return cached.shape as T["type"] extends keyof ElementShapes
+        ? ElementShapes[T["type"]] | undefined
+        : ElementShape | undefined;
+    }
+    return undefined;
   };
 
-  public static set = <T extends ExcalidrawElement>(
-    element: T,
-    shape: T["type"] extends keyof ElementShapes
-      ? ElementShapes[T["type"]]
-      : Drawable,
-  ) => ShapeCache.cache.set(element, shape);
-
-  public static delete = (element: ExcalidrawElement) =>
+  public static delete = (element: ExcalidrawElement) => {
     ShapeCache.cache.delete(element);
+    elementWithCanvasCache.delete(element);
+  };
 
   public static destroy = () => {
     ShapeCache.cache = new WeakMap();
@@ -117,12 +123,13 @@ export class ShapeCache {
       isExporting: boolean;
       canvasBackgroundColor: AppState["viewBackgroundColor"];
       embedsValidationStatus: EmbedsValidationStatus;
+      theme: AppState["theme"];
     } | null,
   ) => {
     // when exporting, always regenerated to guarantee the latest shape
     const cachedShape = renderConfig?.isExporting
       ? undefined
-      : ShapeCache.get(element);
+      : ShapeCache.get(element, renderConfig ? renderConfig.theme : null);
 
     // `null` indicates no rc shape applicable for this element type,
     // but it's considered a valid cache value (= do not regenerate)
@@ -132,19 +139,25 @@ export class ShapeCache {
 
     elementWithCanvasCache.delete(element);
 
-    const shape = generateElementShape(
+    const shape = _generateElementShape(
       element,
       ShapeCache.rg,
       renderConfig || {
         isExporting: false,
         canvasBackgroundColor: COLOR_PALETTE.white,
         embedsValidationStatus: null,
+        theme: THEME.LIGHT,
       },
     ) as T["type"] extends keyof ElementShapes
       ? ElementShapes[T["type"]]
       : Drawable | null;
 
-    ShapeCache.cache.set(element, shape);
+    if (!renderConfig?.isExporting) {
+      ShapeCache.cache.set(element, {
+        shape,
+        theme: renderConfig?.theme || THEME.LIGHT,
+      });
+    }
 
     return shape;
   };
@@ -180,6 +193,7 @@ function adjustRoughness(element: ExcalidrawElement): number {
 export const generateRoughOptions = (
   element: ExcalidrawElement,
   continuousPath = false,
+  isDarkMode: boolean = false,
 ): Options => {
   const options: Options = {
     seed: element.seed,
@@ -204,7 +218,9 @@ export const generateRoughOptions = (
     fillWeight: element.strokeWidth / 2,
     hachureGap: element.strokeWidth * 4,
     roughness: adjustRoughness(element),
-    stroke: element.strokeColor,
+    stroke: isDarkMode
+      ? applyDarkModeFilter(element.strokeColor)
+      : element.strokeColor,
     preserveVertices:
       continuousPath || element.roughness < ROUGHNESS.cartoonist,
   };
@@ -218,6 +234,8 @@ export const generateRoughOptions = (
       options.fillStyle = element.fillStyle;
       options.fill = isTransparent(element.backgroundColor)
         ? undefined
+        : isDarkMode
+        ? applyDarkModeFilter(element.backgroundColor)
         : element.backgroundColor;
       if (element.type === "ellipse") {
         options.curveFitting = 1;
@@ -231,6 +249,8 @@ export const generateRoughOptions = (
         options.fill =
           element.backgroundColor === "transparent"
             ? undefined
+            : isDarkMode
+            ? applyDarkModeFilter(element.backgroundColor)
             : element.backgroundColor;
       }
       return options;
@@ -284,6 +304,7 @@ const getArrowheadShapes = (
   generator: RoughGenerator,
   options: Options,
   canvasBackgroundColor: string,
+  isDarkMode: boolean,
 ) => {
   const arrowheadPoints = getArrowheadPoints(
     element,
@@ -309,6 +330,10 @@ const getArrowheadShapes = (
     return [generator.line(x3, y3, x4, y4, options)];
   };
 
+  const strokeColor = isDarkMode
+    ? applyDarkModeFilter(element.strokeColor)
+    : element.strokeColor;
+
   switch (arrowhead) {
     case "dot":
     case "circle":
@@ -324,10 +349,10 @@ const getArrowheadShapes = (
           fill:
             arrowhead === "circle_outline"
               ? canvasBackgroundColor
-              : element.strokeColor,
+              : strokeColor,
 
           fillStyle: "solid",
-          stroke: element.strokeColor,
+          stroke: strokeColor,
           roughness: Math.min(0.5, options.roughness || 0),
         }),
       ];
@@ -352,7 +377,7 @@ const getArrowheadShapes = (
             fill:
               arrowhead === "triangle_outline"
                 ? canvasBackgroundColor
-                : element.strokeColor,
+                : strokeColor,
             fillStyle: "solid",
             roughness: Math.min(1, options.roughness || 0),
           },
@@ -380,7 +405,7 @@ const getArrowheadShapes = (
             fill:
               arrowhead === "diamond_outline"
                 ? canvasBackgroundColor
-                : element.strokeColor,
+                : strokeColor,
             fillStyle: "solid",
             roughness: Math.min(1, options.roughness || 0),
           },
@@ -602,19 +627,22 @@ export const generateLinearCollisionShape = (
  *
  * @private
  */
-const generateElementShape = (
+const _generateElementShape = (
   element: Exclude<NonDeletedExcalidrawElement, ExcalidrawSelectionElement>,
   generator: RoughGenerator,
   {
     isExporting,
     canvasBackgroundColor,
     embedsValidationStatus,
+    theme,
   }: {
     isExporting: boolean;
     canvasBackgroundColor: string;
     embedsValidationStatus: EmbedsValidationStatus | null;
+    theme?: AppState["theme"];
   },
-): Drawable | Drawable[] | null => {
+): ElementShape => {
+  const isDarkMode = theme === THEME.DARK;
   switch (element.type) {
     case "rectangle":
     case "iframe":
@@ -640,6 +668,7 @@ const generateElementShape = (
               embedsValidationStatus,
             ),
             true,
+            isDarkMode,
           ),
         );
       } else {
@@ -655,6 +684,7 @@ const generateElementShape = (
               embedsValidationStatus,
             ),
             false,
+            isDarkMode,
           ),
         );
       }
@@ -692,7 +722,7 @@ const generateElementShape = (
             C ${topX} ${topY}, ${topX} ${topY}, ${topX + verticalRadius} ${
             topY + horizontalRadius
           }`,
-          generateRoughOptions(element, true),
+          generateRoughOptions(element, true, isDarkMode),
         );
       } else {
         shape = generator.polygon(
@@ -702,7 +732,7 @@ const generateElementShape = (
             [bottomX, bottomY],
             [leftX, leftY],
           ],
-          generateRoughOptions(element),
+          generateRoughOptions(element, false, isDarkMode),
         );
       }
       return shape;
@@ -713,14 +743,14 @@ const generateElementShape = (
         element.height / 2,
         element.width,
         element.height,
-        generateRoughOptions(element),
+        generateRoughOptions(element, false, isDarkMode),
       );
       return shape;
     }
     case "line":
     case "arrow": {
       let shape: ElementShapes[typeof element.type];
-      const options = generateRoughOptions(element);
+      const options = generateRoughOptions(element, false, isDarkMode);
 
       // points array can be empty in the beginning, so it is important to add
       // initial position to it
@@ -745,7 +775,7 @@ const generateElementShape = (
           shape = [
             generator.path(
               generateElbowArrowShape(points, 16),
-              generateRoughOptions(element, true),
+              generateRoughOptions(element, true, isDarkMode),
             ),
           ];
         }
@@ -778,6 +808,7 @@ const generateElementShape = (
             generator,
             options,
             canvasBackgroundColor,
+            isDarkMode,
           );
           shape.push(...shapes);
         }
@@ -795,6 +826,7 @@ const generateElementShape = (
             generator,
             options,
             canvasBackgroundColor,
+            isDarkMode,
           );
           shape.push(...shapes);
         }
@@ -802,23 +834,28 @@ const generateElementShape = (
       return shape;
     }
     case "freedraw": {
-      let shape: ElementShapes[typeof element.type];
-      generateFreeDrawShape(element);
+      // oredered in terms of z-index [background, stroke]
+      const shapes: ElementShapes[typeof element.type] = [];
 
+      // (1) background fill (rc shape), optional
       if (isPathALoop(element.points)) {
         // generate rough polygon to fill freedraw shape
         const simplifiedPoints = simplify(
           element.points as Mutable<LocalPoint[]>,
           0.75,
         );
-        shape = generator.curve(simplifiedPoints as [number, number][], {
-          ...generateRoughOptions(element),
-          stroke: "none",
-        });
-      } else {
-        shape = null;
+        shapes.push(
+          generator.curve(simplifiedPoints as [number, number][], {
+            ...generateRoughOptions(element, false, isDarkMode),
+            stroke: "none",
+          }),
+        );
       }
-      return shape;
+
+      // (2) stroke
+      shapes.push(getFreeDrawSvgPath(element));
+
+      return shapes;
     }
     case "frame":
     case "magicframe":
@@ -925,9 +962,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
       return getPolygonShape(element);
     case "arrow":
     case "line": {
-      const roughShape =
-        ShapeCache.get(element)?.[0] ??
-        ShapeCache.generateElementShape(element, null)[0];
+      const roughShape = ShapeCache.generateElementShape(element, null)[0];
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
 
       return shouldTestInside(element)
@@ -1003,3 +1038,69 @@ export const toggleLinePolygonState = (
 
   return ret;
 };
+
+// -----------------------------------------------------------------------------
+//                         freedraw shape helper
+// -----------------------------------------------------------------------------
+
+// NOTE not cached (-> for SVG export)
+const getFreeDrawSvgPath = (element: ExcalidrawFreeDrawElement) => {
+  return getSvgPathFromStroke(
+    getFreedrawOutlinePoints(element),
+  ) as SVGPathString;
+};
+
+export const getFreedrawOutlinePoints = (
+  element: ExcalidrawFreeDrawElement,
+) => {
+  // If input points are empty (should they ever be?) return a dot
+  const inputPoints = element.simulatePressure
+    ? element.points
+    : element.points.length
+    ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
+    : [[0, 0, 0.5]];
+
+  return getStroke(inputPoints as number[][], {
+    simulatePressure: element.simulatePressure,
+    size: element.strokeWidth * 4.25,
+    thinning: 0.6,
+    smoothing: 0.5,
+    streamline: 0.5,
+    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
+    last: true,
+  }) as [number, number][];
+};
+
+const med = (A: number[], B: number[]) => {
+  return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
+};
+
+// Trim SVG path data so number are each two decimal points. This
+// improves SVG exports, and prevents rendering errors on points
+// with long decimals.
+const TO_FIXED_PRECISION = /(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g;
+
+const getSvgPathFromStroke = (points: number[][]): string => {
+  if (!points.length) {
+    return "";
+  }
+
+  const max = points.length - 1;
+
+  return points
+    .reduce(
+      (acc, point, i, arr) => {
+        if (i === max) {
+          acc.push(point, med(point, arr[0]), "L", arr[0], "Z");
+        } else {
+          acc.push(point, med(point, arr[i + 1]));
+        }
+        return acc;
+      },
+      ["M", points[0], "Q"],
+    )
+    .join(" ")
+    .replace(TO_FIXED_PRECISION, "$1");
+};
+
+// -----------------------------------------------------------------------------

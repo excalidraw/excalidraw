@@ -14,6 +14,7 @@ import {
 } from "@excalidraw/math";
 
 import {
+  type Bounds,
   BinaryHeap,
   invariant,
   isAnyTrue,
@@ -54,7 +55,6 @@ import {
 import { aabbForElement, pointInsideBounds } from "./bounds";
 import { getHoveredElementForBinding } from "./collision";
 
-import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
 import type {
   Arrowhead,
