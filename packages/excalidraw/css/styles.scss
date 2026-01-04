@@ -106,6 +106,9 @@ body.excalidraw-cursor-resize * {
 
     &.interactive {
       z-index: var(--zIndex-interactiveCanvas);
+      // Apply theme filter only to interactive canvas for UI elements
+      // (resize handles, selection boxes, etc.)
+      filter: var(--theme-filter);
     }
 
     // Remove the main canvas from document flow to avoid resizeObserver
@@ -132,16 +135,6 @@ body.excalidraw-cursor-resize * {
     z-index: 2;
     transform-origin: top left;
     pointer-events: none;
-  }
-
-  &.theme--dark {
-    // The percentage is inspired by
-    // https://material.io/design/color/dark-theme.html#properties, which
-    // recommends surface color of #121212, 93% yields #111111 for #FFF
-
-    canvas {
-      filter: var(--theme-filter);
-    }
   }
 
   .FixedSideContainer {

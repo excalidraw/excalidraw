@@ -101,6 +101,12 @@ export const convertMermaidToExcalidraw = async ({
       maxWidthOrHeight:
         Math.max(parent.offsetWidth, parent.offsetHeight) *
         window.devicePixelRatio,
+      appState: {
+        // TODO hack (will be refactored in TTD v2)
+        exportWithDarkMode: document
+          .querySelector(".excalidraw-container")
+          ?.classList.contains("theme--dark"),
+      },
     });
     // if converting to blob fails, there's some problem that will
     // likely prevent preview and export (e.g. canvas too big)

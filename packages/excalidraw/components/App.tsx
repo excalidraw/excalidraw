@@ -47,7 +47,6 @@ import {
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   THEME,
-  THEME_FILTER,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
   YOUTUBE_STATES,
@@ -89,6 +88,7 @@ import {
   getDateTime,
   isShallowEqual,
   arrayToMap,
+  applyDarkModeFilter,
   type EXPORT_IMAGE_TYPES,
   randomInteger,
   CLASSES,
@@ -1770,8 +1770,9 @@ class App extends React.Component<AppProps, AppState> {
               }
             }}
             style={{
-              background: this.state.viewBackgroundColor,
-              filter: isDarkTheme ? THEME_FILTER : "none",
+              background: isDarkTheme
+                ? applyDarkModeFilter(this.state.viewBackgroundColor)
+                : this.state.viewBackgroundColor,
               zIndex: 2,
               border: "none",
               display: "block",
@@ -1781,7 +1782,9 @@ class App extends React.Component<AppProps, AppState> {
               fontFamily: "Assistant",
               fontSize: `${FRAME_STYLE.nameFontSize}px`,
               transform: `translate(-${FRAME_NAME_EDIT_PADDING}px, ${FRAME_NAME_EDIT_PADDING}px)`,
-              color: "var(--color-gray-80)",
+              color: isDarkTheme
+                ? FRAME_STYLE.nameColorDarkTheme
+                : FRAME_STYLE.nameColorLightTheme,
               overflow: "hidden",
               maxWidth: `${
                 document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING
@@ -2116,6 +2119,7 @@ class App extends React.Component<AppProps, AppState> {
                             elementsPendingErasure: this.elementsPendingErasure,
                             pendingFlowchartNodes:
                               this.flowChartCreator.pendingNodes,
+                            theme: this.state.theme,
                           }}
                         />
                         {this.state.newElement && (
@@ -2136,6 +2140,7 @@ class App extends React.Component<AppProps, AppState> {
                               elementsPendingErasure:
                                 this.elementsPendingErasure,
                               pendingFlowchartNodes: null,
+                              theme: this.state.theme,
                             }}
                           />
                         )}
@@ -3181,6 +3186,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       setEraserCursor(this.interactiveCanvas, this.state.theme);
     }
+
     // Hide hyperlink popup if shown when element type is not selection
     if (
       prevState.activeTool.type === "selection" &&

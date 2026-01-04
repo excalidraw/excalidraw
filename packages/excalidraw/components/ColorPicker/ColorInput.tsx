@@ -1,7 +1,9 @@
 import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { KEYS } from "@excalidraw/common";
+import { isTransparent, KEYS } from "@excalidraw/common";
+
+import tinycolor from "tinycolor2";
 
 import { getShortcutKey } from "../..//shortcut";
 import { useAtom } from "../../editor-jotai";
@@ -10,18 +12,32 @@ import { useEditorInterface } from "../App";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { eyeDropperIcon } from "../icons";
 
-import { getColor } from "./ColorPicker";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
-interface ColorInputProps {
-  color: string;
-  onChange: (color: string) => void;
-  label: string;
-  colorPickerType: ColorPickerType;
-  placeholder?: string;
-}
+/**
+ * tries to keep the input color as-is if it's valid, making minimal adjustments
+ * (trimming whitespace or adding `#` to hex colors)
+ */
+export const normalizeInputColor = (color: string): string | null => {
+  color = color.trim();
+  if (isTransparent(color)) {
+    return color;
+  }
+
+  const tc = tinycolor(color);
+  if (tc.isValid()) {
+    // testing for `#` first fixes a bug on Electron (more specfically, an
+    // Obsidian popout window), where a hex color without `#` is considered valid
+    if (tc.getFormat() === "hex" && !color.startsWith("#")) {
+      return `#${color}`;
+    }
+    return color;
+  }
+
+  return null;
+};
 
 export const ColorInput = ({
   color,
@@ -29,7 +45,13 @@ export const ColorInput = ({
   label,
   colorPickerType,
   placeholder,
-}: ColorInputProps) => {
+}: {
+  color: string;
+  onChange: (color: string) => void;
+  label: string;
+  colorPickerType: ColorPickerType;
+  placeholder?: string;
+}) => {
   const editorInterface = useEditorInterface();
   const [innerValue, setInnerValue] = useState(color);
   const [activeSection, setActiveColorPickerSection] = useAtom(
@@ -43,7 +65,7 @@ export const ColorInput = ({
   const changeColor = useCallback(
     (inputValue: string) => {
       const value = inputValue.toLowerCase();
-      const color = getColor(value);
+      const color = normalizeInputColor(value);
 
       if (color) {
         onChange(color);

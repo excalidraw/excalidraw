@@ -1,5 +1,4 @@
 import rough from "roughjs/bin/rough";
-import { getStroke } from "perfect-freehand";
 
 import {
   type GlobalPoint,
@@ -22,6 +21,7 @@ import {
   isRTL,
   getVerticalOffset,
   invariant,
+  applyDarkModeFilter,
 } from "@excalidraw/common";
 
 import type {
@@ -78,15 +78,7 @@ import type {
   ElementsMap,
 } from "./types";
 
-import type { StrokeOptions } from "perfect-freehand";
 import type { RoughCanvas } from "roughjs/bin/canvas";
-
-// using a stronger invert (100% vs our regular 93%) and saturate
-// as a temp hack to make images in dark theme look closer to original
-// color scheme (it's still not quite there and the colors look slightly
-// desatured, alas...)
-export const IMAGE_INVERT_FILTER =
-  "invert(100%) hue-rotate(180deg) saturate(1.25)";
 
 const isPendingImageElement = (
   element: ExcalidrawElement,
@@ -94,19 +86,6 @@ const isPendingImageElement = (
 ) =>
   isInitializedImageElement(element) &&
   !renderConfig.imageCache.has(element.fileId);
-
-const shouldResetImageFilter = (
-  element: ExcalidrawElement,
-  renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState | InteractiveCanvasAppState,
-) => {
-  return (
-    appState.theme === THEME.DARK &&
-    isInitializedImageElement(element) &&
-    !isPendingImageElement(element, renderConfig) &&
-    renderConfig.imageCache.get(element.fileId)?.mimeType !== MIME_TYPES.svg
-  );
-};
 
 const getCanvasPadding = (element: ExcalidrawElement) => {
   switch (element.type) {
@@ -272,11 +251,6 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  // in dark theme, revert the image color filter
-  if (shouldResetImageFilter(element, renderConfig, appState)) {
-    context.filter = IMAGE_INVERT_FILTER;
-  }
-
   drawElementOnCanvas(element, rc, context, renderConfig);
 
   context.restore();
@@ -421,7 +395,8 @@ const drawElementOnCanvas = (
     case "ellipse": {
       context.lineJoin = "round";
       context.lineCap = "round";
-      rc.draw(ShapeCache.get(element)!);
+
+      rc.draw(ShapeCache.generateElementShape(element, renderConfig));
       break;
     }
     case "arrow":
@@ -429,25 +404,30 @@ const drawElementOnCanvas = (
       context.lineJoin = "round";
       context.lineCap = "round";
 
-      ShapeCache.get(element)!.forEach((shape) => {
-        rc.draw(shape);
-      });
+      ShapeCache.generateElementShape(element, renderConfig).forEach(
+        (shape) => {
+          rc.draw(shape);
+        },
+      );
       break;
     }
     case "freedraw": {
       // Draw directly to canvas
       context.save();
-      context.fillStyle = element.strokeColor;
 
-      const path = getFreeDrawPath2D(element) as Path2D;
-      const fillShape = ShapeCache.get(element);
+      const shapes = ShapeCache.generateElementShape(element, renderConfig);
 
-      if (fillShape) {
-        rc.draw(fillShape);
+      for (const shape of shapes) {
+        if (typeof shape === "string") {
+          context.fillStyle =
+            renderConfig.theme === THEME.DARK
+              ? applyDarkModeFilter(element.strokeColor)
+              : element.strokeColor;
+          context.fill(new Path2D(shape));
+        } else {
+          rc.draw(shape);
+        }
       }
-
-      context.fillStyle = element.strokeColor;
-      context.fill(path);
 
       context.restore();
       break;
@@ -506,7 +486,10 @@ const drawElementOnCanvas = (
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
         context.font = getFontString(element);
-        context.fillStyle = element.strokeColor;
+        context.fillStyle =
+          renderConfig.theme === THEME.DARK
+            ? applyDarkModeFilter(element.strokeColor)
+            : element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
 
         // Canvas does not support multiline text by default
@@ -759,12 +742,17 @@ export const renderElement = (
         context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
         context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-        context.strokeStyle = FRAME_STYLE.strokeColor;
+        context.strokeStyle =
+          appState.theme === THEME.DARK
+            ? applyDarkModeFilter(FRAME_STYLE.strokeColor)
+            : FRAME_STYLE.strokeColor;
 
         // TODO change later to only affect AI frames
         if (isMagicFrameElement(element)) {
           context.strokeStyle =
-            appState.theme === THEME.LIGHT ? "#7affd7" : "#1d8264";
+            appState.theme === THEME.LIGHT
+              ? "#7affd7"
+              : applyDarkModeFilter("#1d8264");
         }
 
         if (FRAME_STYLE.radius && context.roundRect) {
@@ -787,11 +775,6 @@ export const renderElement = (
       break;
     }
     case "freedraw": {
-      // TODO investigate if we can do this in situ. Right now we need to call
-      // beforehand because math helpers (such as getElementAbsoluteCoords)
-      // rely on existing shapes
-      ShapeCache.generateElementShape(element, null);
-
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const cx = (x1 + x2) / 2 + appState.scrollX;
@@ -835,10 +818,6 @@ export const renderElement = (
     case "text":
     case "iframe":
     case "embeddable": {
-      // TODO investigate if we can do this in situ. Right now we need to call
-      // beforehand because math helpers (such as getElementAbsoluteCoords)
-      // rely on existing shapes
-      ShapeCache.generateElementShape(element, renderConfig);
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const cx = (x1 + x2) / 2 + appState.scrollX;
@@ -861,9 +840,6 @@ export const renderElement = (
         context.save();
         context.translate(cx, cy);
 
-        if (shouldResetImageFilter(element, renderConfig, appState)) {
-          context.filter = "none";
-        }
         const boundTextElement = getBoundTextElement(element, elementsMap);
 
         if (isArrowElement(element) && boundTextElement) {
@@ -1026,23 +1002,6 @@ export const renderElement = (
   context.globalAlpha = 1;
 };
 
-export const pathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>([]);
-
-export function generateFreeDrawShape(element: ExcalidrawFreeDrawElement) {
-  const svgPathData = getFreeDrawSvgPath(element);
-  const path = new Path2D(svgPathData);
-  pathsCache.set(element, path);
-  return path;
-}
-
-export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement) {
-  return pathsCache.get(element);
-}
-
-export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
-  return getSvgPathFromStroke(getFreedrawOutlinePoints(element));
-}
-
 export function getFreedrawOutlineAsSegments(
   element: ExcalidrawFreeDrawElement,
   points: [number, number][],
@@ -1097,58 +1056,4 @@ export function getFreedrawOutlineAsSegments(
       ),
     ],
   );
-}
-
-export function getFreedrawOutlinePoints(element: ExcalidrawFreeDrawElement) {
-  // If input points are empty (should they ever be?) return a dot
-  const inputPoints = element.simulatePressure
-    ? element.points
-    : element.points.length
-    ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
-    : [[0, 0, 0.5]];
-
-  // Consider changing the options for simulated pressure vs real pressure
-  const options: StrokeOptions = {
-    simulatePressure: element.simulatePressure,
-    size: element.strokeWidth * 4.25,
-    thinning: 0.6,
-    smoothing: 0.5,
-    streamline: 0.5,
-    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
-    last: true,
-  };
-
-  return getStroke(inputPoints as number[][], options) as [number, number][];
-}
-
-function med(A: number[], B: number[]) {
-  return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
-}
-
-// Trim SVG path data so number are each two decimal points. This
-// improves SVG exports, and prevents rendering errors on points
-// with long decimals.
-const TO_FIXED_PRECISION = /(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g;
-
-function getSvgPathFromStroke(points: number[][]): string {
-  if (!points.length) {
-    return "";
-  }
-
-  const max = points.length - 1;
-
-  return points
-    .reduce(
-      (acc, point, i, arr) => {
-        if (i === max) {
-          acc.push(point, med(point, arr[0]), "L", arr[0], "Z");
-        } else {
-          acc.push(point, med(point, arr[i + 1]));
-        }
-        return acc;
-      },
-      ["M", points[0], "Q"],
-    )
-    .join(" ")
-    .replace(TO_FIXED_PRECISION, "$1");
 }
