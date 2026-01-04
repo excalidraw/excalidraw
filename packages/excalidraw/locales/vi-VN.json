@@ -351,7 +351,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
-    "rotate": "",
+    "rotate": "Giới hạn góc độ bằng cách giữ {{shortcut}} khi xoay",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
