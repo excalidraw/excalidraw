@@ -1,5 +1,5 @@
 import { reconcileElements } from "@excalidraw/excalidraw";
-import { MIME_TYPES } from "@excalidraw/common";
+import { MIME_TYPES, toBrandedType } from "@excalidraw/common";
 import { decompressData } from "@excalidraw/excalidraw/data/encode";
 import {
   encryptData,
@@ -243,7 +243,7 @@ export const saveToFirebase = async (
 
   FirebaseSceneVersionCache.set(socket, storedElements);
 
-  return storedElements;
+  return toBrandedType<RemoteExcalidrawElement[]>(storedElements);
 };
 
 export const loadFromFirebase = async (

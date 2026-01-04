@@ -19,7 +19,11 @@ import { decodeSvgBase64Payload } from "../scene/export";
 import { base64ToString, stringToBase64, toByteString } from "./encode";
 import { nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
-import { restore, restoreLibraryItems } from "./restore";
+import {
+  restoreAppState,
+  restoreElements,
+  restoreLibraryItems,
+} from "./restore";
 
 import type { AppState, DataURL, LibraryItem } from "../types";
 
@@ -155,10 +159,13 @@ export const loadSceneOrLibraryFromBlob = async (
     if (isValidExcalidrawData(data)) {
       return {
         type: MIME_TYPES.excalidraw,
-        data: restore(
-          {
-            elements: data.elements || [],
-            appState: {
+        data: {
+          elements: restoreElements(data.elements, localElements, {
+            repairBindings: true,
+            deleteInvisibleElements: true,
+          }),
+          appState: restoreAppState(
+            {
               theme: localAppState?.theme,
               fileHandle: fileHandle || blob.handle || null,
               ...cleanAppStateForExport(data.appState || {}),
@@ -166,16 +173,10 @@ export const loadSceneOrLibraryFromBlob = async (
                 ? calculateScrollCenter(data.elements || [], localAppState)
                 : {}),
             },
-            files: data.files,
-          },
-          localAppState,
-          localElements,
-          {
-            repairBindings: true,
-            refreshDimensions: false,
-            deleteInvisibleElements: true,
-          },
-        ),
+            localAppState,
+          ),
+          files: data.files || {},
+        },
       };
     } else if (isValidLibrary(data)) {
       return {

@@ -7,7 +7,10 @@ import {
 } from "@excalidraw/excalidraw/clipboard";
 import { encodePngMetadata } from "@excalidraw/excalidraw/data/image";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
-import { restore } from "@excalidraw/excalidraw/data/restore";
+import {
+  restoreAppState,
+  restoreElements,
+} from "@excalidraw/excalidraw/data/restore";
 import {
   exportToCanvas as _exportToCanvas,
   exportToSvg as _exportToSvg,
@@ -45,12 +48,11 @@ export const exportToCanvas = ({
 }: ExportOpts & {
   exportPadding?: number;
 }) => {
-  const { elements: restoredElements, appState: restoredAppState } = restore(
-    { elements, appState },
-    null,
-    null,
-    { deleteInvisibleElements: true },
-  );
+  const restoredElements = restoreElements(elements, null, {
+    deleteInvisibleElements: true,
+  });
+  const restoredAppState = restoreAppState(appState, null);
+
   const { exportBackground, viewBackgroundColor } = restoredAppState;
   return _exportToCanvas(
     restoredElements,
@@ -176,12 +178,10 @@ export const exportToSvg = async ({
   skipInliningFonts?: true;
   reuseImages?: boolean;
 }): Promise<SVGSVGElement> => {
-  const { elements: restoredElements, appState: restoredAppState } = restore(
-    { elements, appState },
-    null,
-    null,
-    { deleteInvisibleElements: true },
-  );
+  const restoredElements = restoreElements(elements, null, {
+    deleteInvisibleElements: true,
+  });
+  const restoredAppState = restoreAppState(appState, null);
 
   const exportAppState = {
     ...restoredAppState,

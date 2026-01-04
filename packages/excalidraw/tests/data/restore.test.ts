@@ -34,6 +34,20 @@ describe("restoreElements", () => {
     mockSizeHelper.mockRestore();
   });
 
+  it("basic restoreElements", () => {
+    const textElement = API.createElement({ type: "text" });
+    const rectElement = API.createElement({ type: "rectangle" });
+    const elements = [textElement, rectElement];
+
+    const restoredElements = restore.restoreElements(elements, null);
+    expect(restoredElements.length).toBe(elements.length);
+  });
+
+  it("when imported data state is null it should return an empty array of elements", () => {
+    const restoredElements = restore.restoreElements(null, null);
+    expect(restoredElements.length).toBe(0);
+  });
+
   it("should return empty array when element is null", () => {
     expect(restore.restoreElements(null, null)).toStrictEqual([]);
   });
@@ -434,12 +448,12 @@ describe("restoreElements", () => {
   });
 
   it("bump versions of local duplicate elements when supplied", () => {
-    const rectangle = API.createElement({ type: "rectangle" });
+    const rectangle = API.createElement({ type: "rectangle" }); // version=1
     const ellipse = API.createElement({ type: "ellipse" });
-    const rectangle_modified = newElementWith(rectangle, { isDeleted: true });
+    const rectangle_modified = newElementWith(rectangle, { isDeleted: true }); // version=2
 
-    const restoredElements = restore.restoreElements(
-      [rectangle, ellipse],
+    const restoredElements = restore.bumpElementVersions(
+      restore.restoreElements([rectangle, ellipse], null),
       [rectangle_modified],
     );
 
@@ -448,7 +462,7 @@ describe("restoreElements", () => {
     expect(restoredElements).toEqual([
       expect.objectContaining({
         id: rectangle.id,
-        version: rectangle_modified.version + 2,
+        version: rectangle_modified.version + 1,
       }),
       expect.objectContaining({
         id: ellipse.id,
@@ -456,9 +470,73 @@ describe("restoreElements", () => {
       }),
     ]);
   });
+
+  it("bump versions of local duplicate elements when supplied even if both have same version", () => {
+    const rectangle = API.createElement({ type: "rectangle" });
+
+    const restored_rectangle_1 = restore.restoreElements([rectangle], null)[0];
+    const restored_rectangle_2 = restore.restoreElements(
+      [restored_rectangle_1],
+      null,
+    )[0];
+
+    // restored rectangle version should be +1 because of re-index
+    expect(rectangle.version).not.toBe(restored_rectangle_1.version);
+
+    // restoring it again shouldn't re-index again
+    expect(restored_rectangle_1.version).toBe(restored_rectangle_2.version);
+    expect(restored_rectangle_1.versionNonce).toBe(
+      restored_rectangle_2.versionNonce,
+    );
+
+    const modified_rectangle_1 = newElementWith(restored_rectangle_1, {
+      width: 500,
+    });
+    const modified_rectangle_2 = newElementWith(restored_rectangle_2, {
+      width: 600,
+    });
+
+    const restoredElements = restore.bumpElementVersions(
+      restore.restoreElements([modified_rectangle_1], null),
+      [modified_rectangle_2],
+    );
+
+    expect(restoredElements[0].id).toBe(rectangle.id);
+    expect(restoredElements[0].id).toBe(modified_rectangle_1.id);
+    expect(restoredElements[0].versionNonce).not.toBe(
+      modified_rectangle_1.versionNonce,
+    );
+    expect(restoredElements[0].version).toBe(modified_rectangle_2.version + 1);
+  });
 });
 
 describe("restoreAppState", () => {
+  it("when appState is null it should return the local app state property", () => {
+    const stubLocalAppState = getDefaultAppState();
+    stubLocalAppState.cursorButton = "down";
+    stubLocalAppState.name = "local app state";
+
+    const restoredAppState = restore.restoreAppState(null, stubLocalAppState);
+    expect(restoredAppState.cursorButton).toBe(stubLocalAppState.cursorButton);
+    expect(restoredAppState.name).toBe(stubLocalAppState.name);
+  });
+
+  it("when local appState is null but imported app state is supplied", () => {
+    const stubImportedAppState = getDefaultAppState();
+    stubImportedAppState.cursorButton = "down";
+    stubImportedAppState.name = "imported app state";
+
+    const importedDataState = {} as ImportedDataState;
+    importedDataState.appState = stubImportedAppState;
+
+    const restoredAppState = restore.restoreAppState(
+      importedDataState.appState,
+      null,
+    );
+    expect(restoredAppState.cursorButton).toBe("up");
+    expect(restoredAppState.name).toBe(stubImportedAppState.name);
+  });
+
   it("should restore with imported data", () => {
     const stubImportedAppState = getDefaultAppState();
     stubImportedAppState.activeTool.type = "selection";
@@ -635,83 +713,6 @@ describe("restoreAppState", () => {
         null,
       ).openSidebar,
     ).toEqual({ name: DEFAULT_SIDEBAR.name, tab: "ola" });
-  });
-});
-
-describe("restore", () => {
-  it("when imported data state is null it should return an empty array of elements", () => {
-    const stubLocalAppState = getDefaultAppState();
-
-    const restoredData = restore.restore(null, stubLocalAppState, null);
-    expect(restoredData.elements.length).toBe(0);
-  });
-
-  it("when imported data state is null it should return the local app state property", () => {
-    const stubLocalAppState = getDefaultAppState();
-    stubLocalAppState.cursorButton = "down";
-    stubLocalAppState.name = "local app state";
-
-    const restoredData = restore.restore(null, stubLocalAppState, null);
-    expect(restoredData.appState.cursorButton).toBe(
-      stubLocalAppState.cursorButton,
-    );
-    expect(restoredData.appState.name).toBe(stubLocalAppState.name);
-  });
-
-  it("when imported data state has elements", () => {
-    const stubLocalAppState = getDefaultAppState();
-
-    const textElement = API.createElement({ type: "text" });
-    const rectElement = API.createElement({ type: "rectangle" });
-    const elements = [textElement, rectElement];
-
-    const importedDataState = {} as ImportedDataState;
-    importedDataState.elements = elements;
-
-    const restoredData = restore.restore(
-      importedDataState,
-      stubLocalAppState,
-      null,
-    );
-    expect(restoredData.elements.length).toBe(elements.length);
-  });
-
-  it("when local app state is null but imported app state is supplied", () => {
-    const stubImportedAppState = getDefaultAppState();
-    stubImportedAppState.cursorButton = "down";
-    stubImportedAppState.name = "imported app state";
-
-    const importedDataState = {} as ImportedDataState;
-    importedDataState.appState = stubImportedAppState;
-
-    const restoredData = restore.restore(importedDataState, null, null);
-    expect(restoredData.appState.cursorButton).toBe("up");
-    expect(restoredData.appState.name).toBe(stubImportedAppState.name);
-  });
-
-  it("bump versions of local duplicate elements when supplied", () => {
-    const rectangle = API.createElement({ type: "rectangle" });
-    const ellipse = API.createElement({ type: "ellipse" });
-
-    const rectangle_modified = newElementWith(rectangle, { isDeleted: true });
-
-    const restoredData = restore.restore(
-      { elements: [rectangle, ellipse] },
-      null,
-      [rectangle_modified],
-    );
-
-    expect(restoredData.elements[0].id).toBe(rectangle.id);
-    expect(restoredData.elements[0].versionNonce).not.toBe(
-      rectangle.versionNonce,
-    );
-    expect(restoredData.elements).toEqual([
-      expect.objectContaining({ version: rectangle_modified.version + 2 }),
-      expect.objectContaining({
-        id: ellipse.id,
-        version: ellipse.version + 1,
-      }),
-    ]);
   });
 });
 
