@@ -1,4 +1,8 @@
-import { MAX_CUSTOM_COLORS_USED_IN_CANVAS } from "@excalidraw/common";
+import {
+  isTransparent,
+  MAX_CUSTOM_COLORS_USED_IN_CANVAS,
+  tinycolor,
+} from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -108,48 +112,17 @@ export const isColorDark = (color: string, threshold = 160): boolean => {
     return true;
   }
 
-  if (color === "transparent") {
+  if (isTransparent(color)) {
     return false;
   }
 
-  // a string color (white etc) or any other format -> convert to rgb by way
-  // of creating a DOM node and retrieving the computeStyle
-  if (!color.startsWith("#")) {
-    const node = document.createElement("div");
-    node.style.color = color;
-
-    if (node.style.color) {
-      // making invisible so document doesn't reflow (hopefully).
-      // display=none works too, but supposedly not in all browsers
-      node.style.position = "absolute";
-      node.style.visibility = "hidden";
-      node.style.width = "0";
-      node.style.height = "0";
-
-      // needs to be in DOM else browser won't compute the style
-      document.body.appendChild(node);
-      const computedColor = getComputedStyle(node).color;
-      document.body.removeChild(node);
-      // computed style is in rgb() format
-      const rgb = computedColor
-        .replace(/^(rgb|rgba)\(/, "")
-        .replace(/\)$/, "")
-        .replace(/\s/g, "")
-        .split(",");
-      const r = parseInt(rgb[0]);
-      const g = parseInt(rgb[1]);
-      const b = parseInt(rgb[2]);
-
-      return calculateContrast(r, g, b) < threshold;
-    }
-    // invalid color -> assume it default to black
+  const tc = tinycolor(color);
+  if (!tc.isValid()) {
+    // invalid color -> assume it defaults to black
     return true;
   }
 
-  const r = parseInt(color.slice(1, 3), 16);
-  const g = parseInt(color.slice(3, 5), 16);
-  const b = parseInt(color.slice(5, 7), 16);
-
+  const { r, g, b } = tc.toRgb();
   return calculateContrast(r, g, b) < threshold;
 };
 

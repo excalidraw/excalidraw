@@ -3,11 +3,13 @@ import {
   KEYS,
   CLASSES,
   POINTER_BUTTON,
+  THEME,
   isWritableElement,
   getFontString,
   getFontFamilyString,
   isTestEnv,
   MIME_TYPES,
+  applyDarkModeFilter,
 } from "@excalidraw/common";
 
 import {
@@ -260,9 +262,11 @@ export const textWysiwyg = ({
         ),
         textAlign,
         verticalAlign,
-        color: updatedTextElement.strokeColor,
+        color:
+          appState.theme === THEME.DARK
+            ? applyDarkModeFilter(updatedTextElement.strokeColor)
+            : updatedTextElement.strokeColor,
         opacity: updatedTextElement.opacity / 100,
-        filter: "var(--theme-filter)",
         maxHeight: `${editorMaxHeight}px`,
       });
       editable.scrollTop = 0;
