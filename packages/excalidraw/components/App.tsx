@@ -3255,7 +3255,6 @@ class App extends React.Component<AppProps, AppState> {
       this.rc = null;
       // @ts-ignore
       this.excalidrawContainerRef.current = undefined;
-      this.nearestScrollableContainer = undefined;
       this.excalidrawContainerValue = { container: null, id: "unmounted" };
     }
 
