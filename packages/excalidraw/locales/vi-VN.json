@@ -357,7 +357,7 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "publishLibrary": "Chia sẻ thư viện của bạn",
-    "bindTextToElement": "",
+    "bindTextToElement": "Nhấn {{shortcut}} để thêm văn bản",
     "createFlowchart": "",
     "deepBoxSelect": "",
     "eraserRevert": "",
