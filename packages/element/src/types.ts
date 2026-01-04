@@ -325,6 +325,7 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     endBinding: FixedPointBinding | null;
     startArrowhead: Arrowhead | null;
     endArrowhead: Arrowhead | null;
+    customLabelOffset?: { x: number; y: number } | null;
   }>;
 
 export type ExcalidrawLineElement = ExcalidrawLinearElement &
