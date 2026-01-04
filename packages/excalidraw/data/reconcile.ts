@@ -36,7 +36,7 @@ export const shouldDiscardRemoteElement = (
       // resolve conflicting edits deterministically by taking the one with
       // the lowest versionNonce
       (local.version === remote.version &&
-        local.versionNonce < remote.versionNonce))
+        local.versionNonce <= remote.versionNonce))
   ) {
     return true;
   }
