@@ -430,12 +430,26 @@ interface KeyBlocker {
   close(): void;
 }
 
+/**
+   * Attaches an inline link suggester to the specified input element.
+   * @param inputEl The HTML input element to attach the suggester to.
+   * @param widthWrapper Optional HTML element to wrap the width of suggester element.
+   * @param containerEl Optional container element used as collision boundary.
+   * @param surpessPlaceholder Whether to suppress the placeholder text. Defaults to true.
+   * @returns A KeyBlocker instance for managing keyboard input.
+   */
 export const attachInlineLinkSuggester = (
   inputEl: HTMLInputElement|HTMLTextAreaElement,
   widthWrapper?: HTMLElement,
   container: HTMLDivElement | null = null,
+  surpessPlaceholder: boolean = true,
 ): KeyBlocker =>
-  getHostPlugin().attachInlineLinkSuggester(inputEl, widthWrapper, container);
+  getHostPlugin().attachInlineLinkSuggester(
+    inputEl,
+    widthWrapper,
+    container,
+    surpessPlaceholder,
+  );
 
 export const syncElementLinkWithText = (): boolean => {
   return getHostPlugin().settings.syncElementLinkWithText ?? true;

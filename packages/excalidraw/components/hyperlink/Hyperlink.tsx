@@ -46,8 +46,9 @@ import { ToolButton } from "../ToolButton";
 import { FreedrawIcon, TrashIcon, elementLinkIcon, searchIcon } from "../icons";
 import { getSelectedElements } from "../../scene";
 
-import { getLinkHandleFromCoords } from "./helpers";
 import { attachInlineLinkSuggester } from "../../obsidianUtils"; //zsviczian
+
+import { getLinkHandleFromCoords } from "./helpers";
 
 import "./Hyperlink.scss";
 
@@ -201,7 +202,12 @@ export const Hyperlink = ({
     if (!isEditing || !inputRef.current) {
       return;
     }
-    const keyBlocker = attachInlineLinkSuggester(inputRef.current);
+    const keyBlocker = attachInlineLinkSuggester(
+      inputRef.current,
+      undefined,
+      undefined,
+      false,
+    );
     return () => keyBlocker?.close();
   }, [isEditing]);
   //zsviczian - end
