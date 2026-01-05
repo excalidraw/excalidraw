@@ -807,7 +807,7 @@ body.excalidraw-cursor-resize * {
 .excalidraw .excalidraw__poll-popup {
   position: absolute;
   right: 16px;
-  bottom: 48px;
+  bottom: 96px;
   width: 320px;
   max-height: calc(100vh - 120px);
   pointer-events: auto;
@@ -828,6 +828,25 @@ body.excalidraw-cursor-resize * {
   flex-direction: column;
   gap: 8px;
   padding: 8px;
+}
+
+.excalidraw .excalidraw__poll-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.excalidraw .excalidraw__poll-popup-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.excalidraw .excalidraw__poll-popup-toggle {
+  padding: 4px 8px;
 }
 
 .excalidraw .excalidraw__poll-popup-inner .excalidraw__poll-card {

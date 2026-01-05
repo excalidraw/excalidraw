@@ -657,6 +657,8 @@
     "newPoll": "New poll",
     "searchPlaceholder": "Search polls",
     "noPolls": "No polls yet",
+    "collapse": "Collapse",
+    "expand": "Expand",
     "statusOpen": "Open",
     "statusClosed": "Closed",
     "statusIdle": "Not started",
