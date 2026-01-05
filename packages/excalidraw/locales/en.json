@@ -493,12 +493,14 @@
     "title": {
       "exportToPng": "Export to PNG",
       "exportToSvg": "Export to SVG",
-      "copyPngToClipboard": "Copy PNG to clipboard"
+      "copyPngToClipboard": "Copy PNG to clipboard",
+      "saveAsPDF": "Save As PDF"
     },
     "button": {
       "exportToPng": "PNG",
       "exportToSvg": "SVG",
-      "copyPngToClipboard": "Copy to clipboard"
+      "copyPngToClipboard": "Copy to clipboard",
+      "saveAsPDF": "Save As PDF"
     }
   },
   "encrypted": {

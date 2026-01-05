@@ -280,6 +280,8 @@ export const MIME_TYPES = {
   "excalidraw.png": "image/png",
   // binary
   binary: "application/octet-stream",
+  // pdf
+  pdf: "application/pdf",
   // image
   ...IMAGE_MIME_TYPES,
 } as const;
@@ -294,6 +296,7 @@ export const EXPORT_IMAGE_TYPES = {
   png: "png",
   svg: "svg",
   clipboard: "clipboard",
+  pdf: "pdf",
 } as const;
 
 export const EXPORT_DATA_TYPES = {

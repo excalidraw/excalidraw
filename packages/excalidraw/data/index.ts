@@ -14,6 +14,8 @@ import { isFrameLikeElement } from "@excalidraw/element";
 
 import { getElementsOverlappingFrame } from "@excalidraw/element";
 
+import { jsPDF } from "jspdf";
+
 import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
@@ -93,7 +95,7 @@ export const prepareElementsForExport = (
 };
 
 export const exportCanvas = async (
-  type: Omit<ExportType, "backend">,
+  type: Omit<ExportType, "backend"> ,
   elements: ExportedElements,
   appState: AppState,
   files: BinaryFiles,
@@ -108,7 +110,6 @@ export const exportCanvas = async (
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
-    /** filename, if applicable */
     name?: string;
     fileHandle?: FileSystemHandle | null;
     exportingFrame: ExcalidrawFrameLikeElement | null;
@@ -117,6 +118,10 @@ export const exportCanvas = async (
   if (elements.length === 0) {
     throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
+
+  // -----------------------------------------------------------
+  // 1. SVG EXPORT (Vector)
+  // -----------------------------------------------------------
   if (type === "svg" || type === "clipboard-svg") {
     const svgPromise = exportToSvg(
       elements,
@@ -135,8 +140,7 @@ export const exportCanvas = async (
     if (type === "svg") {
       return fileSave(
         svgPromise.then((svg) => {
-          // adding SVG preamble so that older software parse the SVG file
-          // properly
+          // adding SVG preamble so that older software parse the SVG file properly
           return new Blob([SVG_DOCUMENT_PREAMBLE + svg.outerHTML], {
             type: MIME_TYPES.svg,
           });
@@ -160,13 +164,19 @@ export const exportCanvas = async (
     }
   }
 
-  const tempCanvas = exportToCanvas(elements, appState, files, {
+  // -----------------------------------------------------------
+  // GENERATE CANVAS (Shared by PNG, Clipboard, and PDF)
+  // -----------------------------------------------------------
+  const tempCanvas =await exportToCanvas(elements, appState, files, {
     exportBackground,
     viewBackgroundColor,
     exportPadding,
     exportingFrame,
   });
 
+  // -----------------------------------------------------------
+  // 2. PNG EXPORT
+  // -----------------------------------------------------------
   if (type === "png") {
     let blob = canvasToBlob(tempCanvas);
 
@@ -188,7 +198,12 @@ export const exportCanvas = async (
       mimeTypes: [IMAGE_MIME_TYPES.png],
       fileHandle,
     });
-  } else if (type === "clipboard") {
+  } 
+  
+  // -----------------------------------------------------------
+  // 3. CLIPBOARD EXPORT
+  // -----------------------------------------------------------
+  else if (type === "clipboard") {
     try {
       const blob = canvasToBlob(tempCanvas);
       await copyBlobToClipboardAsPng(blob);
@@ -197,8 +212,6 @@ export const exportCanvas = async (
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw new Error(t("canvasError.canvasTooBig"));
       }
-      // TypeError *probably* suggests ClipboardItem not defined, which
-      // people on Firefox can enable through a flag, so let's tell them.
       if (isFirefox && error.name === "TypeError") {
         throw new Error(
           `${t("alerts.couldNotCopyToClipboard")}\n\n${t(
@@ -209,8 +222,37 @@ export const exportCanvas = async (
         throw new Error(t("alerts.couldNotCopyToClipboard"));
       }
     }
-  } else {
-    // shouldn't happen
+  } 
+  
+  // -----------------------------------------------------------
+  // 4. PDF EXPORT 
+  // -----------------------------------------------------------
+  else if (type === "pdf") {
+    try {
+      const doc = new jsPDF({
+        orientation: tempCanvas.width > tempCanvas.height ? "l" : "p",
+        unit: "px",
+        format: [tempCanvas.width, tempCanvas.height],
+        compress: true, 
+      });
+      doc.addImage(tempCanvas, "PNG", 0, 0, tempCanvas.width, tempCanvas.height);
+
+      const blob = doc.output("blob");
+
+      return fileSave(blob, {
+        description: "Export to PDF",
+        name,
+        extension: "pdf",
+        mimeTypes: ["application/pdf"],
+        fileHandle,
+      });
+    } catch (error) {
+      console.error("Error exporting to PDF:", error);
+      throw new Error("Failed to export to PDF");
+    }
+  } 
+  
+  else {
     throw new Error("Unsupported export type");
   }
 };

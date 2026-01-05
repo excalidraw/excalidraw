@@ -90,5 +90,9 @@
   },
   "resolutions": {
     "strip-ansi": "6.0.1"
+  },
+  "dependencies": {
+    "clsx": "2.1.1",
+    "jspdf": "4.0.0"
   }
 }
