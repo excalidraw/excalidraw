@@ -654,6 +654,12 @@
   },
   "poll": {
     "option": "Option",
+    "newPoll": "New poll",
+    "searchPlaceholder": "Search polls",
+    "noPolls": "No polls yet",
+    "statusOpen": "Open",
+    "statusClosed": "Closed",
+    "statusIdle": "Not started",
     "addOption": "Add option",
     "removeOption": "Remove",
     "questionPlaceholder": "Ask a question...",

@@ -1,0 +1,98 @@
+.excalidraw__polls-sidebar {
+  --poll-line-color: var(--theme-border-primary, #d0d7de);
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.excalidraw__polls-sidebar__controls {
+  display: grid;
+  gap: 6px;
+}
+
+.excalidraw__polls-sidebar__new {
+  align-self: flex-start;
+}
+
+.excalidraw__polls-sidebar__search {
+  width: 100%;
+  border: 1px dashed var(--poll-line-color);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+.excalidraw__polls-sidebar__list {
+  flex: 0 1 auto;
+  max-height: 35%;
+  overflow: auto;
+}
+
+.excalidraw__polls-sidebar__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.excalidraw__polls-sidebar__item-button {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--sidebar-border-color);
+  background: var(--sidebar-bg-color);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.excalidraw__polls-sidebar__item-button.is-selected {
+  border-color: var(--color-primary, #3b82f6);
+  box-shadow: 0 0 0 1px var(--color-primary, #3b82f6);
+}
+
+.excalidraw__polls-sidebar__item-title {
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.excalidraw__polls-sidebar__item-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.excalidraw__polls-sidebar__item-status.is-open {
+  color: var(--color-primary, #3b82f6);
+}
+
+.excalidraw__polls-sidebar__item-status.is-closed,
+.excalidraw__polls-sidebar__item-status.is-idle {
+  color: var(--color-text-secondary);
+}
+
+.excalidraw__polls-sidebar__empty,
+.excalidraw__polls-sidebar__detail-empty {
+  padding: 12px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.excalidraw__polls-sidebar__detail {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}

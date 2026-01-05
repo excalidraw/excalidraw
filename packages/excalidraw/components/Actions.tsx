@@ -73,7 +73,6 @@ import {
   mermaidLogoIcon,
   laserPointerToolIcon,
   MagicIcon,
-  PollIcon,
   LassoIcon,
   sharpArrowIcon,
   roundArrowIcon,
@@ -1076,7 +1075,6 @@ export const ShapesSwitcher = ({
     app.state.preferredSelectionTool.type !== "lasso";
 
   const embeddableToolSelected = activeTool.type === "embeddable";
-  const pollToolSelected = activeTool.type === "poll";
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
@@ -1185,7 +1183,6 @@ export const ShapesSwitcher = ({
           className={clsx("App-toolbar__extra-tools-trigger", {
             "App-toolbar__extra-tools-trigger--selected":
               frameToolSelected ||
-              pollToolSelected ||
               embeddableToolSelected ||
               lassoToolSelected ||
               // in collab we're already highlighting the laser button
@@ -1201,8 +1198,6 @@ export const ShapesSwitcher = ({
         >
           {frameToolSelected
             ? frameToolIcon
-            : pollToolSelected
-            ? PollIcon
             : embeddableToolSelected
             ? EmbedIcon
             : laserToolSelected && !app.props.isCollaborating
@@ -1233,14 +1228,7 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.embeddable")}
           </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "poll" })}
-            icon={PollIcon}
-            data-testid="toolbar-poll"
-            selected={pollToolSelected}
-          >
-            {t("toolBar.poll")}
-          </DropdownMenu.Item>
+          
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "laser" })}
             icon={laserPointerToolIcon}
