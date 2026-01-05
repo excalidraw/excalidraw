@@ -58,7 +58,6 @@
   },
   "dependencies": {
     "@excalidraw/common": "0.18.0",
-    "@excalidraw/math": "0.18.0",
-    "polygon-clipping": "^0.15.7"
+    "@excalidraw/math": "0.18.0"
   }
 }

@@ -4,12 +4,13 @@ import {
   type LocalPoint,
   vectorFromPoint,
   vectorNormalize,
+  lineSegment,
+  type GlobalPoint,
 } from "@excalidraw/math";
-
+import { debugDrawLine, debugDrawPolygon } from "@excalidraw/common";
 import polygonClipping from "polygon-clipping";
 
 import type { Polygon, MultiPolygon, Ring } from "polygon-clipping";
-
 import type { ExcalidrawFreeDrawElement } from "./types";
 
 // Number of segments to approximate each semicircular cap
@@ -20,6 +21,12 @@ const MIN_RADIUS = 0.5;
 
 // Pressure to radius multiplier (scaled by strokeWidth)
 const PRESSURE_RADIUS_MULTIPLIER = 2.0;
+
+// Minimum distance between points to avoid numerical instability
+const MIN_POINT_DISTANCE = 0.1;
+
+// Epsilon for filtering near-duplicate points in polygons
+const EPSILON = 0.01;
 
 /**
  * Compute the radius for a point based on pressure and strokeWidth.
@@ -77,6 +84,8 @@ function generateArcPoints(
  * @param r1 - Radius at first point (from pressure)
  * @param p2 - Second point
  * @param r2 - Radius at second point (from pressure)
+ * @param forcePerpendicularCap1 - Force cap1 to be perpendicular (for stroke start)
+ * @param forcePerpendicularCap2 - Force cap2 to be perpendicular (for stroke end)
  * @returns Array of points forming the ovoid polygon
  */
 function createOvoid(
@@ -84,11 +93,13 @@ function createOvoid(
   r1: number,
   p2: LocalPoint,
   r2: number,
+  forcePerpendicularCap1: boolean = false,
+  forcePerpendicularCap2: boolean = false,
 ): LocalPoint[] {
   const dist = pointDistance(p1, p2);
 
   // If points are too close, create a circle at the midpoint
-  if (dist < 0.001) {
+  if (dist < MIN_POINT_DISTANCE) {
     const avgRadius = (r1 + r2) / 2;
     return generateArcPoints(p1, avgRadius, 0, Math.PI * 2, CAP_SEGMENTS * 2);
   }
@@ -112,28 +123,31 @@ function createOvoid(
   // Compute tangent points on each circle
   // The perpendicular offset needs to be adjusted for the tangent angle
   const tangentPerpAngle = baseAngle + Math.PI / 2 + tangentAngleOffset;
+  const purePerpAngle = baseAngle + Math.PI / 2;
 
-  // Cap at p1 (semicircle facing away from p2)
-  // Goes from p1Right to p1Left (counterclockwise, facing back)
-  const cap1StartAngle = tangentPerpAngle + Math.PI;
-  const cap1EndAngle = cap1StartAngle + Math.PI;
+  // Cap at p1 (semicircle facing AWAY from p2, i.e., toward baseAngle + PI)
+  // Use perpendicular cap for stroke start, otherwise use tangent-adjusted
+  const p1PerpAngle = forcePerpendicularCap1 ? purePerpAngle : tangentPerpAngle;
+  const p1RightAngle = p1PerpAngle;
+  const p1LeftAngle = p1PerpAngle + Math.PI;
   const cap1Points = generateArcPoints(
     p1,
     r1,
-    cap1StartAngle,
-    cap1EndAngle,
+    p1RightAngle,
+    p1LeftAngle,
     CAP_SEGMENTS,
   );
 
-  // Cap at p2 (semicircle facing away from p1)
-  // Goes from p2Left to p2Right (counterclockwise, facing forward)
-  const cap2StartAngle = tangentPerpAngle;
-  const cap2EndAngle = cap2StartAngle + Math.PI;
+  // Cap at p2 (semicircle facing AWAY from p1, i.e., toward baseAngle)
+  // Use perpendicular cap for stroke end, otherwise use tangent-adjusted
+  const p2PerpAngle = forcePerpendicularCap2 ? purePerpAngle : tangentPerpAngle;
+  const p2LeftAngle = p2PerpAngle + Math.PI;
+  const p2RightAngle = p2LeftAngle + Math.PI;
   const cap2Points = generateArcPoints(
     p2,
     r2,
-    cap2StartAngle,
-    cap2EndAngle,
+    p2LeftAngle,
+    p2RightAngle,
     CAP_SEGMENTS,
   );
 
@@ -145,7 +159,48 @@ function createOvoid(
     ...cap2Points, // p2's front cap
   ];
 
-  return ovoidPoints;
+  // Filter out near-duplicate consecutive points to avoid numerical issues
+  return filterNearDuplicates(ovoidPoints);
+}
+
+/**
+ * Filter out consecutive points that are too close together.
+ * This prevents numerical instability in polygon boolean operations.
+ */
+function filterNearDuplicates(points: LocalPoint[]): LocalPoint[] {
+  if (points.length < 2) {
+    return points;
+  }
+
+  const filtered: LocalPoint[] = [points[0]];
+
+  for (let i = 1; i < points.length; i++) {
+    const prev = filtered[filtered.length - 1];
+    const curr = points[i];
+    const dx = curr[0] - prev[0];
+    const dy = curr[1] - prev[1];
+    const distSq = dx * dx + dy * dy;
+
+    // Only add if far enough from previous point
+    if (distSq > EPSILON * EPSILON) {
+      filtered.push(curr);
+    }
+  }
+
+  // Also check if last point is too close to first point
+  if (filtered.length > 2) {
+    const first = filtered[0];
+    const last = filtered[filtered.length - 1];
+    const dx = last[0] - first[0];
+    const dy = last[1] - first[1];
+    const distSq = dx * dx + dy * dy;
+
+    if (distSq < EPSILON * EPSILON) {
+      filtered.pop();
+    }
+  }
+
+  return filtered.length >= 3 ? filtered : points;
 }
 
 /**
@@ -197,7 +252,26 @@ function fromClipperResult(result: MultiPolygon): LocalPoint[][] {
 export function generateFreeDrawOvoidOutline(
   element: ExcalidrawFreeDrawElement,
 ): [number, number][] {
-  const { points, pressures, simulatePressure, strokeWidth } = element;
+  const { x, y, points, pressures, simulatePressure, strokeWidth } = element;
+
+  // Debug draw the raw segments from the freedraw element points
+  const colors = ["red", "green", "blue", "orange", "purple"];
+
+  // points.forEach((pt, i) => {
+  //   if (i === points.length - 1) {
+  //     return;
+  //   }
+  //   debugDrawLine(
+  //     lineSegment(
+  //       pointFrom<GlobalPoint>(x + pt[0], y + pt[1]),
+  //       pointFrom<GlobalPoint>(x + points[i + 1][0], y + points[i + 1][1]),
+  //     ),
+  //     {
+  //       color: colors[i % colors.length],
+  //       permanent: true,
+  //     },
+  //   );
+  // });
 
   if (points.length === 0) {
     return [];
@@ -231,7 +305,27 @@ export function generateFreeDrawOvoidOutline(
     const r1 = getRadiusForPressure(pressure1, strokeWidth);
     const r2 = getRadiusForPressure(pressure2, strokeWidth);
 
-    const ovoidPoints = createOvoid(p1, r1, p2, r2);
+    // Force perpendicular caps at stroke endpoints
+    const isFirstSegment = i === 0;
+    const isLastSegment = i === points.length - 2;
+
+    const ovoidPoints = createOvoid(
+      p1,
+      r1,
+      p2,
+      r2,
+      isFirstSegment, // Force perpendicular cap at stroke start
+      isLastSegment, // Force perpendicular cap at stroke end
+    );
+
+    // Draw the ovoid with different colors for debugging
+    debugDrawPolygon(
+      ovoidPoints.map((p) => pointFrom<GlobalPoint>(x + p[0], y + p[1])),
+      {
+        color: colors[i % colors.length],
+        permanent: true,
+      },
+    );
 
     if (ovoidPoints.length >= 3) {
       ovoids.push(toClipperPolygon(ovoidPoints));
