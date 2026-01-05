@@ -21,9 +21,11 @@ declare global {
   }
 }
 
+export type Polygon = GlobalPoint[];
+
 export type DebugElement = {
   color: string;
-  data: LineSegment<GlobalPoint> | Curve<GlobalPoint>;
+  data: LineSegment<GlobalPoint> | Curve<GlobalPoint> | Polygon;
   permanent: boolean;
 };
 
@@ -127,6 +129,20 @@ export const debugDrawBounds = (
       },
     ),
   );
+};
+
+export const debugDrawPolygon = (
+  points: GlobalPoint[],
+  opts?: {
+    color?: string;
+    permanent?: boolean;
+  },
+) => {
+  addToCurrentFrame({
+    color: opts?.color ?? "blue",
+    data: points,
+    permanent: !!opts?.permanent,
+  });
 };
 
 export const debugDrawPoints = (

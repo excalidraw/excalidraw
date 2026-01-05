@@ -75,6 +75,39 @@ const renderCubicBezier = (
   context.restore();
 };
 
+const isPolygon = (data: any): data is GlobalPoint[] => {
+  return (
+    Array.isArray(data) &&
+    data.every((point) => Array.isArray(point) && point.length === 2)
+  );
+};
+
+const renderPolygon = (
+  context: CanvasRenderingContext2D,
+  zoom: number,
+  points: GlobalPoint[],
+  color: string,
+) => {
+  if (points.length < 3) {
+    return;
+  }
+
+  context.save();
+  context.fillStyle = color;
+  context.globalAlpha = 0.3;
+  context.beginPath();
+  context.moveTo(points[0][0] * zoom, points[0][1] * zoom);
+  for (let i = 1; i < points.length; i++) {
+    context.lineTo(points[i][0] * zoom, points[i][1] * zoom);
+  }
+  context.closePath();
+  context.fill();
+  context.globalAlpha = 1.0;
+  context.strokeStyle = color;
+  context.stroke();
+  context.restore();
+};
+
 const renderOrigin = (context: CanvasRenderingContext2D, zoom: number) => {
   context.strokeStyle = "#888";
   context.save();
@@ -277,6 +310,14 @@ const render = (
           context,
           appState.zoom.value,
           el.data as Curve<GlobalPoint>,
+          el.color,
+        );
+        break;
+      case isPolygon(el.data):
+        renderPolygon(
+          context,
+          appState.zoom.value,
+          el.data as GlobalPoint[],
           el.color,
         );
         break;
