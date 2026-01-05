@@ -63,6 +63,7 @@ import {
   getElementAbsoluteCoords,
 } from "./bounds";
 import { shouldTestInside } from "./collision";
+import { generateFreeDrawOvoidSvgPath } from "./freedraw";
 
 import type {
   ExcalidrawElement,
@@ -77,6 +78,10 @@ import type {
 
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
+
+// Toggle between old (perfect-freehand) and new (ovoid-union) freedraw rendering
+// Set to true to use the new ovoid-based implementation
+export const USE_NEW_FREEDRAW_RENDERER = true;
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
@@ -852,8 +857,12 @@ const _generateElementShape = (
         );
       }
 
-      // (2) stroke
-      shapes.push(getFreeDrawSvgPath(element));
+      // (2) stroke - use new ovoid renderer or legacy perfect-freehand
+      if (USE_NEW_FREEDRAW_RENDERER) {
+        shapes.push(generateFreeDrawOvoidSvgPath(element) as SVGPathString);
+      } else {
+        shapes.push(getFreeDrawSvgPath(element));
+      }
 
       return shapes;
     }
