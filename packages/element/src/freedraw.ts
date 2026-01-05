@@ -6,27 +6,192 @@ import {
   vectorNormalize,
   lineSegment,
   type GlobalPoint,
+  type Polygon,
+  polygonFromPoints,
 } from "@excalidraw/math";
 import { debugDrawLine, debugDrawPolygon } from "@excalidraw/common";
-import polygonClipping from "polygon-clipping";
 
-import type { Polygon, MultiPolygon, Ring } from "polygon-clipping";
 import type { ExcalidrawFreeDrawElement } from "./types";
 
 // Number of segments to approximate each semicircular cap
-const CAP_SEGMENTS = 8;
+const CAP_SEGMENTS = 20;
 
 // Minimum radius to avoid degenerate shapes
-const MIN_RADIUS = 0.5;
+const MIN_RADIUS = 0.05;
 
 // Pressure to radius multiplier (scaled by strokeWidth)
 const PRESSURE_RADIUS_MULTIPLIER = 2.0;
 
 // Minimum distance between points to avoid numerical instability
-const MIN_POINT_DISTANCE = 0.1;
+const MIN_POINT_DISTANCE = 0.001;
 
 // Epsilon for filtering near-duplicate points in polygons
 const EPSILON = 0.01;
+
+// Simple union implementation taking advantage of the following facts:
+// - The ovoids are generated in sequence along the stroke path
+// - Each ovoid overlaps only with its immediate neighbors
+// - The ovoids are convex shapes
+
+// Therefore, we can simply stitch together the outer edges of the ovoids
+// by taking the first half of the first ovoid and the second half of the last ovoid,
+// and connecting them with the outer edges of the intermediate ovoids. The overlapping
+// ovoid caps are always the same radius at the shared points, so they align perfectly.
+// It should be easy to find the closest point to the side of the previous side segment and
+// one of the closest points on the next ovoid's start cap.
+function chainOvoidsIntoSinglePolygon<P extends LocalPoint | GlobalPoint>(
+  records: {
+    polygon: Polygon<P>;
+    firstPoint: P;
+    secondPoint: P;
+  }[],
+): Polygon<P> | null {
+  if (records.length === 0) {
+    return null;
+  }
+
+  if (records.length === 1) {
+    return records[0].polygon;
+  }
+
+  const capPointCount = CAP_SEGMENTS + 1;
+
+  const isClosedPolygon = (points: P[]) => {
+    if (points.length < 2) {
+      return false;
+    }
+    const first = points[0];
+    const last = points[points.length - 1];
+    return first[0] === last[0] && first[1] === last[1];
+  };
+
+  const openPolygon = (points: P[]) =>
+    isClosedPolygon(points) ? points.slice(0, -1) : points.slice();
+
+  const distanceSq = (a: P, b: P) => {
+    const dx = a[0] - b[0];
+    const dy = a[1] - b[1];
+    return dx * dx + dy * dy;
+  };
+
+  const distanceToSegmentSq = (p: P, a: P, b: P) => {
+    const abx = b[0] - a[0];
+    const aby = b[1] - a[1];
+    const apx = p[0] - a[0];
+    const apy = p[1] - a[1];
+    const abLenSq = abx * abx + aby * aby;
+
+    if (abLenSq === 0) {
+      return distanceSq(p, a);
+    }
+
+    const t = Math.max(0, Math.min(1, (apx * abx + apy * aby) / abLenSq));
+    const closest = pointFrom<P>(a[0] + abx * t, a[1] + aby * t);
+    return distanceSq(p, closest);
+  };
+
+  const closestIndexToSegment = (points: P[], a: P, b: P) => {
+    let bestIndex = 0;
+    let bestDistance = Number.POSITIVE_INFINITY;
+
+    for (let i = 0; i < points.length; i++) {
+      const dist = distanceToSegmentSq(points[i], a, b);
+      if (dist < bestDistance) {
+        bestDistance = dist;
+        bestIndex = i;
+      }
+    }
+
+    return bestIndex;
+  };
+
+  const pushIfDistinct = (points: P[], point: P) => {
+    if (points.length === 0) {
+      points.push(point);
+      return;
+    }
+    if (distanceSq(points[points.length - 1], point) > EPSILON * EPSILON) {
+      points.push(point);
+    }
+  };
+
+  const ovoids = records.map((record) => {
+    const open = openPolygon(record.polygon);
+
+    if (open.length < capPointCount * 2) {
+      return {
+        cap1: open,
+        cap2: [] as P[],
+        p1Right: open[0],
+        p1Left: open[open.length - 1],
+        p2Left: open[0],
+        p2Right: open[open.length - 1],
+      };
+    }
+
+    const cap1 = open.slice(0, capPointCount);
+    const cap2 = open.slice(capPointCount, capPointCount * 2);
+
+    return {
+      cap1,
+      cap2,
+      p1Right: cap1[0],
+      p1Left: cap1[cap1.length - 1],
+      p2Left: cap2[0],
+      p2Right: cap2[cap2.length - 1],
+    };
+  });
+
+  const leftChain: P[] = [];
+  const rightChain: P[] = [];
+
+  ovoids[0].cap1.forEach((point) => pushIfDistinct(leftChain, point));
+  pushIfDistinct(rightChain, ovoids[0].p1Right);
+
+  for (let i = 0; i < ovoids.length; i++) {
+    const current = ovoids[i];
+
+    pushIfDistinct(leftChain, current.p2Left);
+    pushIfDistinct(rightChain, current.p2Right);
+
+    if (i + 1 >= ovoids.length) {
+      continue;
+    }
+
+    const next = ovoids[i + 1];
+
+    const leftIndex = closestIndexToSegment(
+      next.cap1,
+      current.p1Left,
+      current.p2Left,
+    );
+
+    for (let j = leftIndex; j < next.cap1.length; j++) {
+      pushIfDistinct(leftChain, next.cap1[j]);
+    }
+
+    const rightIndex = closestIndexToSegment(
+      next.cap1,
+      current.p1Right,
+      current.p2Right,
+    );
+
+    for (let j = rightIndex; j >= 0; j--) {
+      pushIfDistinct(rightChain, next.cap1[j]);
+    }
+  }
+
+  const lastOvoid = ovoids[ovoids.length - 1];
+  lastOvoid.cap2.forEach((point) => pushIfDistinct(leftChain, point));
+
+  const rightChainReversed = rightChain.slice(0, -1).reverse();
+  const outline = filterNearDuplicates<P>([
+    ...leftChain,
+    ...rightChainReversed,
+  ]);
+
+  return polygonFromPoints<P>(outline);
+}
 
 /**
  * Compute the radius for a point based on pressure and strokeWidth.
@@ -50,20 +215,20 @@ function getRadiusForPressure(pressure: number, strokeWidth: number): number {
  * @param segments - Number of segments to divide the arc into
  * @returns Array of points along the arc
  */
-function generateArcPoints(
+function generateArcPoints<P extends LocalPoint | GlobalPoint>(
   center: LocalPoint,
   radius: number,
   startAngle: number,
   endAngle: number,
   segments: number,
-): LocalPoint[] {
-  const points: LocalPoint[] = [];
+): P[] {
+  const points: P[] = [];
   const angleStep = (endAngle - startAngle) / segments;
 
   for (let i = 0; i <= segments; i++) {
     const angle = startAngle + i * angleStep;
     points.push(
-      pointFrom<LocalPoint>(
+      pointFrom<P>(
         center[0] + radius * Math.cos(angle),
         center[1] + radius * Math.sin(angle),
       ),
@@ -88,20 +253,22 @@ function generateArcPoints(
  * @param forcePerpendicularCap2 - Force cap2 to be perpendicular (for stroke end)
  * @returns Array of points forming the ovoid polygon
  */
-function createOvoid(
+function createOvoid<P extends LocalPoint | GlobalPoint>(
   p1: LocalPoint,
   r1: number,
   p2: LocalPoint,
   r2: number,
   forcePerpendicularCap1: boolean = false,
   forcePerpendicularCap2: boolean = false,
-): LocalPoint[] {
+): Polygon<P> {
   const dist = pointDistance(p1, p2);
 
   // If points are too close, create a circle at the midpoint
   if (dist < MIN_POINT_DISTANCE) {
     const avgRadius = (r1 + r2) / 2;
-    return generateArcPoints(p1, avgRadius, 0, Math.PI * 2, CAP_SEGMENTS * 2);
+    return polygonFromPoints<P>(
+      generateArcPoints(p1, avgRadius, 0, Math.PI * 2, CAP_SEGMENTS * 2),
+    );
   }
 
   // Direction vector from p1 to p2
@@ -130,7 +297,7 @@ function createOvoid(
   const p1PerpAngle = forcePerpendicularCap1 ? purePerpAngle : tangentPerpAngle;
   const p1RightAngle = p1PerpAngle;
   const p1LeftAngle = p1PerpAngle + Math.PI;
-  const cap1Points = generateArcPoints(
+  const cap1Points = generateArcPoints<P>(
     p1,
     r1,
     p1RightAngle,
@@ -143,7 +310,7 @@ function createOvoid(
   const p2PerpAngle = forcePerpendicularCap2 ? purePerpAngle : tangentPerpAngle;
   const p2LeftAngle = p2PerpAngle + Math.PI;
   const p2RightAngle = p2LeftAngle + Math.PI;
-  const cap2Points = generateArcPoints(
+  const cap2Points = generateArcPoints<P>(
     p2,
     r2,
     p2LeftAngle,
@@ -154,25 +321,27 @@ function createOvoid(
   // Assemble the ovoid polygon:
   // cap1 goes around the back of p1, cap2 goes around the front of p2
   // The arc endpoints naturally connect with the tangent lines
-  const ovoidPoints: LocalPoint[] = [
+  const ovoidPoints: P[] = [
     ...cap1Points, // p1's back cap
     ...cap2Points, // p2's front cap
   ];
 
   // Filter out near-duplicate consecutive points to avoid numerical issues
-  return filterNearDuplicates(ovoidPoints);
+  return polygonFromPoints<P>(filterNearDuplicates<P>(ovoidPoints));
 }
 
 /**
  * Filter out consecutive points that are too close together.
  * This prevents numerical instability in polygon boolean operations.
  */
-function filterNearDuplicates(points: LocalPoint[]): LocalPoint[] {
+function filterNearDuplicates<P extends LocalPoint | GlobalPoint>(
+  points: P[],
+): P[] {
   if (points.length < 2) {
     return points;
   }
 
-  const filtered: LocalPoint[] = [points[0]];
+  const filtered: P[] = [points[0]];
 
   for (let i = 1; i < points.length; i++) {
     const prev = filtered[filtered.length - 1];
@@ -204,39 +373,6 @@ function filterNearDuplicates(points: LocalPoint[]): LocalPoint[] {
 }
 
 /**
- * Convert a polygon (array of LocalPoints) to polygon-clipping format.
- * polygon-clipping expects: [[[x,y], [x,y], ...]]
- */
-function toClipperPolygon(points: LocalPoint[]): Polygon {
-  if (points.length === 0) {
-    return [];
-  }
-  // Ensure the polygon is closed
-  const ring: Ring = points.map((p) => [p[0], p[1]]);
-
-  // Close the ring if not already closed
-  if (
-    ring.length > 0 &&
-    (ring[0][0] !== ring[ring.length - 1][0] ||
-      ring[0][1] !== ring[ring.length - 1][1])
-  ) {
-    ring.push([ring[0][0], ring[0][1]]);
-  }
-
-  return [ring];
-}
-
-/**
- * Convert polygon-clipping result back to LocalPoint arrays.
- * Returns the largest polygon (by point count) from the result.
- */
-function fromClipperResult(result: MultiPolygon): LocalPoint[][] {
-  return result.map((polygon) =>
-    polygon[0].map((coord) => pointFrom<LocalPoint>(coord[0], coord[1])),
-  );
-}
-
-/**
  * Generate the outline of a freedraw element using the ovoid-union approach.
  *
  * This creates ovoid shapes between each consecutive pair of points,
@@ -257,21 +393,21 @@ export function generateFreeDrawOvoidOutline(
   // Debug draw the raw segments from the freedraw element points
   const colors = ["red", "green", "blue", "orange", "purple"];
 
-  // points.forEach((pt, i) => {
-  //   if (i === points.length - 1) {
-  //     return;
-  //   }
-  //   debugDrawLine(
-  //     lineSegment(
-  //       pointFrom<GlobalPoint>(x + pt[0], y + pt[1]),
-  //       pointFrom<GlobalPoint>(x + points[i + 1][0], y + points[i + 1][1]),
-  //     ),
-  //     {
-  //       color: colors[i % colors.length],
-  //       permanent: true,
-  //     },
-  //   );
-  // });
+  points.forEach((pt, i) => {
+    if (i === points.length - 1) {
+      return;
+    }
+    debugDrawLine(
+      lineSegment(
+        pointFrom<GlobalPoint>(x + pt[0], y + pt[1]),
+        pointFrom<GlobalPoint>(x + points[i + 1][0], y + points[i + 1][1]),
+      ),
+      {
+        color: colors[i % colors.length],
+        permanent: true,
+      },
+    );
+  });
 
   if (points.length === 0) {
     return [];
@@ -292,7 +428,7 @@ export function generateFreeDrawOvoidOutline(
   }
 
   // Generate ovoids for each consecutive pair of points
-  const ovoids: Polygon[] = [];
+  const ovoids: Polygon<LocalPoint>[] = [];
 
   for (let i = 0; i < points.length - 1; i++) {
     const p1 = points[i] as LocalPoint;
@@ -309,7 +445,7 @@ export function generateFreeDrawOvoidOutline(
     const isFirstSegment = i === 0;
     const isLastSegment = i === points.length - 2;
 
-    const ovoidPoints = createOvoid(
+    const ovoidPoints = createOvoid<LocalPoint>(
       p1,
       r1,
       p2,
@@ -328,7 +464,7 @@ export function generateFreeDrawOvoidOutline(
     );
 
     if (ovoidPoints.length >= 3) {
-      ovoids.push(toClipperPolygon(ovoidPoints));
+      ovoids.push(ovoidPoints);
     }
   }
 
@@ -337,38 +473,24 @@ export function generateFreeDrawOvoidOutline(
   }
 
   // Union all ovoids together
-  const result = polygonClipping.union(
-    [ovoids[0]],
-    ...ovoids.slice(1).map((ovoid) => [ovoid]),
+  const result = chainOvoidsIntoSinglePolygon<LocalPoint>(
+    ovoids.map((poly, i) => ({
+      polygon: poly,
+      firstPoint: points[i],
+      secondPoint: points[i + 1],
+    })),
   );
 
-  // let result: MultiPolygon = ovoids[0] ? [ovoids[0]] : [];
-
-  // for (let i = 1; i < ovoids.length; i++) {
-  //   if (ovoids[i]) {
-  //     try {
-  //       result = polygonClipping.union(result, [ovoids[i]]);
-  //     } catch {
-  //       // If union fails for this ovoid, skip it
-  //       continue;
-  //     }
-  //   }
-  // }
-
-  if (result.length === 0) {
+  if (result === null) {
     return [];
   }
 
-  // Convert back to point array
-  // Take the outer ring of the first (largest) polygon
-  const outlinePolygons = fromClipperResult(result);
-
-  if (outlinePolygons.length === 0 || outlinePolygons[0].length === 0) {
+  if (result === null) {
     return [];
   }
 
   // Return the first (outer) polygon
-  return outlinePolygons[0].map((p) => [p[0], p[1]]);
+  return result;
 }
 
 /**
