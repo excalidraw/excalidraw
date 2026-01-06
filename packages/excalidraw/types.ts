@@ -191,7 +191,6 @@ type _CommonCanvasAppState = {
   frameToHighlight: AppState["frameToHighlight"]; // TODO: move to interactive canvas if possible
   offsetLeft: AppState["offsetLeft"];
   offsetTop: AppState["offsetTop"];
-  theme: AppState["theme"];
 };
 
 export type StaticCanvasAppState = Readonly<
@@ -214,6 +213,7 @@ export type InteractiveCanvasAppState = Readonly<
   _CommonCanvasAppState & {
     activeTool: AppState["activeTool"];
     // renderInteractiveScene
+    theme: AppState["theme"];
     activeEmbeddable: AppState["activeEmbeddable"];
     selectionElement: AppState["selectionElement"];
     selectedGroupIds: AppState["selectedGroupIds"];

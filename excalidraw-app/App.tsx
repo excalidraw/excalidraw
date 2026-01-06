@@ -396,6 +396,10 @@ const ExcalidrawWrapper = () => {
 
   const editorInterface = useEditorInterface();
 
+  useEffect(() => {
+    document.documentElement.classList.remove("dark");
+  }, []);
+
   // initial state
   // ---------------------------------------------------------------------------
 

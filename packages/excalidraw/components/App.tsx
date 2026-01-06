@@ -2993,10 +2993,10 @@ class App extends React.Component<AppProps, AppState> {
     this.resetStore();
 
     if (initialData?.scrollX != null) {
-      scene.appState.scrollX = initialData.scrollX;
+      restoredAppState.scrollX = initialData.scrollX;
     }
     if (initialData?.scrollY != null) {
-      scene.appState.scrollY = initialData.scrollY;
+      restoredAppState.scrollY = initialData.scrollY;
     }
 
     this.resetHistory();
