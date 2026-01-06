@@ -149,6 +149,7 @@ export class LinearElementEditor {
   public readonly pointerOffset: Readonly<{ x: number; y: number }>;
   public readonly hoverPointIndex: number;
   public readonly segmentMidPointHoveredCoords: GlobalPoint | null;
+  public readonly hoveredFocusPointBinding: "start" | "end" | null;
   public readonly elbowed: boolean;
   public readonly customLineAngle: number | null;
   public readonly isEditing: boolean;
@@ -194,6 +195,7 @@ export class LinearElementEditor {
     };
     this.hoverPointIndex = -1;
     this.segmentMidPointHoveredCoords = null;
+    this.hoveredFocusPointBinding = null;
     this.elbowed = isElbowArrow(element) && element.elbowed;
     this.customLineAngle = null;
     this.isEditing = isEditing;

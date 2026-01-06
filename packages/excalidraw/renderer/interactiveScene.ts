@@ -26,6 +26,8 @@ import {
   getTransformHandles,
   getTransformHandlesFromCoords,
   hasBoundingBox,
+  isArrowElement,
+  isBindableElement,
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
@@ -45,6 +47,10 @@ import {
 } from "@excalidraw/element";
 
 import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
+import {
+  getGlobalFixedPointForBindableElement,
+  isFocusPointVisible,
+} from "@excalidraw/element";
 
 import type {
   TransformHandles,
@@ -155,6 +161,19 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
     LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value,
     false,
   );
+};
+
+const renderFocusPointHighlight = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  focusPoint: GlobalPoint,
+) => {
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
+  highlightPoint(focusPoint, context, appState);
+
+  context.restore();
 };
 
 const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
@@ -921,6 +940,146 @@ const renderLinearPointHandles = (
   context.restore();
 };
 
+const renderFocusPointConnectionLine = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  fromPoint: GlobalPoint,
+  toPoint: GlobalPoint,
+) => {
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
+  context.strokeStyle = "rgba(134, 131, 226, 0.6)";
+  context.lineWidth = 1 / appState.zoom.value;
+  context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
+
+  context.beginPath();
+  context.moveTo(fromPoint[0], fromPoint[1]);
+  context.lineTo(toPoint[0], toPoint[1]);
+  context.stroke();
+
+  context.restore();
+};
+
+const renderFocusPointIndicators = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  element: NonDeleted<ExcalidrawLinearElement>,
+  elementsMap: NonDeletedSceneElementsMap,
+) => {
+  // Render focus point indicators when the arrow is selected
+  if (
+    !appState.selectedLinearElement?.elementId ||
+    appState.selectedLinearElement.elementId !== element.id
+  ) {
+    return;
+  }
+
+  const arrow = element as any;
+
+  // Render start binding focus point and connection line
+  if (arrow.startBinding?.elementId) {
+    const bindableElement = elementsMap.get(arrow.startBinding.elementId);
+    if (
+      bindableElement &&
+      isBindableElement(bindableElement) &&
+      !bindableElement.isDeleted
+    ) {
+      const focusPoint = getGlobalFixedPointForBindableElement(
+        arrow.startBinding.fixedPoint,
+        bindableElement,
+        elementsMap,
+      );
+
+      // Only render if focus point is within the bindable element
+      if (isFocusPointVisible(focusPoint, bindableElement, elementsMap)) {
+        const isHovered =
+          appState.selectedLinearElement?.hoveredFocusPointBinding === "start";
+
+        // Render dashed line from arrow start point to focus point
+        const arrowStartPoint =
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            arrow,
+            0,
+            elementsMap,
+          );
+        renderFocusPointConnectionLine(
+          context,
+          appState,
+          arrowStartPoint,
+          focusPoint,
+        );
+
+        context.save();
+        context.translate(appState.scrollX, appState.scrollY);
+
+        renderSingleLinearPoint(
+          context,
+          appState,
+          focusPoint,
+          LinearElementEditor.POINT_HANDLE_SIZE / 1.5,
+          isHovered,
+          false,
+          false,
+        );
+
+        context.restore();
+      }
+    }
+  }
+
+  // Render end binding focus point and connection line
+  if (arrow.endBinding?.elementId) {
+    const bindableElement = elementsMap.get(arrow.endBinding.elementId);
+    if (
+      bindableElement &&
+      isBindableElement(bindableElement) &&
+      !bindableElement.isDeleted
+    ) {
+      const focusPoint = getGlobalFixedPointForBindableElement(
+        arrow.endBinding.fixedPoint,
+        bindableElement,
+        elementsMap,
+      );
+
+      // Only render if focus point is within the bindable element
+      if (isFocusPointVisible(focusPoint, bindableElement, elementsMap)) {
+        const isHovered =
+          appState.selectedLinearElement?.hoveredFocusPointBinding === "end";
+
+        // Render dashed line from arrow end point to focus point
+        const arrowEndPoint =
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            arrow,
+            arrow.points.length - 1,
+            elementsMap,
+          );
+        renderFocusPointConnectionLine(
+          context,
+          appState,
+          arrowEndPoint,
+          focusPoint,
+        );
+
+        context.save();
+        context.translate(appState.scrollX, appState.scrollY);
+
+        renderSingleLinearPoint(
+          context,
+          appState,
+          focusPoint,
+          LinearElementEditor.POINT_HANDLE_SIZE / 1.5,
+          isHovered,
+          false,
+          false,
+        );
+
+        context.restore();
+      }
+    }
+  }
+};
+
 const renderTransformHandles = (
   context: CanvasRenderingContext2D,
   renderConfig: InteractiveCanvasRenderConfig,
@@ -1270,6 +1429,47 @@ const _renderInteractiveScene = ({
           : editor.hoverPointIndex >= 0
       ) {
         renderLinearElementPointHighlight(context, appState, elementsMap);
+      }
+
+      // Render focus point highlight when hovering
+      if (
+        editor.hoveredFocusPointBinding &&
+        isArrowElement(firstSelectedLinear)
+      ) {
+        const arrow = firstSelectedLinear as any;
+        const binding =
+          editor.hoveredFocusPointBinding === "start"
+            ? arrow.startBinding
+            : arrow.endBinding;
+
+        if (binding?.elementId) {
+          const bindableElement = elementsMap.get(binding.elementId);
+          if (
+            bindableElement &&
+            isBindableElement(bindableElement) &&
+            !bindableElement.isDeleted
+          ) {
+            const focusPoint = getGlobalFixedPointForBindableElement(
+              binding.fixedPoint,
+              bindableElement,
+              elementsMap,
+            );
+            // Only render highlight if focus point is visible
+            if (isFocusPointVisible(focusPoint, bindableElement, elementsMap)) {
+              renderFocusPointHighlight(context, appState, focusPoint);
+            }
+          }
+        }
+      }
+
+      if (isArrowElement(firstSelectedLinear)) {
+        // Render focus point indicators for linear element
+        renderFocusPointIndicators(
+          context,
+          appState,
+          firstSelectedLinear,
+          allElementsMap,
+        );
       }
     }
   }

@@ -34,6 +34,7 @@ import {
 import {
   getAllHoveredElementAtPoint,
   getHoveredElementForBinding,
+  hitElementItself,
   intersectElementWithLineSegment,
   isBindableElementInsideOtherBindable,
   isPointInElement,
@@ -114,6 +115,21 @@ export type BindingStrategy =
  */
 export const BASE_BINDING_GAP = 10;
 export const BASE_BINDING_GAP_ELBOW = 5;
+
+export const isFocusPointVisible = (
+  focusPoint: GlobalPoint,
+  bindableElement: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+): boolean => {
+  // Check if the focus point is within the element's shape bounds
+  return hitElementItself({
+    element: bindableElement,
+    elementsMap,
+    point: focusPoint,
+    threshold: bindableElement.strokeWidth / 2,
+    overrideShouldTestInside: true,
+  });
+};
 
 export const getBindingGap = (
   bindTarget: ExcalidrawBindableElement,
