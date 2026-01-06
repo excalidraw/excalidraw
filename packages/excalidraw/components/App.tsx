@@ -249,6 +249,8 @@ import {
   doBoundsIntersect,
   isPointInElement,
   maxBindingDistance_simple,
+  convertToExcalidrawElements,
+  type ExcalidrawElementSkeleton,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -400,7 +402,6 @@ import {
   SnapCache,
   isGridModeEnabled,
 } from "../snapping";
-import { convertToExcalidrawElements } from "../data/transform";
 import { Renderer } from "../scene/Renderer";
 import {
   setEraserCursor,
@@ -463,7 +464,7 @@ import type { ClipboardData, PastedMixedContent } from "../clipboard";
 import type { ExportedElements } from "../data";
 import type { ContextMenuItems } from "./ContextMenu";
 import type { FileSystemHandle } from "../data/filesystem";
-import type { ExcalidrawElementSkeleton } from "../data/transform";
+
 import type {
   AppClassProperties,
   AppProps,
@@ -5548,14 +5549,7 @@ class App extends React.Component<AppProps, AppState> {
     },
     keepSelection = false,
   ) => {
-    const nextTool =
-      tool.type === "poll"
-        ? {
-            type: "selection" as const,
-            locked: tool.locked,
-            fromSelection: tool.fromSelection,
-          }
-        : tool;
+    const nextTool = tool;
 
     if (!this.isToolSupported(nextTool.type)) {
       console.warn(
@@ -7683,8 +7677,7 @@ class App extends React.Component<AppProps, AppState> {
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
-      this.state.activeTool.type !== "image" &&
-      this.state.activeTool.type !== "poll"
+      this.state.activeTool.type !== "image"
     ) {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
@@ -8991,6 +8984,8 @@ class App extends React.Component<AppProps, AppState> {
               },
             ],
           ]),
+          point[0],
+          point[1],
           this.scene,
           this.state,
           { newArrow: true, altKey: event.altKey, initialBinding: true },

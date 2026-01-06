@@ -1,5 +1,3 @@
-import type { ExcalidrawElement } from "@excalidraw/element/types";
-
 export type PollResultVisibility = "live" | "creator" | "reveal";
 export type PollAccess = "all" | "editors";
 export type PollDisplayMode = "percent" | "count";
@@ -10,10 +8,18 @@ export type PollOption = {
   label: string;
 };
 
+export type PollBallot = {
+  optionIds: string[];
+  updatedAt: number;
+};
+
 export type PollMetadata = {
   id: string;
+  createdAt: number;
   question: string;
   options: PollOption[];
+  results?: Record<string, number>;
+  ballots?: Record<string, PollBallot>;
   settings: {
     allowMultiple: boolean;
     allowRevote: boolean;
@@ -31,8 +37,4 @@ export type PollMetadata = {
     revealResults: boolean;
     lockedOptions: boolean;
   };
-};
-
-export type PollElement = ExcalidrawElement & {
-  customData?: Record<string, any> & { poll?: PollMetadata };
 };
