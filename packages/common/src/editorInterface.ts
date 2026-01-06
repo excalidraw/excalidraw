@@ -1,3 +1,5 @@
+import mobile from "is-mobile";
+
 export type StylesPanelMode = "compact" | "full" | "mobile";
 
 export type EditorInterface = Readonly<{
@@ -139,12 +141,13 @@ export const getFormFactor = (
   editorWidth: number,
   editorHeight: number,
 ): EditorInterface["formFactor"] => {
-  if (isMobileBreakpoint(editorWidth, editorHeight)) {
+  if (mobile()) {
     return "phone";
-  }
-
-  if (isTabletBreakpoint(editorWidth, editorHeight)) {
+  } else if (mobile({ tablet: true })) {
     return "tablet";
+  } else if (isMobileBreakpoint(editorWidth, editorHeight)) {
+    // NOTE: Very small editor sizes should be treated as phone
+    return "phone";
   }
 
   return "desktop";
