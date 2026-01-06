@@ -616,5 +616,25 @@ export const projectFixedPointOntoDiagonal = (
     p = p1 || p2 || null;
   }
 
-  return p && isPointInElement(p, element, elementsMap) ? p : null;
+  if (p && isPointInElement(p, element, elementsMap)) {
+    const center = elementCenterPoint(element, elementsMap);
+    const topLeft = pointRotateRads(
+      pointFrom<GlobalPoint>(element.x, element.y),
+      center,
+      element.angle,
+    );
+    const centerToCornerDist = pointDistance(center, topLeft);
+    const centerToProjectedDist = pointDistance(center, p);
+
+    if (centerToProjectedDist <= centerToCornerDist * 0.33) {
+      return pointFrom<GlobalPoint>(
+        element.x + element.width * 0.5001,
+        element.y + element.height * 0.5001,
+      );
+    }
+
+    return p;
+  }
+
+  return null;
 };
