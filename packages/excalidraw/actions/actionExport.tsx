@@ -202,7 +202,9 @@ export const actionSaveToActiveFile = register({
     }
   },
   keyTest: (event) =>
-    event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
+    event.key.toLowerCase() === KEYS.S &&
+    event[KEYS.CTRL_OR_CMD] &&
+    !event.shiftKey,
 });
 
 export const actionSaveFileToDisk = register({
@@ -241,7 +243,9 @@ export const actionSaveFileToDisk = register({
     }
   },
   keyTest: (event) =>
-    event.key === KEYS.S && event.shiftKey && event[KEYS.CTRL_OR_CMD],
+    event.key.toLowerCase() === KEYS.S &&
+    event.shiftKey &&
+    event[KEYS.CTRL_OR_CMD],
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
