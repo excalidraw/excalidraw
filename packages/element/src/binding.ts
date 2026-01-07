@@ -86,6 +86,7 @@ import type {
   Ordered,
   PointsPositionUpdates,
 } from "./types";
+import { debugDrawHitVolume } from "@excalidraw/utils";
 
 export type BindingStrategy =
   // Create a new binding with this mode
@@ -798,7 +799,11 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     startDragged ? -1 : 0,
     elementsMap,
   );
-
+  otherBindableElement &&
+    debugDrawHitVolume(otherBindableElement, elementsMap, {
+      rays: 100,
+      color: "red",
+    });
   const other: BindingStrategy =
     otherBindableElement &&
     !otherFocusPointIsInElement &&
