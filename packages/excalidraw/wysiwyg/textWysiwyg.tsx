@@ -46,7 +46,7 @@ import type {
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
-import { actionSaveToActiveFile } from "../actions";
+import { actionSaveToActiveFile, actionSaveFileToDisk } from "../actions";
 
 import { parseDataTransferEvent } from "../clipboard";
 import {
@@ -393,7 +393,13 @@ export const textWysiwyg = ({
     } else if (actionSaveToActiveFile.keyTest(event)) {
       event.preventDefault();
       handleSubmit();
-      app.actionManager.executeAction(actionSaveToActiveFile);
+      // Try to save to active file first, fallback to save-as dialog if not available
+      // (e.g., when no file handle exists for a new unsaved file)
+      if (app.actionManager.isActionEnabled(actionSaveToActiveFile)) {
+        app.actionManager.executeAction(actionSaveToActiveFile);
+      } else {
+        app.actionManager.executeAction(actionSaveFileToDisk);
+      }
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
       if (event.isComposing || event.keyCode === 229) {
@@ -506,9 +512,9 @@ export const textWysiwyg = ({
           startIndices.concat(
             idx
               ? // curr line index is prev line's start + prev line's length + \n
-                startIndices[idx - 1] + lines[idx - 1].length + 1
+              startIndices[idx - 1] + lines[idx - 1].length + 1
               : // first selected line
-                selectionStart,
+              selectionStart,
           ),
         [] as number[],
       )
