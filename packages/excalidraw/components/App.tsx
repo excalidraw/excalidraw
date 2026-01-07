@@ -9180,15 +9180,16 @@ class App extends React.Component<AppProps, AppState> {
                 isBindableElement(bindableElement) &&
                 !bindableElement.isDeleted
               ) {
-                // Calculate the fixed point ratio based on the new pointer position
                 const center = pointFrom<GlobalPoint>(
                   bindableElement.x + bindableElement.width / 2,
                   bindableElement.y + bindableElement.height / 2,
                 );
-
-                // Rotate the pointer position to align with the element's coordinate system
+                const point = pointFrom<GlobalPoint>(
+                  pointerCoords.x,
+                  pointerCoords.y,
+                );
                 const nonRotatedPoint = pointRotateRads<GlobalPoint>(
-                  pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
+                  point,
                   center,
                   -bindableElement.angle as Radians,
                 );
@@ -9207,15 +9208,9 @@ class App extends React.Component<AppProps, AppState> {
                   1,
                 );
 
-                // Check if the new focus point position is valid (within bindable element bounds)
-                if (
-                  !isFocusPointVisible(
-                    nonRotatedPoint,
-                    bindableElement,
-                    elementsMap,
-                  )
-                ) {
-                  // Don't update if the new position is outside the element bounds
+                // Check if the new focus point position is
+                // within bindable element bounds
+                if (!isFocusPointVisible(point, bindableElement, elementsMap)) {
                   return;
                 }
 
@@ -9233,9 +9228,9 @@ class App extends React.Component<AppProps, AppState> {
                   [bindingField]: updatedBinding,
                 });
 
-                // Update the arrow point using updateBoundPoint to snap it to the element's outline
+                // Update bindings
+                const pointUpdates = new Map();
                 const pointIndex = isStartBinding ? 0 : arrow.points.length - 1;
-
                 const newPoint = updateBoundPoint(
                   arrow,
                   bindingField as "startBinding" | "endBinding",
@@ -9243,8 +9238,6 @@ class App extends React.Component<AppProps, AppState> {
                   bindableElement,
                   elementsMap,
                 );
-
-                const pointUpdates = new Map();
 
                 if (newPoint) {
                   pointUpdates.set(pointIndex, { point: newPoint });
