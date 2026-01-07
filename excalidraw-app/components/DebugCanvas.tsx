@@ -27,7 +27,10 @@ import { isCurve } from "@excalidraw/math/curve";
 import React from "react";
 
 import type { Curve } from "@excalidraw/math";
-import type { DebugElement, DebugPolygon } from "@excalidraw/utils";
+import type {
+  DebugElement,
+  DebugPolygon,
+} from "@excalidraw/element/visualdebug";
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
