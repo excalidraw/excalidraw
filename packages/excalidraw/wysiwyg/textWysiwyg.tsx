@@ -585,6 +585,11 @@ export const textWysiwyg = ({
     });
   };
 
+  const handleBlur = ()=>{
+    if(!document.hasFocus()) return ;
+    handleSubmit();
+  }
+
   const cleanup = () => {
     // remove events to ensure they don't late-fire
     editable.onblur = null;
@@ -635,7 +640,7 @@ export const textWysiwyg = ({
       }
 
       // Otherwise, re-enable submit on blur and refocus the editor.
-      editable.onblur = handleSubmit;
+      editable.onblur = handleBlur;
       editable.focus();
     });
   };
@@ -645,7 +650,7 @@ export const textWysiwyg = ({
     window.addEventListener("pointerup", bindBlurEvent);
     // handle edge-case where pointerup doesn't fire e.g. due to user
     // alt-tabbing away
-    window.addEventListener("blur", handleSubmit);
+    window.addEventListener("blur", handleBlur);
   };
 
   // prevent blur when changing properties from the menu
