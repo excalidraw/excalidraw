@@ -231,9 +231,19 @@ describe("library", () => {
         type: MIME_TYPES.excalidrawlib,
       },
     ]);
-    await waitFor(() => {
-      expect(h.elements).toEqual([expect.objectContaining({ [ORIG_ID]: "A" })]);
-    });
+    await waitFor(
+      () => {
+        expect(h.elements).toEqual([
+          expect.objectContaining({ [ORIG_ID]: "A" }),
+        ]);
+      },
+      {
+        // This test fails on slower CI runs, so bigger timeout and check
+        // interval is set to accommodate that.
+        timeout: 2000,
+        interval: 100,
+      },
+    );
     expect(h.state.activeTool.type).toBe("selection");
   });
 });
