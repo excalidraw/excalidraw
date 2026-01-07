@@ -123,7 +123,6 @@ import {
   isBindingEnabled,
   shouldEnableBindingForPointerEvent,
   updateBoundElements,
-  updateBoundPoint,
   LinearElementEditor,
   newElementWith,
   newFrameElement,
@@ -253,6 +252,7 @@ import {
   maxBindingDistance_simple,
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
+  handleFocusPointDrag,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6952,7 +6952,12 @@ class App extends React.Component<AppProps, AppState> {
               elementsMap,
             );
             if (
-              isFocusPointVisible(focusPoint, bindableElement, elementsMap) &&
+              isFocusPointVisible(
+                focusPoint,
+                arrow,
+                bindableElement,
+                elementsMap,
+              ) &&
               pointDistance(pointerPos, focusPoint) <= hitThreshold
             ) {
               hoveredFocusPointBinding = "start";
@@ -6974,7 +6979,12 @@ class App extends React.Component<AppProps, AppState> {
               elementsMap,
             );
             if (
-              isFocusPointVisible(focusPoint, bindableElement, elementsMap) &&
+              isFocusPointVisible(
+                focusPoint,
+                arrow,
+                bindableElement,
+                elementsMap,
+              ) &&
               pointDistance(pointerPos, focusPoint) <= hitThreshold
             ) {
               hoveredFocusPointBinding = "end";
@@ -7961,6 +7971,7 @@ class App extends React.Component<AppProps, AppState> {
                 if (
                   isFocusPointVisible(
                     focusPoint,
+                    arrow,
                     bindableElement,
                     elementsMap,
                   ) &&
@@ -7989,6 +8000,7 @@ class App extends React.Component<AppProps, AppState> {
                 if (
                   isFocusPointVisible(
                     focusPoint,
+                    arrow,
                     bindableElement,
                     elementsMap,
                   ) &&
@@ -9157,150 +9169,17 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.selectedLinearElement) {
         const linearElementEditor = this.state.selectedLinearElement;
 
-        // Handle focus point dragging
+        // Handle focus point dragging if needed
         if (linearElementEditor.hoveredFocusPointBinding) {
-          const arrow = LinearElementEditor.getElement(
-            linearElementEditor.elementId,
-            elementsMap,
-          ) as any;
-
-          if (arrow && isBindingElement(arrow)) {
-            const isStartBinding =
-              linearElementEditor.hoveredFocusPointBinding === "start";
-            const binding = isStartBinding
-              ? arrow.startBinding
-              : arrow.endBinding;
-
-            if (binding?.elementId) {
-              const bindableElement = elementsMap.get(
-                binding.elementId,
-              ) as ExcalidrawBindableElement;
-              if (
-                bindableElement &&
-                isBindableElement(bindableElement) &&
-                !bindableElement.isDeleted
-              ) {
-                const center = pointFrom<GlobalPoint>(
-                  bindableElement.x + bindableElement.width / 2,
-                  bindableElement.y + bindableElement.height / 2,
-                );
-                const point = pointFrom<GlobalPoint>(
-                  pointerCoords.x,
-                  pointerCoords.y,
-                );
-                const nonRotatedPoint = pointRotateRads<GlobalPoint>(
-                  point,
-                  center,
-                  -bindableElement.angle as Radians,
-                );
-
-                // Calculate fixed point ratio (0-1)
-                const fixedX = clamp(
-                  (nonRotatedPoint[0] - bindableElement.x) /
-                    bindableElement.width,
-                  0,
-                  1,
-                );
-                const fixedY = clamp(
-                  (nonRotatedPoint[1] - bindableElement.y) /
-                    bindableElement.height,
-                  0,
-                  1,
-                );
-
-                // Check if the new focus point position is
-                // within bindable element bounds
-                if (!isFocusPointVisible(point, bindableElement, elementsMap)) {
-                  return;
-                }
-
-                const bindingField = isStartBinding
-                  ? "startBinding"
-                  : "endBinding";
-
-                const updatedBinding = {
-                  ...binding,
-                  fixedPoint: [fixedX, fixedY] as [number, number],
-                };
-
-                // Update the binding on the arrow
-                this.scene.mutateElement(arrow, {
-                  [bindingField]: updatedBinding,
-                });
-
-                // Update bindings
-                const pointUpdates = new Map();
-                const pointIndex = isStartBinding ? 0 : arrow.points.length - 1;
-                const newPoint = updateBoundPoint(
-                  arrow,
-                  bindingField as "startBinding" | "endBinding",
-                  updatedBinding,
-                  bindableElement,
-                  elementsMap,
-                );
-
-                if (newPoint) {
-                  pointUpdates.set(pointIndex, { point: newPoint });
-                }
-
-                // Also update the adjacent end if it has a binding
-                const adjacentBindingField = isStartBinding
-                  ? "endBinding"
-                  : "startBinding";
-                const adjacentBinding = isStartBinding
-                  ? arrow.endBinding
-                  : arrow.startBinding;
-
-                if (adjacentBinding?.elementId) {
-                  const adjacentBindableElement = elementsMap.get(
-                    adjacentBinding.elementId,
-                  ) as ExcalidrawBindableElement;
-
-                  if (
-                    adjacentBindableElement &&
-                    isBindableElement(adjacentBindableElement) &&
-                    !adjacentBindableElement.isDeleted
-                  ) {
-                    const adjacentPointIndex = isStartBinding
-                      ? arrow.points.length - 1
-                      : 0;
-
-                    const adjacentNewPoint = updateBoundPoint(
-                      arrow,
-                      adjacentBindingField as "startBinding" | "endBinding",
-                      adjacentBinding,
-                      adjacentBindableElement,
-                      elementsMap,
-                    );
-
-                    if (adjacentNewPoint) {
-                      pointUpdates.set(adjacentPointIndex, {
-                        point: adjacentNewPoint,
-                      });
-                    }
-                  }
-                }
-
-                // Filter out undefined values before passing to movePoints
-                const filteredUpdates = new Map<number, { point: LocalPoint }>(
-                  Array.from(pointUpdates.entries()).filter(
-                    (entry): entry is [number, { point: LocalPoint }] =>
-                      entry[1] !== undefined,
-                  ),
-                );
-
-                if (filteredUpdates.size > 0) {
-                  LinearElementEditor.movePoints(
-                    arrow,
-                    this.scene,
-                    filteredUpdates,
-                  );
-                }
-
-                pointerDownState.drag.hasOccurred = true;
-                return;
-              }
-            }
+          if (
+            handleFocusPointDrag(
+              linearElementEditor,
+              elementsMap,
+              pointerCoords,
+              this.scene,
+            )
+          ) {
+            return;
           }
         }
 

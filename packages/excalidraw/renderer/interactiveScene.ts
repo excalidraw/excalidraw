@@ -992,7 +992,9 @@ const renderFocusPointIndicators = (
       );
 
       // Only render if focus point is within the bindable element
-      if (isFocusPointVisible(focusPoint, bindableElement, elementsMap)) {
+      if (
+        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap)
+      ) {
         const isHovered =
           appState.selectedLinearElement?.hoveredFocusPointBinding === "start";
 
@@ -1043,7 +1045,9 @@ const renderFocusPointIndicators = (
       );
 
       // Only render if focus point is within the bindable element
-      if (isFocusPointVisible(focusPoint, bindableElement, elementsMap)) {
+      if (
+        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap)
+      ) {
         const isHovered =
           appState.selectedLinearElement?.hoveredFocusPointBinding === "end";
 
@@ -1455,7 +1459,14 @@ const _renderInteractiveScene = ({
               elementsMap,
             );
             // Only render highlight if focus point is visible
-            if (isFocusPointVisible(focusPoint, bindableElement, elementsMap)) {
+            if (
+              isFocusPointVisible(
+                focusPoint,
+                arrow,
+                bindableElement,
+                elementsMap,
+              )
+            ) {
               renderFocusPointHighlight(context, appState, focusPoint);
             }
           }
