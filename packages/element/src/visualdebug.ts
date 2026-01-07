@@ -1,15 +1,23 @@
 import {
   isLineSegment,
   lineSegment,
+  pointDistanceSq,
   pointFrom,
   type GlobalPoint,
   type LocalPoint,
 } from "@excalidraw/math";
+import { type Bounds, isBounds } from "@excalidraw/common";
+import {
+  getElementBounds,
+  intersectElementWithLineSegment,
+  isFreeDrawElement,
+  isLinearElement,
+  isPathALoop,
+} from "@excalidraw/element";
 
+import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 import type { Curve } from "@excalidraw/math";
 import type { LineSegment } from "@excalidraw/utils";
-
-import { type Bounds, isBounds } from "./bounds";
 
 // The global data holder to collect the debug operations
 declare global {
@@ -23,8 +31,67 @@ declare global {
 
 export type DebugElement = {
   color: string;
-  data: LineSegment<GlobalPoint> | Curve<GlobalPoint>;
+  data: LineSegment<GlobalPoint> | Curve<GlobalPoint> | DebugPolygon;
   permanent: boolean;
+};
+
+export type DebugPolygon = {
+  type: "polygon";
+  points: GlobalPoint[];
+  fill?: boolean;
+  close?: boolean;
+};
+
+export const debugDrawHitVolume = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  options?: {
+    rays?: number;
+    color?: string;
+    fill?: boolean;
+  },
+) => {
+  if (
+    (isLinearElement(element) || isFreeDrawElement(element)) &&
+    !isPathALoop(element.points)
+  ) {
+    return;
+  }
+
+  const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
+  const center = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
+  const rays = options?.rays ?? 100;
+  const radius = Math.max(x2 - x1, y2 - y1) * 2;
+  const points: GlobalPoint[] = [];
+
+  for (let i = 0; i < rays; i += 1) {
+    const angle = (i / rays) * Math.PI * 2;
+    const end = pointFrom<GlobalPoint>(
+      center[0] + Math.cos(angle) * radius,
+      center[1] + Math.sin(angle) * radius,
+    );
+    const hits = intersectElementWithLineSegment(
+      element,
+      elementsMap,
+      lineSegment(center, end),
+    );
+    if (hits.length === 0) {
+      continue;
+    }
+    hits.sort(pointDistanceSq);
+    points.push(hits[0]);
+  }
+
+  if (points.length >= 3) {
+    debugDrawPolygon(points, {
+      color: options?.color ?? "orange",
+      fill: options?.fill ?? true,
+    });
+  } else {
+    console.warn(
+      `debugDrawHitVolume: could not compute hit volume for element ${element.id}`,
+    );
+  }
 };
 
 export const debugDrawCubicBezier = (
@@ -59,6 +126,31 @@ export const debugDrawLine = (
       permanent: !!opts?.permanent,
     }),
   );
+};
+
+export const debugDrawPolygon = (
+  points: GlobalPoint[],
+  opts?: {
+    color?: string;
+    permanent?: boolean;
+    fill?: boolean;
+    close?: boolean;
+  },
+) => {
+  if (points.length < 2) {
+    return;
+  }
+
+  addToCurrentFrame({
+    color: opts?.color ?? "orange",
+    permanent: !!opts?.permanent,
+    data: {
+      type: "polygon",
+      points,
+      fill: opts?.fill,
+      close: opts?.close,
+    },
+  });
 };
 
 export const debugDrawPoint = (
@@ -101,7 +193,7 @@ export const debugDrawBounds = (
     permanent?: boolean;
   },
 ) => {
-  (isBounds(box) ? [box] : box).forEach((bbox) =>
+  (isBounds(box) ? [box] : box).forEach((bbox: Bounds) =>
     debugDrawLine(
       [
         lineSegment(
