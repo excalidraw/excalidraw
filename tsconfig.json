@@ -13,11 +13,11 @@
     "noFallthroughCasesInSwitch": true,
     "module": "ESNext",
     "moduleResolution": "node",
+    "ignoreDeprecations": "5.0",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": ".",
     "paths": {
       "@excalidraw/common": ["./packages/common/src/index.ts"],
       "@excalidraw/common/*": ["./packages/common/src/*"],
