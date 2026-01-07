@@ -231,6 +231,57 @@ export const StatsInner = memo(
                       setAppState={setAppState}
                     />
                   </StatsRow>
+                  <StatsRow columns={2}>
+                    <div>{t("stats.gridStyle")}</div>
+                    <div style={{ display: "flex", gap: "4px" }}>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setAppState({ gridStyle: "lines" })
+                        }
+                        style={{
+                          padding: "2px 8px",
+                          fontSize: "12px",
+                          border: "1px solid var(--default-border-color)",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                          backgroundColor:
+                            appState.gridStyle === "lines"
+                              ? "var(--color-primary)"
+                              : "transparent",
+                          color:
+                            appState.gridStyle === "lines"
+                              ? "var(--color-primary-contrast)"
+                              : "inherit",
+                        }}
+                      >
+                        {t("stats.gridStyleLines")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setAppState({ gridStyle: "dots" })
+                        }
+                        style={{
+                          padding: "2px 8px",
+                          fontSize: "12px",
+                          border: "1px solid var(--default-border-color)",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                          backgroundColor:
+                            appState.gridStyle === "dots"
+                              ? "var(--color-primary)"
+                              : "transparent",
+                          color:
+                            appState.gridStyle === "dots"
+                              ? "var(--color-primary-contrast)"
+                              : "inherit",
+                        }}
+                      >
+                        {t("stats.gridStyleDots")}
+                      </button>
+                    </div>
+                  </StatsRow>
                 </>
               )}
             </StatsRows>
@@ -437,6 +488,7 @@ export const StatsInner = memo(
       prev.appState.stats.panels === next.appState.stats.panels &&
       prev.gridModeEnabled === next.gridModeEnabled &&
       prev.appState.gridStep === next.appState.gridStep &&
+      prev.appState.gridStyle === next.appState.gridStyle &&
       prev.appState.croppingElementId === next.appState.croppingElementId
     );
   },

@@ -521,7 +521,10 @@
     "version": "Version",
     "versionCopy": "Click to copy",
     "versionNotAvailable": "Version not available",
-    "width": "Width"
+    "width": "Width",
+    "gridStyle": "Grid style",
+    "gridStyleLines": "Lines",
+    "gridStyleDots": "Dots"
   },
   "toast": {
     "addedToLibrary": "Added to library",
