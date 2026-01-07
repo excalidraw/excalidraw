@@ -146,6 +146,12 @@ export const isFocusPointVisible = (
   elementsMap: ElementsMap,
   ignoreOverlap = false,
 ): boolean => {
+  // No focus point management for elbow arrows, because elbow arrows
+  // always have their focus point at the arrow point itself
+  if (isElbowArrow(arrow)) {
+    return false;
+  }
+
   // Avoid showing the focus point indicator if the focus point is essentially
   // on top of the arrow point it belongs to itself, if not ignoring specifically
   if (!ignoreOverlap) {
@@ -186,7 +192,7 @@ export const handleFocusPointDrag = (
     elementsMap,
   ) as any;
 
-  if (!arrow || !isBindingElement(arrow)) {
+  if (!arrow || !isBindingElement(arrow) || isElbowArrow(arrow)) {
     return false;
   }
 
