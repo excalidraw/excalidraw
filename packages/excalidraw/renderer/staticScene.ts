@@ -34,13 +34,13 @@ import {
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
 
-import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
+import { bootstrapCanvas, fillCircle, getNormalizedCanvasDimensions } from "./helpers";
 
 import type {
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,
 } from "../scene/types";
-import type { StaticCanvasAppState, Zoom } from "../types";
+import { GridType, type StaticCanvasAppState, type Zoom } from "../types";
 
 const GridLineColor = {
   [THEME.LIGHT]: {
@@ -53,6 +53,7 @@ const GridLineColor = {
   },
 } as const;
 
+
 const strokeGrid = (
   context: CanvasRenderingContext2D,
   /** grid cell pixel size */
@@ -63,6 +64,28 @@ const strokeGrid = (
   scrollY: number,
   zoom: Zoom,
   theme: StaticCanvasRenderConfig["theme"],
+  width: number,
+  height: number,
+  gridType?: GridType,
+) => {
+  if (gridType === undefined || gridType === GridType.DEFAULT) {
+    strokeDefaultGrid(context, gridSize, gridStep, scrollX, scrollY, zoom, width, height);
+  } else if (gridType === GridType.DOT) {
+    strokeDotGrid(context, gridSize, scrollX, scrollY, zoom, width, height);
+  } else if (gridType === GridType.ISOMETRIC_DOT) {
+    strokeIsometricDotGrid(context, gridSize, scrollX, scrollY, zoom, width, height);
+  }
+};
+
+const strokeDefaultGrid = (
+  context: CanvasRenderingContext2D,
+  /** grid cell pixel size */
+  gridSize: number,
+  /** setting to 1 will disble bold lines */
+  gridStep: number,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
   width: number,
   height: number,
 ) => {
@@ -126,6 +149,88 @@ const strokeGrid = (
     context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
     context.stroke();
   }
+  context.restore();
+};
+
+
+const strokeIsometricDotGrid = (
+  context: CanvasRenderingContext2D,
+  gridSize: number,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
+  width: number,
+  height: number,
+) => {
+  const spacing = gridSize * 1.7320508075688772; // horizontal spacing in model units
+  const vSpacing = gridSize; // vertical spacing in model units
+  
+  // Calculate offsets in screen coordinates using the original Excalidraw approach
+  const offsetX = (scrollX % spacing) - spacing;
+  const offsetY = (scrollY % vSpacing) - vSpacing;
+
+  // Calculate the scaled spacing based on zoom
+  const scaledSpacing = spacing * zoom.value;
+  const scaledVSpacing = vSpacing * zoom.value;
+  
+  // Skip rendering if grid is too small
+  if (scaledSpacing < 10) {
+    return;
+  }
+
+  context.save();
+
+  // Apply pixel alignment for crisp rendering
+  if (zoom.value === 1) {
+    context.translate(offsetX % 1 ? 0 : 0.5, offsetY % 1 ? 0 : 0.5);
+  }
+
+  context.fillStyle = "#C4C4C4";
+
+  // Calculate visible area in screen coordinates
+  const visibleStartX = offsetX;
+  const visibleEndX = offsetX + width + scaledSpacing * 2;
+  const visibleStartY = offsetY;
+  const visibleEndY = offsetY + height + scaledVSpacing * 2;
+
+  // Iterate through rows in screen coordinates
+  let row = Math.round(Math.abs((scrollY - visibleStartY) / vSpacing));
+  let initialColValue = Math.round(Math.abs((scrollX - visibleStartX) / spacing));
+  let col = initialColValue;
+  for (let y = visibleStartY; y < visibleEndY; y += vSpacing, row++) {
+    for (let x = visibleStartX; x < visibleEndX; x += spacing, col++) {
+      if ((col & 1) === (row & 1))
+        fillCircle(context, x, y, 3, false);
+    }
+    col = initialColValue;  
+  }
+  
+  context.restore();
+};
+
+
+const strokeDotGrid = (
+  context: CanvasRenderingContext2D,
+  /** grid cell pixel size */
+  gridSize: number,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
+  width: number,
+  height: number,
+) => {
+  const offsetX = (scrollX % gridSize) - gridSize;
+  const offsetY = (scrollY % gridSize) - gridSize;
+
+  context.save();
+
+  context.fillStyle = "#C4C4C4"
+  for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
+    for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
+      fillCircle(context, x, y, 2, false);
+    }
+  }
+
   context.restore();
 };
 
@@ -271,6 +376,7 @@ const _renderStaticScene = ({
       renderConfig.theme,
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,
+      appState.gridType
     );
   }
 

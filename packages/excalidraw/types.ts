@@ -201,6 +201,7 @@ export type StaticCanvasAppState = Readonly<
     selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
     gridSize: AppState["gridSize"];
     gridStep: AppState["gridStep"];
+    gridType: AppState["gridType"];
     frameRendering: AppState["frameRendering"];
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
     hoveredElementIds: AppState["hoveredElementIds"];
@@ -262,6 +263,12 @@ export type ObservedElementsAppState = {
   croppingElementId: AppState["croppingElementId"];
   lockedMultiSelections: AppState["lockedMultiSelections"];
   activeLockedId: AppState["activeLockedId"];
+};
+
+export enum GridType {
+  DEFAULT,
+  DOT,
+  ISOMETRIC_DOT,
 };
 
 export interface AppState {
@@ -397,6 +404,7 @@ export interface AppState {
   /** grid cell px size */
   gridSize: number;
   gridStep: number;
+  gridType: GridType;
   gridModeEnabled: boolean;
   viewModeEnabled: boolean;
 
@@ -587,6 +595,7 @@ export interface ExcalidrawProps {
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
+  gridType?: GridType;
   gridModeEnabled?: boolean;
   objectsSnapModeEnabled?: boolean;
   libraryReturnUrl?: string;

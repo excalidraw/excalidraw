@@ -85,6 +85,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.ItemCustom>
         <LanguageList style={{ width: "100%" }} />
       </MainMenu.ItemCustom>
+      <MainMenu.DefaultItems.ChangeGridType />
       <MainMenu.DefaultItems.ChangeCanvasBackground />
     </MainMenu>
   );
