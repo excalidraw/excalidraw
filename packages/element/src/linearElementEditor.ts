@@ -2305,7 +2305,7 @@ const pointDraggingUpdates = (
       : startIsDraggingOverEndElement &&
         app.state.bindMode !== "inside" &&
         getFeatureFlag("COMPLEX_BINDINGS")
-      ? nextArrow.points[nextArrow.points.length - 1]
+      ? endLocalPoint
       : startBindable
       ? updateBoundPoint(
           element,
@@ -2318,10 +2318,13 @@ const pointDraggingUpdates = (
       : nextArrow.points[0];
 
   const endChanged =
-    pointDistance(
-      endLocalPoint,
-      nextArrow.points[nextArrow.points.length - 1],
-    ) !== 0;
+    !startIsDraggingOverEndElement &&
+    !(
+      endIsDraggingOverStartElement &&
+      app.state.bindMode !== "inside" &&
+      getFeatureFlag("COMPLEX_BINDINGS")
+    ) &&
+    !!endBindable;
   const startChanged =
     pointDistance(startLocalPoint, nextArrow.points[0]) !== 0;
 
