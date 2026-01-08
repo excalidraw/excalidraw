@@ -144,6 +144,7 @@ import "./index.scss";
 
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
+import { ExcalidrawChatCanvasWrapper } from "./components/ChatCanvas";
 
 import type { CollabAPI } from "./collab/Collab";
 
@@ -831,14 +832,11 @@ const ExcalidrawWrapper = () => {
     },
   };
 
-  return (
-    <div
-      style={{ height: "100%" }}
-      className={clsx("excalidraw-app", {
-        "is-collaborating": isCollaborating,
-      })}
-    >
-      <Excalidraw
+  // Check if ChatCanvas UI mode is enabled
+  const isChatCanvasMode = new URLSearchParams(window.location.search).get("ui") === "chatcanvas";
+
+  const excalidrawContent = (
+    <Excalidraw
         excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
@@ -1192,6 +1190,36 @@ const ExcalidrawWrapper = () => {
           />
         )}
       </Excalidraw>
+    );
+
+  // If ChatCanvas mode is enabled, wrap with ChatCanvasShell
+  if (isChatCanvasMode && excalidrawAPI) {
+    return (
+      <div
+        style={{ height: "100%" }}
+        className={clsx("excalidraw-app", {
+          "is-collaborating": isCollaborating,
+        })}
+      >
+        <ExcalidrawChatCanvasWrapper
+          excalidrawAPI={excalidrawAPI}
+          title="ChatCanvas"
+        >
+          {excalidrawContent}
+        </ExcalidrawChatCanvasWrapper>
+      </div>
+    );
+  }
+
+  // Otherwise, return the original UI
+  return (
+    <div
+      style={{ height: "100%" }}
+      className={clsx("excalidraw-app", {
+        "is-collaborating": isCollaborating,
+      })}
+    >
+      {excalidrawContent}
     </div>
   );
 };
