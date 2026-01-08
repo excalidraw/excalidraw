@@ -112,7 +112,7 @@ describe("move element", () => {
     expect([rectB.x, rectB.y]).toEqual([200, 0]);
     expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[110, -4.576537]], 0);
     expect([[arrow.width, arrow.height]]).toCloselyEqualPoints(
-      [[79, 132.89433]],
+      [[79.00036001606544, 50.88511362968198]],
       0,
     );
 
@@ -132,9 +132,12 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([201, 2]);
-    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[111, 6.1499]], 0);
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints(
+      [[110.03494591041962, -4.4986282513603655]],
+      0,
+    );
     expect([[arrow.width, arrow.height]]).toCloselyEqualPoints(
-      [[79, 124.1678]],
+      [[79.96505408958038, 52.80720411960504]],
       0,
     );
 

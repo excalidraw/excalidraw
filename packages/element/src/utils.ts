@@ -618,15 +618,39 @@ export const projectFixedPointOntoDiagonal = (
 
   if (p && isPointInElement(p, element, elementsMap)) {
     const center = elementCenterPoint(element, elementsMap);
-    const topLeft = pointRotateRads(
-      pointFrom<GlobalPoint>(element.x, element.y),
-      center,
-      element.angle,
+    const sideMidpoints = [
+      pointRotateRads(
+        pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
+        center,
+        element.angle,
+      ),
+      pointRotateRads(
+        pointFrom<GlobalPoint>(
+          element.x + element.width,
+          element.y + element.height / 2,
+        ),
+        center,
+        element.angle,
+      ),
+      pointRotateRads(
+        pointFrom<GlobalPoint>(
+          element.x + element.width / 2,
+          element.y + element.height,
+        ),
+        center,
+        element.angle,
+      ),
+      pointRotateRads(
+        pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
+        center,
+        element.angle,
+      ),
+    ];
+    const isPointNearSideMidpoint = sideMidpoints.some(
+      (midpoint) => pointDistance(point, midpoint) <= 30,
     );
-    const centerToCornerDist = pointDistance(center, topLeft);
-    const centerToProjectedDist = pointDistance(center, p);
 
-    if (centerToProjectedDist <= centerToCornerDist * 0.33) {
+    if (isPointNearSideMidpoint) {
       return pointFrom<GlobalPoint>(
         element.x + element.width * 0.5001,
         element.y + element.height * 0.5001,
