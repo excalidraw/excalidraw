@@ -1,27 +1,49 @@
 import { useCallback } from "react";
 import { useSetAtom } from "jotai";
 import { chatMessagesAtom, isAgentLoadingAtom, agentErrorAtom } from "./atoms";
-import { mockAgent, type AgentRequest, type AgentResponse } from "./mockAgent";
+import { mockAgent } from "./mockAgent";
 import { extractElementContext } from "./useSelectionContext";
+import { convertToExcalidrawElements } from "@excalidraw/excalidraw";
+import { newElementWith } from "@excalidraw/element";
+import type { ExcalidrawElement } from "@excalidraw/element";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+import type {
+  AgentAction,
+  AgentRequest,
+  SelectionContextPayload,
+} from "./types";
 
 /**
  * Hook to handle agent responses and apply them to the canvas.
  */
-export const useAgentResponse = (excalidrawAPI: ExcalidrawImperativeAPI | null) => {
+export const useAgentResponse = (
+  excalidrawAPI: ExcalidrawImperativeAPI | null,
+) => {
   const setMessages = useSetAtom(chatMessagesAtom);
   const setIsAgentLoading = useSetAtom(isAgentLoadingAtom);
   const setAgentError = useSetAtom(agentErrorAtom);
 
+  const applyAgentActions = useCallback(
+    async (actions: AgentAction[]) => {
+      if (!excalidrawAPI || actions.length === 0) return;
+
+      let currentElements = excalidrawAPI.getSceneElements();
+
+      for (const action of actions) {
+        currentElements = applyAction(action, excalidrawAPI, currentElements);
+      }
+    },
+    [excalidrawAPI],
+  );
+
   const handleAgentResponse = useCallback(
-    async (message: string, context: any) => {
+    async (message: string, context: SelectionContextPayload) => {
       if (!excalidrawAPI) return;
 
       setIsAgentLoading(true);
       setAgentError(null);
 
       try {
-        const appState = excalidrawAPI.getAppState();
         const elements = excalidrawAPI.getSceneElements();
         const selectedElementIds = context.selectedElements || [];
 
@@ -48,17 +70,13 @@ export const useAgentResponse = (excalidrawAPI: ExcalidrawImperativeAPI | null) 
             content: response.message,
             timestamp: Date.now(),
             contextElements: selectedElementIds,
+            actions: response.actions ?? [],
+            applied: false,
           },
         ]);
-
-        // Apply actions to the canvas
-        if (response.actions && response.actions.length > 0) {
-          for (const action of response.actions) {
-            await applyAction(action, excalidrawAPI, elements);
-          }
-        }
-      } catch (error: any) {
-        const errorMessage = error?.message || "An error occurred";
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "An error occurred";
         setAgentError(errorMessage);
         setMessages((prev) => [
           ...prev,
@@ -73,24 +91,24 @@ export const useAgentResponse = (excalidrawAPI: ExcalidrawImperativeAPI | null) 
         setIsAgentLoading(false);
       }
     },
-    [excalidrawAPI, setMessages, setIsAgentLoading, setAgentError]
+    [excalidrawAPI, setMessages, setIsAgentLoading, setAgentError],
   );
 
-  return handleAgentResponse;
+  return { handleAgentResponse, applyAgentActions };
 };
 
 /**
  * Apply an agent action to the canvas.
  */
-async function applyAction(
-  action: any,
+function applyAction(
+  action: AgentAction,
   excalidrawAPI: ExcalidrawImperativeAPI,
-  currentElements: any[]
-) {
+  currentElements: readonly ExcalidrawElement[],
+): ExcalidrawElement[] {
   const appState = excalidrawAPI.getAppState();
   const selectedElementIds = appState.selectedElementIds || {};
   const selectedIds = Object.keys(selectedElementIds).filter(
-    (id) => selectedElementIds[id]
+    (id) => selectedElementIds[id],
   );
 
   switch (action.type) {
@@ -98,11 +116,7 @@ async function applyAction(
       // Update the selected elements with new properties
       const updatedElements = currentElements.map((el) => {
         if (selectedIds.includes(el.id)) {
-          return {
-            ...el,
-            ...action.payload,
-            versionTag: el.versionTag ? el.versionTag + 1 : 1,
-          };
+          return newElementWith(el, action.payload);
         }
         return el;
       });
@@ -110,42 +124,41 @@ async function applyAction(
       excalidrawAPI.updateScene({
         elements: updatedElements,
       });
-      break;
+      return updatedElements;
     }
 
     case "addElements": {
       // Add new elements to the canvas
-      const newElements = action.payload.elements || [];
+      const newElements = convertToExcalidrawElements(
+        action.payload.elements,
+        { regenerateIds: true },
+      );
       const allElements = [...currentElements, ...newElements];
 
       excalidrawAPI.updateScene({
         elements: allElements,
       });
-      break;
+      return allElements;
     }
 
     case "deleteElements": {
       // Delete elements by ID
-      const idsToDelete = action.payload.elementIds || [];
+      const idsToDelete = action.payload.elementIds;
       const filteredElements = currentElements.filter(
-        (el) => !idsToDelete.includes(el.id)
+        (el) => !idsToDelete.includes(el.id),
       );
 
       excalidrawAPI.updateScene({
         elements: filteredElements,
       });
-      break;
+      return filteredElements;
     }
 
     case "applyStyle": {
       // Apply style to selected elements
       const updatedElements = currentElements.map((el) => {
         if (selectedIds.includes(el.id)) {
-          return {
-            ...el,
-            ...action.payload.style,
-            versionTag: el.versionTag ? el.versionTag + 1 : 1,
-          };
+          return newElementWith(el, action.payload.style);
         }
         return el;
       });
@@ -153,10 +166,10 @@ async function applyAction(
       excalidrawAPI.updateScene({
         elements: updatedElements,
       });
-      break;
+      return updatedElements;
     }
 
-    default:
-      console.warn(`Unknown action type: ${action.type}`);
   }
+
+  return [...currentElements];
 }

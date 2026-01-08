@@ -3,36 +3,54 @@
  * Simulates an AI agent that processes user messages and returns canvas operations.
  */
 
-export interface AgentRequest {
-  message: string;
-  selectedElements: string[];
-  elementCount: number;
-  elementDetails?: any[];
-}
+import type {
+  AgentRequest,
+  AgentResponse,
+  ElementContext,
+} from "./types";
+import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
 
-export interface AgentResponse {
-  success: boolean;
-  message: string;
-  actions?: AgentAction[];
-  error?: string;
-}
+const toSkeletonFromContext = (
+  detail: ElementContext,
+): ExcalidrawElementSkeleton => {
+  const base = {
+    type: detail.type,
+    x: detail.x + 20,
+    y: detail.y + 20,
+    width: detail.width,
+    height: detail.height,
+    angle: detail.angle,
+    strokeColor: detail.strokeColor,
+    backgroundColor: detail.backgroundColor,
+    fillStyle: detail.fillStyle,
+    strokeWidth: detail.strokeWidth,
+  };
 
-export interface AgentAction {
-  type: "addElements" | "updateSelected" | "deleteElements" | "applyStyle";
-  payload: any;
-}
+  if (detail.type === "text") {
+    return {
+      ...base,
+      type: "text",
+      text: detail.text || "Text",
+      fontSize: detail.fontSize,
+      fontFamily: detail.fontFamily,
+      textAlign: detail.textAlign,
+    } as ExcalidrawElementSkeleton;
+  }
+
+  return base as ExcalidrawElementSkeleton;
+};
 
 /**
  * Mock agent that simulates AI responses.
  * In production, this would call a real backend API.
  */
 export const mockAgent = async (
-  request: AgentRequest
+  request: AgentRequest,
 ): Promise<AgentResponse> => {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
-  const { message, selectedElements, elementCount, elementDetails } = request;
+  const { message, elementCount, elementDetails } = request;
 
   // Simple keyword-based responses
   if (
@@ -42,9 +60,7 @@ export const mockAgent = async (
     message.toLowerCase().includes("green")
   ) {
     const colorMatch = message.match(/(red|blue|green|yellow|purple|orange)/i);
-    const color = colorMatch
-      ? colorMatch[1].toLowerCase()
-      : "blue";
+    const color = colorMatch ? colorMatch[1].toLowerCase() : "blue";
 
     const colorMap: Record<string, string> = {
       red: "#ff0000",
@@ -125,12 +141,7 @@ export const mockAgent = async (
         {
           type: "addElements",
           payload: {
-            elements: elementDetails?.map((el) => ({
-              ...el,
-              id: `${el.id}-copy-${Date.now()}`,
-              x: el.x + 20,
-              y: el.y + 20,
-            })) || [],
+            elements: elementDetails.map((el) => toSkeletonFromContext(el)),
           },
         },
       ],
@@ -151,7 +162,8 @@ export const mockAgent = async (
             elements: [
               {
                 type: "text",
-                text: message.replace(/add note|add text/i, "").trim() || "Note",
+                text:
+                  message.replace(/add note|add text/i, "").trim() || "Note",
                 x: 100,
                 y: 100,
                 width: 200,
@@ -164,7 +176,6 @@ export const mockAgent = async (
                 backgroundColor: "#fffacd",
                 fillStyle: "solid",
                 strokeWidth: 1,
-                angle: 0,
               },
             ],
           },

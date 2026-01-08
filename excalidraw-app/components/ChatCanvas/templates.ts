@@ -3,12 +3,14 @@
  * Each template contains a set of pre-configured elements
  */
 
+import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
+
 export interface Template {
   id: string;
   name: string;
   description: string;
   thumbnail: string;
-  elements: any[];
+  elements: ExcalidrawElementSkeleton[];
 }
 
 export const TEMPLATES: Template[] = [
@@ -28,7 +30,6 @@ export const TEMPLATES: Template[] = [
         backgroundColor: "#ffffff",
         fillStyle: "solid",
         strokeWidth: 2,
-        angle: 0,
         text: "Header",
         fontSize: 16,
         fontFamily: 1,
@@ -45,7 +46,6 @@ export const TEMPLATES: Template[] = [
         backgroundColor: "#f0f0f0",
         fillStyle: "solid",
         strokeWidth: 2,
-        angle: 0,
         text: "Nav",
         fontSize: 12,
         fontFamily: 1,
@@ -62,7 +62,6 @@ export const TEMPLATES: Template[] = [
         backgroundColor: "#ffffff",
         fillStyle: "solid",
         strokeWidth: 2,
-        angle: 0,
         text: "Content Area",
         fontSize: 14,
         fontFamily: 1,
@@ -79,7 +78,6 @@ export const TEMPLATES: Template[] = [
         backgroundColor: "#f0f0f0",
         fillStyle: "solid",
         strokeWidth: 2,
-        angle: 0,
         text: "Footer",
         fontSize: 12,
         fontFamily: 1,
@@ -104,7 +102,6 @@ export const TEMPLATES: Template[] = [
         backgroundColor: "#e3f2fd",
         fillStyle: "solid",
         strokeWidth: 2,
-        angle: 0,
         text: "Start",
         fontSize: 14,
         fontFamily: 1,
@@ -121,7 +118,6 @@ export const TEMPLATES: Template[] = [
         backgroundColor: "#fff3e0",
         fillStyle: "solid",
         strokeWidth: 2,
-        angle: 0,
         text: "Decision",
         fontSize: 12,
         fontFamily: 1,
@@ -138,7 +134,6 @@ export const TEMPLATES: Template[] = [
         backgroundColor: "#e8f5e9",
         fillStyle: "solid",
         strokeWidth: 2,
-        angle: 0,
         text: "Process",
         fontSize: 14,
         fontFamily: 1,
@@ -155,7 +150,6 @@ export const TEMPLATES: Template[] = [
         backgroundColor: "#e3f2fd",
         fillStyle: "solid",
         strokeWidth: 2,
-        angle: 0,
         text: "End",
         fontSize: 14,
         fontFamily: 1,
@@ -180,7 +174,6 @@ export const TEMPLATES: Template[] = [
         backgroundColor: "#f3e5f5",
         fillStyle: "solid",
         strokeWidth: 2,
-        angle: 0,
         text: "Central Idea",
         fontSize: 12,
         fontFamily: 1,
@@ -197,7 +190,6 @@ export const TEMPLATES: Template[] = [
         backgroundColor: "#ede7f6",
         fillStyle: "solid",
         strokeWidth: 2,
-        angle: 0,
         text: "Topic 1",
         fontSize: 11,
         fontFamily: 1,
@@ -214,7 +206,6 @@ export const TEMPLATES: Template[] = [
         backgroundColor: "#ede7f6",
         fillStyle: "solid",
         strokeWidth: 2,
-        angle: 0,
         text: "Topic 2",
         fontSize: 11,
         fontFamily: 1,
@@ -231,7 +222,6 @@ export const TEMPLATES: Template[] = [
         backgroundColor: "#ede7f6",
         fillStyle: "solid",
         strokeWidth: 2,
-        angle: 0,
         text: "Topic 3",
         fontSize: 11,
         fontFamily: 1,
@@ -248,7 +238,6 @@ export const TEMPLATES: Template[] = [
         backgroundColor: "#ede7f6",
         fillStyle: "solid",
         strokeWidth: 2,
-        angle: 0,
         text: "Topic 4",
         fontSize: 11,
         fontFamily: 1,
@@ -262,7 +251,9 @@ export const TEMPLATES: Template[] = [
 /**
  * Load a template and return the elements
  */
-export const loadTemplate = (templateId: string): any[] | null => {
+export const loadTemplate = (
+  templateId: string,
+): ExcalidrawElementSkeleton[] | null => {
   const template = TEMPLATES.find((t) => t.id === templateId);
   return template ? template.elements : null;
 };

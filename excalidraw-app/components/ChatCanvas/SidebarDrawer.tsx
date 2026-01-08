@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useAtom } from "jotai";
 import { isSidebarOpenAtom, sidebarWidthAtom } from "./atoms";
-import { getAvailableTemplates } from "./templates";
+import { getAvailableTemplates, type Template } from "./templates";
 import "./SidebarDrawer.scss";
 
 interface SidebarDrawerProps {
-  onLoadTemplate?: (template: any) => void;
+  onLoadTemplate?: (template: Template) => void;
 }
 
 export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({
@@ -14,7 +14,7 @@ export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({
   const [isSidebarOpen, setIsSidebarOpen] = useAtom(isSidebarOpenAtom);
   const [sidebarWidth, setSidebarWidth] = useAtom(sidebarWidthAtom);
   const [activeTab, setActiveTab] = useState<"templates" | "layers">(
-    "templates"
+    "templates",
   );
   const [isResizing, setIsResizing] = useState(false);
 
@@ -50,10 +50,7 @@ export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({
   }
 
   return (
-    <div
-      className="chatcanvas-sidebar"
-      style={{ width: `${sidebarWidth}px` }}
-    >
+    <div className="chatcanvas-sidebar" style={{ width: `${sidebarWidth}px` }}>
       <div className="chatcanvas-sidebar__header">
         <h2 className="chatcanvas-sidebar__title">Assets</h2>
         <button
