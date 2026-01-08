@@ -333,6 +333,123 @@ export const handleFocusPointDrag = (
   return true;
 };
 
+export const handleFocusPointPointerDown = (
+  arrow: ExcalidrawArrowElement,
+  pointerDownState: { origin: { x: number; y: number } },
+  elementsMap: NonDeletedSceneElementsMap,
+  zoom: AppState["zoom"],
+): "start" | "end" | null => {
+  const pointerPos = pointFrom(
+    pointerDownState.origin.x,
+    pointerDownState.origin.y,
+  );
+  const hitThreshold = 5 / zoom.value;
+
+  // Check start binding focus point
+  if (arrow.startBinding?.elementId) {
+    const bindableElement = elementsMap.get(arrow.startBinding.elementId);
+    if (
+      bindableElement &&
+      isBindableElement(bindableElement) &&
+      !bindableElement.isDeleted
+    ) {
+      const focusPoint = getGlobalFixedPointForBindableElement(
+        arrow.startBinding.fixedPoint,
+        bindableElement,
+        elementsMap,
+      );
+      if (
+        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap) &&
+        pointDistance(pointerPos, focusPoint) <= hitThreshold
+      ) {
+        return "start";
+      }
+    }
+  }
+
+  // Check end binding focus point (only if start not already hit)
+  if (arrow.endBinding?.elementId) {
+    const bindableElement = elementsMap.get(arrow.endBinding.elementId);
+    if (
+      bindableElement &&
+      isBindableElement(bindableElement) &&
+      !bindableElement.isDeleted
+    ) {
+      const focusPoint = getGlobalFixedPointForBindableElement(
+        arrow.endBinding.fixedPoint,
+        bindableElement,
+        elementsMap,
+      );
+      if (
+        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap) &&
+        pointDistance(pointerPos, focusPoint) <= hitThreshold
+      ) {
+        return "end";
+      }
+    }
+  }
+
+  return null;
+};
+
+export const handleFocusPointHover = (
+  arrow: ExcalidrawArrowElement,
+  scenePointerX: number,
+  scenePointerY: number,
+  scene: Scene,
+  zoom: AppState["zoom"],
+): "start" | "end" | null => {
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const pointerPos = pointFrom(scenePointerX, scenePointerY);
+  const hitThreshold = 5 / zoom.value;
+
+  // Check start binding focus point
+  if (arrow.startBinding?.elementId) {
+    const bindableElement = elementsMap.get(arrow.startBinding.elementId);
+    if (
+      bindableElement &&
+      isBindableElement(bindableElement) &&
+      !bindableElement.isDeleted
+    ) {
+      const focusPoint = getGlobalFixedPointForBindableElement(
+        arrow.startBinding.fixedPoint,
+        bindableElement,
+        elementsMap,
+      );
+      if (
+        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap) &&
+        pointDistance(pointerPos, focusPoint) <= hitThreshold
+      ) {
+        return "start";
+      }
+    }
+  }
+
+  // Check end binding focus point (only if start not already hovered)
+  if (arrow.endBinding?.elementId) {
+    const bindableElement = elementsMap.get(arrow.endBinding.elementId);
+    if (
+      bindableElement &&
+      isBindableElement(bindableElement) &&
+      !bindableElement.isDeleted
+    ) {
+      const focusPoint = getGlobalFixedPointForBindableElement(
+        arrow.endBinding.fixedPoint,
+        bindableElement,
+        elementsMap,
+      );
+      if (
+        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap) &&
+        pointDistance(pointerPos, focusPoint) <= hitThreshold
+      ) {
+        return "end";
+      }
+    }
+  }
+
+  return null;
+};
+
 export const shouldEnableBindingForPointerEvent = (
   event: React.PointerEvent<HTMLElement>,
 ) => {

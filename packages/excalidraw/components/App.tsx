@@ -118,8 +118,6 @@ import {
   bindOrUnbindBindingElements,
   fixBindingsAfterDeletion,
   getHoveredElementForBinding,
-  getGlobalFixedPointForBindableElement,
-  isFocusPointVisible,
   isBindingEnabled,
   shouldEnableBindingForPointerEvent,
   updateBoundElements,
@@ -253,6 +251,8 @@ import {
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
   handleFocusPointDrag,
+  handleFocusPointHover,
+  handleFocusPointPointerDown,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6933,64 +6933,14 @@ class App extends React.Component<AppProps, AppState> {
       // Check for focus point hover
       let hoveredFocusPointBinding: "start" | "end" | null = null;
       const arrow = element as any;
-      if (arrow.startBinding?.elementId || arrow.endBinding?.elementId) {
-        const elementsMap = this.scene.getNonDeletedElementsMap();
-        const pointerPos = pointFrom(scenePointerX, scenePointerY);
-        const hitThreshold = 5 / this.state.zoom.value;
-
-        // Check start binding focus point
-        if (arrow.startBinding?.elementId) {
-          const bindableElement = elementsMap.get(arrow.startBinding.elementId);
-          if (
-            bindableElement &&
-            isBindableElement(bindableElement) &&
-            !bindableElement.isDeleted
-          ) {
-            const focusPoint = getGlobalFixedPointForBindableElement(
-              arrow.startBinding.fixedPoint,
-              bindableElement,
-              elementsMap,
-            );
-            if (
-              isFocusPointVisible(
-                focusPoint,
-                arrow,
-                bindableElement,
-                elementsMap,
-              ) &&
-              pointDistance(pointerPos, focusPoint) <= hitThreshold
-            ) {
-              hoveredFocusPointBinding = "start";
-            }
-          }
-        }
-
-        // Check end binding focus point (only if start not already hovered)
-        if (!hoveredFocusPointBinding && arrow.endBinding?.elementId) {
-          const bindableElement = elementsMap.get(arrow.endBinding.elementId);
-          if (
-            bindableElement &&
-            isBindableElement(bindableElement) &&
-            !bindableElement.isDeleted
-          ) {
-            const focusPoint = getGlobalFixedPointForBindableElement(
-              arrow.endBinding.fixedPoint,
-              bindableElement,
-              elementsMap,
-            );
-            if (
-              isFocusPointVisible(
-                focusPoint,
-                arrow,
-                bindableElement,
-                elementsMap,
-              ) &&
-              pointDistance(pointerPos, focusPoint) <= hitThreshold
-            ) {
-              hoveredFocusPointBinding = "end";
-            }
-          }
-        }
+      if (arrow.startBinding || arrow.endBinding) {
+        hoveredFocusPointBinding = handleFocusPointHover(
+          element as ExcalidrawArrowElement,
+          scenePointerX,
+          scenePointerY,
+          this.scene,
+          this.state.zoom,
+        );
       }
 
       if (
@@ -7946,70 +7896,12 @@ class App extends React.Component<AppProps, AppState> {
           ) as any;
 
           if (arrow && isBindingElement(arrow)) {
-            const pointerPos = pointFrom(
-              pointerDownState.origin.x,
-              pointerDownState.origin.y,
+            const hitFocusPoint = handleFocusPointPointerDown(
+              arrow,
+              pointerDownState,
+              elementsMap,
+              this.state.zoom,
             );
-            const hitThreshold = 5 / this.state.zoom.value;
-            let hitFocusPoint: "start" | "end" | null = null;
-
-            // Check start binding focus point
-            if (arrow.startBinding?.elementId) {
-              const bindableElement = elementsMap.get(
-                arrow.startBinding.elementId,
-              );
-              if (
-                bindableElement &&
-                isBindableElement(bindableElement) &&
-                !bindableElement.isDeleted
-              ) {
-                const focusPoint = getGlobalFixedPointForBindableElement(
-                  arrow.startBinding.fixedPoint,
-                  bindableElement,
-                  elementsMap,
-                );
-                if (
-                  isFocusPointVisible(
-                    focusPoint,
-                    arrow,
-                    bindableElement,
-                    elementsMap,
-                  ) &&
-                  pointDistance(pointerPos, focusPoint) <= hitThreshold
-                ) {
-                  hitFocusPoint = "start";
-                }
-              }
-            }
-
-            // Check end binding focus point (only if start not already hit)
-            if (!hitFocusPoint && arrow.endBinding?.elementId) {
-              const bindableElement = elementsMap.get(
-                arrow.endBinding.elementId,
-              );
-              if (
-                bindableElement &&
-                isBindableElement(bindableElement) &&
-                !bindableElement.isDeleted
-              ) {
-                const focusPoint = getGlobalFixedPointForBindableElement(
-                  arrow.endBinding.fixedPoint,
-                  bindableElement,
-                  elementsMap,
-                );
-                if (
-                  isFocusPointVisible(
-                    focusPoint,
-                    arrow,
-                    bindableElement,
-                    elementsMap,
-                  ) &&
-                  pointDistance(pointerPos, focusPoint) <= hitThreshold
-                ) {
-                  hitFocusPoint = "end";
-                }
-              }
-            }
 
             // If focus point is hit, update state and prevent element selection
             if (hitFocusPoint) {
