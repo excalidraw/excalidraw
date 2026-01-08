@@ -59,7 +59,7 @@ const Header = () => (
 
 const Section = (props: { title: string; children: React.ReactNode }) => (
   <>
-    <h3>{props.title}</h3>
+    <h3 style={{fontSize: '2.025rem'}}>{props.title}</h3>
     <div className="HelpDialog__islands-container">{props.children}</div>
   </>
 );
@@ -70,7 +70,7 @@ const ShortcutIsland = (props: {
   className?: string;
 }) => (
   <div className={`HelpDialog__island ${props.className}`}>
-    <h4 className="HelpDialog__island-title">{props.caption}</h4>
+    <h4 className="HelpDialog__island-title"  style={{fontSize: '1.925rem'}}>{props.caption}</h4>
     <div className="HelpDialog__island-content">{props.children}</div>
   </div>
 );
@@ -111,7 +111,7 @@ const Shortcut = ({
 
   return (
     <div className="HelpDialog__shortcut">
-      <div>{label}</div>
+      <div style={{fontSize: '0.925rem', fontWeight: '500', margin: '0.5rem 0rem'}}>{label}</div>
       <div className="HelpDialog__key-container">
         {[...intersperse(splitShortcutKeys, isOr ? t("helpDialog.or") : null)]}
       </div>

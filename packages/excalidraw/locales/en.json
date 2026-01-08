@@ -207,7 +207,7 @@
     "copyLink": "Copy link",
     "save": "Save to current file",
     "saveAs": "Save as",
-    "load": "Open",
+    "load": "Open a file",
     "getShareableLink": "Get shareable link",
     "close": "Close",
     "selectLanguage": "Select language",
@@ -557,9 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "All your data is saved locally in your browser.",
+      "center_heading": "Your Data.  Your Browser.  Your Control ...",
       "center_heading_plus": "Did you want to go to the Excalidraw+ instead?",
-      "menuHint": "Export, preferences, languages, ..."
+      "menuHint": "Preferences, Export & More ..."
     },
     "defaults": {
       "menuHint": "Export, preferences, and more...",
