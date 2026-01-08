@@ -63,6 +63,7 @@ import {
 
 import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
 import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
+import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
 import type {
   FileId,
   NonDeletedExcalidrawElement,
@@ -112,6 +113,10 @@ import {
   importFromBackend,
   isCollaborationLink,
 } from "./data";
+import { GoogleDriveStorage } from "./data/GoogleDriveStorage";
+import { GoogleDriveService } from "./data/GoogleDrive";
+import { BoardManager } from "./data/BoardManager";
+import { googleDriveAuthAtom, currentBoardIdAtom } from "./app-jotai";
 
 import { updateStaleImageStatuses } from "./data/FileManager";
 import {
@@ -226,7 +231,43 @@ const initializeScene = async (opts: {
   );
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
-  const localDataState = importFromLocalStorage();
+  // Check if Google Drive board is active
+  const auth = appJotaiStore.get(googleDriveAuthAtom);
+  const currentBoardId = appJotaiStore.get(currentBoardIdAtom);
+
+  let localDataState: ImportedDataState | null = null;
+
+  if (auth.isAuthenticated && currentBoardId && GoogleDriveStorage.isActive()) {
+    // Authenticated with board selected - try Google Drive first, fallback to board-specific localStorage
+    try {
+      // Try to load from Google Drive
+      const boardData = await GoogleDriveStorage.loadBoard(currentBoardId);
+      // If Google Drive has data, use it
+      if (boardData.elements && boardData.elements.length > 0) {
+        localDataState = boardData;
+      } else {
+        // Google Drive is empty, try board-specific localStorage
+        const boardLocalData = importFromLocalStorage(currentBoardId);
+        if (boardLocalData.elements && boardLocalData.elements.length > 0) {
+          localDataState = boardLocalData;
+        } else {
+          // Both empty, return empty state
+          localDataState = { elements: [], appState: null };
+        }
+      }
+    } catch (error: any) {
+      console.error(
+        "Failed to load from Google Drive, trying board-specific localStorage:",
+        error,
+      );
+      // Fall back to board-specific localStorage
+      const boardLocalData = importFromLocalStorage(currentBoardId);
+      localDataState = boardLocalData;
+    }
+  } else {
+    // Not authenticated or no board selected, use shared localStorage (default canvas)
+    localDataState = importFromLocalStorage(null);
+  }
 
   let scene: Omit<
     RestoredDataState,
@@ -397,6 +438,19 @@ const ExcalidrawWrapper = () => {
     setTimeout(() => {
       trackEvent("load", "version", getVersion());
     }, VERSION_TIMEOUT);
+  }, []);
+
+  // Restore Google Drive auth state on mount
+  useEffect(() => {
+    GoogleDriveService.restoreAuthState();
+
+    // If authenticated, refresh boards list
+    const auth = appJotaiStore.get(googleDriveAuthAtom);
+    if (auth.isAuthenticated && auth.accessToken) {
+      BoardManager.refreshBoardsList().catch((error) => {
+        console.error("Failed to refresh boards list on restore:", error);
+      });
+    }
   }, []);
 
   const [excalidrawAPI, excalidrawRefCallback] =
@@ -920,6 +974,7 @@ const ExcalidrawWrapper = () => {
           theme={appTheme}
           setTheme={(theme) => setAppTheme(theme)}
           refresh={() => forceRefresh((prev) => !prev)}
+          excalidrawAPI={excalidrawAPI}
         />
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}
