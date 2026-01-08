@@ -2338,13 +2338,7 @@ const pointDraggingUpdates = (
   const indices = Array.from(indicesSet);
 
   return {
-    updates:
-      updates.startBinding || updates.suggestedBinding
-        ? {
-            startBinding: updates.startBinding,
-            suggestedBinding: updates.suggestedBinding,
-          }
-        : undefined,
+    updates,
     positions: new Map(
       indices.map((idx) => {
         return [

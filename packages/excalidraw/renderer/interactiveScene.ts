@@ -945,11 +945,14 @@ const renderFocusPointConnectionLine = (
   appState: InteractiveCanvasAppState,
   fromPoint: GlobalPoint,
   toPoint: GlobalPoint,
+  isDragging: boolean,
 ) => {
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 
-  context.strokeStyle = "rgba(134, 131, 226, 0.6)";
+  context.strokeStyle = isDragging
+    ? "rgba(140, 140, 140, 0.5)"
+    : "rgba(134, 131, 226, 0.6)";
   context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
 
@@ -958,6 +961,34 @@ const renderFocusPointConnectionLine = (
   context.lineTo(toPoint[0], toPoint[1]);
   context.stroke();
 
+  context.restore();
+};
+
+const renderFocusPointIndicator = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  point: GlobalPoint,
+  radius: number,
+  isHovered: boolean,
+  isDragging: boolean,
+) => {
+  context.save();
+  context.strokeStyle = isDragging ? "rgba(120, 120, 120, 0.7)" : "#5e5ad8";
+  context.setLineDash([]);
+  context.fillStyle = isDragging
+    ? "rgba(220, 220, 220, 0.8)"
+    : isHovered
+    ? "rgba(134, 131, 226, 0.9)"
+    : "rgba(255, 255, 255, 0.9)";
+
+  fillCircle(
+    context,
+    point[0],
+    point[1],
+    radius / appState.zoom.value,
+    true,
+    true,
+  );
   context.restore();
 };
 
@@ -976,6 +1007,7 @@ const renderFocusPointIndicators = (
   }
 
   const arrow = element as any;
+  const isDragging = !!appState.selectedLinearElement?.isDragging;
 
   // Render start binding focus point and connection line
   if (arrow.startBinding?.elementId) {
@@ -1010,19 +1042,19 @@ const renderFocusPointIndicators = (
           appState,
           arrowStartPoint,
           focusPoint,
+          isDragging,
         );
 
         context.save();
         context.translate(appState.scrollX, appState.scrollY);
 
-        renderSingleLinearPoint(
+        renderFocusPointIndicator(
           context,
           appState,
           focusPoint,
           LinearElementEditor.POINT_HANDLE_SIZE / 1.5,
           isHovered,
-          false,
-          false,
+          isDragging,
         );
 
         context.restore();
@@ -1063,19 +1095,19 @@ const renderFocusPointIndicators = (
           appState,
           arrowEndPoint,
           focusPoint,
+          isDragging,
         );
 
         context.save();
         context.translate(appState.scrollX, appState.scrollY);
 
-        renderSingleLinearPoint(
+        renderFocusPointIndicator(
           context,
           appState,
           focusPoint,
           LinearElementEditor.POINT_HANDLE_SIZE / 1.5,
           isHovered,
-          false,
-          false,
+          isDragging,
         );
 
         context.restore();
@@ -1472,16 +1504,16 @@ const _renderInteractiveScene = ({
           }
         }
       }
+    }
 
-      if (isArrowElement(firstSelectedLinear)) {
-        // Render focus point indicators for linear element
-        renderFocusPointIndicators(
-          context,
-          appState,
-          firstSelectedLinear,
-          allElementsMap,
-        );
-      }
+    if (isArrowElement(firstSelectedLinear)) {
+      // Render focus point indicators for linear element even during dragging.
+      renderFocusPointIndicators(
+        context,
+        appState,
+        firstSelectedLinear,
+        allElementsMap,
+      );
     }
   }
 
