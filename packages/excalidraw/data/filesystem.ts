@@ -16,6 +16,71 @@ type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
 
 const INPUT_CHANGE_INTERVAL_MS = 5000;
 
+/**
+ * Check if running on Capacitor native platform (Android/iOS)
+ * Uses dynamic check to avoid import errors on web
+ */
+export const isCapacitorNative = (): boolean => {
+  try {
+    // Check if Capacitor is available and we're on a native platform
+    const Capacitor = (window as any).Capacitor;
+    return Capacitor?.isNativePlatform?.() ?? false;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Save file using Capacitor Filesystem (for Android/iOS)
+ */
+const fileSaveCapacitor = async (
+  blob: Blob | Promise<Blob>,
+  opts: {
+    name: string;
+    extension: FILE_EXTENSION;
+  },
+): Promise<FileSystemHandle | null> => {
+  const resolvedBlob = await blob;
+  const fileName = `${opts.name}.${opts.extension}`;
+
+  try {
+    // Dynamically import Capacitor modules to avoid bundling issues on web
+    const { Filesystem, Directory } = await import("@capacitor/filesystem");
+
+    // Convert blob to base64
+    const base64Data = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        const base64 = result.split(",")[1];
+        resolve(base64 || "");
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(resolvedBlob);
+    });
+
+    // Save to Documents directory
+    const result = await Filesystem.writeFile({
+      path: fileName,
+      data: base64Data,
+      directory: Directory.Documents,
+      recursive: true,
+    });
+
+    console.log("File saved to:", result.uri);
+
+    // Show a toast/alert to the user about where the file was saved
+    if ((window as any).alert) {
+      (window as any).alert(`File saved to Documents/${fileName}`);
+    }
+
+    return null; // Capacitor doesn't use FileSystemHandle
+  } catch (error) {
+    console.error("Error saving file with Capacitor:", error);
+    throw error;
+  }
+};
+
 export const fileOpen = async <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
   description: string;
@@ -99,6 +164,15 @@ export const fileSave = (
     fileHandle?: FileSystemHandle | null;
   },
 ) => {
+  // Use Capacitor filesystem on native platforms (Android/iOS)
+  if (isCapacitorNative()) {
+    return fileSaveCapacitor(blob, {
+      name: opts.name,
+      extension: opts.extension,
+    });
+  }
+
+  // Use browser-fs-access on web
   return _fileSave(
     blob,
     {
