@@ -2138,6 +2138,63 @@ const pointDraggingUpdates = (
     };
   }
 
+  // Handle the case where neither endpoint is being dragged
+  // but we need to update bound endpoints
+  if (!startIsDragged && !endIsDragged) {
+    const nextArrow = {
+      ...element,
+      points: element.points.map((p, idx) => {
+        return naiveDraggingPoints.get(idx)?.point ?? p;
+      }),
+    };
+    const positions = new Map(naiveDraggingPoints);
+
+    if (element.startBinding) {
+      const startBindable = elementsMap.get(element.startBinding.elementId) as
+        | ExcalidrawBindableElement
+        | undefined;
+      if (startBindable) {
+        const startPoint =
+          updateBoundPoint(
+            nextArrow,
+            "startBinding",
+            element.startBinding,
+            startBindable,
+            elementsMap,
+          ) ?? null;
+        if (startPoint) {
+          positions.set(0, { point: startPoint, isDragging: true });
+        }
+      }
+    }
+
+    if (element.endBinding) {
+      const endBindable = elementsMap.get(element.endBinding.elementId) as
+        | ExcalidrawBindableElement
+        | undefined;
+      if (endBindable) {
+        const endPoint =
+          updateBoundPoint(
+            nextArrow,
+            "endBinding",
+            element.endBinding,
+            endBindable,
+            elementsMap,
+          ) ?? null;
+        if (endPoint) {
+          positions.set(element.points.length - 1, {
+            point: endPoint,
+            isDragging: true,
+          });
+        }
+      }
+    }
+
+    return {
+      positions,
+    };
+  }
+
   if (startIsDragged === endIsDragged) {
     return {
       positions: naiveDraggingPoints,
