@@ -16,7 +16,7 @@ import {
   intersectElementWithLineSegment,
 } from "@excalidraw/element";
 
-import type { ElementsSegmentsMap, GlobalPoint } from "@excalidraw/math/types";
+import type { ElementsSegmentsMap, GlobalPoint } from "@excalidraw/math";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 export const getLassoSelectedElementIds = (input: {
