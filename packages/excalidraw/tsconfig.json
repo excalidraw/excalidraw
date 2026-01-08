@@ -1,8 +1,7 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist/types",
-    "ignoreDeprecations": "5.0"
+    "outDir": "./dist/types"
   },
   "include": ["**/*"],
   "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"]
