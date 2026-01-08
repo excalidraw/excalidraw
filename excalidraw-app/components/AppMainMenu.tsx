@@ -2,6 +2,7 @@ import {
   loginIcon,
   ExcalLogo,
   eyeIcon,
+  brainIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
@@ -22,6 +23,7 @@ export const AppMainMenu: React.FC<{
   theme: Theme | "system";
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
+  onAISettingsOpen: () => void;
 }> = React.memo((props) => {
   return (
     <MainMenu>
@@ -40,6 +42,9 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
+      <MainMenu.Item icon={brainIcon} onClick={props.onAISettingsOpen}>
+        AI Settings
+      </MainMenu.Item>
       <MainMenu.ItemLink
         icon={ExcalLogo}
         href={`${

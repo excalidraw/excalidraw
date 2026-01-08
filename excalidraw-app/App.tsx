@@ -105,6 +105,7 @@ import {
   exportToExcalidrawPlus,
 } from "./components/ExportToExcalidrawPlus";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
+import { AISettingsDialog } from "./components/AISettingsDialog";
 
 import {
   exportToBackend,
@@ -417,6 +418,7 @@ const ExcalidrawWrapper = () => {
   });
 
   const [, forceRefresh] = useState(false);
+  const [isAISettingsOpen, setIsAISettingsOpen] = useState(false);
 
   useEffect(() => {
     if (isDevEnv()) {
@@ -920,7 +922,11 @@ const ExcalidrawWrapper = () => {
           theme={appTheme}
           setTheme={(theme) => setAppTheme(theme)}
           refresh={() => forceRefresh((prev) => !prev)}
+          onAISettingsOpen={() => setIsAISettingsOpen(true)}
         />
+        {isAISettingsOpen && (
+          <AISettingsDialog onClose={() => setIsAISettingsOpen(false)} />
+        )}
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}
           isCollabEnabled={!isCollabDisabled}

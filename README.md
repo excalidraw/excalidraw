@@ -1,124 +1,128 @@
-<a href="https://excalidraw.com/" target="_blank" rel="noopener">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2_dark.png" />
-    <img alt="Excalidraw" src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2.png" />
-  </picture>
-</a>
-
-<h4 align="center">
-  <a href="https://excalidraw.com">Excalidraw Editor</a> |
-  <a href="https://plus.excalidraw.com/blog">Blog</a> |
-  <a href="https://docs.excalidraw.com">Documentation</a> |
-  <a href="https://plus.excalidraw.com">Excalidraw+</a>
-</h4>
-
 <div align="center">
-  <h2>
-    An open source virtual hand-drawn style whiteboard. </br>
-    Collaborative and end-to-end encrypted. </br>
-  <br />
-  </h2>
+  <h1>ExcalidrawGrail</h1>
+  <p><strong>AI-Powered Whiteboard with Multi-LLM Support</strong></p>
+  <p>OpenAI | Anthropic Claude | Ollama</p>
 </div>
 
 <br />
-<p align="center">
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/LICENSE">
-    <img alt="Excalidraw is released under the MIT license." src="https://img.shields.io/badge/license-MIT-blue.svg"  /></a>
-  <a href="https://www.npmjs.com/package/@excalidraw/excalidraw">
-    <img alt="npm downloads/month" src="https://img.shields.io/npm/dm/@excalidraw/excalidraw"  /></a>
-  <a href="https://docs.excalidraw.com/docs/introduction/contributing">
-    <img alt="PRs welcome!" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"  /></a>
-  <a href="https://discord.gg/UexuTaE">
-    <img alt="Chat on Discord" src="https://img.shields.io/discord/723672430744174682?color=738ad6&label=Chat%20on%20Discord&logo=discord&logoColor=ffffff&widge=false"/></a>
-  <a href="https://deepwiki.com/excalidraw/excalidraw">
-    <img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg" /></a>
-  <a href="https://twitter.com/excalidraw">
-    <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+@excalidraw&style=social&logo=twitter"/></a>
-</p>
 
 <div align="center">
-  <figure>
-    <a href="https://excalidraw.com" target="_blank" rel="noopener">
-      <img src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github%2Fproduct_showcase.png" alt="Product showcase" />
-    </a>
-    <figcaption>
-      <p align="center">
-        Create beautiful hand-drawn like diagrams, wireframes, or whatever you like.
-      </p>
-    </figcaption>
-  </figure>
+  <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" />
+  <img alt="Self-Hosted" src="https://img.shields.io/badge/self--hosted-yes-green.svg" />
+  <img alt="Privacy First" src="https://img.shields.io/badge/privacy-first-purple.svg" />
 </div>
 
-## Features
+<br />
 
-The Excalidraw editor (npm package) supports:
+<div align="center">
+  <img src="assets/screenshot-demo.png" alt="ExcalidrawGrail Demo - Text-to-Diagram comparison between Ollama and GPT-4o" width="800" />
+  <p><em>Text-to-Diagram: Same prompt, different models (Ollama Devstral vs GPT-4o)</em></p>
+</div>
 
-- 💯&nbsp;Free & open-source.
-- 🎨&nbsp;Infinite, canvas-based whiteboard.
-- ✍️&nbsp;Hand-drawn like style.
-- 🌓&nbsp;Dark mode.
-- 🏗️&nbsp;Customizable.
-- 📷&nbsp;Image support.
-- 😀&nbsp;Shape libraries support.
-- 🌐&nbsp;Localization (i18n) support.
-- 🖼️&nbsp;Export to PNG, SVG & clipboard.
-- 💾&nbsp;Open format - export drawings as an `.excalidraw` json file.
-- ⚒️&nbsp;Wide range of tools - rectangle, circle, diamond, arrow, line, free-draw, eraser...
-- ➡️&nbsp;Arrow-binding & labeled arrows.
-- 🔙&nbsp;Undo / Redo.
-- 🔍&nbsp;Zoom and panning support.
+## What is ExcalidrawGrail?
 
-## Excalidraw.com
+ExcalidrawGrail is a fork of [Excalidraw](https://github.com/excalidraw/excalidraw) with **built-in AI support** for multiple LLM providers. No need for external proxies or backend services - configure your API keys directly in the app.
 
-The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase of what you can build with Excalidraw. Its [source code](https://github.com/excalidraw/excalidraw/tree/master/excalidraw-app) is part of this repository as well, and the app features:
+### Key Features
 
-- 📡&nbsp;PWA support (works offline).
-- 🤼&nbsp;Real-time collaboration.
-- 🔒&nbsp;End-to-end encryption.
-- 💾&nbsp;Local-first support (autosaves to the browser).
-- 🔗&nbsp;Shareable links (export to a readonly link you can share with others).
+- **Multi-LLM Support** - Choose between OpenAI, Anthropic Claude, or Ollama
+- **Text-to-Diagram** - Describe a diagram in natural language, get Mermaid output rendered as shapes
+- **Diagram-to-Code** - Draw a wireframe, convert it to HTML/CSS with vision AI
+- **Privacy-First** - Your API keys stay in your browser (localStorage)
+- **Self-Hosted** - Run locally with Ollama, no external API calls required
+- **Model Selection** - Pick any model available from your chosen provider
 
-We'll be adding these features as drop-in plugins for the npm package in the future.
+## Screenshots
 
-## Quick start
+<table>
+  <tr>
+    <td align="center">
+      <img src="assets/screenshot-menu.png" alt="AI Settings in Menu" width="280" /><br />
+      <em>AI Settings in the menu</em>
+    </td>
+    <td align="center">
+      <img src="assets/screenshot-settings.png" alt="AI Settings Dialog" width="400" /><br />
+      <em>Configure your provider and model</em>
+    </td>
+  </tr>
+</table>
 
-**Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
-
-Use `npm` or `yarn` to install the package.
+## Quick Start
 
 ```bash
-npm install react react-dom @excalidraw/excalidraw
-# or
-yarn add react react-dom @excalidraw/excalidraw
+git clone https://github.com/yourname/excalidrawgrail.git
+cd excalidrawgrail
+yarn install
+yarn start
 ```
 
-Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
+Open `http://localhost:5173` and click **Menu > AI Settings** to configure.
 
-## Contributing
+## AI Configuration
 
-- Missing something or found a bug? [Report here](https://github.com/excalidraw/excalidraw/issues).
-- Want to contribute? Check out our [contribution guide](https://docs.excalidraw.com/docs/introduction/contributing) or let us know on [Discord](https://discord.gg/UexuTaE).
-- Want to help with translations? See the [translation guide](https://docs.excalidraw.com/docs/introduction/contributing#translating).
+### Option 1: Ollama (Self-Hosted, Free)
 
-## Integrations
+1. Install [Ollama](https://ollama.ai)
+2. Pull a model: `ollama pull llama3.2`
+3. For vision features: `ollama pull llava`
+4. In ExcalidrawGrail: Menu > AI Settings > Select "Ollama"
+5. Models are fetched automatically from your local Ollama instance
 
-- [VScode extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor)
-- [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw)
+### Option 2: OpenAI
 
-## Who's integrating Excalidraw
+1. Get an API key from [OpenAI Platform](https://platform.openai.com)
+2. Menu > AI Settings > Select "OpenAI"
+3. Enter your API key
+4. Recommended models: `gpt-4o` (vision), `gpt-4o-mini` (fast)
 
-[Google Cloud](https://googlecloudcheatsheet.withgoogle.com/architecture) • [Meta](https://meta.com/) • [CodeSandbox](https://codesandbox.io/) • [Obsidian Excalidraw](https://github.com/zsviczian/obsidian-excalidraw-plugin) • [Replit](https://replit.com/) • [Slite](https://slite.com/) • [Notion](https://notion.so/) • [HackerRank](https://www.hackerrank.com/) • and many others
+### Option 3: Anthropic Claude
 
-## Sponsors & support
+1. Get an API key from [Anthropic Console](https://console.anthropic.com)
+2. Menu > AI Settings > Select "Anthropic"
+3. Enter your API key
+4. Recommended: `claude-sonnet-4-20250514`
 
-If you like the project, you can become a sponsor at [Open Collective](https://opencollective.com/excalidraw) or use [Excalidraw+](https://plus.excalidraw.com/).
+## Usage
 
-## Thank you for supporting Excalidraw
+### Text-to-Diagram
 
-[<img src="https://opencollective.com/excalidraw/tiers/sponsors/0/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/0/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/1/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/1/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/2/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/2/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/3/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/3/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/4/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/4/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/5/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/5/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/6/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/6/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/7/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/7/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/8/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/8/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/9/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/9/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/10/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/10/website)
+1. Press `Shift + A` or click the AI wand icon
+2. Describe your diagram: *"A flowchart showing user authentication flow"*
+3. AI generates Mermaid code, rendered as Excalidraw shapes
 
-<a href="https://opencollective.com/excalidraw#category-CONTRIBUTE" target="_blank"><img src="https://opencollective.com/excalidraw/tiers/backers.svg?avatarHeight=32"/></a>
+### Diagram-to-Code
 
-Last but not least, we're thankful to these companies for offering their services for free:
+1. Draw a wireframe inside a frame
+2. Click "Generate code" on the frame
+3. AI analyzes the drawing and generates HTML/CSS
 
-[![Vercel](./.github/assets/vercel.svg)](https://vercel.com) [![Sentry](./.github/assets/sentry.svg)](https://sentry.io) [![Crowdin](./.github/assets/crowdin.svg)](https://crowdin.com)
+## Development
+
+```bash
+yarn test:typecheck  # TypeScript checks
+yarn test:update     # Run tests
+yarn fix             # Auto-fix linting
+yarn build-node      # Build packages
+```
+
+## Architecture
+
+```
+excalidraw-app/
+├── components/
+│   ├── AI.tsx              # Multi-provider AI logic
+│   ├── AISettingsDialog.tsx # Settings UI
+│   └── AppMainMenu.tsx     # Menu with AI Settings
+packages/
+├── excalidraw/             # Core editor
+├── common/                 # Shared constants
+└── ...
+```
+
+## Credits
+
+Based on [Excalidraw](https://excalidraw.com) - the amazing open-source whiteboard.
+
+## License
+
+MIT
