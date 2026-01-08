@@ -50,7 +50,7 @@ ExcalidrawGrail is a fork of [Excalidraw](https://github.com/excalidraw/excalidr
 ## Quick Start
 
 ```bash
-git clone https://github.com/yourname/excalidrawgrail.git
+git clone https://github.com/iamthemediagit/excalidrawgrail.git
 cd excalidrawgrail
 yarn install
 yarn start
