@@ -1,4 +1,5 @@
 import { atom } from "jotai";
+import type { AgentAction } from "./types";
 
 export interface ChatMessage {
   id: string;
@@ -6,6 +7,8 @@ export interface ChatMessage {
   content: string;
   timestamp: number;
   contextElements?: string[]; // Element IDs referenced in this message
+  actions?: AgentAction[];
+  applied?: boolean;
 }
 
 export interface SelectionContext {

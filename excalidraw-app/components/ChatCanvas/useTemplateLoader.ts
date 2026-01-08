@@ -1,11 +1,14 @@
 import { useCallback } from "react";
 import { loadTemplate, type Template } from "./templates";
+import { convertToExcalidrawElements } from "@excalidraw/excalidraw";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 /**
  * Hook to handle template loading and applying to the canvas.
  */
-export const useTemplateLoader = (excalidrawAPI: ExcalidrawImperativeAPI | null) => {
+export const useTemplateLoader = (
+  excalidrawAPI: ExcalidrawImperativeAPI | null,
+) => {
   const handleLoadTemplate = useCallback(
     async (template: Template) => {
       if (!excalidrawAPI) return;
@@ -19,16 +22,13 @@ export const useTemplateLoader = (excalidrawAPI: ExcalidrawImperativeAPI | null)
 
       // Get current elements
       const currentElements = excalidrawAPI.getSceneElements();
+      const hydratedElements = convertToExcalidrawElements(templateElements, {
+        regenerateIds: true,
+      });
 
       // Ask user if they want to replace or append
       // For now, we'll append the template elements
-      const newElements = [
-        ...currentElements,
-        ...templateElements.map((el) => ({
-          ...el,
-          id: `${el.id || Math.random()}-${Date.now()}`,
-        })),
-      ];
+      const newElements = [...currentElements, ...hydratedElements];
 
       // Update the scene with new elements
       excalidrawAPI.updateScene({
@@ -36,11 +36,11 @@ export const useTemplateLoader = (excalidrawAPI: ExcalidrawImperativeAPI | null)
       });
 
       // Optionally scroll to the new elements
-      excalidrawAPI.scrollToContent(newElements);
+      excalidrawAPI.scrollToContent(hydratedElements);
 
       console.log(`Loaded template: ${template.name}`);
     },
-    [excalidrawAPI]
+    [excalidrawAPI],
   );
 
   return handleLoadTemplate;

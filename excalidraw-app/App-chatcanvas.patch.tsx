@@ -29,8 +29,8 @@
           // Handle settings if needed
         }}
       >
-        {/* The existing Excalidraw content goes here */}
-        {/* All the existing JSX from the original return statement */}
+        // The existing Excalidraw content goes here
+        // All the existing JSX from the original return statement
       </ExcalidrawChatCanvasWrapper>
     );
   }

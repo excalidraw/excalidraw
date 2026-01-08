@@ -1,13 +1,18 @@
 import { useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { selectionContextAtom } from "./atoms";
+import { isTextElement } from "@excalidraw/element";
+import type { ExcalidrawElement } from "@excalidraw/element";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+import type { ElementContext } from "./types";
 
 /**
  * Hook to track selected elements from Excalidraw API and update the selection context atom.
  * This enables the chat panel to know which elements are currently selected on the canvas.
  */
-export const useSelectionContext = (excalidrawAPI: ExcalidrawImperativeAPI | null) => {
+export const useSelectionContext = (
+  excalidrawAPI: ExcalidrawImperativeAPI | null,
+) => {
   const setSelectionContext = useSetAtom(selectionContextAtom);
 
   useEffect(() => {
@@ -18,7 +23,7 @@ export const useSelectionContext = (excalidrawAPI: ExcalidrawImperativeAPI | nul
       const appState = excalidrawAPI.getAppState();
       const selectedElementIds = appState.selectedElementIds || {};
       const selectedIds = Object.keys(selectedElementIds).filter(
-        (id) => selectedElementIds[id]
+        (id) => selectedElementIds[id],
       );
 
       setSelectionContext({
@@ -46,18 +51,17 @@ export const useSelectionContext = (excalidrawAPI: ExcalidrawImperativeAPI | nul
  * This creates a structured payload of the selected elements.
  */
 export const extractElementContext = (
-  elements: any[],
-  selectedElementIds: string[]
-) => {
+  elements: readonly ExcalidrawElement[],
+  selectedElementIds: string[],
+): ElementContext[] => {
   return selectedElementIds
     .map((id) => {
       const element = elements.find((el) => el.id === id);
       if (!element) return null;
 
-      return {
+      const baseContext: ElementContext = {
         id: element.id,
         type: element.type,
-        text: element.text || "",
         x: element.x,
         y: element.y,
         width: element.width,
@@ -67,10 +71,28 @@ export const extractElementContext = (
         backgroundColor: element.backgroundColor,
         fillStyle: element.fillStyle,
         strokeWidth: element.strokeWidth,
-        fontSize: element.fontSize,
-        fontFamily: element.fontFamily,
-        textAlign: element.textAlign,
+        frameId: element.frameId,
+        groupIds: element.groupIds,
       };
+
+      if (isTextElement(element)) {
+        return {
+          ...baseContext,
+          text: element.text,
+          fontSize: element.fontSize,
+          fontFamily: element.fontFamily,
+          textAlign: element.textAlign,
+        };
+      }
+
+      if ("text" in element && typeof element.text === "string") {
+        return {
+          ...baseContext,
+          text: element.text,
+        };
+      }
+
+      return baseContext;
     })
-    .filter((el) => el !== null);
+    .filter((context): context is ElementContext => context !== null);
 };

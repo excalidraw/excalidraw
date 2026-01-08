@@ -1,10 +1,9 @@
 import React, { ReactNode } from "react";
-import { useAtom } from "jotai";
-import { Provider } from "../../app-jotai";
-import { ChatCanvasShell, chatMessagesAtom } from "./index";
+import { ChatCanvasShell } from "./ChatCanvasShell";
 import { useSelectionContext } from "./useSelectionContext";
 import { useAgentResponse } from "./useAgentResponse";
 import { useTemplateLoader } from "./useTemplateLoader";
+import type { SelectionContextPayload } from "./types";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 interface ExcalidrawChatCanvasWrapperProps {
@@ -32,12 +31,16 @@ export const ExcalidrawChatCanvasWrapper: React.FC<
   useSelectionContext(excalidrawAPI);
 
   // Handle agent responses
-  const handleAgentResponse = useAgentResponse(excalidrawAPI);
+  const { handleAgentResponse, applyAgentActions } =
+    useAgentResponse(excalidrawAPI);
 
   // Handle template loading
   const handleLoadTemplate = useTemplateLoader(excalidrawAPI);
 
-  const handleSendMessage = (message: string, context: any) => {
+  const handleSendMessage = (
+    message: string,
+    context: SelectionContextPayload,
+  ) => {
     handleAgentResponse(message, context);
   };
 
@@ -47,6 +50,7 @@ export const ExcalidrawChatCanvasWrapper: React.FC<
       onExport={onExport}
       onSettings={onSettings}
       onSendMessage={handleSendMessage}
+      onApplyActions={applyAgentActions}
       onLoadTemplate={handleLoadTemplate}
     >
       {children}

@@ -9,13 +9,18 @@ import {
   agentErrorAtom,
   type ChatMessage,
 } from "./atoms";
+import type { AgentAction, SelectionContextPayload } from "./types";
 import "./ChatPanel.scss";
 
 interface ChatPanelProps {
-  onSendMessage?: (message: string, context?: any) => void;
+  onSendMessage?: (message: string, context: SelectionContextPayload) => void;
+  onApplyActions?: (actions: AgentAction[]) => void;
 }
 
-export const ChatPanel: React.FC<ChatPanelProps> = ({ onSendMessage }) => {
+export const ChatPanel: React.FC<ChatPanelProps> = ({
+  onSendMessage,
+  onApplyActions,
+}) => {
   const [messages, setMessages] = useAtom(chatMessagesAtom);
   const [isChatPanelOpen, setIsChatPanelOpen] = useAtom(isChatPanelOpenAtom);
   const [chatPanelWidth, setChatPanelWidth] = useAtom(chatPanelWidthAtom);
@@ -46,7 +51,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onSendMessage }) => {
       contextElements: selectionContext.elementIds,
     };
 
-    setMessages([...messages, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
 
     // Trigger the callback
@@ -56,6 +61,17 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onSendMessage }) => {
         elementCount: selectionContext.count,
       });
     }
+  };
+
+  const handleApplyActions = (messageId: string, actions: AgentAction[]) => {
+    if (actions.length === 0 || !onApplyActions) return;
+
+    onApplyActions(actions);
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId ? { ...msg, applied: true } : msg,
+      ),
+    );
   };
 
   // Handle keyboard shortcuts
@@ -119,8 +135,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onSendMessage }) => {
       {selectionContext.count > 0 && (
         <div className="chatcanvas-panel__context">
           <span className="chatcanvas-panel__context-label">
-            {selectionContext.count} item{selectionContext.count > 1 ? "s" : ""}{" "}
-            selected
+            Selection Context
+          </span>
+          <span className="chatcanvas-panel__context-count">
+            {selectionContext.count} item
+            {selectionContext.count > 1 ? "s" : ""}
           </span>
         </div>
       )}
@@ -146,6 +165,17 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onSendMessage }) => {
                 {msg.contextElements.length > 1 ? "s" : ""}
               </div>
             )}
+            {msg.role === "assistant" && msg.actions?.length ? (
+              <div className="chatcanvas-panel__message-actions">
+                <button
+                  className="chatcanvas-panel__apply"
+                  onClick={() => handleApplyActions(msg.id, msg.actions ?? [])}
+                  disabled={msg.applied}
+                >
+                  {msg.applied ? "Applied" : "Apply to canvas"}
+                </button>
+              </div>
+            ) : null}
           </div>
         ))}
         {isAgentLoading && (

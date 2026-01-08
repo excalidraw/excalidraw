@@ -44,9 +44,20 @@
     padding: 8px 16px;
     background-color: var(--color-info-light, #e3f2fd);
     border-bottom: 1px solid var(--color-info, #2196f3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   &__context-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-info, #2196f3);
+  }
+
+  &__context-count {
     font-size: 12px;
     font-weight: 500;
     color: var(--color-info, #2196f3);
@@ -128,6 +139,33 @@
     font-size: 12px;
     color: var(--color-text-secondary, #999999);
     padding: 0 4px;
+  }
+
+  &__message-actions {
+    display: flex;
+    gap: 8px;
+    padding: 0 4px;
+  }
+
+  &__apply {
+    border: 1px solid var(--color-primary, #2196f3);
+    background-color: transparent;
+    color: var(--color-primary, #2196f3);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-primary, #2196f3);
+      color: #ffffff;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
   }
 
   &__loading {
