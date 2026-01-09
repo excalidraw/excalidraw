@@ -21,6 +21,11 @@ import type {
   LocalPoint,
 } from "./types";
 
+export const MIN_ELLIPSE_AXIS_LENGTH = 1e-6;
+
+const clampAxisLength = (value: number) =>
+  Math.max(Math.abs(value), MIN_ELLIPSE_AXIS_LENGTH);
+
 /**
  * Construct an Ellipse object from the parameters
  *
@@ -54,8 +59,14 @@ export const ellipseIncludesPoint = <Point extends GlobalPoint | LocalPoint>(
   ellipse: Ellipse<Point>,
 ) => {
   const { center, halfWidth, halfHeight } = ellipse;
-  const normalizedX = (p[0] - center[0]) / halfWidth;
-  const normalizedY = (p[1] - center[1]) / halfHeight;
+  
+  // Handle degenerate case: zero-sized ellipse is treated as a point
+  if (Math.abs(halfWidth) < MIN_ELLIPSE_AXIS_LENGTH && Math.abs(halfHeight) < MIN_ELLIPSE_AXIS_LENGTH) {
+    return p[0] === center[0] && p[1] === center[1];
+  }
+  
+  const normalizedX = (p[0] - center[0]) / clampAxisLength(halfWidth);
+  const normalizedY = (p[1] - center[1]) / clampAxisLength(halfHeight);
 
   return normalizedX * normalizedX + normalizedY * normalizedY <= 1;
 };
@@ -92,8 +103,14 @@ export const ellipseDistanceFromPoint = <
   ellipse: Ellipse<Point>,
 ): number => {
   const { halfWidth, halfHeight, center } = ellipse;
-  const a = halfWidth;
-  const b = halfHeight;
+  
+  // Handle degenerate case: zero-sized ellipse is treated as a point
+  if (Math.abs(halfWidth) < MIN_ELLIPSE_AXIS_LENGTH && Math.abs(halfHeight) < MIN_ELLIPSE_AXIS_LENGTH) {
+    return pointDistance(p, center);
+  }
+  
+  const a = clampAxisLength(halfWidth);
+  const b = clampAxisLength(halfHeight);
   const translatedPoint = vectorAdd(
     vectorFromPoint(p),
     vectorScale(vectorFromPoint(center), -1),
@@ -143,8 +160,8 @@ export const ellipseDistanceFromPoint = <
 export function ellipseSegmentInterceptPoints<
   Point extends GlobalPoint | LocalPoint,
 >(e: Readonly<Ellipse<Point>>, s: Readonly<LineSegment<Point>>): Point[] {
-  const rx = e.halfWidth;
-  const ry = e.halfHeight;
+  const rx = clampAxisLength(e.halfWidth);
+  const ry = clampAxisLength(e.halfHeight);
 
   const dir = vectorFromPoint(s[1], s[0]);
   const diff = vector(s[0][0] - e.center[0], s[0][1] - e.center[1]);
@@ -205,16 +222,18 @@ export function ellipseLineIntersectionPoints<
   const y1 = g[1] - cy;
   const x2 = h[0] - cx;
   const y2 = h[1] - cy;
+  const safeHalfWidth = clampAxisLength(halfWidth);
+  const safeHalfHeight = clampAxisLength(halfHeight);
   const a =
-    Math.pow(x2 - x1, 2) / Math.pow(halfWidth, 2) +
-    Math.pow(y2 - y1, 2) / Math.pow(halfHeight, 2);
+    Math.pow(x2 - x1, 2) / Math.pow(safeHalfWidth, 2) +
+    Math.pow(y2 - y1, 2) / Math.pow(safeHalfHeight, 2);
   const b =
     2 *
-    ((x1 * (x2 - x1)) / Math.pow(halfWidth, 2) +
-      (y1 * (y2 - y1)) / Math.pow(halfHeight, 2));
+    ((x1 * (x2 - x1)) / Math.pow(safeHalfWidth, 2) +
+      (y1 * (y2 - y1)) / Math.pow(safeHalfHeight, 2));
   const c =
-    Math.pow(x1, 2) / Math.pow(halfWidth, 2) +
-    Math.pow(y1, 2) / Math.pow(halfHeight, 2) -
+    Math.pow(x1, 2) / Math.pow(safeHalfWidth, 2) +
+    Math.pow(y1, 2) / Math.pow(safeHalfHeight, 2) -
     1;
   const t1 = (-b + Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
   const t2 = (-b - Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
