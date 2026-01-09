@@ -144,7 +144,10 @@ import "./index.scss";
 
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
-import { ExcalidrawChatCanvasWrapper } from "./components/ChatCanvas";
+import {
+  ExcalidrawChatCanvasWrapper,
+  type ImageToolRequest,
+} from "./components/ChatCanvas";
 
 import type { CollabAPI } from "./collab/Collab";
 
@@ -418,6 +421,8 @@ const ExcalidrawWrapper = () => {
   });
 
   const [, forceRefresh] = useState(false);
+  const [imageToolRequest, setImageToolRequest] =
+    useState<ImageToolRequest | null>(null);
 
   useEffect(() => {
     if (isDevEnv()) {
@@ -880,6 +885,12 @@ const ExcalidrawWrapper = () => {
         handleKeyboardGlobally={true}
         autoFocus={true}
         theme={editorTheme}
+        onImageToolAction={
+          isChatCanvasMode
+            ? (action, elementId) =>
+                setImageToolRequest({ action, elementId })
+            : undefined
+        }
         renderTopRightUI={(isMobile) => {
           if (isMobile || !collabAPI || isCollabDisabled) {
             return null;
@@ -1204,6 +1215,8 @@ const ExcalidrawWrapper = () => {
         <ExcalidrawChatCanvasWrapper
           excalidrawAPI={excalidrawAPI}
           title="ChatCanvas"
+          imageToolRequest={imageToolRequest}
+          onImageToolRequestHandled={() => setImageToolRequest(null)}
         >
           {excalidrawContent}
         </ExcalidrawChatCanvasWrapper>

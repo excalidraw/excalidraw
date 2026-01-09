@@ -618,6 +618,10 @@ export interface ExcalidrawProps {
     activeTool: AppState["activeTool"],
     pointerDownState: PointerDownState,
   ) => void;
+  onImageToolAction?: (
+    action: "crop" | "edit" | "extend" | "upscale" | "layers",
+    elementId: string,
+  ) => void;
   onScrollChange?: (scrollX: number, scrollY: number, zoom: Zoom) => void;
   onUserFollow?: (payload: OnUserFollowedPayload) => void;
   children?: React.ReactNode;

@@ -313,6 +313,10 @@ import {
   actionToggleLinearEditor,
   actionToggleObjectsSnapMode,
   actionToggleCropEditor,
+  actionImageCrop,
+  actionImageEdit,
+  actionImageExtend,
+  actionImageUpscale,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
@@ -11818,6 +11822,21 @@ class App extends React.Component<AppProps, AppState> {
   ): ContextMenuItems => {
     const options: ContextMenuItems = [];
 
+    const selectedElements = this.scene.getSelectedElements(this.state);
+    const hasImageSelection = selectedElements.some((element) =>
+      isImageElement(element),
+    );
+    const imageToolActions: ContextMenuItems =
+      hasImageSelection && this.props.onImageToolAction
+        ? [
+            CONTEXT_MENU_SEPARATOR,
+            actionImageCrop,
+            actionImageEdit,
+            actionImageExtend,
+            actionImageUpscale,
+          ]
+        : [];
+
     options.push(actionCopyAsPng, actionCopyAsSvg);
 
     // canvas contextMenu
@@ -11881,6 +11900,7 @@ class App extends React.Component<AppProps, AppState> {
       actionSelectAllElementsInFrame,
       actionRemoveAllElementsFromFrame,
       actionWrapSelectionInFrame,
+      ...imageToolActions,
       CONTEXT_MENU_SEPARATOR,
       actionToggleCropEditor,
       CONTEXT_MENU_SEPARATOR,
