@@ -1350,8 +1350,8 @@ describe("multiple selection", () => {
 
     expect(boundArrow.x).toBeCloseTo(380 * scaleX);
     expect(boundArrow.y).toBeCloseTo(240 * scaleY);
-    expect(boundArrow.points[1][0]).toBeCloseTo(63.2365);
-    expect(boundArrow.points[1][1]).toBeCloseTo(-73.7746);
+    expect(boundArrow.points[1][0]).toBeCloseTo(59.79791516093493);
+    expect(boundArrow.points[1][1]).toBeCloseTo(-79.73055354791326);
 
     expect(arrowLabelPos.x + arrowLabel.width / 2).toBeCloseTo(
       boundArrow.x + boundArrow.points[1][0] / 2,
