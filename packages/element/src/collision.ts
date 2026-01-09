@@ -376,6 +376,18 @@ export const intersectElementWithLineSegment = (
         line,
         offset,
       );
+    case "triangle":
+    case "hexagon":
+    case "heart":
+    case "star":
+      // For new polygon shapes, use diamond intersection as approximation
+      return intersectDiamondWithLineSegment(
+        element as any as ExcalidrawDiamondElement,
+        elementsMap,
+        line,
+        offset,
+        onlyFirst,
+      );
     case "line":
     case "freedraw":
     case "arrow":

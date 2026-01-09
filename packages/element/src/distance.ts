@@ -45,6 +45,12 @@ export const distanceToElement = (
       return distanceToDiamondElement(element, elementsMap, p);
     case "ellipse":
       return distanceToEllipseElement(element, elementsMap, p);
+    case "triangle":
+    case "hexagon":
+    case "heart":
+    case "star":
+      // For new polygon shapes, use diamond distance as approximation
+      return distanceToDiamondElement(element as any as ExcalidrawDiamondElement, elementsMap, p);
     case "line":
     case "arrow":
     case "freedraw":

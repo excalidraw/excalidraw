@@ -184,6 +184,10 @@ export const isBindableElement = (
     (element.type === "rectangle" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
+      element.type === "triangle" ||
+      element.type === "hexagon" ||
+      element.type === "heart" ||
+      element.type === "star" ||
       element.type === "image" ||
       element.type === "iframe" ||
       element.type === "embeddable" ||
@@ -237,6 +241,10 @@ export const isTextBindableContainer = (
     (element.type === "rectangle" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
+      element.type === "triangle" ||
+      element.type === "hexagon" ||
+      element.type === "heart" ||
+      element.type === "star" ||
       isArrowElement(element))
   );
 };
@@ -255,6 +263,10 @@ export const isExcalidrawElement = (
     case "iframe":
     case "embeddable":
     case "ellipse":
+    case "triangle":
+    case "hexagon":
+    case "heart":
+    case "star":
     case "arrow":
     case "freedraw":
     case "line":
@@ -277,7 +289,11 @@ export const isFlowchartNodeElement = (
   return (
     element.type === "rectangle" ||
     element.type === "ellipse" ||
-    element.type === "diamond"
+    element.type === "diamond" ||
+    element.type === "triangle" ||
+    element.type === "hexagon" ||
+    element.type === "heart" ||
+    element.type === "star"
   );
 };
 
@@ -312,7 +328,7 @@ export const isUsingAdaptiveRadius = (type: string) =>
   type === "image";
 
 export const isUsingProportionalRadius = (type: string) =>
-  type === "line" || type === "arrow" || type === "diamond";
+  type === "line" || type === "arrow" || type === "diamond" || type === "triangle";
 
 export const canApplyRoundnessTypeToElement = (
   roundnessType: RoundnessType,

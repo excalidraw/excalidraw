@@ -24,8 +24,10 @@ import {
   ArrowIcon,
   extraToolsIcon,
   DiamondIcon,
-  EllipseIcon,
-  LineIcon,
+  EllipseIcon,  TriangleIcon,
+  HexagonIcon,
+  HeartIcon,
+  StarIcon,  LineIcon,
   TextIcon,
   ImageIcon,
   frameToolIcon,
@@ -56,6 +58,26 @@ const SHAPE_TOOLS = [
     type: "ellipse",
     icon: EllipseIcon,
     title: capitalizeString(t("toolBar.ellipse")),
+  },
+  {
+    type: "triangle",
+    icon: TriangleIcon,
+    title: capitalizeString(t("toolBar.triangle")),
+  },
+  {
+    type: "hexagon",
+    icon: HexagonIcon,
+    title: capitalizeString(t("toolBar.hexagon")),
+  },
+  {
+    type: "heart",
+    icon: HeartIcon,
+    title: capitalizeString(t("toolBar.heart")),
+  },
+  {
+    type: "star",
+    icon: StarIcon,
+    title: capitalizeString(t("toolBar.star")),
   },
 ] as const;
 
@@ -95,7 +117,7 @@ export const MobileToolBar = ({
   const activeTool = app.state.activeTool;
   const [isOtherShapesMenuOpen, setIsOtherShapesMenuOpen] = useState(false);
   const [lastActiveGenericShape, setLastActiveGenericShape] = useState<
-    "rectangle" | "diamond" | "ellipse"
+    "rectangle" | "diamond" | "ellipse" | "triangle" | "hexagon" | "heart" | "star"
   >("rectangle");
   const [lastActiveLinearElement, setLastActiveLinearElement] = useState<
     "arrow" | "line"
@@ -106,7 +128,11 @@ export const MobileToolBar = ({
     if (
       activeTool.type === "rectangle" ||
       activeTool.type === "diamond" ||
-      activeTool.type === "ellipse"
+      activeTool.type === "ellipse" ||
+      activeTool.type === "triangle" ||
+      activeTool.type === "hexagon" ||
+      activeTool.type === "heart" ||
+      activeTool.type === "star"
     ) {
       setLastActiveGenericShape(activeTool.type);
     }
@@ -276,6 +302,14 @@ export const MobileToolBar = ({
               ? "toolBar.diamond"
               : lastActiveGenericShape === "ellipse"
               ? "toolBar.ellipse"
+              : lastActiveGenericShape === "triangle"
+              ? "toolBar.triangle"
+              : lastActiveGenericShape === "hexagon"
+              ? "toolBar.hexagon"
+              : lastActiveGenericShape === "heart"
+              ? "toolBar.heart"
+              : lastActiveGenericShape === "star"
+              ? "toolBar.star"
               : "toolBar.rectangle",
           ),
         )}
@@ -284,7 +318,11 @@ export const MobileToolBar = ({
           if (
             type === "rectangle" ||
             type === "diamond" ||
-            type === "ellipse"
+            type === "ellipse" ||
+            type === "triangle" ||
+            type === "hexagon" ||
+            type === "heart" ||
+            type === "star"
           ) {
             setLastActiveGenericShape(type);
             app.setActiveTool({ type });

@@ -537,6 +537,69 @@ export const getDiamondPoints = (element: ExcalidrawElement) => {
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 };
 
+export const getTrianglePoints = (element: ExcalidrawElement) => {
+  // Centered equilateral-like triangle
+  const topX = element.width / 2;
+  const topY = 0;
+  const leftX = 0;
+  const leftY = element.height;
+  const rightX = element.width;
+  const rightY = element.height;
+
+  return [topX, topY, leftX, leftY, rightX, rightY];
+};
+
+export const getHexagonPoints = (element: ExcalidrawElement) => {
+  const w = element.width;
+  const h = element.height;
+  const w4 = w / 4;
+  const w34 = (3 * w) / 4;
+  const h2 = h / 2;
+
+  return [
+    w4, 0,       // top-left
+    w34, 0,      // top-right
+    w, h2,       // right
+    w34, h,      // bottom-right
+    w4, h,       // bottom-left
+    0, h2,       // left
+  ];
+};
+
+export const getHeartPoints = (element: ExcalidrawElement) => {
+  const w = element.width;
+  const h = element.height;
+  
+  return [
+    w / 2, h,           // bottom point
+    0, h * 0.3,         // left control
+    0, 0,               // top-left
+    w / 4, 0,           // left curve top
+    w / 2, h * 0.3 / 2, // center top
+    (3 * w) / 4, 0,     // right curve top
+    w, 0,               // top-right
+    w, h * 0.3,         // right control
+  ];
+};
+
+export const getStarPoints = (element: ExcalidrawElement) => {
+  const points: number[] = [];
+  const spikes = 5;
+  const outerRadius = Math.min(element.width, element.height) / 2;
+  const innerRadius = outerRadius * 0.4;
+  const centerX = element.width / 2;
+  const centerY = element.height / 2;
+  
+  for (let i = 0; i < spikes * 2; i++) {
+    const radius = i % 2 === 0 ? outerRadius : innerRadius;
+    const angle = (i * Math.PI) / spikes - Math.PI / 2;
+    points.push(centerX + radius * Math.cos(angle));
+    points.push(centerY + radius * Math.sin(angle));
+  }
+  
+  return points;
+};
+
 // reference: https://eliot-jones.com/2019/12/cubic-bezier-curve-bounding-boxes
 const getBezierValueForT = (
   t: number,

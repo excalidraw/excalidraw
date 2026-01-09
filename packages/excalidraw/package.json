@@ -1,10 +1,14 @@
 {
-  "name": "@excalidraw/excalidraw",
-  "version": "0.18.0",
+  "name": "@misenkashari/excalidraw",
+  "version": "1.0.0",
   "type": "module",
   "types": "./dist/types/excalidraw/index.d.ts",
   "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kashari/excalidraw.git"
+  },
   "exports": {
     "./common/*": {
       "types": "./dist/types/common/src/*.d.ts"
@@ -66,9 +70,8 @@
       "last 1 safari version"
     ]
   },
-  "repository": "https://github.com/excalidraw/excalidraw",
-  "bugs": "https://github.com/excalidraw/excalidraw/issues",
-  "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
+  "bugs": "https://github.com/kashari/excalidraw/issues",
+  "homepage": "https://github.com/kashari/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
     "gen:types": "rimraf types && tsc",
     "build:esm": "rimraf dist && node ../../scripts/buildPackage.js && yarn gen:types"

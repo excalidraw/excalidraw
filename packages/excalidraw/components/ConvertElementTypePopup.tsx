@@ -60,8 +60,10 @@ import type {
   ConvertibleTypes,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
-  ExcalidrawEllipseElement,
-  ExcalidrawLinearElement,
+  ExcalidrawEllipseElement,  ExcalidrawTriangleElement,
+  ExcalidrawHexagonElement,
+  ExcalidrawHeartElement,
+  ExcalidrawStarElement,  ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextContainer,
@@ -85,8 +87,10 @@ import { ToolButton } from "./ToolButton";
 import {
   DiamondIcon,
   elbowArrowIcon,
-  EllipseIcon,
-  LineIcon,
+  EllipseIcon,  TriangleIcon,
+  HexagonIcon,
+  HeartIcon,
+  StarIcon,  LineIcon,
   RectangleIcon,
   roundArrowIcon,
   sharpArrowIcon,
@@ -103,10 +107,14 @@ type ExcalidrawConvertibleElement =
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
+  | ExcalidrawTriangleElement
+  | ExcalidrawHexagonElement
+  | ExcalidrawHeartElement
+  | ExcalidrawStarElement
   | ExcalidrawLinearElement;
 
 // indicates order of switching
-const GENERIC_TYPES = ["rectangle", "diamond", "ellipse"] as const;
+const GENERIC_TYPES = ["rectangle", "diamond", "ellipse", "triangle", "hexagon", "heart", "star"] as const;
 // indicates order of switching
 const LINEAR_TYPES = [
   "line",
@@ -305,6 +313,10 @@ const Panel = ({
           ["rectangle", RectangleIcon],
           ["diamond", DiamondIcon],
           ["ellipse", EllipseIcon],
+          ["triangle", TriangleIcon],
+          ["hexagon", HexagonIcon],
+          ["heart", HeartIcon],
+          ["star", StarIcon],
         ]
       : [];
 

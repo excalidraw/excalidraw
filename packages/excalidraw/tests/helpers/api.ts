@@ -281,8 +281,12 @@ export class API {
       case "rectangle":
       case "diamond":
       case "ellipse":
+      case "triangle":
+      case "hexagon":
+      case "heart":
+      case "star":
         element = newElement({
-          type: type as "rectangle" | "diamond" | "ellipse",
+          type: type as "rectangle" | "diamond" | "ellipse" | "triangle" | "hexagon" | "heart" | "star",
           ...base,
         });
         break;

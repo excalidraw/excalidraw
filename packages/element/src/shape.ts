@@ -60,6 +60,10 @@ import {
   getArrowheadPoints,
   getCenterForBounds,
   getDiamondPoints,
+  getTrianglePoints,
+  getHexagonPoints,
+  getHeartPoints,
+  getStarPoints,
   getElementAbsoluteCoords,
 } from "./bounds";
 import { shouldTestInside } from "./collision";
@@ -230,7 +234,11 @@ export const generateRoughOptions = (
     case "iframe":
     case "embeddable":
     case "diamond":
-    case "ellipse": {
+    case "ellipse":
+    case "triangle":
+    case "hexagon":
+    case "heart":
+    case "star": {
       options.fillStyle = element.fillStyle;
       options.fill = isTransparent(element.backgroundColor)
         ? undefined
@@ -747,6 +755,96 @@ const _generateElementShape = (
       );
       return shape;
     }
+    case "triangle": {
+      const [topX, topY, leftX, leftY, rightX, rightY] = getTrianglePoints(element);
+
+      const shape: ElementShapes[typeof element.type] = generator.polygon(
+        [
+          [topX, topY],
+          [leftX, leftY],
+          [rightX, rightY],
+        ],
+        generateRoughOptions(element, false, isDarkMode),
+      );
+      return shape;
+    }
+    case "hexagon": {
+      const points = getHexagonPoints(element);
+      const polygonPoints: [number, number][] = [];
+      
+      for (let i = 0; i < points.length; i += 2) {
+        polygonPoints.push([points[i], points[i + 1]]);
+      }
+
+      const shape: ElementShapes[typeof element.type] = generator.polygon(
+        polygonPoints,
+        generateRoughOptions(element, false, isDarkMode),
+      );
+      return shape;
+    }
+    case "heart": {
+      const w = element.width;
+      const h = element.height;
+
+      // Improved heart shape with better proportions
+      const shape: ElementShapes[typeof element.type] = generator.path(
+        `M ${w / 2},${h * 0.9}
+         C ${w / 2},${h * 0.9} ${0},${h * 0.5} ${0},${h * 0.3}
+         C ${0},${h * 0.15} ${w * 0.1},${0} ${w * 0.25},${0}
+         C ${w * 0.35},${0} ${w * 0.45},${h * 0.05} ${w / 2},${h * 0.25}
+         C ${w * 0.55},${h * 0.05} ${w * 0.65},${0} ${w * 0.75},${0}
+         C ${w * 0.9},${0} ${w},${h * 0.15} ${w},${h * 0.3}
+         C ${w},${h * 0.5} ${w / 2},${h * 0.9} ${w / 2},${h * 0.9}
+         Z`,
+        generateRoughOptions(element, true, isDarkMode),
+      );
+      return shape;
+    }
+    case "star": {
+      let shape: ElementShapes[typeof element.type];
+      const points = getStarPoints(element);
+      const polygonPoints: [number, number][] = [];
+      
+      for (let i = 0; i < points.length; i += 2) {
+        polygonPoints.push([points[i], points[i + 1]]);
+      }
+
+      if (element.roundness) {
+        const radius = getCornerRadius(Math.min(element.width, element.height) / 10, element);
+        let pathData = `M ${polygonPoints[0][0]} ${polygonPoints[0][1]}`;
+        
+        for (let i = 0; i < polygonPoints.length; i++) {
+          const current = polygonPoints[i];
+          const next = polygonPoints[(i + 1) % polygonPoints.length];
+          const prev = polygonPoints[(i - 1 + polygonPoints.length) % polygonPoints.length];
+          
+          const dx1 = current[0] - prev[0];
+          const dy1 = current[1] - prev[1];
+          const len1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+          const dx2 = next[0] - current[0];
+          const dy2 = next[1] - current[1];
+          const len2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+          
+          const r = Math.min(radius, len1 / 3, len2 / 3);
+          
+          const x1 = current[0] - (dx1 / len1) * r;
+          const y1 = current[1] - (dy1 / len1) * r;
+          const x2 = current[0] + (dx2 / len2) * r;
+          const y2 = current[1] + (dy2 / len2) * r;
+          
+          pathData += ` L ${x1} ${y1} Q ${current[0]} ${current[1]}, ${x2} ${y2}`;
+        }
+        pathData += ' Z';
+        
+        shape = generator.path(pathData, generateRoughOptions(element, true, isDarkMode));
+      } else {
+        shape = generator.polygon(
+          polygonPoints,
+          generateRoughOptions(element, false, isDarkMode),
+        );
+      }
+      return shape;
+    }
     case "line":
     case "arrow": {
       let shape: ElementShapes[typeof element.type];
@@ -952,6 +1050,10 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
   switch (element.type) {
     case "rectangle":
     case "diamond":
+    case "triangle":
+    case "hexagon":
+    case "heart":
+    case "star":
     case "frame":
     case "magicframe":
     case "embeddable":
@@ -959,7 +1061,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
     case "iframe":
     case "text":
     case "selection":
-      return getPolygonShape(element);
+      return getPolygonShape(element as any);
     case "arrow":
     case "line": {
       const roughShape = ShapeCache.generateElementShape(element, null)[0];

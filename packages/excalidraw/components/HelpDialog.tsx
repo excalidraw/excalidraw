@@ -161,6 +161,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[KEYS.O, KEYS["4"]]}
             />
             <Shortcut
+              label={t("toolBar.triangle")}
+              shortcuts={[KEYS.T]}
+            />
+            <Shortcut
               label={t("toolBar.arrow")}
               shortcuts={[KEYS.A, KEYS["5"]]}
             />
@@ -171,10 +175,6 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             <Shortcut
               label={t("toolBar.freedraw")}
               shortcuts={[KEYS.P, KEYS["7"]]}
-            />
-            <Shortcut
-              label={t("toolBar.text")}
-              shortcuts={[KEYS.T, KEYS["8"]]}
             />
             <Shortcut label={t("toolBar.image")} shortcuts={[KEYS["9"]]} />
             <Shortcut

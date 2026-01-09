@@ -354,6 +354,42 @@ export const EllipseIcon = createIcon(
   tablerIconProps,
 );
 
+// custom: triangle
+export const TriangleIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 3l9 18h-18z" />
+  </g>,
+  tablerIconProps,
+);
+
+// custom: hexagon
+export const HexagonIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M19 6.873a2 2 0 0 1 1 1.732v6.79a2 2 0 0 1 -1 1.732l-6 3.464a2 2 0 0 1 -2 0l-6 -3.464a2 2 0 0 1 -1 -1.732v-6.79a2 2 0 0 1 1 -1.732l6 -3.464a2 2 0 0 1 2 0z" />
+  </g>,
+  tablerIconProps,
+);
+
+// custom: heart
+export const HeartIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
+  </g>,
+  tablerIconProps,
+);
+
+// custom: star
+export const StarIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 2l3.09 6.26l6.91 1.01l-5 4.87l1.18 6.88l-6.18 -3.25l-6.18 3.25l1.18 -6.88l-5 -4.87l6.91 -1.01z" />
+  </g>,
+  tablerIconProps,
+);
+
 // tabler-icons: arrow-narrow-right
 export const ArrowIcon = createIcon(
   <g strokeWidth="1.5">
