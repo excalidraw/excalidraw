@@ -36,10 +36,12 @@ import { generateLinearCollisionShape } from "./shape";
 import { isPointInElement } from "./collision";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isRectangularElement } from "./typeChecks";
+import { getBindingGap } from "./binding";
 
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
+  ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
@@ -573,7 +575,7 @@ const getDiagonalsForBindableElement = (
 export const projectFixedPointOntoDiagonal = (
   arrow: ExcalidrawArrowElement,
   point: GlobalPoint,
-  element: ExcalidrawElement,
+  element: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
 ): GlobalPoint | null => {
@@ -582,6 +584,58 @@ export const projectFixedPointOntoDiagonal = (
     return null;
   }
 
+  const center = elementCenterPoint(element, elementsMap);
+  const sideMidpoints = [
+    // TOP midpoint
+    pointRotateRads(
+      pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
+      center,
+      element.angle,
+    ),
+    // RIGHT midpoint
+    pointRotateRads(
+      pointFrom<GlobalPoint>(
+        element.x + element.width,
+        element.y + element.height / 2,
+      ),
+      center,
+      element.angle,
+    ),
+    // BOTTOM midpoint
+    pointRotateRads(
+      pointFrom<GlobalPoint>(
+        element.x + element.width / 2,
+        element.y + element.height,
+      ),
+      center,
+      element.angle,
+    ),
+    // LEFT midpoint
+    pointRotateRads(
+      pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
+      center,
+      element.angle,
+    ),
+  ];
+  const sideMidPoint = sideMidpoints.find((midpoint, idx) => {
+    return (
+      pointDistance(point, midpoint) <= getBindingGap(element, arrow) &&
+      (idx === 0
+        ? point[1] <= midpoint[1]
+        : idx === 1
+        ? point[0] >= midpoint[0]
+        : idx === 2
+        ? point[1] >= midpoint[1]
+        : point[0] <= midpoint[0])
+    );
+  });
+
+  if (sideMidPoint) {
+    return sideMidPoint;
+  }
+
+  // Do the projection onto the diagonals (or center lines
+  // for non-rectangular shapes)
   const [diagonalOne, diagonalTwo] = getDiagonalsForBindableElement(
     element,
     elementsMap,
@@ -609,55 +663,15 @@ export const projectFixedPointOntoDiagonal = (
   const d1 = p1 && pointDistance(a, p1);
   const d2 = p2 && pointDistance(a, p2);
 
-  let p = null;
+  let projection = null;
   if (d1 != null && d2 != null) {
-    p = d1 < d2 ? p1 : p2;
+    projection = d1 < d2 ? p1 : p2;
   } else {
-    p = p1 || p2 || null;
+    projection = p1 || p2 || null;
   }
 
-  if (p && isPointInElement(p, element, elementsMap)) {
-    const center = elementCenterPoint(element, elementsMap);
-    const sideMidpoints = [
-      pointRotateRads(
-        pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
-        center,
-        element.angle,
-      ),
-      pointRotateRads(
-        pointFrom<GlobalPoint>(
-          element.x + element.width,
-          element.y + element.height / 2,
-        ),
-        center,
-        element.angle,
-      ),
-      pointRotateRads(
-        pointFrom<GlobalPoint>(
-          element.x + element.width / 2,
-          element.y + element.height,
-        ),
-        center,
-        element.angle,
-      ),
-      pointRotateRads(
-        pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
-        center,
-        element.angle,
-      ),
-    ];
-    const isPointNearSideMidpoint = sideMidpoints.some(
-      (midpoint) => pointDistance(point, midpoint) <= 30,
-    );
-
-    if (isPointNearSideMidpoint) {
-      return pointFrom<GlobalPoint>(
-        element.x + element.width * 0.5001,
-        element.y + element.height * 0.5001,
-      );
-    }
-
-    return p;
+  if (projection && isPointInElement(projection, element, elementsMap)) {
+    return projection;
   }
 
   return null;
