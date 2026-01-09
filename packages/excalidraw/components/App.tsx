@@ -440,7 +440,13 @@ import {
   isPointHittingLink,
   isPointHittingLinkIcon,
 } from "./hyperlink/helpers";
-import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
+import {
+  MagicIcon,
+  copyIcon,
+  fullscreenIcon,
+  brainIcon,
+  eyeIcon,
+} from "./icons";
 import { Toast } from "./Toast";
 
 import { findShapeByKey } from "./shapes";
@@ -2019,6 +2025,40 @@ class App extends React.Component<AppProps, AppState> {
                                     "button",
                                   )
                                 }
+                              />
+                              <ElementCanvasButton
+                                title="Generate Development Prompt"
+                                icon={brainIcon}
+                                checked={false}
+                                onChange={() => {
+                                  window.dispatchEvent(
+                                    new CustomEvent(
+                                      "excalidraw:generate-prompt-request",
+                                      {
+                                        detail: {
+                                          frameId: firstSelectedElement.id,
+                                        },
+                                      },
+                                    ),
+                                  );
+                                }}
+                              />
+                              <ElementCanvasButton
+                                title="Describe Image"
+                                icon={eyeIcon}
+                                checked={false}
+                                onChange={() => {
+                                  window.dispatchEvent(
+                                    new CustomEvent(
+                                      "excalidraw:describe-image-request",
+                                      {
+                                        detail: {
+                                          frameId: firstSelectedElement.id,
+                                        },
+                                      },
+                                    ),
+                                  );
+                                }}
                               />
                             </ElementCanvasButtons>
                           )}

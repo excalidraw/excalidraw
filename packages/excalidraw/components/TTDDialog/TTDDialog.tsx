@@ -372,6 +372,14 @@ export const TTDDialogBase = withInternalFallback(
                     onKeyboardSubmit={() => {
                       refOnGenerate.current();
                     }}
+                    onVoiceInput={(transcript) => {
+                      setText(transcript);
+                      setTtdGeneration((s) => ({
+                        generatedResponse: s?.generatedResponse ?? null,
+                        prompt: transcript,
+                      }));
+                    }}
+                    voiceDisabled={onTextSubmitInProgess}
                   />
                 </TTDDialogPanel>
                 <TTDDialogPanel

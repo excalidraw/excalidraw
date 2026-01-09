@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 
 import { EVENT, KEYS } from "@excalidraw/common";
 
+import { VoiceButton } from "./VoiceButton";
+
 import type { ChangeEventHandler } from "react";
 
 interface TTDDialogInputProps {
@@ -9,6 +11,8 @@ interface TTDDialogInputProps {
   placeholder: string;
   onChange: ChangeEventHandler<HTMLTextAreaElement>;
   onKeyboardSubmit?: () => void;
+  onVoiceInput?: (text: string) => void;
+  voiceDisabled?: boolean;
 }
 
 export const TTDDialogInput = ({
@@ -16,6 +20,8 @@ export const TTDDialogInput = ({
   placeholder,
   onChange,
   onKeyboardSubmit,
+  onVoiceInput,
+  voiceDisabled,
 }: TTDDialogInputProps) => {
   const ref = useRef<HTMLTextAreaElement>(null);
 
@@ -43,12 +49,17 @@ export const TTDDialogInput = ({
   }, []);
 
   return (
-    <textarea
-      className="ttd-dialog-input"
-      onChange={onChange}
-      value={input}
-      placeholder={placeholder}
-      ref={ref}
-    />
+    <div className="ttd-dialog-input-container">
+      <textarea
+        className="ttd-dialog-input"
+        onChange={onChange}
+        value={input}
+        placeholder={placeholder}
+        ref={ref}
+      />
+      {onVoiceInput && (
+        <VoiceButton onTranscript={onVoiceInput} disabled={voiceDisabled} />
+      )}
+    </div>
   );
 };

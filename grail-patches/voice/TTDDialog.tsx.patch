@@ -1,0 +1,19 @@
+diff --git a/packages/excalidraw/components/TTDDialog/TTDDialog.tsx b/packages/excalidraw/components/TTDDialog/TTDDialog.tsx
+index 68d230d2..793e8ce7 100644
+--- a/packages/excalidraw/components/TTDDialog/TTDDialog.tsx
++++ b/packages/excalidraw/components/TTDDialog/TTDDialog.tsx
+@@ -372,6 +372,14 @@ export const TTDDialogBase = withInternalFallback(
+                     onKeyboardSubmit={() => {
+                       refOnGenerate.current();
+                     }}
++                    onVoiceInput={(transcript) => {
++                      setText(transcript);
++                      setTtdGeneration((s) => ({
++                        generatedResponse: s?.generatedResponse ?? null,
++                        prompt: transcript,
++                      }));
++                    }}
++                    voiceDisabled={onTextSubmitInProgess}
+                   />
+                 </TTDDialogPanel>
+                 <TTDDialogPanel

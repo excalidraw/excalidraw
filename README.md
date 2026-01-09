@@ -42,6 +42,8 @@ ExcalidrawGrail is a fork of [Excalidraw](https://github.com/excalidraw/excalidr
 - **Multi-LLM Support** - Choose between OpenAI, Anthropic Claude, or Ollama
 - **Text-to-Diagram** - Describe a diagram in natural language, get Mermaid output rendered as shapes
 - **Diagram-to-Code** - Draw a wireframe, convert it to HTML/CSS with vision AI
+- **Wireframe-to-Prompt** - Generate comprehensive development prompts from wireframes
+- **Image Description** - Analyze and describe any image with AI vision
 - **Privacy-First** - Your API keys stay in your browser (localStorage)
 - **Self-Hosted** - Run locally with Ollama, no external API calls required
 - **Model Selection** - Pick any model available from your chosen provider
@@ -60,6 +62,25 @@ ExcalidrawGrail is a fork of [Excalidraw](https://github.com/excalidraw/excalidr
     </td>
   </tr>
 </table>
+
+## AI Frame
+
+The AI Frame is a special canvas element that enables vision-based AI features.
+
+<div align="center">
+  <img src="assets/screenshot-aiframe-buttons.png" alt="AI Frame Buttons" height="120" />
+</div>
+
+| Button | Feature | Description |
+|:------:|---------|-------------|
+| 🪄 | **Diagram-to-Code** | Converts wireframe drawings to HTML/CSS |
+| 🧠 | **Wireframe-to-Prompt** | Generates development prompts from designs |
+| 👁️ | **Image Description** | Analyzes and describes images with AI vision |
+
+<div align="center">
+  <img src="assets/screenshot-image-describe.png" alt="Image Description Demo" width="800" /><br />
+  <em>Image Description: AI analyzes photos and generates detailed descriptions</em>
+</div>
 
 ## Quick Start
 
@@ -106,9 +127,67 @@ Open `http://localhost:5173` and click **Menu > AI Settings** to configure.
 
 ### Diagram-to-Code
 
-1. Draw a wireframe inside a frame
-2. Click "Generate code" on the frame
-3. AI analyzes the drawing and generates HTML/CSS
+1. Draw a wireframe inside an AI Frame
+2. Click the magic wand icon [🪄] on the frame
+3. AI analyzes the drawing and generates HTML/CSS in a preview iframe
+
+### Wireframe-to-Prompt
+
+1. Draw a wireframe inside an AI Frame
+2. Click the brain icon [🧠] on the frame
+3. AI generates a comprehensive development prompt with:
+   - App overview and target users
+   - Core features breakdown
+   - Tech stack recommendations
+   - File structure and components
+   - Data models and API endpoints
+
+### Image Description
+
+1. Insert an image inside an AI Frame
+2. Click the eye icon [👁️] on the frame
+3. AI analyzes and describes the image with:
+   - Visual description (subjects, objects, setting)
+   - Colors and artistic style
+   - Context and mood
+   - Suggested tags
+
+## Docker
+
+### Development
+```bash
+docker compose up
+```
+Open `http://localhost:3000`
+
+### Production
+```bash
+docker build -t excalidrawgrail .
+docker run -p 80:80 excalidrawgrail
+```
+
+## Syncing with Upstream
+
+ExcalidrawGrail is a fork. To get updates from the original Excalidraw:
+
+### Setup (once)
+```bash
+git remote add upstream https://github.com/excalidraw/excalidraw.git
+```
+
+### Sync
+```bash
+git fetch upstream
+git checkout master
+git merge upstream/master
+git push origin master
+```
+
+### Rebase feature branches
+```bash
+git checkout your-feature-branch
+git rebase master
+```
 
 ## Development
 
@@ -124,9 +203,14 @@ yarn build-node      # Build packages
 ```
 excalidraw-app/
 ├── components/
-│   ├── AI.tsx              # Multi-provider AI logic
-│   ├── AISettingsDialog.tsx # Settings UI
-│   └── AppMainMenu.tsx     # Menu with AI Settings
+│   ├── AI.tsx                       # Multi-provider AI logic
+│   ├── AISettingsDialog.tsx         # Settings UI
+│   ├── MagicFramePromptGenerator.tsx # Wireframe-to-prompt
+│   └── AppMainMenu.tsx              # Menu with AI Settings
+grail-patches/
+├── voice/                           # Voice input patches
+├── prompt-mode/                     # Prompt generation patches
+└── apply-patches.sh                 # Postinstall patch script
 packages/
 ├── excalidraw/             # Core editor
 ├── common/                 # Shared constants

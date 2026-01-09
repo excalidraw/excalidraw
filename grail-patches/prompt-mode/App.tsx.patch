@@ -1,0 +1,43 @@
+diff --git a/packages/excalidraw/components/App.tsx b/packages/excalidraw/components/App.tsx
+index 853a3104..7da9cf06 100644
+--- a/packages/excalidraw/components/App.tsx
++++ b/packages/excalidraw/components/App.tsx
+@@ -440,7 +440,13 @@ import {
+   isPointHittingLink,
+   isPointHittingLinkIcon,
+ } from "./hyperlink/helpers";
+-import { MagicIcon, copyIcon, fullscreenIcon, brainIcon } from "./icons";
++import {
++  MagicIcon,
++  copyIcon,
++  fullscreenIcon,
++  brainIcon,
++  eyeIcon,
++} from "./icons";
+ import { Toast } from "./Toast";
+ 
+ import { findShapeByKey } from "./shapes";
+@@ -2037,6 +2043,23 @@ class App extends React.Component<AppProps, AppState> {
+                                   );
+                                 }}
+                               />
++                              <ElementCanvasButton
++                                title="Describe Image"
++                                icon={eyeIcon}
++                                checked={false}
++                                onChange={() => {
++                                  window.dispatchEvent(
++                                    new CustomEvent(
++                                      "excalidraw:describe-image-request",
++                                      {
++                                        detail: {
++                                          frameId: firstSelectedElement.id,
++                                        },
++                                      },
++                                    ),
++                                  );
++                                }}
++                              />
+                             </ElementCanvasButtons>
+                           )}
+                         {selectedElements.length === 1 &&
