@@ -4,3 +4,5 @@ import "@excalidraw/excalidraw/css";
 interface Window {
   __EXCALIDRAW_SHA__: string | undefined;
 }
+
+declare module "tui-image-editor";

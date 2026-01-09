@@ -76,3 +76,15 @@ export interface AgentResponse {
   actions?: AgentAction[];
   error?: string;
 }
+
+export type ImageToolAction =
+  | "crop"
+  | "edit"
+  | "extend"
+  | "upscale"
+  | "layers";
+
+export type ImageToolRequest = {
+  action: ImageToolAction;
+  elementId: string;
+};

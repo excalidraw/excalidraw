@@ -1,22 +1,47 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useAtom } from "jotai";
+import { isImageElement } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/element";
 import { isSidebarOpenAtom, sidebarWidthAtom } from "./atoms";
-import { getAvailableTemplates, type Template } from "./templates";
+import type {
+  BinaryFiles,
+  ExcalidrawImperativeAPI,
+} from "@excalidraw/excalidraw/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ImageToolAction } from "./types";
 import "./SidebarDrawer.scss";
 
 interface SidebarDrawerProps {
-  onLoadTemplate?: (template: Template) => void;
+  excalidrawAPI: ExcalidrawImperativeAPI | null;
+  elements: readonly ExcalidrawElement[];
+  files: BinaryFiles;
+  selectedImageId: string | null;
+  onImageToolAction: (action: ImageToolAction) => void;
+  onExportCanvas: () => void;
+  onExportSelection: () => void;
 }
 
 export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({
-  onLoadTemplate,
+  excalidrawAPI,
+  elements,
+  files,
+  selectedImageId,
+  onImageToolAction,
+  onExportCanvas,
+  onExportSelection,
 }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useAtom(isSidebarOpenAtom);
   const [sidebarWidth, setSidebarWidth] = useAtom(sidebarWidthAtom);
-  const [activeTab, setActiveTab] = useState<"templates" | "layers">(
-    "templates",
-  );
   const [isResizing, setIsResizing] = useState(false);
+
+  const imageAssets = useMemo(() => {
+    return elements
+      .filter((element) => isImageElement(element))
+      .map((element) => ({
+        element,
+        file: files[element.fileId],
+      }));
+  }, [elements, files]);
 
   const handleMouseDown = () => {
     setIsResizing(true);
@@ -26,7 +51,7 @@ export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({
     const handleMouseMove = (e: MouseEvent) => {
       if (!isResizing) return;
 
-      const newWidth = Math.max(200, Math.min(400, e.clientX));
+      const newWidth = Math.max(220, Math.min(420, e.clientX));
       setSidebarWidth(newWidth);
     };
 
@@ -45,6 +70,25 @@ export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({
     };
   }, [isResizing, setSidebarWidth]);
 
+  const handleSelectAsset = (elementId: string) => {
+    if (!excalidrawAPI) {
+      return;
+    }
+
+    excalidrawAPI.updateScene({
+      appState: {
+        selectedElementIds: {
+          [elementId]: true,
+        },
+      },
+      captureUpdate: CaptureUpdateAction.NEVER,
+    });
+    const target = elements.find((element) => element.id === elementId);
+    if (target) {
+      excalidrawAPI.scrollToContent([target]);
+    }
+  };
+
   if (!isSidebarOpen) {
     return null;
   }
@@ -52,7 +96,7 @@ export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({
   return (
     <div className="chatcanvas-sidebar" style={{ width: `${sidebarWidth}px` }}>
       <div className="chatcanvas-sidebar__header">
-        <h2 className="chatcanvas-sidebar__title">Assets</h2>
+        <h2 className="chatcanvas-sidebar__title">Image Design</h2>
         <button
           className="chatcanvas-sidebar__close"
           onClick={() => setIsSidebarOpen(false)}
@@ -62,62 +106,88 @@ export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({
         </button>
       </div>
 
-      {/* Tabs */}
-      <div className="chatcanvas-sidebar__tabs">
-        <button
-          className={`chatcanvas-sidebar__tab ${
-            activeTab === "templates" ? "chatcanvas-sidebar__tab--active" : ""
-          }`}
-          onClick={() => setActiveTab("templates")}
-        >
-          Templates
-        </button>
-        <button
-          className={`chatcanvas-sidebar__tab ${
-            activeTab === "layers" ? "chatcanvas-sidebar__tab--active" : ""
-          }`}
-          onClick={() => setActiveTab("layers")}
-        >
-          Layers
-        </button>
-      </div>
-
-      {/* Content */}
       <div className="chatcanvas-sidebar__content">
-        {activeTab === "templates" && (
-          <div className="chatcanvas-sidebar__templates">
-            {getAvailableTemplates().map((template) => (
-              <div
-                key={template.id}
-                className="chatcanvas-sidebar__template-item"
-                onClick={() => onLoadTemplate?.(template)}
+        <section className="chatcanvas-sidebar__section">
+          <div className="chatcanvas-sidebar__section-title">Image Tools</div>
+          <div className="chatcanvas-sidebar__tool-grid">
+            {(
+              [
+                ["crop", "Crop"],
+                ["edit", "Edit"],
+                ["extend", "Extend"],
+                ["upscale", "Upscale"],
+                ["layers", "Layers"],
+              ] as const
+            ).map(([action, label]) => (
+              <button
+                key={action}
+                className="chatcanvas-sidebar__tool"
+                onClick={() => onImageToolAction(action)}
+                disabled={!selectedImageId}
               >
-                <div className="chatcanvas-sidebar__template-thumbnail">
-                  {template.thumbnail}
-                </div>
-                <div className="chatcanvas-sidebar__template-info">
-                  <div className="chatcanvas-sidebar__template-name">
-                    {template.name}
-                  </div>
-                  <div className="chatcanvas-sidebar__template-desc">
-                    {template.description}
-                  </div>
-                </div>
-              </div>
+                {label}
+              </button>
             ))}
           </div>
-        )}
+        </section>
 
-        {activeTab === "layers" && (
-          <div className="chatcanvas-sidebar__layers">
+        <section className="chatcanvas-sidebar__section">
+          <div className="chatcanvas-sidebar__section-title">Assets</div>
+          {imageAssets.length ? (
+            <div className="chatcanvas-sidebar__assets">
+              {imageAssets.map(({ element, file }) => (
+                <button
+                  key={element.id}
+                  className={`chatcanvas-sidebar__asset ${
+                    element.id === selectedImageId
+                      ? "chatcanvas-sidebar__asset--active"
+                      : ""
+                  }`}
+                  onClick={() => handleSelectAsset(element.id)}
+                >
+                  <div className="chatcanvas-sidebar__asset-thumb">
+                    {file?.dataURL ? (
+                      <img src={file.dataURL} alt="asset" />
+                    ) : (
+                      <div className="chatcanvas-sidebar__asset-placeholder">
+                        No preview
+                      </div>
+                    )}
+                  </div>
+                  <div className="chatcanvas-sidebar__asset-meta">
+                    <span>Image</span>
+                    <small>{element.id}</small>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
             <p className="chatcanvas-sidebar__placeholder">
-              Layers panel coming soon
+              No image assets yet.
             </p>
+          )}
+        </section>
+
+        <section className="chatcanvas-sidebar__section">
+          <div className="chatcanvas-sidebar__section-title">Export</div>
+          <div className="chatcanvas-sidebar__export">
+            <button
+              className="chatcanvas-sidebar__tool"
+              onClick={onExportCanvas}
+            >
+              Export Canvas
+            </button>
+            <button
+              className="chatcanvas-sidebar__tool"
+              onClick={onExportSelection}
+              disabled={!selectedImageId}
+            >
+              Export Selected Image
+            </button>
           </div>
-        )}
+        </section>
       </div>
 
-      {/* Resize Handle */}
       <div
         className="chatcanvas-sidebar__resizer"
         onMouseDown={handleMouseDown}

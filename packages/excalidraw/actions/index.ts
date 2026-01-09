@@ -89,3 +89,10 @@ export { actionToggleLinearEditor } from "./actionLinearEditor";
 export { actionToggleSearchMenu } from "./actionToggleSearchMenu";
 
 export { actionToggleCropEditor } from "./actionCropEditor";
+export {
+  actionImageCrop,
+  actionImageEdit,
+  actionImageExtend,
+  actionImageUpscale,
+  actionImageLayers,
+} from "./actionImageTools";

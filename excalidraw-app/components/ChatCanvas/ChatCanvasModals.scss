@@ -1,0 +1,123 @@
+.chatcanvas-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 15, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.chatcanvas-modal {
+  background: var(--color-surface, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25);
+  width: min(960px, 92vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chatcanvas-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border, #e0e0e0);
+  background: var(--color-surface-secondary, #f9f9f9);
+}
+
+.chatcanvas-modal__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #333333);
+}
+
+.chatcanvas-modal__body {
+  padding: 20px;
+  overflow: auto;
+}
+
+.chatcanvas-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--color-border, #e0e0e0);
+  background: var(--color-surface-secondary, #f9f9f9);
+}
+
+.chatcanvas-modal__button {
+  border: 1px solid var(--color-border, #e0e0e0);
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text-primary, #333333);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-primary, #2196f3);
+    color: var(--color-primary, #2196f3);
+  }
+
+  &--primary {
+    background: var(--color-primary, #2196f3);
+    border-color: var(--color-primary, #2196f3);
+    color: #ffffff;
+
+    &:hover {
+      background: var(--color-primary-dark, #1976d2);
+      border-color: var(--color-primary-dark, #1976d2);
+      color: #ffffff;
+    }
+  }
+}
+
+.chatcanvas-modal__form {
+  display: grid;
+  gap: 12px;
+}
+
+.chatcanvas-modal__form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.chatcanvas-modal__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary, #666666);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chatcanvas-modal__input,
+.chatcanvas-modal__select,
+.chatcanvas-modal__textarea {
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--color-text-primary, #333333);
+  background: #ffffff;
+}
+
+.chatcanvas-modal__hint {
+  font-size: 12px;
+  color: var(--color-text-secondary, #888888);
+}
+
+.chatcanvas-cropper {
+  max-width: 100%;
+  max-height: 60vh;
+}
+
+.chatcanvas-image-editor {
+  height: 600px;
+}
