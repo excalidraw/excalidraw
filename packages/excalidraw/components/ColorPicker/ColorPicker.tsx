@@ -5,6 +5,7 @@ import { useRef, useEffect } from "react";
 import {
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
   COLOR_PALETTE,
+  isColorDark,
   isWritableElement,
 } from "@excalidraw/common";
 
@@ -29,7 +30,7 @@ import { ColorInput } from "./ColorInput";
 import { Picker } from "./Picker";
 import PickerHeading from "./PickerHeading";
 import { TopPicks } from "./TopPicks";
-import { activeColorPickerSectionAtom, isColorDark } from "./colorPickerUtils";
+import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 
 import "./ColorPicker.scss";
 

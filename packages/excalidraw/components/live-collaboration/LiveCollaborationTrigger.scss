@@ -1,4 +1,4 @@
-@import "../../css/variables.module.scss";
+@use "../../css/variables.module" as *;
 
 .excalidraw {
   .collab-button {
@@ -58,8 +58,8 @@
     bottom: -5px;
     padding: 3px;
     border-radius: 50%;
-    background-color: $oc-green-2;
-    color: $oc-green-9;
+    background-color: $color-green-2;
+    color: $color-green-9;
     font-size: 0.6rem;
     font-family: "Cascadia";
   }
