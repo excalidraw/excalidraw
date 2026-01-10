@@ -1591,7 +1591,7 @@ describe("history", () => {
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
           fixedPoint: expect.arrayContaining([
-            0.5379561888991137, 0.5379561888991137,
+            0.5494504863123428, 0.549450486312343,
           ]),
           mode: "orbit",
         });
@@ -1616,7 +1616,7 @@ describe("history", () => {
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
           fixedPoint: expect.arrayContaining([
-            0.5379561888991137, 0.5379561888991137,
+            0.5494504863123428, 0.549450486312343,
           ]),
           mode: "orbit",
         });
@@ -1641,7 +1641,7 @@ describe("history", () => {
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
           fixedPoint: expect.arrayContaining([
-            0.5379561888991137, 0.5379561888991137,
+            0.5494504863123428, 0.549450486312343,
           ]),
           mode: "orbit",
         });
@@ -1674,7 +1674,7 @@ describe("history", () => {
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
           fixedPoint: expect.arrayContaining([
-            0.5379561888991137, 0.5379561888991137,
+            0.5494504863123428, 0.549450486312343,
           ]),
           mode: "orbit",
         });
@@ -1699,7 +1699,7 @@ describe("history", () => {
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
           fixedPoint: expect.arrayContaining([
-            0.5379561888991137, 0.5379561888991137,
+            0.5494504863123428, 0.549450486312343,
           ]),
           mode: "orbit",
         });
@@ -4633,12 +4633,12 @@ describe("history", () => {
                 id: arrowId,
                 startBinding: expect.objectContaining({
                   elementId: rect1.id,
-                  fixedPoint: [0.6363636363636364, 0.6363636363636364],
+                  fixedPoint: [0.5001, 0.5001],
                   mode: "orbit",
                 }),
                 endBinding: expect.objectContaining({
                   elementId: rect2.id,
-                  fixedPoint: [0.41019091151895054, 0.5898090884810495],
+                  fixedPoint: [0, 0.5001],
                   mode: "orbit",
                 }),
               }),
@@ -4776,13 +4776,13 @@ describe("history", () => {
                 id: arrowId,
                 startBinding: expect.objectContaining({
                   elementId: rect1.id,
-                  fixedPoint: [0.6363636363636364, 0.6363636363636364],
+                  fixedPoint: [0.5001, 0.5001],
                   mode: "orbit",
                 }),
                 // rebound with previous rectangle
                 endBinding: expect.objectContaining({
                   elementId: rect2.id,
-                  fixedPoint: [0.39511653718091, 0.6048834628190899],
+                  fixedPoint: [0, 0.5001],
                   mode: "orbit",
                 }),
               }),
@@ -5062,12 +5062,12 @@ describe("history", () => {
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
                 fixedPoint: expect.arrayContaining([
-                  0.548442798411514, 0.548442798411514,
+                  0.548383798101935, 0.548383798101935,
                 ]),
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
-                fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
+                fixedPoint: expect.arrayContaining([0, 0.5001]),
               }),
               isDeleted: true,
             }),
