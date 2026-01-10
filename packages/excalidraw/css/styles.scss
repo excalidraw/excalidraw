@@ -1,5 +1,5 @@
-@import "./variables.module.scss";
-@import "./theme";
+@use "./variables.module" as *;
+@use "./theme";
 
 :root {
   --zIndex-canvas: 1;
@@ -210,7 +210,7 @@ body.excalidraw-cursor-resize * {
 
   .divider {
     width: 1px;
-    background-color: $oc-gray-2;
+    background-color: $color-gray-2;
     margin: 1px;
   }
 
@@ -729,8 +729,8 @@ body.excalidraw-cursor-resize * {
     justify-content: center;
 
     padding: 40px;
-    background-color: $oc-red-1;
-    border: 3px solid $oc-red-9;
+    background-color: $color-red-1;
+    border: 3px solid $color-red-9;
   }
 
   .ErrorSplash-paragraph {

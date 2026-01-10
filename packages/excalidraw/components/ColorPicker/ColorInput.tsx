@@ -1,9 +1,7 @@
 import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { isTransparent, KEYS } from "@excalidraw/common";
-
-import tinycolor from "tinycolor2";
+import { KEYS, normalizeInputColor } from "@excalidraw/common";
 
 import { getShortcutKey } from "../..//shortcut";
 import { useAtom } from "../../editor-jotai";
@@ -15,29 +13,6 @@ import { eyeDropperIcon } from "../icons";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 
 import type { ColorPickerType } from "./colorPickerUtils";
-
-/**
- * tries to keep the input color as-is if it's valid, making minimal adjustments
- * (trimming whitespace or adding `#` to hex colors)
- */
-export const normalizeInputColor = (color: string): string | null => {
-  color = color.trim();
-  if (isTransparent(color)) {
-    return color;
-  }
-
-  const tc = tinycolor(color);
-  if (tc.isValid()) {
-    // testing for `#` first fixes a bug on Electron (more specfically, an
-    // Obsidian popout window), where a hex color without `#` is considered valid
-    if (tc.getFormat() === "hex" && !color.startsWith("#")) {
-      return `#${color}`;
-    }
-    return color;
-  }
-
-  return null;
-};
 
 export const ColorInput = ({
   color,
