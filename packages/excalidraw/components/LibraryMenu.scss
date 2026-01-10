@@ -1,4 +1,4 @@
-@import "open-color/open-color";
+@use "../css/variables.module" as *;
 
 .excalidraw {
   .layer-ui__library {
@@ -46,15 +46,15 @@
     }
 
     &-close.ToolIcon_type_button {
-      background-color: $oc-blue-6;
+      background-color: $color-blue-6;
       align-self: flex-end;
       &:hover {
-        background-color: $oc-blue-8;
+        background-color: $color-blue-8;
       }
       .ToolIcon__icon {
         width: auto;
         font-size: 1rem;
-        color: $oc-white;
+        color: #fff;
         padding: 0 0.5rem;
       }
     }
@@ -90,7 +90,7 @@
 
     border-radius: var(--border-radius-lg);
     background-color: var(--color-primary);
-    color: $oc-white;
+    color: #fff;
     text-align: center;
     white-space: nowrap;
     text-decoration: none !important;

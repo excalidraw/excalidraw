@@ -1,8 +1,4 @@
-import {
-  isTransparent,
-  MAX_CUSTOM_COLORS_USED_IN_CANVAS,
-  tinycolor,
-} from "@excalidraw/common";
+import { MAX_CUSTOM_COLORS_USED_IN_CANVAS } from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -99,32 +95,6 @@ export type ActiveColorPickerSectionAtomType =
   | null;
 export const activeColorPickerSectionAtom =
   atom<ActiveColorPickerSectionAtomType>(null);
-
-const calculateContrast = (r: number, g: number, b: number): number => {
-  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-  return yiq;
-};
-
-// YIQ algo, inspiration from https://stackoverflow.com/a/11868398
-export const isColorDark = (color: string, threshold = 160): boolean => {
-  // no color ("") -> assume it default to black
-  if (!color) {
-    return true;
-  }
-
-  if (isTransparent(color)) {
-    return false;
-  }
-
-  const tc = tinycolor(color);
-  if (!tc.isValid()) {
-    // invalid color -> assume it defaults to black
-    return true;
-  }
-
-  const { r, g, b } = tc.toRgb();
-  return calculateContrast(r, g, b) < threshold;
-};
 
 export type ColorPickerType =
   | "canvasBackground"
