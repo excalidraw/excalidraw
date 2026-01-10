@@ -27,7 +27,10 @@ import { isCurve } from "@excalidraw/math/curve";
 import React from "react";
 
 import type { Curve } from "@excalidraw/math";
-import type { DebugElement } from "@excalidraw/common";
+import type {
+  DebugElement,
+  DebugPolygon,
+} from "@excalidraw/element/visualdebug";
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
@@ -74,6 +77,44 @@ const renderCubicBezier = (
   context.stroke();
   context.restore();
 };
+
+const renderPolygon = (
+  context: CanvasRenderingContext2D,
+  zoom: number,
+  polygon: DebugPolygon,
+  color: string,
+) => {
+  const { points, fill, close } = polygon;
+
+  if (points.length < 2) {
+    return;
+  }
+
+  context.save();
+  context.beginPath();
+  context.moveTo(points[0][0] * zoom, points[0][1] * zoom);
+  for (let i = 1; i < points.length; i += 1) {
+    context.lineTo(points[i][0] * zoom, points[i][1] * zoom);
+  }
+  if (close !== false) {
+    context.closePath();
+  }
+
+  if (fill) {
+    context.save();
+    context.globalAlpha = 0.15;
+    context.fillStyle = color;
+    context.fill();
+    context.restore();
+  }
+
+  context.strokeStyle = color;
+  context.stroke();
+  context.restore();
+};
+
+const isDebugPolygon = (data: DebugElement["data"]): data is DebugPolygon =>
+  (data as DebugPolygon).type === "polygon";
 
 const renderOrigin = (context: CanvasRenderingContext2D, zoom: number) => {
   context.strokeStyle = "#888";
@@ -279,6 +320,9 @@ const render = (
           el.data as Curve<GlobalPoint>,
           el.color,
         );
+        break;
+      case isDebugPolygon(el.data):
+        renderPolygon(context, appState.zoom.value, el.data, el.color);
         break;
       default:
         throw new Error(`Unknown element type ${JSON.stringify(el)}`);

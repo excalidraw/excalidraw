@@ -34,6 +34,7 @@ import {
 import {
   getAllHoveredElementAtPoint,
   getHoveredElementForBinding,
+  hitElementItself,
   intersectElementWithLineSegment,
   isBindableElementInsideOtherBindable,
   isPointInElement,
@@ -51,6 +52,7 @@ import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
   isArrowElement,
   isBindableElement,
+  isBindingElement,
   isBoundToContainer,
   isElbowArrow,
   isRectangularElement,
@@ -135,6 +137,317 @@ export const maxBindingDistance_simple = (zoom?: AppState["zoom"]): number => {
     BASE_BINDING_DISTANCE,
     BASE_BINDING_DISTANCE * 2,
   );
+};
+
+export const isFocusPointVisible = (
+  focusPoint: GlobalPoint,
+  arrow: ExcalidrawArrowElement,
+  bindableElement: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+  ignoreOverlap = false,
+): boolean => {
+  // No focus point management for elbow arrows, because elbow arrows
+  // always have their focus point at the arrow point itself
+  if (isElbowArrow(arrow)) {
+    return false;
+  }
+
+  // Avoid showing the focus point indicator if the focus point is essentially
+  // on top of the arrow point it belongs to itself, if not ignoring specifically
+  if (!ignoreOverlap) {
+    const associatedPointIdx =
+      arrow.startBinding?.elementId === bindableElement.id
+        ? 0
+        : arrow.points.length - 1;
+    const associatedArrowPoint =
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        arrow,
+        associatedPointIdx,
+        elementsMap,
+      );
+
+    if (pointDistanceSq(focusPoint, associatedArrowPoint) < 1) {
+      return false;
+    }
+  }
+
+  // Check if the focus point is within the element's shape bounds
+  return hitElementItself({
+    element: bindableElement,
+    elementsMap,
+    point: focusPoint,
+    threshold: getBindingGap(bindableElement, arrow),
+    overrideShouldTestInside: true,
+  });
+};
+
+export const handleFocusPointDrag = (
+  linearElementEditor: LinearElementEditor,
+  elementsMap: NonDeletedSceneElementsMap,
+  pointerCoords: { x: number; y: number },
+  scene: Scene,
+): boolean => {
+  const arrow = LinearElementEditor.getElement(
+    linearElementEditor.elementId,
+    elementsMap,
+  ) as any;
+
+  if (!arrow || !isBindingElement(arrow) || isElbowArrow(arrow)) {
+    return false;
+  }
+
+  const isStartBinding =
+    linearElementEditor.hoveredFocusPointBinding === "start";
+  const binding = isStartBinding ? arrow.startBinding : arrow.endBinding;
+
+  if (binding?.elementId) {
+    const bindableElement = elementsMap.get(
+      binding.elementId,
+    ) as ExcalidrawBindableElement;
+    if (
+      bindableElement &&
+      isBindableElement(bindableElement) &&
+      !bindableElement.isDeleted
+    ) {
+      let point = pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y);
+      const center = pointFrom<GlobalPoint>(
+        bindableElement.x + bindableElement.width / 2,
+        bindableElement.y + bindableElement.height / 2,
+      );
+
+      // Check if the new focus point position is
+      // within bindable element bounds
+      if (
+        !isFocusPointVisible(point, arrow, bindableElement, elementsMap, true)
+      ) {
+        const otherPoint = pointFromVector(
+          vectorScale(
+            vectorNormalize(vectorFromPoint(point, center, 0.1)),
+            Math.max(bindableElement.width, bindableElement.height) * 2,
+          ),
+          center,
+        );
+        point = intersectElementWithLineSegment(
+          bindableElement,
+          elementsMap,
+          lineSegment(center, otherPoint),
+          getBindingGap(bindableElement, arrow) - 0.1,
+        )[0];
+
+        invariant(
+          point,
+          "Ray from center with length double the largest side must intersect the " +
+            "outline of the element",
+        );
+      }
+
+      const nonRotatedPoint = pointRotateRads<GlobalPoint>(
+        point,
+        center,
+        -bindableElement.angle as Radians,
+      );
+
+      // Calculate fixed point ratio (0-1)
+      const fixedX =
+        (nonRotatedPoint[0] - bindableElement.x) / bindableElement.width;
+      const fixedY =
+        (nonRotatedPoint[1] - bindableElement.y) / bindableElement.height;
+      const bindingField = isStartBinding ? "startBinding" : "endBinding";
+      const updatedBinding = {
+        ...binding,
+        fixedPoint: [fixedX, fixedY] as [number, number],
+      };
+
+      // Update the binding on the arrow
+      scene.mutateElement(arrow, {
+        [bindingField]: updatedBinding,
+      });
+
+      // Update bindings
+      const pointUpdates = new Map();
+      const pointIndex = isStartBinding ? 0 : arrow.points.length - 1;
+      const newPoint = updateBoundPoint(
+        arrow,
+        bindingField as "startBinding" | "endBinding",
+        updatedBinding,
+        bindableElement,
+        elementsMap,
+      );
+
+      if (newPoint) {
+        pointUpdates.set(pointIndex, { point: newPoint });
+      }
+
+      // Also update the adjacent end if it has a binding
+      const adjacentBindingField = isStartBinding
+        ? "endBinding"
+        : "startBinding";
+      const adjacentBinding = isStartBinding
+        ? arrow.endBinding
+        : arrow.startBinding;
+
+      if (adjacentBinding?.elementId) {
+        const adjacentBindableElement = elementsMap.get(
+          adjacentBinding.elementId,
+        ) as ExcalidrawBindableElement;
+
+        if (
+          adjacentBindableElement &&
+          isBindableElement(adjacentBindableElement) &&
+          !adjacentBindableElement.isDeleted
+        ) {
+          const adjacentPointIndex = isStartBinding
+            ? arrow.points.length - 1
+            : 0;
+
+          const adjacentNewPoint = updateBoundPoint(
+            arrow,
+            adjacentBindingField as "startBinding" | "endBinding",
+            adjacentBinding,
+            adjacentBindableElement,
+            elementsMap,
+          );
+
+          if (adjacentNewPoint) {
+            pointUpdates.set(adjacentPointIndex, {
+              point: adjacentNewPoint,
+            });
+          }
+        }
+      }
+
+      // Filter out undefined values before passing to movePoints
+      const filteredUpdates = new Map<number, { point: LocalPoint }>(
+        Array.from(pointUpdates.entries()).filter(
+          (entry): entry is [number, { point: LocalPoint }] =>
+            entry[1] !== undefined,
+        ),
+      );
+
+      if (filteredUpdates.size > 0) {
+        LinearElementEditor.movePoints(arrow, scene, filteredUpdates);
+      }
+    }
+  }
+
+  return true;
+};
+
+export const handleFocusPointPointerDown = (
+  arrow: ExcalidrawArrowElement,
+  pointerDownState: { origin: { x: number; y: number } },
+  elementsMap: NonDeletedSceneElementsMap,
+  zoom: AppState["zoom"],
+): "start" | "end" | null => {
+  const pointerPos = pointFrom(
+    pointerDownState.origin.x,
+    pointerDownState.origin.y,
+  );
+  const hitThreshold = 5 / zoom.value;
+
+  // Check start binding focus point
+  if (arrow.startBinding?.elementId) {
+    const bindableElement = elementsMap.get(arrow.startBinding.elementId);
+    if (
+      bindableElement &&
+      isBindableElement(bindableElement) &&
+      !bindableElement.isDeleted
+    ) {
+      const focusPoint = getGlobalFixedPointForBindableElement(
+        arrow.startBinding.fixedPoint,
+        bindableElement,
+        elementsMap,
+      );
+      if (
+        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap) &&
+        pointDistance(pointerPos, focusPoint) <= hitThreshold
+      ) {
+        return "start";
+      }
+    }
+  }
+
+  // Check end binding focus point (only if start not already hit)
+  if (arrow.endBinding?.elementId) {
+    const bindableElement = elementsMap.get(arrow.endBinding.elementId);
+    if (
+      bindableElement &&
+      isBindableElement(bindableElement) &&
+      !bindableElement.isDeleted
+    ) {
+      const focusPoint = getGlobalFixedPointForBindableElement(
+        arrow.endBinding.fixedPoint,
+        bindableElement,
+        elementsMap,
+      );
+      if (
+        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap) &&
+        pointDistance(pointerPos, focusPoint) <= hitThreshold
+      ) {
+        return "end";
+      }
+    }
+  }
+
+  return null;
+};
+
+export const handleFocusPointHover = (
+  arrow: ExcalidrawArrowElement,
+  scenePointerX: number,
+  scenePointerY: number,
+  scene: Scene,
+  zoom: AppState["zoom"],
+): "start" | "end" | null => {
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const pointerPos = pointFrom(scenePointerX, scenePointerY);
+  const hitThreshold = 5 / zoom.value;
+
+  // Check start binding focus point
+  if (arrow.startBinding?.elementId) {
+    const bindableElement = elementsMap.get(arrow.startBinding.elementId);
+    if (
+      bindableElement &&
+      isBindableElement(bindableElement) &&
+      !bindableElement.isDeleted
+    ) {
+      const focusPoint = getGlobalFixedPointForBindableElement(
+        arrow.startBinding.fixedPoint,
+        bindableElement,
+        elementsMap,
+      );
+      if (
+        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap) &&
+        pointDistance(pointerPos, focusPoint) <= hitThreshold
+      ) {
+        return "start";
+      }
+    }
+  }
+
+  // Check end binding focus point (only if start not already hovered)
+  if (arrow.endBinding?.elementId) {
+    const bindableElement = elementsMap.get(arrow.endBinding.elementId);
+    if (
+      bindableElement &&
+      isBindableElement(bindableElement) &&
+      !bindableElement.isDeleted
+    ) {
+      const focusPoint = getGlobalFixedPointForBindableElement(
+        arrow.endBinding.fixedPoint,
+        bindableElement,
+        elementsMap,
+      );
+      if (
+        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap) &&
+        pointDistance(pointerPos, focusPoint) <= hitThreshold
+      ) {
+        return "end";
+      }
+    }
+  }
+
+  return null;
 };
 
 export const shouldEnableBindingForPointerEvent = (

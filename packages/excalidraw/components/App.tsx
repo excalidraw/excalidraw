@@ -250,6 +250,9 @@ import {
   maxBindingDistance_simple,
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
+  handleFocusPointDrag,
+  handleFocusPointHover,
+  handleFocusPointPointerDown,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6926,6 +6929,36 @@ class App extends React.Component<AppProps, AppState> {
           },
         });
       }
+
+      // Check for focus point hover
+      let hoveredFocusPointBinding: "start" | "end" | null = null;
+      const arrow = element as any;
+      if (arrow.startBinding || arrow.endBinding) {
+        hoveredFocusPointBinding = handleFocusPointHover(
+          element as ExcalidrawArrowElement,
+          scenePointerX,
+          scenePointerY,
+          this.scene,
+          this.state.zoom,
+        );
+      }
+
+      if (
+        this.state.selectedLinearElement.hoveredFocusPointBinding !==
+        hoveredFocusPointBinding
+      ) {
+        this.setState({
+          selectedLinearElement: {
+            ...this.state.selectedLinearElement,
+            hoveredFocusPointBinding,
+          },
+        });
+      }
+
+      // Set cursor to pointer when hovering over a focus point
+      if (hoveredFocusPointBinding) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+      }
     } else {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
     }
@@ -7846,6 +7879,40 @@ class App extends React.Component<AppProps, AppState> {
           }
           if (ret.didAddPoint) {
             return true;
+          }
+
+          // Check if we're hovering over a focus point - if so, prevent selecting
+          // the bindable element and let focus point dragging take priority
+          if (linearElementEditor.hoveredFocusPointBinding) {
+            return false;
+          }
+
+          // Also check at current pointer position if focus point is being hovered
+          // (in case we're clicking directly without a prior move event)
+          const elementsMap = this.scene.getNonDeletedElementsMap();
+          const arrow = LinearElementEditor.getElement(
+            linearElementEditor.elementId,
+            elementsMap,
+          ) as any;
+
+          if (arrow && isBindingElement(arrow)) {
+            const hitFocusPoint = handleFocusPointPointerDown(
+              arrow,
+              pointerDownState,
+              elementsMap,
+              this.state.zoom,
+            );
+
+            // If focus point is hit, update state and prevent element selection
+            if (hitFocusPoint) {
+              this.setState({
+                selectedLinearElement: {
+                  ...linearElementEditor,
+                  hoveredFocusPointBinding: hitFocusPoint,
+                },
+              });
+              return false;
+            }
           }
         }
 
@@ -8993,6 +9060,20 @@ class App extends React.Component<AppProps, AppState> {
 
       if (this.state.selectedLinearElement) {
         const linearElementEditor = this.state.selectedLinearElement;
+
+        // Handle focus point dragging if needed
+        if (linearElementEditor.hoveredFocusPointBinding) {
+          if (
+            handleFocusPointDrag(
+              linearElementEditor,
+              elementsMap,
+              pointerCoords,
+              this.scene,
+            )
+          ) {
+            return;
+          }
+        }
 
         if (
           LinearElementEditor.shouldAddMidpoint(
