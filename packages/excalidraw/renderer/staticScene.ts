@@ -65,6 +65,7 @@ const strokeGrid = (
   theme: StaticCanvasRenderConfig["theme"],
   width: number,
   height: number,
+  gridStyle: "lines" | "dots" = "lines",
 ) => {
   const offsetX = (scrollX % gridSize) - gridSize;
   const offsetY = (scrollY % gridSize) - gridSize;
@@ -83,48 +84,79 @@ const strokeGrid = (
     context.translate(offsetX % 1 ? 0 : 0.5, offsetY % 1 ? 0 : 0.5);
   }
 
-  // vertical lines
-  for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
-    const isBold =
-      gridStep > 1 && Math.round(x - scrollX) % (gridStep * gridSize) === 0;
-    // don't render regular lines when zoomed out and they're barely visible
-    if (!isBold && actualGridSize < 10) {
-      continue;
+  if (gridStyle === "dots") {
+    // Dot grid rendering
+    for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
+      for (
+        let y = offsetY;
+        y < offsetY + height + gridSize * 2;
+        y += gridSize
+      ) {
+        const isBoldX =
+          gridStep > 1 && Math.round(x - scrollX) % (gridStep * gridSize) === 0;
+        const isBoldY =
+          gridStep > 1 && Math.round(y - scrollY) % (gridStep * gridSize) === 0;
+        const isBold = isBoldX && isBoldY;
+
+        // Skip non-bold dots when zoomed out
+        if (!isBold && actualGridSize < 10) {
+          continue;
+        }
+
+        const radius = Math.min(2 / zoom.value, isBold ? 3 : 1.5);
+        context.beginPath();
+        context.arc(x, y, radius, 0, Math.PI * 2);
+        context.fillStyle = isBold
+          ? GridLineColor[theme].bold
+          : GridLineColor[theme].regular;
+        context.fill();
+      }
+    }
+  } else {
+    // Line grid rendering (default)
+    // vertical lines
+    for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
+      const isBold =
+        gridStep > 1 && Math.round(x - scrollX) % (gridStep * gridSize) === 0;
+      // don't render regular lines when zoomed out and they're barely visible
+      if (!isBold && actualGridSize < 10) {
+        continue;
+      }
+
+      const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
+      context.lineWidth = lineWidth;
+      const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
+
+      context.beginPath();
+      context.setLineDash(isBold ? [] : lineDash);
+      context.strokeStyle = isBold
+        ? GridLineColor[theme].bold
+        : GridLineColor[theme].regular;
+      context.moveTo(x, offsetY - gridSize);
+      context.lineTo(x, Math.ceil(offsetY + height + gridSize * 2));
+      context.stroke();
     }
 
-    const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
-    context.lineWidth = lineWidth;
-    const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
+    for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
+      const isBold =
+        gridStep > 1 && Math.round(y - scrollY) % (gridStep * gridSize) === 0;
+      if (!isBold && actualGridSize < 10) {
+        continue;
+      }
 
-    context.beginPath();
-    context.setLineDash(isBold ? [] : lineDash);
-    context.strokeStyle = isBold
-      ? GridLineColor[theme].bold
-      : GridLineColor[theme].regular;
-    context.moveTo(x, offsetY - gridSize);
-    context.lineTo(x, Math.ceil(offsetY + height + gridSize * 2));
-    context.stroke();
-  }
+      const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
+      context.lineWidth = lineWidth;
+      const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
 
-  for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
-    const isBold =
-      gridStep > 1 && Math.round(y - scrollY) % (gridStep * gridSize) === 0;
-    if (!isBold && actualGridSize < 10) {
-      continue;
+      context.beginPath();
+      context.setLineDash(isBold ? [] : lineDash);
+      context.strokeStyle = isBold
+        ? GridLineColor[theme].bold
+        : GridLineColor[theme].regular;
+      context.moveTo(offsetX - gridSize, y);
+      context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
+      context.stroke();
     }
-
-    const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
-    context.lineWidth = lineWidth;
-    const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
-
-    context.beginPath();
-    context.setLineDash(isBold ? [] : lineDash);
-    context.strokeStyle = isBold
-      ? GridLineColor[theme].bold
-      : GridLineColor[theme].regular;
-    context.moveTo(offsetX - gridSize, y);
-    context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
-    context.stroke();
   }
   context.restore();
 };
@@ -271,6 +303,7 @@ const _renderStaticScene = ({
       renderConfig.theme,
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,
+      appState.gridStyle,
     );
   }
 
@@ -404,7 +437,7 @@ const _renderStaticScene = ({
             (isExporting ||
               (isEmbeddableElement(element) &&
                 renderConfig.embedsValidationStatus.get(element.id) !==
-                  true)) &&
+                true)) &&
             element.width &&
             element.height
           ) {
