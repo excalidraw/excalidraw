@@ -1,0 +1,70 @@
+.chatcanvas-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background-color: var(--color-surface, #ffffff);
+
+  /* CSS Variables for theming */
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f9f9f9;
+  --color-border: #e0e0e0;
+  --color-text-primary: #333333;
+  --color-text-secondary: #666666;
+  --color-primary: #2196f3;
+  --color-primary-light: rgba(33, 150, 243, 0.1);
+  --color-primary-dark: #1976d2;
+  --color-primary-darker: #1565c0;
+  --color-hover: #f5f5f5;
+  --color-disabled: #cccccc;
+  --color-info: #2196f3;
+  --color-info-light: #e3f2fd;
+  --color-danger: #f44336;
+  --color-danger-light: #ffebee;
+
+  /* Dark theme support */
+  @media (prefers-color-scheme: dark) {
+    --color-surface: #1e1e1e;
+    --color-surface-secondary: #2a2a2a;
+    --color-border: #404040;
+    --color-text-primary: #e0e0e0;
+    --color-text-secondary: #999999;
+    --color-hover: #333333;
+    --color-disabled: #555555;
+  }
+}
+
+.chatcanvas-shell__main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.chatcanvas-shell__canvas-wrapper {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+
+  > * {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .chatcanvas-shell {
+    --color-primary: #1976d2;
+  }
+
+  .chatcanvas-shell__main {
+    flex-direction: column;
+  }
+
+  .chatcanvas-shell__canvas-wrapper {
+    flex: 1;
+  }
+}
