@@ -13,6 +13,7 @@ import {
 import type { GlobalPoint, LineSegment, LocalPoint } from "@excalidraw/math";
 
 import type { AppState, Zoom } from "@excalidraw/excalidraw/types";
+import type { Bounds } from "@excalidraw/common";
 
 import { getElementAbsoluteCoords } from "./bounds";
 import {
@@ -23,7 +24,6 @@ import {
 } from "./transformHandles";
 import { isImageElement, isLinearElement } from "./typeChecks";
 
-import type { Bounds } from "./bounds";
 import type {
   TransformHandleType,
   TransformHandle,

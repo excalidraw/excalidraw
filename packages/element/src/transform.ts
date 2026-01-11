@@ -16,7 +16,9 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import { bindBindingElement } from "@excalidraw/element";
+import type { MarkOptional } from "@excalidraw/common/utility-types";
+
+import { bindBindingElement } from "./binding";
 import {
   newArrowElement,
   newElement,
@@ -25,21 +27,20 @@ import {
   newLinearElement,
   newMagicFrameElement,
   newTextElement,
-} from "@excalidraw/element";
-import { measureText, normalizeText } from "@excalidraw/element";
-import { isArrowElement } from "@excalidraw/element";
+  type ElementConstructorOpts,
+} from "./newElement";
+import { measureText, normalizeText } from "./textMeasurements";
+import { isArrowElement } from "./typeChecks";
 
-import { syncInvalidIndices } from "@excalidraw/element";
+import { syncInvalidIndices } from "./fractionalIndex";
 
-import { redrawTextBoundingBox } from "@excalidraw/element";
+import { redrawTextBoundingBox } from "./textElement";
 
-import { LinearElementEditor } from "@excalidraw/element";
+import { LinearElementEditor } from "./linearElementEditor";
 
-import { getCommonBounds } from "@excalidraw/element";
+import { getCommonBounds } from "./bounds";
 
-import { Scene } from "@excalidraw/element";
-
-import type { ElementConstructorOpts } from "@excalidraw/element";
+import { Scene } from "./Scene";
 
 import type {
   ExcalidrawArrowElement,
@@ -59,9 +60,7 @@ import type {
   NonDeletedSceneElementsMap,
   TextAlign,
   VerticalAlign,
-} from "@excalidraw/element/types";
-
-import type { MarkOptional } from "@excalidraw/common/utility-types";
+} from "./types";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
