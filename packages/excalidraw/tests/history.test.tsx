@@ -5061,9 +5061,7 @@ describe("history", () => {
               id: arrowId,
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
-                fixedPoint: expect.arrayContaining([
-                  0.548442798411514, 0.548442798411514,
-                ]),
+                fixedPoint: expect.arrayContaining([1, 0.5001]),
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,

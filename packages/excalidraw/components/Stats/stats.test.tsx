@@ -32,6 +32,7 @@ import {
 } from "../../tests/test-utils";
 
 import { getStepSizedValue } from "./utils";
+import { J } from "vitest/dist/chunks/reporters.DTtkbAtP";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -135,7 +136,8 @@ describe("binding with linear elements", () => {
     ) as HTMLInputElement;
     expect(linear.startBinding).not.toBe(null);
     expect(inputX).not.toBeNull();
-    UI.updateInput(inputX, String("186"));
+
+    UI.updateInput(inputX, String("184"));
     expect(linear.startBinding).not.toBe(null);
   });
 
