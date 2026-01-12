@@ -116,7 +116,7 @@ export type BindingStrategy =
  */
 export const BASE_BINDING_GAP = 10;
 export const BASE_BINDING_GAP_ELBOW = 5;
-export const FOCUS_POINT_SIZE = LinearElementEditor.POINT_HANDLE_SIZE / 1.5;
+export const FOCUS_POINT_SIZE = 10 / 1.5;
 
 export const getBindingGap = (
   bindTarget: ExcalidrawBindableElement,
@@ -170,7 +170,7 @@ export const isFocusPointVisible = (
 
     if (
       pointDistance(focusPoint, associatedArrowPoint) <
-      FOCUS_POINT_SIZE / zoom.value
+      (FOCUS_POINT_SIZE * 1.5) / zoom.value
     ) {
       return false;
     }
@@ -340,7 +340,7 @@ export const handleFocusPointPointerDown = (
     pointerDownState.origin.x,
     pointerDownState.origin.y,
   );
-  const hitThreshold = FOCUS_POINT_SIZE / zoom.value;
+  const hitThreshold = (FOCUS_POINT_SIZE * 1.5) / zoom.value;
 
   // Check start binding focus point
   if (arrow.startBinding?.elementId) {
@@ -410,7 +410,7 @@ export const handleFocusPointHover = (
 ): "start" | "end" | null => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const pointerPos = pointFrom(scenePointerX, scenePointerY);
-  const hitThreshold = FOCUS_POINT_SIZE / zoom.value;
+  const hitThreshold = (FOCUS_POINT_SIZE * 1.5) / zoom.value;
 
   // Check start binding focus point
   if (arrow.startBinding?.elementId) {
