@@ -971,10 +971,12 @@ const renderFocusPointIndicator = (
   isHovered: boolean,
   isDragging: boolean,
 ) => {
+  const disabled =
+    isDragging && !appState.selectedLinearElement?.hoveredFocusPointBinding;
   context.save();
-  context.strokeStyle = isDragging ? "rgba(120, 120, 120, 0.7)" : "#5e5ad8";
+  context.strokeStyle = disabled ? "rgba(120, 120, 120, 0.7)" : "#5e5ad8";
   context.setLineDash([]);
-  context.fillStyle = isDragging
+  context.fillStyle = disabled
     ? "rgba(220, 220, 220, 0.8)"
     : isHovered
     ? "rgba(134, 131, 226, 0.9)"

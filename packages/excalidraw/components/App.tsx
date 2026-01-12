@@ -6950,6 +6950,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           selectedLinearElement: {
             ...this.state.selectedLinearElement,
+            isDragging: false,
             hoveredFocusPointBinding,
           },
         });
@@ -9059,7 +9060,7 @@ class App extends React.Component<AppProps, AppState> {
       const elementsMap = this.scene.getNonDeletedElementsMap();
 
       if (this.state.selectedLinearElement) {
-        const linearElementEditor = this.state.selectedLinearElement;
+        let linearElementEditor = this.state.selectedLinearElement;
 
         // Handle focus point dragging if needed
         if (linearElementEditor.hoveredFocusPointBinding) {
@@ -9073,6 +9074,26 @@ class App extends React.Component<AppProps, AppState> {
           ) {
             return;
           }
+
+          const element = LinearElementEditor.getElement(
+            linearElementEditor.elementId,
+            elementsMap,
+          )!;
+          linearElementEditor = {
+            ...linearElementEditor,
+            selectedPointsIndices: [
+              linearElementEditor.hoveredFocusPointBinding === "start"
+                ? 0
+                : element.points.length - 1,
+            ],
+            initialState: {
+              ...linearElementEditor.initialState,
+              lastClickedPoint:
+                linearElementEditor.hoveredFocusPointBinding === "start"
+                  ? 0
+                  : element.points.length - 1,
+            },
+          };
         }
 
         if (
@@ -9994,6 +10015,12 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({ selectedLinearElement: null });
           }
         } else if (this.state.selectedLinearElement.isDragging) {
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              isDragging: false,
+            },
+          });
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: childEvent,
             sceneCoords,

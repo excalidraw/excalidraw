@@ -176,7 +176,7 @@ export const isFocusPointVisible = (
     element: bindableElement,
     elementsMap,
     point: focusPoint,
-    threshold: getBindingGap(bindableElement, arrow),
+    threshold: 0,
     overrideShouldTestInside: true,
   });
 };
@@ -209,7 +209,7 @@ export const handleFocusPointDrag = (
       isBindableElement(bindableElement) &&
       !bindableElement.isDeleted
     ) {
-      let point = pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y);
+      const point = pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y);
       const center = pointFrom<GlobalPoint>(
         bindableElement.x + bindableElement.width / 2,
         bindableElement.y + bindableElement.height / 2,
@@ -220,25 +220,7 @@ export const handleFocusPointDrag = (
       if (
         !isFocusPointVisible(point, arrow, bindableElement, elementsMap, true)
       ) {
-        const otherPoint = pointFromVector(
-          vectorScale(
-            vectorNormalize(vectorFromPoint(point, center, 0.1)),
-            Math.max(bindableElement.width, bindableElement.height) * 2,
-          ),
-          center,
-        );
-        point = intersectElementWithLineSegment(
-          bindableElement,
-          elementsMap,
-          lineSegment(center, otherPoint),
-          getBindingGap(bindableElement, arrow) - 0.1,
-        )[0];
-
-        invariant(
-          point,
-          "Ray from center with length double the largest side must intersect the " +
-            "outline of the element",
-        );
+        return false;
       }
 
       const nonRotatedPoint = pointRotateRads<GlobalPoint>(
@@ -327,10 +309,12 @@ export const handleFocusPointDrag = (
       if (filteredUpdates.size > 0) {
         LinearElementEditor.movePoints(arrow, scene, filteredUpdates);
       }
+
+      return true;
     }
   }
 
-  return true;
+  return false;
 };
 
 export const handleFocusPointPointerDown = (
