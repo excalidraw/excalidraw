@@ -1022,7 +1022,13 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   const otherFocusPointIsInElement =
     otherBindableElement &&
     otherFocusPoint &&
-    isPointInElement(otherFocusPoint, otherBindableElement, elementsMap);
+    hitElementItself({
+      point: otherFocusPoint,
+      element: otherBindableElement,
+      elementsMap,
+      threshold: 0,
+      overrideShouldTestInside: true,
+    });
 
   // Handle outside-outside binding to the same element
   if (otherBinding && otherBinding.elementId === hit?.id) {
