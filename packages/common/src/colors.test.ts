@@ -4,6 +4,12 @@ import {
   rgbToHex,
 } from "@excalidraw/common";
 
+describe("COLOR_PALETTE", () => {
+  it("color palette doesn't regress", () => {
+    expect(COLOR_PALETTE).toMatchSnapshot();
+  });
+});
+
 describe("applyDarkModeFilter", () => {
   describe("basic transformations", () => {
     it("transforms black to near-white", () => {

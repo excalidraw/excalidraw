@@ -1,5 +1,4 @@
 import { exportToCanvas, exportToSvg } from "@excalidraw/utils/export";
-import OpenColor from "open-color";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
@@ -57,7 +56,7 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
 
   const ctx = canvas.getContext("2d")!;
 
-  ctx.fillStyle = OpenColor.white;
+  ctx.fillStyle = "#fff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // draw items
@@ -87,7 +86,7 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
     // draw item border
     // -------------------------------------------------------------------------
     ctx.lineWidth = BORDER_WIDTH;
-    ctx.strokeStyle = OpenColor.gray[4];
+    ctx.strokeStyle = "#ced4da";
     ctx.strokeRect(
       colOffset + BOX_PADDING / 2,
       rowOffset + BOX_PADDING / 2,
@@ -131,7 +130,7 @@ const SingleLibraryItem = ({
         elements: libItem.elements,
         appState: {
           ...appState,
-          viewBackgroundColor: OpenColor.white,
+          viewBackgroundColor: "#fff",
           exportBackground: true,
         },
         files: null,
@@ -175,7 +174,7 @@ const SingleLibraryItem = ({
           }}
         >
           <div style={{ padding: "0.5em 0" }}>
-            <span style={{ fontWeight: 500, color: OpenColor.gray[6] }}>
+            <span style={{ fontWeight: 500, color: "#868e96" }}>
               {t("publishDialog.itemName")}
             </span>
             <span aria-hidden="true" className="required">

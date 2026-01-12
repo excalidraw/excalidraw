@@ -6,7 +6,6 @@ import {
   type LocalPoint,
   type Radians,
 } from "@excalidraw/math";
-import oc from "open-color";
 
 import {
   arrayToMap,
@@ -1544,7 +1543,7 @@ const _renderInteractiveScene = ({
         elementsMap,
       );
     }
-    const selectionColor = renderConfig.selectionColor || oc.black;
+    const selectionColor = renderConfig.selectionColor || "#000";
 
     if (showBoundingBox) {
       // Optimisation for finding quickly relevant element ids
@@ -1627,7 +1626,7 @@ const _renderInteractiveScene = ({
           y2,
           selectionColors: groupElements.some((el) => el.locked)
             ? ["#ced4da"]
-            : [oc.black],
+            : ["#000"],
           dashed: true,
           cx: x1 + (x2 - x1) / 2,
           cy: y1 + (y2 - y1) / 2,
@@ -1653,7 +1652,7 @@ const _renderInteractiveScene = ({
     context.translate(appState.scrollX, appState.scrollY);
 
     if (selectedElements.length === 1) {
-      context.fillStyle = oc.white;
+      context.fillStyle = "#fff";
       const transformHandles = getTransformHandles(
         selectedElements[0],
         appState.zoom,
@@ -1698,7 +1697,7 @@ const _renderInteractiveScene = ({
     ) {
       const dashedLinePadding =
         (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
-      context.fillStyle = oc.white;
+      context.fillStyle = "#fff";
       const [x1, y1, x2, y2] = getCommonBounds(selectedElements, elementsMap);
       const initialLineDash = context.getLineDash();
       context.setLineDash([2 / appState.zoom.value]);
