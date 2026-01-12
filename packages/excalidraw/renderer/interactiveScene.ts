@@ -21,6 +21,7 @@ import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
   elementCenterPoint,
+  FOCUS_POINT_SIZE,
   getOmitSidesForEditorInterface,
   getTransformHandles,
   getTransformHandlesFromCoords,
@@ -1067,7 +1068,7 @@ const renderFocusPointIndicators = (
           context,
           appState,
           focusPoint,
-          LinearElementEditor.POINT_HANDLE_SIZE / 1.5,
+          FOCUS_POINT_SIZE,
           isHovered,
           isDragging,
         );
