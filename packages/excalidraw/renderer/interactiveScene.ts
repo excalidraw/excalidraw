@@ -1009,9 +1009,15 @@ const renderFocusPointIndicators = (
 
   const arrow = element as any;
   const isDragging = !!appState.selectedLinearElement?.isDragging;
+  const startArrowPointSelected =
+    !!appState.selectedLinearElement?.selectedPointsIndices?.includes(0);
+  const endArrowPointSelected =
+    !!appState.selectedLinearElement?.selectedPointsIndices?.includes(
+      arrow.points.length - 1,
+    );
 
   // Render start binding focus point and connection line
-  if (arrow.startBinding?.elementId) {
+  if (arrow.startBinding?.elementId && !startArrowPointSelected) {
     const bindableElement = elementsMap.get(arrow.startBinding.elementId);
     if (
       bindableElement &&
@@ -1064,7 +1070,7 @@ const renderFocusPointIndicators = (
   }
 
   // Render end binding focus point and connection line
-  if (arrow.endBinding?.elementId) {
+  if (arrow.endBinding?.elementId && !endArrowPointSelected) {
     const bindableElement = elementsMap.get(arrow.endBinding.elementId);
     if (
       bindableElement &&

@@ -9072,6 +9072,17 @@ class App extends React.Component<AppProps, AppState> {
               this.scene,
             )
           ) {
+            this.setState({
+              selectedLinearElement: {
+                ...linearElementEditor,
+                isDragging: false,
+                selectedPointsIndices: [],
+                initialState: {
+                  ...linearElementEditor.initialState,
+                  lastClickedPoint: -1,
+                },
+              },
+            });
             return;
           }
 
