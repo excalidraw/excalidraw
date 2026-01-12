@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { t } from "../../i18n";
 
 import type { PollMetadata, PollOption } from "../../poll/types";
+import { CloseIcon, adjustmentsIcon } from "../icons";
 
 type PollCardProps = {
   metadata: PollMetadata;
@@ -20,6 +21,8 @@ type PollCardProps = {
   onStop: () => void;
   onReveal: (value: boolean) => void;
   now: number;
+  showTotalVotes?: boolean;
+  showQuestionInput?: boolean;
 };
 
 const clampTimer = (value: number) => {
@@ -155,8 +158,10 @@ const PollOptionsList = ({
                 className="excalidraw__poll-option__remove"
                 type="button"
                 onClick={() => removeOption(option.id)}
+                aria-label={t("poll.removeOption")}
+                title={t("poll.removeOption")}
               >
-                {t("poll.removeOption")}
+                {CloseIcon}
               </button>
             )}
             {displayResults && (
@@ -173,7 +178,7 @@ const PollOptionsList = ({
         <div className="excalidraw__poll-options__add">
           <button
             type="button"
-            className="excalidraw__poll-button"
+            className="excalidraw-button excalidraw__poll-button"
             onClick={addOption}
           >
             {t("poll.addOption")}
@@ -198,13 +203,16 @@ export const PollCard = ({
                            onStop,
                            onReveal,
                            now,
+                           showTotalVotes = true,
+                           showQuestionInput = true,
                          }: PollCardProps) => {
   const isLive = metadata.status.state === "open";
   const editable = canEdit && isSelected && !isLive;
-  const isLocked = metadata.status.state !== "idle";
-  const optionsEditable = editable && !metadata.status.lockedOptions;
+  const isLocked = metadata.status.state === "open";
+  const optionsEditable = editable;
   const [showAdvanced, setShowAdvanced] = useState(false);
   const showSettings = showAdvanced && editable;
+  const showSettingsToggle = editable;
   const showResults =
     metadata.settings.resultVisibility === "live" ||
     (metadata.settings.resultVisibility === "creator" &&
@@ -240,66 +248,81 @@ export const PollCard = ({
           isLocked ? t("poll.showSettingsHint") : undefined
         }
       >
-        {editable ? (
-          <input
-            className="excalidraw__poll-question"
-            value={metadata.question}
-            placeholder={t("poll.questionPlaceholder")}
-            disabled={isLocked}
-            onChange={(event) =>
-              onChange((prev) => ({ ...prev, question: event.target.value }))
-            }
-          />
-        ) : (
-          <div className="excalidraw__poll-question__text">
-            {metadata.question}
-          </div>
-        )}
-        <div className="excalidraw__poll-actions">
-          {metadata.status.state === "open" ? (
-            <button
-              type="button"
-              className="excalidraw__poll-button"
-              onClick={onStop}
-            >
-              {t("poll.stop")}
-            </button>
-          ) : metadata.status.state === "closed" ? (
-            <button
-              type="button"
-              className="excalidraw__poll-button"
-              onClick={onStart}
-            >
-              {t("poll.reopen")}
-            </button>
+        {showQuestionInput ? (
+          editable ? (
+            <input
+              className="excalidraw__poll-question"
+              value={metadata.question}
+              placeholder={t("poll.questionPlaceholder")}
+              disabled={isLocked}
+              onChange={(event) =>
+                onChange((prev) => ({ ...prev, question: event.target.value }))
+              }
+            />
           ) : (
-            <button
-              type="button"
-              className="excalidraw__poll-button"
-              onClick={onStart}
-            >
-              {t("poll.start")}
-            </button>
+            <div>{metadata.question}</div>
+          )
+        ) : null}
+        <div
+          className={clsx(
+            "excalidraw__poll-actions",
+            showSettingsToggle && "is-split",
           )}
-          {metadata.settings.resultVisibility === "reveal" && (
-            <button
-              type="button"
-              className="excalidraw__poll-button"
-              onClick={() => onReveal(!metadata.status.revealResults)}
-            >
-              {metadata.status.revealResults
-                ? t("poll.hideResults")
-                : t("poll.revealResults")}
-            </button>
-          )}
-          {editable && (
-            <button
-              type="button"
-              className="excalidraw__poll-button"
-              onClick={() => setShowAdvanced((prev) => !prev)}
-            >
-              {showAdvanced ? t("poll.hideAdvanced") : t("poll.showAdvanced")}
-            </button>
+        >
+          <div className="excalidraw__poll-actions__primary">
+            {isOwner &&
+              (metadata.status.state === "open" ? (
+                <button
+                  type="button"
+                  className="excalidraw-button excalidraw__poll-button"
+                  onClick={onStop}
+                >
+                  {t("poll.stop")}
+                </button>
+              ) : metadata.status.state === "closed" ? (
+                <button
+                  type="button"
+                  className="excalidraw-button excalidraw__poll-button"
+                  onClick={onStart}
+                >
+                  {t("poll.reopen")}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="excalidraw-button excalidraw__poll-button"
+                  onClick={onStart}
+                >
+                  {t("poll.start")}
+                </button>
+              ))}
+            {metadata.settings.resultVisibility === "reveal" && (
+              <button
+                type="button"
+                className="excalidraw-button excalidraw__poll-button"
+                onClick={() => onReveal(!metadata.status.revealResults)}
+              >
+                {metadata.status.revealResults
+                  ? t("poll.hideResults")
+                  : t("poll.revealResults")}
+              </button>
+            )}
+          </div>
+          {showSettingsToggle && (
+            <div className="excalidraw__poll-actions__secondary">
+              <button
+                type="button"
+                className="excalidraw-button excalidraw__poll-button excalidraw__poll-settings-button"
+                onClick={() => setShowAdvanced((prev) => !prev)}
+              >
+                {adjustmentsIcon}
+                <span>
+                  {showAdvanced
+                    ? t("poll.hideAdvanced")
+                    : t("poll.showAdvanced")}
+                </span>
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -341,18 +364,6 @@ export const PollCard = ({
               disabled={!optionsEditable}
             />
             {t("poll.revote")}
-          </label>
-          <label className="excalidraw__poll-setting">
-            <input
-              type="checkbox"
-              className="excalidraw__poll-selector"
-              checked={metadata.settings.limitPerSession}
-              onChange={(event) =>
-                toggleSetting("limitPerSession")(event.target.checked)
-              }
-              disabled={!optionsEditable}
-            />
-            {t("poll.limitPerSession")}
           </label>
           <label className="excalidraw__poll-setting">
             {t("poll.access")}
@@ -424,9 +435,6 @@ export const PollCard = ({
 
       <div className="excalidraw__poll-footer">
         <div className="excalidraw__poll-meta">
-          {metadata.status.state === "closed" && (
-            <span>{t("poll.closed")}</span>
-          )}
           {metadata.status.state === "open" && remainingMs && (
             <span>
               {t("poll.timerCountdown", {
@@ -440,9 +448,11 @@ export const PollCard = ({
             </span>
           )}
         </div>
-        <div className="excalidraw__poll-total">
-          {t("poll.totalVotes", { count: totalVotes })}
-        </div>
+        {showTotalVotes && (
+          <div className="excalidraw__poll-total">
+            {t("poll.totalVotes", { count: totalVotes })}
+          </div>
+        )}
       </div>
     </div>
   );

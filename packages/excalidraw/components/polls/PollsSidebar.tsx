@@ -8,6 +8,8 @@ import {
   useExcalidrawAppState,
   useExcalidrawSetAppState,
 } from "../App";
+import { searchIcon } from "../icons";
+import { TextField } from "../TextField";
 import { PollCard } from "./PollCard";
 
 import "./PollsSidebar.scss";
@@ -52,37 +54,37 @@ export const PollsSidebar = () => {
     const trimmed = query.trim().toLowerCase();
     const matches = trimmed
       ? polls.filter((poll) =>
-          poll.question.toLowerCase().includes(trimmed),
-        )
+        poll.question.toLowerCase().includes(trimmed),
+      )
       : polls;
     return sortPolls(matches);
   }, [polls, query]);
-
-  const selectedPoll =
-    polls.find((poll) => poll.id === appState.selectedPollId) || null;
-  const detailPoll = selectedPoll || filteredPolls[0] || null;
 
   const handleCreatePoll = () => {
     app.createPoll();
     setQuery("");
   };
+  const now = Date.now();
+  const canEdit = appState.viewModeEnabled === false;
 
   return (
     <div className="excalidraw__polls-sidebar">
       <div className="excalidraw__polls-sidebar__controls">
         <button
           type="button"
-          className="excalidraw__poll-button excalidraw__polls-sidebar__new"
+          className="excalidraw-button excalidraw__poll-button excalidraw__polls-sidebar__new"
           onClick={handleCreatePoll}
         >
           + {t("poll.newPoll")}
         </button>
-        <input
-          type="search"
+        <TextField
           className="excalidraw__polls-sidebar__search"
           placeholder={t("poll.searchPlaceholder")}
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          icon={searchIcon}
+          onChange={(value) => setQuery(value)}
+          type="search"
+          fullWidth
         />
       </div>
 
@@ -98,69 +100,106 @@ export const PollsSidebar = () => {
               const totalVotes = getTotalVotes(counts);
               const statusLabel = getPollStatusLabel(poll);
               const isSelected = poll.id === appState.selectedPollId;
+              const isLive = poll.status.state === "open";
+              const canRename = isSelected && canEdit && !isLive;
+              const canVote =
+                poll.status.state === "open" &&
+                (poll.settings.access === "all" ||
+                  appState.viewModeEnabled === false);
+              const toggleSelection = () =>
+                setAppState({
+                  selectedPollId: isSelected ? null : poll.id,
+                });
               return (
                 <li key={poll.id} className="excalidraw__polls-sidebar__item">
-                  <button
-                    type="button"
+                  <div
                     className={clsx(
-                      "excalidraw__polls-sidebar__item-button",
+                      "excalidraw__polls-sidebar__item-card",
                       isSelected && "is-selected",
+                      canRename && "is-editable",
                     )}
-                    onClick={() =>
-                      setAppState({ selectedPollId: poll.id })
-                    }
                   >
-                    <div className="excalidraw__polls-sidebar__item-title">
-                      {poll.question || t("poll.questionPlaceholder")}
-                    </div>
-                    <div className="excalidraw__polls-sidebar__item-meta">
-                      <span
-                        className={clsx(
-                          "excalidraw__polls-sidebar__item-status",
-                          `is-${poll.status.state}`,
+                    <div
+                      className="excalidraw__polls-sidebar__item-button"
+                      role="button"
+                      tabIndex={0}
+                      aria-expanded={isSelected}
+                      onClick={toggleSelection}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          toggleSelection();
+                        }
+                      }}
+                    >
+                      <div className="excalidraw__polls-sidebar__item-title">
+                        {canRename ? (
+                          <input
+                            className="excalidraw__polls-sidebar__item-title-input"
+                            value={poll.question}
+                            placeholder={t("poll.questionPlaceholder")}
+                            onChange={(event) =>
+                              app.updatePollMetadata(poll.id, (prev) => ({
+                                ...prev,
+                                question: event.target.value,
+                              }))
+                            }
+                            onClick={(event) => event.stopPropagation()}
+                            onPointerDown={(event) => event.stopPropagation()}
+                            onKeyDown={(event) => event.stopPropagation()}
+                          />
+                        ) : (
+                          <span className="excalidraw__polls-sidebar__item-title-text">
+                            {poll.question || t("poll.questionPlaceholder")}
+                          </span>
                         )}
-                      >
-                        {statusLabel}
-                      </span>
-                      <span className="excalidraw__polls-sidebar__item-votes">
-                        {t("poll.totalVotes", { count: totalVotes })}
-                      </span>
+                      </div>
+                      <div className="excalidraw__polls-sidebar__item-meta">
+                        <span
+                          className={clsx(
+                            "excalidraw__polls-sidebar__item-status",
+                            `is-${poll.status.state}`,
+                          )}
+                        >
+                          {statusLabel}
+                        </span>
+                        <span className="excalidraw__polls-sidebar__item-votes">
+                          {t("poll.totalVotes", { count: totalVotes })}
+                        </span>
+                      </div>
                     </div>
-                  </button>
+                    {isSelected && (
+                      <div className="excalidraw__polls-sidebar__item-detail">
+                        <PollCard
+                          metadata={poll}
+                          isSelected={true}
+                          canEdit={canEdit}
+                          canVote={canVote}
+                          isOwner={app.isPollOwner(poll)}
+                          voteSelection={app.getPollSelection(poll.id)}
+                          counts={counts}
+                          showQuestionInput={false}
+                          onChange={(updater) => {
+                            app.updatePollMetadata(poll.id, updater);
+                          }}
+                          onVote={(optionIds) =>
+                            app.handlePollVote(poll.id, optionIds)
+                          }
+                          onStart={() => app.startPoll(poll.id)}
+                          onStop={() => app.stopPoll(poll.id)}
+                          onReveal={(value) =>
+                            app.togglePollReveal(poll.id, value)
+                          }
+                          now={now}
+                          showTotalVotes={false}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </li>
               );
             })}
           </ul>
-        )}
-      </div>
-
-      <div className="excalidraw__polls-sidebar__detail">
-        {detailPoll ? (
-          <PollCard
-            metadata={detailPoll}
-            isSelected={true}
-            canEdit={appState.viewModeEnabled === false}
-            canVote={
-              detailPoll.status.state === "open" &&
-              (detailPoll.settings.access === "all" ||
-                appState.viewModeEnabled === false)
-            }
-            isOwner={app.isPollOwner(detailPoll)}
-            voteSelection={app.getPollSelection(detailPoll.id)}
-            counts={app.getPollCountsAsObject(detailPoll)}
-            onChange={(updater) => {
-              app.updatePollMetadata(detailPoll.id, updater);
-            }}
-            onVote={(optionIds) => app.handlePollVote(detailPoll.id, optionIds)}
-            onStart={() => app.startPoll(detailPoll.id)}
-            onStop={() => app.stopPoll(detailPoll.id)}
-            onReveal={(value) => app.togglePollReveal(detailPoll.id, value)}
-            now={Date.now()}
-          />
-        ) : (
-          <div className="excalidraw__polls-sidebar__detail-empty">
-            {t("poll.noPolls")}
-          </div>
         )}
       </div>
     </div>

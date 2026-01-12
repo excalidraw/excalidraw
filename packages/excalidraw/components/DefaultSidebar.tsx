@@ -60,12 +60,12 @@ export const DefaultSidebar = Object.assign(
   withInternalFallback(
     "DefaultSidebar",
     ({
-      children,
-      className,
-      onDock,
-      docked,
-      ...rest
-    }: Merge<
+       children,
+       className,
+       onDock,
+       docked,
+       ...rest
+     }: Merge<
       MarkOptional<Omit<SidebarProps, "name">, "children">,
       {
         /** pass `false` to disable docking */
@@ -94,9 +94,9 @@ export const DefaultSidebar = Object.assign(
             isForceDocked || onDock === false || (!onDock && docked != null)
               ? undefined
               : // compose to allow the host app to listen on default behavior
-                composeEventHandlers(onDock, (docked) => {
-                  setAppState({ defaultSidebarDockedPreference: docked });
-                })
+              composeEventHandlers(onDock, (docked) => {
+                setAppState({ defaultSidebarDockedPreference: docked });
+              })
           }
         >
           <Sidebar.Tabs>

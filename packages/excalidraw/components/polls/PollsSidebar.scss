@@ -1,35 +1,55 @@
 .excalidraw__polls-sidebar {
-  --poll-line-color: var(--theme-border-primary, #d0d7de);
-
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   height: 100%;
-  padding: 8px;
+  padding: 0.75rem;
   box-sizing: border-box;
+  font-size: 0.875rem;
 }
 
 .excalidraw__polls-sidebar__controls {
   display: grid;
-  gap: 6px;
+  gap: 8px;
 }
 
 .excalidraw__polls-sidebar__new {
   align-self: flex-start;
+  --button-width: auto;
+  --button-height: auto;
+  --button-bg: var(--color-primary);
+  --button-color: var(--color-icon-white);
+  --button-border: var(--color-primary);
+  --button-hover-bg: var(--color-primary-darker);
+  --button-hover-color: var(--color-icon-white);
+  --button-hover-border: var(--color-primary-darker);
+  --button-active-bg: var(--color-primary-darkest);
 }
 
 .excalidraw__polls-sidebar__search {
   width: 100%;
-  border: 1px dashed var(--poll-line-color);
-  border-radius: 6px;
-  padding: 6px 8px;
-  font-size: 12px;
-  box-sizing: border-box;
+}
+
+.excalidraw__polls-sidebar__search .ExcTextField__input {
+  background-color: #f5f5f9;
+  border-radius: var(--border-radius-md);
+  border: 0;
+  height: 3rem;
+}
+
+.excalidraw.theme--dark .excalidraw__polls-sidebar__search .ExcTextField__input {
+  background-color: #31303b;
+}
+
+.excalidraw__polls-sidebar__search
+.ExcTextField__input
+input::placeholder {
+  font-size: 0.9rem;
 }
 
 .excalidraw__polls-sidebar__list {
-  flex: 0 1 auto;
-  max-height: 35%;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: auto;
 }
 
@@ -38,41 +58,90 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 6px;
+  gap: 10px;
+}
+
+.excalidraw__polls-sidebar__item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.excalidraw__polls-sidebar__item-card {
+  border-radius: var(--border-radius-lg);
+  background: var(--island-bg-color);
+  border: 1px solid var(--default-border-color);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.excalidraw__polls-sidebar__item-card:hover {
+  background: var(--color-surface-high);
+}
+
+.excalidraw__polls-sidebar__item-card.is-selected {
+  background: var(--color-surface-high);
+  border-color: transparent;
+}
+
+.excalidraw__polls-sidebar__item-card.is-selected:hover {
+  background: var(--color-surface-high);
+  border-color: transparent;
 }
 
 .excalidraw__polls-sidebar__item-button {
-  width: 100%;
   text-align: left;
-  border: 1px solid var(--sidebar-border-color);
-  background: var(--sidebar-bg-color);
-  border-radius: 8px;
-  padding: 8px;
+  border: 0;
+  background: transparent;
+  padding: 0.25rem 0.5rem;
   display: flex;
   flex-direction: column;
   gap: 4px;
   cursor: pointer;
 }
 
-.excalidraw__polls-sidebar__item-button.is-selected {
-  border-color: var(--color-primary, #3b82f6);
-  box-shadow: 0 0 0 1px var(--color-primary, #3b82f6);
-}
-
 .excalidraw__polls-sidebar__item-title {
   font-weight: 600;
-  font-size: 12px;
+  font-size: 0.875rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.excalidraw__polls-sidebar__item-title-text {
+  display: block;
+}
+
+.excalidraw__polls-sidebar__item-title-input {
+  width: 100%;
+  border: 0;
+  border-radius: var(--border-radius-md);
+  padding: 0.4rem 0.5rem;
+  font-size: 0.875rem;
+  background-color: #f5f5f9;
+  box-sizing: border-box;
+}
+
+.excalidraw.theme--dark
+.excalidraw__polls-sidebar__item-title-input {
+  background-color: #31303b;
+  color: var(--color-text-primary);
 }
 
 .excalidraw__polls-sidebar__item-meta {
   display: flex;
   justify-content: space-between;
   gap: 8px;
-  font-size: 11px;
+  font-size: 0.875rem;
   color: var(--color-text-secondary);
+}
+
+.excalidraw__polls-sidebar__item-card.is-selected.is-editable
+.excalidraw__polls-sidebar__item-meta {
+  padding-left: 0.5rem;
 }
 
 .excalidraw__polls-sidebar__item-status.is-open {
@@ -84,15 +153,20 @@
   color: var(--color-text-secondary);
 }
 
-.excalidraw__polls-sidebar__empty,
-.excalidraw__polls-sidebar__detail-empty {
+.excalidraw__polls-sidebar__empty {
   padding: 12px;
   color: var(--color-text-secondary);
-  font-size: 12px;
+  font-size: 0.875rem;
 }
 
-.excalidraw__polls-sidebar__detail {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
+.excalidraw__polls-sidebar__item-detail {
+  border-top: 1px solid var(--default-border-color);
+  padding-top: 0.5rem;
+}
+
+.excalidraw__polls-sidebar__item-detail .excalidraw__poll-card {
+  background: transparent;
+  border: 0;
+  padding: 0.5rem 0;
+  box-shadow: none;
 }

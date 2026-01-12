@@ -36,7 +36,7 @@ body.excalidraw-cursor-resize * {
 
 .excalidraw {
   --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
-    Roboto, Helvetica, Arial, sans-serif;
+  Roboto, Helvetica, Arial, sans-serif;
   font-family: var(--ui-font);
 
   position: relative;
@@ -806,8 +806,8 @@ body.excalidraw-cursor-resize * {
 /* Poll popup */
 .excalidraw .excalidraw__poll-popup {
   position: absolute;
-  right: 16px;
-  bottom: 96px;
+  left: 16px;
+  bottom: 70px;
   width: 320px;
   max-height: calc(100vh - 120px);
   pointer-events: auto;
@@ -818,24 +818,24 @@ body.excalidraw-cursor-resize * {
   width: 100%;
   max-height: 100%;
   box-sizing: border-box;
-  background: var(--theme-background-secondary, #fefefe);
-  border: none;
-  border-radius: var(--poll-radius, 12px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  background: var(--island-bg-color);
+  border: 1px solid var(--default-border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-island);
   overflow: auto;
   pointer-events: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 8px;
+  gap: 12px;
+  padding: 12px;
 }
 
 .excalidraw .excalidraw__poll-popup-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  font-size: 12px;
+  gap: 12px;
+  font-size: 0.875rem;
   font-weight: 600;
 }
 
@@ -846,7 +846,8 @@ body.excalidraw-cursor-resize * {
 }
 
 .excalidraw .excalidraw__poll-popup-toggle {
-  padding: 4px 8px;
+  --button-width: auto;
+  --button-height: auto;
 }
 
 .excalidraw .excalidraw__poll-popup-inner .excalidraw__poll-card {
@@ -856,66 +857,112 @@ body.excalidraw-cursor-resize * {
 .excalidraw .excalidraw__poll-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 8px;
+  gap: 12px;
+  padding: 12px;
   width: 100%;
-  height: 100%;
-  overflow: auto;
   box-sizing: border-box;
-  font-size: 11px;
-  --poll-line-color: var(--theme-border-primary, #d0d7de);
-  --poll-line-shadow: rgba(0, 0, 0, 0.05);
-  --poll-hatch: repeating-linear-gradient(
-    -45deg,
-    transparent,
-    transparent 5px,
-    var(--poll-line-color) 5px,
-    var(--poll-line-color) 8px
-  );
+  font-size: 0.875rem;
+  line-height: 1.4;
+  background: var(--island-bg-color);
+  border: 1px solid var(--default-border-color);
+  border-radius: var(--border-radius-lg);
 }
 
 .excalidraw .excalidraw__poll-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 8px;
+  gap: 12px;
 }
 
 .excalidraw .excalidraw__poll-question,
 .excalidraw .excalidraw__poll-option__input {
   width: 100%;
-  border: 1px solid var(--theme-border-primary, #d0d7de);
-  border-radius: 6px;
-  padding: 7px 8px;
-  font-size: 12px;
+  border: 0;
+  border-radius: var(--border-radius-md);
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  background: #f5f5f9;
   box-sizing: border-box;
 }
 
-.excalidraw .excalidraw__poll-question__text {
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.3;
+.excalidraw.theme--dark .excalidraw__poll-question,
+.excalidraw.theme--dark .excalidraw__poll-option__input {
+  background: #31303b;
 }
 
 .excalidraw .excalidraw__poll-actions {
   display: flex;
-  gap: 4px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.excalidraw .excalidraw__poll-actions.is-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.excalidraw .excalidraw__poll-actions__primary,
+.excalidraw .excalidraw__poll-actions__secondary {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.excalidraw .excalidraw__poll-actions.is-split
+.excalidraw__poll-actions__primary,
+.excalidraw .excalidraw__poll-actions.is-split
+.excalidraw__poll-actions__secondary {
+  flex-direction: column;
+  width: 100%;
+}
+
+.excalidraw .excalidraw__poll-actions.is-split
+.excalidraw__poll-actions__secondary {
+  align-items: flex-end;
+}
+
+.excalidraw .excalidraw__poll-actions.is-split .excalidraw__poll-button {
+  width: 100%;
+  justify-content: center;
 }
 
 .excalidraw .excalidraw__poll-button {
-  border: 1px solid var(--theme-border-primary, #d0d7de);
-  background: transparent;
-  border-radius: 6px;
-  padding: 6px 10px;
+  --button-width: auto;
+  --button-height: auto;
+  padding: 0.35rem 0.6rem;
   line-height: 1.2;
-  cursor: pointer;
-  font-size: 11px;
+  font-size: 0.875rem;
+  border-radius: var(--border-radius-md);
+}
+
+.excalidraw .excalidraw__poll-settings-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.excalidraw .excalidraw__poll-settings-button svg {
+  width: 1rem;
+  height: 1rem;
 }
 
 .excalidraw .excalidraw__poll-options {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
+}
+
+.excalidraw .excalidraw__poll-options__add .excalidraw__poll-button {
+  --button-bg: var(--color-surface-primary-container);
+  --button-color: var(--color-on-primary-container);
+  --button-border: transparent;
+  --button-hover-bg: var(--color-surface-high);
+  --button-hover-color: var(--color-on-primary-container);
+  --button-hover-border: transparent;
 }
 
 .excalidraw .excalidraw__poll-option {
@@ -933,38 +980,12 @@ body.excalidraw-cursor-resize * {
 }
 
 .excalidraw .excalidraw__poll-selector {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   margin: 0;
   flex: 0 0 auto;
-  border: 1px dashed var(--poll-line-color);
-  border-radius: 4px;
-  box-shadow: 1px 1px 0 0 var(--poll-line-color),
-    2px 2px 0 0 var(--poll-line-shadow);
-  background-color: var(--theme-background-secondary, #fefefe);
+  accent-color: var(--color-primary);
   cursor: pointer;
-  transition: box-shadow 0.15s ease, transform 0.12s ease,
-    background-position 0.2s ease, border-color 0.2s ease;
-}
-
-.excalidraw .excalidraw__poll-selector[type="radio"] {
-  border-radius: 50%;
-}
-
-.excalidraw .excalidraw__poll-selector:checked {
-  border-color: var(--color-primary);
-  box-shadow: 1px 1px 0 0 var(--color-primary),
-    2px 2px 0 0 var(--poll-line-shadow);
-  background-image: var(--poll-hatch);
-  background-size: 10px 10px;
-  background-position: 1px 1px;
-}
-
-.excalidraw .excalidraw__poll-selector:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--color-primary), 1px 1px 0 0 var(--color-primary);
 }
 
 .excalidraw .excalidraw__poll-selector:disabled {
@@ -972,79 +993,87 @@ body.excalidraw-cursor-resize * {
   cursor: default;
 }
 
-.excalidraw .excalidraw__poll-selector:not(:disabled):active {
-  transform: translate(1px, 1px);
-}
-
 .excalidraw .excalidraw__poll-option__text {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 12px;
+  font-size: 0.875rem;
 }
 
 .excalidraw .excalidraw__poll-option__remove {
   border: none;
   background: transparent;
-  color: var(--theme-danger, #c53030);
+  color: var(--color-danger);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 4px;
+}
+
+.excalidraw .excalidraw__poll-option__remove svg {
+  width: 12px;
+  height: 12px;
+}
+
+.excalidraw .excalidraw__poll-option__remove:hover {
+  background: var(--color-surface-high);
 }
 
 .excalidraw .excalidraw__poll-option__result {
   min-width: 40px;
   text-align: right;
   font-variant-numeric: tabular-nums;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
 }
 
 .excalidraw .excalidraw__poll-settings {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 8px;
-  max-height: min(220px, 40vh);
-  overflow: auto;
-  padding-right: 4px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  border-top: 1px solid var(--default-border-color);
+  padding-top: 12px;
+  margin-top: 4px;
 }
 
 .excalidraw .excalidraw__poll-setting {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 8px;
+  font-size: 0.875rem;
+  min-width: 0;
 }
 
 .excalidraw .excalidraw__poll-setting select,
 .excalidraw .excalidraw__poll-setting input[type="number"] {
   flex: 1;
-  border: 1px dashed var(--poll-line-color);
-  border-radius: 6px;
-  padding: 4px 6px;
-  font-size: 11px;
-  background-color: var(--theme-background-secondary, #fefefe);
-  box-shadow: 1px 1px 0 0 var(--poll-line-color),
-    2px 2px 0 0 var(--poll-line-shadow);
+  border: 0;
+  border-radius: var(--border-radius-md);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  background-color: #f5f5f9;
+  min-width: 0;
+}
+
+.excalidraw.theme--dark .excalidraw__poll-setting select,
+.excalidraw.theme--dark .excalidraw__poll-setting input[type="number"] {
+  background-color: #31303b;
 }
 
 .excalidraw .excalidraw__poll-select {
   -webkit-appearance: none;
   appearance: none;
-  background-image: linear-gradient(
-      45deg,
-      transparent 55%,
-      var(--poll-line-color) 55%,
-      var(--poll-line-color) 65%,
-      transparent 65%
-    ),
-    linear-gradient(
-      -45deg,
-      transparent 55%,
-      var(--poll-line-color) 55%,
-      var(--poll-line-color) 65%,
-      transparent 65%
-    );
-  background-position: calc(100% - 12px) 50%, calc(100% - 6px) 50%;
+  background-image: var(--dropdown-icon);
   background-repeat: no-repeat;
-  background-size: 8px 8px, 8px 8px;
-  padding-right: 24px;
+  background-position: right 0.5rem center;
+  background-size: 0.65em auto;
+  padding-right: 1.75rem;
   cursor: pointer;
 }
 
@@ -1067,8 +1096,10 @@ body.excalidraw-cursor-resize * {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
 }
 
 .excalidraw .excalidraw__poll-results-hidden {
-  color: var(--theme-muted, #64748b);
+  color: var(--color-text-secondary);
 }

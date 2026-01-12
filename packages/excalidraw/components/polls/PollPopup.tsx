@@ -42,18 +42,18 @@ const sortPolls = (
 };
 
 export const PollPopup = ({
-  polls,
-  selectedPollId,
-  viewModeEnabled,
-  pollSessionId,
-  getPollCountsAsObject,
-  getPollSelection,
-  updatePollMetadata,
-  handlePollVote,
-  startPoll,
-  stopPoll,
-  togglePollReveal,
-}: PollPopupProps) => {
+                            polls,
+                            selectedPollId,
+                            viewModeEnabled,
+                            pollSessionId,
+                            getPollCountsAsObject,
+                            getPollSelection,
+                            updatePollMetadata,
+                            handlePollVote,
+                            startPoll,
+                            stopPoll,
+                            togglePollReveal,
+                          }: PollPopupProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const openPolls = useMemo(() => {
@@ -79,7 +79,7 @@ export const PollPopup = ({
           </div>
           <button
             type="button"
-            className="excalidraw__poll-button excalidraw__poll-popup-toggle"
+            className="excalidraw-button excalidraw__poll-button excalidraw__poll-popup-toggle"
             onClick={() => setIsCollapsed((prev) => !prev)}
           >
             {isCollapsed ? t("poll.expand") : t("poll.collapse")}

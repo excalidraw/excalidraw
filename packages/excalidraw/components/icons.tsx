@@ -485,7 +485,7 @@ export const PollIcon = createIcon(
     <rect x="10" y="7" width="3" height="11" rx="1" />
     <rect x="15" y="4" width="3" height="14" rx="1" />
   </g>,
-  modifiedTablerIconProps,
+  tablerIconProps,
 );
 
 export const DuplicateIcon = createIcon(

@@ -161,13 +161,13 @@ export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
 export type ActiveTool =
   | {
-      type: ToolType;
-      customType: null;
-    }
+  type: ToolType;
+  customType: null;
+}
   | {
-      type: "custom";
-      customType: string;
-    };
+  type: "custom";
+  customType: string;
+};
 
 export type SidebarName = string;
 export type SidebarTabName = string;
@@ -195,53 +195,53 @@ type _CommonCanvasAppState = {
 
 export type StaticCanvasAppState = Readonly<
   _CommonCanvasAppState & {
-    shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
-    /** null indicates transparent bg */
-    viewBackgroundColor: AppState["viewBackgroundColor"] | null;
-    exportScale: AppState["exportScale"];
-    selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
-    gridSize: AppState["gridSize"];
-    gridStep: AppState["gridStep"];
-    frameRendering: AppState["frameRendering"];
-    currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
-    hoveredElementIds: AppState["hoveredElementIds"];
-    suggestedBinding: AppState["suggestedBinding"];
-    // Cropping
-    croppingElementId: AppState["croppingElementId"];
-  }
+  shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
+  /** null indicates transparent bg */
+  viewBackgroundColor: AppState["viewBackgroundColor"] | null;
+  exportScale: AppState["exportScale"];
+  selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
+  gridSize: AppState["gridSize"];
+  gridStep: AppState["gridStep"];
+  frameRendering: AppState["frameRendering"];
+  currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
+  hoveredElementIds: AppState["hoveredElementIds"];
+  suggestedBinding: AppState["suggestedBinding"];
+  // Cropping
+  croppingElementId: AppState["croppingElementId"];
+}
 >;
 
 export type InteractiveCanvasAppState = Readonly<
   _CommonCanvasAppState & {
-    // renderInteractiveScene
-    activeEmbeddable: AppState["activeEmbeddable"];
-    selectionElement: AppState["selectionElement"];
-    selectedGroupIds: AppState["selectedGroupIds"];
-    selectedLinearElement: AppState["selectedLinearElement"];
-    multiElement: AppState["multiElement"];
-    newElement: AppState["newElement"];
-    isBindingEnabled: AppState["isBindingEnabled"];
-    suggestedBinding: AppState["suggestedBinding"];
-    isRotating: AppState["isRotating"];
-    elementsToHighlight: AppState["elementsToHighlight"];
-    // Collaborators
-    collaborators: AppState["collaborators"];
-    // SnapLines
-    snapLines: AppState["snapLines"];
-    zenModeEnabled: AppState["zenModeEnabled"];
-    editingTextElement: AppState["editingTextElement"];
-    // Cropping
-    isCropping: AppState["isCropping"];
-    croppingElementId: AppState["croppingElementId"];
-    // Search matches
-    searchMatches: AppState["searchMatches"];
-    activeLockedId: AppState["activeLockedId"];
-    // Non-used but needed in binding highlight arrow overdraw
-    hoveredElementIds: AppState["hoveredElementIds"];
-    frameRendering: AppState["frameRendering"];
-    shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
-    exportScale: AppState["exportScale"];
-  }
+  // renderInteractiveScene
+  activeEmbeddable: AppState["activeEmbeddable"];
+  selectionElement: AppState["selectionElement"];
+  selectedGroupIds: AppState["selectedGroupIds"];
+  selectedLinearElement: AppState["selectedLinearElement"];
+  multiElement: AppState["multiElement"];
+  newElement: AppState["newElement"];
+  isBindingEnabled: AppState["isBindingEnabled"];
+  suggestedBinding: AppState["suggestedBinding"];
+  isRotating: AppState["isRotating"];
+  elementsToHighlight: AppState["elementsToHighlight"];
+  // Collaborators
+  collaborators: AppState["collaborators"];
+  // SnapLines
+  snapLines: AppState["snapLines"];
+  zenModeEnabled: AppState["zenModeEnabled"];
+  editingTextElement: AppState["editingTextElement"];
+  // Cropping
+  isCropping: AppState["isCropping"];
+  croppingElementId: AppState["croppingElementId"];
+  // Search matches
+  searchMatches: AppState["searchMatches"];
+  activeLockedId: AppState["activeLockedId"];
+  // Non-used but needed in binding highlight arrow overdraw
+  hoveredElementIds: AppState["hoveredElementIds"];
+  frameRendering: AppState["frameRendering"];
+  shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
+  exportScale: AppState["exportScale"];
+}
 >;
 
 export type ObservedAppState = ObservedStandaloneAppState &
@@ -408,7 +408,7 @@ export interface AppState {
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
   /** group being edited when you drill down to its constituent element
-    (e.g. when you double-click on a group's element) */
+   (e.g. when you double-click on a group's element) */
   editingGroupId: GroupId | null;
   width: number;
   height: number;
@@ -425,13 +425,13 @@ export interface AppState {
   currentChartType: ChartType;
   pasteDialog:
     | {
-        shown: false;
-        data: null;
-      }
+    shown: false;
+    data: null;
+  }
     | {
-        shown: true;
-        data: Spreadsheet;
-      };
+    shown: true;
+    data: Spreadsheet;
+  };
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
   snapLines: readonly SnapLine[];
@@ -527,8 +527,8 @@ export type LibraryItems_anyVersion = LibraryItems | LibraryItems_v1;
 
 export type LibraryItemsSource =
   | ((
-      currentLibraryItems: LibraryItems,
-    ) => MaybePromise<LibraryItems_anyVersion | Blob>)
+  currentLibraryItems: LibraryItems,
+) => MaybePromise<LibraryItems_anyVersion | Blob>)
   | MaybePromise<LibraryItems_anyVersion | Blob>;
 // -----------------------------------------------------------------------------
 
@@ -934,9 +934,9 @@ export type FrameNameBoundsCache = {
   _cache: Map<
     string,
     FrameNameBounds & {
-      zoom: AppState["zoom"]["value"];
-      versionNonce: ExcalidrawFrameLikeElement["versionNonce"];
-    }
+    zoom: AppState["zoom"]["value"];
+    versionNonce: ExcalidrawFrameLikeElement["versionNonce"];
+  }
   >;
 };
 
