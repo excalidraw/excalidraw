@@ -4533,7 +4533,7 @@ describe("history", () => {
         expect(
           (h.elements[2] as ExcalidrawElbowArrowElement).startBinding
             ?.fixedPoint,
-        ).not.toEqual([1, 0.5001]);
+        ).toEqual([1, 0.5001]);
         expect(
           (h.elements[2] as ExcalidrawElbowArrowElement).startBinding?.mode,
         ).toBe("orbit");
@@ -4633,7 +4633,7 @@ describe("history", () => {
                 id: arrowId,
                 startBinding: expect.objectContaining({
                   elementId: rect1.id,
-                  fixedPoint: [0.5001, 0.5001],
+                  fixedPoint: [1, 0.5001],
                   mode: "orbit",
                 }),
                 endBinding: expect.objectContaining({
@@ -4776,7 +4776,7 @@ describe("history", () => {
                 id: arrowId,
                 startBinding: expect.objectContaining({
                   elementId: rect1.id,
-                  fixedPoint: [0.5001, 0.5001],
+                  fixedPoint: [1, 0.5001],
                   mode: "orbit",
                 }),
                 // rebound with previous rectangle
@@ -5061,9 +5061,7 @@ describe("history", () => {
               id: arrowId,
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
-                fixedPoint: expect.arrayContaining([
-                  0.548383798101935, 0.548383798101935,
-                ]),
+                fixedPoint: expect.arrayContaining([1, 0.5001]),
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
