@@ -10,8 +10,6 @@ const lessPrecise = (num: number, precision = 5) =>
 const getAvgFrameTime = (times: number[]) =>
   lessPrecise(times.reduce((a, b) => a + b) / times.length);
 
-const getFps = (frametime: number) => lessPrecise(1000 / frametime);
-
 export class Debug {
   public static DEBUG_LOG_TIMES = true;
 
@@ -66,12 +64,14 @@ export class Debug {
       }
       for (const [name, { t, times, avg }] of Object.entries(Debug.TIMES_AVG)) {
         if (times.length) {
-          const avgFrameTime = getAvgFrameTime(times);
+          // const avgFrameTime = getAvgFrameTime(times);
+          const totalTime = times.reduce((a, b) => a + b);
+          const avgFrameTime = lessPrecise(totalTime / Debug.FRAME_COUNT);
           console.info(
             name,
-            `${times.length} runs: ${avgFrameTime}ms across ${
+            `- ${times.length} calls - ${avgFrameTime}ms/frame across ${
               Debug.FRAME_COUNT
-            } frames (${getFps(avgFrameTime)} fps ~ ${lessPrecise(
+            } frames (${lessPrecise(
               (avgFrameTime / 16.67) * 100,
               1,
             )}% of frame budget)`,
@@ -136,7 +136,7 @@ export class Debug {
       return (...args: T) => {
         const t0 = performance.now();
         const ret = fn(...args);
-        Debug.logTime(performance.now() - t0, name);
+        Debug[type](performance.now() - t0, name);
         return ret;
       };
     };
