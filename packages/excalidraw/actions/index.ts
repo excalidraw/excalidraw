@@ -77,6 +77,7 @@ export {
 } from "./actionClipboard";
 
 export { actionToggleGridMode } from "./actionToggleGridMode";
+export { actionChangeGridType } from "./actionChangeGridType";
 export { actionToggleZenMode } from "./actionToggleZenMode";
 export { actionToggleObjectsSnapMode } from "./actionToggleObjectsSnapMode";
 
