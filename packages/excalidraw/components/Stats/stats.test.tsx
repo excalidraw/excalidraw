@@ -32,7 +32,6 @@ import {
 } from "../../tests/test-utils";
 
 import { getStepSizedValue } from "./utils";
-import { J } from "vitest/dist/chunks/reporters.DTtkbAtP";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
