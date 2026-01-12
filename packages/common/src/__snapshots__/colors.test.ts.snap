@@ -1,5 +1,97 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`COLOR_PALETTE > color palette doesn't regress 1`] = `
+{
+  "black": "#1e1e1e",
+  "blue": [
+    "#e7f5ff",
+    "#a5d8ff",
+    "#4dabf7",
+    "#228be6",
+    "#1971c2",
+  ],
+  "bronze": [
+    "#f8f1ee",
+    "#eaddd7",
+    "#d2bab0",
+    "#a18072",
+    "#846358",
+  ],
+  "cyan": [
+    "#e3fafc",
+    "#99e9f2",
+    "#3bc9db",
+    "#15aabf",
+    "#0c8599",
+  ],
+  "grape": [
+    "#f8f0fc",
+    "#eebefa",
+    "#da77f2",
+    "#be4bdb",
+    "#9c36b5",
+  ],
+  "gray": [
+    "#f8f9fa",
+    "#e9ecef",
+    "#ced4da",
+    "#868e96",
+    "#343a40",
+  ],
+  "green": [
+    "#ebfbee",
+    "#b2f2bb",
+    "#69db7c",
+    "#40c057",
+    "#2f9e44",
+  ],
+  "orange": [
+    "#fff4e6",
+    "#ffd8a8",
+    "#ffa94d",
+    "#fd7e14",
+    "#e8590c",
+  ],
+  "pink": [
+    "#fff0f6",
+    "#fcc2d7",
+    "#f783ac",
+    "#e64980",
+    "#c2255c",
+  ],
+  "red": [
+    "#fff5f5",
+    "#ffc9c9",
+    "#ff8787",
+    "#fa5252",
+    "#e03131",
+  ],
+  "teal": [
+    "#e6fcf5",
+    "#96f2d7",
+    "#38d9a9",
+    "#12b886",
+    "#099268",
+  ],
+  "transparent": "transparent",
+  "violet": [
+    "#f3f0ff",
+    "#d0bfff",
+    "#9775fa",
+    "#7950f2",
+    "#6741d9",
+  ],
+  "white": "#ffffff",
+  "yellow": [
+    "#fff9db",
+    "#ffec99",
+    "#ffd43b",
+    "#fab005",
+    "#f08c00",
+  ],
+}
+`;
+
 exports[`applyDarkModeFilter > COLOR_PALETTE regression tests > matches snapshot for all palette colors 1`] = `
 {
   "black": "#d3d3d3",

@@ -5,10 +5,13 @@ import { getOriginalContainerHeightFromCache } from "@excalidraw/element";
 
 import {
   CODES,
+  colorToHex,
   KEYS,
   FONT_FAMILY,
   TEXT_ALIGN,
+  THEME,
   VERTICAL_ALIGN,
+  applyDarkModeFilter,
 } from "@excalidraw/common";
 
 import type {
@@ -22,6 +25,7 @@ import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
 import {
   GlobalTestState,
+  act,
   render,
   screen,
   unmountComponent,
@@ -1660,6 +1664,62 @@ describe("textWysiwyg", () => {
       Keyboard.exitTextEditor(editor);
 
       expect(h.elements[1].angle).toBe(30);
+    });
+  });
+
+  describe("Test theme change", () => {
+    const { h } = window;
+
+    // Helper to compare colors (browser may return rgb format)
+    const colorsAreEqual = (color1: string, color2: string) => {
+      return colorToHex(color1) === colorToHex(color2);
+    };
+
+    beforeEach(async () => {
+      await render(
+        <Excalidraw
+          handleKeyboardGlobally={true}
+          initialData={{
+            appState: {
+              theme: THEME.LIGHT,
+            },
+          }}
+        />,
+      );
+      API.setElements([]);
+    });
+
+    it("should update textarea color when theme changes to dark mode and back", async () => {
+      const originalColor = "#ff0000";
+
+      const textElement = API.createElement({
+        type: "text",
+        text: "test",
+        strokeColor: originalColor,
+      });
+
+      API.setElements([textElement]);
+
+      mouse.doubleClickOn(textElement as ExcalidrawTextElement);
+
+      const editor = await getTextEditor({ waitForEditor: true });
+
+      expect(colorsAreEqual(editor.style.color, originalColor)).toBe(true);
+
+      act(() => {
+        h.setState({ theme: THEME.DARK });
+        // Trigger element mutation to fire onChange callback
+        h.app.scene.mutateElement(textElement, {});
+      });
+      expect(
+        colorsAreEqual(editor.style.color, applyDarkModeFilter(originalColor)),
+      ).toBe(true);
+
+      act(() => {
+        h.setState({ theme: THEME.LIGHT });
+        h.app.scene.mutateElement(textElement, {});
+      });
+      expect(colorsAreEqual(editor.style.color, originalColor)).toBe(true);
     });
   });
 });

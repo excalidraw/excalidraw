@@ -1,5 +1,5 @@
-@import "../../css/variables.module.scss";
-@import "./Chat/Chat.scss";
+@use "../../css/variables.module.scss" as *;
+@use "./Chat/Chat.scss";
 
 $verticalBreakpoint: 861px;
 $fullScreenModalBreakpoint: 600px;
@@ -481,7 +481,7 @@ $fullScreenModalBreakpoint: 600px;
       height: 2.5rem;
 
       font-size: 12px;
-      color: $oc-white;
+      color: #fff;
       background-color: var(--color-primary);
       width: 100%;
 
@@ -511,7 +511,9 @@ $fullScreenModalBreakpoint: 600px;
       }
     }
 
-    position: relative;
+    & {
+      position: relative;
+    }
 
     div {
       display: contents;
