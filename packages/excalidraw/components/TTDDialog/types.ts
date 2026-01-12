@@ -4,7 +4,7 @@ import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
 
 import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
 
-import type { ChatMessageType } from "../Chat";
+import type { ChatMessageType } from "./Chat";
 
 import type { BinaryFiles } from "../../types";
 
@@ -20,11 +20,13 @@ export type OnTestSubmitRetValue = {
     }
 );
 
+export type TTDMessage = {
+  role: "user" | "assistant" | "system";
+  content: string;
+};
+
 export type TTDPayload = {
-  messages: Array<{
-    role: "user" | "assistant" | "system";
-    content: string;
-  }>;
+  messages: TTDMessage[];
   onChunk?: (chunk: string) => void;
   onStreamCreated?: () => void;
   signal?: AbortSignal;

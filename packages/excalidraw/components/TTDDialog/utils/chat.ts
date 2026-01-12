@@ -1,7 +1,7 @@
 import { findLastIndex, randomId } from "@excalidraw/common";
 
-import type { ChatHistory, ChatMessageType } from "../../Chat";
-import type { ChatMessage } from "../../Chat/types";
+import type { ChatHistory, ChatMessageType } from "../Chat";
+import type { ChatMessage } from "../Chat/types";
 
 export const updateAssistantContent = (
   chatHistory: ChatHistory,

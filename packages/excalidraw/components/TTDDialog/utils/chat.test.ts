@@ -6,7 +6,7 @@ import {
   updateAssistantContent,
 } from "./chat";
 
-import type { ChatHistory } from "../../Chat";
+import type { ChatHistory } from "../Chat";
 
 describe("chat utils", () => {
   describe("updateAssistantContent", () => {

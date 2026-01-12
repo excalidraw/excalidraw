@@ -1,6 +1,6 @@
 import { t } from "../../../i18n";
 import { ArrowRightIcon } from "../../icons";
-import { ChatInterface } from "../../Chat";
+import { ChatInterface } from "../Chat";
 import { InlineIcon } from "../../InlineIcon";
 import { TTDDialogPanel } from "../TTDDialogPanel";
 
@@ -12,7 +12,7 @@ import { ChatHistoryMenu } from "./ChatHistoryMenu";
 
 import type { SavedChat } from "../types";
 
-import type { ChatMessageType } from "../../Chat";
+import type { ChatMessageType } from "../Chat";
 
 interface TTDChatPanelProps {
   chatId: string;

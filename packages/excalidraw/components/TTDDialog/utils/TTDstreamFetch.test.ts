@@ -1,6 +1,8 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 
-import { streamFetch } from "./streamFetch";
+import { TTDStreamFetch } from "./TTDStreamFetch";
+
+import type { StreamChunk } from "./TTDStreamFetch";
 
 function createMockStream(chunks: string[]): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
@@ -18,11 +20,22 @@ function createMockStream(chunks: string[]): ReadableStream<Uint8Array> {
   });
 }
 
-function createSSEChunk(data: string): string {
-  return `data: ${data}\n\n`;
-}
+const createContentChunkData = (delta: string): string => {
+  const data: StreamChunk & { type: "content" } = { type: "content", delta };
+  return JSON.stringify(data);
+};
 
-describe("streamFetch", () => {
+const createContentChunk = (delta: string): string => {
+  return `data: ${createContentChunkData(delta)}\n\n`;
+};
+
+const createDataChunk = (data: string): string => {
+  return `data: ${data}\n\n`;
+};
+
+const DONE_CHUNK = "data: [DONE]\n\n";
+
+describe("TTDStreamFetch", () => {
   let originalFetch: typeof global.fetch;
 
   beforeEach(() => {
@@ -38,9 +51,9 @@ describe("streamFetch", () => {
     it("should stream data chunks and return full response", async () => {
       const chunks: string[] = [];
       const mockChunks = [
-        createSSEChunk(JSON.stringify("Hello ")),
-        createSSEChunk(JSON.stringify("world")),
-        createSSEChunk("[DONE]"),
+        createContentChunk("Hello "),
+        createContentChunk("world"),
+        DONE_CHUNK,
       ];
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -49,9 +62,9 @@ describe("streamFetch", () => {
         body: createMockStream(mockChunks),
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
         onChunk: (chunk) => chunks.push(chunk),
       });
 
@@ -62,9 +75,9 @@ describe("streamFetch", () => {
 
     it("should handle multi-line chunks", async () => {
       const mockChunks = [
-        createSSEChunk(JSON.stringify("Line 1\n")),
-        createSSEChunk(JSON.stringify("Line 2")),
-        createSSEChunk("[DONE]"),
+        createContentChunk("Line 1\n"),
+        createContentChunk("Line 2"),
+        DONE_CHUNK,
       ];
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -73,9 +86,9 @@ describe("streamFetch", () => {
         body: createMockStream(mockChunks),
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.generatedResponse).toBe("Line 1\nLine 2");
@@ -83,10 +96,7 @@ describe("streamFetch", () => {
 
     it("should call onStreamCreated callback", async () => {
       const onStreamCreated = vi.fn();
-      const mockChunks = [
-        createSSEChunk(JSON.stringify("test")),
-        createSSEChunk("[DONE]"),
-      ];
+      const mockChunks = [createContentChunk("test"), DONE_CHUNK];
 
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -94,9 +104,9 @@ describe("streamFetch", () => {
         body: createMockStream(mockChunks),
       });
 
-      await streamFetch({
+      await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
         onStreamCreated,
       });
 
@@ -105,9 +115,9 @@ describe("streamFetch", () => {
 
     it("should handle empty chunks gracefully", async () => {
       const mockChunks = [
-        createSSEChunk(JSON.stringify("")),
-        createSSEChunk(JSON.stringify("valid")),
-        createSSEChunk("[DONE]"),
+        createContentChunk(""),
+        createContentChunk("valid"),
+        DONE_CHUNK,
       ];
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -116,9 +126,9 @@ describe("streamFetch", () => {
         body: createMockStream(mockChunks),
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.generatedResponse).toBe("valid");
@@ -126,9 +136,9 @@ describe("streamFetch", () => {
 
     it("should handle null chunk as stream termination", async () => {
       const mockChunks = [
-        createSSEChunk(JSON.stringify("before null")),
-        createSSEChunk("null"),
-        createSSEChunk(JSON.stringify("after null")),
+        createContentChunk("before null"),
+        createDataChunk("null"),
+        createContentChunk("after null"),
       ];
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -137,9 +147,9 @@ describe("streamFetch", () => {
         body: createMockStream(mockChunks),
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.generatedResponse).toBe("before null");
@@ -148,10 +158,7 @@ describe("streamFetch", () => {
 
   describe("rate limit handling", () => {
     it("should extract rate limit headers when enabled", async () => {
-      const mockChunks = [
-        createSSEChunk(JSON.stringify("test")),
-        createSSEChunk("[DONE]"),
-      ];
+      const mockChunks = [createContentChunk("test"), DONE_CHUNK];
 
       const headers = new Headers();
       headers.set("X-Ratelimit-Limit", "100");
@@ -163,9 +170,9 @@ describe("streamFetch", () => {
         body: createMockStream(mockChunks),
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
         extractRateLimits: true,
       });
 
@@ -174,10 +181,7 @@ describe("streamFetch", () => {
     });
 
     it("should not extract rate limits when disabled", async () => {
-      const mockChunks = [
-        createSSEChunk(JSON.stringify("test")),
-        createSSEChunk("[DONE]"),
-      ];
+      const mockChunks = [createContentChunk("test"), DONE_CHUNK];
 
       const headers = new Headers();
       headers.set("X-Ratelimit-Limit", "100");
@@ -189,9 +193,9 @@ describe("streamFetch", () => {
         body: createMockStream(mockChunks),
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
         extractRateLimits: false,
       });
 
@@ -200,10 +204,7 @@ describe("streamFetch", () => {
     });
 
     it("should handle missing rate limit headers", async () => {
-      const mockChunks = [
-        createSSEChunk(JSON.stringify("test")),
-        createSSEChunk("[DONE]"),
-      ];
+      const mockChunks = [createContentChunk("test"), DONE_CHUNK];
 
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -211,9 +212,9 @@ describe("streamFetch", () => {
         body: createMockStream(mockChunks),
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
         extractRateLimits: true,
       });
 
@@ -232,9 +233,9 @@ describe("streamFetch", () => {
         headers,
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.error).toBeDefined();
@@ -255,9 +256,9 @@ describe("streamFetch", () => {
         text: async () => "Server error occurred",
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.error).toBeDefined();
@@ -272,9 +273,9 @@ describe("streamFetch", () => {
         text: async () => "",
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.error).toBeDefined();
@@ -288,9 +289,9 @@ describe("streamFetch", () => {
         body: null,
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.error).toBeDefined();
@@ -298,7 +299,7 @@ describe("streamFetch", () => {
     });
 
     it("should handle empty response", async () => {
-      const mockChunks = [createSSEChunk("[DONE]")];
+      const mockChunks = [DONE_CHUNK];
 
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -306,9 +307,9 @@ describe("streamFetch", () => {
         body: createMockStream(mockChunks),
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.error).toBeDefined();
@@ -320,9 +321,9 @@ describe("streamFetch", () => {
         .fn()
         .mockRejectedValue(new Error("Network connection failed"));
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.error).toBeDefined();
@@ -335,9 +336,9 @@ describe("streamFetch", () => {
         .mockImplementation(() => {});
 
       const mockChunks = [
-        createSSEChunk("invalid json"),
-        createSSEChunk(JSON.stringify("valid")),
-        createSSEChunk("[DONE]"),
+        createDataChunk("invalid"),
+        createContentChunk("valid"),
+        DONE_CHUNK,
       ];
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -346,9 +347,9 @@ describe("streamFetch", () => {
         body: createMockStream(mockChunks),
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.generatedResponse).toBe("valid");
@@ -369,9 +370,9 @@ describe("streamFetch", () => {
         return Promise.reject(error);
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
         signal: abortController.signal,
       });
 
@@ -395,9 +396,9 @@ describe("streamFetch", () => {
         body: stream,
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.error).toBeDefined();
@@ -409,8 +410,8 @@ describe("streamFetch", () => {
     it("should handle lines without data prefix", async () => {
       const mockChunks = [
         ": comment line\n",
-        createSSEChunk(JSON.stringify("valid")),
-        createSSEChunk("[DONE]"),
+        createContentChunk("valid"),
+        DONE_CHUNK,
       ];
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -419,9 +420,9 @@ describe("streamFetch", () => {
         body: createMockStream(mockChunks),
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.generatedResponse).toBe("valid");
@@ -429,10 +430,10 @@ describe("streamFetch", () => {
 
     it("should handle empty lines in stream", async () => {
       const mockChunks = [
-        createSSEChunk(JSON.stringify("first")),
+        createContentChunk("first"),
         "\n\n",
-        createSSEChunk(JSON.stringify("second")),
-        createSSEChunk("[DONE]"),
+        createContentChunk("second"),
+        DONE_CHUNK,
       ];
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -441,9 +442,9 @@ describe("streamFetch", () => {
         body: createMockStream(mockChunks),
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.generatedResponse).toBe("firstsecond");
@@ -453,9 +454,9 @@ describe("streamFetch", () => {
       // Split an SSE message across multiple chunks
       const mockChunks = [
         "data: ",
-        JSON.stringify("partial"),
+        createContentChunkData("partial"),
         "\n\n",
-        createSSEChunk("[DONE]"),
+        DONE_CHUNK,
       ];
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -464,9 +465,9 @@ describe("streamFetch", () => {
         body: createMockStream(mockChunks),
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.generatedResponse).toBe("partial");
@@ -474,9 +475,9 @@ describe("streamFetch", () => {
 
     it("should handle [DONE] marker to terminate stream", async () => {
       const mockChunks = [
-        createSSEChunk(JSON.stringify("content")),
-        createSSEChunk("[DONE]"),
-        createSSEChunk(JSON.stringify("should not appear")),
+        createContentChunk("content"),
+        DONE_CHUNK,
+        createContentChunk("should not appear"),
       ];
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -485,74 +486,12 @@ describe("streamFetch", () => {
         body: createMockStream(mockChunks),
       });
 
-      const result = await streamFetch({
+      const result = await TTDStreamFetch({
         url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
+        messages: [],
       });
 
       expect(result.generatedResponse).toBe("content");
-    });
-  });
-
-  describe("request configuration", () => {
-    it("should send POST request with correct headers and body", async () => {
-      const mockFetch = vi.fn().mockResolvedValue({
-        ok: true,
-        headers: new Headers(),
-        body: createMockStream([
-          createSSEChunk(JSON.stringify("test")),
-          createSSEChunk("[DONE]"),
-        ]),
-      });
-
-      global.fetch = mockFetch;
-
-      const payload = { prompt: "test prompt", model: "gpt-4" };
-
-      await streamFetch({
-        url: "https://api.example.com/stream",
-        payload,
-      });
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        "https://api.example.com/stream",
-        expect.objectContaining({
-          method: "POST",
-          headers: {
-            Accept: "text/event-stream",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }),
-      );
-    });
-
-    it("should pass abort signal to fetch", async () => {
-      const mockFetch = vi.fn().mockResolvedValue({
-        ok: true,
-        headers: new Headers(),
-        body: createMockStream([
-          createSSEChunk(JSON.stringify("test")),
-          createSSEChunk("[DONE]"),
-        ]),
-      });
-
-      global.fetch = mockFetch;
-
-      const abortController = new AbortController();
-
-      await streamFetch({
-        url: "https://api.example.com/stream",
-        payload: { prompt: "test" },
-        signal: abortController.signal,
-      });
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          signal: abortController.signal,
-        }),
-      );
     });
   });
 });

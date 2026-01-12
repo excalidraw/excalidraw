@@ -1,9 +1,9 @@
 import clsx from "clsx";
 import React, { useState, useEffect } from "react";
 
-import { t } from "../../i18n";
-import { FilledButton } from "../FilledButton";
-import { TrashIcon, codeIcon, stackPushIcon, RetryIcon } from "../icons";
+import { t } from "../../../i18n";
+import { FilledButton } from "../../FilledButton";
+import { TrashIcon, codeIcon, stackPushIcon, RetryIcon } from "../../icons";
 
 import type { ChatMessage as ChatMessageType } from "./types";
 

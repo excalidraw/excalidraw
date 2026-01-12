@@ -1,10 +1,10 @@
 import React, { useRef, useEffect } from "react";
 import { KEYS } from "@excalidraw/common";
 
-import { ArrowRightIcon, stop as StopIcon } from "../icons";
-import { InlineIcon } from "../InlineIcon";
+import { ArrowRightIcon, stop as StopIcon } from "../../icons";
+import { InlineIcon } from "../../InlineIcon";
 
-import { t } from "../../i18n";
+import { t } from "../../../i18n";
 
 import { ChatMessage } from "./ChatMessage";
 

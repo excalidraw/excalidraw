@@ -4,13 +4,12 @@ import {
   getTextFromElements,
   MIME_TYPES,
   TTDDialog,
+  TTDStreamFetch,
 } from "@excalidraw/excalidraw";
 import { getDataURL } from "@excalidraw/excalidraw/data/blob";
 import { safelyParseJSON } from "@excalidraw/common";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
-
-import { streamFetch } from "../utils/streamFetch";
 
 export const AIComponents = ({
   excalidrawAPI,
@@ -101,15 +100,14 @@ export const AIComponents = ({
       />
 
       <TTDDialog
-        onTextSubmit={async (payload) => {
-          const { onChunk, onStreamCreated, signal, ...requestPayload } =
-            payload;
+        onTextSubmit={async (data) => {
+          const { onChunk, onStreamCreated, signal, messages } = data;
 
-          const result = await streamFetch({
+          const result = await TTDStreamFetch({
             url: `${
               import.meta.env.VITE_APP_AI_BACKEND
             }/v1/ai/text-to-diagram/chat-streaming`,
-            payload: requestPayload,
+            messages,
             onChunk,
             onStreamCreated,
             extractRateLimits: true,

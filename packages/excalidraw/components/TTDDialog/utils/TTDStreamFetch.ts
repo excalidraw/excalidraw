@@ -1,3 +1,5 @@
+import type { TTDMessage } from "@excalidraw/excalidraw/components/TTDDialog/types";
+
 interface RateLimitInfo {
   rateLimit?: number;
   rateLimitRemaining?: number;
@@ -5,7 +7,7 @@ interface RateLimitInfo {
 
 interface StreamingOptions {
   url: string;
-  payload: any;
+  messages: readonly TTDMessage[];
   onChunk?: (chunk: string) => void;
   extractRateLimits?: boolean;
   signal?: AbortSignal;
@@ -22,6 +24,23 @@ type StreamingResult = {
       generatedResponse?: null | undefined;
     }
 );
+
+export type StreamChunk =
+  | {
+      type: "content";
+      delta: string;
+    }
+  | {
+      type: "done";
+      finishReason: "stop" | "length" | "content_filter" | "tool_calls" | null;
+    }
+  | {
+      type: "error";
+      error: {
+        message: string;
+        code?: string;
+      };
+    };
 
 function extractRateLimitHeaders(headers: Headers): RateLimitInfo {
   const rateLimit = headers.get("X-Ratelimit-Limit");
@@ -71,12 +90,12 @@ async function* parseSSEStream(
   }
 }
 
-export async function streamFetch(
+export async function TTDStreamFetch(
   options: StreamingOptions,
 ): Promise<StreamingResult> {
   const {
     url,
-    payload,
+    messages,
     onChunk,
     onStreamCreated,
     extractRateLimits = true,
@@ -94,7 +113,7 @@ export async function streamFetch(
         Accept: "text/event-stream",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ messages }),
       signal,
     });
 
@@ -131,15 +150,26 @@ export async function streamFetch(
         }
 
         try {
-          const chunk = JSON.parse(data);
+          const chunk: StreamChunk = JSON.parse(data);
 
           if (chunk === null) {
             break;
           }
 
-          if (chunk) {
-            fullResponse += chunk;
-            onChunk?.(chunk);
+          switch (chunk.type) {
+            case "content": {
+              const delta = chunk.delta;
+              if (delta) {
+                fullResponse += delta;
+                onChunk?.(delta);
+              }
+              break;
+            }
+            case "error":
+              error = new Error(chunk.error.message);
+              break;
+            case "done":
+              break;
           }
         } catch (e) {
           console.warn("Failed to parse SSE data:", data, e);

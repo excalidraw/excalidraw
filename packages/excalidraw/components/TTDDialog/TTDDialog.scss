@@ -1,5 +1,5 @@
 @import "../../css/variables.module.scss";
-@import "../Chat/Chat.scss";
+@import "./Chat/Chat.scss";
 
 $verticalBreakpoint: 861px;
 $fullScreenModalBreakpoint: 600px;
@@ -355,7 +355,7 @@ $fullScreenModalBreakpoint: 600px;
     @media screen and (min-width: $verticalBreakpoint) {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 4rem;
+      gap: 2rem;
     }
   }
 

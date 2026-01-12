@@ -8,7 +8,7 @@ import { trackEvent } from "../../../analytics";
 import { t } from "../../../i18n";
 
 import { errorAtom, rateLimitsAtom, chatHistoryAtom } from "../TTDContext";
-import { useChatAgent } from "../../Chat";
+import { useChatAgent } from "../Chat";
 
 import {
   getLastAssistantMessage,

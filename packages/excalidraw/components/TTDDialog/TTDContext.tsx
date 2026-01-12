@@ -2,7 +2,7 @@ import { randomId } from "@excalidraw/common";
 
 import { atom } from "../../editor-jotai";
 
-import type { ChatHistory } from "../Chat";
+import type { ChatHistory } from "./Chat";
 
 import type { RateLimits } from "./types";
 
