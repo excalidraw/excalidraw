@@ -1,4 +1,4 @@
-import { normalizeInputColor } from "../components/ColorPicker/ColorInput";
+import { normalizeInputColor } from "@excalidraw/common";
 
 describe("normalizeInputColor", () => {
   describe("hex colors", () => {

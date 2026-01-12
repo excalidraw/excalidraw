@@ -1,4 +1,4 @@
-@import "../../css/variables.module.scss";
+@use "../../css/variables.module" as *;
 
 $verticalBreakpoint: 861px;
 
@@ -241,7 +241,7 @@ $verticalBreakpoint: 861px;
       height: 2.5rem;
 
       font-size: 12px;
-      color: $oc-white;
+      color: #fff;
       background-color: var(--color-primary);
       width: 100%;
 
@@ -271,7 +271,9 @@ $verticalBreakpoint: 861px;
       }
     }
 
-    position: relative;
+    & {
+      position: relative;
+    }
 
     div {
       display: contents;

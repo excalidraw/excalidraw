@@ -1,4 +1,27 @@
-@import "open-color/open-color.scss";
+$color-red-1: #ffe3e3;
+$color-red-3: #ffa8a8;
+$color-red-6: #fa5252;
+$color-red-7: #f03e3e;
+$color-red-8: #e03131;
+$color-red-9: #c92a2a;
+$color-gray-1: #f1f3f5;
+$color-gray-2: #e9ecef;
+$color-gray-4: #ced4da;
+$color-gray-5: #adb5bd;
+$color-gray-6: #868e96;
+$color-gray-7: #495057;
+$color-gray-8: #343a40;
+$color-green-0: #ebfbee;
+$color-green-2: #b2f2bb;
+$color-green-4: #69db7c;
+$color-green-9: #2b8a3e;
+$color-blue-1: #d0ebff;
+$color-blue-2: #a5d8ff;
+$color-blue-4: #4dabf7;
+$color-blue-5: #339af0;
+$color-blue-6: #228be6;
+$color-blue-7: #1c7ed6;
+$color-blue-8: #1971c2;
 
 @mixin isMobile() {
   @at-root .excalidraw--mobile#{&} {
@@ -137,7 +160,10 @@
 
 @mixin outlineButtonIconStyles {
   @include outlineButtonStyles;
-  padding: 0;
+
+  & {
+    padding: 0;
+  }
 
   svg {
     width: var(--default-icon-size);
