@@ -5,6 +5,8 @@ import {
   type GlobalPoint,
   type LocalPoint,
   type Radians,
+  bezierEquation,
+  pointRotateRads,
 } from "@excalidraw/math";
 
 import {
@@ -21,6 +23,7 @@ import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
   elementCenterPoint,
+  getDiamondBaseCorners,
   getOmitSidesForEditorInterface,
   getTransformHandles,
   getTransformHandlesFromCoords,
@@ -363,12 +366,43 @@ const renderBindingHighlightForBindableElement_simple = (
         const midpointRadius = 5 / appState.zoom.value;
         const cutoutPadding = 5 / appState.zoom.value;
         const cutoutRadius = midpointRadius + cutoutPadding;
-        const midpoints = [
-          { x: element.width / 2, y: 0 }, // TOP
-          { x: element.width, y: element.height / 2 }, // RIGHT
-          { x: element.width / 2, y: element.height }, // BOTTOM
-          { x: 0, y: element.height / 2 }, // LEFT
-        ];
+
+        let midpoints;
+        if (element.type === "diamond") {
+          const center = elementCenterPoint(element, elementsMap);
+          midpoints = getDiamondBaseCorners(element).map((curve) => {
+            const point = bezierEquation(curve, 0.5);
+            const rotatedPoint = pointRotateRads(point, center, element.angle);
+
+            return {
+              x: rotatedPoint[0] - element.x,
+              y: rotatedPoint[1] - element.y,
+            };
+          });
+        } else {
+          const center = elementCenterPoint(element, elementsMap);
+          const basePoints = [
+            { x: element.width / 2, y: 0 }, // TOP
+            { x: element.width, y: element.height / 2 }, // RIGHT
+            { x: element.width / 2, y: element.height }, // BOTTOM
+            { x: 0, y: element.height / 2 }, // LEFT
+          ];
+          midpoints = basePoints.map((point) => {
+            const globalPoint = pointFrom<GlobalPoint>(
+              point.x + element.x,
+              point.y + element.y,
+            );
+            const rotatedPoint = pointRotateRads(
+              globalPoint,
+              center,
+              element.angle,
+            );
+            return {
+              x: rotatedPoint[0] - element.x,
+              y: rotatedPoint[1] - element.y,
+            };
+          });
+        }
 
         // Clear cutouts around midpoints
         midpoints.forEach((midpoint) => {
@@ -660,12 +694,44 @@ const renderBindingHighlightForBindableElement_complex = (
     const midpointRadius = 5 / appState.zoom.value;
     const cutoutPadding = 5 / appState.zoom.value;
     const cutoutRadius = midpointRadius + cutoutPadding;
-    const midpoints = [
-      { x: element.width / 2, y: 0 }, // TOP
-      { x: element.width, y: element.height / 2 }, // RIGHT
-      { x: element.width / 2, y: element.height }, // BOTTOM
-      { x: 0, y: element.height / 2 }, // LEFT
-    ];
+
+    let midpoints;
+    if (element.type === "diamond") {
+      const [, curves] = deconstructDiamondElement(element);
+      const center = elementCenterPoint(element, allElementsMap);
+
+      midpoints = curves.map((curve) => {
+        const point = bezierEquation(curve, 0.5);
+        const rotatedPoint = pointRotateRads(point, center, element.angle);
+        return {
+          x: rotatedPoint[0] - element.x,
+          y: rotatedPoint[1] - element.y,
+        };
+      });
+    } else {
+      const center = elementCenterPoint(element, allElementsMap);
+      const basePoints = [
+        { x: element.width / 2, y: 0 }, // TOP
+        { x: element.width, y: element.height / 2 }, // RIGHT
+        { x: element.width / 2, y: element.height }, // BOTTOM
+        { x: 0, y: element.height / 2 }, // LEFT
+      ];
+      midpoints = basePoints.map((point) => {
+        const globalPoint = pointFrom<GlobalPoint>(
+          point.x + element.x,
+          point.y + element.y,
+        );
+        const rotatedPoint = pointRotateRads(
+          globalPoint,
+          center,
+          element.angle,
+        );
+        return {
+          x: rotatedPoint[0] - element.x,
+          y: rotatedPoint[1] - element.y,
+        };
+      });
+    }
 
     // Clear cutouts around midpoints
     midpoints.forEach((midpoint) => {

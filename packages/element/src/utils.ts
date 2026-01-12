@@ -331,24 +331,10 @@ export function deconstructRectanguloidElement(
   return shape;
 }
 
-/**
- * Get the **unrotated** building components of a diamond element
- * in the form of line segments and curves as a tuple, in this order.
- *
- * @param element The element to deconstruct
- * @param offset An optional offset
- * @returns Tuple of line **unrotated** segments (0) and curves (1)
- */
-export function deconstructDiamondElement(
+export function getDiamondBaseCorners(
   element: ExcalidrawDiamondElement,
   offset: number = 0,
-): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
-  const cachedShape = getElementShapesCacheEntry(element, offset);
-
-  if (cachedShape) {
-    return cachedShape;
-  }
-
+): Curve<GlobalPoint>[] {
   const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
     getDiamondPoints(element);
   const verticalRadius = element.roundness
@@ -365,7 +351,7 @@ export function deconstructDiamondElement(
     pointFrom(element.x + leftX, element.y + leftY),
   ];
 
-  const baseCorners = [
+  return [
     curve(
       pointFrom<GlobalPoint>(
         right[0] - verticalRadius,
@@ -415,6 +401,27 @@ export function deconstructDiamondElement(
       ),
     ), // TOP
   ];
+}
+
+/**
+ * Get the **unrotated** building components of a diamond element
+ * in the form of line segments and curves as a tuple, in this order.
+ *
+ * @param element The element to deconstruct
+ * @param offset An optional offset
+ * @returns Tuple of line **unrotated** segments (0) and curves (1)
+ */
+export function deconstructDiamondElement(
+  element: ExcalidrawDiamondElement,
+  offset: number = 0,
+): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+  const cachedShape = getElementShapesCacheEntry(element, offset);
+
+  if (cachedShape) {
+    return cachedShape;
+  }
+
+  const baseCorners = getDiamondBaseCorners(element, offset);
 
   const corners = baseCorners.map(
     (corner) =>
