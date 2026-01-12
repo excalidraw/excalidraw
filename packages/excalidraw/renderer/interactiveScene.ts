@@ -77,11 +77,6 @@ import {
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
 
-import {
-  type AppClassProperties,
-  type InteractiveCanvasAppState,
-} from "../types";
-
 import { getClientColor, renderRemoteCursors } from "../clients";
 
 import {
@@ -90,6 +85,12 @@ import {
   getNormalizedCanvasDimensions,
   strokeRectWithRotation_simple,
 } from "./helpers";
+
+import type {
+  Zoom,
+  AppClassProperties,
+  InteractiveCanvasAppState,
+} from "../types";
 
 import type {
   InteractiveCanvasRenderConfig,
@@ -998,6 +999,7 @@ const renderFocusPointIndicators = (
   appState: InteractiveCanvasAppState,
   element: NonDeleted<ExcalidrawLinearElement>,
   elementsMap: NonDeletedSceneElementsMap,
+  zoom: Zoom,
 ) => {
   // Render focus point indicators when the arrow is selected
   if (
@@ -1032,7 +1034,13 @@ const renderFocusPointIndicators = (
 
       // Only render if focus point is within the bindable element
       if (
-        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap)
+        isFocusPointVisible(
+          focusPoint,
+          arrow,
+          bindableElement,
+          elementsMap,
+          zoom,
+        )
       ) {
         const isHovered =
           appState.selectedLinearElement?.hoveredFocusPointBinding === "start";
@@ -1085,7 +1093,13 @@ const renderFocusPointIndicators = (
 
       // Only render if focus point is within the bindable element
       if (
-        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap)
+        isFocusPointVisible(
+          focusPoint,
+          arrow,
+          bindableElement,
+          elementsMap,
+          zoom,
+        )
       ) {
         const isHovered =
           appState.selectedLinearElement?.hoveredFocusPointBinding === "end";
@@ -1504,6 +1518,7 @@ const _renderInteractiveScene = ({
                 arrow,
                 bindableElement,
                 elementsMap,
+                appState.zoom,
               )
             ) {
               renderFocusPointHighlight(context, appState, focusPoint);
@@ -1520,6 +1535,7 @@ const _renderInteractiveScene = ({
         appState,
         firstSelectedLinear,
         allElementsMap,
+        appState.zoom,
       );
     }
   }

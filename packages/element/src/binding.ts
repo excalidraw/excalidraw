@@ -144,6 +144,7 @@ export const isFocusPointVisible = (
   arrow: ExcalidrawArrowElement,
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
+  zoom: AppState["zoom"],
   ignoreOverlap = false,
 ): boolean => {
   // No focus point management for elbow arrows, because elbow arrows
@@ -166,7 +167,10 @@ export const isFocusPointVisible = (
         elementsMap,
       );
 
-    if (pointDistanceSq(focusPoint, associatedArrowPoint) < 1) {
+    if (
+      pointDistance(focusPoint, associatedArrowPoint) <
+      LinearElementEditor.POINT_HANDLE_SIZE / 1.5 / zoom.value
+    ) {
       return false;
     }
   }
@@ -186,6 +190,7 @@ export const handleFocusPointDrag = (
   elementsMap: NonDeletedSceneElementsMap,
   pointerCoords: { x: number; y: number },
   scene: Scene,
+  zoom: AppState["zoom"],
 ): boolean => {
   const arrow = LinearElementEditor.getElement(
     linearElementEditor.elementId,
@@ -218,7 +223,14 @@ export const handleFocusPointDrag = (
       // Check if the new focus point position is
       // within bindable element bounds
       if (
-        !isFocusPointVisible(point, arrow, bindableElement, elementsMap, true)
+        !isFocusPointVisible(
+          point,
+          arrow,
+          bindableElement,
+          elementsMap,
+          zoom,
+          true,
+        )
       ) {
         return false;
       }
@@ -343,7 +355,13 @@ export const handleFocusPointPointerDown = (
         elementsMap,
       );
       if (
-        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap) &&
+        isFocusPointVisible(
+          focusPoint,
+          arrow,
+          bindableElement,
+          elementsMap,
+          zoom,
+        ) &&
         pointDistance(pointerPos, focusPoint) <= hitThreshold
       ) {
         return "start";
@@ -365,7 +383,13 @@ export const handleFocusPointPointerDown = (
         elementsMap,
       );
       if (
-        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap) &&
+        isFocusPointVisible(
+          focusPoint,
+          arrow,
+          bindableElement,
+          elementsMap,
+          zoom,
+        ) &&
         pointDistance(pointerPos, focusPoint) <= hitThreshold
       ) {
         return "end";
@@ -401,7 +425,13 @@ export const handleFocusPointHover = (
         elementsMap,
       );
       if (
-        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap) &&
+        isFocusPointVisible(
+          focusPoint,
+          arrow,
+          bindableElement,
+          elementsMap,
+          zoom,
+        ) &&
         pointDistance(pointerPos, focusPoint) <= hitThreshold
       ) {
         return "start";
@@ -423,7 +453,13 @@ export const handleFocusPointHover = (
         elementsMap,
       );
       if (
-        isFocusPointVisible(focusPoint, arrow, bindableElement, elementsMap) &&
+        isFocusPointVisible(
+          focusPoint,
+          arrow,
+          bindableElement,
+          elementsMap,
+          zoom,
+        ) &&
         pointDistance(pointerPos, focusPoint) <= hitThreshold
       ) {
         return "end";

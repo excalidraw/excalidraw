@@ -9070,6 +9070,7 @@ class App extends React.Component<AppProps, AppState> {
               elementsMap,
               pointerCoords,
               this.scene,
+              this.state.zoom,
             )
           ) {
             this.setState({
