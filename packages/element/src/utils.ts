@@ -27,7 +27,11 @@ import {
 
 import type { Curve, LineSegment, LocalPoint } from "@excalidraw/math";
 
-import type { NormalizedZoomValue, Zoom } from "@excalidraw/excalidraw/types";
+import type {
+  AppState,
+  NormalizedZoomValue,
+  Zoom,
+} from "@excalidraw/excalidraw/types";
 
 import { elementCenterPoint, getDiamondPoints } from "./bounds";
 
@@ -36,7 +40,7 @@ import { generateLinearCollisionShape } from "./shape";
 import { isPointInElement } from "./collision";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isRectangularElement } from "./typeChecks";
-import { getBindingGap } from "./binding";
+import { maxBindingDistance_simple } from "./binding";
 
 import type {
   ElementsMap,
@@ -585,6 +589,7 @@ export const projectFixedPointOntoDiagonal = (
   element: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
+  zoom?: AppState["zoom"],
 ): GlobalPoint | null => {
   invariant(arrow.points.length >= 2, "Arrow must have at least two points");
   if (arrow.width < 3 && arrow.height < 3) {
@@ -626,7 +631,7 @@ export const projectFixedPointOntoDiagonal = (
   ];
   const sideMidPoint = sideMidpoints.find((midpoint, idx) => {
     return (
-      pointDistance(point, midpoint) <= getBindingGap(element, arrow) &&
+      pointDistance(point, midpoint) <= maxBindingDistance_simple(zoom) &&
       (idx === 0
         ? point[1] <= midpoint[1]
         : idx === 1

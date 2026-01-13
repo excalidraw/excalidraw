@@ -411,6 +411,7 @@ export class LinearElementEditor {
                 startBindingElement,
                 "start",
                 elementsMap,
+                app.state.zoom,
               )
             : linearElementEditor.initialState.altFocusPoint,
       },
@@ -627,6 +628,7 @@ export class LinearElementEditor {
                 altFocusPointBindableElement,
                 "start",
                 elementsMap,
+                app.state.zoom,
               )
             : linearElementEditor.initialState.altFocusPoint,
       },

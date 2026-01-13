@@ -796,6 +796,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
               hit,
               startDragged ? "start" : "end",
               elementsMap,
+              appState.zoom,
             ) || globalPoint,
         }
     : { mode: null };
@@ -826,6 +827,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
               otherBindableElement,
               startDragged ? "end" : "start",
               elementsMap,
+              appState.zoom,
             ) || otherEndpoint,
         }
       : { mode: undefined };
