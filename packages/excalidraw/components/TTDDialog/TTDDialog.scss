@@ -6,8 +6,17 @@ $verticalBreakpoint: 861px;
   .Modal.Dialog.ttd-dialog {
     padding: 1.25rem;
 
+    @media screen and (max-width: $verticalBreakpoint) {
+      padding: 0.75rem;
+    }
+
     &.Dialog--fullscreen {
       margin-top: 0;
+    }
+
+    // Hide the default Dialog close button, we use our custom styled one
+    .Dialog__close {
+      display: none;
     }
 
     .Island {
@@ -15,22 +24,60 @@ $verticalBreakpoint: 861px;
       height: 100%;
       display: flex;
       flex-direction: column;
-      flex: 1 1 auto;
       box-shadow: none;
+      overflow: hidden;
     }
 
     .Modal__content {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
       height: auto;
       max-height: 100%;
+      overflow: hidden;
 
       @media screen and (min-width: $verticalBreakpoint) {
         max-height: 750px;
-        height: 100%;
+        height: 750px;
       }
     }
 
     .Dialog__content {
       flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+  }
+
+  .ttd-dialog-close {
+    @include outlineButtonStyles;
+
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 100;
+
+    --button-bg: transparent;
+    border: 0 !important;
+
+    width: var(--lg-button-size);
+    height: var(--lg-button-size);
+    padding: 0;
+
+    svg {
+      width: var(--lg-icon-size);
+      height: var(--lg-icon-size);
+    }
+
+    &:hover {
+      background: var(--button-hover-bg, var(--island-bg-color));
+    }
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      top: 0.75rem;
+      right: 0.75rem;
     }
   }
 
@@ -38,7 +85,8 @@ $verticalBreakpoint: 861px;
     font-size: 15px;
     font-style: italic;
     font-weight: 500;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    flex-shrink: 0;
   }
 
   .ttd-dialog-tabs-root {
@@ -59,9 +107,32 @@ $verticalBreakpoint: 861px;
     font-weight: 600;
     font-family: inherit;
     letter-spacing: 0.4px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:hover {
+      color: var(--color-primary);
+    }
 
     &[data-state="active"] {
       border-bottom: 2px solid var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    .ttd-dialog-ai-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 6px;
+      font-size: 10px;
+      line-height: 1;
+      border-radius: 12px;
+      background: var(--color-promo);
+      color: var(--color-surface-lowest);
+      vertical-align: middle;
     }
   }
 
@@ -69,17 +140,32 @@ $verticalBreakpoint: 861px;
     border-bottom: 1px solid var(--color-surface-high);
     margin-bottom: 1.5rem;
     padding-inline: 2.5rem;
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      padding-inline: 1.25rem;
+      margin-bottom: 1rem;
+    }
   }
 
   .ttd-dialog-content {
     padding-inline: 2.5rem;
-    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      padding-inline: 1.25rem;
+    }
 
     &[hidden] {
       display: none;
     }
+  }
+
+  .ttd-dialog-error-banner-container {
+    flex-shrink: 0;
   }
 
   .ttd-dialog-input {
@@ -89,9 +175,19 @@ $verticalBreakpoint: 861px;
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--dialog-border-color);
     white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
     padding: 0.85rem;
     box-sizing: border-box;
     font-family: monospace;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    &::placeholder {
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
 
     @media screen and (min-width: $verticalBreakpoint) {
       width: 100%;
@@ -105,26 +201,107 @@ $verticalBreakpoint: 861px;
     justify-content: center;
     padding: 0.85rem;
     box-sizing: border-box;
-    flex-grow: 1;
+    flex: 1 1 auto;
+    min-height: 0;
     position: relative;
 
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
-      left center;
+    background: rgba(245, 245, 245, 0);
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--dialog-border-color);
 
-    height: 400px;
+    height: 100%;
     width: auto;
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      padding: 0.65rem;
+      min-height: 200px;
+    }
 
     @media screen and (min-width: $verticalBreakpoint) {
       width: 100%;
-      // acts as min-height
-      height: 200px;
+      min-height: 200px;
+      height: auto;
     }
 
     canvas {
       max-width: 100%;
       max-height: 100%;
+      position: relative;
+      z-index: 1;
+    }
+  }
+
+  .ttd-dialog-output-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+
+    svg {
+      width: 60%;
+      height: 60%;
+      max-width: 100%;
+      max-height: 100%;
+      color: var(--color-gray-50);
+    }
+  }
+
+  .ttd-dialog-output-syntax-error {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    text-align: center;
+    z-index: 2;
+
+    &__icon {
+      font-size: 3rem;
+      line-height: 1;
+      animation: error-bounce 0.5s ease-out;
+    }
+
+    &__title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-danger);
+
+      @at-root .excalidraw.theme--dark#{&} {
+        color: #ff8787;
+      }
+    }
+
+    &__message {
+      font-size: 0.875rem;
+      color: var(--color-gray-60);
+      max-width: 400px;
+      line-height: 1.5;
+
+      @at-root .excalidraw.theme--dark#{&} {
+        color: var(--color-gray-40);
+      }
+    }
+  }
+
+  .ttd-dialog-output-canvas-container--hidden {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  @keyframes error-bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
     }
   }
 
@@ -135,6 +312,10 @@ $verticalBreakpoint: 861px;
     align-items: center;
     justify-content: center;
     flex-grow: 1;
+
+    &--error {
+      opacity: 0.15;
+    }
   }
 
   .ttd-dialog-output-error {
@@ -161,12 +342,24 @@ $verticalBreakpoint: 861px;
   }
 
   .ttd-dialog-panels {
-    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow: hidden;
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
 
     @media screen and (min-width: $verticalBreakpoint) {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      grid-template-rows: minmax(0, 1fr);
       gap: 4rem;
+      overflow: hidden;
     }
   }
 
@@ -174,12 +367,35 @@ $verticalBreakpoint: 861px;
     display: flex;
     flex-direction: column;
     width: 100%;
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      &:first-child {
+        flex: 0 0 auto;
+        max-height: 25vh;
+        min-height: 180px;
+      }
+
+      &:last-child {
+        flex: 1 1 auto;
+        min-height: 300px;
+        overflow: visible;
+      }
+    }
 
     &__header {
       display: flex;
       margin: 0px 4px 4px 4px;
       align-items: center;
       gap: 1rem;
+      flex-shrink: 0;
+
+      @media screen and (max-width: $verticalBreakpoint) {
+        margin: 0px 2px 4px 2px;
+        gap: 0.5rem;
+      }
 
       label {
         font-size: 14px;
@@ -191,6 +407,10 @@ $verticalBreakpoint: 861px;
     &:first-child {
       .ttd-dialog-panel-button-container:not(.invisible) {
         margin-bottom: 4rem;
+
+        @media screen and (max-width: $verticalBreakpoint) {
+          margin-bottom: 1rem;
+        }
       }
     }
 
@@ -201,19 +421,32 @@ $verticalBreakpoint: 861px;
     }
 
     textarea {
-      height: 100%;
+      flex: 1 1 auto;
+      min-height: 0;
       resize: none;
       border-radius: var(--border-radius-lg);
       border: 1px solid var(--dialog-border-color);
       white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
       padding: 0.85rem;
       box-sizing: border-box;
       width: 100%;
       font-family: monospace;
+      overflow-y: auto;
+      overflow-x: hidden;
+
+      &::placeholder {
+        white-space: normal;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
 
       @media screen and (max-width: $verticalBreakpoint) {
         width: auto;
-        height: 10rem;
+        height: 5rem;
+        flex: 0 0 auto;
+        padding: 0.65rem;
       }
     }
   }
@@ -221,6 +454,15 @@ $verticalBreakpoint: 861px;
   .ttd-dialog-panel-button-container {
     margin-top: 1rem;
     margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      margin-top: 0.5rem;
+      margin-bottom: 0;
+    }
 
     &.invisible {
       .ttd-dialog-panel-button {
@@ -306,12 +548,103 @@ $verticalBreakpoint: 861px;
     font-size: 0.625rem;
     opacity: 0.6;
     display: flex;
-    gap: 0.125rem;
+    align-items: center;
+    gap: 0.25rem;
+
+    &__label {
+      opacity: 0.8;
+      padding: 0 0.125rem;
+    }
 
     &__key {
       border: 1px solid gray;
       padding: 2px 3px;
       border-radius: 4px;
+    }
+
+    &.disabled {
+      opacity: 0.25;
+      pointer-events: none;
+    }
+  }
+
+  .ttd-dialog-ai-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 6px;
+    margin-left: 10px;
+    font-size: 10px;
+    line-height: 1;
+    border-radius: 12px;
+    background: var(--color-promo);
+    color: var(--color-surface-lowest);
+    vertical-align: middle;
+  }
+
+  .ttd-dialog-rate-limit {
+    font-size: 12px;
+    margin-left: auto;
+    color: var(--color-primary);
+    font-weight: 600;
+
+    &--exceeded {
+      color: var(--color-danger);
+    }
+  }
+
+  .ttd-dialog-char-count {
+    font-size: 12px;
+    font-family: monospace;
+    margin-left: auto;
+
+    &--exceeded {
+      color: var(--color-danger);
+    }
+  }
+
+  .ttd-dialog-code-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-left: auto;
+  }
+
+  .ttd-dialog-code-toggle-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-gray-50);
+    user-select: none;
+    cursor: pointer;
+    white-space: nowrap;
+
+    @at-root .excalidraw.theme--dark#{&} {
+      color: var(--color-gray-40);
+    }
+  }
+
+  .ttd-dialog-mermaid-code {
+    flex: 1 1 auto;
+    min-height: 0;
+    resize: none;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--dialog-border-color);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    padding: 0.85rem;
+    box-sizing: border-box;
+    width: 100%;
+    font-family: monospace;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: var(--color-surface-primary-container);
+    color: var(--color-on-surface);
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      width: auto;
+      height: 10rem;
+      flex: 0 0 auto;
     }
   }
 }

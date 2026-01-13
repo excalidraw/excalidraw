@@ -79,7 +79,7 @@ export const convertMermaidToExcalidraw = async ({
     let ret;
     try {
       ret = await api.parseMermaidToExcalidraw(mermaidDefinition);
-    } catch (err: any) {
+    } catch (err: unknown) {
       ret = await api.parseMermaidToExcalidraw(
         mermaidDefinition.replace(/"/g, "'"),
       );
@@ -112,17 +112,17 @@ export const convertMermaidToExcalidraw = async ({
     // likely prevent preview and export (e.g. canvas too big)
     try {
       await canvasToBlob(canvas);
-    } catch (e: any) {
-      if (e.name === "CANVAS_POSSIBLY_TOO_BIG") {
+    } catch (e: unknown) {
+      if (e instanceof Error && e.name === "CANVAS_POSSIBLY_TOO_BIG") {
         throw new Error(t("canvasError.canvasTooBig"));
       }
       throw e;
     }
     parent.style.background = "var(--default-bg-color)";
     canvasNode.replaceChildren(canvas);
-  } catch (err: any) {
+  } catch (err: unknown) {
     parent.style.background = "var(--default-bg-color)";
-    if (mermaidDefinition) {
+    if (mermaidDefinition && err instanceof Error) {
       setError(err);
     }
 

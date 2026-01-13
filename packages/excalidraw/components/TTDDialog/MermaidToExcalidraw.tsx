@@ -1,11 +1,10 @@
-import { useState, useRef, useEffect, useDeferredValue } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 import { EDITOR_LS_KEYS, debounce, isDevEnv } from "@excalidraw/common";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { useApp } from "../App";
-import { ArrowRightIcon } from "../icons";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { t } from "../../i18n";
 import Trans from "../Trans";
@@ -25,6 +24,7 @@ import "./MermaidToExcalidraw.scss";
 
 import type { BinaryFiles } from "../../types";
 import type { MermaidToExcalidrawLibProps } from "./common";
+import { ArrowRightIcon } from "@excalidraw/excalidraw/components/icons";
 
 const MERMAID_EXAMPLE =
   "flowchart TD\n A[Christmas] -->|Get money| B(Go shopping)\n B --> C{Let me think}\n C -->|One| D[Laptop]\n C -->|Two| E[iPhone]\n C -->|Three| F[Car]";
@@ -41,8 +41,8 @@ const MermaidToExcalidraw = ({
       EditorLocalStorage.get<string>(EDITOR_LS_KEYS.MERMAID_TO_EXCALIDRAW) ||
       MERMAID_EXAMPLE,
   );
-  const deferredText = useDeferredValue(text.trim());
   const [error, setError] = useState<Error | null>(null);
+  const [hasContent, setHasContent] = useState(false);
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const data = useRef<{
@@ -52,27 +52,62 @@ const MermaidToExcalidraw = ({
 
   const app = useApp();
 
-  useEffect(() => {
-    convertMermaidToExcalidraw({
-      canvasRef,
-      data,
-      mermaidToExcalidrawLib,
-      setError,
-      mermaidDefinition: deferredText,
-    }).catch((err) => {
-      if (isDevEnv()) {
-        console.error("Failed to parse mermaid definition", err);
+  // Extracted conversion logic to avoid duplication
+  const performConversion = useCallback(
+    (mermaidDefinition: string) => {
+      if (!mermaidDefinition) {
+        return;
       }
-    });
 
-    debouncedSaveMermaidDefinition(deferredText);
-  }, [deferredText, mermaidToExcalidrawLib]);
+      convertMermaidToExcalidraw({
+        canvasRef,
+        data,
+        mermaidToExcalidrawLib,
+        setError,
+        mermaidDefinition,
+      })
+        .then(() => {
+          setHasContent(data.current.elements.length > 0);
+        })
+        .catch((err) => {
+          if (isDevEnv()) {
+            console.error("Failed to parse mermaid definition", err);
+          }
+          setHasContent(false);
+        });
+    },
+    [mermaidToExcalidrawLib],
+  );
 
+  // Stable ref to always use latest performConversion in debounced function
+  const performConversionRef = useRef(performConversion);
+  performConversionRef.current = performConversion;
+
+  // Debounced conversion for auto-convert mode (performance optimization)
+  const debouncedConvert = useRef(
+    debounce((definition: string) => {
+      performConversionRef.current(definition);
+    }, 300),
+  ).current;
+
+  // Auto-convert on text change with debounce
+  useEffect(() => {
+    const trimmedText = text.trim();
+    debouncedConvert(trimmedText);
+  }, [text, debouncedConvert]);
+
+  // Save to local storage on text change
+  useEffect(() => {
+    debouncedSaveMermaidDefinition(text.trim());
+  }, [text]);
+
+  // Cleanup: flush pending operations on unmount
   useEffect(
     () => () => {
       debouncedSaveMermaidDefinition.flush();
+      debouncedConvert.flush?.();
     },
-    [],
+    [debouncedConvert],
   );
 
   const onInsertToEditor = () => {
@@ -83,6 +118,28 @@ const MermaidToExcalidraw = ({
       shouldSaveMermaidDataToStorage: true,
     });
   };
+
+  const onInsertRef = useRef(onInsertToEditor);
+  onInsertRef.current = onInsertToEditor;
+
+  // Global keyboard shortcut: Cmd/Ctrl+Enter to insert
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.key === "Enter" &&
+        (event.metaKey || event.ctrlKey) &&
+        !event.shiftKey
+      ) {
+        event.preventDefault();
+        onInsertRef.current();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <>
@@ -103,31 +160,29 @@ const MermaidToExcalidraw = ({
         />
       </div>
       <TTDDialogPanels>
-        <TTDDialogPanel label={t("mermaid.syntax")}>
+        <TTDDialogPanel
+          label={t("mermaid.syntax")}
+        >
           <TTDDialogInput
             input={text}
             placeholder={"Write Mermaid diagram defintion here..."}
             onChange={(event) => setText(event.target.value)}
-            onKeyboardSubmit={() => {
-              onInsertToEditor();
-            }}
           />
         </TTDDialogPanel>
         <TTDDialogPanel
           label={t("mermaid.preview")}
           panelAction={{
-            action: () => {
-              onInsertToEditor();
-            },
+            action: onInsertToEditor,
             label: t("mermaid.button"),
             icon: ArrowRightIcon,
           }}
-          renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
+          renderSubmitShortcut={() => <TTDDialogSubmitShortcut variant="ctrlEnter" />}
         >
           <TTDDialogOutput
             canvasRef={canvasRef}
             loaded={mermaidToExcalidrawLib.loaded}
             error={error}
+            hasContent={hasContent}
           />
         </TTDDialogPanel>
       </TTDDialogPanels>

@@ -1,0 +1,155 @@
+@import "../../css/variables.module.scss";
+
+.excalidraw {
+  .ttd-dialog-cta-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .ttd-dialog-cta-popup {
+    background: var(--island-bg-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    max-width: 420px;
+    width: 90%;
+    position: relative;
+    animation: slideUp 0.3s ease;
+    border: 1px solid var(--dialog-border-color);
+
+    &__close {
+      @include outlineButtonStyles;
+
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 10;
+
+      --button-bg: transparent;
+      border: 0 !important;
+
+      width: var(--lg-button-size);
+      height: var(--lg-button-size);
+      padding: 0;
+
+      svg {
+        width: var(--lg-icon-size);
+        height: var(--lg-icon-size);
+      }
+
+      &:hover {
+        background: var(--button-hover-bg, var(--island-bg-color));
+      }
+
+      @media screen and (max-width: 861px) {
+        top: 1rem;
+        right: 1rem;
+      }
+    }
+
+    &__content {
+      padding: 2.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1.5rem;
+    }
+
+    &__title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+      letter-spacing: -0.02em;
+    }
+
+    &__text {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--color-on-surface);
+      opacity: 0.85;
+    }
+
+    &__buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 100%;
+    }
+
+    &__button {
+      width: 100%;
+      padding: 0.875rem 1.5rem;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: var(--border-radius-md);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &--explore {
+        background: transparent;
+        border: 2px solid var(--color-primary);
+        color: var(--color-primary);
+
+        &:hover {
+          background: var(--color-primary-light);
+        }
+
+        &:active {
+          background: var(--color-primary-light-darker);
+        }
+      }
+
+      &--trial {
+        background: var(--color-primary);
+        color: white;
+
+        &:hover {
+          background: var(--color-primary-darker);
+        }
+
+        &:active {
+          background: var(--color-primary-darkest);
+        }
+
+        @at-root .excalidraw.theme--dark#{&} {
+          color: var(--color-gray-100);
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

@@ -1,0 +1,110 @@
+@import "../../css/variables.module.scss";
+
+$verticalBreakpoint: 861px;
+
+.excalidraw {
+  .ttd-dialog-error-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    margin-bottom: 1rem;
+    background-color: rgba(#ff6b6b, 0.1);
+    border: 1px solid rgba(#ff6b6b, 0.3);
+    border-radius: var(--border-radius-lg);
+    animation: slide-down 0.3s ease-out;
+    z-index: 10;
+    position: relative;
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    @at-root .excalidraw.theme--dark#{&} {
+      background-color: rgba(#ff6b6b, 0.15);
+      border-color: rgba(#ff6b6b, 0.4);
+    }
+
+    &__message {
+      flex: 1;
+      color: #c92a2a;
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 1.4;
+      padding: 0 0.75rem;
+
+      @media screen and (max-width: $verticalBreakpoint) {
+        font-size: 0.8125rem;
+        padding: 0 0.5rem;
+      }
+
+      @at-root .excalidraw.theme--dark#{&} {
+        color: #ffa8a8;
+      }
+    }
+
+    &__close {
+      flex-shrink: 0;
+      margin-left: 0.5rem;
+      margin-right: 0.75rem;
+      padding: 0.25rem;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      color: #c92a2a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+
+      @media screen and (max-width: $verticalBreakpoint) {
+        margin-left: 0.25rem;
+        margin-right: 0;
+        padding: 0.2rem;
+      }
+
+      &:hover {
+        background-color: rgba(#c92a2a, 0.1);
+      }
+
+      &:active {
+        background-color: rgba(#c92a2a, 0.2);
+      }
+
+      @at-root .excalidraw.theme--dark#{&} {
+        color: #ffa8a8;
+
+        &:hover {
+          background-color: rgba(#ffa8a8, 0.1);
+        }
+
+        &:active {
+          background-color: rgba(#ffa8a8, 0.15);
+        }
+      }
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+
+        @media screen and (max-width: $verticalBreakpoint) {
+          width: 0.875rem;
+          height: 0.875rem;
+        }
+      }
+    }
+  }
+
+  @keyframes slide-down {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
