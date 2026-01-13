@@ -47,10 +47,79 @@ type SceneStateCallbackRemover = () => void;
 
 type SelectionHash = string & { __brand: "selectionHash" };
 
+class CachedMap<K, V> extends Map<K, V> {
+  private cacheKey: K | null = null;
+  private cache: V | null = null;
+
+  // private cacheHitsThisFrame = 0;
+  // private cacheHitsFrameId: number | null = null;
+
+  // constructor(...args: any[]) {
+  //   super(...args);
+  //   this.scheduleCacheHitsReport();
+  // }
+
+  // private scheduleCacheHitsReport() {
+  //   if (this.cacheHitsFrameId && this.cacheHitsFrameId > 0) {
+  //     window.cancelAnimationFrame(this.cacheHitsFrameId!);
+  //   }
+
+  //   this.cacheHitsFrameId = window.requestAnimationFrame(
+  //     this.scheduleCacheHitsReport.bind(this),
+  //   );
+
+  //   this.cacheHitsFrameId = null;
+  //   if (this.cacheHitsThisFrame > 0) {
+  //     console.log(`CachedMap cache hits (frame): ${this.cacheHitsThisFrame}`);
+  //   }
+  //   this.cacheHitsThisFrame = 0;
+  // }
+
+  get(key: K): V | undefined {
+    if (this.cacheKey === key && this.cache !== null) {
+      //this.cacheHitsThisFrame += 1;
+      return this.cache;
+    }
+
+    const value = super.get(key);
+    if (value !== undefined) {
+      this.cache = value;
+      this.cacheKey = key;
+    }
+
+    return value;
+  }
+
+  has(key: K): boolean {
+    if (this.cacheKey === key && this.cache !== null) {
+      return true;
+    }
+    return super.has(key);
+  }
+
+  set(key: K, value: V): this {
+    this.cacheKey = null;
+    this.cache = null;
+    return super.set(key, value);
+  }
+
+  delete(key: K): boolean {
+    this.cacheKey = null;
+    this.cache = null;
+    return super.delete(key);
+  }
+
+  clear(): void {
+    this.cacheKey = null;
+    this.cache = null;
+    super.clear();
+  }
+}
+
 const getNonDeletedElements = <T extends ExcalidrawElement>(
   allElements: readonly T[],
 ) => {
-  const elementsMap = new Map() as NonDeletedSceneElementsMap;
+  const elementsMap = toBrandedType(new CachedMap());
   const elements: T[] = [];
   for (const element of allElements) {
     if (!element.isDeleted) {
@@ -115,7 +184,7 @@ export class Scene {
   private nonDeletedElements: readonly Ordered<NonDeletedExcalidrawElement>[] =
     [];
   private nonDeletedElementsMap = toBrandedType<NonDeletedSceneElementsMap>(
-    new Map(),
+    new CachedMap(),
   );
   // ideally all elements within the scene should be wrapped around with `Ordered` type, but right now there is no real benefit doing so
   private elements: readonly OrderedExcalidrawElement[] = [];
@@ -292,7 +361,9 @@ export class Scene {
     });
     const nonDeletedElements = getNonDeletedElements(this.elements);
     this.nonDeletedElements = nonDeletedElements.elements;
-    this.nonDeletedElementsMap = nonDeletedElements.elementsMap;
+    this.nonDeletedElementsMap = toBrandedType(
+      new CachedMap(nonDeletedElements.elementsMap),
+    );
 
     this.frames = nextFrameLikes;
     this.nonDeletedFramesLikes = getNonDeletedElements(this.frames).elements;
