@@ -108,16 +108,6 @@ export type HitTestArgs = {
 let cachedPoint: GlobalPoint | null = null;
 let cachedElement: WeakRef<ExcalidrawElement> | null = null;
 
-// let cacheHitsThisFrame = 0;
-// const scheduleCacheHitsReport = () => {
-//   window.requestAnimationFrame(scheduleCacheHitsReport);
-//   if (cacheHitsThisFrame > 0) {
-//     console.log(`hitElementItself cache hits (frame): ${cacheHitsThisFrame}`);
-//   }
-//   cacheHitsThisFrame = 0;
-// };
-// scheduleCacheHitsReport();
-
 export const hitElementItself = ({
   point,
   element,
@@ -135,7 +125,6 @@ export const hitElementItself = ({
       derefElement.version === element.version &&
       derefElement.versionNonce === element.versionNonce
     ) {
-      //cacheHitsThisFrame++;
       return true;
     }
   }

@@ -51,33 +51,8 @@ class CachedMap<K, V> extends Map<K, V> {
   private cacheKey: K | null = null;
   private cache: V | null = null;
 
-  // private cacheHitsThisFrame = 0;
-  // private cacheHitsFrameId: number | null = null;
-
-  // constructor(...args: any[]) {
-  //   super(...args);
-  //   this.scheduleCacheHitsReport();
-  // }
-
-  // private scheduleCacheHitsReport() {
-  //   if (this.cacheHitsFrameId && this.cacheHitsFrameId > 0) {
-  //     window.cancelAnimationFrame(this.cacheHitsFrameId!);
-  //   }
-
-  //   this.cacheHitsFrameId = window.requestAnimationFrame(
-  //     this.scheduleCacheHitsReport.bind(this),
-  //   );
-
-  //   this.cacheHitsFrameId = null;
-  //   if (this.cacheHitsThisFrame > 0) {
-  //     console.log(`CachedMap cache hits (frame): ${this.cacheHitsThisFrame}`);
-  //   }
-  //   this.cacheHitsThisFrame = 0;
-  // }
-
   get(key: K): V | undefined {
     if (this.cacheKey === key && this.cache !== null) {
-      //this.cacheHitsThisFrame += 1;
       return this.cache;
     }
 
