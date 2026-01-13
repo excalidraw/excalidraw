@@ -204,10 +204,18 @@ export const copyToClipboard = async (
   /** supply if available to make the operation more certain to succeed */
   clipboardEvent?: ClipboardEvent | null,
 ) => {
-  await copyTextToSystemClipboard(
-    serializeAsClipboardJSON({ elements, files }),
-    clipboardEvent,
-  );
+  const json = serializeAsClipboardJSON({ elements, files });
+  if (clipboardEvent) {
+    try {
+      clipboardEvent.clipboardData?.setData(MIME_TYPES.excalidraw, json);
+      clipboardEvent.clipboardData?.setData(MIME_TYPES.text, json);
+      clipboardEvent.preventDefault();
+      return;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  await copyTextToSystemClipboard(json, clipboardEvent);
 };
 
 const parsePotentialSpreadsheet = (

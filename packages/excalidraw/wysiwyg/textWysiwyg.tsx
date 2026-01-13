@@ -9,7 +9,6 @@ import {
   getFontFamilyString,
   isTestEnv,
   MIME_TYPES,
-  EXPORT_DATA_TYPES,
   applyDarkModeFilter,
 } from "@excalidraw/common";
 
@@ -48,9 +47,9 @@ import type {
 } from "@excalidraw/element/types";
 
 import { actionSaveToActiveFile } from "../actions";
+import { actionPaste } from "../actions/actionClipboard";
 
 import { parseDataTransferEvent } from "../clipboard";
-import { isValidExcalidrawData } from "../data/json";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
@@ -327,23 +326,14 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.onpaste = async (event) => {
-      // prevent pasting of excalidraw json into the text element
-      const plainText = event.clipboardData?.getData(MIME_TYPES.text);
-      if (plainText) {
-        try {
-          const parsed = JSON.parse(plainText);
-          if (
-            parsed &&
-            (isValidExcalidrawData(parsed) ||
-              parsed.type === EXPORT_DATA_TYPES.excalidrawClipboard ||
-              parsed.type === EXPORT_DATA_TYPES.excalidrawClipboardWithAPI)
-          ) {
-            event.preventDefault();
-            return;
-          }
-        } catch {
-          // ignore
-        }
+      // prevent pasting of excalidraw content into the text element
+      if (event.clipboardData?.types.includes(MIME_TYPES.excalidraw)) {
+        event.preventDefault();
+        // save the text element
+        editable.blur();
+        // paste the excalidraw element(s)
+        app.actionManager.executeAction(actionPaste, "keyboard", event);
+        return;
       }
 
       const textItem = (await parseDataTransferEvent(event)).findByType(
