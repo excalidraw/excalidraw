@@ -3496,7 +3496,22 @@ class App extends React.Component<AppProps, AppState> {
         const { elements: skeletonElements, files } =
           await api.parseMermaidToExcalidraw(data.text);
 
-        const elements = convertToExcalidrawElements(skeletonElements, {
+        // Process skeleton elements to convert <br> tags to newlines BEFORE conversion
+        const processedSkeletonElements = skeletonElements.map((el) => {
+          const processed = { ...el };
+          if (processed.label && typeof processed.label === "object" && "text" in processed.label && typeof processed.label.text === "string") {
+            processed.label = {
+              ...processed.label,
+              text: processed.label.text.replace(/<br\s*\/?>/gi, "\n"),
+            };
+          }
+          if ("text" in processed && typeof processed.text === "string") {
+            (processed as any).text = processed.text.replace(/<br\s*\/?>/gi, "\n");
+          }
+          return processed;
+        });
+
+        const elements = convertToExcalidrawElements(processedSkeletonElements, {
           regenerateIds: true,
         });
 
