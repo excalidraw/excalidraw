@@ -105,6 +105,9 @@ export type HitTestArgs = {
   overrideShouldTestInside?: boolean;
 };
 
+let cachedPoint: GlobalPoint | null = null;
+let cachedElement: WeakRef<ExcalidrawElement> | null = null;
+
 export const hitElementItself = ({
   point,
   element,
@@ -113,6 +116,19 @@ export const hitElementItself = ({
   frameNameBound = null,
   overrideShouldTestInside = false,
 }: HitTestArgs) => {
+  // Return cached result if the same point and element version is tested again
+  if (cachedPoint && pointsEqual(point, cachedPoint)) {
+    const derefElement = cachedElement?.deref();
+    if (
+      derefElement &&
+      derefElement.id === element.id &&
+      derefElement.version === element.version &&
+      derefElement.versionNonce === element.versionNonce
+    ) {
+      return true;
+    }
+  }
+
   // Hit test against a frame's name
   const hitFrameName = frameNameBound
     ? isPointWithinBounds(
@@ -153,7 +169,14 @@ export const hitElementItself = ({
       isPointOnElementOutline(point, element, elementsMap, threshold)
     : isPointOnElementOutline(point, element, elementsMap, threshold);
 
-  return hitElement || hitFrameName;
+  const result = hitElement || hitFrameName;
+
+  if (result) {
+    cachedPoint = point;
+    cachedElement = new WeakRef(element);
+  }
+
+  return result;
 };
 
 export const hitElementBoundingBox = (
