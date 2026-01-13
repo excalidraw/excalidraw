@@ -364,8 +364,6 @@ const renderBindingHighlightForBindableElement_simple = (
         context.translate(element.x, element.y);
 
         const midpointRadius = 5 / appState.zoom.value;
-        const cutoutPadding = 5 / appState.zoom.value;
-        const cutoutRadius = midpointRadius + cutoutPadding;
 
         let midpoints;
         if (element.type === "diamond") {
@@ -403,16 +401,6 @@ const renderBindingHighlightForBindableElement_simple = (
             };
           });
         }
-
-        // Clear cutouts around midpoints
-        midpoints.forEach((midpoint) => {
-          context.clearRect(
-            midpoint.x - cutoutRadius,
-            midpoint.y - cutoutRadius,
-            cutoutRadius * 2,
-            cutoutRadius * 2,
-          );
-        });
 
         context.fillStyle =
           appState.theme === THEME.DARK
