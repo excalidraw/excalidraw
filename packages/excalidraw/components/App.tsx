@@ -250,6 +250,7 @@ import {
   maxBindingDistance_simple,
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
+  getSnapOutlineMidPoint,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6378,15 +6379,28 @@ class App extends React.Component<AppProps, AppState> {
       // and point
       const { newElement } = this.state;
       if (!newElement && isBindingEnabled(this.state)) {
+        const globalPoint = pointFrom<GlobalPoint>(
+          scenePointerX,
+          scenePointerY,
+        );
+        const elementsMap = this.scene.getNonDeletedElementsMap();
         const hoveredElement = getHoveredElementForBinding(
-          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+          globalPoint,
           this.scene.getNonDeletedElements(),
-          this.scene.getNonDeletedElementsMap(),
+          elementsMap,
           (el) => maxBindingDistance_simple(this.state.zoom),
         );
         if (hoveredElement) {
           this.setState({
-            suggestedBinding: hoveredElement,
+            suggestedBinding: {
+              element: hoveredElement,
+              midPoint: getSnapOutlineMidPoint(
+                globalPoint,
+                hoveredElement,
+                elementsMap,
+                this.state.zoom,
+              ),
+            },
           });
         } else if (this.state.suggestedBinding) {
           this.setState({
@@ -6569,16 +6583,19 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.getNonDeletedElementsMap(),
         (el) => maxBindingDistance_simple(this.state.zoom),
       );
-      if (
-        hit &&
-        !isPointInElement(
-          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-          hit,
-          this.scene.getNonDeletedElementsMap(),
-        )
-      ) {
+      const scenePointer = pointFrom<GlobalPoint>(scenePointerX, scenePointerY);
+      const elementsMap = this.scene.getNonDeletedElementsMap();
+      if (hit && !isPointInElement(scenePointer, hit, elementsMap)) {
         this.setState({
-          suggestedBinding: hit,
+          suggestedBinding: {
+            element: hit,
+            midPoint: getSnapOutlineMidPoint(
+              scenePointer,
+              hit,
+              elementsMap,
+              this.state.zoom,
+            ),
+          },
         });
       }
     }
@@ -8677,7 +8694,17 @@ class App extends React.Component<AppProps, AppState> {
             bindMode: "orbit",
             newElement: element,
             startBoundElement: boundElement,
-            suggestedBinding: boundElement || null,
+            suggestedBinding: boundElement
+              ? {
+                  element: boundElement,
+                  midPoint: getSnapOutlineMidPoint(
+                    point,
+                    boundElement,
+                    elementsMap,
+                    this.state.zoom,
+                  ),
+                }
+              : null,
             selectedElementIds: nextSelectedElementIds,
             selectedLinearElement: linearElementEditor,
           };

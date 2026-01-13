@@ -583,19 +583,12 @@ const getDiagonalsForBindableElement = (
   return [diagonalOne, diagonalTwo];
 };
 
-export const projectFixedPointOntoDiagonal = (
-  arrow: ExcalidrawArrowElement,
+export const getSnapOutlineMidPoint = (
   point: GlobalPoint,
   element: ExcalidrawBindableElement,
-  startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
   zoom?: AppState["zoom"],
-): GlobalPoint | null => {
-  invariant(arrow.points.length >= 2, "Arrow must have at least two points");
-  if (arrow.width < 3 && arrow.height < 3) {
-    return null;
-  }
-
+) => {
   const center = elementCenterPoint(element, elementsMap);
   const sideMidpoints = [
     // TOP midpoint
@@ -629,7 +622,7 @@ export const projectFixedPointOntoDiagonal = (
       element.angle,
     ),
   ];
-  const sideMidPoint = sideMidpoints.find((midpoint, idx) => {
+  return sideMidpoints.find((midpoint, idx) => {
     return (
       pointDistance(point, midpoint) <= maxBindingDistance_simple(zoom) &&
       (idx === 0
@@ -641,7 +634,27 @@ export const projectFixedPointOntoDiagonal = (
         : point[0] <= midpoint[0])
     );
   });
+};
 
+export const projectFixedPointOntoDiagonal = (
+  arrow: ExcalidrawArrowElement,
+  point: GlobalPoint,
+  element: ExcalidrawBindableElement,
+  startOrEnd: "start" | "end",
+  elementsMap: ElementsMap,
+  zoom?: AppState["zoom"],
+): GlobalPoint | null => {
+  invariant(arrow.points.length >= 2, "Arrow must have at least two points");
+  if (arrow.width < 3 && arrow.height < 3) {
+    return null;
+  }
+
+  const sideMidPoint = getSnapOutlineMidPoint(
+    point,
+    element,
+    elementsMap,
+    zoom,
+  );
   if (sideMidPoint) {
     return sideMidPoint;
   }
