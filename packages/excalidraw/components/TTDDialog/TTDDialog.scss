@@ -5,14 +5,6 @@ $verticalBreakpoint: 861px;
 $fullScreenModalBreakpoint: 600px;
 
 .excalidraw {
-  &.theme--dark {
-    .ttd-chat-menu-item__delete {
-      svg {
-        color: var(--color-on-surface);
-      }
-    }
-  }
-
   .Modal.Dialog.ttd-dialog {
     padding: 1.25rem;
 
@@ -133,14 +125,15 @@ $fullScreenModalBreakpoint: 600px;
     min-width: 280px;
 
     .dropdown-menu-container.dropdown-menu-container {
-      padding-inline: 8px !important;
-      padding-top: 8px;
-      padding-bottom: 8px;
+      padding-inline: 0.5rem !important;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
       max-height: min(400px, 70vh);
       height: fit-content;
       overflow-y: auto;
       box-shadow: var(--shadow-island);
       border-radius: var(--border-radius-lg);
+      background-color: var(--island-bg-color-alt);
     }
   }
 
@@ -586,7 +579,7 @@ $fullScreenModalBreakpoint: 600px;
     width: unset;
     align-items: center;
     justify-content: space-between;
-    padding: 0.2rem 0.5rem;
+    padding: 0.25rem 0.5rem;
     cursor: pointer;
     position: relative;
     border: 1px solid transparent;
@@ -612,6 +605,12 @@ $fullScreenModalBreakpoint: 600px;
       white-space: nowrap;
     }
 
+    &:hover {
+      .ttd-chat-menu-item__delete {
+        visibility: visible;
+      }
+    }
+
     .ttd-chat-menu-item__delete {
       border: none;
       padding: 0.25rem;
@@ -622,14 +621,24 @@ $fullScreenModalBreakpoint: 600px;
       align-items: center;
       justify-content: center;
       background: transparent;
+      visibility: hidden;
+
+      &:hover {
+        color: var(--color-danger);
+      }
+
+      @at-root .excalidraw.theme--dark#{&} {
+        svg {
+          color: var(--color-on-surface);
+        }
+        &:hover svg {
+          color: var(--color-danger);
+        }
+      }
 
       svg {
         width: 16px;
         height: 16px;
-      }
-
-      &:hover {
-        color: var(--color-danger);
       }
     }
   }

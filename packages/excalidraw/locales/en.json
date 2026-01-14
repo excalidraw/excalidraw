@@ -631,8 +631,6 @@
     },
     "aiBeta": "AI Beta",
     "label": "Chat",
-    "helpTooltip": "Currently we use Mermaid as a middle step, so you'll get best results if you describe a diagram, workflow, flow chart, and similar.",
-    "helpAriaLabel": "Text-to-diagram help",
     "menu": "Menu",
     "newChat": "New Chat",
     "deleteChat": "Delete chat",

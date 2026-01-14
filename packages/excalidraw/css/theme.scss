@@ -23,6 +23,7 @@
   --input-hover-bg-color: #{$color-gray-1};
   --input-label-color: #{$color-gray-7};
   --island-bg-color: #ffffff;
+  --island-bg-color-alt: #fff;
   --keybinding-color: var(--color-gray-40);
   --link-color: #{$color-blue-7};
   --overlay-bg-color: #{color.adjust(#fff, $alpha: -0.12)};
@@ -199,6 +200,7 @@
     --input-hover-bg-color: #181818;
     --input-label-color: #{$color-gray-2};
     --island-bg-color: #232329;
+    --island-bg-color-alt: hsl(240, 12%, 12%);
     --keybinding-color: var(--color-gray-60);
     --link-color: #{$color-blue-4};
     --overlay-bg-color: #{color.adjust($color-gray-8, $alpha: -0.88)};
