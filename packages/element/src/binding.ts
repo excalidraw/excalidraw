@@ -247,6 +247,11 @@ export const handleFocusPointDrag = (
       );
 
       // Calculate fixed point ratio (0-1)
+      const hit = getHoveredElementForBinding(
+        point,
+        scene.getNonDeletedElements(),
+        elementsMap,
+      );
       const fixedX =
         (nonRotatedPoint[0] - bindableElement.x) / bindableElement.width;
       const fixedY =
@@ -255,6 +260,7 @@ export const handleFocusPointDrag = (
       const updatedBinding = {
         ...binding,
         fixedPoint: [fixedX, fixedY] as [number, number],
+        ...(hit && hit.id !== bindableElement.id ? { elementId: hit.id } : {}),
       };
 
       // Update the binding on the arrow
