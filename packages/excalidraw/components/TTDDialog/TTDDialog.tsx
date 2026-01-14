@@ -18,13 +18,14 @@ import "./TTDDialog.scss";
 import type {
   MermaidToExcalidrawLibProps,
   OnTestSubmitRetValue,
-  OnTextSubmitProps,
+  TTTDDialog,
 } from "./types";
 
 export const TTDDialog = (
   props:
     | {
-        onTextSubmit(props: OnTextSubmitProps): Promise<OnTestSubmitRetValue>;
+        onTextSubmit: TTTDDialog.onTextSubmit;
+        renderWarning?: TTTDDialog.renderWarning;
       }
     | { __fallback: true },
 ) => {
@@ -49,7 +50,10 @@ const TTDDialogBase = withInternalFallback(
     tab: "text-to-diagram" | "mermaid";
   } & (
     | {
-        onTextSubmit(props: OnTextSubmitProps): Promise<OnTestSubmitRetValue>;
+        onTextSubmit(
+          props: TTTDDialog.OnTextSubmitProps,
+        ): Promise<OnTestSubmitRetValue>;
+        renderWarning?: TTTDDialog.renderWarning;
       }
     | { __fallback: true }
   )) => {
@@ -104,6 +108,7 @@ const TTDDialogBase = withInternalFallback(
               <TextToDiagram
                 mermaidToExcalidrawLib={mermaidToExcalidrawLib}
                 onTextSubmit={rest.onTextSubmit}
+                renderWarning={rest.renderWarning}
               />
             </TTDDialogTab>
           )}

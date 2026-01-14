@@ -17,16 +17,18 @@ import {
   updateAssistantContent,
 } from "../utils/chat";
 
-import type { OnTextSubmitProps, OnTestSubmitRetValue } from "../types";
-
-interface UseTextGenerationProps {
-  onTextSubmit: (props: OnTextSubmitProps) => Promise<OnTestSubmitRetValue>;
-}
+import type { TTTDDialog, OnTestSubmitRetValue } from "../types";
 
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 10000;
 
-export const useTextGeneration = ({ onTextSubmit }: UseTextGenerationProps) => {
+export const useTextGeneration = ({
+  onTextSubmit,
+}: {
+  onTextSubmit: (
+    props: TTTDDialog.OnTextSubmitProps,
+  ) => Promise<OnTestSubmitRetValue>;
+}) => {
   const [, setError] = useAtom(errorAtom);
   const [rateLimits, setRateLimits] = useAtom(rateLimitsAtom);
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom);

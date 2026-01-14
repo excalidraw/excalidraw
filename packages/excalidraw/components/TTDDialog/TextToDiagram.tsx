@@ -31,21 +31,23 @@ import { addMessages, getLastAssistantMessage } from "./utils/chat";
 
 import type { BinaryFiles } from "../../types";
 import type {
-  OnTextSubmitProps,
   OnTestSubmitRetValue,
   MermaidToExcalidrawLibProps,
   TChat,
+  TTTDDialog,
 } from "./types";
-
-interface TextToDiagramContentProps {
-  mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
-  onTextSubmit: (props: OnTextSubmitProps) => Promise<OnTestSubmitRetValue>;
-}
 
 const TextToDiagramContent = ({
   mermaidToExcalidrawLib,
   onTextSubmit,
-}: TextToDiagramContentProps) => {
+  renderWarning,
+}: {
+  mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
+  onTextSubmit: (
+    props: TTTDDialog.OnTextSubmitProps,
+  ) => Promise<OnTestSubmitRetValue>;
+  renderWarning?: TTTDDialog.renderWarning;
+}) => {
   const app = useApp();
   const setAppState = useExcalidrawSetAppState();
 
@@ -240,6 +242,7 @@ const TextToDiagramContent = ({
         onInsertMessage={handleInsertMessage}
         onRetry={handleRetry}
         onViewAsMermaid={onViewAsMermaid}
+        renderWarning={renderWarning}
       />
       {showPreview && (
         <TTDPreviewPanel
@@ -257,14 +260,19 @@ const TextToDiagramContent = ({
 export const TextToDiagram = ({
   mermaidToExcalidrawLib,
   onTextSubmit,
+  renderWarning,
 }: {
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
-  onTextSubmit(props: OnTextSubmitProps): Promise<OnTestSubmitRetValue>;
+  onTextSubmit(
+    props: TTTDDialog.OnTextSubmitProps,
+  ): Promise<OnTestSubmitRetValue>;
+  renderWarning?: TTTDDialog.renderWarning;
 }) => {
   return (
     <TextToDiagramContent
       mermaidToExcalidrawLib={mermaidToExcalidrawLib}
       onTextSubmit={onTextSubmit}
+      renderWarning={renderWarning}
     />
   );
 };

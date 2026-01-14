@@ -657,7 +657,7 @@
       "requestFailed": "Request failed"
     },
     "rateLimit": {
-      "message": "You've hit your daily AI limit on the free plan. Unlock more power with our most advanced AI or come back tomorrow when your limit resets."
+      "message": "You've hit your AI limit on the free plan. Try out Excalidraw+ for more or come back tomorrow."
     },
     "upsellBtnLabel": "Upgrade to Plus"
   },

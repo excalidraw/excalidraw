@@ -8,7 +8,7 @@ import { t } from "../../../i18n";
 
 import { ChatMessage } from "./ChatMessage";
 
-import type { TChat } from "../types";
+import type { TChat, TTTDDialog } from "../types";
 
 import type { FormEventHandler } from "react";
 
@@ -27,6 +27,7 @@ export const ChatInterface = ({
   onDeleteMessage,
   onInsertMessage,
   onRetry,
+  renderWarning,
 }: {
   chatId: string;
   messages: TChat.ChatMessage[];
@@ -51,6 +52,7 @@ export const ChatInterface = ({
   onDeleteMessage?: (messageId: string) => void;
   onInsertMessage?: (message: TChat.ChatMessage) => void;
   onRetry?: (message: TChat.ChatMessage) => void;
+  renderWarning?: TTTDDialog.renderWarning;
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -128,6 +130,7 @@ export const ChatInterface = ({
               onRetry={onRetry}
               rateLimitRemaining={rateLimits?.rateLimitRemaining}
               isLastMessage={index === messages.length - 1}
+              renderWarning={renderWarning}
             />
           ))
         )}

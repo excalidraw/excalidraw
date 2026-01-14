@@ -12,9 +12,33 @@ import { ChatHistoryMenu } from "./ChatHistoryMenu";
 
 import { ChatInterface } from ".";
 
-import type { SavedChat, TChat } from "../types";
+import type { SavedChat, TChat, TTTDDialog } from "../types";
 
-interface TTDChatPanelProps {
+export const TTDChatPanel = ({
+  chatId,
+  messages,
+  currentPrompt,
+  onPromptChange,
+  onSendMessage,
+  isGenerating,
+  generatedResponse,
+  isMenuOpen,
+  onMenuToggle,
+  onMenuClose,
+  onNewChat,
+  onRestoreChat,
+  onDeleteChat,
+  savedChats,
+  activeSessionId,
+  onAbort,
+  onMermaidTabClick,
+  onAiRepairClick,
+  onDeleteMessage,
+  onInsertMessage,
+  onRetry,
+  onViewAsMermaid,
+  renderWarning,
+}: {
   chatId: string;
   messages: TChat.ChatMessage[];
   currentPrompt: string;
@@ -40,32 +64,9 @@ interface TTDChatPanelProps {
   onRetry?: (message: TChat.ChatMessage) => void;
 
   onViewAsMermaid: () => void;
-}
 
-export const TTDChatPanel = ({
-  chatId,
-  messages,
-  currentPrompt,
-  onPromptChange,
-  onSendMessage,
-  isGenerating,
-  generatedResponse,
-  isMenuOpen,
-  onMenuToggle,
-  onMenuClose,
-  onNewChat,
-  onRestoreChat,
-  onDeleteChat,
-  savedChats,
-  activeSessionId,
-  onAbort,
-  onMermaidTabClick,
-  onAiRepairClick,
-  onDeleteMessage,
-  onInsertMessage,
-  onRetry,
-  onViewAsMermaid,
-}: TTDChatPanelProps) => {
+  renderWarning?: TTTDDialog.renderWarning;
+}) => {
   const [rateLimits] = useAtom(rateLimitsAtom);
 
   const getPanelActions = () => {
@@ -148,6 +149,7 @@ export const TTDChatPanel = ({
           description: t("chat.placeholder.description"),
           hint: t("chat.placeholder.hint"),
         }}
+        renderWarning={renderWarning}
       />
     </TTDDialogPanel>
   );

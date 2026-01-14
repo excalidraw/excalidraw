@@ -23,13 +23,6 @@ export type LLMMessage = {
   content: string;
 };
 
-export type OnTextSubmitProps = {
-  messages: LLMMessage[];
-  onChunk?: (chunk: string) => void;
-  onStreamCreated?: () => void;
-  signal?: AbortSignal;
-};
-
 export type MermaidData = {
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles | null;
@@ -77,4 +70,21 @@ export interface MermaidToExcalidrawLibProps {
       config?: MermaidConfig,
     ) => Promise<MermaidToExcalidrawResult>;
   }>;
+}
+
+export namespace TTTDDialog {
+  export type OnTextSubmitProps = {
+    messages: LLMMessage[];
+    onChunk?: (chunk: string) => void;
+    onStreamCreated?: () => void;
+    signal?: AbortSignal;
+  };
+
+  // TTDDialog props
+  export type onTextSubmit = (
+    props: OnTextSubmitProps,
+  ) => Promise<OnTestSubmitRetValue>;
+  export type renderWarning = (
+    chatMessage: TChat.ChatMessage,
+  ) => React.ReactNode;
 }

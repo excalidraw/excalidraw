@@ -5,9 +5,9 @@ import { t } from "../../../i18n";
 import { FilledButton } from "../../FilledButton";
 import { TrashIcon, codeIcon, stackPushIcon, RetryIcon } from "../../icons";
 
-import type { TChat } from "../types";
+import type { TChat, TTTDDialog } from "../types";
 
-interface ChatMessageProps {
+export const ChatMessage: React.FC<{
   message: TChat.ChatMessage;
   onMermaidTabClick?: (message: TChat.ChatMessage) => void;
   onAiRepairClick?: (message: TChat.ChatMessage) => void;
@@ -16,9 +16,8 @@ interface ChatMessageProps {
   onRetry?: (message: TChat.ChatMessage) => void;
   rateLimitRemaining?: number;
   isLastMessage?: boolean;
-}
-
-export const ChatMessage: React.FC<ChatMessageProps> = ({
+  renderWarning?: TTTDDialog.renderWarning;
+}> = ({
   message,
   onMermaidTabClick,
   onAiRepairClick,
@@ -27,6 +26,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   onRetry,
   rateLimitRemaining,
   isLastMessage,
+  renderWarning,
 }) => {
   const [canRetry, setCanRetry] = useState(false);
 
@@ -72,22 +72,28 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
           </div>
           <div className="chat-message__body">
             <div className="chat-message__text">
-              {t("chat.rateLimit.message")}
-              <div style={{ marginTop: "10px" }}>
-                <FilledButton
-                  onClick={() => {
-                    window.open(
-                      `${
-                        import.meta.env.VITE_APP_PLUS_LP
-                      }/plus?utm_source=excalidraw&utm_medium=app&utm_content=chatBannerBanner#excalidraw-redirect`,
-                      "_blank",
-                      "noopener",
-                    );
-                  }}
-                >
-                  {t("chat.upsellBtnLabel")}
-                </FilledButton>
-              </div>
+              {renderWarning ? (
+                renderWarning(message)
+              ) : (
+                <>
+                  {t("chat.rateLimit.message")}
+                  <div style={{ marginTop: "10px" }}>
+                    <FilledButton
+                      onClick={() => {
+                        window.open(
+                          `${
+                            import.meta.env.VITE_APP_PLUS_LP
+                          }/plus?utm_source=excalidraw&utm_medium=app&utm_content=ttdChatBanner#excalidraw-redirect`,
+                          "_blank",
+                          "noopener",
+                        );
+                      }}
+                    >
+                      {t("chat.upsellBtnLabel")}
+                    </FilledButton>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
