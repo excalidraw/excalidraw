@@ -977,6 +977,7 @@ const renderFocusPointIndicator = (
     isDragging && !appState.selectedLinearElement?.hoveredFocusPointBinding;
   context.save();
   context.strokeStyle = disabled ? "rgba(120, 120, 120, 0.7)" : "#5e5ad8";
+  context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([]);
   context.fillStyle = disabled
     ? "rgba(220, 220, 220, 0.8)"
