@@ -8,11 +8,11 @@ import { t } from "../../../i18n";
 
 import { ChatMessage } from "./ChatMessage";
 
-import type { ChatInterfaceProps } from "./types";
+import type { TChat } from "../types";
 
 import type { FormEventHandler } from "react";
 
-export const ChatInterface: React.FC<ChatInterfaceProps> = ({
+export const ChatInterface = ({
   chatId,
   messages,
   currentPrompt,
@@ -27,6 +27,30 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   onDeleteMessage,
   onInsertMessage,
   onRetry,
+}: {
+  chatId: string;
+  messages: TChat.ChatMessage[];
+  currentPrompt: string;
+  onPromptChange: (prompt: string) => void;
+  onSendMessage: (message: string) => void;
+  isGenerating: boolean;
+  rateLimits?: {
+    rateLimit: number;
+    rateLimitRemaining: number;
+  } | null;
+  onViewAsMermaid?: () => void;
+  generatedResponse?: string | null;
+  placeholder: {
+    title: string;
+    description: string;
+    hint: string;
+  };
+  onAbort?: () => void;
+  onMermaidTabClick?: (message: TChat.ChatMessage) => void;
+  onAiRepairClick?: (message: TChat.ChatMessage) => void;
+  onDeleteMessage?: (messageId: string) => void;
+  onInsertMessage?: (message: TChat.ChatMessage) => void;
+  onRetry?: (message: TChat.ChatMessage) => void;
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -123,7 +147,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               placeholder={
                 messages.length > 0
                   ? t("chat.inputPlaceholderWithMessages")
-                  : t("chat.inputPlaceholder")
+                  : t("chat.inputPlaceholder", { shortcut: "Shift + Enter" })
               }
               disabled={isGenerating}
               rows={1}

@@ -1,11 +1,10 @@
 import { findLastIndex, randomId } from "@excalidraw/common";
 
-import type { ChatHistory, ChatMessageType } from "../Chat";
-import type { ChatMessage } from "../Chat/types";
+import type { LLMMessage, TChat } from "../types";
 
 export const updateAssistantContent = (
-  chatHistory: ChatHistory,
-  payload: Partial<ChatMessage>,
+  chatHistory: TChat.ChatHistory,
+  payload: Partial<TChat.ChatMessage>,
 ) => {
   const { messages } = chatHistory;
 
@@ -33,7 +32,7 @@ export const updateAssistantContent = (
   };
 };
 
-export const getLastAssistantMessage = (chatHistory: ChatHistory) => {
+export const getLastAssistantMessage = (chatHistory: TChat.ChatHistory) => {
   const { messages } = chatHistory;
 
   const lastAssistantIndex = findLastIndex(
@@ -45,10 +44,10 @@ export const getLastAssistantMessage = (chatHistory: ChatHistory) => {
 };
 
 export const addMessages = (
-  chatHistory: ChatHistory,
-  messages: Array<Omit<ChatMessageType, "id" | "timestamp">>,
+  chatHistory: TChat.ChatHistory,
+  messages: Array<Omit<TChat.ChatMessage, "id" | "timestamp">>,
 ) => {
-  const newMessages: Array<ChatMessageType> = messages.map((message) => ({
+  const newMessages: Array<TChat.ChatMessage> = messages.map((message) => ({
     ...message,
     id: randomId(),
     timestamp: new Date(),
@@ -60,7 +59,7 @@ export const addMessages = (
   };
 };
 
-export const removeLastAssistantMessage = (chatHistory: ChatHistory) => {
+export const removeLastAssistantMessage = (chatHistory: TChat.ChatHistory) => {
   const lastMsgIdx = (chatHistory.messages ?? []).findLastIndex(
     (msg) => msg.type === "assistant",
   );
@@ -74,40 +73,19 @@ export const removeLastAssistantMessage = (chatHistory: ChatHistory) => {
   return chatHistory;
 };
 
-export const getMessagesForApi = (
-  chatHistory: ChatHistory,
-): Array<{
-  role: "user" | "assistant" | "system";
-  content: string;
-}> => {
-  const filteredMessages: Array<{
-    role: "user" | "assistant" | "system";
-    content: string;
-  }> = [];
+export const getMessagesForLLM = (
+  chatHistory: TChat.ChatHistory,
+): LLMMessage[] => {
+  const messages: LLMMessage[] = [];
 
-  const lastUserMessage = chatHistory.messages
-    .filter((msg) => !!msg.content)
-    .slice()
-    .reverse()
-    .find((msg) => msg.type === "user");
-
-  const lastAssistantMessages = chatHistory.messages
-    .filter((msg) => msg.type === "assistant" && !!msg.content)
-    .slice(-2);
-
-  if (lastUserMessage) {
-    filteredMessages.push({
-      role: lastUserMessage.type,
-      content: lastUserMessage.content,
-    });
+  for (const msg of chatHistory.messages) {
+    if (msg.content && (msg.type === "user" || msg.type === "assistant")) {
+      messages.push({
+        role: msg.type,
+        content: msg.content,
+      });
+    }
   }
 
-  filteredMessages.push(
-    ...lastAssistantMessages.map((msg) => ({
-      role: msg.type as "user" | "assistant" | "system",
-      content: msg.content,
-    })),
-  );
-
-  return filteredMessages;
+  return messages;
 };

@@ -65,7 +65,7 @@ export const useTTDChatStorage = (): UseTTDChatStorageReturn => {
     const firstUserMessage = chatHistory.messages.find(
       (msg) => msg.type === "user",
     );
-    if (!firstUserMessage) {
+    if (!firstUserMessage || !firstUserMessage.content) {
       return;
     }
 
@@ -89,7 +89,7 @@ export const useTTDChatStorage = (): UseTTDChatStorageReturn => {
       id: chatHistory.id,
       title,
       messages: chatHistory.messages
-        .filter((msg) => msg.type !== "system")
+        .filter((msg) => msg.type === "user" || msg.type === "assistant")
         .map((msg) => ({
           ...msg,
           timestamp:

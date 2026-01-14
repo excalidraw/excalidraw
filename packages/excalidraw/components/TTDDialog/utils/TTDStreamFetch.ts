@@ -1,4 +1,4 @@
-import type { TTDMessage } from "@excalidraw/excalidraw/components/TTDDialog/types";
+import type { LLMMessage } from "@excalidraw/excalidraw/components/TTDDialog/types";
 
 interface RateLimitInfo {
   rateLimit?: number;
@@ -7,7 +7,7 @@ interface RateLimitInfo {
 
 interface StreamingOptions {
   url: string;
-  messages: readonly TTDMessage[];
+  messages: readonly LLMMessage[];
   onChunk?: (chunk: string) => void;
   extractRateLimits?: boolean;
   signal?: AbortSignal;

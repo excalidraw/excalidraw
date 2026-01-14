@@ -621,7 +621,7 @@
     "errorMermaidSyntax": "Mermaid syntax error"
   },
   "chat": {
-    "inputPlaceholder": "Start typing your diagram idea here...",
+    "inputPlaceholder": "Start typing your diagram idea here... ({{shortcut}} for new line)",
     "inputPlaceholderWithMessages": "Continue refining your diagram...",
     "rateLimitRemaining": "{{count}} requests left today",
     "role": {
@@ -640,8 +640,8 @@
     "viewAsMermaid": "View as Mermaid",
     "placeholder": {
       "title": "Let's design your diagram",
-      "description": "Describe the diagram you want to create, and I'll generate it for you.",
-      "hint": "Currently we use Mermaid as a middle step, so you'll get best results if you describe a diagram, workflow, flow chart, and similar."
+      "description": "Describe the diagram you want to create, and we'll generate it for you.",
+      "hint": "At the moment we know Flowchart, Sequence, and Class diagrams."
     },
     "preview": "Preview",
     "insert": "Insert",

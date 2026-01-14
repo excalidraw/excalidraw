@@ -4,7 +4,6 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { useAtom, useAtomValue } from "../../editor-jotai";
 
-import { t } from "../../i18n";
 import { useApp, useExcalidrawSetAppState } from "../App";
 
 import { useChatAgent } from "./Chat";
@@ -25,25 +24,22 @@ import { useTTDChatStorage } from "./useTTDChatStorage";
 import { useMermaidRenderer } from "./hooks/useMermaidRenderer";
 import { useTextGeneration } from "./hooks/useTextGeneration";
 import { useChatManagement } from "./hooks/useChatManagement";
-import { TTDChatPanel } from "./components/TTDChatPanel";
-import { TTDPreviewPanel } from "./components/TTDPreviewPanel";
+import { TTDChatPanel } from "./Chat/TTDChatPanel";
+import { TTDPreviewPanel } from "./TTDPreviewPanel";
 
 import { addMessages, getLastAssistantMessage } from "./utils/chat";
 
-import type { ChatMessageType } from "./Chat";
-
 import type { BinaryFiles } from "../../types";
 import type {
-  TTDPayload,
+  OnTextSubmitProps,
   OnTestSubmitRetValue,
   MermaidToExcalidrawLibProps,
+  TChat,
 } from "./types";
-
-export type { OnTestSubmitRetValue, TTDPayload };
 
 interface TextToDiagramContentProps {
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
-  onTextSubmit: (payload: TTDPayload) => Promise<OnTestSubmitRetValue>;
+  onTextSubmit: (props: OnTextSubmitProps) => Promise<OnTestSubmitRetValue>;
 }
 
 const TextToDiagramContent = ({
@@ -87,16 +83,15 @@ const TextToDiagramContent = ({
     if (rateLimits?.rateLimitRemaining === 0) {
       const hasRateLimitMessage = chatHistory.messages.some(
         (msg) =>
-          msg.type === "system" &&
-          msg.content.includes(t("chat.rateLimit.message")),
+          msg.type === "warning" && msg.warningType === "rateLimitExceeded",
       );
 
       if (!hasRateLimitMessage) {
         setChatHistory(
           addMessages(chatHistory, [
             {
-              type: "system",
-              content: t("chat.rateLimit.message"),
+              type: "warning",
+              warningType: "rateLimitExceeded",
             },
           ]),
         );
@@ -118,7 +113,7 @@ const TextToDiagramContent = ({
     }
   };
 
-  const handleMermaidTabClick = (message: ChatMessageType) => {
+  const handleMermaidTabClick = (message: TChat.ChatMessage) => {
     const mermaidContent = message.content || "";
     if (mermaidContent) {
       saveMermaidDataToStorage(mermaidContent);
@@ -128,7 +123,7 @@ const TextToDiagramContent = ({
     }
   };
 
-  const handleInsertMessage = async (message: ChatMessageType) => {
+  const handleInsertMessage = async (message: TChat.ChatMessage) => {
     const mermaidContent = message.content || "";
     if (!mermaidContent.trim() || !mermaidToExcalidrawLib.loaded) {
       return;
@@ -159,7 +154,7 @@ const TextToDiagramContent = ({
     }
   };
 
-  const handleAiRepairClick = async (message: ChatMessageType) => {
+  const handleAiRepairClick = async (message: TChat.ChatMessage) => {
     const mermaidContent = message.content || "";
     const errorMessage = message.error || "";
 
@@ -172,14 +167,14 @@ const TextToDiagramContent = ({
     await onGenerate(repairPrompt, true);
   };
 
-  const handleRetry = async (message: ChatMessageType) => {
+  const handleRetry = async (message: TChat.ChatMessage) => {
     const messageIndex = chatHistory.messages.findIndex(
       (msg) => msg.id === message.id,
     );
 
     if (messageIndex > 0) {
       const previousMessage = chatHistory.messages[messageIndex - 1];
-      if (previousMessage.type === "user") {
+      if (previousMessage.type === "user" && previousMessage.content) {
         setLastRetryAttempt();
         await onGenerate(previousMessage.content, true);
       }
@@ -263,7 +258,7 @@ export const TextToDiagram = ({
   onTextSubmit,
 }: {
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
-  onTextSubmit(payload: TTDPayload): Promise<OnTestSubmitRetValue>;
+  onTextSubmit(props: OnTextSubmitProps): Promise<OnTestSubmitRetValue>;
 }) => {
   return (
     <TextToDiagramContent

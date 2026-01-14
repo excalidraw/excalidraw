@@ -1,10 +1,10 @@
-import { t } from "../../../i18n";
-import { ArrowRightIcon } from "../../icons";
+import { t } from "../../i18n";
+import { ArrowRightIcon } from "../icons";
 
-import { TTDDialogPanel } from "../TTDDialogPanel";
-import { TTDDialogOutput } from "../TTDDialogOutput";
+import { TTDDialogPanel } from "./TTDDialogPanel";
+import { TTDDialogOutput } from "./TTDDialogOutput";
 
-import type { TTDPanelAction } from "../TTDDialogPanel";
+import type { TTDPanelAction } from "./TTDDialogPanel";
 
 interface TTDPreviewPanelProps {
   canvasRef: React.RefObject<HTMLDivElement | null>;

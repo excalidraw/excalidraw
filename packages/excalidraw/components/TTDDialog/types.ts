@@ -4,8 +4,6 @@ import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
 
 import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
 
-import type { ChatMessageType } from "./Chat";
-
 import type { BinaryFiles } from "../../types";
 
 // API Types
@@ -20,13 +18,13 @@ export type OnTestSubmitRetValue = {
     }
 );
 
-export type TTDMessage = {
-  role: "user" | "assistant" | "system";
+export type LLMMessage = {
+  role: "user" | "assistant";
   content: string;
 };
 
-export type TTDPayload = {
-  messages: TTDMessage[];
+export type OnTextSubmitProps = {
+  messages: LLMMessage[];
   onChunk?: (chunk: string) => void;
   onStreamCreated?: () => void;
   signal?: AbortSignal;
@@ -42,10 +40,31 @@ export interface RateLimits {
   rateLimitRemaining: number;
 }
 
+export namespace TChat {
+  export type ChatMessage = {
+    id: string;
+    timestamp: Date;
+    isGenerating?: boolean;
+    error?: string;
+    errorDetails?: string;
+    errorType?: "parse" | "network" | "other";
+    lastAttemptAt?: number;
+    type: "user" | "assistant" | "warning";
+    warningType?: "rateLimitExceeded";
+    content?: string;
+  };
+
+  export type ChatHistory = {
+    id: string;
+    messages: ChatMessage[];
+    currentPrompt: string;
+  };
+}
+
 export interface SavedChat {
   id: string;
   title: string;
-  messages: ChatMessageType[];
+  messages: TChat.ChatMessage[];
   currentPrompt: string;
   timestamp: number;
 }

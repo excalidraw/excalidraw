@@ -5,15 +5,15 @@ import { t } from "../../../i18n";
 import { FilledButton } from "../../FilledButton";
 import { TrashIcon, codeIcon, stackPushIcon, RetryIcon } from "../../icons";
 
-import type { ChatMessage as ChatMessageType } from "./types";
+import type { TChat } from "../types";
 
 interface ChatMessageProps {
-  message: ChatMessageType;
-  onMermaidTabClick?: (message: ChatMessageType) => void;
-  onAiRepairClick?: (message: ChatMessageType) => void;
+  message: TChat.ChatMessage;
+  onMermaidTabClick?: (message: TChat.ChatMessage) => void;
+  onAiRepairClick?: (message: TChat.ChatMessage) => void;
   onDeleteMessage?: (messageId: string) => void;
-  onInsertMessage?: (message: ChatMessageType) => void;
-  onRetry?: (message: ChatMessageType) => void;
+  onInsertMessage?: (message: TChat.ChatMessage) => void;
+  onRetry?: (message: TChat.ChatMessage) => void;
   rateLimitRemaining?: number;
   isLastMessage?: boolean;
 }
@@ -60,7 +60,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
-  if (message.type === "system") {
+  if (message.type === "warning") {
     return (
       <div className="chat-message chat-message--system">
         <div className="chat-message__content">
@@ -72,7 +72,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
           </div>
           <div className="chat-message__body">
             <div className="chat-message__text">
-              {message.content}
+              {t("chat.rateLimit.message")}
               <div style={{ marginTop: "10px" }}>
                 <FilledButton
                   onClick={() => {

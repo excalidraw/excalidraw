@@ -1,17 +1,17 @@
 import {
   addMessages,
   getLastAssistantMessage,
-  getMessagesForApi,
+  getMessagesForLLM,
   removeLastAssistantMessage,
   updateAssistantContent,
 } from "./chat";
 
-import type { ChatHistory } from "../Chat";
+import type { TChat } from "../types";
 
 describe("chat utils", () => {
   describe("updateAssistantContent", () => {
     it("should update the last assistant message with new payload", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -39,7 +39,7 @@ describe("chat utils", () => {
     });
 
     it("should update only the last assistant message when multiple exist", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -73,7 +73,7 @@ describe("chat utils", () => {
     });
 
     it("should update isGenerating flag", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -95,7 +95,7 @@ describe("chat utils", () => {
     });
 
     it("should update error information", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -118,7 +118,7 @@ describe("chat utils", () => {
     });
 
     it("should return unchanged chatHistory if no assistant message exists", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -139,7 +139,7 @@ describe("chat utils", () => {
     });
 
     it("should not mutate original chatHistory", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -163,7 +163,7 @@ describe("chat utils", () => {
 
   describe("getLastAssistantMessage", () => {
     it("should return the last assistant message", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -193,7 +193,7 @@ describe("chat utils", () => {
     });
 
     it("should return the last assistant message when multiple exist", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -225,7 +225,7 @@ describe("chat utils", () => {
     });
 
     it("should return undefined if no assistant message exists", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -244,7 +244,7 @@ describe("chat utils", () => {
     });
 
     it("should return undefined for empty messages array", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [],
@@ -258,7 +258,7 @@ describe("chat utils", () => {
 
   describe("addMessages", () => {
     it("should add a single message with id and timestamp", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [],
@@ -281,7 +281,7 @@ describe("chat utils", () => {
     });
 
     it("should add multiple messages", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [],
@@ -304,7 +304,7 @@ describe("chat utils", () => {
     });
 
     it("should append to existing messages", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -329,8 +329,8 @@ describe("chat utils", () => {
       expect(result.messages[1].content).toBe("New message");
     });
 
-    it("should add system messages", () => {
-      const chatHistory: ChatHistory = {
+    it("should add warning messages", () => {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [],
@@ -338,18 +338,16 @@ describe("chat utils", () => {
 
       const result = addMessages(chatHistory, [
         {
-          type: "system",
-          content: "Rate limit reached",
+          type: "warning",
         },
       ]);
 
       expect(result.messages).toHaveLength(1);
-      expect(result.messages[0].type).toBe("system");
-      expect(result.messages[0].content).toBe("Rate limit reached");
+      expect(result.messages[0].type).toBe("warning");
     });
 
     it("should preserve additional message properties", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [],
@@ -371,7 +369,7 @@ describe("chat utils", () => {
     });
 
     it("should not mutate original chatHistory", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [],
@@ -389,7 +387,7 @@ describe("chat utils", () => {
     });
 
     it("should generate unique IDs for each message", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [],
@@ -412,7 +410,7 @@ describe("chat utils", () => {
 
   describe("removeLastAssistantMessage", () => {
     it("should remove the last assistant message", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -445,7 +443,7 @@ describe("chat utils", () => {
     });
 
     it("should remove only the last assistant message when multiple exist", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -478,7 +476,7 @@ describe("chat utils", () => {
     });
 
     it("should return unchanged chatHistory if no assistant message exists", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -497,7 +495,7 @@ describe("chat utils", () => {
     });
 
     it("should handle empty messages array", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [],
@@ -509,7 +507,7 @@ describe("chat utils", () => {
     });
 
     it("should not mutate original chatHistory", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -530,57 +528,8 @@ describe("chat utils", () => {
   });
 
   describe("getMessagesForApi", () => {
-    it("should return last user message and last two assistant messages", () => {
-      const chatHistory: ChatHistory = {
-        id: "chat-1",
-        currentPrompt: "",
-        messages: [
-          {
-            id: "1",
-            type: "user",
-            content: "First question",
-            timestamp: new Date("2024-01-01"),
-          },
-          {
-            id: "2",
-            type: "assistant",
-            content: "First answer",
-            timestamp: new Date("2024-01-01"),
-          },
-          {
-            id: "3",
-            type: "user",
-            content: "Second question",
-            timestamp: new Date("2024-01-01"),
-          },
-          {
-            id: "4",
-            type: "assistant",
-            content: "Second answer",
-            timestamp: new Date("2024-01-01"),
-          },
-        ],
-      };
-
-      const result = getMessagesForApi(chatHistory);
-
-      expect(result).toHaveLength(3);
-      expect(result[0]).toEqual({
-        role: "user",
-        content: "Second question",
-      });
-      expect(result[1]).toEqual({
-        role: "assistant",
-        content: "First answer",
-      });
-      expect(result[2]).toEqual({
-        role: "assistant",
-        content: "Second answer",
-      });
-    });
-
     it("should filter out messages with empty content", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -611,55 +560,15 @@ describe("chat utils", () => {
         ],
       };
 
-      const result = getMessagesForApi(chatHistory);
+      const result = getMessagesForLLM(chatHistory);
 
       expect(result).toHaveLength(2);
       expect(result[0].content).toBe("Valid question");
       expect(result[1].content).toBe("Valid answer");
     });
 
-    it("should only include last two assistant messages when more exist", () => {
-      const chatHistory: ChatHistory = {
-        id: "chat-1",
-        currentPrompt: "",
-        messages: [
-          {
-            id: "1",
-            type: "user",
-            content: "Question",
-            timestamp: new Date("2024-01-01"),
-          },
-          {
-            id: "2",
-            type: "assistant",
-            content: "First",
-            timestamp: new Date("2024-01-01"),
-          },
-          {
-            id: "3",
-            type: "assistant",
-            content: "Second",
-            timestamp: new Date("2024-01-01"),
-          },
-          {
-            id: "4",
-            type: "assistant",
-            content: "Third",
-            timestamp: new Date("2024-01-01"),
-          },
-        ],
-      };
-
-      const result = getMessagesForApi(chatHistory);
-
-      expect(result).toHaveLength(3);
-      expect(result[0].role).toBe("user");
-      expect(result[1].content).toBe("Second");
-      expect(result[2].content).toBe("Third");
-    });
-
     it("should return only user message if no assistant messages", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -672,7 +581,7 @@ describe("chat utils", () => {
         ],
       };
 
-      const result = getMessagesForApi(chatHistory);
+      const result = getMessagesForLLM(chatHistory);
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -682,7 +591,7 @@ describe("chat utils", () => {
     });
 
     it("should return only assistant messages if no user message", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -695,7 +604,7 @@ describe("chat utils", () => {
         ],
       };
 
-      const result = getMessagesForApi(chatHistory);
+      const result = getMessagesForLLM(chatHistory);
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -705,59 +614,19 @@ describe("chat utils", () => {
     });
 
     it("should return empty array for empty messages", () => {
-      const chatHistory: ChatHistory = {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [],
       };
 
-      const result = getMessagesForApi(chatHistory);
+      const result = getMessagesForLLM(chatHistory);
 
       expect(result).toEqual([]);
     });
 
-    it("should return the last user message from multiple user messages", () => {
-      const chatHistory: ChatHistory = {
-        id: "chat-1",
-        currentPrompt: "",
-        messages: [
-          {
-            id: "1",
-            type: "user",
-            content: "First question",
-            timestamp: new Date("2024-01-01"),
-          },
-          {
-            id: "2",
-            type: "user",
-            content: "Second question",
-            timestamp: new Date("2024-01-01"),
-          },
-          {
-            id: "3",
-            type: "user",
-            content: "Third question",
-            timestamp: new Date("2024-01-01"),
-          },
-          {
-            id: "4",
-            type: "assistant",
-            content: "Answer",
-            timestamp: new Date("2024-01-01"),
-          },
-        ],
-      };
-
-      const result = getMessagesForApi(chatHistory);
-
-      expect(result[0]).toEqual({
-        role: "user",
-        content: "Third question",
-      });
-    });
-
-    it("should handle system messages by filtering them out", () => {
-      const chatHistory: ChatHistory = {
+    it("should filter out warning messages", () => {
+      const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
         currentPrompt: "",
         messages: [
@@ -769,23 +638,21 @@ describe("chat utils", () => {
           },
           {
             id: "2",
-            type: "system",
-            content: "System message",
-            timestamp: new Date("2024-01-01"),
-          },
-          {
-            id: "3",
-            type: "assistant",
-            content: "Answer",
+            type: "warning",
+            content: "warning",
             timestamp: new Date("2024-01-01"),
           },
         ],
       };
 
-      const result = getMessagesForApi(chatHistory);
+      const result = getMessagesForLLM(chatHistory);
 
-      expect(result).toHaveLength(2);
-      expect(result.some((msg) => msg.role === "system")).toBe(false);
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual(
+        expect.objectContaining({
+          role: "user",
+        }),
+      );
     });
   });
 });

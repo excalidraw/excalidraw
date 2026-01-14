@@ -1,6 +1,6 @@
 import { t } from "../../../i18n";
 import { ArrowRightIcon } from "../../icons";
-import { ChatInterface } from "../Chat";
+
 import { InlineIcon } from "../../InlineIcon";
 import { TTDDialogPanel } from "../TTDDialogPanel";
 
@@ -10,13 +10,13 @@ import { rateLimitsAtom } from "../TTDContext";
 
 import { ChatHistoryMenu } from "./ChatHistoryMenu";
 
-import type { SavedChat } from "../types";
+import { ChatInterface } from ".";
 
-import type { ChatMessageType } from "../Chat";
+import type { SavedChat, TChat } from "../types";
 
 interface TTDChatPanelProps {
   chatId: string;
-  messages: ChatMessageType[];
+  messages: TChat.ChatMessage[];
   currentPrompt: string;
   onPromptChange: (prompt: string) => void;
   onSendMessage: (message: string, isRepairFlow?: boolean) => void;
@@ -33,11 +33,11 @@ interface TTDChatPanelProps {
   activeSessionId: string;
 
   onAbort: () => void;
-  onMermaidTabClick: (message: ChatMessageType) => void;
-  onAiRepairClick: (message: ChatMessageType) => void;
+  onMermaidTabClick: (message: TChat.ChatMessage) => void;
+  onAiRepairClick: (message: TChat.ChatMessage) => void;
   onDeleteMessage: (messageId: string) => void;
-  onInsertMessage: (message: ChatMessageType) => void;
-  onRetry?: (message: ChatMessageType) => void;
+  onInsertMessage: (message: TChat.ChatMessage) => void;
+  onRetry?: (message: TChat.ChatMessage) => void;
 
   onViewAsMermaid: () => void;
 }

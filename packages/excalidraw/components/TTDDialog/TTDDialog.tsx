@@ -7,10 +7,7 @@ import { Dialog } from "../Dialog";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 
 import MermaidToExcalidraw from "./MermaidToExcalidraw";
-import TextToDiagram, {
-  type OnTestSubmitRetValue,
-  type TTDPayload,
-} from "./TextToDiagram";
+import TextToDiagram from "./TextToDiagram";
 import TTDDialogTabs from "./TTDDialogTabs";
 import { TTDDialogTabTriggers } from "./TTDDialogTabTriggers";
 import { TTDDialogTabTrigger } from "./TTDDialogTabTrigger";
@@ -18,12 +15,16 @@ import { TTDDialogTab } from "./TTDDialogTab";
 
 import "./TTDDialog.scss";
 
-import type { MermaidToExcalidrawLibProps } from "./types";
+import type {
+  MermaidToExcalidrawLibProps,
+  OnTestSubmitRetValue,
+  OnTextSubmitProps,
+} from "./types";
 
 export const TTDDialog = (
   props:
     | {
-        onTextSubmit(payload: TTDPayload): Promise<OnTestSubmitRetValue>;
+        onTextSubmit(props: OnTextSubmitProps): Promise<OnTestSubmitRetValue>;
       }
     | { __fallback: true },
 ) => {
@@ -39,7 +40,7 @@ export const TTDDialog = (
 /**
  * Text to diagram (TTD) dialog
  */
-export const TTDDialogBase = withInternalFallback(
+const TTDDialogBase = withInternalFallback(
   "TTDDialogBase",
   ({
     tab,
@@ -48,7 +49,7 @@ export const TTDDialogBase = withInternalFallback(
     tab: "text-to-diagram" | "mermaid";
   } & (
     | {
-        onTextSubmit(value: TTDPayload): Promise<OnTestSubmitRetValue>;
+        onTextSubmit(props: OnTextSubmitProps): Promise<OnTestSubmitRetValue>;
       }
     | { __fallback: true }
   )) => {

@@ -12,15 +12,15 @@ import { useChatAgent } from "../Chat";
 
 import {
   getLastAssistantMessage,
-  getMessagesForApi,
+  getMessagesForLLM,
   removeLastAssistantMessage,
   updateAssistantContent,
 } from "../utils/chat";
 
-import type { TTDPayload, OnTestSubmitRetValue } from "../types";
+import type { OnTextSubmitProps, OnTestSubmitRetValue } from "../types";
 
 interface UseTextGenerationProps {
-  onTextSubmit: (payload: TTDPayload) => Promise<OnTestSubmitRetValue>;
+  onTextSubmit: (props: OnTextSubmitProps) => Promise<OnTestSubmitRetValue>;
 }
 
 const MIN_PROMPT_LENGTH = 3;
@@ -123,12 +123,12 @@ export const useTextGeneration = ({ onTextSubmit }: UseTextGenerationProps) => {
     try {
       trackEvent("ai", "generate", "ttd");
 
-      const filteredMessages = getMessagesForApi(chatHistory);
+      const previousMessages = getMessagesForLLM(chatHistory);
 
       const { generatedResponse, error, rateLimit, rateLimitRemaining } =
         await onTextSubmit({
           messages: [
-            ...filteredMessages,
+            ...previousMessages.slice(-3),
             { role: "user", content: promptWithContext },
           ],
           onStreamCreated: () => {

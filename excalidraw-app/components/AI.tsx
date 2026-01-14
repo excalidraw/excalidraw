@@ -100,8 +100,8 @@ export const AIComponents = ({
       />
 
       <TTDDialog
-        onTextSubmit={async (data) => {
-          const { onChunk, onStreamCreated, signal, messages } = data;
+        onTextSubmit={async (props) => {
+          const { onChunk, onStreamCreated, signal, messages } = props;
 
           const result = await TTDStreamFetch({
             url: `${
