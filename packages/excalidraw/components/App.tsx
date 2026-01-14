@@ -7883,12 +7883,6 @@ class App extends React.Component<AppProps, AppState> {
             return true;
           }
 
-          // Check if we're hovering over a focus point - if so, prevent selecting
-          // the bindable element and let focus point dragging take priority
-          if (linearElementEditor.hoveredFocusPointBinding) {
-            return false;
-          }
-
           // Also check at current pointer position if focus point is being hovered
           // (in case we're clicking directly without a prior move event)
           const elementsMap = this.scene.getNonDeletedElementsMap();
@@ -7898,12 +7892,13 @@ class App extends React.Component<AppProps, AppState> {
           ) as any;
 
           if (arrow && isBindingElement(arrow)) {
-            const hitFocusPoint = handleFocusPointPointerDown(
-              arrow,
-              pointerDownState,
-              elementsMap,
-              this.state.zoom,
-            );
+            const { hitFocusPoint, pointerOffset } =
+              handleFocusPointPointerDown(
+                arrow,
+                pointerDownState,
+                elementsMap,
+                this.state.zoom,
+              );
 
             // If focus point is hit, update state and prevent element selection
             if (hitFocusPoint) {
@@ -7911,6 +7906,7 @@ class App extends React.Component<AppProps, AppState> {
                 selectedLinearElement: {
                   ...linearElementEditor,
                   hoveredFocusPointBinding: hitFocusPoint,
+                  pointerOffset,
                 },
               });
               return false;

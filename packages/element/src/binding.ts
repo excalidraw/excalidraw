@@ -215,7 +215,11 @@ export const handleFocusPointDrag = (
       isBindableElement(bindableElement) &&
       !bindableElement.isDeleted
     ) {
-      const point = pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y);
+      const { x: offsetX, y: offsetY } = linearElementEditor.pointerOffset;
+      const point = pointFrom<GlobalPoint>(
+        pointerCoords.x - offsetX,
+        pointerCoords.y - offsetY,
+      );
       const center = pointFrom<GlobalPoint>(
         bindableElement.x + bindableElement.width / 2,
         bindableElement.y + bindableElement.height / 2,
@@ -332,7 +336,10 @@ export const handleFocusPointPointerDown = (
   pointerDownState: { origin: { x: number; y: number } },
   elementsMap: NonDeletedSceneElementsMap,
   zoom: AppState["zoom"],
-): "start" | "end" | null => {
+): {
+  hitFocusPoint: "start" | "end" | null;
+  pointerOffset: { x: number; y: number };
+} => {
   const pointerPos = pointFrom(
     pointerDownState.origin.x,
     pointerDownState.origin.y,
@@ -362,7 +369,13 @@ export const handleFocusPointPointerDown = (
         ) &&
         pointDistance(pointerPos, focusPoint) <= hitThreshold
       ) {
-        return "start";
+        return {
+          hitFocusPoint: "start",
+          pointerOffset: {
+            x: pointerPos[0] - focusPoint[0],
+            y: pointerPos[1] - focusPoint[1],
+          },
+        };
       }
     }
   }
@@ -390,12 +403,21 @@ export const handleFocusPointPointerDown = (
         ) &&
         pointDistance(pointerPos, focusPoint) <= hitThreshold
       ) {
-        return "end";
+        return {
+          hitFocusPoint: "end",
+          pointerOffset: {
+            x: pointerPos[0] - focusPoint[0],
+            y: pointerPos[1] - focusPoint[1],
+          },
+        };
       }
     }
   }
 
-  return null;
+  return {
+    hitFocusPoint: null,
+    pointerOffset: { x: 0, y: 0 },
+  };
 };
 
 export const handleFocusPointPointerUp = (
