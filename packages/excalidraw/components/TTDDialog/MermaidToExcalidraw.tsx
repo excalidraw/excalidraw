@@ -10,6 +10,8 @@ import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { t } from "../../i18n";
 import Trans from "../Trans";
 
+import { useUIAppState } from "../../context/ui-appState";
+
 import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
 import { TTDDialogPanel } from "./TTDDialogPanel";
@@ -54,6 +56,7 @@ const MermaidToExcalidraw = ({
   }>({ elements: [], files: null });
 
   const app = useApp();
+  const { theme } = useUIAppState();
 
   useEffect(() => {
     const doRender = async () => {
@@ -68,6 +71,7 @@ const MermaidToExcalidraw = ({
           mermaidToExcalidrawLib,
           setError,
           mermaidDefinition: deferredText,
+          theme,
         });
 
         if (!result.success) {
@@ -85,7 +89,7 @@ const MermaidToExcalidraw = ({
       doRender();
       debouncedSaveMermaidDefinition(deferredText);
     }
-  }, [deferredText, mermaidToExcalidrawLib, isActive]);
+  }, [deferredText, mermaidToExcalidrawLib, isActive, theme]);
 
   useEffect(
     () => () => {

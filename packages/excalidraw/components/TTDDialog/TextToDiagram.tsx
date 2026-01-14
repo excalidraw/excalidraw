@@ -142,6 +142,7 @@ const TextToDiagramContent = ({
       mermaidToExcalidrawLib,
       setError,
       mermaidDefinition: mermaidContent,
+      theme: app.state.theme,
     });
 
     if (result.success) {

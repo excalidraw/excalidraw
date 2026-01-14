@@ -10,6 +10,8 @@ import { isValidMermaidSyntax } from "../utils/mermaidValidation";
 
 import { getLastAssistantMessage } from "../utils/chat";
 
+import { useUIAppState } from "../../../context/ui-appState";
+
 import type { BinaryFiles } from "../../../types";
 import type { MermaidToExcalidrawLibProps } from "../types";
 
@@ -57,6 +59,8 @@ export const useMermaidRenderer = ({
   const hasErrorOffsetRef = useRef(false);
   const currentThrottleDelayRef = useRef(FAST_THROTTLE_DELAY);
 
+  const { theme } = useUIAppState();
+
   const renderMermaid = useCallback(
     async (mermaidDefinition: string): Promise<boolean> => {
       if (!mermaidDefinition.trim() || !mermaidToExcalidrawLib.loaded) {
@@ -77,6 +81,7 @@ export const useMermaidRenderer = ({
         mermaidToExcalidrawLib,
         setError,
         mermaidDefinition,
+        theme,
       });
 
       const renderDuration = performance.now() - renderStartTime;
@@ -90,7 +95,7 @@ export const useMermaidRenderer = ({
       isRenderingRef.current = false;
       return result.success;
     },
-    [canvasRef, mermaidToExcalidrawLib, setError],
+    [canvasRef, mermaidToExcalidrawLib, setError, theme],
   );
 
   const throttledRenderMermaid = useMemo(() => {

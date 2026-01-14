@@ -1,9 +1,16 @@
 import { DEFAULT_EXPORT_PADDING, EDITOR_LS_KEYS } from "@excalidraw/common";
 
-import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  NonDeletedExcalidrawElement,
+  Theme,
+} from "@excalidraw/element/types";
 
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
-import { convertToExcalidrawElements, exportToCanvas } from "../../index";
+import {
+  convertToExcalidrawElements,
+  exportToCanvas,
+  THEME,
+} from "../../index";
 
 import type { MermaidToExcalidrawLibProps } from "./types";
 
@@ -30,7 +37,14 @@ export const resetPreview = ({
   canvasNode.replaceChildren();
 };
 
-interface ConvertMermaidToExcalidrawFormatProps {
+export const convertMermaidToExcalidraw = async ({
+  canvasRef,
+  mermaidToExcalidrawLib,
+  mermaidDefinition,
+  setError,
+  data,
+  theme,
+}: {
   canvasRef: React.RefObject<HTMLDivElement | null>;
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
   mermaidDefinition: string;
@@ -39,19 +53,8 @@ interface ConvertMermaidToExcalidrawFormatProps {
     elements: readonly NonDeletedExcalidrawElement[];
     files: BinaryFiles | null;
   }>;
-}
-
-type ConvertMermaidResult =
-  | { success: true }
-  | { success: false; error?: Error };
-
-export const convertMermaidToExcalidraw = async ({
-  canvasRef,
-  mermaidToExcalidrawLib,
-  mermaidDefinition,
-  setError,
-  data,
-}: ConvertMermaidToExcalidrawFormatProps): Promise<ConvertMermaidResult> => {
+  theme: Theme;
+}): Promise<{ success: true } | { success: false; error?: Error }> => {
   const canvasNode = canvasRef.current;
   const parent = canvasNode?.parentElement;
 
@@ -98,10 +101,7 @@ export const convertMermaidToExcalidraw = async ({
         Math.max(parent.offsetWidth, parent.offsetHeight) *
         window.devicePixelRatio,
       appState: {
-        // TODO hack (will be refactored in TTD v2)
-        exportWithDarkMode: document
-          .querySelector(".excalidraw-container")
-          ?.classList.contains("theme--dark"),
+        exportWithDarkMode: theme === THEME.DARK,
       },
     });
 
