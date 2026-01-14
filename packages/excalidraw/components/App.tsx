@@ -253,6 +253,7 @@ import {
   handleFocusPointDrag,
   handleFocusPointHover,
   handleFocusPointPointerDown,
+  handleFocusPointPointerUp,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -10017,7 +10018,12 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        if (
+        if (this.state.selectedLinearElement.hoveredFocusPointBinding) {
+          handleFocusPointPointerUp(
+            this.state.selectedLinearElement,
+            this.scene,
+          );
+        } else if (
           pointerDownState.hit?.element?.id !==
           this.state.selectedLinearElement.elementId
         ) {

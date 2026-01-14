@@ -311,16 +311,13 @@ export const handleFocusPointDrag = (
         }
       }
 
-      // Filter out undefined values before passing to movePoints
-      const filteredUpdates = new Map<number, { point: LocalPoint }>(
-        Array.from(pointUpdates.entries()).filter(
-          (entry): entry is [number, { point: LocalPoint }] =>
-            entry[1] !== undefined,
-        ),
-      );
-
-      if (filteredUpdates.size > 0) {
-        LinearElementEditor.movePoints(arrow, scene, filteredUpdates);
+      if (pointUpdates.size > 0) {
+        LinearElementEditor.movePoints(arrow, scene, pointUpdates, {
+          [bindingField]: {
+            ...updatedBinding,
+            mode: "orbit",
+          },
+        });
       }
 
       return true;
@@ -399,6 +396,69 @@ export const handleFocusPointPointerDown = (
   }
 
   return null;
+};
+
+export const handleFocusPointPointerUp = (
+  linearElementEditor: LinearElementEditor,
+  scene: Scene,
+) => {
+  invariant(
+    linearElementEditor.hoveredFocusPointBinding,
+    "Must have a hovered focus point",
+  );
+
+  const arrow = LinearElementEditor.getElement<ExcalidrawArrowElement>(
+    linearElementEditor.elementId,
+    scene.getNonDeletedElementsMap(),
+  );
+  invariant(arrow, "Arrow must be in the scene");
+
+  // Clean up
+  const bindingKey =
+    linearElementEditor.hoveredFocusPointBinding === "start"
+      ? "startBinding"
+      : "endBinding";
+  const otherBindingKey =
+    linearElementEditor.hoveredFocusPointBinding === "start"
+      ? "endBinding"
+      : "startBinding";
+  const boundElementId = arrow[bindingKey]?.elementId;
+  const otherBoundElementId = arrow[otherBindingKey]?.elementId;
+  const oldBoundElement =
+    boundElementId &&
+    scene
+      .getNonDeletedElements()
+      .find(
+        (element) =>
+          element.id !== boundElementId &&
+          element.id !== otherBoundElementId &&
+          isBindableElement(element) &&
+          element.boundElements?.find(({ id }) => id === arrow.id),
+      );
+  if (oldBoundElement) {
+    scene.mutateElement(oldBoundElement, {
+      boundElements: oldBoundElement.boundElements?.filter(
+        ({ id }) => id !== arrow.id,
+      ),
+    });
+  }
+
+  // Record the new bound element
+  const boundElement =
+    boundElementId && scene.getNonDeletedElementsMap().get(boundElementId);
+  if (boundElement) {
+    scene.mutateElement(boundElement, {
+      boundElements: [
+        ...(boundElement.boundElements || [])?.filter(
+          ({ id }) => id !== arrow.id,
+        ),
+        {
+          id: arrow.id,
+          type: "arrow",
+        },
+      ],
+    });
+  }
 };
 
 export const handleFocusPointHover = (
