@@ -298,7 +298,7 @@ export const getAllHoveredElementAtPoint = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  toleranceFn?: (element: ExcalidrawBindableElement) => number,
+  tolerance?: number,
 ): NonDeleted<ExcalidrawBindableElement>[] => {
   const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
@@ -314,7 +314,7 @@ export const getAllHoveredElementAtPoint = (
 
     if (
       isBindableElement(element, false) &&
-      bindingBorderTest(element, point, elementsMap, toleranceFn?.(element))
+      bindingBorderTest(element, point, elementsMap, tolerance)
     ) {
       candidateElements.push(element);
 
@@ -331,13 +331,13 @@ export const getHoveredElementForBinding = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  toleranceFn?: (element: ExcalidrawBindableElement) => number,
+  tolerance?: number,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
   const candidateElements = getAllHoveredElementAtPoint(
     point,
     elements,
     elementsMap,
-    toleranceFn,
+    tolerance,
   );
 
   if (!candidateElements || candidateElements.length === 0) {
