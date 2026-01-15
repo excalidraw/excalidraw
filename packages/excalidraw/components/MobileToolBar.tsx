@@ -22,6 +22,7 @@ import {
   EraserIcon,
   RectangleIcon,
   ArrowIcon,
+  DoubleArrowIcon,
   extraToolsIcon,
   DiamondIcon,
   EllipseIcon,
@@ -77,6 +78,12 @@ const LINEAR_ELEMENT_TOOLS = [
     type: "arrow",
     icon: ArrowIcon,
     title: capitalizeString(t("toolBar.arrow")),
+  },
+  {
+    type: "arrow",
+    icon: DoubleArrowIcon,
+    title: capitalizeString(t("toolBar.doubleArrow")),
+    defaultArrowheads: { start: "arrow", end: "arrow" },
   },
   { type: "line", icon: LineIcon, title: capitalizeString(t("toolBar.line")) },
 ] as const;
@@ -315,7 +322,6 @@ export const MobileToolBar = ({
         onToolChange={(type: string) => {
           if (type === "arrow" || type === "line") {
             setLastActiveLinearElement(type);
-            app.setActiveTool({ type });
           }
         }}
         displayedOption={

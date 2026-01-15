@@ -19,6 +19,7 @@ type ToolOption = {
   type: string;
   icon: React.ReactNode;
   title?: string;
+  defaultArrowheads?: { start: "arrow" | null; end: "arrow" | null };
 };
 
 type ToolPopoverProps = {
@@ -95,12 +96,12 @@ export const ToolPopover = ({
         sideOffset={SIDE_OFFSET}
         collisionBoundary={container ?? undefined}
       >
-        {options.map(({ type, icon, title }) => (
+        {options.map(({ type, icon, title, defaultArrowheads }) => (
           <ToolButton
             className={clsx(className, {
               active: currentType === type,
             })}
-            key={type}
+            key={`${type}${defaultArrowheads ? '-double' : ''}`}
             type="radio"
             icon={icon}
             checked={currentType === type}
@@ -108,12 +109,15 @@ export const ToolPopover = ({
             title={title || capitalizeString(type)}
             keyBindingLabel=""
             aria-label={title || capitalizeString(type)}
-            data-testid={`toolbar-${type}`}
+            data-testid={`toolbar-${type}${defaultArrowheads ? '-double' : ''}`}
             onChange={() => {
               if (app.state.activeTool.type !== type) {
                 trackEvent("toolbar", type, "ui");
               }
-              app.setActiveTool({ type: type as any });
+              app.setActiveTool({ 
+                type: type as any,
+                ...(defaultArrowheads ? { defaultArrowheads } : {})
+              });
               onToolChange?.(type);
             }}
           />
