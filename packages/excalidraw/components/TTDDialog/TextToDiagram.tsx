@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
@@ -13,12 +13,7 @@ import {
   insertToEditor,
   saveMermaidDataToStorage,
 } from "./common";
-import {
-  errorAtom,
-  rateLimitsAtom,
-  chatHistoryAtom,
-  showPreviewAtom,
-} from "./TTDContext";
+import { errorAtom, chatHistoryAtom, showPreviewAtom } from "./TTDContext";
 
 import { useTTDChatStorage } from "./useTTDChatStorage";
 import { useMermaidRenderer } from "./hooks/useMermaidRenderer";
@@ -27,15 +22,10 @@ import { useChatManagement } from "./hooks/useChatManagement";
 import { TTDChatPanel } from "./Chat/TTDChatPanel";
 import { TTDPreviewPanel } from "./TTDPreviewPanel";
 
-import { addMessages, getLastAssistantMessage } from "./utils/chat";
+import { getLastAssistantMessage } from "./utils/chat";
 
 import type { BinaryFiles } from "../../types";
-import type {
-  OnTestSubmitRetValue,
-  MermaidToExcalidrawLibProps,
-  TChat,
-  TTTDDialog,
-} from "./types";
+import type { MermaidToExcalidrawLibProps, TChat, TTTDDialog } from "./types";
 
 const TextToDiagramContent = ({
   mermaidToExcalidrawLib,
@@ -45,7 +35,7 @@ const TextToDiagramContent = ({
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
   onTextSubmit: (
     props: TTTDDialog.OnTextSubmitProps,
-  ) => Promise<OnTestSubmitRetValue>;
+  ) => Promise<TTTDDialog.OnTextSubmitRetValue>;
   renderWarning?: TTTDDialog.renderWarning;
 }) => {
   const app = useApp();
@@ -53,7 +43,6 @@ const TextToDiagramContent = ({
 
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useAtom(errorAtom);
-  const [rateLimits] = useAtom(rateLimitsAtom);
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom);
   const showPreview = useAtomValue(showPreviewAtom);
 
@@ -80,31 +69,6 @@ const TextToDiagramContent = ({
     handleMenuToggle,
     handleMenuClose,
   } = useChatManagement();
-
-  useEffect(() => {
-    if (rateLimits?.rateLimitRemaining === 0) {
-      const hasRateLimitMessage = chatHistory.messages.some(
-        (msg) =>
-          msg.type === "warning" && msg.warningType === "rateLimitExceeded",
-      );
-
-      if (!hasRateLimitMessage) {
-        setChatHistory(
-          addMessages(chatHistory, [
-            {
-              type: "warning",
-              warningType: "rateLimitExceeded",
-            },
-          ]),
-        );
-      }
-    }
-  }, [
-    rateLimits?.rateLimitRemaining,
-    chatHistory.messages,
-    chatHistory,
-    setChatHistory,
-  ]);
 
   const onViewAsMermaid = () => {
     if (typeof lastAssistantMessage?.content === "string") {
@@ -265,7 +229,7 @@ export const TextToDiagram = ({
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
   onTextSubmit(
     props: TTTDDialog.OnTextSubmitProps,
-  ): Promise<OnTestSubmitRetValue>;
+  ): Promise<TTTDDialog.OnTextSubmitRetValue>;
   renderWarning?: TTTDDialog.renderWarning;
 }) => {
   return (

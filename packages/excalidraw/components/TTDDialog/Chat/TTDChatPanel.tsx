@@ -2,6 +2,7 @@ import { t } from "../../../i18n";
 import { ArrowRightIcon } from "../../icons";
 
 import { InlineIcon } from "../../InlineIcon";
+
 import { TTDDialogPanel } from "../TTDDialogPanel";
 
 import { useAtom } from "../../../editor-jotai";
@@ -11,6 +12,8 @@ import { rateLimitsAtom } from "../TTDContext";
 import { ChatHistoryMenu } from "./ChatHistoryMenu";
 
 import { ChatInterface } from ".";
+
+import type { TTDPanelAction } from "../TTDDialogPanel";
 
 import type { SavedChat, TChat, TTTDDialog } from "../types";
 
@@ -70,13 +73,17 @@ export const TTDChatPanel = ({
   const [rateLimits] = useAtom(rateLimitsAtom);
 
   const getPanelActions = () => {
-    const actions = [];
+    const actions: TTDPanelAction[] = [];
     if (rateLimits) {
       actions.push({
         label: t("chat.rateLimitRemaining", {
           count: rateLimits.rateLimitRemaining,
         }),
-        variant: "rateLimit" as const,
+        variant: "rateLimit",
+        className:
+          rateLimits.rateLimitRemaining < 5
+            ? "ttd-dialog-panel__rate-limit--danger"
+            : "",
       });
     }
 
@@ -85,7 +92,7 @@ export const TTDChatPanel = ({
         action: onViewAsMermaid,
         label: t("chat.viewAsMermaid"),
         icon: <InlineIcon icon={ArrowRightIcon} />,
-        variant: "link" as const,
+        variant: "link",
       });
     }
 

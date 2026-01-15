@@ -409,9 +409,12 @@ $fullScreenModalBreakpoint: 600px;
 
     &__rate-limit {
       font-size: 0.75rem;
-      color: var(--color-danger);
       font-weight: 500;
       white-space: nowrap;
+
+      &--danger {
+        color: var(--color-danger);
+      }
     }
 
     &__menu-wrapper {

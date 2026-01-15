@@ -61,6 +61,7 @@ export const ChatMessage: React.FC<{
   };
 
   if (message.type === "warning") {
+    const customOverride = renderWarning?.(message);
     return (
       <div className="chat-message chat-message--system">
         <div className="chat-message__content">
@@ -72,11 +73,11 @@ export const ChatMessage: React.FC<{
           </div>
           <div className="chat-message__body">
             <div className="chat-message__text">
-              {renderWarning ? (
-                renderWarning(message)
-              ) : (
+              {customOverride ? (
+                customOverride
+              ) : message.warningType === "messageLimitExceeded" ? (
                 <>
-                  {t("chat.rateLimit.message")}
+                  {t("chat.rateLimit.messageLimit")}
                   <div style={{ marginTop: "10px" }}>
                     <FilledButton
                       onClick={() => {
@@ -93,6 +94,8 @@ export const ChatMessage: React.FC<{
                     </FilledButton>
                   </div>
                 </>
+              ) : (
+                t("chat.rateLimit.generalRateLimit")
               )}
             </div>
           </div>

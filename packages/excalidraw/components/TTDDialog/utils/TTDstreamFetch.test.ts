@@ -70,7 +70,7 @@ describe("TTDStreamFetch", () => {
 
       expect(result.generatedResponse).toBe("Hello world");
       expect(chunks).toEqual(["Hello ", "world"]);
-      expect(result.error).toBeUndefined();
+      expect(result.error).toBeNull();
     });
 
     it("should handle multi-line chunks", async () => {
@@ -239,9 +239,7 @@ describe("TTDStreamFetch", () => {
       });
 
       expect(result.error).toBeDefined();
-      expect(result.error?.message).toBe(
-        "Too many requests today, please try again tomorrow!",
-      );
+      expect(result.error?.message).toBe("Rate limit exceeded");
       expect(result.rateLimit).toBe(100);
       expect(result.rateLimitRemaining).toBe(0);
     });
@@ -295,7 +293,9 @@ describe("TTDStreamFetch", () => {
       });
 
       expect(result.error).toBeDefined();
-      expect(result.error?.message).toBe("No response body");
+      expect(result.error?.message).toBe(
+        "Couldn't get reader from response body",
+      );
     });
 
     it("should handle empty response", async () => {

@@ -11,13 +11,14 @@ import { errorAtom, rateLimitsAtom, chatHistoryAtom } from "../TTDContext";
 import { useChatAgent } from "../Chat";
 
 import {
+  addMessages,
   getLastAssistantMessage,
   getMessagesForLLM,
   removeLastAssistantMessage,
   updateAssistantContent,
 } from "../utils/chat";
 
-import type { TTTDDialog, OnTestSubmitRetValue } from "../types";
+import type { TTTDDialog } from "../types";
 
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 10000;
@@ -27,7 +28,7 @@ export const useTextGeneration = ({
 }: {
   onTextSubmit: (
     props: TTTDDialog.OnTextSubmitProps,
-  ) => Promise<OnTestSubmitRetValue>;
+  ) => Promise<TTTDDialog.OnTextSubmitRetValue>;
 }) => {
   const [, setError] = useAtom(errorAtom);
   const [rateLimits, setRateLimits] = useAtom(rateLimitsAtom);
@@ -176,12 +177,52 @@ export const useTextGeneration = ({
           return;
         }
 
-        if (
-          error.message ===
-          "Too many requests today, please try again tomorrow!"
-        ) {
-          setChatHistory((prev) => removeLastAssistantMessage(prev));
+        if (error.status === 429) {
+          setChatHistory((prev) => {
+            const chatHistory = removeLastAssistantMessage(prev);
+
+            return {
+              ...chatHistory,
+              messages: chatHistory.messages.filter(
+                (msg) =>
+                  msg.type !== "warning" ||
+                  msg.warningType === "rateLimitExceeded" ||
+                  msg.warningType === "messageLimitExceeded",
+              ),
+            };
+          });
+
+          setChatHistory((chatHistory) => {
+            return addMessages(chatHistory, [
+              {
+                type: "warning",
+                warningType:
+                  rateLimitRemaining === 0
+                    ? "messageLimitExceeded"
+                    : "rateLimitExceeded",
+              },
+            ]);
+          });
+
           return;
+        } else if (rateLimitRemaining === 0) {
+          setChatHistory((chatHistory) => {
+            chatHistory = {
+              ...chatHistory,
+              messages: chatHistory.messages.filter(
+                (msg) =>
+                  msg.type !== "warning" ||
+                  msg.warningType === "rateLimitExceeded" ||
+                  msg.warningType === "messageLimitExceeded",
+              ),
+            };
+            return addMessages(chatHistory, [
+              {
+                type: "warning",
+                warningType: "messageLimitExceeded",
+              },
+            ]);
+          });
         }
 
         handleError(error as Error, "network");

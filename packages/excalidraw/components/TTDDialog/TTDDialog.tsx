@@ -15,11 +15,7 @@ import { TTDDialogTab } from "./TTDDialogTab";
 
 import "./TTDDialog.scss";
 
-import type {
-  MermaidToExcalidrawLibProps,
-  OnTestSubmitRetValue,
-  TTTDDialog,
-} from "./types";
+import type { MermaidToExcalidrawLibProps, TTTDDialog } from "./types";
 
 export const TTDDialog = (
   props:
@@ -52,7 +48,7 @@ const TTDDialogBase = withInternalFallback(
     | {
         onTextSubmit(
           props: TTTDDialog.OnTextSubmitProps,
-        ): Promise<OnTestSubmitRetValue>;
+        ): Promise<TTTDDialog.OnTextSubmitRetValue>;
         renderWarning?: TTTDDialog.renderWarning;
       }
     | { __fallback: true }

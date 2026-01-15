@@ -1,3 +1,5 @@
+import type { RequestError } from "@excalidraw/excalidraw/errors";
+
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
@@ -5,18 +7,6 @@ import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
 import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
 
 import type { BinaryFiles } from "../../types";
-
-// API Types
-export type OnTestSubmitRetValue = {
-  rateLimit?: number | null;
-  rateLimitRemaining?: number | null;
-} & (
-  | { generatedResponse: string | undefined; error?: null | undefined }
-  | {
-      error: Error;
-      generatedResponse?: null | undefined;
-    }
-);
 
 export type LLMMessage = {
   role: "user" | "assistant";
@@ -43,7 +33,8 @@ export namespace TChat {
     errorType?: "parse" | "network" | "other";
     lastAttemptAt?: number;
     type: "user" | "assistant" | "warning";
-    warningType?: "rateLimitExceeded";
+    warningType?: /* daily rate limit */
+    "messageLimitExceeded" | /* general 429 */ "rateLimitExceeded";
     content?: string;
   };
 
@@ -80,11 +71,26 @@ export namespace TTTDDialog {
     signal?: AbortSignal;
   };
 
+  export type OnTextSubmitRetValue = {
+    rateLimit?: number | null;
+    rateLimitRemaining?: number | null;
+  } & (
+    | { generatedResponse: string; error: null }
+    | {
+        error: RequestError;
+        generatedResponse?: null;
+      }
+  );
+
   // TTDDialog props
   export type onTextSubmit = (
     props: OnTextSubmitProps,
-  ) => Promise<OnTestSubmitRetValue>;
+  ) => Promise<OnTextSubmitRetValue>;
+
+  /**
+   * return undefined to use default rendering
+   */
   export type renderWarning = (
     chatMessage: TChat.ChatMessage,
-  ) => React.ReactNode;
+  ) => React.ReactNode | undefined;
 }

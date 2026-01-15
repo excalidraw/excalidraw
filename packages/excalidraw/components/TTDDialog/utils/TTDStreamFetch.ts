@@ -1,4 +1,9 @@
-import type { LLMMessage } from "@excalidraw/excalidraw/components/TTDDialog/types";
+import { RequestError } from "@excalidraw/excalidraw/errors";
+
+import type {
+  LLMMessage,
+  TTTDDialog,
+} from "@excalidraw/excalidraw/components/TTDDialog/types";
 
 interface RateLimitInfo {
   rateLimit?: number;
@@ -13,17 +18,6 @@ interface StreamingOptions {
   signal?: AbortSignal;
   onStreamCreated?: () => void;
 }
-
-type StreamingResult = {
-  rateLimit?: number | null;
-  rateLimitRemaining?: number | null;
-} & (
-  | { generatedResponse: string | undefined; error?: null | undefined }
-  | {
-      error: Error;
-      generatedResponse?: null | undefined;
-    }
-);
 
 export type StreamChunk =
   | {
@@ -92,7 +86,7 @@ async function* parseSSEStream(
 
 export async function TTDStreamFetch(
   options: StreamingOptions,
-): Promise<StreamingResult> {
+): Promise<TTTDDialog.OnTextSubmitRetValue> {
   const {
     url,
     messages,
@@ -105,7 +99,7 @@ export async function TTDStreamFetch(
   try {
     let fullResponse = "";
     let rateLimitInfo: RateLimitInfo = {};
-    let error: Error | null = null;
+    let error: RequestError | null = null;
 
     const response = await fetch(url, {
       method: "POST",
@@ -125,20 +119,27 @@ export async function TTDStreamFetch(
       if (response.status === 429) {
         return {
           ...rateLimitInfo,
-          error: new Error(
-            "Too many requests today, please try again tomorrow!",
-          ),
+          error: new RequestError({
+            message: "Rate limit exceeded",
+            status: 429,
+          }),
         };
       }
 
       const text = await response.text();
-      throw new Error(text || "Generation failed...");
+      throw new RequestError({
+        message: text || "Generation failed...",
+        status: response.status,
+      });
     }
 
     const reader = response.body?.getReader();
 
     if (!reader) {
-      throw new Error("No response body");
+      throw new RequestError({
+        message: "Couldn't get reader from response body",
+        status: 500,
+      });
     }
 
     onStreamCreated?.();
@@ -166,7 +167,10 @@ export async function TTDStreamFetch(
               break;
             }
             case "error":
-              error = new Error(chunk.error.message);
+              error = new RequestError({
+                message: chunk.error.message,
+                status: 500,
+              });
               break;
             case "done":
               break;
@@ -177,9 +181,12 @@ export async function TTDStreamFetch(
       }
     } catch (streamError: any) {
       if (streamError.name === "AbortError") {
-        error = new Error("Request aborted");
+        error = new RequestError({ message: "Request aborted", status: 499 });
       } else {
-        error = new Error(streamError.message || "Streaming error");
+        error = new RequestError({
+          message: streamError.message || "Streaming error",
+          status: 500,
+        });
       }
     }
 
@@ -193,22 +200,29 @@ export async function TTDStreamFetch(
     if (!fullResponse) {
       return {
         ...rateLimitInfo,
-        error: new Error("Generation failed..."),
+        error: new RequestError({
+          message: "Generation failed...",
+          status: response.status,
+        }),
       };
     }
 
     return {
       generatedResponse: fullResponse,
+      error: null,
       ...rateLimitInfo,
     };
   } catch (err: any) {
     if (err.name === "AbortError") {
       return {
-        error: new Error("Request aborted"),
+        error: new RequestError({ message: "Request aborted", status: 499 }),
       };
     }
     return {
-      error: new Error(err.message || "Request failed"),
+      error: new RequestError({
+        message: err.message || "Request failed",
+        status: 500,
+      }),
     };
   }
 }

@@ -13,6 +13,7 @@ export type TTDPanelAction = {
   icon?: ReactNode;
   variant: "button" | "link" | "rateLimit";
   disabled?: boolean;
+  className?: string;
 };
 
 interface TTDDialogPanelProps {
@@ -46,7 +47,10 @@ export const TTDDialogPanel = ({
     if (panelAction?.variant === "link") {
       return (
         <button
-          className="ttd-dialog-panel-action-link"
+          className={clsx(
+            "ttd-dialog-panel-action-link",
+            panelAction.className,
+          )}
           onClick={panelAction.action}
           disabled={panelAction?.disabled || onTextSubmitInProgess}
           type="button"
@@ -64,7 +68,7 @@ export const TTDDialogPanel = ({
     if (panelAction?.variant === "button") {
       return (
         <Button
-          className="ttd-dialog-panel-button"
+          className={clsx("ttd-dialog-panel-button", panelAction.className)}
           onSelect={panelAction.action ? panelAction.action : () => {}}
           disabled={panelAction?.disabled || onTextSubmitInProgess}
         >
@@ -79,7 +83,14 @@ export const TTDDialogPanel = ({
 
     if (panelAction?.variant === "rateLimit") {
       return (
-        <div className="ttd-dialog-panel__rate-limit">{panelAction.label}</div>
+        <div
+          className={clsx(
+            "ttd-dialog-panel__rate-limit",
+            panelAction.className,
+          )}
+        >
+          {panelAction.label}
+        </div>
       );
     }
   };

@@ -148,11 +148,13 @@ export const ChatInterface = ({
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               placeholder={
-                messages.length > 0
+                rateLimits?.rateLimitRemaining === 0
+                  ? t("chat.rateLimit.messageLimitInputPlaceholder")
+                  : messages.length > 0
                   ? t("chat.inputPlaceholderWithMessages")
                   : t("chat.inputPlaceholder", { shortcut: "Shift + Enter" })
               }
-              disabled={isGenerating}
+              disabled={isGenerating || rateLimits?.rateLimitRemaining === 0}
               rows={1}
               cols={30}
               onInput={onInput}
