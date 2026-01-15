@@ -82,7 +82,10 @@ export const actionFinalize = register<FormData>({
         app.scene,
       );
 
-      if (isBindingElement(element)) {
+      if (
+        isBindingElement(element) &&
+        !appState.selectedLinearElement.segmentMidPointHoveredCoords
+      ) {
         const newArrow = !!appState.newElement;
 
         const selectedPointsIndices =
