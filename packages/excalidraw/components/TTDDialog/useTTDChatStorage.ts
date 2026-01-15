@@ -65,7 +65,7 @@ export const useTTDChatStorage = (): UseTTDChatStorageReturn => {
     const firstUserMessage = chatHistory.messages.find(
       (msg) => msg.type === "user",
     );
-    if (!firstUserMessage || !firstUserMessage.content) {
+    if (!firstUserMessage || typeof firstUserMessage.content !== "string") {
       return;
     }
 

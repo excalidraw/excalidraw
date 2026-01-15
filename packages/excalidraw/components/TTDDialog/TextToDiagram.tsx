@@ -141,7 +141,10 @@ const TextToDiagramContent = ({
 
     if (messageIndex > 0) {
       const previousMessage = chatHistory.messages[messageIndex - 1];
-      if (previousMessage.type === "user" && previousMessage.content) {
+      if (
+        previousMessage.type === "user" &&
+        typeof previousMessage.content === "string"
+      ) {
         setLastRetryAttempt();
         await onGenerate(previousMessage.content, true);
       }

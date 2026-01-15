@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useLayoutEffect } from "react";
 import { KEYS } from "@excalidraw/common";
 
 import { ArrowRightIcon, stop as StopIcon } from "../../icons";
@@ -57,7 +57,7 @@ export const ChatInterface = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     messagesEndRef.current?.scrollIntoView();
   }, [messages]);
 
@@ -131,10 +131,14 @@ export const ChatInterface = ({
               rateLimitRemaining={rateLimits?.rateLimitRemaining}
               isLastMessage={index === messages.length - 1}
               renderWarning={renderWarning}
+              // so we don't allow to repair parse errors which aren't the last message
+              allowFixingParseError={
+                message.errorType === "parse" && index === messages.length - 1
+              }
             />
           ))
         )}
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} id="messages-end" />
       </div>
 
       <div className="chat-interface__input-container">
