@@ -60,7 +60,19 @@
     }
 
     &[disabled] {
-      pointer-events: none;
+      cursor: not-allowed;
+
+      &.ExcButton--variant-filled,
+      &:hover {
+        --back-color: var(--color-surface-low) !important;
+        --text-color: var(--color-on-surface-variant) !important;
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-on-surface-variant);
+        --border-color: var(--color-surface-high);
+      }
     }
 
     &,
