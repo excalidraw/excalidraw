@@ -6,6 +6,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -640,6 +641,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -1204,6 +1206,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -1567,6 +1570,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -1932,6 +1936,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -2198,6 +2203,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -2654,6 +2660,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -2960,6 +2967,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -3282,6 +3290,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -3579,6 +3588,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -3868,6 +3878,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -4106,6 +4117,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -4366,6 +4378,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -4640,6 +4653,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -4872,6 +4886,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -5104,6 +5119,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -5354,6 +5370,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -5613,6 +5630,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -5874,6 +5892,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -6206,6 +6225,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -6636,6 +6656,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -7013,6 +7034,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -7328,6 +7350,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -7623,6 +7646,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -7856,6 +7880,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -8211,6 +8236,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -8566,6 +8592,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -8975,6 +9002,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -9257,6 +9285,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -9524,6 +9553,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -9792,6 +9822,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -10027,6 +10058,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -10327,6 +10359,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -10647,6 +10680,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -10886,6 +10920,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -11331,6 +11366,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -11594,6 +11630,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -11832,6 +11869,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -12072,6 +12110,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -12466,6 +12505,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -12679,6 +12719,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -12889,6 +12930,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -13193,6 +13235,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -13494,6 +13537,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -13742,6 +13786,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -13982,6 +14027,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -14222,6 +14268,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -14472,6 +14519,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -14806,6 +14854,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -14979,6 +15028,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -15266,6 +15316,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -15532,6 +15583,7 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -15688,6 +15740,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -15973,6 +16026,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -16138,6 +16192,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -16889,6 +16944,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -17538,6 +17594,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -18187,6 +18244,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -18939,6 +18997,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -19710,6 +19769,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -20193,6 +20253,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -20707,6 +20768,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
@@ -21169,6 +21231,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,

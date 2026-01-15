@@ -127,7 +127,7 @@ export const MobileToolBar = ({
         if (tool.type !== activeTool.type) return false;
         // For arrow type, also match defaultArrowheads
         if (tool.type === "arrow") {
-          const toolHasDouble = tool.defaultArrowheads?.start === "arrow" && tool.defaultArrowheads?.end === "arrow";
+          const toolHasDouble = "defaultArrowheads" in tool && tool.defaultArrowheads?.start === "arrow" && tool.defaultArrowheads?.end === "arrow";
           const activeHasDouble = activeTool.defaultArrowheads?.start === "arrow" && activeTool.defaultArrowheads?.end === "arrow";
           return toolHasDouble === activeHasDouble;
         }
@@ -334,7 +334,7 @@ export const MobileToolBar = ({
             // For arrow type with multiple variants, match by defaultArrowheads
             // The ToolPopover will have already set the activeTool, so we check that
             if (type === "arrow") {
-              const toolHasDouble = tool.defaultArrowheads?.start === "arrow" && tool.defaultArrowheads?.end === "arrow";
+              const toolHasDouble = "defaultArrowheads" in tool && tool.defaultArrowheads?.start === "arrow" && tool.defaultArrowheads?.end === "arrow";
               const activeHasDouble = app.state.activeTool.defaultArrowheads?.start === "arrow" && app.state.activeTool.defaultArrowheads?.end === "arrow";
               return toolHasDouble === activeHasDouble;
             }

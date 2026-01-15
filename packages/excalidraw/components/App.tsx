@@ -5282,25 +5282,10 @@ class App extends React.Component<AppProps, AppState> {
         };
       }
       
-      // Reset arrow arrowheads when switching arrow tools (for selection case)
-      const arrowheadResets =
-        nextActiveTool.type === "arrow" && nextActiveTool.defaultArrowheads
-          ? {
-              currentItemStartArrowhead: nextActiveTool.defaultArrowheads.start,
-              currentItemEndArrowhead: nextActiveTool.defaultArrowheads.end,
-            }
-          : nextActiveTool.type === "arrow" && !nextActiveTool.defaultArrowheads
-          ? {
-              currentItemStartArrowhead: null,
-              currentItemEndArrowhead: "arrow" as const,
-            }
-          : {};
-      
       return {
         ...prevState,
         ...commonResets,
         activeTool: nextActiveTool,
-        ...arrowheadResets,
       };
     });
   };

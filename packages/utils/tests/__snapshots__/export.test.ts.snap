@@ -6,6 +6,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "defaultArrowheads": undefined,
     "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,

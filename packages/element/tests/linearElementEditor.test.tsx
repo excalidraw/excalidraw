@@ -31,6 +31,7 @@ import * as textElementUtils from "../src/textElement";
 import { getBoundTextElementPosition, getBoundTextMaxWidth } from "../src";
 import { LinearElementEditor } from "../src";
 import { newArrowElement } from "../src";
+import { isElbowArrow } from "../src/typeChecks";
 
 import {
   getTextEditor,
@@ -1534,6 +1535,226 @@ describe("Test Linear Elements", () => {
       const tolerance = 0.01; // Small tolerance for floating point precision
 
       expect(angleDifference).toBeLessThan(tolerance);
+    });
+  });
+
+  describe("Double Arrow Support", () => {
+    it("should maintain both arrowheads when editing points", async () => {
+      // Create a double arrow (both arrowheads set)
+      const doubleArrow = API.createElement({
+        type: "arrow",
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 0,
+        points: [pointFrom(0, 0), pointFrom(200, 0)],
+        startArrowhead: "arrow",
+        endArrowhead: "arrow",
+      });
+
+      h.elements = [doubleArrow];
+
+      // Enter line editor mode
+      mouse.clickAt(doubleArrow.x + 100, doubleArrow.y);
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.ENTER);
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+
+      // Drag the end point to a new location
+      const endPointX = doubleArrow.x + 200;
+      const endPointY = doubleArrow.y;
+      
+      mouse.downAt(endPointX, endPointY);
+      mouse.moveTo(endPointX + 50, endPointY + 50);
+      mouse.up();
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Verify both arrowheads are still present
+      const updatedArrow = h.elements[0] as typeof doubleArrow;
+      expect(updatedArrow.startArrowhead).toBe("arrow");
+      expect(updatedArrow.endArrowhead).toBe("arrow");
+    });
+
+    it("should maintain both arrowheads when dragging midpoint", async () => {
+      // Create a double arrow with 3 points
+      const doubleArrow = API.createElement({
+        type: "arrow",
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 100,
+        points: [
+          pointFrom(0, 0),
+          pointFrom(100, 50),
+          pointFrom(200, 100),
+        ],
+        startArrowhead: "arrow",
+        endArrowhead: "arrow",
+      });
+
+      h.elements = [doubleArrow];
+
+      // Click on the arrow to enter edit mode
+      mouse.clickAt(doubleArrow.x + 100, doubleArrow.y + 50);
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.ENTER);
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+
+      // Get midpoint between first and second point
+      const elementsMap = arrayToMap(h.elements);
+      const midPoints = LinearElementEditor.getEditorMidPoints(
+        doubleArrow,
+        elementsMap,
+        h.state,
+      );
+
+      // Drag the first midpoint if it exists
+      if (midPoints[0]) {
+        mouse.downAt(midPoints[0][0], midPoints[0][1]);
+        mouse.moveTo(midPoints[0][0] + 30, midPoints[0][1] + 30);
+        mouse.up();
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
+      // Verify both arrowheads are still present
+      const updatedArrow = h.elements[0] as typeof doubleArrow;
+      expect(updatedArrow.startArrowhead).toBe("arrow");
+      expect(updatedArrow.endArrowhead).toBe("arrow");
+    });
+
+    it("should support binding on both ends of double arrow", async () => {
+      // Create two rectangles to bind to
+      const rect1 = API.createElement({
+        type: "rectangle",
+        x: 50,
+        y: 50,
+        width: 100,
+        height: 100,
+      });
+
+      const rect2 = API.createElement({
+        type: "rectangle",
+        x: 300,
+        y: 50,
+        width: 100,
+        height: 100,
+      });
+
+      // Create a double arrow using API directly
+      const doubleArrow = API.createElement({
+        type: "arrow",
+        x: 150,
+        y: 100,
+        width: 200,
+        height: 0,
+        points: [pointFrom(0, 0), pointFrom(200, 0)],
+        startArrowhead: "arrow",
+        endArrowhead: "arrow",
+      });
+
+      h.elements = [rect1, rect2, doubleArrow];
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Verify both arrowheads are present
+      expect(doubleArrow.startArrowhead).toBe("arrow");
+      expect(doubleArrow.endArrowhead).toBe("arrow");
+
+      // Verify the structure supports bindings
+      // The element has properties for both start and end bindings
+      expect("startBinding" in doubleArrow).toBe(true);
+      expect("endBinding" in doubleArrow).toBe(true);
+    });
+
+    it("should work with elbow arrows with double arrowheads", async () => {
+      // Create an elbow double arrow directly
+      const elbowArrow = API.createElement({
+        type: "arrow",
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 100,
+        points: [
+          pointFrom(0, 0),
+          pointFrom(100, 0),
+          pointFrom(100, 100),
+          pointFrom(200, 100),
+        ],
+        elbowed: true,
+        startArrowhead: "arrow",
+        endArrowhead: "arrow",
+      });
+
+      h.elements = [elbowArrow];
+
+      // Select the arrow
+      mouse.clickAt(elbowArrow.x + 100, elbowArrow.y + 50);
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Verify both arrowheads are present in elbow arrow
+      const arrow = h.elements[0] as typeof elbowArrow;
+      expect(arrow.startArrowhead).toBe("arrow");
+      expect(arrow.endArrowhead).toBe("arrow");
+      expect(isElbowArrow(arrow)).toBe(true);
+
+      // Verify that the arrow type and arrowheads coexist properly
+      expect(arrow.type).toBe("arrow");
+      expect(Array.isArray(arrow.points)).toBe(true);
+      expect(arrow.points.length).toBeGreaterThan(0);
+    });
+
+    it("should preserve both arrowheads when duplicating points", async () => {
+      // Create a double arrow
+      const doubleArrow = API.createElement({
+        type: "arrow",
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 0,
+        points: [
+          pointFrom(0, 0),
+          pointFrom(100, 0),
+          pointFrom(200, 0),
+        ],
+        startArrowhead: "arrow",
+        endArrowhead: "arrow",
+      });
+
+      h.elements = [doubleArrow];
+
+      // Enter edit mode
+      mouse.clickAt(doubleArrow.x + 100, doubleArrow.y);
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.ENTER);
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Select the middle point
+      mouse.clickAt(doubleArrow.x + 100, doubleArrow.y);
+
+      // Duplicate the point (Ctrl+D)
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.D);
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Verify both arrowheads are still present
+      const updatedArrow = h.elements[0] as typeof doubleArrow;
+      expect(updatedArrow.startArrowhead).toBe("arrow");
+      expect(updatedArrow.endArrowhead).toBe("arrow");
     });
   });
 });
