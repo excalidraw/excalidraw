@@ -124,8 +124,7 @@ export const hitElementItself = ({
     cachedPoint &&
     pointsEqual(point, cachedPoint) &&
     cachedThreshold <= threshold &&
-    (!overrideShouldTestInside ||
-      (overrideShouldTestInside && cachedOverrideShouldTestInside))
+    overrideShouldTestInside === cachedOverrideShouldTestInside
   ) {
     const derefElement = cachedElement?.deref();
     if (
