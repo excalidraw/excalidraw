@@ -226,6 +226,25 @@
       border-color: var(--color-primary);
     }
 
+    &[disabled] {
+      cursor: not-allowed;
+
+      &:hover {
+        --background: var(--color-surface-mid);
+        background-color: var(--background);
+      }
+
+      &:active {
+        border-color: transparent;
+      }
+
+      @at-root .excalidraw.theme--dark#{&} {
+        &:hover {
+          --background: var(--color-surface-high);
+        }
+      }
+    }
+
     svg {
       width: var(--lg-icon-size);
       height: var(--lg-icon-size);

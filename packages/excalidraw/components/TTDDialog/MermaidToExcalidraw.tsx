@@ -10,6 +10,8 @@ import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { t } from "../../i18n";
 import Trans from "../Trans";
 
+import { useUIAppState } from "../../context/ui-appState";
+
 import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
 import { TTDDialogPanel } from "./TTDDialogPanel";
@@ -19,12 +21,13 @@ import {
   convertMermaidToExcalidraw,
   insertToEditor,
   saveMermaidDataToStorage,
+  resetPreview,
 } from "./common";
 
 import "./MermaidToExcalidraw.scss";
 
 import type { BinaryFiles } from "../../types";
-import type { MermaidToExcalidrawLibProps } from "./common";
+import type { MermaidToExcalidrawLibProps } from "./types";
 
 const MERMAID_EXAMPLE =
   "flowchart TD\n A[Christmas] -->|Get money| B(Go shopping)\n B --> C{Let me think}\n C -->|One| D[Laptop]\n C -->|Two| E[iPhone]\n C -->|Three| F[Car]";
@@ -33,8 +36,10 @@ const debouncedSaveMermaidDefinition = debounce(saveMermaidDataToStorage, 300);
 
 const MermaidToExcalidraw = ({
   mermaidToExcalidrawLib,
+  isActive,
 }: {
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
+  isActive?: boolean;
 }) => {
   const [text, setText] = useState(
     () =>
@@ -51,22 +56,40 @@ const MermaidToExcalidraw = ({
   }>({ elements: [], files: null });
 
   const app = useApp();
+  const { theme } = useUIAppState();
 
   useEffect(() => {
-    convertMermaidToExcalidraw({
-      canvasRef,
-      data,
-      mermaidToExcalidrawLib,
-      setError,
-      mermaidDefinition: deferredText,
-    }).catch((err) => {
-      if (isDevEnv()) {
-        console.error("Failed to parse mermaid definition", err);
-      }
-    });
+    const doRender = async () => {
+      try {
+        if (!deferredText) {
+          resetPreview({ canvasRef, setError });
+          return;
+        }
+        const result = await convertMermaidToExcalidraw({
+          canvasRef,
+          data,
+          mermaidToExcalidrawLib,
+          setError,
+          mermaidDefinition: deferredText,
+          theme,
+        });
 
-    debouncedSaveMermaidDefinition(deferredText);
-  }, [deferredText, mermaidToExcalidrawLib]);
+        if (!result.success) {
+          const err = result.error ?? new Error("Invalid mermaid definition");
+          setError(err);
+        }
+      } catch (err) {
+        if (isDevEnv()) {
+          console.error("Failed to parse mermaid definition", err);
+        }
+      }
+    };
+
+    if (isActive) {
+      doRender();
+      debouncedSaveMermaidDefinition(deferredText);
+    }
+  }, [deferredText, mermaidToExcalidrawLib, isActive, theme]);
 
   useEffect(
     () => () => {
@@ -103,10 +126,10 @@ const MermaidToExcalidraw = ({
         />
       </div>
       <TTDDialogPanels>
-        <TTDDialogPanel label={t("mermaid.syntax")}>
+        <TTDDialogPanel>
           <TTDDialogInput
             input={text}
-            placeholder={"Write Mermaid diagram defintion here..."}
+            placeholder={t("mermaid.inputPlaceholder")}
             onChange={(event) => setText(event.target.value)}
             onKeyboardSubmit={() => {
               onInsertToEditor();
@@ -114,14 +137,16 @@ const MermaidToExcalidraw = ({
           />
         </TTDDialogPanel>
         <TTDDialogPanel
-          label={t("mermaid.preview")}
-          panelAction={{
-            action: () => {
-              onInsertToEditor();
+          panelActions={[
+            {
+              action: () => {
+                onInsertToEditor();
+              },
+              label: t("mermaid.button"),
+              icon: ArrowRightIcon,
+              variant: "button",
             },
-            label: t("mermaid.button"),
-            icon: ArrowRightIcon,
-          }}
+          ]}
           renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
         >
           <TTDDialogOutput

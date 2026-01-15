@@ -1,18 +1,22 @@
 import { DEFAULT_EXPORT_PADDING, EDITOR_LS_KEYS } from "@excalidraw/common";
 
-import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
-import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
-
-import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  NonDeletedExcalidrawElement,
+  Theme,
+} from "@excalidraw/element/types";
 
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
-import { canvasToBlob } from "../../data/blob";
-import { t } from "../../i18n";
-import { convertToExcalidrawElements, exportToCanvas } from "../../index";
+import {
+  convertToExcalidrawElements,
+  exportToCanvas,
+  THEME,
+} from "../../index";
+
+import type { MermaidToExcalidrawLibProps } from "./types";
 
 import type { AppClassProperties, BinaryFiles } from "../../types";
 
-const resetPreview = ({
+export const resetPreview = ({
   canvasRef,
   setError,
 }: {
@@ -33,17 +37,14 @@ const resetPreview = ({
   canvasNode.replaceChildren();
 };
 
-export interface MermaidToExcalidrawLibProps {
-  loaded: boolean;
-  api: Promise<{
-    parseMermaidToExcalidraw: (
-      definition: string,
-      config?: MermaidConfig,
-    ) => Promise<MermaidToExcalidrawResult>;
-  }>;
-}
-
-interface ConvertMermaidToExcalidrawFormatProps {
+export const convertMermaidToExcalidraw = async ({
+  canvasRef,
+  mermaidToExcalidrawLib,
+  mermaidDefinition,
+  setError,
+  data,
+  theme,
+}: {
   canvasRef: React.RefObject<HTMLDivElement | null>;
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
   mermaidDefinition: string;
@@ -52,38 +53,36 @@ interface ConvertMermaidToExcalidrawFormatProps {
     elements: readonly NonDeletedExcalidrawElement[];
     files: BinaryFiles | null;
   }>;
-}
-
-export const convertMermaidToExcalidraw = async ({
-  canvasRef,
-  mermaidToExcalidrawLib,
-  mermaidDefinition,
-  setError,
-  data,
-}: ConvertMermaidToExcalidrawFormatProps) => {
+  theme: Theme;
+}): Promise<{ success: true } | { success: false; error?: Error }> => {
   const canvasNode = canvasRef.current;
   const parent = canvasNode?.parentElement;
 
   if (!canvasNode || !parent) {
-    return;
+    return { success: false };
   }
 
   if (!mermaidDefinition) {
     resetPreview({ canvasRef, setError });
-    return;
+    return { success: false };
   }
 
+  let ret;
   try {
     const api = await mermaidToExcalidrawLib.api;
 
-    let ret;
     try {
-      ret = await api.parseMermaidToExcalidraw(mermaidDefinition);
-    } catch (err: any) {
-      ret = await api.parseMermaidToExcalidraw(
-        mermaidDefinition.replace(/"/g, "'"),
-      );
+      try {
+        ret = await api.parseMermaidToExcalidraw(mermaidDefinition);
+      } catch (err: unknown) {
+        ret = await api.parseMermaidToExcalidraw(
+          mermaidDefinition.replace(/"/g, "'"),
+        );
+      }
+    } catch (err: unknown) {
+      return { success: false, error: err as Error };
     }
+
     const { elements, files } = ret;
     setError(null);
 
@@ -102,34 +101,23 @@ export const convertMermaidToExcalidraw = async ({
         Math.max(parent.offsetWidth, parent.offsetHeight) *
         window.devicePixelRatio,
       appState: {
-        // TODO hack (will be refactored in TTD v2)
-        exportWithDarkMode: document
-          .querySelector(".excalidraw-container")
-          ?.classList.contains("theme--dark"),
+        exportWithDarkMode: theme === THEME.DARK,
       },
     });
-    // if converting to blob fails, there's some problem that will
-    // likely prevent preview and export (e.g. canvas too big)
-    try {
-      await canvasToBlob(canvas);
-    } catch (e: any) {
-      if (e.name === "CANVAS_POSSIBLY_TOO_BIG") {
-        throw new Error(t("canvasError.canvasTooBig"));
-      }
-      throw e;
-    }
+
     parent.style.background = "var(--default-bg-color)";
     canvasNode.replaceChildren(canvas);
+    return { success: true };
   } catch (err: any) {
     parent.style.background = "var(--default-bg-color)";
     if (mermaidDefinition) {
       setError(err);
     }
 
-    throw err;
+    // Return error so caller can display meaningful error message
+    return { success: false, error: err };
   }
 };
-
 export const saveMermaidDataToStorage = (mermaidDefinition: string) => {
   EditorLocalStorage.set(
     EDITOR_LS_KEYS.MERMAID_TO_EXCALIDRAW,
