@@ -107,9 +107,9 @@ export type HitTestArgs = {
 
 let cachedPoint: GlobalPoint | null = null;
 let cachedElement: WeakRef<ExcalidrawElement> | null = null;
-let cachedThreshold: number = -Infinity;
-let ignoredHits = false;
-let nonIgnoredHits = false;
+let cachedThreshold: number = Infinity;
+let cachedHit: boolean = false;
+let cachedOverrideShouldTestInside = false;
 
 export const hitElementItself = ({
   point,
@@ -124,8 +124,8 @@ export const hitElementItself = ({
     cachedPoint &&
     pointsEqual(point, cachedPoint) &&
     cachedThreshold <= threshold &&
-    ((overrideShouldTestInside && ignoredHits) ||
-      (!overrideShouldTestInside && nonIgnoredHits))
+    (!overrideShouldTestInside ||
+      (overrideShouldTestInside && cachedOverrideShouldTestInside))
   ) {
     const derefElement = cachedElement?.deref();
     if (
@@ -134,7 +134,7 @@ export const hitElementItself = ({
       derefElement.version === element.version &&
       derefElement.versionNonce === element.versionNonce
     ) {
-      return true;
+      return cachedHit;
     }
   }
 
@@ -181,16 +181,11 @@ export const hitElementItself = ({
   const result = hitElement || hitFrameName;
 
   // Cache end result
-  if (result) {
-    cachedPoint = point;
-    cachedElement = new WeakRef(element);
-    cachedThreshold = threshold;
-    if (overrideShouldTestInside) {
-      ignoredHits = true;
-    } else {
-      nonIgnoredHits = true;
-    }
-  }
+  cachedPoint = point;
+  cachedElement = new WeakRef(element);
+  cachedThreshold = threshold;
+  cachedOverrideShouldTestInside = overrideShouldTestInside;
+  cachedHit = result;
 
   return result;
 };
