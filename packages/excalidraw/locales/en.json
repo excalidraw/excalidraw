@@ -650,7 +650,7 @@
       "generationFailed": "Generation failed",
       "invalidDiagram": "Generated an invalid diagram :(. You may also try a different prompt.",
       "fixInMermaid": "Edit Mermaid manually →",
-      "aiRepair": "Regenerate →",
+      "aiRepair": "Regenerate (auto-fix) →",
       "requestAborted": "Request aborted",
       "requestFailed": "Request failed"
     },
