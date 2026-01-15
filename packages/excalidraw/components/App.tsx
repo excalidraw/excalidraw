@@ -4884,10 +4884,10 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         const shape = findShapeByKey(event.key, this);
         if (shape) {
-          if (this.state.activeTool.type !== shape) {
+          if (this.state.activeTool.type !== shape.value) {
             trackEvent(
               "toolbar",
-              shape,
+              shape.value,
               `keyboard (${
                 this.editorInterface.formFactor === "phone"
                   ? "mobile"
@@ -4895,7 +4895,7 @@ class App extends React.Component<AppProps, AppState> {
               })`,
             );
           }
-          if (shape === "arrow" && this.state.activeTool.type === "arrow") {
+          if (shape.value === "arrow" && this.state.activeTool.type === "arrow") {
             this.setState((prevState) => ({
               currentItemArrowType:
                 prevState.currentItemArrowType === ARROW_TYPE.sharp
@@ -4905,7 +4905,13 @@ class App extends React.Component<AppProps, AppState> {
                   : ARROW_TYPE.sharp,
             }));
           }
-          this.setActiveTool({ type: shape });
+          this.setActiveTool({ 
+            type: shape.value,
+            // Explicitly set or clear defaultArrowheads based on the shape config
+            ...("defaultArrowheads" in shape && shape.defaultArrowheads
+              ? { defaultArrowheads: shape.defaultArrowheads }
+              : { defaultArrowheads: undefined }),
+          });
           event.stopPropagation();
         } else if (event.key === KEYS.Q) {
           this.toggleLock("keyboard");
@@ -5250,6 +5256,20 @@ class App extends React.Component<AppProps, AppState> {
               }),
         };
       } else if (nextActiveTool.type !== "selection") {
+        // Reset arrow arrowheads when switching arrow tools
+        const arrowheadResets =
+          nextActiveTool.type === "arrow" && nextActiveTool.defaultArrowheads
+            ? {
+                currentItemStartArrowhead: nextActiveTool.defaultArrowheads.start,
+                currentItemEndArrowhead: nextActiveTool.defaultArrowheads.end,
+              }
+            : nextActiveTool.type === "arrow" && !nextActiveTool.defaultArrowheads
+            ? {
+                currentItemStartArrowhead: null,
+                currentItemEndArrowhead: "arrow" as const,
+              }
+            : {};
+        
         return {
           ...prevState,
           ...commonResets,
@@ -5258,12 +5278,29 @@ class App extends React.Component<AppProps, AppState> {
           selectedGroupIds: makeNextSelectedElementIds({}, prevState),
           editingGroupId: null,
           multiElement: null,
+          ...arrowheadResets,
         };
       }
+      
+      // Reset arrow arrowheads when switching arrow tools (for selection case)
+      const arrowheadResets =
+        nextActiveTool.type === "arrow" && nextActiveTool.defaultArrowheads
+          ? {
+              currentItemStartArrowhead: nextActiveTool.defaultArrowheads.start,
+              currentItemEndArrowhead: nextActiveTool.defaultArrowheads.end,
+            }
+          : nextActiveTool.type === "arrow" && !nextActiveTool.defaultArrowheads
+          ? {
+              currentItemStartArrowhead: null,
+              currentItemEndArrowhead: "arrow" as const,
+            }
+          : {};
+      
       return {
         ...prevState,
         ...commonResets,
         activeTool: nextActiveTool,
+        ...arrowheadResets,
       };
     });
   };

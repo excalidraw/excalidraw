@@ -402,7 +402,10 @@ export const updateActiveTool = (
       type: "custom",
       customType: data.customType,
       locked: data.locked ?? appState.activeTool.locked,
-      ...(data.defaultArrowheads && { defaultArrowheads: data.defaultArrowheads }),
+      // Only preserve defaultArrowheads if explicitly provided
+      ...(data.defaultArrowheads 
+        ? { defaultArrowheads: data.defaultArrowheads }
+        : { defaultArrowheads: undefined }),
     };
   }
 
@@ -416,7 +419,10 @@ export const updateActiveTool = (
     customType: null,
     locked: data.locked ?? appState.activeTool.locked,
     fromSelection: data.fromSelection ?? false,
-    ...(data.defaultArrowheads && { defaultArrowheads: data.defaultArrowheads }),
+    // Only set defaultArrowheads if explicitly provided, otherwise clear it
+    ...(data.defaultArrowheads 
+      ? { defaultArrowheads: data.defaultArrowheads }
+      : { defaultArrowheads: undefined }),
   };
 };
 

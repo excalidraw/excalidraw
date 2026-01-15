@@ -1187,9 +1187,10 @@ export const ShapesSwitcher = ({
                 } else {
                   app.setActiveTool({ 
                     type: value,
+                    // Explicitly set or clear defaultArrowheads based on the shape config
                     ...("defaultArrowheads" in shape && shape.defaultArrowheads
                       ? { defaultArrowheads: shape.defaultArrowheads }
-                      : {}),
+                      : { defaultArrowheads: undefined }),
                   });
                 }
               }}

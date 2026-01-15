@@ -105,8 +105,8 @@ export const MobileToolBar = ({
     "rectangle" | "diamond" | "ellipse"
   >("rectangle");
   const [lastActiveLinearElement, setLastActiveLinearElement] = useState<
-    "arrow" | "line"
-  >("arrow");
+    typeof LINEAR_ELEMENT_TOOLS[number]
+  >(LINEAR_ELEMENT_TOOLS[0]);
 
   // keep lastActiveGenericShape in sync with active tool if user switches via other UI
   useEffect(() => {
@@ -122,9 +122,22 @@ export const MobileToolBar = ({
   // keep lastActiveLinearElement in sync with active tool if user switches via other UI
   useEffect(() => {
     if (activeTool.type === "arrow" || activeTool.type === "line") {
-      setLastActiveLinearElement(activeTool.type);
+      // Find the matching tool option based on type and defaultArrowheads
+      const matchingTool = LINEAR_ELEMENT_TOOLS.find((tool) => {
+        if (tool.type !== activeTool.type) return false;
+        // For arrow type, also match defaultArrowheads
+        if (tool.type === "arrow") {
+          const toolHasDouble = tool.defaultArrowheads?.start === "arrow" && tool.defaultArrowheads?.end === "arrow";
+          const activeHasDouble = activeTool.defaultArrowheads?.start === "arrow" && activeTool.defaultArrowheads?.end === "arrow";
+          return toolHasDouble === activeHasDouble;
+        }
+        return true;
+      });
+      if (matchingTool) {
+        setLastActiveLinearElement(matchingTool);
+      }
     }
-  }, [activeTool.type]);
+  }, [activeTool.type, activeTool.defaultArrowheads]);
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
@@ -308,27 +321,31 @@ export const MobileToolBar = ({
         app={app}
         options={LINEAR_ELEMENT_TOOLS}
         activeTool={activeTool}
-        defaultOption={lastActiveLinearElement}
+        defaultOption={lastActiveLinearElement.type}
         namePrefix="linearElementType"
-        title={capitalizeString(
-          t(
-            lastActiveLinearElement === "arrow"
-              ? "toolBar.arrow"
-              : "toolBar.line",
-          ),
-        )}
+        title={lastActiveLinearElement.title}
         data-testid="toolbar-arrow"
         fillable={true}
         onToolChange={(type: string) => {
-          if (type === "arrow" || type === "line") {
-            setLastActiveLinearElement(type);
+          // Find the tool option that was clicked
+          const selectedTool = LINEAR_ELEMENT_TOOLS.find((tool) => {
+            // Match by type first
+            if (tool.type !== type) return false;
+            // For arrow type with multiple variants, match by defaultArrowheads
+            // The ToolPopover will have already set the activeTool, so we check that
+            if (type === "arrow") {
+              const toolHasDouble = tool.defaultArrowheads?.start === "arrow" && tool.defaultArrowheads?.end === "arrow";
+              const activeHasDouble = app.state.activeTool.defaultArrowheads?.start === "arrow" && app.state.activeTool.defaultArrowheads?.end === "arrow";
+              return toolHasDouble === activeHasDouble;
+            }
+            return true;
+          });
+          
+          if (selectedTool) {
+            setLastActiveLinearElement(selectedTool);
           }
         }}
-        displayedOption={
-          LINEAR_ELEMENT_TOOLS.find(
-            (tool) => tool.type === lastActiveLinearElement,
-          ) || LINEAR_ELEMENT_TOOLS[0]
-        }
+        displayedOption={lastActiveLinearElement}
       />
 
       {/* Text Tool */}

@@ -122,5 +122,5 @@ export const findShapeByKey = (key: string, app: AppClassProperties) => {
           : (shape.key as readonly string[]).includes(key)))
     );
   });
-  return shape?.value || null;
+  return shape || null;
 };

@@ -55,10 +55,25 @@ export const ToolPopover = ({
   const SIDE_OFFSET = 32 / 2 + 10;
   const { container } = useExcalidrawContainer();
 
-  // if currentType is not in options, close popup
-  if (!options.some((o) => o.type === currentType) && isPopupOpen) {
-    setIsPopupOpen(false);
-  }
+  // Close popup if currentType is not in options (moved to useEffect to avoid render-time state updates)
+  useEffect(() => {
+    const matchesAnyOption = options.some((option) => {
+      if (option.type !== currentType) return false;
+      // For arrow type, also check defaultArrowheads
+      if (option.type === "arrow" && option.defaultArrowheads) {
+        const activeHasDouble = app.state.activeTool.defaultArrowheads?.start === "arrow" && 
+                               app.state.activeTool.defaultArrowheads?.end === "arrow";
+        const optionHasDouble = option.defaultArrowheads.start === "arrow" && 
+                               option.defaultArrowheads.end === "arrow";
+        return activeHasDouble === optionHasDouble;
+      }
+      return true;
+    });
+    
+    if (!matchesAnyOption && isPopupOpen) {
+      setIsPopupOpen(false);
+    }
+  }, [currentType, isPopupOpen, options, app.state.activeTool.defaultArrowheads]);
 
   // Close popover when user starts interacting with the canvas (pointer down)
   useEffect(() => {
@@ -86,6 +101,17 @@ export const ToolPopover = ({
           data-testid={dataTestId}
           onPointerDown={() => {
             setIsPopupOpen((v) => !v);
+            
+            // When opening popup, activate the displayed option so popup stays open
+            if (!isPopupOpen) {
+              app.setActiveTool({
+                type: displayedOption.type as any,
+                ...(displayedOption.defaultArrowheads
+                  ? { defaultArrowheads: displayedOption.defaultArrowheads }
+                  : { defaultArrowheads: undefined }),
+              });
+            }
+            
             onToolChange(defaultOption);
           }}
         />
@@ -96,15 +122,30 @@ export const ToolPopover = ({
         sideOffset={SIDE_OFFSET}
         collisionBoundary={container ?? undefined}
       >
-        {options.map(({ type, icon, title, defaultArrowheads }) => (
+        {options.map(({ type, icon, title, defaultArrowheads }) => {
+          // Check if this option matches the active tool (type + defaultArrowheads)
+          const isChecked = (() => {
+            if (currentType !== type) return false;
+            // For arrow type, also check defaultArrowheads
+            if (type === "arrow") {
+              const activeHasDouble = app.state.activeTool.defaultArrowheads?.start === "arrow" && 
+                                     app.state.activeTool.defaultArrowheads?.end === "arrow";
+              const optionHasDouble = defaultArrowheads?.start === "arrow" && 
+                                     defaultArrowheads?.end === "arrow";
+              return activeHasDouble === optionHasDouble;
+            }
+            return true;
+          })();
+          
+          return (
           <ToolButton
             className={clsx(className, {
-              active: currentType === type,
+              active: isChecked,
             })}
             key={`${type}${defaultArrowheads ? '-double' : ''}`}
             type="radio"
             icon={icon}
-            checked={currentType === type}
+            checked={isChecked}
             name={`${namePrefix}-option`}
             title={title || capitalizeString(type)}
             keyBindingLabel=""
@@ -116,12 +157,15 @@ export const ToolPopover = ({
               }
               app.setActiveTool({ 
                 type: type as any,
-                ...(defaultArrowheads ? { defaultArrowheads } : {})
+                // Explicitly set or clear defaultArrowheads
+                ...(defaultArrowheads 
+                  ? { defaultArrowheads } 
+                  : { defaultArrowheads: undefined })
               });
               onToolChange?.(type);
             }}
           />
-        ))}
+        );})}
       </Popover.Content>
     </Popover.Root>
   );
