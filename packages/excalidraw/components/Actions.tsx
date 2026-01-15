@@ -1080,8 +1080,8 @@ export const ShapesSwitcher = ({
 
   return (
     <>
-      {getToolbarTools(app).map(
-        ({ value, icon, key, numericKey, fillable }, index) => {
+      {getToolbarTools(app).map((shape, index) => {
+          const { value, icon, key, numericKey, fillable } = shape;
           if (
             UIOptions.tools?.[
               value as Extract<
@@ -1137,16 +1137,32 @@ export const ShapesSwitcher = ({
           return (
             <ToolButton
               className={clsx("Shape", { fillable })}
-              key={value}
+              key={`toolbar-${value}-${index}`}
               type="radio"
               icon={icon}
-              checked={activeTool.type === value}
+              checked={
+                activeTool.type === value &&
+                // For arrow tools, also check if defaultArrowheads match
+                (value !== "arrow" ||
+                  (("defaultArrowheads" in shape && shape.defaultArrowheads) ? 
+                    (activeTool.defaultArrowheads?.start === shape.defaultArrowheads.start &&
+                     activeTool.defaultArrowheads?.end === shape.defaultArrowheads.end) :
+                    (!activeTool.defaultArrowheads ||
+                     activeTool.defaultArrowheads.start !== "arrow" ||
+                     activeTool.defaultArrowheads.end !== "arrow")))
+              }
               name="editor-current-shape"
               title={`${capitalizeString(label)} — ${shortcut}`}
               keyBindingLabel={numericKey || letter}
               aria-label={capitalizeString(label)}
               aria-keyshortcuts={shortcut}
-              data-testid={`toolbar-${value}`}
+              data-testid={`toolbar-${value}${
+                "defaultArrowheads" in shape &&
+                shape.defaultArrowheads?.start === "arrow" &&
+                shape.defaultArrowheads?.end === "arrow"
+                  ? "-double"
+                  : ""
+              }`}
               onPointerDown={({ pointerType }) => {
                 if (!app.state.penDetected && pointerType === "pen") {
                   app.togglePenMode(true);
@@ -1169,7 +1185,12 @@ export const ShapesSwitcher = ({
                     type: value,
                   });
                 } else {
-                  app.setActiveTool({ type: value });
+                  app.setActiveTool({ 
+                    type: value,
+                    ...("defaultArrowheads" in shape && shape.defaultArrowheads
+                      ? { defaultArrowheads: shape.defaultArrowheads }
+                      : {}),
+                  });
                 }
               }}
             />

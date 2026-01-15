@@ -162,10 +162,12 @@ export type ActiveTool =
   | {
       type: ToolType;
       customType: null;
+      defaultArrowheads?: { start: "arrow" | null; end: "arrow" | null };
     }
   | {
       type: "custom";
       customType: string;
+      defaultArrowheads?: { start: "arrow" | null; end: "arrow" | null };
     };
 
 export type SidebarName = string;

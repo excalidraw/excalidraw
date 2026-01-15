@@ -5191,6 +5191,7 @@ class App extends React.Component<AppProps, AppState> {
     tool: ({ type: ToolType } | { type: "custom"; customType: string }) & {
       locked?: boolean;
       fromSelection?: boolean;
+      defaultArrowheads?: { start: "arrow" | null; end: "arrow" | null };
     },
     keepSelection = false,
   ) => {
@@ -8542,9 +8543,21 @@ class App extends React.Component<AppProps, AppState> {
       values from appState. */
 
       const { currentItemStartArrowhead, currentItemEndArrowhead } = this.state;
+      
+      // Check if activeTool has defaultArrowheads (for double arrow tool)
+      const hasDefaultArrowheads = 
+        this.state.activeTool.defaultArrowheads &&
+        (this.state.activeTool.defaultArrowheads.start !== undefined ||
+         this.state.activeTool.defaultArrowheads.end !== undefined);
+      
       const [startArrowhead, endArrowhead] =
         elementType === "arrow"
-          ? [currentItemStartArrowhead, currentItemEndArrowhead]
+          ? hasDefaultArrowheads
+            ? [
+                this.state.activeTool.defaultArrowheads!.start,
+                this.state.activeTool.defaultArrowheads!.end,
+              ]
+            : [currentItemStartArrowhead, currentItemEndArrowhead]
           : [null, null];
 
       const element =

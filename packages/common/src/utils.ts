@@ -388,7 +388,11 @@ export const updateActiveTool = (
         type: ToolType;
       }
     | { type: "custom"; customType: string }
-  ) & { locked?: boolean; fromSelection?: boolean }) & {
+  ) & { 
+    locked?: boolean; 
+    fromSelection?: boolean;
+    defaultArrowheads?: { start: "arrow" | null; end: "arrow" | null };
+  }) & {
     lastActiveToolBeforeEraser?: ActiveTool | null;
   },
 ): AppState["activeTool"] => {
@@ -398,6 +402,7 @@ export const updateActiveTool = (
       type: "custom",
       customType: data.customType,
       locked: data.locked ?? appState.activeTool.locked,
+      ...(data.defaultArrowheads && { defaultArrowheads: data.defaultArrowheads }),
     };
   }
 
@@ -411,6 +416,7 @@ export const updateActiveTool = (
     customType: null,
     locked: data.locked ?? appState.activeTool.locked,
     fromSelection: data.fromSelection ?? false,
+    ...(data.defaultArrowheads && { defaultArrowheads: data.defaultArrowheads }),
   };
 };
 

@@ -11,6 +11,7 @@ import {
   TextIcon,
   ImageIcon,
   EraserIcon,
+  DoubleArrowIcon,
 } from "./icons";
 
 import type { AppClassProperties } from "../types";
@@ -50,6 +51,14 @@ export const SHAPES = [
     key: KEYS.A,
     numericKey: KEYS["5"],
     fillable: true,
+  },
+  {
+    icon: DoubleArrowIcon,
+    value: "arrow",
+    key: KEYS.X,
+    numericKey: null,
+    fillable: false,
+    defaultArrowheads: { start: "arrow", end: "arrow" },
   },
   {
     icon: LineIcon,
