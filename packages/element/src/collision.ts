@@ -123,7 +123,7 @@ export const hitElementItself = ({
   if (
     cachedPoint &&
     pointsEqual(point, cachedPoint) &&
-    cachedThreshold >= threshold &&
+    cachedThreshold <= threshold &&
     ((overrideShouldTestInside && ignoredHits) ||
       (!overrideShouldTestInside && nonIgnoredHits))
   ) {
@@ -184,9 +184,7 @@ export const hitElementItself = ({
   if (result) {
     cachedPoint = point;
     cachedElement = new WeakRef(element);
-    if (threshold > cachedThreshold) {
-      cachedThreshold = threshold;
-    }
+    cachedThreshold = threshold;
     if (overrideShouldTestInside) {
       ignoredHits = true;
     } else {
