@@ -123,7 +123,7 @@ export const hitElementItself = ({
   if (
     cachedPoint &&
     pointsEqual(point, cachedPoint) &&
-    cachedThreshold >= threshold &&
+    cachedThreshold <= threshold &&
     ((overrideShouldTestInside && ignoredHits) ||
       (!overrideShouldTestInside && nonIgnoredHits))
   ) {
