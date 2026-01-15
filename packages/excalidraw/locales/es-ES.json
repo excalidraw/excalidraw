@@ -612,7 +612,54 @@
     "button": "Insertar",
     "description": "Actualmente sólo estos tipos de <flowchartLink>diagrama de flujo</flowchartLink>,<sequenceLink> Secuencia, </sequenceLink> y <classLink>Clase </classLink> son soportados. Los otros tipos de diagramas se renderizarán como imagen en Excalidraw.",
     "syntax": "Sintaxis Mermaid",
-    "preview": "Vista previa"
+    "preview": "Vista previa",
+    "label": "",
+    "inputPlaceholder": ""
+  },
+  "ttd": {
+    "error": "",
+    "errorMermaidSyntax": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": "Búsqueda rápida"
