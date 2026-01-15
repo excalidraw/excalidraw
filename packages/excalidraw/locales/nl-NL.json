@@ -612,7 +612,54 @@
     "button": "Invoegen",
     "description": "Momenteel worden alleen <flowchartLink>Flowchart</flowchartLink>-, <sequenceLink>Sequence</sequenceLink>- en <classLink>Class</classLink>-diagrammen ondersteund. De andere types worden als afbeelding weergegeven in Excalidraw.",
     "syntax": "Mermaid Syntaxis",
-    "preview": "Voorbeeld"
+    "preview": "Voorbeeld",
+    "label": "",
+    "inputPlaceholder": ""
+  },
+  "ttd": {
+    "error": "",
+    "errorMermaidSyntax": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": "Snel Zoeken"
