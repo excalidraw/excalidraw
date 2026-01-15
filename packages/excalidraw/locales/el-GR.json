@@ -612,7 +612,54 @@
     "button": "Εισαγωγή",
     "description": "Επί του παρόντος υποστηρίζονται μόνο Διαγράμματα <flowchartLink>Ροής</flowchartLink>,<sequenceLink> Ακολουθίας, </sequenceLink> και <classLink>Κλάσεων</classLink>. Οι άλλοι τύποι θα αποδοθούν ως εικόνα στο Excalidraw.",
     "syntax": "Σύνταξη Mermaid",
-    "preview": "Προεπισκόπηση"
+    "preview": "Προεπισκόπηση",
+    "label": "",
+    "inputPlaceholder": ""
+  },
+  "ttd": {
+    "error": "",
+    "errorMermaidSyntax": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": "Γρήγορη αναζήτηση"
