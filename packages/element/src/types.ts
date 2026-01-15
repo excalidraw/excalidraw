@@ -303,6 +303,10 @@ export type PointsPositionUpdates = Map<
   { point: LocalPoint; isDragging?: boolean }
 >;
 
+/**
+ * Arrowhead styles for linear elements.
+ * Can be applied to both `startArrowhead` and `endArrowhead` properties.
+ */
 export type Arrowhead =
   | "arrow"
   | "bar"
@@ -317,13 +321,22 @@ export type Arrowhead =
   | "crowfoot_many"
   | "crowfoot_one_or_many";
 
+/**
+ * Base type for linear elements (lines and arrows).
+ * 
+ * Note: Both `startArrowhead` and `endArrowhead` can be set independently,
+ * enabling double-headed arrows (arrowheads on both ends) or mixed styles.
+ * Set both to non-null values to create a double arrow.
+ */
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
     type: "line" | "arrow";
     points: readonly LocalPoint[];
     startBinding: FixedPointBinding | null;
     endBinding: FixedPointBinding | null;
+    /** Arrowhead style at the start point. Set to create arrows pointing backwards or double arrows. */
     startArrowhead: Arrowhead | null;
+    /** Arrowhead style at the end point. Standard arrow direction. */
     endArrowhead: Arrowhead | null;
   }>;
 
@@ -339,6 +352,10 @@ export type FixedSegment = {
   index: Index;
 };
 
+/**
+ * Arrow element type. Supports single or double arrowheads via
+ * `startArrowhead` and `endArrowhead` inherited from ExcalidrawLinearElement.
+ */
 export type ExcalidrawArrowElement = ExcalidrawLinearElement &
   Readonly<{
     type: "arrow";
