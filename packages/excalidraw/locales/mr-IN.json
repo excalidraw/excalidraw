@@ -612,7 +612,54 @@
     "button": "शिरवा",
     "description": "सध्या फक्त <flowchartLink> प्रवाह चित्र (फ़्लो चार्ट) </flowchartLink> आणि <sequenceLink> क्रम चित्र (सिकवेंस ड़ायग्राम) </sequenceLink> करता येतात. बाक़ीचे चित्र प्रकार एक्सकाली चित्र पद्धति नी चित्रित होतील.",
     "syntax": "मर्मेड संरचना नियम",
-    "preview": "पूर्वावलोकन"
+    "preview": "पूर्वावलोकन",
+    "label": "",
+    "inputPlaceholder": ""
+  },
+  "ttd": {
+    "error": "",
+    "errorMermaidSyntax": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": "जलद शोध"
