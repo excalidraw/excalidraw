@@ -6,32 +6,6 @@ import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
 
 import { COLOR_PALETTE } from "./colors";
 
-export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-export const isWindows = /^Win/.test(navigator.platform);
-export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
-export const isFirefox =
-  typeof window !== "undefined" &&
-  "netscape" in window &&
-  navigator.userAgent.indexOf("rv:") > 1 &&
-  navigator.userAgent.indexOf("Gecko") > 1;
-export const isChrome = navigator.userAgent.indexOf("Chrome") !== -1;
-export const isSafari =
-  !isChrome && navigator.userAgent.indexOf("Safari") !== -1;
-export const isIOS =
-  /iPad|iPhone/i.test(navigator.platform) ||
-  // iPadOS 13+
-  (navigator.userAgent.includes("Mac") && "ontouchend" in document);
-// keeping function so it can be mocked in test
-export const isBrave = () =>
-  (navigator as any).brave?.isBrave?.name === "isBrave";
-
-export const isMobile =
-  isIOS ||
-  /android|webos|ipod|blackberry|iemobile|opera mini/i.test(
-    navigator.userAgent,
-  ) ||
-  /android|ios|ipod|blackberry|windows phone/i.test(navigator.platform);
-
 export const supportsResizeObserver =
   typeof window !== "undefined" && "ResizeObserver" in window;
 
@@ -131,7 +105,15 @@ export const CLASSES = {
   SEARCH_MENU_INPUT_WRAPPER: "layer-ui__search-inputWrapper",
   CONVERT_ELEMENT_TYPE_POPUP: "ConvertElementTypePopup",
   SHAPE_ACTIONS_THEME_SCOPE: "shape-actions-theme-scope",
+  FRAME_NAME: "frame-name",
 };
+
+export const FONT_SIZES = {
+  sm: 16,
+  md: 20,
+  lg: 28,
+  xl: 36,
+} as const;
 
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
@@ -323,9 +305,6 @@ export const IDLE_THRESHOLD = 60_000;
 // Report a user active each ACTIVE_THRESHOLD milliseconds
 export const ACTIVE_THRESHOLD = 3_000;
 
-// duplicates --theme-filter, should be removed soon
-export const THEME_FILTER = "invert(93%) hue-rotate(180deg)";
-
 export const URL_QUERY_KEYS = {
   addLibrary: "addLibrary",
 } as const;
@@ -348,26 +327,6 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     image: true,
   },
 };
-
-// breakpoints
-// -----------------------------------------------------------------------------
-
-// mobile: up to 699px
-export const MQ_MAX_MOBILE = 599;
-
-export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
-export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
-
-// tablets
-export const MQ_MIN_TABLET = MQ_MAX_MOBILE + 1; // lower bound (excludes phones)
-export const MQ_MAX_TABLET = 1400; // upper bound (excludes laptops/desktops)
-
-// desktop/laptop
-export const MQ_MIN_WIDTH_DESKTOP = 1440;
-
-// sidebar
-export const MQ_RIGHT_SIDEBAR_MIN_WIDTH = 1229;
-// -----------------------------------------------------------------------------
 
 export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
 
@@ -543,3 +502,10 @@ export enum UserIdleState {
 export const LINE_POLYGON_POINT_MERGE_DISTANCE = 20;
 
 export const DOUBLE_TAP_POSITION_THRESHOLD = 35;
+
+export const BIND_MODE_TIMEOUT = 700; // ms
+
+// glass background for mobile action buttons
+export const MOBILE_ACTION_BUTTON_BG = {
+  background: "var(--mobile-action-button-bg)",
+} as const;

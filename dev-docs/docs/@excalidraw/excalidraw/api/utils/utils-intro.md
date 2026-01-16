@@ -292,7 +292,7 @@ viewportCoordsToSceneCoords(&#123; clientX: number, clientY: number },<br/>&nbsp
   appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a><br/>): &#123;x: number, y: number}
 </pre>
 
-### useDevice
+### useEditorInterface
 
 This hook can be used to check the type of device which is being used. It can only be used inside the `children` of `Excalidraw` component.
 
@@ -300,8 +300,8 @@ Open the `main menu` in the below example to view the footer.
 
 ```jsx live noInline
 const MobileFooter = ({}) => {
-  const device = useDevice();
-  if (device.editor.isMobile) {
+  const editorInterface = useEditorInterface();
+  if (editorInterface.formFactor === "phone") {
     return (
       <Footer>
         <button
@@ -336,12 +336,20 @@ render(<App />);
 The `device` has the following `attributes`, some grouped into `viewport` and `editor` objects, per context.
 
 | Name | Type | Description |
-| --- | --- | --- |
-| `viewport.isMobile` | `boolean` | Set to `true` when viewport is in `mobile` breakpoint |
-| `viewport.isLandscape` | `boolean` | Set to `true` when the viewport is in `landscape` mode |
-| `editor.canFitSidebar` | `boolean` | Set to `true` if there's enough space to fit the `sidebar` |
-| `editor.isMobile` | `boolean` | Set to `true` when editor container is in `mobile` breakpoint |
-| `isTouchScreen` | `boolean` | Set to `true` for `touch` when touch event detected |
+| ---- | ---- | ----------- |
+
+The `EditorInterface` object has the following properties:
+
+| Name | Type | Description |
+| --- | --- | --- | --- | --- | --- |
+| `formFactor` | `'phone' | 'tablet' | 'desktop'` | Indicates the device type based on screen size |
+| `desktopUIMode` | `'compact' | 'full'` | UI mode for desktop form factor |
+| `userAgent.raw` | `string` | Raw user agent string |
+| `userAgent.isMobileDevice` | `boolean` | True if device is mobile |
+| `userAgent.platform` | `'ios' | 'android' | 'other' | 'unknown'` | Device platform |
+| `isTouchScreen` | `boolean` | True if touch events are detected |
+| `canFitSidebar` | `boolean` | True if sidebar can fit in the viewport |
+| `isLandscape` | `boolean` | True if viewport is in landscape mode |
 
 ### i18n
 

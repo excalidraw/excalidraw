@@ -1,7 +1,6 @@
 import { toIterable } from "@excalidraw/common";
 
 import { isInvisiblySmallElement } from "./sizeHelpers";
-import { isLinearElementType } from "./typeChecks";
 
 import type {
   ExcalidrawElement,
@@ -55,27 +54,6 @@ export const isNonDeletedElement = <T extends ExcalidrawElement>(
   element: T,
 ): element is NonDeleted<T> => !element.isDeleted;
 
-const _clearElements = (
-  elements: readonly ExcalidrawElement[],
-): ExcalidrawElement[] =>
-  getNonDeletedElements(elements).map((element) =>
-    isLinearElementType(element.type)
-      ? { ...element, lastCommittedPoint: null }
-      : element,
-  );
-
-export const clearElementsForDatabase = (
-  elements: readonly ExcalidrawElement[],
-) => _clearElements(elements);
-
-export const clearElementsForExport = (
-  elements: readonly ExcalidrawElement[],
-) => _clearElements(elements);
-
-export const clearElementsForLocalStorage = (
-  elements: readonly ExcalidrawElement[],
-) => _clearElements(elements);
-
 export * from "./align";
 export * from "./binding";
 export * from "./bounds";
@@ -114,6 +92,7 @@ export * from "./store";
 export * from "./textElement";
 export * from "./textMeasurements";
 export * from "./textWrapping";
+export * from "./transform";
 export * from "./transformHandles";
 export * from "./typeChecks";
 export * from "./utils";

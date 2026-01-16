@@ -1,6 +1,7 @@
 import { isPoint, pointDistance, pointFrom, pointFromVector } from "./point";
 import { vector, vectorNormal, vectorNormalize, vectorScale } from "./vector";
 import { LegendreGaussN24CValues, LegendreGaussN24TValues } from "./constants";
+import { lineSegment, lineSegmentIntersectionPoints } from "./segment";
 
 import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
 
@@ -172,6 +173,23 @@ export function curveIntersectLineSegment<
   solution = calculate(initial_guesses[2], l, c);
   if (solution) {
     return [solution];
+  }
+
+  // Fallback: approximate the curve with short segments to catch near-endpoint hits.
+  const startHit = lineSegmentIntersectionPoints(
+    lineSegment(bezierEquation(c, 0), bezierEquation(c, 1 / 20)),
+    l,
+  );
+  if (startHit) {
+    return [startHit];
+  }
+
+  const endHit = lineSegmentIntersectionPoints(
+    lineSegment(bezierEquation(c, 19 / 20), bezierEquation(c, 1)),
+    l,
+  );
+  if (endHit) {
+    return [endHit];
   }
 
   return [];

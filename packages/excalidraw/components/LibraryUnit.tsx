@@ -3,7 +3,7 @@ import { memo, useRef, useState } from "react";
 
 import { useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
 
-import { useDevice } from "./App";
+import { useEditorInterface } from "./App";
 import { CheckboxItem } from "./CheckboxItem";
 import { PlusIcon } from "./icons";
 
@@ -36,7 +36,7 @@ export const LibraryUnit = memo(
     const svg = useLibraryItemSvg(id, elements, svgCache, ref);
 
     const [isHovered, setIsHovered] = useState(false);
-    const isMobile = useDevice().editor.isMobile;
+    const isMobile = useEditorInterface().formFactor === "phone";
     const adder = isPending && (
       <div className="library-unit__adder">{PlusIcon}</div>
     );

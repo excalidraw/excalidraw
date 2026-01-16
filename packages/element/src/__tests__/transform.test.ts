@@ -1,11 +1,12 @@
 import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
 
-import type { ExcalidrawArrowElement } from "@excalidraw/element/types";
+import {
+  convertToExcalidrawElements,
+  type ExcalidrawElementSkeleton,
+} from "../transform";
 
-import { convertToExcalidrawElements } from "./transform";
-
-import type { ExcalidrawElementSkeleton } from "./transform";
+import type { ExcalidrawArrowElement } from "../types";
 
 const opts = { regenerateIds: false };
 
@@ -432,12 +433,9 @@ describe("Test Transform", () => {
         boundElements: [{ id: text.id, type: "text" }],
         startBinding: {
           elementId: rectangle.id,
-          focus: 0,
-          gap: 1,
         },
         endBinding: {
           elementId: ellipse.id,
-          focus: -0,
         },
       });
 
@@ -517,12 +515,9 @@ describe("Test Transform", () => {
         boundElements: [{ id: text1.id, type: "text" }],
         startBinding: {
           elementId: text2.id,
-          focus: 0,
-          gap: 1,
         },
         endBinding: {
           elementId: text3.id,
-          focus: -0,
         },
       });
 
@@ -780,8 +775,8 @@ describe("Test Transform", () => {
       const [arrow, rect] = excalidrawElements;
       expect((arrow as ExcalidrawArrowElement).endBinding).toStrictEqual({
         elementId: "rect-1",
-        focus: -0,
-        gap: 25,
+        fixedPoint: [-2.05, 0.5001],
+        mode: "orbit",
       });
       expect(rect.boundElements).toStrictEqual([
         {
