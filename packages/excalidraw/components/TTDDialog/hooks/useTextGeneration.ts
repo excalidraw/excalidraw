@@ -88,11 +88,11 @@ export const useTextGeneration = ({
     setError(error);
   };
 
-  const onGenerate = async (
-    promptWithContext: string,
+  const onGenerate: TTTDDialog.OnGenerate = async ({
+    prompt,
     isRepairFlow = false,
-  ) => {
-    if (!validatePrompt(promptWithContext)) {
+  }) => {
+    if (!validatePrompt(prompt)) {
       return;
     }
 
@@ -106,7 +106,7 @@ export const useTextGeneration = ({
     streamingAbortControllerRef.current = abortController;
 
     if (!isRepairFlow) {
-      addUserMessage(promptWithContext);
+      addUserMessage(prompt);
       addAssistantMessage();
     } else {
       setChatHistory((prev) =>
@@ -127,7 +127,7 @@ export const useTextGeneration = ({
 
       const messages: LLMMessage[] = [
         ...previousMessages.slice(-3),
-        { role: "user", content: promptWithContext },
+        { role: "user", content: prompt },
       ];
 
       const { generatedResponse, error, rateLimit, rateLimitRemaining } =

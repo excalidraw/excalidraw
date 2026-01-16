@@ -131,7 +131,7 @@ const TextToDiagramContent = ({
 
     const repairPrompt = `Fix the error in this Mermaid diagram. The diagram is:\n\n\`\`\`mermaid\n${mermaidContent}\n\`\`\`\n\nThe exception/error is: ${errorMessage}\n\nPlease fix the Mermaid syntax and regenerate a valid diagram.`;
 
-    await onGenerate(repairPrompt, true);
+    await onGenerate({ prompt: repairPrompt, isRepairFlow: true });
   };
 
   const handleRetry = async (message: TChat.ChatMessage) => {
@@ -146,7 +146,10 @@ const TextToDiagramContent = ({
         typeof previousMessage.content === "string"
       ) {
         setLastRetryAttempt();
-        await onGenerate(previousMessage.content, true);
+        await onGenerate({
+          prompt: previousMessage.content,
+          isRepairFlow: true,
+        });
       }
     }
   };
@@ -191,7 +194,7 @@ const TextToDiagramContent = ({
         messages={chatHistory.messages}
         currentPrompt={chatHistory.currentPrompt}
         onPromptChange={handlePromptChange}
-        onSendMessage={onGenerate}
+        onGenerate={onGenerate}
         isGenerating={lastAssistantMessage?.isGenerating ?? false}
         generatedResponse={lastAssistantMessage?.content}
         isMenuOpen={isMenuOpen}

@@ -17,7 +17,7 @@ export const ChatInterface = ({
   messages,
   currentPrompt,
   onPromptChange,
-  onSendMessage,
+  onGenerate,
   isGenerating,
   rateLimits,
   placeholder,
@@ -33,7 +33,7 @@ export const ChatInterface = ({
   messages: TChat.ChatMessage[];
   currentPrompt: string;
   onPromptChange: (prompt: string) => void;
-  onSendMessage: (message: string) => void;
+  onGenerate: TTTDDialog.OnGenerate;
   isGenerating: boolean;
   rateLimits?: {
     rateLimit: number;
@@ -83,7 +83,7 @@ export const ChatInterface = ({
       return;
     }
 
-    onSendMessage(trimmedPrompt);
+    onGenerate({ prompt: trimmedPrompt });
     onPromptChange("");
   };
 

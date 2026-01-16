@@ -64,6 +64,11 @@ export interface MermaidToExcalidrawLibProps {
 }
 
 export namespace TTTDDialog {
+  export type OnGenerate = (opts: {
+    prompt: string;
+    isRepairFlow?: boolean;
+  }) => Promise<void>;
+
   export type OnTextSubmitProps = {
     messages: LLMMessage[];
     onChunk?: (chunk: string) => void;
