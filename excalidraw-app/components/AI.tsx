@@ -11,6 +11,8 @@ import { safelyParseJSON } from "@excalidraw/common";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
+import { TTDIndexedDBAdapter } from "../data/TTDStorage";
+
 export const AIComponents = ({
   excalidrawAPI,
 }: {
@@ -116,6 +118,7 @@ export const AIComponents = ({
 
           return result;
         }}
+        persistenceAdapter={TTDIndexedDBAdapter}
       />
     </>
   );
