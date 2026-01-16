@@ -60,7 +60,8 @@ export const addMessages = (
 };
 
 export const removeLastAssistantMessage = (chatHistory: TChat.ChatHistory) => {
-  const lastMsgIdx = (chatHistory.messages ?? []).findLastIndex(
+  const lastMsgIdx = findLastIndex(
+    chatHistory.messages ?? [],
     (msg) => msg.type === "assistant",
   );
 
