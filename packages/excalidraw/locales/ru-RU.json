@@ -341,7 +341,7 @@
     "canvasPanning": "Чтобы переместить холст, удерживайте {{shortcut_1}} или {{shortcut_2}} во время перетаскивания или используйте инструмент «Рука»",
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
     "arrowTool": "Нажмите, чтобы начать рисование нескольких точек, перетащите для одной линии. Нажмите {{shortcut}} снова, чтобы изменить тип стрелки.",
-    "arrowBindModifiers": "",
+    "arrowBindModifiers": "Удерживайте {{shortcut_1}} , чтобы отключить привязку, или {{shortcut_2}} для привязки в фиксированной точке",
     "freeDraw": "Нажмите и перетаскивайте, отпустите по завершении",
     "text": "Совет: при выбранном инструменте выделения дважды щёлкните в любом месте, чтобы добавить текст",
     "embeddable": "Перетащите для встраивания веб-сайта",
@@ -613,53 +613,53 @@
     "description": "В настоящее время поддерживаются только <flowchartLink>блок-схемы</flowchartLink>, <sequenceLink>диаграммы последовательности</sequenceLink> и <classLink>диаграммы классов</classLink>. Другие типы будут отображаться в виде изображения в Excalidraw.",
     "syntax": "Синтаксис Mermaid",
     "preview": "Предпросмотр",
-    "label": "",
-    "inputPlaceholder": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Напишите здесь определение диаграммы Mermaid..."
   },
   "ttd": {
-    "error": "",
-    "errorMermaidSyntax": ""
+    "error": "Ошибка!",
+    "errorMermaidSyntax": "Синтаксическая ошибка Mermaid"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "Начните вводить сюда идею диаграммы... ({{shortcut}} для новой строки)",
+    "inputPlaceholderWithMessages": "Продолжайте доработку диаграммы...",
+    "rateLimitRemaining": "Осталось запросов сегодня: {{count}}",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Вы",
+      "assistant": "ИИ-помощник",
+      "system": "Система"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "ИИ-бета",
+    "label": "Чат",
+    "menu": "Меню",
+    "newChat": "Новый чат",
+    "deleteChat": "Удалить чат",
+    "deleteMessage": "Удалить сообщение",
+    "viewAsMermaid": "Просмотреть как Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "Давайте создадим вашу диаграмму",
+      "description": "Опишите диаграмму, которую вы хотите создать, и мы сгенерируем её для вас.",
+      "hint": "На данный момент мы знаем диаграммы блок-схемы, последовательности и классов."
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Предпросмотр",
+    "insert": "Вставить",
+    "retry": "Повторить",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": ""
+      "promptTooShort": "Подсказка слишком короткая (мин. символов: {{min}})",
+      "promptTooLong": "Подсказка слишком длинная (макс. символов: {{max}})",
+      "generationFailed": "Генерация не удалась",
+      "invalidDiagram": "Сгенерирована неверная диаграмма :(. Вы можете редактировать вручную, повторите с автоисправлением или попробуйте другую подсказку.",
+      "fixInMermaid": "Изменить Mermaid вручную →",
+      "aiRepair": "Перегенерировать (автоисправление) →",
+      "requestAborted": "Запрос отменён",
+      "requestFailed": "Запрос не удался"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "Вы достигли лимита ИИ на бесплатном тарифном плане. Попробуйте Excalidraw+ или вернитесь завтра.",
+      "generalRateLimit": "Подождите, вы слишком быстры для нас! Пожалуйста, подождите немного, прежде чем повторить попытку.",
+      "messageLimitInputPlaceholder": "Вы достигли лимита сообщений"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Перейти на Plus"
   },
   "quickSearch": {
     "placeholder": "Быстрый поиск"
