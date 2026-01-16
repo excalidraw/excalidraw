@@ -15,13 +15,18 @@ import { TTDDialogTab } from "./TTDDialogTab";
 
 import "./TTDDialog.scss";
 
-import type { MermaidToExcalidrawLibProps, TTTDDialog } from "./types";
+import type {
+  MermaidToExcalidrawLibProps,
+  TTDPersistenceAdapter,
+  TTTDDialog,
+} from "./types";
 
 export const TTDDialog = (
   props:
     | {
         onTextSubmit: TTTDDialog.onTextSubmit;
         renderWarning?: TTTDDialog.renderWarning;
+        persistenceAdapter: TTDPersistenceAdapter;
       }
     | { __fallback: true },
 ) => {
@@ -50,6 +55,7 @@ const TTDDialogBase = withInternalFallback(
           props: TTTDDialog.OnTextSubmitProps,
         ): Promise<TTTDDialog.OnTextSubmitRetValue>;
         renderWarning?: TTTDDialog.renderWarning;
+        persistenceAdapter: TTDPersistenceAdapter;
       }
     | { __fallback: true }
   )) => {
@@ -105,6 +111,7 @@ const TTDDialogBase = withInternalFallback(
                 mermaidToExcalidrawLib={mermaidToExcalidrawLib}
                 onTextSubmit={rest.onTextSubmit}
                 renderWarning={rest.renderWarning}
+                persistenceAdapter={rest.persistenceAdapter}
               />
             </TTDDialogTab>
           )}
