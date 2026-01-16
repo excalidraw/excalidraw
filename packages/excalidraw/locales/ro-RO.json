@@ -613,53 +613,53 @@
     "description": "În prezent, numai <flowchartLink>Organigramele</flowchartLink>, <sequenceLink>Diagramele de secvență</sequenceLink> și <classLink>Diagramele de clasă</classLink> sunt acceptate. Celelalte tipuri vor fi redate ca imagine în Excalidraw.",
     "syntax": "Sintaxă Mermaid",
     "preview": "Previzualizare",
-    "label": "",
-    "inputPlaceholder": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Scrie definiţia diagramei Mermaid aici..."
   },
   "ttd": {
-    "error": "",
-    "errorMermaidSyntax": ""
+    "error": "Eroare!",
+    "errorMermaidSyntax": "Eroare de sintaxă Mermaid"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "Începe să îți introduci ideea de diagramă aici... ({{shortcut}} pentru linia nouă)",
+    "inputPlaceholderWithMessages": "Continuă rafinarea diagramei...",
+    "rateLimitRemaining": "Cereri rămase astăzi: {{count}}",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Tu",
+      "assistant": "Asistent IA",
+      "system": "Sistem"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "Beta IA",
+    "label": "Conversație",
+    "menu": "Meniu",
+    "newChat": "Conversație nouă",
+    "deleteChat": "Ștergere conversație",
+    "deleteMessage": "Ștergere mesaj",
+    "viewAsMermaid": "Vizualizare ca Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "Hai să-ți proiectăm diagrama",
+      "description": "Descrie diagrama pe care vrei să o creezi și o vom genera pentru tine.",
+      "hint": "În acest moment cunoaștem organigrame, diagrame de secvență și diagrame de clasă."
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Previzualizare",
+    "insert": "Introducere",
+    "retry": "Reîncercare",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": ""
+      "promptTooShort": "Solicitarea este prea scurtă (min. {{min}} caractere)",
+      "promptTooLong": "Solicitarea este prea lungă (max. {{max}} caractere)",
+      "generationFailed": "Generare nereușită",
+      "invalidDiagram": "A generat o diagramă nevalidă :(. Poți edita manual, reîncerca cu funcția de fixare automată sau încerca o altă solicitare.",
+      "fixInMermaid": "Editare Mermaid manual →",
+      "aiRepair": "Regenerare (fixare automată) →",
+      "requestAborted": "Cerere anulată",
+      "requestFailed": "Cerere nereușită"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "Ai atins limita IA la planul gratuit. Încearcă Excalidraw+ pentru mai multe sau revino mâine.",
+      "generalRateLimit": "Stai puțin, te grăbești! Așteaptă un moment înainte de a reîncerca.",
+      "messageLimitInputPlaceholder": "Ai atins limita de mesaje"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Actualizare la Plus"
   },
   "quickSearch": {
     "placeholder": "Căutare rapidă"
