@@ -613,11 +613,11 @@
     "description": "Attualmente sono supportati solo diagrammi di <flowchartLink>flusso</flowchartLink>,<sequenceLink> sequenza, </sequenceLink> e <classLink>classe </classLink>. Gli altri tipi saranno rappresentati come immagini in Excalidraw.",
     "syntax": "Sintassi Mermaid",
     "preview": "Anteprima",
-    "label": "",
+    "label": "Mermaid",
     "inputPlaceholder": ""
   },
   "ttd": {
-    "error": "",
+    "error": "Errore!",
     "errorMermaidSyntax": ""
   },
   "chat": {
@@ -625,25 +625,25 @@
     "inputPlaceholderWithMessages": "",
     "rateLimitRemaining": "",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Tu",
+      "assistant": "Assistente IA",
+      "system": "Sistema"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
+    "aiBeta": "IA Beta",
+    "label": "Chat",
+    "menu": "Menu",
+    "newChat": "Nuova Chat",
+    "deleteChat": "Elimina Chat",
+    "deleteMessage": "Cancella messaggio",
     "viewAsMermaid": "",
     "placeholder": {
       "title": "",
       "description": "",
       "hint": ""
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Anteprima",
+    "insert": "Inserisci",
+    "retry": "Riprova",
     "errors": {
       "promptTooShort": "",
       "promptTooLong": "",
@@ -652,7 +652,7 @@
       "fixInMermaid": "",
       "aiRepair": "",
       "requestAborted": "",
-      "requestFailed": ""
+      "requestFailed": "Richiesta non riuscita"
     },
     "rateLimit": {
       "messageLimit": "",
