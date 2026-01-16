@@ -1,43 +1,23 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { randomId } from "@excalidraw/common";
 
 import { atom, useAtom } from "../../editor-jotai";
 
 import { chatHistoryAtom } from "./TTDContext";
 
-import type { SavedChat } from "./types";
+import type { SavedChat, SavedChats, TTDPersistenceAdapter } from "./types";
 
-const TTD_CHATS_STORAGE_KEY = "excalidraw-ttd-chats";
+interface UseTTDChatStorageProps {
+  persistenceAdapter: TTDPersistenceAdapter;
+}
 
 interface UseTTDChatStorageReturn {
   savedChats: SavedChats;
-  saveCurrentChat: () => void;
-  deleteChat: (chatId: string) => SavedChats;
+  saveCurrentChat: () => Promise<void>;
+  deleteChat: (chatId: string) => Promise<SavedChats>;
   restoreChat: (chat: SavedChat) => SavedChat;
-  createNewChatId: () => string;
+  createNewChatId: () => Promise<string>;
 }
-
-type SavedChats = SavedChat[];
-
-const saveChatsToStorage = (chats: SavedChats) => {
-  try {
-    window.localStorage.setItem(TTD_CHATS_STORAGE_KEY, JSON.stringify(chats));
-  } catch (error: any) {
-    console.warn(`Failed to save chats to localStorage: ${error.message}`);
-  }
-};
-
-const loadChatsFromStorage = (): SavedChats => {
-  try {
-    const data = window.localStorage.getItem(TTD_CHATS_STORAGE_KEY);
-    if (data) {
-      return JSON.parse(data) as SavedChats;
-    }
-  } catch (error: any) {
-    console.warn(`Failed to load chats from localStorage: ${error.message}`);
-  }
-  return [];
-};
 
 const generateChatTitle = (firstMessage: string): string => {
   const trimmed = firstMessage.trim();
@@ -47,17 +27,60 @@ const generateChatTitle = (firstMessage: string): string => {
   return `${trimmed.substring(0, 47)}...`;
 };
 
-// Shared atom for saved chats - initialized once from localStorage
-export const savedChatsAtom = atom<SavedChats>(loadChatsFromStorage());
+// Shared atom for saved chats - starts empty, populated via onLoadChats
+export const savedChatsAtom = atom<SavedChats>([]);
+export const isLoadingChatsAtom = atom<boolean>(false);
+export const chatsLoadedAtom = atom<boolean>(false);
 
-export const useTTDChatStorage = (): UseTTDChatStorageReturn => {
+export const useTTDChatStorage = ({
+  persistenceAdapter,
+}: UseTTDChatStorageProps): UseTTDChatStorageReturn => {
   const [chatHistory] = useAtom(chatHistoryAtom);
   const [savedChats, setSavedChats] = useAtom(savedChatsAtom);
+  const [isLoading, setIsLoading] = useAtom(isLoadingChatsAtom);
+  const [chatsLoaded, setChatsLoaded] = useAtom(chatsLoadedAtom);
+
+  // Ref to track latest savedChats for async operations
+  const savedChatsRef = useRef(savedChats);
+  savedChatsRef.current = savedChats;
 
   const lastMessageInHistory =
     chatHistory?.messages[chatHistory?.messages.length - 1];
 
-  const saveCurrentChat = () => {
+  // Load chats on-demand
+  const loadChats = useCallback(async () => {
+    if (chatsLoaded || isLoading) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const chats = await persistenceAdapter.loadChats();
+      setSavedChats(chats);
+      setChatsLoaded(true);
+    } catch (error) {
+      console.warn("Failed to load chats:", error);
+      setSavedChats([]);
+      setChatsLoaded(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    chatsLoaded,
+    isLoading,
+    setSavedChats,
+    setIsLoading,
+    setChatsLoaded,
+    persistenceAdapter,
+  ]);
+
+  // INITIAL LOAD
+  useEffect(() => {
+    loadChats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const saveCurrentChat = useCallback(async () => {
     if (chatHistory.messages.length === 0) {
       return;
     }
@@ -71,7 +94,7 @@ export const useTTDChatStorage = (): UseTTDChatStorageReturn => {
 
     const title = generateChatTitle(firstUserMessage.content);
 
-    const currentSavedChats = loadChatsFromStorage();
+    const currentSavedChats = savedChatsRef.current;
     const existingChat = currentSavedChats.find(
       (chat) => chat.id === chatHistory.id,
     );
@@ -111,9 +134,15 @@ export const useTTDChatStorage = (): UseTTDChatStorageReturn => {
       .slice(0, 10);
 
     setSavedChats(updatedChats);
-    saveChatsToStorage(updatedChats);
-  };
 
+    try {
+      await persistenceAdapter.saveChats(updatedChats);
+    } catch (error) {
+      console.warn("Failed to save chats:", error);
+    }
+  }, [chatHistory, setSavedChats, persistenceAdapter]);
+
+  // Auto-save when generation completes
   useEffect(() => {
     if (!lastMessageInHistory?.isGenerating) {
       saveCurrentChat();
@@ -125,23 +154,33 @@ export const useTTDChatStorage = (): UseTTDChatStorageReturn => {
     lastMessageInHistory?.isGenerating,
   ]);
 
-  const deleteChat = (chatId: string): SavedChats => {
-    const updatedChats = savedChats.filter((chat) => chat.id !== chatId);
-    setSavedChats(updatedChats);
-    saveChatsToStorage(updatedChats);
+  const deleteChat = useCallback(
+    async (chatId: string): Promise<SavedChats> => {
+      const updatedChats = savedChatsRef.current.filter(
+        (chat) => chat.id !== chatId,
+      );
+      setSavedChats(updatedChats);
 
-    return updatedChats;
-  };
+      try {
+        await persistenceAdapter.saveChats(updatedChats);
+      } catch (error) {
+        console.warn("Failed to save after delete:", error);
+      }
 
-  const restoreChat = (chat: SavedChat): SavedChat => {
-    saveCurrentChat();
+      return updatedChats;
+    },
+    [setSavedChats, persistenceAdapter],
+  );
+
+  const restoreChat = useCallback((chat: SavedChat): SavedChat => {
+    // Save is handled by the caller after state update
     return chat;
-  };
+  }, []);
 
-  const createNewChatId = (): string => {
-    saveCurrentChat();
+  const createNewChatId = useCallback(async (): Promise<string> => {
+    await saveCurrentChat();
     return randomId();
-  };
+  }, [saveCurrentChat]);
 
   return {
     savedChats,
