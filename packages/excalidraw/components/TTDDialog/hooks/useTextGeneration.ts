@@ -18,7 +18,7 @@ import {
   updateAssistantContent,
 } from "../utils/chat";
 
-import type { TTTDDialog } from "../types";
+import type { LLMMessage, TTTDDialog } from "../types";
 
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 10000;
@@ -88,11 +88,11 @@ export const useTextGeneration = ({
     setError(error);
   };
 
-  const onGenerate = async (
-    promptWithContext: string,
+  const onGenerate: TTTDDialog.OnGenerate = async ({
+    prompt,
     isRepairFlow = false,
-  ) => {
-    if (!validatePrompt(promptWithContext)) {
+  }) => {
+    if (!validatePrompt(prompt)) {
       return;
     }
 
@@ -106,21 +106,18 @@ export const useTextGeneration = ({
     streamingAbortControllerRef.current = abortController;
 
     if (!isRepairFlow) {
-      addUserMessage(promptWithContext);
+      addUserMessage(prompt);
       addAssistantMessage();
     } else {
-      const lastAsisstantMessage = getLastAssistantMessage(chatHistory);
-
-      if (lastAsisstantMessage?.errorType === "network") {
-        setChatHistory((prev) =>
-          updateAssistantContent(prev, {
-            isGenerating: true,
-            error: undefined,
-            errorType: undefined,
-            errorDetails: undefined,
-          }),
-        );
-      }
+      setChatHistory((prev) =>
+        updateAssistantContent(prev, {
+          isGenerating: true,
+          content: "",
+          error: undefined,
+          errorType: undefined,
+          errorDetails: undefined,
+        }),
+      );
     }
 
     try {
@@ -128,12 +125,14 @@ export const useTextGeneration = ({
 
       const previousMessages = getMessagesForLLM(chatHistory);
 
+      const messages: LLMMessage[] = [
+        ...previousMessages.slice(-3),
+        { role: "user", content: prompt },
+      ];
+
       const { generatedResponse, error, rateLimit, rateLimitRemaining } =
         await onTextSubmit({
-          messages: [
-            ...previousMessages.slice(-3),
-            { role: "user", content: promptWithContext },
-          ],
+          messages,
           onStreamCreated: () => {
             if (isRepairFlow) {
               setChatHistory((prev) =>

@@ -648,7 +648,7 @@
       "promptTooShort": "Prompt is too short (min {{min}} characters)",
       "promptTooLong": "Prompt is too long (max {{max}} characters)",
       "generationFailed": "Generation failed",
-      "invalidDiagram": "Generated an invalid diagram :(. You may also try a different prompt.",
+      "invalidDiagram": "Generated an invalid diagram :(. You may edit manually, retry with auto-fix, or try a different prompt.",
       "fixInMermaid": "Edit Mermaid manually →",
       "aiRepair": "Regenerate (auto-fix) →",
       "requestAborted": "Request aborted",

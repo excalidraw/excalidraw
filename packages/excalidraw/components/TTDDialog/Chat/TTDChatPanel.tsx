@@ -22,7 +22,7 @@ export const TTDChatPanel = ({
   messages,
   currentPrompt,
   onPromptChange,
-  onSendMessage,
+  onGenerate,
   isGenerating,
   generatedResponse,
   isMenuOpen,
@@ -46,7 +46,7 @@ export const TTDChatPanel = ({
   messages: TChat.ChatMessage[];
   currentPrompt: string;
   onPromptChange: (prompt: string) => void;
-  onSendMessage: (message: string, isRepairFlow?: boolean) => void;
+  onGenerate: TTTDDialog.OnGenerate;
   isGenerating: boolean;
   generatedResponse: string | null | undefined;
 
@@ -141,7 +141,7 @@ export const TTDChatPanel = ({
         messages={messages}
         currentPrompt={currentPrompt}
         onPromptChange={onPromptChange}
-        onSendMessage={onSendMessage}
+        onGenerate={onGenerate}
         isGenerating={isGenerating}
         generatedResponse={generatedResponse}
         onAbort={onAbort}

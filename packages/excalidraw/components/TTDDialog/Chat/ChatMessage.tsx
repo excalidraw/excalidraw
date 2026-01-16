@@ -17,6 +17,7 @@ export const ChatMessage: React.FC<{
   rateLimitRemaining?: number;
   isLastMessage?: boolean;
   renderWarning?: TTTDDialog.renderWarning;
+  allowFixingParseError?: boolean;
 }> = ({
   message,
   onMermaidTabClick,
@@ -27,6 +28,7 @@ export const ChatMessage: React.FC<{
   rateLimitRemaining,
   isLastMessage,
   renderWarning,
+  allowFixingParseError,
 }) => {
   const [canRetry, setCanRetry] = useState(false);
 
@@ -119,10 +121,9 @@ export const ChatMessage: React.FC<{
         </div>
         <div className="chat-message__body">
           {message.error ? (
-            <div className="chat-message__error">
-              {message.content}
-              <div>{message.error}</div>
-              {message.errorType === "parse" && (
+            <>
+              <div className="chat-message__error">{message.content}</div>
+              {message.errorType === "parse" && allowFixingParseError && (
                 <>
                   <p>{t("chat.errors.invalidDiagram")}</p>
                   <div className="chat-message__error-actions">
@@ -148,7 +149,7 @@ export const ChatMessage: React.FC<{
                   </div>
                 </>
               )}
-            </div>
+            </>
           ) : (
             <div className="chat-message__text">
               {message.content}
