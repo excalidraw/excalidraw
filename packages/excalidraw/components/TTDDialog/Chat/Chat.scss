@@ -339,12 +339,21 @@ $verticalBreakpoint: 861px;
       gap: 0.5rem;
     }
 
+    &__error_message {
+      background: var(--color-warning-background);
+      color: var(--color-warning-color);
+
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--border-radius-md);
+      margin-top: 1rem;
+      font-size: 0.875rem;
+    }
+
     &__error-link {
       display: flex;
       align-items: center;
       background: none;
       border: none;
-      color: var(--color-primary);
       cursor: pointer;
       font-size: 0.875rem;
       font-weight: 500;
@@ -352,6 +361,14 @@ $verticalBreakpoint: 861px;
       margin-top: 1rem;
       text-decoration: underline;
       font-family: inherit;
+      color: var(--link-color);
+
+      &:hover {
+        color: var(--link-color-hover);
+      }
+      &:active {
+        color: var(--link-color-active);
+      }
 
       &:disabled {
         cursor: not-allowed;
