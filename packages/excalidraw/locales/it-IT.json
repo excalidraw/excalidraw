@@ -614,16 +614,16 @@
     "syntax": "Sintassi Mermaid",
     "preview": "Anteprima",
     "label": "Mermaid",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "Scrivi qui la definizione del diagramma Mermaid..."
   },
   "ttd": {
     "error": "Errore!",
-    "errorMermaidSyntax": ""
+    "errorMermaidSyntax": "Errore di sintassi Mermaid"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "Inizia a digitare qui la tua idea per il diagramma... ({{shortcut}} per una nuova riga)",
+    "inputPlaceholderWithMessages": "Continua a perfezionare il tuo diagramma...",
+    "rateLimitRemaining": "{{count}} richieste rimaste oggi",
     "role": {
       "user": "Tu",
       "assistant": "Assistente IA",
@@ -635,31 +635,31 @@
     "newChat": "Nuova Chat",
     "deleteChat": "Elimina Chat",
     "deleteMessage": "Cancella messaggio",
-    "viewAsMermaid": "",
+    "viewAsMermaid": "Visualizza come Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "Progettiamo il tuo diagramma",
+      "description": "Descrivi il diagramma che vuoi creare e noi lo genereremo per te.",
+      "hint": "Al momento conosciamo i diagrammi di flusso, di sequenza e di classe."
     },
     "preview": "Anteprima",
     "insert": "Inserisci",
     "retry": "Riprova",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
+      "promptTooShort": "Il prompt è troppo corto (min {{min}} caratteri)",
+      "promptTooLong": "Il prompt è troppo lungo (max {{max}} caratteri)",
+      "generationFailed": "Generazione non riuscita",
+      "invalidDiagram": "È stato generato un diagramma non valido :(. Puoi modificarlo manualmente, riprovare con la correzione automatica o provare un prompt diverso.",
+      "fixInMermaid": "Modifica Mermaid manualmente→",
+      "aiRepair": "Rigenera (correzione automatica) →",
+      "requestAborted": "Richiesta annullata",
       "requestFailed": "Richiesta non riuscita"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "Hai raggiunto il tuo limite di IA sul piano gratuito. Prova Excalidraw+ per saperne di più o torna domani.",
+      "generalRateLimit": "Fermati, sei troppo veloce per noi! Attendi un attimo prima di riprovare.",
+      "messageLimitInputPlaceholder": "Hai raggiunto il limite di messaggi"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Aggiorna alla Plus"
   },
   "quickSearch": {
     "placeholder": "Ricerca rapida"
