@@ -26,6 +26,8 @@
   --island-bg-color-alt: #fff;
   --keybinding-color: var(--color-gray-40);
   --link-color: #{$color-blue-7};
+  --link-color-hover: #{$color-blue-8};
+  --link-color-active: #{$color-blue-2};
   --overlay-bg-color: #{color.adjust(#fff, $alpha: -0.12)};
   --popup-bg-color: var(--island-bg-color);
   --popup-secondary-bg-color: #{$color-gray-1};
