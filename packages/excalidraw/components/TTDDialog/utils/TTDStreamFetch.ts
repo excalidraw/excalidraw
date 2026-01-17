@@ -32,7 +32,7 @@ export type StreamChunk =
       type: "error";
       error: {
         message: string;
-        code?: string;
+        status?: number;
       };
     };
 
