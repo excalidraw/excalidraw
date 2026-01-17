@@ -504,7 +504,7 @@ const renderElementToSvg = (
         // We first apply `scale` transforms (horizontal/vertical mirroring)
         // on the <use> element, then apply translation and rotation
         // on the <g> element which wraps the <use>.
-        // Doing this separately is a quick hack to to work around compositing
+        // Doing this separately is a quick hack to work around compositing
         // the transformations correctly (the transform-origin was not being
         // applied correctly).
         if (element.scale[0] !== 1 || element.scale[1] !== 1) {
