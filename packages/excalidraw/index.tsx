@@ -187,6 +187,9 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
   }
 
   const isUIOptionsSame = prevUIOptionsKeys.every((key) => {
+    if (key === "getFormFactor") {
+      return true;
+    }
     if (key === "canvasActions") {
       const canvasOptionKeys = Object.keys(
         prevUIOptions.canvasActions!,

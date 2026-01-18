@@ -682,8 +682,10 @@ export type UIOptions = Partial<{
    * Optionally control the editor form factor and desktop UI mode from the host app.
    * If not provided, we will take care of it internally.
    */
-  formFactor?: EditorInterface["formFactor"];
-  desktopUIMode?: EditorInterface["desktopUIMode"];
+  getFormFactor?: (
+    editorWidth: number,
+    editorHeight: number,
+  ) => EditorInterface["formFactor"];
   /** @deprecated does nothing. Will be removed in 0.15 */
   welcomeScreen?: boolean;
 }>;
