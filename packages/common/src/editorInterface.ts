@@ -16,7 +16,6 @@ export type EditorInterface = Readonly<{
 const DESKTOP_UI_MODE_STORAGE_KEY = "excalidraw.desktopUIMode";
 
 // breakpoints
-// mobile: up to 699px
 export const MQ_MAX_MOBILE = 599;
 
 export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
@@ -24,9 +23,9 @@ export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
 
 // tablets
 export const MQ_MIN_TABLET = MQ_MAX_MOBILE + 1; // lower bound (excludes phones)
-export const MQ_MAX_TABLET = 1400; // upper bound (excludes laptops/desktops)
+export const MQ_MAX_TABLET = 1180; // ipad air
 
-// desktop/laptop
+// desktop/laptop (NOTE: not used for form factor detection)
 export const MQ_MIN_WIDTH_DESKTOP = 1440;
 
 // sidebar
