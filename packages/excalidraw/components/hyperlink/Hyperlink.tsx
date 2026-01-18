@@ -197,6 +197,28 @@ export const Hyperlink = ({
     }
   }, [isEditing, editorInterface.formFactor, editorInterface.isTouchScreen]);
 
+  // zsviczian - keep input state in sync with native mutations (e.g. Obsidian suggester)
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      const inputEl = inputRef.current;
+      setInputVal(inputEl.value ?? element.link ?? "");
+      const handleInput = (event: Event) => {
+        const target = event.target as HTMLInputElement | null;
+        if (!target) {
+          return;
+        }
+        setInputVal(target.value);
+      };
+      inputEl.addEventListener("input", handleInput);
+      return () => {
+        inputEl.removeEventListener("input", handleInput);
+      };
+    }
+
+    setInputVal(element.link || "");
+  }, [isEditing, element.link]);
+  // zsviczian - end
+
   //zsviczian - attach link suggester
   useEffect(() => {
     if (!isEditing || !inputRef.current) {
