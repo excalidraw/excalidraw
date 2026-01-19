@@ -119,6 +119,7 @@ export const actionClearCanvas = register({
         gridModeEnabled: appState.gridModeEnabled,
         stats: appState.stats,
         pasteDialog: appState.pasteDialog,
+        stylesPanelMode: appState.stylesPanelMode,
         activeTool:
           appState.activeTool.type === "image"
             ? {

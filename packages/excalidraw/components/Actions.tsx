@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import * as Popover from "@radix-ui/react-popover";
 
 import {
@@ -909,9 +909,35 @@ export const MobileShapeActions = ({
   const targetElements = getTargetElements(elementsMap, appState);
   const { container } = useExcalidrawContainer();
   const mobileActionsRef = useRef<HTMLDivElement>(null);
+  const [actionsWidth, setActionsWidth] = useState(0);
 
-  const ACTIONS_WIDTH =
-    mobileActionsRef.current?.getBoundingClientRect()?.width ?? 0;
+  // Use useEffect to properly measure width after render
+  useEffect(() => {
+    const measureWidth = () => {
+      if (mobileActionsRef.current) {
+        const width = mobileActionsRef.current.getBoundingClientRect().width;
+        if (width > 0) {
+          setActionsWidth(width);
+        }
+      }
+    };
+
+    measureWidth();
+
+    // Re-measure on resize if ResizeObserver is available
+    if (typeof ResizeObserver !== "undefined") {
+      const resizeObserver = new ResizeObserver(measureWidth);
+      if (mobileActionsRef.current) {
+        resizeObserver.observe(mobileActionsRef.current);
+      }
+
+      return () => {
+        resizeObserver.disconnect();
+      };
+    }
+  }, []);
+
+  const ACTIONS_WIDTH = actionsWidth;
 
   // 7 actions + 2 for undo/redo
   const MIN_ACTIONS = 9;
