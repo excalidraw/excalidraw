@@ -65,6 +65,7 @@ import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconc
 import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
 import type {
   FileId,
+  ExcalidrawElement,
   NonDeletedExcalidrawElement,
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -452,14 +453,60 @@ const ExcalidrawWrapper = () => {
               elements: data.scene.elements,
               forceFetchFiles: true,
             })
-            .then(({ loadedFiles, erroredFiles }) => {
-              excalidrawAPI.addFiles(loadedFiles);
+            .then(
+              async ({
+                loadedFiles,
+                erroredFiles,
+              }: {
+                loadedFiles: import("@excalidraw/excalidraw/types").BinaryFileData[];
+                erroredFiles: Map<FileId, true>;
+              }) => {
+              // Persist successfully fetched files to local cache for offline/future use
+              if (loadedFiles.length) {
+                excalidrawAPI.addFiles(loadedFiles);
+                try {
+                  const filesMap: BinaryFiles = {};
+                  for (const f of loadedFiles) filesMap[f.id] = f;
+                  const elementsToSave = excalidrawAPI
+                    .getSceneElementsIncludingDeleted()
+                    .filter((el: ExcalidrawElement) =>
+                      isInitializedImageElement(el) && filesMap[el.fileId],
+                    );
+                  await LocalData.fileStorage.saveFiles({
+                    elements: elementsToSave,
+                    files: filesMap,
+                  });
+                } catch (err) {
+                  // non-fatal: caching to IDB failed
+                  console.warn("Failed to save fetched files to IDB", err);
+                }
+              }
+
+              // If some files errored (e.g., Firebase blocked by VPN), try local IDB fallback
+              if (erroredFiles.size) {
+                try {
+                  const fallback = await LocalData.fileStorage.getFiles([
+                    ...erroredFiles.keys(),
+                  ]);
+                  if (fallback.loadedFiles.length) {
+                    excalidrawAPI.addFiles(fallback.loadedFiles);
+                    // Remove recovered files from the errored set
+                    for (const f of fallback.loadedFiles) {
+                      erroredFiles.delete(f.id);
+                    }
+                  }
+                } catch (err) {
+                  console.warn("Failed to load files from IDB fallback", err);
+                }
+              }
+
               updateStaleImageStatuses({
                 excalidrawAPI,
                 erroredFiles,
                 elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
               });
-            });
+              },
+            );
         }
       } else {
         const fileIds =
@@ -475,14 +522,58 @@ const ExcalidrawWrapper = () => {
             `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
             data.key,
             fileIds,
-          ).then(({ loadedFiles, erroredFiles }) => {
-            excalidrawAPI.addFiles(loadedFiles);
+          ).then(
+            async ({
+              loadedFiles,
+              erroredFiles,
+            }: {
+              loadedFiles: import("@excalidraw/excalidraw/types").BinaryFileData[];
+              erroredFiles: Map<FileId, true>;
+            }) => {
+            // Add and persist successfully fetched files
+            if (loadedFiles.length) {
+              excalidrawAPI.addFiles(loadedFiles);
+              try {
+                const filesMap: BinaryFiles = {};
+                for (const f of loadedFiles) filesMap[f.id] = f;
+                const elementsToSave = excalidrawAPI
+                  .getSceneElementsIncludingDeleted()
+                  .filter((el: ExcalidrawElement) =>
+                    isInitializedImageElement(el) && filesMap[el.fileId],
+                  );
+                await LocalData.fileStorage.saveFiles({
+                  elements: elementsToSave,
+                  files: filesMap,
+                });
+              } catch (err) {
+                console.warn("Failed to save fetched files to IDB", err);
+              }
+            }
+
+            // VPN/blocked network fallback: try to read missing files from local IDB
+            if (erroredFiles.size) {
+              try {
+                const fallback = await LocalData.fileStorage.getFiles([
+                  ...erroredFiles.keys(),
+                ]);
+                if (fallback.loadedFiles.length) {
+                  excalidrawAPI.addFiles(fallback.loadedFiles);
+                  for (const f of fallback.loadedFiles) {
+                    erroredFiles.delete(f.id);
+                  }
+                }
+              } catch (err) {
+                console.warn("Failed to load files from IDB fallback", err);
+              }
+            }
+
             updateStaleImageStatuses({
               excalidrawAPI,
               erroredFiles,
               elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
             });
-          });
+          },
+          );
         } else if (isInitialLoad) {
           if (fileIds.length) {
             LocalData.fileStorage
