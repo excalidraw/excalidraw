@@ -380,7 +380,7 @@
     "sceneContent": "Jelenet tartalma:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Vagy"
   },
   "roomDialog": {
     "desc_intro": "",
@@ -420,7 +420,7 @@
     "drag": "vonszolás",
     "editor": "Szerkesztő",
     "editLineArrowPoints": "",
-    "editText": "",
+    "editText": "Szöveg szerkesztése / címke hozzáadása",
     "github": "Hibát találtál? Küld be",
     "howto": "Kövesd az útmutatóinkat",
     "or": "vagy",
@@ -436,7 +436,7 @@
     "toggleElementLock": "",
     "movePageUpDown": "",
     "movePageLeftRight": "",
-    "cropStart": "",
+    "cropStart": "Kép kivágása",
     "cropFinish": ""
   },
   "clearCanvasDialog": {
@@ -481,25 +481,25 @@
   "imageExportDialog": {
     "header": "Kép exportálása",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Háttér",
+      "onlySelected": "Csak a kijelölt",
+      "darkMode": "Sötét mód",
+      "embedScene": "Jelenet beágyazása",
+      "scale": "Nagyítás",
+      "padding": "Eltartás"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "A jelenetet leíró adatok hozzá lesznek adva a PNG/SVG fájlhoz, így a jelenetet vissza lehet majd tölteni belőle. Ez megnöveli a fájl méretét."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exportálás PNG-be",
+      "exportToSvg": "Exportálás SVG-be",
+      "copyPngToClipboard": "PNG másolása a vágólapra"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Vágólapra másolás"
     }
   },
   "encrypted": {
@@ -508,14 +508,14 @@
   },
   "stats": {
     "angle": "Szög",
-    "shapes": "",
+    "shapes": "Alakzatok",
     "height": "Magasság",
     "scene": "Jelenet",
     "selected": "Kijelölt",
     "storage": "Tárhely",
     "fullTitle": "",
-    "title": "",
-    "generalStats": "",
+    "title": "Tulajdonságok",
+    "generalStats": "Általános",
     "elementProperties": "",
     "total": "Összesen",
     "version": "Verzió",
@@ -540,20 +540,20 @@
   },
   "colors": {
     "transparent": "Átlátszó",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Fekete",
+    "white": "Fehér",
+    "red": "Piros",
+    "pink": "Pink",
+    "grape": "Szőlő",
+    "violet": "Lila",
+    "gray": "Szürke",
+    "blue": "Kék",
+    "cyan": "Cián",
+    "teal": "Türkiz",
+    "green": "Zöld",
+    "yellow": "Sárga",
+    "orange": "Narancssárga",
+    "bronze": "Bronz"
   },
   "welcomeScreen": {
     "app": {
@@ -569,7 +569,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Szín",
     "mostUsedCustomColors": "",
     "colors": "",
     "shades": "",
@@ -625,25 +625,25 @@
     "inputPlaceholderWithMessages": "",
     "rateLimitRemaining": "",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Te",
+      "assistant": "AI asszisztens",
+      "system": "Rendszer"
     },
     "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
+    "label": "Csevegés",
+    "menu": "Menü",
+    "newChat": "Új csevegés",
+    "deleteChat": "Csevegés törlése",
+    "deleteMessage": "Üzenet törlése",
     "viewAsMermaid": "",
     "placeholder": {
       "title": "",
       "description": "",
       "hint": ""
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Előnézet",
+    "insert": "Beszúrás",
+    "retry": "Újra",
     "errors": {
       "promptTooShort": "",
       "promptTooLong": "",
@@ -659,18 +659,18 @@
       "generalRateLimit": "",
       "messageLimitInputPlaceholder": ""
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Frissítés Plus csomagra"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Gyorskeresés"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "régi"
     },
     "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "availableFonts": "Elérhető betűtípusok",
+    "empty": "Nem találhatóak betűtípusok"
   },
   "userList": {
     "empty": "",
@@ -683,13 +683,13 @@
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Parancspanel",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Kiválasztás",
+      "confirm": "Megerősítés",
+      "close": "Bezárás"
     },
-    "recents": "",
+    "recents": "Legutóbb használt",
     "search": {
       "placeholder": "",
       "noMatch": ""
@@ -698,8 +698,8 @@
     "shortcutHint": ""
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
+    "ctrl": "Ctrl",
+    "option": "Option",
     "cmd": "",
     "alt": "",
     "escape": "",
