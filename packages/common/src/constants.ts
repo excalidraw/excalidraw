@@ -117,6 +117,7 @@ export const FONT_SIZES = {
 
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
+export const WINDOWS_SYMBOL_FALLBACK_FONT = "Segoe UI Symbol";
 
 /**
  * // TODO: shouldn't be really `const`, likely neither have integers as values, due to value for the custom fonts, which should likely be some hash.
@@ -153,6 +154,7 @@ export const FONT_FAMILY_FALLBACKS = {
   [CJK_HAND_DRAWN_FALLBACK_FONT]: 100,
   ...FONT_FAMILY_GENERIC_FALLBACKS,
   [WINDOWS_EMOJI_FALLBACK_FONT]: 1000,
+  [WINDOWS_SYMBOL_FALLBACK_FONT]: 1001,
 };
 
 export function getGenericFontFamilyFallback(
@@ -178,6 +180,7 @@ export const getFontFamilyFallbacks = (
       return [
         CJK_HAND_DRAWN_FALLBACK_FONT,
         genericFallbackFont,
+        WINDOWS_SYMBOL_FALLBACK_FONT,
         WINDOWS_EMOJI_FALLBACK_FONT,
       ];
     default:
