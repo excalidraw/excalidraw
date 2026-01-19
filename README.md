@@ -43,7 +43,8 @@
     </a>
     <figcaption>
       <p align="center">
-        Create beautiful hand-drawn like diagrams, wireframes, or whatever you like.
+        Create beautiful hand-drawn like diagrams, wireframes, or whatever you like. <br>
+        Make sketches with you team, draw graphs or take notes for school.
       </p>
     </figcaption>
   </figure>
