@@ -344,12 +344,15 @@ const StatsDragInput = <
         onKeyDown={(event) => {
           if (editable) {
             const eventTarget = event.target;
-            if (
-              eventTarget instanceof HTMLInputElement &&
-              event.key === KEYS.ENTER
-            ) {
-              handleInputValue(eventTarget.value, elements, appState);
-              app.focusContainer();
+            if (eventTarget instanceof HTMLInputElement) {
+              if (event.key === KEYS.ENTER) {
+                handleInputValue(eventTarget.value, elements, appState);
+                app.focusContainer();
+              } else if (event.key === KEYS.ESCAPE) {
+                setInputValue(value.toString());
+                stateRef.current.updatePending = false;
+                app.focusContainer();
+              }
             }
           }
         }}
