@@ -827,7 +827,17 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
     ? Array.from(focusableElements).filter(
         (element) =>
           element.tabIndex > -1 && !(element as HTMLInputElement).disabled,
-      )
+      ).sort((a, b) => {
+        if(a.tabIndex === b.tabIndex){
+          return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+        }
+        else if(a.tabIndex > 0 && b.tabIndex > 0){
+          return a.tabIndex - b.tabIndex;
+        }
+        else{
+          return b.tabIndex - a.tabIndex;
+        }
+      })
     : [];
 };
 
