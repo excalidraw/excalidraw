@@ -317,3 +317,4 @@ export { getDataURL } from "./data/blob";
 export { isElementLink } from "@excalidraw/element";
 
 export { setCustomTextMetricsProvider } from "@excalidraw/element";
+export { duplicateElement, duplicateElements } from "@excalidraw/element";
