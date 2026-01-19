@@ -38,7 +38,11 @@ import { elementCenterPoint, getDiamondPoints } from "./bounds";
 
 import { generateLinearCollisionShape } from "./shape";
 
-import { hitElementItself, isPointInElement } from "./collision";
+import {
+  hitElementItself,
+  intersectElementWithLineSegment,
+  isPointInElement,
+} from "./collision";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isRectangularElement } from "./typeChecks";
 import { maxBindingDistance_simple } from "./binding";
@@ -585,6 +589,8 @@ const getDiagonalsForBindableElement = (
 };
 
 export const getSnapOutlineMidPoint = (
+  arrow: ExcalidrawArrowElement,
+  startOrEnd: "start" | "end",
   point: GlobalPoint,
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
@@ -631,8 +637,8 @@ export const getSnapOutlineMidPoint = (
             element.angle,
           ),
         ];
-  return sideMidpoints.find((midpoint, idx) => {
-    return (
+  const candidate = sideMidpoints.find(
+    (midpoint, idx) =>
       pointDistance(point, midpoint) <= maxBindingDistance_simple(zoom) &&
       !hitElementItself({
         point,
@@ -640,9 +646,31 @@ export const getSnapOutlineMidPoint = (
         threshold: 0,
         elementsMap,
         overrideShouldTestInside: true,
-      })
+      }),
+  );
+
+  if (candidate) {
+    const intersector = lineSegment<GlobalPoint>(
+      point,
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        arrow,
+        startOrEnd === "start" ? 1 : arrow.points.length - 2,
+        elementsMap,
+      ),
     );
-  });
+    const intersections = intersectElementWithLineSegment(
+      element,
+      elementsMap,
+      intersector,
+      0,
+      true,
+    );
+    if (intersections.length === 0) {
+      return candidate;
+    }
+  }
+
+  return undefined;
 };
 
 export const projectFixedPointOntoDiagonal = (
@@ -659,6 +687,8 @@ export const projectFixedPointOntoDiagonal = (
   }
 
   const sideMidPoint = getSnapOutlineMidPoint(
+    arrow,
+    startOrEnd,
     point,
     element,
     elementsMap,
@@ -691,7 +721,7 @@ export const projectFixedPointOntoDiagonal = (
     ),
     a,
   );
-  const intersector = lineSegment<GlobalPoint>(point, b);
+  const intersector = lineSegment<GlobalPoint>(b, a);
   const p1 = lineSegmentIntersectionPoints(diagonalOne, intersector);
   const p2 = lineSegmentIntersectionPoints(diagonalTwo, intersector);
   const d1 = p1 && pointDistance(a, p1);

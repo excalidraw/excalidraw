@@ -2190,6 +2190,8 @@ const pointDraggingUpdates = (
         ? {
             element: start.element,
             midPoint: getSnapOutlineMidPoint(
+              element,
+              "start",
               pointFrom<GlobalPoint>(
                 scenePointerX - linearElementEditor.pointerOffset.x,
                 scenePointerY - linearElementEditor.pointerOffset.y,
@@ -2229,6 +2231,8 @@ const pointDraggingUpdates = (
         ? {
             element: end.element,
             midPoint: getSnapOutlineMidPoint(
+              element,
+              "end",
               pointFrom<GlobalPoint>(
                 scenePointerX - linearElementEditor.pointerOffset.x,
                 scenePointerY - linearElementEditor.pointerOffset.y,
