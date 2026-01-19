@@ -1300,14 +1300,16 @@ export const bindPointToSnapToElementOutline = (
       headingForPointFromElement(bindableElement, aabb, point),
     );
     const snapPoint = snapToMid(
-      arrowElement,
       bindableElement,
       elementsMap,
       edgePoint,
+      0.05,
+      arrowElement,
     );
+    const resolved = snapPoint || point;
     const otherPoint = pointFrom<GlobalPoint>(
-      isHorizontal ? bindableCenter[0] : snapPoint[0],
-      !isHorizontal ? bindableCenter[1] : snapPoint[1],
+      isHorizontal ? bindableCenter[0] : resolved[0],
+      !isHorizontal ? bindableCenter[1] : resolved[1],
     );
     const intersector =
       customIntersector ??
@@ -1315,7 +1317,7 @@ export const bindPointToSnapToElementOutline = (
         otherPoint,
         pointFromVector(
           vectorScale(
-            vectorNormalize(vectorFromPoint(snapPoint, otherPoint)),
+            vectorNormalize(vectorFromPoint(resolved, otherPoint)),
             Math.max(bindableElement.width, bindableElement.height) * 2,
           ),
           otherPoint,
@@ -1330,14 +1332,14 @@ export const bindPointToSnapToElementOutline = (
 
     if (!intersection) {
       const anotherPoint = pointFrom<GlobalPoint>(
-        !isHorizontal ? bindableCenter[0] : snapPoint[0],
-        isHorizontal ? bindableCenter[1] : snapPoint[1],
+        !isHorizontal ? bindableCenter[0] : resolved[0],
+        isHorizontal ? bindableCenter[1] : resolved[1],
       );
       const anotherIntersector = lineSegment(
         anotherPoint,
         pointFromVector(
           vectorScale(
-            vectorNormalize(vectorFromPoint(snapPoint, anotherPoint)),
+            vectorNormalize(vectorFromPoint(resolved, anotherPoint)),
             Math.max(bindableElement.width, bindableElement.height) * 2,
           ),
           anotherPoint,
@@ -1484,18 +1486,18 @@ export const avoidRectangularCorner = (
   return p;
 };
 
-const snapToMid = (
-  arrowElement: ExcalidrawArrowElement,
+export const snapToMid = (
   bindTarget: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
   p: GlobalPoint,
   tolerance: number = 0.05,
-): GlobalPoint => {
+  arrowElement?: ExcalidrawArrowElement,
+): GlobalPoint | undefined => {
   const { x, y, width, height, angle } = bindTarget;
   const center = elementCenterPoint(bindTarget, elementsMap, -0.1, -0.1);
   const nonRotated = pointRotateRads(p, center, -angle as Radians);
 
-  const bindingGap = getBindingGap(bindTarget, arrowElement);
+  const bindingGap = arrowElement ? getBindingGap(bindTarget, arrowElement) : 0;
 
   // snap-to-center point is adaptive to element size, but we don't want to go
   // above and below certain px distance
@@ -1504,7 +1506,7 @@ const snapToMid = (
 
   // Too close to the center makes it hard to resolve direction precisely
   if (pointDistance(center, nonRotated) < bindingGap) {
-    return p;
+    return undefined;
   }
 
   if (
@@ -1513,8 +1515,8 @@ const snapToMid = (
     nonRotated[1] < center[1] + verticalThreshold
   ) {
     // LEFT
-    return pointRotateRads<GlobalPoint>(
-      pointFrom(x - bindingGap, center[1]),
+    return pointRotateRads(
+      pointFrom<GlobalPoint>(x - bindingGap, center[1]),
       center,
       angle,
     );
@@ -1524,7 +1526,11 @@ const snapToMid = (
     nonRotated[0] < center[0] + horizontalThreshold
   ) {
     // TOP
-    return pointRotateRads(pointFrom(center[0], y - bindingGap), center, angle);
+    return pointRotateRads(
+      pointFrom<GlobalPoint>(center[0], y - bindingGap),
+      center,
+      angle,
+    );
   } else if (
     nonRotated[0] >= x + width / 2 &&
     nonRotated[1] > center[1] - verticalThreshold &&
@@ -1532,7 +1538,7 @@ const snapToMid = (
   ) {
     // RIGHT
     return pointRotateRads(
-      pointFrom(x + width + bindingGap, center[1]),
+      pointFrom<GlobalPoint>(x + width + bindingGap, center[1]),
       center,
       angle,
     );
@@ -1543,7 +1549,7 @@ const snapToMid = (
   ) {
     // DOWN
     return pointRotateRads(
-      pointFrom(center[0], y + height + bindingGap),
+      pointFrom<GlobalPoint>(center[0], y + height + bindingGap),
       center,
       angle,
     );
@@ -1592,7 +1598,7 @@ const snapToMid = (
     }
   }
 
-  return p;
+  return undefined;
 };
 
 const compareElementArea = (

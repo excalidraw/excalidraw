@@ -49,6 +49,7 @@ import {
   calculateFixedPointForNonElbowArrowBinding,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isBindingEnabled,
+  snapToMid,
   updateBoundPoint,
 } from "./binding";
 import {
@@ -352,6 +353,7 @@ export class LinearElementEditor {
       app,
       shouldRotateWithDiscreteAngle(event),
       event.altKey,
+      linearElementEditor,
     );
 
     LinearElementEditor.movePoints(element, app.scene, positions, {
@@ -530,6 +532,7 @@ export class LinearElementEditor {
       app,
       shouldRotateWithDiscreteAngle(event) && singlePointDragged,
       event.altKey,
+      linearElementEditor,
     );
 
     LinearElementEditor.movePoints(element, app.scene, positions, {
@@ -727,7 +730,6 @@ export class LinearElementEditor {
           ? [pointerDownState.lastClickedPoint]
           : selectedPointsIndices,
       isDragging: false,
-      pointerOffset: { x: 0, y: 0 },
       customLineAngle: null,
       initialState: {
         ...editingLinearElement.initialState,
@@ -2080,6 +2082,7 @@ const pointDraggingUpdates = (
   app: AppClassProperties,
   angleLocked: boolean,
   altKey: boolean,
+  linearElementEditor: LinearElementEditor,
 ): {
   positions: PointsPositionUpdates;
   updates?: PointMoveOtherUpdates;
@@ -2139,11 +2142,13 @@ const pointDraggingUpdates = (
         suggestedBinding: suggestedBindingElement
           ? {
               element: suggestedBindingElement,
-              midPoint: getSnapOutlineMidPoint(
-                pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+              midPoint: snapToMid(
                 suggestedBindingElement,
                 elementsMap,
-                app.state.zoom,
+                pointFrom<GlobalPoint>(
+                  scenePointerX - linearElementEditor.pointerOffset.x,
+                  scenePointerY - linearElementEditor.pointerOffset.y,
+                ),
               ),
             }
           : null,
@@ -2185,7 +2190,10 @@ const pointDraggingUpdates = (
         ? {
             element: start.element,
             midPoint: getSnapOutlineMidPoint(
-              start.focusPoint,
+              pointFrom<GlobalPoint>(
+                scenePointerX - linearElementEditor.pointerOffset.x,
+                scenePointerY - linearElementEditor.pointerOffset.y,
+              ),
               start.element,
               elementsMap,
               app.state.zoom,
@@ -2221,7 +2229,10 @@ const pointDraggingUpdates = (
         ? {
             element: end.element,
             midPoint: getSnapOutlineMidPoint(
-              end.focusPoint,
+              pointFrom<GlobalPoint>(
+                scenePointerX - linearElementEditor.pointerOffset.x,
+                scenePointerY - linearElementEditor.pointerOffset.y,
+              ),
               end.element,
               elementsMap,
               app.state.zoom,

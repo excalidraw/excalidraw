@@ -7,6 +7,7 @@ import {
 } from "@excalidraw/common";
 
 import {
+  bezierEquation,
   curve,
   curveCatmullRomCubicApproxPoints,
   curveOffsetPoints,
@@ -37,7 +38,7 @@ import { elementCenterPoint, getDiamondPoints } from "./bounds";
 
 import { generateLinearCollisionShape } from "./shape";
 
-import { isPointInElement } from "./collision";
+import { hitElementItself, isPointInElement } from "./collision";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isRectangularElement } from "./typeChecks";
 import { maxBindingDistance_simple } from "./binding";
@@ -590,48 +591,56 @@ export const getSnapOutlineMidPoint = (
   zoom: AppState["zoom"],
 ) => {
   const center = elementCenterPoint(element, elementsMap);
-  const sideMidpoints = [
-    // TOP midpoint
-    pointRotateRads(
-      pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
-      center,
-      element.angle,
-    ),
-    // RIGHT midpoint
-    pointRotateRads(
-      pointFrom<GlobalPoint>(
-        element.x + element.width,
-        element.y + element.height / 2,
-      ),
-      center,
-      element.angle,
-    ),
-    // BOTTOM midpoint
-    pointRotateRads(
-      pointFrom<GlobalPoint>(
-        element.x + element.width / 2,
-        element.y + element.height,
-      ),
-      center,
-      element.angle,
-    ),
-    // LEFT midpoint
-    pointRotateRads(
-      pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
-      center,
-      element.angle,
-    ),
-  ];
+  const sideMidpoints =
+    element.type === "diamond"
+      ? getDiamondBaseCorners(element).map((curve) => {
+          const point = bezierEquation(curve, 0.5);
+          const rotatedPoint = pointRotateRads(point, center, element.angle);
+
+          return pointFrom<GlobalPoint>(rotatedPoint[0], rotatedPoint[1]);
+        })
+      : [
+          // RIGHT midpoint
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              element.x + element.width,
+              element.y + element.height / 2,
+            ),
+            center,
+            element.angle,
+          ),
+          // BOTTOM midpoint
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              element.x + element.width / 2,
+              element.y + element.height,
+            ),
+            center,
+            element.angle,
+          ),
+          // LEFT midpoint
+          pointRotateRads(
+            pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
+            center,
+            element.angle,
+          ),
+          // TOP midpoint
+          pointRotateRads(
+            pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
+            center,
+            element.angle,
+          ),
+        ];
   return sideMidpoints.find((midpoint, idx) => {
     return (
       pointDistance(point, midpoint) <= maxBindingDistance_simple(zoom) &&
-      (idx === 0
-        ? point[1] <= midpoint[1]
-        : idx === 1
-        ? point[0] >= midpoint[0]
-        : idx === 2
-        ? point[1] >= midpoint[1]
-        : point[0] <= midpoint[0])
+      !hitElementItself({
+        point,
+        element,
+        threshold: 0,
+        elementsMap,
+        overrideShouldTestInside: true,
+      })
     );
   });
 };

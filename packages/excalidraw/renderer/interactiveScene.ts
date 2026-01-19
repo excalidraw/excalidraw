@@ -403,7 +403,7 @@ const renderBindingHighlightForBindableElement_simple = (
 
           const midpointRadius = 5 / appState.zoom.value;
 
-          let midpoints;
+          let midpoints: LocalPoint[];
           if (suggestedBinding.element.type === "diamond") {
             const center = elementCenterPoint(
               suggestedBinding.element,
@@ -418,10 +418,10 @@ const renderBindingHighlightForBindableElement_simple = (
                   suggestedBinding.element.angle,
                 );
 
-                return {
-                  x: rotatedPoint[0] - suggestedBinding.element.x,
-                  y: rotatedPoint[1] - suggestedBinding.element.y,
-                };
+                return pointFrom<LocalPoint>(
+                  rotatedPoint[0] - suggestedBinding.element.x,
+                  rotatedPoint[1] - suggestedBinding.element.y,
+                );
               },
             );
           } else {
@@ -451,37 +451,50 @@ const renderBindingHighlightForBindableElement_simple = (
                 center,
                 suggestedBinding.element.angle,
               );
-              return {
-                x: rotatedPoint[0] - suggestedBinding.element.x,
-                y: rotatedPoint[1] - suggestedBinding.element.y,
-              };
+              return pointFrom<LocalPoint>(
+                rotatedPoint[0] - suggestedBinding.element.x,
+                rotatedPoint[1] - suggestedBinding.element.y,
+              );
             });
           }
-
-          context.fillStyle = `rgba(0,0,0,0.2)`;
-          midpoints.forEach((midpoint) => {
-            context.beginPath();
-            context.arc(midpoint.x, midpoint.y, midpointRadius, 0, 2 * Math.PI);
-            context.fill();
-          });
-
-          // Draw highlighted midpoint if any
-          if (suggestedBinding.midPoint) {
-            context.fillStyle =
-              appState.theme === THEME.DARK
-                ? `rgba(3, 93, 161, 1)`
-                : `rgba(106, 189, 252, 1)`;
-
-            context.beginPath();
-            context.arc(
+          const highlightedPoint =
+            suggestedBinding.midPoint &&
+            pointFrom<LocalPoint>(
               suggestedBinding.midPoint[0] - suggestedBinding.element.x,
               suggestedBinding.midPoint[1] - suggestedBinding.element.y,
-              midpointRadius,
-              0,
-              2 * Math.PI,
             );
-            context.fill();
-          }
+
+          midpoints.forEach((midpoint) => {
+            const isHighlighted =
+              highlightedPoint && pointsEqual(highlightedPoint, midpoint, 1);
+            if (!isHighlighted) {
+              context.fillStyle = `rgba(0,0,0,0.2)`;
+              context.beginPath();
+              context.arc(
+                midpoint[0],
+                midpoint[1],
+                midpointRadius,
+                0,
+                2 * Math.PI,
+              );
+              context.fill();
+            } else {
+              context.fillStyle =
+                appState.theme === THEME.DARK
+                  ? `rgba(3, 93, 161, 1)`
+                  : `rgba(106, 189, 252, 1)`;
+
+              context.beginPath();
+              context.arc(
+                midpoint[0],
+                midpoint[1],
+                midpointRadius,
+                0,
+                2 * Math.PI,
+              );
+              context.fill();
+            }
+          });
 
           context.restore();
         }

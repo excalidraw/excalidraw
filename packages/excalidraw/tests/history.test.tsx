@@ -4510,14 +4510,14 @@ describe("history", () => {
 
         // create start binding
         mouse.downAt(0, 0);
-        mouse.moveTo(0, 10);
-        mouse.moveTo(0, 10);
+        mouse.moveTo(0, 3);
+        mouse.moveTo(0, 3);
         mouse.up();
 
         // create end binding
         mouse.downAt(100, 0);
-        mouse.moveTo(100, 10);
-        mouse.moveTo(100, 10);
+        mouse.moveTo(100, 3);
+        mouse.moveTo(100, 3);
         mouse.up();
 
         expect(
@@ -4666,13 +4666,13 @@ describe("history", () => {
 
         // create start binding
         mouse.downAt(0, 0);
-        mouse.moveTo(0, 10);
-        mouse.upAt(0, 10);
+        mouse.moveTo(0, 3);
+        mouse.upAt(0, 3);
 
         // create end binding
         mouse.downAt(100, 0);
-        mouse.moveTo(100, 10);
-        mouse.upAt(100, 10);
+        mouse.moveTo(100, 3);
+        mouse.upAt(100, 3);
 
         expect(h.elements).toEqual(
           expect.arrayContaining([
@@ -5031,8 +5031,8 @@ describe("history", () => {
         // bind arrow to rect1 and rect2
         UI.clickTool("arrow");
         mouse.down(0, 0);
-        mouse.moveTo(50, 0);
-        mouse.up(50, 0);
+        mouse.moveTo(50, 3);
+        mouse.up(50, 3);
 
         const arrowId = h.elements[2].id;
 
