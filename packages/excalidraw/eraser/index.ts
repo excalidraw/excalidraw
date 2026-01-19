@@ -30,7 +30,7 @@ import { getBoundTextElementId } from "@excalidraw/element";
 
 import type { Bounds } from "@excalidraw/common";
 
-import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
+import type { GlobalPoint, LineSegment } from "@excalidraw/math";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import { AnimatedTrail } from "../animated-trail";
