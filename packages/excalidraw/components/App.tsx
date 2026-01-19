@@ -6581,6 +6581,34 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const hasDeselectedButton = Boolean(event.buttons);
+
+    // Laser tool: only handle link icon hovering
+    if (this.state.activeTool.type === "laser" && !hasDeselectedButton) {
+      const hitElementMightBeLocked = this.getElementAtPosition(
+        scenePointerX,
+        scenePointerY,
+        { preferSelected: true, includeLockedElements: true },
+      );
+      this.hitLinkElement = this.getElementLinkAtPosition(
+        scenePointer,
+        hitElementMightBeLocked,
+      );
+      if (
+        this.hitLinkElement &&
+        !this.state.selectedElementIds[this.hitLinkElement.id]
+      ) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+        showHyperlinkTooltip(
+          this.hitLinkElement,
+          this.state,
+          this.scene.getNonDeletedElementsMap(),
+        );
+      } else {
+        hideHyperlinkToolip();
+      }
+      return;
+    }
+
     if (
       hasDeselectedButton ||
       (this.state.activeTool.type !== "selection" &&
