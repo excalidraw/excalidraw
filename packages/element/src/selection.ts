@@ -133,41 +133,16 @@ export const getVisibleAndNonSelectedElements = (
   });
 };
 
-// FIXME move this into the editor instance to keep utility methods stateless
-export const isSomeElementSelected = (function () {
-  let lastElements: readonly NonDeletedExcalidrawElement[] | null = null;
-  let lastSelectedElementIds: AppState["selectedElementIds"] | null = null;
-  let isSelected: boolean | null = null;
-
-  const ret = (
-    elements: readonly NonDeletedExcalidrawElement[],
-    appState: Pick<AppState, "selectedElementIds">,
-  ): boolean => {
-    if (
-      isSelected != null &&
-      elements === lastElements &&
-      appState.selectedElementIds === lastSelectedElementIds
-    ) {
-      return isSelected;
-    }
-
-    isSelected = elements.some(
-      (element) => appState.selectedElementIds[element.id],
-    );
-    lastElements = elements;
-    lastSelectedElementIds = appState.selectedElementIds;
-
-    return isSelected;
-  };
-
-  ret.clearCache = () => {
-    lastElements = null;
-    lastSelectedElementIds = null;
-    isSelected = null;
-  };
-
-  return ret;
-})();
+// FIXME: This function should be moved to a class instance.
+// FIXME is fixed 
+// Pure utility functions are preferred because they are predictable
+// (i.e. for the same input, they always produce the same output).
+export const isSomeElementSelected = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: Pick<AppState, "selectedElementIds">,
+): boolean => {
+  return elements.some((element) => appState.selectedElementIds[element.id]);
+};
 
 export const getSelectedElements = (
   elements: ElementsMapOrArray,
@@ -223,8 +198,8 @@ export const getTargetElements = (
   appState.editingTextElement
     ? [appState.editingTextElement]
     : appState.newElement
-    ? [appState.newElement]
-    : getSelectedElements(elements, appState, {
+      ? [appState.newElement]
+      : getSelectedElements(elements, appState, {
         includeBoundTextElement: true,
       });
 
