@@ -2143,6 +2143,7 @@ const pointDraggingUpdates = (
                 pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
                 suggestedBindingElement,
                 elementsMap,
+                app.state.zoom,
               ),
             }
           : null,
@@ -2184,9 +2185,10 @@ const pointDraggingUpdates = (
         ? {
             element: start.element,
             midPoint: getSnapOutlineMidPoint(
-              pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+              start.focusPoint,
               start.element,
               elementsMap,
+              app.state.zoom,
             ),
           }
         : null;
@@ -2219,9 +2221,10 @@ const pointDraggingUpdates = (
         ? {
             element: end.element,
             midPoint: getSnapOutlineMidPoint(
-              pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+              end.focusPoint,
               end.element,
               elementsMap,
+              app.state.zoom,
             ),
           }
         : null;

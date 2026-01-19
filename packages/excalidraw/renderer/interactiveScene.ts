@@ -195,6 +195,7 @@ const renderBindingHighlightForBindableElement_simple = (
   suggestedBinding: NonNullable<AppState["suggestedBinding"]>,
   elementsMap: ElementsMap,
   appState: InteractiveCanvasAppState,
+  pointerCoords: GlobalPoint | null,
 ) => {
   const enclosingFrame =
     suggestedBinding.element.frameId &&
@@ -382,26 +383,11 @@ const renderBindingHighlightForBindableElement_simple = (
         const arrow =
           linearElement?.elementId &&
           LinearElementEditor.getElement(linearElement?.elementId, elementsMap);
-        const pointsIndices = linearElement?.selectedPointsIndices;
-        const pointIdx =
-          arrow &&
-          pointsIndices &&
-          (pointsIndices[0] < 1 || pointsIndices[0] > arrow.points.length - 2)
-            ? pointsIndices[0]
-            : null;
-        const point =
-          arrow &&
-          pointIdx &&
-          LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            arrow,
-            pointIdx,
-            elementsMap,
-          );
         const insideBindable =
-          point &&
+          pointerCoords &&
           arrow &&
           hitElementItself({
-            point,
+            point: pointerCoords,
             element: suggestedBinding.element,
             elementsMap,
             threshold: 0,
@@ -479,12 +465,14 @@ const renderBindingHighlightForBindableElement_simple = (
             context.fill();
           });
 
-          context.fillStyle =
-            appState.theme === THEME.DARK
-              ? `rgba(3, 93, 161, 1)`
-              : `rgba(106, 189, 252, 1)`;
-          context.beginPath();
-          suggestedBinding.midPoint &&
+          // Draw highlighted midpoint if any
+          if (suggestedBinding.midPoint) {
+            context.fillStyle =
+              appState.theme === THEME.DARK
+                ? `rgba(3, 93, 161, 1)`
+                : `rgba(106, 189, 252, 1)`;
+
+            context.beginPath();
             context.arc(
               suggestedBinding.midPoint[0] - suggestedBinding.element.x,
               suggestedBinding.midPoint[1] - suggestedBinding.element.y,
@@ -492,7 +480,8 @@ const renderBindingHighlightForBindableElement_simple = (
               0,
               2 * Math.PI,
             );
-          context.fill();
+            context.fill();
+          }
 
           context.restore();
         }
@@ -859,11 +848,18 @@ const renderBindingHighlightForBindableElement = (
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
+  const pointerCoords = app.lastPointerMoveCoords
+    ? pointFrom<GlobalPoint>(
+        app.lastPointerMoveCoords.x,
+        app.lastPointerMoveCoords.y,
+      )
+    : null;
   renderBindingHighlightForBindableElement_simple(
     context,
     suggestedBinding,
     allElementsMap,
     appState,
+    pointerCoords,
   );
   context.restore();
 };

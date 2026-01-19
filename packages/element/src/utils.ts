@@ -587,7 +587,7 @@ export const getSnapOutlineMidPoint = (
   point: GlobalPoint,
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
-  zoom?: AppState["zoom"],
+  zoom: AppState["zoom"],
 ) => {
   const center = elementCenterPoint(element, elementsMap);
   const sideMidpoints = [
@@ -642,7 +642,7 @@ export const projectFixedPointOntoDiagonal = (
   element: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
-  zoom?: AppState["zoom"],
+  zoom: AppState["zoom"],
 ): GlobalPoint | null => {
   invariant(arrow.points.length >= 2, "Arrow must have at least two points");
   if (arrow.width < 3 && arrow.height < 3) {

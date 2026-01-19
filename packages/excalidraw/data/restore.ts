@@ -82,7 +82,12 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
-import type { AppState, BinaryFiles, LibraryItem } from "../types";
+import type {
+  AppState,
+  BinaryFiles,
+  LibraryItem,
+  NormalizedZoomValue,
+} from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
@@ -211,6 +216,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
             boundElement,
             startOrEnd,
             elementsMap,
+            { value: 1 as NormalizedZoomValue },
           ) || p;
     const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
       element,
