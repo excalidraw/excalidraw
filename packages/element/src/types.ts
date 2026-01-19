@@ -32,6 +32,10 @@ type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
 export type VerticalAlign = typeof VERTICAL_ALIGN[VerticalAlignKeys];
 export type FractionalIndex = string & { _brand: "franctionalIndex" };
 
+export type beforeElementCreated = (
+  element: ExcalidrawElement,
+) => ExcalidrawElement;
+
 export type BoundElement = Readonly<{
   id: ExcalidrawLinearElement["id"];
   type: "arrow" | "text";
