@@ -170,9 +170,9 @@ export const isSavedToFirebase = (
 };
 
 export const saveFilesToFirebase = async ({
-                                            prefix,
-                                            files,
-                                          }: {
+  prefix,
+  files,
+}: {
   prefix: string;
   files: { id: FileId; buffer: Uint8Array }[];
 }) => {

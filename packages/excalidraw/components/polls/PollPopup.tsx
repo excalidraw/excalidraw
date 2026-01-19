@@ -1,8 +1,10 @@
 import React, { useMemo, useState } from "react";
 
 import { t } from "../../i18n";
-import type { PollMetadata } from "../../poll/types";
+
 import { PollCard } from "./PollCard";
+
+import type { PollMetadata } from "../../poll/types";
 
 type PollPopupProps = {
   polls: readonly PollMetadata[];
@@ -31,9 +33,7 @@ const sortPolls = (
   if (!selectedPollId) {
     return sorted;
   }
-  const selectedIndex = sorted.findIndex(
-    (poll) => poll.id === selectedPollId,
-  );
+  const selectedIndex = sorted.findIndex((poll) => poll.id === selectedPollId);
   if (selectedIndex > 0) {
     const [selected] = sorted.splice(selectedIndex, 1);
     sorted.unshift(selected);
@@ -42,18 +42,18 @@ const sortPolls = (
 };
 
 export const PollPopup = ({
-                            polls,
-                            selectedPollId,
-                            viewModeEnabled,
-                            pollSessionId,
-                            getPollCountsAsObject,
-                            getPollSelection,
-                            updatePollMetadata,
-                            handlePollVote,
-                            startPoll,
-                            stopPoll,
-                            togglePollReveal,
-                          }: PollPopupProps) => {
+  polls,
+  selectedPollId,
+  viewModeEnabled,
+  pollSessionId,
+  getPollCountsAsObject,
+  getPollSelection,
+  updatePollMetadata,
+  handlePollVote,
+  startPoll,
+  stopPoll,
+  togglePollReveal,
+}: PollPopupProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const openPolls = useMemo(() => {

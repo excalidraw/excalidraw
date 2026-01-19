@@ -212,8 +212,8 @@ const initializeScene = async (opts: {
   excalidrawAPI: ExcalidrawImperativeAPI;
 }): Promise<
   { scene: ExcalidrawInitialDataState | null } & (
-  | { isExternalScene: true; id: string; key: string }
-  | { isExternalScene: false; id?: null; key?: null }
+    | { isExternalScene: true; id: string; key: string }
+    | { isExternalScene: false; id?: null; key?: null }
   )
 > => {
   const searchParams = new URLSearchParams(window.location.search);
@@ -329,11 +329,11 @@ const initializeScene = async (opts: {
   } else if (scene) {
     return isExternalScene && jsonBackendMatch
       ? {
-        scene,
-        isExternalScene,
-        id: jsonBackendMatch[1],
-        key: jsonBackendMatch[2],
-      }
+          scene,
+          isExternalScene,
+          id: jsonBackendMatch[1],
+          key: jsonBackendMatch[2],
+        }
       : { scene, isExternalScene: false };
   }
   return { scene: null, isExternalScene: false };
@@ -830,27 +830,27 @@ const ExcalidrawWrapper = () => {
               onExportToBackend,
               renderCustomUI: excalidrawAPI
                 ? (elements, appState, files) => {
-                  return (
-                    <ExportToExcalidrawPlus
-                      elements={elements}
-                      appState={appState}
-                      files={files}
-                      name={excalidrawAPI.getName()}
-                      onError={(error) => {
-                        excalidrawAPI?.updateScene({
-                          appState: {
-                            errorMessage: error.message,
-                          },
-                        });
-                      }}
-                      onSuccess={() => {
-                        excalidrawAPI.updateScene({
-                          appState: { openDialog: null },
-                        });
-                      }}
-                    />
-                  );
-                }
+                    return (
+                      <ExportToExcalidrawPlus
+                        elements={elements}
+                        appState={appState}
+                        files={files}
+                        name={excalidrawAPI.getName()}
+                        onError={(error) => {
+                          excalidrawAPI?.updateScene({
+                            appState: {
+                              errorMessage: error.message,
+                            },
+                          });
+                        }}
+                        onSuccess={() => {
+                          excalidrawAPI.updateScene({
+                            appState: { openDialog: null },
+                          });
+                        }}
+                      />
+                    );
+                  }
                 : undefined,
             },
           },
@@ -1114,11 +1114,11 @@ const ExcalidrawWrapper = () => {
             },
             ...(isExcalidrawPlusSignedUser
               ? [
-                {
-                  ...ExcalidrawPlusAppCommand,
-                  label: "Sign in / Go to Excalidraw+",
-                },
-              ]
+                  {
+                    ...ExcalidrawPlusAppCommand,
+                    label: "Sign in / Go to Excalidraw+",
+                  },
+                ]
               : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
 
             {

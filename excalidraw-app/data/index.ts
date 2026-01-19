@@ -135,8 +135,8 @@ export type SocketUpdateDataIncoming =
 
 export type SocketUpdateData =
   SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
-  _brand: "socketUpdateData";
-};
+    _brand: "socketUpdateData";
+  };
 
 const RE_COLLAB_LINK = /^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/;
 
@@ -178,9 +178,9 @@ export const getCollaborationLink = (data: {
  * @deprecated
  */
 const legacy_decodeFromBackend = async ({
-                                          buffer,
-                                          decryptionKey,
-                                        }: {
+  buffer,
+  decryptionKey,
+}: {
   buffer: ArrayBuffer;
   decryptionKey: string;
 }) => {

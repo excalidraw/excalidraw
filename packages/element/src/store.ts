@@ -117,21 +117,21 @@ export class Store {
   public scheduleMicroAction(
     params:
       | {
-      action: CaptureUpdateActionType;
-      elements: readonly ExcalidrawElement[] | undefined;
-      appState: AppState | ObservedAppState | undefined;
-    }
+          action: CaptureUpdateActionType;
+          elements: readonly ExcalidrawElement[] | undefined;
+          appState: AppState | ObservedAppState | undefined;
+        }
       | {
-      action: typeof CaptureUpdateAction.IMMEDIATELY;
-      change: StoreChange;
-      delta: StoreDelta;
-    }
+          action: typeof CaptureUpdateAction.IMMEDIATELY;
+          change: StoreChange;
+          delta: StoreDelta;
+        }
       | {
-      action:
-        | typeof CaptureUpdateAction.NEVER
-        | typeof CaptureUpdateAction.EVENTUALLY;
-      change: StoreChange;
-    },
+          action:
+            | typeof CaptureUpdateAction.NEVER
+            | typeof CaptureUpdateAction.EVENTUALLY;
+          change: StoreChange;
+        },
   ) {
     const { action } = params;
 
@@ -317,15 +317,15 @@ export class Store {
   private processAction(
     params:
       | {
-      action: CaptureUpdateActionType;
-      elements: SceneElementsMap | undefined;
-      appState: AppState | ObservedAppState | undefined;
-    }
+          action: CaptureUpdateActionType;
+          elements: SceneElementsMap | undefined;
+          appState: AppState | ObservedAppState | undefined;
+        }
       | {
-      action: CaptureUpdateActionType;
-      change: StoreChange;
-      delta: StoreDelta | undefined;
-    },
+          action: CaptureUpdateActionType;
+          change: StoreChange;
+          delta: StoreDelta | undefined;
+        },
   ) {
     const { action } = params;
 
@@ -413,7 +413,7 @@ export class Store {
       !(
         this.scheduledMacroActions.size >= 0 &&
         this.scheduledMacroActions.size <=
-        Object.keys(CaptureUpdateAction).length
+          Object.keys(CaptureUpdateAction).length
       )
     ) {
       const message = `There can be at most three store actions scheduled at the same time, but there are "${this.scheduledMacroActions.size}".`;
@@ -550,10 +550,10 @@ export class StoreDelta {
    * Parse and load the delta from the remote payload.
    */
   public static load({
-                       id,
-                       elements: { added, removed, updated },
-                       appState: { delta: appStateDelta },
-                     }: DTO<StoreDelta>) {
+    id,
+    elements: { added, removed, updated },
+    appState: { delta: appStateDelta },
+  }: DTO<StoreDelta>) {
     const elements = ElementsDelta.create(added, removed, updated);
     const appState = AppStateDelta.create(appStateDelta);
 
@@ -1021,9 +1021,9 @@ export const getObservedAppState = (
     lockedMultiSelections: appState.lockedMultiSelections,
     selectedLinearElement: appState.selectedLinearElement
       ? {
-        elementId: appState.selectedLinearElement.elementId,
-        isEditing: !!appState.selectedLinearElement.isEditing,
-      }
+          elementId: appState.selectedLinearElement.elementId,
+          isEditing: !!appState.selectedLinearElement.isEditing,
+        }
       : null,
   };
 

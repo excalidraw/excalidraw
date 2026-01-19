@@ -4,8 +4,9 @@ import React, { useState } from "react";
 
 import { t } from "../../i18n";
 
-import type { PollMetadata, PollOption } from "../../poll/types";
 import { CloseIcon, adjustmentsIcon } from "../icons";
+
+import type { PollMetadata, PollOption } from "../../poll/types";
 
 type PollCardProps = {
   metadata: PollMetadata;
@@ -37,16 +38,16 @@ const getTotalVotes = (counts: Record<string, number>) => {
 };
 
 const PollOptionsList = ({
-                           metadata,
-                           editable,
-                           optionsEditable,
-                           voteSelection,
-                           counts,
-                           displayResults,
-                           onChange,
-                           onVote,
-                           canVote,
-                         }: {
+  metadata,
+  editable,
+  optionsEditable,
+  voteSelection,
+  counts,
+  displayResults,
+  onChange,
+  onVote,
+  canVote,
+}: {
   metadata: PollMetadata;
   editable: boolean;
   optionsEditable: boolean;
@@ -190,22 +191,22 @@ const PollOptionsList = ({
 };
 
 export const PollCard = ({
-                           metadata,
-                           isSelected,
-                           canEdit,
-                           canVote,
-                           isOwner,
-                           voteSelection,
-                           counts,
-                           onChange,
-                           onVote,
-                           onStart,
-                           onStop,
-                           onReveal,
-                           now,
-                           showTotalVotes = true,
-                           showQuestionInput = true,
-                         }: PollCardProps) => {
+  metadata,
+  isSelected,
+  canEdit,
+  canVote,
+  isOwner,
+  voteSelection,
+  counts,
+  onChange,
+  onVote,
+  onStart,
+  onStop,
+  onReveal,
+  now,
+  showTotalVotes = true,
+  showQuestionInput = true,
+}: PollCardProps) => {
   const isLive = metadata.status.state === "open";
   const editable = canEdit && isSelected && !isLive;
   const isLocked = metadata.status.state === "open";
@@ -244,9 +245,7 @@ export const PollCard = ({
       <div
         className="excalidraw__poll-header"
         onDoubleClick={() => setShowAdvanced((prev) => !prev)}
-        title={
-          isLocked ? t("poll.showSettingsHint") : undefined
-        }
+        title={isLocked ? t("poll.showSettingsHint") : undefined}
       >
         {showQuestionInput ? (
           editable ? (
@@ -388,7 +387,8 @@ export const PollCard = ({
               value={metadata.settings.resultVisibility}
               onChange={(event) =>
                 toggleSetting("resultVisibility")(
-                  event.target.value as PollMetadata["settings"]["resultVisibility"],
+                  event.target
+                    .value as PollMetadata["settings"]["resultVisibility"],
                 )
               }
               disabled={!optionsEditable}

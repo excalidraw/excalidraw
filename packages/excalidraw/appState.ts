@@ -297,14 +297,14 @@ export const clearAppStateForDatabase = (appState: Partial<AppState>) => {
 };
 
 export const isEraserActive = ({
-                                 activeTool,
-                               }: {
+  activeTool,
+}: {
   activeTool: AppState["activeTool"];
 }) => activeTool.type === "eraser";
 
 export const isHandToolActive = ({
-                                   activeTool,
-                                 }: {
+  activeTool,
+}: {
   activeTool: AppState["activeTool"];
 }) => {
   return activeTool.type === "hand";

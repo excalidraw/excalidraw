@@ -2,7 +2,9 @@ import clsx from "clsx";
 import React, { useMemo, useState } from "react";
 
 import { t } from "../../i18n";
+
 import type { PollMetadata } from "../../poll/types";
+
 import {
   useApp,
   useExcalidrawAppState,
@@ -10,6 +12,7 @@ import {
 } from "../App";
 import { searchIcon } from "../icons";
 import { TextField } from "../TextField";
+
 import { PollCard } from "./PollCard";
 
 import "./PollsSidebar.scss";
@@ -53,9 +56,7 @@ export const PollsSidebar = () => {
   const filteredPolls = useMemo(() => {
     const trimmed = query.trim().toLowerCase();
     const matches = trimmed
-      ? polls.filter((poll) =>
-        poll.question.toLowerCase().includes(trimmed),
-      )
+      ? polls.filter((poll) => poll.question.toLowerCase().includes(trimmed))
       : polls;
     return sortPolls(matches);
   }, [polls, query]);

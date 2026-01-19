@@ -670,12 +670,12 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         insertedSelectedLinearElement &&
         nextElements.has(insertedSelectedLinearElement.elementId)
           ? new LinearElementEditor(
-            nextElements.get(
-              insertedSelectedLinearElement.elementId,
-            ) as NonDeleted<ExcalidrawLinearElement>,
-            nextElements,
-            insertedSelectedLinearElement.isEditing,
-          )
+              nextElements.get(
+                insertedSelectedLinearElement.elementId,
+              ) as NonDeleted<ExcalidrawLinearElement>,
+              nextElements,
+              insertedSelectedLinearElement.isEditing,
+            )
           : null;
 
       const nextAppState = {
@@ -951,8 +951,13 @@ export class AppStateDelta implements DeltaContainer<AppState> {
     delta: Partial<ObservedAppState>,
   ): Partial<ObservedElementsAppState> {
     // WARN: Do not remove the type-casts as they here to ensure proper type checks
-    const { name, viewBackgroundColor, polls, selectedPollId, ...elementsProps } =
-      delta as ObservedAppState;
+    const {
+      name,
+      viewBackgroundColor,
+      polls,
+      selectedPollId,
+      ...elementsProps
+    } = delta as ObservedAppState;
 
     return elementsProps as SubtypeOf<
       typeof elementsProps,
@@ -1089,27 +1094,27 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   }
 
   private static satisfiesAddition = ({
-                                        deleted,
-                                        inserted,
-                                      }: Delta<ElementPartial>) =>
+    deleted,
+    inserted,
+  }: Delta<ElementPartial>) =>
     // dissallowing added as "deleted", which could cause issues when resolving conflicts
     deleted.isDeleted === true && !inserted.isDeleted;
 
   private static satisfiesRemoval = ({
-                                       deleted,
-                                       inserted,
-                                     }: Delta<ElementPartial>) =>
+    deleted,
+    inserted,
+  }: Delta<ElementPartial>) =>
     !deleted.isDeleted && inserted.isDeleted === true;
 
   private static satisfiesUpdate = ({
-                                      deleted,
-                                      inserted,
-                                    }: Delta<ElementPartial>) => !!deleted.isDeleted === !!inserted.isDeleted;
+    deleted,
+    inserted,
+  }: Delta<ElementPartial>) => !!deleted.isDeleted === !!inserted.isDeleted;
 
   private static satisfiesCommmonInvariants = ({
-                                                 deleted,
-                                                 inserted,
-                                               }: Delta<ElementPartial>) =>
+    deleted,
+    inserted,
+  }: Delta<ElementPartial>) =>
     !!(
       // versions are required integers
       (
@@ -1308,42 +1313,42 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         prevElement: OrderedExcalidrawElement | undefined,
         nextElement: OrderedExcalidrawElement | undefined,
       ) =>
-        (partial: ElementPartial, partialType: "deleted" | "inserted") => {
-          let element: OrderedExcalidrawElement | undefined;
+      (partial: ElementPartial, partialType: "deleted" | "inserted") => {
+        let element: OrderedExcalidrawElement | undefined;
 
-          switch (partialType) {
-            case "deleted":
-              element = prevElement;
+        switch (partialType) {
+          case "deleted":
+            element = prevElement;
+            break;
+          case "inserted":
+            element = nextElement;
+            break;
+        }
+
+        // the element wasn't found -> don't update the partial
+        if (!element) {
+          console.error(
+            `Element not found when trying to apply latest changes`,
+          );
+          return partial;
+        }
+
+        const latestPartial: { [key: string]: unknown } = {};
+
+        for (const key of Object.keys(partial) as Array<keyof typeof partial>) {
+          // do not update following props:
+          // - `boundElements`, as it is a reference value which is postprocessed to contain only deleted/inserted keys
+          switch (key) {
+            case "boundElements":
+              latestPartial[key] = partial[key];
               break;
-            case "inserted":
-              element = nextElement;
-              break;
+            default:
+              latestPartial[key] = element[key];
           }
+        }
 
-          // the element wasn't found -> don't update the partial
-          if (!element) {
-            console.error(
-              `Element not found when trying to apply latest changes`,
-            );
-            return partial;
-          }
-
-          const latestPartial: { [key: string]: unknown } = {};
-
-          for (const key of Object.keys(partial) as Array<keyof typeof partial>) {
-            // do not update following props:
-            // - `boundElements`, as it is a reference value which is postprocessed to contain only deleted/inserted keys
-            switch (key) {
-              case "boundElements":
-                latestPartial[key] = partial[key];
-                break;
-              default:
-                latestPartial[key] = element[key];
-            }
-          }
-
-          return latestPartial;
-        };
+        return latestPartial;
+      };
 
     const applyLatestChangesInternal = (
       deltas: Record<string, Delta<ElementPartial>>,
@@ -1572,42 +1577,42 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       flags: ApplyToFlags,
       options?: ApplyToOptions,
     ) =>
-      (deltas: Record<string, Delta<ElementPartial>>) => {
-        const getElement = ElementsDelta.createGetter(
-          nextElements,
-          snapshot,
-          flags,
-        );
+    (deltas: Record<string, Delta<ElementPartial>>) => {
+      const getElement = ElementsDelta.createGetter(
+        nextElements,
+        snapshot,
+        flags,
+      );
 
-        return Object.entries(deltas).reduce((acc, [id, delta]) => {
-          const element = getElement(id, delta.inserted);
+      return Object.entries(deltas).reduce((acc, [id, delta]) => {
+        const element = getElement(id, delta.inserted);
 
-          if (element) {
-            const nextElement = ElementsDelta.applyDelta(
-              element,
-              delta,
-              flags,
-              options,
-            );
+        if (element) {
+          const nextElement = ElementsDelta.applyDelta(
+            element,
+            delta,
+            flags,
+            options,
+          );
 
-            nextElements.set(nextElement.id, nextElement);
-            acc.set(nextElement.id, nextElement);
+          nextElements.set(nextElement.id, nextElement);
+          acc.set(nextElement.id, nextElement);
 
-            if (!flags.applyDirection) {
-              const prevElement = prevElements.get(id);
+          if (!flags.applyDirection) {
+            const prevElement = prevElements.get(id);
 
-              if (prevElement) {
-                flags.applyDirection =
-                  prevElement.version > nextElement.version
-                    ? "backward"
-                    : "forward";
-              }
+            if (prevElement) {
+              flags.applyDirection =
+                prevElement.version > nextElement.version
+                  ? "backward"
+                  : "forward";
             }
           }
+        }
 
-          return acc;
-        }, new Map<string, OrderedExcalidrawElement>());
-      };
+        return acc;
+      }, new Map<string, OrderedExcalidrawElement>());
+    };
 
   private static createGetter =
     (
@@ -1615,34 +1620,34 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       snapshot: StoreSnapshot["elements"],
       flags: ApplyToFlags,
     ) =>
-      (id: string, partial: ElementPartial) => {
-        let element = elements.get(id);
+    (id: string, partial: ElementPartial) => {
+      let element = elements.get(id);
 
-        if (!element) {
-          // always fallback to the local snapshot, in cases when we cannot find the element in the elements array
-          element = snapshot.get(id);
+      if (!element) {
+        // always fallback to the local snapshot, in cases when we cannot find the element in the elements array
+        element = snapshot.get(id);
 
-          if (element) {
-            // as the element was brought from the snapshot, it automatically results in a possible zindex difference
-            flags.containsZindexDifference = true;
+        if (element) {
+          // as the element was brought from the snapshot, it automatically results in a possible zindex difference
+          flags.containsZindexDifference = true;
 
-            // as the element was force deleted, we need to check if adding it back results in a visible change
-            if (!partial.isDeleted || (partial.isDeleted && !element.isDeleted)) {
-              flags.containsVisibleDifference = true;
-            }
-          } else {
-            // not in elements, not in snapshot? element might have been added remotely!
-            element = newElementWith(
-              { id, version: 1 } as OrderedExcalidrawElement,
-              {
-                ...partial,
-              },
-            );
+          // as the element was force deleted, we need to check if adding it back results in a visible change
+          if (!partial.isDeleted || (partial.isDeleted && !element.isDeleted)) {
+            flags.containsVisibleDifference = true;
           }
+        } else {
+          // not in elements, not in snapshot? element might have been added remotely!
+          element = newElementWith(
+            { id, version: 1 } as OrderedExcalidrawElement,
+            {
+              ...partial,
+            },
+          );
         }
+      }
 
-        return element;
-      };
+      return element;
+    };
 
   private static applyDelta(
     element: OrderedExcalidrawElement,

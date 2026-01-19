@@ -217,7 +217,7 @@ class Portal {
           pointer: payload.pointer,
           button: payload.button || "up",
           selectedElementIds:
-          this.collab.excalidrawAPI.getAppState().selectedElementIds,
+            this.collab.excalidrawAPI.getAppState().selectedElementIds,
           username: this.collab.state.username,
         },
       };
