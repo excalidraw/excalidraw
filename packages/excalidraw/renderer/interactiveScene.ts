@@ -29,6 +29,7 @@ import {
   getTransformHandlesFromCoords,
   hasBoundingBox,
   hitElementItself,
+  isBindableElement,
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
@@ -377,130 +378,118 @@ const renderBindingHighlightForBindableElement_simple = (
 
       context.restore();
 
-      // Draw midpoint indicators
-      if (!isFrameLikeElement(suggestedBinding.element)) {
-        const linearElement = appState.selectedLinearElement;
-        const arrow =
-          linearElement?.elementId &&
-          LinearElementEditor.getElement(linearElement?.elementId, elementsMap);
-        const insideBindable =
-          pointerCoords &&
-          arrow &&
-          hitElementItself({
-            point: pointerCoords,
-            element: suggestedBinding.element,
-            elementsMap,
-            threshold: 0,
-            overrideShouldTestInside: true,
-          });
-
-        if (!insideBindable) {
-          context.save();
-          context.translate(
-            suggestedBinding.element.x,
-            suggestedBinding.element.y,
-          );
-
-          const midpointRadius = 5 / appState.zoom.value;
-
-          let midpoints: LocalPoint[];
-          if (suggestedBinding.element.type === "diamond") {
-            const center = elementCenterPoint(
-              suggestedBinding.element,
-              elementsMap,
-            );
-            midpoints = getDiamondBaseCorners(suggestedBinding.element).map(
-              (curve) => {
-                const point = bezierEquation(curve, 0.5);
-                const rotatedPoint = pointRotateRads(
-                  point,
-                  center,
-                  suggestedBinding.element.angle,
-                );
-
-                return pointFrom<LocalPoint>(
-                  rotatedPoint[0] - suggestedBinding.element.x,
-                  rotatedPoint[1] - suggestedBinding.element.y,
-                );
-              },
-            );
-          } else {
-            const center = elementCenterPoint(
-              suggestedBinding.element,
-              elementsMap,
-            );
-            const basePoints = [
-              { x: suggestedBinding.element.width / 2, y: 0 }, // TOP
-              {
-                x: suggestedBinding.element.width,
-                y: suggestedBinding.element.height / 2,
-              }, // RIGHT
-              {
-                x: suggestedBinding.element.width / 2,
-                y: suggestedBinding.element.height,
-              }, // BOTTOM
-              { x: 0, y: suggestedBinding.element.height / 2 }, // LEFT
-            ];
-            midpoints = basePoints.map((point) => {
-              const globalPoint = pointFrom<GlobalPoint>(
-                point.x + suggestedBinding.element.x,
-                point.y + suggestedBinding.element.y,
-              );
-              const rotatedPoint = pointRotateRads(
-                globalPoint,
-                center,
-                suggestedBinding.element.angle,
-              );
-              return pointFrom<LocalPoint>(
-                rotatedPoint[0] - suggestedBinding.element.x,
-                rotatedPoint[1] - suggestedBinding.element.y,
-              );
-            });
-          }
-          const highlightedPoint =
-            suggestedBinding.midPoint &&
-            pointFrom<LocalPoint>(
-              suggestedBinding.midPoint[0] - suggestedBinding.element.x,
-              suggestedBinding.midPoint[1] - suggestedBinding.element.y,
-            );
-
-          midpoints.forEach((midpoint) => {
-            const isHighlighted =
-              highlightedPoint && pointsEqual(highlightedPoint, midpoint, 1);
-            if (!isHighlighted) {
-              context.fillStyle = `rgba(0,0,0,0.2)`;
-              context.beginPath();
-              context.arc(
-                midpoint[0],
-                midpoint[1],
-                midpointRadius,
-                0,
-                2 * Math.PI,
-              );
-              context.fill();
-            } else {
-              context.fillStyle =
-                appState.theme === THEME.DARK
-                  ? `rgba(3, 93, 161, 1)`
-                  : `rgba(106, 189, 252, 1)`;
-
-              context.beginPath();
-              context.arc(
-                midpoint[0],
-                midpoint[1],
-                midpointRadius,
-                0,
-                2 * Math.PI,
-              );
-              context.fill();
-            }
-          });
-
-          context.restore();
-        }
-      }
-
       break;
+  }
+
+  if (
+    isFrameLikeElement(suggestedBinding.element) ||
+    isBindableElement(suggestedBinding.element)
+  ) {
+    // Draw midpoint indicators
+    const linearElement = appState.selectedLinearElement;
+    const arrow =
+      linearElement?.elementId &&
+      LinearElementEditor.getElement(linearElement?.elementId, elementsMap);
+    const insideBindable =
+      pointerCoords &&
+      arrow &&
+      hitElementItself({
+        point: pointerCoords,
+        element: suggestedBinding.element,
+        elementsMap,
+        threshold: 0,
+        overrideShouldTestInside: true,
+      });
+
+    if (!insideBindable) {
+      context.save();
+      context.translate(suggestedBinding.element.x, suggestedBinding.element.y);
+
+      const midpointRadius = 5 / appState.zoom.value;
+
+      let midpoints: LocalPoint[];
+      if (suggestedBinding.element.type === "diamond") {
+        const center = elementCenterPoint(
+          suggestedBinding.element,
+          elementsMap,
+        );
+        midpoints = getDiamondBaseCorners(suggestedBinding.element).map(
+          (curve) => {
+            const point = bezierEquation(curve, 0.5);
+            const rotatedPoint = pointRotateRads(
+              point,
+              center,
+              suggestedBinding.element.angle,
+            );
+
+            return pointFrom<LocalPoint>(
+              rotatedPoint[0] - suggestedBinding.element.x,
+              rotatedPoint[1] - suggestedBinding.element.y,
+            );
+          },
+        );
+      } else {
+        const center = elementCenterPoint(
+          suggestedBinding.element,
+          elementsMap,
+        );
+        const basePoints = [
+          { x: suggestedBinding.element.width / 2, y: 0 }, // TOP
+          {
+            x: suggestedBinding.element.width,
+            y: suggestedBinding.element.height / 2,
+          }, // RIGHT
+          {
+            x: suggestedBinding.element.width / 2,
+            y: suggestedBinding.element.height,
+          }, // BOTTOM
+          { x: 0, y: suggestedBinding.element.height / 2 }, // LEFT
+        ];
+        midpoints = basePoints.map((point) => {
+          const globalPoint = pointFrom<GlobalPoint>(
+            point.x + suggestedBinding.element.x,
+            point.y + suggestedBinding.element.y,
+          );
+          const rotatedPoint = pointRotateRads(
+            globalPoint,
+            center,
+            suggestedBinding.element.angle,
+          );
+          return pointFrom<LocalPoint>(
+            rotatedPoint[0] - suggestedBinding.element.x,
+            rotatedPoint[1] - suggestedBinding.element.y,
+          );
+        });
+      }
+      const highlightedPoint =
+        suggestedBinding.midPoint &&
+        pointFrom<LocalPoint>(
+          suggestedBinding.midPoint[0] - suggestedBinding.element.x,
+          suggestedBinding.midPoint[1] - suggestedBinding.element.y,
+        );
+
+      midpoints.forEach((midpoint) => {
+        const isHighlighted =
+          highlightedPoint && pointsEqual(highlightedPoint, midpoint, 1);
+        if (!isHighlighted) {
+          context.fillStyle = `rgba(0,0,0,0.2)`;
+          context.beginPath();
+          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+          context.fill();
+        } else {
+          context.fillStyle =
+            appState.theme === THEME.DARK
+              ? `rgba(3, 93, 161, 1)`
+              : `rgba(106, 189, 252, 1)`;
+
+          context.beginPath();
+          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+          context.fill();
+        }
+      });
+
+      context.restore();
+    }
   }
 };
 
