@@ -109,6 +109,7 @@ interface CollabState {
 export const activeRoomLinkAtom = atom<string | null>(null);
 
 type CollabInstance = InstanceType<typeof Collab>;
+type PollBallots = NonNullable<AppState["polls"][number]["ballots"]>;
 
 export interface CollabAPI {
   /** function so that we can access the latest value from stale callbacks */
@@ -587,21 +588,24 @@ class Collab extends PureComponent<CollabProps, CollabState> {
               this.initializeRoom({ fetchScene: false });
               const remoteElements = decryptedData.payload.elements;
               const remotePolls = decryptedData.payload.appState?.polls;
+              const mergedPolls = remotePolls
+                ? this.mergePolls(remotePolls)
+                : null;
               const reconciledElements =
                 this._reconcileElements(remoteElements);
               this.handleRemoteSceneUpdate(reconciledElements);
-              if (remotePolls) {
+              if (mergedPolls) {
                 this.excalidrawAPI.updateScene({
-                  appState: { polls: remotePolls },
+                  appState: { polls: mergedPolls },
                   captureUpdate: CaptureUpdateAction.NEVER,
                 });
                 this.lastBroadcastedOrReceivedPollsHash =
-                  this.getPollsHash(remotePolls);
+                  this.getPollsHash(mergedPolls);
               }
               // noop if already resolved via init from firebase
               scenePromise.resolve({
                 elements: reconciledElements,
-                appState: remotePolls ? { polls: remotePolls } : undefined,
+                appState: mergedPolls ? { polls: mergedPolls } : undefined,
                 scrollToContent: true,
               });
             }
@@ -612,13 +616,15 @@ class Collab extends PureComponent<CollabProps, CollabState> {
               this._reconcileElements(decryptedData.payload.elements),
             );
             if (decryptedData.payload.appState?.polls) {
-              const remotePolls = decryptedData.payload.appState.polls;
+              const mergedPolls = this.mergePolls(
+                decryptedData.payload.appState.polls,
+              );
               this.excalidrawAPI.updateScene({
-                appState: { polls: remotePolls },
+                appState: { polls: mergedPolls },
                 captureUpdate: CaptureUpdateAction.NEVER,
               });
               this.lastBroadcastedOrReceivedPollsHash =
-                this.getPollsHash(remotePolls);
+                this.getPollsHash(mergedPolls);
             }
             break;
           case WS_SUBTYPES.MOUSE_LOCATION: {
@@ -932,6 +938,81 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     return hashString(JSON.stringify(polls));
   };
 
+  private mergePolls = (remotePolls: AppState["polls"]) => {
+    const localPolls = this.excalidrawAPI.getAppState().polls;
+    if (!localPolls.length) {
+      return remotePolls;
+    }
+
+    const localById = new Map(localPolls.map((poll) => [poll.id, poll]));
+    const remoteIds = new Set<string>();
+
+    const merged = remotePolls.map((remotePoll) => {
+      remoteIds.add(remotePoll.id);
+      const localPoll = localById.get(remotePoll.id);
+      if (!localPoll) {
+        return remotePoll;
+      }
+
+      const allowedOptions = new Set(
+        remotePoll.options.map((option) => option.id),
+      );
+      const ballots = this.mergePollBallots(
+        localPoll.ballots,
+        remotePoll.ballots,
+        allowedOptions,
+      );
+
+      return {
+        ...remotePoll,
+        ballots,
+      };
+    });
+
+    for (const poll of localPolls) {
+      if (!remoteIds.has(poll.id)) {
+        merged.push(poll);
+      }
+    }
+
+    return merged;
+  };
+
+  private mergePollBallots = (
+    localBallots: AppState["polls"][number]["ballots"],
+    remoteBallots: AppState["polls"][number]["ballots"],
+    allowedOptions: Set<string>,
+  ): PollBallots => {
+    const merged: PollBallots = {};
+    const local = localBallots ?? {};
+    const remote = remoteBallots ?? {};
+    const sessionIds = new Set([...Object.keys(local), ...Object.keys(remote)]);
+
+    sessionIds.forEach((sessionId) => {
+      const localVote = local[sessionId];
+      const remoteVote = remote[sessionId];
+      if (!localVote && !remoteVote) {
+        return;
+      }
+      const localUpdatedAt = localVote?.updatedAt ?? 0;
+      const remoteUpdatedAt = remoteVote?.updatedAt ?? 0;
+      const chosen = remoteUpdatedAt >= localUpdatedAt ? remoteVote : localVote;
+      if (!chosen) {
+        return;
+      }
+
+      const optionIds = (chosen.optionIds ?? []).filter((id) =>
+        allowedOptions.has(id),
+      );
+      merged[sessionId] = {
+        optionIds,
+        updatedAt: chosen.updatedAt ?? 0,
+      };
+    });
+
+    return merged;
+  };
+
   onPointerUpdate = throttle(
     (payload: {
       pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
@@ -981,9 +1062,12 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       return;
     }
 
-    this.portal.broadcastScene(WS_SUBTYPES.UPDATE, elements, false, {
-      polls: appState.polls,
-    });
+    this.portal.broadcastScene(
+      WS_SUBTYPES.UPDATE,
+      elements,
+      false,
+      shouldBroadcastPolls ? { polls: appState.polls } : undefined,
+    );
 
     if (shouldBroadcastElements) {
       this.lastBroadcastedOrReceivedSceneVersion = sceneVersion;
@@ -1000,11 +1084,14 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   queueBroadcastAllElements = throttle(() => {
     const appState = this.excalidrawAPI.getAppState();
+    const pollsHash = this.getPollsHash(appState.polls);
+    const shouldBroadcastPolls =
+      this.lastBroadcastedOrReceivedPollsHash !== pollsHash;
     this.portal.broadcastScene(
       WS_SUBTYPES.UPDATE,
       this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       true,
-      { polls: appState.polls },
+      shouldBroadcastPolls ? { polls: appState.polls } : undefined,
     );
     const currentVersion = this.getLastBroadcastedOrReceivedSceneVersion();
     const newVersion = Math.max(
@@ -1012,7 +1099,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       getSceneVersion(this.getSceneElementsIncludingDeleted()),
     );
     this.setLastBroadcastedOrReceivedSceneVersion(newVersion);
-    this.lastBroadcastedOrReceivedPollsHash = this.getPollsHash(appState.polls);
+    this.lastBroadcastedOrReceivedPollsHash = pollsHash;
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
   queueSaveToFirebase = throttle(
