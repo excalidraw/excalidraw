@@ -2190,8 +2190,6 @@ const pointDraggingUpdates = (
         ? {
             element: start.element,
             midPoint: getSnapOutlineMidPoint(
-              element,
-              "start",
               pointFrom<GlobalPoint>(
                 scenePointerX - linearElementEditor.pointerOffset.x,
                 scenePointerY - linearElementEditor.pointerOffset.y,
@@ -2199,6 +2197,8 @@ const pointDraggingUpdates = (
               start.element,
               elementsMap,
               app.state.zoom,
+              "start",
+              element,
             ),
           }
         : null;
@@ -2231,8 +2231,6 @@ const pointDraggingUpdates = (
         ? {
             element: end.element,
             midPoint: getSnapOutlineMidPoint(
-              element,
-              "end",
               pointFrom<GlobalPoint>(
                 scenePointerX - linearElementEditor.pointerOffset.x,
                 scenePointerY - linearElementEditor.pointerOffset.y,
@@ -2240,6 +2238,8 @@ const pointDraggingUpdates = (
               end.element,
               elementsMap,
               app.state.zoom,
+              "end",
+              element,
             ),
           }
         : null;

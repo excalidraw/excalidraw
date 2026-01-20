@@ -589,12 +589,12 @@ const getDiagonalsForBindableElement = (
 };
 
 export const getSnapOutlineMidPoint = (
-  arrow: ExcalidrawArrowElement,
-  startOrEnd: "start" | "end",
   point: GlobalPoint,
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
   zoom: AppState["zoom"],
+  startOrEnd: "start" | "end" = "start",
+  arrow?: ExcalidrawArrowElement,
 ) => {
   const center = elementCenterPoint(element, elementsMap);
   const sideMidpoints =
@@ -649,6 +649,10 @@ export const getSnapOutlineMidPoint = (
       }),
   );
 
+  if (!arrow) {
+    return candidate;
+  }
+
   if (candidate) {
     const intersector = lineSegment<GlobalPoint>(
       point,
@@ -687,12 +691,12 @@ export const projectFixedPointOntoDiagonal = (
   }
 
   const sideMidPoint = getSnapOutlineMidPoint(
-    arrow,
-    startOrEnd,
     point,
     element,
     elementsMap,
     zoom,
+    startOrEnd,
+    arrow,
   );
   if (sideMidPoint) {
     return sideMidPoint;

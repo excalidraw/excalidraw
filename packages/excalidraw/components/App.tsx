@@ -8694,17 +8694,20 @@ class App extends React.Component<AppProps, AppState> {
             bindMode: "orbit",
             newElement: element,
             startBoundElement: boundElement,
-            suggestedBinding: boundElement
-              ? {
-                  element: boundElement,
-                  midPoint: getSnapOutlineMidPoint(
-                    point,
-                    boundElement,
-                    elementsMap,
-                    this.state.zoom,
-                  ),
-                }
-              : null,
+            suggestedBinding:
+              boundElement && isBindingElement(element)
+                ? {
+                    element: boundElement,
+                    midPoint: getSnapOutlineMidPoint(
+                      point,
+                      boundElement,
+                      elementsMap,
+                      this.state.zoom,
+                      "end",
+                      element,
+                    ),
+                  }
+                : null,
             selectedElementIds: nextSelectedElementIds,
             selectedLinearElement: linearElementEditor,
           };
