@@ -623,6 +623,7 @@
   "chat": {
     "inputPlaceholder": "",
     "inputPlaceholderWithMessages": "",
+    "generating": "",
     "rateLimitRemaining": "",
     "role": {
       "user": "",
