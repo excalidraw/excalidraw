@@ -10052,7 +10052,7 @@ class App extends React.Component<AppProps, AppState> {
             });
           }
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
-          if (isBindingElement(newElement, false)) {
+          if (isLinearElement(newElement)) {
             this.actionManager.executeAction(actionFinalize, "ui", {
               event: childEvent,
               sceneCoords,
