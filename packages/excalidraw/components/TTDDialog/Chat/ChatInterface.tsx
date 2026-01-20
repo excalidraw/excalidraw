@@ -90,7 +90,9 @@ export const ChatInterface = ({
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === KEYS.ENTER && !event.shiftKey) {
       event.preventDefault();
-      handleSubmit();
+      if (!isGenerating) {
+        handleSubmit();
+      }
     }
   };
 
@@ -143,7 +145,14 @@ export const ChatInterface = ({
 
       <div className="chat-interface__input-container">
         <div className="chat-interface__input-outer">
-          <div className="chat-interface__input-wrapper">
+          <div
+            className="chat-interface__input-wrapper"
+            style={{
+              borderColor: isGenerating
+                ? "var(--dialog-border-color)"
+                : undefined,
+            }}
+          >
             <textarea
               ref={textareaRef}
               autoFocus
@@ -152,13 +161,15 @@ export const ChatInterface = ({
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               placeholder={
-                rateLimits?.rateLimitRemaining === 0
+                isGenerating
+                  ? t("chat.generating")
+                  : rateLimits?.rateLimitRemaining === 0
                   ? t("chat.rateLimit.messageLimitInputPlaceholder")
                   : messages.length > 0
                   ? t("chat.inputPlaceholderWithMessages")
                   : t("chat.inputPlaceholder", { shortcut: "Shift + Enter" })
               }
-              disabled={isGenerating || rateLimits?.rateLimitRemaining === 0}
+              disabled={rateLimits?.rateLimitRemaining === 0}
               rows={1}
               cols={30}
               onInput={onInput}
