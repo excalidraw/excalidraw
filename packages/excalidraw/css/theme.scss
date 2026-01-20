@@ -23,8 +23,11 @@
   --input-hover-bg-color: #{$color-gray-1};
   --input-label-color: #{$color-gray-7};
   --island-bg-color: #ffffff;
+  --island-bg-color-alt: #fff;
   --keybinding-color: var(--color-gray-40);
   --link-color: #{$color-blue-7};
+  --link-color-hover: #{$color-blue-8};
+  --link-color-active: #{$color-blue-2};
   --overlay-bg-color: #{color.adjust(#fff, $alpha: -0.12)};
   --popup-bg-color: var(--island-bg-color);
   --popup-secondary-bg-color: #{$color-gray-1};
@@ -71,6 +74,7 @@
   --library-dropdown-shadow: 0px 15px 6px rgba(0, 0, 0, 0.01),
     0px 8px 5px rgba(0, 0, 0, 0.05), 0px 4px 4px rgba(0, 0, 0, 0.09),
     0px 1px 2px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
+  --chat-msg-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 
   --space-factor: 0.25rem;
   --text-primary-color: var(--color-on-surface);
@@ -198,6 +202,7 @@
     --input-hover-bg-color: #181818;
     --input-label-color: #{$color-gray-2};
     --island-bg-color: #232329;
+    --island-bg-color-alt: hsl(240, 12%, 12%);
     --keybinding-color: var(--color-gray-60);
     --link-color: #{$color-blue-4};
     --overlay-bg-color: #{color.adjust($color-gray-8, $alpha: -0.88)};
