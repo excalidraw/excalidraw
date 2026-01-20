@@ -10052,12 +10052,10 @@ class App extends React.Component<AppProps, AppState> {
             });
           }
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
-          if (isBindingElement(newElement, false)) {
-            this.actionManager.executeAction(actionFinalize, "ui", {
-              event: childEvent,
-              sceneCoords,
-            });
-          }
+          this.actionManager.executeAction(actionFinalize, "ui", {
+            event: childEvent,
+            sceneCoords,
+          });
           this.setState({ suggestedBinding: null, startBoundElement: null });
           if (!activeTool.locked) {
             resetCursor(this.interactiveCanvas);
