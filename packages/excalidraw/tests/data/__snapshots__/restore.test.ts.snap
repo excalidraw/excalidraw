@@ -1,5 +1,52 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`repairing bindings > should strip arrow binding if repair throws 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [],
+  "customData": undefined,
+  "elbowed": false,
+  "endArrowhead": null,
+  "endBinding": null,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id-arrow01",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "points": [
+    [
+      0,
+      0,
+    ],
+    [
+      100,
+      100,
+    ],
+  ],
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "startArrowhead": null,
+  "startBinding": null,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "arrow",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "width": 100,
+  "x": 0,
+  "y": 0,
+}
+`;
+
 exports[`restoreElements > should restore arrow element correctly 1`] = `
 {
   "angle": 0,
@@ -376,6 +423,53 @@ exports[`restoreElements > should restore text element correctly with unknown fo
   "version": 3,
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
+  "width": 100,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`restoreElements > should strip arrow binding if repair throws 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [],
+  "customData": undefined,
+  "elbowed": false,
+  "endArrowhead": null,
+  "endBinding": null,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id-arrow01",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "points": [
+    [
+      0,
+      0,
+    ],
+    [
+      100,
+      100,
+    ],
+  ],
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "startArrowhead": null,
+  "startBinding": null,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "arrow",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
   "width": 100,
   "x": 0,
   "y": 0,
