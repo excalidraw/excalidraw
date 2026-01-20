@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Plakken",
     "pasteAsPlaintext": "Plakken als platte tekst",
-    "pasteCharts": "Plak grafieken",
+    "pasteCharts": "Grafieken plakken",
     "selectAll": "Alles selecteren",
     "multiSelect": "Voeg element toe aan selectie",
     "moveCanvas": "Canvas verplaatsen",
@@ -656,10 +656,10 @@
     },
     "rateLimit": {
       "messageLimit": "Je hebt je AI limiet bereikt op het gratis abonnement. Probeer Excalidraw+ uit voor meer of kom morgen terug.",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "generalRateLimit": "Ho ho, rustig aan, je gaat te snel voor ons! Wacht even voor je het opnieuw probeert.",
+      "messageLimitInputPlaceholder": "Je hebt je berichtenlimiet bereikt"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Upgrade naar Plus"
   },
   "quickSearch": {
     "placeholder": "Snel Zoeken"
