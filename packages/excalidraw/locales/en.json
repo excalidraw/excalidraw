@@ -623,6 +623,7 @@
   "chat": {
     "inputPlaceholder": "Start typing your diagram idea here... ({{shortcut}} for new line)",
     "inputPlaceholderWithMessages": "Continue refining your diagram...",
+    "generating": "Generating...",
     "rateLimitRemaining": "{{count}} requests left today",
     "role": {
       "user": "You",
