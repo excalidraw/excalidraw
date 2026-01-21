@@ -623,7 +623,7 @@
   "chat": {
     "inputPlaceholder": "Începe să îți introduci ideea de diagramă aici... ({{shortcut}} pentru linia nouă)",
     "inputPlaceholderWithMessages": "Continuă rafinarea diagramei...",
-    "generating": "",
+    "generating": "Se generează...",
     "rateLimitRemaining": "Cereri rămase astăzi: {{count}}",
     "role": {
       "user": "Tu",
