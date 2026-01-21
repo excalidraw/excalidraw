@@ -617,8 +617,7 @@
     "inputPlaceholder": "Write Mermaid diagram defintion here..."
   },
   "ttd": {
-    "error": "Error!",
-    "errorMermaidSyntax": "Mermaid syntax error"
+    "error": "Error!"
   },
   "chat": {
     "inputPlaceholder": "Start typing your diagram idea here... ({{shortcut}} for new line)",
@@ -653,7 +652,8 @@
       "fixInMermaid": "Edit Mermaid manually →",
       "aiRepair": "Regenerate (auto-fix) →",
       "requestAborted": "Request aborted",
-      "requestFailed": "Request failed"
+      "requestFailed": "Request failed",
+      "mermaidParseError": "Mermaid syntax error"
     },
     "rateLimit": {
       "messageLimit": "You've hit your AI limit on the free plan. Try out Excalidraw+ for more or come back tomorrow.",

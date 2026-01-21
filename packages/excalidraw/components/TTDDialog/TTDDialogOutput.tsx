@@ -37,7 +37,9 @@ export const TTDDialogOutput = ({
               {t("ttd.error")}
             </div>
             <div className="ttd-dialog-output-error-message">
-              {hideErrorDetails ? t("ttd.errorMermaidSyntax") : error.message}
+              {hideErrorDetails
+                ? t("chat.errors.mermaidParseError")
+                : error.message}
             </div>
           </div>
         </div>
