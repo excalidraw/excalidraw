@@ -617,8 +617,7 @@
     "inputPlaceholder": "Scrie definiţia diagramei Mermaid aici..."
   },
   "ttd": {
-    "error": "Eroare!",
-    "errorMermaidSyntax": "Eroare de sintaxă Mermaid"
+    "error": "Eroare!"
   },
   "chat": {
     "inputPlaceholder": "Începe să îți introduci ideea de diagramă aici... ({{shortcut}} pentru linia nouă)",
@@ -653,7 +652,8 @@
       "fixInMermaid": "Editare Mermaid manual →",
       "aiRepair": "Regenerare (fixare automată) →",
       "requestAborted": "Cerere anulată",
-      "requestFailed": "Cerere nereușită"
+      "requestFailed": "Cerere nereușită",
+      "mermaidParseError": ""
     },
     "rateLimit": {
       "messageLimit": "Ai atins limita IA la planul gratuit. Încearcă Excalidraw+ pentru mai multe sau revino mâine.",
