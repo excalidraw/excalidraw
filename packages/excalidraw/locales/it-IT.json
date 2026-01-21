@@ -617,8 +617,7 @@
     "inputPlaceholder": "Scrivi qui la definizione del diagramma Mermaid..."
   },
   "ttd": {
-    "error": "Errore!",
-    "errorMermaidSyntax": "Errore di sintassi Mermaid"
+    "error": "Errore!"
   },
   "chat": {
     "inputPlaceholder": "Inizia a digitare qui la tua idea per il diagramma... ({{shortcut}} per una nuova riga)",
@@ -653,7 +652,8 @@
       "fixInMermaid": "Modifica Mermaid manualmente→",
       "aiRepair": "Rigenera (correzione automatica) →",
       "requestAborted": "Richiesta annullata",
-      "requestFailed": "Richiesta non riuscita"
+      "requestFailed": "Richiesta non riuscita",
+      "mermaidParseError": ""
     },
     "rateLimit": {
       "messageLimit": "Hai raggiunto il tuo limite di IA sul piano gratuito. Prova Excalidraw+ per saperne di più o torna domani.",
