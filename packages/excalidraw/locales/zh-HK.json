@@ -617,8 +617,7 @@
     "inputPlaceholder": ""
   },
   "ttd": {
-    "error": "",
-    "errorMermaidSyntax": ""
+    "error": ""
   },
   "chat": {
     "inputPlaceholder": "",
@@ -653,7 +652,8 @@
       "fixInMermaid": "",
       "aiRepair": "",
       "requestAborted": "",
-      "requestFailed": ""
+      "requestFailed": "",
+      "mermaidParseError": ""
     },
     "rateLimit": {
       "messageLimit": "",
