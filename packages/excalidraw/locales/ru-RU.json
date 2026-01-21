@@ -617,8 +617,7 @@
     "inputPlaceholder": "Напишите здесь определение диаграммы Mermaid..."
   },
   "ttd": {
-    "error": "Ошибка!",
-    "errorMermaidSyntax": "Синтаксическая ошибка Mermaid"
+    "error": "Ошибка!"
   },
   "chat": {
     "inputPlaceholder": "Начните вводить сюда идею диаграммы... ({{shortcut}} для новой строки)",
@@ -653,7 +652,8 @@
       "fixInMermaid": "Изменить Mermaid вручную →",
       "aiRepair": "Перегенерировать (автоисправление) →",
       "requestAborted": "Запрос отменён",
-      "requestFailed": "Запрос не удался"
+      "requestFailed": "Запрос не удался",
+      "mermaidParseError": ""
     },
     "rateLimit": {
       "messageLimit": "Вы достигли лимита ИИ на бесплатном тарифном плане. Попробуйте Excalidraw+ или вернитесь завтра.",
