@@ -653,7 +653,7 @@
       "aiRepair": "Regenerare (fixare automată) →",
       "requestAborted": "Cerere anulată",
       "requestFailed": "Cerere nereușită",
-      "mermaidParseError": ""
+      "mermaidParseError": "Eroare de sintaxă Mermaid"
     },
     "rateLimit": {
       "messageLimit": "Ai atins limita IA la planul gratuit. Încearcă Excalidraw+ pentru mai multe sau revino mâine.",
