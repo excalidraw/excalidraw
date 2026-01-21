@@ -161,23 +161,18 @@ export const useMermaidRenderer = ({
   useEffect(() => {
     if (lastAssistantMessage?.content && lastAssistantMessage?.isGenerating) {
       throttledRenderMermaid(lastAssistantMessage.content);
-    }
-  }, [
-    throttledRenderMermaid,
-    lastAssistantMessage?.isGenerating,
-    lastAssistantMessage?.content,
-  ]);
-
-  // make sure the last bits are rendered once the streaming is completed
-  useEffect(() => {
-    if (!lastAssistantMessage?.isGenerating) {
+    } else if (!lastAssistantMessage?.isGenerating) {
       throttledRenderMermaid.flush();
       resetThrottleState();
+      if (lastAssistantMessage?.content) {
+        throttledRenderMermaid(lastAssistantMessage.content);
+      }
     }
   }, [
     resetThrottleState,
     throttledRenderMermaid,
     lastAssistantMessage?.isGenerating,
+    lastAssistantMessage?.content,
   ]);
 
   // render the last message if the user navigates between the existing chats
