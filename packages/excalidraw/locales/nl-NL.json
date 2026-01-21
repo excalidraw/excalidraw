@@ -617,8 +617,7 @@
     "inputPlaceholder": "Noteer Mermaid diagram omschrijving hier..."
   },
   "ttd": {
-    "error": "Fout!",
-    "errorMermaidSyntax": "Mermaid syntax fout"
+    "error": "Fout!"
   },
   "chat": {
     "inputPlaceholder": "Begin je diagram idee hier in te typen... ({{shortcut}} voor een nieuwe lijn)",
@@ -653,7 +652,8 @@
       "fixInMermaid": "Mermaid handmatig bewerken →",
       "aiRepair": "Opnieuw genereren (automatisch repareren) →",
       "requestAborted": "Verzoek gestopt",
-      "requestFailed": "Verzoek mislukt"
+      "requestFailed": "Verzoek mislukt",
+      "mermaidParseError": ""
     },
     "rateLimit": {
       "messageLimit": "Je hebt je AI limiet bereikt op het gratis abonnement. Probeer Excalidraw+ uit voor meer of kom morgen terug.",
