@@ -6937,7 +6937,7 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerX,
           scenePointerY,
           this.scene,
-          this.state.zoom,
+          this.state,
         );
       }
 
@@ -7894,7 +7894,7 @@ class App extends React.Component<AppProps, AppState> {
                 arrow,
                 pointerDownState,
                 elementsMap,
-                this.state.zoom,
+                this.state,
               );
 
             // If focus point is hit, update state and prevent element selection
@@ -9054,52 +9054,50 @@ class App extends React.Component<AppProps, AppState> {
       const elementsMap = this.scene.getNonDeletedElementsMap();
 
       if (this.state.selectedLinearElement) {
-        let linearElementEditor = this.state.selectedLinearElement;
+        const linearElementEditor = this.state.selectedLinearElement;
 
         // Handle focus point dragging if needed
         if (linearElementEditor.hoveredFocusPointBinding) {
-          if (
-            handleFocusPointDrag(
-              linearElementEditor,
-              elementsMap,
-              pointerCoords,
-              this.scene,
-              this.state.zoom,
-            )
-          ) {
-            this.setState({
-              selectedLinearElement: {
-                ...linearElementEditor,
-                isDragging: false,
-                selectedPointsIndices: [],
-                initialState: {
-                  ...linearElementEditor.initialState,
-                  lastClickedPoint: -1,
-                },
-              },
-            });
-            return;
-          }
-
-          const element = LinearElementEditor.getElement(
-            linearElementEditor.elementId,
+          handleFocusPointDrag(
+            linearElementEditor,
             elementsMap,
-          )!;
-          linearElementEditor = {
-            ...linearElementEditor,
-            selectedPointsIndices: [
-              linearElementEditor.hoveredFocusPointBinding === "start"
-                ? 0
-                : element.points.length - 1,
-            ],
-            initialState: {
-              ...linearElementEditor.initialState,
-              lastClickedPoint:
-                linearElementEditor.hoveredFocusPointBinding === "start"
-                  ? 0
-                  : element.points.length - 1,
+            pointerCoords,
+            this.scene,
+            this.state,
+            this.getEffectiveGridSize(),
+          );
+          this.setState({
+            selectedLinearElement: {
+              ...linearElementEditor,
+              isDragging: false,
+              selectedPointsIndices: [],
+              initialState: {
+                ...linearElementEditor.initialState,
+                lastClickedPoint: -1,
+              },
             },
-          };
+          });
+          return;
+
+          // const element = LinearElementEditor.getElement(
+          //   linearElementEditor.elementId,
+          //   elementsMap,
+          // )!;
+          // linearElementEditor = {
+          //   ...linearElementEditor,
+          //   selectedPointsIndices: [
+          //     linearElementEditor.hoveredFocusPointBinding === "start"
+          //       ? 0
+          //       : element.points.length - 1,
+          //   ],
+          //   initialState: {
+          //     ...linearElementEditor.initialState,
+          //     lastClickedPoint:
+          //       linearElementEditor.hoveredFocusPointBinding === "start"
+          //         ? 0
+          //         : element.points.length - 1,
+          //   },
+          // };
         }
 
         if (

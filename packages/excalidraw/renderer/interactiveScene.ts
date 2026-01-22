@@ -1041,7 +1041,7 @@ const renderFocusPointIndicators = (
           arrow,
           bindableElement,
           elementsMap,
-          zoom,
+          appState,
         )
       ) {
         const isHovered =
@@ -1100,7 +1100,7 @@ const renderFocusPointIndicators = (
           arrow,
           bindableElement,
           elementsMap,
-          zoom,
+          appState,
         )
       ) {
         const isHovered =
@@ -1520,7 +1520,7 @@ const _renderInteractiveScene = ({
                 arrow,
                 bindableElement,
                 elementsMap,
-                appState.zoom,
+                appState,
               )
             ) {
               renderFocusPointHighlight(context, appState, focusPoint);
