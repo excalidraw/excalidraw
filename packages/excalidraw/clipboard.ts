@@ -556,7 +556,10 @@ export const parseClipboard = async (
   return { text: parsedEventData.value };
 };
 
-export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
+export const copyBlobToClipboard = async (
+  blob: Blob | Promise<Blob>,
+  type: typeof MIME_TYPES[keyof typeof MIME_TYPES],
+) => {
   try {
     // in Safari so far we need to construct the ClipboardItem synchronously
     // (i.e. in the same tick) otherwise browser will complain for lack of
@@ -568,7 +571,7 @@ export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
     // So we need to await this and fallback to awaiting the blob if applicable.
     await navigator.clipboard.write([
       new window.ClipboardItem({
-        [MIME_TYPES.png]: blob,
+        [type]: blob,
       }),
     ]);
   } catch (error: any) {
@@ -577,7 +580,7 @@ export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
     if (isPromiseLike(blob)) {
       await navigator.clipboard.write([
         new window.ClipboardItem({
-          [MIME_TYPES.png]: await blob,
+          [type]: await blob,
         }),
       ]);
     } else {
