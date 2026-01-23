@@ -142,8 +142,8 @@
       "editArrow": "तीर संपादन"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "बहुभुज को तोड़ें",
+      "convertToPolygon": "बहुभुज में बदलें"
     },
     "elementLock": {
       "lock": "ताले में रखें",
@@ -170,8 +170,8 @@
     "copyElementLink": "वस्तु की कड़ी कॉपी करें",
     "linkToElement": "वस्तु की कड़ी",
     "wrapSelectionInFrame": "चौकट में चुने हुवे को लपेटे",
-    "tab": "",
-    "shapeSwitch": ""
+    "tab": "टैब",
+    "shapeSwitch": "आकृति बदलें"
   },
   "elementLink": {
     "title": "वस्तु की कड़ी",
@@ -183,10 +183,10 @@
     "hint_emptyLibrary": "यहाँ जोड़ने के लिए चित्रपटल से एक अवयव चुने, अथवा जन कोष से एक संग्रह नीचे स्थापित करें.",
     "hint_emptyPrivateLibrary": "यहाँ जोड़ने के लिए चित्रपटल से एक अवयव चुने.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "संग्रह में खोजें",
+      "heading": "परिणाम",
+      "noResults": "कोई परिणाम नहीं मिला...",
+      "clearSearch": "खोज मिटाएं"
     }
   },
   "search": {
@@ -195,8 +195,8 @@
     "singleResult": "परिणाम",
     "multipleResults": "परिणाम",
     "placeholder": "पटल पर पाठ्य धूंडे",
-    "frames": "",
-    "texts": ""
+    "frames": "फ्रेम्स",
+    "texts": "पाठ"
   },
   "buttons": {
     "clearReset": "चित्रपटल स्वच्छ करें",
@@ -261,7 +261,7 @@
     "removeItemsFromsLibrary": "{{count}} वस्तु(यें) संग्रह से हटायें?",
     "invalidEncryptionKey": "कूटलेखन कुंजी 22 अक्षरों की होनी चाहिये, इसलिये जीवंत सहयोग अक्षम हैं",
     "collabOfflineWarning": "कोई इंटरनेट कनेक्शन उपलब्ध नहीं है।\nआपके बदलाव सहेजे नहीं जाएंगे!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "ब्राउज़र स्टोरेज भर गया है। परिवर्तन सहेजे नहीं जाएंगे।"
   },
   "errors": {
     "unsupportedFileType": "असमर्थित फाइल प्रकार",
@@ -292,7 +292,7 @@
   },
   "toolBar": {
     "selection": "चयन",
-    "lasso": "",
+    "lasso": "लैसो चयन",
     "image": "प्रतिमा सम्मिलित करें",
     "rectangle": "आयात",
     "diamond": "ईंट",
@@ -313,7 +313,7 @@
     "hand": "हाथ ( खिसका के देखने का औज़ार)",
     "extraTools": "अधिक उपकरण",
     "mermaidToExcalidraw": "मर्मेड से एक्सकाली में",
-    "convertElementType": ""
+    "convertElementType": "आकार का प्रकार बदलें"
   },
   "element": {
     "rectangle": "आयत",
@@ -337,34 +337,34 @@
     "shapes": "आकृतियाँ"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "खोज बंद करने के लिए {{shortcut}} दबाएं",
+    "canvasPanning": "कैनवास को खिसकाने के लिए, {{shortcut_1}} या {{shortcut_2}} दबाकर खींचें",
     "linearElement": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, एकमात्र रेखा के लिए खींचें",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "बिंदुओं के लिए क्लिक करें, रेखा के लिए खींचें। तीर का प्रकार बदलने के लिए {{shortcut}} दबाएं",
+    "arrowBindModifiers": "बंधन रोकने के लिए {{shortcut_1}} दबाएं, या निश्चित बिंदु पर बांधने के लिए {{shortcut_2}} दबाएं",
     "freeDraw": "क्लिक करें और खींचें। समाप्त करने के लिए, छोडे",
     "text": "आप चयन उपकरण से कहीं भी डबल-क्लिक करके पाठ्य को जोड़ सकते हों",
     "embeddable": "वेबसाइट बनाकर जड़ने के लिए क्लिक-ड़्रैग करें",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "text_selected": "पाठ संपादित करने के लिए डबल-क्लिक करें या {{shortcut}} दबाएं",
+    "text_editing": "संपादन समाप्त करने के लिए {{shortcut_1}} या {{shortcut_2}} दबाएं",
+    "linearElementMulti": "समाप्त करने के लिए अंतिम बिंदु पर क्लिक करें या {{shortcut_1}} या {{shortcut_2}} दबाएं",
+    "lockAngle": "कोण को स्थिर रखने के लिए {{shortcut}} दबाएं",
+    "resize": "अनुपात स्थिर रखने के लिए {{shortcut_1}} दबाएं,\nकेंद्र से आकार बदलने के लिए {{shortcut_2}} दबाएं",
+    "resizeImage": "मुक्त रूप से आकार बदलने के लिए {{shortcut_1}} दबाएं,\nकेंद्र से आकार बदलने के लिए {{shortcut_2}} दबाएं",
+    "rotate": "कोण को स्थिर रखने के लिए {{shortcut}} दबाकर घुमाएं",
+    "lineEditor_info": "बिंदुओं को संपादित करने के लिए {{shortcut_1}} दबाएं और डबल-क्लिक करें या {{shortcut_2}} दबाएं",
+    "lineEditor_line_info": "बिंदुओं को संपादित करने के लिए डबल-क्लिक करें या {{shortcut}} दबाएं",
+    "lineEditor_pointSelected": "बिंदु हटाने के लिए {{shortcut_1}} दबाएं,\nडुप्लिकेट करने के लिए {{shortcut_2}}, या स्थानांतरित करने के लिए खींचें",
+    "lineEditor_nothingSelected": "संपादित करने के लिए बिंदु चुनें (बहु-चयन के लिए {{shortcut_1}} दबाएं),\nया नए बिंदु जोड़ने के लिए {{shortcut_2}} दबाकर क्लिक करें",
     "publishLibrary": "आपका अपना समूहकोष प्रकाशित करे",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "पाठ जोड़ने के लिए {{shortcut}} दबाएं",
+    "createFlowchart": "फ्लोचार्ट बनाने के लिए {{shortcut}} दबाएं",
+    "deepBoxSelect": "गहरा चयन करने और खींचने से रोकने के लिए {{shortcut}} दबाएं",
+    "eraserRevert": "हटाने के लिए चिह्नित तत्वों को वापस लाने के लिए {{shortcut}} दबाएं",
     "firefox_clipboard_write": "\"dom.events.asyncClipboard.clipboardItem\" फ़्लैग को \"true\" पर सेट करके इस सुविधा को संभवतः सक्षम किया जा सकता है। Firefox में ब्राउज़र फ़्लैग बदलने के लिए, \"about:config\" पृष्ठ पर जाएँ।",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "स्नैपिंग अक्षम करने के लिए {{shortcut}} दबाएं",
+    "enterCropEditor": "काटने (Crop) के लिए डबल क्लिक करें या {{shortcut}} दबाएं",
+    "leaveCropEditor": "समाप्त करने के लिए बाहर क्लिक करें या {{shortcut_1}} या {{shortcut_2}} दबाएं"
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
@@ -569,7 +569,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "रंग",
     "mostUsedCustomColors": "अधिकांश उपयोगित रंग",
     "colors": "रंग",
     "shades": "छाया",
@@ -651,15 +651,15 @@
     "shortcutHint": "आदेश फलक के लिए, {{shortcut}} का उपयोग कीजिए"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Space",
+    "delete": "Delete",
+    "mmb": "माउस व्हील"
   }
 }
