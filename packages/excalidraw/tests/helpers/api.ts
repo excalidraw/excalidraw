@@ -23,6 +23,8 @@ import { isLinearElementType } from "@excalidraw/element";
 import { getSelectedElements } from "@excalidraw/element";
 import { selectGroupsForSelectedElements } from "@excalidraw/element";
 
+import { FONT_SIZES } from "@excalidraw/common";
+
 import type {
   ExcalidrawElement,
   ExcalidrawGenericElement,
@@ -406,7 +408,7 @@ export class API {
       text: opts?.label?.text || "sample-text",
       width: 50,
       height: 20,
-      fontSize: 16,
+      fontSize: FONT_SIZES.sm,
       containerId: rectangle.id,
       frameId:
         opts?.label?.frameId === undefined
@@ -464,7 +466,7 @@ export class API {
   static readFile = async <T extends "utf8" | null>(
     filepath: string,
     encoding?: T,
-  ): Promise<T extends "utf8" ? string : Buffer> => {
+  ): Promise<T extends "utf8" ? string : ArrayBuffer> => {
     filepath = path.isAbsolute(filepath)
       ? filepath
       : path.resolve(path.join(__dirname, "../", filepath));

@@ -64,6 +64,7 @@ export const ContextMenu = React.memo(
         offsetTop={appState.offsetTop}
         viewportWidth={appState.width}
         viewportHeight={appState.height}
+        className="context-menu-popover"
       >
         <ul
           className="context-menu"

@@ -100,7 +100,7 @@ export const getDefaultAppState = (): Omit<
       panels: STATS_PANELS.generalStats | STATS_PANELS.elementProperties,
     },
     startBoundElement: null,
-    suggestedBindings: [],
+    suggestedBinding: null,
     frameRendering: { enabled: true, clip: true, name: true, outline: true },
     frameToHighlight: null,
     editingFrame: null,
@@ -127,7 +127,7 @@ export const getDefaultAppState = (): Omit<
     searchMatches: null,
     lockedMultiSelections: {},
     activeLockedId: null,
-    stylesPanelMode: "full",
+    bindMode: "orbit",
   };
 };
 
@@ -230,7 +230,7 @@ const APP_STATE_STORAGE_CONF = (<
   shouldCacheIgnoreZoom: { browser: true, export: false, server: false },
   stats: { browser: true, export: false, server: false },
   startBoundElement: { browser: false, export: false, server: false },
-  suggestedBindings: { browser: false, export: false, server: false },
+  suggestedBinding: { browser: false, export: false, server: false },
   frameRendering: { browser: false, export: false, server: false },
   frameToHighlight: { browser: false, export: false, server: false },
   editingFrame: { browser: false, export: false, server: false },
@@ -253,7 +253,7 @@ const APP_STATE_STORAGE_CONF = (<
   searchMatches: { browser: false, export: false, server: false },
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
-  stylesPanelMode: { browser: false, export: false, server: false },
+  bindMode: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

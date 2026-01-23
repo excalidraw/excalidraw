@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Einfügen",
-    "pasteAsPlaintext": "Als reinen Text einfügen",
+    "pasteAsPlaintext": "Als unformatierten Text einfügen",
     "pasteCharts": "Diagramme einfügen",
     "selectAll": "Alle auswählen",
     "multiSelect": "Element zur Auswahl hinzufügen",
@@ -21,7 +21,9 @@
     "copyStyles": "Formatierung kopieren",
     "pasteStyles": "Formatierung übernehmen",
     "stroke": "Strich",
+    "changeStroke": "Strichfarbe ändern",
     "background": "Hintergrund",
+    "changeBackground": "Hintergrundfarbe ändern",
     "fill": "Füllung",
     "strokeWidth": "Strichstärke",
     "strokeStyle": "Konturstil",
@@ -44,6 +46,14 @@
     "arrowhead_triangle_outline": "Dreieck (Umrandung)",
     "arrowhead_diamond": "Raute",
     "arrowhead_diamond_outline": "Raute (Umrandung)",
+    "arrowhead_crowfoot_many": "Krähenfuß (viele)",
+    "arrowhead_crowfoot_one": "Krähenfuß (einer)",
+    "arrowhead_crowfoot_one_or_many": "Krähenfuß (einer oder viele)",
+    "more_options": "Weitere Optionen",
+    "arrowtypes": "Pfeiltyp",
+    "arrowtype_sharp": "Scharfer Pfeil",
+    "arrowtype_round": "Gebogener Pfeil",
+    "arrowtype_elbowed": "Ellenbogen-Pfeil",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "addWatermark": "\"Made with Excalidraw\" hinzufügen",
@@ -72,6 +82,7 @@
     "canvasColors": "Auf Leinwand verwendet",
     "canvasBackground": "Zeichenflächenhintergrund",
     "drawingCanvas": "Leinwand",
+    "clearCanvas": "Zeichenfläche löschen",
     "layers": "Ebenen",
     "actions": "Aktionen",
     "language": "Sprache",
@@ -84,12 +95,13 @@
     "group": "Auswahl gruppieren",
     "ungroup": "Gruppierung aufheben",
     "collaborators": "Mitarbeitende",
-    "showGrid": "Raster anzeigen",
+    "toggleGrid": "Raster umschalten",
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
     "libraryLoadingMessage": "Lade Bibliothek…",
     "libraries": "Bibliotheken durchsuchen",
     "loadingScene": "Lade Zeichnung…",
+    "loadScene": "Szene aus Datei laden",
     "align": "Ausrichten",
     "alignTop": "Obere Kanten",
     "alignBottom": "Untere Kanten",
@@ -105,26 +117,33 @@
     "share": "Teilen",
     "showStroke": "Auswahl für Strichfarbe anzeigen",
     "showBackground": "Hintergrundfarbe auswählen",
-    "toggleTheme": "Design umschalten",
+    "showFonts": "Schriftauswahl anzeigen",
+    "toggleTheme": "Helles/dunkles Design umschalten",
+    "theme": "Design",
     "personalLib": "Persönliche Bibliothek",
     "excalidrawLib": "Excalidraw Bibliothek",
-    "decreaseFontSize": "Schriftgröße verkleinern",
-    "increaseFontSize": "Schrift vergrößern",
+    "decreaseFontSize": "Schriftgröße verringern",
+    "increaseFontSize": "Schriftgröße erhöhen",
     "unbindText": "Text lösen",
     "bindText": "Text an Container binden",
     "createContainerFromText": "Text in Container einbetten",
     "link": {
       "edit": "Link bearbeiten",
-      "editEmbed": "Link bearbeiten & einbetten",
-      "create": "Link erstellen",
-      "createEmbed": "Link erstellen & einbetten",
+      "editEmbed": "Einbettbaren Link bearbeiten",
+      "create": "Link hinzufügen",
       "label": "Link",
       "labelEmbed": "Verlinken & einbetten",
-      "empty": "Kein Link festgelegt"
+      "empty": "Kein Link festgelegt",
+      "hint": "Link hier eingeben oder einfügen",
+      "goToElement": "Gehe zu Zielelement"
     },
     "lineEditor": {
       "edit": "Linie bearbeiten",
-      "exit": "Linieneditor verlassen"
+      "editArrow": "Pfeil bearbeiten"
+    },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
     },
     "elementLock": {
       "lock": "Sperren",
@@ -138,12 +157,46 @@
     "removeAllElementsFromFrame": "Alle Elemente aus dem Rahmen entfernen",
     "eyeDropper": "Farbe von der Zeichenfläche auswählen",
     "textToDiagram": "Text zu Diagramm",
-    "prompt": "Eingabe"
+    "prompt": "Eingabe",
+    "followUs": "Folge uns",
+    "discordChat": "Discord-Chat",
+    "zoomToFitViewport": "Zoom auf Ansicht anpassen",
+    "zoomToFitSelection": "Zoom auf Auswahl anpassen",
+    "zoomToFit": "Zoom auf alle Elemente anpassen",
+    "installPWA": "Excalidraw lokal installieren (PWA)",
+    "autoResize": "Aktiviere automatische Textgrößenanpassung",
+    "imageCropping": "Bild zuschneiden",
+    "unCroppedDimension": "Nicht zugeschnittene Dimension",
+    "copyElementLink": "Link zum Objekt kopieren",
+    "linkToElement": "Link zum Objekt",
+    "wrapSelectionInFrame": "Auswahl in Rahmen einbetten",
+    "tab": "",
+    "shapeSwitch": ""
+  },
+  "elementLink": {
+    "title": "Link zum Objekt",
+    "desc": "Klicke auf eine Form auf der Zeichenfläche oder füge einen Link ein.",
+    "notFound": "Verknüpftes Objekt wurde nicht auf der Zeichenfläche gefunden."
   },
   "library": {
     "noItems": "Noch keine Elemente hinzugefügt...",
     "hint_emptyLibrary": "Wähle ein Element auf der Zeichenfläche, um es hier hinzuzufügen. Oder installiere eine Bibliothek aus dem öffentlichen Verzeichnis.",
-    "hint_emptyPrivateLibrary": "Wähle ein Element von der Zeichenfläche, um es hier hinzuzufügen."
+    "hint_emptyPrivateLibrary": "Wähle ein Element von der Zeichenfläche, um es hier hinzuzufügen.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
+  },
+  "search": {
+    "title": "Auf Zeichenfläche suchen",
+    "noMatch": "Keine Treffer gefunden...",
+    "singleResult": "Ergebnis",
+    "multipleResults": "Ergebnisse",
+    "placeholder": "Text auf Zeichenfläche suchen...",
+    "frames": "",
+    "texts": "Texte"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -151,6 +204,7 @@
     "exportImage": "Exportiere Bild...",
     "export": "Speichern als...",
     "copyToClipboard": "In Zwischenablage kopieren",
+    "copyLink": "Link kopieren",
     "save": "In aktueller Datei speichern",
     "saveAs": "Speichern unter",
     "load": "Öffnen",
@@ -171,14 +225,16 @@
     "fullScreen": "Vollbildanzeige",
     "darkMode": "Dunkles Design",
     "lightMode": "Helles Design",
+    "systemMode": "System-Modus",
     "zenMode": "Zen-Modus",
     "objectsSnapMode": "Einrasten an Objekten",
     "exitZenMode": "Zen-Modus verlassen",
     "cancel": "Abbrechen",
+    "saveLibNames": "",
     "clear": "Löschen",
     "remove": "Entfernen",
     "embed": "Einbettung umschalten",
-    "publishLibrary": "Veröffentlichen",
+    "publishLibrary": "",
     "submit": "Absenden",
     "confirm": "Bestätigen",
     "embeddableInteractionButton": "Klicken, um zu interagieren"
@@ -204,7 +260,8 @@
     "resetLibrary": "Dieses löscht deine Bibliothek. Bist du sicher?",
     "removeItemsFromsLibrary": "{{count}} Element(e) aus der Bibliothek löschen?",
     "invalidEncryptionKey": "Verschlüsselungsschlüssel muss 22 Zeichen lang sein. Die Live-Zusammenarbeit ist deaktiviert.",
-    "collabOfflineWarning": "Keine Internetverbindung verfügbar.\nDeine Änderungen werden nicht gespeichert!"
+    "collabOfflineWarning": "Keine Internetverbindung verfügbar.\nDeine Änderungen werden nicht gespeichert!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Nicht unterstützter Dateityp.",
@@ -212,9 +269,9 @@
     "fileTooBig": "Die Datei ist zu groß. Die maximal zulässige Größe ist {{maxSize}}.",
     "svgImageInsertError": "SVG-Bild konnte nicht eingefügt werden. Das SVG-Markup sieht ungültig aus.",
     "failedToFetchImage": "Bild konnte nicht abgerufen werden.",
-    "invalidSVGString": "Ungültige SVG.",
     "cannotResolveCollabServer": "Konnte keine Verbindung zum Collab-Server herstellen. Bitte lade die Seite neu und versuche es erneut.",
     "importLibraryError": "Bibliothek konnte nicht geladen werden",
+    "saveLibraryError": "Bibliothek konnte nicht gespeichert werden. Bitte speichere deine Bibliothek lokal in einer Datei, um sicherzustellen, dass keine Änderungen verloren gehen.",
     "collabSaveFailed": "Keine Speicherung in der Backend-Datenbank möglich. Wenn die Probleme weiterhin bestehen, solltest Du Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
     "collabSaveFailed_sizeExceeded": "Keine Speicherung in der Backend-Datenbank möglich, die Zeichenfläche scheint zu groß zu sein. Du solltest Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
     "imageToolNotSupported": "Bilder sind deaktiviert.",
@@ -235,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Auswahl",
+    "lasso": "",
     "image": "Bild einfügen",
     "rectangle": "Rechteck",
     "diamond": "Raute",
@@ -255,7 +313,23 @@
     "hand": "Hand (Schwenkwerkzeug)",
     "extraTools": "Weitere Werkzeuge",
     "mermaidToExcalidraw": "Mermaid zu Excalidraw",
-    "magicSettings": "KI-Einstellungen"
+    "convertElementType": ""
+  },
+  "element": {
+    "rectangle": "Rechteck",
+    "diamond": "Raute",
+    "ellipse": "Ellipse",
+    "arrow": "Pfeil",
+    "line": "Linie",
+    "freedraw": "Frei zeichnen",
+    "text": "Text",
+    "image": "Bild",
+    "group": "Gruppe",
+    "frame": "Rahmen",
+    "magicframe": "Wireframe zu Code",
+    "embeddable": "Web-Einbettung",
+    "selection": "Auswahl",
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Aktionen für Zeichenfläche",
@@ -263,28 +337,34 @@
     "shapes": "Formen"
   },
   "hints": {
-    "canvasPanning": "Um die Zeichenfläche zu verschieben, halte das Mausrad oder die Leertaste während des Ziehens, oder verwende das Hand-Werkzeug",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
+    "arrowTool": "",
+    "arrowBindModifiers": "",
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
     "embeddable": "Klicken und ziehen, um eine Webseiten-Einbettung zu erstellen",
-    "text_selected": "Doppelklicken oder Eingabetaste drücken, um Text zu bearbeiten",
-    "text_editing": "Drücke Escape oder CtrlOrCmd+Eingabetaste, um die Bearbeitung abzuschließen",
-    "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
-    "lockAngle": "Du kannst Winkel einschränken, indem du SHIFT gedrückt hältst",
-    "resize": "Du kannst die Proportionen einschränken, indem du SHIFT während der Größenänderung gedrückt hältst. Halte ALT gedrückt, um die Größe vom Zentrum aus zu ändern",
-    "resizeImage": "Du kannst die Größe frei ändern, indem du SHIFT gedrückt hältst; halte ALT, um die Größe vom Zentrum aus zu ändern",
-    "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst",
-    "lineEditor_info": "CtrlOrCmd halten und Doppelklick oder CtrlOrCmd + Eingabe drücken, um Punkte zu bearbeiten",
-    "lineEditor_pointSelected": "Drücke Löschen, um Punkt(e) zu entfernen, CtrlOrCmd+D zum Duplizieren oder ziehe zum Verschieben",
-    "lineEditor_nothingSelected": "Wähle einen zu bearbeitenden Punkt (halte SHIFT gedrückt um mehrere Punkte auszuwählen),\noder halte Alt gedrückt und klicke um neue Punkte hinzuzufügen",
-    "placeImage": "Klicken, um das Bild zu platzieren oder klicken und ziehen um seine Größe manuell zu setzen",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Veröffentliche deine eigene Bibliothek",
-    "bindTextToElement": "Zum Hinzufügen Eingabetaste drücken",
-    "deepBoxSelect": "Halte CtrlOrCmd gedrückt, um innerhalb der Gruppe auszuwählen, und um Ziehen zu vermeiden",
-    "eraserRevert": "Halte Alt gedrückt, um die zum Löschen markierten Elemente zurückzusetzen",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Diese Funktion kann wahrscheinlich aktiviert werden, indem die Einstellung \"dom.events.asyncClipboard.clipboardItem\" auf \"true\" gesetzt wird. Um die Browsereinstellungen in Firefox zu ändern, besuche die Seite \"about:config\".",
-    "disableSnapping": "Halte CtrlOrCmd gedrückt, um das Einrasten zu deaktivieren"
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
@@ -299,9 +379,12 @@
     "openIssueMessage": "Wir waren sehr vorsichtig und haben deine Zeichnungsinformationen nicht in die Fehlerinformationen aufgenommen. Wenn deine Zeichnung nicht privat ist, unterstütze uns bitte über unseren <button>Bug-Tracker</button>. Bitte teile die unten stehenden Informationen mit uns im GitHub Issue (Kopieren und Einfügen).",
     "sceneContent": "Zeichnungsinhalt:"
   },
+  "shareDialog": {
+    "or": "Oder"
+  },
   "roomDialog": {
-    "desc_intro": "Du kannst Leute zu deiner aktuellen Zeichnung einladen um mit ihnen zusammenzuarbeiten.",
-    "desc_privacy": "Keine Sorge, die Sitzung nutzt eine Ende-zu-Ende-Verschlüsselung. Alles was du zeichnest, bleibt privat. Auch unser Server sieht nicht, was du dir einfallen lässt.",
+    "desc_intro": "Lade Leute ein, an deiner Zeichnung mitzuarbeiten.",
+    "desc_privacy": "Keine Sorge, die Sitzung ist Ende-zu-Ende verschlüsselt und vollständig privat. Nicht einmal unser Server kann sehen, was du zeichnest.",
     "button_startSession": "Sitzung starten",
     "button_stopSession": "Sitzung beenden",
     "desc_inProgressIntro": "Die Live-Sitzung wird nun ausgeführt.",
@@ -328,6 +411,8 @@
     "click": "klicken",
     "deepSelect": "Auswahl innerhalb der Gruppe",
     "deepBoxSelect": "Auswahl innerhalb der Gruppe, und Ziehen vermeiden",
+    "createFlowchart": "Erstelle ein Flussdiagramm aus einem generischen Element",
+    "navigateFlowchart": "Durchsuche ein Flussdiagramm",
     "curvedArrow": "Gebogener Pfeil",
     "curvedLine": "Gebogene Linie",
     "documentation": "Dokumentation",
@@ -350,7 +435,9 @@
     "zoomToSelection": "Auf Auswahl zoomen",
     "toggleElementLock": "Auswahl sperren/entsperren",
     "movePageUpDown": "Seite nach oben/unten verschieben",
-    "movePageLeftRight": "Seite nach links/rechts verschieben"
+    "movePageLeftRight": "Seite nach links/rechts verschieben",
+    "cropStart": "Bild zuschneiden",
+    "cropFinish": "Zuschneiden des Bildes beenden"
   },
   "clearCanvasDialog": {
     "title": "Zeichenfläche löschen"
@@ -421,13 +508,15 @@
   },
   "stats": {
     "angle": "Winkel",
-    "element": "Element",
-    "elements": "Elemente",
+    "shapes": "Formen",
     "height": "Höhe",
     "scene": "Zeichnung",
     "selected": "Ausgewählt",
     "storage": "Speicher",
-    "title": "Statistiken für Nerds",
+    "fullTitle": "Zeichenflächen- & Formeigenschaften",
+    "title": "Eigenschaften",
+    "generalStats": "Allgemein",
+    "elementProperties": "Formeigenschaften",
     "total": "Gesamt",
     "version": "Version",
     "versionCopy": "Zum Kopieren klicken",
@@ -439,13 +528,15 @@
     "copyStyles": "Formatierungen kopiert.",
     "copyToClipboard": "In die Zwischenablage kopiert.",
     "copyToClipboardAsPng": "{{exportSelection}} als PNG in die Zwischenablage kopiert\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "{{exportSelection}} als SVG in die Zwischenablage kopiert ({{exportColorScheme}})",
     "fileSaved": "Datei gespeichert.",
     "fileSavedToFilename": "Als {filename} gespeichert",
     "canvas": "Zeichenfläche",
     "selection": "Auswahl",
     "pasteAsSingleElement": "Verwende {{shortcut}} , um als einzelnes Element\neinzufügen oder in einen existierenden Texteditor einzufügen",
     "unableToEmbed": "Einbetten dieser URL ist derzeit nicht zulässig. Erstelle einen Issue auf GitHub, um die URL freigeben zu lassen",
-    "unrecognizedLinkFormat": "Der Link, den Du eingebettet hast, stimmt nicht mit dem erwarteten Format überein. Bitte versuche den 'embed' String einzufügen, der von der Quellseite zur Verfügung gestellt wird"
+    "unrecognizedLinkFormat": "Der Link, den Du eingebettet hast, stimmt nicht mit dem erwarteten Format überein. Bitte versuche den 'embed' String einzufügen, der von der Quellseite zur Verfügung gestellt wird",
+    "elementLinkCopied": "Link in Zwischenablage kopiert"
   },
   "colors": {
     "transparent": "Transparent",
@@ -478,6 +569,7 @@
     }
   },
   "colorPicker": {
+    "color": "Farbe",
     "mostUsedCustomColors": "Beliebteste benutzerdefinierte Farben",
     "colors": "Farben",
     "shades": "Schattierungen",
@@ -521,5 +613,53 @@
     "description": "Derzeit werden nur <flowchartLink>Flussdiagramme</flowchartLink>, <sequenceLink>Sequenzdiagramme</sequenceLink> und <classLink>Klassendiagramme</classLink> unterstützt. Die anderen Typen werden als Bild in Excalidraw dargestellt.",
     "syntax": "Mermaid-Syntax",
     "preview": "Vorschau"
+  },
+  "quickSearch": {
+    "placeholder": "Schnellsuche"
+  },
+  "fontList": {
+    "badge": {
+      "old": "alt"
+    },
+    "sceneFonts": "In dieser Szene",
+    "availableFonts": "Verfügbare Schriftarten",
+    "empty": "Keine Schriftarten gefunden"
+  },
+  "userList": {
+    "empty": "Keine Benutzer gefunden",
+    "hint": {
+      "text": "Klicke auf Benutzer um zu folgen",
+      "followStatus": "Du folgst derzeit diesem Benutzer",
+      "inCall": "Benutzer ist in einem Sprachanruf",
+      "micMuted": "Mikrofon des Benutzers ist stumm geschaltet",
+      "isSpeaking": "Benutzer spricht"
+    }
+  },
+  "commandPalette": {
+    "title": "Befehlspalette",
+    "shortcuts": {
+      "select": "Auswählen",
+      "confirm": "Bestätigen",
+      "close": "Schließen"
+    },
+    "recents": "Zuletzt verwendet",
+    "search": {
+      "placeholder": "Suche in Menüs und Befehlen, entdecke versteckte Funktionen",
+      "noMatch": "Keine passenden Befehle..."
+    },
+    "itemNotAvailable": "Befehl ist nicht verfügbar...",
+    "shortcutHint": "Benutze {{shortcut}} für Befehlspalette"
+  },
+  "keys": {
+    "ctrl": "Strg",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "Leertaste",
+    "delete": "Löschen",
+    "mmb": "Mausrad"
   }
 }

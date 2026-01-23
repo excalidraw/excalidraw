@@ -26,6 +26,7 @@ const DropdownMenuItem = ({
   textStyle,
   onSelect,
   onClick,
+  badge,
   ...rest
 }: {
   icon?: JSX.Element;
@@ -38,6 +39,7 @@ const DropdownMenuItem = ({
   selected?: boolean;
   textStyle?: React.CSSProperties;
   className?: string;
+  badge?: React.ReactNode;
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onSelect">) => {
   const handleClick = useHandleDropdownMenuItemClick(onClick, onSelect);
   const ref = useRef<HTMLButtonElement>(null);
@@ -62,7 +64,12 @@ const DropdownMenuItem = ({
       className={getDropdownMenuItemClassName(className, selected, hovered)}
       title={rest.title ?? rest["aria-label"]}
     >
-      <MenuItemContent textStyle={textStyle} icon={icon} shortcut={shortcut}>
+      <MenuItemContent
+        textStyle={textStyle}
+        icon={icon}
+        shortcut={shortcut}
+        badge={badge}
+      >
         {children}
       </MenuItemContent>
     </button>
