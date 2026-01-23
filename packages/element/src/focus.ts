@@ -35,6 +35,8 @@ import {
   isPointInElement,
 } from "./collision";
 
+import { moveArrowAboveBindable } from "./zindex";
+
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
@@ -97,39 +99,55 @@ export const isFocusPointVisible = (
 // Updates the arrow endpoints in "orbit" configuration
 const focusPointOrbitUpdate = (
   arrow: ExcalidrawArrowElement,
-  bindableElement: ExcalidrawBindableElement,
+  bindableElement: ExcalidrawBindableElement | null,
   isStartBinding: boolean,
+  insideBindableElement: boolean,
   elementsMap: NonDeletedSceneElementsMap,
   scene: Scene,
+  appState: AppState,
 ) => {
-  if (!arrow[isStartBinding ? "startBinding" : "endBinding"]) {
-    return;
-  }
-
-  // Update the targeted bindings
-  const updatedBinding = arrow[isStartBinding ? "startBinding" : "endBinding"];
   const pointUpdates = new Map();
-  const pointIndex = isStartBinding ? 0 : arrow.points.length - 1;
-  const bindingField = isStartBinding ? "startBinding" : "endBinding";
-  const newPoint = updateBoundPoint(
-    arrow,
-    bindingField as "startBinding" | "endBinding",
-    updatedBinding,
-    bindableElement,
-    elementsMap,
-  );
 
-  if (newPoint) {
-    pointUpdates.set(pointIndex, { point: newPoint });
+  const bindingField = isStartBinding ? "startBinding" : "endBinding";
+  const adjacentBindingField = isStartBinding ? "endBinding" : "startBinding";
+  let currentBinding = arrow[bindingField];
+  let adjacentBinding = arrow[adjacentBindingField];
+
+  // Update the dragged focus point related end
+  if (currentBinding && bindableElement) {
+    // Update the targeted bindings
+    if (
+      bindableElement &&
+      adjacentBinding &&
+      currentBinding.elementId === adjacentBinding.elementId
+    ) {
+      currentBinding = {
+        ...currentBinding,
+        mode: "inside",
+      };
+    } else {
+      currentBinding = {
+        ...currentBinding,
+        mode: "orbit",
+      };
+    }
+
+    const pointIndex = isStartBinding ? 0 : arrow.points.length - 1;
+    const newPoint = updateBoundPoint(
+      arrow,
+      bindingField as "startBinding" | "endBinding",
+      currentBinding,
+      bindableElement,
+      elementsMap,
+    );
+
+    if (newPoint) {
+      pointUpdates.set(pointIndex, { point: newPoint });
+    }
   }
 
   // Also update the adjacent end if it has a binding
-  const adjacentBindingField = isStartBinding ? "endBinding" : "startBinding";
-  const adjacentBinding = isStartBinding
-    ? arrow.endBinding
-    : arrow.startBinding;
-
-  if (adjacentBinding?.elementId) {
+  if (adjacentBinding) {
     const adjacentBindableElement = elementsMap.get(
       adjacentBinding.elementId,
     ) as ExcalidrawBindableElement;
@@ -137,13 +155,25 @@ const focusPointOrbitUpdate = (
     if (
       adjacentBindableElement &&
       isBindableElement(adjacentBindableElement) &&
-      !adjacentBindableElement.isDeleted
+      isBindingEnabled(appState)
     ) {
-      const adjacentPointIndex = isStartBinding ? arrow.points.length - 1 : 0;
+      // Same shape bound on both ends
+      if (bindableElement && adjacentBinding.elementId === bindableElement.id) {
+        adjacentBinding = {
+          ...adjacentBinding,
+          mode: "inside",
+        };
+      } else {
+        adjacentBinding = {
+          ...adjacentBinding,
+          mode: "orbit",
+        };
+      }
 
+      const adjacentPointIndex = isStartBinding ? arrow.points.length - 1 : 0;
       const adjacentNewPoint = updateBoundPoint(
         arrow,
-        adjacentBindingField as "startBinding" | "endBinding",
+        adjacentBindingField,
         adjacentBinding,
         adjacentBindableElement,
         elementsMap,
@@ -159,10 +189,8 @@ const focusPointOrbitUpdate = (
 
   if (pointUpdates.size > 0) {
     LinearElementEditor.movePoints(arrow, scene, pointUpdates, {
-      [bindingField]: {
-        ...updatedBinding,
-        mode: "orbit",
-      },
+      [bindingField]: currentBinding,
+      [adjacentBindingField]: adjacentBinding,
     });
   }
 };
@@ -205,11 +233,11 @@ export const handleFocusPointDrag = (
     maxBindingDistance_simple(appState.zoom),
   );
   const bindingField = isStartBinding ? "startBinding" : "endBinding";
+  const insideBindableElement =
+    hit && isPointInElement(point, hit, elementsMap);
 
   if (hit) {
     // Hovering a bindable element...
-    const insideBindableElement =
-      hit && isPointInElement(point, hit, elementsMap);
     const arrowAdjacentPoint =
       LinearElementEditor.getPointAtIndexGlobalCoordinates(
         arrow,
@@ -277,9 +305,6 @@ export const handleFocusPointDrag = (
         ),
       },
     });
-
-    // Update the arrow endpoints
-    focusPointOrbitUpdate(arrow, hit, isStartBinding, elementsMap, scene);
   } else {
     // Not hovering any bindable element, move the arrow endpoint
     const pointUpdates: PointsPositionUpdates = new Map();
@@ -297,6 +322,28 @@ export const handleFocusPointDrag = (
     if (arrow[bindingField]) {
       unbindBindingElement(arrow, isStartBinding ? "start" : "end", scene);
     }
+  }
+
+  // Update the arrow endpoints
+  focusPointOrbitUpdate(
+    arrow,
+    hit,
+    isStartBinding,
+    !!insideBindableElement,
+    elementsMap,
+    scene,
+    appState,
+  );
+
+  if (hit) {
+    moveArrowAboveBindable(
+      point,
+      arrow,
+      scene.getElementsIncludingDeleted(),
+      elementsMap,
+      scene,
+      hit,
+    );
   }
 };
 
