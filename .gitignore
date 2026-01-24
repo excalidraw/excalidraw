@@ -8,7 +8,9 @@
 .history
 .idea
 .vercel
-.vscode
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.recommended.json
 .yarn
 *.log
 *.tgz

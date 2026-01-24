@@ -5,6 +5,7 @@ import svgrPlugin from "vite-plugin-svgr";
 import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
+import oxlint from "vite-plugin-oxlint";
 import { createHtmlPlugin } from "vite-plugin-html";
 import Sitemap from "vite-plugin-sitemap";
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
@@ -125,14 +126,15 @@ export default defineConfig(({ mode }) => {
       react(),
       checker({
         typescript: true,
-        eslint:
-          envVars.VITE_APP_ENABLE_ESLINT === "false"
-            ? undefined
-            : { lintCommand: 'eslint "./**/*.{js,ts,tsx}"' },
         overlay: {
           initialIsOpen: envVars.VITE_APP_COLLAPSE_OVERLAY === "false",
           badgeStyle: "margin-bottom: 4rem; margin-left: 1rem",
         },
+      }),
+      oxlint({
+        configFile: path.resolve(__dirname, "../.oxlintrc.json"),
+        path: path.resolve(__dirname, ".."),
+        oxlintPath: path.resolve(__dirname, "../node_modules/.bin/oxlint"),
       }),
       svgrPlugin(),
       ViteEjsPlugin(),
