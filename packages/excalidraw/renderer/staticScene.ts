@@ -221,7 +221,7 @@ const renderLinkIcon = (
 
       linkCanvasCacheContext.restore();
     }
-    context.globalAlpha = element.opacity;
+    context.globalAlpha = element.opacity/100;
     context.drawImage(linkCanvas, x - centerX, y - centerY, width, height);
     context.restore();
   }
