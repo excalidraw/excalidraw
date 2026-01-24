@@ -14,6 +14,7 @@ import {
   DEFAULT_REDUCED_GLOBAL_ALPHA,
   ELEMENT_READY_TO_ERASE_OPACITY,
   FRAME_STYLE,
+  DARK_THEME_FILTER,
   MIME_TYPES,
   THEME,
   distance,
@@ -433,9 +434,22 @@ const drawElementOnCanvas = (
       break;
     }
     case "image": {
+      context.save();
+      const cacheEntry =
+        element.fileId !== null
+          ? renderConfig.imageCache.get(element.fileId)
+          : null;
       const img = isInitializedImageElement(element)
-        ? renderConfig.imageCache.get(element.fileId)?.image
+        ? cacheEntry?.image
         : undefined;
+
+      const shouldInvertImage =
+        renderConfig.theme === THEME.DARK &&
+        cacheEntry?.mimeType === MIME_TYPES.svg;
+
+      if (shouldInvertImage) {
+        context.filter = DARK_THEME_FILTER;
+      }
       if (img != null && !(img instanceof Promise)) {
         if (element.roundness && context.roundRect) {
           context.beginPath();
@@ -472,6 +486,7 @@ const drawElementOnCanvas = (
       } else {
         drawImagePlaceholder(element, context);
       }
+      context.restore();
       break;
     }
     default: {
