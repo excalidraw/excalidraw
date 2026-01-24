@@ -9,6 +9,7 @@ import {
   isTestEnv,
   getVerticalOffset,
   applyDarkModeFilter,
+  MIME_TYPES,
 } from "@excalidraw/common";
 import { normalizeLink, toValidURL } from "@excalidraw/common";
 import { hashString } from "@excalidraw/element";
@@ -45,9 +46,6 @@ import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
 import type { Drawable } from "roughjs/bin/core";
 import type { RoughSVG } from "roughjs/bin/svg";
-
-const getThemeFilterValue = (theme: AppState["theme"]) =>
-  theme === THEME.DARK ? DARK_THEME_FILTER : "";
 
 const roughSVGDrawWithPrecision = (
   rsvg: RoughSVG,
@@ -526,12 +524,9 @@ const renderElementToSvg = (
 
         if (
           renderConfig.theme === THEME.DARK &&
-          (fileData.invertInDarkMode ?? false)
+          fileData.mimeType === MIME_TYPES.svg
         ) {
-          g.setAttribute(
-            "style",
-            `filter: ${getThemeFilterValue(renderConfig.theme)};`,
-          );
+          g.setAttribute("style", `filter: ${DARK_THEME_FILTER};`);
         }
 
         if (element.crop) {

@@ -445,7 +445,7 @@ const drawElementOnCanvas = (
 
       const shouldInvertImage =
         renderConfig.theme === THEME.DARK &&
-        (cacheEntry?.invertInDarkMode ?? false);
+        cacheEntry?.mimeType === MIME_TYPES.svg;
 
       if (shouldInvertImage) {
         context.filter = DARK_THEME_FILTER;
