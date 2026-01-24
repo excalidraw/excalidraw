@@ -526,7 +526,7 @@ const renderElementToSvg = (
           renderConfig.theme === THEME.DARK &&
           fileData.mimeType === MIME_TYPES.svg
         ) {
-          g.setAttribute("style", `filter: ${DARK_THEME_FILTER};`);
+          g.setAttribute("filter", DARK_THEME_FILTER);
         }
 
         if (element.crop) {
