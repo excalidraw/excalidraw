@@ -77,7 +77,9 @@
       }
       opacity: 0;
       visibility: hidden;
-      transition: visibility 0s linear 0s, opacity 0.5s;
+      transition:
+        visibility 0s linear 0s,
+        opacity 0.5s;
 
       font-family: var(--ui-font);
       font-size: 0.75rem;
@@ -99,7 +101,9 @@
       &--visible {
         opacity: 1;
         visibility: visible;
-        transition: visibility 0s linear 300ms, opacity 0.5s;
+        transition:
+          visibility 0s linear 300ms,
+          opacity 0.5s;
         transition-delay: 0.8s;
 
         pointer-events: var(--ui-pointerEvents);

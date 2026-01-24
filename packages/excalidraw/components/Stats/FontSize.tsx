@@ -81,8 +81,8 @@ const FontSize = ({ element, scene, appState, property }: FontSizeProps) => {
   const _element = isTextElement(element)
     ? element
     : hasBoundTextElement(element)
-    ? getBoundTextElement(element, scene.getNonDeletedElementsMap())
-    : null;
+      ? getBoundTextElement(element, scene.getNonDeletedElementsMap())
+      : null;
 
   if (!_element) {
     return null;

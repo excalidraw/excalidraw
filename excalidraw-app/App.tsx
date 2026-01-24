@@ -192,7 +192,7 @@ if (window.self !== window.top) {
     if (parentUrl.origin === currentUrl.origin) {
       isSelfEmbedding = true;
     }
-  } catch (error) {
+  } catch {
     // ignore
   }
 }
@@ -310,7 +310,7 @@ const initializeScene = async (opts: {
       ) {
         return { scene: data, isExternalScene };
       }
-    } catch (error: any) {
+    } catch {
       return {
         scene: {
           appState: {

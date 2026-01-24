@@ -35,8 +35,9 @@ body.excalidraw-cursor-resize * {
 }
 
 .excalidraw {
-  --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
-    Roboto, Helvetica, Arial, sans-serif;
+  --ui-font:
+    Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI, Roboto,
+    Helvetica, Arial, sans-serif;
   font-family: var(--ui-font);
 
   position: relative;
@@ -432,13 +433,19 @@ body.excalidraw-cursor-resize * {
     appearance: none;
     background-image: var(--dropdown-icon);
     background-repeat: no-repeat;
-    background-position: right 0.7rem top 50%, 0 0;
+    background-position:
+      right 0.7rem top 50%,
+      0 0;
 
     :root[dir="rtl"] & {
-      background-position: left 0.7rem top 50%, 0 0;
+      background-position:
+        left 0.7rem top 50%,
+        0 0;
     }
 
-    background-size: 0.65em auto, 100%;
+    background-size:
+      0.65em auto,
+      100%;
 
     &:focus {
       box-shadow: 0 0 0 2px var(--focus-highlight-color);

@@ -20,7 +20,7 @@ export const actionToggleShapeSwitch = register({
     action: "toggle",
   },
   keywords: ["change", "switch", "swap"],
-  perform(elements, appState, _, app) {
+  perform() {
     editorJotaiStore.set(convertElementTypePopupAtom, {
       type: "panel",
     });
@@ -30,6 +30,6 @@ export const actionToggleShapeSwitch = register({
     };
   },
   checked: (appState) => appState.gridModeEnabled,
-  predicate: (elements, appState, props) =>
+  predicate: (elements) =>
     getConversionTypeFromElements(elements as ExcalidrawElement[]) !== null,
 });

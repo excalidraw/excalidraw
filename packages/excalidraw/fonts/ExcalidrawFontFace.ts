@@ -11,8 +11,8 @@ export class ExcalidrawFontFace {
   private static readonly ASSETS_FALLBACK_URL = `https://esm.sh/${
     import.meta.env.PKG_NAME
       ? `${import.meta.env.PKG_NAME}@${import.meta.env.PKG_VERSION}` // is provided during package build
-      : "@excalidraw/excalidraw" // fallback to the latest package version (i.e. for app)
-  }/dist/prod/`;
+      : "@excalidraw/excalidraw"
+  }/dist/prod/`; // fallback to the latest package version (i.e. for app)
 
   constructor(family: string, uri: string, descriptors?: FontFaceDescriptors) {
     this.urls = ExcalidrawFontFace.createUrls(uri);
@@ -183,7 +183,7 @@ export class ExcalidrawFontFace {
       }
 
       return `format('${parts.pop()}')`;
-    } catch (error) {
+    } catch {
       return "";
     }
   }

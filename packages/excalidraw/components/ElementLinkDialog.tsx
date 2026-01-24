@@ -70,18 +70,20 @@ const ElementLinkDialog = ({
   const handleConfirm = useCallback(() => {
     if (nextLink && nextLink !== elementsMap.get(sourceElementId)?.link) {
       const elementToLink = elementsMap.get(sourceElementId);
-      elementToLink &&
+      if (elementToLink) {
         scene.mutateElement(elementToLink, {
           link: nextLink,
         });
+      }
     }
 
     if (!nextLink && linkEdited && sourceElementId) {
       const elementToLink = elementsMap.get(sourceElementId);
-      elementToLink &&
+      if (elementToLink) {
         scene.mutateElement(elementToLink, {
           link: null,
         });
+      }
     }
 
     onClose?.();

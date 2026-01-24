@@ -606,10 +606,10 @@ export class LinearElementEditor {
       updates?.suggestedBinding?.id !== startBindingElement.id // The end point is not hovering the start bindable + it's binding gap
         ? startBindingElement
         : startIsSelected && // The "other" end (i.e. "start") is dragged
-          endBindingElement &&
-          updates?.suggestedBinding?.id !== endBindingElement.id // The start point is not hovering the end bindable + it's binding gap
-        ? endBindingElement
-        : null;
+            endBindingElement &&
+            updates?.suggestedBinding?.id !== endBindingElement.id // The start point is not hovering the end bindable + it's binding gap
+          ? endBindingElement
+          : null;
 
     const newLinearElementEditor: LinearElementEditor = {
       ...linearElementEditor,
@@ -721,8 +721,8 @@ export class LinearElementEditor {
               )
             : selectedPointsIndices
           : selectedPointsIndices?.includes(pointerDownState.lastClickedPoint)
-          ? [pointerDownState.lastClickedPoint]
-          : selectedPointsIndices,
+            ? [pointerDownState.lastClickedPoint]
+            : selectedPointsIndices,
       isDragging: false,
       pointerOffset: { x: 0, y: 0 },
       customLineAngle: null,
@@ -976,7 +976,7 @@ export class LinearElementEditor {
     const appState = app.state;
     const elementsMap = scene.getNonDeletedElementsMap();
 
-    const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
+    const ret: ReturnType<(typeof LinearElementEditor)["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
       linearElementEditor: null,
@@ -2130,8 +2130,8 @@ const pointDraggingUpdates = (
         suggestedBinding: startIsDragged
           ? start.element
           : endIsDragged
-          ? end.element
-          : null,
+            ? end.element
+            : null,
       },
     };
   }
@@ -2222,14 +2222,14 @@ const pointDraggingUpdates = (
       updates.startBinding === undefined
         ? element.startBinding
         : updates.startBinding === null
-        ? null
-        : updates.startBinding,
+          ? null
+          : updates.startBinding,
     endBinding:
       updates.endBinding === undefined
         ? element.endBinding
         : updates.endBinding === null
-        ? null
-        : updates.endBinding,
+          ? null
+          : updates.endBinding,
   };
 
   // We need to use a custom intersector to ensure that if there is a big "jump"
@@ -2261,28 +2261,28 @@ const pointDraggingUpdates = (
   // We need to update the non-dragged point too if bound,
   // so we look up the old binding to trigger updateBoundPoint
   const endBindable = nextArrow.endBinding
-    ? end.element ??
+    ? (end.element ??
       (elementsMap.get(
         nextArrow.endBinding.elementId,
-      )! as ExcalidrawBindableElement)
+      )! as ExcalidrawBindableElement))
     : null;
 
   const endLocalPoint = startIsDraggingOverEndElement
     ? nextArrow.points[nextArrow.points.length - 1]
     : endIsDraggingOverStartElement &&
-      app.state.bindMode !== "inside" &&
-      getFeatureFlag("COMPLEX_BINDINGS")
-    ? nextArrow.points[0]
-    : endBindable
-    ? updateBoundPoint(
-        element,
-        "endBinding",
-        nextArrow.endBinding,
-        endBindable,
-        elementsMap,
-        endCustomIntersector,
-      ) || nextArrow.points[nextArrow.points.length - 1]
-    : nextArrow.points[nextArrow.points.length - 1];
+        app.state.bindMode !== "inside" &&
+        getFeatureFlag("COMPLEX_BINDINGS")
+      ? nextArrow.points[0]
+      : endBindable
+        ? updateBoundPoint(
+            element,
+            "endBinding",
+            nextArrow.endBinding,
+            endBindable,
+            elementsMap,
+            endCustomIntersector,
+          ) || nextArrow.points[nextArrow.points.length - 1]
+        : nextArrow.points[nextArrow.points.length - 1];
 
   // We need to keep the simulated next arrow up-to-date, because
   // updateBoundPoint looks at the opposite point
@@ -2291,29 +2291,29 @@ const pointDraggingUpdates = (
   // We need to update the non-dragged point too if bound,
   // so we look up the old binding to trigger updateBoundPoint
   const startBindable = nextArrow.startBinding
-    ? start.element ??
+    ? (start.element ??
       (elementsMap.get(
         nextArrow.startBinding.elementId,
-      )! as ExcalidrawBindableElement)
+      )! as ExcalidrawBindableElement))
     : null;
 
   const startLocalPoint =
     endIsDraggingOverStartElement && getFeatureFlag("COMPLEX_BINDINGS")
       ? nextArrow.points[0]
       : startIsDraggingOverEndElement &&
-        app.state.bindMode !== "inside" &&
-        getFeatureFlag("COMPLEX_BINDINGS")
-      ? nextArrow.points[nextArrow.points.length - 1]
-      : startBindable
-      ? updateBoundPoint(
-          element,
-          "startBinding",
-          nextArrow.startBinding,
-          startBindable,
-          elementsMap,
-          startCustomIntersector,
-        ) || nextArrow.points[0]
-      : nextArrow.points[0];
+          app.state.bindMode !== "inside" &&
+          getFeatureFlag("COMPLEX_BINDINGS")
+        ? nextArrow.points[nextArrow.points.length - 1]
+        : startBindable
+          ? updateBoundPoint(
+              element,
+              "startBinding",
+              nextArrow.startBinding,
+              startBindable,
+              elementsMap,
+              startCustomIntersector,
+            ) || nextArrow.points[0]
+          : nextArrow.points[0];
 
   const endChanged =
     pointDistance(
@@ -2350,11 +2350,11 @@ const pointDraggingUpdates = (
                 isDragging: true,
               }
             : idx === element.points.length - 1
-            ? {
-                point: endLocalPoint,
-                isDragging: true,
-              }
-            : naiveDraggingPoints.get(idx)!,
+              ? {
+                  point: endLocalPoint,
+                  isDragging: true,
+                }
+              : naiveDraggingPoints.get(idx)!,
         ];
       }),
     ),

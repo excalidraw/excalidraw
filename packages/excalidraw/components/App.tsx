@@ -810,7 +810,7 @@ class App extends React.Component<AppProps, AppState> {
     let data = null;
     try {
       data = JSON.parse(event.data);
-    } catch (e) {}
+    } catch {}
     if (!data) {
       return;
     }
@@ -1105,13 +1105,13 @@ class App extends React.Component<AppProps, AppState> {
     const currentBinding = startDragged
       ? "startBinding"
       : endDragged
-      ? "endBinding"
-      : null;
+        ? "endBinding"
+        : null;
     const otherBinding = startDragged
       ? "endBinding"
       : endDragged
-      ? "startBinding"
-      : null;
+        ? "startBinding"
+        : null;
     const isAlreadyInsideBindingToSameElement =
       (otherBinding &&
         arrow[otherBinding]?.mode === "inside" &&
@@ -1611,7 +1611,7 @@ class App extends React.Component<AppProps, AppState> {
                           : undefined
                       }
                       src={
-                        src?.type !== "document" ? src?.link ?? "" : undefined
+                        src?.type !== "document" ? (src?.link ?? "") : undefined
                       }
                       // https://stackoverflow.com/q/18470015
                       scrolling="no"
@@ -2825,7 +2825,7 @@ class App extends React.Component<AppProps, AppState> {
     this.stylesPanelMode = nextStylesPanelMode;
 
     if (prevStylesPanelMode !== "full" && nextStylesPanelMode === "full") {
-      this.setState((prevState) => ({
+      this.setState(() => ({
         preferredSelectionTool: {
           type: "selection",
           initialized: true,
@@ -2931,6 +2931,7 @@ class App extends React.Component<AppProps, AppState> {
 
     // note that this check seems to always pass in localhost
     if (isBrave() && !isMeasureTextSupported()) {
+      // oxlint-disable-next-line react/no-did-mount-set-state
       this.setState({
         errorMessage: <BraveMeasureTextError />,
       });
@@ -3243,8 +3244,9 @@ class App extends React.Component<AppProps, AppState> {
         // execute only if the condition still holds when the deferred callback
         // executes (it can be scheduled multiple times depending on how
         // many times the component renders)
-        this.state.selectedLinearElement?.isEditing &&
+        if (this.state.selectedLinearElement?.isEditing) {
           this.actionManager.executeAction(actionFinalize);
+        }
       });
     }
 
@@ -3633,14 +3635,14 @@ class App extends React.Component<AppProps, AppState> {
       typeof opts.position === "object"
         ? opts.position.clientX
         : opts.position === "cursor"
-        ? this.lastViewportPosition.x
-        : this.state.width / 2 + this.state.offsetLeft;
+          ? this.lastViewportPosition.x
+          : this.state.width / 2 + this.state.offsetLeft;
     const clientY =
       typeof opts.position === "object"
         ? opts.position.clientY
         : opts.position === "cursor"
-        ? this.lastViewportPosition.y
-        : this.state.height / 2 + this.state.offsetTop;
+          ? this.lastViewportPosition.y
+          : this.state.height / 2 + this.state.offsetTop;
 
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX, clientY },
@@ -4898,8 +4900,8 @@ class App extends React.Component<AppProps, AppState> {
                 prevState.currentItemArrowType === ARROW_TYPE.sharp
                   ? ARROW_TYPE.round
                   : prevState.currentItemArrowType === ARROW_TYPE.round
-                  ? ARROW_TYPE.elbow
-                  : ARROW_TYPE.sharp,
+                    ? ARROW_TYPE.elbow
+                    : ARROW_TYPE.sharp,
             }));
           }
           this.setActiveTool({ type: shape });
@@ -5370,9 +5372,9 @@ class App extends React.Component<AppProps, AppState> {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
 
     const updateElement = (nextOriginalText: string, isDeleted: boolean) => {
-      this.scene.replaceAllElements([
+      this.scene.replaceAllElements(
         // Not sure why we include deleted elements as well hence using deleted elements map
-        ...this.scene.getElementsIncludingDeleted().map((_element) => {
+        this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
             return newElementWith(_element, {
               originalText: nextOriginalText,
@@ -5388,7 +5390,7 @@ class App extends React.Component<AppProps, AppState> {
           }
           return _element;
         }),
-      ]);
+      );
     };
 
     textWysiwyg({
@@ -6112,10 +6114,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private redirectToLink = (
-    event: React.PointerEvent<HTMLCanvasElement>,
-    isTouchScreen: boolean,
-  ) => {
+  private redirectToLink = (event: React.PointerEvent<HTMLCanvasElement>) => {
     const draggedDistance = pointDistance(
       pointFrom(
         this.lastPointerDownEvent!.clientX,
@@ -6379,7 +6378,7 @@ class App extends React.Component<AppProps, AppState> {
           pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
           this.scene.getNonDeletedElements(),
           this.scene.getNonDeletedElementsMap(),
-          (el) => maxBindingDistance_simple(this.state.zoom),
+          () => maxBindingDistance_simple(this.state.zoom),
         );
         if (hoveredElement) {
           this.setState({
@@ -6410,7 +6409,7 @@ class App extends React.Component<AppProps, AppState> {
             pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
             this.scene.getNonDeletedElements(),
             this.scene.getNonDeletedElementsMap(),
-            (el) => maxBindingDistance_simple(this.state.zoom),
+            () => maxBindingDistance_simple(this.state.zoom),
           );
         if (hoveredElement) {
           this.actionManager.executeAction(actionFinalize, "ui", {
@@ -6564,7 +6563,7 @@ class App extends React.Component<AppProps, AppState> {
         pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
-        (el) => maxBindingDistance_simple(this.state.zoom),
+        () => maxBindingDistance_simple(this.state.zoom),
       );
       if (
         hit &&
@@ -6820,7 +6819,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // set touch moving for mobile context menu
-  private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
+  private handleTouchMove = () => {
     invalidateContextMenu = true;
   };
 
@@ -7039,7 +7038,7 @@ class App extends React.Component<AppProps, AppState> {
     //fires only once, if pen is detected, penMode is enabled
     //the user can disable this by toggling the penMode button
     if (!this.state.penDetected && event.pointerType === "pen") {
-      this.setState((prevState) => {
+      this.setState(() => {
         return {
           penMode: true,
           penDetected: true,
@@ -7207,7 +7206,9 @@ class App extends React.Component<AppProps, AppState> {
 
           Object.keys(prevState.selectedElementIds).forEach((id) => {
             const element = this.scene.getElement(id);
-            element && previouslySelectedElements.push(element);
+            if (element) {
+              previouslySelectedElements.push(element);
+            }
           });
 
           const hitElement = pointerDownState.hit.element!;
@@ -7435,7 +7436,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         this.handleEmbeddableCenterClick(this.hitLinkElement);
       } else {
-        this.redirectToLink(event, this.editorInterface.isTouchScreen);
+        this.redirectToLink(event);
       }
     } else if (this.state.viewModeEnabled) {
       this.setState({
@@ -7518,7 +7519,7 @@ class App extends React.Component<AppProps, AppState> {
 
     let nextPastePrevented = false;
     const isLinux =
-      typeof window === undefined
+      typeof window === "undefined"
         ? false
         : /Linux/.test(window.navigator.platform);
 
@@ -7642,12 +7643,13 @@ class App extends React.Component<AppProps, AppState> {
       ),
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
-      originalElements: this.scene
-        .getNonDeletedElements()
-        .reduce((acc, element) => {
+      originalElements: this.scene.getNonDeletedElements().reduce(
+        (acc, element) => {
           acc.set(element.id, deepCopyElement(element));
           return acc;
-        }, new Map() as PointerDownState["originalElements"]),
+        },
+        new Map() as PointerDownState["originalElements"],
+      ),
       resize: {
         handleType: false,
         isResizing: false,
@@ -8031,7 +8033,9 @@ class App extends React.Component<AppProps, AppState> {
 
                 Object.keys(prevState.selectedElementIds).forEach((id) => {
                   const element = this.scene.getElement(id);
-                  element && previouslySelectedElements.push(element);
+                  if (element) {
+                    previouslySelectedElements.push(element);
+                  }
                 });
 
                 // if hitElement is frame-like, deselect all of its elements
@@ -8860,7 +8864,9 @@ class App extends React.Component<AppProps, AppState> {
   ): (event: KeyboardEvent) => void {
     return withBatchedUpdates((event: KeyboardEvent) => {
       // Prevents focus from escaping excalidraw tab
-      event.key === KEYS.ALT && event.preventDefault();
+      if (event.key === KEYS.ALT) {
+        event.preventDefault();
+      }
       if (this.maybeHandleResize(pointerDownState, event)) {
         return;
       }
@@ -9850,7 +9856,9 @@ class App extends React.Component<AppProps, AppState> {
             .map((e) => elementsMap.get(e.id))
             .filter((e) => isElbowArrow(e))
             .forEach((e) => {
-              !!e && this.scene.mutateElement(e, {});
+              if (e) {
+                this.scene.mutateElement(e, {});
+              }
             });
         }
       }
@@ -10079,7 +10087,7 @@ class App extends React.Component<AppProps, AppState> {
               ),
             }));
           } else {
-            this.setState((prevState) => ({
+            this.setState(() => ({
               newElement: null,
             }));
           }
@@ -12091,7 +12099,9 @@ class App extends React.Component<AppProps, AppState> {
           offsetTop,
         },
         () => {
-          cb && cb();
+          if (cb) {
+            cb();
+          }
         },
       );
     }

@@ -16,11 +16,8 @@
     background-position: center;
     background-repeat: no-repeat;
 
-    background-image: radial-gradient(
-        circle,
-        transparent 60%,
-        var(--sidebar-bg-color) 100%
-      ),
+    background-image:
+      radial-gradient(circle, transparent 60%, var(--sidebar-bg-color) 100%),
       var(--image-source);
 
     display: flex;

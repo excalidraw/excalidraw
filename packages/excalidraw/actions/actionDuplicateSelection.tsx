@@ -109,7 +109,7 @@ export const actionDuplicateSelection = register({
     };
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.D,
-  PanelComponent: ({ elements, appState, updateData, app }) => {
+  PanelComponent: ({ elements, appState, updateData }) => {
     const isMobile = useStylesPanelMode() === "mobile";
 
     return (

@@ -31,12 +31,12 @@ const DropdownMenuItemLink = ({
   const handleClick = useHandleDropdownMenuItemClick(rest.onClick, onSelect);
 
   return (
-    // eslint-disable-next-line react/jsx-no-target-blank
     <a
       {...rest}
       href={href}
+      // oxlint-disable-next-line react/jsx-no-target-blank
       target="_blank"
-      rel={rel || "noopener"}
+      rel={`noopener ${rel || ""}`}
       className={getDropdownMenuItemClassName(className, selected)}
       title={rest.title ?? rest["aria-label"]}
       onClick={handleClick}

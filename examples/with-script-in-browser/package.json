@@ -2,6 +2,13 @@
   "name": "with-script-in-browser",
   "version": "1.0.0",
   "private": true,
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 5002",
+    "build:preview": "yarn build && yarn preview",
+    "build:packages": "yarn --cwd ../../ build:packages"
+  },
   "dependencies": {
     "@excalidraw/excalidraw": "0.18.0",
     "browser-fs-access": "0.29.1",
@@ -11,12 +18,5 @@
   "devDependencies": {
     "typescript": "^5",
     "vite": "5.0.12"
-  },
-  "scripts": {
-    "start": "vite",
-    "build": "vite build",
-    "preview": "vite preview --port 5002",
-    "build:preview": "yarn build && yarn preview",
-    "build:packages": "yarn --cwd ../../ build:packages"
   }
 }

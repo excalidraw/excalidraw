@@ -107,6 +107,7 @@ export class Renderer {
         editingTextElement,
         newElementId,
         // cache-invalidation nonce
+        // oxlint-disable-next-line no-unused-vars
         sceneNonce: _sceneNonce,
       }: {
         zoom: AppState["zoom"];

@@ -85,9 +85,7 @@ const test = <U extends `${string}:${"L" | "R"}`>(
   const reconciledIndices = reconciled.map((x) => x.index);
 
   expect(target.length).toEqual(reconciled.length);
-  expect(reconciledIndices.length).toEqual(
-    new Set([...reconciledIndices]).size,
-  ); // expect no duplicated indices
+  expect(reconciledIndices.length).toEqual(new Set(reconciledIndices).size); // expect no duplicated indices
   assert.deepEqual(
     reconciledIds,
     target.map((uid) => {

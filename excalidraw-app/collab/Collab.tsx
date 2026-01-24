@@ -210,7 +210,9 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
 
     const unsubOnUserFollow = this.excalidrawAPI.onUserFollow((payload) => {
-      this.portal.socket && this.portal.broadcastUserFollowed(payload);
+      if (this.portal.socket) {
+        this.portal.broadcastUserFollowed(payload);
+      }
     });
     const throttledRelayUserViewportBounds = throttleRAF(
       this.relayVisibleSceneBounds,
@@ -915,9 +917,9 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
       pointersMap: Gesture["pointers"];
     }) => {
-      payload.pointersMap.size < 2 &&
-        this.portal.socket &&
+      if (payload.pointersMap.size < 2 && this.portal.socket) {
         this.portal.broadcastMouseLocation(payload);
+      }
     },
     CURSOR_SYNC_TIMEOUT,
   );

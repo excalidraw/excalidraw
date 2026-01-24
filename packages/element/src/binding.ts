@@ -258,7 +258,7 @@ const bindingStrategyForElbowArrowEndpointDragging = (
     globalPoint,
     elements,
     elementsMap,
-    (element) => maxBindingDistance_simple(zoom),
+    () => maxBindingDistance_simple(zoom),
   );
 
   const current = hit
@@ -391,7 +391,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
         element: otherElement,
         focusPoint: shiftKey
           ? elementCenterPoint(otherElement, elementsMap)
-          : origin ?? pointFrom<GlobalPoint>(arrow.x, arrow.y),
+          : (origin ?? pointFrom<GlobalPoint>(arrow.x, arrow.y)),
       };
 
       // We are hovering another element with the end point
@@ -522,41 +522,35 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
       }
       // The opposite binding is inside the same element
       // eslint-disable-next-line no-else-return
-      else {
-        current = { element: hit, mode: "inside", focusPoint: point };
-
-        return { current, other: isMultiPoint ? { mode: undefined } : other };
-      }
-    }
-    // The opposite binding is on a different element (or nested)
-    // eslint-disable-next-line no-else-return
-    else {
-      // Handle the nested element case
-      if (isOverlapping && oppositeElement && !otherIsTransparent) {
-        current = {
-          element: oppositeElement,
-          mode: "inside",
-          focusPoint: point,
-        };
-      } else {
-        current = {
-          element: hit,
-          mode: "orbit",
-          focusPoint: isNested ? point : point,
-        };
-      }
+      current = { element: hit, mode: "inside", focusPoint: point };
 
       return { current, other: isMultiPoint ? { mode: undefined } : other };
     }
+    // The opposite binding is on a different element (or nested)
+    // eslint-disable-next-line no-else-return
+    // Handle the nested element case
+    if (isOverlapping && oppositeElement && !otherIsTransparent) {
+      current = {
+        element: oppositeElement,
+        mode: "inside",
+        focusPoint: point,
+      };
+    } else {
+      current = {
+        element: hit,
+        mode: "orbit",
+        focusPoint: isNested ? point : point,
+      };
+    }
+
+    return { current, other: isMultiPoint ? { mode: undefined } : other };
   }
   // The opposite binding is on a different element or no binding
-  else {
-    current = {
-      element: hit,
-      mode: "orbit",
-      focusPoint: point,
-    };
-  }
+  current = {
+    element: hit,
+    mode: "orbit",
+    focusPoint: point,
+  };
 
   // Must return as only one endpoint is dragged, therefore
   // the end binding strategy might accidentally gets overriden
@@ -683,7 +677,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     globalPoint,
     elements,
     elementsMap,
-    (e) => maxBindingDistance_simple(appState.zoom),
+    () => maxBindingDistance_simple(appState.zoom),
   );
   const pointInElement =
     hit &&
@@ -726,13 +720,13 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
         focusPoint: startDragged
           ? globalPoint
           : // NOTE: Can only affect the start point because new arrows always drag the end point
-          opts?.newArrow
-          ? appState.selectedLinearElement!.initialState.origin!
-          : LinearElementEditor.getPointAtIndexGlobalCoordinates(
-              arrow,
-              0,
-              elementsMap,
-            ), // startFixedPoint,
+            opts?.newArrow
+            ? appState.selectedLinearElement!.initialState.origin!
+            : LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                arrow,
+                0,
+                elementsMap,
+              ), // startFixedPoint,
       },
       end: {
         mode: "inside",
@@ -810,19 +804,19 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           focusPoint: appState.selectedLinearElement.initialState.altFocusPoint,
         }
       : opts?.angleLocked && otherBindableElement
-      ? {
-          mode: "orbit",
-          element: otherBindableElement,
-          focusPoint:
-            projectFixedPointOntoDiagonal(
-              arrow,
-              otherEndpoint,
-              otherBindableElement,
-              startDragged ? "end" : "start",
-              elementsMap,
-            ) || otherEndpoint,
-        }
-      : { mode: undefined };
+        ? {
+            mode: "orbit",
+            element: otherBindableElement,
+            focusPoint:
+              projectFixedPointOntoDiagonal(
+                arrow,
+                otherEndpoint,
+                otherBindableElement,
+                startDragged ? "end" : "start",
+                elementsMap,
+              ) || otherEndpoint,
+          }
+        : { mode: undefined };
 
   return {
     start: startDragged ? current : other,
@@ -1944,9 +1938,9 @@ const newBoundElements = (
   nextBoundElements.push(
     ...elementsToAdd.map(
       (x) =>
-        ({ id: x.id, type: x.type } as
+        ({ id: x.id, type: x.type }) as
           | ExcalidrawArrowElement
-          | ExcalidrawTextElement),
+          | ExcalidrawTextElement,
     ),
   );
 
@@ -2414,7 +2408,7 @@ const SHAPE_CONFIGS: Record<ShapeType, SectorConfig[]> = {
 const getSectorBoundaries = (
   config: SectorConfig[],
 ): Array<{ start: number; end: number; side: Side }> => {
-  return config.map((sector, index) => {
+  return config.map((sector) => {
     const halfWidth = sector.sectorWidth / 2;
     let start = sector.centerAngle - halfWidth;
     let end = sector.centerAngle + halfWidth;

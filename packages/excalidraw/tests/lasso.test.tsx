@@ -359,7 +359,7 @@ describe("Basic lasso selection tests", () => {
           ...e,
           angle: e.angle as Radians,
           index: null,
-        } as ExcalidrawElement),
+        }) as ExcalidrawElement,
     );
 
     act(() => {

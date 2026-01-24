@@ -974,7 +974,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         inserted,
         "selectedElementIds",
         // ts language server has a bit trouble resolving this, so we are giving it a little push
-        (_) => true as ValueOf<T["selectedElementIds"]>,
+        () => true as ValueOf<T["selectedElementIds"]>,
       );
       Delta.diffObjects(
         deleted,
@@ -995,9 +995,8 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       if (isTestEnv() || isDevEnv()) {
         throw e;
       }
-    } finally {
-      return [deleted, inserted];
     }
+    return [deleted, inserted];
   }
 
   private static orderAppStateKeys(partial: Partial<ObservedAppState>) {
@@ -1459,9 +1458,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       if (isTestEnv() || isDevEnv()) {
         throw e;
       }
-    } finally {
-      return [nextElements, flags.containsVisibleDifference];
     }
+    return [nextElements, flags.containsVisibleDifference];
   }
 
   public squash(delta: ElementsDelta): this {
@@ -1802,7 +1800,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
     // updated delta is affecting the binding only in case it contains changed binding or bindable property
     for (const [id] of Array.from(Object.entries(this.updated)).filter(
-      ([_, delta]) =>
+      ([, delta]) =>
         Object.keys({ ...delta.deleted, ...delta.inserted }).find((prop) =>
           bindingProperties.has(prop as BindingProp | BindableProp),
         ),
@@ -1908,9 +1906,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       if (isTestEnv() || isDevEnv()) {
         throw e;
       }
-    } finally {
-      return nextElements;
     }
+    return nextElements;
   }
 
   private static redrawTextBoundingBoxes(
@@ -2051,9 +2048,9 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       if (isTestEnv() || isDevEnv()) {
         throw e;
       }
-    } finally {
-      return [deleted, inserted];
     }
+
+    return [deleted, inserted];
   }
 
   private static stripIrrelevantProps(

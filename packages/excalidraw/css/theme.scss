@@ -34,7 +34,8 @@
   --popup-text-color: #000;
   --popup-text-inverted-color: #fff;
   --select-highlight-color: #{$color-blue-5};
-  --shadow-island: 0px 0px 0.9310142993927002px 0px rgba(0, 0, 0, 0.17),
+  --shadow-island:
+    0px 0px 0.9310142993927002px 0px rgba(0, 0, 0, 0.17),
     0px 0px 3.1270833015441895px 0px rgba(0, 0, 0, 0.08),
     0px 7px 14px 0px rgba(0, 0, 0, 0.05);
 
@@ -56,14 +57,16 @@
   --color-slider-track: hsl(240, 100%, 90%);
   --color-slider-thumb: var(--color-gray-80);
 
-  --modal-shadow: 0px 100px 80px rgba(0, 0, 0, 0.07),
+  --modal-shadow:
+    0px 100px 80px rgba(0, 0, 0, 0.07),
     0px 41.7776px 33.4221px rgba(0, 0, 0, 0.0503198),
     0px 22.3363px 17.869px rgba(0, 0, 0, 0.0417275),
     0px 12.5216px 10.0172px rgba(0, 0, 0, 0.035),
     0px 6.6501px 5.32008px rgba(0, 0, 0, 0.0282725),
     0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
   --avatar-border-color: var(--color-gray-20);
-  --sidebar-shadow: 0px 100px 80px rgba(0, 0, 0, 0.07),
+  --sidebar-shadow:
+    0px 100px 80px rgba(0, 0, 0, 0.07),
     0px 41.7776px 33.4221px rgba(0, 0, 0, 0.0503198),
     0px 22.3363px 17.869px rgba(0, 0, 0, 0.0417275),
     0px 12.5216px 10.0172px rgba(0, 0, 0, 0.035),
@@ -71,9 +74,10 @@
     0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
   --sidebar-border-color: var(--color-surface-high);
   --sidebar-bg-color: var(--island-bg-color);
-  --library-dropdown-shadow: 0px 15px 6px rgba(0, 0, 0, 0.01),
-    0px 8px 5px rgba(0, 0, 0, 0.05), 0px 4px 4px rgba(0, 0, 0, 0.09),
-    0px 1px 2px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
+  --library-dropdown-shadow:
+    0px 15px 6px rgba(0, 0, 0, 0.01), 0px 8px 5px rgba(0, 0, 0, 0.05),
+    0px 4px 4px rgba(0, 0, 0, 0.09), 0px 1px 2px rgba(0, 0, 0, 0.1),
+    0px 0px 0px rgba(0, 0, 0, 0.1);
   --chat-msg-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 
   --space-factor: 0.25rem;
@@ -210,11 +214,13 @@
     --popup-text-color: #{$color-gray-4};
     --popup-text-inverted-color: #2c2c2c;
     --select-highlight-color: #{$color-blue-4};
-    --shadow-island: 0px 0px 0.9310142993927002px 0px rgba(0, 0, 0, 0.17),
+    --shadow-island:
+      0px 0px 0.9310142993927002px 0px rgba(0, 0, 0, 0.17),
       0px 0px 3.1270833015441895px 0px rgba(0, 0, 0, 0.08),
       0px 7px 14px 0px rgba(0, 0, 0, 0.05);
 
-    --modal-shadow: 0px 100px 80px rgba(0, 0, 0, 0.07),
+    --modal-shadow:
+      0px 100px 80px rgba(0, 0, 0, 0.07),
       0px 41.7776px 33.4221px rgba(0, 0, 0, 0.0503198),
       0px 22.3363px 17.869px rgba(0, 0, 0, 0.0417275),
       0px 12.5216px 10.0172px rgba(0, 0, 0, 0.035),
