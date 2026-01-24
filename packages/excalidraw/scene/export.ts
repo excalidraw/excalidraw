@@ -218,7 +218,10 @@ export const exportToCanvas = async (
   // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
   await loadFonts();
 
-  const normalizedFiles = applyDefaultInvertInDarkMode(files, invertSVGInDarkMode);
+  const normalizedFiles = applyDefaultInvertInDarkMode(
+    files,
+    invertSVGInDarkMode,
+  );
 
   const frameRendering = getFrameRenderingConfig(
     exportingFrame ?? null,
@@ -331,7 +334,10 @@ export const exportToSvg = async (
   );
 
   const invertSVGInDarkMode = opts?.invertSVGInDarkMode ?? true;
-  const normalizedFiles = applyDefaultInvertInDarkMode(files, invertSVGInDarkMode);
+  const normalizedFiles = applyDefaultInvertInDarkMode(
+    files,
+    invertSVGInDarkMode,
+  );
 
   let {
     exportPadding = DEFAULT_EXPORT_PADDING,
@@ -399,12 +405,7 @@ export const exportToSvg = async (
         // elements which don't contain the temp frame labels.
         // But it also requires that the exportToSvg is being supplied with
         // only the elements that we're exporting, and no extra.
-        payload: serializeAsJSON(
-          elements,
-          appState,
-          normalizedFiles,
-          "local",
-        ),
+        payload: serializeAsJSON(elements, appState, normalizedFiles, "local"),
       });
     } catch (error: any) {
       console.error(error);
