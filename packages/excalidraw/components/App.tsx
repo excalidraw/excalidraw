@@ -4249,6 +4249,12 @@ class App extends React.Component<AppProps, AppState> {
         continue;
       }
 
+      if (fileData.invertInDarkMode === undefined) {
+        fileData.invertInDarkMode = this.props.invertSVGInDarkMode ?? true
+          ? fileData.mimeType === MIME_TYPES.svg
+          : false;
+      }
+
       addedFiles[fileData.id] = fileData;
       nextFiles[fileData.id] = fileData;
 

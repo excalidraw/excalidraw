@@ -115,6 +115,7 @@ export type BinaryFileData = {
     | typeof MIME_TYPES.binary;
   id: FileId;
   dataURL: DataURL;
+  invertInDarkMode?: boolean;
   /**
    * Epoch timestamp in milliseconds
    */
@@ -634,6 +635,7 @@ export interface ExcalidrawProps {
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
+  invertSVGInDarkMode?: boolean;
 }
 
 export type SceneData = {
@@ -722,6 +724,7 @@ export type AppClassProperties = {
     {
       image: HTMLImageElement | Promise<HTMLImageElement>;
       mimeType: ValueOf<typeof IMAGE_MIME_TYPES>;
+      invertInDarkMode?: boolean;
     }
   >;
   files: BinaryFiles;

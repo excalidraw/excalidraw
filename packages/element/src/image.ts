@@ -61,6 +61,7 @@ export const updateImageCache = async ({
               const data = {
                 image: imagePromise,
                 mimeType: fileData.mimeType,
+                invertInDarkMode: fileData.invertInDarkMode,
               } as const;
               // store the promise immediately to indicate there's an in-progress
               // initialization

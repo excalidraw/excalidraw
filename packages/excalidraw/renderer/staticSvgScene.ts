@@ -3,6 +3,7 @@ import {
   MAX_DECIMALS_FOR_SVG_EXPORT,
   SVG_NS,
   THEME,
+  DARK_THEME_FILTER,
   getFontFamilyString,
   isRTL,
   isTestEnv,
@@ -44,6 +45,9 @@ import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
 import type { Drawable } from "roughjs/bin/core";
 import type { RoughSVG } from "roughjs/bin/svg";
+
+const getThemeFilterValue = (theme: AppState["theme"]) =>
+  theme === THEME.DARK ? DARK_THEME_FILTER : "";
 
 const roughSVGDrawWithPrecision = (
   rsvg: RoughSVG,
@@ -519,6 +523,16 @@ const renderElementToSvg = (
         }
 
         const g = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
+
+        if (
+          renderConfig.theme === THEME.DARK &&
+          (fileData.invertInDarkMode ?? false)
+        ) {
+          g.setAttribute(
+            "style",
+            `filter: ${getThemeFilterValue(renderConfig.theme)};`,
+          );
+        }
 
         if (element.crop) {
           const mask = svgRoot.ownerDocument.createElementNS(SVG_NS, "mask");
