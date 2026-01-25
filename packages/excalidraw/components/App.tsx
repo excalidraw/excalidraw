@@ -1,3 +1,4 @@
+// oxlint-disable typescript/no-misused-spread
 import clsx from "clsx";
 import throttle from "lodash.throttle";
 import React, { useContext } from "react";

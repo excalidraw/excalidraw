@@ -262,7 +262,9 @@ const renderElementToSvg = (
         div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
         div.style.width = "100%";
         div.style.height = "100%";
+        // oxlint-disable-next-line react/iframe-missing-sandbox
         const iframe = div.ownerDocument.createElement("iframe");
+        iframe.setAttribute("sandbox", "");
         iframe.src = embedLink?.link ?? "";
         iframe.style.width = "100%";
         iframe.style.height = "100%";

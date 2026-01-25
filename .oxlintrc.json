@@ -64,8 +64,43 @@
         "allowReferrer": true
       }
     ],
-    "jsx-a11y/no-autofocus": "off",
+
+    "eslint/no-unreachable": "warn",
+
+    // react
+    "react/jsx-no-comment-textnodes": "error",
+    "react/iframe-missing-sandbox": "warn",
+    "react/rules-of-hooks": "error",
+    "react/no-unescaped-entities": "warn",
+
+    // for later
+    // ----------
+    // "react/no-array-index-key": "warn",
+    // "react/jsx-no-useless-fragment": "warn",
+
+    // will require major refactor
+    // ---------------------------
+    // "react/only-export-components": "warn",
+
+    // type-aware rules (requires --type-aware flag)
+    // -------------------------------------------------------------------------
+    "typescript/switch-exhaustiveness-check": "warn",
+    "typescript/unbound-method": [
+      "warn",
+      {
+        "ignoreStatic": true
+      }
+    ],
+
+    // disabled rules
+    // -------------------------------------------------------------------------
+    // may be re-enabled later
+    "typescript/no-redundant-type-constituents": "off",
+    "typescript/no-unsafe-unary-minus": "off",
+    "typescript/no-floating-promises": "off",
+    // not planned
     "eslint/no-async-promise-executor": "off",
+    "jsx-a11y/no-autofocus": "off",
     "eslint-plugin-jsx-a11y/click-events-have-key-events": "off",
     "eslint-plugin-jsx-a11y/label-has-associated-control": "off"
   },
@@ -80,6 +115,8 @@
     "examples/**/public",
     "dev-dist",
     "coverage"
+    // "**/tests/**",
+    // "**/*.test*"
   ],
   "overrides": [
     {

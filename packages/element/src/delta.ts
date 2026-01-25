@@ -467,6 +467,7 @@ export class Delta<T> {
     } else {
       assertNever(
         join,
+        // oxlint-disable-next-line typescript/restrict-template-expressions
         `Unknown distinctKeysIterator's join param "${join}"`,
         true,
       );
@@ -860,6 +861,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
           default:
             assertNever(
               key,
+              // oxlint-disable-next-line typescript/restrict-template-expressions
               `Unknown ObservedElementsAppState's key "${key}"`,
               true,
             );
@@ -1332,6 +1334,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         for (const key of Object.keys(partial) as Array<keyof typeof partial>) {
           // do not update following props:
           // - `boundElements`, as it is a reference value which is postprocessed to contain only deleted/inserted keys
+          // oxlint-disable-next-line typescript/switch-exhaustiveness-check
           switch (key) {
             case "boundElements":
               latestPartial[key] = partial[key];
