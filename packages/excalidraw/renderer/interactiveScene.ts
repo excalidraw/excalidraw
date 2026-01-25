@@ -1383,7 +1383,7 @@ const _renderInteractiveScene = ({
           y2,
           selectionColors: groupElements.some((el) => el.locked)
             ? ["#ced4da"]
-            : ["#000"],
+            : [selectionColor],
           dashed: true,
           cx: x1 + (x2 - x1) / 2,
           cy: y1 + (y2 - y1) / 2,
