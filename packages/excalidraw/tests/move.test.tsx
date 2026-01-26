@@ -78,7 +78,7 @@ describe("move element", () => {
     // create elements
     const rectA = UI.createElement("rectangle", { size: 100 });
     const rectB = UI.createElement("rectangle", { x: 200, y: 0, size: 300 });
-    const arrow = UI.createElement("arrow", { x: 110, y: 50, size: 80 });
+    const arrow = UI.createElement("arrow", { x: 105, y: 50, size: 88 });
 
     act(() => {
       // bind line to two rectangles
@@ -110,11 +110,11 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([200, 0]);
-    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[110, -4.576537]], 0);
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints(
-      [[79.00036001606541, 132.89433860965323]],
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints(
+      [[111, 59.786555555555545]],
       0,
     );
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[78, 78]], 0);
 
     renderInteractiveScene.mockClear();
     renderStaticScene.mockClear();
@@ -133,13 +133,10 @@ describe("move element", () => {
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([201, 2]);
     expect([[arrow.x, arrow.y]]).toCloselyEqualPoints(
-      [[111, 6.149953437004186]],
+      [[111, 59.786555555555545]],
       0,
     );
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints(
-      [[78.99999999999997, 124.16784741121175]],
-      0,
-    );
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[79, 80]], 0);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });

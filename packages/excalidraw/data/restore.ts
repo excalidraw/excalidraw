@@ -141,11 +141,11 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
   existingElementsMap: Readonly<ElementsMap> | null | undefined,
   startOrEnd: "start" | "end",
 ): FixedPointBinding | null => {
-  try {
-    if (!binding) {
-      return null;
-    }
+  if (!binding) {
+    return null;
+  }
 
+  try {
     // ---------------------------------------------------------------------------
     // elbow arrows
     // ---------------------------------------------------------------------------
@@ -217,6 +217,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
               boundElement,
               startOrEnd,
               elementsMap,
+              { value: 1 as NormalizedZoomValue },
             ) || p;
       const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
         element,

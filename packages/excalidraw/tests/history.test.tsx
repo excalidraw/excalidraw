@@ -5031,8 +5031,9 @@ describe("history", () => {
         // bind arrow to rect1 and rect2
         UI.clickTool("arrow");
         mouse.down(0, 0);
-        mouse.moveTo(50, 3);
-        mouse.up(50, 3);
+        mouse.moveTo(25, 0);
+        mouse.moveTo(47, 0);
+        mouse.up(47, 0);
 
         const arrowId = h.elements[2].id;
 
