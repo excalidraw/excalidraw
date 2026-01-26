@@ -218,7 +218,7 @@ describe("Test Linear Elements", () => {
     // drag line from midpoint
     drag(midpoint, pointFrom(midpoint[0] + delta, midpoint[1] + delta));
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`8`);
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
     expect(line.points.length).toEqual(3);
     expect(line.points).toMatchInlineSnapshot(`
       [
