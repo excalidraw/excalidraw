@@ -315,7 +315,7 @@ export const handleFocusPointDrag = (
         elementsMap,
         point[0],
         point[1],
-        gridSize, // TODO: Test around binding areas
+        gridSize,
       ),
     });
     LinearElementEditor.movePoints(arrow, scene, pointUpdates);
