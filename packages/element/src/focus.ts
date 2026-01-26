@@ -7,6 +7,7 @@ import {
   bindBindingElement,
   calculateFixedPointForNonElbowArrowBinding,
   FOCUS_POINT_SIZE,
+  getBindingGap,
   getGlobalFixedPointForBindableElement,
   isBindingEnabled,
   maxBindingDistance_simple,
@@ -19,9 +20,13 @@ import {
   isElbowArrow,
 } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
-import { getHoveredElementForBinding, hitElementItself } from "./collision";
-
+import {
+  getHoveredElementForBinding,
+  hitElementItself,
+  isPointInElement,
+} from "./collision";
 import { moveArrowAboveBindable } from "./zindex";
+import { distanceToElement } from "./distance";
 
 import type {
   ElementsMap,
@@ -77,7 +82,7 @@ export const isFocusPointVisible = (
     element: bindableElement,
     elementsMap,
     point: focusPoint,
-    threshold: maxBindingDistance_simple(appState.zoom),
+    threshold: getBindingGap(bindableElement, arrow),
     overrideShouldTestInside: true,
   });
 };
@@ -220,7 +225,11 @@ export const handleFocusPointDrag = (
   const bindingField = isStartBinding ? "startBinding" : "endBinding";
 
   // Hovering a bindable element
-  if (hit) {
+  if (
+    hit &&
+    (isPointInElement(point, hit, elementsMap) ||
+      distanceToElement(hit, elementsMap, point) <= getBindingGap(hit, arrow))
+  ) {
     // Break existing binding if any
     if (arrow[bindingField] && hit.id !== binding?.elementId) {
       unbindBindingElement(
