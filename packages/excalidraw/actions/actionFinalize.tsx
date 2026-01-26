@@ -98,7 +98,10 @@ export const actionFinalize = register<FormData>({
             map.set(index, {
               point: LinearElementEditor.pointFromAbsoluteCoords(
                 element,
-                pointFrom<GlobalPoint>(sceneCoords.x, sceneCoords.y),
+                pointFrom<GlobalPoint>(
+                  sceneCoords.x - linearElementEditor.pointerOffset.x,
+                  sceneCoords.y - linearElementEditor.pointerOffset.y,
+                ),
                 elementsMap,
               ),
             });
@@ -109,8 +112,8 @@ export const actionFinalize = register<FormData>({
         bindOrUnbindBindingElement(
           element,
           draggedPoints,
-          sceneCoords.x,
-          sceneCoords.y,
+          sceneCoords.x - linearElementEditor.pointerOffset.x,
+          sceneCoords.y - linearElementEditor.pointerOffset.y,
           scene,
           appState,
           {
@@ -173,6 +176,7 @@ export const actionFinalize = register<FormData>({
                     ...linearElementEditor.initialState,
                     lastClickedPoint: -1,
                   },
+                  pointerOffset: { x: 0, y: 0 },
                 },
             selectionElement: null,
             suggestedBinding: null,

@@ -724,7 +724,6 @@ export class LinearElementEditor {
           ? [pointerDownState.lastClickedPoint]
           : selectedPointsIndices,
       isDragging: false,
-      pointerOffset: { x: 0, y: 0 },
       customLineAngle: null,
       initialState: {
         ...editingLinearElement.initialState,
