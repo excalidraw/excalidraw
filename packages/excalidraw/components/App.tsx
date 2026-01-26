@@ -264,7 +264,6 @@ import type {
   NonDeleted,
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
-  ExcalidrawNonSelectionElement,
   FileId,
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,

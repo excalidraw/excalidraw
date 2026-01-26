@@ -19,7 +19,7 @@ import {
   throttleRAF,
 } from "@excalidraw/common";
 import { decryptData } from "@excalidraw/excalidraw/data/encryption";
-import { getVisibleSceneBounds, hashString } from "@excalidraw/element";
+import { getVisibleSceneBounds } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element";
 import { isImageElement, isInitializedImageElement } from "@excalidraw/element";
 import { AbortError } from "@excalidraw/excalidraw/errors";
@@ -111,7 +111,6 @@ interface CollabState {
 export const activeRoomLinkAtom = atom<string | null>(null);
 
 type CollabInstance = InstanceType<typeof Collab>;
-type PollBallots = NonNullable<AppState["polls"][number]["ballots"]>;
 
 export interface CollabAPI {
   /** function so that we can access the latest value from stale callbacks */

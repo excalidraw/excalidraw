@@ -3,8 +3,6 @@ import React, { useMemo, useState } from "react";
 
 import { t } from "../../i18n";
 
-import type { PollMetadata } from "../../poll/types";
-
 import {
   useApp,
   useExcalidrawAppState,
@@ -16,6 +14,8 @@ import { TextField } from "../TextField";
 import { PollCard } from "./PollCard";
 
 import "./PollsSidebar.scss";
+
+import type { PollMetadata } from "../../poll/types";
 
 const getPollStatusLabel = (poll: PollMetadata) => {
   switch (poll.status.state) {
