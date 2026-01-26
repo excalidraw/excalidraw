@@ -16472,7 +16472,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
               ],
               "mode": "orbit",
             },
-            "version": 14,
+            "version": 12,
           },
           "inserted": {
             "endBinding": {
@@ -16492,7 +16492,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
               ],
               "mode": "orbit",
             },
-            "version": 11,
+            "version": 9,
           },
         },
       },
@@ -16841,7 +16841,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
-            "version": 9,
+            "version": 7,
           },
         },
       },
@@ -17482,7 +17482,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
-            "version": 11,
+            "version": 9,
           },
         },
       },
@@ -18131,7 +18131,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
-            "version": 11,
+            "version": 9,
           },
         },
       },
@@ -18535,7 +18535,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
               ],
               "mode": "orbit",
             },
-            "version": 14,
+            "version": 12,
           },
           "inserted": {
             "endBinding": {
@@ -18547,7 +18547,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
               "mode": "orbit",
             },
             "startBinding": null,
-            "version": 11,
+            "version": 9,
           },
         },
         "id2": {
@@ -18864,7 +18864,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
-            "version": 9,
+            "version": 7,
           },
         },
       },
@@ -19301,12 +19301,12 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
               ],
               "mode": "orbit",
             },
-            "version": 15,
+            "version": 13,
           },
           "inserted": {
             "endBinding": null,
             "startBinding": null,
-            "version": 12,
+            "version": 10,
           },
         },
       },
@@ -19615,7 +19615,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
-            "version": 9,
+            "version": 7,
           },
         },
       },

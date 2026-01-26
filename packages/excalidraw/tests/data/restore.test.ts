@@ -200,6 +200,36 @@ describe("restoreElements", () => {
     });
   });
 
+  it("should strip element if restore fails", () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      boundElements: [],
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      boundElements: [],
+    });
+
+    // define getter for a property we access during restoreElement that throws
+    Object.defineProperty(rect2, "seed", {
+      get: () => {
+        throw new Error("FORBIDDEN!");
+      },
+    });
+
+    const restoredElements = restore.restoreElements([rect1, rect2], null);
+
+    expect(restoredElements.length).toBe(1);
+
+    expect(restoredElements).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: rect1.id,
+        }),
+      ]),
+    );
+  });
+
   it("should remove imperceptibly small elements", () => {
     const arrowElement = API.createElement({
       type: "arrow",
@@ -717,6 +747,58 @@ describe("restoreAppState", () => {
 });
 
 describe("repairing bindings", () => {
+  it("should strip arrow binding if repair throws", () => {
+    const container = API.createElement({
+      type: "rectangle",
+      boundElements: [],
+    });
+    const arrowElement = API.createElement({
+      type: "arrow",
+      id: "id-arrow01",
+      endBinding: {
+        elementId: container.id,
+        fixedPoint: [0.5, 0.5],
+        mode: "inside",
+      },
+    });
+
+    Object.assign(container, {
+      boundElements: [{ type: "arrow", id: arrowElement.id }],
+    });
+    // make invalid binding -> throws during repair
+    Object.assign(arrowElement, {
+      endBinding: {
+        // invalid reference
+        elementId: 42,
+      },
+    });
+
+    const restoredElements = restore.restoreElements(
+      [arrowElement, container],
+      null,
+    );
+
+    expect(restoredElements).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: arrowElement.id,
+          endBinding: null,
+        }),
+        expect.objectContaining({
+          id: container.id,
+        }),
+      ]),
+    );
+
+    const restoredArrow = restoredElements[0] as ExcalidrawLinearElement;
+
+    expect(restoredArrow).toMatchSnapshot({
+      seed: expect.any(Number),
+      versionNonce: expect.any(Number),
+      // endBinding: expect.any(Object),
+    });
+  });
+
   it("should repair container boundElements when repair is true", () => {
     const container = API.createElement({
       type: "rectangle",
