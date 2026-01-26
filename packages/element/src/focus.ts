@@ -1,13 +1,4 @@
-import {
-  lineSegment,
-  pointDistance,
-  pointDistanceSq,
-  pointFrom,
-  pointFromVector,
-  vectorFromPoint,
-  vectorScale,
-  type GlobalPoint,
-} from "@excalidraw/math";
+import { pointDistance, pointFrom, type GlobalPoint } from "@excalidraw/math";
 import { invariant } from "@excalidraw/common";
 
 import type { AppState, NullableGridSize } from "@excalidraw/excalidraw/types";
@@ -28,12 +19,7 @@ import {
   isElbowArrow,
 } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
-import {
-  getHoveredElementForBinding,
-  hitElementItself,
-  intersectElementWithLineSegment,
-  isPointInElement,
-} from "./collision";
+import { getHoveredElementForBinding, hitElementItself } from "./collision";
 
 import { moveArrowAboveBindable } from "./zindex";
 
@@ -91,7 +77,7 @@ export const isFocusPointVisible = (
     element: bindableElement,
     elementsMap,
     point: focusPoint,
-    threshold: 1,
+    threshold: maxBindingDistance_simple(appState.zoom),
     overrideShouldTestInside: true,
   });
 };
@@ -101,7 +87,6 @@ const focusPointOrbitUpdate = (
   arrow: ExcalidrawArrowElement,
   bindableElement: ExcalidrawBindableElement | null,
   isStartBinding: boolean,
-  insideBindableElement: boolean,
   elementsMap: NonDeletedSceneElementsMap,
   scene: Scene,
   appState: AppState,
@@ -233,43 +218,9 @@ export const handleFocusPointDrag = (
     maxBindingDistance_simple(appState.zoom),
   );
   const bindingField = isStartBinding ? "startBinding" : "endBinding";
-  const insideBindableElement =
-    hit && isPointInElement(point, hit, elementsMap);
 
+  // Hovering a bindable element
   if (hit) {
-    // Hovering a bindable element...
-    const arrowAdjacentPoint =
-      LinearElementEditor.getPointAtIndexGlobalCoordinates(
-        arrow,
-        isStartBinding ? 1 : arrow.points.length - 2,
-        elementsMap,
-      );
-    const arrowEndPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      arrow,
-      isStartBinding ? 0 : arrow.points.length - 1,
-      elementsMap,
-    );
-    const intersector = lineSegment(
-      arrowAdjacentPoint,
-      pointFromVector(
-        vectorScale(
-          vectorFromPoint(point, arrowAdjacentPoint),
-          Math.max(hit.width, hit.height) * 2 +
-            pointDistance(arrowAdjacentPoint, point) * 2,
-        ),
-        arrowAdjacentPoint,
-      ),
-    );
-    const focusPoint = insideBindableElement
-      ? // Direct focus point positioning inside the bindable element
-        point
-      : // Outline focus point positioning when outside the bindable element
-        intersectElementWithLineSegment(hit, elementsMap, intersector, 0).sort(
-          (a, b) =>
-            pointDistanceSq(a, arrowEndPoint) -
-            pointDistanceSq(b, arrowEndPoint),
-        )[0] || point;
-
     // Break existing binding if any
     if (arrow[bindingField] && hit.id !== binding?.elementId) {
       unbindBindingElement(
@@ -301,7 +252,7 @@ export const handleFocusPointDrag = (
           hit,
           linearElementEditor.hoveredFocusPointBinding,
           elementsMap,
-          focusPoint,
+          point,
         ),
       },
     });
@@ -329,7 +280,6 @@ export const handleFocusPointDrag = (
     arrow,
     hit,
     isStartBinding,
-    !!insideBindableElement,
     elementsMap,
     scene,
     appState,
