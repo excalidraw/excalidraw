@@ -235,6 +235,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       startCollaboration: this.startCollaboration,
       syncElements: this.syncElements,
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
+      broadcastPollVote: this.broadcastPollVote,
       stopCollaboration: this.stopCollaboration,
       setUsername: this.setUsername,
       getUsername: this.getUsername,
@@ -585,13 +586,15 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           case WS_SUBTYPES.INIT: {
             if (!this.portal.socketInitialized) {
               this.initializeRoom({ fetchScene: false });
-              const remoteElements = decryptedData.payload.elements;
+              const { elements: remoteElements, appState } =
+                decryptedData.payload;
               const reconciledElements =
                 this._reconcileElements(remoteElements);
-              this.handleRemoteSceneUpdate(reconciledElements);
+              this.handleRemoteSceneUpdate(reconciledElements, appState);
               // noop if already resolved via init from firebase
               scenePromise.resolve({
                 elements: reconciledElements,
+                appState,
                 scrollToContent: true,
               });
             }
@@ -600,6 +603,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           case WS_SUBTYPES.UPDATE:
             this.handleRemoteSceneUpdate(
               this._reconcileElements(decryptedData.payload.elements),
+              decryptedData.payload.appState,
             );
             break;
           case WS_SUBTYPES.MOUSE_LOCATION: {
@@ -663,6 +667,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
             });
             break;
           }
+          case WS_SUBTYPES.POLL_VOTE: {
+            this.excalidrawAPI.applyPollVote(decryptedData.payload);
+            break;
+          }
 
           default: {
             assertNever(decryptedData, null);
@@ -720,18 +728,20 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.excalidrawAPI.resetScene();
 
       try {
-        const elements = await loadFromFirebase(
+        const sceneData = await loadFromFirebase(
           roomLinkData.roomId,
           roomLinkData.roomKey,
           this.portal.socket,
         );
-        if (elements) {
+        if (sceneData) {
+          const { elements, appState } = sceneData;
           this.setLastBroadcastedOrReceivedSceneVersion(
             getSceneVersion(elements),
           );
 
           return {
             elements,
+            appState,
             scrollToContent: true,
           };
         }
@@ -790,9 +800,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   private handleRemoteSceneUpdate = (
     elements: ReconciledExcalidrawElement[],
+    appState?: Pick<AppState, "polls">,
   ) => {
     this.excalidrawAPI.updateScene({
       elements,
+      appState,
       captureUpdate: CaptureUpdateAction.NEVER,
     });
 
@@ -926,6 +938,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   onIdleStateChange = (userState: UserIdleState) => {
     this.portal.broadcastIdleChange(userState);
+  };
+
+  broadcastPollVote = (payload: PollVotePayload) => {
+    this.portal.broadcastPollVote(payload);
   };
 
   broadcastElements = (elements: readonly OrderedExcalidrawElement[]) => {
