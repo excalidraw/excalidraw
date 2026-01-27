@@ -1345,7 +1345,7 @@ const PanningModeControl = () => {
           selected={appState.panningMode === "verticalFixed"}
           icon={leftRightIcon}
         >
-          {t("labels.horizontalFixedMode")}
+          {t("labels.verticalFixedMode")}
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu>
