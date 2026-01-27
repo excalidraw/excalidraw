@@ -370,7 +370,7 @@
 
   .color-picker__input-label {
     display: grid;
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: auto 1fr auto auto auto;
     gap: 8px;
     align-items: center;
     border: 1px solid var(--default-border-color);
