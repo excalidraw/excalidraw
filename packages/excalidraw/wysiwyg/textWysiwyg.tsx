@@ -13,6 +13,7 @@ import {
 } from "@excalidraw/common";
 
 import {
+  getTextFromElements,
   originalContainerCache,
   updateOriginalContainerCache,
 } from "@excalidraw/element";
@@ -48,7 +49,7 @@ import type {
 
 import { actionSaveToActiveFile } from "../actions";
 
-import { parseDataTransferEvent } from "../clipboard";
+import { parseClipboard, parseDataTransferEvent } from "../clipboard";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
@@ -325,9 +326,43 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.onpaste = async (event) => {
-      const textItem = (await parseDataTransferEvent(event)).findByType(
-        MIME_TYPES.text,
-      );
+      const dataList = await parseDataTransferEvent(event);
+
+      // when copy/pasting excalidraw elements, only paste the text content
+      if (
+        dataList.findByType(MIME_TYPES.excalidrawClipboard) ||
+        dataList.findByType(MIME_TYPES.excalidraw)
+      ) {
+        try {
+          event.preventDefault();
+          const parsed = await parseClipboard(dataList);
+
+          if (parsed.elements) {
+            const text = getTextFromElements(parsed.elements);
+            if (text) {
+              const { selectionStart, selectionEnd, value } = editable;
+
+              editable.value =
+                value.slice(0, selectionStart) +
+                text +
+                value.slice(selectionEnd);
+
+              const newPos = selectionStart + text.length;
+              editable.selectionStart = editable.selectionEnd = newPos;
+
+              editable.dispatchEvent(new Event("input"));
+            }
+          }
+
+          // if excalidraw elements don't contain and text elements,
+          // don't paste anything
+          return;
+        } catch {
+          console.warn("failed to parse excalidraw clipboard data");
+        }
+      }
+
+      const textItem = dataList.findByType(MIME_TYPES.text);
       if (!textItem) {
         return;
       }
