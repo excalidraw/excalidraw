@@ -387,10 +387,6 @@ export const getHoveredElementForFocusPoint = (
   }
 
   const distanceFilteredCandidateElements = candidateElements
-    // Prefer smaller shapes
-    .sort(
-      (a, b) => b.width ** 2 + b.height ** 2 - (a.width ** 2 + a.height ** 2),
-    )
     // Resolve by distance
     .filter(
       (el) =>
@@ -402,7 +398,7 @@ export const getHoveredElementForFocusPoint = (
     return null;
   }
 
-  return distanceFilteredCandidateElements.pop() as NonDeleted<ExcalidrawBindableElement>;
+  return distanceFilteredCandidateElements[0] as NonDeleted<ExcalidrawBindableElement>;
 };
 
 /**
