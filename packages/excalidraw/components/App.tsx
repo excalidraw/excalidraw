@@ -4738,8 +4738,38 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       // Handle Alt key for bind mode
-      if (event.key === KEYS.ALT && getFeatureFlag("COMPLEX_BINDINGS")) {
-        this.handleSkipBindMode();
+      if (event.key === KEYS.ALT) {
+        if (getFeatureFlag("COMPLEX_BINDINGS")) {
+          this.handleSkipBindMode();
+        } else if (
+          this.state.selectedLinearElement &&
+          this.lastPointerMoveCoords
+        ) {
+          // Update focus point status if the binding mode is changing
+          if (this.state.selectedLinearElement.draggedFocusPointBinding) {
+            handleFocusPointDrag(
+              this.state.selectedLinearElement,
+              this.scene.getNonDeletedElementsMap(),
+              this.lastPointerMoveCoords,
+              this.scene,
+              this.state,
+              this.getEffectiveGridSize(),
+              event.altKey,
+            );
+          } else if (
+            this.state.selectedLinearElement.hoverPointIndex !== null &&
+            this.lastPointerMoveEvent &&
+            this.state.selectedLinearElement.initialState.lastClickedPoint >= 0
+          ) {
+            LinearElementEditor.handlePointDragging(
+              this.lastPointerMoveEvent,
+              this,
+              this.lastPointerMoveCoords.x,
+              this.lastPointerMoveCoords.y,
+              this.state.selectedLinearElement,
+            );
+          }
+        }
       }
 
       if (this.actionManager.handleKeyDown(event)) {
@@ -4769,6 +4799,7 @@ class App extends React.Component<AppProps, AppState> {
               this.scene,
               this.state,
               this.getEffectiveGridSize(),
+              event.altKey,
             );
           } else if (
             this.state.selectedLinearElement.hoverPointIndex !== null &&
@@ -5056,6 +5087,35 @@ class App extends React.Component<AppProps, AppState> {
       }
       isHoldingSpace = false;
     }
+
+    if (event.key === KEYS.ALT) {
+      if (this.state.selectedLinearElement && this.lastPointerMoveCoords) {
+        if (this.state.selectedLinearElement.draggedFocusPointBinding) {
+          handleFocusPointDrag(
+            this.state.selectedLinearElement,
+            this.scene.getNonDeletedElementsMap(),
+            this.lastPointerMoveCoords,
+            this.scene,
+            this.state,
+            this.getEffectiveGridSize(),
+            event.altKey,
+          );
+        } else if (
+          this.state.selectedLinearElement.hoverPointIndex !== null &&
+          this.lastPointerMoveEvent &&
+          this.state.selectedLinearElement.initialState.lastClickedPoint >= 0
+        ) {
+          LinearElementEditor.handlePointDragging(
+            this.lastPointerMoveEvent,
+            this,
+            this.lastPointerMoveCoords.x,
+            this.lastPointerMoveCoords.y,
+            this.state.selectedLinearElement,
+          );
+        }
+      }
+    }
+
     if (
       (event.key === KEYS.ALT && this.state.bindMode === "skip") ||
       (!event[KEYS.CTRL_OR_CMD] && !isBindingEnabled(this.state))
@@ -5066,7 +5126,7 @@ class App extends React.Component<AppProps, AppState> {
       });
 
       // Restart the timer if we're creating/editing a linear element and hovering over an element
-      if (this.lastPointerMoveEvent) {
+      if (this.lastPointerMoveEvent && getFeatureFlag("COMPLEX_BINDINGS")) {
         const scenePointer = viewportCoordsToSceneCoords(
           {
             clientX: this.lastPointerMoveEvent.clientX,
@@ -5087,7 +5147,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
           );
 
-          if (isBindingElement(element) && getFeatureFlag("COMPLEX_BINDINGS")) {
+          if (isBindingElement(element)) {
             this.handleDelayedBindModeChange(element, hoveredElement);
           }
         }
@@ -5108,6 +5168,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scene,
             this.state,
             this.getEffectiveGridSize(),
+            event.altKey,
           );
         } else if (
           this.state.selectedLinearElement.hoverPointIndex !== null &&
@@ -9122,6 +9183,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scene,
             this.state,
             this.getEffectiveGridSize(),
+            event.altKey,
           );
           this.setState({
             selectedLinearElement: {

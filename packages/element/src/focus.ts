@@ -88,13 +88,14 @@ export const isFocusPointVisible = (
 };
 
 // Updates the arrow endpoints in "orbit" configuration
-const focusPointOrbitUpdate = (
+const focusPointUpdate = (
   arrow: ExcalidrawArrowElement,
   bindableElement: ExcalidrawBindableElement | null,
   isStartBinding: boolean,
   elementsMap: NonDeletedSceneElementsMap,
   scene: Scene,
   appState: AppState,
+  switchToInsideBinding: boolean,
 ) => {
   const pointUpdates = new Map();
 
@@ -106,11 +107,11 @@ const focusPointOrbitUpdate = (
   // Update the dragged focus point related end
   if (currentBinding && bindableElement) {
     // Update the targeted bindings
-    if (
+    const boundToSameElement =
       bindableElement &&
       adjacentBinding &&
-      currentBinding.elementId === adjacentBinding.elementId
-    ) {
+      currentBinding.elementId === adjacentBinding.elementId;
+    if (switchToInsideBinding || boundToSameElement) {
       currentBinding = {
         ...currentBinding,
         mode: "inside",
@@ -148,7 +149,9 @@ const focusPointOrbitUpdate = (
       isBindingEnabled(appState)
     ) {
       // Same shape bound on both ends
-      if (bindableElement && adjacentBinding.elementId === bindableElement.id) {
+      const boundToSameElementAfterUpdate =
+        bindableElement && adjacentBinding.elementId === bindableElement.id;
+      if (switchToInsideBinding || boundToSameElementAfterUpdate) {
         adjacentBinding = {
           ...adjacentBinding,
           mode: "inside",
@@ -192,6 +195,7 @@ export const handleFocusPointDrag = (
   scene: Scene,
   appState: AppState,
   gridSize: NullableGridSize,
+  switchToInsideBinding: boolean,
 ) => {
   const arrow = LinearElementEditor.getElement(
     linearElementEditor.elementId,
@@ -241,13 +245,21 @@ export const handleFocusPointDrag = (
       );
     }
 
+    // Handle binding mode switch
+    const newMode =
+      switchToInsideBinding && arrow[bindingField]?.mode === "orbit"
+        ? "inside"
+        : !switchToInsideBinding && arrow[bindingField]?.mode === "inside"
+        ? "orbit"
+        : null;
+
     // If no existing binding, create it
-    if (!arrow[bindingField]) {
+    if (!arrow[bindingField] || newMode) {
       // Create a new binding if none exists
       bindBindingElement(
         arrow,
         hit,
-        "orbit",
+        newMode || "orbit",
         linearElementEditor.draggedFocusPointBinding,
         scene,
         point,
@@ -259,6 +271,7 @@ export const handleFocusPointDrag = (
       [bindingField]: {
         ...arrow[bindingField],
         elementId: hit.id,
+        mode: newMode || arrow[bindingField]?.mode || "orbit",
         ...calculateFixedPointForNonElbowArrowBinding(
           arrow,
           hit,
@@ -288,13 +301,14 @@ export const handleFocusPointDrag = (
   }
 
   // Update the arrow endpoints
-  focusPointOrbitUpdate(
+  focusPointUpdate(
     arrow,
     hit,
     isStartBinding,
     elementsMap,
     scene,
     appState,
+    switchToInsideBinding,
   );
 
   if (hit && isBindingEnabled(appState)) {
