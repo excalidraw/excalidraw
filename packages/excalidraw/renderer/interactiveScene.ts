@@ -976,6 +976,7 @@ const renderFocusPointIndicator = (
   const disabled =
     isDragging && !appState.selectedLinearElement?.hoveredFocusPointBinding;
   context.save();
+  context.translate(appState.scrollX, appState.scrollY);
   context.strokeStyle = disabled ? "rgba(120, 120, 120, 0.7)" : "#5e5ad8";
   context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([]);
@@ -1013,15 +1014,9 @@ const renderFocusPointIndicators = (
 
   const arrow = element as any;
   const isDragging = !!appState.selectedLinearElement?.isDragging;
-  const startArrowPointSelected =
-    !!appState.selectedLinearElement?.selectedPointsIndices?.includes(0);
-  const endArrowPointSelected =
-    !!appState.selectedLinearElement?.selectedPointsIndices?.includes(
-      arrow.points.length - 1,
-    );
 
   // Render start binding focus point and connection line
-  if (arrow.startBinding?.elementId && !startArrowPointSelected) {
+  if (arrow.startBinding?.elementId) {
     const bindableElement = elementsMap.get(arrow.startBinding.elementId);
     if (
       bindableElement &&
@@ -1062,9 +1057,6 @@ const renderFocusPointIndicators = (
           isDragging,
         );
 
-        context.save();
-        context.translate(appState.scrollX, appState.scrollY);
-
         renderFocusPointIndicator(
           context,
           appState,
@@ -1073,14 +1065,12 @@ const renderFocusPointIndicators = (
           isHovered,
           isDragging,
         );
-
-        context.restore();
       }
     }
   }
 
   // Render end binding focus point and connection line
-  if (arrow.endBinding?.elementId && !endArrowPointSelected) {
+  if (arrow.endBinding?.elementId) {
     const bindableElement = elementsMap.get(arrow.endBinding.elementId);
     if (
       bindableElement &&
@@ -1113,6 +1103,7 @@ const renderFocusPointIndicators = (
             arrow.points.length - 1,
             elementsMap,
           );
+
         renderFocusPointConnectionLine(
           context,
           appState,
@@ -1120,9 +1111,6 @@ const renderFocusPointIndicators = (
           focusPoint,
           isDragging,
         );
-
-        context.save();
-        context.translate(appState.scrollX, appState.scrollY);
 
         renderFocusPointIndicator(
           context,
@@ -1132,8 +1120,6 @@ const renderFocusPointIndicators = (
           isHovered,
           isDragging,
         );
-
-        context.restore();
       }
     }
   }

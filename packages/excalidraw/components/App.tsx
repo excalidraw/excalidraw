@@ -4759,7 +4759,9 @@ class App extends React.Component<AppProps, AppState> {
           } else if (
             this.state.selectedLinearElement.hoverPointIndex !== null &&
             this.lastPointerMoveEvent &&
-            this.state.selectedLinearElement.initialState.lastClickedPoint >= 0
+            this.state.selectedLinearElement.initialState.lastClickedPoint >=
+              0 &&
+            this.state.selectedLinearElement.isDragging
           ) {
             LinearElementEditor.handlePointDragging(
               this.lastPointerMoveEvent,
@@ -4804,7 +4806,9 @@ class App extends React.Component<AppProps, AppState> {
           } else if (
             this.state.selectedLinearElement.hoverPointIndex !== null &&
             this.lastPointerMoveEvent &&
-            this.state.selectedLinearElement.initialState.lastClickedPoint >= 0
+            this.state.selectedLinearElement.initialState.lastClickedPoint >=
+              0 &&
+            this.state.selectedLinearElement.isDragging
           ) {
             LinearElementEditor.handlePointDragging(
               this.lastPointerMoveEvent,
@@ -5103,7 +5107,8 @@ class App extends React.Component<AppProps, AppState> {
         } else if (
           this.state.selectedLinearElement.hoverPointIndex !== null &&
           this.lastPointerMoveEvent &&
-          this.state.selectedLinearElement.initialState.lastClickedPoint >= 0
+          this.state.selectedLinearElement.initialState.lastClickedPoint >= 0 &&
+          this.state.selectedLinearElement.isDragging
         ) {
           LinearElementEditor.handlePointDragging(
             this.lastPointerMoveEvent,
@@ -5173,7 +5178,8 @@ class App extends React.Component<AppProps, AppState> {
         } else if (
           this.state.selectedLinearElement.hoverPointIndex !== null &&
           this.lastPointerMoveEvent &&
-          this.state.selectedLinearElement.initialState.lastClickedPoint >= 0
+          this.state.selectedLinearElement.initialState.lastClickedPoint >= 0 &&
+          this.state.selectedLinearElement.isDragging
         ) {
           LinearElementEditor.handlePointDragging(
             this.lastPointerMoveEvent,
