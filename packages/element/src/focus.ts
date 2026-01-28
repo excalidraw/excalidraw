@@ -203,13 +203,14 @@ export const handleFocusPointDrag = (
     !arrow ||
     !isBindingElement(arrow) ||
     isElbowArrow(arrow) ||
-    !linearElementEditor.hoveredFocusPointBinding
+    !linearElementEditor.hoveredFocusPointBinding ||
+    !linearElementEditor.draggedFocusPointBinding
   ) {
     return;
   }
 
   const isStartBinding =
-    linearElementEditor.hoveredFocusPointBinding === "start";
+    linearElementEditor.draggedFocusPointBinding === "start";
   const binding = isStartBinding ? arrow.startBinding : arrow.endBinding;
   const { x: offsetX, y: offsetY } = linearElementEditor.pointerOffset;
   const point = pointFrom<GlobalPoint>(
@@ -227,26 +228,27 @@ export const handleFocusPointDrag = (
   // Hovering a bindable element
   if (
     hit &&
+    isBindingEnabled(appState) &&
     (isPointInElement(point, hit, elementsMap) ||
       distanceToElement(hit, elementsMap, point) <= getBindingGap(hit, arrow))
   ) {
-    // Break existing binding if any
+    // Break existing binding if bound to another shape or if binding is disabled
     if (arrow[bindingField] && hit.id !== binding?.elementId) {
       unbindBindingElement(
         arrow,
-        linearElementEditor.hoveredFocusPointBinding,
+        linearElementEditor.draggedFocusPointBinding,
         scene,
       );
     }
 
     // If no existing binding, create it
-    if (!arrow[bindingField] && isBindingEnabled(appState)) {
+    if (!arrow[bindingField]) {
       // Create a new binding if none exists
       bindBindingElement(
         arrow,
         hit,
         "orbit",
-        linearElementEditor.hoveredFocusPointBinding,
+        linearElementEditor.draggedFocusPointBinding,
         scene,
         point,
       );
@@ -256,10 +258,11 @@ export const handleFocusPointDrag = (
     scene.mutateElement(arrow, {
       [bindingField]: {
         ...arrow[bindingField],
+        elementId: hit.id,
         ...calculateFixedPointForNonElbowArrowBinding(
           arrow,
           hit,
-          linearElementEditor.hoveredFocusPointBinding,
+          linearElementEditor.draggedFocusPointBinding,
           elementsMap,
           point,
         ),
@@ -294,7 +297,7 @@ export const handleFocusPointDrag = (
     appState,
   );
 
-  if (hit) {
+  if (hit && isBindingEnabled(appState)) {
     moveArrowAboveBindable(
       point,
       arrow,
@@ -400,8 +403,8 @@ export const handleFocusPointPointerUp = (
   scene: Scene,
 ) => {
   invariant(
-    linearElementEditor.hoveredFocusPointBinding,
-    "Must have a hovered focus point",
+    linearElementEditor.draggedFocusPointBinding,
+    "Must have a dragged focus point at pointer release",
   );
 
   const arrow = LinearElementEditor.getElement<ExcalidrawArrowElement>(
@@ -412,11 +415,11 @@ export const handleFocusPointPointerUp = (
 
   // Clean up
   const bindingKey =
-    linearElementEditor.hoveredFocusPointBinding === "start"
+    linearElementEditor.draggedFocusPointBinding === "start"
       ? "startBinding"
       : "endBinding";
   const otherBindingKey =
-    linearElementEditor.hoveredFocusPointBinding === "start"
+    linearElementEditor.draggedFocusPointBinding === "start"
       ? "endBinding"
       : "startBinding";
   const boundElementId = arrow[bindingKey]?.elementId;
