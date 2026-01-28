@@ -190,6 +190,8 @@ export const THEME = {
   DARK: "dark",
 } as const;
 
+export const DARK_THEME_FILTER = "invert(93%) hue-rotate(180deg)";
+
 export const FRAME_STYLE = {
   strokeColor: "#bbb" as ExcalidrawElement["strokeColor"],
   strokeWidth: 2 as ExcalidrawElement["strokeWidth"],
@@ -304,9 +306,6 @@ export const HYPERLINK_TOOLTIP_DELAY = 300;
 export const IDLE_THRESHOLD = 60_000;
 // Report a user active each ACTIVE_THRESHOLD milliseconds
 export const ACTIVE_THRESHOLD = 3_000;
-
-// duplicates --theme-filter, should be removed soon
-export const THEME_FILTER = "invert(93%) hue-rotate(180deg)";
 
 export const URL_QUERY_KEYS = {
   addLibrary: "addLibrary",

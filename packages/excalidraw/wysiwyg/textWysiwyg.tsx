@@ -3,15 +3,18 @@ import {
   KEYS,
   CLASSES,
   POINTER_BUTTON,
+  THEME,
   isWritableElement,
   getFontString,
   getFontFamilyString,
   isTestEnv,
   MIME_TYPES,
+  applyDarkModeFilter,
 } from "@excalidraw/common";
 
 import {
   originalContainerCache,
+  updateBoundElements,
   updateOriginalContainerCache,
 } from "@excalidraw/element";
 
@@ -130,7 +133,11 @@ export const textWysiwyg = ({
     return false;
   };
 
+  let LAST_THEME = app.state.theme;
+
   const updateWysiwygStyle = () => {
+    LAST_THEME = app.state.theme;
+
     const appState = app.state;
     const updatedTextElement = app.scene.getElement<ExcalidrawTextElement>(id);
 
@@ -202,6 +209,7 @@ export const textWysiwyg = ({
           );
 
           app.scene.mutateElement(container, { height: targetContainerHeight });
+          updateBoundElements(container, app.scene);
           return;
         } else if (
           // autoshrink container height until original container height
@@ -215,6 +223,7 @@ export const textWysiwyg = ({
             container.type,
           );
           app.scene.mutateElement(container, { height: targetContainerHeight });
+          updateBoundElements(container, app.scene);
         } else {
           const { x, y } = computeBoundTextPosition(
             container,
@@ -260,9 +269,11 @@ export const textWysiwyg = ({
         ),
         textAlign,
         verticalAlign,
-        color: updatedTextElement.strokeColor,
+        color:
+          appState.theme === THEME.DARK
+            ? applyDarkModeFilter(updatedTextElement.strokeColor)
+            : updatedTextElement.strokeColor,
         opacity: updatedTextElement.opacity / 100,
-        filter: "var(--theme-filter)",
         maxHeight: `${editorMaxHeight}px`,
       });
       editable.scrollTop = 0;
@@ -594,6 +605,7 @@ export const textWysiwyg = ({
     window.removeEventListener("blur", handleSubmit);
     window.removeEventListener("beforeunload", handleSubmit);
     unbindUpdate();
+    unsubOnChange();
     unbindOnScroll();
 
     editable.remove();
@@ -691,6 +703,13 @@ export const textWysiwyg = ({
       });
     }
   };
+
+  // FIXME after we start emitting updates from Store for appState.theme
+  const unsubOnChange = app.onChangeEmitter.on((elements) => {
+    if (app.state.theme !== LAST_THEME) {
+      updateWysiwygStyle();
+    }
+  });
 
   // handle updates of textElement properties of editing element
   const unbindUpdate = app.scene.onUpdate(() => {

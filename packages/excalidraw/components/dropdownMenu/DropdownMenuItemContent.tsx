@@ -9,11 +9,13 @@ const MenuItemContent = ({
   icon,
   shortcut,
   children,
+  badge,
 }: {
   icon?: JSX.Element;
   shortcut?: string;
   textStyle?: React.CSSProperties;
   children: React.ReactNode;
+  badge?: React.ReactNode;
 }) => {
   const editorInterface = useEditorInterface();
   return (
@@ -22,6 +24,7 @@ const MenuItemContent = ({
       <div style={textStyle} className="dropdown-menu-item__text">
         <Ellipsify>{children}</Ellipsify>
       </div>
+      {badge && <div className="dropdown-menu-item__badge">{badge}</div>}
       {shortcut && editorInterface.formFactor !== "phone" && (
         <div className="dropdown-menu-item__shortcut">{shortcut}</div>
       )}

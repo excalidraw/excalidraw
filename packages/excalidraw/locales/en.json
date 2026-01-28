@@ -612,7 +612,55 @@
     "button": "Insert",
     "description": "Currently only <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Sequence, </sequenceLink> and <classLink>Class </classLink>Diagrams are supported. The other types will be rendered as image in Excalidraw.",
     "syntax": "Mermaid Syntax",
-    "preview": "Preview"
+    "preview": "Preview",
+    "label": "Mermaid",
+    "inputPlaceholder": "Write Mermaid diagram defintion here..."
+  },
+  "ttd": {
+    "error": "Error!"
+  },
+  "chat": {
+    "inputPlaceholder": "Start typing your diagram idea here... ({{shortcut}} for new line)",
+    "inputPlaceholderWithMessages": "Continue refining your diagram...",
+    "generating": "Generating...",
+    "rateLimitRemaining": "{{count}} requests left today",
+    "role": {
+      "user": "You",
+      "assistant": "AI Assistant",
+      "system": "System"
+    },
+    "aiBeta": "AI Beta",
+    "label": "Chat",
+    "menu": "Menu",
+    "newChat": "New Chat",
+    "deleteChat": "Delete chat",
+    "deleteMessage": "Delete message",
+    "viewAsMermaid": "View as Mermaid",
+    "placeholder": {
+      "title": "Let's design your diagram",
+      "description": "Describe the diagram you want to create, and we'll generate it for you.",
+      "hint": "At the moment we know Flowchart, Sequence, and Class diagrams."
+    },
+    "preview": "Preview",
+    "insert": "Insert",
+    "retry": "Retry",
+    "errors": {
+      "promptTooShort": "Prompt is too short (min {{min}} characters)",
+      "promptTooLong": "Prompt is too long (max {{max}} characters)",
+      "generationFailed": "Generation failed",
+      "invalidDiagram": "Generated an invalid diagram :(. You may edit manually, retry with auto-fix, or try a different prompt.",
+      "fixInMermaid": "Edit Mermaid manually →",
+      "aiRepair": "Regenerate (auto-fix) →",
+      "requestAborted": "Request aborted",
+      "requestFailed": "Request failed",
+      "mermaidParseError": "Mermaid syntax error"
+    },
+    "rateLimit": {
+      "messageLimit": "You've hit your AI limit on the free plan. Try out Excalidraw+ for more or come back tomorrow.",
+      "generalRateLimit": "Hold your horses, you're too fast for us! Please wait a moment before trying again.",
+      "messageLimitInputPlaceholder": "You've reached your message limit"
+    },
+    "upsellBtnLabel": "Upgrade to Plus"
   },
   "quickSearch": {
     "placeholder": "Quick search"
