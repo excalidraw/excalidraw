@@ -23,6 +23,7 @@ import {
   getVerticalOffset,
   invariant,
   applyDarkModeFilter,
+  isSafari,
 } from "@excalidraw/common";
 
 import type {
@@ -472,17 +473,55 @@ const drawElementOnCanvas = (
               height: img.naturalHeight,
             };
 
-        context.drawImage(
-          img,
-          x,
-          y,
-          width,
-          height,
-          0 /* hardcoded for the selection box*/,
-          0,
-          element.width,
-          element.height,
-        );
+        if (shouldInvertImage  && isSafari) {
+          const tempCanvas = document.createElement("canvas");
+          tempCanvas.width = element.width;
+          tempCanvas.height = element.height;
+          const tempContext = tempCanvas.getContext("2d");
+
+          if (tempContext) {
+            tempContext.drawImage(
+              img,
+              x,
+              y,
+              width,
+              height,
+              0,
+              0,
+              element.width,
+              element.height,
+            );
+
+            const imageData = tempContext.getImageData(
+              0,
+              0,
+              element.width,
+              element.height,
+            );
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+              data[i] = 255 - data[i];
+              data[i + 1] = 255 - data[i + 1];
+              data[i + 2] = 255 - data[i + 2];
+            }
+
+            tempContext.putImageData(imageData, 0, 0);
+            context.drawImage(tempCanvas, 0, 0);
+          }
+        } else {
+          context.drawImage(
+            img,
+            x,
+            y,
+            width,
+            height,
+            0 /* hardcoded for the selection box*/,
+            0,
+            element.width,
+            element.height,
+          );
+        }
       } else {
         drawImagePlaceholder(element, context);
       }
