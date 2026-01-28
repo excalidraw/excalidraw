@@ -406,7 +406,7 @@ export type ParsedDataTransferFile = Extract<
   { kind: "file" }
 >;
 
-type ParsedDataTranferList = ParsedDataTransferItem[] & {
+export type ParsedDataTranferList = ParsedDataTransferItem[] & {
   /**
    * Only allows filtering by known `string` data types, since `file`
    * types can have multiple items of the same type (e.g. multiple image files)
@@ -457,6 +457,29 @@ const getDataTransferFiles = function (
   );
 };
 
+/** @returns list of MIME types, synchronously */
+export const parseDataTransferEventMimeTypes = (
+  event: ClipboardEvent | DragEvent | React.DragEvent<HTMLDivElement>,
+): Set<string> => {
+  let items: DataTransferItemList | undefined = undefined;
+
+  if (isClipboardEvent(event)) {
+    items = event.clipboardData?.items;
+  } else {
+    items = event.dataTransfer?.items;
+  }
+
+  const types: Set<string> = new Set();
+
+  for (const item of Array.from(items || [])) {
+    if (!types.has(item.type)) {
+      types.add(item.type);
+    }
+  }
+
+  return types;
+};
+
 export const parseDataTransferEvent = async (
   event: ClipboardEvent | DragEvent | React.DragEvent<HTMLDivElement>,
 ): Promise<ParsedDataTranferList> => {
@@ -465,8 +488,7 @@ export const parseDataTransferEvent = async (
   if (isClipboardEvent(event)) {
     items = event.clipboardData?.items;
   } else {
-    const dragEvent = event;
-    items = dragEvent.dataTransfer?.items;
+    items = event.dataTransfer?.items;
   }
 
   const dataItems = (
