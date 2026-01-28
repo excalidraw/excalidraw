@@ -1608,7 +1608,9 @@ export const updateBoundPoint = (
   binding: FixedPointBinding | null | undefined,
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
-  customIntersector?: LineSegment<GlobalPoint>,
+  opts?: {
+    customIntersector?: LineSegment<GlobalPoint>;
+  },
 ): LocalPoint | null => {
   if (
     binding == null ||
@@ -1695,16 +1697,14 @@ export const updateBoundPoint = (
 
   const isNested = (arrowTooShort || isOverlapping) && isLargerThanOther;
 
-  let _customIntersector = customIntersector;
+  let _customIntersector = opts?.customIntersector;
   if (!elbowed && !_customIntersector) {
     const [x1, y1, x2, y2] = LinearElementEditor.getElementAbsoluteCoords(
       arrow,
       elementsMap,
     );
     const center = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
-    const edgePoint = isRectanguloidElement(bindableElement)
-      ? avoidRectangularCorner(arrow, bindableElement, elementsMap, global)
-      : global;
+    const edgePoint = global;
     const adjacentPoint = pointRotateRads(
       pointFrom<GlobalPoint>(
         arrow.x +

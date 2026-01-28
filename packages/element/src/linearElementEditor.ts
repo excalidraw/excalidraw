@@ -2340,7 +2340,9 @@ const pointDraggingUpdates = (
         nextArrow.endBinding,
         endBindable,
         elementsMap,
-        endCustomIntersector,
+        {
+          customIntersector: endCustomIntersector,
+        },
       ) || nextArrow.points[nextArrow.points.length - 1]
     : nextArrow.points[nextArrow.points.length - 1];
 
@@ -2371,7 +2373,7 @@ const pointDraggingUpdates = (
           nextArrow.startBinding,
           startBindable,
           elementsMap,
-          startCustomIntersector,
+          { customIntersector: startCustomIntersector },
         ) || nextArrow.points[0]
       : nextArrow.points[0];
 

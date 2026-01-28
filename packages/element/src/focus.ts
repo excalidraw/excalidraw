@@ -20,13 +20,8 @@ import {
   isElbowArrow,
 } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
-import {
-  getHoveredElementForBinding,
-  hitElementItself,
-  isPointInElement,
-} from "./collision";
+import { getHoveredElementForFocusPoint, hitElementItself } from "./collision";
 import { moveArrowAboveBindable } from "./zindex";
-import { distanceToElement } from "./distance";
 
 import type {
   ElementsMap,
@@ -221,21 +216,17 @@ export const handleFocusPointDrag = (
     pointerCoords.x - offsetX,
     pointerCoords.y - offsetY,
   );
-  const hit = getHoveredElementForBinding(
+  const bindingField = isStartBinding ? "startBinding" : "endBinding";
+  const hit = getHoveredElementForFocusPoint(
     point,
+    arrow,
     scene.getNonDeletedElements(),
     elementsMap,
     maxBindingDistance_simple(appState.zoom),
   );
-  const bindingField = isStartBinding ? "startBinding" : "endBinding";
 
   // Hovering a bindable element
-  if (
-    hit &&
-    isBindingEnabled(appState) &&
-    (isPointInElement(point, hit, elementsMap) ||
-      distanceToElement(hit, elementsMap, point) <= getBindingGap(hit, arrow))
-  ) {
+  if (hit && isBindingEnabled(appState)) {
     // Break existing binding if bound to another shape or if binding is disabled
     if (arrow[bindingField] && hit.id !== binding?.elementId) {
       unbindBindingElement(
