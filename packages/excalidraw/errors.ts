@@ -69,3 +69,22 @@ export class ExcalidrawError extends Error {
     this.name = "ExcalidrawError";
   }
 }
+
+export class RequestError extends Error {
+  public status: number;
+  public data: any;
+  toObject() {
+    return { name: this.name, status: this.status, message: this.message };
+  }
+  constructor({
+    message = "Something went wrong",
+    status = 500,
+    data,
+  }: { message?: string; status?: number; data?: any } = {}) {
+    super();
+    this.name = "RequestError";
+    this.message = message;
+    this.status = status;
+    this.data = data;
+  }
+}

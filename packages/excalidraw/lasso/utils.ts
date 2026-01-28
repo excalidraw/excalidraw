@@ -6,8 +6,9 @@ import {
   polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
+import { type Bounds } from "@excalidraw/common";
+
 import {
-  type Bounds,
   computeBoundTextPosition,
   doBoundsIntersect,
   getBoundTextElement,

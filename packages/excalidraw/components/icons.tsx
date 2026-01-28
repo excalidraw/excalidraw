@@ -7,7 +7,6 @@
 // to determine whether or not the icons should be mirrored in right-to-left languages.
 
 import clsx from "clsx";
-import oc from "open-color";
 import React from "react";
 
 import { THEME } from "@excalidraw/common";
@@ -17,7 +16,7 @@ import type { Theme } from "@excalidraw/element/types";
 export const iconFillColor = (theme: Theme) => "var(--icon-fill-color)";
 
 const handlerColor = (theme: Theme) =>
-  theme === THEME.LIGHT ? oc.white : "#1e1e1e";
+  theme === THEME.LIGHT ? "#fff" : "#1e1e1e";
 
 type Opts = {
   width?: number;
@@ -1595,25 +1594,17 @@ export const FontFamilyNormalIcon = createIcon(
   modifiedTablerIconProps,
 );
 
-export const FontFamilyCodeIcon = createIcon(
-  <>
-    <g
-      clipPath="url(#a)"
-      stroke="currentColor"
-      strokeWidth="1.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M5.833 6.667 2.5 10l3.333 3.333M14.167 6.667 17.5 10l-3.333 3.333M11.667 3.333 8.333 16.667" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h20v20H0z" />
-      </clipPath>
-    </defs>
-  </>,
-  modifiedTablerIconProps,
+export const codeIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M7 8l-4 4l4 4" />
+    <path d="M17 8l4 4l-4 4" />
+    <path d="M14 4l-4 16" />
+  </g>,
+  tablerIconProps,
 );
+
+export const FontFamilyCodeIcon = codeIcon;
 
 export const TextAlignLeftIcon = createIcon(
   <g
@@ -1866,6 +1857,27 @@ export const mermaidLogoIcon = createIcon(
   />,
 );
 
+// tabler-icons: refresh
+export const RetryIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+    <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+  </g>,
+  tablerIconProps,
+);
+
+export const stackPushIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 10l-2 1l8 4l8 -4l-2 -1" />
+    <path d="M4 15l8 4l8 -4" />
+    <path d="M12 4v7" />
+    <path d="M15 8l-3 3l-3 -3" />
+  </g>,
+  tablerIconProps,
+);
+
 export const ArrowRightIcon = createIcon(
   <g strokeWidth="1.25">
     <path d="M4.16602 10H15.8327" />
@@ -1994,12 +2006,23 @@ export const searchIcon = createIcon(
   tablerIconProps,
 );
 
-export const clockIcon = createIcon(
+// clock-bolt
+export const historyCommandIcon = createIcon(
   <g strokeWidth={1.5}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M20.984 12.53a9 9 0 1 0 -7.552 8.355" />
     <path d="M12 7v5l3 3" />
     <path d="M19 16l-2 3h4l-2 3" />
+  </g>,
+  tablerIconProps,
+);
+
+// history
+export const historyIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 8l0 4l2 2" />
+    <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5" />
   </g>,
   tablerIconProps,
 );

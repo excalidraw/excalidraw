@@ -1,4 +1,4 @@
-import { arrayToMap } from "@excalidraw/common";
+import { arrayToMap, type Bounds } from "@excalidraw/common";
 import { getElementBounds } from "@excalidraw/element";
 import {
   isArrowElement,
@@ -14,7 +14,6 @@ import {
   rangeInclusive,
 } from "@excalidraw/math";
 
-import type { Bounds } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,

@@ -290,13 +290,15 @@ export const FontPickerList = React.memo(
             onHover(font.value);
           }
         }}
+        badge={
+          font.badge && (
+            <DropDownMenuItemBadge type={font.badge.type}>
+              {font.badge.placeholder}
+            </DropDownMenuItemBadge>
+          )
+        }
       >
         {font.text}
-        {font.badge && (
-          <DropDownMenuItemBadge type={font.badge.type}>
-            {font.badge.placeholder}
-          </DropDownMenuItemBadge>
-        )}
       </DropdownMenuItem>
     );
 

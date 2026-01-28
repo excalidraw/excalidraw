@@ -108,6 +108,13 @@ export const CLASSES = {
   FRAME_NAME: "frame-name",
 };
 
+export const FONT_SIZES = {
+  sm: 16,
+  md: 20,
+  lg: 28,
+  xl: 36,
+} as const;
+
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
@@ -182,6 +189,8 @@ export const THEME = {
   LIGHT: "light",
   DARK: "dark",
 } as const;
+
+export const DARK_THEME_FILTER = "invert(93%) hue-rotate(180deg)";
 
 export const FRAME_STYLE = {
   strokeColor: "#bbb" as ExcalidrawElement["strokeColor"],
@@ -297,9 +306,6 @@ export const HYPERLINK_TOOLTIP_DELAY = 300;
 export const IDLE_THRESHOLD = 60_000;
 // Report a user active each ACTIVE_THRESHOLD milliseconds
 export const ACTIVE_THRESHOLD = 3_000;
-
-// duplicates --theme-filter, should be removed soon
-export const THEME_FILTER = "invert(93%) hue-rotate(180deg)";
 
 export const URL_QUERY_KEYS = {
   addLibrary: "addLibrary",
