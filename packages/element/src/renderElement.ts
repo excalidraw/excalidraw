@@ -473,7 +473,7 @@ const drawElementOnCanvas = (
               height: img.naturalHeight,
             };
 
-        if (shouldInvertImage  && isSafari) {
+        if (shouldInvertImage && isSafari) {
           const tempCanvas = document.createElement("canvas");
           tempCanvas.width = element.width;
           tempCanvas.height = element.height;
