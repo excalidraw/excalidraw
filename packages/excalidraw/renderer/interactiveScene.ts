@@ -946,14 +946,11 @@ const renderFocusPointConnectionLine = (
   appState: InteractiveCanvasAppState,
   fromPoint: GlobalPoint,
   toPoint: GlobalPoint,
-  isDragging: boolean,
 ) => {
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 
-  context.strokeStyle = isDragging
-    ? "rgba(140, 140, 140, 0.5)"
-    : "rgba(134, 131, 226, 0.6)";
+  context.strokeStyle = "rgba(134, 131, 226, 0.6)";
   context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
 
@@ -971,16 +968,13 @@ const renderFocusPointCicle = (
   point: GlobalPoint,
   radius: number,
   isHovered: boolean,
-  disabled: boolean,
 ) => {
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  context.strokeStyle = disabled ? "rgba(120, 120, 120, 0.7)" : "#5e5ad8";
+  context.strokeStyle = "#5e5ad8";
   context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([]);
-  context.fillStyle = disabled
-    ? "rgba(220, 220, 220, 0.8)"
-    : isHovered
+  context.fillStyle = isHovered
     ? "rgba(134, 131, 226, 0.9)"
     : "rgba(255, 255, 255, 0.9)";
 
@@ -1074,13 +1068,7 @@ const renderFocusPointIndicator = ({
       elementsMap,
     );
 
-    renderFocusPointConnectionLine(
-      context,
-      appState,
-      arrowPoint,
-      focusPoint,
-      isDragging,
-    );
+    renderFocusPointConnectionLine(context, appState, arrowPoint, focusPoint);
 
     renderFocusPointCicle(
       context,
@@ -1088,9 +1076,6 @@ const renderFocusPointIndicator = ({
       focusPoint,
       FOCUS_POINT_SIZE / 1.5,
       isHovered,
-      isDragging ||
-        appState.selectedLinearElement?.draggedFocusPointBinding ===
-          (type === "start" ? "end" : "start"),
     );
   }
 };
