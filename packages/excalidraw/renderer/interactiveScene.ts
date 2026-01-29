@@ -971,7 +971,7 @@ const renderFocusPointCicle = (
 ) => {
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  context.strokeStyle = "#5e5ad8";
+  context.strokeStyle = "rgba(134, 131, 226, 0.6)";
   context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([]);
   context.fillStyle = isHovered
