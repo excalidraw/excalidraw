@@ -128,6 +128,9 @@ const renderLinearElementPointHighlight = (
   ) {
     return;
   }
+  if (appState.selectedLinearElement?.isDragging) {
+    return;
+  }
   const element = LinearElementEditor.getElement(elementId, elementsMap);
 
   if (!element) {
@@ -1058,7 +1061,7 @@ const renderFocusPointIndicator = ({
           context,
           appState,
           focusPoint,
-          FOCUS_POINT_SIZE,
+          FOCUS_POINT_SIZE / 1.5,
           isHovered,
           isDragging ||
             appState.selectedLinearElement?.draggedFocusPointBinding ===
@@ -1423,6 +1426,7 @@ const _renderInteractiveScene = ({
       // Render focus point highlight when hovering
       if (
         editor.hoveredFocusPointBinding &&
+        !editor.draggedFocusPointBinding &&
         isArrowElement(firstSelectedLinear)
       ) {
         const arrow = firstSelectedLinear as any;
