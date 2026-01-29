@@ -10846,10 +10846,16 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
 
-      if (imageFile.size > MAX_ALLOWED_FILE_BYTES) {
+      const maxImageSizeBytes =
+        typeof this.props.maxImageSizeBytes === "number" &&
+        this.props.maxImageSizeBytes > 0
+          ? this.props.maxImageSizeBytes
+          : MAX_ALLOWED_FILE_BYTES;
+
+      if (imageFile.size > maxImageSizeBytes) {
         throw new Error(
           t("errors.fileTooBig", {
-            maxSize: `${Math.trunc(MAX_ALLOWED_FILE_BYTES / 1024 / 1024)}MB`,
+            maxSize: `${Math.trunc(maxImageSizeBytes / 1024 / 1024)}MB`,
           }),
         );
       }

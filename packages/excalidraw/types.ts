@@ -603,6 +603,10 @@ export interface ExcalidrawProps {
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
+  /**
+   * Max allowed image file size in bytes. Defaults to MAX_ALLOWED_FILE_BYTES.
+   */
+  maxImageSizeBytes?: number;
   generateLinkForSelection?: (id: string, type: "element" | "group") => string;
   onLinkOpen?: (
     element: NonDeletedExcalidrawElement,
