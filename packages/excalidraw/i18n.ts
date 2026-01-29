@@ -40,6 +40,7 @@ export const languages: Language[] = [
     { code: "it-IT", label: "Italiano" },
     { code: "ja-JP", label: "日本語" },
     { code: "kab-KAB", label: "Taqbaylit" },
+    { code: "ka-IN", label: "ಕನ್ನಡ" },
     { code: "kk-KZ", label: "Қазақ тілі" },
     { code: "ko-KR", label: "한국어" },
     { code: "ku-TR", label: "Kurdî" },
