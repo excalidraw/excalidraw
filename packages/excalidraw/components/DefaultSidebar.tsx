@@ -18,6 +18,13 @@ import { useExcalidrawSetAppState } from "./App";
 import { LibraryMenu } from "./LibraryMenu";
 import { SearchMenu } from "./SearchMenu";
 import { Sidebar } from "./Sidebar/Sidebar";
+import { WaypointsPanel } from "./WaypointsSidebar";
+import {
+  addWaypointFromCurrentView,
+  renameWaypoint,
+  deleteWaypoint,
+  jumpToWaypoint,
+} from "./Waypoints";
 import { withInternalFallback } from "./hoc/withInternalFallback";
 import { LibraryIcon, searchIcon } from "./icons";
 
@@ -75,7 +82,26 @@ export const DefaultSidebar = Object.assign(
       const { DefaultSidebarTabTriggersTunnel } = useTunnels();
 
       const isForceDocked = appState.openSidebar?.tab === CANVAS_SEARCH_TAB;
+      
+      // Add a new waypoint based on the current canvas view
+      const handleAddWaypoint = () => {
+        setAppState((prev) => addWaypointFromCurrentView(prev));
+      };
+      
+      // Rename an existing waypoint
+      const handleRenameWaypoint = (id: string, name: string) => {
+        setAppState((prev) => renameWaypoint(prev, id, name));
+      };
 
+      // Delete a waypoint from the list
+      const handleDeleteWaypoint = (id: string) => {
+        setAppState((prev) => deleteWaypoint(prev, id));
+      };
+
+      // Jump the canvas to a waypoint’s stored camera view
+      const handleJumpToWaypoint = (id: string) => {
+        setAppState((prev) => jumpToWaypoint(prev, id));
+      };
       return (
         <Sidebar
           {...rest}
@@ -105,6 +131,9 @@ export const DefaultSidebar = Object.assign(
                 <Sidebar.TabTrigger tab={LIBRARY_SIDEBAR_TAB}>
                   {LibraryIcon}
                 </Sidebar.TabTrigger>
+                <Sidebar.TabTrigger tab="waypoints">
+                  WP
+                </Sidebar.TabTrigger>
                 <DefaultSidebarTabTriggersTunnel.Out />
               </Sidebar.TabTriggers>
             </Sidebar.Header>
@@ -113,6 +142,15 @@ export const DefaultSidebar = Object.assign(
             </Sidebar.Tab>
             <Sidebar.Tab tab={CANVAS_SEARCH_TAB}>
               <SearchMenu />
+            </Sidebar.Tab>
+            <Sidebar.Tab tab="waypoints">
+              <WaypointsPanel
+                waypoints={appState.waypoints} // the waypoint list
+                onAdd={handleAddWaypoint} // adding waypoint
+                onJump={handleJumpToWaypoint} // jump to waypoint
+                onRename={handleRenameWaypoint} // rename waypoint
+                onDelete={handleDeleteWaypoint} // delete waypoint
+              />
             </Sidebar.Tab>
             {children}
           </Sidebar.Tabs>
