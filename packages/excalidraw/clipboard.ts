@@ -204,8 +204,13 @@ export const copyToClipboard = async (
   /** supply if available to make the operation more certain to succeed */
   clipboardEvent?: ClipboardEvent | null,
 ) => {
+  const json = serializeAsClipboardJSON({ elements, files });
+
   await copyTextToSystemClipboard(
-    serializeAsClipboardJSON({ elements, files }),
+    {
+      [MIME_TYPES.excalidrawClipboard]: json,
+      [MIME_TYPES.text]: json,
+    },
     clipboardEvent,
   );
 };
@@ -401,7 +406,7 @@ export type ParsedDataTransferFile = Extract<
   { kind: "file" }
 >;
 
-type ParsedDataTranferList = ParsedDataTransferItem[] & {
+export type ParsedDataTranferList = ParsedDataTransferItem[] & {
   /**
    * Only allows filtering by known `string` data types, since `file`
    * types can have multiple items of the same type (e.g. multiple image files)
@@ -452,6 +457,29 @@ const getDataTransferFiles = function (
   );
 };
 
+/** @returns list of MIME types, synchronously */
+export const parseDataTransferEventMimeTypes = (
+  event: ClipboardEvent | DragEvent | React.DragEvent<HTMLDivElement>,
+): Set<string> => {
+  let items: DataTransferItemList | undefined = undefined;
+
+  if (isClipboardEvent(event)) {
+    items = event.clipboardData?.items;
+  } else {
+    items = event.dataTransfer?.items;
+  }
+
+  const types: Set<string> = new Set();
+
+  for (const item of Array.from(items || [])) {
+    if (!types.has(item.type)) {
+      types.add(item.type);
+    }
+  }
+
+  return types;
+};
+
 export const parseDataTransferEvent = async (
   event: ClipboardEvent | DragEvent | React.DragEvent<HTMLDivElement>,
 ): Promise<ParsedDataTranferList> => {
@@ -460,8 +488,7 @@ export const parseDataTransferEvent = async (
   if (isClipboardEvent(event)) {
     items = event.clipboardData?.items;
   } else {
-    const dragEvent = event;
-    items = dragEvent.dataTransfer?.items;
+    items = event.dataTransfer?.items;
   }
 
   const dataItems = (
@@ -567,7 +594,7 @@ export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
     // ClipboardItem constructor, but throws on an unrelated MIME type error.
     // So we need to await this and fallback to awaiting the blob if applicable.
     await navigator.clipboard.write([
-      new window.ClipboardItem({
+      new ClipboardItem({
         [MIME_TYPES.png]: blob,
       }),
     ]);
@@ -576,7 +603,7 @@ export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
     // with resolution value instead
     if (isPromiseLike(blob)) {
       await navigator.clipboard.write([
-        new window.ClipboardItem({
+        new ClipboardItem({
           [MIME_TYPES.png]: await blob,
         }),
       ]);
@@ -586,37 +613,56 @@ export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
   }
 };
 
-export const copyTextToSystemClipboard = async (
-  text: string | null,
+export const copyTextToSystemClipboard = async <
+  MimeType extends ValueOf<typeof STRING_MIME_TYPES>,
+>(
+  text: string | { [K in MimeType]: string } | null,
   clipboardEvent?: ClipboardEvent | null,
 ) => {
-  // (1) first try using Async Clipboard API
-  if (probablySupportsClipboardWriteText) {
+  text = text || "";
+
+  const entries = Object.entries(
+    typeof text === "string" ? { [MIME_TYPES.text]: text } : text,
+  );
+
+  // (1) if we have clipboardEvent, try using it first as it's the most
+  // versatile
+  try {
+    if (clipboardEvent) {
+      for (const [mimeType, value] of entries) {
+        clipboardEvent.clipboardData?.setData(mimeType, value);
+        if (clipboardEvent.clipboardData?.getData(mimeType) !== value) {
+          throw new Error("Failed to setData on clipboardEvent");
+        }
+      }
+    }
+    return;
+  } catch (error: any) {
+    console.error(error);
+  }
+
+  let plainTextEntry = entries.find(
+    ([mimeType]) => mimeType === MIME_TYPES.text,
+  );
+
+  // (2) if we don't have access to clipboardEvent, or that fails,
+  // at least try setting text/plain via navigator.clipboard.writeText
+  // (navigator.clipboard.write doesn't work with non-standard mime types)
+  if (probablySupportsClipboardWriteText && plainTextEntry) {
     try {
       // NOTE: doesn't work on FF on non-HTTPS domains, or when document
       // not focused
-      await navigator.clipboard.writeText(text || "");
-      return;
+      await navigator.clipboard.writeText(plainTextEntry[1]);
+
+      // invalidate it so we don't write it again below
+      plainTextEntry = undefined;
     } catch (error: any) {
       console.error(error);
     }
   }
 
-  // (2) if fails and we have access to ClipboardEvent, use plain old setData()
-  try {
-    if (clipboardEvent) {
-      clipboardEvent.clipboardData?.setData(MIME_TYPES.text, text || "");
-      if (clipboardEvent.clipboardData?.getData(MIME_TYPES.text) !== text) {
-        throw new Error("Failed to setData on clipboardEvent");
-      }
-      return;
-    }
-  } catch (error: any) {
-    console.error(error);
-  }
-
-  // (3) if that fails, use document.execCommand
-  if (!copyTextViaExecCommand(text)) {
+  // (3) if previous fails, use document.execCommand
+  if (plainTextEntry && !copyTextViaExecCommand(plainTextEntry[1])) {
     throw new Error("Error copying to clipboard.");
   }
 };
