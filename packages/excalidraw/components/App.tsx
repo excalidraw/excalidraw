@@ -9229,11 +9229,8 @@ class App extends React.Component<AppProps, AppState> {
                 this.imageCache.get(croppingElement.fileId)?.image;
 
               if (image && !(image instanceof Promise)) {
-                const instantDragOffset = vectorScale(
-                  vector(
-                    pointerCoords.x - lastPointerCoords.x,
-                    pointerCoords.y - lastPointerCoords.y,
-                  ),
+                const scaledDragOffset = vectorScale(
+                  vector(dragOffset.x, dragOffset.y),
                   Math.max(this.state.zoom.value, 2),
                 );
 
@@ -9272,25 +9269,30 @@ class App extends React.Component<AppProps, AppState> {
 
                 // project instantDrafOffset onto leftEdge and topEdge to decompose
                 const offsetVector = vector(
-                  vectorDot(instantDragOffset, topEdge),
-                  vectorDot(instantDragOffset, leftEdge),
+                  vectorDot(scaledDragOffset, topEdge),
+                  vectorDot(scaledDragOffset, leftEdge),
                 );
 
-                const nextCrop = {
-                  ...crop,
-                  x: clamp(
-                    crop.x +
-                      offsetVector[0] * Math.sign(croppingElement.scale[0]),
-                    0,
-                    image.naturalWidth - crop.width,
-                  ),
-                  y: clamp(
-                    crop.y +
-                      offsetVector[1] * Math.sign(croppingElement.scale[1]),
-                    0,
-                    image.naturalHeight - crop.height,
-                  ),
-                };
+                const originalCroppingElement = pointerDownState.originalElements.get(croppingElement.id);
+                const originalCrop = originalCroppingElement && isImageElement(originalCroppingElement) 
+                  ? originalCroppingElement.crop 
+                  : crop;
+
+                  const nextCrop = {
+                    ...crop,
+                    x: clamp(
+                      (originalCrop?.x ?? 0) -
+                        offsetVector[0] * Math.sign(croppingElement.scale[0]),
+                      0,
+                      image.naturalWidth - crop.width,
+                    ),
+                    y: clamp(
+                      (originalCrop?.y ?? 0) -
+                        offsetVector[1] * Math.sign(croppingElement.scale[1]),
+                      0,
+                      image.naturalHeight - crop.height,
+                    ),
+                  };
 
                 this.scene.mutateElement(croppingElement, {
                   crop: nextCrop,
