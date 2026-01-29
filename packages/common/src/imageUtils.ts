@@ -19,8 +19,7 @@ const parseDarkThemeFilter = (filter: string) => {
   };
 };
 
-const { invert: DARK_THEME_FILTER_INVERT, hueRotateDeg } =
-  parseDarkThemeFilter(DARK_THEME_FILTER);
+const { invert, hueRotateDeg } = parseDarkThemeFilter(DARK_THEME_FILTER);
 
 const clampToByte = (value: number) =>
   value < 0 ? 0 : value > 255 ? 255 : value;
@@ -95,13 +94,9 @@ export const applyDarkThemeFilterToImageData = (imageData: ImageData) => {
     const g0 = data[i + 1];
     const b0 = data[i + 2];
 
-    const rInv =
-      255 * DARK_THEME_FILTER_INVERT + r0 * (1 - 2 * DARK_THEME_FILTER_INVERT);
-    const gInv =
-      255 * DARK_THEME_FILTER_INVERT + g0 * (1 - 2 * DARK_THEME_FILTER_INVERT);
-    const bInv =
-      255 * DARK_THEME_FILTER_INVERT + b0 * (1 - 2 * DARK_THEME_FILTER_INVERT);
-
+    const rInv = 255 * invert + r0 * (1 - 2 * invert);
+    const gInv = 255 * invert + g0 * (1 - 2 * invert);
+    const bInv = 255 * invert + b0 * (1 - 2 * invert);
     const { r, g, b } = hueRotate(
       rInv / 255,
       gInv / 255,
