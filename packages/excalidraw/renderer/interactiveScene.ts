@@ -1006,69 +1006,92 @@ const renderFocusPointIndicator = ({
   appState: InteractiveCanvasAppState;
   context: CanvasRenderingContext2D;
   elementsMap: NonDeletedSceneElementsMap;
-
   type: "start" | "end";
 }) => {
-  const isDragging = !!appState.selectedLinearElement?.isDragging;
   const binding = type === "start" ? arrow.startBinding : arrow.endBinding;
+  const bindableElement =
+    binding?.elementId && elementsMap.get(binding.elementId);
+
+  if (
+    !bindableElement ||
+    !isBindableElement(bindableElement) ||
+    bindableElement.isDeleted
+  ) {
+    return;
+  }
+
+  const focusPoint = getGlobalFixedPointForBindableElement(
+    binding.fixedPoint,
+    bindableElement,
+    elementsMap,
+  );
+
+  // Only render if focus point is within the bindable element
+  if (
+    !isFocusPointVisible(
+      focusPoint,
+      arrow,
+      bindableElement,
+      elementsMap,
+      appState,
+    )
+  ) {
+    return;
+  }
+
+  const linearState = appState.selectedLinearElement;
+  const isDragging = !!linearState?.isDragging;
   const pointIndex = type === "start" ? 0 : arrow.points.length - 1;
   const pointSelected =
-    !!appState.selectedLinearElement?.selectedPointsIndices?.includes(
-      pointIndex,
+    !!linearState?.selectedPointsIndices?.includes(pointIndex);
+
+  // render focus point highlight
+  // ----------------------------
+
+  if (
+    linearState?.hoveredFocusPointBinding === type &&
+    !linearState.draggedFocusPointBinding
+  ) {
+    renderFocusPointHighlight(context, appState, focusPoint);
+  }
+
+  // render focus point
+  // ----------------------------
+
+  if (!(pointSelected && isDragging)) {
+    const focusPoint = getGlobalFixedPointForBindableElement(
+      binding.fixedPoint,
+      bindableElement,
+      elementsMap,
     );
 
-  if (binding?.elementId && !(pointSelected && isDragging)) {
-    const bindableElement = elementsMap.get(binding.elementId);
-    if (
-      bindableElement &&
-      isBindableElement(bindableElement) &&
-      !bindableElement.isDeleted
-    ) {
-      const focusPoint = getGlobalFixedPointForBindableElement(
-        binding.fixedPoint,
-        bindableElement,
-        elementsMap,
-      );
+    const isHovered = linearState?.hoveredFocusPointBinding === type;
 
-      // Only render if focus point is within the bindable element
-      if (
-        isFocusPointVisible(
-          focusPoint,
-          arrow,
-          bindableElement,
-          elementsMap,
-          appState,
-        )
-      ) {
-        const isHovered =
-          appState.selectedLinearElement?.hoveredFocusPointBinding === type;
+    // Render dashed line from arrow start point to focus point
+    const arrowPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      pointIndex,
+      elementsMap,
+    );
 
-        // Render dashed line from arrow start point to focus point
-        const arrowPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          arrow,
-          pointIndex,
-          elementsMap,
-        );
-        renderFocusPointConnectionLine(
-          context,
-          appState,
-          arrowPoint,
-          focusPoint,
-          isDragging,
-        );
+    renderFocusPointConnectionLine(
+      context,
+      appState,
+      arrowPoint,
+      focusPoint,
+      isDragging,
+    );
 
-        renderFocusPointCicle(
-          context,
-          appState,
-          focusPoint,
-          FOCUS_POINT_SIZE / 1.5,
-          isHovered,
-          isDragging ||
-            appState.selectedLinearElement?.draggedFocusPointBinding ===
-              (type === "start" ? "end" : "start"),
-        );
-      }
-    }
+    renderFocusPointCicle(
+      context,
+      appState,
+      focusPoint,
+      FOCUS_POINT_SIZE / 1.5,
+      isHovered,
+      isDragging ||
+        appState.selectedLinearElement?.draggedFocusPointBinding ===
+          (type === "start" ? "end" : "start"),
+    );
   }
 };
 
@@ -1421,46 +1444,6 @@ const _renderInteractiveScene = ({
           : linearState.hoverPointIndex >= 0
       ) {
         renderLinearElementPointHighlight(context, appState, elementsMap);
-      }
-
-      // Render focus point highlight when hovering
-      if (
-        linearState.hoveredFocusPointBinding &&
-        !linearState.draggedFocusPointBinding &&
-        isArrowElement(selectedLinearElement)
-      ) {
-        const arrow = selectedLinearElement as any;
-        const binding =
-          linearState.hoveredFocusPointBinding === "start"
-            ? arrow.startBinding
-            : arrow.endBinding;
-
-        if (binding?.elementId) {
-          const bindableElement = elementsMap.get(binding.elementId);
-          if (
-            bindableElement &&
-            isBindableElement(bindableElement) &&
-            !bindableElement.isDeleted
-          ) {
-            const focusPoint = getGlobalFixedPointForBindableElement(
-              binding.fixedPoint,
-              bindableElement,
-              elementsMap,
-            );
-            // Only render highlight if focus point is visible
-            if (
-              isFocusPointVisible(
-                focusPoint,
-                arrow,
-                bindableElement,
-                elementsMap,
-                appState,
-              )
-            ) {
-              renderFocusPointHighlight(context, appState, focusPoint);
-            }
-          }
-        }
       }
     }
 
