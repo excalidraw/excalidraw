@@ -23,6 +23,7 @@ import {
   getVerticalOffset,
   invariant,
   applyDarkModeFilter,
+  applyDarkThemeFilterToImageData,
   isSafari,
 } from "@excalidraw/common";
 
@@ -448,9 +449,10 @@ const drawElementOnCanvas = (
         renderConfig.theme === THEME.DARK &&
         cacheEntry?.mimeType === MIME_TYPES.svg;
 
-      if (shouldInvertImage) {
+      if (shouldInvertImage && !isSafari) {
         context.filter = DARK_THEME_FILTER;
       }
+
       if (img != null && !(img instanceof Promise)) {
         if (element.roundness && context.roundRect) {
           context.beginPath();
@@ -498,13 +500,8 @@ const drawElementOnCanvas = (
               element.width,
               element.height,
             );
-            const data = imageData.data;
 
-            for (let i = 0; i < data.length; i += 4) {
-              data[i] = 255 - data[i];
-              data[i + 1] = 255 - data[i + 1];
-              data[i + 2] = 255 - data[i + 2];
-            }
+            applyDarkThemeFilterToImageData(imageData);
 
             tempContext.putImageData(imageData, 0, 0);
             context.drawImage(tempCanvas, 0, 0);
