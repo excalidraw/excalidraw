@@ -338,6 +338,8 @@ export const DEFAULT_EXPORT_PADDING = 10; // px
 
 export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
 
+export const MAX_ALLOWED_CANVAS_WIDTH_OR_HEIGHT = 8192;
+
 export const MAX_ALLOWED_FILE_BYTES = 4 * 1024 * 1024;
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
