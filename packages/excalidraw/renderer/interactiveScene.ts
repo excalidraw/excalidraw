@@ -1403,35 +1403,35 @@ const _renderInteractiveScene = ({
     );
   }
 
+  const linearState = appState.selectedLinearElement;
+  const selectedLinearElement =
+    linearState &&
+    LinearElementEditor.getElement(linearState.elementId, allElementsMap);
   // Arrows have a different highlight behavior when
   // they are the only selected element
-  if (appState.selectedLinearElement) {
-    const editor = appState.selectedLinearElement;
-    const firstSelectedLinear = selectedElements.find(
-      (el) => el.id === editor.elementId, // Don't forget bound text elements!
-    );
-
+  if (selectedLinearElement) {
     if (!appState.selectedLinearElement.isDragging) {
-      if (editor.segmentMidPointHoveredCoords) {
+      if (linearState.segmentMidPointHoveredCoords) {
         renderElbowArrowMidPointHighlight(context, appState);
       } else if (
-        isElbowArrow(firstSelectedLinear)
-          ? editor.hoverPointIndex === 0 ||
-            editor.hoverPointIndex === firstSelectedLinear.points.length - 1
-          : editor.hoverPointIndex >= 0
+        isElbowArrow(selectedLinearElement)
+          ? linearState.hoverPointIndex === 0 ||
+            linearState.hoverPointIndex ===
+              selectedLinearElement.points.length - 1
+          : linearState.hoverPointIndex >= 0
       ) {
         renderLinearElementPointHighlight(context, appState, elementsMap);
       }
 
       // Render focus point highlight when hovering
       if (
-        editor.hoveredFocusPointBinding &&
-        !editor.draggedFocusPointBinding &&
-        isArrowElement(firstSelectedLinear)
+        linearState.hoveredFocusPointBinding &&
+        !linearState.draggedFocusPointBinding &&
+        isArrowElement(selectedLinearElement)
       ) {
-        const arrow = firstSelectedLinear as any;
+        const arrow = selectedLinearElement as any;
         const binding =
-          editor.hoveredFocusPointBinding === "start"
+          linearState.hoveredFocusPointBinding === "start"
             ? arrow.startBinding
             : arrow.endBinding;
 
@@ -1464,12 +1464,9 @@ const _renderInteractiveScene = ({
       }
     }
 
-    if (
-      isArrowElement(firstSelectedLinear) &&
-      appState.selectedLinearElement?.elementId === firstSelectedLinear.id
-    ) {
+    if (isArrowElement(selectedLinearElement)) {
       renderFocusPointIndicator({
-        arrow: firstSelectedLinear,
+        arrow: selectedLinearElement,
         elementsMap: allElementsMap,
         appState,
         context,
@@ -1477,7 +1474,7 @@ const _renderInteractiveScene = ({
       });
 
       renderFocusPointIndicator({
-        arrow: firstSelectedLinear,
+        arrow: selectedLinearElement,
         elementsMap: allElementsMap,
         appState,
         context,
