@@ -971,10 +971,8 @@ const renderFocusPointIndicator = (
   point: GlobalPoint,
   radius: number,
   isHovered: boolean,
-  isDragging: boolean,
+  disabled: boolean,
 ) => {
-  const disabled =
-    isDragging && !appState.selectedLinearElement?.hoveredFocusPointBinding;
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
   context.strokeStyle = disabled ? "rgba(120, 120, 120, 0.7)" : "#5e5ad8";
@@ -1014,9 +1012,18 @@ const renderFocusPointIndicators = (
 
   const arrow = element as any;
   const isDragging = !!appState.selectedLinearElement?.isDragging;
+  const startArrowPointSelected =
+    !!appState.selectedLinearElement?.selectedPointsIndices?.includes(0);
+  const endArrowPointSelected =
+    !!appState.selectedLinearElement?.selectedPointsIndices?.includes(
+      arrow.points.length - 1,
+    );
 
   // Render start binding focus point and connection line
-  if (arrow.startBinding?.elementId) {
+  if (
+    arrow.startBinding?.elementId &&
+    !(startArrowPointSelected && isDragging)
+  ) {
     const bindableElement = elementsMap.get(arrow.startBinding.elementId);
     if (
       bindableElement &&
@@ -1063,14 +1070,15 @@ const renderFocusPointIndicators = (
           focusPoint,
           FOCUS_POINT_SIZE,
           isHovered,
-          isDragging,
+          isDragging ||
+            appState.selectedLinearElement?.draggedFocusPointBinding === "end",
         );
       }
     }
   }
 
   // Render end binding focus point and connection line
-  if (arrow.endBinding?.elementId) {
+  if (arrow.endBinding?.elementId && !(endArrowPointSelected && isDragging)) {
     const bindableElement = elementsMap.get(arrow.endBinding.elementId);
     if (
       bindableElement &&
@@ -1118,7 +1126,9 @@ const renderFocusPointIndicators = (
           focusPoint,
           LinearElementEditor.POINT_HANDLE_SIZE / 1.5,
           isHovered,
-          isDragging,
+          isDragging ||
+            appState.selectedLinearElement?.draggedFocusPointBinding ===
+              "start",
         );
       }
     }
