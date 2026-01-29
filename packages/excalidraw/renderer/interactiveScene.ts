@@ -59,6 +59,7 @@ import type {
 
 import type {
   ElementsMap,
+  ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
@@ -87,11 +88,7 @@ import {
   strokeRectWithRotation_simple,
 } from "./helpers";
 
-import type {
-  Zoom,
-  AppClassProperties,
-  InteractiveCanvasAppState,
-} from "../types";
+import type { AppClassProperties, InteractiveCanvasAppState } from "../types";
 
 import type {
   InteractiveCanvasRenderConfig,
@@ -965,7 +962,7 @@ const renderFocusPointConnectionLine = (
   context.restore();
 };
 
-const renderFocusPointIndicator = (
+const renderFocusPointCicle = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   point: GlobalPoint,
@@ -995,43 +992,37 @@ const renderFocusPointIndicator = (
   context.restore();
 };
 
-const renderFocusPointIndicators = (
-  context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
-  element: NonDeleted<ExcalidrawLinearElement>,
-  elementsMap: NonDeletedSceneElementsMap,
-  zoom: Zoom,
-) => {
-  // Render focus point indicators when the arrow is selected
-  if (
-    !appState.selectedLinearElement?.elementId ||
-    appState.selectedLinearElement.elementId !== element.id
-  ) {
-    return;
-  }
+const renderFocusPointIndicator = ({
+  arrow,
+  appState,
+  type,
+  context,
+  elementsMap,
+}: {
+  arrow: NonDeleted<ExcalidrawArrowElement>;
+  appState: InteractiveCanvasAppState;
+  context: CanvasRenderingContext2D;
+  elementsMap: NonDeletedSceneElementsMap;
 
-  const arrow = element as any;
+  type: "start" | "end";
+}) => {
   const isDragging = !!appState.selectedLinearElement?.isDragging;
-  const startArrowPointSelected =
-    !!appState.selectedLinearElement?.selectedPointsIndices?.includes(0);
-  const endArrowPointSelected =
+  const binding = type === "start" ? arrow.startBinding : arrow.endBinding;
+  const pointIndex = type === "start" ? 0 : arrow.points.length - 1;
+  const pointSelected =
     !!appState.selectedLinearElement?.selectedPointsIndices?.includes(
-      arrow.points.length - 1,
+      pointIndex,
     );
 
-  // Render start binding focus point and connection line
-  if (
-    arrow.startBinding?.elementId &&
-    !(startArrowPointSelected && isDragging)
-  ) {
-    const bindableElement = elementsMap.get(arrow.startBinding.elementId);
+  if (binding?.elementId && !(pointSelected && isDragging)) {
+    const bindableElement = elementsMap.get(binding.elementId);
     if (
       bindableElement &&
       isBindableElement(bindableElement) &&
       !bindableElement.isDeleted
     ) {
       const focusPoint = getGlobalFixedPointForBindableElement(
-        arrow.startBinding.fixedPoint,
+        binding.fixedPoint,
         bindableElement,
         elementsMap,
       );
@@ -1047,88 +1038,31 @@ const renderFocusPointIndicators = (
         )
       ) {
         const isHovered =
-          appState.selectedLinearElement?.hoveredFocusPointBinding === "start";
+          appState.selectedLinearElement?.hoveredFocusPointBinding === type;
 
         // Render dashed line from arrow start point to focus point
-        const arrowStartPoint =
-          LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            arrow,
-            0,
-            elementsMap,
-          );
+        const arrowPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          arrow,
+          pointIndex,
+          elementsMap,
+        );
         renderFocusPointConnectionLine(
           context,
           appState,
-          arrowStartPoint,
+          arrowPoint,
           focusPoint,
           isDragging,
         );
 
-        renderFocusPointIndicator(
+        renderFocusPointCicle(
           context,
           appState,
           focusPoint,
           FOCUS_POINT_SIZE,
           isHovered,
           isDragging ||
-            appState.selectedLinearElement?.draggedFocusPointBinding === "end",
-        );
-      }
-    }
-  }
-
-  // Render end binding focus point and connection line
-  if (arrow.endBinding?.elementId && !(endArrowPointSelected && isDragging)) {
-    const bindableElement = elementsMap.get(arrow.endBinding.elementId);
-    if (
-      bindableElement &&
-      isBindableElement(bindableElement) &&
-      !bindableElement.isDeleted
-    ) {
-      const focusPoint = getGlobalFixedPointForBindableElement(
-        arrow.endBinding.fixedPoint,
-        bindableElement,
-        elementsMap,
-      );
-
-      // Only render if focus point is within the bindable element
-      if (
-        isFocusPointVisible(
-          focusPoint,
-          arrow,
-          bindableElement,
-          elementsMap,
-          appState,
-        )
-      ) {
-        const isHovered =
-          appState.selectedLinearElement?.hoveredFocusPointBinding === "end";
-
-        // Render dashed line from arrow end point to focus point
-        const arrowEndPoint =
-          LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            arrow,
-            arrow.points.length - 1,
-            elementsMap,
-          );
-
-        renderFocusPointConnectionLine(
-          context,
-          appState,
-          arrowEndPoint,
-          focusPoint,
-          isDragging,
-        );
-
-        renderFocusPointIndicator(
-          context,
-          appState,
-          focusPoint,
-          LinearElementEditor.POINT_HANDLE_SIZE / 1.5,
-          isHovered,
-          isDragging ||
             appState.selectedLinearElement?.draggedFocusPointBinding ===
-              "start",
+              (type === "start" ? "end" : "start"),
         );
       }
     }
@@ -1526,15 +1460,25 @@ const _renderInteractiveScene = ({
       }
     }
 
-    if (isArrowElement(firstSelectedLinear)) {
-      // Render focus point indicators for linear element even during dragging.
-      renderFocusPointIndicators(
-        context,
+    if (
+      isArrowElement(firstSelectedLinear) &&
+      appState.selectedLinearElement?.elementId === firstSelectedLinear.id
+    ) {
+      renderFocusPointIndicator({
+        arrow: firstSelectedLinear,
+        elementsMap: allElementsMap,
         appState,
-        firstSelectedLinear,
-        allElementsMap,
-        appState.zoom,
-      );
+        context,
+        type: "start",
+      });
+
+      renderFocusPointIndicator({
+        arrow: firstSelectedLinear,
+        elementsMap: allElementsMap,
+        appState,
+        context,
+        type: "end",
+      });
     }
   }
 
