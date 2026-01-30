@@ -1,6 +1,6 @@
 const fs = require("fs");
 const { execSync } = require("child_process");
-const core = require("@actions/core");
+// const core = require("@actions/core");
 
 const excalidrawDir = `${__dirname}/../packages/excalidraw`;
 const excalidrawPackage = `${excalidrawDir}/package.json`;
@@ -30,12 +30,12 @@ const publish = () => {
     execSync(`yarn --cwd ${excalidrawDir} publish`);
 
     console.info(`Published ${pkg.name}@latest 🎉`);
-    core.setOutput(
-      "result",
-      `**Latest version has been published** [@dwelle/excalidraw@${pkg.version}](https://www.npmjs.com/package/@excalidraw/excalidraw/v/${pkg.version}) :rocket:`,
-    );
+    // core.setOutput(
+    //   "result",
+    //   `**Latest version has been published** [@dwelle/excalidraw@${pkg.version}](https://www.npmjs.com/package/@excalidraw/excalidraw/v/${pkg.version}) :rocket:`,
+    // );
   } catch (error) {
-    core.setOutput("result", "package couldn't be published :warning:!");
+    // core.setOutput("result", "package couldn't be published :warning:!");
     if (error.output) {
       console.error("stdout:", error.output[1]?.toString());
       console.error("stderr:", error.output[2]?.toString());
