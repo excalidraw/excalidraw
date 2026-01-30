@@ -1171,6 +1171,68 @@ export const updateBoundElements = (
   });
 };
 
+const updateArrowBindings = (
+  latestElement: ExcalidrawArrowElement,
+  startOrEnd: "startBinding" | "endBinding",
+  elementsMap: NonDeletedSceneElementsMap,
+  scene: Scene,
+  appState: AppState,
+) => {
+  invariant(
+    !isElbowArrow(latestElement),
+    "Elbow arrows not supported for indirect updates",
+  );
+
+  const binding = latestElement[startOrEnd];
+  const bindableElement =
+    binding &&
+    (elementsMap.get(binding.elementId) as ExcalidrawBindableElement);
+  const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    latestElement,
+    startOrEnd === "startBinding" ? 0 : -1,
+    elementsMap,
+  );
+  const hit =
+    bindableElement &&
+    hitElementItself({
+      element: bindableElement,
+      point,
+      elementsMap,
+      threshold: maxBindingDistance_simple(appState.zoom),
+    });
+  const strategyName = startOrEnd === "startBinding" ? "start" : "end";
+  unbindBindingElement(latestElement, strategyName, scene);
+  if (hit) {
+    const pointIdx =
+      startOrEnd === "startBinding" ? 0 : latestElement.points.length - 1;
+    const localPoint = latestElement.points[pointIdx];
+    const strategy =
+      getBindingStrategyForDraggingBindingElementEndpoints_simple(
+        latestElement,
+        new Map([[pointIdx, { point: localPoint }]]),
+        point[0],
+        point[1],
+        elementsMap,
+        scene.getNonDeletedElements(),
+        appState,
+      );
+    if (
+      strategy[strategyName] &&
+      strategy[strategyName].element?.id === bindableElement.id &&
+      strategy[strategyName].mode
+    ) {
+      bindBindingElement(
+        latestElement,
+        bindableElement,
+        strategy[strategyName].mode,
+        strategyName,
+        scene,
+        strategy[strategyName].focusPoint,
+      );
+    }
+  }
+};
+
 export const updateBindings = (
   latestElement: ExcalidrawElement,
   scene: Scene,
@@ -1181,14 +1243,27 @@ export const updateBindings = (
   },
 ) => {
   if (isArrowElement(latestElement)) {
-    bindOrUnbindBindingElement(
-      latestElement,
-      new Map(),
-      Infinity,
-      Infinity,
-      scene,
-      appState,
-    );
+    const elementsMap = scene.getNonDeletedElementsMap();
+
+    if (latestElement.startBinding) {
+      updateArrowBindings(
+        latestElement,
+        "startBinding",
+        elementsMap,
+        scene,
+        appState,
+      );
+    }
+
+    if (latestElement.endBinding) {
+      updateArrowBindings(
+        latestElement,
+        "endBinding",
+        elementsMap,
+        scene,
+        appState,
+      );
+    }
   } else {
     updateBoundElements(latestElement, scene, {
       ...options,

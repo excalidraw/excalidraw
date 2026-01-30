@@ -6,6 +6,8 @@ import { InlineIcon } from "../../InlineIcon";
 
 import { t } from "../../../i18n";
 
+import { TTDWelcomeMessage } from "../TTDWelcomeMessage";
+
 import { ChatMessage } from "./ChatMessage";
 
 import type { TChat, TTTDDialog } from "../types";
@@ -20,13 +22,13 @@ export const ChatInterface = ({
   onGenerate,
   isGenerating,
   rateLimits,
-  placeholder,
   onAbort,
   onMermaidTabClick,
   onAiRepairClick,
   onDeleteMessage,
   onInsertMessage,
   onRetry,
+  renderWelcomeScreen,
   renderWarning,
 }: {
   chatId: string;
@@ -41,17 +43,13 @@ export const ChatInterface = ({
   } | null;
   onViewAsMermaid?: () => void;
   generatedResponse?: string | null;
-  placeholder: {
-    title: string;
-    description: string;
-    hint: string;
-  };
   onAbort?: () => void;
   onMermaidTabClick?: (message: TChat.ChatMessage) => void;
   onAiRepairClick?: (message: TChat.ChatMessage) => void;
   onDeleteMessage?: (messageId: string) => void;
   onInsertMessage?: (message: TChat.ChatMessage) => void;
   onRetry?: (message: TChat.ChatMessage) => void;
+  renderWelcomeScreen?: TTTDDialog.renderWelcomeScreen;
   renderWarning?: TTTDDialog.renderWarning;
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -113,12 +111,12 @@ export const ChatInterface = ({
     <div className="chat-interface">
       <div className="chat-interface__messages">
         {messages.length === 0 ? (
-          <div className="chat-interface__empty-state">
-            <div className="chat-interface__empty-state-content">
-              <h3>{placeholder.title}</h3>
-              <p>{placeholder.description}</p>
-              <p>{placeholder.hint}</p>
-            </div>
+          <div className="chat-interface__welcome-screen">
+            {renderWelcomeScreen ? (
+              renderWelcomeScreen({ rateLimits: rateLimits ?? null })
+            ) : (
+              <TTDWelcomeMessage />
+            )}
           </div>
         ) : (
           messages.map((message, index) => (
