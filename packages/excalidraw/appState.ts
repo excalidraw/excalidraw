@@ -83,7 +83,6 @@ export const getDefaultAppState = (): Omit<
     openPopup: null,
     openSidebar: null,
     openDialog: null,
-    // openDialog: { name: "ttd", tab: "text-to-diagram" },
     pasteDialog: { shown: false, data: null },
     previousSelectedElementIds: {},
     resizingElement: null,
