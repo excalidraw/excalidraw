@@ -10073,7 +10073,8 @@ class App extends React.Component<AppProps, AppState> {
       // and sets binding element
       if (
         this.state.selectedLinearElement?.isEditing &&
-        !this.state.newElement
+        !this.state.newElement &&
+        this.state.selectedLinearElement.draggedFocusPointBinding === null
       ) {
         if (
           !pointerDownState.boxSelection.hasOccurred &&
