@@ -8875,6 +8875,7 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.openDialog?.name === "elementLinkSelector") {
         return;
       }
+
       const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
 
       if (this.state.activeLockedId) {
@@ -8934,10 +8935,11 @@ class App extends React.Component<AppProps, AppState> {
         });
         return;
       }
+      const dragOffset = {
+        x: pointerCoords.x - pointerDownState.origin.x,
+        y: pointerCoords.y - pointerDownState.origin.y,
+      };
 
-      const lastPointerCoords =
-        this.lastPointerMoveCoords ?? pointerDownState.origin;
-      this.lastPointerMoveCoords = pointerCoords;
 
       // We need to initialize dragOffsetXY only after we've updated
       // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
@@ -9183,10 +9185,7 @@ class App extends React.Component<AppProps, AppState> {
           !this.state.editingTextElement &&
           this.state.activeEmbeddable?.state !== "active"
         ) {
-          const dragOffset = {
-            x: pointerCoords.x - pointerDownState.drag.origin.x,
-            y: pointerCoords.y - pointerDownState.drag.origin.y,
-          };
+          // 使用外层已计算的 dragOffset（从 pointerDownState.origin 计算的总偏移量）
 
           const originalElements = [
             ...pointerDownState.originalElements.values(),
@@ -9229,10 +9228,8 @@ class App extends React.Component<AppProps, AppState> {
                 this.imageCache.get(croppingElement.fileId)?.image;
 
               if (image && !(image instanceof Promise)) {
-                const scaledDragOffset = vectorScale(
-                  vector(dragOffset.x, dragOffset.y),
-                  Math.max(this.state.zoom.value, 2),
-                );
+                const scaleToNaturalX = image.naturalWidth / croppingElement.width;
+                const scaleToNaturalY = image.naturalHeight / croppingElement.height;
 
                 const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
                   croppingElement,
@@ -9267,10 +9264,10 @@ class App extends React.Component<AppProps, AppState> {
                   vectorSubtract(bottomLeft, topLeft),
                 );
 
-                // project instantDrafOffset onto leftEdge and topEdge to decompose
+                const dragOffsetVector = vector(dragOffset.x, dragOffset.y);
                 const offsetVector = vector(
-                  vectorDot(scaledDragOffset, topEdge),
-                  vectorDot(scaledDragOffset, leftEdge),
+                  vectorDot(dragOffsetVector, topEdge),
+                  vectorDot(dragOffsetVector, leftEdge),
                 );
 
                 const originalCroppingElement = pointerDownState.originalElements.get(croppingElement.id);
@@ -9278,22 +9275,22 @@ class App extends React.Component<AppProps, AppState> {
                   ? originalCroppingElement.crop 
                   : crop;
 
-                  const nextCrop = {
-                    ...crop,
-                    x: clamp(
-                      (originalCrop?.x ?? 0) -
-                        offsetVector[0] * Math.sign(croppingElement.scale[0]),
-                      0,
-                      image.naturalWidth - crop.width,
-                    ),
-                    y: clamp(
-                      (originalCrop?.y ?? 0) -
-                        offsetVector[1] * Math.sign(croppingElement.scale[1]),
-                      0,
-                      image.naturalHeight - crop.height,
-                    ),
-                  };
-
+                const nextCrop = {
+                  ...crop,
+                  x: clamp(
+                    (originalCrop?.x ?? 0) -
+                      offsetVector[0] * scaleToNaturalX * Math.sign(croppingElement.scale[0]),
+                    0,
+                    image.naturalWidth - crop.width,
+                  ),
+                  y: clamp(
+                    (originalCrop?.y ?? 0) -
+                      offsetVector[1] * scaleToNaturalY * Math.sign(croppingElement.scale[1]),
+                    0,
+                    image.naturalHeight - crop.height,
+                  ),
+                };
+     
                 this.scene.mutateElement(croppingElement, {
                   crop: nextCrop,
                 });
