@@ -105,6 +105,7 @@ export default function ExampleApp({
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
   const [renderScrollbars, setRenderScrollbars] = useState(false);
+  const [interactive, setInteractive] = useState(false);
   const [blobUrl, setBlobUrl] = useState<string>("");
   const [canvasUrl, setCanvasUrl] = useState<string>("");
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
@@ -194,6 +195,7 @@ export default function ExampleApp({
         viewModeEnabled,
         zenModeEnabled,
         renderScrollbars,
+        interactive,
         gridModeEnabled,
         theme,
         name: "Custom name of drawing",
@@ -721,6 +723,14 @@ export default function ExampleApp({
               onChange={() => setRenderScrollbars(!renderScrollbars)}
             />
             Render scrollbars
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={interactive}
+              onChange={() => setInteractive(!interactive)}
+            />
+            interactive
           </label>
           <label>
             <input

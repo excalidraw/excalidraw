@@ -6953,6 +6953,42 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     if (this.props.interactive === false) {
+      // Handle link detection for non-interactive mode
+      const scenePointer = viewportCoordsToSceneCoords(event, this.state);
+
+      const hitElement = this.getElementAtPosition(
+        scenePointer.x,
+        scenePointer.y,
+        { preferSelected: true, includeLockedElements: true },
+      );
+
+      this.hitLinkElement = this.getElementLinkAtPosition(
+        scenePointer,
+        hitElement,
+      );
+
+      if (this.hitLinkElement) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+        if (
+          !isEmbeddableElement(this.hitLinkElement) ||
+          isPointHittingLinkIcon(
+            this.hitLinkElement,
+            this.scene.getNonDeletedElementsMap(),
+            this.state,
+            pointFrom(scenePointer.x, scenePointer.y),
+          )
+        ) {
+          showHyperlinkTooltip(
+            this.hitLinkElement,
+            this.state,
+            this.scene.getNonDeletedElementsMap(),
+          );
+        }
+      } else {
+        hideHyperlinkToolip();
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+      }
+
       return false;
     }
 
