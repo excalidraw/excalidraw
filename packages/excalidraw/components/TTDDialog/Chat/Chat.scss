@@ -48,14 +48,14 @@ $verticalBreakpoint: 861px;
       }
     }
 
-    &__empty-state {
+    &__welcome-screen {
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100%;
       min-height: 200px;
 
-      &-content {
+      &__welcome-message {
         text-align: center;
 
         h3 {
