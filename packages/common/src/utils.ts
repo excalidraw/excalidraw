@@ -16,6 +16,8 @@ import {
   FONT_FAMILY,
   getFontFamilyFallbacks,
   WINDOWS_EMOJI_FALLBACK_FONT,
+  APPLE_EMOJI_FALLBACK_FONT,
+  ANDROID_EMOJI_FALLBACK_FONT,
 } from "./constants";
 
 import type { MaybePromise, ResolutionType } from "./utility-types";
