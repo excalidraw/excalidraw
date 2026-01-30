@@ -46,7 +46,11 @@ export const isFocusPointVisible = (
 ): boolean => {
   // No focus point management for elbow arrows, because elbow arrows
   // always have their focus point at the arrow point itself
-  if (isElbowArrow(arrow) || !isBindingEnabled(appState)) {
+  if (
+    isElbowArrow(arrow) ||
+    !isBindingEnabled(appState) ||
+    arrow.points.length !== 2
+  ) {
     return false;
   }
 
