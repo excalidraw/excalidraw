@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "כל המידע שלח נשמר מקומית בדפדפן.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "אתה רוצה ללכת אל Excalidraw+ במקום?",
       "menuHint": "ייצוא, העדפות, שפות, ..."
     },
@@ -612,7 +614,55 @@
     "button": "הוספה",
     "description": "לעת עתה נתמכים רק <flowchartLink>תרשימי זרימה</flowchartLink>, <sequenceLink>תהליכים</sequenceLink>, <classLink>ודיאגרמת מחלקה</classLink>. שאר הסוגים ייוצרו כתמונות ב-Excalidraw.",
     "syntax": "תחביר Mermaid",
-    "preview": "תצוגה מקדימה"
+    "preview": "תצוגה מקדימה",
+    "label": "",
+    "inputPlaceholder": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": "חיפוש מהיר"
