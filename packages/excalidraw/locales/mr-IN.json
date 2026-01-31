@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "तुमचा सर्व डेटा तुमच्या ब्राउझरमध्ये स्थानिक पातळीवर जतन केला जातो.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "त्याऐवजी तुम्हाला Excalidraw+ वर जायचे आहे का?",
       "menuHint": "निर्यात, आवड़ी-निवडी, भाषा, ..."
     },
