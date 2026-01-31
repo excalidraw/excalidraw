@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "جميع بياناتك محفوظة محليًا في المتصفح الخاص بك.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "هل تريد الانتقال إلى Excalidraw+ بدلاً من ذلك؟",
       "menuHint": "التصدير، التفضيلات، اللغات..."
     },
