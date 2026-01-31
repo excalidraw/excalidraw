@@ -21,10 +21,13 @@ import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
   elementCenterPoint,
+  FOCUS_POINT_SIZE,
   getOmitSidesForEditorInterface,
   getTransformHandles,
   getTransformHandlesFromCoords,
   hasBoundingBox,
+  isArrowElement,
+  isBindableElement,
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
@@ -44,6 +47,10 @@ import {
 } from "@excalidraw/element";
 
 import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
+import {
+  getGlobalFixedPointForBindableElement,
+  isFocusPointVisible,
+} from "@excalidraw/element";
 
 import type {
   TransformHandles,
@@ -52,6 +59,7 @@ import type {
 
 import type {
   ElementsMap,
+  ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
@@ -71,11 +79,6 @@ import {
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
 
-import {
-  type AppClassProperties,
-  type InteractiveCanvasAppState,
-} from "../types";
-
 import { getClientColor, renderRemoteCursors } from "../clients";
 
 import {
@@ -84,6 +87,8 @@ import {
   getNormalizedCanvasDimensions,
   strokeRectWithRotation_simple,
 } from "./helpers";
+
+import type { AppClassProperties, InteractiveCanvasAppState } from "../types";
 
 import type {
   InteractiveCanvasRenderConfig,
@@ -123,6 +128,9 @@ const renderLinearElementPointHighlight = (
   ) {
     return;
   }
+  if (appState.selectedLinearElement?.isDragging) {
+    return;
+  }
   const element = LinearElementEditor.getElement(elementId, elementsMap);
 
   if (!element) {
@@ -154,6 +162,19 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
     LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value,
     false,
   );
+};
+
+const renderFocusPointHighlight = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  focusPoint: GlobalPoint,
+) => {
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
+  highlightPoint(focusPoint, context, appState);
+
+  context.restore();
 };
 
 const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
@@ -920,6 +941,145 @@ const renderLinearPointHandles = (
   context.restore();
 };
 
+const renderFocusPointConnectionLine = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  fromPoint: GlobalPoint,
+  toPoint: GlobalPoint,
+) => {
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
+  context.strokeStyle = "rgba(134, 131, 226, 0.6)";
+  context.lineWidth = 1 / appState.zoom.value;
+  context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
+
+  context.beginPath();
+  context.moveTo(fromPoint[0], fromPoint[1]);
+  context.lineTo(toPoint[0], toPoint[1]);
+  context.stroke();
+
+  context.restore();
+};
+
+const renderFocusPointCicle = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  point: GlobalPoint,
+  radius: number,
+  isHovered: boolean,
+) => {
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+  context.strokeStyle = "rgba(134, 131, 226, 0.6)";
+  context.lineWidth = 1 / appState.zoom.value;
+  context.setLineDash([]);
+  context.fillStyle = isHovered
+    ? "rgba(134, 131, 226, 0.9)"
+    : "rgba(255, 255, 255, 0.9)";
+
+  fillCircle(
+    context,
+    point[0],
+    point[1],
+    radius / appState.zoom.value,
+    true,
+    true,
+  );
+  context.restore();
+};
+
+const renderFocusPointIndicator = ({
+  arrow,
+  appState,
+  type,
+  context,
+  elementsMap,
+}: {
+  arrow: NonDeleted<ExcalidrawArrowElement>;
+  appState: InteractiveCanvasAppState;
+  context: CanvasRenderingContext2D;
+  elementsMap: NonDeletedSceneElementsMap;
+  type: "start" | "end";
+}) => {
+  const binding = type === "start" ? arrow.startBinding : arrow.endBinding;
+  const bindableElement =
+    binding?.elementId && elementsMap.get(binding.elementId);
+
+  if (
+    !bindableElement ||
+    !isBindableElement(bindableElement) ||
+    bindableElement.isDeleted
+  ) {
+    return;
+  }
+
+  const focusPoint = getGlobalFixedPointForBindableElement(
+    binding.fixedPoint,
+    bindableElement,
+    elementsMap,
+  );
+
+  // Only render if focus point is within the bindable element
+  if (
+    !isFocusPointVisible(
+      focusPoint,
+      arrow,
+      bindableElement,
+      elementsMap,
+      appState,
+    )
+  ) {
+    return;
+  }
+
+  const linearState = appState.selectedLinearElement;
+  const isDragging = !!linearState?.isDragging;
+  const pointIndex = type === "start" ? 0 : arrow.points.length - 1;
+  const pointSelected =
+    !!linearState?.selectedPointsIndices?.includes(pointIndex);
+
+  // render focus point highlight
+  // ----------------------------
+
+  if (
+    linearState?.hoveredFocusPointBinding === type &&
+    !linearState.draggedFocusPointBinding
+  ) {
+    renderFocusPointHighlight(context, appState, focusPoint);
+  }
+
+  // render focus point
+  // ----------------------------
+
+  if (!(pointSelected && isDragging)) {
+    const focusPoint = getGlobalFixedPointForBindableElement(
+      binding.fixedPoint,
+      bindableElement,
+      elementsMap,
+    );
+
+    const isHovered = linearState?.hoveredFocusPointBinding === type;
+
+    // Render dashed line from arrow start point to focus point
+    const arrowPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      pointIndex,
+      elementsMap,
+    );
+
+    renderFocusPointConnectionLine(context, appState, arrowPoint, focusPoint);
+
+    renderFocusPointCicle(
+      context,
+      appState,
+      focusPoint,
+      FOCUS_POINT_SIZE / 1.5,
+      isHovered,
+    );
+  }
+};
+
 const renderTransformHandles = (
   context: CanvasRenderingContext2D,
   renderConfig: InteractiveCanvasRenderConfig,
@@ -1251,25 +1411,43 @@ const _renderInteractiveScene = ({
     );
   }
 
+  const linearState = appState.selectedLinearElement;
+  const selectedLinearElement =
+    linearState &&
+    LinearElementEditor.getElement(linearState.elementId, allElementsMap);
   // Arrows have a different highlight behavior when
   // they are the only selected element
-  if (appState.selectedLinearElement) {
-    const editor = appState.selectedLinearElement;
-    const firstSelectedLinear = selectedElements.find(
-      (el) => el.id === editor.elementId, // Don't forget bound text elements!
-    );
-
+  if (selectedLinearElement) {
     if (!appState.selectedLinearElement.isDragging) {
-      if (editor.segmentMidPointHoveredCoords) {
+      if (linearState.segmentMidPointHoveredCoords) {
         renderElbowArrowMidPointHighlight(context, appState);
       } else if (
-        isElbowArrow(firstSelectedLinear)
-          ? editor.hoverPointIndex === 0 ||
-            editor.hoverPointIndex === firstSelectedLinear.points.length - 1
-          : editor.hoverPointIndex >= 0
+        isElbowArrow(selectedLinearElement)
+          ? linearState.hoverPointIndex === 0 ||
+            linearState.hoverPointIndex ===
+              selectedLinearElement.points.length - 1
+          : linearState.hoverPointIndex >= 0
       ) {
         renderLinearElementPointHighlight(context, appState, elementsMap);
       }
+    }
+
+    if (isArrowElement(selectedLinearElement)) {
+      renderFocusPointIndicator({
+        arrow: selectedLinearElement,
+        elementsMap: allElementsMap,
+        appState,
+        context,
+        type: "start",
+      });
+
+      renderFocusPointIndicator({
+        arrow: selectedLinearElement,
+        elementsMap: allElementsMap,
+        appState,
+        context,
+        type: "end",
+      });
     }
   }
 

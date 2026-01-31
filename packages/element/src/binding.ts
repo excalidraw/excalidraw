@@ -116,6 +116,7 @@ export type BindingStrategy =
  */
 export const BASE_BINDING_GAP = 10;
 export const BASE_BINDING_GAP_ELBOW = 5;
+export const FOCUS_POINT_SIZE = 10 / 1.5;
 
 export const getBindingGap = (
   bindTarget: ExcalidrawBindableElement,
@@ -145,7 +146,9 @@ export const shouldEnableBindingForPointerEvent = (
   return !event[KEYS.CTRL_OR_CMD];
 };
 
-export const isBindingEnabled = (appState: AppState): boolean => {
+export const isBindingEnabled = (appState: {
+  isBindingEnabled: AppState["isBindingEnabled"];
+}): boolean => {
   return appState.isBindingEnabled;
 };
 
@@ -259,7 +262,7 @@ const bindingStrategyForElbowArrowEndpointDragging = (
     globalPoint,
     elements,
     elementsMap,
-    (element) => maxBindingDistance_simple(zoom),
+    maxBindingDistance_simple(zoom),
   );
 
   const current = hit
@@ -684,7 +687,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     globalPoint,
     elements,
     elementsMap,
-    (e) => maxBindingDistance_simple(appState.zoom),
+    maxBindingDistance_simple(appState.zoom),
   );
   const pointInElement =
     hit &&
@@ -711,7 +714,13 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   const otherFocusPointIsInElement =
     otherBindableElement &&
     otherFocusPoint &&
-    isPointInElement(otherFocusPoint, otherBindableElement, elementsMap);
+    hitElementItself({
+      point: otherFocusPoint,
+      element: otherBindableElement,
+      elementsMap,
+      threshold: 0,
+      overrideShouldTestInside: true,
+    });
 
   // Handle outside-outside binding to the same element
   if (otherBinding && otherBinding.elementId === hit?.id) {
@@ -1674,7 +1683,9 @@ export const updateBoundPoint = (
   binding: FixedPointBinding | null | undefined,
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
-  customIntersector?: LineSegment<GlobalPoint>,
+  opts?: {
+    customIntersector?: LineSegment<GlobalPoint>;
+  },
 ): LocalPoint | null => {
   if (
     binding == null ||
@@ -1761,16 +1772,14 @@ export const updateBoundPoint = (
 
   const isNested = (arrowTooShort || isOverlapping) && isLargerThanOther;
 
-  let _customIntersector = customIntersector;
+  let _customIntersector = opts?.customIntersector;
   if (!elbowed && !_customIntersector) {
     const [x1, y1, x2, y2] = LinearElementEditor.getElementAbsoluteCoords(
       arrow,
       elementsMap,
     );
     const center = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
-    const edgePoint = isRectanguloidElement(bindableElement)
-      ? avoidRectangularCorner(arrow, bindableElement, elementsMap, global)
-      : global;
+    const edgePoint = global;
     const adjacentPoint = pointRotateRads(
       pointFrom<GlobalPoint>(
         arrow.x +
@@ -1884,7 +1893,7 @@ export const calculateFixedPointForNonElbowArrowBinding = (
   elementsMap: ElementsMap,
   focusPoint?: GlobalPoint,
 ): { fixedPoint: FixedPoint } => {
-  const edgePoint = focusPoint
+  const edgePoint: GlobalPoint = focusPoint
     ? focusPoint
     : LinearElementEditor.getPointAtIndexGlobalCoordinates(
         linearElement,
@@ -1892,11 +1901,7 @@ export const calculateFixedPointForNonElbowArrowBinding = (
         elementsMap,
       );
 
-  // Convert the global point to element-local coordinates
-  const elementCenter = pointFrom(
-    hoveredElement.x + hoveredElement.width / 2,
-    hoveredElement.y + hoveredElement.height / 2,
-  );
+  const elementCenter = elementCenterPoint(hoveredElement, elementsMap);
 
   // Rotate the point to account for element rotation
   const nonRotatedPoint = pointRotateRads(
