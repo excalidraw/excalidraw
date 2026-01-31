@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Όλα τα δεδομένα σας αποθηκεύονται τοπικά στο πρόγραμμα περιήγησης.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "Μήπως θέλατε να πάτε στο Excalidraw+;",
       "menuHint": "Εξαγωγή, προτιμήσεις, γλώσσες, ..."
     },
