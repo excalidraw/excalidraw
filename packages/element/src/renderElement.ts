@@ -476,12 +476,14 @@ const drawElementOnCanvas = (
             };
 
         if (shouldInvertImage && isSafari) {
+          const devicePixelRatio = window.devicePixelRatio || 1;
           const tempCanvas = document.createElement("canvas");
-          tempCanvas.width = element.width;
-          tempCanvas.height = element.height;
+          tempCanvas.width = element.width * devicePixelRatio;
+          tempCanvas.height = element.height * devicePixelRatio;
           const tempContext = tempCanvas.getContext("2d");
 
           if (tempContext) {
+            tempContext.scale(devicePixelRatio, devicePixelRatio);
             tempContext.drawImage(
               img,
               x,
@@ -497,14 +499,24 @@ const drawElementOnCanvas = (
             const imageData = tempContext.getImageData(
               0,
               0,
-              element.width,
-              element.height,
+              tempCanvas.width,
+              tempCanvas.height,
             );
 
             applyDarkThemeFilterToImageData(imageData);
 
             tempContext.putImageData(imageData, 0, 0);
-            context.drawImage(tempCanvas, 0, 0);
+            context.drawImage(
+              tempCanvas,
+              0,
+              0,
+              tempCanvas.width,
+              tempCanvas.height,
+              0,
+              0,
+              element.width,
+              element.height,
+            );
           }
         } else {
           context.drawImage(
