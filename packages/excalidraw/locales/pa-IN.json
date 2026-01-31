@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "ਤੁਹਾਡਾ ਸਾਰਾ ਡਾਟਾ ਤੁਹਾਡੇ ਲੋਕਲ ਬਰਾਉਜ਼ਰ ਵਿੱਚ ਸਾਂਭਿਆ ਹੋਇਆ ਹੈ।",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "",
       "menuHint": "ਨਿਰਯਾਤ, ਤਰਜੀਹਾਂ, ਭਾਸ਼ਾਵਾਂ, …"
     },
