@@ -70,7 +70,7 @@ export * from "./elbowArrow";
 export * from "./elementLink";
 export * from "./embeddable";
 export * from "./flowchart";
-export * from "./focus";
+export * from "./arrows/focus";
 export * from "./fractionalIndex";
 export * from "./frame";
 export * from "./groups";

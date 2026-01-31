@@ -13,15 +13,15 @@ import {
   maxBindingDistance_simple,
   unbindBindingElement,
   updateBoundPoint,
-} from "./binding";
+} from "../binding";
 import {
   isBindableElement,
   isBindingElement,
   isElbowArrow,
-} from "./typeChecks";
-import { LinearElementEditor } from "./linearElementEditor";
-import { getHoveredElementForFocusPoint, hitElementItself } from "./collision";
-import { moveArrowAboveBindable } from "./zindex";
+} from "../typeChecks";
+import { LinearElementEditor } from "../linearElementEditor";
+import { getHoveredElementForFocusPoint, hitElementItself } from "../collision";
+import { moveArrowAboveBindable } from "../zindex";
 
 import type {
   ElementsMap,
@@ -29,9 +29,9 @@ import type {
   ExcalidrawBindableElement,
   NonDeletedSceneElementsMap,
   PointsPositionUpdates,
-} from "./types";
+} from "../types";
 
-import type { Scene } from "./Scene";
+import type { Scene } from "../Scene";
 
 export const isFocusPointVisible = (
   focusPoint: GlobalPoint,

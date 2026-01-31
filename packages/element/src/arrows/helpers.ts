@@ -1,7 +1,8 @@
 import type { App } from "@excalidraw/excalidraw/types";
 
-import { handleFocusPointDrag } from "../focus";
 import { LinearElementEditor } from "../linearElementEditor";
+
+import { handleFocusPointDrag } from "./focus";
 
 export const maybeHandleArrowPointlikeDrag = ({
   app,
