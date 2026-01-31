@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Tüm verileriniz tarayıcınızda yerel olarak kaydedilir.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "Ecalidraw+'a mı gitmek istediniz?",
       "menuHint": "Dışa aktar, seçenekler, diller, ..."
     },
