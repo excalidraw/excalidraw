@@ -557,9 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Desenele tale sunt salvate în spațiul de stocare al navigatorului tău.",
+      "center_heading_line2": "Spațiul de stocare al navigatorului poate fi șters în mod neașteptat.",
+      "center_heading_line3": "Salvează-ți periodic munca într-un fișier pentru a evita pierderea acesteia.",
       "center_heading_plus": "Ai vrut să mergi în schimb la Excalidraw+?",
       "menuHint": "Exportare, preferințe, limbi, ..."
     },
