@@ -116,4 +116,9 @@ export namespace TTTDDialog {
   export type renderWarning = (
     chatMessage: TChat.ChatMessage,
   ) => React.ReactNode | undefined;
+
+  export type renderWelcomeScreen = (props: {
+    /** null if not rate limit data currently available */
+    rateLimits: RateLimits | null;
+  }) => React.ReactNode | undefined;
 }

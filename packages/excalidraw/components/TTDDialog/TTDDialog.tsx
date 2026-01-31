@@ -15,6 +15,8 @@ import { TTDDialogTab } from "./TTDDialogTab";
 
 import "./TTDDialog.scss";
 
+import { TTDWelcomeMessage } from "./TTDWelcomeMessage";
+
 import type {
   MermaidToExcalidrawLibProps,
   TTDPersistenceAdapter,
@@ -25,6 +27,7 @@ export const TTDDialog = (
   props:
     | {
         onTextSubmit: TTTDDialog.onTextSubmit;
+        renderWelcomeScreen?: TTTDDialog.renderWelcomeScreen;
         renderWarning?: TTTDDialog.renderWarning;
         persistenceAdapter: TTDPersistenceAdapter;
       }
@@ -38,6 +41,8 @@ export const TTDDialog = (
 
   return <TTDDialogBase {...props} tab={appState.openDialog.tab} />;
 };
+
+TTDDialog.WelcomeMessage = TTDWelcomeMessage;
 
 /**
  * Text to diagram (TTD) dialog
@@ -54,6 +59,7 @@ const TTDDialogBase = withInternalFallback(
         onTextSubmit(
           props: TTTDDialog.OnTextSubmitProps,
         ): Promise<TTTDDialog.OnTextSubmitRetValue>;
+        renderWelcomeScreen?: TTTDDialog.renderWelcomeScreen;
         renderWarning?: TTTDDialog.renderWarning;
         persistenceAdapter: TTDPersistenceAdapter;
       }
@@ -110,6 +116,7 @@ const TTDDialogBase = withInternalFallback(
               <TextToDiagram
                 mermaidToExcalidrawLib={mermaidToExcalidrawLib}
                 onTextSubmit={rest.onTextSubmit}
+                renderWelcomeScreen={rest.renderWelcomeScreen}
                 renderWarning={rest.renderWarning}
                 persistenceAdapter={rest.persistenceAdapter}
               />

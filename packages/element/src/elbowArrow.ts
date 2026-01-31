@@ -2277,7 +2277,10 @@ const getHoveredElement = (
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   zoom?: AppState["zoom"],
 ) => {
-  return getHoveredElementForBinding(origPoint, elements, elementsMap, () =>
+  return getHoveredElementForBinding(
+    origPoint,
+    elements,
+    elementsMap,
     maxBindingDistance_simple(zoom),
   );
 };
