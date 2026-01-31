@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "هەموو داتاکانت لە ناوخۆی وێنگەڕەکەتدا پاشەکەوت کراوە.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "ویستت بڕۆیت بۆ Excalidraw+?",
       "menuHint": "هەناردەکردن، ڕێکخستنەکان، زمانەکان، ..."
     },
