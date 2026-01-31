@@ -23,7 +23,6 @@ import {
   getVerticalOffset,
   invariant,
   applyDarkModeFilter,
-  applyDarkThemeFilterToImageData,
   isSafari,
 } from "@excalidraw/common";
 
@@ -362,8 +361,9 @@ IMAGE_ERROR_PLACEHOLDER_IMG.src = `data:${MIME_TYPES.svg},${encodeURIComponent(
 const drawImagePlaceholder = (
   element: ExcalidrawImageElement,
   context: CanvasRenderingContext2D,
+  theme: StaticCanvasRenderConfig["theme"],
 ) => {
-  context.fillStyle = "#E7E7E7";
+  context.fillStyle = theme === THEME.DARK ? "#2E2E2E" : "#E7E7E7";
   context.fillRect(0, 0, element.width, element.height);
 
   const imageMinWidthOrHeight = Math.min(element.width, element.height);
@@ -445,14 +445,6 @@ const drawElementOnCanvas = (
         ? cacheEntry?.image
         : undefined;
 
-      const shouldInvertImage =
-        renderConfig.theme === THEME.DARK &&
-        cacheEntry?.mimeType === MIME_TYPES.svg;
-
-      if (shouldInvertImage && !isSafari) {
-        context.filter = DARK_THEME_FILTER;
-      }
-
       if (img != null && !(img instanceof Promise)) {
         if (element.roundness && context.roundRect) {
           context.beginPath();
@@ -474,6 +466,10 @@ const drawElementOnCanvas = (
               width: img.naturalWidth,
               height: img.naturalHeight,
             };
+
+        const shouldInvertImage =
+          renderConfig.theme === THEME.DARK &&
+          cacheEntry?.mimeType === MIME_TYPES.svg;
 
         if (shouldInvertImage && isSafari) {
           const devicePixelRatio = window.devicePixelRatio || 1;
@@ -503,7 +499,13 @@ const drawElementOnCanvas = (
               tempCanvas.height,
             );
 
-            applyDarkThemeFilterToImageData(imageData);
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+              data[i] = 255 - data[i];
+              data[i + 1] = 255 - data[i + 1];
+              data[i + 2] = 255 - data[i + 2];
+            }
 
             tempContext.putImageData(imageData, 0, 0);
             context.drawImage(
@@ -519,6 +521,10 @@ const drawElementOnCanvas = (
             );
           }
         } else {
+          if (shouldInvertImage) {
+            context.filter = DARK_THEME_FILTER;
+          }
+
           context.drawImage(
             img,
             x,
@@ -532,7 +538,7 @@ const drawElementOnCanvas = (
           );
         }
       } else {
-        drawImagePlaceholder(element, context);
+        drawImagePlaceholder(element, context, renderConfig.theme);
       }
       context.restore();
       break;
