@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Tutti i tuoi dati sono salvati localmente nel browser.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "Volevi invece andare su Excalidraw+?",
       "menuHint": "Esporta, preferenze, lingue, ..."
     },
@@ -612,7 +614,55 @@
     "button": "Inserisci",
     "description": "Attualmente sono supportati solo diagrammi di <flowchartLink>flusso</flowchartLink>,<sequenceLink> sequenza, </sequenceLink> e <classLink>classe </classLink>. Gli altri tipi saranno rappresentati come immagini in Excalidraw.",
     "syntax": "Sintassi Mermaid",
-    "preview": "Anteprima"
+    "preview": "Anteprima",
+    "label": "Mermaid",
+    "inputPlaceholder": "Scrivi qui la definizione del diagramma Mermaid..."
+  },
+  "ttd": {
+    "error": "Errore!"
+  },
+  "chat": {
+    "inputPlaceholder": "Inizia a digitare qui la tua idea per il diagramma... ({{shortcut}} per una nuova riga)",
+    "inputPlaceholderWithMessages": "Continua a perfezionare il tuo diagramma...",
+    "generating": "Generazione in corso...",
+    "rateLimitRemaining": "{{count}} richieste rimaste oggi",
+    "role": {
+      "user": "Tu",
+      "assistant": "Assistente IA",
+      "system": "Sistema"
+    },
+    "aiBeta": "IA Beta",
+    "label": "Chat",
+    "menu": "Menu",
+    "newChat": "Nuova Chat",
+    "deleteChat": "Elimina Chat",
+    "deleteMessage": "Cancella messaggio",
+    "viewAsMermaid": "Visualizza come Mermaid",
+    "placeholder": {
+      "title": "Progettiamo il tuo diagramma",
+      "description": "Descrivi il diagramma che vuoi creare e noi lo genereremo per te.",
+      "hint": "Al momento conosciamo i diagrammi di flusso, di sequenza e di classe."
+    },
+    "preview": "Anteprima",
+    "insert": "Inserisci",
+    "retry": "Riprova",
+    "errors": {
+      "promptTooShort": "Il prompt è troppo corto (min {{min}} caratteri)",
+      "promptTooLong": "Il prompt è troppo lungo (max {{max}} caratteri)",
+      "generationFailed": "Generazione non riuscita",
+      "invalidDiagram": "È stato generato un diagramma non valido :(. Puoi modificarlo manualmente, riprovare con la correzione automatica o provare un prompt diverso.",
+      "fixInMermaid": "Modifica Mermaid manualmente→",
+      "aiRepair": "Rigenera (correzione automatica) →",
+      "requestAborted": "Richiesta annullata",
+      "requestFailed": "Richiesta non riuscita",
+      "mermaidParseError": "Errore di sintassi Mermaid"
+    },
+    "rateLimit": {
+      "messageLimit": "Hai raggiunto il tuo limite di IA sul piano gratuito. Prova Excalidraw+ per saperne di più o torna domani.",
+      "generalRateLimit": "Fermati, sei troppo veloce per noi! Attendi un attimo prima di riprovare.",
+      "messageLimitInputPlaceholder": "Hai raggiunto il limite di messaggi"
+    },
+    "upsellBtnLabel": "Aggiorna alla Plus"
   },
   "quickSearch": {
     "placeholder": "Ricerca rapida"
