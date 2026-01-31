@@ -1,0 +1,266 @@
+/**
+ * Template definitions for ChatCanvas
+ * Each template contains a set of pre-configured elements
+ */
+
+import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
+
+export interface Template {
+  id: string;
+  name: string;
+  description: string;
+  thumbnail: string;
+  elements: ExcalidrawElementSkeleton[];
+}
+
+export const TEMPLATES: Template[] = [
+  {
+    id: "template-wireframe",
+    name: "Wireframe",
+    description: "Basic wireframe template for UI design",
+    thumbnail: "📐",
+    elements: [
+      {
+        type: "rectangle",
+        x: 50,
+        y: 50,
+        width: 300,
+        height: 60,
+        strokeColor: "#000000",
+        backgroundColor: "#ffffff",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        text: "Header",
+        fontSize: 16,
+        fontFamily: 1,
+        textAlign: "center",
+        verticalAlign: "middle",
+      },
+      {
+        type: "rectangle",
+        x: 50,
+        y: 120,
+        width: 60,
+        height: 200,
+        strokeColor: "#000000",
+        backgroundColor: "#f0f0f0",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        text: "Nav",
+        fontSize: 12,
+        fontFamily: 1,
+        textAlign: "center",
+        verticalAlign: "middle",
+      },
+      {
+        type: "rectangle",
+        x: 120,
+        y: 120,
+        width: 230,
+        height: 200,
+        strokeColor: "#000000",
+        backgroundColor: "#ffffff",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        text: "Content Area",
+        fontSize: 14,
+        fontFamily: 1,
+        textAlign: "center",
+        verticalAlign: "middle",
+      },
+      {
+        type: "rectangle",
+        x: 50,
+        y: 330,
+        width: 300,
+        height: 40,
+        strokeColor: "#000000",
+        backgroundColor: "#f0f0f0",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        text: "Footer",
+        fontSize: 12,
+        fontFamily: 1,
+        textAlign: "center",
+        verticalAlign: "middle",
+      },
+    ],
+  },
+  {
+    id: "template-flowchart",
+    name: "Flowchart",
+    description: "Process flowchart template",
+    thumbnail: "🔄",
+    elements: [
+      {
+        type: "rectangle",
+        x: 150,
+        y: 20,
+        width: 100,
+        height: 50,
+        strokeColor: "#2196f3",
+        backgroundColor: "#e3f2fd",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        text: "Start",
+        fontSize: 14,
+        fontFamily: 1,
+        textAlign: "center",
+        verticalAlign: "middle",
+      },
+      {
+        type: "diamond",
+        x: 150,
+        y: 100,
+        width: 100,
+        height: 80,
+        strokeColor: "#ff9800",
+        backgroundColor: "#fff3e0",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        text: "Decision",
+        fontSize: 12,
+        fontFamily: 1,
+        textAlign: "center",
+        verticalAlign: "middle",
+      },
+      {
+        type: "rectangle",
+        x: 150,
+        y: 220,
+        width: 100,
+        height: 50,
+        strokeColor: "#4caf50",
+        backgroundColor: "#e8f5e9",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        text: "Process",
+        fontSize: 14,
+        fontFamily: 1,
+        textAlign: "center",
+        verticalAlign: "middle",
+      },
+      {
+        type: "rectangle",
+        x: 150,
+        y: 310,
+        width: 100,
+        height: 50,
+        strokeColor: "#2196f3",
+        backgroundColor: "#e3f2fd",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        text: "End",
+        fontSize: 14,
+        fontFamily: 1,
+        textAlign: "center",
+        verticalAlign: "middle",
+      },
+    ],
+  },
+  {
+    id: "template-mindmap",
+    name: "Mindmap",
+    description: "Mind mapping template",
+    thumbnail: "🧠",
+    elements: [
+      {
+        type: "ellipse",
+        x: 200,
+        y: 150,
+        width: 100,
+        height: 80,
+        strokeColor: "#9c27b0",
+        backgroundColor: "#f3e5f5",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        text: "Central Idea",
+        fontSize: 12,
+        fontFamily: 1,
+        textAlign: "center",
+        verticalAlign: "middle",
+      },
+      {
+        type: "ellipse",
+        x: 50,
+        y: 50,
+        width: 80,
+        height: 60,
+        strokeColor: "#673ab7",
+        backgroundColor: "#ede7f6",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        text: "Topic 1",
+        fontSize: 11,
+        fontFamily: 1,
+        textAlign: "center",
+        verticalAlign: "middle",
+      },
+      {
+        type: "ellipse",
+        x: 370,
+        y: 50,
+        width: 80,
+        height: 60,
+        strokeColor: "#673ab7",
+        backgroundColor: "#ede7f6",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        text: "Topic 2",
+        fontSize: 11,
+        fontFamily: 1,
+        textAlign: "center",
+        verticalAlign: "middle",
+      },
+      {
+        type: "ellipse",
+        x: 50,
+        y: 280,
+        width: 80,
+        height: 60,
+        strokeColor: "#673ab7",
+        backgroundColor: "#ede7f6",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        text: "Topic 3",
+        fontSize: 11,
+        fontFamily: 1,
+        textAlign: "center",
+        verticalAlign: "middle",
+      },
+      {
+        type: "ellipse",
+        x: 370,
+        y: 280,
+        width: 80,
+        height: 60,
+        strokeColor: "#673ab7",
+        backgroundColor: "#ede7f6",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        text: "Topic 4",
+        fontSize: 11,
+        fontFamily: 1,
+        textAlign: "center",
+        verticalAlign: "middle",
+      },
+    ],
+  },
+];
+
+/**
+ * Load a template and return the elements
+ */
+export const loadTemplate = (
+  templateId: string,
+): ExcalidrawElementSkeleton[] | null => {
+  const template = TEMPLATES.find((t) => t.id === templateId);
+  return template ? template.elements : null;
+};
+
+/**
+ * Get all available templates
+ */
+export const getAvailableTemplates = (): Template[] => {
+  return TEMPLATES;
+};
