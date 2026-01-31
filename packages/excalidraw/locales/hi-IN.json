@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "आपका सर्व डेटा ब्राउज़र के भीतर स्थानिक जगह पे सुरक्षित किया गया.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "बजाय आपको एक्स-काली-ड्रॉ-प्लस पर जाना है?",
       "menuHint": "निर्यात, पसंद, भाषायें, ..."
     },
