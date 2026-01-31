@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "כל המידע שלח נשמר מקומית בדפדפן.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "אתה רוצה ללכת אל Excalidraw+ במקום?",
       "menuHint": "ייצוא, העדפות, שפות, ..."
     },
