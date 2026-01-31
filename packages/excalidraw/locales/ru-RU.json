@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Все ваши данные сохраняются локально в вашем браузере.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "Хотите перейти на Excalidraw+?",
       "menuHint": "Экспорт, настройки, языки, ..."
     },
