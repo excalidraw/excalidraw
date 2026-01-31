@@ -149,6 +149,8 @@ export class LinearElementEditor {
   public readonly pointerOffset: Readonly<{ x: number; y: number }>;
   public readonly hoverPointIndex: number;
   public readonly segmentMidPointHoveredCoords: GlobalPoint | null;
+  public readonly hoveredFocusPointBinding: "start" | "end" | null;
+  public readonly draggedFocusPointBinding: "start" | "end" | null;
   public readonly elbowed: boolean;
   public readonly customLineAngle: number | null;
   public readonly isEditing: boolean;
@@ -194,6 +196,8 @@ export class LinearElementEditor {
     };
     this.hoverPointIndex = -1;
     this.segmentMidPointHoveredCoords = null;
+    this.hoveredFocusPointBinding = null;
+    this.draggedFocusPointBinding = null;
     this.elbowed = isElbowArrow(element) && element.elbowed;
     this.customLineAngle = null;
     this.isEditing = isEditing;
@@ -2135,6 +2139,63 @@ const pointDraggingUpdates = (
     };
   }
 
+  // Handle the case where neither endpoint is being dragged
+  // but we need to update bound endpoints
+  if (!startIsDragged && !endIsDragged) {
+    const nextArrow = {
+      ...element,
+      points: element.points.map((p, idx) => {
+        return naiveDraggingPoints.get(idx)?.point ?? p;
+      }),
+    };
+    const positions = new Map(naiveDraggingPoints);
+
+    if (element.startBinding) {
+      const startBindable = elementsMap.get(element.startBinding.elementId) as
+        | ExcalidrawBindableElement
+        | undefined;
+      if (startBindable) {
+        const startPoint =
+          updateBoundPoint(
+            nextArrow,
+            "startBinding",
+            element.startBinding,
+            startBindable,
+            elementsMap,
+          ) ?? null;
+        if (startPoint) {
+          positions.set(0, { point: startPoint, isDragging: true });
+        }
+      }
+    }
+
+    if (element.endBinding) {
+      const endBindable = elementsMap.get(element.endBinding.elementId) as
+        | ExcalidrawBindableElement
+        | undefined;
+      if (endBindable) {
+        const endPoint =
+          updateBoundPoint(
+            nextArrow,
+            "endBinding",
+            element.endBinding,
+            endBindable,
+            elementsMap,
+          ) ?? null;
+        if (endPoint) {
+          positions.set(element.points.length - 1, {
+            point: endPoint,
+            isDragging: true,
+          });
+        }
+      }
+    }
+
+    return {
+      positions,
+    };
+  }
+
   if (startIsDragged === endIsDragged) {
     return {
       positions: naiveDraggingPoints,
@@ -2279,7 +2340,9 @@ const pointDraggingUpdates = (
         nextArrow.endBinding,
         endBindable,
         elementsMap,
-        endCustomIntersector,
+        {
+          customIntersector: endCustomIntersector,
+        },
       ) || nextArrow.points[nextArrow.points.length - 1]
     : nextArrow.points[nextArrow.points.length - 1];
 
@@ -2302,7 +2365,7 @@ const pointDraggingUpdates = (
       : startIsDraggingOverEndElement &&
         app.state.bindMode !== "inside" &&
         getFeatureFlag("COMPLEX_BINDINGS")
-      ? nextArrow.points[nextArrow.points.length - 1]
+      ? endLocalPoint
       : startBindable
       ? updateBoundPoint(
           element,
@@ -2310,15 +2373,18 @@ const pointDraggingUpdates = (
           nextArrow.startBinding,
           startBindable,
           elementsMap,
-          startCustomIntersector,
+          { customIntersector: startCustomIntersector },
         ) || nextArrow.points[0]
       : nextArrow.points[0];
 
   const endChanged =
-    pointDistance(
-      endLocalPoint,
-      nextArrow.points[nextArrow.points.length - 1],
-    ) !== 0;
+    !startIsDraggingOverEndElement &&
+    !(
+      endIsDraggingOverStartElement &&
+      app.state.bindMode !== "inside" &&
+      getFeatureFlag("COMPLEX_BINDINGS")
+    ) &&
+    !!endBindable;
   const startChanged =
     pointDistance(startLocalPoint, nextArrow.points[0]) !== 0;
 
@@ -2332,13 +2398,7 @@ const pointDraggingUpdates = (
   const indices = Array.from(indicesSet);
 
   return {
-    updates:
-      updates.startBinding || updates.suggestedBinding
-        ? {
-            startBinding: updates.startBinding,
-            suggestedBinding: updates.suggestedBinding,
-          }
-        : undefined,
+    updates,
     positions: new Map(
       indices.map((idx) => {
         return [
