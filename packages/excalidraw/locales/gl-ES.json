@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Toda a información é gardada de maneira local no seu navegador.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "Queres ir a Excalidraw+ no seu lugar?",
       "menuHint": "Exportar, preferencias, idiomas, ..."
     },
