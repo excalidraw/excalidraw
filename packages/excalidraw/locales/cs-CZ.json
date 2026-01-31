@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Všechna vaše data jsou uložena lokálně ve vašem prohlížeči.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "Chcete místo toho přejít na Excalidraw+?",
       "menuHint": "Export, nastavení, jazyky, ..."
     },
