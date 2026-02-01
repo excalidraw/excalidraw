@@ -1,5 +1,7 @@
 import { exportToCanvas, exportToSvg } from "@excalidraw/utils";
 
+import { vi } from "vitest";
+
 import {
   applyDarkModeFilter,
   FONT_FAMILY,
@@ -191,6 +193,41 @@ describe("exportToSvg", () => {
       null,
     );
     expect(svgElement.innerHTML).toMatchSnapshot();
+  });
+
+  it("does not spam errors when FontFace unicodeRange is missing (node/jsdom polyfill)", async () => {
+    const { ExcalidrawFontFace: ExcalidrawFontFaceClass } = await import(
+      "../../fonts/ExcalidrawFontFace"
+    );
+    const getUnicodeRangeRegexSpy = vi
+      .spyOn(ExcalidrawFontFaceClass.prototype, "getUnicodeRangeRegex" as any)
+      .mockReturnValue(null);
+    const errSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const elements = [
+        {
+          ...textFixture,
+          text: "Hello",
+          originalText: "Hello",
+          height: ELEMENT_HEIGHT,
+          width: ELEMENT_WIDTH,
+          index: "a0",
+        },
+      ] as NonDeletedExcalidrawElement[];
+      const svg = await exportUtils.exportToSvg(
+        elements,
+        DEFAULT_OPTIONS,
+        null,
+      );
+      expect(svg).toBeTruthy();
+      const msgs = errSpy.mock.calls.map((args) => String(args[0]));
+      expect(
+        msgs.some((m) => m.includes("Couldn't transform font-face to css")),
+      ).toBe(false);
+    } finally {
+      errSpy.mockRestore();
+      getUnicodeRangeRegexSpy.mockRestore();
+    }
   });
 });
 
