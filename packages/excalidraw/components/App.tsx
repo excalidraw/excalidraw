@@ -9341,12 +9341,9 @@ class App extends React.Component<AppProps, AppState> {
                 this.imageCache.get(croppingElement.fileId)?.image;
 
               if (image && !(image instanceof Promise)) {
-                const instantDragOffset = vectorScale(
-                  vector(
-                    pointerCoords.x - lastPointerCoords.x,
-                    pointerCoords.y - lastPointerCoords.y,
-                  ),
-                  Math.max(this.state.zoom.value, 2),
+                const instantDragOffset = vector(
+                  pointerCoords.x - lastPointerCoords.x,
+                  pointerCoords.y - lastPointerCoords.y,
                 );
 
                 const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
