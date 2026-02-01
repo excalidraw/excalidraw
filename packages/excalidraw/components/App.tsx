@@ -10,12 +10,10 @@ import {
   pointFrom,
   pointDistance,
   vector,
-  pointRotateRads,
-  vectorScale,
-  vectorFromPoint,
+  pointRotateRads, vectorFromPoint,
   vectorSubtract,
   vectorDot,
-  vectorNormalize,
+  vectorNormalize
 } from "@excalidraw/math";
 
 import {
