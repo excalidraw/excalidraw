@@ -635,13 +635,13 @@ export const copyTextToSystemClipboard = async <
           throw new Error("Failed to setData on clipboardEvent");
         }
       }
+      return;
     }
-    return;
   } catch (error: any) {
     console.error(error);
   }
 
-  let plainTextEntry = entries.find(
+  const plainTextEntry = entries.find(
     ([mimeType]) => mimeType === MIME_TYPES.text,
   );
 
@@ -653,9 +653,7 @@ export const copyTextToSystemClipboard = async <
       // NOTE: doesn't work on FF on non-HTTPS domains, or when document
       // not focused
       await navigator.clipboard.writeText(plainTextEntry[1]);
-
-      // invalidate it so we don't write it again below
-      plainTextEntry = undefined;
+      return;
     } catch (error: any) {
       console.error(error);
     }

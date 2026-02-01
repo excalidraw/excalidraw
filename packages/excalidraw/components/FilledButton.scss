@@ -53,6 +53,7 @@
     &.ExcButton--status-loading,
     &.ExcButton--status-success {
       pointer-events: none;
+      background-color: var(--color-success);
 
       .ExcButton__contents {
         visibility: hidden;
