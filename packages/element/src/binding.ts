@@ -31,7 +31,6 @@ import {
   doBoundsIntersect,
   getCenterForBounds,
   getElementBounds,
-  pointInsideBounds,
 } from "./bounds";
 import {
   getAllHoveredElementAtPoint,
@@ -90,7 +89,6 @@ import type {
   Ordered,
   PointsPositionUpdates,
 } from "./types";
-import { debugDrawLine } from "./visualdebug";
 
 export type BindingStrategy =
   // Create a new binding with this mode
