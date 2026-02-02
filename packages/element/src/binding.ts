@@ -31,6 +31,7 @@ import {
   doBoundsIntersect,
   getCenterForBounds,
   getElementBounds,
+  pointInsideBounds,
 } from "./bounds";
 import {
   getAllHoveredElementAtPoint,
@@ -39,6 +40,7 @@ import {
   intersectElementWithLineSegment,
   isBindableElementInsideOtherBindable,
   isPointInElement,
+  isPointOnElementOutline,
 } from "./collision";
 import { distanceToElement } from "./distance";
 import {
@@ -88,6 +90,7 @@ import type {
   Ordered,
   PointsPositionUpdates,
 } from "./types";
+import { debugDrawLine } from "./visualdebug";
 
 export type BindingStrategy =
   // Create a new binding with this mode
@@ -1705,72 +1708,137 @@ export const updateBoundPoint = (
     bindableElement,
     elementsMap,
   );
+  const otherBinding =
+    startOrEnd === "startBinding" ? arrow.endBinding : arrow.startBinding;
   const pointIndex =
     startOrEnd === "startBinding" ? 0 : arrow.points.length - 1;
   const elbowed = isElbowArrow(arrow);
-  const otherBinding =
-    startOrEnd === "startBinding" ? arrow.endBinding : arrow.startBinding;
   const otherBindableElement =
     otherBinding &&
     (elementsMap.get(otherBinding.elementId)! as ExcalidrawBindableElement);
   const bounds = getElementBounds(bindableElement, elementsMap);
   const otherBounds =
     otherBindableElement && getElementBounds(otherBindableElement, elementsMap);
-  const isLargerThanOther =
+  const otherGlobal =
+    otherBinding &&
     otherBindableElement &&
-    compareElementArea(bindableElement, otherBindableElement) <
-      // if both shapes the same size, pretend the other is larger
-      (startOrEnd === "endBinding" ? 1 : 0);
-  const isOverlapping = otherBounds && doBoundsIntersect(bounds, otherBounds);
+    getGlobalFixedPointForBindableElement(
+      normalizeFixedPoint(otherBinding.fixedPoint),
+      otherBindableElement,
+      elementsMap,
+    );
+  const bindingGap = getBindingGap(bindableElement, arrow);
+  const otherBindingGap =
+    otherBindableElement && getBindingGap(otherBindableElement, arrow);
+  const isOverlapping =
+    otherBindingGap &&
+    otherBounds &&
+    doBoundsIntersect(
+      [
+        bounds[0] - bindingGap,
+        bounds[1] - bindingGap,
+        bounds[2] + bindingGap,
+        bounds[3] + bindingGap,
+      ],
+      [
+        otherBounds[0] - otherBindingGap,
+        otherBounds[1] - otherBindingGap,
+        otherBounds[2] + otherBindingGap,
+        otherBounds[3] + otherBindingGap,
+      ],
+    );
 
   // GOAL: If the arrow becomes too short, we want to jump the arrow endpoints
   // to the exact focus points on the elements.
-  // INTUITION: We're not interested in the exacts length of the arrow (which
+  // INTUITION: We're not interested in the exact length of the arrow (which
   // will change if we change where we route it), we want to know the length of
   // the part which lies outside of both shapes and consider that as a trigger
   // to change where we point the arrow. Avoids jumping the arrow in and out
   // at every frame.
   let arrowTooShort = false;
   if (
-    !isOverlapping &&
+    //!isOverlapping &&
     !elbowed &&
-    arrow.startBinding &&
-    arrow.endBinding &&
+    global &&
+    otherGlobal &&
     otherBindableElement &&
     arrow.points.length === 2
   ) {
-    const startFocusPoint = getGlobalFixedPointForBindableElement(
-      arrow.startBinding.fixedPoint,
-      startOrEnd === "startBinding" ? bindableElement : otherBindableElement,
-      elementsMap,
-    );
-    const endFocusPoint = getGlobalFixedPointForBindableElement(
-      arrow.endBinding.fixedPoint,
-      startOrEnd === "endBinding" ? bindableElement : otherBindableElement,
-      elementsMap,
-    );
-    const segment = lineSegment(startFocusPoint, endFocusPoint);
-    const startIntersection = intersectElementWithLineSegment(
-      startOrEnd === "endBinding" ? bindableElement : otherBindableElement,
-      elementsMap,
-      segment,
-      0,
-      true,
-    );
-    const endIntersection = intersectElementWithLineSegment(
-      startOrEnd === "startBinding" ? bindableElement : otherBindableElement,
-      elementsMap,
-      segment,
-      0,
-      true,
-    );
-    if (startIntersection.length > 0 && endIntersection.length > 0) {
-      const len = pointDistance(startIntersection[0], endIntersection[0]);
-      arrowTooShort = len < 40;
+    const startFocusPoint =
+      startOrEnd === "startBinding" ? global : otherGlobal;
+    const endFocusPoint = startOrEnd === "endBinding" ? global : otherGlobal;
+
+    if (pointDistance(startFocusPoint, endFocusPoint) < 40) {
+      arrowTooShort = true;
+    } else {
+      const segment = lineSegment(startFocusPoint, endFocusPoint);
+
+      const startIsOrbit =
+        startOrEnd === "startBinding"
+          ? binding.mode === "orbit"
+          : otherBinding?.mode === "orbit";
+      const startIntersections = startIsOrbit
+        ? intersectElementWithLineSegment(
+            startOrEnd === "startBinding"
+              ? bindableElement
+              : otherBindableElement,
+            elementsMap,
+            segment,
+            0,
+          )
+        : [];
+      const endIsOrbit =
+        startOrEnd === "endBinding"
+          ? binding.mode === "orbit"
+          : otherBinding?.mode === "orbit";
+      const endIntersections = endIsOrbit
+        ? intersectElementWithLineSegment(
+            startOrEnd === "endBinding"
+              ? bindableElement
+              : otherBindableElement,
+            elementsMap,
+            segment,
+            0,
+          )
+        : [];
+      const len = pointDistance(
+        startIntersections[0] ?? startFocusPoint,
+        endIntersections[0] ?? endFocusPoint,
+      );
+      //debugDrawLine(lineSegment(targetStartPoint, targetEndPoint));
+
+      if (startOrEnd === "startBinding") {
+        if (endIntersections.length === 2) {
+          arrowTooShort = false;
+        } else {
+          arrowTooShort = len < 40;
+        }
+      } else if (startIntersections.length === 2) {
+        arrowTooShort = false;
+      } else {
+        arrowTooShort = len < 40;
+      }
     }
   }
 
-  const isNested = (arrowTooShort || isOverlapping) && isLargerThanOther;
+  const otherFocusPointIsInElement = otherGlobal
+    ? isPointInElement(otherGlobal, bindableElement, elementsMap) ||
+      isPointOnElementOutline(
+        otherGlobal,
+        bindableElement,
+        elementsMap,
+        bindableElement.strokeWidth / 2,
+      )
+    : false;
+  const isLargerThanOther =
+    otherBindableElement &&
+    compareElementArea(bindableElement, otherBindableElement) <
+      // if both shapes the same size, pretend the other is larger
+      (startOrEnd === "endBinding" ? 1 : 0);
+  const isNested =
+    arrowTooShort ||
+    otherFocusPointIsInElement ||
+    (isOverlapping && isLargerThanOther);
 
   let _customIntersector = opts?.customIntersector;
   if (!elbowed && !_customIntersector) {
@@ -1797,10 +1865,13 @@ export const updateBoundPoint = (
         Math.max(bindableElement.width, bindableElement.height) +
         bindingGap * 2,
     );
-    _customIntersector = lineSegment(
-      pointFromVector(halfVector, adjacentPoint),
-      pointFromVector(vectorScale(halfVector, -1), adjacentPoint),
-    );
+    const b = otherFocusPointIsInElement
+      ? pointFromVector(halfVector, adjacentPoint)
+      : pointFromVector(vectorScale(halfVector, -1), adjacentPoint);
+    const a = otherFocusPointIsInElement
+      ? pointFromVector(vectorScale(halfVector, -1), adjacentPoint)
+      : pointFromVector(halfVector, adjacentPoint);
+    _customIntersector = lineSegment(a, b);
   }
 
   const maybeOutlineGlobal =
