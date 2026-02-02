@@ -317,17 +317,17 @@
   },
   "element": {
     "rectangle": "",
-    "diamond": "",
+    "diamond": "ひし形",
     "ellipse": "楕円",
-    "arrow": "",
-    "line": "",
+    "arrow": "矢印",
+    "line": "直線",
     "freedraw": "",
     "text": "文字",
     "image": "画像",
     "group": "グループ",
     "frame": "フレーム",
     "magicframe": "ワイヤーフレームからコードを生成",
-    "embeddable": "",
+    "embeddable": "Web埋め込み",
     "selection": "",
     "iframe": "IFrame"
   },
@@ -508,7 +508,7 @@
   },
   "stats": {
     "angle": "角度",
-    "shapes": "",
+    "shapes": "図形",
     "height": "高さ",
     "scene": "シーン",
     "selected": "選択済み",
@@ -536,7 +536,7 @@
     "pasteAsSingleElement": "{{shortcut}} を使用して単一の要素として貼り付けるか、\n既存のテキストエディタに貼り付け",
     "unableToEmbed": "この URL の埋め込みは現在許可されていません。URL のホワイトリストへの追加をリクエストするには、GitHub で Issue を上げてください。",
     "unrecognizedLinkFormat": "埋め込もうとしたリンクは期待するフォーマットと一致しません。埋め込み元のサイトで提供される「embed」の文字列を貼り付けてください。",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "リンクをクリップボードにコピーしました"
   },
   "colors": {
     "transparent": "透明",
@@ -571,7 +571,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "色",
     "mostUsedCustomColors": "最も使用されているカスタム色",
     "colors": "色",
     "shades": "影",
@@ -615,7 +615,7 @@
     "description": "現在、<flowchartLink>Flowchart</flowchartLink>、<sequenceLink>Sequence</sequenceLink>、<classLink>Class</classLink> のダイアグラムのみに対応しています。その他の種類は、Excalidraw では画像として描画されます。",
     "syntax": "Mermaid 構文",
     "preview": "プレビュー",
-    "label": "",
+    "label": "Mermaid",
     "inputPlaceholder": ""
   },
   "ttd": {
@@ -627,13 +627,13 @@
     "generating": "",
     "rateLimitRemaining": "",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "あなた",
+      "assistant": "AIアシスタント",
+      "system": "システム"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
+    "aiBeta": "AI ベータ版",
+    "label": "チャット",
+    "menu": "メニュー",
     "newChat": "",
     "deleteChat": "",
     "deleteMessage": "",
@@ -643,7 +643,7 @@
       "description": "",
       "hint": ""
     },
-    "preview": "",
+    "preview": "プレビュー",
     "insert": "",
     "retry": "",
     "errors": {
@@ -701,15 +701,15 @@
     "shortcutHint": "コマンドパレットには{{shortcut}}を使用"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Space",
+    "delete": "Delete",
     "mmb": ""
   }
 }
