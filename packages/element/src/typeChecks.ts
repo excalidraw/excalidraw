@@ -153,7 +153,9 @@ export const isLinearElementType = (
   elementType: ElementOrToolType,
 ): boolean => {
   return (
-    elementType === "arrow" || elementType === "line" // || elementType === "freedraw"
+    elementType === "arrow" ||
+    elementType === "doubleArrow" ||
+    elementType === "line" // || elementType === "freedraw"
   );
 };
 
@@ -171,7 +173,7 @@ export const isBindingElement = (
 export const isBindingElementType = (
   elementType: ElementOrToolType,
 ): boolean => {
-  return elementType === "arrow";
+  return elementType === "arrow" || elementType === "doubleArrow";
 };
 
 export const isBindableElement = (

@@ -364,6 +364,19 @@ export const ArrowIcon = createIcon(
   tablerIconProps,
 );
 
+// custom double-headed arrow
+export const DoubleArrowIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <line x1="5" y1="12" x2="9" y2="8" />
+    <line x1="5" y1="12" x2="9" y2="16" />
+    <line x1="19" y1="12" x2="15" y2="8" />
+    <line x1="19" y1="12" x2="15" y2="16" />
+  </g>,
+  tablerIconProps,
+);
+
 // custom?
 export const LineIcon = createIcon(
   <path d="M4.167 10h11.666" strokeWidth="1.5" />,

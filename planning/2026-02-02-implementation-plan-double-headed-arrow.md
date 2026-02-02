@@ -110,8 +110,8 @@ export const AllowedExcalidrawActiveTools: Record<
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] TypeScript compiles without errors: `yarn typecheck`
-- [ ] Linting passes: `yarn lint`
+- [x] TypeScript compiles without errors: `yarn typecheck`
+- [x] Linting passes: `yarn lint`
 
 #### Manual Verification:
 - [ ] N/A for this phase (tool not yet functional)
@@ -212,8 +212,8 @@ import {
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] TypeScript compiles: `yarn typecheck`
-- [ ] Linting passes: `yarn lint`
+- [x] TypeScript compiles: `yarn typecheck`
+- [x] Linting passes: `yarn lint`
 
 #### Manual Verification:
 - [ ] Double-headed arrow button visible in toolbar
@@ -355,8 +355,8 @@ export const canHaveArrowheads = (type: ElementOrToolType): boolean => {
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] TypeScript compiles: `yarn typecheck`
-- [ ] Linting passes: `yarn lint`
+- [x] TypeScript compiles: `yarn typecheck`
+- [x] Linting passes: `yarn lint`
 - [ ] Existing arrow tests pass: `yarn test packages/element/tests/linearElementEditor.test.tsx`
 
 #### Manual Verification:
@@ -441,8 +441,8 @@ const LINEAR_ELEMENT_TOOLS = [
 ### Success Criteria:
 
 #### Automated Verification:
-- [ ] TypeScript compiles: `yarn typecheck`
-- [ ] Linting passes: `yarn lint`
+- [x] TypeScript compiles: `yarn typecheck`
+- [x] Linting passes: `yarn lint`
 
 #### Manual Verification:
 - [ ] On mobile view, double-headed arrow appears in linear element popover
