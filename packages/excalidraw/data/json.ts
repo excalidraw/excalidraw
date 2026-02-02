@@ -103,11 +103,32 @@ export const loadFromJSON = async (
   return loadFromBlob(file, localAppState, localElements, file.handle);
 };
 
-export const isValidExcalidrawData = (data?: {
-  type?: any;
-  elements?: any;
-  appState?: any;
-}): data is ImportedDataState => {
+export const isValidExcalidrawData = (
+  data?: {
+    type?: any;
+    elements?: any;
+    appState?: any;
+    files?: any;
+  },
+  /** If true, accept files with valid structure even without type field */
+  lenient?: boolean,
+): data is ImportedDataState => {
+  if (!data || typeof data !== "object") {
+    return false;
+  }
+
+  // If lenient mode is enabled (for manually created .excalidraw files),
+  // accept files with valid structure even without the type field
+  if (lenient) {
+    return (
+      (!data.elements ||
+        (Array.isArray(data.elements) &&
+          (!data.appState || typeof data.appState === "object"))) &&
+      (!data.files || typeof data.files === "object")
+    );
+  }
+
+  // Standard validation: require type field
   return (
     data?.type === EXPORT_DATA_TYPES.excalidraw &&
     (!data.elements ||
