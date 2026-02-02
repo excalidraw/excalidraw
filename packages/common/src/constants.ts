@@ -450,6 +450,7 @@ export const TOOL_TYPE = {
   diamond: "diamond",
   ellipse: "ellipse",
   arrow: "arrow",
+  doubleArrow: "doubleArrow",
   line: "line",
   freedraw: "freedraw",
   text: "text",

@@ -4918,6 +4918,19 @@ class App extends React.Component<AppProps, AppState> {
                   : ARROW_TYPE.sharp,
             }));
           }
+          if (
+            shape === "doubleArrow" &&
+            this.state.activeTool.type === "doubleArrow"
+          ) {
+            this.setState((prevState) => ({
+              currentItemArrowType:
+                prevState.currentItemArrowType === ARROW_TYPE.sharp
+                  ? ARROW_TYPE.round
+                  : prevState.currentItemArrowType === ARROW_TYPE.round
+                  ? ARROW_TYPE.elbow
+                  : ARROW_TYPE.sharp,
+            }));
+          }
           this.setActiveTool({ type: shape });
           event.stopPropagation();
         } else if (event.key === KEYS.Q) {
@@ -7342,12 +7355,16 @@ class App extends React.Component<AppProps, AppState> {
       this.handleTextOnPointerDown(event, pointerDownState);
     } else if (
       this.state.activeTool.type === "arrow" ||
+      this.state.activeTool.type === "doubleArrow" ||
       this.state.activeTool.type === "line"
     ) {
       this.handleLinearElementOnPointerDown(
         event,
-        this.state.activeTool.type,
+        this.state.activeTool.type === "doubleArrow"
+          ? "arrow"
+          : this.state.activeTool.type,
         pointerDownState,
+        this.state.activeTool.type,
       );
     } else if (this.state.activeTool.type === "freedraw") {
       this.handleFreeDrawElementOnPointerDown(
@@ -8508,6 +8525,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLElement>,
     elementType: ExcalidrawLinearElement["type"],
     pointerDownState: PointerDownState,
+    toolType?: string,
   ): void => {
     if (event.ctrlKey) {
       flushSync(() => {
@@ -8627,7 +8645,9 @@ class App extends React.Component<AppProps, AppState> {
 
       const { currentItemStartArrowhead, currentItemEndArrowhead } = this.state;
       const [startArrowhead, endArrowhead] =
-        elementType === "arrow"
+        toolType === "doubleArrow"
+          ? (["arrow" as const, "arrow" as const] as const)
+          : elementType === "arrow"
           ? [currentItemStartArrowhead, currentItemEndArrowhead]
           : [null, null];
 

@@ -15,6 +15,7 @@ export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "diamond" ||
   type === "freedraw" ||
   type === "arrow" ||
+  type === "doubleArrow" ||
   type === "line" ||
   type === "text" ||
   type === "embeddable";
@@ -27,6 +28,7 @@ export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "diamond" ||
   type === "freedraw" ||
   type === "arrow" ||
+  type === "doubleArrow" ||
   type === "line";
 
 export const hasStrokeStyle = (type: ElementOrToolType) =>
@@ -36,6 +38,7 @@ export const hasStrokeStyle = (type: ElementOrToolType) =>
   type === "ellipse" ||
   type === "diamond" ||
   type === "arrow" ||
+  type === "doubleArrow" ||
   type === "line";
 
 export const canChangeRoundness = (type: ElementOrToolType) =>
@@ -46,6 +49,8 @@ export const canChangeRoundness = (type: ElementOrToolType) =>
   type === "diamond" ||
   type === "image";
 
-export const toolIsArrow = (type: ElementOrToolType) => type === "arrow";
+export const toolIsArrow = (type: ElementOrToolType) =>
+  type === "arrow" || type === "doubleArrow";
 
-export const canHaveArrowheads = (type: ElementOrToolType) => type === "arrow";
+export const canHaveArrowheads = (type: ElementOrToolType) =>
+  type === "arrow" || type === "doubleArrow";
