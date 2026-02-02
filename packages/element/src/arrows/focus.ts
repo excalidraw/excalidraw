@@ -137,7 +137,7 @@ const focusPointUpdate = (
   }
 
   // Also update the adjacent end if it has a binding
-  if (adjacentBinding) {
+  if (adjacentBinding && adjacentBinding.mode === "orbit") {
     const adjacentBindableElement = elementsMap.get(
       adjacentBinding.elementId,
     ) as ExcalidrawBindableElement;
