@@ -160,7 +160,7 @@
     "prompt": "プロンプト",
     "followUs": "フォローする",
     "discordChat": "Discord チャット",
-    "zoomToFitViewport": "表寿範囲に合わせてズーム",
+    "zoomToFitViewport": "表示範囲に合わせてズーム",
     "zoomToFitSelection": "選択範囲に合わせてズーム",
     "zoomToFit": "すべての要素が収まるようにズーム",
     "installPWA": "Excalidrawをローカルにインストール(PWA)",
@@ -292,7 +292,7 @@
   },
   "toolBar": {
     "selection": "選択",
-    "lasso": "",
+    "lasso": "なげなわ選択",
     "image": "画像を挿入",
     "rectangle": "矩形",
     "diamond": "ひし形",
@@ -316,19 +316,19 @@
     "convertElementType": ""
   },
   "element": {
-    "rectangle": "",
+    "rectangle": "矩形",
     "diamond": "ひし形",
     "ellipse": "楕円",
     "arrow": "矢印",
     "line": "線",
-    "freedraw": "",
+    "freedraw": "描画",
     "text": "文字",
     "image": "画像",
     "group": "グループ",
     "frame": "フレーム",
     "magicframe": "ワイヤーフレームからコードを生成",
     "embeddable": "Web埋め込み",
-    "selection": "",
+    "selection": "選択",
     "iframe": "IFrame"
   },
   "headings": {
@@ -708,7 +708,7 @@
     "escape": "Esc",
     "enter": "Enter",
     "shift": "Shift",
-    "spacebar": "Space",
+    "spacebar": "スペース",
     "delete": "Delete",
     "mmb": ""
   }
