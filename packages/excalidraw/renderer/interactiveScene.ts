@@ -39,6 +39,12 @@ import {
   isLineElement,
   isTextElement,
   LinearElementEditor,
+  headingForPoint,
+  compareHeading,
+  HEADING_RIGHT,
+  HEADING_DOWN,
+  HEADING_LEFT,
+  HEADING_UP,
 } from "@excalidraw/element";
 
 import { renderSelectionElement } from "@excalidraw/element";
@@ -424,11 +430,12 @@ const renderBindingHighlightForBindableElement_simple = (
         overrideShouldTestInside: true,
       });
 
-    if (!insideBindable) {
+    if (!insideBindable || isElbowArrow(arrow)) {
       context.save();
       context.translate(suggestedBinding.element.x, suggestedBinding.element.y);
 
       const midpointRadius = 5 / appState.zoom.value;
+      const center = elementCenterPoint(suggestedBinding.element, elementsMap);
 
       let midpoints: LocalPoint[];
       if (suggestedBinding.element.type === "diamond") {
@@ -452,10 +459,6 @@ const renderBindingHighlightForBindableElement_simple = (
           },
         );
       } else {
-        const center = elementCenterPoint(
-          suggestedBinding.element,
-          elementsMap,
-        );
         const basePoints = [
           { x: suggestedBinding.element.width / 2, y: 0 }, // TOP
           {
@@ -491,9 +494,25 @@ const renderBindingHighlightForBindableElement_simple = (
           suggestedBinding.midPoint[1] - suggestedBinding.element.y,
         );
 
-      midpoints.forEach((midpoint) => {
+      const target = [HEADING_RIGHT, HEADING_DOWN, HEADING_LEFT, HEADING_UP];
+      midpoints.forEach((midpoint, idx) => {
         const isHighlighted =
-          highlightedPoint && pointsEqual(highlightedPoint, midpoint, 1);
+          highlightedPoint &&
+          compareHeading(
+            headingForPoint(
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  highlightedPoint[0] + suggestedBinding.element.x,
+                  highlightedPoint[1] + suggestedBinding.element.y,
+                ),
+                center,
+                suggestedBinding.element.angle as Radians,
+              ),
+              center,
+            ),
+            target[idx],
+          );
+
         if (!isHighlighted) {
           context.fillStyle = `rgba(0,0,0,0.2)`;
           context.beginPath();
