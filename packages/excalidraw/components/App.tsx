@@ -5209,15 +5209,33 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
+  private getStyleKey = (tool: ToolType | string): string => {
+    if (
+      tool === "rectangle" ||
+      tool === "diamond" ||
+      tool === "ellipse" ||
+      tool === "frame" ||
+      tool === "magicframe"
+    ) {
+      return "shapes";
+    }
+    if (tool === "line" || tool === "arrow") {
+      return "lines";
+    }
+    return tool;
+  };
+
   private syncCurrentItemStyles = (
     appState: AppState,
     toolKey?: ToolType | string,
   ): AppState["currentItemStyles"] => {
-    const key =
+    const tool =
       toolKey ||
       (appState.activeTool.type === "custom"
         ? appState.activeTool.customType
         : appState.activeTool.type);
+
+    const key = this.getStyleKey(tool);
 
     // Skip non-drawing tools
     if (
@@ -5275,7 +5293,9 @@ class App extends React.Component<AppProps, AppState> {
         ? nextActiveTool.customType
         : nextActiveTool.type;
 
-    const nextToolStyles = this.state.currentItemStyles[nextToolKey] || {};
+    const nextToolStyles = this.state.isStyleSettingsLocked
+      ? {}
+      : this.state.currentItemStyles[this.getStyleKey(nextToolKey)] || {};
 
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);

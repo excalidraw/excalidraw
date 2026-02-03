@@ -351,9 +351,10 @@ export interface AppState {
   currentItemRoundness: StrokeRoundness;
   currentItemArrowType: "sharp" | "round" | "elbow";
   currentItemStyles: Record<
-    ToolType | "custom",
+    string,
     Partial<AppStateStyleProperties>
   >;
+  isStyleSettingsLocked: boolean;
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;

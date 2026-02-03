@@ -43,6 +43,8 @@ import {
   SunIcon,
   TrashIcon,
   usersIcon,
+  LockedIcon,
+  UnlockedIcon,
 } from "../icons";
 
 import "./DefaultItems.scss";
@@ -215,14 +217,14 @@ ClearCanvas.displayName = "ClearCanvas";
 export const ToggleTheme = (
   props:
     | {
-        allowSystemTheme: true;
-        theme: Theme | "system";
-        onSelect: (theme: Theme | "system") => void;
-      }
+      allowSystemTheme: true;
+      theme: Theme | "system";
+      onSelect: (theme: Theme | "system") => void;
+    }
     | {
-        allowSystemTheme?: false;
-        onSelect?: (theme: Theme) => void;
-      },
+      allowSystemTheme?: false;
+      onSelect?: (theme: Theme) => void;
+    },
 ) => {
   const { t } = useI18n();
   const appState = useUIAppState();
@@ -292,6 +294,28 @@ export const ToggleTheme = (
   );
 };
 ToggleTheme.displayName = "ToggleTheme";
+
+export const ToggleStyleSettingsLock = () => {
+  const { t } = useI18n();
+  const appState = useUIAppState();
+  const setAppState = useExcalidrawSetAppState();
+
+  return (
+    <DropdownMenuItem
+      onSelect={(event) => {
+        event.preventDefault();
+        setAppState({ isStyleSettingsLocked: !appState.isStyleSettingsLocked });
+      }}
+      icon={appState.isStyleSettingsLocked ? UnlockedIcon : LockedIcon}
+      data-testid="toggle-style-settings-lock"
+    >
+      {appState.isStyleSettingsLocked
+        ? t("labels.unlockStyleSettings")
+        : t("labels.lockStyleSettings")}
+    </DropdownMenuItem>
+  );
+};
+ToggleStyleSettingsLock.displayName = "ToggleStyleSettingsLock";
 
 export const ChangeCanvasBackground = () => {
   const { t } = useI18n();
