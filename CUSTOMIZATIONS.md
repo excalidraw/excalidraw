@@ -20,7 +20,7 @@ This document tracks all customizations made to the Excalidraw project to avoid 
 ## Access Points
 After these changes, the application is accessible at:
 - **Docker Container:** http://localhost:3081
-- **Dev Server:** http://localhost:3001 (configured via `VITE_APP_PORT` in `.env.development`)
+- **Dev Server:** http://localhost:3081 (configured via `VITE_APP_PORT` in `.env.development`)
 
 ## Repository Setup
 - **Upstream:** excalidraw/excalidraw (main repository)
