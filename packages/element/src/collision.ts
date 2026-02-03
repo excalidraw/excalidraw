@@ -59,8 +59,11 @@ import { LinearElementEditor } from "./linearElementEditor";
 
 import { distanceToElement } from "./distance";
 
+import { getBindingGap } from "./binding";
+
 import type {
   ElementsMap,
+  ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
@@ -290,7 +293,7 @@ export const getAllHoveredElementAtPoint = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  toleranceFn?: (element: ExcalidrawBindableElement) => number,
+  tolerance?: number,
 ): NonDeleted<ExcalidrawBindableElement>[] => {
   const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
@@ -306,7 +309,7 @@ export const getAllHoveredElementAtPoint = (
 
     if (
       isBindableElement(element, false) &&
-      bindingBorderTest(element, point, elementsMap, toleranceFn?.(element))
+      bindingBorderTest(element, point, elementsMap, tolerance)
     ) {
       candidateElements.push(element);
 
@@ -323,13 +326,13 @@ export const getHoveredElementForBinding = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  toleranceFn?: (element: ExcalidrawBindableElement) => number,
+  tolerance?: number,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
   const candidateElements = getAllHoveredElementAtPoint(
     point,
     elements,
     elementsMap,
-    toleranceFn,
+    tolerance,
   );
 
   if (!candidateElements || candidateElements.length === 0) {
@@ -346,6 +349,56 @@ export const getHoveredElementForBinding = (
       (a, b) => b.width ** 2 + b.height ** 2 - (a.width ** 2 + a.height ** 2),
     )
     .pop() as NonDeleted<ExcalidrawBindableElement>;
+};
+
+export const getHoveredElementForFocusPoint = (
+  point: GlobalPoint,
+  arrow: ExcalidrawArrowElement,
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elementsMap: NonDeletedSceneElementsMap,
+  tolerance?: number,
+): ExcalidrawBindableElement | null => {
+  const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
+  // We need to to hit testing from front (end of the array) to back (beginning of the array)
+  // because array is ordered from lower z-index to highest and we want element z-index
+  // with higher z-index
+  for (let index = elements.length - 1; index >= 0; --index) {
+    const element = elements[index];
+
+    invariant(
+      !element.isDeleted,
+      "Elements in the function parameter for getAllElementsAtPositionForBinding() should not contain deleted elements",
+    );
+
+    if (
+      isBindableElement(element, false) &&
+      bindingBorderTest(element, point, elementsMap, tolerance)
+    ) {
+      candidateElements.push(element);
+    }
+  }
+
+  if (!candidateElements || candidateElements.length === 0) {
+    return null;
+  }
+
+  if (candidateElements.length === 1) {
+    return candidateElements[0];
+  }
+
+  const distanceFilteredCandidateElements = candidateElements
+    // Resolve by distance
+    .filter(
+      (el) =>
+        distanceToElement(el, elementsMap, point) <= getBindingGap(el, arrow) ||
+        isPointInElement(point, el, elementsMap),
+    );
+
+  if (distanceFilteredCandidateElements.length === 0) {
+    return null;
+  }
+
+  return distanceFilteredCandidateElements[0] as NonDeleted<ExcalidrawBindableElement>;
 };
 
 /**

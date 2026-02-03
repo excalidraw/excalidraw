@@ -11,7 +11,6 @@ import {
   pointDistance,
   vector,
   pointRotateRads,
-  vectorScale,
   vectorFromPoint,
   vectorSubtract,
   vectorDot,
@@ -251,6 +250,12 @@ import {
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
   getSnapOutlineMidPoint,
+  handleFocusPointDrag,
+  handleFocusPointHover,
+  handleFocusPointPointerDown,
+  handleFocusPointPointerUp,
+  maybeHandleArrowPointlikeDrag,
+  getUncroppedWidthAndHeight,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -644,7 +649,10 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
   lastPointerMoveEvent: PointerEvent | null = null;
+  /** current frame pointer cords */
   lastPointerMoveCoords: { x: number; y: number } | null = null;
+  /** previous frame pointer coords */
+  previousPointerMoveCoords: { x: number; y: number } | null = null;
   lastViewportPosition = { x: 0, y: 0 };
 
   animationFrameHandler = new AnimationFrameHandler();
@@ -4735,8 +4743,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       // Handle Alt key for bind mode
-      if (event.key === KEYS.ALT && getFeatureFlag("COMPLEX_BINDINGS")) {
-        this.handleSkipBindMode();
+      if (event.key === KEYS.ALT) {
+        if (getFeatureFlag("COMPLEX_BINDINGS")) {
+          this.handleSkipBindMode();
+        } else {
+          maybeHandleArrowPointlikeDrag({ app: this, event });
+        }
       }
 
       if (this.actionManager.handleKeyDown(event)) {
@@ -4752,7 +4764,11 @@ class App extends React.Component<AppProps, AppState> {
           this.resetDelayedBindMode();
         }
 
-        this.setState({ isBindingEnabled: false });
+        flushSync(() => {
+          this.setState({ isBindingEnabled: false });
+        });
+
+        maybeHandleArrowPointlikeDrag({ app: this, event });
       }
 
       if (isArrowKey(event.key)) {
@@ -5025,6 +5041,11 @@ class App extends React.Component<AppProps, AppState> {
       }
       isHoldingSpace = false;
     }
+
+    if (event.key === KEYS.ALT) {
+      maybeHandleArrowPointlikeDrag({ app: this, event });
+    }
+
     if (
       (event.key === KEYS.ALT && this.state.bindMode === "skip") ||
       (!event[KEYS.CTRL_OR_CMD] && !isBindingEnabled(this.state))
@@ -5035,7 +5056,7 @@ class App extends React.Component<AppProps, AppState> {
       });
 
       // Restart the timer if we're creating/editing a linear element and hovering over an element
-      if (this.lastPointerMoveEvent) {
+      if (this.lastPointerMoveEvent && getFeatureFlag("COMPLEX_BINDINGS")) {
         const scenePointer = viewportCoordsToSceneCoords(
           {
             clientX: this.lastPointerMoveEvent.clientX,
@@ -5056,14 +5077,18 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
           );
 
-          if (isBindingElement(element) && getFeatureFlag("COMPLEX_BINDINGS")) {
+          if (isBindingElement(element)) {
             this.handleDelayedBindModeChange(element, hoveredElement);
           }
         }
       }
     }
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
-      this.setState({ isBindingEnabled: true });
+      flushSync(() => {
+        this.setState({ isBindingEnabled: true });
+      });
+
+      maybeHandleArrowPointlikeDrag({ app: this, event });
     }
     if (isArrowKey(event.key)) {
       bindOrUnbindBindingElements(
@@ -6385,7 +6410,7 @@ class App extends React.Component<AppProps, AppState> {
           globalPoint,
           this.scene.getNonDeletedElements(),
           elementsMap,
-          (el) => maxBindingDistance_simple(this.state.zoom),
+          maxBindingDistance_simple(this.state.zoom),
         );
         if (hoveredElement) {
           this.setState({
@@ -6424,7 +6449,7 @@ class App extends React.Component<AppProps, AppState> {
             pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
             this.scene.getNonDeletedElements(),
             this.scene.getNonDeletedElementsMap(),
-            (el) => maxBindingDistance_simple(this.state.zoom),
+            maxBindingDistance_simple(this.state.zoom),
           );
         if (hoveredElement) {
           this.actionManager.executeAction(actionFinalize, "ui", {
@@ -6578,7 +6603,7 @@ class App extends React.Component<AppProps, AppState> {
         pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
-        (el) => maxBindingDistance_simple(this.state.zoom),
+        maxBindingDistance_simple(this.state.zoom),
       );
       const scenePointer = pointFrom<GlobalPoint>(scenePointerX, scenePointerY);
       const elementsMap = this.scene.getNonDeletedElementsMap();
@@ -6939,6 +6964,37 @@ class App extends React.Component<AppProps, AppState> {
             segmentMidPointHoveredCoords,
           },
         });
+      }
+
+      // Check for focus point hover
+      let hoveredFocusPointBinding: "start" | "end" | null = null;
+      const arrow = element as any;
+      if (arrow.startBinding || arrow.endBinding) {
+        hoveredFocusPointBinding = handleFocusPointHover(
+          element as ExcalidrawArrowElement,
+          scenePointerX,
+          scenePointerY,
+          this.scene,
+          this.state,
+        );
+      }
+
+      if (
+        this.state.selectedLinearElement.hoveredFocusPointBinding !==
+        hoveredFocusPointBinding
+      ) {
+        this.setState({
+          selectedLinearElement: {
+            ...this.state.selectedLinearElement,
+            isDragging: false,
+            hoveredFocusPointBinding,
+          },
+        });
+      }
+
+      // Set cursor to pointer when hovering over a focus point
+      if (hoveredFocusPointBinding) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
       }
     } else {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
@@ -7860,6 +7916,37 @@ class App extends React.Component<AppProps, AppState> {
           }
           if (ret.didAddPoint) {
             return true;
+          }
+
+          // Also check at current pointer position if focus point is being hovered
+          // (in case we're clicking directly without a prior move event)
+          const elementsMap = this.scene.getNonDeletedElementsMap();
+          const arrow = LinearElementEditor.getElement(
+            linearElementEditor.elementId,
+            elementsMap,
+          ) as any;
+
+          if (arrow && isBindingElement(arrow)) {
+            const { hitFocusPoint, pointerOffset } =
+              handleFocusPointPointerDown(
+                arrow,
+                pointerDownState,
+                elementsMap,
+                this.state,
+              );
+
+            // If focus point is hit, update state and prevent element selection
+            if (hitFocusPoint) {
+              this.setState({
+                selectedLinearElement: {
+                  ...linearElementEditor,
+                  hoveredFocusPointBinding: hitFocusPoint,
+                  draggedFocusPointBinding: hitFocusPoint,
+                  pointerOffset,
+                },
+              });
+              return false;
+            }
           }
         }
 
@@ -8966,8 +9053,8 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       const lastPointerCoords =
-        this.lastPointerMoveCoords ?? pointerDownState.origin;
-      this.lastPointerMoveCoords = pointerCoords;
+        this.previousPointerMoveCoords ?? pointerDownState.origin;
+      this.previousPointerMoveCoords = pointerCoords;
 
       // We need to initialize dragOffsetXY only after we've updated
       // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
@@ -9020,6 +9107,31 @@ class App extends React.Component<AppProps, AppState> {
 
       if (this.state.selectedLinearElement) {
         const linearElementEditor = this.state.selectedLinearElement;
+
+        // Handle focus point dragging if needed
+        if (linearElementEditor.draggedFocusPointBinding) {
+          handleFocusPointDrag(
+            linearElementEditor,
+            elementsMap,
+            pointerCoords,
+            this.scene,
+            this.state,
+            this.getEffectiveGridSize(),
+            event.altKey,
+          );
+          this.setState({
+            selectedLinearElement: {
+              ...linearElementEditor,
+              isDragging: false,
+              selectedPointsIndices: [],
+              initialState: {
+                ...linearElementEditor.initialState,
+                lastClickedPoint: -1,
+              },
+            },
+          });
+          return;
+        }
 
         if (
           LinearElementEditor.shouldAddMidpoint(
@@ -9259,13 +9371,20 @@ class App extends React.Component<AppProps, AppState> {
                 this.imageCache.get(croppingElement.fileId)?.image;
 
               if (image && !(image instanceof Promise)) {
-                const instantDragOffset = vectorScale(
-                  vector(
-                    pointerCoords.x - lastPointerCoords.x,
-                    pointerCoords.y - lastPointerCoords.y,
-                  ),
-                  Math.max(this.state.zoom.value, 2),
+                const uncroppedSize =
+                  getUncroppedWidthAndHeight(croppingElement);
+                const instantDragOffset = vector(
+                  pointerCoords.x - lastPointerCoords.x,
+                  pointerCoords.y - lastPointerCoords.y,
                 );
+
+                // to reduce cursor:image drift, we need to take into account
+                // the canvas image element scaling so we can accurately
+                // track the pixels on movement
+                instantDragOffset[0] *=
+                  image.naturalWidth / uncroppedSize.width;
+                instantDragOffset[1] *=
+                  image.naturalHeight / uncroppedSize.height;
 
                 const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
                   croppingElement,
@@ -9309,13 +9428,13 @@ class App extends React.Component<AppProps, AppState> {
                 const nextCrop = {
                   ...crop,
                   x: clamp(
-                    crop.x +
+                    crop.x -
                       offsetVector[0] * Math.sign(croppingElement.scale[0]),
                     0,
                     image.naturalWidth - crop.width,
                   ),
                   y: clamp(
-                    crop.y +
+                    crop.y -
                       offsetVector[1] * Math.sign(croppingElement.scale[1]),
                     0,
                     image.naturalHeight - crop.height,
@@ -9808,6 +9927,7 @@ class App extends React.Component<AppProps, AppState> {
 
       // just in case, tool changes mid drag, always clean up
       this.lassoTrail.endPath();
+      this.previousPointerMoveCoords = null;
 
       SnapCache.setReferenceSnapPoints(null);
       SnapCache.setVisibleGaps(null);
@@ -9889,12 +10009,14 @@ class App extends React.Component<AppProps, AppState> {
       // and sets binding element
       if (
         this.state.selectedLinearElement?.isEditing &&
-        !this.state.newElement
+        !this.state.newElement &&
+        this.state.selectedLinearElement.draggedFocusPointBinding === null
       ) {
         if (
           !pointerDownState.boxSelection.hasOccurred &&
           pointerDownState.hit?.element?.id !==
-            this.state.selectedLinearElement.elementId
+            this.state.selectedLinearElement.elementId &&
+          this.state.selectedLinearElement.draggedFocusPointBinding === null
         ) {
           this.actionManager.executeAction(actionFinalize);
         } else {
@@ -9930,7 +10052,18 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        if (
+        if (this.state.selectedLinearElement.draggedFocusPointBinding) {
+          handleFocusPointPointerUp(
+            this.state.selectedLinearElement,
+            this.scene,
+          );
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              draggedFocusPointBinding: null,
+            },
+          });
+        } else if (
           pointerDownState.hit?.element?.id !==
           this.state.selectedLinearElement.elementId
         ) {
@@ -9940,6 +10073,12 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({ selectedLinearElement: null });
           }
         } else if (this.state.selectedLinearElement.isDragging) {
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              isDragging: false,
+            },
+          });
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: childEvent,
             sceneCoords,

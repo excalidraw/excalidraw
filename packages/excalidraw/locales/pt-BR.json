@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Todos os dados são salvos localmente no seu navegador.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "Você queria ir para o Excalidraw+ em vez disso?",
       "menuHint": "Exportar, preferências, idiomas..."
     },
@@ -612,7 +614,55 @@
     "button": "Inserir",
     "description": "Atualmente apenas os diagramas<flowchartLink>Flowchart</flowchartLink><sequenceLink>Sequência,</sequenceLink> e <classLink>Class</classLink>são suportados. Os outros tipos serão renderizados como uma imagem no Excalidraw.",
     "syntax": "Sintaxe em Mermaid",
-    "preview": "Visualizar"
+    "preview": "Visualizar",
+    "label": "",
+    "inputPlaceholder": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": "Busca rápida"
