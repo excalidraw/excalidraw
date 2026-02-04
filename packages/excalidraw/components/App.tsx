@@ -8787,8 +8787,6 @@ class App extends React.Component<AppProps, AppState> {
                       boundElement,
                       elementsMap,
                       this.state.zoom,
-                      "end",
-                      element,
                     ),
                   }
                 : null,

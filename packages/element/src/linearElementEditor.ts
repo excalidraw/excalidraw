@@ -2258,8 +2258,6 @@ const pointDraggingUpdates = (
               start.element,
               elementsMap,
               app.state.zoom,
-              "start",
-              element,
             ),
           }
         : null;
@@ -2299,8 +2297,6 @@ const pointDraggingUpdates = (
               end.element,
               elementsMap,
               app.state.zoom,
-              "end",
-              element,
             ),
           }
         : null;

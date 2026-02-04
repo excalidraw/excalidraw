@@ -589,8 +589,6 @@ export const getSnapOutlineMidPoint = (
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
   zoom: AppState["zoom"],
-  startOrEnd: "start" | "end" = "start",
-  arrow?: ExcalidrawArrowElement,
 ) => {
   const center = elementCenterPoint(element, elementsMap);
   const sideMidpoints =
@@ -635,7 +633,8 @@ export const getSnapOutlineMidPoint = (
         ];
   const candidate = sideMidpoints.find(
     (midpoint) =>
-      pointDistance(point, midpoint) <= maxBindingDistance_simple(zoom) &&
+      pointDistance(point, midpoint) <=
+        maxBindingDistance_simple(zoom) + element.strokeWidth / 2 &&
       !hitElementItself({
         point,
         element,
@@ -666,8 +665,6 @@ export const projectFixedPointOntoDiagonal = (
     element,
     elementsMap,
     zoom,
-    startOrEnd,
-    arrow,
   );
   if (sideMidPoint) {
     return sideMidPoint;
