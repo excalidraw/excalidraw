@@ -19,6 +19,7 @@ import {
   isTextElement,
   isArrowElement,
   hasStrokeColor,
+  hasTextStroke,
   toolIsArrow,
 } from "@excalidraw/element";
 
@@ -231,6 +232,8 @@ export const SelectedShapeActions = ({
           {(appState.activeTool.type === "text" ||
             suppportsHorizontalAlign(targetElements, elementsMap)) &&
             renderAction("changeTextAlign")}
+          {renderAction("changeTextStrokeColor")}
+          {renderAction("changeTextStrokeWidth")}
         </>
       )}
 
@@ -597,6 +600,13 @@ const CombinedTextProperties = ({
                 renderAction("changeTextAlign")}
               {shouldAllowVerticalAlign(targetElements, elementsMap) &&
                 renderAction("changeVerticalAlign")}
+              {(appState.activeTool.type === "text" ||
+                targetElements.some(isTextElement)) && (
+                <>
+                  {renderAction("changeTextStrokeColor")}
+                  {renderAction("changeTextStrokeWidth")}
+                </>
+              )}
             </div>
           </PropertiesPopover>
         )}
