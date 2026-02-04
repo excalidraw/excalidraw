@@ -9594,6 +9594,11 @@ class App extends React.Component<AppProps, AppState> {
                   isBindableElement(element) &&
                   element.boundElements?.some((other) => other.type === "arrow")
                 ) {
+                  // 1. We update the binding metadata
+                  updateBoundElements(element, this.scene);
+                  // 2. We update the adjacent bound array endpoint
+                  updateBoundElements(element, this.scene);
+                  // 3. Finally we update the cloned elements attached endpoint
                   updateBoundElements(element, this.scene);
                 }
               });
