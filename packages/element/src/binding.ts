@@ -813,7 +813,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   const other: BindingStrategy =
     otherBindableElement &&
     !otherFocusPointIsInElement &&
-    otherBinding?.mode !== "inside" &&
+    (otherBinding?.mode !== "inside" || opts?.newArrow) &&
     appState.selectedLinearElement?.initialState.altFocusPoint
       ? {
           mode: "orbit",
