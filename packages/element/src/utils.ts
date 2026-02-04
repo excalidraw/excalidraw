@@ -638,7 +638,7 @@ export const getSnapOutlineMidPoint = (
           ),
         ];
   const candidate = sideMidpoints.find(
-    (midpoint, idx) =>
+    (midpoint) =>
       pointDistance(point, midpoint) <= maxBindingDistance_simple(zoom) &&
       !hitElementItself({
         point,
@@ -649,32 +649,7 @@ export const getSnapOutlineMidPoint = (
       }),
   );
 
-  if (!arrow) {
-    return candidate;
-  }
-
-  if (candidate) {
-    const intersector = lineSegment<GlobalPoint>(
-      point,
-      LinearElementEditor.getPointAtIndexGlobalCoordinates(
-        arrow,
-        startOrEnd === "start" ? 1 : arrow.points.length - 2,
-        elementsMap,
-      ),
-    );
-    const intersections = intersectElementWithLineSegment(
-      element,
-      elementsMap,
-      intersector,
-      0,
-      true,
-    );
-    if (intersections.length === 0) {
-      return candidate;
-    }
-  }
-
-  return undefined;
+  return candidate;
 };
 
 export const projectFixedPointOntoDiagonal = (
