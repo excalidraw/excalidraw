@@ -52,5 +52,10 @@
     left: 4px;
     font-size: 12px;
     color: var(--text-primary-color);
+
+    :root[dir="rtl"] & {
+      left: auto;
+      right: 4px;
+    }
   }
 }
