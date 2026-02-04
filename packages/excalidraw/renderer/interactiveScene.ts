@@ -460,7 +460,6 @@ const renderBindingHighlightForBindableElement_simple = (
         );
       } else {
         const basePoints = [
-          { x: suggestedBinding.element.width / 2, y: 0 }, // TOP
           {
             x: suggestedBinding.element.width,
             y: suggestedBinding.element.height / 2,
@@ -470,6 +469,7 @@ const renderBindingHighlightForBindableElement_simple = (
             y: suggestedBinding.element.height,
           }, // BOTTOM
           { x: 0, y: suggestedBinding.element.height / 2 }, // LEFT
+          { x: suggestedBinding.element.width / 2, y: 0 }, // TOP
         ];
         midpoints = basePoints.map((point) => {
           const globalPoint = pointFrom<GlobalPoint>(
