@@ -3485,6 +3485,7 @@ class App extends React.Component<AppProps, AppState> {
         position:
           this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
         retainSeed: isPlainPaste,
+        isPlainPaste,
       });
       return;
     }
@@ -3628,6 +3629,7 @@ class App extends React.Component<AppProps, AppState> {
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
     fitToContent?: boolean;
+    isPlainPaste?: boolean;
   }) => {
     const elements = restoreElements(opts.elements, null, {
       deleteInvisibleElements: true,
@@ -3663,9 +3665,40 @@ class App extends React.Component<AppProps, AppState> {
     const { duplicatedElements } = duplicateElements({
       type: "everything",
       elements: elements.map((element) => {
+        const styleOverrides: Partial<ExcalidrawElement> = opts.isPlainPaste
+          ? {
+              strokeColor: this.state.currentItemStrokeColor,
+              backgroundColor: this.state.currentItemBackgroundColor,
+              fillStyle: this.state.currentItemFillStyle,
+              strokeWidth: this.state.currentItemStrokeWidth,
+              strokeStyle: this.state.currentItemStrokeStyle,
+              roughness: this.state.currentItemRoughness,
+              opacity: this.state.currentItemOpacity,
+              ...((element.type === "text" && {
+                fontFamily: this.state.currentItemFontFamily,
+                fontSize: this.state.currentItemFontSize,
+                textAlign: this.state.currentItemTextAlign,
+              }) ||
+                {}),
+              ...(element.type === "arrow" || element.type === "line"
+                ? {
+                    startArrowhead: this.state.currentItemStartArrowhead,
+                    endArrowhead: this.state.currentItemEndArrowhead,
+                  }
+                : {}),
+              roundness:
+                this.state.currentItemRoundness === "round"
+                  ? {
+                      type: ROUNDNESS.ADAPTIVE_RADIUS,
+                    }
+                  : null,
+            }
+          : {};
+
         return newElementWith(element, {
           x: element.x + gridX - minX,
           y: element.y + gridY - minY,
+          ...styleOverrides,
         });
       }),
       randomizeSeed: !opts.retainSeed,
