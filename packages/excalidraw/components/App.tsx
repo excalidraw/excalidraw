@@ -978,6 +978,9 @@ class App extends React.Component<AppProps, AppState> {
       );
       const elementsMap = this.scene.getNonDeletedElementsMap();
       const hoveredElement = getHoveredElementForBinding(
+        elementsMap.get(
+          this.state.selectedLinearElement.elementId,
+        ) as ExcalidrawArrowElement,
         pointFrom<GlobalPoint>(
           this.lastPointerMoveCoords.x,
           this.lastPointerMoveCoords.y,
@@ -1114,6 +1117,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const { x, y } = this.lastPointerMoveCoords;
       const hoveredElement = getHoveredElementForBinding(
+        arrow,
         pointFrom<GlobalPoint>(x, y),
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
@@ -5607,12 +5611,6 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
 
-        const hoveredElement = getHoveredElementForBinding(
-          pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
-          this.scene.getNonDeletedElements(),
-          this.scene.getNonDeletedElementsMap(),
-        );
-
         if (this.state.selectedLinearElement) {
           const element = LinearElementEditor.getElement(
             this.state.selectedLinearElement.elementId,
@@ -5620,6 +5618,13 @@ class App extends React.Component<AppProps, AppState> {
           );
 
           if (isBindingElement(element)) {
+            const hoveredElement = getHoveredElementForBinding(
+              element,
+              pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
+              this.scene.getNonDeletedElements(),
+              this.scene.getNonDeletedElementsMap(),
+            );
+
             this.handleDelayedBindModeChange(element, hoveredElement);
           }
         }
@@ -7331,7 +7336,8 @@ class App extends React.Component<AppProps, AppState> {
         );
         const elementsMap = this.scene.getNonDeletedElementsMap();
         const hoveredElement = getHoveredElementForBinding(
-          globalPoint,
+          { elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow },
+          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
           this.scene.getNonDeletedElements(),
           elementsMap,
           maxBindingDistance_simple(this.state.zoom),
@@ -7366,7 +7372,46 @@ class App extends React.Component<AppProps, AppState> {
       setCursorForShape(this.interactiveCanvas, this.state);
 
       if (lastPoint === lastCommittedPoint) {
-        if (
+        const hoveredElement =
+          isArrowElement(this.state.newElement) &&
+          isBindingEnabled(this.state) &&
+          getHoveredElementForBinding(
+            this.state.newElement,
+            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+            this.scene.getNonDeletedElements(),
+            this.scene.getNonDeletedElementsMap(),
+            maxBindingDistance_simple(this.state.zoom),
+          );
+        if (hoveredElement) {
+          this.actionManager.executeAction(actionFinalize, "ui", {
+            event: event.nativeEvent,
+            sceneCoords: {
+              x: scenePointerX,
+              y: scenePointerY,
+            },
+          });
+          this.setState({ suggestedBinding: null });
+          if (!this.state.activeTool.locked) {
+            resetCursor(this.interactiveCanvas);
+            this.setState((prevState) => ({
+              newElement: null,
+              activeTool: updateActiveTool(this.state, {
+                type: this.state.preferredSelectionTool.type,
+              }),
+              selectedElementIds: makeNextSelectedElementIds(
+                {
+                  ...prevState.selectedElementIds,
+                  [multiElement.id]: true,
+                },
+                prevState,
+              ),
+              selectedLinearElement: new LinearElementEditor(
+                multiElement,
+                this.scene.getNonDeletedElementsMap(),
+              ),
+            }));
+          }
+        } else if (
           // if we haven't yet created a temp point and we're beyond commit-zone
           // threshold, add a point
           pointDistance(
@@ -7453,6 +7498,7 @@ class App extends React.Component<AppProps, AppState> {
 
         if (isSimpleArrow(multiElement)) {
           const hoveredElement = getHoveredElementForBinding(
+            multiElement,
             pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
             this.scene.getNonDeletedElements(),
             elementsMap,
@@ -7485,6 +7531,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.state.activeTool.type === "arrow") {
       const hit = getHoveredElementForBinding(
+        { elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow },
         pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
@@ -9647,6 +9694,7 @@ class App extends React.Component<AppProps, AppState> {
       const elementsMap = this.scene.getNonDeletedElementsMap();
       const boundElement = isBindingEnabled(this.state)
         ? getHoveredElementForBinding(
+            { elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow },
             point,
             this.scene.getNonDeletedElements(),
             elementsMap,
@@ -10136,6 +10184,7 @@ class App extends React.Component<AppProps, AppState> {
 
           if (isBindingElement(element)) {
             const hoveredElement = getHoveredElementForBinding(
+              element,
               pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
               this.scene.getNonDeletedElements(),
               elementsMap,
