@@ -63,7 +63,6 @@ import { getBindingGap } from "./binding";
 
 import type {
   ElementsMap,
-  ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
@@ -241,25 +240,20 @@ export const hitElementBoundText = (
   return isPointInElement(point, boundTextElement, elementsMap);
 };
 
-const bindingBorderTest = (
+const borderDistance = (
   element: NonDeleted<ExcalidrawBindableElement>,
-  [x, y]: Readonly<GlobalPoint>,
-  elementsMap: NonDeletedSceneElementsMap,
+  point: GlobalPoint,
+  elementsMap: ElementsMap,
   tolerance: number = 0,
-): boolean => {
-  const p = pointFrom<GlobalPoint>(x, y);
-  const shouldTestInside =
-    // disable fullshape snapping for frame elements so we
-    // can bind to frame children
-    !isFrameLikeElement(element);
-
+) => {
   // PERF: Run a cheap test to see if the binding element
   // is even close to the element
+  const [x, y] = point;
   const t = Math.max(1, tolerance);
   const bounds = [x - t, y - t, x + t, y + t] as Bounds;
   const elementBounds = getElementBounds(element, elementsMap);
   if (!doBoundsIntersect(bounds, elementBounds)) {
-    return false;
+    return -Infinity;
   }
 
   // If the element is inside a frame, we should clip the element
@@ -270,26 +264,70 @@ const bindingBorderTest = (
         enclosingFrame,
         elementsMap,
       );
-      if (!pointInsideBounds(p, enclosingFrameBounds)) {
-        return false;
+      if (!pointInsideBounds(point, enclosingFrameBounds)) {
+        return -Infinity;
       }
     }
   }
 
-  // Do the intersection test against the element since it's close enough
-  const intersections = intersectElementWithLineSegment(
-    element,
-    elementsMap,
-    lineSegment(elementCenterPoint(element, elementsMap), p),
-  );
-  const distance = distanceToElement(element, elementsMap, p);
+  const distance = distanceToElement(element, elementsMap, point);
+  if (isPointInElement(point, element, elementsMap)) {
+    return distance;
+  }
 
-  return shouldTestInside
-    ? intersections.length === 0 || distance <= tolerance
-    : intersections.length > 0 && distance <= t;
+  return distance > tolerance ? -Infinity : -distance;
 };
 
+// const bindingBorderTest = (
+//   element: NonDeleted<ExcalidrawBindableElement>,
+//   [x, y]: Readonly<GlobalPoint>,
+//   elementsMap: NonDeletedSceneElementsMap,
+//   tolerance: number = 0,
+// ): boolean => {
+//   const p = pointFrom<GlobalPoint>(x, y);
+//   const shouldTestInside =
+//     // disable fullshape snapping for frame elements so we
+//     // can bind to frame children
+//     !isFrameLikeElement(element);
+
+//   // PERF: Run a cheap test to see if the binding element
+//   // is even close to the element
+//   const t = Math.max(1, tolerance);
+//   const bounds = [x - t, y - t, x + t, y + t] as Bounds;
+//   const elementBounds = getElementBounds(element, elementsMap);
+//   if (!doBoundsIntersect(bounds, elementBounds)) {
+//     return false;
+//   }
+
+//   // If the element is inside a frame, we should clip the element
+//   if (element.frameId) {
+//     const enclosingFrame = elementsMap.get(element.frameId);
+//     if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
+//       const enclosingFrameBounds = getElementBounds(
+//         enclosingFrame,
+//         elementsMap,
+//       );
+//       if (!pointInsideBounds(p, enclosingFrameBounds)) {
+//         return false;
+//       }
+//     }
+//   }
+
+//   // Do the intersection test against the element since it's close enough
+//   const intersections = intersectElementWithLineSegment(
+//     element,
+//     elementsMap,
+//     lineSegment(elementCenterPoint(element, elementsMap), p),
+//   );
+//   const distance = distanceToElement(element, elementsMap, p);
+
+//   return shouldTestInside
+//     ? intersections.length === 0 || distance <= tolerance
+//     : intersections.length > 0 && distance <= t;
+// };
+
 export const getAllHoveredElementAtPoint = (
+  arrow: { elbowed: boolean },
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
@@ -309,7 +347,13 @@ export const getAllHoveredElementAtPoint = (
 
     if (
       isBindableElement(element, false) &&
-      bindingBorderTest(element, point, elementsMap, tolerance)
+      hitElementItself({
+        element,
+        point,
+        elementsMap,
+        threshold: tolerance ?? getBindingGap(element, arrow),
+        overrideShouldTestInside: true,
+      })
     ) {
       candidateElements.push(element);
 
@@ -323,82 +367,42 @@ export const getAllHoveredElementAtPoint = (
 };
 
 export const getHoveredElementForBinding = (
+  arrow: { elbowed: boolean },
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
   tolerance?: number,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
-  const candidateElements = getAllHoveredElementAtPoint(
-    point,
-    elements,
-    elementsMap,
-    tolerance,
-  );
-
-  if (!candidateElements || candidateElements.length === 0) {
-    return null;
-  }
-
-  if (candidateElements.length === 1) {
-    return candidateElements[0];
-  }
-
-  // Prefer smaller shapes
-  return candidateElements
-    .sort(
-      (a, b) => b.width ** 2 + b.height ** 2 - (a.width ** 2 + a.height ** 2),
-    )
-    .pop() as NonDeleted<ExcalidrawBindableElement>;
-};
-
-export const getHoveredElementForFocusPoint = (
-  point: GlobalPoint,
-  arrow: ExcalidrawArrowElement,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  elementsMap: NonDeletedSceneElementsMap,
-  tolerance?: number,
-): ExcalidrawBindableElement | null => {
-  const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
-  // We need to to hit testing from front (end of the array) to back (beginning of the array)
-  // because array is ordered from lower z-index to highest and we want element z-index
-  // with higher z-index
+  const candidateElements: {
+    element: NonDeleted<ExcalidrawBindableElement>;
+    distance: number;
+  }[] = [];
   for (let index = elements.length - 1; index >= 0; --index) {
     const element = elements[index];
 
-    invariant(
-      !element.isDeleted,
-      "Elements in the function parameter for getAllElementsAtPositionForBinding() should not contain deleted elements",
-    );
+    if (!isBindableElement(element, false)) {
+      continue;
+    }
 
-    if (
-      isBindableElement(element, false) &&
-      bindingBorderTest(element, point, elementsMap, tolerance)
-    ) {
-      candidateElements.push(element);
+    const distance = borderDistance(element, point, elementsMap, tolerance);
+    const bindingGap = getBindingGap(element, arrow);
+
+    if (distance > -(tolerance ?? bindingGap)) {
+      candidateElements.push({ element, distance });
     }
   }
 
-  if (!candidateElements || candidateElements.length === 0) {
+  if (candidateElements.length === 0) {
     return null;
   }
 
   if (candidateElements.length === 1) {
-    return candidateElements[0];
+    return candidateElements[0].element;
   }
 
-  const distanceFilteredCandidateElements = candidateElements
-    // Resolve by distance
-    .filter(
-      (el) =>
-        distanceToElement(el, elementsMap, point) <= getBindingGap(el, arrow) ||
-        isPointInElement(point, el, elementsMap),
-    );
-
-  if (distanceFilteredCandidateElements.length === 0) {
-    return null;
-  }
-
-  return distanceFilteredCandidateElements[0] as NonDeleted<ExcalidrawBindableElement>;
+  return candidateElements
+    .sort((a, b) => a.distance - b.distance)
+    .map((c) => c.element)[0];
 };
 
 /**

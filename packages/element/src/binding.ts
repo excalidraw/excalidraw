@@ -256,6 +256,7 @@ const bindingStrategyForElbowArrowEndpointDragging = (
     elementsMap,
   );
   const hit = getHoveredElementForBinding(
+    arrow,
     globalPoint,
     elements,
     elementsMap,
@@ -307,7 +308,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
     draggingPoints.get(startDragged ? startIdx : endIdx)!.point,
     elementsMap,
   );
-  const hit = getHoveredElementForBinding(point, elements, elementsMap);
+  const hit = getHoveredElementForBinding(arrow, point, elements, elementsMap);
 
   // With new arrows this handles the binding at arrow creation
   if (startDragged) {
@@ -352,7 +353,12 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
     // Check and handle nested shapes
     if (hit && arrow.startBinding) {
       const startBinding = arrow.startBinding;
-      const allHits = getAllHoveredElementAtPoint(point, elements, elementsMap);
+      const allHits = getAllHoveredElementAtPoint(
+        arrow,
+        point,
+        elements,
+        elementsMap,
+      );
 
       if (allHits.find((el) => el.id === startBinding.elementId)) {
         const otherElement = elementsMap.get(
@@ -454,9 +460,9 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
   let other: BindingStrategy = { mode: undefined };
 
   const isMultiPoint = arrow.points.length > 2;
-  const hit = getHoveredElementForBinding(point, elements, elementsMap);
+  const hit = getHoveredElementForBinding(arrow, point, elements, elementsMap);
   const isOverlapping = oppositeBinding
-    ? getAllHoveredElementAtPoint(point, elements, elementsMap).some(
+    ? getAllHoveredElementAtPoint(arrow, point, elements, elementsMap).some(
         (el) => el.id === oppositeBinding.elementId,
       )
     : false;
@@ -681,6 +687,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     elementsMap,
   );
   const hit = getHoveredElementForBinding(
+    arrow,
     globalPoint,
     elements,
     elementsMap,
