@@ -164,12 +164,12 @@ export const moveArrowAboveBindable = (
   const hoveredElement = hit
     ? hit
     : getHoveredElementForBinding(
+        arrow,
         point,
         // SAFETY: callers that omit `hit` pass non-deleted elements
         getNonDeletedElements(elements),
         elementsMap,
       );
-
   if (!hoveredElement) {
     return elements;
   }
