@@ -1077,6 +1077,7 @@ export const updateBoundElements = (
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     changedElements?: Map<string, ExcalidrawElement>;
+    indirectArrowUpdate?: boolean;
   },
 ) => {
   if (!isBindableElement(changedElement)) {
@@ -1096,7 +1097,7 @@ export const updateBoundElements = (
     });
   }
 
-  boundElementsVisitor(elementsMap, changedElement, (element) => {
+  const visitor = (element: ExcalidrawElement | undefined) => {
     if (!isArrowElement(element) || element.isDeleted) {
       return;
     }
@@ -1168,7 +1169,14 @@ export const updateBoundElements = (
     if (boundText && !boundText.isDeleted) {
       handleBindTextResize(element, scene, false);
     }
-  });
+  };
+
+  boundElementsVisitor(elementsMap, changedElement, visitor);
+
+  if (options?.indirectArrowUpdate) {
+    boundElementsVisitor(elementsMap, changedElement, visitor);
+    boundElementsVisitor(elementsMap, changedElement, visitor);
+  }
 };
 
 const updateArrowBindings = (
