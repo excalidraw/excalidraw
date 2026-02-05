@@ -607,7 +607,8 @@ export class LinearElementEditor {
     const altFocusPointBindableElement =
       endIsSelected && // The "other" end (i.e. "end") is dragged
       startBindingElement &&
-      updates?.suggestedBinding?.id !== startBindingElement.id // The end point is not hovering the start bindable + it's binding gap
+      updates?.suggestedBinding?.id !== startBindingElement.id && // The end point is not hovering the start bindable + it's binding gap
+      updates?.startBinding?.mode !== "inside"
         ? startBindingElement
         : startIsSelected && // The "other" end (i.e. "start") is dragged
           endBindingElement &&
