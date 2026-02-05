@@ -514,11 +514,25 @@ const renderBindingHighlightForBindableElement_simple = (
           );
 
         if (!isHighlighted) {
-          context.fillStyle = `rgba(0,0,0,0.2)`;
+          context.strokeStyle =
+            appState.theme === THEME.DARK
+              ? `rgba(180, 180, 180, 0.8)`
+              : `rgba(65, 65, 65, 0.4)`;
+          context.lineWidth = 2 / appState.zoom.value;
+          context.fillStyle =
+            appState.theme === THEME.DARK
+              ? `rgba(0, 0, 0, 0.9)`
+              : `rgba(65, 65, 65, 0.4)`;
           context.beginPath();
           context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
           context.fill();
+          context.stroke();
         } else {
+          context.strokeStyle =
+            appState.theme === THEME.DARK
+              ? `rgba(3, 93, 161, 1)`
+              : `rgba(106, 189, 252, 1)`;
+          context.lineWidth = 2 / appState.zoom.value;
           context.fillStyle =
             appState.theme === THEME.DARK
               ? `rgba(3, 93, 161, 1)`
@@ -527,6 +541,7 @@ const renderBindingHighlightForBindableElement_simple = (
           context.beginPath();
           context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
           context.fill();
+          context.stroke();
         }
       });
 
