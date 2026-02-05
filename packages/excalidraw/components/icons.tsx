@@ -13,8 +13,6 @@ import { THEME } from "@excalidraw/common";
 
 import type { Theme } from "@excalidraw/element/types";
 
-export const iconFillColor = (theme: Theme) => "var(--icon-fill-color)";
-
 const handlerColor = (theme: Theme) =>
   theme === THEME.LIGHT ? "#fff" : "#1e1e1e";
 
@@ -985,21 +983,21 @@ export const file = createIcon(
 export const GroupIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
     <>
-      <path d="M25 26H111V111H25" fill={iconFillColor(theme)} />
+      <path d="M25 26H111V111H25" fill="var(--icon-fill-color)" />
       <path
         d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
-        stroke={iconFillColor(theme)}
+        stroke="var(--icon-fill-color)"
         strokeWidth="2"
       />
-      <path d="M100 100H160V160H100" fill={iconFillColor(theme)} />
+      <path d="M100 100H160V160H100" fill="var(--icon-fill-color)" />
       <path
         d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
-        stroke={iconFillColor(theme)}
+        stroke="var(--icon-fill-color)"
         strokeWidth="2"
       />
       <g
         fill={handlerColor(theme)}
-        stroke={iconFillColor(theme)}
+        stroke="var(--icon-fill-color)"
         strokeWidth="6"
       >
         <rect x="2.5" y="2.5" width="30" height="30" />
@@ -1015,21 +1013,21 @@ export const GroupIcon = React.memo(({ theme }: { theme: Theme }) =>
 export const UngroupIcon = React.memo(({ theme }: { theme: Theme }) =>
   createIcon(
     <>
-      <path d="M25 26H111V111H25" fill={iconFillColor(theme)} />
+      <path d="M25 26H111V111H25" fill="var(--icon-fill-color)" />
       <path
         d="M25 111C25 80.2068 25 49.4135 25 26M25 26C48.6174 26 72.2348 26 111 26H25ZM25 26C53.3671 26 81.7343 26 111 26H25ZM111 26C111 52.303 111 78.606 111 111V26ZM111 26C111 51.2947 111 76.5893 111 111V26ZM111 111C87.0792 111 63.1585 111 25 111H111ZM111 111C87.4646 111 63.9293 111 25 111H111ZM25 111C25 81.1514 25 51.3028 25 26V111Z"
-        stroke={iconFillColor(theme)}
+        stroke="var(--icon-fill-color)"
         strokeWidth="2"
       />
-      <path d="M100 100H160V160H100" fill={iconFillColor(theme)} />
+      <path d="M100 100H160V160H100" fill="var(--icon-fill-color)" />
       <path
         d="M100 160C100 144.106 100 128.211 100 100M100 100C117.706 100 135.412 100 160 100H100ZM100 100C114.214 100 128.428 100 160 100H100ZM160 100C160 120.184 160 140.369 160 160V100ZM160 100C160 113.219 160 126.437 160 160V100ZM160 160C145.534 160 131.068 160 100 160H160ZM160 160C143.467 160 126.934 160 100 160H160ZM100 160C100 143.661 100 127.321 100 100V160Z"
-        stroke={iconFillColor(theme)}
+        stroke="var(--icon-fill-color)"
         strokeWidth="2"
       />
       <g
         fill={handlerColor(theme)}
-        stroke={iconFillColor(theme)}
+        stroke="var(--icon-fill-color)"
         strokeWidth="6"
       >
         <rect x="2.5" y="2.5" width="30" height="30" />
@@ -1181,11 +1179,11 @@ export const StrokeWidthExtraBoldIcon = createIcon(
   modifiedTablerIconProps,
 );
 
-export const StrokeStyleSolidIcon = React.memo(({ theme }: { theme: Theme }) =>
+export const StrokeStyleSolidIcon = React.memo(() =>
   createIcon(
     <path
       d="M6 10H34"
-      stroke={iconFillColor(theme)}
+      stroke="var(--icon-fill-color)"
       strokeWidth={2}
       fill="none"
       strokeLinecap="round"
@@ -1653,7 +1651,7 @@ export const TextAlignRightIcon = createIcon(
 );
 
 // tabler-icons: layout-align-top
-export const TextAlignTopIcon = React.memo(({ theme }: { theme: Theme }) =>
+export const TextAlignTopIcon = React.memo(() =>
   createIcon(
     <g
       strokeWidth="1.5"
@@ -1671,7 +1669,7 @@ export const TextAlignTopIcon = React.memo(({ theme }: { theme: Theme }) =>
 );
 
 // tabler-icons: layout-align-bottom
-export const TextAlignBottomIcon = React.memo(({ theme }: { theme: Theme }) =>
+export const TextAlignBottomIcon = React.memo(() =>
   createIcon(
     <g
       strokeWidth="2"
@@ -1689,7 +1687,7 @@ export const TextAlignBottomIcon = React.memo(({ theme }: { theme: Theme }) =>
 );
 
 // tabler-icons: layout-align-middle
-export const TextAlignMiddleIcon = React.memo(({ theme }: { theme: Theme }) =>
+export const TextAlignMiddleIcon = React.memo(() =>
   createIcon(
     <g
       strokeWidth="1.5"

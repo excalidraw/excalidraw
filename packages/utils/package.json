@@ -1,10 +1,21 @@
 {
   "name": "@excalidraw/utils",
   "version": "0.1.2",
+  "description": "Excalidraw utility functions",
+  "keywords": [
+    "excalidraw",
+    "excalidraw-utils"
+  ],
+  "bugs": "https://github.com/excalidraw/excalidraw/issues",
+  "license": "MIT",
+  "repository": "https://github.com/excalidraw/excalidraw",
+  "files": [
+    "dist/*"
+  ],
   "type": "module",
-  "types": "./dist/types/utils/src/index.d.ts",
   "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
+  "types": "./dist/types/utils/src/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/utils/src/index.d.ts",
@@ -16,36 +27,12 @@
       "types": "./dist/types/utils/src/*.d.ts"
     }
   },
-  "files": [
-    "dist/*"
-  ],
-  "description": "Excalidraw utility functions",
   "publishConfig": {
     "access": "public"
   },
-  "license": "MIT",
-  "keywords": [
-    "excalidraw",
-    "excalidraw-utils"
-  ],
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not ie <= 11",
-      "not op_mini all",
-      "not safari < 12",
-      "not kaios <= 2.5",
-      "not edge < 79",
-      "not chrome < 70",
-      "not and_uc < 13",
-      "not samsung < 10"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "scripts": {
+    "gen:types": "rimraf types && tsc",
+    "build:esm": "rimraf dist && node ../../scripts/buildUtils.js && yarn gen:types"
   },
   "dependencies": {
     "@braintree/sanitize-url": "6.0.2",
@@ -65,10 +52,23 @@
     "wawoff2": "2.0.1",
     "which": "4.0.0"
   },
-  "bugs": "https://github.com/excalidraw/excalidraw/issues",
-  "repository": "https://github.com/excalidraw/excalidraw",
-  "scripts": {
-    "gen:types": "rimraf types && tsc",
-    "build:esm": "rimraf dist && node ../../scripts/buildUtils.js && yarn gen:types"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not ie <= 11",
+      "not op_mini all",
+      "not safari < 12",
+      "not kaios <= 2.5",
+      "not edge < 79",
+      "not chrome < 70",
+      "not and_uc < 13",
+      "not samsung < 10"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

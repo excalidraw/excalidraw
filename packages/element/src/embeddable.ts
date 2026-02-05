@@ -63,7 +63,7 @@ const parseYouTubeTimestamp = (url: string): number => {
     const urlObj = new URL(url.startsWith("http") ? url : `https://${url}`);
     timeParam =
       urlObj.searchParams.get("t") || urlObj.searchParams.get("start");
-  } catch (error) {
+  } catch {
     const timeMatch = url.match(/[?&#](?:t|start)=([^&#\s]+)/);
     timeParam = timeMatch?.[1];
   }
@@ -388,7 +388,7 @@ const matchHostname = (
     if (bareDomain === bareAllowedHostname) {
       return bareAllowedHostname;
     }
-  } catch (error) {
+  } catch {
     // ignore
   }
   return null;

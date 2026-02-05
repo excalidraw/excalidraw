@@ -75,7 +75,7 @@ export const createUndoAction: ActionCreator = (history) => ({
     ),
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && matchKey(event, KEYS.Z) && !event.shiftKey,
-  PanelComponent: ({ appState, updateData, data, app }) => {
+  PanelComponent: ({ updateData, data }) => {
     const { isUndoStackEmpty } = useEmitter<HistoryChangedEvent>(
       history.onHistoryChangedEmitter,
       new HistoryChangedEvent(
@@ -115,7 +115,7 @@ export const createRedoAction: ActionCreator = (history) => ({
   keyTest: (event) =>
     (event[KEYS.CTRL_OR_CMD] && event.shiftKey && matchKey(event, KEYS.Z)) ||
     (isWindows && event.ctrlKey && !event.shiftKey && matchKey(event, KEYS.Y)),
-  PanelComponent: ({ appState, updateData, data, app }) => {
+  PanelComponent: ({ updateData, data }) => {
     const { isRedoStackEmpty } = useEmitter(
       history.onHistoryChangedEmitter,
       new HistoryChangedEvent(

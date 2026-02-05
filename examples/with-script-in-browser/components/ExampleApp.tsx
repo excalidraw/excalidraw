@@ -238,7 +238,7 @@ export default function ExampleApp({
             left: "50%",
             transform: "translateX(-50%)",
             bottom: "20px",
-            zIndex: 9999999999999999,
+            zIndex: 999999999999999,
           }}
         >
           Toggle Custom Sidebar
@@ -250,7 +250,7 @@ export default function ExampleApp({
           </TTDDialogTrigger>
         )}
         <TTDDialog
-          onTextSubmit={async (_) => {
+          onTextSubmit={async () => {
             console.info("submit");
             // sleep for 2s
             await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -555,7 +555,7 @@ export default function ExampleApp({
     if (!comment) {
       return null;
     }
-    const appState = excalidrawAPI?.getAppState()!;
+    const appState = excalidrawAPI?.getAppState();
     const { x, y } = sceneCoordsToViewportCoords(
       { sceneX: comment.x, sceneY: comment.y },
       appState,

@@ -41,7 +41,7 @@ Object.defineProperty(window, "FontFace", {
     private status: string;
     private unicodeRange: string;
 
-    constructor(family, source, descriptors) {
+    constructor(family: string, source: string, descriptors: any) {
       this.family = family;
       this.source = source;
       this.descriptors = descriptors;
@@ -72,9 +72,10 @@ Object.defineProperty(window, "EXCALIDRAW_ASSET_PATH", {
 vi.mock(
   "./packages/excalidraw/fonts/ExcalidrawFontFace",
   async (importOriginal) => {
-    const mod = await importOriginal<
-      typeof import("./packages/excalidraw/fonts/ExcalidrawFontFace")
-    >();
+    const mod =
+      await importOriginal<
+        typeof import("./packages/excalidraw/fonts/ExcalidrawFontFace")
+      >();
     const ExcalidrawFontFaceImpl = mod.ExcalidrawFontFace;
 
     return {
@@ -87,7 +88,7 @@ vi.mock(
 
           // read local assets directly, without running a server
           const content = await fs.promises.readFile(url);
-          return content.buffer;
+          return new Uint8Array(content).buffer;
         }
       },
     };

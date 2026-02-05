@@ -1,4 +1,4 @@
-@import "../../packages/excalidraw/css/variables.module.scss";
+@use "../../packages/excalidraw/css/variables.module.scss" as *;
 
 .excalidraw {
   .ShareDialog {

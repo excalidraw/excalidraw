@@ -467,6 +467,7 @@ export class Delta<T> {
     } else {
       assertNever(
         join,
+        // oxlint-disable-next-line typescript/restrict-template-expressions
         `Unknown distinctKeysIterator's join param "${join}"`,
         true,
       );
@@ -860,6 +861,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
           default:
             assertNever(
               key,
+              // oxlint-disable-next-line typescript/restrict-template-expressions
               `Unknown ObservedElementsAppState's key "${key}"`,
               true,
             );
@@ -974,7 +976,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         inserted,
         "selectedElementIds",
         // ts language server has a bit trouble resolving this, so we are giving it a little push
-        (_) => true as ValueOf<T["selectedElementIds"]>,
+        () => true as ValueOf<T["selectedElementIds"]>,
       );
       Delta.diffObjects(
         deleted,
@@ -995,9 +997,8 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       if (isTestEnv() || isDevEnv()) {
         throw e;
       }
-    } finally {
-      return [deleted, inserted];
     }
+    return [deleted, inserted];
   }
 
   private static orderAppStateKeys(partial: Partial<ObservedAppState>) {
@@ -1333,6 +1334,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         for (const key of Object.keys(partial) as Array<keyof typeof partial>) {
           // do not update following props:
           // - `boundElements`, as it is a reference value which is postprocessed to contain only deleted/inserted keys
+          // oxlint-disable-next-line typescript/switch-exhaustiveness-check
           switch (key) {
             case "boundElements":
               latestPartial[key] = partial[key];
@@ -1459,9 +1461,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       if (isTestEnv() || isDevEnv()) {
         throw e;
       }
-    } finally {
-      return [nextElements, flags.containsVisibleDifference];
     }
+    return [nextElements, flags.containsVisibleDifference];
   }
 
   public squash(delta: ElementsDelta): this {
@@ -1802,7 +1803,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
     // updated delta is affecting the binding only in case it contains changed binding or bindable property
     for (const [id] of Array.from(Object.entries(this.updated)).filter(
-      ([_, delta]) =>
+      ([, delta]) =>
         Object.keys({ ...delta.deleted, ...delta.inserted }).find((prop) =>
           bindingProperties.has(prop as BindingProp | BindableProp),
         ),
@@ -1908,9 +1909,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       if (isTestEnv() || isDevEnv()) {
         throw e;
       }
-    } finally {
-      return nextElements;
     }
+    return nextElements;
   }
 
   private static redrawTextBoundingBoxes(
@@ -2051,9 +2051,9 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       if (isTestEnv() || isDevEnv()) {
         throw e;
       }
-    } finally {
-      return [deleted, inserted];
     }
+
+    return [deleted, inserted];
   }
 
   private static stripIrrelevantProps(

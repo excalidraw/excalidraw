@@ -28,7 +28,7 @@ export class TopErrorBoundary extends React.Component<
     for (const [key, value] of Object.entries({ ...localStorage })) {
       try {
         _localStorage[key] = JSON.parse(value);
-      } catch (error: any) {
+      } catch {
         _localStorage[key] = value;
       }
     }
@@ -37,7 +37,7 @@ export class TopErrorBoundary extends React.Component<
       scope.setExtras(errorInfo);
       const eventId = Sentry.captureException(error);
 
-      this.setState((state) => ({
+      this.setState(() => ({
         hasError: true,
         sentryEventId: eventId,
         localStorage: JSON.stringify(_localStorage),

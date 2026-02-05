@@ -301,7 +301,7 @@ const changeFontSize = (
       currentItemFontSize:
         newFontSizes.size === 1
           ? [...newFontSizes][0]
-          : fallbackValue ?? appState.currentItemFontSize,
+          : (fallbackValue ?? appState.currentItemFontSize),
     },
     captureUpdate: CaptureUpdateAction.IMMEDIATELY,
   };
@@ -335,12 +335,12 @@ export const actionChangeStrokeColor = register<
         ...appState,
         ...value,
       },
-      captureUpdate: !!value?.currentItemStrokeColor
+      captureUpdate: value?.currentItemStrokeColor
         ? CaptureUpdateAction.IMMEDIATELY
         : CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+  PanelComponent: ({ elements, appState, updateData, app }) => {
     const { stylesPanelMode } = getStylesPanelInfo(app);
 
     return (
@@ -425,7 +425,7 @@ export const actionChangeBackgroundColor = register<
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+  PanelComponent: ({ elements, appState, updateData, app }) => {
     const { stylesPanelMode } = getStylesPanelInfo(app);
 
     return (
@@ -557,7 +557,7 @@ export const actionChangeStrokeWidth = register<
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => (
+  PanelComponent: ({ elements, appState, updateData, app }) => (
     <fieldset>
       <legend>{t("labels.strokeWidth")}</legend>
       <div className="buttonList">
@@ -614,7 +614,7 @@ export const actionChangeSloppiness = register<ExcalidrawElement["roughness"]>({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => (
+  PanelComponent: ({ elements, appState, updateData, app }) => (
     <fieldset>
       <legend>{t("labels.sloppiness")}</legend>
       <div className="buttonList">
@@ -669,7 +669,7 @@ export const actionChangeStrokeStyle = register<
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => (
+  PanelComponent: ({ elements, appState, updateData, app }) => (
     <fieldset>
       <legend>{t("labels.strokeStyle")}</legend>
       <div className="buttonList">
@@ -984,7 +984,7 @@ export const actionChangeFontFamily = register<{
 
       const fontsCache = Array.from(Fonts.loadedFontsCache.values());
       const fontFamily = Object.entries(FONT_FAMILY).find(
-        ([_, value]) => value === nextFontFamily,
+        ([, value]) => value === nextFontFamily,
       )?.[0];
 
       // skip `document.font.check` check on hover, if at least one font family has loaded as it's super slow (could result in slightly different bbox, which is fine)
@@ -1414,19 +1414,19 @@ export const actionChangeVerticalAlign = register<VerticalAlign>({
               {
                 value: VERTICAL_ALIGN.TOP,
                 text: t("labels.alignTop"),
-                icon: <TextAlignTopIcon theme={appState.theme} />,
+                icon: <TextAlignTopIcon />,
                 testId: "align-top",
               },
               {
                 value: VERTICAL_ALIGN.MIDDLE,
                 text: t("labels.centerVertically"),
-                icon: <TextAlignMiddleIcon theme={appState.theme} />,
+                icon: <TextAlignMiddleIcon />,
                 testId: "align-middle",
               },
               {
                 value: VERTICAL_ALIGN.BOTTOM,
                 text: t("labels.alignBottom"),
-                icon: <TextAlignBottomIcon theme={appState.theme} />,
+                icon: <TextAlignBottomIcon />,
                 testId: "align-bottom",
               },
             ]}
@@ -1533,8 +1533,8 @@ export const actionChangeRoundness = register<"sharp" | "round">({
                 hasLegacyRoundness
                   ? null
                   : element.roundness
-                  ? "round"
-                  : "sharp",
+                    ? "round"
+                    : "sharp",
               (element) =>
                 !isArrowElement(element) && element.hasOwnProperty("roundness"),
               (hasSelection) =>
@@ -1715,12 +1715,12 @@ export const actionChangeArrowProperties = register({
   name: "changeArrowProperties",
   label: "Change arrow properties",
   trackEvent: false,
-  perform: (elements, appState, value, app) => {
+  perform: () => {
     // This action doesn't perform any changes directly
     // It's just a container for the arrow type and arrowhead actions
     return false;
   },
-  PanelComponent: ({ elements, appState, updateData, app, renderAction }) => {
+  PanelComponent: ({ renderAction }) => {
     return (
       <div className="selected-shape-actions">
         {renderAction("changeArrowhead")}
@@ -1953,8 +1953,8 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                   return element.elbowed
                     ? ARROW_TYPE.elbow
                     : element.roundness
-                    ? ARROW_TYPE.round
-                    : ARROW_TYPE.sharp;
+                      ? ARROW_TYPE.round
+                      : ARROW_TYPE.sharp;
                 }
 
                 return null;

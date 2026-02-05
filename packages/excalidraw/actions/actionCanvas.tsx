@@ -64,12 +64,12 @@ export const actionChangeViewBackgroundColor = register<Partial<AppState>>({
   perform: (_, appState, value) => {
     return {
       appState: { ...appState, ...value },
-      captureUpdate: !!value?.viewBackgroundColor
+      captureUpdate: value?.viewBackgroundColor
         ? CaptureUpdateAction.IMMEDIATELY
         : CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, appProps, data }) => {
+  PanelComponent: ({ elements, appState, updateData }) => {
     // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
       <ColorPicker
@@ -138,7 +138,7 @@ export const actionZoomIn = register({
   viewMode: true,
   icon: ZoomInIcon,
   trackEvent: { category: "canvas" },
-  perform: (_elements, appState, _, app) => {
+  perform: (_elements, appState) => {
     return {
       appState: {
         ...appState,
@@ -179,7 +179,7 @@ export const actionZoomOut = register({
   icon: ZoomOutIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (_elements, appState, _, app) => {
+  perform: (_elements, appState) => {
     return {
       appState: {
         ...appState,
@@ -220,7 +220,7 @@ export const actionResetZoom = register({
   icon: ZoomResetIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (_elements, appState, _, app) => {
+  perform: (_elements, appState) => {
     return {
       appState: {
         ...appState,
@@ -474,8 +474,7 @@ export const actionToggleTheme = register<AppState["theme"]>({
       : "buttons.darkMode";
   },
   keywords: ["toggle", "dark", "light", "mode", "theme"],
-  icon: (appState, elements) =>
-    appState.theme === THEME.LIGHT ? MoonIcon : SunIcon,
+  icon: (appState) => (appState.theme === THEME.LIGHT ? MoonIcon : SunIcon),
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_, appState, value) => {

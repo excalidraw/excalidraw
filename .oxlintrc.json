@@ -1,0 +1,149 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "jsx-a11y", "import"],
+  "rules": {
+    "no-unused-vars": [
+      "warn",
+      {
+        "ignoreRestSiblings": true
+      }
+    ],
+    "curly": "warn",
+    "no-console": [
+      "warn",
+      {
+        "allow": ["info", "warn", "error"]
+      }
+    ],
+    "no-else-return": "warn",
+    "no-lonely-if": "warn",
+    "no-unneeded-ternary": "warn",
+    "no-unused-expressions": "warn",
+    "no-useless-return": "warn",
+    "no-var": "warn",
+    "one-var": "warn",
+    "prefer-arrow-callback": "warn",
+    "prefer-const": "warn",
+    "prefer-template": "warn",
+    "typescript/consistent-type-imports": [
+      "error",
+      {
+        "disallowTypeAnnotations": false
+      }
+    ],
+    "typescript/no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": [
+              "../../excalidraw",
+              "../../../packages/excalidraw",
+              "@excalidraw/excalidraw"
+            ],
+            "message": "Do not import from '@excalidraw/excalidraw' package anything but types, as this package must be independent.",
+            "allowTypeImports": true
+          }
+        ]
+      }
+    ],
+    "eslint/no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "jotai",
+            "message": "Do not import from \"jotai\" directly. Use our app-specific modules (\"editor-jotai\" or \"app-jotai\")."
+          }
+        ]
+      }
+    ],
+    "react/jsx-no-target-blank": [
+      "error",
+      {
+        "allowReferrer": true
+      }
+    ],
+
+    "eslint/no-unreachable": "warn",
+
+    // react
+    "react/jsx-no-comment-textnodes": "error",
+    "react/iframe-missing-sandbox": "warn",
+    "react/rules-of-hooks": "error",
+    "react/no-unescaped-entities": "warn",
+
+    // for later
+    // ----------
+    // "react/no-array-index-key": "warn",
+    // "react/jsx-no-useless-fragment": "warn",
+
+    // will require major refactor
+    // ---------------------------
+    // "react/only-export-components": "warn",
+
+    // type-aware rules (requires --type-aware flag)
+    // -------------------------------------------------------------------------
+    "typescript/switch-exhaustiveness-check": "warn",
+    "typescript/unbound-method": [
+      "warn",
+      {
+        "ignoreStatic": true
+      }
+    ],
+
+    // disabled rules
+    // -------------------------------------------------------------------------
+    // may be re-enabled later
+    "typescript/no-redundant-type-constituents": "off",
+    "typescript/no-unsafe-unary-minus": "off",
+    "typescript/no-floating-promises": "off",
+    // not planned
+    "eslint/no-async-promise-executor": "off",
+    "jsx-a11y/no-autofocus": "off",
+    "eslint-plugin-jsx-a11y/click-events-have-key-events": "off",
+    "eslint-plugin-jsx-a11y/label-has-associated-control": "off"
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    "build/",
+    "dist/",
+    ".vscode/",
+    "firebase/",
+    "public/workbox",
+    "packages/excalidraw/types",
+    "examples/**/public",
+    "dev-dist",
+    "coverage"
+    // "**/tests/**",
+    // "**/*.test*"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "packages/common/src/**/*.ts",
+        "packages/common/src/**/*.tsx",
+        "packages/element/src/**/*.ts",
+        "packages/element/src/**/*.tsx"
+      ],
+      "rules": {
+        "typescript/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "../../excalidraw",
+                  "../../../packages/excalidraw",
+                  "@excalidraw/excalidraw"
+                ],
+                "message": "Do not import from '@excalidraw/excalidraw' package anything but types, as this package must be independent.",
+                "allowTypeImports": true
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

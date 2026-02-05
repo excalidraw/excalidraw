@@ -24,7 +24,7 @@ describe("Test measureText", () => {
         ...params,
       });
       expect(getContainerCoords(element)).toEqual({
-        x: 44.2893218813452455,
+        x: 44.289321881345245,
         y: 39.64466094067262,
       });
     });

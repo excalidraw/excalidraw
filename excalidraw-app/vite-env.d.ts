@@ -26,9 +26,6 @@ interface ImportMetaEnv {
   // Set this flag to false if you want to open the overlay by default
   VITE_APP_COLLAPSE_OVERLAY: string;
 
-  // Enable eslint in dev server
-  VITE_APP_ENABLE_ESLINT: string;
-
   // Enable PWA in dev server
   VITE_APP_ENABLE_PWA: string;
 

@@ -107,7 +107,7 @@ export const SearchMenu = () => {
       app.scene.getSceneNonce() !== lastSceneNonceRef.current
     ) {
       searchedQueryRef.current = null;
-      handleSearch(searchQuery, app, (matchItems, index) => {
+      handleSearch(searchQuery, app, (matchItems) => {
         setSearchMatches({
           nonce: randomInteger(),
           items: matchItems,

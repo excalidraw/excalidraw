@@ -245,8 +245,8 @@ export const handleFocusPointDrag = (
       switchToInsideBinding && arrow[bindingField]?.mode === "orbit"
         ? "inside"
         : !switchToInsideBinding && arrow[bindingField]?.mode === "inside"
-        ? "orbit"
-        : null;
+          ? "orbit"
+          : null;
 
     // If no existing binding, create it
     if (!arrow[bindingField] || newMode) {
@@ -458,7 +458,7 @@ export const handleFocusPointPointerUp = (
   if (boundElement) {
     scene.mutateElement(boundElement, {
       boundElements: [
-        ...(boundElement.boundElements || [])?.filter(
+        ...(boundElement.boundElements || []).filter(
           ({ id }) => id !== arrow.id,
         ),
         {

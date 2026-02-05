@@ -806,8 +806,8 @@ const renderElementsBoxHighlight = (
   };
 
   Object.entries(selectGroupsFromGivenElements(elementsInGroups, appState))
-    .filter(([id, isSelected]) => isSelected)
-    .map(([id, isSelected]) => id)
+    .filter(([, isSelected]) => isSelected)
+    .map(([id]) => id)
     .map((groupId) => getSelectionForGroupId(groupId))
     .concat(
       individualElements.map((element) => getSelectionFromElements([element])),
@@ -1706,13 +1706,14 @@ const _renderInteractiveScene = ({
       context.rotate(element.angle);
 
       matchedLines.forEach((matchedLine) => {
-        (matchedLine.showOnCanvas || focus) &&
+        if (matchedLine.showOnCanvas || focus) {
           context.fillRect(
             elementX1 + matchedLine.offsetX / zoomFactor - cx,
             elementY1 + matchedLine.offsetY / zoomFactor - cy,
             matchedLine.width / zoomFactor,
             matchedLine.height / zoomFactor,
           );
+        }
       });
 
       context.restore();

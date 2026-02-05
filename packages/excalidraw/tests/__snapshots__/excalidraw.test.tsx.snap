@@ -25,7 +25,7 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
     <a
       class="dropdown-menu-item dropdown-menu-item-base"
       href="blog.excalidaw.com"
-      rel="noopener"
+      rel="noopener noopener"
       target="_blank"
     >
       <div
@@ -428,7 +428,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         aria-label="GitHub"
         class="dropdown-menu-item dropdown-menu-item-base"
         href="https://github.com/excalidraw/excalidraw"
-        rel="noopener"
+        rel="noopener noopener"
         target="_blank"
         title="GitHub"
       >
@@ -466,7 +466,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         aria-label="X"
         class="dropdown-menu-item dropdown-menu-item-base"
         href="https://x.com/excalidraw"
-        rel="noopener"
+        rel="noopener noopener"
         target="_blank"
         title="X"
       >
@@ -516,7 +516,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         aria-label="Discord"
         class="dropdown-menu-item dropdown-menu-item-base"
         href="https://discord.gg/UexuTaE"
-        rel="noopener"
+        rel="noopener noopener"
         target="_blank"
         title="Discord"
       >

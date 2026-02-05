@@ -667,10 +667,13 @@ export const arrayToMap = <T extends { id: string } | string>(
   if (items instanceof Map) {
     return items;
   }
-  return items.reduce((acc: Map<string, T>, element) => {
-    acc.set(typeof element === "string" ? element : element.id, element);
-    return acc;
-  }, new Map() as Map<string, T>);
+  return items.reduce(
+    (acc: Map<string, T>, element) => {
+      acc.set(typeof element === "string" ? element : element.id, element);
+      return acc;
+    },
+    new Map() as Map<string, T>,
+  );
 };
 
 export const arrayToMapWithIndex = <T extends { id: string }>(
@@ -688,10 +691,13 @@ export const arrayToObject = <T>(
   array: readonly T[],
   groupBy?: (value: T) => string | number,
 ) =>
-  array.reduce((acc, value, idx) => {
-    acc[groupBy ? groupBy(value) : idx] = value;
-    return acc;
-  }, {} as { [key: string]: T });
+  array.reduce(
+    (acc, value, idx) => {
+      acc[groupBy ? groupBy(value) : idx] = value;
+      return acc;
+    },
+    {} as { [key: string]: T },
+  );
 
 /** Doubly linked node */
 export type Node<T> = T & {
@@ -799,7 +805,7 @@ export const isPrimitive = (val: any) => {
 export const getFrame = () => {
   try {
     return window.self === window.top ? "top" : "iframe";
-  } catch (error) {
+  } catch {
     return "iframe";
   }
 };
@@ -1019,8 +1025,8 @@ export const isMemberOf = <T extends string>(
   return collection instanceof Set || collection instanceof Map
     ? collection.has(value as T)
     : "includes" in collection
-    ? collection.includes(value as T)
-    : collection.hasOwnProperty(value);
+      ? collection.includes(value as T)
+      : collection.hasOwnProperty(value);
 };
 
 export const cloneJSON = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
@@ -1151,35 +1157,38 @@ export type HasBrand<T> = {
   [K in keyof T]: K extends `~brand${infer _}` | "_brand" ? true : never;
 }[keyof T];
 
-type RemoveAllBrands<T> = HasBrand<T> extends true
-  ? {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      [K in keyof T as K extends `~brand~${infer _}` | "_brand"
-        ? never
-        : K]: T[K];
-    }
-  : T;
+type RemoveAllBrands<T> =
+  HasBrand<T> extends true
+    ? {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        [K in keyof T as K extends `~brand~${infer _}` | "_brand"
+          ? never
+          : K]: T[K];
+      }
+    : T;
 
 // For accepting values - uses loose matching for branded types
 // Preserves readonly modifier: mutable array requires mutable input
-type UnbrandForValue<T> = T extends Map<infer E, infer F>
-  ? Map<UnbrandForValue<E>, UnbrandForValue<F>>
-  : T extends Set<infer E>
-  ? Set<UnbrandForValue<E>>
-  : T extends readonly any[]
-  ? T extends any[]
-    ? unknown[] // mutable array - require mutable input
-    : readonly unknown[] // readonly array - accept readonly input
-  : RemoveAllBrands<T>;
+type UnbrandForValue<T> =
+  T extends Map<infer E, infer F>
+    ? Map<UnbrandForValue<E>, UnbrandForValue<F>>
+    : T extends Set<infer E>
+      ? Set<UnbrandForValue<E>>
+      : T extends readonly any[]
+        ? T extends any[]
+          ? unknown[] // mutable array - require mutable input
+          : readonly unknown[] // readonly array - accept readonly input
+        : RemoveAllBrands<T>;
 
 // For return types - preserves array element unbranding
-export type Unbrand<T> = T extends Map<infer E, infer F>
-  ? Map<Unbrand<E>, Unbrand<F>>
-  : T extends Set<infer E>
-  ? Set<Unbrand<E>>
-  : T extends readonly (infer E)[]
-  ? Array<Unbrand<E>>
-  : RemoveAllBrands<T>;
+export type Unbrand<T> =
+  T extends Map<infer E, infer F>
+    ? Map<Unbrand<E>, Unbrand<F>>
+    : T extends Set<infer E>
+      ? Set<Unbrand<E>>
+      : T extends readonly (infer E)[]
+        ? Array<Unbrand<E>>
+        : RemoveAllBrands<T>;
 
 export type CombineBrands<BrandedType, CurrentType> =
   BrandedType extends readonly (infer BE)[]
@@ -1191,8 +1200,8 @@ export type CombineBrands<BrandedType, CurrentType> =
 export type CombineBrandsIfNeeded<T, Required> = [T] extends [Required]
   ? T[]
   : HasBrand<T> extends true
-  ? CombineBrands<T, Required>[]
-  : Required[];
+    ? CombineBrands<T, Required>[]
+    : Required[];
 
 /**
  * Makes type into a branded type, ensuring that value is assignable to
@@ -1259,8 +1268,8 @@ export const sizeOf = (
   return isReadonlyArray(value)
     ? value.length
     : value instanceof Map || value instanceof Set
-    ? value.size
-    : Object.keys(value).length;
+      ? value.size
+      : Object.keys(value).length;
 };
 
 export const reduceToCommonValue = <T, R = T>(

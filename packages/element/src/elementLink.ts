@@ -13,7 +13,7 @@ import type { ExcalidrawElement } from "./types";
 export const defaultGetElementLinkFromSelection: Exclude<
   AppProps["generateLinkForSelection"],
   undefined
-> = (id, type) => {
+> = (id) => {
   const url = window.location.href;
 
   try {
@@ -86,7 +86,7 @@ export const isElementLink = (url: string) => {
       _url.searchParams.has(ELEMENT_LINK_KEY) &&
       _url.host === window.location.host
     );
-  } catch (error) {
+  } catch {
     return false;
   }
 };

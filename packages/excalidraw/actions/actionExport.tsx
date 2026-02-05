@@ -43,7 +43,7 @@ export const actionChangeProjectName = register<AppState["name"]>({
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ appState, updateData, appProps, data, app }) => (
+  PanelComponent: ({ updateData, data, app }) => (
     <ProjectName
       label={t("labels.fileTitle")}
       value={app.getName()}

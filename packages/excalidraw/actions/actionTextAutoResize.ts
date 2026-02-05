@@ -11,14 +11,12 @@ import { getSelectedElements } from "../scene";
 
 import { register } from "./register";
 
-import type { AppClassProperties } from "../types";
-
 export const actionTextAutoResize = register({
   name: "autoResize",
   label: "labels.autoResize",
   icon: null,
   trackEvent: { category: "element" },
-  predicate: (elements, appState, _: unknown, app: AppClassProperties) => {
+  predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
     return (
       selectedElements.length === 1 &&
@@ -26,7 +24,7 @@ export const actionTextAutoResize = register({
       !selectedElements[0].autoResize
     );
   },
-  perform: (elements, appState, _, app) => {
+  perform: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
 
     return {

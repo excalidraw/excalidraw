@@ -142,7 +142,7 @@ const StatsDragInput = <
         instantChange: 0,
         originalElements: elements,
         originalElementsMap: app.scene.getNonDeletedElementsMap(),
-        shouldKeepAspectRatio: shouldKeepAspectRatio!!,
+        shouldKeepAspectRatio: shouldKeepAspectRatio!,
         shouldChangeByStepSize: false,
         scene,
         nextValue: rounded,
@@ -218,7 +218,7 @@ const StatsDragInput = <
       <div
         className="drag-input-label"
         ref={labelRef}
-        onPointerDown={(event) => {
+        onPointerDown={() => {
           if (inputRef.current && editable) {
             document.body.classList.add("excalidraw-cursor-resize");
 
@@ -271,7 +271,7 @@ const StatsDragInput = <
                       instantChange: stepChange,
                       originalElements,
                       originalElementsMap,
-                      shouldKeepAspectRatio: shouldKeepAspectRatio!!,
+                      shouldKeepAspectRatio: shouldKeepAspectRatio!,
                       shouldChangeByStepSize: event.shiftKey,
                       property,
                       scene,

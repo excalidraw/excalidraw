@@ -162,10 +162,12 @@ export const ChatInterface = ({
                 isGenerating
                   ? t("chat.generating")
                   : rateLimits?.rateLimitRemaining === 0
-                  ? t("chat.rateLimit.messageLimitInputPlaceholder")
-                  : messages.length > 0
-                  ? t("chat.inputPlaceholderWithMessages")
-                  : t("chat.inputPlaceholder", { shortcut: "Shift + Enter" })
+                    ? t("chat.rateLimit.messageLimitInputPlaceholder")
+                    : messages.length > 0
+                      ? t("chat.inputPlaceholderWithMessages")
+                      : t("chat.inputPlaceholder", {
+                          shortcut: "Shift + Enter",
+                        })
               }
               disabled={rateLimits?.rateLimitRemaining === 0}
               rows={1}

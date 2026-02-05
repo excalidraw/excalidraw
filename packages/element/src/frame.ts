@@ -797,7 +797,7 @@ export const isElementInFrame = (
 
   for (const gid of _element.groupIds) {
     if (opts?.checkedGroups?.has(gid)) {
-      return opts.checkedGroups.get(gid)!!;
+      return opts.checkedGroups.get(gid)!;
     }
   }
 

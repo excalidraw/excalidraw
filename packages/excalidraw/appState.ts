@@ -263,11 +263,11 @@ const _clearAppStateForStorage = <
   exportType: ExportType,
 ) => {
   type ExportableKeys = {
-    [K in keyof typeof APP_STATE_STORAGE_CONF]: typeof APP_STATE_STORAGE_CONF[K][ExportType] extends true
+    [K in keyof typeof APP_STATE_STORAGE_CONF]: (typeof APP_STATE_STORAGE_CONF)[K][ExportType] extends true
       ? K
       : never;
   }[keyof typeof APP_STATE_STORAGE_CONF];
-  const stateForExport = {} as { [K in ExportableKeys]?: typeof appState[K] };
+  const stateForExport = {} as { [K in ExportableKeys]?: (typeof appState)[K] };
   for (const key of Object.keys(appState) as (keyof typeof appState)[]) {
     const propConfig = APP_STATE_STORAGE_CONF[key];
     if (propConfig?.[exportType]) {

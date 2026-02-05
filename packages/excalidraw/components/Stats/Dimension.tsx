@@ -167,16 +167,16 @@ const handleDimensionChange: DragInputCallbackType<
         property === "width"
           ? nextValue
           : keepAspectRatio
-          ? nextValue * aspectRatio
-          : origElement.width,
+            ? nextValue * aspectRatio
+            : origElement.width,
         MIN_WIDTH_OR_HEIGHT,
       );
       const nextHeight = Math.max(
         property === "height"
           ? nextValue
           : keepAspectRatio
-          ? nextValue / aspectRatio
-          : origElement.height,
+            ? nextValue / aspectRatio
+            : origElement.height,
         MIN_WIDTH_OR_HEIGHT,
       );
 

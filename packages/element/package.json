@@ -1,10 +1,21 @@
 {
   "name": "@excalidraw/element",
   "version": "0.18.0",
+  "description": "Excalidraw elements-related logic",
+  "keywords": [
+    "excalidraw",
+    "excalidraw-utils"
+  ],
+  "bugs": "https://github.com/excalidraw/excalidraw/issues",
+  "license": "MIT",
+  "repository": "https://github.com/excalidraw/excalidraw",
+  "files": [
+    "dist/*"
+  ],
   "type": "module",
-  "types": "./dist/types/element/src/index.d.ts",
   "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
+  "types": "./dist/types/element/src/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/element/src/index.d.ts",
@@ -25,18 +36,17 @@
       "default": "./dist/prod/visualdebug.js"
     }
   },
-  "files": [
-    "dist/*"
-  ],
-  "description": "Excalidraw elements-related logic",
   "publishConfig": {
     "access": "public"
   },
-  "license": "MIT",
-  "keywords": [
-    "excalidraw",
-    "excalidraw-utils"
-  ],
+  "scripts": {
+    "gen:types": "rimraf types && tsc",
+    "build:esm": "rimraf dist && node ../../scripts/buildBase.js && yarn gen:types"
+  },
+  "dependencies": {
+    "@excalidraw/common": "0.18.0",
+    "@excalidraw/math": "0.18.0"
+  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -55,15 +65,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "bugs": "https://github.com/excalidraw/excalidraw/issues",
-  "repository": "https://github.com/excalidraw/excalidraw",
-  "scripts": {
-    "gen:types": "rimraf types && tsc",
-    "build:esm": "rimraf dist && node ../../scripts/buildBase.js && yarn gen:types"
-  },
-  "dependencies": {
-    "@excalidraw/common": "0.18.0",
-    "@excalidraw/math": "0.18.0"
   }
 }

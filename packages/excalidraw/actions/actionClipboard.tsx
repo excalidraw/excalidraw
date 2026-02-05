@@ -263,7 +263,7 @@ export const copyText = register({
 
     try {
       copyTextToSystemClipboard(getTextFromElements(selectedElements));
-    } catch (e) {
+    } catch {
       throw new Error(t("errors.copyToSystemClipboardFailed"));
     }
     return {

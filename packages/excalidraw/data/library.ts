@@ -275,7 +275,7 @@ class Library {
         } else {
           resolve(cloneLibraryItems(libraryItems));
         }
-      } catch (error) {
+      } catch {
         return resolve(this.currLibraryItems);
       }
     });
@@ -936,66 +936,63 @@ export const useHandleLibrary = (
   // This effect is still only meant to be run if host apps supply an persitence
   // adapter. If we don't have access to it, it the update listener doesn't
   // do anything.
-  useEffect(
-    () => {
-      // on update, merge with current library items and persist
-      // -----------------------------------------------------------------------
-      const unsubOnLibraryUpdate = onLibraryUpdateEmitter.on(
-        async (update, nextLibraryItems) => {
-          const isLoaded = isLibraryLoadedRef.current;
-          // we want to operate with the latest adapter, but we don't want this
-          // effect to rerun on every adapter change in case host apps' adapter
-          // isn't stable
-          const adapter =
-            ("adapter" in optsRef.current && optsRef.current.adapter) || null;
-          try {
-            if (adapter) {
-              if (
-                // if nextLibraryItems hash identical to previously saved hash,
-                // exit early, even if actual upstream state ends up being
-                // different (e.g. has more data than we have locally), as it'd
-                // be low-impact scenario.
-                lastSavedLibraryItemsHash !==
-                getLibraryItemsHash(nextLibraryItems)
-              ) {
-                await persistLibraryUpdate(adapter, update);
-              }
-            }
-          } catch (error: any) {
-            console.error(
-              `couldn't persist library update: ${error.message}`,
-              update,
-            );
-
-            // currently we only show error if an editor is loaded
-            if (isLoaded && optsRef.current.excalidrawAPI) {
-              optsRef.current.excalidrawAPI.updateScene({
-                appState: {
-                  errorMessage: t("errors.saveLibraryError"),
-                },
-              });
+  useEffect(() => {
+    // on update, merge with current library items and persist
+    // -----------------------------------------------------------------------
+    const unsubOnLibraryUpdate = onLibraryUpdateEmitter.on(
+      async (update, nextLibraryItems) => {
+        const isLoaded = isLibraryLoadedRef.current;
+        // we want to operate with the latest adapter, but we don't want this
+        // effect to rerun on every adapter change in case host apps' adapter
+        // isn't stable
+        const adapter =
+          ("adapter" in optsRef.current && optsRef.current.adapter) || null;
+        try {
+          if (adapter) {
+            if (
+              // if nextLibraryItems hash identical to previously saved hash,
+              // exit early, even if actual upstream state ends up being
+              // different (e.g. has more data than we have locally), as it'd
+              // be low-impact scenario.
+              lastSavedLibraryItemsHash !==
+              getLibraryItemsHash(nextLibraryItems)
+            ) {
+              await persistLibraryUpdate(adapter, update);
             }
           }
-        },
-      );
+        } catch (error: any) {
+          console.error(
+            `couldn't persist library update: ${error.message}`,
+            update,
+          );
 
-      const onUnload = (event: Event) => {
-        if (librarySaveCounter) {
-          preventUnload(event);
+          // currently we only show error if an editor is loaded
+          if (isLoaded && optsRef.current.excalidrawAPI) {
+            optsRef.current.excalidrawAPI.updateScene({
+              appState: {
+                errorMessage: t("errors.saveLibraryError"),
+              },
+            });
+          }
         }
-      };
+      },
+    );
 
-      window.addEventListener(EVENT.BEFORE_UNLOAD, onUnload);
+    const onUnload = (event: Event) => {
+      if (librarySaveCounter) {
+        preventUnload(event);
+      }
+    };
 
-      return () => {
-        window.removeEventListener(EVENT.BEFORE_UNLOAD, onUnload);
-        unsubOnLibraryUpdate();
-        lastSavedLibraryItemsHash = 0;
-        librarySaveCounter = 0;
-      };
-    },
-    [
-      // this effect must not have any deps so it doesn't rerun
-    ],
-  );
+    window.addEventListener(EVENT.BEFORE_UNLOAD, onUnload);
+
+    return () => {
+      window.removeEventListener(EVENT.BEFORE_UNLOAD, onUnload);
+      unsubOnLibraryUpdate();
+      lastSavedLibraryItemsHash = 0;
+      librarySaveCounter = 0;
+    };
+  }, [
+    // this effect must not have any deps so it doesn't rerun
+  ]);
 };
