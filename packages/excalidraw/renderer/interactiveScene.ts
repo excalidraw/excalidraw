@@ -536,14 +536,14 @@ function drawBindingKnob(
   zoom: number,
 ) {
   const scale = hovered ? 1.5 : 1.15;
-  const radius = 5 / zoom;
+  const radius = 4 / zoom;
   const r = radius * scale;
   const fill = hovered ? (themeIsDark ? "#60A5FA" : "#2563EB") : "transparent";
   const innerStroke = "#FFFFFF";
   const outerStroke = "#000000";
 
   ctx.shadowColor = "rgba(0,0,0,0.25)";
-  ctx.shadowBlur = 2 / zoom;
+  ctx.shadowBlur = radius / 2;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 1;
 
@@ -551,7 +551,7 @@ function drawBindingKnob(
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
   ctx.strokeStyle = outerStroke;
-  ctx.lineWidth = 5 / zoom;
+  ctx.lineWidth = radius;
   ctx.stroke();
 
   // Remove shadow for inner details
@@ -564,7 +564,7 @@ function drawBindingKnob(
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
   ctx.strokeStyle = innerStroke;
-  ctx.lineWidth = 2.5 / zoom;
+  ctx.lineWidth = radius / 2;
   ctx.stroke();
 
   // Fill
