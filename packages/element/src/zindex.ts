@@ -160,7 +160,7 @@ export const moveArrowAboveBindable = (
 ): readonly OrderedExcalidrawElement[] => {
   const hoveredElement = hit
     ? hit
-    : getHoveredElementForBinding(point, elements, elementsMap);
+    : getHoveredElementForBinding(arrow, point, elements, elementsMap);
 
   if (!hoveredElement) {
     return elements;
