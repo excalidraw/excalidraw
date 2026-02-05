@@ -115,7 +115,7 @@ export type BindingStrategy =
  *
  * IMPORTANT: currently must be > 0 (this also applies to the computed gap)
  */
-export const BASE_BINDING_GAP = 10;
+export const BASE_BINDING_GAP = 5;
 export const BASE_BINDING_GAP_ELBOW = 5;
 export const FOCUS_POINT_SIZE = 10 / 1.5;
 
