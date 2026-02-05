@@ -181,15 +181,15 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "endBinding": {
     "elementId": "id3",
     "fixedPoint": [
-      "-0.03667",
-      "0.43000",
+      "-0.02000",
+      "0.44667",
     ],
     "mode": "orbit",
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "80.00000",
+  "height": "90.00000",
   "id": "id6",
   "index": "a2",
   "isDeleted": false,
@@ -203,8 +203,8 @@ exports[`move element > rectangles with binding arrow 7`] = `
       0,
     ],
     [
-      "79.00000",
-      "80.00000",
+      89,
+      "90.00000",
     ],
   ],
   "roughness": 1,
@@ -216,8 +216,8 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "startBinding": {
     "elementId": "id0",
     "fixedPoint": [
-      "1.11000",
-      "0.51000",
+      "1.06000",
+      "0.46000",
     ],
     "mode": "orbit",
   },
@@ -228,8 +228,8 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "updated": 1,
   "version": 13,
   "versionNonce": 271613161,
-  "width": "79.00000",
-  "x": "111.00000",
-  "y": "51.00000",
+  "width": 89,
+  "x": 106,
+  "y": "46.00000",
 }
 `;
