@@ -41,7 +41,7 @@ Object.defineProperty(window, "FontFace", {
     private status: string;
     private unicodeRange: string;
 
-    constructor(family, source, descriptors) {
+    constructor(family: string, source: string, descriptors: any) {
       this.family = family;
       this.source = source;
       this.descriptors = descriptors;
@@ -87,7 +87,7 @@ vi.mock(
 
           // read local assets directly, without running a server
           const content = await fs.promises.readFile(url);
-          return content.buffer;
+          return content.buffer as ArrayBuffer;
         }
       },
     };
@@ -108,8 +108,7 @@ console.error = (...args) => {
   if (args[0]?.includes?.("act(")) {
     _consoleError(
       yellow(
-        `<<< WARNING: test "${
-          expect.getState().currentTestName
+        `<<< WARNING: test "${expect.getState().currentTestName
         }" does not wrap some state update in act() >>>`,
       ),
     );

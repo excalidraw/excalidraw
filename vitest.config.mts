@@ -54,7 +54,7 @@ export default defineConfig({
     sequence: {
       hooks: "parallel",
     },
-    setupFiles: ["./setupTests.ts"],
+    setupFiles: [path.resolve(__dirname, "./setupTests.ts")],
     globals: true,
     environment: "jsdom",
     coverage: {
