@@ -385,6 +385,12 @@
     }
   }
 
+  .color-picker__input-error {
+    color: var(--color-danger-dark);
+    font-size: 0.75rem;
+    margin: -4px 8px 8px 12px;
+  }
+
   .color-picker__input-hash {
     padding: 0 0.25rem;
   }
