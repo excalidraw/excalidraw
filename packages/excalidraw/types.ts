@@ -350,6 +350,8 @@ export interface AppState {
   currentHoveredFontFamily: FontFamilyValues | null;
   currentItemRoundness: StrokeRoundness;
   currentItemArrowType: "sharp" | "round" | "elbow";
+  currentItemTextStrokeColor: string | null;
+  currentItemTextStrokeWidth: number;
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
