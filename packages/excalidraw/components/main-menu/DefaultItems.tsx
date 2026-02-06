@@ -9,9 +9,14 @@ import {
   actionLoadScene,
   actionSaveToActiveFile,
   actionShortcuts,
+  actionToggleGridMode,
+  actionToggleObjectsSnapMode,
   actionToggleSearchMenu,
+  actionToggleStats,
   actionToggleTheme,
+  actionToggleZenMode,
 } from "../../actions";
+import { actionToggleViewMode } from "../../actions/actionToggleViewMode";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { trackEvent } from "../../analytics";
 import { useUIAppState } from "../../context/ui-appState";
@@ -23,13 +28,22 @@ import {
   useExcalidrawActionManager,
   useExcalidrawElements,
   useAppProps,
+  useApp,
 } from "../App";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
 import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
 import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
-import { GithubIcon, DiscordIcon, XBrandIcon } from "../icons";
+import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";
+import {
+  GithubIcon,
+  DiscordIcon,
+  XBrandIcon,
+  settingsIcon,
+  checkIcon,
+  emptyIcon,
+} from "../icons";
 import {
   boltIcon,
   DeviceDesktopIcon,
@@ -306,10 +320,14 @@ export const ChangeCanvasBackground = () => {
     return null;
   }
   return (
-    <div style={{ marginTop: "0.5rem" }}>
+    <div style={{ marginTop: "0.75rem" }}>
       <div
         data-testid="canvas-background-label"
-        style={{ fontSize: ".75rem", marginBottom: ".5rem" }}
+        style={{
+          fontSize: "0.875rem",
+          marginBottom: "0.25rem",
+          marginLeft: "0.5rem",
+        }}
       >
         {t("labels.canvasBackground")}
       </div>
@@ -393,3 +411,83 @@ export const LiveCollaborationTrigger = ({
 };
 
 LiveCollaborationTrigger.displayName = "LiveCollaborationTrigger";
+
+export const Preferences = ({ children }: { children?: React.ReactNode }) => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  const app = useApp();
+
+  return (
+    <DropdownMenuSub>
+      <DropdownMenuSub.Trigger icon={settingsIcon}>
+        {t("labels.preferences")}
+      </DropdownMenuSub.Trigger>
+      <DropdownMenuSub.Content className="excalidraw-main-menu-preferences-submenu">
+        <DropdownMenuItem
+          icon={appState.activeTool.locked ? checkIcon : emptyIcon}
+          shortcut={getShortcutFromShortcutName("toolLock")}
+          onSelect={(event) => {
+            app.toggleLock();
+            event.preventDefault();
+          }}
+        >
+          {t("labels.preferences_toolLock")}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          icon={appState.objectsSnapModeEnabled ? checkIcon : emptyIcon}
+          shortcut={getShortcutFromShortcutName("objectsSnapMode")}
+          onSelect={(event) => {
+            actionManager.executeAction(actionToggleObjectsSnapMode);
+            event.preventDefault();
+          }}
+        >
+          {t("buttons.objectsSnapMode")}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          icon={appState.gridModeEnabled ? checkIcon : emptyIcon}
+          shortcut={getShortcutFromShortcutName("gridMode")}
+          onSelect={(event) => {
+            actionManager.executeAction(actionToggleGridMode);
+            event.preventDefault();
+          }}
+        >
+          {t("labels.toggleGrid")}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          icon={appState.zenModeEnabled ? checkIcon : emptyIcon}
+          shortcut={getShortcutFromShortcutName("zenMode")}
+          onSelect={(event) => {
+            actionManager.executeAction(actionToggleZenMode);
+            event.preventDefault();
+          }}
+        >
+          {t("buttons.zenMode")}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          icon={appState.viewModeEnabled ? checkIcon : emptyIcon}
+          shortcut={getShortcutFromShortcutName("viewMode")}
+          onSelect={(event) => {
+            actionManager.executeAction(actionToggleViewMode);
+            event.preventDefault();
+          }}
+        >
+          {t("labels.viewMode")}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          icon={appState.stats.open ? checkIcon : emptyIcon}
+          shortcut={getShortcutFromShortcutName("stats")}
+          onSelect={(event) => {
+            actionManager.executeAction(actionToggleStats);
+            event.preventDefault();
+          }}
+        >
+          {t("stats.fullTitle")}
+        </DropdownMenuItem>
+        {children}
+      </DropdownMenuSub.Content>
+    </DropdownMenuSub>
+  );
+};
+
+Preferences.displayName = "Preferences";

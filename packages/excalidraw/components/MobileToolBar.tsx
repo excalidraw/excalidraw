@@ -375,7 +375,7 @@ export const MobileToolBar = ({
       )}
 
       {/* Other Shapes */}
-      <DropdownMenu open={isOtherShapesMenuOpen} placement="top">
+      <DropdownMenu open={isOtherShapesMenuOpen}>
         <DropdownMenu.Trigger
           className={clsx(
             "App-toolbar__extra-tools-trigger App-toolbar__extra-tools-trigger--mobile",
@@ -403,6 +403,7 @@ export const MobileToolBar = ({
           onClickOutside={() => setIsOtherShapesMenuOpen(false)}
           onSelect={() => setIsOtherShapesMenuOpen(false)}
           className="App-toolbar__extra-tools-dropdown"
+          align="start"
         >
           {!showTextToolOutside && (
             <DropdownMenu.Item
