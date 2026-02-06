@@ -12,8 +12,10 @@ import type { Theme } from "@excalidraw/element/types";
 
 import { LanguageList } from "../app-language/LanguageList";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
+import { isGoogleDriveEnabled } from "../data/google-drive";
 
 import { saveDebugState } from "./DebugCanvas";
+import { GoogleDriveIcon } from "./google-drive";
 
 export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
@@ -22,13 +24,34 @@ export const AppMainMenu: React.FC<{
   theme: Theme | "system";
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
+  onOpenFromGoogleDrive?: () => void;
+  onSaveToGoogleDrive?: () => void;
 }> = React.memo((props) => {
+  const showGoogleDrive = isGoogleDriveEnabled();
+
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
       <MainMenu.DefaultItems.SaveToActiveFile />
       <MainMenu.DefaultItems.Export />
       <MainMenu.DefaultItems.SaveAsImage />
+      {showGoogleDrive && (
+        <>
+          <MainMenu.Separator />
+          <MainMenu.Item
+            icon={<GoogleDriveIcon />}
+            onClick={props.onOpenFromGoogleDrive}
+          >
+            Open from Google Drive
+          </MainMenu.Item>
+          <MainMenu.Item
+            icon={<GoogleDriveIcon />}
+            onClick={props.onSaveToGoogleDrive}
+          >
+            Save to Google Drive
+          </MainMenu.Item>
+        </>
+      )}
       {props.isCollabEnabled && (
         <MainMenu.DefaultItems.LiveCollaborationTrigger
           isCollaborating={props.isCollaborating}
