@@ -46,6 +46,7 @@ export const AppMainMenu: React.FC<{
           import.meta.env.VITE_APP_PLUS_LP
         }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}
         className=""
+        aria-label="Excalidraw+"
       >
         Excalidraw+
       </MainMenu.ItemLink>
@@ -56,12 +57,14 @@ export const AppMainMenu: React.FC<{
           isExcalidrawPlusSignedUser ? "" : "/sign-up"
         }?utm_source=signin&utm_medium=app&utm_content=hamburger`}
         className="highlighted"
+        aria-label={isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
       >
         {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
       </MainMenu.ItemLink>
       {isDevEnv() && (
         <MainMenu.Item
           icon={eyeIcon}
+          aria-label="Visual Debug"
           onClick={() => {
             if (window.visualDebug) {
               delete window.visualDebug;
