@@ -2600,7 +2600,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState((prevAppState) => {
         const actionAppState = actionResult.appState || {};
 
-        return {
+        const nextState = {
           ...prevAppState,
           ...actionAppState,
           // NOTE this will prevent opening context menu using an action
@@ -2613,6 +2613,11 @@ class App extends React.Component<AppProps, AppState> {
           theme,
           name,
           errorMessage,
+        };
+
+        return {
+          ...nextState,
+          currentItemStyles: this.syncCurrentItemStyles(nextState as AppState),
         };
       });
 
@@ -5209,6 +5214,65 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
+  private getStyleKey = (tool: ToolType | string): string => {
+    if (
+      tool === "rectangle" ||
+      tool === "diamond" ||
+      tool === "ellipse" ||
+      tool === "frame" ||
+      tool === "magicframe"
+    ) {
+      return "shapes";
+    }
+    if (tool === "line" || tool === "arrow") {
+      return "lines";
+    }
+    return tool;
+  };
+
+  private syncCurrentItemStyles = (
+    appState: AppState,
+    toolKey?: ToolType | string,
+  ): AppState["currentItemStyles"] => {
+    const tool =
+      toolKey ||
+      (appState.activeTool.type === "custom"
+        ? appState.activeTool.customType
+        : appState.activeTool.type);
+
+    const key = this.getStyleKey(tool);
+
+    // Skip non-drawing tools
+    if (
+      key === "selection" ||
+      key === "lasso" ||
+      key === "eraser" ||
+      key === "hand"
+    ) {
+      return appState.currentItemStyles;
+    }
+
+    return {
+      ...appState.currentItemStyles,
+      [key]: {
+        currentItemStrokeColor: appState.currentItemStrokeColor,
+        currentItemBackgroundColor: appState.currentItemBackgroundColor,
+        currentItemFillStyle: appState.currentItemFillStyle,
+        currentItemStrokeWidth: appState.currentItemStrokeWidth,
+        currentItemStrokeStyle: appState.currentItemStrokeStyle,
+        currentItemRoughness: appState.currentItemRoughness,
+        currentItemOpacity: appState.currentItemOpacity,
+        currentItemFontFamily: appState.currentItemFontFamily,
+        currentItemFontSize: appState.currentItemFontSize,
+        currentItemTextAlign: appState.currentItemTextAlign,
+        currentItemStartArrowhead: appState.currentItemStartArrowhead,
+        currentItemEndArrowhead: appState.currentItemEndArrowhead,
+        currentItemRoundness: appState.currentItemRoundness,
+        currentItemArrowType: appState.currentItemArrowType,
+      },
+    };
+  };
+
   setActiveTool = (
     tool: ({ type: ToolType } | { type: "custom"; customType: string }) & {
       locked?: boolean;
@@ -5224,6 +5288,20 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const nextActiveTool = updateActiveTool(this.state, tool);
+
+    const prevToolKey =
+      this.state.activeTool.type === "custom"
+        ? this.state.activeTool.customType
+        : this.state.activeTool.type;
+    const nextToolKey =
+      nextActiveTool.type === "custom"
+        ? nextActiveTool.customType
+        : nextActiveTool.type;
+
+    const nextToolStyles = this.state.isStyleSettingsLocked
+      ? {}
+      : this.state.currentItemStyles[this.getStyleKey(nextToolKey)] || {};
+
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
     } else if (!isHoldingSpace) {
@@ -5261,6 +5339,8 @@ class App extends React.Component<AppProps, AppState> {
           ...prevState,
           ...commonResets,
           activeTool: nextActiveTool,
+          currentItemStyles: this.syncCurrentItemStyles(prevState, prevToolKey),
+          ...nextToolStyles,
           ...(keepSelection
             ? {}
             : {
@@ -5275,6 +5355,8 @@ class App extends React.Component<AppProps, AppState> {
           ...prevState,
           ...commonResets,
           activeTool: nextActiveTool,
+          currentItemStyles: this.syncCurrentItemStyles(prevState, prevToolKey),
+          ...nextToolStyles,
           selectedElementIds: makeNextSelectedElementIds({}, prevState),
           selectedGroupIds: makeNextSelectedElementIds({}, prevState),
           editingGroupId: null,
@@ -5285,6 +5367,8 @@ class App extends React.Component<AppProps, AppState> {
         ...prevState,
         ...commonResets,
         activeTool: nextActiveTool,
+        currentItemStyles: this.syncCurrentItemStyles(prevState, prevToolKey),
+        ...nextToolStyles,
       };
     });
   };

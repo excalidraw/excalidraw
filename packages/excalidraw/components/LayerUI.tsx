@@ -124,6 +124,7 @@ const DefaultMainMenu: React.FC<{
       </MainMenu.Group>
       <MainMenu.Separator />
       <MainMenu.DefaultItems.ToggleTheme />
+      <MainMenu.DefaultItems.ToggleStyleSettingsLock />
       <MainMenu.DefaultItems.ChangeCanvasBackground />
     </MainMenu>
   );

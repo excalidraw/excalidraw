@@ -43,6 +43,8 @@ import {
   SunIcon,
   TrashIcon,
   usersIcon,
+  LockedIcon,
+  UnlockedIcon,
 } from "../icons";
 
 import "./DefaultItems.scss";
@@ -292,6 +294,28 @@ export const ToggleTheme = (
   );
 };
 ToggleTheme.displayName = "ToggleTheme";
+
+export const ToggleStyleSettingsLock = () => {
+  const { t } = useI18n();
+  const appState = useUIAppState();
+  const setAppState = useExcalidrawSetAppState();
+
+  return (
+    <DropdownMenuItem
+      onSelect={(event) => {
+        event.preventDefault();
+        setAppState({ isStyleSettingsLocked: !appState.isStyleSettingsLocked });
+      }}
+      icon={appState.isStyleSettingsLocked ? UnlockedIcon : LockedIcon}
+      data-testid="toggle-style-settings-lock"
+    >
+      {appState.isStyleSettingsLocked
+        ? t("labels.unlockStyleSettings")
+        : t("labels.lockStyleSettings")}
+    </DropdownMenuItem>
+  );
+};
+ToggleStyleSettingsLock.displayName = "ToggleStyleSettingsLock";
 
 export const ChangeCanvasBackground = () => {
   const { t } = useI18n();
