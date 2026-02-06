@@ -300,7 +300,6 @@ export interface AppState {
    */
   selectionElement: NonDeletedExcalidrawElement | null;
   isBindingEnabled: boolean;
-  startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBinding: NonDeleted<ExcalidrawBindableElement> | null;
   frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
   frameRendering: {
