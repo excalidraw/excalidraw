@@ -296,7 +296,7 @@ export const getAllHoveredElementAtPoint = (
   tolerance?: number,
 ): NonDeleted<ExcalidrawBindableElement>[] => {
   const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
-  // We need to to hit testing from front (end of the array) to back (beginning of the array)
+  // We need to hit testing from front (end of the array) to back (beginning of the array)
   // because array is ordered from lower z-index to highest and we want element z-index
   // with higher z-index
   for (let index = elements.length - 1; index >= 0; --index) {
