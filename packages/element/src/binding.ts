@@ -810,11 +810,13 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     elementsMap,
   );
 
-  const other: BindingStrategy =
-    otherBindableElement &&
-    !otherFocusPointIsInElement &&
-    (otherBinding?.mode !== "inside" || opts?.newArrow) &&
-    appState.selectedLinearElement?.initialState.altFocusPoint
+  const otherNeverOverride = opts?.newArrow
+    ? appState.selectedLinearElement?.initialState.arrowStartIsInside
+    : otherBinding?.mode === "inside";
+  const other: BindingStrategy = !otherNeverOverride
+    ? otherBindableElement &&
+      !otherFocusPointIsInElement &&
+      appState.selectedLinearElement?.initialState.altFocusPoint
       ? {
           mode: "orbit",
           element: otherBindableElement,
@@ -833,7 +835,8 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
               elementsMap,
             ) || otherEndpoint,
         }
-      : { mode: undefined };
+      : { mode: undefined }
+    : { mode: undefined };
 
   return {
     start: startDragged ? current : other,
