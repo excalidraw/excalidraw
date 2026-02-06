@@ -41,9 +41,13 @@ import type { MaybePromise } from "@excalidraw/common/utility-types";
 
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 
+import { googleDriveAuthAtom, currentBoardIdAtom } from "../app-jotai";
+
 import { FileManager } from "./FileManager";
 import { Locker } from "./Locker";
 import { updateBrowserStateVersion } from "./tabSync";
+import { GoogleDriveStorage } from "./GoogleDriveStorage";
+import { saveToBoardLocalStorage } from "./localStorage";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -72,6 +76,7 @@ class LocalFileManager extends FileManager {
 const saveDataStateToLocalStorage = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  boardId: string | null = null,
 ) => {
   const localStorageQuotaExceeded = appJotaiStore.get(
     localStorageQuotaExceededAtom,
@@ -86,14 +91,23 @@ const saveDataStateToLocalStorage = (
       _appState.openSidebar = null;
     }
 
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(getNonDeletedElements(elements)),
-    );
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
-      JSON.stringify(_appState),
-    );
+    // Use board-specific storage if boardId is provided, otherwise use shared storage
+    if (boardId) {
+      saveToBoardLocalStorage(
+        getNonDeletedElements(elements),
+        appState, // Pass full appState, not _appState
+        boardId,
+      );
+    } else {
+      localStorage.setItem(
+        STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
+        JSON.stringify(getNonDeletedElements(elements)),
+      );
+      localStorage.setItem(
+        STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
+        JSON.stringify(_appState),
+      );
+    }
     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
     if (localStorageQuotaExceeded) {
       appJotaiStore.set(localStorageQuotaExceededAtom, false);
@@ -114,6 +128,11 @@ const isQuotaExceededError = (error: any) => {
 type SavingLockTypes = "collaboration";
 
 export class LocalData {
+  // Track the last save promise to wait for completion
+  private static lastSavePromise: Promise<void> | null = null;
+  // Track background Google Drive sync promise
+  private static backgroundSyncPromise: Promise<void> | null = null;
+
   private static _save = debounce(
     async (
       elements: readonly ExcalidrawElement[],
@@ -121,13 +140,50 @@ export class LocalData {
       files: BinaryFiles,
       onFilesSaved: () => void,
     ) => {
-      saveDataStateToLocalStorage(elements, appState);
+      // Create a promise for this save operation
+      const savePromise = (async () => {
+        // Get current board ID for board-specific storage
+        const currentBoardId = appJotaiStore.get(currentBoardIdAtom);
+        const auth = appJotaiStore.get(googleDriveAuthAtom);
 
-      await this.fileStorage.saveFiles({
-        elements,
-        files,
-      });
-      onFilesSaved();
+        // ALWAYS save to localStorage first for reliability and speed
+        // Use board-specific key if authenticated and board is selected
+        // Otherwise use shared localStorage (default canvas)
+        const boardIdForStorage =
+          auth.isAuthenticated && currentBoardId ? currentBoardId : null;
+        saveDataStateToLocalStorage(elements, appState, boardIdForStorage);
+
+        // Save files (images) to local storage
+        await this.fileStorage.saveFiles({
+          elements,
+          files,
+        });
+
+        // Call onFilesSaved immediately after localStorage save
+        onFilesSaved();
+
+        // Then sync to Google Drive in the background (non-blocking)
+        if (GoogleDriveStorage.isActive()) {
+          // Don't await this - let it run in background
+          this.backgroundSyncPromise = (async () => {
+            try {
+              await GoogleDriveStorage.save(elements, appState, files);
+            } catch (error) {
+              console.error(
+                "Background Google Drive sync failed (data is safe in localStorage):",
+                error,
+              );
+              // Don't throw - data is already saved to localStorage
+            }
+          })();
+        }
+      })();
+
+      // Track this save promise
+      this.lastSavePromise = savePromise;
+
+      // Wait for localStorage save to complete
+      await savePromise;
     },
     SAVE_TO_LOCAL_STORAGE_TIMEOUT,
   );
@@ -145,9 +201,31 @@ export class LocalData {
     }
   };
 
-  static flushSave = () => {
+  /**
+   * Flush pending saves and wait for them to complete
+   * Returns a promise that resolves when localStorage saves are complete
+   * Google Drive sync continues in background
+   */
+  static async flushSave(): Promise<void> {
+    // Flush the debounced save (this triggers immediate execution if pending)
     this._save.flush();
-  };
+
+    // Wait for the last save promise to complete (localStorage save)
+    if (this.lastSavePromise) {
+      await this.lastSavePromise;
+    }
+
+    // Optionally wait for background Google Drive sync (with timeout)
+    if (GoogleDriveStorage.isActive() && this.backgroundSyncPromise) {
+      // Wait up to 2 seconds for Google Drive sync, then continue
+      await Promise.race([
+        this.backgroundSyncPromise,
+        new Promise((resolve) => setTimeout(resolve, 2000)),
+      ]).catch(() => {
+        // Ignore errors - data is already in localStorage
+      });
+    }
+  }
 
   private static locker = new Locker<SavingLockTypes>();
 

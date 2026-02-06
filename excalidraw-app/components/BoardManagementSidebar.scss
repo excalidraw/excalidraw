@@ -1,0 +1,283 @@
+.excalidraw {
+  .board-management {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 1rem;
+
+    .board-management-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--sidebar-border-color);
+
+      h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary-color);
+      }
+
+      .board-management-new-board-button {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        background-color: var(--button-bg, var(--island-bg-color));
+        border: 1px solid var(--sidebar-border-color);
+        border-radius: var(--border-radius-lg);
+        transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        color: var(--text-primary-color);
+
+        &:hover:not(:disabled) {
+          background-color: var(--button-hover-bg, var(--island-bg-color));
+          border-color: var(--color-primary);
+          color: var(--color-primary);
+        }
+
+        &:active:not(:disabled) {
+          background-color: var(--button-active-bg, var(--island-bg-color));
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .board-management-new-board-button-content {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+          font-weight: 500;
+
+          svg {
+            width: 1rem;
+            height: 1rem;
+            flex-shrink: 0;
+          }
+        }
+      }
+    }
+
+    .board-management-list {
+      flex: 1 1 auto;
+      overflow-y: auto;
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .board-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        margin-bottom: 0.25rem;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: var(--sidebar-bg-color-hover);
+        }
+
+        &.active {
+          background-color: var(--color-primary-light);
+          color: var(--color-primary-darker);
+        }
+
+        .board-item-button {
+          flex: 1 1 auto;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          background: none;
+          border: none;
+          padding: 0;
+          cursor: pointer;
+          text-align: left;
+          color: inherit;
+          font-size: 0.875rem;
+
+          svg {
+            width: 1rem;
+            height: 1rem;
+            flex-shrink: 0;
+          }
+
+          .board-item-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+
+        .board-item-actions {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          flex-shrink: 0;
+        }
+
+        .board-item-rename,
+        .board-item-delete {
+          background: none;
+          border: none;
+          padding: 0.25rem;
+          cursor: pointer;
+          opacity: 0.7;
+          transition: opacity 0.2s, color 0.2s;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &:hover {
+            opacity: 1;
+          }
+
+          svg {
+            width: 1rem;
+            height: 1rem;
+          }
+        }
+
+        .board-item-rename {
+          color: var(--icon-fill-color);
+
+          &:hover {
+            color: var(--color-primary);
+          }
+        }
+
+        .board-item-delete {
+          color: var(--color-danger);
+
+          &:hover {
+            color: var(--color-danger);
+          }
+        }
+      }
+    }
+
+    .board-management-empty,
+    .board-management-empty-list {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--text-secondary-color);
+      gap: 1rem;
+
+      svg {
+        width: 3rem;
+        height: 3rem;
+        opacity: 0.5;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.875rem;
+      }
+
+      .board-management-signin-button {
+        margin-top: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        background-color: var(--button-bg, var(--island-bg-color));
+        border: 1px solid var(--sidebar-border-color);
+        border-radius: var(--border-radius-lg);
+        transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        color: var(--text-primary-color);
+        min-width: 200px;
+
+        &:hover {
+          background-color: var(--button-hover-bg, var(--island-bg-color));
+          border-color: var(--color-primary);
+          color: var(--color-primary);
+        }
+
+        &:active {
+          background-color: var(--button-active-bg, var(--island-bg-color));
+        }
+
+        .board-management-signin-button-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          font-weight: 500;
+
+          svg {
+            width: 1rem;
+            height: 1rem;
+            flex-shrink: 0;
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+    .board-management-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--sidebar-border-color);
+      margin-top: auto;
+
+      .board-management-user {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 0;
+
+        .board-management-user-email {
+          font-size: 0.75rem;
+          color: var(--text-secondary-color);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          max-width: 100%;
+        }
+      }
+
+      .board-management-logout-button {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--text-primary-color);
+        background-color: var(--button-bg, var(--island-bg-color));
+        border: 1px solid var(--sidebar-border-color);
+        border-radius: var(--border-radius-lg);
+        transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+
+        &:hover {
+          background-color: var(--button-hover-bg, var(--island-bg-color));
+          border-color: var(--color-danger);
+          color: var(--color-danger);
+        }
+
+        &:active {
+          background-color: var(--button-active-bg, var(--island-bg-color));
+        }
+
+        svg {
+          width: 1rem;
+          height: 1rem;
+          flex-shrink: 0;
+        }
+
+        span {
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
