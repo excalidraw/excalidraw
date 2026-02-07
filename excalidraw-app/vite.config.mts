@@ -239,6 +239,10 @@ export default defineConfig(({ mode }) => {
               action: "/",
               accept: {
                 "application/vnd.excalidraw+json": [".excalidraw"],
+                "application/vnd.excalidraw+png": [".excalidraw.png"],
+                "application/vnd.excalidraw+svg": [".excalidraw.svg"],
+                "image/png": [".png"],
+                "image/svg+xml": [".svg"],
               },
             },
           ],
@@ -252,8 +256,12 @@ export default defineConfig(({ mode }) => {
                   name: "file",
                   accept: [
                     "application/vnd.excalidraw+json",
+                    "application/vnd.excalidraw+png",
+                    "application/vnd.excalidraw+svg",
                     "application/json",
                     ".excalidraw",
+                    ".excalidraw.png",
+                    ".excalidraw.svg",
                   ],
                 },
               ],
