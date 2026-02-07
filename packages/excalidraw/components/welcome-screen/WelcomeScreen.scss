@@ -46,7 +46,7 @@
       display: flex;
       position: absolute;
       right: 0;
-      bottom: 100%;
+      bottom: calc(100% + 24px);
 
       :root[dir="rtl"] & {
         left: 0;

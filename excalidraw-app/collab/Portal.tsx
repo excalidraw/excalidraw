@@ -8,6 +8,8 @@ import type { UserIdleState } from "@excalidraw/common";
 import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
 import type {
   OnUserFollowedPayload,
+  PollVotePayload,
+  AppState,
   SocketId,
 } from "@excalidraw/excalidraw/types";
 
@@ -47,10 +49,12 @@ class Portal {
       }
     });
     this.socket.on("new-user", async (_socketId: string) => {
+      const appState = this.collab.excalidrawAPI.getAppState();
       this.broadcastScene(
         WS_SUBTYPES.INIT,
         this.collab.getSceneElementsIncludingDeleted(),
         /* syncAll */ true,
+        { polls: appState.polls },
       );
     });
     this.socket.on("room-user-change", (clients: SocketId[]) => {
@@ -143,6 +147,7 @@ class Portal {
     updateType: WS_SUBTYPES.INIT | WS_SUBTYPES.UPDATE,
     elements: readonly OrderedExcalidrawElement[],
     syncAll: boolean,
+    appState?: Pick<AppState, "polls">,
   ) => {
     if (updateType === WS_SUBTYPES.INIT && !syncAll) {
       throw new Error("syncAll must be true when sending SCENE.INIT");
@@ -167,6 +172,7 @@ class Portal {
       type: updateType,
       payload: {
         elements: syncableElements,
+        ...(appState ? { appState } : {}),
       },
     };
 
@@ -251,6 +257,15 @@ class Portal {
     if (this.socket?.id) {
       this.socket.emit(WS_EVENTS.USER_FOLLOW_CHANGE, payload);
     }
+  };
+
+  broadcastPollVote = (payload: PollVotePayload) => {
+    const data: SocketUpdateDataSource["POLL_VOTE"] = {
+      type: WS_SUBTYPES.POLL_VOTE,
+      payload,
+    };
+
+    return this._broadcastSocketData(data as SocketUpdateData);
   };
 }
 

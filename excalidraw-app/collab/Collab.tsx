@@ -43,11 +43,13 @@ import type {
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 import type {
+  AppState,
   BinaryFileData,
   ExcalidrawImperativeAPI,
   SocketId,
   Collaborator,
   Gesture,
+  PollVotePayload,
 } from "@excalidraw/excalidraw/types";
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
@@ -118,6 +120,7 @@ export interface CollabAPI {
   stopCollaboration: CollabInstance["stopCollaboration"];
   syncElements: CollabInstance["syncElements"];
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
+  broadcastPollVote: CollabInstance["broadcastPollVote"];
   setUsername: CollabInstance["setUsername"];
   getUsername: CollabInstance["getUsername"];
   getActiveRoomLink: CollabInstance["getActiveRoomLink"];
@@ -231,6 +234,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       startCollaboration: this.startCollaboration,
       syncElements: this.syncElements,
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
+      broadcastPollVote: this.broadcastPollVote,
       stopCollaboration: this.stopCollaboration,
       setUsername: this.setUsername,
       getUsername: this.getUsername,
@@ -313,7 +317,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   saveCollabRoomToFirebase = async (
     syncableElements: readonly SyncableExcalidrawElement[],
   ) => {
-    syncableElements = cloneJSON(syncableElements);
     try {
       const storedElements = await saveToFirebase(
         this.portal,
@@ -582,15 +585,15 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           case WS_SUBTYPES.INIT: {
             if (!this.portal.socketInitialized) {
               this.initializeRoom({ fetchScene: false });
-              const remoteElements = toBrandedType<
-                readonly RemoteExcalidrawElement[]
-              >(decryptedData.payload.elements);
+              const { elements: remoteElements, appState } =
+                decryptedData.payload;
               const reconciledElements =
                 this._reconcileElements(remoteElements);
-              this.handleRemoteSceneUpdate(reconciledElements);
+              this.handleRemoteSceneUpdate(reconciledElements, appState);
               // noop if already resolved via init from firebase
               scenePromise.resolve({
                 elements: reconciledElements,
+                appState,
                 scrollToContent: true,
               });
             }
@@ -598,11 +601,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           }
           case WS_SUBTYPES.UPDATE:
             this.handleRemoteSceneUpdate(
-              this._reconcileElements(
-                toBrandedType<readonly RemoteExcalidrawElement[]>(
-                  decryptedData.payload.elements,
-                ),
-              ),
+              this._reconcileElements(decryptedData.payload.elements),
+              decryptedData.payload.appState,
             );
             break;
           case WS_SUBTYPES.MOUSE_LOCATION: {
@@ -666,6 +666,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
             });
             break;
           }
+          case WS_SUBTYPES.POLL_VOTE: {
+            this.excalidrawAPI.applyPollVote(decryptedData.payload);
+            break;
+          }
 
           default: {
             assertNever(decryptedData, null);
@@ -723,18 +727,20 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.excalidrawAPI.resetScene();
 
       try {
-        const elements = await loadFromFirebase(
+        const sceneData = await loadFromFirebase(
           roomLinkData.roomId,
           roomLinkData.roomKey,
           this.portal.socket,
         );
-        if (elements) {
+        if (sceneData) {
+          const { elements, appState } = sceneData;
           this.setLastBroadcastedOrReceivedSceneVersion(
             getSceneVersion(elements),
           );
 
           return {
             elements,
+            appState,
             scrollToContent: true,
           };
         }
@@ -751,26 +757,18 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   private _reconcileElements = (
-    remoteElements: readonly RemoteExcalidrawElement[],
+    remoteElements: readonly ExcalidrawElement[],
   ): ReconciledExcalidrawElement[] => {
+    const localElements = this.getSceneElementsIncludingDeleted();
     const appState = this.excalidrawAPI.getAppState();
-
-    const existingElements = this.getSceneElementsIncludingDeleted();
-
-    // NOTE ideally we restore _after_ reconciliation but we can't do that
-    // as we'd regenerate even elements such as appState.newElement which would
-    // break the state
-    remoteElements = restoreElements(remoteElements, existingElements);
-
-    let reconciledElements = reconcileElements(
-      existingElements,
+    const restoredRemoteElements = restoreElements(
       remoteElements,
-      appState,
+      this.excalidrawAPI.getSceneElementsMapIncludingDeleted(),
     );
-
-    reconciledElements = bumpElementVersions(
-      reconciledElements,
-      existingElements,
+    const reconciledElements = reconcileElements(
+      localElements,
+      restoredRemoteElements as RemoteExcalidrawElement[],
+      appState,
     );
 
     // Avoid broadcasting to the rest of the collaborators the scene
@@ -801,9 +799,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   private handleRemoteSceneUpdate = (
     elements: ReconciledExcalidrawElement[],
+    appState?: Pick<AppState, "polls">,
   ) => {
     this.excalidrawAPI.updateScene({
       elements,
+      appState,
       captureUpdate: CaptureUpdateAction.NEVER,
     });
 
@@ -937,6 +937,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   onIdleStateChange = (userState: UserIdleState) => {
     this.portal.broadcastIdleChange(userState);
+  };
+
+  broadcastPollVote = (payload: PollVotePayload) => {
+    this.portal.broadcastPollVote(payload);
   };
 
   broadcastElements = (elements: readonly OrderedExcalidrawElement[]) => {
