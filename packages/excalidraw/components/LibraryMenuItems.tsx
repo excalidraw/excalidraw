@@ -17,9 +17,14 @@ import { deburr } from "../deburr";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { useScrollPosition } from "../hooks/useScrollPosition";
 import { t } from "../i18n";
+import { libraryCollectionsAtom } from "../data/library";
+import { useAtom } from "../editor-jotai";
 
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
-import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
+import {
+  CollectionHeaderDropdown,
+  LibraryDropdownMenu,
+} from "./LibraryMenuHeaderContent";
 import {
   LibraryMenuSection,
   LibraryMenuSectionGrid,
@@ -32,9 +37,10 @@ import "./LibraryMenuItems.scss";
 
 import { TextField } from "./TextField";
 
-import { useEditorInterface } from "./App";
+import { useApp, useEditorInterface, useExcalidrawSetAppState } from "./App";
 
 import { Button } from "./Button";
+import { collapseDownIcon, collapseUpIcon } from "./icons";
 
 import type { ExcalidrawLibraryIds } from "../data/types";
 
@@ -52,6 +58,12 @@ const ITEMS_RENDERED_PER_BATCH = 17;
 // speed it up
 const CACHED_ITEMS_RENDERED_PER_BATCH = 64;
 
+const COLLECTION_COLLAPSE_STATE_KEY =
+  "excalidraw-library-collection-collapse-state";
+const PERSONAL_LIBRARY_COLLAPSE_KEY = "excalidraw-library-personal-collapsed";
+const EXCALIDRAW_LIBRARY_COLLAPSE_KEY =
+  "excalidraw-library-excalidraw-collapsed";
+
 export default function LibraryMenuItems({
   isLoading,
   libraryItems,
@@ -68,13 +80,18 @@ export default function LibraryMenuItems({
   libraryItems: LibraryItems;
   pendingElements: LibraryItem["elements"];
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
-  onAddToLibrary: (elements: LibraryItem["elements"]) => void;
+  onAddToLibrary: (
+    elements: LibraryItem["elements"],
+    collectionId?: string,
+  ) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   theme: UIAppState["theme"];
   id: string;
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
 }) {
+  const app = useApp();
+  const setAppState = useExcalidrawSetAppState();
   const editorInterface = useEditorInterface();
   const libraryContainerRef = useRef<HTMLDivElement>(null);
   const scrollPosition = useScrollPosition<HTMLDivElement>(libraryContainerRef);
@@ -92,6 +109,107 @@ export default function LibraryMenuItems({
   >(null);
 
   const [searchInputValue, setSearchInputValue] = useState("");
+
+  // Load Personal Library collapse state
+  const [isPersonalLibraryCollapsed, setIsPersonalLibraryCollapsed] = useState(
+    () => {
+      try {
+        const saved = localStorage.getItem(PERSONAL_LIBRARY_COLLAPSE_KEY);
+        return saved === "true";
+      } catch (error) {
+        console.warn("Failed to load personal library collapse state:", error);
+        return false;
+      }
+    },
+  );
+
+  // Load Excalidraw Library collapse state
+  const [isExcalidrawLibraryCollapsed, setIsExcalidrawLibraryCollapsed] =
+    useState(() => {
+      try {
+        const saved = localStorage.getItem(EXCALIDRAW_LIBRARY_COLLAPSE_KEY);
+        return saved === "true";
+      } catch (error) {
+        console.warn(
+          "Failed to load excalidraw library collapse state:",
+          error,
+        );
+        return false;
+      }
+    });
+
+  const [libraryCollections] = useAtom(libraryCollectionsAtom);
+
+  // Load library collections collapse state
+  const [customCollectionCollapsed, setCustomCollectionCollapsed] = useState<
+    Record<string, boolean>
+  >(() => {
+    try {
+      const saved = localStorage.getItem(COLLECTION_COLLAPSE_STATE_KEY);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.warn("Failed to load collection collapse state:", error);
+    }
+    return {};
+  });
+
+  // Save Personal Library collapse state to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        PERSONAL_LIBRARY_COLLAPSE_KEY,
+        String(isPersonalLibraryCollapsed),
+      );
+    } catch (error) {
+      console.warn("Failed to save personal library collapse state:", error);
+    }
+  }, [isPersonalLibraryCollapsed]);
+
+  // Save Excalidraw Library collapse state to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        EXCALIDRAW_LIBRARY_COLLAPSE_KEY,
+        String(isExcalidrawLibraryCollapsed),
+      );
+    } catch (error) {
+      console.warn("Failed to save excalidraw library collapse state:", error);
+    }
+  }, [isExcalidrawLibraryCollapsed]);
+
+  // Save library collections collapse state to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        COLLECTION_COLLAPSE_STATE_KEY,
+        JSON.stringify(customCollectionCollapsed),
+      );
+    } catch (error) {
+      console.warn("Failed to save collection collapse state:", error);
+    }
+  }, [customCollectionCollapsed]);
+
+  // Clean up stale library collections IDs from localStorage
+  useEffect(() => {
+    const collectionIds = new Set(libraryCollections.map((c) => c.id));
+    const hasStaleKeys = Object.keys(customCollectionCollapsed).some(
+      (id) => !collectionIds.has(id),
+    );
+
+    if (hasStaleKeys) {
+      setCustomCollectionCollapsed((prev) => {
+        const cleaned: Record<string, boolean> = {};
+        for (const id of collectionIds) {
+          if (prev[id] !== undefined) {
+            cleaned[id] = prev[id];
+          }
+        }
+        return cleaned;
+      });
+    }
+  }, [libraryCollections, customCollectionCollapsed]);
 
   const IS_LIBRARY_EMPTY = !libraryItems.length && !pendingElements.length;
 
@@ -111,9 +229,27 @@ export default function LibraryMenuItems({
     });
   }, [libraryItems, searchInputValue]);
 
+  // Get items for each collection
+  const collectionItems = useMemo(() => {
+    const itemsMap: Record<string, LibraryItems> = {};
+    libraryCollections.forEach((collection) => {
+      itemsMap[collection.id] = libraryItems.filter(
+        (item) => item.collectionId === collection.id,
+      );
+    });
+    return itemsMap;
+  }, [libraryCollections, libraryItems]);
+
+  // Unpublished items that don't belong to any collection
   const unpublishedItems = useMemo(
-    () => libraryItems.filter((item) => item.status !== "published"),
-    [libraryItems],
+    () =>
+      libraryItems.filter(
+        (item) =>
+          item.status !== "published" &&
+          (!item.collectionId ||
+            !libraryCollections.some((c) => c.id === item.collectionId)),
+      ),
+    [libraryItems, libraryCollections],
   );
 
   const publishedItems = useMemo(
@@ -124,7 +260,15 @@ export default function LibraryMenuItems({
   const onItemSelectToggle = useCallback(
     (id: LibraryItem["id"], event: React.MouseEvent) => {
       const shouldSelect = !selectedItems.includes(id);
-      const orderedItems = [...unpublishedItems, ...publishedItems];
+      // Build ordered items list: unpublished, then collections, then published
+      const collectionItemsList = libraryCollections.flatMap(
+        (collection) => collectionItems[collection.id] || [],
+      );
+      const orderedItems = [
+        ...unpublishedItems,
+        ...collectionItemsList,
+        ...publishedItems,
+      ];
       if (shouldSelect) {
         if (event.shiftKey && lastSelectedItem) {
           const rangeStart = orderedItems.findIndex(
@@ -169,6 +313,8 @@ export default function LibraryMenuItems({
       publishedItems,
       selectedItems,
       unpublishedItems,
+      libraryCollections,
+      collectionItems,
     ],
   );
 
@@ -231,9 +377,12 @@ export default function LibraryMenuItems({
     [selectedItems],
   );
 
-  const onAddToLibraryClick = useCallback(() => {
-    onAddToLibrary(pendingElements);
-  }, [pendingElements, onAddToLibrary]);
+  const onAddToLibraryClick = useCallback(
+    (collectionId?: string) => {
+      onAddToLibrary(pendingElements, collectionId);
+    },
+    [pendingElements, onAddToLibrary],
+  );
 
   const onItemClick = useCallback(
     (id: LibraryItem["id"] | null) => {
@@ -262,56 +411,213 @@ export default function LibraryMenuItems({
     <>
       {!IS_LIBRARY_EMPTY && (
         <div className="library-menu-items-container__header">
-          {t("labels.personalLib")}
+          <span
+            onClick={() =>
+              setIsPersonalLibraryCollapsed(!isPersonalLibraryCollapsed)
+            }
+            style={{
+              display: "flex",
+              alignItems: "center",
+              flex: 1,
+              cursor: "pointer",
+            }}
+          >
+            <span>{t("labels.personalLib")}</span>
+            <span className="library-menu-items-container__header__arrow">
+              {isPersonalLibraryCollapsed ? collapseDownIcon : collapseUpIcon}
+            </span>
+          </span>
         </div>
       )}
-      {!pendingElements.length && !unpublishedItems.length ? (
-        <div className="library-menu-items__no-items">
-          {!publishedItems.length && (
-            <div className="library-menu-items__no-items__label">
-              {t("library.noItems")}
+      {!isPersonalLibraryCollapsed &&
+        (!pendingElements.length && !unpublishedItems.length ? (
+          <div className="library-menu-items__no-items">
+            {!publishedItems.length && (
+              <div className="library-menu-items__no-items__label">
+                {t("library.noItems")}
+              </div>
+            )}
+            <div className="library-menu-items__no-items__hint">
+              {publishedItems.length > 0
+                ? t("library.hint_emptyPrivateLibrary")
+                : t("library.hint_emptyLibrary")}
             </div>
-          )}
-          <div className="library-menu-items__no-items__hint">
-            {publishedItems.length > 0
-              ? t("library.hint_emptyPrivateLibrary")
-              : t("library.hint_emptyLibrary")}
           </div>
-        </div>
-      ) : (
-        <LibraryMenuSectionGrid>
-          {pendingElements.length > 0 && (
+        ) : (
+          <LibraryMenuSectionGrid>
+            {pendingElements.length > 0 && (
+              <LibraryMenuSection
+                itemsRenderedPerBatch={itemsRenderedPerBatch}
+                items={[{ id: null, elements: pendingElements }]}
+                onItemSelectToggle={onItemSelectToggle}
+                onItemDrag={onItemDrag}
+                onClick={() => onAddToLibraryClick(undefined)}
+                isItemSelected={isItemSelected}
+                svgCache={svgCache}
+              />
+            )}
             <LibraryMenuSection
               itemsRenderedPerBatch={itemsRenderedPerBatch}
-              items={[{ id: null, elements: pendingElements }]}
+              items={unpublishedItems}
               onItemSelectToggle={onItemSelectToggle}
               onItemDrag={onItemDrag}
-              onClick={onAddToLibraryClick}
+              onClick={onItemClick}
               isItemSelected={isItemSelected}
               svgCache={svgCache}
             />
-          )}
-          <LibraryMenuSection
-            itemsRenderedPerBatch={itemsRenderedPerBatch}
-            items={unpublishedItems}
-            onItemSelectToggle={onItemSelectToggle}
-            onItemDrag={onItemDrag}
-            onClick={onItemClick}
-            isItemSelected={isItemSelected}
-            svgCache={svgCache}
-          />
-        </LibraryMenuSectionGrid>
-      )}
+          </LibraryMenuSectionGrid>
+        ))}
+
+      {/* Custom Collections */}
+      {libraryCollections.map((collection, index) => {
+        const items = collectionItems[collection.id] || [];
+        const isCollapsed = customCollectionCollapsed[collection.id] ?? false;
+
+        return (
+          <React.Fragment key={collection.id}>
+            <div
+              className="library-menu-items-container__header"
+              style={{ marginTop: "0.75rem" }}
+            >
+              <span
+                onClick={() =>
+                  setCustomCollectionCollapsed((prev) => ({
+                    ...prev,
+                    [collection.id]: !isCollapsed,
+                  }))
+                }
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  flex: 1,
+                  cursor: "pointer",
+                }}
+              >
+                <span>{collection.name}</span>
+                <span className="library-menu-items-container__header__arrow">
+                  {isCollapsed ? collapseDownIcon : collapseUpIcon}
+                </span>
+              </span>
+              <CollectionHeaderDropdown
+                collectionName={collection.name}
+                onRename={async () => {
+                  const newName = window.prompt(
+                    "Rename collection",
+                    collection.name,
+                  );
+                  if (
+                    newName &&
+                    newName.trim() &&
+                    newName !== collection.name
+                  ) {
+                    try {
+                      await app.library.renameLibraryCollection(
+                        collection.id,
+                        newName.trim(),
+                      );
+                    } catch (error: any) {
+                      setAppState({
+                        errorMessage: error?.message || String(error),
+                      });
+                    }
+                  }
+                }}
+                onDelete={async () => {
+                  if (
+                    window.confirm(`Delete "${collection.name}" collection?`)
+                  ) {
+                    try {
+                      await app.library.deleteLibraryCollection(collection.id);
+                    } catch (error: any) {
+                      setAppState({
+                        errorMessage: error?.message || String(error),
+                      });
+                    }
+                  }
+                }}
+                onMoveUp={async () => {
+                  try {
+                    await app.library.moveUpCollection(collection.id);
+                  } catch (error: any) {
+                    setAppState({
+                      errorMessage: error?.message || String(error),
+                    });
+                  }
+                }}
+                onMoveDown={async () => {
+                  try {
+                    await app.library.moveDownCollection(collection.id);
+                  } catch (error: any) {
+                    setAppState({
+                      errorMessage: error?.message || String(error),
+                    });
+                  }
+                }}
+                canMoveUp={index > 0}
+                canMoveDown={index < libraryCollections.length - 1}
+              />
+            </div>
+            {!isCollapsed &&
+              (items.length === 0 && !pendingElements.length ? (
+                <div className="library-menu-items__no-items">
+                  <div className="library-menu-items__no-items__hint">
+                    {t("library.hint_emptyLibrary")}
+                  </div>
+                </div>
+              ) : (
+                <LibraryMenuSectionGrid>
+                  {pendingElements.length > 0 && (
+                    <LibraryMenuSection
+                      itemsRenderedPerBatch={itemsRenderedPerBatch}
+                      items={[{ id: null, elements: pendingElements }]}
+                      onItemSelectToggle={onItemSelectToggle}
+                      onItemDrag={onItemDrag}
+                      onClick={() => onAddToLibraryClick(collection.id)}
+                      isItemSelected={isItemSelected}
+                      svgCache={svgCache}
+                    />
+                  )}
+                  {items.length > 0 && (
+                    <LibraryMenuSection
+                      itemsRenderedPerBatch={itemsRenderedPerBatch}
+                      items={items}
+                      onItemSelectToggle={onItemSelectToggle}
+                      onItemDrag={onItemDrag}
+                      onClick={onItemClick}
+                      isItemSelected={isItemSelected}
+                      svgCache={svgCache}
+                    />
+                  )}
+                </LibraryMenuSectionGrid>
+              ))}
+          </React.Fragment>
+        );
+      })}
 
       {publishedItems.length > 0 && (
         <div
           className="library-menu-items-container__header"
           style={{ marginTop: "0.75rem" }}
         >
-          {t("labels.excalidrawLib")}
+          <span
+            onClick={() =>
+              setIsExcalidrawLibraryCollapsed(!isExcalidrawLibraryCollapsed)
+            }
+            style={{
+              display: "flex",
+              alignItems: "center",
+              flex: 1,
+              cursor: "pointer",
+            }}
+          >
+            <span>{t("labels.excalidrawLib")}</span>
+            <span className="library-menu-items-container__header__arrow">
+              {isExcalidrawLibraryCollapsed ? collapseDownIcon : collapseUpIcon}
+            </span>
+          </span>
         </div>
       )}
-      {publishedItems.length > 0 && (
+      {publishedItems.length > 0 && !isExcalidrawLibraryCollapsed && (
         <LibraryMenuSectionGrid>
           <LibraryMenuSection
             itemsRenderedPerBatch={itemsRenderedPerBatch}

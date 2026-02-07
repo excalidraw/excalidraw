@@ -20,9 +20,12 @@ import { ToolButton } from "./ToolButton";
 import Trans from "./Trans";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
+  ArrowRightIcon,
   DotsIcon,
   ExportIcon,
   LoadIcon,
+  pencilIcon,
+  PlusIcon,
   publishIcon,
   TrashIcon,
 } from "./icons";
@@ -211,6 +214,24 @@ export const LibraryDropdownMenuButton: React.FC<{
               {t("buttons.load")}
             </DropdownMenu.Item>
           )}
+          <DropdownMenu.Item
+            onSelect={async () => {
+              // prompt for a collection name and create a new library collection
+              const name = window.prompt("Create library");
+              if (!name) {
+                return;
+              }
+              try {
+                await library.createLibraryCollection(name);
+              } catch (error: any) {
+                setAppState({ errorMessage: error?.message || String(error) });
+              }
+            }}
+            icon={PlusIcon}
+            data-testid="lib-dropdown--create"
+          >
+            {"Create library"}
+          </DropdownMenu.Item>
           {!!items.length && (
             <DropdownMenu.Item
               onSelect={onLibraryExport}
@@ -270,6 +291,95 @@ export const LibraryDropdownMenuButton: React.FC<{
         />
       )}
       {publishLibSuccess && renderPublishSuccess()}
+    </div>
+  );
+};
+
+export const CollectionHeaderDropdown: React.FC<{
+  collectionName: string;
+  onRename: () => void;
+  onDelete: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
+}> = ({
+  collectionName,
+  onRename,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+  canMoveUp = false,
+  canMoveDown = false,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div
+      className={clsx("library-menu-dropdown-container", {
+        "collection-dropdown-open": isOpen,
+      })}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+      onPointerDown={(e) => {
+        e.stopPropagation();
+      }}
+    >
+      <DropdownMenu open={isOpen}>
+        <DropdownMenu.Trigger
+          onToggle={() => setIsOpen(!isOpen)}
+          className="collection-header-dropdown-trigger"
+        >
+          {DotsIcon}
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content
+          onClickOutside={() => setIsOpen(false)}
+          onSelect={() => setIsOpen(false)}
+          className="collection-header-menu"
+        >
+          <DropdownMenu.Item
+            onSelect={onRename}
+            icon={pencilIcon}
+            data-testid="collection-dropdown--rename"
+          >
+            Rename
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={onDelete}
+            icon={TrashIcon}
+            data-testid="collection-dropdown--delete"
+          >
+            {t("labels.delete")}
+          </DropdownMenu.Item>
+          {onMoveUp && canMoveUp && (
+            <DropdownMenu.Item
+              onSelect={onMoveUp}
+              icon={
+                <div style={{ transform: "rotate(-90deg)" }}>
+                  {ArrowRightIcon}
+                </div>
+              }
+              data-testid="collection-dropdown--move-up"
+            >
+              Move Up
+            </DropdownMenu.Item>
+          )}
+          {onMoveDown && canMoveDown && (
+            <DropdownMenu.Item
+              onSelect={onMoveDown}
+              icon={
+                <div style={{ transform: "rotate(90deg)" }}>
+                  {ArrowRightIcon}
+                </div>
+              }
+              data-testid="collection-dropdown--move-down"
+            >
+              Move Down
+            </DropdownMenu.Item>
+          )}
+        </DropdownMenu.Content>
+      </DropdownMenu>
     </div>
   );
 };
