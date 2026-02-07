@@ -57,7 +57,7 @@ describe("export", () => {
       blob: pngBlob,
       metadata: serializeAsJSON(testElements, h.state, {}, "local"),
     });
-    await API.drop(pngBlobEmbedded);
+    await API.drop([{ kind: "file", file: pngBlobEmbedded }]);
 
     await waitFor(() => {
       expect(h.elements).toEqual([
@@ -94,7 +94,12 @@ describe("export", () => {
   });
 
   it("import embedded png (legacy v1)", async () => {
-    await API.drop(await API.loadFile("./fixtures/test_embedded_v1.png"));
+    await API.drop([
+      {
+        kind: "file",
+        file: await API.loadFile("./fixtures/test_embedded_v1.png"),
+      },
+    ]);
     await waitFor(() => {
       expect(h.elements).toEqual([
         expect.objectContaining({ type: "text", text: "test" }),
@@ -103,7 +108,12 @@ describe("export", () => {
   });
 
   it("import embedded png (v2)", async () => {
-    await API.drop(await API.loadFile("./fixtures/smiley_embedded_v2.png"));
+    await API.drop([
+      {
+        kind: "file",
+        file: await API.loadFile("./fixtures/smiley_embedded_v2.png"),
+      },
+    ]);
     await waitFor(() => {
       expect(h.elements).toEqual([
         expect.objectContaining({ type: "text", text: "😀" }),
@@ -112,7 +122,12 @@ describe("export", () => {
   });
 
   it("import embedded svg (legacy v1)", async () => {
-    await API.drop(await API.loadFile("./fixtures/test_embedded_v1.svg"));
+    await API.drop([
+      {
+        kind: "file",
+        file: await API.loadFile("./fixtures/test_embedded_v1.svg"),
+      },
+    ]);
     await waitFor(() => {
       expect(h.elements).toEqual([
         expect.objectContaining({ type: "text", text: "test" }),
@@ -121,7 +136,12 @@ describe("export", () => {
   });
 
   it("import embedded svg (v2)", async () => {
-    await API.drop(await API.loadFile("./fixtures/smiley_embedded_v2.svg"));
+    await API.drop([
+      {
+        kind: "file",
+        file: await API.loadFile("./fixtures/smiley_embedded_v2.svg"),
+      },
+    ]);
     await waitFor(() => {
       expect(h.elements).toEqual([
         expect.objectContaining({ type: "text", text: "😀" }),

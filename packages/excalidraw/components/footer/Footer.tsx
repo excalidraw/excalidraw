@@ -2,7 +2,7 @@ import clsx from "clsx";
 
 import { actionShortcuts } from "../../actions";
 import { useTunnels } from "../../context/tunnels";
-import { ExitZenModeAction, UndoRedoActions, ZoomActions } from "../Actions";
+import { ExitZenModeButton, UndoRedoActions, ZoomActions } from "../Actions";
 import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
@@ -66,7 +66,7 @@ const Footer = ({
           />
         </div>
       </div>
-      <ExitZenModeAction
+      <ExitZenModeButton
         actionManager={actionManager}
         showExitZenModeBtn={showExitZenModeBtn}
       />

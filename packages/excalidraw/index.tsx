@@ -28,6 +28,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     excalidrawAPI,
     isCollaborating = false,
     onPointerUpdate,
+    renderTopLeftUI,
     renderTopRightUI,
     langCode = defaultLang.code,
     viewModeEnabled,
@@ -120,6 +121,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           excalidrawAPI={excalidrawAPI}
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
+          renderTopLeftUI={renderTopLeftUI}
           renderTopRightUI={renderTopRightUI}
           langCode={langCode}
           viewModeEnabled={viewModeEnabled}
@@ -185,6 +187,9 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
   }
 
   const isUIOptionsSame = prevUIOptionsKeys.every((key) => {
+    if (key === "getFormFactor") {
+      return true;
+    }
     if (key === "canvasActions") {
       const canvasOptionKeys = Object.keys(
         prevUIOptions.canvasActions!,
@@ -227,7 +232,6 @@ export { isInvisiblySmallElement } from "@excalidraw/element";
 
 export { defaultLang, useI18n, languages } from "./i18n";
 export {
-  restore,
   restoreAppState,
   restoreElement,
   restoreElements,
@@ -249,7 +253,6 @@ export {
   loadSceneOrLibraryFromBlob,
   loadLibraryFromBlob,
 } from "./data/blob";
-export { getFreeDrawSvgPath } from "@excalidraw/element";
 export { mergeLibraryItems, getLibraryItemsHash } from "./data/library";
 export { isLinearElement } from "@excalidraw/element";
 
@@ -261,6 +264,9 @@ export {
   DEFAULT_LASER_COLOR,
   UserIdleState,
   normalizeLink,
+  sceneCoordsToViewportCoords,
+  viewportCoordsToSceneCoords,
+  getFormFactor,
 } from "@excalidraw/common";
 
 export {
@@ -273,17 +279,12 @@ export { CaptureUpdateAction } from "@excalidraw/element";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 
-export {
-  sceneCoordsToViewportCoords,
-  viewportCoordsToSceneCoords,
-} from "@excalidraw/common";
-
 export { Sidebar } from "./components/Sidebar/Sidebar";
 export { Button } from "./components/Button";
 export { Footer };
 export { MainMenu };
 export { Ellipsify } from "./components/Ellipsify";
-export { useDevice } from "./components/App";
+export { useEditorInterface, useStylesPanelMode } from "./components/App";
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
 export { Stats } from "./components/Stats";
@@ -291,10 +292,19 @@ export { Stats } from "./components/Stats";
 export { DefaultSidebar } from "./components/DefaultSidebar";
 export { TTDDialog } from "./components/TTDDialog/TTDDialog";
 export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
+export { TTDStreamFetch } from "./components/TTDDialog/utils/TTDStreamFetch";
+export type {
+  TTDPersistenceAdapter,
+  SavedChat,
+  SavedChats,
+} from "./components/TTDDialog/types";
 
 export { zoomToFitBounds } from "./actions/actionCanvas";
-export { convertToExcalidrawElements } from "./data/transform";
-export { getCommonBounds, getVisibleSceneBounds } from "@excalidraw/element";
+export {
+  getCommonBounds,
+  getVisibleSceneBounds,
+  convertToExcalidrawElements,
+} from "@excalidraw/element";
 
 export {
   elementsOverlappingBBox,
@@ -307,3 +317,5 @@ export { getDataURL } from "./data/blob";
 export { isElementLink } from "@excalidraw/element";
 
 export { setCustomTextMetricsProvider } from "@excalidraw/element";
+
+export { CommandPalette } from "./components/CommandPalette/CommandPalette";

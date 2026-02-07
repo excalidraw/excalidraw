@@ -7,8 +7,6 @@ import {
   isPromiseLike,
 } from "@excalidraw/common";
 
-import { clearElementsForExport } from "@excalidraw/element";
-
 import type { ValueOf } from "@excalidraw/common/utility-types";
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 
@@ -18,16 +16,18 @@ import { CanvasError, ImageSceneDataError } from "../errors";
 import { calculateScrollCenter } from "../scene";
 import { decodeSvgBase64Payload } from "../scene/export";
 
-import { isClipboardEvent } from "../clipboard";
-
 import { base64ToString, stringToBase64, toByteString } from "./encode";
 import { nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
-import { restore, restoreLibraryItems } from "./restore";
+import {
+  restoreAppState,
+  restoreElements,
+  restoreLibraryItems,
+} from "./restore";
 
 import type { AppState, DataURL, LibraryItem } from "../types";
 
-import type { FileSystemHandle } from "./filesystem";
+import type { FileSystemHandle } from "browser-fs-access";
 import type { ImportedLibraryData } from "./types";
 
 const parseFileContents = async (blob: Blob | File): Promise<string> => {
@@ -98,6 +98,8 @@ export const getMimeType = (blob: Blob | string): string => {
     return MIME_TYPES.jpg;
   } else if (/\.svg$/.test(name)) {
     return MIME_TYPES.svg;
+  } else if (/\.excalidrawlib$/.test(name)) {
+    return MIME_TYPES.excalidrawlib;
   }
   return "";
 };
@@ -157,10 +159,13 @@ export const loadSceneOrLibraryFromBlob = async (
     if (isValidExcalidrawData(data)) {
       return {
         type: MIME_TYPES.excalidraw,
-        data: restore(
-          {
-            elements: clearElementsForExport(data.elements || []),
-            appState: {
+        data: {
+          elements: restoreElements(data.elements, localElements, {
+            repairBindings: true,
+            deleteInvisibleElements: true,
+          }),
+          appState: restoreAppState(
+            {
               theme: localAppState?.theme,
               fileHandle: fileHandle || blob.handle || null,
               ...cleanAppStateForExport(data.appState || {}),
@@ -168,16 +173,10 @@ export const loadSceneOrLibraryFromBlob = async (
                 ? calculateScrollCenter(data.elements || [], localAppState)
                 : {}),
             },
-            files: data.files,
-          },
-          localAppState,
-          localElements,
-          {
-            repairBindings: true,
-            refreshDimensions: false,
-            deleteInvisibleElements: true,
-          },
-        ),
+            localAppState,
+          ),
+          files: data.files || {},
+        },
       };
     } else if (isValidLibrary(data)) {
       return {
@@ -391,42 +390,6 @@ export const ImageURLToFile = async (
   throw new Error("Error: unsupported file type", { cause: "UNSUPPORTED" });
 };
 
-export const getFilesFromEvent = async (
-  event: React.DragEvent<HTMLDivElement> | ClipboardEvent,
-) => {
-  let fileList: FileList | undefined = undefined;
-  let items: DataTransferItemList | undefined = undefined;
-
-  if (isClipboardEvent(event)) {
-    fileList = event.clipboardData?.files;
-    items = event.clipboardData?.items;
-  } else {
-    const dragEvent = event as React.DragEvent<HTMLDivElement>;
-    fileList = dragEvent.dataTransfer?.files;
-    items = dragEvent.dataTransfer?.items;
-  }
-
-  const files: (File | null)[] = Array.from(fileList || []);
-
-  return await Promise.all(
-    files.map(async (file, idx) => {
-      const dataTransferItem = items?.[idx];
-      const fileHandle = dataTransferItem
-        ? getFileHandle(dataTransferItem)
-        : null;
-      return file
-        ? {
-            file: await normalizeFile(file),
-            fileHandle: await fileHandle,
-          }
-        : {
-            file: null,
-            fileHandle: null,
-          };
-    }),
-  );
-};
-
 export const getFileHandle = async (
   event: DragEvent | React.DragEvent | DataTransferItem,
 ): Promise<FileSystemHandle | null> => {
@@ -452,37 +415,42 @@ export const getFileHandle = async (
 /**
  * attempts to detect if a buffer is a valid image by checking its leading bytes
  */
-const getActualMimeTypeFromImage = (buffer: ArrayBuffer) => {
-  let mimeType: ValueOf<Pick<typeof MIME_TYPES, "png" | "jpg" | "gif">> | null =
-    null;
+const getActualMimeTypeFromImage = async (file: Blob | File) => {
+  let mimeType: ValueOf<
+    Pick<typeof MIME_TYPES, "png" | "jpg" | "gif" | "webp">
+  > | null = null;
 
-  const first8Bytes = `${[...new Uint8Array(buffer).slice(0, 8)].join(" ")} `;
+  const leadingBytes = [
+    ...new Uint8Array(await blobToArrayBuffer(file.slice(0, 15))),
+  ].join(" ");
 
   // uint8 leading bytes
-  const headerBytes = {
+  const bytes = {
     // https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_header
-    png: "137 80 78 71 13 10 26 10 ",
+    png: /^137 80 78 71 13 10 26 10\b/,
     // https://en.wikipedia.org/wiki/JPEG#Syntax_and_structure
     // jpg is a bit wonky. Checking the first three bytes should be enough,
     // but may yield false positives. (https://stackoverflow.com/a/23360709/927631)
-    jpg: "255 216 255 ",
+    jpg: /^255 216 255\b/,
     // https://en.wikipedia.org/wiki/GIF#Example_GIF_file
-    gif: "71 73 70 56 57 97 ",
+    gif: /^71 73 70 56 57 97\b/,
+    // 4 bytes for RIFF + 4 bytes for chunk size + WEBP identifier
+    webp: /^82 73 70 70 \d+ \d+ \d+ \d+ 87 69 66 80 86 80 56\b/,
   };
 
-  if (first8Bytes === headerBytes.png) {
-    mimeType = MIME_TYPES.png;
-  } else if (first8Bytes.startsWith(headerBytes.jpg)) {
-    mimeType = MIME_TYPES.jpg;
-  } else if (first8Bytes.startsWith(headerBytes.gif)) {
-    mimeType = MIME_TYPES.gif;
+  for (const type of Object.keys(bytes) as (keyof typeof bytes)[]) {
+    if (leadingBytes.match(bytes[type])) {
+      mimeType = MIME_TYPES[type];
+      break;
+    }
   }
-  return mimeType;
+
+  return mimeType || file.type || null;
 };
 
 export const createFile = (
   blob: File | Blob | ArrayBuffer,
-  mimeType: ValueOf<typeof MIME_TYPES>,
+  mimeType: string,
   name: string | undefined,
 ) => {
   return new File([blob], name || "", {
@@ -490,39 +458,32 @@ export const createFile = (
   });
 };
 
+const normalizedFileSymbol = Symbol("fileNormalized");
+
 /** attempts to detect correct mimeType if none is set, or if an image
  * has an incorrect extension.
  * Note: doesn't handle missing .excalidraw/.excalidrawlib extension  */
 export const normalizeFile = async (file: File) => {
-  if (!file.type) {
-    if (file?.name?.endsWith(".excalidrawlib")) {
-      file = createFile(
-        await blobToArrayBuffer(file),
-        MIME_TYPES.excalidrawlib,
-        file.name,
-      );
-    } else if (file?.name?.endsWith(".excalidraw")) {
-      file = createFile(
-        await blobToArrayBuffer(file),
-        MIME_TYPES.excalidraw,
-        file.name,
-      );
-    } else {
-      const buffer = await blobToArrayBuffer(file);
-      const mimeType = getActualMimeTypeFromImage(buffer);
-      if (mimeType) {
-        file = createFile(buffer, mimeType, file.name);
-      }
-    }
+  // to prevent double normalization (perf optim)
+  if ((file as any)[normalizedFileSymbol]) {
+    return file;
+  }
+
+  if (file?.name?.endsWith(".excalidrawlib")) {
+    file = createFile(file, MIME_TYPES.excalidrawlib, file.name);
+  } else if (file?.name?.endsWith(".excalidraw")) {
+    file = createFile(file, MIME_TYPES.excalidraw, file.name);
+  } else if (!file.type || file.type?.startsWith("image/")) {
     // when the file is an image, make sure the extension corresponds to the
-    // actual mimeType (this is an edge case, but happens sometime)
-  } else if (isSupportedImageFile(file)) {
-    const buffer = await blobToArrayBuffer(file);
-    const mimeType = getActualMimeTypeFromImage(buffer);
+    // actual mimeType (this is an edge case, but happens - especially
+    // with AI generated images)
+    const mimeType = await getActualMimeTypeFromImage(file);
     if (mimeType && mimeType !== file.type) {
-      file = createFile(buffer, mimeType, file.name);
+      file = createFile(file, mimeType, file.name);
     }
   }
+
+  (file as any)[normalizedFileSymbol] = true;
 
   return file;
 };

@@ -3,14 +3,19 @@ import {
   KEYS,
   CLASSES,
   POINTER_BUTTON,
+  THEME,
   isWritableElement,
   getFontString,
   getFontFamilyString,
   isTestEnv,
+  MIME_TYPES,
+  applyDarkModeFilter,
 } from "@excalidraw/common";
 
 import {
+  getTextFromElements,
   originalContainerCache,
+  updateBoundElements,
   updateOriginalContainerCache,
 } from "@excalidraw/element";
 
@@ -45,7 +50,11 @@ import type {
 
 import { actionSaveToActiveFile } from "../actions";
 
-import { parseClipboard } from "../clipboard";
+import {
+  parseClipboard,
+  parseDataTransferEvent,
+  parseDataTransferEventMimeTypes,
+} from "../clipboard";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
@@ -55,6 +64,8 @@ import {
   actionZoomIn,
   actionZoomOut,
 } from "../actions/actionCanvas";
+
+import type { ParsedDataTranferList } from "../clipboard";
 
 import type App from "../components/App";
 import type { AppState } from "../types";
@@ -129,7 +140,11 @@ export const textWysiwyg = ({
     return false;
   };
 
+  let LAST_THEME = app.state.theme;
+
   const updateWysiwygStyle = () => {
+    LAST_THEME = app.state.theme;
+
     const appState = app.state;
     const updatedTextElement = app.scene.getElement<ExcalidrawTextElement>(id);
 
@@ -201,6 +216,7 @@ export const textWysiwyg = ({
           );
 
           app.scene.mutateElement(container, { height: targetContainerHeight });
+          updateBoundElements(container, app.scene);
           return;
         } else if (
           // autoshrink container height until original container height
@@ -214,6 +230,7 @@ export const textWysiwyg = ({
             container.type,
           );
           app.scene.mutateElement(container, { height: targetContainerHeight });
+          updateBoundElements(container, app.scene);
         } else {
           const { x, y } = computeBoundTextPosition(
             container,
@@ -225,22 +242,6 @@ export const textWysiwyg = ({
         }
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
-      const initialSelectionStart = editable.selectionStart;
-      const initialSelectionEnd = editable.selectionEnd;
-      const initialLength = editable.value.length;
-
-      // restore cursor position after value updated so it doesn't
-      // go to the end of text when container auto expanded
-      if (
-        initialSelectionStart === initialSelectionEnd &&
-        initialSelectionEnd !== initialLength
-      ) {
-        // get diff between length and selection end and shift
-        // the cursor by "diff" times to position correctly
-        const diff = initialLength - initialSelectionEnd;
-        editable.selectionStart = editable.value.length - diff;
-        editable.selectionEnd = editable.value.length - diff;
-      }
 
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
@@ -275,9 +276,11 @@ export const textWysiwyg = ({
         ),
         textAlign,
         verticalAlign,
-        color: updatedTextElement.strokeColor,
+        color:
+          appState.theme === THEME.DARK
+            ? applyDarkModeFilter(updatedTextElement.strokeColor)
+            : updatedTextElement.strokeColor,
         opacity: updatedTextElement.opacity / 100,
-        filter: "var(--theme-filter)",
         maxHeight: `${editorMaxHeight}px`,
       });
       editable.scrollTop = 0;
@@ -333,12 +336,63 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.onpaste = async (event) => {
-      const clipboardData = await parseClipboard(event, true);
-      if (!clipboardData.text) {
+      // we need to synchronously get the MIME types so we can preventDefault()
+      // in the same tick (FF requires that)
+      const mimeTypes = parseDataTransferEventMimeTypes(event);
+
+      let dataList: ParsedDataTranferList | null = null;
+
+      // when copy/pasting excalidraw elements, only paste the text content
+      //
+      // Note that these custom MIME types only work within the same family
+      // of browsers, so won't work e.g. between chrome and firefox. We could
+      // parse the text/plain for existence of excalidraw instead, but this
+      // is an edge case
+      if (
+        mimeTypes.has(MIME_TYPES.excalidrawClipboard) ||
+        mimeTypes.has(MIME_TYPES.excalidraw)
+      ) {
+        // must be called in the same tick
+        event.preventDefault();
+
+        dataList = await parseDataTransferEvent(event);
+
+        try {
+          const parsed = await parseClipboard(dataList);
+
+          if (parsed.elements) {
+            const text = getTextFromElements(parsed.elements);
+            if (text) {
+              const { selectionStart, selectionEnd, value } = editable;
+
+              editable.value =
+                value.slice(0, selectionStart) +
+                text +
+                value.slice(selectionEnd);
+
+              const newPos = selectionStart + text.length;
+              editable.selectionStart = editable.selectionEnd = newPos;
+
+              editable.dispatchEvent(new Event("input"));
+            }
+          }
+
+          // if excalidraw elements don't contain any text elements,
+          // don't paste anything
+          return;
+        } catch {
+          console.warn("failed to parse excalidraw clipboard data");
+        }
+      }
+
+      dataList = dataList || (await parseDataTransferEvent(event));
+
+      const textItem = dataList.findByType(MIME_TYPES.text);
+      if (!textItem) {
         return;
       }
-      const data = normalizeText(clipboardData.text);
-      if (!data) {
+      const text = normalizeText(textItem.value);
+      if (!text) {
         return;
       }
       const container = getContainerElement(
@@ -356,7 +410,7 @@ export const textWysiwyg = ({
           app.scene.getNonDeletedElementsMap(),
         );
         const wrappedText = wrapText(
-          `${editable.value}${data}`,
+          `${editable.value}${text}`,
           font,
           getBoundTextMaxWidth(container, boundTextElement),
         );
@@ -540,6 +594,7 @@ export const textWysiwyg = ({
     if (isDestroyed) {
       return;
     }
+
     isDestroyed = true;
     // cleanup must be run before onSubmit otherwise when app blurs the wysiwyg
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
@@ -607,6 +662,7 @@ export const textWysiwyg = ({
     window.removeEventListener("blur", handleSubmit);
     window.removeEventListener("beforeunload", handleSubmit);
     unbindUpdate();
+    unsubOnChange();
     unbindOnScroll();
 
     editable.remove();
@@ -623,14 +679,24 @@ export const textWysiwyg = ({
     const isPropertiesTrigger =
       target instanceof HTMLElement &&
       target.classList.contains("properties-trigger");
+    const isPropertiesContent =
+      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      !!(target as Element).closest(".properties-content");
+    const inShapeActionsMenu =
+      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      (!!(target as Element).closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
+        !!(target as Element).closest(".compact-shape-actions-island"));
 
     setTimeout(() => {
-      editable.onblur = handleSubmit;
-
-      // case: clicking on the same property → no change → no update → no focus
-      if (!isPropertiesTrigger) {
-        editable.focus();
+      // If we interacted within shape actions menu or its popovers/triggers,
+      // keep submit disabled and don't steal focus back to textarea.
+      if (inShapeActionsMenu || isPropertiesTrigger || isPropertiesContent) {
+        return;
       }
+
+      // Otherwise, re-enable submit on blur and refocus the editor.
+      editable.onblur = handleSubmit;
+      editable.focus();
     });
   };
 
@@ -653,6 +719,7 @@ export const textWysiwyg = ({
         event.preventDefault();
         app.handleCanvasPanUsingWheelOrSpaceDrag(event);
       }
+
       temporarilyDisableSubmit();
       return;
     }
@@ -660,15 +727,20 @@ export const textWysiwyg = ({
     const isPropertiesTrigger =
       target instanceof HTMLElement &&
       target.classList.contains("properties-trigger");
+    const isPropertiesContent =
+      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      !!(target as Element).closest(".properties-content");
 
     if (
       ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-        event.target.closest(
+        (event.target.closest(
           `.${CLASSES.SHAPE_ACTIONS_MENU}, .${CLASSES.ZOOM_ACTIONS}`,
-        ) &&
+        ) ||
+          event.target.closest(".compact-shape-actions-island")) &&
         !isWritableElement(event.target)) ||
-      isPropertiesTrigger
+      isPropertiesTrigger ||
+      isPropertiesContent
     ) {
       temporarilyDisableSubmit();
     } else if (
@@ -688,6 +760,13 @@ export const textWysiwyg = ({
       });
     }
   };
+
+  // FIXME after we start emitting updates from Store for appState.theme
+  const unsubOnChange = app.onChangeEmitter.on((elements) => {
+    if (app.state.theme !== LAST_THEME) {
+      updateWysiwygStyle();
+    }
+  });
 
   // handle updates of textElement properties of editing element
   const unbindUpdate = app.scene.onUpdate(() => {

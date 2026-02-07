@@ -1,5 +1,5 @@
-@import "./variables.module.scss";
-@import "./theme";
+@use "./variables.module" as *;
+@use "./theme";
 
 :root {
   --zIndex-canvas: 1;
@@ -11,6 +11,12 @@
   --zIndex-eyeDropperBackdrop: 5;
   --zIndex-eyeDropperPreview: 6;
   --zIndex-hyperlinkContainer: 7;
+
+  --zIndex-ui-bottom: 60;
+  --zIndex-ui-context-menu: 90;
+  --zIndex-ui-styles-popup: 100;
+  --zIndex-ui-top: 100;
+  --zIndex-ui-library: 120;
 
   --zIndex-modal: 1000;
   --zIndex-popup: 1001;
@@ -43,6 +49,16 @@ body.excalidraw-cursor-resize * {
   right: 0;
   height: 100%;
   width: 100%;
+
+  button {
+    // browser default. Looks kinda good on low-dpi.
+    font-size: 0.8333rem;
+  }
+
+  button,
+  label {
+    @include buttonNoHighlight;
+  }
 
   button {
     cursor: pointer;
@@ -90,6 +106,9 @@ body.excalidraw-cursor-resize * {
 
     &.interactive {
       z-index: var(--zIndex-interactiveCanvas);
+      // Apply theme filter only to interactive canvas for UI elements
+      // (resize handles, selection boxes, etc.)
+      filter: var(--theme-filter);
     }
 
     // Remove the main canvas from document flow to avoid resizeObserver
@@ -116,16 +135,6 @@ body.excalidraw-cursor-resize * {
     z-index: 2;
     transform-origin: top left;
     pointer-events: none;
-  }
-
-  &.theme--dark {
-    // The percentage is inspired by
-    // https://material.io/design/color/dark-theme.html#properties, which
-    // recommends surface color of #121212, 93% yields #111111 for #FFF
-
-    canvas {
-      filter: var(--theme-filter);
-    }
   }
 
   .FixedSideContainer {
@@ -201,7 +210,7 @@ body.excalidraw-cursor-resize * {
 
   .divider {
     width: 1px;
-    background-color: $oc-gray-2;
+    background-color: $color-gray-2;
     margin: 1px;
   }
 
@@ -232,30 +241,35 @@ body.excalidraw-cursor-resize * {
   }
 
   .App-top-bar {
-    z-index: var(--zIndex-layerUI);
+    z-index: var(--zIndex-ui-top);
     display: flex;
     flex-direction: column;
-    align-items: center;
+  }
+
+  .App-welcome-screen {
+    z-index: var(--zIndex-layerUI);
   }
 
   .App-bottom-bar {
     position: absolute;
-    top: 0;
+    // account for margins
+    width: calc(100% - 28px);
+    max-width: 450px;
     bottom: 0;
-    left: 0;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
     --bar-padding: calc(4 * var(--space-factor));
-    z-index: 4;
+    z-index: var(--zIndex-ui-bottom);
     display: flex;
-    align-items: flex-end;
+    flex-direction: column;
+
     pointer-events: none;
+    justify-content: center;
 
     > .Island {
-      width: 100%;
-      max-width: 100%;
-      min-width: 100%;
       box-sizing: border-box;
       max-height: 100%;
+      padding: 4px;
       display: flex;
       flex-direction: column;
       pointer-events: var(--ui-pointerEvents);
@@ -263,7 +277,8 @@ body.excalidraw-cursor-resize * {
   }
 
   .App-toolbar {
-    width: 100%;
+    display: flex;
+    justify-content: center;
 
     .eraser {
       &.ToolIcon:hover {
@@ -276,15 +291,21 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .App-toolbar-content {
+  .excalidraw-ui-top-left,
+  .excalidraw-ui-top-right {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 8px;
+    gap: 0.5rem;
+  }
 
-    .dropdown-menu--mobile {
-      bottom: 55px;
-      top: auto;
+  .App-toolbar-content {
+    display: flex;
+    flex-direction: column;
+
+    pointer-events: none;
+
+    & > * {
+      pointer-events: var(--ui-pointerEvents);
     }
   }
 
@@ -317,7 +338,7 @@ body.excalidraw-cursor-resize * {
 
   .App-menu_top {
     grid-template-columns: 1fr 2fr 1fr;
-    grid-gap: 2rem;
+    grid-gap: 1rem;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
@@ -334,6 +355,14 @@ body.excalidraw-cursor-resize * {
 
   .App-menu_top > *:first-child {
     justify-self: flex-start;
+  }
+
+  .selected-shape-actions-container {
+    width: fit-content;
+
+    &--compact {
+      min-width: 48px;
+    }
   }
 
   .App-menu_top > *:last-child {
@@ -498,7 +527,7 @@ body.excalidraw-cursor-resize * {
       display: none;
     }
     .scroll-back-to-content {
-      bottom: calc(80px + var(--sab, 0));
+      bottom: calc(100px + var(--sab, 0));
       z-index: -1;
     }
   }
@@ -677,6 +706,11 @@ body.excalidraw-cursor-resize * {
       margin-top: 0rem;
     }
   }
+
+  .link-button {
+    display: flex;
+    text-decoration: none !important;
+  }
 }
 
 .ErrorSplash.excalidraw {
@@ -695,8 +729,8 @@ body.excalidraw-cursor-resize * {
     justify-content: center;
 
     padding: 40px;
-    background-color: $oc-red-1;
-    border: 3px solid $oc-red-9;
+    background-color: $color-red-1;
+    border: 3px solid $color-red-9;
   }
 
   .ErrorSplash-paragraph {

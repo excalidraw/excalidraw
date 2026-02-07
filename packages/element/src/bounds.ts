@@ -2,6 +2,7 @@ import rough from "roughjs/bin/rough";
 
 import {
   arrayToMap,
+  type Bounds,
   invariant,
   rescalePoints,
   sizeOf,
@@ -42,6 +43,7 @@ import {
   isBoundToContainer,
   isFreeDrawElement,
   isLinearElement,
+  isLineElement,
   isTextElement,
 } from "./typeChecks";
 
@@ -76,16 +78,6 @@ export type RectangleBox = {
 };
 
 type MaybeQuadraticSolution = [number | null, number | null] | false;
-
-/**
- * x and y position of top left corner, x and y position of bottom right corner
- */
-export type Bounds = readonly [
-  minX: number,
-  minY: number,
-  maxX: number,
-  maxY: number,
-];
 
 export type SceneBounds = readonly [
   sceneX: number,
@@ -321,19 +313,42 @@ export const getElementLineSegments = (
 
   if (shape.type === "polycurve") {
     const curves = shape.data;
-    const points = curves
-      .map((curve) => pointsOnBezierCurves(curve, 10))
-      .flat();
-    let i = 0;
+    const pointsOnCurves = curves.map((curve) =>
+      pointsOnBezierCurves(curve, 10),
+    );
+
     const segments: LineSegment<GlobalPoint>[] = [];
-    while (i < points.length - 1) {
-      segments.push(
-        lineSegment(
-          pointFrom(points[i][0], points[i][1]),
-          pointFrom(points[i + 1][0], points[i + 1][1]),
-        ),
-      );
-      i++;
+
+    if (
+      (isLineElement(element) && !element.polygon) ||
+      isArrowElement(element)
+    ) {
+      for (const points of pointsOnCurves) {
+        let i = 0;
+
+        while (i < points.length - 1) {
+          segments.push(
+            lineSegment(
+              pointFrom(points[i][0], points[i][1]),
+              pointFrom(points[i + 1][0], points[i + 1][1]),
+            ),
+          );
+          i++;
+        }
+      }
+    } else {
+      const points = pointsOnCurves.flat();
+      let i = 0;
+
+      while (i < points.length - 1) {
+        segments.push(
+          lineSegment(
+            pointFrom(points[i][0], points[i][1]),
+            pointFrom(points[i + 1][0], points[i + 1][1]),
+          ),
+        );
+        i++;
+      }
     }
 
     return segments;
@@ -882,6 +897,7 @@ export const getArrowheadPoints = (
   return [x2, y2, x3, y3, x4, y4];
 };
 
+// TODO reuse shape.ts
 const generateLinearElementShape = (
   element: ExcalidrawLinearElement,
 ): Drawable => {
@@ -939,7 +955,7 @@ const getLinearElementRotatedBounds = (
   }
 
   // first element is always the curve
-  const cachedShape = ShapeCache.get(element)?.[0];
+  const cachedShape = ShapeCache.get(element, null)?.[0];
   const shape = cachedShape ?? generateLinearElementShape(element);
   const ops = getCurvePathOps(shape);
   const transformXY = ([x, y]: GlobalPoint) =>
@@ -1252,6 +1268,13 @@ export const elementCenterPoint = (
   xOffset: number = 0,
   yOffset: number = 0,
 ) => {
+  if (isLinearElement(element)) {
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
+    const [x, y] = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
+
+    return pointFrom<GlobalPoint>(x + xOffset, y + yOffset);
+  }
+
   const [x, y] = getCenterForBounds(getElementBounds(element, elementsMap));
 
   return pointFrom<GlobalPoint>(x + xOffset, y + yOffset);

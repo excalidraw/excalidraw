@@ -1,7 +1,6 @@
 import { toIterable } from "@excalidraw/common";
 
 import { isInvisiblySmallElement } from "./sizeHelpers";
-import { isLinearElementType } from "./typeChecks";
 
 import type {
   ExcalidrawElement,
@@ -29,6 +28,9 @@ export const hashElementsVersion = (elements: ElementsMapOrArray): number => {
 
 // string hash function (using djb2). Not cryptographically secure, use only
 // for versioning and such.
+// note: hashes individual code units (not code points),
+// but for hashing purposes this is fine as it iterates through every code unit
+// (as such, no need to encode to byte string first)
 export const hashString = (s: string): number => {
   let hash: number = 5381;
   for (let i = 0; i < s.length; i++) {
@@ -52,27 +54,6 @@ export const isNonDeletedElement = <T extends ExcalidrawElement>(
   element: T,
 ): element is NonDeleted<T> => !element.isDeleted;
 
-const _clearElements = (
-  elements: readonly ExcalidrawElement[],
-): ExcalidrawElement[] =>
-  getNonDeletedElements(elements).map((element) =>
-    isLinearElementType(element.type)
-      ? { ...element, lastCommittedPoint: null }
-      : element,
-  );
-
-export const clearElementsForDatabase = (
-  elements: readonly ExcalidrawElement[],
-) => _clearElements(elements);
-
-export const clearElementsForExport = (
-  elements: readonly ExcalidrawElement[],
-) => _clearElements(elements);
-
-export const clearElementsForLocalStorage = (
-  elements: readonly ExcalidrawElement[],
-) => _clearElements(elements);
-
 export * from "./align";
 export * from "./binding";
 export * from "./bounds";
@@ -89,6 +70,7 @@ export * from "./elbowArrow";
 export * from "./elementLink";
 export * from "./embeddable";
 export * from "./flowchart";
+export * from "./arrows/focus";
 export * from "./fractionalIndex";
 export * from "./frame";
 export * from "./groups";
@@ -111,7 +93,9 @@ export * from "./store";
 export * from "./textElement";
 export * from "./textMeasurements";
 export * from "./textWrapping";
+export * from "./transform";
 export * from "./transformHandles";
 export * from "./typeChecks";
 export * from "./utils";
 export * from "./zindex";
+export * from "./arrows/helpers";

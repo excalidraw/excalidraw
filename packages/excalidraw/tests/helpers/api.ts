@@ -23,6 +23,8 @@ import { isLinearElementType } from "@excalidraw/element";
 import { getSelectedElements } from "@excalidraw/element";
 import { selectGroupsForSelectedElements } from "@excalidraw/element";
 
+import { FONT_SIZES } from "@excalidraw/common";
+
 import type {
   ExcalidrawElement,
   ExcalidrawGenericElement,
@@ -406,7 +408,7 @@ export class API {
       text: opts?.label?.text || "sample-text",
       width: 50,
       height: 20,
-      fontSize: 16,
+      fontSize: FONT_SIZES.sm,
       containerId: rectangle.id,
       frameId:
         opts?.label?.frameId === undefined
@@ -464,7 +466,7 @@ export class API {
   static readFile = async <T extends "utf8" | null>(
     filepath: string,
     encoding?: T,
-  ): Promise<T extends "utf8" ? string : Buffer> => {
+  ): Promise<T extends "utf8" ? string : ArrayBuffer> => {
     filepath = path.isAbsolute(filepath)
       ? filepath
       : path.resolve(path.join(__dirname, "../", filepath));
@@ -478,43 +480,43 @@ export class API {
     });
   };
 
-  static drop = async (_blobs: Blob[] | Blob) => {
-    const blobs = Array.isArray(_blobs) ? _blobs : [_blobs];
-    const fileDropEvent = createEvent.drop(GlobalTestState.interactiveCanvas);
-    const texts = await Promise.all(
-      blobs.map(
-        (blob) =>
-          new Promise<string>((resolve, reject) => {
-            try {
-              const reader = new FileReader();
-              reader.onload = () => {
-                resolve(reader.result as string);
-              };
-              reader.readAsText(blob);
-            } catch (error: any) {
-              reject(error);
-            }
-          }),
-      ),
-    );
+  static drop = async (items: ({kind: "string", value: string, type: string} | {kind: "file", file: File | Blob, type?: string })[]) => {
 
-    const files = blobs as File[] & { item: (index: number) => File };
+    const fileDropEvent = createEvent.drop(GlobalTestState.interactiveCanvas);
+
+    const dataTransferFileItems = items.filter(i => i.kind === "file") as {kind: "file", file: File | Blob, type: string }[];
+
+    const files = dataTransferFileItems.map(item => item.file) as File[] & { item: (index: number) => File };
+    // https://developer.mozilla.org/en-US/docs/Web/API/FileList/item
     files.item = (index: number) => files[index];
 
     Object.defineProperty(fileDropEvent, "dataTransfer", {
       value: {
+        // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/files
         files,
+        // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/items
+        items: items.map((item, idx) => {
+          if (item.kind === "string")  {
+            return {
+              kind: "string",
+              type: item.type,
+              // https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem/getAsString
+              getAsString: (cb: (text: string) => any) => cb(item.value),
+            };
+          }
+          return {
+            kind: "file",
+            type: item.type || item.file.type,
+            // https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem/getAsFile
+            getAsFile: () => item.file,
+          };
+        }),
+        // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/getData
         getData: (type: string) => {
-          const idx = blobs.findIndex((b) => b.type === type);
-          if (idx >= 0) {
-            return texts[idx];
-          }
-          if (type === "text") {
-            return texts.join("\n");
-          }
-          return "";
+          return items.find((item) => item.type === "string" && item.type === type) || "";
         },
-        types: Array.from(new Set(blobs.map((b) => b.type))),
+        // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types
+        types: Array.from(new Set(items.map((item) => item.kind === "file" ? "Files" : item.type))),
       },
     });
     Object.defineProperty(fileDropEvent, "clientX", {

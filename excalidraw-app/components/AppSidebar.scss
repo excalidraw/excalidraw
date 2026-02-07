@@ -1,0 +1,36 @@
+.excalidraw {
+  .app-sidebar-promo-container {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    flex: 1 1 auto;
+  }
+
+  .app-sidebar-promo-image {
+    margin: 1rem 0;
+
+    height: 16.25rem;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    background-image: radial-gradient(
+        circle,
+        transparent 60%,
+        var(--sidebar-bg-color) 100%
+      ),
+      var(--image-source);
+
+    display: flex;
+  }
+
+  .app-sidebar-promo-text {
+    padding: 0 2rem;
+  }
+
+  .link-button {
+    margin: 0 auto;
+  }
+}

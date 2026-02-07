@@ -88,6 +88,10 @@ export const actionToggleLinearEditor = register({
       selectedElementIds: appState.selectedElementIds,
     })[0] as ExcalidrawLinearElement;
 
+    if (!selectedElement) {
+      return null;
+    }
+
     const label = t(
       selectedElement.type === "arrow"
         ? "labels.lineEditor.editArrow"

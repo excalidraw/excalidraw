@@ -46,9 +46,11 @@ describe("Math curve", () => {
         pointFrom(10, 50),
         pointFrom(50, 50),
       );
-      const l = lineSegment(pointFrom(0, 112.5), pointFrom(90, 0));
+      const l = lineSegment(pointFrom(10, -60), pointFrom(10, 60));
 
-      expect(curveIntersectLineSegment(c, l)).toCloselyEqualPoints([[50, 50]]);
+      expect(curveIntersectLineSegment(c, l)).toCloselyEqualPoints([
+        [9.99, 5.05],
+      ]);
     });
 
     it("can be detected where the determinant is overly precise", () => {

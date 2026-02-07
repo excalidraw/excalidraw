@@ -7,7 +7,7 @@ import type {
   PendingExcalidrawElements,
 } from "@excalidraw/excalidraw/types";
 
-import { bindLinearElement } from "./binding";
+import { bindBindingElement } from "./binding";
 import { updateElbowArrowPoints } from "./elbowArrow";
 import {
   HEADING_DOWN,
@@ -446,8 +446,14 @@ const createBindingArrow = (
 
   const elementsMap = scene.getNonDeletedElementsMap();
 
-  bindLinearElement(bindingArrow, startBindingElement, "start", scene);
-  bindLinearElement(bindingArrow, endBindingElement, "end", scene);
+  bindBindingElement(
+    bindingArrow,
+    startBindingElement,
+    "orbit",
+    "start",
+    scene,
+  );
+  bindBindingElement(bindingArrow, endBindingElement, "orbit", "end", scene);
 
   const changedElements = new Map<string, OrderedExcalidrawElement>();
   changedElements.set(
