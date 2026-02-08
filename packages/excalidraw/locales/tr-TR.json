@@ -171,7 +171,9 @@
     "linkToElement": "Nesneye bağlantıla",
     "wrapSelectionInFrame": "Seçimi karede kaydır",
     "tab": "Sekme",
-    "shapeSwitch": "Şekli başkasıyla değiştir"
+    "shapeSwitch": "Şekli başkasıyla değiştir",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Nesneye bağlantıla",
