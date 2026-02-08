@@ -171,7 +171,9 @@
     "linkToElement": "Enllaç a l'objecte",
     "wrapSelectionInFrame": "Embolica la selecció en un marc",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Enllaç a l'objecte",
