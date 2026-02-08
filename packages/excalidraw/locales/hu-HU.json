@@ -171,7 +171,9 @@
     "linkToElement": "Hivatkozás az objektumhoz",
     "wrapSelectionInFrame": "",
     "tab": "Tab",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Hivatkozás az objektumhoz",
