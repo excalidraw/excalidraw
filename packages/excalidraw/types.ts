@@ -350,6 +350,8 @@ export interface AppState {
   currentHoveredFontFamily: FontFamilyValues | null;
   currentItemRoundness: StrokeRoundness;
   currentItemArrowType: "sharp" | "round" | "elbow";
+  currentItemStyles: Record<string, Partial<AppStateStyleProperties>>;
+  isStyleSettingsLocked: boolean;
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
@@ -451,7 +453,6 @@ export interface AppState {
     focusedId: ExcalidrawElement["id"] | null;
     matches: readonly SearchMatch[];
   }> | null;
-
   /** the locked element/group that's active and shows unlock popup */
   activeLockedId: string | null;
   // when locking multiple units of elements together, we assign a temporary
@@ -461,6 +462,24 @@ export interface AppState {
   lockedMultiSelections: { [groupId: string]: true };
   bindMode: BindMode;
 }
+
+export type AppStateStyleProperties = Pick<
+  AppState,
+  | "currentItemStrokeColor"
+  | "currentItemBackgroundColor"
+  | "currentItemFillStyle"
+  | "currentItemStrokeWidth"
+  | "currentItemStrokeStyle"
+  | "currentItemRoughness"
+  | "currentItemOpacity"
+  | "currentItemFontFamily"
+  | "currentItemFontSize"
+  | "currentItemTextAlign"
+  | "currentItemStartArrowhead"
+  | "currentItemEndArrowhead"
+  | "currentItemRoundness"
+  | "currentItemArrowType"
+>;
 
 export type SearchMatch = {
   id: string;
