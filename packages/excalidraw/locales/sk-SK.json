@@ -171,7 +171,9 @@
     "linkToElement": "Odkaz na objekt",
     "wrapSelectionInFrame": "Zabaliť výber do rámu",
     "tab": "Tab",
-    "shapeSwitch": "Zmeniť tvar"
+    "shapeSwitch": "Zmeniť tvar",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Odkaz na objekt",
