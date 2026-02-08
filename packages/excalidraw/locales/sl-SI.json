@@ -171,7 +171,9 @@
     "linkToElement": "Povezava do objekta",
     "wrapSelectionInFrame": "Zavij izbor v okvir",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Povezava do objekta",
