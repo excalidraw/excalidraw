@@ -171,7 +171,9 @@
     "linkToElement": "இணைப்பு",
     "wrapSelectionInFrame": "தேர்வை வடிவத்தில் சுற்று",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "இணைப்பு",
