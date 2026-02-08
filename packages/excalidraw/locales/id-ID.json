@@ -171,7 +171,9 @@
     "linkToElement": "Taut ke objek",
     "wrapSelectionInFrame": "Bungkus pilihan dalam bingkai",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Taut ke objek",
