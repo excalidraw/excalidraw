@@ -171,7 +171,9 @@
     "linkToElement": "連結至物件",
     "wrapSelectionInFrame": "將選取內容放入框架",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "連結至物件",
