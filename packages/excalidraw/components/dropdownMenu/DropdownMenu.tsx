@@ -12,6 +12,7 @@ import DropdownMenuItemLink from "./DropdownMenuItemLink";
 import MenuSeparator from "./DropdownMenuSeparator";
 import DropdownMenuSub from "./DropdownMenuSub";
 import DropdownMenuTrigger from "./DropdownMenuTrigger";
+import DropdownMenuItemCheckbox from "./DropdownMenuItemCheckbox";
 import {
   getMenuContentComponent,
   getMenuTriggerComponent,
@@ -57,6 +58,7 @@ const DropdownMenu = ({
 DropdownMenu.Trigger = DropdownMenuTrigger;
 DropdownMenu.Content = DropdownMenuContent;
 DropdownMenu.Item = DropdownMenuItem;
+DropdownMenu.ItemCheckbox = DropdownMenuItemCheckbox;
 DropdownMenu.ItemLink = DropdownMenuItemLink;
 DropdownMenu.ItemCustom = DropdownMenuItemCustom;
 DropdownMenu.Group = DropdownMenuGroup;
