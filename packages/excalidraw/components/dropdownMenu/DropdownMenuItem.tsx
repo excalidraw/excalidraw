@@ -16,6 +16,17 @@ import MenuItemContent from "./DropdownMenuItemContent";
 
 import type { JSX } from "react";
 
+export type DropdownMenuItemProps = {
+  icon?: JSX.Element;
+  badge?: React.ReactNode;
+  value?: string | number | undefined;
+  onSelect?: (event: Event) => void;
+  children: React.ReactNode;
+  shortcut?: string;
+  selected?: boolean;
+  className?: string;
+} & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onSelect">;
+
 const DropdownMenuItem = ({
   icon,
   badge,
@@ -26,19 +37,7 @@ const DropdownMenuItem = ({
   selected,
   onSelect,
   ...rest
-}: {
-  icon?: JSX.Element;
-  badge?: React.ReactNode;
-  value?: string | number | undefined;
-  onSelect?: (event: Event) => void;
-  children: React.ReactNode;
-  shortcut?: string;
-  selected?: boolean;
-  className?: string;
-} & Omit<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  "onSelect" | "onClick"
->) => {
+}: DropdownMenuItemProps) => {
   const handleSelect = useHandleDropdownMenuItemSelect(onSelect);
 
   return (
