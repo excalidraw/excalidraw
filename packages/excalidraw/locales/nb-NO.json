@@ -171,7 +171,9 @@
     "linkToElement": "Lenke til objekt",
     "wrapSelectionInFrame": "Brekk om utvalg i ramme",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Lenke til objekt",
