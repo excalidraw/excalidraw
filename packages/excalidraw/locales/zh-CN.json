@@ -171,7 +171,9 @@
     "linkToElement": "链接到对象",
     "wrapSelectionInFrame": "用选中的元素创建画框",
     "tab": "Tab",
-    "shapeSwitch": "切换形状"
+    "shapeSwitch": "切换形状",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "链接到对象",
