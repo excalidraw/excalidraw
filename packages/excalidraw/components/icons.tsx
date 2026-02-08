@@ -2396,3 +2396,15 @@ export const presentationIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+// empty placeholder icon (used for alignment in menus)
+export const emptyIcon = <div style={{ width: "1rem", height: "1rem" }} />;
+
+//tabler-icons: chevron-right
+export const chevronRight = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <polyline points="9 6 15 12 9 18" />
+  </g>,
+  tablerIconProps,
+);

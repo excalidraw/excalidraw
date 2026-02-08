@@ -30,10 +30,12 @@ import { PropertiesPopover } from "../PropertiesPopover";
 import { QuickSearch } from "../QuickSearch";
 import { ScrollableList } from "../ScrollableList";
 import DropdownMenuGroup from "../dropdownMenu/DropdownMenuGroup";
-import DropdownMenuItem, {
+import {
   DropDownMenuItemBadgeType,
   DropDownMenuItemBadge,
 } from "../dropdownMenu/DropdownMenuItem";
+import MenuItemContent from "../dropdownMenu/DropdownMenuItemContent";
+import { getDropdownMenuItemClassName } from "../dropdownMenu/common";
 import {
   FontFamilyCodeIcon,
   FontFamilyHeadingIcon,
@@ -269,45 +271,74 @@ export const FontPickerList = React.memo(
       [filteredFonts, sceneFamilies],
     );
 
-    const renderFont = (font: FontDescriptor, index: number) => (
-      <DropdownMenuItem
-        key={font.value}
-        icon={font.icon}
-        value={font.value}
-        order={index}
-        textStyle={{
-          fontFamily: getFontFamilyString({ fontFamily: font.value }),
-        }}
-        hovered={font.value === hoveredFont?.value}
-        selected={font.value === selectedFontFamily}
-        // allow to tab between search and selected font
-        tabIndex={font.value === selectedFontFamily ? 0 : -1}
-        onClick={(e) => {
-          wrappedOnSelect(Number(e.currentTarget.value));
-        }}
-        onMouseMove={() => {
-          if (hoveredFont?.value !== font.value) {
-            onHover(font.value);
-          }
-        }}
-        badge={
-          font.badge && (
-            <DropDownMenuItemBadge type={font.badge.type}>
-              {font.badge.placeholder}
-            </DropDownMenuItemBadge>
-          )
+    const FontPickerListItem = ({
+      font,
+      order,
+    }: {
+      font: FontDescriptor;
+      order: number;
+    }) => {
+      const ref = useRef<HTMLButtonElement>(null);
+      const isHovered = font.value === hoveredFont?.value;
+      const isSelected = font.value === selectedFontFamily;
+
+      useEffect(() => {
+        if (!isHovered) {
+          return;
         }
-      >
-        {font.text}
-      </DropdownMenuItem>
-    );
+        if (order === 0) {
+          // scroll into the first item differently, so it's visible what is above (i.e. group title)
+          ref.current?.scrollIntoView?.({ block: "end" });
+        } else {
+          ref.current?.scrollIntoView?.({ block: "nearest" });
+        }
+      }, [isHovered, order]);
+
+      return (
+        <button
+          ref={ref}
+          type="button"
+          value={font.value}
+          className={getDropdownMenuItemClassName("", isSelected, isHovered)}
+          title={font.text}
+          // allow to tab between search and selected font
+          tabIndex={isSelected ? 0 : -1}
+          onClick={(e) => {
+            wrappedOnSelect(Number(e.currentTarget.value));
+          }}
+          onMouseMove={() => {
+            if (hoveredFont?.value !== font.value) {
+              onHover(font.value);
+            }
+          }}
+        >
+          <MenuItemContent
+            icon={font.icon}
+            badge={
+              font.badge && (
+                <DropDownMenuItemBadge type={font.badge.type}>
+                  {font.badge.placeholder}
+                </DropDownMenuItemBadge>
+              )
+            }
+            textStyle={{
+              fontFamily: getFontFamilyString({ fontFamily: font.value }),
+            }}
+          >
+            {font.text}
+          </MenuItemContent>
+        </button>
+      );
+    };
 
     const groups = [];
 
     if (sceneFilteredFonts.length) {
       groups.push(
         <DropdownMenuGroup title={t("fontList.sceneFonts")} key="group_1">
-          {sceneFilteredFonts.map(renderFont)}
+          {sceneFilteredFonts.map((font, index) => (
+            <FontPickerListItem key={font.value} font={font} order={index} />
+          ))}
         </DropdownMenuGroup>,
       );
     }
@@ -315,9 +346,13 @@ export const FontPickerList = React.memo(
     if (availableFilteredFonts.length) {
       groups.push(
         <DropdownMenuGroup title={t("fontList.availableFonts")} key="group_2">
-          {availableFilteredFonts.map((font, index) =>
-            renderFont(font, index + sceneFilteredFonts.length),
-          )}
+          {availableFilteredFonts.map((font, index) => (
+            <FontPickerListItem
+              key={font.value}
+              font={font}
+              order={index + sceneFilteredFonts.length}
+            />
+          ))}
         </DropdownMenuGroup>,
       );
     }

@@ -62,7 +62,7 @@ export const AppMainMenu: React.FC<{
       {isDevEnv() && (
         <MainMenu.Item
           icon={eyeIcon}
-          onClick={() => {
+          onSelect={() => {
             if (window.visualDebug) {
               delete window.visualDebug;
               saveDebugState({ enabled: false });

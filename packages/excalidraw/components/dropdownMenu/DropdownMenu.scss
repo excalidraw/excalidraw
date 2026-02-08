@@ -2,16 +2,27 @@
 
 .excalidraw {
   .dropdown-menu {
-    position: absolute;
-    top: 2.5rem;
-    margin-top: 0.5rem;
     max-width: 16rem;
+    z-index: 1;
 
     &--placement-top {
-      top: auto;
-      bottom: 100%;
-      margin-top: 0;
       margin-bottom: 0.5rem;
+    }
+
+    &__submenu-trigger {
+      &[aria-expanded="true"] {
+        .dropdown-menu-item {
+          background-color: var(--button-hover-bg);
+        }
+      }
+    }
+
+    &__submenu-trigger-icon {
+      margin-left: auto;
+      opacity: 0.5;
+      svg g {
+        stroke-width: 2;
+      }
     }
 
     &--mobile {
@@ -19,7 +30,7 @@
       row-gap: 0.75rem;
 
       // When main menu is in the top toolbar, position relative to trigger
-      &.main-menu-dropdown {
+      &.main-menu {
         min-width: 232px;
         margin-top: 0;
         margin-bottom: 0;
@@ -32,10 +43,6 @@
       .dropdown-menu-container {
         padding: 8px 8px;
         box-sizing: border-box;
-        max-height: calc(
-          100svh - var(--editor-container-padding) * 2 - 2.25rem
-        );
-        box-shadow: var(--shadow-island);
         border-radius: var(--border-radius-lg);
         position: relative;
         transition: box-shadow 0.5s ease-in-out;
@@ -51,14 +58,25 @@
 
     .dropdown-menu-container {
       background-color: var(--island-bg-color);
-
       overflow-y: auto;
-      --gap: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+
+      box-shadow: var(--box-shadow, var(--shadow-island));
+
+      max-height: calc(100svh - var(--editor-container-padding) * 2 - 2.25rem);
+
+      @at-root .excalidraw.theme--dark#{&} {
+        box-shadow: var(--box-shadow, var(--shadow-island)),
+          0 0 0 1px rgba(0, 0, 0, 0.15);
+      }
     }
 
     .dropdown-menu-item-base {
       display: flex;
       column-gap: 0.625rem;
+      padding: 0 0.5rem;
       font-size: 0.875rem;
       color: var(--color-on-surface);
       width: 100%;
@@ -115,11 +133,9 @@
 
     .dropdown-menu-item {
       height: 2rem;
-      margin: 1px;
       padding: 0 0.5rem;
-      width: calc(100% - 2px);
       background-color: transparent;
-      border: 1px solid transparent;
+      border: none;
       align-items: center;
       cursor: pointer;
       border-radius: var(--border-radius-md);
@@ -162,7 +178,7 @@
 
       &:active {
         background-color: var(--button-hover-bg);
-        border-color: var(--color-brand-active);
+        box-shadow: 0 0 0 1px var(--color-brand-active);
       }
 
       svg {
@@ -223,7 +239,7 @@
     }
 
     &:active {
-      border-color: var(--color-primary);
+      box-shadow: 0 0 0 1px var(--color-primary);
     }
 
     &[disabled] {
@@ -235,7 +251,7 @@
       }
 
       &:active {
-        border-color: transparent;
+        box-shadow: none;
       }
 
       @at-root .excalidraw.theme--dark#{&} {
