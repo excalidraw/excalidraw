@@ -265,6 +265,7 @@ import type {
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  ExcalidrawTextElementWithContainer,
   NonDeleted,
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
@@ -7213,6 +7214,11 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    // Handle arrow label dragging
+    if (this.handleArrowLabelDrag(event, pointerDownState)) {
+      return;
+    }
+
     const allowOnPointerDown =
       !this.state.penMode ||
       event.pointerType !== "touch" ||
@@ -12255,6 +12261,99 @@ class App extends React.Component<AppProps, AppState> {
       offsetTop: 0,
     };
   }
+
+  // Detect if user clicked on an arrow label and initiate drag if so
+  private handleArrowLabelDrag = (
+    event: React.PointerEvent<HTMLElement>,
+    pointerDownState: PointerDownState,
+  ): boolean => {
+    const { x, y } = pointerDownState.origin;
+    const hitElement = pointerDownState.hit.element;
+    
+    if (hitElement && isArrowElement(hitElement)) {
+      const label = getBoundTextElement(
+        hitElement,
+        this.scene.getNonDeletedElementsMap(),
+      );
+      
+      if (label) {
+        const labelPosition = LinearElementEditor.getBoundTextElementPosition(
+          hitElement,
+          label as ExcalidrawTextElementWithContainer,
+          this.scene.getNonDeletedElementsMap(),
+        );
+        
+        const isClickInLabel = 
+          x >= labelPosition.x &&
+          x <= labelPosition.x + label.width &&
+          y >= labelPosition.y &&
+          y <= labelPosition.y + label.height;
+        
+        if (isClickInLabel) {
+          this.startDraggingArrowLabel(
+            hitElement, 
+            label as ExcalidrawTextElementWithContainer,
+            pointerDownState
+          );
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  };
+
+  // Handle the dragging of an arrow label to reposition it around the arrow
+  private startDraggingArrowLabel = (
+    arrow: ExcalidrawArrowElement,
+    label: ExcalidrawTextElementWithContainer,
+    pointerDownState: PointerDownState,
+  ) => {
+    const { x: startX, y: startY } = pointerDownState.origin;
+    const currentOffset = arrow.customLabelOffset || { x: 0, y: 0 };
+    
+    const onPointerMove = (event: PointerEvent) => {
+      const { x: currentX, y: currentY } = viewportCoordsToSceneCoords(
+        { clientX: event.clientX, clientY: event.clientY },
+        this.state,
+      );
+      
+      const deltaX = currentX - startX;
+      const deltaY = currentY - startY;
+      
+      this.updateScene({
+        elements: this.scene.getElementsIncludingDeleted().map((el) => {
+          if (el.id === arrow.id && isArrowElement(el)) {
+            return {
+              ...el,
+              customLabelOffset: {
+                x: currentOffset.x + deltaX,
+                y: currentOffset.y + deltaY,
+              },
+            };
+          }
+          return el;
+        }),
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+    };
+    
+    const onPointerUp = () => {
+      window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+      window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
+      
+      const finalArrow = this.scene.getElement(arrow.id);
+      if (finalArrow && isArrowElement(finalArrow)) {
+        this.scene.mutateElement(finalArrow, {
+          version: finalArrow.version + 1,
+        });
+      }
+      this.store.scheduleCapture();
+    };
+    
+    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
+    window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+  };
 
   watchState = () => {};
 

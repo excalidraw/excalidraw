@@ -1800,8 +1800,10 @@ export class LinearElementEditor {
     if (points.length < 2) {
       mutateElement(boundTextElement, elementsMap, { isDeleted: true });
     }
+    
     let x = 0;
     let y = 0;
+    
     if (element.points.length % 2 === 1) {
       const index = Math.floor(element.points.length / 2);
       const midPoint = LinearElementEditor.getPointGlobalCoordinates(
@@ -1821,6 +1823,14 @@ export class LinearElementEditor {
       x = midSegmentMidpoint[0] - boundTextElement.width / 2;
       y = midSegmentMidpoint[1] - boundTextElement.height / 2;
     }
+    
+    // 👇 AJOUTE CES LIGNES ICI
+    // Si l'utilisateur a défini une position custom, on l'utilise
+    if (element.customLabelOffset) {
+      x += element.customLabelOffset.x;
+      y += element.customLabelOffset.y;
+    }
+    
     return { x, y };
   };
 
