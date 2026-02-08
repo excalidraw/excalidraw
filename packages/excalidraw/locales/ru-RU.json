@@ -171,7 +171,9 @@
     "linkToElement": "Ссылка на объект",
     "wrapSelectionInFrame": "Поместить выделенное в фрейм",
     "tab": "Вкладка",
-    "shapeSwitch": "Сменить форму"
+    "shapeSwitch": "Сменить форму",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Ссылка на объект",
