@@ -171,7 +171,9 @@
     "linkToElement": "لینک به آیتم",
     "wrapSelectionInFrame": "انتخاب را در قاب قرار دهید",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "لینک به آیتم",
