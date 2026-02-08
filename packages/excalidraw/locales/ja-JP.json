@@ -171,7 +171,9 @@
     "linkToElement": "オブジェクトにリンク",
     "wrapSelectionInFrame": "選択範囲をフレームで囲む",
     "tab": "Tab",
-    "shapeSwitch": "図形形状を変更"
+    "shapeSwitch": "図形形状を変更",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "オブジェクトにリンク",
