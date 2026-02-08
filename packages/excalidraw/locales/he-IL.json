@@ -171,7 +171,9 @@
     "linkToElement": "קישור לפריט",
     "wrapSelectionInFrame": "לעטוף את הבחירה במסגרת",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "קישור לפריט",
