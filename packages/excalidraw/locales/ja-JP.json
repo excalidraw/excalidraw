@@ -75,7 +75,7 @@
     "right": "右寄せ",
     "extraBold": "極太",
     "architect": "建築家",
-    "artist": "アーティスト",
+    "artist": "画家",
     "cartoonist": "漫画家",
     "fileTitle": "ファイル名",
     "colorPicker": "カラーピッカー",
@@ -600,12 +600,12 @@
       "loadFromFile": {
         "title": "ファイルからロード",
         "button": "ファイルからロード",
-        "description": "ファイルからのロードは、<bold>現在の描画内容を置き換えます</bold>。<br></br>その前に、以下の選択肢のいずれかにより描画内容を保存できます。"
+        "description": "ファイルからの読み込みは、<bold>現在の描画内容を置き換えます</bold>。<br></br>その前に、以下の選択肢のいずれかにより描画内容を保存できます。"
       },
       "shareableLink": {
-        "title": "リンクからロード",
+        "title": "リンクから読み込み",
         "button": "描画内容を置き換える",
-        "description": "外部図面のロードは、<bold>現在の描画内容を置き換えます</bold>。<br></br>その前に、以下の選択肢のいずれかにより描画内容を保存できます。"
+        "description": "外部の描画データの読み込みは、<bold>現在の描画内容を置き換えます</bold>。<br></br>その前に、以下の選択肢のいずれかにより描画内容を保存できます。"
       }
     }
   },
@@ -647,29 +647,29 @@
     "insert": "挿入",
     "retry": "再試行",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "プロンプトが短すぎます ({{min}} 文字以上)",
+      "promptTooLong": "プロンプトが長すぎます ({{max}} 文字以下)",
+      "generationFailed": "生成に失敗しました",
+      "invalidDiagram": "無効なダイアグラムが生成されました。手動で編集、自動修正で再試行、または別のプロンプトをお試しください。",
+      "fixInMermaid": "Mermaidで手動編集 →",
+      "aiRepair": "再生成 (自動修正) →",
+      "requestAborted": "リクエストが中断されました",
+      "requestFailed": "リクエストに失敗しました",
+      "mermaidParseError": "Mermaid構文エラー"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "無料プランのAI利用上限に達しました。Excalidraw+をお試しいただくか、また明日ご利用ください。",
+      "generalRateLimit": "操作が速すぎたようです。もう少し待ってから再度お試しください。",
+      "messageLimitInputPlaceholder": "メッセージの送信上限に達しました"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Plusにアップグレード"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "クイック検索"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "旧"
     },
     "sceneFonts": "このシーン内",
     "availableFonts": "利用可能フォント",
