@@ -171,7 +171,9 @@
     "linkToElement": "वस्तू ह्याचा दुवा",
     "wrapSelectionInFrame": "चौकटित निवडलेले गुंडाळा",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "वस्तू ह्याचा दुवा",
