@@ -288,7 +288,8 @@
     },
     "asyncPasteFailedOnRead": "Couldn't paste (couldn't read from system clipboard).",
     "asyncPasteFailedOnParse": "Couldn't paste.",
-    "copyToSystemClipboardFailed": "Couldn't copy to clipboard."
+    "copyToSystemClipboardFailed": "Couldn't copy to clipboard.",
+    "invalidHexColor": "Invalid hexadecimal value"
   },
   "toolBar": {
     "selection": "Selection",
