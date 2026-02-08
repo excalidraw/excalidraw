@@ -171,7 +171,9 @@
     "linkToElement": "Link all'oggetto",
     "wrapSelectionInFrame": "Avvolgi la selezione nella cornice",
     "tab": "Scheda",
-    "shapeSwitch": "Cambia forma"
+    "shapeSwitch": "Cambia forma",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Link all'oggetto",
