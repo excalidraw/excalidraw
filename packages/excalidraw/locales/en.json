@@ -171,7 +171,9 @@
     "linkToElement": "Link to object",
     "wrapSelectionInFrame": "Wrap selection in frame",
     "tab": "Tab",
-    "shapeSwitch": "Switch shape"
+    "shapeSwitch": "Switch shape",
+    "preferences": "Preferences",
+    "preferences_toolLock": "Tool lock"
   },
   "elementLink": {
     "title": "Link to object",
