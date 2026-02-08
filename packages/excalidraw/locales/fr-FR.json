@@ -171,7 +171,9 @@
     "linkToElement": "Lien vers un objet",
     "wrapSelectionInFrame": "Mettre la sélection dans un cadre",
     "tab": "Onglet",
-    "shapeSwitch": "Changer de forme"
+    "shapeSwitch": "Changer de forme",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Lien vers un objet",
