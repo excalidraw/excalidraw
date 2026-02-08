@@ -171,7 +171,9 @@
     "linkToElement": "Link naar object",
     "wrapSelectionInFrame": "Selectie omslaan in frame",
     "tab": "Tab",
-    "shapeSwitch": "Verander vorm"
+    "shapeSwitch": "Verander vorm",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Link naar object",
