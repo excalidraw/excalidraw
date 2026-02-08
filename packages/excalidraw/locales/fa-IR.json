@@ -196,7 +196,7 @@
     "multipleResults": "نتایج",
     "placeholder": "جستجوی متن در بوم...",
     "frames": "",
-    "texts": ""
+    "texts": "متن"
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -571,7 +571,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "رنگ",
     "mostUsedCustomColors": "رنگ های به‌تازگی به‌کار گرفته شده",
     "colors": "رنگ‌ها",
     "shades": "جلوه‌ها",
@@ -619,7 +619,7 @@
     "inputPlaceholder": ""
   },
   "ttd": {
-    "error": ""
+    "error": "خطا!"
   },
   "chat": {
     "inputPlaceholder": "",
@@ -627,8 +627,8 @@
     "generating": "",
     "rateLimitRemaining": "",
     "role": {
-      "user": "",
-      "assistant": "",
+      "user": "شما",
+      "assistant": "دستیار هوش مصنوعی",
       "system": ""
     },
     "aiBeta": "",
@@ -707,9 +707,9 @@
     "alt": "",
     "escape": "",
     "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
+    "shift": "Shift",
+    "spacebar": "فاصله",
+    "delete": "حذف",
     "mmb": ""
   }
 }
