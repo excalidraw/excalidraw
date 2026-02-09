@@ -1,78 +1,62 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 
 import { THEME } from "@excalidraw/common";
+
+import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
 import type { ValueOf } from "@excalidraw/common/utility-types";
 
 import { useExcalidrawAppState } from "../App";
 
-import MenuItemContent from "./DropdownMenuItemContent";
 import {
   getDropdownMenuItemClassName,
-  useHandleDropdownMenuItemClick,
+  useHandleDropdownMenuItemSelect,
 } from "./common";
+import MenuItemContent from "./DropdownMenuItemContent";
 
 import type { JSX } from "react";
 
-const DropdownMenuItem = ({
-  icon,
-  value,
-  order,
-  children,
-  shortcut,
-  className,
-  hovered,
-  selected,
-  textStyle,
-  onSelect,
-  onClick,
-  badge,
-  ...rest
-}: {
+export type DropdownMenuItemProps = {
   icon?: JSX.Element;
+  badge?: React.ReactNode;
   value?: string | number | undefined;
-  order?: number;
   onSelect?: (event: Event) => void;
   children: React.ReactNode;
   shortcut?: string;
-  hovered?: boolean;
   selected?: boolean;
-  textStyle?: React.CSSProperties;
   className?: string;
-  badge?: React.ReactNode;
-} & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onSelect">) => {
-  const handleClick = useHandleDropdownMenuItemClick(onClick, onSelect);
-  const ref = useRef<HTMLButtonElement>(null);
+} & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onSelect">;
 
-  useEffect(() => {
-    if (hovered) {
-      if (order === 0) {
-        // scroll into the first item differently, so it's visible what is above (i.e. group title)
-        ref.current?.scrollIntoView({ block: "end" });
-      } else {
-        ref.current?.scrollIntoView({ block: "nearest" });
-      }
-    }
-  }, [hovered, order]);
+const DropdownMenuItem = ({
+  icon,
+  badge,
+  value,
+  children,
+  shortcut,
+  className,
+  selected,
+  onSelect,
+  ...rest
+}: DropdownMenuItemProps) => {
+  const handleSelect = useHandleDropdownMenuItemSelect(onSelect);
 
   return (
-    <button
-      {...rest}
-      ref={ref}
-      value={value}
-      onClick={handleClick}
-      className={getDropdownMenuItemClassName(className, selected, hovered)}
-      title={rest.title ?? rest["aria-label"]}
+    <DropdownMenuPrimitive.Item
+      className="radix-menu-item"
+      onSelect={handleSelect}
+      asChild
     >
-      <MenuItemContent
-        textStyle={textStyle}
-        icon={icon}
-        shortcut={shortcut}
-        badge={badge}
+      <button
+        {...rest}
+        value={value}
+        className={getDropdownMenuItemClassName(className, selected)}
+        title={rest.title ?? rest["aria-label"]}
       >
-        {children}
-      </MenuItemContent>
-    </button>
+        <MenuItemContent icon={icon} shortcut={shortcut} badge={badge}>
+          {children}
+        </MenuItemContent>
+      </button>
+    </DropdownMenuPrimitive.Item>
   );
 };
 DropdownMenuItem.displayName = "DropdownMenuItem";

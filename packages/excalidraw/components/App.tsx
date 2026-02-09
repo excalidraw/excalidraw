@@ -8743,6 +8743,7 @@ class App extends React.Component<AppProps, AppState> {
               selectedPointsIndices: [endIdx],
               initialState: {
                 ...linearElementEditor.initialState,
+                arrowStartIsInside: event.altKey,
                 lastClickedPoint: endIdx,
                 origin: pointFrom<GlobalPoint>(
                   pointerDownState.origin.x,
@@ -9594,7 +9595,9 @@ class App extends React.Component<AppProps, AppState> {
                   isBindableElement(element) &&
                   element.boundElements?.some((other) => other.type === "arrow")
                 ) {
-                  updateBoundElements(element, this.scene);
+                  updateBoundElements(element, this.scene, {
+                    indirectArrowUpdate: true,
+                  });
                 }
               });
 

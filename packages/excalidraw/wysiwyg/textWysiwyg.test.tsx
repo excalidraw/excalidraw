@@ -1550,7 +1550,6 @@ describe("textWysiwyg", () => {
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).verticalAlign,
       ).toBe(VERTICAL_ALIGN.BOTTOM);
-
       // Attempt to Bind 2nd text using text tool
       UI.clickTool("text");
       mouse.clickAt(

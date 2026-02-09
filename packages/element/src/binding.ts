@@ -811,10 +811,13 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     elementsMap,
   );
 
-  const other: BindingStrategy =
-    otherBindableElement &&
-    !otherFocusPointIsInElement &&
-    appState.selectedLinearElement?.initialState.altFocusPoint
+  const otherNeverOverride = opts?.newArrow
+    ? appState.selectedLinearElement?.initialState.arrowStartIsInside
+    : otherBinding?.mode === "inside";
+  const other: BindingStrategy = !otherNeverOverride
+    ? otherBindableElement &&
+      !otherFocusPointIsInElement &&
+      appState.selectedLinearElement?.initialState.altFocusPoint
       ? {
           mode: "orbit",
           element: otherBindableElement,
@@ -833,7 +836,8 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
               elementsMap,
             ) || otherEndpoint,
         }
-      : { mode: undefined };
+      : { mode: undefined }
+    : { mode: undefined };
 
   return {
     start: startDragged ? current : other,
@@ -1078,6 +1082,7 @@ export const updateBoundElements = (
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     changedElements?: Map<string, ExcalidrawElement>;
+    indirectArrowUpdate?: boolean;
   },
 ) => {
   if (!isBindableElement(changedElement)) {
@@ -1097,7 +1102,7 @@ export const updateBoundElements = (
     });
   }
 
-  boundElementsVisitor(elementsMap, changedElement, (element) => {
+  const visitor = (element: ExcalidrawElement | undefined) => {
     if (!isArrowElement(element) || element.isDeleted) {
       return;
     }
@@ -1169,7 +1174,14 @@ export const updateBoundElements = (
     if (boundText && !boundText.isDeleted) {
       handleBindTextResize(element, scene, false);
     }
-  });
+  };
+
+  boundElementsVisitor(elementsMap, changedElement, visitor);
+
+  if (options?.indirectArrowUpdate) {
+    boundElementsVisitor(elementsMap, changedElement, visitor);
+    boundElementsVisitor(elementsMap, changedElement, visitor);
+  }
 };
 
 const updateArrowBindings = (

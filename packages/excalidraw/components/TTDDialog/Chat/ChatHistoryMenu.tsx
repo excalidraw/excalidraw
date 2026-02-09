@@ -52,11 +52,7 @@ export const ChatHistoryMenu = ({
             >
               {historyIcon}
             </DropdownMenu.Trigger>
-            <DropdownMenu.Content
-              onClickOutside={onClose}
-              onSelect={onClose}
-              placement="bottom"
-            >
+            <DropdownMenu.Content onClickOutside={onClose} onSelect={onClose}>
               <>
                 {savedChats.map((chat) => (
                   <DropdownMenu.ItemCustom
