@@ -4628,7 +4628,7 @@ describe("history", () => {
                 }),
                 endBinding: expect.objectContaining({
                   elementId: rect2.id,
-                  fixedPoint: [0.4106696643494564, 0.5893303356505437],
+                  fixedPoint: [0.4123831479260477, 0.5876168520739522],
                   mode: "orbit",
                 }),
               }),

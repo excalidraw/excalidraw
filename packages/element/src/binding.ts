@@ -27,11 +27,7 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
 import type { Bounds } from "@excalidraw/common";
 
-import {
-  doBoundsIntersect,
-  getCenterForBounds,
-  getElementBounds,
-} from "./bounds";
+import { getCenterForBounds } from "./bounds";
 import {
   getAllHoveredElementAtPoint,
   getHoveredElementForBinding,
@@ -39,7 +35,6 @@ import {
   intersectElementWithLineSegment,
   isBindableElementInsideOtherBindable,
   isPointInElement,
-  isPointOnElementOutline,
 } from "./collision";
 import { distanceToElement } from "./distance";
 import {
@@ -1685,10 +1680,34 @@ const snapToMid = (
   return p;
 };
 
-const compareElementArea = (
-  a: ExcalidrawBindableElement,
-  b: ExcalidrawBindableElement,
-) => b.width ** 2 + b.height ** 2 - (a.width ** 2 + a.height ** 2);
+const extractBinding = (
+  arrow: ExcalidrawArrowElement,
+  startOrEnd: "startBinding" | "endBinding",
+  elementsMap: ElementsMap,
+) => {
+  const binding = arrow[startOrEnd];
+  if (!binding) {
+    return {
+      element: null,
+      fixedPoint: null,
+      focusPoint: null,
+      binding,
+      mode: null,
+    };
+  }
+
+  return {
+    element: elementsMap.get(binding.elementId) as ExcalidrawBindableElement,
+    fixedPoint: binding.fixedPoint,
+    focusPoint: getGlobalFixedPointForBindableElement(
+      normalizeFixedPoint(binding.fixedPoint),
+      elementsMap.get(binding.elementId) as ExcalidrawBindableElement,
+      elementsMap,
+    ),
+    binding,
+    mode: binding.mode,
+  };
+};
 
 export const updateBoundPoint = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
@@ -1713,218 +1732,89 @@ export const updateBoundPoint = (
     return null;
   }
 
-  const global = getGlobalFixedPointForBindableElement(
+  const focusPoint = getGlobalFixedPointForBindableElement(
     normalizeFixedPoint(binding.fixedPoint),
     bindableElement,
     elementsMap,
   );
-  const otherBinding =
-    startOrEnd === "startBinding" ? arrow.endBinding : arrow.startBinding;
-  const pointIndex =
-    startOrEnd === "startBinding" ? 0 : arrow.points.length - 1;
-  const elbowed = isElbowArrow(arrow);
-  const otherBindableElement =
-    otherBinding &&
-    (elementsMap.get(otherBinding.elementId)! as ExcalidrawBindableElement);
-  const bounds = getElementBounds(bindableElement, elementsMap);
-  const otherBounds =
-    otherBindableElement && getElementBounds(otherBindableElement, elementsMap);
-  const otherGlobal =
-    otherBinding &&
-    otherBindableElement &&
-    getGlobalFixedPointForBindableElement(
-      normalizeFixedPoint(otherBinding.fixedPoint),
-      otherBindableElement,
-      elementsMap,
-    );
-  const bindingGap = getBindingGap(bindableElement, arrow);
-  const otherBindingGap =
-    otherBindableElement && getBindingGap(otherBindableElement, arrow);
-  const isOverlapping =
-    otherBindingGap &&
-    otherBounds &&
-    doBoundsIntersect(
-      [
-        bounds[0] - bindingGap,
-        bounds[1] - bindingGap,
-        bounds[2] + bindingGap,
-        bounds[3] + bindingGap,
-      ],
-      [
-        otherBounds[0] - otherBindingGap,
-        otherBounds[1] - otherBindingGap,
-        otherBounds[2] + otherBindingGap,
-        otherBounds[3] + otherBindingGap,
-      ],
-    );
 
-  // GOAL: If the arrow becomes too short, we want to jump the arrow endpoints
-  // to the exact focus points on the elements.
-  // INTUITION: We're not interested in the exact length of the arrow (which
-  // will change if we change where we route it), we want to know the length of
-  // the part which lies outside of both shapes and consider that as a trigger
-  // to change where we point the arrow. Avoids jumping the arrow in and out
-  // at every frame.
-  let arrowTooShort = false;
-  if (
-    //!isOverlapping &&
-    !elbowed &&
-    global &&
-    otherGlobal &&
-    otherBindableElement &&
-    arrow.points.length === 2
-  ) {
-    const startFocusPoint =
-      startOrEnd === "startBinding" ? global : otherGlobal;
-    const endFocusPoint = startOrEnd === "endBinding" ? global : otherGlobal;
-
-    if (pointDistance(startFocusPoint, endFocusPoint) < 40) {
-      arrowTooShort = true;
-    } else {
-      const segment = lineSegment(startFocusPoint, endFocusPoint);
-
-      const startIsOrbit =
-        startOrEnd === "startBinding"
-          ? binding.mode === "orbit"
-          : otherBinding?.mode === "orbit";
-      const startIntersections = startIsOrbit
-        ? intersectElementWithLineSegment(
-            startOrEnd === "startBinding"
-              ? bindableElement
-              : otherBindableElement,
-            elementsMap,
-            segment,
-            0,
-          )
-        : [];
-      const endIsOrbit =
-        startOrEnd === "endBinding"
-          ? binding.mode === "orbit"
-          : otherBinding?.mode === "orbit";
-      const endIntersections = endIsOrbit
-        ? intersectElementWithLineSegment(
-            startOrEnd === "endBinding"
-              ? bindableElement
-              : otherBindableElement,
-            elementsMap,
-            segment,
-            0,
-          )
-        : [];
-      const len = pointDistance(
-        startIntersections[0] ?? startFocusPoint,
-        endIntersections[0] ?? endFocusPoint,
-      );
-      //debugDrawLine(lineSegment(targetStartPoint, targetEndPoint));
-
-      if (startOrEnd === "startBinding") {
-        if (endIntersections.length === 2) {
-          arrowTooShort = false;
-        } else {
-          arrowTooShort = len < 40;
-        }
-      } else if (startIntersections.length === 2) {
-        arrowTooShort = false;
-      } else {
-        arrowTooShort = len < 40;
-      }
-    }
-  }
-
-  const otherFocusPointIsInElement = otherGlobal
-    ? isPointInElement(otherGlobal, bindableElement, elementsMap) ||
-      isPointOnElementOutline(
-        otherGlobal,
-        bindableElement,
-        elementsMap,
-        bindableElement.strokeWidth / 2,
-      )
-    : false;
-  const isLargerThanOther =
-    otherBindableElement &&
-    compareElementArea(bindableElement, otherBindableElement) <
-      // if both shapes the same size, pretend the other is larger
-      (startOrEnd === "endBinding" ? 1 : 0);
-  const isNested =
-    arrowTooShort ||
-    otherFocusPointIsInElement ||
-    (isOverlapping && isLargerThanOther);
-
-  let _customIntersector = opts?.customIntersector;
-  if (!elbowed && !_customIntersector) {
-    const [x1, y1, x2, y2] = LinearElementEditor.getElementAbsoluteCoords(
+  // Short-circuit for inside binding as it doesn't require any
+  // calculations and is not affected by other bindings
+  if (binding.mode === "inside") {
+    return LinearElementEditor.createPointAt(
       arrow,
       elementsMap,
+      focusPoint[0],
+      focusPoint[1],
+      null,
     );
-    const center = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
-    const edgePoint = global;
-    const adjacentPoint = pointRotateRads(
-      pointFrom<GlobalPoint>(
-        arrow.x +
-          arrow.points[pointIndex === 0 ? 1 : arrow.points.length - 2][0],
-        arrow.y +
-          arrow.points[pointIndex === 0 ? 1 : arrow.points.length - 2][1],
-      ),
-      center,
-      arrow.angle as Radians,
-    );
-    const bindingGap = getBindingGap(bindableElement, arrow);
-    const halfVector = vectorScale(
-      vectorNormalize(vectorFromPoint(edgePoint, adjacentPoint)),
-      pointDistance(edgePoint, adjacentPoint) +
-        Math.max(bindableElement.width, bindableElement.height) +
-        bindingGap * 2,
-    );
-    const b = otherFocusPointIsInElement
-      ? pointFromVector(halfVector, adjacentPoint)
-      : pointFromVector(vectorScale(halfVector, -1), adjacentPoint);
-    const a = otherFocusPointIsInElement
-      ? pointFromVector(vectorScale(halfVector, -1), adjacentPoint)
-      : pointFromVector(halfVector, adjacentPoint);
-    _customIntersector = lineSegment(a, b);
   }
 
-  const maybeOutlineGlobal =
-    binding.mode === "orbit" && bindableElement
-      ? isNested
-        ? global
-        : bindPointToSnapToElementOutline(
-            {
-              ...arrow,
-              points: [
-                pointIndex === 0
-                  ? LinearElementEditor.createPointAt(
-                      arrow,
-                      elementsMap,
-                      global[0],
-                      global[1],
-                      null,
-                    )
-                  : arrow.points[0],
-                ...arrow.points.slice(1, -1),
-                pointIndex === arrow.points.length - 1
-                  ? LinearElementEditor.createPointAt(
-                      arrow,
-                      elementsMap,
-                      global[0],
-                      global[1],
-                      null,
-                    )
-                  : arrow.points[arrow.points.length - 1],
-              ],
-            },
-            bindableElement,
-            pointIndex === 0 ? "start" : "end",
-            elementsMap,
-            _customIntersector,
-          )
-      : global;
+  const { element: otherBindable, focusPoint: otherFocusPoint } =
+    extractBinding(
+      arrow,
+      startOrEnd === "startBinding" ? "endBinding" : "startBinding",
+      elementsMap,
+    );
+
+  const otherOutlinePoint =
+    otherBindable &&
+    intersectElementWithLineSegment(
+      otherBindable,
+      elementsMap,
+      lineSegment(focusPoint, otherFocusPoint),
+      getBindingGap(bindableElement, arrow),
+    ).sort(
+      (a, b) => pointDistanceSq(a, focusPoint) - pointDistanceSq(b, focusPoint),
+    )[0];
+  const outlinePoint =
+    otherFocusPoint &&
+    intersectElementWithLineSegment(
+      bindableElement,
+      elementsMap,
+      lineSegment(focusPoint, otherFocusPoint),
+      getBindingGap(bindableElement, arrow),
+    ).sort(
+      (a, b) =>
+        pointDistanceSq(a, otherFocusPoint) -
+        pointDistanceSq(b, otherFocusPoint),
+    )[0];
+  const arrowLength =
+    otherOutlinePoint && outlinePoint
+      ? pointDistance(otherOutlinePoint, outlinePoint)
+      : 0;
+  const otherArrowPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startOrEnd === "startBinding" ? -1 : 0,
+    elementsMap,
+  );
+  const targetPoint = otherBindable
+    ? arrowLength > 7
+      ? hitElementItself({
+          element: otherBindable,
+          point: outlinePoint || otherFocusPoint,
+          elementsMap,
+          threshold: getBindingGap(bindableElement, arrow),
+        })
+        ? focusPoint
+        : outlinePoint || focusPoint
+      : focusPoint
+    : intersectElementWithLineSegment(
+        bindableElement,
+        elementsMap,
+        lineSegment<GlobalPoint>(otherArrowPoint, focusPoint),
+        getBindingGap(bindableElement, arrow),
+      ).sort(
+        (a, b) =>
+          pointDistanceSq(a, otherArrowPoint) -
+          pointDistanceSq(b, otherArrowPoint),
+      )[0] || focusPoint;
 
   return LinearElementEditor.createPointAt(
     arrow,
     elementsMap,
-    maybeOutlineGlobal[0],
-    maybeOutlineGlobal[1],
+    targetPoint[0],
+    targetPoint[1],
     null,
   );
 };
