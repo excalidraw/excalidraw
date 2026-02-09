@@ -172,8 +172,8 @@
     "wrapSelectionInFrame": "Încapsulare selecție în cadru",
     "tab": "Filă",
     "shapeSwitch": "Comutare formă",
-    "preferences": "",
-    "preferences_toolLock": ""
+    "preferences": "Preferințe",
+    "preferences_toolLock": "Blocare instrument"
   },
   "elementLink": {
     "title": "Link către obiect",
