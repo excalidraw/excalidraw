@@ -434,6 +434,7 @@ const renderBindingHighlightForBindableElement_simple = (
       context.save();
       context.translate(suggestedBinding.element.x, suggestedBinding.element.y);
 
+      const midpointRadius = 5 / appState.zoom.value;
       const center = elementCenterPoint(suggestedBinding.element, elementsMap);
 
       let midpoints: LocalPoint[];
@@ -512,68 +513,30 @@ const renderBindingHighlightForBindableElement_simple = (
             target[idx],
           );
 
-        drawBindingKnob(
-          context,
-          midpoint[0],
-          midpoint[1],
-          !!isHighlighted,
-          appState.theme === THEME.DARK,
-          appState.zoom.value,
-        );
+        if (!isHighlighted) {
+          context.fillStyle =
+            appState.theme === THEME.DARK
+              ? `rgba(0, 0, 0, 0.5)`
+              : `rgba(65, 65, 65, 0.4)`;
+          context.beginPath();
+          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+          context.fill();
+        } else {
+          context.fillStyle =
+            appState.theme === THEME.DARK
+              ? `rgba(3, 93, 161, 1)`
+              : `rgba(106, 189, 252, 1)`;
+
+          context.beginPath();
+          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+          context.fill();
+        }
       });
 
       context.restore();
     }
   }
 };
-
-function drawBindingKnob(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  hovered: boolean,
-  themeIsDark: boolean,
-  zoom: number,
-) {
-  const scale = hovered ? 1.5 : 1.15;
-  const radius = 4 / zoom;
-  const r = radius * scale;
-  const fill = hovered ? (themeIsDark ? "#60A5FA" : "#2563EB") : "transparent";
-  const innerStroke = "#FFFFFF";
-  const outerStroke = "#000000";
-
-  ctx.shadowColor = "rgba(0,0,0,0.25)";
-  ctx.shadowBlur = radius / 2;
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 1;
-
-  // Outer stroke (halo)
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.strokeStyle = outerStroke;
-  ctx.lineWidth = radius;
-  ctx.stroke();
-
-  // Remove shadow for inner details
-  ctx.shadowColor = "rgba(0,0,0,0)";
-  ctx.shadowBlur = 0;
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 0;
-
-  // Inner stroke
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.strokeStyle = innerStroke;
-  ctx.lineWidth = radius / 2;
-  ctx.stroke();
-
-  // Fill
-  ctx.beginPath();
-  ctx.arc(x, y, r - 0.1, 0, Math.PI * 2); // slightly inset so strokes stay crisp
-  ctx.fillStyle = fill;
-  ctx.globalAlpha = 0.9;
-  ctx.fill();
-}
 
 const renderBindingHighlightForBindableElement_complex = (
   app: AppClassProperties,
