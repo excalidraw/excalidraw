@@ -47,6 +47,7 @@ import type { Bounds } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
   getBindingStrategyForDraggingBindingElementEndpoints,
+  getGlobalFixedPointForBindableElement,
   isBindingEnabled,
   updateBoundPoint,
 } from "./binding";
@@ -2292,19 +2293,6 @@ const pointDraggingUpdates = (
         : updates.endBinding,
   };
 
-  // We need to use a custom intersector to ensure that if there is a big "jump"
-  // in the arrow's position, we can position it with outline avoidance
-  // pixel-perfectly and avoid "dancing" arrows.
-  // NOTE: Direction matters here, so we create two intersectors
-  const startCustomIntersector =
-    start.focusPoint && end.focusPoint
-      ? lineSegment(start.focusPoint, end.focusPoint)
-      : undefined;
-  const endCustomIntersector =
-    start.focusPoint && end.focusPoint
-      ? lineSegment(end.focusPoint, start.focusPoint)
-      : undefined;
-
   // Needed to handle a special case where an existing arrow is dragged over
   // the same element it is bound to on the other side
   const startIsDraggingOverEndElement =
@@ -2326,30 +2314,6 @@ const pointDraggingUpdates = (
         nextArrow.endBinding.elementId,
       )! as ExcalidrawBindableElement)
     : null;
-
-  const endLocalPoint = startIsDraggingOverEndElement
-    ? nextArrow.points[nextArrow.points.length - 1]
-    : endIsDraggingOverStartElement &&
-      app.state.bindMode !== "inside" &&
-      getFeatureFlag("COMPLEX_BINDINGS")
-    ? nextArrow.points[0]
-    : endBindable
-    ? updateBoundPoint(
-        element,
-        "endBinding",
-        nextArrow.endBinding,
-        endBindable,
-        elementsMap,
-        {
-          customIntersector: endCustomIntersector,
-        },
-      ) || nextArrow.points[nextArrow.points.length - 1]
-    : nextArrow.points[nextArrow.points.length - 1];
-
-  // We need to keep the simulated next arrow up-to-date, because
-  // updateBoundPoint looks at the opposite point
-  nextArrow.points[nextArrow.points.length - 1] = endLocalPoint;
-
   // We need to update the non-dragged point too if bound,
   // so we look up the old binding to trigger updateBoundPoint
   const startBindable = nextArrow.startBinding
@@ -2359,21 +2323,95 @@ const pointDraggingUpdates = (
       )! as ExcalidrawBindableElement)
     : null;
 
+  // We need to use a custom intersector to ensure that if there is a big "jump"
+  // in the arrow's position, we can position it with outline avoidance
+  // pixel-perfectly and avoid "dancing" arrows.
+  // NOTE: Direction matters here, so we create two intersectors
+  // const resolvedStartFocusPoint = start.focusPoint
+  //   ? start.focusPoint
+  //   : nextArrow.startBinding && startBindable
+  //   ? getGlobalFixedPointForBindableElement(
+  //       nextArrow.startBinding.fixedPoint,
+  //       startBindable,
+  //       elementsMap,
+  //     )
+  //   : null;
+  // const resolvedEndFocusPoint = end.focusPoint
+  //   ? end.focusPoint
+  //   : nextArrow.endBinding && endBindable
+  //   ? getGlobalFixedPointForBindableElement(
+  //       nextArrow.endBinding.fixedPoint,
+  //       endBindable,
+  //       elementsMap,
+  //     )
+  //   : null;
+  const startCustomIntersector =
+    start.focusPoint && end.focusPoint
+      ? lineSegment(start.focusPoint, end.focusPoint)
+      : undefined;
+  const endCustomIntersector =
+    start.focusPoint && end.focusPoint
+      ? lineSegment(end.focusPoint, start.focusPoint)
+      : undefined;
+
+  // const endLocalPoint = startIsDraggingOverEndElement
+  //   ? nextArrow.points[nextArrow.points.length - 1]
+  //   : endIsDraggingOverStartElement &&
+  //     app.state.bindMode !== "inside" &&
+  //     getFeatureFlag("COMPLEX_BINDINGS")
+  //   ? nextArrow.points[0]
+  //   : endBindable
+  //   ? updateBoundPoint(
+  //       element,
+  //       "endBinding",
+  //       nextArrow.endBinding,
+  //       endBindable,
+  //       elementsMap,
+  //       endCustomIntersector,
+  //     ) || nextArrow.points[nextArrow.points.length - 1]
+  //   : nextArrow.points[nextArrow.points.length - 1];
+  const endLocalPoint =
+    startIsDragged && endBindable
+      ? updateBoundPoint(
+          element,
+          "endBinding",
+          nextArrow.endBinding,
+          endBindable,
+          elementsMap,
+          endCustomIntersector,
+        ) || nextArrow.points[0]
+      : nextArrow.points[nextArrow.points.length - 1];
+
+  // We need to keep the simulated next arrow up-to-date, because
+  // updateBoundPoint looks at the opposite point
+  nextArrow.points[nextArrow.points.length - 1] = endLocalPoint;
+
+  // const startLocalPoint =
+  //   endIsDraggingOverStartElement && getFeatureFlag("COMPLEX_BINDINGS")
+  //     ? nextArrow.points[0]
+  //     : startIsDraggingOverEndElement &&
+  //       app.state.bindMode !== "inside" &&
+  //       getFeatureFlag("COMPLEX_BINDINGS")
+  //     ? endLocalPoint
+  //     : startBindable
+  //     ? updateBoundPoint(
+  //         element,
+  //         "startBinding",
+  //         nextArrow.startBinding,
+  //         startBindable,
+  //         elementsMap,
+  //         startCustomIntersector,
+  //       ) || nextArrow.points[0]
+  //     : nextArrow.points[0];
   const startLocalPoint =
-    endIsDraggingOverStartElement && getFeatureFlag("COMPLEX_BINDINGS")
-      ? nextArrow.points[0]
-      : startIsDraggingOverEndElement &&
-        app.state.bindMode !== "inside" &&
-        getFeatureFlag("COMPLEX_BINDINGS")
-      ? endLocalPoint
-      : startBindable
+    endIsDragged && startBindable
       ? updateBoundPoint(
           element,
           "startBinding",
           nextArrow.startBinding,
           startBindable,
           elementsMap,
-          { customIntersector: startCustomIntersector },
+          startCustomIntersector,
         ) || nextArrow.points[0]
       : nextArrow.points[0];
 
