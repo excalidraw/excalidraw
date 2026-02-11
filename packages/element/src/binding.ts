@@ -1719,7 +1719,6 @@ export const updateBoundPoint = (
   binding: FixedPointBinding | null | undefined,
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
-  customIntersector?: LineSegment<GlobalPoint>,
 ): LocalPoint | null => {
   if (
     binding == null ||
