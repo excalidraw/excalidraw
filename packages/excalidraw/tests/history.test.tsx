@@ -4772,11 +4772,7 @@ describe("history", () => {
                 // rebound with previous rectangle
                 endBinding: expect.objectContaining({
                   elementId: rect2.id,
-<<<<<<< HEAD
-                  fixedPoint: [0.410958904109589, 0.589041095890411],
-=======
                   fixedPoint: [0, 0.5001],
->>>>>>> a70417f23 (feat(editor): visualize binding midpoints + support for simple arrows (#10611))
                   mode: "orbit",
                 }),
               }),
