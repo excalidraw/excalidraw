@@ -47,6 +47,7 @@ import type {
   DurableIncrement,
   EphemeralIncrement,
 } from "@excalidraw/element";
+import type { GlobalPoint } from "@excalidraw/math";
 
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
@@ -301,7 +302,10 @@ export interface AppState {
   selectionElement: NonDeletedExcalidrawElement | null;
   isBindingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
-  suggestedBinding: NonDeleted<ExcalidrawBindableElement> | null;
+  suggestedBinding: {
+    element: NonDeleted<ExcalidrawBindableElement>;
+    midPoint?: GlobalPoint;
+  } | null;
   frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
   frameRendering: {
     enabled: boolean;
@@ -759,6 +763,7 @@ export type AppClassProperties = {
   updateEditorAtom: App["updateEditorAtom"];
   onPointerDownEmitter: App["onPointerDownEmitter"];
 
+  lastPointerMoveCoords: App["lastPointerMoveCoords"];
   bindModeHandler: App["bindModeHandler"];
 };
 
