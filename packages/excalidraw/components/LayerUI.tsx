@@ -370,6 +370,9 @@ const LayerUI = ({
                     flex: 1,
                     minHeight: 0,
                     marginTop: "0.25rem",
+                    boxSizing: "border-box",
+                    paddingInlineStart: "2px",
+                    paddingInlineEnd: "2px",
                     overflowY: "auto",
                     overflowX: "hidden",
                   }}
