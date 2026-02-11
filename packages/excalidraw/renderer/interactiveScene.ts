@@ -5,6 +5,8 @@ import {
   type GlobalPoint,
   type LocalPoint,
   type Radians,
+  bezierEquation,
+  pointRotateRads,
 } from "@excalidraw/math";
 
 import {
@@ -21,11 +23,13 @@ import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
   elementCenterPoint,
+  getDiamondBaseCorners,
   FOCUS_POINT_SIZE,
   getOmitSidesForEditorInterface,
   getTransformHandles,
   getTransformHandlesFromCoords,
   hasBoundingBox,
+  hitElementItself,
   isArrowElement,
   isBindableElement,
   isElbowArrow,
@@ -35,6 +39,12 @@ import {
   isLineElement,
   isTextElement,
   LinearElementEditor,
+  headingForPoint,
+  compareHeading,
+  HEADING_RIGHT,
+  HEADING_DOWN,
+  HEADING_LEFT,
+  HEADING_UP,
 } from "@excalidraw/element";
 
 import { renderSelectionElement } from "@excalidraw/element";
@@ -88,8 +98,11 @@ import {
   strokeRectWithRotation_simple,
 } from "./helpers";
 
-import type { AppClassProperties, InteractiveCanvasAppState } from "../types";
-
+import type {
+  AppState,
+  AppClassProperties,
+  InteractiveCanvasAppState,
+} from "../types";
 import type {
   InteractiveCanvasRenderConfig,
   InteractiveSceneRenderConfig,
@@ -209,11 +222,14 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
 
 const renderBindingHighlightForBindableElement_simple = (
   context: CanvasRenderingContext2D,
-  element: ExcalidrawBindableElement,
+  suggestedBinding: NonNullable<AppState["suggestedBinding"]>,
   elementsMap: ElementsMap,
   appState: InteractiveCanvasAppState,
+  pointerCoords: GlobalPoint | null,
 ) => {
-  const enclosingFrame = element.frameId && elementsMap.get(element.frameId);
+  const enclosingFrame =
+    suggestedBinding.element.frameId &&
+    elementsMap.get(suggestedBinding.element.frameId);
   if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
     context.translate(enclosingFrame.x, enclosingFrame.y);
 
@@ -236,12 +252,12 @@ const renderBindingHighlightForBindableElement_simple = (
     context.translate(-enclosingFrame.x, -enclosingFrame.y);
   }
 
-  switch (element.type) {
+  switch (suggestedBinding.element.type) {
     case "magicframe":
     case "frame":
       context.save();
 
-      context.translate(element.x, element.y);
+      context.translate(suggestedBinding.element.x, suggestedBinding.element.y);
 
       context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
       context.strokeStyle =
@@ -254,14 +270,19 @@ const renderBindingHighlightForBindableElement_simple = (
         context.roundRect(
           0,
           0,
-          element.width,
-          element.height,
+          suggestedBinding.element.width,
+          suggestedBinding.element.height,
           FRAME_STYLE.radius / appState.zoom.value,
         );
         context.stroke();
         context.closePath();
       } else {
-        context.strokeRect(0, 0, element.width, element.height);
+        context.strokeRect(
+          0,
+          0,
+          suggestedBinding.element.width,
+          suggestedBinding.element.height,
+        );
       }
 
       context.restore();
@@ -269,30 +290,30 @@ const renderBindingHighlightForBindableElement_simple = (
     default:
       context.save();
 
-      const center = elementCenterPoint(element, elementsMap);
+      const center = elementCenterPoint(suggestedBinding.element, elementsMap);
 
       context.translate(center[0], center[1]);
-      context.rotate(element.angle as Radians);
+      context.rotate(suggestedBinding.element.angle as Radians);
       context.translate(-center[0], -center[1]);
 
-      context.translate(element.x, element.y);
+      context.translate(suggestedBinding.element.x, suggestedBinding.element.y);
 
       context.lineWidth =
-        clamp(1.75, element.strokeWidth, 4) /
+        clamp(1.75, suggestedBinding.element.strokeWidth, 4) /
         Math.max(0.25, appState.zoom.value);
       context.strokeStyle =
         appState.theme === THEME.DARK
           ? `rgba(3, 93, 161, 1)`
           : `rgba(106, 189, 252, 1)`;
 
-      switch (element.type) {
+      switch (suggestedBinding.element.type) {
         case "ellipse":
           context.beginPath();
           context.ellipse(
-            element.width / 2,
-            element.height / 2,
-            element.width / 2,
-            element.height / 2,
+            suggestedBinding.element.width / 2,
+            suggestedBinding.element.height / 2,
+            suggestedBinding.element.width / 2,
+            suggestedBinding.element.height / 2,
             0,
             0,
             2 * Math.PI,
@@ -302,18 +323,20 @@ const renderBindingHighlightForBindableElement_simple = (
           break;
         case "diamond":
           {
-            const [segments, curves] = deconstructDiamondElement(element);
+            const [segments, curves] = deconstructDiamondElement(
+              suggestedBinding.element,
+            );
 
             // Draw each line segment individually
             segments.forEach((segment) => {
               context.beginPath();
               context.moveTo(
-                segment[0][0] - element.x,
-                segment[0][1] - element.y,
+                segment[0][0] - suggestedBinding.element.x,
+                segment[0][1] - suggestedBinding.element.y,
               );
               context.lineTo(
-                segment[1][0] - element.x,
-                segment[1][1] - element.y,
+                segment[1][0] - suggestedBinding.element.x,
+                segment[1][1] - suggestedBinding.element.y,
               );
               context.stroke();
             });
@@ -322,14 +345,17 @@ const renderBindingHighlightForBindableElement_simple = (
             curves.forEach((curve) => {
               const [start, control1, control2, end] = curve;
               context.beginPath();
-              context.moveTo(start[0] - element.x, start[1] - element.y);
+              context.moveTo(
+                start[0] - suggestedBinding.element.x,
+                start[1] - suggestedBinding.element.y,
+              );
               context.bezierCurveTo(
-                control1[0] - element.x,
-                control1[1] - element.y,
-                control2[0] - element.x,
-                control2[1] - element.y,
-                end[0] - element.x,
-                end[1] - element.y,
+                control1[0] - suggestedBinding.element.x,
+                control1[1] - suggestedBinding.element.y,
+                control2[0] - suggestedBinding.element.x,
+                control2[1] - suggestedBinding.element.y,
+                end[0] - suggestedBinding.element.x,
+                end[1] - suggestedBinding.element.y,
               );
               context.stroke();
             });
@@ -338,18 +364,20 @@ const renderBindingHighlightForBindableElement_simple = (
           break;
         default:
           {
-            const [segments, curves] = deconstructRectanguloidElement(element);
+            const [segments, curves] = deconstructRectanguloidElement(
+              suggestedBinding.element,
+            );
 
             // Draw each line segment individually
             segments.forEach((segment) => {
               context.beginPath();
               context.moveTo(
-                segment[0][0] - element.x,
-                segment[0][1] - element.y,
+                segment[0][0] - suggestedBinding.element.x,
+                segment[0][1] - suggestedBinding.element.y,
               );
               context.lineTo(
-                segment[1][0] - element.x,
-                segment[1][1] - element.y,
+                segment[1][0] - suggestedBinding.element.x,
+                segment[1][1] - suggestedBinding.element.y,
               );
               context.stroke();
             });
@@ -358,14 +386,17 @@ const renderBindingHighlightForBindableElement_simple = (
             curves.forEach((curve) => {
               const [start, control1, control2, end] = curve;
               context.beginPath();
-              context.moveTo(start[0] - element.x, start[1] - element.y);
+              context.moveTo(
+                start[0] - suggestedBinding.element.x,
+                start[1] - suggestedBinding.element.y,
+              );
               context.bezierCurveTo(
-                control1[0] - element.x,
-                control1[1] - element.y,
-                control2[0] - element.x,
-                control2[1] - element.y,
-                end[0] - element.x,
-                end[1] - element.y,
+                control1[0] - suggestedBinding.element.x,
+                control1[1] - suggestedBinding.element.y,
+                control2[0] - suggestedBinding.element.x,
+                control2[1] - suggestedBinding.element.y,
+                end[0] - suggestedBinding.element.x,
+                end[1] - suggestedBinding.element.y,
               );
               context.stroke();
             });
@@ -377,6 +408,133 @@ const renderBindingHighlightForBindableElement_simple = (
       context.restore();
 
       break;
+  }
+
+  if (
+    isFrameLikeElement(suggestedBinding.element) ||
+    isBindableElement(suggestedBinding.element)
+  ) {
+    // Draw midpoint indicators
+    const linearElement = appState.selectedLinearElement;
+    const arrow =
+      linearElement?.elementId &&
+      LinearElementEditor.getElement(linearElement?.elementId, elementsMap);
+    const insideBindable =
+      pointerCoords &&
+      arrow &&
+      hitElementItself({
+        point: pointerCoords,
+        element: suggestedBinding.element,
+        elementsMap,
+        threshold: 0,
+        overrideShouldTestInside: true,
+      });
+
+    if (!insideBindable || isElbowArrow(arrow)) {
+      context.save();
+      context.translate(suggestedBinding.element.x, suggestedBinding.element.y);
+
+      const midpointRadius = 5 / appState.zoom.value;
+      const center = elementCenterPoint(suggestedBinding.element, elementsMap);
+
+      let midpoints: LocalPoint[];
+      if (suggestedBinding.element.type === "diamond") {
+        const center = elementCenterPoint(
+          suggestedBinding.element,
+          elementsMap,
+        );
+        midpoints = getDiamondBaseCorners(suggestedBinding.element).map(
+          (curve) => {
+            const point = bezierEquation(curve, 0.5);
+            const rotatedPoint = pointRotateRads(
+              point,
+              center,
+              suggestedBinding.element.angle,
+            );
+
+            return pointFrom<LocalPoint>(
+              rotatedPoint[0] - suggestedBinding.element.x,
+              rotatedPoint[1] - suggestedBinding.element.y,
+            );
+          },
+        );
+      } else {
+        const basePoints = [
+          {
+            x: suggestedBinding.element.width,
+            y: suggestedBinding.element.height / 2,
+          }, // RIGHT
+          {
+            x: suggestedBinding.element.width / 2,
+            y: suggestedBinding.element.height,
+          }, // BOTTOM
+          { x: 0, y: suggestedBinding.element.height / 2 }, // LEFT
+          { x: suggestedBinding.element.width / 2, y: 0 }, // TOP
+        ];
+        midpoints = basePoints.map((point) => {
+          const globalPoint = pointFrom<GlobalPoint>(
+            point.x + suggestedBinding.element.x,
+            point.y + suggestedBinding.element.y,
+          );
+          const rotatedPoint = pointRotateRads(
+            globalPoint,
+            center,
+            suggestedBinding.element.angle,
+          );
+          return pointFrom<LocalPoint>(
+            rotatedPoint[0] - suggestedBinding.element.x,
+            rotatedPoint[1] - suggestedBinding.element.y,
+          );
+        });
+      }
+      const highlightedPoint =
+        suggestedBinding.midPoint &&
+        pointFrom<LocalPoint>(
+          suggestedBinding.midPoint[0] - suggestedBinding.element.x,
+          suggestedBinding.midPoint[1] - suggestedBinding.element.y,
+        );
+
+      const target = [HEADING_RIGHT, HEADING_DOWN, HEADING_LEFT, HEADING_UP];
+      midpoints.forEach((midpoint, idx) => {
+        const isHighlighted =
+          highlightedPoint &&
+          compareHeading(
+            headingForPoint(
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  highlightedPoint[0] + suggestedBinding.element.x,
+                  highlightedPoint[1] + suggestedBinding.element.y,
+                ),
+                center,
+                suggestedBinding.element.angle as Radians,
+              ),
+              center,
+            ),
+            target[idx],
+          );
+
+        if (!isHighlighted) {
+          context.fillStyle =
+            appState.theme === THEME.DARK
+              ? `rgba(0, 0, 0, 0.5)`
+              : `rgba(65, 65, 65, 0.4)`;
+          context.beginPath();
+          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+          context.fill();
+        } else {
+          context.fillStyle =
+            appState.theme === THEME.DARK
+              ? `rgba(3, 93, 161, 1)`
+              : `rgba(106, 189, 252, 1)`;
+
+          context.beginPath();
+          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+          context.fill();
+        }
+      });
+
+      context.restore();
+    }
   }
 };
 
@@ -631,6 +789,78 @@ const renderBindingHighlightForBindableElement_complex = (
     context.fill();
 
     context.restore();
+
+    // Draw midpoint indicators
+    context.save();
+    context.translate(
+      element.x + appState.scrollX,
+      element.y + appState.scrollY,
+    );
+
+    const midpointRadius = 5 / appState.zoom.value;
+    const cutoutPadding = 5 / appState.zoom.value;
+    const cutoutRadius = midpointRadius + cutoutPadding;
+
+    let midpoints;
+    if (element.type === "diamond") {
+      const [, curves] = deconstructDiamondElement(element);
+      const center = elementCenterPoint(element, allElementsMap);
+
+      midpoints = curves.map((curve) => {
+        const point = bezierEquation(curve, 0.5);
+        const rotatedPoint = pointRotateRads(point, center, element.angle);
+        return {
+          x: rotatedPoint[0] - element.x,
+          y: rotatedPoint[1] - element.y,
+        };
+      });
+    } else {
+      const center = elementCenterPoint(element, allElementsMap);
+      const basePoints = [
+        { x: element.width / 2, y: 0 }, // TOP
+        { x: element.width, y: element.height / 2 }, // RIGHT
+        { x: element.width / 2, y: element.height }, // BOTTOM
+        { x: 0, y: element.height / 2 }, // LEFT
+      ];
+      midpoints = basePoints.map((point) => {
+        const globalPoint = pointFrom<GlobalPoint>(
+          point.x + element.x,
+          point.y + element.y,
+        );
+        const rotatedPoint = pointRotateRads(
+          globalPoint,
+          center,
+          element.angle,
+        );
+        return {
+          x: rotatedPoint[0] - element.x,
+          y: rotatedPoint[1] - element.y,
+        };
+      });
+    }
+
+    // Clear cutouts around midpoints
+    midpoints.forEach((midpoint) => {
+      context.clearRect(
+        midpoint.x - cutoutRadius,
+        midpoint.y - cutoutRadius,
+        cutoutRadius * 2,
+        cutoutRadius * 2,
+      );
+    });
+
+    context.fillStyle =
+      appState.theme === THEME.DARK
+        ? `rgba(3, 93, 161, ${opacity})`
+        : `rgba(106, 189, 252, ${opacity})`;
+
+    midpoints.forEach((midpoint) => {
+      context.beginPath();
+      context.arc(midpoint.x, midpoint.y, midpointRadius, 0, 2 * Math.PI);
+      context.fill();
+    });
+
+    context.restore();
   }
 
   return {
@@ -641,17 +871,21 @@ const renderBindingHighlightForBindableElement_complex = (
 const renderBindingHighlightForBindableElement = (
   app: AppClassProperties,
   context: CanvasRenderingContext2D,
-  element: ExcalidrawBindableElement,
+  suggestedBinding: AppState["suggestedBinding"],
   allElementsMap: NonDeletedSceneElementsMap,
   appState: InteractiveCanvasAppState,
   deltaTime: number,
   state?: { runtime: number },
 ) => {
+  if (suggestedBinding === null) {
+    return;
+  }
+
   if (getFeatureFlag("COMPLEX_BINDINGS")) {
     return renderBindingHighlightForBindableElement_complex(
       app,
       context,
-      element,
+      suggestedBinding.element,
       allElementsMap,
       appState,
       deltaTime,
@@ -661,11 +895,18 @@ const renderBindingHighlightForBindableElement = (
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
+  const pointerCoords = app.lastPointerMoveCoords
+    ? pointFrom<GlobalPoint>(
+        app.lastPointerMoveCoords.x,
+        app.lastPointerMoveCoords.y,
+      )
+    : null;
   renderBindingHighlightForBindableElement_simple(
     context,
-    element,
+    suggestedBinding,
     allElementsMap,
     appState,
+    pointerCoords,
   );
   context.restore();
 };
