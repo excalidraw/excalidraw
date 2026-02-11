@@ -1758,7 +1758,8 @@ export const updateBoundPoint = (
   );
   const otherFocusPointOrArrowPoint = otherFocusPoint || otherArrowPoint;
   const intersector =
-    otherFocusPoint && lineSegment(focusPoint, otherFocusPoint);
+    otherFocusPointOrArrowPoint &&
+    lineSegment(focusPoint, otherFocusPointOrArrowPoint);
   const otherOutlinePoint =
     otherBindable &&
     intersector &&
