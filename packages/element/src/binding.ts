@@ -1077,7 +1077,6 @@ export const updateBoundElements = (
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     changedElements?: Map<string, ExcalidrawElement>;
-    indirectArrowUpdate?: boolean;
   },
 ) => {
   if (!isBindableElement(changedElement)) {
@@ -1172,11 +1171,6 @@ export const updateBoundElements = (
   };
 
   boundElementsVisitor(elementsMap, changedElement, visitor);
-
-  if (options?.indirectArrowUpdate) {
-    boundElementsVisitor(elementsMap, changedElement, visitor);
-    boundElementsVisitor(elementsMap, changedElement, visitor);
-  }
 };
 
 const updateArrowBindings = (
