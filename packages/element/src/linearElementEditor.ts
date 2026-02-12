@@ -2338,15 +2338,6 @@ const pointDraggingUpdates = (
         : updates.endBinding,
   };
 
-  // We need to update the non-dragged point too if bound,
-  // so we look up the old binding to trigger updateBoundPoint
-  const startBindable = nextArrow.startBinding
-    ? start.element ??
-      (elementsMap.get(
-        nextArrow.startBinding.elementId,
-      )! as ExcalidrawBindableElement)
-    : null;
-
   // Needed to handle a special case where an existing arrow is dragged over
   // the same element it is bound to on the other side
   const startIsDraggingOverEndElement =
@@ -2389,6 +2380,15 @@ const pointDraggingUpdates = (
   // We need to keep the simulated next arrow up-to-date, because
   // updateBoundPoint looks at the opposite point
   nextArrow.points[nextArrow.points.length - 1] = endLocalPoint;
+
+  // We need to update the non-dragged point too if bound,
+  // so we look up the old binding to trigger updateBoundPoint
+  const startBindable = nextArrow.startBinding
+    ? start.element ??
+      (elementsMap.get(
+        nextArrow.startBinding.elementId,
+      )! as ExcalidrawBindableElement)
+    : null;
 
   const startLocalPoint =
     endIsDraggingOverStartElement && getFeatureFlag("COMPLEX_BINDINGS")
