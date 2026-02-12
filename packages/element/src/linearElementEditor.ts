@@ -2382,6 +2382,7 @@ const pointDraggingUpdates = (
         nextArrow.endBinding,
         endBindable,
         elementsMap,
+        endIsDragged,
       ) || nextArrow.points[nextArrow.points.length - 1]
     : nextArrow.points[nextArrow.points.length - 1];
 
@@ -2403,6 +2404,7 @@ const pointDraggingUpdates = (
           nextArrow.startBinding,
           startBindable,
           elementsMap,
+          startIsDragged,
         ) || nextArrow.points[0]
       : nextArrow.points[0];
 

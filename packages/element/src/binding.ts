@@ -112,6 +112,7 @@ export type BindingStrategy =
  */
 export const BASE_BINDING_GAP = 5;
 export const BASE_BINDING_GAP_ELBOW = 5;
+export const BASE_ARROW_MIN_LENGTH = 10;
 export const FOCUS_POINT_SIZE = 10 / 1.5;
 
 export const getBindingGap = (
@@ -1721,6 +1722,7 @@ export const updateBoundPoint = (
   binding: FixedPointBinding | null | undefined,
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
+  dragging?: boolean,
 ): LocalPoint | null => {
   if (
     binding == null ||
@@ -1791,6 +1793,14 @@ export const updateBoundPoint = (
         pointDistanceSq(a, otherFocusPointOrArrowPoint) -
         pointDistanceSq(b, otherFocusPointOrArrowPoint),
     )[0];
+  const startHasArrowhead = arrow.startArrowhead !== null;
+  const endHasArrowhead = arrow.endArrowhead !== null;
+  const resolvedTarget =
+    (!startHasArrowhead && !endHasArrowhead) ||
+    (startOrEnd === "startBinding" && startHasArrowhead) ||
+    (startOrEnd === "endBinding" && endHasArrowhead)
+      ? focusPoint
+      : outlinePoint || focusPoint;
 
   // 1. Handle case when the outline point (or focus point) is inside
   // the other shape by short-circuiting to the focus point, otherwise
@@ -1804,13 +1814,15 @@ export const updateBoundPoint = (
       elementsMap,
       threshold: getBindingGap(otherBindable, arrow),
       overrideShouldTestInside: true,
-    })
+    }) &&
+    !dragging
   ) {
+    console.trace("?");
     return LinearElementEditor.createPointAt(
       arrow,
       elementsMap,
-      focusPoint[0],
-      focusPoint[1],
+      resolvedTarget[0],
+      resolvedTarget[1],
       null,
     );
   }
@@ -1819,7 +1831,8 @@ export const updateBoundPoint = (
     ? otherOutlinePoint || otherFocusPoint || otherArrowPoint
     : otherArrowPoint;
   const arrowTooShort =
-    pointDistance(otherTargetPoint, outlinePoint || focusPoint) <= 7;
+    pointDistance(otherTargetPoint, outlinePoint || focusPoint) <=
+    BASE_ARROW_MIN_LENGTH;
 
   // 2. If the arrow is unconnected at the other end, just check arrow size
   // and short-circuit to the focus point if the arrow is too short to
@@ -1841,8 +1854,8 @@ export const updateBoundPoint = (
     return LinearElementEditor.createPointAt(
       arrow,
       elementsMap,
-      focusPoint[0],
-      focusPoint[1],
+      resolvedTarget?.[0] || focusPoint[0],
+      resolvedTarget?.[1] || focusPoint[1],
       null,
     );
   }
