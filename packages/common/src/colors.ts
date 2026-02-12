@@ -346,7 +346,7 @@ export const normalizeInputColor = (color: string): string | null => {
   if (tc.isValid()) {
     // testing for `#` first fixes a bug on Electron (more specfically, an
     // Obsidian popout window), where a hex color without `#` is considered valid
-    if (tc.getFormat() === "hex" && !color.startsWith("#")) {
+    if (["hex", "hex8"].includes(tc.getFormat()) && !color.startsWith("#")) {
       return `#${color}`;
     }
     return color;
