@@ -1269,6 +1269,7 @@ const renderFocusPointIndicator = ({
       bindableElement,
       elementsMap,
       appState,
+      type,
     )
   ) {
     return;
