@@ -1716,6 +1716,9 @@ const extractBinding = (
   };
 };
 
+const elementArea = (element: ExcalidrawBindableElement) =>
+  element.width * element.height;
+
 export const updateBoundPoint = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   startOrEnd: "startBinding" | "endBinding",
@@ -1808,16 +1811,17 @@ export const updateBoundPoint = (
   if (
     otherBindable &&
     outlinePoint &&
+    !dragging &&
+    // Arbitrary threshold to handle wireframing use cases
+    elementArea(otherBindable) < elementArea(bindableElement) * 2 &&
     hitElementItself({
       element: otherBindable,
       point: outlinePoint,
       elementsMap,
       threshold: getBindingGap(otherBindable, arrow),
       overrideShouldTestInside: true,
-    }) &&
-    !dragging
+    })
   ) {
-    console.trace("?");
     return LinearElementEditor.createPointAt(
       arrow,
       elementsMap,
