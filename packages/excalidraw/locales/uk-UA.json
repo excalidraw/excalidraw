@@ -188,7 +188,7 @@
       "inputPlaceholder": "",
       "heading": "",
       "noResults": "",
-      "clearSearch": ""
+      "clearSearch": "Очистити пошук"
     }
   },
   "search": {
@@ -236,7 +236,7 @@
     "clear": "Очистити",
     "remove": "Видалити",
     "embed": "Перемкнути вкладення",
-    "publishLibrary": "",
+    "publishLibrary": "Перейменувати або опублікувати",
     "submit": "Надіслати",
     "confirm": "Підтвердити",
     "embeddableInteractionButton": "Натисніть для взаємодії"
@@ -359,7 +359,7 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "publishLibrary": "Опублікувати свою власну бібліотеку",
-    "bindTextToElement": "",
+    "bindTextToElement": "{{shortcut}} щоб додати текст",
     "createFlowchart": "",
     "deepBoxSelect": "",
     "eraserRevert": "",
@@ -627,17 +627,17 @@
     "inputPlaceholder": "",
     "inputPlaceholderWithMessages": "",
     "generating": "",
-    "rateLimitRemaining": "",
+    "rateLimitRemaining": "Сьогодні залишилося {{count}} запитів",
     "role": {
       "user": "Ви",
-      "assistant": "",
+      "assistant": "ШІ-асистент",
       "system": "Система"
     },
     "aiBeta": "",
-    "label": "",
+    "label": "Чат",
     "menu": "Меню",
-    "newChat": "",
-    "deleteChat": "",
+    "newChat": "Новий чат",
+    "deleteChat": "Видалити чат",
     "deleteMessage": "Видалити повідомлення",
     "viewAsMermaid": "",
     "placeholder": {
@@ -649,7 +649,7 @@
     "insert": "Вставити",
     "retry": "Спробувати знову",
     "errors": {
-      "promptTooShort": "",
+      "promptTooShort": "Запит надто короткий (мін. {{min}} символів)",
       "promptTooLong": "",
       "generationFailed": "",
       "invalidDiagram": "",
