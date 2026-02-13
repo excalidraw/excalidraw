@@ -573,7 +573,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Колір",
     "mostUsedCustomColors": "Найбільш використовувані користувацькі кольори",
     "colors": "Кольори",
     "shades": "Тіні",
@@ -621,7 +621,7 @@
     "inputPlaceholder": ""
   },
   "ttd": {
-    "error": ""
+    "error": "Помилка!"
   },
   "chat": {
     "inputPlaceholder": "",
@@ -629,16 +629,16 @@
     "generating": "",
     "rateLimitRemaining": "",
     "role": {
-      "user": "",
+      "user": "Ви",
       "assistant": "",
-      "system": ""
+      "system": "Система"
     },
     "aiBeta": "",
     "label": "",
-    "menu": "",
+    "menu": "Меню",
     "newChat": "",
     "deleteChat": "",
-    "deleteMessage": "",
+    "deleteMessage": "Видалити повідомлення",
     "viewAsMermaid": "",
     "placeholder": {
       "title": "",
@@ -646,8 +646,8 @@
       "hint": ""
     },
     "preview": "",
-    "insert": "",
-    "retry": "",
+    "insert": "Вставити",
+    "retry": "Спробувати знову",
     "errors": {
       "promptTooShort": "",
       "promptTooLong": "",
@@ -662,7 +662,7 @@
     "rateLimit": {
       "messageLimit": "",
       "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimitInputPlaceholder": "Ви досягли вашого ліміту повідомлень"
     },
     "upsellBtnLabel": ""
   },
@@ -703,15 +703,15 @@
     "shortcutHint": "Для панелі команд використовуйте {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Space",
+    "delete": "Delete",
+    "mmb": "Коліщатко"
   }
 }
