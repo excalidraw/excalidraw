@@ -1048,7 +1048,7 @@ export class LinearElementEditor {
           },
           arrowStartIsInside:
             !!app.state.newElement &&
-            (app.state.bindMode === "inside" || app.state.bindMode === "skip"),
+            (app.state.bindMode === "fixed" || app.state.bindMode === "skip"),
           altFocusPoint: null,
         },
         selectedPointsIndices: [element.points.length - 1],
@@ -1110,7 +1110,7 @@ export class LinearElementEditor {
         },
         arrowStartIsInside:
           !!app.state.newElement &&
-          (app.state.bindMode === "inside" || app.state.bindMode === "skip"),
+          (app.state.bindMode === "fixed" || app.state.bindMode === "skip"),
         altFocusPoint: null,
       },
       selectedPointsIndices: nextSelectedPointsIndices,
@@ -2377,7 +2377,7 @@ const pointDraggingUpdates = (
   const endLocalPoint = startIsDraggingOverEndElement
     ? nextArrow.points[nextArrow.points.length - 1]
     : endIsDraggingOverStartElement &&
-      app.state.bindMode !== "inside" &&
+      app.state.bindMode !== "fixed" &&
       getFeatureFlag("COMPLEX_BINDINGS")
     ? nextArrow.points[0]
     : endBindable
@@ -2410,7 +2410,7 @@ const pointDraggingUpdates = (
     endIsDraggingOverStartElement && getFeatureFlag("COMPLEX_BINDINGS")
       ? nextArrow.points[0]
       : startIsDraggingOverEndElement &&
-        app.state.bindMode !== "inside" &&
+        app.state.bindMode !== "fixed" &&
         getFeatureFlag("COMPLEX_BINDINGS")
       ? endLocalPoint
       : startBindable
@@ -2428,7 +2428,7 @@ const pointDraggingUpdates = (
     !startIsDraggingOverEndElement &&
     !(
       endIsDraggingOverStartElement &&
-      app.state.bindMode !== "inside" &&
+      app.state.bindMode !== "fixed" &&
       getFeatureFlag("COMPLEX_BINDINGS")
     ) &&
     !!endBindable;

@@ -206,10 +206,10 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
         elementsMap,
       );
       const mode = isPointInElement(p, boundElement, elementsMap)
-        ? "inside"
+        ? "fixed"
         : "orbit";
       const focusPoint =
-        mode === "inside"
+        mode === "fixed"
           ? p
           : projectFixedPointOntoDiagonal(
               element,
