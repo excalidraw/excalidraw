@@ -175,7 +175,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
       if (binding.elementId) {
         return {
           elementId: binding.elementId,
-          mode: binding.mode,
+          mode: (binding.mode as string) === "inside" ? "fixed" : binding.mode,
           fixedPoint: normalizeFixedPoint(binding.fixedPoint || [0.5, 0.5]),
         } as FixedPointBinding | null;
       }
