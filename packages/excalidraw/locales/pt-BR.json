@@ -135,15 +135,15 @@
       "labelEmbed": "Vincular e incorporar",
       "empty": "Nenhum link foi definido",
       "hint": "Digite ou cole o seu link aqui",
-      "goToElement": ""
+      "goToElement": "Ir para o elemento alvo"
     },
     "lineEditor": {
       "edit": "Editar linha",
       "editArrow": "Editar seta"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Parar polígono",
+      "convertToPolygon": "Converter para polígono"
     },
     "elementLock": {
       "lock": "Bloquear",
@@ -170,13 +170,13 @@
     "copyElementLink": "Copiar link para o objeto",
     "linkToElement": "Links para o objeto",
     "wrapSelectionInFrame": "Ajustar seleção no frame",
-    "tab": "",
-    "shapeSwitch": "",
-    "preferences": "",
-    "preferences_toolLock": ""
+    "tab": "Aba",
+    "shapeSwitch": "Trocar forma",
+    "preferences": "Preferências",
+    "preferences_toolLock": "Bloqueio de ferramenta"
   },
   "elementLink": {
-    "title": "",
+    "title": "Links para o objeto",
     "desc": "Clique em uma forma na tela ou cole um link.",
     "notFound": "Objeto vinculado não foi encontrado na tela."
   },
@@ -186,9 +186,9 @@
     "hint_emptyPrivateLibrary": "Selecione um item na tela para adicioná-lo aqui.",
     "search": {
       "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "heading": "Correspondências da biblioteca",
+      "noResults": "Nenhum resultado encontrado...",
+      "clearSearch": "Limpar pesquisa"
     }
   },
   "search": {
@@ -197,8 +197,8 @@
     "singleResult": "resultado",
     "multipleResults": "resultados",
     "placeholder": "Procurar texto na tela...",
-    "frames": "",
-    "texts": ""
+    "frames": "Quadros",
+    "texts": "Textos"
   },
   "buttons": {
     "clearReset": "Limpar a tela",
@@ -232,7 +232,7 @@
     "objectsSnapMode": "Encaixar em objetos",
     "exitZenMode": "Sair do modo zen",
     "cancel": "Cancelar",
-    "saveLibNames": "",
+    "saveLibNames": "Salvar nome(s) e sair",
     "clear": "Limpar",
     "remove": "Remover",
     "embed": "Alternar incorporação",
@@ -263,7 +263,7 @@
     "removeItemsFromsLibrary": "Excluir {{count}} item(ns) da biblioteca?",
     "invalidEncryptionKey": "A chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desabilitada.",
     "collabOfflineWarning": "Sem conexão com a internet disponível.\nSuas alterações não serão salvas!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "A cota de armazenamento do navegador excedida. As alterações não serão salvas."
   },
   "errors": {
     "unsupportedFileType": "Tipo de arquivo não suportado.",
@@ -315,7 +315,7 @@
     "hand": "Mão (ferramenta de rolagem)",
     "extraTools": "Mais ferramentas",
     "mermaidToExcalidraw": "Mermaid para Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "Alternar tipo de forma"
   },
   "element": {
     "rectangle": "Retângulo",
@@ -339,7 +339,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "{{shortcut}} para descartar a pesquisa",
     "canvasPanning": "",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "arrowTool": "",
@@ -359,8 +359,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "publishLibrary": "Publicar sua própria biblioteca",
-    "bindTextToElement": "",
-    "createFlowchart": "",
+    "bindTextToElement": "{{shortcut}} para adicionar texto",
+    "createFlowchart": "{{shortcut}} para criar um fluxo",
     "deepBoxSelect": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "Esse recurso pode ser ativado configurando a opção \"dom.events.asyncClipboard.clipboardItem\" como \"true\". Para alterar os sinalizadores do navegador no Firefox, visite a página \"about:config\".",
@@ -538,7 +538,7 @@
     "pasteAsSingleElement": "Use {{shortcut}} para colar como um único elemento,\nou cole em um editor de texto já existente",
     "unableToEmbed": "No momento não é permitido incorporar esta URL. Crie uma issue no GitHub para solicitar a lista branca da URL",
     "unrecognizedLinkFormat": "O link incorporado não corresponde ao formato esperado. Por favor, tente colar a string 'incorporada' que foi fornecida pelo site de origem",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Link copiado para a área de transferência"
   },
   "colors": {
     "transparent": "Transparente",
@@ -559,8 +559,8 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
+      "center_heading": "Seus desenhos estão salvos no armazenamento do seu navegador.",
+      "center_heading_line2": "O armazenamento do navegador pode ser apagado inesperadamente.",
       "center_heading_line3": "",
       "center_heading_plus": "Você queria ir para o Excalidraw+ em vez disso?",
       "menuHint": "Exportar, preferências, idiomas..."
@@ -573,7 +573,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Cor",
     "mostUsedCustomColors": "Cores personalizadas mais usadas",
     "colors": "Cores",
     "shades": "Tons",
@@ -617,15 +617,15 @@
     "description": "Atualmente apenas os diagramas<flowchartLink>Flowchart</flowchartLink><sequenceLink>Sequência,</sequenceLink> e <classLink>Class</classLink>são suportados. Os outros tipos serão renderizados como uma imagem no Excalidraw.",
     "syntax": "Sintaxe em Mermaid",
     "preview": "Visualizar",
-    "label": "",
-    "inputPlaceholder": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Escreva definição de diagrama Mermaid aqui..."
   },
   "ttd": {
-    "error": ""
+    "error": "Erro!"
   },
   "chat": {
     "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
+    "inputPlaceholderWithMessages": "Continuar refinando seu diagrama...",
     "generating": "",
     "rateLimitRemaining": "",
     "role": {
