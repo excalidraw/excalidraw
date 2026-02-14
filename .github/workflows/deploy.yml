@@ -1,0 +1,39 @@
+name: Build and Deploy Excalidraw
+
+on:
+  push:
+    branches:
+      - master
+
+  # Optional: build on PR merge
+  pull_request:
+    branches:
+      - master
+    types: [closed]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build Excalidraw
+        run: yarn --cwd ./excalidraw-app build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./excalidraw-app/build
+          publish_branch: gh-pages
