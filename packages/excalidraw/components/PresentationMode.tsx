@@ -271,6 +271,13 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
     const laserCanvasRef = useRef<HTMLCanvasElement>(null);
     const laserPointsRef = useRef<{ x: number, y: number, time: number }[]>([]);
     const laserAnimationRef = useRef<number | null>(null);
+    const laserEnabledRef = useRef(laserEnabled);
+    const isPointerDownRef = useRef(false);
+
+    // Keep ref in sync with state
+    useEffect(() => {
+        laserEnabledRef.current = laserEnabled;
+    }, [laserEnabled]);
 
     const drawLaser = useCallback(() => {
         const canvas = laserCanvasRef.current;
@@ -285,10 +292,15 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
             return;
         }
 
-        // Clear canvas
+        // Clear canvas first
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        // Only draw if we have points and laser is enabled
         const points = laserPointsRef.current;
+        if (points.length === 0 || !laserEnabledRef.current) {
+            laserAnimationRef.current = requestAnimationFrame(drawLaser);
+            return;
+        }
 
         // Always request next frame for continuous animation
         laserAnimationRef.current = requestAnimationFrame(drawLaser);
@@ -341,9 +353,10 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
     }, [drawLaser]);
 
     const handleLaserPointerDown = (e: React.PointerEvent) => {
-        if (!laserEnabled) return;
+        if (!laserEnabledRef.current) return;
         e.preventDefault();
         e.currentTarget.setPointerCapture(e.pointerId);
+        isPointerDownRef.current = true;
 
         laserPointsRef.current = [{ x: e.clientX, y: e.clientY, time: performance.now() }];
 
@@ -353,14 +366,17 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
     };
 
     const handleLaserPointerMove = (e: React.PointerEvent) => {
-        if (!laserEnabled) return;
+        if (!laserEnabledRef.current || !isPointerDownRef.current) return;
 
         laserPointsRef.current.push({ x: e.clientX, y: e.clientY, time: performance.now() });
     };
 
     const handleLaserPointerUp = (e: React.PointerEvent) => {
-        if (!laserEnabled) return;
+        if (!laserEnabledRef.current) return;
+        isPointerDownRef.current = false;
         e.currentTarget.releasePointerCapture(e.pointerId);
+        // Clear points when mouse is released
+        laserPointsRef.current = [];
     };
 
     // Cleanup animation on unmount
@@ -459,10 +475,6 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
             ref={containerRef}
             tabIndex={0}
             onClick={handleClick}
-            onPointerDown={handleLaserPointerDown}
-            onPointerMove={handleLaserPointerMove}
-            onPointerUp={handleLaserPointerUp}
-            onPointerLeave={handleLaserPointerUp}
             style={{ touchAction: "none" }}
         >
             <canvas
