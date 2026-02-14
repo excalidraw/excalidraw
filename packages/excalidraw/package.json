@@ -109,7 +109,9 @@
     "pwacompat": "2.0.17",
     "roughjs": "4.6.4",
     "sass": "1.51.0",
-    "tunnel-rat": "0.1.2"
+    "tunnel-rat": "0.1.2",
+    "jspdf": "2.5.1",
+    "pptxgenjs": "3.12.0"
   },
   "devDependencies": {
     "@size-limit/preset-big-lib": "9.0.0",
