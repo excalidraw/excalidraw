@@ -75,25 +75,16 @@ const PresentationMenuSlide = ({
             onDrop={onDrop}
             onClick={onClick}
         >
-            <div className="PresentationMenu__slide-drag-handle">
-                {DraggableIcon}
-            </div>
             <div className="PresentationMenu__slide-preview">
                 {previewUrl ? (
                     <img
                         src={previewUrl}
                         alt={getFrameLikeTitle(frame)}
                         className="PresentationMenu__slide-preview-img"
-                        style={{ width: "100%", height: "100%", objectFit: "contain" }}
                     />
                 ) : (
-                    <div className="PresentationMenu__slide-preview-placeholder">
-                        {index + 1}
-                    </div>
+                    <div className="PresentationMenu__slide-preview-placeholder" />
                 )}
-            </div>
-            <div className="PresentationMenu__slide-info">
-                <span className="PresentationMenu__slide-name">{getFrameLikeTitle(frame)}</span>
             </div>
         </div>
     );
@@ -230,7 +221,11 @@ export const PresentationMenu = ({ app, elements }: PresentationMenuProps) => {
                             appState={appState}
                             files={files}
                             onClick={() => {
-                                app.scrollToContent(frame, { animate: true, fitToContent: true });
+                                app.scrollToContent(frame, {
+                                    animate: true,
+                                    fitToViewport: true,
+                                    viewportZoomFactor: 1
+                                });
                             }}
                             onDragStart={(e) => handleDragStart(e, index)}
                             onDragOver={handleDragOver}
@@ -244,17 +239,16 @@ export const PresentationMenu = ({ app, elements }: PresentationMenuProps) => {
                         </div>
                     )}
                 </div>
-
-                <div className="PresentationMenu__footer">
-                    <button
-                        className="PresentationMenu__start-btn"
-                        onClick={() => {
-                            app.startPresentation();
-                        }}
-                    >
-                        {PlayIcon} Start presentation
-                    </button>
-                </div>
+            </div>
+            <div className="PresentationMenu__footer">
+                <button
+                    className="PresentationMenu__start-btn"
+                    onClick={() => {
+                        app.startPresentation();
+                    }}
+                >
+                    {PlayIcon} Start presentation
+                </button>
             </div>
         </div>
     );

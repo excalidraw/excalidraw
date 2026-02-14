@@ -78,8 +78,25 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
     const [laserEnabled, setLaserEnabled] = useState(false);
     const [layout, setLayout] = useState({ fitScale: 1, offsetX: 0, offsetY: 0 });
 
-    // Sort frames by position (left to right, top to bottom)
+    // Sort frames by presentationSlideOrder or position
     const sortedFrames = useMemo(() => {
+        if (appState.presentationSlideOrder) {
+            const frameMap = new Map(frames.map((f) => [f.id, f]));
+            const ordered = appState.presentationSlideOrder
+                .map((id) => frameMap.get(id))
+                .filter((f): f is ExcalidrawFrameLikeElement => !!f);
+
+            // Add any new frames that aren't in the order yet
+            const orderedIds = new Set(ordered.map(f => f.id));
+            const remaining = frames.filter(f => !orderedIds.has(f.id));
+            remaining.sort((a, b) => {
+                if (Math.abs(a.y - b.y) > 50) return a.y - b.y;
+                return a.x - b.x;
+            });
+
+            return [...ordered, ...remaining];
+        }
+
         return [...frames].sort((a, b) => {
             const yDiff = a.y - b.y;
             if (Math.abs(yDiff) > 50) {
@@ -87,7 +104,7 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
             }
             return a.x - b.x;
         });
-    }, [frames]);
+    }, [frames, appState.presentationSlideOrder]);
 
     const currentFrame = sortedFrames[currentSlideIndex];
 
