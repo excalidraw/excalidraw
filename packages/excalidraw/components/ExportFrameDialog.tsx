@@ -10,6 +10,7 @@ import { exportToCanvas } from "../scene/export";
 import { canvasToBlob } from "../data/blob";
 import { getFrameLikeTitle, getNonDeletedElements, isFrameLikeElement } from "@excalidraw/element";
 import { CheckboxItem } from "./CheckboxItem";
+import { TextField } from "./TextField";
 
 import "./ExportFrameDialog.scss";
 
@@ -30,6 +31,7 @@ export const ExportFrameDialog = ({
     const [framePreviews, setFramePreviews] = useState<{ id: string; blob: Blob | null; name: string }[]>([]);
     const [selectedFrameIds, setSelectedFrameIds] = useState<Set<string>>(new Set());
     const [loading, setLoading] = useState(true);
+    const [customRange, setCustomRange] = useState("");
 
     useEffect(() => {
         const generatePreviews = async () => {
@@ -57,7 +59,7 @@ export const ExportFrameDialog = ({
                                 exportBackground: true,
                                 viewBackgroundColor: appState.viewBackgroundColor,
                                 exportingFrame: frame,
-                                exportPadding: 0, // No padding
+                                exportPadding: 0,
                             },
                         );
                         const blob = await canvasToBlob(canvas);
@@ -86,19 +88,48 @@ export const ExportFrameDialog = ({
         setSelectedFrameIds(newSelectedIds);
     };
 
-    const getElementsToExport = () => {
-        return elements.filter(element => {
-            if (isFrameLikeElement(element)) {
-                return selectedFrameIds.has(element.id);
+    const handleSelectAll = () => {
+        const newSelectedIds = new Set<string>();
+        framePreviews.forEach(p => newSelectedIds.add(p.id));
+        setSelectedFrameIds(newSelectedIds);
+        setCustomRange("");
+    };
+
+    const handleSelectNone = () => {
+        setSelectedFrameIds(new Set());
+        setCustomRange("");
+    };
+
+    const handleCustomRangeChange = (value: string) => {
+        setCustomRange(value);
+        if (!value.trim()) {
+            setSelectedFrameIds(new Set());
+            return;
+        }
+
+        const newSelectedIds = new Set<string>();
+        const parts = value.split(",");
+
+        parts.forEach(part => {
+            const range = part.trim().split("-");
+            if (range.length === 2) {
+                const start = parseInt(range[0], 10);
+                const end = parseInt(range[1], 10);
+                if (!isNaN(start) && !isNaN(end)) {
+                    for (let i = start; i <= end; i++) {
+                        if (i > 0 && i <= framePreviews.length) {
+                            newSelectedIds.add(framePreviews[i - 1].id);
+                        }
+                    }
+                }
+            } else if (range.length === 1) {
+                const page = parseInt(range[0], 10);
+                if (!isNaN(page) && page > 0 && page <= framePreviews.length) {
+                    newSelectedIds.add(framePreviews[page - 1].id);
+                }
             }
-            return true; // Keep other elements, assuming export logic handles frame content selection
         });
-        // The above logic is slightly flawed for `exportToPDF` and `exportToPPTX` because they re-query frames from `elements`.
-        // We should pass the filtered list of elements, BUT `exportToPDF` calls `getFrameLikeElements` internally.
-        // However, `exportToPDF` filters elements using `getNonDeletedElements(elements)`.
-        // A better approach is to simply return the original `elements` list but modify `exportToPDF` / `exportToPPTX` to accept a list of frame IDs to export.
-        // OR, we can filter the `elements` array to remove the frames we don't want to export.
-        // Removing the frame element itself from the array passed to export functions should work because they iterate over frames found in that array.
+        setSelectedFrameIds(newSelectedIds);
     };
 
     const handleExportPdf = async () => {
@@ -159,21 +190,19 @@ export const ExportFrameDialog = ({
                             <div className="ExportFrameDialog__preview-list">
                                 {framePreviews.map((preview) => (
                                     <div key={preview.id} className="ExportFrameDialog__preview-item" onClick={() => handleCheckboxChange(preview.id, !selectedFrameIds.has(preview.id))}>
-                                        <div className="ExportFrameDialog__preview-header">
-                                            <CheckboxItem
-                                                checked={selectedFrameIds.has(preview.id)}
-                                                onChange={(checked) => handleCheckboxChange(preview.id, checked)}
-                                            >
-                                                { }
-                                            </CheckboxItem>
-                                        </div>
                                         <div className="ExportFrameDialog__preview-image">
                                             {preview.blob && (
                                                 <img src={URL.createObjectURL(preview.blob)} alt={preview.name} />
                                             )}
+                                            <div className="ExportFrameDialog__preview-checkbox">
+                                                <CheckboxItem
+                                                    checked={selectedFrameIds.has(preview.id)}
+                                                    onChange={(checked) => handleCheckboxChange(preview.id, checked)}
+                                                >
+                                                    { }
+                                                </CheckboxItem>
+                                            </div>
                                         </div>
-                                        {/* <div className="ExportFrameDialog__preview-name">{preview.name}</div> - User requested to remove name? "no padding or frame name" */}
-                                        <div className="ExportFrameDialog__preview-name">{preview.name}</div>
                                     </div>
                                 ))}
                                 {framePreviews.length === 0 && <div>No frames found to export</div>}
@@ -181,10 +210,26 @@ export const ExportFrameDialog = ({
                         )}
                     </div>
                     <div className="ExportFrameDialog__actions">
-                        <h3>Export Options</h3>
-                        <div style={{ marginBottom: '1rem' }}>
-                            {selectedFrameIds.size} frame{selectedFrameIds.size !== 1 ? 's' : ''} selected
+                        <div className="ExportFrameDialog__selection">
+                            <h3>Select</h3>
+                            <div className="ExportFrameDialog__selection-buttons">
+                                <button type="button" className="ExportFrameDialog__button--secondary" onClick={handleSelectAll}>All</button>
+                                <button type="button" className="ExportFrameDialog__button--secondary" onClick={handleSelectNone}>None</button>
+                            </div>
+                            <div className="ExportFrameDialog__selection-custom">
+                                <TextField
+                                    value={customRange}
+                                    placeholder="e.g. 1, 2, 5-9"
+                                    onChange={handleCustomRangeChange}
+                                    label="Custom Range"
+                                />
+                            </div>
+                            <div className="ExportFrameDialog__selection-count">
+                                {selectedFrameIds.size} frame{selectedFrameIds.size !== 1 ? 's' : ''} selected
+                            </div>
                         </div>
+
+                        <h3>Export Options</h3>
                         <FilledButton
                             className="ExportFrameDialog__button"
                             label="Export to PDF"
