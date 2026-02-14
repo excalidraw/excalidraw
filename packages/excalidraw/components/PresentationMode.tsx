@@ -441,6 +441,11 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
 
     const handleClick = useCallback(
         (e: React.MouseEvent) => {
+            // Don't change slides when laser is enabled
+            if (laserEnabled) {
+                return;
+            }
+
             const rect = (e.target as HTMLElement).getBoundingClientRect();
             const clickPosition = (e.clientX - rect.left) / rect.width;
 
@@ -450,7 +455,7 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
                 prevSlide();
             }
         },
-        [nextSlide, prevSlide],
+        [nextSlide, prevSlide, laserEnabled],
     );
 
     if (sortedFrames.length === 0) {

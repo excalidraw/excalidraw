@@ -59,7 +59,7 @@
     bottom: 40px;
     left: 50%;
     transform: translateX(-50%) translateY(20px);
-    z-index: 20;
+    z-index: 1000000;
     display: flex;
     align-items: center;
     gap: 12px;
