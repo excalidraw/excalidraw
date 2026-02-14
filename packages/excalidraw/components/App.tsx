@@ -2206,6 +2206,7 @@ class App extends React.Component<AppProps, AppState> {
                           elements={this.scene.getNonDeletedElements()}
                           appState={this.state}
                           files={this.files}
+                          app={this}
                           onClose={() => {
                             this.presentationModeEnabled = false;
                             this.triggerRender(true);
@@ -3995,7 +3996,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  togglePresentationMode = () => {
+  startPresentation = () => {
     const frames = this.scene.getNonDeletedFramesLikes();
     if (frames.length === 0) {
       this.setToast({
@@ -4014,6 +4015,15 @@ class App extends React.Component<AppProps, AppState> {
 
     this.presentationModeEnabled = !this.presentationModeEnabled;
     this.triggerRender(true);
+  };
+
+  togglePresentationMode = () => {
+    if (this.presentationModeEnabled) {
+      this.startPresentation();
+    } else {
+      const isPresentationSidebarOpen = this.state.openSidebar?.name === "presentation";
+      this.setAppState({ openSidebar: isPresentationSidebarOpen ? null : { name: "presentation" } });
+    }
   };
 
   updateFrameRendering = (

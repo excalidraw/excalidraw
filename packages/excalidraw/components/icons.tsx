@@ -790,6 +790,23 @@ export const SendToBackIcon = createIcon(arrowBarToTopJSX, {
 // first one the user sees. Horizontal align icons should not be flipped since
 // that would make them lie about their function.
 //
+export const PlayIcon = createIcon(
+  <path d="M7 4v16l13 -8z" fill="currentColor" />,
+  tablerIconProps,
+);
+
+export const DraggableIcon = createIcon(
+  <g strokeWidth="1.5">
+    <circle cx="9" cy="5" r="1" fill="currentColor" />
+    <circle cx="9" cy="12" r="1" fill="currentColor" />
+    <circle cx="9" cy="19" r="1" fill="currentColor" />
+    <circle cx="15" cy="5" r="1" fill="currentColor" />
+    <circle cx="15" cy="12" r="1" fill="currentColor" />
+    <circle cx="15" cy="19" r="1" fill="currentColor" />
+  </g>,
+  tablerIconProps,
+);
+
 export const AlignTopIcon = createIcon(
   <>
     <g clipPath="url(#a)" stroke="currentColor" strokeWidth="1.25">

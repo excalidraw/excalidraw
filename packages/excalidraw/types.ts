@@ -464,6 +464,11 @@ export interface AppState {
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
   bindMode: BindMode;
+  /**
+   * The order of the slides (frames) in the presentation mode.
+   * If null, the order is based on the frames' position on the canvas.
+   */
+  presentationSlideOrder: string[] | null;
 }
 
 export type SearchMatch = {
@@ -716,6 +721,8 @@ export type AppProps = Merge<
 /** A subset of App class properties that we need to use elsewhere
  * in the app, eg Manager. Factored out into a separate type to keep DRY. */
 export type AppClassProperties = {
+  startPresentation: () => void;
+  // togglePresentationMode: () => void; // Already defined below or inherited?
   props: AppProps;
   state: AppState;
   interactiveCanvas: HTMLCanvasElement | null;
@@ -766,6 +773,7 @@ export type AppClassProperties = {
   lastPointerMoveCoords: App["lastPointerMoveCoords"];
   bindModeHandler: App["bindModeHandler"];
   togglePresentationMode: App["togglePresentationMode"];
+  laserTrails: App["laserTrails"];
 };
 
 export type PointerDownState = Readonly<{

@@ -430,6 +430,7 @@ export const DEFAULT_ELEMENT_PROPS: {
 };
 
 export const LIBRARY_SIDEBAR_TAB = "library";
+export const PRESENTATION_SIDEBAR_TAB = "presentation";
 export const CANVAS_SEARCH_TAB = "search";
 
 export const DEFAULT_SIDEBAR = {

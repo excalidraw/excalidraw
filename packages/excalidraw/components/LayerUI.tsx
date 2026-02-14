@@ -434,33 +434,6 @@ const LayerUI = ({
               editorInterface.formFactor === "phone",
               appState,
             )}
-            {appState.openDialog?.name !== "elementLinkSelector" && (
-              <button
-                type="button"
-                className="presentation-mode-trigger"
-                onClick={() => app.togglePresentationMode()}
-                title={`Present (${navigator.platform.includes("Mac") ? "\u2318" : "Ctrl"}+P)`}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 36,
-                  height: 36,
-                  borderRadius: 8,
-                  border: "none",
-                  background: "var(--island-bg-color, #fff)",
-                  boxShadow: "var(--shadow-island)",
-                  cursor: "pointer",
-                  color: "var(--icon-fill-color, #333)",
-                  padding: 0,
-                  marginLeft: 8,
-                  transition: "all 0.15s ease",
-                }}
-                id="presentation-mode-button"
-              >
-                {presentationIcon}
-              </button>
-            )}
             {!appState.viewModeEnabled &&
               appState.openDialog?.name !== "elementLinkSelector" &&
               // hide button when sidebar docked
@@ -485,17 +458,19 @@ const LayerUI = ({
 
   const renderSidebars = () => {
     return (
-      <DefaultSidebar
-        __fallback
-        onDock={(docked) => {
-          trackEvent(
-            "sidebar",
-            `toggleDock (${docked ? "dock" : "undock"})`,
-            `(${editorInterface.formFactor === "phone" ? "mobile" : "desktop"
-            })`,
-          );
-        }}
-      />
+      <>
+        <DefaultSidebar
+          __fallback
+          onDock={(docked) => {
+            trackEvent(
+              "sidebar",
+              `toggleDock (${docked ? "dock" : "undock"})`,
+              `(${editorInterface.formFactor === "phone" ? "mobile" : "desktop"
+              })`,
+            );
+          }}
+        />
+      </>
     );
   };
 

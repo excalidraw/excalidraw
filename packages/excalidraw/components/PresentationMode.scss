@@ -27,10 +27,9 @@
   // Canvas
   &__canvas {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     opacity: 1;
     transition: opacity 0.3s ease-in;
 
@@ -39,133 +38,135 @@
     }
   }
 
-  // Navigation arrows
-  &__nav {
+  // Laser SVG Overlay
+  &__laser-svg {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  &--laser-enabled {
+    cursor: crosshair;
+  }
+
+  // Floating Toolbar
+  &__toolbar {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    z-index: 20;
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: rgba(255, 255, 255, 0.8);
-    opacity: 0;
-    transition: all 0.3s ease;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.2);
-      color: #fff;
-      transform: translateY(-50%) scale(1.1);
-    }
-
-    &:active {
-      transform: translateY(-50%) scale(0.95);
-    }
-
-    &--prev {
-      left: 24px;
-    }
-
-    &--next {
-      right: 24px;
-    }
-  }
-
-  &:hover &__nav {
-    opacity: 1;
-  }
-
-  // Slide counter
-  &__counter {
-    position: absolute;
-    top: 20px;
-    right: 24px;
-    z-index: 10;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(8px);
+    gap: 12px;
+    padding: 8px 12px;
+    background: rgba(28, 28, 30, 0.8);
+    backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 6px 16px;
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.9);
-    letter-spacing: 0.5px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     opacity: 0;
-    transition: opacity 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: auto;
 
-    &-current {
-      color: #fff;
-      font-weight: 600;
+    &:hover,
+    .presentation-mode:hover & {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
-    &-separator {
-      color: rgba(255, 255, 255, 0.4);
-      margin: 0 2px;
+    &-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    &-total {
-      color: rgba(255, 255, 255, 0.6);
-    }
-  }
-
-  &:hover &__counter {
-    opacity: 1;
-  }
-
-  // Exit button
-  &__exit {
-    position: absolute;
-    top: 20px;
-    left: 24px;
-    z-index: 10;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 6px 14px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    color: rgba(255, 255, 255, 0.8);
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    opacity: 0;
-    transition: all 0.3s ease;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.15);
-      color: #fff;
+    &-divider {
+      width: 1px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 0 4px;
     }
 
-    span {
-      text-transform: uppercase;
+    &-counter {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--ui-font);
+      min-width: 60px;
+      text-align: center;
+      user-select: none;
     }
-  }
 
-  &:hover &__exit {
-    opacity: 1;
+    &-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 0;
+
+      &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+
+      &:active:not(:disabled) {
+        transform: scale(0.92);
+      }
+
+      &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      &--active {
+        background: var(--color-promo, #7048e8);
+        color: #fff;
+        box-shadow: 0 0 12px rgba(112, 72, 232, 0.4);
+
+        &:hover {
+          background: var(--color-promo-dark, #5f3dc4);
+        }
+      }
+
+      &--exit {
+        width: auto;
+        padding: 0 12px;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: rgba(255, 255, 255, 0.8);
+
+        span {
+          background: rgba(255, 255, 255, 0.15);
+          padding: 2px 4px;
+          border-radius: 4px;
+        }
+
+        &:hover {
+          background: rgba(250, 82, 82, 0.2);
+          color: #ff8787;
+        }
+      }
+    }
   }
 
   // Dots indicator
   &__dots {
     position: absolute;
-    bottom: 24px;
+    bottom: 100px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
@@ -178,15 +179,15 @@
     border-radius: 20px;
     opacity: 0;
     transition: opacity 0.3s ease;
-  }
 
-  &:hover &__dots {
-    opacity: 1;
+    .presentation-mode:hover & {
+      opacity: 1;
+    }
   }
 
   &__dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.3);
     border: none;
@@ -201,12 +202,12 @@
 
     &--active {
       background: #fff;
-      transform: scale(1.2);
+      transform: scale(1.5);
       box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
 
       &:hover {
         background: #fff;
-        transform: scale(1.3);
+        transform: scale(1.6);
       }
     }
   }

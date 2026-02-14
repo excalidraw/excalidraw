@@ -1,32 +1,37 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+    useState,
+    useEffect,
+    useRef,
+    useMemo,
+    useCallback,
+} from "react";
 import { createPortal } from "react-dom";
 import rough from "roughjs/bin/rough";
-
 import {
     arrayToMap,
     toBrandedType,
-    THEME,
 } from "@excalidraw/common";
-
 import {
     getElementsOverlappingFrame,
     syncInvalidIndices,
 } from "@excalidraw/element";
-
 import {
-    getInitializedImageElements,
     updateImageCache,
+    getInitializedImageElements,
 } from "@excalidraw/element";
-
-import type {
-    ExcalidrawFrameLikeElement,
-    NonDeletedExcalidrawElement,
-    NonDeletedSceneElementsMap,
-} from "@excalidraw/element/types";
-
-import { getDefaultAppState } from "../appState";
 import { renderStaticScene } from "../renderer/staticScene";
+import { getDefaultAppState } from "../appState";
 import { Fonts } from "../fonts";
+import { t } from "../i18n";
+import { SVGLayer } from "./SVGLayer";
+import {
+    chevronLeftIcon as ChevronLeftIcon,
+    chevronRight as ChevronRightIcon,
+    PlayIcon,
+    stop as StopIcon,
+    presentationIcon,
+} from "./icons";
+import clsx from "clsx";
 
 import type { RenderableElementsMap } from "../scene/types";
 import type {
@@ -34,7 +39,13 @@ import type {
     BinaryFiles,
     EmbedsValidationStatus,
     ElementsPendingErasure,
+    AppClassProperties,
 } from "../types";
+import type {
+    ExcalidrawFrameLikeElement,
+    NonDeletedExcalidrawElement,
+    NonDeletedSceneElementsMap,
+} from "@excalidraw/element/types";
 
 import "./PresentationMode.scss";
 
@@ -44,6 +55,7 @@ interface PresentationModeProps {
     appState: AppState;
     files: BinaryFiles;
     onClose: () => void;
+    app: AppClassProperties;
 }
 
 const PresentationMode: React.FC<PresentationModeProps> = ({
@@ -52,18 +64,23 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
     appState,
     files,
     onClose,
+    app,
 }) => {
     const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isRendering, setIsRendering] = useState(true);
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+    const [dimensions, setDimensions] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight,
+    });
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const [laserEnabled, setLaserEnabled] = useState(false);
+    const [layout, setLayout] = useState({ fitScale: 1, offsetX: 0, offsetY: 0 });
 
     // Sort frames by position (left to right, top to bottom)
-    const sortedFrames = React.useMemo(() => {
+    const sortedFrames = useMemo(() => {
         return [...frames].sort((a, b) => {
-            // Sort primarily by y position (top to bottom), then by x (left to right)
             const yDiff = a.y - b.y;
             if (Math.abs(yDiff) > 50) {
                 return yDiff;
@@ -91,9 +108,7 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
     useEffect(() => {
         const el = containerRef.current;
         if (el && document.fullscreenEnabled) {
-            el.requestFullscreen().catch(() => {
-                // Fullscreen not supported or denied, continue in regular mode
-            });
+            el.requestFullscreen().catch(() => { });
         }
 
         return () => {
@@ -107,7 +122,6 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
     useEffect(() => {
         const handleFullscreenChange = () => {
             if (!document.fullscreenElement) {
-                // User exited fullscreen via browser controls
                 onClose();
             }
             updateDimensions();
@@ -131,22 +145,8 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
             const screenWidth = dimensions.width;
             const screenHeight = dimensions.height;
 
-            // Calculate the scale to fit the frame into the screen
             const frameAspectRatio = currentFrame.width / currentFrame.height;
             const screenAspectRatio = screenWidth / screenHeight;
-
-            let renderWidth: number;
-            let renderHeight: number;
-
-            if (frameAspectRatio > screenAspectRatio) {
-                // Frame is wider relative to screen
-                renderWidth = screenWidth;
-                renderHeight = screenWidth / frameAspectRatio;
-            } else {
-                // Frame is taller relative to screen
-                renderHeight = screenHeight;
-                renderWidth = screenHeight * frameAspectRatio;
-            }
 
             const scale = window.devicePixelRatio || 1;
             canvas.width = screenWidth * scale;
@@ -154,13 +154,11 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
             canvas.style.width = `${screenWidth}px`;
             canvas.style.height = `${screenHeight}px`;
 
-            // Get elements within the frame
             const frameElements = getElementsOverlappingFrame(
                 elements,
                 currentFrame,
             );
 
-            // Load fonts
             await Fonts.loadElementsFonts(frameElements);
 
             const { imageCache } = await updateImageCache({
@@ -173,12 +171,10 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
 
             const defaultAppState = getDefaultAppState();
 
-            // Calculate scroll offsets to center the frame on the canvas
             const scaleX = screenWidth / currentFrame.width;
             const scaleY = screenHeight / currentFrame.height;
             const fitScale = Math.min(scaleX, scaleY);
 
-            // Center the content
             const offsetX =
                 (screenWidth - currentFrame.width * fitScale) / 2 / fitScale;
             const offsetY =
@@ -186,6 +182,8 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
 
             const scrollX = -currentFrame.x + offsetX;
             const scrollY = -currentFrame.y + offsetY;
+
+            setLayout({ fitScale, offsetX, offsetY });
 
             renderStaticScene({
                 canvas,
@@ -231,6 +229,58 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
         renderSlide();
     }, [currentFrame, elements, appState, files, dimensions]);
 
+    const nextSlide = useCallback(() => {
+        if (currentSlideIndex < sortedFrames.length - 1) {
+            setIsTransitioning(true);
+            setTimeout(() => {
+                setCurrentSlideIndex((prev) => Math.min(prev + 1, sortedFrames.length - 1));
+                setTimeout(() => setIsTransitioning(false), 50);
+            }, 200);
+        }
+    }, [currentSlideIndex, sortedFrames.length]);
+
+    const prevSlide = useCallback(() => {
+        if (currentSlideIndex > 0) {
+            setIsTransitioning(true);
+            setTimeout(() => {
+                setCurrentSlideIndex((prev) => Math.max(prev - 1, 0));
+                setTimeout(() => setIsTransitioning(false), 50);
+            }, 200);
+        }
+    }, [currentSlideIndex]);
+
+    const handlePointerDown = (e: React.PointerEvent) => {
+        if (!laserEnabled) return;
+
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (!rect) return;
+
+        const cx = e.clientX - rect.left;
+        const cy = e.clientY - rect.top;
+
+        const sx = cx / layout.fitScale + currentFrame.x - layout.offsetX;
+        const sy = cy / layout.fitScale + currentFrame.y - layout.offsetY;
+
+        app.laserTrails.startPath(sx, sy);
+    };
+
+    const handlePointerMove = (e: React.PointerEvent) => {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (!rect) return;
+
+        const cx = e.clientX - rect.left;
+        const cy = e.clientY - rect.top;
+
+        const sx = cx / layout.fitScale + currentFrame.x - layout.offsetX;
+        const sy = cy / layout.fitScale + currentFrame.y - layout.offsetY;
+
+        app.laserTrails.addPointToPath(sx, sy);
+    };
+
+    const handlePointerUp = () => {
+        app.laserTrails.endPath();
+    };
+
     // Keyboard navigation
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -245,27 +295,17 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
                 case " ": // Space
                     e.preventDefault();
                     e.stopPropagation();
-                    if (currentSlideIndex < sortedFrames.length - 1) {
-                        setIsTransitioning(true);
-                        setTimeout(() => {
-                            setCurrentSlideIndex((prev) =>
-                                Math.min(prev + 1, sortedFrames.length - 1),
-                            );
-                            setTimeout(() => setIsTransitioning(false), 50);
-                        }, 200);
-                    }
+                    nextSlide();
                     break;
                 case "ArrowLeft":
                 case "ArrowUp":
                     e.preventDefault();
                     e.stopPropagation();
-                    if (currentSlideIndex > 0) {
-                        setIsTransitioning(true);
-                        setTimeout(() => {
-                            setCurrentSlideIndex((prev) => Math.max(prev - 1, 0));
-                            setTimeout(() => setIsTransitioning(false), 50);
-                        }, 200);
-                    }
+                    prevSlide();
+                    break;
+                case "l":
+                case "L":
+                    setLaserEnabled(prev => !prev);
                     break;
                 case "Home":
                     e.preventDefault();
@@ -288,73 +328,31 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
             }
         };
 
-        // Use capture phase to intercept before other handlers
         window.addEventListener("keydown", handleKeyDown, true);
         return () => window.removeEventListener("keydown", handleKeyDown, true);
-    }, [currentSlideIndex, sortedFrames.length, onClose]);
+    }, [currentSlideIndex, sortedFrames.length, onClose, prevSlide, nextSlide]);
 
-    // Click event to go to next slide
     const handleClick = useCallback(
         (e: React.MouseEvent) => {
-            // Right third of screen = next, left third = previous
             const rect = (e.target as HTMLElement).getBoundingClientRect();
             const clickPosition = (e.clientX - rect.left) / rect.width;
 
             if (clickPosition > 0.66) {
-                if (currentSlideIndex < sortedFrames.length - 1) {
-                    setIsTransitioning(true);
-                    setTimeout(() => {
-                        setCurrentSlideIndex((prev) =>
-                            Math.min(prev + 1, sortedFrames.length - 1),
-                        );
-                        setTimeout(() => setIsTransitioning(false), 50);
-                    }, 200);
-                }
+                nextSlide();
             } else if (clickPosition < 0.33) {
-                if (currentSlideIndex > 0) {
-                    setIsTransitioning(true);
-                    setTimeout(() => {
-                        setCurrentSlideIndex((prev) => Math.max(prev - 1, 0));
-                        setTimeout(() => setIsTransitioning(false), 50);
-                    }, 200);
-                }
+                prevSlide();
             }
         },
-        [currentSlideIndex, sortedFrames.length],
+        [nextSlide, prevSlide],
     );
 
     if (sortedFrames.length === 0) {
         return createPortal(
             <div className="presentation-mode" ref={containerRef}>
                 <div className="presentation-mode__empty">
-                    <div className="presentation-mode__empty-icon">
-                        <svg
-                            width="80"
-                            height="80"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.5"
-                        >
-                            <path d="M3 4l18 0" />
-                            <path d="M4 4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-10" />
-                            <path d="M12 16l0 4" />
-                            <path d="M9 20l6 0" />
-                        </svg>
-                    </div>
                     <h2>No Frames Found</h2>
-                    <p>
-                        Add frames to your canvas to create presentation slides.
-                        <br />
-                        Each frame becomes a separate slide.
-                    </p>
-                    <button
-                        type="button"
-                        className="presentation-mode__close-btn"
-                        onClick={onClose}
-                    >
-                        Close
-                    </button>
+                    <p>Add frames to your canvas to create presentation slides.</p>
+                    <button type="button" onClick={onClose}>Close</button>
                 </div>
             </div>,
             document.body,
@@ -363,121 +361,104 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
 
     return createPortal(
         <div
-            className={`presentation-mode ${isTransitioning ? "presentation-mode--transitioning" : ""}`}
+            className={clsx("presentation-mode", {
+                "presentation-mode--transitioning": isTransitioning,
+                "presentation-mode--laser-enabled": laserEnabled,
+            })}
             ref={containerRef}
             onClick={handleClick}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerLeave={handlePointerUp}
+            style={{ touchAction: "none" }}
         >
             <canvas
                 ref={canvasRef}
-                className={`presentation-mode__canvas ${isRendering ? "presentation-mode__canvas--loading" : ""}`}
+                className={clsx("presentation-mode__canvas", {
+                    "presentation-mode__canvas--loading": isRendering,
+                })}
             />
 
-            {/* Slide counter */}
-            <div className="presentation-mode__counter">
-                <span className="presentation-mode__counter-current">
-                    {currentSlideIndex + 1}
-                </span>
-                <span className="presentation-mode__counter-separator">/</span>
-                <span className="presentation-mode__counter-total">
-                    {sortedFrames.length}
-                </span>
+            {laserEnabled && (
+                <div
+                    className="presentation-mode__laser-container"
+                    style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        pointerEvents: "none",
+                        zIndex: 10,
+                    }}
+                >
+                    <div
+                        style={{
+                            transform: `translate(${layout.offsetX * layout.fitScale}px, ${layout.offsetY * layout.fitScale}px) scale(${layout.fitScale}) translate(${-currentFrame.x}px, ${-currentFrame.y}px)`,
+                            width: "100%",
+                            height: "100%",
+                        }}
+                    >
+                        <SVGLayer trails={[app.laserTrails]} />
+                    </div>
+                </div>
+            )}
+
+            <div className="presentation-mode__toolbar" onClick={(e) => e.stopPropagation()}>
+                <div className="presentation-mode__toolbar-group">
+                    <button
+                        type="button"
+                        className="presentation-mode__toolbar-btn"
+                        onClick={prevSlide}
+                        disabled={currentSlideIndex === 0}
+                    >
+                        {ChevronLeftIcon}
+                    </button>
+                    <div className="presentation-mode__toolbar-counter">
+                        {currentSlideIndex + 1} / {sortedFrames.length}
+                    </div>
+                    <button
+                        type="button"
+                        className="presentation-mode__toolbar-btn"
+                        onClick={nextSlide}
+                        disabled={currentSlideIndex === sortedFrames.length - 1}
+                    >
+                        {ChevronRightIcon}
+                    </button>
+                </div>
+                <div className="presentation-mode__toolbar-divider" />
+                <button
+                    type="button"
+                    className={clsx("presentation-mode__toolbar-btn", {
+                        "presentation-mode__toolbar-btn--active": laserEnabled,
+                    })}
+                    onClick={() => setLaserEnabled(!laserEnabled)}
+                >
+                    <div style={{ width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: "currentColor" }} />
+                    </div>
+                </button>
+                <div className="presentation-mode__toolbar-divider" />
+                <button
+                    type="button"
+                    className="presentation-mode__toolbar-btn presentation-mode__toolbar-btn--exit"
+                    onClick={onClose}
+                >
+                    {StopIcon}
+                    <span>ESC</span>
+                </button>
             </div>
 
-            {/* Navigation arrows */}
-            {currentSlideIndex > 0 && (
-                <button
-                    type="button"
-                    className="presentation-mode__nav presentation-mode__nav--prev"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setIsTransitioning(true);
-                        setTimeout(() => {
-                            setCurrentSlideIndex((prev) => Math.max(prev - 1, 0));
-                            setTimeout(() => setIsTransitioning(false), 50);
-                        }, 200);
-                    }}
-                    aria-label="Previous slide"
-                >
-                    <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    >
-                        <polyline points="15 18 9 12 15 6" />
-                    </svg>
-                </button>
-            )}
-
-            {currentSlideIndex < sortedFrames.length - 1 && (
-                <button
-                    type="button"
-                    className="presentation-mode__nav presentation-mode__nav--next"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setIsTransitioning(true);
-                        setTimeout(() => {
-                            setCurrentSlideIndex((prev) =>
-                                Math.min(prev + 1, sortedFrames.length - 1),
-                            );
-                            setTimeout(() => setIsTransitioning(false), 50);
-                        }, 200);
-                    }}
-                    aria-label="Next slide"
-                >
-                    <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    >
-                        <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                </button>
-            )}
-
-            {/* Close button */}
-            <button
-                type="button"
-                className="presentation-mode__exit"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onClose();
-                }}
-                aria-label="Exit presentation"
-            >
-                <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                >
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-                <span>ESC</span>
-            </button>
-
-            {/* Slide indicator dots */}
             {sortedFrames.length <= 20 && (
                 <div className="presentation-mode__dots">
                     {sortedFrames.map((_, index) => (
                         <button
                             type="button"
                             key={index}
-                            className={`presentation-mode__dot ${index === currentSlideIndex ? "presentation-mode__dot--active" : ""}`}
+                            className={clsx("presentation-mode__dot", {
+                                "presentation-mode__dot--active": index === currentSlideIndex,
+                            })}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setIsTransitioning(true);
@@ -486,13 +467,11 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
                                     setTimeout(() => setIsTransitioning(false), 50);
                                 }, 200);
                             }}
-                            aria-label={`Go to slide ${index + 1}`}
                         />
                     ))}
                 </div>
             )}
 
-            {/* Loading indicator */}
             {isRendering && (
                 <div className="presentation-mode__loading">
                     <div className="presentation-mode__spinner" />
