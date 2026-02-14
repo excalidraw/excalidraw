@@ -224,7 +224,8 @@ export const PresentationMenu = ({ app, elements }: PresentationMenuProps) => {
                                 app.scrollToContent(frame, {
                                     animate: true,
                                     fitToViewport: true,
-                                    viewportZoomFactor: 1
+                                    viewportZoomFactor: 1,
+                                    canvasOffsets: app.getEditorUIOffsets(),
                                 });
                             }}
                             onDragStart={(e) => handleDragStart(e, index)}

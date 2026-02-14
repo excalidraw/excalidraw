@@ -100,15 +100,14 @@
     flex-direction: column;
     flex: 1 1 auto;
     padding: 1rem 0;
+    min-height: 0;
 
     [role="tabpanel"] {
-      flex: 1;
+      flex: 1 1 0;
       outline: none;
-
-      flex: 1 1 auto;
       display: flex;
       flex-direction: column;
-      outline: none;
+      min-height: 0;
     }
 
     [role="tabpanel"][data-state="inactive"] {
@@ -122,7 +121,7 @@
     }
   }
 
-  .sidebar-tabs-root > .sidebar__header {
+  .sidebar-tabs-root>.sidebar__header {
     padding-top: 0;
     padding-bottom: 1rem;
   }
