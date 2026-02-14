@@ -1,4 +1,4 @@
-FROM --platform=${BUILDPLATFORM} node:18 AS build
+FROM --platform=${BUILDPLATFORM} node:20-alpine AS build
 
 WORKDIR /opt/node_app
 
@@ -13,7 +13,7 @@ ARG NODE_ENV=production
 
 RUN npm_config_target_arch=${TARGETARCH} yarn build:app:docker
 
-FROM --platform=${TARGETPLATFORM} nginx:1.27-alpine
+FROM --platform=${TARGETPLATFORM} nginx:1.29-alpine
 
 COPY --from=build /opt/node_app/excalidraw-app/build /usr/share/nginx/html
 

@@ -1,0 +1,296 @@
+.presentation-mode {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: none;
+  user-select: none;
+  overflow: hidden;
+
+  &:hover {
+    cursor: default;
+  }
+
+  &--transitioning {
+    .presentation-mode__canvas {
+      opacity: 0;
+      transition: opacity 0.2s ease-out;
+    }
+  }
+
+  // Canvas
+  &__canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    transition: opacity 0.3s ease-in;
+
+    &--loading {
+      opacity: 0.3;
+    }
+  }
+
+  // Navigation arrows
+  &__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.8);
+    opacity: 0;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    &:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+
+    &--prev {
+      left: 24px;
+    }
+
+    &--next {
+      right: 24px;
+    }
+  }
+
+  &:hover &__nav {
+    opacity: 1;
+  }
+
+  // Slide counter
+  &__counter {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 0.5px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    &-current {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    &-separator {
+      color: rgba(255, 255, 255, 0.4);
+      margin: 0 2px;
+    }
+
+    &-total {
+      color: rgba(255, 255, 255, 0.6);
+    }
+  }
+
+  &:hover &__counter {
+    opacity: 1;
+  }
+
+  // Exit button
+  &__exit {
+    position: absolute;
+    top: 20px;
+    left: 24px;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.8);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    opacity: 0;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    span {
+      text-transform: uppercase;
+    }
+  }
+
+  &:hover &__exit {
+    opacity: 1;
+  }
+
+  // Dots indicator
+  &__dots {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover &__dots {
+    opacity: 1;
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.6);
+      transform: scale(1.3);
+    }
+
+    &--active {
+      background: #fff;
+      transform: scale(1.2);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+
+      &:hover {
+        background: #fff;
+        transform: scale(1.3);
+      }
+    }
+  }
+
+  // Loading spinner
+  &__loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+  }
+
+  &__spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    animation: presentation-spin 0.8s linear infinite;
+  }
+
+  @keyframes presentation-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  // Empty state
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
+
+    &-icon {
+      margin-bottom: 24px;
+      opacity: 0.5;
+
+      svg {
+        width: 80px;
+        height: 80px;
+      }
+    }
+
+    h2 {
+      font-size: 28px;
+      font-weight: 600;
+      margin: 0 0 12px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.5);
+      margin: 0 0 32px;
+    }
+  }
+
+  &__close-btn {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 10px 28px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
+  }
+}

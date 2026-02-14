@@ -47,7 +47,7 @@ import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { useEditorInterface, useStylesPanelMode } from "./App";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
-import { sidebarRightIcon } from "./icons";
+import { sidebarRightIcon, presentationIcon } from "./icons";
 import { DefaultSidebar } from "./DefaultSidebar";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
@@ -167,21 +167,21 @@ const LayerUI = ({
 
   const spacing = isCompactStylesPanel
     ? {
-        menuTopGap: 4,
-        toolbarColGap: 4,
-        toolbarRowGap: 1,
-        toolbarInnerRowGap: 0.5,
-        islandPadding: 1,
-        collabMarginLeft: 8,
-      }
+      menuTopGap: 4,
+      toolbarColGap: 4,
+      toolbarRowGap: 1,
+      toolbarInnerRowGap: 0.5,
+      islandPadding: 1,
+      collabMarginLeft: 8,
+    }
     : {
-        menuTopGap: 6,
-        toolbarColGap: 4,
-        toolbarRowGap: 1,
-        toolbarInnerRowGap: 1,
-        islandPadding: 1,
-        collabMarginLeft: 8,
-      };
+      menuTopGap: 6,
+      toolbarColGap: 4,
+      toolbarRowGap: 1,
+      toolbarInnerRowGap: 1,
+      islandPadding: 1,
+      collabMarginLeft: 8,
+    };
 
   const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
 
@@ -419,6 +419,33 @@ const LayerUI = ({
               editorInterface.formFactor === "phone",
               appState,
             )}
+            {appState.openDialog?.name !== "elementLinkSelector" && (
+              <button
+                type="button"
+                className="presentation-mode-trigger"
+                onClick={() => app.togglePresentationMode()}
+                title={`Present (${navigator.platform.includes("Mac") ? "\u2318" : "Ctrl"}+P)`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 36,
+                  height: 36,
+                  borderRadius: 8,
+                  border: "none",
+                  background: "var(--island-bg-color, #fff)",
+                  boxShadow: "var(--shadow-island)",
+                  cursor: "pointer",
+                  color: "var(--icon-fill-color, #333)",
+                  padding: 0,
+                  marginLeft: 8,
+                  transition: "all 0.15s ease",
+                }}
+                id="presentation-mode-button"
+              >
+                {presentationIcon}
+              </button>
+            )}
             {!appState.viewModeEnabled &&
               appState.openDialog?.name !== "elementLinkSelector" &&
               // hide button when sidebar docked
@@ -449,8 +476,7 @@ const LayerUI = ({
           trackEvent(
             "sidebar",
             `toggleDock (${docked ? "dock" : "undock"})`,
-            `(${
-              editorInterface.formFactor === "phone" ? "mobile" : "desktop"
+            `(${editorInterface.formFactor === "phone" ? "mobile" : "desktop"
             })`,
           );
         }}
@@ -479,8 +505,7 @@ const LayerUI = ({
             trackEvent(
               "sidebar",
               `${DEFAULT_SIDEBAR.name} (open)`,
-              `button (${
-                editorInterface.formFactor === "phone" ? "mobile" : "desktop"
+              `button (${editorInterface.formFactor === "phone" ? "mobile" : "desktop"
               })`,
             );
           }
@@ -519,8 +544,8 @@ const LayerUI = ({
                       ? "strokeColor"
                       : "backgroundColor"
                     : colorPickerType === "elementBackground"
-                    ? "backgroundColor"
-                    : "strokeColor"]: color,
+                      ? "backgroundColor"
+                      : "strokeColor"]: color,
                 });
                 ShapeCache.delete(element);
               }
@@ -600,8 +625,8 @@ const LayerUI = ({
             className="layer-ui__wrapper"
             style={
               appState.openSidebar &&
-              isSidebarDocked &&
-              editorInterface.canFitSidebar
+                isSidebarDocked &&
+                editorInterface.canFitSidebar
                 ? { width: `calc(100% - var(--right-sidebar-width))` }
                 : {}
             }
