@@ -157,15 +157,17 @@ export const throttleRAF = <T extends any[]>(
   let lastArgs: T | null = null;
   let lastArgsTrailing: T | null = null;
 
-  const scheduleFunc = (args: T) => {
+  const scheduleFunc = () => {
     timerId = window.requestAnimationFrame(() => {
       timerId = null;
-      fn(...args);
+      if (lastArgs) {
+        fn(...lastArgs);
+      }
       lastArgs = null;
       if (lastArgsTrailing) {
         lastArgs = lastArgsTrailing;
         lastArgsTrailing = null;
-        scheduleFunc(lastArgs);
+        scheduleFunc();
       }
     });
   };
@@ -177,7 +179,7 @@ export const throttleRAF = <T extends any[]>(
     }
     lastArgs = args;
     if (timerId === null) {
-      scheduleFunc(lastArgs);
+      scheduleFunc();
     } else if (opts?.trailing) {
       lastArgsTrailing = args;
     }
