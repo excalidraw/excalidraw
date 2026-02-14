@@ -121,12 +121,14 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
         return () => window.removeEventListener("resize", updateDimensions);
     }, [updateDimensions]);
 
-    // Request fullscreen on mount
+    // Request fullscreen and focus on mount
     useEffect(() => {
         const el = containerRef.current;
         if (el && document.fullscreenEnabled) {
             el.requestFullscreen().catch(() => { });
         }
+        // Focus the container to receive keyboard events
+        el?.focus();
 
         return () => {
             if (document.fullscreenElement) {
@@ -266,37 +268,109 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
         }
     }, [currentSlideIndex]);
 
-    const handlePointerDown = (e: React.PointerEvent) => {
+    const laserCanvasRef = useRef<HTMLCanvasElement>(null);
+    const laserPointsRef = useRef<{ x: number, y: number, time: number }[]>([]);
+    const laserAnimationRef = useRef<number | null>(null);
+
+    const drawLaser = useCallback(() => {
+        const canvas = laserCanvasRef.current;
+        if (!canvas) {
+            laserAnimationRef.current = requestAnimationFrame(drawLaser);
+            return;
+        }
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            laserAnimationRef.current = requestAnimationFrame(drawLaser);
+            return;
+        }
+
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const points = laserPointsRef.current;
+
+        // Always request next frame for continuous animation
+        laserAnimationRef.current = requestAnimationFrame(drawLaser);
+
+        if (points.length < 2) {
+            // Just draw current point
+            if (points.length === 1) {
+                ctx.beginPath();
+                ctx.arc(points[0].x, points[0].y, 8, 0, Math.PI * 2);
+                ctx.fillStyle = 'red';
+                ctx.fill();
+            }
+            return;
+        }
+
+        // Draw smooth path
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+
+        for (let i = 1; i < points.length; i++) {
+            const p0 = points[Math.max(0, i - 1)];
+            const p1 = points[i];
+            const midX = (p0.x + p1.x) / 2;
+            const midY = (p0.y + p1.y) / 2;
+            ctx.quadraticCurveTo(p0.x, p0.y, midX, midY);
+        }
+
+        ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
+
+        // Style
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+
+        // Fade old points
+        const now = performance.now();
+        laserPointsRef.current = points.filter(p => now - p.time < 2000);
+    }, []);
+
+    // Start animation loop on mount
+    useEffect(() => {
+        laserAnimationRef.current = requestAnimationFrame(drawLaser);
+        return () => {
+            if (laserAnimationRef.current) {
+                cancelAnimationFrame(laserAnimationRef.current);
+            }
+        };
+    }, [drawLaser]);
+
+    const handleLaserPointerDown = (e: React.PointerEvent) => {
+        if (!laserEnabled) return;
+        e.preventDefault();
+        e.currentTarget.setPointerCapture(e.pointerId);
+
+        laserPointsRef.current = [{ x: e.clientX, y: e.clientY, time: performance.now() }];
+
+        if (!laserAnimationRef.current) {
+            laserAnimationRef.current = requestAnimationFrame(drawLaser);
+        }
+    };
+
+    const handleLaserPointerMove = (e: React.PointerEvent) => {
         if (!laserEnabled) return;
 
-        const rect = containerRef.current?.getBoundingClientRect();
-        if (!rect) return;
-
-        const cx = e.clientX - rect.left;
-        const cy = e.clientY - rect.top;
-
-        const sx = cx / layout.fitScale + currentFrame.x - layout.offsetX;
-        const sy = cy / layout.fitScale + currentFrame.y - layout.offsetY;
-
-        app.laserTrails.startPath(sx, sy);
+        laserPointsRef.current.push({ x: e.clientX, y: e.clientY, time: performance.now() });
     };
 
-    const handlePointerMove = (e: React.PointerEvent) => {
-        const rect = containerRef.current?.getBoundingClientRect();
-        if (!rect) return;
-
-        const cx = e.clientX - rect.left;
-        const cy = e.clientY - rect.top;
-
-        const sx = cx / layout.fitScale + currentFrame.x - layout.offsetX;
-        const sy = cy / layout.fitScale + currentFrame.y - layout.offsetY;
-
-        app.laserTrails.addPointToPath(sx, sy);
+    const handleLaserPointerUp = (e: React.PointerEvent) => {
+        if (!laserEnabled) return;
+        e.currentTarget.releasePointerCapture(e.pointerId);
     };
 
-    const handlePointerUp = () => {
-        app.laserTrails.endPath();
-    };
+    // Cleanup animation on unmount
+    useEffect(() => {
+        return () => {
+            if (laserAnimationRef.current) {
+                cancelAnimationFrame(laserAnimationRef.current);
+            }
+        };
+    }, []);
 
     // Keyboard navigation
     useEffect(() => {
@@ -347,7 +421,7 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
 
         window.addEventListener("keydown", handleKeyDown, true);
         return () => window.removeEventListener("keydown", handleKeyDown, true);
-    }, [currentSlideIndex, sortedFrames.length, onClose, prevSlide, nextSlide]);
+    }, [currentSlideIndex, sortedFrames.length, onClose, prevSlide, nextSlide, setLaserEnabled]);
 
     const handleClick = useCallback(
         (e: React.MouseEvent) => {
@@ -383,11 +457,12 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
                 "presentation-mode--laser-enabled": laserEnabled,
             })}
             ref={containerRef}
+            tabIndex={0}
             onClick={handleClick}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerLeave={handlePointerUp}
+            onPointerDown={handleLaserPointerDown}
+            onPointerMove={handleLaserPointerMove}
+            onPointerUp={handleLaserPointerUp}
+            onPointerLeave={handleLaserPointerUp}
             style={{ touchAction: "none" }}
         >
             <canvas
@@ -401,23 +476,35 @@ const PresentationMode: React.FC<PresentationModeProps> = ({
                 <div
                     className="presentation-mode__laser-container"
                     style={{
-                        position: "absolute",
+                        position: "fixed",
                         top: 0,
                         left: 0,
-                        width: "100%",
-                        height: "100%",
+                        width: "100vw",
+                        height: "100vh",
+                        zIndex: 999999,
                         pointerEvents: "none",
-                        zIndex: 10,
                     }}
                 >
                     <div
                         style={{
-                            transform: `translate(${layout.offsetX * layout.fitScale}px, ${layout.offsetY * layout.fitScale}px) scale(${layout.fitScale}) translate(${-currentFrame.x}px, ${-currentFrame.y}px)`,
-                            width: "100%",
-                            height: "100%",
+                            position: "fixed",
+                            top: 0,
+                            left: 0,
+                            width: "100vw",
+                            height: "100vh",
+                            pointerEvents: "auto",
                         }}
+                        onPointerDown={handleLaserPointerDown}
+                        onPointerMove={handleLaserPointerMove}
+                        onPointerUp={handleLaserPointerUp}
+                        onPointerLeave={handleLaserPointerUp}
                     >
-                        <SVGLayer trails={[app.laserTrails]} />
+                        <canvas
+                            ref={laserCanvasRef}
+                            width={window.innerWidth}
+                            height={window.innerHeight}
+                            style={{ display: 'block' }}
+                        />
                     </div>
                 </div>
             )}

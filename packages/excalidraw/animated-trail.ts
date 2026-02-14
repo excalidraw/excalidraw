@@ -79,7 +79,19 @@ export class AnimatedTrail implements Trail {
     }
 
     if (this.trailElement.parentNode !== this.container && this.container) {
+      console.log("Appending trail to container:", {
+        containerTag: this.container.tagName,
+        containerClass: this.container.className,
+        containerId: this.container.id,
+      });
       this.container.appendChild(this.trailElement);
+      console.log("Trail element appended to container");
+      console.log("Trail element attributes:", {
+        d: this.trailElement.getAttribute("d"),
+        fill: this.trailElement.getAttribute("fill"),
+        stroke: this.trailElement.getAttribute("stroke"),
+        style: this.trailElement.style.cssText,
+      });
     }
 
     this.animationFrameHandler.start(this);
@@ -159,6 +171,9 @@ export class AnimatedTrail implements Trail {
 
     const svgPaths = paths.join(" ").trim();
 
+    if (svgPaths) {
+      console.log("onFrame: Setting path d to:", svgPaths.substring(0, 100));
+    }
     this.trailElement.setAttribute("d", svgPaths);
     if (this.trailAnimation) {
       this.trailElement.setAttribute(

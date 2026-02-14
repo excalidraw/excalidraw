@@ -774,6 +774,7 @@ export type AppClassProperties = {
   bindModeHandler: App["bindModeHandler"];
   togglePresentationMode: App["togglePresentationMode"];
   laserTrails: App["laserTrails"];
+  presentationLaserTrails: App["presentationLaserTrails"];
 };
 
 export type PointerDownState = Readonly<{
