@@ -59,6 +59,7 @@ import { HandButton } from "./HandButton";
 import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
+import { ExportFrameDialog } from "./ExportFrameDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
@@ -226,6 +227,20 @@ const LayerUI = ({
     );
   };
 
+  const renderExportFrameDialog = () => {
+    if (appState.openDialog?.name !== "frameExport") {
+      return null;
+    }
+
+    return (
+      <ExportFrameDialog
+        elements={elements}
+        appState={appState}
+        files={files}
+        onCloseRequest={() => setAppState({ openDialog: null })}
+      />
+    );
+  };
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
       {/* wrapping to Fragment stops React from occasionally complaining
@@ -588,6 +603,7 @@ const LayerUI = ({
         />
       )}
       <tunnels.OverwriteConfirmDialogTunnel.Out />
+      {renderExportFrameDialog()}
       {renderImageExportDialog()}
       {renderJSONExportDialog()}
       {appState.pasteDialog.shown && (

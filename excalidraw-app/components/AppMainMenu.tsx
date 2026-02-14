@@ -29,8 +29,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.SaveToActiveFile />
       <MainMenu.DefaultItems.Export />
       <MainMenu.DefaultItems.SaveAsImage />
-      <MainMenu.DefaultItems.ExportToPdf />
-      <MainMenu.DefaultItems.ExportToPptx />
+      <MainMenu.DefaultItems.ExportToFrame />
       {props.isCollabEnabled && (
         <MainMenu.DefaultItems.LiveCollaborationTrigger
           isCollaborating={props.isCollaborating}

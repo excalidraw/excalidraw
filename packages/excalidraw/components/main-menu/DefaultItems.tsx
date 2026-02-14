@@ -554,70 +554,23 @@ Preferences.ToggleZenMode = PreferencesToggleZenModeItem;
 Preferences.ToggleViewMode = PreferencesToggleViewModeItem;
 Preferences.ToggleElementProperties = PreferencesToggleElementPropertiesItem;
 
-
-export const ExportToPdf = () => {
+export const ExportToFrame = () => {
   const { t } = useI18n();
-  const elements = useExcalidrawElements();
-  const appState = useExcalidrawAppState();
-  const { files } = useApp();
-
-  const handleExport = async () => {
-    try {
-      const { exportToPDF } = await import("../../scene/export-to-pdf");
-      await exportToPDF(elements, appState, files);
-    } catch (error: any) {
-      console.error(error);
-      if (error.message !== "No frames found to export") {
-        throw error;
-      }
-      // TODO: show toast?
-      window.alert(t("alerts.noFramesFound"));
-    }
-  };
+  const setAppState = useExcalidrawSetAppState();
 
   return (
     <DropdownMenuItem
       icon={ExportIcon}
-      onSelect={handleExport}
-      data-testid="pdf-export-button"
-      aria-label="Export frames to PDF"
+      onSelect={() => {
+        setAppState({ openDialog: { name: "frameExport" } });
+      }}
+      data-testid="frame-export-button"
+      aria-label="Export frames"
     >
-      Export frames to PDF
+      Export frames
     </DropdownMenuItem>
   );
 };
-ExportToPdf.displayName = "ExportToPdf";
-
-export const ExportToPptx = () => {
-  const { t } = useI18n();
-  const elements = useExcalidrawElements();
-  const appState = useExcalidrawAppState();
-  const { files } = useApp();
-
-  const handleExport = async () => {
-    try {
-      const { exportToPPTX } = await import("../../scene/export-to-pptx");
-      await exportToPPTX(elements, appState, files);
-    } catch (error: any) {
-      console.error(error);
-      if (error.message !== "No frames found to export") {
-        throw error;
-      }
-      window.alert(t("alerts.noFramesFound"));
-    }
-  };
-
-  return (
-    <DropdownMenuItem
-      icon={ExportIcon}
-      onSelect={handleExport}
-      data-testid="pptx-export-button"
-      aria-label="Export frames to PPTX"
-    >
-      Export frames to PPTX
-    </DropdownMenuItem>
-  );
-};
-ExportToPptx.displayName = "ExportToPptx";
+ExportToFrame.displayName = "ExportToFrame";
 
 Preferences.displayName = "Preferences";
