@@ -1,0 +1,34 @@
+name: Preview Docker Build
+
+on:
+  push:
+    branches:
+      - "feature/**"
+
+jobs:
+  docker-preview:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Docker login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract branch name
+        id: vars
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          SAFE_NAME=$(echo $BRANCH_NAME | tr '/' '-')
+          echo "BRANCH=$SAFE_NAME" >> $GITHUB_OUTPUT
+
+      - name: Build & push preview image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            abhijitsinghas/excalidraw:${{ steps.vars.outputs.BRANCH }}
