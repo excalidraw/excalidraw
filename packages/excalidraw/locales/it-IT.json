@@ -172,8 +172,8 @@
     "wrapSelectionInFrame": "Avvolgi la selezione nella cornice",
     "tab": "Scheda",
     "shapeSwitch": "Cambia forma",
-    "preferences": "",
-    "preferences_toolLock": ""
+    "preferences": "Preferenze",
+    "preferences_toolLock": "Blocco strumento"
   },
   "elementLink": {
     "title": "Link all'oggetto",
