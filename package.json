@@ -46,7 +46,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "homepage": ".",
+  "homepage": "https://excalidraw.abhijits.com",
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
     "build-node": "node ./scripts/build-node.js",
@@ -86,7 +86,9 @@
     "release:latest": "node scripts/release.js --tag=latest",
     "rm:build": "rimraf --glob excalidraw-app/build excalidraw-app/dist excalidraw-app/dev-dist packages/*/dist packages/*/build examples/*/build examples/*/dist",
     "rm:node_modules": "rimraf --glob node_modules excalidraw-app/node_modules packages/*/node_modules",
-    "clean-install": "yarn rm:node_modules && yarn install"
+    "clean-install": "yarn rm:node_modules && yarn install",
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -d excalidraw-app/build"
   },
   "resolutions": {
     "strip-ansi": "6.0.1"
