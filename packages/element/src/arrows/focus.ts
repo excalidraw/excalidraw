@@ -42,6 +42,7 @@ export const isFocusPointVisible = (
     isBindingEnabled: AppState["isBindingEnabled"];
     zoom: AppState["zoom"];
   },
+  startOrEnd: "start" | "end",
   ignoreOverlap = false,
 ): boolean => {
   // No focus point management for elbow arrows, because elbow arrows
@@ -76,14 +77,25 @@ export const isFocusPointVisible = (
     }
   }
 
-  // Check if the focus point is within the element's shape bounds
-  return hitElementItself({
-    element: bindableElement,
+  const arrowPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startOrEnd === "end" ? arrow.points.length - 1 : 0,
     elementsMap,
-    point: focusPoint,
-    threshold: getBindingGap(bindableElement, arrow),
-    overrideShouldTestInside: true,
-  });
+  );
+
+  // Check if the focus point is within the element's shape bounds
+  // Endpoint dragging takes precedence
+  return (
+    pointDistance(focusPoint, arrowPoint) >=
+      (FOCUS_POINT_SIZE * 1.5) / appState.zoom.value &&
+    hitElementItself({
+      element: bindableElement,
+      elementsMap,
+      point: focusPoint,
+      threshold: getBindingGap(bindableElement, arrow),
+      overrideShouldTestInside: true,
+    })
+  );
 };
 
 // Updates the arrow endpoints in "orbit" configuration
@@ -353,6 +365,7 @@ export const handleFocusPointPointerDown = (
           bindableElement,
           elementsMap,
           appState,
+          "start",
         ) &&
         pointDistance(pointerPos, focusPoint) <= hitThreshold
       ) {
@@ -387,6 +400,7 @@ export const handleFocusPointPointerDown = (
           bindableElement,
           elementsMap,
           appState,
+          "end",
         ) &&
         pointDistance(pointerPos, focusPoint) <= hitThreshold
       ) {
@@ -501,6 +515,7 @@ export const handleFocusPointHover = (
           bindableElement,
           elementsMap,
           appState,
+          "start",
         ) &&
         pointDistance(pointerPos, focusPoint) <= hitThreshold
       ) {
@@ -529,6 +544,7 @@ export const handleFocusPointHover = (
           bindableElement,
           elementsMap,
           appState,
+          "end",
         ) &&
         pointDistance(pointerPos, focusPoint) <= hitThreshold
       ) {
