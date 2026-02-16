@@ -18,7 +18,6 @@ import type {
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
   Ordered,
-  OrderedExcalidrawElement,
 } from "./types";
 
 const isOfTargetFrame = (element: ExcalidrawElement, frameId: string) => {
@@ -157,7 +156,7 @@ export const moveArrowAboveBindable = (
   elementsMap: NonDeletedSceneElementsMap,
   scene: Scene,
   hit?: NonDeletedExcalidrawElement,
-): readonly OrderedExcalidrawElement[] => {
+) => {
   const hoveredElement = hit
     ? hit
     : getHoveredElementForBinding(point, elements, elementsMap);

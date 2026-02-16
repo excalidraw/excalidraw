@@ -1970,6 +1970,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         // TODO: with precise bindings this is quite expensive, so consider optimisation so it's only triggered when the arrow does not intersect (imprecise) element bounds
         updateBoundElements(element, scene, {
           changedElements: changed,
+          skipArrowZindexUpdate: true,
         });
       }
     }

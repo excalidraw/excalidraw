@@ -67,6 +67,7 @@ import {
   deconstructRectanguloidElement,
   projectFixedPointOntoDiagonal,
 } from "./utils";
+import { moveArrowAboveBindable } from "./zindex";
 
 import type { Scene } from "./Scene";
 
@@ -1084,6 +1085,7 @@ export const updateBoundElements = (
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     changedElements?: Map<string, ExcalidrawElement>;
     indirectArrowUpdate?: boolean;
+    skipArrowZindexUpdate?: boolean;
   },
 ) => {
   if (!isBindableElement(changedElement)) {
@@ -1152,6 +1154,21 @@ export const updateBoundElements = (
           );
 
           if (point) {
+            if (!options?.skipArrowZindexUpdate) {
+              moveArrowAboveBindable(
+                LinearElementEditor.getPointGlobalCoordinates(
+                  element,
+                  point,
+                  elementsMap,
+                ),
+                element,
+                scene.getNonDeletedElements(),
+                scene.getNonDeletedElementsMap(),
+                scene,
+                changedElement,
+              );
+            }
+
             return [
               bindingProp === "startBinding" ? 0 : element.points.length - 1,
               { point },
