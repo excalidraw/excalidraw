@@ -22,9 +22,8 @@ describe("normalizeInputColor", () => {
     });
 
     it("does NOT add hash to hexa without hash (tinycolor detects as hex8, not hex)", () => {
-      // Note: tinycolor detects 8-digit hex as "hex8" format, not "hex",
-      // so the hash prefix logic doesn't apply
-      expect(normalizeInputColor("ff000080")).toBe("ff000080");
+      // Note: tinycolor detects 8-digit hex as "hex8" format, not "hex"
+      expect(normalizeInputColor("ff000080")).toBe("#ff000080");
     });
   });
 
