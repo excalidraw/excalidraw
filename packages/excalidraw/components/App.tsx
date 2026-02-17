@@ -8662,18 +8662,20 @@ class App extends React.Component<AppProps, AppState> {
               roughness: this.state.currentItemRoughness,
               opacity: this.state.currentItemOpacity,
               roundness:
-                this.state.currentItemArrowType === ARROW_TYPE.round
+                this.state.currentItemArrowType === ARROW_TYPE.round ||
+                this.state.currentItemArrowType === ARROW_TYPE.elbow
                   ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
-                  : // note, roundness doesn't have any effect for elbow arrows,
-                    // but it's best to set it to null as well
-                    null,
+                  : null,
               startArrowhead,
               endArrowhead,
               locked: false,
               frameId: topLayerFrame ? topLayerFrame.id : null,
-              elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow,
+              elbowed:
+                this.state.currentItemArrowType === ARROW_TYPE.elbow ||
+                this.state.currentItemArrowType === ARROW_TYPE.sharpElbow,
               fixedSegments:
-                this.state.currentItemArrowType === ARROW_TYPE.elbow
+                this.state.currentItemArrowType === ARROW_TYPE.elbow ||
+                this.state.currentItemArrowType === ARROW_TYPE.sharpElbow
                   ? []
                   : null,
             })
