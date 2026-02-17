@@ -4845,6 +4845,7 @@ class App extends React.Component<AppProps, AppState> {
         event.preventDefault();
       } else if (event.key === KEYS.ENTER) {
         const selectedElements = this.scene.getSelectedElements(this.state);
+        const selectedGroupIds = getSelectedGroupIds(this.state);
         if (selectedElements.length === 1) {
           const selectedElement = selectedElements[0];
           if (event[KEYS.CTRL_OR_CMD] || isLineElement(selectedElement)) {
@@ -4887,6 +4888,45 @@ class App extends React.Component<AppProps, AppState> {
               editingFrame: selectedElement.id,
             });
           }
+        } else if (
+          selectedGroupIds.length === 1 &&
+          selectedElements.every((element) =>
+            isElementInGroup(element, selectedGroupIds[0]),
+          )
+        ) {
+          const nextEditingGroupId = selectedGroupIds[0];
+          const selectedElements = getElementsInGroup(
+            this.scene.getNonDeletedElementsMap(),
+            nextEditingGroupId,
+          );
+
+          const nextGroupIds: Record<string, true> = {};
+          const nextSelectedElementIds: Record<string, true> = {};
+          // iterate through elements in the group
+          selectedElements.forEach((element) => {
+            const editingGroupIndex =
+              element.groupIds.indexOf(nextEditingGroupId);
+            const groupIds = element.groupIds.slice(0, editingGroupIndex);
+            // we can confidently select element if it's in a nested group
+            if (groupIds.length > 0) {
+              const lastGroupId = groupIds[groupIds.length - 1];
+              nextGroupIds[lastGroupId] = true;
+              nextSelectedElementIds[element.id] = true;
+              // otherwise, we need to filter out bound text elements
+            } else if (!isBoundToContainer(element)) {
+              nextSelectedElementIds[element.id] = true;
+            }
+          });
+
+          this.setState((prevState) => ({
+            ...prevState,
+            selectedElementIds: makeNextSelectedElementIds(
+              nextSelectedElementIds,
+              prevState,
+            ),
+            selectedGroupIds: nextGroupIds,
+            editingGroupId: nextEditingGroupId,
+          }));
         }
       } else if (
         !event.ctrlKey &&
