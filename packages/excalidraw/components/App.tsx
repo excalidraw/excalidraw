@@ -4460,6 +4460,41 @@ class App extends React.Component<AppProps, AppState> {
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
+      if (
+      event.key === KEYS.ENTER &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.altKey &&
+      Object.keys(this.state.selectedGroupIds).length === 1 &&
+      !this.state.editingGroupId
+    ) {
+      const groupId = Object.keys(this.state.selectedGroupIds)[0];
+      const elementsInGroup = getElementsInGroup(
+        this.scene.getNonDeletedElements(),
+        groupId,
+      );
+      this.setState({
+        ...selectGroupsForSelectedElements(
+          {
+            editingGroupId: groupId,
+            selectedElementIds: elementsInGroup.reduce<Record<string, true>>(
+              (acc, el) => {
+                acc[el.id] = true;
+                return acc;
+          },
+          {},
+        ),
+      },
+      this.scene.getNonDeletedElements(),
+      this.state, 
+      this,  
+    ),
+    editingGroupId: groupId,
+  });
+  event.preventDefault();
+  return;
+}
+    
       // normalize `event.key` when CapsLock is pressed #2372
 
       if (
