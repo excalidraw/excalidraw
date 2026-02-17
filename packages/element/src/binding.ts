@@ -807,13 +807,23 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     startDragged ? -1 : 0,
     elementsMap,
   );
-
+  const pointIsCloseToOtherElement =
+    otherFocusPoint &&
+    otherBindableElement &&
+    hitElementItself({
+      point: globalPoint,
+      element: otherBindableElement,
+      elementsMap,
+      threshold: maxBindingDistance_simple(appState.zoom),
+      overrideShouldTestInside: true,
+    });
   const otherNeverOverride = opts?.newArrow
     ? appState.selectedLinearElement?.initialState.arrowStartIsInside
     : otherBinding?.mode === "inside";
   const other: BindingStrategy = !otherNeverOverride
     ? otherBindableElement &&
       !otherFocusPointIsInElement &&
+      !pointIsCloseToOtherElement &&
       appState.selectedLinearElement?.initialState.altFocusPoint
       ? {
           mode: "orbit",
