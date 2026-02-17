@@ -9,7 +9,6 @@ import {
   vectorFromPoint,
   curveLength,
   curvePointAtLength,
-  lineSegment,
 } from "@excalidraw/math";
 
 import { getCurvePathOps } from "@excalidraw/utils/shape";
@@ -2339,19 +2338,6 @@ const pointDraggingUpdates = (
         : updates.endBinding,
   };
 
-  // We need to use a custom intersector to ensure that if there is a big "jump"
-  // in the arrow's position, we can position it with outline avoidance
-  // pixel-perfectly and avoid "dancing" arrows.
-  // NOTE: Direction matters here, so we create two intersectors
-  const startCustomIntersector =
-    start.focusPoint && end.focusPoint
-      ? lineSegment(start.focusPoint, end.focusPoint)
-      : undefined;
-  const endCustomIntersector =
-    start.focusPoint && end.focusPoint
-      ? lineSegment(end.focusPoint, start.focusPoint)
-      : undefined;
-
   // Needed to handle a special case where an existing arrow is dragged over
   // the same element it is bound to on the other side
   const startIsDraggingOverEndElement =
@@ -2387,9 +2373,7 @@ const pointDraggingUpdates = (
         nextArrow.endBinding,
         endBindable,
         elementsMap,
-        {
-          customIntersector: endCustomIntersector,
-        },
+        endIsDragged,
       ) || nextArrow.points[nextArrow.points.length - 1]
     : nextArrow.points[nextArrow.points.length - 1];
 
@@ -2420,7 +2404,7 @@ const pointDraggingUpdates = (
           nextArrow.startBinding,
           startBindable,
           elementsMap,
-          { customIntersector: startCustomIntersector },
+          startIsDragged,
         ) || nextArrow.points[0]
       : nextArrow.points[0];
 

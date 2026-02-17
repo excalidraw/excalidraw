@@ -43,6 +43,11 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { isRectangularElement } from "./typeChecks";
 import { maxBindingDistance_simple } from "./binding";
 
+import {
+  getGlobalFixedPointForBindableElement,
+  normalizeFixedPoint,
+} from "./binding";
+
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
@@ -677,11 +682,35 @@ export const projectFixedPointOntoDiagonal = (
     elementsMap,
   );
 
-  const a = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+  // To avoid working with stale arrow state, we use the opposite focus point
+  // of the current endpoint, which will always be unchanged during moving of
+  // the endpoint. This is only needed when the arrow has only two points.
+  let a = LinearElementEditor.getPointAtIndexGlobalCoordinates(
     arrow,
     startOrEnd === "start" ? 1 : arrow.points.length - 2,
     elementsMap,
   );
+  if (arrow.points.length === 2) {
+    const otherBinding =
+      startOrEnd === "start" ? arrow.endBinding : arrow.startBinding;
+    const otherBindable =
+      otherBinding &&
+      (elementsMap.get(otherBinding.elementId) as
+        | ExcalidrawBindableElement
+        | undefined);
+    const otherFocusPoint =
+      otherBinding &&
+      otherBindable &&
+      getGlobalFixedPointForBindableElement(
+        normalizeFixedPoint(otherBinding.fixedPoint),
+        otherBindable,
+        elementsMap,
+      );
+    if (otherFocusPoint) {
+      a = otherFocusPoint;
+    }
+  }
+
   const b = pointFromVector<GlobalPoint>(
     vectorScale(
       vectorFromPoint(point, a),
