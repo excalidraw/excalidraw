@@ -1,0 +1,95 @@
+.settings-dialog {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.settings-dialog__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.settings-dialog__heading {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.settings-dialog__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--color-on-surface);
+}
+
+.settings-dialog__input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border-outline-variant);
+  border-radius: 0.5rem;
+  background: var(--color-surface-low);
+  color: var(--color-on-surface);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  outline: none;
+
+  &:focus {
+    border-color: var(--color-primary);
+  }
+}
+
+.settings-dialog__status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.settings-dialog__status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.settings-dialog__status-text {
+  color: var(--color-on-surface);
+}
+
+.settings-dialog__actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.settings-dialog__btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.settings-dialog__btn--primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.settings-dialog__btn--secondary {
+  background: var(--color-surface-high);
+  color: var(--color-on-surface);
+}

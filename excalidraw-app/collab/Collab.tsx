@@ -79,7 +79,7 @@ import {
   loadFromFirebase,
   saveFilesToFirebase,
   saveToFirebase,
-} from "../data/firebase";
+} from "../data/supabase";
 import {
   importUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
