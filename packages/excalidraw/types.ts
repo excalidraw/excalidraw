@@ -3,9 +3,8 @@ import type {
   UserIdleState,
   throttleRAF,
   MIME_TYPES,
+  EditorInterface,
 } from "@excalidraw/common";
-
-import type { SuggestedBinding } from "@excalidraw/element";
 
 import type { LinearElementEditor } from "@excalidraw/element";
 
@@ -33,6 +32,7 @@ import type {
   ExcalidrawIframeLikeElement,
   OrderedExcalidrawElement,
   ExcalidrawNonSelectionElement,
+  BindMode,
 } from "@excalidraw/element/types";
 
 import type {
@@ -47,6 +47,7 @@ import type {
   DurableIncrement,
   EphemeralIncrement,
 } from "@excalidraw/element";
+import type { GlobalPoint } from "@excalidraw/math";
 
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
@@ -62,6 +63,8 @@ import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
 import type React from "react";
 import type { JSX } from "react";
+
+export type { App };
 
 export type SocketId = string & { _brand: "SocketId" };
 
@@ -204,6 +207,7 @@ export type StaticCanvasAppState = Readonly<
     frameRendering: AppState["frameRendering"];
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
     hoveredElementIds: AppState["hoveredElementIds"];
+    suggestedBinding: AppState["suggestedBinding"];
     // Cropping
     croppingElementId: AppState["croppingElementId"];
   }
@@ -217,8 +221,9 @@ export type InteractiveCanvasAppState = Readonly<
     selectedGroupIds: AppState["selectedGroupIds"];
     selectedLinearElement: AppState["selectedLinearElement"];
     multiElement: AppState["multiElement"];
+    newElement: AppState["newElement"];
     isBindingEnabled: AppState["isBindingEnabled"];
-    suggestedBindings: AppState["suggestedBindings"];
+    suggestedBinding: AppState["suggestedBinding"];
     isRotating: AppState["isRotating"];
     elementsToHighlight: AppState["elementsToHighlight"];
     // Collaborators
@@ -233,6 +238,11 @@ export type InteractiveCanvasAppState = Readonly<
     // Search matches
     searchMatches: AppState["searchMatches"];
     activeLockedId: AppState["activeLockedId"];
+    // Non-used but needed in binding highlight arrow overdraw
+    hoveredElementIds: AppState["hoveredElementIds"];
+    frameRendering: AppState["frameRendering"];
+    shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
+    exportScale: AppState["exportScale"];
   }
 >;
 
@@ -292,7 +302,10 @@ export interface AppState {
   selectionElement: NonDeletedExcalidrawElement | null;
   isBindingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
-  suggestedBindings: SuggestedBinding[];
+  suggestedBinding: {
+    element: NonDeleted<ExcalidrawBindableElement>;
+    midPoint?: GlobalPoint;
+  } | null;
   frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
   frameRendering: {
     enabled: boolean;
@@ -316,6 +329,10 @@ export interface AppState {
     // indicates if the current tool is temporarily switched on from the selection tool
     fromSelection: boolean;
   } & ActiveTool;
+  preferredSelectionTool: {
+    type: "selection" | "lasso";
+    initialized: boolean;
+  };
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
@@ -346,7 +363,7 @@ export interface AppState {
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
-  openMenu: "canvas" | "shape" | null;
+  openMenu: "canvas" | null;
   openPopup:
     | "canvasBackground"
     | "elementBackground"
@@ -363,8 +380,8 @@ export interface AppState {
     | { name: "imageExport" | "help" | "jsonExport" }
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
     | { name: "commandPalette" }
+    | { name: "settings" }
     | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] };
-
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -446,9 +463,7 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
-
-  /** properties sidebar mode - determines whether to show compact or complete sidebar */
-  stylesPanelMode: "compact" | "full";
+  bindMode: BindMode;
 }
 
 export type SearchMatch = {
@@ -465,11 +480,7 @@ export type SearchMatch = {
 
 export type UIAppState = Omit<
   AppState,
-  | "suggestedBindings"
-  | "startBoundElement"
-  | "cursorButton"
-  | "scrollX"
-  | "scrollY"
+  "startBoundElement" | "cursorButton" | "scrollX" | "scrollY"
 >;
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
@@ -571,6 +582,10 @@ export interface ExcalidrawProps {
     /** excludes the duplicated elements */
     prevElements: readonly ExcalidrawElement[],
   ) => ExcalidrawElement[] | void;
+  renderTopLeftUI?: (
+    isMobile: boolean,
+    appState: UIAppState,
+  ) => JSX.Element | null;
   renderTopRightUI?: (
     isMobile: boolean,
     appState: UIAppState,
@@ -669,6 +684,14 @@ export type UIOptions = Partial<{
   tools: {
     image: boolean;
   };
+  /**
+   * Optionally control the editor form factor and desktop UI mode from the host app.
+   * If not provided, we will take care of it internally.
+   */
+  getFormFactor?: (
+    editorWidth: number,
+    editorHeight: number,
+  ) => EditorInterface["formFactor"];
   /** @deprecated does nothing. Will be removed in 0.15 */
   welcomeScreen?: boolean;
 }>;
@@ -708,7 +731,7 @@ export type AppClassProperties = {
     }
   >;
   files: BinaryFiles;
-  device: App["device"];
+  editorInterface: App["editorInterface"];
   scene: App["scene"];
   syncActionResult: App["syncActionResult"];
   fonts: App["fonts"];
@@ -738,8 +761,10 @@ export type AppClassProperties = {
 
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
+  onPointerDownEmitter: App["onPointerDownEmitter"];
 
-  defaultSelectionTool: "selection" | "lasso";
+  lastPointerMoveCoords: App["lastPointerMoveCoords"];
+  bindModeHandler: App["bindModeHandler"];
 };
 
 export type PointerDownState = Readonly<{
@@ -841,6 +866,7 @@ export interface ExcalidrawImperativeAPI {
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
   toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
+  getEditorInterface: () => EditorInterface;
   /**
    * Disables rendering of frames (including element clipping), but currently
    * the frames are still interactive in edit mode. As such, this API should be
@@ -878,18 +904,6 @@ export interface ExcalidrawImperativeAPI {
     callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
 }
-
-export type Device = Readonly<{
-  viewport: {
-    isMobile: boolean;
-    isLandscape: boolean;
-  };
-  editor: {
-    isMobile: boolean;
-    canFitSidebar: boolean;
-  };
-  isTouchScreen: boolean;
-}>;
 
 export type FrameNameBounds = {
   x: number;

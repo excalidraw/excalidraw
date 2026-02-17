@@ -41,7 +41,7 @@ const LogoText = () => (
   </svg>
 );
 
-type LogoSize = "xs" | "small" | "normal" | "large" | "custom";
+type LogoSize = "xs" | "small" | "normal" | "large" | "custom" | "mobile";
 
 interface LogoProps {
   size?: LogoSize;

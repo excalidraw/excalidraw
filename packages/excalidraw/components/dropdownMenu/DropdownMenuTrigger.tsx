@@ -1,6 +1,8 @@
 import clsx from "clsx";
 
-import { useDevice } from "../App";
+import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
+
+import { useEditorInterface } from "../App";
 
 const MenuTrigger = ({
   className = "",
@@ -14,17 +16,16 @@ const MenuTrigger = ({
   onToggle: () => void;
   title?: string;
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onSelect">) => {
-  const device = useDevice();
+  const editorInterface = useEditorInterface();
   const classNames = clsx(
     `dropdown-menu-button ${className}`,
     "zen-mode-transition",
     {
-      "dropdown-menu-button--mobile": device.editor.isMobile,
+      "dropdown-menu-button--mobile": editorInterface.formFactor === "phone",
     },
   ).trim();
   return (
-    <button
-      data-prevent-outside-click
+    <DropdownMenuPrimitive.Trigger
       className={classNames}
       onClick={onToggle}
       type="button"
@@ -33,7 +34,7 @@ const MenuTrigger = ({
       {...rest}
     >
       {children}
-    </button>
+    </DropdownMenuPrimitive.Trigger>
   );
 };
 

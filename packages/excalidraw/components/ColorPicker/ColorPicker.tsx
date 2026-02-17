@@ -1,11 +1,11 @@
-import * as Popover from "@radix-ui/react-popover";
+import { Popover } from "radix-ui";
 import clsx from "clsx";
 import { useRef, useEffect } from "react";
 
 import {
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
   COLOR_PALETTE,
-  isTransparent,
+  isColorDark,
   isWritableElement,
 } from "@excalidraw/common";
 
@@ -15,11 +15,11 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
-import { useExcalidrawContainer } from "../App";
+import { useExcalidrawContainer, useStylesPanelMode } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
-import { backgroundIcon, slashIcon, strokeIcon } from "../icons";
+import { slashIcon, strokeIcon } from "../icons";
 import {
   saveCaretPosition,
   restoreCaretPosition,
@@ -30,34 +30,13 @@ import { ColorInput } from "./ColorInput";
 import { Picker } from "./Picker";
 import PickerHeading from "./PickerHeading";
 import { TopPicks } from "./TopPicks";
-import { activeColorPickerSectionAtom, isColorDark } from "./colorPickerUtils";
+import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 
 import "./ColorPicker.scss";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
 import type { AppState } from "../../types";
-
-const isValidColor = (color: string) => {
-  const style = new Option().style;
-  style.color = color;
-  return !!style.color;
-};
-
-export const getColor = (color: string): string | null => {
-  if (isTransparent(color)) {
-    return color;
-  }
-
-  // testing for `#` first fixes a bug on Electron (more specfically, an
-  // Obsidian popout window), where a hex color without `#` is (incorrectly)
-  // considered valid
-  return isValidColor(`#${color}`)
-    ? `#${color}`
-    : isValidColor(color)
-    ? color
-    : null;
-};
 
 interface ColorPickerProps {
   type: ColorPickerType;
@@ -73,7 +52,6 @@ interface ColorPickerProps {
   palette?: ColorPaletteCustom | null;
   topPicks?: ColorTuple;
   updateData: (formData?: any) => void;
-  compactMode?: boolean;
 }
 
 const ColorPickerPopupContent = ({
@@ -100,6 +78,9 @@ const ColorPickerPopupContent = ({
   getOpenPopup: () => AppState["openPopup"];
 }) => {
   const { container } = useExcalidrawContainer();
+  const stylesPanelMode = useStylesPanelMode();
+  const isCompactMode = stylesPanelMode !== "full";
+  const isMobileMode = stylesPanelMode === "mobile";
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
@@ -216,6 +197,8 @@ const ColorPickerPopupContent = ({
           type={type}
           elements={elements}
           updateData={updateData}
+          showTitle={isCompactMode}
+          showHotKey={!isMobileMode}
         >
           {colorInputJSX}
         </Picker>
@@ -230,7 +213,6 @@ const ColorPickerTrigger = ({
   label,
   color,
   type,
-  compactMode = false,
   mode = "background",
   onToggle,
   editingTextElement,
@@ -238,11 +220,13 @@ const ColorPickerTrigger = ({
   color: string | null;
   label: string;
   type: ColorPickerType;
-  compactMode?: boolean;
   mode?: "background" | "stroke";
   onToggle: () => void;
   editingTextElement?: boolean;
 }) => {
+  const stylesPanelMode = useStylesPanelMode();
+  const isCompactMode = stylesPanelMode !== "full";
+  const isMobileMode = stylesPanelMode === "mobile";
   const handleClick = (e: React.MouseEvent) => {
     // use pointerdown so we run before outside-close logic
     e.preventDefault();
@@ -263,6 +247,8 @@ const ColorPickerTrigger = ({
         "is-transparent": !color || color === "transparent",
         "has-outline":
           !color || !isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD),
+        "compact-sizing": isCompactMode,
+        "mobile-border": isMobileMode,
       })}
       aria-label={label}
       style={color ? { "--swatch-color": color } : undefined}
@@ -275,31 +261,18 @@ const ColorPickerTrigger = ({
       onClick={handleClick}
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
-      {compactMode && color && (
+      {isCompactMode && color && mode === "stroke" && (
         <div className="color-picker__button-background">
-          {mode === "background" ? (
-            <span
-              style={{
-                color:
-                  color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
-                    ? "#fff"
-                    : "#111",
-              }}
-            >
-              {backgroundIcon}
-            </span>
-          ) : (
-            <span
-              style={{
-                color:
-                  color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
-                    ? "#fff"
-                    : "#111",
-              }}
-            >
-              {strokeIcon}
-            </span>
-          )}
+          <span
+            style={{
+              color:
+                color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
+                  ? "#fff"
+                  : "#111",
+            }}
+          >
+            {strokeIcon}
+          </span>
         </div>
       )}
     </Popover.Trigger>
@@ -316,22 +289,24 @@ export const ColorPicker = ({
   topPicks,
   updateData,
   appState,
-  compactMode = false,
 }: ColorPickerProps) => {
   const openRef = useRef(appState.openPopup);
   useEffect(() => {
     openRef.current = appState.openPopup;
   }, [appState.openPopup]);
+  const stylesPanelMode = useStylesPanelMode();
+  const isCompactMode = stylesPanelMode !== "full";
+
   return (
     <div>
       <div
         role="dialog"
         aria-modal="true"
         className={clsx("color-picker-container", {
-          "color-picker-container--no-top-picks": compactMode,
+          "color-picker-container--no-top-picks": isCompactMode,
         })}
       >
-        {!compactMode && (
+        {!isCompactMode && (
           <TopPicks
             activeColor={color}
             onChange={onChange}
@@ -339,7 +314,7 @@ export const ColorPicker = ({
             topPicks={topPicks}
           />
         )}
-        {!compactMode && <ButtonSeparator />}
+        {!isCompactMode && <ButtonSeparator />}
         <Popover.Root
           open={appState.openPopup === type}
           onOpenChange={(open) => {
@@ -353,7 +328,6 @@ export const ColorPicker = ({
             color={color}
             label={label}
             type={type}
-            compactMode={compactMode}
             mode={type === "elementStroke" ? "stroke" : "background"}
             editingTextElement={!!appState.editingTextElement}
             onToggle={() => {

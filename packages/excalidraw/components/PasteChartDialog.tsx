@@ -1,4 +1,3 @@
-import oc from "open-color";
 import React, { useLayoutEffect, useRef, useState } from "react";
 
 import type { ChartType } from "@excalidraw/element/types";
@@ -49,7 +48,7 @@ const ChartPreviewBtn = (props: {
         elements,
         {
           exportBackground: false,
-          viewBackgroundColor: oc.white,
+          viewBackgroundColor: "#fff",
         },
         null, // files
         {

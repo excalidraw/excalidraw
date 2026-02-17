@@ -1,36 +1,58 @@
-import Spinner from "../Spinner";
+import clsx from "clsx";
 
-const ErrorComp = ({ error }: { error: string }) => {
-  return (
-    <div
-      data-testid="ttd-dialog-output-error"
-      className="ttd-dialog-output-error"
-    >
-      Error! <p>{error}</p>
-    </div>
-  );
-};
+import Spinner from "../Spinner";
+import { t } from "../../i18n";
+import { alertTriangleIcon } from "../icons";
 
 interface TTDDialogOutputProps {
   error: Error | null;
   canvasRef: React.RefObject<HTMLDivElement | null>;
   loaded: boolean;
+  hideErrorDetails?: boolean;
 }
 
 export const TTDDialogOutput = ({
   error,
   canvasRef,
   loaded,
+  hideErrorDetails,
 }: TTDDialogOutputProps) => {
   return (
-    <div className="ttd-dialog-output-wrapper">
-      {error && <ErrorComp error={error.message} />}
+    <div
+      className={`ttd-dialog-output-wrapper ${
+        error ? "ttd-dialog-output-wrapper--error" : ""
+      }`}
+    >
+      {error && (
+        <div
+          key="error"
+          data-testid="ttd-dialog-output-error"
+          className="ttd-dialog-output-error"
+        >
+          <div className="ttd-dialog-output-error-content">
+            <div className="ttd-dialog-output-error-icon">
+              {alertTriangleIcon}
+            </div>
+            <div className="ttd-dialog-output-error-title">
+              {t("ttd.error")}
+            </div>
+            <div className="ttd-dialog-output-error-message">
+              {hideErrorDetails
+                ? t("chat.errors.mermaidParseError")
+                : error.message}
+            </div>
+          </div>
+        </div>
+      )}
       {loaded ? (
         <div
-          ref={canvasRef}
-          style={{ opacity: error ? "0.15" : 1 }}
-          className="ttd-dialog-output-canvas-container"
-        />
+          key="canvas"
+          className={clsx("ttd-dialog-output-canvas-container", {
+            invisible: !!error,
+          })}
+        >
+          <div ref={canvasRef} className="ttd-dialog-output-canvas-content" />
+        </div>
       ) : (
         <Spinner size="2rem" />
       )}

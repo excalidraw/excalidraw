@@ -4,7 +4,17 @@ import {
   CURSOR_TYPE,
   isShallowEqual,
   sceneCoordsToViewportCoords,
+  type EditorInterface,
 } from "@excalidraw/common";
+import { AnimationController } from "@excalidraw/excalidraw/renderer/animation";
+
+import type {
+  InteractiveCanvasRenderConfig,
+  InteractiveSceneRenderAnimationState,
+  InteractiveSceneRenderConfig,
+  RenderableElementsMap,
+  RenderInteractiveSceneCallback,
+} from "@excalidraw/excalidraw/scene/types";
 
 import type {
   NonDeletedExcalidrawElement,
@@ -12,15 +22,13 @@ import type {
 } from "@excalidraw/element/types";
 
 import { t } from "../../i18n";
-import { isRenderThrottlingEnabled } from "../../reactUtils";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
 
 import type {
-  InteractiveCanvasRenderConfig,
-  RenderableElementsMap,
-  RenderInteractiveSceneCallback,
-} from "../../scene/types";
-import type { AppState, Device, InteractiveCanvasAppState } from "../../types";
+  AppClassProperties,
+  AppState,
+  InteractiveCanvasAppState,
+} from "../../types";
 import type { DOMAttributes } from "react";
 
 type InteractiveCanvasProps = {
@@ -35,7 +43,8 @@ type InteractiveCanvasProps = {
   scale: number;
   appState: InteractiveCanvasAppState;
   renderScrollbars: boolean;
-  device: Device;
+  editorInterface: EditorInterface;
+  app: AppClassProperties;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
   ) => void;
@@ -70,8 +79,11 @@ type InteractiveCanvasProps = {
   >;
 };
 
+export const INTERACTIVE_SCENE_ANIMATION_KEY = "animateInteractiveScene";
+
 const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   const isComponentMounted = useRef(false);
+  const rendererParams = useRef(null as InteractiveSceneRenderConfig | null);
 
   useEffect(() => {
     if (!isComponentMounted.current) {
@@ -128,29 +140,60 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         )) ||
       "#6965db";
 
-    renderInteractiveScene(
-      {
-        canvas: props.canvas,
-        elementsMap: props.elementsMap,
-        visibleElements: props.visibleElements,
-        selectedElements: props.selectedElements,
-        allElementsMap: props.allElementsMap,
-        scale: window.devicePixelRatio,
-        appState: props.appState,
-        renderConfig: {
-          remotePointerViewportCoords,
-          remotePointerButton,
-          remoteSelectedElementIds,
-          remotePointerUsernames,
-          remotePointerUserStates,
-          selectionColor,
-          renderScrollbars: props.renderScrollbars,
-        },
-        device: props.device,
-        callback: props.renderInteractiveSceneCallback,
+    rendererParams.current = {
+      app: props.app,
+      canvas: props.canvas,
+      elementsMap: props.elementsMap,
+      visibleElements: props.visibleElements,
+      selectedElements: props.selectedElements,
+      allElementsMap: props.allElementsMap,
+      scale: window.devicePixelRatio,
+      appState: props.appState,
+      renderConfig: {
+        remotePointerViewportCoords,
+        remotePointerButton,
+        remoteSelectedElementIds,
+        remotePointerUsernames,
+        remotePointerUserStates,
+        selectionColor,
+        renderScrollbars: props.renderScrollbars,
+        // NOTE not memoized on so we don't rerender on cursor move
+        lastViewportPosition: props.app.lastViewportPosition,
       },
-      isRenderThrottlingEnabled(),
-    );
+      editorInterface: props.editorInterface,
+      callback: props.renderInteractiveSceneCallback,
+      animationState: {
+        bindingHighlight: undefined,
+      },
+      deltaTime: 0,
+    };
+
+    if (!AnimationController.running(INTERACTIVE_SCENE_ANIMATION_KEY)) {
+      AnimationController.start<InteractiveSceneRenderAnimationState>(
+        INTERACTIVE_SCENE_ANIMATION_KEY,
+        ({ deltaTime, state }) => {
+          const nextAnimationState = renderInteractiveScene({
+            ...rendererParams.current!,
+            deltaTime,
+            animationState: state,
+          }).animationState;
+
+          if (nextAnimationState) {
+            for (const key in nextAnimationState) {
+              if (
+                nextAnimationState[
+                  key as keyof InteractiveSceneRenderAnimationState
+                ] !== undefined
+              ) {
+                return nextAnimationState;
+              }
+            }
+          }
+
+          return undefined;
+        },
+      );
+    }
   });
 
   return (
@@ -201,8 +244,9 @@ const getRelevantAppStateProps = (
   selectedGroupIds: appState.selectedGroupIds,
   selectedLinearElement: appState.selectedLinearElement,
   multiElement: appState.multiElement,
+  newElement: appState.newElement,
   isBindingEnabled: appState.isBindingEnabled,
-  suggestedBindings: appState.suggestedBindings,
+  suggestedBinding: appState.suggestedBinding,
   isRotating: appState.isRotating,
   elementsToHighlight: appState.elementsToHighlight,
   collaborators: appState.collaborators, // Necessary for collab. sessions
@@ -214,6 +258,10 @@ const getRelevantAppStateProps = (
   croppingElementId: appState.croppingElementId,
   searchMatches: appState.searchMatches,
   activeLockedId: appState.activeLockedId,
+  hoveredElementIds: appState.hoveredElementIds,
+  frameRendering: appState.frameRendering,
+  shouldCacheIgnoreZoom: appState.shouldCacheIgnoreZoom,
+  exportScale: appState.exportScale,
 });
 
 const areEqual = (

@@ -1,10 +1,6 @@
 import { average } from "@excalidraw/math";
 
-import type {
-  ExcalidrawBindableElement,
-  FontFamilyValues,
-  FontString,
-} from "@excalidraw/element/types";
+import type { FontFamilyValues, FontString } from "@excalidraw/element/types";
 
 import type {
   ActiveTool,
@@ -14,15 +10,11 @@ import type {
   Zoom,
 } from "@excalidraw/excalidraw/types";
 
-import { COLOR_PALETTE } from "./colors";
 import {
   DEFAULT_VERSION,
   ENV,
   FONT_FAMILY,
   getFontFamilyFallbacks,
-  isDarwin,
-  isAndroid,
-  isIOS,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 
@@ -385,6 +377,10 @@ export const removeSelection = () => {
 
 export const distance = (x: number, y: number) => Math.abs(x - y);
 
+export const isSelectionLikeTool = (type: ToolType | "custom") => {
+  return type === "selection" || type === "lasso";
+};
+
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: ((
@@ -425,19 +421,6 @@ export const allowFullScreen = () =>
   document.documentElement.requestFullscreen();
 
 export const exitFullScreen = () => document.exitFullscreen();
-
-export const getShortcutKey = (shortcut: string): string => {
-  shortcut = shortcut
-    .replace(/\bAlt\b/i, "Alt")
-    .replace(/\bShift\b/i, "Shift")
-    .replace(/\b(Enter|Return)\b/i, "Enter");
-  if (isDarwin) {
-    return shortcut
-      .replace(/\bCtrlOrCmd\b/gi, "Cmd")
-      .replace(/\bAlt\b/i, "Option");
-  }
-  return shortcut.replace(/\bCtrlOrCmd\b/gi, "Ctrl");
-};
 
 export const viewportCoordsToSceneCoords = (
   { clientX, clientY }: { clientX: number; clientY: number },
@@ -563,19 +546,6 @@ export const mapFind = <T, K>(
   }
   return undefined;
 };
-
-export const isTransparent = (color: string) => {
-  const isRGBTransparent = color.length === 5 && color.substr(4, 1) === "0";
-  const isRRGGBBTransparent = color.length === 9 && color.substr(7, 2) === "00";
-  return (
-    isRGBTransparent ||
-    isRRGGBBTransparent ||
-    color === COLOR_PALETTE.transparent
-  );
-};
-
-export const isBindingFallthroughEnabled = (el: ExcalidrawBindableElement) =>
-  el.fillStyle !== "solid" || isTransparent(el.backgroundColor);
 
 export type ResolvablePromise<T> = Promise<T> & {
   resolve: [T] extends [undefined]
@@ -1176,39 +1146,69 @@ export const normalizeEOL = (str: string) => {
 };
 
 // -----------------------------------------------------------------------------
-type HasBrand<T> = {
+export type HasBrand<T> = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  [K in keyof T]: K extends `~brand${infer _}` ? true : never;
+  [K in keyof T]: K extends `~brand${infer _}` | "_brand" ? true : never;
 }[keyof T];
 
 type RemoveAllBrands<T> = HasBrand<T> extends true
   ? {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      [K in keyof T as K extends `~brand~${infer _}` ? never : K]: T[K];
+      [K in keyof T as K extends `~brand~${infer _}` | "_brand"
+        ? never
+        : K]: T[K];
     }
-  : never;
+  : T;
 
-// adapted from https://github.com/colinhacks/zod/discussions/1994#discussioncomment-6068940
-// currently does not cover all types (e.g. tuples, promises...)
-type Unbrand<T> = T extends Map<infer E, infer F>
-  ? Map<E, F>
+// For accepting values - uses loose matching for branded types
+// Preserves readonly modifier: mutable array requires mutable input
+type UnbrandForValue<T> = T extends Map<infer E, infer F>
+  ? Map<UnbrandForValue<E>, UnbrandForValue<F>>
   : T extends Set<infer E>
-  ? Set<E>
-  : T extends Array<infer E>
-  ? Array<E>
+  ? Set<UnbrandForValue<E>>
+  : T extends readonly any[]
+  ? T extends any[]
+    ? unknown[] // mutable array - require mutable input
+    : readonly unknown[] // readonly array - accept readonly input
   : RemoveAllBrands<T>;
+
+// For return types - preserves array element unbranding
+export type Unbrand<T> = T extends Map<infer E, infer F>
+  ? Map<Unbrand<E>, Unbrand<F>>
+  : T extends Set<infer E>
+  ? Set<Unbrand<E>>
+  : T extends readonly (infer E)[]
+  ? Array<Unbrand<E>>
+  : RemoveAllBrands<T>;
+
+export type CombineBrands<BrandedType, CurrentType> =
+  BrandedType extends readonly (infer BE)[]
+    ? CurrentType extends readonly (infer CE)[]
+      ? Array<CE & BE>
+      : CurrentType & BrandedType
+    : CurrentType & BrandedType;
+
+export type CombineBrandsIfNeeded<T, Required> = [T] extends [Required]
+  ? T[]
+  : HasBrand<T> extends true
+  ? CombineBrands<T, Required>[]
+  : Required[];
 
 /**
  * Makes type into a branded type, ensuring that value is assignable to
- * the base ubranded type. Optionally you can explicitly supply current value
+ * the base unbranded type. Optionally you can explicitly supply current value
  * type to combine both (useful for composite branded types. Make sure you
  * compose branded types which are not composite themselves.)
  */
-export const toBrandedType = <BrandedType, CurrentType = BrandedType>(
-  value: Unbrand<BrandedType>,
-) => {
-  return value as CurrentType & BrandedType;
-};
+export function toBrandedType<BrandedType>(
+  value: UnbrandForValue<BrandedType>,
+): BrandedType;
+export function toBrandedType<BrandedType, CurrentType>(
+  value: CurrentType,
+): CombineBrands<BrandedType, CurrentType>;
+export function toBrandedType(value: unknown) {
+  return value;
+}
 
 // -----------------------------------------------------------------------------
 
@@ -1287,58 +1287,46 @@ export const reduceToCommonValue = <T, R = T>(
   return commonValue;
 };
 
-export const isMobileOrTablet = (): boolean => {
-  const ua = navigator.userAgent || "";
-  const platform = navigator.platform || "";
-  const uaData = (navigator as any).userAgentData as
-    | { mobile?: boolean; platform?: string }
-    | undefined;
+type FEATURE_FLAGS = {
+  COMPLEX_BINDINGS: boolean;
+};
 
-  // --- 1) chromium: prefer ua client hints -------------------------------
-  if (uaData) {
-    const plat = (uaData.platform || "").toLowerCase();
-    const isDesktopOS =
-      plat === "windows" ||
-      plat === "macos" ||
-      plat === "linux" ||
-      plat === "chrome os";
-    if (uaData.mobile === true) {
-      return true;
-    }
-    if (uaData.mobile === false && plat === "android") {
-      const looksTouchTablet =
-        matchMedia?.("(hover: none)").matches &&
-        matchMedia?.("(pointer: coarse)").matches;
-      return looksTouchTablet;
-    }
-    if (isDesktopOS) {
-      return false;
-    }
+const FEATURE_FLAGS_STORAGE_KEY = "excalidraw-feature-flags";
+const DEFAULT_FEATURE_FLAGS: FEATURE_FLAGS = {
+  COMPLEX_BINDINGS: false,
+};
+let featureFlags: FEATURE_FLAGS | null = null;
+
+export const getFeatureFlag = <F extends keyof FEATURE_FLAGS>(
+  flag: F,
+): FEATURE_FLAGS[F] => {
+  if (!featureFlags) {
+    try {
+      const serializedFlags = localStorage.getItem(FEATURE_FLAGS_STORAGE_KEY);
+      if (serializedFlags) {
+        const flags = JSON.parse(serializedFlags);
+        featureFlags = flags ?? DEFAULT_FEATURE_FLAGS;
+      }
+    } catch {}
   }
 
-  // --- 2) ios (includes ipad) --------------------------------------------
-  if (isIOS) {
-    return true;
-  }
+  return (featureFlags || DEFAULT_FEATURE_FLAGS)[flag];
+};
 
-  // --- 3) android legacy ua fallback -------------------------------------
-  if (isAndroid) {
-    const isAndroidPhone = /Mobile/i.test(ua);
-    const isAndroidTablet = !isAndroidPhone;
-    if (isAndroidPhone || isAndroidTablet) {
-      const looksTouchTablet =
-        matchMedia?.("(hover: none)").matches &&
-        matchMedia?.("(pointer: coarse)").matches;
-      return looksTouchTablet;
-    }
+export const setFeatureFlag = <F extends keyof FEATURE_FLAGS>(
+  flag: F,
+  value: FEATURE_FLAGS[F],
+) => {
+  try {
+    featureFlags = {
+      ...(featureFlags || DEFAULT_FEATURE_FLAGS),
+      [flag]: value,
+    };
+    localStorage.setItem(
+      FEATURE_FLAGS_STORAGE_KEY,
+      JSON.stringify(featureFlags),
+    );
+  } catch (e) {
+    console.error("unable to set feature flag", e);
   }
-
-  // --- 4) last resort desktop exclusion ----------------------------------
-  const looksDesktopPlatform =
-    /Win|Linux|CrOS|Mac/.test(platform) ||
-    /Windows NT|X11|CrOS|Macintosh/.test(ua);
-  if (looksDesktopPlatform) {
-    return false;
-  }
-  return false;
 };

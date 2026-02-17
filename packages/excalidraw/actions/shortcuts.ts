@@ -1,8 +1,9 @@
-import { isDarwin, getShortcutKey } from "@excalidraw/common";
+import { isDarwin } from "@excalidraw/common";
 
 import type { SubtypeOf } from "@excalidraw/common/utility-types";
 
 import { t } from "../i18n";
+import { getShortcutKey } from "../shortcut";
 
 import type { ActionName } from "./types";
 
@@ -54,7 +55,8 @@ export type ShortcutName =
   | "saveScene"
   | "imageExport"
   | "commandPalette"
-  | "searchMenu";
+  | "searchMenu"
+  | "toolLock";
 
 const shortcutMap: Record<ShortcutName, string[]> = {
   toggleTheme: [getShortcutKey("Shift+Alt+D")],
@@ -116,6 +118,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   toggleShortcuts: [getShortcutKey("?")],
   searchMenu: [getShortcutKey("CtrlOrCmd+F")],
   wrapSelectionInFrame: [],
+  toolLock: [getShortcutKey("Q")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName, idx = 0) => {

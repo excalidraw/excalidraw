@@ -1,5 +1,4 @@
-@import "open-color/open-color.scss";
-@import "../css/variables.module.scss";
+@use "../css/variables.module" as *;
 
 .excalidraw {
   .App-toolbar {
@@ -42,6 +41,10 @@
       background-color: var(--button-hover-bg);
       box-shadow: 0 0 0 1px
         var(--button-active-border, var(--color-primary-darkest)) inset;
+    }
+
+    &:hover {
+      background-color: transparent;
     }
 
     &--selected,

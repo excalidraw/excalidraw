@@ -1,5 +1,8 @@
 .excalidraw {
   .ExcalidrawLogo {
+    --logo-icon--mobile: 1rem;
+    --logo-text--mobile: 0.75rem;
+
     --logo-icon--xs: 2rem;
     --logo-text--xs: 1.5rem;
 
@@ -28,6 +31,17 @@
       margin-left: 0.75rem;
       width: auto;
       color: var(--color-logo-text);
+    }
+
+    &.is-mobile {
+      .ExcalidrawLogo-icon {
+        height: var(--logo-icon--mobile);
+      }
+
+      .ExcalidrawLogo-text {
+        height: var(--logo-text--mobile);
+        margin-left: 0.5rem;
+      }
     }
 
     &.is-xs {

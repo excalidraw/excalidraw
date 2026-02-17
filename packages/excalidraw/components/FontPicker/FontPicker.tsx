@@ -1,4 +1,4 @@
-import * as Popover from "@radix-ui/react-popover";
+import { Popover } from "radix-ui";
 import clsx from "clsx";
 import React, { useCallback, useMemo } from "react";
 
@@ -106,6 +106,7 @@ export const FontPicker = React.memo(
           <FontPickerTrigger
             selectedFontFamily={selectedFontFamily}
             isOpened={isOpened}
+            compactMode={compactMode}
           />
           {isOpened && (
             <FontPickerList
