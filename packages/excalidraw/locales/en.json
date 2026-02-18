@@ -578,7 +578,8 @@
     "colors": "Colors",
     "shades": "Shades",
     "hexCode": "Hex code",
-    "noShades": "No shades available for this color"
+    "noShades": "No shades available for this color",
+    "invalidHex": "Invalid hex color (use 3/4/6/8 digits: 0-9, a-f)"
   },
   "overwriteConfirm": {
     "action": {
