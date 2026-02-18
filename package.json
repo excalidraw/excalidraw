@@ -46,6 +46,10 @@
   "engines": {
     "node": ">=18.0.0"
   },
+  "volta": {
+    "node": "22.17.1",
+    "yarn": "1.22.22"
+  },
   "homepage": ".",
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
