@@ -2,21 +2,21 @@ import { pointsEqual } from "./point";
 import { lineSegment, pointOnLineSegment } from "./segment";
 import { PRECISION } from "./utils";
 
-import type { GlobalPoint, LocalPoint, Polygon } from "./types";
+import type { GenericPoint, Polygon } from "./types";
 
-export function polygon<Point extends GlobalPoint | LocalPoint>(
+export function polygon<Point extends GenericPoint>(
   ...points: Point[]
 ) {
   return polygonClose(points) as Polygon<Point>;
 }
 
-export function polygonFromPoints<Point extends GlobalPoint | LocalPoint>(
+export function polygonFromPoints<Point extends GenericPoint>(
   points: Point[],
 ) {
   return polygonClose(points) as Polygon<Point>;
 }
 
-export const polygonIncludesPoint = <Point extends LocalPoint | GlobalPoint>(
+export const polygonIncludesPoint = <Point extends GenericPoint>(
   point: Point,
   polygon: Polygon<Point>,
 ) => {
@@ -41,7 +41,7 @@ export const polygonIncludesPoint = <Point extends LocalPoint | GlobalPoint>(
   return inside;
 };
 
-export const polygonIncludesPointNonZero = <Point extends [number, number]>(
+export const polygonIncludesPointNonZero = <Point extends GenericPoint>(
   point: Point,
   polygon: Point[],
 ): boolean => {
@@ -69,7 +69,7 @@ export const polygonIncludesPointNonZero = <Point extends [number, number]>(
   return windingNumber !== 0;
 };
 
-export const pointOnPolygon = <Point extends LocalPoint | GlobalPoint>(
+export const pointOnPolygon = <Point extends GenericPoint>(
   p: Point,
   poly: Polygon<Point>,
   threshold = PRECISION,
@@ -86,7 +86,7 @@ export const pointOnPolygon = <Point extends LocalPoint | GlobalPoint>(
   return on;
 };
 
-function polygonClose<Point extends LocalPoint | GlobalPoint>(
+function polygonClose<Point extends GenericPoint>(
   polygon: Point[],
 ) {
   return polygonIsClosed(polygon)
@@ -94,7 +94,7 @@ function polygonClose<Point extends LocalPoint | GlobalPoint>(
     : ([...polygon, polygon[0]] as Polygon<Point>);
 }
 
-function polygonIsClosed<Point extends LocalPoint | GlobalPoint>(
+function polygonIsClosed<Point extends GenericPoint>(
   polygon: Point[],
 ) {
   return pointsEqual(polygon[0], polygon[polygon.length - 1]);
