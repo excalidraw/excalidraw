@@ -63,7 +63,7 @@ export const Dialog = (props: DialogProps) => {
     setTimeout(() => {
       if (focusableElements.length > 0 && props.autofocus !== false) {
         // If there's an element other than close, focus it.
-        (focusableElements[1] || focusableElements[0]).focus();
+        (focusableElements[0] || focusableElements[1]).focus();
       }
     });
 
