@@ -10,10 +10,8 @@ import {
   arrayToMap,
   assertNever,
   cloneJSON,
-  getFontString,
   isDevEnv,
   toBrandedType,
-  getLineHeight,
 } from "@excalidraw/common";
 
 import type { MarkOptional } from "@excalidraw/common/utility-types";
@@ -29,12 +27,11 @@ import {
   newTextElement,
   type ElementConstructorOpts,
 } from "./newElement";
-import { measureText, normalizeText } from "./textMeasurements";
 import { isArrowElement } from "./typeChecks";
 
 import { syncInvalidIndices } from "./fractionalIndex";
 
-import { redrawTextBoundingBox } from "./textElement";
+import { getInitialTextMetrics, redrawTextBoundingBox } from "./textElement";
 
 import { LinearElementEditor } from "./linearElementEditor";
 
@@ -579,14 +576,7 @@ export const convertToExcalidrawElements = (
       case "text": {
         const fontFamily = element?.fontFamily || DEFAULT_FONT_FAMILY;
         const fontSize = element?.fontSize || DEFAULT_FONT_SIZE;
-        const lineHeight = element?.lineHeight || getLineHeight(fontFamily);
-        const text = element.text ?? "";
-        const normalizedText = normalizeText(text);
-        const metrics = measureText(
-          normalizedText,
-          getFontString({ fontFamily, fontSize }),
-          lineHeight,
-        );
+        const metrics = getInitialTextMetrics(element, fontFamily, fontSize);
 
         excalidrawElement = newTextElement({
           width: metrics.width,
