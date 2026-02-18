@@ -10558,13 +10558,14 @@ class App extends React.Component<AppProps, AppState> {
             },
             this.state,
           );
-          const hitElements = this.getElementsAtPosition(
+          const hitElement = this.getElementAtPosition(
             scenePointer.x,
             scenePointer.y,
           );
-          hitElements.forEach((hitElement) =>
-            this.elementsPendingErasure.add(hitElement.id),
-          );
+
+          if (hitElement) {
+            this.elementsPendingErasure.add(hitElement.id);
+          }
         }
         this.eraseElements();
         return;
