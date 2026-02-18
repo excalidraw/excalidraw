@@ -203,8 +203,8 @@ import {
   normalizeText,
   measureText,
   getLineHeightInPx,
-  getApproxMinLineWidth,
-  getApproxMinLineHeight,
+  getApproxMinContainerWidth,
+  getApproxMinContainerHeight,
   getMinTextElementWidth,
   ShapeCache,
   getRenderOpacity,
@@ -5806,11 +5806,11 @@ class App extends React.Component<AppProps, AppState> {
         fontSize,
         fontFamily,
       };
-      const minWidth = getApproxMinLineWidth(
+      const minWidth = getApproxMinContainerWidth(
         getFontString(fontString),
         lineHeight,
       );
-      const minHeight = getApproxMinLineHeight(fontSize, lineHeight);
+      const minHeight = getApproxMinContainerHeight(fontSize, lineHeight);
       const newHeight = Math.max(container.height, minHeight);
       const newWidth = Math.max(container.width, minWidth);
       this.scene.mutateElement(container, {
