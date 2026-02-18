@@ -368,6 +368,10 @@
     }
   }
 
+  .color-picker__input-wrapper {
+    margin: 8px;
+  }
+
   .color-picker__input-label {
     display: grid;
     grid-template-columns: auto 1fr auto auto;
@@ -376,13 +380,29 @@
     border: 1px solid var(--default-border-color);
     border-radius: 8px;
     padding: 0 12px;
-    margin: 8px;
     box-sizing: border-box;
 
     &:focus-within {
       box-shadow: 0 0 0 1px var(--color-primary-darkest);
       border-radius: var(--border-radius-lg);
     }
+
+    &.has-error {
+      border-color: var(--color-danger);
+      
+      &:focus-within {
+        box-shadow: 0 0 0 1px var(--color-danger);
+      }
+    }
+  }
+
+  .color-picker__input-error {
+    color: var(--color-danger);
+    font-size: 0.75rem;
+    margin-top: 4px;
+    margin-left: 12px;
+    margin-right: 12px;
+    line-height: 1.4;
   }
 
   .color-picker__input-hash {
