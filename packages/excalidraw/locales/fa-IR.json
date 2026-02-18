@@ -142,8 +142,9 @@
       "editArrow": "ویرایش پیکان"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "شکستن چندضلعی",
+      "convertToPolygon": "تبدیل به چندضلعی"
+
     },
     "elementLock": {
       "lock": "قفل",
@@ -170,8 +171,9 @@
     "copyElementLink": "کپی لینک به آیتم",
     "linkToElement": "لینک به آیتم",
     "wrapSelectionInFrame": "انتخاب را در قاب قرار دهید",
-    "tab": "",
-    "shapeSwitch": ""
+    "tab": "زبانه",
+    "shapeSwitch": "تغییر شکل"
+
   },
   "elementLink": {
     "title": "لینک به آیتم",
@@ -183,10 +185,11 @@
     "hint_emptyLibrary": "یک آیتم روی بوم را برای اضافه شده به اینجا انتخاب کنید، یا یک کتابخانه از مخزن عمومی در بخش پایین را نصب کنید.",
     "hint_emptyPrivateLibrary": "یک آیتم روی بوم را برای اضافه شدن به اینجا انتخاب کنید.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "جستجو در کتابخانه",
+      "heading": "نتایج کتابخانه",
+      "noResults": "هیچ نتیجه‌ای یافت نشد",
+      "clearSearch": "پاک کردن جستجو"
+
     }
   },
   "search": {
@@ -195,8 +198,9 @@
     "singleResult": "نتیجه",
     "multipleResults": "نتایج",
     "placeholder": "جستجوی متن در بوم...",
-    "frames": "",
-    "texts": ""
+    "frames": "فریم‌ها",
+    "texts": "متن‌ها"
+
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -230,11 +234,11 @@
     "objectsSnapMode": "به اشیاء بچسبد",
     "exitZenMode": "خروج از حالت تمرکز",
     "cancel": "لغو",
-    "saveLibNames": "",
+    "saveLibNames": "ذخیره نام‌ها و خروج",
     "clear": "پاکسازی",
     "remove": "پاک کردن",
     "embed": "تغییر افزونه",
-    "publishLibrary": "",
+    "publishLibrary": "انتشار یا تغییر نام کتابخانه",
     "submit": "ارسال",
     "confirm": "تایید",
     "embeddableInteractionButton": "کلیک برای تعامل"
@@ -292,7 +296,7 @@
   },
   "toolBar": {
     "selection": "گزینش",
-    "lasso": "",
+    "lasso": "انتخاب لاسو",
     "image": "وارد کردن تصویر",
     "rectangle": "مستطیل",
     "diamond": "لوزی",
@@ -313,7 +317,7 @@
     "hand": "دست (ابزار پانینگ)",
     "extraTools": "ابزارهای بیشتر",
     "mermaidToExcalidraw": "مرمید به excalidraw",
-    "convertElementType": ""
+    "convertElementType": "تغییر نوع شکل"
   },
   "element": {
     "rectangle": "مستطیل",
@@ -571,7 +575,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color":  "رنگ",
     "mostUsedCustomColors": "رنگ های به‌تازگی به‌کار گرفته شده",
     "colors": "رنگ‌ها",
     "shades": "جلوه‌ها",
@@ -701,15 +705,15 @@
     "shortcutHint": "برای تخته دستور ها {{shortcut}} را بکار بگیرید"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Space",
+    "delete": "Delete",
+    "mmb": "دکمه وسط ماوس"
   }
 }
