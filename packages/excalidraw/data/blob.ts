@@ -156,7 +156,13 @@ export const loadSceneOrLibraryFromBlob = async (
       }
       throw error;
     }
-    if (isValidExcalidrawData(data)) {
+
+    // Check if file has .excalidraw extension for lenient validation
+    const fileName = (blob as File).name || (blob.handle as FileSystemHandle)?.name || "";
+    const isExcalidrawFile = fileName.endsWith(".excalidraw");
+
+    // Try standard validation first
+    if (isValidExcalidrawData(data, false)) {
       return {
         type: MIME_TYPES.excalidraw,
         data: {
@@ -178,7 +184,38 @@ export const loadSceneOrLibraryFromBlob = async (
           files: data.files || {},
         },
       };
-    } else if (isValidLibrary(data)) {
+    }
+
+    // If standard validation failed but file has .excalidraw extension,
+    // try lenient validation (for manually created files)
+    if (isExcalidrawFile && isValidExcalidrawData(data, true)) {
+      return {
+        type: MIME_TYPES.excalidraw,
+        data: restore(
+          {
+            elements: data.elements || [],
+            appState: {
+              theme: localAppState?.theme,
+              fileHandle: fileHandle || blob.handle || null,
+              ...cleanAppStateForExport(data.appState || {}),
+              ...(localAppState
+                ? calculateScrollCenter(data.elements || [], localAppState)
+                : {}),
+            },
+            files: data.files,
+          },
+          localAppState,
+          localElements,
+          {
+            repairBindings: true,
+            refreshDimensions: false,
+            deleteInvisibleElements: true,
+          },
+        ),
+      };
+    }
+
+    if (isValidLibrary(data)) {
       return {
         type: MIME_TYPES.excalidrawlib,
         data,

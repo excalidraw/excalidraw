@@ -1,0 +1,38 @@
+{
+  "elements": [
+    {
+      "id": "test-rectangle-1",
+      "type": "rectangle",
+      "x": 100,
+      "y": 100,
+      "width": 200,
+      "height": 150,
+      "angle": 0,
+      "strokeColor": "#000000",
+      "backgroundColor": "transparent",
+      "fillStyle": "hachure",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 12345,
+      "version": 1,
+      "versionNonce": 67890,
+      "index": null,
+      "isDeleted": false,
+      "groupIds": [],
+      "frameId": null,
+      "boundElements": null,
+      "updated": 1234567890,
+      "link": null,
+      "locked": false,
+      "roundness": null
+    }
+  ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff",
+    "gridModeEnabled": false
+  },
+  "files": {}
+}
+
