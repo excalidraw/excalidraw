@@ -144,6 +144,10 @@ export default defineConfig(({ mode }) => {
         },
 
         workbox: {
+
+          // 3 MiB
+          maximumFileSizeToCacheInBytes: 3000000,
+
           // don't precache fonts, locales and separate chunks
           globIgnores: [
             "fonts.css",
