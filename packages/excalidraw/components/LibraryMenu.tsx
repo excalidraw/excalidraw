@@ -88,10 +88,11 @@ const LibraryMenuContent = memo(
     const [libraryItemsData] = useAtom(libraryItemsAtom);
 
     const _onAddToLibrary = useCallback(
-      (elements: LibraryItem["elements"]) => {
+      (elements: LibraryItem["elements"], collectionId?: string) => {
         const addToLibrary = async (
           processedElements: LibraryItem["elements"],
           libraryItems: LibraryItems,
+          targetCollectionId?: string,
         ) => {
           trackEvent("element", "addToLibrary", "ui");
           for (const type of LIBRARY_DISABLED_TYPES) {
@@ -107,6 +108,7 @@ const LibraryMenuContent = memo(
               elements: processedElements,
               id: randomId(),
               created: Date.now(),
+              collectionId: targetCollectionId,
             },
             ...libraryItems,
           ];
@@ -115,7 +117,7 @@ const LibraryMenuContent = memo(
             setAppState({ errorMessage: t("alerts.errorAddingToLibrary") });
           });
         };
-        addToLibrary(elements, libraryItemsData.libraryItems);
+        addToLibrary(elements, libraryItemsData.libraryItems, collectionId);
       },
       [onAddToLibrary, library, setAppState, libraryItemsData.libraryItems],
     );

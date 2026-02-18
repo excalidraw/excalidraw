@@ -137,6 +137,7 @@
     z-index: 1;
     position: relative;
     &--in-heading {
+      z-index: 2; // Higher z-index for main dropdown so it appears above collection dropdowns
       margin-left: auto;
       .dropdown-menu {
         top: 100%;
