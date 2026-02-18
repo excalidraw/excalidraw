@@ -148,59 +148,340 @@ export const debounce = <T extends any[]>(
   return ret;
 };
 
+// // throttle callback to execute once per animation frame
+// export const throttleRAF = <T extends any[]>(
+//   fn: (...args: T) => void,
+//   opts?: { trailing?: boolean },
+// ) => {
+//   let timerId: number | null = null;
+//   let lastArgs: T | null = null;
+//   let lastArgsTrailing: T | null = null;
+
+//   const scheduleFunc = (args: T) => {
+//     timerId = window.requestAnimationFrame(() => {
+//       timerId = null;
+//       fn(...args);
+//       lastArgs = null;
+//       if (lastArgsTrailing) {
+//         lastArgs = lastArgsTrailing;
+//         lastArgsTrailing = null;
+//         scheduleFunc(lastArgs);
+//       }
+//     });
+//   };
+
+//   const ret = (...args: T) => {
+//     if (isTestEnv()) {
+//       fn(...args);
+//       return;
+//     }
+//     lastArgs = args;
+//     if (timerId === null) {
+//       scheduleFunc(lastArgs);
+//     } else if (opts?.trailing) {
+//       lastArgsTrailing = args;
+//     }
+//   };
+//   ret.flush = () => {
+//     if (timerId !== null) {
+//       cancelAnimationFrame(timerId);
+//       timerId = null;
+//     }
+//     if (lastArgs) {
+//       fn(...(lastArgsTrailing || lastArgs));
+//       lastArgs = lastArgsTrailing = null;
+//     }
+//   };
+//   ret.cancel = () => {
+//     lastArgs = lastArgsTrailing = null;
+//     if (timerId !== null) {
+//       cancelAnimationFrame(timerId);
+//       timerId = null;
+//     }
+//   };
+//   return ret;
+// };
+
+// // This is the original throttleRAF with added logging for debugging
+// // throttle callback to execute once per animation frame
+// export const throttleRAF = <T extends any[]>(
+//   fn: (...args: T) => void,
+//   opts?: { trailing?: boolean },
+// ) => {
+//   let timerId: number | null = null;
+//   let lastArgs: T | null = null;
+//   let lastArgsTrailing: T | null = null;
+
+//   // Track when event entered the throttle
+//   let lastCallTS = 0;
+
+//   const scheduleFunc = (args: T) => {
+//     const scheduledAt = performance.now();
+//     console.log(`throttleRAF scheduled at: ${scheduledAt.toFixed(2)}ms`);
+
+//     timerId = window.requestAnimationFrame(() => {
+//       const executedAt = performance.now();
+
+//       console.log(
+//         `throttleRAF executed callback. Latency = ${(executedAt - scheduledAt).toFixed(2)}ms`
+//       );
+
+//       timerId = null;
+//       fn(...args);
+//       lastArgs = null;
+
+//       if (lastArgsTrailing) {
+//         lastArgs = lastArgsTrailing;
+//         lastArgsTrailing = null;
+//         scheduleFunc(lastArgs);
+//       }
+//     });
+//   };
+
+//   const ret = (...args: T) => {
+//     const now = performance.now();
+//     console.log(
+//       `throttleRAF call received at: ${now.toFixed(2)}ms (delta: ${(now - lastCallTS).toFixed(2)}ms)`
+//     );
+//     lastCallTS = now;
+
+//     if (isTestEnv()) {
+//       fn(...args);
+//       return;
+//     }
+
+//     lastArgs = args;
+
+//     if (timerId === null) {
+//       scheduleFunc(lastArgs);
+//     } else if (opts?.trailing) {
+//       lastArgsTrailing = args;
+//       console.log("trailing args stored");
+//     }
+//   };
+
+//   ret.flush = () => {
+//     if (timerId !== null) {
+//       cancelAnimationFrame(timerId);
+//       timerId = null;
+//     }
+
+//     if (lastArgs) {
+//       const start = performance.now();
+//       console.log("⚡ flush call");
+//       fn(...(lastArgsTrailing || lastArgs));
+//       console.log(`⚡ flush executed immediately in ${(performance.now() - start).toFixed(2)}ms`);
+//       lastArgs = lastArgsTrailing = null;
+//     }
+//   };
+
+//   ret.cancel = () => {
+//     console.log("throttleRAF cancelled");
+//     lastArgs = lastArgsTrailing = null;
+//     if (timerId !== null) {
+//       cancelAnimationFrame(timerId);
+//       timerId = null;
+//     }
+//   };
+
+//   return ret;
+// };
+
+// // This is the first version of throttleRAF with
+// // throttle callback to execute once per animation frame
+// export const throttleRAF = <T extends any[]>(
+//   fn: (...args: T) => void,           // fn is the function to be throttled
+//   opts?: { trailing?: boolean },      // opts is a optional object with a trailing boolean property
+// ) => {
+//   let timerId: number | null = null;  // timerId to track the scheduled animation frame
+//   let lastArgs: T | null = null;      // lastArgs to store the latest arguments
+
+//   const execute = () => {             // No need to pass args, we use lastArgs directly
+//     timerId = null;                   // Clear timerId as we're executing now
+    
+//     // If there are lastArgs, call fn with them
+//     if (lastArgs) {                   
+//       fn(...lastArgs);
+//       lastArgs = null;                // Clear lastArgs after execution
+//     }
+//   };
+
+//   const ret = (...args: T) => {       // ret is the throttled function
+//     lastArgs = args;                  // Update lastArgs with the latest arguments
+    
+//     // If no animation frame is scheduled, schedule one
+//     if (timerId === null) {           
+//       timerId = window.requestAnimationFrame(execute);
+//     // Otherwise, if trailing is true, we just update lastArgs
+//     } else if (opts?.trailing) {      
+//       // For trailing calls, just update lastArgs
+//       // The existing animation frame will handle execution
+//     }
+//   };
+
+//   ret.flush = () => {
+//     if (timerId !== null) {
+//       cancelAnimationFrame(timerId);
+//       timerId = null;
+//     }
+//     execute();      // Execute with the latest args
+//   };
+
+//   ret.cancel = () => {
+//     lastArgs = null;
+//     if (timerId !== null) {
+//       cancelAnimationFrame(timerId);
+//       timerId = null;
+//     }
+//   };
+
+//   return ret;
+// };
+
+
+// First version to solve the issue with latency logging
+// // throttle callback to execute once per animation frame
+// export const throttleRAF = <T extends any[]>(
+//   fn: (...args: T) => void,
+//   opts?: { trailing?: boolean },
+// ) => {
+//   let timerId: number | null = null;
+//   let lastArgs: T | null = null;
+//   let lastArgsTrailing: T | null = null;
+
+//   let lastArgsTimestamp: number | null = null;
+//   let lastArgsTrailingTimestamp: number | null = null;
+
+//   const scheduleFunc = (args: T) => {
+//     timerId = window.requestAnimationFrame(() => {
+//       timerId = null;
+
+//       if (lastArgs) {
+//         // --- ADD THIS LOG ---
+//         // Read from the parallel timestamp variable
+//         if (lastArgsTimestamp) {
+//           const latency = performance.now() - lastArgsTimestamp;
+//           console.log(`Argument Latency: ${latency.toFixed(2)}ms`);
+//         }
+//         // --- END LOG ---
+
+//         fn(...lastArgs);
+//       }
+
+//       lastArgs = null;
+//       lastArgsTimestamp = null;
+
+//       if (lastArgsTrailing) {           // if there are trailing args
+//         lastArgs = lastArgsTrailing;    // move trailing args to lastArgs
+//         lastArgsTimestamp = lastArgsTrailingTimestamp;  // move trailing timestamp
+//         lastArgsTrailing = null;    //  clear trailing args
+//         lastArgsTrailingTimestamp = null;
+//         scheduleFunc(lastArgs);
+//       }
+//     });
+//   };
+
+//   const ret = (...args: T) => {
+//     if (isTestEnv()) {
+//       fn(...args);
+//       return;
+//     }
+//     lastArgs = args;
+//     lastArgsTimestamp = performance.now();
+//     if (timerId === null) {
+//       scheduleFunc(lastArgs);
+//     } else if (opts?.trailing) {
+//       lastArgsTrailing = args;
+//       lastArgsTrailingTimestamp = performance.now();
+      
+//     }
+//   };
+//   ret.flush = () => {
+//     if (timerId !== null) {
+//       cancelAnimationFrame(timerId);
+//       timerId = null;
+//     }
+//     if (lastArgs) {
+//       fn(...(lastArgsTrailing || lastArgs));
+//       lastArgs = lastArgsTrailing = null;
+//       lastArgsTimestamp = lastArgsTrailingTimestamp = null;
+//     }
+//   };
+//   ret.cancel = () => {
+//     lastArgs = lastArgsTrailing = null;
+//     lastArgsTimestamp = lastArgsTrailingTimestamp = null;
+//     if (timerId !== null) {
+//       cancelAnimationFrame(timerId);
+//       timerId = null;
+//     }
+//   };
+//   return ret;
+// };
+
+
+// Second version to solve the issue with latency logging 
 // throttle callback to execute once per animation frame
 export const throttleRAF = <T extends any[]>(
-  fn: (...args: T) => void,
-  opts?: { trailing?: boolean },
+  fn: (...args: T) => void,           // fn is the function to be throttled
+  opts?: { trailing?: boolean },      // opts is an optional object with a trailing boolean property
 ) => {
   let timerId: number | null = null;
-  let lastArgs: T | null = null;
-  let lastArgsTrailing: T | null = null;
+  
+  // MODIFICATION: Store arguments (args) and the call time (callTime)
+  let lastArgsAndCallTime: { args: T; callTime: number } | null = null;
 
-  const scheduleFunc = (args: T) => {
-    timerId = window.requestAnimationFrame(() => {
-      timerId = null;
-      fn(...args);
-      lastArgs = null;
-      if (lastArgsTrailing) {
-        lastArgs = lastArgsTrailing;
-        lastArgsTrailing = null;
-        scheduleFunc(lastArgs);
-      }
-    });
-  };
+  const execute = () => {
+    timerId = null;
 
-  const ret = (...args: T) => {
-    if (isTestEnv()) {
+    if (lastArgsAndCallTime) {
+      const execTime = performance.now(); // Get execution time
+      const { args, callTime } = lastArgsAndCallTime;
+
+      // LATENCY CALCULATION:
+      const latency = execTime - callTime; 
+      // For demonstration, we log the latency.  
+      console.log(`[Throttle] Latency: ${latency.toFixed(2)}ms (Called: ${callTime.toFixed(2)}ms, Executed: ${execTime.toFixed(2)}ms)`);
+
       fn(...args);
-      return;
-    }
-    lastArgs = args;
-    if (timerId === null) {
-      scheduleFunc(lastArgs);
-    } else if (opts?.trailing) {
-      lastArgsTrailing = args;
+      lastArgsAndCallTime = null; // Clear after execution
     }
   };
+
+  const ret = (...args: T) => {       // ret is the throttled function
+    const callTime = performance.now(); // Get call time on invocation
+
+    // Update with the latest arguments and call time
+    lastArgsAndCallTime = { args, callTime }; 
+
+    // If no animation frame is scheduled, schedule one
+    if (timerId === null) {           
+      timerId = window.requestAnimationFrame(execute);
+    // Otherwise, if trailing is true, we just update lastArgsAndCallTime
+    } else if (opts?.trailing) {      
+      // The existing animation frame will handle execution
+    }
+  };
+
   ret.flush = () => {
     if (timerId !== null) {
       cancelAnimationFrame(timerId);
       timerId = null;
     }
-    if (lastArgs) {
-      fn(...(lastArgsTrailing || lastArgs));
-      lastArgs = lastArgsTrailing = null;
-    }
+    // Execute with the latest args (and callTime, though less relevant for flush)
+    execute(); 
   };
+
   ret.cancel = () => {
-    lastArgs = lastArgsTrailing = null;
+    lastArgsAndCallTime = null;
     if (timerId !== null) {
       cancelAnimationFrame(timerId);
       timerId = null;
     }
   };
+
   return ret;
 };
+
 
 /**
  * Exponential ease-out method
