@@ -5140,7 +5140,33 @@ class App extends React.Component<AppProps, AppState> {
 
       this.setState({ suggestedBinding: null });
     }
+    
+  if (
+    event.ctrlKey &&
+    event.shiftKey &&
+    !event.altKey &&
+    (event.key === KEYS.ARROW_LEFT || event.key === KEYS.ARROW_RIGHT)
+  ) {
+    const selectedElements = this.scene.getSelectedElements(this.state);
+    if (selectedElements.length === 1 && isBindableElement(selectedElements[0])) {
+      const current = selectedElements[0] as ExcalidrawBindableElement;
+      const forward = event.key === KEYS.ARROW_RIGHT;
+      const elementsMap = this.scene.getNonDeletedElementsMap();
 
+      const nextId = this.flowChartNavigator.exploreSiblingByGraph(
+        current,
+        elementsMap,
+        forward,
+      );
+      if (nextId) {
+        this.setState((prevState) => ({
+          selectedElementIds: makeNextSelectedElementIds({ [nextId]: true }, prevState),
+        }));
+      }
+    }
+    event.preventDefault();
+    return;
+  }
     if (!event.altKey) {
       if (this.flowChartNavigator.isExploring) {
         this.flowChartNavigator.clear();
