@@ -1961,8 +1961,17 @@ export const fixDuplicatedBindingsAfterDuplication = (
   duplicatedElements: ExcalidrawElement[],
   origIdToDuplicateId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
   duplicateElementsMap: NonDeletedSceneElementsMap,
+  isAltDrag?: boolean,
 ) => {
+  // For "everything" type duplication (programmatic, not user interaction),
+  // isAltDrag is undefined and we preserve all bindings like before.
+  // For "in-place" duplication:
+  // - isAltDrag = true: ALT+drag - keep bindings only when both elements are duplicated
+  // - isAltDrag = false: Ctrl+D - remove arrow bindings, but keep container bindings
+  const shouldPreserveAllBindings = isAltDrag === undefined;
+
   for (const duplicateElement of duplicatedElements) {
+    // For boundElements (arrows/text bound to this element)
     if ("boundElements" in duplicateElement && duplicateElement.boundElements) {
       Object.assign(duplicateElement, {
         boundElements: duplicateElement.boundElements.reduce(
@@ -1971,8 +1980,18 @@ export const fixDuplicatedBindingsAfterDuplication = (
             binding,
           ) => {
             const newBindingId = origIdToDuplicateId.get(binding.id);
-            if (newBindingId) {
-              acc.push({ ...binding, id: newBindingId });
+            // Keep binding if:
+            // - It's programmatic duplication AND bound element exists in map
+            // - It's an ALT+drag AND both elements were duplicated
+            // - It's Ctrl+D AND it's a text element (container binding)
+            const shouldKeepBinding = shouldPreserveAllBindings
+              ? newBindingId
+              : isAltDrag
+              ? newBindingId
+              : binding.type === "text" && newBindingId;
+
+            if (shouldKeepBinding) {
+              acc.push({ ...binding, id: newBindingId! });
             }
             return acc;
           },
@@ -1981,19 +2000,37 @@ export const fixDuplicatedBindingsAfterDuplication = (
       });
     }
 
+    // For containerId (text bound to container)
     if ("containerId" in duplicateElement && duplicateElement.containerId) {
+      const newContainerId = origIdToDuplicateId.get(
+        duplicateElement.containerId,
+      );
       Object.assign(duplicateElement, {
-        containerId:
-          origIdToDuplicateId.get(duplicateElement.containerId) ?? null,
+        // Always preserve containerId if container was duplicated
+        containerId: newContainerId ?? null,
       });
     }
+
+    // For arrow bindings - track if we had bindings to shapes that were duplicated
+    let shouldRecalculateElbow = false;
 
     if ("endBinding" in duplicateElement && duplicateElement.endBinding) {
       const newEndBindingId = origIdToDuplicateId.get(
         duplicateElement.endBinding.elementId,
       );
+      // For Ctrl+D, if binding target wasn't duplicated, we'll need to recalculate
+      if (isAltDrag === false && !newEndBindingId) {
+        shouldRecalculateElbow = true;
+      }
       Object.assign(duplicateElement, {
-        endBinding: newEndBindingId
+        endBinding: shouldPreserveAllBindings
+          ? newEndBindingId
+            ? {
+                ...duplicateElement.endBinding,
+                elementId: newEndBindingId,
+              }
+            : null
+          : isAltDrag && newEndBindingId
           ? {
               ...duplicateElement.endBinding,
               elementId: newEndBindingId,
@@ -2002,20 +2039,46 @@ export const fixDuplicatedBindingsAfterDuplication = (
       });
     }
     if ("startBinding" in duplicateElement && duplicateElement.startBinding) {
-      const newEndBindingId = origIdToDuplicateId.get(
+      const newStartBindingId = origIdToDuplicateId.get(
         duplicateElement.startBinding.elementId,
       );
+      // For Ctrl+D, if binding target wasn't duplicated, we'll need to recalculate
+      if (isAltDrag === false && !newStartBindingId) {
+        shouldRecalculateElbow = true;
+      }
       Object.assign(duplicateElement, {
-        startBinding: newEndBindingId
+        startBinding: shouldPreserveAllBindings
+          ? newStartBindingId
+            ? {
+                ...duplicateElement.startBinding,
+                elementId: newStartBindingId,
+              }
+            : null
+          : isAltDrag && newStartBindingId
           ? {
               ...duplicateElement.startBinding,
-              elementId: newEndBindingId,
+              elementId: newStartBindingId,
             }
           : null,
       });
     }
 
-    if (isElbowArrow(duplicateElement)) {
+    // Update elbow arrow points
+    // - For programmatic duplication: always update
+    // - For ALT+drag: always update
+    // - For Ctrl+D: only update if binding target wasn't duplicated
+    if (isElbowArrow(duplicateElement) && isAltDrag !== false) {
+      Object.assign(
+        duplicateElement,
+        updateElbowArrowPoints(duplicateElement, duplicateElementsMap, {
+          points: [
+            duplicateElement.points[0],
+            duplicateElement.points[duplicateElement.points.length - 1],
+          ],
+        }),
+      );
+    } else if (isElbowArrow(duplicateElement) && shouldRecalculateElbow) {
+      // Ctrl+D case where binding targets weren't duplicated
       Object.assign(
         duplicateElement,
         updateElbowArrowPoints(duplicateElement, duplicateElementsMap, {

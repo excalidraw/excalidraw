@@ -119,8 +119,13 @@ export const duplicateElements = (
          *
          * Use this when duplicating Scene elements, during user interaction
          * such as alt-drag or on duplicate action.
+         *
+         * isAltDrag:
+         * - true: ALT+drag - keep bindings only when both elements are duplicated
+         * - false: Ctrl+D - remove all bindings
          */
         type: "in-place";
+        isAltDrag: boolean;
         idsOfElementsToDuplicate: Map<
           ExcalidrawElement["id"],
           ExcalidrawElement
@@ -369,6 +374,7 @@ export const duplicateElements = (
     duplicatedElements,
     origIdToDuplicateId,
     duplicateElementsMap as NonDeletedSceneElementsMap,
+    opts.type === "in-place" ? opts.isAltDrag : undefined,
   );
 
   bindElementsToFramesAfterDuplication(
