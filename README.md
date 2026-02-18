@@ -94,6 +94,9 @@ yarn add react react-dom @excalidraw/excalidraw
 
 Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
 
+## Example of 'How To Use'
+- add pictures or video
+
 ## Contributing
 
 - Missing something or found a bug? [Report here](https://github.com/excalidraw/excalidraw/issues).
@@ -112,6 +115,10 @@ Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excal
 ## Sponsors & support
 
 If you like the project, you can become a sponsor at [Open Collective](https://opencollective.com/excalidraw) or use [Excalidraw+](https://plus.excalidraw.com/).
+
+## Citation details
+
+provided in the [CITATION](https://github.com/WadieBishoy25/excalidraw/blob/master/CITATION.cff) file
 
 ## Thank you for supporting Excalidraw
 
