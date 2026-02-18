@@ -151,6 +151,9 @@ polyfill();
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
 
+const VITE_APP_PLUS_LP = import.meta.env.VITE_APP_PLUS_LP;
+const VITE_APP_PLUS_APP = import.meta.env.VITE_APP_PLUS_APP;
+
 declare global {
   interface BeforeInstallPromptEventChoiceResult {
     outcome: "accepted" | "dismissed";
@@ -800,9 +803,7 @@ const ExcalidrawWrapper = () => {
     keywords: ["plus", "cloud", "server"],
     perform: () => {
       window.open(
-        `${
-          import.meta.env.VITE_APP_PLUS_LP
-        }/plus?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
+        `${VITE_APP_PLUS_LP}/plus?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
     },
@@ -823,9 +824,7 @@ const ExcalidrawWrapper = () => {
     ],
     perform: () => {
       window.open(
-        `${
-          import.meta.env.VITE_APP_PLUS_APP
-        }?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
+        `${VITE_APP_PLUS_APP}?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
     },
