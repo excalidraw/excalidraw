@@ -26,6 +26,7 @@ import {
   isArrowKey,
   KEYS,
   APP_NAME,
+  EDITOR_LS_KEYS,
   CURSOR_TYPE,
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
   DEFAULT_VERTICAL_ALIGN,
@@ -351,6 +352,7 @@ import {
 } from "../clipboard";
 
 import { exportCanvas, loadFromBlob } from "../data";
+import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restoreAppState, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
@@ -387,6 +389,7 @@ import {
   hideHyperlinkToolip,
   Hyperlink,
 } from "../components/hyperlink/Hyperlink";
+import { createDefaultPoll } from "../poll/utils";
 
 import { Fonts } from "../fonts";
 import { editorJotaiStore, type WritableAtom } from "../editor-jotai";
@@ -437,6 +440,7 @@ import { activeEyeDropperAtom } from "./EyeDropper";
 import FollowMode from "./FollowMode/FollowMode";
 import LayerUI from "./LayerUI";
 import { ElementCanvasButton } from "./MagicButton";
+import { PollPopup } from "./polls/PollPopup";
 import { SVGLayer } from "./SVGLayer";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
@@ -452,6 +456,8 @@ import { Toast } from "./Toast";
 import { findShapeByKey } from "./shapes";
 
 import UnlockPopup from "./UnlockPopup";
+
+import type { PollMetadata } from "../poll/types";
 
 import type { ExcalidrawLibraryIds } from "../data/types";
 
@@ -632,6 +638,14 @@ class App extends React.Component<AppProps, AppState> {
   /** embeds that have been inserted to DOM (as a perf optim, we don't want to
    * insert to DOM before user initially scrolls to them) */
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
+  private pollSessionId: string;
+  private pollVotes = new Map<
+    string,
+    Map<string, { optionIds: string[]; updatedAt: number }>
+  >();
+  private pollCounts = new Map<string, Map<string, number>>();
+  private pollTimers = new Map<string, number>();
+  private pollCountdownInterval: number | null = null;
 
   private handleToastClose = () => {
     this.setToast(null);
@@ -694,6 +708,18 @@ class App extends React.Component<AppProps, AppState> {
   >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
+  private getOrCreatePollSessionId(): string {
+    const storedId = EditorLocalStorage.get<string>(
+      EDITOR_LS_KEYS.POLL_SESSION_ID,
+    );
+    if (typeof storedId === "string" && storedId.length > 0) {
+      return storedId;
+    }
+    const nextId = nanoid();
+    EditorLocalStorage.set(EDITOR_LS_KEYS.POLL_SESSION_ID, nextId);
+    return nextId;
+  }
+
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -740,6 +766,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.store = new Store(this);
     this.history = new History(this.store);
+    this.pollSessionId = this.getOrCreatePollSessionId();
 
     if (excalidrawAPI) {
       const api: ExcalidrawImperativeAPI = {
@@ -778,6 +805,7 @@ class App extends React.Component<AppProps, AppState> {
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
         onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
         onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
+        applyPollVote: this.applyPollVote,
       } as const;
       if (typeof excalidrawAPI === "function") {
         excalidrawAPI(api);
@@ -1642,6 +1670,356 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  private clearPollTimer = (pollId: string) => {
+    const handle = this.pollTimers.get(pollId);
+    if (handle) {
+      clearTimeout(handle);
+      this.pollTimers.delete(pollId);
+    }
+  };
+
+  private stopPollCountdownInterval = () => {
+    if (this.pollCountdownInterval !== null) {
+      window.clearInterval(this.pollCountdownInterval);
+      this.pollCountdownInterval = null;
+    }
+  };
+
+  private syncPollCountdownInterval = () => {
+    const hasOpenTimedPoll = this.state.polls.some(
+      (poll) =>
+        poll.status.state === "open" &&
+        poll.status.closesAt !== null &&
+        poll.status.closesAt > Date.now(),
+    );
+
+    if (hasOpenTimedPoll) {
+      if (this.pollCountdownInterval === null) {
+        this.pollCountdownInterval = window.setInterval(() => {
+          this.triggerRender();
+        }, 1000);
+      }
+    } else {
+      this.stopPollCountdownInterval();
+    }
+  };
+
+  private normalizePoll = (poll: PollMetadata): PollMetadata => {
+    return {
+      ballots: {},
+      results: {},
+      ...poll,
+    };
+  };
+
+  private getPollById = (pollId: string): PollMetadata | null => {
+    const poll = this.state.polls.find((entry) => entry.id === pollId);
+    return poll ? this.normalizePoll(poll) : null;
+  };
+
+  public createPoll = () => {
+    const poll = createDefaultPoll(this.pollSessionId);
+    this.setState((prevState) => ({
+      polls: [...prevState.polls, poll],
+      selectedPollId: poll.id,
+    }));
+    return poll;
+  };
+
+  public isPollOwner = (poll: PollMetadata) => {
+    return poll.settings.createdBy === this.pollSessionId;
+  };
+
+  private pollCountsToObject = (counts: Map<string, number>) => {
+    const result: Record<string, number> = {};
+    counts.forEach((value, key) => {
+      result[key] = value;
+    });
+    return result;
+  };
+
+  private getPollBallots = (pollId: string) => {
+    const ballots: NonNullable<PollMetadata["ballots"]> = {};
+    const votesBySession = this.pollVotes.get(pollId);
+    votesBySession?.forEach((vote, sessionId) => {
+      ballots[sessionId] = {
+        optionIds: vote.optionIds,
+        updatedAt: vote.updatedAt,
+      };
+    });
+    return ballots;
+  };
+
+  private syncPollCounts = (poll: PollMetadata) => {
+    let votesBySession = this.pollVotes.get(poll.id);
+    if (!votesBySession) {
+      votesBySession = new Map();
+      this.pollVotes.set(poll.id, votesBySession);
+    }
+
+    const optionIds = new Set(poll.options.map((option) => option.id));
+
+    const ballots = poll.ballots ?? {};
+    Object.entries(ballots).forEach(([sessionId, ballot]) => {
+      const filtered = (ballot.optionIds || []).filter((id) =>
+        optionIds.has(id),
+      );
+      const updatedAt = ballot.updatedAt ?? 0;
+      const previous = votesBySession!.get(sessionId);
+      if (!previous || updatedAt >= previous.updatedAt) {
+        votesBySession!.set(sessionId, {
+          optionIds: filtered,
+          updatedAt,
+        });
+      }
+    });
+
+    const counts = new Map<string, number>();
+    poll.options.forEach((option) => counts.set(option.id, 0));
+
+    for (const [sessionId, vote] of votesBySession) {
+      const filtered = vote.optionIds.filter((id) => optionIds.has(id));
+      if (filtered.length !== vote.optionIds.length) {
+        votesBySession.set(sessionId, {
+          optionIds: filtered,
+          updatedAt: vote.updatedAt,
+        });
+      }
+      filtered.forEach((id) => {
+        counts.set(id, (counts.get(id) || 0) + 1);
+      });
+    }
+
+    this.pollCounts.set(poll.id, counts);
+
+    return { counts, votesBySession };
+  };
+
+  public getPollCountsAsObject = (poll: PollMetadata) => {
+    const { counts } = this.syncPollCounts(poll);
+    return this.pollCountsToObject(counts);
+  };
+
+  public getPollSelection = (pollId: string) => {
+    const poll = this.getPollById(pollId);
+    if (poll) {
+      this.syncPollCounts(poll);
+    }
+    const votesBySession = this.pollVotes.get(pollId);
+    return votesBySession?.get(this.pollSessionId)?.optionIds ?? [];
+  };
+
+  public updatePollMetadata = (
+    pollId: string,
+    updater: (poll: PollMetadata) => PollMetadata,
+  ) => {
+    this.setState((prevState) => {
+      const polls = prevState.polls;
+      const pollIndex = polls.findIndex((entry) => entry.id === pollId);
+      if (pollIndex === -1) {
+        return null;
+      }
+
+      const poll = this.normalizePoll(polls[pollIndex]);
+      const nextPoll = updater(poll);
+      const counts = this.syncPollCounts(nextPoll).counts;
+      const updatedPoll = {
+        ...nextPoll,
+        ballots: this.getPollBallots(nextPoll.id),
+        results: this.pollCountsToObject(counts),
+      };
+
+      const nextPolls = [...polls];
+      nextPolls[pollIndex] = updatedPoll;
+
+      return { polls: nextPolls };
+    });
+  };
+
+  public handlePollVote = (
+    pollId: string,
+    optionIds: string[],
+    opts?: {
+      sessionId?: string;
+      timestamp?: number;
+      source?: "local" | "remote";
+    },
+  ) => {
+    const poll = this.getPollById(pollId);
+    if (!poll) {
+      return;
+    }
+
+    if (poll.status.state !== "open") {
+      return;
+    }
+
+    if (
+      opts?.source !== "remote" &&
+      poll.settings.access === "editors" &&
+      this.state.viewModeEnabled === true
+    ) {
+      return;
+    }
+
+    const sessionId = opts?.sessionId ?? this.pollSessionId;
+    let timestamp = opts?.timestamp ?? Date.now();
+
+    const allowedOptions = new Set(poll.options.map((option) => option.id));
+    const filtered = optionIds.filter((id) => allowedOptions.has(id));
+
+    const nextSelection = poll.settings.allowMultiple
+      ? filtered
+      : filtered.slice(0, 1);
+
+    const { votesBySession } = this.syncPollCounts(poll);
+    const previous = votesBySession.get(sessionId);
+    if (
+      poll.settings.limitPerSession &&
+      previous &&
+      !poll.settings.allowRevote
+    ) {
+      return;
+    }
+
+    if (
+      opts?.source !== "remote" &&
+      previous &&
+      timestamp <= previous.updatedAt
+    ) {
+      timestamp = previous.updatedAt + 1;
+    }
+
+    if (previous && timestamp <= previous.updatedAt) {
+      return;
+    }
+
+    votesBySession.set(sessionId, {
+      optionIds: nextSelection,
+      updatedAt: timestamp,
+    });
+    this.syncPollCounts(poll);
+
+    this.updatePollMetadata(pollId, (prev) => prev);
+
+    if (opts?.source !== "remote") {
+      this.props.onPollVote?.({
+        pollId,
+        optionIds: nextSelection,
+        sessionId,
+        timestamp,
+      });
+    }
+  };
+
+  public applyPollVote: ExcalidrawImperativeAPI["applyPollVote"] = (
+    payload,
+  ) => {
+    if (!this.getPollById(payload.pollId)) {
+      return;
+    }
+
+    this.handlePollVote(payload.pollId, payload.optionIds, {
+      sessionId: payload.sessionId,
+      timestamp: payload.timestamp,
+      source: "remote",
+    });
+  };
+
+  public startPoll = (pollId: string) => {
+    const poll = this.getPollById(pollId);
+    if (!poll) {
+      return;
+    }
+    if (!this.isPollOwner(poll)) {
+      return;
+    }
+
+    this.clearPollTimer(poll.id);
+    const closesAt =
+      poll.settings.timerSeconds && poll.settings.timerSeconds > 0
+        ? Date.now() + poll.settings.timerSeconds * 1000
+        : null;
+
+    if (closesAt) {
+      this.pollTimers.set(
+        poll.id,
+        window.setTimeout(() => {
+          this.stopPoll(pollId);
+        }, closesAt - Date.now()),
+      );
+    }
+
+    this.updatePollMetadata(pollId, (prev) => ({
+      ...prev,
+      status: {
+        ...prev.status,
+        state: "open",
+        closesAt,
+        lockedOptions: true,
+        revealResults:
+          prev.settings.resultVisibility === "live"
+            ? true
+            : prev.status.revealResults,
+      },
+    }));
+  };
+
+  public stopPoll = (pollId: string) => {
+    const poll = this.getPollById(pollId);
+    if (!poll) {
+      return;
+    }
+    if (!this.isPollOwner(poll)) {
+      return;
+    }
+
+    this.clearPollTimer(poll.id);
+
+    this.updatePollMetadata(pollId, (prev) => ({
+      ...prev,
+      status: {
+        ...prev.status,
+        state: "closed",
+        closesAt: null,
+        lockedOptions: false,
+        revealResults:
+          prev.status.revealResults ||
+          prev.settings.resultVisibility === "live" ||
+          prev.settings.resultVisibility === "creator",
+      },
+    }));
+  };
+
+  public togglePollReveal = (pollId: string, reveal: boolean) => {
+    this.updatePollMetadata(pollId, (prev) => ({
+      ...prev,
+      status: { ...prev.status, revealResults: reveal },
+    }));
+  };
+
+  private renderPollPopup() {
+    if (!this.state.polls.length) {
+      return null;
+    }
+
+    return (
+      <PollPopup
+        polls={this.state.polls}
+        selectedPollId={this.state.selectedPollId}
+        viewModeEnabled={this.state.viewModeEnabled}
+        pollSessionId={this.pollSessionId}
+        getPollCountsAsObject={this.getPollCountsAsObject}
+        getPollSelection={this.getPollSelection}
+        updatePollMetadata={this.updatePollMetadata}
+        handlePollVote={this.handlePollVote}
+        startPoll={this.startPoll}
+        stopPoll={this.stopPoll}
+        togglePollReveal={this.togglePollReveal}
+      />
+    );
+  }
+
   private getFrameNameDOMId = (frameElement: ExcalidrawElement) => {
     return `${this.id}-frame-name-${frameElement.id}`;
   };
@@ -2203,6 +2581,7 @@ class App extends React.Component<AppProps, AppState> {
                         )}
                       </ExcalidrawActionManagerContext.Provider>
                       {this.renderEmbeddables()}
+                      {this.renderPollPopup()}
                     </ExcalidrawElementsContext.Provider>
                   </ExcalidrawAppStateContext.Provider>
                 </ExcalidrawSetAppStateContext.Provider>
@@ -2655,6 +3034,11 @@ class App extends React.Component<AppProps, AppState> {
   private resetScene = withBatchedUpdates(
     (opts?: { resetLoadingState: boolean }) => {
       this.scene.replaceAllElements([]);
+      this.pollVotes.clear();
+      this.pollCounts.clear();
+      this.pollTimers.forEach((handle) => clearTimeout(handle));
+      this.pollTimers.clear();
+      this.stopPollCountdownInterval();
       this.setState((state) => ({
         ...getDefaultAppState(),
         isLoading: opts?.resetLoadingState ? false : state.isLoading,
@@ -2944,6 +3328,8 @@ class App extends React.Component<AppProps, AppState> {
         errorMessage: <BraveMeasureTextError />,
       });
     }
+
+    this.syncPollCountdownInterval();
   }
 
   public componentWillUnmount() {
@@ -2967,6 +3353,9 @@ class App extends React.Component<AppProps, AppState> {
     ShapeCache.destroy();
     SnapCache.destroy();
     clearTimeout(touchTimeout);
+    this.pollTimers.forEach((handle) => clearTimeout(handle));
+    this.pollTimers.clear();
+    this.stopPollCountdownInterval();
     isSomeElementSelected.clearCache();
     selectGroupsForSelectedElements.clearCache();
     touchTimeout = 0;
@@ -3264,6 +3653,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.store.commit(elementsMap, this.state);
+    this.syncPollCountdownInterval();
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
@@ -5217,14 +5607,16 @@ class App extends React.Component<AppProps, AppState> {
     },
     keepSelection = false,
   ) => {
-    if (!this.isToolSupported(tool.type)) {
+    const nextTool = tool;
+
+    if (!this.isToolSupported(nextTool.type)) {
       console.warn(
-        `"${tool.type}" tool is disabled via "UIOptions.canvasActions.tools.${tool.type}"`,
+        `"${nextTool.type}" tool is disabled via "UIOptions.canvasActions.tools.${nextTool.type}"`,
       );
       return;
     }
 
-    const nextActiveTool = updateActiveTool(this.state, tool);
+    const nextActiveTool = updateActiveTool(this.state, nextTool);
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
     } else if (!isHoldingSpace) {
@@ -8732,12 +9124,7 @@ class App extends React.Component<AppProps, AppState> {
           point[1],
           this.scene,
           this.state,
-          {
-            newArrow: true,
-            altKey: event.altKey,
-            initialBinding: true,
-            angleLocked: shouldRotateWithDiscreteAngle(event.nativeEvent),
-          },
+          { newArrow: true, altKey: event.altKey, initialBinding: true },
         );
       }
 
@@ -11173,7 +11560,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   /** updates image cache, refreshing updated elements and/or setting status
-      to error for images that fail during <img> element creation */
+   to error for images that fail during <img> element creation */
   private updateImageCache = async (
     elements: readonly InitializedExcalidrawImageElement[],
     files = this.files,
@@ -11645,11 +12032,7 @@ class App extends React.Component<AppProps, AppState> {
   ): void => {
     const selectionElement = this.state.selectionElement;
     const pointerCoords = pointerDownState.lastCoords;
-    if (
-      selectionElement &&
-      pointerDownState.boxSelection.hasOccurred &&
-      this.state.activeTool.type !== "eraser"
-    ) {
+    if (selectionElement && this.state.activeTool.type !== "eraser") {
       dragNewElement({
         newElement: selectionElement,
         elementType: this.state.activeTool.type,
@@ -11713,27 +12096,25 @@ class App extends React.Component<AppProps, AppState> {
       snapLines,
     });
 
-    if (!isBindingElement(newElement)) {
-      dragNewElement({
-        newElement,
-        elementType: this.state.activeTool.type,
-        originX: pointerDownState.originInGrid.x,
-        originY: pointerDownState.originInGrid.y,
-        x: gridX,
-        y: gridY,
-        width: distance(pointerDownState.originInGrid.x, gridX),
-        height: distance(pointerDownState.originInGrid.y, gridY),
-        shouldMaintainAspectRatio: isImageElement(newElement)
-          ? !shouldMaintainAspectRatio(event)
-          : shouldMaintainAspectRatio(event),
-        shouldResizeFromCenter: shouldResizeFromCenter(event),
-        zoom: this.state.zoom.value,
-        scene: this.scene,
-        widthAspectRatio: aspectRatio,
-        originOffset: this.state.originSnapOffset,
-        informMutation,
-      });
-    }
+    dragNewElement({
+      newElement,
+      elementType: this.state.activeTool.type,
+      originX: pointerDownState.originInGrid.x,
+      originY: pointerDownState.originInGrid.y,
+      x: gridX,
+      y: gridY,
+      width: distance(pointerDownState.originInGrid.x, gridX),
+      height: distance(pointerDownState.originInGrid.y, gridY),
+      shouldMaintainAspectRatio: isImageElement(newElement)
+        ? !shouldMaintainAspectRatio(event)
+        : shouldMaintainAspectRatio(event),
+      shouldResizeFromCenter: shouldResizeFromCenter(event),
+      zoom: this.state.zoom.value,
+      scene: this.scene,
+      widthAspectRatio: aspectRatio,
+      originOffset: this.state.originSnapOffset,
+      informMutation,
+    });
 
     this.setState({
       newElement,

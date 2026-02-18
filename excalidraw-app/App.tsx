@@ -74,6 +74,7 @@ import type {
   BinaryFiles,
   ExcalidrawInitialDataState,
   UIAppState,
+  PollVotePayload,
 } from "@excalidraw/excalidraw/types";
 import type { ResolutionType } from "@excalidraw/common/utility-types";
 import type { ResolvablePromise } from "@excalidraw/common/utils";
@@ -707,6 +708,15 @@ const ExcalidrawWrapper = () => {
     }
   };
 
+  const onPollVote = useCallback(
+    (payload: PollVotePayload) => {
+      if (collabAPI?.isCollaborating()) {
+        collabAPI.broadcastPollVote(payload);
+      }
+    },
+    [collabAPI],
+  );
+
   const [latestShareableLink, setLatestShareableLink] = useState<string | null>(
     null,
   );
@@ -844,6 +854,7 @@ const ExcalidrawWrapper = () => {
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
+        onPollVote={onPollVote}
         UIOptions={{
           canvasActions: {
             toggleTheme: true,

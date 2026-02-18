@@ -25,6 +25,7 @@ import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
+  PollVotePayload,
   SocketId,
 } from "@excalidraw/excalidraw/types";
 import type { MakeBrand } from "@excalidraw/common/utility-types";
@@ -76,6 +77,8 @@ export type EncryptedData = {
   iv: Uint8Array;
 };
 
+type SceneAppState = Pick<AppState, "polls">;
+
 export type SocketUpdateDataSource = {
   INVALID_RESPONSE: {
     type: WS_SUBTYPES.INVALID_RESPONSE;
@@ -84,12 +87,14 @@ export type SocketUpdateDataSource = {
     type: WS_SUBTYPES.INIT;
     payload: {
       elements: readonly OrderedExcalidrawElement[];
+      appState?: SceneAppState;
     };
   };
   SCENE_UPDATE: {
     type: WS_SUBTYPES.UPDATE;
     payload: {
       elements: readonly OrderedExcalidrawElement[];
+      appState?: SceneAppState;
     };
   };
   MOUSE_LOCATION: {
@@ -117,6 +122,10 @@ export type SocketUpdateDataSource = {
       userState: UserIdleState;
       username: string;
     };
+  };
+  POLL_VOTE: {
+    type: WS_SUBTYPES.POLL_VOTE;
+    payload: PollVotePayload;
   };
 };
 

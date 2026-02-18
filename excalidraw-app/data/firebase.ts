@@ -6,7 +6,7 @@ import {
   decryptData,
 } from "@excalidraw/excalidraw/data/encryption";
 import { restoreElements } from "@excalidraw/excalidraw/data/restore";
-import { getSceneVersion } from "@excalidraw/element";
+import { getSceneVersion, hashString } from "@excalidraw/element";
 import { initializeApp } from "firebase/app";
 import {
   getFirestore,
@@ -90,21 +90,26 @@ type FirebaseStoredScene = {
   ciphertext: Bytes;
 };
 
-const encryptElements = async (
+type FirebaseSceneData = {
+  elements: readonly ExcalidrawElement[];
+  appState?: Pick<AppState, "polls">;
+};
+
+const encryptSceneData = async (
   key: string,
-  elements: readonly ExcalidrawElement[],
+  data: FirebaseSceneData,
 ): Promise<{ ciphertext: ArrayBuffer; iv: Uint8Array }> => {
-  const json = JSON.stringify(elements);
+  const json = JSON.stringify(data);
   const encoded = new TextEncoder().encode(json);
   const { encryptedBuffer, iv } = await encryptData(key, encoded);
 
   return { ciphertext: encryptedBuffer, iv };
 };
 
-const decryptElements = async (
+const decryptSceneData = async (
   data: FirebaseStoredScene,
   roomKey: string,
-): Promise<readonly ExcalidrawElement[]> => {
+): Promise<FirebaseSceneData> => {
   const ciphertext = data.ciphertext.toUint8Array() as Uint8Array<ArrayBuffer>;
   const iv = data.iv.toUint8Array() as Uint8Array<ArrayBuffer>;
 
@@ -112,30 +117,52 @@ const decryptElements = async (
   const decodedData = new TextDecoder("utf-8").decode(
     new Uint8Array(decrypted),
   );
-  return JSON.parse(decodedData);
+  const parsed = JSON.parse(decodedData);
+  if (Array.isArray(parsed)) {
+    return { elements: parsed };
+  }
+  if (parsed && Array.isArray(parsed.elements)) {
+    return parsed;
+  }
+  return { elements: [] };
+};
+
+const getPollsHash = (polls?: AppState["polls"]) => {
+  return polls ? hashString(JSON.stringify(polls)) : null;
 };
 
 class FirebaseSceneVersionCache {
-  private static cache = new WeakMap<Socket, number>();
+  private static cache = new WeakMap<
+    Socket,
+    { sceneVersion: number; pollsHash: number | null }
+  >();
   static get = (socket: Socket) => {
     return FirebaseSceneVersionCache.cache.get(socket);
   };
   static set = (
     socket: Socket,
     elements: readonly SyncableExcalidrawElement[],
+    polls?: AppState["polls"],
   ) => {
-    FirebaseSceneVersionCache.cache.set(socket, getSceneVersion(elements));
+    FirebaseSceneVersionCache.cache.set(socket, {
+      sceneVersion: getSceneVersion(elements),
+      pollsHash: getPollsHash(polls),
+    });
   };
 }
 
 export const isSavedToFirebase = (
   portal: Portal,
   elements: readonly ExcalidrawElement[],
+  polls?: AppState["polls"],
 ): boolean => {
   if (portal.socket && portal.roomId && portal.roomKey) {
     const sceneVersion = getSceneVersion(elements);
-
-    return FirebaseSceneVersionCache.get(portal.socket) === sceneVersion;
+    const cached = FirebaseSceneVersionCache.get(portal.socket);
+    return (
+      cached?.sceneVersion === sceneVersion &&
+      cached.pollsHash === getPollsHash(polls)
+    );
   }
   // if no room exists, consider the room saved so that we don't unnecessarily
   // prevent unload (there's nothing we could do at that point anyway)
@@ -173,10 +200,14 @@ export const saveFilesToFirebase = async ({
 
 const createFirebaseSceneDocument = async (
   elements: readonly SyncableExcalidrawElement[],
+  appState: Pick<AppState, "polls">,
   roomKey: string,
 ) => {
   const sceneVersion = getSceneVersion(elements);
-  const { ciphertext, iv } = await encryptElements(roomKey, elements);
+  const { ciphertext, iv } = await encryptSceneData(roomKey, {
+    elements,
+    appState,
+  });
   return {
     sceneVersion,
     ciphertext: Bytes.fromUint8Array(new Uint8Array(ciphertext)),
@@ -195,7 +226,7 @@ export const saveToFirebase = async (
     !roomId ||
     !roomKey ||
     !socket ||
-    isSavedToFirebase(portal, elements)
+    isSavedToFirebase(portal, elements, appState.polls)
   ) {
     return null;
   }
@@ -207,7 +238,11 @@ export const saveToFirebase = async (
     const snapshot = await transaction.get(docRef);
 
     if (!snapshot.exists()) {
-      const storedScene = await createFirebaseSceneDocument(elements, roomKey);
+      const storedScene = await createFirebaseSceneDocument(
+        elements,
+        { polls: appState.polls },
+        roomKey,
+      );
 
       transaction.set(docRef, storedScene);
 
@@ -215,8 +250,12 @@ export const saveToFirebase = async (
     }
 
     const prevStoredScene = snapshot.data() as FirebaseStoredScene;
+    const prevStoredSceneData = await decryptSceneData(
+      prevStoredScene,
+      roomKey,
+    );
     const prevStoredElements = getSyncableElements(
-      restoreElements(await decryptElements(prevStoredScene, roomKey), null),
+      restoreElements(prevStoredSceneData.elements, null),
     );
     const reconciledElements = getSyncableElements(
       reconcileElements(
@@ -228,6 +267,7 @@ export const saveToFirebase = async (
 
     const storedScene = await createFirebaseSceneDocument(
       reconciledElements,
+      { polls: appState.polls },
       roomKey,
     );
 
@@ -237,20 +277,30 @@ export const saveToFirebase = async (
     return storedScene;
   });
 
+  const storedSceneData = await decryptSceneData(storedScene, roomKey);
   const storedElements = getSyncableElements(
-    restoreElements(await decryptElements(storedScene, roomKey), null),
+    restoreElements(storedSceneData.elements, null),
   );
 
-  FirebaseSceneVersionCache.set(socket, storedElements);
+  FirebaseSceneVersionCache.set(
+    socket,
+    storedElements,
+    storedSceneData.appState?.polls,
+  );
 
   return toBrandedType<RemoteExcalidrawElement[]>(storedElements);
 };
+
+type FirebaseSceneLoadResult = {
+  elements: readonly SyncableExcalidrawElement[];
+  appState?: Pick<AppState, "polls">;
+} | null;
 
 export const loadFromFirebase = async (
   roomId: string,
   roomKey: string,
   socket: Socket | null,
-): Promise<readonly SyncableExcalidrawElement[] | null> => {
+): Promise<FirebaseSceneLoadResult> => {
   const firestore = _getFirestore();
   const docRef = doc(firestore, "scenes", roomId);
   const docSnap = await getDoc(docRef);
@@ -258,17 +308,21 @@ export const loadFromFirebase = async (
     return null;
   }
   const storedScene = docSnap.data() as FirebaseStoredScene;
+  const storedSceneData = await decryptSceneData(storedScene, roomKey);
   const elements = getSyncableElements(
-    restoreElements(await decryptElements(storedScene, roomKey), null, {
+    restoreElements(storedSceneData.elements, null, {
       deleteInvisibleElements: true,
     }),
   );
+  const appState = storedSceneData.appState?.polls
+    ? { polls: storedSceneData.appState.polls }
+    : undefined;
 
   if (socket) {
-    FirebaseSceneVersionCache.set(socket, elements);
+    FirebaseSceneVersionCache.set(socket, elements, appState?.polls);
   }
 
-  return elements;
+  return { elements, appState };
 };
 
 export const loadFilesFromFirebase = async (
