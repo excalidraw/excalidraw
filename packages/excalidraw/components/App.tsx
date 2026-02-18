@@ -7355,6 +7355,19 @@ class App extends React.Component<AppProps, AppState> {
         });
         pointerDownState.hit.wasAddedToSelection = true;
       }
+    } else if (this.state.activeTool.type === "selection") {
+      // Show toast notification when user clicks on empty canvas with selection tool
+      // to guide them to select a shape tool for drawing
+      if (
+        !pointerDownState.hit.element &&
+        !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
+        !pointerDownState.resize.handleType
+      ) {
+        this.setToast({
+          message: t("toast.noToolSelected"),
+          duration: 3000,
+        });
+      }
     } else if (this.state.activeTool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
     } else if (
