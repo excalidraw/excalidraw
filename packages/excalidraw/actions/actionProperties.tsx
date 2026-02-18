@@ -388,33 +388,31 @@ export const actionChangeBackgroundColor = register<
       };
     }
 
-    let nextElements;
-
     const selectedElements = app.scene.getSelectedElements(appState);
-    const shouldEnablePolygon =
-      !isTransparent(value.currentItemBackgroundColor) &&
-      selectedElements.every(
-        (el) => isLineElement(el) && canBecomePolygon(el.points),
-      );
-
-    if (shouldEnablePolygon) {
-      const selectedElementsMap = arrayToMap(selectedElements);
-      nextElements = elements.map((el) => {
-        if (selectedElementsMap.has(el.id) && isLineElement(el)) {
-          return newElementWith(el, {
-            backgroundColor: value.currentItemBackgroundColor,
-            ...toggleLinePolygonState(el, true),
-          });
+    const selectedElementsMap = arrayToMap(selectedElements);
+    const nextElements = elements.map((el) => {
+      if (selectedElementsMap.has(el.id)) {
+        if (
+          !isTransparent(value.currentItemBackgroundColor) &&
+          isLineElement(el)
+        ) {
+          if (canBecomePolygon(el.points)) {
+            return newElementWith(el, {
+              backgroundColor: value.currentItemBackgroundColor,
+              ...toggleLinePolygonState(el, true),
+            });
+          }
+          return {
+            ...el,
+            backgroundColor: "transparent",
+          };
         }
-        return el;
-      });
-    } else {
-      nextElements = changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
+        return newElementWith(el, {
           backgroundColor: value.currentItemBackgroundColor,
-        }),
-      );
-    }
+        });
+      }
+      return el;
+    });
 
     return {
       elements: nextElements,
