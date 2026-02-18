@@ -430,6 +430,11 @@ import ConvertElementTypePopup, {
   convertElementTypes,
 } from "./ConvertElementTypePopup";
 
+import ChangeElementPropertyPopup, {
+  propertyEditors,
+  changeElementPropertyPopupAtom,
+} from "./ChangeElementPropertyPopup";
+
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
@@ -2201,6 +2206,8 @@ class App extends React.Component<AppProps, AppState> {
                         {showShapeSwitchPanel && (
                           <ConvertElementTypePopup app={this} />
                         )}
+                        {/* Arrow element property popup */}
+                        <ChangeElementPropertyPopup app={this} />
                       </ExcalidrawActionManagerContext.Provider>
                       {this.renderEmbeddables()}
                     </ExcalidrawElementsContext.Provider>
@@ -4508,10 +4515,58 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        // Shape switching
         if (event.key === KEYS.ESCAPE) {
+          // Close any open popups (shape-switch & arrow-property)
           this.updateEditorAtom(convertElementTypePopupAtom, null);
-        } else if (
+          this.updateEditorAtom(changeElementPropertyPopupAtom, null);
+        }
+
+        // Arrowhead switching (TAB)
+        if (
+          event.key === KEYS.TAB &&
+          (document.activeElement === this.excalidrawContainerRef?.current ||
+            document.activeElement?.classList.contains(
+              CLASSES.CONVERT_ELEMENT_TYPE_POPUP,
+            ))
+        ) {
+          event.preventDefault();
+
+          const elements = getSelectedElements(
+            this.scene.getNonDeletedElementsMap(),
+            this.state,
+          );
+
+          for (const propertyEditor of propertyEditors.values()) {
+            if (propertyEditor.isValidForElements(this, elements)) {
+              this.updateEditorAtom(convertElementTypePopupAtom, null);
+
+              const currentPropertyPopup = editorJotaiStore.get(
+                changeElementPropertyPopupAtom,
+              );
+
+              if (currentPropertyPopup?.type === "panel") {
+                propertyEditor.cycle(
+                  this,
+                  elements,
+                  event.shiftKey ? "left" : "right",
+                );
+
+                this.store.scheduleCapture();
+              }
+
+              this.updateEditorAtom(changeElementPropertyPopupAtom, {
+                type: "panel",
+                propertyType: propertyEditor.type,
+                context: propertyEditor.getContext?.(this, elements),
+              });
+
+              return;
+            }
+          }
+        }
+
+        // Shape switching (TAB)
+        if (
           event.key === KEYS.TAB &&
           (document.activeElement === this.excalidrawContainerRef?.current ||
             document.activeElement?.classList.contains(
@@ -4536,6 +4591,8 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
           if (conversionType) {
+            // Close the property switching popup so only one popup is open at a time
+            this.updateEditorAtom(changeElementPropertyPopupAtom, null);
             this.updateEditorAtom(convertElementTypePopupAtom, {
               type: "panel",
             });

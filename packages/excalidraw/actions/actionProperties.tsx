@@ -1549,7 +1549,7 @@ export const actionChangeRoundness = register<"sharp" | "round">({
   },
 });
 
-const getArrowheadOptions = (flip: boolean) => {
+export const getArrowheadOptions = (flip: boolean) => {
   return [
     {
       value: null,
