@@ -1,0 +1,49 @@
+.chatcanvas-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: var(--color-surface, #ffffff);
+  border-bottom: 1px solid var(--color-border, #e0e0e0);
+  height: 56px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-primary, #333333);
+  }
+
+  &__right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  &__button {
+    padding: 8px 12px;
+    background-color: transparent;
+    border: 1px solid var(--color-border, #e0e0e0);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--color-text-primary, #333333);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: var(--color-hover, #f5f5f5);
+      border-color: var(--color-border-hover, #d0d0d0);
+    }
+
+    &:active {
+      background-color: var(--color-active, #efefef);
+    }
+  }
+}
