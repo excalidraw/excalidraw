@@ -53,6 +53,7 @@ export type ActionName =
   | "bringForward"
   | "sendToBack"
   | "bringToFront"
+  | "bringToMiddle"
   | "copyStyles"
   | "selectAll"
   | "pasteStyles"
