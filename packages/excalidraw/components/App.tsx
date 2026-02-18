@@ -442,10 +442,7 @@ import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
-import {
-  isPointHittingLink,
-  isPointHittingLinkIcon,
-} from "./hyperlink/helpers";
+import { isPointHittingLink } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { Toast } from "./Toast";
 
@@ -1210,12 +1207,99 @@ class App extends React.Component<AppProps, AppState> {
     return this.iFrameRefs.get(element.id);
   }
 
-  private handleEmbeddableCenterClick(element: ExcalidrawIframeLikeElement) {
+  private handleIframeLikeElementHover = ({
+    hitElement,
+    scenePointer,
+    moveEvent,
+  }: {
+    hitElement: NonDeleted<ExcalidrawElement> | null;
+    scenePointer: { x: number; y: number };
+    moveEvent: React.PointerEvent<HTMLCanvasElement>;
+  }): boolean => {
     if (
-      this.state.activeEmbeddable?.element === element &&
+      hitElement &&
+      isIframeLikeElement(hitElement) &&
+      this.isIframeLikeElementCenter(
+        hitElement,
+        moveEvent,
+        scenePointer.x,
+        scenePointer.y,
+      )
+    ) {
+      setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+      this.setState({
+        activeEmbeddable: { element: hitElement, state: "hover" },
+      });
+      return true;
+    } else if (this.state.activeEmbeddable?.state === "hover") {
+      this.setState({ activeEmbeddable: null });
+    }
+    return false;
+  };
+
+  /** @returns true if iframe-like element click handled */
+  private handleIframeLikeCenterClick(): boolean {
+    if (!this.lastPointerDownEvent || !this.lastPointerUpEvent) {
+      return false;
+    }
+
+    const scenePointerStart = viewportCoordsToSceneCoords(
+      {
+        clientX: this.lastPointerDownEvent.clientX,
+        clientY: this.lastPointerDownEvent.clientY,
+      },
+      this.state,
+    );
+    const scenePointerEnd = viewportCoordsToSceneCoords(
+      {
+        clientX: this.lastPointerUpEvent.clientX,
+        clientY: this.lastPointerUpEvent.clientY,
+      },
+      this.state,
+    );
+
+    const hitElementStart = this.getElementAtPosition(
+      scenePointerStart.x,
+      scenePointerStart.y,
+    );
+
+    const hitElementEnd = this.getElementAtPosition(
+      scenePointerEnd.x,
+      scenePointerEnd.y,
+    );
+
+    if (
+      !hitElementStart ||
+      !hitElementEnd ||
+      hitElementStart !== hitElementEnd ||
+      this.lastPointerUpEvent.timeStamp - this.lastPointerDownEvent.timeStamp >
+        300 ||
+      gesture.pointers.size > 1 ||
+      !isIframeLikeElement(hitElementStart) ||
+      !isIframeLikeElement(hitElementEnd) ||
+      !this.isIframeLikeElementCenter(
+        hitElementStart,
+        this.lastPointerUpEvent,
+        scenePointerStart.x,
+        scenePointerStart.y,
+      ) ||
+      !this.isIframeLikeElementCenter(
+        hitElementEnd,
+        this.lastPointerUpEvent,
+        scenePointerEnd.x,
+        scenePointerEnd.y,
+      )
+    ) {
+      return false;
+    }
+
+    const iframeLikeElement = hitElementEnd;
+
+    if (
+      this.state.activeEmbeddable?.element === iframeLikeElement &&
       this.state.activeEmbeddable?.state === "active"
     ) {
-      return;
+      return true;
     }
 
     // The delay serves two purposes
@@ -1226,31 +1310,34 @@ class App extends React.Component<AppProps, AppState> {
     //    in fullscreen mode
     setTimeout(() => {
       this.setState({
-        activeEmbeddable: { element, state: "active" },
-        selectedElementIds: { [element.id]: true },
+        activeEmbeddable: { element: iframeLikeElement, state: "active" },
+        selectedElementIds: { [iframeLikeElement.id]: true },
         newElement: null,
         selectionElement: null,
       });
     }, 100);
 
-    if (isIframeElement(element)) {
-      return;
+    if (isIframeElement(iframeLikeElement)) {
+      return true;
     }
 
-    const iframe = this.getHTMLIFrameElement(element);
+    const iframe = this.getHTMLIFrameElement(iframeLikeElement);
 
     if (!iframe?.contentWindow) {
-      return;
+      return true;
     }
 
     if (iframe.src.includes("youtube")) {
-      const state = YOUTUBE_VIDEO_STATES.get(element.id);
+      const state = YOUTUBE_VIDEO_STATES.get(iframeLikeElement.id);
       if (!state) {
-        YOUTUBE_VIDEO_STATES.set(element.id, YOUTUBE_STATES.UNSTARTED);
+        YOUTUBE_VIDEO_STATES.set(
+          iframeLikeElement.id,
+          YOUTUBE_STATES.UNSTARTED,
+        );
         iframe.contentWindow.postMessage(
           JSON.stringify({
             event: "listening",
-            id: element.id,
+            id: iframeLikeElement.id,
           }),
           "*",
         );
@@ -1287,6 +1374,8 @@ class App extends React.Component<AppProps, AppState> {
         "*",
       );
     }
+
+    return true;
   }
 
   private isIframeLikeElementCenter(
@@ -6622,10 +6711,14 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    const hasDeselectedButton = Boolean(event.buttons);
+    const isPressingAnyButton = Boolean(event.buttons);
+    const isLaserTool = this.state.activeTool.type === "laser";
     if (
-      hasDeselectedButton ||
-      (this.state.activeTool.type !== "selection" &&
+      isPressingAnyButton ||
+      // checking against laser so that if you mouseover with a laser tool
+      // over a link/embeddable, we change the cursor
+      (!isLaserTool &&
+        this.state.activeTool.type !== "selection" &&
         this.state.activeTool.type !== "lasso" &&
         this.state.activeTool.type !== "text" &&
         this.state.activeTool.type !== "eraser")
@@ -6745,6 +6838,14 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else {
       hideHyperlinkToolip();
+      if (isLaserTool) {
+        this.handleIframeLikeElementHover({
+          hitElement,
+          scenePointer,
+          moveEvent: event,
+        });
+        return;
+      }
       if (
         hitElement &&
         (hitElement.link || isEmbeddableElement(hitElement)) &&
@@ -6777,33 +6878,21 @@ class App extends React.Component<AppProps, AppState> {
           !hitElement?.locked
         ) {
           if (
-            hitElement &&
-            isIframeLikeElement(hitElement) &&
-            this.isIframeLikeElementCenter(
+            !this.handleIframeLikeElementHover({
               hitElement,
-              event,
-              scenePointerX,
-              scenePointerY,
-            )
-          ) {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-            this.setState({
-              activeEmbeddable: { element: hitElement, state: "hover" },
-            });
-          } else if (
-            !hitElement ||
-            // Elbow arrows can only be moved when unconnected
-            !isElbowArrow(hitElement) ||
-            !(hitElement.startBinding || hitElement.endBinding)
+              scenePointer,
+              moveEvent: event,
+            }) &&
+            (!hitElement ||
+              // Elbow arrows can only be moved when unconnected
+              !isElbowArrow(hitElement) ||
+              !(hitElement.startBinding || hitElement.endBinding))
           ) {
             if (
               this.state.activeTool.type !== "lasso" ||
               selectedElements.length > 0
             ) {
               setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
-            }
-            if (this.state.activeEmbeddable?.state === "hover") {
-              this.setState({ activeEmbeddable: null });
             }
           }
         }
@@ -7456,26 +7545,9 @@ class App extends React.Component<AppProps, AppState> {
       x: scenePointerX,
       y: scenePointerY,
     };
-    const clicklength =
-      event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0);
 
-    if (this.editorInterface.formFactor === "phone" && clicklength < 300) {
-      const hitElement = this.getElementAtPosition(
-        scenePointer.x,
-        scenePointer.y,
-      );
-      if (
-        isIframeLikeElement(hitElement) &&
-        this.isIframeLikeElementCenter(
-          hitElement,
-          event,
-          scenePointer.x,
-          scenePointer.y,
-        )
-      ) {
-        this.handleEmbeddableCenterClick(hitElement);
-        return;
-      }
+    if (this.handleIframeLikeCenterClick()) {
+      return;
     }
 
     if (this.editorInterface.isTouchScreen) {
@@ -7496,20 +7568,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      if (
-        clicklength < 300 &&
-        isIframeLikeElement(this.hitLinkElement) &&
-        !isPointHittingLinkIcon(
-          this.hitLinkElement,
-          this.scene.getNonDeletedElementsMap(),
-          this.state,
-          pointFrom(scenePointer.x, scenePointer.y),
-        )
-      ) {
-        this.handleEmbeddableCenterClick(this.hitLinkElement);
-      } else {
-        this.redirectToLink(event, this.editorInterface.isTouchScreen);
-      }
+      this.redirectToLink(event, this.editorInterface.isTouchScreen);
     } else if (this.state.viewModeEnabled) {
       this.setState({
         activeEmbeddable: null,
@@ -10851,25 +10910,6 @@ class App extends React.Component<AppProps, AppState> {
           newElement: null,
           suggestedBinding: null,
         });
-      }
-
-      if (
-        hitElement &&
-        this.lastPointerUpEvent &&
-        this.lastPointerDownEvent &&
-        this.lastPointerUpEvent.timeStamp -
-          this.lastPointerDownEvent.timeStamp <
-          300 &&
-        gesture.pointers.size <= 1 &&
-        isIframeLikeElement(hitElement) &&
-        this.isIframeLikeElementCenter(
-          hitElement,
-          this.lastPointerUpEvent,
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-        )
-      ) {
-        this.handleEmbeddableCenterClick(hitElement);
       }
     });
   }
