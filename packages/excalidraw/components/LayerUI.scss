@@ -168,4 +168,17 @@
       }
     }
   }
+  .layer-ui__wrapper__footer-left,
+  .layer-ui__wrapper__footer-right,
+  .footer-center {
+    margin-bottom: 12px;
+  }
+
+  @supports (margin-bottom: env(safe-area-inset-bottom)) {
+    .layer-ui__wrapper__footer-left,
+    .layer-ui__wrapper__footer-right,
+    .footer-center {
+      margin-bottom: calc(12px + env(safe-area-inset-bottom));
+    }
+  }
 }
