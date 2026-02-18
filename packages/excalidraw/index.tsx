@@ -23,6 +23,7 @@ polyfill();
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
     onChange,
+    beforeElementCreated,
     onIncrement,
     initialData,
     excalidrawAPI,
@@ -116,6 +117,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
       <InitializeApp langCode={langCode} theme={theme}>
         <App
           onChange={onChange}
+          beforeElementCreated={beforeElementCreated}
           onIncrement={onIncrement}
           initialData={initialData}
           excalidrawAPI={excalidrawAPI}
