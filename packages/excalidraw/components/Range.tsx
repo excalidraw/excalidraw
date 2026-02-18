@@ -36,10 +36,21 @@ export const Range = ({ updateData, app, testId }: RangeProps) => {
       const valueElement = valueRef.current;
       const inputWidth = rangeElement.offsetWidth;
       const thumbWidth = 15; // 15 is the width of the thumb
+      const isRTL = document.documentElement.getAttribute("dir") === "rtl";
       const position =
         (value / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
-      valueElement.style.left = `${position}px`;
-      rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
+
+      // Reset both left and right before setting the correct one for the direction
+      valueElement.style.left = "";
+      valueElement.style.right = "";
+
+      if (isRTL) {
+        valueElement.style.right = `${position}px`;
+        rangeElement.style.background = `linear-gradient(to left, var(--color-slider-track) 0%, var(--color-slider-track) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
+      } else {
+        valueElement.style.left = `${position}px`;
+        rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
+      }
     }
   }, [value]);
 
