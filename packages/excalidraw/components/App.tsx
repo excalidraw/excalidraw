@@ -319,6 +319,7 @@ import {
   actionToggleLinearEditor,
   actionToggleObjectsSnapMode,
   actionToggleCropEditor,
+  actionSaveToActiveFile,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
@@ -1774,7 +1775,14 @@ class App extends React.Component<AppProps, AppState> {
               // for some inexplicable reason, `onBlur` triggered on ESC
               // does not reset `state.editingFrame` despite being called,
               // and we need to reset it here as well
-              if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
+              if (actionSaveToActiveFile.keyTest(event)) {
+                event.preventDefault();
+                this.resetEditingFrame(f);
+                this.actionManager.executeAction(actionSaveToActiveFile);
+              } else if (
+                event.key === KEYS.ESCAPE ||
+                event.key === KEYS.ENTER
+              ) {
                 this.resetEditingFrame(f);
               }
             }}
