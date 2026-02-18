@@ -334,6 +334,10 @@ const getArrowheadShapes = (
     ? applyDarkModeFilter(element.strokeColor)
     : element.strokeColor;
 
+  const fillColor = isDarkMode
+    ? applyDarkModeFilter(canvasBackgroundColor)
+    : canvasBackgroundColor;
+
   switch (arrowhead) {
     case "dot":
     case "circle":
@@ -348,7 +352,7 @@ const getArrowheadShapes = (
           ...options,
           fill:
             arrowhead === "circle_outline"
-              ? canvasBackgroundColor
+              ? fillColor
               : strokeColor,
 
           fillStyle: "solid",
@@ -376,7 +380,7 @@ const getArrowheadShapes = (
             ...options,
             fill:
               arrowhead === "triangle_outline"
-                ? canvasBackgroundColor
+                ? fillColor
                 : strokeColor,
             fillStyle: "solid",
             roughness: Math.min(1, options.roughness || 0),
@@ -404,7 +408,7 @@ const getArrowheadShapes = (
             ...options,
             fill:
               arrowhead === "diamond_outline"
-                ? canvasBackgroundColor
+                ? fillColor
                 : strokeColor,
             fillStyle: "solid",
             roughness: Math.min(1, options.roughness || 0),
