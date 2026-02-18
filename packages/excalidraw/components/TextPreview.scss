@@ -1,0 +1,26 @@
+.excalidraw-text-preview-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--zIndex-wysiwyg);
+  pointer-events: none;
+  max-width: 400px;
+  width: calc(100% - 40px);
+  max-height: 200px;
+  contain: layout style paint;
+}
+
+.excalidraw-text-preview {
+  background: var(--island-bg-color);
+  border: 2px dashed var(--button-hover-bg);
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: var(--shadow-island);
+  max-height: 180px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  contain: layout style paint;
+}

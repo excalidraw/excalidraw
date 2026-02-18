@@ -436,6 +436,7 @@ import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
 import FollowMode from "./FollowMode/FollowMode";
 import LayerUI from "./LayerUI";
+import { TextPreview } from "./TextPreview";
 import { ElementCanvasButton } from "./MagicButton";
 import { SVGLayer } from "./SVGLayer";
 import { searchItemInFocusAtom } from "./SearchMenu";
@@ -1984,6 +1985,8 @@ class App extends React.Component<AppProps, AppState> {
                         >
                           {this.props.children}
                         </LayerUI>
+
+                        <TextPreview textPreview={this.state.textPreview} theme={this.state.theme} />
 
                         <div className="excalidraw-textEditorContainer" />
                         <div className="excalidraw-contextMenuContainer" />

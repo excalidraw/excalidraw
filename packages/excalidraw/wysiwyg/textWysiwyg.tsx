@@ -70,6 +70,59 @@ import type { ParsedDataTranferList } from "../clipboard";
 import type App from "../components/App";
 import type { AppState } from "../types";
 
+let mirror: HTMLDivElement | null = null;
+
+// ============================================================================
+// TEXT PREVIEW STATE MANAGEMENT
+// Tracks whether text is currently off-screen to decouple visibility from
+// content updates and position recalculations
+// ============================================================================
+let isTextCurrentlyOffScreen = false;
+let lastPreviewText = "";
+let textPreviewCheckScheduled = false;
+let previewVisibilityTimeout: ReturnType<typeof setTimeout> | null = null;
+const PREVIEW_VISIBILITY_DELAY = 200; // ms before showing preview
+
+const getCaretOffset = (textarea: HTMLTextAreaElement) => {
+  const { selectionStart, value } = textarea;
+  const textBeforeCaret = value.substring(0, selectionStart);
+
+  if (!mirror) {
+    mirror = document.createElement("div");
+    mirror.style.position = "absolute";
+    mirror.style.visibility = "hidden";
+    mirror.style.top = "0";
+    mirror.style.left = "0";
+    document.body.appendChild(mirror);
+  }
+
+  const style = window.getComputedStyle(textarea);
+  [
+    "fontFamily",
+    "fontSize",
+    "fontStyle",
+    "fontWeight",
+    "lineHeight",
+    "padding",
+    "border",
+    "boxSizing",
+    "whiteSpace",
+    "wordBreak",
+    "width",
+  ].forEach((prop) => {
+    (mirror!.style as any)[prop] = (style as any)[prop];
+  });
+
+  mirror.textContent = textBeforeCaret;
+  const caretMarker = document.createElement("span");
+  caretMarker.textContent = "\u200B";
+  mirror.appendChild(caretMarker);
+
+  const { offsetLeft, offsetTop } = caretMarker;
+
+  return { left: offsetLeft, top: offsetTop };
+};
+
 const getTransform = (
   width: number,
   height: number,
@@ -294,6 +347,129 @@ export const textWysiwyg = ({
     }
   };
 
+  /**
+   * Checks if text is off-screen and updates preview visibility.
+   * ONLY called on viewport changes (scroll, zoom, resize), NOT on input.
+   * Uses debouncing to batch multiple viewport changes.
+   * Also uses a delay before showing preview to avoid jarring transitions.
+   */
+  const checkAndUpdatePreviewVisibility = () => {
+    const appState = app.state;
+    const updatedTextElement = app.scene.getElement<ExcalidrawTextElement>(id);
+    if (!updatedTextElement || !editable) {
+      return;
+    }
+
+    const rect = editable.getBoundingClientRect();
+    const containerRect = excalidrawContainer?.getBoundingClientRect();
+
+    if (!containerRect) {
+      return;
+    }
+
+    const viewportWidth = containerRect.width;
+    const viewportHeight = containerRect.height;
+
+    const relativeTop = rect.top - containerRect.top;
+    const relativeLeft = rect.left - containerRect.left;
+    const relativeBottom = rect.bottom - containerRect.top;
+    const relativeRight = rect.right - containerRect.left;
+
+    const wasOffScreen = isTextCurrentlyOffScreen;
+    isTextCurrentlyOffScreen =
+      relativeBottom < 0 ||
+      relativeTop > viewportHeight ||
+      relativeRight < 0 ||
+      relativeLeft > viewportWidth;
+
+    // Check caret if textarea is on-screen
+    if (!isTextCurrentlyOffScreen) {
+      const caretOffset = getCaretOffset(editable);
+      const caretTop = relativeTop + caretOffset.top * appState.zoom.value;
+      const caretLeft = relativeLeft + caretOffset.left * appState.zoom.value;
+
+      isTextCurrentlyOffScreen =
+        caretTop < 0 ||
+        caretTop > viewportHeight ||
+        caretLeft < 0 ||
+        caretLeft > viewportWidth;
+    }
+
+    // Handle visibility state changes
+    if (wasOffScreen !== isTextCurrentlyOffScreen) {
+      // Clear any pending timeout
+      if (previewVisibilityTimeout) {
+        clearTimeout(previewVisibilityTimeout);
+        previewVisibilityTimeout = null;
+      }
+
+      if (isTextCurrentlyOffScreen) {
+        // Text went off-screen, show preview and move textarea completely off-screen
+        const { textAlign, verticalAlign } = updatedTextElement;
+        const font = getFontString(updatedTextElement);
+
+        // Position textarea completely off-screen so it doesn't render visually
+        editable.style.position = "fixed";
+        editable.style.left = "-9999px";
+        editable.style.top = "-9999px";
+        editable.style.width = "1px";
+        editable.style.height = "1px";
+        editable.style.pointerEvents = "none";
+        editable.style.opacity = "1";
+
+        app.setAppState({
+          textPreview: {
+            text: editable.value,
+            font,
+            textAlign,
+            verticalAlign,
+            color: updatedTextElement.strokeColor,
+            opacity: updatedTextElement.opacity,
+            width: updatedTextElement.width,
+            height: updatedTextElement.height,
+          },
+        });
+      } else {
+        // Text came back on-screen, restore textarea position and hide preview
+        editable.style.position = "absolute";
+        editable.style.left = "";
+        editable.style.top = "";
+        editable.style.width = "";
+        editable.style.height = "";
+        editable.style.pointerEvents = "auto";
+        app.setAppState({ textPreview: null });
+      }
+    }
+  };
+
+  /**
+   * Updates preview content ONLY (text) when user types.
+   * Does NOT re-check position to avoid layout thrashing.
+   * Position is only rechecked on viewport changes.
+   */
+  const updatePreviewContent = () => {
+    if (!isTextCurrentlyOffScreen) {
+      return; // Text is on-screen, no preview needed
+    }
+
+    const currentText = editable.value;
+    if (lastPreviewText === currentText) {
+      return; // No text change
+    }
+
+    lastPreviewText = currentText;
+    const appState = app.state;
+
+    if (appState.textPreview) {
+      app.setAppState({
+        textPreview: {
+          ...appState.textPreview,
+          text: currentText,
+        },
+      });
+    }
+  };
+
   const editable = document.createElement("textarea");
 
   editable.dir = "auto";
@@ -429,6 +605,8 @@ export const textWysiwyg = ({
         editable.selectionEnd = selectionStart;
       }
       onChange(editable.value);
+      // Update preview content ONLY, don't check position
+      updatePreviewContent();
     };
   }
 
@@ -437,14 +615,38 @@ export const textWysiwyg = ({
       event.preventDefault();
       app.actionManager.executeAction(actionZoomIn);
       updateWysiwygStyle();
+      // Check preview visibility after zoom
+      if (!textPreviewCheckScheduled) {
+        textPreviewCheckScheduled = true;
+        requestAnimationFrame(() => {
+          checkAndUpdatePreviewVisibility();
+          textPreviewCheckScheduled = false;
+        });
+      }
     } else if (!event.shiftKey && actionZoomOut.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomOut);
       updateWysiwygStyle();
+      // Check preview visibility after zoom
+      if (!textPreviewCheckScheduled) {
+        textPreviewCheckScheduled = true;
+        requestAnimationFrame(() => {
+          checkAndUpdatePreviewVisibility();
+          textPreviewCheckScheduled = false;
+        });
+      }
     } else if (!event.shiftKey && actionResetZoom.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionResetZoom);
       updateWysiwygStyle();
+      // Check preview visibility after zoom
+      if (!textPreviewCheckScheduled) {
+        textPreviewCheckScheduled = true;
+        requestAnimationFrame(() => {
+          checkAndUpdatePreviewVisibility();
+          textPreviewCheckScheduled = false;
+        });
+      }
     } else if (actionDecreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionDecreaseFontSize);
     } else if (actionIncreaseFontSize.keyTest(event)) {
@@ -480,7 +682,22 @@ export const textWysiwyg = ({
       }
       // We must send an input event to resize the element
       editable.dispatchEvent(new Event("input"));
+    } else if (
+      event.key === KEYS.ARROW_LEFT ||
+      event.key === KEYS.ARROW_RIGHT ||
+      event.key === KEYS.ARROW_UP ||
+      event.key === KEYS.ARROW_DOWN ||
+      event.key === "Home" ||
+      event.key === "End"
+    ) {
+      // Caret movement doesn't change text, just update content display
+      updatePreviewContent();
     }
+  };
+
+  editable.onclick = () => {
+    // Click movement doesn't change text, just update content display
+    updatePreviewContent();
   };
 
   const TAB_SIZE = 4;
@@ -650,6 +867,12 @@ export const textWysiwyg = ({
     editable.oninput = null;
     editable.onkeydown = null;
 
+    // Clear any pending preview timeout
+    if (previewVisibilityTimeout) {
+      clearTimeout(previewVisibilityTimeout);
+      previewVisibilityTimeout = null;
+    }
+
     if (observer) {
       observer.disconnect();
     }
@@ -665,6 +888,7 @@ export const textWysiwyg = ({
     unbindOnScroll();
 
     editable.remove();
+    app.setAppState({ textPreview: null });
   };
 
   const bindBlurEvent = (event?: MouseEvent) => {
@@ -780,9 +1004,20 @@ export const textWysiwyg = ({
 
   const unbindOnScroll = app.onScrollChangeEmitter.on(() => {
     updateWysiwygStyle();
+    // Check preview visibility on scroll (debounced via RAF)
+    if (!textPreviewCheckScheduled) {
+      textPreviewCheckScheduled = true;
+      requestAnimationFrame(() => {
+        checkAndUpdatePreviewVisibility();
+        textPreviewCheckScheduled = false;
+      });
+    }
   });
 
   // ---------------------------------------------------------------------------
+  // INITIALIZE TEXT PREVIEW: Check initial off-screen state
+  // ---------------------------------------------------------------------------
+  checkAndUpdatePreviewVisibility();
 
   let isDestroyed = false;
 
@@ -799,10 +1034,28 @@ export const textWysiwyg = ({
   if (canvas && "ResizeObserver" in window) {
     observer = new window.ResizeObserver(() => {
       updateWysiwygStyle();
+      // Check preview visibility on resize
+      if (!textPreviewCheckScheduled) {
+        textPreviewCheckScheduled = true;
+        requestAnimationFrame(() => {
+          checkAndUpdatePreviewVisibility();
+          textPreviewCheckScheduled = false;
+        });
+      }
     });
     observer.observe(canvas);
   } else {
-    window.addEventListener("resize", updateWysiwygStyle);
+    window.addEventListener("resize", () => {
+      updateWysiwygStyle();
+      // Check preview visibility on resize
+      if (!textPreviewCheckScheduled) {
+        textPreviewCheckScheduled = true;
+        requestAnimationFrame(() => {
+          checkAndUpdatePreviewVisibility();
+          textPreviewCheckScheduled = false;
+        });
+      }
+    });
   }
 
   editable.onpointerdown = (event) => event.stopPropagation();
