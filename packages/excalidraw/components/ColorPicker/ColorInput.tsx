@@ -29,12 +29,14 @@ export const ColorInput = ({
 }) => {
   const editorInterface = useEditorInterface();
   const [innerValue, setInnerValue] = useState(color);
+  const [isInvalid, setIsInvalid] = useState(false);
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
 
   useEffect(() => {
     setInnerValue(color);
+    setIsInvalid(false);
   }, [color]);
 
   const changeColor = useCallback(
@@ -44,6 +46,12 @@ export const ColorInput = ({
 
       if (color) {
         onChange(color);
+        setIsInvalid((prev) => (prev ? false : prev));
+      } else if (value.trim() !== "" && value.replace(/^#/, "").length >= 3) {
+        // Only show invalid feedback when user has typed at least 3 characters
+        setIsInvalid((prev) => (prev ? prev : true));
+      } else {
+        setIsInvalid((prev) => (prev ? false : prev));
       }
       setInnerValue(value);
     },
@@ -68,7 +76,11 @@ export const ColorInput = ({
   }, [setEyeDropperState]);
 
   return (
-    <div className="color-picker__input-label">
+    <div
+      className={clsx("color-picker__input-label", {
+        "color-picker__input-label--invalid": isInvalid,
+      })}
+    >
       <div className="color-picker__input-hash">#</div>
       <input
         ref={activeSection === "hex" ? inputRef : undefined}
@@ -82,6 +94,7 @@ export const ColorInput = ({
         value={(innerValue || "").replace(/^#/, "")}
         onBlur={() => {
           setInnerValue(color);
+          setIsInvalid(false);
         }}
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
