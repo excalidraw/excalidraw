@@ -235,6 +235,24 @@ export const actionWrapTextInContainer = register({
     const selectedElements = app.scene.getSelectedElements(appState);
     let updatedElements: readonly ExcalidrawElement[] = elements.slice();
     const containerIds: Mutable<AppState["selectedElementIds"]> = {};
+    const wrappedTextIds = new Set<string>();
+
+    for (const textElement of selectedElements) {
+      if (isTextElement(textElement)) {
+        wrappedTextIds.add(textElement.id);
+      }
+    }
+    //remove text link with prev shape
+    for (const element of selectedElements) {
+      if (!isTextElement(element) && element.boundElements?.length) {
+        const newBoundElementsArray = element.boundElements.filter(
+          (b) => !(b.type === "text" && wrappedTextIds.has(b.id)),
+        );
+        app.scene.mutateElement(element, {
+          boundElements: newBoundElementsArray,
+        });
+      }
+    }
 
     for (const textElement of selectedElements) {
       if (isTextElement(textElement) && !isBoundToContainer(textElement)) {
