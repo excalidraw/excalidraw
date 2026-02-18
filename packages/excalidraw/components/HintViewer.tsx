@@ -40,7 +40,7 @@ const getHints = ({
   editorInterface,
   app,
 }: HintViewerProps): null | string | string[] => {
-  const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
+  const { activeTool, isScaling, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
   if (
@@ -104,7 +104,7 @@ const getHints = ({
   }
 
   if (
-    isResizing &&
+    isScaling &&
     lastPointerDownWith === "mouse" &&
     selectedElements.length === 1
   ) {
