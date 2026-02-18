@@ -957,6 +957,21 @@ const ExcalidrawWrapper = () => {
         {localStorageQuotaExceeded && (
           <div className="alert alert--danger">
             {t("alerts.localStorageQuotaExceeded")}
+            <div
+              className="tooltip-wrapper"
+              style={{ display: "inline-block", marginLeft: "6px" }}
+            >
+              <span
+                className="tooltip-icon"
+                aria-label="More info"
+                tabIndex={0}
+              >
+                ℹ️
+              </span>
+              <div className="tooltip-content">
+                {t("alerts.tooltipslocalStorageInfo")}
+              </div>
+            </div>
           </div>
         )}
         {latestShareableLink && (

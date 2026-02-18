@@ -263,7 +263,8 @@
     "removeItemsFromsLibrary": "Delete {{count}} item(s) from library?",
     "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled.",
     "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!",
-    "localStorageQuotaExceeded": "Browser storage quota exceeded. Changes will not be saved."
+    "localStorageQuotaExceeded": "Browser storage quota exceeded. Changes will not be saved.",
+    "tooltipslocalStorageInfo": "Your browser’s storage is full. Try saving your current scene as a file, then remove older saved drawings to free up space."
   },
   "errors": {
     "unsupportedFileType": "Unsupported file type.",
