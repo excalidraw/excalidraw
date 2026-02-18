@@ -10392,6 +10392,25 @@ class App extends React.Component<AppProps, AppState> {
                   },
                   { informMutation: false, isDragging: false },
                 );
+
+                const boundText = getBoundTextElement(
+                  element,
+                  this.scene.getNonDeletedElementsMap(),
+                );
+
+                if (boundText) {
+                  const boundTextIndex = boundText.groupIds.indexOf(
+                    this.state.editingGroupId!,
+                  );
+
+                  mutateElement(
+                    boundText,
+                    {
+                      groupIds: boundText.groupIds.slice(0, boundTextIndex),
+                    },
+                    false,
+                  );
+                }
               }
 
               nextElements.forEach((element) => {
