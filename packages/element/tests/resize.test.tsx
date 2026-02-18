@@ -19,7 +19,7 @@ import {
 import type { LocalPoint } from "@excalidraw/math";
 
 import { isLinearElement } from "../src/typeChecks";
-import { resizeSingleElement } from "../src/resizeElements";
+import { getResizeArrowDirection, resizeSingleElement } from "../src/resizeElements";
 import { LinearElementEditor } from "../src/linearElementEditor";
 import { getElementPointsCoords } from "../src/bounds";
 
@@ -1361,5 +1361,99 @@ describe("multiple selection", () => {
     );
     expect(arrowLabel.angle).toEqual(0);
     expect(arrowLabel.fontSize).toBeCloseTo(20 * scaleY);
+  });
+});
+
+const mockArrow = (px: number, py: number): ExcalidrawLinearElement => ({
+
+  id: "mock-arrow",
+  type: "arrow",
+  x: 0,
+  y: 0,
+  width: Math.abs(px),
+  height: Math.abs(py),
+  angle: 0,
+  strokeColor: "#000",
+  backgroundColor: "transparent",
+  fillStyle: "hachure",
+  strokeWidth: 1,
+  strokeStyle: "solid",
+  roundness: null,
+  roughness: 0,
+  opacity: 100,
+  groupIds: [],
+  seed: 1,
+  version: 1,
+  versionNonce: 1,
+  isDeleted: false,
+  boundElements: [],
+  updated: 1,
+  link: null,
+  locked: false,
+  points: [
+    [0, 0],
+    [px, py],
+  ],
+  lastCommittedPoint: null,
+  startBinding: null,
+  endBinding: null,
+  startArrowhead: null,
+  endArrowhead: null,
+  customData: undefined,
+  index: 0 as unknown as import("../src/types").FractionalIndex,
+  frameId: null,
+});
+
+describe("getResizeArrowDirection (MC/DC)", () => {
+  // CT1: DP(F,F,F,F) -> T2:L16
+  it('CT1: should return "origin" for non-resize handles', () => {
+    const element = mockArrow(10, 10);
+    expect(getResizeArrowDirection("rotation", element)).toBe("origin");
+  });
+
+  // CT2: DP(V,F,F,F) -> T2:L12
+  it('CT2: should return "end" for "ne" handle and px >= 0', () => {
+    const element = mockArrow(10, 10);
+    expect(getResizeArrowDirection("ne", element)).toBe("end");
+  });
+
+  // CT3: DP(F,V,F,F) -> T2:L14
+  it('CT3: should return "end" for "sw" handle and px <= 0', () => {
+    const element = mockArrow(-10, 10);
+    expect(getResizeArrowDirection("sw", element)).toBe("end");
+  });
+
+
+  it('CT4: should return "end" for "nw" handle and px < 0', () => {
+    const element = mockArrow(-10, 10);
+    expect(getResizeArrowDirection("nw", element)).toBe("end");
+  });
+
+  it('CT5: should return "end" for "nw" handle and py < 0', () => {
+    const element = mockArrow(10, -10);
+    expect(getResizeArrowDirection("nw", element)).toBe("end");
+  });
+
+  it('CT6: should return "origin" for "nw" handle and px/py not negative', () => {
+    const element = mockArrow(10, 10);
+    expect(getResizeArrowDirection("nw", element)).toBe("origin");
+  });
+
+  // CT7: SD2(V,F) -> T4:L2
+  it('CT7: should return "end" for "se" handle and px > 0', () => {
+    const element = mockArrow(10, -10);
+    expect(getResizeArrowDirection("se", element)).toBe("end");
+  });
+
+  // CT8: SD2(F,V) -> T4:L3
+  it('CT8: should return "end" for "se" handle and py > 0', () => {
+    const element = mockArrow(-10, 10);
+    expect(getResizeArrowDirection("se", element)).toBe("end");
+  });
+
+  // CT9: SD2(F,F) -> T4:L4
+  it('CT9: should return "origin" for "se" handle and px/py not positive', () => {
+    const element = mockArrow(-10, -10);
+    expect(getResizeArrowDirection("se", element)).toBe("origin");
   });
 });
