@@ -383,6 +383,15 @@
       box-shadow: 0 0 0 1px var(--color-primary-darkest);
       border-radius: var(--border-radius-lg);
     }
+
+    &--error {
+      border-color: #e03131;
+      background-color: rgba(224, 49, 49, 0.05);
+
+      &:focus-within {
+        box-shadow: 0 0 0 1px #e03131;
+      }
+    }
   }
 
   .color-picker__input-hash {

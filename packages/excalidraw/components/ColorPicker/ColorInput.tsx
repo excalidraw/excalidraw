@@ -29,26 +29,35 @@ export const ColorInput = ({
 }) => {
   const editorInterface = useEditorInterface();
   const [innerValue, setInnerValue] = useState(color);
+  const [isInvalid, setIsInvalid] = useState(false);
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
 
   useEffect(() => {
     setInnerValue(color);
+    setIsInvalid(false);
   }, [color]);
 
   const changeColor = useCallback(
     (inputValue: string) => {
       const value = inputValue.toLowerCase();
-      const color = normalizeInputColor(value);
+      const normalizedColor = normalizeInputColor(value);
 
-      if (color) {
-        onChange(color);
+      if (normalizedColor) {
+        onChange(normalizedColor);
+        setIsInvalid(false);
+      } else if (value.trim() !== "") {
+        // Only show error if there's actual input that's invalid
+        setIsInvalid(true);
+      } else {
+        setIsInvalid(false);
       }
       setInnerValue(value);
     },
     [onChange],
   );
+
 
   const inputRef = useRef<HTMLInputElement>(null);
   const eyeDropperTriggerRef = useRef<HTMLDivElement>(null);
@@ -68,7 +77,7 @@ export const ColorInput = ({
   }, [setEyeDropperState]);
 
   return (
-    <div className="color-picker__input-label">
+    <div className={clsx("color-picker__input-label", { "color-picker__input-label--error": isInvalid })}>
       <div className="color-picker__input-hash">#</div>
       <input
         ref={activeSection === "hex" ? inputRef : undefined}
@@ -76,12 +85,15 @@ export const ColorInput = ({
         spellCheck={false}
         className="color-picker-input"
         aria-label={label}
+        aria-invalid={isInvalid}
+        title={isInvalid ? t("colorPicker.invalidColor") : undefined}
         onChange={(event) => {
           changeColor(event.target.value);
         }}
         value={(innerValue || "").replace(/^#/, "")}
         onBlur={() => {
           setInnerValue(color);
+          setIsInvalid(false);
         }}
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
@@ -115,10 +127,10 @@ export const ColorInput = ({
                 s
                   ? null
                   : {
-                      keepOpenOnAlt: false,
-                      onSelect: (color) => onChange(color),
-                      colorPickerType,
-                    },
+                    keepOpenOnAlt: false,
+                    onSelect: (color) => onChange(color),
+                    colorPickerType,
+                  },
               )
             }
             title={`${t(
