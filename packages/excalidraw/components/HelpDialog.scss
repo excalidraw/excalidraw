@@ -6,6 +6,38 @@
       max-width: 960px;
     }
 
+    .HelpDialog__search-input {
+      width: 0;
+      opacity: 0;
+      margin-left: 0;
+      padding: 4px 0;
+      font-size: 1rem;
+      background: transparent;
+      color: var(--text-primary-color);
+      border: none;
+      border-bottom: 2px solid var(--color-primary);
+      outline: none;
+      box-shadow: none;
+      appearance: none;
+      font-family: inherit;
+      transition: width 0.3s ease, opacity 0.2s ease, margin 0.2s ease;
+
+      &::placeholder {
+        color: var(--text-secondary-color, #aaa);
+        opacity: 0.7;
+      }
+
+      &:focus {
+        border-bottom-color: var(--color-primary);
+      }
+
+      &--active {
+        width: 180px;
+        opacity: 1;
+        margin-left: 8px;
+      }
+    }
+
     h3 {
       margin: 1.5rem 0;
       font-weight: 700;
@@ -127,5 +159,6 @@
       font-family: inherit;
       line-height: 1;
     }
+
   }
 }
