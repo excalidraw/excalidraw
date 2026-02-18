@@ -718,12 +718,29 @@ const drawElementFromCanvas = (
     // revert afterwards we don't have account for it during drawing
     context.translate(-cx, -cy);
 
+    let x =
+      (x1 + appState.scrollX) * window.devicePixelRatio -
+      (padding * elementWithCanvas.scale) / elementWithCanvas.scale;
+    let y =
+      (y1 + appState.scrollY) * window.devicePixelRatio -
+      (padding * elementWithCanvas.scale) / elementWithCanvas.scale;
+
+    if (x % 1 >= 0.5 && x % 1 < 0.6) {
+      x = Math.floor(x) + 0.6;
+    } else if (x % 1 > 0.4 && x % 1 <= 0.5) {
+      x = Math.floor(x) + 0.4;
+    }
+
+    if (y % 1 >= 0.5 && y % 1 < 0.6) {
+      y = Math.floor(y) + 0.6;
+    } else if (y % 1 > 0.4 && y % 1 <= 0.5) {
+      y = Math.floor(y) + 0.4;
+    }
+
     context.drawImage(
       elementWithCanvas.canvas!,
-      (x1 + appState.scrollX) * window.devicePixelRatio -
-        (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
-      (y1 + appState.scrollY) * window.devicePixelRatio -
-        (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
+      x,
+      y,
       elementWithCanvas.canvas!.width / elementWithCanvas.scale,
       elementWithCanvas.canvas!.height / elementWithCanvas.scale,
     );
