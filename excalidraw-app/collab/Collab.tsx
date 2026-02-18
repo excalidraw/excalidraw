@@ -352,13 +352,14 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     }
   };
 
-  stopCollaboration = (keepRemoteState = true) => {
+  stopCollaboration = async (keepRemoteState = true) => {
     this.queueBroadcastAllElements.cancel();
     this.queueSaveToFirebase.cancel();
     this.loadImageFiles.cancel();
     this.resetErrorIndicator(true);
 
-    this.saveCollabRoomToFirebase(
+    // Ensure we save the latest state before stopping collaboration
+    await this.saveCollabRoomToFirebase(
       getSyncableElements(
         this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       ),
@@ -379,6 +380,9 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       // that could have been saved in other tabs while we were collaborating
       resetBrowserStateVersions();
 
+      // Ensure all pending changes are saved before pushing new state
+      this.queueSaveToFirebase.flush();
+      
       window.history.pushState({}, APP_NAME, window.location.origin);
       this.destroySocketClient();
 
@@ -970,9 +974,9 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   }, SYNC_FULL_SCENE_INTERVAL_MS);
 
   queueSaveToFirebase = throttle(
-    () => {
+    async () => {
       if (this.portal.socketInitialized) {
-        this.saveCollabRoomToFirebase(
+        await this.saveCollabRoomToFirebase(
           getSyncableElements(
             this.excalidrawAPI.getSceneElementsIncludingDeleted(),
           ),

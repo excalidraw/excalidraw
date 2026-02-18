@@ -2658,7 +2658,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState((state) => ({
         ...getDefaultAppState(),
         isLoading: opts?.resetLoadingState ? false : state.isLoading,
-        theme: this.state.theme,
+        theme: state.theme,
       }));
       this.resetStore();
       this.resetHistory();
@@ -3270,8 +3270,21 @@ class App extends React.Component<AppProps, AppState> {
     // init, which would trigger onChange with empty elements, which would then
     // override whatever is in localStorage currently.
     if (!this.state.isLoading) {
-      this.props.onChange?.(elements, this.state, this.files);
-      this.onChangeEmitter.trigger(elements, this.state, this.files);
+      // Only trigger onChange when there are actual changes to elements or important app state
+      const prevElements = this.scene.getElementsIncludingDeleted();
+      const hasElementChanges = elements.length !== prevElements.length ||
+        elements.some((element, index) => element !== prevElements[index]);
+      
+      const hasImportantStateChanges = 
+        this.state.selectedElementIds !== prevState.selectedElementIds ||
+        this.state.width !== prevState.width ||
+        this.state.height !== prevState.height ||
+        this.state.editingTextElement !== prevState.editingTextElement;
+
+      if (hasElementChanges || hasImportantStateChanges) {
+        this.props.onChange?.(elements, this.state, this.files);
+        this.onChangeEmitter.trigger(elements, this.state, this.files);
+      }
     }
   }
 
