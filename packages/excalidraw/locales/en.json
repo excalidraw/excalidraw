@@ -427,6 +427,7 @@
     "howto": "Follow our guides",
     "or": "or",
     "preventBinding": "Prevent arrow binding",
+    "preventGridSnapping": "Precision draw (ignore grid)",
     "tools": "Tools",
     "shortcuts": "Keyboard shortcuts",
     "textFinish": "Finish editing (text editor)",
