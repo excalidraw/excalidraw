@@ -183,13 +183,44 @@ window.addEventListener(
   },
 );
 
+// Replace the existing allowedDomains array with a more permissive approach
+const allowedDomains = [
+  "excalidraw.com",
+  "localhost",
+  "127.0.0.1",
+  // Add any additional trusted domains here
+];
+
+const getHostname = (): string => {
+  try {
+    return new URL(window.location.href).hostname;
+  } catch {
+    return window.location.hostname ?? "";
+  }
+};
+
+const hostname = getHostname();
+
+const isWhitelisted = allowedDomains.some(
+  (domain) => hostname === domain || hostname.endsWith(`.${domain}`),
+);
+
 let isSelfEmbedding = false;
 
 if (window.self !== window.top) {
   try {
-    const parentUrl = new URL(document.referrer);
+    const parentUrl = new URL(document.referrer || "");
     const currentUrl = new URL(window.location.href);
-    if (parentUrl.origin === currentUrl.origin) {
+    if (!isWhitelisted) {
+      alert("Embedding not allowed. Please request whitelisting.");
+      try {
+        // attempt to break out of the iframe; may throw on cross-origin
+        window.top?.location.replace(window.location.href);
+      } catch {
+        // stop the app from initializing by treating as self-embedding
+        isSelfEmbedding = true;
+      }
+    } else if (parentUrl.origin === currentUrl.origin) {
       isSelfEmbedding = true;
     }
   } catch (error) {
