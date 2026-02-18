@@ -50,7 +50,11 @@ import {
   actionBringForward,
   actionSendToBack,
 } from "../actions";
-import { createUndoAction, createRedoAction } from "../actions/actionHistory";
+import {
+  createUndoAction,
+  createRedoAction,
+  createClearHistoryAction,
+} from "../actions/actionHistory";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import * as StaticScene from "../renderer/staticScene";
 import { getDefaultAppState } from "../appState";
@@ -2105,6 +2109,65 @@ describe("history", () => {
       expect(h.history.isRedoStackEmpty).toBeFalsy();
       expect(queryByTestId(container, "button-undo")).toBeDisabled();
       expect(queryByTestId(container, "button-redo")).not.toBeDisabled();
+    });
+
+    it("should clear history when clearHistory action is executed", async () => {
+      const { container } = await render(<Excalidraw />);
+
+      const undoAction = createUndoAction(h.history);
+      const clearHistoryAction = createClearHistoryAction(h.history);
+
+      // Create some elements to build history
+      UI.createElement("rectangle", { x: 10, y: 10 });
+      UI.createElement("ellipse", { x: 50, y: 50 });
+      
+      expect(h.history.isUndoStackEmpty).toBe(false);
+      expect(h.history.isRedoStackEmpty).toBe(true);
+
+      // Undo once to create redo stack
+      API.executeAction(undoAction);
+      
+      expect(h.history.isUndoStackEmpty).toBe(false);
+      expect(h.history.isRedoStackEmpty).toBe(false);
+
+      // Execute clear history action
+      API.executeAction(clearHistoryAction);
+
+      // Both stacks should be empty
+      await waitFor(() => {
+        expect(h.history.isUndoStackEmpty).toBe(true);
+        expect(h.history.isRedoStackEmpty).toBe(true);
+      });
+
+      // Buttons should be disabled
+      await waitFor(() => {
+        expect(queryByTestId(container, "button-undo")).toBeDisabled();
+        expect(queryByTestId(container, "button-redo")).toBeDisabled();
+        expect(queryByTestId(container, "button-clear-history")).toBeDisabled();
+      });
+    });
+
+    it("should keep elements on canvas after clearing history", async () => {
+      await render(<Excalidraw />);
+
+      const clearHistoryAction = createClearHistoryAction(h.history);
+
+      // Create an element
+      const rect = UI.createElement("rectangle", { x: 10, y: 10 });
+      
+      expect(h.elements.length).toBe(1);
+      expect(h.history.isUndoStackEmpty).toBe(false);
+
+      // Clear history
+      API.executeAction(clearHistoryAction);
+
+      // Element should still be on canvas
+      expect(h.elements.length).toBe(1);
+      expect(h.elements[0].id).toBe(rect.id);
+      
+      // But history should be empty
+      expect(h.history.isUndoStackEmpty).toBe(true);
+      expect(h.history.isRedoStackEmpty).toBe(true);
     });
   });
 

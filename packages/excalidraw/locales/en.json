@@ -222,6 +222,7 @@
     "edit": "Edit",
     "undo": "Undo",
     "redo": "Redo",
+    "clearHistory": "Clear history",
     "resetLibrary": "Reset library",
     "createNewRoom": "Create new room",
     "fullScreen": "Full screen",
