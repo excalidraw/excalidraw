@@ -1,4 +1,7 @@
-import { makeNextSelectedElementIds } from "../src/selection";
+import {
+  makeNextSelectedElementIds,
+  isSomeElementSelected,
+} from "../src/selection";
 
 describe("makeNextSelectedElementIds", () => {
   const _makeNextSelectedElementIds = (
@@ -31,5 +34,25 @@ describe("makeNextSelectedElementIds", () => {
       { 1: true, 3: true },
       true,
     );
+  });
+});
+
+describe("isSomeElementSelected", () => {
+  it("should return true if at least one element is selected", () => {
+    const elements = [{ id: "1" }, { id: "2" }] as any;
+    const appState = { selectedElementIds: { 2: true } as Record<string, true> };
+    expect(isSomeElementSelected(elements, appState)).toBe(true);
+  });
+
+  it("should return false if no elements are selected", () => {
+    const elements = [{ id: "1" }, { id: "2" }] as any;
+    const appState = { selectedElementIds: { 3: true } as Record<string, true> };
+    expect(isSomeElementSelected(elements, appState)).toBe(false);
+  });
+
+  it("should return false if elements array is empty", () => {
+    const elements = [] as any;
+    const appState = { selectedElementIds: { 1: true } as Record<string, true> };
+    expect(isSomeElementSelected(elements, appState)).toBe(false);
   });
 });
