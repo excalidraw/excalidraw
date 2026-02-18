@@ -136,6 +136,10 @@
     top: 1rem;
     right: 1rem;
     bottom: 1rem;
+
+    @media (max-width: 1535px) and (min-width: 1024px) {
+      top: 9rem;
+    }
   }
 
   .welcome-screen-center__logo {
