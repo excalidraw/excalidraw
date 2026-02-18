@@ -243,8 +243,9 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
 };
 
 const restoreElementWithProperties = <
-  T extends Required<Omit<ExcalidrawElement, "customData">> & {
+  T extends Required<Omit<ExcalidrawElement, "customData" | "visibility">> & {
     customData?: ExcalidrawElement["customData"];
+    visibility?: ExcalidrawElement["visibility"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
     /** @deprecated */
@@ -259,7 +260,9 @@ const restoreElementWithProperties = <
     // @ts-ignore TS complains here but type checks the call sites fine.
     keyof K
   > &
-    Partial<Pick<ExcalidrawElement, "type" | "x" | "y" | "customData">>,
+    Partial<
+      Pick<ExcalidrawElement, "type" | "x" | "y" | "visibility" | "customData">
+    >,
 ): T => {
   const base: Pick<T, keyof ExcalidrawElement> = {
     type: extra.type || element.type,
@@ -304,6 +307,7 @@ const restoreElementWithProperties = <
     updated: element.updated ?? getUpdatedTimestamp(),
     link: element.link ? normalizeLink(element.link) : null,
     locked: element.locked ?? false,
+    visibility: element.visibility,
   };
 
   if ("customData" in element || "customData" in extra) {

@@ -5614,6 +5614,7 @@ class App extends React.Component<AppProps, AppState> {
                   !(isTextElement(element) && element.containerId)),
             )
     )
+      .filter((el) => !el.visibility || el.visibility === "active")
       .filter((el) => this.hitElement(x, y, el))
       .filter((element) => {
         // hitting a frame's element from outside the frame is not considered a hit

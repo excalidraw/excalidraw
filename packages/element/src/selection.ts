@@ -64,35 +64,37 @@ export const getElementsWithinSelection = (
   const [selectionX1, selectionY1, selectionX2, selectionY2] =
     getElementAbsoluteCoords(selection, elementsMap);
 
-  let elementsInSelection = elements.filter((element) => {
-    let [elementX1, elementY1, elementX2, elementY2] = getElementBounds(
-      element,
-      elementsMap,
-    );
-
-    const containingFrame = getContainingFrame(element, elementsMap);
-    if (containingFrame) {
-      const [fx1, fy1, fx2, fy2] = getElementBounds(
-        containingFrame,
+  let elementsInSelection = elements
+    .filter((e) => !e.visibility || e.visibility === "active")
+    .filter((element) => {
+      let [elementX1, elementY1, elementX2, elementY2] = getElementBounds(
+        element,
         elementsMap,
       );
 
-      elementX1 = Math.max(fx1, elementX1);
-      elementY1 = Math.max(fy1, elementY1);
-      elementX2 = Math.min(fx2, elementX2);
-      elementY2 = Math.min(fy2, elementY2);
-    }
+      const containingFrame = getContainingFrame(element, elementsMap);
+      if (containingFrame) {
+        const [fx1, fy1, fx2, fy2] = getElementBounds(
+          containingFrame,
+          elementsMap,
+        );
 
-    return (
-      element.locked === false &&
-      element.type !== "selection" &&
-      !isBoundToContainer(element) &&
-      selectionX1 <= elementX1 &&
-      selectionY1 <= elementY1 &&
-      selectionX2 >= elementX2 &&
-      selectionY2 >= elementY2
-    );
-  });
+        elementX1 = Math.max(fx1, elementX1);
+        elementY1 = Math.max(fy1, elementY1);
+        elementX2 = Math.min(fx2, elementX2);
+        elementY2 = Math.min(fy2, elementY2);
+      }
+
+      return (
+        element.locked === false &&
+        element.type !== "selection" &&
+        !isBoundToContainer(element) &&
+        selectionX1 <= elementX1 &&
+        selectionY1 <= elementY1 &&
+        selectionX2 >= elementX2 &&
+        selectionY2 >= elementY2
+      );
+    });
 
   elementsInSelection = excludeElementsInFrames
     ? excludeElementsInFramesFromSelection(elementsInSelection)
