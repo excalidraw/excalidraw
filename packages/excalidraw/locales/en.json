@@ -198,7 +198,10 @@
     "multipleResults": "results",
     "placeholder": "Find text on canvas...",
     "frames": "Frames",
-    "texts": "Texts"
+    "texts": "Texts",
+    "replacePlaceholder": "Replace text on canvas...",
+    "replaceAll": "Replace all",
+    "replace": "Replace"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
