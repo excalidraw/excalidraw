@@ -2251,7 +2251,7 @@ class App extends React.Component<AppProps, AppState> {
       this.files,
       {
         exportBackground: this.state.exportBackground,
-        name: this.getName(),
+        name: this.getName(elements),
         viewBackgroundColor: this.state.viewBackgroundColor,
         exportingFrame: opts.exportingFrame,
       },
@@ -5314,10 +5314,25 @@ class App extends React.Component<AppProps, AppState> {
     return gesture.pointers.size >= 2;
   };
 
-  public getName = () => {
-    return (
-      this.state.name ||
-      this.props.name ||
+  public getName = (elements?: readonly ExcalidrawElement[]) => {
+
+    // <PR by obaidregens | the selected text (max 30 chars) will be included before appName for the suggested filename>
+
+    // ?. makes 'text' undefined if elements is undefined so the default return value will be skipped to
+    const text = elements?.filter((el) => !el.isDeleted && isTextElement(el))
+    .map((el) => (el as ExcalidrawTextElement).text)
+    .join("")
+    .trim();                                                                              
+
+    if (text){
+      return `[${text.slice(0, 30)}] ${t("labels.untitled")}-${getDateTime()}`;
+    }
+
+    // </PR by obaidregens | the selected text (max 30 chars) will be included before appName for the suggested filename>
+                                                                                                                                                                                                                
+    return (                                                                                                                                                                                                    
+      this.state.name ||                                                                                                                                                                                        
+      this.props.name ||                                                                                                                                                                                        
       `${t("labels.untitled")}-${getDateTime()}`
     );
   };
