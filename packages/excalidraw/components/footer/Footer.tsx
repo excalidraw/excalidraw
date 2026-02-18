@@ -23,6 +23,11 @@ const Footer = ({
 }) => {
   const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
 
+  // NEW: how many elements are currently selected?
+  const selectedCount = appState.selectedElementIds
+    ? Object.keys(appState.selectedElementIds).length
+    : 0;
+
   return (
     <footer
       role="contentinfo"
@@ -49,6 +54,22 @@ const Footer = ({
                     appState.zenModeEnabled,
                 })}
               />
+            )}
+
+            {/* NEW: show selection count when something is selected */}
+            {selectedCount > 0 && (
+              <div
+                className="footer-selection-indicator"
+                style={{
+                  fontSize: "0.75rem",
+                  opacity: 0.8,
+                  marginTop: 4,
+                }}
+              >
+                {selectedCount === 1
+                  ? "1 element selected"
+                  : `${selectedCount} elements selected`}
+              </div>
             )}
           </Section>
         </Stack.Col>
