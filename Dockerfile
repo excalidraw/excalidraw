@@ -1,6 +1,7 @@
 FROM --platform=${BUILDPLATFORM} node:18 AS build
 
 WORKDIR /opt/node_app
+EXPOSE 8080
 
 COPY . .
 
@@ -16,5 +17,6 @@ RUN npm_config_target_arch=${TARGETARCH} yarn build:app:docker
 FROM --platform=${TARGETPLATFORM} nginx:1.27-alpine
 
 COPY --from=build /opt/node_app/excalidraw-app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
 
-HEALTHCHECK CMD wget -q -O /dev/null http://localhost || exit 1
+HEALTHCHECK CMD wget -q -O /dev/null http://localhost:8080 || exit 1
