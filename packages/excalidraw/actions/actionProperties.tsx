@@ -1972,3 +1972,171 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
     );
   },
 });
+
+export const actionChangeTextStrokeColor = register<
+  Pick<AppState, "currentItemTextStrokeColor">
+>({
+  name: "changeTextStrokeColor",
+  label: "labels.textStroke",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      ...(value?.currentItemTextStrokeColor !== undefined && {
+        elements: changeProperty(
+          elements,
+          appState,
+          (el) => {
+            if (isTextElement(el)) {
+              return newElementWith(el, {
+                textStrokeColor: value.currentItemTextStrokeColor,
+              });
+            }
+            return el;
+          },
+          true,
+        ),
+      }),
+      appState: {
+        ...appState,
+        ...value,
+      },
+      captureUpdate:
+        value?.currentItemTextStrokeColor !== undefined
+          ? CaptureUpdateAction.IMMEDIATELY
+          : CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const { stylesPanelMode } = getStylesPanelInfo(app);
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+
+    return (
+      <>
+        {stylesPanelMode === "full" && (
+          <h3 aria-hidden="true">{t("labels.textStroke")}</h3>
+        )}
+        <ColorPicker
+          topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
+          palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
+          type="elementStroke"
+          label={t("labels.textStroke")}
+          color={getFormValue(
+            elements,
+            app,
+            (element) => {
+              if (isTextElement(element)) {
+                return element.textStrokeColor;
+              }
+              const boundTextElement = getBoundTextElement(element, elementsMap);
+              if (boundTextElement) {
+                return boundTextElement.textStrokeColor;
+              }
+              return null;
+            },
+            (element) =>
+              isTextElement(element) ||
+              getBoundTextElement(element, elementsMap) !== null,
+            (hasSelection) =>
+              !hasSelection ? appState.currentItemTextStrokeColor : null,
+          )}
+          onChange={(color) =>
+            updateData({ currentItemTextStrokeColor: color })
+          }
+          elements={elements}
+          appState={appState}
+          updateData={updateData}
+        />
+      </>
+    );
+  },
+});
+
+export const actionChangeTextStrokeWidth = register<
+  ExcalidrawTextElement["textStrokeWidth"]
+>({
+  name: "changeTextStrokeWidth",
+  label: "labels.textStrokeWidth",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(
+        elements,
+        appState,
+        (el) => {
+          if (isTextElement(el)) {
+            return newElementWith(el, {
+              textStrokeWidth: value,
+            });
+          }
+          return el;
+        },
+        true,
+      ),
+      appState: { ...appState, currentItemTextStrokeWidth: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+
+    return (
+      <fieldset>
+        <legend>{t("labels.textStrokeWidth")}</legend>
+        <div className="buttonList">
+          <RadioSelection
+            group="text-stroke-width"
+            options={[
+              {
+                value: 0,
+                text: t("labels.none"),
+                icon: StrokeWidthBaseIcon,
+                testId: "textStrokeWidth-none",
+              },
+              {
+                value: STROKE_WIDTH.thin,
+                text: t("labels.thin"),
+                icon: StrokeWidthBaseIcon,
+                testId: "textStrokeWidth-thin",
+              },
+              {
+                value: STROKE_WIDTH.bold,
+                text: t("labels.bold"),
+                icon: StrokeWidthBoldIcon,
+                testId: "textStrokeWidth-bold",
+              },
+              {
+                value: STROKE_WIDTH.extraBold,
+                text: t("labels.extraBold"),
+                icon: StrokeWidthExtraBoldIcon,
+                testId: "textStrokeWidth-extraBold",
+              },
+            ]}
+            value={getFormValue(
+              elements,
+              app,
+              (element) => {
+                if (isTextElement(element)) {
+                  return element.textStrokeWidth;
+                }
+                const boundTextElement = getBoundTextElement(
+                  element,
+                  elementsMap,
+                );
+                if (boundTextElement) {
+                  return boundTextElement.textStrokeWidth;
+                }
+                return null;
+              },
+              (element) =>
+                isTextElement(element) ||
+                getBoundTextElement(element, elementsMap) !== null,
+              (hasSelection) =>
+                hasSelection ? null : appState.currentItemTextStrokeWidth,
+            )}
+            onChange={(value) => updateData(value)}
+          />
+        </div>
+      </fieldset>
+    );
+  },
+});
