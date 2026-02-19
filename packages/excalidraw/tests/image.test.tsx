@@ -1,9 +1,11 @@
-import { randomId, reseed } from "@excalidraw/common";
+import { EXPORT_DATA_TYPES, randomId, reseed } from "@excalidraw/common";
+import decodePng from "png-chunks-extract";
 
 import type { FileId } from "@excalidraw/element/types";
 
 import * as blobModule from "../data/blob";
 import * as filesystemModule from "../data/filesystem";
+import { decodePngMetadata, encodePngMetadata } from "../data/image";
 import { Excalidraw } from "../index";
 import { createPasteEvent } from "../clipboard";
 
@@ -111,5 +113,49 @@ describe("image insertion", () => {
     UI.clickTool("image");
 
     await assert();
+  });
+});
+
+describe("png metadata", () => {
+  it("stores scene metadata in iTXt chunks", async () => {
+    const pngBlob = await API.loadFile("./fixtures/smiley.png");
+    const metadata = JSON.stringify({
+      type: EXPORT_DATA_TYPES.excalidraw,
+      elements: [{ type: "text", text: "😀" }],
+    });
+
+    const embedded = await encodePngMetadata({
+      blob: pngBlob,
+      metadata,
+    });
+
+    const chunks = decodePng(
+      new Uint8Array(await blobModule.blobToArrayBuffer(embedded)),
+    );
+    expect(chunks.some((chunk) => chunk.name === "iTXt")).toBe(true);
+  });
+
+  it("roundtrips iTXt metadata content", async () => {
+    const pngBlob = await API.loadFile("./fixtures/smiley.png");
+    const metadata = JSON.stringify({
+      type: EXPORT_DATA_TYPES.excalidraw,
+      elements: [{ type: "text", text: "😀" }],
+    });
+
+    const embedded = await encodePngMetadata({
+      blob: pngBlob,
+      metadata,
+    });
+
+    await expect(decodePngMetadata(embedded)).resolves.toBe(metadata);
+  });
+
+  it("keeps legacy tEXt decoding support", async () => {
+    const legacyBlob = await API.loadFile("./fixtures/smiley_embedded_v2.png");
+    const metadata = await decodePngMetadata(legacyBlob);
+
+    expect(JSON.parse(metadata).elements).toEqual([
+      expect.objectContaining({ type: "text", text: "😀" }),
+    ]);
   });
 });
