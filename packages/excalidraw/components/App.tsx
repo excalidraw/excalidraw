@@ -1242,7 +1242,16 @@ class App extends React.Component<AppProps, AppState> {
 
   /** @returns true if iframe-like element click handled */
   private handleIframeLikeCenterClick(): boolean {
-    if (!this.lastPointerDownEvent || !this.lastPointerUpEvent) {
+    if (
+      !this.lastPointerDownEvent ||
+      !this.lastPointerUpEvent ||
+      // middle-click or something other than primary
+      this.lastPointerDownEvent.button !== POINTER_BUTTON.MAIN ||
+      // panning
+      isHoldingSpace ||
+      // wrong tool
+      !oneOf(this.state.activeTool.type, ["laser", "selection", "lasso"])
+    ) {
       return false;
     }
 
@@ -4872,7 +4881,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         const shape = findShapeByKey(event.key, this);
 
-        if (this.state.viewModeEnabled && !oneOf(["laser", "hand"], shape)) {
+        if (this.state.viewModeEnabled && !oneOf(shape, ["laser", "hand"])) {
           return;
         }
 

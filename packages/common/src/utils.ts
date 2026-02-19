@@ -1334,8 +1334,8 @@ export const setFeatureFlag = <F extends keyof FEATURE_FLAGS>(
 };
 
 export const oneOf = <N extends string | number | symbol | null, H extends N>(
-  haystack: readonly H[],
   needle: N,
+  haystack: readonly H[],
 ): needle is H => {
   return haystack.includes(needle as any);
 };
