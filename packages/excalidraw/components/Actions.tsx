@@ -1081,8 +1081,9 @@ export const ShapesSwitcher = ({
   return (
     <>
       {getToolbarTools(app).map(
-        ({ value, icon, key, numericKey, fillable }, index) => {
+        ({ value, icon, key, numericKey, fillable, toolbar }) => {
           if (
+            toolbar === false ||
             UIOptions.tools?.[
               value as Extract<
                 typeof value,
@@ -1099,6 +1100,9 @@ export const ShapesSwitcher = ({
           const shortcut = letter
             ? `${letter} ${t("helpDialog.or")} ${numericKey}`
             : `${numericKey}`;
+          const keybindingLabel =
+            value === "hand" ? undefined : numericKey || letter;
+
           // when in compact styles panel mode (tablet)
           // use a ToolPopover for selection/lasso toggle as well
           if (
@@ -1143,7 +1147,7 @@ export const ShapesSwitcher = ({
               checked={activeTool.type === value}
               name="editor-current-shape"
               title={`${capitalizeString(label)} — ${shortcut}`}
-              keyBindingLabel={numericKey || letter}
+              keyBindingLabel={keybindingLabel}
               aria-label={capitalizeString(label)}
               aria-keyshortcuts={shortcut}
               data-testid={`toolbar-${value}`}
