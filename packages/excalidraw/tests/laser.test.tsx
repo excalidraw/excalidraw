@@ -106,4 +106,26 @@ describe("laser tool interactions", () => {
 
     handleIframeLikeCenterClickSpy.mockRestore();
   });
+
+  it("doesn't pan in view mode when laser tool is active", async () => {
+    await render(<Excalidraw />);
+
+    API.setAppState({ viewModeEnabled: true });
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+    });
+
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toContain("");
+
+    const initialScrollX = h.state.scrollX;
+    const initialScrollY = h.state.scrollY;
+
+    mouse.downAt(100, 100);
+    mouse.moveTo(180, 160);
+    mouse.upAt(180, 160);
+
+    expect(h.state.scrollX).toBe(initialScrollX);
+    expect(h.state.scrollY).toBe(initialScrollY);
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toContain("");
+  });
 });

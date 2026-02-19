@@ -1219,12 +1219,14 @@ class App extends React.Component<AppProps, AppState> {
     if (
       hitElement &&
       isIframeLikeElement(hitElement) &&
-      this.isIframeLikeElementCenter(
-        hitElement,
-        moveEvent,
-        scenePointer.x,
-        scenePointer.y,
-      )
+      (this.state.viewModeEnabled ||
+        this.state.activeTool.type === "laser" ||
+        this.isIframeLikeElementCenter(
+          hitElement,
+          moveEvent,
+          scenePointer.x,
+          scenePointer.y,
+        ))
     ) {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
       this.setState({
@@ -1243,57 +1245,59 @@ class App extends React.Component<AppProps, AppState> {
       return false;
     }
 
-    const scenePointerStart = viewportCoordsToSceneCoords(
-      {
-        clientX: this.lastPointerDownEvent.clientX,
-        clientY: this.lastPointerDownEvent.clientY,
-      },
-      this.state,
+    const viewportClickStart_scenePoint = pointFrom(
+      viewportCoordsToSceneCoords(
+        {
+          clientX: this.lastPointerDownEvent.clientX,
+          clientY: this.lastPointerDownEvent.clientY,
+        },
+        this.state,
+      ),
     );
-    const scenePointerEnd = viewportCoordsToSceneCoords(
-      {
-        clientX: this.lastPointerUpEvent.clientX,
-        clientY: this.lastPointerUpEvent.clientY,
-      },
-      this.state,
-    );
-
-    const hitElementStart = this.getElementAtPosition(
-      scenePointerStart.x,
-      scenePointerStart.y,
-    );
-
-    const hitElementEnd = this.getElementAtPosition(
-      scenePointerEnd.x,
-      scenePointerEnd.y,
+    const viewportClickEnd_scenePoint = pointFrom(
+      viewportCoordsToSceneCoords(
+        {
+          clientX: this.lastPointerUpEvent.clientX,
+          clientY: this.lastPointerUpEvent.clientY,
+        },
+        this.state,
+      ),
     );
 
-    if (
-      !hitElementStart ||
-      !hitElementEnd ||
-      hitElementStart !== hitElementEnd ||
-      this.lastPointerUpEvent.timeStamp - this.lastPointerDownEvent.timeStamp >
-        300 ||
-      gesture.pointers.size > 1 ||
-      !isIframeLikeElement(hitElementStart) ||
-      !isIframeLikeElement(hitElementEnd) ||
-      !this.isIframeLikeElementCenter(
-        hitElementStart,
-        this.lastPointerUpEvent,
-        scenePointerStart.x,
-        scenePointerStart.y,
-      ) ||
-      !this.isIframeLikeElementCenter(
-        hitElementEnd,
-        this.lastPointerUpEvent,
-        scenePointerEnd.x,
-        scenePointerEnd.y,
-      )
-    ) {
+    const draggedDistance = pointDistance(
+      viewportClickStart_scenePoint,
+      viewportClickEnd_scenePoint,
+    );
+
+    if (draggedDistance > DRAGGING_THRESHOLD) {
       return false;
     }
 
-    const iframeLikeElement = hitElementEnd;
+    const hitElement = this.getElementAtPosition(
+      viewportClickStart_scenePoint[0],
+      viewportClickStart_scenePoint[1],
+    );
+
+    const shouldActivate =
+      hitElement &&
+      this.lastPointerUpEvent.timeStamp - this.lastPointerDownEvent.timeStamp <=
+        300 &&
+      gesture.pointers.size < 2 &&
+      isIframeLikeElement(hitElement) &&
+      (this.state.viewModeEnabled ||
+        this.state.activeTool.type === "laser" ||
+        this.isIframeLikeElementCenter(
+          hitElement,
+          this.lastPointerUpEvent,
+          viewportClickEnd_scenePoint[0],
+          viewportClickEnd_scenePoint[1],
+        ));
+
+    if (!shouldActivate) {
+      return false;
+    }
+
+    const iframeLikeElement = hitElement;
 
     if (
       this.state.activeEmbeddable?.element === iframeLikeElement &&
@@ -5113,7 +5117,8 @@ class App extends React.Component<AppProps, AppState> {
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
       if (
-        this.state.viewModeEnabled ||
+        (this.state.viewModeEnabled &&
+          this.state.activeTool.type !== "laser") ||
         this.state.openDialog?.name === "elementLinkSelector"
       ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
@@ -6227,9 +6232,8 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private redirectToLink = (
+  private handleElementLinkClick = (
     event: React.PointerEvent<HTMLCanvasElement>,
-    isTouchScreen: boolean,
   ) => {
     const draggedDistance = pointDistance(
       pointFrom(
@@ -6803,6 +6807,10 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
+    if (isEraserActive(this.state)) {
+      return;
+    }
+
     const hitElementMightBeLocked = this.getElementAtPosition(
       scenePointerX,
       scenePointerY,
@@ -6819,18 +6827,25 @@ class App extends React.Component<AppProps, AppState> {
       hitElement = hitElementMightBeLocked;
     }
 
-    this.hitLinkElement = this.getElementLinkAtPosition(
-      scenePointer,
-      hitElementMightBeLocked,
-    );
-    if (isEraserActive(this.state)) {
-      return;
+    if (
+      !this.handleIframeLikeElementHover({
+        hitElement,
+        scenePointer,
+        moveEvent: event,
+      })
+    ) {
+      this.hitLinkElement = this.getElementLinkAtPosition(
+        scenePointer,
+        hitElementMightBeLocked,
+      );
     }
+
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+
       showHyperlinkTooltip(
         this.hitLinkElement,
         this.state,
@@ -6839,11 +6854,6 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       hideHyperlinkToolip();
       if (isLaserTool) {
-        this.handleIframeLikeElementHover({
-          hitElement,
-          scenePointer,
-          moveEvent: event,
-        });
         return;
       }
       if (
@@ -6878,15 +6888,10 @@ class App extends React.Component<AppProps, AppState> {
           !hitElement?.locked
         ) {
           if (
-            !this.handleIframeLikeElementHover({
-              hitElement,
-              scenePointer,
-              moveEvent: event,
-            }) &&
-            (!hitElement ||
-              // Elbow arrows can only be moved when unconnected
-              !isElbowArrow(hitElement) ||
-              !(hitElement.startBinding || hitElement.endBinding))
+            !hitElement ||
+            // Elbow arrows can only be moved when unconnected
+            !isElbowArrow(hitElement) ||
+            !(hitElement.startBinding || hitElement.endBinding)
           ) {
             if (
               this.state.activeTool.type !== "lasso" ||
@@ -7568,7 +7573,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      this.redirectToLink(event, this.editorInterface.isTouchScreen);
+      this.handleElementLinkClick(event);
     } else if (this.state.viewModeEnabled) {
       this.setState({
         activeEmbeddable: null,
@@ -7628,7 +7633,8 @@ class App extends React.Component<AppProps, AppState> {
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           isHandToolActive(this.state) ||
-          this.state.viewModeEnabled)
+          (this.state.viewModeEnabled &&
+            this.state.activeTool.type !== "laser"))
       )
     ) {
       return false;
@@ -7706,7 +7712,10 @@ class App extends React.Component<AppProps, AppState> {
         lastPointerUp = null;
         isPanning = false;
         if (!isHoldingSpace) {
-          if (this.state.viewModeEnabled) {
+          if (
+            this.state.viewModeEnabled &&
+            this.state.activeTool.type !== "laser"
+          ) {
             setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
           } else {
             setCursorForShape(this.interactiveCanvas, this.state);
