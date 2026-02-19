@@ -49,8 +49,15 @@
   .zero-label {
     position: absolute;
     bottom: 0;
-    left: 4px;
     font-size: 12px;
     color: var(--text-primary-color);
+
+    :root[dir="ltr"] & {
+      left: 4px;
+    }
+
+    :root[dir="rtl"] & {
+      right: 4px;
+    }
   }
 }
