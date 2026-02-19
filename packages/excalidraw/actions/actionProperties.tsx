@@ -1555,7 +1555,7 @@ const getArrowheadOptions = (flip: boolean) => {
       value: null,
       text: t("labels.arrowhead_none"),
       keyBinding: "q",
-      icon: ArrowheadNoneIcon,
+      icon: <ArrowheadNoneIcon flip={flip} />,
     },
     {
       value: "arrow",
