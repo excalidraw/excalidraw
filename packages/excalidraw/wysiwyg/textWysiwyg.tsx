@@ -302,6 +302,7 @@ export const textWysiwyg = ({
   // prevent line wrapping on Safari
   editable.wrap = "off";
   editable.classList.add("excalidraw-wysiwyg");
+  editable.spellcheck = true;
 
   let whiteSpace = "pre";
   let wordBreak = "normal";
