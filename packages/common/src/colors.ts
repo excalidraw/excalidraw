@@ -137,6 +137,7 @@ export const COLORS_PER_ROW = 5;
 
 export const DEFAULT_CHART_COLOR_INDEX = 4;
 
+export const DEFAULT_ELEMENT_LASER_COLOR_INDEX = 4;
 export const DEFAULT_ELEMENT_STROKE_COLOR_INDEX = 4;
 export const DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX = 1;
 
@@ -181,6 +182,15 @@ const COMMON_ELEMENT_SHADES = pick(COLOR_PALETTE, [
 // -----------------------------------------------------------------------------
 
 // ORDER matters for positioning in quick picker
+export const DEFAULT_ELEMENT_LASER_PICKS = [
+  COLOR_PALETTE.black,
+  COLOR_PALETTE.red[DEFAULT_ELEMENT_LASER_COLOR_INDEX],
+  COLOR_PALETTE.green[DEFAULT_ELEMENT_LASER_COLOR_INDEX],
+  COLOR_PALETTE.blue[DEFAULT_ELEMENT_LASER_COLOR_INDEX],
+  COLOR_PALETTE.yellow[DEFAULT_ELEMENT_LASER_COLOR_INDEX],
+] as ColorTuple;
+
+// ORDER matters for positioning in quick picker
 export const DEFAULT_ELEMENT_STROKE_PICKS = [
   COLOR_PALETTE.black,
   COLOR_PALETTE.red[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
@@ -213,6 +223,17 @@ export const DEFAULT_CANVAS_BACKGROUND_PICKS = [
 
 // palette defaults
 // -----------------------------------------------------------------------------
+
+export const DEFAULT_ELEMENT_LASER_COLOR_PALETTE = {
+  // 1st row
+  transparent: COLOR_PALETTE.transparent,
+  white: COLOR_PALETTE.white,
+  gray: COLOR_PALETTE.gray,
+  black: COLOR_PALETTE.black,
+  bronze: COLOR_PALETTE.bronze,
+  // rest
+  ...COMMON_ELEMENT_SHADES,
+} as const;
 
 export const DEFAULT_ELEMENT_STROKE_COLOR_PALETTE = {
   // 1st row
