@@ -108,6 +108,7 @@ import {
   loadDesktopUIModePreference,
   setDesktopUIMode,
   isSelectionLikeTool,
+  oneOf,
 } from "@excalidraw/common";
 
 import {
@@ -4846,13 +4847,6 @@ class App extends React.Component<AppProps, AppState> {
 
       if (this.actionManager.handleKeyDown(event)) {
         return;
-      }
-
-      function oneOf<N extends string | number | symbol | null, H extends N>(
-        haystack: readonly H[],
-        needle: N,
-      ): needle is H {
-        return haystack.includes(needle as any);
       }
 
       // view mode hardcoded from upstream -> disable tool switching for now
