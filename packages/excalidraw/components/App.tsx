@@ -652,6 +652,8 @@ class App extends React.Component<AppProps, AppState> {
   previousPointerMoveCoords: { x: number; y: number } | null = null;
   lastViewportPosition = { x: 0, y: 0 };
 
+  edgeScrollRafId: number | null = null;
+
   animationFrameHandler = new AnimationFrameHandler();
 
   laserTrails = new LaserTrails(this.animationFrameHandler, this);
@@ -9052,6 +9054,39 @@ class App extends React.Component<AppProps, AppState> {
       }
       const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
 
+      if (pointerDownState.drag.hasOccurred) {
+        const EDGE_SCROLL_THRESHOLD = 50;
+
+        const { clientX, clientY } = event;
+        const width = this.state.width;
+        const height = this.state.height;
+
+        const isNearLeftEdge = clientX < EDGE_SCROLL_THRESHOLD;
+        const isNearRightEdge = clientX > width - EDGE_SCROLL_THRESHOLD;
+        const isNearTopEdge = clientY < EDGE_SCROLL_THRESHOLD;
+        const isNearBottomEdge = clientY > height - EDGE_SCROLL_THRESHOLD;
+
+        if (
+          isNearLeftEdge ||
+          isNearRightEdge ||
+          isNearTopEdge ||
+          isNearBottomEdge
+        ) {
+          if (!this.edgeScrollRafId) {
+            this.handleEdgeScrolling(
+              clientX,
+              clientY,
+              width,
+              height,
+              EDGE_SCROLL_THRESHOLD,
+            );
+          }
+        } else if (this.edgeScrollRafId) {
+          cancelAnimationFrame(this.edgeScrollRafId);
+          this.edgeScrollRafId = null;
+        }
+      }
+
       if (this.state.activeLockedId) {
         this.setState({
           activeLockedId: null,
@@ -9948,11 +9983,74 @@ class App extends React.Component<AppProps, AppState> {
     return false;
   }
 
+  private handleEdgeScrolling = (
+    clientX: number,
+    clientY: number,
+    width: number,
+    height: number,
+    threshold: number,
+  ) => {
+    if (!this.lastPointerMoveCoords) {
+      this.edgeScrollRafId = requestAnimationFrame(() =>
+        this.handleEdgeScrolling(clientX, clientY, width, height, threshold),
+      );
+      return;
+    }
+
+    const { clientX: currentX, clientY: currentY } = this
+      .lastPointerMoveEvent || { clientX, clientY };
+
+    if (
+      currentX >= threshold &&
+      currentX <= width - threshold &&
+      currentY >= threshold &&
+      currentY <= height - threshold
+    ) {
+      if (this.edgeScrollRafId) {
+        cancelAnimationFrame(this.edgeScrollRafId);
+        this.edgeScrollRafId = null;
+      }
+      return;
+    }
+
+    let dx = 0;
+    let dy = 0;
+    const MAX_SPEED = 20;
+
+    if (currentX < threshold) {
+      dx = -MAX_SPEED * (1 - currentX / threshold);
+    } else if (currentX > width - threshold) {
+      dx = MAX_SPEED * (1 - (width - currentX) / threshold);
+    }
+
+    if (currentY < threshold) {
+      dy = -MAX_SPEED * (1 - currentY / threshold);
+    } else if (currentY > height - threshold) {
+      dy = MAX_SPEED * (1 - (height - currentY) / threshold);
+    }
+
+    if (dx !== 0 || dy !== 0) {
+      this.translateCanvas({
+        scrollX: this.state.scrollX - dx / this.state.zoom.value,
+        scrollY: this.state.scrollY - dy / this.state.zoom.value,
+      });
+    }
+
+    this.edgeScrollRafId = requestAnimationFrame(() =>
+      this.handleEdgeScrolling(currentX, currentY, width, height, threshold),
+    );
+  };
+
   private onPointerUpFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ): (event: PointerEvent) => void {
     return withBatchedUpdates((childEvent: PointerEvent) => {
       const elementsMap = this.scene.getNonDeletedElementsMap();
+
+      if (this.edgeScrollRafId) {
+        cancelAnimationFrame(this.edgeScrollRafId);
+        this.edgeScrollRafId = null;
+      }
 
       this.removePointer(childEvent);
       pointerDownState.drag.blockDragging = false;
