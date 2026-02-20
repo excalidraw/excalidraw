@@ -322,7 +322,7 @@ import {
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
-import { actionPaste } from "../actions/actionClipboard";
+import { actionPaste, imageExport } from "../actions/actionClipboard";
 import { actionCopyElementLink } from "../actions/actionElementLink";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
 import {
@@ -12114,6 +12114,8 @@ class App extends React.Component<AppProps, AppState> {
       CONTEXT_MENU_SEPARATOR,
       actionDuplicateSelection,
       actionToggleElementLock,
+      CONTEXT_MENU_SEPARATOR,
+      imageExport,
       CONTEXT_MENU_SEPARATOR,
       actionDeleteSelected,
     ];
