@@ -202,9 +202,11 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       style={{
         width: props.appState.width,
         height: props.appState.height,
-        cursor: props.appState.viewModeEnabled
-          ? CURSOR_TYPE.GRAB
-          : CURSOR_TYPE.AUTO,
+        cursor:
+          props.appState.viewModeEnabled &&
+          props.appState.activeTool.type !== "laser"
+            ? CURSOR_TYPE.GRAB
+            : CURSOR_TYPE.AUTO,
       }}
       width={props.appState.width * props.scale}
       height={props.appState.height * props.scale}
@@ -233,6 +235,7 @@ const getRelevantAppStateProps = (
   width: appState.width,
   height: appState.height,
   viewModeEnabled: appState.viewModeEnabled,
+  activeTool: appState.activeTool,
   openDialog: appState.openDialog,
   editingGroupId: appState.editingGroupId,
   selectedElementIds: appState.selectedElementIds,

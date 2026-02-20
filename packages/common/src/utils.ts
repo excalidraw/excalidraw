@@ -1,5 +1,7 @@
 import { average } from "@excalidraw/math";
 
+import type { GlobalCoord } from "@excalidraw/math";
+
 import type { FontFamilyValues, FontString } from "@excalidraw/element/types";
 
 import type {
@@ -441,7 +443,7 @@ export const viewportCoordsToSceneCoords = (
   const x = (clientX - offsetLeft) / zoom.value - scrollX;
   const y = (clientY - offsetTop) / zoom.value - scrollY;
 
-  return { x, y };
+  return { x, y } as GlobalCoord;
 };
 
 export const sceneCoordsToViewportCoords = (
@@ -1329,4 +1331,11 @@ export const setFeatureFlag = <F extends keyof FEATURE_FLAGS>(
   } catch (e) {
     console.error("unable to set feature flag", e);
   }
+};
+
+export const oneOf = <N extends string | number | symbol | null, H extends N>(
+  needle: N,
+  haystack: readonly H[],
+): needle is H => {
+  return haystack.includes(needle as any);
 };

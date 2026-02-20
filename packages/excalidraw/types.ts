@@ -215,6 +215,7 @@ export type StaticCanvasAppState = Readonly<
 
 export type InteractiveCanvasAppState = Readonly<
   _CommonCanvasAppState & {
+    activeTool: AppState["activeTool"];
     // renderInteractiveScene
     activeEmbeddable: AppState["activeEmbeddable"];
     selectionElement: AppState["selectionElement"];
