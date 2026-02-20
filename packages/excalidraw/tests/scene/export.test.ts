@@ -1,5 +1,7 @@
 import { exportToCanvas, exportToSvg } from "@excalidraw/utils";
 
+import { vi } from "vitest";
+
 import {
   applyDarkModeFilter,
   FONT_FAMILY,
@@ -191,6 +193,59 @@ describe("exportToSvg", () => {
       null,
     );
     expect(svgElement.innerHTML).toMatchSnapshot();
+  });
+
+  it("does not spam errors when FontFace unicodeRange is missing (node/jsdom polyfill)", async () => {
+    const { ExcalidrawFontFace } = await import("../../fonts/ExcalidrawFontFace");
+
+    const proto: any = ExcalidrawFontFace.prototype;
+    const original = proto.getUnicodeRangeRegex;
+
+    const unicodeRangeShim = vi
+      .spyOn(proto, "getUnicodeRangeRegex")
+      .mockImplementation(function (this: any) {
+        if (this.fontFace) {
+          try {
+            delete this.fontFace.unicodeRange;
+          } catch {}
+          this.fontFace.unicodeRange = undefined;
+
+          this.fontFace.descriptors = this.fontFace.descriptors ?? {};
+          this.fontFace.descriptors.unicodeRange = undefined;
+        }
+        return original.call(this);
+      });
+
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    try {
+      const elements = [
+        {
+          ...textFixture,
+          text: "Hello",
+          originalText: "Hello",
+          height: ELEMENT_HEIGHT,
+          width: ELEMENT_WIDTH,
+          index: "a0",
+        },
+      ] as NonDeletedExcalidrawElement[];
+
+      const svg = await exportUtils.exportToSvg(
+        elements,
+        DEFAULT_OPTIONS,
+        null,
+      );
+
+      expect(svg).toBeTruthy();
+
+      const msgs = errSpy.mock.calls.map((args) => String(args[0]));
+      expect(
+        msgs.some((m) => m.includes("Couldn't transform font-face to css")),
+      ).toBe(false);
+    } finally {
+      errSpy.mockRestore();
+      unicodeRangeShim.mockRestore();
+    }
   });
 });
 
