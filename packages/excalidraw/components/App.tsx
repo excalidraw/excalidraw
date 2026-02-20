@@ -6205,6 +6205,36 @@ class App extends React.Component<AppProps, AppState> {
 
     for (let index = elements.length - 1; index >= 0; index--) {
       const element = elements[index];
+      // If pointer is over a bound text element that doesn't have a link
+      // itself but its container does, we want to treat the container link
+      // as clickable. We only do this in view mode (same semantics as base
+      // link hit detection uses when over bounding box) so editing UX stays
+      // unchanged.
+      if (
+        element.type === "text" &&
+        !element.link &&
+        (element as any).containerId &&
+        this.state.viewModeEnabled
+      ) {
+        const container = this.scene.getNonDeletedElement(
+          (element as any).containerId,
+        );
+        if (container && container.link) {
+          // Re-run hit test using container so that clicking directly on
+          // the text triggers the container's link.
+          if (
+            isPointHittingLink(
+              container,
+              this.scene.getNonDeletedElementsMap(),
+              this.state,
+              pointFrom(scenePointer.x, scenePointer.y),
+              this.device.editor.isMobile,
+            )
+          ) {
+            return container as ExcalidrawElement;
+          }
+        }
+      }
       if (
         hitElementMightBeLocked &&
         element.id === hitElementMightBeLocked.id
