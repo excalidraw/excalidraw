@@ -1,0 +1,32 @@
+name: "✨ Enhancement"
+description: "Propose an enhancement to an existing feature."
+title: "[Enhancement]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: "Current Behavior"
+      description: "A clear and concise description of how the feature works today."
+    validations:
+      required: true
+
+  - type: textarea
+    id: desired-behavior
+    attributes:
+      label: "Desired Behavior"
+      description: "A clear and concise description of how you would like the feature to be enhanced."
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: "Why is this enhancement necessary?"
+      description: "Please explain why this change would be a valuable improvement."
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: "Additional Context"
+      description: "Add any other context, mockups, or screenshots about the enhancement here."
