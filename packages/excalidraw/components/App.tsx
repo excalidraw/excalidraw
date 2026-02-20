@@ -567,6 +567,7 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
+let isMiddleButtonPressed: boolean = false;
 
 /**
  * Map of youtube embed video states
@@ -7224,6 +7225,11 @@ class App extends React.Component<AppProps, AppState> {
 
     this.lastPointerDownEvent = event;
 
+    // Track middle button state for wheel zoom feature
+    if (event.button === POINTER_BUTTON.WHEEL) {
+      isMiddleButtonPressed = true;
+    }
+
     // we must exit before we set `cursorButton` state and `savePointer`
     // else it will send pointer state & laser pointer events in collab when
     // panning
@@ -7531,6 +7537,11 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     if (getFeatureFlag("COMPLEX_BINDINGS")) {
       this.resetDelayedBindMode();
+    }
+
+    // Reset middle button state
+    if (event.button === POINTER_BUTTON.WHEEL) {
+      isMiddleButtonPressed = false;
     }
 
     this.removePointer(event);
@@ -12142,13 +12153,15 @@ class App extends React.Component<AppProps, AppState> {
 
       event.preventDefault();
 
-      if (isPanning) {
+      // Allow zooming with middle button even when panning mode is active
+      if (isPanning && !isMiddleButtonPressed) {
         return;
       }
 
       const { deltaX, deltaY } = event;
       // note that event.ctrlKey is necessary to handle pinch zooming
-      if (event.metaKey || event.ctrlKey) {
+      // also handle middle button + scroll for zoom
+      if (event.metaKey || event.ctrlKey || isMiddleButtonPressed) {
         const sign = Math.sign(deltaY);
         const MAX_STEP = ZOOM_STEP * 100;
         const absDelta = Math.abs(deltaY);
