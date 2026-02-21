@@ -22,6 +22,7 @@ import {
 import {
   calculateFixedPointForNonElbowArrowBinding,
   getNonDeletedElements,
+  isFixedPoint,
   isPointInElement,
   isValidPolygon,
   projectFixedPointOntoDiagonal,
@@ -155,7 +156,9 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
         | ExcalidrawElbowArrowElement["startBinding"]
         | ExcalidrawElbowArrowElement["endBinding"] = {
         ...binding,
-        fixedPoint: normalizeFixedPoint(binding.fixedPoint ?? [0, 0]),
+        fixedPoint: normalizeFixedPoint(
+          isFixedPoint(binding.fixedPoint) ? binding.fixedPoint : [0, 0],
+        ),
         mode: binding.mode || "orbit",
       };
 
@@ -176,7 +179,9 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
         return {
           elementId: binding.elementId,
           mode: binding.mode,
-          fixedPoint: normalizeFixedPoint(binding.fixedPoint || [0.5, 0.5]),
+          fixedPoint: normalizeFixedPoint(
+            isFixedPoint(binding.fixedPoint) ? binding.fixedPoint : [0.5, 0.5],
+          ),
         } as FixedPointBinding | null;
       }
       return null;

@@ -2447,21 +2447,32 @@ export const getArrowLocalFixedPoints = (
   ];
 };
 
-export const normalizeFixedPoint = <T extends FixedPoint | null>(
+export const isFixedPoint = (
+  fixedPoint: any,
+): fixedPoint is FixedPointBinding["fixedPoint"] => {
+  return (
+    Array.isArray(fixedPoint) &&
+    fixedPoint.length === 2 &&
+    fixedPoint.every((coord) => typeof coord === "number")
+  );
+};
+
+export const normalizeFixedPoint = <T extends FixedPoint>(
   fixedPoint: T,
-): T extends null ? null : FixedPoint => {
+): FixedPoint => {
+  const point: FixedPoint = isFixedPoint(fixedPoint)
+    ? fixedPoint
+    : [0.5001, 0.5001];
+
   // Do not allow a precise 0.5 for fixed point ratio
   // to avoid jumping arrow heading due to floating point imprecision
-  if (
-    fixedPoint &&
-    (Math.abs(fixedPoint[0] - 0.5) < 0.0001 ||
-      Math.abs(fixedPoint[1] - 0.5) < 0.0001)
-  ) {
-    return fixedPoint.map((ratio) =>
+  if (Math.abs(point[0] - 0.5) < 0.0001 || Math.abs(point[1] - 0.5) < 0.0001) {
+    return point.map((ratio) =>
       Math.abs(ratio - 0.5) < 0.0001 ? 0.5001 : ratio,
-    ) as T extends null ? null : FixedPoint;
+    ) as FixedPoint;
   }
-  return fixedPoint as any as T extends null ? null : FixedPoint;
+
+  return point;
 };
 
 type Side =
