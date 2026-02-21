@@ -22,7 +22,6 @@ import {
 import {
   calculateFixedPointForNonElbowArrowBinding,
   getNonDeletedElements,
-  isFixedPoint,
   isPointInElement,
   isValidPolygon,
   projectFixedPointOntoDiagonal,
@@ -200,7 +199,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
       : existingElementsMap;
 
     // migrating legacy focus point bindings
-    if (typeof boundElement !== "undefined" && boundElement && elementsMap) {
+    if (boundElement && elementsMap) {
       const p = LinearElementEditor.getPointAtIndexGlobalCoordinates(
         element,
         startOrEnd === "start" ? 0 : element.points.length - 1,
