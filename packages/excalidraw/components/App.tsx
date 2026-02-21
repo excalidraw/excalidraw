@@ -6879,6 +6879,9 @@ class App extends React.Component<AppProps, AppState> {
           type: "text",
           id: element.id,
         }),
+        ...(isArrowElement(container) && {
+          boundTextPositionOnPath: container.boundTextPositionOnPath ?? 0.5,
+        }),
       });
     }
     this.setState({ editingTextElement: element });
