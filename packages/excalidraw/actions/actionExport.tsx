@@ -294,6 +294,20 @@ export const actionLoadScene = register({
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
 });
 
+export const actionExportImage = register({
+  name: "imageExport",
+  label: "buttons.exportImage",
+  trackEvent: { category: "export", action: "dialog" },
+  perform: (_elements, appState) => {
+    return {
+      appState: { ...appState, openDialog: { name: "imageExport" } },
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.E,
+});
+
 export const actionExportWithDarkMode = register<
   AppState["exportWithDarkMode"]
 >({
