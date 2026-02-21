@@ -171,7 +171,9 @@
     "linkToElement": "Посилання на об’єкт",
     "wrapSelectionInFrame": "Обтікання виділеного фрагмента рамкою",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Посилання на об’єкт",
@@ -186,7 +188,7 @@
       "inputPlaceholder": "",
       "heading": "",
       "noResults": "",
-      "clearSearch": ""
+      "clearSearch": "Очистити пошук"
     }
   },
   "search": {
@@ -234,7 +236,7 @@
     "clear": "Очистити",
     "remove": "Видалити",
     "embed": "Перемкнути вкладення",
-    "publishLibrary": "",
+    "publishLibrary": "Перейменувати або опублікувати",
     "submit": "Надіслати",
     "confirm": "Підтвердити",
     "embeddableInteractionButton": "Натисніть для взаємодії"
@@ -357,7 +359,7 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "publishLibrary": "Опублікувати свою власну бібліотеку",
-    "bindTextToElement": "",
+    "bindTextToElement": "{{shortcut}} щоб додати текст",
     "createFlowchart": "",
     "deepBoxSelect": "",
     "eraserRevert": "",
@@ -571,7 +573,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Колір",
     "mostUsedCustomColors": "Найбільш використовувані користувацькі кольори",
     "colors": "Кольори",
     "shades": "Тіні",
@@ -619,24 +621,24 @@
     "inputPlaceholder": ""
   },
   "ttd": {
-    "error": ""
+    "error": "Помилка!"
   },
   "chat": {
     "inputPlaceholder": "",
     "inputPlaceholderWithMessages": "",
     "generating": "",
-    "rateLimitRemaining": "",
+    "rateLimitRemaining": "Сьогодні залишилося {{count}} запитів",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Ви",
+      "assistant": "ШІ-асистент",
+      "system": "Система"
     },
     "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
+    "label": "Чат",
+    "menu": "Меню",
+    "newChat": "Новий чат",
+    "deleteChat": "Видалити чат",
+    "deleteMessage": "Видалити повідомлення",
     "viewAsMermaid": "",
     "placeholder": {
       "title": "",
@@ -644,10 +646,10 @@
       "hint": ""
     },
     "preview": "",
-    "insert": "",
-    "retry": "",
+    "insert": "Вставити",
+    "retry": "Спробувати знову",
     "errors": {
-      "promptTooShort": "",
+      "promptTooShort": "Запит надто короткий (мін. {{min}} символів)",
       "promptTooLong": "",
       "generationFailed": "",
       "invalidDiagram": "",
@@ -660,7 +662,7 @@
     "rateLimit": {
       "messageLimit": "",
       "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimitInputPlaceholder": "Ви досягли вашого ліміту повідомлень"
     },
     "upsellBtnLabel": ""
   },
@@ -701,15 +703,15 @@
     "shortcutHint": "Для панелі команд використовуйте {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Space",
+    "delete": "Delete",
+    "mmb": "Коліщатко"
   }
 }

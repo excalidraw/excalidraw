@@ -171,7 +171,9 @@
     "linkToElement": "Liên kết đến đối tượng",
     "wrapSelectionInFrame": "Đưa vùng chọn vào khung",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Liên kết đến đối tượng",

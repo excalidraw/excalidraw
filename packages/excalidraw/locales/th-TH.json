@@ -171,7 +171,9 @@
     "linkToElement": "ลิงค์ไปสู่วัตถุ",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "ลิงค์ไปสู่วัตถุ",

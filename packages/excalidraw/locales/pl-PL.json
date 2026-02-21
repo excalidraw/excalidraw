@@ -171,7 +171,9 @@
     "linkToElement": "Link do obiektu",
     "wrapSelectionInFrame": "Owiń wybór w ramkę",
     "tab": "Tab",
-    "shapeSwitch": "Wybór kształtu"
+    "shapeSwitch": "Wybór kształtu",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Link do obiektu",

@@ -171,7 +171,9 @@
     "linkToElement": "Link all'oggetto",
     "wrapSelectionInFrame": "Avvolgi la selezione nella cornice",
     "tab": "Scheda",
-    "shapeSwitch": "Cambia forma"
+    "shapeSwitch": "Cambia forma",
+    "preferences": "Preferenze",
+    "preferences_toolLock": "Blocco strumento"
   },
   "elementLink": {
     "title": "Link all'oggetto",
@@ -557,9 +559,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "I tuoi disegni vengono salvati nella memoria del tuo browser.",
+      "center_heading_line2": "La memoria del browser potrebbe essere cancellata inaspettatamente.",
+      "center_heading_line3": "Salva regolarmente il tuo lavoro in un file per evitare di perderlo.",
       "center_heading_plus": "Volevi invece andare su Excalidraw+?",
       "menuHint": "Esporta, preferenze, lingue, ..."
     },

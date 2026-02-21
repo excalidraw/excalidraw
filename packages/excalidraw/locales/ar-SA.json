@@ -171,7 +171,9 @@
     "linkToElement": "رابط إلى الكائن",
     "wrapSelectionInFrame": "تغليف التحديد في إطار",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "رابط إلى الكائن",

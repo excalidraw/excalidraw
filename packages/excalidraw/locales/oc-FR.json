@@ -171,7 +171,9 @@
     "linkToElement": "Ligam cap a l’objècte",
     "wrapSelectionInFrame": "",
     "tab": "Onglet",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "",

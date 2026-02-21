@@ -171,7 +171,9 @@
     "linkToElement": "Lien vers un objet",
     "wrapSelectionInFrame": "Mettre la sélection dans un cadre",
     "tab": "Onglet",
-    "shapeSwitch": "Changer de forme"
+    "shapeSwitch": "Changer de forme",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Lien vers un objet",
@@ -557,9 +559,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Vos dessins sont enregistrés dans le stockage de votre navigateur.",
+      "center_heading_line2": "Le stockage du navigateur peut être effacé de manière inattendue.",
+      "center_heading_line3": "Enregistrez régulièrement votre travail dans un fichier pour éviter de le perdre.",
       "center_heading_plus": "Vouliez-vous plutôt aller à Excalidraw+ à la place ?",
       "menuHint": "Exportation, préférences, langues, ..."
     },
@@ -615,54 +617,54 @@
     "description": "Actuellement, seuls les diagrammes <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Sequence, </sequenceLink> et <classLink>de classe </classLink>sont pris en charge. Les autres types seront rendus en tant qu'image dans Excalidraw.",
     "syntax": "Syntaxe Mermaid",
     "preview": "Prévisualisation",
-    "label": "",
-    "inputPlaceholder": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Écrivez la définition du diagramme de Mermaid ici..."
   },
   "ttd": {
-    "error": ""
+    "error": "Erreur!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "Commencez à taper votre idée de diagramme ici... ({{shortcut}} pour une nouvelle ligne)",
+    "inputPlaceholderWithMessages": "Continuer à affiner votre diagramme...",
+    "generating": "Génération...",
+    "rateLimitRemaining": "{{count}} demandes restantes aujourd'hui",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Vous",
+      "assistant": "Assistant IA",
+      "system": "Système"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "Bêta IA",
+    "label": "Chat",
+    "menu": "Menu",
+    "newChat": "Nouveau chat",
+    "deleteChat": "Supprimer le chat",
+    "deleteMessage": "Supprimer le message",
+    "viewAsMermaid": "Voir en tant que Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "Créons votre diagramme",
+      "description": "Décrivez le diagramme que vous voulez créer, et nous le générerons pour vous.",
+      "hint": "Pour le moment, nous connaissons les diagrammes Flowchart, Séquence et Classe."
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Prévisualisation",
+    "insert": "Insérer",
+    "retry": "Recommencer",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "La requête est trop courte (min {{min}} caractères)",
+      "promptTooLong": "La requête est trop longue (max {{max}} caractères)",
+      "generationFailed": "Échec de la génération",
+      "invalidDiagram": "A généré un diagramme non valide :(. Vous pouvez modifier manuellement, réessayer avec la correction automatique, ou essayer une invite différente.",
+      "fixInMermaid": "Modifier Mermaid manuellement →",
+      "aiRepair": "Régénérer (correction automatique) →",
+      "requestAborted": "Demande abandonnée",
+      "requestFailed": "La requête a échoué",
+      "mermaidParseError": "Erreur de syntaxe Mermaid"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "Vous avez atteint votre limite d'IA sur le plan gratuit. Essayez Excalidraw+ pour plus ou revenez demain.",
+      "generalRateLimit": "Tenez vos chevaux, vous êtes trop rapide pour nous! Veuillez attendre un instant avant de réessayer.",
+      "messageLimitInputPlaceholder": "Vous avez atteint votre limite de messages"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Devenez Premium"
   },
   "quickSearch": {
     "placeholder": "Recherche rapide"

@@ -171,7 +171,9 @@
     "linkToElement": "Odkaz na objekt",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Odkaz na objekt",

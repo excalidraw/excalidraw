@@ -171,7 +171,9 @@
     "linkToElement": "Hiperligação para o objeto",
     "wrapSelectionInFrame": "Ajustar seleção no quadro",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Hiperligação para o objeto",

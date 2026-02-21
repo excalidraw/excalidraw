@@ -171,7 +171,9 @@
     "linkToElement": "链接到对象",
     "wrapSelectionInFrame": "用选中的元素创建画框",
     "tab": "Tab",
-    "shapeSwitch": "切换形状"
+    "shapeSwitch": "切换形状",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "链接到对象",
@@ -615,7 +617,7 @@
     "description": "目前仅支持<flowchartLink>流程图</flowchartLink>、<sequenceLink>序列图</sequenceLink>和<classLink>类图</classLink>。其他类型在 Excalidraw 中将以图像呈现。",
     "syntax": "Mermaid 语法",
     "preview": "预览",
-    "label": "",
+    "label": "Mermaid",
     "inputPlaceholder": ""
   },
   "ttd": {
@@ -653,16 +655,16 @@
       "invalidDiagram": "",
       "fixInMermaid": "",
       "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "requestAborted": "请求中止",
+      "requestFailed": "请求失败",
+      "mermaidParseError": "Mermaid 语法错误"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "您已达到免费版的 AI 使用上限。请尝试 Excalidraw+ 获取更多额度，或明天再试。",
+      "generalRateLimit": "慢点慢点，您的手速太快了！请稍候再试。",
+      "messageLimitInputPlaceholder": "您已达到消息上限"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "升级到 Plus"
   },
   "quickSearch": {
     "placeholder": "快速搜索"

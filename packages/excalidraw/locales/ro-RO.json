@@ -171,7 +171,9 @@
     "linkToElement": "Link către obiect",
     "wrapSelectionInFrame": "Încapsulare selecție în cadru",
     "tab": "Filă",
-    "shapeSwitch": "Comutare formă"
+    "shapeSwitch": "Comutare formă",
+    "preferences": "Preferințe",
+    "preferences_toolLock": "Blocare instrument"
   },
   "elementLink": {
     "title": "Link către obiect",

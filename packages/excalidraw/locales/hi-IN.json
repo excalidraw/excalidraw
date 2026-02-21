@@ -171,7 +171,9 @@
     "linkToElement": "वस्तु की कड़ी",
     "wrapSelectionInFrame": "चौकट में चुने हुवे को लपेटे",
     "tab": "",
-    "shapeSwitch": "आकार बदलें"
+    "shapeSwitch": "आकार बदलें",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "वस्तु की कड़ी",

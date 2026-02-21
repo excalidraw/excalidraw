@@ -171,7 +171,9 @@
     "linkToElement": "Länk till objektet",
     "wrapSelectionInFrame": "Omslut urvaled i ram",
     "tab": "Flik",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "Länk till objektet",

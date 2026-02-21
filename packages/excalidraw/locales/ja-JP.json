@@ -34,7 +34,7 @@
     "opacity": "透明度",
     "textAlign": "文字の配置",
     "edges": "角",
-    "sharp": "四角",
+    "sharp": "シャープ",
     "round": "丸",
     "arrowheads": "線の終点",
     "arrowhead_none": "なし",
@@ -46,14 +46,14 @@
     "arrowhead_triangle_outline": "三角 (中抜き)",
     "arrowhead_diamond": "ひし形",
     "arrowhead_diamond_outline": "ひし形 (中抜き)",
-    "arrowhead_crowfoot_many": "鳥の足記法（多対多）",
-    "arrowhead_crowfoot_one": "鳥の足記法（一対一）",
-    "arrowhead_crowfoot_one_or_many": "鳥の足記法（一対多）",
-    "more_options": "詳細設定",
-    "arrowtypes": "矢印の種類",
+    "arrowhead_crowfoot_many": "カラスの足 (*)",
+    "arrowhead_crowfoot_one": "カラスの足 (1)",
+    "arrowhead_crowfoot_one_or_many": "カラスの足 (1..*)",
+    "more_options": "その他のオプション",
+    "arrowtypes": "矢印タイプ",
     "arrowtype_sharp": "鋭い矢印",
     "arrowtype_round": "曲線矢印",
-    "arrowtype_elbowed": "ひじ矢印",
+    "arrowtype_elbowed": "折れ線矢印",
     "fontSize": "フォントの大きさ",
     "fontFamily": "フォントの種類",
     "addWatermark": "\"Made with Excalidraw\"と表示",
@@ -75,14 +75,14 @@
     "right": "右寄せ",
     "extraBold": "極太",
     "architect": "建築家",
-    "artist": "アーティスト",
+    "artist": "画家",
     "cartoonist": "漫画家",
     "fileTitle": "ファイル名",
     "colorPicker": "カラーピッカー",
     "canvasColors": "キャンバス上で使用",
     "canvasBackground": "キャンバスの背景",
     "drawingCanvas": "キャンバスの描画",
-    "clearCanvas": "キャンバスを片付ける",
+    "clearCanvas": "キャンバスを消去",
     "layers": "レイヤー",
     "actions": "操作",
     "language": "言語",
@@ -101,7 +101,7 @@
     "libraryLoadingMessage": "ライブラリを読み込み中…",
     "libraries": "ライブラリを参照する",
     "loadingScene": "シーンを読み込み中…",
-    "loadScene": "ファイルからシーン",
+    "loadScene": "ファイルからシーンを開く",
     "align": "配置",
     "alignTop": "上揃え",
     "alignBottom": "下揃え",
@@ -160,18 +160,20 @@
     "prompt": "プロンプト",
     "followUs": "フォローする",
     "discordChat": "Discord チャット",
-    "zoomToFitViewport": "表寿範囲に合わせてズーム",
+    "zoomToFitViewport": "表示範囲に合わせてズーム",
     "zoomToFitSelection": "選択範囲に合わせてズーム",
     "zoomToFit": "すべての要素が収まるようにズーム",
     "installPWA": "Excalidrawをローカルにインストール(PWA)",
     "autoResize": "テキストの自動サイズ変更を有効化",
-    "imageCropping": "画像のトリミング",
-    "unCroppedDimension": "",
-    "copyElementLink": "",
+    "imageCropping": "画像の切り抜き",
+    "unCroppedDimension": "元のサイズ",
+    "copyElementLink": "オブジェクトへのリンクをコピー",
     "linkToElement": "オブジェクトにリンク",
-    "wrapSelectionInFrame": "選択範囲を枠で折り返す",
+    "wrapSelectionInFrame": "選択範囲をフレームで囲む",
     "tab": "Tab",
-    "shapeSwitch": "図形形状を変更"
+    "shapeSwitch": "図形形状を変更",
+    "preferences": "",
+    "preferences_toolLock": ""
   },
   "elementLink": {
     "title": "オブジェクトにリンク",
@@ -185,15 +187,15 @@
     "search": {
       "inputPlaceholder": "ライブラリを検索",
       "heading": "ライブラリと一致",
-      "noResults": "一致するアイテムが見つかりませんでした…",
+      "noResults": "一致するアイテムはありません…",
       "clearSearch": "検索のクリア"
     }
   },
   "search": {
     "title": "キャンバスで検索",
-    "noMatch": "一致なし…",
-    "singleResult": "結果",
-    "multipleResults": "結果数",
+    "noMatch": "一致する結果はありません…",
+    "singleResult": "件",
+    "multipleResults": "件",
     "placeholder": "キャンバス内のテキストを検索…",
     "frames": "フレーム",
     "texts": "テキスト"
@@ -240,7 +242,7 @@
     "embeddableInteractionButton": "クリックして操作"
   },
   "alerts": {
-    "clearReset": "この操作によってキャンバス全体が消えます。よろしいですか？",
+    "clearReset": "キャンバス全体を消去します。本当によろしいですか？",
     "couldNotCreateShareableLink": "共有URLを作成できませんでした。",
     "couldNotCreateShareableLinkTooBig": "共有可能なリンクを作成できませんでした: シーンが大きすぎます",
     "couldNotLoadInvalidFile": "無効なファイルを読み込めませんでした。",
@@ -249,8 +251,8 @@
     "couldNotCopyToClipboard": "クリップボードにコピーできませんでした。",
     "decryptFailed": "データを復号できませんでした。",
     "uploadedSecurly": "データのアップロードはエンドツーエンド暗号化によって保護されています。Excalidrawサーバーと第三者はデータの内容を見ることができません。",
-    "loadSceneOverridePrompt": "外部図面を読み込むと、既存のコンテンツが置き換わります。続行しますか？",
-    "collabStopOverridePrompt": "セッションを停止すると、ローカルに保存されている図が上書きされます。 本当によろしいですか？\n\n(ローカルの図を保持したい場合は、セッションを停止せずにブラウザタブを閉じてください。)",
+    "loadSceneOverridePrompt": "外部の描画データを読み込むと、既存のコンテンツが置き換わります。続行しますか？",
+    "collabStopOverridePrompt": "セッションを停止すると、ローカルに保存されている図が上書きされます。 本当によろしいですか？\n\n(ローカルの図を保持したい場合は、セッションを停止せずにブラウザーのタブを閉じてください。)",
     "errorAddingToLibrary": "アイテムをライブラリに追加できませんでした",
     "errorRemovingFromLibrary": "ライブラリからアイテムを削除できませんでした",
     "confirmAddLibrary": "{{numShapes}} 個の図形をライブラリに追加します。よろしいですか？",
@@ -261,7 +263,7 @@
     "removeItemsFromsLibrary": "{{count}} 個のアイテムをライブラリから削除しますか？",
     "invalidEncryptionKey": "暗号化キーは22文字でなければなりません。共同編集は無効化されています。",
     "collabOfflineWarning": "インターネットに接続されていません。\n変更は保存されません！",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "ブラウザーのストレージ容量を超えました。変更は保存されません。"
   },
   "errors": {
     "unsupportedFileType": "サポートされていないファイル形式です。",
@@ -271,13 +273,13 @@
     "failedToFetchImage": "画像の読み込みに失敗しました。",
     "cannotResolveCollabServer": "コラボレーションサーバに接続できませんでした。ページを再読み込みして、もう一度お試しください。",
     "importLibraryError": "ライブラリを読み込めませんでした。",
-    "saveLibraryError": "",
+    "saveLibraryError": "ライブラリをストレージに保存できませんでした。変更を失わないように、ローカルにファイルとして保存してください。",
     "collabSaveFailed": "バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
     "collabSaveFailed_sizeExceeded": "キャンバスが大きすぎるため、バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
     "imageToolNotSupported": "画像ツールは使用不可です。",
     "brave_measure_text_error": {
-      "line1": "<bold>Aggressly Block Fingerprinting</bold> の設定が有効なBraveブラウザを使用しているようです。",
-      "line2": "これにより、図面の <bold>テキスト要素</bold> が壊れる可能性があります。",
+      "line1": "<bold>Aggressly Block Fingerprinting</bold> 設定が有効なBraveブラウザーを使用しているようです。",
+      "line2": "これにより、描画内の<bold>テキスト要素</bold>が壊れる可能性があります。",
       "line3": "この設定を無効にすることを強く推奨します。 <link>設定手順</link> をこちらから確認できます。",
       "line4": "この設定を無効にすると、テキスト要素の表示が修正されません。 GitHub で <issueLink>Issue</issueLink> を開くか、 <discordLink>Discord</discordLink> にご記入ください"
     },
@@ -292,9 +294,9 @@
   },
   "toolBar": {
     "selection": "選択",
-    "lasso": "",
+    "lasso": "なげなわ選択",
     "image": "画像を挿入",
-    "rectangle": "矩形",
+    "rectangle": "長方形",
     "diamond": "ひし形",
     "ellipse": "楕円",
     "arrow": "矢印",
@@ -304,31 +306,31 @@
     "library": "ライブラリ",
     "lock": "描画後も使用中のツールを選択したままにする",
     "penMode": "ペンモード - タッチ防止",
-    "link": "",
+    "link": "選択した図形にリンクを追加・更新",
     "eraser": "消しゴム",
-    "frame": "フレームツール",
+    "frame": "フレーム",
     "magicframe": "ワイヤーフレームからコードを生成",
     "embeddable": "Web埋め込み",
     "laser": "レーザーポインター",
     "hand": "手 (パンニングツール)",
     "extraTools": "その他のツール",
     "mermaidToExcalidraw": "Mermaid を Excalidraw に変換",
-    "convertElementType": ""
+    "convertElementType": "図形タイプを切り替え"
   },
   "element": {
-    "rectangle": "",
-    "diamond": "",
+    "rectangle": "長方形",
+    "diamond": "ひし形",
     "ellipse": "楕円",
-    "arrow": "",
-    "line": "",
-    "freedraw": "",
+    "arrow": "矢印",
+    "line": "線",
+    "freedraw": "フリーハンド",
     "text": "文字",
     "image": "画像",
     "group": "グループ",
     "frame": "フレーム",
     "magicframe": "ワイヤーフレームからコードを生成",
-    "embeddable": "",
-    "selection": "",
+    "embeddable": "Web埋め込み",
+    "selection": "選択",
     "iframe": "IFrame"
   },
   "headings": {
@@ -337,34 +339,34 @@
     "shapes": "図形"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} で検索を閉じる",
+    "canvasPanning": "キャンバスを移動するには、{{shortcut_1}} か {{shortcut_2}} を押しながらドラッグ、または手のひらツールを使用",
     "linearElement": "クリックすると複数の頂点からなる曲線を開始、ドラッグすると直線",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "クリックで複数の点を追加、ドラッグで直線。{{shortcut}} を再度押すと矢印タイプが変更されます。",
+    "arrowBindModifiers": "{{shortcut_1}} を押し続けるとバインドを無効化、{{shortcut_2}} を押し続けると固定点にバインド",
     "freeDraw": "クリックしてドラッグします。離すと終了します",
     "text": "ヒント: 選択ツールを使用して任意の場所をダブルクリックしてテキストを追加することもできます",
     "embeddable": "クリックしてドラッグし、ウェブサイトを埋め込む",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "text_selected": "ダブルクリック、または {{shortcut}} を押してテキストを編集",
+    "text_editing": "{{shortcut_1}} または {{shortcut_2}} を押して編集を終了",
+    "linearElementMulti": "最後の点をクリック、または {{shortcut_1}} か {{shortcut_2}} を押して完了",
+    "lockAngle": "{{shortcut}} を押し続けて角度を固定",
+    "resize": "{{shortcut_1}} を押し続けて縦横比を維持、\n{{shortcut_2}} を押し続けて中心からリサイズ",
+    "resizeImage": "{{shortcut_1}} を押し続けて自由にリサイズ、\n{{shortcut_2}} を押し続けて中心からリサイズ",
+    "rotate": "{{shortcut}} を押し続けて角度を固定して回転",
+    "lineEditor_info": "{{shortcut_1}} を押しながらダブルクリック、または {{shortcut_2}} を押して点を編集",
+    "lineEditor_line_info": "ダブルクリック、または {{shortcut}} を押して点を編集",
+    "lineEditor_pointSelected": "{{shortcut_1}} で点を削除、\n{{shortcut_2}} で複製、またはドラッグで移動",
+    "lineEditor_nothingSelected": "点を選択して編集 ({{shortcut_1}} を押し続けて複数選択)、\nまたは {{shortcut_2}} を押しながらクリックで新しい点を追加",
     "publishLibrary": "自分のライブラリを公開",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} でテキストを追加",
+    "createFlowchart": "{{shortcut}} でフローチャートを作成",
+    "deepBoxSelect": "{{shortcut}} を押し続けて詳細選択・ドラッグ防止",
+    "eraserRevert": "{{shortcut}} を押し続けて削除マークを取り消し",
     "firefox_clipboard_write": "この機能は、\"dom.events.asyncClipboard.clipboardItem\" フラグを \"true\" に設定することで有効になる可能性があります。Firefox でブラウザーの設定を変更するには、\"about:config\" ページを参照してください。",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "{{shortcut}} を押し続けてスナップを無効化",
+    "enterCropEditor": "画像をダブルクリック、または {{shortcut}} を押して切り抜き",
+    "leaveCropEditor": "画像の外をクリック、または {{shortcut_1}} か {{shortcut_2}} を押して切り抜きを終了"
   },
   "canvasError": {
     "cannotShowPreview": "プレビューを表示できません",
@@ -373,17 +375,17 @@
   },
   "errorSplash": {
     "headingMain": "エラーが発生しました。もう一度やり直してください。 <button>ページを再読み込みする。</button>",
-    "clearCanvasMessage": "再読み込みがうまくいかない場合は、 <button>キャンバスを消去しています</button>",
+    "clearCanvasMessage": "再読み込みがうまくいかない場合は、<button>キャンバスを消去</button>してみてください。",
     "clearCanvasCaveat": " これにより作業が失われます ",
-    "trackedToSentry": "識別子のエラー {{eventId}} が我々のシステムで追跡されました。",
-    "openIssueMessage": "エラーに関するシーン情報を含めないように非常に慎重に設定しました。もしあなたのシーンがプライベートでない場合は、私たちのフォローアップを検討してください。 <button>バグ報告</button> GitHub のIssueに以下の情報をコピーして貼り付けてください。",
+    "trackedToSentry": "エラー (識別子: {{eventId}}) はシステムに記録されました。",
+    "openIssueMessage": "エラーにシーン情報が含まれないよう配慮しています。シーンが非公開でなければ、<button>バグ報告</button>へのご協力をお願いします。以下の情報をコピーしてGitHub Issueに貼り付けてください。",
     "sceneContent": "シーンの内容:"
   },
   "shareDialog": {
     "or": "または"
   },
   "roomDialog": {
-    "desc_intro": "図面にコラボレーションするよう人々を招待します。",
+    "desc_intro": "他の人を描画の共同編集に招待しましょう。",
     "desc_privacy": "心配しないでください、セッションはエンドツーエンドで暗号化されており、完全にプライベートです。私たちのサーバーでさえも、あなたが描いたものを見ることができません。",
     "button_startSession": "セッションを開始する",
     "button_stopSession": "セッションを終了する",
@@ -411,8 +413,8 @@
     "click": "クリック",
     "deepSelect": "深い選択",
     "deepBoxSelect": "ボックス内の深い選択、およびドラッグの抑止",
-    "createFlowchart": "",
-    "navigateFlowchart": "",
+    "createFlowchart": "汎用要素からフローチャートを作成",
+    "navigateFlowchart": "フローチャート内を移動",
     "curvedArrow": "カーブした矢印",
     "curvedLine": "曲線",
     "documentation": "ドキュメント",
@@ -436,8 +438,8 @@
     "toggleElementLock": "選択したアイテムをロック/ロック解除",
     "movePageUpDown": "ページを上下に移動",
     "movePageLeftRight": "ページを左右に移動",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "画像を切り抜き",
+    "cropFinish": "画像の切り抜きを終了"
   },
   "clearCanvasDialog": {
     "title": "キャンバスを消去"
@@ -463,10 +465,10 @@
       "required": "必須項目",
       "website": "有効な URL を入力してください"
     },
-    "noteDescription": "以下に含めるライブラリを提出してください <link>公開ライブラリのリポジトリ</link>他の人が作図に使えるようにするためです",
-    "noteGuidelines": "最初にライブラリを手動で承認する必要があります。次をお読みください <link>ガイドライン</link> 送信する前に、GitHubアカウントが必要になりますが、必須ではありません。",
-    "noteLicense": "提出することにより、ライブラリが次の下で公開されることに同意します： <link>MIT ライセンス </link>つまり誰でも制限なく使えるということです",
-    "noteItems": "各ライブラリ項目は、フィルタリングのために独自の名前を持つ必要があります。以下のライブラリアイテムが含まれます:",
+    "noteDescription": "あなたのライブラリを<link>公開ライブラリリポジトリ</link>に投稿して、他の人が作図に使えるようにしましょう。",
+    "noteGuidelines": "投稿されたライブラリは担当者が審査します。投稿前に<link>ガイドライン</link>をお読みください。修正をお願いすることがあるため、GitHubアカウントがあると便利ですが、必須ではありません。",
+    "noteLicense": "投稿することで、ライブラリが<link>MITライセンス</link>で公開されることに同意したものとみなします。これは誰でも自由に利用できることを意味します。",
+    "noteItems": "各アイテムにはフィルタリング用に固有の名前が必要です。以下のアイテムが含まれます:",
     "atleastOneLibItem": "開始するには少なくとも1つのライブラリ項目を選択してください",
     "republishWarning": "注意: 選択された項目の中には、すでに公開/投稿済みと表示されているものがあります。既存のライブラリや投稿を更新する場合のみ、アイテムを再投稿してください。"
   },
@@ -508,15 +510,15 @@
   },
   "stats": {
     "angle": "角度",
-    "shapes": "",
+    "shapes": "図形",
     "height": "高さ",
     "scene": "シーン",
     "selected": "選択済み",
     "storage": "ストレージ",
-    "fullTitle": "",
+    "fullTitle": "キャンバス・図形のプロパティ",
     "title": "プロパティ",
-    "generalStats": "",
-    "elementProperties": "",
+    "generalStats": "全般",
+    "elementProperties": "図形のプロパティ",
     "total": "合計",
     "version": "バージョン",
     "versionCopy": "クリックしてコピー",
@@ -528,7 +530,7 @@
     "copyStyles": "スタイルをコピーしました。",
     "copyToClipboard": "クリップボードにコピー",
     "copyToClipboardAsPng": "{{exportSelection}} を PNG 形式でクリップボードにコピーしました\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "{{exportSelection}} を SVG 形式でクリップボードにコピーしました\n({{exportColorScheme}})",
     "fileSaved": "ファイルを保存しました",
     "fileSavedToFilename": "{filename} に保存しました",
     "canvas": "キャンバス",
@@ -536,7 +538,7 @@
     "pasteAsSingleElement": "{{shortcut}} を使用して単一の要素として貼り付けるか、\n既存のテキストエディタに貼り付け",
     "unableToEmbed": "この URL の埋め込みは現在許可されていません。URL のホワイトリストへの追加をリクエストするには、GitHub で Issue を上げてください。",
     "unrecognizedLinkFormat": "埋め込もうとしたリンクは期待するフォーマットと一致しません。埋め込み元のサイトで提供される「embed」の文字列を貼り付けてください。",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "リンクをクリップボードにコピーしました"
   },
   "colors": {
     "transparent": "透明",
@@ -557,9 +559,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "描画データはブラウザーのストレージに保存されます。",
+      "center_heading_line2": "ブラウザーのストレージは予期せず消去されることがあります。",
+      "center_heading_line3": "作業を失わないよう、定期的にファイルへ保存してください。",
       "center_heading_plus": "代わりにExcalidraw+を開きますか？",
       "menuHint": "エクスポート、設定、言語..."
     },
@@ -571,7 +573,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "色",
     "mostUsedCustomColors": "最も使用されているカスタム色",
     "colors": "色",
     "shades": "影",
@@ -600,12 +602,12 @@
       "loadFromFile": {
         "title": "ファイルからロード",
         "button": "ファイルからロード",
-        "description": "ファイルからのロードは、<bold>現在の描画内容を置き換えます</bold>。<br></br>その前に、以下の選択肢のいずれかにより描画内容を保存できます。"
+        "description": "ファイルからの読み込みは、<bold>現在の描画内容を置き換えます</bold>。<br></br>その前に、以下の選択肢のいずれかにより描画内容を保存できます。"
       },
       "shareableLink": {
-        "title": "リンクからロード",
+        "title": "リンクから読み込み",
         "button": "描画内容を置き換える",
-        "description": "外部図面のロードは、<bold>現在の描画内容を置き換えます</bold>。<br></br>その前に、以下の選択肢のいずれかにより描画内容を保存できます。"
+        "description": "外部の描画データの読み込みは、<bold>現在の描画内容を置き換えます</bold>。<br></br>その前に、以下の選択肢のいずれかにより描画内容を保存できます。"
       }
     }
   },
@@ -615,61 +617,61 @@
     "description": "現在、<flowchartLink>Flowchart</flowchartLink>、<sequenceLink>Sequence</sequenceLink>、<classLink>Class</classLink> のダイアグラムのみに対応しています。その他の種類は、Excalidraw では画像として描画されます。",
     "syntax": "Mermaid 構文",
     "preview": "プレビュー",
-    "label": "",
-    "inputPlaceholder": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Mermaid のダイアグラム定義をここに入力..."
   },
   "ttd": {
-    "error": ""
+    "error": "エラー！"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "ダイアグラムのアイデアを入力... ({{shortcut}} で改行)",
+    "inputPlaceholderWithMessages": "ダイアグラムを修正...",
+    "generating": "生成中...",
+    "rateLimitRemaining": "本日の残りリクエスト回数: {{count}}",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "あなた",
+      "assistant": "AIアシスタント",
+      "system": "システム"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "AI ベータ版",
+    "label": "チャット",
+    "menu": "メニュー",
+    "newChat": "新しいチャット",
+    "deleteChat": "チャットを削除",
+    "deleteMessage": "メッセージを削除",
+    "viewAsMermaid": "Mermaidで表示",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "ダイアグラムをデザインしよう",
+      "description": "作りたいダイアグラムを説明してください。AIが生成します。",
+      "hint": "フローチャート、シーケンス図、クラス図に対応しています。"
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "プレビュー",
+    "insert": "挿入",
+    "retry": "再試行",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "プロンプトが短すぎます ({{min}} 文字以上)",
+      "promptTooLong": "プロンプトが長すぎます ({{max}} 文字以下)",
+      "generationFailed": "生成に失敗しました",
+      "invalidDiagram": "無効なダイアグラムが生成されました。手動で編集、自動修正で再試行、または別のプロンプトをお試しください。",
+      "fixInMermaid": "Mermaidで手動編集 →",
+      "aiRepair": "再生成 (自動修正) →",
+      "requestAborted": "リクエストが中断されました",
+      "requestFailed": "リクエストに失敗しました",
+      "mermaidParseError": "Mermaid構文エラー"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "無料プランのAI利用上限に達しました。Excalidraw+をお試しいただくか、また明日ご利用ください。",
+      "generalRateLimit": "操作が速すぎたようです。もう少し待ってから再度お試しください。",
+      "messageLimitInputPlaceholder": "メッセージの送信上限に達しました"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Plusにアップグレード"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "クイック検索"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "旧"
     },
     "sceneFonts": "このシーン内",
     "availableFonts": "利用可能フォント",
@@ -680,36 +682,36 @@
     "hint": {
       "text": "ユーザーをクリックしてフォロー",
       "followStatus": "現在このユーザーをフォローしています",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "inCall": "ユーザーは音声通話中です",
+      "micMuted": "ユーザーのマイクはミュート中です",
+      "isSpeaking": "ユーザーは発話中です"
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "コマンドパレット",
     "shortcuts": {
       "select": "選択",
       "confirm": "確認",
       "close": "閉じる"
     },
-    "recents": "",
+    "recents": "最近使ったもの",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "メニュー、コマンドを検索して便利な機能を見つけよう",
+      "noMatch": "一致するコマンドはありません..."
     },
-    "itemNotAvailable": "",
+    "itemNotAvailable": "コマンドを利用できません...",
     "shortcutHint": "コマンドパレットには{{shortcut}}を使用"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "スペース",
+    "delete": "Delete",
+    "mmb": "スクロールホイール"
   }
 }

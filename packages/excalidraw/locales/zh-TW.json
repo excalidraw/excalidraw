@@ -142,8 +142,8 @@
       "editArrow": "編輯箭頭"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "解除多邊形",
+      "convertToPolygon": "轉換為多邊形"
     },
     "elementLock": {
       "lock": "鎖定",
@@ -171,7 +171,9 @@
     "linkToElement": "連結至物件",
     "wrapSelectionInFrame": "將選取內容放入框架",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "切換形狀",
+    "preferences": "偏好設定",
+    "preferences_toolLock": "鎖定工具"
   },
   "elementLink": {
     "title": "連結至物件",
@@ -183,10 +185,10 @@
     "hint_emptyLibrary": "選取畫布上的物件以加入，或從下方的公開儲存庫中安裝資料庫。",
     "hint_emptyPrivateLibrary": "選擇畫布上的物件以在此加入。",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "搜尋資料庫",
+      "heading": "相符的資料庫",
+      "noResults": "找不到相符的項目...",
+      "clearSearch": "清除搜尋"
     }
   },
   "search": {
@@ -195,8 +197,8 @@
     "singleResult": "結果",
     "multipleResults": "結果",
     "placeholder": "在畫布上尋找文字…",
-    "frames": "",
-    "texts": ""
+    "frames": "框架",
+    "texts": "文字"
   },
   "buttons": {
     "clearReset": "重設畫布",
@@ -230,11 +232,11 @@
     "objectsSnapMode": "吸附至物件",
     "exitZenMode": "離開專注模式",
     "cancel": "取消",
-    "saveLibNames": "",
+    "saveLibNames": "儲存名稱並離開",
     "clear": "清除",
     "remove": "刪除",
     "embed": "切換嵌入",
-    "publishLibrary": "",
+    "publishLibrary": "重新命名或發布",
     "submit": "送出",
     "confirm": "確認",
     "embeddableInteractionButton": "點擊以互動"
@@ -261,7 +263,7 @@
     "removeItemsFromsLibrary": "從資料庫刪除 {{count}} 項？",
     "invalidEncryptionKey": "加密鍵必須為22字元。即時協作已停用。",
     "collabOfflineWarning": "沒有可用的網路連線。\n變更無法儲存！",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "瀏覽器儲存空間已滿。變更將不會被儲存。"
   },
   "errors": {
     "unsupportedFileType": "不支援的檔案類型。",
@@ -292,7 +294,7 @@
   },
   "toolBar": {
     "selection": "選取",
-    "lasso": "",
+    "lasso": "繩索選取",
     "image": "插入圖片",
     "rectangle": "長方形",
     "diamond": "菱形",
@@ -313,7 +315,7 @@
     "hand": "手形（平移工具）",
     "extraTools": "更多工具",
     "mermaidToExcalidraw": "Mermaid 至 Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "切換形狀類型"
   },
   "element": {
     "rectangle": "矩形",
@@ -337,21 +339,21 @@
     "shapes": "形狀"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} 以隱藏搜尋",
+    "canvasPanning": "如要移動畫布，請在拖曳時按住 {{shortcut_1}} 或 {{shortcut_2}}，或使用手形工具",
     "linearElement": "點擊以繪製多點曲線；或拖曳以繪製直線",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "點選以開始建立多點，拖曳可建立單一線段。再次按下 {{shortcut}} 以變更箭頭類型。",
+    "arrowBindModifiers": "按住 {{shortcut_1}} 以停用綁定，或按住 {{shortcut_2}} 以綁定於固定點",
     "freeDraw": "點擊並拖曳來繪圖，放開即結束",
     "text": "提示：亦可使用選取工具在任何地方雙擊來加入文字",
     "embeddable": "點擊並拖移以建立嵌入網站",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
+    "text_selected": "按兩下滑鼠或按 {{shortcut}} 以編輯文字",
+    "text_editing": "{{shortcut_1}} 或 {{shortcut_2}} 以結束編輯",
+    "linearElementMulti": "點選最後一個點，或按下 {{shortcut_1}} 或 {{shortcut_2}} 以完成",
+    "lockAngle": "你可以按住 {{shortcut}} 以鎖定角度",
     "resize": "",
     "resizeImage": "",
-    "rotate": "",
+    "rotate": "你可以在旋轉時按住 {{shortcut}} 以鎖定角度",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -619,13 +621,13 @@
     "inputPlaceholder": ""
   },
   "ttd": {
-    "error": ""
+    "error": "錯誤！"
   },
   "chat": {
     "inputPlaceholder": "",
     "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "generating": "生成中...",
+    "rateLimitRemaining": "今日剩餘 {{count}} 次請求",
     "role": {
       "user": "",
       "assistant": "",
@@ -636,16 +638,16 @@
     "menu": "",
     "newChat": "",
     "deleteChat": "",
-    "deleteMessage": "",
+    "deleteMessage": "刪除訊息",
     "viewAsMermaid": "",
     "placeholder": {
       "title": "",
       "description": "",
       "hint": ""
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "預覽",
+    "insert": "插入",
+    "retry": "重試",
     "errors": {
       "promptTooShort": "",
       "promptTooLong": "",
