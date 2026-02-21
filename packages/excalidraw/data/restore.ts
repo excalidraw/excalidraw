@@ -156,9 +156,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
         | ExcalidrawElbowArrowElement["startBinding"]
         | ExcalidrawElbowArrowElement["endBinding"] = {
         ...binding,
-        fixedPoint: normalizeFixedPoint(
-          isFixedPoint(binding.fixedPoint) ? binding.fixedPoint : [0, 0],
-        ),
+        fixedPoint: normalizeFixedPoint(binding.fixedPoint),
         mode: binding.mode || "orbit",
       };
 
@@ -179,9 +177,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
         return {
           elementId: binding.elementId,
           mode: binding.mode,
-          fixedPoint: normalizeFixedPoint(
-            isFixedPoint(binding.fixedPoint) ? binding.fixedPoint : [0.5, 0.5],
-          ),
+          fixedPoint: normalizeFixedPoint(binding.fixedPoint),
         } as FixedPointBinding | null;
       }
       return null;
