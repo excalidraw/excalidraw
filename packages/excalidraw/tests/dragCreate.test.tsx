@@ -357,4 +357,59 @@ describe("Test dragCreate", () => {
       ]);
     });
   });
+
+  describe("cancel in-progress creation with Escape", () => {
+    it("rectangle", async () => {
+      const { getByToolName, container } = await render(
+        <Excalidraw handleKeyboardGlobally={true} />,
+      );
+      fireEvent.click(getByToolName("rectangle"));
+
+      const canvas = container.querySelector("canvas.interactive")!;
+
+      fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+      fireEvent.pointerMove(canvas, { clientX: 80, clientY: 70 });
+      fireEvent.keyDown(document, { key: KEYS.ESCAPE });
+      fireEvent.pointerUp(canvas, { clientX: 80, clientY: 70 });
+
+      expect(h.state.newElement).toBeNull();
+      expect(h.elements.length).toBe(0);
+    });
+
+    it("arrow", async () => {
+      const { getByToolName, container } = await render(
+        <Excalidraw handleKeyboardGlobally={true} />,
+      );
+      fireEvent.click(getByToolName("arrow"));
+
+      const canvas = container.querySelector("canvas.interactive")!;
+
+      fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+      fireEvent.pointerMove(canvas, { clientX: 80, clientY: 70 });
+      fireEvent.keyDown(document, { key: KEYS.ESCAPE });
+      fireEvent.pointerUp(canvas, { clientX: 80, clientY: 70 });
+
+      expect(h.state.newElement).toBeNull();
+      expect(h.state.multiElement).toBeNull();
+      expect(h.elements.length).toBe(0);
+    });
+
+    it("freedraw", async () => {
+      const { getByToolName, container } = await render(
+        <Excalidraw handleKeyboardGlobally={true} />,
+      );
+      fireEvent.click(getByToolName("freedraw"));
+
+      const canvas = container.querySelector("canvas.interactive")!;
+
+      fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+      fireEvent.pointerMove(canvas, { clientX: 40, clientY: 30 });
+      fireEvent.pointerMove(canvas, { clientX: 55, clientY: 45 });
+      fireEvent.keyDown(document, { key: KEYS.ESCAPE });
+      fireEvent.pointerUp(canvas, { clientX: 55, clientY: 45 });
+
+      expect(h.state.newElement).toBeNull();
+      expect(h.elements.length).toBe(0);
+    });
+  });
 });

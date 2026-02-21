@@ -9061,10 +9061,86 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
+  private removePointerInteractionEventListeners = (
+    pointerDownState: PointerDownState,
+  ) => {
+    this.missingPointerEventCleanupEmitter.clear();
+
+    window.removeEventListener(
+      EVENT.POINTER_MOVE,
+      pointerDownState.eventListeners.onMove!,
+    );
+    window.removeEventListener(
+      EVENT.POINTER_UP,
+      pointerDownState.eventListeners.onUp!,
+    );
+    window.removeEventListener(
+      EVENT.KEYDOWN,
+      pointerDownState.eventListeners.onKeyDown!,
+    );
+    window.removeEventListener(
+      EVENT.KEYUP,
+      pointerDownState.eventListeners.onKeyUp!,
+    );
+  };
+
+  private cancelInProgressPointerCreation = (
+    pointerDownState: PointerDownState,
+  ): boolean => {
+    const { newElement, multiElement } = this.state;
+
+    if (!newElement || multiElement) {
+      return false;
+    }
+
+    if (pointerDownState.eventListeners.onMove) {
+      pointerDownState.eventListeners.onMove.flush();
+    }
+
+    this.removePointerInteractionEventListeners(pointerDownState);
+    this.lassoTrail.endPath();
+    this.previousPointerMoveCoords = null;
+    SnapCache.setReferenceSnapPoints(null);
+    SnapCache.setVisibleGaps(null);
+
+    const nextSelectedElementIds = { ...this.state.selectedElementIds };
+    delete nextSelectedElementIds[newElement.id];
+
+    this.updateScene({
+      elements: this.scene
+        .getElementsIncludingDeleted()
+        .filter((element) => element.id !== newElement.id),
+      appState: {
+        cursorButton: "up",
+        newElement: null,
+        multiElement: null,
+        selectionElement: null,
+        selectedLinearElement: null,
+        startBoundElement: null,
+        suggestedBinding: null,
+        selectedElementIds: makeNextSelectedElementIds(
+          nextSelectedElementIds,
+          this.state,
+        ),
+      },
+      captureUpdate: CaptureUpdateAction.NEVER,
+    });
+
+    return true;
+  };
+
   private onKeyDownFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ): (event: KeyboardEvent) => void {
     return withBatchedUpdates((event: KeyboardEvent) => {
+      if (
+        event.key === KEYS.ESCAPE &&
+        this.cancelInProgressPointerCreation(pointerDownState)
+      ) {
+        event.preventDefault();
+        return;
+      }
+
       if (this.maybeHandleResize(pointerDownState, event)) {
         return;
       }
@@ -10203,24 +10279,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      this.missingPointerEventCleanupEmitter.clear();
-
-      window.removeEventListener(
-        EVENT.POINTER_MOVE,
-        pointerDownState.eventListeners.onMove!,
-      );
-      window.removeEventListener(
-        EVENT.POINTER_UP,
-        pointerDownState.eventListeners.onUp!,
-      );
-      window.removeEventListener(
-        EVENT.KEYDOWN,
-        pointerDownState.eventListeners.onKeyDown!,
-      );
-      window.removeEventListener(
-        EVENT.KEYUP,
-        pointerDownState.eventListeners.onKeyUp!,
-      );
+      this.removePointerInteractionEventListeners(pointerDownState);
 
       this.props?.onPointerUp?.(activeTool, pointerDownState);
       this.onPointerUpEmitter.trigger(
