@@ -560,7 +560,7 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
   }
 
   // Must return as only one endpoint is dragged, therefore
-  // the end binding strategy might accidentally gets overriden
+  // the end binding strategy might accidentally gets overridden
   return { current, other: isMultiPoint ? { mode: undefined } : other };
 };
 
