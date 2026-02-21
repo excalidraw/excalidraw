@@ -138,6 +138,35 @@ describe("multi point mode in linear elements", () => {
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
+  it("arrow can still be finished with Escape in multi-point mode", async () => {
+    const { getByToolName, container } = await render(<Excalidraw />);
+    const tool = getByToolName("arrow");
+    fireEvent.click(tool);
+
+    const canvas = container.querySelector("canvas.interactive")!;
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 30 });
+    fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
+    fireEvent.pointerMove(canvas, { clientX: 50, clientY: 60 });
+
+    fireEvent.pointerDown(canvas, { clientX: 50, clientY: 60 });
+    fireEvent.pointerUp(canvas);
+    fireEvent.pointerMove(canvas, { clientX: 100, clientY: 140 });
+
+    fireEvent.keyDown(document, {
+      key: KEYS.ESCAPE,
+    });
+
+    expect(h.elements.length).toEqual(1);
+
+    const element = h.elements[0] as ExcalidrawLinearElement;
+    expect(element.type).toEqual("arrow");
+    expect(element.points).toEqual([
+      [0, 0],
+      [20, 30],
+      [70, 110],
+    ]);
+  });
+
   it("line", async () => {
     const { getByToolName, container } = await render(<Excalidraw />);
     // select tool
