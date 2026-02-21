@@ -32,7 +32,7 @@ const GRID_OPACITY = 50;
 export interface Spreadsheet {
   title: string | null;
   labels: string[] | null;
-  values: number[];
+  series: { name: string | null; values: number[] }[];
 }
 
 export const NOT_SPREADSHEET = "NOT_SPREADSHEET";
@@ -45,7 +45,7 @@ type ParseSpreadsheetResult =
 /**
  * @private exported for testing
  */
-export const tryParseNumber = (s: string): number | null => {
+export const tryParseNumber = (s: string): number | null => {``
   const match = /^([-+]?)[$€£¥₩]?([-+]?)([\d.,]+)[%]?$/.exec(s);
   if (!match) {
     return null;
@@ -62,21 +62,15 @@ const isNumericColumn = (lines: string[][], columnIndex: number) =>
 export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   const numCols = cells[0].length;
 
-  if (numCols > 2) {
-    return { type: NOT_SPREADSHEET, reason: "More than 2 columns" };
-  }
-
   if (numCols === 1) {
     if (!isNumericColumn(cells, 0)) {
       return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
     }
 
     const hasHeader = tryParseNumber(cells[0][0]) === null;
-    const values = (hasHeader ? cells.slice(1) : cells).map((line) =>
-      tryParseNumber(line[0]),
-    );
+    const rows = hasHeader ? cells.slice(1) : cells;
 
-    if (values.length < 2) {
+    if (rows.length < 2) {
       return { type: NOT_SPREADSHEET, reason: "Less than two rows" };
     }
 
@@ -85,38 +79,104 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
       spreadsheet: {
         title: hasHeader ? cells[0][0] : null,
         labels: null,
-        values: values as number[],
+        series: [
+          { name: hasHeader ? cells[0][0] : null, values: rows.map((r) => tryParseNumber(r[0])!) },
+        ],
       },
     };
   }
 
-  const labelColumnNumeric = isNumericColumn(cells, 0);
-  const valueColumnNumeric = isNumericColumn(cells, 1);
+  // For multi-column input, detect numeric columns
+  const numericCols = new Array<boolean>(numCols).fill(false).map((_, i) =>
+    isNumericColumn(cells, i),
+  );
 
-  if (!labelColumnNumeric && !valueColumnNumeric) {
+  // If first column is non-numeric and there's at least one numeric column,
+  // treat the first column as labels and the rest as series.
+  if (!numericCols[0] && numericCols.some(Boolean)) {
+    const firstNumericIndex = numericCols.findIndex(Boolean);
+    const hasHeader = tryParseNumber(cells[0][firstNumericIndex]) === null;
+    const rows = hasHeader ? cells.slice(1) : cells;
+
+    if (rows.length < 2) {
+      return { type: NOT_SPREADSHEET, reason: "Less than 2 rows" };
+    }
+
+    // labels come from the first column
+    const labels = rows.map((row) => row[0]);
+
+    const series: { name: string | null; values: number[] }[] = [];
+    for (let col = 1; col < numCols; col++) {
+      if (!numericCols[col]) {
+        return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
+      }
+      const name = hasHeader ? cells[0][col] : null;
+      const values = rows.map((row) => tryParseNumber(row[col]));
+      if (values.some((v) => v === null)) {
+        return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
+      }
+      series.push({ name, values: values as number[] });
+    }
+
+    const combinedTitle = hasHeader
+      ? series
+          .map((s) => s.name ?? "")
+          .filter((n) => n.trim().length > 0)
+          .join(", ") || null
+      : null;
+
+    return {
+      type: VALID_SPREADSHEET,
+      spreadsheet: {
+        title: combinedTitle,
+        labels,
+        series,
+      },
+    };
+  }
+
+  // Otherwise expect all columns to be numeric (multiple series, no labels)
+  if (!numericCols.some(Boolean)) {
     return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
   }
 
-  const [labelColumnIndex, valueColumnIndex] = valueColumnNumeric
-    ? [0, 1]
-    : [1, 0];
-  const hasHeader = tryParseNumber(cells[0][valueColumnIndex]) === null;
+  const firstNumericIndex = numericCols.findIndex(Boolean);
+  const hasHeader = tryParseNumber(cells[0][firstNumericIndex]) === null;
   const rows = hasHeader ? cells.slice(1) : cells;
 
   if (rows.length < 2) {
     return { type: NOT_SPREADSHEET, reason: "Less than 2 rows" };
   }
 
+  const series: { name: string | null; values: number[] }[] = [];
+  for (let col = 0; col < numCols; col++) {
+    if (!numericCols[col]) {
+      return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
+    }
+    const name = hasHeader ? cells[0][col] : null;
+    const values = rows.map((row) => tryParseNumber(row[col]));
+    if (values.some((v) => v === null)) {
+      return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
+    }
+    series.push({ name, values: values as number[] });
+  }
+
+  const combinedTitle = hasHeader
+    ? series
+        .map((s) => s.name ?? "")
+        .filter((n) => n.trim().length > 0)
+        .join(", ") || null
+    : null;
+
   return {
     type: VALID_SPREADSHEET,
     spreadsheet: {
-      title: hasHeader ? cells[0][valueColumnIndex] : null,
-      labels: rows.map((row) => row[labelColumnIndex]),
-      values: rows.map((row) => tryParseNumber(row[valueColumnIndex])!),
+      title: combinedTitle,
+      labels: null,
+      series,
     },
   };
 };
-
 const transposeCells = (cells: string[][]) => {
   const nextCells: string[][] = [];
   for (let col = 0; col < cells[0].length; col++) {
@@ -131,30 +191,28 @@ const transposeCells = (cells: string[][]) => {
 
 export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   // Copy/paste from excel, spreadsheets, tsv, csv.
-  // For now we only accept 2 columns with an optional header
+  // Accept any number of columns. Try common delimiters (tab, comma, semicolon)
+  // and pick the one that yields a consistent column count across rows.
 
-  // Check for tab separated values
-  let lines = text
-    .trim()
-    .split("\n")
-    .map((line) => line.trim().split("\t"));
-
-  // Check for comma separated files
-  if (lines.length && lines[0].length !== 2) {
-    lines = text
-      .trim()
-      .split("\n")
-      .map((line) => line.trim().split(","));
-  }
-
-  if (lines.length === 0) {
+  const rawLines = text.trim().split("\n").map((l) => l.trim());
+  if (rawLines.length === 0 || (rawLines.length === 1 && rawLines[0] === "")) {
     return { type: NOT_SPREADSHEET, reason: "No values" };
   }
 
-  const numColsFirstLine = lines[0].length;
-  const isSpreadsheet = lines.every((line) => line.length === numColsFirstLine);
+  const delimiters = ["\t", ",", ";"];
+  let lines: string[][] | null = null;
 
-  if (!isSpreadsheet) {
+  for (const delim of delimiters) {
+    const candidate = rawLines.map((line) => line.split(delim));
+    const numColsFirstLine = candidate[0].length;
+    const isSpreadsheet = candidate.every((line) => line.length === numColsFirstLine);
+    if (isSpreadsheet && numColsFirstLine > 0) {
+      lines = candidate;
+      break;
+    }
+  }
+
+  if (!lines) {
     return {
       type: NOT_SPREADSHEET,
       reason: "All rows don't have same number of columns",
@@ -189,9 +247,11 @@ const commonProps = {
   locked: false,
 } as const;
 
-const getChartDimensions = (spreadsheet: Spreadsheet) => {
-  const chartWidth =
-    (BAR_WIDTH + BAR_GAP) * spreadsheet.values.length + BAR_GAP;
+const getChartDimensions = (spreadsheet: Spreadsheet, stacked = false) => {
+  const numCategories = (spreadsheet.labels ?? spreadsheet.series[0].values).length;
+  const numSeries = stacked ? 1 : spreadsheet.series.length;
+  const categoryBlockWidth = numSeries * (BAR_WIDTH + BAR_GAP);
+  const chartWidth = categoryBlockWidth * numCategories + BAR_GAP;
   const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
   return { chartWidth, chartHeight };
 };
@@ -202,17 +262,26 @@ const chartXLabels = (
   y: number,
   groupId: string,
   backgroundColor: string,
+  stacked = false,
 ): ChartElements => {
+  const labels = spreadsheet.labels ?? spreadsheet.series[0].values.map((_: number, i: number) => String(i + 1));
+
+  const numSeries = stacked ? 1 : spreadsheet.series.length;
+  const categoryBlockWidth = numSeries * (BAR_WIDTH + BAR_GAP);
+
   return (
-    spreadsheet.labels?.map((label, index) => {
+    labels.map((label, index) => {
+      // center the label under the category block
+      const categoryX = x + index * categoryBlockWidth + BAR_GAP;
+      const labelX = categoryX + (categoryBlockWidth - BAR_GAP) / 2;
       return newTextElement({
         groupIds: [groupId],
         backgroundColor,
         ...commonProps,
         text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
-        x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
+        x: labelX,
         y: y + BAR_GAP / 2,
-        width: BAR_WIDTH,
+        width: categoryBlockWidth,
         angle: 5.87 as Radians,
         fontSize: FONT_SIZES.sm,
         textAlign: "center",
@@ -239,13 +308,16 @@ const chartYLabels = (
     textAlign: "right",
   });
 
+  const maxVal = Math.max(
+    ...spreadsheet.series.reduce((acc, s) => acc.concat(s.values), [] as number[]),
+  );
   const maxYLabel = newTextElement({
     groupIds: [groupId],
     backgroundColor,
     ...commonProps,
     x: x - BAR_GAP,
     y: y - BAR_HEIGHT - minYLabel.height / 2,
-    text: Math.max(...spreadsheet.values).toLocaleString(),
+    text: maxVal.toLocaleString(),
     textAlign: "right",
   });
 
@@ -258,8 +330,9 @@ const chartLines = (
   y: number,
   groupId: string,
   backgroundColor: string,
+  stacked = false,
 ): ChartElements => {
-  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet);
+  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet, stacked);
   const xLine = newLinearElement({
     backgroundColor,
     groupIds: [groupId],
@@ -306,8 +379,9 @@ const chartBaseElements = (
   groupId: string,
   backgroundColor: string,
   debug?: boolean,
+  stacked = false,
 ): ChartElements => {
-  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet);
+  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet, stacked);
 
   const title = spreadsheet.title
     ? newTextElement({
@@ -341,9 +415,9 @@ const chartBaseElements = (
   return [
     ...(debugRect ? [debugRect] : []),
     ...(title ? [title] : []),
-    ...chartXLabels(spreadsheet, x, y, groupId, backgroundColor),
+    ...chartXLabels(spreadsheet, x, y, groupId, backgroundColor, stacked),
     ...chartYLabels(spreadsheet, x, y, groupId, backgroundColor),
-    ...chartLines(spreadsheet, x, y, groupId, backgroundColor),
+    ...chartLines(spreadsheet, x, y, groupId, backgroundColor, stacked),
   ];
 };
 
@@ -352,21 +426,28 @@ const chartTypeBar = (
   x: number,
   y: number,
 ): ChartElements => {
-  const max = Math.max(...spreadsheet.values);
+  const max = Math.max(
+    ...spreadsheet.series.reduce((acc, s) => acc.concat(s.values), [] as number[]),
+  );
   const groupId = randomId();
-  const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+  const categoryBlockWidth = spreadsheet.series.length * (BAR_WIDTH + BAR_GAP);
 
-  const bars = spreadsheet.values.map((value, index) => {
-    const barHeight = (value / max) * BAR_HEIGHT;
-    return newElement({
-      backgroundColor,
-      groupIds: [groupId],
-      ...commonProps,
-      type: "rectangle",
-      x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP,
-      y: y - barHeight - BAR_GAP,
-      width: BAR_WIDTH,
-      height: barHeight,
+  const bars = spreadsheet.series.flatMap((series, s) => {
+    const seriesColor = bgColors[s % bgColors.length];
+    const barX = s * (BAR_WIDTH + BAR_GAP);
+    return series.values.map((value, cat) => {
+      const categoryX = x + cat * categoryBlockWidth + BAR_GAP;
+      const barHeight = (value / max) * BAR_HEIGHT;
+      return newElement({
+          backgroundColor: seriesColor,
+          groupIds: [groupId],
+          ...commonProps,
+          type: "rectangle",
+          x: barX + categoryX,
+          y: y - barHeight - BAR_GAP,
+          width: BAR_WIDTH,
+          height: barHeight,
+        });
     });
   });
 
@@ -377,8 +458,9 @@ const chartTypeBar = (
       x,
       y,
       groupId,
-      backgroundColor,
+      bgColors[0],
       isDevEnv(),
+      false,
     ),
   ];
 };
@@ -388,70 +470,83 @@ const chartTypeLine = (
   x: number,
   y: number,
 ): ChartElements => {
-  const max = Math.max(...spreadsheet.values);
+  const max = Math.max(
+    ...spreadsheet.series.reduce((acc, s) => acc.concat(s.values), [] as number[]),
+  );
   const groupId = randomId();
-  const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
 
-  let index = 0;
-  const points = [];
-  for (const value of spreadsheet.values) {
-    const cx = index * (BAR_WIDTH + BAR_GAP);
-    const cy = -(value / max) * BAR_HEIGHT;
-    points.push([cx, cy]);
-    index++;
-  }
+  const elements: NonDeletedExcalidrawElement[] = [];
 
-  const maxX = Math.max(...points.map((element) => element[0]));
-  const maxY = Math.max(...points.map((element) => element[1]));
-  const minX = Math.min(...points.map((element) => element[0]));
-  const minY = Math.min(...points.map((element) => element[1]));
+  for (let s = 0; s < spreadsheet.series.length; s++) {
+    const seriesColor = bgColors[s % bgColors.length];
 
-  const line = newLinearElement({
-    backgroundColor,
-    groupIds: [groupId],
-    ...commonProps,
-    type: "line",
-    x: x + BAR_GAP + BAR_WIDTH / 2,
-    y: y - BAR_GAP,
-    height: maxY - minY,
-    width: maxX - minX,
-    strokeWidth: 2,
-    points: points as any,
-  });
+    let index = 0;
+    const points = [];
+    for (const value of spreadsheet.series[s].values) {
+      const cx = index * (BAR_WIDTH + BAR_GAP);
+      const cy = -(value / max) * BAR_HEIGHT;
+      points.push([cx, cy]);
+      index++;
+    }
 
-  const dots = spreadsheet.values.map((value, index) => {
-    const cx = index * (BAR_WIDTH + BAR_GAP) + BAR_GAP / 2;
-    const cy = -(value / max) * BAR_HEIGHT + BAR_GAP / 2;
-    return newElement({
-      backgroundColor,
-      groupIds: [groupId],
-      ...commonProps,
-      fillStyle: "solid",
-      strokeWidth: 2,
-      type: "ellipse",
-      x: x + cx + BAR_WIDTH / 2,
-      y: y + cy - BAR_GAP * 2,
-      width: BAR_GAP,
-      height: BAR_GAP,
-    });
-  });
+    const maxX = Math.max(...points.map((element) => element[0]));
+    const maxY = Math.max(...points.map((element) => element[1]));
+    const minX = Math.min(...points.map((element) => element[0]));
+    const minY = Math.min(...points.map((element) => element[1]));
 
-  const lines = spreadsheet.values.map((value, index) => {
-    const cx = index * (BAR_WIDTH + BAR_GAP) + BAR_GAP / 2;
-    const cy = (value / max) * BAR_HEIGHT + BAR_GAP / 2 + BAR_GAP;
-    return newLinearElement({
-      backgroundColor,
+    const line = newLinearElement({
+      backgroundColor: seriesColor,
       groupIds: [groupId],
       ...commonProps,
       type: "line",
-      x: x + cx + BAR_WIDTH / 2 + BAR_GAP / 2,
-      y: y - cy,
-      height: cy,
-      strokeStyle: "dotted",
-      opacity: GRID_OPACITY,
-      points: [pointFrom(0, 0), pointFrom(0, cy)],
+      x: x + BAR_GAP + BAR_WIDTH / 2,
+      y: y - BAR_GAP,
+      height: maxY - minY,
+      width: maxX - minX,
+      strokeWidth: 2,
+      points: points as any,
     });
-  });
+
+    elements.push(line);
+
+    const dots = points.map(([px, py]) => {
+      const cx = px + BAR_GAP / 2;
+      const cy = py + BAR_GAP / 2;
+      return newElement({
+        backgroundColor: seriesColor,
+        groupIds: [groupId],
+        ...commonProps,
+        fillStyle: "solid",
+        strokeWidth: 2,
+        type: "ellipse",
+        x: x + cx + BAR_WIDTH / 2,
+        y: y + cy - BAR_GAP * 2,
+        width: BAR_GAP,
+        height: BAR_GAP,
+      });
+    });
+
+    elements.push(...dots);
+
+    const lines = points.map(([px, py]) => {
+      const cx = px + BAR_GAP / 2;
+      const cy = -py + BAR_GAP / 2 + BAR_GAP;
+      return newLinearElement({
+          backgroundColor: seriesColor,
+          groupIds: [groupId],
+          ...commonProps,
+          type: "line",
+          x: x + cx + BAR_WIDTH / 2 + BAR_GAP / 2,
+          y: y - cy,
+          height: cy,
+          strokeStyle: "dotted",
+          opacity: GRID_OPACITY,
+          points: [pointFrom(0, 0), pointFrom(0, cy)],
+        });
+    });
+
+    elements.push(...lines);
+  }
 
   return [
     ...chartBaseElements(
@@ -459,12 +554,11 @@ const chartTypeLine = (
       x,
       y,
       groupId,
-      backgroundColor,
+      bgColors[0],
       isDevEnv(),
+      true,
     ),
-    line,
-    ...lines,
-    ...dots,
+    ...elements,
   ];
 };
 

@@ -1,5 +1,45 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`tryParseSpreadsheet > parses multiple columns into multiple series 1`] = `
+{
+  "spreadsheet": {
+    "labels": [
+      "Week 1",
+      "Week 2",
+      "Week 3",
+    ],
+    "series": [
+      {
+        "name": "Users",
+        "values": [
+          100,
+          200,
+          150,
+        ],
+      },
+      {
+        "name": "Admins",
+        "values": [
+          5,
+          8,
+          6,
+        ],
+      },
+      {
+        "name": "Guests",
+        "values": [
+          20,
+          25,
+          30,
+        ],
+      },
+    ],
+    "title": "Users, Admins, Guests",
+  },
+  "type": "VALID_SPREADSHEET",
+}
+`;
+
 exports[`tryParseSpreadsheet > works for numbers with comma in them 1`] = `
 {
   "spreadsheet": {
@@ -8,12 +48,17 @@ exports[`tryParseSpreadsheet > works for numbers with comma in them 1`] = `
       "Week 2",
       "Week 3",
     ],
-    "title": "Users",
-    "values": [
-      814,
-      10301,
-      4264,
+    "series": [
+      {
+        "name": "Users",
+        "values": [
+          814,
+          10301,
+          4264,
+        ],
+      },
     ],
+    "title": "Users",
   },
   "type": "VALID_SPREADSHEET",
 }

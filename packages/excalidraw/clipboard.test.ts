@@ -172,9 +172,12 @@ describe("parseClipboard()", () => {
       ),
     );
     expect(clipboardData.spreadsheet).toEqual({
-      title: "b",
-      labels: ["1", "4", "7"],
-      values: [2, 5, 10],
+      title: "a, b",
+      labels: null,
+      series: [
+        { name: "a", values: [1, 4, 7] },
+        { name: "b", values: [2, 5, 10] },
+      ],
     });
     // -------------------------------------------------------------------------
     clipboardData = await parseClipboard(
@@ -190,9 +193,12 @@ describe("parseClipboard()", () => {
       ),
     );
     expect(clipboardData.spreadsheet).toEqual({
-      title: "b",
-      labels: ["1", "4", "7"],
-      values: [2, 5, 10],
+      title: "a, b",
+      labels: null,
+      series: [
+        { name: "a", values: [1, 4, 7] },
+        { name: "b", values: [2, 5, 10] },
+      ],
     });
     // -------------------------------------------------------------------------
     clipboardData = await parseClipboard(
@@ -213,9 +219,12 @@ describe("parseClipboard()", () => {
       ),
     );
     expect(clipboardData.spreadsheet).toEqual({
-      title: "b",
-      labels: ["1", "4", "7"],
-      values: [2, 5, 10],
+      title: "a, b",
+      labels: null,
+      series: [
+        { name: "a", values: [1, 4, 7] },
+        { name: "b", values: [2, 5, 10] },
+      ],
     });
   });
 });
