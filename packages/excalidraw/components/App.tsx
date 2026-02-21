@@ -568,6 +568,8 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
+const EDGE_PAN_THRESHOLD = 24;
+const EDGE_PAN_MAX_STEP = 4;
 
 /**
  * Map of youtube embed video states
@@ -652,6 +654,13 @@ class App extends React.Component<AppProps, AppState> {
   /** previous frame pointer coords */
   previousPointerMoveCoords: { x: number; y: number } | null = null;
   lastViewportPosition = { x: 0, y: 0 };
+  private selectionEdgePanRafId: number | null = null;
+  private selectionEdgePanLastEvent: PointerEvent | null = null;
+  private isSelectionEdgePanSyntheticMove = false;
+  private isSelectionEdgePanPrimed = false;
+  private skipNextSelectionEdgePanTick = false;
+  private selectionEdgePanLastClientCoords: { x: number; y: number } | null =
+    null;
 
   animationFrameHandler = new AnimationFrameHandler();
 
@@ -7567,6 +7576,11 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerUp = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    this.selectionEdgePanLastEvent = null;
+    this.isSelectionEdgePanPrimed = false;
+    this.skipNextSelectionEdgePanTick = false;
+    this.selectionEdgePanLastClientCoords = null;
+    this.stopSelectionEdgePanLoop();
     if (getFeatureFlag("COMPLEX_BINDINGS")) {
       this.resetDelayedBindMode();
     }
@@ -9089,10 +9103,27 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ) {
     return withBatchedUpdatesThrottled((event: PointerEvent) => {
+      const pointerMoveClientDelta = { x: 0, y: 0 };
+      if (!this.isSelectionEdgePanSyntheticMove) {
+        // Prioritize real pointer movement over synthetic edge-pan ticks
+        // without restarting the loop every pointermove (smoother feel).
+        this.skipNextSelectionEdgePanTick = true;
+        if (this.selectionEdgePanLastClientCoords) {
+          pointerMoveClientDelta.x =
+            event.clientX - this.selectionEdgePanLastClientCoords.x;
+          pointerMoveClientDelta.y =
+            event.clientY - this.selectionEdgePanLastClientCoords.y;
+        }
+        this.selectionEdgePanLastClientCoords = {
+          x: event.clientX,
+          y: event.clientY,
+        };
+        this.selectionEdgePanLastEvent = event;
+      }
       if (this.state.openDialog?.name === "elementLinkSelector") {
         return;
       }
-      const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
+      let pointerCoords = viewportCoordsToSceneCoords(event, this.state);
 
       if (this.state.activeLockedId) {
         this.setState({
@@ -9425,6 +9456,62 @@ class App extends React.Component<AppProps, AppState> {
           !this.state.editingTextElement &&
           this.state.activeEmbeddable?.state !== "active"
         ) {
+          const edgePanDelta = this.getSelectionEdgePanDelta(event);
+          // Pan only when user pushes towards an edge, or while holding still
+          // at edge (delta ~= 0), to avoid accidental pan near top/left.
+          if (
+            (edgePanDelta.x < 0 && pointerMoveClientDelta.x > 0) ||
+            (edgePanDelta.x > 0 && pointerMoveClientDelta.x < 0)
+          ) {
+            edgePanDelta.x = 0;
+          }
+          if (
+            (edgePanDelta.y < 0 && pointerMoveClientDelta.y > 0) ||
+            (edgePanDelta.y > 0 && pointerMoveClientDelta.y < 0)
+          ) {
+            edgePanDelta.y = 0;
+          }
+          const isEdgePanZone = edgePanDelta.x !== 0 || edgePanDelta.y !== 0;
+          if (edgePanDelta.x || edgePanDelta.y) {
+            this.startSelectionEdgePanLoop(pointerDownState);
+            // Avoid accidental pan on first edge contact during a normal drag.
+            // Continuous pan is handled by the edge-pan RAF loop.
+            if (
+              !this.isSelectionEdgePanSyntheticMove &&
+              !this.isSelectionEdgePanPrimed
+            ) {
+              this.isSelectionEdgePanPrimed = true;
+              edgePanDelta.x = 0;
+              edgePanDelta.y = 0;
+            }
+          } else {
+            this.isSelectionEdgePanPrimed = false;
+            this.stopSelectionEdgePanLoop();
+          }
+          if (edgePanDelta.x || edgePanDelta.y) {
+            const zoomValue = this.state.zoom.value;
+            this.translateCanvas((prevState) => ({
+              scrollX:
+                prevState.scrollX - edgePanDelta.x / prevState.zoom.value,
+              scrollY:
+                prevState.scrollY - edgePanDelta.y / prevState.zoom.value,
+            }));
+            // Keep edge-pan speed deterministic: when edge-pan is active for
+            // an axis, use fixed per-frame movement instead of raw pointer
+            // deltas (which vary with mouse speed).
+            pointerCoords = {
+              x:
+                edgePanDelta.x !== 0
+                  ? lastPointerCoords.x + edgePanDelta.x / zoomValue
+                  : pointerCoords.x,
+              y:
+                edgePanDelta.y !== 0
+                  ? lastPointerCoords.y + edgePanDelta.y / zoomValue
+                  : pointerCoords.y,
+            };
+            this.previousPointerMoveCoords = pointerCoords;
+          }
+
           const dragOffset = {
             x: pointerCoords.x - pointerDownState.drag.origin.x,
             y: pointerCoords.y - pointerDownState.drag.origin.y,
@@ -9553,16 +9640,22 @@ class App extends React.Component<AppProps, AppState> {
           // Snap cache *must* be synchronously popuplated before initial drag,
           // otherwise the first drag even will not snap, causing a jump before
           // it snaps to its position if previously snapped already.
-          this.maybeCacheVisibleGaps(event, selectedElements);
-          this.maybeCacheReferenceSnapPoints(event, selectedElements);
+          let snapOffset = { x: 0, y: 0 };
+          let snapLines = [] as AppState["snapLines"];
+          if (!isEdgePanZone) {
+            this.maybeCacheVisibleGaps(event, selectedElements);
+            this.maybeCacheReferenceSnapPoints(event, selectedElements);
 
-          const { snapOffset, snapLines } = snapDraggedElements(
-            originalElements,
-            dragOffset,
-            this,
-            event,
-            this.scene.getNonDeletedElementsMap(),
-          );
+            const snapResult = snapDraggedElements(
+              originalElements,
+              dragOffset,
+              this,
+              event,
+              this.scene.getNonDeletedElementsMap(),
+            );
+            snapOffset = snapResult.snapOffset;
+            snapLines = snapResult.snapLines;
+          }
 
           this.setState({ snapLines });
 
@@ -9575,7 +9668,11 @@ class App extends React.Component<AppProps, AppState> {
               dragOffset,
               this.scene,
               snapOffset,
-              event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+              event[KEYS.CTRL_OR_CMD] ||
+                this.isSelectionEdgePanSyntheticMove ||
+                isEdgePanZone
+                ? null
+                : this.getEffectiveGridSize(),
             );
           }
 
@@ -9990,6 +10087,94 @@ class App extends React.Component<AppProps, AppState> {
     return false;
   }
 
+  private getSelectionEdgePanDelta(event: PointerEvent) {
+    if (
+      event.pointerType === "touch" ||
+      this.state.width <= 0 ||
+      this.state.height <= 0
+    ) {
+      return { x: 0, y: 0 };
+    }
+
+    const canvasRect = this.interactiveCanvas?.getBoundingClientRect();
+    const hasValidCanvasRect =
+      !!canvasRect && canvasRect.width > 0 && canvasRect.height > 0;
+    const rect = hasValidCanvasRect
+      ? {
+          left: canvasRect.left,
+          right: canvasRect.right,
+          top: canvasRect.top,
+          bottom: canvasRect.bottom,
+        }
+      : {
+          left: this.state.offsetLeft,
+          right: this.state.offsetLeft + this.state.width,
+          top: this.state.offsetTop,
+          bottom: this.state.offsetTop + this.state.height,
+        };
+    const getAxisDelta = (pointerPos: number, min: number, max: number) => {
+      if (pointerPos < min + EDGE_PAN_THRESHOLD) {
+        return -EDGE_PAN_MAX_STEP;
+      }
+      if (pointerPos > max - EDGE_PAN_THRESHOLD) {
+        return EDGE_PAN_MAX_STEP;
+      }
+      return 0;
+    };
+
+    return {
+      x: getAxisDelta(event.clientX, rect.left, rect.right),
+      y: getAxisDelta(event.clientY, rect.top, rect.bottom),
+    };
+  }
+
+  private startSelectionEdgePanLoop(pointerDownState: PointerDownState) {
+    if (this.selectionEdgePanRafId !== null) {
+      return;
+    }
+
+    const tick = () => {
+      if (this.state.cursorButton !== "down") {
+        this.stopSelectionEdgePanLoop();
+        return;
+      }
+      if (
+        this.selectionEdgePanLastEvent &&
+        typeof this.selectionEdgePanLastEvent.buttons === "number" &&
+        this.selectionEdgePanLastEvent.buttons === 0
+      ) {
+        this.stopSelectionEdgePanLoop();
+        return;
+      }
+      if (this.skipNextSelectionEdgePanTick) {
+        this.skipNextSelectionEdgePanTick = false;
+        this.selectionEdgePanRafId = window.requestAnimationFrame(tick);
+        return;
+      }
+      const onMove = pointerDownState.eventListeners.onMove;
+      if (!onMove || !this.selectionEdgePanLastEvent) {
+        this.stopSelectionEdgePanLoop();
+        return;
+      }
+      this.isSelectionEdgePanSyntheticMove = true;
+      try {
+        onMove(this.selectionEdgePanLastEvent);
+      } finally {
+        this.isSelectionEdgePanSyntheticMove = false;
+      }
+      this.selectionEdgePanRafId = window.requestAnimationFrame(tick);
+    };
+
+    this.selectionEdgePanRafId = window.requestAnimationFrame(tick);
+  }
+
+  private stopSelectionEdgePanLoop() {
+    if (this.selectionEdgePanRafId !== null) {
+      window.cancelAnimationFrame(this.selectionEdgePanRafId);
+      this.selectionEdgePanRafId = null;
+    }
+  }
+
   private onPointerUpFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ): (event: PointerEvent) => void {
@@ -9997,6 +10182,11 @@ class App extends React.Component<AppProps, AppState> {
       const elementsMap = this.scene.getNonDeletedElementsMap();
 
       this.removePointer(childEvent);
+      this.selectionEdgePanLastEvent = null;
+      this.isSelectionEdgePanPrimed = false;
+      this.skipNextSelectionEdgePanTick = false;
+      this.selectionEdgePanLastClientCoords = null;
+      this.stopSelectionEdgePanLoop();
       pointerDownState.drag.blockDragging = false;
       if (pointerDownState.eventListeners.onMove) {
         pointerDownState.eventListeners.onMove.flush();
@@ -10221,6 +10411,10 @@ class App extends React.Component<AppProps, AppState> {
         EVENT.KEYUP,
         pointerDownState.eventListeners.onKeyUp!,
       );
+      pointerDownState.eventListeners.onMove = null;
+      pointerDownState.eventListeners.onUp = null;
+      pointerDownState.eventListeners.onKeyDown = null;
+      pointerDownState.eventListeners.onKeyUp = null;
 
       this.props?.onPointerUp?.(activeTool, pointerDownState);
       this.onPointerUpEmitter.trigger(
