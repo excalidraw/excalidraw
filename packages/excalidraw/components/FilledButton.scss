@@ -1,4 +1,4 @@
-@import "../css/variables.module.scss";
+@use "../css/variables.module" as *;
 
 @keyframes successStatusAnimation {
   0% {
@@ -24,6 +24,14 @@
     background-color: var(--back-color);
     border-color: var(--border-color);
 
+    border-radius: 0.5rem;
+    border-width: 1px;
+    border-style: solid;
+
+    font-family: var(--font-family);
+
+    user-select: none;
+
     &:hover {
       transition: all 150ms ease-out;
     }
@@ -45,6 +53,7 @@
     &.ExcButton--status-loading,
     &.ExcButton--status-success {
       pointer-events: none;
+      background-color: var(--color-success);
 
       .ExcButton__contents {
         visibility: hidden;
@@ -52,7 +61,19 @@
     }
 
     &[disabled] {
-      pointer-events: none;
+      cursor: not-allowed;
+
+      &.ExcButton--variant-filled,
+      &:hover {
+        --back-color: var(--color-surface-low) !important;
+        --text-color: var(--color-on-surface-variant) !important;
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-on-surface-variant);
+        --border-color: var(--color-surface-high);
+      }
     }
 
     &,
@@ -265,14 +286,6 @@
         }
       }
     }
-
-    border-radius: 0.5rem;
-    border-width: 1px;
-    border-style: solid;
-
-    font-family: var(--font-family);
-
-    user-select: none;
 
     &--size-large {
       font-weight: 600;

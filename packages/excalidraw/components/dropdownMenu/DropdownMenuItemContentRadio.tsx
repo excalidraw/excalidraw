@@ -27,9 +27,7 @@ const DropdownMenuItemContentRadio = <T,>({
   return (
     <>
       <div className="dropdown-menu-item-base dropdown-menu-item-bare">
-        <label className="dropdown-menu-item__text" htmlFor={name}>
-          {children}
-        </label>
+        <label className="dropdown-menu-item__text">{children}</label>
         <RadioGroup
           name={name}
           value={value}

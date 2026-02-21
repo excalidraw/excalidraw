@@ -59,8 +59,11 @@ import { LinearElementEditor } from "./linearElementEditor";
 
 import { distanceToElement } from "./distance";
 
+import { getBindingGap } from "./binding";
+
 import type {
   ElementsMap,
+  ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
@@ -105,6 +108,12 @@ export type HitTestArgs = {
   overrideShouldTestInside?: boolean;
 };
 
+let cachedPoint: GlobalPoint | null = null;
+let cachedElement: WeakRef<ExcalidrawElement> | null = null;
+let cachedThreshold: number = Infinity;
+let cachedHit: boolean = false;
+let cachedOverrideShouldTestInside = false;
+
 export const hitElementItself = ({
   point,
   element,
@@ -113,6 +122,24 @@ export const hitElementItself = ({
   frameNameBound = null,
   overrideShouldTestInside = false,
 }: HitTestArgs) => {
+  // Return cached result if the same point and element version is tested again
+  if (
+    cachedPoint &&
+    pointsEqual(point, cachedPoint) &&
+    cachedThreshold <= threshold &&
+    overrideShouldTestInside === cachedOverrideShouldTestInside
+  ) {
+    const derefElement = cachedElement?.deref();
+    if (
+      derefElement &&
+      derefElement.id === element.id &&
+      derefElement.version === element.version &&
+      derefElement.versionNonce === element.versionNonce
+    ) {
+      return cachedHit;
+    }
+  }
+
   // Hit test against a frame's name
   const hitFrameName = frameNameBound
     ? isPointWithinBounds(
@@ -153,7 +180,16 @@ export const hitElementItself = ({
       isPointOnElementOutline(point, element, elementsMap, threshold)
     : isPointOnElementOutline(point, element, elementsMap, threshold);
 
-  return hitElement || hitFrameName;
+  const result = hitElement || hitFrameName;
+
+  // Cache end result
+  cachedPoint = point;
+  cachedElement = new WeakRef(element);
+  cachedThreshold = threshold;
+  cachedOverrideShouldTestInside = overrideShouldTestInside;
+  cachedHit = result;
+
+  return result;
 };
 
 export const hitElementBoundingBox = (
@@ -257,7 +293,7 @@ export const getAllHoveredElementAtPoint = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  toleranceFn?: (element: ExcalidrawBindableElement) => number,
+  tolerance?: number,
 ): NonDeleted<ExcalidrawBindableElement>[] => {
   const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
@@ -273,7 +309,7 @@ export const getAllHoveredElementAtPoint = (
 
     if (
       isBindableElement(element, false) &&
-      bindingBorderTest(element, point, elementsMap, toleranceFn?.(element))
+      bindingBorderTest(element, point, elementsMap, tolerance)
     ) {
       candidateElements.push(element);
 
@@ -290,13 +326,13 @@ export const getHoveredElementForBinding = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  toleranceFn?: (element: ExcalidrawBindableElement) => number,
+  tolerance?: number,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
   const candidateElements = getAllHoveredElementAtPoint(
     point,
     elements,
     elementsMap,
-    toleranceFn,
+    tolerance,
   );
 
   if (!candidateElements || candidateElements.length === 0) {
@@ -313,6 +349,56 @@ export const getHoveredElementForBinding = (
       (a, b) => b.width ** 2 + b.height ** 2 - (a.width ** 2 + a.height ** 2),
     )
     .pop() as NonDeleted<ExcalidrawBindableElement>;
+};
+
+export const getHoveredElementForFocusPoint = (
+  point: GlobalPoint,
+  arrow: ExcalidrawArrowElement,
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elementsMap: NonDeletedSceneElementsMap,
+  tolerance?: number,
+): ExcalidrawBindableElement | null => {
+  const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
+  // We need to to hit testing from front (end of the array) to back (beginning of the array)
+  // because array is ordered from lower z-index to highest and we want element z-index
+  // with higher z-index
+  for (let index = elements.length - 1; index >= 0; --index) {
+    const element = elements[index];
+
+    invariant(
+      !element.isDeleted,
+      "Elements in the function parameter for getAllElementsAtPositionForBinding() should not contain deleted elements",
+    );
+
+    if (
+      isBindableElement(element, false) &&
+      bindingBorderTest(element, point, elementsMap, tolerance)
+    ) {
+      candidateElements.push(element);
+    }
+  }
+
+  if (!candidateElements || candidateElements.length === 0) {
+    return null;
+  }
+
+  if (candidateElements.length === 1) {
+    return candidateElements[0];
+  }
+
+  const distanceFilteredCandidateElements = candidateElements
+    // Resolve by distance
+    .filter(
+      (el) =>
+        distanceToElement(el, elementsMap, point) <= getBindingGap(el, arrow) ||
+        isPointInElement(point, el, elementsMap),
+    );
+
+  if (distanceFilteredCandidateElements.length === 0) {
+    return null;
+  }
+
+  return distanceFilteredCandidateElements[0] as NonDeleted<ExcalidrawBindableElement>;
 };
 
 /**

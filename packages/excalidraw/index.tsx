@@ -187,6 +187,9 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
   }
 
   const isUIOptionsSame = prevUIOptionsKeys.every((key) => {
+    if (key === "getFormFactor") {
+      return true;
+    }
     if (key === "canvasActions") {
       const canvasOptionKeys = Object.keys(
         prevUIOptions.canvasActions!,
@@ -229,7 +232,6 @@ export { isInvisiblySmallElement } from "@excalidraw/element";
 
 export { defaultLang, useI18n, languages } from "./i18n";
 export {
-  restore,
   restoreAppState,
   restoreElement,
   restoreElements,
@@ -251,7 +253,6 @@ export {
   loadSceneOrLibraryFromBlob,
   loadLibraryFromBlob,
 } from "./data/blob";
-export { getFreeDrawSvgPath } from "@excalidraw/element";
 export { mergeLibraryItems, getLibraryItemsHash } from "./data/library";
 export { isLinearElement } from "@excalidraw/element";
 
@@ -291,6 +292,12 @@ export { Stats } from "./components/Stats";
 export { DefaultSidebar } from "./components/DefaultSidebar";
 export { TTDDialog } from "./components/TTDDialog/TTDDialog";
 export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
+export { TTDStreamFetch } from "./components/TTDDialog/utils/TTDStreamFetch";
+export type {
+  TTDPersistenceAdapter,
+  SavedChat,
+  SavedChats,
+} from "./components/TTDDialog/types";
 
 export { zoomToFitBounds } from "./actions/actionCanvas";
 export {
@@ -310,3 +317,5 @@ export { getDataURL } from "./data/blob";
 export { isElementLink } from "@excalidraw/element";
 
 export { setCustomTextMetricsProvider } from "@excalidraw/element";
+
+export { CommandPalette } from "./components/CommandPalette/CommandPalette";

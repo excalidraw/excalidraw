@@ -2276,7 +2276,7 @@ const getHoveredElement = (
     origPoint,
     elements,
     elementsMap,
-    (element) => maxBindingDistance_simple(zoom),
+    maxBindingDistance_simple(zoom),
   );
 };
 

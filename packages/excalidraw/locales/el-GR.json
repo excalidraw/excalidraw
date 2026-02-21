@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Όλα τα δεδομένα σας αποθηκεύονται τοπικά στο πρόγραμμα περιήγησης.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "Μήπως θέλατε να πάτε στο Excalidraw+;",
       "menuHint": "Εξαγωγή, προτιμήσεις, γλώσσες, ..."
     },
@@ -612,7 +614,55 @@
     "button": "Εισαγωγή",
     "description": "Επί του παρόντος υποστηρίζονται μόνο Διαγράμματα <flowchartLink>Ροής</flowchartLink>,<sequenceLink> Ακολουθίας, </sequenceLink> και <classLink>Κλάσεων</classLink>. Οι άλλοι τύποι θα αποδοθούν ως εικόνα στο Excalidraw.",
     "syntax": "Σύνταξη Mermaid",
-    "preview": "Προεπισκόπηση"
+    "preview": "Προεπισκόπηση",
+    "label": "",
+    "inputPlaceholder": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": "Γρήγορη αναζήτηση"

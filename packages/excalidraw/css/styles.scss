@@ -1,5 +1,5 @@
-@import "./variables.module.scss";
-@import "./theme";
+@use "./variables.module" as *;
+@use "./theme";
 
 :root {
   --zIndex-canvas: 1;
@@ -16,6 +16,7 @@
   --zIndex-ui-context-menu: 90;
   --zIndex-ui-styles-popup: 100;
   --zIndex-ui-top: 100;
+  --zIndex-ui-main-menu: 110;
   --zIndex-ui-library: 120;
 
   --zIndex-modal: 1000;
@@ -106,6 +107,9 @@ body.excalidraw-cursor-resize * {
 
     &.interactive {
       z-index: var(--zIndex-interactiveCanvas);
+      // Apply theme filter only to interactive canvas for UI elements
+      // (resize handles, selection boxes, etc.)
+      filter: var(--theme-filter);
     }
 
     // Remove the main canvas from document flow to avoid resizeObserver
@@ -132,16 +136,6 @@ body.excalidraw-cursor-resize * {
     z-index: 2;
     transform-origin: top left;
     pointer-events: none;
-  }
-
-  &.theme--dark {
-    // The percentage is inspired by
-    // https://material.io/design/color/dark-theme.html#properties, which
-    // recommends surface color of #121212, 93% yields #111111 for #FFF
-
-    canvas {
-      filter: var(--theme-filter);
-    }
   }
 
   .FixedSideContainer {
@@ -217,7 +211,7 @@ body.excalidraw-cursor-resize * {
 
   .divider {
     width: 1px;
-    background-color: $oc-gray-2;
+    background-color: $color-gray-2;
     margin: 1px;
   }
 
@@ -228,6 +222,18 @@ body.excalidraw-cursor-resize * {
   input:focus-visible {
     outline: transparent;
     box-shadow: 0 0 0 1px var(--color-brand-hover);
+  }
+
+  // radix doesn't allow differntiating between hover and keyboard active
+  // states (it's forcing :focus on both).
+  //
+  // proper handling would be to disable :focus-visible by default, and enable
+  // on keyboard arrows (it'd then have to be disabled again, e.g. on keydown
+  // or container focus)
+  //
+  // alas, that is left for another day
+  [data-radix-collection-item]:focus-visible {
+    box-shadow: none !important;
   }
 
   .buttonList {
@@ -677,6 +683,9 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  .main-menu {
+    z-index: var(--zIndex-ui-main-menu);
+  }
   .main-menu-trigger {
     @include filledButtonOnCanvas;
   }
@@ -736,8 +745,8 @@ body.excalidraw-cursor-resize * {
     justify-content: center;
 
     padding: 40px;
-    background-color: $oc-red-1;
-    border: 3px solid $oc-red-9;
+    background-color: $color-red-1;
+    border: 3px solid $color-red-9;
   }
 
   .ErrorSplash-paragraph {

@@ -341,7 +341,7 @@
     "canvasPanning": "Pour déplacer le canevas, maintenez {{shortcut_1}} ou {{shortcut_2}} enfoncé tout en faisant glisser, ou utilisez l'outil main",
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
     "arrowTool": "Cliquez pour démarrer plusieurs points, faites glisser pour une ligne unique. Appuyez à nouveau sur {{shortcut}} pour changer le type de flèche.",
-    "arrowBindModifiers": "",
+    "arrowBindModifiers": "Maintenez {{shortcut_1}} pour désactiver la liaison, ou {{shortcut_2}} pour se lier à un point fixe",
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
     "embeddable": "Cliquez et glissez pour créer une intégration de site web",
@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Toutes vos données sont sauvegardées en local dans votre navigateur.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "Vouliez-vous plutôt aller à Excalidraw+ à la place ?",
       "menuHint": "Exportation, préférences, langues, ..."
     },
@@ -612,7 +614,55 @@
     "button": "Insérer",
     "description": "Actuellement, seuls les diagrammes <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Sequence, </sequenceLink> et <classLink>de classe </classLink>sont pris en charge. Les autres types seront rendus en tant qu'image dans Excalidraw.",
     "syntax": "Syntaxe Mermaid",
-    "preview": "Prévisualisation"
+    "preview": "Prévisualisation",
+    "label": "",
+    "inputPlaceholder": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": "Recherche rapide"
