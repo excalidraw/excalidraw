@@ -4522,9 +4522,12 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   public getEditorUIOffsets = (): Offsets => {
+    const isMobile = this.editorInterface.formFactor === "phone";
+    const toolBarSelector = isMobile ? ".App-toolbar-content" : ".App-toolbar";
+
     const toolbarBottom =
       this.excalidrawContainerRef?.current
-        ?.querySelector(".App-toolbar")
+        ?.querySelector(toolBarSelector)
         ?.getBoundingClientRect()?.bottom ?? 0;
     const sidebarRect = this.excalidrawContainerRef?.current
       ?.querySelector(".sidebar")
