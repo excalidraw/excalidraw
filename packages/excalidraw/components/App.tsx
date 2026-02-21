@@ -879,17 +879,20 @@ class App extends React.Component<AppProps, AppState> {
         "Missing last pointer move coords when changing bind skip mode for arrow start",
       );
       const elementsMap = this.scene.getNonDeletedElementsMap();
-      const hoveredElement = getHoveredElementForBinding(
-        elementsMap.get(
-          this.state.selectedLinearElement.elementId,
-        ) as ExcalidrawArrowElement,
-        pointFrom<GlobalPoint>(
-          this.lastPointerMoveCoords.x,
-          this.lastPointerMoveCoords.y,
-        ),
-        this.scene.getNonDeletedElements(),
-        elementsMap,
-      );
+      const arrow = elementsMap.get(
+        this.state.selectedLinearElement.elementId,
+      ) as ExcalidrawArrowElement | undefined;
+      const hoveredElement =
+        arrow &&
+        getHoveredElementForBinding(
+          arrow,
+          pointFrom<GlobalPoint>(
+            this.lastPointerMoveCoords.x,
+            this.lastPointerMoveCoords.y,
+          ),
+          this.scene.getNonDeletedElements(),
+          elementsMap,
+        );
       const element = LinearElementEditor.getElement(
         this.state.selectedLinearElement.elementId,
         elementsMap,
