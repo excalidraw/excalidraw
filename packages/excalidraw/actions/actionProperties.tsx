@@ -1753,18 +1753,29 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
         elementsMap,
       );
       let newElement = newElementWith(el, {
-        x: value === ARROW_TYPE.elbow ? startPoint[0] : el.x,
-        y: value === ARROW_TYPE.elbow ? startPoint[1] : el.y,
+        x:
+          value === ARROW_TYPE.elbow || value === ARROW_TYPE.sharpElbow
+            ? startPoint[0]
+            : el.x,
+        y:
+          value === ARROW_TYPE.elbow || value === ARROW_TYPE.sharpElbow
+            ? startPoint[1]
+            : el.y,
         roundness:
-          value === ARROW_TYPE.round
+          value === ARROW_TYPE.round || value === ARROW_TYPE.elbow
             ? {
                 type: ROUNDNESS.PROPORTIONAL_RADIUS,
               }
             : null,
-        elbowed: value === ARROW_TYPE.elbow,
-        angle: value === ARROW_TYPE.elbow ? (0 as Radians) : el.angle,
+        elbowed: value === ARROW_TYPE.elbow || value === ARROW_TYPE.sharpElbow,
+        angle:
+          value === ARROW_TYPE.elbow || value === ARROW_TYPE.sharpElbow
+            ? (0 as Radians)
+            : el.angle,
         points:
-          value === ARROW_TYPE.elbow || el.elbowed
+          value === ARROW_TYPE.elbow ||
+          value === ARROW_TYPE.sharpElbow ||
+          el.elbowed
             ? [
                 LinearElementEditor.pointFromAbsoluteCoords(
                   {
@@ -1946,15 +1957,24 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                 icon: elbowArrowIcon,
                 testId: "elbow-arrow",
               },
+              {
+                value: ARROW_TYPE.sharpElbow,
+                text: t("labels.arrowtype_sharpElbow"),
+                icon: elbowArrowIcon,
+                testId: "sharp-elbow-arrow",
+              },
             ]}
             value={getFormValue(
               elements,
               app,
               (element) => {
                 if (isArrowElement(element)) {
-                  return element.elbowed
-                    ? ARROW_TYPE.elbow
-                    : element.roundness
+                  if (element.elbowed) {
+                    return element.roundness
+                      ? ARROW_TYPE.elbow
+                      : ARROW_TYPE.sharpElbow;
+                  }
+                  return element.roundness
                     ? ARROW_TYPE.round
                     : ARROW_TYPE.sharp;
                 }

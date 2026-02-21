@@ -480,10 +480,13 @@ export const STATS_PANELS = { generalStats: 1, elementProperties: 2 } as const;
 
 export const MIN_WIDTH_OR_HEIGHT = 1;
 
-export const ARROW_TYPE: { [T in AppState["currentItemArrowType"]]: T } = {
+export const ARROW_TYPE: {
+  [T in AppState["currentItemArrowType"]]: T;
+} = {
   sharp: "sharp",
   round: "round",
   elbow: "elbow",
+  sharpElbow: "sharpElbow",
 };
 
 export const DEFAULT_REDUCED_GLOBAL_ALPHA = 0.3;

@@ -354,7 +354,7 @@ export interface AppState {
   currentItemEndArrowhead: Arrowhead | null;
   currentHoveredFontFamily: FontFamilyValues | null;
   currentItemRoundness: StrokeRoundness;
-  currentItemArrowType: "sharp" | "round" | "elbow";
+  currentItemArrowType: "sharp" | "round" | "elbow" | "sharpElbow";
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
