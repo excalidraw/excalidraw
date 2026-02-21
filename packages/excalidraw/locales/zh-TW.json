@@ -349,7 +349,7 @@
     "embeddable": "點擊並拖移以建立嵌入網站",
     "text_selected": "按兩下滑鼠或按 {{shortcut}} 以編輯文字",
     "text_editing": "{{shortcut_1}} 或 {{shortcut_2}} 以結束編輯",
-    "linearElementMulti": "",
+    "linearElementMulti": "點選最後一個點，或按下 {{shortcut_1}} 或 {{shortcut_2}} 以完成",
     "lockAngle": "你可以按住 {{shortcut}} 以鎖定角度",
     "resize": "",
     "resizeImage": "",
