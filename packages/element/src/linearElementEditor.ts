@@ -1090,6 +1090,26 @@ export class LinearElementEditor {
     // it would get deselected if the point is outside the hitbox area
     if (clickedPointIndex >= 0 || segmentMidpoint) {
       ret.hitElement = element;
+    } else {
+      // if the element has bound text, hitTest, if valid maintain hit element as linear element
+      const boundTextElement = getBoundTextElement(element, elementsMap);
+      if (boundTextElement) {
+        const { x: textX, y: textY } = this.getBoundTextElementPosition(
+          element,
+          boundTextElement,
+          elementsMap,
+        );
+        if (
+          scenePointer.x >= textX &&
+          scenePointer.x <= textX + boundTextElement.width &&
+          scenePointer.y >= textY &&
+          scenePointer.y <= textY + boundTextElement.height
+        ) {
+          ret.hitElement = element;
+          // console.log("bound text 🎯", element);
+          return ret;
+        }
+      }
     }
 
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
