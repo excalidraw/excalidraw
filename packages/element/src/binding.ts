@@ -2460,19 +2460,24 @@ export const isFixedPoint = (
 export const normalizeFixedPoint = <T extends FixedPoint>(
   fixedPoint: T,
 ): FixedPoint => {
-  const point: FixedPoint = isFixedPoint(fixedPoint)
-    ? fixedPoint
-    : [0.5001, 0.5001];
+  if (!isFixedPoint(fixedPoint)) {
+    return [0.5001, 0.5001];
+  }
+
+  const EPSILON = 0.0001;
 
   // Do not allow a precise 0.5 for fixed point ratio
   // to avoid jumping arrow heading due to floating point imprecision
-  if (Math.abs(point[0] - 0.5) < 0.0001 || Math.abs(point[1] - 0.5) < 0.0001) {
-    return point.map((ratio) =>
-      Math.abs(ratio - 0.5) < 0.0001 ? 0.5001 : ratio,
+  if (
+    Math.abs(fixedPoint[0] - 0.5) < EPSILON ||
+    Math.abs(fixedPoint[1] - 0.5) < EPSILON
+  ) {
+    return fixedPoint.map((ratio) =>
+      Math.abs(ratio - 0.5) < EPSILON ? 0.5001 : ratio,
     ) as FixedPoint;
   }
 
-  return point;
+  return fixedPoint;
 };
 
 type Side =
