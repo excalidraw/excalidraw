@@ -289,6 +289,8 @@ import type {
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
+import { erasePixelFromFreeDraw } from "../eraser/pixelEraser";
+
 import {
   actionAddToLibrary,
   actionBringForward,
@@ -6978,11 +6980,107 @@ class App extends React.Component<AppProps, AppState> {
     event: PointerEvent,
     scenePointer: { x: number; y: number },
   ) => {
-    const elementsToErase = this.eraserTrail.addPointToPath(
-      scenePointer.x,
-      scenePointer.y,
-      event.altKey,
-    );
+    const { elementsToErase, erasedFreeDrawElements } =
+      this.eraserTrail.addPointToPath(
+        scenePointer.x,
+        scenePointer.y,
+        event.altKey,
+      );
+
+    if (erasedFreeDrawElements.length > 0) {
+      // Logic to pixel-erase freedraw elements
+      // We iterate over each hit element, apply the "erase capsule" logic,
+      // and replace the element with the result (which could be 0, 1, or more fragments).
+      // We do this immediately (mutation).
+
+      // Note: We need to handle this carefully to avoid "flicker" if we just delete and add.
+      // Ideally we mutate existing if 1-to-1, or replace if split.
+
+      // Also, we must ensure that these elements are removed from `elementsPendingErasure`
+      // just in case they were added there previously (though our updated EraserTrail shouldn't add them).
+
+      const eraserPath = this.eraserTrail.getCurrentTrail()?.originalPoints;
+      // Convert to GlobalPoint
+      if (eraserPath && eraserPath.length >= 2) {
+        const globalPath: GlobalPoint[] = eraserPath.map((p) =>
+          pointFrom<GlobalPoint>(p[0], p[1]),
+        );
+
+        const currentElementsMap = this.scene.getNonDeletedElementsMap();
+        let didChange = false;
+        const elementsToReplace: {
+          old: ExcalidrawElement;
+          new: ExcalidrawElement[];
+        }[] = [];
+
+        for (const element of erasedFreeDrawElements) {
+          // Double check it's still in the scene and matches
+          const currentEl = currentElementsMap.get(element.id);
+          if (!currentEl || currentEl.isDeleted) {
+            continue;
+          }
+
+          const newFragments = erasePixelFromFreeDraw(
+            element,
+            globalPath,
+            this.state.zoom.value,
+          );
+
+          // If the result is effectively unchanged, skip
+          // But calculating "unchanged" is hard. relying on geometry logic.
+          // If length is same and points count close...
+          // For now, assume always update if hit.
+
+          elementsToReplace.push({ old: element, new: newFragments });
+          didChange = true;
+        }
+
+        if (didChange) {
+          // Apply updates
+          // We can use scene.replaceAllElements or similar, but we have specific replacements
+          // simpler: delete old, add new.
+          // Or strictly:
+          // newElements = allElements.map(...) + newFragments
+          // Optimally:
+          const nextElements = this.scene
+            .getElementsIncludingDeleted()
+            .flatMap((el) => {
+              const replacement = elementsToReplace.find(
+                (r) => r.old.id === el.id,
+              );
+              if (replacement) {
+                // Mark old as deleted if we are generating new IDs for all?
+                // Current logic: Fragment 0 keeps ID.
+                // So we replace `el` with `replacement.new[0]` and append others?
+                // Or if `replacement.new` is empty, return deleted version.
+
+                if (replacement.new.length === 0) {
+                  return newElementWith(el, { isDeleted: true });
+                }
+
+                // If we have fragments, the first one replaces the current one (keeping ID/z-index position)
+                // The others need to be inserted... where?
+                // Ideally right after.
+                // flatMap allows returning array!
+
+                // return replacement.new; // This inserts them in place.
+                // However, `newElementWith` on `replacement.new[0]` kept the ID.
+                // So it's an update.
+                return replacement.new;
+              }
+              return el;
+            });
+
+          this.scene.replaceAllElements(nextElements);
+          // Don't trigger history recording yet? Or should we?
+          // Typically erasing is continuous. We might want to capture at the end of stroke?
+          // App.tsx usually schedules capture.
+          // But `handleEraser` is called on pointer move.
+          // We probably shouldn't capture on every move.
+          // But we do need to update the scene.
+        }
+      }
+    }
 
     this.elementsPendingErasure = new Set(elementsToErase);
     this.triggerRender();
