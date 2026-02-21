@@ -204,7 +204,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
       : existingElementsMap;
 
     // migrating legacy focus point bindings
-    if (boundElement && elementsMap) {
+    if (typeof boundElement !== "undefined" && boundElement && elementsMap) {
       const p = LinearElementEditor.getPointAtIndexGlobalCoordinates(
         element,
         startOrEnd === "start" ? 0 : element.points.length - 1,
