@@ -118,7 +118,6 @@ exports[`given element A and group of elements B and given both are selected whe
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -561,7 +560,6 @@ exports[`given element A and group of elements B and given both are selected whe
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -983,7 +981,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -1564,7 +1561,6 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -1789,7 +1785,6 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -2185,7 +2180,6 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -2442,7 +2436,6 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -2637,7 +2630,6 @@ exports[`regression tests > can drag element that covers another element, while 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -2975,7 +2967,6 @@ exports[`regression tests > change the properties of a shape > [end of test] app
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -3245,7 +3236,6 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -3500,7 +3490,6 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -3749,7 +3738,6 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -4022,7 +4010,6 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -4350,7 +4337,6 @@ exports[`regression tests > deleting last but one element in editing group shoul
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -4828,7 +4814,6 @@ exports[`regression tests > deselects group of selected elements on pointer down
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -5097,7 +5082,6 @@ exports[`regression tests > deselects group of selected elements on pointer up w
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -5415,7 +5399,6 @@ exports[`regression tests > deselects selected element on pointer down when poin
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -5608,7 +5591,6 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -5821,7 +5803,6 @@ exports[`regression tests > double click to edit a group > [end of test] appStat
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -6233,7 +6214,6 @@ exports[`regression tests > drags selected elements from point inside common bou
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -7354,7 +7334,6 @@ exports[`regression tests > given a group of selected elements with an element t
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -7703,7 +7682,6 @@ exports[`regression tests > given a selected element A and a not selected elemen
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -7995,7 +7973,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -8244,7 +8221,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -8496,7 +8472,6 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -8689,7 +8664,6 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -8882,7 +8856,6 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -10016,7 +9989,6 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -10452,7 +10424,6 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -10853,7 +10824,6 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -11054,7 +11024,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -11597,7 +11566,6 @@ exports[`regression tests > noop interaction after undo shouldn't create history
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -11887,7 +11855,6 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -12024,7 +11991,6 @@ exports[`regression tests > shift click on selected element should deselect it o
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -12241,7 +12207,6 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -12576,7 +12541,6 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -13024,7 +12988,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -13671,7 +13634,6 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -13810,7 +13772,6 @@ exports[`regression tests > supports nested groups > [end of test] appState 1`] 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -14486,7 +14447,6 @@ exports[`regression tests > switches from group of selected elements to another 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -14840,7 +14800,6 @@ exports[`regression tests > switches selected element on pointer down > [end of 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -15086,7 +15045,6 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -15599,7 +15557,6 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -15737,7 +15694,6 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
