@@ -1040,7 +1040,7 @@ class App extends React.Component<AppProps, AppState> {
           );
 
           this.setState({
-            bindMode: "inside",
+            bindMode: "fixed",
             selectedLinearElement: {
               ...this.state.selectedLinearElement,
               initialState: {
@@ -1121,16 +1121,16 @@ class App extends React.Component<AppProps, AppState> {
       : null;
     const isAlreadyInsideBindingToSameElement =
       (otherBinding &&
-        arrow[otherBinding]?.mode === "inside" &&
+        arrow[otherBinding]?.mode === "fixed" &&
         arrow[otherBinding]?.elementId === hoveredElement?.id) ||
       (currentBinding &&
-        arrow[currentBinding]?.mode === "inside" &&
+        arrow[currentBinding]?.mode === "fixed" &&
         hoveredElement?.id === arrow[currentBinding]?.elementId);
 
     if (
       currentBinding &&
       otherBinding &&
-      arrow[currentBinding]?.mode === "inside" &&
+      arrow[currentBinding]?.mode === "fixed" &&
       hoveredElement?.id !== arrow[currentBinding]?.elementId &&
       arrow[otherBinding]?.elementId !== arrow[currentBinding]?.elementId
     ) {
@@ -1162,7 +1162,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       // Clear the inside binding mode too
-      if (this.state.bindMode === "inside") {
+      if (this.state.bindMode === "fixed") {
         flushSync(() => {
           this.setState({
             bindMode: "orbit",

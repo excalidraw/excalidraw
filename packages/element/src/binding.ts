@@ -314,7 +314,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
     if (hit) {
       start = {
         element: hit,
-        mode: "inside",
+        mode: "fixed",
         focusPoint: point,
       };
     } else {
@@ -339,13 +339,13 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
         start: isMultiPoint
           ? { mode: undefined }
           : {
-              mode: "inside",
+              mode: "fixed",
               element: hit,
               focusPoint: origin ?? center,
             },
         end: isMultiPoint
           ? { mode: "orbit", element: hit, focusPoint: point }
-          : { mode: "inside", element: hit, focusPoint: point },
+          : { mode: "fixed", element: hit, focusPoint: point },
       };
     }
 
@@ -365,7 +365,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
           start: isMultiPoint
             ? { mode: undefined }
             : {
-                mode: otherElement.id !== hit.id ? "orbit" : "inside",
+                mode: otherElement.id !== hit.id ? "orbit" : "fixed",
                 element: otherElement,
                 focusPoint: origin ?? pointFrom<GlobalPoint>(arrow.x, arrow.y),
               },
@@ -388,7 +388,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
       const otherIsInsideBinding =
         !!appState.selectedLinearElement?.initialState.arrowStartIsInside;
       const other: BindingStrategy = {
-        mode: otherIsInsideBinding ? "inside" : "orbit",
+        mode: otherIsInsideBinding ? "fixed" : "orbit",
         element: otherElement,
         focusPoint: shiftKey
           ? elementCenterPoint(otherElement, elementsMap)
@@ -402,9 +402,9 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
       let current: BindingStrategy;
       if (hit) {
         const isInsideBinding =
-          globalBindMode === "inside" || globalBindMode === "skip";
+          globalBindMode === "fixed" || globalBindMode === "skip";
         current = {
-          mode: isInsideBinding && !isNested ? "inside" : "orbit",
+          mode: isInsideBinding && !isNested ? "fixed" : "orbit",
           element: hit,
           focusPoint: isInsideBinding || isNested ? point : point,
         };
@@ -422,10 +422,10 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
     if (!arrow.startBinding) {
       if (hit) {
         const isInsideBinding =
-          globalBindMode === "inside" || globalBindMode === "skip";
+          globalBindMode === "fixed" || globalBindMode === "skip";
 
         end = {
-          mode: isInsideBinding ? "inside" : "orbit",
+          mode: isInsideBinding ? "fixed" : "orbit",
           element: hit,
           focusPoint: point,
         };
@@ -474,7 +474,7 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
 
   // If the global bind mode is in free binding mode, just bind
   // where the pointer is and keep the other end intact
-  if (globalBindMode === "inside" || globalBindMode === "skip") {
+  if (globalBindMode === "fixed" || globalBindMode === "skip") {
     current = hit
       ? {
           element:
@@ -482,7 +482,7 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
               ? hit
               : oppositeElement,
           focusPoint: point,
-          mode: "inside",
+          mode: "fixed",
         }
       : { mode: null };
     other =
@@ -500,12 +500,9 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
   }
 
   // Already inside binding over the same hit element should remain inside bound
-  if (
-    hit.id === currentBinding?.elementId &&
-    currentBinding.mode === "inside"
-  ) {
+  if (hit.id === currentBinding?.elementId && currentBinding.mode === "fixed") {
     return {
-      current: { mode: "inside", focusPoint: point, element: hit },
+      current: { mode: "fixed", focusPoint: point, element: hit },
       other,
     };
   }
@@ -524,7 +521,7 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
       // The opposite binding is inside the same element
       // eslint-disable-next-line no-else-return
       else {
-        current = { element: hit, mode: "inside", focusPoint: point };
+        current = { element: hit, mode: "fixed", focusPoint: point };
 
         return { current, other: isMultiPoint ? { mode: undefined } : other };
       }
@@ -536,7 +533,7 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
       if (isOverlapping && oppositeElement && !otherIsTransparent) {
         current = {
           element: oppositeElement,
-          mode: "inside",
+          mode: "fixed",
           focusPoint: point,
         };
       } else {
@@ -728,7 +725,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
 
     return {
       start: {
-        mode: "inside",
+        mode: "fixed",
         element: hit,
         focusPoint: startDragged
           ? globalPoint
@@ -742,7 +739,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
             ), // startFixedPoint,
       },
       end: {
-        mode: "inside",
+        mode: "fixed",
         element: hit,
         focusPoint: endDragged
           ? globalPoint
@@ -761,7 +758,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       start: startDragged
         ? hit
           ? {
-              mode: "inside",
+              mode: "fixed",
               element: hit,
               focusPoint: globalPoint,
             }
@@ -770,7 +767,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       end: endDragged
         ? hit
           ? {
-              mode: "inside",
+              mode: "fixed",
               element: hit,
               focusPoint: globalPoint,
             }
@@ -783,7 +780,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   const current: BindingStrategy = hit
     ? pointInElement
       ? {
-          mode: "inside",
+          mode: "fixed",
           element: hit,
           focusPoint: globalPoint,
         }
@@ -819,7 +816,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     });
   const otherNeverOverride = opts?.newArrow
     ? appState.selectedLinearElement?.initialState.arrowStartIsInside
-    : otherBinding?.mode === "inside";
+    : otherBinding?.mode === "fixed";
   const other: BindingStrategy = !otherNeverOverride
     ? otherBindableElement &&
       !otherFocusPointIsInElement &&

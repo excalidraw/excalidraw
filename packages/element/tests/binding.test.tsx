@@ -72,14 +72,14 @@ describe("binding for simple arrows", () => {
       expect(startBinding.fixedPoint[0]).toBeLessThanOrEqual(1);
       expect(startBinding.fixedPoint[1]).toBeGreaterThanOrEqual(0);
       expect(startBinding.fixedPoint[1]).toBeLessThanOrEqual(1);
-      expect(startBinding.mode).toBe("inside");
+      expect(startBinding.mode).toBe("fixed");
 
       const endBinding = arrow.endBinding as FixedPointBinding;
       expect(endBinding.fixedPoint[0]).toBeGreaterThanOrEqual(0);
       expect(endBinding.fixedPoint[0]).toBeLessThanOrEqual(1);
       expect(endBinding.fixedPoint[1]).toBeGreaterThanOrEqual(0);
       expect(endBinding.fixedPoint[1]).toBeLessThanOrEqual(1);
-      expect(endBinding.mode).toBe("inside");
+      expect(endBinding.mode).toBe("fixed");
 
       // Move the bindable
       mouse.downAt(100, 150);
