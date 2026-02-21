@@ -1338,6 +1338,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -1714,6 +1715,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -2091,6 +2093,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -2839,6 +2842,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -3161,6 +3165,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -3501,6 +3506,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -3813,6 +3819,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -4115,6 +4122,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -4365,6 +4373,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -4638,6 +4647,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -4927,6 +4937,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -5171,6 +5182,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -5415,6 +5427,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -5678,6 +5691,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -5952,6 +5966,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -6223,6 +6238,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -6567,6 +6583,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -7014,6 +7031,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -7411,6 +7429,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -8032,6 +8051,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -8275,6 +8295,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -8644,6 +8665,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -9019,6 +9041,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -9738,6 +9761,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -10016,6 +10040,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -10295,6 +10320,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -10541,6 +10567,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -11180,6 +11207,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -11432,6 +11460,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -12373,6 +12402,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -12644,6 +12674,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": false,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -12895,6 +12926,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -13568,6 +13600,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -13788,6 +13821,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -14638,6 +14672,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "showHyperlinkPopup": false,
   "showWelcomeScreen": false,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -14896,6 +14931,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "showHyperlinkPopup": false,
   "showWelcomeScreen": false,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -15147,6 +15183,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": false,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -15398,6 +15435,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -15658,6 +15696,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -16005,6 +16044,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -16189,6 +16229,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -16486,6 +16527,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -16764,6 +16806,7 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
   "showHyperlinkPopup": false,
   "showWelcomeScreen": false,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -16930,6 +16973,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -17224,6 +17268,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -21071,6 +21116,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -21570,6 +21616,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -22097,6 +22144,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
+  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
