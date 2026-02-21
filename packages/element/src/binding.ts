@@ -1774,9 +1774,15 @@ export const updateBoundPoint = (
       startOrEnd === "startBinding" ? "endBinding" : "startBinding",
       elementsMap,
     );
+  const adjacentPointIndex =
+    startOrEnd === "startBinding" ? 1 : arrow.points.length - 2;
   const otherArrowPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
     arrow,
-    startOrEnd === "startBinding" ? -1 : 0,
+    arrow.points.length > 2
+      ? adjacentPointIndex
+      : startOrEnd === "startBinding"
+      ? -1
+      : 0,
     elementsMap,
   );
   const otherFocusPointOrArrowPoint = otherFocusPoint || otherArrowPoint;
