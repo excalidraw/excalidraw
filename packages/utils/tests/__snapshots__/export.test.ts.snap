@@ -15,7 +15,6 @@ exports[`exportToSvg > with default arguments 1`] = `
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -74,10 +73,6 @@ exports[`exportToSvg > with default arguments 1`] = `
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
