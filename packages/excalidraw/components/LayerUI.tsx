@@ -59,6 +59,7 @@ import { HandButton } from "./HandButton";
 import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
+import { TerraformImportDialog} from "./TerraformImportDialog"
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
@@ -234,7 +235,7 @@ const LayerUI = ({
     }
 
     return (
-      <ImageExportDialog
+      <TerraformImportDialog
         elements={elements}
         appState={appState}
         files={files}
