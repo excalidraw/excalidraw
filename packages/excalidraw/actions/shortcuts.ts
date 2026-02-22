@@ -65,7 +65,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   loadScene: [getShortcutKey("CtrlOrCmd+O")],
   clearCanvas: [getShortcutKey("CtrlOrCmd+Delete")],
   imageExport: [getShortcutKey("CtrlOrCmd+Shift+E")],
-  terraformImport: [getShortcutKey("CtrlOrCmd+Shift+T")],
+  terraformImport: [getShortcutKey("CtrlOrCmd+Shift+K")],
   commandPalette: [
     getShortcutKey("CtrlOrCmd+/"),
     getShortcutKey("CtrlOrCmd+Shift+P"),
