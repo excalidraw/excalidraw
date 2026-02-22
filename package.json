@@ -30,6 +30,7 @@
     "husky": "7.0.4",
     "jsdom": "22.1.0",
     "lint-staged": "12.3.7",
+    "nodemon": "3.1.14",
     "pepjs": "0.5.3",
     "prettier": "2.6.2",
     "rewire": "6.0.0",
