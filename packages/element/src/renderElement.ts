@@ -22,6 +22,7 @@ import {
   isRTL,
   getVerticalOffset,
   invariant,
+  isTransparent,
   applyDarkModeFilter,
   isSafari,
 } from "@excalidraw/common";
@@ -78,6 +79,7 @@ import type {
   ExcalidrawFrameLikeElement,
   NonDeletedSceneElementsMap,
   ElementsMap,
+  ExcalidrawFrameElement,
 } from "./types";
 
 import type { RoughCanvas } from "roughjs/bin/canvas";
@@ -777,6 +779,45 @@ export const renderSelectionElement = (
   context.restore();
 };
 
+export const renderFrameBackground = (
+  frame: ExcalidrawFrameElement,
+  context: CanvasRenderingContext2D,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+  opts?: {
+    roundCorners?: boolean;
+  },
+) => {
+  if (isTransparent(frame.backgroundColor)) {
+    return;
+  }
+
+  context.save();
+  context.translate(frame.x + appState.scrollX, frame.y + appState.scrollY);
+  context.fillStyle =
+    appState.theme === THEME.DARK
+      ? applyDarkModeFilter(frame.backgroundColor)
+      : frame.backgroundColor;
+
+  const shouldRoundCorners = opts?.roundCorners ?? true;
+
+  if (shouldRoundCorners && FRAME_STYLE.radius && context.roundRect) {
+    context.beginPath();
+    context.roundRect(
+      0,
+      0,
+      frame.width,
+      frame.height,
+      FRAME_STYLE.radius / appState.zoom.value,
+    );
+    context.fill();
+    context.closePath();
+  } else {
+    context.fillRect(0, 0, frame.width, frame.height);
+  }
+
+  context.restore();
+};
+
 export const renderElement = (
   element: NonDeletedExcalidrawElement,
   elementsMap: RenderableElementsMap,
@@ -808,7 +849,6 @@ export const renderElement = (
           element.x + appState.scrollX,
           element.y + appState.scrollY,
         );
-        context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
         context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
         context.strokeStyle =

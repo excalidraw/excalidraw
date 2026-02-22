@@ -8,6 +8,7 @@ import {
   isRTL,
   isTestEnv,
   getVerticalOffset,
+  isTransparent,
   applyDarkModeFilter,
   MIME_TYPES,
 } from "@excalidraw/common";
@@ -23,6 +24,7 @@ import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
 import {
   isArrowElement,
+  isFrameLikeElement,
   isIframeLikeElement,
   isInitializedImageElement,
   isTextElement,
@@ -38,6 +40,7 @@ import { getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
   ExcalidrawTextElementWithContainer,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -717,11 +720,76 @@ export const renderSceneToSvg = (
     return;
   }
 
+  const renderedFrameBackgrounds = new Set<string>();
+  const maybeRenderFrameBackground = (
+    element: NonDeletedExcalidrawElement | ExcalidrawFrameLikeElement,
+  ) => {
+    if (
+      !renderConfig.frameRendering.enabled ||
+      (!renderConfig.frameRendering.outline && !renderConfig.exportingFrame)
+    ) {
+      return;
+    }
+
+    const frame =
+      renderConfig.exportingFrame ||
+      (isFrameLikeElement(element)
+        ? element
+        : getContainingFrame(element, elementsMap));
+
+    if (
+      !frame ||
+      renderedFrameBackgrounds.has(frame.id) ||
+      !frame.backgroundColor ||
+      isTransparent(frame.backgroundColor)
+    ) {
+      return;
+    }
+
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame, elementsMap);
+    const cx = (x2 - x1) / 2 - (frame.x - x1);
+    const cy = (y2 - y1) / 2 - (frame.y - y1);
+    const degree = (180 * frame.angle) / Math.PI;
+
+    const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+    rect.setAttribute(
+      "transform",
+      `translate(${frame.x + renderConfig.offsetX} ${
+        frame.y + renderConfig.offsetY
+      }) rotate(${degree} ${cx} ${cy})`,
+    );
+    rect.setAttribute("width", `${frame.width}px`);
+    rect.setAttribute("height", `${frame.height}px`);
+
+    const isDirectlyExportedFrame =
+      !!renderConfig.exportingFrame &&
+      frame.id === renderConfig.exportingFrame.id;
+    if (!isDirectlyExportedFrame) {
+      rect.setAttribute("rx", FRAME_STYLE.radius.toString());
+      rect.setAttribute("ry", FRAME_STYLE.radius.toString());
+    }
+    rect.setAttribute(
+      "fill",
+      renderConfig.theme === THEME.DARK
+        ? applyDarkModeFilter(frame.backgroundColor)
+        : frame.backgroundColor,
+    );
+    rect.setAttribute("stroke", "none");
+
+    svgRoot.appendChild(rect);
+    renderedFrameBackgrounds.add(frame.id);
+  };
+
+  if (renderConfig.exportingFrame) {
+    maybeRenderFrameBackground(renderConfig.exportingFrame);
+  }
+
   // render elements
   elements
     .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       if (!element.isDeleted) {
+        maybeRenderFrameBackground(element);
         if (
           isTextElement(element) &&
           element.containerId &&
