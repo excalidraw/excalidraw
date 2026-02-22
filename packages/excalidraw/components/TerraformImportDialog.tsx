@@ -144,15 +144,17 @@ const ImageExportModal = ({
     return (
       <div className="TerraformImportModal">
         <h3>Import Terraform</h3>
-        <input type="file" accept=".json" onChange={e => setPlanFile(e.target.files?.[0] ?? null)} />
-        <input type="file" accept=".dot" onChange={e => setDotFile(e.target.files?.[0] ?? null)} />
+        <div className="TerraformImportModal__settings__inputs">
+          <input type="file" accept=".json" onChange={e => setPlanFile(e.target.files?.[0] ?? null)} />
+          <input type="file" accept=".dot" onChange={e => setDotFile(e.target.files?.[0] ?? null)} />
+        </div>
         <div className="TerraformImportModal__settings__buttons">
             <FilledButton 
                 className="TerraformImportModal__settings__buttons__button"
                 onClick={handleSubmit} 
                 disabled={!planFile || !dotFile || loading}>
-    │       Import
-    │     </FilledButton>
+                Import
+            </FilledButton>
         </div>
       </div>
     );

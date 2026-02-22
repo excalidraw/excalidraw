@@ -169,7 +169,50 @@
           flex-basis: 100%;
           justify-content: center;
         }
+
+        .ExcButton[disabled] {
+          &.ExcButton--variant-filled,
+          &:hover {
+            --back-color: var(--color-primary) !important;
+            --text-color: var(--color-on-primary) !important;
+            opacity: 0.5;
+          }
+        }
       }
+      &__inputs {                                                                                                                                  
+        display: flex;                                                
+        flex-direction: column;                                                                                                                    
+        gap: 12px;                                                                                                                                 
+    
+        // Style the file inputs
+        input[type="file"] {
+          padding: 0.75rem;
+          border: 1px dashed var(--color-gray-40);
+          border-radius: 8px;
+          cursor: pointer;
+          font-family: var(--font-family);
+          font-size: 0.875rem;
+          color: var(--color-on-surface);
+          background: var(--color-surface-low);
+    
+          &:hover {
+            border-color: var(--color-primary);
+            background: var(--color-primary-light);
+          }
+        }
+    
+        // Labels above each input
+        label {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          font-family: "Assistant";
+          font-weight: 600;
+          font-size: 0.875rem;
+          color: var(--color-on-surface);
+        }
+      }
+    
     }
   }
 }
