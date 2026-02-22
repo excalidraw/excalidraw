@@ -34,7 +34,7 @@ import { Switch } from "./Switch";
 import { Tooltip } from "./Tooltip";
 import { FilledButton } from "./FilledButton";
 
-import "./ImageExportDialog.scss";
+import "./TerraformImportDialog.scss";
 
 import type { ActionManager } from "../actions/manager";
 
@@ -146,10 +146,14 @@ const ImageExportModal = ({
         <h3>Import Terraform</h3>
         <input type="file" accept=".json" onChange={e => setPlanFile(e.target.files?.[0] ?? null)} />
         <input type="file" accept=".dot" onChange={e => setDotFile(e.target.files?.[0] ?? null)} />
-        <FilledButton onClick={handleSubmit} disabled={!planFile || !dotFile || loading}>
-  │       Import
-  │     </FilledButton>
-
+        <div className="TerraformImportModal__settings__buttons">
+            <FilledButton 
+                className="TerraformImportModal__settings__buttons__button"
+                onClick={handleSubmit} 
+                disabled={!planFile || !dotFile || loading}>
+    │       Import
+    │     </FilledButton>
+        </div>
       </div>
     );
   };
