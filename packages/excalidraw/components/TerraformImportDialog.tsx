@@ -98,10 +98,17 @@ const ImageExportModal = ({
     const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async () => {
+        if (!planFile || !dotFile) return;
         setLoading(true);
         setError(null);
         try {
-          const res = await fetch("http://localhost:3000/api/hello");
+          const formData = new FormData();
+          formData.append("planFile", planFile);
+          formData.append("dotFile", dotFile);
+          const res = await fetch("http://localhost:3000/terraform/upload", {
+            method: "POST",
+            body: formData,
+          });
           const data = await res.json();
           console.log("Backend response:", data);
         } catch (err) {
