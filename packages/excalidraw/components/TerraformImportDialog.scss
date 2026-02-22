@@ -9,8 +9,9 @@
 
   .TerraformImportModal {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
 
     user-select: none;
 
@@ -179,29 +180,64 @@
           }
         }
       }
-      &__inputs {                                                                                                                                  
-        display: flex;                                                
-        flex-direction: column;                                                                                                                    
-        gap: 12px;                                                                                                                                 
-    
-        // Style the file inputs
+      &__inputs {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
         input[type="file"] {
-          padding: 0.75rem;
-          border: 1px dashed var(--color-gray-40);
-          border-radius: 8px;
-          cursor: pointer;
+          // Match FilledButton outlined style
           font-family: var(--font-family);
-          font-size: 0.875rem;
-          color: var(--color-on-surface);
-          background: var(--color-surface-low);
-    
+          font-weight: 600;
+          font-size: 0.75rem;
+          letter-spacing: normal;
+
+          min-height: 2.5rem;
+          padding: 0.5rem 1rem;
+
+          border-radius: 0.5rem;
+          border: 1px solid var(--color-primary);
+          background-color: transparent;
+          color: var(--color-primary);
+
+          cursor: pointer;
+          user-select: none;
+
+          transition: all 150ms ease-out;
+
           &:hover {
-            border-color: var(--color-primary);
-            background: var(--color-primary-light);
+            border-color: var(--color-brand-hover);
+            color: var(--color-brand-hover);
+            background-color: var(--color-primary-light);
+          }
+
+          &:active {
+            border-color: var(--color-brand-active);
+            color: var(--color-brand-active);
+          }
+
+          &::file-selector-button {
+            font-family: var(--font-family);
+            font-weight: 600;
+            font-size: 0.75rem;
+
+            padding: 0.35rem 0.75rem;
+            margin-right: 0.75rem;
+
+            border-radius: 0.5rem;
+            border: none;
+            background-color: var(--color-primary);
+            color: var(--color-surface-lowest);
+
+            cursor: pointer;
+            transition: all 150ms ease-out;
+
+            &:hover {
+              background-color: var(--color-brand-hover);
+            }
           }
         }
-    
-        // Labels above each input
+
         label {
           display: flex;
           flex-direction: column;
