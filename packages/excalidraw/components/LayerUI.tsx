@@ -226,6 +226,26 @@ const LayerUI = ({
     );
   };
 
+  const renderTerraformImportDialog = () => {
+    if (
+      appState.openDialog?.name !== "terraformImport"
+    ) {
+      return null;
+    }
+
+    return (
+      <ImageExportDialog
+        elements={elements}
+        appState={appState}
+        files={files}
+        actionManager={actionManager}
+        onExportImage={onExportImage}
+        onCloseRequest={() => setAppState({ openDialog: null })}
+        name={app.getName()}
+      />
+    );
+  };
+
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
       {/* wrapping to Fragment stops React from occasionally complaining
@@ -564,6 +584,7 @@ const LayerUI = ({
       )}
       <tunnels.OverwriteConfirmDialogTunnel.Out />
       {renderImageExportDialog()}
+      {renderTerraformImportDialog()}
       {renderJSONExportDialog()}
       {appState.pasteDialog.shown && (
         <PasteChartDialog
@@ -584,6 +605,7 @@ const LayerUI = ({
           actionManager={actionManager}
           renderJSONExportDialog={renderJSONExportDialog}
           renderImageExportDialog={renderImageExportDialog}
+          renderTerraformImportDialog={renderTerraformImportDialog}
           setAppState={setAppState}
           onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}

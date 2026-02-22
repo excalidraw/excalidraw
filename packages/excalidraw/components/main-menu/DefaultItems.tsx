@@ -98,6 +98,7 @@ export const LoadScene = () => {
 };
 LoadScene.displayName = "LoadScene";
 
+//todo: add button here
 export const SaveToActiveFile = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -134,6 +135,24 @@ export const SaveAsImage = () => {
   );
 };
 SaveAsImage.displayName = "SaveAsImage";
+
+export const ImportTerraform = () => {
+  const setAppState = useExcalidrawSetAppState();
+  const { t } = useI18n();
+  return (
+    <DropdownMenuItem
+      icon={ExportImageIcon}
+      data-testid="image-export-button"
+      onSelect={() => setAppState({ openDialog: { name: "terraformImport" } })}
+      shortcut={getShortcutFromShortcutName("terraformImport")}
+      aria-label="Import Terraform"
+    >
+      Import Terraform
+    </DropdownMenuItem>
+  );
+};
+ImportTerraform.displayName = "ImportTerraform";
+
 
 export const CommandPalette = (opts?: { className?: string }) => {
   const setAppState = useExcalidrawSetAppState();

@@ -54,6 +54,7 @@ export type ShortcutName =
     >
   | "saveScene"
   | "imageExport"
+  | "terraformImport"
   | "commandPalette"
   | "searchMenu"
   | "toolLock";
@@ -64,6 +65,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   loadScene: [getShortcutKey("CtrlOrCmd+O")],
   clearCanvas: [getShortcutKey("CtrlOrCmd+Delete")],
   imageExport: [getShortcutKey("CtrlOrCmd+Shift+E")],
+  terraformImport: [getShortcutKey("CtrlOrCmd+Shift+T")],
   commandPalette: [
     getShortcutKey("CtrlOrCmd+/"),
     getShortcutKey("CtrlOrCmd+Shift+P"),
