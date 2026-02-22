@@ -97,7 +97,20 @@ const ImageExportModal = ({
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = async () => { }
+    const handleSubmit = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const res = await fetch("http://localhost:3000/api/hello");
+          const data = await res.json();
+          console.log("Backend response:", data);
+        } catch (err) {
+          console.error("Backend error:", err);
+          setError(err instanceof Error ? err.message : "Request failed");
+        } finally {
+          setLoading(false);
+        }
+    }
 
   
     useEffect(() => {
