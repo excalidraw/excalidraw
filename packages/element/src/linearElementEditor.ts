@@ -1,4 +1,3 @@
-// oxlint-disable typescript/no-misused-spread
 import {
   pointCenter,
   pointFrom,
