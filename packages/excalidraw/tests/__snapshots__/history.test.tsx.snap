@@ -98,7 +98,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -732,7 +731,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -2277,40 +2275,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": {
-    "angle": 0,
-    "backgroundColor": "transparent",
-    "boundElements": [
-      {
-        "id": "id4",
-        "type": "arrow",
-      },
-    ],
-    "customData": undefined,
-    "fillStyle": "solid",
-    "frameId": null,
-    "groupIds": [],
-    "height": 100,
-    "id": "id0",
-    "index": "a0",
-    "isDeleted": false,
-    "link": null,
-    "locked": false,
-    "opacity": 100,
-    "roughness": 1,
-    "roundness": null,
-    "seed": 1,
-    "strokeColor": "#1e1e1e",
-    "strokeStyle": "solid",
-    "strokeWidth": 2,
-    "type": "rectangle",
-    "updated": 1,
-    "version": 3,
-    "versionNonce": 493213705,
-    "width": 100,
-    "x": -100,
-    "y": -50,
-  },
   "stats": {
     "open": false,
     "panels": 3,
@@ -7388,7 +7352,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -10360,7 +10323,6 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -16591,7 +16553,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -17340,7 +17301,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -17987,7 +17947,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -18632,7 +18591,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -19385,7 +19343,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
@@ -21603,7 +21560,6 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "showHyperlinkPopup": false,
   "showWelcomeScreen": true,
   "snapLines": [],
-  "startBoundElement": null,
   "stats": {
     "open": false,
     "panels": 3,
