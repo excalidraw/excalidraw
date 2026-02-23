@@ -365,7 +365,7 @@ export class LinearElementEditor {
 
     // Apply the point movement if needed
     let suggestedBinding: AppState["suggestedBinding"] = null;
-    const { positions, updates } = pointDraggingUpdates(
+    const { positions, updates, hit } = pointDraggingUpdates(
       [idx],
       deltaX,
       deltaY,
@@ -407,17 +407,20 @@ export class LinearElementEditor {
 
     // Move the arrow over the bindable object in terms of z-index
     if (isBindingElement(element)) {
-      moveArrowAboveBindable(
-        LinearElementEditor.getPointGlobalCoordinates(
+      if (hit) {
+        moveArrowAboveBindable(
+          LinearElementEditor.getPointGlobalCoordinates(
+            element,
+            element.points[element.points.length - 1],
+            elementsMap,
+          ),
           element,
-          element.points[element.points.length - 1],
+          elements,
           elementsMap,
-        ),
-        element,
-        elements,
-        elementsMap,
-        app.scene,
-      );
+          app.scene,
+          hit,
+        );
+      }
     }
 
     // PERF: Avoid state updates if not absolutely necessary
@@ -566,7 +569,7 @@ export class LinearElementEditor {
 
     // Apply the point movement if needed
     let suggestedBinding: AppState["suggestedBinding"] = null;
-    const { positions, updates } = pointDraggingUpdates(
+    const { positions, updates, hit } = pointDraggingUpdates(
       selectedPointsIndices,
       deltaX,
       deltaY,
@@ -610,19 +613,22 @@ export class LinearElementEditor {
 
     // Move the arrow over the bindable object in terms of z-index
     if (isBindingElement(element) && startIsSelected !== endIsSelected) {
-      moveArrowAboveBindable(
-        LinearElementEditor.getPointGlobalCoordinates(
+      if (hit) {
+        moveArrowAboveBindable(
+          LinearElementEditor.getPointGlobalCoordinates(
+            element,
+            startIsSelected
+              ? element.points[0]
+              : element.points[element.points.length - 1],
+            elementsMap,
+          ),
           element,
-          startIsSelected
-            ? element.points[0]
-            : element.points[element.points.length - 1],
+          elements,
           elementsMap,
-        ),
-        element,
-        elements,
-        elementsMap,
-        app.scene,
-      );
+          app.scene,
+          hit,
+        );
+      }
     }
 
     // Attached text might need to update if arrow dimensions change
@@ -2385,6 +2391,7 @@ const pointDraggingUpdates = (
 ): {
   positions: PointsPositionUpdates;
   updates?: PointMoveOtherUpdates;
+  hit?: ExcalidrawBindableElement | null;
 } => {
   const naiveDraggingPoints = new Map(
     selectedPointsIndices.map((pointIndex) => {
@@ -2744,6 +2751,7 @@ const pointDraggingUpdates = (
         ];
       }),
     ),
+    hit: startIsDragged ? start.element : end.element,
   };
 };
 
