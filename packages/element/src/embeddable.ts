@@ -56,6 +56,8 @@ const RE_REDDIT =
 const RE_REDDIT_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
 
+const RE_NOTION = /^https:\/\/([a-zA-Z0-9-]+)\.notion\.site\/.+/;
+
 const parseYouTubeLikeTimestamp = (url: string): number => {
   let timeParam: string | null | undefined;
 
@@ -83,6 +85,27 @@ const parseYouTubeLikeTimestamp = (url: string): number => {
 
   const [, hours = "0", minutes = "0", seconds = "0"] = timeMatch;
   return parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds);
+};
+
+const toNotionEmbedURL = (url: string): string | null => {
+  try {
+    const parsed = new URL(url);
+
+    if (!parsed.hostname.endsWith(".notion.site")) {
+      return null;
+    }
+
+    const match = parsed.pathname.match(/([a-f0-9]{32})$/i);
+    if (!match) {
+      return null;
+    }
+
+    const pageId = match[1];
+
+    return `https://${parsed.hostname}/ebd/${pageId}`;
+  } catch {
+    return null;
+  }
 };
 
 const parseGoogleDriveVideoLink = (
@@ -141,6 +164,7 @@ const ALLOWED_DOMAINS = new Set([
   "gist.github.com",
   "twitter.com",
   "x.com",
+  "*.notion.site",
   "*.simplepdf.eu",
   "stackblitz.com",
   "val.town",
@@ -158,6 +182,7 @@ const ALLOW_SAME_ORIGIN = new Set([
   "figma.com",
   "twitter.com",
   "x.com",
+  "*.notion.site",
   "*.simplepdf.eu",
   "stackblitz.com",
   "reddit.com",
@@ -276,6 +301,28 @@ export const getEmbedLink = (
       type,
       sandbox: { allowSameOrigin },
     };
+  }
+
+  const notionLink = link.match(RE_NOTION);
+  if (notionLink) {
+    const embedURL = toNotionEmbedURL(link);
+    if (embedURL) {
+      type = "generic";
+      link = embedURL;
+      aspectRatio = { w: 550, h: 550 };
+      embeddedLinkCache.set(originalLink, {
+        link,
+        intrinsicSize: aspectRatio,
+        type,
+        sandbox: { allowSameOrigin },
+      });
+      return {
+        link,
+        intrinsicSize: aspectRatio,
+        type,
+        sandbox: { allowSameOrigin },
+      };
+    }
   }
 
   const figmaLink = link.match(RE_FIGMA);
