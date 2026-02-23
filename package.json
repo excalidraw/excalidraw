@@ -95,7 +95,9 @@
   "dependencies": {
     "@dagrejs/graphlib-dot": "1.0.2",
     "@excalidraw/excalidraw": "0.18.0",
+    "better-sqlite3": "12.6.2",
     "cors": "2.8.6",
+    "drizzle-orm": "0.45.1",
     "express": "5.2.1",
     "graphlib-dot": "0.6.4",
     "multer": "2.0.2",
