@@ -185,15 +185,14 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
     // binding schema v1 (legacy) -> attempt to migrate to v2
     // ---------------------------------------------------------------------------
 
-    const targetBoundElement =
-      (targetElementsMap.get(binding.elementId) as ExcalidrawBindableElement) ||
-      undefined;
+    const targetBoundElement = targetElementsMap.get(binding.elementId) as
+      | ExcalidrawBindableElement
+      | undefined;
     const boundElement =
       targetBoundElement ||
-      (existingElementsMap?.get(
-        binding.elementId,
-      ) as ExcalidrawBindableElement) ||
-      undefined;
+      (existingElementsMap?.get(binding.elementId) as
+        | ExcalidrawBindableElement
+        | undefined);
     const elementsMap = targetBoundElement
       ? targetElementsMap
       : existingElementsMap;
