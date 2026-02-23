@@ -12,3 +12,4 @@ export * from "./url";
 export * from "./utils";
 export * from "./emitter";
 export * from "./editorInterface";
+export { Debug } from "../debug";
