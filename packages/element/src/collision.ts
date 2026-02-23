@@ -278,54 +278,6 @@ const borderDistance = (
   return distance > tolerance ? -Infinity : -distance;
 };
 
-// const bindingBorderTest = (
-//   element: NonDeleted<ExcalidrawBindableElement>,
-//   [x, y]: Readonly<GlobalPoint>,
-//   elementsMap: NonDeletedSceneElementsMap,
-//   tolerance: number = 0,
-// ): boolean => {
-//   const p = pointFrom<GlobalPoint>(x, y);
-//   const shouldTestInside =
-//     // disable fullshape snapping for frame elements so we
-//     // can bind to frame children
-//     !isFrameLikeElement(element);
-
-//   // PERF: Run a cheap test to see if the binding element
-//   // is even close to the element
-//   const t = Math.max(1, tolerance);
-//   const bounds = [x - t, y - t, x + t, y + t] as Bounds;
-//   const elementBounds = getElementBounds(element, elementsMap);
-//   if (!doBoundsIntersect(bounds, elementBounds)) {
-//     return false;
-//   }
-
-//   // If the element is inside a frame, we should clip the element
-//   if (element.frameId) {
-//     const enclosingFrame = elementsMap.get(element.frameId);
-//     if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
-//       const enclosingFrameBounds = getElementBounds(
-//         enclosingFrame,
-//         elementsMap,
-//       );
-//       if (!pointInsideBounds(p, enclosingFrameBounds)) {
-//         return false;
-//       }
-//     }
-//   }
-
-//   // Do the intersection test against the element since it's close enough
-//   const intersections = intersectElementWithLineSegment(
-//     element,
-//     elementsMap,
-//     lineSegment(elementCenterPoint(element, elementsMap), p),
-//   );
-//   const distance = distanceToElement(element, elementsMap, p);
-
-//   return shouldTestInside
-//     ? intersections.length === 0 || distance <= tolerance
-//     : intersections.length > 0 && distance <= t;
-// };
-
 export const getAllHoveredElementAtPoint = (
   arrow: { elbowed: boolean },
   point: Readonly<GlobalPoint>,
@@ -334,7 +286,7 @@ export const getAllHoveredElementAtPoint = (
   tolerance?: number,
 ): NonDeleted<ExcalidrawBindableElement>[] => {
   const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
-  // We need to to hit testing from front (end of the array) to back (beginning of the array)
+  // We need to do hit testing from front (end of the array) to back (beginning of the array)
   // because array is ordered from lower z-index to highest and we want element z-index
   // with higher z-index
   for (let index = elements.length - 1; index >= 0; --index) {
@@ -384,7 +336,12 @@ export const getHoveredElementForBinding = (
       continue;
     }
 
-    const distance = borderDistance(element, point, elementsMap, tolerance);
+    const distance = borderDistance(
+      element,
+      point,
+      elementsMap,
+      tolerance ?? 0,
+    );
     const bindingGap = getBindingGap(element, arrow);
 
     if (distance > -(tolerance ?? bindingGap)) {
@@ -400,9 +357,44 @@ export const getHoveredElementForBinding = (
     return candidateElements[0].element;
   }
 
-  return candidateElements
-    .sort((a, b) => a.distance - b.distance)
-    .map((c) => c.element)[0];
+  const furthestDistance = candidateElements.sort(
+    (a, b) => a.distance - b.distance,
+  );
+
+  const candidate = furthestDistance[furthestDistance.length - 1].element;
+  const [cx1, cy1, cx2, cy2] = getElementBounds(candidate, elementsMap);
+  const candidateArea = Math.max(
+    0.00001,
+    Math.abs(cx2 - cx1) * Math.abs(cy2 - cy1),
+  );
+  const overlaps = furthestDistance
+    .map((c) => {
+      if (c.element === candidate) {
+        return { ...c, overlapPercent: 0, relativeArea: 1 };
+      }
+
+      const [x1, y1, x2, y2] = getElementBounds(c.element, elementsMap);
+      const overlapX1 = x1 > cx1 && x1 < cx2 ? x1 : cx1;
+      const overlapY1 = y1 > cy1 && y1 < cy2 ? y1 : cy1;
+      const overlapX2 = x2 < cx2 && x2 > cx1 ? x2 : cx2;
+      const overlapY2 = y2 < cy2 && y2 > cy1 ? y2 : cy2;
+      const overlapWdith =
+        overlapX1 !== cx1 || overlapX2 !== cx2 ? overlapX2 - overlapX1 : 0;
+      const overlapHeight =
+        overlapY1 !== cy1 || overlapY2 !== cy2 ? overlapY2 - overlapY1 : 0;
+      const area = Math.max(0.00001, Math.abs(x2 - x1) * Math.abs(y2 - y1));
+      const overlapPercent = Math.abs(overlapHeight * overlapWdith) / area;
+
+      return {
+        ...c,
+        overlapPercent,
+        relativeArea:
+          overlapPercent === 0 ? 1 : Math.min(area / candidateArea, 1),
+      };
+    })
+    .filter((c) => c.overlapPercent > 0.25 && c.relativeArea < 0.75);
+
+  return overlaps.length > 0 ? overlaps[0].element : candidate;
 };
 
 /**

@@ -9287,17 +9287,16 @@ class App extends React.Component<AppProps, AppState> {
             return;
           }
 
-          if (isBindingElement(element)) {
+          if (isBindingElement(element) && getFeatureFlag("COMPLEX_BINDINGS")) {
             const hoveredElement = getHoveredElementForBinding(
               element,
               pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
               this.scene.getNonDeletedElements(),
               elementsMap,
+              maxBindingDistance_simple(this.state.zoom),
             );
 
-            if (getFeatureFlag("COMPLEX_BINDINGS")) {
-              this.handleDelayedBindModeChange(element, hoveredElement);
-            }
+            this.handleDelayedBindModeChange(element, hoveredElement);
           }
 
           if (
