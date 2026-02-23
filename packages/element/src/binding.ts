@@ -2453,7 +2453,7 @@ export const isFixedPoint = (
   return (
     Array.isArray(fixedPoint) &&
     fixedPoint.length === 2 &&
-    fixedPoint.every((coord) => typeof coord === "number")
+    fixedPoint.every((coord) => Number.isFinite(coord))
   );
 };
 
