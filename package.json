@@ -97,6 +97,7 @@
     "@excalidraw/excalidraw": "0.18.0",
     "better-sqlite3": "12.6.2",
     "cors": "2.8.6",
+    "d3-force": "3.0.0",
     "drizzle-orm": "0.45.1",
     "express": "5.2.1",
     "graphlib-dot": "0.6.4",

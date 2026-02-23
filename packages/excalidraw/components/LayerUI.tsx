@@ -228,21 +228,13 @@ const LayerUI = ({
   };
 
   const renderTerraformImportDialog = () => {
-    if (
-      appState.openDialog?.name !== "terraformImport"
-    ) {
+    if (appState.openDialog?.name !== "terraformImport") {
       return null;
     }
 
     return (
       <TerraformImportDialog
-        elements={elements}
-        appState={appState}
-        files={files}
-        actionManager={actionManager}
-        onExportImage={onExportImage}
         onCloseRequest={() => setAppState({ openDialog: null })}
-        name={app.getName()}
       />
     );
   };

@@ -121,23 +121,28 @@ app.get("/terraform/upload/:id", (req, res) => {
   });
 });
 
-app.get("/terraform/upload/:id/excalidraw", (req, res) => {
-  const row = db
-    .select()
-    .from(uploads)
-    .where(eq(uploads.id, Number(req.params.id)))
-    .get();
-  if (!row) {
-    return res.status(404).json({ error: "Not found" });
+app.get("/terraform/upload/:id/excalidraw", async (req, res) => {
+  try {
+    const row = db
+      .select()
+      .from(uploads)
+      .where(eq(uploads.id, Number(req.params.id)))
+      .get();
+    if (!row) {
+      return res.status(404).json({ error: "Not found" });
+    }
+    const nodes = JSON.parse(row.data);
+    const excalidraw = await nodesToExcalidraw(nodes);
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="terraform-${row.id}.excalidraw"`,
+    );
+    return res.json(excalidraw);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: error.message });
   }
-  const nodes = JSON.parse(row.data);
-  const excalidraw = nodesToExcalidraw(nodes);
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader(
-    "Content-Disposition",
-    `attachment; filename="terraform-${row.id}.excalidraw"`,
-  );
-  return res.json(excalidraw);
 });
 
 app.listen(PORT, () => {
