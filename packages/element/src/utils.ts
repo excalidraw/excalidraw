@@ -430,7 +430,7 @@ export function deconstructDiamondElement(
     return cachedShape;
   }
 
-  const baseCorners = getDiamondBaseCorners(element, offset);
+  const baseCorners = getDiamondBaseCorners(element);
 
   const corners = baseCorners.map(
     (corner) =>
