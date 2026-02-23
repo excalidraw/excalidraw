@@ -1,6 +1,8 @@
 .DS_Store
 .env
 backend/uploads/
+backend/temp/
+uploads/
 .env.development.local
 .env.local
 .env.production.local

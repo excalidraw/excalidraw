@@ -93,9 +93,11 @@
     "strip-ansi": "6.0.1"
   },
   "dependencies": {
+    "@dagrejs/graphlib-dot": "1.0.2",
     "@excalidraw/excalidraw": "0.18.0",
     "cors": "2.8.6",
     "express": "5.2.1",
+    "graphlib-dot": "0.6.4",
     "multer": "2.0.2",
     "react": "19.2.4",
     "react-dom": "19.2.4"
