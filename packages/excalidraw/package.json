@@ -62,7 +62,6 @@
     "@excalidraw/math": "0.18.0",
     "@excalidraw/mermaid-to-excalidraw": "2.0.0-rfc3",
     "@excalidraw/random-username": "1.1.0",
-    "radix-ui": "1.4.3",
     "browser-fs-access": "0.29.1",
     "canvas-roundrect-polyfill": "0.0.1",
     "clsx": "1.1.1",
@@ -84,6 +83,7 @@
     "png-chunks-extract": "1.0.0",
     "points-on-curve": "1.0.1",
     "pwacompat": "2.0.17",
+    "radix-ui": "1.4.3",
     "roughjs": "4.6.4",
     "sass": "1.51.0",
     "tunnel-rat": "0.1.2"

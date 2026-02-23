@@ -4906,8 +4906,8 @@ class App extends React.Component<AppProps, AppState> {
                 prevState.currentItemArrowType === ARROW_TYPE.sharp
                   ? ARROW_TYPE.round
                   : prevState.currentItemArrowType === ARROW_TYPE.round
-                  ? ARROW_TYPE.elbow
-                  : ARROW_TYPE.sharp,
+                    ? ARROW_TYPE.elbow
+                    : ARROW_TYPE.sharp,
             }));
           }
 

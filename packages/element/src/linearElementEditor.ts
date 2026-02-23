@@ -615,10 +615,10 @@ export class LinearElementEditor {
       updates?.suggestedBinding?.element.id !== startBindingElement.id // The end point is not hovering the start bindable + it's binding gap
         ? startBindingElement
         : startIsSelected && // The "other" end (i.e. "start") is dragged
-          endBindingElement &&
-          updates?.suggestedBinding?.element.id !== endBindingElement.id // The start point is not hovering the end bindable + it's binding gap
-        ? endBindingElement
-        : null;
+            endBindingElement &&
+            updates?.suggestedBinding?.element.id !== endBindingElement.id // The start point is not hovering the end bindable + it's binding gap
+          ? endBindingElement
+          : null;
 
     const newLinearElementEditor: LinearElementEditor = {
       ...linearElementEditor,
@@ -2137,8 +2137,8 @@ const pointDraggingUpdates = (
     const suggestedBindingElement = startIsDragged
       ? start.element
       : endIsDragged
-      ? end.element
-      : null;
+        ? end.element
+        : null;
 
     return {
       positions: naiveDraggingPoints,
@@ -2364,19 +2364,19 @@ const pointDraggingUpdates = (
   const endLocalPoint = startIsDraggingOverEndElement
     ? nextArrow.points[nextArrow.points.length - 1]
     : endIsDraggingOverStartElement &&
-      app.state.bindMode !== "inside" &&
-      getFeatureFlag("COMPLEX_BINDINGS")
-    ? nextArrow.points[0]
-    : endBindable
-    ? updateBoundPoint(
-        element,
-        "endBinding",
-        nextArrow.endBinding,
-        endBindable,
-        elementsMap,
-        endIsDragged,
-      ) || nextArrow.points[nextArrow.points.length - 1]
-    : nextArrow.points[nextArrow.points.length - 1];
+        app.state.bindMode !== "inside" &&
+        getFeatureFlag("COMPLEX_BINDINGS")
+      ? nextArrow.points[0]
+      : endBindable
+        ? updateBoundPoint(
+            element,
+            "endBinding",
+            nextArrow.endBinding,
+            endBindable,
+            elementsMap,
+            endIsDragged,
+          ) || nextArrow.points[nextArrow.points.length - 1]
+        : nextArrow.points[nextArrow.points.length - 1];
 
   // We need to keep the simulated next arrow up-to-date, because
   // updateBoundPoint looks at the opposite point
@@ -2395,19 +2395,19 @@ const pointDraggingUpdates = (
     endIsDraggingOverStartElement && getFeatureFlag("COMPLEX_BINDINGS")
       ? nextArrow.points[0]
       : startIsDraggingOverEndElement &&
-        app.state.bindMode !== "inside" &&
-        getFeatureFlag("COMPLEX_BINDINGS")
-      ? endLocalPoint
-      : startBindable
-      ? updateBoundPoint(
-          element,
-          "startBinding",
-          nextArrow.startBinding,
-          startBindable,
-          elementsMap,
-          startIsDragged,
-        ) || nextArrow.points[0]
-      : nextArrow.points[0];
+          app.state.bindMode !== "inside" &&
+          getFeatureFlag("COMPLEX_BINDINGS")
+        ? endLocalPoint
+        : startBindable
+          ? updateBoundPoint(
+              element,
+              "startBinding",
+              nextArrow.startBinding,
+              startBindable,
+              elementsMap,
+              startIsDragged,
+            ) || nextArrow.points[0]
+          : nextArrow.points[0];
 
   const endChanged =
     !startIsDraggingOverEndElement &&

@@ -125,7 +125,7 @@ const parseGoogleDriveVideoLink = (
       // normalize to seconds for a stable preview URL.
       timestamp: timestamp > 0 ? timestamp : undefined,
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 };

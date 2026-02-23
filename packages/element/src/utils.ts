@@ -343,7 +343,6 @@ export function deconstructRectanguloidElement(
 
 export function getDiamondBaseCorners(
   element: ExcalidrawDiamondElement,
-  offset: number = 0,
 ): Curve<GlobalPoint>[] {
   const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
     getDiamondPoints(element);

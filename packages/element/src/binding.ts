@@ -825,20 +825,20 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           focusPoint: appState.selectedLinearElement.initialState.altFocusPoint,
         }
       : opts?.angleLocked && otherBindableElement
-      ? {
-          mode: "orbit",
-          element: otherBindableElement,
-          focusPoint:
-            projectFixedPointOntoDiagonal(
-              arrow,
-              otherEndpoint,
-              otherBindableElement,
-              startDragged ? "end" : "start",
-              elementsMap,
-              appState.zoom,
-            ) || otherEndpoint,
-        }
-      : { mode: undefined }
+        ? {
+            mode: "orbit",
+            element: otherBindableElement,
+            focusPoint:
+              projectFixedPointOntoDiagonal(
+                arrow,
+                otherEndpoint,
+                otherBindableElement,
+                startDragged ? "end" : "start",
+                elementsMap,
+                appState.zoom,
+              ) || otherEndpoint,
+          }
+        : { mode: undefined }
     : { mode: undefined };
 
   return {
@@ -1849,8 +1849,8 @@ export const updateBoundPoint = (
     return LinearElementEditor.createPointAt(
       arrow,
       elementsMap,
-      arrowTooShort ? focusPoint[0] : outlinePoint?.[0] ?? focusPoint[0],
-      arrowTooShort ? focusPoint[1] : outlinePoint?.[1] ?? focusPoint[1],
+      arrowTooShort ? focusPoint[0] : (outlinePoint?.[0] ?? focusPoint[0]),
+      arrowTooShort ? focusPoint[1] : (outlinePoint?.[1] ?? focusPoint[1]),
       null,
     );
   }
