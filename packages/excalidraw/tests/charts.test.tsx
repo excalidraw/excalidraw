@@ -74,4 +74,91 @@ Swordsmanship skill\t8\t1`,
       },
     });
   });
+
+  it("parses semicolon-separated values", () => {
+    const result = tryParseSpreadsheet(
+      `Metric;Player A;Player B
+Speed;80;60
+Strength;65;85
+Agility;90;70`,
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        title: "Metric",
+        labels: ["Speed", "Strength", "Agility"],
+        series: [
+          { title: "Player A", values: [80, 65, 90] },
+          { title: "Player B", values: [60, 85, 70] },
+        ],
+      },
+    });
+  });
+
+  it("transposes wide data (more value cols than rows) into series-per-row", () => {
+    const result = tryParseSpreadsheet(
+      `trait,Dunk,Egg,Daeron
+Physical,10,2,7
+Mental,10,2,7`,
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        title: "trait",
+        labels: ["Dunk", "Egg", "Daeron"],
+        series: [
+          { title: "Physical", values: [10, 2, 7] },
+          { title: "Mental", values: [10, 2, 7] },
+        ],
+      },
+    });
+  });
+
+  it("transposes single data row with header into single series", () => {
+    const result = tryParseSpreadsheet(
+      `trait,Dunk,Egg,Daeron
+Physical,10,2,7`,
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        title: "Physical",
+        labels: ["Dunk", "Egg", "Daeron"],
+        series: [{ title: "Physical", values: [10, 2, 7] }],
+      },
+    });
+  });
+
+  it("transposes single data row without header into single series", () => {
+    const result = tryParseSpreadsheet(`Physical,10,2,7`);
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        title: "Physical",
+        labels: null,
+        series: [{ title: "Physical", values: [10, 2, 7] }],
+      },
+    });
+  });
+
+  it("prefers tab over comma/semicolon when tabs produce multiple columns", () => {
+    const result = tryParseSpreadsheet(
+      `Label\tValue
+A\t10
+B\t20`,
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        title: "Value",
+        labels: ["A", "B"],
+        series: [{ title: "Value", values: [10, 20] }],
+      },
+    });
+  });
 });

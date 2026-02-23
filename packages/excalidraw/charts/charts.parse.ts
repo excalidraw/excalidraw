@@ -25,8 +25,8 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
     const hasHeader = cells[0].every((cell) => tryParseNumber(cell) === null);
     const rows = hasHeader ? cells.slice(1) : cells;
 
-    if (rows.length < 2) {
-      return { ok: false, reason: "Less than 2 rows" };
+    if (rows.length < 1) {
+      return { ok: false, reason: "No data rows" };
     }
 
     const invalidNumericColumn = rows.some((row) =>
@@ -34,6 +34,28 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
     );
     if (invalidNumericColumn) {
       return { ok: false, reason: "Value is not numeric" };
+    }
+
+    // When there are more value columns than data rows, the data is in
+    // "wide" format — transpose so columns become labels (dimensions)
+    // and rows become series. This enables e.g. radar charts for wide data.
+    const numValueCols = numCols - 1;
+    if (numValueCols > rows.length) {
+      const labels = hasHeader ? cells[0].slice(1).map((h) => h.trim()) : null;
+      const series = rows.map((row) => ({
+        title: row[0]?.trim() || null,
+        values: row.slice(1).map((v) => tryParseNumber(v)!),
+      }));
+      const title =
+        series.length === 1
+          ? series[0].title
+          : hasHeader
+          ? cells[0][0].trim() || null
+          : null;
+      return {
+        ok: true,
+        data: { title, labels, series },
+      };
     }
 
     const series = cells[0].slice(1).map((seriesTitle, index) => {
@@ -107,22 +129,32 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
 };
 
 export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
-  // Copy/paste from excel, spreadsheets, TSV, CSV.
-  const parseDelimitedLines = (delimiter: "\t" | ",") =>
+  // Copy/paste from excel, spreadsheets, TSV, CSV, semicolon-separated.
+  const parseDelimitedLines = (delimiter: "\t" | "," | ";") =>
     text
       .replace(/\r\n?/g, "\n")
       .split("\n")
       .filter((line) => line.trim().length > 0)
       .map((line) => line.split(delimiter).map((cell) => cell.trim()));
 
-  const tabSeparatedLines = parseDelimitedLines("\t");
-  const commaSeparatedLines = parseDelimitedLines(",");
-  const lines =
-    tabSeparatedLines.length &&
-    tabSeparatedLines[0].length === 1 &&
-    commaSeparatedLines[0]?.length > 1
-      ? commaSeparatedLines
-      : tabSeparatedLines;
+  // Score each delimiter: prefer consistent column counts with the most columns.
+  // A delimiter that produces all single-column rows likely isn't the right one.
+  const candidates = (["\t", ",", ";"] as const).map((delimiter) => {
+    const parsed = parseDelimitedLines(delimiter);
+    const numCols = parsed[0]?.length ?? 0;
+    const isConsistent =
+      parsed.length > 0 && parsed.every((line) => line.length === numCols);
+    return { delimiter, parsed, numCols, isConsistent };
+  });
+
+  // Prefer: consistent + most columns. Among ties, tab > comma > semicolon
+  // (the array order already encodes this priority).
+  const best =
+    candidates.find((c) => c.isConsistent && c.numCols > 1) ??
+    candidates.find((c) => c.isConsistent) ??
+    candidates[0];
+
+  const lines = best.parsed;
 
   if (lines.length === 0) {
     return { ok: false, reason: "No values" };
