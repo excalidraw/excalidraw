@@ -18,6 +18,7 @@ const {
   cleanUpRoleLinks,
 } = require("./pipeline");
 const { mockLanggraphEnrichment, applyEnrichment } = require("./enrichment");
+const { nodesToExcalidraw } = require("./excalidraw");
 
 const app = express();
 const PORT = 3000;
@@ -118,6 +119,25 @@ app.get("/terraform/upload/:id", (req, res) => {
     node_count: row.nodeCount,
     created_at: row.createdAt,
   });
+});
+
+app.get("/terraform/upload/:id/excalidraw", (req, res) => {
+  const row = db
+    .select()
+    .from(uploads)
+    .where(eq(uploads.id, Number(req.params.id)))
+    .get();
+  if (!row) {
+    return res.status(404).json({ error: "Not found" });
+  }
+  const nodes = JSON.parse(row.data);
+  const excalidraw = nodesToExcalidraw(nodes);
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename="terraform-${row.id}.excalidraw"`,
+  );
+  return res.json(excalidraw);
 });
 
 app.listen(PORT, () => {
