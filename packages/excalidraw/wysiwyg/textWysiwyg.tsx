@@ -13,7 +13,9 @@ import {
 } from "@excalidraw/common";
 
 import {
+  getTextFromElements,
   originalContainerCache,
+  updateBoundElements,
   updateOriginalContainerCache,
 } from "@excalidraw/element";
 
@@ -48,7 +50,11 @@ import type {
 
 import { actionSaveToActiveFile } from "../actions";
 
-import { parseDataTransferEvent } from "../clipboard";
+import {
+  parseClipboard,
+  parseDataTransferEvent,
+  parseDataTransferEventMimeTypes,
+} from "../clipboard";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
@@ -58,6 +64,8 @@ import {
   actionZoomIn,
   actionZoomOut,
 } from "../actions/actionCanvas";
+
+import type { ParsedDataTranferList } from "../clipboard";
 
 import type App from "../components/App";
 import type { AppState } from "../types";
@@ -208,6 +216,7 @@ export const textWysiwyg = ({
           );
 
           app.scene.mutateElement(container, { height: targetContainerHeight });
+          updateBoundElements(container, app.scene);
           return;
         } else if (
           // autoshrink container height until original container height
@@ -221,6 +230,7 @@ export const textWysiwyg = ({
             container.type,
           );
           app.scene.mutateElement(container, { height: targetContainerHeight });
+          updateBoundElements(container, app.scene);
         } else {
           const { x, y } = computeBoundTextPosition(
             container,
@@ -325,9 +335,58 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.onpaste = async (event) => {
-      const textItem = (await parseDataTransferEvent(event)).findByType(
-        MIME_TYPES.text,
-      );
+      // we need to synchronously get the MIME types so we can preventDefault()
+      // in the same tick (FF requires that)
+      const mimeTypes = parseDataTransferEventMimeTypes(event);
+
+      let dataList: ParsedDataTranferList | null = null;
+
+      // when copy/pasting excalidraw elements, only paste the text content
+      //
+      // Note that these custom MIME types only work within the same family
+      // of browsers, so won't work e.g. between chrome and firefox. We could
+      // parse the text/plain for existence of excalidraw instead, but this
+      // is an edge case
+      if (
+        mimeTypes.has(MIME_TYPES.excalidrawClipboard) ||
+        mimeTypes.has(MIME_TYPES.excalidraw)
+      ) {
+        // must be called in the same tick
+        event.preventDefault();
+
+        dataList = await parseDataTransferEvent(event);
+
+        try {
+          const parsed = await parseClipboard(dataList);
+
+          if (parsed.elements) {
+            const text = getTextFromElements(parsed.elements);
+            if (text) {
+              const { selectionStart, selectionEnd, value } = editable;
+
+              editable.value =
+                value.slice(0, selectionStart) +
+                text +
+                value.slice(selectionEnd);
+
+              const newPos = selectionStart + text.length;
+              editable.selectionStart = editable.selectionEnd = newPos;
+
+              editable.dispatchEvent(new Event("input"));
+            }
+          }
+
+          // if excalidraw elements don't contain any text elements,
+          // don't paste anything
+          return;
+        } catch {
+          console.warn("failed to parse excalidraw clipboard data");
+        }
+      }
+
+      dataList = dataList || (await parseDataTransferEvent(event));
+
+      const textItem = dataList.findByType(MIME_TYPES.text);
       if (!textItem) {
         return;
       }
