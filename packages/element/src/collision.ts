@@ -357,19 +357,19 @@ export const getHoveredElementForBinding = (
     return candidateElements[0].element;
   }
 
-  const furthestDistance = candidateElements.sort(
-    (a, b) => a.distance - b.distance,
+  const closestDistance = candidateElements.sort(
+    (a, b) => Math.abs(a.distance) - Math.abs(b.distance),
   );
 
-  const candidate = furthestDistance[furthestDistance.length - 1].element;
-  const [cx1, cy1, cx2, cy2] = getElementBounds(candidate, elementsMap);
+  const candidate = closestDistance[0];
+  const [cx1, cy1, cx2, cy2] = getElementBounds(candidate.element, elementsMap);
   const candidateArea = Math.max(
     0.00001,
     Math.abs(cx2 - cx1) * Math.abs(cy2 - cy1),
   );
-  const overlaps = furthestDistance
+  const overlaps = closestDistance
     .map((c) => {
-      if (c.element === candidate) {
+      if (c.element === candidate.element) {
         return { ...c, overlapPercent: 0, relativeArea: 1 };
       }
 
@@ -394,7 +394,9 @@ export const getHoveredElementForBinding = (
     })
     .filter((c) => c.overlapPercent > 0.25 && c.relativeArea < 0.75);
 
-  return overlaps.length > 0 ? overlaps[0].element : candidate;
+  return candidate.distance >= 0 && overlaps.length > 0
+    ? overlaps[0].element
+    : candidate.element;
 };
 
 /**
