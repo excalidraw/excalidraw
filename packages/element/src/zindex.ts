@@ -10,7 +10,6 @@ import { getElementsInGroup } from "./groups";
 import { syncMovedIndices } from "./fractionalIndex";
 import { getSelectedElements } from "./selection";
 import { getBoundTextElement, getContainerElement } from "./textElement";
-import { getHoveredElementForBinding } from "./collision";
 
 import type { Scene } from "./Scene";
 import type {
@@ -158,12 +157,8 @@ export const moveArrowAboveBindable = (
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
   scene: Scene,
-  hit?: NonDeletedExcalidrawElement,
+  hoveredElement: NonDeletedExcalidrawElement,
 ): readonly OrderedExcalidrawElement[] => {
-  const hoveredElement = hit
-    ? hit
-    : getHoveredElementForBinding(arrow, point, elements, elementsMap);
-
   if (!hoveredElement) {
     return elements;
   }
