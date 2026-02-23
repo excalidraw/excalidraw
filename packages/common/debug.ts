@@ -1,9 +1,3 @@
-declare global {
-  interface Window {
-    debug: typeof Debug;
-  }
-}
-
 const lessPrecise = (num: number, precision = 5) =>
   parseFloat(num.toPrecision(precision));
 
@@ -158,5 +152,3 @@ export class Debug {
     };
   };
 }
-//@ts-ignore
-window.debug = Debug;
