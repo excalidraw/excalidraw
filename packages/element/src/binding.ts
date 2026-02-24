@@ -1776,10 +1776,13 @@ export const updateBoundPoint = (
     );
   const otherArrowPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
     arrow,
-    startOrEnd === "startBinding" ? -1 : 0,
+    startOrEnd === "startBinding" ? 1 : -2,
     elementsMap,
   );
-  const otherFocusPointOrArrowPoint = otherFocusPoint || otherArrowPoint;
+  const otherFocusPointOrArrowPoint =
+    arrow.points.length === 2
+      ? otherFocusPoint || otherArrowPoint
+      : otherArrowPoint;
   const intersector =
     otherFocusPointOrArrowPoint &&
     lineSegment(focusPoint, otherFocusPointOrArrowPoint);
