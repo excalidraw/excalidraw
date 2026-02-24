@@ -1,5 +1,6 @@
 import {
   clamp,
+  pointDistanceSq,
   pointFrom,
   pointsEqual,
   type GlobalPoint,
@@ -37,14 +38,9 @@ import {
   isImageElement,
   isLinearElement,
   isLineElement,
+  maxBindingDistance_simple,
   isTextElement,
   LinearElementEditor,
-  headingForPoint,
-  compareHeading,
-  HEADING_RIGHT,
-  HEADING_DOWN,
-  HEADING_LEFT,
-  HEADING_UP,
 } from "@excalidraw/element";
 
 import { renderSelectionElement } from "@excalidraw/element";
@@ -432,12 +428,10 @@ const renderBindingHighlightForBindableElement_simple = (
 
     if (!insideBindable || isElbowArrow(arrow)) {
       context.save();
-      context.translate(suggestedBinding.element.x, suggestedBinding.element.y);
 
-      const midpointRadius = 5 / appState.zoom.value;
       const center = elementCenterPoint(suggestedBinding.element, elementsMap);
 
-      let midpoints: LocalPoint[];
+      let midpoints: GlobalPoint[];
       if (suggestedBinding.element.type === "diamond") {
         const center = elementCenterPoint(
           suggestedBinding.element,
@@ -452,10 +446,7 @@ const renderBindingHighlightForBindableElement_simple = (
               suggestedBinding.element.angle,
             );
 
-            return pointFrom<LocalPoint>(
-              rotatedPoint[0] - suggestedBinding.element.x,
-              rotatedPoint[1] - suggestedBinding.element.y,
-            );
+            return pointFrom<GlobalPoint>(rotatedPoint[0], rotatedPoint[1]);
           },
         );
       } else {
@@ -481,37 +472,35 @@ const renderBindingHighlightForBindableElement_simple = (
             center,
             suggestedBinding.element.angle,
           );
-          return pointFrom<LocalPoint>(
-            rotatedPoint[0] - suggestedBinding.element.x,
-            rotatedPoint[1] - suggestedBinding.element.y,
-          );
+          return pointFrom<GlobalPoint>(rotatedPoint[0], rotatedPoint[1]);
         });
       }
-      const highlightedPoint =
-        suggestedBinding.midPoint &&
-        pointFrom<LocalPoint>(
-          suggestedBinding.midPoint[0] - suggestedBinding.element.x,
-          suggestedBinding.midPoint[1] - suggestedBinding.element.y,
+
+      const highlightedMidpointIdx =
+        pointerCoords &&
+        midpoints.reduce(
+          (closestIdx, midpoint, idx) => {
+            const distanceSq = pointDistanceSq(midpoint, pointerCoords);
+            if (distanceSq < closestIdx.distanceSq) {
+              return { idx, distanceSq };
+            }
+            return closestIdx;
+          },
+          { idx: -1, distanceSq: Infinity },
         );
 
-      const target = [HEADING_RIGHT, HEADING_DOWN, HEADING_LEFT, HEADING_UP];
+      const midpointRadius = 4 / appState.zoom.value;
+      const highlightThreshold =
+        maxBindingDistance_simple(appState.zoom) +
+        suggestedBinding.element.strokeWidth / 2;
+      const highlightThresholdSq = highlightThreshold * highlightThreshold;
+
       midpoints.forEach((midpoint, idx) => {
         const isHighlighted =
-          highlightedPoint &&
-          compareHeading(
-            headingForPoint(
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  highlightedPoint[0] + suggestedBinding.element.x,
-                  highlightedPoint[1] + suggestedBinding.element.y,
-                ),
-                center,
-                suggestedBinding.element.angle as Radians,
-              ),
-              center,
-            ),
-            target[idx],
-          );
+          highlightedMidpointIdx &&
+          highlightedMidpointIdx.idx !== -1 &&
+          highlightedMidpointIdx.distanceSq <= highlightThresholdSq &&
+          idx === highlightedMidpointIdx.idx;
 
         if (!isHighlighted) {
           context.fillStyle =
