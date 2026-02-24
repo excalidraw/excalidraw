@@ -8,6 +8,7 @@ import {
   type Radians,
   bezierEquation,
   pointRotateRads,
+  pointDistance,
 } from "@excalidraw/math";
 
 import {
@@ -415,9 +416,8 @@ const renderBindingHighlightForBindableElement_simple = (
     const arrow =
       linearElement?.elementId &&
       LinearElementEditor.getElement(linearElement?.elementId, elementsMap);
-    const insideBindable =
+    const cursorIsInsideBindable =
       pointerCoords &&
-      arrow &&
       hitElementItself({
         point: pointerCoords,
         element: suggestedBinding.element,
@@ -426,7 +426,7 @@ const renderBindingHighlightForBindableElement_simple = (
         overrideShouldTestInside: true,
       });
 
-    if (!insideBindable || isElbowArrow(arrow)) {
+    if (!arrow || !cursorIsInsideBindable || isElbowArrow(arrow)) {
       context.save();
 
       const center = elementCenterPoint(suggestedBinding.element, elementsMap);
@@ -476,46 +476,69 @@ const renderBindingHighlightForBindableElement_simple = (
         });
       }
 
-      const highlightedMidpointIdx =
-        pointerCoords &&
-        midpoints.reduce(
-          (closestIdx, midpoint, idx) => {
-            const distanceSq = pointDistanceSq(midpoint, pointerCoords);
-            if (distanceSq < closestIdx.distanceSq) {
-              return { idx, distanceSq };
-            }
-            return closestIdx;
+      if (!pointerCoords) {
+        return;
+      }
+
+      const highlightedMidpointIdx = midpoints.reduce(
+        (
+          closestIdx: {
+            idx: number;
+            distanceSq: number;
+            midpoint: GlobalPoint;
           },
-          { idx: -1, distanceSq: Infinity },
-        );
+          midpoint,
+          idx,
+        ) => {
+          const distanceSq = pointDistanceSq(midpoint, pointerCoords);
+          if (distanceSq < closestIdx.distanceSq) {
+            return { idx, distanceSq, midpoint };
+          }
+          return closestIdx;
+        },
+        {
+          idx: -1,
+          distanceSq: Infinity,
+          midpoint: pointFrom<GlobalPoint>(0, 0),
+        },
+      );
 
       const midpointRadius = 4 / appState.zoom.value;
       const highlightThreshold =
         maxBindingDistance_simple(appState.zoom) +
         suggestedBinding.element.strokeWidth / 2;
-      const highlightThresholdSq = highlightThreshold * highlightThreshold;
+
+      const distanceFromMidpoint =
+        highlightedMidpointIdx &&
+        pointDistance(highlightedMidpointIdx.midpoint, pointerCoords);
 
       midpoints.forEach((midpoint, idx) => {
         const isHighlighted =
+          !cursorIsInsideBindable &&
           highlightedMidpointIdx &&
+          highlightedMidpointIdx.idx === idx &&
+          distanceFromMidpoint <= highlightThreshold;
+
+        const isShown =
+          !isHighlighted &&
           highlightedMidpointIdx.idx !== -1 &&
-          highlightedMidpointIdx.distanceSq <= highlightThresholdSq &&
+          distanceFromMidpoint <= highlightThreshold * 2 &&
           idx === highlightedMidpointIdx.idx;
 
-        if (!isHighlighted) {
-          context.fillStyle =
-            appState.theme === THEME.DARK
-              ? `rgba(0, 0, 0, 0.5)`
-              : `rgba(65, 65, 65, 0.4)`;
-          context.beginPath();
-          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
-          context.fill();
-        } else {
+        if (isHighlighted) {
           context.fillStyle =
             appState.theme === THEME.DARK
               ? `rgba(3, 93, 161, 1)`
               : `rgba(106, 189, 252, 1)`;
 
+          context.beginPath();
+          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+          context.fill();
+        } else if (isShown) {
+          context.fillStyle =
+            appState.theme === THEME.DARK
+              ? `rgba(0, 0, 0, 0.5)`
+              : `rgba(65, 65, 65, 0.4)`;
           context.beginPath();
           context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
           context.fill();
