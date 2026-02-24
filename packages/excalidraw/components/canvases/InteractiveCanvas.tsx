@@ -265,6 +265,7 @@ const getRelevantAppStateProps = (
   frameRendering: appState.frameRendering,
   shouldCacheIgnoreZoom: appState.shouldCacheIgnoreZoom,
   exportScale: appState.exportScale,
+  currentItemArrowType: appState.currentItemArrowType,
 });
 
 const areEqual = (
