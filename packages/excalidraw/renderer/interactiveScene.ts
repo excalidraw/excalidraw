@@ -1,6 +1,5 @@
 import {
   clamp,
-  pointDistanceSq,
   pointFrom,
   pointsEqual,
   type GlobalPoint,
@@ -426,7 +425,12 @@ const renderBindingHighlightForBindableElement_simple = (
         overrideShouldTestInside: true,
       });
 
-    if (!arrow || !cursorIsInsideBindable || isElbowArrow(arrow)) {
+    const isElbow =
+      (arrow && isElbowArrow(arrow)) ||
+      (appState.activeTool.type === "arrow" &&
+        appState.currentItemArrowType === "elbow");
+
+    if (!cursorIsInsideBindable || isElbow) {
       context.save();
 
       const center = elementCenterPoint(suggestedBinding.element, elementsMap);
@@ -476,54 +480,47 @@ const renderBindingHighlightForBindableElement_simple = (
         });
       }
 
-      if (!pointerCoords) {
-        return;
-      }
-
-      const highlightedMidpointIdx = midpoints.reduce(
-        (
-          closestIdx: {
-            idx: number;
-            distanceSq: number;
-            midpoint: GlobalPoint;
+      const hoveredMidpoint =
+        pointerCoords &&
+        midpoints.reduce(
+          (
+            closestIdx: {
+              idx: number;
+              distance: number;
+            },
+            point,
+            idx,
+          ) => {
+            const distance = pointDistance(point, pointerCoords);
+            if (idx === -1 || distance < closestIdx.distance) {
+              return { idx, distance };
+            }
+            return closestIdx;
           },
-          midpoint,
-          idx,
-        ) => {
-          const distanceSq = pointDistanceSq(midpoint, pointerCoords);
-          if (distanceSq < closestIdx.distanceSq) {
-            return { idx, distanceSq, midpoint };
-          }
-          return closestIdx;
-        },
-        {
-          idx: -1,
-          distanceSq: Infinity,
-          midpoint: pointFrom<GlobalPoint>(0, 0),
-        },
-      );
+          {
+            idx: -1,
+            distance: Infinity,
+          },
+        );
 
       const midpointRadius = 4 / appState.zoom.value;
       const highlightThreshold =
         maxBindingDistance_simple(appState.zoom) +
         suggestedBinding.element.strokeWidth / 2;
 
-      const distanceFromMidpoint =
-        highlightedMidpointIdx &&
-        pointDistance(highlightedMidpointIdx.midpoint, pointerCoords);
-
       midpoints.forEach((midpoint, idx) => {
         const isHighlighted =
-          !cursorIsInsideBindable &&
-          highlightedMidpointIdx &&
-          highlightedMidpointIdx.idx === idx &&
-          distanceFromMidpoint <= highlightThreshold;
+          (!cursorIsInsideBindable || isElbow) &&
+          hoveredMidpoint?.idx === idx &&
+          hoveredMidpoint.distance <= highlightThreshold;
 
+        // also render midpoint if cursor close but not highlighted
+        // (for elbows, always show all points)
         const isShown =
           !isHighlighted &&
-          highlightedMidpointIdx.idx !== -1 &&
-          distanceFromMidpoint <= highlightThreshold * 2 &&
-          idx === highlightedMidpointIdx.idx;
+          (isElbow ||
+            (idx === hoveredMidpoint?.idx &&
+              hoveredMidpoint.distance <= highlightThreshold * 2));
 
         if (isHighlighted) {
           context.fillStyle =
@@ -537,8 +534,8 @@ const renderBindingHighlightForBindableElement_simple = (
         } else if (isShown) {
           context.fillStyle =
             appState.theme === THEME.DARK
-              ? `rgba(0, 0, 0, 0.5)`
-              : `rgba(65, 65, 65, 0.4)`;
+              ? `rgba(0, 0, 0, 0.8)`
+              : `rgba(65, 65, 65, 0.5)`;
           context.beginPath();
           context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
           context.fill();
