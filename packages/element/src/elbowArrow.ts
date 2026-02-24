@@ -30,7 +30,6 @@ import {
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
   getBindingGap,
-  maxBindingDistance_simple,
   BASE_BINDING_GAP_ELBOW,
 } from "./binding";
 import { distanceToElement } from "./distance";
@@ -2286,7 +2285,7 @@ const getHoveredElement = (
     origPoint,
     elements,
     elementsMap,
-    maxBindingDistance_simple(zoom),
+    zoom,
   );
 };
 

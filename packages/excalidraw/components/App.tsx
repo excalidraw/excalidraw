@@ -250,7 +250,6 @@ import {
   getElementBounds,
   doBoundsIntersect,
   isPointInElement,
-  maxBindingDistance_simple,
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
   getSnapOutlineMidPoint,
@@ -7092,7 +7091,7 @@ class App extends React.Component<AppProps, AppState> {
           pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
           this.scene.getNonDeletedElements(),
           elementsMap,
-          maxBindingDistance_simple(this.state.zoom),
+          this.state.zoom,
         );
         if (hoveredElement) {
           this.setState({
@@ -7132,7 +7131,7 @@ class App extends React.Component<AppProps, AppState> {
             pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
             this.scene.getNonDeletedElements(),
             this.scene.getNonDeletedElementsMap(),
-            maxBindingDistance_simple(this.state.zoom),
+            this.state.zoom,
           );
         if (hoveredElement) {
           this.actionManager.executeAction(actionFinalize, "ui", {
@@ -7284,7 +7283,7 @@ class App extends React.Component<AppProps, AppState> {
         pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
-        maxBindingDistance_simple(this.state.zoom),
+        this.state.zoom,
       );
       const scenePointer = pointFrom<GlobalPoint>(scenePointerX, scenePointerY);
       const elementsMap = this.scene.getNonDeletedElementsMap();
@@ -9893,7 +9892,7 @@ class App extends React.Component<AppProps, AppState> {
               pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
               this.scene.getNonDeletedElements(),
               elementsMap,
-              maxBindingDistance_simple(this.state.zoom),
+              this.state.zoom,
             );
 
             this.handleDelayedBindModeChange(element, hoveredElement);
