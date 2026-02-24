@@ -11,11 +11,11 @@
   transition: all 0.15s ease;
   pointer-events: auto;
   user-select: none;
-  
+
   // Ensure icon stays crisp at all zoom levels
   image-rendering: -webkit-optimize-contrast;
   image-rendering: pixelated;
-  
+
   &:hover {
     color: var(--color-primary);
     background: var(--color-surface-higher);
@@ -23,22 +23,22 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
     transform: scale(1.15);
   }
-  
+
   &--selected {
     color: var(--color-primary);
     border-color: var(--color-primary);
     background: var(--color-primary-alpha-10);
   }
-  
+
   &--visible {
     background: var(--color-primary-alpha-20);
     border-color: var(--color-primary);
-    
+
     &:hover {
       background: var(--color-primary-alpha-30);
     }
   }
-  
+
   svg {
     flex-shrink: 0;
     width: 100%;
@@ -51,12 +51,12 @@
   color: var(--color-gray-30);
   background: var(--color-surface-low);
   border-color: var(--color-border);
-  
+
   &:hover {
     color: var(--color-primary);
     background: var(--color-surface-higher);
   }
-  
+
   &--selected {
     color: var(--color-primary);
     border-color: var(--color-primary);

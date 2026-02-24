@@ -1,15 +1,11 @@
 import { isTextElement } from "@excalidraw/element";
-import { 
-  addNoteToTextElement, 
-  removeNoteFromTextElement, 
-  updateNoteForTextElement,
-  hasNote 
-} from "@excalidraw/element";
+import { removeNoteFromTextElement, hasNote } from "@excalidraw/element";
 import { CaptureUpdateAction } from "@excalidraw/element";
-import { getSelectedElements } from "../scene";
-import { mutateElement } from "@excalidraw/element";
+
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
-import type { AppClassProperties, AppState, ExcalidrawProps } from "../types";
+
+import { getSelectedElements } from "../scene";
+
 import { register } from "./register";
 
 export const actionAddNote = register({
@@ -21,10 +17,7 @@ export const actionAddNote = register({
         d="M4 3a1 1 0 00-1 1v12a1 1 0 001 1h10a1 1 0 001-1V9.5l-3-3V16H5V5h4.5l3-3H4z"
         fill="currentColor"
       />
-      <path
-        d="m14 3 3 3-8 8L7 15l1-2 6-6z"
-        fill="currentColor"
-      />
+      <path d="m14 3 3 3-8 8L7 15l1-2 6-6z" fill="currentColor" />
     </svg>
   ),
   keywords: ["note", "tooltip", "annotation"],
@@ -40,7 +33,7 @@ export const actionAddNote = register({
   perform: (elements, appState, value, app) => {
     const selectedElements = getSelectedElements(elements, appState);
     const textElement = selectedElements[0] as ExcalidrawTextElement;
-    
+
     return {
       elements,
       appState: {
@@ -61,10 +54,7 @@ export const actionEditNote = register({
         d="M4 3a1 1 0 00-1 1v12a1 1 0 001 1h10a1 1 0 001-1V9.5l-3-3V16H5V5h4.5l3-3H4z"
         fill="currentColor"
       />
-      <path
-        d="m14 3 3 3-8 8L7 15l1-2 6-6z"
-        fill="currentColor"
-      />
+      <path d="m14 3 3 3-8 8L7 15l1-2 6-6z" fill="currentColor" />
     </svg>
   ),
   keywords: ["note", "tooltip", "edit", "annotation"],
@@ -80,7 +70,7 @@ export const actionEditNote = register({
   perform: (elements, appState, value, app) => {
     const selectedElements = getSelectedElements(elements, appState);
     const textElement = selectedElements[0] as ExcalidrawTextElement;
-    
+
     return {
       elements,
       appState: {
@@ -116,13 +106,18 @@ export const actionRemoveNote = register({
   perform: (elements, appState, value, app) => {
     const selectedElements = getSelectedElements(elements, appState);
     const textElement = selectedElements[0] as ExcalidrawTextElement;
-    
+
     // Remove the note from the text element
     removeNoteFromTextElement(textElement, app.scene);
-    
+
     return {
       elements: app.scene.getNonDeletedElements(),
-      appState,
+      appState: {
+        ...appState,
+        editingNoteElementId: null,
+        showingNoteTooltipElementId: null,
+        showNoteTooltip: null,
+      },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },

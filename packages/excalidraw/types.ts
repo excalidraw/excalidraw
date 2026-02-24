@@ -465,6 +465,12 @@ export interface AppState {
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
   bindMode: BindMode;
+
+  /** Note-related state */
+  editingNoteElementId: ExcalidrawElement["id"] | null;
+  hoveredNoteElementId: ExcalidrawElement["id"] | null;
+  showingNoteTooltipElementId: ExcalidrawElement["id"] | null;
+  showNoteTooltip: { elementId: string; x: number; y: number } | null;
 }
 
 export type SearchMatch = {

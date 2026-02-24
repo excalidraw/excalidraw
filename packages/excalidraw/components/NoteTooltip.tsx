@@ -1,10 +1,12 @@
 import React from "react";
-import clsx from "clsx";
+
 import { FONT_FAMILY } from "@excalidraw/common";
+
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
-import type { UIAppState } from "../types";
 
 import "./NoteTooltip.scss";
+
+import type { UIAppState } from "../types";
 
 interface NoteTooltipProps {
   textElement: ExcalidrawTextElement;
@@ -26,7 +28,7 @@ export const NoteTooltip: React.FC<NoteTooltipProps> = ({
   onMouseLeave,
 }) => {
   const note = textElement.note;
-  
+
   if (!note || !note.content) {
     return null;
   }
@@ -53,8 +55,12 @@ export const NoteTooltip: React.FC<NoteTooltipProps> = ({
           className="note-tooltip__content"
           style={{
             fontSize: `${note.formatting.fontSize}px`,
-            fontFamily: Object.entries(FONT_FAMILY).find(([, value]) => value === note.formatting.fontFamily)?.[0] || 'Arial',
-            textAlign: note.formatting.textAlign as React.CSSProperties['textAlign'],
+            fontFamily:
+              Object.entries(FONT_FAMILY).find(
+                ([, value]) => value === note.formatting.fontFamily,
+              )?.[0] || "Arial",
+            textAlign: note.formatting
+              .textAlign as React.CSSProperties["textAlign"],
             color: note.formatting.strokeColor,
             backgroundColor: note.formatting.backgroundColor,
             fontWeight: note.formatting.bold ? "bold" : "normal",

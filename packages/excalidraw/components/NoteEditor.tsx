@@ -1,13 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
+
 import clsx from "clsx";
-import { t } from "../i18n";
+
 import { FONT_FAMILY, TEXT_ALIGN } from "@excalidraw/common";
-import { Popover } from "./Popover";
+
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
-import type { UIAppState } from "../types";
+
+import { t } from "../i18n";
+
+import { Popover } from "./Popover";
 import { TrashIcon, CloseIcon, checkIcon } from "./icons";
 
 import "./NoteEditor.scss";
+
+import type { UIAppState } from "../types";
 
 interface NoteEditorProps {
   textElement: ExcalidrawTextElement;
@@ -26,11 +32,9 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const existingNote = textElement.note;
-  
-  const [noteContent, setNoteContent] = useState(
-    existingNote?.content || ""
-  );
-  
+
+  const [noteContent, setNoteContent] = useState(existingNote?.content || "");
+
   const [formatting, setFormatting] = useState(
     existingNote?.formatting || {
       fontSize: 12,
@@ -40,7 +44,7 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
       backgroundColor: "transparent",
       bold: false,
       italic: false,
-    }
+    },
   );
 
   useEffect(() => {
@@ -53,7 +57,9 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
   const handleSave = () => {
     if (noteContent.trim()) {
       const noteData: NonNullable<ExcalidrawTextElement["note"]> = {
-        id: existingNote?.id || `note_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id:
+          existingNote?.id ||
+          `note_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         content: noteContent.trim(),
         isVisible: false,
         formatting,
@@ -77,10 +83,7 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
   };
 
   return (
-    <Popover
-      onCloseRequest={onCancel}
-      className="note-editor-popover"
-    >
+    <Popover onCloseRequest={onCancel} className="note-editor-popover">
       <div className="note-editor">
         <div className="note-editor__header">
           <h3 className="note-editor__title">
@@ -99,8 +102,12 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
             rows={4}
             style={{
               fontSize: `${formatting.fontSize}px`,
-              fontFamily: Object.entries(FONT_FAMILY).find(([, value]) => value === formatting.fontFamily)?.[0] || 'Arial',
-              textAlign: formatting.textAlign as React.CSSProperties['textAlign'],
+              fontFamily:
+                Object.entries(FONT_FAMILY).find(
+                  ([, value]) => value === formatting.fontFamily,
+                )?.[0] || "Arial",
+              textAlign:
+                formatting.textAlign as React.CSSProperties["textAlign"],
               color: formatting.strokeColor,
               backgroundColor: formatting.backgroundColor,
               fontWeight: formatting.bold ? "bold" : "normal",
@@ -116,18 +123,26 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
               type="number"
               className="note-editor__font-size-input"
               value={formatting.fontSize}
-              onChange={(e) => updateFormatting({ fontSize: parseInt(e.target.value) || 16 })}
+              onChange={(e) =>
+                updateFormatting({ fontSize: parseInt(e.target.value) || 16 })
+              }
               min="8"
               max="72"
             />
           </div>
 
           <div className="note-editor__formatting-row">
-            <label className="note-editor__label">{t("labels.fontFamily")}</label>
+            <label className="note-editor__label">
+              {t("labels.fontFamily")}
+            </label>
             <select
               className="note-editor__select"
               value={formatting.fontFamily}
-              onChange={(e) => updateFormatting({ fontFamily: parseInt(e.target.value) as any })}
+              onChange={(e) =>
+                updateFormatting({
+                  fontFamily: parseInt(e.target.value) as any,
+                })
+              }
             >
               {Object.entries(FONT_FAMILY).map(([key, value]) => (
                 <option key={key} value={value}>
@@ -138,11 +153,15 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
           </div>
 
           <div className="note-editor__formatting-row">
-            <label className="note-editor__label">{t("labels.textAlign")}</label>
+            <label className="note-editor__label">
+              {t("labels.textAlign")}
+            </label>
             <select
               className="note-editor__select"
               value={formatting.textAlign}
-              onChange={(e) => updateFormatting({ textAlign: e.target.value as any })}
+              onChange={(e) =>
+                updateFormatting({ textAlign: e.target.value as any })
+              }
             >
               <option value={TEXT_ALIGN.LEFT}>Left</option>
               <option value={TEXT_ALIGN.CENTER}>Center</option>
@@ -151,22 +170,34 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
           </div>
 
           <div className="note-editor__formatting-row">
-            <label className="note-editor__label">{t("labels.strokeColor")}</label>
+            <label className="note-editor__label">
+              {t("labels.changeStroke")}
+            </label>
             <input
               type="color"
               className="note-editor__color-input"
               value={formatting.strokeColor}
-              onChange={(e) => updateFormatting({ strokeColor: e.target.value })}
+              onChange={(e) =>
+                updateFormatting({ strokeColor: e.target.value })
+              }
             />
           </div>
 
           <div className="note-editor__formatting-row">
-            <label className="note-editor__label">{t("labels.backgroundColor")}</label>
+            <label className="note-editor__label">
+              {t("labels.changeBackground")}
+            </label>
             <input
               type="color"
               className="note-editor__color-input"
-              value={formatting.backgroundColor === "transparent" ? "#ffffff" : formatting.backgroundColor}
-              onChange={(e) => updateFormatting({ backgroundColor: e.target.value })}
+              value={
+                formatting.backgroundColor === "transparent"
+                  ? "#ffffff"
+                  : formatting.backgroundColor
+              }
+              onChange={(e) =>
+                updateFormatting({ backgroundColor: e.target.value })
+              }
             />
           </div>
 
@@ -222,7 +253,9 @@ export const NoteEditor: React.FC<NoteEditorProps> = ({
               onClick={handleSave}
               disabled={!noteContent.trim()}
               title={existingNote ? t("buttons.save") : t("labels.addNote")}
-              aria-label={existingNote ? t("buttons.save") : t("labels.addNote")}
+              aria-label={
+                existingNote ? t("buttons.save") : t("labels.addNote")
+              }
             >
               {checkIcon}
             </button>

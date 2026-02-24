@@ -10,11 +10,18 @@ import {
   isShallowEqual,
 } from "@excalidraw/common";
 
-import { mutateElement } from "@excalidraw/element";
+import { mutateElement, removeNoteFromTextElement } from "@excalidraw/element";
 
 import { showSelectedShapeActions } from "@excalidraw/element";
 
 import { ShapeCache } from "@excalidraw/element";
+
+import {
+  isTextElement,
+  hasNote,
+  addNoteToTextElement,
+  updateNoteForTextElement,
+} from "@excalidraw/element";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
@@ -60,6 +67,7 @@ import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
+import { NoteEditor } from "./NoteEditor";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
@@ -619,6 +627,40 @@ const LayerUI = ({
               </button>
             )}
           </div>
+          {/* Note Editor Modal */}
+          {appState.editingNoteElementId &&
+            (() => {
+              const editingElement = elements.find(
+                (el) => el.id === appState.editingNoteElementId,
+              );
+              return editingElement && isTextElement(editingElement) ? (
+                <NoteEditor
+                  textElement={editingElement}
+                  appState={appState}
+                  onSave={(noteData) => {
+                    if (hasNote(editingElement)) {
+                      updateNoteForTextElement(
+                        editingElement,
+                        noteData,
+                        app.scene,
+                      );
+                    } else {
+                      addNoteToTextElement(editingElement, noteData, app.scene);
+                    }
+                    setAppState({ editingNoteElementId: null });
+                  }}
+                  onCancel={() => {
+                    setAppState({ editingNoteElementId: null });
+                  }}
+                  onDelete={() => {
+                    if (editingElement && hasNote(editingElement)) {
+                      removeNoteFromTextElement(editingElement, app.scene);
+                    }
+                    setAppState({ editingNoteElementId: null });
+                  }}
+                />
+              ) : null;
+            })()}
           {renderSidebars()}
         </>
       )}
