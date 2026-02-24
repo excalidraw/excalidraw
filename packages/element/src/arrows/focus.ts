@@ -10,7 +10,6 @@ import {
   getBindingGap,
   getGlobalFixedPointForBindableElement,
   isBindingEnabled,
-  maxBindingDistance_simple,
   unbindBindingElement,
   updateBoundPoint,
 } from "../binding";
@@ -239,7 +238,7 @@ export const handleFocusPointDrag = (
     point,
     scene.getNonDeletedElements(),
     elementsMap,
-    maxBindingDistance_simple(appState.zoom),
+    appState.zoom,
   );
 
   // Hovering a bindable element

@@ -25,7 +25,7 @@ import type {
   Radians,
 } from "@excalidraw/math";
 
-import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
+import type { AppState, FrameNameBounds } from "@excalidraw/excalidraw/types";
 
 import { isPathALoop } from "./utils";
 import {
@@ -59,7 +59,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 
 import { distanceToElement } from "./distance";
 
-import { getBindingGap } from "./binding";
+import { getBindingGap, maxBindingDistance_simple } from "./binding";
 
 import type {
   ElementsMap,
@@ -240,7 +240,7 @@ export const hitElementBoundText = (
   return isPointInElement(point, boundTextElement, elementsMap);
 };
 
-const borderDistance = (
+const bindableElementBorderDistanceIfClose = (
   element: NonDeleted<ExcalidrawBindableElement>,
   point: GlobalPoint,
   elementsMap: ElementsMap,
@@ -323,12 +323,16 @@ export const getHoveredElementForBinding = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  tolerance?: number,
+  zoom?: AppState["zoom"],
 ): NonDeleted<ExcalidrawBindableElement> | null => {
-  const candidateElements: {
+  type Candidate = {
     element: NonDeleted<ExcalidrawBindableElement>;
     distance: number;
-  }[] = [];
+    overlapPercent?: number;
+    relativeArea?: number;
+  };
+
+  const candidates: Candidate[] = [];
   for (let index = elements.length - 1; index >= 0; --index) {
     const element = elements[index];
 
@@ -336,38 +340,42 @@ export const getHoveredElementForBinding = (
       continue;
     }
 
-    const distance = borderDistance(
+    const maxDistance = maxBindingDistance_simple(zoom);
+    const distance = bindableElementBorderDistanceIfClose(
       element,
       point,
       elementsMap,
-      tolerance ?? 0,
+      maxDistance,
     );
-    const bindingGap = getBindingGap(element, arrow);
 
-    if (distance > -(tolerance ?? bindingGap)) {
-      candidateElements.push({ element, distance });
+    if (distance > -maxDistance) {
+      candidates.push({ element, distance });
+
+      if (!isTransparent(element.backgroundColor) && distance >= 0) {
+        break;
+      }
     }
   }
 
-  if (candidateElements.length === 0) {
+  if (candidates.length === 0) {
     return null;
   }
 
-  if (candidateElements.length === 1) {
-    return candidateElements[0].element;
+  if (candidates.length === 1) {
+    return candidates[0].element;
   }
 
-  const closestDistance = candidateElements.sort(
+  const closestElements = candidates.sort(
     (a, b) => Math.abs(a.distance) - Math.abs(b.distance),
   );
 
-  const candidate = closestDistance[0];
+  const candidate = closestElements[0];
   const [cx1, cy1, cx2, cy2] = getElementBounds(candidate.element, elementsMap);
   const candidateArea = Math.max(
     0.00001,
     Math.abs(cx2 - cx1) * Math.abs(cy2 - cy1),
   );
-  const overlaps = closestDistance
+  const overlaps = closestElements
     .map((c) => {
       if (c.element === candidate.element) {
         return { ...c, overlapPercent: 0, relativeArea: 1 };
