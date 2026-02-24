@@ -294,7 +294,7 @@ const bindingStrategyForElbowArrowEndpointDragging = (
     globalPoint,
     elements,
     elementsMap,
-    maxBindingDistance_simple(zoom),
+    zoom,
   );
 
   const current = hit
@@ -734,7 +734,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       : globalPoint,
     elements,
     elementsMap,
-    maxBindingDistance_simple(appState.zoom),
+    appState.zoom,
   );
   const pointInElement =
     hit &&
