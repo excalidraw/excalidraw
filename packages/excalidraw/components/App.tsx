@@ -7137,6 +7137,15 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    // If a previous Ctrl-key action (keydown toggle or handleLinearElement
+    // pointer-down) temporarily changed isBindingEnabled and the Ctrl key is no
+    // longer held on this pointer-down, restore the original value now.
+    if (!event.ctrlKey && this.bindingEnabledBeforeCtrl !== null) {
+      const restore = this.bindingEnabledBeforeCtrl;
+      this.bindingEnabledBeforeCtrl = null;
+      this.setState({ isBindingEnabled: restore });
+    }
+
     const scenePointer = viewportCoordsToSceneCoords(event, this.state);
     const { x: scenePointerX, y: scenePointerY } = scenePointer;
     this.lastPointerMoveCoords = {
@@ -7578,6 +7587,12 @@ class App extends React.Component<AppProps, AppState> {
 
     this.removePointer(event);
     this.lastPointerUpEvent = event;
+
+    if (!event.ctrlKey && this.bindingEnabledBeforeCtrl !== null) {
+      const restore = this.bindingEnabledBeforeCtrl;
+      this.bindingEnabledBeforeCtrl = null;
+      this.setState({ isBindingEnabled: restore });
+    }
 
     const scenePointer = viewportCoordsToSceneCoords(
       { clientX: event.clientX, clientY: event.clientY },
@@ -8633,6 +8648,12 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): void => {
     if (event.ctrlKey) {
+      // Capture the current value so it can be restored when Ctrl is released
+      // (via onKeyUp) or on the next non-Ctrl pointer-down (via
+      // handleCanvasPointerDown), matching the keydown-toggle mechanism.
+      if (this.bindingEnabledBeforeCtrl === null) {
+        this.bindingEnabledBeforeCtrl = this.state.isBindingEnabled;
+      }
       flushSync(() => {
         this.setState({ isBindingEnabled: false });
       });

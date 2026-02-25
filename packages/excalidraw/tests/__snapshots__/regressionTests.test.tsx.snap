@@ -904,7 +904,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
   "gridStep": 5,
   "height": 768,
   "hoveredElementIds": {},
-  "isBindingEnabled": false,
+  "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
   "isResizing": false,

@@ -93,9 +93,10 @@ describe("contextMenu element", () => {
       "paste",
       "selectAll",
       "gridMode",
+      "objectsSnapMode",
+      "arrowBinding",
       "zenMode",
       "viewMode",
-      "objectsSnapMode",
       "stats",
     ];
 

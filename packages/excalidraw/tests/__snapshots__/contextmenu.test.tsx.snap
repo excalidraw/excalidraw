@@ -7540,6 +7540,18 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       },
       {
         "checked": [Function],
+        "keyTest": [Function],
+        "label": "labels.arrowBinding",
+        "name": "arrowBinding",
+        "perform": [Function],
+        "trackEvent": {
+          "category": "canvas",
+          "predicate": [Function],
+        },
+        "viewMode": false,
+      },
+      {
+        "checked": [Function],
         "icon": <svg
           aria-hidden="true"
           className=""
