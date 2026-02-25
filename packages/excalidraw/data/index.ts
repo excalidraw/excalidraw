@@ -117,6 +117,55 @@ export const exportCanvas = async (
   if (elements.length === 0) {
     throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
+  if (type === "pdf") {
+    const svgElement = await exportToSvg(
+      elements,
+      {
+        exportBackground,
+        exportWithDarkMode: appState.exportWithDarkMode,
+        viewBackgroundColor,
+        exportPadding,
+        exportScale: appState.exportScale,
+      },
+      files,
+      { exportingFrame },
+    );
+
+    const width = svgElement.width.baseVal.value;
+    const height = svgElement.height.baseVal.value;
+
+    const [{ jsPDF }, { svg2pdf }] = await Promise.all([
+      import("jspdf"),
+      import("svg2pdf.js"),
+    ]);
+
+    const orientation = width > height ? "landscape" : "portrait";
+    const pdf = new jsPDF({
+      orientation,
+      unit: "pt",
+      format: [width, height],
+      compress: true,
+    });
+
+    await svg2pdf(svgElement, pdf, {
+      x: 0,
+      y: 0,
+      width,
+      height,
+    });
+
+    const pdfBlob = new Blob([pdf.output("arraybuffer")], {
+      type: "application/pdf",
+    });
+
+    return fileSave(pdfBlob, {
+      description: "Export to PDF",
+      name,
+      extension: "pdf",
+      fileHandle,
+    });
+  }
+
   if (type === "svg" || type === "clipboard-svg") {
     const svgPromise = exportToSvg(
       elements,
