@@ -244,6 +244,7 @@ export type InteractiveCanvasAppState = Readonly<
     frameRendering: AppState["frameRendering"];
     shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
     exportScale: AppState["exportScale"];
+    currentItemArrowType: AppState["currentItemArrowType"];
   }
 >;
 
