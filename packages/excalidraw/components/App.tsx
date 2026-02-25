@@ -4866,7 +4866,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.viewModeEnabled &&
         event.key === KEYS.ESCAPE
       ) {
-        this.setActiveTool({ type: "hand" });
+        this.setActiveTool({ type: "selection" });
         return;
       }
 
