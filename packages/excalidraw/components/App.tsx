@@ -119,7 +119,6 @@ import {
   fixBindingsAfterDeletion,
   getHoveredElementForBinding,
   isBindingEnabled,
-  shouldEnableBindingForPointerEvent,
   updateBoundElements,
   LinearElementEditor,
   newElementWith,
@@ -319,6 +318,7 @@ import {
   actionToggleElementLock,
   actionToggleLinearEditor,
   actionToggleObjectsSnapMode,
+  actionToggleArrowBinding,
   actionToggleCropEditor,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
@@ -641,6 +641,7 @@ class App extends React.Component<AppProps, AppState> {
   private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
+  private bindingEnabledBeforeCtrl: boolean | null = null;
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
@@ -4930,13 +4931,16 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (event[KEYS.CTRL_OR_CMD] && this.state.isBindingEnabled) {
+      if (event[KEYS.CTRL_OR_CMD] && !event.repeat) {
         if (getFeatureFlag("COMPLEX_BINDINGS")) {
           this.resetDelayedBindMode();
         }
 
+        if (this.bindingEnabledBeforeCtrl === null) {
+          this.bindingEnabledBeforeCtrl = this.state.isBindingEnabled;
+        }
         flushSync(() => {
-          this.setState({ isBindingEnabled: false });
+          this.setState({ isBindingEnabled: !this.bindingEnabledBeforeCtrl });
         });
 
         maybeHandleArrowPointlikeDrag({ app: this, event });
@@ -5210,9 +5214,11 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
     }
-    if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
+    if (!event[KEYS.CTRL_OR_CMD] && this.bindingEnabledBeforeCtrl !== null) {
+      const restore = this.bindingEnabledBeforeCtrl;
+      this.bindingEnabledBeforeCtrl = null;
       flushSync(() => {
-        this.setState({ isBindingEnabled: true });
+        this.setState({ isBindingEnabled: restore });
       });
 
       maybeHandleArrowPointlikeDrag({ app: this, event });
@@ -7351,7 +7357,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.clearSelectionIfNotUsingSelection();
-    this.updateBindingEnabledOnPointerMove(event);
 
     if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
       return;
@@ -11323,15 +11328,6 @@ class App extends React.Component<AppProps, AppState> {
     this.addNewImagesToImageCache();
   }, IMAGE_RENDER_TIMEOUT);
 
-  private updateBindingEnabledOnPointerMove = (
-    event: React.PointerEvent<HTMLElement>,
-  ) => {
-    const shouldEnableBinding = shouldEnableBindingForPointerEvent(event);
-    if (this.state.isBindingEnabled !== shouldEnableBinding) {
-      this.setState({ isBindingEnabled: shouldEnableBinding });
-    }
-  };
-
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: makeNextSelectedElementIds({}, prevState),
@@ -12093,6 +12089,7 @@ class App extends React.Component<AppProps, AppState> {
         CONTEXT_MENU_SEPARATOR,
         actionToggleGridMode,
         actionToggleObjectsSnapMode,
+        actionToggleArrowBinding,
         actionToggleZenMode,
         actionToggleViewMode,
         actionToggleStats,

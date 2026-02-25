@@ -173,7 +173,8 @@
     "tab": "Tab",
     "shapeSwitch": "Switch shape",
     "preferences": "Preferences",
-    "preferences_toolLock": "Tool lock"
+    "preferences_toolLock": "Tool lock",
+    "arrowBinding": "Arrow binding"
   },
   "elementLink": {
     "title": "Link to object",

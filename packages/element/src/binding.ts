@@ -1,5 +1,4 @@
 import {
-  KEYS,
   arrayToMap,
   getFeatureFlag,
   invariant,
@@ -135,12 +134,6 @@ export const maxBindingDistance_simple = (zoom?: AppState["zoom"]): number => {
     BASE_BINDING_DISTANCE,
     BASE_BINDING_DISTANCE * 2,
   );
-};
-
-export const shouldEnableBindingForPointerEvent = (
-  event: React.PointerEvent<HTMLElement>,
-) => {
-  return !event[KEYS.CTRL_OR_CMD];
 };
 
 export const isBindingEnabled = (appState: {
