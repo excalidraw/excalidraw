@@ -67,16 +67,23 @@ export const convertMermaidToExcalidraw = async ({
     return { success: false };
   }
 
+  // Replace HTML line break tags with newlines so that multiline node labels
+  // render correctly (e.g. A["foo<br>bar"] should produce two-line text)
+  const normalizedDefinition = mermaidDefinition.replace(
+    /<br\s*\/?>/gi,
+    "\n",
+  );
+
   let ret;
   try {
     const api = await mermaidToExcalidrawLib.api;
 
     try {
       try {
-        ret = await api.parseMermaidToExcalidraw(mermaidDefinition);
+        ret = await api.parseMermaidToExcalidraw(normalizedDefinition);
       } catch (err: unknown) {
         ret = await api.parseMermaidToExcalidraw(
-          mermaidDefinition.replace(/"/g, "'"),
+          normalizedDefinition.replace(/"/g, "'"),
         );
       }
     } catch (err: unknown) {
