@@ -85,7 +85,6 @@
     "@excalidraw/math": "0.18.0",
     "@excalidraw/mermaid-to-excalidraw": "2.0.0-rfc3",
     "@excalidraw/random-username": "1.1.0",
-    "radix-ui": "1.4.3",
     "browser-fs-access": "0.29.1",
     "canvas-roundrect-polyfill": "0.0.1",
     "clsx": "1.1.1",
@@ -96,6 +95,7 @@
     "image-blob-reduce": "3.0.1",
     "jotai": "2.11.0",
     "jotai-scope": "0.7.2",
+    "jspdf": "4.2.0",
     "lodash.debounce": "4.0.8",
     "lodash.throttle": "4.1.1",
     "nanoid": "3.3.3",
@@ -107,8 +107,10 @@
     "png-chunks-extract": "1.0.0",
     "points-on-curve": "1.0.1",
     "pwacompat": "2.0.17",
+    "radix-ui": "1.4.3",
     "roughjs": "4.6.4",
     "sass": "1.51.0",
+    "svg2pdf.js": "2.7.0",
     "tunnel-rat": "0.1.2"
   },
   "devDependencies": {

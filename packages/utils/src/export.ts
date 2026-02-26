@@ -196,6 +196,26 @@ export const exportToSvg = async ({
   });
 };
 
+export const exportToPdf = async ({
+  elements,
+  appState = getDefaultAppState(),
+  files = {},
+  exportPadding,
+  exportingFrame,
+}: Omit<ExportOpts, "getDimensions" | "maxWidthOrHeight"> & {
+  exportPadding?: number;
+}): Promise<Blob> => {
+  const svg = await exportToSvg({
+    elements,
+    appState,
+    files,
+    exportPadding,
+    exportingFrame,
+  });
+  const { svgToPdfBlob } = await import("@excalidraw/excalidraw/data/pdf");
+  return svgToPdfBlob(svg);
+};
+
 export const exportToClipboard = async (
   opts: ExportOpts & {
     mimeType?: string;
