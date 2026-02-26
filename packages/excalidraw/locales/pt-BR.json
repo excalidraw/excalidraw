@@ -135,15 +135,15 @@
       "labelEmbed": "Vincular e incorporar",
       "empty": "Nenhum link foi definido",
       "hint": "Digite ou cole o seu link aqui",
-      "goToElement": ""
+      "goToElement": "Ir para o elemento de destino"
     },
     "lineEditor": {
       "edit": "Editar linha",
       "editArrow": "Editar seta"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Quebrar polígono",
+      "convertToPolygon": "Converter para polígono"
     },
     "elementLock": {
       "lock": "Bloquear",
@@ -170,11 +170,11 @@
     "copyElementLink": "Copiar link para o objeto",
     "linkToElement": "Links para o objeto",
     "wrapSelectionInFrame": "Ajustar seleção no frame",
-    "tab": "",
-    "shapeSwitch": ""
+    "tab": "Tab",
+    "shapeSwitch": "Alternar forma"
   },
   "elementLink": {
-    "title": "",
+    "title": "Link para o objeto",
     "desc": "Clique em uma forma na tela ou cole um link.",
     "notFound": "Objeto vinculado não foi encontrado na tela."
   },
@@ -183,10 +183,10 @@
     "hint_emptyLibrary": "Selecione um item na tela para adicioná-lo aqui, ou instale uma biblioteca do repositório público, abaixo.",
     "hint_emptyPrivateLibrary": "Selecione um item na tela para adicioná-lo aqui.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Pesquisar biblioteca",
+      "heading": "Resultados da biblioteca",
+      "noResults": "Nenhum item correspondente encontrado...",
+      "clearSearch": "Limpar pesquisa"
     }
   },
   "search": {
@@ -195,8 +195,8 @@
     "singleResult": "resultado",
     "multipleResults": "resultados",
     "placeholder": "Procurar texto na tela...",
-    "frames": "",
-    "texts": ""
+    "frames": "Quadros",
+    "texts": "Textos"
   },
   "buttons": {
     "clearReset": "Limpar a tela",
@@ -230,7 +230,7 @@
     "objectsSnapMode": "Encaixar em objetos",
     "exitZenMode": "Sair do modo zen",
     "cancel": "Cancelar",
-    "saveLibNames": "",
+    "saveLibNames": "Salvar nome(s) e sair",
     "clear": "Limpar",
     "remove": "Remover",
     "embed": "Alternar incorporação",
@@ -261,7 +261,7 @@
     "removeItemsFromsLibrary": "Excluir {{count}} item(ns) da biblioteca?",
     "invalidEncryptionKey": "A chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desabilitada.",
     "collabOfflineWarning": "Sem conexão com a internet disponível.\nSuas alterações não serão salvas!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Cota de armazenamento do navegador excedida. As alterações não serão salvas."
   },
   "errors": {
     "unsupportedFileType": "Tipo de arquivo não suportado.",
@@ -292,7 +292,7 @@
   },
   "toolBar": {
     "selection": "Seleção",
-    "lasso": "",
+    "lasso": "Seleção por laço",
     "image": "Inserir imagem",
     "rectangle": "Retângulo",
     "diamond": "Losango",
@@ -313,7 +313,7 @@
     "hand": "Mão (ferramenta de rolagem)",
     "extraTools": "Mais ferramentas",
     "mermaidToExcalidraw": "Mermaid para Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "Alternar tipo de forma"
   },
   "element": {
     "rectangle": "Retângulo",
@@ -337,34 +337,34 @@
     "shapes": "Formas"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} para fechar a pesquisa",
+    "canvasPanning": "Para mover a tela, segure {{shortcut_1}} ou {{shortcut_2}} enquanto arrasta, ou use a ferramenta mão",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "Clique para iniciar vários pontos, arraste para uma linha única. Pressione {{shortcut}} novamente para mudar o tipo de seta.",
+    "arrowBindModifiers": "Segure {{shortcut_1}} para desativar a vinculação, ou {{shortcut_2}} para vincular em um ponto fixo",
     "freeDraw": "Toque e arraste, solte quando terminar",
     "text": "Dica: você também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
     "embeddable": "Clique e arraste para criar um site incorporado",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "text_selected": "Clique duas vezes ou pressione {{shortcut}} para editar o texto",
+    "text_editing": "Pressione {{shortcut_1}} ou {{shortcut_2}} para terminar a edição",
+    "linearElementMulti": "Clique no último ponto ou pressione {{shortcut_1}} ou {{shortcut_2}} para finalizar",
+    "lockAngle": "Você pode restringir o ângulo segurando {{shortcut}}",
+    "resize": "Você pode restringir as proporções segurando {{shortcut_1}} ao redimensionar,\nsegure {{shortcut_2}} para redimensionar a partir do centro",
+    "resizeImage": "Você pode redimensionar livremente segurando {{shortcut_1}},\nsegure {{shortcut_2}} para redimensionar a partir do centro",
+    "rotate": "Você pode restringir os ângulos segurando {{shortcut}} ao rotacionar",
+    "lineEditor_info": "Segure {{shortcut_1}} e clique duas vezes ou pressione {{shortcut_2}} para editar pontos",
+    "lineEditor_line_info": "Clique duas vezes ou pressione {{shortcut}} para editar pontos",
+    "lineEditor_pointSelected": "Pressione {{shortcut_1}} para remover ponto(s),\n{{shortcut_2}} para duplicar, ou arraste para mover",
+    "lineEditor_nothingSelected": "Selecione um ponto para editar (segure {{shortcut_1}} para selecionar vários),\nou segure {{shortcut_2}} e clique para adicionar novos pontos",
     "publishLibrary": "Publicar sua própria biblioteca",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} para adicionar texto",
+    "createFlowchart": "{{shortcut}} para criar um fluxograma",
+    "deepBoxSelect": "Segure {{shortcut}} para seleção profunda e para evitar arrastar",
+    "eraserRevert": "Segure {{shortcut}} para reverter os elementos marcados para exclusão",
     "firefox_clipboard_write": "Esse recurso pode ser ativado configurando a opção \"dom.events.asyncClipboard.clipboardItem\" como \"true\". Para alterar os sinalizadores do navegador no Firefox, visite a página \"about:config\".",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Segure {{shortcut}} para desativar o encaixe",
+    "enterCropEditor": "Clique duas vezes na imagem ou pressione {{shortcut}} para recortar a imagem",
+    "leaveCropEditor": "Clique fora da imagem ou pressione {{shortcut_1}} ou {{shortcut_2}} para finalizar o recorte"
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
@@ -536,7 +536,7 @@
     "pasteAsSingleElement": "Use {{shortcut}} para colar como um único elemento,\nou cole em um editor de texto já existente",
     "unableToEmbed": "No momento não é permitido incorporar esta URL. Crie uma issue no GitHub para solicitar a lista branca da URL",
     "unrecognizedLinkFormat": "O link incorporado não corresponde ao formato esperado. Por favor, tente colar a string 'incorporada' que foi fornecida pelo site de origem",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Link copiado para a área de transferência"
   },
   "colors": {
     "transparent": "Transparente",
@@ -557,9 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Seus desenhos são salvos no armazenamento do seu navegador.",
+      "center_heading_line2": "O armazenamento do navegador pode ser limpo inesperadamente.",
+      "center_heading_line3": "Salve seu trabalho em um arquivo regularmente para evitar perdê-lo.",
       "center_heading_plus": "Você queria ir para o Excalidraw+ em vez disso?",
       "menuHint": "Exportar, preferências, idiomas..."
     },
@@ -571,7 +571,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Cor",
     "mostUsedCustomColors": "Cores personalizadas mais usadas",
     "colors": "Cores",
     "shades": "Tons",
@@ -615,54 +615,54 @@
     "description": "Atualmente apenas os diagramas<flowchartLink>Flowchart</flowchartLink><sequenceLink>Sequência,</sequenceLink> e <classLink>Class</classLink>são suportados. Os outros tipos serão renderizados como uma imagem no Excalidraw.",
     "syntax": "Sintaxe em Mermaid",
     "preview": "Visualizar",
-    "label": "",
-    "inputPlaceholder": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Escreva a definição do diagrama Mermaid aqui..."
   },
   "ttd": {
-    "error": ""
+    "error": "Erro!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "Comece a digitar a ideia do seu diagrama aqui... ({{shortcut}} para nova linha)",
+    "inputPlaceholderWithMessages": "Continue refinando seu diagrama...",
+    "generating": "Gerando...",
+    "rateLimitRemaining": "{{count}} solicitações restantes hoje",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Você",
+      "assistant": "Assistente de IA",
+      "system": "Sistema"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "IA Beta",
+    "label": "Chat",
+    "menu": "Menu",
+    "newChat": "Novo chat",
+    "deleteChat": "Excluir chat",
+    "deleteMessage": "Excluir mensagem",
+    "viewAsMermaid": "Ver como Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "Vamos criar seu diagrama",
+      "description": "Descreva o diagrama que você quer criar e nós o geraremos para você.",
+      "hint": "No momento, suportamos fluxogramas, diagramas de sequência e de classe."
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Pré-visualização",
+    "insert": "Inserir",
+    "retry": "Tentar novamente",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "O prompt é muito curto (mínimo de {{min}} caracteres)",
+      "promptTooLong": "O prompt é muito longo (máximo de {{max}} caracteres)",
+      "generationFailed": "Falha na geração",
+      "invalidDiagram": "Foi gerado um diagrama inválido :(. Você pode editar manualmente, tentar novamente com correção automática ou usar um prompt diferente.",
+      "fixInMermaid": "Editar Mermaid manualmente →",
+      "aiRepair": "Gerar novamente (correção automática) →",
+      "requestAborted": "Solicitação cancelada",
+      "requestFailed": "Falha na solicitação",
+      "mermaidParseError": "Erro de sintaxe do Mermaid"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "Você atingiu seu limite de IA no plano gratuito. Experimente o Excalidraw+ para mais ou volte amanhã.",
+      "generalRateLimit": "Calma aí, você está rápido demais para nós! Aguarde um momento antes de tentar novamente.",
+      "messageLimitInputPlaceholder": "Você atingiu seu limite de mensagens"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Atualizar para Plus"
   },
   "quickSearch": {
     "placeholder": "Busca rápida"
@@ -701,15 +701,15 @@
     "shortcutHint": "Para a paleta de comandos, use {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Espaço",
+    "delete": "Delete",
+    "mmb": "Roda do mouse"
   }
 }
