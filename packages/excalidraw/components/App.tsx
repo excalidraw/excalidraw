@@ -247,7 +247,6 @@ import {
   getElementBounds,
   doBoundsIntersect,
   isPointInElement,
-  maxBindingDistance_simple,
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
   getSnapOutlineMidPoint,
@@ -879,14 +878,20 @@ class App extends React.Component<AppProps, AppState> {
         "Missing last pointer move coords when changing bind skip mode for arrow start",
       );
       const elementsMap = this.scene.getNonDeletedElementsMap();
-      const hoveredElement = getHoveredElementForBinding(
-        pointFrom<GlobalPoint>(
-          this.lastPointerMoveCoords.x,
-          this.lastPointerMoveCoords.y,
-        ),
-        this.scene.getNonDeletedElements(),
-        elementsMap,
-      );
+      const arrow = elementsMap.get(
+        this.state.selectedLinearElement.elementId,
+      ) as ExcalidrawArrowElement | undefined;
+      const hoveredElement =
+        arrow &&
+        getHoveredElementForBinding(
+          arrow,
+          pointFrom<GlobalPoint>(
+            this.lastPointerMoveCoords.x,
+            this.lastPointerMoveCoords.y,
+          ),
+          this.scene.getNonDeletedElements(),
+          elementsMap,
+        );
       const element = LinearElementEditor.getElement(
         this.state.selectedLinearElement.elementId,
         elementsMap,
@@ -1016,6 +1021,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const { x, y } = this.lastPointerMoveCoords;
       const hoveredElement = getHoveredElementForBinding(
+        arrow,
         pointFrom<GlobalPoint>(x, y),
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
@@ -5192,12 +5198,6 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
 
-        const hoveredElement = getHoveredElementForBinding(
-          pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
-          this.scene.getNonDeletedElements(),
-          this.scene.getNonDeletedElementsMap(),
-        );
-
         if (this.state.selectedLinearElement) {
           const element = LinearElementEditor.getElement(
             this.state.selectedLinearElement.elementId,
@@ -5205,6 +5205,13 @@ class App extends React.Component<AppProps, AppState> {
           );
 
           if (isBindingElement(element)) {
+            const hoveredElement = getHoveredElementForBinding(
+              element,
+              pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
+              this.scene.getNonDeletedElements(),
+              this.scene.getNonDeletedElementsMap(),
+            );
+
             this.handleDelayedBindModeChange(element, hoveredElement);
           }
         }
@@ -6533,10 +6540,11 @@ class App extends React.Component<AppProps, AppState> {
         );
         const elementsMap = this.scene.getNonDeletedElementsMap();
         const hoveredElement = getHoveredElementForBinding(
-          globalPoint,
+          { elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow },
+          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
           this.scene.getNonDeletedElements(),
           elementsMap,
-          maxBindingDistance_simple(this.state.zoom),
+          this.state.zoom,
         );
         if (hoveredElement) {
           this.setState({
@@ -6572,10 +6580,11 @@ class App extends React.Component<AppProps, AppState> {
           isArrowElement(this.state.newElement) &&
           isBindingEnabled(this.state) &&
           getHoveredElementForBinding(
+            this.state.newElement,
             pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
             this.scene.getNonDeletedElements(),
             this.scene.getNonDeletedElementsMap(),
-            maxBindingDistance_simple(this.state.zoom),
+            this.state.zoom,
           );
         if (hoveredElement) {
           this.actionManager.executeAction(actionFinalize, "ui", {
@@ -6585,7 +6594,7 @@ class App extends React.Component<AppProps, AppState> {
               y: scenePointerY,
             },
           });
-          this.setState({ suggestedBinding: null, startBoundElement: null });
+          this.setState({ suggestedBinding: null });
           if (!this.state.activeTool.locked) {
             resetCursor(this.interactiveCanvas);
             this.setState((prevState) => ({
@@ -6694,6 +6703,7 @@ class App extends React.Component<AppProps, AppState> {
 
         if (isSimpleArrow(multiElement)) {
           const hoveredElement = getHoveredElementForBinding(
+            multiElement,
             pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
             this.scene.getNonDeletedElements(),
             elementsMap,
@@ -6726,10 +6736,11 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.state.activeTool.type === "arrow") {
       const hit = getHoveredElementForBinding(
+        { elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow },
         pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
-        maxBindingDistance_simple(this.state.zoom),
+        this.state.zoom,
       );
       const scenePointer = pointFrom<GlobalPoint>(scenePointerX, scenePointerY);
       const elementsMap = this.scene.getNonDeletedElementsMap();
@@ -7207,7 +7218,6 @@ class App extends React.Component<AppProps, AppState> {
         appState: {
           newElement: null,
           editingTextElement: null,
-          startBoundElement: null,
           suggestedBinding: null,
           selectedElementIds: makeNextSelectedElementIds(
             Object.keys(this.state.selectedElementIds)
@@ -8466,18 +8476,8 @@ class App extends React.Component<AppProps, AppState> {
       };
     });
 
-    const boundElement = getHoveredElementForBinding(
-      pointFrom<GlobalPoint>(
-        pointerDownState.origin.x,
-        pointerDownState.origin.y,
-      ),
-      this.scene.getNonDeletedElements(),
-      this.scene.getNonDeletedElementsMap(),
-    );
-
     this.setState({
       newElement: element,
-      startBoundElement: boundElement,
       suggestedBinding: null,
     });
   };
@@ -8682,6 +8682,7 @@ class App extends React.Component<AppProps, AppState> {
       const hoveredElementForBinding =
         isBindingEnabled(this.state) &&
         getHoveredElementForBinding(
+          { elbowed: isElbowArrow(multiElement) },
           pointFrom<GlobalPoint>(
             this.lastPointerMoveCoords?.x ??
               rx + multiElement.points[multiElement.points.length - 1][0],
@@ -8804,6 +8805,7 @@ class App extends React.Component<AppProps, AppState> {
       const elementsMap = this.scene.getNonDeletedElementsMap();
       const boundElement = isBindingEnabled(this.state)
         ? getHoveredElementForBinding(
+            { elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow },
             point,
             this.scene.getNonDeletedElements(),
             elementsMap,
@@ -8879,7 +8881,6 @@ class App extends React.Component<AppProps, AppState> {
             ...prevState,
             bindMode: "orbit",
             newElement: element,
-            startBoundElement: boundElement,
             suggestedBinding:
               boundElement && isBindingElement(element)
                 ? {
@@ -9285,16 +9286,16 @@ class App extends React.Component<AppProps, AppState> {
             return;
           }
 
-          if (isBindingElement(element)) {
+          if (isBindingElement(element) && getFeatureFlag("COMPLEX_BINDINGS")) {
             const hoveredElement = getHoveredElementForBinding(
+              element,
               pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
               this.scene.getNonDeletedElements(),
               elementsMap,
+              this.state.zoom,
             );
 
-            if (getFeatureFlag("COMPLEX_BINDINGS")) {
-              this.handleDelayedBindModeChange(element, hoveredElement);
-            }
+            this.handleDelayedBindModeChange(element, hoveredElement);
           }
 
           if (
@@ -10327,7 +10328,7 @@ class App extends React.Component<AppProps, AppState> {
               sceneCoords,
             });
           }
-          this.setState({ suggestedBinding: null, startBoundElement: null });
+          this.setState({ suggestedBinding: null });
           if (!activeTool.locked) {
             resetCursor(this.interactiveCanvas);
             this.setState((prevState) => ({

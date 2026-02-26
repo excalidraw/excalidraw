@@ -303,7 +303,6 @@ export interface AppState {
    */
   selectionElement: NonDeletedExcalidrawElement | null;
   isBindingEnabled: boolean;
-  startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBinding: {
     element: NonDeleted<ExcalidrawBindableElement>;
     midPoint?: GlobalPoint;
@@ -480,10 +479,7 @@ export type SearchMatch = {
   }[];
 };
 
-export type UIAppState = Omit<
-  AppState,
-  "startBoundElement" | "cursorButton" | "scrollX" | "scrollY"
->;
+export type UIAppState = Omit<AppState, "cursorButton" | "scrollX" | "scrollY">;
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
 
