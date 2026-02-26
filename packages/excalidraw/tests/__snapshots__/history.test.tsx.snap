@@ -15,7 +15,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -73,10 +72,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -649,7 +644,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -707,10 +701,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -1213,7 +1203,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -1273,10 +1262,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -1576,7 +1561,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -1636,10 +1620,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -1941,7 +1921,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -2001,10 +1980,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -2207,7 +2182,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -2265,10 +2239,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -2663,7 +2633,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -2723,10 +2692,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -2969,7 +2934,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -3029,10 +2993,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -3291,7 +3251,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -3351,10 +3310,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -3588,7 +3543,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -3648,10 +3602,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -3877,7 +3827,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -3937,10 +3886,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -4115,7 +4060,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -4175,10 +4119,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -4375,7 +4315,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -4435,10 +4374,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -4649,7 +4584,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -4709,10 +4643,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -4881,7 +4811,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -4941,10 +4870,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -5113,7 +5038,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -5173,10 +5097,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -5363,7 +5283,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -5423,10 +5342,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -5622,7 +5537,6 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -5682,10 +5596,6 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -5883,7 +5793,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -5941,10 +5850,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -6215,7 +6120,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#ffc9c9",
@@ -6273,10 +6177,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -6645,7 +6545,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -6703,10 +6602,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -7022,7 +6917,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -7082,10 +6976,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -7337,7 +7227,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -7395,10 +7284,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -7632,7 +7517,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#ffc9c9",
@@ -7690,10 +7574,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "openPopup": "elementBackground",
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -7865,7 +7745,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -7923,10 +7802,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -8220,7 +8095,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -8278,10 +8152,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -8575,7 +8445,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -8633,10 +8502,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -8984,7 +8849,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -9042,10 +8906,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -9266,7 +9126,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -9324,10 +9183,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -9533,7 +9388,6 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#ffc9c9",
@@ -9591,10 +9445,6 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "openPopup": "elementBackground",
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -9801,7 +9651,6 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#ffc9c9",
@@ -9859,10 +9708,6 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "openPopup": "elementBackground",
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -10036,7 +9881,6 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -10096,10 +9940,6 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -10336,7 +10176,6 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -10394,10 +10233,6 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -10656,7 +10491,6 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -10714,10 +10548,6 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -10895,7 +10725,6 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -10955,10 +10784,6 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -11340,7 +11165,6 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#a5d8ff",
@@ -11398,10 +11222,6 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "openPopup": "elementBackground",
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -11603,7 +11423,6 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -11661,10 +11480,6 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -11841,7 +11656,6 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -11899,10 +11713,6 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -12081,7 +11891,6 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -12139,10 +11948,6 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -12475,7 +12280,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -12535,10 +12339,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -12688,7 +12488,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -12746,10 +12545,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -12898,7 +12693,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -12958,10 +12752,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -13202,7 +12992,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -13260,10 +13049,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -13503,7 +13288,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -13563,10 +13347,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -13751,7 +13531,6 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -13809,10 +13588,6 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -13991,7 +13766,6 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -14049,10 +13823,6 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -14231,7 +14001,6 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -14289,10 +14058,6 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -14481,7 +14246,6 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -14539,10 +14303,6 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -14815,7 +14575,6 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -14875,10 +14634,6 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -14988,7 +14743,6 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -15046,10 +14800,6 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -15275,7 +15025,6 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -15335,10 +15084,6 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -15541,7 +15286,6 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -15601,10 +15345,6 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -15697,7 +15437,6 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#a5d8ff",
@@ -15755,10 +15494,6 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -15982,7 +15717,6 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -16042,10 +15776,6 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "originSnapOffset": {
     "x": 0,
     "y": 0,
-  },
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
   },
   "penDetected": false,
   "penMode": false,
@@ -16147,7 +15877,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -16205,10 +15934,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -16898,7 +16623,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -16956,10 +16680,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -17547,7 +17267,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -17605,10 +17324,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -18196,7 +17911,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -18254,10 +17968,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -18948,7 +18658,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -19006,10 +18715,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -19719,7 +19424,6 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -19777,10 +19481,6 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -20202,7 +19902,6 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -20260,10 +19959,6 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -20716,7 +20411,6 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -20774,10 +20468,6 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
@@ -21178,7 +20868,6 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
-  "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
@@ -21236,10 +20925,6 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
-  "pasteDialog": {
-    "data": null,
-    "shown": false,
-  },
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {
