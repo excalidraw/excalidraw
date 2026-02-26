@@ -319,6 +319,7 @@ import {
   actionToggleLinearEditor,
   actionToggleObjectsSnapMode,
   actionToggleArrowBinding,
+  actionToggleMidpointSnapping,
   actionToggleCropEditor,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
@@ -12111,6 +12112,7 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleGridMode,
         actionToggleObjectsSnapMode,
         actionToggleArrowBinding,
+        actionToggleMidpointSnapping,
         actionToggleZenMode,
         actionToggleViewMode,
         actionToggleStats,

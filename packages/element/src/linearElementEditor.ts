@@ -418,6 +418,7 @@ export class LinearElementEditor {
                 "start",
                 elementsMap,
                 app.state.zoom,
+                app.state.isMidpointSnappingEnabled,
               )
             : linearElementEditor.initialState.altFocusPoint,
       },
@@ -636,6 +637,7 @@ export class LinearElementEditor {
                 "start",
                 elementsMap,
                 app.state.zoom,
+                app.state.isMidpointSnappingEnabled,
               )
             : linearElementEditor.initialState.altFocusPoint,
       },

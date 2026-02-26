@@ -11,6 +11,7 @@ import {
   actionShortcuts,
   actionToggleArrowBinding,
   actionToggleGridMode,
+  actionToggleMidpointSnapping,
   actionToggleObjectsSnapMode,
   actionToggleSearchMenu,
   actionToggleStats,
@@ -462,6 +463,24 @@ const PreferencesToggleArrowBindingItem = () => {
   );
 };
 
+const PreferencesToggleMidpointSnappingItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.isMidpointSnappingEnabled}
+      shortcut={getShortcutFromShortcutName("midpointSnapping")}
+      onSelect={(event) => {
+        actionManager.executeAction(actionToggleMidpointSnapping);
+        event.preventDefault();
+      }}
+    >
+      {t("labels.midpointSnapping")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
 export const PreferencesToggleGridModeItem = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -558,6 +577,7 @@ export const Preferences = ({
             <PreferencesToggleViewModeItem />
             <PreferencesToggleElementPropertiesItem />
             <PreferencesToggleArrowBindingItem />
+            <PreferencesToggleMidpointSnappingItem />
           </>
         )}
         {additionalItems}
@@ -569,6 +589,7 @@ export const Preferences = ({
 Preferences.ToggleToolLock = PreferencesToggleToolLockItem;
 Preferences.ToggleSnapMode = PreferencesToggleSnapModeItem;
 Preferences.ToggleArrowBinding = PreferencesToggleArrowBindingItem;
+Preferences.ToggleMidpointSnapping = PreferencesToggleMidpointSnappingItem;
 Preferences.ToggleGridMode = PreferencesToggleGridModeItem;
 Preferences.ToggleZenMode = PreferencesToggleZenModeItem;
 Preferences.ToggleViewMode = PreferencesToggleViewModeItem;

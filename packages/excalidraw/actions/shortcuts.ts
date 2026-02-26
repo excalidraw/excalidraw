@@ -29,6 +29,7 @@ export type ShortcutName =
       | "group"
       | "ungroup"
       | "arrowBinding"
+      | "midpointSnapping"
       | "gridMode"
       | "zenMode"
       | "objectsSnapMode"
@@ -96,6 +97,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   group: [getShortcutKey("CtrlOrCmd+G")],
   ungroup: [getShortcutKey("CtrlOrCmd+Shift+G")],
   arrowBinding: [getShortcutKey("Alt+B")],
+  midpointSnapping: [getShortcutKey("Alt+M")],
   gridMode: [getShortcutKey("CtrlOrCmd+'")],
   zenMode: [getShortcutKey("Alt+Z")],
   objectsSnapMode: [getShortcutKey("Alt+S")],

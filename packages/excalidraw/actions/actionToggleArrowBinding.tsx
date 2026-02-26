@@ -17,7 +17,7 @@ export const actionToggleArrowBinding = register({
         ...appState,
         isBindingEnabled: !this.checked!(appState),
       },
-      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      captureUpdate: CaptureUpdateAction.NEVER,
     };
   },
   checked: (appState) => appState.isBindingEnabled,

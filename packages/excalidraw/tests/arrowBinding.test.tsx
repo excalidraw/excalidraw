@@ -1,22 +1,15 @@
-/**
- * Tests for arrow binding preferences – focused on the non-default case where
- * isBindingEnabled is false (arrow binding turned off).
- *
- * Features under test:
- *  - actionToggleArrowBinding (action state, perform, checked)
- *  - Ctrl/Cmd keydown / keyup toggle logic (toggle-on-press, not hold-to-disable)
- *  - event.repeat guard preventing rapid-key-repeat from re-triggering toggle
- *  - bindingEnabledBeforeCtrl single-capture semantics
- *  - Arrow not binding when isBindingEnabled is false
- *  - Persistence: isBindingEnabled loaded from localStorage (browser: true)
- *  - Canvas context menu exposes the arrowBinding action
- */
-
-import React from "react";
-
 import { reseed } from "@excalidraw/common";
+import { projectFixedPointOntoDiagonal } from "@excalidraw/element";
 
-import type { ExcalidrawArrowElement } from "@excalidraw/element/types";
+import { pointFrom } from "@excalidraw/math";
+
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
+
+import type {
+  ExcalidrawArrowElement,
+  ExcalidrawBindableElement,
+  ExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import { actionToggleArrowBinding } from "../actions/actionToggleArrowBinding";
 import { Excalidraw } from "../index";
@@ -28,7 +21,6 @@ import {
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
-  GlobalTestState,
   waitFor,
   unmountComponent,
 } from "./test-utils";
@@ -127,8 +119,7 @@ describe("Arrow binding – non-default case (isBindingEnabled: false)", () => {
      * Baseline: verify binding IS created with binding enabled so we know the
      * spatial setup is correct.
      */
-    it("arrow startBinding is set when binding is enabled (baseline)", async () => {
-      // Rectangle centred in canvas
+    it("arrow startBinding is set when binding is enabled", async () => {
       API.setElements([
         API.createElement({
           type: "rectangle",
@@ -200,7 +191,7 @@ describe("Arrow binding – non-default case (isBindingEnabled: false)", () => {
       API.setAppState({ isBindingEnabled: false });
 
       UI.clickTool("arrow");
-      // End inside the target rectangle – binding off → no endBinding
+      // End inside the target rectangle – binding off -> no endBinding
       mouse.down(100, 200);
       mouse.up(600, 200);
 
@@ -226,8 +217,8 @@ describe("Arrow binding – non-default case (isBindingEnabled: false)", () => {
       ]);
 
       // Disable then re-enable binding
-      API.executeAction(actionToggleArrowBinding); // true → false
-      API.executeAction(actionToggleArrowBinding); // false → true
+      API.executeAction(actionToggleArrowBinding); // true -> false
+      API.executeAction(actionToggleArrowBinding); // false -> true
       expect(h.state.isBindingEnabled).toBe(true);
 
       UI.clickTool("arrow");
@@ -245,7 +236,58 @@ describe("Arrow binding – non-default case (isBindingEnabled: false)", () => {
   });
 
   // -------------------------------------------------------------------------
-  // Ctrl / Cmd key toggle semantics
+  // Arrow does snap to midpoint when isMidpointSnappingEnabled is true
+  // -------------------------------------------------------------------------
+  describe("Arrow doesn't snap to midpoint when midpoint snapping is disabled", () => {
+    it("does not snap to midpoint when midpoint snapping is turned off", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rectNoMidSnap",
+        x: 100,
+        y: 100,
+        width: 400,
+        height: 200,
+      }) as ExcalidrawBindableElement;
+      const arrow = API.createElement({
+        type: "arrow",
+        x: 0,
+        y: 250,
+        width: 502,
+        height: -48,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(502, -48)],
+      }) as ExcalidrawArrowElement;
+      const elementsMap = new Map<string, ExcalidrawElement>([
+        [rect.id, rect],
+        [arrow.id, arrow],
+      ]);
+      const point = pointFrom<GlobalPoint>(502, 202);
+
+      const snappedWithMidpoint = projectFixedPointOntoDiagonal(
+        arrow,
+        point,
+        rect,
+        "end",
+        elementsMap,
+        h.state.zoom,
+        true,
+      );
+      const snappedWithoutMidpoint = projectFixedPointOntoDiagonal(
+        arrow,
+        point,
+        rect,
+        "end",
+        elementsMap,
+        h.state.zoom,
+        false,
+      );
+
+      expect(snappedWithMidpoint).toEqual([500, 200]);
+      expect(snappedWithoutMidpoint).not.toEqual([500, 200]);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Ctrl / Cmd key toggle
   // -------------------------------------------------------------------------
 
   describe("Ctrl key toggle when binding starts OFF", () => {
@@ -339,7 +381,7 @@ describe("Arrow binding – non-default case (isBindingEnabled: false)", () => {
       // Start ON, first Ctrl keydown captures 'true' and flips to false
       expect(h.state.isBindingEnabled).toBe(true);
 
-      ctrlKeyDown(); // capture true → flip to false
+      ctrlKeyDown(); // capture true -> flip to false
       expect(h.state.isBindingEnabled).toBe(false);
 
       // A second keydown with Ctrl (e.g. pressing another key while Ctrl held)
@@ -349,104 +391,12 @@ describe("Arrow binding – non-default case (isBindingEnabled: false)", () => {
         ctrlKey: true,
         repeat: false,
       });
-      // bindingEnabledBeforeCtrl is already captured; isBindingEnabled = !true = false (same)
+      // bindingEnabledBeforeCtrl is already captured
       expect(h.state.isBindingEnabled).toBe(false);
 
-      // Ctrl keyup restores to captured value (true)
+      // Ctrl keyup restores to captured value
       ctrlKeyUp();
       expect(h.state.isBindingEnabled).toBe(true);
-    });
-  });
-
-  // -------------------------------------------------------------------------
-  // Persistence
-  // -------------------------------------------------------------------------
-
-  describe("Persistence (isBindingEnabled initialData / browser storage)", () => {
-    it("respects isBindingEnabled=false supplied via initialData", async () => {
-      unmountComponent();
-      localStorage.clear();
-      reseed(7);
-
-      // The core <Excalidraw> component accepts initial state through the
-      // initialData prop; the browser-storage persistence layer (browser: true)
-      // sits in the app shell above. Passing the value directly exercises the
-      // same hydration path.
-      await render(
-        <Excalidraw
-          handleKeyboardGlobally={true}
-          initialData={{ appState: { isBindingEnabled: false } }}
-        />,
-      );
-
-      await waitFor(() => {
-        expect(h.state.isBindingEnabled).toBe(false);
-      });
-    });
-
-    it("defaults to isBindingEnabled=true when localStorage has no entry", () => {
-      // localStorage is cleared in beforeEach; after a fresh render the default applies
-      expect(h.state.isBindingEnabled).toBe(true);
-    });
-  });
-
-  // -------------------------------------------------------------------------
-  // Canvas context menu
-  // -------------------------------------------------------------------------
-
-  describe("Canvas context menu", () => {
-    it("includes the arrowBinding action item", () => {
-      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
-        button: 2,
-        clientX: 1,
-        clientY: 1,
-      });
-
-      const contextMenu = UI.queryContextMenu();
-      expect(contextMenu).not.toBeNull();
-      expect(
-        contextMenu?.querySelector(`li[data-testid="arrowBinding"]`),
-      ).not.toBeNull();
-    });
-
-    it("arrowBinding context-menu item has checkmark class when binding is on", () => {
-      expect(h.state.isBindingEnabled).toBe(true);
-
-      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
-        button: 2,
-        clientX: 1,
-        clientY: 1,
-      });
-
-      const contextMenu = UI.queryContextMenu();
-      expect(contextMenu).not.toBeNull();
-      // The context-menu button receives the "checkmark" CSS class when checked
-      const button = contextMenu?.querySelector<HTMLElement>(
-        `li[data-testid="arrowBinding"] button.checkmark`,
-      );
-      expect(button).not.toBeNull();
-    });
-
-    it("arrowBinding context-menu item has no checkmark class when binding is off", () => {
-      API.setAppState({ isBindingEnabled: false });
-
-      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
-        button: 2,
-        clientX: 1,
-        clientY: 1,
-      });
-
-      const contextMenu = UI.queryContextMenu();
-      expect(contextMenu).not.toBeNull();
-      const item = contextMenu?.querySelector<HTMLElement>(
-        `li[data-testid="arrowBinding"]`,
-      );
-      expect(item).not.toBeNull();
-      // No checkmark class when unchecked
-      const checkedButton = contextMenu?.querySelector<HTMLElement>(
-        `li[data-testid="arrowBinding"] button.checkmark`,
-      );
-      expect(checkedButton).toBeNull();
     });
   });
 

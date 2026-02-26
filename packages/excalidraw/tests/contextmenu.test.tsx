@@ -95,6 +95,7 @@ describe("contextMenu element", () => {
       "gridMode",
       "objectsSnapMode",
       "arrowBinding",
+      "midpointSnapping",
       "zenMode",
       "viewMode",
       "stats",

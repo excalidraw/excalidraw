@@ -791,6 +791,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
               startDragged ? "start" : "end",
               elementsMap,
               appState.zoom,
+              appState.isMidpointSnappingEnabled,
             ) || globalPoint,
         }
     : { mode: null };
@@ -835,6 +836,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
               startDragged ? "end" : "start",
               elementsMap,
               appState.zoom,
+              appState.isMidpointSnappingEnabled,
             ) || otherEndpoint,
         }
       : { mode: undefined }

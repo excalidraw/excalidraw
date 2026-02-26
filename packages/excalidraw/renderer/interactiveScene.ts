@@ -407,8 +407,9 @@ const renderBindingHighlightForBindableElement_simple = (
   }
 
   if (
-    isFrameLikeElement(suggestedBinding.element) ||
-    isBindableElement(suggestedBinding.element)
+    appState.isMidpointSnappingEnabled &&
+    (isFrameLikeElement(suggestedBinding.element) ||
+      isBindableElement(suggestedBinding.element))
   ) {
     // Draw midpoint indicators
     const linearElement = appState.selectedLinearElement;
@@ -799,77 +800,79 @@ const renderBindingHighlightForBindableElement_complex = (
 
     context.restore();
 
-    // Draw midpoint indicators
-    context.save();
-    context.translate(
-      element.x + appState.scrollX,
-      element.y + appState.scrollY,
-    );
-
-    const midpointRadius = 5 / appState.zoom.value;
-    const cutoutPadding = 5 / appState.zoom.value;
-    const cutoutRadius = midpointRadius + cutoutPadding;
-
-    let midpoints;
-    if (element.type === "diamond") {
-      const [, curves] = deconstructDiamondElement(element);
-      const center = elementCenterPoint(element, allElementsMap);
-
-      midpoints = curves.map((curve) => {
-        const point = bezierEquation(curve, 0.5);
-        const rotatedPoint = pointRotateRads(point, center, element.angle);
-        return {
-          x: rotatedPoint[0] - element.x,
-          y: rotatedPoint[1] - element.y,
-        };
-      });
-    } else {
-      const center = elementCenterPoint(element, allElementsMap);
-      const basePoints = [
-        { x: element.width / 2, y: 0 }, // TOP
-        { x: element.width, y: element.height / 2 }, // RIGHT
-        { x: element.width / 2, y: element.height }, // BOTTOM
-        { x: 0, y: element.height / 2 }, // LEFT
-      ];
-      midpoints = basePoints.map((point) => {
-        const globalPoint = pointFrom<GlobalPoint>(
-          point.x + element.x,
-          point.y + element.y,
-        );
-        const rotatedPoint = pointRotateRads(
-          globalPoint,
-          center,
-          element.angle,
-        );
-        return {
-          x: rotatedPoint[0] - element.x,
-          y: rotatedPoint[1] - element.y,
-        };
-      });
-    }
-
-    // Clear cutouts around midpoints
-    midpoints.forEach((midpoint) => {
-      context.clearRect(
-        midpoint.x - cutoutRadius,
-        midpoint.y - cutoutRadius,
-        cutoutRadius * 2,
-        cutoutRadius * 2,
+    if (appState.isMidpointSnappingEnabled) {
+      // Draw midpoint indicators
+      context.save();
+      context.translate(
+        element.x + appState.scrollX,
+        element.y + appState.scrollY,
       );
-    });
 
-    context.fillStyle =
-      appState.theme === THEME.DARK
-        ? `rgba(3, 93, 161, ${opacity})`
-        : `rgba(106, 189, 252, ${opacity})`;
+      const midpointRadius = 5 / appState.zoom.value;
+      const cutoutPadding = 5 / appState.zoom.value;
+      const cutoutRadius = midpointRadius + cutoutPadding;
 
-    midpoints.forEach((midpoint) => {
-      context.beginPath();
-      context.arc(midpoint.x, midpoint.y, midpointRadius, 0, 2 * Math.PI);
-      context.fill();
-    });
+      let midpoints;
+      if (element.type === "diamond") {
+        const [, curves] = deconstructDiamondElement(element);
+        const center = elementCenterPoint(element, allElementsMap);
 
-    context.restore();
+        midpoints = curves.map((curve) => {
+          const point = bezierEquation(curve, 0.5);
+          const rotatedPoint = pointRotateRads(point, center, element.angle);
+          return {
+            x: rotatedPoint[0] - element.x,
+            y: rotatedPoint[1] - element.y,
+          };
+        });
+      } else {
+        const center = elementCenterPoint(element, allElementsMap);
+        const basePoints = [
+          { x: element.width / 2, y: 0 }, // TOP
+          { x: element.width, y: element.height / 2 }, // RIGHT
+          { x: element.width / 2, y: element.height }, // BOTTOM
+          { x: 0, y: element.height / 2 }, // LEFT
+        ];
+        midpoints = basePoints.map((point) => {
+          const globalPoint = pointFrom<GlobalPoint>(
+            point.x + element.x,
+            point.y + element.y,
+          );
+          const rotatedPoint = pointRotateRads(
+            globalPoint,
+            center,
+            element.angle,
+          );
+          return {
+            x: rotatedPoint[0] - element.x,
+            y: rotatedPoint[1] - element.y,
+          };
+        });
+      }
+
+      // Clear cutouts around midpoints
+      midpoints.forEach((midpoint) => {
+        context.clearRect(
+          midpoint.x - cutoutRadius,
+          midpoint.y - cutoutRadius,
+          cutoutRadius * 2,
+          cutoutRadius * 2,
+        );
+      });
+
+      context.fillStyle =
+        appState.theme === THEME.DARK
+          ? `rgba(3, 93, 161, ${opacity})`
+          : `rgba(106, 189, 252, ${opacity})`;
+
+      midpoints.forEach((midpoint) => {
+        context.beginPath();
+        context.arc(midpoint.x, midpoint.y, midpointRadius, 0, 2 * Math.PI);
+        context.fill();
+      });
+
+      context.restore();
+    }
   }
 
   return {

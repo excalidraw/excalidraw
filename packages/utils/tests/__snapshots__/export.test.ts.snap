@@ -59,6 +59,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
+  "isMidpointSnappingEnabled": true,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",

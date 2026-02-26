@@ -60,6 +60,7 @@ export type ActionName =
   | "zenMode"
   | "objectsSnapMode"
   | "arrowBinding"
+  | "midpointSnapping"
   | "stats"
   | "changeStrokeColor"
   | "changeBackgroundColor"

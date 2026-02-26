@@ -224,6 +224,7 @@ export type InteractiveCanvasAppState = Readonly<
     multiElement: AppState["multiElement"];
     newElement: AppState["newElement"];
     isBindingEnabled: AppState["isBindingEnabled"];
+    isMidpointSnappingEnabled: AppState["isMidpointSnappingEnabled"];
     suggestedBinding: AppState["suggestedBinding"];
     isRotating: AppState["isRotating"];
     elementsToHighlight: AppState["elementsToHighlight"];
@@ -303,6 +304,7 @@ export interface AppState {
    */
   selectionElement: NonDeletedExcalidrawElement | null;
   isBindingEnabled: boolean;
+  isMidpointSnappingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBinding: {
     element: NonDeleted<ExcalidrawBindableElement>;
