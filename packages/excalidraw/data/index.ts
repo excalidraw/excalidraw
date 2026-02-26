@@ -160,6 +160,33 @@ export const exportCanvas = async (
     }
   }
 
+  if (type === "pdf") {
+    const svg = await exportToSvg(
+      elements,
+      {
+        exportBackground,
+        exportWithDarkMode: appState.exportWithDarkMode,
+        viewBackgroundColor,
+        exportPadding,
+        exportScale: appState.exportScale,
+        exportEmbedScene: false,
+      },
+      files,
+      { exportingFrame },
+    );
+
+    const { svgToPdfBlob } = await import("./pdf");
+    const blob = await svgToPdfBlob(svg);
+
+    return fileSave(new Promise<Blob>((resolve) => resolve(blob)), {
+      description: "Export to PDF",
+      name,
+      extension: "pdf",
+      mimeTypes: [MIME_TYPES.pdf],
+      fileHandle: null,
+    });
+  }
+
   const tempCanvas = exportToCanvas(elements, appState, files, {
     exportBackground,
     viewBackgroundColor,
