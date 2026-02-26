@@ -438,6 +438,7 @@ export class Scene {
     options: {
       informMutation: boolean;
       isDragging: boolean;
+      isBindingEnabled?: boolean;
     } = {
       informMutation: true,
       isDragging: false,

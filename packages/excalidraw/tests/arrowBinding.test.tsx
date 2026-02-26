@@ -1,5 +1,8 @@
 import { reseed } from "@excalidraw/common";
-import { projectFixedPointOntoDiagonal } from "@excalidraw/element";
+import {
+  isElbowArrow,
+  projectFixedPointOntoDiagonal,
+} from "@excalidraw/element";
 
 import { pointFrom } from "@excalidraw/math";
 
@@ -12,7 +15,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { actionToggleArrowBinding } from "../actions/actionToggleArrowBinding";
-import { Excalidraw } from "../index";
+import { Excalidraw, sceneCoordsToViewportCoords } from "../index";
 
 import { API } from "./helpers/api";
 import { Pointer, UI } from "./helpers/ui";
@@ -232,6 +235,79 @@ describe("Arrow binding – non-default case (isBindingEnabled: false)", () => {
         expect(arrow).toBeDefined();
         expect(arrow!.startBinding).not.toBeNull();
       });
+    });
+
+    it("elbow arrow does not snap to rectangle when binding is disabled", async () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect-elbow-no-snap",
+        x: 900,
+        y: 500,
+        width: 200,
+        height: 120,
+      }) as ExcalidrawBindableElement;
+      API.setElements([rect]);
+
+      // Turn off arrow binding
+      API.setAppState({
+        isBindingEnabled: false,
+        isMidpointSnappingEnabled: false,
+      });
+      expect(h.state.isBindingEnabled).toBe(false);
+
+      // Create the elbow arrow
+      UI.clickTool("arrow");
+      API.setAppState({ currentItemArrowType: "elbow" });
+      mouse.downAt(700, 400);
+      mouse.upAt(760, 460);
+
+      let arrow: ExcalidrawArrowElement;
+      await waitFor(() => {
+        const maybeArrow = h.elements.find(isElbowArrow);
+        expect(maybeArrow).toBeDefined();
+        arrow = maybeArrow!;
+      });
+
+      // Move the elbow arrow
+      UI.clickTool("selection");
+
+      const insideRectanglePoint = pointFrom<GlobalPoint>(1010, 570);
+      const originalArrowEndGlobal = pointFrom<GlobalPoint>(
+        arrow!.x + arrow!.points[arrow!.points.length - 1][0],
+        arrow!.y + arrow!.points[arrow!.points.length - 1][1],
+      );
+      const originalArrowEndViewport = sceneCoordsToViewportCoords(
+        {
+          sceneX: originalArrowEndGlobal[0],
+          sceneY: originalArrowEndGlobal[1],
+        },
+        h.state,
+      );
+      const insideRectangleViewport = sceneCoordsToViewportCoords(
+        {
+          sceneX: insideRectanglePoint[0],
+          sceneY: insideRectanglePoint[1],
+        },
+        h.state,
+      );
+
+      // End point dragged inside the rectangle; with snapping enabled this
+      // would snap to the rectangle outline.
+      mouse.moveTo(originalArrowEndViewport.x, originalArrowEndViewport.y);
+      mouse.down();
+      mouse.moveTo(insideRectangleViewport.x, insideRectangleViewport.y);
+      mouse.up();
+
+      const updatedEnd = arrow!.points[arrow!.points.length - 1];
+      const updatedEndGlobal = pointFrom<GlobalPoint>(
+        arrow!.x + updatedEnd[0],
+        arrow!.y + updatedEnd[1],
+      );
+
+      expect(arrow!.startBinding).toBeNull();
+      expect(arrow!.endBinding).toBeNull();
+      expect(updatedEndGlobal).not.toEqual(originalArrowEndGlobal);
+      expect(updatedEndGlobal).toEqual(insideRectanglePoint);
     });
   });
 

@@ -170,8 +170,20 @@ export const bindOrUnbindBindingElement = (
     },
   );
 
-  bindOrUnbindBindingElementEdge(arrow, start, "start", scene);
-  bindOrUnbindBindingElementEdge(arrow, end, "end", scene);
+  bindOrUnbindBindingElementEdge(
+    arrow,
+    start,
+    "start",
+    scene,
+    appState.isBindingEnabled,
+  );
+  bindOrUnbindBindingElementEdge(
+    arrow,
+    end,
+    "end",
+    scene,
+    appState.isBindingEnabled,
+  );
   if (start.focusPoint || end.focusPoint) {
     // If the strategy dictates a focus point override, then
     // update the arrow points to point to the focus point.
@@ -214,12 +226,21 @@ const bindOrUnbindBindingElementEdge = (
   { mode, element, focusPoint }: BindingStrategy,
   startOrEnd: "start" | "end",
   scene: Scene,
+  shouldSnapToOutline = true,
 ): void => {
   if (mode === null) {
     // null means break the binding
     unbindBindingElement(arrow, startOrEnd, scene);
   } else if (mode !== undefined) {
-    bindBindingElement(arrow, element, mode, startOrEnd, scene, focusPoint);
+    bindBindingElement(
+      arrow,
+      element,
+      mode,
+      startOrEnd,
+      scene,
+      focusPoint,
+      shouldSnapToOutline,
+    );
   }
 };
 
@@ -1000,6 +1021,7 @@ export const bindBindingElement = (
   startOrEnd: "start" | "end",
   scene: Scene,
   focusPoint?: GlobalPoint,
+  shouldSnapToOutline = true,
 ): void => {
   const elementsMap = scene.getNonDeletedElementsMap();
 
@@ -1014,6 +1036,7 @@ export const bindBindingElement = (
         hoveredElement,
         startOrEnd,
         elementsMap,
+        shouldSnapToOutline,
       ),
     };
   } else {
@@ -1887,6 +1910,7 @@ export const calculateFixedPointForElbowArrowBinding = (
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
+  shouldSnapToOutline = true,
 ): { fixedPoint: FixedPoint } => {
   const bounds = [
     hoveredElement.x,
@@ -1894,12 +1918,18 @@ export const calculateFixedPointForElbowArrowBinding = (
     hoveredElement.x + hoveredElement.width,
     hoveredElement.y + hoveredElement.height,
   ] as Bounds;
-  const snappedPoint = bindPointToSnapToElementOutline(
-    linearElement,
-    hoveredElement,
-    startOrEnd,
-    elementsMap,
-  );
+  const snappedPoint = shouldSnapToOutline
+    ? bindPointToSnapToElementOutline(
+        linearElement,
+        hoveredElement,
+        startOrEnd,
+        elementsMap,
+      )
+    : LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        linearElement,
+        startOrEnd === "start" ? 0 : -1,
+        elementsMap,
+      );
   const globalMidPoint = pointFrom(
     bounds[0] + (bounds[2] - bounds[0]) / 2,
     bounds[1] + (bounds[3] - bounds[1]) / 2,

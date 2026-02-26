@@ -359,11 +359,17 @@ export class LinearElementEditor {
       linearElementEditor,
     );
 
-    LinearElementEditor.movePoints(element, app.scene, positions, {
-      startBinding: updates?.startBinding,
-      endBinding: updates?.endBinding,
-      moveMidPointsWithElement: updates?.moveMidPointsWithElement,
-    });
+    LinearElementEditor.movePoints(
+      element,
+      app.scene,
+      positions,
+      {
+        startBinding: updates?.startBinding,
+        endBinding: updates?.endBinding,
+        moveMidPointsWithElement: updates?.moveMidPointsWithElement,
+      },
+      { isBindingEnabled: app.state.isBindingEnabled },
+    );
     // Set the suggested binding from the updates if available
     if (isBindingElement(element, false)) {
       if (isBindingEnabled(app.state)) {
@@ -539,11 +545,17 @@ export class LinearElementEditor {
       linearElementEditor,
     );
 
-    LinearElementEditor.movePoints(element, app.scene, positions, {
-      startBinding: updates?.startBinding,
-      endBinding: updates?.endBinding,
-      moveMidPointsWithElement: updates?.moveMidPointsWithElement,
-    });
+    LinearElementEditor.movePoints(
+      element,
+      app.scene,
+      positions,
+      {
+        startBinding: updates?.startBinding,
+        endBinding: updates?.endBinding,
+        moveMidPointsWithElement: updates?.moveMidPointsWithElement,
+      },
+      { isBindingEnabled: app.state.isBindingEnabled },
+    );
 
     // Set the suggested binding from the updates if available
     if (isBindingElement(element, false)) {
@@ -1526,6 +1538,9 @@ export class LinearElementEditor {
       endBinding?: FixedPointBinding | null;
       moveMidPointsWithElement?: boolean | null;
     },
+    options?: {
+      isBindingEnabled?: boolean;
+    },
   ) {
     const { points } = element;
 
@@ -1594,6 +1609,7 @@ export class LinearElementEditor {
       otherUpdates,
       {
         isDragging: Array.from(pointUpdates.values()).some((t) => t.isDragging),
+        isBindingEnabled: options?.isBindingEnabled,
       },
     );
   }
@@ -1708,6 +1724,7 @@ export class LinearElementEditor {
       isDragging?: boolean;
       zoom?: AppState["zoom"];
       sceneElementsMap?: NonDeletedSceneElementsMap;
+      isBindingEnabled?: boolean;
     },
   ) {
     if (isElbowArrow(element)) {
@@ -1728,6 +1745,7 @@ export class LinearElementEditor {
       scene.mutateElement(element, updates, {
         informMutation: true,
         isDragging: options?.isDragging ?? false,
+        isBindingEnabled: options?.isBindingEnabled,
       });
     } else {
       // TODO do we need to get precise coords here just to calc centers?
