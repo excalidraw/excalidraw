@@ -600,5 +600,8 @@ export const actionToggleHandTool = register({
     };
   },
   keyTest: (event) =>
-    !event.altKey && !event[KEYS.CTRL_OR_CMD] && event.key === KEYS.H,
+    !event.altKey &&
+    !event[KEYS.CTRL_OR_CMD] &&
+    event.key === KEYS.H &&
+    !event.repeat,
 });
