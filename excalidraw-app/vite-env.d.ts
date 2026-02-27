@@ -11,6 +11,9 @@ interface ImportMetaEnv {
   // collaboration WebSocket server (https: string
   VITE_APP_WS_SERVER_URL: string;
 
+  // MongoDB backend server for room persistence
+  VITE_APP_MONGODB_BACKEND_URL: string;
+
   // set this only if using the collaboration workflow we use on excalidraw.com
   VITE_APP_PORTAL_URL: string;
   VITE_APP_AI_BACKEND: string;
@@ -22,6 +25,9 @@ interface ImportMetaEnv {
   VITE_APP_DEV_DISABLE_LIVE_RELOAD: string;
 
   VITE_APP_DISABLE_SENTRY: string;
+
+  // Disable the prevent unload dialog
+  VITE_APP_DISABLE_PREVENT_UNLOAD: string;
 
   // Set this flag to false if you want to open the overlay by default
   VITE_APP_COLLAPSE_OVERLAY: string;

@@ -13,11 +13,67 @@ services:
       disable: true
     environment:
       - NODE_ENV=development
+      - VITE_APP_MONGODB_BACKEND_URL=http://localhost:3003
     volumes:
       - ./:/opt/node_app/app:delegated
       - ./package.json:/opt/node_app/package.json
       - ./yarn.lock:/opt/node_app/yarn.lock
       - notused:/opt/node_app/app/node_modules
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:7.0
+    container_name: excalidraw-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: excalidraw
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: excalidraw-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/
+      ME_CONFIG_BASICAUTH: false
+    depends_on:
+      - mongodb
+
+  # Backend API server (to be implemented)
+  # Uncomment and configure once you create the backend
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: excalidraw-backend
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3003:3003"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - PORT=3003
+  #     - MONGODB_URI=mongodb://mongodb:27017/excalidraw
+  #     - CORS_ORIGINS=http://localhost:3000,http://localhost:3001
+  #     - MAX_FILE_SIZE=4194304
+  #   depends_on:
+  #     - mongodb
+  #   volumes:
+  #     - ./backend:/app
+  #     - /app/node_modules
 
 volumes:
   notused:
+  mongodb_data:
+  mongodb_config:

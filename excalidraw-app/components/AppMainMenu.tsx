@@ -14,6 +14,7 @@ import { LanguageList } from "../app-language/LanguageList";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 
 import { saveDebugState } from "./DebugCanvas";
+import { RoomListMenu } from "./RoomListMenu";
 
 export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
@@ -22,6 +23,9 @@ export const AppMainMenu: React.FC<{
   theme: Theme | "system";
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
+  currentRoomId: string | null;
+  onRoomSelect: (roomId: string, roomKey: string, displayName: string) => void;
+  onCreateNewRoom: () => void;
 }> = React.memo((props) => {
   return (
     <MainMenu>
@@ -30,10 +34,19 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.Export />
       <MainMenu.DefaultItems.SaveAsImage />
       {props.isCollabEnabled && (
-        <MainMenu.DefaultItems.LiveCollaborationTrigger
-          isCollaborating={props.isCollaborating}
-          onSelect={() => props.onCollabDialogOpen()}
-        />
+        <>
+          <MainMenu.DefaultItems.LiveCollaborationTrigger
+            isCollaborating={props.isCollaborating}
+            onSelect={() => props.onCollabDialogOpen()}
+          />
+          {props.isCollaborating && (
+            <RoomListMenu
+              currentRoomId={props.currentRoomId}
+              onRoomSelect={props.onRoomSelect}
+              onCreateNewRoom={props.onCreateNewRoom}
+            />
+          )}
+        </>
       )}
       <MainMenu.DefaultItems.CommandPalette className="highlighted" />
       <MainMenu.DefaultItems.SearchMenu />

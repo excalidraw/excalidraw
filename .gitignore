@@ -27,3 +27,9 @@ dev-dist
 html
 meta*.json
 .claude
+
+# Backend
+backend/.env.local
+backend/.env.production
+backend/node_modules
+backend/*.log

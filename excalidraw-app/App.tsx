@@ -119,7 +119,7 @@ import {
   importUsernameFromLocalStorage,
 } from "./data/localStorage";
 
-import { loadFilesFromFirebase } from "./data/firebase";
+import { loadFilesFromFirebase } from "./data/mongodb";
 import {
   LibraryIndexedDBAdapter,
   LibraryLocalStorageMigrationAdapter,
@@ -417,6 +417,10 @@ const ExcalidrawWrapper = () => {
   });
 
   const [, forceRefresh] = useState(false);
+
+  // Room management state
+  const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
+  const [currentRoomName, setCurrentRoomName] = useState<string>("Untitled Room");
 
   useEffect(() => {
     if (isDevEnv()) {
@@ -773,6 +777,33 @@ const ExcalidrawWrapper = () => {
     [setShareDialogState],
   );
 
+  const handleRoomSelect = useCallback(
+    (roomId: string, roomKey: string, displayName: string) => {
+      setCurrentRoomId(roomId);
+      setCurrentRoomName(displayName);
+      
+      // Navigate to the room
+      const roomLink = `${window.location.origin}${window.location.pathname}#room=${roomId},${roomKey}`;
+      window.location.href = roomLink;
+      window.location.reload();
+    },
+    [],
+  );
+
+  const handleCreateNewRoom = useCallback(() => {
+    // Stop current collaboration
+    if (collabAPI && isCollaborating) {
+      collabAPI.stopCollaboration(false);
+    }
+    
+    // Open collaboration dialog to create new room
+    setShareDialogState({ isOpen: true, type: "collaborationOnly" });
+  }, [collabAPI, isCollaborating, setShareDialogState]);
+
+  const handleRoomNameChange = useCallback((newName: string) => {
+    setCurrentRoomName(newName);
+  }, []);
+
   // browsers generally prevent infinite self-embedding, there are
   // cases where it still happens, and while we disallow self-embedding
   // by not whitelisting our own origin, this serves as an additional guard
@@ -920,6 +951,9 @@ const ExcalidrawWrapper = () => {
           theme={appTheme}
           setTheme={(theme) => setAppTheme(theme)}
           refresh={() => forceRefresh((prev) => !prev)}
+          currentRoomId={currentRoomId}
+          onRoomSelect={handleRoomSelect}
+          onCreateNewRoom={handleCreateNewRoom}
         />
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}

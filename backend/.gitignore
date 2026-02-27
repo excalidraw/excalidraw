@@ -1,0 +1,8 @@
+node_modules/
+.env.local
+.env.production
+*.log
+.DS_Store
+
+# Allow .env with safe development defaults
+# !.env

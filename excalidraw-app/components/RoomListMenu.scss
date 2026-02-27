@@ -1,0 +1,188 @@
+.room-list-menu {
+  padding: 0;
+  min-width: 320px;
+  max-width: 400px;
+}
+
+.room-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+}
+
+.room-search-icon {
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
+  
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.room-search-input {
+  flex: 1;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--color-gray-30);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-surface-primary);
+  color: var(--color-text-primary);
+  outline: none;
+  
+  &:focus {
+    border-color: var(--color-primary);
+  }
+  
+  &::placeholder {
+    color: var(--color-text-secondary);
+  }
+}
+
+.room-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+
+.room-list-loading {
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-transform: none;
+  opacity: 0.7;
+}
+
+.room-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  cursor: pointer;
+  border-radius: var(--border-radius-md);
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: var(--color-gray-10);
+    
+    .room-list-item-actions {
+      opacity: 1;
+    }
+  }
+  
+  &.active {
+    background-color: var(--color-primary-light);
+    
+    .room-list-item-name {
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+  }
+}
+
+.room-list-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.room-list-item-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.room-list-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.room-list-item-badge {
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  
+  &.active {
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+  }
+}
+
+.room-list-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.room-list-item-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  opacity: 0.6;
+  transition: opacity 0.2s, background-color 0.2s;
+  
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  &:hover {
+    opacity: 1;
+    background-color: var(--color-gray-20);
+  }
+}
+
+.room-list-item-lock {
+  font-size: 1rem;
+  opacity: 0.5;
+}
+
+.room-list-empty,
+.room-list-error {
+  padding: 1rem 0.75rem;
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.room-list-error {
+  color: var(--color-error);
+}
+
+@media (prefers-color-scheme: dark) {
+  .room-list-item:hover {
+    background-color: var(--color-gray-90);
+  }
+  
+  .room-list-item.active {
+    background-color: var(--color-primary-dark);
+  }
+  
+  .room-list-item-action:hover {
+    background-color: var(--color-gray-80);
+  }
+}

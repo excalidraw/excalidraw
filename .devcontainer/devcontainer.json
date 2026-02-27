@@ -1,0 +1,61 @@
+{
+  "name": "Excalidraw Development",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "excalidraw-dev",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "editorconfig.editorconfig",
+        "ms-azuretools.vscode-docker",
+        "mongodb.mongodb-vscode"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "typescript.tsdk": "node_modules/typescript/lib",
+        "typescript.enablePromptUseWorkspaceTsdk": true
+      }
+    }
+  },
+
+  "forwardPorts": [80, 3001, 3003, 8081, 27017],
+  "portsAttributes": {
+    "80": {
+      "label": "Nginx (Main Entry)",
+      "onAutoForward": "notify"
+    },
+    "3001": {
+      "label": "Excalidraw Dev Server",
+      "onAutoForward": "silent"
+    },
+    "3003": {
+      "label": "Backend API",
+      "onAutoForward": "silent"
+    },
+    "8081": {
+      "label": "Mongo Express",
+      "onAutoForward": "silent"
+    },
+    "27017": {
+      "label": "MongoDB",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "postCreateCommand": "yarn install",
+  "postStartCommand": "echo '\n✨ DevContainer ready!\n\n📍 Access points:\n  - Main app (nginx): http://localhost:80\n  - Dev server: http://localhost:3001 (run: yarn start)\n  - API: http://localhost/api\n  - Mongo Express: http://localhost/mongo-express\n  - MongoDB: mongodb://localhost:27017\n\n🚀 Run \"yarn start\" to begin development\n'",
+
+  "remoteUser": "node",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest"
+    }
+  }
+}

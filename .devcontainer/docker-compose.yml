@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  # Development container - VS Code attaches here
+  excalidraw-dev:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    container_name: excalidraw-dev
+    volumes:
+      - ..:/workspace:cached
+      - node_modules:/workspace/node_modules
+      - excalidraw_app_node_modules:/workspace/excalidraw-app/node_modules
+    command: sleep infinity
+    environment:
+      - NODE_ENV=development
+      - VITE_APP_MONGODB_BACKEND_URL=http://localhost/api
+      - VITE_APP_DISABLE_PREVENT_UNLOAD=true
+    depends_on:
+      - mongodb
+      - backend
+    networks:
+      - excalidraw-network
+
+  # Backend API server
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: excalidraw-backend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+      - MONGODB_URI=mongodb://mongodb:27017/excalidraw
+      - CORS_ORIGINS=http://localhost,http://localhost:80,http://localhost:3001
+      - MAX_FILE_SIZE=4194304
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - excalidraw-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3003/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB database
+  mongodb:
+    image: mongo:7.0
+    container_name: excalidraw-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: excalidraw
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - excalidraw-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Mongo Express - Database UI
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: excalidraw-mongo-express
+    restart: unless-stopped
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/
+      ME_CONFIG_BASICAUTH: false
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - excalidraw-network
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: excalidraw-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - excalidraw-dev
+      - backend
+      - mongo-express
+    networks:
+      - excalidraw-network
+
+volumes:
+  node_modules:
+  excalidraw_app_node_modules:
+  mongodb_data:
+  mongodb_config:
+
+networks:
+  excalidraw-network:
+    driver: bridge
