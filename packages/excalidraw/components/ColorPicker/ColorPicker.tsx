@@ -186,7 +186,7 @@ const ColorPickerPopupContent = ({
                   };
             });
           }}
-          onEscape={(event) => {
+          onEscape={() => {
             if (eyeDropperState) {
               setEyeDropperState(null);
             } else {

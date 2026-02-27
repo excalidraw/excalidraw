@@ -74,7 +74,7 @@ export const convertMermaidToExcalidraw = async ({
     try {
       try {
         ret = await api.parseMermaidToExcalidraw(mermaidDefinition);
-      } catch (err: unknown) {
+      } catch {
         ret = await api.parseMermaidToExcalidraw(
           mermaidDefinition.replace(/"/g, "'"),
         );

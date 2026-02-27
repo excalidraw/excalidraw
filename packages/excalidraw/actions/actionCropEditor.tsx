@@ -43,7 +43,7 @@ export const actionToggleCropEditor = register({
     }
     return false;
   },
-  PanelComponent: ({ appState, updateData, app }) => {
+  PanelComponent: ({ updateData }) => {
     const label = t("helpDialog.cropStart");
 
     return (

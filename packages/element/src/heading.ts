@@ -268,16 +268,16 @@ export const headingForPointFromElement = <Point extends GlobalPoint>(
   )
     ? HEADING_UP
     : triangleIncludesPoint<Point>(
-        [topRight, bottomRight, midPoint] as Triangle<Point>,
-        p,
-      )
-    ? HEADING_RIGHT
-    : triangleIncludesPoint<Point>(
-        [bottomRight, bottomLeft, midPoint] as Triangle<Point>,
-        p,
-      )
-    ? HEADING_DOWN
-    : HEADING_LEFT;
+          [topRight, bottomRight, midPoint] as Triangle<Point>,
+          p,
+        )
+      ? HEADING_RIGHT
+      : triangleIncludesPoint<Point>(
+            [bottomRight, bottomLeft, midPoint] as Triangle<Point>,
+            p,
+          )
+        ? HEADING_DOWN
+        : HEADING_LEFT;
 };
 
 export const flipHeading = (h: Heading): Heading =>

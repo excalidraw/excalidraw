@@ -255,11 +255,12 @@ const handleSegmentRenormalization = (
       );
     }
 
-    isDevEnv() &&
+    if (isDevEnv()) {
       invariant(
         validateElbowPoints(nextPoints),
         "Invalid elbow points with fixed segments",
       );
+    }
 
     return normalizeArrowElementUpdate(
       nextPoints,
@@ -521,8 +522,8 @@ const handleSegmentMove = (
         ? segmentLength / 2
         : BASE_PADDING
       : segmentIsTooShort
-      ? -segmentLength / 2
-      : -BASE_PADDING;
+        ? -segmentLength / 2
+        : -BASE_PADDING;
     fixedSegments[activelyModifiedSegmentIdx].start = pointFrom<LocalPoint>(
       fixedSegments[activelyModifiedSegmentIdx].start[0] +
         (startIsHorizontal ? padding : 0),
@@ -547,8 +548,8 @@ const handleSegmentMove = (
         ? segmentLength / 2
         : BASE_PADDING
       : segmentIsTooShort
-      ? -segmentLength / 2
-      : -BASE_PADDING;
+        ? -segmentLength / 2
+        : -BASE_PADDING;
     fixedSegments[activelyModifiedSegmentIdx].end = pointFrom<LocalPoint>(
       fixedSegments[activelyModifiedSegmentIdx].end[0] +
         (endIsHorizontal ? padding : 0),
@@ -571,7 +572,7 @@ const handleSegmentMove = (
   }));
 
   // For start, clone old arrow points
-  const newPoints: GlobalPoint[] = arrow.points.map((p, i) =>
+  const newPoints: GlobalPoint[] = arrow.points.map((p) =>
     pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
   );
 
@@ -720,11 +721,11 @@ const handleEndpointDrag = (
     i === 0
       ? pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1])
       : i === updatedPoints.length - 1
-      ? pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1])
-      : pointFrom<GlobalPoint>(
-          arrow.x + arrow.points[i][0],
-          arrow.y + arrow.points[i][1],
-        ),
+        ? pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1])
+        : pointFrom<GlobalPoint>(
+            arrow.x + arrow.points[i][0],
+            arrow.y + arrow.points[i][1],
+          ),
   );
   const nextFixedSegments = fixedSegments.map((segment) => ({
     ...segment,
@@ -982,8 +983,8 @@ export const updateElbowArrowPoints = (
           idx === 0
             ? updates.points![0]
             : idx === arrow.points.length - 1
-            ? updates.points![1]
-            : p,
+              ? updates.points![1]
+              : p,
         )
       : updates.points.slice()
     : arrow.points.slice();
@@ -1489,8 +1490,12 @@ const routeElbowArrow = (
       node.pos[0],
       node.pos[1],
     ]) as GlobalPoint[];
-    startDongle && points.unshift(startGlobalPoint);
-    endDongle && points.push(endGlobalPoint);
+    if (startDongle) {
+      points.unshift(startGlobalPoint);
+    }
+    if (endDongle) {
+      points.push(endGlobalPoint);
+    }
 
     return points;
   }
@@ -1680,29 +1685,29 @@ const generateDynamicAABBs = (
         ? Math.min((startEl[0] + endEl[2]) / 2, a[0] - startLeft)
         : (startEl[0] + endEl[2]) / 2
       : a[0] > b[0]
-      ? a[0] - startLeft
-      : common[0] - startLeft,
+        ? a[0] - startLeft
+        : common[0] - startLeft,
     a[1] > b[3]
       ? a[0] > b[2] || a[2] < b[0]
         ? Math.min((startEl[1] + endEl[3]) / 2, a[1] - startUp)
         : (startEl[1] + endEl[3]) / 2
       : a[1] > b[1]
-      ? a[1] - startUp
-      : common[1] - startUp,
+        ? a[1] - startUp
+        : common[1] - startUp,
     a[2] < b[0]
       ? a[1] > b[3] || a[3] < b[1]
         ? Math.max((startEl[2] + endEl[0]) / 2, a[2] + startRight)
         : (startEl[2] + endEl[0]) / 2
       : a[2] < b[2]
-      ? a[2] + startRight
-      : common[2] + startRight,
+        ? a[2] + startRight
+        : common[2] + startRight,
     a[3] < b[1]
       ? a[0] > b[2] || a[2] < b[0]
         ? Math.max((startEl[3] + endEl[1]) / 2, a[3] + startDown)
         : (startEl[3] + endEl[1]) / 2
       : a[3] < b[3]
-      ? a[3] + startDown
-      : common[3] + startDown,
+        ? a[3] + startDown
+        : common[3] + startDown,
   ] as Bounds;
   const second = [
     b[0] > a[2]
@@ -1710,29 +1715,29 @@ const generateDynamicAABBs = (
         ? Math.min((endEl[0] + startEl[2]) / 2, b[0] - endLeft)
         : (endEl[0] + startEl[2]) / 2
       : b[0] > a[0]
-      ? b[0] - endLeft
-      : common[0] - endLeft,
+        ? b[0] - endLeft
+        : common[0] - endLeft,
     b[1] > a[3]
       ? b[0] > a[2] || b[2] < a[0]
         ? Math.min((endEl[1] + startEl[3]) / 2, b[1] - endUp)
         : (endEl[1] + startEl[3]) / 2
       : b[1] > a[1]
-      ? b[1] - endUp
-      : common[1] - endUp,
+        ? b[1] - endUp
+        : common[1] - endUp,
     b[2] < a[0]
       ? b[1] > a[3] || b[3] < a[1]
         ? Math.max((endEl[2] + startEl[0]) / 2, b[2] + endRight)
         : (endEl[2] + startEl[0]) / 2
       : b[2] < a[2]
-      ? b[2] + endRight
-      : common[2] + endRight,
+        ? b[2] + endRight
+        : common[2] + endRight,
     b[3] < a[1]
       ? b[0] > a[2] || b[2] < a[0]
         ? Math.max((endEl[3] + startEl[1]) / 2, b[3] + endDown)
         : (endEl[3] + startEl[1]) / 2
       : b[3] < a[3]
-      ? b[3] + endDown
-      : common[3] + endDown,
+        ? b[3] + endDown
+        : common[3] + endDown,
   ] as Bounds;
 
   const c = commonAABB([first, second]);

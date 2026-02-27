@@ -11,7 +11,7 @@ const ExcalidrawWrapper: React.FC = () => {
     <>
       <App
         appTitle={"Excalidraw with Nextjs Example"}
-        useCustom={(api: any, args?: any[]) => {}}
+        useCustom={() => {}}
         excalidrawLib={excalidrawLib}
       >
         <Excalidraw />

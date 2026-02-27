@@ -17,7 +17,6 @@ interface FontPickerTriggerProps {
 }
 
 export const FontPickerTrigger = ({
-  selectedFontFamily,
   isOpened = false,
   compactMode = false,
 }: FontPickerTriggerProps) => {

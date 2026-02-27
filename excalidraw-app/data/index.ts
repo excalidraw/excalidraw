@@ -181,7 +181,7 @@ const legacy_decodeFromBackend = async ({
     const iv = buffer.slice(0, IV_LENGTH_BYTES);
     const encrypted = buffer.slice(IV_LENGTH_BYTES, buffer.byteLength);
     decrypted = await decryptData(new Uint8Array(iv), encrypted, decryptionKey);
-  } catch (error: any) {
+  } catch {
     // Fixed IV (old format, backward compatibility)
     const fixedIv = new Uint8Array(IV_LENGTH_BYTES);
     decrypted = await decryptData(fixedIv, buffer, decryptionKey);

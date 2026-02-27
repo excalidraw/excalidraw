@@ -55,10 +55,13 @@ export const actionSelectAllElementsInFrame = register({
         elements,
         appState: {
           ...appState,
-          selectedElementIds: elementsInFrame.reduce((acc, element) => {
-            acc[element.id] = true;
-            return acc;
-          }, {} as Record<ExcalidrawElement["id"], true>),
+          selectedElementIds: elementsInFrame.reduce(
+            (acc, element) => {
+              acc[element.id] = true;
+              return acc;
+            },
+            {} as Record<ExcalidrawElement["id"], true>,
+          ),
         },
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
@@ -164,7 +167,7 @@ export const actionWrapSelectionInFrame = register({
   name: "wrapSelectionInFrame",
   label: "labels.wrapSelectionInFrame",
   trackEvent: { category: "element" },
-  predicate: (elements, appState, _, app) => {
+  predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
 
     return (

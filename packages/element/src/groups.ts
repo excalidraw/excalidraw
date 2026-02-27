@@ -231,8 +231,8 @@ export const getSelectedGroupIds = (
   appState: InteractiveCanvasAppState,
 ): GroupId[] =>
   Object.entries(appState.selectedGroupIds)
-    .filter(([groupId, isSelected]) => isSelected)
-    .map(([groupId, isSelected]) => groupId);
+    .filter(([, isSelected]) => isSelected)
+    .map(([groupId]) => groupId);
 
 // given a list of elements, return the the actual group ids that should be selected
 // or used to update the elements
@@ -325,8 +325,8 @@ export const getMaximumGroups = (
   elements: ExcalidrawElement[],
   elementsMap: ElementsMap,
 ): ExcalidrawElement[][] => {
-  const groups: Map<String, ExcalidrawElement[]> = new Map<
-    String,
+  const groups: Map<string, ExcalidrawElement[]> = new Map<
+    string,
     ExcalidrawElement[]
   >();
   elements.forEach((element: ExcalidrawElement) => {

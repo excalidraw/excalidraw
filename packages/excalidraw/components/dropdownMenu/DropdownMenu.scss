@@ -68,7 +68,8 @@
       max-height: calc(100svh - var(--editor-container-padding) * 2 - 2.25rem);
 
       @at-root .excalidraw.theme--dark#{&} {
-        box-shadow: var(--box-shadow, var(--shadow-island)),
+        box-shadow:
+          var(--box-shadow, var(--shadow-island)),
           0 0 0 1px rgba(0, 0, 0, 0.15);
       }
     }

@@ -26,6 +26,7 @@ export const CheckboxItem: React.FC<{
       <button
         type="button"
         className="Checkbox-box"
+        // oxlint-disable-next-line jsx_a11y/prefer-tag-over-role
         role="checkbox"
         aria-checked={checked}
       >

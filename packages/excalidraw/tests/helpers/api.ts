@@ -4,7 +4,11 @@ import util from "util";
 
 import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 
-import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
+import {
+  DEFAULT_VERTICAL_ALIGN,
+  ROUNDNESS,
+  assertNever,
+} from "@excalidraw/common";
 
 import {
   newArrowElement,
@@ -52,7 +56,6 @@ import type { Action } from "../../actions/types";
 import type App from "../../components/App";
 import type { AppState } from "../../types";
 
-
 const readFile = util.promisify(fs.readFile);
 // so that window.h is available when App.tsx is not imported as well.
 createTestHook();
@@ -80,26 +83,31 @@ export class API {
     });
   };
 
-  static setSelectedElements = (elements: ExcalidrawElement[], editingGroupId?: string | null) => {
+  static setSelectedElements = (
+    elements: ExcalidrawElement[],
+    editingGroupId?: string | null,
+  ) => {
     act(() => {
       h.setState({
         ...selectGroupsForSelectedElements(
-        {
-          editingGroupId: editingGroupId ?? null,
-          selectedElementIds: elements.reduce((acc, element) => {
-            acc[element.id] = true;
-            return acc;
-          }, {} as Record<ExcalidrawElement["id"], true>),
-        },
-        elements,
-        h.state,
-        h.app,
-        )
+          {
+            editingGroupId: editingGroupId ?? null,
+            selectedElementIds: elements.reduce(
+              (acc, element) => {
+                acc[element.id] = true;
+                return acc;
+              },
+              {} as Record<ExcalidrawElement["id"], true>,
+            ),
+          },
+          elements,
+          h.state,
+          h.app,
+        ),
       });
     });
   };
 
-  // eslint-disable-next-line prettier/prettier
   static updateElement = <T extends ExcalidrawElement>(
     ...args: Parameters<typeof h.app.scene.mutateElement<T>>
   ) => {
@@ -151,8 +159,11 @@ export class API {
   };
 
   static getElement = <T extends ExcalidrawElement>(element: T): T => {
-    return h.app.scene.getElementsMapIncludingDeleted().get(element.id) as T || element;
-  }
+    return (
+      (h.app.scene.getElementsMapIncludingDeleted().get(element.id) as T) ||
+      element
+    );
+  };
 
   static createElement = <
     T extends Exclude<ExcalidrawElementType, "selection"> = "rectangle",
@@ -200,38 +211,48 @@ export class API {
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
       : never;
-    points?: T extends "arrow" | "line" | "freedraw" ? readonly LocalPoint[] : never;
+    points?: T extends "arrow" | "line" | "freedraw"
+      ? readonly LocalPoint[]
+      : never;
     locked?: boolean;
     fileId?: T extends "image" ? string : never;
     scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
     status?: T extends "image" ? ExcalidrawImageElement["status"] : never;
     startBinding?: T extends "arrow"
-      ? ExcalidrawArrowElement["startBinding"] | ExcalidrawElbowArrowElement["startBinding"]
+      ?
+          | ExcalidrawArrowElement["startBinding"]
+          | ExcalidrawElbowArrowElement["startBinding"]
       : never;
     endBinding?: T extends "arrow"
-      ? ExcalidrawArrowElement["endBinding"] | ExcalidrawElbowArrowElement["endBinding"]
+      ?
+          | ExcalidrawArrowElement["endBinding"]
+          | ExcalidrawElbowArrowElement["endBinding"]
       : never;
     startArrowhead?: T extends "arrow"
-      ? ExcalidrawArrowElement["startArrowhead"] | ExcalidrawElbowArrowElement["startArrowhead"]
+      ?
+          | ExcalidrawArrowElement["startArrowhead"]
+          | ExcalidrawElbowArrowElement["startArrowhead"]
       : never;
     endArrowhead?: T extends "arrow"
-      ? ExcalidrawArrowElement["endArrowhead"] | ExcalidrawElbowArrowElement["endArrowhead"]
+      ?
+          | ExcalidrawArrowElement["endArrowhead"]
+          | ExcalidrawElbowArrowElement["endArrowhead"]
       : never;
     elbowed?: boolean;
     fixedSegments?: FixedSegment[] | null;
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
-    ? ExcalidrawFreeDrawElement
-    : T extends "text"
-    ? ExcalidrawTextElement
-    : T extends "image"
-    ? ExcalidrawImageElement
-    : T extends "frame"
-    ? ExcalidrawFrameElement
-    : T extends "magicframe"
-    ? ExcalidrawMagicFrameElement
-    : ExcalidrawGenericElement => {
+      ? ExcalidrawFreeDrawElement
+      : T extends "text"
+        ? ExcalidrawTextElement
+        : T extends "image"
+          ? ExcalidrawImageElement
+          : T extends "frame"
+            ? ExcalidrawFrameElement
+            : T extends "magicframe"
+              ? ExcalidrawMagicFrameElement
+              : ExcalidrawGenericElement => {
     let element: Mutable<ExcalidrawElement> = null!;
 
     const appState = h?.state || getDefaultAppState();
@@ -412,20 +433,17 @@ export class API {
       containerId: rectangle.id,
       frameId:
         opts?.label?.frameId === undefined
-          ? opts?.frameId ?? null
-          : opts?.label?.frameId ?? null,
-      groupIds: opts?.label?.groupIds === undefined
-      ? opts?.groupIds
-      : opts?.label?.groupIds ,
-
+          ? (opts?.frameId ?? null)
+          : (opts?.label?.frameId ?? null),
+      groupIds:
+        opts?.label?.groupIds === undefined
+          ? opts?.groupIds
+          : opts?.label?.groupIds,
     });
 
-    h.app.scene.mutateElement(
-      rectangle,
-      {
-        boundElements: [{ type: "text", id: text.id }],
-      },
-    );
+    h.app.scene.mutateElement(rectangle, {
+      boundElements: [{ type: "text", id: text.id }],
+    });
 
     return [rectangle, text];
   };
@@ -449,16 +467,13 @@ export class API {
       containerId: arrow.id,
       frameId:
         opts?.label?.frameId === undefined
-          ? opts?.frameId ?? null
-          : opts?.label?.frameId ?? null,
+          ? (opts?.frameId ?? null)
+          : (opts?.label?.frameId ?? null),
     });
 
-    h.app.scene.mutateElement(
-      arrow,
-      {
-        boundElements: [{ type: "text", id: text.id }],
-      },
-    );
+    h.app.scene.mutateElement(arrow, {
+      boundElements: [{ type: "text", id: text.id }],
+    });
 
     return [arrow, text];
   };
@@ -480,13 +495,23 @@ export class API {
     });
   };
 
-  static drop = async (items: ({kind: "string", value: string, type: string} | {kind: "file", file: File | Blob, type?: string })[]) => {
-
+  static drop = async (
+    items: (
+      | { kind: "string"; value: string; type: string }
+      | { kind: "file"; file: File | Blob; type?: string }
+    )[],
+  ) => {
     const fileDropEvent = createEvent.drop(GlobalTestState.interactiveCanvas);
 
-    const dataTransferFileItems = items.filter(i => i.kind === "file") as {kind: "file", file: File | Blob, type: string }[];
+    const dataTransferFileItems = items.filter((i) => i.kind === "file") as {
+      kind: "file";
+      file: File | Blob;
+      type: string;
+    }[];
 
-    const files = dataTransferFileItems.map(item => item.file) as File[] & { item: (index: number) => File };
+    const files = dataTransferFileItems.map((item) => item.file) as File[] & {
+      item: (index: number) => File;
+    };
     // https://developer.mozilla.org/en-US/docs/Web/API/FileList/item
     files.item = (index: number) => files[index];
 
@@ -495,8 +520,8 @@ export class API {
         // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/files
         files,
         // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/items
-        items: items.map((item, idx) => {
-          if (item.kind === "string")  {
+        items: items.map((item) => {
+          if (item.kind === "string") {
             return {
               kind: "string",
               type: item.type,
@@ -513,10 +538,18 @@ export class API {
         }),
         // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/getData
         getData: (type: string) => {
-          return items.find((item) => item.type === "string" && item.type === type) || "";
+          return (
+            items.find(
+              (item) => item.type === "string" && item.type === type,
+            ) || ""
+          );
         },
         // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types
-        types: Array.from(new Set(items.map((item) => item.kind === "file" ? "Files" : item.type))),
+        types: Array.from(
+          new Set(
+            items.map((item) => (item.kind === "file" ? "Files" : item.type)),
+          ),
+        ),
       },
     });
     Object.defineProperty(fileDropEvent, "clientX", {

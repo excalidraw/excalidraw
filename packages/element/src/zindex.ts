@@ -334,7 +334,7 @@ const shiftElementsByOne = (
       .map((idx) => elements[idx].id),
   );
 
-  groupedIndices.forEach((indices, i) => {
+  groupedIndices.forEach((indices) => {
     const leadingIndex = indices[0];
     const trailingIndex = indices[indices.length - 1];
     const boundaryIndex = direction === "left" ? leadingIndex : trailingIndex;

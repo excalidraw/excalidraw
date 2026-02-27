@@ -92,13 +92,13 @@ export const getMimeType = (blob: Blob | string): string => {
   }
   if (/\.(excalidraw|json)$/.test(name)) {
     return MIME_TYPES.json;
-  } else if (/\.png$/.test(name)) {
+  } else if (/\.png$/i.test(name)) {
     return MIME_TYPES.png;
-  } else if (/\.jpe?g$/.test(name)) {
+  } else if (/\.jpe?g$/i.test(name)) {
     return MIME_TYPES.jpg;
-  } else if (/\.svg$/.test(name)) {
+  } else if (/\.svg$/i.test(name)) {
     return MIME_TYPES.svg;
-  } else if (/\.excalidrawlib$/.test(name)) {
+  } else if (/\.excalidrawlib$/i.test(name)) {
     return MIME_TYPES.excalidrawlib;
   }
   return "";
@@ -314,7 +314,7 @@ export const resizeImageFile = async (
   file: File,
   opts: {
     /** undefined indicates auto */
-    outputType?: typeof MIME_TYPES["jpg"];
+    outputType?: (typeof MIME_TYPES)["jpg"];
     maxWidthOrHeight: number;
   },
 ): Promise<File> => {
@@ -372,7 +372,7 @@ export const ImageURLToFile = async (
   let response;
   try {
     response = await fetch(imageUrl);
-  } catch (error: any) {
+  } catch {
     throw new Error("Error: failed to fetch image", { cause: "FETCH_ERROR" });
   }
 

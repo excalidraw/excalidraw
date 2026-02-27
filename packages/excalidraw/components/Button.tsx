@@ -5,11 +5,10 @@ import { composeEventHandlers } from "@excalidraw/common";
 
 import "./Button.scss";
 
-interface ButtonProps
-  extends React.DetailedHTMLProps<
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
-    HTMLButtonElement
-  > {
+interface ButtonProps extends React.DetailedHTMLProps<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  HTMLButtonElement
+> {
   type?: "button" | "submit" | "reset";
   onSelect: () => any;
   /** whether button is in active state */
@@ -33,7 +32,7 @@ export const Button = ({
 }: ButtonProps) => {
   return (
     <button
-      onClick={composeEventHandlers(rest.onClick, (event) => {
+      onClick={composeEventHandlers(rest.onClick, () => {
         onSelect();
       })}
       type={type}

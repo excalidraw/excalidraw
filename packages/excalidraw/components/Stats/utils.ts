@@ -174,7 +174,7 @@ export const moveElement = (
   );
   if (boundTextElement) {
     const latestBoundTextElement = elementsMap.get(boundTextElement.id);
-    latestBoundTextElement &&
+    if (latestBoundTextElement) {
       scene.mutateElement(
         latestBoundTextElement,
         {
@@ -183,6 +183,7 @@ export const moveElement = (
         },
         { informMutation: shouldInformMutation, isDragging: false },
       );
+    }
   }
 
   if (isFrameLikeElement(originalElement)) {

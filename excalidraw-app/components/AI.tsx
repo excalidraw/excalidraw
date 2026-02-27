@@ -95,7 +95,7 @@ export const AIComponents = ({
             return {
               html,
             };
-          } catch (error: any) {
+          } catch {
             throw new Error("Generation failed (invalid response)");
           }
         }}

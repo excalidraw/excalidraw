@@ -169,13 +169,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
   );
 };
 
-const Position = ({
-  property,
-  element,
-  elementsMap,
-  scene,
-  appState,
-}: PositionProps) => {
+const Position = ({ property, element, scene, appState }: PositionProps) => {
   const [topLeftX, topLeftY] = pointRotateRads(
     pointFrom(element.x, element.y),
     pointFrom(element.x + element.width / 2, element.y + element.height / 2),

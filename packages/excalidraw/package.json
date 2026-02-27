@@ -1,10 +1,25 @@
 {
   "name": "@excalidraw/excalidraw",
   "version": "0.18.0",
+  "description": "Excalidraw as a React component",
+  "keywords": [
+    "excalidraw",
+    "excalidraw-embed",
+    "npm",
+    "npm excalidraw",
+    "react"
+  ],
+  "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
+  "bugs": "https://github.com/excalidraw/excalidraw/issues",
+  "license": "MIT",
+  "repository": "https://github.com/excalidraw/excalidraw",
+  "files": [
+    "dist/*"
+  ],
   "type": "module",
-  "types": "./dist/types/excalidraw/index.d.ts",
   "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
+  "types": "./dist/types/excalidraw/index.d.ts",
   "exports": {
     "./common/*": {
       "types": "./dist/types/common/src/*.d.ts"
@@ -32,50 +47,12 @@
       "default": "./dist/prod/index.js"
     }
   },
-  "files": [
-    "dist/*"
-  ],
   "publishConfig": {
     "access": "public"
   },
-  "description": "Excalidraw as a React component",
-  "license": "MIT",
-  "keywords": [
-    "excalidraw",
-    "excalidraw-embed",
-    "react",
-    "npm",
-    "npm excalidraw"
-  ],
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not ie <= 11",
-      "not op_mini all",
-      "not safari < 12",
-      "not kaios <= 2.5",
-      "not edge < 79",
-      "not chrome < 70",
-      "not and_uc < 13",
-      "not samsung < 10"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "repository": "https://github.com/excalidraw/excalidraw",
-  "bugs": "https://github.com/excalidraw/excalidraw/issues",
-  "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
     "gen:types": "rimraf types && tsc",
     "build:esm": "rimraf dist && node ../../scripts/buildPackage.js && yarn gen:types"
-  },
-  "peerDependencies": {
-    "react": "^17.0.2 || ^18.2.0 || ^19.0.0",
-    "react-dom": "^17.0.2 || ^18.2.0 || ^19.0.0"
   },
   "dependencies": {
     "@braintree/sanitize-url": "6.0.2",
@@ -85,7 +62,6 @@
     "@excalidraw/math": "0.18.0",
     "@excalidraw/mermaid-to-excalidraw": "2.0.0-rfc3",
     "@excalidraw/random-username": "1.1.0",
-    "radix-ui": "1.4.3",
     "browser-fs-access": "0.29.1",
     "canvas-roundrect-polyfill": "0.0.1",
     "clsx": "1.1.1",
@@ -107,6 +83,7 @@
     "png-chunks-extract": "1.0.0",
     "points-on-curve": "1.0.1",
     "pwacompat": "2.0.17",
+    "radix-ui": "1.4.3",
     "roughjs": "4.6.4",
     "sass": "1.51.0",
     "tunnel-rat": "0.1.2"
@@ -132,5 +109,28 @@
     "harfbuzzjs": "0.3.6",
     "jest-diff": "29.7.0",
     "typescript": "5.9.3"
+  },
+  "peerDependencies": {
+    "react": "^17.0.2 || ^18.2.0 || ^19.0.0",
+    "react-dom": "^17.0.2 || ^18.2.0 || ^19.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not ie <= 11",
+      "not op_mini all",
+      "not safari < 12",
+      "not kaios <= 2.5",
+      "not edge < 79",
+      "not chrome < 70",
+      "not and_uc < 13",
+      "not samsung < 10"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

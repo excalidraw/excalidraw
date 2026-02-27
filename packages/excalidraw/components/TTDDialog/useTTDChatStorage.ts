@@ -123,7 +123,7 @@ export const useTTDChatStorage = ({
       currentPrompt: chatHistory.currentPrompt,
       timestamp: messagesChanged
         ? Date.now()
-        : existingChat?.timestamp ?? Date.now(),
+        : (existingChat?.timestamp ?? Date.now()),
     };
 
     const updatedChats = [

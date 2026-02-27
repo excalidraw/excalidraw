@@ -35,7 +35,6 @@ export const bootstrapCanvas = ({
   normalizedWidth,
   normalizedHeight,
   theme,
-  isExporting,
   viewBackgroundColor,
 }: {
   canvas: HTMLCanvasElement;

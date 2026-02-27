@@ -13,7 +13,7 @@ Once the callback is triggered, you will need to store the api in state to acces
 ```jsx showLineNumbers
 export default function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
-  return <Excalidraw excalidrawAPI={(api)=> setExcalidrawAPI(api)} />;
+  return <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)} />;
 }
 ```
 
@@ -362,10 +362,9 @@ This API has the below signature. It sets the `tool` passed in param as the acti
 
 ```ts
 (
-  tool: (
-    | { type: ToolType }
-    | { type: "custom"; customType: string }
-  ) & { locked?: boolean },
+  tool: ({ type: ToolType } | { type: "custom"; customType: string }) & {
+    locked?: boolean;
+  },
 ) => {};
 ```
 

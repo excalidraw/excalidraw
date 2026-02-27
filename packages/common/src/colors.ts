@@ -118,12 +118,15 @@ const pick = <R extends Record<string, any>, K extends readonly (keyof R)[]>(
   source: R,
   keys: K,
 ) => {
-  return keys.reduce((acc, key: K[number]) => {
-    if (key in source) {
-      acc[key] = source[key];
-    }
-    return acc;
-  }, {} as Pick<R, K[number]>) as Pick<R, K[number]>;
+  return keys.reduce(
+    (acc, key: K[number]) => {
+      if (key in source) {
+        acc[key] = source[key];
+      }
+      return acc;
+    },
+    {} as Pick<R, K[number]>,
+  ) as Pick<R, K[number]>;
 };
 
 export type ColorTuple = readonly [string, string, string, string, string];

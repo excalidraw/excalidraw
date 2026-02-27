@@ -263,7 +263,7 @@ describe("library menu", () => {
       const latestLibrary = await h.app.library.getLatestLibrary();
       expect(latestLibrary.length).toBeGreaterThan(0);
       expect(latestLibrary.length).toBe(libraryItems.length);
-      const { versionNonce, ...strippedElement } = libraryItems[0]?.elements[0]; // stripped due to mutations
+      const { versionNonce, ...strippedElement } = libraryItems[0]!.elements[0]; // stripped due to mutations
       expect(latestLibrary[0].elements).toEqual([
         expect.objectContaining(strippedElement),
       ]);

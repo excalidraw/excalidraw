@@ -132,7 +132,6 @@ export const colorPickerKeyNavHandler = ({
   onChange,
   customColors,
   setActiveColorPickerSection,
-  updateData,
   activeShade,
   onEyeDropperToggle,
   onEscape,
@@ -183,8 +182,8 @@ export const colorPickerKeyNavHandler = ({
       activeSectionIndex + indexOffset > sections.length - 1
         ? 0
         : activeSectionIndex + indexOffset < 0
-        ? sections.length - 1
-        : activeSectionIndex + indexOffset;
+          ? sections.length - 1
+          : activeSectionIndex + indexOffset;
 
     const nextSection = sections[nextSectionIndex];
 

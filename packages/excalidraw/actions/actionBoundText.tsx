@@ -158,7 +158,9 @@ export const actionBindText = register({
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
       textAlign: TEXT_ALIGN.CENTER,
       autoResize: true,
-      angle: (isArrowElement(container) ? 0 : container?.angle ?? 0) as Radians,
+      angle: (isArrowElement(container)
+        ? 0
+        : (container?.angle ?? 0)) as Radians,
     });
     app.scene.mutateElement(container, {
       boundElements: (container.boundElements || []).concat({

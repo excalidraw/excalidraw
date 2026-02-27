@@ -19,11 +19,6 @@
       "command": "yarn fix",
       "runAtStart": false
     },
-    "prettier": {
-      "name": "Prettify",
-      "command": "yarn prettier",
-      "runAtStart": false
-    },
     "start": {
       "name": "Start Excalidraw",
       "command": "yarn start",

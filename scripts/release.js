@@ -69,9 +69,9 @@ const getArguments = () => {
 
   if (!version) {
     // set the next version based on the excalidraw package version + commit hash
-    const excalidrawPackageVersion = require(getPackageJsonPath(
-      "excalidraw",
-    )).version;
+    const excalidrawPackageVersion = require(
+      getPackageJsonPath("excalidraw"),
+    ).version;
 
     const hash = getShortCommitHash();
 

@@ -123,7 +123,9 @@ export const Hyperlink = ({
         if (link) {
           setToast({ message: t("toast.unableToEmbed"), closable: true });
         }
-        element.link && embeddableLinkCache.set(element.id, element.link);
+        if (element.link) {
+          embeddableLinkCache.set(element.id, element.link);
+        }
         scene.mutateElement(element, {
           link,
         });
@@ -376,8 +378,8 @@ export const getContextMenuLabel = (
   const label = isEmbeddableElement(selectedElements[0])
     ? "labels.link.editEmbed"
     : selectedElements[0]?.link
-    ? "labels.link.edit"
-    : "labels.link.create";
+      ? "labels.link.edit"
+      : "labels.link.create";
   return label;
 };
 
@@ -455,7 +457,7 @@ const shouldHideLinkPopup = (
   elementsMap: ElementsMap,
   appState: AppState,
   [clientX, clientY]: GlobalPoint,
-): Boolean => {
+): boolean => {
   const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
     { clientX, clientY },
     appState,

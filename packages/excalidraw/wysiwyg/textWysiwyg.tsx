@@ -555,8 +555,9 @@ export const textWysiwyg = ({
     let { selectionStart, selectionEnd, value } = editable;
 
     // chars before selectionStart on the same line
-    const startOffset = value.slice(0, selectionStart).match(/[^\n]*$/)![0]
-      .length;
+    const startOffset = value
+      .slice(0, selectionStart)
+      .match(/[^\n]*$/)![0].length;
     // put caret at the start of the line
     selectionStart = selectionStart - startOffset;
 
@@ -761,7 +762,7 @@ export const textWysiwyg = ({
   };
 
   // FIXME after we start emitting updates from Store for appState.theme
-  const unsubOnChange = app.onChangeEmitter.on((elements) => {
+  const unsubOnChange = app.onChangeEmitter.on(() => {
     if (app.state.theme !== LAST_THEME) {
       updateWysiwygStyle();
     }

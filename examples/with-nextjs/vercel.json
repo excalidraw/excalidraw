@@ -1,3 +1,4 @@
 {
-  "outputDirectory": "build"
+  "outputDirectory": "build",
+  "installCommand": "yarn install && yarn --cwd ../../ install"
 }

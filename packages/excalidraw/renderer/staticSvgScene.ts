@@ -262,7 +262,9 @@ const renderElementToSvg = (
         div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
         div.style.width = "100%";
         div.style.height = "100%";
+        // oxlint-disable-next-line react/iframe-missing-sandbox
         const iframe = div.ownerDocument.createElement("iframe");
+        iframe.setAttribute("sandbox", "");
         iframe.src = embedLink?.link ?? "";
         iframe.style.width = "100%";
         iframe.style.height = "100%";
@@ -654,8 +656,8 @@ const renderElementToSvg = (
           element.textAlign === "center"
             ? element.width / 2
             : element.textAlign === "right"
-            ? element.width
-            : 0;
+              ? element.width
+              : 0;
         const verticalOffset = getVerticalOffset(
           element.fontFamily,
           element.fontSize,
@@ -666,8 +668,8 @@ const renderElementToSvg = (
           element.textAlign === "center"
             ? "middle"
             : element.textAlign === "right" || direction === "rtl"
-            ? "end"
-            : "start";
+              ? "end"
+              : "start";
         for (let i = 0; i < lines.length; i++) {
           const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
           text.textContent = lines[i];

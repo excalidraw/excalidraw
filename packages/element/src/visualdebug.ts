@@ -252,6 +252,7 @@ const addToCurrentFrame = (element: DebugElement) => {
   if (window.visualDebug?.data && window.visualDebug.data.length === 0) {
     window.visualDebug.data[0] = [];
   }
-  window.visualDebug?.data &&
+  if (window.visualDebug?.data) {
     window.visualDebug.data[window.visualDebug.data.length - 1].push(element);
+  }
 };

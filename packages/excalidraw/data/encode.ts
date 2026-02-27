@@ -16,8 +16,8 @@ export const toByteString = (data: string | Uint8Array | ArrayBuffer) => {
     typeof data === "string"
       ? new TextEncoder().encode(data)
       : data instanceof Uint8Array
-      ? data
-      : new Uint8Array(data);
+        ? data
+        : new Uint8Array(data);
   let bstring = "";
   for (const byte of bytes) {
     bstring += String.fromCharCode(byte);

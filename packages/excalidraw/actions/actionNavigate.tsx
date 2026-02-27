@@ -56,7 +56,7 @@ export const actionGoToCollaborator = register<Collaborator>({
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ updateData, data, appState }) => {
+  PanelComponent: ({ updateData, data }) => {
     const { socketId, collaborator, withName, isBeingFollowed } =
       data as GoToCollaboratorComponentProps;
 

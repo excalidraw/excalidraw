@@ -58,7 +58,6 @@ export const MobileMenu = ({
   renderTopRightUI,
   renderSidebars,
   renderWelcomeScreen,
-  UIOptions,
   app,
   onPenModeToggle,
 }: MobileMenuProps) => {

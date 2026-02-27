@@ -119,13 +119,13 @@ function Picker<T>({
   const renderOptions = (options: Option<T>[]) => {
     return (
       <div className="picker-content">
-        {options.map((option, i) => (
+        {options.map((option) => (
           <button
             type="button"
             className={clsx("picker-option", {
               active: value === option.value,
             })}
-            onClick={(event) => {
+            onClick={() => {
               onChange(option.value);
             }}
             title={`${option.text} ${

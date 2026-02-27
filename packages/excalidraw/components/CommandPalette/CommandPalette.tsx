@@ -125,7 +125,7 @@ const CommandShortcutHint = ({
 
   return (
     <div className={clsx("shortcut", className)}>
-      {shortcuts.map((item, idx) => {
+      {shortcuts.map((item) => {
         return (
           <div className="shortcut-wrapper" key={item}>
             <div className="shortcut-key">{item === "$" ? "+" : item}</div>
@@ -346,7 +346,7 @@ function CommandPaletteInner({
             ...command,
             predicate: action.predicate
               ? action.predicate
-              : (elements, appState, appProps, app) => {
+              : (elements, appState) => {
                   const selectedElements = getSelectedElements(
                     elements,
                     appState,
@@ -476,7 +476,7 @@ function CommandPaletteInner({
             );
           },
           perform: () => {
-            setAppState((prevState) => ({
+            setAppState(() => ({
               openPopup: "elementStroke",
             }));
           },
@@ -495,7 +495,7 @@ function CommandPaletteInner({
             );
           },
           perform: () => {
-            setAppState((prevState) => ({
+            setAppState(() => ({
               openPopup: "elementBackground",
             }));
           },
@@ -538,7 +538,7 @@ function CommandPaletteInner({
             icon,
             keywords: ["toolbar"],
             viewMode: false,
-            perform: ({ event }) => {
+            perform: () => {
               if (value === "image") {
                 app.setActiveTool({
                   type: value,
@@ -944,7 +944,7 @@ function CommandPaletteInner({
         )}
 
         {Object.keys(commandsByCategory).length > 0 ? (
-          Object.keys(commandsByCategory).map((category, idx) => {
+          Object.keys(commandsByCategory).map((category) => {
             return (
               <div className="command-category" key={category}>
                 <div className="command-category-title">{category}</div>

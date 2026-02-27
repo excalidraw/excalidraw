@@ -73,7 +73,7 @@ const ActiveRoomDialog = ({
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(activeRoomLink);
-    } catch (e) {
+    } catch {
       collabAPI.setCollabError(t("errors.copyToSystemClipboardFailed"));
     }
 
@@ -97,7 +97,7 @@ const ActiveRoomDialog = ({
         text: t("roomDialog.shareTitle"),
         url: activeRoomLink,
       });
-    } catch (error: any) {
+    } catch {
       // Just ignore.
     }
   };

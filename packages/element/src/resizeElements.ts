@@ -819,8 +819,8 @@ export const resizeSingleElement = (
     nextHeight,
     origElement.angle,
     handleDirection,
-    shouldMaintainAspectRatio!!,
-    shouldResizeFromCenter!!,
+    shouldMaintainAspectRatio,
+    shouldResizeFromCenter,
   );
 
   if (isLinearElement(origElement) && rescaledPoints.points) {
@@ -1370,7 +1370,7 @@ export const resizeMultipleElements = (
         false,
       );
 
-      const update: typeof elementsAndUpdates[0]["update"] = {
+      const update: (typeof elementsAndUpdates)[0]["update"] = {
         x,
         y,
         width,

@@ -25,9 +25,9 @@ const querySearchInput = async () => {
   const input =
     h.app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
       `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
-    )!;
+    );
   await waitFor(() => expect(input).not.toBeNull());
-  return input;
+  return input!;
 };
 
 describe("search", () => {

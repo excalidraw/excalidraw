@@ -30,7 +30,7 @@ config.entry = "../packages/excalidraw/index-node";
 // to just a string with the path of the canvas.node file. We need to tell
 // webpack to avoid rewriting that dependency.
 config.externals = (context, request, callback) => {
-  if (/\.node$/.test(request)) {
+  if (request.endsWith(".node")) {
     return callback(
       null,
       "commonjs ../../../node_modules/canvas/build/Release/canvas.node",

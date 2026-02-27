@@ -20,7 +20,7 @@ root.render(
   <StrictMode>
     <App
       appTitle={"Excalidraw Example"}
-      useCustom={(api: any, args?: any[]) => {}}
+      useCustom={() => {}}
       excalidrawLib={window.ExcalidrawLib}
     >
       <Excalidraw />
