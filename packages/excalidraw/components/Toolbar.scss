@@ -1,7 +1,18 @@
 @use "../css/variables.module" as *;
 
+@keyframes rainbow-bg {
+  0%   { background-color: hsl(0, 80%, 88%); }
+  16%  { background-color: hsl(60, 80%, 88%); }
+  33%  { background-color: hsl(120, 80%, 88%); }
+  50%  { background-color: hsl(180, 80%, 88%); }
+  66%  { background-color: hsl(240, 80%, 88%); }
+  83%  { background-color: hsl(300, 80%, 88%); }
+  100% { background-color: hsl(360, 80%, 88%); }
+}
+
 .excalidraw {
   .App-toolbar {
+    animation: rainbow-bg 5s linear infinite;
     &.zen-mode {
       .ToolIcon__keybinding,
       .HintViewer {
