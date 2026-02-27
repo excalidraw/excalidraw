@@ -355,22 +355,22 @@
     "text_editing": "{{shortcut_1}} 或 {{shortcut_2}} 以結束編輯",
     "linearElementMulti": "點選最後一個點，或按下 {{shortcut_1}} 或 {{shortcut_2}} 以完成",
     "lockAngle": "你可以按住 {{shortcut}} 以鎖定角度",
-    "resize": "縮放時按住 {{shortcut_1}} 可保持原比例縮放；\\n按住 {{shortcut_2}} 可由中心點進行縮放",
-    "resizeImage": "",
+    "resize": "縮放時按住 {{shortcut_1}} 可保持等比例，\n按住 {{shortcut_2}} 則可從中心縮放",
+    "resizeImage": "按住 {{shortcut_1}} 可自由縮放，\n按住 {{shortcut_2}} 則可從中心縮放",
     "rotate": "你可以在旋轉時按住 {{shortcut}} 以鎖定角度",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "按兩下滑鼠或按 {{shortcut}} 以編輯控制點",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_info": "按住 {{shortcut_1}} 並按兩下或按下 {{shortcut_2}} 以編輯點",
+    "lineEditor_line_info": "按兩下或按 {{shortcut}} 以編輯點",
+    "lineEditor_pointSelected": "按下 {{shortcut_1}} 移除點，\n{{shortcut_2}} 重製，或拖曳以移動",
+    "lineEditor_nothingSelected": "選取一個點以進行編輯（按住 {{shortcut_1}} 可多選），\n或按住 {{shortcut_2}} 並點選以新增點",
     "publishLibrary": "發布個人資料庫",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "按下 {{shortcut}} 新增文字",
+    "createFlowchart": "按下 {{shortcut}} 建立流程圖",
+    "deepBoxSelect": "按住 {{shortcut}} 以進行深度選取，並防止拖曳",
+    "eraserRevert": "按住 {{shortcut}} 以還原標記為刪除的元素",
     "firefox_clipboard_write": "此功能有機會透過將 \"dom.events.asyncClipboard.clipboardItem\" 設定為 \"true\" 來開啟。\n若要變更 Firefox 瀏覽器的此設定值，請至 \"about:config\" 頁面。",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "按住 {{shortcut}} 以停用貼齊（自動對齊）",
+    "enterCropEditor": "按兩下圖片或按下 {{shortcut}} 以裁剪圖片",
+    "leaveCropEditor": "點選圖片外部，或按下 {{shortcut_1}} 或 {{shortcut_2}} 以完成裁剪"
   },
   "canvasError": {
     "cannotShowPreview": "無法顯示預覽",
@@ -563,9 +563,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "你的繪圖已儲存在瀏覽器的儲存空間中。",
+      "center_heading_line2": "瀏覽器儲存空間可能會意外地被清除。",
+      "center_heading_line3": "請定期將作品儲存為檔案，以避免遺失。",
       "center_heading_plus": "您是否是要前往 Excalidraw+ ？",
       "menuHint": "輸出、偏好設定、語言..."
     },
@@ -622,14 +622,14 @@
     "syntax": "Mermaid 語法",
     "preview": "預覽",
     "label": "Mermaid",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "在這裡編寫 Mermaid 定義..."
   },
   "ttd": {
     "error": "錯誤！"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
+    "inputPlaceholder": "在這裡開始輸入你的圖表構想...（{{shortcut}} 換行）",
+    "inputPlaceholderWithMessages": "繼續調整你的圖表...",
     "generating": "生成中...",
     "rateLimitRemaining": "今日剩餘 {{count}} 次請求",
     "role": {
@@ -638,37 +638,37 @@
       "system": "系統"
     },
     "aiBeta": "AI Beta 版",
-    "label": "聊天",
+    "label": "對話",
     "menu": "選單",
-    "newChat": "",
-    "deleteChat": "",
+    "newChat": "新的對話",
+    "deleteChat": "刪除對話",
     "deleteMessage": "刪除訊息",
-    "viewAsMermaid": "",
+    "viewAsMermaid": "以 Mermaid 格式檢視",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "讓我們開始設計你的圖表",
+      "description": "描述你想要建立的圖表，我們將為你生成。",
+      "hint": "目前支援流程圖、時序圖以及類別圖。"
     },
     "preview": "預覽",
     "insert": "插入",
     "retry": "重試",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "提示詞太短（至少 {{min}} 個字元）",
+      "promptTooLong": "提示詞太長（最多 {{max}} 個字元）",
+      "generationFailed": "生成失敗",
+      "invalidDiagram": "生成的圖表語法無效 :(。你可以手動編輯、嘗試自動修復，或換個提示詞試試。",
+      "fixInMermaid": "手動編輯 Mermaid →",
+      "aiRepair": "重新生成（自動修復）→",
+      "requestAborted": "請求已中止",
+      "requestFailed": "請求失敗",
+      "mermaidParseError": "Mermaid 語法錯誤"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "你已達到免費方案的 AI 使用上限。請試用 Excalidraw+ 以取得更多額度，或明天再試。",
+      "generalRateLimit": "別心急，你的操作速度太快了！請稍等片刻後再試。",
+      "messageLimitInputPlaceholder": "你已達到訊息上限"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "升級至 Plus"
   },
   "quickSearch": {
     "placeholder": "快速搜尋"
@@ -707,15 +707,15 @@
     "shortcutHint": "使用 {{shortcut}} 開啟指令面板"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "空白鍵",
+    "delete": "Delete",
+    "mmb": "滾輪"
   }
 }
