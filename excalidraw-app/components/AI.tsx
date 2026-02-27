@@ -1,13 +1,17 @@
-import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import {
   DiagramToCodePlugin,
   exportToBlob,
   getTextFromElements,
   MIME_TYPES,
   TTDDialog,
+  TTDStreamFetch,
 } from "@excalidraw/excalidraw";
 import { getDataURL } from "@excalidraw/excalidraw/data/blob";
-import { safelyParseJSON } from "@excalidraw/excalidraw/utils";
+import { safelyParseJSON } from "@excalidraw/common";
+
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+
+import { TTDIndexedDBAdapter } from "../data/TTDStorage";
 
 export const AIComponents = ({
   excalidrawAPI,
@@ -72,7 +76,7 @@ export const AIComponents = ({
                   </br>
                   <div>You can also try <a href="${
                     import.meta.env.VITE_APP_PLUS_LP
-                  }/plus?utm_source=excalidraw&utm_medium=app&utm_content=d2c" target="_blank" rel="noreferrer noopener">Excalidraw+</a> to get more requests.</div>
+                  }/plus?utm_source=excalidraw&utm_medium=app&utm_content=d2c" target="_blank" rel="noopener">Excalidraw+</a> to get more requests.</div>
                 </div>
                 </body>
                 </html>`,
@@ -98,61 +102,23 @@ export const AIComponents = ({
       />
 
       <TTDDialog
-        onTextSubmit={async (input) => {
-          try {
-            const response = await fetch(
-              `${
-                import.meta.env.VITE_APP_AI_BACKEND
-              }/v1/ai/text-to-diagram/generate`,
-              {
-                method: "POST",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ prompt: input }),
-              },
-            );
+        onTextSubmit={async (props) => {
+          const { onChunk, onStreamCreated, signal, messages } = props;
 
-            const rateLimit = response.headers.has("X-Ratelimit-Limit")
-              ? parseInt(response.headers.get("X-Ratelimit-Limit") || "0", 10)
-              : undefined;
+          const result = await TTDStreamFetch({
+            url: `${
+              import.meta.env.VITE_APP_AI_BACKEND
+            }/v1/ai/text-to-diagram/chat-streaming`,
+            messages,
+            onChunk,
+            onStreamCreated,
+            extractRateLimits: true,
+            signal,
+          });
 
-            const rateLimitRemaining = response.headers.has(
-              "X-Ratelimit-Remaining",
-            )
-              ? parseInt(
-                  response.headers.get("X-Ratelimit-Remaining") || "0",
-                  10,
-                )
-              : undefined;
-
-            const json = await response.json();
-
-            if (!response.ok) {
-              if (response.status === 429) {
-                return {
-                  rateLimit,
-                  rateLimitRemaining,
-                  error: new Error(
-                    "Too many requests today, please try again tomorrow!",
-                  ),
-                };
-              }
-
-              throw new Error(json.message || "Generation failed...");
-            }
-
-            const generatedResponse = json.generatedResponse;
-            if (!generatedResponse) {
-              throw new Error("Generation failed...");
-            }
-
-            return { generatedResponse, rateLimit, rateLimitRemaining };
-          } catch (err: any) {
-            throw new Error("Request failed");
-          }
+          return result;
         }}
+        persistenceAdapter={TTDIndexedDBAdapter}
       />
     </>
   );

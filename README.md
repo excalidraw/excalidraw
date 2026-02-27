@@ -60,20 +60,17 @@ docker-compose -f docker-compose-prod.yml up -d
 <br />
 <p align="center">
   <a href="https://github.com/excalidraw/excalidraw/blob/master/LICENSE">
-    <img alt="Excalidraw is released under the MIT license." src="https://img.shields.io/badge/license-MIT-blue.svg"  />
-  </a>
+    <img alt="Excalidraw is released under the MIT license." src="https://img.shields.io/badge/license-MIT-blue.svg"  /></a>
   <a href="https://www.npmjs.com/package/@excalidraw/excalidraw">
-    <img alt="npm downloads/month" src="https://img.shields.io/npm/dm/@excalidraw/excalidraw"  />
-  </a>
+    <img alt="npm downloads/month" src="https://img.shields.io/npm/dm/@excalidraw/excalidraw"  /></a>
   <a href="https://docs.excalidraw.com/docs/introduction/contributing">
-    <img alt="PRs welcome!" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"  />
-  </a>
+    <img alt="PRs welcome!" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"  /></a>
   <a href="https://discord.gg/UexuTaE">
-    <img alt="Chat on Discord" src="https://img.shields.io/discord/723672430744174682?color=738ad6&label=Chat%20on%20Discord&logo=discord&logoColor=ffffff&widge=false"/>
-  </a>
+    <img alt="Chat on Discord" src="https://img.shields.io/discord/723672430744174682?color=738ad6&label=Chat%20on%20Discord&logo=discord&logoColor=ffffff&widge=false"/></a>
+  <a href="https://deepwiki.com/excalidraw/excalidraw">
+    <img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg" /></a>
   <a href="https://twitter.com/excalidraw">
-    <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+@excalidraw&style=social&logo=twitter"/>
-  </a>
+    <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+@excalidraw&style=social&logo=twitter"/></a>
 </p>
 
 <div align="center">
@@ -100,7 +97,7 @@ The Excalidraw editor (npm package) supports:
 - 🏗️&nbsp;Customizable.
 - 📷&nbsp;Image support.
 - 😀&nbsp;Shape libraries support.
-- 👅&nbsp;Localization (i18n) support.
+- 🌐&nbsp;Localization (i18n) support.
 - 🖼️&nbsp;Export to PNG, SVG & clipboard.
 - 💾&nbsp;Open format - export drawings as an `.excalidraw` json file.
 - ⚒️&nbsp;Wide range of tools - rectangle, circle, diamond, arrow, line, free-draw, eraser...

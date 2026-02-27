@@ -1,20 +1,23 @@
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
+
+import { KEYS, queryFocusableElements } from "@excalidraw/common";
+
+import { useSetAtom } from "../editor-jotai";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
+import { t } from "../i18n";
+
 import {
   useExcalidrawContainer,
-  useDevice,
+  useEditorInterface,
   useExcalidrawSetAppState,
 } from "./App";
-import { KEYS } from "../keys";
-import "./Dialog.scss";
 import { Island } from "./Island";
-import { Modal } from "./Modal";
-import { queryFocusableElements } from "../utils";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
-import { useSetAtom } from "../editor-jotai";
-import { t } from "../i18n";
+import { Modal } from "./Modal";
 import { CloseIcon } from "./icons";
+
+import "./Dialog.scss";
 
 export type DialogSize = number | "small" | "regular" | "wide" | undefined;
 
@@ -48,7 +51,7 @@ export const Dialog = (props: DialogProps) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
   const [lastActiveElement] = useState(document.activeElement);
   const { id } = useExcalidrawContainer();
-  const isFullscreen = useDevice().viewport.isMobile;
+  const isFullscreen = useEditorInterface().formFactor === "phone";
 
   useEffect(() => {
     if (!islandNode) {

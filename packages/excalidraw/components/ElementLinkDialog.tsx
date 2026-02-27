@@ -1,35 +1,41 @@
-import { TextField } from "./TextField";
-import type { AppProps, AppState, UIAppState } from "../types";
-import DialogActionButton from "./DialogActionButton";
-import { getSelectedElements } from "../scene";
+import { useCallback, useEffect, useState } from "react";
+
+import { normalizeLink, KEYS } from "@excalidraw/common";
+
 import {
   defaultGetElementLinkFromSelection,
   getLinkIdAndTypeFromSelection,
-} from "../element/elementLink";
-import { mutateElement } from "../element/mutateElement";
-import { useCallback, useEffect, useState } from "react";
+} from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { Scene } from "@excalidraw/element";
+
 import { t } from "../i18n";
-import type { ElementsMap, ExcalidrawElement } from "../element/types";
+import { getSelectedElements } from "../scene";
+
+import DialogActionButton from "./DialogActionButton";
+import { TextField } from "./TextField";
 import { ToolButton } from "./ToolButton";
 import { TrashIcon } from "./icons";
-import { KEYS } from "../keys";
 
 import "./ElementLinkDialog.scss";
-import { normalizeLink } from "../data/url";
 
+import type { AppProps, AppState, UIAppState } from "../types";
 const ElementLinkDialog = ({
   sourceElementId,
   onClose,
-  elementsMap,
   appState,
+  scene,
   generateLinkForSelection = defaultGetElementLinkFromSelection,
 }: {
   sourceElementId: ExcalidrawElement["id"];
-  elementsMap: ElementsMap;
   appState: UIAppState;
+  scene: Scene;
   onClose?: () => void;
   generateLinkForSelection: AppProps["generateLinkForSelection"];
 }) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
   const originalLink = elementsMap.get(sourceElementId)?.link ?? null;
 
   const [nextLink, setNextLink] = useState<string | null>(originalLink);
@@ -65,7 +71,7 @@ const ElementLinkDialog = ({
     if (nextLink && nextLink !== elementsMap.get(sourceElementId)?.link) {
       const elementToLink = elementsMap.get(sourceElementId);
       elementToLink &&
-        mutateElement(elementToLink, {
+        scene.mutateElement(elementToLink, {
           link: nextLink,
         });
     }
@@ -73,13 +79,13 @@ const ElementLinkDialog = ({
     if (!nextLink && linkEdited && sourceElementId) {
       const elementToLink = elementsMap.get(sourceElementId);
       elementToLink &&
-        mutateElement(elementToLink, {
+        scene.mutateElement(elementToLink, {
           link: null,
         });
     }
 
     onClose?.();
-  }, [sourceElementId, nextLink, elementsMap, linkEdited, onClose]);
+  }, [sourceElementId, nextLink, elementsMap, linkEdited, scene, onClose]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

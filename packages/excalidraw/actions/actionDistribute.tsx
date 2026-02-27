@@ -1,26 +1,45 @@
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import { isFrameLikeElement } from "@excalidraw/element";
+
+import { CODES, KEYS, arrayToMap } from "@excalidraw/common";
+
+import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element";
+
+import { distributeElements } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import { getSelectedElementsByGroup } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { Distribution } from "@excalidraw/element";
+
+import { ToolButton } from "../components/ToolButton";
 import {
   DistributeHorizontallyIcon,
   DistributeVerticallyIcon,
 } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
-import type { Distribution } from "../distribute";
-import { distributeElements } from "../distribute";
-import { getNonDeletedElements } from "../element";
-import { isFrameLikeElement } from "../element/typeChecks";
-import type { ExcalidrawElement } from "../element/types";
-import { updateFrameMembershipOfSelectedElements } from "../frame";
+
 import { t } from "../i18n";
-import { CODES, KEYS } from "../keys";
+
 import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
-import type { AppClassProperties, AppState } from "../types";
-import { arrayToMap, getShortcutKey } from "../utils";
+
+import { getShortcutKey } from "../shortcut";
+
 import { register } from "./register";
+
+import type { AppClassProperties, AppState } from "../types";
 
 const enableActionGroup = (appState: AppState, app: AppClassProperties) => {
   const selectedElements = app.scene.getSelectedElements(appState);
   return (
-    selectedElements.length > 1 &&
+    getSelectedElementsByGroup(
+      selectedElements,
+      app.scene.getNonDeletedElementsMap(),
+      appState as Readonly<AppState>,
+    ).length > 2 &&
     // TODO enable distributing frames when implemented properly
     !selectedElements.some((el) => isFrameLikeElement(el))
   );
@@ -38,6 +57,8 @@ const distributeSelectedElements = (
     selectedElements,
     app.scene.getNonDeletedElementsMap(),
     distribution,
+    appState,
+    app.scene,
   );
 
   const updatedElementsMap = arrayToMap(updatedElements);

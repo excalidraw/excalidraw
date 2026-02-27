@@ -33,10 +33,6 @@ export class ImageSceneDataError extends Error {
   }
 }
 
-export class InvalidFractionalIndexError extends Error {
-  public code = "ELEMENT_HAS_INVALID_INDEX" as const;
-}
-
 type WorkerErrorCodes = "WORKER_URL_NOT_DEFINED" | "WORKER_IN_THE_MAIN_CHUNK";
 
 export class WorkerUrlNotDefinedError extends Error {
@@ -71,5 +67,24 @@ export class ExcalidrawError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "ExcalidrawError";
+  }
+}
+
+export class RequestError extends Error {
+  public status: number;
+  public data: any;
+  toObject() {
+    return { name: this.name, status: this.status, message: this.message };
+  }
+  constructor({
+    message = "Something went wrong",
+    status = 500,
+    data,
+  }: { message?: string; status?: number; data?: any } = {}) {
+    super();
+    this.name = "RequestError";
+    this.message = message;
+    this.status = status;
+    this.data = data;
   }
 }

@@ -1,29 +1,30 @@
-import type { ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import OpenColor from "open-color";
-
-import { Dialog } from "./Dialog";
-import { t } from "../i18n";
-import Trans from "./Trans";
-
-import type { LibraryItems, LibraryItem, UIAppState } from "../types";
 import { exportToCanvas, exportToSvg } from "@excalidraw/utils/export";
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import {
   EDITOR_LS_KEYS,
   EXPORT_DATA_TYPES,
-  EXPORT_SOURCE,
   MIME_TYPES,
   VERSIONS,
-} from "../constants";
-import type { ExportedLibraryData } from "../data/types";
-import { canvasToBlob, resizeImageFile } from "../data/blob";
-import { chunk } from "../utils";
-import DialogActionButton from "./DialogActionButton";
-import { CloseIcon } from "./icons";
-import { ToolButton } from "./ToolButton";
+  chunk,
+  getExportSource,
+} from "@excalidraw/common";
+
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
+import { canvasToBlob, resizeImageFile } from "../data/blob";
+import { t } from "../i18n";
+
+import { Dialog } from "./Dialog";
+import DialogActionButton from "./DialogActionButton";
+import { ToolButton } from "./ToolButton";
+import Trans from "./Trans";
+import { CloseIcon } from "./icons";
 
 import "./PublishLibrary.scss";
+
+import type { ReactNode } from "react";
+import type { ExportedLibraryData } from "../data/types";
+import type { LibraryItems, LibraryItem, UIAppState } from "../types";
 
 interface PublishLibraryDataParams {
   authorName: string;
@@ -55,7 +56,7 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
 
   const ctx = canvas.getContext("2d")!;
 
-  ctx.fillStyle = OpenColor.white;
+  ctx.fillStyle = "#fff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // draw items
@@ -85,7 +86,7 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
     // draw item border
     // -------------------------------------------------------------------------
     ctx.lineWidth = BORDER_WIDTH;
-    ctx.strokeStyle = OpenColor.gray[4];
+    ctx.strokeStyle = "#ced4da";
     ctx.strokeRect(
       colOffset + BOX_PADDING / 2,
       rowOffset + BOX_PADDING / 2,
@@ -129,7 +130,7 @@ const SingleLibraryItem = ({
         elements: libItem.elements,
         appState: {
           ...appState,
-          viewBackgroundColor: OpenColor.white,
+          viewBackgroundColor: "#fff",
           exportBackground: true,
         },
         files: null,
@@ -173,7 +174,7 @@ const SingleLibraryItem = ({
           }}
         >
           <div style={{ padding: "0.5em 0" }}>
-            <span style={{ fontWeight: 500, color: OpenColor.gray[6] }}>
+            <span style={{ fontWeight: 500, color: "#868e96" }}>
               {t("publishDialog.itemName")}
             </span>
             <span aria-hidden="true" className="required">
@@ -279,7 +280,7 @@ const PublishLibrary = ({
     const libContent: ExportedLibraryData = {
       type: EXPORT_DATA_TYPES.excalidrawLibrary,
       version: VERSIONS.excalidrawLibrary,
-      source: EXPORT_SOURCE,
+      source: getExportSource(),
       libraryItems: clonedLibItems,
     };
     const content = JSON.stringify(libContent, null, 2);
@@ -387,7 +388,7 @@ const PublishLibrary = ({
                 <a
                   href="https://libraries.excalidraw.com"
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener"
                 >
                   {el}
                 </a>
@@ -516,7 +517,7 @@ const PublishLibrary = ({
           </div>
           <div className="publish-library__buttons">
             <DialogActionButton
-              label={t("buttons.cancel")}
+              label={t("buttons.saveLibNames")}
               onClick={onDialogClose}
               data-testid="cancel-clear-canvas-button"
             />

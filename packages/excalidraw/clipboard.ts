@@ -1,25 +1,41 @@
-import type {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "./element/types";
-import type { BinaryFiles } from "./types";
-import type { Spreadsheet } from "./charts";
-import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
 import {
   ALLOWED_PASTE_MIME_TYPES,
   EXPORT_DATA_TYPES,
   MIME_TYPES,
-} from "./constants";
+  arrayToMap,
+  isMemberOf,
+  isPromiseLike,
+  EVENT,
+} from "@excalidraw/common";
+
+import { mutateElement } from "@excalidraw/element";
+import { deepCopyElement } from "@excalidraw/element";
 import {
   isFrameLikeElement,
   isInitializedImageElement,
-} from "./element/typeChecks";
-import { deepCopyElement } from "./element/newElement";
-import { mutateElement } from "./element/mutateElement";
-import { getContainingFrame } from "./frame";
-import { arrayToMap, isMemberOf, isPromiseLike } from "./utils";
-import { createFile, isSupportedImageFileType } from "./data/blob";
+} from "@excalidraw/element";
+
+import { getContainingFrame } from "@excalidraw/element";
+
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
+import type { IMAGE_MIME_TYPES, STRING_MIME_TYPES } from "@excalidraw/common";
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
+
 import { ExcalidrawError } from "./errors";
+import {
+  createFile,
+  getFileHandle,
+  isSupportedImageFileType,
+  normalizeFile,
+} from "./data/blob";
+
+import type { FileSystemHandle } from "./data/filesystem";
+
+import type { BinaryFiles } from "./types";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
@@ -30,7 +46,6 @@ type ElementsClipboard = {
 export type PastedMixedContent = { type: "text" | "imageUrl"; value: string }[];
 
 export interface ClipboardData {
-  spreadsheet?: Spreadsheet;
   elements?: readonly ExcalidrawElement[];
   files?: BinaryFiles;
   text?: string;
@@ -84,7 +99,7 @@ export const createPasteEvent = ({
     console.warn("createPasteEvent: no types or files provided");
   }
 
-  const event = new ClipboardEvent("paste", {
+  const event = new ClipboardEvent(EVENT.PASTE, {
     clipboardData: new DataTransfer(),
   });
 
@@ -96,7 +111,7 @@ export const createPasteEvent = ({
         continue;
       }
       try {
-        event.clipboardData?.setData(type, value);
+        event.clipboardData?.items.add(value, type);
         if (event.clipboardData?.getData(type) !== value) {
           throw new Error(`Failed to set "${type}" as clipboardData item`);
         }
@@ -164,7 +179,7 @@ export const serializeAsClipboardJSON = ({
         !framesToCopy.has(getContainingFrame(element, elementsMap)!)
       ) {
         const copiedElement = deepCopyElement(element);
-        mutateElement(copiedElement, {
+        mutateElement(copiedElement, elementsMap, {
           frameId: null,
         });
         return copiedElement;
@@ -184,20 +199,15 @@ export const copyToClipboard = async (
   /** supply if available to make the operation more certain to succeed */
   clipboardEvent?: ClipboardEvent | null,
 ) => {
+  const json = serializeAsClipboardJSON({ elements, files });
+
   await copyTextToSystemClipboard(
-    serializeAsClipboardJSON({ elements, files }),
+    {
+      [MIME_TYPES.excalidrawClipboard]: json,
+      [MIME_TYPES.text]: json,
+    },
     clipboardEvent,
   );
-};
-
-const parsePotentialSpreadsheet = (
-  text: string,
-): { spreadsheet: Spreadsheet } | { errorMessage: string } | null => {
-  const result = tryParseSpreadsheet(text);
-  if (result.type === VALID_SPREADSHEET) {
-    return { spreadsheet: result.spreadsheet };
-  }
-  return null;
 };
 
 /** internal, specific to parsing paste events. Do not reuse. */
@@ -221,14 +231,10 @@ function parseHTMLTree(el: ChildNode) {
   return result;
 }
 
-const maybeParseHTMLPaste = (
-  event: ClipboardEvent,
+const maybeParseHTMLDataItem = (
+  dataItem: ParsedDataTransferItemType<typeof MIME_TYPES["html"]>,
 ): { type: "mixedContent"; value: PastedMixedContent } | null => {
-  const html = event.clipboardData?.getData(MIME_TYPES.html);
-
-  if (!html) {
-    return null;
-  }
+  const html = dataItem.value;
 
   try {
     const doc = new DOMParser().parseFromString(html, MIME_TYPES.html);
@@ -324,18 +330,21 @@ export const readSystemClipboard = async () => {
  * Parses "paste" ClipboardEvent.
  */
 const parseClipboardEventTextData = async (
-  event: ClipboardEvent,
+  dataList: ParsedDataTranferList,
   isPlainPaste = false,
 ): Promise<ParsedClipboardEventTextData> => {
   try {
-    const mixedContent = !isPlainPaste && event && maybeParseHTMLPaste(event);
+    const htmlItem = dataList.findByType(MIME_TYPES.html);
+
+    const mixedContent =
+      !isPlainPaste && htmlItem && maybeParseHTMLDataItem(htmlItem);
 
     if (mixedContent) {
       if (mixedContent.value.every((item) => item.type === "text")) {
         return {
           type: "text",
           value:
-            event.clipboardData?.getData(MIME_TYPES.text) ||
+            dataList.getData(MIME_TYPES.text) ??
             mixedContent.value
               .map((item) => item.value)
               .join("\n")
@@ -346,23 +355,178 @@ const parseClipboardEventTextData = async (
       return mixedContent;
     }
 
-    const text = event.clipboardData?.getData(MIME_TYPES.text);
-
-    return { type: "text", value: (text || "").trim() };
+    return {
+      type: "text",
+      value: (dataList.getData(MIME_TYPES.text) || "").trim(),
+    };
   } catch {
     return { type: "text", value: "" };
   }
+};
+
+type AllowedParsedDataTransferItem =
+  | {
+      type: ValueOf<typeof IMAGE_MIME_TYPES>;
+      kind: "file";
+      file: File;
+      fileHandle: FileSystemHandle | null;
+    }
+  | { type: ValueOf<typeof STRING_MIME_TYPES>; kind: "string"; value: string };
+
+type ParsedDataTransferItem =
+  | {
+      type: string;
+      kind: "file";
+      file: File;
+      fileHandle: FileSystemHandle | null;
+    }
+  | { type: string; kind: "string"; value: string };
+
+type ParsedDataTransferItemType<
+  T extends AllowedParsedDataTransferItem["type"],
+> = AllowedParsedDataTransferItem & { type: T };
+
+export type ParsedDataTransferFile = Extract<
+  AllowedParsedDataTransferItem,
+  { kind: "file" }
+>;
+
+export type ParsedDataTranferList = ParsedDataTransferItem[] & {
+  /**
+   * Only allows filtering by known `string` data types, since `file`
+   * types can have multiple items of the same type (e.g. multiple image files)
+   * unlike `string` data transfer items.
+   */
+  findByType: typeof findDataTransferItemType;
+  /**
+   * Only allows filtering by known `string` data types, since `file`
+   * types can have multiple items of the same type (e.g. multiple image files)
+   * unlike `string` data transfer items.
+   */
+  getData: typeof getDataTransferItemData;
+  getFiles: typeof getDataTransferFiles;
+};
+
+const findDataTransferItemType = function <
+  T extends ValueOf<typeof STRING_MIME_TYPES>,
+>(this: ParsedDataTranferList, type: T): ParsedDataTransferItemType<T> | null {
+  return (
+    this.find(
+      (item): item is ParsedDataTransferItemType<T> => item.type === type,
+    ) || null
+  );
+};
+const getDataTransferItemData = function <
+  T extends ValueOf<typeof STRING_MIME_TYPES>,
+>(
+  this: ParsedDataTranferList,
+  type: T,
+):
+  | ParsedDataTransferItemType<ValueOf<typeof STRING_MIME_TYPES>>["value"]
+  | null {
+  const item = this.find(
+    (
+      item,
+    ): item is ParsedDataTransferItemType<ValueOf<typeof STRING_MIME_TYPES>> =>
+      item.type === type,
+  );
+
+  return item?.value ?? null;
+};
+
+const getDataTransferFiles = function (
+  this: ParsedDataTranferList,
+): ParsedDataTransferFile[] {
+  return this.filter(
+    (item): item is ParsedDataTransferFile => item.kind === "file",
+  );
+};
+
+/** @returns list of MIME types, synchronously */
+export const parseDataTransferEventMimeTypes = (
+  event: ClipboardEvent | DragEvent | React.DragEvent<HTMLDivElement>,
+): Set<string> => {
+  let items: DataTransferItemList | undefined = undefined;
+
+  if (isClipboardEvent(event)) {
+    items = event.clipboardData?.items;
+  } else {
+    items = event.dataTransfer?.items;
+  }
+
+  const types: Set<string> = new Set();
+
+  for (const item of Array.from(items || [])) {
+    if (!types.has(item.type)) {
+      types.add(item.type);
+    }
+  }
+
+  return types;
+};
+
+export const parseDataTransferEvent = async (
+  event: ClipboardEvent | DragEvent | React.DragEvent<HTMLDivElement>,
+): Promise<ParsedDataTranferList> => {
+  let items: DataTransferItemList | undefined = undefined;
+
+  if (isClipboardEvent(event)) {
+    items = event.clipboardData?.items;
+  } else {
+    items = event.dataTransfer?.items;
+  }
+
+  const dataItems = (
+    await Promise.all(
+      Array.from(items || []).map(
+        async (item): Promise<ParsedDataTransferItem | null> => {
+          if (item.kind === "file") {
+            let file = item.getAsFile();
+            if (file) {
+              const fileHandle = await getFileHandle(item);
+              file = await normalizeFile(file);
+              return {
+                type: file.type,
+                kind: "file",
+                file,
+                fileHandle,
+              };
+            }
+          } else if (item.kind === "string") {
+            const { type } = item;
+            let value: string;
+            if ("clipboardData" in event && event.clipboardData) {
+              value = event.clipboardData?.getData(type);
+            } else {
+              value = await new Promise<string>((resolve) => {
+                item.getAsString((str) => resolve(str));
+              });
+            }
+            return { type, kind: "string", value };
+          }
+
+          return null;
+        },
+      ),
+    )
+  ).filter((data): data is ParsedDataTransferItem => data != null);
+
+  return Object.assign(dataItems, {
+    findByType: findDataTransferItemType,
+    getData: getDataTransferItemData,
+    getFiles: getDataTransferFiles,
+  });
 };
 
 /**
  * Attempts to parse clipboard event.
  */
 export const parseClipboard = async (
-  event: ClipboardEvent,
+  dataList: ParsedDataTranferList,
   isPlainPaste = false,
 ): Promise<ClipboardData> => {
   const parsedEventData = await parseClipboardEventTextData(
-    event,
+    dataList,
     isPlainPaste,
   );
 
@@ -370,19 +534,6 @@ export const parseClipboard = async (
     return {
       mixedContent: parsedEventData.value,
     };
-  }
-
-  try {
-    // if system clipboard contains spreadsheet, use it even though it's
-    // technically possible it's staler than in-app clipboard
-    const spreadsheetResult =
-      !isPlainPaste && parsePotentialSpreadsheet(parsedEventData.value);
-
-    if (spreadsheetResult) {
-      return spreadsheetResult;
-    }
-  } catch (error: any) {
-    console.error(error);
   }
 
   try {
@@ -415,7 +566,7 @@ export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
     // ClipboardItem constructor, but throws on an unrelated MIME type error.
     // So we need to await this and fallback to awaiting the blob if applicable.
     await navigator.clipboard.write([
-      new window.ClipboardItem({
+      new ClipboardItem({
         [MIME_TYPES.png]: blob,
       }),
     ]);
@@ -424,7 +575,7 @@ export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
     // with resolution value instead
     if (isPromiseLike(blob)) {
       await navigator.clipboard.write([
-        new window.ClipboardItem({
+        new ClipboardItem({
           [MIME_TYPES.png]: await blob,
         }),
       ]);
@@ -434,28 +585,27 @@ export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
   }
 };
 
-export const copyTextToSystemClipboard = async (
-  text: string | null,
+export const copyTextToSystemClipboard = async <
+  MimeType extends ValueOf<typeof STRING_MIME_TYPES>,
+>(
+  text: string | { [K in MimeType]: string } | null,
   clipboardEvent?: ClipboardEvent | null,
 ) => {
-  // (1) first try using Async Clipboard API
-  if (probablySupportsClipboardWriteText) {
-    try {
-      // NOTE: doesn't work on FF on non-HTTPS domains, or when document
-      // not focused
-      await navigator.clipboard.writeText(text || "");
-      return;
-    } catch (error: any) {
-      console.error(error);
-    }
-  }
+  text = text || "";
 
-  // (2) if fails and we have access to ClipboardEvent, use plain old setData()
+  const entries = Object.entries(
+    typeof text === "string" ? { [MIME_TYPES.text]: text } : text,
+  );
+
+  // (1) if we have clipboardEvent, try using it first as it's the most
+  // versatile
   try {
     if (clipboardEvent) {
-      clipboardEvent.clipboardData?.setData(MIME_TYPES.text, text || "");
-      if (clipboardEvent.clipboardData?.getData(MIME_TYPES.text) !== text) {
-        throw new Error("Failed to setData on clipboardEvent");
+      for (const [mimeType, value] of entries) {
+        clipboardEvent.clipboardData?.setData(mimeType, value);
+        if (clipboardEvent.clipboardData?.getData(mimeType) !== value) {
+          throw new Error("Failed to setData on clipboardEvent");
+        }
       }
       return;
     }
@@ -463,8 +613,26 @@ export const copyTextToSystemClipboard = async (
     console.error(error);
   }
 
-  // (3) if that fails, use document.execCommand
-  if (!copyTextViaExecCommand(text)) {
+  const plainTextEntry = entries.find(
+    ([mimeType]) => mimeType === MIME_TYPES.text,
+  );
+
+  // (2) if we don't have access to clipboardEvent, or that fails,
+  // at least try setting text/plain via navigator.clipboard.writeText
+  // (navigator.clipboard.write doesn't work with non-standard mime types)
+  if (probablySupportsClipboardWriteText && plainTextEntry) {
+    try {
+      // NOTE: doesn't work on FF on non-HTTPS domains, or when document
+      // not focused
+      await navigator.clipboard.writeText(plainTextEntry[1]);
+      return;
+    } catch (error: any) {
+      console.error(error);
+    }
+  }
+
+  // (3) if previous fails, use document.execCommand
+  if (plainTextEntry && !copyTextViaExecCommand(plainTextEntry[1])) {
     throw new Error("Error copying to clipboard.");
   }
 };
@@ -510,4 +678,15 @@ const copyTextViaExecCommand = (text: string | null) => {
   textarea.remove();
 
   return success;
+};
+
+export const isClipboardEvent = (
+  event: React.SyntheticEvent | Event,
+): event is ClipboardEvent => {
+  /** not using instanceof ClipboardEvent due to tests (jsdom) */
+  return (
+    event.type === EVENT.PASTE ||
+    event.type === EVENT.COPY ||
+    event.type === EVENT.CUT
+  );
 };

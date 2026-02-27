@@ -1,19 +1,30 @@
-import { getCommonBounds, getNonDeletedElements } from "../element";
-import type { ExcalidrawElement } from "../element/types";
-import { addElementsToFrame, removeAllElementsFromFrame } from "../frame";
-import { getFrameChildren } from "../frame";
-import { KEYS } from "../keys";
-import type { AppClassProperties, AppState, UIAppState } from "../types";
-import { updateActiveTool } from "../utils";
+import { getNonDeletedElements } from "@excalidraw/element";
+import { mutateElement } from "@excalidraw/element";
+import { newFrameElement } from "@excalidraw/element";
+import { isFrameLikeElement } from "@excalidraw/element";
+import {
+  addElementsToFrame,
+  removeAllElementsFromFrame,
+} from "@excalidraw/element";
+import { getFrameChildren } from "@excalidraw/element";
+
+import { KEYS, updateActiveTool } from "@excalidraw/common";
+
+import { getElementsInGroup } from "@excalidraw/element";
+
+import { getCommonBounds } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { setCursorForShape } from "../cursor";
-import { register } from "./register";
-import { isFrameLikeElement } from "../element/typeChecks";
 import { frameToolIcon } from "../components/icons";
-import { CaptureUpdateAction } from "../store";
 import { getSelectedElements } from "../scene";
-import { newFrameElement } from "../element/newElement";
-import { getElementsInGroup } from "../groups";
-import { mutateElement } from "../element/mutateElement";
+
+import { register } from "./register";
+
+import type { AppClassProperties, AppState, UIAppState } from "../types";
 
 const isSingleFrameSelected = (
   appState: UIAppState,
@@ -163,11 +174,9 @@ export const actionWrapSelectionInFrame = register({
   },
   perform: (elements, appState, _, app) => {
     const selectedElements = getSelectedElements(elements, appState);
+    const elementsMap = app.scene.getNonDeletedElementsMap();
 
-    const [x1, y1, x2, y2] = getCommonBounds(
-      selectedElements,
-      app.scene.getNonDeletedElementsMap(),
-    );
+    const [x1, y1, x2, y2] = getCommonBounds(selectedElements, elementsMap);
     const PADDING = 16;
     const frame = newFrameElement({
       x: x1 - PADDING,
@@ -186,13 +195,9 @@ export const actionWrapSelectionInFrame = register({
       for (const elementInGroup of elementsInGroup) {
         const index = elementInGroup.groupIds.indexOf(appState.editingGroupId);
 
-        mutateElement(
-          elementInGroup,
-          {
-            groupIds: elementInGroup.groupIds.slice(0, index),
-          },
-          false,
-        );
+        mutateElement(elementInGroup, elementsMap, {
+          groupIds: elementInGroup.groupIds.slice(0, index),
+        });
       }
     }
 

@@ -1,5 +1,7 @@
-import type { Node } from "../../utils";
-import { KEYS } from "../../keys";
+import { KEYS } from "@excalidraw/common";
+
+import type { Node } from "@excalidraw/common";
+
 import { type FontDescriptor } from "./FontPickerList";
 
 interface FontPickerKeyNavHandlerProps {

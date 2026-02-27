@@ -1,30 +1,33 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { getColor } from "./ColorPicker";
-import type { ColorPickerType } from "./colorPickerUtils";
-import { activeColorPickerSectionAtom } from "./colorPickerUtils";
-import { eyeDropperIcon } from "../icons";
-import { useAtom } from "../../editor-jotai";
-import { KEYS } from "../../keys";
-import { activeEyeDropperAtom } from "../EyeDropper";
 import clsx from "clsx";
-import { t } from "../../i18n";
-import { useDevice } from "../App";
-import { getShortcutKey } from "../../utils";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-interface ColorInputProps {
-  color: string;
-  onChange: (color: string) => void;
-  label: string;
-  colorPickerType: ColorPickerType;
-}
+import { KEYS, normalizeInputColor } from "@excalidraw/common";
+
+import { getShortcutKey } from "../..//shortcut";
+import { useAtom } from "../../editor-jotai";
+import { t } from "../../i18n";
+import { useEditorInterface } from "../App";
+import { activeEyeDropperAtom } from "../EyeDropper";
+import { eyeDropperIcon } from "../icons";
+
+import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+
+import type { ColorPickerType } from "./colorPickerUtils";
 
 export const ColorInput = ({
   color,
   onChange,
   label,
   colorPickerType,
-}: ColorInputProps) => {
-  const device = useDevice();
+  placeholder,
+}: {
+  color: string;
+  onChange: (color: string) => void;
+  label: string;
+  colorPickerType: ColorPickerType;
+  placeholder?: string;
+}) => {
+  const editorInterface = useEditorInterface();
   const [innerValue, setInnerValue] = useState(color);
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
@@ -37,7 +40,7 @@ export const ColorInput = ({
   const changeColor = useCallback(
     (inputValue: string) => {
       const value = inputValue.toLowerCase();
-      const color = getColor(value);
+      const color = normalizeInputColor(value);
 
       if (color) {
         onChange(color);
@@ -90,9 +93,10 @@ export const ColorInput = ({
           }
           event.stopPropagation();
         }}
+        placeholder={placeholder}
       />
       {/* TODO reenable on mobile with a better UX */}
-      {!device.editor.isMobile && (
+      {editorInterface.formFactor !== "phone" && (
         <>
           <div
             style={{

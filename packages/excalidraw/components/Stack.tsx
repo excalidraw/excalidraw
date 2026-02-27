@@ -1,7 +1,7 @@
-import "./Stack.scss";
-
 import React, { forwardRef } from "react";
 import clsx from "clsx";
+
+import "./Stack.scss";
 
 type StackProps = {
   children: React.ReactNode;

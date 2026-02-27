@@ -1,14 +1,20 @@
-import type { JSX } from "react";
 import React from "react";
-import { t } from "../i18n";
-import { KEYS } from "../keys";
-import { Dialog } from "./Dialog";
-import { getShortcutKey } from "../utils";
-import "./HelpDialog.scss";
-import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
-import { probablySupportsClipboardBlob } from "../clipboard";
-import { isDarwin, isFirefox, isWindows } from "../constants";
+
+import { isDarwin, isFirefox, isWindows } from "@excalidraw/common";
+
+import { KEYS } from "@excalidraw/common";
+
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import { probablySupportsClipboardBlob } from "../clipboard";
+import { t } from "../i18n";
+import { getShortcutKey } from "../shortcut";
+
+import { Dialog } from "./Dialog";
+import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
+
+import "./HelpDialog.scss";
+
+import type { JSX } from "react";
 
 const Header = () => (
   <div className="HelpDialog__header">
@@ -16,7 +22,7 @@ const Header = () => (
       className="HelpDialog__btn"
       href="https://docs.excalidraw.com"
       target="_blank"
-      rel="noopener noreferrer"
+      rel="noopener"
     >
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
       {t("helpDialog.documentation")}
@@ -25,7 +31,7 @@ const Header = () => (
       className="HelpDialog__btn"
       href="https://plus.excalidraw.com/blog"
       target="_blank"
-      rel="noopener noreferrer"
+      rel="noopener"
     >
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
       {t("helpDialog.blog")}
@@ -241,6 +247,11 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             <Shortcut
               label={t("toolBar.link")}
               shortcuts={[getShortcutKey("CtrlOrCmd+K")]}
+            />
+            <Shortcut
+              label={t("toolBar.convertElementType")}
+              shortcuts={["Tab", "Shift+Tab"]}
+              isOr={true}
             />
           </ShortcutIsland>
           <ShortcutIsland

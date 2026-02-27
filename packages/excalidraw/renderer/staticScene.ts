@@ -1,41 +1,56 @@
-import { FRAME_STYLE } from "../constants";
-import { getElementAbsoluteCoords } from "../element";
-
 import {
-  elementOverlapsWithFrame,
-  getTargetFrame,
-  shouldApplyFrameClip,
-} from "../frame";
+  applyDarkModeFilter,
+  FRAME_STYLE,
+  THEME,
+  throttleRAF,
+} from "@excalidraw/common";
+import { isElementLink } from "@excalidraw/element";
+import { createPlaceholderEmbeddableLabel } from "@excalidraw/element";
+import { getBoundTextElement } from "@excalidraw/element";
 import {
   isEmbeddableElement,
   isIframeLikeElement,
   isTextElement,
-} from "../element/typeChecks";
-import { renderElement } from "../renderer/renderElement";
-import { createPlaceholderEmbeddableLabel } from "../element/embeddable";
-import type { StaticCanvasAppState, Zoom } from "../types";
+} from "@excalidraw/element";
+import {
+  elementOverlapsWithFrame,
+  getTargetFrame,
+  shouldApplyFrameClip,
+} from "@excalidraw/element";
+
+import { renderElement } from "@excalidraw/element";
+
+import { getElementAbsoluteCoords } from "@excalidraw/element";
+
 import type {
   ElementsMap,
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
-} from "../element/types";
-import type {
-  StaticCanvasRenderConfig,
-  StaticSceneRenderConfig,
-} from "../scene/types";
+} from "@excalidraw/element/types";
+
 import {
   EXTERNAL_LINK_IMG,
   ELEMENT_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
+
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
-import { throttleRAF } from "../utils";
-import { getBoundTextElement } from "../element/textElement";
-import { isElementLink } from "../element/elementLink";
+
+import type {
+  StaticCanvasRenderConfig,
+  StaticSceneRenderConfig,
+} from "../scene/types";
+import type { StaticCanvasAppState, Zoom } from "../types";
 
 const GridLineColor = {
-  Bold: "#dddddd",
-  Regular: "#e5e5e5",
+  [THEME.LIGHT]: {
+    bold: "#dddddd",
+    regular: "#e5e5e5",
+  },
+  [THEME.DARK]: {
+    bold: applyDarkModeFilter("#dddddd"),
+    regular: applyDarkModeFilter("#e5e5e5"),
+  },
 } as const;
 
 const strokeGrid = (
@@ -47,6 +62,7 @@ const strokeGrid = (
   scrollX: number,
   scrollY: number,
   zoom: Zoom,
+  theme: StaticCanvasRenderConfig["theme"],
   width: number,
   height: number,
 ) => {
@@ -82,7 +98,9 @@ const strokeGrid = (
 
     context.beginPath();
     context.setLineDash(isBold ? [] : lineDash);
-    context.strokeStyle = isBold ? GridLineColor.Bold : GridLineColor.Regular;
+    context.strokeStyle = isBold
+      ? GridLineColor[theme].bold
+      : GridLineColor[theme].regular;
     context.moveTo(x, offsetY - gridSize);
     context.lineTo(x, Math.ceil(offsetY + height + gridSize * 2));
     context.stroke();
@@ -101,7 +119,9 @@ const strokeGrid = (
 
     context.beginPath();
     context.setLineDash(isBold ? [] : lineDash);
-    context.strokeStyle = isBold ? GridLineColor.Bold : GridLineColor.Regular;
+    context.strokeStyle = isBold
+      ? GridLineColor[theme].bold
+      : GridLineColor[theme].regular;
     context.moveTo(offsetX - gridSize, y);
     context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
     context.stroke();
@@ -109,7 +129,7 @@ const strokeGrid = (
   context.restore();
 };
 
-const frameClip = (
+export const frameClip = (
   frame: ExcalidrawFrameLikeElement,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
@@ -184,7 +204,7 @@ const renderLinkIcon = (
         window.devicePixelRatio * appState.zoom.value,
         window.devicePixelRatio * appState.zoom.value,
       );
-      linkCanvasCacheContext.fillStyle = "#fff";
+      linkCanvasCacheContext.fillStyle = appState.viewBackgroundColor || "#fff";
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
       if (canvasKey === "elementLink") {
@@ -201,6 +221,7 @@ const renderLinkIcon = (
 
       linkCanvasCacheContext.restore();
     }
+    context.globalAlpha = element.opacity / 100;
     context.drawImage(linkCanvas, x - centerX, y - centerY, width, height);
     context.restore();
   }
@@ -248,6 +269,7 @@ const _renderStaticScene = ({
       appState.scrollX,
       appState.scrollY,
       appState.zoom,
+      renderConfig.theme,
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,
     );

@@ -1,21 +1,3 @@
-import throttle from "lodash.throttle";
-import { PureComponent } from "react";
-import type {
-  BinaryFileData,
-  ExcalidrawImperativeAPI,
-  SocketId,
-  Collaborator,
-  Gesture,
-} from "@excalidraw/excalidraw/types";
-import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
-import { APP_NAME, ENV, EVENT } from "@excalidraw/excalidraw/constants";
-import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
-import type {
-  ExcalidrawElement,
-  FileId,
-  InitializedExcalidrawImageElement,
-  OrderedExcalidrawElement,
-} from "@excalidraw/excalidraw/element/types";
 import {
   CaptureUpdateAction,
   getSceneVersion,
@@ -23,12 +5,53 @@ import {
   zoomToFitBounds,
   reconcileElements,
 } from "@excalidraw/excalidraw";
+import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
+import { APP_NAME, cloneJSON, EVENT, toBrandedType } from "@excalidraw/common";
 import {
+  IDLE_THRESHOLD,
+  ACTIVE_THRESHOLD,
+  UserIdleState,
   assertNever,
+  isDevEnv,
+  isTestEnv,
   preventUnload,
   resolvablePromise,
   throttleRAF,
-} from "@excalidraw/excalidraw/utils";
+} from "@excalidraw/common";
+import { decryptData } from "@excalidraw/excalidraw/data/encryption";
+import { getVisibleSceneBounds } from "@excalidraw/element";
+import { newElementWith } from "@excalidraw/element";
+import { isImageElement, isInitializedImageElement } from "@excalidraw/element";
+import { AbortError } from "@excalidraw/excalidraw/errors";
+import { t } from "@excalidraw/excalidraw/i18n";
+import { withBatchedUpdates } from "@excalidraw/excalidraw/reactUtils";
+
+import throttle from "lodash.throttle";
+import { PureComponent } from "react";
+
+import { bumpElementVersions } from "@excalidraw/excalidraw/data/restore";
+
+import type {
+  ReconciledExcalidrawElement,
+  RemoteExcalidrawElement,
+} from "@excalidraw/excalidraw/data/reconcile";
+import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
+import type {
+  ExcalidrawElement,
+  FileId,
+  InitializedExcalidrawImageElement,
+  OrderedExcalidrawElement,
+} from "@excalidraw/element/types";
+import type {
+  BinaryFileData,
+  ExcalidrawImperativeAPI,
+  SocketId,
+  Collaborator,
+  Gesture,
+} from "@excalidraw/excalidraw/types";
+import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
+
+import { appJotaiStore, atom } from "../app-jotai";
 import {
   CURSOR_SYNC_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
@@ -39,51 +62,38 @@ import {
   SYNC_FULL_SCENE_INTERVAL_MS,
   WS_EVENTS,
 } from "../app_constants";
-import type {
-  SocketUpdateDataSource,
-  SyncableExcalidrawElement,
-} from "../data";
 import {
   generateCollaborationLinkData,
   getCollaborationLink,
   getSyncableElements,
 } from "../data";
-import { isSavedToFirebase } from "../data/firebase";
-import {
-  importUsernameFromLocalStorage,
-  saveUsernameToLocalStorage,
-} from "../data/localStorage";
-import Portal from "./Portal";
-import { t } from "@excalidraw/excalidraw/i18n";
-import {
-  IDLE_THRESHOLD,
-  ACTIVE_THRESHOLD,
-  UserIdleState,
-} from "@excalidraw/excalidraw/constants";
 import {
   encodeFilesForUpload,
   FileManager,
   updateStaleImageStatuses,
 } from "../data/FileManager";
-import { AbortError } from "@excalidraw/excalidraw/errors";
-import {
-  isImageElement,
-  isInitializedImageElement,
-} from "@excalidraw/excalidraw/element/typeChecks";
-import { newElementWith } from "@excalidraw/excalidraw/element/mutateElement";
-import { decryptData } from "@excalidraw/excalidraw/data/encryption";
-import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
-import { appJotaiStore, atom } from "../app-jotai";
-import type { Mutable, ValueOf } from "@excalidraw/excalidraw/utility-types";
-import { getVisibleSceneBounds } from "@excalidraw/excalidraw/element/bounds";
-import { getStorageBackend } from "../data/config";
-import { withBatchedUpdates } from "@excalidraw/excalidraw/reactUtils";
+import {
+  isSavedToFirebase,
+  loadFilesFromFirebase,
+  loadFromFirebase,
+  saveFilesToFirebase,
+  saveToFirebase,
+} from "../data/firebase";
+import {
+  importUsernameFromLocalStorage,
+  saveUsernameToLocalStorage,
+} from "../data/localStorage";
+import { resetBrowserStateVersions } from "../data/tabSync";
+
 import { collabErrorIndicatorAtom } from "./CollabError";
+import Portal from "./Portal";
+
 import type {
-  ReconciledExcalidrawElement,
-  RemoteExcalidrawElement,
-} from "@excalidraw/excalidraw/data/reconcile";
+  SocketUpdateDataSource,
+  SyncableExcalidrawElement,
+} from "../data";
+import { getStorageBackend } from "excalidraw-app/data/config";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const isCollaboratingAtom = atom(false);
@@ -249,7 +259,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
 
-    if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+    if (isTestEnv() || isDevEnv()) {
       window.collab = window.collab || ({} as Window["collab"]);
       Object.defineProperties(window, {
         collab: {
@@ -309,13 +319,20 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       //  the purpose is to run in immediately after user decides to stay
       this.saveCollabRoomToFirebase(syncableElements);
 
-      preventUnload(event);
+      if (import.meta.env.VITE_APP_DISABLE_PREVENT_UNLOAD !== "true") {
+        preventUnload(event);
+      } else {
+        console.warn(
+          "preventing unload disabled (VITE_APP_DISABLE_PREVENT_UNLOAD)",
+        );
+      }
     }
   });
 
   saveCollabRoomToFirebase = async (
     syncableElements: readonly SyncableExcalidrawElement[],
   ) => {
+    syncableElements = cloneJSON(syncableElements);
     try {
       const storageBackend = await getStorageBackend();
       const storedElements = await storageBackend.saveToStorageBackend(
@@ -452,7 +469,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   private decryptPayload = async (
-    iv: Uint8Array,
+    iv: Uint8Array<ArrayBuffer>,
     encryptedData: ArrayBuffer,
     decryptionKey: string,
   ): Promise<ValueOf<SocketUpdateDataSource>> => {
@@ -543,7 +560,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       return null;
     }
 
-    if (!existingRoomLinkData) {
+    if (existingRoomLinkData) {
+      // when joining existing room, don't merge it with current scene data
+      this.excalidrawAPI.resetScene();
+    } else {
       const elements = this.excalidrawAPI.getSceneElements().map((element) => {
         if (isImageElement(element) && element.status === "saved") {
           return newElementWith(element, { status: "pending" });
@@ -572,7 +592,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     // All socket listeners are moving to Portal
     this.portal.socket.on(
       "client-broadcast",
-      async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
+      async (encryptedData: ArrayBuffer, iv: Uint8Array<ArrayBuffer>) => {
         if (!this.portal.roomKey) {
           return;
         }
@@ -589,7 +609,9 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           case WS_SUBTYPES.INIT: {
             if (!this.portal.socketInitialized) {
               this.initializeRoom({ fetchScene: false });
-              const remoteElements = decryptedData.payload.elements;
+              const remoteElements = toBrandedType<
+                readonly RemoteExcalidrawElement[]
+              >(decryptedData.payload.elements);
               const reconciledElements =
                 this._reconcileElements(remoteElements);
               this.handleRemoteSceneUpdate(reconciledElements);
@@ -603,7 +625,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           }
           case WS_SUBTYPES.UPDATE:
             this.handleRemoteSceneUpdate(
-              this._reconcileElements(decryptedData.payload.elements),
+              this._reconcileElements(
+                toBrandedType<readonly RemoteExcalidrawElement[]>(
+                  decryptedData.payload.elements,
+                ),
+              ),
             );
             break;
           case WS_SUBTYPES.MOUSE_LOCATION: {
@@ -791,15 +817,26 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   private _reconcileElements = (
-    remoteElements: readonly ExcalidrawElement[],
+    remoteElements: readonly RemoteExcalidrawElement[],
   ): ReconciledExcalidrawElement[] => {
-    const localElements = this.getSceneElementsIncludingDeleted();
     const appState = this.excalidrawAPI.getAppState();
-    const restoredRemoteElements = restoreElements(remoteElements, null);
-    const reconciledElements = reconcileElements(
-      localElements,
-      restoredRemoteElements as RemoteExcalidrawElement[],
+
+    const existingElements = this.getSceneElementsIncludingDeleted();
+
+    // NOTE ideally we restore _after_ reconciliation but we can't do that
+    // as we'd regenerate even elements such as appState.newElement which would
+    // break the state
+    remoteElements = restoreElements(remoteElements, existingElements);
+
+    let reconciledElements = reconcileElements(
+      existingElements,
+      remoteElements,
       appState,
+    );
+
+    reconciledElements = bumpElementVersions(
+      reconciledElements,
+      existingElements,
     );
 
     // Avoid broadcasting to the rest of the collaborators the scene
@@ -1069,7 +1106,7 @@ declare global {
   }
 }
 
-if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+if (isTestEnv() || isDevEnv()) {
   window.collab = window.collab || ({} as Window["collab"]);
 }
 

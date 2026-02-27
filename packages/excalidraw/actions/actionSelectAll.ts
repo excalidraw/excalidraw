@@ -1,12 +1,18 @@
-import { KEYS } from "../keys";
-import { register } from "./register";
-import { selectGroupsForSelectedElements } from "../groups";
-import { getNonDeletedElements, isTextElement } from "../element";
-import type { ExcalidrawElement } from "../element/types";
-import { isLinearElement } from "../element/typeChecks";
-import { LinearElementEditor } from "../element/linearElementEditor";
+import { getNonDeletedElements } from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
+import { isLinearElement, isTextElement } from "@excalidraw/element";
+
+import { arrayToMap, KEYS } from "@excalidraw/common";
+
+import { selectGroupsForSelectedElements } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { selectAllIcon } from "../components/icons";
-import { CaptureUpdateAction } from "../store";
+
+import { register } from "./register";
 
 export const actionSelectAll = register({
   name: "selectAll",
@@ -15,7 +21,7 @@ export const actionSelectAll = register({
   trackEvent: { category: "canvas" },
   viewMode: false,
   perform: (elements, appState, value, app) => {
-    if (appState.editingLinearElement) {
+    if (appState.selectedLinearElement?.isEditing) {
       return false;
     }
 
@@ -47,7 +53,7 @@ export const actionSelectAll = register({
           // single linear element selected
           Object.keys(selectedElementIds).length === 1 &&
           isLinearElement(elements[0])
-            ? new LinearElementEditor(elements[0])
+            ? new LinearElementEditor(elements[0], arrayToMap(elements))
             : null,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,

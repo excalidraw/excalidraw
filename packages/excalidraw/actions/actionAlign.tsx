@@ -1,5 +1,22 @@
-import type { Alignment } from "../align";
-import { alignElements } from "../align";
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import { isFrameLikeElement } from "@excalidraw/element";
+
+import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element";
+
+import { KEYS, arrayToMap } from "@excalidraw/common";
+
+import { alignElements } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import { getSelectedElementsByGroup } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { Alignment } from "@excalidraw/element";
+
+import { ToolButton } from "../components/ToolButton";
 import {
   AlignBottomIcon,
   AlignLeftIcon,
@@ -8,18 +25,16 @@ import {
   CenterHorizontallyIcon,
   CenterVerticallyIcon,
 } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
-import { getNonDeletedElements } from "../element";
-import { isFrameLikeElement } from "../element/typeChecks";
-import type { ExcalidrawElement } from "../element/types";
-import { updateFrameMembershipOfSelectedElements } from "../frame";
+
 import { t } from "../i18n";
-import { KEYS } from "../keys";
+
 import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
-import type { AppClassProperties, AppState, UIAppState } from "../types";
-import { arrayToMap, getShortcutKey } from "../utils";
+
+import { getShortcutKey } from "../shortcut";
+
 import { register } from "./register";
+
+import type { AppClassProperties, AppState, UIAppState } from "../types";
 
 export const alignActionsPredicate = (
   appState: UIAppState,
@@ -27,7 +42,11 @@ export const alignActionsPredicate = (
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
   return (
-    selectedElements.length > 1 &&
+    getSelectedElementsByGroup(
+      selectedElements,
+      app.scene.getNonDeletedElementsMap(),
+      appState as Readonly<AppState>,
+    ).length > 1 &&
     // TODO enable aligning frames when implemented properly
     !selectedElements.some((el) => isFrameLikeElement(el))
   );
@@ -40,13 +59,12 @@ const alignSelectedElements = (
   alignment: Alignment,
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
-  const elementsMap = arrayToMap(elements);
 
   const updatedElements = alignElements(
     selectedElements,
-    elementsMap,
     alignment,
     app.scene,
+    appState,
   );
 
   const updatedElementsMap = arrayToMap(updatedElements);

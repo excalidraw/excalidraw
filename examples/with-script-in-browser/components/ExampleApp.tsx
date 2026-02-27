@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import React, {
   useEffect,
   useState,
@@ -6,13 +7,24 @@ import React, {
   Children,
   cloneElement,
 } from "react";
-import ExampleSidebar from "./sidebar/ExampleSidebar";
 
 import type * as TExcalidraw from "@excalidraw/excalidraw";
+import type { ImportedLibraryData } from "@excalidraw/excalidraw/data/types";
+import type {
+  NonDeletedExcalidrawElement,
+  Theme,
+} from "@excalidraw/excalidraw/element/types";
+import type {
+  AppState,
+  BinaryFileData,
+  ExcalidrawImperativeAPI,
+  ExcalidrawInitialDataState,
+  Gesture,
+  LibraryItems,
+  PointerDownState as ExcalidrawPointerDownState,
+} from "@excalidraw/excalidraw/types";
 
-import { nanoid } from "nanoid";
-
-import type { ResolvablePromise } from "../utils";
+import initialData from "../initialData";
 import {
   resolvablePromise,
   distance2d,
@@ -23,24 +35,11 @@ import {
 
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
-import initialData from "../initialData";
-
-import type {
-  AppState,
-  BinaryFileData,
-  ExcalidrawImperativeAPI,
-  ExcalidrawInitialDataState,
-  Gesture,
-  LibraryItems,
-  PointerDownState as ExcalidrawPointerDownState,
-} from "@excalidraw/excalidraw/types";
-import type {
-  NonDeletedExcalidrawElement,
-  Theme,
-} from "@excalidraw/excalidraw/element/types";
-import type { ImportedLibraryData } from "@excalidraw/excalidraw/data/types";
+import ExampleSidebar from "./sidebar/ExampleSidebar";
 
 import "./ExampleApp.scss";
+
+import type { ResolvablePromise } from "../utils";
 
 type Comment = {
   x: number;
@@ -105,6 +104,7 @@ export default function ExampleApp({
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
+  const [renderScrollbars, setRenderScrollbars] = useState(false);
   const [blobUrl, setBlobUrl] = useState<string>("");
   const [canvasUrl, setCanvasUrl] = useState<string>("");
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
@@ -193,6 +193,7 @@ export default function ExampleApp({
         }) => setPointerData(payload),
         viewModeEnabled,
         zenModeEnabled,
+        renderScrollbars,
         gridModeEnabled,
         theme,
         name: "Custom name of drawing",
@@ -710,6 +711,14 @@ export default function ExampleApp({
               onChange={() => setGridModeEnabled(!gridModeEnabled)}
             />
             Grid mode
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={renderScrollbars}
+              onChange={() => setRenderScrollbars(!renderScrollbars)}
+            />
+            Render scrollbars
           </label>
           <label>
             <input

@@ -1,11 +1,14 @@
-import React, { forwardRef, useState } from "react";
 import clsx from "clsx";
+import React, { forwardRef, useState } from "react";
+
+import { isPromiseLike } from "@excalidraw/common";
+
+import { AbortError } from "../errors";
+
+import Spinner from "./Spinner";
+import { tablerCheckIcon } from "./icons";
 
 import "./FilledButton.scss";
-import { AbortError } from "../errors";
-import Spinner from "./Spinner";
-import { isPromiseLike } from "../utils";
-import { tablerCheckIcon } from "./icons";
 
 export type ButtonVariant = "filled" | "outlined" | "icon";
 export type ButtonColor =
@@ -17,7 +20,7 @@ export type ButtonColor =
 export type ButtonSize = "medium" | "large";
 
 export type FilledButtonProps = {
-  label: string;
+  label?: string;
 
   children?: React.ReactNode;
   onClick?: (event: React.MouseEvent) => void;
@@ -30,6 +33,7 @@ export type FilledButtonProps = {
   fullWidth?: boolean;
 
   icon?: React.ReactNode;
+  disabled?: boolean;
 };
 
 export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
@@ -45,6 +49,7 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
       fullWidth,
       className,
       status,
+      disabled,
     },
     ref,
   ) => {
@@ -91,7 +96,7 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
         type="button"
         aria-label={label}
         ref={ref}
-        disabled={_status === "loading" || _status === "success"}
+        disabled={disabled || _status === "loading" || _status === "success"}
       >
         <div className="ExcButton__contents">
           {_status === "loading" ? (

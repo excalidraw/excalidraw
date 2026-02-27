@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import Script from "next/script";
+
 import "../common.scss";
 
 // Since client components get prerenderd on server as well hence importing the excalidraw stuff dynamically

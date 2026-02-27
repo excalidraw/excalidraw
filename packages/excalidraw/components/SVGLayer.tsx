@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
-import type { Trail } from "../animated-trail";
 
 import "./SVGLayer.scss";
+
+import type { Trail } from "../animated-trail";
 
 type SVGLayerProps = {
   trails: Trail[];

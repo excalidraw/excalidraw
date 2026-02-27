@@ -1,11 +1,13 @@
+import fs from "fs";
+
 // vitest.setup.ts
 import "vitest-canvas-mock";
 import "@testing-library/jest-dom";
-import fs from "fs";
 import { vi } from "vitest";
+
 import polyfill from "./packages/excalidraw/polyfill";
-import { testPolyfills } from "./packages/excalidraw/tests/helpers/polyfills";
 import { yellow } from "./packages/excalidraw/tests/helpers/colorize";
+import { testPolyfills } from "./packages/excalidraw/tests/helpers/polyfills";
 
 // mock for pep.js not working with setPointerCapture()
 HTMLElement.prototype.setPointerCapture = vi.fn();
@@ -92,11 +94,6 @@ vi.mock(
   },
 );
 
-vi.mock("nanoid", () => {
-  return {
-    nanoid: vi.fn(() => "test-id"),
-  };
-});
 // ReactDOM is located inside index.tsx file
 // as a result, we need a place for it to render into
 const element = document.createElement("div");

@@ -1,18 +1,22 @@
 import React from "react";
-import { render, waitFor } from "./test-utils";
-import { Excalidraw } from "../index";
-import { API } from "./helpers/api";
+
+import { SVG_NS } from "@excalidraw/common";
+
+import type { FileId } from "@excalidraw/element/types";
+
+import { getDefaultAppState } from "../appState";
+import { getDataURL } from "../data/blob";
 import { encodePngMetadata } from "../data/image";
 import { serializeAsJSON } from "../data/json";
+import { Excalidraw } from "../index";
 import {
   decodeSvgBase64Payload,
   encodeSvgBase64Payload,
   exportToSvg,
 } from "../scene/export";
-import type { FileId } from "../element/types";
-import { getDataURL } from "../data/blob";
-import { getDefaultAppState } from "../appState";
-import { SVG_NS } from "../constants";
+
+import { API } from "./helpers/api";
+import { render, waitFor } from "./test-utils";
 
 const { h } = window;
 
@@ -53,7 +57,7 @@ describe("export", () => {
       blob: pngBlob,
       metadata: serializeAsJSON(testElements, h.state, {}, "local"),
     });
-    await API.drop(pngBlobEmbedded);
+    await API.drop([{ kind: "file", file: pngBlobEmbedded }]);
 
     await waitFor(() => {
       expect(h.elements).toEqual([
@@ -90,7 +94,12 @@ describe("export", () => {
   });
 
   it("import embedded png (legacy v1)", async () => {
-    await API.drop(await API.loadFile("./fixtures/test_embedded_v1.png"));
+    await API.drop([
+      {
+        kind: "file",
+        file: await API.loadFile("./fixtures/test_embedded_v1.png"),
+      },
+    ]);
     await waitFor(() => {
       expect(h.elements).toEqual([
         expect.objectContaining({ type: "text", text: "test" }),
@@ -99,7 +108,12 @@ describe("export", () => {
   });
 
   it("import embedded png (v2)", async () => {
-    await API.drop(await API.loadFile("./fixtures/smiley_embedded_v2.png"));
+    await API.drop([
+      {
+        kind: "file",
+        file: await API.loadFile("./fixtures/smiley_embedded_v2.png"),
+      },
+    ]);
     await waitFor(() => {
       expect(h.elements).toEqual([
         expect.objectContaining({ type: "text", text: "😀" }),
@@ -108,7 +122,12 @@ describe("export", () => {
   });
 
   it("import embedded svg (legacy v1)", async () => {
-    await API.drop(await API.loadFile("./fixtures/test_embedded_v1.svg"));
+    await API.drop([
+      {
+        kind: "file",
+        file: await API.loadFile("./fixtures/test_embedded_v1.svg"),
+      },
+    ]);
     await waitFor(() => {
       expect(h.elements).toEqual([
         expect.objectContaining({ type: "text", text: "test" }),
@@ -117,7 +136,12 @@ describe("export", () => {
   });
 
   it("import embedded svg (v2)", async () => {
-    await API.drop(await API.loadFile("./fixtures/smiley_embedded_v2.svg"));
+    await API.drop([
+      {
+        kind: "file",
+        file: await API.loadFile("./fixtures/smiley_embedded_v2.svg"),
+      },
+    ]);
     await waitFor(() => {
       expect(h.elements).toEqual([
         expect.objectContaining({ type: "text", text: "😀" }),

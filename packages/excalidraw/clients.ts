@@ -4,8 +4,10 @@ import {
   COLOR_WHITE,
   THEME,
   UserIdleState,
-} from "./constants";
+} from "@excalidraw/common";
+
 import { roundRect } from "./renderer/roundRect";
+
 import type { InteractiveCanvasRenderConfig } from "./scene/types";
 import type {
   Collaborator,

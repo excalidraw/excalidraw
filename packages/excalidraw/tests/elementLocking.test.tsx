@@ -1,12 +1,14 @@
-import React from "react";
-import { Excalidraw } from "../index";
-import { render, unmountComponent } from "../tests/test-utils";
-import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
-import { KEYS } from "../keys";
-import { API } from "../tests/helpers/api";
+import { KEYS } from "@excalidraw/common";
+
 import { actionSelectAll } from "../actions";
 import { t } from "../i18n";
-import { mutateElement } from "../element/mutateElement";
+import { Excalidraw } from "../index";
+
+import { API } from "../tests/helpers/api";
+import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
+import { render, unmountComponent } from "../tests/test-utils";
+
+import { getTextEditor } from "./queries/dom";
 
 unmountComponent();
 
@@ -70,7 +72,7 @@ describe("element locking", () => {
     expect(lockedRectangle).toEqual(expect.objectContaining({ x: 0, y: 0 }));
   });
 
-  it("you can drag element that's below a locked element", () => {
+  it("dragging element that's below a locked element", () => {
     const rectangle = API.createElement({
       type: "rectangle",
       width: 100,
@@ -91,6 +93,14 @@ describe("element locking", () => {
     mouse.moveTo(100, 100);
     mouse.upAt(100, 100);
     expect(lockedRectangle).toEqual(expect.objectContaining({ x: 0, y: 0 }));
+    expect(rectangle).toEqual(expect.objectContaining({ x: 0, y: 0 }));
+
+    // once selected, the locked element above should be ignored
+    API.setSelectedElements([rectangle]);
+    mouse.downAt(50, 50);
+    mouse.moveTo(100, 100);
+    mouse.upAt(100, 100);
+    expect(lockedRectangle).toEqual(expect.objectContaining({ x: 0, y: 0 }));
     expect(rectangle).toEqual(expect.objectContaining({ x: 50, y: 50 }));
     expect(API.getSelectedElements().length).toBe(1);
     expect(API.getSelectedElement().id).toBe(rectangle.id);
@@ -105,7 +115,7 @@ describe("element locking", () => {
     expect(API.getSelectedElements().length).toBe(1);
   });
 
-  it("clicking on a locked element should select the unlocked element beneath it", () => {
+  it("clicking on a locked element should not select the unlocked element beneath it", () => {
     const rectangle = API.createElement({
       type: "rectangle",
       width: 100,
@@ -123,8 +133,8 @@ describe("element locking", () => {
     API.setElements([rectangle, lockedRectangle]);
     expect(API.getSelectedElements().length).toBe(0);
     mouse.clickAt(50, 50);
-    expect(API.getSelectedElements().length).toBe(1);
-    expect(API.getSelectedElement().id).toBe(rectangle.id);
+    expect(API.getSelectedElements().length).toBe(0);
+    expect(h.state.activeLockedId).toBe(lockedRectangle.id);
   });
 
   it("right-clicking on a locked element should select it & open its contextMenu", () => {
@@ -235,7 +245,7 @@ describe("element locking", () => {
     expect(h.state.editingTextElement?.id).toBe(h.elements[1].id);
   });
 
-  it("should ignore locked text under cursor when clicked with text tool", () => {
+  it("should ignore locked text under cursor when clicked with text tool", async () => {
     const text = API.createElement({
       type: "text",
       text: "ola",
@@ -248,16 +258,14 @@ describe("element locking", () => {
     API.setElements([text]);
     UI.clickTool("text");
     mouse.clickAt(text.x + 50, text.y + 50);
-    const editor = document.querySelector(
-      ".excalidraw-textEditorContainer > textarea",
-    ) as HTMLTextAreaElement;
+    const editor = await getTextEditor();
     expect(editor).not.toBe(null);
     expect(h.state.editingTextElement?.id).not.toBe(text.id);
     expect(h.elements.length).toBe(2);
     expect(h.state.editingTextElement?.id).toBe(h.elements[1].id);
   });
 
-  it("should ignore text under cursor when double-clicked with selection tool", () => {
+  it("should ignore text under cursor when double-clicked with selection tool", async () => {
     const text = API.createElement({
       type: "text",
       text: "ola",
@@ -270,9 +278,7 @@ describe("element locking", () => {
     API.setElements([text]);
     UI.clickTool("selection");
     mouse.doubleClickAt(text.x + 50, text.y + 50);
-    const editor = document.querySelector(
-      ".excalidraw-textEditorContainer > textarea",
-    ) as HTMLTextAreaElement;
+    const editor = await getTextEditor();
     expect(editor).not.toBe(null);
     expect(h.state.editingTextElement?.id).not.toBe(text.id);
     expect(h.elements.length).toBe(2);
@@ -294,7 +300,7 @@ describe("element locking", () => {
       height: textSize,
       containerId: container.id,
     });
-    mutateElement(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [{ id: text.id, type: "text" }],
     });
 
@@ -318,7 +324,7 @@ describe("element locking", () => {
     ]);
   });
 
-  it("bound text shouldn't be editable via double-click", () => {
+  it("bound text shouldn't be editable via double-click", async () => {
     const container = API.createElement({
       type: "rectangle",
       width: 100,
@@ -335,7 +341,7 @@ describe("element locking", () => {
       containerId: container.id,
       locked: true,
     });
-    mutateElement(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [{ id: text.id, type: "text" }],
     });
     API.setElements([container, text]);
@@ -343,16 +349,14 @@ describe("element locking", () => {
     UI.clickTool("selection");
     mouse.doubleClickAt(container.width / 2, container.height / 2);
 
-    const editor = document.querySelector(
-      ".excalidraw-textEditorContainer > textarea",
-    ) as HTMLTextAreaElement;
+    const editor = await getTextEditor();
     expect(editor).not.toBe(null);
     expect(h.state.editingTextElement?.id).not.toBe(text.id);
     expect(h.elements.length).toBe(3);
     expect(h.state.editingTextElement?.id).toBe(h.elements[2].id);
   });
 
-  it("bound text shouldn't be editable via text tool", () => {
+  it("bound text shouldn't be editable via text tool", async () => {
     const container = API.createElement({
       type: "rectangle",
       width: 100,
@@ -369,7 +373,7 @@ describe("element locking", () => {
       containerId: container.id,
       locked: true,
     });
-    mutateElement(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [{ id: text.id, type: "text" }],
     });
     API.setElements([container, text]);
@@ -377,9 +381,7 @@ describe("element locking", () => {
     UI.clickTool("text");
     mouse.clickAt(container.width / 2, container.height / 2);
 
-    const editor = document.querySelector(
-      ".excalidraw-textEditorContainer > textarea",
-    ) as HTMLTextAreaElement;
+    const editor = await getTextEditor();
     expect(editor).not.toBe(null);
     expect(h.state.editingTextElement?.id).not.toBe(text.id);
     expect(h.elements.length).toBe(3);
