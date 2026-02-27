@@ -35,8 +35,8 @@ export class ExcalidrawFontFace {
    * Retrieves `undefined` otherwise.
    */
   public toCSS(characters: string): Promise<string> | undefined {
-    // quick exit in case the characters are not within this font face's unicode range
-    if (!this.getUnicodeRangeRegex().test(characters)) {
+    const unicodeRangeRegex = this.getUnicodeRangeRegex();
+    if (unicodeRangeRegex !== null && !unicodeRangeRegex.test(characters)) {
       return;
     }
 
@@ -111,11 +111,17 @@ export class ExcalidrawFontFace {
     });
   }
 
-  private getUnicodeRangeRegex() {
+  private getUnicodeRangeRegex(): RegExp | null {
+    const fontFaceAny = this.fontFace as { unicodeRange?: string; descriptors?: { unicodeRange?: string } };
+    const unicodeRange =
+      fontFaceAny.unicodeRange ?? fontFaceAny.descriptors?.unicodeRange;
+    if (typeof unicodeRange !== "string" || unicodeRange.length === 0) {
+      return null;
+    }
     // using \u{h} or \u{hhhhh} to match any number of hex digits,
     // otherwise we would get an "Invalid Unicode escape" error
     // e.g. U+0-1007F -> \u{0}-\u{1007F}
-    const unicodeRangeRegex = this.fontFace.unicodeRange
+    const unicodeRangeRegex = unicodeRange
       .split(/,\s*/)
       .map((range) => {
         const [start, end] = range.replace("U+", "").split("-");
