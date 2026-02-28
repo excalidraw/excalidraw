@@ -456,6 +456,8 @@ export interface AppState {
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
   bindMode: BindMode;
+  isArrowMultiSelectEnabled: boolean;
+  arrowMultiSelectSourceId: ExcalidrawElement["id"] | null;
 }
 
 export type SearchMatch = {

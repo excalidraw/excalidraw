@@ -83,6 +83,7 @@ import type { CaptureUpdateActionType } from "@excalidraw/element";
 import { trackEvent } from "../analytics";
 import { RadioSelection } from "../components/RadioSelection";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
+import { CheckboxItem } from "../components/CheckboxItem";
 import { FontPicker } from "../components/FontPicker/FontPicker";
 import { IconPicker } from "../components/IconPicker";
 import { Range } from "../components/Range";
@@ -1727,9 +1728,48 @@ export const actionChangeArrowProperties = register({
       <div className="selected-shape-actions">
         {renderAction("changeArrowhead")}
         {renderAction("changeArrowType")}
+        {renderAction("toggleArrowMultiSelect")}
       </div>
     );
   },
+});
+
+export const actionToggleArrowMultiSelect = register<
+  AppState["isArrowMultiSelectEnabled"]
+>({
+  name: "toggleArrowMultiSelect",
+  label: "labels.multiSelect",
+  trackEvent: false,
+  perform: (_elements, appState, value) => {
+    const isArrowMultiSelectEnabled =
+      value ?? !appState.isArrowMultiSelectEnabled;
+
+    return {
+      appState: {
+        ...appState,
+        isArrowMultiSelectEnabled,
+        arrowMultiSelectSourceId: isArrowMultiSelectEnabled
+          ? appState.arrowMultiSelectSourceId
+          : null,
+      },
+      captureUpdate: CaptureUpdateAction.NEVER,
+    };
+  },
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    event.key.toLowerCase() === "m" &&
+    !event.shiftKey &&
+    !event.altKey,
+  predicate: (_elements, appState) =>
+    appState.activeTool.type === "arrow" || appState.isArrowMultiSelectEnabled,
+  PanelComponent: ({ appState, updateData }) => (
+    <CheckboxItem
+      checked={appState.isArrowMultiSelectEnabled}
+      onChange={(checked) => updateData(checked)}
+    >
+      {`${t("labels.multiSelect")} (${getShortcutKey("CtrlOrCmd+M")})`}
+    </CheckboxItem>
+  ),
 });
 
 export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
