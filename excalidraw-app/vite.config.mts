@@ -239,6 +239,8 @@ export default defineConfig(({ mode }) => {
               action: "/",
               accept: {
                 "application/vnd.excalidraw+json": [".excalidraw"],
+                "image/png": [".excalidraw.png"],
+                "image/svg+xml": [".excalidraw.svg"],
               },
             },
           ],
