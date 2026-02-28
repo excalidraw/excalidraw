@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeSubmitPrompt": [],
+    "beforeShellExecution": [
+      {
+        "command": "bash .cursor/hooks/command-guard.sh"
+      }
+    ],
+    "beforeMCPExecution": [],
+    "beforeReadFile": [],
+    "afterFileEdit": [],
+    "stop": [
+      {
+        "command": "bash .cursor/hooks/grind.sh"
+      }
+    ]
+  }
+}
