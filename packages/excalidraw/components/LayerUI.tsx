@@ -556,13 +556,13 @@ const LayerUI = ({
       <tunnels.OverwriteConfirmDialogTunnel.Out />
       {renderImageExportDialog()}
       {renderJSONExportDialog()}
-      {appState.pasteDialog.shown && (
+      {appState.openDialog?.name === "charts" && (
         <PasteChartDialog
-          setAppState={setAppState}
-          appState={appState}
+          data={appState.openDialog.data}
+          rawText={appState.openDialog.rawText}
           onClose={() =>
             setAppState({
-              pasteDialog: { shown: false, data: null },
+              openDialog: null,
             })
           }
         />
