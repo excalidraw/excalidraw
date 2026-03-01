@@ -2,11 +2,7 @@
   "version": 1,
   "hooks": {
     "beforeSubmitPrompt": [],
-    "beforeShellExecution": [
-      {
-        "command": "bash .cursor/hooks/command-guard.sh"
-      }
-    ],
+    "beforeShellExecution": [],
     "beforeMCPExecution": [],
     "beforeReadFile": [],
     "afterFileEdit": [],
