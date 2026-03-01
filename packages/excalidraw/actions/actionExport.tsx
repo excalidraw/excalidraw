@@ -1,4 +1,4 @@
-import {
+﻿import {
   KEYS,
   DEFAULT_EXPORT_PADDING,
   EXPORT_SCALES,
@@ -9,18 +9,20 @@ import { getNonDeletedElements } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { Theme } from "@excalidraw/element/types";
+import type { ExcalidrawElement, Theme } from "@excalidraw/element/types";
 
 import { useEditorInterface } from "../components/App";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { ProjectName } from "../components/ProjectName";
+import { Toast } from "../components/Toast";
 import { ToolButton } from "../components/ToolButton";
 import { Tooltip } from "../components/Tooltip";
 import { ExportIcon, questionCircle, saveAs } from "../components/icons";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
+
 import { resaveAsImageWithScene } from "../data/resave";
 
 import { t } from "../i18n";
@@ -31,7 +33,15 @@ import "../components/ToolIcon.scss";
 
 import { register } from "./register";
 
-import type { AppState } from "../types";
+import type { JSONExportData } from "../data/json";
+
+import type {
+  AppClassProperties,
+  AppState,
+  BinaryFiles,
+  ExcalidrawProps,
+  OnExportProgress,
+} from "../types";
 
 export const actionChangeProjectName = register<AppState["name"]>({
   name: "changeProjectName",
@@ -150,6 +160,140 @@ export const actionChangeExportEmbedScene = register<
   ),
 });
 
+// ---------------------------------------------------------------------------
+// onExport interception helpers
+// ---------------------------------------------------------------------------
+
+let onExportInProgress = false;
+
+/** awaits host app's onExport result, and renders progress to the UI */
+async function handleOnExportResult(
+  onExportResult: ReturnType<NonNullable<ExcalidrawProps["onExport"]>>,
+  opts: {
+    signal: AbortSignal;
+    app: AppClassProperties;
+  },
+): Promise<void> {
+  const onProgress = (progress: {
+    message?: OnExportProgress["message"];
+    progress?: number | null;
+  }) => {
+    const message = progress.message ?? t("progressDialog.defaultMessage");
+    opts.app.setAppState({
+      toast: {
+        message:
+          progress.progress != null ? (
+            <>
+              {message}
+              <Toast.ProgressBar progress={progress.progress} />
+            </>
+          ) : (
+            message
+          ),
+        duration: Infinity,
+      },
+    });
+  };
+
+  if (
+    onExportResult != null &&
+    typeof onExportResult === "object" &&
+    Symbol.asyncIterator in onExportResult
+  ) {
+    onProgress({ progress: null });
+
+    for await (const value of onExportResult) {
+      if (opts.signal.aborted) {
+        onExportResult.return();
+        return;
+      }
+      if (value.type === "progress") {
+        onProgress({
+          message: value.message,
+          progress: value.progress ?? null,
+        });
+      } else if (value.type === "done") {
+        return;
+      }
+    }
+
+    // Generator completed without explicit "done" message
+    return;
+  }
+
+  if (onExportResult instanceof Promise) {
+    onProgress({ progress: null });
+    await onExportResult;
+  }
+}
+
+function prepareDataForJSONExport(
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  files: BinaryFiles,
+  app: AppClassProperties,
+): { abortController: AbortController; data: Promise<JSONExportData> } {
+  const abortController = new AbortController();
+  const signal = abortController.signal;
+
+  const dataPromise = new Promise<JSONExportData>(async (resolve) => {
+    const _elements: readonly ExcalidrawElement[] = elements;
+    const _appState: AppState = appState;
+
+    try {
+      if (app.props.onExport) {
+        await handleOnExportResult(
+          app.props.onExport(
+            "json",
+            {
+              elements,
+              appState,
+              files,
+            },
+            {
+              signal,
+            },
+          ),
+          {
+            app,
+            signal,
+          },
+        );
+      }
+    } catch (error: any) {
+      if (error?.name === "AbortError") {
+        // if abort error, assume it's a reaction on the signal being aborted
+        console.warn(
+          `onExport() aborted by host app (signal aborted: ${signal.aborted})`,
+        );
+      } else {
+        // non-abort error
+        //
+        console.error("Error during props.onExport() handling", error);
+      }
+
+      // either way, we currently don't allow host apps to cancel save actions
+      // so we resolve to orig data
+    }
+
+    resolve({
+      elements: _elements,
+      appState: _appState,
+      // return latest files in case they finished loading during onExport
+      files: app.files,
+    });
+  });
+
+  return {
+    abortController,
+    data: dataPromise,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Save actions
+// ---------------------------------------------------------------------------
+
 export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",
   label: "buttons.save",
@@ -163,42 +307,62 @@ export const actionSaveToActiveFile = register({
     );
   },
   perform: async (elements, appState, value, app) => {
-    const fileHandleExists = !!appState.fileHandle;
+    if (onExportInProgress) {
+      return false;
+    }
+    onExportInProgress = true;
+
+    const previousFileHandle = appState.fileHandle;
+    const filename = app.getName();
+
+    const { abortController, data: exportedDataPromise } =
+      prepareDataForJSONExport(elements, appState, app.files, app);
 
     try {
-      const { fileHandle } = isImageFileHandle(appState.fileHandle)
+      const { fileHandle } = isImageFileHandle(previousFileHandle)
         ? await resaveAsImageWithScene(
-            elements,
-            appState,
-            app.files,
-            app.getName(),
+            exportedDataPromise,
+            previousFileHandle,
+            filename,
           )
-        : await saveAsJSON(elements, appState, app.files, app.getName());
+        : await saveAsJSON({
+            data: exportedDataPromise,
+            filename,
+            fileHandle: previousFileHandle,
+          });
 
       return {
-        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+        captureUpdate: CaptureUpdateAction.NEVER,
         appState: {
-          ...appState,
           fileHandle,
-          toast: fileHandleExists
-            ? {
-                message: fileHandle?.name
-                  ? t("toast.fileSavedToFilename").replace(
-                      "{filename}",
-                      `"${fileHandle.name}"`,
-                    )
-                  : t("toast.fileSaved"),
-              }
-            : null,
+          toast: {
+            message:
+              previousFileHandle && fileHandle?.name
+                ? t("toast.fileSavedToFilename").replace(
+                    "{filename}",
+                    `"${fileHandle.name}"`,
+                  )
+                : t("toast.fileSaved"),
+            duration: 1500,
+          },
         },
       };
     } catch (error: any) {
+      abortController.abort();
+
       if (error?.name !== "AbortError") {
         console.error(error);
       } else {
         console.warn(error);
       }
-      return { captureUpdate: CaptureUpdateAction.EVENTUALLY };
+      return {
+        captureUpdate: CaptureUpdateAction.NEVER,
+        appState: {
+          toast: null,
+        },
+      };
+    } finally {
+      onExportInProgress = false;
     }
   },
   keyTest: (event) =>
@@ -212,36 +376,50 @@ export const actionSaveFileToDisk = register({
   viewMode: true,
   trackEvent: { category: "export" },
   perform: async (elements, appState, value, app) => {
+    if (onExportInProgress) {
+      return false;
+    }
+    onExportInProgress = true;
+
+    const { abortController, data: exportedDataPromise } =
+      prepareDataForJSONExport(elements, appState, app.files, app);
+
     try {
-      const { fileHandle } = await saveAsJSON(
-        elements,
-        {
-          ...appState,
-          fileHandle: null,
-        },
-        app.files,
-        app.getName(),
-      );
+      const { fileHandle: savedFileHandle } = await saveAsJSON({
+        data: exportedDataPromise,
+        filename: app.getName(),
+        fileHandle: null,
+      });
+
       return {
-        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+        captureUpdate: CaptureUpdateAction.NEVER,
         appState: {
-          ...appState,
           openDialog: null,
-          fileHandle,
+          fileHandle: savedFileHandle,
           toast: { message: t("toast.fileSaved") },
         },
       };
     } catch (error: any) {
+      abortController.abort();
       if (error?.name !== "AbortError") {
         console.error(error);
       } else {
         console.warn(error);
       }
-      return { captureUpdate: CaptureUpdateAction.EVENTUALLY };
+      return {
+        captureUpdate: CaptureUpdateAction.NEVER,
+        appState: {
+          toast: null,
+        },
+      };
+    } finally {
+      onExportInProgress = false;
     }
   },
   keyTest: (event) =>
-    event.key === KEYS.S && event.shiftKey && event[KEYS.CTRL_OR_CMD],
+    event.key.toLowerCase() === KEYS.S &&
+    event.shiftKey &&
+    event[KEYS.CTRL_OR_CMD],
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
