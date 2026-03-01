@@ -53,7 +53,6 @@ import type { Spreadsheet } from "./charts";
 import type { ClipboardData } from "./clipboard";
 import type App from "./components/App";
 import type Library from "./data/library";
-import type { FileSystemHandle } from "./data/filesystem";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
@@ -408,7 +407,11 @@ export interface AppState {
   previousSelectedElementIds: { [id: string]: true };
   selectedElementsAreBeingDragged: boolean;
   shouldCacheIgnoreZoom: boolean;
-  toast: { message: string; closable?: boolean; duration?: number } | null;
+  toast: {
+    message: React.ReactNode;
+    closable?: boolean;
+    duration?: number;
+  } | null;
   zenModeEnabled: boolean;
   theme: Theme;
   /** grid cell px size */
@@ -427,7 +430,7 @@ export interface AppState {
   offsetTop: number;
   offsetLeft: number;
 
-  fileHandle: FileSystemHandle | null;
+  fileHandle: FileSystemFileHandle | null;
   collaborators: Map<SocketId, Collaborator>;
   stats: {
     open: boolean;
@@ -546,6 +549,13 @@ export type OnUserFollowedPayload = {
   action: "FOLLOW" | "UNFOLLOW";
 };
 
+export type OnExportProgress = {
+  type: "progress";
+  message?: React.ReactNode;
+  /** 0-1 range */
+  progress?: number;
+};
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
@@ -641,6 +651,32 @@ export interface ExcalidrawProps {
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
+  /**
+   * Called before exporting to a file.
+   *
+   * Allows the host app to intercept and delay saving until async operations
+   * (e.g., images are loaded) complete.
+   *
+   * If Promise/AsyncGenerator is returned, a progress toast will be shown
+   * until the operation completes. Generator can yield progress updates.
+   */
+  onExport?: (
+    /** type of export. Currently we only call for JSON exports or
+     * JSON-embedded PNG (which is also identified as `json` type here)*/
+    type: "json",
+    data: {
+      elements: readonly ExcalidrawElement[];
+      appState: AppState;
+      files: BinaryFiles;
+    },
+    options: {
+      /** signal that gets aborted if user cancels the export (e.g. closes
+       * the native file picker dialog). In that case, you can either
+       * return immediately, or throw AbortError.
+       */
+      signal: AbortSignal;
+    },
+  ) => MaybePromise<void> | AsyncGenerator<OnExportProgress, void>;
 }
 
 export type SceneData = {
@@ -767,6 +803,8 @@ export type AppClassProperties = {
 
   lastPointerMoveCoords: App["lastPointerMoveCoords"];
   bindModeHandler: App["bindModeHandler"];
+
+  setAppState: App["setAppState"];
 };
 
 export type PointerDownState = Readonly<{
