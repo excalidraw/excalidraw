@@ -44,6 +44,7 @@ import {
 
 import {
   isArrowElement,
+  isBindableElement,
   isBoundToContainer,
   isElbowArrow,
   isLinearElement,
@@ -1740,17 +1741,26 @@ export const actionToggleArrowMultiSelect = register<
   name: "toggleArrowMultiSelect",
   label: "labels.multiSelect",
   trackEvent: false,
-  perform: (_elements, appState, value) => {
+  perform: (elements, appState, value) => {
     const isArrowMultiSelectEnabled =
       value ?? !appState.isArrowMultiSelectEnabled;
+    const sourceElement =
+      appState.arrowMultiSelectSourceId &&
+      getNonDeletedElements(elements).find(
+        (element) => element.id === appState.arrowMultiSelectSourceId,
+      );
+    const arrowMultiSelectSourceId =
+      isArrowMultiSelectEnabled &&
+      sourceElement &&
+      isBindableElement(sourceElement, false)
+        ? sourceElement.id
+        : null;
 
     return {
       appState: {
         ...appState,
         isArrowMultiSelectEnabled,
-        arrowMultiSelectSourceId: isArrowMultiSelectEnabled
-          ? appState.arrowMultiSelectSourceId
-          : null,
+        arrowMultiSelectSourceId,
       },
       captureUpdate: CaptureUpdateAction.NEVER,
     };
@@ -1760,14 +1770,16 @@ export const actionToggleArrowMultiSelect = register<
     event.key.toLowerCase() === "m" &&
     !event.shiftKey &&
     !event.altKey,
-  predicate: (_elements, appState) =>
+  predicate: (elements, appState) =>
     appState.activeTool.type === "arrow" || appState.isArrowMultiSelectEnabled,
   PanelComponent: ({ appState, updateData }) => (
     <CheckboxItem
       checked={appState.isArrowMultiSelectEnabled}
-      onChange={(checked) => updateData(checked)}
+      onChange={(checked) =>
+        updateData<AppState["isArrowMultiSelectEnabled"]>(checked)
+      }
     >
-      {`${t("labels.multiSelect")} (${getShortcutKey("CtrlOrCmd+M")})`}
+      {`${t("labels.multiSelect")} (${getShortcutKey("Ctrl")})`}
     </CheckboxItem>
   ),
 });
