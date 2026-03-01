@@ -299,6 +299,8 @@ export type {
   SavedChats,
 } from "./components/TTDDialog/types";
 
+export type { CanvasNotification } from "./types";
+
 export { zoomToFitBounds } from "./actions/actionCanvas";
 export {
   getCommonBounds,

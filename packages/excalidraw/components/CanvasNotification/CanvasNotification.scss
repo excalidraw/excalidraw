@@ -1,0 +1,57 @@
+.excalidraw {
+  .canvas-notification {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    pointer-events: all;
+
+    background-color: var(--color-primary-hover);
+    color: var(--color-primary-light);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+
+    &__label {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      white-space: pre-wrap;
+      line-height: 1;
+    }
+
+    &__icon {
+      display: flex;
+      align-items: center;
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+
+    &__dismiss-btn {
+      all: unset;
+      cursor: pointer;
+      border-radius: 0.25rem;
+
+      &:hover {
+        background-color: var(--color-primary-darker);
+      }
+
+      &:active {
+        background-color: var(--color-primary-darkest);
+      }
+
+      svg {
+        display: block;
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+  }
+}

@@ -547,6 +547,14 @@ export type OnUserFollowedPayload = {
   action: "FOLLOW" | "UNFOLLOW";
 };
 
+export type CanvasNotification = {
+  label: string;
+  icon?: JSX.Element;
+  color?: string;
+  textColor?: string;
+  onDismiss?: () => void;
+};
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
@@ -642,6 +650,7 @@ export interface ExcalidrawProps {
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
+  canvasNotification?: CanvasNotification | null;
 }
 
 export type SceneData = {
