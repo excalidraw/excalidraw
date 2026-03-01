@@ -15,6 +15,8 @@ const DARK_MODE_COLORS_CACHE: Map<string, string> | null =
 
 const DARK_MODE_FILTER_INVERT_PERCENT = 93;
 const DARK_MODE_FILTER_HUE_ROTATE_DEGREES = 180 as Degrees;
+const DARK_MODE_FILTER_REVERSE_HUE_ROTATE_DEGREES =
+  -DARK_MODE_FILTER_HUE_ROTATE_DEGREES as Degrees;
 
 function cssHueRotate(
   red: number,
@@ -160,7 +162,7 @@ export const removeDarkModeFilter = (color: string): string => {
     rgb.r,
     rgb.g,
     rgb.b,
-    -DARK_MODE_FILTER_HUE_ROTATE_DEGREES,
+    DARK_MODE_FILTER_REVERSE_HUE_ROTATE_DEGREES,
   );
   const restored = cssInvertInverse(
     rotatedBack.r,
