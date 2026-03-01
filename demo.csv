@@ -1,0 +1,11 @@
+id,name,email,department,role
+1,Alice Chen,alice@example.com,Engineering,Developer
+2,Bob Smith,bob@example.com,Design,Designer
+3,Carol Davis,carol@example.com,Product,PM
+4,David Lee,david@example.com,Engineering,DevOps
+5,Eve Wilson,eve@example.com,Marketing,Content
+6,Frank Brown,frank@example.com,Sales,Account Manager
+7,Grace Kim,grace@example.com,Engineering,Developer
+8,Henry Taylor,henry@example.com,Support,Customer Success
+9,Iris Martinez,iris@example.com,Design,UX Researcher
+10,Jack Anderson,jack@example.com,Product,Analyst
