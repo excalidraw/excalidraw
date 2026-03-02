@@ -1,5 +1,5 @@
 // define `EXCALIDRAW_ASSET_PATH` as a SSOT
-const OSS_FONTS_CDN = "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/oss/";
+const OSS_FONTS_CDN = "/";
 const OSS_FONTS_FALLBACK = "/";
 
 /**
@@ -9,6 +9,7 @@ const OSS_FONTS_FALLBACK = "/";
  */
 module.exports.woff2BrowserPlugin = () => {
   let isDev;
+  let isActive = false;
 
   return {
     name: "woff2BrowserPlugin",
@@ -19,7 +20,7 @@ module.exports.woff2BrowserPlugin = () => {
     transform(code, id) {
       // using copy / replace as fonts defined in the `.css` don't have to be manually copied over (vite/rollup does this automatically),
       // but at the same time can't be easily prefixed with the `EXCALIDRAW_ASSET_PATH` only for the `excalidraw-app`
-      if (!isDev && id.endsWith("/excalidraw/fonts/fonts.css")) {
+      if (!isDev && isActive && id.endsWith("/excalidraw/fonts/fonts.css")) {
         return `/* WARN: The following content is generated during excalidraw-app build */
 
       @font-face {
@@ -63,7 +64,7 @@ module.exports.woff2BrowserPlugin = () => {
       }`;
       }
 
-      if (!isDev && id.endsWith("excalidraw-app/index.html")) {
+      if (!isDev && isActive && id.endsWith("excalidraw-app/index.html")) {
         return code.replace(
           "<!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->",
           `<script>
