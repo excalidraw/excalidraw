@@ -12,11 +12,13 @@ import {
   saveFilesToHttpStorage,
   saveToHttpStorage,
 } from "./httpStorage";
+
 import type { StorageBackend } from "./StorageBackend";
 
 const firebaseStorage: StorageBackend = {
   isSaved: isSavedToFirebase,
-  saveToStorageBackend: saveToFirebase,
+  saveToStorageBackend:
+    saveToFirebase as unknown as StorageBackend["saveToStorageBackend"],
   loadFromStorageBackend: loadFromFirebase,
   saveFilesToStorageBackend: saveFilesToFirebase,
   loadFilesFromStorageBackend: loadFilesFromFirebase,

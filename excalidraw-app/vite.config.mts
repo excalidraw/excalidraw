@@ -20,6 +20,12 @@ export default defineConfig(({ mode }) => {
       host: true, // listen on all addresses
       // open the browser
       open: false,
+      proxy: {
+        "/api": {
+          target: "http://excalidraw-storage-backend:8080",
+          changeOrigin: true,
+        },
+      },
     },
     // We need to specify the envDir since now there are no
     //more located in parallel with the vite.config.ts file but in parent dir
@@ -207,7 +213,6 @@ export default defineConfig(({ mode }) => {
               },
             },
           ],
-          maximumFileSizeToCacheInBytes: 2.3 * 1024 ** 2, // 2.3MB
         },
         manifest: {
           short_name: "Excalidraw",

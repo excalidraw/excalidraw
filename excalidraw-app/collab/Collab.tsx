@@ -31,6 +31,8 @@ import { PureComponent } from "react";
 
 import { bumpElementVersions } from "@excalidraw/excalidraw/data/restore";
 
+import { getStorageBackend, storageBackend } from "excalidraw-app/data/config";
+
 import type {
   ReconciledExcalidrawElement,
   RemoteExcalidrawElement,
@@ -74,13 +76,6 @@ import {
 } from "../data/FileManager";
 import { LocalData } from "../data/LocalData";
 import {
-  isSavedToFirebase,
-  loadFilesFromFirebase,
-  loadFromFirebase,
-  saveFilesToFirebase,
-  saveToFirebase,
-} from "../data/firebase";
-import {
   importUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
 } from "../data/localStorage";
@@ -93,7 +88,6 @@ import type {
   SocketUpdateDataSource,
   SyncableExcalidrawElement,
 } from "../data";
-import { getStorageBackend } from "excalidraw-app/data/config";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const isCollaboratingAtom = atom(false);
@@ -313,7 +307,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     if (
       this.isCollaborating() &&
       (this.fileManager.shouldPreventUnload(syncableElements) ||
-        !isSavedToFirebase(this.portal, syncableElements))
+        !storageBackend?.isSaved(this.portal, syncableElements))
     ) {
       // this won't run in time if user decides to leave the site, but
       //  the purpose is to run in immediately after user decides to stay
@@ -349,7 +343,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           this.canPersistToBackend = true;
         }
 
-        this.handleRemoteSceneUpdate(this._reconcileElements(storedElements));
+        this.handleRemoteSceneUpdate(
+          this._reconcileElements(
+            storedElements as unknown as RemoteExcalidrawElement[],
+          ),
+        );
       }
     } catch (error: any) {
       const errorMessage = /is longer than.*?bytes/.test(error.message)
