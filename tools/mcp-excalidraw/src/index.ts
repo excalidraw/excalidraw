@@ -211,14 +211,27 @@ const parseFrames = (input: Buffer): string[] => {
   const messages: string[] = [];
 
   while (true) {
-    const headerEnd = frameBuffer.indexOf("\r\n\r\n");
+    const headerEndCrlf = frameBuffer.indexOf("\r\n\r\n");
+    const headerEndLf = frameBuffer.indexOf("\n\n");
+
+    let headerEnd = -1;
+    let separatorLength = 0;
+
+    if (headerEndCrlf >= 0 && (headerEndLf < 0 || headerEndCrlf <= headerEndLf)) {
+      headerEnd = headerEndCrlf;
+      separatorLength = 4;
+    } else if (headerEndLf >= 0) {
+      headerEnd = headerEndLf;
+      separatorLength = 2;
+    }
+
     if (headerEnd < 0) {
       break;
     }
 
     const headerText = frameBuffer.slice(0, headerEnd).toString("utf8");
     const contentLengthHeader = headerText
-      .split("\r\n")
+      .split(/\r?\n/)
       .find((line) => line.toLowerCase().startsWith("content-length:"));
 
     if (!contentLengthHeader) {
@@ -231,12 +244,14 @@ const parseFrames = (input: Buffer): string[] => {
       throw new Error("Invalid Content-Length value");
     }
 
-    const totalLength = headerEnd + 4 + contentLength;
+    const totalLength = headerEnd + separatorLength + contentLength;
     if (frameBuffer.length < totalLength) {
       break;
     }
 
-    const body = frameBuffer.slice(headerEnd + 4, totalLength).toString("utf8");
+    const body = frameBuffer
+      .slice(headerEnd + separatorLength, totalLength)
+      .toString("utf8");
     frameBuffer = frameBuffer.slice(totalLength);
     messages.push(body);
   }
