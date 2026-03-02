@@ -1,28 +1,33 @@
 import React from "react";
 import { vi } from "vitest";
+
+import { getLineHeightInPx } from "@excalidraw/element";
+
+import { KEYS, arrayToMap, getLineHeight } from "@excalidraw/common";
+
+import { getElementBounds } from "@excalidraw/element";
+
+import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
+
+import { Excalidraw } from "../index";
+
+import { API } from "./helpers/api";
+import { mockMermaidToExcalidraw } from "./helpers/mocks";
+import { Pointer, Keyboard } from "./helpers/ui";
 import {
   render,
   waitFor,
   GlobalTestState,
   unmountComponent,
 } from "./test-utils";
-import { Pointer, Keyboard } from "./helpers/ui";
-import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
-import { getLineHeightInPx } from "../element/textMeasurements";
-import { getElementBounds } from "../element";
+
 import type { NormalizedZoomValue } from "../types";
-import { API } from "./helpers/api";
-import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
-import { arrayToMap } from "../utils";
-import { mockMermaidToExcalidraw } from "./helpers/mocks";
-import { getLineHeight } from "../fonts";
 
 const { h } = window;
 
 const mouse = new Pointer("mouse");
 
-vi.mock("../keys.ts", async (importOriginal) => {
+vi.mock("@excalidraw/common", async (importOriginal) => {
   const module: any = await importOriginal();
   return {
     __esmodule: true,
@@ -299,6 +304,41 @@ describe("pasting & frames", () => {
       expect(h.elements.length).toBe(2);
       expect(h.elements[1].type).toBe(rect.type);
       expect(h.elements[1].frameId).toBe(frame.id);
+    });
+  });
+
+  it("should remove element from frame when pasted outside", async () => {
+    const frame = API.createElement({
+      type: "frame",
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    });
+    const rect = API.createElement({
+      type: "rectangle",
+      frameId: frame.id,
+      x: 10,
+      y: 10,
+      width: 50,
+      height: 50,
+    });
+
+    API.setElements([frame]);
+
+    const clipboardJSON = await serializeAsClipboardJSON({
+      elements: [rect],
+      files: null,
+    });
+
+    mouse.moveTo(150, 150);
+
+    pasteWithCtrlCmdV(clipboardJSON);
+
+    await waitFor(() => {
+      expect(h.elements.length).toBe(2);
+      expect(h.elements[1].type).toBe(rect.type);
+      expect(h.elements[1].frameId).toBe(null);
     });
   });
 

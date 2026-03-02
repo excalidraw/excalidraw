@@ -1,9 +1,11 @@
-import decodePng from "png-chunks-extract";
 import tEXt from "png-chunk-text";
 import encodePng from "png-chunks-encode";
-import { encode, decode } from "./encode";
-import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
+import decodePng from "png-chunks-extract";
+
+import { EXPORT_DATA_TYPES, MIME_TYPES } from "@excalidraw/common";
+
 import { blobToArrayBuffer } from "./blob";
+import { encode, decode } from "./encode";
 
 // -----------------------------------------------------------------------------
 // PNG

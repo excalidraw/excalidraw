@@ -1,19 +1,5 @@
-import { loadLibraryFromBlob } from "./blob";
-import type {
-  LibraryItems,
-  LibraryItem,
-  ExcalidrawImperativeAPI,
-  LibraryItemsSource,
-  LibraryItems_anyVersion,
-} from "../types";
-import { restoreLibraryItems } from "./restore";
-import type App from "../components/App";
-import { atom, editorJotaiStore } from "../editor-jotai";
-import type { ExcalidrawElement } from "../element/types";
-import { getCommonBoundingBox } from "../element/bounds";
-import { AbortError } from "../errors";
-import { t } from "../i18n";
 import { useEffect, useRef } from "react";
+
 import {
   URL_HASH_KEYS,
   URL_QUERY_KEYS,
@@ -21,20 +7,42 @@ import {
   EVENT,
   DEFAULT_SIDEBAR,
   LIBRARY_SIDEBAR_TAB,
-} from "../constants";
-import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
-import {
   arrayToMap,
   cloneJSON,
   preventUnload,
   promiseTry,
   resolvablePromise,
-} from "../utils";
-import type { MaybePromise } from "../utility-types";
-import { Emitter } from "../emitter";
-import { Queue } from "../queue";
-import { hashElementsVersion, hashString } from "../element";
-import { toValidURL } from "./url";
+  toValidURL,
+  Queue,
+  Emitter,
+} from "@excalidraw/common";
+
+import { hashElementsVersion, hashString } from "@excalidraw/element";
+
+import { getCommonBoundingBox } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { MaybePromise } from "@excalidraw/common/utility-types";
+
+import { atom, editorJotaiStore } from "../editor-jotai";
+
+import { AbortError } from "../errors";
+import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
+import { t } from "../i18n";
+
+import { loadLibraryFromBlob } from "./blob";
+import { restoreLibraryItems } from "./restore";
+
+import type App from "../components/App";
+
+import type {
+  LibraryItems,
+  LibraryItem,
+  ExcalidrawImperativeAPI,
+  LibraryItemsSource,
+  LibraryItems_anyVersion,
+} from "../types";
 
 /**
  * format: hostname or hostname/pathname
@@ -54,6 +62,7 @@ type LibraryUpdate = {
   deletedItems: Map<LibraryItem["id"], LibraryItem>;
   /** newly added items in the library */
   addedItems: Map<LibraryItem["id"], LibraryItem>;
+  updatedItems: Map<LibraryItem["id"], LibraryItem>;
 };
 
 // an object so that we can later add more properties to it without breaking,
@@ -162,6 +171,7 @@ const createLibraryUpdate = (
   const update: LibraryUpdate = {
     deletedItems: new Map<LibraryItem["id"], LibraryItem>(),
     addedItems: new Map<LibraryItem["id"], LibraryItem>(),
+    updatedItems: new Map<LibraryItem["id"], LibraryItem>(),
   };
 
   for (const item of prevLibraryItems) {
@@ -173,8 +183,11 @@ const createLibraryUpdate = (
   const prevItemsMap = arrayToMap(prevLibraryItems);
 
   for (const item of nextLibraryItems) {
-    if (!prevItemsMap.has(item.id)) {
+    const prevItem = prevItemsMap.get(item.id);
+    if (!prevItem) {
       update.addedItems.set(item.id, item);
+    } else if (getLibraryItemHash(prevItem) !== getLibraryItemHash(item)) {
+      update.updatedItems.set(item.id, item);
     }
   }
 
@@ -184,6 +197,7 @@ const createLibraryUpdate = (
 class Library {
   /** latest libraryItems */
   private currLibraryItems: LibraryItems = [];
+
   /** snapshot of library items since last onLibraryChange call */
   private prevLibraryItems = cloneLibraryItems(this.currLibraryItems);
 
@@ -577,12 +591,14 @@ class AdapterTransaction {
 let lastSavedLibraryItemsHash = 0;
 let librarySaveCounter = 0;
 
+const getLibraryItemHash = (item: LibraryItem) => {
+  return `${item.id}:${item.name || ""}:${hashElementsVersion(item.elements)}`;
+};
+
 export const getLibraryItemsHash = (items: LibraryItems) => {
   return hashString(
     items
-      .map((item) => {
-        return `${item.id}:${hashElementsVersion(item.elements)}`;
-      })
+      .map((item) => getLibraryItemHash(item))
       .sort()
       .join(),
   );
@@ -629,6 +645,13 @@ const persistLibraryUpdate = async (
           // in DB to preserve the ordering we do in editor (newly added
           // items are added to the beginning)
           addedItems.push(item);
+        }
+      }
+
+      // replace existing items with their updated versions
+      if (update.updatedItems) {
+        for (const [id, item] of update.updatedItems) {
+          nextLibraryItemsMap.set(id, item);
         }
       }
 

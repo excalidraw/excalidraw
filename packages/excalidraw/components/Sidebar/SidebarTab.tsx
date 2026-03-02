@@ -1,4 +1,5 @@
-import * as RadixTabs from "@radix-ui/react-tabs";
+import { Tabs as RadixTabs } from "radix-ui";
+
 import type { SidebarTabName } from "../../types";
 
 export const SidebarTab = ({

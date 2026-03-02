@@ -6,13 +6,46 @@ import React, {
   memo,
   useRef,
 } from "react";
-import type Library from "../data/library";
+
+import {
+  LIBRARY_DISABLED_TYPES,
+  randomId,
+  isShallowEqual,
+  KEYS,
+  isWritableElement,
+  addEventListener,
+  EVENT,
+  CLASSES,
+} from "@excalidraw/common";
+
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
+
+import { trackEvent } from "../analytics";
+import { useUIAppState } from "../context/ui-appState";
 import {
   distributeLibraryItemsOnSquareGrid,
   libraryItemsAtom,
 } from "../data/library";
+import { atom, useAtom } from "../editor-jotai";
 import { t } from "../i18n";
-import { randomId } from "../random";
+
+import { getSelectedElements } from "../scene";
+
+import {
+  useApp,
+  useAppProps,
+  useExcalidrawElements,
+  useExcalidrawSetAppState,
+} from "./App";
+import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
+import LibraryMenuItems from "./LibraryMenuItems";
+import Spinner from "./Spinner";
+
+import "./LibraryMenu.scss";
+
 import type {
   LibraryItems,
   LibraryItem,
@@ -20,27 +53,7 @@ import type {
   UIAppState,
   AppClassProperties,
 } from "../types";
-import LibraryMenuItems from "./LibraryMenuItems";
-import { trackEvent } from "../analytics";
-import { atom, useAtom } from "../editor-jotai";
-import Spinner from "./Spinner";
-import {
-  useApp,
-  useAppProps,
-  useExcalidrawElements,
-  useExcalidrawSetAppState,
-} from "./App";
-import { getSelectedElements } from "../scene";
-import { useUIAppState } from "../context/ui-appState";
-
-import "./LibraryMenu.scss";
-import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
-import type {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "../element/types";
-import { LIBRARY_DISABLED_TYPES } from "../constants";
-import { isShallowEqual } from "../utils";
+import type Library from "../data/library";
 
 export const isLibraryMenuOpenAtom = atom(false);
 
@@ -258,11 +271,52 @@ export const LibraryMenu = memo(() => {
   const memoizedLibrary = useMemo(() => app.library, [app.library]);
   const pendingElements = usePendingElementsMemo(appState, app);
 
+  useEffect(() => {
+    return addEventListener(
+      document,
+      EVENT.KEYDOWN,
+      (event) => {
+        if (event.key === KEYS.ESCAPE && event.target instanceof HTMLElement) {
+          const target = event.target;
+          if (target.closest(`.${CLASSES.SIDEBAR}`)) {
+            // stop propagation so that we don't prevent it downstream
+            // (default browser behavior is to clear search input on ESC)
+            if (selectedItems.length > 0) {
+              event.stopPropagation();
+              setSelectedItems([]);
+            } else if (
+              isWritableElement(target) &&
+              target instanceof HTMLInputElement &&
+              !target.value
+            ) {
+              event.stopPropagation();
+              // if search input empty -> close library
+              // (maybe not a good idea?)
+              setAppState({ openSidebar: null });
+              app.focusContainer();
+            }
+          } else if (selectedItems.length > 0) {
+            const { x, y } = app.lastViewportPosition;
+            const elementUnderCursor = document.elementFromPoint(x, y);
+            // also deselect elements if sidebar doesn't have focus but the
+            // cursor is over it
+            if (elementUnderCursor?.closest(`.${CLASSES.SIDEBAR}`)) {
+              event.stopPropagation();
+              setSelectedItems([]);
+            }
+          }
+        }
+      },
+      { capture: true },
+    );
+  }, [selectedItems, setAppState, app]);
+
   const onInsertLibraryItems = useCallback(
     (libraryItems: LibraryItems) => {
       onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
+      app.focusContainer();
     },
-    [onInsertElements],
+    [onInsertElements, app],
   );
 
   const deselectItems = useCallback(() => {

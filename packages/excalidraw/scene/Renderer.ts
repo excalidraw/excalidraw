@@ -1,17 +1,20 @@
-import { isElementInViewport } from "../element/sizeHelpers";
-import { isImageElement } from "../element/typeChecks";
+import { isElementInViewport } from "@excalidraw/element";
+
+import { memoize, toBrandedType } from "@excalidraw/common";
+
 import type {
   ExcalidrawElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
-} from "../element/types";
-import { renderInteractiveSceneThrottled } from "../renderer/interactiveScene";
+} from "@excalidraw/element/types";
+
+import type { Scene } from "@excalidraw/element";
+
 import { renderStaticSceneThrottled } from "../renderer/staticScene";
 
-import type { AppState } from "../types";
-import { memoize, toBrandedType } from "../utils";
-import type Scene from "./Scene";
 import type { RenderableElementsMap } from "./types";
+
+import type { AppState } from "../types";
 
 export class Renderer {
   private scene: Scene;
@@ -67,25 +70,14 @@ export class Renderer {
       elements,
       editingTextElement,
       newElementId,
-      pendingImageElementId,
     }: {
       elements: readonly NonDeletedExcalidrawElement[];
       editingTextElement: AppState["editingTextElement"];
       newElementId: ExcalidrawElement["id"] | undefined;
-      pendingImageElementId: AppState["pendingImageElementId"];
     }) => {
       const elementsMap = toBrandedType<RenderableElementsMap>(new Map());
 
       for (const element of elements) {
-        if (isImageElement(element)) {
-          if (
-            // => not placed on canvas yet (but in elements array)
-            pendingImageElementId === element.id
-          ) {
-            continue;
-          }
-        }
-
         if (newElementId === element.id) {
           continue;
         }
@@ -114,7 +106,6 @@ export class Renderer {
         width,
         editingTextElement,
         newElementId,
-        pendingImageElementId,
         // cache-invalidation nonce
         sceneNonce: _sceneNonce,
       }: {
@@ -129,7 +120,6 @@ export class Renderer {
         /** note: first render of newElement will always bust the cache
          * (we'd have to prefilter elements outside of this function) */
         newElementId: ExcalidrawElement["id"] | undefined;
-        pendingImageElementId: AppState["pendingImageElementId"];
         sceneNonce: ReturnType<InstanceType<typeof Scene>["getSceneNonce"]>;
       }) => {
         const elements = this.scene.getNonDeletedElements();
@@ -138,7 +128,6 @@ export class Renderer {
           elements,
           editingTextElement,
           newElementId,
-          pendingImageElementId,
         });
 
         const visibleElements = getVisibleCanvasElements({
@@ -160,7 +149,6 @@ export class Renderer {
   // NOTE Doesn't destroy everything (scene, rc, etc.) because it may not be
   // safe to break TS contract here (for upstream cases)
   public destroy() {
-    renderInteractiveSceneThrottled.cancel();
     renderStaticSceneThrottled.cancel();
     this.getRenderableElements.clear();
   }

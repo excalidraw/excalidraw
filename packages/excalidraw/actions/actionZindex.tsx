@@ -1,21 +1,24 @@
+import { KEYS, CODES, isDarwin } from "@excalidraw/common";
+
 import {
   moveOneLeft,
   moveOneRight,
   moveAllLeft,
   moveAllRight,
-} from "../zindex";
-import { KEYS, CODES } from "../keys";
-import { t } from "../i18n";
-import { getShortcutKey } from "../utils";
-import { register } from "./register";
+} from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
 import {
   BringForwardIcon,
   BringToFrontIcon,
   SendBackwardIcon,
   SendToBackIcon,
 } from "../components/icons";
-import { isDarwin } from "../constants";
-import { CaptureUpdateAction } from "../store";
+import { t } from "../i18n";
+import { getShortcutKey } from "../shortcut";
+
+import { register } from "./register";
 
 export const actionSendBackward = register({
   name: "sendBackward",
@@ -23,9 +26,9 @@ export const actionSendBackward = register({
   keywords: ["move down", "zindex", "layer"],
   icon: SendBackwardIcon,
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, value, app) => {
     return {
-      elements: moveOneLeft(elements, appState),
+      elements: moveOneLeft(elements, appState, app.scene),
       appState,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -53,9 +56,9 @@ export const actionBringForward = register({
   keywords: ["move up", "zindex", "layer"],
   icon: BringForwardIcon,
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, value, app) => {
     return {
-      elements: moveOneRight(elements, appState),
+      elements: moveOneRight(elements, appState, app.scene),
       appState,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };

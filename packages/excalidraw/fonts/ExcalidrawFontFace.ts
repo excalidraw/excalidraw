@@ -1,5 +1,5 @@
-import { promiseTry } from "../utils";
-import { LOCAL_FONT_PROTOCOL } from "./FontMetadata";
+import { promiseTry, LOCAL_FONT_PROTOCOL } from "@excalidraw/common";
+
 import { subsetWoff2GlyphsByCodepoints } from "../subset/subset-main";
 
 type DataURL = string;

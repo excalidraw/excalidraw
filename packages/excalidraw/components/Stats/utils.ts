@@ -1,28 +1,33 @@
-import type { Radians } from "@excalidraw/math";
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
+
 import {
-  bindOrUnbindLinearElements,
-  updateBoundElements,
-} from "../../element/binding";
-import { mutateElement } from "../../element/mutateElement";
-import { getBoundTextElement } from "../../element/textElement";
-import {
-  isFrameLikeElement,
-  isLinearElement,
-  isTextElement,
-} from "../../element/typeChecks";
-import type {
-  ElementsMap,
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-  NonDeletedSceneElementsMap,
-} from "../../element/types";
+  getBoundTextElement,
+  isBindingElement,
+  unbindBindingElement,
+} from "@excalidraw/element";
+import { isFrameLikeElement } from "@excalidraw/element";
+
 import {
   getSelectedGroupIds,
   getElementsInGroup,
   isInGroup,
-} from "../../groups";
-import type Scene from "../../scene/Scene";
+} from "@excalidraw/element";
+
+import { getFrameChildren } from "@excalidraw/element";
+
+import { updateBindings } from "@excalidraw/element";
+import { DRAGGING_THRESHOLD } from "@excalidraw/common";
+
+import type { Radians } from "@excalidraw/math";
+
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
+
+import type { Scene } from "@excalidraw/element";
+
 import type { AppState } from "../../types";
 
 export type StatsInputProperty =
@@ -35,17 +40,12 @@ export type StatsInputProperty =
   | "gridStep";
 
 export const SMALLEST_DELTA = 0.01;
+export const STEP_SIZE = 10;
 
 export const isPropertyEditable = (
   element: ExcalidrawElement,
   property: keyof ExcalidrawElement,
 ) => {
-  if (property === "height" && isTextElement(element)) {
-    return false;
-  }
-  if (property === "width" && isTextElement(element)) {
-    return false;
-  }
   if (property === "angle" && isFrameLikeElement(element)) {
     return false;
   }
@@ -114,12 +114,27 @@ export const moveElement = (
   newTopLeftX: number,
   newTopLeftY: number,
   originalElement: ExcalidrawElement,
-  elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
   scene: Scene,
+  appState: AppState,
   originalElementsMap: ElementsMap,
   shouldInformMutation = true,
 ) => {
+  if (
+    isBindingElement(originalElement) &&
+    (originalElement.startBinding || originalElement.endBinding)
+  ) {
+    if (
+      Math.abs(newTopLeftX - originalElement.x) < DRAGGING_THRESHOLD &&
+      Math.abs(newTopLeftY - originalElement.y) < DRAGGING_THRESHOLD
+    ) {
+      return;
+    }
+
+    unbindBindingElement(originalElement, "start", scene);
+    unbindBindingElement(originalElement, "end", scene);
+  }
+
+  const elementsMap = scene.getNonDeletedElementsMap();
   const latestElement = elementsMap.get(originalElement.id);
   if (!latestElement) {
     return;
@@ -143,15 +158,15 @@ export const moveElement = (
     -originalElement.angle as Radians,
   );
 
-  mutateElement(
+  scene.mutateElement(
     latestElement,
     {
       x,
       y,
     },
-    shouldInformMutation,
+    { informMutation: shouldInformMutation, isDragging: false },
   );
-  updateBindings(latestElement, elementsMap, elements, scene);
+  updateBindings(latestElement, scene, appState);
 
   const boundTextElement = getBoundTextElement(
     originalElement,
@@ -160,14 +175,59 @@ export const moveElement = (
   if (boundTextElement) {
     const latestBoundTextElement = elementsMap.get(boundTextElement.id);
     latestBoundTextElement &&
-      mutateElement(
+      scene.mutateElement(
         latestBoundTextElement,
         {
           x: boundTextElement.x + changeInX,
           y: boundTextElement.y + changeInY,
         },
-        shouldInformMutation,
+        { informMutation: shouldInformMutation, isDragging: false },
       );
+  }
+
+  if (isFrameLikeElement(originalElement)) {
+    const originalChildren = getFrameChildren(
+      originalElementsMap,
+      originalElement.id,
+    );
+    originalChildren.forEach((child) => {
+      const latestChildElement = elementsMap.get(child.id);
+
+      if (!latestChildElement) {
+        return;
+      }
+
+      const [childCX, childCY] = [
+        child.x + child.width / 2,
+        child.y + child.height / 2,
+      ];
+      const [childTopLeftX, childTopLeftY] = pointRotateRads(
+        pointFrom(child.x, child.y),
+        pointFrom(childCX, childCY),
+        child.angle,
+      );
+
+      const childNewTopLeftX = Math.round(childTopLeftX + changeInX);
+      const childNewTopLeftY = Math.round(childTopLeftY + changeInY);
+
+      const [childX, childY] = pointRotateRads(
+        pointFrom(childNewTopLeftX, childNewTopLeftY),
+        pointFrom(childCX + changeInX, childCY + changeInY),
+        -child.angle as Radians,
+      );
+
+      scene.mutateElement(
+        latestChildElement,
+        {
+          x: childX,
+          y: childY,
+        },
+        { informMutation: shouldInformMutation, isDragging: false },
+      );
+      updateBindings(latestChildElement, scene, appState, {
+        simultaneouslyUpdated: originalChildren,
+      });
+    });
   }
 };
 
@@ -190,30 +250,4 @@ export const getAtomicUnits = (
       });
     });
   return _atomicUnits;
-};
-
-export const updateBindings = (
-  latestElement: ExcalidrawElement,
-  elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
-  scene: Scene,
-  options?: {
-    simultaneouslyUpdated?: readonly ExcalidrawElement[];
-    newSize?: { width: number; height: number };
-    zoom?: AppState["zoom"];
-  },
-) => {
-  if (isLinearElement(latestElement)) {
-    bindOrUnbindLinearElements(
-      [latestElement],
-      elementsMap,
-      elements,
-      scene,
-      true,
-      [],
-      options?.zoom,
-    );
-  } else {
-    updateBoundElements(latestElement, elementsMap, options);
-  }
 };

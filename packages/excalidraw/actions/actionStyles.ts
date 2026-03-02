@@ -1,30 +1,39 @@
 import {
-  isTextElement,
-  isExcalidrawElement,
-  redrawTextBoundingBox,
-} from "../element";
-import { CODES, KEYS } from "../keys";
-import { t } from "../i18n";
-import { register } from "./register";
-import { newElementWith } from "../element/mutateElement";
-import {
   DEFAULT_FONT_SIZE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
-} from "../constants";
-import { getBoundTextElement } from "../element/textElement";
+  CODES,
+  KEYS,
+  getLineHeight,
+} from "@excalidraw/common";
+
+import { newElementWith } from "@excalidraw/element";
+
 import {
   hasBoundTextElement,
   canApplyRoundnessTypeToElement,
   getDefaultRoundnessTypeForElement,
   isFrameLikeElement,
   isArrowElement,
-} from "../element/typeChecks";
-import { getSelectedElements } from "../scene";
-import type { ExcalidrawTextElement } from "../element/types";
+  isExcalidrawElement,
+  isTextElement,
+} from "@excalidraw/element";
+
+import {
+  getBoundTextElement,
+  redrawTextBoundingBox,
+} from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+
 import { paintIcon } from "../components/icons";
-import { CaptureUpdateAction } from "../store";
-import { getLineHeight } from "../fonts";
+
+import { t } from "../i18n";
+import { getSelectedElements } from "../scene";
+
+import { register } from "./register";
 
 // `copiedStyles` is exported only for tests.
 export let copiedStyles: string = "{}";
@@ -131,11 +140,8 @@ export const actionPasteStyles = register({
                     element.id === newElement.containerId,
                 ) || null;
             }
-            redrawTextBoundingBox(
-              newElement,
-              container,
-              app.scene.getNonDeletedElementsMap(),
-            );
+
+            redrawTextBoundingBox(newElement, container, app.scene);
           }
 
           if (

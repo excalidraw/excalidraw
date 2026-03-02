@@ -3,7 +3,7 @@
 All `props` are _optional_.
 
 | Name | Type | Default | Description |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| --- | --- | --- | --- |
 | [`initialData`](/docs/@excalidraw/excalidraw/api/props/initialdata) | `object` &#124; `null` &#124; <code>Promise<object &#124; null></code> | `null` | The initial data with which app loads. |
 | [`excalidrawAPI`](/docs/@excalidraw/excalidraw/api/props/excalidraw-api) | `function` | \_ | Callback triggered with the excalidraw api once rendered |
 | [`isCollaborating`](#iscollaborating) | `boolean` | \_ | This indicates if the app is in `collaboration` mode |
@@ -13,7 +13,7 @@ All `props` are _optional_.
 | [`onScrollChange`](#onscrollchange) | `function` | \_ | This prop if passed gets triggered when scrolling the canvas. |
 | [`onPaste`](#onpaste) | `function` | \_ | Callback to be triggered if passed when something is pasted into the scene |
 | [`onLibraryChange`](#onlibrarychange) | `function` | \_ | The callback if supplied is triggered when the library is updated and receives the library items. |
-| [`generateLinkForSelection`](#generateLinkForSelection) | `function` | \_ | Allows you to override `url` generation when linking to Excalidraw elements. |
+| [`generateLinkForSelection`](#generatelinkforselection) | `function` | \_ | Allows you to override `url` generation when linking to Excalidraw elements. |
 | [`onLinkOpen`](#onlinkopen) | `function` | \_ | The callback if supplied is triggered when any link is opened. |
 | [`langCode`](#langcode) | `string` | `en` | Language code string to be used in Excalidraw |
 | [`renderTopRightUI`](/docs/@excalidraw/excalidraw/api/props/render-props#rendertoprightui) | `function` | \_ | Render function that renders custom UI in top right corner |
@@ -29,8 +29,9 @@ All `props` are _optional_.
 | [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | `false` | Indicates whether to bind the keyboard events to document. |
 | [`autoFocus`](#autofocus) | `boolean` | `false` | Indicates whether to focus the Excalidraw component on page load |
 | [`generateIdForFile`](#generateidforfile) | `function` | \_ | Allows you to override `id` generation for files added on canvas |
-| [`validateEmbeddable`](#validateEmbeddable) | string[] | `boolean | RegExp | RegExp[] | ((link: string) => boolean | undefined)` | \_ | use for custom src url validation |
+| [`validateEmbeddable`](#validateembeddable) | `string[]` \| `boolean` \| `RegExp` \| `RegExp[]` \| <code>((link: string) => boolean &#124; undefined)</code> | \_ | use for custom src url validation |
 | [`renderEmbeddable`](/docs/@excalidraw/excalidraw/api/props/render-props#renderEmbeddable) | `function` | \_ | Render function that can override the built-in `<iframe>` |
+| [`renderScrollbars`] | `boolean`| | `false` | Indicates whether scrollbars will be shown
 
 ### Storing custom data on Excalidraw elements
 

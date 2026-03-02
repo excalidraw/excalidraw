@@ -1,12 +1,16 @@
+import { isEmbeddableElement } from "@excalidraw/element";
+
+import { KEYS } from "@excalidraw/common";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import { ToolButton } from "../components/ToolButton";
 import { getContextMenuLabel } from "../components/hyperlink/Hyperlink";
 import { LinkIcon } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
-import { isEmbeddableElement } from "../element/typeChecks";
 import { t } from "../i18n";
-import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../store";
-import { getShortcutKey } from "../utils";
+import { getShortcutKey } from "../shortcut";
+
 import { register } from "./register";
 
 export const actionLink = register({

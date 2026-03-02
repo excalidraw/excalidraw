@@ -20,6 +20,12 @@ export default defineConfig(({ mode }) => {
       host: true, // listen on all addresses
       // open the browser
       open: false,
+      proxy: {
+        "/api": {
+          target: "http://excalidraw-storage-backend:8080",
+          changeOrigin: true,
+        },
+      },
     },
     // We need to specify the envDir since now there are no
     //more located in parallel with the vite.config.ts file but in parent dir
@@ -30,28 +36,56 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: [
         {
+          find: /^@excalidraw\/common$/,
+          replacement: path.resolve(
+            __dirname,
+            "../packages/common/src/index.ts",
+          ),
+        },
+        {
+          find: /^@excalidraw\/common\/(.*?)/,
+          replacement: path.resolve(__dirname, "../packages/common/src/$1"),
+        },
+        {
+          find: /^@excalidraw\/element$/,
+          replacement: path.resolve(
+            __dirname,
+            "../packages/element/src/index.ts",
+          ),
+        },
+        {
+          find: /^@excalidraw\/element\/(.*?)/,
+          replacement: path.resolve(__dirname, "../packages/element/src/$1"),
+        },
+        {
           find: /^@excalidraw\/excalidraw$/,
-          replacement: path.resolve(__dirname, "../packages/excalidraw/index.tsx"),
+          replacement: path.resolve(
+            __dirname,
+            "../packages/excalidraw/index.tsx",
+          ),
         },
         {
           find: /^@excalidraw\/excalidraw\/(.*?)/,
           replacement: path.resolve(__dirname, "../packages/excalidraw/$1"),
         },
         {
-          find: /^@excalidraw\/utils$/,
-          replacement: path.resolve(__dirname, "../packages/utils/index.ts"),
-        },
-        {
-          find: /^@excalidraw\/utils\/(.*?)/,
-          replacement: path.resolve(__dirname, "../packages/utils/$1"),
-        },
-        {
           find: /^@excalidraw\/math$/,
-          replacement: path.resolve(__dirname, "../packages/math/index.ts"),
+          replacement: path.resolve(__dirname, "../packages/math/src/index.ts"),
         },
         {
           find: /^@excalidraw\/math\/(.*?)/,
-          replacement: path.resolve(__dirname, "../packages/math/$1"),
+          replacement: path.resolve(__dirname, "../packages/math/src/$1"),
+        },
+        {
+          find: /^@excalidraw\/utils$/,
+          replacement: path.resolve(
+            __dirname,
+            "../packages/utils/src/index.ts",
+          ),
+        },
+        {
+          find: /^@excalidraw\/utils\/(.*?)/,
+          replacement: path.resolve(__dirname, "../packages/utils/src/$1"),
         },
       ],
     },
@@ -79,6 +113,10 @@ export default defineConfig(({ mode }) => {
               const index = id.indexOf("locales/");
               // Taking the substring after "locales/"
               return `locales/${id.substring(index + 8)}`;
+            }
+
+            if (id.includes("@excalidraw/mermaid-to-excalidraw")) {
+              return "mermaid-to-excalidraw";
             }
           },
         },

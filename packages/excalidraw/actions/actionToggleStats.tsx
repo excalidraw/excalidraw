@@ -1,13 +1,15 @@
-import { register } from "./register";
-import { CODES, KEYS } from "../keys";
+import { CODES, KEYS } from "@excalidraw/common";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
 import { abacusIcon } from "../components/icons";
-import { CaptureUpdateAction } from "../store";
+
+import { register } from "./register";
 
 export const actionToggleStats = register({
   name: "stats",
   label: "stats.fullTitle",
   icon: abacusIcon,
-  paletteName: "Toggle stats",
   viewMode: true,
   trackEvent: { category: "menu" },
   keywords: ["edit", "attributes", "customize"],

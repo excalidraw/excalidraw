@@ -1,10 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
+import { getSceneVersion } from "@excalidraw/element";
+
 import { saveToHttpStorage } from "./httpStorage";
+
 import type Portal from "../collab/Portal";
 import type { Socket } from "socket.io-client";
 import type { SyncableExcalidrawElement } from ".";
 import type { AppState } from "../../packages/excalidraw/types";
-import { getSceneVersion } from "../../packages/excalidraw/element";
 
 // Mock environment variable
 vi.stubEnv("VITE_APP_HTTP_STORAGE_BACKEND_URL", "http://test-backend.local");

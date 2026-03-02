@@ -1,25 +1,56 @@
-import { Fragment, memo, useEffect, useRef, useState } from "react";
-import { collapseDownIcon, upIcon, searchIcon } from "./icons";
-import { TextField } from "./TextField";
-import { Button } from "./Button";
-import { useApp, useExcalidrawSetAppState } from "./App";
-import debounce from "lodash.debounce";
-import type { AppClassProperties } from "../types";
-import { isTextElement, newTextElement } from "../element";
-import type { ExcalidrawTextElement } from "../element/types";
-import { addEventListener, getFontString } from "../utils";
-import { KEYS } from "../keys";
+import { round } from "@excalidraw/math";
 import clsx from "clsx";
+import debounce from "lodash.debounce";
+import { Fragment, memo, useEffect, useMemo, useRef, useState } from "react";
+
+import {
+  CLASSES,
+  EVENT,
+  FONT_FAMILY,
+  FRAME_STYLE,
+  getLineHeight,
+} from "@excalidraw/common";
+
+import { isElementCompletelyInViewport } from "@excalidraw/element";
+
+import { measureText } from "@excalidraw/element";
+
+import {
+  KEYS,
+  randomInteger,
+  addEventListener,
+  getFontString,
+} from "@excalidraw/common";
+
+import { newTextElement } from "@excalidraw/element";
+import { isTextElement, isFrameLikeElement } from "@excalidraw/element";
+
+import { getDefaultFrameName } from "@excalidraw/element/frame";
+
+import type {
+  ExcalidrawFrameLikeElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
+
 import { atom, useAtom } from "../editor-jotai";
-import { t } from "../i18n";
-import { isElementCompletelyInViewport } from "../element/sizeHelpers";
-import { randomInteger } from "../random";
-import { CLASSES, EVENT } from "../constants";
+
 import { useStable } from "../hooks/useStable";
+import { t } from "../i18n";
+
+import { useApp, useExcalidrawSetAppState } from "./App";
+import { Button } from "./Button";
+import { TextField } from "./TextField";
+import {
+  collapseDownIcon,
+  upIcon,
+  searchIcon,
+  frameToolIcon,
+  TextIcon,
+} from "./icons";
 
 import "./SearchMenu.scss";
-import { round } from "@excalidraw/math";
-import { measureText } from "../element/textMeasurements";
+
+import type { AppClassProperties, SearchMatch } from "../types";
 
 const searchQueryAtom = atom<string>("");
 export const searchItemInFocusAtom = atom<number | null>(null);
@@ -27,7 +58,7 @@ export const searchItemInFocusAtom = atom<number | null>(null);
 const SEARCH_DEBOUNCE = 350;
 
 type SearchMatchItem = {
-  textElement: ExcalidrawTextElement;
+  element: ExcalidrawTextElement | ExcalidrawFrameLikeElement;
   searchQuery: SearchQuery;
   index: number;
   preview: {
@@ -36,12 +67,7 @@ type SearchMatchItem = {
     moreBefore: boolean;
     moreAfter: boolean;
   };
-  matchedLines: {
-    offsetX: number;
-    offsetY: number;
-    width: number;
-    height: number;
-  }[];
+  matchedLines: SearchMatch["matchedLines"];
 };
 
 type SearchMatches = {
@@ -89,11 +115,16 @@ export const SearchMenu = () => {
         searchedQueryRef.current = searchQuery;
         lastSceneNonceRef.current = app.scene.getSceneNonce();
         setAppState({
-          searchMatches: matchItems.map((searchMatch) => ({
-            id: searchMatch.textElement.id,
-            focus: false,
-            matchedLines: searchMatch.matchedLines,
-          })),
+          searchMatches: matchItems.length
+            ? {
+                focusedId: null,
+                matches: matchItems.map((searchMatch) => ({
+                  id: searchMatch.element.id,
+                  focus: false,
+                  matchedLines: searchMatch.matchedLines,
+                })),
+              }
+            : null,
         });
       });
     }
@@ -135,13 +166,25 @@ export const SearchMenu = () => {
 
   useEffect(() => {
     setAppState((state) => {
+      if (!state.searchMatches) {
+        return null;
+      }
+
+      const focusedId =
+        focusIndex !== null
+          ? state.searchMatches?.matches[focusIndex]?.id || null
+          : null;
+
       return {
-        searchMatches: state.searchMatches.map((match, index) => {
-          if (index === focusIndex) {
-            return { ...match, focus: true };
-          }
-          return { ...match, focus: false };
-        }),
+        searchMatches: {
+          focusedId,
+          matches: state.searchMatches.matches.map((match, index) => {
+            if (index === focusIndex) {
+              return { ...match, focus: true };
+            }
+            return { ...match, focus: false };
+          }),
+        },
       };
     });
   }, [focusIndex, setAppState]);
@@ -155,17 +198,21 @@ export const SearchMenu = () => {
 
         const matchAsElement = newTextElement({
           text: match.searchQuery,
-          x: match.textElement.x + (match.matchedLines[0]?.offsetX ?? 0),
-          y: match.textElement.y + (match.matchedLines[0]?.offsetY ?? 0),
+          x: match.element.x + (match.matchedLines[0]?.offsetX ?? 0),
+          y: match.element.y + (match.matchedLines[0]?.offsetY ?? 0),
           width: match.matchedLines[0]?.width,
           height: match.matchedLines[0]?.height,
-          fontSize: match.textElement.fontSize,
-          fontFamily: match.textElement.fontFamily,
+          fontSize: isFrameLikeElement(match.element)
+            ? FRAME_STYLE.nameFontSize
+            : match.element.fontSize,
+          fontFamily: isFrameLikeElement(match.element)
+            ? FONT_FAMILY.Assistant
+            : match.element.fontFamily,
         });
 
         const FONT_SIZE_LEGIBILITY_THRESHOLD = 14;
 
-        const fontSize = match.textElement.fontSize;
+        const fontSize = matchAsElement.fontSize;
         const isTextTiny =
           fontSize * zoomValue < FONT_SIZE_LEGIBILITY_THRESHOLD;
 
@@ -219,7 +266,7 @@ export const SearchMenu = () => {
       searchedQueryRef.current = null;
       lastSceneNonceRef.current = undefined;
       setAppState({
-        searchMatches: [],
+        searchMatches: null,
       });
       setIsSearching(false);
     };
@@ -250,6 +297,10 @@ export const SearchMenu = () => {
         event.preventDefault();
         event.stopPropagation();
 
+        if (app.state.openDialog) {
+          return;
+        }
+
         if (!searchInputRef.current?.matches(":focus")) {
           if (app.state.openDialog) {
             setAppState({
@@ -258,10 +309,6 @@ export const SearchMenu = () => {
           }
           searchInputRef.current?.focus();
           searchInputRef.current?.select();
-        } else {
-          setAppState({
-            openSidebar: null,
-          });
         }
       }
 
@@ -322,11 +369,16 @@ export const SearchMenu = () => {
               searchedQueryRef.current = searchQuery;
               lastSceneNonceRef.current = app.scene.getSceneNonce();
               setAppState({
-                searchMatches: matchItems.map((searchMatch) => ({
-                  id: searchMatch.textElement.id,
-                  focus: false,
-                  matchedLines: searchMatch.matchedLines,
-                })),
+                searchMatches: matchItems.length
+                  ? {
+                      focusedId: null,
+                      matches: matchItems.map((searchMatch) => ({
+                        id: searchMatch.element.id,
+                        focus: false,
+                        matchedLines: searchMatch.matchedLines,
+                      })),
+                    }
+                  : null,
               });
 
               setIsSearching(false);
@@ -433,17 +485,56 @@ interface MatchListProps {
 }
 
 const MatchListBase = (props: MatchListProps) => {
+  const frameNameMatches = useMemo(
+    () =>
+      props.matches.items.filter((match) => isFrameLikeElement(match.element)),
+    [props.matches],
+  );
+
+  const textMatches = useMemo(
+    () => props.matches.items.filter((match) => isTextElement(match.element)),
+    [props.matches],
+  );
+
   return (
-    <div className="layer-ui__search-result-container">
-      {props.matches.items.map((searchMatch, index) => (
-        <ListItem
-          key={searchMatch.textElement.id + searchMatch.index}
-          searchQuery={props.searchQuery}
-          preview={searchMatch.preview}
-          highlighted={index === props.focusIndex}
-          onClick={() => props.onItemClick(index)}
-        />
-      ))}
+    <div>
+      {frameNameMatches.length > 0 && (
+        <div className="layer-ui__search-result-container">
+          <div className="layer-ui__search-result-title">
+            <div className="title-icon">{frameToolIcon}</div>
+            <div>{t("search.frames")}</div>
+          </div>
+          {frameNameMatches.map((searchMatch, index) => (
+            <ListItem
+              key={searchMatch.element.id + searchMatch.index}
+              searchQuery={props.searchQuery}
+              preview={searchMatch.preview}
+              highlighted={index === props.focusIndex}
+              onClick={() => props.onItemClick(index)}
+            />
+          ))}
+
+          {textMatches.length > 0 && <div className="layer-ui__divider" />}
+        </div>
+      )}
+
+      {textMatches.length > 0 && (
+        <div className="layer-ui__search-result-container">
+          <div className="layer-ui__search-result-title">
+            <div className="title-icon">{TextIcon}</div>
+            <div>{t("search.texts")}</div>
+          </div>
+          {textMatches.map((searchMatch, index) => (
+            <ListItem
+              key={searchMatch.element.id + searchMatch.index}
+              searchQuery={props.searchQuery}
+              preview={searchMatch.preview}
+              highlighted={index + frameNameMatches.length === props.focusIndex}
+              onClick={() => props.onItemClick(index + frameNameMatches.length)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -578,12 +669,7 @@ const getMatchedLines = (
     index,
     index + searchQuery.length,
   );
-  const matchedLines: {
-    offsetX: number;
-    offsetY: number;
-    width: number;
-    height: number;
-  }[] = [];
+  const matchedLines: SearchMatch["matchedLines"] = [];
 
   for (const lineIndexRange of lineIndexRanges) {
     if (remainingQuery === "") {
@@ -643,6 +729,7 @@ const getMatchedLines = (
         offsetY,
         width,
         height,
+        showOnCanvas: true,
       });
 
       startIndex += matchCapacity;
@@ -650,6 +737,47 @@ const getMatchedLines = (
   }
 
   return matchedLines;
+};
+
+const getMatchInFrame = (
+  frame: ExcalidrawFrameLikeElement,
+  searchQuery: SearchQuery,
+  index: number,
+  zoomValue: number,
+): SearchMatch["matchedLines"] => {
+  const text = frame.name ?? getDefaultFrameName(frame);
+  const matchedText = text.slice(index, index + searchQuery.length);
+
+  const prefixText = text.slice(0, index);
+  const font = getFontString({
+    fontSize: FRAME_STYLE.nameFontSize,
+    fontFamily: FONT_FAMILY.Assistant,
+  });
+
+  const lineHeight = getLineHeight(FONT_FAMILY.Assistant);
+
+  const offset = measureText(prefixText, font, lineHeight);
+
+  // Correct non-zero width for empty string
+  if (prefixText === "") {
+    offset.width = 0;
+  }
+
+  const matchedMetrics = measureText(matchedText, font, lineHeight);
+
+  const offsetX = offset.width;
+  const offsetY = -offset.height - FRAME_STYLE.strokeWidth;
+  const width = matchedMetrics.width;
+
+  return [
+    {
+      offsetX,
+      offsetY,
+      width,
+      height: matchedMetrics.height,
+      showOnCanvas: offsetX + width <= frame.width * zoomValue,
+    },
+  ];
 };
 
 const escapeSpecialCharacters = (string: string) => {
@@ -672,9 +800,14 @@ const handleSearch = debounce(
       isTextElement(el),
     ) as ExcalidrawTextElement[];
 
-    texts.sort((a, b) => a.y - b.y);
+    const frames = elements.filter((el) =>
+      isFrameLikeElement(el),
+    ) as ExcalidrawFrameLikeElement[];
 
-    const matchItems: SearchMatchItem[] = [];
+    texts.sort((a, b) => a.y - b.y);
+    frames.sort((a, b) => a.y - b.y);
+
+    const textMatches: SearchMatchItem[] = [];
 
     const regex = new RegExp(escapeSpecialCharacters(searchQuery), "gi");
 
@@ -687,8 +820,35 @@ const handleSearch = debounce(
         const matchedLines = getMatchedLines(textEl, searchQuery, match.index);
 
         if (matchedLines.length > 0) {
-          matchItems.push({
-            textElement: textEl,
+          textMatches.push({
+            element: textEl,
+            searchQuery,
+            preview,
+            index: match.index,
+            matchedLines,
+          });
+        }
+      }
+    }
+
+    const frameMatches: SearchMatchItem[] = [];
+
+    for (const frame of frames) {
+      let match = null;
+      const name = frame.name ?? getDefaultFrameName(frame);
+
+      while ((match = regex.exec(name)) !== null) {
+        const preview = getMatchPreview(name, match.index, searchQuery);
+        const matchedLines = getMatchInFrame(
+          frame,
+          searchQuery,
+          match.index,
+          app.state.zoom.value,
+        );
+
+        if (matchedLines.length > 0) {
+          frameMatches.push({
+            element: frame,
             searchQuery,
             preview,
             index: match.index,
@@ -702,9 +862,12 @@ const handleSearch = debounce(
       app.visibleElements.map((visibleElement) => visibleElement.id),
     );
 
+    // putting frame matches first
+    const matchItems: SearchMatchItem[] = [...frameMatches, ...textMatches];
+
     const focusIndex =
       matchItems.findIndex((matchItem) =>
-        visibleIds.has(matchItem.textElement.id),
+        visibleIds.has(matchItem.element.id),
       ) ?? null;
 
     cb(matchItems, focusIndex);

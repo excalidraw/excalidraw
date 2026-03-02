@@ -1,7 +1,9 @@
 import React from "react";
-import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
-import CustomFooter from "./CustomFooter";
+
 import type * as TExcalidraw from "@excalidraw/excalidraw";
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+
+import CustomFooter from "./CustomFooter";
 
 const MobileFooter = ({
   excalidrawAPI,
@@ -10,10 +12,10 @@ const MobileFooter = ({
   excalidrawAPI: ExcalidrawImperativeAPI;
   excalidrawLib: typeof TExcalidraw;
 }) => {
-  const { useDevice, Footer } = excalidrawLib;
+  const { useEditorInterface, Footer } = excalidrawLib;
 
-  const device = useDevice();
-  if (device.editor.isMobile) {
+  const editorInterface = useEditorInterface();
+  if (editorInterface.formFactor === "phone") {
     return (
       <Footer>
         <CustomFooter

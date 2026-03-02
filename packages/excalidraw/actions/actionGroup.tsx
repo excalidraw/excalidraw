@@ -1,29 +1,9 @@
-import { KEYS } from "../keys";
-import { t } from "../i18n";
-import { arrayToMap, getShortcutKey } from "../utils";
-import { register } from "./register";
-import { UngroupIcon, GroupIcon } from "../components/icons";
-import { newElementWith } from "../element/mutateElement";
-import { isSomeElementSelected } from "../scene";
-import {
-  getSelectedGroupIds,
-  selectGroup,
-  selectGroupsForSelectedElements,
-  getElementsInGroup,
-  addToGroup,
-  removeFromSelectedGroups,
-  isElementInGroup,
-} from "../groups";
-import { getNonDeletedElements } from "../element";
-import { randomId } from "../random";
-import { ToolButton } from "../components/ToolButton";
-import type {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-  OrderedExcalidrawElement,
-} from "../element/types";
-import type { AppClassProperties, AppState } from "../types";
-import { isBoundToContainer } from "../element/typeChecks";
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import { newElementWith } from "@excalidraw/element";
+
+import { isBoundToContainer } from "@excalidraw/element";
+
 import {
   frameAndChildrenSelectedTogether,
   getElementsInResizingFrame,
@@ -32,9 +12,42 @@ import {
   groupByFrameLikes,
   removeElementsFromFrame,
   replaceAllElementsInFrame,
-} from "../frame";
-import { syncMovedIndices } from "../fractionalIndex";
-import { CaptureUpdateAction } from "../store";
+} from "@excalidraw/element";
+
+import { KEYS, randomId, arrayToMap } from "@excalidraw/common";
+
+import {
+  getSelectedGroupIds,
+  selectGroup,
+  selectGroupsForSelectedElements,
+  getElementsInGroup,
+  addToGroup,
+  removeFromSelectedGroups,
+  isElementInGroup,
+} from "@excalidraw/element";
+
+import { syncMovedIndices } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  OrderedExcalidrawElement,
+} from "@excalidraw/element/types";
+
+import { ToolButton } from "../components/ToolButton";
+import { UngroupIcon, GroupIcon } from "../components/icons";
+
+import { t } from "../i18n";
+
+import { isSomeElementSelected } from "../scene";
+
+import { getShortcutKey } from "../shortcut";
+
+import { register } from "./register";
+
+import type { AppClassProperties, AppState } from "../types";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {

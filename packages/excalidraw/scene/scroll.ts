@@ -1,15 +1,16 @@
-import type { AppState, Offsets, PointerCoords, Zoom } from "../types";
-import type { ExcalidrawElement } from "../element/types";
-import {
-  getCommonBounds,
-  getClosestElementBounds,
-  getVisibleElements,
-} from "../element";
-
+import { getVisibleElements } from "@excalidraw/element";
 import {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
-} from "../utils";
+} from "@excalidraw/common";
+
+import { getClosestElementBounds } from "@excalidraw/element";
+
+import { getCommonBounds } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { AppState, Offsets, PointerCoords, Zoom } from "../types";
 
 const isOutsideViewPort = (appState: AppState, cords: Array<number>) => {
   const [x1, y1, x2, y2] = cords;

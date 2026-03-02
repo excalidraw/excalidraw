@@ -1,5 +1,7 @@
-import { exportToCanvas } from "./scene/export";
 import { getDefaultAppState } from "./appState";
+import { exportToCanvas } from "./scene/export";
+
+const fs = require("fs");
 
 const { registerFont, createCanvas } = require("canvas");
 
@@ -74,7 +76,6 @@ const canvas = exportToCanvas(
   createCanvas,
 );
 
-const fs = require("fs");
 const out = fs.createWriteStream("test.png");
 const stream = (canvas as any).createPNGStream();
 stream.pipe(out);

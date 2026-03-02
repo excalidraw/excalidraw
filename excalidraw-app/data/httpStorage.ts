@@ -1,21 +1,28 @@
 // Inspired and partly copied from https://gitlab.com/kiliandeca/excalidraw-fork
 // MIT, Kilian Decaderincourt
 
-import type { SyncableExcalidrawElement } from ".";
-import { getSyncableElements } from ".";
-import { MIME_TYPES } from "../../packages/excalidraw/constants";
+import { MIME_TYPES } from "@excalidraw/common";
+
+import { getSceneVersion } from "@excalidraw/element";
+
+import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
+
 import { decompressData } from "../../packages/excalidraw/data/encode";
+
 import {
   encryptData,
   decryptData,
   IV_LENGTH_BYTES,
 } from "../../packages/excalidraw/data/encryption";
+
 import { restoreElements } from "../../packages/excalidraw/data/restore";
-import { getSceneVersion } from "../../packages/excalidraw/element";
-import type {
-  ExcalidrawElement,
-  FileId,
-} from "../../packages/excalidraw/element/types";
+
+import { reconcileElements } from "../../packages/excalidraw/data/reconcile";
+
+import { getSyncableElements } from ".";
+
+import type { SyncableExcalidrawElement } from ".";
+
 import type {
   AppState,
   BinaryFileData,
@@ -24,7 +31,7 @@ import type {
 } from "../../packages/excalidraw/types";
 import type Portal from "../collab/Portal";
 import type { RemoteExcalidrawElement } from "../../packages/excalidraw/data/reconcile";
-import { reconcileElements } from "../../packages/excalidraw/data/reconcile";
+
 import type { StoredScene } from "./StorageBackend";
 import type { Socket } from "socket.io-client";
 
@@ -216,7 +223,7 @@ export const saveFilesToHttpStorage = async ({
   await Promise.all(
     files.map(async ({ id, buffer }) => {
       try {
-        const payloadBlob = new Blob([buffer]);
+        const payloadBlob = new Blob([buffer as Uint8Array<ArrayBuffer>]);
         const payload = await new Response(payloadBlob).arrayBuffer();
         await fetch(`${HTTP_STORAGE_BACKEND_URL}/files/${id}`, {
           method: "PUT",
@@ -302,7 +309,11 @@ const decryptElements = async (
   data: StoredScene,
   roomKey: string,
 ): Promise<readonly ExcalidrawElement[]> => {
-  const decrypted = await decryptData(data.iv, data.ciphertext, roomKey);
+  const decrypted = await decryptData(
+    data.iv as Uint8Array<ArrayBuffer>,
+    data.ciphertext,
+    roomKey,
+  );
   const decodedData = new TextDecoder("utf-8").decode(
     new Uint8Array(decrypted),
   );

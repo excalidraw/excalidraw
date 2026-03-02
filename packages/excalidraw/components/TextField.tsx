@@ -1,4 +1,4 @@
-import type { KeyboardEvent } from "react";
+import clsx from "clsx";
 import {
   forwardRef,
   useRef,
@@ -6,11 +6,13 @@ import {
   useLayoutEffect,
   useState,
 } from "react";
-import clsx from "clsx";
 
-import "./TextField.scss";
 import { Button } from "./Button";
 import { eyeIcon, eyeClosedIcon } from "./icons";
+
+import "./TextField.scss";
+
+import type { KeyboardEvent } from "react";
 
 type TextFieldProps = {
   onChange?: (value: string) => void;
@@ -26,6 +28,7 @@ type TextFieldProps = {
   className?: string;
   placeholder?: string;
   isRedacted?: boolean;
+  type?: "text" | "search";
 } & ({ value: string } | { defaultValue: string });
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
@@ -41,6 +44,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       isRedacted = false,
       icon,
       className,
+      type,
       ...rest
     },
     ref,
@@ -94,6 +98,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             ref={innerRef}
             onChange={(event) => onChange?.(event.target.value)}
             onKeyDown={onKeyDown}
+            type={type}
           />
           {isRedacted && (
             <Button

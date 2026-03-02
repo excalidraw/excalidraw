@@ -27,5 +27,4 @@ dev-dist
 html
 meta*.json
 docker-compose.override.yml
-CLAUDE.md
-.claude/
+.claude

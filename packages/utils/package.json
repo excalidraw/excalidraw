@@ -2,18 +2,18 @@
   "name": "@excalidraw/utils",
   "version": "0.1.2",
   "type": "module",
-  "types": "./dist/types/utils/index.d.ts",
+  "types": "./dist/types/utils/src/index.d.ts",
   "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
   "exports": {
     ".": {
-      "types": "./dist/types/utils/index.d.ts",
+      "types": "./dist/types/utils/src/index.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
       "default": "./dist/prod/index.js"
     },
     "./*": {
-      "types": "./../utils/dist/types/utils/*"
+      "types": "./dist/types/utils/src/*.d.ts"
     }
   },
   "files": [
@@ -51,7 +51,6 @@
     "@braintree/sanitize-url": "6.0.2",
     "@excalidraw/laser-pointer": "1.3.1",
     "browser-fs-access": "0.29.1",
-    "open-color": "1.9.1",
     "pako": "2.0.3",
     "perfect-freehand": "1.2.0",
     "png-chunk-text": "1.0.0",
@@ -62,14 +61,14 @@
   "devDependencies": {
     "cross-env": "7.0.3",
     "fonteditor-core": "2.4.0",
-    "typescript": "4.9.4",
+    "typescript": "5.9.3",
     "wawoff2": "2.0.1",
     "which": "4.0.0"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
-    "gen:types": "rm -rf types && tsc",
-    "build:esm": "rm -rf dist && node ../../scripts/buildUtils.js && yarn gen:types"
+    "gen:types": "rimraf types && tsc",
+    "build:esm": "rimraf dist && node ../../scripts/buildUtils.js && yarn gen:types"
   }
 }

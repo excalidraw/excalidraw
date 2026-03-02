@@ -1,4 +1,4 @@
-@import "../css/variables.module.scss";
+@use "../css/variables.module" as *;
 
 // container in body where the actual tooltip is appended to
 .excalidraw-tooltip {
@@ -14,13 +14,13 @@
   pointer-events: none;
   word-wrap: break-word;
 
-  background: $oc-black;
+  background: #000;
 
   line-height: 1.5;
   text-align: center;
   font-size: 13px;
   font-weight: 500;
-  color: $oc-white;
+  color: #fff;
 
   display: none;
 

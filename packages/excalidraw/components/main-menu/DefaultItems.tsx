@@ -1,11 +1,43 @@
+import clsx from "clsx";
+
+import { THEME } from "@excalidraw/common";
+
+import type { Theme } from "@excalidraw/element/types";
+
+import {
+  actionClearCanvas,
+  actionLoadScene,
+  actionSaveToActiveFile,
+  actionShortcuts,
+  actionToggleGridMode,
+  actionToggleObjectsSnapMode,
+  actionToggleSearchMenu,
+  actionToggleStats,
+  actionToggleTheme,
+  actionToggleZenMode,
+} from "../../actions";
+import { actionToggleViewMode } from "../../actions/actionToggleViewMode";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
+import { trackEvent } from "../../analytics";
+import { useUIAppState } from "../../context/ui-appState";
+import { useSetAtom } from "../../editor-jotai";
 import { useI18n } from "../../i18n";
+import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import {
   useExcalidrawSetAppState,
   useExcalidrawActionManager,
   useExcalidrawElements,
   useAppProps,
+  useApp,
 } from "../App";
+import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
+import Trans from "../Trans";
+import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
+import DropdownMenuItemCheckbox from "../dropdownMenu/DropdownMenuItemCheckbox";
+import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
+import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
+import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";
+import { GithubIcon, DiscordIcon, XBrandIcon, settingsIcon } from "../icons";
 import {
   boltIcon,
   DeviceDesktopIcon,
@@ -20,27 +52,7 @@ import {
   TrashIcon,
   usersIcon,
 } from "../icons";
-import { GithubIcon, DiscordIcon, XBrandIcon } from "../icons";
-import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
-import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
-import {
-  actionClearCanvas,
-  actionLoadScene,
-  actionSaveToActiveFile,
-  actionShortcuts,
-  actionToggleSearchMenu,
-  actionToggleTheme,
-} from "../../actions";
-import clsx from "clsx";
-import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
-import { useSetAtom } from "../../editor-jotai";
-import { useUIAppState } from "../../context/ui-appState";
-import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
-import Trans from "../Trans";
-import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
-import { THEME } from "../../constants";
-import type { Theme } from "../../element/types";
-import { trackEvent } from "../../analytics";
+
 import "./DefaultItems.scss";
 
 export const LoadScene = () => {
@@ -302,10 +314,14 @@ export const ChangeCanvasBackground = () => {
     return null;
   }
   return (
-    <div style={{ marginTop: "0.5rem" }}>
+    <div style={{ marginTop: "0.75rem" }}>
       <div
         data-testid="canvas-background-label"
-        style={{ fontSize: ".75rem", marginBottom: ".5rem" }}
+        style={{
+          fontSize: "0.875rem",
+          marginBottom: "0.25rem",
+          marginLeft: "0.5rem",
+        }}
       >
         {t("labels.canvasBackground")}
       </div>
@@ -389,3 +405,152 @@ export const LiveCollaborationTrigger = ({
 };
 
 LiveCollaborationTrigger.displayName = "LiveCollaborationTrigger";
+
+const PreferencesToggleToolLockItem = () => {
+  const { t } = useI18n();
+  const app = useApp();
+  const appState = useUIAppState();
+
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.activeTool.locked}
+      shortcut={getShortcutFromShortcutName("toolLock")}
+      onSelect={(event) => {
+        app.toggleLock();
+        event.preventDefault();
+      }}
+    >
+      {t("labels.preferences_toolLock")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
+const PreferencesToggleSnapModeItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.objectsSnapModeEnabled}
+      shortcut={getShortcutFromShortcutName("objectsSnapMode")}
+      onSelect={(event) => {
+        actionManager.executeAction(actionToggleObjectsSnapMode);
+        event.preventDefault();
+      }}
+    >
+      {t("buttons.objectsSnapMode")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
+export const PreferencesToggleGridModeItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.gridModeEnabled}
+      shortcut={getShortcutFromShortcutName("gridMode")}
+      onSelect={(event) => {
+        actionManager.executeAction(actionToggleGridMode);
+        event.preventDefault();
+      }}
+    >
+      {t("labels.toggleGrid")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
+export const PreferencesToggleZenModeItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.zenModeEnabled}
+      shortcut={getShortcutFromShortcutName("zenMode")}
+      onSelect={(event) => {
+        actionManager.executeAction(actionToggleZenMode);
+        event.preventDefault();
+      }}
+    >
+      {t("buttons.zenMode")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
+const PreferencesToggleViewModeItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.viewModeEnabled}
+      shortcut={getShortcutFromShortcutName("viewMode")}
+      onSelect={(event) => {
+        actionManager.executeAction(actionToggleViewMode);
+        event.preventDefault();
+      }}
+    >
+      {t("labels.viewMode")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
+const PreferencesToggleElementPropertiesItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.stats.open}
+      shortcut={getShortcutFromShortcutName("stats")}
+      onSelect={(event) => {
+        actionManager.executeAction(actionToggleStats);
+        event.preventDefault();
+      }}
+    >
+      {t("stats.fullTitle")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
+export const Preferences = ({
+  children,
+  additionalItems,
+}: {
+  children?: React.ReactNode;
+  additionalItems?: React.ReactNode;
+}) => {
+  const { t } = useI18n();
+  return (
+    <DropdownMenuSub>
+      <DropdownMenuSub.Trigger icon={settingsIcon}>
+        {t("labels.preferences")}
+      </DropdownMenuSub.Trigger>
+      <DropdownMenuSub.Content className="excalidraw-main-menu-preferences-submenu">
+        {children || (
+          <>
+            <PreferencesToggleToolLockItem />
+            <PreferencesToggleSnapModeItem />
+            <PreferencesToggleGridModeItem />
+            <PreferencesToggleZenModeItem />
+            <PreferencesToggleViewModeItem />
+            <PreferencesToggleElementPropertiesItem />
+          </>
+        )}
+        {additionalItems}
+      </DropdownMenuSub.Content>
+    </DropdownMenuSub>
+  );
+};
+
+Preferences.ToggleToolLock = PreferencesToggleToolLockItem;
+Preferences.ToggleSnapMode = PreferencesToggleSnapModeItem;
+Preferences.ToggleGridMode = PreferencesToggleGridModeItem;
+Preferences.ToggleZenMode = PreferencesToggleZenModeItem;
+Preferences.ToggleViewMode = PreferencesToggleViewModeItem;
+Preferences.ToggleElementProperties = PreferencesToggleElementPropertiesItem;
+
+Preferences.displayName = "Preferences";

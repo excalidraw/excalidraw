@@ -10,6 +10,12 @@
  *   (localStorage, indexedDB).
  */
 
+import { clearAppStateForLocalStorage } from "@excalidraw/excalidraw/appState";
+import {
+  CANVAS_SEARCH_TAB,
+  DEFAULT_SIDEBAR,
+  debounce,
+} from "@excalidraw/common";
 import {
   createStore,
   entries,
@@ -19,31 +25,29 @@ import {
   setMany,
   get,
 } from "idb-keyval";
-import { clearAppStateForLocalStorage } from "@excalidraw/excalidraw/appState";
-import {
-  CANVAS_SEARCH_TAB,
-  DEFAULT_SIDEBAR,
-} from "@excalidraw/excalidraw/constants";
+
+import { appJotaiStore, atom } from "excalidraw-app/app-jotai";
+import { getNonDeletedElements } from "@excalidraw/element";
+
 import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
-import { clearElementsForLocalStorage } from "@excalidraw/excalidraw/element";
-import type {
-  ExcalidrawElement,
-  FileId,
-} from "@excalidraw/excalidraw/element/types";
+import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
 } from "@excalidraw/excalidraw/types";
-import type { MaybePromise } from "@excalidraw/excalidraw/utility-types";
-import { debounce } from "@excalidraw/excalidraw/utils";
+import type { MaybePromise } from "@excalidraw/common/utility-types";
+
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
+
 import { FileManager } from "./FileManager";
 import { Locker } from "./Locker";
 import { updateBrowserStateVersion } from "./tabSync";
 
 const filesStore = createStore("files-db", "files-store");
+
+export const localStorageQuotaExceededAtom = atom(false);
 
 class LocalFileManager extends FileManager {
   clearObsoleteFiles = async (opts: { currentFileIds: FileId[] }) => {
@@ -69,6 +73,9 @@ const saveDataStateToLocalStorage = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
+  const localStorageQuotaExceeded = appJotaiStore.get(
+    localStorageQuotaExceededAtom,
+  );
   try {
     const _appState = clearAppStateForLocalStorage(appState);
 
@@ -81,17 +88,27 @@ const saveDataStateToLocalStorage = (
 
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(clearElementsForLocalStorage(elements)),
+      JSON.stringify(getNonDeletedElements(elements)),
     );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
       JSON.stringify(_appState),
     );
     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
+    if (localStorageQuotaExceeded) {
+      appJotaiStore.set(localStorageQuotaExceededAtom, false);
+    }
   } catch (error: any) {
     // Unable to access window.localStorage
     console.error(error);
+    if (isQuotaExceededError(error) && !localStorageQuotaExceeded) {
+      appJotaiStore.set(localStorageQuotaExceededAtom, true);
+    }
   }
+};
+
+const isQuotaExceededError = (error: any) => {
+  return error instanceof DOMException && error.name === "QuotaExceededError";
 };
 
 type SavingLockTypes = "collaboration";

@@ -1,27 +1,39 @@
-import { ExportIcon, questionCircle, saveAs } from "../components/icons";
+import {
+  KEYS,
+  DEFAULT_EXPORT_PADDING,
+  EXPORT_SCALES,
+  THEME,
+} from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { Theme } from "@excalidraw/element/types";
+
+import { useEditorInterface } from "../components/App";
+import { CheckboxItem } from "../components/CheckboxItem";
+import { DarkModeToggle } from "../components/DarkModeToggle";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import { Tooltip } from "../components/Tooltip";
-import { DarkModeToggle } from "../components/DarkModeToggle";
+import { ExportIcon, questionCircle, saveAs } from "../components/icons";
 import { loadFromJSON, saveAsJSON } from "../data";
-import { resaveAsImageWithScene } from "../data/resave";
-import { t } from "../i18n";
-import { useDevice } from "../components/App";
-import { KEYS } from "../keys";
-import { register } from "./register";
-import { CheckboxItem } from "../components/CheckboxItem";
-import { getExportSize } from "../scene/export";
-import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, THEME } from "../constants";
-import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { getNonDeletedElements } from "../element";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
-import type { Theme } from "../element/types";
+import { resaveAsImageWithScene } from "../data/resave";
+
+import { t } from "../i18n";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
+import { getExportSize } from "../scene/export";
 
 import "../components/ToolIcon.scss";
-import { CaptureUpdateAction } from "../store";
 
-export const actionChangeProjectName = register({
+import { register } from "./register";
+
+import type { AppState } from "../types";
+
+export const actionChangeProjectName = register<AppState["name"]>({
   name: "changeProjectName",
   label: "labels.fileTitle",
   trackEvent: false,
@@ -41,7 +53,7 @@ export const actionChangeProjectName = register({
   ),
 });
 
-export const actionChangeExportScale = register({
+export const actionChangeExportScale = register<AppState["exportScale"]>({
   name: "changeExportScale",
   label: "imageExportDialog.scale",
   trackEvent: { category: "export", action: "scale" },
@@ -91,7 +103,9 @@ export const actionChangeExportScale = register({
   },
 });
 
-export const actionChangeExportBackground = register({
+export const actionChangeExportBackground = register<
+  AppState["exportBackground"]
+>({
   name: "changeExportBackground",
   label: "imageExportDialog.label.withBackground",
   trackEvent: { category: "export", action: "toggleBackground" },
@@ -111,7 +125,9 @@ export const actionChangeExportBackground = register({
   ),
 });
 
-export const actionChangeExportEmbedScene = register({
+export const actionChangeExportEmbedScene = register<
+  AppState["exportEmbedScene"]
+>({
   name: "changeExportEmbedScene",
   label: "imageExportDialog.tooltip.embedScene",
   trackEvent: { category: "export", action: "embedScene" },
@@ -232,7 +248,7 @@ export const actionSaveFileToDisk = register({
       icon={saveAs}
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
-      showAriaLabel={useDevice().editor.isMobile}
+      showAriaLabel={useEditorInterface().formFactor === "phone"}
       hidden={!nativeFileSystemSupported}
       onClick={() => updateData(null)}
       data-testid="save-as-button"
@@ -278,7 +294,9 @@ export const actionLoadScene = register({
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
 });
 
-export const actionExportWithDarkMode = register({
+export const actionExportWithDarkMode = register<
+  AppState["exportWithDarkMode"]
+>({
   name: "exportWithDarkMode",
   label: "imageExportDialog.label.darkMode",
   trackEvent: { category: "export", action: "toggleTheme" },
