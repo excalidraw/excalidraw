@@ -81,7 +81,6 @@ exports[`exportToSvg > with default arguments 1`] = `
     "type": "selection",
   },
   "previousSelectedElementIds": {},
-  "progressDialog": null,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,

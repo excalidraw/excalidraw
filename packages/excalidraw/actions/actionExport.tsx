@@ -1,4 +1,4 @@
-﻿import {
+import {
   KEYS,
   DEFAULT_EXPORT_PADDING,
   EXPORT_SCALES,
@@ -237,9 +237,6 @@ function prepareDataForJSONExport(
   const signal = abortController.signal;
 
   const dataPromise = new Promise<JSONExportData>(async (resolve) => {
-    const _elements: readonly ExcalidrawElement[] = elements;
-    const _appState: AppState = appState;
-
     try {
       if (app.props.onExport) {
         await handleOnExportResult(
@@ -277,8 +274,8 @@ function prepareDataForJSONExport(
     }
 
     resolve({
-      elements: _elements,
-      appState: _appState,
+      elements,
+      appState,
       // return latest files in case they finished loading during onExport
       files: app.files,
     });
