@@ -22,7 +22,6 @@ import {
   EVENT,
   THEME,
   VERSION_TIMEOUT,
-  VersionedSnapshotStore,
   debounce,
   getVersion,
   getFrame,
@@ -116,6 +115,7 @@ import {
 } from "./data";
 
 import { updateStaleImageStatuses } from "./data/FileManager";
+import { FileStatusStore } from "./data/fileStatusStore";
 import {
   importFromLocalStorage,
   importUsernameFromLocalStorage,
@@ -370,20 +370,6 @@ const initializeScene = async (opts: {
   return { scene: null, isExternalScene: false };
 };
 
-type ImageLoadingStatus = "loading" | "loaded" | "error";
-
-const getImagePendingCount = (statuses: Map<FileId, ImageLoadingStatus>) => {
-  let pending = 0;
-  let total = 0;
-  for (const status of statuses.values()) {
-    total++;
-    if (status === "loading") {
-      pending++;
-    }
-  }
-  return { pending, total };
-};
-
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
@@ -450,30 +436,6 @@ const ExcalidrawWrapper = () => {
   }, [excalidrawAPI]);
 
   // ---------------------------------------------------------------------------
-  // Image loading status tracking
-  // ---------------------------------------------------------------------------
-  const imageLoadingStatusStoreRef = useRef(
-    new VersionedSnapshotStore<Map<FileId, ImageLoadingStatus>>(new Map()),
-  );
-
-  const updateImageStatus = useCallback(
-    (updates: Array<[FileId, ImageLoadingStatus]>) => {
-      imageLoadingStatusStoreRef.current.update((prev) => {
-        let changed = false;
-        const next = new Map(prev);
-        for (const [id, status] of updates) {
-          if (next.get(id) !== status) {
-            next.set(id, status);
-            changed = true;
-          }
-        }
-        return changed ? next : prev;
-      });
-    },
-    [],
-  );
-
-  // ---------------------------------------------------------------------------
   // Hoisted loadImages
   // ---------------------------------------------------------------------------
   const loadImages = useCallback(
@@ -484,17 +446,6 @@ const ExcalidrawWrapper = () => {
 
       if (collabAPI?.isCollaborating()) {
         if (data.scene.elements) {
-          const fileIds = data.scene.elements.reduce((acc, element) => {
-            if (isInitializedImageElement(element)) {
-              acc.push(element.fileId);
-            }
-            return acc;
-          }, [] as FileId[]);
-
-          if (fileIds.length) {
-            updateImageStatus(fileIds.map((id) => [id, "loading"]));
-          }
-
           collabAPI
             .fetchImageFilesFromFirebase({
               elements: data.scene.elements,
@@ -507,14 +458,6 @@ const ExcalidrawWrapper = () => {
                 erroredFiles,
                 elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
               });
-              updateImageStatus([
-                ...loadedFiles.map(
-                  (f) => [f.id, "loaded"] as [FileId, "loaded"],
-                ),
-                ...[...erroredFiles.keys()].map(
-                  (id) => [id, "error"] as [FileId, "error"],
-                ),
-              ]);
             });
         }
       } else {
@@ -528,7 +471,10 @@ const ExcalidrawWrapper = () => {
 
         if (data.isExternalScene) {
           if (fileIds.length) {
-            updateImageStatus(fileIds.map((id) => [id, "loading"]));
+            // Direct Firebase call (not through FileManager), so track manually
+            FileStatusStore.updateStatuses(
+              fileIds.map((id) => [id, "loading"]),
+            );
           }
           loadFilesFromFirebase(
             `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
@@ -541,7 +487,7 @@ const ExcalidrawWrapper = () => {
               erroredFiles,
               elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
             });
-            updateImageStatus([
+            FileStatusStore.updateStatuses([
               ...loadedFiles.map((f) => [f.id, "loaded"] as [FileId, "loaded"]),
               ...[...erroredFiles.keys()].map(
                 (id) => [id, "error"] as [FileId, "error"],
@@ -550,7 +496,6 @@ const ExcalidrawWrapper = () => {
           });
         } else if (isInitialLoad) {
           if (fileIds.length) {
-            updateImageStatus(fileIds.map((id) => [id, "loading"]));
             LocalData.fileStorage
               .getFiles(fileIds)
               .then(async ({ loadedFiles, erroredFiles }) => {
@@ -562,15 +507,6 @@ const ExcalidrawWrapper = () => {
                   erroredFiles,
                   elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
                 });
-                // await new Promise((r) => setTimeout(r, 5500));
-                updateImageStatus([
-                  ...loadedFiles.map(
-                    (f) => [f.id, "loaded"] as [FileId, "loaded"],
-                  ),
-                  ...[...erroredFiles.keys()].map(
-                    (id) => [id, "error"] as [FileId, "error"],
-                  ),
-                ]);
               });
           }
           // on fresh load, clear unused files from IDB (from previous
@@ -581,7 +517,7 @@ const ExcalidrawWrapper = () => {
         }
       }
     },
-    [collabAPI, excalidrawAPI, updateImageStatus],
+    [collabAPI, excalidrawAPI],
   );
 
   useEffect(() => {
@@ -862,9 +798,10 @@ const ExcalidrawWrapper = () => {
   // ---------------------------------------------------------------------------
   const onExport: Required<ExcalidrawProps>["onExport"] = useCallback(
     async function* () {
-      const imageLoadingStatusStore = imageLoadingStatusStoreRef.current;
-      let snapshot = imageLoadingStatusStore.getSnapshot();
-      const { pending, total } = getImagePendingCount(snapshot.value);
+      let snapshot = FileStatusStore.getSnapshot();
+      const { pending, total } = FileStatusStore.getPendingCount(
+        snapshot.value,
+      );
       if (pending === 0) {
         return;
       }
@@ -878,10 +815,9 @@ const ExcalidrawWrapper = () => {
 
       // Wait for all pending images to finish
       while (true) {
-        snapshot = await imageLoadingStatusStore.pull(snapshot.version);
-        const { pending: nowPending, total: nowTotal } = getImagePendingCount(
-          snapshot.value,
-        );
+        snapshot = await FileStatusStore.pull(snapshot.version);
+        const { pending: nowPending, total: nowTotal } =
+          FileStatusStore.getPendingCount(snapshot.value);
 
         yield {
           type: "progress",
