@@ -32,9 +32,15 @@ const DEFAULT_ROOT = "/home/diplov/excalidraw/excalidraw-app";
 const selectedRoot = process.env.EXCALIDRAW_MCP_ROOT || DEFAULT_ROOT;
 const store = new SceneStore(selectedRoot);
 const registry = createToolRegistry(store);
+type WireMode = "unknown" | "header" | "line";
+let wireMode: WireMode = "unknown";
 
 const writeResponse = (payload: JsonRpcResponse): void => {
   const serialized = JSON.stringify(payload);
+  if (wireMode === "line") {
+    process.stdout.write(`${serialized}\n`);
+    return;
+  }
   const headers = `Content-Length: ${Buffer.byteLength(
     serialized,
     "utf8",
@@ -210,50 +216,96 @@ const parseFrames = (input: Buffer): string[] => {
   frameBuffer = Buffer.concat([frameBuffer, input]);
   const messages: string[] = [];
 
-  while (true) {
-    const headerEndCrlf = frameBuffer.indexOf("\r\n\r\n");
-    const headerEndLf = frameBuffer.indexOf("\n\n");
+  const parseHeaderFrames = () => {
+    while (true) {
+      const headerEndCrlf = frameBuffer.indexOf("\r\n\r\n");
+      const headerEndLf = frameBuffer.indexOf("\n\n");
 
-    let headerEnd = -1;
-    let separatorLength = 0;
+      let headerEnd = -1;
+      let separatorLength = 0;
 
-    if (headerEndCrlf >= 0 && (headerEndLf < 0 || headerEndCrlf <= headerEndLf)) {
-      headerEnd = headerEndCrlf;
-      separatorLength = 4;
-    } else if (headerEndLf >= 0) {
-      headerEnd = headerEndLf;
-      separatorLength = 2;
+      if (
+        headerEndCrlf >= 0 &&
+        (headerEndLf < 0 || headerEndCrlf <= headerEndLf)
+      ) {
+        headerEnd = headerEndCrlf;
+        separatorLength = 4;
+      } else if (headerEndLf >= 0) {
+        headerEnd = headerEndLf;
+        separatorLength = 2;
+      }
+
+      if (headerEnd < 0) {
+        break;
+      }
+
+      const headerText = frameBuffer.slice(0, headerEnd).toString("utf8");
+      const contentLengthHeader = headerText
+        .split(/\r?\n/)
+        .find((line) => line.toLowerCase().startsWith("content-length:"));
+
+      if (!contentLengthHeader) {
+        throw new Error("Missing Content-Length header");
+      }
+
+      const rawLength = contentLengthHeader.split(":")[1]?.trim();
+      const contentLength = rawLength ? Number.parseInt(rawLength, 10) : NaN;
+      if (!Number.isFinite(contentLength) || contentLength < 0) {
+        throw new Error("Invalid Content-Length value");
+      }
+
+      const totalLength = headerEnd + separatorLength + contentLength;
+      if (frameBuffer.length < totalLength) {
+        break;
+      }
+
+      const body = frameBuffer
+        .slice(headerEnd + separatorLength, totalLength)
+        .toString("utf8");
+      frameBuffer = frameBuffer.slice(totalLength);
+      messages.push(body);
+    }
+  };
+
+  const parseLineFrames = () => {
+    while (true) {
+      const lineEnd = frameBuffer.indexOf("\n");
+      if (lineEnd < 0) {
+        break;
+      }
+      const line = frameBuffer.slice(0, lineEnd).toString("utf8").trim();
+      frameBuffer = frameBuffer.slice(lineEnd + 1);
+      if (!line) {
+        continue;
+      }
+      messages.push(line);
     }
 
-    if (headerEnd < 0) {
-      break;
+    const leftover = frameBuffer.toString("utf8").trim();
+    if (leftover.startsWith("{") || leftover.startsWith("[")) {
+      try {
+        JSON.parse(leftover);
+        messages.push(leftover);
+        frameBuffer = Buffer.alloc(0);
+      } catch {
+        // wait for more data
+      }
     }
+  };
 
-    const headerText = frameBuffer.slice(0, headerEnd).toString("utf8");
-    const contentLengthHeader = headerText
-      .split(/\r?\n/)
-      .find((line) => line.toLowerCase().startsWith("content-length:"));
-
-    if (!contentLengthHeader) {
-      throw new Error("Missing Content-Length header");
+  if (wireMode === "unknown") {
+    const preview = frameBuffer.toString("utf8");
+    if (/^content-length\s*:/im.test(preview)) {
+      wireMode = "header";
+    } else if (preview.trimStart().startsWith("{")) {
+      wireMode = "line";
     }
+  }
 
-    const rawLength = contentLengthHeader.split(":")[1]?.trim();
-    const contentLength = rawLength ? Number.parseInt(rawLength, 10) : NaN;
-    if (!Number.isFinite(contentLength) || contentLength < 0) {
-      throw new Error("Invalid Content-Length value");
-    }
-
-    const totalLength = headerEnd + separatorLength + contentLength;
-    if (frameBuffer.length < totalLength) {
-      break;
-    }
-
-    const body = frameBuffer
-      .slice(headerEnd + separatorLength, totalLength)
-      .toString("utf8");
-    frameBuffer = frameBuffer.slice(totalLength);
-    messages.push(body);
+  if (wireMode === "header") {
+    parseHeaderFrames();
+  } else {
+    parseLineFrames();
   }
 
   return messages;
