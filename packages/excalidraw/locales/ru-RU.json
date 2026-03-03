@@ -177,7 +177,9 @@
     "tab": "Вкладка",
     "shapeSwitch": "Сменить форму",
     "preferences": "Настройки",
-    "preferences_toolLock": "Закрепить инструмент"
+    "preferences_toolLock": "Закрепить инструмент",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Ссылка на объект",
