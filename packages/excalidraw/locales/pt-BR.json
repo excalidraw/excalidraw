@@ -177,7 +177,9 @@
     "tab": "Aba",
     "shapeSwitch": "Trocar forma",
     "preferences": "Preferências",
-    "preferences_toolLock": "Bloqueio de ferramenta"
+    "preferences_toolLock": "Bloqueio de ferramenta",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Links para o objeto",
