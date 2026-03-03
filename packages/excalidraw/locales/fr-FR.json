@@ -177,7 +177,9 @@
     "tab": "Onglet",
     "shapeSwitch": "Changer de forme",
     "preferences": "Préférences",
-    "preferences_toolLock": "Verrouillage de l'outil"
+    "preferences_toolLock": "Verrouillage de l'outil",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Lien vers un objet",
