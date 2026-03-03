@@ -177,7 +177,9 @@
     "tab": "แท็บ",
     "shapeSwitch": "",
     "preferences": "การตั้งค่า",
-    "preferences_toolLock": ""
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "ลิงค์ไปสู่วัตถุ",
