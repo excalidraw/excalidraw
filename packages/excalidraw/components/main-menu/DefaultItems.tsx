@@ -9,7 +9,9 @@ import {
   actionLoadScene,
   actionSaveToActiveFile,
   actionShortcuts,
+  actionToggleArrowBinding,
   actionToggleGridMode,
+  actionToggleMidpointSnapping,
   actionToggleObjectsSnapMode,
   actionToggleSearchMenu,
   actionToggleStats,
@@ -443,6 +445,40 @@ const PreferencesToggleSnapModeItem = () => {
   );
 };
 
+const PreferencesToggleArrowBindingItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.bindingPreference === "enabled"}
+      onSelect={(event) => {
+        actionManager.executeAction(actionToggleArrowBinding);
+        event.preventDefault();
+      }}
+    >
+      {t("labels.arrowBinding")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
+const PreferencesToggleMidpointSnappingItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.isMidpointSnappingEnabled}
+      onSelect={(event) => {
+        actionManager.executeAction(actionToggleMidpointSnapping);
+        event.preventDefault();
+      }}
+    >
+      {t("labels.midpointSnapping")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
 export const PreferencesToggleGridModeItem = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -538,6 +574,8 @@ export const Preferences = ({
             <PreferencesToggleZenModeItem />
             <PreferencesToggleViewModeItem />
             <PreferencesToggleElementPropertiesItem />
+            <PreferencesToggleArrowBindingItem />
+            <PreferencesToggleMidpointSnappingItem />
           </>
         )}
         {additionalItems}
@@ -548,6 +586,8 @@ export const Preferences = ({
 
 Preferences.ToggleToolLock = PreferencesToggleToolLockItem;
 Preferences.ToggleSnapMode = PreferencesToggleSnapModeItem;
+Preferences.ToggleArrowBinding = PreferencesToggleArrowBindingItem;
+Preferences.ToggleMidpointSnapping = PreferencesToggleMidpointSnappingItem;
 Preferences.ToggleGridMode = PreferencesToggleGridModeItem;
 Preferences.ToggleZenMode = PreferencesToggleZenModeItem;
 Preferences.ToggleViewMode = PreferencesToggleViewModeItem;

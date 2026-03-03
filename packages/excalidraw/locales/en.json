@@ -177,7 +177,9 @@
     "tab": "Tab",
     "shapeSwitch": "Switch shape",
     "preferences": "Preferences",
-    "preferences_toolLock": "Tool lock"
+    "preferences_toolLock": "Tool lock",
+    "arrowBinding": "Arrow binding",
+    "midpointSnapping": "Snap to midpoints"
   },
   "elementLink": {
     "title": "Link to object",
