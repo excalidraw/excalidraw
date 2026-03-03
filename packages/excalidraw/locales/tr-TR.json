@@ -177,7 +177,9 @@
     "tab": "Sekme",
     "shapeSwitch": "Şekli başkasıyla değiştir",
     "preferences": "Tercihler",
-    "preferences_toolLock": "Aracı Kilitle"
+    "preferences_toolLock": "Aracı Kilitle",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Nesneye bağlantıla",
