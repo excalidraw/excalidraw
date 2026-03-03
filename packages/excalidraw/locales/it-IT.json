@@ -177,7 +177,9 @@
     "tab": "Scheda",
     "shapeSwitch": "Cambia forma",
     "preferences": "Preferenze",
-    "preferences_toolLock": "Blocco strumento"
+    "preferences_toolLock": "Blocco strumento",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Link all'oggetto",
