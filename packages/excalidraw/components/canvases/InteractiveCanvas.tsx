@@ -249,6 +249,7 @@ const getRelevantAppStateProps = (
   multiElement: appState.multiElement,
   newElement: appState.newElement,
   isBindingEnabled: appState.isBindingEnabled,
+  isMidpointSnappingEnabled: appState.isMidpointSnappingEnabled,
   suggestedBinding: appState.suggestedBinding,
   isRotating: appState.isRotating,
   elementsToHighlight: appState.elementsToHighlight,
