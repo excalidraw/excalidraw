@@ -90,7 +90,10 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
     it("checked() reflects the current bindingPreference value", () => {
       expect(actionToggleArrowBinding.checked!(h.state)).toBe(true);
 
-      API.setAppState({ bindingPreference: "disabled", isBindingEnabled: false });
+      API.setAppState({
+        bindingPreference: "disabled",
+        isBindingEnabled: false,
+      });
       expect(actionToggleArrowBinding.checked!(h.state)).toBe(false);
     });
 
@@ -102,7 +105,10 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
     });
 
     it("executing the action toggles binding from disabled → enabled", () => {
-      API.setAppState({ bindingPreference: "disabled", isBindingEnabled: false });
+      API.setAppState({
+        bindingPreference: "disabled",
+        isBindingEnabled: false,
+      });
 
       API.executeAction(actionToggleArrowBinding);
       expect(h.state.isBindingEnabled).toBe(true);
@@ -165,7 +171,10 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
         }),
       ]);
 
-      API.setAppState({ bindingPreference: "disabled", isBindingEnabled: false });
+      API.setAppState({
+        bindingPreference: "disabled",
+        isBindingEnabled: false,
+      });
 
       UI.clickTool("arrow");
       // Start inside the rectangle – binding is off, so no startBinding
@@ -193,7 +202,10 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
         }),
       ]);
 
-      API.setAppState({ bindingPreference: "disabled", isBindingEnabled: false });
+      API.setAppState({
+        bindingPreference: "disabled",
+        isBindingEnabled: false,
+      });
 
       UI.clickTool("arrow");
       // End inside the target rectangle – binding off -> no endBinding
@@ -371,7 +383,10 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
 
   describe("Ctrl key toggle when binding preference is disabled", () => {
     it("Ctrl keydown temporarily enables binding when preference is disabled", () => {
-      API.setAppState({ bindingPreference: "disabled", isBindingEnabled: false });
+      API.setAppState({
+        bindingPreference: "disabled",
+        isBindingEnabled: false,
+      });
 
       ctrlKeyDown();
 
@@ -379,7 +394,10 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
     });
 
     it("Ctrl keyup restores isBindingEnabled to false after the temporary toggle", () => {
-      API.setAppState({ bindingPreference: "disabled", isBindingEnabled: false });
+      API.setAppState({
+        bindingPreference: "disabled",
+        isBindingEnabled: false,
+      });
 
       ctrlKeyDown();
       expect(h.state.isBindingEnabled).toBe(true);
@@ -389,7 +407,10 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
     });
 
     it("full round-trip: off → Ctrl down → on → Ctrl up → off", () => {
-      API.setAppState({ bindingPreference: "disabled", isBindingEnabled: false });
+      API.setAppState({
+        bindingPreference: "disabled",
+        isBindingEnabled: false,
+      });
 
       ctrlKeyDown();
       expect(h.state.isBindingEnabled).toBe(true);
@@ -399,7 +420,10 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
     });
 
     it("full round-trip can be repeated after Ctrl release resets state", () => {
-      API.setAppState({ bindingPreference: "disabled", isBindingEnabled: false });
+      API.setAppState({
+        bindingPreference: "disabled",
+        isBindingEnabled: false,
+      });
 
       // First cycle
       ctrlKeyDown();
@@ -440,7 +464,10 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
 
   describe("event.repeat guard", () => {
     it("Ctrl keydown with repeat=true does not toggle binding (preference: disabled)", () => {
-      API.setAppState({ bindingPreference: "disabled", isBindingEnabled: false });
+      API.setAppState({
+        bindingPreference: "disabled",
+        isBindingEnabled: false,
+      });
 
       ctrlKeyDown({ repeat: true });
 
@@ -484,7 +511,11 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
 
   describe("View-mode guard", () => {
     it("Ctrl keydown in viewMode does not toggle isBindingEnabled", () => {
-      API.setAppState({ bindingPreference: "disabled", isBindingEnabled: false, viewModeEnabled: true });
+      API.setAppState({
+        bindingPreference: "disabled",
+        isBindingEnabled: false,
+        viewModeEnabled: true,
+      });
 
       ctrlKeyDown();
 
