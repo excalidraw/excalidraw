@@ -177,7 +177,9 @@
     "tab": "Tab",
     "shapeSwitch": "Wybór kształtu",
     "preferences": "",
-    "preferences_toolLock": ""
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Link do obiektu",
