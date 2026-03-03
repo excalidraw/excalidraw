@@ -177,7 +177,9 @@
     "tab": "Tab",
     "shapeSwitch": "切換形狀",
     "preferences": "偏好設定",
-    "preferences_toolLock": "鎖定工具"
+    "preferences_toolLock": "鎖定工具",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "連結至物件",
