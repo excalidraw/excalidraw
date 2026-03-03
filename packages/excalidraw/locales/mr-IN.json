@@ -177,7 +177,9 @@
     "tab": "",
     "shapeSwitch": "",
     "preferences": "",
-    "preferences_toolLock": ""
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "वस्तू ह्याचा दुवा",
