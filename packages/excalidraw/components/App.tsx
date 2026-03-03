@@ -642,7 +642,6 @@ class App extends React.Component<AppProps, AppState> {
   private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
-  private bindingEnabledBeforeCtrl: boolean | null = null;
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
@@ -2734,7 +2733,9 @@ class App extends React.Component<AppProps, AppState> {
 
   private onBlur = withBatchedUpdates(() => {
     isHoldingSpace = false;
-    this.setState({ isBindingEnabled: true });
+    this.setState({
+      isBindingEnabled: this.state.bindingPreference === "enabled",
+    });
   });
 
   private onUnload = () => {
@@ -4937,11 +4938,10 @@ class App extends React.Component<AppProps, AppState> {
           this.resetDelayedBindMode();
         }
 
-        if (this.bindingEnabledBeforeCtrl === null) {
-          this.bindingEnabledBeforeCtrl = this.state.isBindingEnabled;
-        }
         flushSync(() => {
-          this.setState({ isBindingEnabled: !this.bindingEnabledBeforeCtrl });
+          this.setState({
+            isBindingEnabled: this.state.bindingPreference !== "enabled",
+          });
         });
 
         maybeHandleArrowPointlikeDrag({ app: this, event });
@@ -5215,12 +5215,13 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
     }
-    if (!event[KEYS.CTRL_OR_CMD] && this.bindingEnabledBeforeCtrl !== null) {
-      const restore = this.bindingEnabledBeforeCtrl;
-      this.bindingEnabledBeforeCtrl = null;
-      flushSync(() => {
-        this.setState({ isBindingEnabled: restore });
-      });
+    if (!event[KEYS.CTRL_OR_CMD]) {
+      const preferenceEnabled = this.state.bindingPreference === "enabled";
+      if (this.state.isBindingEnabled !== preferenceEnabled) {
+        flushSync(() => {
+          this.setState({ isBindingEnabled: preferenceEnabled });
+        });
+      }
 
       maybeHandleArrowPointlikeDrag({ app: this, event });
     }
@@ -7138,13 +7139,12 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
-    // If a previous Ctrl-key action (keydown toggle or handleLinearElement
-    // pointer-down) temporarily changed isBindingEnabled and the Ctrl key is no
-    // longer held on this pointer-down, restore the original value now.
-    if (!event.ctrlKey && this.bindingEnabledBeforeCtrl !== null) {
-      const restore = this.bindingEnabledBeforeCtrl;
-      this.bindingEnabledBeforeCtrl = null;
-      this.setState({ isBindingEnabled: restore });
+    // If Ctrl is not held, ensure isBindingEnabled reflects the user preference.
+    if (!event.ctrlKey) {
+      const preferenceEnabled = this.state.bindingPreference === "enabled";
+      if (this.state.isBindingEnabled !== preferenceEnabled) {
+        this.setState({ isBindingEnabled: preferenceEnabled });
+      }
     }
 
     const scenePointer = viewportCoordsToSceneCoords(event, this.state);
@@ -7589,10 +7589,11 @@ class App extends React.Component<AppProps, AppState> {
     this.removePointer(event);
     this.lastPointerUpEvent = event;
 
-    if (!event.ctrlKey && this.bindingEnabledBeforeCtrl !== null) {
-      const restore = this.bindingEnabledBeforeCtrl;
-      this.bindingEnabledBeforeCtrl = null;
-      this.setState({ isBindingEnabled: restore });
+    if (!event.ctrlKey) {
+      const preferenceEnabled = this.state.bindingPreference === "enabled";
+      if (this.state.isBindingEnabled !== preferenceEnabled) {
+        this.setState({ isBindingEnabled: preferenceEnabled });
+      }
     }
 
     const scenePointer = viewportCoordsToSceneCoords(
@@ -8649,14 +8650,10 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): void => {
     if (event.ctrlKey) {
-      // Capture the current value so it can be restored when Ctrl is released
-      // (via onKeyUp) or on the next non-Ctrl pointer-down (via
-      // handleCanvasPointerDown), matching the keydown-toggle mechanism.
-      if (this.bindingEnabledBeforeCtrl === null) {
-        this.bindingEnabledBeforeCtrl = this.state.isBindingEnabled;
-      }
       flushSync(() => {
-        this.setState({ isBindingEnabled: false });
+        this.setState({
+          isBindingEnabled: this.state.bindingPreference !== "enabled",
+        });
       });
     }
 

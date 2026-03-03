@@ -1370,6 +1370,7 @@ export const bindPointToSnapToElementOutline = (
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
   customIntersector?: LineSegment<GlobalPoint>,
+  isMidpointSnappingEnabled = true,
 ): GlobalPoint => {
   const elbowed = isElbowArrow(arrowElement);
   const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
@@ -1409,13 +1410,9 @@ export const bindPointToSnapToElementOutline = (
     const isHorizontal = headingIsHorizontal(
       headingForPointFromElement(bindableElement, aabb, point),
     );
-    const snapPoint = snapToMid(
-      bindableElement,
-      elementsMap,
-      edgePoint,
-      0.05,
-      arrowElement,
-    );
+    const snapPoint = isMidpointSnappingEnabled
+      ? snapToMid(bindableElement, elementsMap, edgePoint, 0.05, arrowElement)
+      : undefined;
     const resolved = snapPoint || point;
     const otherPoint = pointFrom<GlobalPoint>(
       isHorizontal ? bindableCenter[0] : resolved[0],
@@ -1911,6 +1908,7 @@ export const calculateFixedPointForElbowArrowBinding = (
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
   shouldSnapToOutline = true,
+  isMidpointSnappingEnabled = true,
 ): { fixedPoint: FixedPoint } => {
   const bounds = [
     hoveredElement.x,
@@ -1924,6 +1922,8 @@ export const calculateFixedPointForElbowArrowBinding = (
         hoveredElement,
         startOrEnd,
         elementsMap,
+        undefined,
+        isMidpointSnappingEnabled,
       )
     : LinearElementEditor.getPointAtIndexGlobalCoordinates(
         linearElement,

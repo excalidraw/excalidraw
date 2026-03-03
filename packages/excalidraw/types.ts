@@ -304,6 +304,7 @@ export interface AppState {
    */
   selectionElement: NonDeletedExcalidrawElement | null;
   isBindingEnabled: boolean;
+  bindingPreference: "enabled" | "disabled";
   isMidpointSnappingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBinding: {

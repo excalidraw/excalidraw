@@ -71,6 +71,7 @@ export const getDefaultAppState = (): Omit<
     gridStep: DEFAULT_GRID_STEP,
     gridModeEnabled: false,
     isBindingEnabled: true,
+    bindingPreference: "enabled",
     isMidpointSnappingEnabled: true,
     defaultSidebarDockedPreference: false,
     isLoading: false,
@@ -195,6 +196,7 @@ const APP_STATE_STORAGE_CONF = (<
   gridModeEnabled: { browser: true, export: true, server: true },
   height: { browser: false, export: false, server: false },
   isBindingEnabled: { browser: true, export: false, server: false },
+  bindingPreference: { browser: true, export: false, server: false },
   isMidpointSnappingEnabled: { browser: true, export: false, server: false },
   defaultSidebarDockedPreference: {
     browser: true,

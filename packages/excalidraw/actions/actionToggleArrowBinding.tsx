@@ -1,4 +1,3 @@
-import { CODES, KEYS } from "@excalidraw/common";
 import { CaptureUpdateAction } from "@excalidraw/element";
 
 import { register } from "./register";
@@ -9,18 +8,19 @@ export const actionToggleArrowBinding = register({
   viewMode: false,
   trackEvent: {
     category: "canvas",
-    predicate: (appState) => !appState.isBindingEnabled,
+    predicate: (appState) => appState.bindingPreference === "disabled",
   },
   perform(elements, appState) {
+    const newPreference =
+      appState.bindingPreference === "enabled" ? "disabled" : "enabled";
     return {
       appState: {
         ...appState,
-        isBindingEnabled: !this.checked!(appState),
+        bindingPreference: newPreference,
+        isBindingEnabled: newPreference === "enabled",
       },
       captureUpdate: CaptureUpdateAction.NEVER,
     };
   },
-  checked: (appState) => appState.isBindingEnabled,
-  keyTest: (event) =>
-    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.B,
+  checked: (appState) => appState.bindingPreference === "enabled",
 });

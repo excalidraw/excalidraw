@@ -175,7 +175,7 @@
     "preferences": "Preferences",
     "preferences_toolLock": "Tool lock",
     "arrowBinding": "Arrow binding",
-    "midpointSnapping": "Midpoint snapping"
+    "midpointSnapping": "Snap to midpoints"
   },
   "elementLink": {
     "title": "Link to object",

@@ -368,7 +368,10 @@ export class LinearElementEditor {
         endBinding: updates?.endBinding,
         moveMidPointsWithElement: updates?.moveMidPointsWithElement,
       },
-      { isBindingEnabled: app.state.isBindingEnabled },
+      {
+        isBindingEnabled: app.state.isBindingEnabled,
+        isMidpointSnappingEnabled: app.state.isMidpointSnappingEnabled,
+      },
     );
     // Set the suggested binding from the updates if available
     if (isBindingElement(element, false)) {
@@ -554,7 +557,10 @@ export class LinearElementEditor {
         endBinding: updates?.endBinding,
         moveMidPointsWithElement: updates?.moveMidPointsWithElement,
       },
-      { isBindingEnabled: app.state.isBindingEnabled },
+      {
+        isBindingEnabled: app.state.isBindingEnabled,
+        isMidpointSnappingEnabled: app.state.isMidpointSnappingEnabled,
+      },
     );
 
     // Set the suggested binding from the updates if available
@@ -1540,6 +1546,7 @@ export class LinearElementEditor {
     },
     options?: {
       isBindingEnabled?: boolean;
+      isMidpointSnappingEnabled?: boolean;
     },
   ) {
     const { points } = element;
@@ -1610,6 +1617,7 @@ export class LinearElementEditor {
       {
         isDragging: Array.from(pointUpdates.values()).some((t) => t.isDragging),
         isBindingEnabled: options?.isBindingEnabled,
+        isMidpointSnappingEnabled: options?.isMidpointSnappingEnabled,
       },
     );
   }
@@ -1725,6 +1733,7 @@ export class LinearElementEditor {
       zoom?: AppState["zoom"];
       sceneElementsMap?: NonDeletedSceneElementsMap;
       isBindingEnabled?: boolean;
+      isMidpointSnappingEnabled?: boolean;
     },
   ) {
     if (isElbowArrow(element)) {
@@ -1746,6 +1755,7 @@ export class LinearElementEditor {
         informMutation: true,
         isDragging: options?.isDragging ?? false,
         isBindingEnabled: options?.isBindingEnabled,
+        isMidpointSnappingEnabled: options?.isMidpointSnappingEnabled,
       });
     } else {
       // TODO do we need to get precise coords here just to calc centers?
@@ -2165,14 +2175,16 @@ const pointDraggingUpdates = (
         suggestedBinding: suggestedBindingElement
           ? {
               element: suggestedBindingElement,
-              midPoint: snapToMid(
-                suggestedBindingElement,
-                elementsMap,
-                pointFrom<GlobalPoint>(
-                  scenePointerX - linearElementEditor.pointerOffset.x,
-                  scenePointerY - linearElementEditor.pointerOffset.y,
-                ),
-              ),
+              midPoint: app.state.isMidpointSnappingEnabled
+                ? snapToMid(
+                    suggestedBindingElement,
+                    elementsMap,
+                    pointFrom<GlobalPoint>(
+                      scenePointerX - linearElementEditor.pointerOffset.x,
+                      scenePointerY - linearElementEditor.pointerOffset.y,
+                    ),
+                  )
+                : undefined,
             }
           : null,
       },

@@ -451,8 +451,7 @@ const PreferencesToggleArrowBindingItem = () => {
   const appState = useUIAppState();
   return (
     <DropdownMenuItemCheckbox
-      checked={appState.isBindingEnabled}
-      shortcut={getShortcutFromShortcutName("arrowBinding")}
+      checked={appState.bindingPreference === "enabled"}
       onSelect={(event) => {
         actionManager.executeAction(actionToggleArrowBinding);
         event.preventDefault();
@@ -470,7 +469,6 @@ const PreferencesToggleMidpointSnappingItem = () => {
   return (
     <DropdownMenuItemCheckbox
       checked={appState.isMidpointSnappingEnabled}
-      shortcut={getShortcutFromShortcutName("midpointSnapping")}
       onSelect={(event) => {
         actionManager.executeAction(actionToggleMidpointSnapping);
         event.preventDefault();

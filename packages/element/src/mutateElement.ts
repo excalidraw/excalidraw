@@ -41,6 +41,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   options?: {
     isDragging?: boolean;
     isBindingEnabled?: boolean;
+    isMidpointSnappingEnabled?: boolean;
   },
 ) => {
   let didChange = false;

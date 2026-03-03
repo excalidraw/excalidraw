@@ -916,6 +916,7 @@ export const updateElbowArrowPoints = (
   options?: {
     isDragging?: boolean;
     isBindingEnabled?: boolean;
+    isMidpointSnappingEnabled?: boolean;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
   if (arrow.points.length < 2) {
@@ -1204,6 +1205,7 @@ const getElbowArrowData = (
     isDragging?: boolean;
     zoom?: AppState["zoom"];
     isBindingEnabled?: boolean;
+    isMidpointSnappingEnabled?: boolean;
   },
 ) => {
   const origStartGlobalPoint: GlobalPoint = pointTranslate<
@@ -1258,6 +1260,7 @@ const getElbowArrowData = (
     elementsMap,
     options?.isDragging,
     options?.isBindingEnabled,
+    options?.isMidpointSnappingEnabled,
   );
   const endGlobalPoint = getGlobalPoint(
     {
@@ -1274,6 +1277,7 @@ const getElbowArrowData = (
     elementsMap,
     options?.isDragging,
     options?.isBindingEnabled,
+    options?.isMidpointSnappingEnabled,
   );
   const startHeading = getBindPointHeading(
     startGlobalPoint,
@@ -2218,6 +2222,7 @@ const getGlobalPoint = (
   elementsMap?: ElementsMap,
   isDragging?: boolean,
   isBindingEnabled = true,
+  isMidpointSnappingEnabled = true,
 ): GlobalPoint => {
   if (isDragging) {
     if (isBindingEnabled && element && elementsMap) {
@@ -2226,6 +2231,8 @@ const getGlobalPoint = (
         element,
         startOrEnd,
         elementsMap,
+        undefined,
+        isMidpointSnappingEnabled,
       );
     }
 

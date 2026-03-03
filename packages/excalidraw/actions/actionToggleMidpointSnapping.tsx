@@ -1,4 +1,3 @@
-import { KEYS } from "@excalidraw/common";
 import { CaptureUpdateAction } from "@excalidraw/element";
 
 import { register } from "./register";
@@ -21,6 +20,4 @@ export const actionToggleMidpointSnapping = register({
     };
   },
   checked: (appState) => appState.isMidpointSnappingEnabled,
-  keyTest: (event) =>
-    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === "KeyM",
 });
