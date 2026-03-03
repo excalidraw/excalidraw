@@ -177,7 +177,9 @@
     "tab": "Tab",
     "shapeSwitch": "Verander vorm",
     "preferences": "Voorkeuren",
-    "preferences_toolLock": "Tool vergrendelen"
+    "preferences_toolLock": "Tool vergrendelen",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Link naar object",
