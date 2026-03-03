@@ -177,7 +177,9 @@
     "tab": "Tab",
     "shapeSwitch": "切换形状",
     "preferences": "",
-    "preferences_toolLock": ""
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "链接到对象",
