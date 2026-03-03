@@ -303,8 +303,14 @@ export interface AppState {
    * - set on pointer down, updated during pointer move
    */
   selectionElement: NonDeletedExcalidrawElement | null;
+  /**
+   * tracking current arrow binding editor state (takes into account
+   * `bindingPreference` and keyboard modifiers (ctrl/alt)
+   */
   isBindingEnabled: boolean;
+  /** user arrow binding preference */
   bindingPreference: "enabled" | "disabled";
+  /** user preference whether arrow snap to midpoints while binding */
   isMidpointSnappingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBinding: {
