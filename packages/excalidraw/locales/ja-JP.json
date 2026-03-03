@@ -177,7 +177,9 @@
     "tab": "Tab",
     "shapeSwitch": "図形形状を変更",
     "preferences": "",
-    "preferences_toolLock": ""
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "オブジェクトにリンク",
