@@ -177,7 +177,9 @@
     "tab": "Filă",
     "shapeSwitch": "Comutare formă",
     "preferences": "Preferințe",
-    "preferences_toolLock": "Blocare instrument"
+    "preferences_toolLock": "Blocare instrument",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Link către obiect",
