@@ -116,6 +116,7 @@ export const AllowedExcalidrawActiveTools: Record<
   hand: true,
   laser: false,
   magicframe: false,
+  table: true,
 };
 
 export type RestoredDataState = {
@@ -525,6 +526,14 @@ export const restoreElement = (
       return restoreElementWithProperties(element, {
         name: element.name ?? null,
       });
+    case "table": {
+      const tableElement = element as Extract<typeof element, { type: "table" }>;
+      return restoreElementWithProperties(tableElement, {
+        rows: tableElement.rows,
+        cols: tableElement.cols,
+        cells: tableElement.cells ?? {},
+      });
+    }
 
     // Don't use default case so as to catch a missing an element type case.
     // We also don't want to throw, but instead return void so we filter

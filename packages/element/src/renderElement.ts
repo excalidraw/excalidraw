@@ -11,6 +11,8 @@ import {
 
 import {
   BOUND_TEXT_PADDING,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
   DEFAULT_REDUCED_GLOBAL_ALPHA,
   ELEMENT_READY_TO_ERASE_OPACITY,
   FRAME_STYLE,
@@ -70,6 +72,7 @@ import { ShapeCache } from "./shape";
 
 import type {
   ExcalidrawElement,
+  ExcalidrawTableElement,
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
@@ -543,6 +546,66 @@ const drawElementOnCanvas = (
       context.restore();
       break;
     }
+    case "table": {
+      const tableElement = element as ExcalidrawTableElement;
+      const { rows, cols, width, height, cells } = tableElement;
+      const cellWidth = width / cols;
+      const cellHeight = height / rows;
+
+      context.save();
+
+      const strokeColor =
+        renderConfig.theme === THEME.DARK
+          ? applyDarkModeFilter(tableElement.strokeColor)
+          : tableElement.strokeColor;
+      const fillColor =
+        renderConfig.theme === THEME.DARK
+          ? applyDarkModeFilter(tableElement.backgroundColor)
+          : tableElement.backgroundColor;
+
+      context.fillStyle = fillColor;
+      context.fillRect(0, 0, width, height);
+
+      context.strokeStyle = strokeColor;
+      context.lineWidth = tableElement.strokeWidth;
+      context.strokeRect(0, 0, width, height);
+
+      for (let c = 1; c < cols; c++) {
+        context.beginPath();
+        context.moveTo(c * cellWidth, 0);
+        context.lineTo(c * cellWidth, height);
+        context.stroke();
+      }
+      for (let r = 1; r < rows; r++) {
+        context.beginPath();
+        context.moveTo(0, r * cellHeight);
+        context.lineTo(width, r * cellHeight);
+        context.stroke();
+      }
+
+      context.font = getFontString({
+        fontSize: Math.min(DEFAULT_FONT_SIZE, cellHeight * 0.4),
+        fontFamily: DEFAULT_FONT_FAMILY,
+      });
+      context.fillStyle = strokeColor;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cellKey = `${r}:${c}`;
+          const cellText = cells[cellKey]?.text ?? "";
+          if (cellText) {
+            const x = c * cellWidth + cellWidth / 2;
+            const y = r * cellHeight + cellHeight / 2;
+            context.fillText(cellText, x, y);
+          }
+        }
+      }
+
+      context.restore();
+      break;
+    }
     default: {
       if (isTextElement(element)) {
         const rtl = isRTL(element.text);
@@ -885,6 +948,7 @@ export const renderElement = (
     case "arrow":
     case "image":
     case "text":
+    case "table":
     case "iframe":
     case "embeddable": {
       if (renderConfig.isExporting) {

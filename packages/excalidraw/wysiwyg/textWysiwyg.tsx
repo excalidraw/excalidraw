@@ -595,6 +595,10 @@ export const textWysiwyg = ({
     }
 
     isDestroyed = true;
+    // Capture value immediately before any cleanup - the editable can lose its
+    // value when removed from DOM or when focus changes in some edge cases
+    const valueToSubmit = editable.value;
+
     // cleanup must be run before onSubmit otherwise when app blurs the wysiwyg
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
@@ -610,8 +614,14 @@ export const textWysiwyg = ({
       app.scene.getNonDeletedElementsMap(),
     );
 
+    // #region agent log
+    const isTableCell = !!(updateElement as any).customData?.tableCell;
+    if (isTableCell) {
+      fetch('http://127.0.0.1:7820/ingest/61a9a78b-d249-45ad-91ad-90d6d7330fd7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'fa5f82'},body:JSON.stringify({sessionId:'fa5f82',location:'textWysiwyg.tsx:handleSubmit:preOnSubmit',message:'Table cell handleSubmit',data:{editableValue:valueToSubmit,editableValueLen:valueToSubmit?.length,hasContainer:!!container},hypothesisId:'D',timestamp:Date.now()})}).catch(()=>{});
+    }
+    // #endregion
     if (container) {
-      if (editable.value.trim()) {
+      if (valueToSubmit.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
           app.scene.mutateElement(container, {
@@ -640,7 +650,7 @@ export const textWysiwyg = ({
 
     onSubmit({
       viaKeyboard: submittedViaKeyboard,
-      nextOriginalText: editable.value,
+      nextOriginalText: valueToSubmit,
     });
   };
 
@@ -748,6 +758,13 @@ export const textWysiwyg = ({
       // so without introducing crazier hacks, nothing we can do
       !isTestEnv()
     ) {
+      // #region agent log
+      const el = app.scene.getElement(element.id) as ExcalidrawTextElement;
+      const isTableCell = el && !!(el as any).customData?.tableCell;
+      if (isTableCell) {
+        fetch('http://127.0.0.1:7820/ingest/61a9a78b-d249-45ad-91ad-90d6d7330fd7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'fa5f82'},body:JSON.stringify({sessionId:'fa5f82',location:'textWysiwyg.tsx:onPointerDown:canvasClick',message:'Canvas click submit path',data:{editableValue:editable.value},hypothesisId:'F',timestamp:Date.now()})}).catch(()=>{});
+      }
+      // #endregion
       // On mobile, blur event doesn't seem to always fire correctly,
       // so we want to also submit on pointerdown outside the wysiwyg.
       // Done in the next frame to prevent pointerdown from creating a new text

@@ -129,6 +129,7 @@ import {
   newIframeElement,
   newArrowElement,
   newElement,
+  newTableElement,
   newImageElement,
   newLinearElement,
   newTextElement,
@@ -155,6 +156,7 @@ import {
   isFlowchartNodeElement,
   isBindableElement,
   isTextElement,
+  isTableElement,
   getNormalizedDimensions,
   isElementCompletelyInViewport,
   isElementInViewport,
@@ -265,6 +267,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
+  ExcalidrawTableElement,
   ExcalidrawTextElement,
   NonDeleted,
   InitializedExcalidrawImageElement,
@@ -6039,6 +6042,164 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private getTableCellAtPosition = (
+    table: ExcalidrawTableElement,
+    sceneX: number,
+    sceneY: number,
+  ): { row: number; col: number } | null => {
+    const { x, y, width, height, rows, cols, angle } = table;
+    const cx = x + width / 2;
+    const cy = y + height / 2;
+
+    const [localX, localY] = pointRotateRads(
+      pointFrom(sceneX - cx, sceneY - cy),
+      pointFrom(0, 0),
+      -angle as Radians,
+    );
+    const relX = localX + width / 2;
+    const relY = localY + height / 2;
+
+    const cellWidth = width / cols;
+    const cellHeight = height / rows;
+    const col = Math.floor(relX / cellWidth);
+    const row = Math.floor(relY / cellHeight);
+
+    if (row >= 0 && row < rows && col >= 0 && col < cols) {
+      return { row, col };
+    }
+    return null;
+  };
+
+  private startTableCellEditing = (
+    table: ExcalidrawTableElement,
+    row: number,
+    col: number,
+  ): void => {
+    const cellKey = `${row}:${col}`;
+    const cellText = table.cells[cellKey]?.text ?? "";
+    const cellWidth = table.width / table.cols;
+    const cellHeight = table.height / table.rows;
+    const cellX = table.x + col * cellWidth;
+    const cellY = table.y + row * cellHeight;
+
+    const cellPadding = 4;
+    const fontSize = Math.min(
+      this.state.currentItemFontSize,
+      (cellHeight - cellPadding * 2) * 0.8,
+    );
+
+    const tempTextElement = newTextElement({
+      x: cellX + cellPadding,
+      y: cellY + cellPadding,
+      width: cellWidth - cellPadding * 2,
+      height: cellHeight - cellPadding * 2,
+      text: cellText,
+      originalText: cellText,
+      fontSize,
+      fontFamily: this.state.currentItemFontFamily,
+      strokeColor: table.strokeColor,
+      backgroundColor: "transparent",
+      fillStyle: "solid",
+      strokeWidth: table.strokeWidth,
+      strokeStyle: table.strokeStyle,
+      roughness: table.roughness,
+      opacity: table.opacity,
+      frameId: table.frameId,
+      groupIds: table.groupIds,
+    });
+
+    const elementWithTableCellData = newElementWith(tempTextElement, {
+      customData: { tableCell: { tableId: table.id, row, col } },
+    });
+
+    this.scene.insertElement(elementWithTableCellData);
+    this.setState({ editingTextElement: elementWithTableCellData });
+
+    const elementsMap = this.scene.getElementsMapIncludingDeleted();
+
+    textWysiwyg({
+      id: elementWithTableCellData.id,
+      canvas: this.canvas,
+      getViewportCoords: (x, y) => {
+        const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
+          { sceneX: x, sceneY: y },
+          this.state,
+        );
+        return [
+          viewportX - this.state.offsetLeft,
+          viewportY - this.state.offsetTop,
+        ];
+      },
+      onChange: withBatchedUpdates((nextOriginalText) => {
+        this.scene.replaceAllElements(
+          this.scene.getElementsIncludingDeleted().map((el) => {
+            if (el.id === elementWithTableCellData.id && isTextElement(el)) {
+              return newElementWith(el, {
+                originalText: nextOriginalText,
+                ...refreshTextDimensions(
+                  el,
+                  el.containerId ? getContainerElement(el, elementsMap) : null,
+                  elementsMap,
+                  nextOriginalText,
+                ),
+              });
+            }
+            return el;
+          }),
+        );
+      }),
+      onSubmit: withBatchedUpdates(({ nextOriginalText }) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7820/ingest/61a9a78b-d249-45ad-91ad-90d6d7330fd7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'fa5f82'},body:JSON.stringify({sessionId:'fa5f82',location:'App.tsx:onSubmit:entry',message:'Table cell onSubmit',data:{nextOriginalText,nextLen:nextOriginalText?.length,tableId:table.id,cellKey},hypothesisId:'A',timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+        const currentTable = this.scene.getElement(table.id);
+        // #region agent log
+        fetch('http://127.0.0.1:7820/ingest/61a9a78b-d249-45ad-91ad-90d6d7330fd7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'fa5f82'},body:JSON.stringify({sessionId:'fa5f82',location:'App.tsx:onSubmit:tableCheck',message:'Table lookup',data:{tableFound:!!currentTable,isTable:currentTable?isTableElement(currentTable):false,cellsBefore:currentTable&&isTableElement(currentTable)?JSON.stringify(currentTable.cells):null},hypothesisId:'B',timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+        if (currentTable && isTableElement(currentTable)) {
+          this.scene.mutateElement(currentTable, {
+            cells: {
+              ...currentTable.cells,
+              [cellKey]: { text: nextOriginalText.trim() },
+            },
+          });
+          // #region agent log
+          const afterTable = this.scene.getElement(table.id);
+          fetch('http://127.0.0.1:7820/ingest/61a9a78b-d249-45ad-91ad-90d6d7330fd7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'fa5f82'},body:JSON.stringify({sessionId:'fa5f82',location:'App.tsx:onSubmit:afterMutate',message:'After mutate',data:{cellsAfter:afterTable&&isTableElement(afterTable)?JSON.stringify(afterTable.cells):null},hypothesisId:'C',timestamp:Date.now()})}).catch(()=>{});
+          // #endregion
+        }
+
+        this.scene.replaceAllElements(
+          this.scene
+            .getElementsIncludingDeleted()
+            .filter((el) => el.id !== elementWithTableCellData.id),
+        );
+
+        // #region agent log
+        const tableAfterReplace = this.scene.getElement(table.id);
+        fetch('http://127.0.0.1:7820/ingest/61a9a78b-d249-45ad-91ad-90d6d7330fd7',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'fa5f82'},body:JSON.stringify({sessionId:'fa5f82',location:'App.tsx:onSubmit:afterReplace',message:'After replaceAllElements',data:{tableCells:tableAfterReplace&&isTableElement(tableAfterReplace)?JSON.stringify(tableAfterReplace.cells):null},hypothesisId:'E',timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+        this.store.scheduleCapture();
+
+        flushSync(() => {
+          this.setState({
+            newElement: null,
+            editingTextElement: null,
+          });
+        });
+
+        if (this.state.activeTool.locked) {
+          setCursorForShape(this.interactiveCanvas, this.state);
+        }
+
+        this.focusContainer();
+      }),
+      element: elementWithTableCellData,
+      excalidrawContainer: this.excalidrawContainerRef.current,
+      app: this,
+    });
+  };
+
   private startImageCropping = (image: ExcalidrawImageElement) => {
     this.store.scheduleCapture();
     this.setState({
@@ -6203,6 +6364,14 @@ class App extends React.Component<AppProps, AppState> {
           activeEmbeddable: { element: hitElement, state: "active" },
         });
         return;
+      }
+
+      if (isTableElement(hitElement)) {
+        const cell = this.getTableCellAtPosition(hitElement, sceneX, sceneY);
+        if (cell) {
+          this.startTableCellEditing(hitElement, cell.row, cell.col);
+          return;
+        }
       }
 
       // shouldn't edit/create text when inside line editor (often false positive)
@@ -7536,6 +7705,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
+    } else if (this.state.activeTool.type === "table") {
+      this.createTableElementOnPointerDown(pointerDownState);
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
@@ -9044,6 +9215,43 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  private createTableElementOnPointerDown = (
+    pointerDownState: PointerDownState,
+  ): void => {
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
+        ? null
+        : this.getEffectiveGridSize(),
+    );
+
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+      x: gridX,
+      y: gridY,
+    });
+
+    const table = newTableElement({
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      frameId: topLayerFrame ? topLayerFrame.id : null,
+    });
+
+    this.scene.insertElement(table);
+
+    this.setState({
+      multiElement: null,
+      newElement: table,
+    });
+  };
+
   private maybeCacheReferenceSnapPoints(
     event: KeyboardModifiersObject,
     selectedElements: ExcalidrawElement[],
@@ -9875,6 +10083,9 @@ class App extends React.Component<AppProps, AppState> {
               linearElementEditor,
             )!,
           });
+        } else if (newElement.type === "table") {
+          pointerDownState.lastCoords.x = pointerCoords.x;
+          pointerDownState.lastCoords.y = pointerCoords.y;
         } else {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
@@ -10409,6 +10620,11 @@ class App extends React.Component<AppProps, AppState> {
         this.handleTextWysiwyg(newElement, {
           isExistingElement: true,
         });
+      }
+
+      if (isTableElement(newElement)) {
+        this.resetCursor();
+        this.startTableCellEditing(newElement, 0, 0);
       }
 
       if (

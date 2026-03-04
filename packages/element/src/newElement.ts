@@ -44,6 +44,7 @@ import type {
   ExcalidrawEmbeddableElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeElement,
+  ExcalidrawTableElement,
   ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
@@ -212,6 +213,36 @@ export const newMagicFrameElement = (
   );
 
   return frameElement;
+};
+
+const DEFAULT_TABLE_COLS = 3;
+const DEFAULT_TABLE_ROWS = 2;
+const DEFAULT_TABLE_WIDTH = 360;
+const DEFAULT_TABLE_HEIGHT = 120;
+
+export const newTableElement = (
+  opts: {
+    rows?: number;
+    cols?: number;
+    cells?: ExcalidrawTableElement["cells"];
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawTableElement> => {
+  const rows = opts.rows ?? DEFAULT_TABLE_ROWS;
+  const cols = opts.cols ?? DEFAULT_TABLE_COLS;
+  const tableElement = newElementWith(
+    {
+      ..._newElementBase<ExcalidrawTableElement>("table", opts),
+      type: "table",
+      rows,
+      cols,
+      width: opts.width ?? DEFAULT_TABLE_WIDTH,
+      height: opts.height ?? DEFAULT_TABLE_HEIGHT,
+      cells: opts.cells ?? {},
+    },
+    {},
+  );
+
+  return tableElement;
 };
 
 /** computes element x/y offset based on textAlign/verticalAlign */

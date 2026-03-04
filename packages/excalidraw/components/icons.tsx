@@ -406,6 +406,18 @@ export const TextIcon = createIcon(
   tablerIconProps,
 );
 
+// tabler-icons: table (grid 3x2)
+export const TableIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <rect x="4" y="4" width="16" height="16" rx="1" />
+    <line x1="4" y1="12" x2="20" y2="12" />
+    <line x1="9.33" y1="4" x2="9.33" y2="20" />
+    <line x1="14.67" y1="4" x2="14.67" y2="20" />
+  </g>,
+  tablerIconProps,
+);
+
 export const TextSizeIcon = createIcon(
   <g stroke="currentColor" strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />

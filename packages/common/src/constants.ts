@@ -461,6 +461,7 @@ export const TOOL_TYPE = {
   magicframe: "magicframe",
   embeddable: "embeddable",
   laser: "laser",
+  table: "table",
 } as const;
 
 export const EDITOR_LS_KEYS = {

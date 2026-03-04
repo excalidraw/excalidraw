@@ -18,6 +18,7 @@ import type {
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
+  ExcalidrawTableElement,
   RoundnessType,
   ExcalidrawFrameLikeElement,
   ExcalidrawElementType,
@@ -88,6 +89,12 @@ export const isFrameLikeElement = (
     element != null &&
     (element.type === "frame" || element.type === "magicframe")
   );
+};
+
+export const isTableElement = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawTableElement => {
+  return element != null && element.type === "table";
 };
 
 export const isFreeDrawElement = (
@@ -261,7 +268,8 @@ export const isExcalidrawElement = (
     case "frame":
     case "magicframe":
     case "image":
-    case "selection": {
+    case "selection":
+    case "table": {
       return true;
     }
     default: {
