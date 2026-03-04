@@ -9,6 +9,7 @@ import type { MarkRequired } from "@excalidraw/common/utility-types";
 import { t } from "../i18n";
 
 import { useExcalidrawActionManager } from "./App";
+import { chevronDownIcon } from "./icons";
 import { Island } from "./Island";
 import { QuickSearch } from "./QuickSearch";
 import { ScrollableList } from "./ScrollableList";
@@ -183,32 +184,28 @@ export const UserList = React.memo(
       maxAvatars - 1,
     );
 
+    const hasOverflow = uniqueCollaboratorsArray.length > maxAvatars - 1;
+
     const firstNAvatarsJSX = firstNCollaborators.map((collaborator) => {
       const avatarJSX = renderCollaborator({
         actionManager,
         collaborator,
         socketId: collaborator.socketId,
-        shouldWrapWithTooltip: !collaborator.isCurrentUser || !currentUserMenu,
+        shouldWrapWithTooltip:
+          !collaborator.isCurrentUser || !currentUserMenu || hasOverflow,
         isBeingFollowed: collaborator.socketId === userToFollow,
       });
 
       // Wrap current user's avatar in a pill with chevron + popover
-      if (collaborator.isCurrentUser && currentUserMenu) {
+      // only when the "+N" overflow is not shown (menu goes there instead)
+      if (collaborator.isCurrentUser && currentUserMenu && !hasOverflow) {
         return (
           <Popover.Root key={collaborator.socketId}>
             <Popover.Trigger asChild>
               <div className="UserList__pill">
                 {avatarJSX}
                 <div className="UserList__pill-chevron">
-                  <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
-                    <path
-                      d="M1 1L5 5L9 1"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                  {chevronDownIcon}
                 </div>
               </div>
             </Popover.Trigger>
@@ -293,6 +290,16 @@ export const UserList = React.memo(
                         ]
                       : []}
                   </ScrollableList>
+                  {currentUserMenu && (
+                    <>
+                      <div className="UserList__more-menu-divider" />
+                      <Popover.Close asChild>
+                        <div className="dropdown-menu">
+                          {currentUserMenu}
+                        </div>
+                      </Popover.Close>
+                    </>
+                  )}
                   <Popover.Arrow
                     width={20}
                     height={10}
