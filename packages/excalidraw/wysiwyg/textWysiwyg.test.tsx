@@ -811,7 +811,7 @@ describe("textWysiwyg", () => {
       });
     });
 
-    it("should'nt bind text to container when not double clicked on center", async () => {
+    it("shouldn't bind text to container when not double clicked on center", async () => {
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(rectangle.id);
 

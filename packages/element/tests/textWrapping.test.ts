@@ -10,7 +10,7 @@ describe("Test wrapText", () => {
 
   it("should wrap the text correctly when word length is exactly equal to max width", () => {
     const text = "Hello Excalidraw";
-    // Length of "Excalidraw" is 100 and exacty equal to max width
+    // Length of "Excalidraw" is 100 and exactly equal to max width
     const res = wrapText(text, font, 100);
     expect(res).toEqual(`Hello\nExcalidraw`);
   });

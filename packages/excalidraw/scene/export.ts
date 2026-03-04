@@ -79,9 +79,9 @@ const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
 
   if (metrics.width > maxWidth) {
     // we iterate from the right, removing characters one by one instead
-    // of bulding the string up. This assumes that it's more likely
+    // of building the string up. This assumes that it's more likely
     // your frame names will overflow by not that many characters
-    // (if ever), so it sohuld be faster this way.
+    // (if ever), so it should be faster this way.
     for (let i = text.length; i > 0; i--) {
       const newText = `${text.slice(0, i)}...`;
       if (ctx.measureText(newText).width <= maxWidth) {
@@ -371,7 +371,7 @@ export const exportToSvg = async (
     try {
       encodeSvgBase64Payload({
         metadataElement,
-        // when embedding scene, we want to embed the origionally supplied
+        // when embedding scene, we want to embed the originally supplied
         // elements which don't contain the temp frame labels.
         // But it also requires that the exportToSvg is being supplied with
         // only the elements that we're exporting, and no extra.

@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const THRESSHOLD = 85;
+const THRESHOLD = 85;
 
 // we're using BCP 47 language tags as keys
 // e.g. https://gist.github.com/typpo/b2b828a35e683b9bf8db91b5404f1bd1
@@ -182,7 +182,7 @@ const printHeader = () => {
 };
 
 const printRow = (id, locale, coverage) => {
-  const isOver = coverage >= THRESSHOLD;
+  const isOver = coverage >= THRESHOLD;
   let result = `| ${isOver ? id : "..."} | `;
   result += `${locale in flags ? flags[locale] : ""} | `;
   const language = locale in languages ? languages[locale] : locale;
@@ -199,7 +199,7 @@ const printRow = (id, locale, coverage) => {
 };
 
 console.info(
-  `Each language must be at least **${THRESSHOLD}%** translated in order to appear on Excalidraw. Join us on [Crowdin](https://crowdin.com/project/excalidraw) and help us translate your own language. **Can't find yours yet?** Open an [issue](https://github.com/excalidraw/excalidraw/issues/new) and we'll add it to the list.`,
+  `Each language must be at least **${THRESHOLD}%** translated in order to appear on Excalidraw. Join us on [Crowdin](https://crowdin.com/project/excalidraw) and help us translate your own language. **Can't find yours yet?** Open an [issue](https://github.com/excalidraw/excalidraw/issues/new) and we'll add it to the list.`,
 );
 console.info("\n\r");
 console.info(printHeader());

@@ -352,7 +352,7 @@ class Library {
     /**
      * LibraryItems that will replace current items. Can be a function which
      * will be invoked after all previous tasks are resolved
-     * (this is the prefered way to update the library to avoid race conditions,
+     * (this is the preferred way to update the library to avoid race conditions,
      * but you'll want to manually merge the library items in the callback
      *  - which is what we're doing in Library.importLibrary()).
      *
@@ -877,7 +877,7 @@ export const useHandleLibrary = (
                     `couldn't delete legacy library data: ${error.message}`,
                   );
                 }
-                // migration suceeded, load migrated data
+                // migration succeeded, load migrated data
                 return nextItems;
               } catch (error: any) {
                 console.error(
@@ -933,7 +933,7 @@ export const useHandleLibrary = (
   // can run this hook outside of an active editor instance and the library
   // update queue/loop survives editor remounts
   //
-  // This effect is still only meant to be run if host apps supply an persitence
+  // This effect is still only meant to be run if host apps supply an persistence
   // adapter. If we don't have access to it, it the update listener doesn't
   // do anything.
   useEffect(
