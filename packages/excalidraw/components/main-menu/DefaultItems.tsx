@@ -469,6 +469,7 @@ const PreferencesToggleMidpointSnappingItem = () => {
   return (
     <DropdownMenuItemCheckbox
       checked={appState.isMidpointSnappingEnabled}
+      disabled={appState.bindingPreference === "disabled"}
       onSelect={(event) => {
         actionManager.executeAction(actionToggleMidpointSnapping);
         event.preventDefault();

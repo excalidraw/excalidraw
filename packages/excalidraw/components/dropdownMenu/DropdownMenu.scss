@@ -181,6 +181,21 @@
         box-shadow: 0 0 0 1px var(--color-brand-active);
       }
 
+      &[disabled] {
+        cursor: not-allowed;
+        opacity: 0.5;
+        pointer-events: none;
+
+        &:hover {
+          background-color: transparent;
+        }
+
+        &:active {
+          background-color: transparent;
+          box-shadow: none;
+        }
+      }
+
       svg {
         width: 1rem;
         height: 1rem;
