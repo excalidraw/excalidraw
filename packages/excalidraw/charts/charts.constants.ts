@@ -1,5 +1,5 @@
 import {
-  COLOR_PALETTE,
+  COLOR_CHARCOAL_BLACK,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   VERTICAL_ALIGN,
@@ -45,7 +45,7 @@ export const commonProps = {
   fontSize: DEFAULT_FONT_SIZE,
   opacity: 100,
   roughness: 1,
-  strokeColor: COLOR_PALETTE.black,
+  strokeColor: COLOR_CHARCOAL_BLACK,
   roundness: null,
   strokeStyle: "solid",
   strokeWidth: 1,

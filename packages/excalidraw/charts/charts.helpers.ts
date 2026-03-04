@@ -1,7 +1,6 @@
 import { pointFrom } from "@excalidraw/math";
 
 import {
-  COLOR_PALETTE,
   DEFAULT_CHART_COLOR_INDEX,
   FONT_FAMILY,
   FONT_SIZES,
@@ -11,6 +10,7 @@ import {
   getFontString,
   getLineHeight,
   ROUGHNESS,
+  COLOR_CHARCOAL_BLACK,
 } from "@excalidraw/common";
 
 import {
@@ -419,7 +419,7 @@ export const createSeriesLegend = (
       backgroundColor: "transparent",
       type: "rectangle",
       fillStyle: "solid",
-      strokeColor: COLOR_PALETTE.black,
+      strokeColor: COLOR_CHARCOAL_BLACK,
       x: centerX - pillWidth / 2,
       y: legendY - pillHeight / 2,
       width: pillWidth,
@@ -849,7 +849,7 @@ export const chartBaseElements = (
         y: y - chartHeight,
         width: chartWidth,
         height: chartHeight,
-        strokeColor: COLOR_PALETTE.black,
+        strokeColor: COLOR_CHARCOAL_BLACK,
         fillStyle: "solid",
         opacity: 6,
       })

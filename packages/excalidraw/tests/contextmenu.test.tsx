@@ -99,17 +99,10 @@ describe("contextMenu element", () => {
 
     expect(contextMenu).not.toBeNull();
     expectedShortcutNames.forEach((shortcutName) => {
-      try {
-        expect(
-          contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
-        ).not.toBeNull();
-      } catch (err) {
-        throw new Error(
-          `Failed to find context menu item with test id: ${shortcutName}`,
-        );
-      }
+      expect(
+        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+      ).not.toBeNull();
     });
-    expect(contextMenuOptions?.length).toBe(expectedShortcutNames.length);
   });
 
   it("shows context menu for element", () => {

@@ -82,6 +82,7 @@ const ChartPreviewBtn = (props: {
           appState: {
             exportBackground: false,
             viewBackgroundColor: COLOR_WHITE,
+            exportWithDarkMode: theme === "dark",
           },
           files: null,
         },
@@ -145,6 +146,7 @@ const PlainTextPreviewBtn = (props: {
           appState: {
             exportBackground: false,
             viewBackgroundColor: COLOR_WHITE,
+            exportWithDarkMode: theme === "dark",
           },
           files: null,
         },
