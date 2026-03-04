@@ -4433,7 +4433,7 @@ describe("history", () => {
           }),
           expect.objectContaining({
             ...textProps,
-            // bound text got redrawn, as redraw is triggered based on container positon!
+            // bound text got redrawn, as redraw is triggered based on container position!
             id: text.id,
             containerId: container.id,
             isDeleted: false,

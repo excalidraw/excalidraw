@@ -8552,7 +8552,7 @@ class App extends React.Component<AppProps, AppState> {
     return element;
   };
 
-  //create rectangle element with youtube top left on nearest grid point width / hight 640/360
+  //create rectangle element with youtube top left on nearest grid point width / height 640/360
   public insertEmbeddableElement = ({
     sceneX,
     sceneY,

@@ -258,7 +258,7 @@ describe("Test wrapText", () => {
       expect(res).toBe("\nHello\nworld");
     });
 
-    it("should break and collapse leading whitespaces whe words break", () => {
+    it("should break and collapse leading whitespaces when words break", () => {
       const maxWidth = 30;
       const res = wrapText(text, font, maxWidth);
       expect(res).toBe("\nHel\nlo\nwor\nld");

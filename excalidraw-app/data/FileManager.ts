@@ -166,7 +166,7 @@ export class FileManager {
 
   /** a file element prevents unload only if it's being saved regardless of
    *  its `status`. This ensures that elements who for any reason haven't
-   *  beed set to `saved` status don't prevent unload in future sessions.
+   *  been set to `saved` status don't prevent unload in future sessions.
    *  Technically we should prevent unload when the origin client haven't
    *  yet saved the `status` update to storage, but that should be taken care
    *  of during regular beforeUnload unsaved files check.
