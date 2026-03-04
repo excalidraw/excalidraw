@@ -1508,6 +1508,25 @@ export const actionChangeRoundness = register<"sharp" | "round">({
       (el) => el.roundness?.type === ROUNDNESS.LEGACY,
     );
 
+    const roundnessValue = getFormValue(
+      elements,
+      app,
+      (element) =>
+        hasLegacyRoundness
+          ? null
+          : element.roundness
+          ? "round"
+          : "sharp",
+      (element) =>
+        !isArrowElement(element) && element.hasOwnProperty("roundness"),
+      (hasSelection) =>
+        hasSelection ? null : appState.currentItemRoundness,
+    );
+
+    const showRadiusSlider = 
+      roundnessValue === "round" && 
+      targetElements.some((el) => isUsingAdaptiveRadius(el.type));
+
     return (
       <fieldset>
         <legend>{t("labels.edges")}</legend>
@@ -1526,25 +1545,75 @@ export const actionChangeRoundness = register<"sharp" | "round">({
                 icon: EdgeRoundIcon,
               },
             ]}
-            value={getFormValue(
-              elements,
-              app,
-              (element) =>
-                hasLegacyRoundness
-                  ? null
-                  : element.roundness
-                  ? "round"
-                  : "sharp",
-              (element) =>
-                !isArrowElement(element) && element.hasOwnProperty("roundness"),
-              (hasSelection) =>
-                hasSelection ? null : appState.currentItemRoundness,
-            )}
+            value={roundnessValue}
             onChange={(value) => updateData(value)}
           />
           {renderAction("togglePolygon")}
         </div>
+        {showRadiusSlider && renderAction("changeCornerRadius")}
       </fieldset>
+    );
+  },
+});
+
+export const actionChangeCornerRadius = register<number>({
+  name: "changeCornerRadius",
+  label: "Change corner radius",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (!el.roundness || !isUsingAdaptiveRadius(el.type)) {
+          return el;
+        }
+
+        return newElementWith(el, {
+          roundness: {
+            type: ROUNDNESS.ADAPTIVE_RADIUS,
+            value,
+          },
+        });
+      }),
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, app, updateData }) => {
+    const selectedElements = app.scene.getSelectedElements(app.state);
+    
+    // Get current radius value from selected elements
+    const currentRadius = selectedElements.reduce((acc, element) => {
+      if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
+        const radius = element.roundness.value ?? 32;
+        return acc === null ? radius : Math.min(acc, radius);
+      }
+      return acc;
+    }, null as number | null) ?? 32;
+
+    // Calculate max radius (pill shape is when radius = height/2)
+    const maxRadius = Math.min(
+      200,
+      ...selectedElements.map((el) => Math.min(el.width, el.height) / 2)
+    );
+
+    return (
+      <label className="control-label" style={{ marginTop: "0.5rem" }}>
+        {t("labels.cornerRadius")}
+        <input
+          type="range"
+          min="0"
+          max={Math.max(maxRadius, currentRadius)}
+          step="1"
+          value={currentRadius}
+          onChange={(event) => updateData(+event.target.value)}
+          style={{ width: "100%" }}
+        />
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", marginTop: "0.25rem" }}>
+          <span>0</span>
+          <span>{currentRadius}px</span>
+          <span>{Math.round(maxRadius)}px</span>
+        </div>
+      </label>
     );
   },
 });
