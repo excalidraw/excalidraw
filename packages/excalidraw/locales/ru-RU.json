@@ -178,8 +178,8 @@
     "shapeSwitch": "Сменить форму",
     "preferences": "Настройки",
     "preferences_toolLock": "Закрепить инструмент",
-    "arrowBinding": "",
-    "midpointSnapping": ""
+    "arrowBinding": "Привязка стрелкой",
+    "midpointSnapping": "Привязка к средней точке"
   },
   "elementLink": {
     "title": "Ссылка на объект",
