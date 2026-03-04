@@ -4,6 +4,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { getFileHandleType, isImageFileHandleType } from "./blob";
 
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { exportCanvas, prepareElementsForExport } from ".";
 
 import type { AppState, BinaryFiles } from "../types";

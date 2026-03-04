@@ -39,5 +39,37 @@
         "allowReferrer": true
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["packages/excalidraw/**/*.{ts,tsx}"],
+      "excludedFiles": ["packages/excalidraw/**/*.test.{ts,tsx}"],
+      "rules": {
+        "@typescript-eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@excalidraw/excalidraw"],
+                "message": "Do not import from the barrel 'index.tsx' files. Use direct relative imports to the specific module instead.",
+                "allowTypeImports": true
+              }
+            ],
+            "paths": [
+              ".",
+              "..",
+              "../..",
+              "../../..",
+              "../../../..",
+              "../../../../..",
+              "../index",
+              "../../index",
+              "../../../index",
+              "../../../../index"
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }
