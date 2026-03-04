@@ -552,6 +552,7 @@ export type CanvasNotification = {
   icon?: JSX.Element;
   color?: string;
   textColor?: string;
+  borderColor?: string;
   onDismiss?: () => void;
 };
 
@@ -651,6 +652,7 @@ export interface ExcalidrawProps {
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
   canvasNotification?: CanvasNotification | null;
+  currentUserMenu?: React.ReactNode;
 }
 
 export type SceneData = {

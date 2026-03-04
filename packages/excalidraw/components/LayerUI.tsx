@@ -98,6 +98,7 @@ interface LayerUIProps {
   app: AppClassProperties;
   isCollaborating: boolean;
   generateLinkForSelection?: AppProps["generateLinkForSelection"];
+  currentUserMenu?: ExcalidrawProps["currentUserMenu"];
 }
 
 const DefaultMainMenu: React.FC<{
@@ -157,6 +158,7 @@ const LayerUI = ({
   app,
   isCollaborating,
   generateLinkForSelection,
+  currentUserMenu,
 }: LayerUIProps) => {
   const editorInterface = useEditorInterface();
   const stylesPanelMode = useStylesPanelMode();
@@ -404,6 +406,7 @@ const LayerUI = ({
               <UserList
                 collaborators={appState.collaborators}
                 userToFollow={appState.userToFollow?.socketId || null}
+                currentUserMenu={currentUserMenu}
               />
             )}
             {renderTopRightUI?.(

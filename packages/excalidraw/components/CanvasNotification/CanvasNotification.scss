@@ -1,4 +1,13 @@
 .excalidraw {
+  .canvas-notification__border {
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    pointer-events: none;
+    border: 2px solid;
+    z-index: 4;
+  }
+
   .canvas-notification {
     position: absolute;
     bottom: 2.5rem;

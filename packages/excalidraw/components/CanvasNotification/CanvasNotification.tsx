@@ -18,25 +18,33 @@ const CanvasNotification = ({ notification }: CanvasNotificationProps) => {
   }
 
   return (
-    <div className="canvas-notification" style={style}>
-      <div className="canvas-notification__label">
-        {notification.icon && (
-          <span className="canvas-notification__icon">
-            {notification.icon}
-          </span>
-        )}
-        {notification.label}
-      </div>
-      {notification.onDismiss && (
-        <button
-          type="button"
-          onClick={notification.onDismiss}
-          className="canvas-notification__dismiss-btn"
-        >
-          {CloseIcon}
-        </button>
+    <>
+      {notification.borderColor && (
+        <div
+          className="canvas-notification__border"
+          style={{ borderColor: notification.borderColor }}
+        />
       )}
-    </div>
+      <div className="canvas-notification" style={style}>
+        <div className="canvas-notification__label">
+          {notification.icon && (
+            <span className="canvas-notification__icon">
+              {notification.icon}
+            </span>
+          )}
+          {notification.label}
+        </div>
+        {notification.onDismiss && (
+          <button
+            type="button"
+            onClick={notification.onDismiss}
+            className="canvas-notification__dismiss-btn"
+          >
+            {CloseIcon}
+          </button>
+        )}
+      </div>
+    </>
   );
 };
 

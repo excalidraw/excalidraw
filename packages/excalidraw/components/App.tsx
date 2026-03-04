@@ -2085,6 +2085,7 @@ class App extends React.Component<AppProps, AppState> {
                           generateLinkForSelection={
                             this.props.generateLinkForSelection
                           }
+                          currentUserMenu={this.props.currentUserMenu}
                         >
                           {this.props.children}
                         </LayerUI>
