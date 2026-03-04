@@ -178,8 +178,8 @@
     "shapeSwitch": "Comutare formă",
     "preferences": "Preferințe",
     "preferences_toolLock": "Blocare instrument",
-    "arrowBinding": "",
-    "midpointSnapping": ""
+    "arrowBinding": "Legare săgeată",
+    "midpointSnapping": "Ancorare la punctele medii"
   },
   "elementLink": {
     "title": "Link către obiect",
