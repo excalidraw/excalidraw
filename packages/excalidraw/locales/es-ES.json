@@ -624,7 +624,8 @@
     "syntax": "Sintaxis Mermaid",
     "preview": "Vista previa",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
