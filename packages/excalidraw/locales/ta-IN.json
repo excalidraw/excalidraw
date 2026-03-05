@@ -624,7 +624,8 @@
     "syntax": "மெர்மெய்டு தொடரியல்",
     "preview": "முன்னோட்டம்",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
