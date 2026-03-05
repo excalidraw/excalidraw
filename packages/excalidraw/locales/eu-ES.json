@@ -624,7 +624,8 @@
     "syntax": "Mermaid sintaxia",
     "preview": "Aurrebista",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
