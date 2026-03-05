@@ -624,7 +624,8 @@
     "syntax": "Синтаксис Mermaid",
     "preview": "Попередній перегляд",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": "Помилка!"
