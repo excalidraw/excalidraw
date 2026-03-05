@@ -624,7 +624,8 @@
     "syntax": "مرمید syntax",
     "preview": "پیشنمایش",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": "خطا!"
