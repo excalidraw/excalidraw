@@ -624,7 +624,8 @@
     "syntax": "Sintaxă Mermaid",
     "preview": "Previzualizare",
     "label": "Mermaid",
-    "inputPlaceholder": "Scrie definiţia diagramei Mermaid aici..."
+    "inputPlaceholder": "Scrie definiţia diagramei Mermaid aici...",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": "Eroare!"
