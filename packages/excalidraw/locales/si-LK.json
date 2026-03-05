@@ -624,7 +624,8 @@
     "syntax": "Mermaid වාක්‍ය ඛණ්ඩය",
     "preview": "Mermaid පූර්වදර්ශනය",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
