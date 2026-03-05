@@ -624,7 +624,8 @@
     "syntax": "Mermaid Синтаксис",
     "preview": "Преглед",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
