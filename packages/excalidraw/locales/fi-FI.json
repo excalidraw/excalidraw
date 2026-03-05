@@ -624,7 +624,8 @@
     "syntax": "",
     "preview": "Esikatsele",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
