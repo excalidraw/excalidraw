@@ -79,6 +79,13 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: "build",
+      modulePreload: {
+        resolveDependencies: (_filename, deps) => {
+          // exclude lazy-loaded chunks from modulepreload so they aren't
+          // fetched eagerly (they're runtime-cached by the SW on first use)
+          return deps.filter((dep) => !dep.includes("codemirror.chunk"));
+        },
+      },
       rollupOptions: {
         output: {
           assetFileNames(chunkInfo) {
@@ -105,6 +112,14 @@ export default defineConfig(({ mode }) => {
 
             if (id.includes("@excalidraw/mermaid-to-excalidraw")) {
               return "mermaid-to-excalidraw";
+            }
+
+            if (
+              id.includes("@codemirror/") ||
+              id.includes("@lezer/") ||
+              id.includes("CodeMirrorEditor")
+            ) {
+              return "codemirror.chunk";
             }
           },
         },
