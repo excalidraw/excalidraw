@@ -624,7 +624,8 @@
     "syntax": "मर्मेड विन्यास",
     "preview": "पूर्वावलोकन",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
