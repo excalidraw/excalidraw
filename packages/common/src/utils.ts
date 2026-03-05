@@ -88,7 +88,8 @@ export const isWritableElement = (
     (target.type === "text" ||
       target.type === "number" ||
       target.type === "password" ||
-      target.type === "search"));
+      target.type === "search")) ||
+  (target instanceof HTMLElement && target.closest(".cm-editor") !== null);
 
 export const getFontFamilyString = ({
   fontFamily,

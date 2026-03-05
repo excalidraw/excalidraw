@@ -1,11 +1,17 @@
-import React from "react";
-import { expect } from "vitest";
+import { expect, vi } from "vitest";
 
 import { Excalidraw } from "../index";
 
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
 import { getTextEditor, updateTextEditor } from "./queries/dom";
 import { render, waitFor } from "./test-utils";
+
+// Mock CodeMirror deps so the dynamic import of CodeMirrorEditor fails,
+// causing TTDDialogInput to fall back to <textarea> in tests.
+vi.mock("@codemirror/view", () => ({}));
+vi.mock("@codemirror/state", () => ({}));
+vi.mock("@codemirror/language", () => ({}));
+vi.mock("@lezer/highlight", () => ({}));
 
 mockMermaidToExcalidraw({
   mockRef: true,
