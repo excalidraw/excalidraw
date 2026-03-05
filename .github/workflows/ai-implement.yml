@@ -1,0 +1,59 @@
+name: "AI: Implement Issue"
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  implement:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
+    if: |
+      !github.event.issue.pull_request &&
+      (contains(github.event.comment.body, '/oc implement') ||
+       contains(github.event.comment.body, '/opencode implement'))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Cache OpenCode
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.opencode/bin
+          key: opencode-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Install OpenCode
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: curl -fsSL https://opencode.ai/install | bash
+
+      - name: Add OpenCode to PATH
+        run: echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+      - name: Run OpenCode implementer agent
+        env:
+          MODEL: opencode/big-pickle
+          AGENT: implementer
+          SKAINET_TOKEN: ${{ secrets.SKAINET_TOKEN }}
+        run: opencode github run
+
+      - name: Label created PR as ai-implemented
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || true)
+          PR_NUMBER=$(gh pr list --state open --head "$CURRENT_BRANCH" --json number --jq '.[0].number' 2>/dev/null || true)
+
+          if [ -n "$PR_NUMBER" ]; then
+            echo "Found PR #$PR_NUMBER"
+            gh pr edit "$PR_NUMBER" --add-label "ai-implemented"
+          else
+            echo "No PR number available to label."
+          fi

@@ -1,0 +1,5 @@
+pre-commit:
+  commands:
+    actionlint:
+      glob: ".github/workflows/*.{yml,yaml}"
+      run: mise exec -- actionlint {staged_files}

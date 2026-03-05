@@ -1,0 +1,7 @@
+[tools]
+actionlint = "latest"
+lefthook = "latest"
+
+[tasks."hooks:install"]
+description = "Install git hooks with lefthook (and clear legacy custom hooksPath)"
+run = "git config --unset core.hooksPath >/dev/null 2>&1 || true; lefthook install"

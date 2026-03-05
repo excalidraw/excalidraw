@@ -1,0 +1,58 @@
+name: "AI: Rework PR"
+
+on:
+  pull_request:
+    types: [labeled]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  rework:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
+    if: |
+      (github.event.action == 'labeled' &&
+       github.event.label.name == 'ai-reviewed') ||
+      (github.event.action == 'submitted' &&
+       github.event.review.state == 'changes_requested' &&
+       contains(github.event.pull_request.labels.*.name, 'ai-implemented'))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Cache OpenCode
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.opencode/bin
+          key: opencode-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Install OpenCode
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: curl -fsSL https://opencode.ai/install | bash
+
+      - name: Add OpenCode to PATH
+        run: echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+      - name: Run OpenCode reworker agent
+        env:
+          MODEL: opencode/big-pickle
+          AGENT: reworker
+          PROMPT: |
+            Address all review comments on this pull request.
+            Read each comment carefully and implement the requested changes.
+            Commit and push your fixes to the current branch.
+          SKAINET_TOKEN: ${{ secrets.SKAINET_TOKEN }}
+        run: opencode github run
+
+      - name: Label the PR as ai-reworked
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: gh pr edit "${{ github.event.pull_request.number }}" --add-label "ai-reworked"

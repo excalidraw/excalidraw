@@ -1,2 +1,4 @@
 #!/bin/sh
+# Keep code hooks in Husky; add workflow linting via Lefthook.
 # yarn lint-staged
+mise exec -- lefthook run pre-commit "$@"

@@ -1,0 +1,62 @@
+name: "AI: Review PR"
+
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      issues: write
+    if: |
+      github.event.action == 'labeled' &&
+      github.event.label.name == 'ai-implemented'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Cache OpenCode
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.opencode/bin
+          key: opencode-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Install OpenCode
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: curl -fsSL https://opencode.ai/install | bash
+
+      - name: Add OpenCode to PATH
+        run: echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+      - name: Run OpenCode reviewer agent
+        env:
+          MODEL: opencode/big-pickle
+          AGENT: reviewer
+          PROMPT: |
+            Review this pull request thoroughly:
+            - Check for code quality issues, potential bugs, and security concerns
+            - Look for performance implications and maintainability
+            - Suggest specific improvements with actionable feedback
+            - Leave review comments on the relevant lines of code
+            - Respond only on the pull request (review comments/review summary), not on the underlying issue
+          SKAINET_TOKEN: ${{ secrets.SKAINET_TOKEN }}
+        run: opencode github run
+
+      - name: Label the PR as ai-reviewed
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr edit "$PR_NUMBER" --add-label "ai-reviewed"
+          else
+            echo "No PR number available to label."
+          fi
