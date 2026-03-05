@@ -624,7 +624,8 @@
     "syntax": "Sintaxe em Mermaid",
     "preview": "Visualizar",
     "label": "Mermaid",
-    "inputPlaceholder": "Escreva definição de diagrama Mermaid aqui..."
+    "inputPlaceholder": "Escreva definição de diagrama Mermaid aqui...",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": "Erro!"
