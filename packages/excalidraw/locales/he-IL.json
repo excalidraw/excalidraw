@@ -624,7 +624,8 @@
     "syntax": "תחביר Mermaid",
     "preview": "תצוגה מקדימה",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
