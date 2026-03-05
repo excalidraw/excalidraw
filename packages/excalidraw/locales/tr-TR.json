@@ -624,7 +624,8 @@
     "syntax": "Mermaid Sözdizimi",
     "preview": "Önizleme",
     "label": "Mermaid",
-    "inputPlaceholder": "\"Mermaid diyagram tanımını buraya yazın..."
+    "inputPlaceholder": "\"Mermaid diyagram tanımını buraya yazın...",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": "Hata!"
