@@ -624,7 +624,8 @@
     "syntax": "Σύνταξη Mermaid",
     "preview": "Προεπισκόπηση",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
