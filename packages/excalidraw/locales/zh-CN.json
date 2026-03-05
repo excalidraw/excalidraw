@@ -624,7 +624,8 @@
     "syntax": "Mermaid 语法",
     "preview": "预览",
     "label": "Mermaid",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
