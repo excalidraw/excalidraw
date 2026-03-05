@@ -624,7 +624,8 @@
     "syntax": "Mermaid Syntaxis",
     "preview": "Voorbeeld",
     "label": "Mermaid",
-    "inputPlaceholder": "Noteer Mermaid diagram omschrijving hier..."
+    "inputPlaceholder": "Noteer Mermaid diagram omschrijving hier...",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": "Fout!"
