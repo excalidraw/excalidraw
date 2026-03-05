@@ -108,6 +108,7 @@ import {
   loadDesktopUIModePreference,
   setDesktopUIMode,
   isSelectionLikeTool,
+  oneOf,
 } from "@excalidraw/common";
 
 import {
@@ -118,7 +119,6 @@ import {
   fixBindingsAfterDeletion,
   getHoveredElementForBinding,
   isBindingEnabled,
-  shouldEnableBindingForPointerEvent,
   updateBoundElements,
   LinearElementEditor,
   newElementWith,
@@ -249,6 +249,7 @@ import {
   maxBindingDistance_simple,
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
+  getSnapOutlineMidPoint,
   handleFocusPointDrag,
   handleFocusPointHover,
   handleFocusPointPointerDown,
@@ -317,6 +318,8 @@ import {
   actionToggleElementLock,
   actionToggleLinearEditor,
   actionToggleObjectsSnapMode,
+  actionToggleArrowBinding,
+  actionToggleMidpointSnapping,
   actionToggleCropEditor,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
@@ -423,6 +426,8 @@ import { EraserTrail } from "../eraser";
 
 import { getShortcutKey } from "../shortcut";
 
+import { tryParseSpreadsheet } from "../charts";
+
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
   convertElementTypePopupAtom,
@@ -441,10 +446,7 @@ import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
-import {
-  isPointHittingLink,
-  isPointHittingLinkIcon,
-} from "./hyperlink/helpers";
+import { isPointHittingLink } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { Toast } from "./Toast";
 
@@ -1209,12 +1211,112 @@ class App extends React.Component<AppProps, AppState> {
     return this.iFrameRefs.get(element.id);
   }
 
-  private handleEmbeddableCenterClick(element: ExcalidrawIframeLikeElement) {
+  private handleIframeLikeElementHover = ({
+    hitElement,
+    scenePointer,
+    moveEvent,
+  }: {
+    hitElement: NonDeleted<ExcalidrawElement> | null;
+    scenePointer: { x: number; y: number };
+    moveEvent: React.PointerEvent<HTMLCanvasElement>;
+  }): boolean => {
     if (
-      this.state.activeEmbeddable?.element === element &&
+      hitElement &&
+      isIframeLikeElement(hitElement) &&
+      (this.state.viewModeEnabled ||
+        this.state.activeTool.type === "laser" ||
+        this.isIframeLikeElementCenter(
+          hitElement,
+          moveEvent,
+          scenePointer.x,
+          scenePointer.y,
+        ))
+    ) {
+      setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+      this.setState({
+        activeEmbeddable: { element: hitElement, state: "hover" },
+      });
+      return true;
+    } else if (this.state.activeEmbeddable?.state === "hover") {
+      this.setState({ activeEmbeddable: null });
+    }
+    return false;
+  };
+
+  /** @returns true if iframe-like element click handled */
+  private handleIframeLikeCenterClick(): boolean {
+    if (
+      !this.lastPointerDownEvent ||
+      !this.lastPointerUpEvent ||
+      // middle-click or something other than primary
+      this.lastPointerDownEvent.button !== POINTER_BUTTON.MAIN ||
+      // panning
+      isHoldingSpace ||
+      // wrong tool
+      !oneOf(this.state.activeTool.type, ["laser", "selection", "lasso"])
+    ) {
+      return false;
+    }
+
+    const viewportClickStart_scenePoint = pointFrom(
+      viewportCoordsToSceneCoords(
+        {
+          clientX: this.lastPointerDownEvent.clientX,
+          clientY: this.lastPointerDownEvent.clientY,
+        },
+        this.state,
+      ),
+    );
+    const viewportClickEnd_scenePoint = pointFrom(
+      viewportCoordsToSceneCoords(
+        {
+          clientX: this.lastPointerUpEvent.clientX,
+          clientY: this.lastPointerUpEvent.clientY,
+        },
+        this.state,
+      ),
+    );
+
+    const draggedDistance = pointDistance(
+      viewportClickStart_scenePoint,
+      viewportClickEnd_scenePoint,
+    );
+
+    if (draggedDistance > DRAGGING_THRESHOLD) {
+      return false;
+    }
+
+    const hitElement = this.getElementAtPosition(
+      viewportClickStart_scenePoint[0],
+      viewportClickStart_scenePoint[1],
+    );
+
+    const shouldActivate =
+      hitElement &&
+      this.lastPointerUpEvent.timeStamp - this.lastPointerDownEvent.timeStamp <=
+        300 &&
+      gesture.pointers.size < 2 &&
+      isIframeLikeElement(hitElement) &&
+      (this.state.viewModeEnabled ||
+        this.state.activeTool.type === "laser" ||
+        this.isIframeLikeElementCenter(
+          hitElement,
+          this.lastPointerUpEvent,
+          viewportClickEnd_scenePoint[0],
+          viewportClickEnd_scenePoint[1],
+        ));
+
+    if (!shouldActivate) {
+      return false;
+    }
+
+    const iframeLikeElement = hitElement;
+
+    if (
+      this.state.activeEmbeddable?.element === iframeLikeElement &&
       this.state.activeEmbeddable?.state === "active"
     ) {
-      return;
+      return true;
     }
 
     // The delay serves two purposes
@@ -1225,31 +1327,34 @@ class App extends React.Component<AppProps, AppState> {
     //    in fullscreen mode
     setTimeout(() => {
       this.setState({
-        activeEmbeddable: { element, state: "active" },
-        selectedElementIds: { [element.id]: true },
+        activeEmbeddable: { element: iframeLikeElement, state: "active" },
+        selectedElementIds: { [iframeLikeElement.id]: true },
         newElement: null,
         selectionElement: null,
       });
     }, 100);
 
-    if (isIframeElement(element)) {
-      return;
+    if (isIframeElement(iframeLikeElement)) {
+      return true;
     }
 
-    const iframe = this.getHTMLIFrameElement(element);
+    const iframe = this.getHTMLIFrameElement(iframeLikeElement);
 
     if (!iframe?.contentWindow) {
-      return;
+      return true;
     }
 
     if (iframe.src.includes("youtube")) {
-      const state = YOUTUBE_VIDEO_STATES.get(element.id);
+      const state = YOUTUBE_VIDEO_STATES.get(iframeLikeElement.id);
       if (!state) {
-        YOUTUBE_VIDEO_STATES.set(element.id, YOUTUBE_STATES.UNSTARTED);
+        YOUTUBE_VIDEO_STATES.set(
+          iframeLikeElement.id,
+          YOUTUBE_STATES.UNSTARTED,
+        );
         iframe.contentWindow.postMessage(
           JSON.stringify({
             event: "listening",
-            id: element.id,
+            id: iframeLikeElement.id,
           }),
           "*",
         );
@@ -1286,6 +1391,8 @@ class App extends React.Component<AppProps, AppState> {
         "*",
       );
     }
+
+    return true;
   }
 
   private isIframeLikeElementCenter(
@@ -2628,7 +2735,9 @@ class App extends React.Component<AppProps, AppState> {
 
   private onBlur = withBatchedUpdates(() => {
     isHoldingSpace = false;
-    this.setState({ isBindingEnabled: true });
+    this.setState({
+      isBindingEnabled: this.state.bindingPreference === "enabled",
+    });
   });
 
   private onUnload = () => {
@@ -3438,14 +3547,19 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // ------------------- Spreadsheet -------------------
-    if (data.spreadsheet && !isPlainPaste) {
-      this.setState({
-        pasteDialog: {
-          data: data.spreadsheet,
-          shown: true,
-        },
-      });
-      return;
+
+    if (!isPlainPaste && data.text) {
+      const result = tryParseSpreadsheet(data.text);
+      if (result.ok) {
+        this.setState({
+          openDialog: {
+            name: "charts",
+            data: result.data,
+            rawText: data.text,
+          },
+        });
+        return;
+      }
     }
 
     // ------------------- Images or SVG code -------------------
@@ -4754,17 +4868,87 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      // view mode hardcoded from upstream -> disable tool switching for now
+      const shouldPreventToolSwitching = this.props.viewModeEnabled === true;
+
+      if (
+        !shouldPreventToolSwitching &&
+        this.state.viewModeEnabled &&
+        event.key === KEYS.ESCAPE
+      ) {
+        this.setActiveTool({ type: "selection" });
+        return;
+      }
+
+      if (
+        !shouldPreventToolSwitching &&
+        !event.ctrlKey &&
+        !event.altKey &&
+        !event.metaKey &&
+        !this.state.newElement &&
+        !this.state.selectionElement &&
+        !this.state.selectedElementsAreBeingDragged
+      ) {
+        const shape = findShapeByKey(event.key, this);
+
+        if (this.state.viewModeEnabled && !oneOf(shape, ["laser", "hand"])) {
+          return;
+        }
+
+        if (shape) {
+          if (this.state.activeTool.type !== shape) {
+            trackEvent(
+              "toolbar",
+              shape,
+              `keyboard (${
+                this.editorInterface.formFactor === "phone"
+                  ? "mobile"
+                  : "desktop"
+              })`,
+            );
+          }
+          if (shape === "arrow" && this.state.activeTool.type === "arrow") {
+            this.setState((prevState) => ({
+              currentItemArrowType:
+                prevState.currentItemArrowType === ARROW_TYPE.sharp
+                  ? ARROW_TYPE.round
+                  : prevState.currentItemArrowType === ARROW_TYPE.round
+                  ? ARROW_TYPE.elbow
+                  : ARROW_TYPE.sharp,
+            }));
+          }
+
+          if (shape === "lasso" && this.state.activeTool.type === "laser") {
+            this.setActiveTool({
+              type: this.state.preferredSelectionTool.type,
+            });
+          } else {
+            this.setActiveTool({ type: shape });
+          }
+
+          event.stopPropagation();
+
+          return;
+        } else if (event.key === KEYS.Q) {
+          this.toggleLock("keyboard");
+          event.stopPropagation();
+          return;
+        }
+      }
+
       if (this.state.viewModeEnabled) {
         return;
       }
 
-      if (event[KEYS.CTRL_OR_CMD] && this.state.isBindingEnabled) {
+      if (event[KEYS.CTRL_OR_CMD] && !event.repeat) {
         if (getFeatureFlag("COMPLEX_BINDINGS")) {
           this.resetDelayedBindMode();
         }
 
         flushSync(() => {
-          this.setState({ isBindingEnabled: false });
+          this.setState({
+            isBindingEnabled: this.state.bindingPreference !== "enabled",
+          });
         });
 
         maybeHandleArrowPointlikeDrag({ app: this, event });
@@ -4887,44 +5071,8 @@ class App extends React.Component<AppProps, AppState> {
             });
           }
         }
-      } else if (
-        !event.ctrlKey &&
-        !event.altKey &&
-        !event.metaKey &&
-        !this.state.newElement &&
-        !this.state.selectionElement &&
-        !this.state.selectedElementsAreBeingDragged
-      ) {
-        const shape = findShapeByKey(event.key, this);
-        if (shape) {
-          if (this.state.activeTool.type !== shape) {
-            trackEvent(
-              "toolbar",
-              shape,
-              `keyboard (${
-                this.editorInterface.formFactor === "phone"
-                  ? "mobile"
-                  : "desktop"
-              })`,
-            );
-          }
-          if (shape === "arrow" && this.state.activeTool.type === "arrow") {
-            this.setState((prevState) => ({
-              currentItemArrowType:
-                prevState.currentItemArrowType === ARROW_TYPE.sharp
-                  ? ARROW_TYPE.round
-                  : prevState.currentItemArrowType === ARROW_TYPE.round
-                  ? ARROW_TYPE.elbow
-                  : ARROW_TYPE.sharp,
-            }));
-          }
-          this.setActiveTool({ type: shape });
-          event.stopPropagation();
-        } else if (event.key === KEYS.Q) {
-          this.toggleLock("keyboard");
-          event.stopPropagation();
-        }
       }
+
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
         isHoldingSpace = true;
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
@@ -4988,15 +5136,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (event.key === KEYS.K && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
-        if (this.state.activeTool.type === "laser") {
-          this.setActiveTool({ type: this.state.preferredSelectionTool.type });
-        } else {
-          this.setActiveTool({ type: "laser" });
-        }
-        return;
-      }
-
       if (
         event[KEYS.CTRL_OR_CMD] &&
         (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
@@ -5023,7 +5162,8 @@ class App extends React.Component<AppProps, AppState> {
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
       if (
-        this.state.viewModeEnabled ||
+        (this.state.viewModeEnabled &&
+          this.state.activeTool.type !== "laser") ||
         this.state.openDialog?.name === "elementLinkSelector"
       ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
@@ -5082,10 +5222,13 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
     }
-    if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
-      flushSync(() => {
-        this.setState({ isBindingEnabled: true });
-      });
+    if (!event[KEYS.CTRL_OR_CMD]) {
+      const preferenceEnabled = this.state.bindingPreference === "enabled";
+      if (this.state.isBindingEnabled !== preferenceEnabled) {
+        flushSync(() => {
+          this.setState({ isBindingEnabled: preferenceEnabled });
+        });
+      }
 
       maybeHandleArrowPointlikeDrag({ app: this, event });
     }
@@ -6137,9 +6280,8 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private redirectToLink = (
+  private handleElementLinkClick = (
     event: React.PointerEvent<HTMLCanvasElement>,
-    isTouchScreen: boolean,
   ) => {
     const draggedDistance = pointDistance(
       pointFrom(
@@ -6400,15 +6542,28 @@ class App extends React.Component<AppProps, AppState> {
       // and point
       const { newElement } = this.state;
       if (!newElement && isBindingEnabled(this.state)) {
+        const globalPoint = pointFrom<GlobalPoint>(
+          scenePointerX,
+          scenePointerY,
+        );
+        const elementsMap = this.scene.getNonDeletedElementsMap();
         const hoveredElement = getHoveredElementForBinding(
-          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+          globalPoint,
           this.scene.getNonDeletedElements(),
-          this.scene.getNonDeletedElementsMap(),
+          elementsMap,
           maxBindingDistance_simple(this.state.zoom),
         );
         if (hoveredElement) {
           this.setState({
-            suggestedBinding: hoveredElement,
+            suggestedBinding: {
+              element: hoveredElement,
+              midPoint: getSnapOutlineMidPoint(
+                globalPoint,
+                hoveredElement,
+                elementsMap,
+                this.state.zoom,
+              ),
+            },
           });
         } else if (this.state.suggestedBinding) {
           this.setState({
@@ -6591,24 +6746,31 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.getNonDeletedElementsMap(),
         maxBindingDistance_simple(this.state.zoom),
       );
-      if (
-        hit &&
-        !isPointInElement(
-          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-          hit,
-          this.scene.getNonDeletedElementsMap(),
-        )
-      ) {
+      const scenePointer = pointFrom<GlobalPoint>(scenePointerX, scenePointerY);
+      const elementsMap = this.scene.getNonDeletedElementsMap();
+      if (hit && !isPointInElement(scenePointer, hit, elementsMap)) {
         this.setState({
-          suggestedBinding: hit,
+          suggestedBinding: {
+            element: hit,
+            midPoint: getSnapOutlineMidPoint(
+              scenePointer,
+              hit,
+              elementsMap,
+              this.state.zoom,
+            ),
+          },
         });
       }
     }
 
-    const hasDeselectedButton = Boolean(event.buttons);
+    const isPressingAnyButton = Boolean(event.buttons);
+    const isLaserTool = this.state.activeTool.type === "laser";
     if (
-      hasDeselectedButton ||
-      (this.state.activeTool.type !== "selection" &&
+      isPressingAnyButton ||
+      // checking against laser so that if you mouseover with a laser tool
+      // over a link/embeddable, we change the cursor
+      (!isLaserTool &&
+        this.state.activeTool.type !== "selection" &&
         this.state.activeTool.type !== "lasso" &&
         this.state.activeTool.type !== "text" &&
         this.state.activeTool.type !== "eraser")
@@ -6693,6 +6855,10 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
+    if (isEraserActive(this.state)) {
+      return;
+    }
+
     const hitElementMightBeLocked = this.getElementAtPosition(
       scenePointerX,
       scenePointerY,
@@ -6709,18 +6875,25 @@ class App extends React.Component<AppProps, AppState> {
       hitElement = hitElementMightBeLocked;
     }
 
-    this.hitLinkElement = this.getElementLinkAtPosition(
-      scenePointer,
-      hitElementMightBeLocked,
-    );
-    if (isEraserActive(this.state)) {
-      return;
+    if (
+      !this.handleIframeLikeElementHover({
+        hitElement,
+        scenePointer,
+        moveEvent: event,
+      })
+    ) {
+      this.hitLinkElement = this.getElementLinkAtPosition(
+        scenePointer,
+        hitElementMightBeLocked,
+      );
     }
+
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+
       showHyperlinkTooltip(
         this.hitLinkElement,
         this.state,
@@ -6728,6 +6901,9 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else {
       hideHyperlinkToolip();
+      if (isLaserTool) {
+        return;
+      }
       if (
         hitElement &&
         (hitElement.link || isEmbeddableElement(hitElement)) &&
@@ -6760,20 +6936,6 @@ class App extends React.Component<AppProps, AppState> {
           !hitElement?.locked
         ) {
           if (
-            hitElement &&
-            isIframeLikeElement(hitElement) &&
-            this.isIframeLikeElementCenter(
-              hitElement,
-              event,
-              scenePointerX,
-              scenePointerY,
-            )
-          ) {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-            this.setState({
-              activeEmbeddable: { element: hitElement, state: "hover" },
-            });
-          } else if (
             !hitElement ||
             // Elbow arrows can only be moved when unconnected
             !isElbowArrow(hitElement) ||
@@ -6784,9 +6946,6 @@ class App extends React.Component<AppProps, AppState> {
               selectedElements.length > 0
             ) {
               setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
-            }
-            if (this.state.activeEmbeddable?.state === "hover") {
-              this.setState({ activeEmbeddable: null });
             }
           }
         }
@@ -6987,6 +7146,14 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    // If Ctrl is not held, ensure isBindingEnabled reflects the user preference.
+    if (!event.ctrlKey) {
+      const preferenceEnabled = this.state.bindingPreference === "enabled";
+      if (this.state.isBindingEnabled !== preferenceEnabled) {
+        this.setState({ isBindingEnabled: preferenceEnabled });
+      }
+    }
+
     const scenePointer = viewportCoordsToSceneCoords(event, this.state);
     const { x: scenePointerX, y: scenePointerY } = scenePointer;
     this.lastPointerMoveCoords = {
@@ -7207,7 +7374,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.clearSelectionIfNotUsingSelection();
-    this.updateBindingEnabledOnPointerMove(event);
 
     if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
       return;
@@ -7430,6 +7596,13 @@ class App extends React.Component<AppProps, AppState> {
     this.removePointer(event);
     this.lastPointerUpEvent = event;
 
+    if (!event.ctrlKey) {
+      const preferenceEnabled = this.state.bindingPreference === "enabled";
+      if (this.state.isBindingEnabled !== preferenceEnabled) {
+        this.setState({ isBindingEnabled: preferenceEnabled });
+      }
+    }
+
     const scenePointer = viewportCoordsToSceneCoords(
       { clientX: event.clientX, clientY: event.clientY },
       this.state,
@@ -7439,26 +7612,9 @@ class App extends React.Component<AppProps, AppState> {
       x: scenePointerX,
       y: scenePointerY,
     };
-    const clicklength =
-      event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0);
 
-    if (this.editorInterface.formFactor === "phone" && clicklength < 300) {
-      const hitElement = this.getElementAtPosition(
-        scenePointer.x,
-        scenePointer.y,
-      );
-      if (
-        isIframeLikeElement(hitElement) &&
-        this.isIframeLikeElementCenter(
-          hitElement,
-          event,
-          scenePointer.x,
-          scenePointer.y,
-        )
-      ) {
-        this.handleEmbeddableCenterClick(hitElement);
-        return;
-      }
+    if (this.handleIframeLikeCenterClick()) {
+      return;
     }
 
     if (this.editorInterface.isTouchScreen) {
@@ -7479,20 +7635,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
-      if (
-        clicklength < 300 &&
-        isIframeLikeElement(this.hitLinkElement) &&
-        !isPointHittingLinkIcon(
-          this.hitLinkElement,
-          this.scene.getNonDeletedElementsMap(),
-          this.state,
-          pointFrom(scenePointer.x, scenePointer.y),
-        )
-      ) {
-        this.handleEmbeddableCenterClick(this.hitLinkElement);
-      } else {
-        this.redirectToLink(event, this.editorInterface.isTouchScreen);
-      }
+      this.handleElementLinkClick(event);
     } else if (this.state.viewModeEnabled) {
       this.setState({
         activeEmbeddable: null,
@@ -7552,7 +7695,8 @@ class App extends React.Component<AppProps, AppState> {
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           isHandToolActive(this.state) ||
-          this.state.viewModeEnabled)
+          (this.state.viewModeEnabled &&
+            this.state.activeTool.type !== "laser"))
       )
     ) {
       return false;
@@ -7630,7 +7774,10 @@ class App extends React.Component<AppProps, AppState> {
         lastPointerUp = null;
         isPanning = false;
         if (!isHoldingSpace) {
-          if (this.state.viewModeEnabled) {
+          if (
+            this.state.viewModeEnabled &&
+            this.state.activeTool.type !== "laser"
+          ) {
             setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
           } else {
             setCursorForShape(this.interactiveCanvas, this.state);
@@ -8511,7 +8658,9 @@ class App extends React.Component<AppProps, AppState> {
   ): void => {
     if (event.ctrlKey) {
       flushSync(() => {
-        this.setState({ isBindingEnabled: false });
+        this.setState({
+          isBindingEnabled: this.state.bindingPreference !== "enabled",
+        });
       });
     }
 
@@ -8743,6 +8892,7 @@ class App extends React.Component<AppProps, AppState> {
               selectedPointsIndices: [endIdx],
               initialState: {
                 ...linearElementEditor.initialState,
+                arrowStartIsInside: event.altKey,
                 lastClickedPoint: endIdx,
                 origin: pointFrom<GlobalPoint>(
                   pointerDownState.origin.x,
@@ -8761,7 +8911,18 @@ class App extends React.Component<AppProps, AppState> {
             bindMode: "orbit",
             newElement: element,
             startBoundElement: boundElement,
-            suggestedBinding: boundElement || null,
+            suggestedBinding:
+              boundElement && isBindingElement(element)
+                ? {
+                    element: boundElement,
+                    midPoint: getSnapOutlineMidPoint(
+                      point,
+                      boundElement,
+                      elementsMap,
+                      this.state.zoom,
+                    ),
+                  }
+                : null,
             selectedElementIds: nextSelectedElementIds,
             selectedLinearElement: linearElementEditor,
           };
@@ -10823,25 +10984,6 @@ class App extends React.Component<AppProps, AppState> {
           suggestedBinding: null,
         });
       }
-
-      if (
-        hitElement &&
-        this.lastPointerUpEvent &&
-        this.lastPointerDownEvent &&
-        this.lastPointerUpEvent.timeStamp -
-          this.lastPointerDownEvent.timeStamp <
-          300 &&
-        gesture.pointers.size <= 1 &&
-        isIframeLikeElement(hitElement) &&
-        this.isIframeLikeElementCenter(
-          hitElement,
-          this.lastPointerUpEvent,
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-        )
-      ) {
-        this.handleEmbeddableCenterClick(hitElement);
-      }
     });
   }
 
@@ -11211,15 +11353,6 @@ class App extends React.Component<AppProps, AppState> {
   private scheduleImageRefresh = throttle(() => {
     this.addNewImagesToImageCache();
   }, IMAGE_RENDER_TIMEOUT);
-
-  private updateBindingEnabledOnPointerMove = (
-    event: React.PointerEvent<HTMLElement>,
-  ) => {
-    const shouldEnableBinding = shouldEnableBindingForPointerEvent(event);
-    if (this.state.isBindingEnabled !== shouldEnableBinding) {
-      this.setState({ isBindingEnabled: shouldEnableBinding });
-    }
-  };
 
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
@@ -11982,6 +12115,8 @@ class App extends React.Component<AppProps, AppState> {
         CONTEXT_MENU_SEPARATOR,
         actionToggleGridMode,
         actionToggleObjectsSnapMode,
+        actionToggleArrowBinding,
+        actionToggleMidpointSnapping,
         actionToggleZenMode,
         actionToggleViewMode,
         actionToggleStats,

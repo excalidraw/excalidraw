@@ -108,7 +108,6 @@ export const actionFinalize = register<FormData>({
 
             return map;
           }, new Map()) ?? new Map();
-
         bindOrUnbindBindingElement(
           element,
           draggedPoints,

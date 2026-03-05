@@ -59,6 +59,8 @@ export type ActionName =
   | "gridMode"
   | "zenMode"
   | "objectsSnapMode"
+  | "arrowBinding"
+  | "midpointSnapping"
   | "stats"
   | "changeStrokeColor"
   | "changeBackgroundColor"
