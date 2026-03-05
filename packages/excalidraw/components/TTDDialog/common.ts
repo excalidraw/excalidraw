@@ -72,15 +72,23 @@ export const convertMermaidToExcalidraw = async ({
     const api = await mermaidToExcalidrawLib.api;
 
     try {
+      ret = await api.parseMermaidToExcalidraw(mermaidDefinition);
+    } catch (err: unknown) {
+      const originalParseError = err as Error;
+
+      if (!mermaidDefinition.includes('"')) {
+        return { success: false, error: originalParseError };
+      }
+
       try {
-        ret = await api.parseMermaidToExcalidraw(mermaidDefinition);
-      } catch (err: unknown) {
         ret = await api.parseMermaidToExcalidraw(
           mermaidDefinition.replace(/"/g, "'"),
         );
+      } catch {
+        // Keep the original error so line/column references stay aligned with
+        // the user's unmodified input.
+        return { success: false, error: originalParseError };
       }
-    } catch (err: unknown) {
-      return { success: false, error: err as Error };
     }
 
     const { elements, files } = ret;
