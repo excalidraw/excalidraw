@@ -624,7 +624,8 @@
     "syntax": "Syntax Mermaid",
     "preview": "Pratinjau",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
