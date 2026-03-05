@@ -624,7 +624,8 @@
     "syntax": "Mermaid 構文",
     "preview": "プレビュー",
     "label": "Mermaid",
-    "inputPlaceholder": "Mermaid のダイアグラム定義をここに入力..."
+    "inputPlaceholder": "Mermaid のダイアグラム定義をここに入力...",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": "エラー！"
