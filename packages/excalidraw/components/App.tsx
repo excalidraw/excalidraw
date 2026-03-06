@@ -6880,7 +6880,7 @@ class App extends React.Component<AppProps, AppState> {
           id: element.id,
         }),
         ...(isArrowElement(container) && {
-          boundTextPositionOnPath: container.boundTextPositionOnPath ?? 0.5,
+          boundTextParameter: container.boundTextParameter ?? 0.5,
         }),
       });
     }
@@ -8210,6 +8210,15 @@ class App extends React.Component<AppProps, AppState> {
           : hoverPointIndex >= 0;
         if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
           this.cursor.set(CURSOR_TYPE.POINTER);
+        } else if (
+          isArrowElement(element) &&
+          hitElementBoundText(
+            pointFrom(scenePointerX, scenePointerY),
+            element,
+            elementsMap,
+          )
+        ) {
+          this.cursor.set(CURSOR_TYPE.MOVE);
         } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
           if (
             // Elbow arrows can only be moved when unconnected
@@ -10630,6 +10639,26 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
+        // Here is where we could potentially account for dragging of bound text elements
+        if (
+          linearElementEditor.isDragging &&
+          linearElementEditor.lastBoundTextParameter
+        ) {
+          const updatedEditor = LinearElementEditor.handleBoundTextDragging(
+            linearElementEditor,
+            this.scene,
+            pointerCoords.x,
+            pointerCoords.y,
+          );
+          if (updatedEditor) {
+            pointerDownState.drag.hasOccurred = true;
+            this.setState({
+              selectedLinearElement: updatedEditor,
+            });
+          }
+          return;
+        }
+
         if (
           LinearElementEditor.shouldAddMidpoint(
             this.state.selectedLinearElement,
@@ -11542,7 +11571,8 @@ class App extends React.Component<AppProps, AppState> {
       if (
         this.state.selectedLinearElement?.isEditing &&
         !this.state.newElement &&
-        this.state.selectedLinearElement.draggedFocusPointBinding === null
+        this.state.selectedLinearElement.draggedFocusPointBinding === null &&
+        !this.state.selectedLinearElement.lastBoundTextParameter
       ) {
         if (
           !pointerDownState.boxSelection.hasOccurred &&
@@ -11597,6 +11627,14 @@ class App extends React.Component<AppProps, AppState> {
                 ...this.state.selectedLinearElement.initialState,
                 arrowOtherEndpointInitialBinding: null,
               },
+            },
+          });
+        } else if (this.state.selectedLinearElement.lastBoundTextParameter) {
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              lastBoundTextParameter: null,
+              isDragging: false,
             },
           });
         } else if (
