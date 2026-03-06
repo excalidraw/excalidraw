@@ -2,7 +2,7 @@
 
 exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu items if passed from host 1`] = `
 <div
-  aria-labelledby="radix-:r7t:"
+  aria-labelledby="radix-:r85:"
   aria-orientation="vertical"
   class="dropdown-menu main-menu"
   data-align="start"
@@ -12,7 +12,7 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
   data-state="open"
   data-testid="dropdown-menu"
   dir="ltr"
-  id="radix-:r7u:"
+  id="radix-:r86:"
   role="menu"
   style="outline: none; --radix-dropdown-menu-content-transform-origin: var(--radix-popper-transform-origin); --radix-dropdown-menu-content-available-width: var(--radix-popper-available-width); --radix-dropdown-menu-content-available-height: var(--radix-popper-available-height); --radix-dropdown-menu-trigger-width: var(--radix-popper-anchor-width); --radix-dropdown-menu-trigger-height: var(--radix-popper-anchor-height); animation: none;"
   tabindex="-1"
