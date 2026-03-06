@@ -42,9 +42,9 @@ $wide-viewport-width: 1000px;
 
   &.theme--dark {
     .HintViewer {
-      color: var(--color-gray-60);
+      color: var(--color-gray-40);
       kbd {
-        border-color: var(--color-gray-60);
+        border-color: var(--color-gray-40);
       }
     }
   }
