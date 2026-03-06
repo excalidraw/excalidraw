@@ -719,6 +719,7 @@ export type AppProps = Merge<
 export type AppClassProperties = {
   props: AppProps;
   state: AppState;
+  sessionExportThemeOverride: App["sessionExportThemeOverride"];
   interactiveCanvas: HTMLCanvasElement | null;
   /** static canvas */
   canvas: HTMLCanvasElement;
