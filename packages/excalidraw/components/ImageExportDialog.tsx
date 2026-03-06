@@ -59,6 +59,7 @@ type ImageExportModalProps = {
   actionManager: ActionManager;
   onExportImage: AppClassProperties["onExportImage"];
   name: string;
+  exportWithDarkMode: boolean;
 };
 
 const ImageExportModal = ({
@@ -68,6 +69,7 @@ const ImageExportModal = ({
   actionManager,
   onExportImage,
   name,
+  exportWithDarkMode,
 }: ImageExportModalProps) => {
   const hasSelection = isSomeElementSelected(
     elementsSnapshot,
@@ -78,9 +80,6 @@ const ImageExportModal = ({
   const [exportSelectionOnly, setExportSelectionOnly] = useState(hasSelection);
   const [exportWithBackground, setExportWithBackground] = useState(
     appStateSnapshot.exportBackground,
-  );
-  const [exportDarkMode, setExportDarkMode] = useState(
-    appStateSnapshot.exportWithDarkMode,
   );
   const [embedScene, setEmbedScene] = useState(
     appStateSnapshot.exportEmbedScene,
@@ -99,7 +98,7 @@ const ImageExportModal = ({
   }, [
     projectName,
     exportWithBackground,
-    exportDarkMode,
+    exportWithDarkMode,
     exportScale,
     embedScene,
     resetCopyStatus,
@@ -128,7 +127,7 @@ const ImageExportModal = ({
         ...appStateSnapshot,
         name: projectName,
         exportBackground: exportWithBackground,
-        exportWithDarkMode: exportDarkMode,
+        exportWithDarkMode,
         exportScale,
         exportEmbedScene: embedScene,
       },
@@ -163,7 +162,7 @@ const ImageExportModal = ({
     exportingFrame,
     projectName,
     exportWithBackground,
-    exportDarkMode,
+    exportWithDarkMode,
     exportScale,
     embedScene,
   ]);
@@ -233,9 +232,8 @@ const ImageExportModal = ({
         >
           <Switch
             name="exportDarkModeSwitch"
-            checked={exportDarkMode}
+            checked={exportWithDarkMode}
             onChange={(checked) => {
-              setExportDarkMode(checked);
               actionManager.executeAction(
                 actionExportWithDarkMode,
                 "ui",
@@ -399,6 +397,7 @@ export const ImageExportDialog = ({
         actionManager={actionManager}
         onExportImage={onExportImage}
         name={name}
+        exportWithDarkMode={appState.exportWithDarkMode}
       />
     </Dialog>
   );
