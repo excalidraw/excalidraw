@@ -1,9 +1,11 @@
 import { line, linesIntersectAt } from "./line";
+
 import {
   isPoint,
   pointCenter,
   pointFromVector,
   pointRotateRads,
+  pointFrom,
 } from "./point";
 import { PRECISION } from "./utils";
 import {
@@ -192,4 +194,34 @@ export function lineSegmentsDistance<Point extends GlobalPoint | LocalPoint>(
     distanceToLineSegment(s2[0], s1),
     distanceToLineSegment(s2[1], s1),
   );
+}
+
+export function lineSegmentClosestParameter<
+  Point extends GlobalPoint | LocalPoint,
+>(point: Point, line: LineSegment<Point>): number {
+  const [x, y] = point;
+  const [[x1, y1], [x2, y2]] = line;
+
+  const A = x - x1;
+  const B = y - y1;
+  const C = x2 - x1;
+  const D = y2 - y1;
+
+  const dot = A * C + B * D;
+  const len_sq = C * C + D * D;
+  let param = 0;
+  if (len_sq !== 0) {
+    param = dot / len_sq;
+  }
+
+  return Math.max(0, Math.min(1, param));
+}
+
+export function pointOnLineSegmentAtParameter<
+  Point extends GlobalPoint | LocalPoint,
+>(line: LineSegment<Point>, parameter: number): Point {
+  const [[x1, y1], [x2, y2]] = line;
+  const x = x1 + parameter * (x2 - x1);
+  const y = y1 + parameter * (y2 - y1);
+  return pointFrom<Point>(x, y);
 }
