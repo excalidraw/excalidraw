@@ -151,24 +151,19 @@ export const debounce = <T extends any[]>(
   return ret;
 };
 
-// throttle callback to execute once per animation frame
-export const throttleRAF = <T extends any[]>(
-  fn: (...args: T) => void,
-  opts?: { trailing?: boolean },
-) => {
+// throttle callback to execute once per animation frame using the latest args
+export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
   let timerId: number | null = null;
   let lastArgs: T | null = null;
-  let lastArgsTrailing: T | null = null;
 
-  const scheduleFunc = (args: T) => {
+  const scheduleFunc = () => {
     timerId = window.requestAnimationFrame(() => {
       timerId = null;
-      fn(...args);
+      const args = lastArgs;
       lastArgs = null;
-      if (lastArgsTrailing) {
-        lastArgs = lastArgsTrailing;
-        lastArgsTrailing = null;
-        scheduleFunc(lastArgs);
+
+      if (args) {
+        fn(...args);
       }
     });
   };
@@ -180,9 +175,7 @@ export const throttleRAF = <T extends any[]>(
     }
     lastArgs = args;
     if (timerId === null) {
-      scheduleFunc(lastArgs);
-    } else if (opts?.trailing) {
-      lastArgsTrailing = args;
+      scheduleFunc();
     }
   };
   ret.flush = () => {
@@ -191,12 +184,12 @@ export const throttleRAF = <T extends any[]>(
       timerId = null;
     }
     if (lastArgs) {
-      fn(...(lastArgsTrailing || lastArgs));
-      lastArgs = lastArgsTrailing = null;
+      fn(...lastArgs);
+      lastArgs = null;
     }
   };
   ret.cancel = () => {
-    lastArgs = lastArgsTrailing = null;
+    lastArgs = null;
     if (timerId !== null) {
       cancelAnimationFrame(timerId);
       timerId = null;
