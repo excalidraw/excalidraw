@@ -178,8 +178,8 @@
     "shapeSwitch": "Changer de forme",
     "preferences": "Préférences",
     "preferences_toolLock": "Verrouillage de l'outil",
-    "arrowBinding": "",
-    "midpointSnapping": ""
+    "arrowBinding": "Liaison de flèches",
+    "midpointSnapping": "S'accrocher aux points intermédiaires"
   },
   "elementLink": {
     "title": "Lien vers un objet",
@@ -625,7 +625,7 @@
     "preview": "Prévisualisation",
     "label": "Mermaid",
     "inputPlaceholder": "Écrivez la définition du diagramme de Mermaid ici...",
-    "autoFixAvailable": ""
+    "autoFixAvailable": "Correction automatique disponible"
   },
   "ttd": {
     "error": "Erreur!"
