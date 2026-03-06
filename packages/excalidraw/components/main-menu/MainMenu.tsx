@@ -8,6 +8,7 @@ import { t } from "../../i18n";
 import { useEditorInterface, useExcalidrawSetAppState } from "../App";
 import { UserList } from "../UserList";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";
+import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { HamburgerMenuIcon } from "../icons";
 
@@ -52,12 +53,8 @@ const MainMenu = Object.assign(
               onSelect={composeEventHandlers(onSelect, () => {
                 setAppState({ openMenu: null });
               })}
-              placement="bottom"
-              className={
-                editorInterface.formFactor === "phone"
-                  ? "main-menu-dropdown"
-                  : ""
-              }
+              className="main-menu"
+              align="start"
             >
               {children}
               {editorInterface.formFactor === "phone" &&
@@ -84,6 +81,7 @@ const MainMenu = Object.assign(
     ItemCustom: DropdownMenu.ItemCustom,
     Group: DropdownMenu.Group,
     Separator: DropdownMenu.Separator,
+    Sub: DropdownMenuSub,
     DefaultItems,
   },
 );

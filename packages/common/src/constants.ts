@@ -106,7 +106,15 @@ export const CLASSES = {
   CONVERT_ELEMENT_TYPE_POPUP: "ConvertElementTypePopup",
   SHAPE_ACTIONS_THEME_SCOPE: "shape-actions-theme-scope",
   FRAME_NAME: "frame-name",
+  DROPDOWN_MENU_EVENT_WRAPPER: "dropdown-menu-event-wrapper",
 };
+
+export const FONT_SIZES = {
+  sm: 16,
+  md: 20,
+  lg: 28,
+  xl: 36,
+} as const;
 
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
@@ -183,6 +191,8 @@ export const THEME = {
   DARK: "dark",
 } as const;
 
+export const DARK_THEME_FILTER = "invert(93%) hue-rotate(180deg)";
+
 export const FRAME_STYLE = {
   strokeColor: "#bbb" as ExcalidrawElement["strokeColor"],
   strokeWidth: 2 as ExcalidrawElement["strokeWidth"],
@@ -242,6 +252,7 @@ export const STRING_MIME_TYPES = {
   json: "application/json",
   // excalidraw data
   excalidraw: "application/vnd.excalidraw+json",
+  excalidrawClipboard: "application/vnd.excalidraw.clipboard+json",
   // LEGACY: fully-qualified library JSON data
   excalidrawlib: "application/vnd.excalidrawlib+json",
   // list of excalidraw library item ids
@@ -297,9 +308,6 @@ export const HYPERLINK_TOOLTIP_DELAY = 300;
 export const IDLE_THRESHOLD = 60_000;
 // Report a user active each ACTIVE_THRESHOLD milliseconds
 export const ACTIVE_THRESHOLD = 3_000;
-
-// duplicates --theme-filter, should be removed soon
-export const THEME_FILTER = "invert(93%) hue-rotate(180deg)";
 
 export const URL_QUERY_KEYS = {
   addLibrary: "addLibrary",

@@ -1,53 +1,76 @@
 import clsx from "clsx";
 
+import { Fragment } from "react";
+
 import { Button } from "../Button";
 import Spinner from "../Spinner";
 
 import type { ReactNode } from "react";
 
-interface TTDDialogPanelProps {
+export type TTDPanelAction = {
   label: string;
+  action?: () => void;
+  icon?: ReactNode;
+  variant: "button" | "link" | "rateLimit";
+  disabled?: boolean;
+  className?: string;
+};
+
+interface TTDDialogPanelProps {
+  label?: string | ReactNode;
   children: ReactNode;
-  panelAction?: {
-    label: string;
-    action: () => void;
-    icon?: ReactNode;
-  };
-  panelActionDisabled?: boolean;
+  panelActions?: TTDPanelAction[];
   onTextSubmitInProgess?: boolean;
   renderTopRight?: () => ReactNode;
   renderSubmitShortcut?: () => ReactNode;
-  renderBottomRight?: () => ReactNode;
+  className?: string;
+  panelActionJustifyContent?:
+    | "flex-start"
+    | "flex-end"
+    | "center"
+    | "space-between"
+    | "space-around"
+    | "space-evenly";
 }
 
 export const TTDDialogPanel = ({
   label,
   children,
-  panelAction,
-  panelActionDisabled = false,
+  panelActions = [],
   onTextSubmitInProgess,
   renderTopRight,
   renderSubmitShortcut,
-  renderBottomRight,
+  className,
+  panelActionJustifyContent = "flex-start",
 }: TTDDialogPanelProps) => {
-  return (
-    <div className="ttd-dialog-panel">
-      <div className="ttd-dialog-panel__header">
-        <label>{label}</label>
-        {renderTopRight?.()}
-      </div>
+  const renderPanelAction = (panelAction: TTDPanelAction) => {
+    if (panelAction?.variant === "link") {
+      return (
+        <button
+          className={clsx(
+            "ttd-dialog-panel-action-link",
+            panelAction.className,
+          )}
+          onClick={panelAction.action}
+          disabled={panelAction?.disabled || onTextSubmitInProgess}
+          type="button"
+        >
+          {panelAction.label}
+          {panelAction.icon && (
+            <span className="ttd-dialog-panel-action-link__icon">
+              {panelAction.icon}
+            </span>
+          )}
+        </button>
+      );
+    }
 
-      {children}
-      <div
-        className={clsx("ttd-dialog-panel-button-container", {
-          invisible: !panelAction,
-        })}
-        style={{ display: "flex", alignItems: "center" }}
-      >
+    if (panelAction?.variant === "button") {
+      return (
         <Button
-          className="ttd-dialog-panel-button"
-          onSelect={panelAction ? panelAction.action : () => {}}
-          disabled={panelActionDisabled || onTextSubmitInProgess}
+          className={clsx("ttd-dialog-panel-button", panelAction.className)}
+          onSelect={panelAction.action ? panelAction.action : () => {}}
+          disabled={panelAction?.disabled || onTextSubmitInProgess}
         >
           <div className={clsx({ invisible: onTextSubmitInProgess })}>
             {panelAction?.label}
@@ -55,10 +78,46 @@ export const TTDDialogPanel = ({
           </div>
           {onTextSubmitInProgess && <Spinner />}
         </Button>
-        {!panelActionDisabled &&
-          !onTextSubmitInProgess &&
-          renderSubmitShortcut?.()}
-        {renderBottomRight?.()}
+      );
+    }
+
+    if (panelAction?.variant === "rateLimit") {
+      return (
+        <div
+          className={clsx(
+            "ttd-dialog-panel__rate-limit",
+            panelAction.className,
+          )}
+        >
+          {panelAction.label}
+        </div>
+      );
+    }
+  };
+
+  return (
+    <div className={clsx("ttd-dialog-panel", className)}>
+      {(label || renderTopRight) && (
+        <div className="ttd-dialog-panel__header">
+          {typeof label === "string" ? <label>{label}</label> : label}
+          {renderTopRight?.()}
+        </div>
+      )}
+      {children}
+      <div
+        className={clsx("ttd-dialog-panel-button-container", {
+          invisible: !panelActions.length,
+        })}
+        style={{
+          justifyContent: panelActionJustifyContent,
+        }}
+      >
+        {panelActions.filter(Boolean).map((panelAction) => (
+          <Fragment key={panelAction.label}>
+            {renderPanelAction(panelAction)}
+          </Fragment>
+        ))}
+        {!onTextSubmitInProgess && renderSubmitShortcut?.()}
       </div>
     </div>
   );

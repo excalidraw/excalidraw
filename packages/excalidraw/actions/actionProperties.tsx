@@ -22,6 +22,7 @@ import {
   isTransparent,
   reduceToCommonValue,
   invariant,
+  FONT_SIZES,
 } from "@excalidraw/common";
 
 import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
@@ -758,25 +759,25 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
               group="font-size"
               options={[
                 {
-                  value: 16,
+                  value: FONT_SIZES.sm,
                   text: t("labels.small"),
                   icon: FontSizeSmallIcon,
                   testId: "fontSize-small",
                 },
                 {
-                  value: 20,
+                  value: FONT_SIZES.md,
                   text: t("labels.medium"),
                   icon: FontSizeMediumIcon,
                   testId: "fontSize-medium",
                 },
                 {
-                  value: 28,
+                  value: FONT_SIZES.lg,
                   text: t("labels.large"),
                   icon: FontSizeLargeIcon,
                   testId: "fontSize-large",
                 },
                 {
-                  value: 36,
+                  value: FONT_SIZES.xl,
                   text: t("labels.veryLarge"),
                   icon: FontSizeExtraLargeIcon,
                   testId: "fontSize-veryLarge",
@@ -1554,7 +1555,7 @@ const getArrowheadOptions = (flip: boolean) => {
       value: null,
       text: t("labels.arrowhead_none"),
       keyBinding: "q",
-      icon: ArrowheadNoneIcon,
+      icon: <ArrowheadNoneIcon flip={flip} />,
     },
     {
       value: "arrow",
@@ -1682,7 +1683,8 @@ export const actionChangeArrowhead = register<{
                   ? element.startArrowhead
                   : appState.currentItemStartArrowhead,
               true,
-              appState.currentItemStartArrowhead,
+              (hasSelection) =>
+                hasSelection ? null : appState.currentItemStartArrowhead,
             )}
             onChange={(value) => updateData({ position: "start", type: value })}
             numberOfOptionsToAlwaysShow={4}
@@ -1699,7 +1701,8 @@ export const actionChangeArrowhead = register<{
                   ? element.endArrowhead
                   : appState.currentItemEndArrowhead,
               true,
-              appState.currentItemEndArrowhead,
+              (hasSelection) =>
+                hasSelection ? null : appState.currentItemEndArrowhead,
             )}
             onChange={(value) => updateData({ position: "end", type: value })}
             numberOfOptionsToAlwaysShow={4}
@@ -1827,6 +1830,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                   startElement,
                   "start",
                   elementsMap,
+                  appState.isBindingEnabled,
                 ),
               }
             : null;
@@ -1840,6 +1844,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                   endElement,
                   "end",
                   elementsMap,
+                  appState.isBindingEnabled,
                 ),
               }
             : null;

@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "تمام داده های شما به صورت محلی در مرورگر شما ذخیره می شود.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "آیا می‌خواهید به جای آن به Excalidraw+ بروید؟",
       "menuHint": "خروجی، ترجیحات، زبان ها، ..."
     },
@@ -612,7 +614,55 @@
     "button": "درج",
     "description": "فعلا فقط <flowchartLink> فلوچارت </flowchartLink> ، <sequenceLink> توالی </sequenceLink> و <classLink> کلاس </classLink> نمودارها پشتیبانی می شوند. انواع دیگر به صورت تصویر در Excalidraw ارائه خواهند شد.",
     "syntax": "مرمید syntax",
-    "preview": "پیشنمایش"
+    "preview": "پیشنمایش",
+    "label": "",
+    "inputPlaceholder": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": "جستجو فوری"

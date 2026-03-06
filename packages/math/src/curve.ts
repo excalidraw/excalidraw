@@ -138,7 +138,7 @@ const calculate = <Point extends GlobalPoint | LocalPoint>(
   l: LineSegment<Point>,
   c: Curve<Point>,
 ) => {
-  const solution = solveWithAnalyticalJacobian(c, l, t0, s0, 1e-2, 3);
+  const solution = solveWithAnalyticalJacobian(c, l, t0, s0, 1e-2, 4);
 
   if (!solution) {
     return null;

@@ -1,4 +1,5 @@
-@import "../css/variables.module.scss";
+@use "sass:color";
+@use "../css/variables.module" as *;
 
 .excalidraw {
   .Checkbox {
@@ -12,7 +13,7 @@
     -webkit-tap-highlight-color: transparent;
 
     &:hover:not(.is-checked) .Checkbox-box:not(:focus) {
-      box-shadow: 0 0 0 2px #{$oc-blue-4};
+      box-shadow: 0 0 0 2px #{$color-blue-4};
     }
 
     &:hover:not(.is-checked) .Checkbox-box:not(:focus) {
@@ -24,25 +25,25 @@
 
     &:active {
       .Checkbox-box {
-        box-shadow: 0 0 2px 1px inset #{$oc-blue-7} !important;
+        box-shadow: 0 0 2px 1px inset #{$color-blue-7} !important;
       }
     }
 
     &:hover {
       .Checkbox-box {
-        background-color: fade-out($oc-blue-1, 0.8);
+        background-color: color.adjust($color-blue-1, $alpha: -0.8);
       }
     }
 
     &.is-checked {
       .Checkbox-box {
-        background-color: #{$oc-blue-1};
+        background-color: #{$color-blue-1};
         svg {
           display: block;
         }
       }
       &:hover .Checkbox-box {
-        background-color: #{$oc-blue-2};
+        background-color: #{$color-blue-2};
       }
     }
 
@@ -58,16 +59,16 @@
       align-items: center;
       justify-content: center;
 
-      box-shadow: 0 0 0 2px #{$oc-blue-7};
+      box-shadow: 0 0 0 2px #{$color-blue-7};
       background-color: transparent;
       border-radius: 4px;
 
-      color: #{$oc-blue-7};
+      color: #{$color-blue-7};
 
       border: 0;
 
       &:focus {
-        box-shadow: 0 0 0 3px #{$oc-blue-7};
+        box-shadow: 0 0 0 3px #{$color-blue-7};
       }
 
       svg {

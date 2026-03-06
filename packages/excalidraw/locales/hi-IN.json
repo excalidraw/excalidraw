@@ -143,7 +143,7 @@
     },
     "polygon": {
       "breakPolygon": "",
-      "convertToPolygon": ""
+      "convertToPolygon": "बहुभुज में कनवर्ट करें"
     },
     "elementLock": {
       "lock": "ताले में रखें",
@@ -171,7 +171,7 @@
     "linkToElement": "वस्तु की कड़ी",
     "wrapSelectionInFrame": "चौकट में चुने हुवे को लपेटे",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "आकार बदलें"
   },
   "elementLink": {
     "title": "वस्तु की कड़ी",
@@ -183,9 +183,9 @@
     "hint_emptyLibrary": "यहाँ जोड़ने के लिए चित्रपटल से एक अवयव चुने, अथवा जन कोष से एक संग्रह नीचे स्थापित करें.",
     "hint_emptyPrivateLibrary": "यहाँ जोड़ने के लिए चित्रपटल से एक अवयव चुने.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
+      "inputPlaceholder": "लाइब्रेरी में खोजें",
+      "heading": "लाइब्रेरी मैच",
+      "noResults": "कोई मिलता जुलता नहीं मिला |||",
       "clearSearch": ""
     }
   },
@@ -195,8 +195,8 @@
     "singleResult": "परिणाम",
     "multipleResults": "परिणाम",
     "placeholder": "पटल पर पाठ्य धूंडे",
-    "frames": "",
-    "texts": ""
+    "frames": "फ्रेम्स",
+    "texts": "शब्द"
   },
   "buttons": {
     "clearReset": "चित्रपटल स्वच्छ करें",
@@ -292,7 +292,7 @@
   },
   "toolBar": {
     "selection": "चयन",
-    "lasso": "",
+    "lasso": "लासो सलेक्शन",
     "image": "प्रतिमा सम्मिलित करें",
     "rectangle": "आयात",
     "diamond": "ईंट",
@@ -313,7 +313,7 @@
     "hand": "हाथ ( खिसका के देखने का औज़ार)",
     "extraTools": "अधिक उपकरण",
     "mermaidToExcalidraw": "मर्मेड से एक्सकाली में",
-    "convertElementType": ""
+    "convertElementType": "आकार प्रकार टॉगल करें"
   },
   "element": {
     "rectangle": "आयत",
@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "आपका सर्व डेटा ब्राउज़र के भीतर स्थानिक जगह पे सुरक्षित किया गया.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "बजाय आपको एक्स-काली-ड्रॉ-प्लस पर जाना है?",
       "menuHint": "निर्यात, पसंद, भाषायें, ..."
     },
@@ -612,7 +614,55 @@
     "button": "सन्निवेश करे",
     "description": "वर्तमान में केवल <flowchartLink>बहाव चित्र</flowchartLink>, <sequenceLink> अनुक्रम चित्र </sequenceLink> और <classLink>वर्ग चित्र</classLink> का चित्रिकरण संभव हैं. अन्य चित्र प्रकार एक्सकाली प्रतिमा जैसे चित्रित किए जायेंगे.",
     "syntax": "मर्मेड विन्यास",
-    "preview": "पूर्वावलोकन"
+    "preview": "पूर्वावलोकन",
+    "label": "",
+    "inputPlaceholder": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": "त्वरित खोज"

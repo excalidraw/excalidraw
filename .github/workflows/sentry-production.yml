@@ -28,7 +28,7 @@ jobs:
           export SENTRY_RELEASE=$(sentry-cli releases propose-version)
           sentry-cli releases new $SENTRY_RELEASE --project $SENTRY_PROJECT
           sentry-cli releases set-commits --auto $SENTRY_RELEASE
-          sentry-cli releases files $SENTRY_RELEASE upload-sourcemaps --no-rewrite ./build/static/js/ --url-prefix "~/static/js"
+          sentry-cli sourcemaps upload --release $SENTRY_RELEASE --no-rewrite ./build/static/js/ --url-prefix "~/static/js"
           sentry-cli releases finalize $SENTRY_RELEASE
           sentry-cli releases deploys $SENTRY_RELEASE new -e production
         env:

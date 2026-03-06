@@ -40,9 +40,6 @@ import type { ActionManager } from "../actions/manager";
 
 import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
 
-const supportsContextFilters =
-  "filter" in document.createElement("canvas").getContext("2d")!;
-
 export const ErrorCanvasPreview = () => {
   return (
     <div>
@@ -230,25 +227,23 @@ const ImageExportModal = ({
             }}
           />
         </ExportSetting>
-        {supportsContextFilters && (
-          <ExportSetting
-            label={t("imageExportDialog.label.darkMode")}
+        <ExportSetting
+          label={t("imageExportDialog.label.darkMode")}
+          name="exportDarkModeSwitch"
+        >
+          <Switch
             name="exportDarkModeSwitch"
-          >
-            <Switch
-              name="exportDarkModeSwitch"
-              checked={exportDarkMode}
-              onChange={(checked) => {
-                setExportDarkMode(checked);
-                actionManager.executeAction(
-                  actionExportWithDarkMode,
-                  "ui",
-                  checked,
-                );
-              }}
-            />
-          </ExportSetting>
-        )}
+            checked={exportDarkMode}
+            onChange={(checked) => {
+              setExportDarkMode(checked);
+              actionManager.executeAction(
+                actionExportWithDarkMode,
+                "ui",
+                checked,
+              );
+            }}
+          />
+        </ExportSetting>
         <ExportSetting
           label={t("imageExportDialog.label.embedScene")}
           tooltip={t("imageExportDialog.tooltip.embedScene")}

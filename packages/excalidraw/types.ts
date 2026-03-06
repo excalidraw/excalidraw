@@ -20,7 +20,6 @@ import type {
   GroupId,
   ExcalidrawBindableElement,
   Arrowhead,
-  ChartType,
   FontFamilyValues,
   FileId,
   Theme,
@@ -47,6 +46,7 @@ import type {
   DurableIncrement,
   EphemeralIncrement,
 } from "@excalidraw/element";
+import type { GlobalPoint } from "@excalidraw/math";
 
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
@@ -62,6 +62,8 @@ import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
 import type React from "react";
 import type { JSX } from "react";
+
+export type { App };
 
 export type SocketId = string & { _brand: "SocketId" };
 
@@ -212,6 +214,7 @@ export type StaticCanvasAppState = Readonly<
 
 export type InteractiveCanvasAppState = Readonly<
   _CommonCanvasAppState & {
+    activeTool: AppState["activeTool"];
     // renderInteractiveScene
     activeEmbeddable: AppState["activeEmbeddable"];
     selectionElement: AppState["selectionElement"];
@@ -220,6 +223,7 @@ export type InteractiveCanvasAppState = Readonly<
     multiElement: AppState["multiElement"];
     newElement: AppState["newElement"];
     isBindingEnabled: AppState["isBindingEnabled"];
+    isMidpointSnappingEnabled: AppState["isMidpointSnappingEnabled"];
     suggestedBinding: AppState["suggestedBinding"];
     isRotating: AppState["isRotating"];
     elementsToHighlight: AppState["elementsToHighlight"];
@@ -240,6 +244,7 @@ export type InteractiveCanvasAppState = Readonly<
     frameRendering: AppState["frameRendering"];
     shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
     exportScale: AppState["exportScale"];
+    currentItemArrowType: AppState["currentItemArrowType"];
   }
 >;
 
@@ -297,9 +302,20 @@ export interface AppState {
    * - set on pointer down, updated during pointer move
    */
   selectionElement: NonDeletedExcalidrawElement | null;
+  /**
+   * tracking current arrow binding editor state (takes into account
+   * `bindingPreference` and keyboard modifiers (ctrl/alt)
+   */
   isBindingEnabled: boolean;
+  /** user arrow binding preference */
+  bindingPreference: "enabled" | "disabled";
+  /** user preference whether arrow snap to midpoints while binding */
+  isMidpointSnappingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
-  suggestedBinding: NonDeleted<ExcalidrawBindableElement> | null;
+  suggestedBinding: {
+    element: NonDeleted<ExcalidrawBindableElement>;
+    midPoint?: GlobalPoint;
+  } | null;
   frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
   frameRendering: {
     enabled: boolean;
@@ -375,7 +391,8 @@ export interface AppState {
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
     | { name: "commandPalette" }
     | { name: "settings" }
-    | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] };
+    | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] }
+    | { name: "charts"; data: Spreadsheet; rawText: string };
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -417,16 +434,6 @@ export interface AppState {
     /** bitmap. Use `STATS_PANELS` bit values */
     panels: number;
   };
-  currentChartType: ChartType;
-  pasteDialog:
-    | {
-        shown: false;
-        data: null;
-      }
-    | {
-        shown: true;
-        data: Spreadsheet;
-      };
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
   snapLines: readonly SnapLine[];
@@ -682,8 +689,10 @@ export type UIOptions = Partial<{
    * Optionally control the editor form factor and desktop UI mode from the host app.
    * If not provided, we will take care of it internally.
    */
-  formFactor?: EditorInterface["formFactor"];
-  desktopUIMode?: EditorInterface["desktopUIMode"];
+  getFormFactor?: (
+    editorWidth: number,
+    editorHeight: number,
+  ) => EditorInterface["formFactor"];
   /** @deprecated does nothing. Will be removed in 0.15 */
   welcomeScreen?: boolean;
 }>;
@@ -755,6 +764,7 @@ export type AppClassProperties = {
   updateEditorAtom: App["updateEditorAtom"];
   onPointerDownEmitter: App["onPointerDownEmitter"];
 
+  lastPointerMoveCoords: App["lastPointerMoveCoords"];
   bindModeHandler: App["bindModeHandler"];
 };
 

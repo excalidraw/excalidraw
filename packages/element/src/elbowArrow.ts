@@ -915,6 +915,8 @@ export const updateElbowArrowPoints = (
   },
   options?: {
     isDragging?: boolean;
+    isBindingEnabled?: boolean;
+    isMidpointSnappingEnabled?: boolean;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
   if (arrow.points.length < 2) {
@@ -1202,6 +1204,8 @@ const getElbowArrowData = (
   options?: {
     isDragging?: boolean;
     zoom?: AppState["zoom"];
+    isBindingEnabled?: boolean;
+    isMidpointSnappingEnabled?: boolean;
   },
 ) => {
   const origStartGlobalPoint: GlobalPoint = pointTranslate<
@@ -1215,7 +1219,7 @@ const getElbowArrowData = (
 
   let hoveredStartElement = null;
   let hoveredEndElement = null;
-  if (options?.isDragging) {
+  if (options?.isDragging && options?.isBindingEnabled !== false) {
     const elements = Array.from(elementsMap.values());
     hoveredStartElement =
       getHoveredElement(
@@ -1255,6 +1259,8 @@ const getElbowArrowData = (
     hoveredStartElement,
     elementsMap,
     options?.isDragging,
+    options?.isBindingEnabled,
+    options?.isMidpointSnappingEnabled,
   );
   const endGlobalPoint = getGlobalPoint(
     {
@@ -1270,6 +1276,8 @@ const getElbowArrowData = (
     hoveredEndElement,
     elementsMap,
     options?.isDragging,
+    options?.isBindingEnabled,
+    options?.isMidpointSnappingEnabled,
   );
   const startHeading = getBindPointHeading(
     startGlobalPoint,
@@ -2213,14 +2221,18 @@ const getGlobalPoint = (
   element?: ExcalidrawBindableElement | null,
   elementsMap?: ElementsMap,
   isDragging?: boolean,
+  isBindingEnabled = true,
+  isMidpointSnappingEnabled = true,
 ): GlobalPoint => {
   if (isDragging) {
-    if (element && elementsMap) {
+    if (isBindingEnabled && element && elementsMap) {
       return bindPointToSnapToElementOutline(
         arrow,
         element,
         startOrEnd,
         elementsMap,
+        undefined,
+        isMidpointSnappingEnabled,
       );
     }
 
@@ -2276,7 +2288,7 @@ const getHoveredElement = (
     origPoint,
     elements,
     elementsMap,
-    (element) => maxBindingDistance_simple(zoom),
+    maxBindingDistance_simple(zoom),
   );
 };
 

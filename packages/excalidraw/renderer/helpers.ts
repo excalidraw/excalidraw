@@ -1,4 +1,4 @@
-import { THEME, THEME_FILTER } from "@excalidraw/common";
+import { THEME, applyDarkModeFilter } from "@excalidraw/common";
 
 import type { StaticCanvasRenderConfig } from "../scene/types";
 import type { AppState, StaticCanvasAppState } from "../types";
@@ -51,10 +51,6 @@ export const bootstrapCanvas = ({
   context.setTransform(1, 0, 0, 1, 0, 0);
   context.scale(scale, scale);
 
-  if (isExporting && theme === THEME.DARK) {
-    context.filter = THEME_FILTER;
-  }
-
   // Paint background
   if (typeof viewBackgroundColor === "string") {
     const hasTransparence =
@@ -66,7 +62,10 @@ export const bootstrapCanvas = ({
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
     }
     context.save();
-    context.fillStyle = viewBackgroundColor;
+    context.fillStyle =
+      theme === THEME.DARK
+        ? applyDarkModeFilter(viewBackgroundColor)
+        : viewBackgroundColor;
     context.fillRect(0, 0, normalizedWidth, normalizedHeight);
     context.restore();
   } else {
