@@ -625,7 +625,7 @@
     "preview": "Предпросмотр",
     "label": "Mermaid",
     "inputPlaceholder": "Напишите здесь определение диаграммы Mermaid...",
-    "autoFixAvailable": ""
+    "autoFixAvailable": "Автоисправление доступно"
   },
   "ttd": {
     "error": "Ошибка!"
