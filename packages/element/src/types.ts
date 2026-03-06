@@ -358,7 +358,7 @@ export type ExcalidrawArrowElement = ExcalidrawLinearElement &
     elbowed: boolean;
     // normalized position of the bound text on the arrow path, 0(start) - 1(end)
     // optional for now, not to affect older drawings, or pasted elements without this property
-    boundTextPositionOnPath?: number;
+    boundTextParameter?: number;
   }>;
 
 export type ExcalidrawElbowArrowElement = Merge<
