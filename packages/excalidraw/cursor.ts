@@ -78,7 +78,7 @@ export const setEraserCursor = (
 
 export const setCursorForShape = (
   interactiveCanvas: HTMLCanvasElement | null,
-  appState: Pick<AppState, "activeTool" | "theme">,
+  appState: Pick<AppState, "activeTool" | "theme" | "currentItemStrokeWidth">,
 ) => {
   if (!interactiveCanvas) {
     return;
@@ -89,9 +89,6 @@ export const setCursorForShape = (
     interactiveCanvas.style.cursor = CURSOR_TYPE.GRAB;
   } else if (isEraserActive(appState)) {
     setEraserCursor(interactiveCanvas, appState.theme);
-    // do nothing if image tool is selected which suggests there's
-    // a image-preview set as the cursor
-    // Ignore custom type as well and let host decide
   } else if (appState.activeTool.type === "laser") {
     const url =
       appState.theme === THEME.LIGHT
@@ -99,7 +96,9 @@ export const setCursorForShape = (
         : laserPointerCursorDataURL_darkMode;
     interactiveCanvas.style.cursor = `url(${url}), auto`;
   } else if (!["image", "custom"].includes(appState.activeTool.type)) {
-    interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
+    const strokeWidth = appState.currentItemStrokeWidth || 1;
+    const cursorSize = Math.max(8, Math.min(24, strokeWidth * 2));
+    interactiveCanvas.style.cursor = `${cursorSize} ${cursorSize}, pointer`;
   } else if (appState.activeTool.type !== "image") {
     interactiveCanvas.style.cursor = CURSOR_TYPE.AUTO;
   }
