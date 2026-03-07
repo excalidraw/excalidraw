@@ -13,6 +13,11 @@ import type { Degrees } from "@excalidraw/math";
 const DARK_MODE_COLORS_CACHE: Map<string, string> | null =
   typeof window !== "undefined" ? new Map() : null;
 
+const DARK_MODE_FILTER_INVERT_PERCENT = 93;
+const DARK_MODE_FILTER_HUE_ROTATE_DEGREES = 180 as Degrees;
+const DARK_MODE_FILTER_REVERSE_HUE_ROTATE_DEGREES =
+  -DARK_MODE_FILTER_HUE_ROTATE_DEGREES as Degrees;
+
 function cssHueRotate(
   red: number,
   green: number,
@@ -80,6 +85,32 @@ const cssInvert = (
   return { r: invertedR, g: invertedG, b: invertedB };
 };
 
+const cssInvertInverse = (
+  r: number,
+  g: number,
+  b: number,
+  percent: number,
+): { r: number; g: number; b: number } => {
+  const p = clamp(percent, 0, 100) / 100;
+  const denominator = 1 - 2 * p;
+
+  // 50% invert loses information and cannot be reversed.
+  if (Math.abs(denominator) < Number.EPSILON) {
+    return { r, g, b };
+  }
+
+  const invertComponent = (color: number): number => {
+    const restored = (color - 255 * p) / denominator;
+    return Math.round(clamp(restored, 0, 255));
+  };
+
+  return {
+    r: invertComponent(r),
+    g: invertComponent(g),
+    b: invertComponent(b),
+  };
+};
+
 export const applyDarkModeFilter = (color: string): string => {
   const cached = DARK_MODE_COLORS_CACHE?.get(color);
   if (cached) {
@@ -92,18 +123,58 @@ export const applyDarkModeFilter = (color: string): string => {
   // order of operations matters
   // (corresponds to "filter: invert(invertPercent) hue-rotate(hueDegrees)" in css)
   const rgb = tc.toRgb();
-  const inverted = cssInvert(rgb.r, rgb.g, rgb.b, 93);
+  const inverted = cssInvert(
+    rgb.r,
+    rgb.g,
+    rgb.b,
+    DARK_MODE_FILTER_INVERT_PERCENT,
+  );
   const rotated = cssHueRotate(
     inverted.r,
     inverted.g,
     inverted.b,
-    180 as Degrees,
+    DARK_MODE_FILTER_HUE_ROTATE_DEGREES,
   );
 
   const result = rgbToHex(rotated.r, rotated.g, rotated.b, alpha);
 
   if (DARK_MODE_COLORS_CACHE) {
     DARK_MODE_COLORS_CACHE.set(color, result);
+  }
+
+  return result;
+};
+
+const REVERSE_DARK_MODE_COLORS_CACHE: Map<string, string> | null =
+  typeof window !== "undefined" ? new Map() : null;
+
+export const removeDarkModeFilter = (color: string): string => {
+  const cached = REVERSE_DARK_MODE_COLORS_CACHE?.get(color);
+  if (cached) {
+    return cached;
+  }
+
+  const tc = tinycolor(color);
+  const alpha = tc.getAlpha();
+
+  const rgb = tc.toRgb();
+  const rotatedBack = cssHueRotate(
+    rgb.r,
+    rgb.g,
+    rgb.b,
+    DARK_MODE_FILTER_REVERSE_HUE_ROTATE_DEGREES,
+  );
+  const restored = cssInvertInverse(
+    rotatedBack.r,
+    rotatedBack.g,
+    rotatedBack.b,
+    DARK_MODE_FILTER_INVERT_PERCENT,
+  );
+
+  const result = rgbToHex(restored.r, restored.g, restored.b, alpha);
+
+  if (REVERSE_DARK_MODE_COLORS_CACHE) {
+    REVERSE_DARK_MODE_COLORS_CACHE.set(color, result);
   }
 
   return result;
