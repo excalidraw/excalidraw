@@ -65,6 +65,7 @@ export const languages: Language[] = [
     { code: "zh-TW", label: "繁體中文" },
     { code: "vi-VN", label: "Tiếng Việt" },
     { code: "mr-IN", label: "मराठी" },
+    { code: "mn-MN", label: "Монгол" },
   ]
     .filter(
       (lang) =>
