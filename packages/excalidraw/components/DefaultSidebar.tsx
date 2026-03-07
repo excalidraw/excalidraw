@@ -4,6 +4,7 @@ import {
   CANVAS_SEARCH_TAB,
   DEFAULT_SIDEBAR,
   LIBRARY_SIDEBAR_TAB,
+  POLL_SIDEBAR_TAB,
   composeEventHandlers,
 } from "@excalidraw/common";
 
@@ -11,6 +12,7 @@ import type { MarkOptional, Merge } from "@excalidraw/common/utility-types";
 
 import { useTunnels } from "../context/tunnels";
 import { useUIAppState } from "../context/ui-appState";
+import { t } from "../i18n";
 
 import "../components/dropdownMenu/DropdownMenu.scss";
 
@@ -19,7 +21,8 @@ import { LibraryMenu } from "./LibraryMenu";
 import { SearchMenu } from "./SearchMenu";
 import { Sidebar } from "./Sidebar/Sidebar";
 import { withInternalFallback } from "./hoc/withInternalFallback";
-import { LibraryIcon, searchIcon } from "./icons";
+import { LibraryIcon, PollIcon, searchIcon } from "./icons";
+import { PollsSidebar } from "./polls/PollsSidebar";
 
 import type { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";
 
@@ -105,6 +108,13 @@ export const DefaultSidebar = Object.assign(
                 <Sidebar.TabTrigger tab={LIBRARY_SIDEBAR_TAB}>
                   {LibraryIcon}
                 </Sidebar.TabTrigger>
+                <Sidebar.TabTrigger
+                  tab={POLL_SIDEBAR_TAB}
+                  title={t("toolBar.poll")}
+                  aria-label={t("toolBar.poll")}
+                >
+                  {PollIcon}
+                </Sidebar.TabTrigger>
                 <DefaultSidebarTabTriggersTunnel.Out />
               </Sidebar.TabTriggers>
             </Sidebar.Header>
@@ -113,6 +123,9 @@ export const DefaultSidebar = Object.assign(
             </Sidebar.Tab>
             <Sidebar.Tab tab={CANVAS_SEARCH_TAB}>
               <SearchMenu />
+            </Sidebar.Tab>
+            <Sidebar.Tab tab={POLL_SIDEBAR_TAB}>
+              <PollsSidebar />
             </Sidebar.Tab>
             {children}
           </Sidebar.Tabs>

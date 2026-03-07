@@ -1232,6 +1232,7 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.embeddable")}
           </DropdownMenu.Item>
+
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "laser" })}
             icon={laserPointerToolIcon}

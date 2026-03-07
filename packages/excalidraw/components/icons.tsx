@@ -476,6 +476,17 @@ export const EmbedIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+export const PollIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="3" y1="21" x2="21" y2="21" />
+    <rect x="5" y="12" width="3" height="6" rx="1" />
+    <rect x="10" y="7" width="3" height="11" rx="1" />
+    <rect x="15" y="4" width="3" height="14" rx="1" />
+  </g>,
+  tablerIconProps,
+);
+
 export const DuplicateIcon = createIcon(
   <g strokeWidth="1.25">
     <path d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z" />

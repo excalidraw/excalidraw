@@ -57,6 +57,7 @@ import type { FileSystemHandle } from "./data/filesystem";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
+import type { PollMetadata } from "./poll/types";
 
 import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
@@ -254,6 +255,8 @@ export type ObservedAppState = ObservedStandaloneAppState &
 export type ObservedStandaloneAppState = {
   name: AppState["name"];
   viewBackgroundColor: AppState["viewBackgroundColor"];
+  polls: AppState["polls"];
+  selectedPollId: AppState["selectedPollId"];
 };
 
 export type ObservedElementsAppState = {
@@ -385,6 +388,8 @@ export interface AppState {
     | "compactArrowProperties"
     | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
+  polls: PollMetadata[];
+  selectedPollId: string | null;
   openDialog:
     | null
     | { name: "imageExport" | "help" | "jsonExport" }
@@ -420,7 +425,7 @@ export interface AppState {
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
   /** group being edited when you drill down to its constituent element
-    (e.g. when you double-click on a group's element) */
+   (e.g. when you double-click on a group's element) */
   editingGroupId: GroupId | null;
   width: number;
   height: number;
@@ -546,6 +551,13 @@ export type OnUserFollowedPayload = {
   action: "FOLLOW" | "UNFOLLOW";
 };
 
+export type PollVotePayload = {
+  pollId: string;
+  optionIds: string[];
+  sessionId: string;
+  timestamp: number;
+};
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
@@ -563,6 +575,7 @@ export interface ExcalidrawProps {
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => void;
+  onPollVote?: (payload: PollVotePayload) => void;
   onPaste?: (
     data: ClipboardData,
     event: ClipboardEvent | null,
@@ -748,6 +761,15 @@ export type AppClassProperties = {
   togglePenMode: App["togglePenMode"];
   toggleLock: App["toggleLock"];
   setActiveTool: App["setActiveTool"];
+  createPoll: App["createPoll"];
+  updatePollMetadata: App["updatePollMetadata"];
+  handlePollVote: App["handlePollVote"];
+  startPoll: App["startPoll"];
+  stopPoll: App["stopPoll"];
+  togglePollReveal: App["togglePollReveal"];
+  getPollCountsAsObject: App["getPollCountsAsObject"];
+  getPollSelection: App["getPollSelection"];
+  isPollOwner: App["isPollOwner"];
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
@@ -905,6 +927,7 @@ export interface ExcalidrawImperativeAPI {
   onUserFollow: (
     callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
+  applyPollVote: (payload: PollVotePayload) => void;
 }
 
 export type FrameNameBounds = {

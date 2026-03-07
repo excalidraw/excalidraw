@@ -109,13 +109,6 @@ export const CLASSES = {
   DROPDOWN_MENU_EVENT_WRAPPER: "dropdown-menu-event-wrapper",
 };
 
-export const FONT_SIZES = {
-  sm: 16,
-  md: 20,
-  lg: 28,
-  xl: 36,
-} as const;
-
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
@@ -211,6 +204,12 @@ export const FRAME_STYLE = {
 
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;
+export const FONT_SIZES = {
+  sm: 16,
+  md: 20,
+  lg: 28,
+  xl: 36,
+} as const;
 export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
@@ -431,6 +430,7 @@ export const DEFAULT_ELEMENT_PROPS: {
 
 export const LIBRARY_SIDEBAR_TAB = "library";
 export const CANVAS_SEARCH_TAB = "search";
+export const POLL_SIDEBAR_TAB = "polls";
 
 export const DEFAULT_SIDEBAR = {
   name: "default",
@@ -468,6 +468,7 @@ export const EDITOR_LS_KEYS = {
   // legacy naming (non)scheme
   MERMAID_TO_EXCALIDRAW: "mermaid-to-excalidraw",
   PUBLISH_LIBRARY: "publish-library-data",
+  POLL_SESSION_ID: "excalidraw-poll-session-id",
 } as const;
 
 /**
