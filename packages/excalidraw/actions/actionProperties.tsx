@@ -44,6 +44,7 @@ import {
 
 import {
   isArrowElement,
+  isBindableElement,
   isBoundToContainer,
   isElbowArrow,
   isLinearElement,
@@ -83,6 +84,7 @@ import type { CaptureUpdateActionType } from "@excalidraw/element";
 import { trackEvent } from "../analytics";
 import { RadioSelection } from "../components/RadioSelection";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
+import { CheckboxItem } from "../components/CheckboxItem";
 import { FontPicker } from "../components/FontPicker/FontPicker";
 import { IconPicker } from "../components/IconPicker";
 import { Range } from "../components/Range";
@@ -1727,9 +1729,59 @@ export const actionChangeArrowProperties = register({
       <div className="selected-shape-actions">
         {renderAction("changeArrowhead")}
         {renderAction("changeArrowType")}
+        {renderAction("toggleArrowMultiSelect")}
       </div>
     );
   },
+});
+
+export const actionToggleArrowMultiSelect = register<
+  AppState["isArrowMultiSelectEnabled"]
+>({
+  name: "toggleArrowMultiSelect",
+  label: "labels.multiSelect",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    const isArrowMultiSelectEnabled =
+      value ?? !appState.isArrowMultiSelectEnabled;
+    const sourceElement =
+      appState.arrowMultiSelectSourceId &&
+      getNonDeletedElements(elements).find(
+        (element) => element.id === appState.arrowMultiSelectSourceId,
+      );
+    const arrowMultiSelectSourceId =
+      isArrowMultiSelectEnabled &&
+      sourceElement &&
+      isBindableElement(sourceElement, false)
+        ? sourceElement.id
+        : null;
+
+    return {
+      appState: {
+        ...appState,
+        isArrowMultiSelectEnabled,
+        arrowMultiSelectSourceId,
+      },
+      captureUpdate: CaptureUpdateAction.NEVER,
+    };
+  },
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    event.key.toLowerCase() === "m" &&
+    !event.shiftKey &&
+    !event.altKey,
+  predicate: (elements, appState) =>
+    appState.activeTool.type === "arrow" || appState.isArrowMultiSelectEnabled,
+  PanelComponent: ({ appState, updateData }) => (
+    <CheckboxItem
+      checked={appState.isArrowMultiSelectEnabled}
+      onChange={(checked) =>
+        updateData<AppState["isArrowMultiSelectEnabled"]>(checked)
+      }
+    >
+      {`${t("labels.multiSelect")} (${getShortcutKey("Ctrl")})`}
+    </CheckboxItem>
+  ),
 });
 
 export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({

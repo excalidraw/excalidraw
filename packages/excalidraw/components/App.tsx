@@ -242,6 +242,7 @@ import {
   positionElementsOnGrid,
   calculateFixedPointForNonElbowArrowBinding,
   bindOrUnbindBindingElement,
+  bindBindingElement,
   mutateElement,
   getElementBounds,
   doBoundsIntersect,
@@ -4622,6 +4623,15 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (
+          this.state.isArrowMultiSelectEnabled &&
+          (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER)
+        ) {
+          event.preventDefault();
+          this.resetArrowMultiSelectMode(true);
+          return;
+        }
+
+        if (
           selectedElements.length === 1 &&
           isImageElement(selectedElements[0]) &&
           event.key === KEYS.ENTER
@@ -4861,6 +4871,32 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.state.openDialog?.name === "elementLinkSelector") {
+        return;
+      }
+
+      if (
+        event[KEYS.CTRL_OR_CMD] &&
+        event.key.toLowerCase() === "m" &&
+        !event.shiftKey &&
+        !event.altKey
+      ) {
+        event.preventDefault();
+
+        if (this.state.isArrowMultiSelectEnabled) {
+          this.resetArrowMultiSelectMode(true);
+        } else {
+          if (this.state.activeTool.type !== "arrow") {
+            this.setActiveTool({ type: "arrow" });
+          }
+          this.setState((prevState) => ({
+            isArrowMultiSelectEnabled: true,
+            arrowMultiSelectSourceId: null,
+            selectedElementIds: makeNextSelectedElementIds({}, prevState),
+            selectedGroupIds: {},
+            editingGroupId: null,
+            activeEmbeddable: null,
+          }));
+        }
         return;
       }
 
@@ -5402,6 +5438,14 @@ class App extends React.Component<AppProps, AppState> {
         selectedLinearElement: isSelectionLikeTool(nextActiveTool.type)
           ? prevState.selectedLinearElement
           : null,
+        isArrowMultiSelectEnabled:
+          nextActiveTool.type === "arrow"
+            ? prevState.isArrowMultiSelectEnabled
+            : false,
+        arrowMultiSelectSourceId:
+          nextActiveTool.type === "arrow"
+            ? prevState.arrowMultiSelectSourceId
+            : null,
       } as const;
 
       if (nextActiveTool.type === "freedraw") {
@@ -5439,6 +5483,226 @@ class App extends React.Component<AppProps, AppState> {
         activeTool: nextActiveTool,
       };
     });
+  };
+
+  private setArrowMultiSelectSource = (
+    source: NonDeleted<ExcalidrawBindableElement>,
+  ) => {
+    this.setState((prevState) => ({
+      arrowMultiSelectSourceId: source.id,
+      selectedElementIds: makeNextSelectedElementIds(
+        { [source.id]: true },
+        prevState,
+      ),
+      selectedGroupIds: {},
+      editingGroupId: null,
+      activeEmbeddable: null,
+    }));
+  };
+
+  private resetArrowMultiSelectMode = (clearSelection = false) => {
+    if (clearSelection) {
+      this.setState((prevState) => ({
+        isArrowMultiSelectEnabled: false,
+        arrowMultiSelectSourceId: null,
+        selectedElementIds: makeNextSelectedElementIds({}, prevState),
+        selectedGroupIds: {},
+        editingGroupId: null,
+        activeEmbeddable: null,
+      }));
+      return;
+    }
+
+    this.setState({
+      isArrowMultiSelectEnabled: false,
+      arrowMultiSelectSourceId: null,
+    });
+  };
+
+  private getSideMidPointsForBindableElement = (
+    element: ExcalidrawBindableElement,
+  ): [GlobalPoint, GlobalPoint, GlobalPoint, GlobalPoint] => {
+    const center = pointFrom<GlobalPoint>(
+      element.x + element.width / 2,
+      element.y + element.height / 2,
+    );
+    const basePoints: [GlobalPoint, GlobalPoint, GlobalPoint, GlobalPoint] = [
+      pointFrom<GlobalPoint>(element.x + element.width, center[1]), // RIGHT
+      pointFrom<GlobalPoint>(center[0], element.y + element.height), // BOTTOM
+      pointFrom<GlobalPoint>(element.x, center[1]), // LEFT
+      pointFrom<GlobalPoint>(center[0], element.y), // TOP
+    ];
+
+    return basePoints.map((point) =>
+      pointRotateRads(point, center, element.angle as Radians),
+    ) as [GlobalPoint, GlobalPoint, GlobalPoint, GlobalPoint];
+  };
+
+  private getFacingMidPointsForBindableElements = (
+    source: ExcalidrawBindableElement,
+    target: ExcalidrawBindableElement,
+  ) => {
+    const sourceCenter = pointFrom<GlobalPoint>(
+      source.x + source.width / 2,
+      source.y + source.height / 2,
+    );
+    const targetCenter = pointFrom<GlobalPoint>(
+      target.x + target.width / 2,
+      target.y + target.height / 2,
+    );
+
+    const deltaX = targetCenter[0] - sourceCenter[0];
+    const deltaY = targetCenter[1] - sourceCenter[1];
+    let sourceSideIdx = 0;
+    let targetSideIdx = 2;
+
+    if (Math.abs(deltaX) >= Math.abs(deltaY)) {
+      sourceSideIdx = deltaX >= 0 ? 0 : 2;
+      targetSideIdx = deltaX >= 0 ? 2 : 0;
+    } else {
+      sourceSideIdx = deltaY >= 0 ? 1 : 3;
+      targetSideIdx = deltaY >= 0 ? 3 : 1;
+    }
+
+    const sourceMidPoints = this.getSideMidPointsForBindableElement(source);
+    const targetMidPoints = this.getSideMidPointsForBindableElement(target);
+
+    return {
+      startPoint: sourceMidPoints[sourceSideIdx],
+      endPoint: targetMidPoints[targetSideIdx],
+    };
+  };
+
+  private hasBindingArrowBetweenElements = (
+    sourceId: ExcalidrawElement["id"],
+    targetId: ExcalidrawElement["id"],
+  ) => {
+    return this.scene
+      .getNonDeletedElements()
+      .some(
+        (element) =>
+          isArrowElement(element) &&
+          ((element.startBinding?.elementId === sourceId &&
+            element.endBinding?.elementId === targetId) ||
+            (element.startBinding?.elementId === targetId &&
+              element.endBinding?.elementId === sourceId)),
+      );
+  };
+
+  private createBoundArrowForMultiSelect = (
+    source: NonDeleted<ExcalidrawBindableElement>,
+    target: NonDeleted<ExcalidrawBindableElement>,
+  ) => {
+    const { startPoint, endPoint } = this.getFacingMidPointsForBindableElements(
+      source,
+      target,
+    );
+
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+      x: startPoint[0],
+      y: startPoint[1],
+    });
+    const sharedFrameId =
+      source.frameId && source.frameId === target.frameId
+        ? source.frameId
+        : null;
+
+    const arrow = newArrowElement({
+      type: "arrow",
+      x: startPoint[0],
+      y: startPoint[1],
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      roundness:
+        this.state.currentItemArrowType === ARROW_TYPE.round
+          ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
+          : null,
+      startArrowhead: this.state.currentItemStartArrowhead,
+      endArrowhead: this.state.currentItemEndArrowhead,
+      locked: false,
+      frameId: sharedFrameId || (topLayerFrame ? topLayerFrame.id : null),
+      elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow,
+      fixedSegments:
+        this.state.currentItemArrowType === ARROW_TYPE.elbow ? [] : null,
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(
+          endPoint[0] - startPoint[0],
+          endPoint[1] - startPoint[1],
+        ),
+      ],
+    });
+
+    bindBindingElement(arrow, source, "orbit", "start", this.scene, startPoint);
+    bindBindingElement(arrow, target, "orbit", "end", this.scene, endPoint);
+    this.scene.insertElement(arrow);
+
+    LinearElementEditor.movePoints(
+      arrow,
+      this.scene,
+      new Map([[1, { point: arrow.points[1] }]]),
+    );
+  };
+
+  private handleArrowMultiSelectPointerDown = (
+    event: React.PointerEvent<HTMLElement>,
+    scenePointerX: number,
+    scenePointerY: number,
+  ) => {
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+    const hit = getHoveredElementForBinding(
+      pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+      this.scene.getNonDeletedElements(),
+      elementsMap,
+      maxBindingDistance_simple(this.state.zoom),
+    );
+
+    if (!hit) {
+      return;
+    }
+
+    const sourceElement =
+      this.state.arrowMultiSelectSourceId &&
+      elementsMap.get(this.state.arrowMultiSelectSourceId);
+    const source =
+      sourceElement && isBindableElement(sourceElement, false)
+        ? sourceElement
+        : null;
+
+    if (!source || hit.id === source.id) {
+      this.setArrowMultiSelectSource(hit);
+      return;
+    }
+
+    const multiSelectModifier = event[KEYS.CTRL_OR_CMD] || event.shiftKey;
+    if (!multiSelectModifier) {
+      this.setArrowMultiSelectSource(hit);
+      return;
+    }
+
+    if (!this.hasBindingArrowBetweenElements(source.id, hit.id)) {
+      this.createBoundArrowForMultiSelect(source, hit);
+      this.syncActionResult({
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+    }
+
+    this.setState((prevState) => ({
+      selectedElementIds: makeNextSelectedElementIds(
+        {
+          ...prevState.selectedElementIds,
+          [source.id]: true,
+          [hit.id]: true,
+        },
+        prevState,
+      ),
+      activeEmbeddable: null,
+    }));
   };
 
   setOpenDialog = (dialogType: AppState["openDialog"]) => {
@@ -7298,6 +7562,22 @@ class App extends React.Component<AppProps, AppState> {
     // else it will send pointer state & laser pointer events in collab when
     // panning
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+      return;
+    }
+
+    if (
+      this.state.isArrowMultiSelectEnabled &&
+      this.state.activeTool.type === "arrow" &&
+      (event.button === POINTER_BUTTON.MAIN ||
+        event.button === POINTER_BUTTON.TOUCH) &&
+      gesture.pointers.size <= 1
+    ) {
+      event.preventDefault();
+      this.handleArrowMultiSelectPointerDown(
+        event,
+        scenePointerX,
+        scenePointerY,
+      );
       return;
     }
 
