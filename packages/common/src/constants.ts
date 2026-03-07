@@ -268,6 +268,8 @@ export const MIME_TYPES = {
   binary: "application/octet-stream",
   // image
   ...IMAGE_MIME_TYPES,
+  // document
+  pdf: "application/pdf",
 } as const;
 
 export const ALLOWED_PASTE_MIME_TYPES = [
@@ -279,6 +281,7 @@ export const ALLOWED_PASTE_MIME_TYPES = [
 export const EXPORT_IMAGE_TYPES = {
   png: "png",
   svg: "svg",
+  pdf: "pdf",
   clipboard: "clipboard",
 } as const;
 

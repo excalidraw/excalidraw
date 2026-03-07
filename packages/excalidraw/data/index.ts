@@ -117,6 +117,33 @@ export const exportCanvas = async (
   if (elements.length === 0) {
     throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
+  if (type === "pdf") {
+    const svg = await exportToSvg(
+      elements,
+      {
+        exportBackground,
+        exportWithDarkMode: appState.exportWithDarkMode,
+        viewBackgroundColor,
+        exportPadding,
+        exportScale: appState.exportScale,
+        exportEmbedScene: false,
+      },
+      files,
+      { exportingFrame },
+    );
+
+    const { exportToPdf } = await import("./pdf");
+    const blob = await exportToPdf(svg);
+
+    return fileSave(Promise.resolve(blob), {
+      description: "Export to PDF",
+      name,
+      extension: "pdf",
+      mimeTypes: [MIME_TYPES.pdf],
+      fileHandle,
+    });
+  }
+
   if (type === "svg" || type === "clipboard-svg") {
     const svgPromise = exportToSvg(
       elements,
