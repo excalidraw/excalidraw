@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Toate datele tale sunt salvate local în navigatorul tău.",
+      "center_heading": "Desenele tale sunt salvate în spațiul de stocare al navigatorului tău.",
+      "center_heading_line2": "Spațiul de stocare al navigatorului poate fi șters în mod neașteptat.",
+      "center_heading_line3": "Salvează-ți periodic munca într-un fișier pentru a evita pierderea acesteia.",
       "center_heading_plus": "Ai vrut să mergi în schimb la Excalidraw+?",
       "menuHint": "Exportare, preferințe, limbi, ..."
     },
@@ -612,7 +614,55 @@
     "button": "Introducere",
     "description": "În prezent, numai <flowchartLink>Organigramele</flowchartLink>, <sequenceLink>Diagramele de secvență</sequenceLink> și <classLink>Diagramele de clasă</classLink> sunt acceptate. Celelalte tipuri vor fi redate ca imagine în Excalidraw.",
     "syntax": "Sintaxă Mermaid",
-    "preview": "Previzualizare"
+    "preview": "Previzualizare",
+    "label": "Mermaid",
+    "inputPlaceholder": "Scrie definiţia diagramei Mermaid aici..."
+  },
+  "ttd": {
+    "error": "Eroare!"
+  },
+  "chat": {
+    "inputPlaceholder": "Începe să îți introduci ideea de diagramă aici... ({{shortcut}} pentru linia nouă)",
+    "inputPlaceholderWithMessages": "Continuă rafinarea diagramei...",
+    "generating": "Se generează...",
+    "rateLimitRemaining": "Cereri rămase astăzi: {{count}}",
+    "role": {
+      "user": "Tu",
+      "assistant": "Asistent IA",
+      "system": "Sistem"
+    },
+    "aiBeta": "Beta IA",
+    "label": "Conversație",
+    "menu": "Meniu",
+    "newChat": "Conversație nouă",
+    "deleteChat": "Ștergere conversație",
+    "deleteMessage": "Ștergere mesaj",
+    "viewAsMermaid": "Vizualizare ca Mermaid",
+    "placeholder": {
+      "title": "Hai să-ți proiectăm diagrama",
+      "description": "Descrie diagrama pe care vrei să o creezi și o vom genera pentru tine.",
+      "hint": "În acest moment cunoaștem organigrame, diagrame de secvență și diagrame de clasă."
+    },
+    "preview": "Previzualizare",
+    "insert": "Introducere",
+    "retry": "Reîncercare",
+    "errors": {
+      "promptTooShort": "Solicitarea este prea scurtă (min. {{min}} caractere)",
+      "promptTooLong": "Solicitarea este prea lungă (max. {{max}} caractere)",
+      "generationFailed": "Generare nereușită",
+      "invalidDiagram": "A generat o diagramă nevalidă :(. Poți edita manual, reîncerca cu funcția de fixare automată sau încerca o altă solicitare.",
+      "fixInMermaid": "Editare Mermaid manual →",
+      "aiRepair": "Regenerare (fixare automată) →",
+      "requestAborted": "Cerere anulată",
+      "requestFailed": "Cerere nereușită",
+      "mermaidParseError": "Eroare de sintaxă Mermaid"
+    },
+    "rateLimit": {
+      "messageLimit": "Ai atins limita IA la planul gratuit. Încearcă Excalidraw+ pentru mai multe sau revino mâine.",
+      "generalRateLimit": "Stai puțin, te grăbești! Așteaptă un moment înainte de a reîncerca.",
+      "messageLimitInputPlaceholder": "Ai atins limita de mesaje"
+    },
+    "upsellBtnLabel": "Actualizare la Plus"
   },
   "quickSearch": {
     "placeholder": "Căutare rapidă"

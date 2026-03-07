@@ -16,6 +16,7 @@
   --zIndex-ui-context-menu: 90;
   --zIndex-ui-styles-popup: 100;
   --zIndex-ui-top: 100;
+  --zIndex-ui-main-menu: 110;
   --zIndex-ui-library: 120;
 
   --zIndex-modal: 1000;
@@ -221,6 +222,18 @@ body.excalidraw-cursor-resize * {
   input:focus-visible {
     outline: transparent;
     box-shadow: 0 0 0 1px var(--color-brand-hover);
+  }
+
+  // radix doesn't allow differntiating between hover and keyboard active
+  // states (it's forcing :focus on both).
+  //
+  // proper handling would be to disable :focus-visible by default, and enable
+  // on keyboard arrows (it'd then have to be disabled again, e.g. on keydown
+  // or container focus)
+  //
+  // alas, that is left for another day
+  [data-radix-collection-item]:focus-visible {
+    box-shadow: none !important;
   }
 
   .buttonList {
@@ -670,6 +683,9 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  .main-menu {
+    z-index: var(--zIndex-ui-main-menu);
+  }
   .main-menu-trigger {
     @include filledButtonOnCanvas;
   }

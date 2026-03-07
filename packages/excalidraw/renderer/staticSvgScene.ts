@@ -3,11 +3,13 @@ import {
   MAX_DECIMALS_FOR_SVG_EXPORT,
   SVG_NS,
   THEME,
+  DARK_THEME_FILTER,
   getFontFamilyString,
   isRTL,
   isTestEnv,
   getVerticalOffset,
   applyDarkModeFilter,
+  MIME_TYPES,
 } from "@excalidraw/common";
 import { normalizeLink, toValidURL } from "@excalidraw/common";
 import { hashString } from "@excalidraw/element";
@@ -519,6 +521,13 @@ const renderElementToSvg = (
         }
 
         const g = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
+
+        if (
+          renderConfig.theme === THEME.DARK &&
+          fileData.mimeType === MIME_TYPES.svg
+        ) {
+          g.setAttribute("filter", DARK_THEME_FILTER);
+        }
 
         if (element.crop) {
           const mask = svgRoot.ownerDocument.createElementNS(SVG_NS, "mask");

@@ -3,6 +3,12 @@ import {
   mapFind,
   reduceToCommonValue,
 } from "@excalidraw/common";
+import { vi } from "vitest";
+
+// Import directly to avoid the @excalidraw/common throttleRAF mock from setupTests.ts.
+import { throttleRAF } from "./utils";
+
+type RafCallback = FrameRequestCallback;
 
 describe("@excalidraw/common/utils", () => {
   describe("isTransparent()", () => {
@@ -77,6 +83,89 @@ describe("@excalidraw/common/utils", () => {
     it("should return undefined if no mapped element is found", () => {
       expect(mapFind([1, 2], () => undefined)).toBe(undefined);
       expect(mapFind([1, 2], () => null)).toBe(undefined);
+    });
+  });
+
+  describe("throttleRAF()", () => {
+    let frameCallbacks: Map<number, RafCallback>;
+    let nextFrameId: number;
+
+    const runScheduledFrame = (timestamp = 16) => {
+      const callbacks = [...frameCallbacks.values()];
+      frameCallbacks.clear();
+      callbacks.forEach((callback) => callback(timestamp));
+    };
+
+    beforeEach(() => {
+      frameCallbacks = new Map();
+      nextFrameId = 0;
+
+      vi.spyOn(window, "requestAnimationFrame").mockImplementation(
+        (callback) => {
+          const frameId = ++nextFrameId;
+          frameCallbacks.set(frameId, callback);
+          return frameId;
+        },
+      );
+
+      vi.spyOn(window, "cancelAnimationFrame").mockImplementation((frameId) => {
+        frameCallbacks.delete(frameId);
+      });
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it("should invoke the callback with the last args from the same frame", () => {
+      const fn = vi.fn();
+      const throttled = throttleRAF(fn);
+
+      throttled("first", 1);
+      throttled("second", 2);
+      throttled("last", 3);
+
+      expect(fn).not.toHaveBeenCalled();
+      expect(window.requestAnimationFrame).toHaveBeenCalledTimes(1);
+
+      runScheduledFrame();
+
+      expect(fn).toHaveBeenCalledTimes(1);
+      expect(fn).toHaveBeenCalledWith("last", 3);
+    });
+
+    it("should flush the pending callback immediately", () => {
+      const fn = vi.fn();
+      const throttled = throttleRAF(fn);
+
+      throttled("first");
+      throttled("last");
+
+      throttled.flush();
+
+      expect(window.cancelAnimationFrame).toHaveBeenCalledTimes(1);
+      expect(fn).toHaveBeenCalledTimes(1);
+      expect(fn).toHaveBeenCalledWith("last");
+
+      runScheduledFrame();
+
+      expect(fn).toHaveBeenCalledTimes(1);
+    });
+
+    it("should cancel the pending callback", () => {
+      const fn = vi.fn();
+      const throttled = throttleRAF(fn);
+
+      throttled("first");
+      throttled("last");
+
+      throttled.cancel();
+
+      expect(window.cancelAnimationFrame).toHaveBeenCalledTimes(1);
+
+      runScheduledFrame();
+
+      expect(fn).not.toHaveBeenCalled();
     });
   });
 });
