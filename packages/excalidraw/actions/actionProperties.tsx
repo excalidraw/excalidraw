@@ -7,6 +7,8 @@ import {
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
   DEFAULT_ELEMENT_STROKE_PICKS,
+  DEFAULT_ELEMENT_LASER_COLOR_PALETTE,
+  DEFAULT_ELEMENT_LASER_PICKS,
   ARROW_TYPE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -363,6 +365,47 @@ export const actionChangeStrokeColor = register<
           )}
           onChange={(color) => updateData({ currentItemStrokeColor: color })}
           elements={elements}
+          appState={appState}
+          updateData={updateData}
+        />
+      </>
+    );
+  },
+});
+
+export const actionChangeLaserColor = register<
+  Pick<AppState, "currentLaserColor">
+>({
+  name: "changeLaserColor",
+  label: "toolBar.laser",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      appState: {
+        ...appState,
+        ...value,
+      },
+      captureUpdate: !!value?.currentLaserColor
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  PanelComponent: ({ appState, updateData, app }) => {
+    const { stylesPanelMode } = getStylesPanelInfo(app);
+
+    return (
+      <>
+        {stylesPanelMode === "full" && (
+          <h3 aria-hidden="true">{t("toolBar.laser")}</h3>
+        )}
+        <ColorPicker
+          topPicks={DEFAULT_ELEMENT_LASER_PICKS}
+          palette={DEFAULT_ELEMENT_LASER_COLOR_PALETTE}
+          type="elementStroke"
+          label={t("toolBar.laser")}
+          color={appState.currentLaserColor}
+          onChange={(color) => updateData({ currentLaserColor: color })}
+          elements={[]}
           appState={appState}
           updateData={updateData}
         />
