@@ -627,6 +627,35 @@ export const getCubicBezierCurveBound = (
   return [minX, minY, maxX, maxY];
 };
 
+export const getQuadraticBezierCurveBound = (
+  p0: GlobalPoint,
+  p1: GlobalPoint,
+  p2: GlobalPoint,
+): Bounds => {
+  // For quadratic Bezier B(t) = (1-t)^2 p0 + 2(1-t)t p1 + t^2 p2
+  // derivative roots t = (p0 - p1) / (p0 - 2*p1 + p2)
+  const boundsForCoord = (c0: number, c1: number, c2: number) => {
+    let min = Math.min(c0, c2);
+    let max = Math.max(c0, c2);
+    const denom = c0 - 2 * c1 + c2;
+    if (denom !== 0) {
+      const t = (c0 - c1) / denom;
+      if (t > 0 && t < 1) {
+        const oneMinusT = 1 - t;
+        const val = oneMinusT * oneMinusT * c0 + 2 * oneMinusT * t * c1 + t * t * c2;
+        min = Math.min(min, val);
+        max = Math.max(max, val);
+      }
+    }
+    return [min, max] as const;
+  };
+
+  const [minX, maxX] = boundsForCoord(p0[0], p1[0], p2[0]);
+  const [minY, maxY] = boundsForCoord(p0[1], p1[1], p2[1]);
+
+  return [minX, minY, maxX, maxY];
+};
+
 export const getMinMaxXYFromCurvePathOps = (
   ops: Op[],
   transformXY?: (p: GlobalPoint) => GlobalPoint,
@@ -669,9 +698,38 @@ export const getMinMaxXYFromCurvePathOps = (
         limits.maxX = Math.max(limits.maxX, maxX);
         limits.maxY = Math.max(limits.maxY, maxY);
       } else if (op === "lineTo") {
-        // TODO: Implement this
+        const _p = pointFrom<GlobalPoint>(data[0], data[1]);
+        const p = transformXY ? transformXY(_p) : _p;
+
+        const p0 = transformXY ? transformXY(currentP) : currentP;
+        currentP = _p;
+
+        limits.minX = Math.min(limits.minX, p0[0], p[0]);
+        limits.minY = Math.min(limits.minY, p0[1], p[1]);
+
+        limits.maxX = Math.max(limits.maxX, p0[0], p[0]);
+        limits.maxY = Math.max(limits.maxY, p0[1], p[1]);
       } else if (op === "qcurveTo") {
-        // TODO: Implement this
+        const _p1 = pointFrom<GlobalPoint>(data[0], data[1]);
+        const _p2 = pointFrom<GlobalPoint>(data[2], data[3]);
+
+        const p1 = transformXY ? transformXY(_p1) : _p1;
+        const p2 = transformXY ? transformXY(_p2) : _p2;
+
+        const p0 = transformXY ? transformXY(currentP) : currentP;
+        currentP = _p2;
+
+        const [minX, minY, maxX, maxY] = getQuadraticBezierCurveBound(
+          p0,
+          p1,
+          p2,
+        );
+
+        limits.minX = Math.min(limits.minX, minX);
+        limits.minY = Math.min(limits.minY, minY);
+
+        limits.maxX = Math.max(limits.maxX, maxX);
+        limits.maxY = Math.max(limits.maxY, maxY);
       }
       return limits;
     },
@@ -1062,9 +1120,9 @@ export const getResizedElementAbsoluteCoords = (
     const gen = rough.generator();
     const curve = !element.roundness
       ? gen.linearPath(
-          points as [number, number][],
-          generateRoughOptions(element),
-        )
+        points as [number, number][],
+        generateRoughOptions(element),
+      )
       : gen.curve(points as [number, number][], generateRoughOptions(element));
 
     const ops = getCurvePathOps(curve);
@@ -1089,9 +1147,9 @@ export const getElementPointsCoords = (
   const curve =
     element.roundness == null
       ? gen.linearPath(
-          points as [number, number][],
-          generateRoughOptions(element),
-        )
+        points as [number, number][],
+        generateRoughOptions(element),
+      )
       : gen.curve(points as [number, number][], generateRoughOptions(element));
   const ops = getCurvePathOps(curve);
   const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
