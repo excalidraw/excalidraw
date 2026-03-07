@@ -298,7 +298,7 @@ const PublishLibrary = ({
     formData.append("twitterHandle", libraryData.twitterHandle);
     formData.append("website", libraryData.website);
 
-    fetch(`${import.meta.env.VITE_APP_LIBRARY_BACKEND}/submit`, {
+    fetch(`${(window.EXCALIDRAW_ENV?.VITE_APP_LIBRARY_BACKEND || import.meta.env.VITE_APP_LIBRARY_BACKEND)}/submit`, {
       method: "post",
       body: formData,
     })

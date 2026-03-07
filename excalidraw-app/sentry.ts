@@ -8,7 +8,7 @@ const SentryEnvHostnameMap: { [key: string]: string } = {
   "vercel.app": "staging",
 };
 
-const SENTRY_DISABLED = import.meta.env.VITE_APP_DISABLE_SENTRY === "true";
+const SENTRY_DISABLED = (window.EXCALIDRAW_ENV?.VITE_APP_DISABLE_SENTRY || import.meta.env.VITE_APP_DISABLE_SENTRY) === "true";
 
 // Disable Sentry locally or inside the Docker to avoid noise/respect privacy
 const onlineEnv =
@@ -22,7 +22,7 @@ Sentry.init({
     ? "https://7bfc596a5bf945eda6b660d3015a5460@sentry.io/5179260"
     : undefined,
   environment: onlineEnv ? SentryEnvHostnameMap[onlineEnv] : undefined,
-  release: import.meta.env.VITE_APP_GIT_SHA,
+  release: (window.EXCALIDRAW_ENV?.VITE_APP_GIT_SHA || import.meta.env.VITE_APP_GIT_SHA),
   ignoreErrors: [
     "undefined is not an object (evaluating 'window.__pad.performLoop')", // Only happens on Safari, but spams our servers. Doesn't break anything
     "InvalidStateError: Failed to execute 'transaction' on 'IDBDatabase': The database connection is closing.", // Not much we can do about the IndexedDB closing error

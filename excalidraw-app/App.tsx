@@ -640,7 +640,7 @@ const ExcalidrawWrapper = () => {
           excalidrawAPI.getSceneElements(),
         )
       ) {
-        if (import.meta.env.VITE_APP_DISABLE_PREVENT_UNLOAD !== "true") {
+        if ((window.EXCALIDRAW_ENV?.VITE_APP_DISABLE_PREVENT_UNLOAD || import.meta.env.VITE_APP_DISABLE_PREVENT_UNLOAD) !== "true") {
           preventUnload(event);
         } else {
           console.warn(
@@ -801,7 +801,7 @@ const ExcalidrawWrapper = () => {
     perform: () => {
       window.open(
         `${
-          import.meta.env.VITE_APP_PLUS_LP
+          (window.EXCALIDRAW_ENV?.VITE_APP_PLUS_LP || import.meta.env.VITE_APP_PLUS_LP)
         }/plus?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
@@ -824,7 +824,7 @@ const ExcalidrawWrapper = () => {
     perform: () => {
       window.open(
         `${
-          import.meta.env.VITE_APP_PLUS_APP
+          (window.EXCALIDRAW_ENV?.VITE_APP_PLUS_APP || import.meta.env.VITE_APP_PLUS_APP)
         }?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );

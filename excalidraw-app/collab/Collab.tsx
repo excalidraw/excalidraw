@@ -300,7 +300,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       //  the purpose is to run in immediately after user decides to stay
       this.saveCollabRoomToFirebase(syncableElements);
 
-      if (import.meta.env.VITE_APP_DISABLE_PREVENT_UNLOAD !== "true") {
+      if ((window.EXCALIDRAW_ENV?.VITE_APP_DISABLE_PREVENT_UNLOAD || import.meta.env.VITE_APP_DISABLE_PREVENT_UNLOAD) !== "true") {
         preventUnload(event);
       } else {
         console.warn(
@@ -519,7 +519,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
     try {
       this.portal.socket = this.portal.open(
-        socketIOClient(import.meta.env.VITE_APP_WS_SERVER_URL, {
+        socketIOClient((window.EXCALIDRAW_ENV?.VITE_APP_WS_SERVER_URL || import.meta.env.VITE_APP_WS_SERVER_URL), {
           transports: ["websocket", "polling"],
         }),
         roomId,
