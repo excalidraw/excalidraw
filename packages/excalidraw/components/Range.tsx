@@ -38,8 +38,16 @@ export const Range = ({ updateData, app, testId }: RangeProps) => {
       const thumbWidth = 15; // 15 is the width of the thumb
       const position =
         (value / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
-      valueElement.style.left = `${position}px`;
-      rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
+      const isRTL = document.documentElement.dir === "rtl";
+      if (isRTL) {
+        valueElement.style.right = `${position}px`;
+        valueElement.style.left = "auto";
+      } else {
+        valueElement.style.left = `${position}px`;
+        valueElement.style.right = "auto";
+      }
+      const gradientDir = isRTL ? "to left" : "to right";
+      rangeElement.style.background = `linear-gradient(${gradientDir}, var(--color-slider-track) 0%, var(--color-slider-track) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
     }
   }, [value]);
 
