@@ -804,8 +804,11 @@ const handleSearch = debounce(
       isFrameLikeElement(el),
     ) as ExcalidrawFrameLikeElement[];
 
-    texts.sort((a, b) => a.y - b.y);
-    frames.sort((a, b) => a.y - b.y);
+    // Sort by element ID for stable ordering when elements are dragged
+    // Previously sorted by Y position, which caused results to reorder during drag
+    // See: https://github.com/excalidraw/excalidraw/issues/9503
+    texts.sort((a, b) => a.id.localeCompare(b.id));
+    frames.sort((a, b) => a.id.localeCompare(b.id));
 
     const textMatches: SearchMatchItem[] = [];
 
