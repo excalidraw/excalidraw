@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Error"
   },
+  "progressDialog": {
+    "title": "Saving",
+    "defaultMessage": "Preparing to save..."
+  },
   "exportDialog": {
     "disk_title": "Save to disk",
     "disk_details": "Export the scene data to a file from which you can import later.",

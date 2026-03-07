@@ -22,6 +22,7 @@ polyfill();
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
+    onExport,
     onChange,
     onIncrement,
     initialData,
@@ -115,6 +116,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     <EditorJotaiProvider store={editorJotaiStore}>
       <InitializeApp langCode={langCode} theme={theme}>
         <App
+          onExport={onExport}
           onChange={onChange}
           onIncrement={onIncrement}
           initialData={initialData}
