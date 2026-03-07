@@ -308,6 +308,7 @@ import {
   actionSelectAll,
   actionSendBackward,
   actionSendToBack,
+  actionToggleShowGrid,
   actionToggleGridMode,
   actionToggleStats,
   actionToggleZenMode,
@@ -2229,7 +2230,7 @@ class App extends React.Component<AppProps, AppState> {
                           renderConfig={{
                             imageCache: this.imageCache,
                             isExporting: false,
-                            renderGrid: isGridModeEnabled(this),
+                            renderGrid: this.state.showGrid || isGridModeEnabled(this),
                             canvasBackgroundColor:
                               this.state.viewBackgroundColor,
                             embedsValidationStatus: this.embedsValidationStatus,
@@ -12106,6 +12107,7 @@ class App extends React.Component<AppProps, AppState> {
         return [
           ...options,
           actionToggleGridMode,
+          actionToggleShowGrid,
           actionToggleZenMode,
           actionToggleViewMode,
           actionToggleStats,
@@ -12123,6 +12125,7 @@ class App extends React.Component<AppProps, AppState> {
         actionUnlockAllElements,
         CONTEXT_MENU_SEPARATOR,
         actionToggleGridMode,
+        actionToggleShowGrid,
         actionToggleObjectsSnapMode,
         actionToggleArrowBinding,
         actionToggleMidpointSnapping,

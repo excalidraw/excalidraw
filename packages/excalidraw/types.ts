@@ -414,6 +414,7 @@ export interface AppState {
   /** grid cell px size */
   gridSize: number;
   gridStep: number;
+  showGrid: boolean;
   gridModeEnabled: boolean;
   viewModeEnabled: boolean;
 
