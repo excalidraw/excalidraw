@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeSubmitPrompt": [],
+    "beforeShellExecution": [],
+    "beforeMCPExecution": [],
+    "beforeReadFile": [],
+    "afterFileEdit": [],
+    "stop": [
+      {
+        "command": "bash .cursor/hooks/grind.sh"
+      }
+    ]
+  }
+}
