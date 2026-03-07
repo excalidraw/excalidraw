@@ -277,7 +277,7 @@ const eraserTest = (
 
     // If the eraser movement is so fast that a large distance is covered
     // between the last two points, the distanceToElement miss, so we test
-    // agaist each segment of the linear element
+    // against each segment of the linear element
     const segments = getElementLineSegments(element, elementsMap);
     for (const seg of segments) {
       if (lineSegmentsDistance(seg, pathSegment) <= tolerance) {

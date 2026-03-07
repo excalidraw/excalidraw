@@ -807,7 +807,7 @@ export const textWysiwyg = ({
 
   editable.onpointerdown = (event) => event.stopPropagation();
 
-  // rAF (+ capture to by doubly sure) so we don't catch te pointerdown that
+  // rAF (+ capture to by doubly sure) so we don't catch the pointerdown that
   // triggered the wysiwyg
   requestAnimationFrame(() => {
     window.addEventListener("pointerdown", onPointerDown, { capture: true });

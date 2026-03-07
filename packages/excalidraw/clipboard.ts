@@ -266,7 +266,7 @@ export const readSystemClipboard = async () => {
     try {
       if (navigator.clipboard?.readText) {
         console.warn(
-          `navigator.clipboard.readText() failed (${error.message}). Failling back to navigator.clipboard.read()`,
+          `navigator.clipboard.readText() failed (${error.message}). Falling back to navigator.clipboard.read()`,
         );
         const readText = await navigator.clipboard?.readText();
         if (readText) {
@@ -277,7 +277,7 @@ export const readSystemClipboard = async () => {
       // @ts-ignore
       if (navigator.clipboard?.read) {
         console.warn(
-          `navigator.clipboard.readText() failed (${error.message}). Failling back to navigator.clipboard.read()`,
+          `navigator.clipboard.readText() failed (${error.message}). Falling back to navigator.clipboard.read()`,
         );
       } else {
         if (error.name === "DataError") {

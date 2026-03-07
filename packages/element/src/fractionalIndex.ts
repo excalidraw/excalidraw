@@ -183,7 +183,7 @@ export const syncMovedIndices = (
       },
     );
 
-    // split mutation so we don't end up in an incosistent state
+    // split mutation so we don't end up in an inconsistent state
     for (const [element, { index }] of elementsUpdates) {
       mutateElement(element, elementsMap, { index });
     }
