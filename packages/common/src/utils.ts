@@ -169,10 +169,6 @@ export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
   };
 
   const ret = (...args: T) => {
-    if (isTestEnv()) {
-      fn(...args);
-      return;
-    }
     lastArgs = args;
     if (timerId === null) {
       scheduleFunc();

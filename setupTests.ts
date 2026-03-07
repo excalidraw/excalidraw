@@ -6,8 +6,18 @@ import "@testing-library/jest-dom";
 import { vi } from "vitest";
 
 import polyfill from "./packages/excalidraw/polyfill";
+import { mockThrottleRAF } from "./packages/excalidraw/tests/helpers/mocks";
 import { yellow } from "./packages/excalidraw/tests/helpers/colorize";
 import { testPolyfills } from "./packages/excalidraw/tests/helpers/polyfills";
+
+vi.mock("@excalidraw/common", async (importOriginal) => {
+  const module = await importOriginal<typeof import("@excalidraw/common")>();
+
+  return {
+    ...module,
+    throttleRAF: mockThrottleRAF,
+  };
+});
 
 // mock for pep.js not working with setPointerCapture()
 HTMLElement.prototype.setPointerCapture = vi.fn();
