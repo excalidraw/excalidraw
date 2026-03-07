@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import {
   CLASSES,
@@ -46,7 +46,7 @@ import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { useEditorInterface, useStylesPanelMode } from "./App";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
-import { sidebarRightIcon } from "./icons";
+import { sidebarRightIcon, chevronRightIcon } from "./icons";
 import { DefaultSidebar } from "./DefaultSidebar";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
@@ -163,6 +163,30 @@ const LayerUI = ({
   const isCompactStylesPanel = stylesPanelMode === "compact";
   const tunnels = useInitializeTunnels();
 
+  // State for left menu collapse
+  const [isLeftMenuCollapsed, setIsLeftMenuCollapsed] = useState(() => {
+    try {
+      return window.localStorage.getItem("leftMenuCollapsed") === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        "leftMenuCollapsed",
+        isLeftMenuCollapsed.toString(),
+      );
+    } catch {
+      // ignore localStorage errors
+    }
+  }, [isLeftMenuCollapsed]);
+
+  const toggleLeftMenu = () => {
+    setIsLeftMenuCollapsed(!isLeftMenuCollapsed);
+  };
+
   const spacing = isCompactStylesPanel
     ? {
         menuTopGap: 4,
@@ -242,6 +266,7 @@ const LayerUI = ({
         className={clsx("selected-shape-actions zen-mode-transition", {
           "transition-left": appState.zenModeEnabled,
         })}
+        style={{ padding: 0 }}
       >
         {isCompactMode ? (
           <Island
@@ -262,22 +287,104 @@ const LayerUI = ({
             />
           </Island>
         ) : (
-          <Island
-            className={CLASSES.SHAPE_ACTIONS_MENU}
-            padding={2}
-            style={{
-              // we want to make sure this doesn't overflow so subtracting the
-              // approximate height of hamburgerMenu + footer
-              maxHeight: `${appState.height - 166}px`,
-            }}
-          >
-            <SelectedShapeActions
-              appState={appState}
-              elementsMap={app.scene.getNonDeletedElementsMap()}
-              renderAction={actionManager.renderAction}
-              app={app}
-            />
-          </Island>
+          <div style={{ position: "relative" }}>
+            <Island
+              className={CLASSES.SHAPE_ACTIONS_MENU}
+              padding={0}
+              style={{
+                // we want to make sure this doesn't overflow so subtracting the
+                // approximate height of hamburgerMenu + footer
+                maxHeight: isLeftMenuCollapsed
+                  ? "none"
+                  : `${appState.height - 166}px`,
+                width: isLeftMenuCollapsed
+                  ? "var(--lg-button-size)"
+                  : "12.5rem",
+                overflow: isLeftMenuCollapsed ? "hidden" : "visible",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: isLeftMenuCollapsed ? "center" : "flex-start",
+                ...(isLeftMenuCollapsed
+                  ? { height: "var(--lg-button-size)" }
+                  : {}),
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: isLeftMenuCollapsed ? "center" : "flex-start",
+                  alignItems: "flex-start",
+                  padding: 0,
+                  margin: 0,
+                  borderBottom: isLeftMenuCollapsed
+                    ? "none"
+                    : "1px solid var(--color-border)",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={toggleLeftMenu}
+                  className={clsx("left-menu-toggle", {
+                    "left-menu-toggle--collapsed": isLeftMenuCollapsed,
+                  })}
+                  style={{
+                    width: "2rem",
+                    height: "2rem",
+                    minWidth: "2rem",
+                    minHeight: "2rem",
+                    padding: 0,
+                    ...(isLeftMenuCollapsed
+                      ? { margin: 0 }
+                      : {
+                          marginBlockStart: "-0.5rem",
+                          marginInlineStart: "-0.5rem",
+                        }),
+                    border: "none",
+                    borderRadius: "var(--border-radius-md)",
+                    backgroundColor: "var(--island-bg-color)",
+                    color: "var(--icon-fill-color)",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                    ...(isLeftMenuCollapsed ? {} : { zIndex: 1 }),
+                    transform: isLeftMenuCollapsed
+                      ? "rotate(180deg)"
+                      : "rotate(0deg)",
+                  }}
+                  title={
+                    isLeftMenuCollapsed
+                      ? t("buttons.expandLeftMenu")
+                      : t("buttons.collapseLeftMenu")
+                  }
+                >
+                  {chevronRightIcon}
+                </button>
+              </div>
+              {!isLeftMenuCollapsed && (
+                <div
+                  style={{
+                    flex: 1,
+                    minHeight: 0,
+                    marginTop: "0.25rem",
+                    boxSizing: "border-box",
+                    paddingInlineStart: "2px",
+                    paddingInlineEnd: "2px",
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                  }}
+                >
+                  <SelectedShapeActions
+                    appState={appState}
+                    elementsMap={app.scene.getNonDeletedElementsMap()}
+                    renderAction={actionManager.renderAction}
+                    app={app}
+                  />
+                </div>
+              )}
+            </Island>
+          </div>
         )}
       </Section>
     );
@@ -392,13 +499,9 @@ const LayerUI = ({
               </Section>
             )}
           <div
-            className={clsx(
-              "layer-ui__wrapper__top-right zen-mode-transition",
-              {
-                "transition-right": appState.zenModeEnabled,
-                "layer-ui__wrapper__top-right--compact": isCompactStylesPanel,
-              },
-            )}
+            className={clsx("layer-ui__wrapper__top-right", {
+              "layer-ui__wrapper__top-right--compact": isCompactStylesPanel,
+            })}
           >
             {appState.collaborators.size > 0 && (
               <UserList
