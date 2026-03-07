@@ -32,7 +32,7 @@ export const CURSOR_TYPE = {
   POINTER: "pointer",
   MOVE: "move",
   AUTO: "",
-};
+} as const;
 export const POINTER_BUTTON = {
   MAIN: 0,
   WHEEL: 1,
@@ -96,7 +96,7 @@ export const ENV = {
   TEST: "test",
   DEVELOPMENT: "development",
   PRODUCTION: "production",
-};
+} as const;
 
 export const CLASSES = {
   SIDEBAR: "sidebar",
@@ -107,7 +107,7 @@ export const CLASSES = {
   SHAPE_ACTIONS_THEME_SCOPE: "shape-actions-theme-scope",
   FRAME_NAME: "frame-name",
   DROPDOWN_MENU_EVENT_WRAPPER: "dropdown-menu-event-wrapper",
-};
+} as const;
 
 export const FONT_SIZES = {
   sm: 16,
@@ -361,13 +361,13 @@ export const VERTICAL_ALIGN = {
   TOP: "top",
   MIDDLE: "middle",
   BOTTOM: "bottom",
-};
+} as const;
 
 export const TEXT_ALIGN = {
   LEFT: "left",
   CENTER: "center",
   RIGHT: "right",
-};
+} as const;
 
 export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
 
