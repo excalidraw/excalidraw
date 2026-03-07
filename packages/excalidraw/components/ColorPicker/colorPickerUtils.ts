@@ -100,3 +100,26 @@ export type ColorPickerType =
   | "canvasBackground"
   | "elementBackground"
   | "elementStroke";
+
+// --- Persistent Custom Colors ---
+const LOCAL_STORAGE_KEY = "excalidraw-custom-colors";
+
+export const loadPersistentCustomColors = (): string[] => {
+  try {
+    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (err) {
+    console.warn("Failed to load custom colors", err);
+  }
+  return [];
+};
+
+export const savePersistentCustomColors = (colors: string[]) => {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(colors));
+  } catch (err) {
+    console.warn("Failed to save custom colors", err);
+  }
+};
