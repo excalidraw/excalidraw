@@ -36,10 +36,14 @@ export const Range = ({ updateData, app, testId }: RangeProps) => {
       const valueElement = valueRef.current;
       const inputWidth = rangeElement.offsetWidth;
       const thumbWidth = 15; // 15 is the width of the thumb
+      const isRTL =
+        getComputedStyle(rangeElement).direction === "rtl";
       const position =
         (value / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
-      valueElement.style.left = `${position}px`;
-      rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
+      valueElement.style.insetInlineStart = `${position}px`;
+      valueElement.style.insetInlineEnd = "auto";
+      const gradientDir = isRTL ? "to left" : "to right";
+      rangeElement.style.background = `linear-gradient(${gradientDir}, var(--color-slider-track) 0%, var(--color-slider-track) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
     }
   }, [value]);
 
