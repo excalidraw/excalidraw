@@ -35,6 +35,8 @@ interface PublishLibraryDataParams {
   website: string;
 }
 
+const LIBRARY_BACKEND = import.meta.env.VITE_APP_LIBRARY_BACKEND;
+
 const generatePreviewImage = async (libraryItems: LibraryItems) => {
   const MAX_ITEMS_PER_ROW = 6;
   const BOX_SIZE = 128;
@@ -298,7 +300,7 @@ const PublishLibrary = ({
     formData.append("twitterHandle", libraryData.twitterHandle);
     formData.append("website", libraryData.website);
 
-    fetch(`${import.meta.env.VITE_APP_LIBRARY_BACKEND}/submit`, {
+    fetch(`${LIBRARY_BACKEND}/submit`, {
       method: "post",
       body: formData,
     })
