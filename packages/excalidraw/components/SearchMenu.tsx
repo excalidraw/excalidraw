@@ -22,7 +22,12 @@ import {
   getFontString,
 } from "@excalidraw/common";
 
-import { newTextElement } from "@excalidraw/element";
+import {
+  newTextElement,
+  newElementWith,
+  refreshTextDimensions,
+  getContainerElement,
+} from "@excalidraw/element";
 import { isTextElement, isFrameLikeElement } from "@excalidraw/element";
 
 import { getDefaultFrameName } from "@excalidraw/element/frame";
@@ -87,6 +92,8 @@ export const SearchMenu = () => {
   const searchQuery = inputValue.trim() as SearchQuery;
 
   const [isSearching, setIsSearching] = useState(false);
+
+  const [replaceValue, setReplaceValue] = useState("");
 
   const [searchMatches, setSearchMatches] = useState<SearchMatches>({
     nonce: null,
@@ -223,10 +230,10 @@ export const SearchMenu = () => {
             app.canvas.height / window.devicePixelRatio,
             {
               offsetLeft: app.state.offsetLeft,
-              offsetTop: app.state.offsetTop,
               scrollX: app.state.scrollX,
               scrollY: app.state.scrollY,
               zoom: app.state.zoom,
+              offsetTop: app.state.offsetTop,
             },
             app.scene.getNonDeletedElementsMap(),
             app.getEditorUIOffsets(),
@@ -277,6 +284,163 @@ export const SearchMenu = () => {
     goToPreviousItem,
     searchMatches,
   });
+
+  const handleReplace = (matchIndex: number, replaceWith: string) => {
+    const match = searchMatches.items[matchIndex];
+    if (!match) {
+      return;
+    }
+
+    const elements = app.scene.getElementsIncludingDeleted();
+    const elementsMap = app.scene.getElementsMapIncludingDeleted();
+
+    const nextElements = elements.map((el) => {
+      if (el.id !== match.element.id) {
+        return el;
+      }
+
+      if (isFrameLikeElement(el)) {
+        const frame = el;
+        const newName = (frame.name ?? getDefaultFrameName(frame)).replace(
+          searchQuery as string,
+          replaceWith,
+        );
+        return newElementWith(frame, { name: newName });
+      }
+
+      if (isTextElement(el)) {
+        const textEl = el;
+        const originalText = textEl.originalText;
+        const nextOriginal =
+          originalText.slice(0, match.index) +
+          replaceWith +
+          originalText.slice(match.index + (searchQuery as string).length);
+
+        return newElementWith(textEl, {
+          originalText: nextOriginal,
+          ...refreshTextDimensions(
+            textEl,
+            getContainerElement(textEl, elementsMap),
+            elementsMap,
+            nextOriginal,
+          ),
+        });
+      }
+
+      return el;
+    });
+
+    app.scene.replaceAllElements(nextElements);
+
+    // re-run the current search (do not change the search input) to refresh matches
+    setIsSearching(true);
+    const currentSearch = inputValue.trim() as SearchQuery;
+    handleSearch(currentSearch, app, (matchItems, index) => {
+      setSearchMatches({ nonce: randomInteger(), items: matchItems });
+      // don't set focusIndex here to avoid automatic scroll-to-content
+      setFocusIndex(null);
+      searchedQueryRef.current = currentSearch;
+      lastSceneNonceRef.current = app.scene.getSceneNonce();
+      setAppState({
+        searchMatches: matchItems.length
+          ? {
+              focusedId: null,
+              matches: matchItems.map((searchMatch) => ({
+                id: searchMatch.element.id,
+                focus: false,
+                matchedLines: searchMatch.matchedLines,
+              })),
+            }
+          : null,
+      });
+
+      setIsSearching(false);
+    });
+  };
+
+  const handleReplaceAll = (replaceWith: string) => {
+    if (!searchMatches.items.length) {
+      return;
+    }
+
+    const elements = app.scene.getElementsIncludingDeleted();
+    const elementsMap = app.scene.getElementsMapIncludingDeleted();
+
+    const byId = new Map<string, SearchMatchItem[]>();
+    for (const m of searchMatches.items) {
+      const arr = byId.get(m.element.id) || [];
+      arr.push(m);
+      byId.set(m.element.id, arr);
+    }
+
+    const nextElements = elements.map((el) => {
+      const matchesForEl = byId.get(el.id);
+      if (!matchesForEl || !matchesForEl.length) {
+        return el;
+      }
+
+      if (isFrameLikeElement(el)) {
+        const frame = el;
+        const name = frame.name ?? getDefaultFrameName(frame);
+        const newName = name.replace(
+          new RegExp(escapeSpecialCharacters(searchQuery as string), "gi"),
+          replaceWith,
+        );
+        return newElementWith(frame, { name: newName });
+      }
+
+      if (isTextElement(el)) {
+        let nextOriginal = el.originalText;
+        // replace all occurrences
+        nextOriginal = nextOriginal.replace(
+          new RegExp(escapeSpecialCharacters(searchQuery as string), "gi"),
+          replaceWith,
+        );
+
+        return newElementWith(el, {
+          originalText: nextOriginal,
+          ...refreshTextDimensions(
+            el,
+            getContainerElement(el, elementsMap),
+            elementsMap,
+            nextOriginal,
+          ),
+        });
+      }
+
+      return el;
+    });
+
+    app.scene.replaceAllElements(nextElements);
+
+    // After Replace All, run search for the replace value (do not change the search input)
+    setIsSearching(true);
+    const searchFor = replaceWith as SearchQuery;
+    handleSearch(searchFor, app, (matchItems, index) => {
+      setSearchMatches({ nonce: randomInteger(), items: matchItems });
+      // avoid auto-scroll by not focusing an index
+      setFocusIndex(null);
+      // keep searchedQueryRef pointing at the user's search input so the
+      // outer effect doesn't overwrite the replace-all results (we intentionally
+      // don't change the visible search input)
+      searchedQueryRef.current = inputValue.trim() as SearchQuery;
+      lastSceneNonceRef.current = app.scene.getSceneNonce();
+      setAppState({
+        searchMatches: matchItems.length
+          ? {
+              focusedId: null,
+              matches: matchItems.map((searchMatch) => ({
+                id: searchMatch.element.id,
+                focus: false,
+                matchedLines: searchMatch.matchedLines,
+              })),
+            }
+          : null,
+      });
+
+      setIsSearching(false);
+    });
+  };
 
   useEffect(() => {
     const eventHandler = (event: KeyboardEvent) => {
@@ -386,6 +550,42 @@ export const SearchMenu = () => {
           }}
           selectOnRender
         />
+      </div>
+      <div className="layer-ui__search-replace">
+        <TextField
+          className="layer-ui__search-replace-input"
+          value={replaceValue}
+          placeholder={t("search.replacePlaceholder")}
+          onChange={(v) => setReplaceValue(v)}
+        />
+
+        <div className="layer-ui__search-replace-actions">
+          <Button
+            onSelect={() => {
+              // Replace current focused match or first match
+              let indexToReplace = 0;
+              if (focusIndex !== null) {
+                indexToReplace = focusIndex;
+              } else if (searchMatches.items.length > 0) {
+                indexToReplace = 0;
+              }
+              handleReplace(indexToReplace, replaceValue);
+            }}
+            className="result-nav-btn"
+            disabled={searchMatches.items.length === 0 || !searchQuery}
+          >
+            {t("search.replace")}
+          </Button>
+          <Button
+            onSelect={() => {
+              handleReplaceAll(replaceValue);
+            }}
+            className="result-nav-btn"
+            disabled={searchMatches.items.length === 0 || !searchQuery}
+          >
+            {t("search.replaceAll")}
+          </Button>
+        </div>
       </div>
 
       <div className="layer-ui__search-count">
