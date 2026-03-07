@@ -267,6 +267,7 @@ export {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
   getFormFactor,
+  throttleRAF,
 } from "@excalidraw/common";
 
 export {
