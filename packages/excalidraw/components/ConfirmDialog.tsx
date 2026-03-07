@@ -73,6 +73,7 @@ const ConfirmDialog = (props: Props) => {
             container?.focus();
           }}
           actionType="danger"
+          tabIndex = {1}
         />
       </div>
     </Dialog>
