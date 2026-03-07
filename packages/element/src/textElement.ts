@@ -8,13 +8,15 @@ import {
   getFontString,
   isProdEnv,
   invariant,
+  randomInteger,
+  getUpdatedTimestamp,
 } from "@excalidraw/common";
 
 import { pointFrom, pointRotateRads, type Radians } from "@excalidraw/math";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
-import type { ExtractSetType } from "@excalidraw/common/utility-types";
+import type { ExtractSetType, Mutable } from "@excalidraw/common/utility-types";
 
 import {
   resetOriginalContainerCache,
@@ -527,4 +529,73 @@ export const getTextFromElements = (
     }, [])
     .join(separator);
   return text;
+};
+
+// ============================================================================
+// Note-related functions
+// ============================================================================
+
+/** Check if a text element has a note attached */
+export const hasNote = (
+  element: ExcalidrawElement,
+): element is ExcalidrawTextElement & {
+  note: NonNullable<ExcalidrawTextElement["note"]>;
+} => {
+  return (
+    isTextElement(element) && !!element.note && !!element.note.content.trim()
+  );
+};
+
+/** Add a note to a text element */
+export const addNoteToTextElement = (
+  textElement: ExcalidrawTextElement,
+  noteData: NonNullable<ExcalidrawTextElement["note"]>,
+  scene: Scene,
+) => {
+  if (!isTextElement(textElement)) {
+    return;
+  }
+
+  scene.mutateElement(textElement, {
+    note: noteData,
+  });
+
+  scene.triggerUpdate();
+};
+
+/** Remove a note from a text element */
+export const removeNoteFromTextElement = (
+  textElement: ExcalidrawTextElement,
+  scene: Scene,
+) => {
+  if (!isTextElement(textElement) || !textElement.note) {
+    return;
+  }
+
+  // mutateElement skips keys with `undefined` values, so we must directly
+  // delete the note property and bump the version manually.
+  const mutable = textElement as Mutable<ExcalidrawTextElement>;
+  delete mutable.note;
+  mutable.version += 1;
+  mutable.versionNonce = randomInteger();
+  mutable.updated = getUpdatedTimestamp();
+
+  scene.triggerUpdate();
+};
+
+/** Update an existing note on a text element */
+export const updateNoteForTextElement = (
+  textElement: ExcalidrawTextElement,
+  noteData: NonNullable<ExcalidrawTextElement["note"]>,
+  scene: Scene,
+) => {
+  if (!isTextElement(textElement)) {
+    return;
+  }
+
+  scene.mutateElement(textElement, {
+    note: noteData,
+  });
+
+  scene.triggerUpdate();
 };

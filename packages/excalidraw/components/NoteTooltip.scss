@@ -1,0 +1,93 @@
+.note-tooltip {
+  pointer-events: auto;
+  max-width: 320px;
+  font-size: 13px;
+  animation: fadeInScale 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &__container {
+    position: relative;
+    background: var(--color-surface-highest);
+    border: 1px solid rgba(var(--color-border-rgb), 0.2);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08),
+      0 0 0 1px rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+
+    // Modern glassmorphism effect
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 100%
+    );
+
+    [data-theme="dark"] & {
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.02) 100%
+      );
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+  }
+
+  &__content {
+    padding: 20px;
+    line-height: 1.5;
+    color: var(--color-text);
+    background: transparent;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    max-height: 240px;
+    overflow-y: auto;
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(var(--color-border-rgb), 0.1);
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: linear-gradient(
+        135deg,
+        var(--color-primary),
+        var(--color-primary-darker)
+      );
+      border-radius: 10px;
+
+      &:hover {
+        background: var(--color-primary-darker);
+      }
+    }
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .note-tooltip {
+  &__container {
+    background: var(--color-surface-highest);
+    border-color: var(--color-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  &__content {
+    color: var(--color-text);
+  }
+}

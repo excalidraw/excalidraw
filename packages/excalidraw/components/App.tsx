@@ -154,7 +154,6 @@ import {
   isElbowArrow,
   isFlowchartNodeElement,
   isBindableElement,
-  isTextElement,
   getNormalizedDimensions,
   isElementCompletelyInViewport,
   isElementInViewport,
@@ -256,6 +255,8 @@ import {
   handleFocusPointPointerUp,
   maybeHandleArrowPointlikeDrag,
   getUncroppedWidthAndHeight,
+  hasNote,
+  isTextElement,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -323,6 +324,11 @@ import {
   actionToggleCropEditor,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
+import {
+  actionAddNote,
+  actionEditNote,
+  actionRemoveNote,
+} from "../actions/actionNote";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
 import { actionPaste } from "../actions/actionClipboard";
 import { actionCopyElementLink } from "../actions/actionElementLink";
@@ -449,6 +455,8 @@ import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { Toast } from "./Toast";
+import { NoteIcon } from "./NoteIcon";
+import { NoteTooltip } from "./NoteTooltip";
 
 import { findShapeByKey } from "./shapes";
 
@@ -2291,6 +2299,113 @@ class App extends React.Component<AppProps, AppState> {
                           onPointerDown={this.handleCanvasPointerDown}
                           onDoubleClick={this.handleCanvasDoubleClick}
                         />
+                        {/* Note Icons Overlay */}
+                        {visibleElements
+                          .filter((element) => {
+                            return (
+                              isTextElement(element) &&
+                              hasNote(element) &&
+                              !this.state.editingTextElement &&
+                              isElementInViewport(
+                                element,
+                                this.state.width,
+                                this.state.height,
+                                this.state,
+                                elementsMap,
+                              )
+                            );
+                          })
+                          .map((element) => (
+                            <NoteIcon
+                              key={`note-icon-${element.id}`}
+                              textElement={element as ExcalidrawTextElement}
+                              appState={this.state}
+                              elementsMap={elementsMap}
+                              onClick={() => {
+                                this.setState({
+                                  editingNoteElementId: element.id,
+                                });
+                              }}
+                              onMouseEnter={(event) => {
+                                if ((this as any).noteTooltipTimeout) {
+                                  clearTimeout(
+                                    (this as any).noteTooltipTimeout,
+                                  );
+                                }
+
+                                const rect =
+                                  this.interactiveCanvas?.getBoundingClientRect();
+                                if (rect) {
+                                  this.setState({
+                                    showNoteTooltip: {
+                                      elementId: element.id,
+                                      x: event.clientX - rect.left,
+                                      y: event.clientY - rect.top,
+                                    },
+                                    showingNoteTooltipElementId: element.id,
+                                  });
+                                }
+                              }}
+                              onMouseLeave={() => {
+                                (this as any).noteTooltipTimeout = setTimeout(
+                                  () => {
+                                    this.setState({
+                                      showNoteTooltip: null,
+                                      showingNoteTooltipElementId: null,
+                                    });
+                                  },
+                                  200,
+                                );
+                              }}
+                            />
+                          ))}
+                        {/* Note Tooltip */}
+                        {this.state.showNoteTooltip &&
+                          this.state.showingNoteTooltipElementId &&
+                          (() => {
+                            const tooltipElement = elementsMap.get(
+                              this.state.showingNoteTooltipElementId,
+                            );
+                            return tooltipElement &&
+                              isTextElement(tooltipElement) &&
+                              hasNote(tooltipElement) ? (
+                              <NoteTooltip
+                                textElement={tooltipElement}
+                                appState={this.state}
+                                x={this.state.showNoteTooltip.x}
+                                y={this.state.showNoteTooltip.y}
+                                onClose={() => {
+                                  if ((this as any).noteTooltipTimeout) {
+                                    clearTimeout(
+                                      (this as any).noteTooltipTimeout,
+                                    );
+                                  }
+                                  this.setState({
+                                    showNoteTooltip: null,
+                                    showingNoteTooltipElementId: null,
+                                  });
+                                }}
+                                onMouseEnter={() => {
+                                  if ((this as any).noteTooltipTimeout) {
+                                    clearTimeout(
+                                      (this as any).noteTooltipTimeout,
+                                    );
+                                  }
+                                }}
+                                onMouseLeave={() => {
+                                  (this as any).noteTooltipTimeout = setTimeout(
+                                    () => {
+                                      this.setState({
+                                        showNoteTooltip: null,
+                                        showingNoteTooltipElementId: null,
+                                      });
+                                    },
+                                    200,
+                                  );
+                                }}
+                              />
+                            ) : null;
+                          })()}
                         {this.state.userToFollow && (
                           <FollowMode
                             width={this.state.width}
@@ -12174,6 +12289,9 @@ class App extends React.Component<AppProps, AppState> {
       actionUnbindText,
       actionBindText,
       actionWrapTextInContainer,
+      actionAddNote,
+      actionEditNote,
+      actionRemoveNote,
       actionUngroup,
       CONTEXT_MENU_SEPARATOR,
       actionAddToLibrary,

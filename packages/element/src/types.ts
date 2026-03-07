@@ -32,6 +32,23 @@ type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
 export type VerticalAlign = typeof VERTICAL_ALIGN[VerticalAlignKeys];
 export type FractionalIndex = string & { _brand: "franctionalIndex" };
 
+export type NoteFormatting = {
+  fontSize: number;
+  fontFamily: FontFamilyValues;
+  textAlign: TextAlign;
+  strokeColor: string;
+  backgroundColor: string;
+  bold: boolean;
+  italic: boolean;
+};
+
+export type Note = {
+  id: string;
+  content: string;
+  isVisible: boolean;
+  formatting: NoteFormatting;
+};
+
 export type BoundElement = Readonly<{
   id: ExcalidrawLinearElement["id"];
   type: "arrow" | "text";
@@ -254,6 +271,8 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      *  with font size (using `getLineHeightInPx` helper).
      */
     lineHeight: number & { _brand: "unitlessLineHeight" };
+    /** Optional note attached to the text element */
+    note?: Note;
   }>;
 
 export type ExcalidrawBindableElement =
