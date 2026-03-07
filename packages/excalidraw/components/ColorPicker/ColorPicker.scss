@@ -378,6 +378,7 @@
     padding: 0 12px;
     margin: 8px;
     box-sizing: border-box;
+    position: relative;
 
     &:focus-within {
       box-shadow: 0 0 0 1px var(--color-primary-darkest);
@@ -421,6 +422,22 @@
     &:focus-visible {
       box-shadow: none;
     }
+
+    &--invalid {
+      border-color: var(--color-danger);
+      color: var(--color-danger);
+    }
+  }
+
+  .color-picker-input__error {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    font-size: 0.75rem;
+    color: var(--color-danger);
+    padding: 0.25rem 0.5rem;
+    white-space: nowrap;
   }
 
   .color-picker-label-swatch-container {
