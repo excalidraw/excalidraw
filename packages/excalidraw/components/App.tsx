@@ -735,6 +735,9 @@ class App extends React.Component<AppProps, AppState> {
       this,
     );
     this.scene = new Scene();
+    if (props.beforeElementCreated) {
+      this.scene.beforeElementCreated(props.beforeElementCreated);
+    }
 
     this.canvas = document.createElement("canvas");
     this.rc = rough.canvas(this.canvas);
