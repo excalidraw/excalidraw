@@ -1313,8 +1313,21 @@ export const resizeMultipleElements = (
       );
 
     if (keepAspectRatio) {
-      scaleX = scale;
-      scaleY = scale;
+      // If the elements are in a group and shouldMaintainAspectRatio is true(meaning user is holding shift),
+      // we need to adjust the scaleX or scaleY based on the handleDirection
+      if(targetElements.some(item => isInGroup(item.latest)) && shouldMaintainAspectRatio) {
+        if(handleDirection.length === 1) {
+          if(handleDirection.includes("e") || handleDirection.includes("w")) {
+            scaleX = scale;
+          } else if (handleDirection.includes("n") || handleDirection.includes("s")) {
+            scaleY = scale;
+          }
+        }
+      }
+      else {
+        scaleX = scale;
+        scaleY = scale;
+      }
     }
 
     /**
@@ -1425,11 +1438,15 @@ export const resizeMultipleElements = (
       }
 
       if (isTextElement(orig)) {
-        const metrics = measureFontSizeFromWidth(orig, elementsMap, width);
-        if (!metrics) {
-          return;
+        if (!shouldMaintainAspectRatio) {
+          const metrics = measureFontSizeFromWidth(orig, elementsMap, width);
+          if (!metrics) {
+            return;
+          }
+          update.fontSize = metrics.size;
+        } else {
+          update.fontSize = orig.fontSize;
         }
-        update.fontSize = metrics.size;
       }
 
       const boundTextElement = originalElementsMap.get(
@@ -1437,7 +1454,7 @@ export const resizeMultipleElements = (
       ) as ExcalidrawTextElementWithContainer | undefined;
 
       if (boundTextElement) {
-        if (keepAspectRatio) {
+        if (keepAspectRatio && !shouldMaintainAspectRatio) {
           const newFontSize = boundTextElement.fontSize * scale;
           if (newFontSize < MIN_FONT_SIZE) {
             return;
