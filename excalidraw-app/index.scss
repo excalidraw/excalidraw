@@ -128,3 +128,52 @@
     }
   }
 }
+.tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+  pointer-events: auto;
+}
+
+.tooltip-icon {
+  font-size: 0.9rem;
+  cursor: help;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.tooltip-icon:hover {
+  opacity: 1;
+}
+
+.tooltip-content {
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  visibility: hidden;
+  opacity: 0;
+  min-width: 200px;
+  max-width: min(260px, 80vw);
+  background-color: var(--color-surface-primary);
+  color: var(--color-text-primary);
+  text-align: left;
+  border-radius: var(--border-radius-sm);
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  white-space: normal; /* ✅ allow wrapping */
+  word-wrap: break-word; /* ✅ break long words */
+  max-width: min(260px, 80vw); /* ✅ responsive width */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 9999;
+  pointer-events: auto;
+  overflow-wrap: anywhere; /* ✅ prevent text overflow */
+}
+
+.tooltip-wrapper:hover .tooltip-content,
+.tooltip-content:hover {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
