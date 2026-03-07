@@ -94,6 +94,27 @@ yarn add react react-dom @excalidraw/excalidraw
 
 Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
 
+## ChatCanvas UI (experimental)
+
+This repository includes a Lovart-inspired ChatCanvas shell that combines an infinite canvas with a right-side chat panel and left-side templates drawer. To enable the UI, launch the app and append `?ui=chatcanvas` to the URL:
+
+```
+http://localhost:3000/?ui=chatcanvas
+```
+
+Key capabilities:
+
+- Three-column shell with collapsible/resizable chat panel and templates drawer.
+- Selection context pill that mirrors current canvas selection.
+- Mock agent workflow: send chat messages, then apply responses to the canvas.
+- Built-in templates for wireframes, flowcharts, and mind maps.
+
+Known limitations:
+
+- Agent responses are mock-only (no real backend).
+- Selection context updates via polling.
+- Templates append to the canvas (no replace/merge dialog yet).
+
 ## Contributing
 
 - Missing something or found a bug? [Report here](https://github.com/excalidraw/excalidraw/issues).
