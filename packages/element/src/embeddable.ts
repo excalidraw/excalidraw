@@ -56,6 +56,9 @@ const RE_REDDIT =
 const RE_REDDIT_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
 
+const RE_TIKTOK =
+  /^(?:https?:\/\/)?(?:www\.)?tiktok\.com\/@[\w.-]+\/video\/(\d+)/;
+
 const parseYouTubeLikeTimestamp = (url: string): number => {
   let timeParam: string | null | undefined;
 
@@ -147,6 +150,7 @@ const ALLOWED_DOMAINS = new Set([
   "giphy.com",
   "reddit.com",
   "forms.microsoft.com",
+  "tiktok.com",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
@@ -264,6 +268,25 @@ export const getEmbedLink = (
       search ? `?${search}` : ""
     }`;
     aspectRatio = { w: 560, h: 315 };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    });
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    };
+  }
+
+  const tiktokLink = link.match(RE_TIKTOK);
+  if (tiktokLink?.[1]) {
+    type = "video";
+    link = `https://www.tiktok.com/embed/v2/${tiktokLink[1]}`;
+    aspectRatio = { w: 315, h: 560 };
     embeddedLinkCache.set(originalLink, {
       link,
       intrinsicSize: aspectRatio,
