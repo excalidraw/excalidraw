@@ -51,7 +51,7 @@ import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
 
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
-import { getToolbarTools } from "./shapes";
+import { getToolbarTools, getSelectionToolOptions } from "./shapes";
 
 import "./Actions.scss";
 
@@ -80,7 +80,6 @@ import {
   TextSizeIcon,
   adjustmentsIcon,
   DotsHorizontalIcon,
-  SelectionIcon,
   pencilIcon,
 } from "./icons";
 
@@ -1054,18 +1053,7 @@ export const ShapesSwitcher = ({
   const isFullStylesPanel = stylesPanelMode === "full";
   const isCompactStylesPanel = stylesPanelMode === "compact";
 
-  const SELECTION_TOOLS = [
-    {
-      type: "selection",
-      icon: SelectionIcon,
-      title: capitalizeString(t("toolBar.selection")),
-    },
-    {
-      type: "lasso",
-      icon: LassoIcon,
-      title: capitalizeString(t("toolBar.lasso")),
-    },
-  ] as const;
+  const SELECTION_TOOLS = getSelectionToolOptions();
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
