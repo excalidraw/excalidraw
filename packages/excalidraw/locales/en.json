@@ -20,6 +20,7 @@
     "bringForward": "Bring forward",
     "sendToBack": "Send to back",
     "bringToFront": "Bring to front",
+    "bringToMiddle": "Bring to middle",
     "sendBackward": "Send backward",
     "delete": "Delete",
     "copyStyles": "Copy styles",
