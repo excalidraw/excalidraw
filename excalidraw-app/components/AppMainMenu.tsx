@@ -22,6 +22,7 @@ export const AppMainMenu: React.FC<{
   theme: Theme | "system";
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
+  onSettingsOpen: () => void;
 }> = React.memo((props) => {
   return (
     <MainMenu>
@@ -77,6 +78,9 @@ export const AppMainMenu: React.FC<{
         </MainMenu.Item>
       )}
       <MainMenu.Separator />
+      <MainMenu.Item onSelect={() => props.onSettingsOpen()}>
+        Settings
+      </MainMenu.Item>
       <MainMenu.DefaultItems.Preferences />
       <MainMenu.DefaultItems.ToggleTheme
         allowSystemTheme
