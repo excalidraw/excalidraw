@@ -13,7 +13,7 @@ import { orderByFractionalIndex } from "@excalidraw/element";
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
 import { ToolButton } from "../components/ToolButton";
-import { UndoIcon, RedoIcon } from "../components/icons";
+import { UndoIcon, RedoIcon, ClearHistoryIcon } from "../components/icons";
 import { HistoryChangedEvent } from "../history";
 import { useEmitter } from "../hooks/useEmitter";
 import { t } from "../i18n";
@@ -136,6 +136,67 @@ export const createRedoAction: ActionCreator = (history) => ({
         data-testid="button-redo"
         style={{
           ...(isMobile ? MOBILE_ACTION_BUTTON_BG : {}),
+        }}
+      />
+    );
+  },
+});
+
+export const createClearHistoryAction: ActionCreator = (history) => ({
+  name: "clearHistory",
+  label: "buttons.clearHistory",
+  icon: ClearHistoryIcon,
+  trackEvent: { category: "history" },
+  viewMode: false,
+  perform: (elements, appState, __, app) => {
+    if (
+      !appState.multiElement &&
+      !appState.resizingElement &&
+      !appState.editingTextElement &&
+      !appState.newElement &&
+      !appState.selectedElementsAreBeingDragged &&
+      !appState.selectionElement &&
+      !app.flowChartCreator.isCreatingChart
+    ) {
+      history.clear();
+      return {
+        appState,
+        elements,
+        captureUpdate: CaptureUpdateAction.NEVER,
+      };
+    }
+    return { captureUpdate: CaptureUpdateAction.EVENTUALLY };
+  },
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    event.shiftKey &&
+    event.altKey &&
+    matchKey(event, KEYS.Z),
+  PanelComponent: ({ appState, updateData, data }) => {
+    const { isUndoStackEmpty, isRedoStackEmpty } = useEmitter(
+      history.onHistoryChangedEmitter,
+      new HistoryChangedEvent(
+        history.isUndoStackEmpty,
+        history.isRedoStackEmpty,
+      ),
+    );
+
+    const isHistoryEmpty = isUndoStackEmpty && isRedoStackEmpty;
+
+    return (
+      <ToolButton
+        type="button"
+        icon={ClearHistoryIcon}
+        aria-label={t("buttons.clearHistory")}
+        onClick={updateData}
+        size={data?.size || "medium"}
+        disabled={isHistoryEmpty}
+        data-testid="button-clear-history"
+        title={t("buttons.clearHistory")}
+        style={{
+          ...(appState.stylesPanelMode === "mobile"
+            ? MOBILE_ACTION_BUTTON_BG
+            : {}),
         }}
       />
     );

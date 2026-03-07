@@ -76,6 +76,7 @@ export type ActionName =
   | "changeFontSize"
   | "undo"
   | "redo"
+  | "clearHistory"
   | "finalize"
   | "changeProjectName"
   | "changeExportBackground"
