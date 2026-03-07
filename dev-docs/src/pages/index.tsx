@@ -1,3 +1,4 @@
+import '../font.css';
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import HomepageFeatures from "@site/src/components/Homepage";
@@ -6,6 +7,16 @@ import clsx from "clsx";
 import React from "react";
 
 import styles from "./index.module.css";
+
+declare module "@theme/Layout" {
+  import * as React from "react";
+  interface LayoutProps {
+    description?: string;
+    children?: React.ReactNode;
+  }
+  const Layout: React.FC<LayoutProps>;
+  export default Layout;
+}
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
