@@ -421,6 +421,11 @@
     &:focus-visible {
       box-shadow: none;
     }
+
+    &--error {
+      color: var(--color-danger);
+      border-color: var(--color-danger);
+    }
   }
 
   .color-picker-label-swatch-container {
