@@ -2433,3 +2433,139 @@ export const settingsIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+// ── Everyday Objects toolbar icons ──────────────────────────────────────────
+
+// Shared props for object icons: same dimensions as tabler but stroke 1.5
+const objectIconProps: Opts = {
+  ...tablerIconProps,
+  strokeWidth: 1.5,
+} as const;
+
+// tabler-icons: user
+export const objectsToolIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <circle cx="12" cy="7" r="4" />
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+  </g>,
+  objectIconProps,
+);
+
+// tabler-icons: car
+export const carIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+    <path d="M5 17h-2v-6l2 -5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" />
+  </g>,
+  objectIconProps,
+);
+
+// tabler-icons: bike
+export const bikeIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <circle cx="5" cy="15" r="3" />
+    <circle cx="19" cy="15" r="3" />
+    <path d="M9 15l1 -7h5" />
+    <path d="M10 8l4 3l5 -3" />
+    <path d="M12 8l2 7" />
+  </g>,
+  objectIconProps,
+);
+
+// tabler-icons: man
+export const personIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <circle cx="12" cy="5" r="3" />
+    <path d="M12 8v6" />
+    <path d="M9 12l-2 6" />
+    <path d="M15 12l2 6" />
+    <path d="M9 21l3 -3l3 3" />
+  </g>,
+  objectIconProps,
+);
+
+// tabler-icons: walk
+export const walkingIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <circle cx="13" cy="4" r="1" />
+    <path d="M7 21l3 -4" />
+    <path d="M16 21l-2 -4l-3 -3l1 -6" />
+    <path d="M6 12l2 -3l4 -1l3 3l3 1" />
+  </g>,
+  objectIconProps,
+);
+
+// tabler-icons: run
+export const runningIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <circle cx="14" cy="4" r="1" />
+    <path d="M5 21l4 -4" />
+    <path d="M13 21l2 -3l-2 -4l4 -4l-2 -3" />
+    <path d="M5 14l2 -3l4 -1l3 3" />
+    <path d="M17 8l2 -1" />
+  </g>,
+  objectIconProps,
+);
+
+// tabler-icons: user (custom waving pose variant)
+export const wavingIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <circle cx="12" cy="5" r="2" />
+    <path d="M12 7v5" />
+    <path d="M9 10l-3 4" />
+    <path d="M15 10l3 4" />
+    <path d="M9 19l3 -7l3 7" />
+  </g>,
+  objectIconProps,
+);
+
+// tabler-icons: home
+export const houseIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
+    <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+    <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+  </g>,
+  objectIconProps,
+);
+
+// tabler-icons: tree
+export const treeIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 3l4 4l-2 0l4 4l-3 0l3 4h-5v6h-2v-6h-5l3 -4h-3l4 -4h-2z" />
+  </g>,
+  objectIconProps,
+);
+
+// tabler-icons: table
+export const tableIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <rect x="4" y="5" width="16" height="4" rx="1" />
+    <path d="M7 9v10" />
+    <path d="M17 9v10" />
+    <path d="M7 13h10" />
+  </g>,
+  objectIconProps,
+);
+
+// tabler-icons: device-mobile
+export const phoneIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <rect x="7" y="2" width="10" height="20" rx="2" ry="2" />
+    <line x1="11" y1="5" x2="13" y2="5" />
+    <line x1="12" y1="17" x2="12.01" y2="17" />
+  </g>,
+  objectIconProps,
+);
