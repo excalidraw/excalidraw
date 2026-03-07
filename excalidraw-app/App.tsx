@@ -278,7 +278,7 @@ const initializeScene = async (opts: {
       }
       scene.scrollToContent = true;
       if (!roomLinkData) {
-        window.history.replaceState({}, APP_NAME, window.location.origin);
+        window.history.replaceState({}, APP_NAME, window.location.pathname);
       }
     } else {
       // https://github.com/excalidraw/excalidraw/issues/1919
@@ -295,10 +295,10 @@ const initializeScene = async (opts: {
       }
 
       roomLinkData = null;
-      window.history.replaceState({}, APP_NAME, window.location.origin);
+      window.history.replaceState({}, APP_NAME, window.location.pathname);
     }
   } else if (externalUrlMatch) {
-    window.history.replaceState({}, APP_NAME, window.location.origin);
+    window.history.replaceState({}, APP_NAME, window.location.pathname);
 
     const url = externalUrlMatch[1];
     try {

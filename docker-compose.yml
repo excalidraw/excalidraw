@@ -4,6 +4,8 @@ services:
       context: .
       args:
         - NODE_ENV=development
+        - VITE_APP_BASE_PATH
+        - VITE_APP_WS_SERVER_PATH
     container_name: excalidraw
     ports:
       - "3000:80"
