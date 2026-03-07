@@ -22,9 +22,10 @@ type FileVersion = Required<BinaryFileData>["version"];
 export class FileManager {
   /** files being fetched */
   private fetchingFiles = new Map<ExcalidrawImageElement["fileId"], true>();
+  /** files that errored during fetch, with timestamp of when the error occurred */
   private erroredFiles_fetch = new Map<
     ExcalidrawImageElement["fileId"],
-    true
+    number
   >();
   /** files being saved */
   private savingFiles = new Map<
@@ -59,9 +60,18 @@ export class FileManager {
   }
 
   /**
-   * returns whether file is saved/errored, or being processed
+   * returns whether file is saved/errored, or being processed.
+   * For errored files, allows retry after 10 seconds to handle race conditions
+   * where file may not have been uploaded yet when first fetch was attempted.
    */
   isFileTracked = (id: FileId) => {
+    // Allow retry for errored files after 10 seconds
+    const errorTimestamp = this.erroredFiles_fetch.get(id);
+    if (errorTimestamp && Date.now() - errorTimestamp > 10000) {
+      this.erroredFiles_fetch.delete(id);
+      return false;
+    }
+
     return (
       this.savedFiles.has(id) ||
       this.savingFiles.has(id) ||
@@ -151,9 +161,12 @@ export class FileManager {
 
       for (const file of loadedFiles) {
         this.savedFiles.set(file.id, this.getFileVersion(file));
+        // Clear any previous fetch error for this file
+        this.erroredFiles_fetch.delete(file.id);
       }
       for (const [fileId] of erroredFiles) {
-        this.erroredFiles_fetch.set(fileId, true);
+        // Store timestamp so we can allow retry after a delay
+        this.erroredFiles_fetch.set(fileId, Date.now());
       }
 
       return { loadedFiles, erroredFiles };
