@@ -287,7 +287,7 @@ export const actionToggleFullScreen = register({
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
-      className="fullscreen-button zoom-button"
+      className="fullscreen-button"
       icon={fullscreenIcon}
       title={t("buttons.fullScreen")}
       aria-label={t("buttons.fullScreen")}
