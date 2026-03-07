@@ -3,6 +3,10 @@
     "paste": "Ielīmēt",
     "pasteAsPlaintext": "Ielīmēt kā vienkāršu tekstu",
     "pasteCharts": "Ielīmēt grafikus",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Atlasīt visu",
     "multiSelect": "Pievienot elementu atlasei",
     "moveCanvas": "Pārvietot tāfeli",
@@ -171,7 +175,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -616,7 +624,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

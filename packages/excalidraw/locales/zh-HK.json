@@ -3,6 +3,10 @@
     "paste": "貼上",
     "pasteAsPlaintext": "",
     "pasteCharts": "貼上圖表",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "全選",
     "multiSelect": "多重選取",
     "moveCanvas": "移動畫布",
@@ -171,7 +175,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -616,7 +624,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

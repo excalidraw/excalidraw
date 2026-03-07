@@ -3,6 +3,10 @@
     "paste": "Pegar",
     "pasteAsPlaintext": "Pegar en tèxt brut",
     "pasteCharts": "Pegar los grafics",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Tot seleccionar",
     "multiSelect": "Apondre un element a la seleccion",
     "moveCanvas": "Desplaçar lo canabàs",
@@ -171,7 +175,11 @@
     "linkToElement": "Ligam cap a l’objècte",
     "wrapSelectionInFrame": "",
     "tab": "Onglet",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -616,7 +624,8 @@
     "syntax": "Sintaxi Mermaid",
     "preview": "Apercebut",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

@@ -3,6 +3,10 @@
     "paste": "चिटकवा",
     "pasteAsPlaintext": "साधा मजकूर च्या रुपात पेस्ट करा",
     "pasteCharts": "चार्ट चिकटवा",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "समस्त निवडा",
     "multiSelect": "निवडित तत्व जोडा",
     "moveCanvas": "पटल हलवा",
@@ -171,7 +175,11 @@
     "linkToElement": "वस्तू ह्याचा दुवा",
     "wrapSelectionInFrame": "चौकटित निवडलेले गुंडाळा",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "वस्तू ह्याचा दुवा",
@@ -616,7 +624,8 @@
     "syntax": "मर्मेड संरचना नियम",
     "preview": "पूर्वावलोकन",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

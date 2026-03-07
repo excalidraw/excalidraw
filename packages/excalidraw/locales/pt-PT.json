@@ -3,6 +3,10 @@
     "paste": "Colar",
     "pasteAsPlaintext": "Colar como texto simples",
     "pasteCharts": "Colar gráficos",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Selecionar tudo",
     "multiSelect": "Adicionar elemento à seleção",
     "moveCanvas": "Mover área de desenho",
@@ -171,7 +175,11 @@
     "linkToElement": "Hiperligação para o objeto",
     "wrapSelectionInFrame": "Ajustar seleção no quadro",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Hiperligação para o objeto",
@@ -616,7 +624,8 @@
     "syntax": "Sintaxe Mermaid",
     "preview": "Pré-visualizar",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

@@ -3,6 +3,10 @@
     "paste": "Lipire",
     "pasteAsPlaintext": "Inserare ca text simplu",
     "pasteCharts": "Lipire diagrame",
+    "chartType_bar": "Diagramă cu bare",
+    "chartType_line": "Diagramă cu linii",
+    "chartType_radar": "Diagramă radar",
+    "chartType_plaintext": "Text simplu",
     "selectAll": "Selectare totală",
     "multiSelect": "Adaugă element la selecție",
     "moveCanvas": "Mutare pânză",
@@ -171,7 +175,11 @@
     "linkToElement": "Link către obiect",
     "wrapSelectionInFrame": "Încapsulare selecție în cadru",
     "tab": "Filă",
-    "shapeSwitch": "Comutare formă"
+    "shapeSwitch": "Comutare formă",
+    "preferences": "Preferințe",
+    "preferences_toolLock": "Blocare instrument",
+    "arrowBinding": "Legare săgeată",
+    "midpointSnapping": "Ancorare la punctele medii"
   },
   "elementLink": {
     "title": "Link către obiect",
@@ -616,7 +624,8 @@
     "syntax": "Sintaxă Mermaid",
     "preview": "Previzualizare",
     "label": "Mermaid",
-    "inputPlaceholder": "Scrie definiţia diagramei Mermaid aici..."
+    "inputPlaceholder": "Scrie definiţia diagramei Mermaid aici...",
+    "autoFixAvailable": "Este disponibilă funcția de fixare automată"
   },
   "ttd": {
     "error": "Eroare!"

@@ -3,6 +3,10 @@
     "paste": "Prilepi",
     "pasteAsPlaintext": "Prilepi kot navadno besedilo",
     "pasteCharts": "Prilepi grafikone",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Izberi vse",
     "multiSelect": "Dodaj element v izbor",
     "moveCanvas": "Premakni platno",
@@ -171,7 +175,11 @@
     "linkToElement": "Povezava do objekta",
     "wrapSelectionInFrame": "Zavij izbor v okvir",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Povezava do objekta",
@@ -616,7 +624,8 @@
     "syntax": "Sintaksa Mermaid",
     "preview": "Predogled",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

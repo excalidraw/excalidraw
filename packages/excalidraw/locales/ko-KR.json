@@ -3,6 +3,10 @@
     "paste": "붙여넣기",
     "pasteAsPlaintext": "일반 텍스트로 붙여넣기",
     "pasteCharts": "차트 붙여넣기",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "전체 선택",
     "multiSelect": "선택 영역에 추가하기",
     "moveCanvas": "캔버스 이동",
@@ -171,7 +175,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -616,7 +624,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

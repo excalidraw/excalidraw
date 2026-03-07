@@ -3,6 +3,10 @@
     "paste": "Vložiť",
     "pasteAsPlaintext": "Vložiť ako obyčajný text",
     "pasteCharts": "Vložiť grafy",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Vybrať všetko",
     "multiSelect": "Pridať prvok do výberu",
     "moveCanvas": "Pohyb plátna",
@@ -171,7 +175,11 @@
     "linkToElement": "Odkaz na objekt",
     "wrapSelectionInFrame": "Zabaliť výber do rámu",
     "tab": "Tab",
-    "shapeSwitch": "Zmeniť tvar"
+    "shapeSwitch": "Zmeniť tvar",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Odkaz na objekt",
@@ -616,7 +624,8 @@
     "syntax": "Mermaid syntax",
     "preview": "Ukážka",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

@@ -3,6 +3,10 @@
     "paste": "הדבקה",
     "pasteAsPlaintext": "הדבקה ללא עיצוב",
     "pasteCharts": "הדבקת תרשימים",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "בחירה בהכול",
     "multiSelect": "הוספת רכיב לבחירה",
     "moveCanvas": "הזזת הקנבס",
@@ -171,7 +175,11 @@
     "linkToElement": "קישור לפריט",
     "wrapSelectionInFrame": "לעטוף את הבחירה במסגרת",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "קישור לפריט",
@@ -616,7 +624,8 @@
     "syntax": "תחביר Mermaid",
     "preview": "תצוגה מקדימה",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

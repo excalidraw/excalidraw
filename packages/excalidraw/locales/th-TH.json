@@ -3,6 +3,10 @@
     "paste": "วาง",
     "pasteAsPlaintext": "วางโดยไม่มีการจัดรูปแบบ",
     "pasteCharts": "วางแผนภูมิ",
+    "chartType_bar": "",
+    "chartType_line": "แผนภูมิเส้น",
+    "chartType_radar": "",
+    "chartType_plaintext": "ข้อความธรรมดา",
     "selectAll": "เลือกทั้งหมด",
     "multiSelect": "เพิ่มองค์ประกอบในการเลือก",
     "moveCanvas": "เคลื่อนย้ายผ้าใบ",
@@ -49,7 +53,7 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "more_options": "ตัวเลือกเพิ่มเติม",
     "arrowtypes": "ชนิดลูกศร",
     "arrowtype_sharp": "ลูกศรแหลม",
     "arrowtype_round": "ลูกศรโค้ง",
@@ -170,8 +174,12 @@
     "copyElementLink": "คัดลอกลิงค์ไปสู่วัตถุ",
     "linkToElement": "ลิงค์ไปสู่วัตถุ",
     "wrapSelectionInFrame": "",
-    "tab": "",
-    "shapeSwitch": ""
+    "tab": "แท็บ",
+    "shapeSwitch": "",
+    "preferences": "การตั้งค่า",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "ลิงค์ไปสู่วัตถุ",
@@ -183,20 +191,20 @@
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": "",
     "search": {
-      "inputPlaceholder": "",
+      "inputPlaceholder": "ค้นหาห้องสมุด",
       "heading": "",
       "noResults": "",
       "clearSearch": ""
     }
   },
   "search": {
-    "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
+    "title": "ใช้บนผืนผ้าใบ",
+    "noMatch": "ไม่พบรายการที่ตรงกัน...",
+    "singleResult": "ผลลัพธ์",
+    "multipleResults": "ผลลัพธ์",
     "placeholder": "ค้นหาข้อความในผืนผ้าใบ",
-    "frames": "",
-    "texts": ""
+    "frames": "กรอบ",
+    "texts": "ข้อความ"
   },
   "buttons": {
     "clearReset": "รีเซ็ทผืนผ้าใบ",
@@ -292,7 +300,7 @@
   },
   "toolBar": {
     "selection": "การเลือก",
-    "lasso": "",
+    "lasso": "การเลือก Lasso",
     "image": "แทรกรูปภาพ",
     "rectangle": "สี่เหลี่ยมผืนผ้า",
     "diamond": "รูปเพชร",
@@ -393,10 +401,10 @@
     "shareTitle": ""
   },
   "errorDialog": {
-    "title": ""
+    "title": "ข้อผิดพลาด"
   },
   "exportDialog": {
-    "disk_title": "",
+    "disk_title": "บันทึกไปยังดิสก์",
     "disk_details": "",
     "disk_button": "บันทึกเป็นไฟล์",
     "link_title": "ลิงก์ที่สามารถแชร์ได้",
@@ -413,9 +421,9 @@
     "deepBoxSelect": "",
     "createFlowchart": "",
     "navigateFlowchart": "",
-    "curvedArrow": "",
-    "curvedLine": "",
-    "documentation": "",
+    "curvedArrow": "ลูกศรโค้ง",
+    "curvedLine": "เส้นโค้ง",
+    "documentation": "เอกสารคู่มือ",
     "doubleClick": "ดับเบิลคลิก",
     "drag": "ลาก",
     "editor": "ตัวแก้ไข",
@@ -426,7 +434,7 @@
     "or": "หรือ",
     "preventBinding": "",
     "tools": "เครื่องมือ",
-    "shortcuts": "",
+    "shortcuts": "แป้นพิมพ์ลัด",
     "textFinish": "",
     "textNewLine": "",
     "title": "ช่วยเหลือ",
@@ -440,15 +448,15 @@
     "cropFinish": ""
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "ล้างผืนผ้าใบ"
   },
   "publishDialog": {
     "title": "",
-    "itemName": "",
+    "itemName": "ชื่อสิ่งของ",
     "authorName": "ชื่อเจ้าของ",
     "githubUsername": "ชื่อผู้ใช้ GitHub",
     "twitterUsername": "ชื่อผู้ใช้ Twitter",
-    "libraryName": "",
+    "libraryName": "ชื่อไลบรารี่",
     "libraryDesc": "",
     "website": "เว็บไซต์",
     "placeholder": {
@@ -461,7 +469,7 @@
     },
     "errors": {
       "required": "จำเป็น",
-      "website": ""
+      "website": "ป้อน URL ที่ถูกต้อง"
     },
     "noteDescription": "",
     "noteGuidelines": "",
@@ -475,7 +483,7 @@
     "content": ""
   },
   "confirmDialog": {
-    "resetLibrary": "",
+    "resetLibrary": "รีเซ็ตคลัง",
     "removeItemsFromLib": ""
   },
   "imageExportDialog": {
@@ -571,7 +579,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "สี",
     "mostUsedCustomColors": "",
     "colors": "สี",
     "shades": "รูปร่าง",
@@ -616,7 +624,8 @@
     "syntax": "",
     "preview": "ดูตัวอย่าง",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
@@ -624,32 +633,32 @@
   "chat": {
     "inputPlaceholder": "",
     "inputPlaceholderWithMessages": "",
-    "generating": "",
+    "generating": "กำลังสร้าง...",
     "rateLimitRemaining": "",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "คุณ",
+      "assistant": "ผู้ช่วย AI",
+      "system": "ระบบ"
     },
     "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
+    "label": "แชท",
+    "menu": "เมนู",
+    "newChat": "แชทใหม่",
+    "deleteChat": "ลบแชท",
+    "deleteMessage": "ลบข้อความ",
     "viewAsMermaid": "",
     "placeholder": {
       "title": "",
       "description": "",
       "hint": ""
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "ดูตัวอย่าง",
+    "insert": "แทรก",
+    "retry": "ลองซ้ำ",
     "errors": {
       "promptTooShort": "",
       "promptTooLong": "",
-      "generationFailed": "",
+      "generationFailed": "การสร้างล้มเหลว",
       "invalidDiagram": "",
       "fixInMermaid": "",
       "aiRepair": "",
@@ -662,7 +671,7 @@
       "generalRateLimit": "",
       "messageLimitInputPlaceholder": ""
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "อัปเกรดบัญชีเป็นแบบ Plus"
   },
   "quickSearch": {
     "placeholder": "ค้นหาด่วน"
@@ -701,15 +710,15 @@
     "shortcutHint": ""
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "เลื่อน",
+    "spacebar": "อวกาศ",
+    "delete": "ลบ",
     "mmb": ""
   }
 }

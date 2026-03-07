@@ -3,6 +3,10 @@
     "paste": "Қою",
     "pasteAsPlaintext": "",
     "pasteCharts": "Диаграммаларды қою",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Бәрін таңдау",
     "multiSelect": "",
     "moveCanvas": "",
@@ -171,7 +175,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -616,7 +624,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

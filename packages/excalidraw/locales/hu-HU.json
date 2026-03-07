@@ -3,6 +3,10 @@
     "paste": "Beillesztés",
     "pasteAsPlaintext": "Beillesztés formázatlan szövegként",
     "pasteCharts": "Grafikon beillesztése",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Összes kijelölése",
     "multiSelect": "Elem hozzáadása a kijelöléshez",
     "moveCanvas": "Vászon mozgatása",
@@ -171,7 +175,11 @@
     "linkToElement": "Hivatkozás az objektumhoz",
     "wrapSelectionInFrame": "",
     "tab": "Tab",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Hivatkozás az objektumhoz",
@@ -616,7 +624,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

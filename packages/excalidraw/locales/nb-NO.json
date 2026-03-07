@@ -3,6 +3,10 @@
     "paste": "Lim inn",
     "pasteAsPlaintext": "Lim inn som klartekst",
     "pasteCharts": "Lim inn diagrammer",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Velg alt",
     "multiSelect": "Legg til element i utvalg",
     "moveCanvas": "Flytt lerretet",
@@ -171,7 +175,11 @@
     "linkToElement": "Lenke til objekt",
     "wrapSelectionInFrame": "Brekk om utvalg i ramme",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Lenke til objekt",
@@ -616,7 +624,8 @@
     "syntax": "Mermaid-syntaks",
     "preview": "Forhåndsvisning",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

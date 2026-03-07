@@ -3,6 +3,10 @@
     "paste": "បិទភ្ជាប់",
     "pasteAsPlaintext": "បិទភ្ជាប់ជាអត្ថបទធម្មតា",
     "pasteCharts": "បិទភ្ជាប់តារាង",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "ជ្រើសរើស​ទាំងអស់",
     "multiSelect": "បន្ថែមធាតុទៅលើការជ្រើសរើស",
     "moveCanvas": "ផ្លាស់ទីបាវ",
@@ -171,7 +175,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -616,7 +624,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

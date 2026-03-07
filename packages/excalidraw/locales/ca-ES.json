@@ -3,6 +3,10 @@
     "paste": "Enganxa",
     "pasteAsPlaintext": "Enganxar com a text pla",
     "pasteCharts": "Enganxa els diagrames",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Selecciona-ho tot",
     "multiSelect": "Afegeix un element a la selecció",
     "moveCanvas": "Mou el llenç",
@@ -171,7 +175,11 @@
     "linkToElement": "Enllaç a l'objecte",
     "wrapSelectionInFrame": "Embolica la selecció en un marc",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Enllaç a l'objecte",
@@ -616,7 +624,8 @@
     "syntax": "Sintaxi de Mermaid",
     "preview": "Previsualització",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

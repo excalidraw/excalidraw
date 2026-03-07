@@ -3,6 +3,10 @@
     "paste": "Itsatsi",
     "pasteAsPlaintext": "Itsatsi testu arrunt gisa",
     "pasteCharts": "Itsatsi grafikoak",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Hautatu dena",
     "multiSelect": "Gehitu elementua hautapenera",
     "moveCanvas": "Mugitu oihala",
@@ -171,7 +175,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -616,7 +624,8 @@
     "syntax": "Mermaid sintaxia",
     "preview": "Aurrebista",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

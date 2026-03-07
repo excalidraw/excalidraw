@@ -3,6 +3,10 @@
     "paste": "ਪੇਸਟ ਕਰੋ",
     "pasteAsPlaintext": "ਸਾਦੇ ਪਾਠ ਵਜੋਂ ਪੇਸਟ ਕਰੋ",
     "pasteCharts": "ਚਾਰਟ ਪੇਸਟ ਕਰੋ",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "ਸਾਰੇ ਚੁਣੋ",
     "multiSelect": "ਐਲੀਮੈਂਟ ਨੂੰ ਚੋਣ ਵਿੱਚ ਜੋੜੋ",
     "moveCanvas": "ਕੈਨਵਸ ਹਿਲਾਓ",
@@ -171,7 +175,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -616,7 +624,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

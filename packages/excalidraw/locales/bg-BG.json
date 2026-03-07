@@ -3,6 +3,10 @@
     "paste": "Постави",
     "pasteAsPlaintext": "Постави като обикновен текст",
     "pasteCharts": "Постави графики",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Маркирай всичко",
     "multiSelect": "Добави елемент към селекция",
     "moveCanvas": "Премести платно",
@@ -171,7 +175,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -616,7 +624,8 @@
     "syntax": "Mermaid Синтаксис",
     "preview": "Преглед",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

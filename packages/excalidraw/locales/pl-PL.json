@@ -3,6 +3,10 @@
     "paste": "Wklej",
     "pasteAsPlaintext": "Wklej jako zwykły tekst",
     "pasteCharts": "Wklej wykresy",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Zaznacz wszystko",
     "multiSelect": "Dodaj element do zaznaczenia",
     "moveCanvas": "Przesuń obszar roboczy",
@@ -171,7 +175,11 @@
     "linkToElement": "Link do obiektu",
     "wrapSelectionInFrame": "Owiń wybór w ramkę",
     "tab": "Tab",
-    "shapeSwitch": "Wybór kształtu"
+    "shapeSwitch": "Wybór kształtu",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Link do obiektu",
@@ -616,7 +624,8 @@
     "syntax": "Składnia diagramów Mermaid",
     "preview": "Podgląd",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

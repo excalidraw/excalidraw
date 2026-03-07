@@ -3,6 +3,10 @@
     "paste": "Dán",
     "pasteAsPlaintext": "Dán kiểu văn bản thuần",
     "pasteCharts": "Dán biểu đồ",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Chọn tất cả",
     "multiSelect": "Chọn thêm đối tượng này",
     "moveCanvas": "Di chuyển canvas",
@@ -171,7 +175,11 @@
     "linkToElement": "Liên kết đến đối tượng",
     "wrapSelectionInFrame": "Đưa vùng chọn vào khung",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Liên kết đến đối tượng",
@@ -616,7 +624,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

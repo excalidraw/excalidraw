@@ -3,6 +3,10 @@
     "paste": "Klistra in",
     "pasteAsPlaintext": "Klistra som oformaterad text",
     "pasteCharts": "Klistra in diagram",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Markera alla",
     "multiSelect": "Lägg till element till markering",
     "moveCanvas": "Flytta canvas",
@@ -171,7 +175,11 @@
     "linkToElement": "Länk till objektet",
     "wrapSelectionInFrame": "Omslut urvaled i ram",
     "tab": "Flik",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Länk till objektet",
@@ -616,7 +624,8 @@
     "syntax": "Mermaid-syntax",
     "preview": "Förhandsgranska",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

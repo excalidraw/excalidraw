@@ -3,6 +3,10 @@
     "paste": "पेस्ट",
     "pasteAsPlaintext": "सादे पाठ के रूप में चिपकाएं",
     "pasteCharts": "चार्ट चिपकाएँ",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "सेलेक्ट ऑल",
     "multiSelect": "अवयव को चयन में सम्मिलित करें",
     "moveCanvas": "चित्रपटल को स्थानांतरित करें",
@@ -171,7 +175,11 @@
     "linkToElement": "वस्तु की कड़ी",
     "wrapSelectionInFrame": "चौकट में चुने हुवे को लपेटे",
     "tab": "",
-    "shapeSwitch": "आकार बदलें"
+    "shapeSwitch": "आकार बदलें",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "वस्तु की कड़ी",
@@ -616,7 +624,8 @@
     "syntax": "मर्मेड विन्यास",
     "preview": "पूर्वावलोकन",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

@@ -3,6 +3,10 @@
     "paste": "دانانەوە",
     "pasteAsPlaintext": "دایبنێ وەک دەقی سادە",
     "pasteCharts": "دانانەوەی خشتەکان",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "دیاریکردنی هەموو",
     "multiSelect": "زیادکردنی بۆ دیاریکراوەکان",
     "moveCanvas": "تابلۆ بجوڵێنە",
@@ -171,7 +175,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -616,7 +624,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

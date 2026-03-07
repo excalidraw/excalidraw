@@ -3,6 +3,10 @@
     "paste": "අලවන්න",
     "pasteAsPlaintext": "සරල පෙළ ලෙස අලවන්න",
     "pasteCharts": "ප්‍රස්ථාරය",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "සියල්ලම",
     "multiSelect": "තෝරා ගැනීමට අංගය එකතු කරන්න",
     "moveCanvas": "කැන්වසය චලනය කරන්න",
@@ -171,7 +175,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -616,7 +624,8 @@
     "syntax": "Mermaid වාක්‍ය ඛණ්ඩය",
     "preview": "Mermaid පූර්වදර්ශනය",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

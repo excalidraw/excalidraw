@@ -3,6 +3,10 @@
     "paste": "Įklijuoti",
     "pasteAsPlaintext": "Įklijuoti kaip paprastą tekstą",
     "pasteCharts": "Įklijuoti diagramas",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Pažymėti viską",
     "multiSelect": "Pridėkite elementą prie pasirinktų",
     "moveCanvas": "Judinti drobę",
@@ -171,7 +175,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -616,7 +624,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

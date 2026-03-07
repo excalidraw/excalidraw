@@ -3,6 +3,10 @@
     "paste": "Plakken",
     "pasteAsPlaintext": "Plakken als platte tekst",
     "pasteCharts": "Grafieken plakken",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Alles selecteren",
     "multiSelect": "Voeg element toe aan selectie",
     "moveCanvas": "Canvas verplaatsen",
@@ -171,7 +175,11 @@
     "linkToElement": "Link naar object",
     "wrapSelectionInFrame": "Selectie omslaan in frame",
     "tab": "Tab",
-    "shapeSwitch": "Verander vorm"
+    "shapeSwitch": "Verander vorm",
+    "preferences": "Voorkeuren",
+    "preferences_toolLock": "Tool vergrendelen",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Link naar object",
@@ -557,9 +565,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Je tekeningen worden bewaard in de opslag van je browser.",
+      "center_heading_line2": "Browser opslag kan onverwacht gewist worden.",
+      "center_heading_line3": "Sla je werk regelmatig op in een bestand om te voorkomen dat je het kwijtraakt.",
       "center_heading_plus": "Wil je in plaats daarvan naar Excalidraw+ gaan?",
       "menuHint": "Exporteren, voorkeuren en meer, ..."
     },
@@ -616,7 +624,8 @@
     "syntax": "Mermaid Syntaxis",
     "preview": "Voorbeeld",
     "label": "Mermaid",
-    "inputPlaceholder": "Noteer Mermaid diagram omschrijving hier..."
+    "inputPlaceholder": "Noteer Mermaid diagram omschrijving hier...",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": "Fout!"
@@ -624,7 +633,7 @@
   "chat": {
     "inputPlaceholder": "Begin je diagram idee hier in te typen... ({{shortcut}} voor een nieuwe lijn)",
     "inputPlaceholderWithMessages": "Ga door met het verfijnen van je diagram...",
-    "generating": "",
+    "generating": "Genereren...",
     "rateLimitRemaining": "{{count}} verzoeken over vandaag",
     "role": {
       "user": "Jij",
@@ -655,7 +664,7 @@
       "aiRepair": "Opnieuw genereren (automatisch repareren) →",
       "requestAborted": "Verzoek gestopt",
       "requestFailed": "Verzoek mislukt",
-      "mermaidParseError": ""
+      "mermaidParseError": "Mermaid syntax fout"
     },
     "rateLimit": {
       "messageLimit": "Je hebt je AI limiet bereikt op het gratis abonnement. Probeer Excalidraw+ uit voor meer of kom morgen terug.",

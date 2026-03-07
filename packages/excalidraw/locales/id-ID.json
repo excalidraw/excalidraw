@@ -3,6 +3,10 @@
     "paste": "Tempel",
     "pasteAsPlaintext": "Tempel sebagai teks biasa",
     "pasteCharts": "Tempel diagram",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Pilih semua",
     "multiSelect": "Tambah unsur ke seleksi",
     "moveCanvas": "Pindahkan kanvas",
@@ -171,7 +175,11 @@
     "linkToElement": "Taut ke objek",
     "wrapSelectionInFrame": "Bungkus pilihan dalam bingkai",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Taut ke objek",
@@ -616,7 +624,8 @@
     "syntax": "Syntax Mermaid",
     "preview": "Pratinjau",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

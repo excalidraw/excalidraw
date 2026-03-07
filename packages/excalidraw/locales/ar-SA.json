@@ -3,6 +3,10 @@
     "paste": "لصق",
     "pasteAsPlaintext": "اللصق كنص عادي",
     "pasteCharts": "لصق الرسوم البيانية",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "تحديد الكل",
     "multiSelect": "إضافة عنصر للتحديد",
     "moveCanvas": "نقل لوح الرسم",
@@ -171,7 +175,11 @@
     "linkToElement": "رابط إلى الكائن",
     "wrapSelectionInFrame": "تغليف التحديد في إطار",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "رابط إلى الكائن",
@@ -616,7 +624,8 @@
     "syntax": "صيغة Mermaid",
     "preview": "معاينة",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

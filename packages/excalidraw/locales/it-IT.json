@@ -3,6 +3,10 @@
     "paste": "Incolla",
     "pasteAsPlaintext": "Incolla come testo normale",
     "pasteCharts": "Incolla grafici",
+    "chartType_bar": "Grafico a barre",
+    "chartType_line": "Grafico a linee",
+    "chartType_radar": "Grafico radar",
+    "chartType_plaintext": "Testo semplice",
     "selectAll": "Seleziona tutto",
     "multiSelect": "Aggiungi elemento alla selezione",
     "moveCanvas": "Sposta tela",
@@ -171,7 +175,11 @@
     "linkToElement": "Link all'oggetto",
     "wrapSelectionInFrame": "Avvolgi la selezione nella cornice",
     "tab": "Scheda",
-    "shapeSwitch": "Cambia forma"
+    "shapeSwitch": "Cambia forma",
+    "preferences": "Preferenze",
+    "preferences_toolLock": "Blocco strumento",
+    "arrowBinding": "Legatura a freccia",
+    "midpointSnapping": "Aggancia ai punti medi"
   },
   "elementLink": {
     "title": "Link all'oggetto",
@@ -557,9 +565,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "I tuoi disegni vengono salvati nella memoria del tuo browser.",
+      "center_heading_line2": "La memoria del browser potrebbe essere cancellata inaspettatamente.",
+      "center_heading_line3": "Salva regolarmente il tuo lavoro in un file per evitare di perderlo.",
       "center_heading_plus": "Volevi invece andare su Excalidraw+?",
       "menuHint": "Esporta, preferenze, lingue, ..."
     },
@@ -616,7 +624,8 @@
     "syntax": "Sintassi Mermaid",
     "preview": "Anteprima",
     "label": "Mermaid",
-    "inputPlaceholder": "Scrivi qui la definizione del diagramma Mermaid..."
+    "inputPlaceholder": "Scrivi qui la definizione del diagramma Mermaid...",
+    "autoFixAvailable": "Correzione automatica disponibile"
   },
   "ttd": {
     "error": "Errore!"
