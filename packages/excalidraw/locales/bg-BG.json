@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Грешка"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Запази към диск",
     "disk_details": "",
