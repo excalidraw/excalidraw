@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Virhe"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Tallenna levylle",
     "disk_details": "Vie työn tiedot tiedostoon, josta sen voi tuoda myöhemmin.",
