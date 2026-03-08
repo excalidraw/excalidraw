@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Kesalahan"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Simpan ke disk",
     "disk_details": "Ekspor data pemandangan ke file yang mana Anda dapat impor nanti.",
