@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Σφάλμα"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Αποθήκευση στο δίσκο",
     "disk_details": "Εξαγωγή δεδομένων σκηνής σε ένα αρχείο από το οποίο μπορείτε να εισάγετε αργότερα.",
