@@ -735,7 +735,6 @@ class App extends React.Component<AppProps, AppState> {
     super(props);
     const defaultAppState = getDefaultAppState();
     const {
-      onExcalidrawAPI,
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
@@ -743,6 +742,7 @@ class App extends React.Component<AppProps, AppState> {
       theme = defaultAppState.theme,
       name = `${t("labels.untitled")}-${getDateTime()}`,
     } = props;
+
     this.state = {
       ...defaultAppState,
       theme,
@@ -791,7 +791,7 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
 
-    const api: ExcalidrawImperativeAPI = {
+    this.api = {
       updateScene: this.updateScene,
       applyDeltas: this.applyDeltas,
       mutateElement: this.mutateElement,
@@ -831,15 +831,7 @@ class App extends React.Component<AppProps, AppState> {
       onEvent: this.onEvent,
     } as const;
 
-    this.api = api;
-
-    if (onExcalidrawAPI) {
-      if (typeof onExcalidrawAPI === "function") {
-        onExcalidrawAPI(api);
-      } else {
-        console.error("onExcalidrawAPI should be a function!");
-      }
-    }
+    props.onExcalidrawAPI?.(this.api);
   }
 
   updateEditorAtom = <Value, Args extends unknown[], Result>(
