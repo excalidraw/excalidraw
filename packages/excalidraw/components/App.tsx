@@ -6095,18 +6095,34 @@ class App extends React.Component<AppProps, AppState> {
       });
 
     if (!existingTextElement && shouldBindToContainer && container) {
+      let boundTextParameter;
+      // default positioning for bound text on arrows
+      if (isArrowElement(container)) {
+        let segmentIndex;
+        let segmentParameter;
+        if (container.elbowed) {
+          segmentIndex = container.points.length - 2;
+          segmentParameter = 0.5;
+        } else {
+          segmentIndex =
+            container.points.length % 2 === 1
+              ? Math.floor(container.points.length / 2)
+              : container.points.length / 2 - 1;
+          segmentParameter = container.points.length % 2 === 1 ? 0.0 : 0.5;
+        }
+        boundTextParameter = {
+          segmentIndex,
+          segmentParameter,
+          pathParameter: 0.5,
+        };
+      }
+
       this.scene.mutateElement(container, {
         boundElements: (container.boundElements || []).concat({
           type: "text",
           id: element.id,
         }),
-        ...(isArrowElement(container) && {
-          boundTextParameter: container.boundTextParameter ?? {
-            segmentIndex: Math.floor((container.points.length - 1) / 2),
-            segmentParameter: 0.5,
-            pathParameter: 0.5,
-          },
-        }),
+        ...(isArrowElement(container) && boundTextParameter),
       });
     }
     this.setState({ editingTextElement: element });

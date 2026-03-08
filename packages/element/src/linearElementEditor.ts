@@ -91,7 +91,6 @@ import type {
   ExcalidrawBindableElement,
 } from "./types";
 
-
 /**
  * Normalizes line points so that the start point is at [0,0]. This is
  * expected in various parts of the codebase.
@@ -1981,10 +1980,6 @@ export class LinearElementEditor {
       if (distance < bestDistance) {
         bestDistance = distance;
         bestSegmentIndex = i;
-        // bestLocalParameter =
-        //   seg.type === "line"
-        //     ? lineSegmentClosestParameter(point, lines[seg.index])
-        //     : curveClosestParameter(curves[seg.index], point);
       }
     }
 
@@ -1994,7 +1989,7 @@ export class LinearElementEditor {
     }
 
     const bestSegment = segments[bestSegmentIndex];
-    // only need to calculate local parameter once to avoid doing it every segment in loop
+    // only calculate local parameter once we've found closest segment
     const bestLocalParameter =
       bestSegment.type === "line"
         ? lineSegmentClosestParameter(point, lines[bestSegment.index])
@@ -2017,23 +2012,6 @@ export class LinearElementEditor {
     },
   ): GlobalPoint {
     const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
-    // const segmentLengths: number[] = [];
-
-    // if (lines.length > 0) {
-    //   for (const seg of lines) {
-    //     segmentLengths.push(pointDistance(seg[0], seg[1]));
-    //   }
-    // } else {
-    //   for (const seg of curves) {
-    //     segmentLengths.push(curveLength(seg));
-    //   }
-    // }
-
-    // const totalLength = segmentLengths.reduce((sum, len) => sum + len, 0);
-    // if (totalLength === 0) {
-    //   return pointFrom<GlobalPoint>(element.x, element.y);
-    // }
-
     const idx = clamp(
       parameter.segmentIndex,
       0,
@@ -2064,25 +2042,12 @@ export class LinearElementEditor {
       mutateElement(boundTextElement, elementsMap, { isDeleted: true });
     }
 
-    // default value of 0.5 for backward compatibility
-    const boundTextParameter = isArrowElement(element)
-      ? element.boundTextParameter
-      : {
-          segmentIndex:
-            points.length > 1 ? Math.floor((points.length - 1) / 2) : 0,
-          segmentParameter: 0.5,
-          pathParameter: 0.5,
-        };
-
-    if (
-      boundTextParameter !== undefined &&
-      boundTextParameter.pathParameter !== 0.5
-    ) {
-      // determine position on line based on boundTextParameter value
+    if (isArrowElement(element) && element.boundTextParameter) {
       const pathPoint = LinearElementEditor.getPointAtParameter(
         element,
-        boundTextParameter,
+        element.boundTextParameter,
       );
+
       return {
         x: pathPoint[0] - boundTextElement.width / 2,
         y: pathPoint[1] - boundTextElement.height / 2,
