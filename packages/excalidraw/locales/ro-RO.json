@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Eroare"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Salvare pe disc",
     "disk_details": "Exportă datele scenei pe un fișier din care poți importa mai târziu.",
