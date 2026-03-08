@@ -11,6 +11,92 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## Unreleased
+
+## Excalidraw API
+
+### Breaking changes
+
+- Renamed the `excalidrawAPI` prop to `onExcalidrawAPI`.
+
+### Features
+
+- Added `onMount` and `onInitialize` props. `onMount` receives `{ excalidrawAPI, container }` once the editor root is mounted, and `onInitialize` fires once the initial scene has loaded.
+
+  ```tsx
+  <Excalidraw
+    onMount={({ excalidrawAPI, container }) => {
+      console.log(container);
+      excalidrawAPI.scrollToContent();
+    }}
+    onInitialize={(api) => {
+      api.refresh();
+    }}
+  />
+  ```
+
+- Same events are also accessible imperatively through `api.onEvent(...)`.
+
+  ```tsx
+  <Excalidraw
+    onExcalidrawAPI={(api) => {
+      api.onEvent("editor:mount", ({ excalidrawAPI, container }) => {
+        excalidrawAPI.scrollToContent();
+        console.log(container);
+      });
+
+      api.onEvent("editor:initialize").then((readyApi) => {
+        readyApi.scrollToContent();
+      });
+    }}
+  />
+  ```
+
+  Note that in future releases, most, if not all, `excalidrawAPI.on*` subscriptions will be removed in favor of `excalidrawAPI.onEvent(name)`.
+
+- Exported `ExcalidrawAPIProvider`, `useExcalidrawAPI`, and `useAppStateValue` from the package entrypoint. The imperative API also now exposes `onStateChange`.
+
+  ```tsx
+  <ExcalidrawAPIProvider>
+    <Excalidraw />
+    <Logger />
+  </ExcalidrawAPIProvider>;
+
+  function Logger() {
+    const api = useExcalidrawAPI();
+
+    useAppStateValue("viewModeEnabled", (viewModeEnabled) => {
+      console.log("view mode changed:", viewModeEnabled);
+    });
+
+    React.useEffect(() => {
+      if (api) {
+        console.log("editor instance id:", api.id);
+      }
+    }, [api]);
+
+    return null;
+  }
+  ```
+
+- Added `onExport` so host apps can delay JSON export until async work completes. The handler receives the export data plus an `AbortSignal`, and may return a `Promise` or an async generator that yields progress updates for the built-in toast UI.
+
+  ```tsx
+  <Excalidraw
+    onExport={async function* (_type, { files }, { signal }) {
+      yield { type: "progress", message: "Waiting for images..." };
+
+      await waitForImagesToLoad(files, signal);
+
+      if (signal.aborted) {
+        return;
+      }
+
+      yield { type: "progress", message: "Export ready", progress: 1 };
+    }}
+  />
+  ```
+
 ## Excalidraw Library
 
 ## 0.18.0 (2025-03-11)

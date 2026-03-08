@@ -6,7 +6,6 @@ import {
   sceneCoordsToViewportCoords,
   type EditorInterface,
 } from "@excalidraw/common";
-import { AnimationController } from "@excalidraw/excalidraw/renderer/animation";
 
 import type {
   InteractiveCanvasRenderConfig,
@@ -23,6 +22,8 @@ import type {
 
 import { t } from "../../i18n";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
+
+import { AnimationController } from "../../renderer/animation";
 
 import type {
   AppClassProperties,
