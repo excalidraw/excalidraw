@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "பிழை"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "வட்டில் சேமி",
     "disk_details": "காட்சித் தரவை நீங்கள் பின்னர் இறக்குமதி செய்யக்கூடிய ஒரு கோப்பிற்கு ஏற்றுமதிசெய்க.",
