@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "오류"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "디스크에 저장",
     "disk_details": "나중에 다시 불러올 수 있도록 화면 데이터를 내보냅니다.",
