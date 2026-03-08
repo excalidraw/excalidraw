@@ -356,7 +356,7 @@ export type ExcalidrawArrowElement = ExcalidrawLinearElement &
   Readonly<{
     type: "arrow";
     elbowed: boolean;
-    // normalized position of the bound text on the arrow path, 0(start) - 1(end)
+    // segment-relative properties for arrows with bound text
     // optional for now, not to affect older drawings, or pasted elements without this property
     boundTextParameter?: {
       // index of the segment the text is bound to, starting with 0
