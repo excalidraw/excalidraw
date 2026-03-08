@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Fel"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Spara till disk",
     "disk_details": "Exportera skissdata till en fil som du kan importera från senare.",
