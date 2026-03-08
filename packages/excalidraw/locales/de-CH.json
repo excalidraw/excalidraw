@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Fehler"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Auf Festplatte speichern",
     "disk_details": "Exportiere die Zeichnungsdaten in eine Datei, die Du später importieren kannst.",
