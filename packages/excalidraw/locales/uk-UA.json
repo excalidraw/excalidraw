@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Помилка"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Зберегти на диск",
     "disk_details": "Експорт даних сцени в файл, з якого можна імпортувати пізніше.",
