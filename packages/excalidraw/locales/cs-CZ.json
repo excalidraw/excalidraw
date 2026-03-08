@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Chyba"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Uložit na disk",
     "disk_details": "Exportovat data scény do souboru, ze kterého můžete importovat později.",
