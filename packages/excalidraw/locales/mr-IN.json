@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "त्रुटि"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "डिस्क मधे जतन करा",
     "disk_details": "सीन डेटा बाहेर एक फ़ाइल मधे जतन करा, त्या फ़ाइल मधुम तो डेटा नंतर परत आणु शकता.",
