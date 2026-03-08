@@ -6101,7 +6101,11 @@ class App extends React.Component<AppProps, AppState> {
           id: element.id,
         }),
         ...(isArrowElement(container) && {
-          boundTextParameter: container.boundTextParameter ?? 0.5,
+          boundTextParameter: container.boundTextParameter ?? {
+            segmentIndex: Math.floor((container.points.length - 1) / 2),
+            segmentParameter: 0.5,
+            pathParameter: 0.5,
+          },
         }),
       });
     }
