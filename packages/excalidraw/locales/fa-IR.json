@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "خطا"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "ذخیره در دیسک",
     "disk_details": "داده های صحنه را به فایلی که بعداً می توانید از آن وارد کنید صادر کنید.",
