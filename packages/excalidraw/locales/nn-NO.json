@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Feil"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Lagre til disk",
     "disk_details": "Eksporter scenedataa til ei fil du kan importere seinare.",
