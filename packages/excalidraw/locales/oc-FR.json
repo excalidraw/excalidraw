@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Error"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Salvar al disc",
     "disk_details": "Exportar las donadas de la scèna cap a un fichièr que podètz importar mai tard.",
