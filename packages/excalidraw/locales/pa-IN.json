@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "ਗਲਤੀ"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "ਡਿਸਕ ਵਿੱਚ ਸਾਂਭੋ",
     "disk_details": "ਦ੍ਰਿਸ਼ ਦਾ ਡਾਟਾ ਫਾਈਲ ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ ਜਿੱਥੋਂ ਤੁਸੀਂ ਇਸਨੂੰ ਬਾਅਦ ਵਿੱਚ ਆਯਾਤ ਕਰ ਸਕਦੇ ਹੋ।",
