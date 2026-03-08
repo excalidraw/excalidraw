@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "خطأ"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "حفظ الملف على الجهاز",
     "disk_details": "تصدير بيانات المشهد إلى ملف يمكنك الاستيراد منه لاحقًا.",
