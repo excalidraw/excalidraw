@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Tuccḍa"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Sekles deg uḍebsi",
     "disk_details": "Sekles isefka n usayes deg ufaylu ansi ara tizmireḍ ad d-tketreḍ areḍqal.",
