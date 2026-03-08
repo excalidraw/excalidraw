@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "ข้อผิดพลาด"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "บันทึกไปยังดิสก์",
     "disk_details": "",
