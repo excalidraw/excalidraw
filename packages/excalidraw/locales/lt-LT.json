@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Klaida"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Įrašyti į diską",
     "disk_details": "",
