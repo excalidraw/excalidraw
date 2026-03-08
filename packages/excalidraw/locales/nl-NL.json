@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Fout"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Opslaan op schijf",
     "disk_details": "De scènegegevens exporteren naar een bestand waaruit u later kunt importeren.",
