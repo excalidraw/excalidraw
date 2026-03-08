@@ -6,7 +6,7 @@ import { hitElementBoundingBox } from "@excalidraw/element";
 
 import type { GlobalPoint, Radians } from "@excalidraw/math";
 
-import type { Bounds } from "@excalidraw/element";
+import type { Bounds } from "@excalidraw/common";
 import type {
   ElementsMap,
   NonDeletedExcalidrawElement,

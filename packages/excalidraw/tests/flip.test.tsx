@@ -25,6 +25,7 @@ import { Excalidraw } from "../index";
 // Importing to spy on it and mock the implementation (mocking does not work with simple vi.mock for some reason)
 import * as blobModule from "../data/blob";
 
+import { SMILEY_IMAGE_DIMENSIONS } from "./fixtures/constants";
 import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import {
@@ -37,6 +38,8 @@ import {
 } from "./test-utils";
 
 import { getTextEditor } from "./queries/dom";
+
+import { mockHTMLImageElement } from "./helpers/mocks";
 
 import type { NormalizedZoomValue } from "../types";
 
@@ -742,6 +745,23 @@ describe("freedraw", () => {
 //image
 //TODO: currently there is no test for pixel colors at flipped positions.
 describe("image", () => {
+  beforeEach(() => {
+    // it's necessary to specify the height in order to calculate natural dimensions of the image
+    h.state.height = 1000;
+  });
+
+  beforeAll(() => {
+    mockHTMLImageElement(
+      SMILEY_IMAGE_DIMENSIONS.width,
+      SMILEY_IMAGE_DIMENSIONS.height,
+    );
+  });
+
+  afterAll(() => {
+    vi.unstubAllGlobals();
+    h.state.height = 0;
+  });
+
   const createImage = async () => {
     const sendPasteEvent = (file?: File) => {
       const clipboardEvent = createPasteEvent({ files: file ? [file] : [] });

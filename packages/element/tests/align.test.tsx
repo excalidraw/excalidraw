@@ -589,4 +589,424 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[2].x).toEqual(250);
     expect(API.getSelectedElements()[3].x).toEqual(150);
   });
+
+  const createGroupAndSelectInEditGroupMode = () => {
+    UI.clickTool("rectangle");
+    mouse.down();
+    mouse.up(100, 100);
+
+    UI.clickTool("rectangle");
+    mouse.down(0, 0);
+    mouse.up(100, 100);
+
+    // select the first element.
+    // The second rectangle is already reselected because it was the last element created
+    mouse.reset();
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.moveTo(10, 0);
+      mouse.click();
+    });
+
+    API.executeAction(actionGroup);
+    mouse.reset();
+    mouse.moveTo(10, 0);
+    mouse.doubleClick();
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.click();
+      mouse.moveTo(100, 100);
+      mouse.click();
+    });
+  };
+
+  it("aligns elements within a group while in group edit mode correctly to the top", () => {
+    createGroupAndSelectInEditGroupMode();
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+
+    API.executeAction(actionAlignTop);
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(0);
+  });
+  it("aligns elements within a group while in group edit mode correctly to the bottom", () => {
+    createGroupAndSelectInEditGroupMode();
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+
+    API.executeAction(actionAlignBottom);
+
+    expect(API.getSelectedElements()[0].y).toEqual(100);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+  });
+  it("aligns elements within a group while in group edit mode correctly to the left", () => {
+    createGroupAndSelectInEditGroupMode();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+
+    API.executeAction(actionAlignLeft);
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(0);
+  });
+  it("aligns elements within a group while in group edit mode correctly to the right", () => {
+    createGroupAndSelectInEditGroupMode();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+
+    API.executeAction(actionAlignRight);
+
+    expect(API.getSelectedElements()[0].x).toEqual(100);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+  });
+  it("aligns elements within a group while in group edit mode correctly to the vertical center", () => {
+    createGroupAndSelectInEditGroupMode();
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+
+    API.executeAction(actionAlignVerticallyCentered);
+
+    expect(API.getSelectedElements()[0].y).toEqual(50);
+    expect(API.getSelectedElements()[1].y).toEqual(50);
+  });
+  it("aligns elements within a group while in group edit mode correctly to the horizontal center", () => {
+    createGroupAndSelectInEditGroupMode();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+
+    API.executeAction(actionAlignHorizontallyCentered);
+
+    expect(API.getSelectedElements()[0].x).toEqual(50);
+    expect(API.getSelectedElements()[1].x).toEqual(50);
+  });
+
+  const createNestedGroupAndSelectInEditGroupMode = () => {
+    UI.clickTool("rectangle");
+    mouse.down();
+    mouse.up(100, 100);
+
+    UI.clickTool("rectangle");
+    mouse.down(0, 0);
+    mouse.up(100, 100);
+
+    // Select the first element.
+    // The second rectangle is already reselected because it was the last element created
+    mouse.reset();
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.moveTo(10, 0);
+      mouse.click();
+    });
+
+    API.executeAction(actionGroup);
+
+    mouse.reset();
+    mouse.moveTo(200, 200);
+    // create third element
+    UI.clickTool("rectangle");
+    mouse.down(0, 0);
+    mouse.up(100, 100);
+
+    // third element is already selected, select the initial group and group together
+    mouse.reset();
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.moveTo(10, 0);
+      mouse.click();
+    });
+
+    API.executeAction(actionGroup);
+
+    // double click to enter edit mode
+    mouse.doubleClick();
+
+    // select nested group and other element within the group
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.moveTo(200, 200);
+      mouse.click();
+    });
+  };
+
+  it("aligns element and nested group while in group edit mode correctly to the top", () => {
+    createNestedGroupAndSelectInEditGroupMode();
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[2].y).toEqual(200);
+
+    API.executeAction(actionAlignTop);
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[2].y).toEqual(0);
+  });
+  it("aligns element and nested group while in group edit mode correctly to the bottom", () => {
+    createNestedGroupAndSelectInEditGroupMode();
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[2].y).toEqual(200);
+
+    API.executeAction(actionAlignBottom);
+
+    expect(API.getSelectedElements()[0].y).toEqual(100);
+    expect(API.getSelectedElements()[1].y).toEqual(200);
+    expect(API.getSelectedElements()[2].y).toEqual(200);
+  });
+  it("aligns element and nested group while in group edit mode correctly to the left", () => {
+    createNestedGroupAndSelectInEditGroupMode();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[2].x).toEqual(200);
+
+    API.executeAction(actionAlignLeft);
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[2].x).toEqual(0);
+  });
+  it("aligns element and nested group while in group edit mode correctly to the right", () => {
+    createNestedGroupAndSelectInEditGroupMode();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[2].x).toEqual(200);
+
+    API.executeAction(actionAlignRight);
+
+    expect(API.getSelectedElements()[0].x).toEqual(100);
+    expect(API.getSelectedElements()[1].x).toEqual(200);
+    expect(API.getSelectedElements()[2].x).toEqual(200);
+  });
+  it("aligns element and nested group while in group edit mode correctly to the vertical center", () => {
+    createNestedGroupAndSelectInEditGroupMode();
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[2].y).toEqual(200);
+
+    API.executeAction(actionAlignVerticallyCentered);
+
+    expect(API.getSelectedElements()[0].y).toEqual(50);
+    expect(API.getSelectedElements()[1].y).toEqual(150);
+    expect(API.getSelectedElements()[2].y).toEqual(100);
+  });
+  it("aligns elements and nested group within a group while in group edit mode correctly to the horizontal center", () => {
+    createNestedGroupAndSelectInEditGroupMode();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[2].x).toEqual(200);
+
+    API.executeAction(actionAlignHorizontallyCentered);
+
+    expect(API.getSelectedElements()[0].x).toEqual(50);
+    expect(API.getSelectedElements()[1].x).toEqual(150);
+    expect(API.getSelectedElements()[2].x).toEqual(100);
+  });
+
+  const createAndSelectSingleGroup = () => {
+    UI.clickTool("rectangle");
+    mouse.down();
+    mouse.up(100, 100);
+
+    UI.clickTool("rectangle");
+    mouse.down(0, 0);
+    mouse.up(100, 100);
+
+    // Select the first element.
+    // The second rectangle is already reselected because it was the last element created
+    mouse.reset();
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.moveTo(10, 0);
+      mouse.click();
+    });
+
+    API.executeAction(actionGroup);
+  };
+
+  it("aligns elements within a single-selected group correctly to the top", () => {
+    createAndSelectSingleGroup();
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+
+    API.executeAction(actionAlignTop);
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(0);
+  });
+  it("aligns elements within a single-selected group correctly to the bottom", () => {
+    createAndSelectSingleGroup();
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+
+    API.executeAction(actionAlignBottom);
+
+    expect(API.getSelectedElements()[0].y).toEqual(100);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+  });
+  it("aligns elements within a single-selected group correctly to the left", () => {
+    createAndSelectSingleGroup();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+
+    API.executeAction(actionAlignLeft);
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(0);
+  });
+  it("aligns elements within a single-selected group correctly to the right", () => {
+    createAndSelectSingleGroup();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+
+    API.executeAction(actionAlignRight);
+
+    expect(API.getSelectedElements()[0].x).toEqual(100);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+  });
+  it("aligns elements within a single-selected group correctly to the vertical center", () => {
+    createAndSelectSingleGroup();
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+
+    API.executeAction(actionAlignVerticallyCentered);
+
+    expect(API.getSelectedElements()[0].y).toEqual(50);
+    expect(API.getSelectedElements()[1].y).toEqual(50);
+  });
+  it("aligns elements within a single-selected group correctly to the horizontal center", () => {
+    createAndSelectSingleGroup();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+
+    API.executeAction(actionAlignHorizontallyCentered);
+
+    expect(API.getSelectedElements()[0].x).toEqual(50);
+    expect(API.getSelectedElements()[1].x).toEqual(50);
+  });
+
+  const createAndSelectSingleGroupWithNestedGroup = () => {
+    UI.clickTool("rectangle");
+    mouse.down();
+    mouse.up(100, 100);
+
+    UI.clickTool("rectangle");
+    mouse.down(0, 0);
+    mouse.up(100, 100);
+
+    // Select the first element.
+    // The second rectangle is already reselected because it was the last element created
+    mouse.reset();
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.moveTo(10, 0);
+      mouse.click();
+    });
+
+    API.executeAction(actionGroup);
+
+    mouse.reset();
+    UI.clickTool("rectangle");
+    mouse.down(200, 200);
+    mouse.up(100, 100);
+
+    // Add group to current selection
+    mouse.restorePosition(10, 0);
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.click();
+    });
+
+    // Create the nested group
+    API.executeAction(actionGroup);
+  };
+  it("aligns elements within a single-selected group containing a nested group correctly to the top", () => {
+    createAndSelectSingleGroupWithNestedGroup();
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[2].y).toEqual(200);
+
+    API.executeAction(actionAlignTop);
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[2].y).toEqual(0);
+  });
+  it("aligns elements within a single-selected group containing a nested group correctly to the bottom", () => {
+    createAndSelectSingleGroupWithNestedGroup();
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[2].y).toEqual(200);
+
+    API.executeAction(actionAlignBottom);
+
+    expect(API.getSelectedElements()[0].y).toEqual(100);
+    expect(API.getSelectedElements()[1].y).toEqual(200);
+    expect(API.getSelectedElements()[2].y).toEqual(200);
+  });
+  it("aligns elements within a single-selected group containing a nested group correctly to the left", () => {
+    createAndSelectSingleGroupWithNestedGroup();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[2].x).toEqual(200);
+
+    API.executeAction(actionAlignLeft);
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[2].x).toEqual(0);
+  });
+  it("aligns elements within a single-selected group containing a nested group correctly to the right", () => {
+    createAndSelectSingleGroupWithNestedGroup();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[2].x).toEqual(200);
+
+    API.executeAction(actionAlignRight);
+
+    expect(API.getSelectedElements()[0].x).toEqual(100);
+    expect(API.getSelectedElements()[1].x).toEqual(200);
+    expect(API.getSelectedElements()[2].x).toEqual(200);
+  });
+  it("aligns elements within a single-selected group containing a nested group correctly to the vertical center", () => {
+    createAndSelectSingleGroupWithNestedGroup();
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[2].y).toEqual(200);
+
+    API.executeAction(actionAlignVerticallyCentered);
+
+    expect(API.getSelectedElements()[0].y).toEqual(50);
+    expect(API.getSelectedElements()[1].y).toEqual(150);
+    expect(API.getSelectedElements()[2].y).toEqual(100);
+  });
+  it("aligns elements within a single-selected group containing a nested group correctly to the horizontal center", () => {
+    createAndSelectSingleGroupWithNestedGroup();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[2].x).toEqual(200);
+
+    API.executeAction(actionAlignHorizontallyCentered);
+
+    expect(API.getSelectedElements()[0].x).toEqual(50);
+    expect(API.getSelectedElements()[1].x).toEqual(150);
+    expect(API.getSelectedElements()[2].x).toEqual(100);
+  });
 });

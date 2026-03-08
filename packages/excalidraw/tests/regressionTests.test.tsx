@@ -1,7 +1,13 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { FONT_FAMILY, CODES, KEYS, reseed } from "@excalidraw/common";
+import {
+  FONT_FAMILY,
+  CODES,
+  KEYS,
+  reseed,
+  MQ_MIN_WIDTH_DESKTOP,
+} from "@excalidraw/common";
 
 import { setDateTimeForTests } from "@excalidraw/common";
 
@@ -60,7 +66,7 @@ beforeEach(async () => {
   finger2.reset();
 
   await render(<Excalidraw handleKeyboardGlobally={true} />);
-  API.setAppState({ height: 768, width: 1024 });
+  API.setAppState({ height: 768, width: MQ_MIN_WIDTH_DESKTOP });
 });
 
 afterEach(() => {
@@ -150,7 +156,7 @@ describe("regression tests", () => {
         expect(h.state.activeTool.type).toBe(shape);
 
         mouse.down(10, 10);
-        mouse.up(10, 10);
+        mouse.up(30, 30);
 
         if (shouldSelect) {
           expect(API.getSelectedElement().type).toBe(shape);
@@ -363,7 +369,6 @@ describe("regression tests", () => {
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.Z);
       Keyboard.keyPress(KEYS.Z);
-      Keyboard.keyPress(KEYS.Z);
     });
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(2);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -462,6 +467,7 @@ describe("regression tests", () => {
 
     mouse.reset();
     mouse.down();
+    mouse.move(-1000, -1000);
     mouse.restorePosition(...end);
     mouse.up();
 
@@ -512,6 +518,7 @@ describe("regression tests", () => {
 
     mouse.reset();
     mouse.down();
+    mouse.move(-1000, -1000);
     mouse.restorePosition(...end);
     mouse.up();
 
@@ -529,6 +536,7 @@ describe("regression tests", () => {
 
     mouse.moveTo(-10, -10); // the NW resizing handle is at [0, 0], so moving further
     mouse.down();
+    mouse.move(-1000, -1000);
     mouse.restorePosition(...end);
     mouse.up();
 

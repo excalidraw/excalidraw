@@ -1,4 +1,9 @@
-import { invariant, isDevEnv, isTestEnv } from "@excalidraw/common";
+import {
+  invariant,
+  isDevEnv,
+  isTestEnv,
+  type Bounds,
+} from "@excalidraw/common";
 
 import {
   pointFrom,
@@ -19,7 +24,7 @@ import type {
   Vector,
 } from "@excalidraw/math";
 
-import { getCenterForBounds, type Bounds } from "./bounds";
+import { getCenterForBounds } from "./bounds";
 
 import type { ExcalidrawBindableElement } from "./types";
 

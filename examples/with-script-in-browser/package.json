@@ -17,6 +17,6 @@
     "build": "vite build",
     "preview": "vite preview --port 5002",
     "build:preview": "yarn build && yarn preview",
-    "build:package": "yarn workspace @excalidraw/excalidraw run build:esm"
+    "build:packages": "yarn --cwd ../../ build:packages"
   }
 }

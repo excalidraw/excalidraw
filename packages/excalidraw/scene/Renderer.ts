@@ -10,7 +10,6 @@ import type {
 
 import type { Scene } from "@excalidraw/element";
 
-import { renderInteractiveSceneThrottled } from "../renderer/interactiveScene";
 import { renderStaticSceneThrottled } from "../renderer/staticScene";
 
 import type { RenderableElementsMap } from "./types";
@@ -150,7 +149,6 @@ export class Renderer {
   // NOTE Doesn't destroy everything (scene, rc, etc.) because it may not be
   // safe to break TS contract here (for upstream cases)
   public destroy() {
-    renderInteractiveSceneThrottled.cancel();
     renderStaticSceneThrottled.cancel();
     this.getRenderableElements.clear();
   }

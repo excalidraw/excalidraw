@@ -14,10 +14,10 @@ import {
 } from "@excalidraw/math";
 
 import {
+  type Bounds,
   BinaryHeap,
   invariant,
   isAnyTrue,
-  tupleToCoors,
   getSizeFromPoints,
   isDevEnv,
   arrayToMap,
@@ -27,10 +27,11 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import {
   bindPointToSnapToElementOutline,
-  FIXED_BINDING_DISTANCE,
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
-  getHoveredElementForBinding,
+  getBindingGap,
+  maxBindingDistance_simple,
+  BASE_BINDING_GAP_ELBOW,
 } from "./binding";
 import { distanceToElement } from "./distance";
 import {
@@ -51,10 +52,9 @@ import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
 } from "./types";
-
 import { aabbForElement, pointInsideBounds } from "./bounds";
+import { getHoveredElementForBinding } from "./collision";
 
-import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
 import type {
   Arrowhead,
@@ -63,6 +63,7 @@ import type {
   FixedPointBinding,
   FixedSegment,
   NonDeletedExcalidrawElement,
+  Ordered,
 } from "./types";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
@@ -358,6 +359,12 @@ const handleSegmentRelease = (
     null,
     null,
   );
+
+  if (!restoredPoints || restoredPoints.length < 2) {
+    throw new Error(
+      "Property 'points' is required in the update returned by normalizeArrowElementUpdate()",
+    );
+  }
 
   const nextPoints: GlobalPoint[] = [];
 
@@ -706,7 +713,7 @@ const handleEndpointDrag = (
   endGlobalPoint: GlobalPoint,
   hoveredStartElement: ExcalidrawBindableElement | null,
   hoveredEndElement: ExcalidrawBindableElement | null,
-) => {
+): ElementUpdate<ExcalidrawElbowArrowElement> => {
   let startIsSpecial = arrow.startIsSpecial ?? null;
   let endIsSpecial = arrow.endIsSpecial ?? null;
   const globalUpdatedPoints = updatedPoints.map((p, i) =>
@@ -741,8 +748,15 @@ const handleEndpointDrag = (
 
   // Calculate the moving second point connection and add the start point
   {
-    const secondPoint = globalUpdatedPoints[startIsSpecial ? 2 : 1];
-    const thirdPoint = globalUpdatedPoints[startIsSpecial ? 3 : 2];
+    const secondPoint = globalUpdatedPoints.at(startIsSpecial ? 2 : 1);
+    const thirdPoint = globalUpdatedPoints.at(startIsSpecial ? 3 : 2);
+
+    if (!secondPoint || !thirdPoint) {
+      throw new Error(
+        `Second and third points must exist when handling endpoint drag (${startIsSpecial})`,
+      );
+    }
+
     const startIsHorizontal = headingIsHorizontal(startHeading);
     const secondIsHorizontal = headingIsHorizontal(
       vectorToHeading(vectorFromPoint(secondPoint, thirdPoint)),
@@ -801,10 +815,19 @@ const handleEndpointDrag = (
 
   // Calculate the moving second to last point connection
   {
-    const secondToLastPoint =
-      globalUpdatedPoints[globalUpdatedPoints.length - (endIsSpecial ? 3 : 2)];
-    const thirdToLastPoint =
-      globalUpdatedPoints[globalUpdatedPoints.length - (endIsSpecial ? 4 : 3)];
+    const secondToLastPoint = globalUpdatedPoints.at(
+      globalUpdatedPoints.length - (endIsSpecial ? 3 : 2),
+    );
+    const thirdToLastPoint = globalUpdatedPoints.at(
+      globalUpdatedPoints.length - (endIsSpecial ? 4 : 3),
+    );
+
+    if (!secondToLastPoint || !thirdToLastPoint) {
+      throw new Error(
+        `Second and third to last points must exist when handling endpoint drag (${endIsSpecial})`,
+      );
+    }
+
     const endIsHorizontal = headingIsHorizontal(endHeading);
     const secondIsHorizontal = headingForPointIsHorizontal(
       thirdToLastPoint,
@@ -892,6 +915,8 @@ export const updateElbowArrowPoints = (
   },
   options?: {
     isDragging?: boolean;
+    isBindingEnabled?: boolean;
+    isMidpointSnappingEnabled?: boolean;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
   if (arrow.points.length < 2) {
@@ -1179,6 +1204,8 @@ const getElbowArrowData = (
   options?: {
     isDragging?: boolean;
     zoom?: AppState["zoom"];
+    isBindingEnabled?: boolean;
+    isMidpointSnappingEnabled?: boolean;
   },
 ) => {
   const origStartGlobalPoint: GlobalPoint = pointTranslate<
@@ -1192,7 +1219,7 @@ const getElbowArrowData = (
 
   let hoveredStartElement = null;
   let hoveredEndElement = null;
-  if (options?.isDragging) {
+  if (options?.isDragging && options?.isBindingEnabled !== false) {
     const elements = Array.from(elementsMap.values());
     hoveredStartElement =
       getHoveredElement(
@@ -1221,6 +1248,7 @@ const getElbowArrowData = (
   const startGlobalPoint = getGlobalPoint(
     {
       ...arrow,
+      angle: 0,
       type: "arrow",
       elbowed: true,
       points: nextPoints,
@@ -1231,10 +1259,13 @@ const getElbowArrowData = (
     hoveredStartElement,
     elementsMap,
     options?.isDragging,
+    options?.isBindingEnabled,
+    options?.isMidpointSnappingEnabled,
   );
   const endGlobalPoint = getGlobalPoint(
     {
       ...arrow,
+      angle: 0,
       type: "arrow",
       elbowed: true,
       points: nextPoints,
@@ -1245,6 +1276,8 @@ const getElbowArrowData = (
     hoveredEndElement,
     elementsMap,
     options?.isDragging,
+    options?.isBindingEnabled,
+    options?.isMidpointSnappingEnabled,
   );
   const startHeading = getBindPointHeading(
     startGlobalPoint,
@@ -1252,6 +1285,7 @@ const getElbowArrowData = (
     hoveredStartElement,
     origStartGlobalPoint,
     elementsMap,
+    options?.zoom,
   );
   const endHeading = getBindPointHeading(
     endGlobalPoint,
@@ -1259,6 +1293,7 @@ const getElbowArrowData = (
     hoveredEndElement,
     origEndGlobalPoint,
     elementsMap,
+    options?.zoom,
   );
   const startPointBounds = [
     startGlobalPoint[0] - 2,
@@ -1279,8 +1314,8 @@ const getElbowArrowData = (
         offsetFromHeading(
           startHeading,
           arrow.startArrowhead
-            ? FIXED_BINDING_DISTANCE * 6
-            : FIXED_BINDING_DISTANCE * 2,
+            ? getBindingGap(hoveredStartElement, { elbowed: true }) * 6
+            : getBindingGap(hoveredStartElement, { elbowed: true }) * 2,
           1,
         ),
       )
@@ -1292,8 +1327,8 @@ const getElbowArrowData = (
         offsetFromHeading(
           endHeading,
           arrow.endArrowhead
-            ? FIXED_BINDING_DISTANCE * 6
-            : FIXED_BINDING_DISTANCE * 2,
+            ? getBindingGap(hoveredEndElement, { elbowed: true }) * 6
+            : getBindingGap(hoveredEndElement, { elbowed: true }) * 2,
           1,
         ),
       )
@@ -1340,8 +1375,8 @@ const getElbowArrowData = (
             ? 0
             : BASE_PADDING -
                 (arrow.startArrowhead
-                  ? FIXED_BINDING_DISTANCE * 6
-                  : FIXED_BINDING_DISTANCE * 2),
+                  ? BASE_BINDING_GAP_ELBOW * 6
+                  : BASE_BINDING_GAP_ELBOW * 2),
           BASE_PADDING,
         ),
     boundsOverlap
@@ -1356,8 +1391,8 @@ const getElbowArrowData = (
             ? 0
             : BASE_PADDING -
                 (arrow.endArrowhead
-                  ? FIXED_BINDING_DISTANCE * 6
-                  : FIXED_BINDING_DISTANCE * 2),
+                  ? BASE_BINDING_GAP_ELBOW * 6
+                  : BASE_BINDING_GAP_ELBOW * 2),
           BASE_PADDING,
         ),
     boundsOverlap,
@@ -2071,16 +2106,7 @@ const normalizeArrowElementUpdate = (
   nextFixedSegments: readonly FixedSegment[] | null,
   startIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"],
   endIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"],
-): {
-  points: LocalPoint[];
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  fixedSegments: readonly FixedSegment[] | null;
-  startIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"];
-  endIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"];
-} => {
+): ElementUpdate<ExcalidrawElbowArrowElement> => {
   const offsetX = global[0][0];
   const offsetY = global[0][1];
   let points = global.map((p) =>
@@ -2195,14 +2221,18 @@ const getGlobalPoint = (
   element?: ExcalidrawBindableElement | null,
   elementsMap?: ElementsMap,
   isDragging?: boolean,
+  isBindingEnabled = true,
+  isMidpointSnappingEnabled = true,
 ): GlobalPoint => {
   if (isDragging) {
-    if (element && elementsMap) {
+    if (isBindingEnabled && element && elementsMap) {
       return bindPointToSnapToElementOutline(
         arrow,
         element,
         startOrEnd,
         elementsMap,
+        undefined,
+        isMidpointSnappingEnabled,
       );
     }
 
@@ -2226,6 +2256,7 @@ const getBindPointHeading = (
   hoveredElement: ExcalidrawBindableElement | null | undefined,
   origPoint: GlobalPoint,
   elementsMap: ElementsMap,
+  zoom?: AppState["zoom"],
 ): Heading =>
   getHeadingForElbowArrowSnap(
     p,
@@ -2244,21 +2275,20 @@ const getBindPointHeading = (
       ),
     origPoint,
     elementsMap,
+    zoom,
   );
 
 const getHoveredElement = (
   origPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   zoom?: AppState["zoom"],
 ) => {
   return getHoveredElementForBinding(
-    tupleToCoors(origPoint),
+    origPoint,
     elements,
     elementsMap,
-    zoom,
-    true,
-    true,
+    maxBindingDistance_simple(zoom),
   );
 };
 

@@ -23,7 +23,11 @@ import {
   syncInvalidIndicesImmutable,
   hashElementsVersion,
   hashString,
+  isInitializedImageElement,
+  isImageElement,
 } from "./index";
+
+import type { ApplyToOptions } from "./delta";
 
 import type {
   ExcalidrawElement,
@@ -72,8 +76,9 @@ type MicroActionsQueue = (() => void)[];
  * Store which captures the observed changes and emits them as `StoreIncrement` events.
  */
 export class Store {
-  // internally used by history
+  // for internal use by history
   public readonly onDurableIncrementEmitter = new Emitter<[DurableIncrement]>();
+  // for public use as part of onIncrement API
   public readonly onStoreIncrementEmitter = new Emitter<
     [DurableIncrement | EphemeralIncrement]
   >();
@@ -137,6 +142,8 @@ export class Store {
     } else {
       // immediately create an immutable change of the scheduled updates,
       // compared to the current state, so that they won't mutate later on during batching
+      // also, we have to compare against the current state,
+      // as comparing against the snapshot might include yet uncomitted changes (i.e. async freedraw / text / image, etc.)
       const currentSnapshot = StoreSnapshot.create(
         this.app.scene.getElementsMapIncludingDeleted(),
         this.app.state,
@@ -233,7 +240,6 @@ export class Store {
     if (!storeDelta.isEmpty()) {
       const increment = new DurableIncrement(storeChange, storeDelta);
 
-      // Notify listeners with the increment
       this.onDurableIncrementEmitter.trigger(increment);
       this.onStoreIncrementEmitter.trigger(increment);
     }
@@ -546,10 +552,26 @@ export class StoreDelta {
   public static load({
     id,
     elements: { added, removed, updated },
+    appState: { delta: appStateDelta },
   }: DTO<StoreDelta>) {
     const elements = ElementsDelta.create(added, removed, updated);
+    const appState = AppStateDelta.create(appStateDelta);
 
-    return new this(id, elements, AppStateDelta.empty());
+    return new this(id, elements, appState);
+  }
+
+  /**
+   * Squash the passed deltas into the aggregated delta instance.
+   */
+  public static squash(...deltas: StoreDelta[]) {
+    const aggregatedDelta = StoreDelta.empty();
+
+    for (const delta of deltas) {
+      aggregatedDelta.elements.squash(delta.elements);
+      aggregatedDelta.appState.squash(delta.appState);
+    }
+
+    return aggregatedDelta;
   }
 
   /**
@@ -566,9 +588,13 @@ export class StoreDelta {
     delta: StoreDelta,
     elements: SceneElementsMap,
     appState: AppState,
+    options?: ApplyToOptions,
   ): [SceneElementsMap, AppState, boolean] {
-    const [nextElements, elementsContainVisibleChange] =
-      delta.elements.applyTo(elements);
+    const [nextElements, elementsContainVisibleChange] = delta.elements.applyTo(
+      elements,
+      StoreSnapshot.empty().elements,
+      options,
+    );
 
     const [nextAppState, appStateContainsVisibleChange] =
       delta.appState.applyTo(appState, nextElements);
@@ -599,6 +625,10 @@ export class StoreDelta {
         id: delta.id,
       },
     );
+  }
+
+  public static empty() {
+    return StoreDelta.create(ElementsDelta.empty(), AppStateDelta.empty());
   }
 
   public isEmpty() {
@@ -869,7 +899,7 @@ export class StoreSnapshot {
   }
 
   /**
-   * Detect if there any changed elements.
+   * Detect if there are any changed elements.
    */
   private detectChangedElements(
     nextElements: SceneElementsMap,
@@ -904,6 +934,14 @@ export class StoreSnapshot {
         !prevElement || // element was added
         prevElement.version < nextElement.version // element was updated
       ) {
+        if (
+          isImageElement(nextElement) &&
+          !isInitializedImageElement(nextElement)
+        ) {
+          // ignore any updates on uninitialized image elements
+          continue;
+        }
+
         changedElements.set(nextElement.id, nextElement);
       }
     }
@@ -958,8 +996,7 @@ const getDefaultObservedAppState = (): ObservedAppState => {
     viewBackgroundColor: COLOR_PALETTE.white,
     selectedElementIds: {},
     selectedGroupIds: {},
-    editingLinearElementId: null,
-    selectedLinearElementId: null,
+    selectedLinearElement: null,
     croppingElementId: null,
     activeLockedId: null,
     lockedMultiSelections: {},
@@ -978,14 +1015,12 @@ export const getObservedAppState = (
     croppingElementId: appState.croppingElementId,
     activeLockedId: appState.activeLockedId,
     lockedMultiSelections: appState.lockedMultiSelections,
-    editingLinearElementId:
-      (appState as AppState).editingLinearElement?.elementId ?? // prefer app state, as it's likely newer
-      (appState as ObservedAppState).editingLinearElementId ?? // fallback to observed app state, as it's likely older coming from a previous snapshot
-      null,
-    selectedLinearElementId:
-      (appState as AppState).selectedLinearElement?.elementId ??
-      (appState as ObservedAppState).selectedLinearElementId ??
-      null,
+    selectedLinearElement: appState.selectedLinearElement
+      ? {
+          elementId: appState.selectedLinearElement.elementId,
+          isEditing: !!appState.selectedLinearElement.isEditing,
+        }
+      : null,
   };
 
   Reflect.defineProperty(observedAppState, hiddenObservedAppStateProp, {

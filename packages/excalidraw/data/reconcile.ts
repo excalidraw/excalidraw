@@ -20,7 +20,7 @@ export type ReconciledExcalidrawElement = OrderedExcalidrawElement &
 export type RemoteExcalidrawElement = OrderedExcalidrawElement &
   MakeBrand<"RemoteExcalidrawElement">;
 
-const shouldDiscardRemoteElement = (
+export const shouldDiscardRemoteElement = (
   localAppState: AppState,
   local: OrderedExcalidrawElement | undefined,
   remote: RemoteExcalidrawElement,
@@ -30,13 +30,13 @@ const shouldDiscardRemoteElement = (
     // local element is being edited
     (local.id === localAppState.editingTextElement?.id ||
       local.id === localAppState.resizingElement?.id ||
-      local.id === localAppState.newElement?.id || // TODO: Is this still valid? As newElement is selection element, which is never part of the elements array
+      local.id === localAppState.newElement?.id ||
       // local element is newer
       local.version > remote.version ||
       // resolve conflicting edits deterministically by taking the one with
       // the lowest versionNonce
       (local.version === remote.version &&
-        local.versionNonce < remote.versionNonce))
+        local.versionNonce <= remote.versionNonce))
   ) {
     return true;
   }

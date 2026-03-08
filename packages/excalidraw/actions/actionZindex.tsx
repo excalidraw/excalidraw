@@ -1,4 +1,4 @@
-import { KEYS, CODES, getShortcutKey, isDarwin } from "@excalidraw/common";
+import { KEYS, CODES, isDarwin } from "@excalidraw/common";
 
 import {
   moveOneLeft,
@@ -16,6 +16,7 @@ import {
   SendToBackIcon,
 } from "../components/icons";
 import { t } from "../i18n";
+import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 

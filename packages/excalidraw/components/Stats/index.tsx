@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState, memo } from "react";
 import { STATS_PANELS } from "@excalidraw/common";
 import { getCommonBounds } from "@excalidraw/element";
 import { getUncroppedWidthAndHeight } from "@excalidraw/element";
-import { isElbowArrow, isImageElement } from "@excalidraw/element";
+import { isImageElement } from "@excalidraw/element";
 
 import { frameAndChildrenSelectedTogether } from "@excalidraw/element";
 
@@ -333,16 +333,14 @@ export const StatsInner = memo(
                           appState={appState}
                         />
                       </StatsRow>
-                      {!isElbowArrow(singleElement) && (
-                        <StatsRow>
-                          <Angle
-                            property="angle"
-                            element={singleElement}
-                            scene={scene}
-                            appState={appState}
-                          />
-                        </StatsRow>
-                      )}
+                      <StatsRow>
+                        <Angle
+                          property="angle"
+                          element={singleElement}
+                          scene={scene}
+                          appState={appState}
+                        />
+                      </StatsRow>
                       <StatsRow>
                         <FontSize
                           property="fontSize"

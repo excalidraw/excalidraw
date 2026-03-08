@@ -1,7 +1,11 @@
-import { getCommonBoundingBox } from "./bounds";
-import { newElementWith } from "./mutateElement";
+import type { AppState } from "@excalidraw/excalidraw/types";
 
-import { getMaximumGroups } from "./groups";
+import { updateBoundElements } from "./binding";
+import { getCommonBoundingBox } from "./bounds";
+
+import { getSelectedElementsByGroup } from "./groups";
+
+import type { Scene } from "./Scene";
 
 import type { ElementsMap, ExcalidrawElement } from "./types";
 
@@ -14,6 +18,8 @@ export const distributeElements = (
   selectedElements: ExcalidrawElement[],
   elementsMap: ElementsMap,
   distribution: Distribution,
+  appState: Readonly<AppState>,
+  scene: Scene,
 ): ExcalidrawElement[] => {
   const [start, mid, end, extent] =
     distribution.axis === "x"
@@ -21,7 +27,11 @@ export const distributeElements = (
       : (["minY", "midY", "maxY", "height"] as const);
 
   const bounds = getCommonBoundingBox(selectedElements);
-  const groups = getMaximumGroups(selectedElements, elementsMap)
+  const groups = getSelectedElementsByGroup(
+    selectedElements,
+    elementsMap,
+    appState,
+  )
     .map((group) => [group, getCommonBoundingBox(group)] as const)
     .sort((a, b) => a[1][mid] - b[1][mid]);
 
@@ -59,12 +69,16 @@ export const distributeElements = (
         translation[distribution.axis] = pos - box[mid];
       }
 
-      return group.map((element) =>
-        newElementWith(element, {
+      return group.map((element) => {
+        const updatedElement = scene.mutateElement(element, {
           x: element.x + translation.x,
           y: element.y + translation.y,
-        }),
-      );
+        });
+        updateBoundElements(element, scene, {
+          simultaneouslyUpdated: group,
+        });
+        return updatedElement;
+      });
     });
   }
 
@@ -83,11 +97,15 @@ export const distributeElements = (
     pos += step;
     pos += box[extent];
 
-    return group.map((element) =>
-      newElementWith(element, {
+    return group.map((element) => {
+      const updatedElement = scene.mutateElement(element, {
         x: element.x + translation.x,
         y: element.y + translation.y,
-      }),
-    );
+      });
+      updateBoundElements(element, scene, {
+        simultaneouslyUpdated: group,
+      });
+      return updatedElement;
+    });
   });
 };

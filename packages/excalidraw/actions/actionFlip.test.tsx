@@ -38,15 +38,13 @@ describe("flipping re-centers selection", () => {
         height: 239.9,
         startBinding: {
           elementId: "rec1",
-          focus: 0,
-          gap: 5,
           fixedPoint: [0.49, -0.05],
+          mode: "orbit",
         },
         endBinding: {
           elementId: "rec2",
-          focus: 0,
-          gap: 5,
           fixedPoint: [-0.05, 0.49],
+          mode: "orbit",
         },
         startArrowhead: null,
         endArrowhead: "arrow",
@@ -74,11 +72,11 @@ describe("flipping re-centers selection", () => {
 
     const rec1 = h.elements.find((el) => el.id === "rec1")!;
     expect(rec1.x).toBeCloseTo(100, 0);
-    expect(rec1.y).toBeCloseTo(100, 0);
+    expect(rec1.y).toBeCloseTo(101, 0);
 
     const rec2 = h.elements.find((el) => el.id === "rec2")!;
     expect(rec2.x).toBeCloseTo(220, 0);
-    expect(rec2.y).toBeCloseTo(250, 0);
+    expect(rec2.y).toBeCloseTo(251, 0);
   });
 });
 
@@ -99,8 +97,8 @@ describe("flipping arrowheads", () => {
       endArrowhead: null,
       endBinding: {
         elementId: rect.id,
-        focus: 0.5,
-        gap: 5,
+        fixedPoint: [0.5, 0.5],
+        mode: "orbit",
       },
     });
 
@@ -139,13 +137,13 @@ describe("flipping arrowheads", () => {
       endArrowhead: "circle",
       startBinding: {
         elementId: rect.id,
-        focus: 0.5,
-        gap: 5,
+        fixedPoint: [0.5, 0.5],
+        mode: "orbit",
       },
       endBinding: {
         elementId: rect2.id,
-        focus: 0.5,
-        gap: 5,
+        fixedPoint: [0.5, 0.5],
+        mode: "orbit",
       },
     });
 
@@ -195,8 +193,8 @@ describe("flipping arrowheads", () => {
       endArrowhead: null,
       endBinding: {
         elementId: rect.id,
-        focus: 0.5,
-        gap: 5,
+        fixedPoint: [0.5, 0.5],
+        mode: "orbit",
       },
     });
 

@@ -22,6 +22,7 @@ import { atom, useAtom, useAtomValue } from "../app-jotai";
 import { activeRoomLinkAtom } from "../collab/Collab";
 
 import "./ShareDialog.scss";
+import { QRCode } from "./QRCode";
 
 import type { CollabAPI } from "../collab/Collab";
 
@@ -142,6 +143,7 @@ const ActiveRoomDialog = ({
           }}
         />
       </div>
+      <QRCode value={activeRoomLink} />
       <div className="ShareDialog__active__description">
         <p>
           <span

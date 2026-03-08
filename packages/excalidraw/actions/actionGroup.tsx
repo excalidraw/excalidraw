@@ -14,7 +14,7 @@ import {
   replaceAllElementsInFrame,
 } from "@excalidraw/element";
 
-import { KEYS, randomId, arrayToMap, getShortcutKey } from "@excalidraw/common";
+import { KEYS, randomId, arrayToMap } from "@excalidraw/common";
 
 import {
   getSelectedGroupIds,
@@ -42,6 +42,8 @@ import { UngroupIcon, GroupIcon } from "../components/icons";
 import { t } from "../i18n";
 
 import { isSomeElementSelected } from "../scene";
+
+import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 

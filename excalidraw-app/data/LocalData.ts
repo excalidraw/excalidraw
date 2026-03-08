@@ -16,7 +16,6 @@ import {
   DEFAULT_SIDEBAR,
   debounce,
 } from "@excalidraw/common";
-import { clearElementsForLocalStorage } from "@excalidraw/element";
 import {
   createStore,
   entries,
@@ -26,6 +25,9 @@ import {
   setMany,
   get,
 } from "idb-keyval";
+
+import { appJotaiStore, atom } from "excalidraw-app/app-jotai";
+import { getNonDeletedElements } from "@excalidraw/element";
 
 import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
@@ -44,6 +46,8 @@ import { Locker } from "./Locker";
 import { updateBrowserStateVersion } from "./tabSync";
 
 const filesStore = createStore("files-db", "files-store");
+
+export const localStorageQuotaExceededAtom = atom(false);
 
 class LocalFileManager extends FileManager {
   clearObsoleteFiles = async (opts: { currentFileIds: FileId[] }) => {
@@ -69,6 +73,9 @@ const saveDataStateToLocalStorage = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
+  const localStorageQuotaExceeded = appJotaiStore.get(
+    localStorageQuotaExceededAtom,
+  );
   try {
     const _appState = clearAppStateForLocalStorage(appState);
 
@@ -81,17 +88,27 @@ const saveDataStateToLocalStorage = (
 
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(clearElementsForLocalStorage(elements)),
+      JSON.stringify(getNonDeletedElements(elements)),
     );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
       JSON.stringify(_appState),
     );
     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
+    if (localStorageQuotaExceeded) {
+      appJotaiStore.set(localStorageQuotaExceededAtom, false);
+    }
   } catch (error: any) {
     // Unable to access window.localStorage
     console.error(error);
+    if (isQuotaExceededError(error) && !localStorageQuotaExceeded) {
+      appJotaiStore.set(localStorageQuotaExceededAtom, true);
+    }
   }
+};
+
+const isQuotaExceededError = (error: any) => {
+  return error instanceof DOMException && error.name === "QuotaExceededError";
 };
 
 type SavingLockTypes = "collaboration";

@@ -4,12 +4,13 @@ import {
   polygonFromPoints,
   lineSegment,
   polygonIncludesPointNonZero,
-  doBoundsIntersect,
 } from "@excalidraw/math";
 
+import { type Bounds } from "@excalidraw/common";
+
 import {
-  type Bounds,
   computeBoundTextPosition,
+  doBoundsIntersect,
   getBoundTextElement,
   getElementBounds,
   intersectElementWithLineSegment,

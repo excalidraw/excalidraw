@@ -1,5 +1,4 @@
-@import "open-color/open-color";
-@import "../../css/variables.module.scss";
+@use "../../css/variables.module" as *;
 
 .excalidraw {
   .sidebar {
@@ -9,7 +8,7 @@
     top: 0;
     bottom: 0;
     right: 0;
-    z-index: 5;
+    z-index: var(--zIndex-ui-library);
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -19,6 +18,12 @@
 
     pointer-events: var(--ui-pointerEvents);
 
+    overflow: hidden;
+    border-radius: 0;
+    width: calc(var(--right-sidebar-width) - var(--space-factor) * 2);
+
+    border-left: 1px solid var(--sidebar-border-color);
+
     :root[dir="rtl"] & {
       left: 0;
       right: auto;
@@ -27,12 +32,6 @@
     &--docked {
       box-shadow: none;
     }
-
-    overflow: hidden;
-    border-radius: 0;
-    width: calc(var(--right-sidebar-width) - var(--space-factor) * 2);
-
-    border-left: 1px solid var(--sidebar-border-color);
 
     :root[dir="rtl"] & {
       border-right: 1px solid var(--sidebar-border-color);

@@ -2,32 +2,60 @@
 
 exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu items if passed from host 1`] = `
 <div
-  class="dropdown-menu"
+  aria-labelledby="radix-:r85:"
+  aria-orientation="vertical"
+  class="dropdown-menu main-menu"
+  data-align="start"
+  data-orientation="vertical"
+  data-radix-menu-content=""
+  data-side="bottom"
+  data-state="open"
   data-testid="dropdown-menu"
+  dir="ltr"
+  id="radix-:r86:"
+  role="menu"
+  style="outline: none; --radix-dropdown-menu-content-transform-origin: var(--radix-popper-transform-origin); --radix-dropdown-menu-content-available-width: var(--radix-popper-available-width); --radix-dropdown-menu-content-available-height: var(--radix-popper-available-height); --radix-dropdown-menu-trigger-width: var(--radix-popper-anchor-width); --radix-dropdown-menu-trigger-height: var(--radix-popper-anchor-height); animation: none;"
+  tabindex="-1"
 >
   <div
     class="Island dropdown-menu-container"
-    style="--padding: 2; z-index: 2;"
+    style="--padding: 2;"
   >
     <button
-      class="dropdown-menu-item dropdown-menu-item-base"
+      class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+      data-orientation="vertical"
+      data-radix-collection-item=""
+      role="menuitem"
+      tabindex="-1"
     >
       <div
         class="dropdown-menu-item__text"
       >
-        Click me
+        <span
+          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+        >
+          Click me
+        </span>
       </div>
     </button>
     <a
-      class="dropdown-menu-item dropdown-menu-item-base"
+      class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+      data-orientation="vertical"
+      data-radix-collection-item=""
       href="blog.excalidaw.com"
-      rel="noopener"
+      rel="noopener noopener"
+      role="menuitem"
+      tabindex="-1"
       target="_blank"
     >
       <div
         class="dropdown-menu-item__text"
       >
-        Excalidraw blog
+        <span
+          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+        >
+          Excalidraw blog
+        </span>
       </div>
     </a>
     <div
@@ -41,8 +69,12 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
     </div>
     <button
       aria-label="Help"
-      class="dropdown-menu-item dropdown-menu-item-base"
+      class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+      data-orientation="vertical"
+      data-radix-collection-item=""
       data-testid="help-menu-item"
+      role="menuitem"
+      tabindex="-1"
       title="Help"
     >
       <div
@@ -88,7 +120,11 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
       <div
         class="dropdown-menu-item__text"
       >
-        Help
+        <span
+          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+        >
+          Help
+        </span>
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -102,17 +138,33 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
 
 exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should render menu with default items when "UIOPtions" is "undefined" 1`] = `
 <div
-  class="dropdown-menu"
+  aria-labelledby="radix-:rq:"
+  aria-orientation="vertical"
+  class="dropdown-menu main-menu"
+  data-align="start"
+  data-orientation="vertical"
+  data-radix-menu-content=""
+  data-side="bottom"
+  data-state="open"
   data-testid="dropdown-menu"
+  dir="ltr"
+  id="radix-:rr:"
+  role="menu"
+  style="outline: none; --radix-dropdown-menu-content-transform-origin: var(--radix-popper-transform-origin); --radix-dropdown-menu-content-available-width: var(--radix-popper-available-width); --radix-dropdown-menu-content-available-height: var(--radix-popper-available-height); --radix-dropdown-menu-trigger-width: var(--radix-popper-anchor-width); --radix-dropdown-menu-trigger-height: var(--radix-popper-anchor-height); animation: none;"
+  tabindex="-1"
 >
   <div
     class="Island dropdown-menu-container"
-    style="--padding: 2; z-index: 2;"
+    style="--padding: 2;"
   >
     <button
       aria-label="Open"
-      class="dropdown-menu-item dropdown-menu-item-base"
+      class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+      data-orientation="vertical"
+      data-radix-collection-item=""
       data-testid="load-button"
+      role="menuitem"
+      tabindex="-1"
       title="Open"
     >
       <div
@@ -138,7 +190,11 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        Open
+        <span
+          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+        >
+          Open
+        </span>
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -148,8 +204,12 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
     </button>
     <button
       aria-label="Save to..."
-      class="dropdown-menu-item dropdown-menu-item-base"
+      class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+      data-orientation="vertical"
+      data-radix-collection-item=""
       data-testid="json-export-button"
+      role="menuitem"
+      tabindex="-1"
       title="Save to..."
     >
       <div
@@ -175,13 +235,21 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        Save to...
+        <span
+          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+        >
+          Save to...
+        </span>
       </div>
     </button>
     <button
       aria-label="Export image..."
-      class="dropdown-menu-item dropdown-menu-item-base"
+      class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+      data-orientation="vertical"
+      data-radix-collection-item=""
       data-testid="image-export-button"
+      role="menuitem"
+      tabindex="-1"
       title="Export image..."
     >
       <div
@@ -231,7 +299,11 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        Export image...
+        <span
+          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+        >
+          Export image...
+        </span>
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -241,8 +313,12 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
     </button>
     <button
       aria-label="Find on canvas"
-      class="dropdown-menu-item dropdown-menu-item-base"
+      class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+      data-orientation="vertical"
+      data-radix-collection-item=""
       data-testid="search-menu-button"
+      role="menuitem"
+      tabindex="-1"
       title="Find on canvas"
     >
       <div
@@ -280,7 +356,11 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        Find on canvas
+        <span
+          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+        >
+          Find on canvas
+        </span>
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -290,8 +370,12 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
     </button>
     <button
       aria-label="Help"
-      class="dropdown-menu-item dropdown-menu-item-base"
+      class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+      data-orientation="vertical"
+      data-radix-collection-item=""
       data-testid="help-menu-item"
+      role="menuitem"
+      tabindex="-1"
       title="Help"
     >
       <div
@@ -337,7 +421,11 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        Help
+        <span
+          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+        >
+          Help
+        </span>
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -347,8 +435,12 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
     </button>
     <button
       aria-label="Reset the canvas"
-      class="dropdown-menu-item dropdown-menu-item-base"
+      class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+      data-orientation="vertical"
+      data-radix-collection-item=""
       data-testid="clear-canvas-button"
+      role="menuitem"
+      tabindex="-1"
       title="Reset the canvas"
     >
       <div
@@ -374,11 +466,15 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        Reset the canvas
+        <span
+          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+        >
+          Reset the canvas
+        </span>
       </div>
     </button>
     <div
-      style="height: 1px; margin: .5rem 0px;"
+      style="height: 1px; margin: 6px 0px; flex: 0 0 auto;"
     />
     <div
       class="dropdown-menu-group "
@@ -390,9 +486,13 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       </p>
       <a
         aria-label="GitHub"
-        class="dropdown-menu-item dropdown-menu-item-base"
+        class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+        data-orientation="vertical"
+        data-radix-collection-item=""
         href="https://github.com/excalidraw/excalidraw"
-        rel="noopener"
+        rel="noopener noopener"
+        role="menuitem"
+        tabindex="-1"
         target="_blank"
         title="GitHub"
       >
@@ -419,14 +519,22 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         <div
           class="dropdown-menu-item__text"
         >
-          GitHub
+          <span
+            style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+          >
+            GitHub
+          </span>
         </div>
       </a>
       <a
         aria-label="X"
-        class="dropdown-menu-item dropdown-menu-item-base"
+        class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+        data-orientation="vertical"
+        data-radix-collection-item=""
         href="https://x.com/excalidraw"
-        rel="noopener"
+        rel="noopener noopener"
+        role="menuitem"
+        tabindex="-1"
         target="_blank"
         title="X"
       >
@@ -465,14 +573,22 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         <div
           class="dropdown-menu-item__text"
         >
-          Follow us
+          <span
+            style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+          >
+            Follow us
+          </span>
         </div>
       </a>
       <a
         aria-label="Discord"
-        class="dropdown-menu-item dropdown-menu-item-base"
+        class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+        data-orientation="vertical"
+        data-radix-collection-item=""
         href="https://discord.gg/UexuTaE"
-        rel="noopener"
+        rel="noopener noopener"
+        role="menuitem"
+        tabindex="-1"
         target="_blank"
         title="Discord"
       >
@@ -505,17 +621,25 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         <div
           class="dropdown-menu-item__text"
         >
-          Discord chat
+          <span
+            style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+          >
+            Discord chat
+          </span>
         </div>
       </a>
     </div>
     <div
-      style="height: 1px; margin: .5rem 0px;"
+      style="height: 1px; margin: 6px 0px; flex: 0 0 auto;"
     />
     <button
       aria-label="Dark mode"
-      class="dropdown-menu-item dropdown-menu-item-base"
+      class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+      data-orientation="vertical"
+      data-radix-collection-item=""
       data-testid="toggle-dark-mode"
+      role="menuitem"
+      tabindex="-1"
       title="Dark mode"
     >
       <div
@@ -542,7 +666,11 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        Dark mode
+        <span
+          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+        >
+          Dark mode
+        </span>
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -551,11 +679,11 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       </div>
     </button>
     <div
-      style="margin-top: 0.5rem;"
+      style="margin-top: 0.75rem;"
     >
       <div
         data-testid="canvas-background-label"
-        style="font-size: .75rem; margin-bottom: .5rem;"
+        style="font-size: 0.875rem; margin-bottom: 0.25rem; margin-left: 0.5rem;"
       >
         Canvas background
       </div>
@@ -631,11 +759,12 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
               style="width: 1px; height: 1rem; margin: 0px auto;"
             />
             <button
-              aria-controls="radix-:r0:"
+              aria-controls="radix-:r16:"
               aria-expanded="false"
               aria-haspopup="dialog"
               aria-label="Canvas background"
               class="color-picker__button active-color properties-trigger has-outline"
+              data-openpopup="canvasBackground"
               data-state="closed"
               style="--swatch-color: #ffffff;"
               title="Show background color picker"

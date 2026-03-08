@@ -23,7 +23,7 @@ type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
 const embeddedLinkCache = new Map<string, IframeDataWithSandbox>();
 
 const RE_YOUTUBE =
-  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=|\?start=|&start=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
+  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)/;
 
 const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}\.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
@@ -56,11 +56,86 @@ const RE_REDDIT =
 const RE_REDDIT_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
 
+const parseYouTubeLikeTimestamp = (url: string): number => {
+  let timeParam: string | null | undefined;
+
+  try {
+    const urlObj = new URL(url.startsWith("http") ? url : `https://${url}`);
+    timeParam =
+      urlObj.searchParams.get("t") || urlObj.searchParams.get("start");
+  } catch (error) {
+    const timeMatch = url.match(/[?&#](?:t|start)=([^&#\s]+)/);
+    timeParam = timeMatch?.[1];
+  }
+
+  if (!timeParam) {
+    return 0;
+  }
+
+  if (/^\d+$/.test(timeParam)) {
+    return parseInt(timeParam, 10);
+  }
+
+  const timeMatch = timeParam.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/);
+  if (!timeMatch) {
+    return 0;
+  }
+
+  const [, hours = "0", minutes = "0", seconds = "0"] = timeMatch;
+  return parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds);
+};
+
+const parseGoogleDriveVideoLink = (
+  url: string,
+): { fileId: string; resourceKey?: string; timestamp?: number } | null => {
+  try {
+    const urlObj = new URL(url.startsWith("http") ? url : `https://${url}`);
+    const hostname = urlObj.hostname.replace(/^www\./, "");
+    if (hostname !== "drive.google.com") {
+      return null;
+    }
+
+    let fileId: string | null = null;
+    const pathMatch = urlObj.pathname.match(/^\/file\/d\/([^/]+)(?:\/|$)/);
+    if (pathMatch?.[1]) {
+      fileId = pathMatch[1];
+    } else if (urlObj.pathname === "/open" || urlObj.pathname === "/uc") {
+      // Shared Drive links can be emitted as:
+      // - /open?id=<fileId> (common "open in Drive" format)
+      // - /uc?...&id=<fileId> (download/export endpoint often seen in copied links)
+      fileId = urlObj.searchParams.get("id");
+    }
+
+    if (!fileId || !/^[a-zA-Z0-9_-]+$/.test(fileId)) {
+      return null;
+    }
+
+    // Some Drive share links include `resourcekey` for access to link-shared
+    // files; preserve it in the preview URL so embeds keep working.
+    const resourceKey = urlObj.searchParams.get("resourcekey");
+    const timestamp = parseYouTubeLikeTimestamp(urlObj.toString());
+
+    return {
+      fileId,
+      resourceKey:
+        resourceKey && /^[a-zA-Z0-9_-]+$/.test(resourceKey)
+          ? resourceKey
+          : undefined,
+      // Drive accepts YouTube-like `t` formats (e.g. `t=90`, `t=1m30s`);
+      // normalize to seconds for a stable preview URL.
+      timestamp: timestamp > 0 ? timestamp : undefined,
+    };
+  } catch (error) {
+    return null;
+  }
+};
+
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
   "youtu.be",
   "vimeo.com",
   "player.vimeo.com",
+  "drive.google.com",
   "figma.com",
   "link.excalidraw.com",
   "gist.github.com",
@@ -79,6 +154,7 @@ const ALLOW_SAME_ORIGIN = new Set([
   "youtu.be",
   "vimeo.com",
   "player.vimeo.com",
+  "drive.google.com",
   "figma.com",
   "twitter.com",
   "x.com",
@@ -113,7 +189,8 @@ export const getEmbedLink = (
   let aspectRatio = { w: 560, h: 840 };
   const ytLink = link.match(RE_YOUTUBE);
   if (ytLink?.[2]) {
-    const time = ytLink[3] ? `&start=${ytLink[3]}` : ``;
+    const startTime = parseYouTubeLikeTimestamp(originalLink);
+    const time = startTime > 0 ? `&start=${startTime}` : ``;
     const isPortrait = link.includes("shorts");
     type = "video";
     switch (ytLink[1]) {
@@ -167,6 +244,36 @@ export const getEmbedLink = (
       intrinsicSize: aspectRatio,
       type,
       error,
+      sandbox: { allowSameOrigin },
+    };
+  }
+
+  const googleDriveVideo = parseGoogleDriveVideoLink(link);
+  if (googleDriveVideo) {
+    type = "video";
+    const searchParams = new URLSearchParams();
+    if (googleDriveVideo.resourceKey) {
+      searchParams.set("resourcekey", googleDriveVideo.resourceKey);
+    }
+    if (googleDriveVideo.timestamp) {
+      searchParams.set("t", `${googleDriveVideo.timestamp}`);
+    }
+
+    const search = searchParams.toString();
+    link = `https://drive.google.com/file/d/${googleDriveVideo.fileId}/preview${
+      search ? `?${search}` : ""
+    }`;
+    aspectRatio = { w: 560, h: 315 };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    });
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
       sandbox: { allowSameOrigin },
     };
   }

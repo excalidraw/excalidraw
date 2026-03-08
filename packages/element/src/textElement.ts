@@ -10,11 +10,11 @@ import {
   invariant,
 } from "@excalidraw/common";
 
+import { pointFrom, pointRotateRads, type Radians } from "@excalidraw/math";
+
 import type { AppState } from "@excalidraw/excalidraw/types";
 
 import type { ExtractSetType } from "@excalidraw/common/utility-types";
-
-import type { Radians } from "@excalidraw/math";
 
 import {
   resetOriginalContainerCache,
@@ -254,6 +254,26 @@ export const computeBoundTextPosition = (
     x =
       containerCoords.x + (maxContainerWidth / 2 - boundTextElement.width / 2);
   }
+  const angle = (container.angle ?? 0) as Radians;
+
+  if (angle !== 0) {
+    const contentCenter = pointFrom(
+      containerCoords.x + maxContainerWidth / 2,
+      containerCoords.y + maxContainerHeight / 2,
+    );
+    const textCenter = pointFrom(
+      x + boundTextElement.width / 2,
+      y + boundTextElement.height / 2,
+    );
+
+    const [rx, ry] = pointRotateRads(textCenter, contentCenter, angle);
+
+    return {
+      x: rx - boundTextElement.width / 2,
+      y: ry - boundTextElement.height / 2,
+    };
+  }
+
   return { x, y };
 };
 
