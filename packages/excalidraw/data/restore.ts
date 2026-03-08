@@ -93,8 +93,10 @@ import {
 import type {
   AppState,
   BinaryFiles,
+  Collaborator,
   LibraryItem,
   NormalizedZoomValue,
+  SocketId,
 } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
@@ -1117,6 +1119,17 @@ export const restoreAppState = (
       defaultAppState.currentItemStrokeWidthKey;
   }
 
+  // JSON.stringify serializes Map as a plain object {},
+  // so we reconstruct collaborators as a proper Map on restore
+  if (
+    nextAppState.collaborators &&
+    !(nextAppState.collaborators instanceof Map)
+  ) {
+    nextAppState.collaborators = new Map(
+      Object.entries(nextAppState.collaborators as Record<string, Collaborator>),
+    ) as Map<SocketId, Collaborator>;
+  }
+  
   return {
     ...nextAppState,
     cursorButton: localAppState?.cursorButton || "up",
