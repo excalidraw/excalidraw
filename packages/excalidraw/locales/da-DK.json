@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Fejl"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Gem til disk",
     "disk_details": "",
