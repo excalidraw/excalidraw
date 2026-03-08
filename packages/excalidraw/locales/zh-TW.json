@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "錯誤"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "儲存至硬碟",
     "disk_details": "將場景匯出為可供匯入之檔案",
