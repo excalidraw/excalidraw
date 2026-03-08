@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Hata"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Belleğe kaydet",
     "disk_details": "Sahne verilerini daha sonra içe aktarabileceğiniz bir dosyaya aktarın.",
