@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Napaka"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Shrani na disk",
     "disk_details": "Izvozite podatke scene v datoteko, iz katere jo lahko pozneje uvozite.",
