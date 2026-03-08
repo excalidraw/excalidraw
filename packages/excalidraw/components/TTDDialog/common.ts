@@ -1,4 +1,12 @@
-import { DEFAULT_EXPORT_PADDING, EDITOR_LS_KEYS } from "@excalidraw/common";
+import {
+  DEFAULT_EXPORT_PADDING,
+  EDITOR_LS_KEYS,
+  THEME,
+} from "@excalidraw/common";
+
+import { convertToExcalidrawElements } from "@excalidraw/element";
+
+import { exportToCanvas } from "@excalidraw/utils";
 
 import type {
   NonDeletedExcalidrawElement,
@@ -6,11 +14,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
-import {
-  convertToExcalidrawElements,
-  exportToCanvas,
-  THEME,
-} from "../../index";
 
 import type { MermaidToExcalidrawLibProps } from "./types";
 
