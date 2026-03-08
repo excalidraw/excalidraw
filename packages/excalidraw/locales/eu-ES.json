@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Errorea"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Gorde diskoan",
     "disk_details": "Esportatu eszenaren datuak geroago inportatu ahal izango duzun fitxategi batan.",
