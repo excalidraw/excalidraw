@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "هه‌ڵه‌ ڕوویدا"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "پاشەکەوت بکە لە دیسک",
     "disk_details": "هەناردەکردنی داتای دیمەنەکە بۆ فایلێک کە دواتر دەتوانیت لێی هاوردە بکەیت.",
