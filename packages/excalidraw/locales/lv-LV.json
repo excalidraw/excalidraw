@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Kļūda"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Saglabāt diskā",
     "disk_details": "Eksportēt ainas datus datnē, ko vēlāk varēsiet importēt.",
