@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "ချို့ယွင်းချက်"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "",
     "disk_details": "",
