@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Qátelik"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Diskke saqlaw",
     "disk_details": "",
