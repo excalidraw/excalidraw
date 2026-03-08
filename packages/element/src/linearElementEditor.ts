@@ -163,7 +163,6 @@ export class LinearElementEditor {
   public readonly lastBoundTextParameter: {
     segmentIndex: number;
     segmentParameter: number;
-    pathParameter: number;
   } | null;
 
   // @deprecated renamed to initialState because the data is used during linear
@@ -1121,7 +1120,6 @@ export class LinearElementEditor {
           const currentBoundTextParameter = element.boundTextParameter ?? {
             segmentIndex: 0,
             segmentParameter: 0.5,
-            pathParameter: 0.5,
           };
           // alter ret for the the case of dragging the bound text of an arrow element
           ret.linearElementEditor = {
@@ -1930,52 +1928,18 @@ export class LinearElementEditor {
   ): {
     segmentIndex: number;
     segmentParameter: number;
-    pathParameter: number;
   } {
     const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
-    const segments: Array<{
-      type: "line" | "curve";
-      index: number;
-      length: number;
-    }> = [];
-
-    if (lines.length > 0) {
-      lines.forEach((line, index) => {
-        segments.push({
-          type: "line",
-          index,
-          length: pointDistance(line[0], line[1]),
-        });
-      });
-    } else {
-      curves.forEach((curve, index) => {
-        segments.push({
-          type: "curve",
-          index,
-          length: curveLength(curve),
-        });
-      });
-    }
-
-    const totalLength = segments.reduce((sum, seg) => sum + seg.length, 0);
-    if (totalLength === 0) {
-      return {
-        segmentIndex: 0,
-        segmentParameter: 0.5,
-        pathParameter: 0.5,
-      };
-    }
+    const isLine = lines.length > 0;
+    const count = isLine ? lines.length : curves.length;
 
     let bestDistance = Infinity;
     let bestSegmentIndex = 0;
-    // let bestLocalParameter = 0;
 
-    for (let i = 0; i < segments.length; i++) {
-      const seg = segments[i];
-      const distance =
-        seg.type === "line"
-          ? distanceToLineSegment(point, lines[seg.index])
-          : curvePointDistance(curves[seg.index], point);
+    for (let i = 0; i < count; i++) {
+      const distance = isLine
+        ? distanceToLineSegment(point, lines[i])
+        : curvePointDistance(curves[i], point);
 
       if (distance < bestDistance) {
         bestDistance = distance;
@@ -1983,23 +1947,14 @@ export class LinearElementEditor {
       }
     }
 
-    let cumulativeLength = 0;
-    for (let i = 0; i < bestSegmentIndex; i++) {
-      cumulativeLength += segments[i].length;
-    }
-
-    const bestSegment = segments[bestSegmentIndex];
     // only calculate local parameter once we've found closest segment
-    const bestLocalParameter =
-      bestSegment.type === "line"
-        ? lineSegmentClosestParameter(point, lines[bestSegment.index])
-        : curveClosestParameter(curves[bestSegment.index], point);
-    cumulativeLength += bestSegment.length * bestLocalParameter;
+    const bestLocalParameter = isLine
+      ? lineSegmentClosestParameter(point, lines[bestSegmentIndex])
+      : curveClosestParameter(curves[bestSegmentIndex], point);
 
     return {
       segmentIndex: bestSegmentIndex,
       segmentParameter: bestLocalParameter,
-      pathParameter: clamp(cumulativeLength / totalLength, 0, 1),
     };
   }
 
@@ -2008,7 +1963,6 @@ export class LinearElementEditor {
     parameter: {
       segmentIndex: number;
       segmentParameter: number;
-      pathParameter: number;
     },
   ): GlobalPoint {
     const [lines, curves] = deconstructLinearOrFreeDrawElement(element);

@@ -6113,7 +6113,6 @@ class App extends React.Component<AppProps, AppState> {
         boundTextParameter = {
           segmentIndex,
           segmentParameter,
-          pathParameter: 0.5,
         };
       }
 
