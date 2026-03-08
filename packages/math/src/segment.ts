@@ -216,12 +216,3 @@ export function lineSegmentClosestParameter<
 
   return Math.max(0, Math.min(1, param));
 }
-
-export function pointOnLineSegmentAtParameter<
-  Point extends GlobalPoint | LocalPoint,
->(line: LineSegment<Point>, parameter: number): Point {
-  const [[x1, y1], [x2, y2]] = line;
-  const x = x1 + parameter * (x2 - x1);
-  const y = y1 + parameter * (y2 - y1);
-  return pointFrom<Point>(x, y);
-}
