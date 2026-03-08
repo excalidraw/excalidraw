@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Hiba"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Mentés lemezre",
     "disk_details": "Exportálja a jelenetadatokat egy fájlba, amelyből később importálhatja.",
