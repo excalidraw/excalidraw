@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "त्रुटि"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "डिस्क पर सुरक्षित करे",
     "disk_details": "दृश्य डेटा एक फ़ाइल में निर्यात करे, जहांसे आप उसे पुनः आयात कर सके",
