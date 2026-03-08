@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Ошибка"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Сохранить на диск",
     "disk_details": "Экспортировать данные сцены в файл, из которого можно импортировать позже.",
