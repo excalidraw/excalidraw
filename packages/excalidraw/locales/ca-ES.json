@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Error"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Desa al disc",
     "disk_details": "Exporta les dades de l'escena a un fitxer que després podreu importar.",
