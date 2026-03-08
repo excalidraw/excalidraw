@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "שגיאה"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "שמור לכונן",
     "disk_details": "ייצא מידע של הקנבאס לקובץ שתוכל לייבא אחר כך.",
