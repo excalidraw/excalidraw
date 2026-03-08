@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "ত্রুটি"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "",
     "disk_details": "",
