@@ -11644,8 +11644,7 @@ class App extends React.Component<AppProps, AppState> {
         // restore the fractional indices by mutating elements
         syncInvalidIndices(elements.concat(ret.data.elements));
 
-        // don't capture and only update the store snapshot for old elements,
-        // otherwise we would end up with duplicated fractional indices on undo
+        // Clear the current scene and record it as a single history entry
         this.store.scheduleMicroAction({
           action: CaptureUpdateAction.NEVER,
           elements,
@@ -11653,15 +11652,48 @@ class App extends React.Component<AppProps, AppState> {
         });
 
         this.setState({ isLoading: true });
-        this.syncActionResult({
-          ...ret.data,
-          appState: {
-            ...(ret.data.appState || this.state),
-            isLoading: false,
-          },
-          replaceFiles: true,
-          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        
+        // Instead of syncActionResult, we need to:
+        // 1. Clear the current scene
+        // 2. Insert the new elements
+        // 3. Record it as a single undoable action
+        
+        // First, mark all current elements as deleted
+        const deletedElements = elements.map(el => 
+          newElementWith(el, { isDeleted: true })
+        );
+        
+        // Then combine with new elements
+        const allElements = [
+          ...deletedElements,
+          ...ret.data.elements,
+        ];
+        
+        // Update the scene
+        this.scene.replaceAllElements(allElements);
+        
+        // Update app state
+        const newAppState = {
+          ...(ret.data.appState || this.state),
+          isLoading: false,
+        };
+        
+        // Update files
+        if (ret.data.files) {
+          this.addMissingFiles(ret.data.files, true);
+          this.addNewImagesToImageCache();
+        }
+        
+        // Record this as a single undoable action
+        this.store.scheduleMicroAction({
+          action: CaptureUpdateAction.IMMEDIATELY,
+          elements: allElements,
+          appState: getObservedAppState(newAppState),
         });
+        
+        // Update the UI
+        this.setState(newAppState);
+        
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library
           .updateLibrary({
