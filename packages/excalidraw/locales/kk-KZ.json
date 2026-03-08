@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Қате"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "",
     "disk_details": "Сахна деректерін кейін қайта импорттауға болатын файлға экспорттаңыз.",
