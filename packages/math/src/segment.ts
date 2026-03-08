@@ -5,7 +5,6 @@ import {
   pointCenter,
   pointFromVector,
   pointRotateRads,
-  pointFrom,
 } from "./point";
 import { PRECISION } from "./utils";
 import {
