@@ -43,7 +43,7 @@
   "overrides": [
     {
       "files": ["packages/excalidraw/**/*.{ts,tsx}"],
-      "excludedFiles": ["packages/excalidraw/**/*.test.{ts,tsx}"],
+      "excludedFiles": ["packages/excalidraw/**/*.test.{ts,tsx}", "packages/excalidraw/**/*.test.*.{ts,tsx}"],
       "rules": {
         "@typescript-eslint/no-restricted-imports": [
           "error",
@@ -55,18 +55,7 @@
                 "allowTypeImports": true
               }
             ],
-            "paths": [
-              ".",
-              "..",
-              "../..",
-              "../../..",
-              "../../../..",
-              "../../../../..",
-              "../index",
-              "../../index",
-              "../../../index",
-              "../../../../index"
-            ]
+            "paths": [".", "..", "../..", "../../..", "../../../..", "../../../../..", "../index", "../../index", "../../../index", "../../../../index"]
           }
         ]
       }

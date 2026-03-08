@@ -166,6 +166,30 @@ export const actionChangeExportEmbedScene = register<
 
 let onExportInProgress = false;
 
+const onProgressToast = (
+  app: AppClassProperties,
+  progress: {
+    message?: OnExportProgress["message"];
+    progress?: number | null;
+  },
+) => {
+  const message = progress.message ?? t("progressDialog.defaultMessage");
+  app.setAppState({
+    toast: {
+      message:
+        progress.progress != null ? (
+          <>
+            {message}
+            <Toast.ProgressBar progress={progress.progress} />
+          </>
+        ) : (
+          message
+        ),
+      duration: Infinity,
+    },
+  });
+};
+
 /** awaits host app's onExport result, and renders progress to the UI */
 async function handleOnExportResult(
   onExportResult: ReturnType<NonNullable<ExcalidrawProps["onExport"]>>,
@@ -174,41 +198,23 @@ async function handleOnExportResult(
     app: AppClassProperties;
   },
 ): Promise<void> {
-  const onProgress = (progress: {
-    message?: OnExportProgress["message"];
-    progress?: number | null;
-  }) => {
-    const message = progress.message ?? t("progressDialog.defaultMessage");
-    opts.app.setAppState({
-      toast: {
-        message:
-          progress.progress != null ? (
-            <>
-              {message}
-              <Toast.ProgressBar progress={progress.progress} />
-            </>
-          ) : (
-            message
-          ),
-        duration: Infinity,
-      },
-    });
-  };
+  if (opts.app.state.isLoading) {
+    onProgressToast(opts.app, { progress: null });
+    await opts.app.onStateChange({ predicate: (state) => !state.isLoading });
+  }
 
   if (
     onExportResult != null &&
     typeof onExportResult === "object" &&
     Symbol.asyncIterator in onExportResult
   ) {
-    onProgress({ progress: null });
-
     for await (const value of onExportResult) {
       if (opts.signal.aborted) {
         onExportResult.return();
         return;
       }
       if (value.type === "progress") {
-        onProgress({
+        onProgressToast(opts.app, {
           message: value.message,
           progress: value.progress ?? null,
         });
@@ -222,7 +228,7 @@ async function handleOnExportResult(
   }
 
   if (onExportResult instanceof Promise) {
-    onProgress({ progress: null });
+    onProgressToast(opts.app, { progress: null });
     await onExportResult;
   }
 }

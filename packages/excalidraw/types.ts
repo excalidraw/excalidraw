@@ -562,11 +562,26 @@ export interface ExcalidrawProps {
     appState: AppState,
     files: BinaryFiles,
   ) => void;
+  /**
+   * note: only subscribes if the props.onIncrement is defined on initial render
+   */
   onIncrement?: (event: DurableIncrement | EphemeralIncrement) => void;
   initialData?:
     | (() => MaybePromise<ExcalidrawInitialDataState | null>)
     | MaybePromise<ExcalidrawInitialDataState | null>;
-  excalidrawAPI?: (api: ExcalidrawImperativeAPI) => void;
+  /**
+   * Invoked as soon as the Excalidraw API is available
+   * NOTE editor is not yet mounted, and state is not yet initialized
+   */
+  onExcalidrawAPI?: (api: ExcalidrawImperativeAPI) => void;
+  /**
+   * Invoked once the editor root is mounted.
+   */
+  onMount?: (payload: ExcalidrawMountPayload) => void;
+  /**
+   * Invoked once the initial scene is loaded.
+   */
+  onInitialize?: (api: ExcalidrawImperativeAPI) => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
     pointer: { x: number; y: number; tool: "pointer" | "laser" };
@@ -755,6 +770,7 @@ export type AppProps = Merge<
 export type AppClassProperties = {
   props: AppProps;
   state: AppState;
+  api: App["api"];
   sessionExportThemeOverride: App["sessionExportThemeOverride"];
   interactiveCanvas: HTMLCanvasElement | null;
   /** static canvas */
@@ -800,6 +816,8 @@ export type AppClassProperties = {
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
   onPointerDownEmitter: App["onPointerDownEmitter"];
+  onEvent: App["onEvent"];
+  onStateChange: App["onStateChange"];
 
   lastPointerMoveCoords: App["lastPointerMoveCoords"];
   bindModeHandler: App["bindModeHandler"];
@@ -877,6 +895,20 @@ export type PointerDownState = Readonly<{
 
 export type UnsubscribeCallback = () => void;
 
+export type ExcalidrawMountPayload = {
+  excalidrawAPI: ExcalidrawImperativeAPI;
+  /*
+   *Excalidraw container.
+   * should never be null, but just to be safe
+   */
+  container: HTMLDivElement | null;
+};
+
+export type ExcalidrawImperativeAPIEventMap = {
+  "editor:mount": [payload: ExcalidrawMountPayload];
+  "editor:initialize": [api: ExcalidrawImperativeAPI];
+};
+
 export interface ExcalidrawImperativeAPI {
   updateScene: InstanceType<typeof App>["updateScene"];
   applyDeltas: InstanceType<typeof App>["applyDeltas"];
@@ -943,6 +975,8 @@ export interface ExcalidrawImperativeAPI {
   onUserFollow: (
     callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
+  onStateChange: InstanceType<typeof App>["onStateChange"];
+  onEvent: InstanceType<typeof App>["onEvent"];
 }
 
 export type FrameNameBounds = {
