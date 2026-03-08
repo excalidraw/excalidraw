@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "エラー"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "ディスクに保存",
     "disk_details": "シーンデータを後からインポートできるファイルにエクスポートします。",
