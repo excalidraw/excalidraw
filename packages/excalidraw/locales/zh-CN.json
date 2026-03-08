@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "错误"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "保存到本地",
     "disk_details": "将画布数据导出为文件，以便以后导入",
