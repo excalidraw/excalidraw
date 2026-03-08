@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "දෝෂ සංවාද මාතෘකාව"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "තැටි මාතෘකාව",
     "disk_details": "තැටි විස්තර",
