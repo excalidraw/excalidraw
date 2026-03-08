@@ -362,7 +362,6 @@ export type ExcalidrawArrowElement = ExcalidrawLinearElement &
       // index of the segment the text is bound to, starting with 0
       segmentIndex: number;
       segmentParameter: number;
-      pathParameter: number;
     };
   }>;
 
