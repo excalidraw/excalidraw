@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Lỗi"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Lưu về máy",
     "disk_details": "",
