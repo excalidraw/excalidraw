@@ -403,6 +403,10 @@
   "errorDialog": {
     "title": "Error"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Guardar en disco",
     "disk_details": "Exportar los datos de la escena a un archivo desde el cual pueda importar más tarde.",
