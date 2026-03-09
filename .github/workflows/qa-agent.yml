@@ -1,0 +1,60 @@
+name: UI QA Agent Pipeline
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  ui-qa-validation:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Checkout PR Code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+          
+      - name: Install Excalidraw Dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Start Excalidraw Server
+        run: yarn start &
+        env:
+          VITE_APP_PORT: 3000
+          BROWSER: none
+          
+      - name: Wait for Excalidraw to Boot
+        run: npx wait-on http://localhost:3000 --timeout 120000
+        
+      - name: Setup QA Agent
+        working-directory: ./scripts/qa-agent
+        run: npm install
+        
+      - name: Install Playwright Browsers
+        working-directory: ./scripts/qa-agent
+        run: npx playwright install --with-deps chromium
+        
+      - name: Run QA Validation Agent
+        working-directory: ./scripts/qa-agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          APP_URL: http://localhost:3000
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "OPENAI_API_KEY is not set. Skipping QA validation."
+            exit 0
+          fi
+          npx ts-node index.ts
+        
+      - name: Upload Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-agent-screenshots
+          path: scripts/qa-agent/screenshots/
+          retention-days: 7
