@@ -34,6 +34,7 @@ import {
   isPathALoop,
   moveArrowAboveBindable,
   projectFixedPointOntoDiagonal,
+  getBoundTextPathProps,
   type Store,
 } from "@excalidraw/element";
 
@@ -160,7 +161,7 @@ export class LinearElementEditor {
   public readonly elbowed: boolean;
   public readonly customLineAngle: number | null;
   public readonly isEditing: boolean;
-  public readonly lastBoundTextParameter: {
+  public readonly lastBoundTextPathProps: {
     segmentIndex: number;
     segmentParameter: number;
   } | null;
@@ -211,7 +212,7 @@ export class LinearElementEditor {
     this.elbowed = isElbowArrow(element) && element.elbowed;
     this.customLineAngle = null;
     this.isEditing = isEditing;
-    this.lastBoundTextParameter = null;
+    this.lastBoundTextPathProps = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -1116,16 +1117,15 @@ export class LinearElementEditor {
           scenePointer.y <= textY + boundTextElement.height
         ) {
           ret.hitElement = element;
-          // console.log("bound text 🎯", element);
-          const currentBoundTextParameter = element.boundTextParameter ?? {
-            segmentIndex: 0,
-            segmentParameter: 0.5,
-          };
+          const currentBoundTextPathProps = getBoundTextPathProps(
+            boundTextElement,
+            element,
+          );
           // alter ret for the the case of dragging the bound text of an arrow element
           ret.linearElementEditor = {
             ...linearElementEditor,
             isDragging: true,
-            lastBoundTextParameter: currentBoundTextParameter,
+            lastBoundTextPathProps: currentBoundTextPathProps,
             initialState: {
               prevSelectedPointsIndices:
                 linearElementEditor.selectedPointsIndices,
@@ -1889,20 +1889,20 @@ export class LinearElementEditor {
       linearElementEditor.elementId,
       elementsMap,
     );
-    if (!element || !isArrowElement(element)) {
+    const boundTextElement = getBoundTextElement(element, elementsMap);
+    if (!element || !isArrowElement(element) || !boundTextElement) {
       return null;
     }
     const pointerGlobalPoint = pointFrom<GlobalPoint>(pointerX, pointerY);
-    const boundTextParameter =
-      LinearElementEditor.projectPointOnLinearElementPath(
-        element,
-        pointerGlobalPoint,
-      );
-    scene.mutateElement(element, {
-      boundTextParameter,
+    const pathProps = LinearElementEditor.projectPointOnLinearElementPath(
+      element,
+      pointerGlobalPoint,
+    );
+    scene.mutateElement(boundTextElement, {
+      pathProps,
     });
 
-    const boundTextElement = getBoundTextElement(element, elementsMap);
+    // const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
       const { x: textX, y: textY } = this.getBoundTextElementPosition(
         element,
@@ -1918,18 +1918,18 @@ export class LinearElementEditor {
     return {
       ...linearElementEditor,
       isDragging: true,
-      lastBoundTextParameter: boundTextParameter,
+      lastBoundTextPathProps: pathProps,
     };
   }
 
   static projectPointOnLinearElementPath(
-    element: NonDeleted<ExcalidrawLinearElement>,
+    container: NonDeleted<ExcalidrawLinearElement>,
     point: GlobalPoint,
   ): {
     segmentIndex: number;
     segmentParameter: number;
   } {
-    const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
+    const [lines, curves] = deconstructLinearOrFreeDrawElement(container);
     const isLine = lines.length > 0;
     const count = isLine ? lines.length : curves.length;
 
@@ -1958,20 +1958,20 @@ export class LinearElementEditor {
     };
   }
 
-  static getPointAtParameter(
-    element: NonDeleted<ExcalidrawLinearElement>,
-    parameter: {
+  static getPointAtPathProps(
+    container: NonDeleted<ExcalidrawLinearElement>,
+    pathProps: {
       segmentIndex: number;
       segmentParameter: number;
     },
   ): GlobalPoint {
-    const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
+    const [lines, curves] = deconstructLinearOrFreeDrawElement(container);
     const idx = clamp(
-      parameter.segmentIndex,
+      pathProps.segmentIndex,
       0,
       lines.length > 0 ? lines.length - 1 : curves.length - 1,
     );
-    const t = clamp(parameter.segmentParameter, 0, 1);
+    const t = clamp(pathProps.segmentParameter, 0, 1);
 
     if (lines.length > 0) {
       const segment = lines[idx];
@@ -1996,10 +1996,10 @@ export class LinearElementEditor {
       mutateElement(boundTextElement, elementsMap, { isDeleted: true });
     }
 
-    if (isArrowElement(element) && element.boundTextParameter) {
-      const pathPoint = LinearElementEditor.getPointAtParameter(
+    if (isArrowElement(element) && boundTextElement.pathProps) {
+      const pathPoint = LinearElementEditor.getPointAtPathProps(
         element,
-        element.boundTextParameter,
+        boundTextElement.pathProps,
       );
 
       return {

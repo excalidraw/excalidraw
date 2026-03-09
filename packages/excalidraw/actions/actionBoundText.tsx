@@ -87,6 +87,7 @@ export const actionUnbindText = register({
           text: boundTextElement.originalText,
           x,
           y,
+          ...(isArrowElement(element) && { pathProps: null }),
         });
         app.scene.mutateElement(element, {
           boundElements: element.boundElements?.filter(
