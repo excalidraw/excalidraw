@@ -123,5 +123,29 @@ Last but not least, we're thankful to these companies for offering their service
 
 [![Vercel](./.github/assets/vercel.svg)](https://vercel.com) [![Sentry](./.github/assets/sentry.svg)](https://sentry.io) [![Crowdin](./.github/assets/crowdin.svg)](https://crowdin.com)
 
-# Test
-Test
+## QA Agent Write-up & Tradeoffs
+
+The UI QA Agent evaluates Excalidraw functionality by parsing Pull Request descriptions for `QA_TESTING` blocks and automatically running browser tests.
+
+### Architecture
+- **Parser**: Extracts Preconditions, Steps, and Expected Results from the PR body.
+- **Executor**: Uses a headless browser (Playwright) to perform actions on the application canvas based on generated steps, simulating user interactions based on predefined test cases map. It captures screenshots of the final state or on failure.
+- **Reporter**: Compiles the results (Pass/Fail) and posts a Markdown comment back to the GitHub PR.
+
+### Tradeoffs & Considerations
+1. **Mocked Vision capabilities vs Real LLM**: Currently, the agent uses a mocked fallback for LLM execution commands and vision validation to demonstrate the flow. A production setup would use GPT-4V, allowing it to interpret canvas contents dynamically, though this can introduce latency and cost.
+2. **Determinism vs Flexibility**: LLM interpretation of natural language steps can result in flaky tests if the UI changes unexpectedly. Imposing a strict format (`QA_TESTING` block) mitigates hallucination and increases determinism.
+3. **Canvas Testing Constraints**: Because Excalidraw renders elements on a `<canvas>`, standard DOM interactions are ineffective. The agent mitigates this by relying on robust keyboard shortcuts and coordinate-based mouse operations (`mouse_click`, `mouse_drag`).
+
+### How to Run Locally
+```bash
+cd scripts/qa-agent
+npm install
+
+export APP_URL="http://localhost:3001"
+export GITHUB_TOKEN="<dummy_token>"
+export OPENAI_API_KEY="<dummy_key>"
+export MOCK_PR_BODY=$(cat mock-pr.md)
+
+npx ts-node index.ts
+```

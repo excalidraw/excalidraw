@@ -1,0 +1,5 @@
+mock-pr.md
+screenshots/
+*.js
+!jest.config.js
+!eslint.config.js
