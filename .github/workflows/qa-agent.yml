@@ -24,10 +24,11 @@ jobs:
       - name: Start Excalidraw Server
         run: yarn start &
         env:
-          PORT: 3000
+          VITE_APP_PORT: 3000
+          BROWSER: none
           
       - name: Wait for Excalidraw to Boot
-        run: npx wait-on http://localhost:3000 --timeout 60000
+        run: npx wait-on http://localhost:3000 --timeout 120000
         
       - name: Setup QA Agent
         working-directory: ./scripts/qa-agent
