@@ -178,8 +178,8 @@
     "shapeSwitch": "切換形狀",
     "preferences": "偏好設定",
     "preferences_toolLock": "鎖定工具",
-    "arrowBinding": "",
-    "midpointSnapping": ""
+    "arrowBinding": "箭頭連結",
+    "midpointSnapping": "貼齊中點"
   },
   "elementLink": {
     "title": "連結至物件",
@@ -404,8 +404,8 @@
     "title": "錯誤"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "儲存中",
+    "defaultMessage": "正在準備儲存..."
   },
   "exportDialog": {
     "disk_title": "儲存至硬碟",
@@ -629,7 +629,7 @@
     "preview": "預覽",
     "label": "Mermaid",
     "inputPlaceholder": "在這裡編寫 Mermaid 定義...",
-    "autoFixAvailable": ""
+    "autoFixAvailable": "自動修正可用"
   },
   "ttd": {
     "error": "錯誤！"
