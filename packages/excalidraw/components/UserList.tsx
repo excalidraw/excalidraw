@@ -179,12 +179,36 @@ export const UserList = React.memo(
 
     const [maxAvatars, setMaxAvatars] = React.useState(DEFAULT_MAX_AVATARS);
 
-    const firstNCollaborators = uniqueCollaboratorsArray.slice(
-      0,
-      maxAvatars - 1,
+    const hasOtherCollaborators = uniqueCollaboratorsArray.some(
+      (c) => !c.isCurrentUser,
     );
+    const effectiveCurrentUserMenu =
+      currentUserMenu && hasOtherCollaborators ? currentUserMenu : null;
 
-    const hasOverflow = uniqueCollaboratorsArray.length > maxAvatars - 1;
+    const slotsForAvatars = maxAvatars - 1;
+
+    const firstNCollaborators = (() => {
+      if (!effectiveCurrentUserMenu) {
+        return uniqueCollaboratorsArray.slice(0, slotsForAvatars);
+      }
+      // Ensure current user is always last (rightmost) and always visible
+      const currentUser = uniqueCollaboratorsArray.find(
+        (c) => c.isCurrentUser,
+      );
+      if (!currentUser) {
+        return uniqueCollaboratorsArray.slice(0, slotsForAvatars);
+      }
+      const others = uniqueCollaboratorsArray.filter(
+        (c) => !c.isCurrentUser,
+      );
+      return [
+        ...others.slice(0, Math.max(0, slotsForAvatars - 1)),
+        currentUser,
+      ];
+    })();
+
+    const hasOverflow =
+      uniqueCollaboratorsArray.length > firstNCollaborators.length;
 
     const firstNAvatarsJSX = firstNCollaborators.map((collaborator) => {
       const avatarJSX = renderCollaborator({
@@ -192,13 +216,13 @@ export const UserList = React.memo(
         collaborator,
         socketId: collaborator.socketId,
         shouldWrapWithTooltip:
-          !collaborator.isCurrentUser || !currentUserMenu || hasOverflow,
+          !collaborator.isCurrentUser || !effectiveCurrentUserMenu || hasOverflow,
         isBeingFollowed: collaborator.socketId === userToFollow,
       });
 
       // Wrap current user's avatar in a pill with chevron + popover
       // only when the "+N" overflow is not shown (menu goes there instead)
-      if (collaborator.isCurrentUser && currentUserMenu && !hasOverflow) {
+      if (collaborator.isCurrentUser && effectiveCurrentUserMenu && !hasOverflow) {
         return (
           <Popover.Root key={collaborator.socketId}>
             <Popover.Trigger asChild>
@@ -214,11 +238,11 @@ export const UserList = React.memo(
               sideOffset={10}
               className="dropdown-menu"
             >
-              <Popover.Close asChild>
-                <Island padding={2} className="dropdown-menu-container">
-                  {currentUserMenu}
-                </Island>
-              </Popover.Close>
+              <Island padding={2} className="dropdown-menu-container">
+                <Popover.Close asChild>
+                  <div>{effectiveCurrentUserMenu}</div>
+                </Popover.Close>
+              </Island>
             </Popover.Content>
           </Popover.Root>
         );
@@ -247,10 +271,12 @@ export const UserList = React.memo(
         >
           {firstNAvatarsJSX}
 
-          {uniqueCollaboratorsArray.length > maxAvatars - 1 && (
+          {hasOverflow && (
             <Popover.Root>
               <Popover.Trigger className="UserList__more">
-                +{uniqueCollaboratorsArray.length - maxAvatars + 1}
+                +
+                {uniqueCollaboratorsArray.length -
+                  firstNCollaborators.length}
               </Popover.Trigger>
               <Popover.Content
                 style={{
@@ -290,12 +316,12 @@ export const UserList = React.memo(
                         ]
                       : []}
                   </ScrollableList>
-                  {currentUserMenu && (
+                  {effectiveCurrentUserMenu && (
                     <>
                       <div className="UserList__more-menu-divider" />
                       <Popover.Close asChild>
                         <div className="dropdown-menu">
-                          {currentUserMenu}
+                          {effectiveCurrentUserMenu}
                         </div>
                       </Popover.Close>
                     </>

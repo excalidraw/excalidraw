@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 import { DEFAULT_UI_OPTIONS, isShallowEqual } from "@excalidraw/common";
 
