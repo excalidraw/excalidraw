@@ -684,6 +684,7 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
   lastPointerMoveEvent: PointerEvent | null = null;
+  _diagPointerMoveLogged = false;
   /** current frame pointer cords */
   lastPointerMoveCoords: { x: number; y: number } | null = null;
   /** previous frame pointer coords */
@@ -3006,6 +3007,77 @@ class App extends React.Component<AppProps, AppState> {
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
+    // [DIAG] Capture-phase listener to detect if pointerdown is intercepted
+    // before reaching our React handler. Patches stopPropagation/
+    // stopImmediatePropagation so we can detect if another listener kills
+    // the event before it reaches the canvas.
+    document.addEventListener(
+      "pointerdown",
+      (e) => {
+        const target = e.target as HTMLElement | null;
+        if (
+          target?.closest(".excalidraw") &&
+          (target.tagName === "CANVAS" || target.closest("canvas"))
+        ) {
+          console.info(
+            "[DIAG] document capture pointerdown on canvas, tool:",
+            this.state.activeTool?.type,
+            {
+              defaultPrevented: e.defaultPrevented,
+              cancelable: e.cancelable,
+              isTrusted: e.isTrusted,
+              target: target.tagName,
+              pointerType: e.pointerType,
+              button: e.button,
+            },
+          );
+
+          // Patch to detect stopPropagation/stopImmediatePropagation
+          const origStop = e.stopPropagation.bind(e);
+          const origStopImm = e.stopImmediatePropagation.bind(e);
+          const origPD = e.preventDefault.bind(e);
+          e.stopPropagation = () => {
+            console.warn(
+              "[DIAG] capture: pointerdown stopPropagation called!",
+              new Error().stack,
+            );
+            origStop();
+          };
+          e.stopImmediatePropagation = () => {
+            console.warn(
+              "[DIAG] capture: pointerdown stopImmediatePropagation called!",
+              new Error().stack,
+            );
+            origStopImm();
+          };
+          e.preventDefault = () => {
+            console.warn(
+              "[DIAG] capture: pointerdown preventDefault called!",
+              new Error().stack,
+            );
+            origPD();
+          };
+        }
+      },
+      true, // capture phase
+    );
+    // [DIAG] Bubble-phase listener to confirm event wasn't stopped
+    document.addEventListener(
+      "pointerdown",
+      (e) => {
+        const target = e.target as HTMLElement | null;
+        if (
+          target?.closest(".excalidraw") &&
+          (target.tagName === "CANVAS" || target.closest("canvas"))
+        ) {
+          console.info(
+            "[DIAG] document bubble pointerdown reached (not stopped)",
+          );
+        }
+      },
+      false, // bubble phase
+    );
+
     if (isTestEnv() || isDevEnv()) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
@@ -3500,8 +3572,14 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private onTouchStart = (event: TouchEvent) => {
+    console.info("[DIAG] touchStart", {
+      touches: event.touches.length,
+      defaultPrevented: event.defaultPrevented,
+      isIOS,
+    });
     // fix for Apple Pencil Scribble (do not prevent for other devices)
     if (isIOS) {
+      console.info("[DIAG] touchStart: calling preventDefault (isIOS)");
       event.preventDefault();
     }
 
@@ -6416,6 +6494,20 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    if (!this._diagPointerMoveLogged) {
+      console.info("[DIAG] pointerMove (first)", {
+        pointerType: event.pointerType,
+        isPanning,
+        isHoldingSpace,
+        viewModeEnabled: this.state.viewModeEnabled,
+        activeTool: this.state.activeTool.type,
+        cursorButton: this.state.cursorButton,
+      });
+      this._diagPointerMoveLogged = true;
+      setTimeout(() => {
+        this._diagPointerMoveLogged = false;
+      }, 2000);
+    }
     this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
     this.lastPointerMoveEvent = event.nativeEvent;
     const scenePointer = viewportCoordsToSceneCoords(event, this.state);
@@ -7196,6 +7288,56 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    console.info("[DIAG] pointerDown", {
+      pointerType: event.pointerType,
+      button: event.button,
+      isPanning,
+      isHoldingSpace,
+      viewModeEnabled: this.state.viewModeEnabled,
+      penMode: this.state.penMode,
+      activeTool: this.state.activeTool.type,
+      editingTextElement: !!this.state.editingTextElement,
+      openDialog: this.state.openDialog?.name ?? null,
+      gesturePointers: gesture.pointers.size,
+      newElement: this.state.newElement?.type ?? null,
+      target: (event.target as HTMLElement)?.tagName,
+      defaultPrevented: event.nativeEvent.defaultPrevented,
+      cancelable: event.nativeEvent.cancelable,
+      isTrusted: event.nativeEvent.isTrusted,
+      hasSetPointerCapture: "setPointerCapture" in HTMLElement.prototype,
+      composedPath: event.nativeEvent
+        .composedPath()
+        .slice(0, 3)
+        .map((el) => (el as HTMLElement).tagName || el.constructor?.name),
+    });
+
+    // Patch nativeEvent to detect if something calls preventDefault/stopPropagation
+    const nativeEvt = event.nativeEvent;
+    const origPreventDefault = nativeEvt.preventDefault.bind(nativeEvt);
+    const origStopProp = nativeEvt.stopPropagation.bind(nativeEvt);
+    const origStopImmediate =
+      nativeEvt.stopImmediatePropagation.bind(nativeEvt);
+    nativeEvt.preventDefault = () => {
+      console.warn(
+        "[DIAG] pointerDown preventDefault called!",
+        new Error().stack,
+      );
+      origPreventDefault();
+    };
+    nativeEvt.stopPropagation = () => {
+      console.warn(
+        "[DIAG] pointerDown stopPropagation called!",
+        new Error().stack,
+      );
+      origStopProp();
+    };
+    nativeEvt.stopImmediatePropagation = () => {
+      console.warn(
+        "[DIAG] pointerDown stopImmediatePropagation called!",
+        new Error().stack,
+      );
+      origStopImmediate();
+    };
     // If Ctrl is not held, ensure isBindingEnabled reflects the user preference.
     if (!event.ctrlKey) {
       const preferenceEnabled = this.state.bindingPreference === "enabled";
@@ -7330,6 +7472,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (isPanning) {
+      console.info("[DIAG] pointerDown EXIT: isPanning");
       return;
     }
 
@@ -7339,6 +7482,7 @@ class App extends React.Component<AppProps, AppState> {
     // else it will send pointer state & laser pointer events in collab when
     // panning
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+      console.info("[DIAG] pointerDown EXIT: panUsingWheelOrSpaceDrag");
       return;
     }
 
@@ -7403,11 +7547,16 @@ class App extends React.Component<AppProps, AppState> {
       event.button !== POINTER_BUTTON.TOUCH &&
       event.button !== POINTER_BUTTON.ERASER
     ) {
+      console.info("[DIAG] pointerDown EXIT: unhandled button", event.button);
       return;
     }
 
     // don't select while panning
     if (gesture.pointers.size > 1) {
+      console.info(
+        "[DIAG] pointerDown EXIT: multi-pointer gesture",
+        gesture.pointers.size,
+      );
       return;
     }
 
@@ -7420,12 +7569,16 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     if (this.handleDraggingScrollBar(event, pointerDownState)) {
+      console.info("[DIAG] pointerDown EXIT: dragging scrollbar");
       return;
     }
 
     this.clearSelectionIfNotUsingSelection();
 
     if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
+      console.info(
+        "[DIAG] pointerDown EXIT: handled by selectionOnPointerDown",
+      );
       return;
     }
 
@@ -7438,6 +7591,11 @@ class App extends React.Component<AppProps, AppState> {
       this.state.activeTool.type === "image";
 
     if (!allowOnPointerDown) {
+      console.info("[DIAG] pointerDown EXIT: penMode blocking touch", {
+        penMode: this.state.penMode,
+        pointerType: event.pointerType,
+        activeTool: this.state.activeTool.type,
+      });
       return;
     }
 
@@ -7625,6 +7783,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser") {
+      console.info("[DIAG] pointerDown: registering move/up listeners");
       window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.addEventListener(EVENT.POINTER_UP, onPointerUp);
       window.addEventListener(EVENT.KEYDOWN, onKeyDown);
@@ -7633,12 +7792,20 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.eventListeners.onUp = onPointerUp;
       pointerDownState.eventListeners.onKeyUp = onKeyUp;
       pointerDownState.eventListeners.onKeyDown = onKeyDown;
+    } else {
+      console.info(
+        "[DIAG] pointerDown: NOT registering listeners (viewMode + non-laser)",
+      );
     }
   };
 
   private handleCanvasPointerUp = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    console.info("[DIAG] pointerUp", {
+      pointerType: event.pointerType,
+      button: event.button,
+    });
     if (getFeatureFlag("COMPLEX_BINDINGS")) {
       this.resetDelayedBindMode();
     }
