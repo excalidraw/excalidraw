@@ -404,8 +404,8 @@
     "title": "Eroare"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "În curs de salvare",
+    "defaultMessage": "Se pregătește salvarea..."
   },
   "exportDialog": {
     "disk_title": "Salvare pe disc",
