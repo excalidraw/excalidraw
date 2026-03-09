@@ -470,71 +470,9 @@ $fullScreenModalBreakpoint: 600px;
     }
   }
 
-  .ttd-dialog-panel-button {
-    &.excalidraw-button {
-      font-family: inherit;
-      font-weight: 600;
-      height: 2.5rem;
-
-      font-size: 12px;
-      color: #fff;
-      background-color: var(--color-primary);
-      width: 100%;
-
-      &:hover {
-        background-color: var(--color-primary-darker);
-      }
-      &:active {
-        background-color: var(--color-primary-darkest);
-      }
-
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-
-        &:hover {
-          background-color: var(--color-primary);
-        }
-      }
-
-      @media screen and (min-width: $verticalBreakpoint) {
-        width: auto;
-        min-width: 7.5rem;
-      }
-
-      @at-root .excalidraw.theme--dark#{&} {
-        color: var(--color-gray-100);
-      }
-    }
-
-    & {
-      position: relative;
-    }
-
-    div {
-      display: contents;
-
-      &.invisible {
-        visibility: hidden;
-      }
-
-      &.Spinner {
-        display: flex !important;
-        position: absolute;
-        inset: 0;
-
-        --spinner-color: white;
-
-        @at-root .excalidraw.theme--dark#{&} {
-          --spinner-color: var(--color-gray-100);
-        }
-      }
-
-      span {
-        padding-left: 0.5rem;
-        display: flex;
-      }
-    }
+  // move the icon to the right
+  .ttd-dialog-panel-button .ExcButton__icon {
+    order: 2;
   }
 
   .ttd-dialog-submit-shortcut {
