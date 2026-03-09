@@ -258,6 +258,7 @@ import {
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isNonDeletedElement,
+  getBoundTextPathProps,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6874,25 +6875,25 @@ class App extends React.Component<AppProps, AppState> {
       });
 
     if (!existingTextElement && shouldBindToContainer && container) {
-      let boundTextParameter;
+      let boundTextPathProps;
       // default positioning for bound text on arrows
       if (isArrowElement(container)) {
-        let segmentIndex;
-        let segmentParameter;
-        if (container.elbowed) {
-          segmentIndex = container.points.length - 2;
-          segmentParameter = 0.5;
-        } else {
-          segmentIndex =
-            container.points.length % 2 === 1
-              ? Math.floor(container.points.length / 2)
-              : container.points.length / 2 - 1;
-          segmentParameter = container.points.length % 2 === 1 ? 0.0 : 0.5;
-        }
-        boundTextParameter = {
-          segmentIndex,
-          segmentParameter,
-        };
+        // let segmentIndex;
+        // let segmentParameter;
+        // if (container.elbowed) {
+        //   segmentIndex = container.points.length - 2;
+        //   segmentParameter = 0.5;
+        // } else {
+        //   segmentIndex =
+        //     container.points.length % 2 === 1
+        //       ? Math.floor(container.points.length / 2)
+        //       : container.points.length / 2 - 1;
+        //   segmentParameter = container.points.length % 2 === 1 ? 0.0 : 0.5;
+        // }
+        boundTextPathProps = getBoundTextPathProps(element, container);
+        this.scene.mutateElement(element, {
+          pathProps: boundTextPathProps,
+        });
       }
 
       this.scene.mutateElement(container, {
@@ -6900,7 +6901,6 @@ class App extends React.Component<AppProps, AppState> {
           type: "text",
           id: element.id,
         }),
-        ...(isArrowElement(container) && boundTextParameter),
       });
     }
     this.setState({ editingTextElement: element });
@@ -10661,7 +10661,7 @@ class App extends React.Component<AppProps, AppState> {
         // Here is where we could potentially account for dragging of bound text elements
         if (
           linearElementEditor.isDragging &&
-          linearElementEditor.lastBoundTextParameter
+          linearElementEditor.lastBoundTextPathProps
         ) {
           const updatedEditor = LinearElementEditor.handleBoundTextDragging(
             linearElementEditor,
@@ -11591,7 +11591,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.selectedLinearElement?.isEditing &&
         !this.state.newElement &&
         this.state.selectedLinearElement.draggedFocusPointBinding === null &&
-        !this.state.selectedLinearElement.lastBoundTextParameter
+        !this.state.selectedLinearElement.lastBoundTextPathProps
       ) {
         if (
           !pointerDownState.boxSelection.hasOccurred &&
@@ -11648,11 +11648,11 @@ class App extends React.Component<AppProps, AppState> {
               },
             },
           });
-        } else if (this.state.selectedLinearElement.lastBoundTextParameter) {
+        } else if (this.state.selectedLinearElement.lastBoundTextPathProps) {
           this.setState({
             selectedLinearElement: {
               ...this.state.selectedLinearElement,
-              lastBoundTextParameter: null,
+              lastBoundTextPathProps: null,
               isDragging: false,
             },
           });

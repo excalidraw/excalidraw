@@ -254,6 +254,13 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      *  with font size (using `getLineHeightInPx` helper).
      */
     lineHeight: number & { _brand: "unitlessLineHeight" };
+    /**
+     * Positional properties for text bound to a linear element, such as an arrow.
+     * */
+    pathProps?: {
+      segmentIndex: number;
+      segmentParameter: number;
+    } | null;
   }>;
 
 export type ExcalidrawBindableElement =
@@ -275,6 +282,10 @@ export type ExcalidrawTextContainer =
 
 export type ExcalidrawTextElementWithContainer = {
   containerId: ExcalidrawTextContainer["id"];
+  pathProps?: {
+    segmentIndex: number;
+    segmentParameter: number;
+  } | null;
 } & ExcalidrawTextElement;
 
 export type FixedPoint = [number, number];
@@ -356,13 +367,6 @@ export type ExcalidrawArrowElement = ExcalidrawLinearElement &
   Readonly<{
     type: "arrow";
     elbowed: boolean;
-    // segment-relative properties for arrows with bound text
-    // optional for now, not to affect older drawings, or pasted elements without this property
-    boundTextParameter?: {
-      // index of the segment the text is bound to, starting with 0
-      segmentIndex: number;
-      segmentParameter: number;
-    };
   }>;
 
 export type ExcalidrawElbowArrowElement = Merge<
