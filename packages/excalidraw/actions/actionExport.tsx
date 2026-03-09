@@ -498,7 +498,7 @@ export const actionExportWithDarkMode = register<
   label: "imageExportDialog.label.darkMode",
   trackEvent: { category: "export", action: "toggleTheme" },
   perform: (_elements, appState, value, app) => {
-    app.sessionExportThemeOverride = value ? THEME.DARK : THEME.LIGHT;
+    app.setSessionExportThemeOverride(value ? THEME.DARK : THEME.LIGHT);
     return {
       appState: { ...appState, exportWithDarkMode: value },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,

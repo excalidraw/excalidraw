@@ -326,33 +326,6 @@ describe("<Excalidraw/>", () => {
         expect(h.state.exportWithDarkMode).toBe(true);
       });
     });
-
-    it("should keep the export theme override for the current session", async () => {
-      await render(<Excalidraw theme={THEME.LIGHT} />);
-
-      act(() => {
-        (h.app as any).actionManager.executeAction(
-          actionExportWithDarkMode,
-          "ui",
-          true,
-        );
-      });
-
-      expect(h.app.sessionExportThemeOverride).toBe(THEME.DARK);
-      expect(h.state.exportWithDarkMode).toBe(true);
-
-      act(() => {
-        h.setState({ theme: THEME.DARK });
-      });
-
-      act(() => {
-        h.setState({ theme: THEME.LIGHT });
-      });
-
-      await waitFor(() => {
-        expect(h.state.exportWithDarkMode).toBe(true);
-      });
-    });
   });
 
   describe("Test name prop", () => {

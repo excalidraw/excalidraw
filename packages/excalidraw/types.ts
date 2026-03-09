@@ -799,7 +799,7 @@ export type AppClassProperties = {
   props: AppProps;
   state: AppState;
   api: App["api"];
-  sessionExportThemeOverride: App["sessionExportThemeOverride"];
+  setSessionExportThemeOverride: App["setSessionExportThemeOverride"];
   interactiveCanvas: HTMLCanvasElement | null;
   /** static canvas */
   canvas: HTMLCanvasElement;
