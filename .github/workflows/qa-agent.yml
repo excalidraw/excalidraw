@@ -31,7 +31,7 @@ jobs:
         
       - name: Setup QA Agent
         working-directory: ./scripts/qa-agent
-        run: npm ci
+        run: npm install
         
       - name: Install Playwright Browsers
         working-directory: ./scripts/qa-agent
