@@ -1894,42 +1894,7 @@ export class LinearElementEditor {
       return null;
     }
     const pointerGlobalPoint = pointFrom<GlobalPoint>(pointerX, pointerY);
-    const pathProps = LinearElementEditor.projectPointOnLinearElementPath(
-      element,
-      pointerGlobalPoint,
-    );
-    scene.mutateElement(boundTextElement, {
-      pathProps,
-    });
-
-    // const boundTextElement = getBoundTextElement(element, elementsMap);
-    if (boundTextElement) {
-      const { x: textX, y: textY } = this.getBoundTextElementPosition(
-        element,
-        boundTextElement,
-        elementsMap,
-      );
-      scene.mutateElement(boundTextElement, {
-        x: textX,
-        y: textY,
-      });
-    }
-
-    return {
-      ...linearElementEditor,
-      isDragging: true,
-      lastBoundTextPathProps: pathProps,
-    };
-  }
-
-  static projectPointOnLinearElementPath(
-    container: NonDeleted<ExcalidrawLinearElement>,
-    point: GlobalPoint,
-  ): {
-    segmentIndex: number;
-    segmentParameter: number;
-  } {
-    const [lines, curves] = deconstructLinearOrFreeDrawElement(container);
+    const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
     const isLine = lines.length > 0;
     const count = isLine ? lines.length : curves.length;
 
@@ -1938,8 +1903,8 @@ export class LinearElementEditor {
 
     for (let i = 0; i < count; i++) {
       const distance = isLine
-        ? distanceToLineSegment(point, lines[i])
-        : curvePointDistance(curves[i], point);
+        ? distanceToLineSegment(pointerGlobalPoint, lines[i])
+        : curvePointDistance(curves[i], pointerGlobalPoint);
 
       if (distance < bestDistance) {
         bestDistance = distance;
@@ -1947,14 +1912,33 @@ export class LinearElementEditor {
       }
     }
 
-    // only calculate local parameter once we've found closest segment
     const bestLocalParameter = isLine
-      ? lineSegmentClosestParameter(point, lines[bestSegmentIndex])
-      : curveClosestParameter(curves[bestSegmentIndex], point);
-
-    return {
+      ? lineSegmentClosestParameter(pointerGlobalPoint, lines[bestSegmentIndex])
+      : curveClosestParameter(curves[bestSegmentIndex], pointerGlobalPoint);
+    const pathProps = {
       segmentIndex: bestSegmentIndex,
       segmentParameter: bestLocalParameter,
+    };
+
+    const idx = clamp(bestSegmentIndex, 0, count - 1);
+    const t = clamp(bestLocalParameter, 0, 1);
+    const pathPoint = isLine
+      ? pointFrom(
+          lines[idx][0][0] + t * (lines[idx][1][0] - lines[idx][0][0]),
+          lines[idx][0][1] + t * (lines[idx][1][1] - lines[idx][0][1]),
+        )
+      : curvePointAtLength(curves[idx], t);
+
+    scene.mutateElement(boundTextElement, {
+      pathProps,
+      x: pathPoint[0] - boundTextElement.width / 2,
+      y: pathPoint[1] - boundTextElement.height / 2,
+    });
+
+    return {
+      ...linearElementEditor,
+      isDragging: true,
+      lastBoundTextPathProps: pathProps,
     };
   }
 
