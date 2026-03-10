@@ -90,8 +90,6 @@
     border: 1px solid var(--color-gray-20);
     cursor: pointer;
     pointer-events: var(--ui-pointerEvents);
-    user-select: none;
-    transition: background-color 0.15s ease;
 
     &:hover {
       background-color: var(--color-surface-high);
@@ -102,11 +100,6 @@
     display: flex;
     align-items: center;
     color: var(--color-gray-50);
-    transition: transform 0.15s ease;
-  }
-
-  [data-state="open"] > .UserList__pill .UserList__pill-chevron {
-    transform: rotate(180deg);
   }
 
   .UserList__collaborator--avatar-only {

@@ -187,25 +187,26 @@ export const UserList = React.memo(
 
     const slotsForAvatars = maxAvatars - 1;
 
-    const firstNCollaborators = (() => {
-      if (!effectiveCurrentUserMenu || slotsForAvatars < 1) {
-        return uniqueCollaboratorsArray.slice(0, slotsForAvatars);
-      }
-      // Ensure current user is always last (rightmost) and always visible
+    let firstNCollaborators = uniqueCollaboratorsArray.slice(
+      0,
+      slotsForAvatars,
+    );
+
+    // Ensure current user is always last (rightmost) and always visible
+    if (effectiveCurrentUserMenu && slotsForAvatars >= 1) {
       const currentUser = uniqueCollaboratorsArray.find(
         (c) => c.isCurrentUser,
       );
-      if (!currentUser) {
-        return uniqueCollaboratorsArray.slice(0, slotsForAvatars);
+      if (currentUser) {
+        const others = uniqueCollaboratorsArray.filter(
+          (c) => !c.isCurrentUser,
+        );
+        firstNCollaborators = [
+          ...others.slice(0, Math.max(0, slotsForAvatars - 1)),
+          currentUser,
+        ];
       }
-      const others = uniqueCollaboratorsArray.filter(
-        (c) => !c.isCurrentUser,
-      );
-      return [
-        ...others.slice(0, Math.max(0, slotsForAvatars - 1)),
-        currentUser,
-      ];
-    })();
+    }
 
     const hasOverflow =
       uniqueCollaboratorsArray.length > firstNCollaborators.length;
@@ -215,8 +216,7 @@ export const UserList = React.memo(
         actionManager,
         collaborator,
         socketId: collaborator.socketId,
-        shouldWrapWithTooltip:
-          !collaborator.isCurrentUser || !effectiveCurrentUserMenu || hasOverflow,
+        shouldWrapWithTooltip: true,
         isBeingFollowed: collaborator.socketId === userToFollow,
       });
 
@@ -267,12 +267,7 @@ export const UserList = React.memo(
       <div className="UserList__wrapper" ref={userListWrapper}>
         <div
           className={clsx("UserList", className)}
-          style={{
-            [`--max-avatars` as any]:
-              effectiveCurrentUserMenu && !hasOverflow
-                ? maxAvatars + 1
-                : maxAvatars,
-          }}
+          style={{ [`--max-avatars` as any]: maxAvatars }}
         >
           {firstNAvatarsJSX}
 
