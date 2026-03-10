@@ -14,6 +14,7 @@ import {
   curveClosestParameter,
   curvePointDistance,
   clamp,
+  bezierEquation,
 } from "@excalidraw/math";
 
 import { getCurvePathOps } from "@excalidraw/utils/shape";
@@ -1927,7 +1928,7 @@ export class LinearElementEditor {
           lines[idx][0][0] + t * (lines[idx][1][0] - lines[idx][0][0]),
           lines[idx][0][1] + t * (lines[idx][1][1] - lines[idx][0][1]),
         )
-      : curvePointAtLength(curves[idx], t);
+      : bezierEquation(curves[idx], t);
 
     scene.mutateElement(boundTextElement, {
       pathProps,
@@ -1964,7 +1965,7 @@ export class LinearElementEditor {
         segment[0][1] + t * (segment[1][1] - segment[0][1]),
       );
     }
-    return curvePointAtLength<GlobalPoint>(curves[idx], t);
+    return bezierEquation<GlobalPoint>(curves[idx], t);
   }
 
   static getBoundTextElementPosition = (
@@ -1978,9 +1979,7 @@ export class LinearElementEditor {
     );
     if (points.length < 2) {
       mutateElement(boundTextElement, elementsMap, { isDeleted: true });
-    }
-
-    if (isArrowElement(element) && boundTextElement.pathProps) {
+    } else if (isArrowElement(element) && boundTextElement.pathProps) {
       const pathPoint = LinearElementEditor.getPointAtPathProps(
         element,
         boundTextElement.pathProps,
