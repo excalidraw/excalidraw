@@ -35,7 +35,6 @@ import type { Scene } from "./Scene";
 import type { MaybeTransformHandleType } from "./transformHandles";
 import type {
   ElementsMap,
-  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawElementType,
   ExcalidrawLinearElement,
