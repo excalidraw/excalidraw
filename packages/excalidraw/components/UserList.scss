@@ -83,7 +83,6 @@
   .UserList__pill {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
     padding: 0 0.25rem 0 0;
     border-radius: 1.25rem;
     background-color: var(--color-surface-low);
@@ -100,6 +99,13 @@
     display: flex;
     align-items: center;
     color: var(--color-gray-50);
+    width: 15px;
+    height: 15px;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   .UserList__collaborator--avatar-only {
