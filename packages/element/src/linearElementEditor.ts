@@ -2400,7 +2400,7 @@ const pointDraggingUpdates = (
     ? nextArrow.points[0]
     : endBindable
     ? updateBoundPoint(
-        element,
+        nextArrow,
         "endBinding",
         nextArrow.endBinding,
         endBindable,
@@ -2431,7 +2431,7 @@ const pointDraggingUpdates = (
       ? endLocalPoint
       : startBindable
       ? updateBoundPoint(
-          element,
+          nextArrow,
           "startBinding",
           nextArrow.startBinding,
           startBindable,
