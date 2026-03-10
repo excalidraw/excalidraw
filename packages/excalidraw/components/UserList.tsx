@@ -188,7 +188,7 @@ export const UserList = React.memo(
     const slotsForAvatars = maxAvatars - 1;
 
     const firstNCollaborators = (() => {
-      if (!effectiveCurrentUserMenu) {
+      if (!effectiveCurrentUserMenu || slotsForAvatars < 1) {
         return uniqueCollaboratorsArray.slice(0, slotsForAvatars);
       }
       // Ensure current user is always last (rightmost) and always visible
@@ -267,7 +267,12 @@ export const UserList = React.memo(
       <div className="UserList__wrapper" ref={userListWrapper}>
         <div
           className={clsx("UserList", className)}
-          style={{ [`--max-avatars` as any]: maxAvatars }}
+          style={{
+            [`--max-avatars` as any]:
+              effectiveCurrentUserMenu && !hasOverflow
+                ? maxAvatars + 1
+                : maxAvatars,
+          }}
         >
           {firstNAvatarsJSX}
 
