@@ -538,6 +538,7 @@ export const getBoundTextPathProps = (
     if (element.pathProps != null) {
       return element.pathProps;
     }
+    // default to middle point or middle seg midpoint for backward compatibility
     let segmentIndex;
     let segmentParameter;
     if (container.elbowed) {

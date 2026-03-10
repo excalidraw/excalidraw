@@ -1913,6 +1913,7 @@ export class LinearElementEditor {
       }
     }
 
+    // NOTE: parameter's can be calcualated at the same time as distance, separated here for distinction but can create functions that return both
     const bestLocalParameter = isLine
       ? lineSegmentClosestParameter(pointerGlobalPoint, lines[bestSegmentIndex])
       : curveClosestParameter(curves[bestSegmentIndex], pointerGlobalPoint);

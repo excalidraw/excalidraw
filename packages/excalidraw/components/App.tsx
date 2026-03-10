@@ -6096,22 +6096,9 @@ class App extends React.Component<AppProps, AppState> {
       });
 
     if (!existingTextElement && shouldBindToContainer && container) {
-      let boundTextPathProps;
-      // default positioning for bound text on arrows
       if (isArrowElement(container)) {
-        // let segmentIndex;
-        // let segmentParameter;
-        // if (container.elbowed) {
-        //   segmentIndex = container.points.length - 2;
-        //   segmentParameter = 0.5;
-        // } else {
-        //   segmentIndex =
-        //     container.points.length % 2 === 1
-        //       ? Math.floor(container.points.length / 2)
-        //       : container.points.length / 2 - 1;
-        //   segmentParameter = container.points.length % 2 === 1 ? 0.0 : 0.5;
-        // }
-        boundTextPathProps = getBoundTextPathProps(element, container);
+        // default positioning for bound text on arrows
+        const boundTextPathProps = getBoundTextPathProps(element, container);
         this.scene.mutateElement(element, {
           pathProps: boundTextPathProps,
         });
