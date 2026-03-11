@@ -279,10 +279,15 @@ export function curveClosestParameter<Point extends GlobalPoint | LocalPoint>(
 
   const t0 = Math.max((closestStep - 1) / maxSteps, 0);
   const t1 = Math.min((closestStep + 1) / maxSteps, 1);
-
-  return (
-    localMinimum(t0, t1, (t) => pointDistance(p, bezierEquation(c, t))) ?? NaN
+  const param = localMinimum(t0, t1, (t) =>
+    pointDistance(p, bezierEquation(c, t)),
   );
+
+  if (!param) {
+    return 0;
+  }
+
+  return param;
 }
 
 /**
