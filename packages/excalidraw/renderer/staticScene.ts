@@ -71,9 +71,10 @@ const strokeGrid = (
 
   const actualGridSize = gridSize * zoom.value;
 
-  const spaceWidth = 1 / zoom.value;
-
   context.save();
+
+  const lineWidth = 1 / zoom.value;
+  const lineDash = [2 / zoom.value, 2 / zoom.value];
 
   // Offset rendering by 0.5 to ensure that 1px wide lines are crisp.
   // We only do this when zoomed to 100% because otherwise the offset is
@@ -92,12 +93,9 @@ const strokeGrid = (
       continue;
     }
 
-    const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
-    context.lineWidth = lineWidth;
-    const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
-
     context.beginPath();
-    context.setLineDash(isBold ? [] : lineDash);
+    context.lineWidth = lineWidth;
+    context.setLineDash(lineDash);
     context.strokeStyle = isBold
       ? GridLineColor[theme].bold
       : GridLineColor[theme].regular;
@@ -113,12 +111,9 @@ const strokeGrid = (
       continue;
     }
 
-    const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
-    context.lineWidth = lineWidth;
-    const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
-
     context.beginPath();
-    context.setLineDash(isBold ? [] : lineDash);
+    context.lineWidth = lineWidth;
+    context.setLineDash(lineDash);
     context.strokeStyle = isBold
       ? GridLineColor[theme].bold
       : GridLineColor[theme].regular;
