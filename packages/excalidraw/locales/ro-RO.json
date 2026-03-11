@@ -53,7 +53,14 @@
     "arrowhead_crowfoot_many": "Model entitate-asociere (multe)",
     "arrowhead_crowfoot_one": "Model entitate-asociere (unul)",
     "arrowhead_crowfoot_one_or_many": "Model entitate-asociere (unul sau multe)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Mai multe opțiuni",
+    "cardinality": "",
     "arrowtypes": "Tip de săgeată",
     "arrowtype_sharp": "Săgeată ascuțită",
     "arrowtype_round": "Săgeată curbată",
@@ -624,7 +631,7 @@
   "mermaid": {
     "title": "Mermaid la Excalidraw",
     "button": "Introducere",
-    "description": "În prezent, numai <flowchartLink>Organigramele</flowchartLink>, <sequenceLink>Diagramele de secvență</sequenceLink> și <classLink>Diagramele de clasă</classLink> sunt acceptate. Celelalte tipuri vor fi redate ca imagine în Excalidraw.",
+    "description": "",
     "syntax": "Sintaxă Mermaid",
     "preview": "Previzualizare",
     "label": "Mermaid",
@@ -654,7 +661,7 @@
     "placeholder": {
       "title": "Hai să-ți proiectăm diagrama",
       "description": "Descrie diagrama pe care vrei să o creezi și o vom genera pentru tine.",
-      "hint": "În acest moment cunoaștem organigrame, diagrame de secvență și diagrame de clasă."
+      "hint": ""
     },
     "preview": "Previzualizare",
     "insert": "Introducere",
