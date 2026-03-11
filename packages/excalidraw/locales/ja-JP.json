@@ -53,7 +53,14 @@
     "arrowhead_crowfoot_many": "カラスの足 (*)",
     "arrowhead_crowfoot_one": "カラスの足 (1)",
     "arrowhead_crowfoot_one_or_many": "カラスの足 (1..*)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "その他のオプション",
+    "cardinality": "",
     "arrowtypes": "矢印タイプ",
     "arrowtype_sharp": "鋭い矢印",
     "arrowtype_round": "曲線矢印",
@@ -624,7 +631,7 @@
   "mermaid": {
     "title": "Mermaid を Excalidraw に変換",
     "button": "挿入",
-    "description": "現在、<flowchartLink>Flowchart</flowchartLink>、<sequenceLink>Sequence</sequenceLink>、<classLink>Class</classLink> のダイアグラムのみに対応しています。その他の種類は、Excalidraw では画像として描画されます。",
+    "description": "",
     "syntax": "Mermaid 構文",
     "preview": "プレビュー",
     "label": "Mermaid",
@@ -654,7 +661,7 @@
     "placeholder": {
       "title": "ダイアグラムをデザインしよう",
       "description": "作りたいダイアグラムを説明してください。AIが生成します。",
-      "hint": "フローチャート、シーケンス図、クラス図に対応しています。"
+      "hint": ""
     },
     "preview": "プレビュー",
     "insert": "挿入",
