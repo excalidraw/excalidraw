@@ -573,11 +573,15 @@ export interface ExcalidrawProps {
    * Invoked as soon as the Excalidraw API is available
    * NOTE editor is not yet mounted, and state is not yet initialized
    */
-  onExcalidrawAPI?: (api: ExcalidrawImperativeAPI) => void;
+  onExcalidrawAPI?: (api: ExcalidrawImperativeAPI | null) => void;
   /**
    * Invoked once the editor root is mounted.
    */
   onMount?: (payload: ExcalidrawMountPayload) => void;
+  /**
+   * Invoked when the editor root is unmounted.
+   */
+  onUnmount?: () => void;
   /**
    * Invoked once the initial scene is loaded.
    */
@@ -907,9 +911,12 @@ export type ExcalidrawMountPayload = {
 export type ExcalidrawImperativeAPIEventMap = {
   "editor:mount": [payload: ExcalidrawMountPayload];
   "editor:initialize": [api: ExcalidrawImperativeAPI];
+  "editor:unmount": [];
 };
 
 export interface ExcalidrawImperativeAPI {
+  /** Whether the editor has been unmounted and the API is no longer usable. */
+  isDestroyed: boolean;
   updateScene: InstanceType<typeof App>["updateScene"];
   applyDeltas: InstanceType<typeof App>["applyDeltas"];
   mutateElement: InstanceType<typeof App>["mutateElement"];

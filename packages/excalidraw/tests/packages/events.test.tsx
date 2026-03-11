@@ -41,13 +41,15 @@ describe("event callbacks", () => {
 
     await render(
       <Excalidraw
-        onExcalidrawAPI={(api) =>
-          lifecyclePromise.resolve({
-            api: api as ExcalidrawImperativeAPI,
-            mount: api.onEvent("editor:mount"),
-            initialize: api.onEvent("editor:initialize"),
-          })
-        }
+        onExcalidrawAPI={(api) => {
+          if (api) {
+            lifecyclePromise.resolve({
+              api,
+              mount: api.onEvent("editor:mount"),
+              initialize: api.onEvent("editor:initialize"),
+            });
+          }
+        }}
       />,
     );
 
