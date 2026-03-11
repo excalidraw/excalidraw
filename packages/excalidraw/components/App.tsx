@@ -231,6 +231,7 @@ import {
   dragSelectedElements,
   getDragOffsetXY,
   isNonDeletedElement,
+  getTextFromElements,
   Scene,
   Store,
   CaptureUpdateAction,
@@ -363,6 +364,7 @@ import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 import {
   calculateScrollCenter,
   getElementsOverlappingSelection,
+  getElementsWithinSelection,
   getNormalizedZoom,
   getSelectedElements,
   hasBackground,
@@ -643,6 +645,11 @@ class App extends React.Component<AppProps, AppState> {
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
   private iFrameRefs = new Map<ExcalidrawElement["id"], HTMLIFrameElement>();
+  private plainTextCopy = null as null | {
+    text: string;
+    elements: readonly ExcalidrawElement[];
+    files: BinaryFiles | null;
+  };
   /**
    * Indicates whether the embeddable's url has been validated for rendering.
    * If value not set, indicates that the validation is pending.
@@ -3489,6 +3496,39 @@ class App extends React.Component<AppProps, AppState> {
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
+    const selectedIds = Object.keys(this.state.selectedElementIds).filter(
+      (id) => this.state.selectedElementIds[id as ExcalidrawElement["id"]],
+    ) as ExcalidrawElement["id"][];
+
+    if (selectedIds.length === 1) {
+      const elementsMap = this.scene.getNonDeletedElementsMap();
+      const selectedElement = elementsMap.get(selectedIds[0]);
+      const boundTextElement =
+        selectedElement && getBoundTextElement(selectedElement, elementsMap);
+
+      if (
+        selectedElement &&
+        (isTextElement(selectedElement) || boundTextElement)
+      ) {
+        const elementsToCopy = this.scene.getSelectedElements({
+          selectedElementIds: this.state.selectedElementIds,
+          includeBoundTextElement: true,
+          includeElementsInFrames: true,
+        });
+        const text = getTextFromElements(elementsToCopy);
+        this.plainTextCopy = {
+          text,
+          elements: elementsToCopy.map((element) => deepCopyElement(element)),
+          files: null,
+        };
+        copyTextToSystemClipboard(text, event);
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+    }
+
+    this.plainTextCopy = null;
     this.actionManager.executeAction(actionCopy, "keyboard", event);
     event.preventDefault();
     event.stopPropagation();
@@ -3765,6 +3805,24 @@ class App extends React.Component<AppProps, AppState> {
       // must be called in the same frame (thus before any awaits) as the paste
       // event else some browsers (FF...) will clear the clipboardData
       // (something something security)
+      const clipboardText = event?.clipboardData?.getData(MIME_TYPES.text);
+      const hasExcalidrawClipboard = !!event?.clipboardData?.getData(
+        MIME_TYPES.excalidrawClipboard,
+      );
+      if (
+        !isPlainPaste &&
+        this.plainTextCopy &&
+        !hasExcalidrawClipboard &&
+        clipboardText === this.plainTextCopy.text
+      ) {
+        this.addElementsFromPasteOrLibrary({
+          elements: this.plainTextCopy.elements,
+          files: this.plainTextCopy.files,
+          position: "cursor",
+        });
+        event.preventDefault();
+        return;
+      }
       const dataTransferList = await parseDataTransferEvent(event);
 
       const filesList = dataTransferList.getFiles();
@@ -9972,12 +10030,18 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
           const elementsWithinSelection = this.state.selectionElement
-            ? getElementsOverlappingSelection(
-                elements,
-                this.state.selectionElement,
-                this.scene.getNonDeletedElementsMap(),
-                true,
-              )
+            ? pointerDownState.withCmdOrCtrl
+              ? getElementsWithinSelection(
+                  elements,
+                  this.state.selectionElement,
+                  this.scene.getNonDeletedElementsMap(),
+                )
+              : getElementsOverlappingSelection(
+                  elements,
+                  this.state.selectionElement,
+                  this.scene.getNonDeletedElementsMap(),
+                  true,
+                )
             : [];
 
           this.setState((prevState) => {
