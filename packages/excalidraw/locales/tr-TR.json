@@ -53,7 +53,14 @@
     "arrowhead_crowfoot_many": "Karga ayak (çok)",
     "arrowhead_crowfoot_one": "Karga ayak (bir)",
     "arrowhead_crowfoot_one_or_many": "Karga ayak (bir veya çok sayıda)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Daha fazla seçenek",
+    "cardinality": "",
     "arrowtypes": "Ok şekli",
     "arrowtype_sharp": "Düz ok",
     "arrowtype_round": "Kavisli ok",
@@ -624,7 +631,7 @@
   "mermaid": {
     "title": "Mermaid'den Excalidraw'a",
     "button": "Ekle",
-    "description": "Şu anda yalnızca <flowchartLink>Akış şeması</flowchartLink>,<sequenceLink> Dizi, </sequenceLink> ve <classLink>Sınıf </classLink>Diyagramları deskteklenmektedir. Diğer türler, Excalidraw'da görsel olarak çizilecektir.",
+    "description": "",
     "syntax": "Mermaid Sözdizimi",
     "preview": "Önizleme",
     "label": "Mermaid",
@@ -654,7 +661,7 @@
     "placeholder": {
       "title": "\"Hadi, diyagramınızı tasarlayalım",
       "description": "Oluşturmak istediğiniz diyagramı tarif edin, sizin için biz hazırlayalım.",
-      "hint": "Şu anda Akış Şeması, Sıralama ve Sınıf diyagramlarını destekliyoruz."
+      "hint": ""
     },
     "preview": "Önizleme",
     "insert": "Ekle",
