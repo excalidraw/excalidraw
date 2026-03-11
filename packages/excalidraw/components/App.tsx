@@ -588,6 +588,9 @@ let tappedTwiceTimer = 0;
 let firstTapPosition: { x: number; y: number } | null = null;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
+let isRightClickPanning: boolean = false;
+// 右键拖动/滚轮缩放联动相关（历史实现保留为注释，便于后续对比/回滚）
+// let rightClickAnchorScene: { x: number; y: number } | null = null;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
@@ -7797,20 +7800,29 @@ class App extends React.Component<AppProps, AppState> {
   public handleCanvasPanUsingWheelOrSpaceDrag = (
     event: React.PointerEvent<HTMLElement> | MouseEvent,
   ): boolean => {
-    if (
-      !(
-        gesture.pointers.size <= 1 &&
-        (event.button === POINTER_BUTTON.WHEEL ||
-          (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
-          isHandToolActive(this.state) ||
-          (this.state.viewModeEnabled &&
-            this.state.activeTool.type !== "laser"))
-      )
-    ) {
+    const hasMousePointerType =
+      "pointerType" in event && (event as any).pointerType === "mouse";
+    const isNoPointerType = !("pointerType" in event);
+    const isMouseRight =
+      (hasMousePointerType || isNoPointerType) &&
+      event.button === POINTER_BUTTON.SECONDARY;
+    const shouldPan =
+      gesture.pointers.size <= 1 &&
+      (event.button === POINTER_BUTTON.WHEEL ||
+        isMouseRight ||
+        (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
+        isHandToolActive(this.state) ||
+        (this.state.viewModeEnabled && this.state.activeTool.type !== "laser"));
+    if (!shouldPan) {
       return false;
     }
     isPanning = true;
-
+    isRightClickPanning = isMouseRight;
+    // 旧实现（已注释保留）：右键按下时缓存 scene 锚点，再在滚轮缩放时把它换算回 viewport
+    // 该方案在“边拖动边滚轮缩放”时，容易因滚动/缩放 state 更新顺序导致锚点漂移。
+    // rightClickAnchorScene = isMouseRight
+    //   ? viewportCoordsToSceneCoords(event as MouseEvent, this.state)
+    //   : null;
     // due to event.preventDefault below, container wouldn't get focus
     // automatically
     this.focusContainer();
@@ -7872,15 +7884,24 @@ class App extends React.Component<AppProps, AppState> {
         window.addEventListener(EVENT.POINTER_UP, enableNextPaste);
       }
 
-      this.translateCanvas({
-        scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
-        scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
-      });
+      // 关键：这里必须使用函数式更新，避免 pointermove 高频批处理时读到过期 this.state，
+      // 否则在“右键拖动 + 滚轮缩放”叠加输入下会出现累积误差（表现为缩放漂移）。
+      //
+      // 旧实现（保留注释）：
+      // this.translateCanvas({
+      //   scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
+      //   scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
+      // });
+      this.translateCanvas((state) => ({
+        scrollX: state.scrollX - deltaX / state.zoom.value,
+        scrollY: state.scrollY - deltaY / state.zoom.value,
+      }));
     });
     const teardown = withBatchedUpdates(
       (lastPointerUp = () => {
         lastPointerUp = null;
         isPanning = false;
+        isRightClickPanning = false;
         if (!isHoldingSpace) {
           if (
             this.state.viewModeEnabled &&
@@ -11802,6 +11823,16 @@ class App extends React.Component<AppProps, AppState> {
 
     if (
       (("pointerType" in event.nativeEvent &&
+        event.nativeEvent.pointerType === "mouse" &&
+        event.button === POINTER_BUTTON.SECONDARY) ||
+        isRightClickPanning) &&
+      !this.state.viewModeEnabled
+    ) {
+      return;
+    }
+
+    if (
+      (("pointerType" in event.nativeEvent &&
         event.nativeEvent.pointerType === "touch") ||
         ("pointerType" in event.nativeEvent &&
           event.nativeEvent.pointerType === "pen" &&
@@ -12333,13 +12364,14 @@ class App extends React.Component<AppProps, AppState> {
 
       event.preventDefault();
 
-      if (isPanning) {
+      if (isPanning && !isRightClickPanning) {
         return;
       }
 
       const { deltaX, deltaY } = event;
+      const allowZoomWithoutModifier = isRightClickPanning;
       // note that event.ctrlKey is necessary to handle pinch zooming
-      if (event.metaKey || event.ctrlKey) {
+      if (event.metaKey || event.ctrlKey || allowZoomWithoutModifier) {
         const sign = Math.sign(deltaY);
         const MAX_STEP = ZOOM_STEP * 100;
         const absDelta = Math.abs(deltaY);
@@ -12356,17 +12388,49 @@ class App extends React.Component<AppProps, AppState> {
           // reduced amplification for small deltas (small movements on a trackpad)
           Math.min(1, absDelta / 20);
 
-        this.translateCanvas((state) => ({
-          ...getStateForZoom(
-            {
-              viewportX: this.lastViewportPosition.x,
-              viewportY: this.lastViewportPosition.y,
-              nextZoom: getNormalizedZoom(newZoom),
-            },
-            state,
-          ),
-          shouldCacheIgnoreZoom: true,
-        }));
+        this.translateCanvas((state) => {
+          const nextZoom = getNormalizedZoom(newZoom);
+
+          if (allowZoomWithoutModifier) {
+            // 严格使用本次滚轮事件的光标位置作为缩放中心（不要用 || 回退：
+            // clientX/clientY 可能是 0，使用 || 会错误回退导致漂移）
+            const viewportX = event.clientX;
+            const viewportY = event.clientY;
+
+            // 目标不变量（需求说明.txt#L26-28）：
+            // 按住右键滚轮缩放时，鼠标光标对应的“画布(scene)坐标”保持不变。
+            //
+            // 做法：
+            // 1) 先在“当前 state（旧 zoom）”下计算光标处 scene 坐标 anchorScene
+            // 2) 再解出在 nextZoom 下应当设置的 scrollX/scrollY，使得 anchorScene 仍映射回相同 viewport
+            const anchorScene = viewportCoordsToSceneCoords(
+              { clientX: viewportX, clientY: viewportY },
+              state,
+            );
+
+            return {
+              scrollX:
+                (viewportX - state.offsetLeft) / nextZoom - anchorScene.x,
+              scrollY: (viewportY - state.offsetTop) / nextZoom - anchorScene.y,
+              zoom: {
+                value: nextZoom,
+              },
+              shouldCacheIgnoreZoom: true,
+            };
+          }
+
+          return {
+            ...getStateForZoom(
+              {
+                viewportX: this.lastViewportPosition.x,
+                viewportY: this.lastViewportPosition.y,
+                nextZoom,
+              },
+              state,
+            ),
+            shouldCacheIgnoreZoom: true,
+          };
+        });
         this.resetShouldCacheIgnoreZoomDebounced();
         return;
       }
