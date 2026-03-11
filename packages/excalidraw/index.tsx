@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { DEFAULT_UI_OPTIONS, isShallowEqual } from "@excalidraw/common";
 
@@ -12,7 +18,10 @@ import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollab
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
 import { defaultLang } from "./i18n";
-import { useAppStateValue as _useAppStateValue } from "./hooks/useAppStateValue";
+import {
+  useAppStateValue as _useAppStateValue,
+  useOnAppStateChange as _useOnAppStateChange,
+} from "./hooks/useAppStateValue";
 import { EditorJotaiProvider, editorJotaiStore } from "./editor-jotai";
 import polyfill from "./polyfill";
 
@@ -31,8 +40,8 @@ polyfill();
 
 /**
  * Stateless provider that allows `useExcalidrawAPI()` (and hooks built
- * on it, such as `useAppStateValue()`) to work outside the <Excalidraw>
- * component tree.
+ * on it, such as `useAppStateValue()` and `useOnAppStateChange()`) to work
+ * outside the <Excalidraw> component tree.
  */
 export const ExcalidrawAPIProvider = ({
   children,
@@ -57,6 +66,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     initialData,
     onExcalidrawAPI,
     onMount,
+    onUnmount,
     onInitialize,
     isCollaborating = false,
     onPointerUpdate,
@@ -119,12 +129,16 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   }
 
   const setExcalidrawAPI = useContext(ExcalidrawAPISetContext);
+
+  const onExcalidrawAPIRef = useRef(onExcalidrawAPI);
+  onExcalidrawAPIRef.current = onExcalidrawAPI;
+
   const handleExcalidrawAPI = useCallback(
-    (api: ExcalidrawImperativeAPI) => {
+    (api: ExcalidrawImperativeAPI | null) => {
       setExcalidrawAPI?.(api);
-      onExcalidrawAPI?.(api);
+      onExcalidrawAPIRef.current?.(api);
     },
-    [onExcalidrawAPI, setExcalidrawAPI],
+    [setExcalidrawAPI],
   );
 
   useEffect(() => {
@@ -162,6 +176,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           initialData={initialData}
           onExcalidrawAPI={handleExcalidrawAPI}
           onMount={onMount}
+          onUnmount={onUnmount}
           onInitialize={onInitialize}
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
@@ -378,7 +393,7 @@ export {
 } from "./charts";
 
 // -----------------------------------------------------------------------------
-// useAppStateValue() wrapper for host apps for the return type to reflect the
+// useExcalidrawStateValue() wrapper for host apps for the return type to reflect the
 // the potentially `undefined` value for initial render before the excalidrawAPI
 // is ready.
 //
@@ -388,25 +403,23 @@ export {
  * @param prop - appState prop(s) to subscribe to, or a selector function.
  * NOTE `prop/selector` is memoized and will not change after initial render
  */
-export function useAppStateValue<K extends keyof AppState>(
+export function useExcalidrawStateValue<K extends keyof AppState>(
   prop: K,
-  callback?: (value: AppState[K], appState: AppState) => void,
 ): AppState[K] | undefined;
-export function useAppStateValue<T extends keyof AppState>(
+export function useExcalidrawStateValue<T extends keyof AppState>(
   props: T[],
-  callback?: (values: AppState, appState: AppState) => void,
 ): AppState | undefined;
-export function useAppStateValue<T>(
+export function useExcalidrawStateValue<T>(
   selector: (appState: AppState) => T,
-  callback?: (value: T, appState: AppState) => void,
 ): T | undefined;
-export function useAppStateValue(
+export function useExcalidrawStateValue(
   selector:
     | keyof AppState
     | (keyof AppState)[]
     | ((appState: AppState) => unknown),
-  callback?: (value: any, appState: AppState) => void,
 ) {
-  return _useAppStateValue(selector as any, callback, false);
+  return _useAppStateValue(selector as any, false);
 }
 // -----------------------------------------------------------------------------
+
+export { _useOnAppStateChange as useOnExcalidrawStateChange };

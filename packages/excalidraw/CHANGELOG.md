@@ -18,22 +18,13 @@ Please add the latest change on the top under the correct section.
 ### Breaking changes
 
 - Renamed the `excalidrawAPI` prop to `onExcalidrawAPI`.
+  - `onExcalidrawAPI` is now called on mount (instead of during constructor), and later on unmount (with `null` value). The API may be removed altogether in the future (you can use `onMount` & `onUmount` to manage the `ExcalidrawAPI` object (e.g. to cache it to a global state), already).
 
 ### Features
 
-- Added `onMount` and `onInitialize` props. `onMount` receives `{ excalidrawAPI, container }` once the editor root is mounted, and `onInitialize` fires once the initial scene has loaded.
+- Added `ExcalidrawAPI.isDestroyed` flag. Set to `true` once the editor unmounts. Calling any `get*` method, `onStateChange`, or `onEvent` on a destroyed API instance will throw in development and `console.error` in production. The `ExcalidrawAPI` will be reset to `null` on umount, but to be extra safe, you should check `ExcalidrawAPI.isDestroyed` before calling these methods to guard against subtle race conditions in your code.
 
-  ```tsx
-  <Excalidraw
-    onMount={({ excalidrawAPI, container }) => {
-      console.log(container);
-      excalidrawAPI.scrollToContent();
-    }}
-    onInitialize={(api) => {
-      api.refresh();
-    }}
-  />
-  ```
+- Added `onMount`, `onInitialize`, and `onUnmount` props. `onMount` receives `{ excalidrawAPI, container }` once the editor root is mounted. `onInitialize` fires once the initial scene has loaded. `onUnmount` fires just before unmounting.
 
 - Same events are also accessible imperatively through `api.onEvent(...)`.
 
@@ -41,7 +32,6 @@ Please add the latest change on the top under the correct section.
   <Excalidraw
     onExcalidrawAPI={(api) => {
       api.onEvent("editor:mount", ({ excalidrawAPI, container }) => {
-        excalidrawAPI.scrollToContent();
         console.log(container);
       });
 
@@ -54,7 +44,9 @@ Please add the latest change on the top under the correct section.
 
   Note that in future releases, most, if not all, `excalidrawAPI.on*` subscriptions will be removed in favor of `excalidrawAPI.onEvent(name)`.
 
-- Exported `ExcalidrawAPIProvider`, `useExcalidrawAPI`, and `useAppStateValue` from the package entrypoint. The imperative API also now exposes `onStateChange`.
+- Also added `"editor:unmount"` lifecycle event, only accessible via `api.onEvent("editor:unmount")`.
+
+- Exported `<ExcalidrawAPIProvider/>`, `useExcalidrawAPI()`, `useAppStateValue(prop | props | selectorFunction)`, and `useOnExcalidrawStateChange(prop | props | selectorFunction, callback)` from the package. The imperative API also now exposes `onStateChange(prop | props | selectorFunction, callback?)`, and `onEvent(name, callback)`.
 
   ```tsx
   <ExcalidrawAPIProvider>
@@ -63,6 +55,9 @@ Please add the latest change on the top under the correct section.
   </ExcalidrawAPIProvider>;
 
   function Logger() {
+    // initially null before the ExcalidrawAPIProvider initializes ater
+    // <Excalidraw/> renders
+    // When <Excalidraw/> unmounts, is reset back to null
     const api = useExcalidrawAPI();
 
     useAppStateValue("viewModeEnabled", (viewModeEnabled) => {
