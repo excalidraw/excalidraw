@@ -69,10 +69,10 @@ import type {
   NonDeletedExcalidrawElement,
   ExcalidrawSelectionElement,
   ExcalidrawLinearElement,
-  Arrowhead,
   ExcalidrawFreeDrawElement,
   ElementsMap,
   ExcalidrawLineElement,
+  Arrowhead,
 } from "./types";
 
 import type { Drawable, Options } from "roughjs/bin/core";
@@ -296,6 +296,82 @@ const modifyIframeLikeForRoughOptions = (
   return element;
 };
 
+const generateArrowheadCardinalityOne = (
+  generator: RoughGenerator,
+  arrowheadPoints: number[] | null,
+  lineOptions: Options,
+) => {
+  if (arrowheadPoints === null) {
+    return [];
+  }
+
+  const [, , x3, y3, x4, y4] = arrowheadPoints;
+
+  return [generator.line(x3, y3, x4, y4, lineOptions)];
+};
+
+const generateArrowheadLinesToTip = (
+  generator: RoughGenerator,
+  arrowheadPoints: number[] | null,
+  lineOptions: Options,
+) => {
+  if (arrowheadPoints === null) {
+    return [];
+  }
+
+  const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
+
+  return [
+    generator.line(x3, y3, x2, y2, lineOptions),
+    generator.line(x4, y4, x2, y2, lineOptions),
+  ];
+};
+
+const getArrowheadLineOptions = (
+  element: ExcalidrawLinearElement,
+  options: Options,
+) => {
+  const lineOptions = { ...options };
+
+  if (element.strokeStyle === "dotted") {
+    // for dotted arrows caps, reduce gap to make it more legible
+    const dash = getDashArrayDotted(element.strokeWidth - 1);
+    lineOptions.strokeLineDash = [dash[0], dash[1] - 1];
+  } else {
+    // for solid/dashed, keep solid arrow cap
+    delete lineOptions.strokeLineDash;
+  }
+  lineOptions.roughness = Math.min(1, lineOptions.roughness || 0);
+
+  return lineOptions;
+};
+
+const generateArrowheadOutlineCircle = (
+  generator: RoughGenerator,
+  options: Options,
+  strokeColor: string,
+  arrowheadPoints: number[] | null,
+  fill: string,
+  diameterScale = 1,
+) => {
+  if (arrowheadPoints === null) {
+    return [];
+  }
+
+  const [x, y, diameter] = arrowheadPoints;
+  const circleOptions = {
+    ...options,
+    fill,
+    fillStyle: "solid" as const,
+    stroke: strokeColor,
+    roughness: Math.min(0.5, options.roughness || 0),
+  };
+
+  delete circleOptions.strokeLineDash;
+
+  return [generator.circle(x, y, diameter * diameterScale, circleOptions)];
+};
+
 const getArrowheadShapes = (
   element: ExcalidrawLinearElement,
   shape: Drawable[],
@@ -306,63 +382,54 @@ const getArrowheadShapes = (
   canvasBackgroundColor: string,
   isDarkMode: boolean,
 ) => {
-  const arrowheadPoints = getArrowheadPoints(
-    element,
-    shape,
-    position,
-    arrowhead,
-  );
-
-  if (arrowheadPoints === null) {
+  if (arrowhead === null) {
     return [];
   }
-
-  const generateCrowfootOne = (
-    arrowheadPoints: number[] | null,
-    options: Options,
-  ) => {
-    if (arrowheadPoints === null) {
-      return [];
-    }
-
-    const [, , x3, y3, x4, y4] = arrowheadPoints;
-
-    return [generator.line(x3, y3, x4, y4, options)];
-  };
 
   const strokeColor = isDarkMode
     ? applyDarkModeFilter(element.strokeColor)
     : element.strokeColor;
+  const backgroundFillColor = isDarkMode
+    ? applyDarkModeFilter(canvasBackgroundColor)
+    : canvasBackgroundColor;
+  const cardinalityOneOrManyOffset = -0.25;
+  const cardinalityZeroCircleScale = 0.8;
 
   switch (arrowhead) {
-    case "dot":
     case "circle":
     case "circle_outline": {
-      const [x, y, diameter] = arrowheadPoints;
-
-      // always use solid stroke for arrowhead
-      delete options.strokeLineDash;
-
-      return [
-        generator.circle(x, y, diameter, {
-          ...options,
-          fill:
-            arrowhead === "circle_outline"
-              ? canvasBackgroundColor
-              : strokeColor,
-
-          fillStyle: "solid",
-          stroke: strokeColor,
-          roughness: Math.min(0.5, options.roughness || 0),
-        }),
-      ];
+      return generateArrowheadOutlineCircle(
+        generator,
+        options,
+        strokeColor,
+        getArrowheadPoints(element, shape, position, arrowhead),
+        arrowhead === "circle_outline" ? backgroundFillColor : strokeColor,
+      );
     }
     case "triangle":
     case "triangle_outline": {
+      const arrowheadPoints = getArrowheadPoints(
+        element,
+        shape,
+        position,
+        arrowhead,
+      );
+
+      if (arrowheadPoints === null) {
+        return [];
+      }
+
       const [x, y, x2, y2, x3, y3] = arrowheadPoints;
+      const triangleOptions = {
+        ...options,
+        fill:
+          arrowhead === "triangle_outline" ? backgroundFillColor : strokeColor,
+        fillStyle: "solid" as const,
+        roughness: Math.min(1, options.roughness || 0),
+      };
 
       // always use solid stroke for arrowhead
-      delete options.strokeLineDash;
+      delete triangleOptions.strokeLineDash;
 
       return [
         generator.polygon(
@@ -372,24 +439,34 @@ const getArrowheadShapes = (
             [x3, y3],
             [x, y],
           ],
-          {
-            ...options,
-            fill:
-              arrowhead === "triangle_outline"
-                ? canvasBackgroundColor
-                : strokeColor,
-            fillStyle: "solid",
-            roughness: Math.min(1, options.roughness || 0),
-          },
+          triangleOptions,
         ),
       ];
     }
     case "diamond":
     case "diamond_outline": {
+      const arrowheadPoints = getArrowheadPoints(
+        element,
+        shape,
+        position,
+        arrowhead,
+      );
+
+      if (arrowheadPoints === null) {
+        return [];
+      }
+
       const [x, y, x2, y2, x3, y3, x4, y4] = arrowheadPoints;
+      const diamondOptions = {
+        ...options,
+        fill:
+          arrowhead === "diamond_outline" ? backgroundFillColor : strokeColor,
+        fillStyle: "solid" as const,
+        roughness: Math.min(1, options.roughness || 0),
+      };
 
       // always use solid stroke for arrowhead
-      delete options.strokeLineDash;
+      delete diamondOptions.strokeLineDash;
 
       return [
         generator.polygon(
@@ -400,46 +477,106 @@ const getArrowheadShapes = (
             [x4, y4],
             [x, y],
           ],
-          {
-            ...options,
-            fill:
-              arrowhead === "diamond_outline"
-                ? canvasBackgroundColor
-                : strokeColor,
-            fillStyle: "solid",
-            roughness: Math.min(1, options.roughness || 0),
-          },
+          diamondOptions,
         ),
       ];
     }
-    case "crowfoot_one":
-      return generateCrowfootOne(arrowheadPoints, options);
+    case "cardinality_one":
+      return generateArrowheadCardinalityOne(
+        generator,
+        getArrowheadPoints(element, shape, position, arrowhead),
+        getArrowheadLineOptions(element, options),
+      );
+    case "cardinality_many":
+      return generateArrowheadLinesToTip(
+        generator,
+        getArrowheadPoints(element, shape, position, arrowhead),
+        getArrowheadLineOptions(element, options),
+      );
+    case "cardinality_one_or_many": {
+      const lineOptions = getArrowheadLineOptions(element, options);
+
+      return [
+        ...generateArrowheadLinesToTip(
+          generator,
+          getArrowheadPoints(element, shape, position, "cardinality_many"),
+          lineOptions,
+        ),
+        ...generateArrowheadCardinalityOne(
+          generator,
+          getArrowheadPoints(
+            element,
+            shape,
+            position,
+            "cardinality_one",
+            cardinalityOneOrManyOffset,
+          ),
+          lineOptions,
+        ),
+      ];
+    }
+    case "cardinality_exactly_one": {
+      const lineOptions = getArrowheadLineOptions(element, options);
+
+      return [
+        ...generateArrowheadCardinalityOne(
+          generator,
+          getArrowheadPoints(element, shape, position, "cardinality_one", -0.5),
+          lineOptions,
+        ),
+        ...generateArrowheadCardinalityOne(
+          generator,
+          getArrowheadPoints(element, shape, position, "cardinality_one"),
+          lineOptions,
+        ),
+      ];
+    }
+    case "cardinality_zero_or_one": {
+      const lineOptions = getArrowheadLineOptions(element, options);
+
+      return [
+        ...generateArrowheadOutlineCircle(
+          generator,
+          options,
+          strokeColor,
+          getArrowheadPoints(element, shape, position, "circle_outline", 1.5),
+          backgroundFillColor,
+          cardinalityZeroCircleScale,
+        ),
+        ...generateArrowheadCardinalityOne(
+          generator,
+          getArrowheadPoints(element, shape, position, "cardinality_one", -0.5),
+          lineOptions,
+        ),
+      ];
+    }
+    case "cardinality_zero_or_many": {
+      const lineOptions = getArrowheadLineOptions(element, options);
+
+      return [
+        ...generateArrowheadLinesToTip(
+          generator,
+          getArrowheadPoints(element, shape, position, "cardinality_many"),
+          lineOptions,
+        ),
+        ...generateArrowheadOutlineCircle(
+          generator,
+          options,
+          strokeColor,
+          getArrowheadPoints(element, shape, position, "circle_outline", 1.5),
+          backgroundFillColor,
+          cardinalityZeroCircleScale,
+        ),
+      ];
+    }
     case "bar":
     case "arrow":
-    case "crowfoot_many":
-    case "crowfoot_one_or_many":
     default: {
-      const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
-
-      if (element.strokeStyle === "dotted") {
-        // for dotted arrows caps, reduce gap to make it more legible
-        const dash = getDashArrayDotted(element.strokeWidth - 1);
-        options.strokeLineDash = [dash[0], dash[1] - 1];
-      } else {
-        // for solid/dashed, keep solid arrow cap
-        delete options.strokeLineDash;
-      }
-      options.roughness = Math.min(1, options.roughness || 0);
-      return [
-        generator.line(x3, y3, x2, y2, options),
-        generator.line(x4, y4, x2, y2, options),
-        ...(arrowhead === "crowfoot_one_or_many"
-          ? generateCrowfootOne(
-              getArrowheadPoints(element, shape, position, "crowfoot_one"),
-              options,
-            )
-          : []),
-      ];
+      return generateArrowheadLinesToTip(
+        generator,
+        getArrowheadPoints(element, shape, position, arrowhead),
+        getArrowheadLineOptions(element, options),
+      );
     }
   }
 };

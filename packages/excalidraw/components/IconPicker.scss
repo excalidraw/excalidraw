@@ -6,12 +6,19 @@
     padding: 0.5rem;
     background: var(--popup-bg-color);
     border: 0 solid color.adjust(#fff, $alpha: -0.75);
-    box-shadow: var(--shadow-island);
+    box-shadow: var(--shadow-island-stronger);
     border-radius: 4px;
     position: absolute;
     :root[dir="rtl"] & {
       padding: 0.4rem;
     }
+  }
+
+  .picker-sections,
+  .picker-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .picker-container button,
@@ -62,7 +69,13 @@
 
   .picker-collapsible {
     font-size: 0.75rem;
-    padding: 0.5rem 0;
+    padding: 0;
+    color: var(--text-primary-color);
+  }
+
+  .picker-section-label {
+    font-size: 0.75rem;
+    color: var(--text-primary-color);
   }
 
   .picker-keybinding {

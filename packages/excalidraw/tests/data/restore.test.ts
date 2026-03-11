@@ -200,6 +200,26 @@ describe("restoreElements", () => {
     });
   });
 
+  it("should normalize legacy crowfoot arrowheads on restore", () => {
+    const arrowElement = API.createElement({
+      type: "arrow",
+    });
+
+    const restoredArrow = restore.restoreElements(
+      [
+        {
+          ...arrowElement,
+          startArrowhead: "crowfoot_one",
+          endArrowhead: "crowfoot_one_or_many",
+        } as any,
+      ],
+      null,
+    )[0] as ExcalidrawLinearElement;
+
+    expect(restoredArrow.startArrowhead).toBe("cardinality_one");
+    expect(restoredArrow.endArrowhead).toBe("cardinality_one_or_many");
+  });
+
   it("should strip element if restore fails", () => {
     const rect1 = API.createElement({
       type: "rectangle",
