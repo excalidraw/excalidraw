@@ -53,7 +53,14 @@
     "arrowhead_crowfoot_many": "Морщинки (много)",
     "arrowhead_crowfoot_one": "Морщинки (одна)",
     "arrowhead_crowfoot_one_or_many": "Морщинки (одна или много)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Больше вариантов",
+    "cardinality": "",
     "arrowtypes": "Тип стрелки",
     "arrowtype_sharp": "Острая стрелка",
     "arrowtype_round": "Изогнутая стрелка",
@@ -624,7 +631,7 @@
   "mermaid": {
     "title": "Из Mermaid в Excalidraw",
     "button": "Вставить",
-    "description": "В настоящее время поддерживаются только <flowchartLink>блок-схемы</flowchartLink>, <sequenceLink>диаграммы последовательности</sequenceLink> и <classLink>диаграммы классов</classLink>. Другие типы будут отображаться в виде изображения в Excalidraw.",
+    "description": "",
     "syntax": "Синтаксис Mermaid",
     "preview": "Предпросмотр",
     "label": "Mermaid",
@@ -654,7 +661,7 @@
     "placeholder": {
       "title": "Давайте создадим вашу диаграмму",
       "description": "Опишите диаграмму, которую вы хотите создать, и мы сгенерируем её для вас.",
-      "hint": "На данный момент мы знаем диаграммы блок-схемы, последовательности и классов."
+      "hint": ""
     },
     "preview": "Предпросмотр",
     "insert": "Вставить",
