@@ -11,6 +11,7 @@ import {
   THEME,
   DEFAULT_GRID_STEP,
   isTestEnv,
+  STROKE_PRESSURE,
 } from "@excalidraw/common";
 
 import type { AppState, NormalizedZoomValue } from "./types";
@@ -40,6 +41,7 @@ export const getDefaultAppState = (): Omit<
     currentItemArrowType: ARROW_TYPE.round,
     currentItemStrokeStyle: DEFAULT_ELEMENT_PROPS.strokeStyle,
     currentItemStrokeWidth: DEFAULT_ELEMENT_PROPS.strokeWidth,
+    strokePressure: STROKE_PRESSURE.variable,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
     currentHoveredFontFamily: null,
     cursorButton: "up",
@@ -171,6 +173,7 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemStrokeColor: { browser: true, export: false, server: false },
   currentItemStrokeStyle: { browser: true, export: false, server: false },
   currentItemStrokeWidth: { browser: true, export: false, server: false },
+  strokePressure: { browser: true, export: false, server: false },
   currentItemTextAlign: { browser: true, export: false, server: false },
   currentHoveredFontFamily: { browser: false, export: false, server: false },
   cursorButton: { browser: true, export: false, server: false },
