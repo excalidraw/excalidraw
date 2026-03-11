@@ -362,7 +362,7 @@ import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 
 import {
   calculateScrollCenter,
-  getElementsWithinSelection,
+  getElementsOverlappingSelection,
   getNormalizedZoom,
   getSelectedElements,
   hasBackground,
@@ -9972,11 +9972,11 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
           const elementsWithinSelection = this.state.selectionElement
-            ? getElementsWithinSelection(
+            ? getElementsOverlappingSelection(
                 elements,
                 this.state.selectionElement,
                 this.scene.getNonDeletedElementsMap(),
-                false,
+                true,
               )
             : [];
 
@@ -9991,6 +9991,17 @@ class App extends React.Component<AppProps, AppState> {
                 {},
               ),
             };
+
+            if (!elementsWithinSelection.length) {
+              const fallbackHit = this.getElementAtPosition(
+                pointerDownState.lastCoords.x,
+                pointerDownState.lastCoords.y,
+                { includeLockedElements: true },
+              );
+              if (fallbackHit) {
+                nextSelectedElementIds[fallbackHit.id] = true;
+              }
+            }
 
             if (pointerDownState.hit.element) {
               // if using ctrl/cmd, select the hitElement only if we
