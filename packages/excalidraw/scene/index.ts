@@ -1,5 +1,6 @@
 export {
   isSomeElementSelected,
+  getElementsOverlappingSelection,
   getElementsWithinSelection,
   getSelectedElements,
   getTargetElements,
