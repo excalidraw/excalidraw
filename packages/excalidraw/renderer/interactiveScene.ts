@@ -961,8 +961,8 @@ const renderSelectionBorder = (
     elementProperties.padding ?? DEFAULT_TRANSFORM_HANDLE_SPACING * 2;
 
   const linePadding = padding / appState.zoom.value;
-  const lineWidth = 8 / appState.zoom.value;
-  const spaceWidth = 4 / appState.zoom.value;
+  const dashLength = 2 / appState.zoom.value;
+  const dashGap = 2 / appState.zoom.value;
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
@@ -973,11 +973,11 @@ const renderSelectionBorder = (
     context.strokeStyle = selectionColors[index];
     if (dashed) {
       context.setLineDash([
-        lineWidth,
-        spaceWidth + (lineWidth + spaceWidth) * (count - 1),
+        dashLength,
+        dashGap + (dashLength + dashGap) * (count - 1),
       ]);
     }
-    context.lineDashOffset = (lineWidth + spaceWidth) * index;
+    context.lineDashOffset = (dashLength + dashGap) * index;
     strokeRectWithRotation_simple(
       context,
       x1 - linePadding,
@@ -1205,7 +1205,7 @@ const renderFocusPointConnectionLine = (
 
   context.strokeStyle = "rgba(134, 131, 226, 0.6)";
   context.lineWidth = 1 / appState.zoom.value;
-  context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
+  context.setLineDash([2 / appState.zoom.value, 2 / appState.zoom.value]);
 
   context.beginPath();
   context.moveTo(fromPoint[0], fromPoint[1]);
