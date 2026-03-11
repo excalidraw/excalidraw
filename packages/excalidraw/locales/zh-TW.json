@@ -53,7 +53,14 @@
     "arrowhead_crowfoot_many": "雞爪符號（多）",
     "arrowhead_crowfoot_one": "雞爪符號（一）",
     "arrowhead_crowfoot_one_or_many": "雞爪符號（一或多）",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "更多選項",
+    "cardinality": "",
     "arrowtypes": "箭頭類型",
     "arrowtype_sharp": "尖銳箭頭",
     "arrowtype_round": "彎角箭頭",
@@ -624,7 +631,7 @@
   "mermaid": {
     "title": "Mermaid 至 Excalidraw",
     "button": "插入",
-    "description": "目前僅支援 <flowchartLink>Flowchart</flowchartLink> 、 <sequenceLink>Sequence</sequenceLink> 及 <classLink>Class </classLink> 圖表。其餘檔案類型在 Excalidraw 將會以圖像呈現。",
+    "description": "",
     "syntax": "Mermaid 語法",
     "preview": "預覽",
     "label": "Mermaid",
@@ -654,7 +661,7 @@
     "placeholder": {
       "title": "讓我們開始設計你的圖表",
       "description": "描述你想要建立的圖表，我們將為你生成。",
-      "hint": "目前支援流程圖、時序圖以及類別圖。"
+      "hint": ""
     },
     "preview": "預覽",
     "insert": "插入",
