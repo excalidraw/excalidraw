@@ -53,7 +53,14 @@
     "arrowhead_crowfoot_many": "Zampe di gallina (molti)",
     "arrowhead_crowfoot_one": "Zampa di gallina (una)",
     "arrowhead_crowfoot_one_or_many": "Zampe di gallina (una o molte)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Altre opzioni",
+    "cardinality": "",
     "arrowtypes": "Tipo di freccia",
     "arrowtype_sharp": "Freccia affilata",
     "arrowtype_round": "Freccia curva",
@@ -624,7 +631,7 @@
   "mermaid": {
     "title": "Da Mermaid a Excalidraw",
     "button": "Inserisci",
-    "description": "Attualmente sono supportati solo diagrammi di <flowchartLink>flusso</flowchartLink>,<sequenceLink> sequenza, </sequenceLink> e <classLink>classe </classLink>. Gli altri tipi saranno rappresentati come immagini in Excalidraw.",
+    "description": "",
     "syntax": "Sintassi Mermaid",
     "preview": "Anteprima",
     "label": "Mermaid",
@@ -654,7 +661,7 @@
     "placeholder": {
       "title": "Progettiamo il tuo diagramma",
       "description": "Descrivi il diagramma che vuoi creare e noi lo genereremo per te.",
-      "hint": "Al momento conosciamo i diagrammi di flusso, di sequenza e di classe."
+      "hint": ""
     },
     "preview": "Anteprima",
     "insert": "Inserisci",
