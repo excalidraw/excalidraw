@@ -10,50 +10,82 @@ import { t } from "../i18n";
 import { getShortcutKey } from "../shortcut";
 
 import { Dialog } from "./Dialog";
-import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
+import { ExternalLinkIcon } from "./icons";
 
 import "./HelpDialog.scss";
 
 import type { JSX } from "react";
 
-const Header = () => (
-  <div className="HelpDialog__header">
-    <a
-      className="HelpDialog__btn"
-      href="https://docs.excalidraw.com"
-      target="_blank"
-      rel="noopener"
-    >
-      <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
-      {t("helpDialog.documentation")}
-    </a>
-    <a
-      className="HelpDialog__btn"
-      href="https://plus.excalidraw.com/blog"
-      target="_blank"
-      rel="noopener"
-    >
-      <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
-      {t("helpDialog.blog")}
-    </a>
-    <a
-      className="HelpDialog__btn"
-      href="https://github.com/excalidraw/excalidraw/issues"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <div className="HelpDialog__link-icon">{GithubIcon}</div>
-      {t("helpDialog.github")}
-    </a>
-    <a
-      className="HelpDialog__btn"
-      href="https://youtube.com/@excalidraw"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <div className="HelpDialog__link-icon">{youtubeIcon}</div>
-      YouTube
-    </a>
+const AboutSection = () => (
+  <div className="HelpDialog__about">
+    <div className="HelpDialog__about-content">
+      <h3 className="HelpDialog__about-title">About Flexcalidraw</h3>
+      <p className="HelpDialog__about-description">
+        Flexcalidraw is a fork of the beautiful open-source whiteboard app{" "}
+        <a
+          href="https://excalidraw.com?utm_source=flexcalidraw&utm_medium=app&utm_content=help_dialog"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Excalidraw
+        </a>
+        , enhanced with embedded analytics powered by{" "}
+        <a
+          href="https://luzmo.com/flex?utm_source=flexcalidraw&utm_medium=app&utm_content=help_dialog"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Luzmo Flex
+        </a>
+        .
+      </p>
+      <p className="HelpDialog__about-description">
+        Create hand-drawn diagrams and add interactive, data-driven charts
+        directly on your canvas.
+      </p>
+    </div>
+
+    <div className="HelpDialog__links">
+      <a
+        className="HelpDialog__btn HelpDialog__btn--primary"
+        href="https://excalidraw.com?utm_source=flexcalidraw&utm_medium=app&utm_content=help_dialog"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
+        Visit Excalidraw
+      </a>
+      <a
+        className="HelpDialog__btn HelpDialog__btn--secondary"
+        href="https://luzmo.com/flex?utm_source=flexcalidraw&utm_medium=app&utm_content=help_dialog"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
+        Explore Luzmo Flex
+      </a>
+    </div>
+
+    <div className="HelpDialog__attribution">
+      <span>Built with </span>
+      <span className="HelpDialog__attribution-heart">♥</span>
+      <span> on </span>
+      <a
+        href="https://excalidraw.com?utm_source=flexcalidraw&utm_medium=app&utm_content=help_dialog"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Excalidraw
+      </a>
+      <span> + </span>
+      <a
+        href="https://luzmo.com/flex?utm_source=flexcalidraw&utm_medium=app&utm_content=help_dialog"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Luzmo Flex
+      </a>
+    </div>
   </div>
 );
 
@@ -134,10 +166,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
     <>
       <Dialog
         onCloseRequest={handleClose}
-        title={t("helpDialog.title")}
+        title="About & Help"
         className={"HelpDialog"}
       >
-        <Header />
+        <AboutSection />
         <Section title={t("helpDialog.shortcuts")}>
           <ShortcutIsland
             className="HelpDialog__island--tools"
@@ -177,6 +209,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[KEYS.T, KEYS["8"]]}
             />
             <Shortcut label={t("toolBar.image")} shortcuts={[KEYS["9"]]} />
+            <Shortcut label={t("toolBar.luzmochart")} shortcuts={[KEYS.C]} />
             <Shortcut
               label={t("toolBar.eraser")}
               shortcuts={[KEYS.E, KEYS["0"]]}

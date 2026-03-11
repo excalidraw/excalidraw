@@ -1,4 +1,4 @@
-FROM --platform=${BUILDPLATFORM} node:18 AS build
+FROM --platform=${BUILDPLATFORM} node:20 AS build
 
 WORKDIR /opt/node_app
 
@@ -10,6 +10,11 @@ RUN --mount=type=cache,target=/root/.cache/yarn \
     npm_config_target_arch=${TARGETARCH} yarn --network-timeout 600000
 
 ARG NODE_ENV=production
+# WebSocket server URL for collaboration (browser connects here)
+ARG VITE_APP_WS_SERVER_URL=http://localhost:3002
+ENV VITE_APP_WS_SERVER_URL=${VITE_APP_WS_SERVER_URL}
+# Increase Node heap size for Vite build
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
 RUN npm_config_target_arch=${TARGETARCH} yarn build:app:docker
 

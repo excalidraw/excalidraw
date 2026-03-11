@@ -52,8 +52,59 @@ declare module "png-chunks-extract" {
 // -----------------------------------------------------------------------------
 
 interface Blob {
-  handle?: FileSystemFileHandle;
+  handle?: import("browser-fs-access").FileSystemHandle;
   name?: string;
+}
+
+// browser-fs-access module declaration for bundler moduleResolution
+declare module "browser-fs-access" {
+  export interface FileSystemHandle {
+    readonly kind: "file" | "directory";
+    readonly name: string;
+  }
+
+  export interface FileSystemFileHandle extends FileSystemHandle {
+    readonly kind: "file";
+    getFile(): Promise<File>;
+    createWritable(): Promise<FileSystemWritableFileStream>;
+  }
+
+  export interface FileSystemWritableFileStream extends WritableStream {
+    write(data: BufferSource | Blob | string): Promise<void>;
+    seek(position: number): Promise<void>;
+    truncate(size: number): Promise<void>;
+  }
+
+  export interface FileOpenOptions {
+    description?: string;
+    mimeTypes?: string[];
+    extensions?: string[];
+    multiple?: boolean;
+    legacySetup?: (
+      resolve: (value: File | File[]) => void,
+      reject: (reason?: Error) => void,
+      input: HTMLInputElement,
+    ) => (rejectPromise: boolean) => void;
+  }
+
+  export interface FileSaveOptions {
+    fileName?: string;
+    description?: string;
+    mimeTypes?: string[];
+    extensions?: string[];
+  }
+
+  export function fileOpen<M extends boolean | undefined = false>(
+    options?: FileOpenOptions & { multiple?: M },
+  ): Promise<M extends true ? File[] : File>;
+
+  export function fileSave(
+    blob: Blob | Promise<Blob>,
+    options?: FileSaveOptions,
+    existingHandle?: FileSystemHandle | null,
+  ): Promise<FileSystemHandle | null>;
+
+  export const supported: boolean;
 }
 
 declare module "*.scss";

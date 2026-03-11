@@ -34,6 +34,7 @@ import {
   LassoIcon,
   mermaidLogoIcon,
   MagicIcon,
+  LuzmoChartIcon,
 } from "./icons";
 
 import "./ToolIcon.scss";
@@ -122,6 +123,7 @@ export const MobileToolBar = ({
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
+  const luzmochartToolSelected = activeTool.type === "luzmochart";
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
@@ -153,11 +155,13 @@ export const MobileToolBar = ({
 
   const showTextToolOutside = toolbarWidth >= MIN_WIDTH + 1 * ADDITIONAL_WIDTH;
   const showImageToolOutside = toolbarWidth >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
-  const showFrameToolOutside = toolbarWidth >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
+  const showLuzmoChartOutside =
+    toolbarWidth >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
 
   const extraTools = [
     "text",
     "frame",
+    "luzmochart",
     "embeddable",
     "laser",
     "magicframe",
@@ -168,7 +172,7 @@ export const MobileToolBar = ({
     if (showImageToolOutside && tool === "image") {
       return false;
     }
-    if (showFrameToolOutside && tool === "frame") {
+    if (showLuzmoChartOutside && tool === "luzmochart") {
       return false;
     }
     return true;
@@ -181,6 +185,8 @@ export const MobileToolBar = ({
       ? ImageIcon
       : activeTool.type === "frame"
       ? frameToolIcon
+      : activeTool.type === "luzmochart"
+      ? LuzmoChartIcon
       : activeTool.type === "embeddable"
       ? EmbedIcon
       : activeTool.type === "laser"
@@ -359,18 +365,18 @@ export const MobileToolBar = ({
         />
       )}
 
-      {/* Frame Tool */}
-      {showFrameToolOutside && (
+      {/* Luzmo Chart */}
+      {showLuzmoChartOutside && (
         <ToolButton
-          className={clsx({ active: frameToolSelected })}
+          className={clsx({ active: luzmochartToolSelected })}
           type="radio"
-          icon={frameToolIcon}
-          checked={frameToolSelected}
+          icon={LuzmoChartIcon}
+          checked={luzmochartToolSelected}
           name="editor-current-shape"
-          title={`${capitalizeString(t("toolBar.frame"))}`}
-          aria-label={capitalizeString(t("toolBar.frame"))}
-          data-testid="toolbar-frame"
-          onChange={() => handleToolChange("frame")}
+          title={`${capitalizeString(t("toolBar.luzmochart"))}`}
+          aria-label={capitalizeString(t("toolBar.luzmochart"))}
+          data-testid="toolbar-luzmochart"
+          onChange={() => handleToolChange("luzmochart")}
         />
       )}
 
@@ -427,17 +433,26 @@ export const MobileToolBar = ({
               {t("toolBar.image")}
             </DropdownMenu.Item>
           )}
-          {!showFrameToolOutside && (
+          {!showLuzmoChartOutside && (
             <DropdownMenu.Item
-              onSelect={() => app.setActiveTool({ type: "frame" })}
-              icon={frameToolIcon}
-              shortcut={KEYS.F.toLocaleUpperCase()}
-              data-testid="toolbar-frame"
-              selected={frameToolSelected}
+              onSelect={() => app.setActiveTool({ type: "luzmochart" })}
+              icon={LuzmoChartIcon}
+              shortcut={KEYS.C.toLocaleUpperCase()}
+              data-testid="toolbar-luzmochart"
+              selected={luzmochartToolSelected}
             >
-              {t("toolBar.frame")}
+              {t("toolBar.luzmochart")}
             </DropdownMenu.Item>
           )}
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "frame" })}
+            icon={frameToolIcon}
+            shortcut={KEYS.F.toLocaleUpperCase()}
+            data-testid="toolbar-frame"
+            selected={frameToolSelected}
+          >
+            {t("toolBar.frame")}
+          </DropdownMenu.Item>
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "embeddable" })}
             icon={EmbedIcon}
@@ -472,9 +487,9 @@ export const MobileToolBar = ({
                 onSelect={() => app.onMagicframeToolSelect()}
                 icon={MagicIcon}
                 data-testid="toolbar-magicframe"
-                badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
               >
                 {t("toolBar.magicframe")}
+                <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
               </DropdownMenu.Item>
             </>
           )}

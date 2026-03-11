@@ -33,10 +33,16 @@ import {
   normalizeFile,
 } from "./data/blob";
 
+import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
+
+import type { FileSystemHandle } from "./data/filesystem";
+
+import type { Spreadsheet } from "./charts";
+
 import type { BinaryFiles } from "./types";
 
 type ElementsClipboard = {
-  type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
+  type: typeof EXPORT_DATA_TYPES.flexcalidrawClipboard;
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles | undefined;
 };
@@ -44,6 +50,7 @@ type ElementsClipboard = {
 export type PastedMixedContent = { type: "text" | "imageUrl"; value: string }[];
 
 export interface ClipboardData {
+  spreadsheet?: Spreadsheet;
   elements?: readonly ExcalidrawElement[];
   files?: BinaryFiles;
   text?: string;
@@ -75,6 +82,9 @@ const clipboardContainsElements = (
 ): contents is { elements: ExcalidrawElement[]; files?: BinaryFiles } => {
   if (
     [
+      EXPORT_DATA_TYPES.flexcalidraw,
+      EXPORT_DATA_TYPES.flexcalidrawClipboard,
+      EXPORT_DATA_TYPES.flexcalidrawClipboardWithAPI,
       EXPORT_DATA_TYPES.excalidraw,
       EXPORT_DATA_TYPES.excalidrawClipboard,
       EXPORT_DATA_TYPES.excalidrawClipboardWithAPI,
@@ -170,7 +180,7 @@ export const serializeAsClipboardJSON = ({
 
   // select bound text elements when copying
   const contents: ElementsClipboard = {
-    type: EXPORT_DATA_TYPES.excalidrawClipboard,
+    type: EXPORT_DATA_TYPES.flexcalidrawClipboard,
     elements: elements.map((element) => {
       if (
         getContainingFrame(element, elementsMap) &&
@@ -201,11 +211,21 @@ export const copyToClipboard = async (
 
   await copyTextToSystemClipboard(
     {
-      [MIME_TYPES.excalidrawClipboard]: json,
+      [MIME_TYPES.flexcalidrawClipboard]: json,
       [MIME_TYPES.text]: json,
     },
     clipboardEvent,
   );
+};
+
+const parsePotentialSpreadsheet = (
+  text: string,
+): { spreadsheet: Spreadsheet } | { errorMessage: string } | null => {
+  const result = tryParseSpreadsheet(text);
+  if (result.type === VALID_SPREADSHEET) {
+    return { spreadsheet: result.spreadsheet };
+  }
+  return null;
 };
 
 /** internal, specific to parsing paste events. Do not reuse. */
@@ -367,7 +387,7 @@ type AllowedParsedDataTransferItem =
       type: ValueOf<typeof IMAGE_MIME_TYPES>;
       kind: "file";
       file: File;
-      fileHandle: FileSystemFileHandle | null;
+      fileHandle: FileSystemHandle | null;
     }
   | { type: ValueOf<typeof STRING_MIME_TYPES>; kind: "string"; value: string };
 
@@ -376,7 +396,7 @@ type ParsedDataTransferItem =
       type: string;
       kind: "file";
       file: File;
-      fileHandle: FileSystemFileHandle | null;
+      fileHandle: FileSystemHandle | null;
     }
   | { type: string; kind: "string"; value: string };
 
@@ -535,8 +555,23 @@ export const parseClipboard = async (
   }
 
   try {
+    // if system clipboard contains spreadsheet, use it even though it's
+    // technically possible it's staler than in-app clipboard
+    const spreadsheetResult =
+      !isPlainPaste && parsePotentialSpreadsheet(parsedEventData.value);
+
+    if (spreadsheetResult) {
+      return spreadsheetResult;
+    }
+  } catch (error: any) {
+    console.error(error);
+  }
+
+  try {
     const systemClipboardData = JSON.parse(parsedEventData.value);
     const programmaticAPI =
+      systemClipboardData.type ===
+        EXPORT_DATA_TYPES.flexcalidrawClipboardWithAPI ||
       systemClipboardData.type === EXPORT_DATA_TYPES.excalidrawClipboardWithAPI;
     if (clipboardContainsElements(systemClipboardData)) {
       return {

@@ -12,10 +12,77 @@
       font-size: 1.125rem;
     }
 
-    &__header {
+    &__about {
+      background: linear-gradient(
+        135deg,
+        var(--color-surface-low) 0%,
+        var(--color-surface-mid) 100%
+      );
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--dialog-border-color);
+    }
+
+    &__about-title {
+      margin: 0 0 0.75rem 0 !important;
+      font-size: 1.25rem !important;
+      color: var(--text-primary-color);
+    }
+
+    &__about-content {
+      margin-bottom: 1.25rem;
+    }
+
+    &__about-description {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      color: var(--text-primary-color);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      a {
+        color: var(--color-primary);
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    &__links {
       display: flex;
       flex-wrap: wrap;
       gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    &__attribution {
+      font-size: 0.8125rem;
+      color: var(--text-primary-color);
+      opacity: 0.8;
+      text-align: center;
+      padding-top: 1rem;
+      border-top: 1px solid var(--dialog-border-color);
+
+      a {
+        color: var(--color-primary);
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    &__attribution-heart {
+      color: #e25555;
     }
 
     &__btn {
@@ -47,6 +114,27 @@
 
       &:active {
         border-color: var(--color-primary);
+      }
+
+      &--primary {
+        --background: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+
+        &:hover {
+          --background: var(--color-primary-darker);
+          border-color: var(--color-primary-darker);
+        }
+      }
+
+      &--secondary {
+        --background: transparent;
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+
+        &:hover {
+          --background: var(--color-primary-light);
+        }
       }
     }
 

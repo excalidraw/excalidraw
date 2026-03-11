@@ -430,6 +430,18 @@ export const ImageIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+// Luzmo chart icon (bar chart)
+export const LuzmoChartIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M3 12m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+    <path d="M9 8m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+    <path d="M15 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+    <path d="M4 20h14" />
+  </g>,
+  tablerIconProps,
+);
+
 // tabler-icons: eraser
 export const EraserIcon = createIcon(
   <g strokeWidth="1.5">
@@ -557,6 +569,27 @@ export const GithubIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+const getLuzmoMarkSrc = (isDark: boolean) => {
+  const assetPath =
+    typeof window !== "undefined" && (window as any).EXCALIDRAW_ASSET_PATH
+      ? `${(window as any).EXCALIDRAW_ASSET_PATH}`
+      : "";
+  return (
+    assetPath + (isDark ? "/luzmo_mark_dark.svg" : "/luzmo_mark_light.svg")
+  );
+};
+
+export const LuzmoMarkIcon = ({ theme }: { theme?: Theme }) => {
+  const isDark = theme === THEME.DARK;
+  return (
+    <img
+      src={getLuzmoMarkSrc(isDark)}
+      alt="Luzmo"
+      style={{ width: 20, height: 20 }}
+    />
+  );
+};
+
 export const DiscordIcon = createIcon(
   <g strokeWidth="1.25">
     <path d="M7.5 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM12.5 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM6.25 6.25c2.917-.833 4.583-.833 7.5 0M5.833 13.75c2.917.833 5.417.833 8.334 0" />
@@ -598,6 +631,18 @@ export const save = createIcon(
 export const saveAs = createIcon(
   "M252 54L203 8a28 27 0 00-20-8H28C12 0 0 12 0 27v195c0 15 12 26 28 26h204c15 0 28-11 28-26V73a28 27 0 00-8-19zM130 213c-21 0-37-16-37-36 0-19 16-35 37-35 20 0 37 16 37 35 0 20-17 36-37 36zm56-169v56c0 4-4 6-7 6H44c-4 0-7-2-7-6V42c0-4 3-7 7-7h133l4 2 3 2a7 7 0 012 5z M296 201l87 95-188 205-78 9c-10 1-19-8-18-20l9-84zm141-14l-41-44a31 31 0 00-46 0l-38 41 87 95 38-42c13-14 13-36 0-50z",
   { width: 448, height: 512 },
+);
+
+// tabler-icon: layout-2 (template/layout icon)
+export const TemplateIcon = createIcon(
+  <g strokeWidth="1.25">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <rect x="4" y="4" width="6" height="6" rx="1" />
+    <rect x="14" y="4" width="6" height="6" rx="1" />
+    <rect x="4" y="14" width="6" height="6" rx="1" />
+    <rect x="14" y="14" width="6" height="6" rx="1" />
+  </g>,
+  tablerIconProps,
 );
 
 // tabler-icon: folder
@@ -1287,21 +1332,13 @@ export const EdgeRoundIcon = createIcon(
   tablerIconProps,
 );
 
-export const ArrowheadNoneIcon = React.memo(
-  ({ flip = false }: { flip?: boolean }) =>
-    createIcon(
-      <g
-        transform={flip ? "translate(24, 0) scale(-1, 1)" : ""}
-        stroke="currentColor"
-        opacity={0.3}
-        strokeWidth={2}
-      >
-        <path d="M12 12l-9 0" />
-        <path d="M21 9l-6 6" />
-        <path d="M21 15l-6 -6" />
-      </g>,
-      tablerIconProps,
-    ),
+export const ArrowheadNoneIcon = createIcon(
+  <g stroke="currentColor" opacity={0.3} strokeWidth={2}>
+    <path d="M12 12l9 0" />
+    <path d="M3 9l6 6" />
+    <path d="M3 15l6 -6" />
+  </g>,
+  tablerIconProps,
 );
 
 export const ArrowheadArrowIcon = React.memo(

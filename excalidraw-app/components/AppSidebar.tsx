@@ -2,6 +2,7 @@ import { DefaultSidebar, Sidebar, THEME } from "@excalidraw/excalidraw";
 import {
   messageCircleIcon,
   presentationIcon,
+  LuzmoChartIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { LinkButton } from "@excalidraw/excalidraw/components/LinkButton";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
@@ -25,6 +26,12 @@ export const AppSidebar = () => {
           style={{ opacity: openSidebar?.tab === "presentation" ? 1 : 0.4 }}
         >
           {presentationIcon}
+        </Sidebar.TabTrigger>
+        <Sidebar.TabTrigger
+          tab="chart"
+          style={{ opacity: openSidebar?.tab === "chart" ? 1 : 0.4 }}
+        >
+          {LuzmoChartIcon}
         </Sidebar.TabTrigger>
       </DefaultSidebar.TabTriggers>
       <Sidebar.Tab tab="comments">

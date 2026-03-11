@@ -206,3 +206,205 @@
   --button-hover-bg: #363541;
   --button-bg: var(--color-surface-high);
 }
+
+// Luzmo Chart Properties
+.luzmo-chart-properties {
+  // === Luzmo CSS custom properties (light mode defaults) ===
+  // All values reference Excalidraw's own design tokens so they
+  // automatically respond to theme changes without extra overrides.
+
+  // Primary — map to Excalidraw's primary color
+  --luzmo-primary: var(--color-primary);
+  --luzmo-primary-hover: var(--color-primary-darker);
+  --luzmo-primary-down: var(--color-primary-darkest);
+  --luzmo-primary-focus: var(--color-primary-darker);
+  --luzmo-primary-inverse-color: #ffffff;
+  --luzmo-primary-rgb: 105, 101, 219; // matches #6965db
+
+  // Background — map to Excalidraw's surface tokens
+  --luzmo-background-color: var(--island-bg-color);
+  --luzmo-background-color-rgb: 255, 255, 255; // recalculated per theme via dark override
+  --luzmo-background-color-hover: var(--color-surface-mid);
+  --luzmo-background-color-down: var(--color-surface-low);
+  --luzmo-background-color-focus: var(--color-surface-mid);
+  --luzmo-background-color-highlight: var(--color-surface-high);
+  --luzmo-background-color-highlight-hover: var(--color-surface-low);
+  --luzmo-background-color-highlight-down: var(--color-surface-low);
+  --luzmo-background-color-alt-1: var(--color-surface-mid);
+  --luzmo-background-color-alt-2: var(--color-surface-high);
+  --luzmo-background-color-disabled: var(--color-surface-high);
+
+  // Text — map to Excalidraw's text tokens
+  --luzmo-font-color: var(--text-primary-color);
+  --luzmo-font-color-hard: var(--color-on-surface);
+  --luzmo-font-color-hover: var(--text-primary-color);
+  --luzmo-font-color-down: var(--color-on-surface);
+  --luzmo-font-color-focus: var(--text-primary-color);
+  --luzmo-font-color-extra-dimmed: var(--color-gray-50);
+  --luzmo-font-color-disabled: var(--color-disabled);
+
+  // Border — map to Excalidraw's border tokens
+  --luzmo-border-color: var(--default-border-color);
+  --luzmo-border-color-rgb: 0, 0, 0; // recalculated per theme via dark override
+  --luzmo-border-color-hover: var(--color-brand-hover);
+  --luzmo-border-color-down: var(--color-brand-active);
+  --luzmo-border-color-focus: var(--color-brand-hover);
+  --luzmo-border-color-full: var(--color-gray-30);
+  --luzmo-border-color-full-hover: var(--color-gray-40);
+  --luzmo-border-color-disabled: var(--color-border-outline-variant);
+
+  // Selected state — map to Excalidraw's on-surface tokens
+  --luzmo-selected-color: var(--color-gray-60);
+  --luzmo-selected-color-hover: var(--color-gray-70);
+  --luzmo-selected-color-hard: var(--color-gray-90);
+
+  // Typography — match Excalidraw's "Assistant" font and size scale
+  --luzmo-font-family: "Assistant", sans-serif;
+  --luzmo-font-size-xs: 0.625rem;
+  --luzmo-font-size-s: 0.75rem;
+  --luzmo-font-size-m: 0.875rem;
+  --luzmo-font-size: 0.875rem;
+  --luzmo-font-size-l: 1rem;
+  --luzmo-font-weight: 400;
+  --luzmo-font-weight-semibold: 600;
+  --luzmo-font-weight-bold: 700;
+
+  // Border radius — match Excalidraw's radius tokens
+  --luzmo-border-radius: var(--border-radius-md, 0.375rem);
+  --luzmo-border-radius-s: 0.25rem;
+  --luzmo-border-radius-l: var(--border-radius-lg, 0.5rem);
+  --luzmo-border-radius-xl: 0.75rem;
+  --luzmo-border-radius-full: 9999px;
+
+  // Scrollbar — match Excalidraw's scrollbar tokens
+  --luzmo-scrollbar-size: 6px;
+  --luzmo-scrollbar-width: thin;
+  --luzmo-scrollbar-track-background: transparent;
+  --luzmo-scrollbar-thumb-background: var(--scrollbar-thumb);
+  --luzmo-scrollbar-thumb-hover-background: var(--scrollbar-thumb-hover);
+  --luzmo-scrollbar-thumb-border-radius: 3px;
+  --luzmo-scrollbar-track-border-radius: 3px;
+
+  --luzmo-accordion-item-width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  width: 100%;
+  min-width: 0; // Allow flex item to shrink below content size
+  overflow: hidden;
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0; // Allow flex item to shrink
+  }
+
+  &__divider {
+    height: 1px;
+    margin: 0.125rem 0;
+    background: var(--default-border-color);
+    min-width: 0;
+  }
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-primary-color);
+  }
+
+  &__value {
+    font-size: 0.875rem;
+    color: var(--text-primary-color);
+    padding: 0.375rem 0.5rem;
+    background: var(--color-surface-low, #f5f5f5);
+    border-radius: var(--border-radius-md, 4px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__select {
+    font-size: 0.875rem;
+    color: var(--text-primary-color);
+    padding: 0.375rem 0.5rem;
+    background: var(--color-surface-low, #f5f5f5);
+    border: 1px solid var(--default-border-color, #ddd);
+    border-radius: var(--border-radius-md, 4px);
+    cursor: pointer;
+    width: 100%;
+    min-width: 0; // Allow select to shrink
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    &:hover {
+      border-color: var(--color-primary-light, #aaa);
+    }
+
+    optgroup {
+      font-weight: 600;
+      color: var(--text-primary-color);
+    }
+
+    option {
+      font-weight: normal;
+    }
+  }
+
+  &__hint {
+    font-size: 0.75rem;
+    color: var(--color-gray-50);
+    font-style: italic;
+    padding: 0.5rem;
+    background: var(--color-surface-low, #f5f5f5);
+    border-radius: var(--border-radius-md, 4px);
+    text-align: center;
+  }
+
+  &__custom {
+    margin-top: 0.5rem;
+    width: 100%;
+    min-width: 0; // Allow flex item to shrink
+    overflow: hidden;
+
+    // Ensure Luzmo components fit within the panel
+    luzmo-item-data-picker-panel,
+    luzmo-edit-item {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    // Constrain any nested content
+    > * {
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+  }
+}
+
+// Dark mode overrides for Luzmo components in Actions.
+// Most color tokens already auto-switch because they reference Excalidraw
+// CSS variables (--island-bg-color, --text-primary-color, etc.).
+// Only RGB helpers and the primary color (which shifts hue in dark mode)
+// need explicit dark overrides.
+:root.theme--dark .luzmo-chart-properties,
+.excalidraw.theme--dark .luzmo-chart-properties {
+  // Primary shifts to a lighter, higher-contrast hue in dark mode
+  --luzmo-primary: var(--color-primary); // #a8a5ff in dark
+  --luzmo-primary-hover: var(--color-primary-darker);
+  --luzmo-primary-down: var(--color-primary-darkest);
+  --luzmo-primary-focus: var(--color-primary-darker);
+  --luzmo-primary-rgb: 168, 165, 255; // matches #a8a5ff
+
+  // RGB helpers must be recalculated for dark background
+  --luzmo-background-color-rgb: 35, 35, 41; // matches --island-bg-color #232329
+
+  // Border RGB for dark mode (white-based rgba calculations)
+  --luzmo-border-color-rgb: 255, 255, 255;
+}

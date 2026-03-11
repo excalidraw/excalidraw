@@ -1,4 +1,4 @@
-import { getShortcutKey } from "../../shortcut";
+import { getShortcutKey } from "@excalidraw/excalidraw/shortcut";
 
 export const TTDDialogSubmitShortcut = () => {
   return (

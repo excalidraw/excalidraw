@@ -88,6 +88,7 @@ export const renderNewElementSceneThrottled = throttleRAF(
   (config: NewElementSceneRenderConfig) => {
     _renderNewElementScene(config);
   },
+  { trailing: true },
 );
 
 export const renderNewElementScene = (

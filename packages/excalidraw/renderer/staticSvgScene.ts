@@ -38,6 +38,8 @@ import { getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
+  ExcalidrawLuzmoChartElement,
+  ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -277,6 +279,151 @@ const renderElementToSvg = (
         embeddableNode.appendChild(foreignObject);
       }
       addToRoot(embeddableNode, element);
+      break;
+    }
+    case "luzmochart": {
+      // render placeholder rectangle for Luzmo chart
+      const shape = ShapeCache.generateElementShape(element, renderConfig);
+      const node = roughSVGDrawWithPrecision(
+        rsvg,
+        shape,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
+      );
+      const chartOpacity = element.opacity / 100;
+      if (chartOpacity !== 1) {
+        node.setAttribute("stroke-opacity", `${chartOpacity}`);
+        node.setAttribute("fill-opacity", `${chartOpacity}`);
+      }
+      node.setAttribute("stroke-linecap", "round");
+      node.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      addToRoot(node, element);
+
+      // Cast to LuzmoChartElement to access chart-specific properties
+      const luzmoElement = element as ExcalidrawLuzmoChartElement;
+
+      // Check if there's a linked AI summary element
+      const summaryElementId = luzmoElement.customData?.aiSummaryElementId as
+        | string
+        | undefined;
+      let summaryText: string | null = null;
+
+      if (summaryElementId) {
+        // Find the summary text element - use allElementsMap if available
+        // (summary elements may be outside the export frame and thus not in elementsMap)
+        const lookupMap = renderConfig.allElementsMap ?? elementsMap;
+        const summaryElement = lookupMap.get(summaryElementId) as
+          | ExcalidrawTextElement
+          | undefined;
+        if (
+          summaryElement &&
+          summaryElement.type === "text" &&
+          !summaryElement.isDeleted
+        ) {
+          summaryText = summaryElement.text;
+        }
+      }
+
+      const textColor = renderConfig.exportWithDarkMode ? "#ffffff" : "#333333";
+      const padding = 20;
+      const maxWidth = element.width - padding * 2;
+      const fontSize = 14;
+      const lineHeight = 20;
+
+      // Create a group for all text content
+      const textGroup = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
+      textGroup.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+
+      if (summaryText && summaryText.trim()) {
+        // Word wrap the summary text manually for SVG
+        const words = summaryText.split(" ");
+        const lines: string[] = [];
+        let currentLine = "";
+
+        // Approximate character width (will vary by font, but good enough for layout)
+        const avgCharWidth = fontSize * 0.5;
+        const maxCharsPerLine = Math.floor(maxWidth / avgCharWidth);
+
+        for (const word of words) {
+          const testLine = currentLine ? `${currentLine} ${word}` : word;
+          if (testLine.length > maxCharsPerLine && currentLine) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        }
+        if (currentLine) {
+          lines.push(currentLine);
+        }
+
+        // Add chart type label at the top (use local coords: 0,0 = element top-left)
+        const chartLabel = svgRoot.ownerDocument.createElementNS(
+          SVG_NS,
+          "text",
+        );
+        chartLabel.setAttribute("x", `${element.width / 2}`);
+        chartLabel.setAttribute("y", `${padding + 10}`);
+        chartLabel.setAttribute("text-anchor", "middle");
+        chartLabel.setAttribute("dominant-baseline", "middle");
+        chartLabel.setAttribute("font-family", "sans-serif");
+        chartLabel.setAttribute("font-size", "12");
+        chartLabel.setAttribute("font-weight", "bold");
+        chartLabel.setAttribute("fill", textColor);
+        chartLabel.setAttribute("opacity", "0.7");
+        chartLabel.textContent = `Luzmo Chart (${luzmoElement.chartType})`;
+        textGroup.appendChild(chartLabel);
+
+        // Calculate starting Y position to center the summary text block (local coords)
+        const totalTextHeight = lines.length * lineHeight;
+        const labelHeight = 30;
+        const availableHeight = element.height - padding * 2 - labelHeight;
+        const startY =
+          padding + labelHeight + (availableHeight - totalTextHeight) / 2;
+
+        // Render each line of summary text
+        for (let i = 0; i < lines.length; i++) {
+          const textLine = svgRoot.ownerDocument.createElementNS(
+            SVG_NS,
+            "text",
+          );
+          textLine.setAttribute("x", `${element.width / 2}`);
+          textLine.setAttribute("y", `${startY + i * lineHeight}`);
+          textLine.setAttribute("text-anchor", "middle");
+          textLine.setAttribute("dominant-baseline", "middle");
+          textLine.setAttribute("font-family", "sans-serif");
+          textLine.setAttribute("font-size", `${fontSize}`);
+          textLine.setAttribute("fill", textColor);
+          textLine.textContent = lines[i];
+          textGroup.appendChild(textLine);
+        }
+      } else {
+        // No summary available - show simple placeholder label (local coords)
+        const chartLabel = svgRoot.ownerDocument.createElementNS(
+          SVG_NS,
+          "text",
+        );
+        chartLabel.setAttribute("x", `${element.width / 2}`);
+        chartLabel.setAttribute("y", `${element.height / 2}`);
+        chartLabel.setAttribute("text-anchor", "middle");
+        chartLabel.setAttribute("dominant-baseline", "middle");
+        chartLabel.setAttribute("font-family", "sans-serif");
+        chartLabel.setAttribute("font-size", `${fontSize}`);
+        chartLabel.setAttribute("fill", textColor);
+        chartLabel.textContent = `Luzmo Chart (${luzmoElement.chartType})`;
+        textGroup.appendChild(chartLabel);
+      }
+
+      addToRoot(textGroup, element);
       break;
     }
     case "line":
@@ -717,11 +864,31 @@ export const renderSceneToSvg = (
     return;
   }
 
+  // Collect summary element IDs from Luzmo charts - these will be rendered
+  // inside the chart placeholder, so we skip rendering them separately
+  const summaryElementIds = new Set<string>();
+  for (const element of elements) {
+    if (element.type === "luzmochart" && !element.isDeleted) {
+      const luzmoElement = element as ExcalidrawLuzmoChartElement;
+      const summaryId = luzmoElement.customData?.aiSummaryElementId as
+        | string
+        | undefined;
+      if (summaryId) {
+        summaryElementIds.add(summaryId);
+      }
+    }
+  }
+
   // render elements
   elements
     .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       if (!element.isDeleted) {
+        // Skip summary text elements - they're rendered inside the chart
+        if (summaryElementIds.has(element.id)) {
+          return;
+        }
+
         if (
           isTextElement(element) &&
           element.containerId &&

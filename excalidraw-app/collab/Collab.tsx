@@ -72,7 +72,6 @@ import {
   FileManager,
   updateStaleImageStatuses,
 } from "../data/FileManager";
-import { FileStatusStore } from "../data/fileStatusStore";
 import { LocalData } from "../data/LocalData";
 import {
   isSavedToFirebase,
@@ -150,7 +149,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     };
     this.portal = new Portal(this);
     this.fileManager = new FileManager({
-      onFileStatusChange: FileStatusStore.updateStatuses.bind(FileStatusStore),
       getFiles: async (fileIds) => {
         const { roomId, roomKey } = this.portal;
         if (!roomId || !roomKey) {

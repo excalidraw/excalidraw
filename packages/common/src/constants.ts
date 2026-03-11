@@ -1,6 +1,7 @@
 import type {
   ExcalidrawElement,
   FontFamilyValues,
+  LuzmoChartType,
 } from "@excalidraw/element/types";
 import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
 
@@ -9,7 +10,7 @@ import { COLOR_PALETTE } from "./colors";
 export const supportsResizeObserver =
   typeof window !== "undefined" && "ResizeObserver" in window;
 
-export const APP_NAME = "Excalidraw";
+export const APP_NAME = "Luzmo's Flexcalidraw";
 
 // distance when creating text before it's considered `autoResize: false`
 // we're using higher threshold so that clicks that end up being drags
@@ -201,7 +202,9 @@ export const FRAME_STYLE = {
   roughness: 0 as ExcalidrawElement["roughness"],
   roundness: null as ExcalidrawElement["roundness"],
   backgroundColor: "transparent" as ExcalidrawElement["backgroundColor"],
-  radius: 8,
+  // Keep in sync with --luzmo-border-radius-s / --border-radius-md for subtle corners
+  // that align with charts, rectangles, and UI panels (0.25rem = 4px at 16px root)
+  radius: 4,
   nameOffsetY: 3,
   nameColorLightTheme: "#999999",
   nameColorDarkTheme: "#7a7a7a",
@@ -250,18 +253,26 @@ export const STRING_MIME_TYPES = {
   text: "text/plain",
   html: "text/html",
   json: "application/json",
-  // excalidraw data
+  // flexcalidraw data (fork of excalidraw with extended features)
+  flexcalidraw: "application/vnd.flexcalidraw+json",
+  flexcalidrawClipboard: "application/vnd.flexcalidraw.clipboard+json",
+  // LEGACY: fully-qualified library JSON data
+  flexcalidrawlib: "application/vnd.flexcalidrawlib+json",
+  // list of flexcalidraw library item ids
+  flexcalidrawlibIds: "application/vnd.flexcalidrawlib.ids+json",
+  // backward compatibility aliases for excalidraw format
   excalidraw: "application/vnd.excalidraw+json",
   excalidrawClipboard: "application/vnd.excalidraw.clipboard+json",
-  // LEGACY: fully-qualified library JSON data
   excalidrawlib: "application/vnd.excalidrawlib+json",
-  // list of excalidraw library item ids
   excalidrawlibIds: "application/vnd.excalidrawlib.ids+json",
 } as const;
 
 export const MIME_TYPES = {
   ...STRING_MIME_TYPES,
-  // image-encoded excalidraw data
+  // image-encoded flexcalidraw data
+  "flexcalidraw.svg": "image/svg+xml",
+  "flexcalidraw.png": "image/png",
+  // backward compatibility for excalidraw image format
   "excalidraw.svg": "image/svg+xml",
   "excalidraw.png": "image/png",
   // binary
@@ -283,6 +294,11 @@ export const EXPORT_IMAGE_TYPES = {
 } as const;
 
 export const EXPORT_DATA_TYPES = {
+  flexcalidraw: "flexcalidraw",
+  flexcalidrawClipboard: "flexcalidraw/clipboard",
+  flexcalidrawLibrary: "flexcalidrawlib",
+  flexcalidrawClipboardWithAPI: "flexcalidraw-api/clipboard",
+  // backward compatibility for excalidraw format (used for import detection)
   excalidraw: "excalidraw",
   excalidrawClipboard: "excalidraw/clipboard",
   excalidrawLibrary: "excalidrawlib",
@@ -441,6 +457,7 @@ export const LIBRARY_DISABLED_TYPES = new Set([
   "iframe",
   "embeddable",
   "image",
+  "luzmochart",
 ] as const);
 
 // use these constants to easily identify reference sites
@@ -461,7 +478,198 @@ export const TOOL_TYPE = {
   magicframe: "magicframe",
   embeddable: "embeddable",
   laser: "laser",
+  luzmochart: "luzmochart",
 } as const;
+
+// Luzmo chart type categories for UI grouping
+export const LUZMO_CHART_CATEGORIES = [
+  { id: "basic", label: "Basic Charts" },
+  { id: "advanced", label: "Advanced Charts" },
+  { id: "table", label: "Tables" },
+  { id: "map", label: "Maps" },
+  { id: "filter", label: "Filters" },
+] as const;
+
+// Luzmo chart type metadata for UI display
+export const LUZMO_CHART_TYPES: {
+  type: LuzmoChartType;
+  label: string;
+  category: "basic" | "advanced" | "map" | "filter" | "table";
+  slots: string[];
+}[] = [
+  // Basic Charts
+  {
+    type: "donut-chart",
+    label: "Donut Chart",
+    category: "basic",
+    slots: ["category", "measure"],
+  },
+  {
+    type: "bar-chart",
+    label: "Bar Chart",
+    category: "basic",
+    slots: ["y-axis", "measure", "legend"],
+  },
+  {
+    type: "column-chart",
+    label: "Column Chart",
+    category: "basic",
+    slots: ["x-axis", "measure", "legend"],
+  },
+  {
+    type: "line-chart",
+    label: "Line Chart",
+    category: "basic",
+    slots: ["x-axis", "measure", "legend"],
+  },
+  {
+    type: "area-chart",
+    label: "Area Chart",
+    category: "basic",
+    slots: ["x-axis", "measure", "legend"],
+  },
+  // Advanced Charts
+  {
+    type: "bubble-chart",
+    label: "Bubble Chart",
+    category: "advanced",
+    slots: ["category", "measure", "color"],
+  },
+  {
+    type: "scatter-plot",
+    label: "Scatter Plot",
+    category: "advanced",
+    slots: ["x-axis", "y-axis", "size", "name", "color"],
+  },
+  {
+    type: "funnel-chart",
+    label: "Funnel Chart",
+    category: "advanced",
+    slots: ["category", "measure"],
+  },
+  {
+    type: "treemap-chart",
+    label: "Treemap Chart",
+    category: "advanced",
+    slots: ["category", "measure", "color"],
+  },
+  {
+    type: "sunburst-chart",
+    label: "Sunburst Chart",
+    category: "advanced",
+    slots: ["levels", "measure"],
+  },
+  {
+    type: "radar-chart",
+    label: "Radar Chart",
+    category: "advanced",
+    slots: ["category", "measure", "legend"],
+  },
+  {
+    type: "sankey-diagram",
+    label: "Sankey Diagram",
+    category: "advanced",
+    slots: ["source", "destination", "category", "measure"],
+  },
+  {
+    type: "wordcloud-chart",
+    label: "Word Cloud",
+    category: "advanced",
+    slots: ["category", "measure", "color"],
+  },
+  {
+    type: "circular-gauge",
+    label: "Circular Gauge",
+    category: "advanced",
+    slots: ["measure", "target"],
+  },
+  {
+    type: "speedometer-chart",
+    label: "Speedometer",
+    category: "advanced",
+    slots: ["target", "measure"],
+  },
+  {
+    type: "bullet-chart",
+    label: "Bullet Chart",
+    category: "advanced",
+    slots: ["category", "measure", "target"],
+  },
+  // Tables
+  {
+    type: "regular-table",
+    label: "Table",
+    category: "table",
+    slots: ["columns"],
+  },
+  {
+    type: "pivot-table",
+    label: "Pivot Table",
+    category: "table",
+    slots: ["row", "column", "measure"],
+  },
+  {
+    type: "heat-table",
+    label: "Heat Table",
+    category: "table",
+    slots: ["x-axis", "y-axis", "measure"],
+  },
+  // Map Charts
+  {
+    type: "choropleth-map",
+    label: "Choropleth Map",
+    category: "map",
+    slots: ["geo", "measure", "category"],
+  },
+  {
+    type: "marker-map",
+    label: "Marker Map",
+    category: "map",
+    slots: ["geo", "measure"],
+  },
+  {
+    type: "symbol-map",
+    label: "Symbol Map",
+    category: "map",
+    slots: ["geo", "measure", "category"],
+  },
+  // Filters
+  {
+    type: "date-filter",
+    label: "Date Filter",
+    category: "filter",
+    slots: ["time"],
+  },
+  {
+    type: "dropdown-filter",
+    label: "Dropdown Filter",
+    category: "filter",
+    slots: ["dimension"],
+  },
+  {
+    type: "slicer-filter",
+    label: "Slicer Filter",
+    category: "filter",
+    slots: ["dimension"],
+  },
+  {
+    type: "slider-filter",
+    label: "Slider Filter",
+    category: "filter",
+    slots: ["slidermetric"],
+  },
+];
+
+// Get chart type metadata
+export const getChartTypeInfo = (chartType: LuzmoChartType) => {
+  return LUZMO_CHART_TYPES.find((ct) => ct.type === chartType);
+};
+
+// Get available slots for a chart type
+export const getChartSlots = (chartType: LuzmoChartType): string[] => {
+  const info = getChartTypeInfo(chartType);
+  return info?.slots ?? [];
+};
 
 export const EDITOR_LS_KEYS = {
   OAI_API_KEY: "excalidraw-oai-api-key",

@@ -128,3 +128,48 @@
     }
   }
 }
+
+.attribution-banner {
+  gap: 0.375rem;
+  cursor: default;
+
+  &:hover {
+    background-color: var(--color-surface-low);
+    color: var(--button-color, var(--color-on-surface)) !important;
+  }
+
+  &:active {
+    background-color: var(--color-surface-low);
+  }
+
+  &__text {
+    color: var(--color-on-surface);
+    opacity: 0.7;
+  }
+
+  &__link {
+    color: var(--color-primary) !important;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+
+    &:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+  }
+
+  &__separator {
+    color: var(--color-on-surface);
+    opacity: 0.5;
+  }
+}
+
+.theme--dark {
+  .attribution-banner {
+    &:hover {
+      color: var(--button-color, var(--color-on-surface)) !important;
+    }
+  }
+}

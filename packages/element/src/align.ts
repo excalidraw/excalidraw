@@ -43,6 +43,7 @@ export const alignElements = (
       // update bound elements
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: group,
+        indirectArrowUpdate: true,
       });
       return updatedEle;
     });

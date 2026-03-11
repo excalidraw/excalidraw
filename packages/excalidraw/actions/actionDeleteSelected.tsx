@@ -30,7 +30,7 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { TrashIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 
-import { useStylesPanelMode } from "../components/App";
+import { useStylesPanelMode } from "..";
 
 import { register } from "./register";
 
@@ -292,6 +292,7 @@ export const actionDeleteSelected = register({
         multiElement: null,
         newElement: null,
         activeEmbeddable: null,
+        activeLuzmoChart: null,
         selectedLinearElement: null,
       },
       captureUpdate: isSomeElementSelected(

@@ -4,6 +4,7 @@ services:
       context: .
       args:
         - NODE_ENV=development
+        - VITE_APP_WS_SERVER_URL=http://localhost:3002
     container_name: excalidraw
     ports:
       - "3000:80"
@@ -18,6 +19,20 @@ services:
       - ./package.json:/opt/node_app/package.json
       - ./yarn.lock:/opt/node_app/yarn.lock
       - notused:/opt/node_app/app/node_modules
+
+  excalidraw-room:
+    build:
+      context: .
+      dockerfile: excalidraw-room.Dockerfile
+    container_name: excalidraw-room
+    ports:
+      - "3002:80"
+    restart: on-failure
+    environment:
+      - PORT=80
+      - NODE_ENV=production
+      # Allow any origin to connect to WebSocket
+      - CORS_ORIGIN=*
 
 volumes:
   notused:

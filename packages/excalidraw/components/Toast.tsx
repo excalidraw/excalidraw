@@ -5,22 +5,11 @@ import { ToolButton } from "./ToolButton";
 
 import "./Toast.scss";
 
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
 
 const DEFAULT_TOAST_TIMEOUT = 5000;
 
-const ProgressBar = ({ progress }: { progress: number }) => (
-  <div className="Toast__progress-bar">
-    <div
-      className="Toast__progress-bar-fill"
-      style={{
-        width: `${Math.min(5, Math.round(progress * 100))}%`,
-      }}
-    />
-  </div>
-);
-
-const ToastComponent = ({
+export const Toast = ({
   message,
   onClose,
   closable = false,
@@ -28,7 +17,7 @@ const ToastComponent = ({
   duration = DEFAULT_TOAST_TIMEOUT,
   style,
 }: {
-  message: ReactNode;
+  message: string;
   onClose: () => void;
   closable?: boolean;
   duration?: number;
@@ -58,12 +47,11 @@ const ToastComponent = ({
   return (
     <div
       className="Toast"
-      role="status"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       style={style}
     >
-      <div className="Toast__message">{message}</div>
+      <p className="Toast__message">{message}</p>
       {closable && (
         <ToolButton
           icon={CloseIcon}
@@ -76,5 +64,3 @@ const ToastComponent = ({
     </div>
   );
 };
-
-export const Toast = Object.assign(ToastComponent, { ProgressBar });

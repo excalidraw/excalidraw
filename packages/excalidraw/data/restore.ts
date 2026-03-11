@@ -82,12 +82,7 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
-import type {
-  AppState,
-  BinaryFiles,
-  LibraryItem,
-  NormalizedZoomValue,
-} from "../types";
+import type { AppState, BinaryFiles, LibraryItem } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
@@ -113,6 +108,7 @@ export const AllowedExcalidrawActiveTools: Record<
   custom: true,
   frame: true,
   embeddable: true,
+  luzmochart: true,
   hand: true,
   laser: false,
   magicframe: false,
@@ -155,7 +151,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
         | ExcalidrawElbowArrowElement["startBinding"]
         | ExcalidrawElbowArrowElement["endBinding"] = {
         ...binding,
-        fixedPoint: normalizeFixedPoint(binding.fixedPoint),
+        fixedPoint: normalizeFixedPoint(binding.fixedPoint ?? [0, 0]),
         mode: binding.mode || "orbit",
       };
 
@@ -176,7 +172,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
         return {
           elementId: binding.elementId,
           mode: binding.mode,
-          fixedPoint: normalizeFixedPoint(binding.fixedPoint),
+          fixedPoint: normalizeFixedPoint(binding.fixedPoint || [0.5, 0.5]),
         } as FixedPointBinding | null;
       }
       return null;
@@ -185,14 +181,15 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
     // binding schema v1 (legacy) -> attempt to migrate to v2
     // ---------------------------------------------------------------------------
 
-    const targetBoundElement = targetElementsMap.get(binding.elementId) as
-      | ExcalidrawBindableElement
-      | undefined;
+    const targetBoundElement =
+      (targetElementsMap.get(binding.elementId) as ExcalidrawBindableElement) ||
+      undefined;
     const boundElement =
       targetBoundElement ||
-      (existingElementsMap?.get(binding.elementId) as
-        | ExcalidrawBindableElement
-        | undefined);
+      (existingElementsMap?.get(
+        binding.elementId,
+      ) as ExcalidrawBindableElement) ||
+      undefined;
     const elementsMap = targetBoundElement
       ? targetElementsMap
       : existingElementsMap;
@@ -207,36 +204,18 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
       const mode = isPointInElement(p, boundElement, elementsMap)
         ? "inside"
         : "orbit";
-      const safeElement = {
-        ...element,
-        startBinding: element.startBinding?.elementId
-          ? {
-              ...element.startBinding,
-              mode,
-              fixedPoint: normalizeFixedPoint(element.startBinding.fixedPoint),
-            }
-          : null,
-        endBinding: element.endBinding?.elementId
-          ? {
-              ...element.endBinding,
-              mode,
-              fixedPoint: normalizeFixedPoint(element.endBinding.fixedPoint),
-            }
-          : null,
-      };
       const focusPoint =
         mode === "inside"
           ? p
           : projectFixedPointOntoDiagonal(
-              safeElement,
+              element,
               p,
               boundElement,
               startOrEnd,
               elementsMap,
-              { value: 1 as NormalizedZoomValue },
             ) || p;
       const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
-        safeElement,
+        element,
         boundElement,
         startOrEnd,
         elementsMap,
@@ -524,6 +503,24 @@ export const restoreElement = (
     case "frame":
       return restoreElementWithProperties(element, {
         name: element.name ?? null,
+      });
+    case "luzmochart":
+      return restoreElementWithProperties(element, {
+        chartType: (element as any).chartType ?? "donut-chart",
+        slots: (element as any).slots ?? null,
+        options: (element as any).options ?? null,
+        authConfig: (element as any).authConfig ?? null,
+        contextId:
+          (element as any).contextId ??
+          `luzmo-chart-${Date.now()}-${Math.random()
+            .toString(36)
+            .substr(2, 9)}`,
+        themeId: (element as any).themeId,
+        fontFamily: (element as any).fontFamily ?? FONT_FAMILY.Excalifont,
+        aiSummaryEnabled: (element as any).aiSummaryEnabled ?? false,
+        // Legacy fields for backward compatibility
+        chartData: (element as any).chartData ?? null,
+        chartOptions: (element as any).chartOptions ?? null,
       });
 
     // Don't use default case so as to catch a missing an element type case.

@@ -348,6 +348,8 @@ export const textWysiwyg = ({
       // parse the text/plain for existence of excalidraw instead, but this
       // is an edge case
       if (
+        mimeTypes.has(MIME_TYPES.flexcalidrawClipboard) ||
+        mimeTypes.has(MIME_TYPES.flexcalidraw) ||
         mimeTypes.has(MIME_TYPES.excalidrawClipboard) ||
         mimeTypes.has(MIME_TYPES.excalidraw)
       ) {

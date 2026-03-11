@@ -24,6 +24,7 @@ import {
   invariant,
   applyDarkModeFilter,
   isSafari,
+  isTransparent,
 } from "@excalidraw/common";
 
 import type {
@@ -74,6 +75,7 @@ import type {
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
+  ExcalidrawLuzmoChartElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawFrameLikeElement,
   NonDeletedSceneElementsMap,
@@ -144,6 +146,8 @@ export interface ExcalidrawElementWithCanvas {
   imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
   boundTextCanvas: HTMLCanvasElement;
+  /** Element version at cache creation - used to invalidate when element is mutated (e.g. text content changes) */
+  elementVersion: number;
 }
 
 const cappedElementCanvasSize = (
@@ -335,6 +339,7 @@ const generateElementCanvas = (
     boundTextCanvas,
     angle: element.angle,
     imageCrop: isImageElement(element) ? element.crop : null,
+    elementVersion: element.version,
   };
 };
 
@@ -394,6 +399,7 @@ const drawElementOnCanvas = (
     case "rectangle":
     case "iframe":
     case "embeddable":
+    case "luzmochart":
     case "diamond":
     case "ellipse": {
       context.lineJoin = "round";
@@ -635,6 +641,8 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion ||
     prevElementWithCanvas.imageCrop !== imageCrop ||
     prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity ||
+    // Invalidate when element was mutated (e.g. text content changed via typewriter effect)
+    prevElementWithCanvas.elementVersion !== element.version ||
     // since we rotate the canvas when copying from cached canvas, we don't
     // regenerate the cached canvas. But we need to in case of labels which are
     // cached alongside the arrow, and we want the labels to remain unrotated
@@ -808,15 +816,27 @@ export const renderElement = (
           element.x + appState.scrollX,
           element.y + appState.scrollY,
         );
-        context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
-        context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-        context.strokeStyle =
+        // Use element's visual properties (stroke, background, roundness)
+        const strokeColor =
           appState.theme === THEME.DARK
-            ? applyDarkModeFilter(FRAME_STYLE.strokeColor)
-            : FRAME_STYLE.strokeColor;
+            ? applyDarkModeFilter(element.strokeColor)
+            : element.strokeColor;
+        const fillColor =
+          appState.theme === THEME.DARK
+            ? applyDarkModeFilter(element.backgroundColor)
+            : element.backgroundColor;
 
-        // TODO change later to only affect AI frames
+        // Always use FRAME_STYLE.radius to align with frameClip, interactiveScene,
+        // Luzmo charts (--luzmo-border-radius-s), and rectangles. Do NOT use
+        // getCornerRadius—it yields oversized corners for large frames.
+        const radius = FRAME_STYLE.radius;
+        const radiusZoomed = radius / appState.zoom.value;
+
+        context.lineWidth = element.strokeWidth / appState.zoom.value;
+        context.strokeStyle = strokeColor;
+
+        // Magic frames keep their distinct green stroke (TODO: only AI frames)
         if (isMagicFrameElement(element)) {
           context.strokeStyle =
             appState.theme === THEME.LIGHT
@@ -824,18 +844,29 @@ export const renderElement = (
               : applyDarkModeFilter("#1d8264");
         }
 
-        if (FRAME_STYLE.radius && context.roundRect) {
+        // Stroke style (solid/dashed/dotted)
+        if (element.strokeStyle === "dashed") {
+          context.setLineDash([8, 8 + element.strokeWidth]);
+        } else if (element.strokeStyle === "dotted") {
+          context.setLineDash([1.5, 6 + element.strokeWidth]);
+        } else {
+          context.setLineDash([]);
+        }
+
+        if (radius > 0 && context.roundRect) {
           context.beginPath();
-          context.roundRect(
-            0,
-            0,
-            element.width,
-            element.height,
-            FRAME_STYLE.radius / appState.zoom.value,
-          );
+          context.roundRect(0, 0, element.width, element.height, radiusZoomed);
+          if (!isTransparent(fillColor)) {
+            context.fillStyle = fillColor;
+            context.fill();
+          }
           context.stroke();
           context.closePath();
         } else {
+          if (!isTransparent(fillColor)) {
+            context.fillStyle = fillColor;
+            context.fillRect(0, 0, element.width, element.height);
+          }
           context.strokeRect(0, 0, element.width, element.height);
         }
 
@@ -886,7 +917,8 @@ export const renderElement = (
     case "image":
     case "text":
     case "iframe":
-    case "embeddable": {
+    case "embeddable":
+    case "luzmochart": {
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const cx = (x1 + x2) / 2 + appState.scrollX;
@@ -980,6 +1012,85 @@ export const renderElement = (
 
           context.translate(-shiftX, -shiftY);
           drawElementOnCanvas(element, rc, context, renderConfig);
+
+          // For Luzmo charts, draw the summary text on top of the placeholder
+          if (element.type === "luzmochart") {
+            const luzmoElement = element as ExcalidrawLuzmoChartElement;
+            const summaryElementId = luzmoElement.customData
+              ?.aiSummaryElementId as string | undefined;
+
+            if (summaryElementId) {
+              const summaryElement = allElementsMap.get(summaryElementId) as
+                | ExcalidrawTextElement
+                | undefined;
+
+              if (
+                summaryElement &&
+                summaryElement.type === "text" &&
+                !summaryElement.isDeleted &&
+                summaryElement.text?.trim()
+              ) {
+                const textColor =
+                  renderConfig.theme === THEME.DARK ? "#ffffff" : "#333333";
+                const padding = 20;
+
+                context.save();
+                context.font = "14px sans-serif";
+                context.fillStyle = textColor;
+                context.textAlign = "center";
+                context.textBaseline = "middle";
+
+                // Draw chart type label at the top
+                context.globalAlpha = 0.7;
+                context.font = "bold 12px sans-serif";
+                context.fillText(
+                  `Luzmo Chart (${luzmoElement.chartType})`,
+                  element.width / 2,
+                  padding + 10,
+                );
+
+                // Draw summary text with word wrapping
+                context.globalAlpha = 1;
+                context.font = "14px sans-serif";
+                const maxWidth = element.width - padding * 2;
+                const lineHeight = 20;
+                const words = summaryElement.text.split(" ");
+                const lines: string[] = [];
+                let currentLine = "";
+
+                for (const word of words) {
+                  const testLine = currentLine
+                    ? `${currentLine} ${word}`
+                    : word;
+                  const metrics = context.measureText(testLine);
+                  if (metrics.width > maxWidth && currentLine) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                  } else {
+                    currentLine = testLine;
+                  }
+                }
+                if (currentLine) {
+                  lines.push(currentLine);
+                }
+
+                // Calculate starting Y position to center the text block
+                const totalTextHeight = lines.length * lineHeight;
+                const startY =
+                  (element.height - totalTextHeight) / 2 + lineHeight / 2;
+
+                for (let i = 0; i < lines.length; i++) {
+                  context.fillText(
+                    lines[i],
+                    element.width / 2,
+                    startY + i * lineHeight,
+                  );
+                }
+
+                context.restore();
+              }
+            }
+          }
         }
 
         context.restore();

@@ -108,6 +108,7 @@ export const actionFinalize = register<FormData>({
 
             return map;
           }, new Map()) ?? new Map();
+
         bindOrUnbindBindingElement(
           element,
           draggedPoints,
@@ -325,6 +326,7 @@ export const actionFinalize = register<FormData>({
             ? appState.activeTool
             : activeTool,
         activeEmbeddable: null,
+        activeLuzmoChart: null,
         newElement: null,
         selectionElement: null,
         multiElement: null,

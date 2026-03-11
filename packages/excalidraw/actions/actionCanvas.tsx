@@ -118,6 +118,7 @@ export const actionClearCanvas = register({
         gridStep: appState.gridStep,
         gridModeEnabled: appState.gridModeEnabled,
         stats: appState.stats,
+        pasteDialog: appState.pasteDialog,
         activeTool:
           appState.activeTool.type === "image"
             ? {
@@ -520,6 +521,7 @@ export const actionToggleEraserTool = register({
         selectedElementIds: {},
         selectedGroupIds: {},
         activeEmbeddable: null,
+        activeLuzmoChart: null,
         activeTool,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -557,6 +559,7 @@ export const actionToggleLassoTool = register({
         selectedElementIds: {},
         selectedGroupIds: {},
         activeEmbeddable: null,
+        activeLuzmoChart: null,
         activeTool,
       },
       captureUpdate: CaptureUpdateAction.NEVER,
@@ -594,6 +597,7 @@ export const actionToggleHandTool = register({
         selectedElementIds: {},
         selectedGroupIds: {},
         activeEmbeddable: null,
+        activeLuzmoChart: null,
         activeTool,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,

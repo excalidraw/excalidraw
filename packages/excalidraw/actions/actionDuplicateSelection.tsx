@@ -27,7 +27,7 @@ import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 import { getShortcutKey } from "../shortcut";
 
-import { useStylesPanelMode } from "../components/App";
+import { useStylesPanelMode } from "..";
 
 import { register } from "./register";
 

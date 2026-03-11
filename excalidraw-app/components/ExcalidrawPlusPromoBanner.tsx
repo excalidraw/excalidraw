@@ -1,22 +1,30 @@
-export const ExcalidrawPlusPromoBanner = ({
-  isSignedIn,
-}: {
-  isSignedIn: boolean;
-}) => {
+/**
+ * Fork attribution banner — credits Excalidraw as the foundation.
+ * Replaces the Excalidraw+ promo for the Luzmo Flexcalidraw fork.
+ */
+export const ExcalidrawPlusPromoBanner = () => {
   return (
-    <a
-      href={
-        isSignedIn
-          ? import.meta.env.VITE_APP_PLUS_APP
-          : `${
-              import.meta.env.VITE_APP_PLUS_LP
-            }/plus?utm_source=excalidraw&utm_medium=app&utm_content=guestBanner#excalidraw-redirect`
-      }
-      target="_blank"
-      rel="noopener"
-      className="plus-banner"
-    >
-      Excalidraw+
-    </a>
+    <div className="plus-banner attribution-banner">
+      <span className="attribution-banner__text">Built on</span>
+      <a
+        href="https://excalidraw.com?utm_source=flexcalidraw&utm_medium=app&utm_content=attribution_banner"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="attribution-banner__link"
+        title="Visit Excalidraw"
+      >
+        Excalidraw
+      </a>
+      <span className="attribution-banner__separator">+</span>
+      <a
+        href="https://luzmo.com/flex?utm_source=flexcalidraw&utm_medium=app&utm_content=attribution_banner"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="attribution-banner__link"
+        title="Visit Luzmo Flex"
+      >
+        Luzmo Flex
+      </a>
+    </div>
   );
 };

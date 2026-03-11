@@ -29,6 +29,7 @@ import type {
   ExcalidrawLineElement,
   ExcalidrawFlowchartNodeElement,
   ExcalidrawLinearElementSubType,
+  ExcalidrawLuzmoChartElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -61,6 +62,12 @@ export const isIframeLikeElement = (
   return (
     !!element && (element.type === "iframe" || element.type === "embeddable")
   );
+};
+
+export const isLuzmoChartElement = (
+  element: ExcalidrawElement | null | undefined,
+): element is ExcalidrawLuzmoChartElement => {
+  return !!element && element.type === "luzmochart";
 };
 
 export const isTextElement = (
@@ -261,7 +268,8 @@ export const isExcalidrawElement = (
     case "frame":
     case "magicframe":
     case "image":
-    case "selection": {
+    case "selection":
+    case "luzmochart": {
       return true;
     }
     default: {
@@ -309,7 +317,8 @@ export const isUsingAdaptiveRadius = (type: string) =>
   type === "rectangle" ||
   type === "embeddable" ||
   type === "iframe" ||
-  type === "image";
+  type === "image" ||
+  type === "luzmochart";
 
 export const isUsingProportionalRadius = (type: string) =>
   type === "line" || type === "arrow" || type === "diamond";

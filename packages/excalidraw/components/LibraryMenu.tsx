@@ -324,6 +324,7 @@ export const LibraryMenu = memo(() => {
       selectedElementIds: {},
       selectedGroupIds: {},
       activeEmbeddable: null,
+      activeLuzmoChart: null,
     });
   }, [setAppState]);
 

@@ -229,14 +229,26 @@ export const generateRoughOptions = (
     case "rectangle":
     case "iframe":
     case "embeddable":
+    case "luzmochart":
     case "diamond":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
-      options.fill = isTransparent(element.backgroundColor)
-        ? undefined
-        : isDarkMode
-        ? applyDarkModeFilter(element.backgroundColor)
-        : element.backgroundColor;
+      // Luzmo charts: use theme-based default when transparent so native canvas
+      // fill matches the widget (avoids color difference in padded area)
+      let fillColor: string | undefined;
+      if (isTransparent(element.backgroundColor)) {
+        fillColor =
+          element.type === "luzmochart"
+            ? isDarkMode
+              ? "#232329"
+              : "#ffffff"
+            : undefined;
+      } else {
+        fillColor = isDarkMode
+          ? applyDarkModeFilter(element.backgroundColor)
+          : element.backgroundColor;
+      }
+      options.fill = fillColor;
       if (element.type === "ellipse") {
         options.curveFitting = 1;
       }
@@ -646,7 +658,8 @@ const _generateElementShape = (
   switch (element.type) {
     case "rectangle":
     case "iframe":
-    case "embeddable": {
+    case "embeddable":
+    case "luzmochart": {
       let shape: ElementShapes[typeof element.type];
       // this is for rendering the stroke/bg of the embeddable, especially
       // when the src url is not set
@@ -955,6 +968,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
     case "frame":
     case "magicframe":
     case "embeddable":
+    case "luzmochart":
     case "image":
     case "iframe":
     case "text":

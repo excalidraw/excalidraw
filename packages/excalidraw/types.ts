@@ -20,6 +20,7 @@ import type {
   GroupId,
   ExcalidrawBindableElement,
   Arrowhead,
+  ChartType,
   FontFamilyValues,
   FileId,
   Theme,
@@ -29,6 +30,8 @@ import type {
   ExcalidrawFrameLikeElement,
   ExcalidrawElementType,
   ExcalidrawIframeLikeElement,
+  ExcalidrawLuzmoChartElement,
+  LuzmoChartType,
   OrderedExcalidrawElement,
   ExcalidrawNonSelectionElement,
   BindMode,
@@ -45,14 +48,15 @@ import type {
   CaptureUpdateActionType,
   DurableIncrement,
   EphemeralIncrement,
+  Store,
 } from "@excalidraw/element";
-import type { GlobalPoint } from "@excalidraw/math";
 
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
 import type { ClipboardData } from "./clipboard";
 import type App from "./components/App";
 import type Library from "./data/library";
+import type { FileSystemHandle } from "./data/filesystem";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
@@ -155,7 +159,8 @@ export type ToolType =
   | "frame"
   | "magicframe"
   | "embeddable"
-  | "laser";
+  | "laser"
+  | "luzmochart";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
@@ -213,16 +218,15 @@ export type StaticCanvasAppState = Readonly<
 
 export type InteractiveCanvasAppState = Readonly<
   _CommonCanvasAppState & {
-    activeTool: AppState["activeTool"];
     // renderInteractiveScene
     activeEmbeddable: AppState["activeEmbeddable"];
+    activeLuzmoChart: AppState["activeLuzmoChart"];
     selectionElement: AppState["selectionElement"];
     selectedGroupIds: AppState["selectedGroupIds"];
     selectedLinearElement: AppState["selectedLinearElement"];
     multiElement: AppState["multiElement"];
     newElement: AppState["newElement"];
     isBindingEnabled: AppState["isBindingEnabled"];
-    isMidpointSnappingEnabled: AppState["isMidpointSnappingEnabled"];
     suggestedBinding: AppState["suggestedBinding"];
     isRotating: AppState["isRotating"];
     elementsToHighlight: AppState["elementsToHighlight"];
@@ -243,7 +247,6 @@ export type InteractiveCanvasAppState = Readonly<
     frameRendering: AppState["frameRendering"];
     shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
     exportScale: AppState["exportScale"];
-    currentItemArrowType: AppState["currentItemArrowType"];
   }
 >;
 
@@ -281,6 +284,10 @@ export interface AppState {
     element: NonDeletedExcalidrawElement;
     state: "hover" | "active";
   } | null;
+  activeLuzmoChart: {
+    element: NonDeletedExcalidrawElement;
+    state: "hover" | "active";
+  } | null;
   /**
    * for a newly created element
    * - set on pointer down, updated during pointer move, used on pointer up
@@ -301,20 +308,9 @@ export interface AppState {
    * - set on pointer down, updated during pointer move
    */
   selectionElement: NonDeletedExcalidrawElement | null;
-  /**
-   * tracking current arrow binding editor state (takes into account
-   * `bindingPreference` and keyboard modifiers (ctrl/alt)
-   */
   isBindingEnabled: boolean;
-  /** user arrow binding preference */
-  bindingPreference: "enabled" | "disabled";
-  /** user preference whether arrow snap to midpoints while binding */
-  isMidpointSnappingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
-  suggestedBinding: {
-    element: NonDeleted<ExcalidrawBindableElement>;
-    midPoint?: GlobalPoint;
-  } | null;
+  suggestedBinding: NonDeleted<ExcalidrawBindableElement> | null;
   frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
   frameRendering: {
     enabled: boolean;
@@ -386,12 +382,11 @@ export interface AppState {
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog:
     | null
-    | { name: "imageExport" | "help" | "jsonExport" }
+    | { name: "imageExport" | "help" | "jsonExport" | "templatePicker" }
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
     | { name: "commandPalette" }
     | { name: "settings" }
-    | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] }
-    | { name: "charts"; data: Spreadsheet; rawText: string };
+    | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] };
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -407,11 +402,7 @@ export interface AppState {
   previousSelectedElementIds: { [id: string]: true };
   selectedElementsAreBeingDragged: boolean;
   shouldCacheIgnoreZoom: boolean;
-  toast: {
-    message: React.ReactNode;
-    closable?: boolean;
-    duration?: number;
-  } | null;
+  toast: { message: string; closable?: boolean; duration?: number } | null;
   zenModeEnabled: boolean;
   theme: Theme;
   /** grid cell px size */
@@ -430,13 +421,23 @@ export interface AppState {
   offsetTop: number;
   offsetLeft: number;
 
-  fileHandle: FileSystemFileHandle | null;
+  fileHandle: FileSystemHandle | null;
   collaborators: Map<SocketId, Collaborator>;
   stats: {
     open: boolean;
     /** bitmap. Use `STATS_PANELS` bit values */
     panels: number;
   };
+  currentChartType: ChartType;
+  pasteDialog:
+    | {
+        shown: false;
+        data: null;
+      }
+    | {
+        shown: true;
+        data: Spreadsheet;
+      };
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
   snapLines: readonly SnapLine[];
@@ -549,39 +550,17 @@ export type OnUserFollowedPayload = {
   action: "FOLLOW" | "UNFOLLOW";
 };
 
-export type OnExportProgress = {
-  type: "progress";
-  message?: React.ReactNode;
-  /** 0-1 range */
-  progress?: number;
-};
-
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
   ) => void;
-  /**
-   * note: only subscribes if the props.onIncrement is defined on initial render
-   */
   onIncrement?: (event: DurableIncrement | EphemeralIncrement) => void;
   initialData?:
     | (() => MaybePromise<ExcalidrawInitialDataState | null>)
     | MaybePromise<ExcalidrawInitialDataState | null>;
-  /**
-   * Invoked as soon as the Excalidraw API is available
-   * NOTE editor is not yet mounted, and state is not yet initialized
-   */
-  onExcalidrawAPI?: (api: ExcalidrawImperativeAPI) => void;
-  /**
-   * Invoked once the editor root is mounted.
-   */
-  onMount?: (payload: ExcalidrawMountPayload) => void;
-  /**
-   * Invoked once the initial scene is loaded.
-   */
-  onInitialize?: (api: ExcalidrawImperativeAPI) => void;
+  excalidrawAPI?: (api: ExcalidrawImperativeAPI) => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
     pointer: { x: number; y: number; tool: "pointer" | "laser" };
@@ -663,35 +642,40 @@ export interface ExcalidrawProps {
     element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
   ) => JSX.Element | null;
+  /**
+   * Custom renderer for Luzmo Chart elements.
+   * If provided, this will be used instead of the default placeholder.
+   * The renderer receives the element, dimensions, and theme.
+   */
+  renderLuzmoChart?: (
+    element: NonDeleted<ExcalidrawLuzmoChartElement>,
+    appState: AppState,
+    dimensions: { width: number; height: number },
+  ) => JSX.Element | null;
+  /**
+   * Custom renderer for Luzmo Chart properties in the Actions panel.
+   * If provided, this will be used to render data pickers and edit options.
+   * The renderer receives the element, appState, and an onChange callback.
+   */
+  renderLuzmoChartProperties?: (
+    element: NonDeleted<ExcalidrawLuzmoChartElement>,
+    appState: UIAppState,
+    onChange: (updates: Partial<ExcalidrawLuzmoChartElement>) => void,
+  ) => JSX.Element | null;
+  /**
+   * Handler for Luzmo Chart type changes.
+   * If provided, this will be called when the chart type is changed.
+   * The handler should use switchItem from @luzmo/analytics-components-kit
+   * to convert slots and options to the new chart type.
+   * Returns a Promise with the updated element properties.
+   */
+  onLuzmoChartTypeChange?: (
+    element: NonDeleted<ExcalidrawLuzmoChartElement>,
+    newChartType: LuzmoChartType,
+  ) => Promise<Partial<ExcalidrawLuzmoChartElement>>;
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
-  /**
-   * Called before exporting to a file.
-   *
-   * Allows the host app to intercept and delay saving until async operations
-   * (e.g., images are loaded) complete.
-   *
-   * If Promise/AsyncGenerator is returned, a progress toast will be shown
-   * until the operation completes. Generator can yield progress updates.
-   */
-  onExport?: (
-    /** type of export. Currently we only call for JSON exports or
-     * JSON-embedded PNG (which is also identified as `json` type here)*/
-    type: "json",
-    data: {
-      elements: readonly ExcalidrawElement[];
-      appState: AppState;
-      files: BinaryFiles;
-    },
-    options: {
-      /** signal that gets aborted if user cancels the export (e.g. closes
-       * the native file picker dialog). In that case, you can either
-       * return immediately, or throw AbortError.
-       */
-      signal: AbortSignal;
-    },
-  ) => MaybePromise<void> | AsyncGenerator<OnExportProgress, void>;
 }
 
 export type SceneData = {
@@ -770,8 +754,6 @@ export type AppProps = Merge<
 export type AppClassProperties = {
   props: AppProps;
   state: AppState;
-  api: App["api"];
-  sessionExportThemeOverride: App["sessionExportThemeOverride"];
   interactiveCanvas: HTMLCanvasElement | null;
   /** static canvas */
   canvas: HTMLCanvasElement;
@@ -787,6 +769,7 @@ export type AppClassProperties = {
   files: BinaryFiles;
   editorInterface: App["editorInterface"];
   scene: App["scene"];
+  store: Store;
   syncActionResult: App["syncActionResult"];
   fonts: App["fonts"];
   pasteFromClipboard: App["pasteFromClipboard"];
@@ -816,13 +799,8 @@ export type AppClassProperties = {
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
   onPointerDownEmitter: App["onPointerDownEmitter"];
-  onEvent: App["onEvent"];
-  onStateChange: App["onStateChange"];
 
-  lastPointerMoveCoords: App["lastPointerMoveCoords"];
   bindModeHandler: App["bindModeHandler"];
-
-  setAppState: App["setAppState"];
 };
 
 export type PointerDownState = Readonly<{
@@ -895,20 +873,6 @@ export type PointerDownState = Readonly<{
 
 export type UnsubscribeCallback = () => void;
 
-export type ExcalidrawMountPayload = {
-  excalidrawAPI: ExcalidrawImperativeAPI;
-  /*
-   *Excalidraw container.
-   * should never be null, but just to be safe
-   */
-  container: HTMLDivElement | null;
-};
-
-export type ExcalidrawImperativeAPIEventMap = {
-  "editor:mount": [payload: ExcalidrawMountPayload];
-  "editor:initialize": [api: ExcalidrawImperativeAPI];
-};
-
 export interface ExcalidrawImperativeAPI {
   updateScene: InstanceType<typeof App>["updateScene"];
   applyDeltas: InstanceType<typeof App>["applyDeltas"];
@@ -975,8 +939,6 @@ export interface ExcalidrawImperativeAPI {
   onUserFollow: (
     callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
-  onStateChange: InstanceType<typeof App>["onStateChange"];
-  onEvent: InstanceType<typeof App>["onEvent"];
 }
 
 export type FrameNameBounds = {

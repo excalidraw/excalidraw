@@ -3,10 +3,6 @@
     "paste": "Paste",
     "pasteAsPlaintext": "Paste as plaintext",
     "pasteCharts": "Paste charts",
-    "chartType_bar": "Bar chart",
-    "chartType_line": "Line chart",
-    "chartType_radar": "Radar chart",
-    "chartType_plaintext": "Plain text",
     "selectAll": "Select all",
     "multiSelect": "Add element to selection",
     "moveCanvas": "Move canvas",
@@ -89,6 +85,47 @@
     "clearCanvas": "Clear canvas",
     "layers": "Layers",
     "actions": "Actions",
+    "luzmochart": "Luzmo Chart Configuration",
+    "chartType": "Chart type",
+    "chartData": "Data Source",
+    "chartTheme": "Chart Theme",
+    "chartSlots": "Data Slots",
+    "chartAuth": "Authentication",
+    "chartAuthKey": "Auth Key",
+    "chartAuthToken": "Auth Token",
+    "chartContextId": "Context ID",
+    "chartConfigure": "Configure in sidebar",
+    "chartNotConfigured": "Not configured",
+    "chartConfigured": "Configured",
+    "chartConfigureHint": "Use the Chart sidebar tab to configure data and options",
+    "chartTypes": {
+      "donut-chart": "Donut Chart",
+      "bar-chart": "Bar Chart",
+      "column-chart": "Column Chart",
+      "line-chart": "Line Chart",
+      "area-chart": "Area Chart",
+      "bubble-chart": "Bubble Chart",
+      "scatter-plot": "Scatter Plot",
+      "funnel-chart": "Funnel Chart",
+      "treemap-chart": "Treemap Chart",
+      "sunburst-chart": "Sunburst Chart",
+      "radar-chart": "Radar Chart",
+      "sankey-diagram": "Sankey Diagram",
+      "wordcloud-chart": "Word Cloud",
+      "circular-gauge": "Circular Gauge",
+      "speedometer-chart": "Speedometer",
+      "bullet-chart": "Bullet Chart",
+      "regular-table": "Table",
+      "pivot-table": "Pivot Table",
+      "heat-table": "Heat Table",
+      "choropleth-map": "Choropleth Map",
+      "marker-map": "Marker Map",
+      "symbol-map": "Symbol Map",
+      "date-filter": "Date Filter",
+      "dropdown-filter": "Dropdown Filter",
+      "slicer-filter": "Slicer Filter",
+      "slider-filter": "Slider Filter"
+    },
     "language": "Language",
     "liveCollaboration": "Live collaboration...",
     "duplicateSelection": "Duplicate",
@@ -177,9 +214,7 @@
     "tab": "Tab",
     "shapeSwitch": "Switch shape",
     "preferences": "Preferences",
-    "preferences_toolLock": "Tool lock",
-    "arrowBinding": "Arrow binding",
-    "midpointSnapping": "Snap to midpoints"
+    "preferences_toolLock": "Tool lock"
   },
   "elementLink": {
     "title": "Link to object",
@@ -216,6 +251,7 @@
     "save": "Save to current file",
     "saveAs": "Save as",
     "load": "Open",
+    "startFromTemplate": "Start from template",
     "getShareableLink": "Get shareable link",
     "close": "Close",
     "selectLanguage": "Select language",
@@ -292,7 +328,8 @@
     "libraryElementTypeError": {
       "embeddable": "Embeddable elements cannot be added to the library.",
       "iframe": "IFrame elements cannot be added to the library.",
-      "image": "Support for adding images to the library coming soon!"
+      "image": "Support for adding images to the library coming soon!",
+      "luzmochart": "Luzmo Chart elements cannot be added to the library."
     },
     "asyncPasteFailedOnRead": "Couldn't paste (couldn't read from system clipboard).",
     "asyncPasteFailedOnParse": "Couldn't paste.",
@@ -321,7 +358,8 @@
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
-    "convertElementType": "Toggle shape type"
+    "convertElementType": "Toggle shape type",
+    "luzmochart": "Luzmo Chart"
   },
   "element": {
     "rectangle": "Rectangle",
@@ -337,7 +375,8 @@
     "magicframe": "Wireframe to code",
     "embeddable": "Web Embed",
     "selection": "Selection",
-    "iframe": "IFrame"
+    "iframe": "IFrame",
+    "luzmochart": "Luzmo Chart"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -402,10 +441,6 @@
   },
   "errorDialog": {
     "title": "Error"
-  },
-  "progressDialog": {
-    "title": "Saving",
-    "defaultMessage": "Preparing to save..."
   },
   "exportDialog": {
     "disk_title": "Save to disk",
@@ -567,6 +602,11 @@
     "orange": "Orange",
     "bronze": "Bronze"
   },
+  "templatePicker": {
+    "title": "Start from template",
+    "subtitle": "Pick a ready-made board to get started instantly.",
+    "loading": "Loading…"
+  },
   "welcomeScreen": {
     "app": {
       "center_heading": "Your drawings are saved in your browser's storage.",
@@ -614,6 +654,11 @@
         "button": "Load from file",
         "description": "Loading from a file will <bold>replace your existing content</bold>.<br></br>You can back up your drawing first using one of the options below."
       },
+      "loadTemplate": {
+        "title": "Load template",
+        "button": "Continue",
+        "description": "Loading a template will <bold>replace your existing content</bold>.<br></br>Save to disk first if you'd like to keep your current drawing."
+      },
       "shareableLink": {
         "title": "Load from link",
         "button": "Replace my content",
@@ -628,8 +673,7 @@
     "syntax": "Mermaid Syntax",
     "preview": "Preview",
     "label": "Mermaid",
-    "inputPlaceholder": "Write Mermaid diagram defintion here...",
-    "autoFixAvailable": "Auto-fix is available"
+    "inputPlaceholder": "Write Mermaid diagram defintion here..."
   },
   "ttd": {
     "error": "Error!"

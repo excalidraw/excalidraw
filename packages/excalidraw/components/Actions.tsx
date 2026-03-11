@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Popover } from "radix-ui";
 
 import {
@@ -7,9 +7,12 @@ import {
   KEYS,
   capitalizeString,
   isTransparent,
+  LUZMO_CHART_CATEGORIES,
+  LUZMO_CHART_TYPES,
 } from "@excalidraw/common";
 
 import {
+  CaptureUpdateAction,
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
   hasBoundTextElement,
@@ -20,7 +23,16 @@ import {
   isArrowElement,
   hasStrokeColor,
   toolIsArrow,
+  isLuzmoChartElement,
+  isFrameLikeElement,
 } from "@excalidraw/element";
+
+import type {
+  LuzmoChartType,
+  FontFamilyValues,
+} from "@excalidraw/element/types";
+
+import type { ExcalidrawLuzmoChartElement } from "@excalidraw/element/types";
 
 import type {
   ExcalidrawElement,
@@ -52,6 +64,7 @@ import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
 import { getToolbarTools } from "./shapes";
+import { FontPicker } from "./FontPicker/FontPicker";
 
 import "./Actions.scss";
 
@@ -59,6 +72,7 @@ import {
   useEditorInterface,
   useStylesPanelMode,
   useExcalidrawContainer,
+  useAppProps,
 } from "./App";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
@@ -85,6 +99,7 @@ import {
 } from "./icons";
 
 import { Island } from "./Island";
+import Spinner from "./Spinner";
 
 import type {
   AppClassProperties,
@@ -134,6 +149,326 @@ export const canChangeBackgroundColor = (
   );
 };
 
+/**
+ * Prevents keyboard events from bubbling up to Excalidraw's global handlers.
+ * This ensures typing in inputs/textareas works correctly without triggering
+ * canvas shortcuts (like Delete, Backspace, arrow keys, etc.)
+ */
+const stopKeyboardPropagation = (e: React.KeyboardEvent) => {
+  e.stopPropagation();
+};
+
+// Compact font picker for Luzmo charts - uses element.id to avoid stale closure
+const CompactLuzmoFontPicker = ({
+  element,
+  app,
+}: {
+  element: ExcalidrawLuzmoChartElement;
+  app: AppClassProperties;
+}) => {
+  const [isFontPickerOpen, setIsFontPickerOpen] = useState(false);
+  const handleFontFamilyChange = useCallback(
+    (fontFamily: FontFamilyValues) => {
+      const currentElement = app.scene.getElement(element.id);
+      if (currentElement && isLuzmoChartElement(currentElement)) {
+        app.scene.mutateElement(currentElement, { fontFamily });
+        app.store.scheduleCapture();
+      }
+      // Persist as default for newly created Luzmo charts
+      app.syncActionResult({
+        appState: { currentItemFontFamily: fontFamily },
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+      setIsFontPickerOpen(false);
+    },
+    [element.id, app.scene, app.store],
+  );
+  return (
+    <FontPicker
+      isOpened={isFontPickerOpen}
+      selectedFontFamily={element.fontFamily}
+      hoveredFontFamily={null}
+      onSelect={handleFontFamilyChange}
+      onHover={() => {}}
+      onLeave={() => {}}
+      onPopupChange={setIsFontPickerOpen}
+      compactMode
+    />
+  );
+};
+
+// Custom properties component for Luzmo Chart elements
+const LuzmoChartProperties = ({
+  element,
+  appState,
+  renderAction,
+  app,
+  isSummaryFrameSelected = false,
+}: {
+  element: ExcalidrawLuzmoChartElement;
+  appState: UIAppState;
+  renderAction: ActionManager["renderAction"];
+  app: AppClassProperties;
+  /** When true, the summary frame is selected; show frame-like native props only */
+  isSummaryFrameSelected?: boolean;
+}) => {
+  const editorInterface = useEditorInterface();
+  const appProps = useAppProps();
+
+  // State for font picker popup
+  const [isFontPickerOpen, setIsFontPickerOpen] = useState(false);
+
+  // Loading state for chart type changes (switchItem API call)
+  const [isChangingChartType, setIsChangingChartType] = useState(false);
+
+  // Subscribe to scene updates to force re-render when element is mutated
+  // This is necessary because Excalidraw mutates elements in place, and React
+  // doesn't detect changes to object properties when the reference stays the same
+  const [, forceUpdate] = useState({});
+  useEffect(() => {
+    const unsubscribe = app.scene.onUpdate(() => {
+      // Force re-render when scene updates (element might have been mutated)
+      forceUpdate({});
+    });
+    return unsubscribe;
+  }, [app.scene]);
+
+  // Update chart type - uses onLuzmoChartTypeChange if provided to handle
+  // slot/options conversion via switchItem, otherwise falls back to simple reset
+  const handleChartTypeChange = useCallback(
+    async (newChartType: LuzmoChartType) => {
+      // Skip if same type
+      if (element.chartType === newChartType) {
+        return;
+      }
+
+      setIsChangingChartType(true);
+      try {
+        // If app provides onLuzmoChartTypeChange, use it to convert slots/options
+        if (appProps.onLuzmoChartTypeChange) {
+          try {
+            const updates = await appProps.onLuzmoChartTypeChange(
+              element,
+              newChartType,
+            );
+            app.scene.mutateElement(element, updates);
+          } catch (error) {
+            console.error("Error switching chart type:", error);
+            // Fallback: just change the type and reset slots/options
+            app.scene.mutateElement(element, {
+              chartType: newChartType,
+              slots: [],
+              options: {},
+            });
+          }
+        } else {
+          // No handler provided - simple reset
+          app.scene.mutateElement(element, {
+            chartType: newChartType,
+            slots: [],
+            options: {},
+          });
+        }
+        // Schedule history capture for undo/redo support
+        app.store.scheduleCapture();
+      } finally {
+        setIsChangingChartType(false);
+      }
+    },
+    [element, app.scene, app.store, appProps],
+  );
+
+  // Handle font family change - always get current element from scene to avoid
+  // stale closure when element is replaced (e.g. after stroke/sloppiness change)
+  const handleFontFamilyChange = useCallback(
+    (fontFamily: FontFamilyValues) => {
+      const currentElement = app.scene.getElement(element.id);
+      if (currentElement && isLuzmoChartElement(currentElement)) {
+        app.scene.mutateElement(currentElement, { fontFamily });
+        app.store.scheduleCapture();
+      }
+      // Persist as default for newly created Luzmo charts (same as text/rectangles)
+      app.syncActionResult({
+        appState: { currentItemFontFamily: fontFamily },
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+      setIsFontPickerOpen(false);
+    },
+    [element.id, app.scene, app.store],
+  );
+
+  // Generic onChange handler for the render prop.
+  // Always get current element from scene to avoid stale closure (e.g. when frame
+  // is selected and we resolve the chart via customData; mutations must target
+  // the actual scene element).
+  const handleElementChange = useCallback(
+    (updates: Partial<ExcalidrawLuzmoChartElement>) => {
+      const currentElement = app.scene.getElement(element.id);
+      if (currentElement && isLuzmoChartElement(currentElement)) {
+        app.scene.mutateElement(currentElement, updates);
+        app.store.scheduleCapture();
+      }
+    },
+    [element.id, app.scene, app.store],
+  );
+
+  // Check if custom render prop is provided
+  const renderLuzmoChartProperties = appProps.renderLuzmoChartProperties;
+
+  return (
+    <div
+      className="selected-shape-actions"
+      onKeyDown={stopKeyboardPropagation}
+      onKeyUp={stopKeyboardPropagation}
+    >
+      {/* Stroke color first, then background - same order as other elements */}
+      <div>{renderAction("changeStrokeColor")}</div>
+      <div>{renderAction("changeBackgroundColor")}</div>
+
+      {/* Font Family Picker - chart only; native frames don't have font */}
+      {!isSummaryFrameSelected && (
+        <fieldset>
+          <legend>{t("labels.fontFamily")}</legend>
+          <FontPicker
+            isOpened={isFontPickerOpen}
+            selectedFontFamily={element.fontFamily}
+            hoveredFontFamily={null}
+            onSelect={handleFontFamilyChange}
+            onHover={() => {}}
+            onLeave={() => {}}
+            onPopupChange={setIsFontPickerOpen}
+          />
+        </fieldset>
+      )}
+
+      {/* Border Style Options (Sloppiness & Roundness) - frame or chart */}
+      <fieldset>
+        <legend>{t("labels.stroke")}</legend>
+        {renderAction("changeStrokeStyle")}
+        {renderAction("changeSloppiness")}
+        {renderAction("changeRoundness")}
+      </fieldset>
+
+      {/* Chart-specific configs (theme, slots, options) */}
+      <fieldset>
+        <legend>{t("labels.luzmochart")}</legend>
+
+        <div
+          className="luzmo-chart-properties"
+          style={{ position: "relative" }}
+        >
+          {/* Loading overlay - same as mobile CompactProperties */}
+          {isChangingChartType && (
+            <div
+              className="luzmo-chart-properties__loading-overlay"
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "var(--island-bg-color, #fff)",
+                opacity: 0.85,
+                zIndex: 10,
+                borderRadius: "var(--border-radius-md, 4px)",
+              }}
+            >
+              <Spinner size="1.5rem" />
+            </div>
+          )}
+          {/* Chart Type Selector - matches other property selects */}
+          <div className="luzmo-chart-properties__item">
+            <label
+              className="luzmo-chart-properties__label"
+              htmlFor="luzmo-chart-type-select"
+            >
+              {t("labels.chartType") || "Chart type"}
+            </label>
+            <select
+              id="luzmo-chart-type-select"
+              className="luzmo-chart-properties__select"
+              value={element.chartType}
+              disabled={isChangingChartType}
+              onChange={(e) =>
+                handleChartTypeChange(e.target.value as LuzmoChartType)
+              }
+            >
+              {LUZMO_CHART_CATEGORIES.map((category) => (
+                <optgroup key={category.id} label={category.label}>
+                  {LUZMO_CHART_TYPES.filter(
+                    (ct) => ct.category === category.id,
+                  ).map((chartType) => (
+                    <option key={chartType.type} value={chartType.type}>
+                      {chartType.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </div>
+
+          {/* Divider between chart type and options */}
+          <div className="luzmo-chart-properties__divider" aria-hidden />
+
+          {/* Custom Luzmo Components (data picker, edit item) via render prop */}
+          {renderLuzmoChartProperties ? (
+            <div className="luzmo-chart-properties__custom">
+              {renderLuzmoChartProperties(
+                element,
+                appState,
+                handleElementChange,
+              )}
+            </div>
+          ) : (
+            /* Fallback: show basic status when no render prop provided */
+            <>
+              <div className="luzmo-chart-properties__item">
+                <label className="luzmo-chart-properties__label">
+                  {t("labels.chartSlots") || "Data Slots"}
+                </label>
+                <div className="luzmo-chart-properties__value">
+                  {element.slots
+                    ? t("labels.chartConfigured") || "Configured"
+                    : t("labels.chartNotConfigured") || "Not configured"}
+                </div>
+              </div>
+              <div className="luzmo-chart-properties__hint">
+                {t("labels.chartConfigureHint") ||
+                  "Use the Chart sidebar tab to configure data and options"}
+              </div>
+            </>
+          )}
+        </div>
+      </fieldset>
+
+      {/* Keep Layers */}
+      <fieldset>
+        <legend>{t("labels.layers")}</legend>
+        <div className="buttonList">
+          {renderAction("sendToBack")}
+          {renderAction("sendBackward")}
+          {renderAction("bringForward")}
+          {renderAction("bringToFront")}
+        </div>
+      </fieldset>
+
+      {/* Actions (copy, delete, link, etc.) - below Luzmo chart config */}
+      <fieldset>
+        <legend>{t("labels.actions")}</legend>
+        <div className="buttonList">
+          {editorInterface.formFactor !== "phone" &&
+            renderAction("duplicateSelection")}
+          {editorInterface.formFactor !== "phone" &&
+            renderAction("deleteSelectedElements")}
+          {renderAction("group")}
+          {renderAction("ungroup")}
+          {renderAction("hyperlink")}
+        </div>
+      </fieldset>
+    </div>
+  );
+};
+
 export const SelectedShapeActions = ({
   appState,
   elementsMap,
@@ -145,7 +480,47 @@ export const SelectedShapeActions = ({
   renderAction: ActionManager["renderAction"];
   app: AppClassProperties;
 }) => {
+  const editorInterface = useEditorInterface();
   const targetElements = getTargetElements(elementsMap, appState);
+
+  // Resolve the element to show properties for. Summary frames (AI chart summary)
+  // have no own settings - we show the linked Luzmo chart's properties instead.
+  const getPropertiesElement = (): ExcalidrawElement | null => {
+    if (targetElements.length !== 1) {
+      return null;
+    }
+    const el = targetElements[0];
+    if (isLuzmoChartElement(el)) {
+      return el;
+    }
+    if (isFrameLikeElement(el)) {
+      const chartId = el.customData?.aiSummaryChartId as string | undefined;
+      if (chartId) {
+        const chart = elementsMap.get(chartId) ?? null;
+        return chart && isLuzmoChartElement(chart) ? chart : null;
+      }
+    }
+    return null;
+  };
+
+  const luzmoElementForProperties = getPropertiesElement();
+
+  // Show Luzmo chart properties when a chart or its summary frame is selected
+  if (
+    luzmoElementForProperties &&
+    isLuzmoChartElement(luzmoElementForProperties)
+  ) {
+    const isSummaryFrameSelected = isFrameLikeElement(targetElements[0]);
+    return (
+      <LuzmoChartProperties
+        element={luzmoElementForProperties as ExcalidrawLuzmoChartElement}
+        appState={appState}
+        renderAction={renderAction}
+        app={app}
+        isSummaryFrameSelected={isSummaryFrameSelected}
+      />
+    );
+  }
 
   let isSingleElementBoundContainer = false;
   if (
@@ -158,7 +533,6 @@ export const SelectedShapeActions = ({
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
   );
-  const editorInterface = useEditorInterface();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
@@ -226,7 +600,7 @@ export const SelectedShapeActions = ({
       {(appState.activeTool.type === "text" ||
         targetElements.some(isTextElement)) && (
         <>
-          <fieldset>{renderAction("changeFontFamily")}</fieldset>
+          {renderAction("changeFontFamily")}
           {renderAction("changeFontSize")}
           {(appState.activeTool.type === "text" ||
             suppportsHorizontalAlign(targetElements, elementsMap)) &&
@@ -321,13 +695,18 @@ const CombinedShapeProperties = ({
   setAppState,
   targetElements,
   container,
+  app,
 }: {
   targetElements: ExcalidrawElement[];
   appState: UIAppState;
   renderAction: ActionManager["renderAction"];
   setAppState: React.Component<any, AppState>["setState"];
   container: HTMLDivElement | null;
+  app: AppClassProperties;
 }) => {
+  const appProps = useAppProps();
+  const renderLuzmoChartProperties = appProps.renderLuzmoChartProperties;
+
   const showFillIcons =
     (hasBackground(appState.activeTool.type) &&
       !isTransparent(appState.currentItemBackgroundColor)) ||
@@ -344,6 +723,107 @@ const CombinedShapeProperties = ({
       appState.activeTool.type !== "laser" &&
       appState.activeTool.type !== "lasso");
   const isOpen = appState.openPopup === "compactStrokeStyles";
+
+  // Include summary frames (they show chart properties, not frame settings)
+  const elementsMap = app.scene.getNonDeletedElementsMap();
+  const propertiesElement = (() => {
+    if (targetElements.length !== 1 || !renderLuzmoChartProperties) {
+      return null;
+    }
+    const el = targetElements[0];
+    if (isLuzmoChartElement(el)) {
+      return el as ExcalidrawLuzmoChartElement;
+    }
+    if (isFrameLikeElement(el)) {
+      const chartId = el.customData?.aiSummaryChartId as string | undefined;
+      if (chartId) {
+        const chart = elementsMap.get(chartId);
+        return chart && isLuzmoChartElement(chart)
+          ? (chart as ExcalidrawLuzmoChartElement)
+          : null;
+      }
+    }
+    return null;
+  })();
+
+  const isSingleLuzmoChart = !!propertiesElement;
+  const isSummaryFrameSelected =
+    isSingleLuzmoChart && isFrameLikeElement(targetElements[0]);
+
+  const luzmoElement = propertiesElement;
+
+  // Force re-render when scene updates (element mutated in place)
+  // Same pattern as LuzmoChartProperties - needed for UI to reflect changes
+  const [, forceUpdate] = useState({});
+  useEffect(() => {
+    if (!isSingleLuzmoChart) {
+      return;
+    }
+    const unsubscribe = app.scene.onUpdate(() => {
+      forceUpdate({});
+    });
+    return unsubscribe;
+  }, [isSingleLuzmoChart, app.scene]);
+
+  // Loading state for chart type changes (switchItem API call)
+  const [isChangingChartType, setIsChangingChartType] = useState(false);
+
+  const handleLuzmoChartChange = useCallback(
+    (updates: Partial<ExcalidrawLuzmoChartElement>) => {
+      if (!luzmoElement) {
+        return;
+      }
+      const currentElement = app.scene.getElement(luzmoElement.id);
+      if (currentElement && isLuzmoChartElement(currentElement)) {
+        app.scene.mutateElement(currentElement, updates);
+        app.store.scheduleCapture();
+      }
+    },
+    [luzmoElement?.id, app.scene, app.store],
+  );
+
+  const handleChartTypeChange = useCallback(
+    async (newChartType: LuzmoChartType) => {
+      if (!luzmoElement || luzmoElement.chartType === newChartType) {
+        return;
+      }
+      const currentElement = app.scene.getElement(luzmoElement.id) as
+        | ExcalidrawLuzmoChartElement
+        | undefined;
+      if (!currentElement || !isLuzmoChartElement(currentElement)) {
+        return;
+      }
+      setIsChangingChartType(true);
+      try {
+        if (appProps.onLuzmoChartTypeChange) {
+          try {
+            const updates = await appProps.onLuzmoChartTypeChange(
+              currentElement,
+              newChartType,
+            );
+            app.scene.mutateElement(currentElement, updates);
+          } catch (error) {
+            console.error("Error switching chart type:", error);
+            app.scene.mutateElement(currentElement, {
+              chartType: newChartType,
+              slots: [],
+              options: {},
+            });
+          }
+        } else {
+          app.scene.mutateElement(currentElement, {
+            chartType: newChartType,
+            slots: [],
+            options: {},
+          });
+        }
+        app.store.scheduleCapture();
+      } finally {
+        setIsChangingChartType(false);
+      }
+    },
+    [luzmoElement?.id, app.scene, app.store, appProps],
+  );
 
   if (!shouldShowCombinedProperties) {
     return null;
@@ -384,7 +864,11 @@ const CombinedShapeProperties = ({
           <PropertiesPopover
             className={PROPERTIES_CLASSES}
             container={container}
-            style={{ maxWidth: "13rem" }}
+            style={{
+              maxWidth: isSingleLuzmoChart ? "20rem" : "13rem",
+              maxHeight: isSingleLuzmoChart ? "min(70vh, 28rem)" : undefined,
+              overflowY: isSingleLuzmoChart ? "auto" : undefined,
+            }}
             onClose={() => {}}
           >
             <div className="selected-shape-actions">
@@ -409,6 +893,90 @@ const CombinedShapeProperties = ({
                 )) &&
                 renderAction("changeRoundness")}
               {renderAction("changeOpacity")}
+              {isSingleLuzmoChart && luzmoElement && (
+                <>
+                  {!isSummaryFrameSelected && (
+                    <fieldset>
+                      <legend>{t("labels.fontFamily")}</legend>
+                      <CompactLuzmoFontPicker
+                        element={luzmoElement}
+                        app={app}
+                      />
+                    </fieldset>
+                  )}
+                  <fieldset>
+                    <legend>{t("labels.luzmochart")}</legend>
+                    <div
+                      className="luzmo-chart-properties compact-popover"
+                      style={{ position: "relative" }}
+                    >
+                      {/* Loading overlay */}
+                      {isChangingChartType && (
+                        <div
+                          className="luzmo-chart-properties__loading-overlay"
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: "var(--island-bg-color, #fff)",
+                            opacity: 0.85,
+                            zIndex: 10,
+                            borderRadius: "var(--border-radius-md, 4px)",
+                          }}
+                        >
+                          <Spinner size="1.5rem" />
+                        </div>
+                      )}
+                      {/* Chart Type Selector - same UI as LuzmoChartProperties */}
+                      <div className="luzmo-chart-properties__item">
+                        <label
+                          className="luzmo-chart-properties__label"
+                          htmlFor="luzmo-chart-type-select-popover"
+                        >
+                          {t("labels.chartType") || "Chart type"}
+                        </label>
+                        <select
+                          id="luzmo-chart-type-select-popover"
+                          className="luzmo-chart-properties__select"
+                          value={luzmoElement.chartType}
+                          disabled={isChangingChartType}
+                          onChange={(e) =>
+                            handleChartTypeChange(
+                              e.target.value as LuzmoChartType,
+                            )
+                          }
+                        >
+                          {LUZMO_CHART_CATEGORIES.map((category) => (
+                            <optgroup key={category.id} label={category.label}>
+                              {LUZMO_CHART_TYPES.filter(
+                                (ct) => ct.category === category.id,
+                              ).map((chartType) => (
+                                <option
+                                  key={chartType.type}
+                                  value={chartType.type}
+                                >
+                                  {chartType.label}
+                                </option>
+                              ))}
+                            </optgroup>
+                          ))}
+                        </select>
+                      </div>
+                      <div
+                        className="luzmo-chart-properties__divider"
+                        aria-hidden
+                      />
+                      {renderLuzmoChartProperties?.(
+                        luzmoElement,
+                        appState,
+                        handleLuzmoChartChange,
+                      )}
+                    </div>
+                  </fieldset>
+                </>
+              )}
             </div>
           </PropertiesPopover>
         )}
@@ -832,6 +1400,7 @@ export const CompactShapeActions = ({
         setAppState={setAppState}
         targetElements={targetElements}
         container={container}
+        app={app}
       />
 
       <CombinedArrowProperties
@@ -968,6 +1537,7 @@ export const MobileShapeActions = ({
           setAppState={setAppState}
           targetElements={targetElements}
           container={container}
+          app={app}
         />
         {/* Combined Arrow Properties */}
         <CombinedArrowProperties
@@ -1081,9 +1651,8 @@ export const ShapesSwitcher = ({
   return (
     <>
       {getToolbarTools(app).map(
-        ({ value, icon, key, numericKey, fillable, toolbar }) => {
+        ({ value, icon, key, numericKey, fillable }, index) => {
           if (
-            toolbar === false ||
             UIOptions.tools?.[
               value as Extract<
                 typeof value,
@@ -1097,12 +1666,10 @@ export const ShapesSwitcher = ({
           const label = t(`toolBar.${value}`);
           const letter =
             key && capitalizeString(typeof key === "string" ? key : key[0]);
-          const shortcut = letter
-            ? `${letter} ${t("helpDialog.or")} ${numericKey}`
-            : `${numericKey}`;
-          const keybindingLabel =
-            value === "hand" ? undefined : numericKey || letter;
-
+          const shortcut =
+            letter && numericKey
+              ? `${letter} ${t("helpDialog.or")} ${numericKey}`
+              : letter || numericKey || "";
           // when in compact styles panel mode (tablet)
           // use a ToolPopover for selection/lasso toggle as well
           if (
@@ -1147,7 +1714,7 @@ export const ShapesSwitcher = ({
               checked={activeTool.type === value}
               name="editor-current-shape"
               title={`${capitalizeString(label)} — ${shortcut}`}
-              keyBindingLabel={keybindingLabel}
+              keyBindingLabel={numericKey || letter}
               aria-label={capitalizeString(label)}
               aria-keyshortcuts={shortcut}
               data-testid={`toolbar-${value}`}

@@ -278,7 +278,7 @@ const PublishLibrary = ({
     const previewImage = await generatePreviewImage(clonedLibItems);
 
     const libContent: ExportedLibraryData = {
-      type: EXPORT_DATA_TYPES.excalidrawLibrary,
+      type: EXPORT_DATA_TYPES.flexcalidrawLibrary,
       version: VERSIONS.excalidrawLibrary,
       source: getExportSource(),
       libraryItems: clonedLibItems,

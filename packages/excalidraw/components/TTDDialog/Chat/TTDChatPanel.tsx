@@ -11,7 +11,7 @@ import { rateLimitsAtom } from "../TTDContext";
 
 import { ChatHistoryMenu } from "./ChatHistoryMenu";
 
-import { ChatInterface } from "./ChatInterface";
+import { ChatInterface } from ".";
 
 import type { TTDPanelAction } from "../TTDDialogPanel";
 

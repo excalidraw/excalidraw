@@ -44,6 +44,11 @@ import type {
   ExcalidrawEmbeddableElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeElement,
+  ExcalidrawLuzmoChartElement,
+  LuzmoChartType,
+  LuzmoSlots,
+  LuzmoChartOptions,
+  LuzmoAuthConfig,
   ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
@@ -177,6 +182,43 @@ export const newIframeElement = (
 ): NonDeleted<ExcalidrawIframeElement> => {
   return {
     ..._newElementBase<ExcalidrawIframeElement>("iframe", opts),
+  };
+};
+
+export const newLuzmoChartElement = (
+  opts: {
+    type: "luzmochart";
+    chartType?: LuzmoChartType;
+    slots?: LuzmoSlots | null;
+    options?: LuzmoChartOptions | null;
+    authConfig?: LuzmoAuthConfig | null;
+    contextId?: string;
+    themeId?: string;
+    fontFamily?: FontFamilyValues;
+    aiSummaryEnabled?: boolean;
+    // Legacy fields for backward compatibility
+    chartData?: Record<string, unknown> | null;
+    chartOptions?: Record<string, unknown> | null;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawLuzmoChartElement> => {
+  // Generate a unique contextId if not provided
+  const contextId =
+    opts.contextId ??
+    `luzmo-chart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+  return {
+    ..._newElementBase<ExcalidrawLuzmoChartElement>("luzmochart", opts),
+    chartType: opts.chartType ?? "donut-chart",
+    slots: opts.slots ?? null,
+    options: opts.options ?? null,
+    authConfig: opts.authConfig ?? null,
+    contextId,
+    themeId: opts.themeId,
+    fontFamily: opts.fontFamily ?? DEFAULT_FONT_FAMILY,
+    aiSummaryEnabled: opts.aiSummaryEnabled ?? false,
+    // Legacy fields
+    chartData: opts.chartData ?? null,
+    chartOptions: opts.chartOptions ?? null,
   };
 };
 

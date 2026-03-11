@@ -1,0 +1,58 @@
+.luzmo-chart-properties-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+
+  // Chart title TextField — smaller font to match sidebar density
+  &__title-input {
+    flex: 1 0 auto;
+
+    .ExcTextField__input {
+      background-color: #f5f5f9;
+      border-radius: var(--border-radius-md);
+      border: 0;
+
+      input {
+        font-size: 0.8rem;
+
+        &::placeholder {
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    .excalidraw.theme--dark & .ExcTextField__input {
+      background-color: #31303b;
+    }
+  }
+
+  // Inline setting row: label left, control right (matches ImageExportDialog pattern)
+  &__setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 1.75rem;
+  }
+
+  &__setting-label {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-primary-color);
+  }
+
+  // Luzmo web-component wrapper — minimal chrome so it blends with the sidebar
+  &__luzmo-component {
+    overflow: hidden;
+    min-width: 0;
+
+    luzmo-item-data-picker-panel,
+    luzmo-edit-item {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+  }
+}

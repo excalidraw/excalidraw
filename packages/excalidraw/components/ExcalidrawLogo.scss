@@ -17,9 +17,17 @@
 
     display: flex;
     align-items: center;
+    gap: 0.5rem;
 
-    svg {
+    svg,
+    img {
       flex: 0 0 auto;
+    }
+
+    .ExcalidrawLogo-luzmo {
+      height: auto;
+      width: auto;
+      object-fit: contain;
     }
 
     .ExcalidrawLogo-icon {
@@ -27,60 +35,94 @@
       color: var(--color-logo-icon);
     }
 
+    .logo-flex {
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-cali {
+      font-weight: 500;
+    }
+
     .ExcalidrawLogo-text {
-      margin-left: 0.75rem;
+      margin-left: 0;
       width: auto;
       color: var(--color-logo-text);
+      font-weight: 600;
+      white-space: nowrap;
     }
 
     &.is-mobile {
+      gap: 0.25rem;
+
+      .ExcalidrawLogo-luzmo {
+        height: var(--logo-text--mobile);
+      }
+
       .ExcalidrawLogo-icon {
         height: var(--logo-icon--mobile);
       }
 
       .ExcalidrawLogo-text {
-        height: var(--logo-text--mobile);
-        margin-left: 0.5rem;
+        font-size: var(--logo-text--mobile);
       }
     }
 
     &.is-xs {
+      .ExcalidrawLogo-luzmo {
+        height: var(--logo-text--xs);
+      }
+
       .ExcalidrawLogo-icon {
         height: var(--logo-icon--xs);
       }
 
       .ExcalidrawLogo-text {
-        height: var(--logo-text--xs);
+        font-size: var(--logo-text--xs);
       }
     }
 
     &.is-small {
+      .ExcalidrawLogo-luzmo {
+        height: var(--logo-text--small);
+      }
+
       .ExcalidrawLogo-icon {
         height: var(--logo-icon--small);
       }
 
       .ExcalidrawLogo-text {
-        height: var(--logo-text--small);
+        font-size: var(--logo-text--small);
       }
     }
 
     &.is-normal {
+      .ExcalidrawLogo-luzmo {
+        height: var(--logo-text--normal);
+      }
+
       .ExcalidrawLogo-icon {
         height: var(--logo-icon--normal);
       }
 
       .ExcalidrawLogo-text {
-        height: var(--logo-text--normal);
+        font-size: var(--logo-text--normal);
       }
     }
 
     &.is-large {
+      gap: 0.75rem;
+
+      .ExcalidrawLogo-luzmo {
+        height: var(--logo-text--large);
+      }
+
       .ExcalidrawLogo-icon {
         height: var(--logo-icon--large);
       }
 
       .ExcalidrawLogo-text {
-        height: var(--logo-text--large);
+        font-size: var(--logo-text--large);
       }
     }
   }

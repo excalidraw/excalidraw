@@ -56,6 +56,11 @@ export type SVGRenderConfig = {
    */
   reuseImages: boolean;
   theme: AppState["theme"];
+  /**
+   * Full elements map for lookups (e.g. Luzmo chart summary elements
+   * that may be outside the export frame). Falls back to elementsMap if not set.
+   */
+  allElementsMap?: RenderableElementsMap;
 };
 
 export type InteractiveCanvasRenderConfig = {
@@ -165,6 +170,7 @@ export type ElementShapes = {
   diamond: Drawable;
   iframe: Drawable;
   embeddable: Drawable;
+  luzmochart: Drawable;
   freedraw: (Drawable | SVGPathString)[];
   arrow: Drawable[];
   line: Drawable[];

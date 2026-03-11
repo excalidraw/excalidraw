@@ -15,6 +15,7 @@ import {
   newIframeElement,
   newImageElement,
   newLinearElement,
+  newLuzmoChartElement,
   newMagicFrameElement,
   newTextElement,
 } from "@excalidraw/element";
@@ -289,6 +290,12 @@ export class API {
       case "embeddable":
         element = newEmbeddableElement({
           type: "embeddable",
+          ...base,
+        });
+        break;
+      case "luzmochart":
+        element = newLuzmoChartElement({
+          type: "luzmochart",
           ...base,
         });
         break;

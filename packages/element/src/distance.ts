@@ -38,6 +38,7 @@ export const distanceToElement = (
     case "text":
     case "iframe":
     case "embeddable":
+    case "luzmochart":
     case "frame":
     case "magicframe":
       return distanceToRectanguloidElement(element, elementsMap, p);

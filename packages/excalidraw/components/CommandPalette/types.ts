@@ -15,7 +15,7 @@ export type CommandPaletteItem = {
   category: string;
   order?: number;
   predicate?: boolean | Action["predicate"];
-  shortcut?: string | null;
+  shortcut?: string;
   /** if false, command will not show while in view mode */
   viewMode?: boolean;
   perform: (data: {

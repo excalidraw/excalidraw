@@ -1,39 +1,26 @@
-import type { MaybePromise } from "@excalidraw/common/utility-types";
-
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { getFileHandleType, isImageFileHandleType } from "./blob";
 
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { exportCanvas, prepareElementsForExport } from ".";
 
 import type { AppState, BinaryFiles } from "../types";
 
 export const resaveAsImageWithScene = async (
-  data: MaybePromise<{
-    elements: readonly ExcalidrawElement[];
-    appState: AppState;
-    files: BinaryFiles;
-  }>,
-  fileHandle: FileSystemFileHandle,
-  filename: string,
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  files: BinaryFiles,
+  name: string,
 ) => {
+  const { exportBackground, viewBackgroundColor, fileHandle } = appState;
+
   const fileHandleType = getFileHandleType(fileHandle);
 
-  if (Math.random() < 1) {
-    throw new Error("OLALALALA");
-  }
-
-  if (!isImageFileHandleType(fileHandleType)) {
+  if (!fileHandle || !isImageFileHandleType(fileHandleType)) {
     throw new Error(
       "fileHandle should exist and should be of type svg or png when resaving",
     );
   }
-
-  let { elements, appState, files } = await data;
-
-  const { exportBackground, viewBackgroundColor } = appState;
-
   appState = {
     ...appState,
     exportEmbedScene: true,
@@ -48,7 +35,7 @@ export const resaveAsImageWithScene = async (
   await exportCanvas(fileHandleType, exportedElements, appState, files, {
     exportBackground,
     viewBackgroundColor,
-    name: filename,
+    name,
     fileHandle,
     exportingFrame,
   });

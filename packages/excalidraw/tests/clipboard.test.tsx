@@ -28,9 +28,7 @@ const { h } = window;
 const mouse = new Pointer("mouse");
 
 vi.mock("@excalidraw/common", async (importOriginal) => {
-  const module = await importOriginal<typeof import("@excalidraw/common")>();
-  const { mockThrottleRAF } = await import("./helpers/mocks");
-
+  const module: any = await importOriginal();
   return {
     __esmodule: true,
     ...module,
@@ -39,7 +37,6 @@ vi.mock("@excalidraw/common", async (importOriginal) => {
       ...module.KEYS,
       CTRL_OR_CMD: "ctrlKey",
     },
-    throttleRAF: mockThrottleRAF,
   };
 });
 

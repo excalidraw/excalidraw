@@ -1,7 +1,5 @@
 import { average } from "@excalidraw/math";
 
-import type { GlobalCoord } from "@excalidraw/math";
-
 import type { FontFamilyValues, FontString } from "@excalidraw/element/types";
 
 import type {
@@ -88,8 +86,7 @@ export const isWritableElement = (
     (target.type === "text" ||
       target.type === "number" ||
       target.type === "password" ||
-      target.type === "search")) ||
-  (target instanceof HTMLElement && target.closest(".cm-editor") !== null);
+      target.type === "search"));
 
 export const getFontFamilyString = ({
   fontFamily,
@@ -151,27 +148,38 @@ export const debounce = <T extends any[]>(
   return ret;
 };
 
-// throttle callback to execute once per animation frame using the latest args
-export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
+// throttle callback to execute once per animation frame
+export const throttleRAF = <T extends any[]>(
+  fn: (...args: T) => void,
+  opts?: { trailing?: boolean },
+) => {
   let timerId: number | null = null;
   let lastArgs: T | null = null;
+  let lastArgsTrailing: T | null = null;
 
-  const scheduleFunc = () => {
+  const scheduleFunc = (args: T) => {
     timerId = window.requestAnimationFrame(() => {
       timerId = null;
-      const args = lastArgs;
+      fn(...args);
       lastArgs = null;
-
-      if (args) {
-        fn(...args);
+      if (lastArgsTrailing) {
+        lastArgs = lastArgsTrailing;
+        lastArgsTrailing = null;
+        scheduleFunc(lastArgs);
       }
     });
   };
 
   const ret = (...args: T) => {
+    if (isTestEnv()) {
+      fn(...args);
+      return;
+    }
     lastArgs = args;
     if (timerId === null) {
-      scheduleFunc();
+      scheduleFunc(lastArgs);
+    } else if (opts?.trailing) {
+      lastArgsTrailing = args;
     }
   };
   ret.flush = () => {
@@ -180,12 +188,12 @@ export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
       timerId = null;
     }
     if (lastArgs) {
-      fn(...lastArgs);
-      lastArgs = null;
+      fn(...(lastArgsTrailing || lastArgs));
+      lastArgs = lastArgsTrailing = null;
     }
   };
   ret.cancel = () => {
-    lastArgs = null;
+    lastArgs = lastArgsTrailing = null;
     if (timerId !== null) {
       cancelAnimationFrame(timerId);
       timerId = null;
@@ -433,7 +441,7 @@ export const viewportCoordsToSceneCoords = (
   const x = (clientX - offsetLeft) / zoom.value - scrollX;
   const y = (clientY - offsetTop) / zoom.value - scrollY;
 
-  return { x, y } as GlobalCoord;
+  return { x, y };
 };
 
 export const sceneCoordsToViewportCoords = (
@@ -1321,11 +1329,4 @@ export const setFeatureFlag = <F extends keyof FEATURE_FLAGS>(
   } catch (e) {
     console.error("unable to set feature flag", e);
   }
-};
-
-export const oneOf = <N extends string | number | symbol | null, H extends N>(
-  needle: N,
-  haystack: readonly H[],
-): needle is H => {
-  return haystack.includes(needle as any);
 };

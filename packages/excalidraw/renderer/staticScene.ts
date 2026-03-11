@@ -25,6 +25,7 @@ import { getElementAbsoluteCoords } from "@excalidraw/element";
 import type {
   ElementsMap,
   ExcalidrawFrameLikeElement,
+  ExcalidrawLuzmoChartElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
@@ -297,12 +298,34 @@ const _renderStaticScene = ({
 
   const inFrameGroupsMap = new Map<string, boolean>();
 
+  // Collect summary element IDs from Luzmo charts - these will be rendered
+  // inside the chart placeholder during export, so we skip rendering them separately
+  const summaryElementIds = new Set<string>();
+  if (isExporting) {
+    for (const element of visibleElements) {
+      if (element.type === "luzmochart" && !element.isDeleted) {
+        const luzmoElement = element as ExcalidrawLuzmoChartElement;
+        const summaryId = luzmoElement.customData?.aiSummaryElementId as
+          | string
+          | undefined;
+        if (summaryId) {
+          summaryElementIds.add(summaryId);
+        }
+      }
+    }
+  }
+
   // Paint visible elements
   visibleElements
     .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       try {
         const frameId = element.frameId || appState.frameToHighlight?.id;
+
+        // Skip summary text elements during export - they're rendered inside the chart
+        if (isExporting && summaryElementIds.has(element.id)) {
+          return;
+        }
 
         if (
           isTextElement(element) &&
@@ -483,6 +506,7 @@ export const renderStaticSceneThrottled = throttleRAF(
   (config: StaticSceneRenderConfig) => {
     _renderStaticScene(config);
   },
+  { trailing: true },
 );
 
 /**

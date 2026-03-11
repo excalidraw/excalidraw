@@ -20,6 +20,7 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { actionToggleStats } from "../actions";
 import { trackEvent } from "../analytics";
+import { isHandToolActive } from "../appState";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { UIAppStateContext } from "../context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";
@@ -54,13 +55,13 @@ import ElementLinkDialog from "./ElementLinkDialog";
 import { ErrorDialog } from "./ErrorDialog";
 import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
 import { FixedSideContainer } from "./FixedSideContainer";
+import { HandButton } from "./HandButton";
 import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
-import { Toast } from "./Toast";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
@@ -118,7 +119,7 @@ const DefaultMainMenu: React.FC<{
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
-      <MainMenu.Group title="Excalidraw links">
+      <MainMenu.Group title="Based on Excalidraw with Luzmo Flex">
         <MainMenu.DefaultItems.Socials />
       </MainMenu.Group>
       <MainMenu.Separator />
@@ -358,6 +359,13 @@ const LayerUI = ({
 
                             <div className="App-toolbar__divider" />
 
+                            <HandButton
+                              checked={isHandToolActive(appState)}
+                              onChange={() => onHandToolToggle()}
+                              title={t("toolBar.hand")}
+                              isMobile
+                            />
+
                             <ShapesSwitcher
                               setAppState={setAppState}
                               activeTool={appState.activeTool}
@@ -504,19 +512,27 @@ const LayerUI = ({
             }
 
             if (selectedElements.length) {
+              const propToUpdate =
+                altKey && eyeDropperState.swapPreviewOnAlt
+                  ? colorPickerType === "elementBackground"
+                    ? "strokeColor"
+                    : "backgroundColor"
+                  : colorPickerType === "elementBackground"
+                  ? "backgroundColor"
+                  : "strokeColor";
               for (const element of selectedElements) {
                 mutateElement(element, arrayToMap(elements), {
-                  [altKey && eyeDropperState.swapPreviewOnAlt
-                    ? colorPickerType === "elementBackground"
-                      ? "strokeColor"
-                      : "backgroundColor"
-                    : colorPickerType === "elementBackground"
-                    ? "backgroundColor"
-                    : "strokeColor"]: color,
+                  [propToUpdate]: color,
                 });
                 ShapeCache.delete(element);
               }
               app.scene.triggerUpdate();
+              // Update currentItem* so next drawn element uses this color
+              if (propToUpdate === "backgroundColor") {
+                setAppState({ currentItemBackgroundColor: color });
+              } else {
+                setAppState({ currentItemStrokeColor: color });
+              }
             } else if (colorPickerType === "elementBackground") {
               setAppState({
                 currentItemBackgroundColor: color,
@@ -540,6 +556,9 @@ const LayerUI = ({
           }}
         />
       )}
+      {appState.openDialog?.name === "templatePicker" && (
+        <tunnels.TemplatePickerDialogTunnel.Out />
+      )}
       <ActiveConfirmDialog />
       {appState.openDialog?.name === "elementLinkSelector" && (
         <ElementLinkDialog
@@ -557,13 +576,13 @@ const LayerUI = ({
       <tunnels.OverwriteConfirmDialogTunnel.Out />
       {renderImageExportDialog()}
       {renderJSONExportDialog()}
-      {appState.openDialog?.name === "charts" && (
+      {appState.pasteDialog.shown && (
         <PasteChartDialog
-          data={appState.openDialog.data}
-          rawText={appState.openDialog.rawText}
+          setAppState={setAppState}
+          appState={appState}
           onClose={() =>
             setAppState({
-              openDialog: null,
+              pasteDialog: { shown: false, data: null },
             })
           }
         />
@@ -606,30 +625,18 @@ const LayerUI = ({
               showExitZenModeBtn={showExitZenModeBtn}
               renderWelcomeScreen={renderWelcomeScreen}
             />
-            {(appState.toast || appState.scrolledOutside) && (
-              <div className="floating-status-stack">
-                {appState.toast && (
-                  <Toast
-                    message={appState.toast.message}
-                    onClose={() => setAppState({ toast: null })}
-                    duration={appState.toast.duration}
-                    closable={appState.toast.closable}
-                  />
-                )}
-                {!appState.toast && appState.scrolledOutside && (
-                  <button
-                    type="button"
-                    className="scroll-back-to-content"
-                    onClick={() => {
-                      setAppState((appState) => ({
-                        ...calculateScrollCenter(elements, appState),
-                      }));
-                    }}
-                  >
-                    {t("buttons.scrollBackToContent")}
-                  </button>
-                )}
-              </div>
+            {appState.scrolledOutside && (
+              <button
+                type="button"
+                className="scroll-back-to-content"
+                onClick={() => {
+                  setAppState((appState) => ({
+                    ...calculateScrollCenter(elements, appState),
+                  }));
+                }}
+              >
+                {t("buttons.scrollBackToContent")}
+              </button>
             )}
           </div>
           {renderSidebars()}

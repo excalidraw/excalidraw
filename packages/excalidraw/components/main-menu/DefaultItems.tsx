@@ -9,9 +9,7 @@ import {
   actionLoadScene,
   actionSaveToActiveFile,
   actionShortcuts,
-  actionToggleArrowBinding,
   actionToggleGridMode,
-  actionToggleMidpointSnapping,
   actionToggleObjectsSnapMode,
   actionToggleSearchMenu,
   actionToggleStats,
@@ -39,7 +37,8 @@ import DropdownMenuItemCheckbox from "../dropdownMenu/DropdownMenuItemCheckbox";
 import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
 import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
 import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";
-import { GithubIcon, DiscordIcon, XBrandIcon, settingsIcon } from "../icons";
+
+import { ExcalLogo, LuzmoMarkIcon, settingsIcon } from "../icons";
 import {
   boltIcon,
   DeviceDesktopIcon,
@@ -51,6 +50,7 @@ import {
   save,
   searchIcon,
   SunIcon,
+  TemplateIcon,
   TrashIcon,
   usersIcon,
 } from "../icons";
@@ -99,6 +99,48 @@ export const LoadScene = () => {
   );
 };
 LoadScene.displayName = "LoadScene";
+
+export const StartFromTemplate = ({ onSelect }: { onSelect: () => void }) => {
+  const { t } = useI18n();
+  const elements = useExcalidrawElements();
+  const appState = useUIAppState();
+
+  if (appState.viewModeEnabled) {
+    return null;
+  }
+
+  const handleSelect = async () => {
+    if (
+      !elements.length ||
+      (await openConfirmModal({
+        title: t("overwriteConfirm.modal.loadTemplate.title"),
+        actionLabel: t("overwriteConfirm.modal.loadTemplate.button"),
+        color: "warning",
+        description: (
+          <Trans
+            i18nKey="overwriteConfirm.modal.loadTemplate.description"
+            bold={(text) => <strong>{text}</strong>}
+            br={() => <br />}
+          />
+        ),
+      }))
+    ) {
+      onSelect();
+    }
+  };
+
+  return (
+    <DropdownMenuItem
+      icon={TemplateIcon}
+      onSelect={handleSelect}
+      data-testid="start-from-template-button"
+      aria-label={t("buttons.startFromTemplate")}
+    >
+      {t("buttons.startFromTemplate")}
+    </DropdownMenuItem>
+  );
+};
+StartFromTemplate.displayName = "StartFromTemplate";
 
 export const SaveToActiveFile = () => {
   const { t } = useI18n();
@@ -354,30 +396,22 @@ export const Export = () => {
 Export.displayName = "Export";
 
 export const Socials = () => {
-  const { t } = useI18n();
-
+  const appState = useUIAppState();
   return (
     <>
       <DropdownMenuItemLink
-        icon={GithubIcon}
-        href="https://github.com/excalidraw/excalidraw"
-        aria-label="GitHub"
+        icon={ExcalLogo}
+        href="https://excalidraw.com?utm_source=flexcalidraw&utm_medium=app&utm_content=main_menu"
+        aria-label="Excalidraw"
       >
-        GitHub
+        Excalidraw
       </DropdownMenuItemLink>
       <DropdownMenuItemLink
-        icon={XBrandIcon}
-        href="https://x.com/excalidraw"
-        aria-label="X"
+        icon={<LuzmoMarkIcon theme={appState.theme} />}
+        href="https://luzmo.com/flex?utm_source=flexcalidraw&utm_medium=app&utm_content=main_menu"
+        aria-label="Luzmo Flex"
       >
-        {t("labels.followUs")}
-      </DropdownMenuItemLink>
-      <DropdownMenuItemLink
-        icon={DiscordIcon}
-        href="https://discord.gg/UexuTaE"
-        aria-label="Discord"
-      >
-        {t("labels.discordChat")}
+        Luzmo Flex
       </DropdownMenuItemLink>
     </>
   );
@@ -441,40 +475,6 @@ const PreferencesToggleSnapModeItem = () => {
       }}
     >
       {t("buttons.objectsSnapMode")}
-    </DropdownMenuItemCheckbox>
-  );
-};
-
-const PreferencesToggleArrowBindingItem = () => {
-  const { t } = useI18n();
-  const actionManager = useExcalidrawActionManager();
-  const appState = useUIAppState();
-  return (
-    <DropdownMenuItemCheckbox
-      checked={appState.bindingPreference === "enabled"}
-      onSelect={(event) => {
-        actionManager.executeAction(actionToggleArrowBinding);
-        event.preventDefault();
-      }}
-    >
-      {t("labels.arrowBinding")}
-    </DropdownMenuItemCheckbox>
-  );
-};
-
-const PreferencesToggleMidpointSnappingItem = () => {
-  const { t } = useI18n();
-  const actionManager = useExcalidrawActionManager();
-  const appState = useUIAppState();
-  return (
-    <DropdownMenuItemCheckbox
-      checked={appState.isMidpointSnappingEnabled}
-      onSelect={(event) => {
-        actionManager.executeAction(actionToggleMidpointSnapping);
-        event.preventDefault();
-      }}
-    >
-      {t("labels.midpointSnapping")}
     </DropdownMenuItemCheckbox>
   );
 };
@@ -574,8 +574,6 @@ export const Preferences = ({
             <PreferencesToggleZenModeItem />
             <PreferencesToggleViewModeItem />
             <PreferencesToggleElementPropertiesItem />
-            <PreferencesToggleArrowBindingItem />
-            <PreferencesToggleMidpointSnappingItem />
           </>
         )}
         {additionalItems}
@@ -586,8 +584,6 @@ export const Preferences = ({
 
 Preferences.ToggleToolLock = PreferencesToggleToolLockItem;
 Preferences.ToggleSnapMode = PreferencesToggleSnapModeItem;
-Preferences.ToggleArrowBinding = PreferencesToggleArrowBindingItem;
-Preferences.ToggleMidpointSnapping = PreferencesToggleMidpointSnappingItem;
 Preferences.ToggleGridMode = PreferencesToggleGridModeItem;
 Preferences.ToggleZenMode = PreferencesToggleZenModeItem;
 Preferences.ToggleViewMode = PreferencesToggleViewModeItem;

@@ -1,9 +1,7 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 import {
-  bumpVersion,
   getLinearElementSubType,
-  mutateElement,
   updateElbowArrowPoints,
 } from "@excalidraw/element";
 
@@ -39,8 +37,6 @@ import {
   isProdEnv,
   mapFind,
   reduceToCommonValue,
-  ROUNDNESS,
-  sceneCoordsToViewportCoords,
   updateActiveTool,
 } from "@excalidraw/common";
 
@@ -75,6 +71,12 @@ import type {
 
 import type { Scene } from "@excalidraw/element";
 
+import {
+  bumpVersion,
+  mutateElement,
+  ROUNDNESS,
+  sceneCoordsToViewportCoords,
+} from "..";
 import { trackEvent } from "../analytics";
 import { atom } from "../editor-jotai";
 

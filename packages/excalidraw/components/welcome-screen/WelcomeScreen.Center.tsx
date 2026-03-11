@@ -5,7 +5,7 @@ import { useUIAppState } from "../../context/ui-appState";
 import { t, useI18n } from "../../i18n";
 import { useEditorInterface, useExcalidrawActionManager } from "../App";
 import { ExcalidrawLogo } from "../ExcalidrawLogo";
-import { HelpIcon, LoadIcon, usersIcon } from "../icons";
+import { HelpIcon, LoadIcon, TemplateIcon, usersIcon } from "../icons";
 
 import type { JSX } from "react";
 
@@ -182,6 +182,26 @@ const MenuItemLiveCollaborationTrigger = ({
 MenuItemLiveCollaborationTrigger.displayName =
   "MenuItemLiveCollaborationTrigger";
 
+const MenuItemStartFromTemplate = ({ onSelect }: { onSelect: () => void }) => {
+  const appState = useUIAppState();
+  const { t } = useI18n();
+
+  if (appState.viewModeEnabled) {
+    return null;
+  }
+
+  return (
+    <WelcomeScreenMenuItem
+      shortcut={null}
+      onSelect={onSelect}
+      icon={TemplateIcon}
+    >
+      {t("buttons.startFromTemplate")}
+    </WelcomeScreenMenuItem>
+  );
+};
+MenuItemStartFromTemplate.displayName = "MenuItemStartFromTemplate";
+
 // -----------------------------------------------------------------------------
 
 Center.Logo = Logo;
@@ -192,5 +212,6 @@ Center.MenuItemLink = WelcomeScreenMenuItemLink;
 Center.MenuItemHelp = MenuItemHelp;
 Center.MenuItemLoadScene = MenuItemLoadScene;
 Center.MenuItemLiveCollaborationTrigger = MenuItemLiveCollaborationTrigger;
+Center.MenuItemStartFromTemplate = MenuItemStartFromTemplate;
 
 export { Center };

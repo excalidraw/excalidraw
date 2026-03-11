@@ -154,6 +154,8 @@ body.excalidraw-cursor-resize * {
     display: flex;
     flex-direction: column;
     row-gap: 0.75rem;
+    min-width: 0; // Allow container to shrink below content size
+    overflow: hidden;
 
     h3,
     legend,
@@ -206,6 +208,8 @@ body.excalidraw-cursor-resize * {
       margin: 0;
       padding: 0;
       border: none;
+      min-width: 0; // Allow fieldset to shrink below content size (prevents overflow)
+      max-width: 100%;
     }
   }
 
@@ -497,26 +501,6 @@ body.excalidraw-cursor-resize * {
 
     &:active {
       border: 1px solid var(--button-active-border);
-    }
-  }
-
-  .floating-status-stack {
-    position: absolute;
-    left: 50%;
-    bottom: 30px;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    pointer-events: none;
-
-    .scroll-back-to-content {
-      position: static;
-      left: auto;
-      bottom: auto;
-      transform: none;
-      pointer-events: var(--ui-pointerEvents);
     }
   }
 
@@ -829,5 +813,22 @@ body.excalidraw-cursor-resize * {
     font-weight: 700;
     letter-spacing: 0.6px;
     font-family: "Assistant";
+  }
+}
+
+.excalidraw__luzmochart-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  transform-origin: top left;
+  pointer-events: none;
+
+  .excalidraw__luzmochart-container__inner {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
   }
 }

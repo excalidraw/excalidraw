@@ -214,7 +214,7 @@ export default function LibraryMenuItems({
         itemIds: selectedItems.includes(id) ? selectedItems : [id],
       };
       event.dataTransfer.setData(
-        MIME_TYPES.excalidrawlibIds,
+        MIME_TYPES.flexcalidrawlibIds,
         JSON.stringify(data),
       );
     },

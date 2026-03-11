@@ -15,7 +15,11 @@ import type {
   ValueOf,
 } from "@excalidraw/common/utility-types";
 
-export type ChartType = "bar" | "line" | "radar";
+// Luzmo slot types - use VizItemSlot from @luzmo/dashboard-contents-types
+// We re-export the type here for convenience
+import type { VizItemSlot } from "@luzmo/dashboard-contents-types";
+
+export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
 export type FontFamilyKeys = keyof typeof FONT_FAMILY;
 export type FontFamilyValues = typeof FONT_FAMILY[FontFamilyKeys];
@@ -124,6 +128,137 @@ export type ExcalidrawIframeLikeElement =
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement;
 
+// Luzmo Flex SDK Chart Types
+// Basic charts (commonly used)
+export type LuzmoBasicChartType =
+  | "donut-chart"
+  | "bar-chart"
+  | "column-chart"
+  | "line-chart"
+  | "area-chart";
+
+// All available Luzmo Flex SDK chart types
+export type LuzmoChartType =
+  | LuzmoBasicChartType
+  | "bubble-chart"
+  | "box-plot"
+  | "bullet-chart"
+  | "choropleth-map"
+  | "circular-gauge"
+  | "circle-pack-chart"
+  | "combination-chart"
+  | "conditional-number"
+  | "date-filter"
+  | "dropdown-filter"
+  | "evolution-number"
+  | "funnel-chart"
+  | "heat-map"
+  | "heat-table"
+  | "hexbin-map"
+  | "marker-map"
+  | "ohlc-chart"
+  | "parallel-coordinates-plot"
+  | "pivot-table"
+  | "pyramid-chart"
+  | "radar-chart"
+  | "regular-table"
+  | "route-map"
+  | "sankey-diagram"
+  | "scatter-plot"
+  | "slicer-filter"
+  | "slider-filter"
+  | "speedometer-chart"
+  | "spike-map"
+  | "strip-plot"
+  | "sunburst-chart"
+  | "symbol-map"
+  | "treemap-chart"
+  | "wordcloud-chart";
+export type {
+  VizItemSlot,
+  GenericSlotContent,
+} from "@luzmo/dashboard-contents-types";
+
+// LuzmoSlots is an array of VizItemSlot (Luzmo's native format)
+export type LuzmoSlots = VizItemSlot[];
+
+// Luzmo theme configuration for chart styling
+export type LuzmoThemeConfig = {
+  /**
+   * Id of the theme, for example, "seasonal", "urban" or custom theme uuid
+   */
+  id?: string;
+  /**
+   * Theme type - "custom" if using custom theme options
+   */
+  type?: string;
+  /**
+   * Custom item background color (rgb format)
+   */
+  itemsBackground?: string;
+  /**
+   * Custom font styling
+   */
+  font?: {
+    fontFamily?: string;
+    fontSize?: number;
+  };
+  /**
+   * Custom color palette for chart elements
+   */
+  colors?: string[];
+};
+
+// Luzmo chart options (appearance/behavior configuration)
+export type LuzmoChartOptions = {
+  title?: { en: string };
+  display?: {
+    legend?: boolean;
+    title?: boolean;
+  };
+  mode?: string;
+  interactivity?: {
+    exportTypes?: string[];
+  };
+  /**
+   * Theme configuration for chart styling
+   */
+  theme?: LuzmoThemeConfig;
+  // Chart-specific options can be added as needed
+  [key: string]: unknown;
+};
+
+// Luzmo authentication configuration
+export type LuzmoAuthConfig = {
+  authKey?: string;
+  authToken?: string;
+  appServer?: string;
+  apiHost?: string;
+};
+
+export type ExcalidrawLuzmoChartElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "luzmochart";
+    chartType: LuzmoChartType;
+    // Slot configuration for data binding
+    slots: LuzmoSlots | null;
+    // Chart appearance/behavior options
+    options: LuzmoChartOptions | null;
+    // Authentication (optional - can be provided at app level)
+    authConfig: LuzmoAuthConfig | null;
+    // Context ID for filtering (must be unique per chart)
+    contextId: string;
+    // Theme ID (built-in or custom UUID)
+    themeId?: string;
+    // Font family for chart text (uses Excalidraw font family values)
+    fontFamily: FontFamilyValues;
+    /** When true, AI-generated chart summary is shown (character-by-character) */
+    aiSummaryEnabled?: boolean;
+    // Legacy fields for backward compatibility
+    chartData: Record<string, unknown> | null;
+    chartOptions: Record<string, unknown> | null;
+  }>;
+
 export type IframeData =
   | {
       intrinsicSize: { w: number; h: number };
@@ -196,7 +331,8 @@ export type ExcalidrawRectanguloidElement =
   | ExcalidrawIframeLikeElement
   | ExcalidrawFrameLikeElement
   | ExcalidrawEmbeddableElement
-  | ExcalidrawSelectionElement;
+  | ExcalidrawSelectionElement
+  | ExcalidrawLuzmoChartElement;
 
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
@@ -213,7 +349,8 @@ export type ExcalidrawElement =
   | ExcalidrawFrameElement
   | ExcalidrawMagicFrameElement
   | ExcalidrawIframeElement
-  | ExcalidrawEmbeddableElement;
+  | ExcalidrawEmbeddableElement
+  | ExcalidrawLuzmoChartElement;
 
 export type ExcalidrawNonSelectionElement = Exclude<
   ExcalidrawElement,
@@ -265,7 +402,8 @@ export type ExcalidrawBindableElement =
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement
   | ExcalidrawFrameElement
-  | ExcalidrawMagicFrameElement;
+  | ExcalidrawMagicFrameElement
+  | ExcalidrawLuzmoChartElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
