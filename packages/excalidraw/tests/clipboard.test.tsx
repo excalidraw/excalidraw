@@ -490,6 +490,10 @@ describe("clipboard - pasting mermaid definition", () => {
         const lines = definition.split("\n");
         return new Promise((resolve, reject) => {
           if (lines.some((line) => line === "flowchart TD")) {
+            // Simulate mermaid parser returning <br> tags as literal text
+            const labelText = definition.includes("<br>")
+              ? "User Registration<br>Process"
+              : "A";
             resolve({
               elements: [
                 {
@@ -503,7 +507,7 @@ describe("clipboard - pasting mermaid definition", () => {
                   strokeWidth: 2,
                   label: {
                     groupIds: [],
-                    text: "A",
+                    text: labelText,
                     fontSize: 20,
                   },
                   link: null,
@@ -557,6 +561,24 @@ describe("clipboard - pasting mermaid definition", () => {
         expect.arrayContaining([
           expect.objectContaining({ type: "text", text: "flowchart TD xx" }),
           expect.objectContaining({ type: "text", text: "A" }),
+        ]),
+      );
+    });
+  });
+
+  it("should convert <br> tags to newlines in mermaid labels", async () => {
+    const text =
+      'flowchart TD\n    A["User Registration<br>Process"]';
+    pasteWithCtrlCmdV(text);
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(2);
+      expect(h.elements).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ type: "rectangle" }),
+          expect.objectContaining({
+            type: "text",
+            text: expect.stringContaining("User Registration\nProcess"),
+          }),
         ]),
       );
     });
