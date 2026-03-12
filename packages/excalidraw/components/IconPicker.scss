@@ -8,7 +8,6 @@
     border: 0 solid color.adjust(#fff, $alpha: -0.75);
     box-shadow: var(--shadow-island-stronger);
     border-radius: 4px;
-    position: absolute;
     :root[dir="rtl"] & {
       padding: 0.4rem;
     }
