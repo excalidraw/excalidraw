@@ -252,37 +252,35 @@ function Picker<T>({
 
   return (
     <Popover.Content
-      side={isMobile ? "right" : "bottom"}
+      className="picker"
+      role="dialog"
+      aria-modal="true"
+      aria-label={label}
+      side={"bottom"}
       align="start"
-      sideOffset={isMobile ? 8 : 12}
+      sideOffset={12}
+      alignOffset={12}
       style={{ zIndex: "var(--zIndex-ui-styles-popup)" }}
       onKeyDown={handleKeyDown}
       collisionBoundary={container ?? undefined}
     >
-      <div
-        className={`picker`}
-        role="dialog"
-        aria-modal="true"
-        aria-label={label}
-      >
-        <div className="picker-sections">
-          {renderSections(visibleSections)}
+      <div className="picker-sections">
+        {renderSections(visibleSections)}
 
-          {hiddenSections.length > 0 && (
-            <Collapsible
-              label={t("labels.more_options")}
-              open={showMoreOptions}
-              openTrigger={() => {
-                setShowMoreOptions((value) => !value);
-              }}
-              className="picker-collapsible"
-            >
-              <div className="picker-sections">
-                {renderSections(hiddenSections)}
-              </div>
-            </Collapsible>
-          )}
-        </div>
+        {hiddenSections.length > 0 && (
+          <Collapsible
+            label={t("labels.more_options")}
+            open={showMoreOptions}
+            openTrigger={() => {
+              setShowMoreOptions((value) => !value);
+            }}
+            className="picker-collapsible"
+          >
+            <div className="picker-sections">
+              {renderSections(hiddenSections)}
+            </div>
+          </Collapsible>
+        )}
       </div>
     </Popover.Content>
   );
