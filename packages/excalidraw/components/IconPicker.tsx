@@ -8,7 +8,7 @@ import { atom, useAtom } from "../editor-jotai";
 import { getLanguage, t } from "../i18n";
 
 import Collapsible from "./Stats/Collapsible";
-import { useEditorInterface, useExcalidrawContainer } from "./App";
+import { useExcalidrawContainer } from "./App";
 
 import "./IconPicker.scss";
 
@@ -79,7 +79,6 @@ function Picker<T>({
   onChange: (value: T) => void;
   onClose: () => void;
 }) {
-  const editorInterface = useEditorInterface();
   const { container } = useExcalidrawContainer();
   const [showMoreOptions, setShowMoreOptions] = useAtom(moreOptionsAtom);
   const allSections = [...visibleSections, ...hiddenSections];
@@ -247,8 +246,6 @@ function Picker<T>({
         </div>
       ),
     );
-
-  const isMobile = editorInterface.formFactor === "phone";
 
   return (
     <Popover.Content
