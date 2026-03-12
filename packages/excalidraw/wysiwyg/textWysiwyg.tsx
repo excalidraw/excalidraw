@@ -8,6 +8,7 @@ import {
   getFontString,
   getFontFamilyString,
   isTestEnv,
+  isSafari,
   MIME_TYPES,
   applyDarkModeFilter,
 } from "@excalidraw/common";
@@ -17,6 +18,8 @@ import {
   originalContainerCache,
   updateBoundElements,
   updateOriginalContainerCache,
+  measureText,
+  wrapTextPreservingWhitespaceWithExplicitNewlineMarkers,
 } from "@excalidraw/element";
 
 import { LinearElementEditor } from "@excalidraw/element";
@@ -103,6 +106,7 @@ export const textWysiwyg = ({
   excalidrawContainer,
   app,
   autoSelect = true,
+  initialPointerDownSceneCoords,
 }: {
   id: ExcalidrawElement["id"];
   /**
@@ -119,7 +123,23 @@ export const textWysiwyg = ({
   excalidrawContainer: HTMLDivElement | null;
   app: App;
   autoSelect?: boolean;
+  initialPointerDownSceneCoords?: { x: number; y: number };
 }): SubmitHandler => {
+  // 需求说明.txt#L30-33: 空格/换行符可视化（类似 VSCode "Render Whitespace: all"）
+  //
+  // 目标：
+  // - 用半透明 #a8a8a8 的点来表示空格
+  // - 用半透明 #a8a8a8 的点来表示换行符
+  //
+  // 设计选择（更稳、更少副作用）：
+  // - 不修改 textarea 的真实 value（避免影响复制/粘贴/光标/选择等行为）
+  // - 在 textarea 下方加一层“只绘制空白符点”的 overlay
+  //   - overlay 文字颜色为 transparent（保留排版宽度与换行）
+  //   - 空格/换行符用特殊 span（CSS 伪元素画点）来可视化
+  //
+  // 旧思路（不采用，但保留说明）：将空格替换成 "·" 或插入特殊字符
+  // 会改变文本宽度/字体渲染差异，导致排版与 textarea 不一致，从而出现错位。
+
   const textPropertiesUpdated = (
     updatedTextElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
@@ -138,6 +158,55 @@ export const textWysiwyg = ({
       return true;
     }
     return false;
+  };
+
+  const whitespaceOverlay = document.createElement("div");
+  whitespaceOverlay.classList.add("excalidraw-wysiwyg__whitespaceOverlay");
+
+  const updateWhitespaceOverlayContent = () => {
+    // overlay 内容与 textarea 同步，但 overlay 自身文字透明，仅通过 span 伪元素绘制点。
+    // 这样既能 1:1 复用浏览器的换行/换页算法，又不会影响 textarea 的输入行为。
+    whitespaceOverlay.replaceChildren();
+
+    const text = editable.value;
+    if (!text) {
+      return;
+    }
+
+    let buffer = "";
+    const flushBuffer = () => {
+      if (buffer) {
+        whitespaceOverlay.appendChild(document.createTextNode(buffer));
+        buffer = "";
+      }
+    };
+
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+
+      if (ch === " ") {
+        flushBuffer();
+        const span = document.createElement("span");
+        span.className = "excalidraw-wysiwyg__ws excalidraw-wysiwyg__ws--space";
+        span.textContent = " ";
+        whitespaceOverlay.appendChild(span);
+        continue;
+      }
+
+      if (ch === "\n") {
+        flushBuffer();
+        const marker = document.createElement("span");
+        marker.className =
+          "excalidraw-wysiwyg__ws excalidraw-wysiwyg__ws--newline";
+        whitespaceOverlay.appendChild(marker);
+        whitespaceOverlay.appendChild(document.createTextNode("\n"));
+        continue;
+      }
+
+      buffer += ch;
+    }
+
+    flushBuffer();
   };
 
   let LAST_THEME = app.state.theme;
@@ -283,11 +352,27 @@ export const textWysiwyg = ({
         opacity: updatedTextElement.opacity / 100,
         maxHeight: `${editorMaxHeight}px`,
       });
+
+      // overlay 必须与 textarea 完全同样的几何与排版参数，否则点会错位
+      Object.assign(whitespaceOverlay.style, {
+        font: editable.style.font,
+        lineHeight: editable.style.lineHeight,
+        width: editable.style.width,
+        height: editable.style.height,
+        left: editable.style.left,
+        top: editable.style.top,
+        transform: editable.style.transform,
+        textAlign: editable.style.textAlign,
+        verticalAlign: editable.style.verticalAlign,
+        opacity: editable.style.opacity,
+        maxHeight: editable.style.maxHeight,
+      });
       editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
       if (isTestEnv()) {
         editable.style.fontFamily = getFontFamilyString(updatedTextElement);
+        whitespaceOverlay.style.fontFamily = editable.style.fontFamily;
       }
 
       app.scene.mutateElement(updatedTextElement, { x: coordX, y: coordY });
@@ -299,15 +384,19 @@ export const textWysiwyg = ({
   editable.dir = "auto";
   editable.tabIndex = 0;
   editable.dataset.type = "wysiwyg";
-  // prevent line wrapping on Safari
-  editable.wrap = "off";
+  editable.wrap = isSafari ? "off" : "soft";
   editable.classList.add("excalidraw-wysiwyg");
+
+  const supportsBreakSpaces =
+    typeof CSS !== "undefined" &&
+    typeof CSS.supports === "function" &&
+    CSS.supports("white-space", "break-spaces");
 
   let whiteSpace = "pre";
   let wordBreak = "normal";
 
   if (isBoundToContainer(element) || !element.autoResize) {
-    whiteSpace = "pre-wrap";
+    whiteSpace = supportsBreakSpaces ? "break-spaces" : "pre-wrap";
     wordBreak = "break-word";
   }
   Object.assign(editable.style, {
@@ -330,8 +419,182 @@ export const textWysiwyg = ({
     overflowWrap: "break-word",
     boxSizing: "content-box",
   });
+
+  // overlay 的基础样式必须与 textarea 保持一致（同样的布局/换行规则），
+  // 同时：
+  // - 指针事件关闭，避免影响编辑交互
+  // - 自身文字透明，仅绘制空白符点
+  // - 层级在 textarea 下方（通过 DOM 顺序 + zIndex 微调）
+  Object.assign(whitespaceOverlay.style, {
+    position: "absolute",
+    display: "inline-block",
+    minHeight: "1em",
+    backfaceVisibility: "hidden",
+    margin: 0,
+    padding: 0,
+    border: 0,
+    outline: 0,
+    resize: "none",
+    background: "transparent",
+    overflow: "hidden",
+    // textarea 的 zIndex 为 --zIndex-wysiwyg；overlay 在其下方
+    zIndex: "calc(var(--zIndex-wysiwyg) - 1)",
+    wordBreak,
+    whiteSpace,
+    overflowWrap: "break-word",
+    boxSizing: "content-box",
+    pointerEvents: "none",
+    color: "transparent",
+  });
   editable.value = element.originalText;
   updateWysiwygStyle();
+  updateWhitespaceOverlayContent();
+
+  const getSelectionIndexFromPointerDown = () => {
+    // 二次单击进入编辑时，根据点击位置计算 textarea selectionStart/End：
+    // - 将点击点从旋转后的坐标系“反旋转”回元素本地坐标
+    // - 用与编辑器一致的软换行（pre-wrap）拆分为行，并保留真实换行符位置
+    // - 结合 textAlign 计算每行起始偏移，再用二分查找定位字符索引
+    if (!initialPointerDownSceneCoords) {
+      return null;
+    }
+
+    const updatedTextElement = app.scene.getElement<ExcalidrawTextElement>(id);
+    if (!updatedTextElement || !isTextElement(updatedTextElement)) {
+      return null;
+    }
+
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+    const container = getContainerElement(updatedTextElement, elementsMap);
+    const angle = getTextElementAngle(updatedTextElement, container);
+
+    const centerX = updatedTextElement.x + updatedTextElement.width / 2;
+    const centerY = updatedTextElement.y + updatedTextElement.height / 2;
+
+    const rotateAround = (
+      x: number,
+      y: number,
+      cx: number,
+      cy: number,
+      angle: number,
+    ) => {
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      const dx = x - cx;
+      const dy = y - cy;
+      return {
+        x: cx + dx * cos - dy * sin,
+        y: cy + dx * sin + dy * cos,
+      };
+    };
+
+    const unrotatedPointer = rotateAround(
+      initialPointerDownSceneCoords.x,
+      initialPointerDownSceneCoords.y,
+      centerX,
+      centerY,
+      -angle,
+    );
+
+    const lineHeightPx =
+      updatedTextElement.fontSize * updatedTextElement.lineHeight;
+    if (lineHeightPx <= 0) {
+      return 0;
+    }
+
+    const editorWidth =
+      parseFloat(editable.style.width) || updatedTextElement.width;
+
+    const normalizedValue = editable.value.replace(/\r\n?/g, "\n");
+    const font = getFontString(updatedTextElement);
+
+    const { lines, explicitNewlineAfterLine } =
+      whitespaceOverlay.style.whiteSpace === "pre-wrap" ||
+      whitespaceOverlay.style.whiteSpace === "break-spaces"
+        ? wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
+            normalizedValue,
+            font,
+            editorWidth,
+          )
+        : {
+            lines: normalizedValue.split("\n"),
+            explicitNewlineAfterLine: normalizedValue
+              .split("\n")
+              .map((_line, idx, arr) => idx < arr.length - 1),
+          };
+
+    const lineStartIndices: number[] = [];
+    let currentIndex = 0;
+    for (let i = 0; i < lines.length; i++) {
+      lineStartIndices.push(currentIndex);
+      currentIndex += lines[i]?.length ?? 0;
+      if (explicitNewlineAfterLine[i]) {
+        currentIndex += 1;
+      }
+    }
+
+    const localX = unrotatedPointer.x - updatedTextElement.x;
+    const localY = unrotatedPointer.y - updatedTextElement.y;
+
+    const clampedLineIndex = Math.max(
+      0,
+      Math.min(lines.length - 1, Math.floor(localY / lineHeightPx)),
+    );
+
+    const lineText = lines[clampedLineIndex] ?? "";
+    const lineWidth =
+      lineText === ""
+        ? 0
+        : measureText(lineText, font, updatedTextElement.lineHeight).width;
+
+    let lineOffsetX = 0;
+    if (updatedTextElement.textAlign === "center") {
+      lineOffsetX = (editorWidth - lineWidth) / 2;
+    } else if (updatedTextElement.textAlign === "right") {
+      lineOffsetX = editorWidth - lineWidth;
+    }
+    lineOffsetX = Math.max(0, lineOffsetX);
+
+    const xWithinLine = localX - lineOffsetX;
+
+    const getPrefixWidth = (length: number) => {
+      if (length <= 0) {
+        return 0;
+      }
+      const prefix = lineText.slice(0, length);
+      return prefix === ""
+        ? 0
+        : measureText(prefix, font, updatedTextElement.lineHeight).width;
+    };
+
+    let charIndex = 0;
+    if (xWithinLine <= 0) {
+      charIndex = 0;
+    } else if (xWithinLine >= lineWidth) {
+      charIndex = lineText.length;
+    } else {
+      let lo = 0;
+      let hi = lineText.length;
+      while (lo < hi) {
+        const mid = Math.floor((lo + hi) / 2);
+        if (getPrefixWidth(mid) < xWithinLine) {
+          lo = mid + 1;
+        } else {
+          hi = mid;
+        }
+      }
+
+      const a = Math.max(0, lo - 1);
+      const b = lo;
+      const da = Math.abs(getPrefixWidth(a) - xWithinLine);
+      const db = Math.abs(getPrefixWidth(b) - xWithinLine);
+      charIndex = db < da ? b : a;
+    }
+
+    return (lineStartIndices[clampedLineIndex] ?? 0) + charIndex;
+  };
+
+  const initialSelectionIndex = getSelectionIndexFromPointerDown();
 
   if (onChange) {
     editable.onpaste = async (event) => {
@@ -428,6 +691,7 @@ export const textWysiwyg = ({
         editable.selectionStart = selectionStart;
         editable.selectionEnd = selectionStart;
       }
+      updateWhitespaceOverlayContent();
       onChange(editable.value);
     };
   }
@@ -665,6 +929,7 @@ export const textWysiwyg = ({
     unbindOnScroll();
 
     editable.remove();
+    whitespaceOverlay.remove();
   };
 
   const bindBlurEvent = (event?: MouseEvent) => {
@@ -786,7 +1051,10 @@ export const textWysiwyg = ({
 
   let isDestroyed = false;
 
-  if (autoSelect) {
+  if (initialSelectionIndex !== null) {
+    // 二次单击进入编辑时：将光标放到点击位置（与 textarea 的软换行保持一致）
+    editable.selectionStart = editable.selectionEnd = initialSelectionIndex;
+  } else if (autoSelect) {
     // select on init (focusing is done separately inside the bindBlurEvent()
     // because we need it to happen *after* the blur event from `pointerdown`)
     editable.select();
@@ -813,9 +1081,13 @@ export const textWysiwyg = ({
     window.addEventListener("pointerdown", onPointerDown, { capture: true });
   });
   window.addEventListener("beforeunload", handleSubmit);
-  excalidrawContainer
-    ?.querySelector(".excalidraw-textEditorContainer")!
-    .appendChild(editable);
+  const textEditorContainer = excalidrawContainer?.querySelector(
+    ".excalidraw-textEditorContainer",
+  )!;
+
+  // overlay 需要在 textarea 之前插入，确保 textarea（真实文本）始终在最上层可交互
+  textEditorContainer.appendChild(whitespaceOverlay);
+  textEditorContainer.appendChild(editable);
 
   return handleSubmit;
 };

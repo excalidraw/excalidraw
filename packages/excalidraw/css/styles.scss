@@ -625,6 +625,43 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  // 需求说明.txt#L30-33: 空格/换行符可视化（类似 VSCode render whitespace: all）
+  //
+  // - 空格：在空格字符的排版盒内居中画一个点
+  // - 换行符：在换行符位置（行尾）画一个点
+  //
+  // 注：真正的文本仍由 textarea 渲染，这里只负责“点”的样式。
+  .excalidraw-wysiwyg__ws {
+    position: relative;
+    display: inline;
+  }
+
+  .excalidraw-wysiwyg__ws--space::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0.18em;
+    height: 0.18em;
+    border-radius: 50%;
+    background: rgba(168, 168, 168, 0.55);
+    transform: translate(-50%, -50%);
+  }
+
+  .excalidraw-wysiwyg__ws--newline {
+    width: 0;
+  }
+
+  .excalidraw-wysiwyg__ws--newline::after {
+    content: "↵";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    color: rgba(168, 168, 168, 0.55);
+    line-height: 1;
+    transform: translate(-50%, -50%);
+  }
+
   @media print {
     .App-bottom-bar,
     .FixedSideContainer,

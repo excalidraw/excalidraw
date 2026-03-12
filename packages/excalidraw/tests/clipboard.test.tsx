@@ -254,7 +254,7 @@ describe("Paste bound text container", () => {
       await sleep(1);
       expect(h.elements.length).toEqual(2);
       const container = h.elements[0];
-      expect(container.height).toBe(368);
+      expect(container.height).toBe(403);
       expect(container.width).toBe(166);
     });
   });
@@ -276,7 +276,7 @@ describe("Paste bound text container", () => {
       await sleep(1);
       expect(h.elements.length).toEqual(2);
       const container = h.elements[0];
-      expect(container.height).toBe(770);
+      expect(container.height).toBe(870);
       expect(container.width).toBe(166);
     });
   });

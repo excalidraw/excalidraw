@@ -401,6 +401,99 @@ export const wrapText = (
   return lines.join("\n");
 };
 
+export const wrapTextPreservingWhitespace = (
+  text: string,
+  font: FontString,
+  maxWidth: number,
+): string => {
+  if (!Number.isFinite(maxWidth) || maxWidth < 0) {
+    return text;
+  }
+
+  const lines: Array<string> = [];
+  const originalLines = text.split("\n");
+
+  for (const originalLine of originalLines) {
+    const currentLineWidth = getLineWidth(originalLine, font);
+
+    if (currentLineWidth <= maxWidth) {
+      lines.push(originalLine);
+      continue;
+    }
+
+    const wrappedLine = wrapLinePreservingWhitespace(
+      originalLine,
+      font,
+      maxWidth,
+    );
+    lines.push(...wrappedLine);
+  }
+
+  return lines.join("\n");
+};
+
+export const wrapTextPreservingWhitespaceWithExplicitNewlineMarkers = (
+  text: string,
+  font: FontString,
+  maxWidth: number,
+): { lines: string[]; explicitNewlineAfterLine: boolean[] } => {
+  // 说明：
+  // - `wrapTextPreservingWhitespace()` 会把“软换行”(自动换行)转换成多行输出（通过插入 `\n` 分隔行），
+  //   这在绘制文本是正确的，但在可视化“换行符(↵)”时会产生误判：
+  //   软换行并不存在真实的 `\n`，因此不应该显示换行符提示。
+  // - 这里返回两份信息：
+  //   1) `lines`：用于渲染的最终行（包含软换行拆分出的行）
+  //   2) `explicitNewlineAfterLine`：仅当该行后面跟着“真实输入的 \n”时为 true
+  //
+  // 这样渲染层可以做到：
+  // - 文本照常自动换行
+  // - 仅在用户真实输入的换行处显示 ↵（不会在自动换行处显示）
+
+  const normalizedText = text.replace(/\r\n?/g, "\n");
+
+  // maxWidth 不可用时，按原文逐行返回，但仍需标记真实换行位置
+  if (!Number.isFinite(maxWidth) || maxWidth < 0) {
+    const originalLines = normalizedText.split("\n");
+    return {
+      lines: originalLines,
+      explicitNewlineAfterLine: originalLines.map(
+        (_line, index) => index < originalLines.length - 1,
+      ),
+    };
+  }
+
+  const lines: string[] = [];
+  const explicitNewlineAfterLine: boolean[] = [];
+  const originalLines = normalizedText.split("\n");
+
+  for (
+    let originalLineIndex = 0;
+    originalLineIndex < originalLines.length;
+    originalLineIndex++
+  ) {
+    const originalLine = originalLines[originalLineIndex];
+    const currentLineWidth = getLineWidth(originalLine, font);
+
+    const wrappedLines =
+      currentLineWidth <= maxWidth
+        ? [originalLine]
+        : wrapLinePreservingWhitespace(originalLine, font, maxWidth);
+
+    for (const line of wrappedLines) {
+      lines.push(line);
+      explicitNewlineAfterLine.push(false);
+    }
+
+    // 原文每个 `\n` 会把文本分成 originalLines；除最后一段外，段末必有一个真实换行符。
+    // 真实换行符应该渲染在“该段最后一行”的末尾，而不是段内的软换行行尾。
+    if (originalLineIndex < originalLines.length - 1) {
+      explicitNewlineAfterLine[explicitNewlineAfterLine.length - 1] = true;
+    }
+  }
+
+  return { lines, explicitNewlineAfterLine };
+};
+
 /**
  * Wraps the original line into the lines based on the given width.
  */
@@ -427,29 +520,35 @@ const wrapLine = (
       ? currentLineWidth + charWidth.calculate(token, font)
       : getLineWidth(testLine, font);
 
-    // build up the current line, skipping length check for possibly trailing whitespaces
-    if (/\s/.test(token) || testLineWidth <= maxWidth) {
+    if (testLineWidth <= maxWidth) {
       currentLine = testLine;
       currentLineWidth = testLineWidth;
       iterator = tokenIterator.next();
       continue;
     }
 
-    // current line is empty => just the token (word) is longer than `maxWidth` and needs to be wrapped
     if (!currentLine) {
-      const wrappedWord = wrapWord(token, font, maxWidth);
-      const trailingLine = wrappedWord[wrappedWord.length - 1] ?? "";
-      const precedingLines = wrappedWord.slice(0, -1);
+      if (/^\s+$/.test(token)) {
+        const whitespaceLines = wrapWhitespace(token, font, maxWidth);
+        const trailingLine = whitespaceLines[whitespaceLines.length - 1] ?? "";
+        const precedingLines = whitespaceLines.slice(0, -1);
 
-      lines.push(...precedingLines);
+        lines.push(...precedingLines);
+        currentLine = trailingLine;
+        currentLineWidth = getLineWidth(trailingLine, font);
+      } else {
+        const wrappedWord = wrapWord(token, font, maxWidth);
+        const trailingLine = wrappedWord[wrappedWord.length - 1] ?? "";
+        const precedingLines = wrappedWord.slice(0, -1);
 
-      // trailing line of the wrapped word might still be joined with next token/s
-      currentLine = trailingLine;
-      currentLineWidth = getLineWidth(trailingLine, font);
+        lines.push(...precedingLines);
+        currentLine = trailingLine;
+        currentLineWidth = getLineWidth(trailingLine, font);
+      }
       iterator = tokenIterator.next();
     } else {
       // push & reset, but don't iterate on the next token, as we didn't use it yet!
-      lines.push(currentLine.trimEnd());
+      lines.push(currentLine);
 
       // purposefully not iterating and not setting `currentLine` to `token`, so that we could use a simple !currentLine check above
       currentLine = "";
@@ -459,8 +558,103 @@ const wrapLine = (
 
   // iterator done, push the trailing line if exists
   if (currentLine) {
-    const trailingLine = trimLine(currentLine, font, maxWidth);
-    lines.push(trailingLine);
+    lines.push(currentLine);
+  }
+
+  return lines;
+};
+
+const wrapLinePreservingWhitespace = (
+  line: string,
+  font: FontString,
+  maxWidth: number,
+): string[] => {
+  const lines: Array<string> = [];
+  const tokens = parseTokens(line);
+  const tokenIterator = tokens[Symbol.iterator]();
+
+  let currentLine = "";
+  let currentLineWidth = 0;
+
+  let iterator = tokenIterator.next();
+
+  while (!iterator.done) {
+    const token = iterator.value;
+    const testLine = currentLine + token;
+
+    const testLineWidth = isSingleCharacter(token)
+      ? currentLineWidth + charWidth.calculate(token, font)
+      : getLineWidth(testLine, font);
+
+    if (testLineWidth <= maxWidth) {
+      currentLine = testLine;
+      currentLineWidth = testLineWidth;
+      iterator = tokenIterator.next();
+      continue;
+    }
+
+    if (!currentLine) {
+      if (/^\s+$/.test(token)) {
+        const whitespaceLines = wrapWhitespace(token, font, maxWidth);
+        const trailingLine = whitespaceLines[whitespaceLines.length - 1] ?? "";
+        const precedingLines = whitespaceLines.slice(0, -1);
+
+        lines.push(...precedingLines);
+        currentLine = trailingLine;
+        currentLineWidth = getLineWidth(trailingLine, font);
+        iterator = tokenIterator.next();
+      } else {
+        const wrappedWord = wrapWord(token, font, maxWidth);
+        const trailingLine = wrappedWord[wrappedWord.length - 1] ?? "";
+        const precedingLines = wrappedWord.slice(0, -1);
+
+        lines.push(...precedingLines);
+        currentLine = trailingLine;
+        currentLineWidth = getLineWidth(trailingLine, font);
+        iterator = tokenIterator.next();
+      }
+    } else {
+      lines.push(currentLine);
+      currentLine = "";
+      currentLineWidth = 0;
+    }
+  }
+
+  if (currentLine !== "") {
+    lines.push(currentLine);
+  }
+
+  return lines;
+};
+
+const wrapWhitespace = (
+  whitespace: string,
+  font: FontString,
+  maxWidth: number,
+) => {
+  const chars = Array.from(whitespace);
+  const lines: Array<string> = [];
+
+  let currentLine = "";
+  let currentLineWidth = 0;
+
+  for (const char of chars) {
+    const _charWidth = charWidth.calculate(char, font);
+    const testLineWidth = currentLineWidth + _charWidth;
+
+    if (testLineWidth <= maxWidth || !currentLine) {
+      currentLine = currentLine + char;
+      currentLineWidth = testLineWidth;
+      continue;
+    }
+
+    lines.push(currentLine);
+    currentLine = char;
+    currentLineWidth = _charWidth;
+  }
+
+  if (currentLine) {
+    lines.push(currentLine);
   }
 
   return lines;
@@ -510,40 +704,6 @@ const wrapWord = (
   }
 
   return lines;
-};
-
-/**
- * Similarly to browsers, does not trim all trailing whitespaces, but only those exceeding the `maxWidth`.
- */
-const trimLine = (line: string, font: FontString, maxWidth: number) => {
-  const shouldTrimWhitespaces = getLineWidth(line, font) > maxWidth;
-
-  if (!shouldTrimWhitespaces) {
-    return line;
-  }
-
-  // defensively default to `trimeEnd` in case the regex does not match
-  let [, trimmedLine, whitespaces] = line.match(/^(.+?)(\s+)$/) ?? [
-    line,
-    line.trimEnd(),
-    "",
-  ];
-
-  let trimmedLineWidth = getLineWidth(trimmedLine, font);
-
-  for (const whitespace of Array.from(whitespaces)) {
-    const _charWidth = charWidth.calculate(whitespace, font);
-    const testLineWidth = trimmedLineWidth + _charWidth;
-
-    if (testLineWidth > maxWidth) {
-      break;
-    }
-
-    trimmedLine = trimmedLine + whitespace;
-    trimmedLineWidth = testLineWidth;
-  }
-
-  return trimmedLine;
 };
 
 /**
