@@ -1,0 +1,20 @@
+name: Tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: master
+
+jobs:
+  test:
+    runs-on: depot-ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - name: Install and test
+        run: |
+          yarn install
+          yarn test:app
