@@ -394,7 +394,7 @@ describe("stats for a non-generic element", () => {
     const originalTextBeforeWrapping = textBeforeWrapping;
     UI.updateInput(width, "30");
     expect(text.height).toBeGreaterThan(textHeightBeforeWrapping);
-    expect(text.text).not.toBe(textBeforeWrapping);
+    expect(text.text).toBe(textBeforeWrapping);
     expect(text.originalText).toBe(originalTextBeforeWrapping);
 
     // min font size is 4

@@ -16,6 +16,8 @@ import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
   getFeatureFlag,
+  getFontString,
+  getVerticalOffset,
   invariant,
   THEME,
 } from "@excalidraw/common";
@@ -41,6 +43,7 @@ import {
   maxBindingDistance_simple,
   isTextElement,
   LinearElementEditor,
+  wrapTextPreservingWhitespaceWithExplicitNewlineMarkers,
 } from "@excalidraw/element";
 
 import { renderSelectionElement } from "@excalidraw/element";
@@ -1498,9 +1501,73 @@ const renderTextBox = (
   const shiftY = -(height / 2 + padding);
   context.translate(cx + appState.scrollX, cy + appState.scrollY);
   context.rotate(text.angle);
-  context.lineWidth = 1 / appState.zoom.value;
-  context.strokeStyle = selectionColor;
-  context.strokeRect(shiftX, shiftY, width, height);
+  if (!text.autoResize) {
+    context.lineWidth = 1 / appState.zoom.value;
+    context.strokeStyle = selectionColor;
+    context.strokeRect(shiftX, shiftY, width, height);
+  }
+
+  const zoom = appState.zoom.value;
+  const elementShiftX = shiftX + padding;
+  const elementShiftY = shiftY + padding;
+
+  const lineHeightPx = text.fontSize * text.lineHeight;
+  const verticalOffset = getVerticalOffset(
+    text.fontFamily,
+    text.fontSize,
+    lineHeightPx,
+  );
+
+  const font = getFontString(text);
+  const maxWidth = text.autoResize ? Infinity : text.width;
+  const { lines, explicitNewlineAfterLine } =
+    wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
+      text.originalText,
+      font,
+      maxWidth,
+    );
+
+  context.save();
+  const lineNumberFontSize = Math.max(10, text.fontSize * 0.8);
+  context.font = getFontString({
+    fontSize: lineNumberFontSize,
+    fontFamily: text.fontFamily,
+  });
+  context.fillStyle = "rgba(168, 168, 168, 0.55)";
+  context.textAlign = "right";
+  context.textBaseline = "alphabetic";
+
+  const gutterPadding = Math.max(4, lineNumberFontSize * 0.25);
+  const gutterRightX = elementShiftX - gutterPadding;
+
+  let lineNumber = 1;
+  for (let index = 0; index < lines.length; index++) {
+    const isNewLogicalLine = index === 0 || explicitNewlineAfterLine[index - 1];
+    if (isNewLogicalLine) {
+      context.fillText(
+        String(lineNumber),
+        gutterRightX,
+        elementShiftY + index * lineHeightPx + verticalOffset,
+      );
+    }
+    if (explicitNewlineAfterLine[index]) {
+      lineNumber++;
+    }
+  }
+  context.restore();
+
+  context.save();
+  context.strokeStyle = "rgba(168, 168, 168, 0.55)";
+  context.lineWidth = 1 / zoom;
+  context.setLineDash([4 / zoom, 2 / zoom]);
+  context.strokeRect(
+    elementShiftX + 0.5 / zoom,
+    elementShiftY + 0.5 / zoom,
+    Math.max(0, text.width - 1 / zoom),
+    Math.max(0, text.height - 1 / zoom),
+  );
+  context.restore();
+
   context.restore();
 };
 

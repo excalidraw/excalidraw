@@ -4,6 +4,7 @@ import {
   SVG_NS,
   THEME,
   DARK_THEME_FILTER,
+  getFontString,
   getFontFamilyString,
   isRTL,
   isTestEnv,
@@ -19,7 +20,12 @@ import {
   getEmbedLink,
 } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
-import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
+import {
+  getBoundTextElement,
+  getBoundTextMaxWidth,
+  getContainerElement,
+  wrapTextPreservingWhitespace,
+} from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
 import {
   isArrowElement,
@@ -645,7 +651,20 @@ const renderElementToSvg = (
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
-        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+        const container = getContainerElement(element, elementsMap);
+        const shouldWrap = !!container || !element.autoResize;
+        const maxWidth = container
+          ? getBoundTextMaxWidth(container, element)
+          : element.width;
+        const renderedText = shouldWrap
+          ? wrapTextPreservingWhitespace(
+              element.originalText,
+              getFontString(element),
+              maxWidth,
+            )
+          : element.originalText;
+
+        const lines = renderedText.replace(/\r\n?/g, "\n").split("\n");
         const lineHeightPx = getLineHeightInPx(
           element.fontSize,
           element.lineHeight,
@@ -661,7 +680,7 @@ const renderElementToSvg = (
           element.fontSize,
           lineHeightPx,
         );
-        const direction = isRTL(element.text) ? "rtl" : "ltr";
+        const direction = isRTL(renderedText) ? "rtl" : "ltr";
         const textAnchor =
           element.textAlign === "center"
             ? "middle"

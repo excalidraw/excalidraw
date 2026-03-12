@@ -283,7 +283,7 @@ describe("textWysiwyg", () => {
       UI.resize(text, "e", [-20, 0]);
       expect(text.width).not.toEqual(prevWidth);
       expect(text.height).not.toEqual(prevHeight);
-      expect(text.text).not.toEqual(prevText);
+      expect(text.text).toEqual(prevText);
       expect(text.autoResize).toBe(false);
 
       const wrappedWidth = text.width;
@@ -375,6 +375,29 @@ describe("textWysiwyg", () => {
 
     afterAll(() => {
       restoreOriginalGetBoundingClientRect();
+    });
+
+    it("should visualize spaces and newlines in the text editor", () => {
+      const overlay = document.querySelector<HTMLDivElement>(
+        ".excalidraw-wysiwyg__whitespaceOverlay",
+      );
+
+      expect(overlay).not.toBe(null);
+
+      updateTextEditor(textarea, "a b\nc");
+
+      expect(
+        overlay!.querySelectorAll(".excalidraw-wysiwyg__ws--space").length,
+      ).toBe(1);
+      expect(
+        overlay!.querySelectorAll(".excalidraw-wysiwyg__ws--newline").length,
+      ).toBe(1);
+
+      Keyboard.exitTextEditor(textarea);
+
+      expect(
+        document.querySelector(".excalidraw-wysiwyg__whitespaceOverlay"),
+      ).toBe(null);
     });
 
     it("should add a tab at the start of the first line", () => {
@@ -926,7 +949,7 @@ describe("textWysiwyg", () => {
 
       Keyboard.exitTextEditor(editor);
       text = h.elements[1] as ExcalidrawTextElementWithContainer;
-      expect(text.text).toBe("Hello\nWorld!");
+      expect(text.text).toBe("Hello World!");
       expect(text.originalText).toBe("Hello World!");
       expect(text.y).toBe(
         rectangle.y + h.elements[0].height / 2 - text.height / 2,
@@ -1233,7 +1256,7 @@ describe("textWysiwyg", () => {
       );
 
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text).toBe(
-        "Online\nwhiteboa\nrd\ncollabor\nation\nmade\neasy",
+        "Online whiteboard collaboration made easy",
       );
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,

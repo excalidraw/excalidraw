@@ -23,7 +23,7 @@ import {
 import { newElementWith } from "./mutateElement";
 import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
-import { wrapText } from "./textWrapping";
+import { wrapTextPreservingWhitespace } from "./textWrapping";
 
 import { isLineElement } from "./typeChecks";
 
@@ -426,16 +426,22 @@ export const refreshTextDimensions = (
   if (textElement.isDeleted) {
     return;
   }
-  if (container || !textElement.autoResize) {
-    text = wrapText(
-      text,
-      getFontString(textElement),
-      container
-        ? getBoundTextMaxWidth(container, textElement)
-        : textElement.width,
-    );
-  }
-  const dimensions = getAdjustedDimensions(textElement, elementsMap, text);
+  const measurementText =
+    container || !textElement.autoResize
+      ? wrapTextPreservingWhitespace(
+          text,
+          getFontString(textElement),
+          container
+            ? getBoundTextMaxWidth(container, textElement)
+            : textElement.width,
+        )
+      : text;
+
+  const dimensions = getAdjustedDimensions(
+    textElement,
+    elementsMap,
+    measurementText,
+  );
   return { text, ...dimensions };
 };
 

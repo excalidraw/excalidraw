@@ -589,12 +589,14 @@ let firstTapPosition: { x: number; y: number } | null = null;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isRightClickPanning: boolean = false;
-// 右键拖动/滚轮缩放联动相关（历史实现保留为注释，便于后续对比/回滚）
-// let rightClickAnchorScene: { x: number; y: number } | null = null;
+let didRightClickZoom: boolean = false;
+let rightClickAnchorScene: { x: number; y: number } | null = null;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
+let suppressNextContextMenuFromRightPan = false;
+let suppressNextContextMenuFromRightPanAt = 0;
 
 /**
  * Map of youtube embed video states
@@ -694,6 +696,8 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
   lastPointerMoveEvent: PointerEvent | null = null;
+  private suppressNextSelectedTextDoubleClick: { elementId: string | null; at: number } =
+    { elementId: null, at: 0 };
   /** current frame pointer cords */
   lastPointerMoveCoords: { x: number; y: number } | null = null;
   /** previous frame pointer coords */
@@ -5642,8 +5646,14 @@ class App extends React.Component<AppProps, AppState> {
     element: ExcalidrawTextElement,
     {
       isExistingElement = false,
+      // 覆盖 wysiwyg 默认的“进入编辑即全选”行为（用于二次单击时只插入光标）
+      autoSelect,
+      // 记录触发编辑的点击位置（scene 坐标），用于在初始化时把光标放到点击处
+      initialPointerDownSceneCoords,
     }: {
       isExistingElement?: boolean;
+      autoSelect?: boolean;
+      initialPointerDownSceneCoords?: { x: number; y: number };
     },
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
@@ -5750,7 +5760,8 @@ class App extends React.Component<AppProps, AppState> {
       // caret (i.e. deselect). There's not much use for always selecting
       // the text on edit anyway (and users can select-all from contextmenu
       // if needed)
-      autoSelect: !this.editorInterface.isTouchScreen,
+      autoSelect: autoSelect ?? !this.editorInterface.isTouchScreen,
+      initialPointerDownSceneCoords,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
@@ -6169,6 +6180,18 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasDoubleClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
   ) => {
+    const { elementId, at } = this.suppressNextSelectedTextDoubleClick;
+    if (elementId && Date.now() - at < 800) {
+      const { x, y } = viewportCoordsToSceneCoords(event, this.state);
+      const hitElement = this.getElementAtPosition(x, y);
+      if (hitElement?.id === elementId && isTextElement(hitElement)) {
+        this.suppressNextSelectedTextDoubleClick = { elementId: null, at: 0 };
+        return;
+      }
+    } else if (elementId) {
+      this.suppressNextSelectedTextDoubleClick = { elementId: null, at: 0 };
+    }
+
     // case: double-clicking with arrow/line tool selected would both create
     // text and enter multiElement mode
     if (this.state.multiElement) {
@@ -7257,6 +7280,7 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    suppressNextContextMenuFromRightPan = false;
     // If Ctrl is not held, ensure isBindingEnabled reflects the user preference.
     if (!event.ctrlKey) {
       const preferenceEnabled = this.state.bindingPreference === "enabled";
@@ -7816,19 +7840,24 @@ class App extends React.Component<AppProps, AppState> {
     if (!shouldPan) {
       return false;
     }
+    const shouldDelayPanUntilDragThreshold = false;
     isPanning = true;
     isRightClickPanning = isMouseRight;
-    // 旧实现（已注释保留）：右键按下时缓存 scene 锚点，再在滚轮缩放时把它换算回 viewport
-    // 该方案在“边拖动边滚轮缩放”时，容易因滚动/缩放 state 更新顺序导致锚点漂移。
-    // rightClickAnchorScene = isMouseRight
-    //   ? viewportCoordsToSceneCoords(event as MouseEvent, this.state)
-    //   : null;
+    if (isMouseRight) {
+      didRightClickZoom = false;
+      rightClickAnchorScene = viewportCoordsToSceneCoords(
+        event as any,
+        this.state,
+      );
+    } else {
+      rightClickAnchorScene = null;
+    }
     // due to event.preventDefault below, container wouldn't get focus
     // automatically
     this.focusContainer();
 
     // preventing defualt while text editing messes with cursor/focus
-    if (!this.state.editingTextElement) {
+    if (!this.state.editingTextElement && !shouldDelayPanUntilDragThreshold) {
       // necessary to prevent browser from scrolling the page if excalidraw
       // not full-page #4489
       //
@@ -7843,18 +7872,26 @@ class App extends React.Component<AppProps, AppState> {
         : /Linux/.test(window.navigator.platform);
 
     setCursor(this.interactiveCanvas, CURSOR_TYPE.GRABBING);
+    const startX = event.clientX;
+    const startY = event.clientY;
     let { clientX: lastX, clientY: lastY } = event;
+    let didRightClickDragPan = false;
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       const deltaX = lastX - event.clientX;
       const deltaY = lastY - event.clientY;
       lastX = event.clientX;
       lastY = event.clientY;
 
+      if (isRightClickPanning && (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0)) {
+        didRightClickDragPan = true;
+      }
+
       /*
        * Prevent paste event if we move while middle clicking on Linux.
        * See issue #1383.
        */
       if (
+        isPanning &&
         isLinux &&
         !nextPastePrevented &&
         (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1)
@@ -7892,16 +7929,24 @@ class App extends React.Component<AppProps, AppState> {
       //   scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
       //   scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
       // });
-      this.translateCanvas((state) => ({
-        scrollX: state.scrollX - deltaX / state.zoom.value,
-        scrollY: state.scrollY - deltaY / state.zoom.value,
-      }));
+      if (isPanning) {
+        this.translateCanvas((state) => ({
+          scrollX: state.scrollX - deltaX / state.zoom.value,
+          scrollY: state.scrollY - deltaY / state.zoom.value,
+        }));
+      }
     });
     const teardown = withBatchedUpdates(
       (lastPointerUp = () => {
         lastPointerUp = null;
         isPanning = false;
         isRightClickPanning = false;
+        rightClickAnchorScene = null;
+        if (didRightClickDragPan || didRightClickZoom) {
+          suppressNextContextMenuFromRightPan = true;
+          suppressNextContextMenuFromRightPanAt = Date.now();
+        }
+        didRightClickZoom = false;
         if (!isHoldingSpace) {
           if (
             this.state.viewModeEnabled &&
@@ -10862,6 +10907,32 @@ class App extends React.Component<AppProps, AppState> {
         // just respect the selected elements from lasso instead
         this.state.activeTool.type !== "lasso"
       ) {
+        if (
+          this.state.activeTool.type === "selection" &&
+          !this.state.editingTextElement &&
+          isTextElement(hitElement) &&
+          !childEvent.shiftKey &&
+          !childEvent[KEYS.CTRL_OR_CMD] &&
+          Object.keys(this.state.selectedElementIds).length === 1 &&
+          this.state.selectedElementIds[hitElement.id]
+        ) {
+          // 二次单击已选中的文本：直接进入编辑，并将光标放到点击位置（不做全选）
+          this.suppressNextSelectedTextDoubleClick = {
+            elementId: hitElement.id,
+            at: Date.now(),
+          };
+          this.setState({ editingTextElement: hitElement });
+          this.handleTextWysiwyg(hitElement, {
+            isExistingElement: true,
+            autoSelect: false,
+            initialPointerDownSceneCoords: {
+              x: pointerDownState.origin.x,
+              y: pointerDownState.origin.y,
+            },
+          });
+          return;
+        }
+
         // when inside line editor, shift selects points instead
         if (
           childEvent.shiftKey &&
@@ -11822,12 +11893,15 @@ class App extends React.Component<AppProps, AppState> {
     event.preventDefault();
 
     if (
-      (("pointerType" in event.nativeEvent &&
-        event.nativeEvent.pointerType === "mouse" &&
-        event.button === POINTER_BUTTON.SECONDARY) ||
-        isRightClickPanning) &&
+      suppressNextContextMenuFromRightPan &&
+      Date.now() - suppressNextContextMenuFromRightPanAt < 1000 &&
       !this.state.viewModeEnabled
     ) {
+      suppressNextContextMenuFromRightPan = false;
+      return;
+    }
+
+    if (isRightClickPanning && isPanning && !this.state.viewModeEnabled) {
       return;
     }
 
@@ -11849,14 +11923,14 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements: true,
     });
 
-    const selectedElements = this.scene.getSelectedElements(this.state);
-    const isHittingCommonBoundBox =
-      this.isHittingCommonBoundingBoxOfSelectedElements(
-        { x, y },
-        selectedElements,
-      );
+    const isElementSelected = Boolean(
+      element && this.state.selectedElementIds[element.id],
+    );
+    const type = isElementSelected ? "element" : "canvas";
 
-    const type = element || isHittingCommonBoundBox ? "element" : "canvas";
+    if (type === "canvas" && event.button === POINTER_BUTTON.SECONDARY) {
+      return;
+    }
 
     const container = this.excalidrawContainerRef.current!;
     const { top: offsetTop, left: offsetLeft } =
@@ -11868,26 +11942,6 @@ class App extends React.Component<AppProps, AppState> {
 
     this.setState(
       {
-        ...(element && !this.state.selectedElementIds[element.id]
-          ? {
-              ...this.state,
-              ...selectGroupsForSelectedElements(
-                {
-                  editingGroupId: this.state.editingGroupId,
-                  selectedElementIds: { [element.id]: true },
-                },
-                this.scene.getNonDeletedElements(),
-                this.state,
-                this,
-              ),
-              selectedLinearElement: isLinearElement(element)
-                ? new LinearElementEditor(
-                    element,
-                    this.scene.getNonDeletedElementsMap(),
-                  )
-                : null,
-            }
-          : this.state),
         showHyperlinkPopup: false,
       },
       () => {
@@ -12372,6 +12426,9 @@ class App extends React.Component<AppProps, AppState> {
       const allowZoomWithoutModifier = isRightClickPanning;
       // note that event.ctrlKey is necessary to handle pinch zooming
       if (event.metaKey || event.ctrlKey || allowZoomWithoutModifier) {
+        if (allowZoomWithoutModifier) {
+          didRightClickZoom = true;
+        }
         const sign = Math.sign(deltaY);
         const MAX_STEP = ZOOM_STEP * 100;
         const absDelta = Math.abs(deltaY);
@@ -12403,10 +12460,12 @@ class App extends React.Component<AppProps, AppState> {
             // 做法：
             // 1) 先在“当前 state（旧 zoom）”下计算光标处 scene 坐标 anchorScene
             // 2) 再解出在 nextZoom 下应当设置的 scrollX/scrollY，使得 anchorScene 仍映射回相同 viewport
-            const anchorScene = viewportCoordsToSceneCoords(
-              { clientX: viewportX, clientY: viewportY },
-              state,
-            );
+            const anchorScene =
+              rightClickAnchorScene ||
+              viewportCoordsToSceneCoords(
+                { clientX: viewportX, clientY: viewportY },
+                state,
+              );
 
             return {
               scrollX:

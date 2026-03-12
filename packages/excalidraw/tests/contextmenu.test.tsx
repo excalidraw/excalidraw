@@ -105,6 +105,37 @@ describe("contextMenu element", () => {
     });
   });
 
+  it("does not show context menu after right-drag pan", () => {
+    expect(UI.queryContextMenu()).toBeNull();
+
+    fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+      button: 2,
+      clientX: 10,
+      clientY: 10,
+      pointerId: 1,
+      pointerType: "mouse",
+    });
+    fireEvent.pointerMove(window, {
+      clientX: 120,
+      clientY: 120,
+      pointerId: 1,
+      pointerType: "mouse",
+    });
+    fireEvent.pointerUp(window, {
+      clientX: 120,
+      clientY: 120,
+      pointerId: 1,
+      pointerType: "mouse",
+    });
+
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+      button: 2,
+      clientX: 120,
+      clientY: 120,
+    });
+    expect(UI.queryContextMenu()).toBeNull();
+  });
+
   it("shows context menu for element", () => {
     UI.clickTool("rectangle");
     mouse.down(0, 0);
