@@ -29,12 +29,14 @@ export const ColorInput = ({
 }) => {
   const editorInterface = useEditorInterface();
   const [innerValue, setInnerValue] = useState(color);
+  const [error, setError] = useState<string | null>(null);
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
 
   useEffect(() => {
     setInnerValue(color);
+    setError(null);
   }, [color]);
 
   const changeColor = useCallback(
@@ -44,6 +46,12 @@ export const ColorInput = ({
 
       if (color) {
         onChange(color);
+        setError(null);
+      } else if (value.trim()) {
+        // Only show error for non-empty invalid input
+        setError(t("colorPicker.invalidHex"));
+      } else {
+        setError(null);
       }
       setInnerValue(value);
     },
@@ -76,12 +84,15 @@ export const ColorInput = ({
         spellCheck={false}
         className="color-picker-input"
         aria-label={label}
+        aria-invalid={!!error}
+        aria-describedby={error ? "color-input-error" : undefined}
         onChange={(event) => {
           changeColor(event.target.value);
         }}
         value={(innerValue || "").replace(/^#/, "")}
         onBlur={() => {
           setInnerValue(color);
+          setError(null);
         }}
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
@@ -95,6 +106,23 @@ export const ColorInput = ({
         }}
         placeholder={placeholder}
       />
+      {error && (
+        <div
+          id="color-input-error"
+          role="alert"
+          style={{
+            color: "var(--color-danger)",
+            fontSize: "0.75rem",
+            marginTop: "0.25rem",
+            position: "absolute",
+            top: "100%",
+            left: 0,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {error}
+        </div>
+      )}
       {/* TODO reenable on mobile with a better UX */}
       {editorInterface.formFactor !== "phone" && (
         <>
