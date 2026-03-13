@@ -28,8 +28,7 @@ export const measureText = (
 
 const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
 
-// FIXME rename to getApproxMinContainerWidth
-export const getApproxMinLineWidth = (
+export const getApproxMinContainerWidth = (
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
 ) => {
@@ -95,8 +94,7 @@ export const getLineHeightInPx = (
   return fontSize * lineHeight;
 };
 
-// FIXME rename to getApproxMinContainerHeight
-export const getApproxMinLineHeight = (
+export const getApproxMinContainerHeight = (
   fontSize: ExcalidrawTextElement["fontSize"],
   lineHeight: ExcalidrawTextElement["lineHeight"],
 ) => {
