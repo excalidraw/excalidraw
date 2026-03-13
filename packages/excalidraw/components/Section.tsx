@@ -4,11 +4,14 @@ import { t } from "../i18n";
 
 import { useExcalidrawContainer } from "./App";
 
-export const Section: React.FC<{
-  heading: "canvasActions" | "selectedShapeActions" | "shapes";
-  children?: React.ReactNode | ((heading: React.ReactNode) => React.ReactNode);
-  className?: string;
-}> = ({ heading, children, ...props }) => {
+export const Section: React.FC<
+  {
+    heading: "canvasActions" | "selectedShapeActions" | "shapes";
+    children?:
+      | React.ReactNode
+      | ((heading: React.ReactNode) => React.ReactNode);
+  } & Omit<React.ComponentProps<"section">, "children">
+> = ({ heading, children, ...props }) => {
   const { id } = useExcalidrawContainer();
   const header = (
     <h2 className="visually-hidden" id={`${id}-${heading}-title`}>
