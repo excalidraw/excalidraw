@@ -448,7 +448,12 @@ export const actionChangeBackgroundColor = register<
             (element) => element.backgroundColor,
             true,
             (hasSelection) =>
-              !hasSelection ? appState.currentItemBackgroundColor : null,
+              !hasSelection
+                ? appState.activeTool.type === "frame"
+                  ? // background default shouldn't apply to new frames
+                    "transparent"
+                  : appState.currentItemBackgroundColor
+                : null,
           )}
           onChange={(color) =>
             updateData({ currentItemBackgroundColor: color })

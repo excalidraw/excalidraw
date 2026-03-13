@@ -109,6 +109,21 @@ describe("element locking", () => {
       expect(crossHatchButton).toBe(null);
     });
 
+    it("should show background color picker for selected frame", () => {
+      const frame = API.createElement({
+        type: "frame",
+      });
+      API.setElements([frame]);
+      API.setSelectedElements([frame]);
+
+      expect(
+        queryByTestId(
+          document.body,
+          `color-top-pick-${DEFAULT_ELEMENT_BACKGROUND_PICKS[0]}`,
+        ),
+      ).not.toBe(null);
+    });
+
     it("should highlight common stroke width of selected elements", () => {
       const rect1 = API.createElement({
         type: "rectangle",

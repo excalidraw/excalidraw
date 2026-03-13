@@ -169,6 +169,20 @@ const prepareElementsForRender = ({
   return nextElements;
 };
 
+const addExportingFrameToElements = (
+  elements: readonly ExcalidrawElement[],
+  exportingFrame?: ExcalidrawFrameLikeElement | null,
+) => {
+  if (
+    !exportingFrame ||
+    elements.some((element) => element.id === exportingFrame.id)
+  ) {
+    return elements;
+  }
+
+  return [...elements, exportingFrame];
+};
+
 export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -216,6 +230,14 @@ export const exportToCanvas = async (
     exportWithDarkMode: appState.exportWithDarkMode,
     frameRendering,
   });
+  const elementsForLookup = addExportingFrameToElements(
+    elementsForRender,
+    exportingFrame,
+  );
+  const allElementsForLookup = addExportingFrameToElements(
+    elements,
+    exportingFrame,
+  );
 
   if (exportingFrame) {
     exportPadding = 0;
@@ -242,10 +264,10 @@ export const exportToCanvas = async (
     canvas,
     rc: rough.canvas(canvas),
     elementsMap: toBrandedType<RenderableElementsMap>(
-      arrayToMap(elementsForRender),
+      arrayToMap(elementsForLookup),
     ),
     allElementsMap: toBrandedType<NonDeletedSceneElementsMap>(
-      arrayToMap(syncInvalidIndices(elements)),
+      arrayToMap(syncInvalidIndices(allElementsForLookup)),
     ),
     visibleElements: elementsForRender,
     scale,
@@ -261,6 +283,7 @@ export const exportToCanvas = async (
     },
     renderConfig: {
       canvasBackgroundColor: viewBackgroundColor,
+      exportingFrame,
       imageCache,
       renderGrid: false,
       isExporting: true,
@@ -325,6 +348,10 @@ export const exportToSvg = async (
     exportWithDarkMode,
     frameRendering,
   });
+  const elementsForLookup = addExportingFrameToElements(
+    elementsForRender,
+    exportingFrame,
+  );
 
   if (exportingFrame) {
     exportPadding = 0;
@@ -386,10 +413,10 @@ export const exportToSvg = async (
   // frame clip paths
   // ---------------------------------------------------------------------------
 
-  const frameElements = getFrameLikeElements(elements);
+  const frameElements = getFrameLikeElements(elementsForLookup);
 
   if (frameElements.length) {
-    const elementsMap = arrayToMap(elements);
+    const elementsMap = arrayToMap(elementsForLookup);
 
     for (const frame of frameElements) {
       const clipPath = svgRoot.ownerDocument.createElementNS(
@@ -472,7 +499,7 @@ export const exportToSvg = async (
 
   renderSceneToSvg(
     elementsForRender,
-    toBrandedType<RenderableElementsMap>(arrayToMap(elementsForRender)),
+    toBrandedType<RenderableElementsMap>(arrayToMap(elementsForLookup)),
     rsvg,
     svgRoot,
     files || {},
@@ -483,6 +510,7 @@ export const exportToSvg = async (
       exportWithDarkMode,
       renderEmbeddables,
       frameRendering,
+      exportingFrame,
       canvasBackgroundColor: viewBackgroundColor,
       embedsValidationStatus: renderEmbeddables
         ? new Map(

@@ -257,6 +257,7 @@ import {
   handleFocusPointPointerUp,
   maybeHandleArrowPointlikeDrag,
   getUncroppedWidthAndHeight,
+  isFrameElement,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -5180,6 +5181,8 @@ class App extends React.Component<AppProps, AppState> {
         if (
           event.key === KEYS.G &&
           (hasBackground(this.state.activeTool.type) ||
+            this.state.activeTool.type === "frame" ||
+            selectedElements.some((element) => isFrameElement(element)) ||
             selectedElements.some((element) => hasBackground(element.type)))
         ) {
           this.setState({ openPopup: "elementBackground" });

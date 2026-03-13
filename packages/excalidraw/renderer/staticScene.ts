@@ -4,21 +4,23 @@ import {
   THEME,
   throttleRAF,
 } from "@excalidraw/common";
-import { isElementLink } from "@excalidraw/element";
+import { isElementLink, isFrameElement } from "@excalidraw/element";
 import { createPlaceholderEmbeddableLabel } from "@excalidraw/element";
 import { getBoundTextElement } from "@excalidraw/element";
 import {
   isEmbeddableElement,
+  isFrameLikeElement,
   isIframeLikeElement,
   isTextElement,
 } from "@excalidraw/element";
 import {
   elementOverlapsWithFrame,
+  getContainingFrame,
   getTargetFrame,
   shouldApplyFrameClip,
 } from "@excalidraw/element";
 
-import { renderElement } from "@excalidraw/element";
+import { renderElement, renderFrameBackground } from "@excalidraw/element";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 
@@ -276,6 +278,39 @@ const _renderStaticScene = ({
   }
 
   const groupsToBeAddedToFrame = new Set<string>();
+  const renderedFrameBackgrounds = new Set<string>();
+
+  const maybeRenderFrameBackground = (
+    element: NonDeletedExcalidrawElement | ExcalidrawFrameLikeElement,
+  ) => {
+    if (
+      !appState.frameRendering.enabled ||
+      (!appState.frameRendering.outline && !renderConfig.exportingFrame)
+    ) {
+      return;
+    }
+
+    const frame =
+      renderConfig.exportingFrame ||
+      (isFrameLikeElement(element)
+        ? element
+        : getContainingFrame(element, elementsMap));
+
+    if (!isFrameElement(frame)) {
+      return;
+    }
+
+    if (!frame || renderedFrameBackgrounds.has(frame.id)) {
+      return;
+    }
+
+    renderFrameBackground(frame, context, appState, {
+      roundCorners:
+        !renderConfig.exportingFrame ||
+        frame.id !== renderConfig.exportingFrame.id,
+    });
+    renderedFrameBackgrounds.add(frame.id);
+  };
 
   visibleElements.forEach((element) => {
     if (
@@ -297,11 +332,19 @@ const _renderStaticScene = ({
 
   const inFrameGroupsMap = new Map<string, boolean>();
 
+  if (renderConfig.exportingFrame) {
+    maybeRenderFrameBackground(renderConfig.exportingFrame);
+  }
+
   // Paint visible elements
   visibleElements
     .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       try {
+        // TODO: optimize (currently we call this func for each element because
+        // children come before their frames and we neeed to render the frame
+        // background at the bottom)
+        maybeRenderFrameBackground(element);
         const frameId = element.frameId || appState.frameToHighlight?.id;
 
         if (

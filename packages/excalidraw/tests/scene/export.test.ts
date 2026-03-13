@@ -279,6 +279,7 @@ describe("exporting frames", () => {
         height: 100,
         x: 0,
         y: 0,
+        backgroundColor: "#ffc9c9",
       });
       const frameChild = API.createElement({
         type: "rectangle",
@@ -311,9 +312,56 @@ describe("exporting frames", () => {
       expect(
         svg.querySelector(`[data-id="${rectOverlapping.id}"]`),
       ).not.toBeNull();
+      // exporting frame background should still be rendered
+      const frameBackgroundNode = svg.querySelector('rect[fill="#ffc9c9"]');
+      expect(frameBackgroundNode).not.toBeNull();
+      expect(frameBackgroundNode).not.toHaveAttribute("rx");
+      expect(frameBackgroundNode).not.toHaveAttribute("ry");
+      expect(
+        frameBackgroundNode!.compareDocumentPosition(
+          svg.querySelector(`[data-id="${frameChild.id}"]`)!,
+        ) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
 
       expect(svg.getAttribute("width")).toBe(frame.width.toString());
       expect(svg.getAttribute("height")).toBe(frame.height.toString());
+    });
+
+    it("should not render SVG frame background for empty/transparent exporting frame bg", async () => {
+      const transparentFrame = API.createElement({
+        type: "frame",
+        width: 100,
+        height: 100,
+        x: 0,
+        y: 0,
+        backgroundColor: "transparent",
+      });
+      const emptyBgFrame = API.createElement({
+        type: "frame",
+        width: 100,
+        height: 100,
+        x: 0,
+        y: 0,
+        backgroundColor: "",
+      });
+
+      const transparentSvg = await exportToSvg({
+        elements: [transparentFrame],
+        files: null,
+        exportPadding: 0,
+        exportingFrame: transparentFrame,
+      });
+      const emptyBgSvg = await exportToSvg({
+        elements: [emptyBgFrame],
+        files: null,
+        exportPadding: 0,
+        exportingFrame: emptyBgFrame,
+      });
+
+      expect(
+        transparentSvg.querySelector('rect[fill="transparent"]'),
+      ).toBeNull();
+      expect(emptyBgSvg.querySelector('rect[fill=""]')).toBeNull();
     });
 
     it("should filter non-overlapping elements when exporting a frame", async () => {
@@ -467,6 +515,66 @@ describe("exporting frames", () => {
       expect(svg.getAttribute("height")).toBe(
         (frame.height + getFrameNameHeight("svg")).toString(),
       );
+    });
+
+    it("should render frame with its background color", async () => {
+      const frame = API.createElement({
+        type: "frame",
+        width: 100,
+        height: 100,
+        x: 0,
+        y: 0,
+        backgroundColor: "#ffc9c9",
+      });
+      const frameChild = API.createElement({
+        type: "rectangle",
+        width: 50,
+        height: 50,
+        x: 10,
+        y: 10,
+        frameId: frame.id,
+      });
+
+      const { exportedElements, exportingFrame } = prepareElementsForExport(
+        [frameChild, frame],
+        {
+          selectedElementIds: {},
+        },
+        false,
+      );
+
+      const svg = await exportToSvg({
+        elements: exportedElements,
+        files: null,
+        exportPadding: 0,
+        exportingFrame,
+      });
+
+      const frameSvgNode = svg.querySelector(`[data-id="${frame.id}"]`);
+      const childSvgNode = svg.querySelector(`[data-id="${frameChild.id}"]`);
+      const frameBackgroundNode = svg.querySelector('rect[fill="#ffc9c9"]');
+
+      expect(frameSvgNode).not.toBeNull();
+      expect(childSvgNode).not.toBeNull();
+      expect(frameBackgroundNode).not.toBeNull();
+      expect(frameSvgNode).toHaveAttribute("fill", "none");
+      expect(frameBackgroundNode).toHaveAttribute(
+        "rx",
+        FRAME_STYLE.radius.toString(),
+      );
+      expect(frameBackgroundNode).toHaveAttribute(
+        "ry",
+        FRAME_STYLE.radius.toString(),
+      );
+
+      expect(
+        frameBackgroundNode!.compareDocumentPosition(childSvgNode!) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+      expect(
+        childSvgNode!.compareDocumentPosition(frameSvgNode!) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
     });
 
     it("should not export frame-overlapping elements belonging to different frame", async () => {
