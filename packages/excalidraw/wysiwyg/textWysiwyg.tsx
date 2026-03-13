@@ -161,7 +161,7 @@ export const textWysiwyg = ({
         app.scene.getNonDeletedElementsMap(),
       );
 
-      let width = updatedTextElement.width;
+      const width = updatedTextElement.width;
 
       // set to element height by default since that's
       // what is going to be used for unbounded text
@@ -241,31 +241,47 @@ export const textWysiwyg = ({
           coordY = y;
         }
       }
-      const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
+      // getViewportCoords already returns DOM-space coordinates
+      let [viewportX, viewportY] = getViewportCoords(coordX, coordY);
 
-      if (!container) {
-        maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
-        width = Math.min(width, maxWidth);
-      } else {
-        width += 0.5;
-      }
+      const zoom = appState.zoom.value;
+      const canvasWidth = appState.width;
+      const canvasHeight = appState.height;
 
-      // add 5% buffer otherwise it causes wysiwyg to jump
+      // Compute scaled textarea dimensions
+      const scaledWidth = width * zoom;
+      const scaledHeight = height * zoom;
+
+      // Padding to prevent tight clipping at edges
+      const padding = 4;
+
+      // Clamp within visible screen
+      viewportX = Math.max(
+        padding,
+        Math.min(viewportX, canvasWidth - scaledWidth - padding),
+      );
+      viewportY = Math.max(
+        padding,
+        Math.min(viewportY, canvasHeight - scaledHeight - padding),
+      );
+
+      // No extra scroll offsets here — getViewportCoords already includes that!
+      const domX = viewportX;
+      const domY = viewportY;
+
+      // Add small buffer for text measurement jitter
       height *= 1.05;
 
       const font = getFontString(updatedTextElement);
+      const editorMaxHeight = (canvasHeight - viewportY) / zoom;
 
-      // Make sure text editor height doesn't go beyond viewport
-      const editorMaxHeight =
-        (appState.height - viewportY) / appState.zoom.value;
       Object.assign(editable.style, {
         font,
-        // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
         width: `${width}px`,
         height: `${height}px`,
-        left: `${viewportX}px`,
-        top: `${viewportY}px`,
+        left: `${domX}px`,
+        top: `${domY}px`,
         transform: getTransform(
           width,
           height,
@@ -283,6 +299,7 @@ export const textWysiwyg = ({
         opacity: updatedTextElement.opacity / 100,
         maxHeight: `${editorMaxHeight}px`,
       });
+
       editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
