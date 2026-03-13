@@ -3150,7 +3150,7 @@ class App extends React.Component<AppProps, AppState> {
     ShapeCache.destroy();
     SnapCache.destroy();
     clearTimeout(touchTimeout);
-    isSomeElementSelected.clearCache();
+    // isSomeElementSelected.clearCache();
     selectGroupsForSelectedElements.clearCache();
     touchTimeout = 0;
     document.documentElement.style.overscrollBehaviorX = "";
