@@ -56,6 +56,9 @@ const RE_REDDIT =
 const RE_REDDIT_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
 
+const RE_TIKTOK =
+  /tiktok\.com\/@([a-zA-Z0-9_-]+)\/video\/(\d+)/;
+
 const parseYouTubeLikeTimestamp = (url: string): number => {
   let timeParam: string | null | undefined;
 
@@ -141,6 +144,7 @@ const ALLOWED_DOMAINS = new Set([
   "gist.github.com",
   "twitter.com",
   "x.com",
+  "tiktok.com",
   "*.simplepdf.eu",
   "stackblitz.com",
   "val.town",
@@ -158,6 +162,7 @@ const ALLOW_SAME_ORIGIN = new Set([
   "figma.com",
   "twitter.com",
   "x.com",
+  "tiktok.com",
   "*.simplepdf.eu",
   "stackblitz.com",
   "reddit.com",
@@ -208,6 +213,26 @@ export const getEmbedLink = (
         break;
     }
     aspectRatio = isPortrait ? { w: 315, h: 560 } : { w: 560, h: 315 };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    });
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    };
+  }
+
+  const tiktokLink = link.match(RE_TIKTOK);
+  if (tiktokLink) {
+    const videoId = tiktokLink[2];
+    type = "video";
+    link = `https://www.tiktok.com/embed/${videoId}`;
+    aspectRatio = { w: 325, h: 575 };
     embeddedLinkCache.set(originalLink, {
       link,
       intrinsicSize: aspectRatio,
