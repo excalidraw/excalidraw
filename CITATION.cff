@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Excalidraw"
+authors:
+  - family-names: "Botros"
+    given-names: "Wadie"
+    email: "Wadie.botros@uni-potsdam.de"
+    orcid: "0000-0002-1825-0097"
+date-released: 2024-11-12
+version: "v1.0.0"
