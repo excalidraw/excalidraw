@@ -31,7 +31,11 @@ import { getBoundTextElementId } from "@excalidraw/element";
 import type { Bounds } from "@excalidraw/common";
 
 import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
-import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
+} from "@excalidraw/element/types";
 
 import { AnimatedTrail } from "../animated-trail";
 
@@ -78,9 +82,13 @@ export class EraserTrail extends AnimatedTrail {
   addPointToPath(x: number, y: number, restore = false) {
     super.addPointToPath(x, y);
 
-    const elementsToEraser = this.updateElementsToBeErased(restore);
+    const { elementsToErase, erasedFreeDrawElements } =
+      this.updateElementsToBeErased(restore);
 
-    return elementsToEraser;
+    return {
+      elementsToErase,
+      erasedFreeDrawElements,
+    };
   }
 
   private updateElementsToBeErased(restoreToErase?: boolean) {
@@ -89,8 +97,16 @@ export class EraserTrail extends AnimatedTrail {
         .getCurrentTrail()
         ?.originalPoints?.map((p) => pointFrom<GlobalPoint>(p[0], p[1])) || [];
 
+    const result: {
+      elementsToErase: ExcalidrawElement["id"][];
+      erasedFreeDrawElements: ExcalidrawFreeDrawElement[];
+    } = {
+      elementsToErase: [],
+      erasedFreeDrawElements: [],
+    };
+
     if (eraserPath.length < 2) {
-      return [];
+      return result;
     }
 
     // for efficiency and avoid unnecessary calculations,
@@ -153,6 +169,11 @@ export class EraserTrail extends AnimatedTrail {
         );
 
         if (intersects) {
+          if (isFreeDrawElement(element)) {
+            result.erasedFreeDrawElements.push(element);
+            continue;
+          }
+
           const shallowestGroupId = element.groupIds.at(-1)!;
 
           if (!this.groupsToErase.has(shallowestGroupId)) {
@@ -184,7 +205,8 @@ export class EraserTrail extends AnimatedTrail {
       }
     }
 
-    return Array.from(this.elementsToErase);
+    result.elementsToErase = Array.from(this.elementsToErase);
+    return result;
   }
 
   endPath(): void {
