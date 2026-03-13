@@ -163,6 +163,19 @@ export const Sidebar = Object.assign(
   forwardRef((props: SidebarProps, ref: React.ForwardedRef<HTMLDivElement>) => {
     const appState = useUIAppState();
 
+    const isRTL = appState.isRTL;
+
+// ... no JSX do componente que envolve o slider:
+
+<div
+  className={clsx(
+    "opacity-slider-container",
+    { "is-rtl-fixed": isRTL } // Adiciona a classe se for RTL
+  )}
+  data-testid="opacity-slider-container"
+>
+  {/* Conteúdo do slider */}
+</div>
     const { onStateChange } = props;
 
     const refPrevOpenSidebar = useRef(appState.openSidebar);
