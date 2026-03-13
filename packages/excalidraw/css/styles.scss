@@ -99,9 +99,10 @@ body.excalidraw-cursor-resize * {
     // following props improve blurriness at certain devicePixelRatios.
     // AFAIK it doesn't affect export (in fact, export seems sharp either way).
 
-    image-rendering: pixelated; // chromium
-    // NOTE: must be declared *after* the above
-    image-rendering: -moz-crisp-edges; // FF
+    // image-rendering: pixelated; // chromium
+    // // NOTE: must be declared *after* the above
+    // image-rendering: -moz-crisp-edges; // FF
+    image-rendering: crisp-edges; // This will provide the same effect
 
     z-index: var(--zIndex-canvas);
 
