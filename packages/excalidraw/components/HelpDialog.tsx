@@ -245,6 +245,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("CtrlOrCmd")]}
             />
             <Shortcut
+              label={t("helpDialog.preventGridSnapping")}
+              shortcuts={[getShortcutKey("CtrlOrCmd")]}
+            />
+            <Shortcut
               label={t("toolBar.link")}
               shortcuts={[getShortcutKey("CtrlOrCmd+K")]}
             />
