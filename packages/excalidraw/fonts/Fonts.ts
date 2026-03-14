@@ -42,6 +42,7 @@ import { LilitaFontFaces } from "./Lilita";
 import {
   MapleMonoNormalNLFontFaces,
   NunitoFontFaces,
+  SarasaFixedCLBoldNerdFontFaces,
   SourceCodeProFontFaces,
   SourceHanSansSCFontFaces,
 } from "./Nunito";
@@ -397,6 +398,7 @@ export class Fonts {
     init("Lilita One", ...LilitaFontFaces);
     init("Maple Mono Normal NL", ...MapleMonoNormalNLFontFaces);
     init("Nunito", ...NunitoFontFaces);
+    init("Sarasa Fixed CL Bold Nerd Font", ...SarasaFixedCLBoldNerdFontFaces);
     init("Source Code Pro", ...SourceCodeProFontFaces);
     init("Source Han Sans SC", ...SourceHanSansSCFontFaces);
     init("Virgil", ...VirgilFontFaces);

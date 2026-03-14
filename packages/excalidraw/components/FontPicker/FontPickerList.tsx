@@ -82,6 +82,7 @@ const getFontFamilyIcon = (fontFamily: FontFamilyValues): JSX.Element => {
     case FONT_FAMILY.Cascadia:
     case FONT_FAMILY["Source Code Pro"]:
     case FONT_FAMILY["Maple Mono Normal NL"]:
+    case FONT_FAMILY["Sarasa Fixed CL Bold Nerd Font"]:
       return FontFamilyCodeIcon;
     default:
       return FontFamilyNormalIcon;

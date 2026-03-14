@@ -777,6 +777,24 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
           </div>
         </div>
       </div>
+      <div
+        style="padding: 0px 0.625rem; margin-top: 0.5rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;"
+      >
+        <div
+          style="font-size: 0.875rem;"
+        >
+          最大宽度
+        </div>
+        <input
+          class="TextInput"
+          data-testid="text-max-width-input"
+          inputmode="numeric"
+          min="1"
+          style="width: 6rem;"
+          type="number"
+          value="300"
+        />
+      </div>
     </div>
   </div>
 </div>

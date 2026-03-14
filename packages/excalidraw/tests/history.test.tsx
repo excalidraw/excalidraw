@@ -43,29 +43,32 @@ import type {
   SceneElementsMap,
 } from "@excalidraw/element/types";
 
-import "../global.d.ts";
+import "../global.js";
 
 import {
   actionSendBackward,
   actionBringForward,
   actionSendToBack,
-} from "../actions";
-import { createUndoAction, createRedoAction } from "../actions/actionHistory";
-import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import * as StaticScene from "../renderer/staticScene";
-import { getDefaultAppState } from "../appState";
+} from "../actions/index.js";
+import {
+  createUndoAction,
+  createRedoAction,
+} from "../actions/actionHistory.js";
+import { actionToggleViewMode } from "../actions/actionToggleViewMode.js";
+import * as StaticScene from "../renderer/staticScene.js";
+import { getDefaultAppState } from "../appState.js";
 import { Excalidraw } from "../index";
-import { createPasteEvent } from "../clipboard";
+import { createPasteEvent } from "../clipboard.js";
 
-import * as blobModule from "../data/blob";
+import * as blobModule from "../data/blob.js";
 
 import {
   DEER_IMAGE_DIMENSIONS,
   SMILEY_IMAGE_DIMENSIONS,
-} from "./fixtures/constants";
-import { API } from "./helpers/api";
-import { Keyboard, Pointer, UI } from "./helpers/ui";
-import { INITIALIZED_IMAGE_PROPS } from "./helpers/constants";
+} from "./fixtures/constants.js";
+import { API } from "./helpers/api.js";
+import { Keyboard, Pointer, UI } from "./helpers/ui.js";
+import { INITIALIZED_IMAGE_PROPS } from "./helpers/constants.js";
 import {
   GlobalTestState,
   act,
@@ -75,10 +78,10 @@ import {
   getCloneByOrigId,
   checkpointHistory,
   unmountComponent,
-} from "./test-utils";
-import { setupImageTest as _setupImageTest } from "./image.test";
+} from "./test-utils.js";
+import { setupImageTest as _setupImageTest } from "./image.test.js";
 
-import type { AppState } from "../types";
+import type { AppState } from "../types.js";
 
 const { h } = window;
 

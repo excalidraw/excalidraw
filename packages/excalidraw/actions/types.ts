@@ -114,6 +114,7 @@ export type ActionName =
   | "distributeVertically"
   | "flipHorizontal"
   | "flipVertical"
+  | "straighten"
   | "viewMode"
   | "exportWithDarkMode"
   | "toggleTheme"

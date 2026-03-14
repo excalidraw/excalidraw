@@ -109,6 +109,7 @@ const drawTextWhitespaceMarkers = ({
 }) => {
   const markerColor = "rgba(168, 168, 168, 0.55)";
   const dotRadius = Math.max(0.5, element.fontSize * 0.09);
+  const newlineMarkerPadding = Math.max(dotRadius * 4, element.fontSize * 0.4);
 
   context.save();
   context.fillStyle = markerColor;
@@ -150,7 +151,11 @@ const drawTextWhitespaceMarkers = ({
       context.save();
       context.textAlign = "center";
       context.textBaseline = "middle";
-      context.fillText("↵", xEnd, lineIndex * lineHeightPx + lineHeightPx / 2);
+      context.fillText(
+        "↵",
+        xEnd + newlineMarkerPadding,
+        lineIndex * lineHeightPx + lineHeightPx / 2,
+      );
       context.restore();
     }
   }
@@ -1137,6 +1142,42 @@ export const renderElement = (
         // not exporting → optimized rendering (cache & render from element
         // canvases)
       } else {
+        if (
+          element.type === "text" &&
+          !appState?.shouldCacheIgnoreZoom &&
+          cappedElementCanvasSize(element, allElementsMap, appState.zoom)
+            .scale < appState.zoom.value
+        ) {
+          const [x1, y1, x2, y2] = getElementAbsoluteCoords(
+            element,
+            elementsMap,
+          );
+          const cx = (x1 + x2) / 2 + appState.scrollX;
+          const cy = (y1 + y2) / 2 + appState.scrollY;
+          let shiftX = (x2 - x1) / 2 - (element.x - x1);
+          let shiftY = (y2 - y1) / 2 - (element.y - y1);
+
+          const container = getContainerElement(element, elementsMap);
+          if (isArrowElement(container)) {
+            const boundTextCoords =
+              LinearElementEditor.getBoundTextElementPosition(
+                container,
+                element as ExcalidrawTextElementWithContainer,
+                elementsMap,
+              );
+            shiftX = (x2 - x1) / 2 - (boundTextCoords.x - x1);
+            shiftY = (y2 - y1) / 2 - (boundTextCoords.y - y1);
+          }
+
+          context.save();
+          context.translate(cx, cy);
+          context.rotate(element.angle);
+          context.translate(-shiftX, -shiftY);
+          drawElementOnCanvas(element, rc, context, renderConfig, elementsMap);
+          context.restore();
+          break;
+        }
+
         const elementWithCanvas = generateElementWithCanvas(
           element,
           allElementsMap,

@@ -141,6 +141,7 @@ export const FONT_FAMILY = {
   "Source Han Sans SC": 11,
   "Source Code Pro": 12,
   "Maple Mono Normal NL": 13,
+  "Sarasa Fixed CL Bold Nerd Font": 14,
 };
 
 // Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
@@ -167,6 +168,7 @@ export function getGenericFontFamilyFallback(
     case FONT_FAMILY["Comic Shanns"]:
     case FONT_FAMILY["Source Code Pro"]:
     case FONT_FAMILY["Maple Mono Normal NL"]:
+    case FONT_FAMILY["Sarasa Fixed CL Bold Nerd Font"]:
       return MONOSPACE_GENERIC_FONT;
 
     default:

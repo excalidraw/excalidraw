@@ -160,6 +160,7 @@ describe("contextMenu element", () => {
       "addToLibrary",
       "flipHorizontal",
       "flipVertical",
+      "straighten",
       "sendBackward",
       "bringForward",
       "sendToBack",
@@ -243,7 +244,7 @@ describe("contextMenu element", () => {
     const contextMenu = UI.queryContextMenu();
     const contextMenuOptions =
       contextMenu?.querySelectorAll(".context-menu li");
-    const expectedShortcutNames: ShortcutName[] = [
+    const expectedShortcutNames: ActionName[] = [
       "cut",
       "copy",
       "paste",
@@ -255,6 +256,7 @@ describe("contextMenu element", () => {
       "addToLibrary",
       "flipHorizontal",
       "flipVertical",
+      "straighten",
       "sendBackward",
       "bringForward",
       "sendToBack",
