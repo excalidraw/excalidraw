@@ -222,7 +222,7 @@ function dataView(
  *
  * @param buffers each buffer (chunk) must be at most 2^32 bits large (~4GB)
  */
-const concatBuffers = (...buffers: Uint8Array[]): Uint8Array<ArrayBuffer> => {
+const concatBuffers = (...buffers: Uint8Array[]): Uint8Array => {
   const bufferView = new Uint8Array(
     VERSION_DATAVIEW_BYTES +
       NEXT_CHUNK_SIZE_DATAVIEW_BYTES * buffers.length +
@@ -295,12 +295,12 @@ const splitBuffers = (concatenatedBuffer: Uint8Array) => {
 
 /** @private */
 const _encryptAndCompress = async (
-  data: Uint8Array<ArrayBuffer> | string,
+  data: Uint8Array | string,
   encryptionKey: string,
 ) => {
   const { encryptedBuffer, iv } = await encryptData(
     encryptionKey,
-    deflate(data) as Uint8Array<ArrayBuffer>,
+    deflate(data) as Uint8Array,
   );
 
   return { iv, buffer: new Uint8Array(encryptedBuffer) };
@@ -330,7 +330,7 @@ export const compressData = async <T extends Record<string, any> = never>(
     : {
         metadata: T;
       }),
-): Promise<Uint8Array<ArrayBuffer>> => {
+): Promise<Uint8Array> => {
   const fileInfo: FileEncodingInfo = {
     version: 2,
     compression: "pako@1",
@@ -355,8 +355,8 @@ export const compressData = async <T extends Record<string, any> = never>(
 
 /** @private */
 const _decryptAndDecompress = async (
-  iv: Uint8Array<ArrayBuffer>,
-  decryptedBuffer: Uint8Array<ArrayBuffer>,
+  iv: Uint8Array,
+  decryptedBuffer: Uint8Array,
   decryptionKey: string,
   isCompressed: boolean,
 ) => {

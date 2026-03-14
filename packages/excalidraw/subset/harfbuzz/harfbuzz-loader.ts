@@ -20,7 +20,7 @@ const load = (): Promise<{
   subset: (
     fontBuffer: ArrayBuffer,
     codePoints: ReadonlySet<number>,
-  ) => Uint8Array<ArrayBuffer>;
+  ) => Uint8Array;
 }> => {
   return new Promise(async (resolve, reject) => {
     try {

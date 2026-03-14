@@ -56,68 +56,16 @@ DefaultTabTriggers.displayName = "DefaultTabTriggers";
 export const DefaultSidebar = Object.assign(
   withInternalFallback(
     "DefaultSidebar",
-    ({
-      children,
-      className,
-      onDock,
-      docked,
-      ...rest
-    }: Merge<
-      MarkOptional<Omit<SidebarProps, "name">, "children">,
-      {
-        /** pass `false` to disable docking */
-        onDock?: SidebarProps["onDock"] | false;
-      }
-    >) => {
-      const appState = useUIAppState();
-      const setAppState = useExcalidrawSetAppState();
-
-      const { DefaultSidebarTabTriggersTunnel } = useTunnels();
-
-      const isForceDocked = appState.openSidebar?.tab === CANVAS_SEARCH_TAB;
-
-      return (
-        <Sidebar
-          {...rest}
-          name="default"
-          key="default"
-          className={clsx("default-sidebar", className)}
-          docked={
-            isForceDocked || (docked ?? appState.defaultSidebarDockedPreference)
-          }
-          onDock={
-            // `onDock=false` disables docking.
-            // if `docked` passed, but no onDock passed, disable manual docking.
-            isForceDocked || onDock === false || (!onDock && docked != null)
-              ? undefined
-              : // compose to allow the host app to listen on default behavior
-                composeEventHandlers(onDock, (docked) => {
-                  setAppState({ defaultSidebarDockedPreference: docked });
-                })
-          }
-        >
-          <Sidebar.Tabs>
-            <Sidebar.Header>
-              <Sidebar.TabTriggers>
-                <Sidebar.TabTrigger tab={CANVAS_SEARCH_TAB}>
-                  {searchIcon}
-                </Sidebar.TabTrigger>
-                <Sidebar.TabTrigger tab={LIBRARY_SIDEBAR_TAB}>
-                  {LibraryIcon}
-                </Sidebar.TabTrigger>
-                <DefaultSidebarTabTriggersTunnel.Out />
-              </Sidebar.TabTriggers>
-            </Sidebar.Header>
-            <Sidebar.Tab tab={LIBRARY_SIDEBAR_TAB}>
-              <LibraryMenu />
-            </Sidebar.Tab>
-            <Sidebar.Tab tab={CANVAS_SEARCH_TAB}>
-              <SearchMenu />
-            </Sidebar.Tab>
-            {children}
-          </Sidebar.Tabs>
-        </Sidebar>
-      );
+    (
+      _props: Merge<
+        MarkOptional<Omit<SidebarProps, "name">, "children">,
+        {
+          /** pass `false` to disable docking */
+          onDock?: SidebarProps["onDock"] | false;
+        }
+      >,
+    ) => {
+      return null;
     },
   ),
   {

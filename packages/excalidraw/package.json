@@ -1,6 +1,6 @@
 {
-  "name": "@excalidraw/excalidraw",
-  "version": "0.18.0",
+  "name": "@emevart/excalidraw",
+  "version": "0.20.0",
   "type": "module",
   "types": "./dist/types/excalidraw/index.d.ts",
   "main": "./dist/prod/index.js",
@@ -36,6 +36,7 @@
     "dist/*"
   ],
   "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
     "access": "public"
   },
   "description": "Excalidraw as a React component",

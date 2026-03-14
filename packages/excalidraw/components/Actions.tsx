@@ -33,7 +33,6 @@ import { actionToggleZenMode } from "../actions";
 
 import { alignActionsPredicate } from "../actions/actionAlign";
 import { trackEvent } from "../analytics";
-import { useTunnels } from "../context/tunnels";
 
 import { t } from "../i18n";
 import {
@@ -70,9 +69,7 @@ import {
   EmbedIcon,
   extraToolsIcon,
   frameToolIcon,
-  mermaidLogoIcon,
   laserPointerToolIcon,
-  MagicIcon,
   LassoIcon,
   sharpArrowIcon,
   roundArrowIcon,
@@ -209,7 +206,6 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
         <>
           {renderAction("changeStrokeStyle")}
-          {renderAction("changeSloppiness")}
         </>
       )}
 
@@ -1076,7 +1072,6 @@ export const ShapesSwitcher = ({
 
   const embeddableToolSelected = activeTool.type === "embeddable";
 
-  const { TTDDialogTriggerTunnel } = useTunnels();
 
   return (
     <>
@@ -1249,27 +1244,6 @@ export const ShapesSwitcher = ({
               selected={lassoToolSelected}
             >
               {t("toolBar.lasso")}
-            </DropdownMenu.Item>
-          )}
-          <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
-            Generate
-          </div>
-          {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
-          <DropdownMenu.Item
-            onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
-            icon={mermaidLogoIcon}
-            data-testid="toolbar-embeddable"
-          >
-            {t("toolBar.mermaidToExcalidraw")}
-          </DropdownMenu.Item>
-          {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
-            <DropdownMenu.Item
-              onSelect={() => app.onMagicframeToolSelect()}
-              icon={MagicIcon}
-              data-testid="toolbar-magicframe"
-              badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
-            >
-              {t("toolBar.magicframe")}
             </DropdownMenu.Item>
           )}
         </DropdownMenu.Content>

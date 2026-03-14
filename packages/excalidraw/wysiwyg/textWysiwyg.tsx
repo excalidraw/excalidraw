@@ -453,7 +453,7 @@ export const textWysiwyg = ({
       event.preventDefault();
       submittedViaKeyboard = true;
       handleSubmit();
-    } else if (actionSaveToActiveFile.keyTest(event)) {
+    } else if (actionSaveToActiveFile.keyTest?.(event, app.actionManager.getAppState(), app.actionManager.getElementsIncludingDeleted(), app as any)) {
       event.preventDefault();
       handleSubmit();
       app.actionManager.executeAction(actionSaveToActiveFile);
