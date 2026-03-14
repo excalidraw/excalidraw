@@ -304,7 +304,9 @@ export {
   exportToBlob,
   exportToSvg,
   exportToClipboard,
-} from "@excalidraw/utils/export";
+} from "./scene/export";
+
+export type { ExportSceneData, ExportSceneConfig } from "./scene/export";
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
 export {

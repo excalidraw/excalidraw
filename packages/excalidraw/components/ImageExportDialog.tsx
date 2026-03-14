@@ -1,4 +1,3 @@
-import { exportToCanvas } from "@excalidraw/utils/export";
 import React, { useEffect, useRef, useState } from "react";
 
 import {
@@ -6,6 +5,7 @@ import {
   EXPORT_IMAGE_TYPES,
   isFirefox,
   EXPORT_SCALES,
+  THEME,
   cloneJSON,
 } from "@excalidraw/common";
 
@@ -26,6 +26,7 @@ import { useCopyStatus } from "../hooks/useCopiedIndicator";
 
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
+import { exportToCanvas } from "../scene/export";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
@@ -128,19 +129,26 @@ const ImageExportModal = ({
     };
 
     exportToCanvas({
-      elements: exportedElements,
-      appState: {
-        ...appStateSnapshot,
-        name: projectName,
-        exportBackground: exportWithBackground,
-        exportWithDarkMode,
-        exportScale,
-        exportEmbedScene: embedScene,
+      data: {
+        elements: exportedElements,
+        appState: {
+          ...appStateSnapshot,
+          name: projectName,
+          exportBackground: exportWithBackground,
+          exportScale,
+          exportEmbedScene: embedScene,
+        },
+        files,
       },
-      files,
-      exportPadding: DEFAULT_EXPORT_PADDING,
-      maxWidthOrHeight: Math.max(maxWidth, maxHeight),
-      exportingFrame,
+      config: {
+        padding: DEFAULT_EXPORT_PADDING,
+        maxWidthOrHeight: Math.max(maxWidth, maxHeight),
+        exportingFrame,
+        theme: exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+        canvasBackgroundColor: exportWithBackground
+          ? appStateSnapshot.viewBackgroundColor
+          : false,
+      },
     })
       .then(async (canvas) => {
         if (isStaleRequest()) {

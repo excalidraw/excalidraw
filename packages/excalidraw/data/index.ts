@@ -4,6 +4,7 @@ import {
   IMAGE_MIME_TYPES,
   isFirefox,
   MIME_TYPES,
+  THEME,
   cloneJSON,
   SVG_DOCUMENT_PREAMBLE,
 } from "@excalidraw/common";
@@ -115,20 +116,29 @@ export const exportCanvas = async (
   if (elements.length === 0) {
     throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
+
+  const theme = appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT;
+
   if (type === "svg" || type === "clipboard-svg") {
-    const svgPromise = exportToSvg(
-      elements,
-      {
-        exportBackground,
-        exportWithDarkMode: appState.exportWithDarkMode,
-        viewBackgroundColor,
-        exportPadding,
-        exportScale: appState.exportScale,
-        exportEmbedScene: appState.exportEmbedScene && type === "svg",
+    const svgPromise = exportToSvg({
+      data: {
+        elements,
+        appState: {
+          ...appState,
+          exportBackground,
+          exportEmbedScene: appState.exportEmbedScene && type === "svg",
+        },
+        files,
       },
-      files,
-      { exportingFrame },
-    );
+      config: {
+        padding: exportPadding,
+        exportingFrame,
+        theme,
+        canvasBackgroundColor: exportBackground
+          ? viewBackgroundColor
+          : "transparent",
+      },
+    });
 
     if (type === "svg") {
       return fileSave(
@@ -158,11 +168,19 @@ export const exportCanvas = async (
     }
   }
 
-  const tempCanvas = exportToCanvas(elements, appState, files, {
-    exportBackground,
-    viewBackgroundColor,
-    exportPadding,
-    exportingFrame,
+  const tempCanvas = exportToCanvas({
+    data: {
+      elements,
+      appState,
+      files,
+    },
+    config: {
+      canvasBackgroundColor: exportBackground ? viewBackgroundColor : false,
+      padding: exportPadding,
+      theme,
+      scale: appState.exportScale,
+      exportingFrame,
+    },
   });
 
   if (type === "png") {

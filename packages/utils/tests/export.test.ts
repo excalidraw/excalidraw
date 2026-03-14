@@ -10,9 +10,22 @@ const exportToSvgSpy = vi.spyOn(mockedSceneExportUtils, "exportToSvg");
 describe("exportToCanvas", async () => {
   const EXPORT_PADDING = 10;
 
-  it("with default arguments", async () => {
+  it("with default arguments (no padding)", async () => {
     const canvas = await utils.exportToCanvas({
-      ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+      data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+    });
+
+    // New API has no default padding - call sites must explicitly set it
+    expect(canvas.width).toBe(100);
+    expect(canvas.height).toBe(100);
+  });
+
+  it("with padding", async () => {
+    const canvas = await utils.exportToCanvas({
+      data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+      config: {
+        padding: EXPORT_PADDING,
+      },
     });
 
     expect(canvas.width).toBe(100 + 2 * EXPORT_PADDING);
@@ -21,8 +34,10 @@ describe("exportToCanvas", async () => {
 
   it("when custom width and height", async () => {
     const canvas = await utils.exportToCanvas({
-      ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
-      getDimensions: () => ({ width: 200, height: 200, scale: 1 }),
+      data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+      config: {
+        getDimensions: () => ({ width: 200, height: 200, scale: 1 }),
+      },
     });
 
     expect(canvas.width).toBe(200);
@@ -33,20 +48,27 @@ describe("exportToCanvas", async () => {
 describe("exportToBlob", async () => {
   describe("mime type", () => {
     it("should change image/jpg to image/jpeg", async () => {
+      const diagramData = diagramFactory();
       const blob = await utils.exportToBlob({
-        ...diagramFactory(),
-        getDimensions: (width, height) => ({ width, height, scale: 1 }),
-        // testing typo in MIME type (jpg → jpeg)
-        mimeType: "image/jpg",
-        appState: {
-          exportBackground: true,
+        data: {
+          elements: diagramData.elements,
+          appState: {
+            ...diagramData.appState,
+            exportBackground: true,
+          },
+          files: diagramData.files,
+        },
+        config: {
+          getDimensions: (width, height) => ({ width, height, scale: 1 }),
+          // testing typo in MIME type (jpg → jpeg)
+          mimeType: "image/jpg",
         },
       });
       expect(blob?.type).toBe(MIME_TYPES.jpg);
     });
     it("should default to image/png", async () => {
       const blob = await utils.exportToBlob({
-        ...diagramFactory(),
+        data: diagramFactory(),
       });
       expect(blob?.type).toBe(MIME_TYPES.png);
     });
@@ -56,9 +78,11 @@ describe("exportToBlob", async () => {
         .spyOn(console, "warn")
         .mockImplementationOnce(() => void 0);
       await utils.exportToBlob({
-        ...diagramFactory(),
-        mimeType: MIME_TYPES.png,
-        quality: 1,
+        data: diagramFactory(),
+        config: {
+          mimeType: MIME_TYPES.png,
+          quality: 1,
+        },
       });
       expect(consoleSpy).toHaveBeenCalledWith(
         `"quality" will be ignored for "${MIME_TYPES.png}" mimeType`,
@@ -68,8 +92,9 @@ describe("exportToBlob", async () => {
 });
 
 describe("exportToSvg", () => {
-  const passedElements = () => exportToSvgSpy.mock.calls[0][0];
-  const passedOptions = () => exportToSvgSpy.mock.calls[0][1];
+  const getPassedArg = () => exportToSvgSpy.mock.calls[0][0];
+  const passedData = () => getPassedArg().data;
+  const passedConfig = () => getPassedArg().config;
 
   afterEach(() => {
     vi.clearAllMocks();
@@ -77,18 +102,14 @@ describe("exportToSvg", () => {
 
   it("with default arguments", async () => {
     await utils.exportToSvg({
-      ...diagramFactory({
+      data: diagramFactory({
         overrides: { appState: void 0 },
       }),
     });
 
-    const passedOptionsWhenDefault = {
-      ...passedOptions(),
-      // To avoid varying snapshots
-      name: "name",
-    };
-    expect(passedElements().length).toBe(3);
-    expect(passedOptionsWhenDefault).toMatchSnapshot();
+    const data = passedData();
+    expect(data.elements.length).toBe(3);
+    expect(passedConfig()).toMatchSnapshot();
   });
 
   // FIXME the utils.exportToSvg no longer filters out deleted elements.
@@ -96,37 +117,39 @@ describe("exportToSvg", () => {
   // type-checking for it correctly.
   it.skip("with deleted elements", async () => {
     await utils.exportToSvg({
-      ...diagramFactory({
+      data: diagramFactory({
         overrides: { appState: void 0 },
         elementOverrides: { isDeleted: true },
       }),
     });
 
-    expect(passedElements().length).toBe(0);
+    expect(passedData().elements.length).toBe(0);
   });
 
-  it("with exportPadding", async () => {
+  it("with padding", async () => {
     await utils.exportToSvg({
-      ...diagramFactory({ overrides: { appState: { name: "diagram name" } } }),
-      exportPadding: 0,
+      data: diagramFactory({ overrides: { appState: { name: "diagram name" } } }),
+      config: {
+        padding: 0,
+      },
     });
 
-    expect(passedElements().length).toBe(3);
-    expect(passedOptions()).toEqual(
-      expect.objectContaining({ exportPadding: 0 }),
+    expect(passedData().elements.length).toBe(3);
+    expect(passedConfig()).toEqual(
+      expect.objectContaining({ padding: 0 }),
     );
   });
 
   it("with exportEmbedScene", async () => {
     await utils.exportToSvg({
-      ...diagramFactory({
+      data: diagramFactory({
         overrides: {
           appState: { name: "diagram name", exportEmbedScene: true },
         },
       }),
     });
 
-    expect(passedElements().length).toBe(3);
-    expect(passedOptions().exportEmbedScene).toBe(true);
+    expect(passedData().elements.length).toBe(3);
+    expect(passedData().appState?.exportEmbedScene).toBe(true);
   });
 });
