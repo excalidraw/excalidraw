@@ -3,6 +3,10 @@
     "paste": "جایگذاری",
     "pasteAsPlaintext": "جایگذاری به عنوان متن ساده",
     "pasteCharts": "جایگذاری نمودارها",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "انتخاب همه",
     "multiSelect": "یک ایتم به انتخاب شده ها اضافه کنید",
     "moveCanvas": "جابجایی بوم",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "پای کلاغی (بسیار)",
     "arrowhead_crowfoot_one": "پای کلاغی (یک)",
     "arrowhead_crowfoot_one_or_many": "پای کلاغی (یک یا بسیار)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "امکانات بیشتر",
+    "cardinality": "",
     "arrowtypes": "نوع پیکان",
     "arrowtype_sharp": "پیکان تیز",
     "arrowtype_round": "پیکان منحنی",
@@ -171,7 +182,11 @@
     "linkToElement": "لینک به آیتم",
     "wrapSelectionInFrame": "انتخاب را در قاب قرار دهید",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "لینک به آیتم",
@@ -196,7 +211,7 @@
     "multipleResults": "نتایج",
     "placeholder": "جستجوی متن در بوم...",
     "frames": "",
-    "texts": ""
+    "texts": "متن"
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "خطا"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "ذخیره در دیسک",
     "disk_details": "داده های صحنه را به فایلی که بعداً می توانید از آن وارد کنید صادر کنید.",
@@ -571,7 +590,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "رنگ",
     "mostUsedCustomColors": "رنگ های به‌تازگی به‌کار گرفته شده",
     "colors": "رنگ‌ها",
     "shades": "جلوه‌ها",
@@ -612,14 +631,15 @@
   "mermaid": {
     "title": "مرمید به excalidraw",
     "button": "درج",
-    "description": "فعلا فقط <flowchartLink> فلوچارت </flowchartLink> ، <sequenceLink> توالی </sequenceLink> و <classLink> کلاس </classLink> نمودارها پشتیبانی می شوند. انواع دیگر به صورت تصویر در Excalidraw ارائه خواهند شد.",
+    "description": "",
     "syntax": "مرمید syntax",
     "preview": "پیشنمایش",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
-    "error": ""
+    "error": "خطا!"
   },
   "chat": {
     "inputPlaceholder": "",
@@ -627,8 +647,8 @@
     "generating": "",
     "rateLimitRemaining": "",
     "role": {
-      "user": "",
-      "assistant": "",
+      "user": "شما",
+      "assistant": "دستیار هوش مصنوعی",
       "system": ""
     },
     "aiBeta": "",
@@ -707,9 +727,9 @@
     "alt": "",
     "escape": "",
     "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
+    "shift": "Shift",
+    "spacebar": "فاصله",
+    "delete": "حذف",
     "mmb": ""
   }
 }

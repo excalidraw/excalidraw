@@ -3,6 +3,10 @@
     "paste": "Lim inn",
     "pasteAsPlaintext": "Lim inn som klartekst",
     "pasteCharts": "Lim inn diagrammer",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Velg alt",
     "multiSelect": "Legg til element i utvalg",
     "moveCanvas": "Flytt lerretet",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "Kråkefot (mange)",
     "arrowhead_crowfoot_one": "Kråkefot (én)",
     "arrowhead_crowfoot_one_or_many": "Kråkefot (én eller mange)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Flere alternativer",
+    "cardinality": "",
     "arrowtypes": "Type pil",
     "arrowtype_sharp": "Skarp pil",
     "arrowtype_round": "Buet pil",
@@ -171,7 +182,11 @@
     "linkToElement": "Lenke til objekt",
     "wrapSelectionInFrame": "Brekk om utvalg i ramme",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Lenke til objekt",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Feil"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Lagre til disk",
     "disk_details": "Eksporter scene-dataene til en fil som du kan importere fra senere.",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Mermaid til Excalidraw",
     "button": "Sett inn",
-    "description": "Foreløpig er bare <flowchartLink>Flowchart</flowchartLink>-,<sequenceLink> Sequence</sequenceLink>- og <classLink>klasse </classLink>-diagrammer støttet. De andre typene vil bli gjengitt som bilde i Excalidraw.",
+    "description": "",
     "syntax": "Mermaid-syntaks",
     "preview": "Forhåndsvisning",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

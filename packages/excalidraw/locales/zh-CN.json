@@ -3,6 +3,10 @@
     "paste": "粘贴",
     "pasteAsPlaintext": "粘贴为纯文本",
     "pasteCharts": "粘贴图表",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "全部选中",
     "multiSelect": "添加元素到选区",
     "moveCanvas": "移动画布",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "鸦爪标记（多）",
     "arrowhead_crowfoot_one": "鸦爪标记（一）",
     "arrowhead_crowfoot_one_or_many": "鸦爪标记（一或多）",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "更多选项",
+    "cardinality": "",
     "arrowtypes": "箭头类型",
     "arrowtype_sharp": "直箭头",
     "arrowtype_round": "曲线箭头",
@@ -171,7 +182,11 @@
     "linkToElement": "链接到对象",
     "wrapSelectionInFrame": "用选中的元素创建画框",
     "tab": "Tab",
-    "shapeSwitch": "切换形状"
+    "shapeSwitch": "切换形状",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "链接到对象",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "错误"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "保存到本地",
     "disk_details": "将画布数据导出为文件，以便以后导入",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Mermaid 至 Excalidraw",
     "button": "插入",
-    "description": "目前仅支持<flowchartLink>流程图</flowchartLink>、<sequenceLink>序列图</sequenceLink>和<classLink>类图</classLink>。其他类型在 Excalidraw 中将以图像呈现。",
+    "description": "",
     "syntax": "Mermaid 语法",
     "preview": "预览",
-    "label": "",
-    "inputPlaceholder": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
@@ -653,16 +673,16 @@
       "invalidDiagram": "",
       "fixInMermaid": "",
       "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "requestAborted": "请求中止",
+      "requestFailed": "请求失败",
+      "mermaidParseError": "Mermaid 语法错误"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "您已达到免费版的 AI 使用上限。请尝试 Excalidraw+ 获取更多额度，或明天再试。",
+      "generalRateLimit": "慢点慢点，您的手速太快了！请稍候再试。",
+      "messageLimitInputPlaceholder": "您已达到消息上限"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "升级到 Plus"
   },
   "quickSearch": {
     "placeholder": "快速搜索"

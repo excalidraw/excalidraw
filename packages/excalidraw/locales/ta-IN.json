@@ -3,6 +3,10 @@
     "paste": "ஒட்டு",
     "pasteAsPlaintext": "அலங்காரமின்றி ஒட்டு",
     "pasteCharts": "விளக்கப்படங்களை ஒட்டு",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "எல்லாம் தேர்ந்தெடு",
     "multiSelect": "உறுப்பைத் தெரிவில் சேர்",
     "moveCanvas": "கித்தானை நகர்த்து",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "கூடுதல் விருப்பங்கள்",
+    "cardinality": "",
     "arrowtypes": "அம்புக்குறி வகை",
     "arrowtype_sharp": "கூர்மையான குறி",
     "arrowtype_round": "வளைந்தக் குறி",
@@ -171,7 +182,11 @@
     "linkToElement": "இணைப்பு",
     "wrapSelectionInFrame": "தேர்வை வடிவத்தில் சுற்று",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "இணைப்பு",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "பிழை"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "வட்டில் சேமி",
     "disk_details": "காட்சித் தரவை நீங்கள் பின்னர் இறக்குமதி செய்யக்கூடிய ஒரு கோப்பிற்கு ஏற்றுமதிசெய்க.",
@@ -616,7 +635,8 @@
     "syntax": "மெர்மெய்டு தொடரியல்",
     "preview": "முன்னோட்டம்",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

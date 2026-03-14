@@ -3,6 +3,10 @@
     "paste": "Enganxa",
     "pasteAsPlaintext": "Enganxar com a text pla",
     "pasteCharts": "Enganxa els diagrames",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Selecciona-ho tot",
     "multiSelect": "Afegeix un element a la selecció",
     "moveCanvas": "Mou el llenç",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "Potes de gall (moltes)",
     "arrowhead_crowfoot_one": "Potes de gall (una)",
     "arrowhead_crowfoot_one_or_many": "Potes de gall (una o moltes)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Més opcions",
+    "cardinality": "",
     "arrowtypes": "Tipus de fletxa",
     "arrowtype_sharp": "Fletxa Esmolada",
     "arrowtype_round": "Fletxa corba",
@@ -171,7 +182,11 @@
     "linkToElement": "Enllaç a l'objecte",
     "wrapSelectionInFrame": "Embolica la selecció en un marc",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Enllaç a l'objecte",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Error"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Desa al disc",
     "disk_details": "Exporta les dades de l'escena a un fitxer que després podreu importar.",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Mermaid a Excalidraw",
     "button": "Inseriu",
-    "description": "Actualment només s'admeten els diagrames <flowchartLink>Flowchart</flowchartLink>, <sequenceLink> Sequence, </sequenceLink> i <classLink> Class </classLink>. Els altres tipus es representaran com a imatge a Excalidraw.",
+    "description": "",
     "syntax": "Sintaxi de Mermaid",
     "preview": "Previsualització",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

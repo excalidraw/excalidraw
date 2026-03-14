@@ -3,6 +3,10 @@
     "paste": "Tempel",
     "pasteAsPlaintext": "Tempel sebagai teks biasa",
     "pasteCharts": "Tempel diagram",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Pilih semua",
     "multiSelect": "Tambah unsur ke seleksi",
     "moveCanvas": "Pindahkan kanvas",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Pilihan lain",
+    "cardinality": "",
     "arrowtypes": "Jenis panah",
     "arrowtype_sharp": "Panah runcing",
     "arrowtype_round": "Panah melengkung",
@@ -171,7 +182,11 @@
     "linkToElement": "Taut ke objek",
     "wrapSelectionInFrame": "Bungkus pilihan dalam bingkai",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Taut ke objek",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Kesalahan"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Simpan ke disk",
     "disk_details": "Ekspor data pemandangan ke file yang mana Anda dapat impor nanti.",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Mermaid menjadi Excalidraw",
     "button": "Sisipkan",
-    "description": "Saat ini hanya <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sekuen, </sequenceLink>, dan <classLink>Kelas</classLink>Diagram yang didukung. Jenis lainnya akan dirender sebagai gambar di Excalidraw.",
+    "description": "",
     "syntax": "Syntax Mermaid",
     "preview": "Pratinjau",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
