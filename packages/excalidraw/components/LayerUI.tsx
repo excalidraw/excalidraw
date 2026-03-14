@@ -528,24 +528,73 @@ const LayerUI = ({
           }
         />
       )}
-      {/* Always render compact MobileMenu layout (phone-style toolbar).
-          On desktop, CSS repositions the toolbar to the left edge. */}
-      <MobileMenu
-        app={app}
-        appState={appState}
-        elements={elements}
-        actionManager={actionManager}
-        renderJSONExportDialog={renderJSONExportDialog}
-        renderImageExportDialog={renderImageExportDialog}
-        setAppState={setAppState}
-        onHandToolToggle={onHandToolToggle}
-        onPenModeToggle={onPenModeToggle}
-        renderTopLeftUI={renderTopLeftUI}
-        renderTopRightUI={renderTopRightUI}
-        renderSidebars={renderSidebars}
-        renderWelcomeScreen={renderWelcomeScreen}
-        UIOptions={UIOptions}
-      />
+      {editorInterface.formFactor === "phone" && (
+        <MobileMenu
+          app={app}
+          appState={appState}
+          elements={elements}
+          actionManager={actionManager}
+          renderJSONExportDialog={renderJSONExportDialog}
+          renderImageExportDialog={renderImageExportDialog}
+          setAppState={setAppState}
+          onHandToolToggle={onHandToolToggle}
+          onPenModeToggle={onPenModeToggle}
+          renderTopLeftUI={renderTopLeftUI}
+          renderTopRightUI={renderTopRightUI}
+          renderSidebars={renderSidebars}
+          renderWelcomeScreen={renderWelcomeScreen}
+          UIOptions={UIOptions}
+        />
+      )}
+      {editorInterface.formFactor !== "phone" && (
+        <>
+          <div
+            className="layer-ui__wrapper"
+            style={
+              appState.openSidebar &&
+              isSidebarDocked &&
+              editorInterface.canFitSidebar
+                ? { width: `calc(100% - var(--right-sidebar-width))` }
+                : {}
+            }
+          >
+            {renderWelcomeScreen && <tunnels.WelcomeScreenCenterTunnel.Out />}
+            {renderFixedSideContainer()}
+            <Footer
+              appState={appState}
+              actionManager={actionManager}
+              showExitZenModeBtn={showExitZenModeBtn}
+              renderWelcomeScreen={renderWelcomeScreen}
+            />
+            {(appState.toast || appState.scrolledOutside) && (
+              <div className="floating-status-stack">
+                {appState.toast && (
+                  <Toast
+                    message={appState.toast.message}
+                    onClose={() => setAppState({ toast: null })}
+                    duration={appState.toast.duration}
+                    closable={appState.toast.closable}
+                  />
+                )}
+                {!appState.toast && appState.scrolledOutside && (
+                  <button
+                    type="button"
+                    className="scroll-back-to-content"
+                    onClick={() => {
+                      setAppState((appState) => ({
+                        ...calculateScrollCenter(elements, appState),
+                      }));
+                    }}
+                  >
+                    {t("buttons.scrollBackToContent")}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+          {renderSidebars()}
+        </>
+      )}
     </>
   );
 
