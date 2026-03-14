@@ -731,6 +731,7 @@ export type CanvasActions = Partial<{
   loadScene: boolean;
   saveToActiveFile: boolean;
   toggleTheme: boolean | null;
+  toggleFullScreen: boolean;
   saveAsImage: boolean;
 }>;
 
