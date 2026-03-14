@@ -1046,9 +1046,27 @@ export const ShapesSwitcher = ({
   UIOptions: AppProps["UIOptions"];
 }) => {
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
+  const [lastActiveGenericShape, setLastActiveGenericShape] = useState<string>("rectangle");
+  const [lastActiveLinearElement, setLastActiveLinearElement] = useState<string>("arrow");
   const stylesPanelMode = useStylesPanelMode();
   const isFullStylesPanel = stylesPanelMode === "full";
   const isCompactStylesPanel = stylesPanelMode === "compact";
+
+  // Build grouped tool definitions from getToolbarTools for compact ToolPopovers
+  const allTools = getToolbarTools(app);
+  const GENERIC_SHAPE_TYPES = ["rectangle", "diamond", "ellipse"];
+  const LINEAR_TYPES = ["arrow", "line"];
+
+  const SHAPE_TOOLS_FOR_POPOVER = allTools
+    .filter((t) => GENERIC_SHAPE_TYPES.includes(t.value))
+    .map((t) => ({ type: t.value, icon: t.icon, title: capitalizeString(t.value) }));
+
+  const LINEAR_TOOLS_FOR_POPOVER = allTools
+    .filter((t) => LINEAR_TYPES.includes(t.value))
+    .map((t) => ({ type: t.value, icon: t.icon, title: capitalizeString(t.value) }));
+
+  // Track which shapes/linear tools were already rendered as popovers
+  const renderedAsPopover = new Set<string>();
 
   const SELECTION_TOOLS = [
     {
@@ -1097,6 +1115,61 @@ export const ShapesSwitcher = ({
             : `${numericKey}`;
           const keybindingLabel =
             value === "hand" ? undefined : numericKey || letter;
+
+          // In compact mode, group shapes into ToolPopovers
+          if (isCompactStylesPanel && GENERIC_SHAPE_TYPES.includes(value)) {
+            if (renderedAsPopover.has("shapes")) return null;
+            renderedAsPopover.add("shapes");
+            return (
+              <ToolPopover
+                key="shapes-popover"
+                app={app}
+                options={SHAPE_TOOLS_FOR_POPOVER}
+                activeTool={activeTool}
+                defaultOption={lastActiveGenericShape}
+                namePrefix="shapeType"
+                title={capitalizeString(t(`toolBar.${lastActiveGenericShape}`))}
+                data-testid="toolbar-rectangle"
+                onToolChange={(type: string) => {
+                  if (GENERIC_SHAPE_TYPES.includes(type)) {
+                    setLastActiveGenericShape(type);
+                    app.setActiveTool({ type });
+                  }
+                }}
+                displayedOption={
+                  SHAPE_TOOLS_FOR_POPOVER.find((s) => s.type === lastActiveGenericShape) ||
+                  SHAPE_TOOLS_FOR_POPOVER[0]
+                }
+              />
+            );
+          }
+
+          if (isCompactStylesPanel && LINEAR_TYPES.includes(value)) {
+            if (renderedAsPopover.has("linear")) return null;
+            renderedAsPopover.add("linear");
+            return (
+              <ToolPopover
+                key="linear-popover"
+                app={app}
+                options={LINEAR_TOOLS_FOR_POPOVER}
+                activeTool={activeTool}
+                defaultOption={lastActiveLinearElement}
+                namePrefix="linearElementType"
+                title={capitalizeString(t(`toolBar.${lastActiveLinearElement}`))}
+                data-testid="toolbar-arrow"
+                onToolChange={(type: string) => {
+                  if (LINEAR_TYPES.includes(type)) {
+                    setLastActiveLinearElement(type);
+                    app.setActiveTool({ type });
+                  }
+                }}
+                displayedOption={
+                  LINEAR_TOOLS_FOR_POPOVER.find((s) => s.type === lastActiveLinearElement) ||
+                  LINEAR_TOOLS_FOR_POPOVER[0]
+                }
+              />
+            );
+          }
 
           // when in compact styles panel mode (tablet)
           // use a ToolPopover for selection/lasso toggle as well
