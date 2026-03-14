@@ -1527,8 +1527,48 @@ const _renderInteractiveScene = ({
     return { atLeastOneVisibleElement: false, elementsMap };
   }
 
+  try {
+    return _renderInteractiveSceneInner({
+      app,
+      canvas,
+      elementsMap,
+      visibleElements,
+      selectedElements,
+      allElementsMap,
+      scale,
+      appState,
+      renderConfig,
+      editorInterface,
+      animationState,
+      deltaTime,
+    });
+  } catch (e) {
+    console.warn("[excalidraw] renderInteractiveScene error:", e);
+    return { atLeastOneVisibleElement: false, elementsMap };
+  }
+};
+
+const _renderInteractiveSceneInner = ({
+  app,
+  canvas,
+  elementsMap,
+  visibleElements,
+  selectedElements,
+  allElementsMap,
+  scale,
+  appState,
+  renderConfig,
+  editorInterface,
+  animationState,
+  deltaTime,
+}: InteractiveSceneRenderConfig): {
+  scrollBars?: ReturnType<typeof getScrollBars>;
+  atLeastOneVisibleElement: boolean;
+  elementsMap: RenderableElementsMap;
+  animationState?: typeof animationState;
+} => {
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
-    canvas,
+    canvas!,
     scale,
   );
   let nextAnimationState = animationState;
