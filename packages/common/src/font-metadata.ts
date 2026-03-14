@@ -73,6 +73,14 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.2,
     },
   },
+  [FONT_FAMILY["Sarasa Fixed CL Bold Nerd Font"]]: {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 984,
+      descender: -273,
+      lineHeight: 1.2,
+    },
+  },
   [FONT_FAMILY["Lilita One"]]: {
     metrics: {
       unitsPerEm: 1000,

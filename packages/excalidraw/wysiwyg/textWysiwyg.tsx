@@ -163,6 +163,8 @@ export const textWysiwyg = ({
   const whitespaceOverlay = document.createElement("div");
   whitespaceOverlay.classList.add("excalidraw-wysiwyg__whitespaceOverlay");
 
+  let newlineMarkerPaddingPx = 0;
+
   const updateWhitespaceOverlayContent = () => {
     // overlay 内容与 textarea 同步，但 overlay 自身文字透明，仅通过 span 伪元素绘制点。
     // 这样既能 1:1 复用浏览器的换行/换页算法，又不会影响 textarea 的输入行为。
@@ -198,6 +200,7 @@ export const textWysiwyg = ({
         const marker = document.createElement("span");
         marker.className =
           "excalidraw-wysiwyg__ws excalidraw-wysiwyg__ws--newline";
+        marker.style.marginLeft = `${newlineMarkerPaddingPx}px`;
         whitespaceOverlay.appendChild(marker);
         whitespaceOverlay.appendChild(document.createTextNode("\n"));
         continue;
@@ -220,6 +223,11 @@ export const textWysiwyg = ({
     if (!updatedTextElement) {
       return;
     }
+    const dotRadius = Math.max(0.5, updatedTextElement.fontSize * 0.09);
+    newlineMarkerPaddingPx = Math.max(
+      dotRadius * 4,
+      updatedTextElement.fontSize * 0.4,
+    );
     const { textAlign, verticalAlign } = updatedTextElement;
     const elementsMap = app.scene.getNonDeletedElementsMap();
     if (updatedTextElement && isTextElement(updatedTextElement)) {
@@ -230,11 +238,11 @@ export const textWysiwyg = ({
         app.scene.getNonDeletedElementsMap(),
       );
 
-      let width = updatedTextElement.width;
+      const width = updatedTextElement.width;
 
       // set to element height by default since that's
       // what is going to be used for unbounded text
-      let height = updatedTextElement.height;
+      const height = updatedTextElement.height;
 
       let maxWidth = updatedTextElement.width;
       let maxHeight = updatedTextElement.height;
@@ -312,16 +320,6 @@ export const textWysiwyg = ({
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
 
-      if (!container) {
-        maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
-        width = Math.min(width, maxWidth);
-      } else {
-        width += 0.5;
-      }
-
-      // add 5% buffer otherwise it causes wysiwyg to jump
-      height *= 1.05;
-
       const font = getFontString(updatedTextElement);
 
       // Make sure text editor height doesn't go beyond viewport
@@ -384,7 +382,6 @@ export const textWysiwyg = ({
   editable.dir = "auto";
   editable.tabIndex = 0;
   editable.dataset.type = "wysiwyg";
-  editable.wrap = isSafari ? "off" : "soft";
   editable.classList.add("excalidraw-wysiwyg");
 
   const supportsBreakSpaces =
@@ -395,7 +392,11 @@ export const textWysiwyg = ({
   let whiteSpace = "pre";
   let wordBreak = "normal";
 
-  if (isBoundToContainer(element) || !element.autoResize) {
+  const shouldWrap = isBoundToContainer(element) || !element.autoResize;
+
+  editable.wrap = shouldWrap && !isSafari ? "soft" : "off";
+
+  if (shouldWrap) {
     whiteSpace = supportsBreakSpaces ? "break-spaces" : "pre-wrap";
     wordBreak = "break-word";
   }
@@ -715,6 +716,7 @@ export const textWysiwyg = ({
       app.actionManager.executeAction(actionIncreaseFontSize);
     } else if (event.key === KEYS.ESCAPE) {
       event.preventDefault();
+      event.stopPropagation();
       submittedViaKeyboard = true;
       handleSubmit();
     } else if (actionSaveToActiveFile.keyTest(event)) {

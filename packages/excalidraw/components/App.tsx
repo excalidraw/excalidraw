@@ -99,7 +99,6 @@ import {
   invariant,
   getFeatureFlag,
   createUserAgentDescriptor,
-  getFormFactor,
   deriveStylesPanelMode,
   isIOS,
   isBrave,
@@ -305,6 +304,7 @@ import {
   actionFinalize,
   actionFlipHorizontal,
   actionFlipVertical,
+  actionStraighten,
   actionGroup,
   actionPasteStyles,
   actionSelectAll,
@@ -696,8 +696,10 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
   lastPointerMoveEvent: PointerEvent | null = null;
-  private suppressNextSelectedTextDoubleClick: { elementId: string | null; at: number } =
-    { elementId: null, at: 0 };
+  private suppressNextSelectedTextDoubleClick: {
+    elementId: string | null;
+    at: number;
+  } = { elementId: null, at: 0 };
   /** current frame pointer cords */
   lastPointerMoveCoords: { x: number; y: number } | null = null;
   /** previous frame pointer coords */
@@ -2941,9 +2943,10 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private getFormFactor = (editorWidth: number, editorHeight: number) => {
+    // 关闭移动端 UI：无论容器尺寸/分辨率如何，始终使用桌面版 UI
     return (
       this.props.UIOptions.getFormFactor?.(editorWidth, editorHeight) ??
-      getFormFactor(editorWidth, editorHeight)
+      "desktop"
     );
   };
 
@@ -4738,6 +4741,22 @@ class App extends React.Component<AppProps, AppState> {
         // Shape switching
         if (event.key === KEYS.ESCAPE) {
           this.updateEditorAtom(convertElementTypePopupAtom, null);
+          if (
+            !this.state.openDialog &&
+            !this.state.openPopup &&
+            !this.state.openMenu &&
+            !this.state.editingTextElement &&
+            !this.state.newElement &&
+            this.state.multiElement === null &&
+            !this.state.selectionElement &&
+            !this.state.selectedElementsAreBeingDragged &&
+            selectedElements.length === 1 &&
+            isTextElement(selectedElements[0])
+          ) {
+            event.preventDefault();
+            this.deselectElements();
+            return;
+          }
         } else if (
           event.key === KEYS.TAB &&
           (document.activeElement === this.excalidrawContainerRef?.current ||
@@ -5659,17 +5678,46 @@ class App extends React.Component<AppProps, AppState> {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
 
     const updateElement = (nextOriginalText: string, isDeleted: boolean) => {
+      const rawMaxWidth = Number(
+        localStorage.getItem("excalidraw.textMaxWidth"),
+      );
+      const textMaxWidth =
+        Number.isFinite(rawMaxWidth) && rawMaxWidth > 0 ? rawMaxWidth : 300;
+
       this.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
+            const container = getContainerElement(_element, elementsMap);
+            const shouldConstrainWidth = !container && _element.autoResize;
+
+            const normalizedOriginalText = normalizeText(nextOriginalText);
+            const unconstrainedMetrics = measureText(
+              normalizedOriginalText,
+              getFontString(_element),
+              _element.lineHeight,
+            );
+
+            const widthUpdates =
+              shouldConstrainWidth && unconstrainedMetrics.width > textMaxWidth
+                ? ({
+                    autoResize: false,
+                    width: textMaxWidth,
+                  } as const)
+                : null;
+
+            const measurementElement = widthUpdates
+              ? newElementWith(_element, widthUpdates)
+              : _element;
+
             return newElementWith(_element, {
               originalText: nextOriginalText,
               isDeleted: isDeleted ?? _element.isDeleted,
+              ...(widthUpdates ? widthUpdates : {}),
               // returns (wrapped) text and new dimensions
               ...refreshTextDimensions(
-                _element,
-                getContainerElement(_element, elementsMap),
+                measurementElement,
+                container,
                 elementsMap,
                 nextOriginalText,
               ),
@@ -5763,8 +5811,6 @@ class App extends React.Component<AppProps, AppState> {
       autoSelect: autoSelect ?? !this.editorInterface.isTouchScreen,
       initialPointerDownSceneCoords,
     });
-    // deselect all other elements when inserting text
-    this.deselectElements();
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
@@ -7872,8 +7918,6 @@ class App extends React.Component<AppProps, AppState> {
         : /Linux/.test(window.navigator.platform);
 
     setCursor(this.interactiveCanvas, CURSOR_TYPE.GRABBING);
-    const startX = event.clientX;
-    const startY = event.clientY;
     let { clientX: lastX, clientY: lastY } = event;
     let didRightClickDragPan = false;
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
@@ -7882,7 +7926,10 @@ class App extends React.Component<AppProps, AppState> {
       lastX = event.clientX;
       lastY = event.clientY;
 
-      if (isRightClickPanning && (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0)) {
+      if (
+        isRightClickPanning &&
+        (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0)
+      ) {
         didRightClickDragPan = true;
       }
 
@@ -12382,6 +12429,7 @@ class App extends React.Component<AppProps, AppState> {
       CONTEXT_MENU_SEPARATOR,
       actionFlipHorizontal,
       actionFlipVertical,
+      actionStraighten,
       CONTEXT_MENU_SEPARATOR,
       actionToggleLinearEditor,
       CONTEXT_MENU_SEPARATOR,

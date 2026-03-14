@@ -10,6 +10,7 @@ import Vietnamese from "./Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTs3j6z
 import SourceHanSansSCBold from "./SourceHanSansSC-Bold.woff2";
 import SourceCodeProBlack from "./SourceCodePro-Black.ttf.woff2";
 import MapleMonoNormalNLBold from "./MapleMonoNormalNL-Bold.ttf.woff2";
+import SarasaFixedCLBoldNerdFont from "./sarasa-fixed-cl-bold-nerd-font.woff2";
 
 export const NunitoFontFaces: ExcalidrawFontFaceDescriptor[] = [
   {
@@ -61,6 +62,15 @@ export const SourceCodeProFontFaces: ExcalidrawFontFaceDescriptor[] = [
 export const MapleMonoNormalNLFontFaces: ExcalidrawFontFaceDescriptor[] = [
   {
     uri: MapleMonoNormalNLBold,
+    descriptors: {
+      weight: "700",
+    },
+  },
+];
+
+export const SarasaFixedCLBoldNerdFontFaces: ExcalidrawFontFaceDescriptor[] = [
+  {
+    uri: SarasaFixedCLBoldNerdFont,
     descriptors: {
       weight: "700",
     },

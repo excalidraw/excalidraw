@@ -10,6 +10,7 @@ import { CODES, KEYS, arrayToMap } from "@excalidraw/common";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
+import type { Radians } from "@excalidraw/math";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
@@ -76,6 +77,50 @@ export const actionFlipVertical = register({
   keyTest: (event) =>
     event.shiftKey && event.code === CODES.V && !event[KEYS.CTRL_OR_CMD],
 });
+
+export const actionStraighten = register({
+  name: "straighten",
+  label: "labels.straighten",
+  trackEvent: { category: "element" },
+  perform: (elements, appState, _, app) => {
+    return {
+      elements: updateFrameMembershipOfSelectedElements(
+        straightenSelectedElements(elements, appState),
+        appState,
+        app,
+      ),
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+});
+
+const straightenSelectedElements = (
+  elements: readonly ExcalidrawElement[],
+  appState: Readonly<AppState>,
+) => {
+  const selectedElements = getSelectedElements(
+    getNonDeletedElements(elements),
+    appState,
+    {
+      includeBoundTextElement: true,
+      includeElementsInFrames: true,
+    },
+  );
+
+  const updatedElements = selectedElements
+    .filter((element) => element.angle !== 0)
+    .map((element) => newElementWith(element, { angle: 0 as Radians }));
+
+  if (!updatedElements.length) {
+    return elements;
+  }
+
+  const updatedElementsMap = arrayToMap(updatedElements);
+  return elements.map(
+    (element) => updatedElementsMap.get(element.id) || element,
+  );
+};
 
 const flipSelectedElements = (
   elements: readonly ExcalidrawElement[],
