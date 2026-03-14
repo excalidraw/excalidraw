@@ -156,8 +156,11 @@ export const deriveStylesPanelMode = (
     return "mobile";
   }
 
-  // Always use compact styles panel (2-button popups) for non-phone
-  return "compact";
+  if (editorInterface.formFactor === "tablet") {
+    return "compact";
+  }
+
+  return editorInterface.desktopUIMode;
 };
 
 export const createUserAgentDescriptor = (
