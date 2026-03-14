@@ -459,6 +459,14 @@ export const createFile = (
   });
 };
 
+const isSVGContent = async (file: Blob | File): Promise<boolean> => {
+  const leadingText = new TextDecoder().decode(
+    await blobToArrayBuffer(file.slice(0, 200)),
+  );
+  const trimmed = leadingText.trimStart();
+  return trimmed.startsWith("<?xml") || trimmed.startsWith("<svg");
+};
+
 const normalizedFileSymbol = Symbol("fileNormalized");
 
 /** attempts to detect correct mimeType if none is set, or if an image
@@ -473,7 +481,16 @@ export const normalizeFile = async (file: File) => {
   if (file?.name?.endsWith(".excalidrawlib")) {
     file = createFile(file, MIME_TYPES.excalidrawlib, file.name);
   } else if (file?.name?.endsWith(".excalidraw")) {
-    file = createFile(file, MIME_TYPES.excalidraw, file.name);
+    // Content sniff: file might be SVG or image saved with wrong extension
+    const actualImageMime = await getActualMimeTypeFromImage(file);
+    const imageMimeValues: readonly string[] = Object.values(IMAGE_MIME_TYPES);
+    if (actualImageMime && imageMimeValues.includes(actualImageMime)) {
+      file = createFile(file, actualImageMime, file.name);
+    } else if (await isSVGContent(file)) {
+      file = createFile(file, MIME_TYPES.svg, file.name);
+    } else {
+      file = createFile(file, MIME_TYPES.excalidraw, file.name);
+    }
   } else if (!file.type || file.type?.startsWith("image/")) {
     // when the file is an image, make sure the extension corresponds to the
     // actual mimeType (this is an edge case, but happens - especially
