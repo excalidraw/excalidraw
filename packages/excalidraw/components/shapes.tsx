@@ -1,7 +1,10 @@
-import { KEYS } from "@excalidraw/common";
+import { KEYS, capitalizeString } from "@excalidraw/common";
+
+import { t } from "../i18n";
 
 import {
   SelectionIcon,
+  LassoIcon,
   RectangleIcon,
   DiamondIcon,
   EllipseIcon,
@@ -16,6 +19,20 @@ import {
 } from "./icons";
 
 import type { AppClassProperties } from "../types";
+
+export const SELECTION_TOOLS = [
+  { type: "selection", icon: SelectionIcon },
+  { type: "lasso", icon: LassoIcon },
+] as const;
+
+export const getSelectionToolOptions = () =>
+  SELECTION_TOOLS.map(({ type, icon }) => ({
+    type,
+    icon,
+    title: capitalizeString(
+      t(type === "selection" ? "toolBar.selection" : "toolBar.lasso"),
+    ),
+  }));
 
 export const SHAPES = [
   {
@@ -117,19 +134,23 @@ export const SHAPES = [
 ] as const;
 
 export const getToolbarTools = (app: AppClassProperties) => {
-  return app.state.preferredSelectionTool.type === "lasso"
-    ? ([
-        {
-          value: "lasso",
-          icon: SelectionIcon,
-          key: KEYS.V,
-          numericKey: KEYS["1"],
-          fillable: true,
-          toolbar: true,
-        },
-        ...SHAPES.slice(1),
-      ] as const)
-    : SHAPES;
+  const selectionType = app.state.preferredSelectionTool.type;
+
+  if (selectionType === "selection") {
+    return SHAPES;
+  }
+
+  const selectionTool = SELECTION_TOOLS.find((t) => t.type === selectionType);
+
+  if (!selectionTool) {
+    return SHAPES;
+  }
+
+  return SHAPES.map((shape) =>
+    shape.value === "selection"
+      ? ({ ...shape, value: selectionType, icon: selectionTool.icon } as const)
+      : shape,
+  );
 };
 
 export const findShapeByKey = (key: string, app: AppClassProperties) => {
