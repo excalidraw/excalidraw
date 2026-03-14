@@ -6761,27 +6761,23 @@ class App extends React.Component<AppProps, AppState> {
           },
           { informMutation: false, isDragging: false },
         );
+        const newLastIdx = multiElement.points.length - 1;
         this.setState({
           selectedLinearElement: {
             ...selectedLinearElement,
-            selectedPointsIndices:
-              selectedLinearElement.selectedPointsIndices?.includes(
-                multiElement.points.length,
-              )
-                ? [
-                    ...selectedLinearElement.selectedPointsIndices.filter(
-                      (idx) =>
-                        idx !== multiElement.points.length &&
-                        idx !== multiElement.points.length - 1,
+            selectedPointsIndices: selectedLinearElement.selectedPointsIndices
+              ? [
+                  ...new Set(
+                    selectedLinearElement.selectedPointsIndices.map((idx) =>
+                      Math.min(idx, newLastIdx),
                     ),
-                    multiElement.points.length - 1,
-                  ]
-                : selectedLinearElement.selectedPointsIndices,
-            lastCommittedPoint:
-              multiElement.points[multiElement.points.length - 1],
+                  ),
+                ]
+              : selectedLinearElement.selectedPointsIndices,
+            lastCommittedPoint: multiElement.points[newLastIdx],
             initialState: {
               ...selectedLinearElement.initialState,
-              lastClickedPoint: multiElement.points.length - 1,
+              lastClickedPoint: newLastIdx,
             },
           },
         });
