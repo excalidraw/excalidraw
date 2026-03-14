@@ -257,6 +257,7 @@ import {
   handleFocusPointPointerUp,
   maybeHandleArrowPointlikeDrag,
   getUncroppedWidthAndHeight,
+  getBoundTextPathProps,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6095,6 +6096,14 @@ class App extends React.Component<AppProps, AppState> {
       });
 
     if (!existingTextElement && shouldBindToContainer && container) {
+      if (isArrowElement(container)) {
+        // default positioning for bound text on arrows
+        const boundTextPathProps = getBoundTextPathProps(element, container);
+        this.scene.mutateElement(element, {
+          pathProps: boundTextPathProps,
+        });
+      }
+
       this.scene.mutateElement(container, {
         boundElements: (container.boundElements || []).concat({
           type: "text",
@@ -7140,6 +7149,15 @@ class App extends React.Component<AppProps, AppState> {
           : hoverPointIndex >= 0;
         if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+        } else if (
+          isArrowElement(element) &&
+          hitElementBoundText(
+            pointFrom(scenePointerX, scenePointerY),
+            element,
+            elementsMap,
+          )
+        ) {
+          setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
         } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
           if (
             // Elbow arrows can only be moved when unconnected
@@ -9350,6 +9368,26 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
+        // Here is where we could potentially account for dragging of bound text elements
+        if (
+          linearElementEditor.isDragging &&
+          linearElementEditor.lastBoundTextPathProps
+        ) {
+          const updatedEditor = LinearElementEditor.handleBoundTextDragging(
+            linearElementEditor,
+            this.scene,
+            pointerCoords.x,
+            pointerCoords.y,
+          );
+          if (updatedEditor) {
+            pointerDownState.drag.hasOccurred = true;
+            this.setState({
+              selectedLinearElement: updatedEditor,
+            });
+          }
+          return;
+        }
+
         if (
           LinearElementEditor.shouldAddMidpoint(
             this.state.selectedLinearElement,
@@ -10227,7 +10265,8 @@ class App extends React.Component<AppProps, AppState> {
       if (
         this.state.selectedLinearElement?.isEditing &&
         !this.state.newElement &&
-        this.state.selectedLinearElement.draggedFocusPointBinding === null
+        this.state.selectedLinearElement.draggedFocusPointBinding === null &&
+        !this.state.selectedLinearElement.lastBoundTextPathProps
       ) {
         if (
           !pointerDownState.boxSelection.hasOccurred &&
@@ -10278,6 +10317,14 @@ class App extends React.Component<AppProps, AppState> {
             selectedLinearElement: {
               ...this.state.selectedLinearElement,
               draggedFocusPointBinding: null,
+            },
+          });
+        } else if (this.state.selectedLinearElement.lastBoundTextPathProps) {
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              lastBoundTextPathProps: null,
+              isDragging: false,
             },
           });
         } else if (
