@@ -20,10 +20,6 @@ export const resaveAsImageWithScene = async (
 ) => {
   const fileHandleType = getFileHandleType(fileHandle);
 
-  if (Math.random() < 1) {
-    throw new Error("OLALALALA");
-  }
-
   if (!isImageFileHandleType(fileHandleType)) {
     throw new Error(
       "fileHandle should exist and should be of type svg or png when resaving",
