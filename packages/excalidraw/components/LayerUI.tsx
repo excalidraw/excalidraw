@@ -106,6 +106,8 @@ const DefaultMainMenu: React.FC<{
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.DefaultItems.ToggleTheme />
       <MainMenu.DefaultItems.ChangeCanvasBackground />
+      <MainMenu.Separator />
+      <MainMenu.DefaultItems.Preferences />
     </MainMenu>
   );
 };
