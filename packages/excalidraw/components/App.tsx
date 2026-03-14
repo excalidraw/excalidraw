@@ -1720,7 +1720,7 @@ class App extends React.Component<AppProps, AppState> {
               }}
             >
               <div
-                //this is a hack that addresses isse with embedded excalidraw.com embeddable
+                //this is a hack that addresses issue with embedded excalidraw.com embeddable
                 //https://github.com/excalidraw/excalidraw/pull/6691#issuecomment-1607383938
                 /*ref={(ref) => {
                   if (!this.excalidrawContainerRef.current) {
@@ -2527,7 +2527,7 @@ class App extends React.Component<AppProps, AppState> {
           data: {
             status: "error",
             code: "ERR_OAI",
-            message: "Nothing genereated :(",
+            message: "Nothing generated :(",
           },
         });
         return;
@@ -4487,7 +4487,7 @@ class App extends React.Component<AppProps, AppState> {
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       /**
-       *  Controls which updates should be captured by the `Store`. Captured updates are emmitted and listened to by other components, such as `History` for undo / redo purposes.
+       *  Controls which updates should be captured by the `Store`. Captured updates are emitted and listened to by other components, such as `History` for undo / redo purposes.
        *
        *  - `CaptureUpdateAction.IMMEDIATELY`: Updates are immediately undoable. Use for most local updates.
        *  - `CaptureUpdateAction.NEVER`: Updates never make it to undo/redo stack. Use for remote updates or scene initialization.
@@ -4538,7 +4538,7 @@ class App extends React.Component<AppProps, AppState> {
     // squash all deltas together, starting with a fresh new delta instance
     const aggregatedDelta = StoreDelta.squash(...deltas);
 
-    // create new instance of elements map & appState, so we don't accidentaly mutate existing ones
+    // create new instance of elements map & appState, so we don't accidentally mutate existing ones
     const nextAppState = { ...this.state };
     const nextElements = new Map(
       this.scene.getElementsMapIncludingDeleted(),
@@ -7762,7 +7762,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   /**
-   * pointerup may not fire in certian cases (user tabs away...), so in order
+   * pointerup may not fire in certain cases (user tabs away...), so in order
    * to properly cleanup pointerdown state, we need to fire any hanging
    * pointerup handlers manually
    */
@@ -7793,7 +7793,7 @@ class App extends React.Component<AppProps, AppState> {
     // automatically
     this.focusContainer();
 
-    // preventing defualt while text editing messes with cursor/focus
+    // preventing default while text editing messes with cursor/focus
     if (!this.state.editingTextElement) {
       // necessary to prevent browser from scrolling the page if excalidraw
       // not full-page #4489
@@ -7834,7 +7834,7 @@ class App extends React.Component<AppProps, AppState> {
         };
 
         /*
-         * Reenable next paste in case of disabled middle click paste for
+         * Re-enable next paste in case of disabled middle click paste for
          * any reason:
          * - right click paste
          * - empty clipboard
@@ -8638,7 +8638,7 @@ class App extends React.Component<AppProps, AppState> {
     return element;
   };
 
-  //create rectangle element with youtube top left on nearest grid point width / hight 640/360
+  //create rectangle element with youtube top left on nearest grid point width / height 640/360
   public insertEmbeddableElement = ({
     sceneX,
     sceneY,
@@ -9667,7 +9667,7 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
 
-          // Snap cache *must* be synchronously popuplated before initial drag,
+          // Snap cache *must* be synchronously populated before initial drag,
           // otherwise the first drag even will not snap, causing a jump before
           // it snaps to its position if previously snapped already.
           this.maybeCacheVisibleGaps(event, selectedElements);
@@ -10865,7 +10865,7 @@ class App extends React.Component<AppProps, AppState> {
                     prevState,
                     this,
                   ),
-                  // set selectedLinearElement only if thats the only element selected
+                  // set selectedLinearElement only if that's the only element selected
                   selectedLinearElement:
                     newSelectedElements.length === 1 &&
                     isLinearElement(newSelectedElements[0])

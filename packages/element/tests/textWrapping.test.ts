@@ -10,7 +10,7 @@ describe("Test wrapText", () => {
 
   it("should wrap the text correctly when word length is exactly equal to max width", () => {
     const text = "Hello Excalidraw";
-    // Length of "Excalidraw" is 100 and exacty equal to max width
+    // Length of "Excalidraw" is 100 and exactly equal to max width
     const res = wrapText(text, font, 100);
     expect(res).toEqual(`Hello\nExcalidraw`);
   });
@@ -258,7 +258,7 @@ describe("Test wrapText", () => {
       expect(res).toBe("\nHello\nworld");
     });
 
-    it("should break and collapse leading whitespaces whe words break", () => {
+    it("should break and collapse leading whitespaces when words break", () => {
       const maxWidth = 30;
       const res = wrapText(text, font, maxWidth);
       expect(res).toBe("\nHel\nlo\nwor\nld");

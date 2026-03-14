@@ -1092,7 +1092,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     deleted,
     inserted,
   }: Delta<ElementPartial>) =>
-    // dissallowing added as "deleted", which could cause issues when resolving conflicts
+    // disallowing added as "deleted", which could cause issues when resolving conflicts
     deleted.isDeleted === true && !inserted.isDeleted;
 
   private static satisfiesRemoval = ({
@@ -1766,7 +1766,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
       if (prevElement === nextElement) {
         // create the new element instance in case we didn't modify the element yet
-        // so that we won't end up in an incosistent state in case we would fail in the middle of mutations
+        // so that we won't end up in an inconsistent state in case we would fail in the middle of mutations
         affectedElement = newElementWith(
           nextElement,
           {
@@ -2024,7 +2024,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
       // don't diff the points as:
       // - we can't ensure the multiplayer order consistency without fractional index on each point
-      // - we prefer to not merge the points, as it might just lead to unexpected / incosistent results
+      // - we prefer to not merge the points, as it might just lead to unexpected / inconsistent results
       const deletedPoints =
         (
           deleted as ElementPartial<

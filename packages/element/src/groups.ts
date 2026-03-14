@@ -89,7 +89,7 @@ export const selectGroupsForSelectedElements = (function () {
     }
 
     const selectedGroupIds: Record<GroupId, boolean> = {};
-    // Gather all the groups withing selected elements
+    // Gather all the groups within selected elements
     for (const selectedElement of selectedElements) {
       let groupIds = selectedElement.groupIds;
       if (appState.editingGroupId) {

@@ -410,7 +410,7 @@ describe("history", () => {
       Keyboard.undo();
       expect(API.getUndoStack().length).toBe(1);
       expect(API.getRedoStack().length).toBe(3);
-      assertSelectedElements(rect); // get's reselected with out pushed entry!
+      assertSelectedElements(rect); // gets reselected with out pushed entry!
       expect(h.elements).toEqual([
         expect.objectContaining({ id: rect.id, backgroundColor: transparent }),
       ]);
@@ -2629,7 +2629,7 @@ describe("history", () => {
       expect(API.getRedoStack().length).toBe(0);
       expect(h.elements).toEqual([
         expect.objectContaining({
-          backgroundColor: yellow, // the color still get's updated
+          backgroundColor: yellow, // the color still gets updated
           isDeleted: true, // but the element remains deleted
         }),
       ]);
@@ -3892,7 +3892,7 @@ describe("history", () => {
             expect.objectContaining({
               ...containerProps,
               id: container.id,
-              // we trigged unbind - bindings from non deleted to deleted cannot exist!
+              // we triggered unbind - bindings from non deleted to deleted cannot exist!
               boundElements: [],
               isDeleted: false,
             }),
@@ -3974,7 +3974,7 @@ describe("history", () => {
           elements: [
             newElementWith(h.elements[0], {
               boundElements: [{ id: remoteText.id, type: "text" }],
-              isDeleted: false, // purposefully undeleting, mimicing concurrenct update
+              isDeleted: false, // purposefully undeleting, mimicking concurrenct update
             }),
             h.elements[1],
             // rebinding the container with a new text element!
@@ -4433,7 +4433,7 @@ describe("history", () => {
           }),
           expect.objectContaining({
             ...textProps,
-            // bound text got redrawn, as redraw is triggered based on container positon!
+            // bound text got redrawn, as redraw is triggered based on container position!
             id: text.id,
             containerId: container.id,
             isDeleted: false,

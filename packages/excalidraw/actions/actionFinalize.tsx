@@ -343,7 +343,7 @@ export const actionFinalize = register<FormData>({
 
         selectedLinearElement,
       },
-      // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
+      // TODO: #7348 we should not capture everything, but if we don't, it leads to inconsistencies -> revisit
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },

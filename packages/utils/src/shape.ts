@@ -62,7 +62,7 @@ import type { Drawable, Op } from "roughjs/bin/core";
 export type Polyline<Point extends GlobalPoint | LocalPoint> =
   LineSegment<Point>[];
 
-// a polycurve is a curve consisting of ther curves, this corresponds to a complex
+// a polycurve is a curve consisting of other curves, this corresponds to a complex
 // curve on the canvas
 export type Polycurve<Point extends GlobalPoint | LocalPoint> = Curve<Point>[];
 

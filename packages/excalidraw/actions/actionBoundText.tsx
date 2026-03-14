@@ -168,7 +168,7 @@ export const actionBindText = register({
     });
     const originalContainerHeight = container.height;
     redrawTextBoundingBox(textElement, container, app.scene);
-    // overwritting the cache with original container height so
+    // overwriting the cache with original container height so
     // it can be restored when unbind
     updateOriginalContainerCache(container.id, originalContainerHeight);
 
