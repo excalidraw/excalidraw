@@ -1523,7 +1523,7 @@ const _renderInteractiveScene = ({
   elementsMap: RenderableElementsMap;
   animationState?: typeof animationState;
 } => {
-  if (canvas === null) {
+  if (canvas === null || !visibleElements) {
     return { atLeastOneVisibleElement: false, elementsMap };
   }
 

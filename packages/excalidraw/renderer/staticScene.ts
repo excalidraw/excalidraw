@@ -236,7 +236,7 @@ const _renderStaticScene = ({
   appState,
   renderConfig,
 }: StaticSceneRenderConfig) => {
-  if (canvas === null) {
+  if (canvas === null || !visibleElements) {
     return;
   }
 
