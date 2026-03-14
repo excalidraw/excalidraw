@@ -5,7 +5,8 @@
   "workspaces": [
     "excalidraw-app",
     "packages/*",
-    "examples/*"
+    "examples/*",
+    "tools/*"
   ],
   "devDependencies": {
     "@babel/preset-env": "7.26.9",
@@ -60,7 +61,9 @@
     "build:version": "yarn --cwd ./excalidraw-app build:version",
     "build": "yarn --cwd ./excalidraw-app build",
     "build:preview": "yarn --cwd ./excalidraw-app build:preview",
+    "build:mcp:excalidraw": "yarn --cwd ./tools/mcp-excalidraw build",
     "start": "yarn --cwd ./excalidraw-app start",
+    "mcp:excalidraw": "yarn build:mcp:excalidraw && node ./tools/mcp-excalidraw/dist/index.js",
     "start:production": "yarn --cwd ./excalidraw-app start:production",
     "start:example": "yarn build:packages && yarn --cwd ./examples/with-script-in-browser start",
     "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watch=false",
