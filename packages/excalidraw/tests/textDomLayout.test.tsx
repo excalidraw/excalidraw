@@ -1,5 +1,13 @@
 import React from "react";
 
+import { getFontString, sceneCoordsToViewportCoords } from "@excalidraw/common";
+import {
+  measureText,
+  wrapTextPreservingWhitespaceWithExplicitNewlineMarkers,
+} from "@excalidraw/element";
+
+import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
@@ -18,6 +26,133 @@ unmountComponent();
 
 const { h } = window;
 const mouse = new Pointer("mouse");
+
+const getTextEditorBasePosition = (editor: HTMLTextAreaElement) => {
+  const left = parseFloat(editor.style.left);
+  const top = parseFloat(editor.style.top);
+  if (!Number.isFinite(left) || !Number.isFinite(top)) {
+    throw new Error("invalid text editor position");
+  }
+  return { x: left, y: top };
+};
+
+const getTextElementBasePosition = (element: { x: number; y: number }) => {
+  const { x, y } = sceneCoordsToViewportCoords(
+    { sceneX: element.x, sceneY: element.y },
+    h.state,
+  );
+  return { x, y };
+};
+
+const getWrappedLinesAndLineStartIndices = ({
+  value,
+  font,
+  maxWidth,
+  shouldWrap,
+}: {
+  value: string;
+  font: ReturnType<typeof getFontString>;
+  maxWidth: number;
+  shouldWrap: boolean;
+}) => {
+  const normalizedValue = value.replace(/\r\n?/g, "\n");
+
+  const { lines, explicitNewlineAfterLine } = shouldWrap
+    ? wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
+        normalizedValue,
+        font,
+        maxWidth,
+      )
+    : {
+        lines: normalizedValue.split("\n"),
+        explicitNewlineAfterLine: normalizedValue
+          .split("\n")
+          .map((_line, idx, arr) => idx < arr.length - 1),
+      };
+
+  const lineStartIndices: number[] = [];
+  let currentIndex = 0;
+  for (let i = 0; i < lines.length; i++) {
+    lineStartIndices.push(currentIndex);
+    currentIndex += lines[i]?.length ?? 0;
+    if (explicitNewlineAfterLine[i]) {
+      currentIndex += 1;
+    }
+  }
+
+  return { normalizedValue, lines, lineStartIndices };
+};
+
+const getCaretViewportPositions = ({
+  element,
+  value,
+  base,
+}: {
+  element: ExcalidrawTextElement;
+  value: string;
+  base: { x: number; y: number };
+}) => {
+  const shouldWrap = !element.autoResize;
+  const font = getFontString(element);
+  const maxWidth = element.width;
+  const lineHeightPx = element.fontSize * element.lineHeight;
+
+  const { normalizedValue, lines, lineStartIndices } =
+    getWrappedLinesAndLineStartIndices({
+      value,
+      font,
+      maxWidth,
+      shouldWrap,
+    });
+
+  const getLineIndexForCharIndex = (index: number) => {
+    const clampedIndex = Math.max(0, Math.min(normalizedValue.length, index));
+    let lineIndex = 0;
+    for (let i = 0; i < lineStartIndices.length; i++) {
+      if (lineStartIndices[i] <= clampedIndex) {
+        lineIndex = i;
+      } else {
+        break;
+      }
+    }
+    return lineIndex;
+  };
+
+  const caretPositions: Array<{ x: number; y: number }> = [];
+  for (let index = 0; index <= normalizedValue.length; index++) {
+    const lineIndex = getLineIndexForCharIndex(index);
+    const lineText = lines[lineIndex] ?? "";
+    const lineStartIndex = lineStartIndices[lineIndex] ?? 0;
+    const col = Math.max(0, Math.min(lineText.length, index - lineStartIndex));
+
+    const lineWidth =
+      lineText === ""
+        ? 0
+        : measureText(lineText, font, element.lineHeight).width;
+
+    let lineOffsetX = 0;
+    if (element.textAlign === "center") {
+      lineOffsetX = (maxWidth - lineWidth) / 2;
+    } else if (element.textAlign === "right") {
+      lineOffsetX = maxWidth - lineWidth;
+    }
+    lineOffsetX = Math.max(0, lineOffsetX);
+
+    const prefix = lineText.slice(0, col);
+    const prefixWidth =
+      prefix === "" ? 0 : measureText(prefix, font, element.lineHeight).width;
+
+    const localX = lineOffsetX + prefixWidth;
+    const localY = lineIndex * lineHeightPx;
+
+    caretPositions.push({
+      x: base.x + localX,
+      y: base.y + localY,
+    });
+  }
+
+  return caretPositions;
+};
 
 describe("text DOM layout (route B)", () => {
   const dimensions = { width: 800, height: 400 };
@@ -180,6 +315,53 @@ describe("text DOM layout (route B)", () => {
     });
   });
 
+  it("editing text shouldn't change interactive canvas selection box bitmap", async () => {
+    const text = API.createElement({
+      type: "text",
+      text: "Excalidraw Editor is great",
+      x: 100,
+      y: 60,
+    });
+    API.setElements([text]);
+
+    UI.resize(text, "e", [-120, 0]);
+    expect(text.autoResize).toBe(false);
+
+    UI.clickTool("selection");
+    mouse.clickAt(text.x + text.width / 2, text.y + text.height / 2);
+
+    await waitFor(() => {
+      expect(h.state.selectedElementIds[text.id]).toBeTruthy();
+    });
+
+    const canvas =
+      document.querySelector<HTMLCanvasElement>("canvas.interactive")!;
+    const context = canvas.getContext("2d")!;
+    const before = new Uint8ClampedArray(
+      context.getImageData(0, 0, canvas.width, canvas.height).data,
+    );
+
+    mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
+    const editor = await getTextEditor();
+    expect(editor).not.toBe(null);
+
+    await waitFor(() => {
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+    });
+
+    const after = new Uint8ClampedArray(
+      context.getImageData(0, 0, canvas.width, canvas.height).data,
+    );
+
+    expect(after).toEqual(before);
+
+    Keyboard.exitTextEditor(editor);
+
+    await waitFor(() => {
+      expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
+    });
+  });
+
   it("double-clicking at most positions shouldn't change editor overlay geometry", async () => {
     const text = API.createElement({
       type: "text",
@@ -313,5 +495,139 @@ describe("text DOM layout (route B)", () => {
     await waitFor(() => {
       expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
     });
+  });
+
+  it("clicking to edit the text box will not change the character absolute position", async () => {
+    const value =
+      "随机文本 Random text 你好，world!  1234\n第二行  spaces  + symbols: ~!@#$%^&*()_+\n\n第三行 end.";
+
+    const text = API.createElement({
+      type: "text",
+      text: "x",
+      x: 120,
+      y: 80,
+      width: 320,
+      height: 80,
+      textAlign: "left",
+      verticalAlign: "top",
+    });
+    API.setElements([text]);
+
+    UI.clickTool("selection");
+    UI.resize(text, "e", [-80, 0]);
+    expect(text.autoResize).toBe(false);
+
+    UI.clickTool("selection");
+    mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
+    const editor = await getTextEditor();
+    expect(h.state.editingTextElement?.id).toBe(text.id);
+    updateTextEditor(editor, value);
+    Keyboard.exitTextEditor(editor);
+
+    await waitFor(() => {
+      const latest = API.getElement(text);
+      expect(latest.originalText).toBe(value);
+    });
+
+    const latest = API.getElement(text);
+    const nonEditPositions = getCaretViewportPositions({
+      element: latest,
+      value: latest.originalText,
+      base: getTextElementBasePosition(latest),
+    });
+
+    UI.clickTool("selection");
+    mouse.doubleClickAt(
+      latest.x + latest.width / 2,
+      latest.y + latest.height / 2,
+    );
+    const editor2 = await getTextEditor();
+    expect(h.state.editingTextElement?.id).toBe(text.id);
+    expect(editor2.value.replace(/\r\n?/g, "\n")).toBe(
+      latest.originalText.replace(/\r\n?/g, "\n"),
+    );
+
+    const editPositions = getCaretViewportPositions({
+      element: latest,
+      value: editor2.value,
+      base: getTextEditorBasePosition(editor2),
+    });
+
+    expect(editPositions).toEqual(nonEditPositions);
+
+    Keyboard.exitTextEditor(editor2);
+
+    await waitFor(() => {
+      expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
+    });
+  });
+
+  it("resizing text narrower and clicking to edit shouldn't change character absolute position", async () => {
+    const value =
+      "随机文本 Random text 你好，world!  1234\n第二行  spaces  + symbols: ~!@#$%^&*()_+\n\n第三行 end.";
+
+    const text = API.createElement({
+      type: "text",
+      text: "x",
+      x: 120,
+      y: 80,
+      width: 360,
+      height: 80,
+      textAlign: "left",
+      verticalAlign: "top",
+    });
+    API.setElements([text]);
+
+    UI.clickTool("selection");
+    UI.resize(text, "e", [-80, 0]);
+    expect(text.autoResize).toBe(false);
+
+    UI.clickTool("selection");
+    mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
+    const editor = await getTextEditor();
+    expect(h.state.editingTextElement?.id).toBe(text.id);
+    updateTextEditor(editor, value);
+    Keyboard.exitTextEditor(editor);
+
+    await waitFor(() => {
+      const latest = API.getElement(text);
+      expect(latest.originalText).toBe(value);
+    });
+
+    for (const deltaX of [-40, -40, -40]) {
+      UI.clickTool("selection");
+      UI.resize(API.getElement(text), "e", [deltaX, 0]);
+
+      const latest = API.getElement(text);
+      expect(latest.autoResize).toBe(false);
+
+      const nonEditPositions = getCaretViewportPositions({
+        element: latest,
+        value: latest.originalText,
+        base: getTextElementBasePosition(latest),
+      });
+
+      UI.clickTool("selection");
+      mouse.doubleClickAt(
+        latest.x + latest.width / 2,
+        latest.y + latest.height / 2,
+      );
+      const editor2 = await getTextEditor();
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+
+      const editPositions = getCaretViewportPositions({
+        element: latest,
+        value: editor2.value,
+        base: getTextEditorBasePosition(editor2),
+      });
+
+      expect(editPositions).toEqual(nonEditPositions);
+
+      Keyboard.exitTextEditor(editor2);
+
+      await waitFor(() => {
+        expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
+      });
+    }
   });
 });

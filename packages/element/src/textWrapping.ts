@@ -432,6 +432,137 @@ export const wrapTextPreservingWhitespace = (
   return lines.join("\n");
 };
 
+let domWrapElement: HTMLDivElement | null = null;
+
+const canUseDomTextWrapping = () => {
+  if (isTestEnv()) {
+    return false;
+  }
+  if (typeof document === "undefined") {
+    return false;
+  }
+  if (!document.body) {
+    return false;
+  }
+  if (typeof document.createRange !== "function") {
+    return false;
+  }
+  return true;
+};
+
+const getDomWrapElement = () => {
+  if (domWrapElement && domWrapElement.isConnected) {
+    return domWrapElement;
+  }
+
+  const el = document.createElement("div");
+  Object.assign(el.style, {
+    position: "fixed",
+    left: "0px",
+    top: "0px",
+    visibility: "hidden",
+    pointerEvents: "none",
+    padding: "0px",
+    margin: "0px",
+    border: "0px",
+    boxSizing: "content-box",
+    overflow: "hidden",
+    overflowWrap: "break-word",
+    wordBreak: "break-word",
+  } as Partial<CSSStyleDeclaration>);
+
+  document.body.appendChild(el);
+  domWrapElement = el;
+  return el;
+};
+
+const wrapTextPreservingWhitespaceWithExplicitNewlineMarkersUsingDom = (
+  text: string,
+  font: FontString,
+  maxWidth: number,
+): { lines: string[]; explicitNewlineAfterLine: boolean[] } => {
+  const normalizedText = text.replace(/\r\n?/g, "\n");
+
+  if (!Number.isFinite(maxWidth) || maxWidth < 0) {
+    const originalLines = normalizedText.split("\n");
+    return {
+      lines: originalLines,
+      explicitNewlineAfterLine: originalLines.map(
+        (_line, index) => index < originalLines.length - 1,
+      ),
+    };
+  }
+
+  const el = getDomWrapElement();
+  el.style.font = font;
+  el.style.width = `${maxWidth}px`;
+
+  const supportsBreakSpaces =
+    typeof CSS !== "undefined" &&
+    typeof CSS.supports === "function" &&
+    CSS.supports("white-space", "break-spaces");
+
+  el.style.whiteSpace = supportsBreakSpaces ? "break-spaces" : "pre-wrap";
+
+  el.textContent = normalizedText;
+
+  const textNode = el.firstChild as Text | null;
+  if (!textNode) {
+    return { lines: [""], explicitNewlineAfterLine: [false] };
+  }
+
+  const codepoints: Array<{ ch: string; start: number; end: number }> = [];
+  let offset = 0;
+  for (const ch of normalizedText) {
+    const start = offset;
+    offset += ch.length;
+    codepoints.push({ ch, start, end: offset });
+  }
+
+  const lines: string[] = [];
+  const explicitNewlineAfterLine: boolean[] = [];
+
+  let buffer = "";
+  let currentTop: number | null = null;
+
+  for (const { ch, start, end } of codepoints) {
+    if (ch === "\n") {
+      lines.push(buffer);
+      explicitNewlineAfterLine.push(true);
+      buffer = "";
+      currentTop = null;
+      continue;
+    }
+
+    const range = document.createRange();
+    range.setStart(textNode, start);
+    range.setEnd(textNode, end);
+    const rect = range.getBoundingClientRect();
+    const top = Math.round(rect.top);
+
+    if (currentTop === null) {
+      currentTop = top;
+      buffer += ch;
+      continue;
+    }
+
+    if (top !== currentTop) {
+      lines.push(buffer);
+      explicitNewlineAfterLine.push(false);
+      buffer = ch;
+      currentTop = top;
+      continue;
+    }
+
+    buffer += ch;
+  }
+
+  lines.push(buffer);
+  explicitNewlineAfterLine.push(false);
+
+  return { lines, explicitNewlineAfterLine };
+};
+
 export const wrapTextPreservingWhitespaceWithExplicitNewlineMarkers = (
   text: string,
   font: FontString,
@@ -448,6 +579,14 @@ export const wrapTextPreservingWhitespaceWithExplicitNewlineMarkers = (
   // 这样渲染层可以做到：
   // - 文本照常自动换行
   // - 仅在用户真实输入的换行处显示 ↵（不会在自动换行处显示）
+
+  if (canUseDomTextWrapping()) {
+    return wrapTextPreservingWhitespaceWithExplicitNewlineMarkersUsingDom(
+      text,
+      font,
+      maxWidth,
+    );
+  }
 
   const normalizedText = text.replace(/\r\n?/g, "\n");
 

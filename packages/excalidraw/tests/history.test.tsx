@@ -43,8 +43,6 @@ import type {
   SceneElementsMap,
 } from "@excalidraw/element/types";
 
-import "../global.js";
-
 import {
   actionSendBackward,
   actionBringForward,
