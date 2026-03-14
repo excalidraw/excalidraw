@@ -14,6 +14,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
+import { sanitizeMermaidElementText } from "../../mermaid";
 
 import type { MermaidToExcalidrawLibProps } from "./types";
 
@@ -94,7 +95,8 @@ export const convertMermaidToExcalidraw = async ({
       }
     }
 
-    const { elements, files = {} } = ret;
+    const { elements: rawElements, files = {} } = ret;
+    const elements = sanitizeMermaidElementText(rawElements);
     setError(null);
 
     data.current = {

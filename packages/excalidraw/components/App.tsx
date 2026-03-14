@@ -419,7 +419,10 @@ import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
 
-import { isMaybeMermaidDefinition } from "../mermaid";
+import {
+  isMaybeMermaidDefinition,
+  sanitizeMermaidElementText,
+} from "../mermaid";
 
 import { LassoTrail } from "../lasso";
 
@@ -3703,8 +3706,10 @@ class App extends React.Component<AppProps, AppState> {
     if (!isPlainPaste && isMaybeMermaidDefinition(data.text)) {
       const api = await import("@excalidraw/mermaid-to-excalidraw");
       try {
-        const { elements: skeletonElements, files = {} } =
+        const { elements: rawSkeletonElements, files = {} } =
           await api.parseMermaidToExcalidraw(data.text);
+        const skeletonElements =
+          sanitizeMermaidElementText(rawSkeletonElements);
 
         const elements = convertToExcalidrawElements(skeletonElements, {
           regenerateIds: true,
