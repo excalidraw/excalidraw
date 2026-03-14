@@ -16,8 +16,6 @@ import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
   getFeatureFlag,
-  getFontString,
-  getVerticalOffset,
   invariant,
   THEME,
 } from "@excalidraw/common";
@@ -41,9 +39,7 @@ import {
   isLinearElement,
   isLineElement,
   maxBindingDistance_simple,
-  isTextElement,
   LinearElementEditor,
-  wrapTextPreservingWhitespaceWithExplicitNewlineMarkers,
 } from "@excalidraw/element";
 
 import { renderSelectionElement } from "@excalidraw/element";
@@ -74,7 +70,6 @@ import type {
   ExcalidrawFrameLikeElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
-  ExcalidrawTextElement,
   GroupId,
   NonDeleted,
   NonDeletedSceneElementsMap,
@@ -1485,92 +1480,6 @@ const renderCropHandles = (
   context.restore();
 };
 
-const renderTextBox = (
-  text: NonDeleted<ExcalidrawTextElement>,
-  context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
-  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
-) => {
-  context.save();
-  const padding = (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
-  const width = text.width + padding * 2;
-  const height = text.height + padding * 2;
-  const cx = text.x + width / 2;
-  const cy = text.y + height / 2;
-  const shiftX = -(width / 2 + padding);
-  const shiftY = -(height / 2 + padding);
-  context.translate(cx + appState.scrollX, cy + appState.scrollY);
-  context.rotate(text.angle);
-  if (!text.autoResize) {
-    context.lineWidth = 1 / appState.zoom.value;
-    context.strokeStyle = selectionColor;
-    context.strokeRect(shiftX, shiftY, width, height);
-  }
-
-  const zoom = appState.zoom.value;
-  const elementShiftX = shiftX + padding;
-  const elementShiftY = shiftY + padding;
-
-  const lineHeightPx = text.fontSize * text.lineHeight;
-  const verticalOffset = getVerticalOffset(
-    text.fontFamily,
-    text.fontSize,
-    lineHeightPx,
-  );
-
-  const font = getFontString(text);
-  const maxWidth = text.autoResize ? Infinity : text.width;
-  const { lines, explicitNewlineAfterLine } =
-    wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
-      text.originalText,
-      font,
-      maxWidth,
-    );
-
-  context.save();
-  const lineNumberFontSize = Math.max(10, text.fontSize * 0.8);
-  context.font = getFontString({
-    fontSize: lineNumberFontSize,
-    fontFamily: text.fontFamily,
-  });
-  context.fillStyle = "rgba(168, 168, 168, 0.55)";
-  context.textAlign = "right";
-  context.textBaseline = "alphabetic";
-
-  const gutterPadding = Math.max(4, lineNumberFontSize * 0.25);
-  const gutterRightX = elementShiftX - gutterPadding;
-
-  let lineNumber = 1;
-  for (let index = 0; index < lines.length; index++) {
-    const isNewLogicalLine = index === 0 || explicitNewlineAfterLine[index - 1];
-    if (isNewLogicalLine) {
-      context.fillText(
-        String(lineNumber),
-        gutterRightX,
-        elementShiftY + index * lineHeightPx + verticalOffset,
-      );
-    }
-    if (explicitNewlineAfterLine[index]) {
-      lineNumber++;
-    }
-  }
-  context.restore();
-
-  context.save();
-  context.strokeStyle = "rgba(168, 168, 168, 0.55)";
-  context.lineWidth = 1 / zoom;
-  context.setLineDash([4 / zoom, 2 / zoom]);
-  context.strokeRect(
-    elementShiftX + 0.5 / zoom,
-    elementShiftY + 0.5 / zoom,
-    Math.max(0, text.width - 1 / zoom),
-    Math.max(0, text.height - 1 / zoom),
-  );
-  context.restore();
-
-  context.restore();
-};
-
 const _renderInteractiveScene = ({
   app,
   canvas,
@@ -1648,23 +1557,6 @@ const _renderInteractiveScene = ({
       );
     } catch (error: any) {
       console.error(error);
-    }
-  }
-
-  if (
-    appState.editingTextElement &&
-    isTextElement(appState.editingTextElement)
-  ) {
-    const textElement = allElementsMap.get(appState.editingTextElement.id) as
-      | ExcalidrawTextElement
-      | undefined;
-    if (textElement && !textElement.autoResize) {
-      renderTextBox(
-        textElement,
-        context,
-        appState,
-        renderConfig.selectionColor,
-      );
     }
   }
 
@@ -1919,8 +1811,6 @@ const _renderInteractiveScene = ({
       if (
         !appState.viewModeEnabled &&
         showBoundingBox &&
-        // do not show transform handles when text is being edited
-        !isTextElement(appState.editingTextElement) &&
         // do not show transform handles when image is being cropped
         !appState.croppingElementId
       ) {
