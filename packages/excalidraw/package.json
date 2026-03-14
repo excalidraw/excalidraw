@@ -1,6 +1,6 @@
 {
   "name": "@emevart/excalidraw",
-  "version": "0.20.3",
+  "version": "0.20.5",
   "type": "module",
   "types": "./dist/types/excalidraw/index.d.ts",
   "main": "./dist/prod/index.js",
@@ -23,7 +23,8 @@
     },
     "./index.css": {
       "development": "./dist/dev/index.css",
-      "production": "./dist/prod/index.css"
+      "production": "./dist/prod/index.css",
+      "default": "./dist/prod/index.css"
     },
     ".": {
       "types": "./dist/types/excalidraw/index.d.ts",
@@ -33,7 +34,7 @@
     }
   },
   "files": [
-    "dist/*"
+    "dist/"
   ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
