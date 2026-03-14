@@ -1,4 +1,4 @@
-import { KEYS } from "@excalidraw/common";
+import { KEYS, getLatinKey } from "@excalidraw/common";
 
 import {
   SelectionIcon,
@@ -143,4 +143,10 @@ export const findShapeByKey = (key: string, app: AppClassProperties) => {
     );
   });
   return shape?.value || null;
+};
+
+/** Same as findShapeByKey but also checks physical key code for non-latin layouts. */
+export const findShapeByEvent = (event: KeyboardEvent | React.KeyboardEvent<Element>, app: AppClassProperties) => {
+  const key = getLatinKey(event);
+  return findShapeByKey(key, app);
 };

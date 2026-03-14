@@ -110,6 +110,8 @@ import {
   setDesktopUIMode,
   isSelectionLikeTool,
   oneOf,
+  isLatinChar,
+  getLatinKey,
 } from "@excalidraw/common";
 
 import {
@@ -451,7 +453,7 @@ import { isPointHittingLink } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 
-import { findShapeByKey } from "./shapes";
+import { findShapeByKey, findShapeByEvent } from "./shapes";
 
 import UnlockPopup from "./UnlockPopup";
 
@@ -4683,6 +4685,22 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
+      // normalize non-latin keys (e.g. Russian ЙЦУКЕН) to latin equivalents
+      // using physical key codes, so hotkeys work on any layout
+      if ("Proxy" in window && !isLatinChar(event.key) && /^Key[A-Z]$/.test(event.code)) {
+        event = new Proxy(event, {
+          get(ev: any, prop) {
+            const value = ev[prop];
+            if (typeof value === "function") {
+              return value.bind(ev);
+            }
+            return prop === "key"
+              ? getLatinKey(ev)
+              : value;
+          },
+        });
+      }
+
       if (!isInputLike(event.target)) {
         if (
           (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
@@ -4974,7 +4992,7 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.selectionElement &&
         !this.state.selectedElementsAreBeingDragged
       ) {
-        const shape = findShapeByKey(event.key, this);
+        const shape = findShapeByEvent(event, this);
 
         if (this.state.viewModeEnabled && !oneOf(shape, ["laser", "hand"])) {
           return;
