@@ -5,6 +5,7 @@
 .env.test.local
 .envrc
 .eslintcache
+.last-run.json
 .history
 .idea
 .vercel

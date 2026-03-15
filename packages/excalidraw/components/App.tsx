@@ -453,7 +453,7 @@ import { isPointHittingLink } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 
-import { findShapeByKey, findShapeByEvent } from "./shapes";
+import { findShapeByEvent } from "./shapes";
 
 import UnlockPopup from "./UnlockPopup";
 
@@ -4687,16 +4687,18 @@ class App extends React.Component<AppProps, AppState> {
 
       // normalize non-latin keys (e.g. Russian ЙЦУКЕН) to latin equivalents
       // using physical key codes, so hotkeys work on any layout
-      if ("Proxy" in window && !isLatinChar(event.key) && /^Key[A-Z]$/.test(event.code)) {
+      if (
+        "Proxy" in window &&
+        !isLatinChar(event.key) &&
+        /^Key[A-Z]$/.test(event.code)
+      ) {
         event = new Proxy(event, {
           get(ev: any, prop) {
             const value = ev[prop];
             if (typeof value === "function") {
               return value.bind(ev);
             }
-            return prop === "key"
-              ? getLatinKey(ev)
-              : value;
+            return prop === "key" ? getLatinKey(ev) : value;
           },
         });
       }

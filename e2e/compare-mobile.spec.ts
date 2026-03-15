@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { test } from "@playwright/test";
 
 test.describe("Mobile layout comparison", () => {
@@ -13,9 +14,12 @@ test.describe("Mobile layout comparison", () => {
     );
 
     // Wait for content to load
-    await page.waitForSelector('[placeholder*="Введите ответ"], [placeholder*="Ответ"]', {
-      timeout: 60_000,
-    });
+    await page.waitForSelector(
+      '[placeholder*="Введите ответ"], [placeholder*="Ответ"]',
+      {
+        timeout: 60_000,
+      },
+    );
     await page.waitForTimeout(2000);
 
     // Dismiss cookie banner
@@ -32,8 +36,14 @@ test.describe("Mobile layout comparison", () => {
 
     for (let i = btnCount - 1; i >= Math.max(0, btnCount - 30); i--) {
       const btn = allButtons.nth(i);
-      if (!(await btn.isVisible())) continue;
-      try { await btn.click({ timeout: 500 }); } catch { continue; }
+      if (!(await btn.isVisible())) {
+        continue;
+      }
+      try {
+        await btn.click({ timeout: 500 });
+      } catch {
+        continue;
+      }
       await page.waitForTimeout(300);
 
       const doskaItem = page.locator('[role="menuitem"]:has-text("Доска")');

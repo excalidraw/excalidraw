@@ -62,10 +62,7 @@ export const MobileMenu = ({
   app,
   onPenModeToggle,
 }: MobileMenuProps) => {
-  const {
-    WelcomeScreenCenterTunnel,
-    MainMenuTunnel,
-  } = useTunnels();
+  const { WelcomeScreenCenterTunnel, MainMenuTunnel } = useTunnels();
   const renderAppTopBar = () => {
     if (appState.openDialog?.name === "elementLinkSelector") {
       return null;

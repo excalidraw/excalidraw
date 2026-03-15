@@ -5,7 +5,10 @@ const PROBLEM_URL =
 
 /** Helper: wait for page content to load, dismiss cookie banner */
 async function setupPage(page: any) {
-  await page.goto(PROBLEM_URL, { timeout: 90_000, waitUntil: "domcontentloaded" });
+  await page.goto(PROBLEM_URL, {
+    timeout: 90_000,
+    waitUntil: "domcontentloaded",
+  });
   await page.waitForSelector(
     '[placeholder*="Ответ"], [placeholder*="ответ"], [placeholder*="решение"]',
     { timeout: 60_000 },
@@ -26,7 +29,9 @@ async function openWhiteboard(page: any): Promise<boolean> {
 
   for (let i = btnCount - 1; i >= Math.max(0, btnCount - 30); i--) {
     const btn = allButtons.nth(i);
-    if (!(await btn.isVisible())) continue;
+    if (!(await btn.isVisible())) {
+      continue;
+    }
     try {
       await btn.click({ timeout: 500 });
     } catch {
@@ -34,9 +39,7 @@ async function openWhiteboard(page: any): Promise<boolean> {
     }
     await page.waitForTimeout(400);
 
-    const doskaItem = page.locator(
-      '[role="menuitem"]:has-text("Доска")',
-    );
+    const doskaItem = page.locator('[role="menuitem"]:has-text("Доска")');
     if ((await doskaItem.count()) > 0) {
       await doskaItem.first().click();
       await page.waitForTimeout(5000);
@@ -59,7 +62,9 @@ test.describe("Desktop 1280x800", () => {
     await page.screenshot({ path: "e2e/screenshots/desktop-01-page.png" });
 
     if (await openWhiteboard(page)) {
-      await page.screenshot({ path: "e2e/screenshots/desktop-02-whiteboard.png" });
+      await page.screenshot({
+        path: "e2e/screenshots/desktop-02-whiteboard.png",
+      });
 
       // Draw a rectangle
       const rectBtn = page.locator('[data-testid="toolbar-rectangle"]');
@@ -77,7 +82,9 @@ test.describe("Desktop 1280x800", () => {
           await page.waitForTimeout(1000);
         }
       }
-      await page.screenshot({ path: "e2e/screenshots/desktop-03-rectangle.png" });
+      await page.screenshot({
+        path: "e2e/screenshots/desktop-03-rectangle.png",
+      });
 
       // Open hamburger menu
       const hamburger = page.locator(".main-menu-trigger");
@@ -93,7 +100,9 @@ test.describe("Desktop 1280x800", () => {
       if ((await extraTools.count()) > 0) {
         await extraTools.first().click();
         await page.waitForTimeout(500);
-        await page.screenshot({ path: "e2e/screenshots/desktop-05-extra-tools.png" });
+        await page.screenshot({
+          path: "e2e/screenshots/desktop-05-extra-tools.png",
+        });
       }
     }
   });
@@ -108,7 +117,9 @@ test.describe("Tablet 768x1024", () => {
     await setupPage(page);
 
     if (await openWhiteboard(page)) {
-      await page.screenshot({ path: "e2e/screenshots/tablet-01-whiteboard.png" });
+      await page.screenshot({
+        path: "e2e/screenshots/tablet-01-whiteboard.png",
+      });
 
       // Draw something
       const drawBtn = page.locator('[data-testid="toolbar-freedraw"]');
@@ -122,7 +133,9 @@ test.describe("Tablet 768x1024", () => {
           await page.mouse.move(cx - 50, cy);
           await page.mouse.down();
           for (let i = 0; i < 15; i++) {
-            await page.mouse.move(cx - 50 + i * 8, cy + Math.sin(i) * 15, { steps: 2 });
+            await page.mouse.move(cx - 50 + i * 8, cy + Math.sin(i) * 15, {
+              steps: 2,
+            });
           }
           await page.mouse.up();
           await page.waitForTimeout(500);
@@ -144,7 +157,9 @@ test.describe("Mobile 390x844", () => {
     await page.screenshot({ path: "e2e/screenshots/mobile-01-page.png" });
 
     if (await openWhiteboard(page)) {
-      await page.screenshot({ path: "e2e/screenshots/mobile-02-whiteboard.png" });
+      await page.screenshot({
+        path: "e2e/screenshots/mobile-02-whiteboard.png",
+      });
 
       // Draw freedraw
       const drawBtn = page.locator('[data-testid="toolbar-freedraw"]');
@@ -152,7 +167,9 @@ test.describe("Mobile 390x844", () => {
         await drawBtn.click();
         await page.waitForTimeout(300);
       }
-      await page.screenshot({ path: "e2e/screenshots/mobile-03-freedraw-selected.png" });
+      await page.screenshot({
+        path: "e2e/screenshots/mobile-03-freedraw-selected.png",
+      });
 
       // Open hamburger
       const hamburger = page.locator(".main-menu-trigger");
@@ -174,7 +191,9 @@ test.describe("Small mobile 375x667", () => {
     await setupPage(page);
 
     if (await openWhiteboard(page)) {
-      await page.screenshot({ path: "e2e/screenshots/small-mobile-01-whiteboard.png" });
+      await page.screenshot({
+        path: "e2e/screenshots/small-mobile-01-whiteboard.png",
+      });
     }
   });
 });
@@ -189,11 +208,15 @@ test.describe("Desktop fullscreen overlay", () => {
 
     if (await openWhiteboard(page)) {
       // Click expand button (Maximize2 icon in external toolbar)
-      const expandBtn = page.locator('button:has(svg.lucide-maximize-2), button[aria-label*="Развернуть"], button[aria-label*="expand"]');
+      const expandBtn = page.locator(
+        'button:has(svg.lucide-maximize-2), button[aria-label*="Развернуть"], button[aria-label*="expand"]',
+      );
       if ((await expandBtn.count()) > 0) {
         await expandBtn.first().click();
         await page.waitForTimeout(3000);
-        await page.screenshot({ path: "e2e/screenshots/fullscreen-01-overlay.png" });
+        await page.screenshot({
+          path: "e2e/screenshots/fullscreen-01-overlay.png",
+        });
       }
     }
   });

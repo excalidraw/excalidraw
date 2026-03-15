@@ -204,9 +204,7 @@ export const SelectedShapeActions = ({
 
       {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
-        <>
-          {renderAction("changeStrokeStyle")}
-        </>
+        <>{renderAction("changeStrokeStyle")}</>
       )}
 
       {(canChangeRoundness(appState.activeTool.type) ||
@@ -1071,7 +1069,6 @@ export const ShapesSwitcher = ({
     app.state.preferredSelectionTool.type !== "lasso";
 
   const embeddableToolSelected = activeTool.type === "embeddable";
-
 
   return (
     <>

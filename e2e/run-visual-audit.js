@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const { chromium } = require("playwright");
 
 const PROBLEM_URL =
@@ -11,7 +12,10 @@ const VIEWPORTS = [
 ];
 
 async function setupPage(page) {
-  await page.goto(PROBLEM_URL, { timeout: 60000, waitUntil: "domcontentloaded" });
+  await page.goto(PROBLEM_URL, {
+    timeout: 60000,
+    waitUntil: "domcontentloaded",
+  });
   await page.waitForSelector(
     '[placeholder*="Ответ"], [placeholder*="ответ"], [placeholder*="решение"]',
     { timeout: 60000 },
@@ -31,8 +35,14 @@ async function openWhiteboard(page) {
 
   for (let i = btnCount - 1; i >= Math.max(0, btnCount - 30); i--) {
     const btn = allButtons.nth(i);
-    if (!(await btn.isVisible())) continue;
-    try { await btn.click({ timeout: 500 }); } catch { continue; }
+    if (!(await btn.isVisible())) {
+      continue;
+    }
+    try {
+      await btn.click({ timeout: 500 });
+    } catch {
+      continue;
+    }
     await page.waitForTimeout(400);
 
     const doskaItem = page.locator('[role="menuitem"]:has-text("Доска")');
@@ -52,9 +62,13 @@ async function openWhiteboard(page) {
 
   for (const vp of VIEWPORTS) {
     console.log(`\n=== ${vp.name} (${vp.width}x${vp.height}) ===`);
-    const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height } });
+    const context = await browser.newContext({
+      viewport: { width: vp.width, height: vp.height },
+    });
     const page = await context.newPage();
-    page.on("pageerror", (e) => console.log(`  PAGE_ERR: ${e.message.slice(0, 100)}`));
+    page.on("pageerror", (e) =>
+      console.log(`  PAGE_ERR: ${e.message.slice(0, 100)}`),
+    );
 
     try {
       await setupPage(page);
@@ -62,7 +76,9 @@ async function openWhiteboard(page) {
       console.log(`  [ok] page loaded`);
 
       if (await openWhiteboard(page)) {
-        await page.screenshot({ path: `e2e/screenshots/${vp.name}-02-whiteboard.png` });
+        await page.screenshot({
+          path: `e2e/screenshots/${vp.name}-02-whiteboard.png`,
+        });
         console.log(`  [ok] whiteboard opened`);
 
         // Draw a rectangle
@@ -80,7 +96,9 @@ async function openWhiteboard(page) {
             await page.mouse.up();
             await page.waitForTimeout(1000);
           }
-          await page.screenshot({ path: `e2e/screenshots/${vp.name}-03-rectangle.png` });
+          await page.screenshot({
+            path: `e2e/screenshots/${vp.name}-03-rectangle.png`,
+          });
           console.log(`  [ok] rectangle drawn`);
         }
 
@@ -89,7 +107,9 @@ async function openWhiteboard(page) {
         if ((await hamburger.count()) > 0) {
           await hamburger.first().click();
           await page.waitForTimeout(500);
-          await page.screenshot({ path: `e2e/screenshots/${vp.name}-04-menu.png` });
+          await page.screenshot({
+            path: `e2e/screenshots/${vp.name}-04-menu.png`,
+          });
           console.log(`  [ok] menu opened`);
           await page.keyboard.press("Escape");
         }
@@ -98,7 +118,9 @@ async function openWhiteboard(page) {
       }
     } catch (e) {
       console.log(`  [FAIL] ${e.message.slice(0, 200)}`);
-      await page.screenshot({ path: `e2e/screenshots/${vp.name}-error.png` }).catch(() => {});
+      await page
+        .screenshot({ path: `e2e/screenshots/${vp.name}-error.png` })
+        .catch(() => {});
     }
 
     await context.close();
