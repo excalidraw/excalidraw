@@ -20,6 +20,12 @@ export const measureText = (
     // lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
+
+  const provider = getTextMetricsProvider();
+  if (!isTestEnv() && provider instanceof DomTextMetricsProvider) {
+    return provider.measureText(_text, font, lineHeight);
+  }
+
   const fontSize = parseFloat(font);
   const height = getTextHeight(_text, fontSize, lineHeight);
   const width = getTextWidth(_text, font);
@@ -114,8 +120,79 @@ export const setCustomTextMetricsProvider = (provider: TextMetricsProvider) => {
   textMetricsProvider = provider;
 };
 
+const getTextMetricsProvider = () => {
+  if (!textMetricsProvider) {
+    textMetricsProvider =
+      typeof document !== "undefined" && document.body && !isTestEnv()
+        ? new DomTextMetricsProvider()
+        : new CanvasTextMetricsProvider();
+  }
+  return textMetricsProvider;
+};
+
 export interface TextMetricsProvider {
   getLineWidth(text: string, fontString: FontString): number;
+}
+
+class DomTextMetricsProvider implements TextMetricsProvider {
+  private container: HTMLDivElement | null = null;
+  private span: HTMLSpanElement | null = null;
+
+  private ensureNodes() {
+    if (this.container && this.span) {
+      return;
+    }
+
+    const container = document.createElement("div");
+    container.style.position = "fixed";
+    container.style.top = "-100000px";
+    container.style.left = "0";
+    container.style.visibility = "hidden";
+    container.style.pointerEvents = "none";
+    container.style.padding = "0";
+    container.style.margin = "0";
+    container.style.border = "0";
+    container.style.whiteSpace = "pre";
+    container.style.display = "block";
+
+    const span = document.createElement("span");
+    span.style.display = "inline-block";
+    span.style.whiteSpace = "pre";
+    span.style.padding = "0";
+    span.style.margin = "0";
+    span.style.border = "0";
+
+    container.appendChild(span);
+    document.body.appendChild(container);
+
+    this.container = container;
+    this.span = span;
+  }
+
+  public getLineWidth(text: string, fontString: FontString): number {
+    this.ensureNodes();
+
+    const span = this.span!;
+    span.style.font = fontString;
+    span.style.lineHeight = "normal";
+    span.textContent = text;
+    return span.getBoundingClientRect().width;
+  }
+
+  public measureText(
+    text: string,
+    fontString: FontString,
+    lineHeight: ExcalidrawTextElement["lineHeight"],
+  ) {
+    this.ensureNodes();
+
+    const span = this.span!;
+    span.style.font = fontString;
+    span.style.lineHeight = String(lineHeight);
+    span.textContent = text;
+    const rect = span.getBoundingClientRect();
+    return { width: rect.width, height: rect.height };
+  }
 }
 
 class CanvasTextMetricsProvider implements TextMetricsProvider {
@@ -150,11 +227,7 @@ class CanvasTextMetricsProvider implements TextMetricsProvider {
 }
 
 export const getLineWidth = (text: string, font: FontString) => {
-  if (!textMetricsProvider) {
-    textMetricsProvider = new CanvasTextMetricsProvider();
-  }
-
-  return textMetricsProvider.getLineWidth(text, font);
+  return getTextMetricsProvider().getLineWidth(text, font);
 };
 
 export const getTextWidth = (text: string, font: FontString) => {

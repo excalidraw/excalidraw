@@ -39,7 +39,13 @@ import { ExcalifontFontFaces } from "./Excalifont";
 import { HelveticaFontFaces } from "./Helvetica";
 import { LiberationFontFaces } from "./Liberation";
 import { LilitaFontFaces } from "./Lilita";
-import { NunitoFontFaces } from "./Nunito";
+import {
+  MapleMonoNormalNLFontFaces,
+  NunitoFontFaces,
+  SarasaFixedCLBoldNerdFontFaces,
+  SourceCodeProFontFaces,
+  SourceHanSansSCFontFaces,
+} from "./Nunito";
 import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
 
@@ -390,7 +396,11 @@ export class Fonts {
     // used for server-side pdf & png export instead of helvetica (technically does not need metrics, but kept in for consistency)
     init("Liberation Sans", ...LiberationFontFaces);
     init("Lilita One", ...LilitaFontFaces);
+    init("Maple Mono Normal NL", ...MapleMonoNormalNLFontFaces);
     init("Nunito", ...NunitoFontFaces);
+    init("Sarasa Fixed CL Bold Nerd Font", ...SarasaFixedCLBoldNerdFontFaces);
+    init("Source Code Pro", ...SourceCodeProFontFaces);
+    init("Source Han Sans SC", ...SourceHanSansSCFontFaces);
     init("Virgil", ...VirgilFontFaces);
 
     // fallback font faces

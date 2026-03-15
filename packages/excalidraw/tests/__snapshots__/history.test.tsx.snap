@@ -3753,8 +3753,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
-  "text": "que
-pasa",
+  "text": "que pasa",
   "textAlign": "left",
   "type": "text",
   "updated": 1,

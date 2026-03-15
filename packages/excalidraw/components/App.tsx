@@ -65,6 +65,7 @@ import {
   debounce,
   distance,
   getFontString,
+  getVerticalOffset,
   getNearestScrollableContainer,
   isInputLike,
   isToolIcon,
@@ -99,7 +100,6 @@ import {
   invariant,
   getFeatureFlag,
   createUserAgentDescriptor,
-  getFormFactor,
   deriveStylesPanelMode,
   isIOS,
   isBrave,
@@ -198,12 +198,14 @@ import {
   getLinkDirectionFromKey,
   cropElement,
   wrapText,
+  wrapTextPreservingWhitespaceWithExplicitNewlineMarkers,
   isElementLink,
   parseElementLinkFromURL,
   isMeasureTextSupported,
   normalizeText,
   measureText,
   getLineHeightInPx,
+  charWidth,
   getApproxMinLineWidth,
   getApproxMinLineHeight,
   getMinTextElementWidth,
@@ -231,6 +233,7 @@ import {
   dragSelectedElements,
   getDragOffsetXY,
   isNonDeletedElement,
+  getTextFromElements,
   Scene,
   Store,
   CaptureUpdateAction,
@@ -304,6 +307,7 @@ import {
   actionFinalize,
   actionFlipHorizontal,
   actionFlipVertical,
+  actionStraighten,
   actionGroup,
   actionPasteStyles,
   actionSelectAll,
@@ -362,6 +366,7 @@ import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 
 import {
   calculateScrollCenter,
+  getElementsOverlappingSelection,
   getElementsWithinSelection,
   getNormalizedZoom,
   getSelectedElements,
@@ -587,10 +592,15 @@ let tappedTwiceTimer = 0;
 let firstTapPosition: { x: number; y: number } | null = null;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
+let isRightClickPanning: boolean = false;
+let didRightClickZoom: boolean = false;
+let rightClickAnchorScene: { x: number; y: number } | null = null;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
+let suppressNextContextMenuFromRightPan = false;
+let suppressNextContextMenuFromRightPanAt = 0;
 
 /**
  * Map of youtube embed video states
@@ -644,6 +654,11 @@ class App extends React.Component<AppProps, AppState> {
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
   private iFrameRefs = new Map<ExcalidrawElement["id"], HTMLIFrameElement>();
+  private plainTextCopy = null as null | {
+    text: string;
+    elements: readonly ExcalidrawElement[];
+    files: BinaryFiles | null;
+  };
   /**
    * Indicates whether the embeddable's url has been validated for rendering.
    * If value not set, indicates that the validation is pending.
@@ -679,12 +694,17 @@ class App extends React.Component<AppProps, AppState> {
   private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
+  private gridCharTopMeasureIntervalId: number | null = null;
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
   lastPointerMoveEvent: PointerEvent | null = null;
+  private suppressNextSelectedTextDoubleClick: {
+    elementId: string | null;
+    at: number;
+  } = { elementId: null, at: 0 };
   /** current frame pointer cords */
   lastPointerMoveCoords: { x: number; y: number } | null = null;
   /** previous frame pointer coords */
@@ -2936,9 +2956,10 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private getFormFactor = (editorWidth: number, editorHeight: number) => {
+    // 关闭移动端 UI：无论容器尺寸/分辨率如何，始终使用桌面版 UI
     return (
       this.props.UIOptions.getFormFactor?.(editorWidth, editorHeight) ??
-      getFormFactor(editorWidth, editorHeight)
+      "desktop"
     );
   };
 
@@ -3142,6 +3163,7 @@ class App extends React.Component<AppProps, AppState> {
     this.library.destroy();
     this.laserTrails.stop();
     this.eraserTrail.stop();
+    this.stopGridCharTopMeasure();
     this.onChangeEmitter.clear();
     this.store.onStoreIncrementEmitter.clear();
     this.store.onDurableIncrementEmitter.clear();
@@ -3525,6 +3547,39 @@ class App extends React.Component<AppProps, AppState> {
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
+    const selectedIds = Object.keys(this.state.selectedElementIds).filter(
+      (id) => this.state.selectedElementIds[id as ExcalidrawElement["id"]],
+    ) as ExcalidrawElement["id"][];
+
+    if (selectedIds.length === 1) {
+      const elementsMap = this.scene.getNonDeletedElementsMap();
+      const selectedElement = elementsMap.get(selectedIds[0]);
+      const boundTextElement =
+        selectedElement && getBoundTextElement(selectedElement, elementsMap);
+
+      if (
+        selectedElement &&
+        (isTextElement(selectedElement) || boundTextElement)
+      ) {
+        const elementsToCopy = this.scene.getSelectedElements({
+          selectedElementIds: this.state.selectedElementIds,
+          includeBoundTextElement: true,
+          includeElementsInFrames: true,
+        });
+        const text = getTextFromElements(elementsToCopy);
+        this.plainTextCopy = {
+          text,
+          elements: elementsToCopy.map((element) => deepCopyElement(element)),
+          files: null,
+        };
+        copyTextToSystemClipboard(text, event);
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+    }
+
+    this.plainTextCopy = null;
     this.actionManager.executeAction(actionCopy, "keyboard", event);
     event.preventDefault();
     event.stopPropagation();
@@ -3801,6 +3856,24 @@ class App extends React.Component<AppProps, AppState> {
       // must be called in the same frame (thus before any awaits) as the paste
       // event else some browsers (FF...) will clear the clipboardData
       // (something something security)
+      const clipboardText = event?.clipboardData?.getData(MIME_TYPES.text);
+      const hasExcalidrawClipboard = !!event?.clipboardData?.getData(
+        MIME_TYPES.excalidrawClipboard,
+      );
+      if (
+        !isPlainPaste &&
+        this.plainTextCopy &&
+        !hasExcalidrawClipboard &&
+        clipboardText === this.plainTextCopy.text
+      ) {
+        this.addElementsFromPasteOrLibrary({
+          elements: this.plainTextCopy.elements,
+          files: this.plainTextCopy.files,
+          position: "cursor",
+        });
+        event.preventDefault();
+        return;
+      }
       const dataTransferList = await parseDataTransferEvent(event);
 
       const filesList = dataTransferList.getFiles();
@@ -4709,6 +4782,22 @@ class App extends React.Component<AppProps, AppState> {
         // Shape switching
         if (event.key === KEYS.ESCAPE) {
           this.updateEditorAtom(convertElementTypePopupAtom, null);
+          if (
+            !this.state.openDialog &&
+            !this.state.openPopup &&
+            !this.state.openMenu &&
+            !this.state.editingTextElement &&
+            !this.state.newElement &&
+            this.state.multiElement === null &&
+            !this.state.selectionElement &&
+            !this.state.selectedElementsAreBeingDragged &&
+            selectedElements.length === 1 &&
+            isTextElement(selectedElements[0])
+          ) {
+            event.preventDefault();
+            this.deselectElements();
+            return;
+          }
         } else if (
           event.key === KEYS.TAB &&
           (document.activeElement === this.excalidrawContainerRef?.current ||
@@ -5471,13 +5560,34 @@ class App extends React.Component<AppProps, AppState> {
       this.onImageToolbarButtonClick();
     }
 
+    if (
+      nextActiveTool.type === "custom" &&
+      nextActiveTool.customType === "gridCharTopMeasure"
+    ) {
+      this.startGridCharTopMeasure();
+    } else {
+      this.stopGridCharTopMeasure();
+    }
+
     this.setState((prevState) => {
+      const isPreciseMeasurementTool =
+        nextActiveTool.type === "custom" &&
+        nextActiveTool.customType === "measure";
+      const isGridCharTopMeasureTool =
+        nextActiveTool.type === "custom" &&
+        nextActiveTool.customType === "gridCharTopMeasure";
       const commonResets = {
         snapLines: prevState.snapLines.length ? [] : prevState.snapLines,
         originSnapOffset: null,
         activeEmbeddable: null,
         selectedLinearElement: isSelectionLikeTool(nextActiveTool.type)
           ? prevState.selectedLinearElement
+          : null,
+        preciseMeasurement: isPreciseMeasurementTool
+          ? prevState.preciseMeasurement
+          : null,
+        gridCharTopMeasurement: isGridCharTopMeasureTool
+          ? prevState.gridCharTopMeasurement
           : null,
       } as const;
 
@@ -5515,6 +5625,151 @@ class App extends React.Component<AppProps, AppState> {
         ...commonResets,
         activeTool: nextActiveTool,
       };
+    });
+  };
+
+  private startGridCharTopMeasure = () => {
+    if (this.gridCharTopMeasureIntervalId !== null) {
+      return;
+    }
+
+    this.computeGridCharTopMeasure();
+    this.gridCharTopMeasureIntervalId = window.setInterval(() => {
+      this.computeGridCharTopMeasure();
+    }, 3000);
+  };
+
+  private stopGridCharTopMeasure = () => {
+    if (this.gridCharTopMeasureIntervalId !== null) {
+      window.clearInterval(this.gridCharTopMeasureIntervalId);
+      this.gridCharTopMeasureIntervalId = null;
+    }
+    if (this.state.gridCharTopMeasurement) {
+      this.setState({ gridCharTopMeasurement: null });
+    }
+  };
+
+  private computeGridCharTopMeasure = () => {
+    if (this.unmounted) {
+      return;
+    }
+
+    if (
+      this.state.activeTool.type !== "custom" ||
+      this.state.activeTool.customType !== "gridCharTopMeasure"
+    ) {
+      return;
+    }
+
+    const gridSize = this.state.gridSize;
+    if (!gridSize || !Number.isFinite(gridSize)) {
+      this.setState({
+        gridCharTopMeasurement: {
+          updated: Date.now(),
+          segments: [],
+        },
+      });
+      return;
+    }
+
+    const elements = this.scene.getNonDeletedElements();
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+
+    const measureCanvas = document.createElement("canvas");
+    const ctx = measureCanvas.getContext("2d");
+    if (!ctx) {
+      return;
+    }
+
+    const segments: Array<{
+      x: number;
+      y1: number;
+      y2: number;
+      distance: number;
+    }> = [];
+
+    for (const element of elements) {
+      if (!isTextElement(element)) {
+        continue;
+      }
+
+      const textElement = element;
+      const container = getContainerElement(textElement, elementsMap);
+      const shouldWrap = !!container || !textElement.autoResize;
+      const maxWidth = textElement.width;
+
+      const { lines } = wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
+        textElement.originalText ?? textElement.text,
+        getFontString(textElement),
+        shouldWrap ? maxWidth : Infinity,
+      );
+
+      const fontString = getFontString(textElement);
+      ctx.font = fontString;
+
+      const fontAscent =
+        ctx.measureText("M").actualBoundingBoxAscent ||
+        textElement.fontSize * 0.8;
+
+      const lineHeightPx = getLineHeightInPx(
+        textElement.fontSize,
+        textElement.lineHeight,
+      );
+      const verticalOffset = getVerticalOffset(
+        textElement.fontFamily,
+        textElement.fontSize,
+        lineHeightPx,
+      );
+
+      for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+        const line = lines[lineIndex] ?? "";
+        const lineWidth = ctx.measureText(line).width;
+
+        let horizontalOffset = 0;
+        if (textElement.textAlign === "center") {
+          horizontalOffset = textElement.width / 2;
+        } else if (textElement.textAlign === "right") {
+          horizontalOffset = textElement.width;
+        }
+
+        let lineStartX = horizontalOffset;
+        if (textElement.textAlign === "center") {
+          lineStartX = horizontalOffset - lineWidth / 2;
+        } else if (textElement.textAlign === "right") {
+          lineStartX = horizontalOffset - lineWidth;
+        }
+
+        const baselineY =
+          textElement.y + lineIndex * lineHeightPx + verticalOffset;
+        let xCursor = 0;
+
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          const w = charWidth.calculate(ch, fontString);
+          const metrics = ctx.measureText(ch);
+          const ascent = metrics.actualBoundingBoxAscent || fontAscent;
+          const topY = baselineY - ascent;
+
+          const yGrid = Math.round(topY / gridSize) * gridSize;
+          const dist = Math.abs(topY - yGrid);
+
+          segments.push({
+            x: textElement.x + lineStartX + xCursor + w / 2,
+            y1: topY,
+            y2: yGrid,
+            distance: dist,
+          });
+
+          xCursor += w;
+        }
+      }
+    }
+
+    this.setState({
+      gridCharTopMeasurement: {
+        updated: Date.now(),
+        segments,
+      },
     });
   };
 
@@ -5617,24 +5872,59 @@ class App extends React.Component<AppProps, AppState> {
     element: ExcalidrawTextElement,
     {
       isExistingElement = false,
+      // 覆盖 wysiwyg 默认的“进入编辑即全选”行为（用于二次单击时只插入光标）
+      autoSelect,
+      // 记录触发编辑的点击位置（scene 坐标），用于在初始化时把光标放到点击处
+      initialPointerDownSceneCoords,
     }: {
       isExistingElement?: boolean;
+      autoSelect?: boolean;
+      initialPointerDownSceneCoords?: { x: number; y: number };
     },
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
 
     const updateElement = (nextOriginalText: string, isDeleted: boolean) => {
+      const rawMaxWidth = Number(
+        localStorage.getItem("excalidraw.textMaxWidth"),
+      );
+      const textMaxWidth =
+        Number.isFinite(rawMaxWidth) && rawMaxWidth > 0 ? rawMaxWidth : 300;
+
       this.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
+            const container = getContainerElement(_element, elementsMap);
+            const shouldConstrainWidth = !container && _element.autoResize;
+
+            const normalizedOriginalText = normalizeText(nextOriginalText);
+            const unconstrainedMetrics = measureText(
+              normalizedOriginalText,
+              getFontString(_element),
+              _element.lineHeight,
+            );
+
+            const widthUpdates =
+              shouldConstrainWidth && unconstrainedMetrics.width > textMaxWidth
+                ? ({
+                    autoResize: false,
+                    width: textMaxWidth,
+                  } as const)
+                : null;
+
+            const measurementElement = widthUpdates
+              ? newElementWith(_element, widthUpdates)
+              : _element;
+
             return newElementWith(_element, {
               originalText: nextOriginalText,
               isDeleted: isDeleted ?? _element.isDeleted,
+              ...(widthUpdates ? widthUpdates : {}),
               // returns (wrapped) text and new dimensions
               ...refreshTextDimensions(
-                _element,
-                getContainerElement(_element, elementsMap),
+                measurementElement,
+                container,
                 elementsMap,
                 nextOriginalText,
               ),
@@ -5725,10 +6015,9 @@ class App extends React.Component<AppProps, AppState> {
       // caret (i.e. deselect). There's not much use for always selecting
       // the text on edit anyway (and users can select-all from contextmenu
       // if needed)
-      autoSelect: !this.editorInterface.isTouchScreen,
+      autoSelect: autoSelect ?? !this.editorInterface.isTouchScreen,
+      initialPointerDownSceneCoords,
     });
-    // deselect all other elements when inserting text
-    this.deselectElements();
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
@@ -6144,6 +6433,18 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasDoubleClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
   ) => {
+    const { elementId, at } = this.suppressNextSelectedTextDoubleClick;
+    if (elementId && Date.now() - at < 800) {
+      const { x, y } = viewportCoordsToSceneCoords(event, this.state);
+      const hitElement = this.getElementAtPosition(x, y);
+      if (hitElement?.id === elementId && isTextElement(hitElement)) {
+        this.suppressNextSelectedTextDoubleClick = { elementId: null, at: 0 };
+        return;
+      }
+    } else if (elementId) {
+      this.suppressNextSelectedTextDoubleClick = { elementId: null, at: 0 };
+    }
+
     // case: double-clicking with arrow/line tool selected would both create
     // text and enter multiElement mode
     if (this.state.multiElement) {
@@ -7232,6 +7533,7 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    suppressNextContextMenuFromRightPan = false;
     // If Ctrl is not held, ensure isBindingEnabled reflects the user preference.
     if (!event.ctrlKey) {
       const preferenceEnabled = this.state.bindingPreference === "enabled";
@@ -7608,6 +7910,41 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
       );
     } else if (this.state.activeTool.type === "custom") {
+      if (this.state.activeTool.customType === "measure") {
+        const originPoint = pointFrom<GlobalPoint>(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+        );
+        const threshold = 10 / this.state.zoom.value;
+
+        this.setState((prevState) => {
+          const existing = prevState.preciseMeasurement;
+
+          if (existing) {
+            const distToStart = pointDistance(existing.start, originPoint);
+            const distToEnd = pointDistance(existing.end, originPoint);
+
+            if (distToStart <= threshold || distToEnd <= threshold) {
+              return {
+                preciseMeasurement: {
+                  ...existing,
+                  dragging: distToStart <= distToEnd ? "start" : "end",
+                  isCreating: false,
+                },
+              };
+            }
+          }
+
+          return {
+            preciseMeasurement: {
+              start: originPoint,
+              end: originPoint,
+              dragging: "end",
+              isCreating: true,
+            },
+          };
+        });
+      }
       setCursorForShape(this.interactiveCanvas, this.state);
     } else if (
       this.state.activeTool.type === TOOL_TYPE.frame ||
@@ -7775,26 +8112,40 @@ class App extends React.Component<AppProps, AppState> {
   public handleCanvasPanUsingWheelOrSpaceDrag = (
     event: React.PointerEvent<HTMLElement> | MouseEvent,
   ): boolean => {
-    if (
-      !(
-        gesture.pointers.size <= 1 &&
-        (event.button === POINTER_BUTTON.WHEEL ||
-          (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
-          isHandToolActive(this.state) ||
-          (this.state.viewModeEnabled &&
-            this.state.activeTool.type !== "laser"))
-      )
-    ) {
+    const hasMousePointerType =
+      "pointerType" in event && (event as any).pointerType === "mouse";
+    const isNoPointerType = !("pointerType" in event);
+    const isMouseRight =
+      (hasMousePointerType || isNoPointerType) &&
+      event.button === POINTER_BUTTON.SECONDARY;
+    const shouldPan =
+      gesture.pointers.size <= 1 &&
+      (event.button === POINTER_BUTTON.WHEEL ||
+        isMouseRight ||
+        (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
+        isHandToolActive(this.state) ||
+        (this.state.viewModeEnabled && this.state.activeTool.type !== "laser"));
+    if (!shouldPan) {
       return false;
     }
+    const shouldDelayPanUntilDragThreshold = false;
     isPanning = true;
-
+    isRightClickPanning = isMouseRight;
+    if (isMouseRight) {
+      didRightClickZoom = false;
+      rightClickAnchorScene = viewportCoordsToSceneCoords(
+        event as any,
+        this.state,
+      );
+    } else {
+      rightClickAnchorScene = null;
+    }
     // due to event.preventDefault below, container wouldn't get focus
     // automatically
     this.focusContainer();
 
     // preventing defualt while text editing messes with cursor/focus
-    if (!this.state.editingTextElement) {
+    if (!this.state.editingTextElement && !shouldDelayPanUntilDragThreshold) {
       // necessary to prevent browser from scrolling the page if excalidraw
       // not full-page #4489
       //
@@ -7810,17 +8161,26 @@ class App extends React.Component<AppProps, AppState> {
 
     setCursor(this.interactiveCanvas, CURSOR_TYPE.GRABBING);
     let { clientX: lastX, clientY: lastY } = event;
+    let didRightClickDragPan = false;
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       const deltaX = lastX - event.clientX;
       const deltaY = lastY - event.clientY;
       lastX = event.clientX;
       lastY = event.clientY;
 
+      if (
+        isRightClickPanning &&
+        (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0)
+      ) {
+        didRightClickDragPan = true;
+      }
+
       /*
        * Prevent paste event if we move while middle clicking on Linux.
        * See issue #1383.
        */
       if (
+        isPanning &&
         isLinux &&
         !nextPastePrevented &&
         (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1)
@@ -7850,15 +8210,32 @@ class App extends React.Component<AppProps, AppState> {
         window.addEventListener(EVENT.POINTER_UP, enableNextPaste);
       }
 
-      this.translateCanvas({
-        scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
-        scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
-      });
+      // 关键：这里必须使用函数式更新，避免 pointermove 高频批处理时读到过期 this.state，
+      // 否则在“右键拖动 + 滚轮缩放”叠加输入下会出现累积误差（表现为缩放漂移）。
+      //
+      // 旧实现（保留注释）：
+      // this.translateCanvas({
+      //   scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
+      //   scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
+      // });
+      if (isPanning) {
+        this.translateCanvas((state) => ({
+          scrollX: state.scrollX - deltaX / state.zoom.value,
+          scrollY: state.scrollY - deltaY / state.zoom.value,
+        }));
+      }
     });
     const teardown = withBatchedUpdates(
       (lastPointerUp = () => {
         lastPointerUp = null;
         isPanning = false;
+        isRightClickPanning = false;
+        rightClickAnchorScene = null;
+        if (didRightClickDragPan || didRightClickZoom) {
+          suppressNextContextMenuFromRightPan = true;
+          suppressNextContextMenuFromRightPanAt = Date.now();
+        }
+        didRightClickZoom = false;
         if (!isHoldingSpace) {
           if (
             this.state.viewModeEnabled &&
@@ -9300,6 +9677,36 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (
+        this.state.activeTool.type === "custom" &&
+        this.state.activeTool.customType === "measure" &&
+        this.state.preciseMeasurement?.dragging
+      ) {
+        const nextPoint = pointFrom<GlobalPoint>(
+          pointerCoords.x,
+          pointerCoords.y,
+        );
+        this.setState((prevState) => {
+          const measurement = prevState.preciseMeasurement;
+          if (!measurement || !measurement.dragging) {
+            return null;
+          }
+          return {
+            preciseMeasurement:
+              measurement.dragging === "start"
+                ? {
+                    ...measurement,
+                    start: nextPoint,
+                  }
+                : {
+                    ...measurement,
+                    end: nextPoint,
+                  },
+          };
+        });
+        return;
+      }
+
       if (this.state.activeTool.type === "laser") {
         this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
@@ -10008,12 +10415,18 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
           const elementsWithinSelection = this.state.selectionElement
-            ? getElementsWithinSelection(
-                elements,
-                this.state.selectionElement,
-                this.scene.getNonDeletedElementsMap(),
-                false,
-              )
+            ? pointerDownState.withCmdOrCtrl
+              ? getElementsWithinSelection(
+                  elements,
+                  this.state.selectionElement,
+                  this.scene.getNonDeletedElementsMap(),
+                )
+              : getElementsOverlappingSelection(
+                  elements,
+                  this.state.selectionElement,
+                  this.scene.getNonDeletedElementsMap(),
+                  true,
+                )
             : [];
 
           this.setState((prevState) => {
@@ -10027,6 +10440,17 @@ class App extends React.Component<AppProps, AppState> {
                 {},
               ),
             };
+
+            if (!elementsWithinSelection.length) {
+              const fallbackHit = this.getElementAtPosition(
+                pointerDownState.lastCoords.x,
+                pointerDownState.lastCoords.y,
+                { includeLockedElements: true },
+              );
+              if (fallbackHit) {
+                nextSelectedElementIds[fallbackHit.id] = true;
+              }
+            }
 
             if (pointerDownState.hit.element) {
               // if using ctrl/cmd, select the hitElement only if we
@@ -10161,6 +10585,23 @@ class App extends React.Component<AppProps, AppState> {
         { clientX: childEvent.clientX, clientY: childEvent.clientY },
         this.state,
       );
+
+      if (activeTool.type === "custom" && activeTool.customType === "measure") {
+        this.setState((prevState) => {
+          const measurement = prevState.preciseMeasurement;
+          if (!measurement) {
+            return null;
+          }
+          return {
+            preciseMeasurement: {
+              ...measurement,
+              dragging: null,
+              isCreating: false,
+            },
+          };
+        });
+        return;
+      }
 
       if (
         this.state.activeTool.type === "selection" &&
@@ -10802,6 +11243,32 @@ class App extends React.Component<AppProps, AppState> {
         // just respect the selected elements from lasso instead
         this.state.activeTool.type !== "lasso"
       ) {
+        if (
+          this.state.activeTool.type === "selection" &&
+          !this.state.editingTextElement &&
+          isTextElement(hitElement) &&
+          !childEvent.shiftKey &&
+          !childEvent[KEYS.CTRL_OR_CMD] &&
+          Object.keys(this.state.selectedElementIds).length === 1 &&
+          this.state.selectedElementIds[hitElement.id]
+        ) {
+          // 二次单击已选中的文本：直接进入编辑，并将光标放到点击位置（不做全选）
+          this.suppressNextSelectedTextDoubleClick = {
+            elementId: hitElement.id,
+            at: Date.now(),
+          };
+          this.setState({ editingTextElement: hitElement });
+          this.handleTextWysiwyg(hitElement, {
+            isExistingElement: true,
+            autoSelect: false,
+            initialPointerDownSceneCoords: {
+              x: pointerDownState.origin.x,
+              y: pointerDownState.origin.y,
+            },
+          });
+          return;
+        }
+
         // when inside line editor, shift selects points instead
         if (
           childEvent.shiftKey &&
@@ -11762,6 +12229,19 @@ class App extends React.Component<AppProps, AppState> {
     event.preventDefault();
 
     if (
+      suppressNextContextMenuFromRightPan &&
+      Date.now() - suppressNextContextMenuFromRightPanAt < 1000 &&
+      !this.state.viewModeEnabled
+    ) {
+      suppressNextContextMenuFromRightPan = false;
+      return;
+    }
+
+    if (isRightClickPanning && isPanning && !this.state.viewModeEnabled) {
+      return;
+    }
+
+    if (
       (("pointerType" in event.nativeEvent &&
         event.nativeEvent.pointerType === "touch") ||
         ("pointerType" in event.nativeEvent &&
@@ -11779,14 +12259,14 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements: true,
     });
 
-    const selectedElements = this.scene.getSelectedElements(this.state);
-    const isHittingCommonBoundBox =
-      this.isHittingCommonBoundingBoxOfSelectedElements(
-        { x, y },
-        selectedElements,
-      );
+    const isElementSelected = Boolean(
+      element && this.state.selectedElementIds[element.id],
+    );
+    const type = isElementSelected ? "element" : "canvas";
 
-    const type = element || isHittingCommonBoundBox ? "element" : "canvas";
+    if (type === "canvas" && event.button === POINTER_BUTTON.SECONDARY) {
+      return;
+    }
 
     const container = this.excalidrawContainerRef.current!;
     const { top: offsetTop, left: offsetLeft } =
@@ -11798,26 +12278,6 @@ class App extends React.Component<AppProps, AppState> {
 
     this.setState(
       {
-        ...(element && !this.state.selectedElementIds[element.id]
-          ? {
-              ...this.state,
-              ...selectGroupsForSelectedElements(
-                {
-                  editingGroupId: this.state.editingGroupId,
-                  selectedElementIds: { [element.id]: true },
-                },
-                this.scene.getNonDeletedElements(),
-                this.state,
-                this,
-              ),
-              selectedLinearElement: isLinearElement(element)
-                ? new LinearElementEditor(
-                    element,
-                    this.scene.getNonDeletedElementsMap(),
-                  )
-                : null,
-            }
-          : this.state),
         showHyperlinkPopup: false,
       },
       () => {
@@ -12258,6 +12718,7 @@ class App extends React.Component<AppProps, AppState> {
       CONTEXT_MENU_SEPARATOR,
       actionFlipHorizontal,
       actionFlipVertical,
+      actionStraighten,
       CONTEXT_MENU_SEPARATOR,
       actionToggleLinearEditor,
       CONTEXT_MENU_SEPARATOR,
@@ -12294,13 +12755,17 @@ class App extends React.Component<AppProps, AppState> {
 
       event.preventDefault();
 
-      if (isPanning) {
+      if (isPanning && !isRightClickPanning) {
         return;
       }
 
       const { deltaX, deltaY } = event;
+      const allowZoomWithoutModifier = isRightClickPanning;
       // note that event.ctrlKey is necessary to handle pinch zooming
-      if (event.metaKey || event.ctrlKey) {
+      if (event.metaKey || event.ctrlKey || allowZoomWithoutModifier) {
+        if (allowZoomWithoutModifier) {
+          didRightClickZoom = true;
+        }
         const sign = Math.sign(deltaY);
         const MAX_STEP = ZOOM_STEP * 100;
         const absDelta = Math.abs(deltaY);
@@ -12317,17 +12782,51 @@ class App extends React.Component<AppProps, AppState> {
           // reduced amplification for small deltas (small movements on a trackpad)
           Math.min(1, absDelta / 20);
 
-        this.translateCanvas((state) => ({
-          ...getStateForZoom(
-            {
-              viewportX: this.lastViewportPosition.x,
-              viewportY: this.lastViewportPosition.y,
-              nextZoom: getNormalizedZoom(newZoom),
-            },
-            state,
-          ),
-          shouldCacheIgnoreZoom: true,
-        }));
+        this.translateCanvas((state) => {
+          const nextZoom = getNormalizedZoom(newZoom);
+
+          if (allowZoomWithoutModifier) {
+            // 严格使用本次滚轮事件的光标位置作为缩放中心（不要用 || 回退：
+            // clientX/clientY 可能是 0，使用 || 会错误回退导致漂移）
+            const viewportX = event.clientX;
+            const viewportY = event.clientY;
+
+            // 目标不变量（需求说明.txt#L26-28）：
+            // 按住右键滚轮缩放时，鼠标光标对应的“画布(scene)坐标”保持不变。
+            //
+            // 做法：
+            // 1) 先在“当前 state（旧 zoom）”下计算光标处 scene 坐标 anchorScene
+            // 2) 再解出在 nextZoom 下应当设置的 scrollX/scrollY，使得 anchorScene 仍映射回相同 viewport
+            const anchorScene =
+              rightClickAnchorScene ||
+              viewportCoordsToSceneCoords(
+                { clientX: viewportX, clientY: viewportY },
+                state,
+              );
+
+            return {
+              scrollX:
+                (viewportX - state.offsetLeft) / nextZoom - anchorScene.x,
+              scrollY: (viewportY - state.offsetTop) / nextZoom - anchorScene.y,
+              zoom: {
+                value: nextZoom,
+              },
+              shouldCacheIgnoreZoom: true,
+            };
+          }
+
+          return {
+            ...getStateForZoom(
+              {
+                viewportX: this.lastViewportPosition.x,
+                viewportY: this.lastViewportPosition.y,
+                nextZoom,
+              },
+              state,
+            ),
+            shouldCacheIgnoreZoom: true,
+          };
+        });
         this.resetShouldCacheIgnoreZoomDebounced();
         return;
       }

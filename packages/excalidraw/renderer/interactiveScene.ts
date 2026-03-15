@@ -39,7 +39,6 @@ import {
   isLinearElement,
   isLineElement,
   maxBindingDistance_simple,
-  isTextElement,
   LinearElementEditor,
 } from "@excalidraw/element";
 
@@ -71,7 +70,6 @@ import type {
   ExcalidrawFrameLikeElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
-  ExcalidrawTextElement,
   GroupId,
   NonDeleted,
   NonDeletedSceneElementsMap,
@@ -961,8 +959,8 @@ const renderSelectionBorder = (
     elementProperties.padding ?? DEFAULT_TRANSFORM_HANDLE_SPACING * 2;
 
   const linePadding = padding / appState.zoom.value;
-  const lineWidth = 8 / appState.zoom.value;
-  const spaceWidth = 4 / appState.zoom.value;
+  const dashLength = 2 / appState.zoom.value;
+  const dashGap = 2 / appState.zoom.value;
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
@@ -973,11 +971,11 @@ const renderSelectionBorder = (
     context.strokeStyle = selectionColors[index];
     if (dashed) {
       context.setLineDash([
-        lineWidth,
-        spaceWidth + (lineWidth + spaceWidth) * (count - 1),
+        dashLength,
+        dashGap + (dashLength + dashGap) * (count - 1),
       ]);
     }
-    context.lineDashOffset = (lineWidth + spaceWidth) * index;
+    context.lineDashOffset = (dashLength + dashGap) * index;
     strokeRectWithRotation_simple(
       context,
       x1 - linePadding,
@@ -1205,7 +1203,7 @@ const renderFocusPointConnectionLine = (
 
   context.strokeStyle = "rgba(134, 131, 226, 0.6)";
   context.lineWidth = 1 / appState.zoom.value;
-  context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
+  context.setLineDash([2 / appState.zoom.value, 2 / appState.zoom.value]);
 
   context.beginPath();
   context.moveTo(fromPoint[0], fromPoint[1]);
@@ -1482,28 +1480,6 @@ const renderCropHandles = (
   context.restore();
 };
 
-const renderTextBox = (
-  text: NonDeleted<ExcalidrawTextElement>,
-  context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
-  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
-) => {
-  context.save();
-  const padding = (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
-  const width = text.width + padding * 2;
-  const height = text.height + padding * 2;
-  const cx = text.x + width / 2;
-  const cy = text.y + height / 2;
-  const shiftX = -(width / 2 + padding);
-  const shiftY = -(height / 2 + padding);
-  context.translate(cx + appState.scrollX, cy + appState.scrollY);
-  context.rotate(text.angle);
-  context.lineWidth = 1 / appState.zoom.value;
-  context.strokeStyle = selectionColor;
-  context.strokeRect(shiftX, shiftY, width, height);
-  context.restore();
-};
-
 const _renderInteractiveScene = ({
   app,
   canvas,
@@ -1581,23 +1557,6 @@ const _renderInteractiveScene = ({
       );
     } catch (error: any) {
       console.error(error);
-    }
-  }
-
-  if (
-    appState.editingTextElement &&
-    isTextElement(appState.editingTextElement)
-  ) {
-    const textElement = allElementsMap.get(appState.editingTextElement.id) as
-      | ExcalidrawTextElement
-      | undefined;
-    if (textElement && !textElement.autoResize) {
-      renderTextBox(
-        textElement,
-        context,
-        appState,
-        renderConfig.selectionColor,
-      );
     }
   }
 
@@ -1852,8 +1811,6 @@ const _renderInteractiveScene = ({
       if (
         !appState.viewModeEnabled &&
         showBoundingBox &&
-        // do not show transform handles when text is being edited
-        !isTextElement(appState.editingTextElement) &&
         // do not show transform handles when image is being cropped
         !appState.croppingElementId
       ) {
@@ -1973,6 +1930,9 @@ const _renderInteractiveScene = ({
     }
   });
 
+  renderPreciseMeasurement(context, appState, renderConfig.selectionColor);
+  renderGridCharTopMeasurement(context, appState, renderConfig.selectionColor);
+
   renderSnaps(context, appState);
 
   context.restore();
@@ -2019,6 +1979,117 @@ const _renderInteractiveScene = ({
     elementsMap,
     animationState: nextAnimationState,
   };
+};
+
+const renderPreciseMeasurement = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  color: string,
+) => {
+  const measurement = appState.preciseMeasurement;
+  if (!measurement) {
+    return;
+  }
+
+  const [x1, y1] = measurement.start;
+  const [x2, y2] = measurement.end;
+
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
+  context.strokeStyle = color;
+  context.lineWidth = 5 / appState.zoom.value;
+  context.lineCap = "round";
+
+  context.beginPath();
+  context.moveTo(x1, y1);
+  context.lineTo(x2, y2);
+  context.stroke();
+
+  const handleRadius = 6 / appState.zoom.value;
+  context.fillStyle =
+    appState.theme === THEME.DARK
+      ? "rgba(0, 0, 0, 0.6)"
+      : "rgba(255,255,255,0.6)";
+  fillCircle(context, x1, y1, handleRadius, true, true);
+  fillCircle(context, x2, y2, handleRadius, true, true);
+
+  const midX = (x1 + x2) / 2;
+  const midY = (y1 + y2) / 2;
+  const distance = pointDistance(measurement.start, measurement.end);
+  const rounded = Math.round(distance * 100) / 100;
+  const label = `${
+    Number.isInteger(rounded) ? rounded : rounded.toFixed(2)
+  } px`;
+
+  context.font = `${
+    20 / appState.zoom.value
+  }px Virgil, Segoe UI, Arial, sans-serif`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+
+  context.lineJoin = "round";
+  context.strokeStyle =
+    appState.theme === THEME.DARK ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.9)";
+  context.lineWidth = 4 / appState.zoom.value;
+  context.strokeText(label, midX, midY);
+
+  context.fillStyle = color;
+  context.fillText(label, midX, midY);
+
+  context.restore();
+};
+
+const renderGridCharTopMeasurement = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  color: string,
+) => {
+  const measurement = appState.gridCharTopMeasurement;
+  if (!measurement) {
+    return;
+  }
+
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
+  context.strokeStyle = color;
+  context.lineWidth = 5 / appState.zoom.value;
+  context.lineCap = "round";
+  context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
+
+  const fontSize = 20 / appState.zoom.value;
+  context.font = `${fontSize}px Virgil, Segoe UI, Arial, sans-serif`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.lineJoin = "round";
+
+  for (const seg of measurement.segments) {
+    context.beginPath();
+    context.moveTo(seg.x, seg.y1);
+    context.lineTo(seg.x, seg.y2);
+    context.stroke();
+
+    const midY = (seg.y1 + seg.y2) / 2;
+    const rounded = Math.round(seg.distance * 100) / 100;
+    const label = `${
+      Number.isInteger(rounded) ? rounded : rounded.toFixed(2)
+    } px`;
+
+    context.save();
+    context.setLineDash([]);
+    context.strokeStyle =
+      appState.theme === THEME.DARK
+        ? "rgba(0,0,0,0.7)"
+        : "rgba(255,255,255,0.9)";
+    context.lineWidth = 4 / appState.zoom.value;
+    context.strokeText(label, seg.x, midY);
+    context.fillStyle = color;
+    context.fillText(label, seg.x, midY);
+    context.restore();
+  }
+
+  context.restore();
 };
 
 /**

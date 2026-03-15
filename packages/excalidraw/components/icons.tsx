@@ -375,6 +375,35 @@ export const LineIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+export const MeasureToolIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="6" y1="18" x2="18" y2="6" />
+    <circle cx="6" cy="18" r="1.5" />
+    <circle cx="18" cy="6" r="1.5" />
+    <path d="M9 15l1 1" />
+    <path d="M12 12l1 1" />
+    <path d="M15 9l1 1" />
+  </g>,
+  tablerIconProps,
+);
+
+export const GridCharTopMeasureToolIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M4 7h16" />
+    <path d="M4 12h16" />
+    <path d="M4 17h16" />
+    <path d="M8 5v14" />
+    <path d="M12 5v14" />
+    <path d="M16 5v14" />
+    <path d="M20 3l0 18" opacity="0.25" />
+    <path d="M18 4l-6 6" />
+    <path d="M14 4h4v4" />
+  </g>,
+  tablerIconProps,
+);
+
 export const PenModeIcon = createIcon(
   <g strokeWidth="1.25">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>

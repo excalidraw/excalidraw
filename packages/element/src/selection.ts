@@ -111,6 +111,62 @@ export const getElementsWithinSelection = (
   return elementsInSelection;
 };
 
+export const getElementsOverlappingSelection = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  selection: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
+  excludeElementsInFrames: boolean = true,
+) => {
+  const [selectionX1, selectionY1, selectionX2, selectionY2] =
+    getElementAbsoluteCoords(selection, elementsMap);
+
+  let elementsInSelection = elements.filter((element) => {
+    let [elementX1, elementY1, elementX2, elementY2] = getElementBounds(
+      element,
+      elementsMap,
+    );
+
+    const containingFrame = getContainingFrame(element, elementsMap);
+    if (containingFrame) {
+      const [fx1, fy1, fx2, fy2] = getElementBounds(
+        containingFrame,
+        elementsMap,
+      );
+
+      elementX1 = Math.max(fx1, elementX1);
+      elementY1 = Math.max(fy1, elementY1);
+      elementX2 = Math.min(fx2, elementX2);
+      elementY2 = Math.min(fy2, elementY2);
+    }
+
+    return (
+      element.locked === false &&
+      element.type !== "selection" &&
+      !isBoundToContainer(element) &&
+      selectionX1 <= elementX2 &&
+      selectionY1 <= elementY2 &&
+      selectionX2 >= elementX1 &&
+      selectionY2 >= elementY1
+    );
+  });
+
+  elementsInSelection = excludeElementsInFrames
+    ? excludeElementsInFramesFromSelection(elementsInSelection)
+    : elementsInSelection;
+
+  elementsInSelection = elementsInSelection.filter((element) => {
+    const containingFrame = getContainingFrame(element, elementsMap);
+
+    if (containingFrame) {
+      return elementOverlapsWithFrame(element, containingFrame, elementsMap);
+    }
+
+    return true;
+  });
+
+  return elementsInSelection;
+};
+
 export const getVisibleAndNonSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: readonly NonDeletedExcalidrawElement[],

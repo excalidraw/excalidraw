@@ -271,6 +271,9 @@ export const getRadarDisplayText = (
 ) => {
   return shouldWrapRadarText(text)
     ? wrapText(text, fontString, maxWidth)
+        .split("\n")
+        .map((line) => line.trimEnd())
+        .join("\n")
     : text;
 };
 
@@ -295,6 +298,7 @@ export const createRadarAxisLabels = (
     radius * (labels.length > 8 ? 0.56 : 0.72),
   );
   const minLabelWidth = getApproxMinLineWidth(fontString, lineHeight);
+  const spaceWidth = measureText(" ", fontString, lineHeight).width;
 
   const axisLabels = labels.map((label, index) => {
     const angle = angles[index];
@@ -306,11 +310,18 @@ export const createRadarAxisLabels = (
         .filter(Boolean)
         .map((word) => measureText(word, fontString, lineHeight).width),
     );
-    const maxLabelWidth = Math.max(
-      minLabelWidth,
-      baseLabelWidth,
-      longestWordWidth,
-    );
+    const minWrappedWordWidth = shouldWrapRadarText(label)
+      ? longestWordWidth + spaceWidth
+      : longestWordWidth;
+    const shouldPreferWrapping =
+      labels.length > 8 && shouldWrapRadarText(label);
+    const preferredLabelWidth = shouldPreferWrapping
+      ? Math.max(
+          minWrappedWordWidth,
+          Math.min(baseLabelWidth, minWrappedWordWidth * 1.2),
+        )
+      : Math.max(baseLabelWidth, minWrappedWordWidth);
+    const maxLabelWidth = Math.max(minLabelWidth, preferredLabelWidth);
     const displayLabel = getRadarDisplayText(label, fontString, maxLabelWidth);
     const metrics = measureText(displayLabel, fontString, lineHeight);
     const cos = Math.cos(angle);

@@ -1,6 +1,5 @@
 import fs from "fs";
 
-// vitest.setup.ts
 import "vitest-canvas-mock";
 import "@testing-library/jest-dom";
 import { vi } from "vitest";
@@ -19,7 +18,6 @@ vi.mock("@excalidraw/common", async (importOriginal) => {
   };
 });
 
-// mock for pep.js not working with setPointerCapture()
 HTMLElement.prototype.setPointerCapture = vi.fn();
 
 Object.assign(globalThis, testPolyfills);
@@ -34,8 +32,8 @@ Object.defineProperty(window, "matchMedia", {
     matches: false,
     media: query,
     onchange: null,
-    addListener: vi.fn(), // deprecated
-    removeListener: vi.fn(), // deprecated
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
@@ -78,7 +76,6 @@ Object.defineProperty(window, "EXCALIDRAW_ASSET_PATH", {
   value: `file://${__dirname}/`,
 });
 
-// mock the font fetch only, so that everything else, as font subsetting, can run inside of the (snapshot) tests
 vi.mock(
   "./packages/excalidraw/fonts/ExcalidrawFontFace",
   async (importOriginal) => {
@@ -95,7 +92,6 @@ vi.mock(
             return super.fetchFont(url);
           }
 
-          // read local assets directly, without running a server
           const content = await fs.promises.readFile(url);
           return content.buffer;
         }
@@ -104,17 +100,12 @@ vi.mock(
   },
 );
 
-// ReactDOM is located inside index.tsx file
-// as a result, we need a place for it to render into
 const element = document.createElement("div");
 element.id = "root";
 document.body.appendChild(element);
 
 const _consoleError = console.error.bind(console);
 console.error = (...args) => {
-  // the react's act() warning usually doesn't contain any useful stack trace
-  // so we're catching the log and re-logging the message with the test name,
-  // also stripping the actual component stack trace as it's not useful
   if (args[0]?.includes?.("act(")) {
     _consoleError(
       yellow(

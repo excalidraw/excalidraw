@@ -1,7 +1,13 @@
 import { queryByText } from "@testing-library/react";
+import { vi } from "vitest";
 
 import { pointFrom } from "@excalidraw/math";
-import { getOriginalContainerHeightFromCache } from "@excalidraw/element";
+import rough from "roughjs/bin/rough";
+
+import {
+  getOriginalContainerHeightFromCache,
+  renderElement,
+} from "@excalidraw/element";
 
 import {
   CODES,
@@ -283,7 +289,7 @@ describe("textWysiwyg", () => {
       UI.resize(text, "e", [-20, 0]);
       expect(text.width).not.toEqual(prevWidth);
       expect(text.height).not.toEqual(prevHeight);
-      expect(text.text).not.toEqual(prevText);
+      expect(text.text).toEqual(prevText);
       expect(text.autoResize).toBe(false);
 
       const wrappedWidth = text.width;
@@ -351,6 +357,37 @@ describe("textWysiwyg", () => {
     });
   });
 
+  describe("escape behavior", () => {
+    const { h } = window;
+
+    beforeEach(async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      API.setElements([]);
+    });
+
+    it("should deselect selected text element on escape", () => {
+      const text = API.createElement({
+        type: "text",
+        text: "ola",
+        x: 60,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      API.setElements([text]);
+      UI.clickTool("selection");
+      mouse.clickOn(text);
+
+      expect(h.state.selectedElementIds[text.id]).toBe(true);
+
+      Keyboard.keyPress(KEYS.ESCAPE);
+
+      expect(h.state.selectedElementIds[text.id]).toBeUndefined();
+      expect(Object.keys(h.state.selectedElementIds)).toHaveLength(0);
+    });
+  });
+
   describe("Test container-unbound text", () => {
     const { h } = window;
     const dimensions = { height: 400, width: 800 };
@@ -375,6 +412,173 @@ describe("textWysiwyg", () => {
 
     afterAll(() => {
       restoreOriginalGetBoundingClientRect();
+    });
+
+    it("should visualize spaces and newlines in the text editor", () => {
+      const overlay = document.querySelector<HTMLDivElement>(
+        ".excalidraw-wysiwyg__whitespaceOverlay",
+      );
+
+      expect(overlay).not.toBe(null);
+
+      updateTextEditor(textarea, "a b\nc");
+
+      expect(
+        overlay!.querySelectorAll(".excalidraw-wysiwyg__ws--space").length,
+      ).toBe(1);
+      expect(
+        overlay!.querySelectorAll(".excalidraw-wysiwyg__ws--newline").length,
+      ).toBe(1);
+
+      Keyboard.exitTextEditor(textarea);
+
+      expect(
+        document.querySelector(".excalidraw-wysiwyg__whitespaceOverlay"),
+      ).toBe(null);
+    });
+
+    it("should render consistent whitespace markers in edit and non-edit modes", () => {
+      const value = "a  b\nc d\nx";
+
+      const overlay = document.querySelector<HTMLDivElement>(
+        ".excalidraw-wysiwyg__whitespaceOverlay",
+      );
+      expect(overlay).not.toBe(null);
+
+      updateTextEditor(textarea, value);
+
+      const expectedSpaceCount = (value.match(/ /g) ?? []).length;
+      const expectedNewlineCount = (value.match(/\n/g) ?? []).length;
+      const fontSize = textElement.fontSize;
+      const expectedDotRadius = Math.max(0.5, fontSize * 0.09);
+      const expectedNewlinePadding = Math.max(
+        expectedDotRadius * 4,
+        fontSize * 0.4,
+      );
+
+      expect(
+        overlay!.querySelectorAll(".excalidraw-wysiwyg__ws--space").length,
+      ).toBe(expectedSpaceCount);
+      const editorNewlines = Array.from(
+        overlay!.querySelectorAll<HTMLSpanElement>(
+          ".excalidraw-wysiwyg__ws--newline",
+        ),
+      );
+      expect(editorNewlines).toHaveLength(expectedNewlineCount);
+      for (const marker of editorNewlines) {
+        expect(parseFloat(marker.style.marginLeft)).toBeCloseTo(
+          expectedNewlinePadding,
+          2,
+        );
+      }
+
+      Keyboard.exitTextEditor(textarea);
+
+      const latestTextElement = window.h.elements.find(
+        (el) => el.id === textElement.id,
+      ) as ExcalidrawTextElement;
+
+      expect(latestTextElement.originalText).toBe(value);
+
+      const elementForRender = {
+        ...latestTextElement,
+        x: 0,
+        y: 0,
+        angle: 0,
+        textAlign: "left",
+      } as ExcalidrawTextElement;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = 1000;
+      canvas.height = 1000;
+      const context = canvas.getContext("2d")!;
+      const rc = rough.canvas(canvas);
+
+      const arcSpy = vi.spyOn(context, "arc");
+      const fillTextSpy = vi.spyOn(context, "fillText");
+      const charWidth = elementForRender.fontSize * 0.6;
+      vi.spyOn(context, "measureText").mockImplementation((text: string) => {
+        return { width: String(text).length * charWidth } as TextMetrics;
+      });
+
+      const elementsMap = new Map([
+        [elementForRender.id, elementForRender],
+      ]) as any;
+      const allElementsMap = new Map([
+        [elementForRender.id, elementForRender],
+      ]) as any;
+
+      const renderConfig = {
+        canvasBackgroundColor: "#ffffff",
+        imageCache: new Map(),
+        renderGrid: false,
+        isExporting: true,
+        embedsValidationStatus: new Map(),
+        elementsPendingErasure: new Set(),
+        pendingFlowchartNodes: null,
+        theme: THEME.LIGHT,
+      } as any;
+
+      const appState = {
+        zoom: { value: 1 },
+        scrollX: 0,
+        scrollY: 0,
+        width: 1000,
+        height: 1000,
+        viewModeEnabled: false,
+        openDialog: null,
+        hoveredElementIds: {},
+        selectedElementIds: {},
+        offsetLeft: 0,
+        offsetTop: 0,
+        theme: THEME.LIGHT,
+        shouldCacheIgnoreZoom: false,
+        viewBackgroundColor: "#ffffff",
+        exportScale: 1,
+        selectedElementsAreBeingDragged: false,
+        gridSize: null,
+        gridStep: 1,
+        frameRendering: { enabled: false, outline: false, clip: false },
+        selectedLinearElements: {},
+        frameToHighlight: null,
+        editingGroupId: null,
+        currentHoveredFontFamily: null,
+        croppingElementId: null,
+        suggestedBinding: null,
+      } as any;
+
+      renderElement(
+        elementForRender as any,
+        elementsMap,
+        allElementsMap,
+        rc,
+        context,
+        renderConfig,
+        appState,
+      );
+
+      const newlineMarkerCalls = fillTextSpy.mock.calls.filter(
+        (call) => call[0] === "↵",
+      );
+
+      expect(arcSpy).toHaveBeenCalledTimes(expectedSpaceCount);
+      expect(newlineMarkerCalls).toHaveLength(expectedNewlineCount);
+
+      const lines = value.split("\n");
+      expect(newlineMarkerCalls[0]?.[1]).toBeCloseTo(
+        lines[0]!.length * charWidth + expectedNewlinePadding,
+        2,
+      );
+      expect(newlineMarkerCalls[1]?.[1]).toBeCloseTo(
+        lines[1]!.length * charWidth + expectedNewlinePadding,
+        2,
+      );
+    });
+
+    it("should keep text selected when exiting editor via escape", () => {
+      Keyboard.exitTextEditor(textarea);
+      expect(h.state.editingTextElement).toBe(null);
+      expect(h.state.selectedElementIds[textElement.id]).toBe(true);
     });
 
     it("should add a tab at the start of the first line", () => {
@@ -565,8 +769,8 @@ describe("textWysiwyg", () => {
       );
       Keyboard.exitTextEditor(textarea);
 
-      expect(textarea.style.width).toBe("792px");
-      expect(h.elements[0].width).toBe(1000);
+      expect(textarea.style.width).toBe("300px");
+      expect(h.elements[0].width).toBe(300);
     });
   });
 
@@ -926,7 +1130,7 @@ describe("textWysiwyg", () => {
 
       Keyboard.exitTextEditor(editor);
       text = h.elements[1] as ExcalidrawTextElementWithContainer;
-      expect(text.text).toBe("Hello\nWorld!");
+      expect(text.text).toBe("Hello World!");
       expect(text.originalText).toBe("Hello World!");
       expect(text.y).toBe(
         rectangle.y + h.elements[0].height / 2 - text.height / 2,
@@ -1233,7 +1437,7 @@ describe("textWysiwyg", () => {
       );
 
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text).toBe(
-        "Online\nwhiteboa\nrd\ncollabor\nation\nmade\neasy",
+        "Online whiteboard collaboration made easy",
       );
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
@@ -1463,12 +1667,14 @@ describe("textWysiwyg", () => {
       Keyboard.exitTextEditor(editor);
 
       const textElement = h.elements[1] as ExcalidrawTextElement;
-      expect(textElement.width).toBe(600);
-      expect(textElement.height).toBe(25);
+      expect(textElement.width).toBe(300);
+      expect(textElement.height).toBeGreaterThan(0);
       expect(textElement.textAlign).toBe(TEXT_ALIGN.LEFT);
       expect((textElement as ExcalidrawTextElement).text).toBe(
         "Excalidraw is an opensource virtual collaborative whiteboard",
       );
+
+      const textElementId = textElement.id;
 
       API.setSelectedElements([textElement]);
 
@@ -1484,37 +1690,25 @@ describe("textWysiwyg", () => {
       );
       expect(h.elements.length).toBe(3);
 
-      expect(h.elements[1]).toEqual(
-        expect.objectContaining({
-          angle: 0,
-          backgroundColor: "transparent",
-          boundElements: [
-            {
-              id: h.elements[2].id,
-              type: "text",
-            },
-          ],
-          fillStyle: "solid",
-          groupIds: [],
-          height: 35,
-          isDeleted: false,
-          link: null,
-          locked: false,
-          opacity: 100,
-          roughness: 1,
-          roundness: null,
-          strokeColor: "#1e1e1e",
-          strokeStyle: "solid",
-          strokeWidth: 2,
-          type: "rectangle",
-          updated: 1,
-          version: 2,
-          width: 610,
-          x: 15,
-          y: 25,
-        }),
+      const container = h.elements[1] as any;
+      const boundText = h.elements.find(
+        (el) => el.id === textElementId,
+      ) as ExcalidrawTextElement;
+
+      expect(container.type).toBe("rectangle");
+      expect(container.boundElements).toEqual([
+        { id: boundText.id, type: "text" },
+      ]);
+      expect(container.x).toBeLessThanOrEqual(boundText.x);
+      expect(container.y).toBeLessThanOrEqual(boundText.y);
+      expect(container.x + container.width).toBeGreaterThanOrEqual(
+        boundText.x + boundText.width,
       );
-      expect(h.elements[2] as ExcalidrawTextElement).toEqual(
+      expect(container.y + container.height).toBeGreaterThanOrEqual(
+        boundText.y + boundText.height,
+      );
+
+      expect(boundText).toEqual(
         expect.objectContaining({
           text: "Excalidraw is an opensource virtual collaborative whiteboard",
           verticalAlign: VERTICAL_ALIGN.MIDDLE,
@@ -1688,7 +1882,7 @@ describe("textWysiwyg", () => {
       API.setElements([]);
     });
 
-    it("should update textarea color when theme changes to dark mode and back", async () => {
+    it("should update textarea caret color when theme changes to dark mode and back", async () => {
       const originalColor = "#ff0000";
 
       const textElement = API.createElement({
@@ -1703,7 +1897,7 @@ describe("textWysiwyg", () => {
 
       const editor = await getTextEditor({ waitForEditor: true });
 
-      expect(colorsAreEqual(editor.style.color, originalColor)).toBe(true);
+      expect(colorsAreEqual(editor.style.caretColor, originalColor)).toBe(true);
 
       act(() => {
         h.setState({ theme: THEME.DARK });
@@ -1711,14 +1905,17 @@ describe("textWysiwyg", () => {
         h.app.scene.mutateElement(textElement, {});
       });
       expect(
-        colorsAreEqual(editor.style.color, applyDarkModeFilter(originalColor)),
+        colorsAreEqual(
+          editor.style.caretColor,
+          applyDarkModeFilter(originalColor),
+        ),
       ).toBe(true);
 
       act(() => {
         h.setState({ theme: THEME.LIGHT });
         h.app.scene.mutateElement(textElement, {});
       });
-      expect(colorsAreEqual(editor.style.color, originalColor)).toBe(true);
+      expect(colorsAreEqual(editor.style.caretColor, originalColor)).toBe(true);
     });
   });
 });

@@ -49,6 +49,38 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.25,
     },
   },
+  [FONT_FAMILY["Source Han Sans SC"]]: {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 1011,
+      descender: -353,
+      lineHeight: 1.25,
+    },
+  },
+  [FONT_FAMILY["Source Code Pro"]]: {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 984,
+      descender: -273,
+      lineHeight: 1.2,
+    },
+  },
+  [FONT_FAMILY["Maple Mono Normal NL"]]: {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 984,
+      descender: -273,
+      lineHeight: 1.2,
+    },
+  },
+  [FONT_FAMILY["Sarasa Fixed CL Bold Nerd Font"]]: {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 984,
+      descender: -273,
+      lineHeight: 1.2,
+    },
+  },
   [FONT_FAMILY["Lilita One"]]: {
     metrics: {
       unitsPerEm: 1000,

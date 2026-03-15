@@ -230,6 +230,8 @@ export type InteractiveCanvasAppState = Readonly<
     collaborators: AppState["collaborators"];
     // SnapLines
     snapLines: AppState["snapLines"];
+    preciseMeasurement: AppState["preciseMeasurement"];
+    gridCharTopMeasurement: AppState["gridCharTopMeasurement"];
     zenModeEnabled: AppState["zenModeEnabled"];
     editingTextElement: AppState["editingTextElement"];
     // Cropping
@@ -445,6 +447,21 @@ export interface AppState {
     y: number;
   } | null;
   objectsSnapModeEnabled: boolean;
+  preciseMeasurement: {
+    start: GlobalPoint;
+    end: GlobalPoint;
+    dragging: "start" | "end" | null;
+    isCreating: boolean;
+  } | null;
+  gridCharTopMeasurement: {
+    updated: number;
+    segments: ReadonlyArray<{
+      x: number;
+      y1: number;
+      y2: number;
+      distance: number;
+    }>;
+  } | null;
   /** the user's socket id & username who is being followed on the canvas */
   userToFollow: UserToFollow | null;
   /** the socket ids of the users following the current user */

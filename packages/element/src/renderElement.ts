@@ -53,6 +53,7 @@ import {
   getBoundTextMaxWidth,
 } from "./textElement";
 import { getLineHeightInPx } from "./textMeasurements";
+import { wrapTextPreservingWhitespaceWithExplicitNewlineMarkers } from "./textWrapping";
 import {
   isTextElement,
   isLinearElement,
@@ -89,12 +90,93 @@ const isPendingImageElement = (
   isInitializedImageElement(element) &&
   !renderConfig.imageCache.has(element.fileId);
 
+const drawTextWhitespaceMarkers = ({
+  context,
+  element,
+  lines,
+  explicitNewlineAfterLine,
+  horizontalOffset,
+  lineHeightPx,
+  verticalOffset,
+}: {
+  context: CanvasRenderingContext2D;
+  element: ExcalidrawTextElement;
+  lines: readonly string[];
+  explicitNewlineAfterLine: readonly boolean[];
+  horizontalOffset: number;
+  lineHeightPx: number;
+  verticalOffset: number;
+}) => {
+  const markerColor = "rgba(168, 168, 168, 0.55)";
+  const dotRadius = Math.max(0.5, element.fontSize * 0.09);
+  const newlineMarkerPadding = Math.max(dotRadius * 4, element.fontSize * 0.4);
+
+  context.save();
+  context.fillStyle = markerColor;
+  context.textAlign = "left";
+  context.textBaseline = "alphabetic";
+
+  for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+    const line = lines[lineIndex];
+    const lineWidth = context.measureText(line).width;
+    const lineStartX =
+      element.textAlign === "center"
+        ? horizontalOffset - lineWidth / 2
+        : element.textAlign === "right"
+        ? horizontalOffset - lineWidth
+        : horizontalOffset;
+
+    const yCenter = lineIndex * lineHeightPx + lineHeightPx / 2;
+
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] !== " ") {
+        continue;
+      }
+      const prefixWidth = context.measureText(line.slice(0, i)).width;
+      const prefixWithSpaceWidth = context.measureText(
+        line.slice(0, i + 1),
+      ).width;
+      const xCenter = lineStartX + (prefixWidth + prefixWithSpaceWidth) / 2;
+
+      context.beginPath();
+      context.arc(xCenter, yCenter, dotRadius, 0, Math.PI * 2);
+      context.fill();
+    }
+
+    // 只在“真实换行符 \n”的位置绘制换行符提示：
+    // - `lines` 里既包含用户输入的真实换行，也包含为了适配宽度而产生的自动换行（软换行）。
+    // - 自动换行处不应该显示 ↵，否则会误导用户以为文本里真的插入了换行符。
+    if (explicitNewlineAfterLine[lineIndex]) {
+      const xEnd = lineStartX + lineWidth;
+      context.save();
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(
+        "↵",
+        xEnd + newlineMarkerPadding,
+        lineIndex * lineHeightPx + lineHeightPx / 2,
+      );
+      context.restore();
+    }
+  }
+
+  context.restore();
+};
+
 const getCanvasPadding = (element: ExcalidrawElement) => {
   switch (element.type) {
     case "freedraw":
       return element.strokeWidth * 12;
-    case "text":
-      return element.fontSize / 2;
+    case "text": {
+      const text = (element as ExcalidrawTextElement).originalText ?? "";
+      const normalizedText = text.replace(/\r\n?/g, "\n");
+      const logicalLineCount = normalizedText.split("\n").length;
+      const digits = String(Math.max(1, logicalLineCount)).length;
+      const lineNumberFontSize = Math.max(10, element.fontSize * 0.8);
+      const lineNumberGutterWidthEstimate =
+        lineNumberFontSize * (digits * 0.65 + 1.2);
+      return element.fontSize / 2 + lineNumberGutterWidthEstimate;
+    }
     case "arrow":
       if (element.endArrowhead || element.endArrowhead) {
         return 40;
@@ -253,7 +335,7 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  drawElementOnCanvas(element, rc, context, renderConfig);
+  drawElementOnCanvas(element, rc, context, renderConfig, elementsMap);
 
   context.restore();
 
@@ -389,6 +471,7 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
+  elementsMap: ElementsMap,
 ) => {
   switch (element.type) {
     case "rectangle":
@@ -545,7 +628,21 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isTextElement(element)) {
-        const rtl = isRTL(element.text);
+        const container = getContainerElement(element, elementsMap);
+        const shouldWrap = !!container || !element.autoResize;
+        const maxWidth = container
+          ? getBoundTextMaxWidth(container, element)
+          : element.width;
+        const { lines, explicitNewlineAfterLine } =
+          wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
+            element.originalText,
+            getFontString(element),
+            shouldWrap ? maxWidth : Infinity,
+          );
+
+        const renderedText = lines.join("\n");
+
+        const rtl = isRTL(renderedText);
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
         if (shouldTemporarilyAttach) {
           // to correctly render RTL text mixed with LTR, we have to append it
@@ -560,9 +657,6 @@ const drawElementOnCanvas = (
             ? applyDarkModeFilter(element.strokeColor)
             : element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
-
-        // Canvas does not support multiline text by default
-        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
 
         const horizontalOffset =
           element.textAlign === "center"
@@ -588,6 +682,62 @@ const drawElementOnCanvas = (
             horizontalOffset,
             index * lineHeightPx + verticalOffset,
           );
+        }
+
+        drawTextWhitespaceMarkers({
+          context,
+          element,
+          lines,
+          explicitNewlineAfterLine,
+          horizontalOffset,
+          lineHeightPx,
+          verticalOffset,
+        });
+
+        if (!renderConfig.isExporting) {
+          context.save();
+          const lineNumberFontSize = Math.max(10, element.fontSize * 0.8);
+          context.font = getFontString({
+            fontSize: lineNumberFontSize,
+            fontFamily: element.fontFamily,
+          });
+          context.fillStyle = "rgba(168, 168, 168, 0.55)";
+          context.textAlign = "right";
+          context.textBaseline = "alphabetic";
+
+          const gutterPadding = Math.max(4, lineNumberFontSize * 0.25);
+          const gutterRightX = -gutterPadding;
+
+          let lineNumber = 1;
+          for (let index = 0; index < lines.length; index++) {
+            const isNewLogicalLine =
+              index === 0 || explicitNewlineAfterLine[index - 1];
+
+            if (isNewLogicalLine) {
+              context.fillText(
+                String(lineNumber),
+                gutterRightX,
+                index * lineHeightPx + verticalOffset,
+              );
+            }
+
+            if (explicitNewlineAfterLine[index]) {
+              lineNumber++;
+            }
+          }
+          context.restore();
+
+          context.save();
+          context.strokeStyle = "rgba(168, 168, 168, 0.55)";
+          context.lineWidth = 1;
+          context.setLineDash([4, 2]);
+          context.strokeRect(
+            0.5,
+            0.5,
+            Math.max(0, element.width - 1),
+            Math.max(0, element.height - 1),
+          );
+          context.restore();
         }
         context.restore();
         if (shouldTemporarilyAttach) {
@@ -854,7 +1004,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig);
+        drawElementOnCanvas(element, rc, context, renderConfig, elementsMap);
         context.restore();
       } else {
         const elementWithCanvas = generateElementWithCanvas(
@@ -940,7 +1090,13 @@ export const renderElement = (
 
           tempCanvasContext.translate(-shiftX, -shiftY);
 
-          drawElementOnCanvas(element, tempRc, tempCanvasContext, renderConfig);
+          drawElementOnCanvas(
+            element,
+            tempRc,
+            tempCanvasContext,
+            renderConfig,
+            elementsMap,
+          );
 
           tempCanvasContext.translate(shiftX, shiftY);
 
@@ -979,13 +1135,49 @@ export const renderElement = (
           }
 
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig);
+          drawElementOnCanvas(element, rc, context, renderConfig, elementsMap);
         }
 
         context.restore();
         // not exporting → optimized rendering (cache & render from element
         // canvases)
       } else {
+        if (
+          element.type === "text" &&
+          !appState?.shouldCacheIgnoreZoom &&
+          cappedElementCanvasSize(element, allElementsMap, appState.zoom)
+            .scale < appState.zoom.value
+        ) {
+          const [x1, y1, x2, y2] = getElementAbsoluteCoords(
+            element,
+            elementsMap,
+          );
+          const cx = (x1 + x2) / 2 + appState.scrollX;
+          const cy = (y1 + y2) / 2 + appState.scrollY;
+          let shiftX = (x2 - x1) / 2 - (element.x - x1);
+          let shiftY = (y2 - y1) / 2 - (element.y - y1);
+
+          const container = getContainerElement(element, elementsMap);
+          if (isArrowElement(container)) {
+            const boundTextCoords =
+              LinearElementEditor.getBoundTextElementPosition(
+                container,
+                element as ExcalidrawTextElementWithContainer,
+                elementsMap,
+              );
+            shiftX = (x2 - x1) / 2 - (boundTextCoords.x - x1);
+            shiftY = (y2 - y1) / 2 - (boundTextCoords.y - y1);
+          }
+
+          context.save();
+          context.translate(cx, cy);
+          context.rotate(element.angle);
+          context.translate(-shiftX, -shiftY);
+          drawElementOnCanvas(element, rc, context, renderConfig, elementsMap);
+          context.restore();
+          break;
+        }
+
         const elementWithCanvas = generateElementWithCanvas(
           element,
           allElementsMap,

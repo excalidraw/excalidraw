@@ -3861,7 +3861,7 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
 
 exports[`regression tests > click-drag to select a group > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > click-drag to select a group > [end of test] number of renders 1`] = `14`;
+exports[`regression tests > click-drag to select a group > [end of test] number of renders 1`] = `15`;
 
 exports[`regression tests > click-drag to select a group > [end of test] redo stack 1`] = `[]`;
 

@@ -47,7 +47,7 @@ import {
   getApproxMinLineWidth,
   getApproxMinLineHeight,
 } from "./textMeasurements";
-import { wrapText } from "./textWrapping";
+import { wrapTextPreservingWhitespace } from "./textWrapping";
 import {
   isArrowElement,
   isBindingElement,
@@ -361,13 +361,13 @@ export const resizeSingleTextElement = (
 
     const newWidth = Math.max(minWidth, nextWidth);
 
-    const text = wrapText(
+    const wrappedText = wrapTextPreservingWhitespace(
       element.originalText,
       getFontString(element),
       Math.abs(newWidth),
     );
     const metrics = measureText(
-      text,
+      wrappedText,
       getFontString(element),
       element.lineHeight,
     );
@@ -393,7 +393,7 @@ export const resizeSingleTextElement = (
       height: Math.abs(metrics.height),
       x: newOrigin.x,
       y: newOrigin.y,
-      text,
+      text: element.originalText,
       autoResize: false,
     };
 

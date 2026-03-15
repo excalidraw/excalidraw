@@ -23,7 +23,7 @@ import {
 import { LinearElementEditor } from "./linearElementEditor";
 
 import { measureText } from "./textMeasurements";
-import { wrapText } from "./textWrapping";
+import { wrapTextPreservingWhitespace } from "./textWrapping";
 import {
   isBoundToContainer,
   isArrowElement,
@@ -62,7 +62,7 @@ export const redrawTextBoundingBox = (
   const boundTextUpdates = {
     x: textElement.x,
     y: textElement.y,
-    text: textElement.text,
+    text: textElement.originalText,
     width: textElement.width,
     height: textElement.height,
     angle: (container
@@ -72,21 +72,20 @@ export const redrawTextBoundingBox = (
       : textElement.angle) as Radians,
   };
 
-  boundTextUpdates.text = textElement.text;
-
+  let measurementText = boundTextUpdates.text;
   if (container || !textElement.autoResize) {
     maxWidth = container
       ? getBoundTextMaxWidth(container, textElement)
       : textElement.width;
-    boundTextUpdates.text = wrapText(
-      textElement.originalText,
+    measurementText = wrapTextPreservingWhitespace(
+      boundTextUpdates.text,
       getFontString(textElement),
       maxWidth,
     );
   }
 
   const metrics = measureText(
-    boundTextUpdates.text,
+    measurementText,
     getFontString(textElement),
     textElement.lineHeight,
   );
@@ -157,7 +156,8 @@ export const handleBindTextResize = (
       return;
     }
 
-    let text = textElement.text;
+    const text = textElement.originalText;
+    let measurementText = text;
     let nextHeight = textElement.height;
     let nextWidth = textElement.width;
     const maxWidth = getBoundTextMaxWidth(container, textElement);
@@ -167,15 +167,13 @@ export const handleBindTextResize = (
       shouldMaintainAspectRatio ||
       (transformHandleType !== "n" && transformHandleType !== "s")
     ) {
-      if (text) {
-        text = wrapText(
-          textElement.originalText,
-          getFontString(textElement),
-          maxWidth,
-        );
-      }
-      const metrics = measureText(
+      measurementText = wrapTextPreservingWhitespace(
         text,
+        getFontString(textElement),
+        maxWidth,
+      );
+      const metrics = measureText(
+        measurementText,
         getFontString(textElement),
         textElement.lineHeight,
       );
