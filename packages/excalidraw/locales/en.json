@@ -318,6 +318,8 @@
     "frame": "Frame tool",
     "magicframe": "Wireframe to code",
     "embeddable": "Web Embed",
+    "measure": "Precise distance measure",
+    "gridCharTopMeasure": "Character top gridline measure",
     "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",

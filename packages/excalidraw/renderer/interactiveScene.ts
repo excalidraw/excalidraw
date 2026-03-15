@@ -1930,6 +1930,9 @@ const _renderInteractiveScene = ({
     }
   });
 
+  renderPreciseMeasurement(context, appState, renderConfig.selectionColor);
+  renderGridCharTopMeasurement(context, appState, renderConfig.selectionColor);
+
   renderSnaps(context, appState);
 
   context.restore();
@@ -1976,6 +1979,117 @@ const _renderInteractiveScene = ({
     elementsMap,
     animationState: nextAnimationState,
   };
+};
+
+const renderPreciseMeasurement = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  color: string,
+) => {
+  const measurement = appState.preciseMeasurement;
+  if (!measurement) {
+    return;
+  }
+
+  const [x1, y1] = measurement.start;
+  const [x2, y2] = measurement.end;
+
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
+  context.strokeStyle = color;
+  context.lineWidth = 5 / appState.zoom.value;
+  context.lineCap = "round";
+
+  context.beginPath();
+  context.moveTo(x1, y1);
+  context.lineTo(x2, y2);
+  context.stroke();
+
+  const handleRadius = 6 / appState.zoom.value;
+  context.fillStyle =
+    appState.theme === THEME.DARK
+      ? "rgba(0, 0, 0, 0.6)"
+      : "rgba(255,255,255,0.6)";
+  fillCircle(context, x1, y1, handleRadius, true, true);
+  fillCircle(context, x2, y2, handleRadius, true, true);
+
+  const midX = (x1 + x2) / 2;
+  const midY = (y1 + y2) / 2;
+  const distance = pointDistance(measurement.start, measurement.end);
+  const rounded = Math.round(distance * 100) / 100;
+  const label = `${
+    Number.isInteger(rounded) ? rounded : rounded.toFixed(2)
+  } px`;
+
+  context.font = `${
+    20 / appState.zoom.value
+  }px Virgil, Segoe UI, Arial, sans-serif`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+
+  context.lineJoin = "round";
+  context.strokeStyle =
+    appState.theme === THEME.DARK ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.9)";
+  context.lineWidth = 4 / appState.zoom.value;
+  context.strokeText(label, midX, midY);
+
+  context.fillStyle = color;
+  context.fillText(label, midX, midY);
+
+  context.restore();
+};
+
+const renderGridCharTopMeasurement = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  color: string,
+) => {
+  const measurement = appState.gridCharTopMeasurement;
+  if (!measurement) {
+    return;
+  }
+
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
+  context.strokeStyle = color;
+  context.lineWidth = 5 / appState.zoom.value;
+  context.lineCap = "round";
+  context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
+
+  const fontSize = 20 / appState.zoom.value;
+  context.font = `${fontSize}px Virgil, Segoe UI, Arial, sans-serif`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.lineJoin = "round";
+
+  for (const seg of measurement.segments) {
+    context.beginPath();
+    context.moveTo(seg.x, seg.y1);
+    context.lineTo(seg.x, seg.y2);
+    context.stroke();
+
+    const midY = (seg.y1 + seg.y2) / 2;
+    const rounded = Math.round(seg.distance * 100) / 100;
+    const label = `${
+      Number.isInteger(rounded) ? rounded : rounded.toFixed(2)
+    } px`;
+
+    context.save();
+    context.setLineDash([]);
+    context.strokeStyle =
+      appState.theme === THEME.DARK
+        ? "rgba(0,0,0,0.7)"
+        : "rgba(255,255,255,0.9)";
+    context.lineWidth = 4 / appState.zoom.value;
+    context.strokeText(label, seg.x, midY);
+    context.fillStyle = color;
+    context.fillText(label, seg.x, midY);
+    context.restore();
+  }
+
+  context.restore();
 };
 
 /**

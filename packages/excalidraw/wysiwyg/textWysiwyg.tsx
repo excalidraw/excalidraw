@@ -343,7 +343,8 @@ export const textWysiwyg = ({
         ),
         textAlign,
         verticalAlign,
-        color:
+        color: "transparent",
+        caretColor:
           appState.theme === THEME.DARK
             ? applyDarkModeFilter(updatedTextElement.strokeColor)
             : updatedTextElement.strokeColor,

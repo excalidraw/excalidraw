@@ -1,6 +1,4 @@
-yarn install
-yarn --cwd ./excalidraw-app vite --port 3000 --strictPort
-yarn electron:dev
+
 所有的新更能都添加详细注释,不要删除代码,直接注释掉就行了;
 不要运行其他的测试文件,一切功能以这个文件为准;
 
@@ -194,20 +192,52 @@ textWysiwyg.tsx:L163-L231
 
 添加更严格的测试条件
 (相对于某一个网格的位置)
-记录这个文本框中每个字符的绝对位置方法:
-方法 1（最推荐）：在真实浏览器 E2E 中，用现成的 whitespace overlay + Range 取每个索引的 rect 
-编写新的测试"clicking to edit the text box will not change the character absolute position"
+记录这个文本框中每个字符的相对于某一个网格的位置方法:
+编辑态：用 whitespace overlay + Range 拿“字符像素坐标”，再转 scene，再转网格
+非编辑态:B. 用 canvas 实际绘制信息推 scene 坐标（更贴近非编辑态 canvas）
+编写测试"clicking to edit the text box will not change the character absolute position"
 操作A:{在画布中创建一个文本框,填入随机生成的内容(用其他算法生成)包括中文英文符号空格换行位置随机排列不少于200个字符;
-记录这个文本框中每个字符的绝对位置,越精确越好,
-不移动画布然后双击编辑,记录编辑时每个字符的绝对位置如果每个字符的绝对位置没有改变则测试通过;}
+记录这个文本框中每个字符的相对于某一个网格的位置,越精确越好,
+不移动画布然后双击编辑,记录编辑时每个字符的相对于某一个网格的位置如果每个字符的相对于某一个网格的位置没有改变则测试通过;}
 操作B{然后模拟鼠标逐渐减小文本框宽度(一次5px),再次执行操作A,如果操作A仍然通过则操作B通过}
+
+
+
+
+获取每个字符的相对于某一个网格的位置
+直接读 getImageData() 从像素里找字形边缘 
+距离精确到小数点后4位
+确保-在缩放为3000%时进行测试编写新测试"getImageData clicking to edit the text box will not change the character absolute position"
+编辑时和非编辑时距离到网格线的距离有差异就不通过;
+操作A:{在画布中创建一个文本框,填入随机生成的内容(用其他算法生成)包括中文英文符号空格换行位置随机排列不少于200个字符;
+记录这个文本框中每个字符的相对于某一个网格的位置,越精确越好,
+不移动画布然后双击编辑,记录编辑时每个字符的相对于某一个网格的位置如果每个字符的相对于某一个网格的位置没有改变则测试通过;}
+操作B{然后模拟鼠标逐渐减小文本框宽度(一次5px),再次执行操作A,如果操作A仍然通过则操作B通过}
+
+
+
+
+
+
+
+在"画布距离精确测量工具"按钮下方添加一个测量某一个字符到周围网格的距离的测量工具
+"字符顶部网格线距离测量工具"
+"字符顶部网格线距离":这个字符顶部最近的一个像素到画布中最近的一个网格线的距离
+点击这个工具后将对画布中所有文本框的文本框中的字符进行计算,编辑时也进行计算,计算结果隔3s自动刷新;直到下一次刷新画布消失;
+
+
+
+
+
 
 
 把“方法 1”的 E2E 测试体系加进仓库并实现操作 A/B
 
 
 
-
+yarn install
+yarn --cwd ./excalidraw-app vite --port 3000 --strictPort
+yarn electron:dev
 - 通过 
 yarn test:code 、 
 yarn test:typecheck
@@ -217,9 +247,9 @@ yarn test:app --watch=false packages/excalidraw/tests/textDomLayout.test.tsx
 yarn install
 npx playwright install chromium
 yarn test:e2e
-
-
-
+yarn eslint --max-warnings=0 e2e/text-wrap-consistency.spec.ts
+yarn test:e2e --reporter=line
+yarn eslint --max-warnings=0 e2e/text-wrap-consistency.spec.ts
 
 
 

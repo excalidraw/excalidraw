@@ -81,16 +81,7 @@ export class Renderer {
         if (newElementId === element.id) {
           continue;
         }
-
-        // we don't want to render text element that's being currently edited
-        // (it's rendered on remote only)
-        if (
-          !editingTextElement ||
-          editingTextElement.type !== "text" ||
-          element.id !== editingTextElement.id
-        ) {
-          elementsMap.set(element.id, element);
-        }
+        elementsMap.set(element.id, element);
       }
       return elementsMap;
     };
