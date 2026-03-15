@@ -1882,7 +1882,7 @@ describe("textWysiwyg", () => {
       API.setElements([]);
     });
 
-    it("should update textarea color when theme changes to dark mode and back", async () => {
+    it("should update textarea caret color when theme changes to dark mode and back", async () => {
       const originalColor = "#ff0000";
 
       const textElement = API.createElement({
@@ -1897,7 +1897,7 @@ describe("textWysiwyg", () => {
 
       const editor = await getTextEditor({ waitForEditor: true });
 
-      expect(colorsAreEqual(editor.style.color, originalColor)).toBe(true);
+      expect(colorsAreEqual(editor.style.caretColor, originalColor)).toBe(true);
 
       act(() => {
         h.setState({ theme: THEME.DARK });
@@ -1905,14 +1905,17 @@ describe("textWysiwyg", () => {
         h.app.scene.mutateElement(textElement, {});
       });
       expect(
-        colorsAreEqual(editor.style.color, applyDarkModeFilter(originalColor)),
+        colorsAreEqual(
+          editor.style.caretColor,
+          applyDarkModeFilter(originalColor),
+        ),
       ).toBe(true);
 
       act(() => {
         h.setState({ theme: THEME.LIGHT });
         h.app.scene.mutateElement(textElement, {});
       });
-      expect(colorsAreEqual(editor.style.color, originalColor)).toBe(true);
+      expect(colorsAreEqual(editor.style.caretColor, originalColor)).toBe(true);
     });
   });
 });

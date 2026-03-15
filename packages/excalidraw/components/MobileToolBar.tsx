@@ -34,6 +34,8 @@ import {
   LassoIcon,
   mermaidLogoIcon,
   MagicIcon,
+  MeasureToolIcon,
+  GridCharTopMeasureToolIcon,
 } from "./icons";
 
 import "./ToolIcon.scss";
@@ -122,6 +124,11 @@ export const MobileToolBar = ({
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
+  const measureToolSelected =
+    activeTool.type === "custom" && activeTool.customType === "measure";
+  const gridCharTopMeasureToolSelected =
+    activeTool.type === "custom" &&
+    activeTool.customType === "gridCharTopMeasure";
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
@@ -159,6 +166,7 @@ export const MobileToolBar = ({
     "text",
     "frame",
     "embeddable",
+    "measure",
     "laser",
     "magicframe",
   ].filter((tool) => {
@@ -173,9 +181,16 @@ export const MobileToolBar = ({
     }
     return true;
   });
-  const extraToolSelected = extraTools.includes(activeTool.type);
+  const extraToolSelected =
+    extraTools.includes(activeTool.type) ||
+    measureToolSelected ||
+    gridCharTopMeasureToolSelected;
   const extraIcon = extraToolSelected
-    ? activeTool.type === "text"
+    ? gridCharTopMeasureToolSelected
+      ? GridCharTopMeasureToolIcon
+      : measureToolSelected
+      ? MeasureToolIcon
+      : activeTool.type === "text"
       ? TextIcon
       : activeTool.type === "image"
       ? ImageIcon
@@ -454,6 +469,29 @@ export const MobileToolBar = ({
             shortcut={KEYS.K.toLocaleUpperCase()}
           >
             {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() =>
+              app.setActiveTool({ type: "custom", customType: "measure" })
+            }
+            icon={MeasureToolIcon}
+            data-testid="toolbar-measure"
+            selected={measureToolSelected}
+          >
+            {t("toolBar.measure")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() =>
+              app.setActiveTool({
+                type: "custom",
+                customType: "gridCharTopMeasure",
+              })
+            }
+            icon={GridCharTopMeasureToolIcon}
+            data-testid="toolbar-grid-char-top-measure"
+            selected={gridCharTopMeasureToolSelected}
+          >
+            {t("toolBar.gridCharTopMeasure")}
           </DropdownMenu.Item>
           <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
             Generate

@@ -3,11 +3,16 @@ import { expect, test, type Page } from "@playwright/test";
 const installCanvasTextSpy = () => {
   const state = {
     nextId: 1,
-    canvasIds: new WeakMap<HTMLCanvasElement, number>(),
+    canvasIds: new WeakMap<object, number>(),
+    bitmapToSourceCanvasId: new WeakMap<object, number>(),
     calls: [] as Array<
       | {
           kind: "fillText";
           canvasId: number;
+          canvasWidth: number;
+          canvasHeight: number;
+          canvasIsInteractive: boolean;
+          canvasIsStatic: boolean;
           text: string;
           x: number;
           y: number;
@@ -15,6 +20,20 @@ const installCanvasTextSpy = () => {
           textAlign: CanvasTextAlign;
           textBaseline: CanvasTextBaseline;
           direction: CanvasDirection;
+          transform: [number, number, number, number, number, number];
+        }
+      | {
+          kind: "drawImage";
+          sourceCanvasId: number;
+          sourceWidth: number;
+          sourceHeight: number;
+          targetCanvasId: number;
+          targetWidth: number;
+          targetHeight: number;
+          targetIsInteractive: boolean;
+          targetIsStatic: boolean;
+          args: number[];
+          transform: [number, number, number, number, number, number];
         }
       | {
           kind: "clear";
@@ -22,7 +41,7 @@ const installCanvasTextSpy = () => {
     >,
   };
 
-  const getCanvasId = (canvas: HTMLCanvasElement) => {
+  const getCanvasId = (canvas: any) => {
     let id = state.canvasIds.get(canvas);
     if (!id) {
       id = state.nextId++;
@@ -40,11 +59,20 @@ const installCanvasTextSpy = () => {
     maxWidth?: number,
   ) {
     try {
-      const canvas = this.canvas;
+      const canvas = (this as any).canvas;
       if (canvas) {
+        const t = this.getTransform();
         state.calls.push({
           kind: "fillText",
           canvasId: getCanvasId(canvas),
+          canvasWidth: canvas.width,
+          canvasHeight: canvas.height,
+          canvasIsInteractive:
+            canvas instanceof HTMLCanvasElement &&
+            canvas.classList.contains("interactive"),
+          canvasIsStatic:
+            canvas instanceof HTMLCanvasElement &&
+            canvas.classList.contains("static"),
           text: String(text),
           x: Number(x),
           y: Number(y),
@@ -52,11 +80,110 @@ const installCanvasTextSpy = () => {
           textAlign: this.textAlign,
           textBaseline: this.textBaseline,
           direction: this.direction,
+          transform: [t.a, t.b, t.c, t.d, t.e, t.f],
         });
       }
     } catch {}
     return (origFillText as any).call(this, text, x, y, maxWidth);
   };
+
+  const origDrawImage = CanvasRenderingContext2D.prototype.drawImage;
+  CanvasRenderingContext2D.prototype.drawImage = function (
+    this: CanvasRenderingContext2D,
+    image: CanvasImageSource,
+    ...rest: any[]
+  ) {
+    try {
+      const sourceCanvas =
+        image instanceof HTMLCanvasElement ||
+        (typeof OffscreenCanvas !== "undefined" &&
+          image instanceof OffscreenCanvas)
+          ? image
+          : null;
+
+      const sourceBitmap =
+        typeof ImageBitmap !== "undefined" && image instanceof ImageBitmap
+          ? image
+          : null;
+
+      const targetCanvas = this.canvas;
+      if ((sourceCanvas || sourceBitmap) && targetCanvas) {
+        const sourceCanvasId = sourceCanvas
+          ? getCanvasId(sourceCanvas)
+          : state.bitmapToSourceCanvasId.get(sourceBitmap!) ?? -1;
+        const targetCanvasId = getCanvasId(targetCanvas);
+        const t = this.getTransform();
+        const args: number[] = rest
+          .map((v) => Number(v))
+          .filter(Number.isFinite);
+        if (sourceCanvasId === -1) {
+          return (origDrawImage as any).call(this, image, ...rest);
+        }
+        state.calls.push({
+          kind: "drawImage",
+          sourceCanvasId,
+          sourceWidth: sourceCanvas ? sourceCanvas.width : sourceBitmap!.width,
+          sourceHeight: sourceCanvas
+            ? sourceCanvas.height
+            : sourceBitmap!.height,
+          targetCanvasId,
+          targetWidth: targetCanvas.width,
+          targetHeight: targetCanvas.height,
+          targetIsInteractive:
+            targetCanvas instanceof HTMLCanvasElement &&
+            targetCanvas.classList.contains("interactive"),
+          targetIsStatic:
+            targetCanvas instanceof HTMLCanvasElement &&
+            targetCanvas.classList.contains("static"),
+          args,
+          transform: [t.a, t.b, t.c, t.d, t.e, t.f],
+        });
+      }
+    } catch {}
+    return (origDrawImage as any).call(this, image, ...rest);
+  };
+
+  const patchTransferToImageBitmap = (proto: any) => {
+    const orig = proto?.transferToImageBitmap;
+    if (typeof orig !== "function") {
+      return;
+    }
+    proto.transferToImageBitmap = function (this: any, ...args: any[]) {
+      const bitmap = orig.apply(this, args);
+      try {
+        state.bitmapToSourceCanvasId.set(bitmap, getCanvasId(this));
+      } catch {}
+      return bitmap;
+    };
+  };
+
+  patchTransferToImageBitmap(HTMLCanvasElement.prototype);
+  if (typeof OffscreenCanvas !== "undefined") {
+    patchTransferToImageBitmap((OffscreenCanvas as any).prototype);
+  }
+
+  if (typeof createImageBitmap === "function") {
+    const origCreate = createImageBitmap;
+    // @ts-expect-error override global for E2E
+    window.createImageBitmap = function (image: any, ...args: any[]) {
+      const sourceId =
+        image instanceof HTMLCanvasElement ||
+        (typeof OffscreenCanvas !== "undefined" &&
+          image instanceof OffscreenCanvas)
+          ? getCanvasId(image)
+          : null;
+      const p = (origCreate as any).call(window, image, ...args);
+      if (sourceId == null) {
+        return p;
+      }
+      return p.then((bitmap: any) => {
+        try {
+          state.bitmapToSourceCanvasId.set(bitmap, sourceId);
+        } catch {}
+        return bitmap;
+      });
+    };
+  }
 
   (window as any).__e2eCanvasText = {
     clear() {
@@ -259,47 +386,6 @@ const generateRandomText = (seed: number, minLength: number) => {
   return normalizeNewlines(out);
 };
 
-const getCanvasLinesFromCalls = (
-  calls: Array<any>,
-  opts: { minLines: number },
-) => {
-  const grouped = new Map<number, Array<{ text: string; y: number }>>();
-  for (const c of calls) {
-    if (c?.kind !== "fillText") {
-      continue;
-    }
-    const text = String(c.text);
-    if (!text || text === "↵") {
-      continue;
-    }
-    if (/^\d+$/.test(text)) {
-      continue;
-    }
-    const canvasId = Number(c.canvasId);
-    const arr = grouped.get(canvasId) || [];
-    arr.push({ text, y: Number(c.y) });
-    grouped.set(canvasId, arr);
-  }
-
-  let best: Array<{ text: string; y: number }> = [];
-  for (const arr of grouped.values()) {
-    if (arr.length > best.length) {
-      best = arr;
-    }
-  }
-
-  const lines = best
-    .slice()
-    .sort((a, b) => a.y - b.y)
-    .map((x) => x.text);
-
-  if (lines.length < opts.minLines) {
-    throw new Error(`insufficient canvas lines: ${lines.length}`);
-  }
-
-  return lines;
-};
-
 const selectTool = async (page: Page, tool: string) => {
   await page.locator(`[data-testid="toolbar-${tool}"]`).locator("..").click();
 };
@@ -372,6 +458,193 @@ const waitForCanvasTextCalls = async (page: Page) => {
   });
 };
 
+const getStaticCanvasRegionHashForTextElement = async (
+  page: Page,
+  elementId: string,
+) => {
+  return page.evaluate(
+    ({ elementId }) => {
+      const h = (window as any).h;
+      if (!h?.state) {
+        throw new Error("missing app state");
+      }
+      const state = h.state;
+      const zoom = Number(state.zoom?.value) || 1;
+
+      const el = (h.elements || []).find((e: any) => e?.id === elementId);
+      if (!el || el.type !== "text") {
+        throw new Error("missing text element");
+      }
+
+      const canvas = document.querySelector<HTMLCanvasElement>(
+        "canvas.excalidraw__canvas.static",
+      );
+      if (!canvas) {
+        throw new Error("missing static canvas");
+      }
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = rect.width ? canvas.width / rect.width : 1;
+      const scaleY = rect.height ? canvas.height / rect.height : 1;
+
+      const paddingClientPx = 4;
+      const leftClient =
+        (el.x + state.scrollX) * zoom + rect.left - paddingClientPx;
+      const topClient =
+        (el.y + state.scrollY) * zoom + rect.top - paddingClientPx;
+      const widthClient = el.width * zoom + paddingClientPx * 2;
+      const heightClient = el.height * zoom + paddingClientPx * 2;
+
+      const sx = Math.max(0, Math.floor((leftClient - rect.left) * scaleX));
+      const sy = Math.max(0, Math.floor((topClient - rect.top) * scaleY));
+      const ex = Math.min(
+        canvas.width,
+        Math.ceil((leftClient - rect.left + widthClient) * scaleX),
+      );
+      const ey = Math.min(
+        canvas.height,
+        Math.ceil((topClient - rect.top + heightClient) * scaleY),
+      );
+
+      const sw = Math.max(0, ex - sx);
+      const sh = Math.max(0, ey - sy);
+      if (sw === 0 || sh === 0) {
+        throw new Error("empty canvas region");
+      }
+
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      if (!ctx) {
+        throw new Error("missing 2d context");
+      }
+      const data = ctx.getImageData(sx, sy, sw, sh).data;
+
+      let hash = 14695981039346656037n;
+      const prime = 1099511628211n;
+      for (let i = 0; i < data.length; i++) {
+        hash ^= BigInt(data[i]);
+        hash = (hash * prime) & 18446744073709551615n;
+      }
+
+      return `${sw}x${sh}:${hash.toString(16)}`;
+    },
+    { elementId },
+  );
+};
+
+type GridPosition = {
+  cellX: number;
+  cellY: number;
+  offsetX: number;
+  offsetY: number;
+};
+
+const getGridPositionsFromOverlay = async (page: Page, value: string) => {
+  return page.evaluate(
+    ({ value }) => {
+      const overlay = document.querySelector<HTMLElement>(
+        ".excalidraw-wysiwyg__whitespaceOverlay",
+      );
+      if (!overlay) {
+        throw new Error("missing overlay");
+      }
+      const normalized = String(value).replace(/\r\n?/g, "\n");
+      const rects: Array<{
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+      }> = [];
+      for (let i = 0; i < normalized.length; i++) {
+        if (normalized[i] === "\n") {
+          continue;
+        }
+        rects.push((window as any).__e2eOverlay.caretRectAt(overlay, i));
+      }
+      const state = (window as any).h?.state;
+      if (!state) {
+        throw new Error("missing app state");
+      }
+      const staticCanvas = document.querySelector<HTMLCanvasElement>(
+        "canvas.excalidraw__canvas.static",
+      );
+      if (!staticCanvas) {
+        throw new Error("missing static canvas");
+      }
+      const canvasRect = staticCanvas.getBoundingClientRect();
+      const zoom = Number(state.zoom?.value) || 1;
+      const gridSize = Number(state.gridSize) || 1;
+      const out: GridPosition[] = [];
+      for (const r of rects) {
+        const clientX = r.x;
+        const clientY = r.y + r.height / 2;
+        const sceneX = (clientX - canvasRect.left) / zoom - state.scrollX;
+        const sceneY = (clientY - canvasRect.top) / zoom - state.scrollY;
+        const cellX = Math.floor(sceneX / gridSize);
+        const cellY = Math.floor(sceneY / gridSize);
+        const offsetX = sceneX - cellX * gridSize;
+        const offsetY = sceneY - cellY * gridSize;
+        out.push({
+          cellX,
+          cellY,
+          offsetX: Math.round(offsetX * 100) / 100,
+          offsetY: Math.round(offsetY * 100) / 100,
+        });
+      }
+      return out;
+    },
+    { value },
+  );
+};
+
+const getCanvasLinesFromRender = async (page: Page, value: string) => {
+  return page.evaluate(
+    ({ value }) => {
+      const calls = (window as any).__e2eCanvasText?.get?.() || [];
+
+      const grouped = new Map<number, any[]>();
+      for (const c of calls) {
+        if (c?.kind !== "fillText") {
+          continue;
+        }
+        const text = String(c.text);
+        if (!text || text === "↵" || /^\d+$/.test(text)) {
+          continue;
+        }
+        const canvasId = Number(c.canvasId);
+        const arr = grouped.get(canvasId) || [];
+        arr.push(c);
+        grouped.set(canvasId, arr);
+      }
+
+      const normalized = String(value).replace(/\r\n?/g, "\n");
+      const expectedLen = normalized.replace(/\n/g, "").length;
+
+      let best: any[] = [];
+      let bestScore = Number.POSITIVE_INFINITY;
+      let bestLen = -1;
+
+      for (const arr of grouped.values()) {
+        const totalLen = arr.reduce((acc, c) => acc + String(c.text).length, 0);
+        const score = Math.abs(totalLen - expectedLen);
+        if (score < bestScore || (score === bestScore && totalLen > bestLen)) {
+          bestScore = score;
+          bestLen = totalLen;
+          best = arr;
+        }
+      }
+
+      if (best.length === 0) {
+        throw new Error("missing canvas text lines");
+      }
+
+      return best
+        .slice()
+        .sort((a, b) => Number(a.y) - Number(b.y))
+        .map((c) => String(c.text));
+    },
+    { value },
+  );
+};
+
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(installCanvasTextSpy);
   await page.addInitScript(installOverlayRangeHelpers);
@@ -381,6 +654,14 @@ test("clicking to edit the text box will not change the character absolute posit
   page,
 }) => {
   await page.goto("/");
+  await page.evaluate(() => {
+    (window as any).h?.setState?.({
+      gridModeEnabled: true,
+      gridSize: 20,
+      gridStep: 5,
+      currentItemFontFamily: 12,
+    });
+  });
 
   const value = generateRandomText(1337, 220);
 
@@ -405,30 +686,18 @@ test("clicking to edit the text box will not change the character absolute posit
   await expect(
     page.locator(".excalidraw-wysiwyg__whitespaceOverlay"),
   ).toBeVisible();
-
-  const initialCharRects = await page.evaluate(
-    ({ value }) => {
-      const overlay = document.querySelector<HTMLElement>(
-        ".excalidraw-wysiwyg__whitespaceOverlay",
-      );
-      if (!overlay) {
-        throw new Error("missing overlay");
-      }
-      return (window as any).__e2eOverlay.renderedCharRects(overlay, value);
-    },
-    { value },
+  const editGridPositionsBefore = await getGridPositionsFromOverlay(
+    page,
+    value,
   );
+  await exitEditor(page);
 
   await page.evaluate(() => (window as any).__e2eCanvasText.clear());
-  await exitEditor(page);
   await toggleTheme(page);
   await waitForCanvasTextCalls(page);
-
-  const calls = await page.evaluate(() =>
-    (window as any).__e2eCanvasText.get(),
-  );
-  const canvasLines = getCanvasLinesFromCalls(calls, { minLines: 1 });
   await toggleTheme(page);
+
+  const canvasLines = await getCanvasLinesFromRender(page, value);
 
   await openEditorByDoubleClickAt(page, createX, createY);
   await expect(
@@ -450,26 +719,8 @@ test("clicking to edit the text box will not change the character absolute posit
 
   expect(domLines).toEqual(canvasLines);
 
-  const afterCharRects = await page.evaluate(
-    ({ value }) => {
-      const overlay = document.querySelector<HTMLElement>(
-        ".excalidraw-wysiwyg__whitespaceOverlay",
-      );
-      if (!overlay) {
-        throw new Error("missing overlay");
-      }
-      return (window as any).__e2eOverlay.renderedCharRects(overlay, value);
-    },
-    { value },
-  );
-
-  expect(afterCharRects.length).toBe(initialCharRects.length);
-  for (let i = 0; i < afterCharRects.length; i++) {
-    const a = afterCharRects[i]!;
-    const b = initialCharRects[i]!;
-    expect(Math.abs(a.x - b.x)).toBeLessThanOrEqual(1);
-    expect(Math.abs(a.y - b.y)).toBeLessThanOrEqual(1);
-  }
+  const editGridPositionsAfter = await getGridPositionsFromOverlay(page, value);
+  expect(editGridPositionsAfter).toEqual(editGridPositionsBefore);
 
   await exitEditor(page);
 });
@@ -478,6 +729,14 @@ test("resizing text narrower and repeating operation A should keep wrapping cons
   page,
 }) => {
   await page.goto("/");
+  await page.evaluate(() => {
+    (window as any).h?.setState?.({
+      gridModeEnabled: true,
+      gridSize: 20,
+      gridStep: 5,
+      currentItemFontFamily: 12,
+    });
+  });
 
   const value = generateRandomText(20250315, 240);
 
@@ -499,12 +758,10 @@ test("resizing text narrower and repeating operation A should keep wrapping cons
     await page.evaluate(() => (window as any).__e2eCanvasText.clear());
     await toggleTheme(page);
     await waitForCanvasTextCalls(page);
-    const calls = await page.evaluate(() =>
-      (window as any).__e2eCanvasText.get(),
-    );
-    const canvasLines = getCanvasLinesFromCalls(calls, { minLines: 1 });
-
     await toggleTheme(page);
+
+    const canvasLines = await getCanvasLinesFromRender(page, value);
+
     const editorAfterResize = await openEditorByDoubleClickAt(
       page,
       createX,
@@ -527,7 +784,92 @@ test("resizing text narrower and repeating operation A should keep wrapping cons
 
     expect(domLines).toEqual(canvasLines);
 
+    const editGrid1 = await getGridPositionsFromOverlay(page, value);
+    await exitEditor(page);
+
+    await openEditorByDoubleClickAt(page, createX, createY);
+    await expect(
+      page.locator(".excalidraw-wysiwyg__whitespaceOverlay"),
+    ).toBeVisible();
+    const editGrid2 = await getGridPositionsFromOverlay(page, value);
+    expect(editGrid2).toEqual(editGrid1);
+
     currentBox = await getEditorBox(page);
     await exitEditor(page);
+  }
+});
+
+test("getImageData clicking to edit the text box will not change the character absolute position (E2E, zoom=3000%)", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.evaluate(() => {
+    (window as any).h?.setState?.({
+      gridModeEnabled: true,
+      gridSize: 20,
+      gridStep: 5,
+      currentItemFontFamily: 12,
+      currentItemFontSize: 1,
+      zoom: { value: 30 },
+    });
+  });
+
+  const value = generateRandomText(424242, 220);
+
+  const createX = 240;
+  const createY = 180;
+
+  const editor = await openTextEditorAt(page, createX, createY);
+  await editor.fill(value);
+  await exitEditor(page);
+
+  const textElementId = await page.evaluate(() => {
+    const h = (window as any).h;
+    const els = h?.elements || [];
+    const text = [...els].reverse().find((e: any) => e?.type === "text");
+    if (!text) {
+      throw new Error("missing text element");
+    }
+    return String(text.id);
+  });
+
+  const captureA = async () => {
+    await page.evaluate(() => (window as any).__e2eCanvasText.clear());
+    await toggleTheme(page);
+    await waitForCanvasTextCalls(page);
+    await toggleTheme(page);
+    const before = await getStaticCanvasRegionHashForTextElement(
+      page,
+      textElementId,
+    );
+
+    await openEditorByDoubleClickAt(page, createX, createY);
+    await page.evaluate(() => (window as any).__e2eCanvasText.clear());
+    await toggleTheme(page);
+    await waitForCanvasTextCalls(page);
+    await toggleTheme(page);
+    const during = await getStaticCanvasRegionHashForTextElement(
+      page,
+      textElementId,
+    );
+
+    expect(during).toEqual(before);
+    await exitEditor(page);
+  };
+
+  await captureA();
+
+  for (let i = 0; i < 6; i++) {
+    const editorForBox = await openEditorByDoubleClickAt(
+      page,
+      createX,
+      createY,
+    );
+    await editorForBox.waitFor();
+    const box = await getEditorBox(page);
+    await exitEditor(page);
+
+    await dragResizeFromRight(page, box, -5 * 30);
+    await captureA();
   }
 });

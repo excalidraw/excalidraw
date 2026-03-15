@@ -65,6 +65,7 @@ import {
   debounce,
   distance,
   getFontString,
+  getVerticalOffset,
   getNearestScrollableContainer,
   isInputLike,
   isToolIcon,
@@ -197,12 +198,14 @@ import {
   getLinkDirectionFromKey,
   cropElement,
   wrapText,
+  wrapTextPreservingWhitespaceWithExplicitNewlineMarkers,
   isElementLink,
   parseElementLinkFromURL,
   isMeasureTextSupported,
   normalizeText,
   measureText,
   getLineHeightInPx,
+  charWidth,
   getApproxMinLineWidth,
   getApproxMinLineHeight,
   getMinTextElementWidth,
@@ -690,6 +693,7 @@ class App extends React.Component<AppProps, AppState> {
   private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
+  private gridCharTopMeasureIntervalId: number | null = null;
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
@@ -3123,6 +3127,7 @@ class App extends React.Component<AppProps, AppState> {
     this.library.destroy();
     this.laserTrails.stop();
     this.eraserTrail.stop();
+    this.stopGridCharTopMeasure();
     this.onChangeEmitter.clear();
     this.store.onStoreIncrementEmitter.clear();
     this.store.onDurableIncrementEmitter.clear();
@@ -5519,13 +5524,34 @@ class App extends React.Component<AppProps, AppState> {
       this.onImageToolbarButtonClick();
     }
 
+    if (
+      nextActiveTool.type === "custom" &&
+      nextActiveTool.customType === "gridCharTopMeasure"
+    ) {
+      this.startGridCharTopMeasure();
+    } else {
+      this.stopGridCharTopMeasure();
+    }
+
     this.setState((prevState) => {
+      const isPreciseMeasurementTool =
+        nextActiveTool.type === "custom" &&
+        nextActiveTool.customType === "measure";
+      const isGridCharTopMeasureTool =
+        nextActiveTool.type === "custom" &&
+        nextActiveTool.customType === "gridCharTopMeasure";
       const commonResets = {
         snapLines: prevState.snapLines.length ? [] : prevState.snapLines,
         originSnapOffset: null,
         activeEmbeddable: null,
         selectedLinearElement: isSelectionLikeTool(nextActiveTool.type)
           ? prevState.selectedLinearElement
+          : null,
+        preciseMeasurement: isPreciseMeasurementTool
+          ? prevState.preciseMeasurement
+          : null,
+        gridCharTopMeasurement: isGridCharTopMeasureTool
+          ? prevState.gridCharTopMeasurement
           : null,
       } as const;
 
@@ -5563,6 +5589,151 @@ class App extends React.Component<AppProps, AppState> {
         ...commonResets,
         activeTool: nextActiveTool,
       };
+    });
+  };
+
+  private startGridCharTopMeasure = () => {
+    if (this.gridCharTopMeasureIntervalId !== null) {
+      return;
+    }
+
+    this.computeGridCharTopMeasure();
+    this.gridCharTopMeasureIntervalId = window.setInterval(() => {
+      this.computeGridCharTopMeasure();
+    }, 3000);
+  };
+
+  private stopGridCharTopMeasure = () => {
+    if (this.gridCharTopMeasureIntervalId !== null) {
+      window.clearInterval(this.gridCharTopMeasureIntervalId);
+      this.gridCharTopMeasureIntervalId = null;
+    }
+    if (this.state.gridCharTopMeasurement) {
+      this.setState({ gridCharTopMeasurement: null });
+    }
+  };
+
+  private computeGridCharTopMeasure = () => {
+    if (this.unmounted) {
+      return;
+    }
+
+    if (
+      this.state.activeTool.type !== "custom" ||
+      this.state.activeTool.customType !== "gridCharTopMeasure"
+    ) {
+      return;
+    }
+
+    const gridSize = this.state.gridSize;
+    if (!gridSize || !Number.isFinite(gridSize)) {
+      this.setState({
+        gridCharTopMeasurement: {
+          updated: Date.now(),
+          segments: [],
+        },
+      });
+      return;
+    }
+
+    const elements = this.scene.getNonDeletedElements();
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+
+    const measureCanvas = document.createElement("canvas");
+    const ctx = measureCanvas.getContext("2d");
+    if (!ctx) {
+      return;
+    }
+
+    const segments: Array<{
+      x: number;
+      y1: number;
+      y2: number;
+      distance: number;
+    }> = [];
+
+    for (const element of elements) {
+      if (!isTextElement(element)) {
+        continue;
+      }
+
+      const textElement = element;
+      const container = getContainerElement(textElement, elementsMap);
+      const shouldWrap = !!container || !textElement.autoResize;
+      const maxWidth = textElement.width;
+
+      const { lines } = wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
+        textElement.originalText ?? textElement.text,
+        getFontString(textElement),
+        shouldWrap ? maxWidth : Infinity,
+      );
+
+      const fontString = getFontString(textElement);
+      ctx.font = fontString;
+
+      const fontAscent =
+        ctx.measureText("M").actualBoundingBoxAscent ||
+        textElement.fontSize * 0.8;
+
+      const lineHeightPx = getLineHeightInPx(
+        textElement.fontSize,
+        textElement.lineHeight,
+      );
+      const verticalOffset = getVerticalOffset(
+        textElement.fontFamily,
+        textElement.fontSize,
+        lineHeightPx,
+      );
+
+      for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+        const line = lines[lineIndex] ?? "";
+        const lineWidth = ctx.measureText(line).width;
+
+        let horizontalOffset = 0;
+        if (textElement.textAlign === "center") {
+          horizontalOffset = textElement.width / 2;
+        } else if (textElement.textAlign === "right") {
+          horizontalOffset = textElement.width;
+        }
+
+        let lineStartX = horizontalOffset;
+        if (textElement.textAlign === "center") {
+          lineStartX = horizontalOffset - lineWidth / 2;
+        } else if (textElement.textAlign === "right") {
+          lineStartX = horizontalOffset - lineWidth;
+        }
+
+        const baselineY =
+          textElement.y + lineIndex * lineHeightPx + verticalOffset;
+        let xCursor = 0;
+
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          const w = charWidth.calculate(ch, fontString);
+          const metrics = ctx.measureText(ch);
+          const ascent = metrics.actualBoundingBoxAscent || fontAscent;
+          const topY = baselineY - ascent;
+
+          const yGrid = Math.round(topY / gridSize) * gridSize;
+          const dist = Math.abs(topY - yGrid);
+
+          segments.push({
+            x: textElement.x + lineStartX + xCursor + w / 2,
+            y1: topY,
+            y2: yGrid,
+            distance: dist,
+          });
+
+          xCursor += w;
+        }
+      }
+    }
+
+    this.setState({
+      gridCharTopMeasurement: {
+        updated: Date.now(),
+        segments,
+      },
     });
   };
 
@@ -7703,6 +7874,41 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
       );
     } else if (this.state.activeTool.type === "custom") {
+      if (this.state.activeTool.customType === "measure") {
+        const originPoint = pointFrom<GlobalPoint>(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+        );
+        const threshold = 10 / this.state.zoom.value;
+
+        this.setState((prevState) => {
+          const existing = prevState.preciseMeasurement;
+
+          if (existing) {
+            const distToStart = pointDistance(existing.start, originPoint);
+            const distToEnd = pointDistance(existing.end, originPoint);
+
+            if (distToStart <= threshold || distToEnd <= threshold) {
+              return {
+                preciseMeasurement: {
+                  ...existing,
+                  dragging: distToStart <= distToEnd ? "start" : "end",
+                  isCreating: false,
+                },
+              };
+            }
+          }
+
+          return {
+            preciseMeasurement: {
+              start: originPoint,
+              end: originPoint,
+              dragging: "end",
+              isCreating: true,
+            },
+          };
+        });
+      }
       setCursorForShape(this.interactiveCanvas, this.state);
     } else if (
       this.state.activeTool.type === TOOL_TYPE.frame ||
@@ -9435,6 +9641,36 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (
+        this.state.activeTool.type === "custom" &&
+        this.state.activeTool.customType === "measure" &&
+        this.state.preciseMeasurement?.dragging
+      ) {
+        const nextPoint = pointFrom<GlobalPoint>(
+          pointerCoords.x,
+          pointerCoords.y,
+        );
+        this.setState((prevState) => {
+          const measurement = prevState.preciseMeasurement;
+          if (!measurement || !measurement.dragging) {
+            return null;
+          }
+          return {
+            preciseMeasurement:
+              measurement.dragging === "start"
+                ? {
+                    ...measurement,
+                    start: nextPoint,
+                  }
+                : {
+                    ...measurement,
+                    end: nextPoint,
+                  },
+          };
+        });
+        return;
+      }
+
       if (this.state.activeTool.type === "laser") {
         this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
@@ -10313,6 +10549,23 @@ class App extends React.Component<AppProps, AppState> {
         { clientX: childEvent.clientX, clientY: childEvent.clientY },
         this.state,
       );
+
+      if (activeTool.type === "custom" && activeTool.customType === "measure") {
+        this.setState((prevState) => {
+          const measurement = prevState.preciseMeasurement;
+          if (!measurement) {
+            return null;
+          }
+          return {
+            preciseMeasurement: {
+              ...measurement,
+              dragging: null,
+              isCreating: false,
+            },
+          };
+        });
+        return;
+      }
 
       if (
         this.state.activeTool.type === "selection" &&
