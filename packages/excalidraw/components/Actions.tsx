@@ -82,7 +82,19 @@ import {
   DotsHorizontalIcon,
   SelectionIcon,
   pencilIcon,
+  objectsToolIcon,
+  carIcon,
+  bikeIcon,
+  personIcon,
+  walkingIcon,
+  runningIcon,
+  wavingIcon,
+  houseIcon,
+  treeIcon,
+  tableIcon,
+  phoneIcon,
 } from "./icons";
+import { OBJECT_SHAPES } from "../data/objectShapes";
 
 import { Island } from "./Island";
 
@@ -94,6 +106,21 @@ import type {
   AppState,
 } from "../types";
 import type { ActionManager } from "../actions/manager";
+
+// Pairing of shape data with their toolbar icons — co-located to prevent
+// silent mismatches if shape names change in objectShapes.ts.
+const OBJECT_SHAPE_ITEMS = [
+  { shape: OBJECT_SHAPES[0], icon: carIcon },
+  { shape: OBJECT_SHAPES[1], icon: bikeIcon },
+  { shape: OBJECT_SHAPES[2], icon: personIcon },
+  { shape: OBJECT_SHAPES[3], icon: walkingIcon },
+  { shape: OBJECT_SHAPES[4], icon: runningIcon },
+  { shape: OBJECT_SHAPES[5], icon: wavingIcon },
+  { shape: OBJECT_SHAPES[6], icon: houseIcon },
+  { shape: OBJECT_SHAPES[7], icon: treeIcon },
+  { shape: OBJECT_SHAPES[8], icon: tableIcon },
+  { shape: OBJECT_SHAPES[9], icon: phoneIcon },
+] as const;
 
 // Common CSS class combinations
 const PROPERTIES_CLASSES = clsx([
@@ -1050,6 +1077,8 @@ export const ShapesSwitcher = ({
   UIOptions: AppProps["UIOptions"];
 }) => {
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
+  const [isObjectsMenuOpen, setIsObjectsMenuOpen] = useState(false);
+  const [objectSearch, setObjectSearch] = useState("");
   const stylesPanelMode = useStylesPanelMode();
   const isFullStylesPanel = stylesPanelMode === "full";
   const isCompactStylesPanel = stylesPanelMode === "compact";
@@ -1272,6 +1301,86 @@ export const ShapesSwitcher = ({
               {t("toolBar.magicframe")}
             </DropdownMenu.Item>
           )}
+        </DropdownMenu.Content>
+      </DropdownMenu>
+      <DropdownMenu open={isObjectsMenuOpen}>
+        <DropdownMenu.Trigger
+          className="App-toolbar__extra-tools-trigger"
+          onToggle={() => {
+            setIsObjectsMenuOpen((prev) => !prev);
+            setAppState({ openMenu: null, openPopup: null });
+          }}
+          title="Everyday objects"
+        >
+          {objectsToolIcon}
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content
+          onClickOutside={() => {
+            setIsObjectsMenuOpen(false);
+            setObjectSearch("");
+          }}
+          onSelect={() => {
+            setIsObjectsMenuOpen(false);
+            setObjectSearch("");
+          }}
+          className="App-toolbar__extra-tools-dropdown"
+        >
+          <div style={{ padding: "4px 8px 8px" }}>
+            <input
+              autoFocus
+              type="search"
+              placeholder="Search objects…"
+              value={objectSearch}
+              onChange={(e) => setObjectSearch(e.target.value)}
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                padding: "4px 8px",
+                borderRadius: 4,
+                border: "1px solid var(--color-border-outline)",
+                background: "var(--color-surface-mid)",
+                color: "var(--color-on-surface)",
+                fontSize: 13,
+                outline: "none",
+              }}
+            />
+          </div>
+          {(() => {
+            const filtered = OBJECT_SHAPE_ITEMS.filter(({ shape }) =>
+              shape.name.toLowerCase().includes(objectSearch.toLowerCase()),
+            );
+            if (filtered.length === 0) {
+              return (
+                <div
+                  style={{
+                    padding: "8px 16px",
+                    color: "var(--color-on-surface-low)",
+                    fontSize: 13,
+                  }}
+                >
+                  No results
+                </div>
+              );
+            }
+            return filtered.map(({ shape, icon }) => (
+              <DropdownMenu.Item
+                key={shape.name}
+                icon={icon}
+                onSelect={() =>
+                  app.addElementsFromPasteOrLibrary({
+                    elements:
+                      shape.elements as unknown as Parameters<
+                        typeof app.addElementsFromPasteOrLibrary
+                      >[0]["elements"],
+                    files: null,
+                    position: "center",
+                  })
+                }
+              >
+                {shape.name}
+              </DropdownMenu.Item>
+            ));
+          })()}
         </DropdownMenu.Content>
       </DropdownMenu>
     </>
