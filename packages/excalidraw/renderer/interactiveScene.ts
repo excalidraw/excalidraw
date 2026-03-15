@@ -1515,6 +1515,7 @@ const _renderInteractiveScene = ({
   appState,
   renderConfig,
   editorInterface,
+  callback,
   animationState,
   deltaTime,
 }: InteractiveSceneRenderConfig): {
@@ -1539,6 +1540,7 @@ const _renderInteractiveScene = ({
       appState,
       renderConfig,
       editorInterface,
+      callback,
       animationState,
       deltaTime,
     });
@@ -1574,7 +1576,7 @@ const _renderInteractiveSceneInner = ({
   let nextAnimationState = animationState;
 
   const context = bootstrapCanvas({
-    canvas,
+    canvas: canvas!,
     scale,
     normalizedWidth,
     normalizedHeight,

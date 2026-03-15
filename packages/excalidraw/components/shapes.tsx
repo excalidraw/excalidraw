@@ -150,3 +150,4 @@ export const findShapeByEvent = (event: KeyboardEvent | React.KeyboardEvent<Elem
   const key = getLatinKey(event);
   return findShapeByKey(key, app);
 };
+

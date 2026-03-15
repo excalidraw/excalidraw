@@ -156,7 +156,8 @@ export const deriveStylesPanelMode = (
     return "mobile";
   }
 
-  // Always compact for tablet and desktop (2-button popups)
+  // compact mode for both tablet and desktop —
+  // shows grouped 2-button popovers instead of full property panel
   return "compact";
 };
 

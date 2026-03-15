@@ -68,10 +68,10 @@ export const encryptData = async (
   const encryptedBuffer = await window.crypto.subtle.encrypt(
     {
       name: "AES-GCM",
-      iv,
+      iv: iv as BufferSource,
     },
     importedKey,
-    buffer,
+    buffer as BufferSource,
   );
 
   return { encryptedBuffer, iv };
@@ -86,9 +86,9 @@ export const decryptData = async (
   return window.crypto.subtle.decrypt(
     {
       name: "AES-GCM",
-      iv,
+      iv: iv as BufferSource,
     },
     key,
-    encrypted,
+    encrypted as BufferSource,
   );
 };
