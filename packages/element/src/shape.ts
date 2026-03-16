@@ -57,8 +57,8 @@ import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
 import {
+  elementCenterPoint,
   getArrowheadPoints,
-  getCenterForBounds,
   getDiamondPoints,
   getElementAbsoluteCoords,
 } from "./bounds";
@@ -446,7 +446,11 @@ const getArrowheadShapes = (
 
 export const generateLinearCollisionShape = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
-) => {
+  elementsMap: ElementsMap,
+): {
+  op: string;
+  data: number[];
+}[] => {
   const generator = new RoughGenerator();
   const options: Options = {
     seed: element.seed,
@@ -455,20 +459,7 @@ export const generateLinearCollisionShape = (
     roughness: 0,
     preserveVertices: true,
   };
-  const center = getCenterForBounds(
-    // Need a non-rotated center point
-    element.points.reduce(
-      (acc, point) => {
-        return [
-          Math.min(element.x + point[0], acc[0]),
-          Math.min(element.y + point[1], acc[1]),
-          Math.max(element.x + point[0], acc[2]),
-          Math.max(element.y + point[1], acc[3]),
-        ];
-      },
-      [Infinity, Infinity, -Infinity, -Infinity],
-    ),
-  );
+  const center = elementCenterPoint(element, elementsMap);
 
   switch (element.type) {
     case "line":

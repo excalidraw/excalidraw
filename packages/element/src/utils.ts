@@ -124,6 +124,7 @@ const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
  */
 export function deconstructLinearOrFreeDrawElement(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
 ): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
   const cachedShape = getElementShapesCacheEntry(element, 0);
 
@@ -131,10 +132,7 @@ export function deconstructLinearOrFreeDrawElement(
     return cachedShape;
   }
 
-  const ops = generateLinearCollisionShape(element) as {
-    op: string;
-    data: number[];
-  }[];
+  const ops = generateLinearCollisionShape(element, elementsMap);
   const lines = [];
   const curves = [];
 

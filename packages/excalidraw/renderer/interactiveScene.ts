@@ -1149,6 +1149,7 @@ const renderLinearPointHandles = (
           points[idx],
           idx,
           appState.zoom,
+          elementsMap,
         )
       ) {
         renderSingleLinearPoint(

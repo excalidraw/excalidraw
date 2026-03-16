@@ -16,6 +16,8 @@ import {
 
 import { elementCenterPoint } from "./bounds";
 
+import { debugDrawCubicBezier } from "./visualdebug";
+
 import type {
   ElementsMap,
   ExcalidrawDiamondElement,
@@ -48,7 +50,7 @@ export const distanceToElement = (
     case "line":
     case "arrow":
     case "freedraw":
-      return distanceToLinearOrFreeDraElement(element, p);
+      return distanceToLinearOrFreeDraElement(element, elementsMap, p);
   }
 };
 
@@ -133,9 +135,20 @@ const distanceToEllipseElement = (
 
 const distanceToLinearOrFreeDraElement = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
   p: GlobalPoint,
 ) => {
-  const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(
+    element,
+    elementsMap,
+  );
+  const colors = ["red", "green", "orange", "cyan", "magenta"];
+  curves.forEach((c, i) =>
+    debugDrawCubicBezier(c, {
+      color: colors[i % colors.length],
+      permanent: true,
+    }),
+  );
   return Math.min(
     ...lines.map((s) => distanceToLineSegment(p, s)),
     ...curves.map((a) => curvePointDistance(a, p)),
