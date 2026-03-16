@@ -228,9 +228,8 @@ const renderWireframeVertexHandles = (
   const radius =
     LinearElementEditor.POINT_HANDLE_SIZE / 2 / appState.zoom.value;
 
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-
+  // Draw at scene coordinates — canvas zoom already applied upstream,
+  // no scroll translate needed here (matches strokeRectWithRotation_simple)
   for (const vertex of vertices.values()) {
     const [x, y] = vertex.globalPoint;
     context.strokeStyle = "#5e5ad8";
@@ -242,8 +241,6 @@ const renderWireframeVertexHandles = (
     context.fill();
     context.stroke();
   }
-
-  context.restore();
 };
 
 const renderBindingHighlightForBindableElement_simple = (
