@@ -95,29 +95,33 @@ export const ToolPopover = ({
         sideOffset={SIDE_OFFSET}
         collisionBoundary={container ?? undefined}
       >
-        {options.map(({ type, icon, title }) => (
-          <ToolButton
-            className={clsx(className, {
-              active: currentType === type,
-            })}
-            key={type}
-            type="radio"
-            icon={icon}
-            checked={currentType === type}
-            name={`${namePrefix}-option`}
-            title={title || capitalizeString(type)}
-            keyBindingLabel=""
-            aria-label={title || capitalizeString(type)}
-            data-testid={`toolbar-${type}`}
-            onChange={() => {
-              if (app.state.activeTool.type !== type) {
-                trackEvent("toolbar", type, "ui");
-              }
-              app.setActiveTool({ type: type as any });
-              onToolChange?.(type);
-            }}
-          />
-        ))}
+        {options.map(({ type, icon, title }, idx) =>
+          type === "---" ? (
+            <div key={`sep-${idx}`} className="tool-popover-separator" />
+          ) : (
+            <ToolButton
+              className={clsx(className, {
+                active: currentType === type,
+              })}
+              key={type}
+              type="radio"
+              icon={icon}
+              checked={currentType === type}
+              name={`${namePrefix}-option`}
+              title={title || capitalizeString(type)}
+              keyBindingLabel=""
+              aria-label={title || capitalizeString(type)}
+              data-testid={`toolbar-${type}`}
+              onChange={() => {
+                if (app.state.activeTool.type !== type) {
+                  trackEvent("toolbar", type, "ui");
+                }
+                app.setActiveTool({ type: type as any });
+                onToolChange?.(type);
+              }}
+            />
+          ),
+        )}
       </Popover.Content>
     </Popover.Root>
   );

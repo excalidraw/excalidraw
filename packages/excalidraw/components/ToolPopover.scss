@@ -4,12 +4,21 @@
   .tool-popover-content {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     gap: 0.25rem;
     border-radius: 0.5rem;
     background: var(--island-bg-color);
     box-shadow: var(--shadow-island);
     padding: 0.5rem;
     z-index: var(--zIndex-layerUI);
+    max-width: 200px;
+  }
+
+  .tool-popover-separator {
+    width: 100%;
+    height: 1px;
+    background: var(--default-border-color);
+    margin: 0.125rem 0;
   }
 
   &:focus {

@@ -26,6 +26,11 @@ import {
   DiamondIcon,
   EllipseIcon,
   TriangleIcon,
+  PrismIcon,
+  PyramidIcon,
+  TetrahedronIcon,
+  CylinderIcon,
+  SphereIcon,
   LineIcon,
   TextIcon,
   ImageIcon,
@@ -62,6 +67,32 @@ const SHAPE_TOOLS = [
     type: "triangle",
     icon: TriangleIcon,
     title: capitalizeString(t("toolBar.triangle")),
+  },
+  { type: "---" as const, icon: null, title: "" },
+  {
+    type: "prism",
+    icon: PrismIcon,
+    title: capitalizeString(t("toolBar.prism")),
+  },
+  {
+    type: "pyramid",
+    icon: PyramidIcon,
+    title: capitalizeString(t("toolBar.pyramid")),
+  },
+  {
+    type: "tetrahedron",
+    icon: TetrahedronIcon,
+    title: capitalizeString(t("toolBar.tetrahedron")),
+  },
+  {
+    type: "cylinder",
+    icon: CylinderIcon,
+    title: capitalizeString(t("toolBar.cylinder")),
+  },
+  {
+    type: "sphere",
+    icon: SphereIcon,
+    title: capitalizeString(t("toolBar.sphere")),
   },
 ] as const;
 

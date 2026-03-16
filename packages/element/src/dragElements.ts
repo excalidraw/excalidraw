@@ -6,8 +6,6 @@ import {
   DRAGGING_THRESHOLD,
 } from "@excalidraw/common";
 
-import { type LocalPoint, pointFrom } from "@excalidraw/math";
-
 import type {
   AppState,
   NormalizedZoomValue,
@@ -30,6 +28,13 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
+
+import {
+  isPolyPresetType,
+  computePolyPoints,
+  getPolyPresetXOffset,
+  getPolyPresetAspectHeight,
+} from "./polyPresets";
 
 import type { Scene } from "./Scene";
 
@@ -331,31 +336,26 @@ export const dragNewElement = ({
     }
   }
 
-  // Triangle: update points instead of width/height
-  if (elementType === "triangle" && isLinearElement(newElement)) {
+  // Polygon presets (rectangle, diamond, triangle): update points instead of width/height
+  if (isPolyPresetType(elementType) && isLinearElement(newElement)) {
     if (shouldMaintainAspectRatio) {
-      // Equilateral triangle: height = width * √3/2
-      height = width * (Math.sqrt(3) / 2);
+      const aspectH = getPolyPresetAspectHeight(elementType, width);
+      height = shouldResizeFromCenter ? aspectH * 2 : aspectH;
       newY = y < originY ? originY - height : originY;
       if (shouldResizeFromCenter) {
-        height = width * (Math.sqrt(3) / 2) * 2;
         newY = originY - height / 2;
       }
     }
 
     if (width !== 0 && height !== 0) {
-      const halfW = width / 2;
+      const xOffset = getPolyPresetXOffset(elementType, width);
+      const points = computePolyPoints(elementType, width, height);
       scene.mutateElement(
         newElement,
         {
-          x: newX + halfW + (originOffset?.x ?? 0),
+          x: newX + xOffset + (originOffset?.x ?? 0),
           y: newY + (originOffset?.y ?? 0),
-          points: [
-            pointFrom<LocalPoint>(0, 0),
-            pointFrom<LocalPoint>(halfW, height),
-            pointFrom<LocalPoint>(-halfW, height),
-            pointFrom<LocalPoint>(0, 0),
-          ],
+          points,
         },
         { informMutation, isDragging: false },
       );

@@ -367,6 +367,63 @@ export const TriangleIcon = createIcon(
   tablerIconProps,
 );
 
+// 3D shape presets
+export const PrismIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M3 10 L15 10 L15 20 L3 20 Z" />
+    <path d="M3 10 L9 4 L21 4 L15 10" />
+    <path d="M15 20 L21 14 L21 4" />
+    <path d="M3 20 L9 14 L21 14" strokeDasharray="3 2" />
+    <path d="M9 4 L9 14" strokeDasharray="3 2" />
+  </g>,
+  tablerIconProps,
+);
+
+export const PyramidIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 3 L4 20 L20 20 Z" />
+    <path d="M12 3 L8 15" strokeDasharray="3 2" />
+    <path d="M12 3 L18 15" strokeDasharray="3 2" />
+    <path d="M8 15 L18 15" strokeDasharray="3 2" />
+    <path d="M4 20 L8 15" />
+    <path d="M20 20 L18 15" />
+  </g>,
+  tablerIconProps,
+);
+
+export const TetrahedronIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 3 L3 20 L21 20 Z" />
+    <path d="M12 3 L12 14" strokeDasharray="3 2" />
+    <path d="M3 20 L12 14" strokeDasharray="3 2" />
+    <path d="M21 20 L12 14" />
+  </g>,
+  tablerIconProps,
+);
+
+export const CylinderIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <ellipse cx="12" cy="6" rx="8" ry="3" />
+    <path d="M4 6 L4 18" />
+    <path d="M20 6 L20 18" />
+    <ellipse cx="12" cy="18" rx="8" ry="3" strokeDasharray="3 2" />
+  </g>,
+  tablerIconProps,
+);
+
+export const SphereIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <circle cx="12" cy="12" r="9" />
+    <ellipse cx="12" cy="12" rx="9" ry="3" strokeDasharray="3 2" />
+  </g>,
+  tablerIconProps,
+);
+
 // tabler-icons: arrow-narrow-right
 export const ArrowIcon = createIcon(
   <g strokeWidth="1.5">

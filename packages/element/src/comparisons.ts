@@ -15,6 +15,11 @@ export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "ellipse" ||
   type === "diamond" ||
   type === "triangle" ||
+  type === "prism" ||
+  type === "pyramid" ||
+  type === "tetrahedron" ||
+  type === "cylinder" ||
+  type === "sphere" ||
   type === "freedraw" ||
   type === "arrow" ||
   type === "line" ||
@@ -28,6 +33,11 @@ export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "ellipse" ||
   type === "diamond" ||
   type === "triangle" ||
+  type === "prism" ||
+  type === "pyramid" ||
+  type === "tetrahedron" ||
+  type === "cylinder" ||
+  type === "sphere" ||
   type === "freedraw" ||
   type === "arrow" ||
   type === "line";

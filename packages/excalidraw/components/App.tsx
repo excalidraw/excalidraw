@@ -259,6 +259,7 @@ import {
   handleFocusPointPointerUp,
   maybeHandleArrowPointlikeDrag,
   getUncroppedWidthAndHeight,
+  isPolyPresetType,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -290,6 +291,9 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
+
+import { createSolidElements } from "../shapePresets/solidFactory";
+import { isSolidPresetType } from "../shapePresets";
 
 import {
   actionAddToLibrary,
@@ -7643,15 +7647,17 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
-    } else if (this.state.activeTool.type === "triangle") {
-      this.createTriangleElementOnPointerDown(pointerDownState);
+    } else if (isPolyPresetType(this.state.activeTool.type)) {
+      this.createPolyPresetOnPointerDown(pointerDownState);
+    } else if (isSolidPresetType(this.state.activeTool.type)) {
+      this.createSolidPresetProxyOnPointerDown(pointerDownState);
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
       this.state.activeTool.type !== "image"
     ) {
       this.createGenericElementOnPointerDown(
-        this.state.activeTool.type,
+        this.state.activeTool.type as any,
         pointerDownState,
       );
     }
@@ -9120,7 +9126,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private createTriangleElementOnPointerDown = (
+  private createPolyPresetOnPointerDown = (
     pointerDownState: PointerDownState,
   ): void => {
     const [gridX, gridY] = getGridPoint(
@@ -9158,6 +9164,14 @@ class App extends React.Component<AppProps, AppState> {
       multiElement: null,
       newElement: element,
     });
+  };
+
+  private createSolidPresetProxyOnPointerDown = (
+    pointerDownState: PointerDownState,
+  ): void => {
+    // Create a rectangle proxy for visual drag feedback.
+    // On pointer up, this proxy is replaced with the actual 3D wireframe.
+    this.createGenericElementOnPointerDown("rectangle", pointerDownState);
   };
 
   private createFrameElementOnPointerDown = (
@@ -9993,7 +10007,7 @@ class App extends React.Component<AppProps, AppState> {
         } else if (
           isLinearElement(newElement) &&
           !newElement.isDeleted &&
-          this.state.activeTool.type !== "triangle"
+          !isPolyPresetType(this.state.activeTool.type)
         ) {
           pointerDownState.drag.hasOccurred = true;
           const points = newElement.points;
@@ -10031,7 +10045,10 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
-          if (this.state.activeTool.type === "triangle") {
+          if (
+            isPolyPresetType(this.state.activeTool.type) ||
+            isSolidPresetType(this.state.activeTool.type)
+          ) {
             pointerDownState.drag.hasOccurred = true;
           }
           this.maybeDragNewGenericElement(pointerDownState, event, false);
@@ -10446,14 +10463,15 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      // Triangle: single-drag creation (no multi-click)
-      if (isLinearElement(newElement) && activeTool.type === "triangle") {
-        if (newElement.points.length >= 4) {
+      // Polygon presets (rectangle, diamond, triangle): single-drag creation
+      if (isLinearElement(newElement) && isPolyPresetType(activeTool.type)) {
+        const minPoints = activeTool.type === "triangle" ? 4 : 5;
+        if (newElement.points.length >= minPoints) {
           this.store.scheduleCapture();
         }
         if (
           !pointerDownState.drag.hasOccurred ||
-          newElement.points.length < 4
+          newElement.points.length < minPoints
         ) {
           // Too small or no drag — remove
           this.scene.replaceAllElements(
@@ -10481,6 +10499,81 @@ class App extends React.Component<AppProps, AppState> {
                 newElement,
                 this.scene.getNonDeletedElementsMap(),
               ),
+            }));
+          } else {
+            this.setState({ newElement: null });
+          }
+          this.scene.triggerUpdate();
+        }
+        return;
+      }
+
+      // 3D solid presets: replace proxy rectangle with grouped wireframe
+      if (
+        newElement &&
+        isSolidPresetType(activeTool.type) &&
+        !isLinearElement(newElement)
+      ) {
+        if (
+          !pointerDownState.drag.hasOccurred ||
+          newElement.width < 10 ||
+          newElement.height < 10
+        ) {
+          // Too small or no drag — remove proxy
+          this.scene.replaceAllElements(
+            this.scene
+              .getElementsIncludingDeleted()
+              .filter((el) => el.id !== newElement.id),
+          );
+          this.setState({ newElement: null });
+        } else {
+          // Remove proxy element
+          this.scene.replaceAllElements(
+            this.scene
+              .getElementsIncludingDeleted()
+              .filter((el) => el.id !== newElement.id),
+          );
+
+          // Create solid wireframe elements
+          const { elements: solidElements, groupId } = createSolidElements(
+            activeTool.type,
+            {
+              x: newElement.x,
+              y: newElement.y,
+              w: newElement.width,
+              h: newElement.height,
+            },
+            {
+              strokeColor: this.state.currentItemStrokeColor,
+              backgroundColor: this.state.currentItemBackgroundColor,
+              fillStyle: this.state.currentItemFillStyle,
+              strokeWidth: this.state.currentItemStrokeWidth,
+              roughness: this.state.currentItemRoughness,
+              opacity: this.state.currentItemOpacity,
+              frameId: newElement.frameId,
+            },
+          );
+
+          // Insert grouped elements
+          this.scene.insertElements(solidElements);
+          this.store.scheduleCapture();
+
+          if (!activeTool.locked) {
+            resetCursor(this.interactiveCanvas);
+            const selectedElementIds: Record<string, true> = {};
+            solidElements.forEach((el) => {
+              selectedElementIds[el.id] = true;
+            });
+            this.setState((prevState) => ({
+              newElement: null,
+              activeTool: updateActiveTool(this.state, {
+                type: this.state.preferredSelectionTool.type,
+              }),
+              selectedElementIds: makeNextSelectedElementIds(
+                selectedElementIds,
+                prevState,
+              ),
+              selectedGroupIds: { [groupId]: true },
             }));
           } else {
             this.setState({ newElement: null });

@@ -79,6 +79,7 @@ export * from "./image";
 export * from "./linearElementEditor";
 export * from "./mutateElement";
 export * from "./newElement";
+export * from "./polyPresets";
 export * from "./positionElementsOnGrid";
 export * from "./renderElement";
 export * from "./resizeElements";

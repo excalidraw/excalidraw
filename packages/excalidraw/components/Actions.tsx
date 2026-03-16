@@ -82,6 +82,11 @@ import {
   DiamondIcon,
   EllipseIcon,
   TriangleIcon,
+  PrismIcon,
+  PyramidIcon,
+  TetrahedronIcon,
+  CylinderIcon,
+  SphereIcon,
   ArrowIcon,
   LineIcon,
   pencilIcon,
@@ -1088,6 +1093,32 @@ export const ShapesSwitcher = ({
       icon: TriangleIcon,
       title: capitalizeString(t("toolBar.triangle")),
     },
+    { type: "---" as const, icon: null, title: "" },
+    {
+      type: "prism",
+      icon: PrismIcon,
+      title: capitalizeString(t("toolBar.prism")),
+    },
+    {
+      type: "pyramid",
+      icon: PyramidIcon,
+      title: capitalizeString(t("toolBar.pyramid")),
+    },
+    {
+      type: "tetrahedron",
+      icon: TetrahedronIcon,
+      title: capitalizeString(t("toolBar.tetrahedron")),
+    },
+    {
+      type: "cylinder",
+      icon: CylinderIcon,
+      title: capitalizeString(t("toolBar.cylinder")),
+    },
+    {
+      type: "sphere",
+      icon: SphereIcon,
+      title: capitalizeString(t("toolBar.sphere")),
+    },
   ] as const;
 
   const LINEAR_TOOLS = [
@@ -1103,7 +1134,9 @@ export const ShapesSwitcher = ({
     },
   ] as const;
 
-  const SHAPE_TYPES: Set<string> = new Set(SHAPE_TOOLS.map((t) => t.type));
+  const SHAPE_TYPES: Set<string> = new Set(
+    SHAPE_TOOLS.map((t) => t.type).filter((t) => t !== "---"),
+  );
   const LINEAR_TYPES: Set<string> = new Set(LINEAR_TOOLS.map((t) => t.type));
 
   const [lastActiveShape, setLastActiveShape] = useState<string>("rectangle");
