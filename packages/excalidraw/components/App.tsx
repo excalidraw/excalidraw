@@ -9283,24 +9283,17 @@ class App extends React.Component<AppProps, AppState> {
     const sv = (element as any).sharedVertices as Record<number, string> | null;
     const prevGlobal = new Map<string, { x: number; y: number }>();
     if (sv) {
+      const globalPts = LinearElementEditor.getPointsGlobalCoordinates(
+        element,
+        this.scene.getNonDeletedElementsMap(),
+      );
       for (const [idxStr, vertexId] of Object.entries(sv)) {
         const idx = Number(idxStr);
-        if (idx < element.points.length) {
-          const lx = element.points[idx][0];
-          const ly = element.points[idx][1];
-          if (element.angle) {
-            const cos = Math.cos(element.angle);
-            const sin = Math.sin(element.angle);
-            prevGlobal.set(vertexId, {
-              x: element.x + lx * cos - ly * sin,
-              y: element.y + lx * sin + ly * cos,
-            });
-          } else {
-            prevGlobal.set(vertexId, {
-              x: element.x + lx,
-              y: element.y + ly,
-            });
-          }
+        if (idx < globalPts.length) {
+          prevGlobal.set(vertexId, {
+            x: globalPts[idx][0],
+            y: globalPts[idx][1],
+          });
         }
       }
     }
@@ -9332,8 +9325,13 @@ class App extends React.Component<AppProps, AppState> {
     sv: Record<number, string>,
     prevGlobal: Map<string, { x: number; y: number }>,
   ): void => {
-    const linEl = element as any;
-    // Compute ABSOLUTE target positions using dynamic index resolution
+    const linEl = element as ExcalidrawLinearElement;
+    const eMap = this.scene.getNonDeletedElementsMap();
+    // Get post-mutation global positions using excalidraw's proper rotation
+    const postGlobal = LinearElementEditor.getPointsGlobalCoordinates(
+      linEl as any,
+      eMap,
+    );
     const vertexTargets = new Map<string, { x: number; y: number }>();
     for (const [idxStr, vertexId] of Object.entries(sv)) {
       const idx = LinearElementEditor.resolveVertexIndex(
@@ -9341,29 +9339,21 @@ class App extends React.Component<AppProps, AppState> {
         sv,
         linEl.points.length,
       );
-      if (idx >= linEl.points.length) {
+      if (idx >= postGlobal.length) {
         continue;
       }
       const prev = prevGlobal.get(vertexId);
       if (!prev) {
         continue;
       }
-      // Convert local point to global (accounting for rotation)
-      let currX = linEl.x + linEl.points[idx][0];
-      let currY = linEl.y + linEl.points[idx][1];
-      if (linEl.angle) {
-        const cos = Math.cos(linEl.angle);
-        const sin = Math.sin(linEl.angle);
-        const lx = linEl.points[idx][0];
-        const ly = linEl.points[idx][1];
-        currX = linEl.x + lx * cos - ly * sin;
-        currY = linEl.y + lx * sin + ly * cos;
-      }
       if (
-        Math.abs(currX - prev.x) > 0.001 ||
-        Math.abs(currY - prev.y) > 0.001
+        Math.abs(postGlobal[idx][0] - prev.x) > 0.001 ||
+        Math.abs(postGlobal[idx][1] - prev.y) > 0.001
       ) {
-        vertexTargets.set(vertexId, { x: currX, y: currY });
+        vertexTargets.set(vertexId, {
+          x: postGlobal[idx][0],
+          y: postGlobal[idx][1],
+        });
       }
     }
     if (vertexTargets.size === 0) {
@@ -9387,7 +9377,7 @@ class App extends React.Component<AppProps, AppState> {
 
     for (const sib of siblings) {
       const sibSV = (sib as any).sharedVertices as Record<number, string>;
-      const sibEl = sib as any;
+      const sibEl = sib as ExcalidrawLinearElement;
       let needsUpdate = false;
       const newPts = [...sibEl.points] as [number, number][];
 
@@ -9404,14 +9394,18 @@ class App extends React.Component<AppProps, AppState> {
         if (idx >= newPts.length) {
           continue;
         }
-        // Set point to absolute target in sibling's local space
-        // Account for element rotation: rotate global→local by -angle
+        // Reverse of getPointsGlobalCoordinates: reverse-rotate around center
         if (sibEl.angle) {
+          const [sx1, sy1, sx2, sy2] = getElementAbsoluteCoords(sibEl, eMap);
+          const scx = (sx1 + sx2) / 2;
+          const scy = (sy1 + sy2) / 2;
           const cos = Math.cos(-sibEl.angle);
           const sin = Math.sin(-sibEl.angle);
-          const dx = target.x - sibEl.x;
-          const dy = target.y - sibEl.y;
-          newPts[idx] = [dx * cos - dy * sin, dx * sin + dy * cos];
+          const dx = target.x - scx;
+          const dy = target.y - scy;
+          const rx = scx + dx * cos - dy * sin;
+          const ry = scy + dx * sin + dy * cos;
+          newPts[idx] = [rx - sibEl.x, ry - sibEl.y];
         } else {
           newPts[idx] = [target.x - sibEl.x, target.y - sibEl.y];
         }

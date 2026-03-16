@@ -1783,10 +1783,8 @@ export class LinearElementEditor {
         sv && options?.isDragging
           ? LinearElementEditor._getSharedVertexGlobals(
               sv,
-              element.x,
-              element.y,
-              element.points,
-              element.angle,
+              element,
+              scene.getNonDeletedElementsMap(),
             )
           : null;
 
@@ -1831,29 +1829,28 @@ export class LinearElementEditor {
     return Math.round((storedKey / maxKey) * (numPoints - 1));
   }
 
-  /** Get global positions of shared vertices (rotation-aware) */
+  /** Get global positions of shared vertices using excalidraw's proper
+   *  center-based rotation (getPointsGlobalCoordinates). */
   private static _getSharedVertexGlobals(
     sv: Record<number, string>,
-    elX: number,
-    elY: number,
-    pts: readonly LocalPoint[],
-    angle = 0,
+    element: NonDeleted<ExcalidrawLinearElement>,
+    elementsMap: ElementsMap,
   ): Map<string, { x: number; y: number }> {
     const result = new Map<string, { x: number; y: number }>();
-    const cos = angle ? Math.cos(angle) : 1;
-    const sin = angle ? Math.sin(angle) : 0;
+    const globalPts = LinearElementEditor.getPointsGlobalCoordinates(
+      element,
+      elementsMap,
+    );
     for (const [idxStr, vertexId] of Object.entries(sv)) {
       const idx = LinearElementEditor.resolveVertexIndex(
         Number(idxStr),
         sv,
-        pts.length,
+        element.points.length,
       );
-      if (idx < pts.length) {
-        const lx = pts[idx][0];
-        const ly = pts[idx][1];
+      if (idx < globalPts.length) {
         result.set(vertexId, {
-          x: elX + lx * cos - ly * sin,
-          y: elY + lx * sin + ly * cos,
+          x: globalPts[idx][0],
+          y: globalPts[idx][1],
         });
       }
     }
@@ -1875,6 +1872,12 @@ export class LinearElementEditor {
     prevGlobal: Map<string, { x: number; y: number }>,
   ): void {
     // 1. Compute ABSOLUTE global positions of moved vertices
+    // Use excalidraw's proper center-based rotation for post-mutation globals
+    const elementsMap = scene.getNonDeletedElementsMap();
+    const postGlobalPts = LinearElementEditor.getPointsGlobalCoordinates(
+      element,
+      elementsMap,
+    );
     const vertexTargets = new Map<string, { x: number; y: number }>();
     for (const [idxStr, vertexId] of Object.entries(sv)) {
       const idx = LinearElementEditor.resolveVertexIndex(
@@ -1882,19 +1885,15 @@ export class LinearElementEditor {
         sv,
         element.points.length,
       );
-      if (idx >= element.points.length) {
+      if (idx >= postGlobalPts.length) {
         continue;
       }
       const prev = prevGlobal.get(vertexId);
       if (!prev) {
         continue;
       }
-      const lx = element.points[idx][0];
-      const ly = element.points[idx][1];
-      const elCos = element.angle ? Math.cos(element.angle) : 1;
-      const elSin = element.angle ? Math.sin(element.angle) : 0;
-      const currX = element.x + lx * elCos - ly * elSin;
-      const currY = element.y + lx * elSin + ly * elCos;
+      const currX = postGlobalPts[idx][0];
+      const currY = postGlobalPts[idx][1];
       if (
         Math.abs(currX - prev.x) > 0.001 ||
         Math.abs(currY - prev.y) > 0.001
@@ -1943,15 +1942,26 @@ export class LinearElementEditor {
         if (idx >= newPoints.length) {
           continue;
         }
-        // Set point to absolute target in sibling's local space (rotation-aware)
-        const gdx = target.x - sibling.x;
-        const gdy = target.y - sibling.y;
+        // Set point to absolute target in sibling's local space
+        // Use reverse of getPointsGlobalCoordinates: reverse-rotate around center
         if (sibling.angle) {
-          const sc = Math.cos(-sibling.angle);
-          const ss = Math.sin(-sibling.angle);
-          newPoints[idx] = pointFrom(gdx * sc - gdy * ss, gdx * ss + gdy * sc);
+          const [sx1, sy1, sx2, sy2] = getElementAbsoluteCoords(
+            sibling,
+            elementsMap,
+          );
+          const scx = (sx1 + sx2) / 2;
+          const scy = (sy1 + sy2) / 2;
+          const [rx, ry] = pointRotateRads(
+            pointFrom(target.x, target.y),
+            pointFrom(scx, scy),
+            -sibling.angle as Radians,
+          );
+          newPoints[idx] = pointFrom(rx - sibling.x, ry - sibling.y);
         } else {
-          newPoints[idx] = pointFrom(gdx, gdy);
+          newPoints[idx] = pointFrom(
+            target.x - sibling.x,
+            target.y - sibling.y,
+          );
         }
         needsUpdate = true;
       }
