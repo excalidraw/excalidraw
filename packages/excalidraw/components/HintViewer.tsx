@@ -46,7 +46,7 @@ const getHints = ({
   if (
     appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
     appState.openSidebar.tab === CANVAS_SEARCH_TAB &&
-    appState.searchMatches?.matches.length
+    appState.searchMatches?.matches?.length
   ) {
     return t("hints.dismissSearch", {
       shortcut: getTaggedShortcutKey("Escape"),

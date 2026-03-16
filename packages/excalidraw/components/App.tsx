@@ -1869,7 +1869,7 @@ class App extends React.Component<AppProps, AppState> {
           isFrameLikeElement(
             this.scene.getElement(this.state.searchMatches.focusedId),
           )
-          ? this.state.searchMatches.matches.find((sm) => sm.focus)
+          ? this.state.searchMatches.matches?.find((sm) => sm.focus)
           : null
         : null;
 
@@ -7282,10 +7282,11 @@ class App extends React.Component<AppProps, AppState> {
         return {
           searchMatches: state.searchMatches && {
             focusedId: null,
-            matches: state.searchMatches.matches.map((searchMatch) => ({
-              ...searchMatch,
-              focus: false,
-            })),
+            matches:
+              state.searchMatches.matches?.map((searchMatch) => ({
+                ...searchMatch,
+                focus: false,
+              })) ?? [],
           },
         };
       });
@@ -10232,8 +10233,8 @@ class App extends React.Component<AppProps, AppState> {
         const element = elementsMap.get(pointerDownState.hit.element.id);
         if (isBindableElement(element)) {
           // Renormalize elbow arrows when they are changed via indirect move
-          element.boundElements
-            ?.filter((e) => e.type === "arrow")
+          (element.boundElements ?? [])
+            .filter((e) => e.type === "arrow")
             .map((e) => elementsMap.get(e.id))
             .filter((e) => isElbowArrow(e))
             .forEach((e) => {
