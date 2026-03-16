@@ -9266,100 +9266,88 @@ class App extends React.Component<AppProps, AppState> {
     if (!this.wireframeDragVertex) {
       return;
     }
-    const { elementId, pointIndex } = this.wireframeDragVertex;
+    const { elementId, pointIndex, vertexId } = this.wireframeDragVertex;
     const element = this.scene.getElement(elementId);
     if (!element || !isLinearElement(element)) {
       this.wireframeDragVertex = null;
       return;
     }
 
-    // Compute new point position in element's local space
-    const newLocalX = pointerCoords.x - element.x;
-    const newLocalY = pointerCoords.y - element.y;
+    const eMap = this.scene.getNonDeletedElementsMap();
+    const sv = (element as any).sharedVertices as Record<number, string> | null;
+
+    // Convert pointer (global) → element local space (reverse-rotate around center)
+    let newLocalX: number;
+    let newLocalY: number;
+    if (element.angle) {
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, eMap);
+      const cx = (x1 + x2) / 2;
+      const cy = (y1 + y2) / 2;
+      const cos = Math.cos(-element.angle);
+      const sin = Math.sin(-element.angle);
+      const dx = pointerCoords.x - cx;
+      const dy = pointerCoords.y - cy;
+      newLocalX = cx + dx * cos - dy * sin - element.x;
+      newLocalY = cy + dx * sin + dy * cos - element.y;
+    } else {
+      newLocalX = pointerCoords.x - element.x;
+      newLocalY = pointerCoords.y - element.y;
+    }
+
     const newPoints = [...element.points] as [number, number][];
     newPoints[pointIndex] = [newLocalX, newLocalY];
 
-    // Save pre-mutation globals for SharedVertex propagation
-    const sv = (element as any).sharedVertices as Record<number, string> | null;
-    const prevGlobal = new Map<string, { x: number; y: number }>();
-    if (sv) {
-      const globalPts = LinearElementEditor.getPointsGlobalCoordinates(
-        element,
-        this.scene.getNonDeletedElementsMap(),
-      );
-      for (const [idxStr, vertexId] of Object.entries(sv)) {
-        const idx = Number(idxStr);
-        if (idx < globalPts.length) {
-          prevGlobal.set(vertexId, {
-            x: globalPts[idx][0],
-            y: globalPts[idx][1],
-          });
-        }
-      }
-    }
-
-    // Handle point-0 normalization: shift element origin
-    if (pointIndex === 0) {
-      const offsetX = newPoints[0][0];
-      const offsetY = newPoints[0][1];
+    // Handle point-0 normalization
+    // Handle point-0 normalization (point 0 must be [0,0])
+    if (
+      pointIndex === 0 &&
+      (Math.abs(newPoints[0][0]) > 0.001 || Math.abs(newPoints[0][1]) > 0.001)
+    ) {
+      const lox = newPoints[0][0];
+      const loy = newPoints[0][1];
+      // Shift all points so point 0 = [0,0]
       for (let k = 0; k < newPoints.length; k++) {
-        newPoints[k] = [newPoints[k][0] - offsetX, newPoints[k][1] - offsetY];
+        newPoints[k] = [newPoints[k][0] - lox, newPoints[k][1] - loy];
       }
-      this.scene.mutateElement(element, {
-        x: element.x + offsetX,
-        y: element.y + offsetY,
-        points: newPoints,
-      } as any);
+      // Rotate local offset to global for element.x/y adjustment
+      if (element.angle) {
+        const c = Math.cos(element.angle);
+        const s = Math.sin(element.angle);
+        this.scene.mutateElement(element, {
+          x: element.x + lox * c - loy * s,
+          y: element.y + lox * s + loy * c,
+          points: newPoints,
+        } as any);
+      } else {
+        this.scene.mutateElement(element, {
+          x: element.x + lox,
+          y: element.y + loy,
+          points: newPoints,
+        } as any);
+      }
     } else {
       this.scene.mutateElement(element, { points: newPoints } as any);
     }
 
-    // Propagate to siblings via SharedVertex
-    if (sv && prevGlobal.size > 0) {
-      this._propagateWireframeVertices(element, sv, prevGlobal);
+    // Propagate: the dragged vertex target is simply pointerCoords
+    if (sv) {
+      const vertexTargets = new Map<string, { x: number; y: number }>();
+      vertexTargets.set(vertexId, {
+        x: pointerCoords.x,
+        y: pointerCoords.y,
+      });
+      this._propagateWireframeVertices(element, vertexTargets);
     }
   };
 
   private _propagateWireframeVertices = (
     element: ExcalidrawElement,
-    sv: Record<number, string>,
-    prevGlobal: Map<string, { x: number; y: number }>,
+    vertexTargets: Map<string, { x: number; y: number }>,
   ): void => {
-    const linEl = element as ExcalidrawLinearElement;
-    const eMap = this.scene.getNonDeletedElementsMap();
-    // Get post-mutation global positions using excalidraw's proper rotation
-    const postGlobal = LinearElementEditor.getPointsGlobalCoordinates(
-      linEl as any,
-      eMap,
-    );
-    const vertexTargets = new Map<string, { x: number; y: number }>();
-    for (const [idxStr, vertexId] of Object.entries(sv)) {
-      const idx = LinearElementEditor.resolveVertexIndex(
-        Number(idxStr),
-        sv,
-        linEl.points.length,
-      );
-      if (idx >= postGlobal.length) {
-        continue;
-      }
-      const prev = prevGlobal.get(vertexId);
-      if (!prev) {
-        continue;
-      }
-      if (
-        Math.abs(postGlobal[idx][0] - prev.x) > 0.001 ||
-        Math.abs(postGlobal[idx][1] - prev.y) > 0.001
-      ) {
-        vertexTargets.set(vertexId, {
-          x: postGlobal[idx][0],
-          y: postGlobal[idx][1],
-        });
-      }
-    }
     if (vertexTargets.size === 0) {
       return;
     }
-
+    const eMap = this.scene.getNonDeletedElementsMap();
     const groupId = element.groupIds?.[0];
     if (!groupId) {
       return;

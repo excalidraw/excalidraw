@@ -1772,13 +1772,12 @@ export class LinearElementEditor {
         pointFrom(dX, dY),
         element.angle,
       );
-      // Save global vertex positions BEFORE mutation (for SharedVertex)
-      // Only propagate if point count matches sharedVertices mapping
-      // (adding midpoints changes point count, making indices invalid)
+      // Save state BEFORE mutation for SharedVertex propagation
       const sv =
         isLineElement(element) && (element as any).sharedVertices
           ? ((element as any).sharedVertices as Record<number, string>)
           : null;
+      const prevPoints = sv && options?.isDragging ? [...element.points] : null;
       const prevGlobal =
         sv && options?.isDragging
           ? LinearElementEditor._getSharedVertexGlobals(
@@ -1796,12 +1795,14 @@ export class LinearElementEditor {
       });
 
       // Propagate shared vertex changes to sibling elements
-      if (prevGlobal && sv) {
+      if (prevGlobal && prevPoints && sv) {
         LinearElementEditor._propagateSharedVertices(
           element as any,
           scene,
           sv,
           prevGlobal,
+          prevPoints,
+          nextPoints,
         );
       }
     }
@@ -1870,42 +1871,51 @@ export class LinearElementEditor {
     scene: Scene,
     sv: Record<number, string>,
     prevGlobal: Map<string, { x: number; y: number }>,
+    prevPoints: readonly LocalPoint[],
+    nextPoints: readonly LocalPoint[],
   ): void {
-    // 1. Compute ABSOLUTE global positions of moved vertices
-    // Use excalidraw's proper center-based rotation for post-mutation globals
-    const elementsMap = scene.getNonDeletedElementsMap();
-    const postGlobalPts = LinearElementEditor.getPointsGlobalCoordinates(
-      element,
-      elementsMap,
-    );
+    // 1. Compute vertex targets using LOCAL delta + rotated vector.
+    // This avoids the center-shift problem when using getPointsGlobalCoordinates
+    // on the mutated element.
+    const cos = element.angle ? Math.cos(element.angle) : 1;
+    const sin = element.angle ? Math.sin(element.angle) : 0;
     const vertexTargets = new Map<string, { x: number; y: number }>();
     for (const [idxStr, vertexId] of Object.entries(sv)) {
       const idx = LinearElementEditor.resolveVertexIndex(
         Number(idxStr),
         sv,
-        element.points.length,
+        nextPoints.length,
       );
-      if (idx >= postGlobalPts.length) {
+      const prevIdx = LinearElementEditor.resolveVertexIndex(
+        Number(idxStr),
+        sv,
+        prevPoints.length,
+      );
+      if (idx >= nextPoints.length || prevIdx >= prevPoints.length) {
         continue;
       }
       const prev = prevGlobal.get(vertexId);
       if (!prev) {
         continue;
       }
-      const currX = postGlobalPts[idx][0];
-      const currY = postGlobalPts[idx][1];
-      if (
-        Math.abs(currX - prev.x) > 0.001 ||
-        Math.abs(currY - prev.y) > 0.001
-      ) {
-        vertexTargets.set(vertexId, { x: currX, y: currY });
+      // Local delta between old and new points
+      const ldx = nextPoints[idx][0] - prevPoints[prevIdx][0];
+      const ldy = nextPoints[idx][1] - prevPoints[prevIdx][1];
+      if (Math.abs(ldx) < 0.001 && Math.abs(ldy) < 0.001) {
+        continue;
       }
+      // Rotate local delta by element angle to get global delta
+      const gdx = ldx * cos - ldy * sin;
+      const gdy = ldx * sin + ldy * cos;
+      // Target = previous global position + global delta
+      vertexTargets.set(vertexId, { x: prev.x + gdx, y: prev.y + gdy });
     }
     if (vertexTargets.size === 0) {
       return;
     }
 
     // 2. Find sibling elements in same group
+    const elementsMap = scene.getNonDeletedElementsMap();
     const groupId = element.groupIds[0];
     if (!groupId) {
       return;
@@ -1927,7 +1937,7 @@ export class LinearElementEditor {
       };
       const sibSV = sibling.sharedVertices;
       let needsUpdate = false;
-      const newPoints = [...sibling.points] as LocalPoint[];
+      const newPoints_ = [...sibling.points] as LocalPoint[];
 
       for (const [idxStr, vertexId] of Object.entries(sibSV)) {
         const target = vertexTargets.get(vertexId);
@@ -1937,13 +1947,12 @@ export class LinearElementEditor {
         const idx = LinearElementEditor.resolveVertexIndex(
           Number(idxStr),
           sibSV,
-          newPoints.length,
+          newPoints_.length,
         );
-        if (idx >= newPoints.length) {
+        if (idx >= newPoints_.length) {
           continue;
         }
-        // Set point to absolute target in sibling's local space
-        // Use reverse of getPointsGlobalCoordinates: reverse-rotate around center
+        // Reverse-rotate target around sibling's center to get local coords
         if (sibling.angle) {
           const [sx1, sy1, sx2, sy2] = getElementAbsoluteCoords(
             sibling,
@@ -1956,9 +1965,9 @@ export class LinearElementEditor {
             pointFrom(scx, scy),
             -sibling.angle as Radians,
           );
-          newPoints[idx] = pointFrom(rx - sibling.x, ry - sibling.y);
+          newPoints_[idx] = pointFrom(rx - sibling.x, ry - sibling.y);
         } else {
-          newPoints[idx] = pointFrom(
+          newPoints_[idx] = pointFrom(
             target.x - sibling.x,
             target.y - sibling.y,
           );
@@ -1971,22 +1980,22 @@ export class LinearElementEditor {
       }
 
       // Re-normalize if point 0 moved (must be [0,0])
-      const shiftX = newPoints[0][0];
-      const shiftY = newPoints[0][1];
+      const shiftX = newPoints_[0][0];
+      const shiftY = newPoints_[0][1];
       if (Math.abs(shiftX) > 0.001 || Math.abs(shiftY) > 0.001) {
-        for (let k = 0; k < newPoints.length; k++) {
-          newPoints[k] = pointFrom(
-            newPoints[k][0] - shiftX,
-            newPoints[k][1] - shiftY,
+        for (let k = 0; k < newPoints_.length; k++) {
+          newPoints_[k] = pointFrom(
+            newPoints_[k][0] - shiftX,
+            newPoints_[k][1] - shiftY,
           );
         }
         scene.mutateElement(sibling, {
           x: sibling.x + shiftX,
           y: sibling.y + shiftY,
-          points: newPoints,
+          points: newPoints_,
         } as any);
       } else {
-        scene.mutateElement(sibling, { points: newPoints } as any);
+        scene.mutateElement(sibling, { points: newPoints_ } as any);
       }
     }
   }

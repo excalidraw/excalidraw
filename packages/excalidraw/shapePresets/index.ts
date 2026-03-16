@@ -76,13 +76,17 @@ export const getWireframeVertices = (
         sv,
         globalPts.length,
       );
-      if (idx < globalPts.length && !vertices.has(vertexId)) {
-        vertices.set(vertexId, {
-          vertexId,
-          globalPoint: globalPts[idx],
-          elementId: el.id,
-          pointIndex: idx,
-        });
+      if (idx < globalPts.length) {
+        const existing = vertices.get(vertexId);
+        // Prefer non-zero pointIndex to avoid point-0 normalization issues
+        if (!existing || (existing.pointIndex === 0 && idx !== 0)) {
+          vertices.set(vertexId, {
+            vertexId,
+            globalPoint: globalPts[idx],
+            elementId: el.id,
+            pointIndex: idx,
+          });
+        }
       }
     }
   }
