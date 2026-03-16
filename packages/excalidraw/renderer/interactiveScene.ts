@@ -223,21 +223,25 @@ const renderWireframeVertexHandles = (
   groupId: string,
   allElements: readonly ExcalidrawElement[],
   elementsMap: ElementsMap,
+  hoveredVertexId: string | null,
 ) => {
   const vertices = getWireframeVertices(groupId, allElements, elementsMap);
   const radius =
     LinearElementEditor.POINT_HANDLE_SIZE / 2 / appState.zoom.value;
+  const hoverRadius = radius * 1.4;
 
-  // Draw at scene coordinates — canvas zoom already applied upstream,
-  // no scroll translate needed here (matches strokeRectWithRotation_simple)
   for (const vertex of vertices.values()) {
     const [x, y] = vertex.globalPoint;
+    const isHovered = vertex.vertexId === hoveredVertexId;
+
     context.strokeStyle = "#5e5ad8";
-    context.lineWidth = 1.5 / appState.zoom.value;
+    context.lineWidth = (isHovered ? 2 : 1.5) / appState.zoom.value;
     context.setLineDash([]);
-    context.fillStyle = "rgba(255, 255, 255, 0.9)";
+    context.fillStyle = isHovered
+      ? "rgba(134, 131, 226, 0.9)"
+      : "rgba(255, 255, 255, 0.9)";
     context.beginPath();
-    context.arc(x, y, radius, 0, 2 * Math.PI);
+    context.arc(x, y, isHovered ? hoverRadius : radius, 0, 2 * Math.PI);
     context.fill();
     context.stroke();
   }
@@ -2019,6 +2023,7 @@ const _renderInteractiveSceneInner = ({
           wireframeGroupId,
           selectedElements,
           elementsMap,
+          app.hoveredWireframeVertexId ?? null,
         );
       }
     }

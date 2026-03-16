@@ -725,6 +725,9 @@ class App extends React.Component<AppProps, AppState> {
     vertexId: string;
   } | null = null;
 
+  // Wireframe vertex hover state (for visual feedback)
+  hoveredWireframeVertexId: string | null = null;
+
   onChangeEmitter = new Emitter<
     [
       elements: readonly ExcalidrawElement[],
@@ -6591,6 +6594,36 @@ class App extends React.Component<AppProps, AppState> {
         resetCursor(this.interactiveCanvas);
       } else {
         setCursorForShape(this.interactiveCanvas, this.state);
+      }
+    }
+
+    // Wireframe vertex hover detection
+    if (
+      !this.state.newElement &&
+      !this.state.selectedElementsAreBeingDragged &&
+      this.state.activeTool.type === "selection"
+    ) {
+      const wireframeGroupId = Object.keys(this.state.selectedGroupIds)[0];
+      if (wireframeGroupId) {
+        const allEls = this.scene.getNonDeletedElements();
+        if (isWireframeGroup(wireframeGroupId, allEls)) {
+          const hovered = getWireframeVertexAtPosition(
+            wireframeGroupId,
+            allEls,
+            this.scene.getNonDeletedElementsMap(),
+            scenePointerX,
+            scenePointerY,
+            this.state.zoom,
+          );
+          const hoveredId = hovered?.vertexId ?? null;
+          if (this.hoveredWireframeVertexId !== hoveredId) {
+            this.hoveredWireframeVertexId = hoveredId;
+            this.scene.triggerUpdate();
+          }
+        }
+      } else if (this.hoveredWireframeVertexId) {
+        this.hoveredWireframeVertexId = null;
+        this.scene.triggerUpdate();
       }
     }
 
