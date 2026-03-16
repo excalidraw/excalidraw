@@ -75,8 +75,34 @@ import type {
   Arrowhead,
 } from "./types";
 
-import type { Drawable, Options } from "roughjs/bin/core";
+import type { Drawable } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
+/**
+ * Post-process a rough.js Drawable to remove intermediate `move` ops.
+ *
+ * rough.js linearPath() inserts a `move` op at the start of every segment
+ * via _doubleLine(). These moveTo calls break canvas dash pattern
+ * continuity. This strips all `move` ops except the very first one,
+ * keeping the path continuous so setLineDash works uniformly.
+ */
+function _makePathContinuous(drawable: Drawable): Drawable {
+  for (const set of drawable.sets) {
+    if (set.type === "path") {
+      let firstMoveFound = false;
+      set.ops = set.ops.filter((op) => {
+        if (op.op === "move") {
+          if (!firstMoveFound) {
+            firstMoveFound = true;
+            return true; // keep first move
+          }
+          return false; // remove subsequent moves
+        }
+        return true; // keep all non-move ops
+      });
+    }
+  }
+  return drawable;
+}
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
@@ -922,6 +948,14 @@ const _generateElementShape = (
         if (options.fill) {
           shape = [
             generator.polygon(points as unknown as RoughPoint[], options),
+          ];
+        } else if (element.strokeStyle !== "solid" && element.roughness === 0) {
+          // rough.js linearPath() inserts moveTo per segment, breaking
+          // canvas dash pattern. Post-process to make path continuous.
+          shape = [
+            _makePathContinuous(
+              generator.linearPath(points as unknown as RoughPoint[], options),
+            ),
           ];
         } else {
           shape = [

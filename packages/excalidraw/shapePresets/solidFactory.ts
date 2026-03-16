@@ -37,8 +37,6 @@ export interface LineGeom {
   points: LocalPoint[];
   dashed: boolean;
   polygon: boolean;
-  /** Force roughness: 0 for clean dashed curves */
-  forceSmooth?: boolean;
 }
 
 export interface EllipseGeom {
@@ -115,9 +113,9 @@ function rect(
 }
 
 /**
- * Generate arc polyline with uniform arc-length spacing.
- * Oversamples at fine angle intervals, then resamples at equal distances
- * so dashed strokes render uniformly across the curve.
+ * Generate arc polyline. Uniform angle spacing with enough segments
+ * for a smooth curve. Dashed rendering handled by core fix in shape.ts
+ * (continuous path without moveTo between segments).
  */
 function arc(
   cx: number,
@@ -129,49 +127,14 @@ function arc(
   dashed: boolean,
   segments = 32,
 ): LineGeom {
-  // 1. Oversample at fine angle intervals
-  const N = 256;
-  const raw: { x: number; y: number }[] = [];
-  for (let i = 0; i <= N; i++) {
-    const t = startAngle + (endAngle - startAngle) * (i / N);
-    raw.push({ x: cx + rx * Math.cos(t), y: cy + ry * Math.sin(t) });
+  const pts: { x: number; y: number }[] = [];
+  for (let i = 0; i <= segments; i++) {
+    const t = startAngle + (endAngle - startAngle) * (i / segments);
+    pts.push({ x: cx + rx * Math.cos(t), y: cy + ry * Math.sin(t) });
   }
-
-  // 2. Cumulative arc lengths
-  const cumLen = [0];
-  for (let i = 1; i < raw.length; i++) {
-    const dx = raw[i].x - raw[i - 1].x;
-    const dy = raw[i].y - raw[i - 1].y;
-    cumLen.push(cumLen[i - 1] + Math.sqrt(dx * dx + dy * dy));
-  }
-  const totalLen = cumLen[cumLen.length - 1];
-
-  // 3. Resample at uniform arc lengths
-  const resampled: { x: number; y: number }[] = [raw[0]];
-  const step = totalLen / segments;
-  let target = step;
-  let j = 1;
-  while (resampled.length < segments && j < raw.length) {
-    if (cumLen[j] >= target) {
-      const prev = cumLen[j - 1];
-      const frac = (target - prev) / (cumLen[j] - prev);
-      resampled.push({
-        x: raw[j - 1].x + frac * (raw[j].x - raw[j - 1].x),
-        y: raw[j - 1].y + frac * (raw[j].y - raw[j - 1].y),
-      });
-      target += step;
-    } else {
-      j++;
-    }
-  }
-  resampled.push(raw[raw.length - 1]);
-
-  // 4. Convert to local points relative to first point
-  const x0 = resampled[0].x;
-  const y0 = resampled[0].y;
-  const points = resampled.map((p) =>
-    pointFrom<LocalPoint>(p.x - x0, p.y - y0),
-  );
+  const x0 = pts[0].x;
+  const y0 = pts[0].y;
+  const points = pts.map((p) => pointFrom<LocalPoint>(p.x - x0, p.y - y0));
 
   return {
     kind: "line",
@@ -180,7 +143,6 @@ function arc(
     points,
     dashed,
     polygon: false,
-    forceSmooth: true,
   };
 }
 
@@ -356,7 +318,9 @@ function createElementFromGeom(
       fillStyle: styles.fillStyle,
       strokeWidth: styles.strokeWidth,
       strokeStyle: geom.dashed ? "dashed" : "solid",
-      roughness: geom.forceSmooth ? 0 : styles.roughness,
+      // Dashed arcs need roughness: 0 so the core continuous-path fix
+      // in shape.ts activates (condition: roughness === 0 && !solid)
+      roughness: geom.dashed ? 0 : styles.roughness,
       opacity: styles.opacity,
       locked: false,
       frameId: styles.frameId,
