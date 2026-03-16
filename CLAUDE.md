@@ -1,7 +1,6 @@
 # CLAUDE.md
 
-> Fork of excalidraw for SdamEx (sdamex.com) -- whiteboard component for math problem solving.
-> Published as `@emevart/excalidraw` to GitHub Packages.
+> Fork of excalidraw for SdamEx (sdamex.com) -- whiteboard component for math problem solving. Published as `@emevart/excalidraw` to GitHub Packages.
 
 ## Project Structure
 
@@ -49,6 +48,7 @@ NPM_TOKEN=<token> npm publish    # Publish to npm.pkg.github.com
 ```
 
 Package config:
+
 - **Registry:** `https://npm.pkg.github.com`
 - **Name:** `@emevart/excalidraw`
 - **Files:** `dist/` directory
