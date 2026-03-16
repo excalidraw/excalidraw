@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Popover } from "radix-ui";
 
 import {
@@ -78,6 +78,11 @@ import {
   adjustmentsIcon,
   DotsHorizontalIcon,
   SelectionIcon,
+  RectangleIcon,
+  DiamondIcon,
+  EllipseIcon,
+  ArrowIcon,
+  LineIcon,
   pencilIcon,
 } from "./icons";
 
@@ -1061,6 +1066,54 @@ export const ShapesSwitcher = ({
     },
   ] as const;
 
+  const SHAPE_TOOLS = [
+    {
+      type: "rectangle",
+      icon: RectangleIcon,
+      title: capitalizeString(t("toolBar.rectangle")),
+    },
+    {
+      type: "diamond",
+      icon: DiamondIcon,
+      title: capitalizeString(t("toolBar.diamond")),
+    },
+    {
+      type: "ellipse",
+      icon: EllipseIcon,
+      title: capitalizeString(t("toolBar.ellipse")),
+    },
+  ] as const;
+
+  const LINEAR_TOOLS = [
+    {
+      type: "arrow",
+      icon: ArrowIcon,
+      title: capitalizeString(t("toolBar.arrow")),
+    },
+    {
+      type: "line",
+      icon: LineIcon,
+      title: capitalizeString(t("toolBar.line")),
+    },
+  ] as const;
+
+  const SHAPE_TYPES: Set<string> = new Set(SHAPE_TOOLS.map((t) => t.type));
+  const LINEAR_TYPES: Set<string> = new Set(LINEAR_TOOLS.map((t) => t.type));
+
+  const [lastActiveShape, setLastActiveShape] = useState<string>("rectangle");
+  const [lastActiveLinear, setLastActiveLinear] = useState<string>("arrow");
+
+  // Sync last active shape/linear with current tool
+  useEffect(() => {
+    if (SHAPE_TYPES.has(activeTool.type)) {
+      setLastActiveShape(activeTool.type);
+    }
+    if (LINEAR_TYPES.has(activeTool.type)) {
+      setLastActiveLinear(activeTool.type);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTool.type]);
+
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const lassoToolSelected =
@@ -1069,6 +1122,12 @@ export const ShapesSwitcher = ({
     app.state.preferredSelectionTool.type !== "lasso";
 
   const embeddableToolSelected = activeTool.type === "embeddable";
+
+  // Track which grouped popovers we already rendered to avoid duplicates
+  const renderedShapePopover = useRef(false);
+  const renderedLinearPopover = useRef(false);
+  renderedShapePopover.current = false;
+  renderedLinearPopover.current = false;
 
   return (
     <>
@@ -1095,7 +1154,7 @@ export const ShapesSwitcher = ({
           const keybindingLabel =
             value === "hand" ? undefined : numericKey || letter;
 
-          // when in compact styles panel mode (tablet)
+          // when in compact styles panel mode
           // use a ToolPopover for selection/lasso toggle as well
           if (
             (value === "selection" || value === "lasso") &&
@@ -1126,6 +1185,66 @@ export const ShapesSwitcher = ({
                   ) || SELECTION_TOOLS[0]
                 }
                 fillable={activeTool.type === "selection"}
+              />
+            );
+          }
+
+          // Group shapes (rectangle/diamond/ellipse) into a single popover
+          if (SHAPE_TYPES.has(value as string) && isCompactStylesPanel) {
+            if (renderedShapePopover.current) {
+              return null;
+            }
+            renderedShapePopover.current = true;
+            return (
+              <ToolPopover
+                key="shape-popover"
+                app={app}
+                options={SHAPE_TOOLS}
+                activeTool={activeTool}
+                defaultOption={lastActiveShape}
+                namePrefix="shapeType"
+                title={capitalizeString(t("toolBar.rectangle"))}
+                data-testid="toolbar-shapes"
+                onToolChange={(type: string) => {
+                  setLastActiveShape(type);
+                  app.setActiveTool({ type: type as any });
+                }}
+                displayedOption={
+                  SHAPE_TOOLS.find(
+                    (t) => t.type === (lastActiveShape as string),
+                  ) || SHAPE_TOOLS[0]
+                }
+                fillable
+              />
+            );
+          }
+
+          // Group linear tools (arrow/line) into a single popover
+          if (LINEAR_TYPES.has(value as string) && isCompactStylesPanel) {
+            if (renderedLinearPopover.current) {
+              return null;
+            }
+            renderedLinearPopover.current = true;
+            return (
+              <ToolPopover
+                key="linear-popover"
+                app={app}
+                options={LINEAR_TOOLS}
+                activeTool={activeTool}
+                defaultOption={lastActiveLinear}
+                namePrefix="linearType"
+                title={capitalizeString(t("toolBar.arrow"))}
+                data-testid="toolbar-linear"
+                onToolChange={(type: string) => {
+                  setLastActiveLinear(type);
+                  app.setActiveTool({ type: type as any });
+                }}
+                displayedOption={
+                  LINEAR_TOOLS.find(
+                    (t) => t.type === (lastActiveLinear as string),
+                  ) || LINEAR_TOOLS[0]
+                }
+                fillable
               />
             );
           }
