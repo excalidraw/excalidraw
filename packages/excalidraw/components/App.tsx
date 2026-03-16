@@ -9193,11 +9193,12 @@ class App extends React.Component<AppProps, AppState> {
   ): void => {
     // Create proxy rectangle for drag calculation (dashed guide)
     this.createGenericElementOnPointerDown("rectangle", pointerDownState);
-    // Make proxy dashed + semi-transparent as a placement guide
+    // Hide proxy — wireframe preview elements show the actual shape
     if (this.state.newElement) {
       this.scene.mutateElement(this.state.newElement, {
-        strokeStyle: "dashed",
-        opacity: 30,
+        opacity: 0,
+        strokeColor: "transparent",
+        backgroundColor: "transparent",
       } as any);
     }
     // Store solid preset type for live preview
@@ -9279,8 +9280,8 @@ class App extends React.Component<AppProps, AppState> {
     prevGlobal: Map<string, { x: number; y: number }>,
   ): void => {
     const linEl = element as any;
-    // Compute global deltas
-    const movedVertices = new Map<string, { dx: number; dy: number }>();
+    // Compute ABSOLUTE target positions (not deltas — avoids float drift)
+    const vertexTargets = new Map<string, { x: number; y: number }>();
     for (const [idxStr, vertexId] of Object.entries(sv)) {
       const idx = Number(idxStr);
       if (idx >= linEl.points.length) {
@@ -9290,13 +9291,16 @@ class App extends React.Component<AppProps, AppState> {
       if (!prev) {
         continue;
       }
-      const dx = linEl.x + linEl.points[idx][0] - prev.x;
-      const dy = linEl.y + linEl.points[idx][1] - prev.y;
-      if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
-        movedVertices.set(vertexId, { dx, dy });
+      const currX = linEl.x + linEl.points[idx][0];
+      const currY = linEl.y + linEl.points[idx][1];
+      if (
+        Math.abs(currX - prev.x) > 0.001 ||
+        Math.abs(currY - prev.y) > 0.001
+      ) {
+        vertexTargets.set(vertexId, { x: currX, y: currY });
       }
     }
-    if (movedVertices.size === 0) {
+    if (vertexTargets.size === 0) {
       return;
     }
 
@@ -9320,23 +9324,18 @@ class App extends React.Component<AppProps, AppState> {
       const sibEl = sib as any;
       let needsUpdate = false;
       const newPts = [...sibEl.points] as [number, number][];
-      let shiftX = 0;
-      let shiftY = 0;
 
       for (const [idxStr, vertexId] of Object.entries(sibSV)) {
-        const delta = movedVertices.get(vertexId);
-        if (!delta) {
+        const target = vertexTargets.get(vertexId);
+        if (!target) {
           continue;
         }
         const idx = Number(idxStr);
         if (idx >= newPts.length) {
           continue;
         }
-        newPts[idx] = [newPts[idx][0] + delta.dx, newPts[idx][1] + delta.dy];
-        if (idx === 0) {
-          shiftX = newPts[0][0];
-          shiftY = newPts[0][1];
-        }
+        // Set point to absolute target in sibling's local space
+        newPts[idx] = [target.x - sibEl.x, target.y - sibEl.y];
         needsUpdate = true;
       }
 
@@ -9344,6 +9343,9 @@ class App extends React.Component<AppProps, AppState> {
         continue;
       }
 
+      // Re-normalize if point 0 moved
+      const shiftX = newPts[0][0];
+      const shiftY = newPts[0][1];
       if (Math.abs(shiftX) > 0.001 || Math.abs(shiftY) > 0.001) {
         for (let k = 0; k < newPts.length; k++) {
           newPts[k] = [newPts[k][0] - shiftX, newPts[k][1] - shiftY];

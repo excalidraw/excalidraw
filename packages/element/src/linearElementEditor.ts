@@ -1846,8 +1846,8 @@ export class LinearElementEditor {
     sv: Record<number, string>,
     prevGlobal: Map<string, { x: number; y: number }>,
   ): void {
-    // 1. Compute global deltas (post-mutation vs pre-mutation)
-    const movedVertices = new Map<string, { dx: number; dy: number }>();
+    // 1. Compute ABSOLUTE global positions of moved vertices (not deltas)
+    const vertexTargets = new Map<string, { x: number; y: number }>();
     for (const [idxStr, vertexId] of Object.entries(sv)) {
       const idx = Number(idxStr);
       if (idx >= element.points.length) {
@@ -1859,13 +1859,15 @@ export class LinearElementEditor {
       }
       const currX = element.x + element.points[idx][0];
       const currY = element.y + element.points[idx][1];
-      const dx = currX - prev.x;
-      const dy = currY - prev.y;
-      if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
-        movedVertices.set(vertexId, { dx, dy });
+      if (
+        Math.abs(currX - prev.x) > 0.001 ||
+        Math.abs(currY - prev.y) > 0.001
+      ) {
+        // Store the TARGET global position (not delta)
+        vertexTargets.set(vertexId, { x: currX, y: currY });
       }
     }
-    if (movedVertices.size === 0) {
+    if (vertexTargets.size === 0) {
       return;
     }
 
@@ -1884,7 +1886,7 @@ export class LinearElementEditor {
           (el as any).sharedVertices,
       );
 
-    // 3. Apply global deltas to matching vertices in siblings
+    // 3. Set matching vertices to absolute target positions
     for (const sib of siblings) {
       const sibling = sib as ExcalidrawLinearElement & {
         sharedVertices: Record<number, string>;
@@ -1892,27 +1894,18 @@ export class LinearElementEditor {
       const sibSV = sibling.sharedVertices;
       let needsUpdate = false;
       const newPoints = [...sibling.points] as LocalPoint[];
-      let shiftX = 0;
-      let shiftY = 0;
 
       for (const [idxStr, vertexId] of Object.entries(sibSV)) {
-        const delta = movedVertices.get(vertexId);
-        if (!delta) {
+        const target = vertexTargets.get(vertexId);
+        if (!target) {
           continue;
         }
         const idx = Number(idxStr);
         if (idx >= newPoints.length) {
           continue;
         }
-        newPoints[idx] = pointFrom(
-          newPoints[idx][0] + delta.dx,
-          newPoints[idx][1] + delta.dy,
-        );
-        // If point 0 moved, need to re-normalize (point 0 must be [0,0])
-        if (idx === 0) {
-          shiftX = newPoints[0][0];
-          shiftY = newPoints[0][1];
-        }
+        // Set point to absolute target in sibling's local space
+        newPoints[idx] = pointFrom(target.x - sibling.x, target.y - sibling.y);
         needsUpdate = true;
       }
 
@@ -1920,7 +1913,9 @@ export class LinearElementEditor {
         continue;
       }
 
-      // Re-normalize if point 0 moved
+      // Re-normalize if point 0 moved (must be [0,0])
+      const shiftX = newPoints[0][0];
+      const shiftY = newPoints[0][1];
       if (Math.abs(shiftX) > 0.001 || Math.abs(shiftY) > 0.001) {
         for (let k = 0; k < newPoints.length; k++) {
           newPoints[k] = pointFrom(

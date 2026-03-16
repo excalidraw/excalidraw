@@ -95,7 +95,9 @@ export const getWireframeVertexAtPosition = (
   zoom: AppState["zoom"],
 ): WireframeVertex | null => {
   const vertices = getWireframeVertices(groupId, allElements, elementsMap);
-  const threshold = 10 / zoom.value; // pixel threshold scaled by zoom
+  // Use vertex handle visual radius + small padding as threshold
+  const handleRadius = LinearElementEditor.POINT_HANDLE_SIZE / 2;
+  const threshold = (handleRadius + 2) / zoom.value;
 
   let closest: WireframeVertex | null = null;
   let closestDist = Infinity;
