@@ -530,6 +530,64 @@ const getStaticCanvasRegionHashForTextElement = async (
   );
 };
 
+const hashBytes64 = (bytes: Uint8Array) => {
+  let hash = 14695981039346656037n;
+  const prime = 1099511628211n;
+  for (let i = 0; i < bytes.length; i++) {
+    hash ^= BigInt(bytes[i]!);
+    hash = (hash * prime) & 18446744073709551615n;
+  }
+  return hash.toString(16);
+};
+
+const getViewportRegionHashForTextElement = async (
+  page: Page,
+  elementId: string,
+) => {
+  const clip = await page.evaluate(
+    ({ elementId }) => {
+      const h = (window as any).h;
+      if (!h?.state) {
+        throw new Error("missing app state");
+      }
+      const state = h.state;
+      const zoom = Number(state.zoom?.value) || 1;
+
+      const el = (h.elements || []).find((e: any) => e?.id === elementId);
+      if (!el || el.type !== "text") {
+        throw new Error("missing text element");
+      }
+
+      const canvas = document.querySelector<HTMLCanvasElement>(
+        "canvas.excalidraw__canvas.static",
+      );
+      if (!canvas) {
+        throw new Error("missing static canvas");
+      }
+      const rect = canvas.getBoundingClientRect();
+
+      const paddingClientPx = 6;
+      const left = (el.x + state.scrollX) * zoom + rect.left - paddingClientPx;
+      const top = (el.y + state.scrollY) * zoom + rect.top - paddingClientPx;
+      const width = el.width * zoom + paddingClientPx * 2;
+      const height = el.height * zoom + paddingClientPx * 2;
+
+      const x = Math.max(0, Math.floor(left));
+      const y = Math.max(0, Math.floor(top));
+      const maxW = Math.max(0, Math.floor(window.innerWidth - x));
+      const maxH = Math.max(0, Math.floor(window.innerHeight - y));
+      const w = Math.max(1, Math.min(Math.ceil(width), maxW));
+      const hgt = Math.max(1, Math.min(Math.ceil(height), maxH));
+
+      return { x, y, width: w, height: hgt };
+    },
+    { elementId },
+  );
+
+  const png = await page.screenshot({ clip });
+  return `${clip.width}x${clip.height}:${hashBytes64(png)}`;
+};
+
 type GridPosition = {
   cellX: number;
   cellY: number;
@@ -799,6 +857,64 @@ test("resizing text narrower and repeating operation A should keep wrapping cons
   }
 });
 
+test("editing should not change whitespace marker rendering (E2E)", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.addStyleTag({
+    content:
+      "canvas.excalidraw__canvas.interactive{opacity:0 !important;} .excalidraw__canvas.interactive{opacity:0 !important;}",
+  });
+  await page.evaluate(() => {
+    (window as any).h?.setState?.({
+      gridModeEnabled: true,
+      gridSize: 20,
+      gridStep: 5,
+      currentItemFontFamily: 12,
+      currentItemFontSize: 20,
+    });
+  });
+
+  const value = "A  B\nC   D\nE";
+
+  const createX = 240;
+  const createY = 180;
+
+  const editor = await openTextEditorAt(page, createX, createY);
+  await editor.fill(value);
+  await exitEditor(page);
+
+  const textElementId = await page.evaluate(() => {
+    const h = (window as any).h;
+    const els = h?.elements || [];
+    const text = [...els].reverse().find((e: any) => e?.type === "text");
+    if (!text) {
+      throw new Error("missing text element");
+    }
+    return String(text.id);
+  });
+
+  await page.mouse.click(10, 10);
+  const before = await getViewportRegionHashForTextElement(page, textElementId);
+
+  await openEditorByDoubleClickAt(page, createX, createY);
+  await page.evaluate(() => {
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (!textarea) {
+      throw new Error("missing textarea");
+    }
+    textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+    textarea.style.caretColor = "transparent";
+  });
+
+  const during = await getViewportRegionHashForTextElement(page, textElementId);
+  expect(during).toEqual(before);
+
+  await exitEditor(page);
+});
+
 test("getImageData clicking to edit the text box will not change the character absolute position (E2E, zoom=3000%)", async ({
   page,
 }) => {
@@ -872,4 +988,325 @@ test("getImageData clicking to edit the text box will not change the character a
     await dragResizeFromRight(page, box, -5 * 30);
     await captureA();
   }
+});
+
+const percentile = (values: number[], p: number) => {
+  if (!values.length) {
+    return NaN;
+  }
+  const sorted = [...values].sort((a, b) => a - b);
+  const clampedP = Math.min(1, Math.max(0, p));
+  const idx = Math.ceil(clampedP * sorted.length) - 1;
+  return sorted[Math.max(0, Math.min(sorted.length - 1, idx))];
+};
+
+// response speed
+test("response speed: long text editing (E2E)", async ({ page }) => {
+  test.setTimeout(900_000);
+  await page.goto("/");
+
+  const createX = 240;
+  const createY = 180;
+  const targetWidth = 300;
+
+  await openTextEditorAt(page, createX, createY);
+  const base = generateRandomText(424242, 50_000);
+  await page.evaluate((value) => {
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (!textarea) {
+      throw new Error("missing textarea");
+    }
+    textarea.value = String(value);
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  }, base);
+  await page.waitForFunction((len) => {
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    return textarea?.value.length === Number(len);
+  }, base.length);
+
+  await exitEditor(page);
+
+  const editorForBox = await openEditorByDoubleClickAt(page, createX, createY);
+  await editorForBox.waitFor();
+  const baseBox = await getEditorBox(page);
+  await exitEditor(page);
+
+  await dragResizeFromRight(page, baseBox, targetWidth - baseBox.width);
+
+  const editor = await openEditorByDoubleClickAt(page, createX, createY);
+  await editor.waitFor();
+  const latencies: number[] = [];
+  for (let i = 0; i < 5; i++) {
+    const dt = await page.evaluate(() => {
+      const textarea = document.querySelector<HTMLTextAreaElement>(
+        "textarea.excalidraw-wysiwyg",
+      );
+      if (!textarea) {
+        throw new Error("missing textarea");
+      }
+      textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+      const t0 = performance.now();
+      textarea.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "x", bubbles: true }),
+      );
+      textarea.value += "x";
+      textarea.dispatchEvent(new Event("input", { bubbles: true }));
+      return performance.now() - t0;
+    });
+    latencies.push(dt);
+  }
+
+  const p95 = percentile(latencies, 0.95);
+  const p50 = percentile(latencies, 0.5);
+  const max = Math.max(...latencies);
+  process.stdout.write(
+    `[response speed] long text editing: p50=${p50.toFixed(
+      1,
+    )}ms p95=${p95.toFixed(1)}ms max=${max.toFixed(1)}ms n=${
+      latencies.length
+    }\n`,
+  );
+  expect(p95).toBeLessThan(500);
+  expect(max).toBeLessThan(1000);
+
+  await exitEditor(page);
+});
+
+// response speed
+test("response speed: Alt+ArrowUp/Down move line (E2E)", async ({ page }) => {
+  test.setTimeout(900_000);
+  await page.goto("/");
+
+  const createX = 240;
+  const createY = 180;
+  const targetWidth = 300;
+
+  await openTextEditorAt(page, createX, createY);
+  const raw = generateRandomText(424242, 50_000);
+  let value = "";
+  for (let i = 0; i < raw.length; i += 80) {
+    value += raw.slice(i, i + 80);
+    if (i + 80 < raw.length) {
+      value += "\n";
+    }
+  }
+  value = value.slice(0, 50_000);
+
+  await page.evaluate((text) => {
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (!textarea) {
+      throw new Error("missing textarea");
+    }
+    textarea.value = String(text);
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  }, value);
+  await page.waitForFunction((len) => {
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    return textarea?.value.length === Number(len);
+  }, value.length);
+
+  await exitEditor(page);
+
+  const editorForBox = await openEditorByDoubleClickAt(page, createX, createY);
+  await editorForBox.waitFor();
+  const baseBox = await getEditorBox(page);
+  await exitEditor(page);
+
+  await dragResizeFromRight(page, baseBox, targetWidth - baseBox.width);
+
+  const editor = await openEditorByDoubleClickAt(page, createX, createY);
+  await editor.waitFor();
+
+  await page.evaluate(() => {
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (!textarea) {
+      throw new Error("missing textarea");
+    }
+    let idx = Math.floor(textarea.value.length / 2);
+    if (textarea.value[idx] === "\n") {
+      idx += 1;
+    }
+    idx = Math.max(1, Math.min(idx, textarea.value.length - 1));
+    textarea.selectionStart = textarea.selectionEnd = idx;
+  });
+
+  const latencies: number[] = [];
+  for (let i = 0; i < 10; i++) {
+    const dt = await page.evaluate(
+      (direction) => {
+        const textarea = document.querySelector<HTMLTextAreaElement>(
+          "textarea.excalidraw-wysiwyg",
+        );
+        if (!textarea) {
+          throw new Error("missing textarea");
+        }
+        const t0 = performance.now();
+        textarea.dispatchEvent(
+          new KeyboardEvent("keydown", {
+            key: direction,
+            altKey: true,
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+        return performance.now() - t0;
+      },
+      i % 2 === 0 ? "ArrowUp" : "ArrowDown",
+    );
+    latencies.push(dt);
+  }
+
+  const p95 = percentile(latencies, 0.95);
+  const p50 = percentile(latencies, 0.5);
+  const max = Math.max(...latencies);
+  process.stdout.write(
+    `[response speed] Alt+ArrowUp/Down move line: p50=${p50.toFixed(
+      1,
+    )}ms p95=${p95.toFixed(1)}ms max=${max.toFixed(1)}ms n=${
+      latencies.length
+    }\n`,
+  );
+  expect(p95).toBeLessThan(500);
+  expect(max).toBeLessThan(1000);
+
+  await exitEditor(page);
+});
+
+// response speed
+test("response speed: double click inserts caret (E2E)", async ({ page }) => {
+  test.setTimeout(900_000);
+  await page.goto("/");
+
+  const createX = 240;
+  const createY = 180;
+  const targetWidth = 300;
+
+  const value = generateRandomText(424242, 50_000);
+
+  await openTextEditorAt(page, createX, createY);
+  await page.evaluate((text) => {
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (!textarea) {
+      throw new Error("missing textarea");
+    }
+    textarea.value = String(text);
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  }, value);
+  await page.waitForFunction((len) => {
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    return textarea?.value.length === Number(len);
+  }, value.length);
+  await exitEditor(page);
+
+  const editorForBox = await openEditorByDoubleClickAt(page, createX, createY);
+  await editorForBox.waitFor();
+  const baseBox = await getEditorBox(page);
+  await exitEditor(page);
+  await dragResizeFromRight(page, baseBox, targetWidth - baseBox.width);
+
+  const canvas = page.locator("canvas.interactive");
+  await canvas.waitFor();
+
+  await page.evaluate(() => {
+    (window as any).__e2eDblClickResponseSpeed = {
+      seq: 0,
+      completedSeq: 0,
+      latencyMs: 0,
+    };
+
+    if ((window as any).__e2eDblClickResponseSpeedInstalled) {
+      return;
+    }
+    (window as any).__e2eDblClickResponseSpeedInstalled = true;
+
+    document.addEventListener(
+      "dblclick",
+      () => {
+        const s = (window as any).__e2eDblClickResponseSpeed;
+        s.seq += 1;
+        const activeSeq = s.seq;
+        const t0 = performance.now();
+        const loop = () => {
+          const textarea = document.querySelector<HTMLTextAreaElement>(
+            "textarea.excalidraw-wysiwyg",
+          );
+          if (textarea && document.activeElement === textarea) {
+            s.latencyMs = performance.now() - t0;
+            s.completedSeq = activeSeq;
+            return;
+          }
+          requestAnimationFrame(loop);
+        };
+        requestAnimationFrame(loop);
+      },
+      { capture: true },
+    );
+  });
+
+  const latencies: number[] = [];
+  for (let i = 0; i < 5; i++) {
+    const expectedSeq = await page.evaluate(
+      () => Number((window as any).__e2eDblClickResponseSpeed?.seq ?? 0) + 1,
+    );
+
+    await page.mouse.dblclick(createX + 50, createY + 10);
+
+    await page.waitForFunction(
+      (seq) => (window as any).__e2eDblClickResponseSpeed?.completedSeq === seq,
+      expectedSeq,
+    );
+
+    await expect(page.locator("textarea.excalidraw-wysiwyg")).toBeVisible();
+
+    const selection = await page.evaluate(() => {
+      const textarea = document.querySelector<HTMLTextAreaElement>(
+        "textarea.excalidraw-wysiwyg",
+      );
+      if (!textarea) {
+        throw new Error("missing textarea");
+      }
+      return {
+        start: textarea.selectionStart,
+        end: textarea.selectionEnd,
+        length: textarea.value.length,
+      };
+    });
+
+    expect(selection.end).toBeGreaterThan(0);
+    expect(selection.end).toBeLessThanOrEqual(selection.length);
+
+    const dt = await page.evaluate(() =>
+      Number((window as any).__e2eDblClickResponseSpeed?.latencyMs ?? NaN),
+    );
+    latencies.push(dt);
+
+    await exitEditor(page);
+  }
+
+  const p95 = percentile(latencies, 0.95);
+  const p50 = percentile(latencies, 0.5);
+  const max = Math.max(...latencies);
+  process.stdout.write(
+    `[response speed] double click inserts caret: p50=${p50.toFixed(
+      1,
+    )}ms p95=${p95.toFixed(1)}ms max=${max.toFixed(1)}ms n=${
+      latencies.length
+    }\n`,
+  );
+  expect(p95).toBeLessThan(500);
+  expect(max).toBeLessThan(1000);
 });

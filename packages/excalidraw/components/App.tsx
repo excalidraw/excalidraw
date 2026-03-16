@@ -4720,6 +4720,28 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
+      if (
+        event.key === "Alt" &&
+        !event.shiftKey &&
+        !event[KEYS.CTRL_OR_CMD] &&
+        !(event as KeyboardEvent).metaKey &&
+        this.excalidrawContainerRef.current &&
+        ((event.target instanceof Node &&
+          this.excalidrawContainerRef.current.contains(event.target)) ||
+          (document.activeElement instanceof Node &&
+            this.excalidrawContainerRef.current.contains(
+              document.activeElement,
+            )))
+      ) {
+        event.preventDefault();
+        if ("stopImmediatePropagation" in event) {
+          (event as KeyboardEvent).stopImmediatePropagation();
+        } else if ("stopPropagation" in event) {
+          (event as React.KeyboardEvent).stopPropagation();
+        }
+        return;
+      }
+
       if (!isInputLike(event.target)) {
         if (
           (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
@@ -5848,7 +5870,11 @@ class App extends React.Component<AppProps, AppState> {
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
 
-    const updateElement = (nextOriginalText: string, isDeleted: boolean) => {
+    const updateElement = (
+      nextOriginalText: string,
+      isDeleted: boolean,
+      shouldRefreshDimensions: boolean,
+    ) => {
       const rawMaxWidth = Number(
         localStorage.getItem("excalidraw.textMaxWidth"),
       );
@@ -5862,42 +5888,62 @@ class App extends React.Component<AppProps, AppState> {
             const container = getContainerElement(_element, elementsMap);
             const shouldConstrainWidth = !container && _element.autoResize;
 
-            const normalizedOriginalText = normalizeText(nextOriginalText);
-            const unconstrainedMetrics = measureText(
-              normalizedOriginalText,
-              getFontString(_element),
-              _element.lineHeight,
-            );
-
-            const widthUpdates =
-              shouldConstrainWidth && unconstrainedMetrics.width > textMaxWidth
+            const widthUpdates = (() => {
+              if (!shouldConstrainWidth) {
+                return null;
+              }
+              const normalizedOriginalText = normalizeText(nextOriginalText);
+              const unconstrainedMetrics = measureText(
+                normalizedOriginalText,
+                getFontString(_element),
+                _element.lineHeight,
+              );
+              return unconstrainedMetrics.width > textMaxWidth
                 ? ({
                     autoResize: false,
                     width: textMaxWidth,
                   } as const)
                 : null;
+            })();
 
             const measurementElement = widthUpdates
               ? newElementWith(_element, widthUpdates)
               : _element;
 
-            return newElementWith(_element, {
+            const baseUpdates = {
               originalText: nextOriginalText,
+              text: nextOriginalText,
               isDeleted: isDeleted ?? _element.isDeleted,
               ...(widthUpdates ? widthUpdates : {}),
-              // returns (wrapped) text and new dimensions
-              ...refreshTextDimensions(
-                measurementElement,
-                container,
-                elementsMap,
-                nextOriginalText,
-              ),
+            } as const;
+
+            return newElementWith(_element, {
+              ...baseUpdates,
+              ...(shouldRefreshDimensions
+                ? refreshTextDimensions(
+                    measurementElement,
+                    container,
+                    elementsMap,
+                    nextOriginalText,
+                  )
+                : null),
             });
           }
           return _element;
         }),
       ]);
     };
+
+    const updateElementDimensionsThrottled = throttle(
+      (nextOriginalText: string) => {
+        if (nextOriginalText.length > 5_000) {
+          return;
+        }
+        updateElement(nextOriginalText, false, true);
+      },
+      200,
+      { leading: false },
+    );
 
     textWysiwyg({
       id: element.id,
@@ -5916,14 +5962,21 @@ class App extends React.Component<AppProps, AppState> {
         ];
       },
       onChange: withBatchedUpdates((nextOriginalText) => {
-        updateElement(nextOriginalText, false);
-        if (isNonDeletedElement(element)) {
-          updateBoundElements(element, this.scene);
+        updateElement(nextOriginalText, false, false);
+        updateElementDimensionsThrottled(nextOriginalText);
+        const latestElement = this.scene.getElement(element.id);
+        if (
+          latestElement &&
+          isNonDeletedElement(latestElement) &&
+          latestElement.boundElements?.length
+        ) {
+          updateBoundElements(latestElement, this.scene);
         }
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
         const isDeleted = !nextOriginalText.trim();
-        updateElement(nextOriginalText, isDeleted);
+        updateElementDimensionsThrottled.cancel();
+        updateElement(nextOriginalText, isDeleted, true);
 
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
@@ -5985,7 +6038,8 @@ class App extends React.Component<AppProps, AppState> {
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.originalText, false);
+    updateElement(element.originalText, false, false);
+    updateElementDimensionsThrottled(element.originalText);
   }
 
   private deselectElements() {

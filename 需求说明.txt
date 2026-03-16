@@ -225,31 +225,152 @@ textWysiwyg.tsx:L163-L231
 "字符顶部网格线距离":这个字符顶部最近的一个像素到画布中最近的一个网格线的距离
 点击这个工具后将对画布中所有文本框的文本框中的字符进行计算,编辑时也进行计算,计算结果隔3s自动刷新;直到下一次刷新画布消失;
 
-
-
-
-
-
-
+已实现：满足 需求说明.txt#L207-215 的方向（getImageData + 3000%）
+- 改为编辑态仍保留 canvas 渲染该 text 元素：移除了“编辑时不渲染该 text”的过滤逻辑（ Renderer.ts ）。
+- 为避免“canvas 文本 + textarea 文本”重影：把 textarea 文本设为透明，但保留 caret 颜色（ textWysiwyg.tsx:L321-L353 ）。
+- 新增 E2E：在 zoom=3000%（ zoom.value = 30 ）下，用 getImageData() 对静态画布中“该文本元素区域”的像素做哈希；进入编辑前后哈希必须完全一致，并重复执行“每次缩小宽度 5px（scene px）”的操作 B（ text-wrap-consistency.spec.ts 里的新用例）。
 把“方法 1”的 E2E 测试体系加进仓库并实现操作 A/B
 
 
 
-yarn install
+添加测试画布中在编辑时,和非编辑时的换行符,空格符有任何样式差别就不通过的测试;(The line break style of the text box remains unchanged during editing)
+editing should not change whitespace marker rendering (E2E)
+目前编辑时会出现二次渲染换行符;导致编辑时换行符和空格重影;
+使用getImageData()进行测试
+
+
+将画布的编辑光标改为不闪烁;类似vscode的Editor:Cursor Blinking solid
+
+
+添加编辑文本框时按下ctrl+c复制编辑光标所在行的文字(不复制换行符)
+
+为这个网页添加监听拦截alt键的功能,防止按下alt跳到其他浏览器按钮;
+添加在文本框内按住alt(无需选中)可以上下移动编辑光标所在行的功能;和代码编辑器按住alt移动行一样;
+
+
+
+更新response speed测试
+1长文本编辑响应速度,
+2按住alt移动行的速度;
+3双击文本框插入光标的响应速度;
+将这些测试的文本框文本长度改为50000再测试
+将这些测试的文本框的宽度设为300再测试
+response speed
+yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed" --reporter=line
+yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed: long text editing" --reporter=line
+yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed: long text editing" --reporter=line
+
+
+
+
+
+
+分析有什么可以记录在浏览器中每一步操作,直到响应所耗费的时间;的方法;
+在Selenium文件夹更新测试脚本test.py
+检查是否已将已将项目运行在http://localhost:3000/ 不重新启动项目
+测试:
+将这些测试的文本框文本长度设为为50000(随机生成文字,并且随机换行)
+将这些测试的文本框的宽度设为300
+操作A:移动画布,将文本框移动到画布中心,在视口内操作文本框,
+测试以下操作的速度(顺序执行):
+1长文本编辑响应速度,
+2按住alt移动行的速度;
+3双击文本框插入光标的响应速度;
+操作B:向下移动20个鼠标滚轮,重复操作A;(重复3次)
+目前的脚本似乎不会移动画布,将操作B移动画布的操作改为鼠标滚轮
+$env:SELENIUM_HEADLESS=1
+python Selenium\test.py
+
+yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed" --reporter=line
+yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "double click inserts caret" --reporter=line
+yarn test:typecheck -- --pretty false
+yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "double click inserts caret" --reporter=line
+
+
+
+
+
+
+
+
+你手动运行方式（按你的要求用 python，不带路径）
+- 先确保你已经把项目跑在 http://localhost:3000/ （你自己启动，不要让脚本启动）
+- 在仓库根目录运行：
+```
+$env:SELENIUM_HEADLESS=1
+python Selenium\test.py
+```
+如果你要有界面跑（方便观察），把 headless 去掉即可：
+```
+Remove-Item Env:\SELENIUM_HEADLESS -ErrorAction SilentlyContinue
+python Selenium\test.py
+```
+另外，你这边用 python Selenium\test.py 时缺的依赖我已经通过 python -m pip install --user typing_extensions 补过了；如果换了 Python 环境，记得在对应环境也装一下。
+
+
+
+
+
+
+
+
+
+方法 A：浏览器内“黑盒”计时（不改业务代码）
+- 在注入脚本里记录 t0=performance.now() （在触发 action 前/事件 capture 阶段）。
+- 触发操作后，用 requestAnimationFrame 连续等 1–2 帧，并加一个“完成条件”：
+  - 长文本编辑：textarea.value 变更完成 +（可选）overlay/尺寸稳定（连续两帧 getBoundingClientRect() 不变）。
+  - Alt 移动行：textarea.value 与上次不同（或 selectionStart/End 发生符合预期的变化）。
+  - 双击：textarea 获得 focus 且 selectionEnd > 0（你们现在就是这么干的）。
+- 优点：实现简单、跨框架；缺点：只能拿到“端到端延迟”，很难拆解成内部步骤。
+D:\a03\miniconda\python.exe -m py_compile Selenium/test.py
+yarn --cwd ./excalidraw-app vite --port 3000 --strictPort
+powershell -NoProfile -Command "try { (Invoke-WebRequest -UseBasicParsing http://localhost:3000/).StatusCode } catch { $_.Exception.Message; exit 1 }"
+powershell -NoProfile -Command "$env:SELENIUM_HEADLESS='1'; $env:EXCALIDRAW_URL='http://localhost:3000'; D:\a03\miniconda\python.exe Selenium\test.py"
+D:\a03\miniconda\python.exe -m py_compile Selenium/test.py
+$env:SELENIUM_HEADLESS=1; $env:EXCALIDRAW_URL='http://localhost:3000'; D:\a03\miniconda\python.exe Selenium\test.py
+python -m pip install --user typing_extensions
+$env:SELENIUM_HEADLESS=1; $env:EXCALIDRAW_URL='http://localhost:3000/'; python Selenium\test.py
+$env:SELENIUM_HEADLESS=1; $env:EXCALIDRAW_URL='http://localhost:3000/'; python Selenium\test.py
+
+
+
+
+
+
+
+yarn eslint --max-warnings=0 e2e/text-wrap-consistency.spec.ts; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+yarn test:typecheck -- --pretty false; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed" --reporter=line
+yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed" --reporter=line
+yarn eslint --max-warnings=0 e2e/text-wrap-consistency.spec.ts
+yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed" --reporter=line
+D:\a03\miniconda\python.exe -m py_compile Selenium/test.py
+
+
+
+
+
+yarn run v1.22.22
 yarn --cwd ./excalidraw-app vite --port 3000 --strictPort
 yarn electron:dev
-- 通过 
 yarn test:code 、 
 yarn test:typecheck
-- 通过 
 yarn test:app --watch=false packages/excalidraw/tests/textDomLayout.test.tsx
-
+http://localhost:3000/
 yarn install
 npx playwright install chromium
 yarn test:e2e
-yarn eslint --max-warnings=0 e2e/text-wrap-consistency.spec.ts
 yarn test:e2e --reporter=line
 yarn eslint --max-warnings=0 e2e/text-wrap-consistency.spec.ts
+yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "editing should not change whitespace marker rendering"
+yarn test:e2e -- e2e/text-wrap-consistency.spec.ts
+yarn test:app packages/excalidraw/wysiwyg/textWysiwyg.test.tsx packages/excalidraw/tests/shortcuts.test.tsx --watch=false
+yarn test:typecheck
+yarn test:code
+yarn eslint --max-warnings=0 e2e/text-wrap-consistency.spec.ts
+yarn test:typecheck -- --pretty false
+yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed"
+yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed" --reporter=line
 
 
 

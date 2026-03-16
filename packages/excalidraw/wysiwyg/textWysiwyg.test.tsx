@@ -42,6 +42,7 @@ import {
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
 import { actionBindText } from "../actions";
+import * as clipboard from "../clipboard";
 
 unmountComponent();
 
@@ -414,7 +415,7 @@ describe("textWysiwyg", () => {
       restoreOriginalGetBoundingClientRect();
     });
 
-    it("should visualize spaces and newlines in the text editor", () => {
+    it("should keep the overlay text in sync with textarea value", () => {
       const overlay = document.querySelector<HTMLDivElement>(
         ".excalidraw-wysiwyg__whitespaceOverlay",
       );
@@ -423,18 +424,65 @@ describe("textWysiwyg", () => {
 
       updateTextEditor(textarea, "a b\nc");
 
-      expect(
-        overlay!.querySelectorAll(".excalidraw-wysiwyg__ws--space").length,
-      ).toBe(1);
-      expect(
-        overlay!.querySelectorAll(".excalidraw-wysiwyg__ws--newline").length,
-      ).toBe(1);
+      expect(overlay!.textContent).toBe("a b\nc");
+      expect(overlay!.querySelectorAll(".excalidraw-wysiwyg__ws").length).toBe(
+        0,
+      );
 
       Keyboard.exitTextEditor(textarea);
 
       expect(
         document.querySelector(".excalidraw-wysiwyg__whitespaceOverlay"),
       ).toBe(null);
+    });
+
+    it("should copy current line on Ctrl/Cmd+C when no selection", async () => {
+      const copySpy = vi
+        .spyOn(clipboard, "copyTextToSystemClipboard")
+        .mockResolvedValue(undefined as any);
+
+      updateTextEditor(textarea, "Line#1\nLine#2\nLine#3");
+      textarea.selectionStart = 8;
+      textarea.selectionEnd = 8;
+
+      fireEvent.keyDown(textarea, {
+        key: "c",
+        ctrlKey: true,
+      });
+
+      expect(copySpy).toHaveBeenCalledWith("Line#2");
+
+      copySpy.mockRestore();
+    });
+
+    it("should move current line up on Alt+ArrowUp", async () => {
+      updateTextEditor(textarea, "Line#1\nLine#2\nLine#3");
+      textarea.selectionStart = 8;
+      textarea.selectionEnd = 8;
+
+      fireEvent.keyDown(textarea, {
+        key: "ArrowUp",
+        altKey: true,
+      });
+
+      expect(textarea.value).toBe("Line#2\nLine#1\nLine#3");
+      expect(textarea.selectionStart).toBe(1);
+      expect(textarea.selectionEnd).toBe(1);
+    });
+
+    it("should move current line down on Alt+ArrowDown", async () => {
+      updateTextEditor(textarea, "Line#1\nLine#2\nLine#3");
+      textarea.selectionStart = 8;
+      textarea.selectionEnd = 8;
+
+      fireEvent.keyDown(textarea, {
+        key: "ArrowDown",
+        altKey: true,
+      });
+
+      expect(textarea.value).toBe("Line#1\nLine#3\nLine#2");
+      expect(textarea.selectionStart).toBe(15);
+      expect(textarea.selectionEnd).toBe(15);
     });
 
     it("should render consistent whitespace markers in edit and non-edit modes", () => {
@@ -456,21 +504,10 @@ describe("textWysiwyg", () => {
         fontSize * 0.4,
       );
 
-      expect(
-        overlay!.querySelectorAll(".excalidraw-wysiwyg__ws--space").length,
-      ).toBe(expectedSpaceCount);
-      const editorNewlines = Array.from(
-        overlay!.querySelectorAll<HTMLSpanElement>(
-          ".excalidraw-wysiwyg__ws--newline",
-        ),
+      expect(overlay!.textContent).toBe(value);
+      expect(overlay!.querySelectorAll(".excalidraw-wysiwyg__ws").length).toBe(
+        0,
       );
-      expect(editorNewlines).toHaveLength(expectedNewlineCount);
-      for (const marker of editorNewlines) {
-        expect(parseFloat(marker.style.marginLeft)).toBeCloseTo(
-          expectedNewlinePadding,
-          2,
-        );
-      }
 
       Keyboard.exitTextEditor(textarea);
 
@@ -1882,7 +1919,7 @@ describe("textWysiwyg", () => {
       API.setElements([]);
     });
 
-    it("should update textarea caret color when theme changes to dark mode and back", async () => {
+    it("should update editor caret color when theme changes to dark mode and back", async () => {
       const originalColor = "#ff0000";
 
       const textElement = API.createElement({
@@ -1897,7 +1934,13 @@ describe("textWysiwyg", () => {
 
       const editor = await getTextEditor({ waitForEditor: true });
 
-      expect(colorsAreEqual(editor.style.caretColor, originalColor)).toBe(true);
+      const caret = document.querySelector<HTMLDivElement>(
+        ".excalidraw-wysiwyg__caret",
+      );
+      expect(caret).not.toBe(null);
+
+      expect(editor.style.caretColor).toBe("transparent");
+      expect(colorsAreEqual(caret!.style.background, originalColor)).toBe(true);
 
       act(() => {
         h.setState({ theme: THEME.DARK });
@@ -1906,7 +1949,7 @@ describe("textWysiwyg", () => {
       });
       expect(
         colorsAreEqual(
-          editor.style.caretColor,
+          caret!.style.background,
           applyDarkModeFilter(originalColor),
         ),
       ).toBe(true);
@@ -1915,7 +1958,7 @@ describe("textWysiwyg", () => {
         h.setState({ theme: THEME.LIGHT });
         h.app.scene.mutateElement(textElement, {});
       });
-      expect(colorsAreEqual(editor.style.caretColor, originalColor)).toBe(true);
+      expect(colorsAreEqual(caret!.style.background, originalColor)).toBe(true);
     });
   });
 });

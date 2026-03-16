@@ -57,6 +57,7 @@ import {
   parseClipboard,
   parseDataTransferEvent,
   parseDataTransferEventMimeTypes,
+  copyTextToSystemClipboard,
 } from "../clipboard";
 import {
   actionDecreaseFontSize,
@@ -163,56 +164,301 @@ export const textWysiwyg = ({
   const whitespaceOverlay = document.createElement("div");
   whitespaceOverlay.classList.add("excalidraw-wysiwyg__whitespaceOverlay");
 
-  let newlineMarkerPaddingPx = 0;
+  const whitespaceOverlayTextNode = document.createTextNode("");
+  whitespaceOverlay.appendChild(whitespaceOverlayTextNode);
 
+  const caret = document.createElement("div");
+  caret.classList.add("excalidraw-wysiwyg__caret");
+  Object.assign(caret.style, {
+    position: "absolute",
+    display: "none",
+    left: "0px",
+    top: "0px",
+    width: "2px",
+    height: "1em",
+    background: "currentcolor",
+    pointerEvents: "none",
+  });
+  whitespaceOverlay.appendChild(caret);
+
+  let lastWhitespaceOverlayValue = "";
   const updateWhitespaceOverlayContent = () => {
-    // overlay 内容与 textarea 同步，但 overlay 自身文字透明，仅通过 span 伪元素绘制点。
-    // 这样既能 1:1 复用浏览器的换行/换页算法，又不会影响 textarea 的输入行为。
-    whitespaceOverlay.replaceChildren();
-
-    const text = editable.value;
-    if (!text) {
+    const nextValue = editable.value;
+    if (lastWhitespaceOverlayValue === nextValue) {
       return;
     }
 
-    let buffer = "";
-    const flushBuffer = () => {
-      if (buffer) {
-        whitespaceOverlay.appendChild(document.createTextNode(buffer));
-        buffer = "";
-      }
-    };
+    const prevValue = lastWhitespaceOverlayValue;
+    const prevLen = prevValue.length;
+    const nextLen = nextValue.length;
 
-    for (let i = 0; i < text.length; i++) {
-      const ch = text[i];
-
-      if (ch === " ") {
-        flushBuffer();
-        const span = document.createElement("span");
-        span.className = "excalidraw-wysiwyg__ws excalidraw-wysiwyg__ws--space";
-        span.textContent = " ";
-        whitespaceOverlay.appendChild(span);
-        continue;
-      }
-
-      if (ch === "\n") {
-        flushBuffer();
-        const marker = document.createElement("span");
-        marker.className =
-          "excalidraw-wysiwyg__ws excalidraw-wysiwyg__ws--newline";
-        marker.style.marginLeft = `${newlineMarkerPaddingPx}px`;
-        whitespaceOverlay.appendChild(marker);
-        whitespaceOverlay.appendChild(document.createTextNode("\n"));
-        continue;
-      }
-
-      buffer += ch;
+    let prefixLen = 0;
+    while (
+      prefixLen < prevLen &&
+      prefixLen < nextLen &&
+      prevValue[prefixLen] === nextValue[prefixLen]
+    ) {
+      prefixLen += 1;
     }
 
-    flushBuffer();
+    let suffixLen = 0;
+    while (
+      suffixLen < prevLen - prefixLen &&
+      suffixLen < nextLen - prefixLen &&
+      prevValue[prevLen - 1 - suffixLen] === nextValue[nextLen - 1 - suffixLen]
+    ) {
+      suffixLen += 1;
+    }
+
+    const oldMidLen = prevLen - prefixLen - suffixLen;
+    const newMid = nextValue.slice(prefixLen, nextLen - suffixLen);
+
+    whitespaceOverlayTextNode.replaceData(prefixLen, oldMidLen, newMid);
+    lastWhitespaceOverlayValue = nextValue;
   };
 
   let LAST_THEME = app.state.theme;
+
+  let caretUpdateRaf: number | null = null;
+  const scheduleCaretUpdate = () => {
+    if (caretUpdateRaf != null) {
+      cancelAnimationFrame(caretUpdateRaf);
+    }
+    caretUpdateRaf = requestAnimationFrame(() => {
+      caretUpdateRaf = null;
+      updateCaret();
+    });
+  };
+
+  const updateCaret = () => {
+    if (document.activeElement !== editable) {
+      caret.style.display = "none";
+      return;
+    }
+
+    const updatedTextElement = app.scene.getElement<ExcalidrawTextElement>(id);
+    if (!updatedTextElement || !isTextElement(updatedTextElement)) {
+      caret.style.display = "none";
+      return;
+    }
+
+    const lineHeightPx =
+      updatedTextElement.fontSize * updatedTextElement.lineHeight;
+    if (lineHeightPx <= 0) {
+      caret.style.display = "none";
+      return;
+    }
+
+    const editorWidth =
+      parseFloat(editable.style.width) || updatedTextElement.width;
+    const textNodeValue = whitespaceOverlayTextNode.nodeValue ?? "";
+    const caretIndex = Math.max(
+      0,
+      Math.min(textNodeValue.length, editable.selectionEnd ?? 0),
+    );
+
+    const overlayStyle = window.getComputedStyle(whitespaceOverlay);
+    const transformStr = overlayStyle.transform;
+    const matrix =
+      transformStr && transformStr !== "none"
+        ? new DOMMatrixReadOnly(transformStr)
+        : new DOMMatrixReadOnly();
+    const hasRotationOrSkew =
+      Math.abs(matrix.b) > 1e-6 || Math.abs(matrix.c) > 1e-6;
+
+    if (hasRotationOrSkew) {
+      const normalizedValue = editable.value.replace(/\r\n?/g, "\n");
+      const font = getFontString(updatedTextElement);
+      const { lines, explicitNewlineAfterLine } =
+        whitespaceOverlay.style.whiteSpace === "pre-wrap" ||
+        whitespaceOverlay.style.whiteSpace === "break-spaces"
+          ? wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
+              normalizedValue,
+              font,
+              editorWidth,
+            )
+          : {
+              lines: normalizedValue.split("\n"),
+              explicitNewlineAfterLine: normalizedValue
+                .split("\n")
+                .map((_line, idx, arr) => idx < arr.length - 1),
+            };
+
+      const lineStartIndices: number[] = [];
+      let currentIndex = 0;
+      for (let i = 0; i < lines.length; i++) {
+        lineStartIndices.push(currentIndex);
+        currentIndex += lines[i]?.length ?? 0;
+        if (explicitNewlineAfterLine[i]) {
+          currentIndex += 1;
+        }
+      }
+
+      const normalizedCaretIndex = Math.max(
+        0,
+        Math.min(normalizedValue.length, editable.selectionEnd ?? 0),
+      );
+
+      let lineIndex = 0;
+      for (let i = 0; i < lineStartIndices.length; i++) {
+        if (lineStartIndices[i] <= normalizedCaretIndex) {
+          lineIndex = i;
+        } else {
+          break;
+        }
+      }
+
+      const lineText = lines[lineIndex] ?? "";
+      const lineStartIndex = lineStartIndices[lineIndex] ?? 0;
+      const col = Math.max(
+        0,
+        Math.min(lineText.length, normalizedCaretIndex - lineStartIndex),
+      );
+
+      const lineWidth =
+        lineText === ""
+          ? 0
+          : measureText(lineText, font, updatedTextElement.lineHeight).width;
+
+      let lineOffsetX = 0;
+      if (updatedTextElement.textAlign === "center") {
+        lineOffsetX = (editorWidth - lineWidth) / 2;
+      } else if (updatedTextElement.textAlign === "right") {
+        lineOffsetX = editorWidth - lineWidth;
+      }
+      lineOffsetX = Math.max(0, lineOffsetX);
+
+      const prefix = lineText.slice(0, col);
+      const prefixWidth =
+        prefix === ""
+          ? 0
+          : measureText(prefix, font, updatedTextElement.lineHeight).width;
+
+      caret.style.display = "block";
+      caret.style.left = `${lineOffsetX + prefixWidth}px`;
+      caret.style.top = `${lineIndex * lineHeightPx}px`;
+      caret.style.height = `${lineHeightPx}px`;
+      return;
+    }
+
+    const parsePx = (v: string) => {
+      const n = parseFloat(v);
+      return Number.isFinite(n) ? n : 0;
+    };
+
+    const originParts = overlayStyle.transformOrigin.split(" ");
+    const originX = parsePx(originParts[0] ?? "0");
+    const originY = parsePx(originParts[1] ?? "0");
+    const invMatrix = matrix.inverse();
+
+    const offsetParent =
+      (whitespaceOverlay.offsetParent as HTMLElement | null) ??
+      whitespaceOverlay.parentElement;
+    const parentRect = offsetParent?.getBoundingClientRect() ?? {
+      left: 0,
+      top: 0,
+    };
+    const baseLeft = parentRect.left + parsePx(whitespaceOverlay.style.left);
+    const baseTop = parentRect.top + parsePx(whitespaceOverlay.style.top);
+
+    const viewportToLocal = (clientX: number, clientY: number) => {
+      const relX = clientX - baseLeft - originX;
+      const relY = clientY - baseTop - originY;
+      const p = new DOMPoint(relX, relY).matrixTransform(invMatrix);
+      return { x: p.x + originX, y: p.y + originY };
+    };
+
+    const range = document.createRange();
+    const getCharRect = (idx: number): DOMRect | null => {
+      if (idx < 0 || idx >= textNodeValue.length) {
+        return null;
+      }
+      range.setStart(whitespaceOverlayTextNode, idx);
+      range.setEnd(whitespaceOverlayTextNode, idx + 1);
+      const rects = range.getClientRects();
+      if (rects.length > 0) {
+        return rects[0]!;
+      }
+      const r = range.getBoundingClientRect();
+      if (r.width > 0 || r.height > 0) {
+        return r;
+      }
+      return null;
+    };
+
+    const getAlignedX = () => {
+      if (updatedTextElement.textAlign === "center") {
+        return editorWidth / 2;
+      }
+      if (updatedTextElement.textAlign === "right") {
+        return editorWidth;
+      }
+      return 0;
+    };
+
+    let caretLocalX = 0;
+    let caretLocalY = 0;
+
+    if (textNodeValue.length === 0) {
+      caretLocalX = getAlignedX();
+      caretLocalY = 0;
+    } else if (caretIndex > 0 && textNodeValue[caretIndex - 1] === "\n") {
+      const nextRect = getCharRect(caretIndex);
+      if (nextRect) {
+        const p = viewportToLocal(nextRect.left, nextRect.top);
+        caretLocalX = p.x;
+        caretLocalY = p.y;
+      } else {
+        let nlCount = 0;
+        let prevIdx = caretIndex - 1;
+        while (prevIdx >= 0 && textNodeValue[prevIdx] === "\n") {
+          nlCount += 1;
+          prevIdx -= 1;
+        }
+        const prevRect = getCharRect(prevIdx);
+        caretLocalX = getAlignedX();
+        if (prevRect) {
+          const scaledLineAdvance = lineHeightPx * matrix.d * nlCount;
+          const p = viewportToLocal(
+            prevRect.left,
+            prevRect.top + scaledLineAdvance,
+          );
+          caretLocalY = p.y;
+        } else {
+          caretLocalY = lineHeightPx * nlCount;
+        }
+      }
+    } else if (
+      caretIndex >= textNodeValue.length ||
+      textNodeValue[caretIndex] === "\n"
+    ) {
+      const prevIdx = Math.min(textNodeValue.length - 1, caretIndex - 1);
+      const prevRect = getCharRect(prevIdx);
+      if (prevRect) {
+        const p = viewportToLocal(prevRect.right, prevRect.top);
+        caretLocalX = p.x;
+        caretLocalY = p.y;
+      } else {
+        caretLocalX = getAlignedX();
+        caretLocalY = 0;
+      }
+    } else {
+      const rect = getCharRect(caretIndex);
+      if (rect) {
+        const p = viewportToLocal(rect.left, rect.top);
+        caretLocalX = p.x;
+        caretLocalY = p.y;
+      } else {
+        caretLocalX = getAlignedX();
+        caretLocalY = 0;
+      }
+    }
+
+    caret.style.display = "block";
+    caret.style.left = `${caretLocalX}px`;
+    caret.style.top = `${caretLocalY}px`;
+    caret.style.height = `${lineHeightPx}px`;
+  };
 
   const updateWysiwygStyle = () => {
     LAST_THEME = app.state.theme;
@@ -223,11 +469,6 @@ export const textWysiwyg = ({
     if (!updatedTextElement) {
       return;
     }
-    const dotRadius = Math.max(0.5, updatedTextElement.fontSize * 0.09);
-    newlineMarkerPaddingPx = Math.max(
-      dotRadius * 4,
-      updatedTextElement.fontSize * 0.4,
-    );
     const { textAlign, verticalAlign } = updatedTextElement;
     const elementsMap = app.scene.getNonDeletedElementsMap();
     if (updatedTextElement && isTextElement(updatedTextElement)) {
@@ -325,6 +566,10 @@ export const textWysiwyg = ({
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
+      const caretColor =
+        appState.theme === THEME.DARK
+          ? applyDarkModeFilter(updatedTextElement.strokeColor)
+          : updatedTextElement.strokeColor;
       Object.assign(editable.style, {
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -344,13 +589,11 @@ export const textWysiwyg = ({
         textAlign,
         verticalAlign,
         color: "transparent",
-        caretColor:
-          appState.theme === THEME.DARK
-            ? applyDarkModeFilter(updatedTextElement.strokeColor)
-            : updatedTextElement.strokeColor,
+        caretColor: "transparent",
         opacity: updatedTextElement.opacity / 100,
         maxHeight: `${editorMaxHeight}px`,
       });
+      caret.style.background = caretColor;
 
       // overlay 必须与 textarea 完全同样的几何与排版参数，否则点会错位
       Object.assign(whitespaceOverlay.style, {
@@ -375,6 +618,7 @@ export const textWysiwyg = ({
       }
 
       app.scene.mutateElement(updatedTextElement, { x: coordX, y: coordY });
+      scheduleCaretUpdate();
     }
   };
 
@@ -451,6 +695,7 @@ export const textWysiwyg = ({
   editable.value = element.originalText;
   updateWysiwygStyle();
   updateWhitespaceOverlayContent();
+  scheduleCaretUpdate();
 
   const getSelectionIndexFromPointerDown = () => {
     // 二次单击进入编辑时，根据点击位置计算 textarea selectionStart/End：
@@ -463,6 +708,37 @@ export const textWysiwyg = ({
 
     const updatedTextElement = app.scene.getElement<ExcalidrawTextElement>(id);
     if (!updatedTextElement || !isTextElement(updatedTextElement)) {
+      return null;
+    }
+
+    if (excalidrawContainer) {
+      const containerRect = excalidrawContainer.getBoundingClientRect();
+      const [viewportX, viewportY] = getViewportCoords(
+        initialPointerDownSceneCoords.x,
+        initialPointerDownSceneCoords.y,
+      );
+      const clientX = containerRect.left + viewportX;
+      const clientY = containerRect.top + viewportY;
+
+      const doc = document as any;
+      let offsetNode: Node | null = null;
+      let offset = 0;
+      if (typeof doc.caretPositionFromPoint === "function") {
+        const pos = doc.caretPositionFromPoint(clientX, clientY);
+        offsetNode = pos?.offsetNode ?? null;
+        offset = Number(pos?.offset ?? 0);
+      } else if (typeof doc.caretRangeFromPoint === "function") {
+        const range = doc.caretRangeFromPoint(clientX, clientY);
+        offsetNode = range?.startContainer ?? null;
+        offset = Number(range?.startOffset ?? 0);
+      }
+
+      if (offsetNode === whitespaceOverlayTextNode) {
+        return Math.max(0, Math.min(whitespaceOverlayTextNode.length, offset));
+      }
+    }
+
+    if (editable.value.length > 5_000) {
       return null;
     }
 
@@ -596,7 +872,6 @@ export const textWysiwyg = ({
     return (lineStartIndices[clampedLineIndex] ?? 0) + charIndex;
   };
 
-  const initialSelectionIndex = getSelectionIndexFromPointerDown();
 
   if (onChange) {
     editable.onpaste = async (event) => {
@@ -695,22 +970,57 @@ export const textWysiwyg = ({
       }
       updateWhitespaceOverlayContent();
       onChange(editable.value);
+      scheduleCaretUpdate();
     };
   }
 
   editable.onkeydown = (event) => {
-    if (!event.shiftKey && actionZoomIn.keyTest(event)) {
+    if (
+      event.altKey &&
+      !event.shiftKey &&
+      !event[KEYS.CTRL_OR_CMD] &&
+      (event.key === "ArrowUp" || event.key === "ArrowDown")
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      moveLines(event.key === "ArrowUp" ? "up" : "down");
+      editable.dispatchEvent(new Event("input"));
+      scheduleCaretUpdate();
+    } else if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomIn);
       updateWysiwygStyle();
+      scheduleCaretUpdate();
     } else if (!event.shiftKey && actionZoomOut.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomOut);
       updateWysiwygStyle();
+      scheduleCaretUpdate();
     } else if (!event.shiftKey && actionResetZoom.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionResetZoom);
       updateWysiwygStyle();
+      scheduleCaretUpdate();
+    } else if (
+      event[KEYS.CTRL_OR_CMD] &&
+      !event.shiftKey &&
+      !event.altKey &&
+      event.key.toLowerCase() === "c"
+    ) {
+      const { selectionStart, selectionEnd } = editable;
+      if (selectionStart !== selectionEnd) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      const caretIndex = selectionEnd ?? 0;
+      const value = editable.value;
+      const lineStart =
+        value.lastIndexOf("\n", Math.max(0, caretIndex - 1)) + 1;
+      const nextNewline = value.indexOf("\n", caretIndex);
+      const lineEnd = nextNewline === -1 ? value.length : nextNewline;
+      const lineText = value.slice(lineStart, lineEnd);
+      void copyTextToSystemClipboard(lineText);
     } else if (actionDecreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionDecreaseFontSize);
     } else if (actionIncreaseFontSize.keyTest(event)) {
@@ -749,6 +1059,17 @@ export const textWysiwyg = ({
       editable.dispatchEvent(new Event("input"));
     }
   };
+
+  editable.addEventListener("keyup", scheduleCaretUpdate);
+  editable.addEventListener("mouseup", scheduleCaretUpdate);
+  editable.addEventListener("focus", scheduleCaretUpdate);
+
+  const onSelectionChange = () => {
+    if (document.activeElement === editable) {
+      scheduleCaretUpdate();
+    }
+  };
+  document.addEventListener("selectionchange", onSelectionChange);
 
   const TAB_SIZE = 4;
   const TAB = " ".repeat(TAB_SIZE);
@@ -813,6 +1134,78 @@ export const textWysiwyg = ({
         selectionEnd - TAB_SIZE * removedTabs.length,
       );
     }
+  };
+
+  const moveLines = (direction: "up" | "down") => {
+    const { selectionStart, selectionEnd } = editable;
+    const value = editable.value;
+    const endForLine =
+      selectionStart === selectionEnd
+        ? selectionEnd
+        : Math.max(selectionStart, selectionEnd - 1);
+
+    const blockStart =
+      value.lastIndexOf("\n", Math.max(0, selectionStart - 1)) + 1;
+    const blockEndNewlineIndex = value.indexOf("\n", endForLine);
+    const blockEnd =
+      blockEndNewlineIndex === -1 ? value.length : blockEndNewlineIndex + 1;
+
+    if (direction === "up") {
+      if (blockStart === 0) {
+        return;
+      }
+      const prevLineStart =
+        value.lastIndexOf("\n", Math.max(0, blockStart - 2)) + 1;
+      const prevLineOriginal = value.slice(prevLineStart, blockStart);
+      const prevLineLength = prevLineOriginal.length;
+      let prevLine = prevLineOriginal;
+      let block = value.slice(blockStart, blockEnd);
+
+      if (blockEnd === value.length && !value.endsWith("\n")) {
+        if (!block.endsWith("\n")) {
+          block = `${block}\n`;
+        }
+        if (prevLine.endsWith("\n")) {
+          prevLine = prevLine.slice(0, -1);
+        }
+      }
+      editable.value =
+        value.slice(0, prevLineStart) +
+        block +
+        prevLine +
+        value.slice(blockEnd);
+      const shift = -prevLineLength;
+      editable.selectionStart = selectionStart + shift;
+      editable.selectionEnd = selectionEnd + shift;
+      return;
+    }
+
+    if (blockEnd === value.length) {
+      return;
+    }
+    const nextLineEndNewlineIndex = value.indexOf("\n", blockEnd);
+    const nextLineEnd =
+      nextLineEndNewlineIndex === -1
+        ? value.length
+        : nextLineEndNewlineIndex + 1;
+    const nextLineOriginal = value.slice(blockEnd, nextLineEnd);
+    const nextLineHasNewline = nextLineOriginal.endsWith("\n");
+    let nextLine = nextLineOriginal;
+    let block = value.slice(blockStart, blockEnd);
+
+    if (!nextLineHasNewline) {
+      if (block.endsWith("\n")) {
+        block = block.slice(0, -1);
+      }
+      nextLine = `${nextLine}\n`;
+    }
+    editable.value =
+      value.slice(0, blockStart) + nextLine + block + value.slice(nextLineEnd);
+    const shift = nextLineHasNewline
+      ? nextLineOriginal.length
+      : nextLine.length;
+    editable.selectionStart = selectionStart + shift;
+    editable.selectionEnd = selectionEnd + shift;
   };
 
   /**
@@ -916,6 +1309,14 @@ export const textWysiwyg = ({
     editable.onblur = null;
     editable.oninput = null;
     editable.onkeydown = null;
+    editable.removeEventListener("keyup", scheduleCaretUpdate);
+    editable.removeEventListener("mouseup", scheduleCaretUpdate);
+    editable.removeEventListener("focus", scheduleCaretUpdate);
+    document.removeEventListener("selectionchange", onSelectionChange);
+    if (caretUpdateRaf != null) {
+      cancelAnimationFrame(caretUpdateRaf);
+      caretUpdateRaf = null;
+    }
 
     if (observer) {
       observer.disconnect();
@@ -1054,16 +1455,6 @@ export const textWysiwyg = ({
 
   let isDestroyed = false;
 
-  if (initialSelectionIndex !== null) {
-    // 二次单击进入编辑时：将光标放到点击位置（与 textarea 的软换行保持一致）
-    editable.selectionStart = editable.selectionEnd = initialSelectionIndex;
-  } else if (autoSelect) {
-    // select on init (focusing is done separately inside the bindBlurEvent()
-    // because we need it to happen *after* the blur event from `pointerdown`)
-    editable.select();
-  }
-  bindBlurEvent();
-
   // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
   // is preferred so we catch changes from host, where window may not resize.
   let observer: ResizeObserver | null = null;
@@ -1091,6 +1482,14 @@ export const textWysiwyg = ({
   // overlay 需要在 textarea 之前插入，确保 textarea（真实文本）始终在最上层可交互
   textEditorContainer.appendChild(whitespaceOverlay);
   textEditorContainer.appendChild(editable);
+
+  const initialSelectionIndex = getSelectionIndexFromPointerDown();
+  if (initialSelectionIndex !== null) {
+    editable.selectionStart = editable.selectionEnd = initialSelectionIndex;
+  } else if (autoSelect) {
+    editable.select();
+  }
+  bindBlurEvent();
 
   return handleSubmit;
 };

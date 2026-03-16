@@ -31,4 +31,22 @@ describe("shortcuts", () => {
       expect(window.h.elements[0].isDeleted).toBe(true);
     });
   });
+
+  it("Alt keydown should be prevented when editor is focused", async () => {
+    const { container } = await render(
+      <Excalidraw handleKeyboardGlobally autoFocus={true} />,
+    );
+    expect(
+      container.querySelector(".excalidraw") === document.activeElement,
+    ).toBe(true);
+
+    const event = new KeyboardEvent("keydown", {
+      key: "Alt",
+      code: "AltLeft",
+      bubbles: true,
+      cancelable: true,
+    });
+    document.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+  });
 });
