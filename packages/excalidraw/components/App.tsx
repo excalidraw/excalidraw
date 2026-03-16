@@ -10031,6 +10031,9 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
+          if (this.state.activeTool.type === "triangle") {
+            pointerDownState.drag.hasOccurred = true;
+          }
           this.maybeDragNewGenericElement(pointerDownState, event, false);
         }
       }
