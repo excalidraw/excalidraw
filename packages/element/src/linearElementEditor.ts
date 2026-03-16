@@ -1779,12 +1779,8 @@ export class LinearElementEditor {
         isLineElement(element) && (element as any).sharedVertices
           ? ((element as any).sharedVertices as Record<number, string>)
           : null;
-      const svValid =
-        sv &&
-        nextPoints.length === element.points.length &&
-        Object.keys(sv).every((idx) => Number(idx) < nextPoints.length);
       const prevGlobal =
-        svValid && options?.isDragging
+        sv && options?.isDragging
           ? LinearElementEditor._getSharedVertexGlobals(
               sv,
               element.x,
@@ -1801,7 +1797,7 @@ export class LinearElementEditor {
       });
 
       // Propagate shared vertex changes to sibling elements
-      if (prevGlobal && svValid && sv) {
+      if (prevGlobal && sv) {
         LinearElementEditor._propagateSharedVertices(
           element as any,
           scene,
@@ -1810,6 +1806,28 @@ export class LinearElementEditor {
         );
       }
     }
+  }
+
+  /**
+   * Resolve stored sharedVertices key → actual point index.
+   * Key 0 always maps to index 0. Max stored key maps to last point.
+   * This handles midpoint insertion: stored {0:"A", 1:"B"} on a
+   * 3-point element resolves to indices 0 and 2.
+   */
+  static resolveVertexIndex(
+    storedKey: number,
+    sv: Record<number, string>,
+    numPoints: number,
+  ): number {
+    if (storedKey === 0) {
+      return 0;
+    }
+    const maxKey = Math.max(...Object.keys(sv).map(Number));
+    if (storedKey === maxKey) {
+      return numPoints - 1;
+    }
+    // For polygon faces with intermediate vertices: proportional mapping
+    return Math.round((storedKey / maxKey) * (numPoints - 1));
   }
 
   /** Get global positions of shared vertices */
@@ -1821,7 +1839,11 @@ export class LinearElementEditor {
   ): Map<string, { x: number; y: number }> {
     const result = new Map<string, { x: number; y: number }>();
     for (const [idxStr, vertexId] of Object.entries(sv)) {
-      const idx = Number(idxStr);
+      const idx = LinearElementEditor.resolveVertexIndex(
+        Number(idxStr),
+        sv,
+        pts.length,
+      );
       if (idx < pts.length) {
         result.set(vertexId, {
           x: elX + pts[idx][0],
@@ -1846,10 +1868,14 @@ export class LinearElementEditor {
     sv: Record<number, string>,
     prevGlobal: Map<string, { x: number; y: number }>,
   ): void {
-    // 1. Compute ABSOLUTE global positions of moved vertices (not deltas)
+    // 1. Compute ABSOLUTE global positions of moved vertices
     const vertexTargets = new Map<string, { x: number; y: number }>();
     for (const [idxStr, vertexId] of Object.entries(sv)) {
-      const idx = Number(idxStr);
+      const idx = LinearElementEditor.resolveVertexIndex(
+        Number(idxStr),
+        sv,
+        element.points.length,
+      );
       if (idx >= element.points.length) {
         continue;
       }
@@ -1900,7 +1926,11 @@ export class LinearElementEditor {
         if (!target) {
           continue;
         }
-        const idx = Number(idxStr);
+        const idx = LinearElementEditor.resolveVertexIndex(
+          Number(idxStr),
+          sibSV,
+          newPoints.length,
+        );
         if (idx >= newPoints.length) {
           continue;
         }

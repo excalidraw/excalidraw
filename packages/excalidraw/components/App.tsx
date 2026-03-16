@@ -9191,16 +9191,25 @@ class App extends React.Component<AppProps, AppState> {
   private createSolidPresetProxyOnPointerDown = (
     pointerDownState: PointerDownState,
   ): void => {
-    // Create proxy rectangle for drag calculation (dashed guide)
+    // Create dashed guide rectangle for drag (like selection bounding box).
+    // Temporarily override state so the proxy uses guide styles.
+    const s = this.state as any;
+    const savedOpacity = s.currentItemOpacity;
+    const savedStrokeColor = s.currentItemStrokeColor;
+    const savedStrokeWidth = s.currentItemStrokeWidth;
+    const savedStrokeStyle = s.currentItemStrokeStyle;
+    const savedRoughness = s.currentItemRoughness;
+    s.currentItemOpacity = 100;
+    s.currentItemStrokeColor = "#6965db";
+    s.currentItemStrokeWidth = 1;
+    s.currentItemStrokeStyle = "dashed";
+    s.currentItemRoughness = 0;
     this.createGenericElementOnPointerDown("rectangle", pointerDownState);
-    // Hide proxy — wireframe preview elements show the actual shape
-    if (this.state.newElement) {
-      this.scene.mutateElement(this.state.newElement, {
-        opacity: 0,
-        strokeColor: "transparent",
-        backgroundColor: "transparent",
-      } as any);
-    }
+    s.currentItemOpacity = savedOpacity;
+    s.currentItemStrokeColor = savedStrokeColor;
+    s.currentItemStrokeWidth = savedStrokeWidth;
+    s.currentItemStrokeStyle = savedStrokeStyle;
+    s.currentItemRoughness = savedRoughness;
     // Store solid preset type for live preview
     this.solidPresetType = this.state.activeTool.type;
     this.solidPresetElements = [];
@@ -9280,10 +9289,14 @@ class App extends React.Component<AppProps, AppState> {
     prevGlobal: Map<string, { x: number; y: number }>,
   ): void => {
     const linEl = element as any;
-    // Compute ABSOLUTE target positions (not deltas — avoids float drift)
+    // Compute ABSOLUTE target positions using dynamic index resolution
     const vertexTargets = new Map<string, { x: number; y: number }>();
     for (const [idxStr, vertexId] of Object.entries(sv)) {
-      const idx = Number(idxStr);
+      const idx = LinearElementEditor.resolveVertexIndex(
+        Number(idxStr),
+        sv,
+        linEl.points.length,
+      );
       if (idx >= linEl.points.length) {
         continue;
       }
@@ -9330,7 +9343,11 @@ class App extends React.Component<AppProps, AppState> {
         if (!target) {
           continue;
         }
-        const idx = Number(idxStr);
+        const idx = LinearElementEditor.resolveVertexIndex(
+          Number(idxStr),
+          sibSV,
+          newPts.length,
+        );
         if (idx >= newPts.length) {
           continue;
         }

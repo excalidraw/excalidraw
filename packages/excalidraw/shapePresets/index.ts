@@ -71,7 +71,11 @@ export const getWireframeVertices = (
       elementsMap,
     );
     for (const [idxStr, vertexId] of Object.entries(sv)) {
-      const idx = Number(idxStr);
+      const idx = LinearElementEditor.resolveVertexIndex(
+        Number(idxStr),
+        sv,
+        globalPts.length,
+      );
       if (idx < globalPts.length && !vertices.has(vertexId)) {
         vertices.set(vertexId, {
           vertexId,
