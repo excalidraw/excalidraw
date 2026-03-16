@@ -7643,6 +7643,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
+    } else if (this.state.activeTool.type === "triangle") {
+      this.createTriangleElementOnPointerDown(pointerDownState);
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
@@ -9118,6 +9120,46 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private createTriangleElementOnPointerDown = (
+    pointerDownState: PointerDownState,
+  ): void => {
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
+        ? null
+        : this.getEffectiveGridSize(),
+    );
+
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+      x: gridX,
+      y: gridY,
+    });
+
+    const element = newLinearElement({
+      type: "line",
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      locked: false,
+      frameId: topLayerFrame ? topLayerFrame.id : null,
+      points: [pointFrom<LocalPoint>(0, 0)],
+      polygon: true,
+    });
+
+    this.scene.insertElement(element);
+    this.setState({
+      multiElement: null,
+      newElement: element,
+    });
+  };
+
   private createFrameElementOnPointerDown = (
     pointerDownState: PointerDownState,
     type: Extract<ToolType, "frame" | "magicframe">,
@@ -9948,7 +9990,11 @@ class App extends React.Component<AppProps, AppState> {
               newElement,
             });
           }
-        } else if (isLinearElement(newElement) && !newElement.isDeleted) {
+        } else if (
+          isLinearElement(newElement) &&
+          !newElement.isDeleted &&
+          this.state.activeTool.type !== "triangle"
+        ) {
           pointerDownState.drag.hasOccurred = true;
           const points = newElement.points;
 
@@ -10394,6 +10440,50 @@ class App extends React.Component<AppProps, AppState> {
 
         this.actionManager.executeAction(actionFinalize);
 
+        return;
+      }
+
+      // Triangle: single-drag creation (no multi-click)
+      if (isLinearElement(newElement) && activeTool.type === "triangle") {
+        if (newElement.points.length >= 4) {
+          this.store.scheduleCapture();
+        }
+        if (
+          !pointerDownState.drag.hasOccurred ||
+          newElement.points.length < 4
+        ) {
+          // Too small or no drag — remove
+          this.scene.replaceAllElements(
+            this.scene
+              .getElementsIncludingDeleted()
+              .filter((el) => el.id !== newElement.id),
+          );
+          this.setState({ newElement: null });
+        } else {
+          if (!activeTool.locked) {
+            resetCursor(this.interactiveCanvas);
+            this.setState((prevState) => ({
+              newElement: null,
+              activeTool: updateActiveTool(this.state, {
+                type: this.state.preferredSelectionTool.type,
+              }),
+              selectedElementIds: makeNextSelectedElementIds(
+                {
+                  ...prevState.selectedElementIds,
+                  [newElement.id]: true,
+                },
+                prevState,
+              ),
+              selectedLinearElement: new LinearElementEditor(
+                newElement,
+                this.scene.getNonDeletedElementsMap(),
+              ),
+            }));
+          } else {
+            this.setState({ newElement: null });
+          }
+          this.scene.triggerUpdate();
+        }
         return;
       }
 

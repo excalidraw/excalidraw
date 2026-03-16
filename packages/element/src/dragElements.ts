@@ -6,6 +6,8 @@ import {
   DRAGGING_THRESHOLD,
 } from "@excalidraw/common";
 
+import { type LocalPoint, pointFrom } from "@excalidraw/math";
+
 import type {
   AppState,
   NormalizedZoomValue,
@@ -25,6 +27,7 @@ import {
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
+  isLinearElement,
   isTextElement,
 } from "./typeChecks";
 
@@ -326,6 +329,38 @@ export const dragNewElement = ({
     if (shouldResizeFromCenter) {
       newX = originX - width / 2;
     }
+  }
+
+  // Triangle: update points instead of width/height
+  if (elementType === "triangle" && isLinearElement(newElement)) {
+    if (shouldMaintainAspectRatio) {
+      // Equilateral triangle: height = width * √3/2
+      height = width * (Math.sqrt(3) / 2);
+      newY = y < originY ? originY - height : originY;
+      if (shouldResizeFromCenter) {
+        height = width * (Math.sqrt(3) / 2) * 2;
+        newY = originY - height / 2;
+      }
+    }
+
+    if (width !== 0 && height !== 0) {
+      const halfW = width / 2;
+      scene.mutateElement(
+        newElement,
+        {
+          x: newX + halfW + (originOffset?.x ?? 0),
+          y: newY + (originOffset?.y ?? 0),
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(halfW, height),
+            pointFrom<LocalPoint>(-halfW, height),
+            pointFrom<LocalPoint>(0, 0),
+          ],
+        },
+        { informMutation, isDragging: false },
+      );
+    }
+    return;
   }
 
   if (width !== 0 && height !== 0) {
