@@ -9266,158 +9266,90 @@ class App extends React.Component<AppProps, AppState> {
     if (!this.wireframeDragVertex) {
       return;
     }
-    const { elementId, pointIndex, vertexId } = this.wireframeDragVertex;
+    const { elementId, pointIndex } = this.wireframeDragVertex;
     const element = this.scene.getElement(elementId);
     if (!element || !isLinearElement(element)) {
       this.wireframeDragVertex = null;
       return;
     }
 
-    const eMap = this.scene.getNonDeletedElementsMap();
-    const sv = (element as any).sharedVertices as Record<number, string> | null;
-
-    // Convert pointer (global) → element local space (reverse-rotate around center)
-    let newLocalX: number;
-    let newLocalY: number;
-    if (element.angle) {
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, eMap);
-      const cx = (x1 + x2) / 2;
-      const cy = (y1 + y2) / 2;
-      const cos = Math.cos(-element.angle);
-      const sin = Math.sin(-element.angle);
-      const dx = pointerCoords.x - cx;
-      const dy = pointerCoords.y - cy;
-      newLocalX = cx + dx * cos - dy * sin - element.x;
-      newLocalY = cy + dx * sin + dy * cos - element.y;
-    } else {
-      newLocalX = pointerCoords.x - element.x;
-      newLocalY = pointerCoords.y - element.y;
-    }
+    // Simple local space conversion (works for unrotated elements)
+    const newLocalX = pointerCoords.x - element.x;
+    const newLocalY = pointerCoords.y - element.y;
 
     const newPoints = [...element.points] as [number, number][];
     newPoints[pointIndex] = [newLocalX, newLocalY];
 
     // Handle point-0 normalization
-    // Handle point-0 normalization (point 0 must be [0,0])
-    if (
-      pointIndex === 0 &&
-      (Math.abs(newPoints[0][0]) > 0.001 || Math.abs(newPoints[0][1]) > 0.001)
-    ) {
+    if (pointIndex === 0) {
       const lox = newPoints[0][0];
       const loy = newPoints[0][1];
-      // Shift all points so point 0 = [0,0]
       for (let k = 0; k < newPoints.length; k++) {
         newPoints[k] = [newPoints[k][0] - lox, newPoints[k][1] - loy];
       }
-      // Rotate local offset to global for element.x/y adjustment
-      if (element.angle) {
-        const c = Math.cos(element.angle);
-        const s = Math.sin(element.angle);
-        this.scene.mutateElement(element, {
-          x: element.x + lox * c - loy * s,
-          y: element.y + lox * s + loy * c,
-          points: newPoints,
-        } as any);
-      } else {
-        this.scene.mutateElement(element, {
-          x: element.x + lox,
-          y: element.y + loy,
-          points: newPoints,
-        } as any);
-      }
+      this.scene.mutateElement(element, {
+        x: element.x + lox,
+        y: element.y + loy,
+        points: newPoints,
+      } as any);
     } else {
       this.scene.mutateElement(element, { points: newPoints } as any);
     }
 
-    // Propagate: the dragged vertex target is simply pointerCoords
+    // Propagate to siblings — use pointerCoords as absolute target
+    const sv = (element as any).sharedVertices as Record<number, string> | null;
     if (sv) {
-      const vertexTargets = new Map<string, { x: number; y: number }>();
-      vertexTargets.set(vertexId, {
-        x: pointerCoords.x,
-        y: pointerCoords.y,
-      });
-      this._propagateWireframeVertices(element, vertexTargets);
-    }
-  };
-
-  private _propagateWireframeVertices = (
-    element: ExcalidrawElement,
-    vertexTargets: Map<string, { x: number; y: number }>,
-  ): void => {
-    if (vertexTargets.size === 0) {
-      return;
-    }
-    const eMap = this.scene.getNonDeletedElementsMap();
-    const groupId = element.groupIds?.[0];
-    if (!groupId) {
-      return;
-    }
-
-    const siblings = this.scene
-      .getNonDeletedElements()
-      .filter(
-        (el) =>
-          el.id !== element.id &&
-          el.groupIds?.includes(groupId) &&
-          isLineElement(el) &&
-          (el as any).sharedVertices,
-      );
-
-    for (const sib of siblings) {
-      const sibSV = (sib as any).sharedVertices as Record<number, string>;
-      const sibEl = sib as ExcalidrawLinearElement;
-      let needsUpdate = false;
-      const newPts = [...sibEl.points] as [number, number][];
-
-      for (const [idxStr, vertexId] of Object.entries(sibSV)) {
-        const target = vertexTargets.get(vertexId);
-        if (!target) {
-          continue;
-        }
-        const idx = LinearElementEditor.resolveVertexIndex(
-          Number(idxStr),
-          sibSV,
-          newPts.length,
+      const vertexId = this.wireframeDragVertex.vertexId;
+      const groupId = element.groupIds?.[0];
+      if (!groupId) {
+        return;
+      }
+      const siblings = this.scene
+        .getNonDeletedElements()
+        .filter(
+          (el) =>
+            el.id !== element.id &&
+            el.groupIds?.includes(groupId) &&
+            isLineElement(el) &&
+            (el as any).sharedVertices,
         );
-        if (idx >= newPts.length) {
+      for (const sib of siblings) {
+        const sibSV = (sib as any).sharedVertices as Record<number, string>;
+        const sibEl = sib as any;
+        const newPts = [...sibEl.points] as [number, number][];
+        let needsUpdate = false;
+        for (const [idxStr, vid] of Object.entries(sibSV)) {
+          if (vid !== vertexId) {
+            continue;
+          }
+          const idx = LinearElementEditor.resolveVertexIndex(
+            Number(idxStr),
+            sibSV,
+            newPts.length,
+          );
+          if (idx >= newPts.length) {
+            continue;
+          }
+          newPts[idx] = [pointerCoords.x - sibEl.x, pointerCoords.y - sibEl.y];
+          needsUpdate = true;
+        }
+        if (!needsUpdate) {
           continue;
         }
-        // Reverse of getPointsGlobalCoordinates: reverse-rotate around center
-        if (sibEl.angle) {
-          const [sx1, sy1, sx2, sy2] = getElementAbsoluteCoords(sibEl, eMap);
-          const scx = (sx1 + sx2) / 2;
-          const scy = (sy1 + sy2) / 2;
-          const cos = Math.cos(-sibEl.angle);
-          const sin = Math.sin(-sibEl.angle);
-          const dx = target.x - scx;
-          const dy = target.y - scy;
-          const rx = scx + dx * cos - dy * sin;
-          const ry = scy + dx * sin + dy * cos;
-          newPts[idx] = [rx - sibEl.x, ry - sibEl.y];
+        const shiftX = newPts[0][0];
+        const shiftY = newPts[0][1];
+        if (Math.abs(shiftX) > 0.001 || Math.abs(shiftY) > 0.001) {
+          for (let k = 0; k < newPts.length; k++) {
+            newPts[k] = [newPts[k][0] - shiftX, newPts[k][1] - shiftY];
+          }
+          this.scene.mutateElement(sib, {
+            x: sibEl.x + shiftX,
+            y: sibEl.y + shiftY,
+            points: newPts,
+          } as any);
         } else {
-          newPts[idx] = [target.x - sibEl.x, target.y - sibEl.y];
+          this.scene.mutateElement(sib, { points: newPts } as any);
         }
-        needsUpdate = true;
-      }
-
-      if (!needsUpdate) {
-        continue;
-      }
-
-      // Re-normalize if point 0 moved
-      const shiftX = newPts[0][0];
-      const shiftY = newPts[0][1];
-      if (Math.abs(shiftX) > 0.001 || Math.abs(shiftY) > 0.001) {
-        for (let k = 0; k < newPts.length; k++) {
-          newPts[k] = [newPts[k][0] - shiftX, newPts[k][1] - shiftY];
-        }
-        this.scene.mutateElement(sib, {
-          x: sibEl.x + shiftX,
-          y: sibEl.y + shiftY,
-          points: newPts,
-        } as any);
-      } else {
-        this.scene.mutateElement(sib, { points: newPts } as any);
       }
     }
   };
