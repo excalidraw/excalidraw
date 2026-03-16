@@ -11,7 +11,7 @@ import type {
   GroupId,
 } from "@excalidraw/element/types";
 
-interface SolidPresetStyles {
+export interface SolidPresetStyles {
   strokeColor: string;
   backgroundColor: string;
   fillStyle: FillStyle;
@@ -21,296 +21,377 @@ interface SolidPresetStyles {
   frameId: string | null;
 }
 
-interface BBox {
+export interface BBox {
   x: number;
   y: number;
   w: number;
   h: number;
 }
 
-const makeLineElement = (
-  x: number,
-  y: number,
-  points: LocalPoint[],
-  styles: SolidPresetStyles,
-  opts: { dashed?: boolean; polygon?: boolean } = {},
-) =>
-  newLinearElement({
-    type: "line",
-    x,
-    y,
-    strokeColor: styles.strokeColor,
-    backgroundColor: opts.polygon ? "transparent" : "transparent",
-    fillStyle: styles.fillStyle,
-    strokeWidth: styles.strokeWidth,
-    strokeStyle: opts.dashed ? "dashed" : "solid",
-    roughness: styles.roughness,
-    opacity: styles.opacity,
-    locked: false,
-    frameId: styles.frameId,
-    points,
-    polygon: opts.polygon ?? false,
-  });
+// ─── Geometry description (data only, no elements) ─────────────────
 
-const makeEllipseElement = (
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  styles: SolidPresetStyles,
-  opts: { dashed?: boolean } = {},
-) =>
-  newElement({
-    type: "ellipse",
-    x,
-    y,
-    width,
-    height,
-    strokeColor: styles.strokeColor,
-    backgroundColor: "transparent",
-    fillStyle: styles.fillStyle,
-    strokeWidth: styles.strokeWidth,
-    strokeStyle: opts.dashed ? "dashed" : "solid",
-    roughness: styles.roughness,
-    opacity: styles.opacity,
-    locked: false,
-    frameId: styles.frameId,
-  });
+export interface LineGeom {
+  kind: "line";
+  x: number;
+  y: number;
+  points: LocalPoint[];
+  dashed: boolean;
+  polygon: boolean;
+  /** Force roughness: 0 for clean dashed curves */
+  forceSmooth?: boolean;
+}
 
-const makeLine = (
+export interface EllipseGeom {
+  kind: "ellipse";
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  dashed: boolean;
+}
+
+export type ElementGeom = LineGeom | EllipseGeom;
+
+// ─── Geometry primitives (pure functions) ──────────────────────────
+
+function line(
   x1: number,
   y1: number,
   x2: number,
   y2: number,
-  styles: SolidPresetStyles,
   dashed = false,
-) =>
-  makeLineElement(
-    x1,
-    y1,
-    [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(x2 - x1, y2 - y1)],
-    styles,
-    { dashed },
-  );
-
-function groupElements(elements: ExcalidrawElement[]): {
-  elements: ExcalidrawElement[];
-  groupId: GroupId;
-} {
-  const groupId = randomId();
-  const grouped = elements.map((el) =>
-    newElementWith(el, { groupIds: [groupId] }),
-  );
-  return { elements: grouped, groupId };
+): LineGeom {
+  return {
+    kind: "line",
+    x: x1,
+    y: y1,
+    points: [
+      pointFrom<LocalPoint>(0, 0),
+      pointFrom<LocalPoint>(x2 - x1, y2 - y1),
+    ],
+    dashed,
+    polygon: false,
+  };
 }
 
-// ─── PRISM (rectangular prism / cuboid) ────────────────────────────
-function createPrism(bbox: BBox, styles: SolidPresetStyles) {
-  const { x, y, w, h } = bbox;
-  const d = Math.min(w, h) * 0.25;
-  const fw = w - d; // front face width
-  const fh = h - d; // front face height
+function poly(
+  x: number,
+  y: number,
+  pts: LocalPoint[],
+  dashed = false,
+): LineGeom {
+  return { kind: "line", x, y, points: pts, dashed, polygon: true };
+}
 
-  // Front face (bottom-left) — solid polygon
-  const front = makeLineElement(
+function ellipseGeom(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  dashed = false,
+): EllipseGeom {
+  return { kind: "ellipse", x, y, width: w, height: h, dashed };
+}
+
+function rect(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  dashed = false,
+): LineGeom {
+  return poly(
     x,
-    y + d,
-    [
-      pointFrom<LocalPoint>(0, 0),
-      pointFrom<LocalPoint>(fw, 0),
-      pointFrom<LocalPoint>(fw, fh),
-      pointFrom<LocalPoint>(0, fh),
-      pointFrom<LocalPoint>(0, 0),
-    ],
-    styles,
-    { polygon: true },
-  );
-
-  // Back face (top-right) — dashed polygon
-  const back = makeLineElement(
-    x + d,
     y,
     [
       pointFrom<LocalPoint>(0, 0),
-      pointFrom<LocalPoint>(fw, 0),
-      pointFrom<LocalPoint>(fw, fh),
-      pointFrom<LocalPoint>(0, fh),
+      pointFrom<LocalPoint>(w, 0),
+      pointFrom<LocalPoint>(w, h),
+      pointFrom<LocalPoint>(0, h),
       pointFrom<LocalPoint>(0, 0),
     ],
-    styles,
-    { polygon: true, dashed: true },
+    dashed,
   );
-
-  // Connecting edges: front corners → back corners
-  // Front-top-left → Back-top-left (visible)
-  const e1 = makeLine(x, y + d, x + d, y, styles, false);
-  // Front-top-right → Back-top-right (visible)
-  const e2 = makeLine(x + fw, y + d, x + d + fw, y, styles, false);
-  // Front-bottom-right → Back-bottom-right (visible)
-  const e3 = makeLine(x + fw, y + d + fh, x + d + fw, y + fh, styles, false);
-  // Front-bottom-left → Back-bottom-left (hidden)
-  const e4 = makeLine(x, y + d + fh, x + d, y + fh, styles, true);
-
-  return groupElements([front, back, e1, e2, e3, e4]);
 }
 
-// ─── PYRAMID (quadrilateral pyramid) ───────────────────────────────
-function createPyramid(bbox: BBox, styles: SolidPresetStyles) {
-  const { x, y, w, h } = bbox;
+/**
+ * Generate arc polyline with uniform arc-length spacing.
+ * Oversamples at fine angle intervals, then resamples at equal distances
+ * so dashed strokes render uniformly across the curve.
+ */
+function arc(
+  cx: number,
+  cy: number,
+  rx: number,
+  ry: number,
+  startAngle: number,
+  endAngle: number,
+  dashed: boolean,
+  segments = 32,
+): LineGeom {
+  // 1. Oversample at fine angle intervals
+  const N = 256;
+  const raw: { x: number; y: number }[] = [];
+  for (let i = 0; i <= N; i++) {
+    const t = startAngle + (endAngle - startAngle) * (i / N);
+    raw.push({ x: cx + rx * Math.cos(t), y: cy + ry * Math.sin(t) });
+  }
 
-  // Base rectangle (bottom, in perspective)
-  const bw = w * 0.7;
-  const bh = h * 0.25;
-  const bx = x + (w - bw) / 2;
-  const by = y + h - bh;
+  // 2. Cumulative arc lengths
+  const cumLen = [0];
+  for (let i = 1; i < raw.length; i++) {
+    const dx = raw[i].x - raw[i - 1].x;
+    const dy = raw[i].y - raw[i - 1].y;
+    cumLen.push(cumLen[i - 1] + Math.sqrt(dx * dx + dy * dy));
+  }
+  const totalLen = cumLen[cumLen.length - 1];
 
-  const base = makeLineElement(
-    bx,
-    by,
-    [
-      pointFrom<LocalPoint>(0, 0),
-      pointFrom<LocalPoint>(bw, 0),
-      pointFrom<LocalPoint>(bw, bh),
-      pointFrom<LocalPoint>(0, bh),
-      pointFrom<LocalPoint>(0, 0),
-    ],
-    styles,
-    { polygon: true },
+  // 3. Resample at uniform arc lengths
+  const resampled: { x: number; y: number }[] = [raw[0]];
+  const step = totalLen / segments;
+  let target = step;
+  let j = 1;
+  while (resampled.length < segments && j < raw.length) {
+    if (cumLen[j] >= target) {
+      const prev = cumLen[j - 1];
+      const frac = (target - prev) / (cumLen[j] - prev);
+      resampled.push({
+        x: raw[j - 1].x + frac * (raw[j].x - raw[j - 1].x),
+        y: raw[j - 1].y + frac * (raw[j].y - raw[j - 1].y),
+      });
+      target += step;
+    } else {
+      j++;
+    }
+  }
+  resampled.push(raw[raw.length - 1]);
+
+  // 4. Convert to local points relative to first point
+  const x0 = resampled[0].x;
+  const y0 = resampled[0].y;
+  const points = resampled.map((p) =>
+    pointFrom<LocalPoint>(p.x - x0, p.y - y0),
   );
 
-  // Apex
-  const ax = x + w / 2;
-  const ay = y;
+  return {
+    kind: "line",
+    x: x0,
+    y: y0,
+    points,
+    dashed,
+    polygon: false,
+    forceSmooth: true,
+  };
+}
 
-  // Edges from apex to base corners
-  // Front-left (visible)
-  const e1 = makeLine(ax, ay, bx, by + bh, styles, false);
-  // Front-right (visible)
-  const e2 = makeLine(ax, ay, bx + bw, by + bh, styles, false);
-  // Back-left (hidden)
-  const e3 = makeLine(ax, ay, bx, by, styles, true);
-  // Back-right (hidden)
-  const e4 = makeLine(ax, ay, bx + bw, by, styles, true);
+// ─── PRISM ─────────────────────────────────────────────────────────
+// Cube with 1 hidden vertex (back-bottom-left).
+// 3 edges meeting at hidden vertex are dashed, rest solid.
+function prismGeom(bbox: BBox): ElementGeom[] {
+  const { x, y, w, h } = bbox;
+  const d = Math.min(w, h) * 0.25;
+  const fw = w - d;
+  const fh = h - d;
 
-  return groupElements([base, e1, e2, e3, e4]);
+  const FTL = { x, y: y + d };
+  const FTR = { x: x + fw, y: y + d };
+  const FBR = { x: x + fw, y: y + d + fh };
+  const FBL = { x, y: y + d + fh };
+
+  const BTL = { x: x + d, y };
+  const BTR = { x: x + d + fw, y };
+  const BBR = { x: x + d + fw, y: y + fh };
+  const BBL = { x: x + d, y: y + fh };
+
+  return [
+    // Front face — solid
+    rect(FTL.x, FTL.y, fw, fh, false),
+    // Top edges — solid
+    line(FTL.x, FTL.y, BTL.x, BTL.y, false),
+    line(FTR.x, FTR.y, BTR.x, BTR.y, false),
+    line(BTL.x, BTL.y, BTR.x, BTR.y, false),
+    // Right edges — solid
+    line(FBR.x, FBR.y, BBR.x, BBR.y, false),
+    line(BTR.x, BTR.y, BBR.x, BBR.y, false),
+    // Hidden edges (3 edges at BBL) — dashed
+    line(BTL.x, BTL.y, BBL.x, BBL.y, true),
+    line(BBL.x, BBL.y, BBR.x, BBR.y, true),
+    line(FBL.x, FBL.y, BBL.x, BBL.y, true),
+  ];
+}
+
+// ─── PYRAMID (quadrilateral) ───────────────────────────────────────
+// Oblique view: front+right faces visible, back+left faces hidden.
+// Hidden vertex BL: 3 edges to it dashed (Apex-BL, FL-BL, BL-BR).
+function pyramidGeom(bbox: BBox): ElementGeom[] {
+  const { x, y, w, h } = bbox;
+
+  // Base in oblique perspective
+  const FL = { x: x + w * 0.0, y: y + h };
+  const FR = { x: x + w * 0.6, y: y + h };
+  const BR = { x: x + w * 1.0, y: y + h * 0.65 };
+  const BL = { x: x + w * 0.4, y: y + h * 0.65 };
+  const A = { x: x + w * 0.45, y };
+
+  return [
+    // Base front edge — solid
+    line(FL.x, FL.y, FR.x, FR.y, false),
+    // Base right edge — solid
+    line(FR.x, FR.y, BR.x, BR.y, false),
+    // Base back edge — dashed
+    line(BL.x, BL.y, BR.x, BR.y, true),
+    // Base left edge — dashed
+    line(FL.x, FL.y, BL.x, BL.y, true),
+    // Lateral: front + right — solid
+    line(A.x, A.y, FL.x, FL.y, false),
+    line(A.x, A.y, FR.x, FR.y, false),
+    line(A.x, A.y, BR.x, BR.y, false),
+    // Lateral: back-left — dashed
+    line(A.x, A.y, BL.x, BL.y, true),
+  ];
 }
 
 // ─── TETRAHEDRON ───────────────────────────────────────────────────
-function createTetrahedron(bbox: BBox, styles: SolidPresetStyles) {
+// Left+right faces visible, 1 hidden back edge (A-C) dashed.
+function tetrahedronGeom(bbox: BBox): ElementGeom[] {
   const { x, y, w, h } = bbox;
 
-  // Base triangle (bottom, in perspective)
-  const b1x = x + w * 0.1;
-  const b1y = y + h;
-  const b2x = x + w * 0.9;
-  const b2y = y + h;
-  const b3x = x + w * 0.5;
-  const b3y = y + h * 0.6;
+  const D = { x: x + w * 0.45, y }; // apex
+  const A = { x: x + w * 0.0, y: y + h * 0.7 }; // front-left
+  const B = { x: x + w * 0.55, y: y + h }; // front-bottom
+  const C = { x: x + w * 1.0, y: y + h * 0.5 }; // back-right
 
-  // Apex
-  const ax = x + w * 0.45;
-  const ay = y;
-
-  // Visible base edges
-  const baseVisible = makeLineElement(
-    b1x,
-    b1y,
-    [
-      pointFrom<LocalPoint>(0, 0),
-      pointFrom<LocalPoint>(b2x - b1x, b2y - b1y),
-      pointFrom<LocalPoint>(b3x - b1x, b3y - b1y),
-    ],
-    styles,
-  );
-
-  // Hidden base edge (back)
-  const baseHidden = makeLine(b3x, b3y, b1x, b1y, styles, true);
-
-  // Edges from apex
-  const e1 = makeLine(ax, ay, b1x, b1y, styles, false);
-  const e2 = makeLine(ax, ay, b2x, b2y, styles, false);
-  const e3 = makeLine(ax, ay, b3x, b3y, styles, true); // back edge
-
-  return groupElements([baseVisible, baseHidden, e1, e2, e3]);
+  return [
+    // Front-left face (A-B-D) — solid
+    line(A.x, A.y, B.x, B.y, false),
+    line(A.x, A.y, D.x, D.y, false),
+    // Front-right face (B-C-D) — solid
+    line(B.x, B.y, D.x, D.y, false),
+    line(B.x, B.y, C.x, C.y, false),
+    line(D.x, D.y, C.x, C.y, false),
+    // Hidden back edge — dashed
+    line(A.x, A.y, C.x, C.y, true),
+  ];
 }
 
 // ─── CYLINDER ──────────────────────────────────────────────────────
-function createCylinder(bbox: BBox, styles: SolidPresetStyles) {
+// Top ellipse solid. Bottom: front arc solid, back arc dashed.
+// Side lines solid.
+function cylinderGeom(bbox: BBox): ElementGeom[] {
   const { x, y, w, h } = bbox;
-  const ellipseH = Math.min(h * 0.2, w * 0.3);
+  const eh = Math.min(h * 0.2, w * 0.3);
+  const rx = w / 2;
+  const ry = eh / 2;
 
-  // Top ellipse (solid)
-  const topEllipse = makeEllipseElement(x, y, w, ellipseH, styles);
+  const tcy = y + ry; // top ellipse center y
+  const bcx = x + rx; // bottom ellipse center x
+  const bcy = y + h - ry; // bottom ellipse center y
 
-  // Bottom ellipse (dashed — back half hidden)
-  const bottomEllipse = makeEllipseElement(
-    x,
-    y + h - ellipseH,
-    w,
-    ellipseH,
-    styles,
-    { dashed: true },
-  );
-
-  // Side lines
-  const leftSide = makeLine(
-    x,
-    y + ellipseH / 2,
-    x,
-    y + h - ellipseH / 2,
-    styles,
-    false,
-  );
-  const rightSide = makeLine(
-    x + w,
-    y + ellipseH / 2,
-    x + w,
-    y + h - ellipseH / 2,
-    styles,
-    false,
-  );
-
-  return groupElements([topEllipse, bottomEllipse, leftSide, rightSide]);
+  return [
+    // Top ellipse — solid
+    ellipseGeom(x, y, w, eh, false),
+    // Bottom front arc (solid): 0 → π (right → bottom → left)
+    arc(bcx, bcy, rx, ry, 0, Math.PI, false),
+    // Bottom back arc (dashed): π → 2π (left → top → right)
+    arc(bcx, bcy, rx, ry, Math.PI, 2 * Math.PI, true),
+    // Side lines — solid
+    line(x, tcy, x, bcy, false),
+    line(x + w, tcy, x + w, bcy, false),
+  ];
 }
 
 // ─── SPHERE ────────────────────────────────────────────────────────
-function createSphere(bbox: BBox, styles: SolidPresetStyles) {
+// Outer circle solid. Equator: front arc solid, back arc dashed.
+function sphereGeom(bbox: BBox): ElementGeom[] {
   const { x, y, w, h } = bbox;
   const size = Math.min(w, h);
-  const cx = x + (w - size) / 2;
-  const cy = y + (h - size) / 2;
+  const sx = x + (w - size) / 2;
+  const sy = y + (h - size) / 2;
 
-  // Main circle (solid)
-  const circle = makeEllipseElement(cx, cy, size, size, styles);
+  const r = size / 2;
+  const cx = sx + r;
+  const cy = sy + r;
+  const mry = size * 0.15; // meridian semi-minor axis (vertical)
 
-  // Horizontal meridian ellipse (dashed, for 3D feel)
-  const meridianH = size * 0.3;
-  const meridianY = cy + (size - meridianH) / 2;
-  const meridian = makeEllipseElement(cx, meridianY, size, meridianH, styles, {
-    dashed: true,
-  });
-
-  return groupElements([circle, meridian]);
+  return [
+    // Main circle — solid
+    ellipseGeom(sx, sy, size, size, false),
+    // Equator front arc (solid): 0 → π (right → bottom → left)
+    arc(cx, cy, r, mry, 0, Math.PI, false),
+    // Equator back arc (dashed): π → 2π (left → top → right)
+    arc(cx, cy, r, mry, Math.PI, 2 * Math.PI, true),
+  ];
 }
 
-// ─── FACTORY ───────────────────────────────────────────────────────
+// ─── Public API ────────────────────────────────────────────────────
+
+export function computeSolidGeometry(type: string, bbox: BBox): ElementGeom[] {
+  switch (type) {
+    case "prism":
+      return prismGeom(bbox);
+    case "pyramid":
+      return pyramidGeom(bbox);
+    case "tetrahedron":
+      return tetrahedronGeom(bbox);
+    case "cylinder":
+      return cylinderGeom(bbox);
+    case "sphere":
+      return sphereGeom(bbox);
+    default:
+      throw new Error(`Unknown solid preset: ${type}`);
+  }
+}
+
+function createElementFromGeom(
+  geom: ElementGeom,
+  styles: SolidPresetStyles,
+): ExcalidrawElement {
+  if (geom.kind === "line") {
+    return newLinearElement({
+      type: "line",
+      x: geom.x,
+      y: geom.y,
+      strokeColor: styles.strokeColor,
+      backgroundColor: "transparent",
+      fillStyle: styles.fillStyle,
+      strokeWidth: styles.strokeWidth,
+      strokeStyle: geom.dashed ? "dashed" : "solid",
+      roughness: geom.forceSmooth ? 0 : styles.roughness,
+      opacity: styles.opacity,
+      locked: false,
+      frameId: styles.frameId,
+      points: geom.points,
+      polygon: geom.polygon,
+    });
+  }
+  return newElement({
+    type: "ellipse",
+    x: geom.x,
+    y: geom.y,
+    width: geom.width,
+    height: geom.height,
+    strokeColor: styles.strokeColor,
+    backgroundColor: "transparent",
+    fillStyle: styles.fillStyle,
+    strokeWidth: styles.strokeWidth,
+    strokeStyle: geom.dashed ? "dashed" : "solid",
+    roughness: styles.roughness,
+    opacity: styles.opacity,
+    locked: false,
+    frameId: styles.frameId,
+  });
+}
+
 export function createSolidElements(
   type: string,
   bbox: BBox,
   styles: SolidPresetStyles,
 ): { elements: ExcalidrawElement[]; groupId: GroupId } {
-  switch (type) {
-    case "prism":
-      return createPrism(bbox, styles);
-    case "pyramid":
-      return createPyramid(bbox, styles);
-    case "tetrahedron":
-      return createTetrahedron(bbox, styles);
-    case "cylinder":
-      return createCylinder(bbox, styles);
-    case "sphere":
-      return createSphere(bbox, styles);
-    default:
-      throw new Error(`Unknown solid preset: ${type}`);
-  }
+  const geoms = computeSolidGeometry(type, bbox);
+  const groupId = randomId();
+  const elements = geoms.map((g) => {
+    const el = createElementFromGeom(g, styles);
+    return newElementWith(el, { groupIds: [groupId] });
+  });
+  return { elements, groupId };
 }

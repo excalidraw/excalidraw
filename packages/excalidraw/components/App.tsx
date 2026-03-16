@@ -292,7 +292,11 @@ import type {
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
-import { createSolidElements } from "../shapePresets/solidFactory";
+import {
+  createSolidElements,
+  computeSolidGeometry,
+} from "../shapePresets/solidFactory";
+
 import { isSolidPresetType } from "../shapePresets";
 
 import {
@@ -460,6 +464,8 @@ import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 import { findShapeByEvent } from "./shapes";
 
 import UnlockPopup from "./UnlockPopup";
+
+import type { SolidPresetStyles } from "../shapePresets/solidFactory";
 
 import type { ExcalidrawLibraryIds } from "../data/types";
 
@@ -702,6 +708,11 @@ class App extends React.Component<AppProps, AppState> {
   laserTrails = new LaserTrails(this.animationFrameHandler, this);
   eraserTrail = new EraserTrail(this.animationFrameHandler, this);
   lassoTrail = new LassoTrail(this.animationFrameHandler, this);
+
+  // 3D solid preset: wireframe elements created during drag
+  private solidPresetElements: ExcalidrawElement[] = [];
+  private solidPresetGroupId: string | null = null;
+  private solidPresetType: string | null = null;
 
   onChangeEmitter = new Emitter<
     [
@@ -9169,9 +9180,82 @@ class App extends React.Component<AppProps, AppState> {
   private createSolidPresetProxyOnPointerDown = (
     pointerDownState: PointerDownState,
   ): void => {
-    // Create a rectangle proxy for visual drag feedback.
-    // On pointer up, this proxy is replaced with the actual 3D wireframe.
+    // Create proxy rectangle for drag calculation (made invisible)
     this.createGenericElementOnPointerDown("rectangle", pointerDownState);
+    // Make proxy invisible — wireframe preview will be visible instead
+    if (this.state.newElement) {
+      this.scene.mutateElement(this.state.newElement, {
+        opacity: 0,
+      } as any);
+    }
+    // Store solid preset type for live preview
+    this.solidPresetType = this.state.activeTool.type;
+    this.solidPresetElements = [];
+    this.solidPresetGroupId = null;
+  };
+
+  private getSolidPresetStyles = (): SolidPresetStyles => ({
+    strokeColor: this.state.currentItemStrokeColor,
+    backgroundColor: this.state.currentItemBackgroundColor,
+    fillStyle: this.state.currentItemFillStyle,
+    strokeWidth: this.state.currentItemStrokeWidth,
+    roughness: this.state.currentItemRoughness,
+    opacity: this.state.currentItemOpacity,
+    frameId: null,
+  });
+
+  private updateSolidPresetPreview = (): void => {
+    const newElement = this.state.newElement;
+    if (!newElement || !this.solidPresetType) {
+      return;
+    }
+
+    const bbox = {
+      x: newElement.x,
+      y: newElement.y,
+      w: newElement.width,
+      h: newElement.height,
+    };
+
+    if (bbox.w < 5 || bbox.h < 5) {
+      return;
+    }
+
+    const geoms = computeSolidGeometry(this.solidPresetType, bbox);
+
+    if (this.solidPresetElements.length === 0) {
+      // First time: create elements
+      const { elements, groupId } = createSolidElements(
+        this.solidPresetType,
+        bbox,
+        this.getSolidPresetStyles(),
+      );
+      this.solidPresetElements = elements;
+      this.solidPresetGroupId = groupId;
+      this.scene.insertElements(elements);
+    } else {
+      // Update existing elements' geometry
+      geoms.forEach((geom, i) => {
+        const el = this.solidPresetElements[i];
+        if (!el) {
+          return;
+        }
+        if (geom.kind === "line") {
+          this.scene.mutateElement(el, {
+            x: geom.x,
+            y: geom.y,
+            points: geom.points,
+          } as any);
+        } else {
+          this.scene.mutateElement(el, {
+            x: geom.x,
+            y: geom.y,
+            width: geom.width,
+            height: geom.height,
+          } as any);
+        }
+      });
+    }
   };
 
   private createFrameElementOnPointerDown = (
@@ -10052,6 +10136,10 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.drag.hasOccurred = true;
           }
           this.maybeDragNewGenericElement(pointerDownState, event, false);
+          // Update 3D wireframe preview during drag
+          if (isSolidPresetType(this.state.activeTool.type)) {
+            this.updateSolidPresetPreview();
+          }
         }
       }
 
@@ -10508,60 +10596,43 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      // 3D solid presets: replace proxy rectangle with grouped wireframe
+      // 3D solid presets: finalize wireframe elements, remove proxy
       if (
         newElement &&
         isSolidPresetType(activeTool.type) &&
         !isLinearElement(newElement)
       ) {
+        // Remove proxy rectangle
+        this.scene.replaceAllElements(
+          this.scene
+            .getElementsIncludingDeleted()
+            .filter((el) => el.id !== newElement.id),
+        );
+
         if (
           !pointerDownState.drag.hasOccurred ||
           newElement.width < 10 ||
-          newElement.height < 10
+          newElement.height < 10 ||
+          this.solidPresetElements.length === 0
         ) {
-          // Too small or no drag — remove proxy
-          this.scene.replaceAllElements(
-            this.scene
-              .getElementsIncludingDeleted()
-              .filter((el) => el.id !== newElement.id),
-          );
+          // Too small or no drag — also remove wireframe elements
+          if (this.solidPresetElements.length > 0) {
+            const ids = new Set(this.solidPresetElements.map((el) => el.id));
+            this.scene.replaceAllElements(
+              this.scene
+                .getElementsIncludingDeleted()
+                .filter((el) => !ids.has(el.id)),
+            );
+          }
           this.setState({ newElement: null });
         } else {
-          // Remove proxy element
-          this.scene.replaceAllElements(
-            this.scene
-              .getElementsIncludingDeleted()
-              .filter((el) => el.id !== newElement.id),
-          );
-
-          // Create solid wireframe elements
-          const { elements: solidElements, groupId } = createSolidElements(
-            activeTool.type,
-            {
-              x: newElement.x,
-              y: newElement.y,
-              w: newElement.width,
-              h: newElement.height,
-            },
-            {
-              strokeColor: this.state.currentItemStrokeColor,
-              backgroundColor: this.state.currentItemBackgroundColor,
-              fillStyle: this.state.currentItemFillStyle,
-              strokeWidth: this.state.currentItemStrokeWidth,
-              roughness: this.state.currentItemRoughness,
-              opacity: this.state.currentItemOpacity,
-              frameId: newElement.frameId,
-            },
-          );
-
-          // Insert grouped elements
-          this.scene.insertElements(solidElements);
+          // Keep wireframe elements, select the group
           this.store.scheduleCapture();
 
           if (!activeTool.locked) {
             resetCursor(this.interactiveCanvas);
             const selectedElementIds: Record<string, true> = {};
-            solidElements.forEach((el) => {
+            this.solidPresetElements.forEach((el) => {
               selectedElementIds[el.id] = true;
             });
             this.setState((prevState) => ({
@@ -10573,13 +10644,20 @@ class App extends React.Component<AppProps, AppState> {
                 selectedElementIds,
                 prevState,
               ),
-              selectedGroupIds: { [groupId]: true },
+              selectedGroupIds: this.solidPresetGroupId
+                ? { [this.solidPresetGroupId]: true }
+                : {},
             }));
           } else {
             this.setState({ newElement: null });
           }
           this.scene.triggerUpdate();
         }
+
+        // Clean up solid preset state
+        this.solidPresetElements = [];
+        this.solidPresetGroupId = null;
+        this.solidPresetType = null;
         return;
       }
 

@@ -28,14 +28,17 @@ export const computePolyPoints = (
         pointFrom<LocalPoint>(0, height),
         pointFrom<LocalPoint>(0, 0),
       ];
-    case "diamond":
+    case "diamond": {
+      const halfW = width / 2;
+      const halfH = height / 2;
       return [
-        pointFrom<LocalPoint>(width / 2, 0),
-        pointFrom<LocalPoint>(width, height / 2),
-        pointFrom<LocalPoint>(width / 2, height),
-        pointFrom<LocalPoint>(0, height / 2),
-        pointFrom<LocalPoint>(width / 2, 0),
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(halfW, halfH),
+        pointFrom<LocalPoint>(0, height),
+        pointFrom<LocalPoint>(-halfW, halfH),
+        pointFrom<LocalPoint>(0, 0),
       ];
+    }
     case "triangle": {
       const halfW = width / 2;
       return [
@@ -54,7 +57,7 @@ export const computePolyPoints = (
  * Get the element x offset for centering (triangle needs special handling).
  */
 export const getPolyPresetXOffset = (type: string, width: number): number => {
-  if (type === "triangle") {
+  if (type === "triangle" || type === "diamond") {
     return width / 2;
   }
   return 0;
