@@ -105,7 +105,7 @@ export default function ExampleApp({
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
   const [renderScrollbars, setRenderScrollbars] = useState(false);
-  const [interactive, setInteractive] = useState(false);
+  const [interactive, setInteractive] = useState(true);
   const [blobUrl, setBlobUrl] = useState<string>("");
   const [canvasUrl, setCanvasUrl] = useState<string>("");
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
@@ -832,6 +832,27 @@ export default function ExampleApp({
             />
             Export with embed scene
           </label>
+          <button
+            type="button"
+            onClick={() => {
+              if (!excalidrawAPI) {
+                return;
+              }
+
+              const elements = excalidrawAPI.getSceneElements();
+              excalidrawAPI.scrollToContent(elements[1], {
+                animate: true,
+                fitToViewport: true,
+                viewportZoomFactor: 0.9,
+                scrollLock: {
+                  lockZoom: true,
+                  overscrollAllowance: 0,
+                },
+              });
+            }}
+          >
+            Fit and lock first element
+          </button>
           <button
             onClick={async () => {
               if (!excalidrawAPI) {

@@ -331,7 +331,10 @@ import {
   actionToggleCropEditor,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
-import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
+import {
+  actionToggleHandTool,
+  resolveViewportForBounds,
+} from "../actions/actionCanvas";
 import { actionPaste } from "../actions/actionClipboard";
 import { actionCopyElementLink } from "../actions/actionElementLink";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
@@ -434,6 +437,7 @@ import {
   constrainScrollState,
   calculateConstrainedScrollCenter,
   areCanvasTranslatesClose,
+  getScrollConstraintsForBounds,
 } from "../scene/scrollConstraints";
 import { EraserTrail } from "../eraser";
 
@@ -502,6 +506,7 @@ import type {
   CollaboratorPointer,
   ToolType,
   OnUserFollowedPayload,
+  ScrollToContentOptions,
   UnsubscribeCallback,
   EmbedsValidationStatus,
   ElementsPendingErasure,
@@ -4430,6 +4435,8 @@ class App extends React.Component<AppProps, AppState> {
 
   private cancelInProgressAnimation: (() => void) | null = null;
 
+  private scrollToContentRequestId = 0;
+
   scrollToContent = (
     /**
      * target to scroll to
@@ -4441,29 +4448,7 @@ class App extends React.Component<AppProps, AppState> {
       | string
       | ExcalidrawElement
       | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
-    opts?: (
-      | {
-          fitToContent?: boolean;
-          fitToViewport?: never;
-          viewportZoomFactor?: number;
-          animate?: boolean;
-          duration?: number;
-        }
-      | {
-          fitToContent?: never;
-          fitToViewport?: boolean;
-          /** when fitToViewport=true, how much screen should the content cover,
-           * between 0.1 (10%) and 1 (100%)
-           */
-          viewportZoomFactor?: number;
-          animate?: boolean;
-          duration?: number;
-        }
-    ) & {
-      minZoom?: number;
-      maxZoom?: number;
-      canvasOffsets?: Offsets;
-    },
+    opts?: ScrollToContentOptions,
   ) => {
     if (typeof target === "string") {
       let id: string | null;
@@ -4476,10 +4461,29 @@ class App extends React.Component<AppProps, AppState> {
         const elements = this.scene.getElementsFromId(id);
 
         if (elements?.length) {
-          this.scrollToContent(elements, {
-            fitToContent: opts?.fitToContent ?? true,
-            animate: opts?.animate ?? true,
-          });
+          if (opts?.fitToViewport) {
+            this.scrollToContent(elements, {
+              fitToViewport: true,
+              viewportZoomFactor: opts.viewportZoomFactor,
+              animate: opts.animate ?? true,
+              duration: opts.duration,
+              scrollLock: opts.scrollLock,
+              minZoom: opts.minZoom,
+              maxZoom: opts.maxZoom,
+              canvasOffsets: opts.canvasOffsets,
+            });
+          } else {
+            this.scrollToContent(elements, {
+              fitToContent: opts?.fitToContent ?? true,
+              viewportZoomFactor: opts?.viewportZoomFactor,
+              animate: opts?.animate ?? true,
+              duration: opts?.duration,
+              scrollLock: opts?.scrollLock,
+              minZoom: opts?.minZoom,
+              maxZoom: opts?.maxZoom,
+              canvasOffsets: opts?.canvasOffsets,
+            });
+          }
         } else if (isElementLink(target)) {
           this.setState({
             toast: {
@@ -4494,33 +4498,68 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.cancelInProgressAnimation?.();
+    this.scrollToContentRequestId += 1;
+
+    if (scrollConstraintsAnimationTimeout) {
+      clearTimeout(scrollConstraintsAnimationTimeout);
+      scrollConstraintsAnimationTimeout = null;
+    }
 
     // convert provided target into ExcalidrawElement[] if necessary
     const targetElements = Array.isArray(target) ? target : [target];
 
+    if (!targetElements.length) {
+      return;
+    }
+
     let zoom = this.state.zoom;
     let scrollX = this.state.scrollX;
     let scrollY = this.state.scrollY;
+    const targetBounds = getCommonBounds(targetElements);
 
     if (opts?.fitToContent || opts?.fitToViewport) {
-      const { appState } = zoomToFit({
+      const resolvedViewport = resolveViewportForBounds({
+        bounds: targetBounds,
         canvasOffsets: opts.canvasOffsets,
-        targetElements,
         appState: this.state,
         fitToViewport: !!opts?.fitToViewport,
         viewportZoomFactor: opts?.viewportZoomFactor,
         minZoom: opts?.minZoom,
         maxZoom: opts?.maxZoom,
       });
-      zoom = appState.zoom;
-      scrollX = appState.scrollX;
-      scrollY = appState.scrollY;
+      zoom = resolvedViewport.zoom;
+      scrollX = resolvedViewport.scrollX;
+      scrollY = resolvedViewport.scrollY;
     } else {
       // compute only the viewport location, without any zoom adjustment
       const scroll = calculateScrollCenter(targetElements, this.state);
       scrollX = scroll.scrollX;
       scrollY = scroll.scrollY;
     }
+
+    const scrollConstraints = opts?.scrollLock
+      ? getScrollConstraintsForBounds({
+          bounds: targetBounds,
+          zoom,
+          viewportDimensions: {
+            width: this.state.width,
+            height: this.state.height,
+          },
+          scrollLock: opts.scrollLock,
+        })
+      : null;
+    const requestId = this.scrollToContentRequestId;
+
+    const installScrollConstraints = () => {
+      if (!scrollConstraints || requestId !== this.scrollToContentRequestId) {
+        return;
+      }
+
+      this.setState({
+        scrollConstraints,
+        viewModeEnabled: true,
+      });
+    };
 
     // when animating, we use RequestAnimationFrame to prevent the animation
     // from slowing down other processes
@@ -4541,14 +4580,35 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({ shouldCacheIgnoreZoom: true });
         },
         onEnd: () => {
-          this.setState({ shouldCacheIgnoreZoom: false });
+          if (requestId !== this.scrollToContentRequestId) {
+            return;
+          }
+
+          this.setState(
+            { shouldCacheIgnoreZoom: false },
+            installScrollConstraints,
+          );
         },
         onCancel: () => {
+          if (requestId !== this.scrollToContentRequestId) {
+            return;
+          }
+
           this.setState({ shouldCacheIgnoreZoom: false });
         },
       });
     } else {
-      this.setState({ scrollX, scrollY, zoom });
+      if (scrollConstraints) {
+        this.setState({
+          scrollX,
+          scrollY,
+          zoom,
+          scrollConstraints,
+          viewModeEnabled: true,
+        });
+      } else {
+        this.setState({ scrollX, scrollY, zoom });
+      }
     }
   };
 
@@ -13177,7 +13237,7 @@ declare global {
       state: AppState;
       setState: React.Component<any, AppState>["setState"];
       watchState: (prev: any, next: any) => void | undefined;
-      app: InstanceType<typeof App>;
+      app: AppClassProperties;
       history: History;
       store: Store;
     };

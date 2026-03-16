@@ -1,3 +1,5 @@
+import { MAX_ZOOM } from "@excalidraw/common";
+
 import { isShallowEqual } from "@excalidraw/common";
 
 import { clamp } from "@excalidraw/math";
@@ -8,11 +10,12 @@ import type {
   AnimateTranslateCanvasValues,
   AppState,
   ScrollConstraints,
+  ScrollToContentLockOptions,
 } from "../types";
 
 // Constants for viewport zoom factor and overscroll allowance
 const MIN_VIEWPORT_ZOOM_FACTOR = 0.1;
-const MAX_VIEWPORT_ZOOM_FACTOR = 1;
+const MAX_VIEWPORT_ZOOM_FACTOR = MAX_ZOOM;
 const DEFAULT_VIEWPORT_ZOOM_FACTOR = 0.2;
 const DEFAULT_OVERSCROLL_ALLOWANCE = 0.2;
 
@@ -27,6 +30,41 @@ let memoizedValues: {
 } | null = null;
 
 type CanvasTranslate = Pick<AppState, "scrollX" | "scrollY" | "zoom">;
+
+export const getScrollConstraintsForBounds = ({
+  bounds,
+  zoom,
+  viewportDimensions,
+  scrollLock,
+}: {
+  bounds: readonly [number, number, number, number];
+  zoom: AppState["zoom"];
+  viewportDimensions: Pick<AppState, "width" | "height">;
+  scrollLock?: boolean | ScrollToContentLockOptions;
+}): ScrollConstraints => {
+  const [x1, y1, x2, y2] = bounds;
+  const width = x2 - x1;
+  const height = y2 - y1;
+  const baseZoom = Math.min(
+    viewportDimensions.width / width,
+    viewportDimensions.height / height,
+  );
+  const lockOptions =
+    scrollLock && typeof scrollLock === "object" ? scrollLock : undefined;
+  const viewportZoomFactor =
+    lockOptions?.viewportZoomFactor ?? zoom.value / baseZoom;
+
+  return {
+    x: x1,
+    y: y1,
+    width,
+    height,
+    animateOnNextUpdate: false,
+    lockZoom: !!lockOptions?.lockZoom,
+    overscrollAllowance: lockOptions?.overscrollAllowance,
+    viewportZoomFactor,
+  };
+};
 
 /**
  * Calculates the zoom levels necessary to fit the constrained scrollable area within the viewport on the X and Y axes.
