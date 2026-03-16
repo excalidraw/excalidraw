@@ -297,7 +297,11 @@ import {
   computeSolidGeometry,
 } from "../shapePresets/solidFactory";
 
-import { isSolidPresetType } from "../shapePresets";
+import {
+  isSolidPresetType,
+  isWireframeGroup,
+  getWireframeVertexAtPosition,
+} from "../shapePresets";
 
 import {
   actionAddToLibrary,
@@ -713,6 +717,13 @@ class App extends React.Component<AppProps, AppState> {
   private solidPresetElements: ExcalidrawElement[] = [];
   private solidPresetGroupId: string | null = null;
   private solidPresetType: string | null = null;
+
+  // Wireframe vertex drag state (direct from group selection)
+  private wireframeDragVertex: {
+    elementId: string;
+    pointIndex: number;
+    vertexId: string;
+  } | null = null;
 
   onChangeEmitter = new Emitter<
     [
@@ -9180,12 +9191,13 @@ class App extends React.Component<AppProps, AppState> {
   private createSolidPresetProxyOnPointerDown = (
     pointerDownState: PointerDownState,
   ): void => {
-    // Create proxy rectangle for drag calculation (made invisible)
+    // Create proxy rectangle for drag calculation (dashed guide)
     this.createGenericElementOnPointerDown("rectangle", pointerDownState);
-    // Make proxy invisible — wireframe preview will be visible instead
+    // Make proxy dashed + semi-transparent as a placement guide
     if (this.state.newElement) {
       this.scene.mutateElement(this.state.newElement, {
-        opacity: 0,
+        strokeStyle: "dashed",
+        opacity: 30,
       } as any);
     }
     // Store solid preset type for live preview
@@ -9203,6 +9215,149 @@ class App extends React.Component<AppProps, AppState> {
     opacity: this.state.currentItemOpacity,
     frameId: null,
   });
+
+  private _handleWireframeVertexDrag = (pointerCoords: {
+    x: number;
+    y: number;
+  }): void => {
+    if (!this.wireframeDragVertex) {
+      return;
+    }
+    const { elementId, pointIndex } = this.wireframeDragVertex;
+    const element = this.scene.getElement(elementId);
+    if (!element || !isLinearElement(element)) {
+      this.wireframeDragVertex = null;
+      return;
+    }
+
+    // Compute new point position in element's local space
+    const newLocalX = pointerCoords.x - element.x;
+    const newLocalY = pointerCoords.y - element.y;
+    const newPoints = [...element.points] as [number, number][];
+    newPoints[pointIndex] = [newLocalX, newLocalY];
+
+    // Save pre-mutation globals for SharedVertex propagation
+    const sv = (element as any).sharedVertices as Record<number, string> | null;
+    const prevGlobal = new Map<string, { x: number; y: number }>();
+    if (sv) {
+      for (const [idxStr, vertexId] of Object.entries(sv)) {
+        const idx = Number(idxStr);
+        if (idx < element.points.length) {
+          prevGlobal.set(vertexId, {
+            x: element.x + element.points[idx][0],
+            y: element.y + element.points[idx][1],
+          });
+        }
+      }
+    }
+
+    // Handle point-0 normalization: shift element origin
+    if (pointIndex === 0) {
+      const offsetX = newPoints[0][0];
+      const offsetY = newPoints[0][1];
+      for (let k = 0; k < newPoints.length; k++) {
+        newPoints[k] = [newPoints[k][0] - offsetX, newPoints[k][1] - offsetY];
+      }
+      this.scene.mutateElement(element, {
+        x: element.x + offsetX,
+        y: element.y + offsetY,
+        points: newPoints,
+      } as any);
+    } else {
+      this.scene.mutateElement(element, { points: newPoints } as any);
+    }
+
+    // Propagate to siblings via SharedVertex
+    if (sv && prevGlobal.size > 0) {
+      this._propagateWireframeVertices(element, sv, prevGlobal);
+    }
+  };
+
+  private _propagateWireframeVertices = (
+    element: ExcalidrawElement,
+    sv: Record<number, string>,
+    prevGlobal: Map<string, { x: number; y: number }>,
+  ): void => {
+    const linEl = element as any;
+    // Compute global deltas
+    const movedVertices = new Map<string, { dx: number; dy: number }>();
+    for (const [idxStr, vertexId] of Object.entries(sv)) {
+      const idx = Number(idxStr);
+      if (idx >= linEl.points.length) {
+        continue;
+      }
+      const prev = prevGlobal.get(vertexId);
+      if (!prev) {
+        continue;
+      }
+      const dx = linEl.x + linEl.points[idx][0] - prev.x;
+      const dy = linEl.y + linEl.points[idx][1] - prev.y;
+      if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
+        movedVertices.set(vertexId, { dx, dy });
+      }
+    }
+    if (movedVertices.size === 0) {
+      return;
+    }
+
+    const groupId = element.groupIds?.[0];
+    if (!groupId) {
+      return;
+    }
+
+    const siblings = this.scene
+      .getNonDeletedElements()
+      .filter(
+        (el) =>
+          el.id !== element.id &&
+          el.groupIds?.includes(groupId) &&
+          isLineElement(el) &&
+          (el as any).sharedVertices,
+      );
+
+    for (const sib of siblings) {
+      const sibSV = (sib as any).sharedVertices as Record<number, string>;
+      const sibEl = sib as any;
+      let needsUpdate = false;
+      const newPts = [...sibEl.points] as [number, number][];
+      let shiftX = 0;
+      let shiftY = 0;
+
+      for (const [idxStr, vertexId] of Object.entries(sibSV)) {
+        const delta = movedVertices.get(vertexId);
+        if (!delta) {
+          continue;
+        }
+        const idx = Number(idxStr);
+        if (idx >= newPts.length) {
+          continue;
+        }
+        newPts[idx] = [newPts[idx][0] + delta.dx, newPts[idx][1] + delta.dy];
+        if (idx === 0) {
+          shiftX = newPts[0][0];
+          shiftY = newPts[0][1];
+        }
+        needsUpdate = true;
+      }
+
+      if (!needsUpdate) {
+        continue;
+      }
+
+      if (Math.abs(shiftX) > 0.001 || Math.abs(shiftY) > 0.001) {
+        for (let k = 0; k < newPts.length; k++) {
+          newPts[k] = [newPts[k][0] - shiftX, newPts[k][1] - shiftY];
+        }
+        this.scene.mutateElement(sib, {
+          x: sibEl.x + shiftX,
+          y: sibEl.y + shiftY,
+          points: newPts,
+        } as any);
+      } else {
+        this.scene.mutateElement(sib, { points: newPts } as any);
+      }
+    }
+  };
 
   private updateSolidPresetPreview = (): void => {
     const newElement = this.state.newElement;
@@ -9668,6 +9823,31 @@ class App extends React.Component<AppProps, AppState> {
         // if elements should be deselected on pointerup
         pointerDownState.drag.hasOccurred = true;
 
+        // Check for wireframe vertex drag (before normal element drag)
+        if (!this.wireframeDragVertex) {
+          const wireframeGroupId = Object.keys(this.state.selectedGroupIds)[0];
+          if (wireframeGroupId) {
+            const allElements = this.scene.getNonDeletedElements();
+            if (isWireframeGroup(wireframeGroupId, allElements)) {
+              const hitVertex = getWireframeVertexAtPosition(
+                wireframeGroupId,
+                allElements,
+                this.scene.getNonDeletedElementsMap(),
+                pointerDownState.origin.x,
+                pointerDownState.origin.y,
+                this.state.zoom,
+              );
+              if (hitVertex) {
+                this.wireframeDragVertex = {
+                  elementId: hitVertex.elementId,
+                  pointIndex: hitVertex.pointIndex,
+                  vertexId: hitVertex.vertexId,
+                };
+              }
+            }
+          }
+        }
+
         // prevent immediate dragging during lasso selection to avoid element displacement
         // only allow dragging if we're not in the middle of lasso selection
         // (on mobile, allow dragging if we hit an element)
@@ -9846,7 +10026,10 @@ class App extends React.Component<AppProps, AppState> {
 
           // when we're editing the name of a frame, we want the user to be
           // able to select and interact with the text input
-          if (!this.state.editingFrame) {
+          if (this.wireframeDragVertex) {
+            // Wireframe vertex drag: move single vertex + propagate to siblings
+            this._handleWireframeVertexDrag(pointerCoords);
+          } else if (!this.state.editingFrame) {
             dragSelectedElements(
               pointerDownState,
               selectedElements,
@@ -9858,7 +10041,7 @@ class App extends React.Component<AppProps, AppState> {
           }
 
           this.setState({
-            selectedElementsAreBeingDragged: true,
+            selectedElementsAreBeingDragged: !this.wireframeDragVertex,
             // element is being dragged and selectionElement that was created on pointer down
             // should be removed
             selectionElement: null,
@@ -10373,6 +10556,12 @@ class App extends React.Component<AppProps, AppState> {
 
       if (getFeatureFlag("COMPLEX_BINDINGS")) {
         this.resetDelayedBindMode();
+      }
+
+      // Clean up wireframe vertex drag
+      if (this.wireframeDragVertex) {
+        this.wireframeDragVertex = null;
+        this.store.scheduleCapture();
       }
 
       this.setState({

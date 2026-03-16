@@ -1773,12 +1773,18 @@ export class LinearElementEditor {
         element.angle,
       );
       // Save global vertex positions BEFORE mutation (for SharedVertex)
+      // Only propagate if point count matches sharedVertices mapping
+      // (adding midpoints changes point count, making indices invalid)
       const sv =
         isLineElement(element) && (element as any).sharedVertices
           ? ((element as any).sharedVertices as Record<number, string>)
           : null;
+      const svValid =
+        sv &&
+        nextPoints.length === element.points.length &&
+        Object.keys(sv).every((idx) => Number(idx) < nextPoints.length);
       const prevGlobal =
-        sv && options?.isDragging
+        svValid && options?.isDragging
           ? LinearElementEditor._getSharedVertexGlobals(
               sv,
               element.x,
@@ -1795,7 +1801,7 @@ export class LinearElementEditor {
       });
 
       // Propagate shared vertex changes to sibling elements
-      if (prevGlobal && sv) {
+      if (prevGlobal && svValid && sv) {
         LinearElementEditor._propagateSharedVertices(
           element as any,
           scene,

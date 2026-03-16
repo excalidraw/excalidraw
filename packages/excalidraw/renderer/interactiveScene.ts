@@ -86,6 +86,7 @@ import {
 } from "../scene/scrollbars";
 
 import { getClientColor, renderRemoteCursors } from "../clients";
+import { isWireframeGroup, getWireframeVertices } from "../shapePresets";
 
 import {
   bootstrapCanvas,
@@ -214,6 +215,35 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
     !isPhantomPoint,
     !isOverlappingPoint || isSelected,
   );
+};
+
+const renderWireframeVertexHandles = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  groupId: string,
+  allElements: readonly ExcalidrawElement[],
+  elementsMap: ElementsMap,
+) => {
+  const vertices = getWireframeVertices(groupId, allElements, elementsMap);
+  const radius =
+    LinearElementEditor.POINT_HANDLE_SIZE / 2 / appState.zoom.value;
+
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
+  for (const vertex of vertices.values()) {
+    const [x, y] = vertex.globalPoint;
+    context.strokeStyle = "#5e5ad8";
+    context.lineWidth = 1.5 / appState.zoom.value;
+    context.setLineDash([]);
+    context.fillStyle = "rgba(255, 255, 255, 0.9)";
+    context.beginPath();
+    context.arc(x, y, radius, 0, 2 * Math.PI);
+    context.fill();
+    context.stroke();
+  }
+
+  context.restore();
 };
 
 const renderBindingHighlightForBindableElement_simple = (
@@ -1126,6 +1156,16 @@ const renderLinearPointHandles = (
       isSelected = true;
     }
 
+    // For wireframe edges: hide unselected vertices (only show the one being dragged)
+    if (
+      _isLineElement &&
+      (element as any).sharedVertices &&
+      !isSelected &&
+      appState.selectedLinearElement?.isEditing
+    ) {
+      return;
+    }
+
     renderSingleLinearPoint(
       context,
       appState,
@@ -1165,7 +1205,8 @@ const renderLinearPointHandles = (
         );
       }
     });
-  } else {
+  } else if (!(_isLineElement && (element as any).sharedVertices)) {
+    // Skip midpoints for wireframe edges (always 2-point lines, midpoint useless)
     const midPoints = LinearElementEditor.getEditorMidPoints(
       element,
       elementsMap,
@@ -1966,6 +2007,21 @@ const _renderInteractiveSceneInner = ({
           appState,
           transformHandles,
           0,
+        );
+      }
+
+      // Render wireframe vertex handles for 3D shape groups
+      const wireframeGroupId = Object.keys(appState.selectedGroupIds)[0];
+      if (
+        wireframeGroupId &&
+        isWireframeGroup(wireframeGroupId, selectedElements)
+      ) {
+        renderWireframeVertexHandles(
+          context,
+          appState,
+          wireframeGroupId,
+          selectedElements,
+          elementsMap,
         );
       }
     }
