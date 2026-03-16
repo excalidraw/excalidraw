@@ -9286,10 +9286,21 @@ class App extends React.Component<AppProps, AppState> {
       for (const [idxStr, vertexId] of Object.entries(sv)) {
         const idx = Number(idxStr);
         if (idx < element.points.length) {
-          prevGlobal.set(vertexId, {
-            x: element.x + element.points[idx][0],
-            y: element.y + element.points[idx][1],
-          });
+          const lx = element.points[idx][0];
+          const ly = element.points[idx][1];
+          if (element.angle) {
+            const cos = Math.cos(element.angle);
+            const sin = Math.sin(element.angle);
+            prevGlobal.set(vertexId, {
+              x: element.x + lx * cos - ly * sin,
+              y: element.y + lx * sin + ly * cos,
+            });
+          } else {
+            prevGlobal.set(vertexId, {
+              x: element.x + lx,
+              y: element.y + ly,
+            });
+          }
         }
       }
     }
@@ -9337,8 +9348,17 @@ class App extends React.Component<AppProps, AppState> {
       if (!prev) {
         continue;
       }
-      const currX = linEl.x + linEl.points[idx][0];
-      const currY = linEl.y + linEl.points[idx][1];
+      // Convert local point to global (accounting for rotation)
+      let currX = linEl.x + linEl.points[idx][0];
+      let currY = linEl.y + linEl.points[idx][1];
+      if (linEl.angle) {
+        const cos = Math.cos(linEl.angle);
+        const sin = Math.sin(linEl.angle);
+        const lx = linEl.points[idx][0];
+        const ly = linEl.points[idx][1];
+        currX = linEl.x + lx * cos - ly * sin;
+        currY = linEl.y + lx * sin + ly * cos;
+      }
       if (
         Math.abs(currX - prev.x) > 0.001 ||
         Math.abs(currY - prev.y) > 0.001
@@ -9385,7 +9405,16 @@ class App extends React.Component<AppProps, AppState> {
           continue;
         }
         // Set point to absolute target in sibling's local space
-        newPts[idx] = [target.x - sibEl.x, target.y - sibEl.y];
+        // Account for element rotation: rotate global→local by -angle
+        if (sibEl.angle) {
+          const cos = Math.cos(-sibEl.angle);
+          const sin = Math.sin(-sibEl.angle);
+          const dx = target.x - sibEl.x;
+          const dy = target.y - sibEl.y;
+          newPts[idx] = [dx * cos - dy * sin, dx * sin + dy * cos];
+        } else {
+          newPts[idx] = [target.x - sibEl.x, target.y - sibEl.y];
+        }
         needsUpdate = true;
       }
 

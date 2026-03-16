@@ -1786,6 +1786,7 @@ export class LinearElementEditor {
               element.x,
               element.y,
               element.points,
+              element.angle,
             )
           : null;
 
@@ -1830,14 +1831,17 @@ export class LinearElementEditor {
     return Math.round((storedKey / maxKey) * (numPoints - 1));
   }
 
-  /** Get global positions of shared vertices */
+  /** Get global positions of shared vertices (rotation-aware) */
   private static _getSharedVertexGlobals(
     sv: Record<number, string>,
     elX: number,
     elY: number,
     pts: readonly LocalPoint[],
+    angle = 0,
   ): Map<string, { x: number; y: number }> {
     const result = new Map<string, { x: number; y: number }>();
+    const cos = angle ? Math.cos(angle) : 1;
+    const sin = angle ? Math.sin(angle) : 0;
     for (const [idxStr, vertexId] of Object.entries(sv)) {
       const idx = LinearElementEditor.resolveVertexIndex(
         Number(idxStr),
@@ -1845,9 +1849,11 @@ export class LinearElementEditor {
         pts.length,
       );
       if (idx < pts.length) {
+        const lx = pts[idx][0];
+        const ly = pts[idx][1];
         result.set(vertexId, {
-          x: elX + pts[idx][0],
-          y: elY + pts[idx][1],
+          x: elX + lx * cos - ly * sin,
+          y: elY + lx * sin + ly * cos,
         });
       }
     }
@@ -1883,13 +1889,16 @@ export class LinearElementEditor {
       if (!prev) {
         continue;
       }
-      const currX = element.x + element.points[idx][0];
-      const currY = element.y + element.points[idx][1];
+      const lx = element.points[idx][0];
+      const ly = element.points[idx][1];
+      const elCos = element.angle ? Math.cos(element.angle) : 1;
+      const elSin = element.angle ? Math.sin(element.angle) : 0;
+      const currX = element.x + lx * elCos - ly * elSin;
+      const currY = element.y + lx * elSin + ly * elCos;
       if (
         Math.abs(currX - prev.x) > 0.001 ||
         Math.abs(currY - prev.y) > 0.001
       ) {
-        // Store the TARGET global position (not delta)
         vertexTargets.set(vertexId, { x: currX, y: currY });
       }
     }
@@ -1934,8 +1943,16 @@ export class LinearElementEditor {
         if (idx >= newPoints.length) {
           continue;
         }
-        // Set point to absolute target in sibling's local space
-        newPoints[idx] = pointFrom(target.x - sibling.x, target.y - sibling.y);
+        // Set point to absolute target in sibling's local space (rotation-aware)
+        const gdx = target.x - sibling.x;
+        const gdy = target.y - sibling.y;
+        if (sibling.angle) {
+          const sc = Math.cos(-sibling.angle);
+          const ss = Math.sin(-sibling.angle);
+          newPoints[idx] = pointFrom(gdx * sc - gdy * ss, gdx * ss + gdy * sc);
+        } else {
+          newPoints[idx] = pointFrom(gdx, gdy);
+        }
         needsUpdate = true;
       }
 
