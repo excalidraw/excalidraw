@@ -75,7 +75,7 @@ import type {
   Arrowhead,
 } from "./types";
 
-import type { Drawable } from "roughjs/bin/core";
+import type { Drawable, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
 /**
  * Post-process a rough.js Drawable to remove intermediate `move` ops.

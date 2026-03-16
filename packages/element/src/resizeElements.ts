@@ -1303,13 +1303,15 @@ export const resizeMultipleElements = (
       ? [midX, midY]
       : anchorsMap[handleDirection];
 
+    const isSideHandle = handleDirection.length === 1; // e, w, n, s
     const keepAspectRatio =
       shouldMaintainAspectRatio ||
       targetElements.some(
         (item) =>
           item.latest.angle !== 0 ||
           isTextElement(item.latest) ||
-          isInGroup(item.latest),
+          // Allow non-proportional stretch via side handles for groups
+          (isInGroup(item.latest) && !isSideHandle),
       );
 
     if (keepAspectRatio) {
