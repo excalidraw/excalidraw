@@ -244,7 +244,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id50",
+      "id": "id6",
       "type": "arrow",
     },
   ],
@@ -290,7 +290,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id50",
+      "id": "id6",
       "type": "arrow",
     },
   ],
@@ -335,7 +335,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id51",
+      "id": "id7",
       "type": "text",
     },
   ],
@@ -401,7 +401,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id50",
+  "containerId": "id6",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -1316,7 +1316,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id56",
+      "id": "id11",
       "type": "text",
     },
     {
@@ -1359,7 +1359,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id57",
+      "id": "id12",
       "type": "text",
     },
   ],
@@ -1398,7 +1398,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id58",
+      "id": "id13",
       "type": "text",
     },
     {
@@ -1441,7 +1441,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id59",
+      "id": "id14",
       "type": "text",
     },
     {
@@ -1488,7 +1488,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id60",
+      "id": "id15",
       "type": "text",
     },
   ],
@@ -1556,7 +1556,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id61",
+      "id": "id16",
       "type": "text",
     },
   ],

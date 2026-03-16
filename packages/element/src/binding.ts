@@ -832,9 +832,15 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       threshold: maxBindingDistance_simple(appState.zoom),
       overrideShouldTestInside: true,
     });
+  const otherPointWasInsideAtStart =
+    !appState.selectedLinearElement?.initialState.altFocusPoint ||
+    pointsEqual(
+      appState.selectedLinearElement.initialState.altFocusPoint,
+      otherEndpoint,
+    );
   const otherNeverOverride = opts?.newArrow
     ? appState.selectedLinearElement?.initialState.arrowStartIsInside
-    : otherBinding?.mode === "inside";
+    : otherBinding?.mode === "inside" && otherPointWasInsideAtStart;
   const other: BindingStrategy = !otherNeverOverride
     ? otherBindableElement &&
       !otherFocusPointIsInElement &&
