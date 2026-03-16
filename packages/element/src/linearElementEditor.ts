@@ -1772,12 +1772,164 @@ export class LinearElementEditor {
         pointFrom(dX, dY),
         element.angle,
       );
+      // Save global vertex positions BEFORE mutation (for SharedVertex)
+      const sv =
+        isLineElement(element) && (element as any).sharedVertices
+          ? ((element as any).sharedVertices as Record<number, string>)
+          : null;
+      const prevGlobal =
+        sv && options?.isDragging
+          ? LinearElementEditor._getSharedVertexGlobals(
+              sv,
+              element.x,
+              element.y,
+              element.points,
+            )
+          : null;
+
       scene.mutateElement(element, {
         ...otherUpdates,
         points: nextPoints,
         x: element.x + rotatedOffset[0],
         y: element.y + rotatedOffset[1],
       });
+
+      // Propagate shared vertex changes to sibling elements
+      if (prevGlobal && sv) {
+        LinearElementEditor._propagateSharedVertices(
+          element as any,
+          scene,
+          sv,
+          prevGlobal,
+        );
+      }
+    }
+  }
+
+  /** Get global positions of shared vertices */
+  private static _getSharedVertexGlobals(
+    sv: Record<number, string>,
+    elX: number,
+    elY: number,
+    pts: readonly LocalPoint[],
+  ): Map<string, { x: number; y: number }> {
+    const result = new Map<string, { x: number; y: number }>();
+    for (const [idxStr, vertexId] of Object.entries(sv)) {
+      const idx = Number(idxStr);
+      if (idx < pts.length) {
+        result.set(vertexId, {
+          x: elX + pts[idx][0],
+          y: elY + pts[idx][1],
+        });
+      }
+    }
+    return result;
+  }
+
+  /**
+   * When a vertex of a wireframe line element moves, update all other
+   * elements in the same group that share the same vertex ID.
+   * Deltas are computed in GLOBAL space to handle point-0 normalization.
+   */
+  private static _propagateSharedVertices(
+    element: ExcalidrawLinearElement & {
+      sharedVertices: Record<number, string>;
+      groupIds: string[];
+    },
+    scene: Scene,
+    sv: Record<number, string>,
+    prevGlobal: Map<string, { x: number; y: number }>,
+  ): void {
+    // 1. Compute global deltas (post-mutation vs pre-mutation)
+    const movedVertices = new Map<string, { dx: number; dy: number }>();
+    for (const [idxStr, vertexId] of Object.entries(sv)) {
+      const idx = Number(idxStr);
+      if (idx >= element.points.length) {
+        continue;
+      }
+      const prev = prevGlobal.get(vertexId);
+      if (!prev) {
+        continue;
+      }
+      const currX = element.x + element.points[idx][0];
+      const currY = element.y + element.points[idx][1];
+      const dx = currX - prev.x;
+      const dy = currY - prev.y;
+      if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
+        movedVertices.set(vertexId, { dx, dy });
+      }
+    }
+    if (movedVertices.size === 0) {
+      return;
+    }
+
+    // 2. Find sibling elements in same group
+    const groupId = element.groupIds[0];
+    if (!groupId) {
+      return;
+    }
+    const siblings = scene
+      .getNonDeletedElements()
+      .filter(
+        (el) =>
+          el.id !== element.id &&
+          el.groupIds?.includes(groupId) &&
+          isLineElement(el) &&
+          (el as any).sharedVertices,
+      );
+
+    // 3. Apply global deltas to matching vertices in siblings
+    for (const sib of siblings) {
+      const sibling = sib as ExcalidrawLinearElement & {
+        sharedVertices: Record<number, string>;
+      };
+      const sibSV = sibling.sharedVertices;
+      let needsUpdate = false;
+      const newPoints = [...sibling.points] as LocalPoint[];
+      let shiftX = 0;
+      let shiftY = 0;
+
+      for (const [idxStr, vertexId] of Object.entries(sibSV)) {
+        const delta = movedVertices.get(vertexId);
+        if (!delta) {
+          continue;
+        }
+        const idx = Number(idxStr);
+        if (idx >= newPoints.length) {
+          continue;
+        }
+        newPoints[idx] = pointFrom(
+          newPoints[idx][0] + delta.dx,
+          newPoints[idx][1] + delta.dy,
+        );
+        // If point 0 moved, need to re-normalize (point 0 must be [0,0])
+        if (idx === 0) {
+          shiftX = newPoints[0][0];
+          shiftY = newPoints[0][1];
+        }
+        needsUpdate = true;
+      }
+
+      if (!needsUpdate) {
+        continue;
+      }
+
+      // Re-normalize if point 0 moved
+      if (Math.abs(shiftX) > 0.001 || Math.abs(shiftY) > 0.001) {
+        for (let k = 0; k < newPoints.length; k++) {
+          newPoints[k] = pointFrom(
+            newPoints[k][0] - shiftX,
+            newPoints[k][1] - shiftY,
+          );
+        }
+        scene.mutateElement(sibling, {
+          x: sibling.x + shiftX,
+          y: sibling.y + shiftY,
+          points: newPoints,
+        } as any);
+      } else {
+        scene.mutateElement(sibling, { points: newPoints } as any);
+      }
     }
   }
 

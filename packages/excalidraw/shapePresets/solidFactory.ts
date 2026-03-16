@@ -37,6 +37,8 @@ export interface LineGeom {
   points: LocalPoint[];
   dashed: boolean;
   polygon: boolean;
+  /** Shared vertex IDs per point index (for wireframe vertex binding) */
+  vertexIds?: string[];
 }
 
 export interface EllipseGeom {
@@ -58,6 +60,8 @@ function line(
   x2: number,
   y2: number,
   dashed = false,
+  v1?: string,
+  v2?: string,
 ): LineGeom {
   return {
     kind: "line",
@@ -69,6 +73,7 @@ function line(
     ],
     dashed,
     polygon: false,
+    vertexIds: v1 && v2 ? [v1, v2] : undefined,
   };
 }
 
@@ -77,8 +82,17 @@ function poly(
   y: number,
   pts: LocalPoint[],
   dashed = false,
+  vertexIds?: string[],
 ): LineGeom {
-  return { kind: "line", x, y, points: pts, dashed, polygon: true };
+  return {
+    kind: "line",
+    x,
+    y,
+    points: pts,
+    dashed,
+    polygon: true,
+    vertexIds,
+  };
 }
 
 function ellipseGeom(
@@ -97,6 +111,10 @@ function rect(
   w: number,
   h: number,
   dashed = false,
+  vTL?: string,
+  vTR?: string,
+  vBR?: string,
+  vBL?: string,
 ): LineGeom {
   return poly(
     x,
@@ -109,6 +127,7 @@ function rect(
       pointFrom<LocalPoint>(0, 0),
     ],
     dashed,
+    vTL ? [vTL, vTR!, vBR!, vBL!, vTL] : undefined,
   );
 }
 
@@ -167,18 +186,18 @@ function prismGeom(bbox: BBox): ElementGeom[] {
 
   return [
     // Front face — solid
-    rect(FTL.x, FTL.y, fw, fh, false),
+    rect(FTL.x, FTL.y, fw, fh, false, "FTL", "FTR", "FBR", "FBL"),
     // Top edges — solid
-    line(FTL.x, FTL.y, BTL.x, BTL.y, false),
-    line(FTR.x, FTR.y, BTR.x, BTR.y, false),
-    line(BTL.x, BTL.y, BTR.x, BTR.y, false),
+    line(FTL.x, FTL.y, BTL.x, BTL.y, false, "FTL", "BTL"),
+    line(FTR.x, FTR.y, BTR.x, BTR.y, false, "FTR", "BTR"),
+    line(BTL.x, BTL.y, BTR.x, BTR.y, false, "BTL", "BTR"),
     // Right edges — solid
-    line(FBR.x, FBR.y, BBR.x, BBR.y, false),
-    line(BTR.x, BTR.y, BBR.x, BBR.y, false),
+    line(FBR.x, FBR.y, BBR.x, BBR.y, false, "FBR", "BBR"),
+    line(BTR.x, BTR.y, BBR.x, BBR.y, false, "BTR", "BBR"),
     // Hidden edges (3 edges at BBL) — dashed
-    line(BTL.x, BTL.y, BBL.x, BBL.y, true),
-    line(BBL.x, BBL.y, BBR.x, BBR.y, true),
-    line(FBL.x, FBL.y, BBL.x, BBL.y, true),
+    line(BTL.x, BTL.y, BBL.x, BBL.y, true, "BTL", "BBL"),
+    line(BBL.x, BBL.y, BBR.x, BBR.y, true, "BBL", "BBR"),
+    line(FBL.x, FBL.y, BBL.x, BBL.y, true, "FBL", "BBL"),
   ];
 }
 
@@ -197,19 +216,19 @@ function pyramidGeom(bbox: BBox): ElementGeom[] {
 
   return [
     // Base front edge — solid
-    line(FL.x, FL.y, FR.x, FR.y, false),
+    line(FL.x, FL.y, FR.x, FR.y, false, "FL", "FR"),
     // Base right edge — solid
-    line(FR.x, FR.y, BR.x, BR.y, false),
+    line(FR.x, FR.y, BR.x, BR.y, false, "FR", "BR"),
     // Base back edge — dashed
-    line(BL.x, BL.y, BR.x, BR.y, true),
+    line(BL.x, BL.y, BR.x, BR.y, true, "BL", "BR"),
     // Base left edge — dashed
-    line(FL.x, FL.y, BL.x, BL.y, true),
+    line(FL.x, FL.y, BL.x, BL.y, true, "FL", "BL"),
     // Lateral: front + right — solid
-    line(A.x, A.y, FL.x, FL.y, false),
-    line(A.x, A.y, FR.x, FR.y, false),
-    line(A.x, A.y, BR.x, BR.y, false),
+    line(A.x, A.y, FL.x, FL.y, false, "A", "FL"),
+    line(A.x, A.y, FR.x, FR.y, false, "A", "FR"),
+    line(A.x, A.y, BR.x, BR.y, false, "A", "BR"),
     // Lateral: back-left — dashed
-    line(A.x, A.y, BL.x, BL.y, true),
+    line(A.x, A.y, BL.x, BL.y, true, "A", "BL"),
   ];
 }
 
@@ -225,14 +244,14 @@ function tetrahedronGeom(bbox: BBox): ElementGeom[] {
 
   return [
     // Front-left face (A-B-D) — solid
-    line(A.x, A.y, B.x, B.y, false),
-    line(A.x, A.y, D.x, D.y, false),
+    line(A.x, A.y, B.x, B.y, false, "A", "B"),
+    line(A.x, A.y, D.x, D.y, false, "A", "D"),
     // Front-right face (B-C-D) — solid
-    line(B.x, B.y, D.x, D.y, false),
-    line(B.x, B.y, C.x, C.y, false),
-    line(D.x, D.y, C.x, C.y, false),
+    line(B.x, B.y, D.x, D.y, false, "B", "D"),
+    line(B.x, B.y, C.x, C.y, false, "B", "C"),
+    line(D.x, D.y, C.x, C.y, false, "D", "C"),
     // Hidden back edge — dashed
-    line(A.x, A.y, C.x, C.y, true),
+    line(A.x, A.y, C.x, C.y, true, "A", "C"),
   ];
 }
 
@@ -309,7 +328,7 @@ function createElementFromGeom(
   styles: SolidPresetStyles,
 ): ExcalidrawElement {
   if (geom.kind === "line") {
-    return newLinearElement({
+    const el = newLinearElement({
       type: "line",
       x: geom.x,
       y: geom.y,
@@ -327,6 +346,17 @@ function createElementFromGeom(
       points: geom.points,
       polygon: geom.polygon,
     });
+    // Add shared vertex mapping for wireframe vertex binding
+    if (geom.vertexIds?.length) {
+      const sharedVertices: Record<number, string> = {};
+      geom.vertexIds.forEach((vid, idx) => {
+        if (vid) {
+          sharedVertices[idx] = vid;
+        }
+      });
+      return newElementWith(el, { sharedVertices } as any);
+    }
+    return el;
   }
   return newElement({
     type: "ellipse",

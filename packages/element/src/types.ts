@@ -344,6 +344,8 @@ export type ExcalidrawLineElement = ExcalidrawLinearElement &
   Readonly<{
     type: "line";
     polygon: boolean;
+    /** Maps pointIndex → shared vertex ID for wireframe vertex binding */
+    sharedVertices?: Readonly<Record<number, string>> | null;
   }>;
 
 export type FixedSegment = {
