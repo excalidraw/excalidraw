@@ -1249,8 +1249,10 @@ export const ShapesSwitcher = ({
   const embeddableToolSelected = activeTool.type === "embeddable";
 
   // Track which grouped popovers we already rendered to avoid duplicates
+  const renderedSelectionPopover = useRef(false);
   const renderedShapePopover = useRef(false);
   const renderedLinearPopover = useRef(false);
+  renderedSelectionPopover.current = false;
   renderedShapePopover.current = false;
   renderedLinearPopover.current = false;
 
@@ -1285,6 +1287,10 @@ export const ShapesSwitcher = ({
             (value === "selection" || value === "lasso") &&
             isCompactStylesPanel
           ) {
+            if (renderedSelectionPopover.current) {
+              return null;
+            }
+            renderedSelectionPopover.current = true;
             return (
               <ToolPopover
                 key={"selection-popover"}
