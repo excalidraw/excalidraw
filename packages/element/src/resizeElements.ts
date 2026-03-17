@@ -1304,11 +1304,25 @@ export const resizeMultipleElements = (
       : anchorsMap[handleDirection];
 
     const isSideHandle = handleDirection.length === 1; // e, w, n, s
+    // Detect rotated wireframe groups eligible for vertex-based resize
+    const allSameAngle = targetElements.every(
+      (item) => item.latest.angle === targetElements[0]?.latest.angle,
+    );
+    const groupAngle = targetElements[0]?.latest.angle ?? 0;
+    const allWireframe = targetElements.every(
+      (item) =>
+        isLinearElement(item.latest) && (item.latest as any).sharedVertices,
+    );
+    const useVertexResize =
+      isSideHandle && groupAngle !== 0 && allSameAngle && allWireframe;
+
     const keepAspectRatio =
       shouldMaintainAspectRatio ||
       targetElements.some(
         (item) =>
-          item.latest.angle !== 0 ||
+          // Rotated elements force proportional — UNLESS vertex-based
+          // resize will handle it (side handle on rotated wireframe group)
+          (item.latest.angle !== 0 && !useVertexResize) ||
           isTextElement(item.latest) ||
           // Allow non-proportional stretch via side handles for groups
           (isInGroup(item.latest) && !isSideHandle),
@@ -1372,7 +1386,7 @@ export const resizeMultipleElements = (
         false,
       );
 
-      const update: typeof elementsAndUpdates[0]["update"] = {
+      let update: typeof elementsAndUpdates[0]["update"] = {
         x,
         y,
         width,
@@ -1380,6 +1394,60 @@ export const resizeMultipleElements = (
         angle,
         ...rescaledPoints,
       };
+
+      // Vertex-based resize for rotated wireframe groups:
+      // Scale vertex global positions in GLOBAL space (matching the
+      // axis-aligned side handles), then reconstruct element properties.
+      // This preserves shared vertex topology which element-based
+      // scaling breaks for rotated elements (per-element rotation centers).
+      if (useVertexResize && isLinearElement(orig)) {
+        const origGlobals = LinearElementEditor.getPointsGlobalCoordinates(
+          orig as NonDeleted<ExcalidrawLinearElement>,
+          originalElementsMap!,
+        );
+
+        // Scale each vertex in global space around anchor
+        const newGlobals = origGlobals.map((g) =>
+          pointFrom(
+            anchorX + (g[0] - anchorX) * scaleX * flipFactorX,
+            anchorY + (g[1] - anchorY) * scaleY * flipFactorY,
+          ),
+        );
+
+        // Reconstruct element from new global vertex positions.
+        // Rotation center = midpoint of global vertices' bounding box
+        // (rotation preserves bounding box center for linear elements).
+        const gxs = newGlobals.map((g) => g[0]);
+        const gys = newGlobals.map((g) => g[1]);
+        const gcx = (Math.min(...gxs) + Math.max(...gxs)) / 2;
+        const gcy = (Math.min(...gys) + Math.max(...gys)) / 2;
+
+        // Reverse-rotate globals around center to get pre-rotation positions
+        const preRots = newGlobals.map((g) =>
+          pointRotateRads(
+            pointFrom(g[0], g[1]),
+            pointFrom(gcx, gcy),
+            -groupAngle as Radians,
+          ),
+        );
+
+        const newX = preRots[0][0];
+        const newY = preRots[0][1];
+        const newPoints = preRots.map((p) =>
+          pointFrom<LocalPoint>(p[0] - newX, p[1] - newY),
+        );
+        const pxs = newPoints.map((p) => p[0]);
+        const pys = newPoints.map((p) => p[1]);
+
+        update = {
+          x: newX,
+          y: newY,
+          width: Math.max(...pxs) - Math.min(...pxs),
+          height: Math.max(...pys) - Math.min(...pys),
+          angle,
+          points: newPoints,
+        };
+      }
 
       if (isElbowArrow(orig)) {
         // Mirror fixed point binding for elbow arrows
