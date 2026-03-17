@@ -6266,8 +6266,24 @@ class App extends React.Component<AppProps, AppState> {
       if (selectedGroupId) {
         this.store.scheduleCapture();
 
-        const shouldEditText =
-          hitElement && isTextBindableContainer(hitElement, false);
+        // find the topmost text-bindable container in this group rather
+        // than relying on hitElement, which can land on a lower-z copy
+        // when the front element is only hit on its bounding box
+        const groupElements = getElementsInGroup(
+          this.scene.getNonDeletedElements(),
+          selectedGroupId,
+        );
+        let textContainer: ExcalidrawElement | null = null;
+        for (let i = groupElements.length - 1; i >= 0; i--) {
+          if (isTextBindableContainer(groupElements[i], false)) {
+            textContainer = groupElements[i];
+            break;
+          }
+        }
+
+        // select the front container (not hitElement) so startTextEditing
+        // finds the correct bound text via selectedElements[0]
+        const selectedId = textContainer?.id ?? hitElement!.id;
 
         this.setState(
           (prevState) => ({
@@ -6275,7 +6291,7 @@ class App extends React.Component<AppProps, AppState> {
             ...selectGroupsForSelectedElements(
               {
                 editingGroupId: selectedGroupId,
-                selectedElementIds: { [hitElement!.id]: true },
+                selectedElementIds: { [selectedId]: true },
               },
               this.scene.getNonDeletedElements(),
               prevState,
@@ -6283,9 +6299,9 @@ class App extends React.Component<AppProps, AppState> {
             ),
           }),
           () => {
-            if (shouldEditText && hitElement) {
+            if (textContainer) {
               const midPoint = getContainerCenter(
-                hitElement,
+                textContainer,
                 this.state,
                 this.scene.getNonDeletedElementsMap(),
               );
@@ -6293,7 +6309,7 @@ class App extends React.Component<AppProps, AppState> {
                 sceneX: midPoint.x,
                 sceneY: midPoint.y,
                 insertAtParentCenter: !event.altKey,
-                container: hitElement as ExcalidrawTextContainer,
+                container: textContainer as ExcalidrawTextContainer,
               });
             }
           },
@@ -6316,10 +6332,46 @@ class App extends React.Component<AppProps, AppState> {
       // shouldn't edit/create text when inside line editor (often false positive)
 
       if (!this.state.selectedLinearElement?.isEditing) {
-        const container = this.getTextBindableContainerAtPosition(
+        let container = this.getTextBindableContainerAtPosition(
           sceneX,
           sceneY,
         );
+
+        // when inside a group, prefer the topmost text-bindable container
+        // so text always goes on the front element (e.g. stacked shapes)
+        if (this.state.editingGroupId && container) {
+          const groupElements = getElementsInGroup(
+            this.scene.getNonDeletedElements(),
+            this.state.editingGroupId,
+          );
+          for (let i = groupElements.length - 1; i >= 0; i--) {
+            if (isTextBindableContainer(groupElements[i], false)) {
+              container = groupElements[i] as typeof container;
+              break;
+            }
+          }
+          // also update selection so startTextEditing resolves the
+          // correct bound text via selectedElements[0]
+          this.setState(
+            { selectedElementIds: { [container.id]: true } },
+            () => {
+              if (container) {
+                const midPoint = getContainerCenter(
+                  container,
+                  this.state,
+                  this.scene.getNonDeletedElementsMap(),
+                );
+                this.startTextEditing({
+                  sceneX: midPoint.x,
+                  sceneY: midPoint.y,
+                  insertAtParentCenter: !event.altKey,
+                  container,
+                });
+              }
+            },
+          );
+          return;
+        }
 
         if (container) {
           if (
