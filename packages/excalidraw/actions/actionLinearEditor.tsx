@@ -45,12 +45,11 @@ export const actionToggleLinearEditor = register({
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     if (
-      !appState.selectedLinearElement?.isEditing &&
+      appState.selectedLinearElement &&
+      !appState.selectedLinearElement.isEditing &&
       selectedElements.length === 1 &&
       isLinearElement(selectedElements[0]) &&
-      !isElbowArrow(selectedElements[0]) &&
-      !(selectedElements[0] as any).polygon &&
-      !(selectedElements[0] as any).sharedVertices
+      !isElbowArrow(selectedElements[0])
     ) {
       return true;
     }
