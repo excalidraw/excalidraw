@@ -1,6 +1,6 @@
 {
   "name": "@emevart/excalidraw",
-  "version": "0.26.31",
+  "version": "0.26.32",
   "type": "module",
   "types": "./dist/types/excalidraw/index.d.ts",
   "main": "./dist/prod/index.js",

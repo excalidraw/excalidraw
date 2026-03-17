@@ -306,7 +306,7 @@ export const ColorPicker = ({
           "color-picker-container--no-top-picks": isCompactMode,
         })}
       >
-        {!isCompactMode && (
+        {(!isCompactMode || type === "canvasBackground") && (
           <TopPicks
             activeColor={color}
             onChange={onChange}
@@ -314,7 +314,7 @@ export const ColorPicker = ({
             topPicks={topPicks}
           />
         )}
-        {!isCompactMode && <ButtonSeparator />}
+        {(!isCompactMode || type === "canvasBackground") && <ButtonSeparator />}
         <Popover.Root
           open={appState.openPopup === type}
           onOpenChange={(open) => {
