@@ -304,6 +304,231 @@ function sphereGeom(bbox: BBox): ElementGeom[] {
   ];
 }
 
+// ─── CONE ─────────────────────────────────────────────────────────
+// Apex at top, elliptical base. Front arc solid, back arc dashed.
+// Two lateral lines from apex to base edges.
+function coneGeom(bbox: BBox): ElementGeom[] {
+  const { x, y, w, h } = bbox;
+  const eh = Math.min(h * 0.2, w * 0.3);
+  const rx = w / 2;
+  const ry = eh / 2;
+  const bcx = x + rx;
+  const bcy = y + h - ry;
+  const apex = { x: x + w * 0.5, y };
+
+  return [
+    // Base front arc (solid)
+    arc(bcx, bcy, rx, ry, 0, Math.PI, false),
+    // Base back arc (dashed)
+    arc(bcx, bcy, rx, ry, Math.PI, 2 * Math.PI, true),
+    // Lateral edges — solid
+    line(apex.x, apex.y, x, bcy, false),
+    line(apex.x, apex.y, x + w, bcy, false),
+  ];
+}
+
+// ─── TRIANGULAR PRISM ─────────────────────────────────────────────
+// Front triangular face visible, back triangle behind.
+// 3 depth edges connect corresponding vertices.
+function triangularPrismGeom(bbox: BBox): ElementGeom[] {
+  const { x, y, w, h } = bbox;
+  const d = Math.min(w, h) * 0.25;
+
+  // Front triangle
+  const FT = { x: x + (w - d) * 0.5, y: y + d };
+  const FBL = { x, y: y + h };
+  const FBR = { x: x + w - d, y: y + h };
+
+  // Back triangle (offset by d)
+  const BT = { x: FT.x + d, y: FT.y - d };
+  const BBL = { x: FBL.x + d, y: FBL.y - d };
+  const BBR = { x: FBR.x + d, y: FBR.y - d };
+
+  return [
+    // Front face — solid
+    line(FT.x, FT.y, FBL.x, FBL.y, false, "FT", "FBL"),
+    line(FBL.x, FBL.y, FBR.x, FBR.y, false, "FBL", "FBR"),
+    line(FBR.x, FBR.y, FT.x, FT.y, false, "FBR", "FT"),
+    // Depth edges — top and right solid, bottom-left dashed
+    line(FT.x, FT.y, BT.x, BT.y, false, "FT", "BT"),
+    line(FBR.x, FBR.y, BBR.x, BBR.y, false, "FBR", "BBR"),
+    line(FBL.x, FBL.y, BBL.x, BBL.y, true, "FBL", "BBL"),
+    // Back face — top solid, rest dashed
+    line(BT.x, BT.y, BBR.x, BBR.y, false, "BT", "BBR"),
+    line(BT.x, BT.y, BBL.x, BBL.y, true, "BT", "BBL"),
+    line(BBL.x, BBL.y, BBR.x, BBR.y, true, "BBL", "BBR"),
+  ];
+}
+
+// ─── BIPYRAMID (3D diamond) ───────────────────────────────────────
+// Two square pyramids joined at base. Top apex, bottom apex, 4 base vertices.
+// Same oblique view as pyramid — BL hidden.
+function bipyramidGeom(bbox: BBox): ElementGeom[] {
+  const { x, y, w, h } = bbox;
+
+  const TA = { x: x + w * 0.45, y }; // top apex
+  const BA = { x: x + w * 0.45, y: y + h }; // bottom apex
+  // Base at middle height
+  const FL = { x: x + w * 0.0, y: y + h * 0.5 };
+  const FR = { x: x + w * 0.6, y: y + h * 0.5 };
+  const BR = { x: x + w * 1.0, y: y + h * 0.32 };
+  const BL = { x: x + w * 0.4, y: y + h * 0.32 };
+
+  return [
+    // Base — front+right solid, back+left dashed
+    line(FL.x, FL.y, FR.x, FR.y, false, "FL", "FR"),
+    line(FR.x, FR.y, BR.x, BR.y, false, "FR", "BR"),
+    line(BL.x, BL.y, BR.x, BR.y, true, "BL", "BR"),
+    line(FL.x, FL.y, BL.x, BL.y, true, "FL", "BL"),
+    // Top apex — visible edges solid, hidden dashed
+    line(TA.x, TA.y, FL.x, FL.y, false, "TA", "FL"),
+    line(TA.x, TA.y, FR.x, FR.y, false, "TA", "FR"),
+    line(TA.x, TA.y, BR.x, BR.y, false, "TA", "BR"),
+    line(TA.x, TA.y, BL.x, BL.y, true, "TA", "BL"),
+    // Bottom apex — visible edges solid, hidden dashed
+    line(BA.x, BA.y, FL.x, FL.y, false, "BA", "FL"),
+    line(BA.x, BA.y, FR.x, FR.y, false, "BA", "FR"),
+    line(BA.x, BA.y, BR.x, BR.y, false, "BA", "BR"),
+    line(BA.x, BA.y, BL.x, BL.y, true, "BA", "BL"),
+  ];
+}
+
+// ─── TRUNCATED PYRAMID (frustum) ──────────────────────────────────
+// Square pyramid with top cut off. Same oblique view as pyramid.
+function truncatedPyramidGeom(bbox: BBox): ElementGeom[] {
+  const { x, y, w, h } = bbox;
+
+  // Bottom base (larger)
+  const BFL = { x: x + w * 0.0, y: y + h };
+  const BFR = { x: x + w * 0.6, y: y + h };
+  const BBR = { x: x + w * 1.0, y: y + h * 0.65 };
+  const BBL = { x: x + w * 0.4, y: y + h * 0.65 };
+  // Top base (smaller, inset)
+  const TFL = { x: x + w * 0.15, y: y + h * 0.3 };
+  const TFR = { x: x + w * 0.52, y: y + h * 0.3 };
+  const TBR = { x: x + w * 0.82, y: y + h * 0.08 };
+  const TBL = { x: x + w * 0.45, y: y + h * 0.08 };
+
+  return [
+    // Bottom base — front+right solid, back+left dashed
+    line(BFL.x, BFL.y, BFR.x, BFR.y, false, "BFL", "BFR"),
+    line(BFR.x, BFR.y, BBR.x, BBR.y, false, "BFR", "BBR"),
+    line(BBL.x, BBL.y, BBR.x, BBR.y, true, "BBL", "BBR"),
+    line(BFL.x, BFL.y, BBL.x, BBL.y, true, "BFL", "BBL"),
+    // Top base — front+right solid, back+left dashed
+    line(TFL.x, TFL.y, TFR.x, TFR.y, false, "TFL", "TFR"),
+    line(TFR.x, TFR.y, TBR.x, TBR.y, false, "TFR", "TBR"),
+    line(TBL.x, TBL.y, TBR.x, TBR.y, true, "TBL", "TBR"),
+    line(TFL.x, TFL.y, TBL.x, TBL.y, true, "TFL", "TBL"),
+    // Lateral — front+right solid, back-left dashed
+    line(BFL.x, BFL.y, TFL.x, TFL.y, false, "BFL", "TFL"),
+    line(BFR.x, BFR.y, TFR.x, TFR.y, false, "BFR", "TFR"),
+    line(BBR.x, BBR.y, TBR.x, TBR.y, false, "BBR", "TBR"),
+    line(BBL.x, BBL.y, TBL.x, TBL.y, true, "BBL", "TBL"),
+  ];
+}
+
+// ─── TRUNCATED CONE ───────────────────────────────────────────────
+// Cone with top cut off. Top and bottom ellipses, lateral edges.
+function truncatedConeGeom(bbox: BBox): ElementGeom[] {
+  const { x, y, w, h } = bbox;
+  const eh = Math.min(h * 0.15, w * 0.25);
+
+  // Bottom ellipse (larger)
+  const brx = w / 2;
+  const bry = eh / 2;
+  const bcx = x + brx;
+  const bcy = y + h - bry;
+
+  // Top ellipse (smaller, ~40% of bottom)
+  const topRatio = 0.4;
+  const trx = brx * topRatio;
+  const tryy = bry * topRatio;
+  const tcx = x + w / 2;
+  const tcy = y + eh / 2;
+
+  return [
+    // Top ellipse — solid
+    ellipseGeom(tcx - trx, tcy - tryy, trx * 2, tryy * 2, false),
+    // Bottom front arc (solid)
+    arc(bcx, bcy, brx, bry, 0, Math.PI, false),
+    // Bottom back arc (dashed)
+    arc(bcx, bcy, brx, bry, Math.PI, 2 * Math.PI, true),
+    // Lateral edges — solid
+    line(tcx - trx, tcy, x, bcy, false),
+    line(tcx + trx, tcy, x + w, bcy, false),
+  ];
+}
+
+// ─── OBLIQUE RECTANGULAR PRISM ────────────────────────────────────
+// Like a regular prism but the top face is shifted sideways,
+// creating a slanted appearance.
+function obliqueRectPrismGeom(bbox: BBox): ElementGeom[] {
+  const { x, y, w, h } = bbox;
+  const shift = w * 0.3; // horizontal shift for obliqueness
+  const bw = w * 0.6; // base width
+  const bh = h * 0.45; // base height (front face)
+
+  // Bottom face
+  const BFL = { x, y: y + h - bh };
+  const BFR = { x: x + bw, y: y + h - bh };
+  const BBR = { x: x + bw + shift, y: y + h - bh - bh * 0.4 };
+  const BBL = { x: x + shift, y: y + h - bh - bh * 0.4 };
+
+  // Top face (same shape, shifted up)
+  const TFL = { x: BFL.x, y: BFL.y + bh };
+  const TFR = { x: BFR.x, y: BFR.y + bh };
+  const TBR = { x: BBR.x, y: BBR.y + bh };
+  const TBL = { x: BBL.x, y: BBL.y + bh };
+
+  return [
+    // Front face — solid
+    rect(BFL.x, BFL.y, bw, bh, false, "BFL", "BFR", "TFR", "TFL"),
+    // Top edges — solid
+    line(BFL.x, BFL.y, BBL.x, BBL.y, false, "BFL", "BBL"),
+    line(BFR.x, BFR.y, BBR.x, BBR.y, false, "BFR", "BBR"),
+    line(BBL.x, BBL.y, BBR.x, BBR.y, false, "BBL", "BBR"),
+    // Bottom edges — solid right, dashed hidden
+    line(TFR.x, TFR.y, TBR.x, TBR.y, false, "TFR", "TBR"),
+    line(TBR.x, TBR.y, TBL.x, TBL.y, true, "TBR", "TBL"),
+    line(TFL.x, TFL.y, TBL.x, TBL.y, true, "TFL", "TBL"),
+    // Right side
+    line(BBR.x, BBR.y, TBR.x, TBR.y, false, "BBR", "TBR"),
+  ];
+}
+
+// ─── OBLIQUE TRIANGULAR PRISM ─────────────────────────────────────
+// Triangular prism leaning to one side.
+function obliqueTriPrismGeom(bbox: BBox): ElementGeom[] {
+  const { x, y, w, h } = bbox;
+  const shift = w * 0.3;
+
+  // Front triangle
+  const FT = { x: x + w * 0.25, y };
+  const FBL = { x, y: y + h };
+  const FBR = { x: x + w * 0.5, y: y + h };
+
+  // Back triangle (shifted right and up for oblique effect)
+  const BT = { x: FT.x + shift, y: FT.y - h * 0.15 };
+  const BBL = { x: FBL.x + shift, y: FBL.y - h * 0.15 };
+  const BBR = { x: FBR.x + shift, y: FBR.y - h * 0.15 };
+
+  return [
+    // Front face — solid
+    line(FT.x, FT.y, FBL.x, FBL.y, false, "FT", "FBL"),
+    line(FBL.x, FBL.y, FBR.x, FBR.y, false, "FBL", "FBR"),
+    line(FBR.x, FBR.y, FT.x, FT.y, false, "FBR", "FT"),
+    // Depth edges — top and right solid, bottom-left dashed
+    line(FT.x, FT.y, BT.x, BT.y, false, "FT", "BT"),
+    line(FBR.x, FBR.y, BBR.x, BBR.y, false, "FBR", "BBR"),
+    line(FBL.x, FBL.y, BBL.x, BBL.y, true, "FBL", "BBL"),
+    // Back face — top solid, rest dashed
+    line(BT.x, BT.y, BBR.x, BBR.y, false, "BT", "BBR"),
+    line(BT.x, BT.y, BBL.x, BBL.y, true, "BT", "BBL"),
+    line(BBL.x, BBL.y, BBR.x, BBR.y, true, "BBL", "BBR"),
+  ];
+}
+
 // ─── Public API ────────────────────────────────────────────────────
 
 export function computeSolidGeometry(type: string, bbox: BBox): ElementGeom[] {
@@ -318,6 +543,20 @@ export function computeSolidGeometry(type: string, bbox: BBox): ElementGeom[] {
       return cylinderGeom(bbox);
     case "sphere":
       return sphereGeom(bbox);
+    case "cone":
+      return coneGeom(bbox);
+    case "triangularPrism":
+      return triangularPrismGeom(bbox);
+    case "bipyramid":
+      return bipyramidGeom(bbox);
+    case "truncatedPyramid":
+      return truncatedPyramidGeom(bbox);
+    case "truncatedCone":
+      return truncatedConeGeom(bbox);
+    case "obliqueRectPrism":
+      return obliqueRectPrismGeom(bbox);
+    case "obliqueTriPrism":
+      return obliqueTriPrismGeom(bbox);
     default:
       throw new Error(`Unknown solid preset: ${type}`);
   }

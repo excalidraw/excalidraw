@@ -260,6 +260,8 @@ import {
   maybeHandleArrowPointlikeDrag,
   getUncroppedWidthAndHeight,
   isPolyPresetType,
+  computePolyPoints,
+  getPolyPresetXOffset,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -717,6 +719,9 @@ class App extends React.Component<AppProps, AppState> {
   private solidPresetElements: ExcalidrawElement[] = [];
   private solidPresetGroupId: string | null = null;
   private solidPresetType: string | null = null;
+
+  // 2D poly preset: live preview element during drag
+  private polyPresetPreviewElement: ExcalidrawElement | null = null;
 
   // Wireframe vertex drag state (direct from group selection)
   private wireframeDragVertex: {
@@ -7705,7 +7710,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.y,
       );
     } else if (isPolyPresetType(this.state.activeTool.type)) {
-      this.createPolyPresetOnPointerDown(pointerDownState);
+      // Use same proxy rectangle as 3D presets — blue dashed guide during drag
+      this.createSolidPresetProxyOnPointerDown(pointerDownState);
     } else if (isSolidPresetType(this.state.activeTool.type)) {
       this.createSolidPresetProxyOnPointerDown(pointerDownState);
     } else if (
@@ -9381,6 +9387,52 @@ class App extends React.Component<AppProps, AppState> {
     };
   };
 
+  private updatePolyPresetPreview = (): void => {
+    const proxyEl = this.state.newElement;
+    if (!proxyEl || !isPolyPresetType(this.state.activeTool.type)) {
+      return;
+    }
+    const w = proxyEl.width;
+    const h = proxyEl.height;
+    if (w < 5 || h < 5) {
+      return;
+    }
+
+    const xOffset = getPolyPresetXOffset(this.state.activeTool.type, w);
+    const points = computePolyPoints(this.state.activeTool.type, w, h);
+
+    if (!this.polyPresetPreviewElement) {
+      const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+        x: proxyEl.x,
+        y: proxyEl.y,
+      });
+      const el = newLinearElement({
+        type: "line",
+        x: proxyEl.x + xOffset,
+        y: proxyEl.y,
+        strokeColor: this.state.currentItemStrokeColor,
+        backgroundColor: this.state.currentItemBackgroundColor,
+        fillStyle: this.state.currentItemFillStyle,
+        strokeWidth: this.state.currentItemStrokeWidth,
+        strokeStyle: this.state.currentItemStrokeStyle,
+        roughness: this.state.currentItemRoughness,
+        opacity: this.state.currentItemOpacity,
+        locked: false,
+        frameId: topLayerFrame ? topLayerFrame.id : null,
+        points,
+        polygon: true,
+      });
+      this.polyPresetPreviewElement = el;
+      this.scene.insertElement(el);
+    } else {
+      this.scene.mutateElement(this.polyPresetPreviewElement, {
+        x: proxyEl.x + xOffset,
+        y: proxyEl.y,
+        points,
+      } as any);
+    }
+  };
+
   private updateSolidPresetPreview = (): void => {
     const newElement = this.state.newElement;
     if (!newElement || !this.solidPresetType) {
@@ -10343,8 +10395,10 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.drag.hasOccurred = true;
           }
           this.maybeDragNewGenericElement(pointerDownState, event, false);
-          // Update 3D wireframe preview during drag
-          if (isSolidPresetType(this.state.activeTool.type)) {
+          // Update live preview during drag
+          if (isPolyPresetType(this.state.activeTool.type)) {
+            this.updatePolyPresetPreview();
+          } else if (isSolidPresetType(this.state.activeTool.type)) {
             this.updateSolidPresetPreview();
           }
         }
@@ -10764,24 +10818,40 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      // Polygon presets (rectangle, diamond, triangle): single-drag creation
-      if (isLinearElement(newElement) && isPolyPresetType(activeTool.type)) {
-        const minPoints = activeTool.type === "triangle" ? 4 : 5;
-        if (newElement.points.length >= minPoints) {
-          this.store.scheduleCapture();
-        }
+      // (2D polygon presets now use proxy rectangle — handled above with isSolidPresetType)
+
+      // 2D polygon presets: remove proxy, keep preview polygon element
+      if (
+        newElement &&
+        isPolyPresetType(activeTool.type) &&
+        !isLinearElement(newElement)
+      ) {
+        // Remove proxy rectangle
+        this.scene.replaceAllElements(
+          this.scene
+            .getElementsIncludingDeleted()
+            .filter((el) => el.id !== newElement.id),
+        );
+
+        const previewEl = this.polyPresetPreviewElement;
         if (
           !pointerDownState.drag.hasOccurred ||
-          newElement.points.length < minPoints
+          newElement.width < 5 ||
+          newElement.height < 5 ||
+          !previewEl
         ) {
-          // Too small or no drag — remove
-          this.scene.replaceAllElements(
-            this.scene
-              .getElementsIncludingDeleted()
-              .filter((el) => el.id !== newElement.id),
-          );
+          // Too small — also remove preview element if created
+          if (previewEl) {
+            this.scene.replaceAllElements(
+              this.scene
+                .getElementsIncludingDeleted()
+                .filter((el) => el.id !== previewEl.id),
+            );
+          }
           this.setState({ newElement: null });
         } else {
+          // Keep preview polygon element
+          this.store.scheduleCapture();
           if (!activeTool.locked) {
             resetCursor(this.interactiveCanvas);
             this.setState((prevState) => ({
@@ -10790,22 +10860,19 @@ class App extends React.Component<AppProps, AppState> {
                 type: this.state.preferredSelectionTool.type,
               }),
               selectedElementIds: makeNextSelectedElementIds(
-                {
-                  ...prevState.selectedElementIds,
-                  [newElement.id]: true,
-                },
+                { [previewEl.id]: true },
                 prevState,
-              ),
-              selectedLinearElement: new LinearElementEditor(
-                newElement,
-                this.scene.getNonDeletedElementsMap(),
               ),
             }));
           } else {
             this.setState({ newElement: null });
           }
-          this.scene.triggerUpdate();
         }
+        // Clean up
+        this.polyPresetPreviewElement = null;
+        this.solidPresetType = null;
+        this.solidPresetElements = [];
+        this.solidPresetGroupId = null;
         return;
       }
 

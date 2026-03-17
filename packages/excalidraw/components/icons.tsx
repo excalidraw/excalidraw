@@ -424,6 +424,149 @@ export const SphereIcon = createIcon(
   tablerIconProps,
 );
 
+// ─── 2D polygon presets ───────────────────────────────────────────
+
+export const PentagonIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 3 L22 10.5 L18.5 21 L5.5 21 L2 10.5 Z" />
+  </g>,
+  tablerIconProps,
+);
+
+export const HexagonIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 2 L21.5 7 L21.5 17 L12 22 L2.5 17 L2.5 7 Z" />
+  </g>,
+  tablerIconProps,
+);
+
+export const OctagonIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M8.5 2.5 L15.5 2.5 L21.5 8.5 L21.5 15.5 L15.5 21.5 L8.5 21.5 L2.5 15.5 L2.5 8.5 Z" />
+  </g>,
+  tablerIconProps,
+);
+
+export const SemicircleIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M3 16 A9 9 0 0 1 21 16 Z" />
+  </g>,
+  tablerIconProps,
+);
+
+export const TrapezoidIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 5 L18 5 L22 19 L2 19 Z" />
+  </g>,
+  tablerIconProps,
+);
+
+export const RightTrapezoidIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M3 5 L18 5 L22 19 L3 19 Z" />
+  </g>,
+  tablerIconProps,
+);
+
+export const RightTriangleIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M4 4 L4 20 L20 20 Z" />
+  </g>,
+  tablerIconProps,
+);
+
+// ─── 3D solid presets ─────────────────────────────────────────────
+
+export const ConeIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 3 L3 19 L21 19 Z" />
+    <ellipse cx="12" cy="19" rx="9" ry="2.5" strokeDasharray="3 2" />
+  </g>,
+  tablerIconProps,
+);
+
+export const TriangularPrismIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M8 4 L2 20 L16 20 Z" />
+    <path d="M8 4 L14 2" />
+    <path d="M16 20 L22 18" />
+    <path d="M14 2 L22 18" />
+    <path d="M2 20 L8 18" strokeDasharray="3 2" />
+    <path d="M8 18 L14 2" strokeDasharray="3 2" />
+    <path d="M8 18 L22 18" strokeDasharray="3 2" />
+  </g>,
+  tablerIconProps,
+);
+
+export const BipyramidIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 2 L3 11 L12 22 L21 11 Z" />
+    <path d="M3 11 L21 11" />
+    <path d="M12 2 L12 22" strokeDasharray="3 2" />
+  </g>,
+  tablerIconProps,
+);
+
+export const TruncatedPyramidIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M2 20 L7 6 L17 6 L22 20 Z" />
+    <path d="M7 6 L10 3 L20 3 L17 6" />
+    <path d="M22 20 L20 3" strokeDasharray="0" />
+    <path d="M20 3 L22 20" />
+  </g>,
+  tablerIconProps,
+);
+
+export const TruncatedConeIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 19 L9 5" />
+    <path d="M18 19 L15 5" />
+    <ellipse cx="12" cy="5" rx="3" ry="1.5" />
+    <ellipse cx="12" cy="19" rx="6" ry="2.5" strokeDasharray="3 2" />
+    <path d="M6 19 A6 2.5 0 0 0 18 19" />
+  </g>,
+  tablerIconProps,
+);
+
+export const ObliqueRectPrismIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M3 10 L13 10 L13 21 L3 21 Z" />
+    <path d="M3 10 L10 4 L20 4 L13 10" />
+    <path d="M13 21 L20 15 L20 4" />
+    <path d="M3 21 L10 15" strokeDasharray="3 2" />
+    <path d="M10 15 L20 15" strokeDasharray="3 2" />
+    <path d="M10 4 L10 15" strokeDasharray="3 2" />
+  </g>,
+  tablerIconProps,
+);
+
+export const ObliqueTriPrismIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 4 L2 20 L12 20 Z" />
+    <path d="M6 4 L14 2" />
+    <path d="M12 20 L20 18" />
+    <path d="M14 2 L20 18" />
+    <path d="M2 20 L10 18" strokeDasharray="3 2" />
+    <path d="M10 18 L14 2" strokeDasharray="3 2" />
+    <path d="M10 18 L20 18" strokeDasharray="3 2" />
+  </g>,
+  tablerIconProps,
+);
+
 // tabler-icons: arrow-narrow-right
 export const ArrowIcon = createIcon(
   <g strokeWidth="1.5">

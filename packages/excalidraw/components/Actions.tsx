@@ -82,11 +82,25 @@ import {
   DiamondIcon,
   EllipseIcon,
   TriangleIcon,
+  RightTriangleIcon,
+  PentagonIcon,
+  HexagonIcon,
+  OctagonIcon,
+  SemicircleIcon,
+  TrapezoidIcon,
+  RightTrapezoidIcon,
   PrismIcon,
   PyramidIcon,
   TetrahedronIcon,
   CylinderIcon,
   SphereIcon,
+  ConeIcon,
+  TriangularPrismIcon,
+  BipyramidIcon,
+  TruncatedPyramidIcon,
+  TruncatedConeIcon,
+  ObliqueRectPrismIcon,
+  ObliqueTriPrismIcon,
   ArrowIcon,
   LineIcon,
   pencilIcon,
@@ -1073,6 +1087,7 @@ export const ShapesSwitcher = ({
   ] as const;
 
   const SHAPE_TOOLS = [
+    // ── 2D basic shapes ──
     {
       type: "rectangle",
       icon: RectangleIcon,
@@ -1093,6 +1108,42 @@ export const ShapesSwitcher = ({
       icon: TriangleIcon,
       title: capitalizeString(t("toolBar.triangle")),
     },
+    {
+      type: "rightTriangle",
+      icon: RightTriangleIcon,
+      title: capitalizeString(t("toolBar.rightTriangle")),
+    },
+    {
+      type: "pentagon",
+      icon: PentagonIcon,
+      title: capitalizeString(t("toolBar.pentagon")),
+    },
+    {
+      type: "hexagon",
+      icon: HexagonIcon,
+      title: capitalizeString(t("toolBar.hexagon")),
+    },
+    {
+      type: "octagon",
+      icon: OctagonIcon,
+      title: capitalizeString(t("toolBar.octagon")),
+    },
+    {
+      type: "trapezoid",
+      icon: TrapezoidIcon,
+      title: capitalizeString(t("toolBar.trapezoid")),
+    },
+    {
+      type: "rightTrapezoid",
+      icon: RightTrapezoidIcon,
+      title: capitalizeString(t("toolBar.rightTrapezoid")),
+    },
+    {
+      type: "semicircle",
+      icon: SemicircleIcon,
+      title: capitalizeString(t("toolBar.semicircle")),
+    },
+    // ── 3D solids ──
     { type: "---" as const, icon: null, title: "" },
     {
       type: "prism",
@@ -1118,6 +1169,41 @@ export const ShapesSwitcher = ({
       type: "sphere",
       icon: SphereIcon,
       title: capitalizeString(t("toolBar.sphere")),
+    },
+    {
+      type: "cone",
+      icon: ConeIcon,
+      title: capitalizeString(t("toolBar.cone")),
+    },
+    {
+      type: "triangularPrism",
+      icon: TriangularPrismIcon,
+      title: capitalizeString(t("toolBar.triangularPrism")),
+    },
+    {
+      type: "bipyramid",
+      icon: BipyramidIcon,
+      title: capitalizeString(t("toolBar.bipyramid")),
+    },
+    {
+      type: "truncatedPyramid",
+      icon: TruncatedPyramidIcon,
+      title: capitalizeString(t("toolBar.truncatedPyramid")),
+    },
+    {
+      type: "truncatedCone",
+      icon: TruncatedConeIcon,
+      title: capitalizeString(t("toolBar.truncatedCone")),
+    },
+    {
+      type: "obliqueRectPrism",
+      icon: ObliqueRectPrismIcon,
+      title: capitalizeString(t("toolBar.obliqueRectPrism")),
+    },
+    {
+      type: "obliqueTriPrism",
+      icon: ObliqueTriPrismIcon,
+      title: capitalizeString(t("toolBar.obliqueTriPrism")),
     },
   ] as const;
 

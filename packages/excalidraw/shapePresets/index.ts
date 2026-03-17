@@ -22,6 +22,13 @@ export const SOLID_PRESET_TYPES = new Set([
   "tetrahedron",
   "cylinder",
   "sphere",
+  "cone",
+  "triangularPrism",
+  "bipyramid",
+  "truncatedPyramid",
+  "truncatedCone",
+  "obliqueRectPrism",
+  "obliqueTriPrism",
 ]);
 
 export const isSolidPresetType = (type: string): boolean =>
