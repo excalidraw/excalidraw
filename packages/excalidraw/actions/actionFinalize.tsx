@@ -17,6 +17,7 @@ import {
 import {
   KEYS,
   arrayToMap,
+  getGridPoint,
   invariant,
   shouldRotateWithDiscreteAngle,
   updateActiveTool,
@@ -27,7 +28,7 @@ import { isInvisiblySmallElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
+import type { LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -93,32 +94,56 @@ export const actionFinalize = register<FormData>({
             ? [element.points.length - 1] // New arrow creation
             : appState.selectedLinearElement.selectedPointsIndices;
 
+        const angleLocked = shouldRotateWithDiscreteAngle(event);
+        const effectiveGridSize = event[KEYS.CTRL_OR_CMD]
+          ? null
+          : app.getEffectiveGridSize();
+
         const draggedPoints: PointsPositionUpdates =
           selectedPointsIndices.reduce((map, index) => {
             map.set(index, {
-              point: LinearElementEditor.pointFromAbsoluteCoords(
-                element,
-                pointFrom<GlobalPoint>(
-                  sceneCoords.x - linearElementEditor.pointerOffset.x,
-                  sceneCoords.y - linearElementEditor.pointerOffset.y,
-                ),
-                elementsMap,
-              ),
+              point: angleLocked
+                ? element.points[index]
+                : LinearElementEditor.createPointAt(
+                    element,
+                    elementsMap,
+                    sceneCoords.x - linearElementEditor.pointerOffset.x,
+                    sceneCoords.y - linearElementEditor.pointerOffset.y,
+                    effectiveGridSize,
+                  ),
             });
 
             return map;
           }, new Map()) ?? new Map();
+
+        const startIsDragged = selectedPointsIndices.includes(0);
+        const lockedGlobal = angleLocked
+          ? LinearElementEditor.getPointAtIndexGlobalCoordinates(
+              element,
+              startIsDragged ? 0 : -1,
+              elementsMap,
+            )
+          : null;
+        const [gridSnappedX, gridSnappedY] = getGridPoint(
+          sceneCoords.x - linearElementEditor.pointerOffset.x,
+          sceneCoords.y - linearElementEditor.pointerOffset.y,
+          effectiveGridSize,
+        );
+        const bindingSceneX = lockedGlobal ? lockedGlobal[0] : gridSnappedX;
+        const bindingSceneY = lockedGlobal ? lockedGlobal[1] : gridSnappedY;
+
         bindOrUnbindBindingElement(
           element,
           draggedPoints,
-          sceneCoords.x - linearElementEditor.pointerOffset.x,
-          sceneCoords.y - linearElementEditor.pointerOffset.y,
+          bindingSceneX,
+          bindingSceneY,
           scene,
           appState,
           {
             newArrow,
             altKey: event.altKey,
-            angleLocked: shouldRotateWithDiscreteAngle(event),
+            angleLocked,
+            gridSize: effectiveGridSize,
           },
         );
       } else if (isLineElement(element)) {

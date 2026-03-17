@@ -344,6 +344,9 @@ export class LinearElementEditor {
 
     // Apply the point movement if needed
     let suggestedBinding: AppState["suggestedBinding"] = null;
+    const effectiveGridSize = event[KEYS.CTRL_OR_CMD]
+      ? null
+      : app.getEffectiveGridSize();
     const { positions, updates } = pointDraggingUpdates(
       [idx],
       deltaX,
@@ -357,8 +360,10 @@ export class LinearElementEditor {
       shouldRotateWithDiscreteAngle(event),
       event.altKey,
       linearElementEditor,
+      effectiveGridSize,
     );
 
+    const angleLocked = shouldRotateWithDiscreteAngle(event);
     LinearElementEditor.movePoints(
       element,
       app.scene,
@@ -370,7 +375,10 @@ export class LinearElementEditor {
       },
       {
         isBindingEnabled: app.state.isBindingEnabled,
-        isMidpointSnappingEnabled: app.state.isMidpointSnappingEnabled,
+        isMidpointSnappingEnabled:
+          app.state.isMidpointSnappingEnabled &&
+          !angleLocked &&
+          !app.state.gridModeEnabled,
       },
     );
     // Set the suggested binding from the updates if available
@@ -427,7 +435,9 @@ export class LinearElementEditor {
                 "start",
                 elementsMap,
                 app.state.zoom,
-                app.state.isMidpointSnappingEnabled,
+                app.state.isMidpointSnappingEnabled &&
+                  !angleLocked &&
+                  !app.state.gridModeEnabled,
               )
             : linearElementEditor.initialState.altFocusPoint,
       },
@@ -533,6 +543,9 @@ export class LinearElementEditor {
 
     // Apply the point movement if needed
     let suggestedBinding: AppState["suggestedBinding"] = null;
+    const effectiveGridSize = event[KEYS.CTRL_OR_CMD]
+      ? null
+      : app.getEffectiveGridSize();
     const { positions, updates } = pointDraggingUpdates(
       selectedPointsIndices,
       deltaX,
@@ -546,8 +559,11 @@ export class LinearElementEditor {
       shouldRotateWithDiscreteAngle(event) && singlePointDragged,
       event.altKey,
       linearElementEditor,
+      effectiveGridSize,
     );
 
+    const angleLocked =
+      shouldRotateWithDiscreteAngle(event) && singlePointDragged;
     LinearElementEditor.movePoints(
       element,
       app.scene,
@@ -559,7 +575,10 @@ export class LinearElementEditor {
       },
       {
         isBindingEnabled: app.state.isBindingEnabled,
-        isMidpointSnappingEnabled: app.state.isMidpointSnappingEnabled,
+        isMidpointSnappingEnabled:
+          app.state.isMidpointSnappingEnabled &&
+          !angleLocked &&
+          !app.state.gridModeEnabled,
       },
     );
 
@@ -655,7 +674,9 @@ export class LinearElementEditor {
                 "start",
                 elementsMap,
                 app.state.zoom,
-                app.state.isMidpointSnappingEnabled,
+                app.state.isMidpointSnappingEnabled &&
+                  !angleLocked &&
+                  !app.state.gridModeEnabled,
               )
             : linearElementEditor.initialState.altFocusPoint,
       },
@@ -2116,6 +2137,7 @@ const pointDraggingUpdates = (
   angleLocked: boolean,
   altKey: boolean,
   linearElementEditor: LinearElementEditor,
+  gridSize?: NullableGridSize,
 ): {
   positions: PointsPositionUpdates;
   updates?: PointMoveOtherUpdates;
@@ -2214,6 +2236,8 @@ const pointDraggingUpdates = (
             element.startBinding,
             startBindable,
             elementsMap,
+            undefined,
+            gridSize,
           ) ?? null;
         if (startPoint) {
           positions.set(0, { point: startPoint, isDragging: true });
@@ -2233,6 +2257,8 @@ const pointDraggingUpdates = (
             element.endBinding,
             endBindable,
             elementsMap,
+            undefined,
+            gridSize,
           ) ?? null;
         if (endPoint) {
           positions.set(element.points.length - 1, {
@@ -2406,6 +2432,7 @@ const pointDraggingUpdates = (
         endBindable,
         elementsMap,
         endIsDragged,
+        endIsDragged ? gridSize : null,
       ) || nextArrow.points[nextArrow.points.length - 1]
     : nextArrow.points[nextArrow.points.length - 1];
 
@@ -2437,6 +2464,7 @@ const pointDraggingUpdates = (
           startBindable,
           elementsMap,
           startIsDragged,
+          startIsDragged ? gridSize : null,
         ) || nextArrow.points[0]
       : nextArrow.points[0];
 
