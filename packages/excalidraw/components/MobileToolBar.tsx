@@ -524,7 +524,7 @@ export const MobileToolBar = ({
           onClickOutside={() => setIsOtherShapesMenuOpen(false)}
           onSelect={() => setIsOtherShapesMenuOpen(false)}
           className="App-toolbar__extra-tools-dropdown"
-          align="start"
+          align="end"
         >
           {!showTextToolOutside && (
             <DropdownMenu.Item
