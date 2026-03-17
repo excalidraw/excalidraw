@@ -50,7 +50,22 @@ export interface EllipseGeom {
   dashed: boolean;
 }
 
-export type ElementGeom = LineGeom | EllipseGeom;
+export interface ArcGeom {
+  kind: "arc";
+  /** Element x (left edge of visible arc bbox) */
+  x: number;
+  /** Element y (top edge of visible arc bbox) */
+  y: number;
+  /** Visible arc width */
+  width: number;
+  /** Visible arc height */
+  height: number;
+  startAngle: number;
+  endAngle: number;
+  dashed: boolean;
+}
+
+export type ElementGeom = LineGeom | EllipseGeom | ArcGeom;
 
 // ─── Geometry primitives (pure functions) ──────────────────────────
 
@@ -132,11 +147,15 @@ function rect(
 }
 
 /**
- * Generate arc polyline. Uniform angle spacing with enough segments
- * for a smooth curve. Dashed rendering handled by core fix in shape.ts
- * (continuous path without moveTo between segments).
+ * Generate arc geometry using core ellipse arc support (smooth curve).
+ * The element bbox covers the visible arc area. shape.ts renders via
+ * rough.js generator.path() with SVG arc command.
+ *
+ * cx, cy: center of the full ellipse
+ * rx, ry: semi-axes of the full ellipse
+ * startAngle, endAngle: arc extent in radians
  */
-function arc(
+function arcGeom(
   cx: number,
   cy: number,
   rx: number,
@@ -144,24 +163,43 @@ function arc(
   startAngle: number,
   endAngle: number,
   dashed: boolean,
-  segments = 32,
-): LineGeom {
-  const pts: { x: number; y: number }[] = [];
-  for (let i = 0; i <= segments; i++) {
-    const t = startAngle + (endAngle - startAngle) * (i / segments);
-    pts.push({ x: cx + rx * Math.cos(t), y: cy + ry * Math.sin(t) });
+): ArcGeom {
+  // Compute visible bbox from arc endpoints + axis crossings
+  const pts: [number, number][] = [
+    [cx + rx * Math.cos(startAngle), cy + ry * Math.sin(startAngle)],
+    [cx + rx * Math.cos(endAngle), cy + ry * Math.sin(endAngle)],
+  ];
+  const norm = (a: number) =>
+    ((a % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+  const s0 = norm(startAngle);
+  const e0 = norm(endAngle);
+  for (const axAng of [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2]) {
+    const na = norm(axAng);
+    const inArc = s0 < e0 ? na >= s0 && na <= e0 : na >= s0 || na <= e0;
+    if (inArc) {
+      pts.push([cx + rx * Math.cos(axAng), cy + ry * Math.sin(axAng)]);
+    }
   }
-  const x0 = pts[0].x;
-  const y0 = pts[0].y;
-  const points = pts.map((p) => pointFrom<LocalPoint>(p.x - x0, p.y - y0));
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const [px, py] of pts) {
+    minX = Math.min(minX, px);
+    minY = Math.min(minY, py);
+    maxX = Math.max(maxX, px);
+    maxY = Math.max(maxY, py);
+  }
 
   return {
-    kind: "line",
-    x: x0,
-    y: y0,
-    points,
+    kind: "arc",
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+    startAngle,
+    endAngle,
     dashed,
-    polygon: false,
   };
 }
 
@@ -272,9 +310,9 @@ function cylinderGeom(bbox: BBox): ElementGeom[] {
     // Top ellipse — solid
     ellipseGeom(x, y, w, eh, false),
     // Bottom front arc (solid): 0 → π (right → bottom → left)
-    arc(bcx, bcy, rx, ry, 0, Math.PI, false),
+    arcGeom(bcx, bcy, rx, ry, 0, Math.PI, false),
     // Bottom back arc (dashed): π → 2π (left → top → right)
-    arc(bcx, bcy, rx, ry, Math.PI, 2 * Math.PI, true),
+    arcGeom(bcx, bcy, rx, ry, Math.PI, 2 * Math.PI, true),
     // Side lines — solid
     line(x, tcy, x, bcy, false),
     line(x + w, tcy, x + w, bcy, false),
@@ -285,22 +323,19 @@ function cylinderGeom(bbox: BBox): ElementGeom[] {
 // Outer circle solid. Equator: front arc solid, back arc dashed.
 function sphereGeom(bbox: BBox): ElementGeom[] {
   const { x, y, w, h } = bbox;
-  const size = Math.min(w, h);
-  const sx = x + (w - size) / 2;
-  const sy = y + (h - size) / 2;
-
-  const r = size / 2;
-  const cx = sx + r;
-  const cy = sy + r;
-  const mry = size * 0.15; // meridian semi-minor axis (vertical)
+  const rx = w / 2;
+  const ry = h / 2;
+  const cx = x + rx;
+  const cy = y + ry;
+  const mry = h * 0.15; // equator semi-minor axis
 
   return [
-    // Main circle — solid
-    ellipseGeom(sx, sy, size, size, false),
+    // Main ellipse — solid (ellipsoid when w ≠ h)
+    ellipseGeom(x, y, w, h, false),
     // Equator front arc (solid): 0 → π (right → bottom → left)
-    arc(cx, cy, r, mry, 0, Math.PI, false),
+    arcGeom(cx, cy, rx, mry, 0, Math.PI, false),
     // Equator back arc (dashed): π → 2π (left → top → right)
-    arc(cx, cy, r, mry, Math.PI, 2 * Math.PI, true),
+    arcGeom(cx, cy, rx, mry, Math.PI, 2 * Math.PI, true),
   ];
 }
 
@@ -318,9 +353,9 @@ function coneGeom(bbox: BBox): ElementGeom[] {
 
   return [
     // Base front arc (solid)
-    arc(bcx, bcy, rx, ry, 0, Math.PI, false),
+    arcGeom(bcx, bcy, rx, ry, 0, Math.PI, false),
     // Base back arc (dashed)
-    arc(bcx, bcy, rx, ry, Math.PI, 2 * Math.PI, true),
+    arcGeom(bcx, bcy, rx, ry, Math.PI, 2 * Math.PI, true),
     // Lateral edges — solid
     line(apex.x, apex.y, x, bcy, false),
     line(apex.x, apex.y, x + w, bcy, false),
@@ -451,9 +486,9 @@ function truncatedConeGeom(bbox: BBox): ElementGeom[] {
     // Top ellipse — solid
     ellipseGeom(tcx - trx, tcy - tryy, trx * 2, tryy * 2, false),
     // Bottom front arc (solid)
-    arc(bcx, bcy, brx, bry, 0, Math.PI, false),
+    arcGeom(bcx, bcy, brx, bry, 0, Math.PI, false),
     // Bottom back arc (dashed)
-    arc(bcx, bcy, brx, bry, Math.PI, 2 * Math.PI, true),
+    arcGeom(bcx, bcy, brx, bry, Math.PI, 2 * Math.PI, true),
     // Lateral edges — solid
     line(tcx - trx, tcy, x, bcy, false),
     line(tcx + trx, tcy, x + w, bcy, false),
@@ -596,6 +631,28 @@ function createElementFromGeom(
       return newElementWith(el, { sharedVertices } as any);
     }
     return el;
+  }
+  if (geom.kind === "arc") {
+    const el = newElement({
+      type: "ellipse",
+      x: geom.x,
+      y: geom.y,
+      width: geom.width,
+      height: geom.height,
+      strokeColor: styles.strokeColor,
+      backgroundColor: "transparent",
+      fillStyle: styles.fillStyle,
+      strokeWidth: styles.strokeWidth,
+      strokeStyle: geom.dashed ? "dashed" : "solid",
+      roughness: geom.dashed ? 0 : styles.roughness,
+      opacity: styles.opacity,
+      locked: false,
+      frameId: styles.frameId,
+    });
+    return newElementWith(el, {
+      startAngle: geom.startAngle,
+      endAngle: geom.endAngle,
+    } as any);
   }
   return newElement({
     type: "ellipse",

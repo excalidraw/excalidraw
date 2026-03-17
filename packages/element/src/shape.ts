@@ -72,6 +72,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ElementsMap,
   ExcalidrawLineElement,
+  ExcalidrawEllipseElement,
   Arrowhead,
 } from "./types";
 
@@ -901,13 +902,80 @@ const _generateElementShape = (
       return shape;
     }
     case "ellipse": {
-      const shape: ElementShapes[typeof element.type] = generator.ellipse(
-        element.width / 2,
-        element.height / 2,
-        element.width,
-        element.height,
-        generateRoughOptions(element, false, isDarkMode),
-      );
+      const ellipseEl = element as ExcalidrawEllipseElement;
+      let shape: ElementShapes[typeof element.type];
+
+      if (
+        ellipseEl.startAngle !== undefined &&
+        ellipseEl.endAngle !== undefined
+      ) {
+        // Compute SVG path for the arc within element bbox.
+        // The element bbox is the visible area; we reconstruct the full
+        // ellipse center and radii from the arc angles.
+        //
+        // For a semicircle (π→2π): element height = ry, center at bottom.
+        // For a front arc (0→π): element height = ry, center at top.
+        // General: compute start/end points, derive SVG arc path.
+        const sa = ellipseEl.startAngle;
+        const ea = ellipseEl.endAngle;
+        const sx = Math.cos(sa);
+        const sy = Math.sin(sa);
+        const ex = Math.cos(ea);
+        const ey = Math.sin(ea);
+
+        // The arc bbox was computed from endpoints + axis crossings.
+        // We need to find rx, ry, and center relative to element.
+        // Strategy: the arc spans from startAngle to endAngle on an ellipse.
+        // Sample all points to find the full ellipse extents, then compute.
+        const n = 64;
+        let minPx = Infinity;
+        let maxPx = -Infinity;
+        let minPy = Infinity;
+        let maxPy = -Infinity;
+        for (let i = 0; i <= n; i++) {
+          const t = sa + (ea - sa) * (i / n);
+          const px = Math.cos(t);
+          const py = Math.sin(t);
+          minPx = Math.min(minPx, px);
+          maxPx = Math.max(maxPx, px);
+          minPy = Math.min(minPy, py);
+          maxPy = Math.max(maxPy, py);
+        }
+        // Element width maps to (maxPx - minPx) * rx
+        // Element height maps to (maxPy - minPy) * ry
+        const rx = element.width / (maxPx - minPx);
+        const ry = element.height / (maxPy - minPy);
+        // Center in element coords
+        const arcCx = -minPx * rx;
+        const arcCy = -minPy * ry;
+
+        // Start and end in element coords
+        const startX = arcCx + rx * sx;
+        const startY = arcCy + ry * sy;
+        const endX = arcCx + rx * ex;
+        const endY = arcCy + ry * ey;
+
+        // SVG arc: large-arc-flag=0 for <180°, 1 for >=180°
+        const angleDiff =
+          (((ea - sa) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+        const largeArc = angleDiff > Math.PI ? 1 : 0;
+        // sweep-flag=1 for clockwise (positive angle direction in screen coords)
+        const sweep = 1;
+
+        const pathStr = `M ${startX} ${startY} A ${rx} ${ry} 0 ${largeArc} ${sweep} ${endX} ${endY}`;
+        shape = generator.path(
+          pathStr,
+          generateRoughOptions(element, false, isDarkMode),
+        );
+      } else {
+        shape = generator.ellipse(
+          element.width / 2,
+          element.height / 2,
+          element.width,
+          element.height,
+          generateRoughOptions(element, false, isDarkMode),
+        );
+      }
       return shape;
     }
     case "line":

@@ -9398,38 +9398,75 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const xOffset = getPolyPresetXOffset(this.state.activeTool.type, w);
-    const points = computePolyPoints(this.state.activeTool.type, w, h);
+    const isSemicircle = this.state.activeTool.type === "semicircle";
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+      x: proxyEl.x,
+      y: proxyEl.y,
+    });
 
-    if (!this.polyPresetPreviewElement) {
-      const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
-        x: proxyEl.x,
-        y: proxyEl.y,
-      });
-      const el = newLinearElement({
-        type: "line",
-        x: proxyEl.x + xOffset,
-        y: proxyEl.y,
-        strokeColor: this.state.currentItemStrokeColor,
-        backgroundColor: this.state.currentItemBackgroundColor,
-        fillStyle: this.state.currentItemFillStyle,
-        strokeWidth: this.state.currentItemStrokeWidth,
-        strokeStyle: this.state.currentItemStrokeStyle,
-        roughness: this.state.currentItemRoughness,
-        opacity: this.state.currentItemOpacity,
-        locked: false,
-        frameId: topLayerFrame ? topLayerFrame.id : null,
-        points,
-        polygon: true,
-      });
-      this.polyPresetPreviewElement = el;
-      this.scene.insertElement(el);
+    if (isSemicircle) {
+      // Semicircle: use ellipse arc element (smooth curve)
+      if (!this.polyPresetPreviewElement) {
+        const el = newElement({
+          type: "ellipse",
+          x: proxyEl.x,
+          y: proxyEl.y,
+          width: w,
+          height: h, // element dimensions = visible semicircle area
+          strokeColor: this.state.currentItemStrokeColor,
+          backgroundColor: this.state.currentItemBackgroundColor,
+          fillStyle: this.state.currentItemFillStyle,
+          strokeWidth: this.state.currentItemStrokeWidth,
+          strokeStyle: this.state.currentItemStrokeStyle,
+          roughness: this.state.currentItemRoughness,
+          opacity: this.state.currentItemOpacity,
+          locked: false,
+          frameId: topLayerFrame ? topLayerFrame.id : null,
+        });
+        // Set arc angles: π → 2π = top semicircle in screen coords
+        (el as any).startAngle = Math.PI;
+        (el as any).endAngle = 2 * Math.PI;
+        this.polyPresetPreviewElement = el;
+        this.scene.insertElement(el);
+      } else {
+        this.scene.mutateElement(this.polyPresetPreviewElement, {
+          x: proxyEl.x,
+          y: proxyEl.y,
+          width: w,
+          height: h,
+        } as any);
+      }
     } else {
-      this.scene.mutateElement(this.polyPresetPreviewElement, {
-        x: proxyEl.x + xOffset,
-        y: proxyEl.y,
-        points,
-      } as any);
+      // Standard polygon preset
+      const xOffset = getPolyPresetXOffset(this.state.activeTool.type, w);
+      const points = computePolyPoints(this.state.activeTool.type, w, h);
+
+      if (!this.polyPresetPreviewElement) {
+        const el = newLinearElement({
+          type: "line",
+          x: proxyEl.x + xOffset,
+          y: proxyEl.y,
+          strokeColor: this.state.currentItemStrokeColor,
+          backgroundColor: this.state.currentItemBackgroundColor,
+          fillStyle: this.state.currentItemFillStyle,
+          strokeWidth: this.state.currentItemStrokeWidth,
+          strokeStyle: this.state.currentItemStrokeStyle,
+          roughness: this.state.currentItemRoughness,
+          opacity: this.state.currentItemOpacity,
+          locked: false,
+          frameId: topLayerFrame ? topLayerFrame.id : null,
+          points,
+          polygon: true,
+        });
+        this.polyPresetPreviewElement = el;
+        this.scene.insertElement(el);
+      } else {
+        this.scene.mutateElement(this.polyPresetPreviewElement, {
+          x: proxyEl.x + xOffset,
+          y: proxyEl.y,
+          points,
+        } as any);
+      }
     }
   };
 
@@ -9474,6 +9511,15 @@ class App extends React.Component<AppProps, AppState> {
             x: geom.x,
             y: geom.y,
             points: geom.points,
+          } as any);
+        } else if (geom.kind === "arc") {
+          this.scene.mutateElement(el, {
+            x: geom.x,
+            y: geom.y,
+            width: geom.width,
+            height: geom.height,
+            startAngle: geom.startAngle,
+            endAngle: geom.endAngle,
           } as any);
         } else {
           this.scene.mutateElement(el, {

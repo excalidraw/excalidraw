@@ -204,13 +204,23 @@ export class ElementBounds {
       const maxY = Math.max(y11, y12, y22, y21);
       bounds = [minX, minY, maxX, maxY];
     } else if (element.type === "ellipse") {
-      const w = (x2 - x1) / 2;
-      const h = (y2 - y1) / 2;
-      const cos = Math.cos(element.angle);
-      const sin = Math.sin(element.angle);
-      const ww = Math.hypot(w * cos, h * sin);
-      const hh = Math.hypot(h * cos, w * sin);
-      bounds = [cx - ww, cy - hh, cx + ww, cy + hh];
+      const ellipseEl = element as ExcalidrawEllipseElement;
+      if (
+        ellipseEl.startAngle !== undefined &&
+        ellipseEl.endAngle !== undefined
+      ) {
+        // For arc elements, just use the element's own bbox.
+        // The element dimensions already represent the visible area.
+        bounds = [x1, y1, x2, y2];
+      } else {
+        const w = (x2 - x1) / 2;
+        const h = (y2 - y1) / 2;
+        const cos = Math.cos(element.angle);
+        const sin = Math.sin(element.angle);
+        const ww = Math.hypot(w * cos, h * sin);
+        const hh = Math.hypot(h * cos, w * sin);
+        bounds = [cx - ww, cy - hh, cx + ww, cy + hh];
+      }
     } else {
       const [x11, y11] = pointRotateRads(
         pointFrom(x1, y1),
@@ -478,21 +488,34 @@ const getSegmentsOnCurve = (
 const getSegmentsOnEllipse = (
   ellipse: ExcalidrawEllipseElement,
 ): LineSegment<GlobalPoint>[] => {
-  const center = pointFrom<GlobalPoint>(
-    ellipse.x + ellipse.width / 2,
-    ellipse.y + ellipse.height / 2,
-  );
+  const isArc =
+    ellipse.startAngle !== undefined && ellipse.endAngle !== undefined;
+
+  // For arcs: full ellipse center is at bottom of element,
+  // semi-axes are width/2 and height (not height/2).
+  const center = isArc
+    ? pointFrom<GlobalPoint>(
+        ellipse.x + ellipse.width / 2,
+        ellipse.y + ellipse.height,
+      )
+    : pointFrom<GlobalPoint>(
+        ellipse.x + ellipse.width / 2,
+        ellipse.y + ellipse.height / 2,
+      );
 
   const a = ellipse.width / 2;
-  const b = ellipse.height / 2;
+  const b = isArc ? ellipse.height : ellipse.height / 2;
+
+  const startAngle = ellipse.startAngle ?? 0;
+  const endAngle = ellipse.endAngle ?? Math.PI * 2;
 
   const segments: LineSegment<GlobalPoint>[] = [];
   const points: GlobalPoint[] = [];
   const n = 90;
-  const deltaT = (Math.PI * 2) / n;
+  const deltaT = (endAngle - startAngle) / n;
 
-  for (let i = 0; i < n; i++) {
-    const t = i * deltaT;
+  for (let i = 0; i <= n; i++) {
+    const t = startAngle + i * deltaT;
     const x = center[0] + a * Math.cos(t);
     const y = center[1] + b * Math.sin(t);
     points.push(pointRotateRads(pointFrom(x, y), center, ellipse.angle));
@@ -502,7 +525,9 @@ const getSegmentsOnEllipse = (
     segments.push(lineSegment(points[i], points[i + 1]));
   }
 
+  // Close: chord for arc, wrap-around for full ellipse
   segments.push(lineSegment(points[points.length - 1], points[0]));
+
   return segments;
 };
 

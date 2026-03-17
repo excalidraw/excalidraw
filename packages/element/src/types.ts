@@ -95,6 +95,10 @@ export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
 
 export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
   type: "ellipse";
+  /** Arc start angle in radians. When undefined, renders full ellipse. */
+  startAngle?: number;
+  /** Arc end angle in radians. */
+  endAngle?: number;
 };
 
 export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &

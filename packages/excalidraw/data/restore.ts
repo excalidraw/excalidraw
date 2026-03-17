@@ -541,6 +541,10 @@ export const restoreElement = (
 
     // generic elements
     case "ellipse":
+      return restoreElementWithProperties(element, {
+        startAngle: (element as any).startAngle,
+        endAngle: (element as any).endAngle,
+      });
     case "rectangle":
     case "diamond":
     case "iframe":
