@@ -382,10 +382,10 @@ function triangularPrismGeom(bbox: BBox): ElementGeom[] {
   const BB = { x: x + w, y: y + h - d }; // back vertex at right
 
   return [
-    // Top base — front edge solid, back edges: right solid, left dashed
+    // Top base — all edges solid (visible from above in oblique view)
     line(TL.x, TL.y, TR.x, TR.y, false, "TL", "TR"),
     line(TR.x, TR.y, TB.x, TB.y, false, "TR", "TB"),
-    line(TL.x, TL.y, TB.x, TB.y, true, "TL", "TB"),
+    line(TL.x, TL.y, TB.x, TB.y, false, "TL", "TB"),
     // Bottom base — front edge solid, back edges dashed
     line(BL.x, BL.y, BR.x, BR.y, false, "BL", "BR"),
     line(BR.x, BR.y, BB.x, BB.y, false, "BR", "BB"),
