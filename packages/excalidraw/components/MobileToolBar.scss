@@ -52,11 +52,9 @@
 
   .mobile-toolbar .App-toolbar__extra-tools-dropdown {
     min-width: 160px;
-    max-height: 60vh;
+    max-height: 50vh;
     overflow-y: auto;
     z-index: var(--zIndex-layerUI);
-    right: 0;
-    left: auto;
   }
 
   .mobile-toolbar-separator {

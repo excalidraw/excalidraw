@@ -20,6 +20,7 @@ const MenuContent = ({
   onSelect,
   open = true,
   align = "end",
+  side,
   style,
 }: {
   children?: React.ReactNode;
@@ -32,6 +33,7 @@ const MenuContent = ({
   open?: boolean;
   style?: React.CSSProperties;
   align?: "start" | "center" | "end";
+  side?: "top" | "bottom" | "left" | "right";
 }) => {
   const editorInterface = useEditorInterface();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -90,6 +92,7 @@ const MenuContent = ({
         style={style}
         data-testid="dropdown-menu"
         align={align}
+        side={side}
         sideOffset={8}
         onCloseAutoFocus={(event: Event) => event.preventDefault()}
       >
