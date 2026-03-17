@@ -220,7 +220,7 @@ export const MobileToolBar = ({
   >("rectangle");
   const [lastActiveLinearElement, setLastActiveLinearElement] = useState<
     "arrow" | "line"
-  >("arrow");
+  >("line");
 
   // keep lastActiveGenericShape in sync with active tool if user switches via other UI
   useEffect(() => {

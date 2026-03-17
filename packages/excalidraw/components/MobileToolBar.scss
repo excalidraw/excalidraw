@@ -52,6 +52,8 @@
 
   .mobile-toolbar .App-toolbar__extra-tools-dropdown {
     min-width: 160px;
+    max-height: 60vh;
+    overflow-y: auto;
     z-index: var(--zIndex-layerUI);
   }
 

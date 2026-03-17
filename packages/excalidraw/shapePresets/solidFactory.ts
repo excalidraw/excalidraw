@@ -390,10 +390,10 @@ function triangularPrismGeom(bbox: BBox): ElementGeom[] {
     line(BL.x, BL.y, BR.x, BR.y, false, "BL", "BR"),
     line(BR.x, BR.y, BB.x, BB.y, false, "BR", "BB"),
     line(BL.x, BL.y, BB.x, BB.y, true, "BL", "BB"),
-    // Lateral edges — front two solid, back dashed
+    // Lateral edges — all solid (right edge visible in oblique view)
     line(TL.x, TL.y, BL.x, BL.y, false, "TL", "BL"),
     line(TR.x, TR.y, BR.x, BR.y, false, "TR", "BR"),
-    line(TB.x, TB.y, BB.x, BB.y, true, "TB", "BB"),
+    line(TB.x, TB.y, BB.x, BB.y, false, "TB", "BB"),
   ];
 }
 
