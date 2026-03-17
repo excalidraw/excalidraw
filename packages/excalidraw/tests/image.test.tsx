@@ -1,4 +1,6 @@
 import { EXPORT_DATA_TYPES, randomId, reseed } from "@excalidraw/common";
+import tEXt from "png-chunk-text";
+import encodePng from "png-chunks-encode";
 import decodePng from "png-chunks-extract";
 
 import type { FileId } from "@excalidraw/element/types";
@@ -20,6 +22,49 @@ import {
 import { INITIALIZED_IMAGE_PROPS } from "./helpers/constants";
 
 const { h } = window;
+
+const createITXtChunk = (keyword: string, text: string) => {
+  const keywordBytes = new TextEncoder().encode(keyword);
+  const textBytes = new TextEncoder().encode(text);
+  const data = new Uint8Array(
+    keywordBytes.length + 1 + 1 + 1 + 1 + 1 + textBytes.length,
+  );
+
+  let offset = 0;
+  data.set(keywordBytes, offset);
+  offset += keywordBytes.length;
+  data[offset++] = 0;
+  data[offset++] = 0;
+  data[offset++] = 0;
+  data[offset++] = 0;
+  data[offset++] = 0;
+  data.set(textBytes, offset);
+
+  return { name: "iTXt" as const, data };
+};
+
+const insertChunkBeforeFirst = async ({
+  blob,
+  chunk,
+  targetChunkName,
+}: {
+  blob: Blob;
+  chunk: { name: string; data: Uint8Array };
+  targetChunkName: string;
+}) => {
+  const chunks = decodePng(
+    new Uint8Array(await blobModule.blobToArrayBuffer(blob)),
+  );
+  const targetIndex = chunks.findIndex(
+    (existingChunk) => existingChunk.name === targetChunkName,
+  );
+
+  expect(targetIndex).toBeGreaterThan(-1);
+
+  chunks.splice(targetIndex, 0, chunk);
+
+  return new Blob([encodePng(chunks)], { type: "image/png" });
+};
 
 export const setupImageTest = async (
   sizes: { width: number; height: number }[],
@@ -154,6 +199,43 @@ describe("png metadata", () => {
   it("keeps legacy tEXt decoding support", async () => {
     const legacyBlob = await API.loadFile("./fixtures/smiley_embedded_v2.png");
     const metadata = await decodePngMetadata(legacyBlob);
+
+    expect(JSON.parse(metadata).elements).toEqual([
+      expect.objectContaining({ type: "text", text: "😀" }),
+    ]);
+  });
+
+  it("ignores unrelated iTXt chunks before the excalidraw metadata", async () => {
+    const pngBlob = await API.loadFile("./fixtures/smiley.png");
+    const metadata = JSON.stringify({
+      type: EXPORT_DATA_TYPES.excalidraw,
+      elements: [{ type: "text", text: "😀" }],
+    });
+
+    const embedded = await encodePngMetadata({
+      blob: pngBlob,
+      metadata,
+    });
+
+    const withUnrelatedITXt = await insertChunkBeforeFirst({
+      blob: embedded,
+      chunk: createITXtChunk("Comment", "preview metadata"),
+      targetChunkName: "iTXt",
+    });
+
+    await expect(decodePngMetadata(withUnrelatedITXt)).resolves.toBe(metadata);
+  });
+
+  it("ignores unrelated tEXt chunks before the excalidraw metadata", async () => {
+    const legacyBlob = await API.loadFile("./fixtures/smiley_embedded_v2.png");
+
+    const withUnrelatedTEXt = await insertChunkBeforeFirst({
+      blob: legacyBlob,
+      chunk: tEXt.encode("Comment", "preview metadata"),
+      targetChunkName: "tEXt",
+    });
+
+    const metadata = await decodePngMetadata(withUnrelatedTEXt);
 
     expect(JSON.parse(metadata).elements).toEqual([
       expect.objectContaining({ type: "text", text: "😀" }),

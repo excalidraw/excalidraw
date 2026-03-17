@@ -97,18 +97,30 @@ export const getTEXtChunk = async (
 ): Promise<PNGMetadataChunk | null> => {
   const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(blob)));
 
-  const iTXtMetadataChunk = chunks.find((chunk) => chunk.name === "iTXt");
-  if (iTXtMetadataChunk) {
-    try {
-      return decodeITXtChunk(iTXtMetadataChunk.data);
-    } catch {
-      // Fall back to legacy tEXt metadata.
+  for (const chunk of chunks) {
+    if (chunk.name === "iTXt") {
+      try {
+        const metadata = decodeITXtChunk(chunk.data);
+        if (metadata.keyword === MIME_TYPES.excalidraw) {
+          return metadata;
+        }
+      } catch {
+        // Continue to the next chunk
+      }
     }
   }
 
-  const tEXtMetadataChunk = chunks.find((chunk) => chunk.name === "tEXt");
-  if (tEXtMetadataChunk) {
-    return tEXt.decode(tEXtMetadataChunk.data);
+  for (const chunk of chunks) {
+    if (chunk.name === "tEXt") {
+      try {
+        const metadata = tEXt.decode(chunk.data);
+        if (metadata.keyword === MIME_TYPES.excalidraw) {
+          return metadata;
+        }
+      } catch {
+        // Continue to the next chunk
+      }
+    }
   }
 
   return null;
