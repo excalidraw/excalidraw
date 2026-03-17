@@ -795,6 +795,40 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
           value="300"
         />
       </div>
+      <div
+        style="padding: 0px 0.625rem; margin-top: 0.5rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;"
+      >
+        <div
+          style="font-size: 0.875rem;"
+        >
+          双击选词间隔(ms)
+        </div>
+        <input
+          class="TextInput"
+          inputmode="numeric"
+          min="1"
+          style="width: 6rem;"
+          type="number"
+          value="200"
+        />
+      </div>
+      <div
+        style="padding: 0px 0.625rem; margin-top: 0.5rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;"
+      >
+        <div
+          style="font-size: 0.875rem;"
+        >
+          三击选行间隔(ms)
+        </div>
+        <input
+          class="TextInput"
+          inputmode="numeric"
+          min="1"
+          style="width: 6rem;"
+          type="number"
+          value="150"
+        />
+      </div>
     </div>
   </div>
 </div>

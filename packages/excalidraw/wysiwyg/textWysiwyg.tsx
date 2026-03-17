@@ -97,6 +97,40 @@ const getTransform = (
 
 type SubmitHandler = () => void;
 
+const getDblClickSelectWordIntervalMs = () => {
+  const stored = Number(
+    localStorage.getItem("excalidraw.dblClickSelectWordIntervalMs"),
+  );
+  const raw = Number.isFinite(stored) ? stored : 200;
+  return Math.max(1, Math.min(2000, Math.floor(raw)));
+};
+
+const getTripleClickSelectLineIntervalMs = () => {
+  const stored = Number(
+    localStorage.getItem("excalidraw.tripleClickSelectLineIntervalMs"),
+  );
+  const raw = Number.isFinite(stored) ? stored : 150;
+  return Math.max(1, Math.min(2000, Math.floor(raw)));
+};
+
+const getTripleClickTotalIntervalMs = () =>
+  getDblClickSelectWordIntervalMs() + getTripleClickSelectLineIntervalMs();
+
+const WORD_COUNTDOWN_EVENT = "excalidraw:selectWordCountdown";
+const LINE_COUNTDOWN_EVENT = "excalidraw:selectLineCountdown";
+
+const emitCountdown = (
+  eventName: string,
+  detail: {
+    kind: "word" | "line";
+    remainingMs: number;
+    durationMs: number;
+    active: boolean;
+  },
+) => {
+  window.dispatchEvent(new CustomEvent(eventName, { detail }));
+};
+
 export const textWysiwyg = ({
   id,
   onChange,
@@ -108,6 +142,7 @@ export const textWysiwyg = ({
   app,
   autoSelect = true,
   initialPointerDownSceneCoords,
+  initialPointerDownClientCoords,
 }: {
   id: ExcalidrawElement["id"];
   /**
@@ -125,6 +160,7 @@ export const textWysiwyg = ({
   app: App;
   autoSelect?: boolean;
   initialPointerDownSceneCoords?: { x: number; y: number };
+  initialPointerDownClientCoords?: { x: number; y: number };
 }): SubmitHandler => {
   // 需求说明.txt#L30-33: 空格/换行符可视化（类似 VSCode "Render Whitespace: all"）
   //
@@ -259,12 +295,15 @@ export const textWysiwyg = ({
 
     const overlayStyle = window.getComputedStyle(whitespaceOverlay);
     const transformStr = overlayStyle.transform;
-    const matrix =
-      transformStr && transformStr !== "none"
-        ? new DOMMatrixReadOnly(transformStr)
-        : new DOMMatrixReadOnly();
-    const hasRotationOrSkew =
-      Math.abs(matrix.b) > 1e-6 || Math.abs(matrix.c) > 1e-6;
+    const DOMMatrixReadOnlyCtor: any = (window as any).DOMMatrixReadOnly;
+    const matrix: any = DOMMatrixReadOnlyCtor
+      ? transformStr && transformStr !== "none"
+        ? new DOMMatrixReadOnlyCtor(transformStr)
+        : new DOMMatrixReadOnlyCtor()
+      : null;
+    const hasRotationOrSkew = matrix
+      ? Math.abs(matrix.b) > 1e-6 || Math.abs(matrix.c) > 1e-6
+      : false;
 
     if (hasRotationOrSkew) {
       const normalizedValue = editable.value.replace(/\r\n?/g, "\n");
@@ -349,7 +388,7 @@ export const textWysiwyg = ({
     const originParts = overlayStyle.transformOrigin.split(" ");
     const originX = parsePx(originParts[0] ?? "0");
     const originY = parsePx(originParts[1] ?? "0");
-    const invMatrix = matrix.inverse();
+    const invMatrix = matrix ? matrix.inverse() : null;
 
     const offsetParent =
       (whitespaceOverlay.offsetParent as HTMLElement | null) ??
@@ -362,6 +401,9 @@ export const textWysiwyg = ({
     const baseTop = parentRect.top + parsePx(whitespaceOverlay.style.top);
 
     const viewportToLocal = (clientX: number, clientY: number) => {
+      if (!invMatrix || typeof DOMPoint === "undefined") {
+        return { x: clientX - baseLeft, y: clientY - baseTop };
+      }
       const relX = clientX - baseLeft - originX;
       const relY = clientY - baseTop - originY;
       const p = new DOMPoint(relX, relY).matrixTransform(invMatrix);
@@ -375,13 +417,20 @@ export const textWysiwyg = ({
       }
       range.setStart(whitespaceOverlayTextNode, idx);
       range.setEnd(whitespaceOverlayTextNode, idx + 1);
-      const rects = range.getClientRects();
+      const rects =
+        "getClientRects" in range && typeof range.getClientRects === "function"
+          ? range.getClientRects()
+          : [];
       if (rects.length > 0) {
         return rects[0]!;
       }
-      const r = range.getBoundingClientRect();
-      if (r.width > 0 || r.height > 0) {
-        return r;
+      const r =
+        "getBoundingClientRect" in range &&
+        typeof (range as any).getBoundingClientRect === "function"
+          ? (range as any).getBoundingClientRect()
+          : null;
+      if (r && (r.width > 0 || r.height > 0)) {
+        return r as DOMRect;
       }
       return null;
     };
@@ -702,7 +751,7 @@ export const textWysiwyg = ({
     // - 将点击点从旋转后的坐标系“反旋转”回元素本地坐标
     // - 用与编辑器一致的软换行（pre-wrap）拆分为行，并保留真实换行符位置
     // - 结合 textAlign 计算每行起始偏移，再用二分查找定位字符索引
-    if (!initialPointerDownSceneCoords) {
+    if (!initialPointerDownSceneCoords && !initialPointerDownClientCoords) {
       return null;
     }
 
@@ -711,13 +760,13 @@ export const textWysiwyg = ({
       return null;
     }
 
-    if (editable.value.length > 5_000) {
-      return null;
-    }
-
     const elementsMap = app.scene.getNonDeletedElementsMap();
     const container = getContainerElement(updatedTextElement, elementsMap);
     const angle = getTextElementAngle(updatedTextElement, container);
+
+    if (angle !== 0) {
+      return null;
+    }
 
     const centerX = updatedTextElement.x + updatedTextElement.width / 2;
     const centerY = updatedTextElement.y + updatedTextElement.height / 2;
@@ -739,13 +788,15 @@ export const textWysiwyg = ({
       };
     };
 
-    const unrotatedPointer = rotateAround(
-      initialPointerDownSceneCoords.x,
-      initialPointerDownSceneCoords.y,
-      centerX,
-      centerY,
-      -angle,
-    );
+    const unrotatedPointer = initialPointerDownSceneCoords
+      ? rotateAround(
+          initialPointerDownSceneCoords.x,
+          initialPointerDownSceneCoords.y,
+          centerX,
+          centerY,
+          -angle,
+        )
+      : null;
 
     const lineHeightPx =
       updatedTextElement.fontSize * updatedTextElement.lineHeight;
@@ -753,91 +804,398 @@ export const textWysiwyg = ({
       return 0;
     }
 
-    const editorWidth =
-      parseFloat(editable.style.width) || updatedTextElement.width;
+    if (unrotatedPointer) {
+      const localX = unrotatedPointer.x - updatedTextElement.x;
+      const localY = unrotatedPointer.y - updatedTextElement.y;
 
-    const normalizedValue = editable.value.replace(/\r\n?/g, "\n");
-    const font = getFontString(updatedTextElement);
+      const editorWidth =
+        parseFloat(editable.style.width) || updatedTextElement.width;
 
-    const { lines, explicitNewlineAfterLine } =
-      whitespaceOverlay.style.whiteSpace === "pre-wrap" ||
-      whitespaceOverlay.style.whiteSpace === "break-spaces"
-        ? wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
-            normalizedValue,
-            font,
-            editorWidth,
-          )
-        : {
-            lines: normalizedValue.split("\n"),
-            explicitNewlineAfterLine: normalizedValue
-              .split("\n")
-              .map((_line, idx, arr) => idx < arr.length - 1),
-          };
+      const normalizedValue = editable.value.replace(/\r\n?/g, "\n");
+      const font = getFontString(updatedTextElement);
 
-    const lineStartIndices: number[] = [];
-    let currentIndex = 0;
-    for (let i = 0; i < lines.length; i++) {
-      lineStartIndices.push(currentIndex);
-      currentIndex += lines[i]?.length ?? 0;
-      if (explicitNewlineAfterLine[i]) {
-        currentIndex += 1;
-      }
-    }
+      const { lines, explicitNewlineAfterLine } =
+        whitespaceOverlay.style.whiteSpace === "pre-wrap" ||
+        whitespaceOverlay.style.whiteSpace === "break-spaces"
+          ? wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
+              normalizedValue,
+              font,
+              editorWidth,
+            )
+          : {
+              lines: normalizedValue.split("\n"),
+              explicitNewlineAfterLine: normalizedValue
+                .split("\n")
+                .map((_line, idx, arr) => idx < arr.length - 1),
+            };
 
-    const localX = unrotatedPointer.x - updatedTextElement.x;
-    const localY = unrotatedPointer.y - updatedTextElement.y;
-
-    const clampedLineIndex = Math.max(
-      0,
-      Math.min(lines.length - 1, Math.floor(localY / lineHeightPx)),
-    );
-
-    const lineText = lines[clampedLineIndex] ?? "";
-    const lineWidth =
-      lineText === ""
-        ? 0
-        : measureText(lineText, font, updatedTextElement.lineHeight).width;
-
-    let lineOffsetX = 0;
-    if (updatedTextElement.textAlign === "center") {
-      lineOffsetX = (editorWidth - lineWidth) / 2;
-    } else if (updatedTextElement.textAlign === "right") {
-      lineOffsetX = editorWidth - lineWidth;
-    }
-    lineOffsetX = Math.max(0, lineOffsetX);
-
-    const xWithinLine = localX - lineOffsetX;
-
-    const getPrefixWidth = (length: number) => {
-      if (length <= 0) {
-        return 0;
-      }
-      const prefix = lineText.slice(0, length);
-      return prefix === ""
-        ? 0
-        : measureText(prefix, font, updatedTextElement.lineHeight).width;
-    };
-
-    let charIndex = 0;
-    if (xWithinLine <= 0) {
-      charIndex = 0;
-    } else if (xWithinLine >= lineWidth) {
-      charIndex = lineText.length;
-    } else {
-      let lo = 0;
-      let hi = lineText.length;
-      while (lo < hi) {
-        const mid = Math.floor((lo + hi) / 2);
-        if (getPrefixWidth(mid) <= xWithinLine) {
-          lo = mid + 1;
-        } else {
-          hi = mid;
+      const lineStartIndices: number[] = [];
+      let currentIndex = 0;
+      for (let i = 0; i < lines.length; i++) {
+        lineStartIndices.push(currentIndex);
+        currentIndex += lines[i]?.length ?? 0;
+        if (explicitNewlineAfterLine[i]) {
+          currentIndex += 1;
         }
       }
-      charIndex = Math.max(0, Math.min(lineText.length, lo));
+
+      const clampedLineIndex = Math.max(
+        0,
+        Math.min(lines.length - 1, Math.floor((localY + 1e-6) / lineHeightPx)),
+      );
+
+      const lineText = lines[clampedLineIndex] ?? "";
+      const lineWidth =
+        lineText === ""
+          ? 0
+          : measureText(lineText, font, updatedTextElement.lineHeight).width;
+
+      let lineOffsetX = 0;
+      if (updatedTextElement.textAlign === "center") {
+        lineOffsetX = (editorWidth - lineWidth) / 2;
+      } else if (updatedTextElement.textAlign === "right") {
+        lineOffsetX = editorWidth - lineWidth;
+      }
+      lineOffsetX = Math.max(0, lineOffsetX);
+      const xWithinLine = localX - lineOffsetX;
+
+      const getPrefixWidth = (length: number) => {
+        if (length <= 0) {
+          return 0;
+        }
+        const prefix = lineText.slice(0, length);
+        return prefix === ""
+          ? 0
+          : measureText(prefix, font, updatedTextElement.lineHeight).width;
+      };
+
+      let charIndex = 0;
+      if (xWithinLine <= 0) {
+        charIndex = 0;
+      } else if (xWithinLine >= lineWidth) {
+        charIndex = lineText.length;
+      } else {
+        let lo = 0;
+        let hi = lineText.length;
+        while (lo < hi) {
+          const mid = Math.floor((lo + hi) / 2);
+          if (getPrefixWidth(mid) <= xWithinLine) {
+            lo = mid + 1;
+          } else {
+            hi = mid;
+          }
+        }
+        charIndex = Math.max(0, Math.min(lineText.length, lo));
+      }
+
+      const resolved =
+        (lineStartIndices[clampedLineIndex] ?? 0) +
+        Math.max(0, Math.min(lineText.length, charIndex));
+
+      if (
+        (window as any).__e2eOverlay ||
+        (window as any).EXCALIDRAW_WYSIWYG_DEBUG
+      ) {
+        const canvasRect = canvas.getBoundingClientRect();
+        (window as any).__e2eWysiwygPointerDebug = {
+          method: "scene",
+          inputClientX: initialPointerDownClientCoords?.x ?? null,
+          inputClientY: initialPointerDownClientCoords?.y ?? null,
+          inputSceneX: initialPointerDownSceneCoords?.x ?? null,
+          inputSceneY: initialPointerDownSceneCoords?.y ?? null,
+          localX,
+          localY,
+          lineHeightPx,
+          editorWidth,
+          clampedLineIndex,
+          resolvedIndex: resolved,
+          offsetLeft: app.state.offsetLeft,
+          offsetTop: app.state.offsetTop,
+          canvasRectLeft: canvasRect.left,
+          canvasRectTop: canvasRect.top,
+        };
+      }
+
+      return resolved;
     }
 
-    return (lineStartIndices[clampedLineIndex] ?? 0) + charIndex;
+    const textNodeValue = whitespaceOverlayTextNode.nodeValue ?? "";
+    const len = textNodeValue.length;
+    if (len === 0) {
+      return 0;
+    }
+
+    const zoom = app.state.zoom.value;
+    const pointerClientX = initialPointerDownClientCoords
+      ? initialPointerDownClientCoords.x
+      : (unrotatedPointer!.x + app.state.scrollX) * zoom + app.state.offsetLeft;
+    const pointerClientY = initialPointerDownClientCoords
+      ? initialPointerDownClientCoords.y
+      : (unrotatedPointer!.y + app.state.scrollY) * zoom + app.state.offsetTop;
+
+    const lineHeightClientPx = lineHeightPx * zoom;
+    if (lineHeightClientPx <= 0) {
+      return 0;
+    }
+
+    const range = document.createRange();
+    const getCharRect = (idx: number): DOMRect | null => {
+      if (idx < 0 || idx >= len) {
+        return null;
+      }
+      if (textNodeValue[idx] === "\n") {
+        return null;
+      }
+      range.setStart(whitespaceOverlayTextNode, idx);
+      range.setEnd(whitespaceOverlayTextNode, idx + 1);
+      const rects =
+        "getClientRects" in range && typeof range.getClientRects === "function"
+          ? range.getClientRects()
+          : [];
+      if (rects.length > 0) {
+        return rects[0]!;
+      }
+      const r =
+        "getBoundingClientRect" in range &&
+        typeof (range as any).getBoundingClientRect === "function"
+          ? (range as any).getBoundingClientRect()
+          : null;
+      if (r && (r.width > 0 || r.height > 0)) {
+        return r as DOMRect;
+      }
+      return null;
+    };
+
+    const firstRenderableCharIndex = (() => {
+      for (let i = 0; i < len; i++) {
+        if (textNodeValue[i] !== "\n") {
+          return i;
+        }
+      }
+      return 0;
+    })();
+
+    const baseTextTopClientY = (() => {
+      const rect = getCharRect(firstRenderableCharIndex);
+      if (!rect) {
+        return pointerClientY;
+      }
+      return rect.top;
+    })();
+
+    const getLineIndexFromClientY = (y: number) => {
+      return Math.max(
+        0,
+        Math.floor((y - baseTextTopClientY + 1e-6) / lineHeightClientPx),
+      );
+    };
+
+    const cache = new Map<number, { x: number; y: number; line: number }>();
+    const getCaretPosForIndex = (caretIndex: number) => {
+      const idx = Math.max(0, Math.min(len, caretIndex));
+      const cached = cache.get(idx);
+      if (cached) {
+        return cached;
+      }
+
+      const editableRect = editable.getBoundingClientRect();
+      let caretClientX = editableRect.left;
+      let caretClientY = editableRect.top;
+
+      if (idx > 0 && textNodeValue[idx - 1] === "\n") {
+        const nextRect = getCharRect(idx);
+        if (nextRect) {
+          caretClientX = nextRect.left;
+          caretClientY = nextRect.top;
+        } else {
+          let nlCount = 0;
+          let prevIdx = idx - 1;
+          while (prevIdx >= 0 && textNodeValue[prevIdx] === "\n") {
+            nlCount += 1;
+            prevIdx -= 1;
+          }
+          const prevRect = getCharRect(prevIdx);
+          if (prevRect) {
+            caretClientX = prevRect.left;
+            caretClientY = prevRect.top + lineHeightClientPx * nlCount;
+          } else {
+            caretClientX = editableRect.left;
+            caretClientY = baseTextTopClientY + lineHeightClientPx * nlCount;
+          }
+        }
+      } else if (idx >= len || textNodeValue[idx] === "\n") {
+        let prevIdx = Math.min(len - 1, idx - 1);
+        while (prevIdx >= 0 && textNodeValue[prevIdx] === "\n") {
+          prevIdx -= 1;
+        }
+        const prevRect = getCharRect(prevIdx);
+        if (prevRect) {
+          caretClientX = prevRect.right;
+          caretClientY = prevRect.top;
+        }
+      } else {
+        const rect = getCharRect(idx);
+        if (rect) {
+          caretClientX = rect.left;
+          caretClientY = rect.top;
+        }
+      }
+
+      const line = getLineIndexFromClientY(caretClientY);
+      const result = { x: caretClientX, y: caretClientY, line };
+      cache.set(idx, result);
+      return result;
+    };
+
+    const nativeSelectionIndex = (() => {
+      const doc: any = document as any;
+      if (typeof doc.caretPositionFromPoint === "function") {
+        const pos = doc.caretPositionFromPoint(pointerClientX, pointerClientY);
+        const node = pos?.offsetNode;
+        const offset = pos?.offset;
+        if (node === whitespaceOverlayTextNode && Number.isFinite(offset)) {
+          return Math.max(0, Math.min(len, Number(offset)));
+        }
+      }
+      if (typeof doc.caretRangeFromPoint === "function") {
+        const r = doc.caretRangeFromPoint(pointerClientX, pointerClientY);
+        const node = r?.startContainer;
+        const offset = r?.startOffset;
+        if (node === whitespaceOverlayTextNode && Number.isFinite(offset)) {
+          return Math.max(0, Math.min(len, Number(offset)));
+        }
+      }
+      return null;
+    })();
+
+    if (nativeSelectionIndex !== null) {
+      if (
+        (window as any).__e2eOverlay ||
+        (window as any).EXCALIDRAW_WYSIWYG_DEBUG
+      ) {
+        const canvasRect = canvas.getBoundingClientRect();
+        (window as any).__e2eWysiwygPointerDebug = {
+          method: "native",
+          inputClientX: initialPointerDownClientCoords?.x ?? null,
+          inputClientY: initialPointerDownClientCoords?.y ?? null,
+          inputSceneX: initialPointerDownSceneCoords?.x ?? null,
+          inputSceneY: initialPointerDownSceneCoords?.y ?? null,
+          pointerClientX,
+          pointerClientY,
+          baseTextTopClientY,
+          lineHeightClientPx,
+          targetLine: getLineIndexFromClientY(pointerClientY),
+          resolvedIndex: nativeSelectionIndex,
+          offsetLeft: app.state.offsetLeft,
+          offsetTop: app.state.offsetTop,
+          canvasRectLeft: canvasRect.left,
+          canvasRectTop: canvasRect.top,
+        };
+      }
+      return nativeSelectionIndex;
+    }
+
+    const targetLine = getLineIndexFromClientY(pointerClientY);
+
+    let lo = 0;
+    let hi = len;
+    while (lo < hi) {
+      const mid = Math.floor((lo + hi) / 2);
+      const { line } = getCaretPosForIndex(mid);
+      if (line < targetLine) {
+        lo = mid + 1;
+      } else {
+        hi = mid;
+      }
+    }
+    let idx = lo;
+    if (idx > len) {
+      idx = len;
+    }
+
+    const { line: lineAtIdx } = getCaretPosForIndex(idx);
+
+    let startLo = 0;
+    let startHi = idx;
+    while (startLo < startHi) {
+      const mid = Math.floor((startLo + startHi) / 2);
+      const { line } = getCaretPosForIndex(mid);
+      if (line < lineAtIdx) {
+        startLo = mid + 1;
+      } else {
+        startHi = mid;
+      }
+    }
+    const lineStart = startLo;
+
+    let endLo = idx;
+    let endHi = len;
+    while (endLo < endHi) {
+      const mid = Math.floor((endLo + endHi) / 2);
+      const { line } = getCaretPosForIndex(mid);
+      if (line <= lineAtIdx) {
+        endLo = mid + 1;
+      } else {
+        endHi = mid;
+      }
+    }
+    const lineEnd = endLo;
+
+    let xLo = lineStart;
+    let xHi = lineEnd;
+    while (xLo < xHi) {
+      const mid = Math.floor((xLo + xHi) / 2);
+      const { x } = getCaretPosForIndex(mid);
+      if (x < pointerClientX) {
+        xLo = mid + 1;
+      } else {
+        xHi = mid;
+      }
+    }
+
+    const right = Math.max(
+      lineStart,
+      Math.min(Math.max(lineStart, lineEnd - 1), xLo),
+    );
+    const left = Math.max(lineStart, right - 1);
+    const leftPos = getCaretPosForIndex(left);
+    const rightPos = getCaretPosForIndex(right);
+
+    if (right === left) {
+      return right;
+    }
+
+    const resolved =
+      Math.abs(rightPos.x - pointerClientX) <
+      Math.abs(leftPos.x - pointerClientX)
+        ? right
+        : left;
+
+    if (
+      (window as any).__e2eOverlay ||
+      (window as any).EXCALIDRAW_WYSIWYG_DEBUG
+    ) {
+      const canvasRect = canvas.getBoundingClientRect();
+      (window as any).__e2eWysiwygPointerDebug = {
+        method: "binary",
+        inputClientX: initialPointerDownClientCoords?.x ?? null,
+        inputClientY: initialPointerDownClientCoords?.y ?? null,
+        inputSceneX: initialPointerDownSceneCoords?.x ?? null,
+        inputSceneY: initialPointerDownSceneCoords?.y ?? null,
+        pointerClientX,
+        pointerClientY,
+        baseTextTopClientY,
+        lineHeightClientPx,
+        targetLine,
+        resolvedIndex: resolved,
+        offsetLeft: app.state.offsetLeft,
+        offsetTop: app.state.offsetTop,
+        canvasRectLeft: canvasRect.left,
+        canvasRectTop: canvasRect.top,
+      };
+    }
+
+    return resolved;
   };
 
   if (onChange) {
@@ -1285,6 +1643,27 @@ export const textWysiwyg = ({
       caretUpdateRaf = null;
     }
 
+    if (dblClickCountdownRaf != null) {
+      cancelAnimationFrame(dblClickCountdownRaf);
+      dblClickCountdownRaf = null;
+    }
+    if (tripleClickCountdownRaf != null) {
+      cancelAnimationFrame(tripleClickCountdownRaf);
+      tripleClickCountdownRaf = null;
+    }
+    emitCountdown(WORD_COUNTDOWN_EVENT, {
+      kind: "word",
+      remainingMs: 0,
+      durationMs: dblClickCountdownDurationMs,
+      active: false,
+    });
+    emitCountdown(LINE_COUNTDOWN_EVENT, {
+      kind: "line",
+      remainingMs: 0,
+      durationMs: tripleClickCountdownDurationMs,
+      active: false,
+    });
+
     if (observer) {
       observer.disconnect();
     }
@@ -1421,6 +1800,92 @@ export const textWysiwyg = ({
   // ---------------------------------------------------------------------------
 
   let isDestroyed = false;
+  let lastPointerUpAt: number | null = null;
+  let firstPointerUpAt: number | null = null;
+  let lastWordSelectionAt: number | null = null;
+  let lastNativeDblClickAt: number | null = null;
+  let dblClickCountdownRaf: number | null = null;
+  let dblClickCountdownStartAt = 0;
+  let dblClickCountdownDurationMs = getDblClickSelectWordIntervalMs();
+  let tripleClickCountdownRaf: number | null = null;
+  let tripleClickCountdownStartAt = 0;
+  let tripleClickCountdownDurationMs = getTripleClickSelectLineIntervalMs();
+
+  const stopDblClickCountdown = () => {
+    if (dblClickCountdownRaf != null) {
+      cancelAnimationFrame(dblClickCountdownRaf);
+      dblClickCountdownRaf = null;
+    }
+    emitCountdown(WORD_COUNTDOWN_EVENT, {
+      kind: "word",
+      remainingMs: 0,
+      durationMs: dblClickCountdownDurationMs,
+      active: false,
+    });
+  };
+
+  const startDblClickCountdown = () => {
+    stopDblClickCountdown();
+    dblClickCountdownDurationMs = getDblClickSelectWordIntervalMs();
+    dblClickCountdownStartAt = performance.now();
+
+    const tick = () => {
+      const elapsed = performance.now() - dblClickCountdownStartAt;
+      const remaining = Math.max(0, dblClickCountdownDurationMs - elapsed);
+      const active = remaining > 0;
+      emitCountdown(WORD_COUNTDOWN_EVENT, {
+        kind: "word",
+        remainingMs: remaining,
+        durationMs: dblClickCountdownDurationMs,
+        active,
+      });
+      if (active) {
+        dblClickCountdownRaf = requestAnimationFrame(tick);
+      } else {
+        dblClickCountdownRaf = null;
+      }
+    };
+
+    tick();
+  };
+
+  const stopTripleClickCountdown = () => {
+    if (tripleClickCountdownRaf != null) {
+      cancelAnimationFrame(tripleClickCountdownRaf);
+      tripleClickCountdownRaf = null;
+    }
+    emitCountdown(LINE_COUNTDOWN_EVENT, {
+      kind: "line",
+      remainingMs: 0,
+      durationMs: tripleClickCountdownDurationMs,
+      active: false,
+    });
+  };
+
+  const startTripleClickCountdown = () => {
+    stopTripleClickCountdown();
+    tripleClickCountdownDurationMs = getTripleClickSelectLineIntervalMs();
+    tripleClickCountdownStartAt = performance.now();
+
+    const tick = () => {
+      const elapsed = performance.now() - tripleClickCountdownStartAt;
+      const remaining = Math.max(0, tripleClickCountdownDurationMs - elapsed);
+      const active = remaining > 0;
+      emitCountdown(LINE_COUNTDOWN_EVENT, {
+        kind: "line",
+        remainingMs: remaining,
+        durationMs: tripleClickCountdownDurationMs,
+        active,
+      });
+      if (active) {
+        tripleClickCountdownRaf = requestAnimationFrame(tick);
+      } else {
+        tripleClickCountdownRaf = null;
+      }
+    };
+
+    tick();
+  };
 
   // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
   // is preferred so we catch changes from host, where window may not resize.
@@ -1434,7 +1899,20 @@ export const textWysiwyg = ({
     window.addEventListener("resize", updateWysiwygStyle);
   }
 
-  editable.onpointerdown = (event) => event.stopPropagation();
+  editable.onpointerdown = (event) => {
+    event.stopPropagation();
+    if (event.button === POINTER_BUTTON.MAIN) {
+      if (dblClickCountdownRaf == null) {
+        startDblClickCountdown();
+      }
+    }
+  };
+
+  editable.addEventListener("dblclick", () => {
+    lastNativeDblClickAt = performance.now();
+    stopDblClickCountdown();
+  });
+
   editable.addEventListener("pointerup", (event) => {
     if (event.button !== POINTER_BUTTON.MAIN) {
       return;
@@ -1462,7 +1940,11 @@ export const textWysiwyg = ({
         }
         range.setStart(whitespaceOverlayTextNode, idx);
         range.setEnd(whitespaceOverlayTextNode, idx + 1);
-        const rects = range.getClientRects();
+        const rects =
+          "getClientRects" in range &&
+          typeof range.getClientRects === "function"
+            ? range.getClientRects()
+            : [];
         if (rects.length > 0) {
           return rects[0]!;
         }
@@ -1498,6 +1980,102 @@ export const textWysiwyg = ({
           scheduleCaretUpdate();
         }
       }
+
+      if (lastNativeDblClickAt != null) {
+        const sinceNative = performance.now() - lastNativeDblClickAt;
+        if (sinceNative >= 0 && sinceNative < 80) {
+          lastPointerUpAt = null;
+          firstPointerUpAt = null;
+          lastWordSelectionAt = null;
+          stopTripleClickCountdown();
+          return;
+        }
+      }
+
+      const now = performance.now();
+      if (lastWordSelectionAt != null) {
+        const sinceWord = now - lastWordSelectionAt;
+        const tripleAfterWordMs = getTripleClickSelectLineIntervalMs();
+        if (sinceWord >= 0 && sinceWord <= tripleAfterWordMs) {
+          const value = editable.value;
+          const start = Math.max(
+            0,
+            Math.min(value.length, editable.selectionStart ?? 0),
+          );
+          const end = Math.max(
+            start,
+            Math.min(value.length, editable.selectionEnd ?? start),
+          );
+
+          const lineStart = value.lastIndexOf("\n", Math.max(0, start - 1)) + 1;
+          const nextNewline = value.indexOf("\n", Math.max(end, lineStart));
+          const lineEnd = nextNewline === -1 ? value.length : nextNewline;
+
+          editable.selectionStart = lineStart;
+          editable.selectionEnd = lineEnd;
+          scheduleCaretUpdate();
+
+          lastPointerUpAt = null;
+          firstPointerUpAt = null;
+          lastWordSelectionAt = null;
+          stopTripleClickCountdown();
+          stopDblClickCountdown();
+          return;
+        }
+        lastWordSelectionAt = null;
+        stopTripleClickCountdown();
+      }
+
+      if (
+        lastPointerUpAt != null &&
+        now - lastPointerUpAt <= getDblClickSelectWordIntervalMs()
+      ) {
+        const value = editable.value;
+        const caretIndex = Math.max(
+          0,
+          Math.min(value.length, editable.selectionEnd ?? 0),
+        );
+
+        const pivot =
+          value.length === 0
+            ? 0
+            : Math.max(0, Math.min(value.length - 1, caretIndex - 1));
+        const isWs = (ch: string) => /\s/.test(ch);
+        const pivotIsWs = value[pivot] != null ? isWs(value[pivot]) : true;
+
+        let start = pivotIsWs ? pivot : pivot;
+        let end = pivotIsWs ? pivot + 1 : pivot + 1;
+
+        while (start > 0 && isWs(value[start - 1]) === pivotIsWs) {
+          start -= 1;
+        }
+        while (end < value.length && isWs(value[end]) === pivotIsWs) {
+          end += 1;
+        }
+
+        const clampedStart = Math.max(0, Math.min(value.length, start));
+        const clampedEnd = Math.max(clampedStart, Math.min(value.length, end));
+
+        if (clampedStart !== clampedEnd) {
+          editable.selectionStart = clampedStart;
+          editable.selectionEnd = clampedEnd;
+          scheduleCaretUpdate();
+        }
+
+        lastPointerUpAt = null;
+        firstPointerUpAt = null;
+        lastWordSelectionAt = now;
+        startTripleClickCountdown();
+        stopDblClickCountdown();
+        return;
+      }
+
+      if (firstPointerUpAt == null) {
+        firstPointerUpAt = now;
+      } else if (now - firstPointerUpAt > getTripleClickTotalIntervalMs()) {
+        firstPointerUpAt = now;
+      }
+      lastPointerUpAt = now;
     });
   });
 
@@ -1520,6 +2098,29 @@ export const textWysiwyg = ({
     editable.selectionStart = editable.selectionEnd = initialSelectionIndex;
   } else if (autoSelect) {
     editable.select();
+  }
+
+  if (initialPointerDownSceneCoords || initialPointerDownClientCoords) {
+    const initialStart = editable.selectionStart;
+    const initialEnd = editable.selectionEnd;
+    requestAnimationFrame(() => {
+      if (!editable.isConnected) {
+        return;
+      }
+      if (
+        editable.selectionStart !== initialStart ||
+        editable.selectionEnd !== initialEnd
+      ) {
+        return;
+      }
+      const recalculatedSelectionIndex = getSelectionIndexFromPointerDown();
+      if (recalculatedSelectionIndex === null) {
+        return;
+      }
+      editable.selectionStart = recalculatedSelectionIndex;
+      editable.selectionEnd = recalculatedSelectionIndex;
+      scheduleCaretUpdate();
+    });
   }
   bindBlurEvent();
 

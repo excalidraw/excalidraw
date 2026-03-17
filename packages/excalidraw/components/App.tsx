@@ -5862,10 +5862,12 @@ class App extends React.Component<AppProps, AppState> {
       autoSelect,
       // 记录触发编辑的点击位置（scene 坐标），用于在初始化时把光标放到点击处
       initialPointerDownSceneCoords,
+      initialPointerDownClientCoords,
     }: {
       isExistingElement?: boolean;
       autoSelect?: boolean;
       initialPointerDownSceneCoords?: { x: number; y: number };
+      initialPointerDownClientCoords?: { x: number; y: number };
     },
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
@@ -6034,6 +6036,7 @@ class App extends React.Component<AppProps, AppState> {
       // if needed)
       autoSelect: autoSelect ?? !this.editorInterface.isTouchScreen,
       initialPointerDownSceneCoords,
+      initialPointerDownClientCoords,
     });
 
     // do an initial update to re-initialize element position since we were
@@ -11279,6 +11282,10 @@ class App extends React.Component<AppProps, AppState> {
           this.handleTextWysiwyg(hitElement, {
             isExistingElement: true,
             autoSelect: false,
+            initialPointerDownClientCoords: {
+              x: childEvent.clientX,
+              y: childEvent.clientY,
+            },
             initialPointerDownSceneCoords: {
               x: pointerDownState.origin.x,
               y: pointerDownState.origin.y,

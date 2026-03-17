@@ -1,6 +1,35 @@
 @use "../css/variables.module" as *;
 
 .excalidraw {
+  .App-toolbar-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .App-toolbar__dblclickProgress {
+    height: 0.25rem;
+    margin-top: 0.25rem;
+    background-color: var(--default-border-color);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .App-toolbar__dblclickProgressBar {
+    height: 100%;
+    width: 100%;
+    background-color: var(--color-primary);
+    transform-origin: left;
+  }
+
+  .App-toolbar__dblclickProgress--line {
+    background-color: var(--button-gray-3);
+  }
+
+  .App-toolbar__dblclickProgressBar--line {
+    background-color: var(--color-warning);
+  }
+
   .App-toolbar {
     &.zen-mode {
       .ToolIcon__keybinding,

@@ -137,6 +137,80 @@ const DefaultOverwriteConfirmDialog = () => {
   );
 };
 
+type SelectCountdownDetail = {
+  kind: "word" | "line";
+  remainingMs: number;
+  durationMs: number;
+  active: boolean;
+};
+
+const WORD_COUNTDOWN_EVENT = "excalidraw:selectWordCountdown";
+const LINE_COUNTDOWN_EVENT = "excalidraw:selectLineCountdown";
+
+const CountdownBar = ({
+  kind,
+  eventName,
+  ariaLabel,
+}: {
+  kind: SelectCountdownDetail["kind"];
+  eventName: string;
+  ariaLabel: string;
+}) => {
+  const [state, setState] = React.useState<SelectCountdownDetail>({
+    kind,
+    remainingMs: 0,
+    durationMs: 0,
+    active: false,
+  });
+
+  React.useEffect(() => {
+    const onCountdown = (event: Event) => {
+      const detail = (event as CustomEvent<SelectCountdownDetail>)?.detail;
+      if (!detail) {
+        return;
+      }
+      if (detail.kind !== kind) {
+        return;
+      }
+      setState(detail);
+    };
+
+    window.addEventListener(eventName, onCountdown);
+    return () => {
+      window.removeEventListener(eventName, onCountdown);
+    };
+  }, [eventName, kind]);
+
+  if (!state.active || state.durationMs <= 0) {
+    return null;
+  }
+
+  const progress = Math.max(
+    0,
+    Math.min(1, state.remainingMs / state.durationMs),
+  );
+
+  return (
+    <div
+      className={clsx("App-toolbar__dblclickProgress", {
+        "App-toolbar__dblclickProgress--line": state.kind === "line",
+      })}
+      role="progressbar"
+      aria-label={ariaLabel}
+      aria-valuemin={0}
+      aria-valuemax={state.durationMs}
+      aria-valuenow={Math.ceil(state.remainingMs)}
+    >
+      <div
+        className={clsx("App-toolbar__dblclickProgressBar", {
+          "App-toolbar__dblclickProgressBar--line": state.kind === "line",
+        })}
+        style={{ transform: `scaleX(${progress})` }}
+      />
+    </div>
+  );
+};
+
 const LayerUI = ({
   actionManager,
   appState,
@@ -328,44 +402,56 @@ const LayerUI = ({
                           "zen-mode": appState.zenModeEnabled,
                         })}
                       >
-                        <Island
-                          padding={spacing.islandPadding}
-                          className={clsx("App-toolbar", {
-                            "zen-mode": appState.zenModeEnabled,
-                            "App-toolbar--compact": isCompactStylesPanel,
-                          })}
-                        >
-                          <HintViewer
-                            appState={appState}
-                            isMobile={editorInterface.formFactor === "phone"}
-                            editorInterface={editorInterface}
-                            app={app}
-                          />
-                          {heading}
-                          <Stack.Row gap={spacing.toolbarInnerRowGap}>
-                            <PenModeButton
-                              zenModeEnabled={appState.zenModeEnabled}
-                              checked={appState.penMode}
-                              onChange={() => onPenModeToggle(null)}
-                              title={t("toolBar.penMode")}
-                              penDetected={appState.penDetected}
-                            />
-                            <LockButton
-                              checked={appState.activeTool.locked}
-                              onChange={onLockToggle}
-                              title={t("toolBar.lock")}
-                            />
-
-                            <div className="App-toolbar__divider" />
-
-                            <ShapesSwitcher
-                              setAppState={setAppState}
-                              activeTool={appState.activeTool}
-                              UIOptions={UIOptions}
+                        <div className="App-toolbar-stack">
+                          <Island
+                            padding={spacing.islandPadding}
+                            className={clsx("App-toolbar", {
+                              "zen-mode": appState.zenModeEnabled,
+                              "App-toolbar--compact": isCompactStylesPanel,
+                            })}
+                          >
+                            <HintViewer
+                              appState={appState}
+                              isMobile={editorInterface.formFactor === "phone"}
+                              editorInterface={editorInterface}
                               app={app}
                             />
-                          </Stack.Row>
-                        </Island>
+                            {heading}
+                            <Stack.Row gap={spacing.toolbarInnerRowGap}>
+                              <PenModeButton
+                                zenModeEnabled={appState.zenModeEnabled}
+                                checked={appState.penMode}
+                                onChange={() => onPenModeToggle(null)}
+                                title={t("toolBar.penMode")}
+                                penDetected={appState.penDetected}
+                              />
+                              <LockButton
+                                checked={appState.activeTool.locked}
+                                onChange={onLockToggle}
+                                title={t("toolBar.lock")}
+                              />
+
+                              <div className="App-toolbar__divider" />
+
+                              <ShapesSwitcher
+                                setAppState={setAppState}
+                                activeTool={appState.activeTool}
+                                UIOptions={UIOptions}
+                                app={app}
+                              />
+                            </Stack.Row>
+                          </Island>
+                          <CountdownBar
+                            kind="word"
+                            eventName={WORD_COUNTDOWN_EVENT}
+                            ariaLabel="Double click remaining time"
+                          />
+                          <CountdownBar
+                            kind="line"
+                            eventName={LINE_COUNTDOWN_EVENT}
+                            ariaLabel="Triple click remaining time"
+                          />
+                        </div>
                         {isCollaborating && (
                           <Island
                             style={{

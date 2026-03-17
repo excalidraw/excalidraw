@@ -729,6 +729,102 @@ test("clicking to edit the text box will not change the character absolute posit
   await exitEditor(page);
 });
 
+//“第一次必定落到下一行”，第二次点击又正常测试
+test("first click to edit selected multi-line text should not jump to next line (E2E)", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.evaluate(() => {
+    (window as any).h?.setState?.({
+      currentItemFontFamily: 12,
+      currentItemFontSize: 32,
+    });
+  });
+
+  const value = "Hello\nWorld";
+  const createX = 240;
+  const createY = 180;
+
+  const editor = await openTextEditorAt(page, createX, createY);
+  await editor.fill(value);
+  await exitEditor(page);
+
+  const editorForProbe = await openEditorByDoubleClickAt(
+    page,
+    createX,
+    createY,
+  );
+  await editorForProbe.waitFor();
+  await expect(
+    page.locator(".excalidraw-wysiwyg__whitespaceOverlay"),
+  ).toBeVisible();
+  const clickPoint = await page.evaluate(() => {
+    const overlay = document.querySelector<HTMLElement>(
+      ".excalidraw-wysiwyg__whitespaceOverlay",
+    );
+    if (!overlay) {
+      throw new Error("missing overlay");
+    }
+    const r = (window as any).__e2eOverlay.charRectAt(overlay, 1);
+    return {
+      clientX: r.x + Math.max(1, r.width / 2),
+      clientY: r.y + r.height / 2,
+    };
+  });
+  await exitEditor(page);
+
+  await selectTool(page, "selection");
+  const canvas = page.locator("canvas.interactive");
+  await canvas.waitFor();
+  const canvasBox = await canvas.boundingBox();
+  if (!canvasBox) {
+    throw new Error("missing canvas bounding box");
+  }
+  const pos = {
+    x: clickPoint.clientX - canvasBox.x,
+    y: clickPoint.clientY - canvasBox.y,
+  };
+
+  await canvas.click({ position: pos });
+  await canvas.click({ position: pos });
+
+  const editor2 = page.locator("textarea.excalidraw-wysiwyg");
+  await expect(editor2).toBeVisible();
+  await page.waitForFunction(() => {
+    const d = (window as any).__e2eWysiwygPointerDebug;
+    return (
+      d &&
+      d.method === "scene" &&
+      Number.isFinite(d.clampedLineIndex) &&
+      Number.isFinite(d.resolvedIndex)
+    );
+  });
+
+  const res = await page.evaluate(() => {
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (!textarea) {
+      throw new Error("missing textarea");
+    }
+    const value = textarea.value;
+    const newlineIndex = value.indexOf("\n");
+    return {
+      selectionStart: textarea.selectionStart,
+      selectionEnd: textarea.selectionEnd,
+      newlineIndex,
+      debug: (window as any).__e2eWysiwygPointerDebug,
+    };
+  });
+
+  expect(res.selectionStart).toBe(res.selectionEnd);
+  expect(res.newlineIndex).toBeGreaterThan(-1);
+  expect(res.selectionStart).toBeLessThanOrEqual(res.newlineIndex);
+  expect(res.debug.method).toBe("scene");
+  expect(res.debug.clampedLineIndex).toBe(0);
+  expect(res.debug.resolvedIndex).toBeLessThanOrEqual(res.newlineIndex);
+});
+
 test("resizing text narrower and repeating operation A should keep wrapping consistent (E2E)", async ({
   page,
 }) => {

@@ -310,6 +310,22 @@ export const ChangeCanvasBackground = () => {
   const actionManager = useExcalidrawActionManager();
   const appProps = useAppProps();
 
+  const [dblClickSelectWordIntervalMs, setDblClickSelectWordIntervalMs] =
+    useState<number>(() => {
+      const stored = Number(
+        localStorage.getItem("excalidraw.dblClickSelectWordIntervalMs"),
+      );
+      return Number.isFinite(stored) && stored > 0 ? stored : 200;
+    });
+
+  const [tripleClickSelectLineIntervalMs, setTripleClickSelectLineIntervalMs] =
+    useState<number>(() => {
+      const stored = Number(
+        localStorage.getItem("excalidraw.tripleClickSelectLineIntervalMs"),
+      );
+      return Number.isFinite(stored) && stored > 0 ? stored : 150;
+    });
+
   const [textMaxWidth, setTextMaxWidth] = useState<number>(() => {
     const stored = Number(localStorage.getItem("excalidraw.textMaxWidth"));
     return Number.isFinite(stored) && stored > 0 ? stored : 300;
@@ -318,6 +334,20 @@ export const ChangeCanvasBackground = () => {
   useEffect(() => {
     localStorage.setItem("excalidraw.textMaxWidth", String(textMaxWidth));
   }, [textMaxWidth]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "excalidraw.dblClickSelectWordIntervalMs",
+      String(dblClickSelectWordIntervalMs),
+    );
+  }, [dblClickSelectWordIntervalMs]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "excalidraw.tripleClickSelectLineIntervalMs",
+      String(tripleClickSelectLineIntervalMs),
+    );
+  }, [tripleClickSelectLineIntervalMs]);
 
   if (
     appState.viewModeEnabled ||
@@ -362,6 +392,58 @@ export const ChangeCanvasBackground = () => {
             const next = Number(event.target.value);
             setTextMaxWidth(
               Number.isFinite(next) && next > 0 ? Math.floor(next) : 300,
+            );
+          }}
+          style={{ width: "6rem" }}
+        />
+      </div>
+      <div
+        style={{
+          padding: "0 0.625rem",
+          marginTop: "0.5rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "0.5rem",
+        }}
+      >
+        <div style={{ fontSize: "0.875rem" }}>双击选词间隔(ms)</div>
+        <input
+          className="TextInput"
+          type="number"
+          inputMode="numeric"
+          min={1}
+          value={dblClickSelectWordIntervalMs}
+          onChange={(event) => {
+            const next = Number(event.target.value);
+            setDblClickSelectWordIntervalMs(
+              Number.isFinite(next) && next > 0 ? Math.floor(next) : 200,
+            );
+          }}
+          style={{ width: "6rem" }}
+        />
+      </div>
+      <div
+        style={{
+          padding: "0 0.625rem",
+          marginTop: "0.5rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "0.5rem",
+        }}
+      >
+        <div style={{ fontSize: "0.875rem" }}>三击选行间隔(ms)</div>
+        <input
+          className="TextInput"
+          type="number"
+          inputMode="numeric"
+          min={1}
+          value={tripleClickSelectLineIntervalMs}
+          onChange={(event) => {
+            const next = Number(event.target.value);
+            setTripleClickSelectLineIntervalMs(
+              Number.isFinite(next) && next > 0 ? Math.floor(next) : 150,
             );
           }}
           style={{ width: "6rem" }}

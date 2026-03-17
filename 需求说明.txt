@@ -253,10 +253,6 @@ editing should not change whitespace marker rendering (E2E)
 将这些测试的文本框文本长度改为50000再测试
 将这些测试的文本框的宽度设为300再测试
 response speed
-yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed" --reporter=line
-yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed: long text editing" --reporter=line
-yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed: long text editing" --reporter=line
-
 
 
 
@@ -275,49 +271,26 @@ yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed: long 
 3双击文本框插入光标的响应速度;
 操作B:向下移动20个鼠标滚轮,重复操作A;(重复3次)
 目前的脚本似乎不会移动画布,将操作B移动画布的操作改为鼠标滚轮
-$env:SELENIUM_HEADLESS=1
-python Selenium\test.py
-
-yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed" --reporter=line
-yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "double click inserts caret" --reporter=line
-yarn test:typecheck -- --pretty false
-yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "double click inserts caret" --reporter=line
-
-
-<wasted
-python - <<'PY'
-import zipfile, pathlib, json
-p=pathlib.Path('test-results/text-wrap-consistency-resp-c235e-le-click-inserts-caret-E2E--chromium/trace.zip')
-with zipfile.ZipFile(p,'r') as z:
-    names=z.namelist()
-    print('files',len(names))
-    for n in names[:30]:
-        print(n)
-PY
-wasted>
-<check 
-python -c "import zipfile, json; z=zipfile.ZipFile('test-results/text-wrap-consistency-resp-c235e-le-click-inserts-caret-E2E--chromium/trace.zip'); data=z.read('test.trace'); print(data[:300].decode('utf-8','replace'));"
-check >
 
 
 
+
+
+
+wasted:
 你手动运行方式（按你的要求用 python，不带路径）
 - 先确保你已经把项目跑在 http://localhost:3000/ （你自己启动，不要让脚本启动）
 - 在仓库根目录运行：
-```
 $env:SELENIUM_HEADLESS=1
 python Selenium\test.py
-```
 如果你要有界面跑（方便观察），把 headless 去掉即可：
-```
 Remove-Item Env:\SELENIUM_HEADLESS -ErrorAction SilentlyContinue
 python Selenium\test.py
-```
 另外，你这边用 python Selenium\test.py 时缺的依赖我已经通过 python -m pip install --user typing_extensions 补过了；如果换了 Python 环境，记得在对应环境也装一下。
 
 
 
-
+wasted:
 方法 A：浏览器内“黑盒”计时（不改业务代码）
 - 在注入脚本里记录 t0=performance.now() （在触发 action 前/事件 capture 阶段）。
 - 触发操作后，用 requestAnimationFrame 连续等 1–2 帧，并加一个“完成条件”：
@@ -326,60 +299,78 @@ python Selenium\test.py
   - 双击：textarea 获得 focus 且 selectionEnd > 0（你们现在就是这么干的）。
 - 优点：实现简单、跨框架；缺点：只能拿到“端到端延迟”，很难拆解成内部步骤。
 D:\a03\miniconda\python.exe -m py_compile Selenium/test.py
+
+
+
+
+将双击选词的间隔时间改为200ms(毫秒)三击选词的间隔时间设为350ms(毫秒)
+双击选词:在编辑时点击文本框中的某一个字符在200ms以内再次点击则选中这个字符所在的词
+三击选行:在已经双击选型的情况下在150ms内第三次点击,则选中行;
+在div.Island.App-toolbar的下面添加一个横向的进度条提示,双击选词的剩余时间;
+在div.Island.App-toolbar的下面添加一个横向的进度条提示,三击选行的剩余时间;(双击选词成功之后显示)
+
+finished:
+在dropdown-menu-button.main-menu-trigger.zen-mode-transition的菜单的最大宽度输入框的下面添加
+双击选词的间隔时间输入框
+三击选行的间隔时间输入框
+可以设置双击选词的间隔时间和三击选行的间隔时间
+
+
+
+分析在画布中双击超长文本框时是否会出现,双 击文本框后还没有插入光标的情况;分析双击文本框插入光标的延迟;在选中状态下点击文本框中的某一个字符插入光标的延迟;
+不考虑旋转的情况下点击编辑，优化文本框点击插入光标响应速度：
+
+分析在画布中由选中状态"第一次点击"某一个字符,进入编辑状态时,分析"第一次点击"插入光标的位置是否准确,分析"第一次点击"和之后的点击插入光标的位置是否有差别;
+
+“第一次点击总是系统性偏移”分析
+在选中文本框时,第一次点击某一个字符似乎会将编辑光标插入到这个字符的下一行,不作任何操作,第二次点击正确地将光标插入在字符的右边;
+分析出现以上现象的原因;
+
+第一次必定落到下一行
+依然出现"第一次必定落到下一行"把 initialPointerDownSceneCoords 与 editor overlay 的实际渲染 top 做一次运行时对比（重点看是否存在固定的 +lineHeightPx 偏移来源）。
+在 e2e 中编写测试验证是否解决"第一次必定落到下一行"问题;
+- 第一次点击进入编辑时，光标位置来自 initialPointerDownSceneCoords → 计算 selectionIndex 的自定义定位逻辑（不是浏览器 textarea 原生点选）。
+已做的修复（彻底绕开“viewport→local”易错映射）
+first click to edit selected multi-line text should not jump to next line (E2E)
+运行时对比（你要的 initialPointerDownSceneCoords vs overlay top）
+- 现在只要在控制台执行：
+  - window.EXCALIDRAW_WYSIWYG_DEBUG = true
+- 然后按“选中 → 第一次点击进入编辑”复现一次，即可读取：
+  - window.__e2eWysiwygPointerDebug
+- 里面包含：
+  - pointerClientY （由 initialPointerDownSceneCoords 反算出的 clientY）
+  - baseTextTopClientY （overlay 首个可渲染字符的 rect.top）
+  - lineHeightClientPx
+  - 以及 offsetTop 与 canvasRectTop ，用来确认两者是否存在固定偏差
+## 已改为“scene 坐标”方案，彻底绕开不稳定的 baseTextTop
+
+
+
+
+
+
+
 启动:
 yarn --cwd ./excalidraw-app vite --port 3000 --strictPort
-powershell -NoProfile -Command "try { (Invoke-WebRequest -UseBasicParsing http://localhost:3000/).StatusCode } catch { $_.Exception.Message; exit 1 }"
-powershell -NoProfile -Command "$env:SELENIUM_HEADLESS='1'; $env:EXCALIDRAW_URL='http://localhost:3000'; D:\a03\miniconda\python.exe Selenium\test.py"
-D:\a03\miniconda\python.exe -m py_compile Selenium/test.py
-$env:SELENIUM_HEADLESS=1; $env:EXCALIDRAW_URL='http://localhost:3000'; D:\a03\miniconda\python.exe Selenium\test.py
-python -m pip install --user typing_extensions
-$env:SELENIUM_HEADLESS=1; $env:EXCALIDRAW_URL='http://localhost:3000/'; python Selenium\test.py
-$env:SELENIUM_HEADLESS=1; $env:EXCALIDRAW_URL='http://localhost:3000/'; python Selenium\test.py
+测试:
+yarn test:e2e --project=chromium --grep "first click to edit selected multi-line"
+控制台:
+window.EXCALIDRAW_WYSIWYG_DEBUG = true
+window.__e2eWysiwygPointerDebug
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+yarn test:app --watch=false
+yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx
+yarn test:app --watch=false --bail=1
 yarn eslint --max-warnings=0 e2e/text-wrap-consistency.spec.ts; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 yarn test:typecheck -- --pretty false; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed" --reporter=line
-yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed" --reporter=line
-yarn eslint --max-warnings=0 e2e/text-wrap-consistency.spec.ts
-yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed" --reporter=line
-D:\a03\miniconda\python.exe -m py_compile Selenium/test.py
-
-
-
-
-
 yarn run v1.22.22
-yarn --cwd ./excalidraw-app vite --port 3000 --strictPort
 yarn electron:dev
-yarn test:code 、 
-yarn test:typecheck
 yarn test:app --watch=false packages/excalidraw/tests/textDomLayout.test.tsx
 http://localhost:3000/
 yarn install
-npx playwright install chromium
 yarn test:e2e
 yarn test:e2e --reporter=line
 yarn eslint --max-warnings=0 e2e/text-wrap-consistency.spec.ts
@@ -388,10 +379,34 @@ yarn test:e2e -- e2e/text-wrap-consistency.spec.ts
 yarn test:app packages/excalidraw/wysiwyg/textWysiwyg.test.tsx packages/excalidraw/tests/shortcuts.test.tsx --watch=false
 yarn test:typecheck
 yarn test:code
-yarn eslint --max-warnings=0 e2e/text-wrap-consistency.spec.ts
 yarn test:typecheck -- --pretty false
 yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed"
-yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed" --reporter=line
+npx playwright install chromium
 
 
 
+
+
+
+
+wastedtest:
+$env:SELENIUM_HEADLESS=1
+python Selenium\test.py
+D:\a03\miniconda\python.exe -m py_compile Selenium/test.py
+$env:SELENIUM_HEADLESS=1; $env:EXCALIDRAW_URL='http://localhost:3000'; D:\a03\miniconda\python.exe Selenium\test.py
+python -m pip install --user typing_extensions
+powershell -NoProfile -Command "try { (Invoke-WebRequest -UseBasicParsing http://localhost:3000/).StatusCode } catch { $_.Exception.Message; exit 1 }"
+powershell -NoProfile -Command "$env:SELENIUM_HEADLESS='1'; $env:EXCALIDRAW_URL='http://localhost:3000'; D:\a03\miniconda\python.exe Selenium\test.py"
+D:\a03\miniconda\python.exe -m py_compile Selenium/test.py
+$env:SELENIUM_HEADLESS=1; $env:EXCALIDRAW_URL='http://localhost:3000/'; python Selenium\test.py
+$env:SELENIUM_HEADLESS=1; $env:EXCALIDRAW_URL='http://localhost:3000/'; python Selenium\test.py
+
+python - <<'PY'
+import zipfile, pathlib, json
+p=pathlib.Path('test-results/text-wrap-consistency-resp-c235e-le-click-inserts-caret-E2E--chromium/trace.zip')
+with zipfile.ZipFile(p,'r') as z:
+    names=z.namelist()
+    print('files',len(names))
+    for n in names[:30]:
+        print(n)
+python -c "import zipfile, json; z=zipfile.ZipFile('test-results/text-wrap-consistency-resp-c235e-le-click-inserts-caret-E2E--chromium/trace.zip'); data=z.read('test.trace'); print(data[:300].decode('utf-8','replace'));"

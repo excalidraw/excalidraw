@@ -239,6 +239,35 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(1);
     });
 
+    it("should place caret near clicked position for very long text on second click", async () => {
+      mockBoundingClientRect({ height: 800, width: 800 });
+      try {
+        const longText = "a".repeat(6001);
+        const text = API.createElement({
+          type: "text",
+          text: longText,
+          x: 60,
+          y: 0,
+          width: 300,
+          height: 200,
+        });
+
+        API.setElements([text]);
+        UI.clickTool("selection");
+
+        mouse.clickAt(text.x + 10, text.y + 10);
+        mouse.clickAt(text.x + 150, text.y + 20);
+
+        const editor = await getTextEditor();
+        expect(editor).not.toBe(null);
+        expect(editor!.selectionStart).toBe(editor!.selectionEnd);
+        expect(editor!.selectionStart).toBeGreaterThan(0);
+        expect(editor!.selectionStart).toBeLessThan(longText.length);
+      } finally {
+        restoreOriginalGetBoundingClientRect();
+      }
+    });
+
     // FIXME too flaky. No one knows why.
     it.skip("should bump the version of a labeled arrow when the label is updated", async () => {
       const arrow = UI.createElement("arrow", {
@@ -913,12 +942,14 @@ describe("textWysiwyg", () => {
         fireEvent.input(editor, { target: { value } }),
       ).not.toThrow();
 
-      expect(diamond.height).toBe(50020);
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      expect(API.getElement(diamond).height).toBe(50020);
 
       // Clearing text to simulate height decrease
       expect(() => updateTextEditor(editor, "")).not.toThrow();
 
-      expect(diamond.height).toBe(70);
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      expect(API.getElement(diamond).height).toBe(70);
     });
 
     it("should bind text to container when double clicked inside of the transparent container", async () => {
