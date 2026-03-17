@@ -48,7 +48,9 @@ export const actionToggleLinearEditor = register({
       !appState.selectedLinearElement?.isEditing &&
       selectedElements.length === 1 &&
       isLinearElement(selectedElements[0]) &&
-      !isElbowArrow(selectedElements[0])
+      !isElbowArrow(selectedElements[0]) &&
+      !(selectedElements[0] as any).polygon &&
+      !(selectedElements[0] as any).sharedVertices
     ) {
       return true;
     }
