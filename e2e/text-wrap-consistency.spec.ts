@@ -1742,3 +1742,247 @@ test("Click on the character to insert the cursor at the back (E2E)", async ({
     await page.waitForTimeout(50);
   }
 });
+//双击选词间隔(ms)三击选行间隔(ms)精确度测试
+
+test("Double click selects word and triple click selects line using configured intervals (E2E)", async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+
+  const dblMs = 2000;
+  const tripleMs = 2000;
+  const withinMs = 1500;
+  const outsideMs = 2500;
+
+  await page.addInitScript(
+    ({ dblMs, tripleMs }) => {
+      localStorage.setItem(
+        "excalidraw.dblClickSelectWordIntervalMs",
+        String(dblMs),
+      );
+      localStorage.setItem(
+        "excalidraw.tripleClickSelectLineIntervalMs",
+        String(tripleMs),
+      );
+    },
+    { dblMs, tripleMs },
+  );
+
+  await page.goto("/");
+
+  const createX = 240;
+  const createY = 180;
+  const value = "alpha beta gamma\nsecond line words\nthird";
+
+  const editor = await openTextEditorAt(page, createX, createY);
+  await editor.fill(value);
+  await expect(
+    page.locator(".excalidraw-wysiwyg__whitespaceOverlay"),
+  ).toBeVisible();
+  await exitEditor(page);
+
+  await openEditorByDoubleClickAt(page, createX, createY);
+  await expect(
+    page.locator(".excalidraw-wysiwyg__whitespaceOverlay"),
+  ).toBeVisible();
+
+  await page.evaluate(() => {
+    (window as any).__e2eNativeDblClickCount = 0;
+    (window as any).__e2eCountdown = { word: null, line: null };
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (!textarea) {
+      throw new Error("missing textarea");
+    }
+    textarea.addEventListener(
+      "dblclick",
+      () => {
+        (window as any).__e2eNativeDblClickCount += 1;
+      },
+      { capture: true },
+    );
+
+    window.addEventListener(
+      "excalidraw:selectWordCountdown",
+      (event: any) => {
+        (window as any).__e2eCountdown.word = event?.detail ?? null;
+      },
+      { capture: true },
+    );
+    window.addEventListener(
+      "excalidraw:selectLineCountdown",
+      (event: any) => {
+        (window as any).__e2eCountdown.line = event?.detail ?? null;
+      },
+      { capture: true },
+    );
+  });
+
+  const target = await page.evaluate(() => {
+    const overlay = document.querySelector<HTMLElement>(
+      ".excalidraw-wysiwyg__whitespaceOverlay",
+    );
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (!overlay || !textarea) {
+      throw new Error("missing editor");
+    }
+    const normalized = textarea.value.replace(/\r\n?/g, "\n");
+    const word = "beta";
+    const wordStart = normalized.indexOf(word);
+    if (wordStart < 0) {
+      throw new Error("missing beta");
+    }
+
+    const pivotIndex = wordStart + 1;
+    const r = (window as any).__e2eOverlay.charRectAt(overlay, pivotIndex) as
+      | DOMRect
+      | { x: number; y: number; width: number; height: number };
+    if (!Number.isFinite(r.x) || !Number.isFinite(r.y) || r.width <= 0) {
+      throw new Error("invalid target rect");
+    }
+
+    const x = r.x + Math.max(1, r.width / 2);
+    const y = r.y + Math.max(1, r.height / 2);
+    const lineEndIdx = normalized.indexOf("\n");
+    const lineEnd = lineEndIdx === -1 ? normalized.length : lineEndIdx;
+
+    return {
+      x,
+      y,
+      caretAfter: pivotIndex + 1,
+      wordStart,
+      wordEnd: wordStart + word.length,
+      lineStart: 0,
+      lineEnd,
+    };
+  });
+
+  const clickOnce = async () => {
+    await page.mouse.move(target.x, target.y);
+    await page.mouse.down();
+    await page.mouse.up();
+  };
+
+  const getSelection = async () => {
+    return page.evaluate(() => {
+      const textarea = document.querySelector<HTMLTextAreaElement>(
+        "textarea.excalidraw-wysiwyg",
+      );
+      if (!textarea) {
+        throw new Error("missing textarea");
+      }
+      return {
+        start: textarea.selectionStart,
+        end: textarea.selectionEnd,
+      };
+    });
+  };
+
+  await page.waitForTimeout(outsideMs);
+  await page.evaluate(() => {
+    (window as any).__e2eNativeDblClickCount = 0;
+    (window as any).__e2eCountdown.word = null;
+    (window as any).__e2eCountdown.line = null;
+  });
+  await page.evaluate((caretAfter) => {
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (!textarea) {
+      throw new Error("missing textarea");
+    }
+    textarea.focus();
+    textarea.selectionStart = caretAfter;
+    textarea.selectionEnd = caretAfter;
+  }, target.caretAfter);
+
+  await clickOnce();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => (window as any).__e2eCountdown?.word?.durationMs ?? null,
+      ),
+    )
+    .toBe(dblMs);
+  {
+    const sel = await getSelection();
+    expect(sel.start).toBe(sel.end);
+    expect(sel.end).toBe(target.caretAfter);
+  }
+  expect(
+    await page.evaluate(
+      () => (window as any).__e2eCountdown?.line?.durationMs ?? null,
+    ),
+  ).toBe(null);
+  await page.waitForTimeout(withinMs);
+  await clickOnce();
+  expect(await getSelection()).toEqual({
+    start: target.wordStart,
+    end: target.wordEnd,
+  });
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => (window as any).__e2eCountdown?.line?.durationMs ?? null,
+      ),
+    )
+    .toBe(tripleMs);
+
+  await page.waitForTimeout(withinMs);
+  await page.evaluate((caretAfter) => {
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (!textarea) {
+      throw new Error("missing textarea");
+    }
+    textarea.selectionStart = caretAfter;
+    textarea.selectionEnd = caretAfter;
+  }, target.caretAfter);
+  await clickOnce();
+  expect(await getSelection()).toEqual({
+    start: target.lineStart,
+    end: target.lineEnd,
+  });
+
+  await clickOnce();
+  {
+    const sel = await getSelection();
+    expect(sel.start).toBe(sel.end);
+    expect(sel.end).toBe(target.caretAfter);
+  }
+
+  await page.waitForTimeout(outsideMs);
+  await clickOnce();
+  {
+    const sel = await getSelection();
+    expect(sel.start).toBe(sel.end);
+    expect(sel.end).toBe(target.caretAfter);
+  }
+
+  await page.waitForTimeout(outsideMs);
+  await clickOnce();
+  await page.waitForTimeout(withinMs);
+  await clickOnce();
+  expect(await getSelection()).toEqual({
+    start: target.wordStart,
+    end: target.wordEnd,
+  });
+
+  await page.waitForTimeout(outsideMs);
+  await clickOnce();
+  {
+    const sel = await getSelection();
+    expect(sel.start).toBe(sel.end);
+    expect(sel.end).toBe(target.caretAfter);
+  }
+
+  await expect
+    .poll(() => page.evaluate(() => (window as any).__e2eNativeDblClickCount))
+    .toBe(0);
+
+  await exitEditor(page);
+});

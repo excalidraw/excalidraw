@@ -344,9 +344,10 @@ first click to edit selected multi-line text should not jump to next line (E2E)
   - 以及 offsetTop 与 canvasRectTop ，用来确认两者是否存在固定偏差
 ## 已改为“scene 坐标”方案，彻底绕开不稳定的 baseTextTop
 
-
-
-
+分析目前的
+双击选词间隔(ms)三击选行间隔(ms)的设置
+是否精确;
+为这个功能在
 
 
 
