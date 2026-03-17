@@ -39,7 +39,7 @@ const decodeITXtChunk = (data: Uint8Array): PNGMetadataChunk => {
   if (compressionFlag !== 0 && compressionFlag !== 1) {
     throw new Error("INVALID");
   }
-  if (compressionFlag === 1 && compressionMethod !== 0) {
+  if (compressionMethod !== 0) {
     throw new Error("INVALID");
   }
 

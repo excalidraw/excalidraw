@@ -1,4 +1,9 @@
-import { EXPORT_DATA_TYPES, randomId, reseed } from "@excalidraw/common";
+import {
+  EXPORT_DATA_TYPES,
+  MIME_TYPES,
+  randomId,
+  reseed,
+} from "@excalidraw/common";
 import tEXt from "png-chunk-text";
 import encodePng from "png-chunks-encode";
 import decodePng from "png-chunks-extract";
@@ -23,9 +28,18 @@ import { INITIALIZED_IMAGE_PROPS } from "./helpers/constants";
 
 const { h } = window;
 
-const createITXtChunk = (keyword: string, text: string) => {
+const createITXtChunk = (
+  keyword: string,
+  text: string,
+  options?: {
+    compressionFlag?: 0 | 1;
+    compressionMethod?: number;
+  },
+) => {
   const keywordBytes = new TextEncoder().encode(keyword);
   const textBytes = new TextEncoder().encode(text);
+  const compressionFlag = options?.compressionFlag ?? 0;
+  const compressionMethod = options?.compressionMethod ?? 0;
   const data = new Uint8Array(
     keywordBytes.length + 1 + 1 + 1 + 1 + 1 + textBytes.length,
   );
@@ -34,8 +48,8 @@ const createITXtChunk = (keyword: string, text: string) => {
   data.set(keywordBytes, offset);
   offset += keywordBytes.length;
   data[offset++] = 0;
-  data[offset++] = 0;
-  data[offset++] = 0;
+  data[offset++] = compressionFlag;
+  data[offset++] = compressionMethod;
   data[offset++] = 0;
   data[offset++] = 0;
   data.set(textBytes, offset);
@@ -224,6 +238,30 @@ describe("png metadata", () => {
     });
 
     await expect(decodePngMetadata(withUnrelatedITXt)).resolves.toBe(metadata);
+  });
+
+  it("ignores invalid iTXt chunks with a non-zero compression method", async () => {
+    const pngBlob = await API.loadFile("./fixtures/smiley.png");
+    const metadata = JSON.stringify({
+      type: EXPORT_DATA_TYPES.excalidraw,
+      elements: [{ type: "text", text: "😀" }],
+    });
+
+    const embedded = await encodePngMetadata({
+      blob: pngBlob,
+      metadata,
+    });
+
+    const withInvalidITXt = await insertChunkBeforeFirst({
+      blob: embedded,
+      chunk: createITXtChunk(MIME_TYPES.excalidraw, "invalid metadata", {
+        compressionFlag: 0,
+        compressionMethod: 1,
+      }),
+      targetChunkName: "iTXt",
+    });
+
+    await expect(decodePngMetadata(withInvalidITXt)).resolves.toBe(metadata);
   });
 
   it("ignores unrelated tEXt chunks before the excalidraw metadata", async () => {
