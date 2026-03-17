@@ -55,6 +55,8 @@
     max-height: 60vh;
     overflow-y: auto;
     z-index: var(--zIndex-layerUI);
+    right: 0;
+    left: auto;
   }
 
   .mobile-toolbar-separator {
