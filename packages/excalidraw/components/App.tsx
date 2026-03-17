@@ -723,6 +723,8 @@ class App extends React.Component<AppProps, AppState> {
     elementId: string;
     pointIndex: number;
     vertexId: string;
+    prevPointerX: number;
+    prevPointerY: number;
   } | null = null;
 
   // Wireframe vertex hover state (for visual feedback)
@@ -9266,44 +9268,53 @@ class App extends React.Component<AppProps, AppState> {
     if (!this.wireframeDragVertex) {
       return;
     }
-    const { elementId, pointIndex } = this.wireframeDragVertex;
+    const { elementId, pointIndex, vertexId, prevPointerX, prevPointerY } =
+      this.wireframeDragVertex;
     const element = this.scene.getElement(elementId);
     if (!element || !isLinearElement(element)) {
       this.wireframeDragVertex = null;
       return;
     }
 
-    // Simple local space conversion (works for unrotated elements)
-    const newLocalX = pointerCoords.x - element.x;
-    const newLocalY = pointerCoords.y - element.y;
+    const elementsMap = this.scene.getNonDeletedElementsMap();
 
-    const newPoints = [...element.points] as [number, number][];
-    newPoints[pointIndex] = [newLocalX, newLocalY];
+    // 1. Move dragged point using delta approach (no center needed)
+    const cdx = pointerCoords.x - prevPointerX;
+    const cdy = pointerCoords.y - prevPointerY;
+    const cos = Math.cos(element.angle);
+    const sin = Math.sin(element.angle);
+    const ldx = cdx * cos + cdy * sin; // rotate by -angle
+    const ldy = -cdx * sin + cdy * cos;
+    const current = element.points[pointIndex];
+    const localPoint = pointFrom<LocalPoint>(
+      current[0] + ldx,
+      current[1] + ldy,
+    );
 
-    // Handle point-0 normalization
-    if (pointIndex === 0) {
-      const lox = newPoints[0][0];
-      const loy = newPoints[0][1];
-      for (let k = 0; k < newPoints.length; k++) {
-        newPoints[k] = [newPoints[k][0] - lox, newPoints[k][1] - loy];
-      }
-      this.scene.mutateElement(element, {
-        x: element.x + lox,
-        y: element.y + loy,
-        points: newPoints,
-      } as any);
-    } else {
-      this.scene.mutateElement(element, { points: newPoints } as any);
-    }
+    // isDragging: false — skip _propagateSharedVertices, we do our own below
+    const pointUpdates = new Map() as Map<
+      number,
+      { point: LocalPoint; isDragging: boolean }
+    >;
+    pointUpdates.set(pointIndex, {
+      point: localPoint,
+      isDragging: false,
+    });
+    LinearElementEditor.movePoints(element, this.scene, pointUpdates);
 
-    // Propagate to siblings — use pointerCoords as absolute target
-    const sv = (element as any).sharedVertices as Record<number, string> | null;
-    if (sv) {
-      const vertexId = this.wireframeDragVertex.vertexId;
-      const groupId = element.groupIds?.[0];
-      if (!groupId) {
-        return;
-      }
+    // 2. Read actual post-mutation global position of the dragged vertex
+    const actualGlobal = LinearElementEditor.getPointGlobalCoordinates(
+      element,
+      element.points[pointIndex],
+      elementsMap,
+    );
+
+    // 3. Propagate to siblings: for each sibling sharing this vertex,
+    //    compute delta between sibling's current position and the target,
+    //    rotate to sibling's local space, and movePoints.
+    //    This is self-correcting — each frame corrects any drift.
+    const groupId = element.groupIds?.[0];
+    if (groupId) {
       const siblings = this.scene
         .getNonDeletedElements()
         .filter(
@@ -9316,42 +9327,58 @@ class App extends React.Component<AppProps, AppState> {
       for (const sib of siblings) {
         const sibSV = (sib as any).sharedVertices as Record<number, string>;
         const sibEl = sib as any;
-        const newPts = [...sibEl.points] as [number, number][];
-        let needsUpdate = false;
         for (const [idxStr, vid] of Object.entries(sibSV)) {
           if (vid !== vertexId) {
             continue;
           }
-          const idx = LinearElementEditor.resolveVertexIndex(
+          const sibIdx = LinearElementEditor.resolveVertexIndex(
             Number(idxStr),
             sibSV,
-            newPts.length,
+            sibEl.points.length,
           );
-          if (idx >= newPts.length) {
+          if (sibIdx >= sibEl.points.length) {
             continue;
           }
-          newPts[idx] = [pointerCoords.x - sibEl.x, pointerCoords.y - sibEl.y];
-          needsUpdate = true;
-        }
-        if (!needsUpdate) {
-          continue;
-        }
-        const shiftX = newPts[0][0];
-        const shiftY = newPts[0][1];
-        if (Math.abs(shiftX) > 0.001 || Math.abs(shiftY) > 0.001) {
-          for (let k = 0; k < newPts.length; k++) {
-            newPts[k] = [newPts[k][0] - shiftX, newPts[k][1] - shiftY];
+          // Current global position of this vertex on the sibling
+          const sibGlobal = LinearElementEditor.getPointGlobalCoordinates(
+            sibEl,
+            sibEl.points[sibIdx],
+            elementsMap,
+          );
+          // Canvas-space delta to align sibling vertex with dragged vertex
+          const dgx = actualGlobal[0] - sibGlobal[0];
+          const dgy = actualGlobal[1] - sibGlobal[1];
+          if (Math.abs(dgx) < 0.001 && Math.abs(dgy) < 0.001) {
+            continue;
           }
-          this.scene.mutateElement(sib, {
-            x: sibEl.x + shiftX,
-            y: sibEl.y + shiftY,
-            points: newPts,
-          } as any);
-        } else {
-          this.scene.mutateElement(sib, { points: newPts } as any);
+          // Rotate delta to sibling's local space (no center needed)
+          const sibCos = Math.cos(sibEl.angle);
+          const sibSin = Math.sin(sibEl.angle);
+          const sibLdx = dgx * sibCos + dgy * sibSin;
+          const sibLdy = -dgx * sibSin + dgy * sibCos;
+          const sibLocal = pointFrom<LocalPoint>(
+            sibEl.points[sibIdx][0] + sibLdx,
+            sibEl.points[sibIdx][1] + sibLdy,
+          );
+          const sibUpdates = new Map() as Map<
+            number,
+            { point: LocalPoint; isDragging: boolean }
+          >;
+          sibUpdates.set(sibIdx, {
+            point: sibLocal,
+            isDragging: false, // no cascade
+          });
+          LinearElementEditor.movePoints(sibEl, this.scene, sibUpdates);
         }
       }
     }
+
+    // Update prevPointer for next frame
+    this.wireframeDragVertex = {
+      ...this.wireframeDragVertex,
+      prevPointerX: pointerCoords.x,
+      prevPointerY: pointerCoords.y,
+    };
   };
 
   private updateSolidPresetPreview = (): void => {
@@ -9837,6 +9864,8 @@ class App extends React.Component<AppProps, AppState> {
                   elementId: hitVertex.elementId,
                   pointIndex: hitVertex.pointIndex,
                   vertexId: hitVertex.vertexId,
+                  prevPointerX: pointerDownState.origin.x,
+                  prevPointerY: pointerDownState.origin.y,
                 };
               }
             }

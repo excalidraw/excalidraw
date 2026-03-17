@@ -1803,6 +1803,8 @@ export class LinearElementEditor {
           prevGlobal,
           prevPoints,
           nextPoints,
+          offsetX,
+          offsetY,
         );
       }
     }
@@ -1873,6 +1875,8 @@ export class LinearElementEditor {
     prevGlobal: Map<string, { x: number; y: number }>,
     prevPoints: readonly LocalPoint[],
     nextPoints: readonly LocalPoint[],
+    offsetX: number,
+    offsetY: number,
   ): void {
     // 1. Compute vertex targets using LOCAL delta + rotated vector.
     // This avoids the center-shift problem when using getPointsGlobalCoordinates
@@ -1898,9 +1902,12 @@ export class LinearElementEditor {
       if (!prev) {
         continue;
       }
-      // Local delta between old and new points
-      const ldx = nextPoints[idx][0] - prevPoints[prevIdx][0];
-      const ldy = nextPoints[idx][1] - prevPoints[prevIdx][1];
+      // Local delta between old and new points.
+      // Add offset to compensate for point-0 normalization: movePoints
+      // subtracts offset from ALL points, so raw delta includes the
+      // normalization shift. Adding offset isolates actual vertex movement.
+      const ldx = nextPoints[idx][0] - prevPoints[prevIdx][0] + offsetX;
+      const ldy = nextPoints[idx][1] - prevPoints[prevIdx][1] + offsetY;
       if (Math.abs(ldx) < 0.001 && Math.abs(ldy) < 0.001) {
         continue;
       }
@@ -1979,7 +1986,9 @@ export class LinearElementEditor {
         continue;
       }
 
-      // Re-normalize if point 0 moved (must be [0,0])
+      // Re-normalize if point 0 moved (must be [0,0]).
+      // Use rotatedOffset (same as _updatePoints) to correctly handle
+      // rotated siblings — simple x+=shiftX breaks global positions.
       const shiftX = newPoints_[0][0];
       const shiftY = newPoints_[0][1];
       if (Math.abs(shiftX) > 0.001 || Math.abs(shiftY) > 0.001) {
@@ -1989,9 +1998,23 @@ export class LinearElementEditor {
             newPoints_[k][1] - shiftY,
           );
         }
+        // Compute rotatedOffset like _updatePoints does
+        const prevCoords = getElementPointsCoords(sibling, sibling.points);
+        const nextCoords = getElementPointsCoords(sibling, newPoints_);
+        const dX =
+          (prevCoords[0] + prevCoords[2]) / 2 -
+          (nextCoords[0] + nextCoords[2]) / 2;
+        const dY =
+          (prevCoords[1] + prevCoords[3]) / 2 -
+          (nextCoords[1] + nextCoords[3]) / 2;
+        const rotatedOffset = pointRotateRads(
+          pointFrom(shiftX, shiftY),
+          pointFrom(dX, dY),
+          sibling.angle,
+        );
         scene.mutateElement(sibling, {
-          x: sibling.x + shiftX,
-          y: sibling.y + shiftY,
+          x: sibling.x + rotatedOffset[0],
+          y: sibling.y + rotatedOffset[1],
           points: newPoints_,
         } as any);
       } else {
