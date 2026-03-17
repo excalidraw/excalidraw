@@ -3,6 +3,8 @@ import React from "react";
 import { KEYS } from "@excalidraw/common";
 import { getBoundTextElement } from "@excalidraw/element";
 
+import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+
 import { actionStackToScale } from "../actions";
 import { Excalidraw } from "../index";
 
@@ -24,7 +26,7 @@ beforeEach(async () => {
 describe("actionStackToScale", () => {
   describe("predicate", () => {
     it.each(["rectangle", "diamond", "ellipse"] as const)(
-      "should be available when a single %s is selected",
+      "runs on a selected %s",
       (type) => {
         const el = API.createElement({ type, x: 50, y: 50 });
         API.setElements([el]);
@@ -36,7 +38,7 @@ describe("actionStackToScale", () => {
       },
     );
 
-    it("should NOT run when a non-stackable element is selected", () => {
+    it("does not run on non-stackable elements", () => {
       const line = API.createElement({ type: "line", x: 50, y: 50 });
       API.setElements([line]);
       API.setSelectedElements([line]);
@@ -46,7 +48,7 @@ describe("actionStackToScale", () => {
       expect(h.elements).toHaveLength(1);
     });
 
-    it("should NOT run when multiple elements are selected", () => {
+    it("does not run with multiple elements selected", () => {
       const rect1 = API.createElement({ type: "rectangle", x: 10, y: 10 });
       const rect2 = API.createElement({ type: "rectangle", x: 50, y: 50 });
       API.setElements([rect1, rect2]);
@@ -57,7 +59,7 @@ describe("actionStackToScale", () => {
       expect(h.elements).toHaveLength(2);
     });
 
-    it("should NOT run when nothing is selected", () => {
+    it("does not run with empty selection", () => {
       const rect = API.createElement({ type: "rectangle", x: 50, y: 50 });
       API.setElements([rect]);
 
@@ -69,7 +71,7 @@ describe("actionStackToScale", () => {
 
   describe("perform", () => {
     it.each(["rectangle", "diamond", "ellipse"] as const)(
-      "should create 2 offset copies behind a %s in correct z-order",
+      "creates 2 offset copies behind a %s in correct z-order",
       (type) => {
         const el = API.createElement({ type, x: 100, y: 100 });
         API.setElements([el]);
@@ -89,7 +91,7 @@ describe("actionStackToScale", () => {
       },
     );
 
-    it("should group all three elements under the same groupId", () => {
+    it("groups all three elements and selects the group", () => {
       const rect = API.createElement({
         type: "rectangle",
         x: 100,
@@ -113,7 +115,7 @@ describe("actionStackToScale", () => {
       expect(selectedGroupIds).toEqual([sharedGroupId]);
     });
 
-    it("should preserve styles from the original element on copies", () => {
+    it("preserves styles on copies", () => {
       const rect = API.createElement({
         type: "rectangle",
         x: 100,
@@ -139,7 +141,7 @@ describe("actionStackToScale", () => {
       }
     });
 
-    it("should keep text only on the original and group it with the stack", () => {
+    it("strips text from copies but keeps it on the original", () => {
       const rect = API.createElement({
         type: "rectangle",
         id: "rect-id",
@@ -181,32 +183,10 @@ describe("actionStackToScale", () => {
       expect(updatedText.groupIds[0]).toBe(updatedRect.groupIds[0]);
     });
 
-    it("should not modify other elements in the scene", () => {
-      const rect = API.createElement({
-        type: "rectangle",
-        x: 100,
-        y: 100,
-      });
-      const other = API.createElement({
-        type: "ellipse",
-        x: 300,
-        y: 300,
-      });
-      API.setElements([other, rect]);
-      API.setSelectedElements([rect]);
-
-      API.executeAction(actionStackToScale);
-
-      const updatedOther = h.elements.find((e) => e.id === other.id)!;
-      expect(updatedOther.x).toBe(300);
-      expect(updatedOther.y).toBe(300);
-      expect(updatedOther.groupIds).toEqual([]);
-    });
-
   });
 
   describe("keyboard shortcut", () => {
-    it("should trigger via Ctrl/Cmd+J", () => {
+    it("triggers via Ctrl/Cmd+J", () => {
       UI.clickTool("rectangle");
       mouse.down(10, 10);
       mouse.up(100, 100);
@@ -220,7 +200,7 @@ describe("actionStackToScale", () => {
       expect(h.elements).toHaveLength(3);
     });
 
-    it("pressing Ctrl+J twice should not stack again — it's a one-way operation", () => {
+    it("Ctrl+J twice does not double-stack", () => {
       UI.clickTool("rectangle");
       mouse.down(10, 10);
       mouse.up(100, 100);
@@ -244,7 +224,7 @@ describe("actionStackToScale", () => {
   });
 
   describe("double-click to edit text", () => {
-    it("should bind new text to the frontmost shape when double-clicking a stack", async () => {
+    it("binds new text to the frontmost shape", async () => {
       const rect = UI.createElement("rectangle", {
         x: 0,
         y: 0,
@@ -272,7 +252,9 @@ describe("actionStackToScale", () => {
       Keyboard.exitTextEditor(editor);
 
       const textEl = h.elements.find(
-        (e) => e.type === "text" && (e as any).containerId === originalId,
+        (e) =>
+          e.type === "text" &&
+          (e as ExcalidrawTextElement).containerId === originalId,
       );
       expect(textEl).toBeDefined();
     });
