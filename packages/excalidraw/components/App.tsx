@@ -6643,6 +6643,10 @@ class App extends React.Component<AppProps, AppState> {
             }
             this.scene.triggerUpdate();
           }
+          // Vertex hover takes priority over resize handles — stop here
+          if (hoveredId) {
+            return;
+          }
         }
       } else if (this.hoveredWireframeVertexId) {
         this.hoveredWireframeVertexId = null;
@@ -7024,22 +7028,25 @@ class App extends React.Component<AppProps, AppState> {
       !isOverScrollBar &&
       this.state.openDialog?.name !== "elementLinkSelector"
     ) {
-      const transformHandleType = getTransformHandleTypeFromCoords(
-        getCommonBounds(selectedElements),
-        scenePointerX,
-        scenePointerY,
-        this.state.zoom,
-        event.pointerType,
-        this.editorInterface,
-      );
-      if (transformHandleType) {
-        setCursor(
-          this.interactiveCanvas,
-          getCursorForResizingElement({
-            transformHandleType,
-          }),
+      // Skip resize cursor if hovering over a wireframe vertex
+      if (!this.hoveredWireframeVertexId) {
+        const transformHandleType = getTransformHandleTypeFromCoords(
+          getCommonBounds(selectedElements),
+          scenePointerX,
+          scenePointerY,
+          this.state.zoom,
+          event.pointerType,
+          this.editorInterface,
         );
-        return;
+        if (transformHandleType) {
+          setCursor(
+            this.interactiveCanvas,
+            getCursorForResizingElement({
+              transformHandleType,
+            }),
+          );
+          return;
+        }
       }
     }
 
@@ -8191,14 +8198,37 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
       } else if (selectedElements.length > 1) {
-        pointerDownState.resize.handleType = getTransformHandleTypeFromCoords(
-          getCommonBounds(selectedElements),
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-          this.state.zoom,
-          event.pointerType,
-          this.editorInterface,
-        );
+        // For wireframe groups, check if pointer is over a vertex first —
+        // vertex drag takes priority over resize handles
+        let skipResize = false;
+        const wfGroupId = Object.keys(this.state.selectedGroupIds)[0];
+        if (wfGroupId) {
+          const allEls = this.scene.getNonDeletedElements();
+          if (isWireframeGroup(wfGroupId, allEls)) {
+            const vtx = getWireframeVertexAtPosition(
+              wfGroupId,
+              allEls,
+              this.scene.getNonDeletedElementsMap(),
+              pointerDownState.origin.x,
+              pointerDownState.origin.y,
+              this.state.zoom,
+            );
+            if (vtx) {
+              skipResize = true;
+            }
+          }
+        }
+        if (!skipResize) {
+          pointerDownState.resize.handleType =
+            getTransformHandleTypeFromCoords(
+              getCommonBounds(selectedElements),
+              pointerDownState.origin.x,
+              pointerDownState.origin.y,
+              this.state.zoom,
+              event.pointerType,
+              this.editorInterface,
+            );
+        }
       }
       if (pointerDownState.resize.handleType) {
         pointerDownState.resize.isResizing = true;
