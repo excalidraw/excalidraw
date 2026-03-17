@@ -361,12 +361,10 @@ describe("stats for a non-generic element", () => {
     mouse.clickAt(20, 30);
     const editor = await getTextEditor();
     updateTextEditor(editor, "Hello!");
-    act(() => {
-      editor.blur();
-    });
+    Keyboard.exitTextEditor(editor);
 
     const text = h.elements[0] as ExcalidrawTextElement;
-    mouse.clickOn(text);
+    API.setSelectedElements([text]);
 
     elementStats = stats?.querySelector("#elementStats");
 

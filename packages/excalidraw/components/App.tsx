@@ -684,6 +684,11 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
+  // TODO this is a hack and we should ideally unify touch and pointer events
+  // and implement our own double click handling end-to-end (currently we're
+  // using a mix of native browser for click events and manual for touch -
+  // and browser doubleClick sucks to begin with)
+  lastPointerUpIsDoubleClick: boolean = false;
   lastPointerMoveEvent: PointerEvent | null = null;
   /** current frame pointer cords */
   lastPointerMoveCoords: { x: number; y: number } | null = null;
@@ -1437,6 +1442,21 @@ class App extends React.Component<AppProps, AppState> {
 
     return true;
   }
+
+  private isDoubleClick = (
+    lastPointerEvent:
+      | PointerEvent
+      | React.PointerEvent<HTMLElement>
+      | undefined
+      | null,
+    currentPointerEvent: PointerEvent | React.PointerEvent<HTMLElement>,
+  ) => {
+    return (
+      lastPointerEvent != null &&
+      currentPointerEvent.timeStamp - lastPointerEvent.timeStamp <=
+        TAP_TWICE_TIMEOUT
+    );
+  };
 
   private isIframeLikeElementCenter(
     el: ExcalidrawIframeLikeElement | null,
@@ -5617,8 +5637,14 @@ class App extends React.Component<AppProps, AppState> {
     element: ExcalidrawTextElement,
     {
       isExistingElement = false,
+      initialCaretSceneCoords = null,
     }: {
       isExistingElement?: boolean;
+      /**
+       * supply null if no caret positioning is desired, and instead
+       * text should be auto-selected
+       */
+      initialCaretSceneCoords?: { x: number; y: number } | null;
     },
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
@@ -5721,6 +5747,7 @@ class App extends React.Component<AppProps, AppState> {
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
       app: this,
+      initialCaretSceneCoords,
       // when text is selected, it's hard (at least on iOS) to re-position the
       // caret (i.e. deselect). There's not much use for always selecting
       // the text on edit anyway (and users can select-all from contextmenu
@@ -5969,6 +5996,7 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter = true,
     container,
     autoEdit = true,
+    initialCaretSceneCoords,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -5978,6 +6006,7 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter?: boolean;
     container?: ExcalidrawTextContainer | null;
     autoEdit?: boolean;
+    initialCaretSceneCoords?: { x: number; y: number };
   }) => {
     let shouldBindToContainer = false;
 
@@ -6116,6 +6145,9 @@ class App extends React.Component<AppProps, AppState> {
     if (autoEdit || existingTextElement || container) {
       this.handleTextWysiwyg(element, {
         isExistingElement: !!existingTextElement,
+        initialCaretSceneCoords: existingTextElement
+          ? initialCaretSceneCoords
+          : null,
       });
     } else {
       this.setState({
@@ -6144,6 +6176,9 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasDoubleClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
   ) => {
+    if (this.state.editingTextElement) {
+      return;
+    }
     // case: double-clicking with arrow/line tool selected would both create
     // text and enter multiElement mode
     if (this.state.multiElement) {
@@ -7680,6 +7715,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.removePointer(event);
+    this.lastPointerUpIsDoubleClick = this.isDoubleClick(
+      this.lastPointerUpEvent,
+      event,
+    );
     this.lastPointerUpEvent = event;
 
     if (!event.ctrlKey) {
@@ -8516,6 +8555,7 @@ class App extends React.Component<AppProps, AppState> {
       insertAtParentCenter: !event.altKey,
       container,
       autoEdit: false,
+      initialCaretSceneCoords: { x: sceneX, y: sceneY },
     });
 
     resetCursor(this.interactiveCanvas);
@@ -10998,6 +11038,30 @@ class App extends React.Component<AppProps, AppState> {
         }
         // reset cursor
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+        return;
+      }
+
+      if (
+        activeTool.type === this.state.preferredSelectionTool.type &&
+        !this.state.editingTextElement &&
+        !pointerDownState.drag.hasOccurred &&
+        !pointerDownState.hit.wasAddedToSelection &&
+        !childEvent.shiftKey &&
+        !childEvent[KEYS.CTRL_OR_CMD] &&
+        !childEvent.altKey &&
+        childEvent.pointerType !== "touch" &&
+        hitElement &&
+        isTextElement(hitElement) &&
+        this.state.selectedElementIds[hitElement.id] &&
+        this.scene.getSelectedElements(this.state).length === 1
+      ) {
+        this.startTextEditing({
+          sceneX: sceneCoords.x,
+          sceneY: sceneCoords.y,
+          initialCaretSceneCoords: this.lastPointerUpIsDoubleClick
+            ? undefined
+            : sceneCoords,
+        });
         return;
       }
 
