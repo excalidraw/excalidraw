@@ -38,7 +38,7 @@ export interface LineGeom {
   dashed: boolean;
   polygon: boolean;
   /** Shared vertex IDs per point index (for wireframe vertex binding) */
-  vertexIds?: string[];
+  vertexIds?: (string | undefined)[];
 }
 
 export interface EllipseGeom {
@@ -88,7 +88,7 @@ function line(
     ],
     dashed,
     polygon: false,
-    vertexIds: v1 && v2 ? [v1, v2] : undefined,
+    vertexIds: v1 || v2 ? [v1, v2] : undefined,
   };
 }
 
@@ -97,7 +97,7 @@ function poly(
   y: number,
   pts: LocalPoint[],
   dashed = false,
-  vertexIds?: string[],
+  vertexIds?: (string | undefined)[],
 ): LineGeom {
   return {
     kind: "line",
@@ -356,9 +356,9 @@ function coneGeom(bbox: BBox): ElementGeom[] {
     arcGeom(bcx, bcy, rx, ry, 0, Math.PI, false),
     // Base back arc (dashed)
     arcGeom(bcx, bcy, rx, ry, Math.PI, 2 * Math.PI, true),
-    // Lateral edges — solid
-    line(apex.x, apex.y, x, bcy, false),
-    line(apex.x, apex.y, x + w, bcy, false),
+    // Lateral edges — solid (APEX shared vertex for draggable apex)
+    line(apex.x, apex.y, x, bcy, false, "APEX", undefined),
+    line(apex.x, apex.y, x + w, bcy, false, "APEX", undefined),
   ];
 }
 
