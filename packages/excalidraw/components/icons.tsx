@@ -2476,6 +2476,17 @@ export const chevronRight = createIcon(
   tablerIconProps,
 );
 
+// Stack-to-Scale: three offset rectangles representing horizontal scaling
+export const StackToScaleIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <rect x="8" y="4" width="12" height="12" rx="1" stroke="currentColor" fill="none" />
+    <rect x="4" y="8" width="12" height="12" rx="1" stroke="currentColor" fill="none" opacity="0.6" />
+    <rect x="0" y="12" width="12" height="12" rx="1" stroke="currentColor" fill="none" opacity="0.3" />
+  </g>,
+  tablerIconProps,
+);
+
 // tabler-icons: adjustments-horizontal
 export const settingsIcon = createIcon(
   <g strokeWidth={1.25}>

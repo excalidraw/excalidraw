@@ -322,6 +322,7 @@ import {
   actionToggleArrowBinding,
   actionToggleMidpointSnapping,
   actionToggleCropEditor,
+  actionStackToScale,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
@@ -6264,18 +6265,39 @@ class App extends React.Component<AppProps, AppState> {
 
       if (selectedGroupId) {
         this.store.scheduleCapture();
-        this.setState((prevState) => ({
-          ...prevState,
-          ...selectGroupsForSelectedElements(
-            {
-              editingGroupId: selectedGroupId,
-              selectedElementIds: { [hitElement!.id]: true },
-            },
-            this.scene.getNonDeletedElements(),
-            prevState,
-            this,
-          ),
-        }));
+
+        const shouldEditText =
+          hitElement && isTextBindableContainer(hitElement, false);
+
+        this.setState(
+          (prevState) => ({
+            ...prevState,
+            ...selectGroupsForSelectedElements(
+              {
+                editingGroupId: selectedGroupId,
+                selectedElementIds: { [hitElement!.id]: true },
+              },
+              this.scene.getNonDeletedElements(),
+              prevState,
+              this,
+            ),
+          }),
+          () => {
+            if (shouldEditText && hitElement) {
+              const midPoint = getContainerCenter(
+                hitElement,
+                this.state,
+                this.scene.getNonDeletedElementsMap(),
+              );
+              this.startTextEditing({
+                sceneX: midPoint.x,
+                sceneY: midPoint.y,
+                insertAtParentCenter: !event.altKey,
+                container: hitElement as ExcalidrawTextContainer,
+              });
+            }
+          },
+        );
         return;
       }
     }
@@ -12247,6 +12269,7 @@ class App extends React.Component<AppProps, AppState> {
       actionPasteStyles,
       CONTEXT_MENU_SEPARATOR,
       actionGroup,
+      actionStackToScale,
       actionTextAutoResize,
       actionUnbindText,
       actionBindText,
