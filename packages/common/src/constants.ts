@@ -217,7 +217,7 @@ export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
 export const DEFAULT_TRANSFORM_HANDLE_SPACING = 2;
 
-export const SIDE_RESIZING_THRESHOLD = 2 * DEFAULT_TRANSFORM_HANDLE_SPACING;
+export const SIDE_RESIZING_THRESHOLD = 5 * DEFAULT_TRANSFORM_HANDLE_SPACING;
 // a small epsilon to make side resizing always take precedence
 // (avoids an increase in renders and changes to tests)
 export const EPSILON = 0.00001;

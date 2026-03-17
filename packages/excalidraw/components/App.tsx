@@ -6319,6 +6319,17 @@ class App extends React.Component<AppProps, AppState> {
         getSelectedGroupIdForElement(hitElement, this.state.selectedGroupIds);
 
       if (selectedGroupId) {
+        // Don't enter wireframe groups — vertex handles are already
+        // available at group level, no need for double-click drill-in
+        if (
+          isWireframeGroup(
+            selectedGroupId,
+            this.scene.getNonDeletedElements(),
+          )
+        ) {
+          return;
+        }
+
         this.store.scheduleCapture();
         this.setState((prevState) => ({
           ...prevState,
@@ -6625,6 +6636,11 @@ class App extends React.Component<AppProps, AppState> {
           const hoveredId = hovered?.vertexId ?? null;
           if (this.hoveredWireframeVertexId !== hoveredId) {
             this.hoveredWireframeVertexId = hoveredId;
+            if (hoveredId) {
+              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+            } else {
+              resetCursor(this.interactiveCanvas);
+            }
             this.scene.triggerUpdate();
           }
         }
@@ -9945,7 +9961,25 @@ class App extends React.Component<AppProps, AppState> {
 
         // Check for wireframe vertex drag (before normal element drag)
         if (!this.wireframeDragVertex) {
-          const wireframeGroupId = Object.keys(this.state.selectedGroupIds)[0];
+          // Try already-selected group first
+          let wireframeGroupId = Object.keys(
+            this.state.selectedGroupIds,
+          )[0];
+
+          // Click-through: if no group selected yet, check if hit element
+          // is part of a wireframe group and start drag in one gesture
+          if (!wireframeGroupId && pointerDownState.hit.element) {
+            const hitEl = pointerDownState.hit.element;
+            if (hitEl.groupIds?.length) {
+              const candidateId =
+                hitEl.groupIds[hitEl.groupIds.length - 1];
+              const allEls = this.scene.getNonDeletedElements();
+              if (isWireframeGroup(candidateId, allEls)) {
+                wireframeGroupId = candidateId;
+              }
+            }
+          }
+
           if (wireframeGroupId) {
             const allElements = this.scene.getNonDeletedElements();
             if (isWireframeGroup(wireframeGroupId, allElements)) {
