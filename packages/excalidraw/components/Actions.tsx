@@ -195,7 +195,8 @@ export const SelectedShapeActions = ({
     targetElements.length === 1 || isSingleElementBoundContainer;
 
   const showLineEditorAction =
-    !appState.selectedLinearElement?.isEditing &&
+    appState.selectedLinearElement &&
+    !appState.selectedLinearElement.isEditing &&
     targetElements.length === 1 &&
     isLinearElement(targetElements[0]) &&
     !isElbowArrow(targetElements[0]);
@@ -787,7 +788,8 @@ const LinearEditorAction = ({
   renderAction: ActionManager["renderAction"];
 }) => {
   const showLineEditorAction =
-    !appState.selectedLinearElement?.isEditing &&
+    appState.selectedLinearElement &&
+    !appState.selectedLinearElement.isEditing &&
     targetElements.length === 1 &&
     isLinearElement(targetElements[0]) &&
     !isElbowArrow(targetElements[0]);
@@ -824,7 +826,8 @@ export const CompactShapeActions = ({
   );
 
   const showLineEditorAction =
-    !appState.selectedLinearElement?.isEditing &&
+    appState.selectedLinearElement &&
+    !appState.selectedLinearElement.isEditing &&
     targetElements.length === 1 &&
     isLinearElement(targetElements[0]) &&
     !isElbowArrow(targetElements[0]);
