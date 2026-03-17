@@ -2,6 +2,13 @@
 
 .excalidraw {
   .confirm-dialog {
+    // Never go fullscreen — confirm dialogs are small by nature
+    &.Dialog--fullscreen .Modal__content {
+      position: static;
+      max-width: var(--max-width);
+      border-radius: var(--border-radius-lg);
+    }
+
     &-buttons {
       display: flex;
       column-gap: 0.5rem;
