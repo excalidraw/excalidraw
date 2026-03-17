@@ -368,17 +368,18 @@ function coneGeom(bbox: BBox): ElementGeom[] {
 // Hidden vertex BBL: edges to it dashed.
 function triangularPrismGeom(bbox: BBox): ElementGeom[] {
   const { x, y, w, h } = bbox;
-  const d = Math.min(w, h) * 0.25; // oblique depth offset
+  const d = Math.min(w, h) * 0.2; // oblique depth offset
+  const fw = w - d; // front face width
 
-  // Top triangle (upper base)
+  // Top triangle (upper base) — back vertex touches top-right
   const TL = { x, y: y + d };
-  const TR = { x: x + w - d, y: y + d };
-  const TB = { x: x + d, y }; // back vertex (up-left in oblique)
+  const TR = { x: x + fw, y: y + d };
+  const TB = { x: x + w, y }; // back vertex at top-right of bbox
 
-  // Bottom triangle (lower base)
+  // Bottom triangle (lower base) — BL at bottom-left
   const BL = { x, y: y + h };
-  const BR = { x: x + w - d, y: y + h };
-  const BB = { x: x + d, y: y + h - d }; // back vertex
+  const BR = { x: x + fw, y: y + h };
+  const BB = { x: x + w, y: y + h - d }; // back vertex at right
 
   return [
     // Top base — front edge solid, back edges: right solid, left dashed
@@ -503,23 +504,24 @@ function truncatedConeGeom(bbox: BBox): ElementGeom[] {
 
 // ─── OBLIQUE RECTANGULAR PRISM ────────────────────────────────────
 // Rectangular bases top and bottom. Lateral edges slanted (oblique).
-// Same oblique view as regular prism but top base shifted sideways.
+// All vertices strictly within bbox.
 function obliqueRectPrismGeom(bbox: BBox): ElementGeom[] {
   const { x, y, w, h } = bbox;
-  const d = Math.min(w, h) * 0.2; // depth offset
-  const shift = w * 0.2; // oblique lateral shift
+  const d = Math.min(w, h) * 0.15; // depth offset
+  const s = w * 0.2; // oblique lateral shift
+  const bw = w - s - d; // base front edge width
 
-  // Bottom base (oblique view)
-  const BFL = { x, y: y + h - d };
-  const BFR = { x: x + w - d - shift, y: y + h - d };
-  const BBR = { x: x + w - shift, y: y + h - d - d };
-  const BBL = { x: x + d, y: y + h - d - d };
+  // Bottom base — front edge touches bottom of bbox
+  const BFL = { x, y: y + h };
+  const BFR = { x: x + bw, y: y + h };
+  const BBR = { x: x + bw + d, y: y + h - d };
+  const BBL = { x: x + d, y: y + h - d };
 
-  // Top base (shifted right by 'shift' for obliqueness)
-  const TFL = { x: BFL.x + shift, y: y + d };
-  const TFR = { x: BFR.x + shift, y: y + d };
-  const TBR = { x: BBR.x + shift, y };
-  const TBL = { x: BBL.x + shift, y };
+  // Top base shifted right by s, at top of bbox
+  const TFL = { x: x + s, y: y + d };
+  const TFR = { x: x + s + bw, y: y + d };
+  const TBR = { x: x + s + bw + d, y };
+  const TBL = { x: x + s + d, y };
 
   return [
     // Top base — all edges visible (solid)
@@ -542,29 +544,30 @@ function obliqueRectPrismGeom(bbox: BBox): ElementGeom[] {
 
 // ─── OBLIQUE TRIANGULAR PRISM ─────────────────────────────────────
 // Triangular bases top and bottom. Lateral edges slanted (oblique).
+// All vertices strictly within bbox.
 function obliqueTriPrismGeom(bbox: BBox): ElementGeom[] {
   const { x, y, w, h } = bbox;
-  const d = Math.min(w, h) * 0.2; // depth offset
-  const shift = w * 0.2; // oblique lateral shift
+  const d = Math.min(w, h) * 0.15; // depth offset
+  const s = w * 0.2; // oblique lateral shift
 
-  // Top triangle
-  const TL = { x: x + shift, y: y + d };
-  const TR = { x: x + w - d + shift * 0.3, y: y + d };
-  const TB = { x: x + d + shift * 0.6, y }; // back vertex
+  // Top triangle (shifted right) — TR touches right edge
+  const TL = { x: x + s, y: y + d };
+  const TR = { x: x + w, y: y + d };
+  const TB = { x: x + s + d, y }; // back vertex
 
-  // Bottom triangle (shifted left by 'shift')
+  // Bottom triangle (at left) — BL touches left+bottom edges
   const BL = { x, y: y + h };
-  const BR = { x: x + w - d - shift * 0.7, y: y + h };
-  const BB = { x: x + d - shift * 0.4, y: y + h - d }; // back vertex
+  const BR = { x: x + w - s, y: y + h };
+  const BB = { x: x + d, y: y + h - d }; // back vertex
 
   return [
-    // Top base — front solid, back: right solid, left dashed
+    // Top base — all edges visible (solid)
     line(TL.x, TL.y, TR.x, TR.y, false, "TL", "TR"),
     line(TR.x, TR.y, TB.x, TB.y, false, "TR", "TB"),
-    line(TL.x, TL.y, TB.x, TB.y, true, "TL", "TB"),
-    // Bottom base
+    line(TL.x, TL.y, TB.x, TB.y, false, "TL", "TB"),
+    // Bottom base — front solid, back edges dashed
     line(BL.x, BL.y, BR.x, BR.y, false, "BL", "BR"),
-    line(BR.x, BR.y, BB.x, BB.y, false, "BR", "BB"),
+    line(BR.x, BR.y, BB.x, BB.y, true, "BR", "BB"),
     line(BL.x, BL.y, BB.x, BB.y, true, "BL", "BB"),
     // Lateral edges (slanted) — front two solid, back dashed
     line(TL.x, TL.y, BL.x, BL.y, false, "TL", "BL"),

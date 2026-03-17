@@ -962,7 +962,11 @@ const _generateElementShape = (
         // sweep-flag=1 for clockwise (positive angle direction in screen coords)
         const sweep = 1;
 
-        const pathStr = `M ${startX} ${startY} A ${rx} ${ry} 0 ${largeArc} ${sweep} ${endX} ${endY}`;
+        // Close with chord (Z) for standalone arcs (2D semicircle).
+        // 3D wireframe arcs are in groups — no chord needed.
+        const isGrouped = element.groupIds && element.groupIds.length > 0;
+        const close = !isGrouped ? " Z" : "";
+        const pathStr = `M ${startX} ${startY} A ${rx} ${ry} 0 ${largeArc} ${sweep} ${endX} ${endY}${close}`;
         shape = generator.path(
           pathStr,
           generateRoughOptions(element, false, isDarkMode),

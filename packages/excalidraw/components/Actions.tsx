@@ -1209,14 +1209,14 @@ export const ShapesSwitcher = ({
 
   const LINEAR_TOOLS = [
     {
-      type: "arrow",
-      icon: ArrowIcon,
-      title: capitalizeString(t("toolBar.arrow")),
-    },
-    {
       type: "line",
       icon: LineIcon,
       title: capitalizeString(t("toolBar.line")),
+    },
+    {
+      type: "arrow",
+      icon: ArrowIcon,
+      title: capitalizeString(t("toolBar.arrow")),
     },
   ] as const;
 
@@ -1226,7 +1226,7 @@ export const ShapesSwitcher = ({
   const LINEAR_TYPES: Set<string> = new Set(LINEAR_TOOLS.map((t) => t.type));
 
   const [lastActiveShape, setLastActiveShape] = useState<string>("rectangle");
-  const [lastActiveLinear, setLastActiveLinear] = useState<string>("arrow");
+  const [lastActiveLinear, setLastActiveLinear] = useState<string>("line");
 
   // Sync last active shape/linear with current tool
   useEffect(() => {
@@ -1339,7 +1339,7 @@ export const ShapesSwitcher = ({
                     (t) => t.type === (lastActiveShape as string),
                   ) || SHAPE_TOOLS[0]
                 }
-                fillable
+                fillable={false}
               />
             );
           }

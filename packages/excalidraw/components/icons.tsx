@@ -333,18 +333,16 @@ export const LassoIcon = createIcon(
 export const RectangleIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+    <rect x="4" y="4" width="16" height="16" rx="0"></rect>
   </g>,
   tablerIconProps,
 );
 
-// tabler-icons: square-rotated
 export const DiamondIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M10.5 20.4l-6.9 -6.9c-.781 -.781 -.781 -2.219 0 -3l6.9 -6.9c.781 -.781 2.219 -.781 3 0l6.9 6.9c.781 .781 .781 2.219 0 3l-6.9 6.9c-.781 .781 -2.219 .781 -3 0z" />
+    <path d="M12 3 L21 12 L12 21 L3 12 Z" />
   </g>,
-
   tablerIconProps,
 );
 
@@ -354,15 +352,13 @@ export const EllipseIcon = createIcon(
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <circle cx="12" cy="12" r="9"></circle>
   </g>,
-
   tablerIconProps,
 );
 
-// tabler-icons: triangle
 export const TriangleIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" />
+    <path d="M12 3 L3 21 L21 21 Z" />
   </g>,
   tablerIconProps,
 );
@@ -383,12 +379,12 @@ export const PrismIcon = createIcon(
 export const PyramidIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M12 3 L4 20 L20 20 Z" />
-    <path d="M12 3 L8 15" strokeDasharray="3 2" />
-    <path d="M12 3 L18 15" strokeDasharray="3 2" />
-    <path d="M8 15 L18 15" strokeDasharray="3 2" />
-    <path d="M4 20 L8 15" />
-    <path d="M20 20 L18 15" />
+    <path d="M3 20 L14 20 L21 15" />
+    <path d="M11 3 L3 20" />
+    <path d="M11 3 L14 20" />
+    <path d="M11 3 L21 15" />
+    <path d="M3 20 L10 15 L21 15" strokeDasharray="3 2" />
+    <path d="M11 3 L10 15" strokeDasharray="3 2" />
   </g>,
   tablerIconProps,
 );
@@ -396,10 +392,10 @@ export const PyramidIcon = createIcon(
 export const TetrahedronIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M12 3 L3 20 L21 20 Z" />
-    <path d="M12 3 L12 14" strokeDasharray="3 2" />
-    <path d="M3 20 L12 14" strokeDasharray="3 2" />
-    <path d="M21 20 L12 14" />
+    <path d="M3 16 L13 21 L11 3 Z" />
+    <path d="M13 21 L21 12" />
+    <path d="M11 3 L21 12" />
+    <path d="M3 16 L21 12" strokeDasharray="3 2" />
   </g>,
   tablerIconProps,
 );
@@ -410,7 +406,8 @@ export const CylinderIcon = createIcon(
     <ellipse cx="12" cy="6" rx="8" ry="3" />
     <path d="M4 6 L4 18" />
     <path d="M20 6 L20 18" />
-    <ellipse cx="12" cy="18" rx="8" ry="3" strokeDasharray="3 2" />
+    <path d="M4 18 A8 3 0 0 0 20 18" />
+    <path d="M4 18 A8 3 0 0 1 20 18" strokeDasharray="3 2" />
   </g>,
   tablerIconProps,
 );
@@ -419,7 +416,8 @@ export const SphereIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <circle cx="12" cy="12" r="9" />
-    <ellipse cx="12" cy="12" rx="9" ry="3" strokeDasharray="3 2" />
+    <path d="M3 12 A9 3 0 0 0 21 12" />
+    <path d="M3 12 A9 3 0 0 1 21 12" strokeDasharray="3 2" />
   </g>,
   tablerIconProps,
 );
@@ -487,8 +485,10 @@ export const RightTriangleIcon = createIcon(
 export const ConeIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M12 3 L3 19 L21 19 Z" />
-    <ellipse cx="12" cy="19" rx="9" ry="2.5" strokeDasharray="3 2" />
+    <path d="M12 3 L4 19" />
+    <path d="M12 3 L20 19" />
+    <path d="M4 19 A8 2.5 0 0 0 20 19" />
+    <path d="M4 19 A8 2.5 0 0 1 20 19" strokeDasharray="3 2" />
   </g>,
   tablerIconProps,
 );
@@ -496,13 +496,13 @@ export const ConeIcon = createIcon(
 export const TriangularPrismIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M8 4 L2 20 L16 20 Z" />
-    <path d="M8 4 L14 2" />
-    <path d="M16 20 L22 18" />
-    <path d="M14 2 L22 18" />
-    <path d="M2 20 L8 18" strokeDasharray="3 2" />
-    <path d="M8 18 L14 2" strokeDasharray="3 2" />
-    <path d="M8 18 L22 18" strokeDasharray="3 2" />
+    <path d="M3 7 L14 7 L20 3 Z" />
+    <path d="M3 20 L14 20" />
+    <path d="M3 7 L3 20" />
+    <path d="M14 7 L14 20" />
+    <path d="M20 3 L20 16" />
+    <path d="M3 20 L20 16" strokeDasharray="3 2" />
+    <path d="M14 20 L20 16" strokeDasharray="3 2" />
   </g>,
   tablerIconProps,
 );
@@ -510,9 +510,12 @@ export const TriangularPrismIcon = createIcon(
 export const BipyramidIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M12 2 L3 11 L12 22 L21 11 Z" />
-    <path d="M3 11 L21 11" />
-    <path d="M12 2 L12 22" strokeDasharray="3 2" />
+    <path d="M12 2 L3 11 L12 22 L14 11 Z" />
+    <path d="M12 2 L21 9 L12 22" />
+    <path d="M3 11 L14 11 L21 9" />
+    <path d="M3 11 L10 9 L21 9" strokeDasharray="3 2" />
+    <path d="M12 2 L10 9" strokeDasharray="3 2" />
+    <path d="M12 22 L10 9" strokeDasharray="3 2" />
   </g>,
   tablerIconProps,
 );
@@ -520,10 +523,16 @@ export const BipyramidIcon = createIcon(
 export const TruncatedPyramidIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M2 20 L7 6 L17 6 L22 20 Z" />
-    <path d="M7 6 L10 3 L20 3 L17 6" />
-    <path d="M22 20 L20 3" strokeDasharray="0" />
-    <path d="M20 3 L22 20" />
+    {/* Bottom base: front+right solid, back dashed */}
+    <path d="M2 21 L15 21 L22 16" />
+    <path d="M2 21 L9 16 L22 16" strokeDasharray="3 2" />
+    {/* Top base: all solid */}
+    <path d="M6 9 L13 9 L17 6 L10 6 Z" />
+    {/* Lateral: front+right solid, back-left dashed */}
+    <path d="M2 21 L6 9" />
+    <path d="M15 21 L13 9" />
+    <path d="M22 16 L17 6" />
+    <path d="M9 16 L10 6" strokeDasharray="3 2" />
   </g>,
   tablerIconProps,
 );
@@ -534,8 +543,8 @@ export const TruncatedConeIcon = createIcon(
     <path d="M6 19 L9 5" />
     <path d="M18 19 L15 5" />
     <ellipse cx="12" cy="5" rx="3" ry="1.5" />
-    <ellipse cx="12" cy="19" rx="6" ry="2.5" strokeDasharray="3 2" />
     <path d="M6 19 A6 2.5 0 0 0 18 19" />
+    <path d="M6 19 A6 2.5 0 0 1 18 19" strokeDasharray="3 2" />
   </g>,
   tablerIconProps,
 );
@@ -543,12 +552,13 @@ export const TruncatedConeIcon = createIcon(
 export const ObliqueRectPrismIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M3 10 L13 10 L13 21 L3 21 Z" />
-    <path d="M3 10 L10 4 L20 4 L13 10" />
-    <path d="M13 21 L20 15 L20 4" />
-    <path d="M3 21 L10 15" strokeDasharray="3 2" />
-    <path d="M10 15 L20 15" strokeDasharray="3 2" />
-    <path d="M10 4 L10 15" strokeDasharray="3 2" />
+    <path d="M8 5 L18 5 L21 2 L11 2 Z" />
+    <path d="M2 19 L12 19" />
+    <path d="M8 5 L2 19" />
+    <path d="M18 5 L12 19" />
+    <path d="M21 2 L15 16" />
+    <path d="M2 19 L5 16 L15 16" strokeDasharray="3 2" />
+    <path d="M11 2 L5 16" strokeDasharray="3 2" />
   </g>,
   tablerIconProps,
 );
@@ -556,13 +566,12 @@ export const ObliqueRectPrismIcon = createIcon(
 export const ObliqueTriPrismIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M6 4 L2 20 L12 20 Z" />
-    <path d="M6 4 L14 2" />
-    <path d="M12 20 L20 18" />
-    <path d="M14 2 L20 18" />
-    <path d="M2 20 L10 18" strokeDasharray="3 2" />
-    <path d="M10 18 L14 2" strokeDasharray="3 2" />
-    <path d="M10 18 L20 18" strokeDasharray="3 2" />
+    <path d="M9 5 L21 5 L13 2 Z" />
+    <path d="M2 20 L14 20" />
+    <path d="M9 5 L2 20" />
+    <path d="M21 5 L14 20" />
+    <path d="M13 2 L6 17" strokeDasharray="3 2" />
+    <path d="M2 20 L6 17 L14 20" strokeDasharray="3 2" />
   </g>,
   tablerIconProps,
 );
