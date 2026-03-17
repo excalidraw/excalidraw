@@ -4499,10 +4499,15 @@ class App extends React.Component<AppProps, AppState> {
 
     this.cancelInProgressAnimation?.();
     this.scrollToContentRequestId += 1;
+    this.debounceConstrainScrollState.cancel();
 
     if (scrollConstraintsAnimationTimeout) {
       clearTimeout(scrollConstraintsAnimationTimeout);
       scrollConstraintsAnimationTimeout = null;
+    }
+
+    if (opts?.scrollLock && this.state.scrollConstraints) {
+      this.setState({ scrollConstraints: null });
     }
 
     // convert provided target into ExcalidrawElement[] if necessary
@@ -4764,8 +4769,14 @@ class App extends React.Component<AppProps, AppState> {
         });
       },
       onStart,
-      onEnd,
-      onCancel,
+      onEnd: () => {
+        this.cancelInProgressAnimation = null;
+        onEnd();
+      },
+      onCancel: () => {
+        this.cancelInProgressAnimation = null;
+        onCancel();
+      },
       duration,
     });
 
