@@ -580,7 +580,7 @@ export const wrapTextPreservingWhitespaceWithExplicitNewlineMarkers = (
   // - 文本照常自动换行
   // - 仅在用户真实输入的换行处显示 ↵（不会在自动换行处显示）
 
-  if (canUseDomTextWrapping()) {
+  if (canUseDomTextWrapping() && text.length <= 5_000) {
     return wrapTextPreservingWhitespaceWithExplicitNewlineMarkersUsingDom(
       text,
       font,

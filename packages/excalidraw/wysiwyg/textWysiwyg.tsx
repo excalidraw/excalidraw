@@ -711,33 +711,6 @@ export const textWysiwyg = ({
       return null;
     }
 
-    if (excalidrawContainer) {
-      const containerRect = excalidrawContainer.getBoundingClientRect();
-      const [viewportX, viewportY] = getViewportCoords(
-        initialPointerDownSceneCoords.x,
-        initialPointerDownSceneCoords.y,
-      );
-      const clientX = containerRect.left + viewportX;
-      const clientY = containerRect.top + viewportY;
-
-      const doc = document as any;
-      let offsetNode: Node | null = null;
-      let offset = 0;
-      if (typeof doc.caretPositionFromPoint === "function") {
-        const pos = doc.caretPositionFromPoint(clientX, clientY);
-        offsetNode = pos?.offsetNode ?? null;
-        offset = Number(pos?.offset ?? 0);
-      } else if (typeof doc.caretRangeFromPoint === "function") {
-        const range = doc.caretRangeFromPoint(clientX, clientY);
-        offsetNode = range?.startContainer ?? null;
-        offset = Number(range?.startOffset ?? 0);
-      }
-
-      if (offsetNode === whitespaceOverlayTextNode) {
-        return Math.max(0, Math.min(whitespaceOverlayTextNode.length, offset));
-      }
-    }
-
     if (editable.value.length > 5_000) {
       return null;
     }
@@ -855,23 +828,17 @@ export const textWysiwyg = ({
       let hi = lineText.length;
       while (lo < hi) {
         const mid = Math.floor((lo + hi) / 2);
-        if (getPrefixWidth(mid) < xWithinLine) {
+        if (getPrefixWidth(mid) <= xWithinLine) {
           lo = mid + 1;
         } else {
           hi = mid;
         }
       }
-
-      const a = Math.max(0, lo - 1);
-      const b = lo;
-      const da = Math.abs(getPrefixWidth(a) - xWithinLine);
-      const db = Math.abs(getPrefixWidth(b) - xWithinLine);
-      charIndex = db < da ? b : a;
+      charIndex = Math.max(0, Math.min(lineText.length, lo));
     }
 
     return (lineStartIndices[clampedLineIndex] ?? 0) + charIndex;
   };
-
 
   if (onChange) {
     editable.onpaste = async (event) => {
@@ -1468,6 +1435,71 @@ export const textWysiwyg = ({
   }
 
   editable.onpointerdown = (event) => event.stopPropagation();
+  editable.addEventListener("pointerup", (event) => {
+    if (event.button !== POINTER_BUTTON.MAIN) {
+      return;
+    }
+    requestAnimationFrame(() => {
+      if (document.activeElement !== editable) {
+        return;
+      }
+      if (editable.selectionStart !== editable.selectionEnd) {
+        return;
+      }
+
+      const text = whitespaceOverlayTextNode.nodeValue ?? "";
+      if (text.length === 0) {
+        return;
+      }
+      const clampedOffset = Math.max(
+        0,
+        Math.min(text.length, editable.selectionEnd ?? 0),
+      );
+      const range = document.createRange();
+      const getCharRect = (idx: number): DOMRect | null => {
+        if (idx < 0 || idx >= text.length || text[idx] === "\n") {
+          return null;
+        }
+        range.setStart(whitespaceOverlayTextNode, idx);
+        range.setEnd(whitespaceOverlayTextNode, idx + 1);
+        const rects = range.getClientRects();
+        if (rects.length > 0) {
+          return rects[0]!;
+        }
+        const r = range.getBoundingClientRect();
+        if (r.width > 0 || r.height > 0) {
+          return r;
+        }
+        return null;
+      };
+
+      const contains = (rect: DOMRect) =>
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+
+      const idxA = Math.max(0, Math.min(text.length - 1, clampedOffset));
+      const idxB = Math.max(0, Math.min(text.length - 1, clampedOffset - 1));
+      const rectA = getCharRect(idxA);
+      const rectB = getCharRect(idxB);
+
+      let nextIndex: number | null = null;
+      if (rectA && contains(rectA)) {
+        nextIndex = idxA + 1;
+      } else if (rectB && contains(rectB)) {
+        nextIndex = idxB + 1;
+      }
+
+      if (nextIndex != null) {
+        const finalIndex = Math.max(0, Math.min(text.length, nextIndex));
+        if (finalIndex !== editable.selectionEnd) {
+          editable.selectionStart = editable.selectionEnd = finalIndex;
+          scheduleCaretUpdate();
+        }
+      }
+    });
+  });
 
   // rAF (+ capture to by doubly sure) so we don't catch te pointerdown that
   // triggered the wysiwyg

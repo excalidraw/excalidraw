@@ -1,18 +1,20 @@
-
+principle:
 所有的新更能都添加详细注释,不要删除代码,直接注释掉就行了;
 不要运行其他的测试文件,一切功能以这个文件为准;
-
+principle:
 此文件是开发新功能的需求说明,
 新的功能都要不影响已有的功能,确保已有的功能不会受新功能影响;
+finished:
 1.将项目框选功能改为框选中任何一个元素的任何位置即可选中该元素,包括文本图片
-
+finished:
 2.将画布的"网格显示"改为只显示虚线,且虚线不随缩放而改变;
 ,将所有的虚线改为"细虚线"的样式,细虚线不随缩放而消失
-
+finished:
 3.在画布中选中单个文本框时将ctrl+c改为"复制文本到剪贴板",粘贴到画布时,粘贴文本框;实现快速复制文本框内容到其他地方,不影响目前复制文本框;
+finished:
 复制时没有复制文本框内的文字,而是将其他信息一起复制了;
 选中文本框时按下复制直接复制文本框文字,粘贴不依靠剪贴板复制的样式信息,使用ctrl+c/ctrl+v监听实现文本框在画布上复制
-
+finished:
 4.添加按住右键拖动缩放效果
 4.1直接在画布的任何地方按下右键不会有任何反应,只会将鼠标光标改为拖动,来拖动(按住右键相当于按住空格键可以拖动);用户右键单击公共边界框不打开菜单
 4.2按住右键时可以使用鼠标滚轮缩放
@@ -24,19 +26,14 @@
 框选
 选中元素之后可以右键设置此元素
 在按住鼠标右键时,按住的位置是不能改的'
-
-不运行测试
+finished:
 分析目前的右键移动画布是否存在不能快速右键移动的问题,
 右键菜单在没有选中元素的时候,是否还有其他事件绑定导致画布卡死不能移动
-
-
-
-
-
 按住右键拖动中滚轮缩放仍有漂移,没有严格以鼠标光标为缩放中心,
 使用更严谨的方法确保按住右键时缩放中心为鼠标光标所在位置,
 在此设置下按住右键的时候,鼠标光标在画布中的坐标是不会变的;
 
+finished:
 5.添加空格符合换行符可视化表示
 空格符和换行在文本框中编辑状态下和非编辑状态下都可见
 空格符的效果和vscode的render whitespace all效果一样
@@ -47,48 +44,48 @@
 将换行符改为和word中一样的样式(向下再向左的箭头)
 画布中的文本框在调整文本框宽度时,不要加入新的换行符,不要删除空格;
 
-
+finished:
 6.为所有的文本框添加虚线边框,紧贴文本,将换行符和空格符包含在内,
 为文本框添加行号,行号显示在虚线框的左侧,自动换行不增加行号(与代码块一致)
 行号样式与代码块类似,行号右对齐文本框行
 
+fixed:
 7.文本框在编辑时和非编辑时在画布上看起来应该只有光标的区别
 目前编辑时虚线边框和行号消失, 正确做法是不应该消失;
 存在一些编辑时和非编辑时换行符号位置差异的情况
 虚线边框可以无限拖动变宽;
 
-
-8.不要运行任何其他测试文件,一切测试以实际运行结果为准
-为更新的代码添加注释,
+finished:
 优化文本框左键点击:鼠标左键点击文本框后,选中文本框,之后再点击,就是将编辑光标插入鼠标光标所在的位置
 第一次鼠标点击就是选中文本框;第二次鼠标左键点击就是插入光标;默认全选是错误设计;选中逻辑只有插入光标后双击选词,三击选行;
 
+fixed:
 点击选中文本框之后,
 情况1:如果等待1秒左右之后鼠标左键点击文本框文本区域,则顺利插入编辑光标;
 情况2:(出现错误)如果紧接着点击文本框文本区域,则似乎触发了一次全选,之后就不选中文本框了,
 (正确情况)应该是顺利插入编辑光标
 
 
-
+fixed:
 当在一个文本框中一直按空格时,空格超出了此行的宽度,编辑光标没有进入下一行;分析原因,和解决方案,不修改代码;
 分析输入字符时输入内容自动换行后光标可以自动换行进入下一行,而输入空格无法自动换行进入下一行的原因,不修改代码;
-
+fixed:
 没有完全解决输入时按空格键无法自动换行进入下一行的问题.
 输入空格空格只是表示空格的透明点进入下一行,但透明点与选中的空格字符位置不对应,存在空格透明点已经有多行,但选中的空格只有2行;分析原因;不修改代码;
 依然存在输入时按空格键无法自动换行进入下一行的问题
 
 
-
+finished:
 9.添加esc功能:
 当选中一个文本框时,按下esc之后不选中此文本框
 当编辑一个文本框时,按下esc还是回到选中状态
 
 
-
+fixed:
 10.分析文本框在双击之后进入编辑状态时,文本框文字和边框,空格的透明点,换行符的向下向左箭头位置或大小发生轻微变化的原因是什么,不修改代码;
 
 
-
+wasted:
 能否一开始就不用canvas渲染文字,所有文字全部用DOM渲染
 不影响当前功能,和文本框样式,分析是否可行
 不修改代码
@@ -100,13 +97,13 @@ DOM 文本的字形 hinting、字距、换行规则
 - 现有命中测试/选择/框选/拖拽都以“场景坐标 + 元素几何”为准；如果 DOM 文本节点接管鼠标事件，会干扰 canvas 的输入系统。要保持交互一致，DOM 文本大概率必须 pointer-events: none ，这又限制了非编辑态的 DOM 文本不能参与原生选择/复制等（除非另做一套交互策略）。
 
 
-
+wasted:
 将所有文本改为使用DOM渲染,分析保持现有功能,都需要做哪些更改;不修改代码;
 
 
 
 为改动路线 B在 tests 编写测试文件
-
+fixed:
 路线 B（一致性最好，改动最大）：把“测量 + 换行 + 高度计算”整体迁到 DOM（用 hidden div/span 或 textarea 的排版结果），再驱动元素 width/height 与显示。这样能最大化消除“双击进入编辑轻微变化”
 
 在#tests编写一个测试,确保画布中的文本框在大多数位置双击编辑时,编辑时和非编辑时的文字位置不变;
@@ -287,9 +284,20 @@ yarn test:typecheck -- --pretty false
 yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "double click inserts caret" --reporter=line
 
 
-
-
-
+<wasted
+python - <<'PY'
+import zipfile, pathlib, json
+p=pathlib.Path('test-results/text-wrap-consistency-resp-c235e-le-click-inserts-caret-E2E--chromium/trace.zip')
+with zipfile.ZipFile(p,'r') as z:
+    names=z.namelist()
+    print('files',len(names))
+    for n in names[:30]:
+        print(n)
+PY
+wasted>
+<check 
+python -c "import zipfile, json; z=zipfile.ZipFile('test-results/text-wrap-consistency-resp-c235e-le-click-inserts-caret-E2E--chromium/trace.zip'); data=z.read('test.trace'); print(data[:300].decode('utf-8','replace'));"
+check >
 
 
 
@@ -310,11 +318,6 @@ python Selenium\test.py
 
 
 
-
-
-
-
-
 方法 A：浏览器内“黑盒”计时（不改业务代码）
 - 在注入脚本里记录 t0=performance.now() （在触发 action 前/事件 capture 阶段）。
 - 触发操作后，用 requestAnimationFrame 连续等 1–2 帧，并加一个“完成条件”：
@@ -323,6 +326,7 @@ python Selenium\test.py
   - 双击：textarea 获得 focus 且 selectionEnd > 0（你们现在就是这么干的）。
 - 优点：实现简单、跨框架；缺点：只能拿到“端到端延迟”，很难拆解成内部步骤。
 D:\a03\miniconda\python.exe -m py_compile Selenium/test.py
+启动:
 yarn --cwd ./excalidraw-app vite --port 3000 --strictPort
 powershell -NoProfile -Command "try { (Invoke-WebRequest -UseBasicParsing http://localhost:3000/).StatusCode } catch { $_.Exception.Message; exit 1 }"
 powershell -NoProfile -Command "$env:SELENIUM_HEADLESS='1'; $env:EXCALIDRAW_URL='http://localhost:3000'; D:\a03\miniconda\python.exe Selenium\test.py"
@@ -331,6 +335,23 @@ $env:SELENIUM_HEADLESS=1; $env:EXCALIDRAW_URL='http://localhost:3000'; D:\a03\mi
 python -m pip install --user typing_extensions
 $env:SELENIUM_HEADLESS=1; $env:EXCALIDRAW_URL='http://localhost:3000/'; python Selenium\test.py
 $env:SELENIUM_HEADLESS=1; $env:EXCALIDRAW_URL='http://localhost:3000/'; python Selenium\test.py
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

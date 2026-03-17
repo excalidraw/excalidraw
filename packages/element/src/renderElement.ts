@@ -83,6 +83,19 @@ import type {
 
 import type { RoughCanvas } from "roughjs/bin/canvas";
 
+type TextWrapCacheEntry = {
+  version: number;
+  versionNonce: number;
+  maxWidth: number;
+  font: string;
+  shouldWrap: boolean;
+  originalText: string;
+  lines: readonly string[];
+  explicitNewlineAfterLine: readonly boolean[];
+};
+
+const textWrapCache = new WeakMap<ExcalidrawTextElement, TextWrapCacheEntry>();
+
 const isPendingImageElement = (
   element: ExcalidrawElement,
   renderConfig: StaticCanvasRenderConfig,
@@ -633,12 +646,42 @@ const drawElementOnCanvas = (
         const maxWidth = container
           ? getBoundTextMaxWidth(container, element)
           : element.width;
-        const { lines, explicitNewlineAfterLine } =
-          wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
+        const font = getFontString(element);
+        const wrapWidth = shouldWrap ? maxWidth : Infinity;
+        const cached = textWrapCache.get(element);
+        let lines: readonly string[];
+        let explicitNewlineAfterLine: readonly boolean[];
+
+        if (
+          cached &&
+          cached.version === element.version &&
+          cached.versionNonce === element.versionNonce &&
+          cached.maxWidth === wrapWidth &&
+          cached.font === font &&
+          cached.shouldWrap === shouldWrap &&
+          cached.originalText === element.originalText
+        ) {
+          lines = cached.lines;
+          explicitNewlineAfterLine = cached.explicitNewlineAfterLine;
+        } else {
+          const res = wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
             element.originalText,
-            getFontString(element),
-            shouldWrap ? maxWidth : Infinity,
+            font,
+            wrapWidth,
           );
+          lines = res.lines;
+          explicitNewlineAfterLine = res.explicitNewlineAfterLine;
+          textWrapCache.set(element, {
+            version: element.version,
+            versionNonce: element.versionNonce,
+            maxWidth: wrapWidth,
+            font,
+            shouldWrap,
+            originalText: element.originalText,
+            lines: res.lines,
+            explicitNewlineAfterLine: res.explicitNewlineAfterLine,
+          });
+        }
 
         const renderedText = lines.join("\n");
 

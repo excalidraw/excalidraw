@@ -530,63 +530,9 @@ const getStaticCanvasRegionHashForTextElement = async (
   );
 };
 
-const hashBytes64 = (bytes: Uint8Array) => {
-  let hash = 14695981039346656037n;
-  const prime = 1099511628211n;
-  for (let i = 0; i < bytes.length; i++) {
-    hash ^= BigInt(bytes[i]!);
-    hash = (hash * prime) & 18446744073709551615n;
-  }
-  return hash.toString(16);
-};
+// removed: hashBytes64 (no longer used)
 
-const getViewportRegionHashForTextElement = async (
-  page: Page,
-  elementId: string,
-) => {
-  const clip = await page.evaluate(
-    ({ elementId }) => {
-      const h = (window as any).h;
-      if (!h?.state) {
-        throw new Error("missing app state");
-      }
-      const state = h.state;
-      const zoom = Number(state.zoom?.value) || 1;
-
-      const el = (h.elements || []).find((e: any) => e?.id === elementId);
-      if (!el || el.type !== "text") {
-        throw new Error("missing text element");
-      }
-
-      const canvas = document.querySelector<HTMLCanvasElement>(
-        "canvas.excalidraw__canvas.static",
-      );
-      if (!canvas) {
-        throw new Error("missing static canvas");
-      }
-      const rect = canvas.getBoundingClientRect();
-
-      const paddingClientPx = 6;
-      const left = (el.x + state.scrollX) * zoom + rect.left - paddingClientPx;
-      const top = (el.y + state.scrollY) * zoom + rect.top - paddingClientPx;
-      const width = el.width * zoom + paddingClientPx * 2;
-      const height = el.height * zoom + paddingClientPx * 2;
-
-      const x = Math.max(0, Math.floor(left));
-      const y = Math.max(0, Math.floor(top));
-      const maxW = Math.max(0, Math.floor(window.innerWidth - x));
-      const maxH = Math.max(0, Math.floor(window.innerHeight - y));
-      const w = Math.max(1, Math.min(Math.ceil(width), maxW));
-      const hgt = Math.max(1, Math.min(Math.ceil(height), maxH));
-
-      return { x, y, width: w, height: hgt };
-    },
-    { elementId },
-  );
-
-  const png = await page.screenshot({ clip });
-  return `${clip.width}x${clip.height}:${hashBytes64(png)}`;
-};
+// removed: getViewportRegionHashForTextElement (use static-canvas hashing instead)
 
 type GridPosition = {
   cellX: number;
@@ -857,6 +803,9 @@ test("resizing text narrower and repeating operation A should keep wrapping cons
   }
 });
 
+//进入编辑态（出现 textarea.excalidraw-wysiwyg）不会改变“空白符标记”的渲染结果 。
+//改用 getStaticCanvasRegionHashForTextElement() 那种“直接从 static canvas 取 imageData”的 hash（不会把 DOM caret/textarea 算进去）
+//failed2026.3.16-16.23.06
 test("editing should not change whitespace marker rendering (E2E)", async ({
   page,
 }) => {
@@ -895,7 +844,10 @@ test("editing should not change whitespace marker rendering (E2E)", async ({
   });
 
   await page.mouse.click(10, 10);
-  const before = await getViewportRegionHashForTextElement(page, textElementId);
+  const before = await getStaticCanvasRegionHashForTextElement(
+    page,
+    textElementId,
+  );
 
   await openEditorByDoubleClickAt(page, createX, createY);
   await page.evaluate(() => {
@@ -909,7 +861,10 @@ test("editing should not change whitespace marker rendering (E2E)", async ({
     textarea.style.caretColor = "transparent";
   });
 
-  const during = await getViewportRegionHashForTextElement(page, textElementId);
+  const during = await getStaticCanvasRegionHashForTextElement(
+    page,
+    textElementId,
+  );
   expect(during).toEqual(before);
 
   await exitEditor(page);
@@ -1309,4 +1264,385 @@ test("response speed: double click inserts caret (E2E)", async ({ page }) => {
   );
   expect(p95).toBeLessThan(500);
   expect(max).toBeLessThan(1000);
+});
+
+//更新双击文本框插入编辑光标测试
+//创建一个5000字符的随机文本文本框,随机换行,(包括汉字,字母,汉语符号,英语符号;)
+//操作A
+//从非选中状态开始
+//第一次随机点击文本框的一个点;
+//第二次点击精确点击文本框中某一行的某一个字符的左半部分,;
+//查看是否将编辑光标插入在这个字符的后面,
+//退出到非选中状态,
+//再次随机点击文本框的一个点
+//第二次点击精确点击文本框中某一行的某一个字符的右半部分;
+//查看是否将编辑光标插入在这个字符的后面,
+//操作B
+//随机选取文本框中50个字符进行操作A,若操作A都通过,则操作B通过;
+//两次点击时间差10ms;(第二次点击后如果没有插入正确的光标位置则测试失败;)
+test("Double click the text box to insert the cursor (E2E)", async ({
+  page,
+}) => {
+  test.setTimeout(900_000);
+  await page.goto("/");
+
+  const createX = 240;
+  const createY = 180;
+  const targetWidth = 300;
+
+  const value = generateRandomText(424243, 5_000);
+
+  const editor = await openTextEditorAt(page, createX, createY);
+  await editor.fill(value);
+  await exitEditor(page);
+
+  const editorForBox = await openEditorByDoubleClickAt(page, createX, createY);
+  await editorForBox.waitFor();
+  const baseBox = await getEditorBox(page);
+  await exitEditor(page);
+  await dragResizeFromRight(page, baseBox, targetWidth - baseBox.width);
+
+  const overlayCandidates = await openEditorByDoubleClickAt(
+    page,
+    createX,
+    createY,
+  );
+  await overlayCandidates.waitFor();
+  await expect(
+    page.locator(".excalidraw-wysiwyg__whitespaceOverlay"),
+  ).toBeVisible();
+
+  const candidates = await page.evaluate(() => {
+    const overlay = document.querySelector<HTMLElement>(
+      ".excalidraw-wysiwyg__whitespaceOverlay",
+    );
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (!overlay || !textarea) {
+      throw new Error("missing editor");
+    }
+
+    const text = textarea.value.replace(/\r\n?/g, "\n");
+    const overlayRect = overlay.getBoundingClientRect();
+
+    const inViewport = (x: number, y: number) =>
+      x > 2 && x < window.innerWidth - 2 && y > 2 && y < window.innerHeight - 2;
+    const inOverlay = (x: number, y: number) =>
+      x > overlayRect.left + 2 &&
+      x < overlayRect.right - 2 &&
+      y > overlayRect.top + 2 &&
+      y < overlayRect.bottom - 2;
+
+    const getCharRect = (i: number) =>
+      (window as any).__e2eOverlay.charRectAt(overlay, i) as DOMRect;
+
+    let state = 20250316 >>> 0;
+    const next = () => {
+      state = (1664525 * state + 1013904223) >>> 0;
+      return state;
+    };
+
+    const pickCharIndex = () => {
+      for (let tries = 0; tries < 5000; tries++) {
+        const i = next() % text.length;
+        if (text[i] === "\n") {
+          continue;
+        }
+        return i;
+      }
+      return 0;
+    };
+
+    const selectionPoints: Array<{ x: number; y: number }> = [];
+    for (let i = 0; i < 20; i++) {
+      const x =
+        overlayRect.left + 5 + (next() % Math.max(1, overlayRect.width - 10));
+      const y =
+        overlayRect.top + 5 + (next() % Math.max(1, overlayRect.height - 10));
+      if (inViewport(x, y) && inOverlay(x, y)) {
+        selectionPoints.push({ x, y });
+      }
+    }
+    if (selectionPoints.length === 0) {
+      const x = (overlayRect.left + overlayRect.right) / 2;
+      const y = (overlayRect.top + overlayRect.bottom) / 2;
+      selectionPoints.push({ x, y });
+    }
+
+    const points: Array<{
+      expected: number;
+      left: { x: number; y: number };
+      right: { x: number; y: number };
+    }> = [];
+    const seen = new Set<number>();
+    for (let tries = 0; tries < 200_000 && points.length < 50; tries++) {
+      const i = pickCharIndex();
+      if (seen.has(i)) {
+        continue;
+      }
+      seen.add(i);
+      const r = getCharRect(i);
+      if (!Number.isFinite(r.x) || !Number.isFinite(r.y) || r.width <= 0) {
+        continue;
+      }
+      const y = r.y + Math.max(1, r.height / 2);
+      const leftX = r.x + Math.max(1, r.width * 0.25);
+      const rightX = r.x + Math.max(1, r.width * 0.75);
+      if (
+        !inViewport(leftX, y) ||
+        !inViewport(rightX, y) ||
+        !inOverlay(leftX, y) ||
+        !inOverlay(rightX, y)
+      ) {
+        continue;
+      }
+      points.push({
+        expected: i + 1,
+        left: { x: leftX, y },
+        right: { x: rightX, y },
+      });
+    }
+
+    if (points.length < 50) {
+      throw new Error(`insufficient candidates: ${points.length}`);
+    }
+
+    return { selectionPoints, points };
+  });
+
+  await exitEditor(page);
+
+  const canvas = page.locator("canvas.interactive");
+  await canvas.waitFor();
+
+  const clickOnce = async (x: number, y: number) => {
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.up();
+  };
+
+  const ensureNonSelected = async () => {
+    await canvas.click({ position: { x: 10, y: 10 } });
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(10);
+    await page.waitForFunction(() => {
+      const state = (window as any).h?.state;
+      if (!state) {
+        return false;
+      }
+      const ids = state.selectedElementIds || {};
+      return Object.keys(ids).length === 0;
+    });
+  };
+
+  const runSecondClickAndAssert = async (
+    pt: { x: number; y: number },
+    expected: number,
+  ) => {
+    await clickOnce(pt.x, pt.y);
+    const textarea = page.locator("textarea.excalidraw-wysiwyg");
+    await expect(textarea).toBeVisible();
+    const selection = await page.evaluate(() => {
+      const textarea = document.querySelector<HTMLTextAreaElement>(
+        "textarea.excalidraw-wysiwyg",
+      );
+      if (!textarea) {
+        throw new Error("missing textarea");
+      }
+      return {
+        start: textarea.selectionStart,
+        end: textarea.selectionEnd,
+        length: textarea.value.length,
+      };
+    });
+    expect(selection.start).toBe(selection.end);
+    expect(selection.end).toBeGreaterThan(0);
+    expect(selection.end).toBeLessThanOrEqual(selection.length);
+    expect(selection.end).toBe(expected);
+  };
+
+  const gapMs = 10;
+  for (let i = 0; i < 50; i++) {
+    const pick = candidates.points[i]!;
+    const seedIdx = (i * 7) % candidates.selectionPoints.length;
+    const seedPoint = candidates.selectionPoints[seedIdx]!;
+
+    await ensureNonSelected();
+    await clickOnce(seedPoint.x, seedPoint.y);
+    await page.waitForTimeout(gapMs);
+    await runSecondClickAndAssert(pick.left, pick.expected);
+    await exitEditor(page);
+    await ensureNonSelected();
+
+    await clickOnce(seedPoint.x, seedPoint.y);
+    await page.waitForTimeout(gapMs);
+    await runSecondClickAndAssert(pick.right, pick.expected);
+    await exitEditor(page);
+  }
+});
+
+//编写在编辑状态下点击文本框某一个字符插入光标在字符后面测试
+//目前编辑画布中文本框时,点击字符的左半部分会将光标插入在字符左侧,点击字符右半部分会将字符插入在光标右侧;改为无论点击字符的左半部分还是右半部分都将光标插入到字符的右侧;
+//文本框进入编辑状态时,点击文本框中某10个字符的位置的随机10个区域(包括这个字符的左半部分和右半部分),检查是否都将光标插入到这个字符的后面;
+test("Click on the character to insert the cursor at the back (E2E)", async ({
+  page,
+}) => {
+  test.setTimeout(900_000);
+  await page.goto("/");
+
+  const createX = 240;
+  const createY = 180;
+  const targetWidth = 300;
+
+  const value = generateRandomText(424244, 5_000);
+
+  const editor = await openTextEditorAt(page, createX, createY);
+  await editor.fill(value);
+  await exitEditor(page);
+
+  const editorForBox = await openEditorByDoubleClickAt(page, createX, createY);
+  await editorForBox.waitFor();
+  const baseBox = await getEditorBox(page);
+  await exitEditor(page);
+  await dragResizeFromRight(page, baseBox, targetWidth - baseBox.width);
+
+  const overlayCandidates = await openEditorByDoubleClickAt(
+    page,
+    createX,
+    createY,
+  );
+  await overlayCandidates.waitFor();
+  await expect(
+    page.locator(".excalidraw-wysiwyg__whitespaceOverlay"),
+  ).toBeVisible();
+
+  const candidates = await page.evaluate(() => {
+    const overlay = document.querySelector<HTMLElement>(
+      ".excalidraw-wysiwyg__whitespaceOverlay",
+    );
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (!overlay || !textarea) {
+      throw new Error("missing editor");
+    }
+
+    const text = textarea.value.replace(/\r\n?/g, "\n");
+    const overlayRect = overlay.getBoundingClientRect();
+
+    const inViewport = (x: number, y: number) =>
+      x > 2 && x < window.innerWidth - 2 && y > 2 && y < window.innerHeight - 2;
+    const inOverlay = (x: number, y: number) =>
+      x > overlayRect.left + 2 &&
+      x < overlayRect.right - 2 &&
+      y > overlayRect.top + 2 &&
+      y < overlayRect.bottom - 2;
+
+    const getCharRect = (i: number) =>
+      (window as any).__e2eOverlay.charRectAt(overlay, i) as DOMRect;
+
+    let state = 20250317 >>> 0;
+    const next = () => {
+      state = (1664525 * state + 1013904223) >>> 0;
+      return state;
+    };
+    const nextFloat = () => next() / 0xffffffff;
+
+    const pickCharIndex = () => {
+      for (let tries = 0; tries < 5000; tries++) {
+        const i = next() % text.length;
+        if (text[i] === "\n") {
+          continue;
+        }
+        return i;
+      }
+      return 0;
+    };
+
+    const charIndices: number[] = [];
+    const seen = new Set<number>();
+    for (let tries = 0; tries < 50_000 && charIndices.length < 10; tries++) {
+      const i = pickCharIndex();
+      if (seen.has(i)) {
+        continue;
+      }
+      seen.add(i);
+      const r = getCharRect(i);
+      if (!Number.isFinite(r.x) || !Number.isFinite(r.y) || r.width <= 0) {
+        continue;
+      }
+      const cx = r.x + Math.max(1, r.width / 2);
+      const cy = r.y + Math.max(1, r.height / 2);
+      if (!inViewport(cx, cy) || !inOverlay(cx, cy)) {
+        continue;
+      }
+      charIndices.push(i);
+    }
+
+    if (charIndices.length < 10) {
+      throw new Error(`insufficient characters: ${charIndices.length}`);
+    }
+
+    const samples: Array<{ x: number; y: number; expected: number }> = [];
+    for (const i of charIndices) {
+      const r = getCharRect(i);
+      const yBase = r.y + Math.max(1, r.height / 2);
+      const leftMin = 0.15;
+      const leftMax = 0.45;
+      const rightMin = 0.55;
+      const rightMax = 0.85;
+
+      let produced = 0;
+      for (let tries = 0; tries < 2000 && produced < 10; tries++) {
+        const isLeft = produced < 5;
+        const frac = isLeft
+          ? leftMin + (leftMax - leftMin) * nextFloat()
+          : rightMin + (rightMax - rightMin) * nextFloat();
+        const yJitter = (nextFloat() - 0.5) * Math.max(1, r.height * 0.4);
+        const x = r.x + Math.max(1, r.width * frac);
+        const y = yBase + yJitter;
+        if (!inViewport(x, y) || !inOverlay(x, y)) {
+          continue;
+        }
+        samples.push({ x, y, expected: i + 1 });
+        produced++;
+      }
+      if (produced < 10) {
+        throw new Error(`insufficient points for char=${i}: ${produced}`);
+      }
+    }
+
+    return { samples };
+  });
+
+  const clickOnce = async (x: number, y: number) => {
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.up();
+  };
+
+  for (const s of candidates.samples) {
+    await clickOnce(s.x, s.y);
+    const textarea = page.locator("textarea.excalidraw-wysiwyg");
+    await expect(textarea).toBeVisible();
+    const selection = await page.evaluate(() => {
+      const textarea = document.querySelector<HTMLTextAreaElement>(
+        "textarea.excalidraw-wysiwyg",
+      );
+      if (!textarea) {
+        throw new Error("missing textarea");
+      }
+      return {
+        start: textarea.selectionStart,
+        end: textarea.selectionEnd,
+        length: textarea.value.length,
+      };
+    });
+    expect(selection.start).toBe(selection.end);
+    expect(selection.end).toBeGreaterThan(0);
+    expect(selection.end).toBeLessThanOrEqual(selection.length);
+    expect(selection.end).toBe(s.expected);
+    await page.waitForTimeout(50);
+  }
 });
