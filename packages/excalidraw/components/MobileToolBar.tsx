@@ -26,11 +26,25 @@ import {
   DiamondIcon,
   EllipseIcon,
   TriangleIcon,
+  PentagonIcon,
+  HexagonIcon,
+  OctagonIcon,
+  SemicircleIcon,
+  TrapezoidIcon,
+  RightTrapezoidIcon,
+  RightTriangleIcon,
   PrismIcon,
   PyramidIcon,
   TetrahedronIcon,
   CylinderIcon,
   SphereIcon,
+  ConeIcon,
+  TriangularPrismIcon,
+  BipyramidIcon,
+  TruncatedPyramidIcon,
+  TruncatedConeIcon,
+  ObliqueRectPrismIcon,
+  ObliqueTriPrismIcon,
   LineIcon,
   TextIcon,
   ImageIcon,
@@ -68,6 +82,41 @@ const SHAPE_TOOLS = [
     icon: TriangleIcon,
     title: capitalizeString(t("toolBar.triangle")),
   },
+  {
+    type: "pentagon",
+    icon: PentagonIcon,
+    title: capitalizeString(t("toolBar.pentagon")),
+  },
+  {
+    type: "hexagon",
+    icon: HexagonIcon,
+    title: capitalizeString(t("toolBar.hexagon")),
+  },
+  {
+    type: "octagon",
+    icon: OctagonIcon,
+    title: capitalizeString(t("toolBar.octagon")),
+  },
+  {
+    type: "semicircle",
+    icon: SemicircleIcon,
+    title: capitalizeString(t("toolBar.semicircle")),
+  },
+  {
+    type: "trapezoid",
+    icon: TrapezoidIcon,
+    title: capitalizeString(t("toolBar.trapezoid")),
+  },
+  {
+    type: "rightTrapezoid",
+    icon: RightTrapezoidIcon,
+    title: capitalizeString(t("toolBar.rightTrapezoid")),
+  },
+  {
+    type: "rightTriangle",
+    icon: RightTriangleIcon,
+    title: capitalizeString(t("toolBar.rightTriangle")),
+  },
   { type: "---" as const, icon: null, title: "" },
   {
     type: "prism",
@@ -94,6 +143,41 @@ const SHAPE_TOOLS = [
     icon: SphereIcon,
     title: capitalizeString(t("toolBar.sphere")),
   },
+  {
+    type: "cone",
+    icon: ConeIcon,
+    title: capitalizeString(t("toolBar.cone")),
+  },
+  {
+    type: "triangularPrism",
+    icon: TriangularPrismIcon,
+    title: capitalizeString(t("toolBar.triangularPrism")),
+  },
+  {
+    type: "bipyramid",
+    icon: BipyramidIcon,
+    title: capitalizeString(t("toolBar.bipyramid")),
+  },
+  {
+    type: "truncatedPyramid",
+    icon: TruncatedPyramidIcon,
+    title: capitalizeString(t("toolBar.truncatedPyramid")),
+  },
+  {
+    type: "truncatedCone",
+    icon: TruncatedConeIcon,
+    title: capitalizeString(t("toolBar.truncatedCone")),
+  },
+  {
+    type: "obliqueRectPrism",
+    icon: ObliqueRectPrismIcon,
+    title: capitalizeString(t("toolBar.obliqueRectPrism")),
+  },
+  {
+    type: "obliqueTriPrism",
+    icon: ObliqueTriPrismIcon,
+    title: capitalizeString(t("toolBar.obliqueTriPrism")),
+  },
 ] as const;
 
 const SELECTION_TOOLS = [
@@ -110,12 +194,12 @@ const SELECTION_TOOLS = [
 ] as const;
 
 const LINEAR_ELEMENT_TOOLS = [
+  { type: "line", icon: LineIcon, title: capitalizeString(t("toolBar.line")) },
   {
     type: "arrow",
     icon: ArrowIcon,
     title: capitalizeString(t("toolBar.arrow")),
   },
-  { type: "line", icon: LineIcon, title: capitalizeString(t("toolBar.line")) },
 ] as const;
 
 type MobileToolBarProps = {

@@ -3628,13 +3628,13 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (event.touches.length === 2) {
-      // Two-finger double-tap → undo
+      // Two-finger double-tap → undo (500ms window)
       if (!didTwoFingerTap) {
         didTwoFingerTap = true;
         clearTimeout(twoFingerTapTimer);
         twoFingerTapTimer = window.setTimeout(() => {
           didTwoFingerTap = false;
-        }, TAP_TWICE_TIMEOUT);
+        }, 500);
       } else {
         // Second two-finger tap within timeout → undo
         didTwoFingerTap = false;
