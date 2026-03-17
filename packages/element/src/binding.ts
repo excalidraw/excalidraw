@@ -1,7 +1,6 @@
 import {
   arrayToMap,
   getFeatureFlag,
-  getGridPoint,
   invariant,
   isTransparent,
 } from "@excalidraw/common";
@@ -200,8 +199,6 @@ export const bindOrUnbindBindingElement = (
             arrow.startBinding,
             start.element,
             scene.getNonDeletedElementsMap(),
-            undefined,
-            opts?.gridSize,
           ) || arrow.points[0],
       });
     }
@@ -215,8 +212,6 @@ export const bindOrUnbindBindingElement = (
             arrow.endBinding,
             end.element,
             scene.getNonDeletedElementsMap(),
-            undefined,
-            opts?.gridSize,
           ) || arrow.points[arrow.points.length - 1],
       });
     }
@@ -1752,54 +1747,6 @@ const extractBinding = (
 const elementArea = (element: ExcalidrawBindableElement) =>
   element.width * element.height;
 
-/**
- * Snaps a bound arrow endpoint to the grid on the axis parallel to the
- * bindable element's side, while preserving the binding gap distance on the
- * perpendicular axis. In other words, the grid axis closest to the side's
- * perpendicular (normal) is used as the snap axis and the other axis is kept at
- * the binding gap distance.
- */
-const snapBoundPointToGrid = (
-  outlinePoint: GlobalPoint,
-  bindableElement: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
-  gridSize: NullableGridSize,
-): GlobalPoint => {
-  if (!gridSize) {
-    return outlinePoint;
-  }
-
-  const aabb = aabbForElement(bindableElement, elementsMap);
-  const heading = headingForPointFromElement(
-    bindableElement,
-    aabb,
-    outlinePoint,
-  );
-
-  const normalLocal = pointFrom<GlobalPoint>(heading[0], heading[1]);
-  const normalGlobal = pointRotateRads(
-    normalLocal,
-    pointFrom<GlobalPoint>(0, 0),
-    bindableElement.angle,
-  );
-
-  const absNX = Math.abs(normalGlobal[0]);
-  const absNY = Math.abs(normalGlobal[1]);
-  if (absNX >= absNY) {
-    // Global X is closest to the perpendicular → keep X, snap Y
-    const [, snappedY] = getGridPoint(
-      outlinePoint[0],
-      outlinePoint[1],
-      gridSize,
-    );
-    return pointFrom<GlobalPoint>(outlinePoint[0], snappedY);
-  }
-
-  // Global Y is closest to the perpendicular → keep Y, snap X
-  const [snappedX] = getGridPoint(outlinePoint[0], outlinePoint[1], gridSize);
-  return pointFrom<GlobalPoint>(snappedX, outlinePoint[1]);
-};
-
 export const updateBoundPoint = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   startOrEnd: "startBinding" | "endBinding",
@@ -1807,7 +1754,6 @@ export const updateBoundPoint = (
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
   dragging?: boolean,
-  gridSize?: NullableGridSize,
 ): LocalPoint | null => {
   if (
     binding == null ||
@@ -1927,24 +1873,11 @@ export const updateBoundPoint = (
   // and short-circuit to the focus point if the arrow is too short to
   // avoid inversion
   if (!otherBindable) {
-    const snapped =
-      !arrowTooShort && outlinePoint
-        ? snapBoundPointToGrid(
-            outlinePoint,
-            bindableElement,
-            elementsMap,
-            gridSize ?? null,
-          )
-        : null;
     return LinearElementEditor.createPointAt(
       arrow,
       elementsMap,
-      arrowTooShort
-        ? focusPoint[0]
-        : snapped?.[0] ?? outlinePoint?.[0] ?? focusPoint[0],
-      arrowTooShort
-        ? focusPoint[1]
-        : snapped?.[1] ?? outlinePoint?.[1] ?? focusPoint[1],
+      arrowTooShort ? focusPoint[0] : outlinePoint?.[0] ?? focusPoint[0],
+      arrowTooShort ? focusPoint[1] : outlinePoint?.[1] ?? focusPoint[1],
       null,
     );
   }
@@ -1963,19 +1896,11 @@ export const updateBoundPoint = (
   }
 
   // 4. In the general case, snap to the outline if possible
-  const snappedOutline = outlinePoint
-    ? snapBoundPointToGrid(
-        outlinePoint,
-        bindableElement,
-        elementsMap,
-        gridSize ?? null,
-      )
-    : null;
   return LinearElementEditor.createPointAt(
     arrow,
     elementsMap,
-    snappedOutline?.[0] ?? outlinePoint?.[0] ?? focusPoint[0],
-    snappedOutline?.[1] ?? outlinePoint?.[1] ?? focusPoint[1],
+    outlinePoint?.[0] || focusPoint[0],
+    outlinePoint?.[1] || focusPoint[1],
     null,
   );
 };

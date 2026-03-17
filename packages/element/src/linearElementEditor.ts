@@ -344,9 +344,6 @@ export class LinearElementEditor {
 
     // Apply the point movement if needed
     let suggestedBinding: AppState["suggestedBinding"] = null;
-    const effectiveGridSize = event[KEYS.CTRL_OR_CMD]
-      ? null
-      : app.getEffectiveGridSize();
     const { positions, updates } = pointDraggingUpdates(
       [idx],
       deltaX,
@@ -360,7 +357,6 @@ export class LinearElementEditor {
       shouldRotateWithDiscreteAngle(event),
       event.altKey,
       linearElementEditor,
-      effectiveGridSize,
     );
 
     const angleLocked = shouldRotateWithDiscreteAngle(event);
@@ -543,9 +539,6 @@ export class LinearElementEditor {
 
     // Apply the point movement if needed
     let suggestedBinding: AppState["suggestedBinding"] = null;
-    const effectiveGridSize = event[KEYS.CTRL_OR_CMD]
-      ? null
-      : app.getEffectiveGridSize();
     const { positions, updates } = pointDraggingUpdates(
       selectedPointsIndices,
       deltaX,
@@ -559,7 +552,6 @@ export class LinearElementEditor {
       shouldRotateWithDiscreteAngle(event) && singlePointDragged,
       event.altKey,
       linearElementEditor,
-      effectiveGridSize,
     );
 
     const angleLocked =
@@ -2137,7 +2129,6 @@ const pointDraggingUpdates = (
   angleLocked: boolean,
   altKey: boolean,
   linearElementEditor: LinearElementEditor,
-  gridSize?: NullableGridSize,
 ): {
   positions: PointsPositionUpdates;
   updates?: PointMoveOtherUpdates;
@@ -2236,8 +2227,6 @@ const pointDraggingUpdates = (
             element.startBinding,
             startBindable,
             elementsMap,
-            undefined,
-            gridSize,
           ) ?? null;
         if (startPoint) {
           positions.set(0, { point: startPoint, isDragging: true });
@@ -2257,8 +2246,6 @@ const pointDraggingUpdates = (
             element.endBinding,
             endBindable,
             elementsMap,
-            undefined,
-            gridSize,
           ) ?? null;
         if (endPoint) {
           positions.set(element.points.length - 1, {
@@ -2432,7 +2419,6 @@ const pointDraggingUpdates = (
         endBindable,
         elementsMap,
         endIsDragged,
-        endIsDragged ? gridSize : null,
       ) || nextArrow.points[nextArrow.points.length - 1]
     : nextArrow.points[nextArrow.points.length - 1];
 
@@ -2464,7 +2450,6 @@ const pointDraggingUpdates = (
           startBindable,
           elementsMap,
           startIsDragged,
-          startIsDragged ? gridSize : null,
         ) || nextArrow.points[0]
       : nextArrow.points[0];
 
