@@ -603,6 +603,9 @@ export const useExcalidrawAPI = () => useContext(ExcalidrawAPIContext);
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
 let firstTapPosition: { x: number; y: number } | null = null;
+// Two-finger double-tap for undo (like Procreate)
+let didTwoFingerTap: boolean = false;
+let twoFingerTapTimer = 0;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
@@ -654,6 +657,7 @@ class App extends React.Component<AppProps, AppState> {
   public id: string;
   private store: Store;
   private history: History;
+  private undoAction!: Action;
   public excalidrawContainerValue: {
     container: HTMLDivElement | null;
     id: string;
@@ -871,7 +875,8 @@ class App extends React.Component<AppProps, AppState> {
     this.history = new History(this.store);
 
     this.actionManager.registerAll(actions);
-    this.actionManager.registerAction(createUndoAction(this.history));
+    this.undoAction = createUndoAction(this.history);
+    this.actionManager.registerAction(this.undoAction);
     this.actionManager.registerAction(createRedoAction(this.history));
 
     // in case internal editor APIs call this early, otherwise we need
@@ -3623,6 +3628,21 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (event.touches.length === 2) {
+      // Two-finger double-tap → undo
+      if (!didTwoFingerTap) {
+        didTwoFingerTap = true;
+        clearTimeout(twoFingerTapTimer);
+        twoFingerTapTimer = window.setTimeout(() => {
+          didTwoFingerTap = false;
+        }, TAP_TWICE_TIMEOUT);
+      } else {
+        // Second two-finger tap within timeout → undo
+        didTwoFingerTap = false;
+        clearTimeout(twoFingerTapTimer);
+        this.actionManager.executeAction(this.undoAction, "ui");
+        return;
+      }
+
       this.setState({
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
         activeEmbeddable: null,
