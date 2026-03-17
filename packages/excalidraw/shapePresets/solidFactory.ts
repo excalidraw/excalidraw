@@ -363,51 +363,57 @@ function coneGeom(bbox: BBox): ElementGeom[] {
 }
 
 // ─── TRIANGULAR PRISM ─────────────────────────────────────────────
-// Front triangular face visible, back triangle behind.
-// 3 depth edges connect corresponding vertices.
+// Triangular bases on top and bottom (like geometry textbooks).
+// Oblique view: front-left lateral face visible.
+// Hidden vertex BBL: edges to it dashed.
 function triangularPrismGeom(bbox: BBox): ElementGeom[] {
   const { x, y, w, h } = bbox;
-  const d = Math.min(w, h) * 0.25;
+  const d = Math.min(w, h) * 0.25; // oblique depth offset
 
-  // Front triangle
-  const FT = { x: x + (w - d) * 0.5, y: y + d };
-  const FBL = { x, y: y + h };
-  const FBR = { x: x + w - d, y: y + h };
+  // Top triangle (upper base)
+  const TL = { x, y: y + d };
+  const TR = { x: x + w - d, y: y + d };
+  const TB = { x: x + d, y }; // back vertex (up-left in oblique)
 
-  // Back triangle (offset by d)
-  const BT = { x: FT.x + d, y: FT.y - d };
-  const BBL = { x: FBL.x + d, y: FBL.y - d };
-  const BBR = { x: FBR.x + d, y: FBR.y - d };
+  // Bottom triangle (lower base)
+  const BL = { x, y: y + h };
+  const BR = { x: x + w - d, y: y + h };
+  const BB = { x: x + d, y: y + h - d }; // back vertex
 
   return [
-    // Front face — solid
-    line(FT.x, FT.y, FBL.x, FBL.y, false, "FT", "FBL"),
-    line(FBL.x, FBL.y, FBR.x, FBR.y, false, "FBL", "FBR"),
-    line(FBR.x, FBR.y, FT.x, FT.y, false, "FBR", "FT"),
-    // Depth edges — top and right solid, bottom-left dashed
-    line(FT.x, FT.y, BT.x, BT.y, false, "FT", "BT"),
-    line(FBR.x, FBR.y, BBR.x, BBR.y, false, "FBR", "BBR"),
-    line(FBL.x, FBL.y, BBL.x, BBL.y, true, "FBL", "BBL"),
-    // Back face — top solid, rest dashed
-    line(BT.x, BT.y, BBR.x, BBR.y, false, "BT", "BBR"),
-    line(BT.x, BT.y, BBL.x, BBL.y, true, "BT", "BBL"),
-    line(BBL.x, BBL.y, BBR.x, BBR.y, true, "BBL", "BBR"),
+    // Top base — front edge solid, back edges: right solid, left dashed
+    line(TL.x, TL.y, TR.x, TR.y, false, "TL", "TR"),
+    line(TR.x, TR.y, TB.x, TB.y, false, "TR", "TB"),
+    line(TL.x, TL.y, TB.x, TB.y, true, "TL", "TB"),
+    // Bottom base — front edge solid, back edges dashed
+    line(BL.x, BL.y, BR.x, BR.y, false, "BL", "BR"),
+    line(BR.x, BR.y, BB.x, BB.y, false, "BR", "BB"),
+    line(BL.x, BL.y, BB.x, BB.y, true, "BL", "BB"),
+    // Lateral edges — front two solid, back dashed
+    line(TL.x, TL.y, BL.x, BL.y, false, "TL", "BL"),
+    line(TR.x, TR.y, BR.x, BR.y, false, "TR", "BR"),
+    line(TB.x, TB.y, BB.x, BB.y, true, "TB", "BB"),
   ];
 }
 
 // ─── BIPYRAMID (3D diamond) ───────────────────────────────────────
-// Two square pyramids joined at base. Top apex, bottom apex, 4 base vertices.
-// Same oblique view as pyramid — BL hidden.
+// Two square pyramids joined at base. Symmetric: axis of symmetry
+// passes through midpoints of the base's side edges (vertical center).
+// Oblique view with BL hidden.
 function bipyramidGeom(bbox: BBox): ElementGeom[] {
   const { x, y, w, h } = bbox;
+  const d = Math.min(w, h) * 0.2; // oblique depth
 
-  const TA = { x: x + w * 0.45, y }; // top apex
-  const BA = { x: x + w * 0.45, y: y + h }; // bottom apex
-  // Base at middle height
-  const FL = { x: x + w * 0.0, y: y + h * 0.5 };
-  const FR = { x: x + w * 0.6, y: y + h * 0.5 };
-  const BR = { x: x + w * 1.0, y: y + h * 0.32 };
-  const BL = { x: x + w * 0.4, y: y + h * 0.32 };
+  // Apexes centered horizontally
+  const TA = { x: x + w * 0.5, y }; // top apex
+  const BA = { x: x + w * 0.5, y: y + h }; // bottom apex
+
+  // Base rhombus at middle height, centered on the axis
+  const midY = y + h * 0.5;
+  const FL = { x, y: midY + d * 0.3 }; // front-left
+  const FR = { x: x + w - d, y: midY + d * 0.3 }; // front-right
+  const BR = { x: x + w, y: midY - d * 0.7 }; // back-right
+  const BL = { x: x + d, y: midY - d * 0.7 }; // back-left
 
   return [
     // Base — front+right solid, back+left dashed
@@ -450,11 +456,11 @@ function truncatedPyramidGeom(bbox: BBox): ElementGeom[] {
     line(BFR.x, BFR.y, BBR.x, BBR.y, false, "BFR", "BBR"),
     line(BBL.x, BBL.y, BBR.x, BBR.y, true, "BBL", "BBR"),
     line(BFL.x, BFL.y, BBL.x, BBL.y, true, "BFL", "BBL"),
-    // Top base — front+right solid, back+left dashed
+    // Top base — all edges solid (visible from above)
     line(TFL.x, TFL.y, TFR.x, TFR.y, false, "TFL", "TFR"),
     line(TFR.x, TFR.y, TBR.x, TBR.y, false, "TFR", "TBR"),
-    line(TBL.x, TBL.y, TBR.x, TBR.y, true, "TBL", "TBR"),
-    line(TFL.x, TFL.y, TBL.x, TBL.y, true, "TFL", "TBL"),
+    line(TBL.x, TBL.y, TBR.x, TBR.y, false, "TBL", "TBR"),
+    line(TFL.x, TFL.y, TBL.x, TBL.y, false, "TFL", "TBL"),
     // Lateral — front+right solid, back-left dashed
     line(BFL.x, BFL.y, TFL.x, TFL.y, false, "BFL", "TFL"),
     line(BFR.x, BFR.y, TFR.x, TFR.y, false, "BFR", "TFR"),
@@ -496,71 +502,74 @@ function truncatedConeGeom(bbox: BBox): ElementGeom[] {
 }
 
 // ─── OBLIQUE RECTANGULAR PRISM ────────────────────────────────────
-// Like a regular prism but the top face is shifted sideways,
-// creating a slanted appearance.
+// Rectangular bases top and bottom. Lateral edges slanted (oblique).
+// Same oblique view as regular prism but top base shifted sideways.
 function obliqueRectPrismGeom(bbox: BBox): ElementGeom[] {
   const { x, y, w, h } = bbox;
-  const shift = w * 0.3; // horizontal shift for obliqueness
-  const bw = w * 0.6; // base width
-  const bh = h * 0.45; // base height (front face)
+  const d = Math.min(w, h) * 0.2; // depth offset
+  const shift = w * 0.2; // oblique lateral shift
 
-  // Bottom face
-  const BFL = { x, y: y + h - bh };
-  const BFR = { x: x + bw, y: y + h - bh };
-  const BBR = { x: x + bw + shift, y: y + h - bh - bh * 0.4 };
-  const BBL = { x: x + shift, y: y + h - bh - bh * 0.4 };
+  // Bottom base (oblique view)
+  const BFL = { x, y: y + h - d };
+  const BFR = { x: x + w - d - shift, y: y + h - d };
+  const BBR = { x: x + w - shift, y: y + h - d - d };
+  const BBL = { x: x + d, y: y + h - d - d };
 
-  // Top face (same shape, shifted up)
-  const TFL = { x: BFL.x, y: BFL.y + bh };
-  const TFR = { x: BFR.x, y: BFR.y + bh };
-  const TBR = { x: BBR.x, y: BBR.y + bh };
-  const TBL = { x: BBL.x, y: BBL.y + bh };
+  // Top base (shifted right by 'shift' for obliqueness)
+  const TFL = { x: BFL.x + shift, y: y + d };
+  const TFR = { x: BFR.x + shift, y: y + d };
+  const TBR = { x: BBR.x + shift, y };
+  const TBL = { x: BBL.x + shift, y };
 
   return [
-    // Front face — solid
-    rect(BFL.x, BFL.y, bw, bh, false, "BFL", "BFR", "TFR", "TFL"),
-    // Top edges — solid
-    line(BFL.x, BFL.y, BBL.x, BBL.y, false, "BFL", "BBL"),
-    line(BFR.x, BFR.y, BBR.x, BBR.y, false, "BFR", "BBR"),
-    line(BBL.x, BBL.y, BBR.x, BBR.y, false, "BBL", "BBR"),
-    // Bottom edges — solid right, dashed hidden
+    // Top base — all edges visible (solid)
+    line(TFL.x, TFL.y, TFR.x, TFR.y, false, "TFL", "TFR"),
     line(TFR.x, TFR.y, TBR.x, TBR.y, false, "TFR", "TBR"),
-    line(TBR.x, TBR.y, TBL.x, TBL.y, true, "TBR", "TBL"),
-    line(TFL.x, TFL.y, TBL.x, TBL.y, true, "TFL", "TBL"),
-    // Right side
-    line(BBR.x, BBR.y, TBR.x, TBR.y, false, "BBR", "TBR"),
+    line(TBR.x, TBR.y, TBL.x, TBL.y, false, "TBR", "TBL"),
+    line(TFL.x, TFL.y, TBL.x, TBL.y, false, "TFL", "TBL"),
+    // Bottom base — front+right solid, back+left dashed
+    line(BFL.x, BFL.y, BFR.x, BFR.y, false, "BFL", "BFR"),
+    line(BFR.x, BFR.y, BBR.x, BBR.y, false, "BFR", "BBR"),
+    line(BBR.x, BBR.y, BBL.x, BBL.y, true, "BBR", "BBL"),
+    line(BFL.x, BFL.y, BBL.x, BBL.y, true, "BFL", "BBL"),
+    // Lateral edges (slanted) — front two solid, back dashed
+    line(TFL.x, TFL.y, BFL.x, BFL.y, false, "TFL", "BFL"),
+    line(TFR.x, TFR.y, BFR.x, BFR.y, false, "TFR", "BFR"),
+    line(TBR.x, TBR.y, BBR.x, BBR.y, false, "TBR", "BBR"),
+    line(TBL.x, TBL.y, BBL.x, BBL.y, true, "TBL", "BBL"),
   ];
 }
 
 // ─── OBLIQUE TRIANGULAR PRISM ─────────────────────────────────────
-// Triangular prism leaning to one side.
+// Triangular bases top and bottom. Lateral edges slanted (oblique).
 function obliqueTriPrismGeom(bbox: BBox): ElementGeom[] {
   const { x, y, w, h } = bbox;
-  const shift = w * 0.3;
+  const d = Math.min(w, h) * 0.2; // depth offset
+  const shift = w * 0.2; // oblique lateral shift
 
-  // Front triangle
-  const FT = { x: x + w * 0.25, y };
-  const FBL = { x, y: y + h };
-  const FBR = { x: x + w * 0.5, y: y + h };
+  // Top triangle
+  const TL = { x: x + shift, y: y + d };
+  const TR = { x: x + w - d + shift * 0.3, y: y + d };
+  const TB = { x: x + d + shift * 0.6, y }; // back vertex
 
-  // Back triangle (shifted right and up for oblique effect)
-  const BT = { x: FT.x + shift, y: FT.y - h * 0.15 };
-  const BBL = { x: FBL.x + shift, y: FBL.y - h * 0.15 };
-  const BBR = { x: FBR.x + shift, y: FBR.y - h * 0.15 };
+  // Bottom triangle (shifted left by 'shift')
+  const BL = { x, y: y + h };
+  const BR = { x: x + w - d - shift * 0.7, y: y + h };
+  const BB = { x: x + d - shift * 0.4, y: y + h - d }; // back vertex
 
   return [
-    // Front face — solid
-    line(FT.x, FT.y, FBL.x, FBL.y, false, "FT", "FBL"),
-    line(FBL.x, FBL.y, FBR.x, FBR.y, false, "FBL", "FBR"),
-    line(FBR.x, FBR.y, FT.x, FT.y, false, "FBR", "FT"),
-    // Depth edges — top and right solid, bottom-left dashed
-    line(FT.x, FT.y, BT.x, BT.y, false, "FT", "BT"),
-    line(FBR.x, FBR.y, BBR.x, BBR.y, false, "FBR", "BBR"),
-    line(FBL.x, FBL.y, BBL.x, BBL.y, true, "FBL", "BBL"),
-    // Back face — top solid, rest dashed
-    line(BT.x, BT.y, BBR.x, BBR.y, false, "BT", "BBR"),
-    line(BT.x, BT.y, BBL.x, BBL.y, true, "BT", "BBL"),
-    line(BBL.x, BBL.y, BBR.x, BBR.y, true, "BBL", "BBR"),
+    // Top base — front solid, back: right solid, left dashed
+    line(TL.x, TL.y, TR.x, TR.y, false, "TL", "TR"),
+    line(TR.x, TR.y, TB.x, TB.y, false, "TR", "TB"),
+    line(TL.x, TL.y, TB.x, TB.y, true, "TL", "TB"),
+    // Bottom base
+    line(BL.x, BL.y, BR.x, BR.y, false, "BL", "BR"),
+    line(BR.x, BR.y, BB.x, BB.y, false, "BR", "BB"),
+    line(BL.x, BL.y, BB.x, BB.y, true, "BL", "BB"),
+    // Lateral edges (slanted) — front two solid, back dashed
+    line(TL.x, TL.y, BL.x, BL.y, false, "TL", "BL"),
+    line(TR.x, TR.y, BR.x, BR.y, false, "TR", "BR"),
+    line(TB.x, TB.y, BB.x, BB.y, true, "TB", "BB"),
   ];
 }
 
