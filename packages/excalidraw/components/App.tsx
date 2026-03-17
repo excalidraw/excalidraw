@@ -8161,9 +8161,9 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       rightClickAnchorScene = null;
     }
-    // due to event.preventDefault below, container wouldn't get focus
-    // automatically
-    this.focusContainer();
+    if (!this.state.editingTextElement) {
+      this.focusContainer();
+    }
 
     // preventing defualt while text editing messes with cursor/focus
     if (!this.state.editingTextElement && !shouldDelayPanUntilDragThreshold) {
@@ -8240,10 +8240,22 @@ class App extends React.Component<AppProps, AppState> {
       //   scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
       // });
       if (isPanning) {
-        this.translateCanvas((state) => ({
-          scrollX: state.scrollX - deltaX / state.zoom.value,
-          scrollY: state.scrollY - deltaY / state.zoom.value,
-        }));
+        const rightClickAnchor = rightClickAnchorScene;
+        if (isRightClickPanning && rightClickAnchor) {
+          this.translateCanvas((state) => ({
+            scrollX:
+              (event.clientX - state.offsetLeft) / state.zoom.value -
+              rightClickAnchor.x,
+            scrollY:
+              (event.clientY - state.offsetTop) / state.zoom.value -
+              rightClickAnchor.y,
+          }));
+        } else {
+          this.translateCanvas((state) => ({
+            scrollX: state.scrollX - deltaX / state.zoom.value,
+            scrollY: state.scrollY - deltaY / state.zoom.value,
+          }));
+        }
       }
     });
     const teardown = withBatchedUpdates(

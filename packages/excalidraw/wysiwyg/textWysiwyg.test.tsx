@@ -239,6 +239,257 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(1);
     });
 
+    it("should not exit text editing on right-click panning", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "ola",
+        x: 60,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      API.setElements([text]);
+      UI.clickTool("selection");
+
+      mouse.doubleClickAt(text.x + 50, text.y + 50);
+
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "hello");
+
+      await act(
+        () =>
+          new Promise<void>((resolve) => {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => resolve());
+            });
+          }),
+      );
+
+      fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+        button: 2,
+        clientX: 10,
+        clientY: 10,
+        pointerType: "mouse",
+      });
+      fireEvent.blur(editor);
+
+      expect(await getTextEditor({ waitForEditor: false })).not.toBe(null);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+
+      fireEvent.pointerUp(window, { button: 2, pointerType: "mouse" });
+
+      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+
+      fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+        button: 0,
+        clientX: 10,
+        clientY: 10,
+        pointerType: "mouse",
+      });
+      fireEvent.blur(editor);
+
+      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+      expect(h.state.editingTextElement).toBe(null);
+    });
+
+    it("should keep editor focused while right-click panning", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "ola",
+        x: 60,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      API.setElements([text]);
+      UI.clickTool("selection");
+
+      mouse.doubleClickAt(text.x + 50, text.y + 50);
+
+      const editor = await getTextEditor();
+      editor.focus();
+
+      expect(document.activeElement).toBe(editor);
+
+      await act(
+        () =>
+          new Promise<void>((resolve) => {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => resolve());
+            });
+          }),
+      );
+
+      fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+        button: 2,
+        clientX: 10,
+        clientY: 10,
+        pointerType: "mouse",
+      });
+
+      fireEvent.pointerMove(window, {
+        button: 2,
+        clientX: 20,
+        clientY: 20,
+        pointerType: "mouse",
+      });
+
+      expect(document.activeElement).toBe(editor);
+
+      fireEvent.pointerUp(window, { button: 2, pointerType: "mouse" });
+    });
+
+    it("should pan at the same rate from textarea and canvas on right-drag", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "ola",
+        x: 60,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      API.setElements([text]);
+      UI.clickTool("selection");
+
+      mouse.doubleClickAt(text.x + 50, text.y + 50);
+
+      const editor = await getTextEditor();
+      editor.focus();
+
+      act(() => {
+        h.app.setState({ scrollX: 0, scrollY: 0 });
+      });
+
+      fireEvent.keyDown(editor, { code: CODES.MINUS, ctrlKey: true });
+
+      await act(
+        () =>
+          new Promise<void>((resolve) => {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => resolve());
+            });
+          }),
+      );
+
+      fireEvent.pointerDown(editor, {
+        button: 2,
+        clientX: 100,
+        clientY: 100,
+        pointerId: 1,
+        pointerType: "mouse",
+      });
+      fireEvent.pointerMove(window, {
+        clientX: 150,
+        clientY: 120,
+        pointerId: 1,
+        pointerType: "mouse",
+      });
+      fireEvent.pointerUp(window, {
+        button: 2,
+        pointerId: 1,
+        pointerType: "mouse",
+      });
+
+      const scrollFromTextarea = { x: h.state.scrollX, y: h.state.scrollY };
+
+      act(() => {
+        h.app.setState({ scrollX: 0, scrollY: 0 });
+      });
+
+      fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+        button: 2,
+        clientX: 100,
+        clientY: 100,
+        pointerId: 2,
+        pointerType: "mouse",
+      });
+      fireEvent.pointerMove(window, {
+        clientX: 150,
+        clientY: 120,
+        pointerId: 2,
+        pointerType: "mouse",
+      });
+      fireEvent.pointerUp(window, {
+        button: 2,
+        pointerId: 2,
+        pointerType: "mouse",
+      });
+
+      expect(h.state.scrollX).toBeCloseTo(scrollFromTextarea.x, 6);
+      expect(h.state.scrollY).toBeCloseTo(scrollFromTextarea.y, 6);
+    });
+
+    it("should keep caret visible when holding right-click", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "ola",
+        x: 60,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      API.setElements([text]);
+      UI.clickTool("selection");
+
+      mouse.doubleClickAt(text.x + 50, text.y + 50);
+
+      const editor = await getTextEditor();
+      editor.focus();
+
+      await act(
+        () =>
+          new Promise<void>((resolve) => {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => resolve());
+            });
+          }),
+      );
+
+      const caret = document.querySelector(
+        ".excalidraw-wysiwyg__caret",
+      ) as HTMLDivElement;
+      expect(caret).not.toBe(null);
+
+      const focusable = document.createElement("div");
+      focusable.tabIndex = 0;
+      document.body.appendChild(focusable);
+
+      try {
+        fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+          button: 2,
+          clientX: 10,
+          clientY: 10,
+          pointerId: 1,
+          pointerType: "mouse",
+        });
+
+        focusable.focus();
+
+        await act(
+          () =>
+            new Promise<void>((resolve) => {
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => resolve());
+              });
+            }),
+        );
+
+        expect(caret.style.display).not.toBe("none");
+      } finally {
+        focusable.remove();
+      }
+
+      fireEvent.pointerUp(window, {
+        button: 2,
+        pointerId: 1,
+        pointerType: "mouse",
+      });
+    });
+
     it("should place caret near clicked position for very long text on second click", async () => {
       mockBoundingClientRect({ height: 800, width: 800 });
       try {

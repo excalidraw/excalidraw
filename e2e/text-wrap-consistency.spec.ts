@@ -1743,7 +1743,7 @@ test("Click on the character to insert the cursor at the back (E2E)", async ({
   }
 });
 //双击选词间隔(ms)三击选行间隔(ms)精确度测试
-
+//excalidraw.dblClickSelectWordIntervalMs 默认 200 ，并被 Math.floor 且 clamp 到 [1, 2000] （见 textWysiwyg.tsx ）。
 test("Double click selects word and triple click selects line using configured intervals (E2E)", async ({
   page,
 }) => {

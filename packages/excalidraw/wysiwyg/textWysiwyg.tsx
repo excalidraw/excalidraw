@@ -256,6 +256,7 @@ export const textWysiwyg = ({
   let LAST_THEME = app.state.theme;
 
   let caretUpdateRaf: number | null = null;
+  let keepCaretVisibleWhilePointerDown = false;
   const scheduleCaretUpdate = () => {
     if (caretUpdateRaf != null) {
       cancelAnimationFrame(caretUpdateRaf);
@@ -268,6 +269,9 @@ export const textWysiwyg = ({
 
   const updateCaret = () => {
     if (document.activeElement !== editable) {
+      if (keepCaretVisibleWhilePointerDown) {
+        return;
+      }
       caret.style.display = "none";
       return;
     }
@@ -1631,6 +1635,7 @@ export const textWysiwyg = ({
 
   const cleanup = () => {
     // remove events to ensure they don't late-fire
+    keepCaretVisibleWhilePointerDown = false;
     editable.onblur = null;
     editable.oninput = null;
     editable.onkeydown = null;
@@ -1671,6 +1676,8 @@ export const textWysiwyg = ({
     window.removeEventListener("resize", updateWysiwygStyle);
     window.removeEventListener("wheel", stopEvent, true);
     window.removeEventListener("pointerdown", onPointerDown);
+    window.removeEventListener("pointerup", onPointerUp);
+    window.removeEventListener("contextmenu", onContextMenu);
     window.removeEventListener("pointerup", bindBlurEvent);
     window.removeEventListener("blur", handleSubmit);
     window.removeEventListener("beforeunload", handleSubmit);
@@ -1738,6 +1745,17 @@ export const textWysiwyg = ({
       return;
     }
 
+    if (event.button === POINTER_BUTTON.SECONDARY) {
+      keepCaretVisibleWhilePointerDown = true;
+      scheduleCaretUpdate();
+      if (target instanceof HTMLTextAreaElement) {
+        event.preventDefault();
+        app.handleCanvasPanUsingWheelOrSpaceDrag(event);
+      }
+      temporarilyDisableSubmit();
+      return;
+    }
+
     const isPropertiesTrigger =
       target instanceof HTMLElement &&
       target.classList.contains("properties-trigger");
@@ -1759,6 +1777,7 @@ export const textWysiwyg = ({
       temporarilyDisableSubmit();
     } else if (
       event.target instanceof HTMLCanvasElement &&
+      event.button === POINTER_BUTTON.MAIN &&
       // Vitest simply ignores stopPropagation, capture-mode, or rAF
       // so without introducing crazier hacks, nothing we can do
       !isTestEnv()
@@ -1772,6 +1791,25 @@ export const textWysiwyg = ({
       requestAnimationFrame(() => {
         handleSubmit();
       });
+    }
+  };
+
+  const onPointerUp = (event: PointerEvent) => {
+    if (event.button === POINTER_BUTTON.SECONDARY) {
+      keepCaretVisibleWhilePointerDown = false;
+      scheduleCaretUpdate();
+    }
+  };
+
+  const onContextMenu = (event: MouseEvent) => {
+    const target = event.target;
+    if (
+      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      (target.closest(".excalidraw-textEditorContainer") ||
+        target.closest(".excalidraw__canvas"))
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
     }
   };
 
@@ -2083,6 +2121,8 @@ export const textWysiwyg = ({
   // triggered the wysiwyg
   requestAnimationFrame(() => {
     window.addEventListener("pointerdown", onPointerDown, { capture: true });
+    window.addEventListener("pointerup", onPointerUp, { capture: true });
+    window.addEventListener("contextmenu", onContextMenu, { capture: true });
   });
   window.addEventListener("beforeunload", handleSubmit);
   const textEditorContainer = excalidrawContainer?.querySelector(

@@ -302,7 +302,7 @@ D:\a03\miniconda\python.exe -m py_compile Selenium/test.py
 
 
 
-
+finished:
 将双击选词的间隔时间改为200ms(毫秒)三击选词的间隔时间设为350ms(毫秒)
 双击选词:在编辑时点击文本框中的某一个字符在200ms以内再次点击则选中这个字符所在的词
 三击选行:在已经双击选型的情况下在150ms内第三次点击,则选中行;
@@ -316,16 +316,15 @@ finished:
 可以设置双击选词的间隔时间和三击选行的间隔时间
 
 
-
+fixed:
 分析在画布中双击超长文本框时是否会出现,双 击文本框后还没有插入光标的情况;分析双击文本框插入光标的延迟;在选中状态下点击文本框中的某一个字符插入光标的延迟;
 不考虑旋转的情况下点击编辑，优化文本框点击插入光标响应速度：
-
 分析在画布中由选中状态"第一次点击"某一个字符,进入编辑状态时,分析"第一次点击"插入光标的位置是否准确,分析"第一次点击"和之后的点击插入光标的位置是否有差别;
-
 “第一次点击总是系统性偏移”分析
 在选中文本框时,第一次点击某一个字符似乎会将编辑光标插入到这个字符的下一行,不作任何操作,第二次点击正确地将光标插入在字符的右边;
 分析出现以上现象的原因;
 
+fixed:
 第一次必定落到下一行
 依然出现"第一次必定落到下一行"把 initialPointerDownSceneCoords 与 editor overlay 的实际渲染 top 做一次运行时对比（重点看是否存在固定的 +lineHeightPx 偏移来源）。
 在 e2e 中编写测试验证是否解决"第一次必定落到下一行"问题;
@@ -344,10 +343,29 @@ first click to edit selected multi-line text should not jump to next line (E2E)
   - 以及 offsetTop 与 canvasRectTop ，用来确认两者是否存在固定偏差
 ## 已改为“scene 坐标”方案，彻底绕开不稳定的 baseTextTop
 
+
+finished
 分析目前的
 双击选词间隔(ms)三击选行间隔(ms)的设置
 是否精确;
-为这个功能在
+为这个功能在text-wrap-consistency.spec.ts //双击选词间隔(ms)三击选行间隔(ms)精确度测试 处编写测试;
+
+finished:
+目前在编辑画布中的文本框时,使用鼠标右键移动屏幕,会退出编辑状态,改为编辑时无论怎么按右键都不退出编辑状态;除非鼠标左键点击画布中其他区域,或按下ESC键才退出编辑状态到选中状态;
+目前编辑文本框时,右键有左键的插入光标功能,将这个功能关闭;
+将编辑时右键功能设为只有移动和缩放,(编辑时右键按住文本框本身也是移动画布)
+在编辑文本框时,在画布其他地方按住右键会让文本框内的编辑光标消失;设为不消失;
+目前在编辑文本框时,在文本框区域按住右键移动,和在画布其他区域按住右键移动的速率不一致,
+(确保编辑时右键按住文本框移动和在画布其他地方按住右键移动的速率一致)(确保按住右键按住的画布位置不会改变,目前在文本框区域按住右键移动按住的文本框位置发生改变)
+目前在编辑时,在文本框内鼠标右键拖动画布,编辑光标不会不可见,在文本框其他区域按住鼠标右键时,编辑光标不可见,松开右键编辑光标恢复;
+解决在文本框其他区域按住鼠标右键时,编辑光标不可见的问题;
+(不要改变编辑光标的位置)
+新增用例：同一段右键拖动路径，分别从 textarea 与 canvas 开始，最终 scrollX/scrollY 必须一致： textWysiwyg.test.tsx
+
+
+
+
+
 
 
 
@@ -358,6 +376,16 @@ yarn test:e2e --project=chromium --grep "first click to edit selected multi-line
 控制台:
 window.EXCALIDRAW_WYSIWYG_DEBUG = true
 window.__e2eWysiwygPointerDebug
+yarn test:typecheck && yarn test:code && yarn test:app --watch=false
+yarn test:typecheck; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; yarn test:code; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; yarn test:app --watch=false; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+yarn test:app --run --reporter=verbose
+yarn vitest packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run -t "same rate" --reporter=verbose
+yarn vitest packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run -t "keep caret visible" --reporter=verbose
+yarn test:typecheck; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; yarn test:code; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+
+
+
 
 
 
@@ -383,6 +411,9 @@ yarn test:code
 yarn test:typecheck -- --pretty false
 yarn test:e2e -- e2e/text-wrap-consistency.spec.ts --grep "response speed"
 npx playwright install chromium
+
+
+
 
 
 
