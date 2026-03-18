@@ -170,20 +170,24 @@ export const createSrcDoc = (body: string) => {
 
 export const getEmbedLink = (
   link: string | null | undefined,
+  trustedEmbedDomains?: string[],
 ): IframeDataWithSandbox | null => {
   if (!link) {
     return null;
   }
 
-  if (embeddedLinkCache.has(link)) {
+  if (!trustedEmbedDomains?.length && embeddedLinkCache.has(link)) {
     return embeddedLinkCache.get(link)!;
   }
 
   const originalLink = link;
 
-  const allowSameOrigin = ALLOW_SAME_ORIGIN.has(
-    matchHostname(link, ALLOW_SAME_ORIGIN) || "",
-  );
+  const isTrustedDomain =
+    trustedEmbedDomains?.some((trusted) => link!.includes(trusted)) ?? false;
+
+  const allowSameOrigin =
+    isTrustedDomain ||
+    ALLOW_SAME_ORIGIN.has(matchHostname(link, ALLOW_SAME_ORIGIN) || "");
 
   let type: "video" | "generic" = "generic";
   let aspectRatio = { w: 560, h: 840 };

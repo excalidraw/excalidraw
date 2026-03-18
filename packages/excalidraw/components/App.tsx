@@ -322,6 +322,7 @@ import {
   actionToggleArrowBinding,
   actionToggleMidpointSnapping,
   actionToggleCropEditor,
+  actionManageTrustedDomains,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
@@ -1701,7 +1702,10 @@ class App extends React.Component<AppProps, AppState> {
               } as const;
             }
           } else {
-            src = getEmbedLink(toValidURL(el.link || ""));
+            src = getEmbedLink(
+              toValidURL(el.link || ""),
+              this.state.trustedEmbedDomains,
+            );
           }
 
           const isActive =
@@ -3341,6 +3345,9 @@ class App extends React.Component<AppProps, AppState> {
 
     this.appStateObserver.flush(prevState);
 
+    if (prevState.trustedEmbedDomains !== this.state.trustedEmbedDomains) {
+      this.embedsValidationStatus.clear();
+    }
     this.updateEmbeddables();
     const elements = this.scene.getElementsIncludingDeleted();
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
@@ -12378,6 +12385,7 @@ class App extends React.Component<AppProps, AppState> {
       actionToggleLinearEditor,
       CONTEXT_MENU_SEPARATOR,
       actionLink,
+      actionManageTrustedDomains,
       actionCopyElementLink,
       CONTEXT_MENU_SEPARATOR,
       actionDuplicateSelection,

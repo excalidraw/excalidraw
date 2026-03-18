@@ -281,6 +281,8 @@ export interface AppState {
     element: NonDeletedExcalidrawElement;
     state: "hover" | "active";
   } | null;
+  /** user added trusted domains for embeds */
+  trustedEmbedDomains: string[];
   /**
    * for a newly created element
    * - set on pointer down, updated during pointer move, used on pointer up
@@ -391,7 +393,8 @@ export interface AppState {
     | { name: "commandPalette" }
     | { name: "settings" }
     | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] }
-    | { name: "charts"; data: Spreadsheet; rawText: string };
+    | { name: "charts"; data: Spreadsheet; rawText: string }
+    | { name: "trustedDomains" };
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *

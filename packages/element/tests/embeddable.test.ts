@@ -231,3 +231,35 @@ describe("Google Drive video embedding", () => {
     ).toBe(true);
   });
 });
+
+describe("custom embeddable validation", () => {
+  it("allows a custom trusted hostname through validateEmbeddable", () => {
+    const validateEmbeddable = (url: string) =>
+      new URL(url).hostname === "widgets.example.com" ? true : undefined;
+
+    expect(
+      embeddableURLValidator(
+        "https://widgets.example.com/embed/abc",
+        validateEmbeddable,
+      ),
+    ).toBe(true);
+  });
+
+  it("falls back to the default allowlist when validateEmbeddable returns undefined", () => {
+    const validateEmbeddable = () => undefined;
+
+    expect(
+      embeddableURLValidator(
+        "https://widgets.example.com/embed/abc",
+        validateEmbeddable,
+      ),
+    ).toBe(false);
+
+    expect(
+      embeddableURLValidator(
+        "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz123456/view",
+        validateEmbeddable,
+      ),
+    ).toBe(true);
+  });
+});
