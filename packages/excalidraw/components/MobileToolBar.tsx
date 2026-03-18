@@ -54,6 +54,7 @@ import {
   LassoIcon,
   mermaidLogoIcon,
   MagicIcon,
+  HighlighterIcon,
 } from "./icons";
 
 import "./ToolIcon.scss";
@@ -221,6 +222,21 @@ export const MobileToolBar = ({
   const [lastActiveLinearElement, setLastActiveLinearElement] = useState<
     "arrow" | "line"
   >("line");
+  const [preferredFreedraw, setPreferredFreedraw] =
+    useState<string>("freedraw");
+
+  const MOBILE_FREEDRAW_TOOLS = [
+    {
+      type: "freedraw" as const,
+      icon: FreedrawIcon,
+      title: capitalizeString(t("toolBar.freedraw")),
+    },
+    {
+      type: "highlighter" as const,
+      icon: HighlighterIcon,
+      title: capitalizeString(t("toolBar.highlighter")),
+    },
+  ];
 
   // keep lastActiveGenericShape in sync with active tool if user switches via other UI
   useEffect(() => {
@@ -352,19 +368,38 @@ export const MobileToolBar = ({
         }
       />
 
-      {/* Free Draw */}
-      <ToolButton
-        className={clsx({
-          active: activeTool.type === "freedraw",
-        })}
-        type="radio"
-        icon={FreedrawIcon}
-        checked={activeTool.type === "freedraw"}
-        name="editor-current-shape"
-        title={`${capitalizeString(t("toolBar.freedraw"))}`}
-        aria-label={capitalizeString(t("toolBar.freedraw"))}
-        data-testid="toolbar-freedraw"
-        onChange={() => handleToolChange("freedraw")}
+      {/* Free Draw / Highlighter */}
+      <ToolPopover
+        key="mobile-freedraw-popover"
+        app={app}
+        options={MOBILE_FREEDRAW_TOOLS}
+        activeTool={{
+          type:
+            activeTool.type === "freedraw"
+              ? preferredFreedraw
+              : activeTool.type,
+        }}
+        defaultOption={preferredFreedraw}
+        namePrefix="mobileFreedrawType"
+        title={capitalizeString(t("toolBar.freedraw"))}
+        data-testid="mobile-toolbar-freedraw"
+        onToolChange={(type: string) => {
+          const isHighlighter = type === "highlighter";
+          app.setHighlighterMode(isHighlighter);
+          app.setActiveTool({ type: "freedraw" });
+          setPreferredFreedraw(type);
+        }}
+        onSelect={(type: string) => {
+          const isHighlighter = type === "highlighter";
+          app.setHighlighterMode(isHighlighter);
+          app.setActiveTool({ type: "freedraw" });
+          setPreferredFreedraw(type);
+        }}
+        displayedOption={
+          MOBILE_FREEDRAW_TOOLS.find(
+            (tool) => tool.type === preferredFreedraw,
+          ) || MOBILE_FREEDRAW_TOOLS[0]
+        }
       />
 
       {/* Eraser */}

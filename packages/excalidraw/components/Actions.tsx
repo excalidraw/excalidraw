@@ -1428,16 +1428,16 @@ export const ShapesSwitcher = ({
                 title={capitalizeString(t("toolBar.freedraw"))}
                 data-testid="toolbar-freedraw"
                 onToolChange={(type: string) => {
-                  app.setActiveTool({ type: "freedraw" });
                   const isHighlighter = type === "highlighter";
-                  app.toggleHighlighterMode(isHighlighter);
+                  app.setHighlighterMode(isHighlighter);
+                  app.setActiveTool({ type: "freedraw" });
                   setPreferredFreedraw(type);
                 }}
                 onSelect={(type: string) => {
                   trackEvent("toolbar", type, "ui");
-                  app.setActiveTool({ type: "freedraw" });
                   const isHighlighter = type === "highlighter";
-                  app.toggleHighlighterMode(isHighlighter);
+                  app.setHighlighterMode(isHighlighter);
+                  app.setActiveTool({ type: "freedraw" });
                   setPreferredFreedraw(type);
                 }}
                 displayedOption={

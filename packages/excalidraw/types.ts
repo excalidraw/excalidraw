@@ -848,7 +848,8 @@ export type AppClassProperties = {
   bindModeHandler: App["bindModeHandler"];
 
   setAppState: App["setAppState"];
-  toggleHighlighterMode: App["toggleHighlighterMode"];
+  setHighlighterMode: App["setHighlighterMode"];
+  applyToolSettings: App["applyToolSettings"];
 };
 
 export type PointerDownState = Readonly<{

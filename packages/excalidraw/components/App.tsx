@@ -613,17 +613,21 @@ let twoFingerTouchStart: {
   positions: Array<{ x: number; y: number }>;
 } | null = null;
 let lastTwoFingerTapTime = 0;
-// Highlighter mode preset values
-let isHighlighterMode = false;
-let savedPencilSettings: {
+// Three independent settings sets for pencil, highlighter, and shapes
+type ToolSettings = {
   strokeWidth: number;
   opacity: number;
-} | null = null;
-
-const HIGHLIGHTER_DEFAULTS = {
-  strokeWidth: 12,
-  opacity: 40,
+  strokeColor: string;
 };
+
+const toolSettings: Record<"pencil" | "highlighter" | "shape", ToolSettings> = {
+  pencil: { strokeWidth: 2, opacity: 100, strokeColor: "#000000" },
+  highlighter: { strokeWidth: 12, opacity: 40, strokeColor: "#ffeb3b" },
+  shape: { strokeWidth: 2, opacity: 100, strokeColor: "#000000" },
+};
+
+let activeSettingsKey: "pencil" | "highlighter" | "shape" = "shape";
+let isHighlighterMode = false;
 
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
@@ -3534,6 +3538,15 @@ class App extends React.Component<AppProps, AppState> {
       this.props.onChange?.(elements, this.state, this.files);
       this.onChangeEmitter.trigger(elements, this.state, this.files);
     }
+
+    // Sync property changes back to the active settings set
+    if (
+      prevState.currentItemStrokeWidth !== this.state.currentItemStrokeWidth ||
+      prevState.currentItemOpacity !== this.state.currentItemOpacity ||
+      prevState.currentItemStrokeColor !== this.state.currentItemStrokeColor
+    ) {
+      this.syncActiveSettings();
+    }
   }
 
   private renderInteractiveSceneCallback = ({
@@ -5641,31 +5654,40 @@ class App extends React.Component<AppProps, AppState> {
         activeTool: nextActiveTool,
       };
     });
+
+    // Apply settings based on tool type
+    // hand/eraser/laser don't create elements — skip to avoid overwriting settings
+    if (tool.type === "freedraw") {
+      this.applyToolSettings(isHighlighterMode ? "highlighter" : "pencil");
+    } else if (
+      tool.type !== "hand" &&
+      tool.type !== "eraser" &&
+      tool.type !== "laser"
+    ) {
+      this.applyToolSettings("shape");
+    }
   };
 
-  toggleHighlighterMode = (enable: boolean) => {
-    if (enable && !isHighlighterMode) {
-      // Save current pencil settings
-      savedPencilSettings = {
-        strokeWidth: this.state.currentItemStrokeWidth,
-        opacity: this.state.currentItemOpacity,
-      };
-      // Apply highlighter defaults
-      this.setState({
-        currentItemStrokeWidth: HIGHLIGHTER_DEFAULTS.strokeWidth,
-        currentItemOpacity: HIGHLIGHTER_DEFAULTS.opacity,
-      });
-      isHighlighterMode = true;
-    } else if (!enable && isHighlighterMode) {
-      // Restore pencil settings
-      if (savedPencilSettings) {
-        this.setState({
-          currentItemStrokeWidth: savedPencilSettings.strokeWidth,
-          currentItemOpacity: savedPencilSettings.opacity,
-        });
-      }
-      isHighlighterMode = false;
-    }
+  setHighlighterMode = (enabled: boolean) => {
+    isHighlighterMode = enabled;
+  };
+
+  applyToolSettings = (key: "pencil" | "highlighter" | "shape") => {
+    activeSettingsKey = key;
+    const s = toolSettings[key];
+    this.setState({
+      currentItemStrokeWidth: s.strokeWidth,
+      currentItemOpacity: s.opacity,
+      currentItemStrokeColor: s.strokeColor,
+    });
+  };
+
+  private syncActiveSettings = () => {
+    toolSettings[activeSettingsKey] = {
+      strokeWidth: this.state.currentItemStrokeWidth,
+      opacity: this.state.currentItemOpacity,
+      strokeColor: this.state.currentItemStrokeColor,
+    };
   };
 
   setOpenDialog = (dialogType: AppState["openDialog"]) => {
