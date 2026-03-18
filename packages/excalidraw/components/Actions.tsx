@@ -383,25 +383,26 @@ const CombinedShapeProperties = ({
           }
         }}
       >
-        <Popover.Trigger asChild>
-          <button
-            type="button"
-            className={clsx("compact-action-button properties-trigger", {
-              active: isOpen,
-            })}
-            title={t("labels.stroke")}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
+        <Tooltip label={t("labels.stroke")}>
+          <Popover.Trigger asChild>
+            <button
+              type="button"
+              className={clsx("compact-action-button properties-trigger", {
+                active: isOpen,
+              })}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
 
-              setAppState({
-                openPopup: isOpen ? null : "compactStrokeStyles",
-              });
-            }}
-          >
-            {adjustmentsIcon}
-          </button>
-        </Popover.Trigger>
+                setAppState({
+                  openPopup: isOpen ? null : "compactStrokeStyles",
+                });
+              }}
+            >
+              {adjustmentsIcon}
+            </button>
+          </Popover.Trigger>
+        </Tooltip>
         {isOpen && (
           <PropertiesPopover
             className={PROPERTIES_CLASSES}
@@ -475,52 +476,53 @@ const CombinedArrowProperties = ({
           }
         }}
       >
-        <Popover.Trigger asChild>
-          <button
-            type="button"
-            className={clsx("compact-action-button properties-trigger", {
-              active: isOpen,
-            })}
-            title={t("labels.arrowtypes")}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
+        <Tooltip label={t("labels.arrowtypes")}>
+          <Popover.Trigger asChild>
+            <button
+              type="button"
+              className={clsx("compact-action-button properties-trigger", {
+                active: isOpen,
+              })}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
 
-              setAppState({
-                openPopup: isOpen ? null : "compactArrowProperties",
-              });
-            }}
-          >
-            {(() => {
-              // Show an icon based on the current arrow type
-              const arrowType = getFormValue(
-                targetElements,
-                app,
-                (element) => {
-                  if (isArrowElement(element)) {
-                    return element.elbowed
-                      ? "elbow"
-                      : element.roundness
-                      ? "round"
-                      : "sharp";
-                  }
-                  return null;
-                },
-                (element) => isArrowElement(element),
-                (hasSelection) =>
-                  hasSelection ? null : appState.currentItemArrowType,
-              );
+                setAppState({
+                  openPopup: isOpen ? null : "compactArrowProperties",
+                });
+              }}
+            >
+              {(() => {
+                // Show an icon based on the current arrow type
+                const arrowType = getFormValue(
+                  targetElements,
+                  app,
+                  (element) => {
+                    if (isArrowElement(element)) {
+                      return element.elbowed
+                        ? "elbow"
+                        : element.roundness
+                        ? "round"
+                        : "sharp";
+                    }
+                    return null;
+                  },
+                  (element) => isArrowElement(element),
+                  (hasSelection) =>
+                    hasSelection ? null : appState.currentItemArrowType,
+                );
 
-              if (arrowType === "elbow") {
-                return elbowArrowIcon;
-              }
-              if (arrowType === "round") {
-                return roundArrowIcon;
-              }
-              return sharpArrowIcon;
-            })()}
-          </button>
-        </Popover.Trigger>
+                if (arrowType === "elbow") {
+                  return elbowArrowIcon;
+                }
+                if (arrowType === "round") {
+                  return roundArrowIcon;
+                }
+                return sharpArrowIcon;
+              })()}
+            </button>
+          </Popover.Trigger>
+        </Tooltip>
         {isOpen && (
           <PropertiesPopover
             container={container}
@@ -572,30 +574,31 @@ const CombinedTextProperties = ({
           }
         }}
       >
-        <Popover.Trigger asChild>
-          <button
-            type="button"
-            className={clsx("compact-action-button properties-trigger", {
-              active: isOpen,
-            })}
-            title={t("labels.textAlign")}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
+        <Tooltip label={t("labels.textAlign")}>
+          <Popover.Trigger asChild>
+            <button
+              type="button"
+              className={clsx("compact-action-button properties-trigger", {
+                active: isOpen,
+              })}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
 
-              if (isOpen) {
-                setAppState({ openPopup: null });
-              } else {
-                if (appState.editingTextElement) {
-                  saveCaretPosition();
+                if (isOpen) {
+                  setAppState({ openPopup: null });
+                } else {
+                  if (appState.editingTextElement) {
+                    saveCaretPosition();
+                  }
+                  setAppState({ openPopup: "compactTextProperties" });
                 }
-                setAppState({ openPopup: "compactTextProperties" });
-              }
-            }}
-          >
-            {TextSizeIcon}
-          </button>
-        </Popover.Trigger>
+              }}
+            >
+              {TextSizeIcon}
+            </button>
+          </Popover.Trigger>
+        </Tooltip>
         {appState.openPopup === "compactTextProperties" && (
           <PropertiesPopover
             className={PROPERTIES_CLASSES}
@@ -683,24 +686,25 @@ const CombinedExtraActions = ({
           }
         }}
       >
-        <Popover.Trigger asChild>
-          <button
-            type="button"
-            className={clsx("compact-action-button properties-trigger", {
-              active: isOpen,
-            })}
-            title={t("labels.actions")}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setAppState({
-                openPopup: isOpen ? null : "compactOtherProperties",
-              });
-            }}
-          >
-            {DotsHorizontalIcon}
-          </button>
-        </Popover.Trigger>
+        <Tooltip label={t("labels.actions")}>
+          <Popover.Trigger asChild>
+            <button
+              type="button"
+              className={clsx("compact-action-button properties-trigger", {
+                active: isOpen,
+              })}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setAppState({
+                  openPopup: isOpen ? null : "compactOtherProperties",
+                });
+              }}
+            >
+              {DotsHorizontalIcon}
+            </button>
+          </Popover.Trigger>
+        </Tooltip>
         {isOpen && (
           <PropertiesPopover
             className={PROPERTIES_CLASSES}
@@ -1504,17 +1508,18 @@ export const ShapesSwitcher = ({
             setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen);
             setAppState({ openMenu: null, openPopup: null });
           }}
-          title={t("toolBar.extraTools")}
         >
-          {frameToolSelected
-            ? frameToolIcon
-            : embeddableToolSelected
-            ? EmbedIcon
-            : laserToolSelected && !app.props.isCollaborating
-            ? laserPointerToolIcon
-            : lassoToolSelected
-            ? LassoIcon
-            : extraToolsIcon}
+          <Tooltip label={t("toolBar.extraTools")}>
+            {frameToolSelected
+              ? frameToolIcon
+              : embeddableToolSelected
+              ? EmbedIcon
+              : laserToolSelected && !app.props.isCollaborating
+              ? laserPointerToolIcon
+              : lassoToolSelected
+              ? LassoIcon
+              : extraToolsIcon}
+          </Tooltip>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           onClickOutside={() => setIsExtraToolsMenuOpen(false)}

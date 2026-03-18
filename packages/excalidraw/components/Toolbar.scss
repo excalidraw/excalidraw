@@ -44,7 +44,7 @@
     }
 
     &:hover {
-      background-color: transparent;
+      background-color: var(--button-hover-bg);
     }
 
     &--selected,

@@ -6,6 +6,7 @@ import { useTunnels } from "../../context/tunnels";
 import { useUIAppState } from "../../context/ui-appState";
 import { t } from "../../i18n";
 import { useEditorInterface, useExcalidrawSetAppState } from "../App";
+import { Tooltip } from "../Tooltip";
 import { UserList } from "../UserList";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";
 import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";
@@ -46,7 +47,7 @@ const MainMenu = Object.assign(
               data-testid="main-menu-trigger"
               className="main-menu-trigger"
             >
-              {HamburgerMenuIcon}
+              <Tooltip label={t("buttons.menu")}>{HamburgerMenuIcon}</Tooltip>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
               onClickOutside={() => setAppState({ openMenu: null })}
