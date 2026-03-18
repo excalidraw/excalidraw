@@ -1500,6 +1500,8 @@ const renderTextBox = (
   context.rotate(text.angle);
   context.lineWidth = 1 / appState.zoom.value;
   context.strokeStyle = selectionColor;
+  context.globalAlpha = 0.5;
+  context.setLineDash([6 / appState.zoom.value, 4 / appState.zoom.value]);
   context.strokeRect(shiftX, shiftY, width, height);
   context.restore();
 };
