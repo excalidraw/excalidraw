@@ -44,6 +44,9 @@ import {
   ROUNDNESS,
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
+  TWO_FINGER_TAP_MAX_DURATION,
+  TWO_FINGER_TAP_MAX_DISTANCE,
+  TWO_FINGER_DOUBLE_TAP_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   THEME,
   TOUCH_CTX_MENU_TIMEOUT,
@@ -604,8 +607,12 @@ let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
 let firstTapPosition: { x: number; y: number } | null = null;
 // Two-finger double-tap for undo (like Procreate)
-let didTwoFingerTap: boolean = false;
-let twoFingerTapTimer = 0;
+// Detect on touchend: if both fingers lifted quickly and didn't move much → tap
+let twoFingerTouchStart: {
+  time: number;
+  positions: Array<{ x: number; y: number }>;
+} | null = null;
+let lastTwoFingerTapTime = 0;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
@@ -3628,20 +3635,14 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (event.touches.length === 2) {
-      // Two-finger double-tap → undo (500ms window)
-      if (!didTwoFingerTap) {
-        didTwoFingerTap = true;
-        clearTimeout(twoFingerTapTimer);
-        twoFingerTapTimer = window.setTimeout(() => {
-          didTwoFingerTap = false;
-        }, 500);
-      } else {
-        // Second two-finger tap within timeout → undo
-        didTwoFingerTap = false;
-        clearTimeout(twoFingerTapTimer);
-        this.actionManager.executeAction(this.undoAction, "ui");
-        return;
-      }
+      // Record two-finger touch start for tap detection on touchend
+      twoFingerTouchStart = {
+        time: Date.now(),
+        positions: Array.from(event.touches).map((t) => ({
+          x: t.clientX,
+          y: t.clientY,
+        })),
+      };
 
       this.setState({
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
@@ -3651,6 +3652,42 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private onTouchEnd = (event: TouchEvent) => {
+    // Two-finger double-tap undo detection
+    if (
+      twoFingerTouchStart &&
+      event.touches.length === 0 // both fingers lifted
+    ) {
+      const duration = Date.now() - twoFingerTouchStart.time;
+      if (duration < TWO_FINGER_TAP_MAX_DURATION) {
+        // Check that fingers didn't move much (not a pinch/swipe)
+        const touches = event.changedTouches;
+        let movedTooMuch = false;
+        for (let i = 0; i < touches.length; i++) {
+          const start = twoFingerTouchStart.positions[i];
+          if (start) {
+            const dx = touches[i].clientX - start.x;
+            const dy = touches[i].clientY - start.y;
+            if (Math.hypot(dx, dy) > TWO_FINGER_TAP_MAX_DISTANCE) {
+              movedTooMuch = true;
+              break;
+            }
+          }
+        }
+        if (!movedTooMuch) {
+          const now = Date.now();
+          if (now - lastTwoFingerTapTime < TWO_FINGER_DOUBLE_TAP_TIMEOUT) {
+            // Second two-finger tap → undo
+            lastTwoFingerTapTime = 0;
+            twoFingerTouchStart = null;
+            this.actionManager.executeAction(this.undoAction, "ui");
+            return;
+          }
+          lastTwoFingerTapTime = now;
+        }
+      }
+      twoFingerTouchStart = null;
+    }
+
     this.resetContextMenuTimer();
     if (event.touches.length > 0) {
       this.setState({
@@ -6342,10 +6379,7 @@ class App extends React.Component<AppProps, AppState> {
         // Don't enter wireframe groups — vertex handles are already
         // available at group level, no need for double-click drill-in
         if (
-          isWireframeGroup(
-            selectedGroupId,
-            this.scene.getNonDeletedElements(),
-          )
+          isWireframeGroup(selectedGroupId, this.scene.getNonDeletedElements())
         ) {
           return;
         }
@@ -8239,15 +8273,14 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
         if (!skipResize) {
-          pointerDownState.resize.handleType =
-            getTransformHandleTypeFromCoords(
-              getCommonBounds(selectedElements),
-              pointerDownState.origin.x,
-              pointerDownState.origin.y,
-              this.state.zoom,
-              event.pointerType,
-              this.editorInterface,
-            );
+          pointerDownState.resize.handleType = getTransformHandleTypeFromCoords(
+            getCommonBounds(selectedElements),
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+            this.state.zoom,
+            event.pointerType,
+            this.editorInterface,
+          );
         }
       }
       if (pointerDownState.resize.handleType) {
@@ -10012,17 +10045,14 @@ class App extends React.Component<AppProps, AppState> {
         // Check for wireframe vertex drag (before normal element drag)
         if (!this.wireframeDragVertex) {
           // Try already-selected group first
-          let wireframeGroupId = Object.keys(
-            this.state.selectedGroupIds,
-          )[0];
+          let wireframeGroupId = Object.keys(this.state.selectedGroupIds)[0];
 
           // Click-through: if no group selected yet, check if hit element
           // is part of a wireframe group and start drag in one gesture
           if (!wireframeGroupId && pointerDownState.hit.element) {
             const hitEl = pointerDownState.hit.element;
             if (hitEl.groupIds?.length) {
-              const candidateId =
-                hitEl.groupIds[hitEl.groupIds.length - 1];
+              const candidateId = hitEl.groupIds[hitEl.groupIds.length - 1];
               const allEls = this.scene.getNonDeletedElements();
               if (isWireframeGroup(candidateId, allEls)) {
                 wireframeGroupId = candidateId;
