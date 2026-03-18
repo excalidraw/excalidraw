@@ -1310,7 +1310,9 @@ class App extends React.Component<AppProps, AppState> {
    */
   public getEffectiveGridSize = () => {
     return (
-      isGridModeEnabled(this) ? this.state.gridSize : null
+      isGridModeEnabled(this) && this.state.gridSnapEnabled
+        ? this.state.gridSize
+        : null
     ) as NullableGridSize;
   };
 
