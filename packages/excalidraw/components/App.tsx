@@ -10602,14 +10602,19 @@ class App extends React.Component<AppProps, AppState> {
                 ? currentPoints[currentPoints.length - 1]
                 : null;
 
+            // Minimum distance² between consecutive points (in scene coords).
+            // Prevents coalesced events from adding sub-pixel noise that
+            // makes perfect-freehand's outline jagged at high zoom.
+            const MIN_POINT_DISTANCE_SQ = 4; // 2px
+
             for (const pt of pointsToAdd) {
-              // Deduplicate
-              if (
-                lastPoint &&
-                lastPoint[0] === pt.dx &&
-                lastPoint[1] === pt.dy
-              ) {
-                continue;
+              // Filter by minimum distance (not just exact match)
+              if (lastPoint) {
+                const ddx = lastPoint[0] - pt.dx;
+                const ddy = lastPoint[1] - pt.dy;
+                if (ddx * ddx + ddy * ddy < MIN_POINT_DISTANCE_SQ) {
+                  continue;
+                }
               }
               const p = pointFrom<LocalPoint>(pt.dx, pt.dy);
               newPointsList.push(p);
