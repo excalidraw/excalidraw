@@ -20,6 +20,7 @@ import {
   isArrowElement,
   hasStrokeColor,
   toolIsArrow,
+  isFrameElement,
 } from "@excalidraw/element";
 
 import type {
@@ -129,8 +130,11 @@ export const canChangeBackgroundColor = (
   targetElements: ExcalidrawElement[],
 ) => {
   return (
+    // frame tool shouldn't allow to set background until frame is created
     hasBackground(appState.activeTool.type) ||
-    targetElements.some((element) => hasBackground(element.type))
+    targetElements.some(
+      (element) => hasBackground(element.type) || isFrameElement(element),
+    )
   );
 };
 

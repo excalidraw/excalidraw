@@ -527,9 +527,20 @@ export const restoreElement = (
     case "embeddable":
       return restoreElementWithProperties(element, {});
     case "magicframe":
-    case "frame":
       return restoreElementWithProperties(element, {
         name: element.name ?? null,
+      });
+    case "frame":
+      const backgroundEnabled =
+        typeof (element as any).backgroundEnabled === "boolean"
+          ? (element as any).backgroundEnabled
+          : false;
+      return restoreElementWithProperties(element, {
+        name: element.name ?? null,
+        backgroundEnabled,
+        ...(!backgroundEnabled
+          ? { backgroundColor: DEFAULT_ELEMENT_PROPS.backgroundColor }
+          : {}),
       });
 
     // Don't use default case so as to catch a missing an element type case.

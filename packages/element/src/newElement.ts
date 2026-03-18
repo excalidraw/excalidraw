@@ -10,6 +10,7 @@ import {
   getFontString,
   getUpdatedTimestamp,
   getLineHeight,
+  isTransparent,
 } from "@excalidraw/common";
 
 import type { Radians } from "@excalidraw/math";
@@ -185,11 +186,13 @@ export const newFrameElement = (
     name?: string;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFrameElement> => {
+  const frameBase = _newElementBase<ExcalidrawFrameElement>("frame", opts);
   const frameElement = newElementWith(
     {
-      ..._newElementBase<ExcalidrawFrameElement>("frame", opts),
+      ...frameBase,
       type: "frame",
       name: opts?.name || null,
+      backgroundEnabled: !isTransparent(frameBase.backgroundColor),
     },
     {},
   );

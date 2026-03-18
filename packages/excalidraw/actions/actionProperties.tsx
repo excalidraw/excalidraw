@@ -46,6 +46,7 @@ import {
 import {
   isArrowElement,
   isBoundToContainer,
+  isFrameElement,
   isElbowArrow,
   isLinearElement,
   isLineElement,
@@ -53,7 +54,13 @@ import {
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
 
-import { hasStrokeColor } from "@excalidraw/element";
+import {
+  canChangeRoundness,
+  hasBackground,
+  hasStrokeColor,
+  hasStrokeStyle,
+  hasStrokeWidth,
+} from "@excalidraw/element";
 
 import {
   updateElbowArrowPoints,
@@ -413,11 +420,19 @@ export const actionChangeBackgroundColor = register<
         return el;
       });
     } else {
-      nextElements = changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          backgroundColor: value.currentItemBackgroundColor,
-        }),
-      );
+      nextElements = changeProperty(elements, appState, (el) => {
+        if (isFrameElement(el)) {
+          return newElementWith(el, {
+            backgroundColor: value.currentItemBackgroundColor,
+            backgroundEnabled: !isTransparent(value.currentItemBackgroundColor),
+          });
+        }
+        return hasBackground(el.type)
+          ? newElementWith(el, {
+              backgroundColor: value.currentItemBackgroundColor,
+            })
+          : el;
+      });
     }
 
     return {
@@ -448,7 +463,12 @@ export const actionChangeBackgroundColor = register<
             (element) => element.backgroundColor,
             true,
             (hasSelection) =>
-              !hasSelection ? appState.currentItemBackgroundColor : null,
+              !hasSelection
+                ? appState.activeTool.type === "frame"
+                  ? // background default shouldn't apply to new frames
+                    "transparent"
+                  : appState.currentItemBackgroundColor
+                : null,
           )}
           onChange={(color) =>
             updateData({ currentItemBackgroundColor: color })
@@ -475,11 +495,13 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
       })`,
     );
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          fillStyle: value,
-        }),
-      ),
+      elements: changeProperty(elements, appState, (el) => {
+        return hasBackground(el.type)
+          ? newElementWith(el, {
+              fillStyle: value,
+            })
+          : el;
+      }),
       appState: { ...appState, currentItemFillStyle: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -552,11 +574,13 @@ export const actionChangeStrokeWidth = register<
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          strokeWidth: value,
-        }),
-      ),
+      elements: changeProperty(elements, appState, (el) => {
+        return hasStrokeWidth(el.type)
+          ? newElementWith(el, {
+              strokeWidth: value,
+            })
+          : el;
+      }),
       appState: { ...appState, currentItemStrokeWidth: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -608,12 +632,14 @@ export const actionChangeSloppiness = register<ExcalidrawElement["roughness"]>({
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          seed: randomInteger(),
-          roughness: value,
-        }),
-      ),
+      elements: changeProperty(elements, appState, (el) => {
+        return hasStrokeStyle(el.type)
+          ? newElementWith(el, {
+              seed: randomInteger(),
+              roughness: value,
+            })
+          : el;
+      }),
       appState: { ...appState, currentItemRoughness: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -664,11 +690,13 @@ export const actionChangeStrokeStyle = register<
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          strokeStyle: value,
-        }),
-      ),
+      elements: changeProperty(elements, appState, (el) => {
+        return hasStrokeStyle(el.type)
+          ? newElementWith(el, {
+              strokeStyle: value,
+            })
+          : el;
+      }),
       appState: { ...appState, currentItemStrokeStyle: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -1480,7 +1508,7 @@ export const actionChangeRoundness = register<"sharp" | "round">({
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, appState, (el) => {
-        if (isElbowArrow(el)) {
+        if (isElbowArrow(el) || !canChangeRoundness(el.type)) {
           return el;
         }
 

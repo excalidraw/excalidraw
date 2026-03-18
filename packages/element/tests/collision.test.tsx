@@ -38,6 +38,53 @@ describe("check rotated elements can be hit:", () => {
   });
 });
 
+describe("frame hit testing", () => {
+  it.each(["transparent", "#ffffff"])(
+    "does not hit frame inside regardless of background color (%s)",
+    (backgroundColor) => {
+      const element = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        backgroundColor,
+      });
+      const elementsMap = arrayToMap([element]);
+
+      expect(
+        hitElementItself({
+          point: pointFrom<GlobalPoint>(50, 50),
+          element,
+          threshold: 10,
+          elementsMap,
+        }),
+      ).toBe(false);
+    },
+  );
+
+  it("hits frame outline", () => {
+    const element = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      backgroundColor: "#ffffff",
+    });
+    const elementsMap = arrayToMap([element]);
+
+    expect(
+      hitElementItself({
+        point: pointFrom<GlobalPoint>(0, 50),
+        element,
+        threshold: 1,
+        elementsMap,
+      }),
+    ).toBe(true);
+  });
+});
+
 describe("hitElementItself cache", () => {
   beforeEach(async () => {
     // reset cache

@@ -78,7 +78,12 @@ import type {
 } from "./types";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
-  if (element.type === "arrow") {
+  if (
+    element.type === "arrow" ||
+    // frame elements should ignore inside hit test even if background is not
+    // transparent, so we can select children easily
+    isFrameLikeElement(element)
+  ) {
     return false;
   }
 

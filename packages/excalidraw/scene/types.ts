@@ -1,6 +1,7 @@
 import type { UserIdleState, EditorInterface } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
@@ -26,6 +27,7 @@ export type RenderableElementsMap = NonDeletedElementsMap &
 
 export type StaticCanvasRenderConfig = {
   canvasBackgroundColor: AppState["viewBackgroundColor"];
+  exportingFrame?: ExcalidrawFrameLikeElement | null;
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   imageCache: AppClassProperties["imageCache"];
@@ -46,6 +48,7 @@ export type SVGRenderConfig = {
   exportWithDarkMode: boolean;
   renderEmbeddables: boolean;
   frameRendering: AppState["frameRendering"];
+  exportingFrame?: ExcalidrawFrameLikeElement | null;
   canvasBackgroundColor: AppState["viewBackgroundColor"];
   embedsValidationStatus: EmbedsValidationStatus;
   /**

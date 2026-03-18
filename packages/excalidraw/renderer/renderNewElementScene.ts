@@ -4,7 +4,9 @@ import {
   getTargetFrame,
   isInvisiblySmallElement,
   renderElement,
+  renderFrameBackground,
   shouldApplyFrameClip,
+  isFrameElement,
 } from "@excalidraw/element";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
@@ -65,6 +67,14 @@ const _renderNewElementScene = ({
         ) {
           frameClip(frame, context, renderConfig, appState);
         }
+      }
+
+      if (
+        isFrameElement(newElement) &&
+        appState.frameRendering.enabled &&
+        appState.frameRendering.outline
+      ) {
+        renderFrameBackground(newElement, context, appState);
       }
 
       renderElement(
