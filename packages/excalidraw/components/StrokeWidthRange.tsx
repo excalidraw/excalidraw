@@ -2,9 +2,9 @@ import { useEffect, useRef } from "react";
 
 import "./StrokeWidthRange.scss";
 
-const STROKE_WIDTH_MIN = 1;
-const STROKE_WIDTH_MAX = 16;
-const STROKE_WIDTH_STEP = 1;
+const STROKE_WIDTH_MIN = 0.5;
+const STROKE_WIDTH_MAX = 8;
+const STROKE_WIDTH_STEP = 0.5;
 
 // Squiggle wave path (centered, with padding from edges so thick strokes don't clip)
 const SQUIGGLE_PATH =
@@ -22,13 +22,20 @@ export const StrokeWidthRange = ({
   onChange: (value: number) => void;
 }) => {
   const rangeRef = useRef<HTMLInputElement>(null);
+  const valueRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (rangeRef.current) {
+    if (rangeRef.current && valueRef.current) {
+      const rangeElement = rangeRef.current;
+      const valueElement = valueRef.current;
       const pct =
         ((value - STROKE_WIDTH_MIN) / (STROKE_WIDTH_MAX - STROKE_WIDTH_MIN)) *
         100;
-      rangeRef.current.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${pct}%, var(--button-bg) ${pct}%, var(--button-bg) 100%)`;
+      const inputWidth = rangeElement.offsetWidth;
+      const thumbWidth = 15;
+      const position = (pct / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
+      valueElement.style.left = `${position}px`;
+      rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${pct}%, var(--button-bg) ${pct}%, var(--button-bg) 100%)`;
     }
   }, [value]);
 
@@ -52,17 +59,22 @@ export const StrokeWidthRange = ({
           />
         </svg>
       </div>
-      <input
-        ref={rangeRef}
-        type="range"
-        min={STROKE_WIDTH_MIN}
-        max={STROKE_WIDTH_MAX}
-        step={STROKE_WIDTH_STEP}
-        value={value}
-        onChange={(e) => onChange(+e.target.value)}
-        className="stroke-width-range__input"
-        data-testid="strokeWidth-slider"
-      />
+      <div className="stroke-width-range__slider">
+        <input
+          ref={rangeRef}
+          type="range"
+          min={STROKE_WIDTH_MIN}
+          max={STROKE_WIDTH_MAX}
+          step={STROKE_WIDTH_STEP}
+          value={value}
+          onChange={(e) => onChange(+e.target.value)}
+          className="stroke-width-range__input"
+          data-testid="strokeWidth-slider"
+        />
+        <div className="stroke-width-range__value" ref={valueRef}>
+          {value}
+        </div>
+      </div>
     </div>
   );
 };

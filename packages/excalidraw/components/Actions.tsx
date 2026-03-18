@@ -1390,7 +1390,13 @@ export const ShapesSwitcher = ({
                 activeTool={activeTool}
                 defaultOption={lastActiveLinear}
                 namePrefix="linearType"
-                title={capitalizeString(t("toolBar.arrow"))}
+                title={capitalizeString(
+                  t(
+                    lastActiveLinear === "line"
+                      ? "toolBar.line"
+                      : "toolBar.arrow",
+                  ),
+                )}
                 data-testid="toolbar-linear"
                 onToolChange={(type: string) => {
                   setLastActiveLinear(type);
