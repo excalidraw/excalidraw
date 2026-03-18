@@ -7119,9 +7119,10 @@ class App extends React.Component<AppProps, AppState> {
         this.state.openDialog?.name !== "elementLinkSelector" &&
         !(selectedElements.length === 1 && isElbowArrow(selectedElements[0])) &&
         // HACK: Disable transform handles for linear elements on mobile until a
-        // better way of showing them is found
+        // better way of showing them is found (except polygon presets — they are closed shapes)
         !(
           isLinearElement(selectedElements[0]) &&
+          !("polygon" in selectedElements[0] && selectedElements[0].polygon) &&
           (this.editorInterface.userAgent.isMobileDevice ||
             selectedElements[0].points.length === 2)
         )
@@ -8281,8 +8282,11 @@ class App extends React.Component<AppProps, AppState> {
         selectedElements.length === 1 &&
         !this.state.selectedLinearElement?.isEditing &&
         !isElbowArrow(selectedElements[0]) &&
+        // HACK: Disable transform handles for linear elements on mobile
+        // (except polygon presets — they are closed shapes)
         !(
           isLinearElement(selectedElements[0]) &&
+          !("polygon" in selectedElements[0] && selectedElements[0].polygon) &&
           (this.editorInterface.userAgent.isMobileDevice ||
             selectedElements[0].points.length === 2)
         ) &&
