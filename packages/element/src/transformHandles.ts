@@ -18,6 +18,7 @@ import {
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
+  isLineElement,
   isLinearElement,
 } from "./typeChecks";
 
@@ -345,6 +346,12 @@ export const hasBoundingBox = (
     return false;
   }
   if (!isLinearElement(element)) {
+    return true;
+  }
+
+  // Poly-preset shapes (triangle, pentagon, etc.) are line elements with
+  // polygon=true — they are closed shapes, not lines, so always show bbox
+  if (isLineElement(element) && element.polygon) {
     return true;
   }
 
