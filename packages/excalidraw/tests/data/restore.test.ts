@@ -118,6 +118,22 @@ describe("restoreElements", () => {
     expect(restoredFrame.backgroundEnabled).toBe(false);
   });
 
+  it("should normalize frame background color when backgroundEnabled is false", () => {
+    const frame = API.createElement({
+      type: "frame",
+      backgroundColor: "#ffc9c9",
+    });
+    frame.backgroundEnabled = false;
+
+    const restoredFrame = restore.restoreElements(
+      [frame],
+      null,
+    )[0] as ExcalidrawFrameElement;
+
+    expect(restoredFrame.backgroundColor).toBe("transparent");
+    expect(restoredFrame.backgroundEnabled).toBe(false);
+  });
+
   it("should preserve frame backgroundEnabled when present", () => {
     const frame = API.createElement({
       type: "frame",
@@ -130,6 +146,7 @@ describe("restoreElements", () => {
       null,
     )[0] as ExcalidrawFrameElement;
 
+    expect(restoredFrame.backgroundColor).toBe("#ffc9c9");
     expect(restoredFrame.backgroundEnabled).toBe(true);
   });
 
