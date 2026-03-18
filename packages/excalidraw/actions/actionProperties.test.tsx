@@ -206,6 +206,7 @@ describe("element locking", () => {
 
       act(() => {
         h.app.actionManager.executeAction(actionChangeBackgroundColor, "ui", {
+          viewBackgroundColor: h.state.viewBackgroundColor,
           currentItemBackgroundColor: "#ffc9c9",
         });
       });
