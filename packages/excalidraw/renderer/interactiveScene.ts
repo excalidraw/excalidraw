@@ -41,6 +41,7 @@ import {
   maxBindingDistance_simple,
   isTextElement,
   LinearElementEditor,
+  getActiveTextElement,
 } from "@excalidraw/element";
 
 import { renderSelectionElement } from "@excalidraw/element";
@@ -86,6 +87,10 @@ import {
 } from "../scene/scrollbars";
 
 import { getClientColor, renderRemoteCursors } from "../clients";
+import {
+  getTextAutoResizeHandle,
+  getTextBoxPadding,
+} from "../textAutoResizeHandle";
 
 import {
   bootstrapCanvas,
@@ -1489,13 +1494,13 @@ const renderTextBox = (
   selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   context.save();
-  const padding = (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
+  const padding = getTextBoxPadding(appState.zoom.value);
   const width = text.width + padding * 2;
   const height = text.height + padding * 2;
-  const cx = text.x + width / 2;
-  const cy = text.y + height / 2;
-  const shiftX = -(width / 2 + padding);
-  const shiftY = -(height / 2 + padding);
+  const cx = text.x + text.width / 2;
+  const cy = text.y + text.height / 2;
+  const shiftX = -(text.width / 2 + padding);
+  const shiftY = -(text.height / 2 + padding);
   context.translate(cx + appState.scrollX, cy + appState.scrollY);
   context.rotate(text.angle);
   context.lineWidth = 1 / appState.zoom.value;
@@ -1503,6 +1508,36 @@ const renderTextBox = (
   context.globalAlpha = 0.5;
   context.setLineDash([6 / appState.zoom.value, 4 / appState.zoom.value]);
   context.strokeRect(shiftX, shiftY, width, height);
+  context.restore();
+};
+
+const renderResetAutoResizeHandle = (
+  text: NonDeleted<ExcalidrawTextElement>,
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
+) => {
+  const autoResizeHandle = getTextAutoResizeHandle(text, appState.zoom.value);
+
+  if (!autoResizeHandle) {
+    return;
+  }
+
+  context.save();
+  context.globalAlpha = 0.5;
+  context.lineWidth = 1.5 / appState.zoom.value;
+  context.lineCap = "round";
+  context.strokeStyle = selectionColor;
+  context.beginPath();
+  context.moveTo(
+    autoResizeHandle.start[0] + appState.scrollX,
+    autoResizeHandle.start[1] + appState.scrollY,
+  );
+  context.lineTo(
+    autoResizeHandle.end[0] + appState.scrollX,
+    autoResizeHandle.end[1] + appState.scrollY,
+  );
+  context.stroke();
   context.restore();
 };
 
@@ -1586,10 +1621,18 @@ const _renderInteractiveScene = ({
     }
   }
 
-  if (
-    appState.editingTextElement &&
-    isTextElement(appState.editingTextElement)
-  ) {
+  const activeTextElement = getActiveTextElement(selectedElements, appState);
+
+  if (activeTextElement && !activeTextElement.autoResize) {
+    renderResetAutoResizeHandle(
+      activeTextElement,
+      context,
+      appState,
+      renderConfig.selectionColor,
+    );
+  }
+
+  if (appState.editingTextElement) {
     const textElement = allElementsMap.get(appState.editingTextElement.id) as
       | ExcalidrawTextElement
       | undefined;

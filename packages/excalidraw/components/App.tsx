@@ -257,6 +257,7 @@ import {
   handleFocusPointPointerUp,
   maybeHandleArrowPointlikeDrag,
   getUncroppedWidthAndHeight,
+  getActiveTextElement,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -416,6 +417,7 @@ import {
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
+import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
 
@@ -5866,6 +5868,57 @@ class App extends React.Component<AppProps, AppState> {
     return null;
   }
 
+  private isHittingTextAutoResizeHandle = (
+    selectedElements: NonDeleted<ExcalidrawElement>[],
+    point: Readonly<{ x: number; y: number }>,
+  ): boolean => {
+    const activeTextElement = getActiveTextElement(
+      selectedElements,
+      this.state,
+    );
+
+    if (
+      activeTextElement &&
+      !activeTextElement.isDeleted &&
+      !activeTextElement.autoResize &&
+      isPointHittingTextAutoResizeHandle(
+        point,
+        activeTextElement,
+        this.state.zoom.value,
+      )
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
+  private handleTextAutoResizeHandlePointerDown = (
+    selectedElements: NonDeleted<ExcalidrawElement>[],
+    point: Readonly<{ x: number; y: number }>,
+  ) => {
+    const activeTextElement = getActiveTextElement(
+      selectedElements,
+      this.state,
+    );
+    if (
+      !activeTextElement ||
+      !this.isHittingTextAutoResizeHandle(selectedElements, point)
+    ) {
+      return false;
+    }
+
+    this.actionManager.executeAction(
+      actionTextAutoResize,
+      "ui",
+      // we need to pass down the element since it may already be deselected
+      // due to the pointerdown
+      activeTextElement,
+    );
+    this.resetCursor();
+    return true;
+  };
+
   // NOTE: Hot path for hit testing, so avoid unnecessary computations
   private getElementAtPosition(
     x: number,
@@ -6990,6 +7043,12 @@ class App extends React.Component<AppProps, AppState> {
     const elements = this.scene.getNonDeletedElements();
 
     const selectedElements = this.scene.getSelectedElements(this.state);
+
+    if (this.isHittingTextAutoResizeHandle(selectedElements, scenePointer)) {
+      setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+      return;
+    }
+
     if (
       selectedElements.length === 1 &&
       !isOverScrollBar &&
@@ -7134,7 +7193,9 @@ class App extends React.Component<AppProps, AppState> {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
       } else if (
         // if using cmd/ctrl, we're not dragging
-        !event[KEYS.CTRL_OR_CMD]
+        !event[KEYS.CTRL_OR_CMD] &&
+        // editing text -> don't show move cursor when hovering over its bbox
+        hitElement?.id !== this.state.editingTextElement?.id
       ) {
         if (
           (hitElement ||
@@ -7355,6 +7416,8 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    const selectedElements = this.scene.getSelectedElements(this.state);
+
     // If Ctrl is not held, ensure isBindingEnabled reflects the user preference.
     if (!event.ctrlKey) {
       const preferenceEnabled = this.state.bindingPreference === "enabled";
@@ -7577,6 +7640,15 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({
       selectedElementsAreBeingDragged: false,
     });
+
+    if (
+      this.handleTextAutoResizeHandlePointerDown(
+        selectedElements,
+        pointerDownState.origin,
+      )
+    ) {
+      return;
+    }
 
     if (this.handleDraggingScrollBar(event, pointerDownState)) {
       return;
