@@ -17,7 +17,6 @@ import {
 import {
   KEYS,
   arrayToMap,
-  getGridPoint,
   invariant,
   shouldRotateWithDiscreteAngle,
   updateActiveTool,
@@ -116,27 +115,11 @@ export const actionFinalize = register<FormData>({
             return map;
           }, new Map()) ?? new Map();
 
-        const startIsDragged = selectedPointsIndices.includes(0);
-        const lockedGlobal = angleLocked
-          ? LinearElementEditor.getPointAtIndexGlobalCoordinates(
-              element,
-              startIsDragged ? 0 : -1,
-              elementsMap,
-            )
-          : null;
-        const [gridSnappedX, gridSnappedY] = getGridPoint(
-          sceneCoords.x - linearElementEditor.pointerOffset.x,
-          sceneCoords.y - linearElementEditor.pointerOffset.y,
-          effectiveGridSize,
-        );
-        const bindingSceneX = lockedGlobal ? lockedGlobal[0] : gridSnappedX;
-        const bindingSceneY = lockedGlobal ? lockedGlobal[1] : gridSnappedY;
-
         bindOrUnbindBindingElement(
           element,
           draggedPoints,
-          bindingSceneX,
-          bindingSceneY,
+          sceneCoords.x,
+          sceneCoords.y,
           scene,
           appState,
           {
