@@ -107,6 +107,7 @@
     "ungroup": "Разделить выделение",
     "collaborators": "Участники",
     "toggleGrid": "Переключить сетку",
+    "gridSnap": "Привязка к сетке",
     "addToLibrary": "Добавить в библиотеку",
     "removeFromLibrary": "Удалить из библиотеки",
     "libraryLoadingMessage": "Загрузка библиотеки…",
