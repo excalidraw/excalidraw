@@ -5684,6 +5684,8 @@ class App extends React.Component<AppProps, AppState> {
     isHighlighterMode = enabled;
   };
 
+  getIsHighlighterMode = () => isHighlighterMode;
+
   applyToolSettings = (key: "pencil" | "highlighter" | "shape") => {
     activeSettingsKey = key;
     const s = toolSettings[key];

@@ -568,6 +568,9 @@ export const actionChangeStrokeWidth = register<
       (hasSelection) => (hasSelection ? null : appState.currentItemStrokeWidth),
     );
 
+    const isHighlighter =
+      appState.activeTool.type === "freedraw" && app.getIsHighlighterMode();
+
     return (
       <fieldset>
         <legend>{t("labels.strokeWidth")}</legend>
@@ -576,6 +579,9 @@ export const actionChangeStrokeWidth = register<
           strokeColor={appState.currentItemStrokeColor}
           opacity={appState.currentItemOpacity}
           onChange={(val) => updateData(val)}
+          min={isHighlighter ? 1 : 0.5}
+          max={isHighlighter ? 16 : 8}
+          step={isHighlighter ? 1 : 0.5}
         />
       </fieldset>
     );

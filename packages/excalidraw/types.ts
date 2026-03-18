@@ -851,6 +851,7 @@ export type AppClassProperties = {
 
   setAppState: App["setAppState"];
   setHighlighterMode: App["setHighlighterMode"];
+  getIsHighlighterMode: App["getIsHighlighterMode"];
   applyToolSettings: App["applyToolSettings"];
 };
 
