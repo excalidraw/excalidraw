@@ -1,5 +1,5 @@
 import { simplify } from "points-on-curve";
-import { getStroke } from "perfect-freehand";
+import { LaserPointer } from "@excalidraw/laser-pointer";
 
 import {
   type GeometricShape,
@@ -1296,22 +1296,41 @@ const getFreeDrawSvgPath = (element: ExcalidrawFreeDrawElement) => {
 export const getFreedrawOutlinePoints = (
   element: ExcalidrawFreeDrawElement,
 ) => {
-  // If input points are empty (should they ever be?) return a dot
-  const inputPoints = element.simulatePressure
-    ? element.points
-    : element.points.length
-    ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
-    : [[0, 0, 0.5]];
+  if (!element.points.length) {
+    return [] as [number, number][];
+  }
 
-  return getStroke(inputPoints as number[][], {
-    simulatePressure: element.simulatePressure,
-    size: element.strokeWidth * 4.25,
-    thinning: 0.6,
-    smoothing: 0.5,
-    streamline: 0.5,
-    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
-    last: true,
-  }) as [number, number][];
+  const size = element.strokeWidth * 4.25;
+
+  const lp = new LaserPointer({
+    size,
+    streamline: 0.45,
+    simplify: 0,
+    sizeMapping: (details) => {
+      const { pressure, runningLength } = details;
+      // Pressure-based width (same easing as original perfect-freehand config)
+      const p = element.simulatePressure ? 0.5 : pressure;
+      const eased = Math.sin((p * Math.PI) / 2); // easeOutSine
+      // Apply thinning: map pressure to width range [1-thinning, 1]
+      const thinning = 0.6;
+      const width = 1 - thinning * (1 - eased);
+      // Start taper
+      const startTaper = Math.min(1, runningLength / (size * 2));
+      return width * startTaper;
+    },
+  });
+
+  for (let i = 0; i < element.points.length; i++) {
+    const [x, y] = element.points[i];
+    const pressure = element.simulatePressure
+      ? 0.5
+      : element.pressures[i] ?? 0.5;
+    lp.addPoint([x, y, pressure] as [number, number, number]);
+  }
+  lp.close();
+
+  // LaserPointer returns [x, y, r][] — map to [x, y][] for SVG path
+  return lp.getStrokeOutline().map(([x, y]) => [x, y] as [number, number]);
 };
 
 const med = (A: number[], B: number[]) => {
