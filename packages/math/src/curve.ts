@@ -240,6 +240,56 @@ export function curveClosestPoint<Point extends GlobalPoint | LocalPoint>(
   return bezierEquation(c, solution);
 }
 
+export function curveClosestParameter<Point extends GlobalPoint | LocalPoint>(
+  c: Curve<Point>,
+  p: Point,
+  tolerance: number = 1e-3,
+): number {
+  const localMinimum = (
+    min: number,
+    max: number,
+    f: (t: number) => number,
+    e: number = tolerance,
+  ) => {
+    let m = min;
+    let n = max;
+    let k;
+
+    while (n - m > e) {
+      k = (n + m) / 2;
+      if (f(k - e) < f(k + e)) {
+        n = k;
+      } else {
+        m = k;
+      }
+    }
+
+    return k;
+  };
+
+  const maxSteps = 30;
+  let closestStep = 0;
+  for (let min = Infinity, step = 0; step < maxSteps; step++) {
+    const d = pointDistance(p, bezierEquation(c, step / maxSteps));
+    if (d < min) {
+      min = d;
+      closestStep = step;
+    }
+  }
+
+  const t0 = Math.max((closestStep - 1) / maxSteps, 0);
+  const t1 = Math.min((closestStep + 1) / maxSteps, 1);
+  const param = localMinimum(t0, t1, (t) =>
+    pointDistance(p, bezierEquation(c, t)),
+  );
+
+  if (!param) {
+    return 0;
+  }
+
+  return param;
+}
+
 /**
  * Determines the distance between a point and the closest point on the
  * Bezier curve.

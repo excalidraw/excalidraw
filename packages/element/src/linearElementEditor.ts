@@ -9,6 +9,12 @@ import {
   vectorFromPoint,
   curveLength,
   curvePointAtLength,
+  lineSegmentClosestParameter,
+  distanceToLineSegment,
+  curveClosestParameter,
+  curvePointDistance,
+  clamp,
+  bezierEquation,
 } from "@excalidraw/math";
 
 import { getCurvePathOps } from "@excalidraw/utils/shape";
@@ -29,6 +35,7 @@ import {
   isPathALoop,
   moveArrowAboveBindable,
   projectFixedPointOntoDiagonal,
+  getBoundTextPathProps,
   type Store,
 } from "@excalidraw/element";
 
@@ -155,6 +162,10 @@ export class LinearElementEditor {
   public readonly elbowed: boolean;
   public readonly customLineAngle: number | null;
   public readonly isEditing: boolean;
+  public readonly lastBoundTextPathProps: {
+    segmentIndex: number;
+    segmentParameter: number;
+  } | null;
 
   // @deprecated renamed to initialState because the data is used during linear
   // element click creation as well (with multiple pointer down events)
@@ -202,6 +213,7 @@ export class LinearElementEditor {
     this.elbowed = isElbowArrow(element) && element.elbowed;
     this.customLineAngle = null;
     this.isEditing = isEditing;
+    this.lastBoundTextPathProps = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -1090,6 +1102,50 @@ export class LinearElementEditor {
     // it would get deselected if the point is outside the hitbox area
     if (clickedPointIndex >= 0 || segmentMidpoint) {
       ret.hitElement = element;
+    } else if (isArrowElement(element)) {
+      // if the element has bound text, hitTest, if valid maintain hit element as linear element
+      const boundTextElement = getBoundTextElement(element, elementsMap);
+      if (boundTextElement) {
+        const { x: textX, y: textY } = this.getBoundTextElementPosition(
+          element,
+          boundTextElement,
+          elementsMap,
+        );
+        if (
+          scenePointer.x >= textX &&
+          scenePointer.x <= textX + boundTextElement.width &&
+          scenePointer.y >= textY &&
+          scenePointer.y <= textY + boundTextElement.height
+        ) {
+          ret.hitElement = element;
+          const currentBoundTextPathProps = getBoundTextPathProps(
+            boundTextElement,
+            element,
+          );
+          // alter ret for the the case of dragging the bound text of an arrow element
+          ret.linearElementEditor = {
+            ...linearElementEditor,
+            isDragging: true,
+            lastBoundTextPathProps: currentBoundTextPathProps,
+            initialState: {
+              prevSelectedPointsIndices:
+                linearElementEditor.selectedPointsIndices,
+              lastClickedPoint: -1,
+              origin: point,
+              segmentMidpoint: {
+                value: null,
+                index: null,
+                added: false,
+              },
+              arrowStartIsInside: false,
+              altFocusPoint: null,
+            },
+            selectedPointsIndices: null,
+            pointerOffset: { x: 0, y: 0 },
+          };
+          return ret;
+        }
+      }
     }
 
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
@@ -1823,6 +1879,96 @@ export class LinearElementEditor {
     );
   }
 
+  static handleBoundTextDragging(
+    linearElementEditor: LinearElementEditor,
+    scene: Scene,
+    pointerX: number,
+    pointerY: number,
+  ): LinearElementEditor | null {
+    const elementsMap = scene.getNonDeletedElementsMap();
+    const element = LinearElementEditor.getElement(
+      linearElementEditor.elementId,
+      elementsMap,
+    );
+    const boundTextElement = getBoundTextElement(element, elementsMap);
+    if (!element || !isArrowElement(element) || !boundTextElement) {
+      return null;
+    }
+    const pointerGlobalPoint = pointFrom<GlobalPoint>(pointerX, pointerY);
+    const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
+    const isLine = lines.length > 0;
+    const count = isLine ? lines.length : curves.length;
+
+    let bestDistance = Infinity;
+    let bestSegmentIndex = 0;
+
+    for (let i = 0; i < count; i++) {
+      const distance = isLine
+        ? distanceToLineSegment(pointerGlobalPoint, lines[i])
+        : curvePointDistance(curves[i], pointerGlobalPoint);
+
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestSegmentIndex = i;
+      }
+    }
+
+    // NOTE: parameter's can be calcualated at the same time as distance, separated here for distinction but can create functions that return both
+    const bestLocalParameter = isLine
+      ? lineSegmentClosestParameter(pointerGlobalPoint, lines[bestSegmentIndex])
+      : curveClosestParameter(curves[bestSegmentIndex], pointerGlobalPoint);
+    const pathProps = {
+      segmentIndex: bestSegmentIndex,
+      segmentParameter: bestLocalParameter,
+    };
+
+    const idx = clamp(bestSegmentIndex, 0, count - 1);
+    const t = clamp(bestLocalParameter, 0, 1);
+    const pathPoint = isLine
+      ? pointFrom(
+          lines[idx][0][0] + t * (lines[idx][1][0] - lines[idx][0][0]),
+          lines[idx][0][1] + t * (lines[idx][1][1] - lines[idx][0][1]),
+        )
+      : bezierEquation(curves[idx], t);
+
+    scene.mutateElement(boundTextElement, {
+      pathProps,
+      x: pathPoint[0] - boundTextElement.width / 2,
+      y: pathPoint[1] - boundTextElement.height / 2,
+    });
+
+    return {
+      ...linearElementEditor,
+      isDragging: true,
+      lastBoundTextPathProps: pathProps,
+    };
+  }
+
+  static getPointAtPathProps(
+    container: NonDeleted<ExcalidrawLinearElement>,
+    pathProps: {
+      segmentIndex: number;
+      segmentParameter: number;
+    },
+  ): GlobalPoint {
+    const [lines, curves] = deconstructLinearOrFreeDrawElement(container);
+    const idx = clamp(
+      pathProps.segmentIndex,
+      0,
+      lines.length > 0 ? lines.length - 1 : curves.length - 1,
+    );
+    const t = clamp(pathProps.segmentParameter, 0, 1);
+
+    if (lines.length > 0) {
+      const segment = lines[idx];
+      return pointFrom<GlobalPoint>(
+        segment[0][0] + t * (segment[1][0] - segment[0][0]),
+        segment[0][1] + t * (segment[1][1] - segment[0][1]),
+      );
+    }
+    return bezierEquation<GlobalPoint>(curves[idx], t);
+  }
+
   static getBoundTextElementPosition = (
     element: ExcalidrawLinearElement,
     boundTextElement: ExcalidrawTextElementWithContainer,
@@ -1834,7 +1980,18 @@ export class LinearElementEditor {
     );
     if (points.length < 2) {
       mutateElement(boundTextElement, elementsMap, { isDeleted: true });
+    } else if (isArrowElement(element) && boundTextElement.pathProps) {
+      const pathPoint = LinearElementEditor.getPointAtPathProps(
+        element,
+        boundTextElement.pathProps,
+      );
+
+      return {
+        x: pathPoint[0] - boundTextElement.width / 2,
+        y: pathPoint[1] - boundTextElement.height / 2,
+      };
     }
+
     let x = 0;
     let y = 0;
     if (element.points.length % 2 === 1) {
