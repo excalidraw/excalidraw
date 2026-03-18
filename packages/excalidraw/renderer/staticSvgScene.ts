@@ -731,6 +731,7 @@ export const renderSceneToSvg = (
   const renderFrameBackgroundNode = (frame: ExcalidrawFrameElement) => {
     if (
       !frame ||
+      !frame.backgroundEnabled ||
       !frame.backgroundColor ||
       isTransparent(frame.backgroundColor)
     ) {
@@ -793,6 +794,7 @@ export const renderSceneToSvg = (
       if (
         !isFrameElement(frame) ||
         renderedFrameBackgrounds.has(frame.id) ||
+        !frame.backgroundEnabled ||
         !frame.backgroundColor ||
         isTransparent(frame.backgroundColor)
       ) {

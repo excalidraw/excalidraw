@@ -11,6 +11,7 @@ import type { LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawElement,
+  ExcalidrawFrameElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -79,6 +80,38 @@ describe("restoreElements", () => {
         deleteInvisibleElements: true,
       }),
     ).toEqual([expect.objectContaining({ isDeleted: true })]);
+  });
+
+  it("should disable frame background for legacy frames missing backgroundEnabled", () => {
+    const frame = API.createElement({
+      type: "frame",
+      backgroundColor: "#ffc9c9",
+    });
+    const legacyFrame = { ...frame } as any;
+    delete legacyFrame.backgroundEnabled;
+
+    const restoredFrame = restore.restoreElements(
+      [legacyFrame],
+      null,
+    )[0] as ExcalidrawFrameElement;
+
+    expect(restoredFrame.backgroundColor).toBe("#ffc9c9");
+    expect(restoredFrame.backgroundEnabled).toBe(false);
+  });
+
+  it("should preserve frame backgroundEnabled when present", () => {
+    const frame = API.createElement({
+      type: "frame",
+      backgroundColor: "#ffc9c9",
+    });
+    frame.backgroundEnabled = true;
+
+    const restoredFrame = restore.restoreElements(
+      [frame],
+      null,
+    )[0] as ExcalidrawFrameElement;
+
+    expect(restoredFrame.backgroundEnabled).toBe(true);
   });
 
   it("should restore text element correctly passing value for each attribute", () => {

@@ -505,9 +505,13 @@ export const restoreElement = (
     case "embeddable":
       return restoreElementWithProperties(element, {});
     case "magicframe":
+      return restoreElementWithProperties(element, {
+        name: element.name ?? null,
+      });
     case "frame":
       return restoreElementWithProperties(element, {
         name: element.name ?? null,
+        backgroundEnabled: (element as any).backgroundEnabled ?? false,
       });
 
     // Don't use default case so as to catch a missing an element type case.

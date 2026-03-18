@@ -336,6 +336,9 @@ const _renderStaticScene = ({
       if (!isFrameElement(frame) || renderedFrameBackgrounds.has(frame.id)) {
         return;
       }
+      if (!frame.backgroundEnabled) {
+        return;
+      }
 
       frameBackgroundByElementId.set(element.id, frame);
       renderedFrameBackgrounds.add(frame.id);

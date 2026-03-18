@@ -787,7 +787,7 @@ export const renderFrameBackground = (
     roundCorners?: boolean;
   },
 ) => {
-  if (isTransparent(frame.backgroundColor)) {
+  if (!frame.backgroundEnabled || isTransparent(frame.backgroundColor)) {
     return;
   }
 

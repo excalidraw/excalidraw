@@ -417,7 +417,13 @@ export const actionChangeBackgroundColor = register<
       });
     } else {
       nextElements = changeProperty(elements, appState, (el) => {
-        return hasBackground(el.type) || isFrameElement(el)
+        if (isFrameElement(el)) {
+          return newElementWith(el, {
+            backgroundColor: value.currentItemBackgroundColor,
+            backgroundEnabled: !isTransparent(value.currentItemBackgroundColor),
+          });
+        }
+        return hasBackground(el.type)
           ? newElementWith(el, {
               backgroundColor: value.currentItemBackgroundColor,
             })
