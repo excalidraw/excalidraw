@@ -577,6 +577,43 @@ describe("exporting frames", () => {
       ).toBeTruthy();
     });
 
+    it("should not render magicframe background", async () => {
+      const magicframe = API.createElement({
+        type: "magicframe",
+        width: 100,
+        height: 100,
+        x: 0,
+        y: 0,
+        backgroundColor: "#ffc9c9",
+      });
+      const frameChild = API.createElement({
+        type: "rectangle",
+        width: 50,
+        height: 50,
+        x: 10,
+        y: 10,
+        frameId: magicframe.id,
+      });
+
+      const { exportedElements, exportingFrame } = prepareElementsForExport(
+        [frameChild, magicframe],
+        {
+          selectedElementIds: {},
+        },
+        false,
+      );
+
+      const svg = await exportToSvg({
+        elements: exportedElements,
+        files: null,
+        exportPadding: 0,
+        exportingFrame,
+      });
+
+      expect(svg.querySelector(`[data-id="${magicframe.id}"]`)).not.toBeNull();
+      expect(svg.querySelector('rect[fill="#ffc9c9"]')).toBeNull();
+    });
+
     it("should not export frame-overlapping elements belonging to different frame", async () => {
       const frame1 = API.createElement({
         type: "frame",

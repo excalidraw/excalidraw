@@ -24,6 +24,7 @@ import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
 import {
   isArrowElement,
+  isFrameElement,
   isFrameLikeElement,
   isIframeLikeElement,
   isInitializedImageElement,
@@ -40,6 +41,7 @@ import { getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
+  ExcalidrawFrameElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElementWithContainer,
   NonDeletedExcalidrawElement,
@@ -723,10 +725,10 @@ export const renderSceneToSvg = (
   const nonIframeElements = elements.filter((el) => !isIframeLikeElement(el));
   const frameBackgroundByElementId = new Map<
     ExcalidrawElement["id"],
-    ExcalidrawFrameLikeElement
+    ExcalidrawFrameElement
   >();
 
-  const renderFrameBackgroundNode = (frame: ExcalidrawFrameLikeElement) => {
+  const renderFrameBackgroundNode = (frame: ExcalidrawFrameElement) => {
     if (
       !frame ||
       !frame.backgroundColor ||
@@ -773,7 +775,10 @@ export const renderSceneToSvg = (
     (renderConfig.frameRendering.outline || renderConfig.exportingFrame)
   ) {
     const renderedFrameBackgrounds = new Set<string>();
-    if (renderConfig.exportingFrame) {
+    if (
+      renderConfig.exportingFrame &&
+      isFrameElement(renderConfig.exportingFrame)
+    ) {
       renderFrameBackgroundNode(renderConfig.exportingFrame);
       renderedFrameBackgrounds.add(renderConfig.exportingFrame.id);
     }
@@ -786,7 +791,7 @@ export const renderSceneToSvg = (
         : getContainingFrame(element, elementsMap);
 
       if (
-        !frame ||
+        !isFrameElement(frame) ||
         renderedFrameBackgrounds.has(frame.id) ||
         !frame.backgroundColor ||
         isTransparent(frame.backgroundColor)
