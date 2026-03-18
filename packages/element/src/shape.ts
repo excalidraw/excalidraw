@@ -1300,23 +1300,21 @@ export const getFreedrawOutlinePoints = (
     return [] as [number, number][];
   }
 
-  const size = element.strokeWidth * 4.25;
+  // perfect-freehand used size as diameter; LaserPointer uses it as radius
+  const size = (element.strokeWidth * 4.25) / 2;
 
   const lp = new LaserPointer({
     size,
     streamline: 0.45,
     simplify: 0,
     sizeMapping: (details) => {
-      const { pressure, runningLength } = details;
+      const { pressure } = details;
       // Pressure-based width (same easing as original perfect-freehand config)
       const p = element.simulatePressure ? 0.5 : pressure;
       const eased = Math.sin((p * Math.PI) / 2); // easeOutSine
       // Apply thinning: map pressure to width range [1-thinning, 1]
       const thinning = 0.6;
-      const width = 1 - thinning * (1 - eased);
-      // Start taper
-      const startTaper = Math.min(1, runningLength / (size * 2));
-      return width * startTaper;
+      return 1 - thinning * (1 - eased);
     },
   });
 
