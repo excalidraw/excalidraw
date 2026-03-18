@@ -26,6 +26,7 @@ import { getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
   ElementsMap,
+  ExcalidrawFrameElement,
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -278,39 +279,15 @@ const _renderStaticScene = ({
   }
 
   const groupsToBeAddedToFrame = new Set<string>();
-  const renderedFrameBackgrounds = new Set<string>();
-
-  const maybeRenderFrameBackground = (
-    element: NonDeletedExcalidrawElement | ExcalidrawFrameLikeElement,
-  ) => {
-    if (
-      !appState.frameRendering.enabled ||
-      (!appState.frameRendering.outline && !renderConfig.exportingFrame)
-    ) {
-      return;
-    }
-
-    const frame =
-      renderConfig.exportingFrame ||
-      (isFrameLikeElement(element)
-        ? element
-        : getContainingFrame(element, elementsMap));
-
-    if (!isFrameElement(frame)) {
-      return;
-    }
-
-    if (!frame || renderedFrameBackgrounds.has(frame.id)) {
-      return;
-    }
-
-    renderFrameBackground(frame, context, appState, {
-      roundCorners:
-        !renderConfig.exportingFrame ||
-        frame.id !== renderConfig.exportingFrame.id,
-    });
-    renderedFrameBackgrounds.add(frame.id);
-  };
+  // iframe-like elements are rendered in a separate top-layer pass.
+  const nonIframeVisibleElements = visibleElements.filter(
+    (el) => !isIframeLikeElement(el),
+  );
+  // Frame background to render right before a given element id.
+  const frameBackgroundByElementId = new Map<
+    NonDeletedExcalidrawElement["id"],
+    ExcalidrawFrameElement
+  >();
 
   visibleElements.forEach((element) => {
     if (
@@ -332,100 +309,135 @@ const _renderStaticScene = ({
 
   const inFrameGroupsMap = new Map<string, boolean>();
 
-  if (renderConfig.exportingFrame) {
-    maybeRenderFrameBackground(renderConfig.exportingFrame);
+  if (
+    appState.frameRendering.enabled &&
+    (appState.frameRendering.outline || renderConfig.exportingFrame)
+  ) {
+    // Precompute where each frame background should be emitted to avoid
+    // re-resolving containing frames during the paint loop.
+    const renderedFrameBackgrounds = new Set<string>();
+    if (
+      renderConfig.exportingFrame &&
+      isFrameElement(renderConfig.exportingFrame)
+    ) {
+      renderFrameBackground(renderConfig.exportingFrame, context, appState, {
+        roundCorners: false,
+      });
+      renderedFrameBackgrounds.add(renderConfig.exportingFrame.id);
+    }
+
+    const maybeQueueFrameBackground = (
+      element: NonDeletedExcalidrawElement | ExcalidrawFrameLikeElement,
+    ) => {
+      const frame = isFrameLikeElement(element)
+        ? element
+        : getContainingFrame(element, elementsMap);
+
+      if (!isFrameElement(frame) || renderedFrameBackgrounds.has(frame.id)) {
+        return;
+      }
+
+      frameBackgroundByElementId.set(element.id, frame);
+      renderedFrameBackgrounds.add(frame.id);
+    };
+
+    nonIframeVisibleElements.forEach((element) => {
+      maybeQueueFrameBackground(element);
+    });
   }
 
   // Paint visible elements
-  visibleElements
-    .filter((el) => !isIframeLikeElement(el))
-    .forEach((element) => {
-      try {
-        // TODO: optimize (currently we call this func for each element because
-        // children come before their frames and we neeed to render the frame
-        // background at the bottom)
-        maybeRenderFrameBackground(element);
-        const frameId = element.frameId || appState.frameToHighlight?.id;
+  nonIframeVisibleElements.forEach((element) => {
+    try {
+      const frameBackground = frameBackgroundByElementId.get(element.id);
+      if (frameBackground) {
+        renderFrameBackground(frameBackground, context, appState, {
+          roundCorners:
+            !renderConfig.exportingFrame ||
+            frameBackground.id !== renderConfig.exportingFrame.id,
+        });
+      }
+      const frameId = element.frameId || appState.frameToHighlight?.id;
 
+      if (
+        isTextElement(element) &&
+        element.containerId &&
+        elementsMap.has(element.containerId)
+      ) {
+        // will be rendered with the container
+        return;
+      }
+
+      context.save();
+
+      if (
+        frameId &&
+        appState.frameRendering.enabled &&
+        appState.frameRendering.clip
+      ) {
+        const frame = getTargetFrame(element, elementsMap, appState);
         if (
-          isTextElement(element) &&
-          element.containerId &&
-          elementsMap.has(element.containerId)
-        ) {
-          // will be rendered with the container
-          return;
-        }
-
-        context.save();
-
-        if (
-          frameId &&
-          appState.frameRendering.enabled &&
-          appState.frameRendering.clip
-        ) {
-          const frame = getTargetFrame(element, elementsMap, appState);
-          if (
-            frame &&
-            shouldApplyFrameClip(
-              element,
-              frame,
-              appState,
-              elementsMap,
-              inFrameGroupsMap,
-            )
-          ) {
-            frameClip(frame, context, renderConfig, appState);
-          }
-          renderElement(
+          frame &&
+          shouldApplyFrameClip(
             element,
-            elementsMap,
-            allElementsMap,
-            rc,
-            context,
-            renderConfig,
+            frame,
             appState,
-          );
-        } else {
-          renderElement(
-            element,
             elementsMap,
-            allElementsMap,
-            rc,
-            context,
-            renderConfig,
-            appState,
-          );
+            inFrameGroupsMap,
+          )
+        ) {
+          frameClip(frame, context, renderConfig, appState);
         }
-
-        const boundTextElement = getBoundTextElement(element, elementsMap);
-        if (boundTextElement) {
-          renderElement(
-            boundTextElement,
-            elementsMap,
-            allElementsMap,
-            rc,
-            context,
-            renderConfig,
-            appState,
-          );
-        }
-
-        context.restore();
-
-        if (!isExporting) {
-          renderLinkIcon(element, context, appState, elementsMap);
-        }
-      } catch (error: any) {
-        console.error(
-          error,
-          element.id,
-          element.x,
-          element.y,
-          element.width,
-          element.height,
+        renderElement(
+          element,
+          elementsMap,
+          allElementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
+        );
+      } else {
+        renderElement(
+          element,
+          elementsMap,
+          allElementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
         );
       }
-    });
+
+      const boundTextElement = getBoundTextElement(element, elementsMap);
+      if (boundTextElement) {
+        renderElement(
+          boundTextElement,
+          elementsMap,
+          allElementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
+        );
+      }
+
+      context.restore();
+
+      if (!isExporting) {
+        renderLinkIcon(element, context, appState, elementsMap);
+      }
+    } catch (error: any) {
+      console.error(
+        error,
+        element.id,
+        element.x,
+        element.y,
+        element.width,
+        element.height,
+      );
+    }
+  });
 
   // render embeddables on top
   visibleElements
