@@ -1314,7 +1314,10 @@ export const getFreedrawOutlinePoints = (
       const eased = Math.sin((p * Math.PI) / 2); // easeOutSine
       // Apply thinning: map pressure to width range [1-thinning, 1]
       const thinning = 0.6;
-      return 1 - thinning * (1 - eased);
+      const width = 1 - thinning * (1 - eased);
+      // Ensure minimum size so LaserPointer generates a proper start cap
+      // (LaserPointer uses a single point when size < 1, causing a spike)
+      return Math.max(width, 1.1 / size);
     },
   });
 
