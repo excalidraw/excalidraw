@@ -3,6 +3,7 @@ import clsx from "clsx";
 import "./ToolIcon.scss";
 
 import { laserPointerToolIcon } from "./icons";
+import { Tooltip } from "./Tooltip";
 
 import type { ToolButtonSize } from "./ToolButton";
 
@@ -17,7 +18,7 @@ type LaserPointerIconProps = {
 const DEFAULT_SIZE: ToolButtonSize = "small";
 
 export const LaserPointerButton = (props: LaserPointerIconProps) => {
-  return (
+  const labelElement = (
     <label
       className={clsx(
         "ToolIcon ToolIcon__LaserPointer",
@@ -26,7 +27,6 @@ export const LaserPointerButton = (props: LaserPointerIconProps) => {
           "is-mobile": props.isMobile,
         },
       )}
-      title={`${props.title}`}
     >
       <input
         className="ToolIcon_type_checkbox"
@@ -39,5 +39,11 @@ export const LaserPointerButton = (props: LaserPointerIconProps) => {
       />
       <div className="ToolIcon__icon">{laserPointerToolIcon}</div>
     </label>
+  );
+
+  return props.title ? (
+    <Tooltip label={props.title}>{labelElement}</Tooltip>
+  ) : (
+    labelElement
   );
 };

@@ -5,6 +5,7 @@ import type { ColorPaletteCustom } from "@excalidraw/common";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
+import { Tooltip } from "../Tooltip";
 
 import HotkeyLabel from "./HotkeyLabel";
 import {
@@ -51,32 +52,32 @@ export const ShadeList = ({
       return (
         <div className="color-picker-content--default shades">
           {shades.map((color, i) => (
-            <button
-              ref={
-                i === shade && activeColorPickerSection === "shades"
-                  ? btnRef
-                  : undefined
-              }
-              tabIndex={-1}
-              key={i}
-              type="button"
-              className={clsx(
-                "color-picker__button color-picker__button--large has-outline",
-                { active: i === shade },
-              )}
-              aria-label="Shade"
-              title={`${colorName} - ${i + 1}`}
-              style={color ? { "--swatch-color": color } : undefined}
-              onClick={() => {
-                onChange(color);
-                setActiveColorPickerSection("shades");
-              }}
-            >
-              <div className="color-picker__button-outline" />
-              {showHotKey && (
-                <HotkeyLabel color={color} keyLabel={i + 1} isShade />
-              )}
-            </button>
+            <Tooltip key={i} label={`${colorName} - ${i + 1}`}>
+              <button
+                ref={
+                  i === shade && activeColorPickerSection === "shades"
+                    ? btnRef
+                    : undefined
+                }
+                tabIndex={-1}
+                type="button"
+                className={clsx(
+                  "color-picker__button color-picker__button--large has-outline",
+                  { active: i === shade },
+                )}
+                aria-label="Shade"
+                style={color ? { "--swatch-color": color } : undefined}
+                onClick={() => {
+                  onChange(color);
+                  setActiveColorPickerSection("shades");
+                }}
+              >
+                <div className="color-picker__button-outline" />
+                {showHotKey && (
+                  <HotkeyLabel color={color} keyLabel={i + 1} isShade />
+                )}
+              </button>
+            </Tooltip>
           ))}
         </div>
       );

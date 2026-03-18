@@ -3,6 +3,7 @@ import clsx from "clsx";
 import "./ToolIcon.scss";
 
 import { PenModeIcon } from "./icons";
+import { Tooltip } from "./Tooltip";
 
 import type { ToolButtonSize } from "./ToolButton";
 
@@ -23,7 +24,7 @@ export const PenModeButton = (props: PenModeIconProps) => {
     return null;
   }
 
-  return (
+  const labelElement = (
     <label
       className={clsx(
         "ToolIcon ToolIcon__penMode",
@@ -32,7 +33,6 @@ export const PenModeButton = (props: PenModeIconProps) => {
           "is-mobile": props.isMobile,
         },
       )}
-      title={`${props.title}`}
     >
       <input
         className="ToolIcon_type_checkbox"
@@ -44,5 +44,11 @@ export const PenModeButton = (props: PenModeIconProps) => {
       />
       <div className="ToolIcon__icon">{PenModeIcon}</div>
     </label>
+  );
+
+  return props.title ? (
+    <Tooltip label={props.title}>{labelElement}</Tooltip>
+  ) : (
+    labelElement
   );
 };

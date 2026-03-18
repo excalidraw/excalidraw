@@ -3,6 +3,7 @@ import clsx from "clsx";
 import "./ToolIcon.scss";
 
 import { LockedIcon, UnlockedIcon } from "./icons";
+import { Tooltip } from "./Tooltip";
 
 import type { ToolButtonSize } from "./ToolButton";
 
@@ -22,7 +23,8 @@ const ICONS = {
 };
 
 export const LockButton = (props: LockIconProps) => {
-  return (
+  const tooltipLabel = `${props.title} — Q`;
+  const labelElement = (
     <label
       className={clsx(
         "ToolIcon ToolIcon__lock",
@@ -31,7 +33,6 @@ export const LockButton = (props: LockIconProps) => {
           "is-mobile": props.isMobile,
         },
       )}
-      title={`${props.title} — Q`}
     >
       <input
         className="ToolIcon_type_checkbox"
@@ -46,5 +47,11 @@ export const LockButton = (props: LockIconProps) => {
         {props.checked ? ICONS.CHECKED : ICONS.UNCHECKED}
       </div>
     </label>
+  );
+
+  return props.title ? (
+    <Tooltip label={tooltipLabel}>{labelElement}</Tooltip>
+  ) : (
+    labelElement
   );
 };

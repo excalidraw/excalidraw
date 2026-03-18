@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { useEffect, useRef } from "react";
 
 import { useAtom } from "../../editor-jotai";
+import { Tooltip } from "../Tooltip";
 
 import HotkeyLabel from "./HotkeyLabel";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
@@ -35,29 +36,29 @@ export const CustomColorList = ({
     <div className="color-picker-content--default">
       {colors.map((c, i) => {
         return (
-          <button
-            ref={color === c ? btnRef : undefined}
-            tabIndex={-1}
-            type="button"
-            className={clsx(
-              "color-picker__button color-picker__button--large has-outline",
-              {
-                active: color === c,
-                "is-transparent": c === "transparent" || !c,
-              },
-            )}
-            onClick={() => {
-              onChange(c);
-              setActiveColorPickerSection("custom");
-            }}
-            title={c}
-            aria-label={label}
-            style={{ "--swatch-color": c }}
-            key={i}
-          >
-            <div className="color-picker__button-outline" />
-            <HotkeyLabel color={c} keyLabel={i + 1} />
-          </button>
+          <Tooltip key={i} label={c || "transparent"}>
+            <button
+              ref={color === c ? btnRef : undefined}
+              tabIndex={-1}
+              type="button"
+              className={clsx(
+                "color-picker__button color-picker__button--large has-outline",
+                {
+                  active: color === c,
+                  "is-transparent": c === "transparent" || !c,
+                },
+              )}
+              onClick={() => {
+                onChange(c);
+                setActiveColorPickerSection("custom");
+              }}
+              aria-label={label}
+              style={{ "--swatch-color": c }}
+            >
+              <div className="color-picker__button-outline" />
+              <HotkeyLabel color={c} keyLabel={i + 1} />
+            </button>
+          </Tooltip>
         );
       })}
     </div>

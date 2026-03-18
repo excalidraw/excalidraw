@@ -10,6 +10,7 @@ import { AbortError } from "../errors";
 import "./ToolIcon.scss";
 
 import Spinner from "./Spinner";
+import { Tooltip } from "./Tooltip";
 import { useExcalidrawContainer } from "./App";
 
 import type { CSSProperties } from "react";
@@ -117,7 +118,7 @@ export const ToolButton = React.forwardRef(
       const type = (props.type === "icon" ? "button" : props.type) as
         | "button"
         | "submit";
-      return (
+      const buttonElement = (
         <button
           className={clsx(
             "ToolIcon_type_button",
@@ -135,7 +136,6 @@ export const ToolButton = React.forwardRef(
           style={props.style}
           data-testid={props["data-testid"]}
           hidden={props.hidden}
-          title={props.title}
           aria-label={props["aria-label"]}
           type={type}
           onClick={onClick}
@@ -165,12 +165,17 @@ export const ToolButton = React.forwardRef(
           {props.children}
         </button>
       );
+
+      return props.title ? (
+        <Tooltip label={props.title}>{buttonElement}</Tooltip>
+      ) : (
+        buttonElement
+      );
     }
 
-    return (
+    const labelElement = (
       <label
         className={clsx("ToolIcon", className)}
-        title={props.title}
         onPointerDown={(event) => {
           lastPointerTypeRef.current = event.pointerType || null;
           props.onPointerDown?.({ pointerType: event.pointerType || null });
@@ -204,6 +209,12 @@ export const ToolButton = React.forwardRef(
           )}
         </div>
       </label>
+    );
+
+    return props.title ? (
+      <Tooltip label={props.title}>{labelElement}</Tooltip>
+    ) : (
+      labelElement
     );
   },
 );

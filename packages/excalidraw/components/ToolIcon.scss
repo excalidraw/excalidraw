@@ -43,6 +43,7 @@
     align-items: center;
 
     border-radius: var(--border-radius-lg);
+    transition: background-color 0.15s ease;
 
     & + .ToolIcon__label {
       margin-inline-start: 0;
@@ -82,9 +83,14 @@
     margin: 0;
     font-size: inherit;
     background-color: initial;
+    transition: background-color 0.15s ease;
 
     &:focus-visible {
       box-shadow: 0 0 0 2px var(--focus-highlight-color);
+    }
+
+    &:hover:not(:disabled) {
+      background-color: var(--button-hover-bg);
     }
 
     &.ToolIcon--selected {

@@ -8,6 +8,8 @@ import {
   isColorDark,
 } from "@excalidraw/common";
 
+import { Tooltip } from "../Tooltip";
+
 import type { ColorPickerType } from "./colorPickerUtils";
 
 interface TopPicksProps {
@@ -49,24 +51,24 @@ export const TopPicks = ({
   return (
     <div className="color-picker__top-picks">
       {colors.map((color: string) => (
-        <button
-          className={clsx("color-picker__button", {
-            active: color === activeColor,
-            "is-transparent": color === "transparent" || !color,
-            "has-outline": !isColorDark(
-              color,
-              COLOR_OUTLINE_CONTRAST_THRESHOLD,
-            ),
-          })}
-          style={{ "--swatch-color": color }}
-          key={color}
-          type="button"
-          title={color}
-          onClick={() => onChange(color)}
-          data-testid={`color-top-pick-${color}`}
-        >
-          <div className="color-picker__button-outline" />
-        </button>
+        <Tooltip key={color} label={color || "transparent"}>
+          <button
+            className={clsx("color-picker__button", {
+              active: color === activeColor,
+              "is-transparent": color === "transparent" || !color,
+              "has-outline": !isColorDark(
+                color,
+                COLOR_OUTLINE_CONTRAST_THRESHOLD,
+              ),
+            })}
+            style={{ "--swatch-color": color }}
+            type="button"
+            onClick={() => onChange(color)}
+            data-testid={`color-top-pick-${color}`}
+          >
+            <div className="color-picker__button-outline" />
+          </button>
+        </Tooltip>
       ))}
     </div>
   );

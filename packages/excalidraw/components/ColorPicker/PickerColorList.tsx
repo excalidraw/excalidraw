@@ -5,6 +5,7 @@ import type { ColorPaletteCustom } from "@excalidraw/common";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
+import { Tooltip } from "../Tooltip";
 
 import HotkeyLabel from "./HotkeyLabel";
 import {
@@ -59,33 +60,37 @@ const PickerColorList = ({
           "",
         );
 
+        const tooltipLabel = `${label}${
+          color.startsWith("#") ? ` ${color}` : ""
+        } — ${keybinding}`;
+
         return (
-          <button
-            ref={colorObj?.colorName === key ? btnRef : undefined}
-            tabIndex={-1}
-            type="button"
-            className={clsx(
-              "color-picker__button color-picker__button--large has-outline",
-              {
-                active: colorObj?.colorName === key,
-                "is-transparent": color === "transparent" || !color,
-              },
-            )}
-            onClick={() => {
-              onChange(color);
-              setActiveColorPickerSection("baseColors");
-            }}
-            title={`${label}${
-              color.startsWith("#") ? ` ${color}` : ""
-            } — ${keybinding}`}
-            aria-label={`${label} — ${keybinding}`}
-            style={color ? { "--swatch-color": color } : undefined}
-            data-testid={`color-${key}`}
-            key={key}
-          >
-            <div className="color-picker__button-outline" />
-            {showHotKey && <HotkeyLabel color={color} keyLabel={keybinding} />}
-          </button>
+          <Tooltip key={key} label={tooltipLabel}>
+            <button
+              ref={colorObj?.colorName === key ? btnRef : undefined}
+              tabIndex={-1}
+              type="button"
+              className={clsx(
+                "color-picker__button color-picker__button--large has-outline",
+                {
+                  active: colorObj?.colorName === key,
+                  "is-transparent": color === "transparent" || !color,
+                },
+              )}
+              onClick={() => {
+                onChange(color);
+                setActiveColorPickerSection("baseColors");
+              }}
+              aria-label={`${label} — ${keybinding}`}
+              style={color ? { "--swatch-color": color } : undefined}
+              data-testid={`color-${key}`}
+            >
+              <div className="color-picker__button-outline" />
+              {showHotKey && (
+                <HotkeyLabel color={color} keyLabel={keybinding} />
+              )}
+            </button>
+          </Tooltip>
         );
       })}
     </div>

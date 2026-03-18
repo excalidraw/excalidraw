@@ -26,6 +26,8 @@ import {
   temporarilyDisableTextEditorBlur,
 } from "../../hooks/useTextEditorFocus";
 
+import { Tooltip } from "../Tooltip";
+
 import { ColorInput } from "./ColorInput";
 import { Picker } from "./Picker";
 import PickerHeading from "./PickerHeading";
@@ -240,42 +242,49 @@ const ColorPickerTrigger = ({
     onToggle();
   };
 
+  const tooltipLabel =
+    type === "elementStroke"
+      ? t("labels.showStroke")
+      : t("labels.showBackground");
+
   return (
-    <Popover.Trigger
-      type="button"
-      className={clsx("color-picker__button active-color properties-trigger", {
-        "is-transparent": !color || color === "transparent",
-        "has-outline":
-          !color || !isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD),
-        "compact-sizing": isCompactMode,
-        "mobile-border": isMobileMode,
-      })}
-      aria-label={label}
-      style={color ? { "--swatch-color": color } : undefined}
-      title={
-        type === "elementStroke"
-          ? t("labels.showStroke")
-          : t("labels.showBackground")
-      }
-      data-openpopup={type}
-      onClick={handleClick}
-    >
-      <div className="color-picker__button-outline">{!color && slashIcon}</div>
-      {isCompactMode && color && mode === "stroke" && (
-        <div className="color-picker__button-background">
-          <span
-            style={{
-              color:
-                color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
-                  ? "#fff"
-                  : "#111",
-            }}
-          >
-            {strokeIcon}
-          </span>
+    <Tooltip label={tooltipLabel}>
+      <Popover.Trigger
+        type="button"
+        className={clsx(
+          "color-picker__button active-color properties-trigger",
+          {
+            "is-transparent": !color || color === "transparent",
+            "has-outline":
+              !color || !isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD),
+            "compact-sizing": isCompactMode,
+            "mobile-border": isMobileMode,
+          },
+        )}
+        aria-label={label}
+        style={color ? { "--swatch-color": color } : undefined}
+        data-openpopup={type}
+        onClick={handleClick}
+      >
+        <div className="color-picker__button-outline">
+          {!color && slashIcon}
         </div>
-      )}
-    </Popover.Trigger>
+        {isCompactMode && color && mode === "stroke" && (
+          <div className="color-picker__button-background">
+            <span
+              style={{
+                color:
+                  color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
+                    ? "#fff"
+                    : "#111",
+              }}
+            >
+              {strokeIcon}
+            </span>
+          </div>
+        )}
+      </Popover.Trigger>
+    </Tooltip>
   );
 };
 

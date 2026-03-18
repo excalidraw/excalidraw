@@ -130,6 +130,10 @@
         flex: 0 0 auto;
       }
 
+      &:hover {
+        background: var(--button-hover-bg, rgba(0, 0, 0, 0.06));
+      }
+
       &.active {
         background: var(
           --color-surface-primary-container,

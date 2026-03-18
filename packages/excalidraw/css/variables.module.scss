@@ -101,6 +101,7 @@ $color-blue-8: #1971c2;
   background-color: var(--button-bg, var(--island-bg-color));
   color: var(--button-color, var(--color-on-surface));
   font-family: var(--ui-font);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 
   svg {
     width: var(--button-width, var(--lg-icon-size));
