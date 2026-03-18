@@ -720,26 +720,15 @@ export const renderSceneToSvg = (
     return;
   }
 
-  const renderedFrameBackgrounds = new Set<string>();
-  const maybeRenderFrameBackground = (
-    element: NonDeletedExcalidrawElement | ExcalidrawFrameLikeElement,
-  ) => {
-    if (
-      !renderConfig.frameRendering.enabled ||
-      (!renderConfig.frameRendering.outline && !renderConfig.exportingFrame)
-    ) {
-      return;
-    }
+  const nonIframeElements = elements.filter((el) => !isIframeLikeElement(el));
+  const frameBackgroundByElementId = new Map<
+    ExcalidrawElement["id"],
+    ExcalidrawFrameLikeElement
+  >();
 
-    const frame =
-      renderConfig.exportingFrame ||
-      (isFrameLikeElement(element)
-        ? element
-        : getContainingFrame(element, elementsMap));
-
+  const renderFrameBackgroundNode = (frame: ExcalidrawFrameLikeElement) => {
     if (
       !frame ||
-      renderedFrameBackgrounds.has(frame.id) ||
       !frame.backgroundColor ||
       isTransparent(frame.backgroundColor)
     ) {
@@ -777,58 +766,91 @@ export const renderSceneToSvg = (
     rect.setAttribute("stroke", "none");
 
     svgRoot.appendChild(rect);
-    renderedFrameBackgrounds.add(frame.id);
   };
 
-  if (renderConfig.exportingFrame) {
-    maybeRenderFrameBackground(renderConfig.exportingFrame);
+  if (
+    renderConfig.frameRendering.enabled &&
+    (renderConfig.frameRendering.outline || renderConfig.exportingFrame)
+  ) {
+    const renderedFrameBackgrounds = new Set<string>();
+    if (renderConfig.exportingFrame) {
+      renderFrameBackgroundNode(renderConfig.exportingFrame);
+      renderedFrameBackgrounds.add(renderConfig.exportingFrame.id);
+    }
+
+    const maybeQueueFrameBackground = (
+      element: NonDeletedExcalidrawElement | ExcalidrawFrameLikeElement,
+    ) => {
+      const frame = isFrameLikeElement(element)
+        ? element
+        : getContainingFrame(element, elementsMap);
+
+      if (
+        !frame ||
+        renderedFrameBackgrounds.has(frame.id) ||
+        !frame.backgroundColor ||
+        isTransparent(frame.backgroundColor)
+      ) {
+        return;
+      }
+
+      frameBackgroundByElementId.set(element.id, frame);
+      renderedFrameBackgrounds.add(frame.id);
+    };
+
+    nonIframeElements.forEach((element) => {
+      if (!element.isDeleted) {
+        maybeQueueFrameBackground(element);
+      }
+    });
   }
 
   // render elements
-  elements
-    .filter((el) => !isIframeLikeElement(el))
-    .forEach((element) => {
-      if (!element.isDeleted) {
-        maybeRenderFrameBackground(element);
-        if (
-          isTextElement(element) &&
-          element.containerId &&
-          elementsMap.has(element.containerId)
-        ) {
-          // will be rendered with the container
-          return;
-        }
+  nonIframeElements.forEach((element) => {
+    if (!element.isDeleted) {
+      const frameBackground = frameBackgroundByElementId.get(element.id);
+      if (frameBackground) {
+        renderFrameBackgroundNode(frameBackground);
+      }
+      if (
+        isTextElement(element) &&
+        element.containerId &&
+        elementsMap.has(element.containerId)
+      ) {
+        // will be rendered with the container
+        return;
+      }
 
-        try {
+      try {
+        renderElementToSvg(
+          element,
+          elementsMap,
+          rsvg,
+          svgRoot,
+          files,
+          element.x + renderConfig.offsetX,
+          element.y + renderConfig.offsetY,
+          renderConfig,
+        );
+
+        const boundTextElement = getBoundTextElement(element, elementsMap);
+        if (boundTextElement) {
           renderElementToSvg(
-            element,
+            boundTextElement,
             elementsMap,
             rsvg,
             svgRoot,
             files,
-            element.x + renderConfig.offsetX,
-            element.y + renderConfig.offsetY,
+            boundTextElement.x + renderConfig.offsetX,
+            boundTextElement.y + renderConfig.offsetY,
             renderConfig,
           );
-
-          const boundTextElement = getBoundTextElement(element, elementsMap);
-          if (boundTextElement) {
-            renderElementToSvg(
-              boundTextElement,
-              elementsMap,
-              rsvg,
-              svgRoot,
-              files,
-              boundTextElement.x + renderConfig.offsetX,
-              boundTextElement.y + renderConfig.offsetY,
-              renderConfig,
-            );
-          }
-        } catch (error: any) {
-          console.error(error);
         }
+      } catch (error: any) {
+        console.error(error);
       }
-    });
+    }
+  });
 
   // render embeddables on top
   elements
