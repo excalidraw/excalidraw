@@ -62,17 +62,23 @@ export const actionStackToScale = register({
   trackEvent: { category: "element" },
 
   perform: (elements, appState, _, app) => {
+    /*
+    high level steps
+    1. get the selected element, and make copies
+    2. reorder the elements so the copies are behind the original
+    3. add the new group id to the elements that need it
+    4. recalculate fractional indices for everything we inserted or moved
+    */
+   
     const el = getStackableElement(appState, app);
     if (!el) {
       return false;
     }
 
-    const elementsMap = arrayToMap(elements);
-    const boundText = getBoundTextElement(el, elementsMap);
+    // create 2 copies of the element with offsets
+    // they should have the same group id
     const groupId = randomId();
-    let nextElements = [...elements];
     const copies: ExcalidrawElement[] = [];
-
     for (const { dx, dy } of STACK_OFFSETS) {
       const copy = deepCopyElement(el);
       copy.id = randomId();
@@ -87,7 +93,9 @@ export const actionStackToScale = register({
 
     // splice copies before the original so they sit behind it in z-order
     // (later index = rendered on top)
-    const idx = nextElements.findIndex((e) => e.id === el.id);
+    let nextElements = [...elements]; // this is the existing elements which we will modify their ordering
+    const idx = nextElements.findIndex((e) => e.id === el.id); // find the index of the original element
+    // reorder
     nextElements.splice(
       idx,
       0,
@@ -96,28 +104,38 @@ export const actionStackToScale = register({
 
     // tag the original (+ its bound text if any) with the new group id;
     // the copies already got it during creation
-    const needsGroup = new Set([el.id, ...(boundText ? [boundText.id] : [])]);
+    const elementsMap = arrayToMap(elements);
+    const boundText = getBoundTextElement(el, elementsMap);
+    // figure out which existing elements need the new group id, it will be the shape and optionally the text if exists
+    const idsToGroup = [el.id];
+    if (boundText) {
+      idsToGroup.push(boundText.id);
+    }
+    const needsGroup = new Set(idsToGroup);
+    // map over the elements and add the new group id to the elements that need it
     nextElements = nextElements.map((e) =>
       needsGroup.has(e.id)
         ? newElementWith(e, {
-            groupIds: addToGroup(
-              e.groupIds,
-              groupId,
-              appState.editingGroupId,
-            ),
-          })
+          groupIds: addToGroup( // group id is immutable for existing elements so use this function
+            e.groupIds,
+            groupId,
+            appState.editingGroupId,
+          ),
+        })
         : e,
     );
 
-    // keep fractional indices in sync after the splice
-    const touched = new Set([
-      ...copies.map((c) => c.id),
-      el.id,
-      ...(boundText ? [boundText.id] : []),
-    ]);
+    // recalculate fractional indices for everything we inserted or moved
+    const movedIds = new Set(copies.map((c) => c.id));
+    movedIds.add(el.id);
+    if (boundText) {
+      movedIds.add(boundText.id);
+    }
+    // get the elements that were moved from the list of all elements, then reorder them
+    const movedElements = nextElements.filter((e) => movedIds.has(e.id));
     const reorderedElements = syncMovedIndices(
       nextElements,
-      arrayToMap(nextElements.filter((e) => touched.has(e.id))),
+      arrayToMap(movedElements),
     );
 
     return {
