@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 import "./Tooltip.scss";
 
@@ -83,6 +83,8 @@ type TooltipProps = {
   disabled?: boolean;
 };
 
+const TOOLTIP_DELAY = 400;
+
 export const Tooltip = ({
   children,
   label,
@@ -90,27 +92,32 @@ export const Tooltip = ({
   style,
   disabled,
 }: TooltipProps) => {
+  const timerRef = useRef<number>(0);
+
   useEffect(() => {
-    return () =>
+    return () => {
+      clearTimeout(timerRef.current);
       getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+    };
   }, []);
+
   if (disabled) {
     return null;
   }
   return (
     <div
       className="excalidraw-tooltip-wrapper"
-      onPointerEnter={(event) =>
-        updateTooltip(
-          event.currentTarget as HTMLDivElement,
-          getTooltipDiv(),
-          label,
-          long,
-        )
-      }
-      onPointerLeave={() =>
-        getTooltipDiv().classList.remove("excalidraw-tooltip--visible")
-      }
+      onPointerEnter={(event) => {
+        const target = event.currentTarget as HTMLDivElement;
+        clearTimeout(timerRef.current);
+        timerRef.current = window.setTimeout(() => {
+          updateTooltip(target, getTooltipDiv(), label, long);
+        }, TOOLTIP_DELAY);
+      }}
+      onPointerLeave={() => {
+        clearTimeout(timerRef.current);
+        getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+      }}
       style={style}
     >
       {children}
