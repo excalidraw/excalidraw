@@ -27,7 +27,6 @@ import {
   KEYS,
   APP_NAME,
   CURSOR_TYPE,
-  DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
   ELEMENT_TRANSLATE_AMOUNT,
@@ -384,7 +383,6 @@ import {
   loadSceneOrLibraryFromBlob,
   normalizeFile,
   parseLibraryJSON,
-  resizeImageFile,
   SVGStringToFile,
 } from "../data/blob";
 
@@ -450,6 +448,7 @@ import { SVGLayer } from "./SVGLayer";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
+import CanvasTextOverlay from "./canvases/CanvasTextOverlay";
 import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
@@ -2094,6 +2093,9 @@ class App extends React.Component<AppProps, AppState> {
             ? POINTER_EVENTS.disabled
             : POINTER_EVENTS.enabled,
           ["--right-sidebar-width" as any]: "302px",
+          ["--text-box-decorations-color" as any]:
+            this.state.textBoxDecorationsColor,
+          ["--text-editor-caret-color" as any]: this.state.textEditorCaretColor,
         }}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -2286,6 +2288,7 @@ class App extends React.Component<AppProps, AppState> {
                               imageCache: this.imageCache,
                               isExporting: false,
                               renderGrid: isGridModeEnabled(this),
+                              renderTextViaDOM: false,
                               canvasBackgroundColor:
                                 this.state.viewBackgroundColor,
                               embedsValidationStatus:
@@ -2308,6 +2311,7 @@ class App extends React.Component<AppProps, AppState> {
                                 imageCache: this.imageCache,
                                 isExporting: false,
                                 renderGrid: false,
+                                renderTextViaDOM: false,
                                 canvasBackgroundColor:
                                   this.state.viewBackgroundColor,
                                 embedsValidationStatus:
@@ -2319,6 +2323,11 @@ class App extends React.Component<AppProps, AppState> {
                               }}
                             />
                           )}
+                          <CanvasTextOverlay
+                            enabled={false}
+                            visibleElements={visibleElements}
+                            appState={this.state}
+                          />
                           <InteractiveCanvas
                             app={this}
                             containerRef={this.excalidrawContainerRef}
@@ -3510,6 +3519,40 @@ class App extends React.Component<AppProps, AppState> {
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
+    const selectedIds = Object.keys(this.state.selectedElementIds).filter(
+      (id) => this.state.selectedElementIds[id as ExcalidrawElement["id"]],
+    ) as ExcalidrawElement["id"][];
+
+    if (selectedIds.length === 1) {
+      const elementsMap = this.scene.getNonDeletedElementsMap();
+      const selectedElement = elementsMap.get(selectedIds[0]);
+      const boundTextElement =
+        selectedElement && getBoundTextElement(selectedElement, elementsMap);
+
+      if (
+        selectedElement &&
+        (isTextElement(selectedElement) || boundTextElement)
+      ) {
+        const elementsToCopy = this.scene.getSelectedElements({
+          selectedElementIds: this.state.selectedElementIds,
+          includeBoundTextElement: true,
+          includeElementsInFrames: true,
+        });
+        const text = getTextFromElements(elementsToCopy);
+        this.plainTextCopy = {
+          text,
+          elements: elementsToCopy.map((element) => deepCopyElement(element)),
+          files: null,
+        };
+        copyTextToSystemClipboard(text, event);
+        this.actionManager.executeAction(actionDeleteSelected, "keyboard");
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+    }
+
+    this.plainTextCopy = null;
     this.actionManager.executeAction(actionCut, "keyboard", event);
     event.preventDefault();
     event.stopPropagation();
@@ -11857,17 +11900,6 @@ class App extends React.Component<AppProps, AppState> {
 
     const existingFileData = this.files[fileId];
     if (!existingFileData?.dataURL) {
-      try {
-        imageFile = await resizeImageFile(imageFile, {
-          maxWidthOrHeight: DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
-        });
-      } catch (error: any) {
-        console.error(
-          "Error trying to resizing image file on insertion",
-          error,
-        );
-      }
-
       if (imageFile.size > MAX_ALLOWED_FILE_BYTES) {
         throw new Error(
           t("errors.fileTooBig", {
@@ -12002,15 +12034,8 @@ class App extends React.Component<AppProps, AppState> {
     imageElement: ExcalidrawImageElement,
     imageHTML: HTMLImageElement,
   ) => {
-    const minHeight = Math.max(this.state.height - 120, 160);
-    // max 65% of canvas height, clamped to <300px, vh - 120px>
-    const maxHeight = Math.min(
-      minHeight,
-      Math.floor(this.state.height * 0.5) / this.state.zoom.value,
-    );
-
-    const height = Math.min(imageHTML.naturalHeight, maxHeight);
-    const width = height * (imageHTML.naturalWidth / imageHTML.naturalHeight);
+    const width = imageHTML.naturalWidth;
+    const height = imageHTML.naturalHeight;
 
     // add current imageElement width/height to account for previous centering
     // of the placeholder image
@@ -12447,10 +12472,19 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements: true,
     });
 
-    const isElementSelected = Boolean(
+    let isElementSelected = Boolean(
       element && this.state.selectedElementIds[element.id],
     );
-    const type = isElementSelected ? "element" : "canvas";
+    let type: "element" | "canvas" = isElementSelected ? "element" : "canvas";
+
+    if (type === "canvas" && element) {
+      this.setState({
+        selectedElementIds: { [element.id]: true },
+        selectedGroupIds: {},
+      });
+      isElementSelected = true;
+      type = "element";
+    }
 
     if (type === "canvas" && event.button === POINTER_BUTTON.SECONDARY) {
       return;

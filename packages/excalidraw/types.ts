@@ -195,6 +195,7 @@ type _CommonCanvasAppState = {
 
 export type StaticCanvasAppState = Readonly<
   _CommonCanvasAppState & {
+    textBoxDecorationsColor: AppState["textBoxDecorationsColor"];
     shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
     /** null indicates transparent bg */
     viewBackgroundColor: AppState["viewBackgroundColor"] | null;
@@ -213,6 +214,7 @@ export type StaticCanvasAppState = Readonly<
 
 export type InteractiveCanvasAppState = Readonly<
   _CommonCanvasAppState & {
+    textBoxDecorationsColor: AppState["textBoxDecorationsColor"];
     activeTool: AppState["activeTool"];
     // renderInteractiveScene
     activeEmbeddable: AppState["activeEmbeddable"];
@@ -366,6 +368,8 @@ export interface AppState {
   currentItemRoundness: StrokeRoundness;
   currentItemArrowType: "sharp" | "round" | "elbow";
   viewBackgroundColor: string;
+  textBoxDecorationsColor: string;
+  textEditorCaretColor: string;
   scrollX: number;
   scrollY: number;
   cursorButton: "up" | "down";
@@ -377,6 +381,8 @@ export interface AppState {
   openMenu: "canvas" | null;
   openPopup:
     | "canvasBackground"
+    | "textBoxDecorations"
+    | "textEditorCaret"
     | "elementBackground"
     | "elementStroke"
     | "fontFamily"

@@ -3,14 +3,12 @@ import {
   KEYS,
   CLASSES,
   POINTER_BUTTON,
-  THEME,
   isWritableElement,
   getFontString,
   getFontFamilyString,
   isTestEnv,
   isSafari,
   MIME_TYPES,
-  applyDarkModeFilter,
 } from "@excalidraw/common";
 
 import {
@@ -619,10 +617,6 @@ export const textWysiwyg = ({
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
-      const caretColor =
-        appState.theme === THEME.DARK
-          ? applyDarkModeFilter(updatedTextElement.strokeColor)
-          : updatedTextElement.strokeColor;
       Object.assign(editable.style, {
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -646,7 +640,7 @@ export const textWysiwyg = ({
         opacity: updatedTextElement.opacity / 100,
         maxHeight: `${editorMaxHeight}px`,
       });
-      caret.style.background = caretColor;
+      caret.style.background = appState.textEditorCaretColor;
 
       // overlay 必须与 textarea 完全同样的几何与排版参数，否则点会错位
       Object.assign(whitespaceOverlay.style, {
@@ -1677,7 +1671,7 @@ export const textWysiwyg = ({
     window.removeEventListener("wheel", stopEvent, true);
     window.removeEventListener("pointerdown", onPointerDown);
     window.removeEventListener("pointerup", onPointerUp);
-    window.removeEventListener("contextmenu", onContextMenu);
+    window.removeEventListener("contextmenu", onContextMenu, true);
     window.removeEventListener("pointerup", bindBlurEvent);
     window.removeEventListener("blur", handleSubmit);
     window.removeEventListener("beforeunload", handleSubmit);

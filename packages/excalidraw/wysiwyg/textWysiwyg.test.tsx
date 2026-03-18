@@ -17,7 +17,6 @@ import {
   TEXT_ALIGN,
   THEME,
   VERTICAL_ALIGN,
-  applyDarkModeFilter,
 } from "@excalidraw/common";
 
 import type {
@@ -2161,7 +2160,7 @@ describe("textWysiwyg", () => {
     });
   });
 
-  describe("Test theme change", () => {
+  describe("Test editor caret color", () => {
     const { h } = window;
 
     // Helper to compare colors (browser may return rgb format)
@@ -2176,6 +2175,7 @@ describe("textWysiwyg", () => {
           initialData={{
             appState: {
               theme: THEME.LIGHT,
+              textEditorCaretColor: "#ff0000",
             },
           }}
         />,
@@ -2183,13 +2183,15 @@ describe("textWysiwyg", () => {
       API.setElements([]);
     });
 
-    it("should update editor caret color when theme changes to dark mode and back", async () => {
-      const originalColor = "#ff0000";
+    it("should keep caret color independent from text stroke color and theme", async () => {
+      const caretColor = "#ff0000";
+      const originalStrokeColor = "#00ff00";
+      const nextStrokeColor = "#0000ff";
 
       const textElement = API.createElement({
         type: "text",
         text: "test",
-        strokeColor: originalColor,
+        strokeColor: originalStrokeColor,
       });
 
       API.setElements([textElement]);
@@ -2204,25 +2206,20 @@ describe("textWysiwyg", () => {
       expect(caret).not.toBe(null);
 
       expect(editor.style.caretColor).toBe("transparent");
-      expect(colorsAreEqual(caret!.style.background, originalColor)).toBe(true);
+      expect(colorsAreEqual(caret!.style.background, caretColor)).toBe(true);
+
+      act(() => {
+        h.app.scene.mutateElement(textElement, {
+          strokeColor: nextStrokeColor,
+        });
+      });
+      expect(colorsAreEqual(caret!.style.background, caretColor)).toBe(true);
 
       act(() => {
         h.setState({ theme: THEME.DARK });
-        // Trigger element mutation to fire onChange callback
         h.app.scene.mutateElement(textElement, {});
       });
-      expect(
-        colorsAreEqual(
-          caret!.style.background,
-          applyDarkModeFilter(originalColor),
-        ),
-      ).toBe(true);
-
-      act(() => {
-        h.setState({ theme: THEME.LIGHT });
-        h.app.scene.mutateElement(textElement, {});
-      });
-      expect(colorsAreEqual(caret!.style.background, originalColor)).toBe(true);
+      expect(colorsAreEqual(caret!.style.background, caretColor)).toBe(true);
     });
   });
 });

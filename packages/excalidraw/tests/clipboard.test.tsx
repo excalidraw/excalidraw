@@ -653,3 +653,104 @@ describe("clipboard - copy plain text, paste original elements internally", () =
     expect(pastedLabel.containerId).toBe(pastedContainer.id);
   });
 });
+
+describe("clipboard - cut plain text, paste original elements internally", () => {
+  it("should cut single text element as plain text and paste as element", async () => {
+    const textElement = API.createElement({
+      type: "text",
+      text: "hello",
+      width: 50,
+      height: 20,
+      fontSize: 48,
+    });
+
+    API.setElements([textElement]);
+    API.setSelectedElements([textElement]);
+
+    (h.app as any).excalidrawContainerRef.current.contains = () => true;
+    const cutEvent = {
+      clipboardData: new DataTransfer(),
+      target: document.body,
+      preventDefault: () => {},
+      stopPropagation: () => {},
+    } as any as ClipboardEvent;
+    act(() => {
+      (h.app as any).onCut(cutEvent);
+    });
+    expect(cutEvent.clipboardData?.getData("text/plain")).toBe("hello");
+    expect(h.elements).toHaveLength(1);
+    expect(h.elements[0].isDeleted).toBe(true);
+
+    mouse.moveTo(100, 100);
+    const pasteEvent = createPasteEvent({
+      types: {
+        "text/plain": "hello",
+      },
+    });
+    act(() => {
+      document.dispatchEvent(pasteEvent);
+    });
+
+    await waitFor(() => {
+      expect(h.elements).toHaveLength(2);
+    });
+
+    const pasted = h.elements.find(
+      (el) => el.id !== textElement.id && el.type === "text" && !el.isDeleted,
+    ) as any;
+    expect(pasted.text).toBe("hello");
+    expect(pasted.fontSize).toBe(48);
+  });
+
+  it("should cut bound text container as plain text and paste as container", async () => {
+    const [container, label] = API.createTextContainer({
+      label: { text: "abc" },
+    });
+    API.setElements([container, label]);
+    API.setSelectedElements([container]);
+
+    (h.app as any).excalidrawContainerRef.current.contains = () => true;
+    const cutEvent = {
+      clipboardData: new DataTransfer(),
+      target: document.body,
+      preventDefault: () => {},
+      stopPropagation: () => {},
+    } as any as ClipboardEvent;
+    act(() => {
+      (h.app as any).onCut(cutEvent);
+    });
+    expect(cutEvent.clipboardData?.getData("text/plain")).toBe("abc");
+    expect(h.elements).toHaveLength(2);
+    expect(h.elements.find((el) => el.id === container.id)?.isDeleted).toBe(
+      true,
+    );
+    expect(h.elements.find((el) => el.id === label.id)?.isDeleted).toBe(true);
+
+    mouse.moveTo(100, 100);
+    const pasteEvent = createPasteEvent({
+      types: {
+        "text/plain": "abc",
+      },
+    });
+    act(() => {
+      document.dispatchEvent(pasteEvent);
+    });
+
+    await waitFor(() => {
+      expect(h.elements).toHaveLength(4);
+    });
+
+    const pastedContainer = h.elements.find(
+      (el) =>
+        el.type === container.type && el.id !== container.id && !el.isDeleted,
+    ) as any;
+    const pastedLabel = h.elements.find(
+      (el) =>
+        el.type === "text" &&
+        (el as any).text === "abc" &&
+        el.id !== label.id &&
+        !el.isDeleted,
+    ) as any;
+    expect(pastedLabel.containerId).toBe(pastedContainer.id);
+  });
+});

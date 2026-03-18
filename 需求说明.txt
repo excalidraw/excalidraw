@@ -1,4 +1,4 @@
-principle:
+only principle:
 所有的新更能都添加详细注释,不要删除代码,直接注释掉就行了;
 不要运行其他的测试文件,一切功能以这个文件为准;
 principle:
@@ -374,19 +374,71 @@ finished:
 新增断言：文本编辑态 Ctrl+方向键移动画布时，文本元素坐标不变：
 
 
-yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run -t "should'nt bind text to container when not double clicked on center"
-yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run --bail=1
-yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run
+分析如何让画布中的文本框在低缩放的情况下更清晰;
+能否彻底阻止画布字体栅格化,是画布中的文本框文字更加清晰;
+如何让画布中的文字在缩小时的清晰度接近,普通网页缩小时的文字清晰度;
+改为不再绘制 text 元素
+彻底防止编辑时减小缩放,编辑内容不可见的问题;
+
+
+finished:
+将ctrl+x剪切文本框时将剪切的内容改为文本框内的内容(文本框内所有文字),粘贴时,监听ctrl+v粘贴相同样式的文本框
+和ctrl+c的复制粘贴逻辑一样(只有剪切不同);
+目前剪切时,剪切到的内容是json内容,
+应该改为剪切文本内容,但在画布内粘贴时,粘贴的是文本框;
+没有实现Ctrl+x剪切文本框文本;
+
+finished:
+将粘贴的图片宽度设为严格按照图片像素宽度展示,
+分析有哪些测试与当前需求相矛盾
+将这些测试注释掉;并注释:"旧的测试,与当前需求相矛盾"
+放弃原来的所有的缩放策略。
+将粘贴的图片宽度设为严格按照图片像素宽度展示功能(唯一缩放策略)
+取消文件压缩/resizeImageFile 这类文件层面的缩放
+
+
+fixed:
+在选中状态下右键某个文本框是可以弹出右键菜单的,
+目前在编辑某个文本框之后,按下esc退出,会导致右键无法选中文本框;
 
 
 
 
 
-yarn test:app --watch=false packages/excalidraw/tests/canvasMoveByArrowKeys.test.tsx packages/excalidraw/tests/move.test.tsx --run
+
+
+
+finished:
+当画布中有大图片时,如何优化画布的移动时的响应速度;(不降低图片分辨率)
+当图片加载延迟较大时,先加载图片的轮廓,在显示图片,以防止移动时卡顿;
+为画布中的图片自动添加1px的紫色边框用于区分图片边界;
+
+
+finished:
+在画布背景按钮的下方添加设置文本框虚线边框(自带),文本框换行符,文本框行号,文本框空格符颜色的按钮;(共用一个颜色)
+
+
+
+在画布背景按钮的下方添加设置编辑光标颜色的按钮(样式和文本框标记颜色)的样式一样
+光标不随描边颜色设置而变化
+
+
+
+yarn test:all
+
+yarn test:e2e --project=chromium --grep "text box style"
+
+
+
+yarn vitest run packages/excalidraw/tests/clipboard.test.tsx
 
 启动:
 yarn --cwd ./excalidraw-app vite --port 3000 --strictPort
 测试:
+yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run -t "should'nt bind text to container when not double clicked on center"
+yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run --bail=1
+yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run
+yarn test:app --watch=false packages/excalidraw/tests/canvasMoveByArrowKeys.test.tsx packages/excalidraw/tests/move.test.tsx --run
 yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run -t "Test container-bound text" --reporter=dot
 yarn test:e2e --project=chromium --grep "first click to edit selected multi-line"
 控制台:
@@ -405,16 +457,6 @@ yarn test:app --watch=false packages/excalidraw/tests/contextmenu.test.tsx --run
 yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run --reporter=dot
 yarn test:app --watch=false packages/excalidraw/tests/canvasMoveByArrowKeys.test.tsx --run --reporter=dot
 yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run -t "should bind text to container when triggered via context menu" --reporter=dot
-
-
-
-
-
-
-
-
-
-
 yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx
 yarn test:app --watch=false --bail=1
 yarn eslint --max-warnings=0 e2e/text-wrap-consistency.spec.ts; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

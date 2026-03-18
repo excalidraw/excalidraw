@@ -244,6 +244,7 @@ const getRelevantAppStateProps = (
   offsetLeft: appState.offsetLeft,
   offsetTop: appState.offsetTop,
   theme: appState.theme,
+  textBoxDecorationsColor: appState.textBoxDecorationsColor,
   selectionElement: appState.selectionElement,
   selectedGroupIds: appState.selectedGroupIds,
   selectedLinearElement: appState.selectedLinearElement,

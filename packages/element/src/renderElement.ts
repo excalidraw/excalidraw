@@ -103,6 +103,55 @@ const isPendingImageElement = (
   isInitializedImageElement(element) &&
   !renderConfig.imageCache.has(element.fileId);
 
+const applyAlphaToColor = (color: string, alpha: number) => {
+  if (!color || color === "transparent") {
+    return `rgba(0, 0, 0, 0)`;
+  }
+
+  const trimmed = color.trim();
+
+  const rgbMatch = trimmed.match(
+    /^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i,
+  );
+  if (rgbMatch) {
+    const r = Number(rgbMatch[1]);
+    const g = Number(rgbMatch[2]);
+    const b = Number(rgbMatch[3]);
+    if ([r, g, b].every((n) => Number.isFinite(n))) {
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+  }
+
+  const rgbaMatch = trimmed.match(
+    /^rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([0-9.]+)\s*\)$/i,
+  );
+  if (rgbaMatch) {
+    const r = Number(rgbaMatch[1]);
+    const g = Number(rgbaMatch[2]);
+    const b = Number(rgbaMatch[3]);
+    if ([r, g, b].every((n) => Number.isFinite(n))) {
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+  }
+
+  const hexMatch = trimmed.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (hexMatch) {
+    const hex = hexMatch[1].toLowerCase();
+    const full =
+      hex.length === 3
+        ? `${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}`
+        : hex;
+    const r = parseInt(full.slice(0, 2), 16);
+    const g = parseInt(full.slice(2, 4), 16);
+    const b = parseInt(full.slice(4, 6), 16);
+    if ([r, g, b].every((n) => Number.isFinite(n))) {
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+  }
+
+  return `rgba(168, 168, 168, ${alpha})`;
+};
+
 const drawTextWhitespaceMarkers = ({
   context,
   element,
@@ -111,6 +160,7 @@ const drawTextWhitespaceMarkers = ({
   horizontalOffset,
   lineHeightPx,
   verticalOffset,
+  markerColor,
 }: {
   context: CanvasRenderingContext2D;
   element: ExcalidrawTextElement;
@@ -119,8 +169,8 @@ const drawTextWhitespaceMarkers = ({
   horizontalOffset: number;
   lineHeightPx: number;
   verticalOffset: number;
+  markerColor: string;
 }) => {
-  const markerColor = "rgba(168, 168, 168, 0.55)";
   const dotRadius = Math.max(0.5, element.fontSize * 0.09);
   const newlineMarkerPadding = Math.max(dotRadius * 4, element.fontSize * 0.4);
 
@@ -276,6 +326,14 @@ const cappedElementCanvasSize = (
   let height = elementHeight * window.devicePixelRatio + padding * 2;
 
   let scale: number = zoom.value;
+  if (isTextElement(element) && zoom.value < 1) {
+    const targetFontPx = 24;
+    const maxSupersampleFactor = 3;
+    const dpr = window.devicePixelRatio || 1;
+    const minScaleForFont = targetFontPx / (element.fontSize * dpr);
+    const maxScale = Math.min(1, zoom.value * maxSupersampleFactor);
+    scale = Math.min(maxScale, Math.max(zoom.value, minScaleForFont));
+  }
 
   // rescale to ensure width and height is within limits
   if (
@@ -348,7 +406,14 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  drawElementOnCanvas(element, rc, context, renderConfig, elementsMap);
+  drawElementOnCanvas(
+    element,
+    rc,
+    context,
+    renderConfig,
+    elementsMap,
+    appState,
+  );
 
   context.restore();
 
@@ -485,6 +550,7 @@ const drawElementOnCanvas = (
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
   elementsMap: ElementsMap,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
   switch (element.type) {
     case "rectangle":
@@ -735,16 +801,25 @@ const drawElementOnCanvas = (
           horizontalOffset,
           lineHeightPx,
           verticalOffset,
+          markerColor: applyAlphaToColor(
+            appState.textBoxDecorationsColor,
+            0.55,
+          ),
         });
 
         if (!renderConfig.isExporting) {
+          const decorationColor = applyAlphaToColor(
+            appState.textBoxDecorationsColor,
+            0.55,
+          );
+
           context.save();
           const lineNumberFontSize = Math.max(10, element.fontSize * 0.8);
           context.font = getFontString({
             fontSize: lineNumberFontSize,
             fontFamily: element.fontFamily,
           });
-          context.fillStyle = "rgba(168, 168, 168, 0.55)";
+          context.fillStyle = decorationColor;
           context.textAlign = "right";
           context.textBaseline = "alphabetic";
 
@@ -771,7 +846,7 @@ const drawElementOnCanvas = (
           context.restore();
 
           context.save();
-          context.strokeStyle = "rgba(168, 168, 168, 0.55)";
+          context.strokeStyle = decorationColor;
           context.lineWidth = 1;
           context.setLineDash([4, 2]);
           context.strokeRect(
@@ -810,10 +885,18 @@ const generateElementWithCanvas = (
         value: 1 as NormalizedZoomValue,
       };
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
+  const nextScale =
+    prevElementWithCanvas &&
+    prevElementWithCanvas.zoomValue !== zoom.value &&
+    !appState?.shouldCacheIgnoreZoom
+      ? cappedElementCanvasSize(element, elementsMap, zoom).scale
+      : null;
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
-    !appState?.shouldCacheIgnoreZoom;
+    !appState?.shouldCacheIgnoreZoom &&
+    nextScale !== null &&
+    prevElementWithCanvas.scale !== nextScale;
   const boundTextElement = getBoundTextElement(element, elementsMap);
   const boundTextElementVersion = boundTextElement?.version || null;
   const imageCrop = isImageElement(element) ? element.crop : null;
@@ -851,6 +934,14 @@ const generateElementWithCanvas = (
     elementWithCanvasCache.set(element, elementWithCanvas);
 
     return elementWithCanvas;
+  }
+  if (
+    nextScale !== null &&
+    prevElementWithCanvas &&
+    prevElementWithCanvas.zoomValue !== zoom.value &&
+    prevElementWithCanvas.scale === nextScale
+  ) {
+    prevElementWithCanvas.zoomValue = zoom.value;
   }
   return prevElementWithCanvas;
 };
@@ -892,6 +983,46 @@ const drawElementFromCanvas = (
       elementWithCanvas.boundTextCanvas.height / zoom,
     );
   } else {
+    if (
+      element.type === "image" &&
+      element.angle === 0 &&
+      element.scale[0] === 1 &&
+      element.scale[1] === 1 &&
+      !isPendingImageElement(element, renderConfig)
+    ) {
+      const viewportX1 = -appState.scrollX;
+      const viewportY1 = -appState.scrollY;
+      const viewportX2 = viewportX1 + appState.width / appState.zoom.value;
+      const viewportY2 = viewportY1 + appState.height / appState.zoom.value;
+
+      const ix1 = Math.max(x1, viewportX1);
+      const iy1 = Math.max(y1, viewportY1);
+      const ix2 = Math.min(x2, viewportX2);
+      const iy2 = Math.min(y2, viewportY2);
+
+      if (ix2 > ix1 && iy2 > iy1) {
+        const dpr = window.devicePixelRatio;
+        const sw = (ix2 - ix1) * dpr * zoom;
+        const sh = (iy2 - iy1) * dpr * zoom;
+
+        if (sw > 0 && sh > 0) {
+          context.drawImage(
+            elementWithCanvas.canvas!,
+            ((ix1 - x1) * dpr + padding) * zoom,
+            ((iy1 - y1) * dpr + padding) * zoom,
+            sw,
+            sh,
+            (ix1 + appState.scrollX) * dpr,
+            (iy1 + appState.scrollY) * dpr,
+            (ix2 - ix1) * dpr,
+            (iy2 - iy1) * dpr,
+          );
+          context.restore();
+          return;
+        }
+      }
+    }
+
     // we translate context to element center so that rotation and scale
     // originates from the element center
     context.translate(cx, cy);
@@ -979,6 +1110,14 @@ export const renderElement = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
+  if (
+    element.type === "text" &&
+    !renderConfig.isExporting &&
+    renderConfig.renderTextViaDOM
+  ) {
+    return;
+  }
+
   const reduceAlphaForSelection =
     appState.openDialog?.name === "elementLinkSelector" &&
     !appState.selectedElementIds[element.id] &&
@@ -1047,7 +1186,14 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig, elementsMap);
+        drawElementOnCanvas(
+          element,
+          rc,
+          context,
+          renderConfig,
+          elementsMap,
+          appState,
+        );
         context.restore();
       } else {
         const elementWithCanvas = generateElementWithCanvas(
@@ -1139,6 +1285,7 @@ export const renderElement = (
             tempCanvasContext,
             renderConfig,
             elementsMap,
+            appState,
           );
 
           tempCanvasContext.translate(shiftX, shiftY);
@@ -1178,7 +1325,14 @@ export const renderElement = (
           }
 
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig, elementsMap);
+          drawElementOnCanvas(
+            element,
+            rc,
+            context,
+            renderConfig,
+            elementsMap,
+            appState,
+          );
         }
 
         context.restore();
@@ -1187,6 +1341,7 @@ export const renderElement = (
       } else {
         if (
           element.type === "text" &&
+          !renderConfig.renderTextViaDOM &&
           !appState?.shouldCacheIgnoreZoom &&
           cappedElementCanvasSize(element, allElementsMap, appState.zoom)
             .scale < appState.zoom.value
@@ -1216,7 +1371,14 @@ export const renderElement = (
           context.translate(cx, cy);
           context.rotate(element.angle);
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig, elementsMap);
+          drawElementOnCanvas(
+            element,
+            rc,
+            context,
+            renderConfig,
+            elementsMap,
+            appState,
+          );
           context.restore();
           break;
         }
@@ -1234,10 +1396,21 @@ export const renderElement = (
 
         const currentImageSmoothingStatus = context.imageSmoothingEnabled;
 
+        const shouldDownscaleTextCanvas =
+          !appState?.shouldCacheIgnoreZoom &&
+          isTextElement(element) &&
+          elementWithCanvas.scale > appState.zoom.value;
+
+        if (shouldDownscaleTextCanvas) {
+          context.imageSmoothingEnabled = true;
+          context.imageSmoothingQuality = "high";
+        }
+
         if (
           // do not disable smoothing during zoom as blurry shapes look better
           // on low resolution (while still zooming in) than sharp ones
           !appState?.shouldCacheIgnoreZoom &&
+          !shouldDownscaleTextCanvas &&
           // angle is 0 -> always disable smoothing
           (!element.angle ||
             // or check if angle is a right angle in which case we can still

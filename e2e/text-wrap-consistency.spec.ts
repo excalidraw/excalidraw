@@ -162,9 +162,9 @@ const installCanvasTextSpy = () => {
     patchTransferToImageBitmap((OffscreenCanvas as any).prototype);
   }
 
+  // override global for E2E
   if (typeof createImageBitmap === "function") {
     const origCreate = createImageBitmap;
-    // @ts-expect-error override global for E2E
     window.createImageBitmap = function (image: any, ...args: any[]) {
       const sourceId =
         image instanceof HTMLCanvasElement ||
@@ -1985,4 +1985,105 @@ test("Double click selects word and triple click selects line using configured i
     .toBe(0);
 
   await exitEditor(page);
+});
+
+//在选中状态下右键某个文本框是可以弹出右键菜单的,
+//目前在编辑某个文本框之后,按下esc退出,会导致右键无法弹出右键菜单;
+//Pressing ESC to exit will result in the inability to right-click and open context menu
+//在此处编写测试Pressing ESC to exit will result in the inability to right-click and open context menu解决这个问题;
+//更新这个测试,一定要先编辑文本框,覆盖按esc退出,点击画布其他区域退出两种情况;之后再测试右键弹出右键菜单
+//更新测试在编辑文本框时,使用右键移动画布,之后,再退出到选中状态,依然可以右键弹出菜单;
+
+test("按 ESC 退出编辑后可右键选中文本框并弹出菜单", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => {
+    (window as any).h?.setState?.({
+      currentItemFontFamily: 12,
+      currentItemFontSize: 22,
+      gridModeEnabled: false,
+    });
+  });
+
+  const createX = 280;
+  const createY = 180;
+
+  const canvas = page.locator("canvas.interactive");
+  await canvas.waitFor();
+
+  const rightClickAndExpectContextMenu = async () => {
+    const { clientX, clientY } = await page.evaluate(() => {
+      const h = (window as any).h;
+      const state = h?.state;
+      const zoom = Number(state?.zoom?.value) || 1;
+      const el = [...(h?.elements || [])]
+        .reverse()
+        .find((e: any) => e?.type === "text");
+      const canvas = document.querySelector<HTMLCanvasElement>(
+        "canvas.excalidraw__canvas.interactive",
+      )!;
+      const rect = canvas.getBoundingClientRect();
+      const cx = (el.x + el.width / 2 + state.scrollX) * zoom + rect.left;
+      const cy = (el.y + el.height / 2 + state.scrollY) * zoom + rect.top;
+      return { clientX: Math.round(cx), clientY: Math.round(cy) };
+    });
+
+    await page
+      .locator(`[data-testid="toolbar-selection"]`)
+      .locator("..")
+      .click();
+    await page.mouse.click(clientX, clientY, { button: "left" });
+    await page.evaluate(
+      ({ x, y }) => {
+        const canvas = document.querySelector<HTMLCanvasElement>(
+          "canvas.excalidraw__canvas.interactive",
+        );
+        if (canvas) {
+          const evt = new MouseEvent("contextmenu", {
+            bubbles: true,
+            cancelable: true,
+            clientX: x,
+            clientY: y,
+            button: 2,
+          });
+          canvas.dispatchEvent(evt);
+        }
+      },
+      { x: clientX, y: clientY },
+    );
+
+    await page.waitForFunction(() => {
+      return Boolean((window as any).h?.state?.contextMenu);
+    });
+    await expect(page.locator(".context-menu")).toBeVisible();
+  };
+
+  // 创建文本并进入编辑（场景 A：ESC 退出）
+  await page.locator(`[data-testid="toolbar-text"]`).locator("..").click();
+  await canvas.click({ position: { x: createX, y: createY } });
+  const editor = page.locator("textarea.excalidraw-wysiwyg");
+  await expect(editor).toBeVisible();
+  await editor.fill("hello world");
+
+  // ESC 退出编辑
+  await editor.press("Escape");
+  await expect(editor).toHaveCount(0);
+
+  await rightClickAndExpectContextMenu();
+
+  await page.keyboard.press("Escape");
+  await page
+    .locator("canvas.interactive")
+    .click({ position: { x: 10, y: 10 } });
+  await page.locator(".context-menu").waitFor({ state: "hidden" });
+
+  // 场景 B：点击画布其它区域退出（重新进入编辑后点击画布退出）
+  await openEditorByDoubleClickAt(page, createX, createY);
+  const editor2 = page.locator("textarea.excalidraw-wysiwyg");
+  await expect(editor2).toBeVisible();
+  await page
+    .locator("canvas.interactive")
+    .click({ position: { x: createX + 200, y: createY + 120 } });
+  await expect(editor2).toHaveCount(0);
+
+  await rightClickAndExpectContextMenu();
 });

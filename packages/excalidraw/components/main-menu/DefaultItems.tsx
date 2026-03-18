@@ -29,10 +29,12 @@ import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import {
   useExcalidrawSetAppState,
   useExcalidrawActionManager,
+  useExcalidrawAppState,
   useExcalidrawElements,
   useAppProps,
   useApp,
 } from "../App";
+import { ColorPicker } from "../ColorPicker/ColorPicker";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
@@ -306,9 +308,11 @@ ToggleTheme.displayName = "ToggleTheme";
 
 export const ChangeCanvasBackground = () => {
   const { t } = useI18n();
-  const appState = useUIAppState();
+  const appState = useExcalidrawAppState();
   const actionManager = useExcalidrawActionManager();
   const appProps = useAppProps();
+  const setAppState = useExcalidrawSetAppState();
+  const elements = useExcalidrawElements();
 
   const [dblClickSelectWordIntervalMs, setDblClickSelectWordIntervalMs] =
     useState<number>(() => {
@@ -369,6 +373,56 @@ export const ChangeCanvasBackground = () => {
       </div>
       <div style={{ padding: "0 0.625rem" }}>
         {actionManager.renderAction("changeViewBackgroundColor")}
+      </div>
+      <div style={{ marginTop: "0.75rem" }}>
+        <div
+          style={{
+            fontSize: "0.875rem",
+            marginBottom: "0.25rem",
+            marginLeft: "0.5rem",
+          }}
+        >
+          文本框标记颜色（边框/换行符/行号/空格符）
+        </div>
+        <div style={{ padding: "0 0.625rem" }}>
+          <ColorPicker
+            topPicks={["#a8a8a8", "#6965db", "#ff5252", "#2ecc71", "#111111"]}
+            label="文本框标记颜色"
+            type="textBoxDecorations"
+            color={appState.textBoxDecorationsColor}
+            onChange={(color) =>
+              setAppState({ textBoxDecorationsColor: color })
+            }
+            data-testid="text-box-decorations-picker"
+            elements={elements}
+            appState={appState}
+            updateData={(formData) => setAppState(formData ?? {})}
+          />
+        </div>
+      </div>
+      <div style={{ marginTop: "0.75rem" }}>
+        <div
+          style={{
+            fontSize: "0.875rem",
+            marginBottom: "0.25rem",
+            marginLeft: "0.5rem",
+          }}
+        >
+          编辑光标颜色
+        </div>
+        <div style={{ padding: "0 0.625rem" }}>
+          <ColorPicker
+            topPicks={["#a8a8a8", "#6965db", "#ff5252", "#2ecc71", "#111111"]}
+            label="编辑光标颜色"
+            type="textEditorCaret"
+            color={appState.textEditorCaretColor}
+            onChange={(color) => setAppState({ textEditorCaretColor: color })}
+            data-testid="text-editor-caret-picker"
+            elements={elements}
+            appState={appState}
+            updateData={(formData) => setAppState(formData ?? {})}
+          />
+        </div>
       </div>
       <div
         style={{

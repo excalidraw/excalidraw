@@ -69,10 +69,10 @@ export const Picker = React.forwardRef(
       : null;
 
     const [customColors] = React.useState(() => {
-      if (type === "canvasBackground") {
-        return [];
+      if (type === "elementBackground" || type === "elementStroke") {
+        return getMostUsedCustomColors(elements, type, palette);
       }
-      return getMostUsedCustomColors(elements, type, palette);
+      return [];
     });
 
     const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(

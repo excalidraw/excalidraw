@@ -98,5 +98,7 @@ export const activeColorPickerSectionAtom =
 
 export type ColorPickerType =
   | "canvasBackground"
+  | "textBoxDecorations"
+  | "textEditorCaret"
   | "elementBackground"
   | "elementStroke";
