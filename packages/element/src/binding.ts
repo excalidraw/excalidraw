@@ -818,6 +818,11 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
                     elementsMap,
                     appState.gridSize as NullableGridSize,
                     arrow,
+                    LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                      arrow,
+                      startDragged ? 1 : -2,
+                      elementsMap,
+                    ),
                   )
                 : globalPoint,
               hit,
@@ -1768,17 +1773,21 @@ const snapBoundPointToGrid = (
   elementsMap: ElementsMap,
   gridSize: NullableGridSize,
   arrowElement: ExcalidrawArrowElement,
+  adjacentPoint?: GlobalPoint,
 ): GlobalPoint => {
   if (!gridSize) {
     return outlinePoint;
   }
 
   const aabb = aabbForElement(bindableElement, elementsMap);
-  const heading = headingForPointFromElement(
-    bindableElement,
-    aabb,
-    outlinePoint,
-  );
+  // For ellipses and diamonds use the arrow's incoming direction instead of
+  // the position-based heading, which can give the wrong axis when the
+  // outline point is near a cardinal zone or an angled diamond face.
+  const heading =
+    adjacentPoint &&
+    (bindableElement.type === "ellipse" || bindableElement.type === "diamond")
+      ? vectorToHeading(vectorFromPoint(adjacentPoint, outlinePoint))
+      : headingForPointFromElement(bindableElement, aabb, outlinePoint);
 
   const normalLocal = pointFrom<GlobalPoint>(heading[0], heading[1]);
   const normalGlobal = pointRotateRads(
