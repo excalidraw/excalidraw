@@ -99,6 +99,25 @@ describe("restoreElements", () => {
     expect(restoredFrame.backgroundEnabled).toBe(false);
   });
 
+  it("should disable frame background when legacy backgroundEnabled is non-boolean", () => {
+    const frame = API.createElement({
+      type: "frame",
+      backgroundColor: "#ffc9c9",
+    });
+    const legacyFrame = {
+      ...frame,
+      backgroundEnabled: undefined,
+    } as any;
+
+    const restoredFrame = restore.restoreElements(
+      [legacyFrame],
+      null,
+    )[0] as ExcalidrawFrameElement;
+
+    expect(restoredFrame.backgroundColor).toBe("transparent");
+    expect(restoredFrame.backgroundEnabled).toBe(false);
+  });
+
   it("should preserve frame backgroundEnabled when present", () => {
     const frame = API.createElement({
       type: "frame",
