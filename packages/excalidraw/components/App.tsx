@@ -5771,6 +5771,68 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  private getSelectedTextElement(
+    container?: ExcalidrawTextContainer | null,
+  ): NonDeleted<ExcalidrawTextElement> | null {
+    const selectedElements = this.scene.getSelectedElements(this.state);
+
+    if (selectedElements.length !== 1) {
+      return null;
+    }
+
+    const selectedElement = selectedElements[0]!;
+
+    if (isTextElement(selectedElement)) {
+      return selectedElement;
+    }
+
+    if (!container) {
+      return null;
+    }
+
+    return getBoundTextElement(
+      selectedElement,
+      this.scene.getNonDeletedElementsMap(),
+    );
+  }
+
+  private getSelectedTextEditingContainerAtPosition(
+    hitElement: NonDeletedExcalidrawElement | null,
+    sceneCoords: { x: number; y: number },
+  ): ExcalidrawTextContainer | null | undefined {
+    const selectedElements = this.scene.getSelectedElements(this.state);
+
+    if (
+      selectedElements.length !== 1 ||
+      !hitElement ||
+      hitElement.id !== selectedElements[0]!.id
+    ) {
+      return null;
+    }
+
+    const selectedElement = selectedElements[0]!;
+
+    if (isTextElement(selectedElement)) {
+      return null;
+    }
+
+    if (!isValidTextContainer(selectedElement)) {
+      return undefined;
+    }
+
+    const textElement = this.getSelectedTextElement(selectedElement);
+    const hitTextElement = this.getTextElementAtPosition(
+      sceneCoords.x,
+      sceneCoords.y,
+    );
+
+    if (!textElement || hitTextElement?.id !== textElement.id) {
+      return undefined;
+    }
+
+    return selectedElement;
+  }
+
   private getTextElementAtPosition(
     x: number,
     y: number,
@@ -6027,24 +6089,9 @@ class App extends React.Component<AppProps, AppState> {
         shouldBindToContainer = true;
       }
     }
-    let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
-
-    const selectedElements = this.scene.getSelectedElements(this.state);
-
-    if (selectedElements.length === 1) {
-      if (isTextElement(selectedElements[0])) {
-        existingTextElement = selectedElements[0];
-      } else if (container) {
-        existingTextElement = getBoundTextElement(
-          selectedElements[0],
-          this.scene.getNonDeletedElementsMap(),
-        );
-      } else {
-        existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
-      }
-    } else {
-      existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
-    }
+    const existingTextElement =
+      this.getSelectedTextElement(container) ||
+      this.getTextElementAtPosition(sceneX, sceneY);
 
     const fontFamily =
       existingTextElement?.fontFamily || this.state.currentItemFontFamily;
@@ -11041,6 +11088,9 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      const selectedTextEditingContainer =
+        this.getSelectedTextEditingContainerAtPosition(hitElement, sceneCoords);
+
       if (
         activeTool.type === this.state.preferredSelectionTool.type &&
         !this.state.editingTextElement &&
@@ -11051,13 +11101,15 @@ class App extends React.Component<AppProps, AppState> {
         !childEvent.altKey &&
         childEvent.pointerType !== "touch" &&
         hitElement &&
-        isTextElement(hitElement) &&
-        this.state.selectedElementIds[hitElement.id] &&
-        this.scene.getSelectedElements(this.state).length === 1
+        ((isTextElement(hitElement) &&
+          this.state.selectedElementIds[hitElement.id] &&
+          this.scene.getSelectedElements(this.state).length === 1) ||
+          selectedTextEditingContainer)
       ) {
         this.startTextEditing({
           sceneX: sceneCoords.x,
           sceneY: sceneCoords.y,
+          container: selectedTextEditingContainer,
           initialCaretSceneCoords: this.lastPointerUpIsDoubleClick
             ? undefined
             : sceneCoords,

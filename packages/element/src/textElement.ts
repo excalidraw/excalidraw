@@ -441,7 +441,8 @@ const VALID_CONTAINER_TYPES = new Set([
 
 export const isValidTextContainer = (element: {
   type: ExcalidrawElementType;
-}) => VALID_CONTAINER_TYPES.has(element.type);
+}): element is ExcalidrawTextContainer =>
+  VALID_CONTAINER_TYPES.has(element.type);
 
 export const computeContainerDimensionForBoundText = (
   dimension: number,
