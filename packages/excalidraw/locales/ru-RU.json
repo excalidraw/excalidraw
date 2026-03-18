@@ -3,8 +3,12 @@
     "paste": "Вставить",
     "pasteAsPlaintext": "Вставить как обычный текст",
     "pasteCharts": "Вставить диаграммы",
+    "chartType_bar": "Столбчатая диаграмма",
+    "chartType_line": "Линейная диаграмма",
+    "chartType_radar": "Радарная диаграмма",
+    "chartType_plaintext": "Обычный текст",
     "selectAll": "Выбрать всё",
-    "multiSelect": "Добавить элемент в выделенный фрагмент",
+    "multiSelect": "Добавить к выделению",
     "moveCanvas": "Переместить холст",
     "cut": "Вырезать",
     "copy": "Копировать",
@@ -30,7 +34,7 @@
     "strokeStyle_solid": "Сплошная",
     "strokeStyle_dashed": "Пунктирная",
     "strokeStyle_dotted": "Точечная",
-    "sloppiness": "Стиль обводки",
+    "sloppiness": "Небрежность",
     "opacity": "Непрозрачность",
     "textAlign": "Выравнивание текста",
     "edges": "Края",
@@ -46,10 +50,17 @@
     "arrowhead_triangle_outline": "Треугольник (контур)",
     "arrowhead_diamond": "Ромб",
     "arrowhead_diamond_outline": "Ромб (контур)",
-    "arrowhead_crowfoot_many": "Морщинки (много)",
-    "arrowhead_crowfoot_one": "Морщинки (одна)",
-    "arrowhead_crowfoot_one_or_many": "Морщинки (одна или много)",
+    "arrowhead_crowfoot_many": "Вороньи лапки (много)",
+    "arrowhead_crowfoot_one": "Вороньи лапки (одна)",
+    "arrowhead_crowfoot_one_or_many": "Вороньи лапки (одна или много)",
+    "arrowhead_cardinality_one": "Один",
+    "arrowhead_cardinality_many": "Много",
+    "arrowhead_cardinality_one_or_many": "Один или много",
+    "arrowhead_cardinality_exactly_one": "Ровно один",
+    "arrowhead_cardinality_zero_or_one": "Ноль или один",
+    "arrowhead_cardinality_zero_or_many": "Ноль или много",
     "more_options": "Больше вариантов",
+    "cardinality": "Кардинальность",
     "arrowtypes": "Тип стрелки",
     "arrowtype_sharp": "Острая стрелка",
     "arrowtype_round": "Изогнутая стрелка",
@@ -138,7 +149,7 @@
       "goToElement": "Перейти к элементу"
     },
     "lineEditor": {
-      "edit": "Редактирование строки",
+      "edit": "Редактировать линию",
       "editArrow": "Изменить стрелку"
     },
     "polygon": {
@@ -171,7 +182,11 @@
     "linkToElement": "Ссылка на объект",
     "wrapSelectionInFrame": "Поместить выделенное в фрейм",
     "tab": "Вкладка",
-    "shapeSwitch": "Сменить форму"
+    "shapeSwitch": "Сменить форму",
+    "preferences": "Настройки",
+    "preferences_toolLock": "Фиксация инструмента",
+    "arrowBinding": "Привязка стрелок",
+    "midpointSnapping": "Привязка к середине"
   },
   "elementLink": {
     "title": "Ссылка на объект",
@@ -248,7 +263,7 @@
     "cannotExportEmptyCanvas": "Не может экспортировать пустой холст.",
     "couldNotCopyToClipboard": "Не удалось скопировать в буфер обмена.",
     "decryptFailed": "Не удалось расшифровать данные.",
-    "uploadedSecurly": "Загружаемые данные защищена сквозным шифрованием, что означает, что сервер Excalidraw и третьи стороны не могут прочитать содержимое.",
+    "uploadedSecurly": "Загружаемые данные защищены сквозным шифрованием, что означает, что сервер Excalidraw и третьи стороны не могут прочитать содержимое.",
     "loadSceneOverridePrompt": "Загрузка рисунка приведёт к замене имеющегося содержимого. Вы хотите продолжить?",
     "collabStopOverridePrompt": "Остановка сессии перезапишет ваш предыдущий, локально сохранённый рисунок. Вы уверены? \n\n(Если вы хотите оставить ваш локальный рисунок, просто закройте вкладку браузера).",
     "errorAddingToLibrary": "Не удалось добавить объект в библиотеку",
@@ -319,21 +334,21 @@
     "obliqueTriPrism": "Наклонная треугольная призма",
     "arrow": "Cтрелка",
     "line": "Линия",
-    "freedraw": "Чертить",
+    "freedraw": "Карандаш",
     "text": "Текст",
     "library": "Библиотека",
     "lock": "Сохранять выбранный инструмент активным после рисования",
     "penMode": "Режим пера – предотвращение касания",
     "link": "Добавить / Обновить ссылку для выбранной фигуры",
     "eraser": "Ластик",
-    "frame": "Фреймовый инструмент",
-    "magicframe": "Каркас для кода",
+    "frame": "Рамка",
+    "magicframe": "Магическая рамка",
     "embeddable": "Встроенная страница",
     "laser": "Лазерная указка",
     "hand": "Рука (перемещение холста)",
     "extraTools": "Дополнительные инструменты",
     "mermaidToExcalidraw": "Mermaid в Excalidraw",
-    "convertElementType": "Переключение типа формы"
+    "convertElementType": "Сменить тип фигуры"
   },
   "element": {
     "rectangle": "Прямоугольник",
@@ -366,7 +381,7 @@
     "image": "Изображение",
     "group": "Группа",
     "frame": "Фрейм",
-    "magicframe": "Каркас для кода",
+    "magicframe": "Магическая рамка",
     "embeddable": "Встроенная страница",
     "selection": "Выделение",
     "iframe": "IFrame"
@@ -435,6 +450,10 @@
   "errorDialog": {
     "title": "Ошибка"
   },
+  "progressDialog": {
+    "title": "Сохранение",
+    "defaultMessage": "Подготовка к сохранению..."
+  },
   "exportDialog": {
     "disk_title": "Сохранить на диск",
     "disk_details": "Экспортировать данные сцены в файл, из которого можно импортировать позже.",
@@ -471,7 +490,7 @@
     "textNewLine": "Добавить новую строку (текстовый редактор)",
     "title": "Справка",
     "view": "Просмотр",
-    "zoomToFit": "Отмастштабировать, чтобы поместились все элементы",
+    "zoomToFit": "Отмасштабировать, чтобы поместились все элементы",
     "zoomToSelection": "Увеличить до выделенного",
     "toggleElementLock": "Заблокировать/разблокировать выделение",
     "movePageUpDown": "Сдвинуть страницу вверх/вниз",
@@ -597,9 +616,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Ваши рисунки сохраняются в хранилище браузера.",
+      "center_heading_line2": "Хранилище браузера может быть очищено неожиданно.",
+      "center_heading_line3": "Сохраняйте работу в файл, чтобы не потерять её.",
       "center_heading_plus": "Хотите перейти на Excalidraw+?",
       "menuHint": "Экспорт, настройки, языки, ..."
     },
@@ -656,7 +675,8 @@
     "syntax": "Синтаксис Mermaid",
     "preview": "Предпросмотр",
     "label": "Mermaid",
-    "inputPlaceholder": "Напишите здесь определение диаграммы Mermaid..."
+    "inputPlaceholder": "Напишите здесь определение диаграммы Mermaid...",
+    "autoFixAvailable": "Доступно автоисправление"
   },
   "ttd": {
     "error": "Ошибка!"
@@ -664,7 +684,7 @@
   "chat": {
     "inputPlaceholder": "Начните вводить сюда идею диаграммы... ({{shortcut}} для новой строки)",
     "inputPlaceholderWithMessages": "Продолжайте доработку диаграммы...",
-    "generating": "",
+    "generating": "Генерация...",
     "rateLimitRemaining": "Осталось запросов сегодня: {{count}}",
     "role": {
       "user": "Вы",
@@ -695,7 +715,7 @@
       "aiRepair": "Перегенерировать (автоисправление) →",
       "requestAborted": "Запрос отменён",
       "requestFailed": "Запрос не удался",
-      "mermaidParseError": ""
+      "mermaidParseError": "Ошибка синтаксиса Mermaid"
     },
     "rateLimit": {
       "messageLimit": "Вы достигли лимита ИИ на бесплатном тарифном плане. Попробуйте Excalidraw+ или вернитесь завтра.",
