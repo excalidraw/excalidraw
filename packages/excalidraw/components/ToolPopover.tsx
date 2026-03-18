@@ -33,6 +33,8 @@ type ToolPopoverProps = {
   onToolChange: (type: string) => void;
   displayedOption: ToolOption;
   fillable?: boolean;
+  /** When provided, replaces the default setActiveTool+onToolChange in popup */
+  onSelect?: (type: string) => void;
 };
 
 export const ToolPopover = ({
@@ -47,6 +49,7 @@ export const ToolPopover = ({
   onToolChange,
   displayedOption,
   fillable = false,
+  onSelect,
 }: ToolPopoverProps) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const currentType = activeTool.type;
@@ -113,11 +116,15 @@ export const ToolPopover = ({
               aria-label={title || capitalizeString(type)}
               data-testid={`toolbar-${type}`}
               onChange={() => {
-                if (app.state.activeTool.type !== type) {
-                  trackEvent("toolbar", type, "ui");
+                if (onSelect) {
+                  onSelect(type);
+                } else {
+                  if (app.state.activeTool.type !== type) {
+                    trackEvent("toolbar", type, "ui");
+                  }
+                  app.setActiveTool({ type: type as any });
+                  onToolChange?.(type);
                 }
-                app.setActiveTool({ type: type as any });
-                onToolChange?.(type);
               }}
             />
           ),

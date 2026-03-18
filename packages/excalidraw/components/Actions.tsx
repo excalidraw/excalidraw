@@ -103,6 +103,8 @@ import {
   ObliqueTriPrismIcon,
   ArrowIcon,
   LineIcon,
+  FreedrawIcon,
+  HighlighterIcon,
   pencilIcon,
 } from "./icons";
 
@@ -1223,6 +1225,19 @@ export const ShapesSwitcher = ({
     },
   ] as const;
 
+  const FREEDRAW_TOOLS = [
+    {
+      type: "freedraw",
+      icon: FreedrawIcon,
+      title: capitalizeString(t("toolBar.freedraw")),
+    },
+    {
+      type: "highlighter",
+      icon: HighlighterIcon,
+      title: capitalizeString(t("toolBar.highlighter")),
+    },
+  ] as const;
+
   const SHAPE_TYPES: Set<string> = new Set(
     SHAPE_TOOLS.map((t) => t.type).filter((t) => t !== "---"),
   );
@@ -1230,6 +1245,8 @@ export const ShapesSwitcher = ({
 
   const [lastActiveShape, setLastActiveShape] = useState<string>("rectangle");
   const [lastActiveLinear, setLastActiveLinear] = useState<string>("line");
+  const [preferredFreedraw, setPreferredFreedraw] =
+    useState<string>("freedraw");
 
   // Sync last active shape/linear with current tool
   useEffect(() => {
@@ -1255,9 +1272,11 @@ export const ShapesSwitcher = ({
   const renderedSelectionPopover = useRef(false);
   const renderedShapePopover = useRef(false);
   const renderedLinearPopover = useRef(false);
+  const renderedFreedrawPopover = useRef(false);
   renderedSelectionPopover.current = false;
   renderedShapePopover.current = false;
   renderedLinearPopover.current = false;
+  renderedFreedrawPopover.current = false;
 
   return (
     <>
@@ -1379,6 +1398,48 @@ export const ShapesSwitcher = ({
                   ) || LINEAR_TOOLS[0]
                 }
                 fillable
+              />
+            );
+          }
+
+          // Group freedraw tools (pencil/highlighter) into a single popover
+          if (value === "freedraw" && isCompactStylesPanel) {
+            if (renderedFreedrawPopover.current) {
+              return null;
+            }
+            renderedFreedrawPopover.current = true;
+            return (
+              <ToolPopover
+                key="freedraw-popover"
+                app={app}
+                options={FREEDRAW_TOOLS}
+                activeTool={{
+                  type:
+                    activeTool.type === "freedraw"
+                      ? preferredFreedraw
+                      : activeTool.type,
+                }}
+                defaultOption={preferredFreedraw}
+                namePrefix="freedrawType"
+                title={capitalizeString(t("toolBar.freedraw"))}
+                data-testid="toolbar-freedraw"
+                onToolChange={(type: string) => {
+                  app.setActiveTool({ type: "freedraw" });
+                  const isHighlighter = type === "highlighter";
+                  app.toggleHighlighterMode(isHighlighter);
+                  setPreferredFreedraw(type);
+                }}
+                onSelect={(type: string) => {
+                  trackEvent("toolbar", type, "ui");
+                  app.setActiveTool({ type: "freedraw" });
+                  const isHighlighter = type === "highlighter";
+                  app.toggleHighlighterMode(isHighlighter);
+                  setPreferredFreedraw(type);
+                }}
+                displayedOption={
+                  FREEDRAW_TOOLS.find((t) => t.type === preferredFreedraw) ||
+                  FREEDRAW_TOOLS[0]
+                }
               />
             );
           }

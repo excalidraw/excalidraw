@@ -613,6 +613,18 @@ let twoFingerTouchStart: {
   positions: Array<{ x: number; y: number }>;
 } | null = null;
 let lastTwoFingerTapTime = 0;
+// Highlighter mode preset values
+let isHighlighterMode = false;
+let savedPencilSettings: {
+  strokeWidth: number;
+  opacity: number;
+} | null = null;
+
+const HIGHLIGHTER_DEFAULTS = {
+  strokeWidth: 12,
+  opacity: 40,
+};
+
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
@@ -5629,6 +5641,31 @@ class App extends React.Component<AppProps, AppState> {
         activeTool: nextActiveTool,
       };
     });
+  };
+
+  toggleHighlighterMode = (enable: boolean) => {
+    if (enable && !isHighlighterMode) {
+      // Save current pencil settings
+      savedPencilSettings = {
+        strokeWidth: this.state.currentItemStrokeWidth,
+        opacity: this.state.currentItemOpacity,
+      };
+      // Apply highlighter defaults
+      this.setState({
+        currentItemStrokeWidth: HIGHLIGHTER_DEFAULTS.strokeWidth,
+        currentItemOpacity: HIGHLIGHTER_DEFAULTS.opacity,
+      });
+      isHighlighterMode = true;
+    } else if (!enable && isHighlighterMode) {
+      // Restore pencil settings
+      if (savedPencilSettings) {
+        this.setState({
+          currentItemStrokeWidth: savedPencilSettings.strokeWidth,
+          currentItemOpacity: savedPencilSettings.opacity,
+        });
+      }
+      isHighlighterMode = false;
+    }
   };
 
   setOpenDialog = (dialogType: AppState["openDialog"]) => {

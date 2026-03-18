@@ -848,6 +848,7 @@ export type AppClassProperties = {
   bindModeHandler: App["bindModeHandler"];
 
   setAppState: App["setAppState"];
+  toggleHighlighterMode: App["toggleHighlighterMode"];
 };
 
 export type PointerDownState = Readonly<{

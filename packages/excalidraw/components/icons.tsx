@@ -616,6 +616,36 @@ export const FreedrawIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+// highlighter marker icon
+export const HighlighterIcon = createIcon(
+  <g stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+    <path
+      d="M15.5 2.5L21.5 8.5L12 18L6 18L6 12L15.5 2.5Z"
+      strokeWidth="1.25"
+      fill="none"
+    />
+    <path d="M6 18L3 21L6 21L7.5 19.5" strokeWidth="1.25" fill="none" />
+    <line
+      x1="14"
+      y1="6"
+      x2="18"
+      y2="10"
+      strokeOpacity="0.5"
+      strokeWidth="1.25"
+    />
+    <line
+      x1="12"
+      y1="8"
+      x2="16"
+      y2="12"
+      strokeOpacity="0.5"
+      strokeWidth="1.25"
+    />
+    <line x1="6" y1="12" x2="12" y2="18" strokeWidth="1.25" />
+  </g>,
+  { fill: "none", width: 24, height: 24 },
+);
+
 // tabler-icons: typography
 export const TextIcon = createIcon(
   <g strokeWidth="1.5">
