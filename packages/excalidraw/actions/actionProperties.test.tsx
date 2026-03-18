@@ -10,7 +10,15 @@ import {
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import { UI } from "../tests/helpers/ui";
-import { render } from "../tests/test-utils";
+import { act, render } from "../tests/test-utils";
+
+import {
+  actionChangeBackgroundColor,
+  actionChangeRoundness,
+  actionChangeStrokeWidth,
+} from "./actionProperties";
+
+const { h } = window;
 
 describe("element locking", () => {
   beforeEach(async () => {
@@ -183,6 +191,73 @@ describe("element locking", () => {
       expect(queryByTestId(document.body, `font-family-code`)).toHaveClass(
         "active",
       );
+    });
+
+    it("should not update text background when changing background in mixed frame selection", () => {
+      const frame = API.createElement({
+        type: "frame",
+      });
+      const text = API.createElement({
+        type: "text",
+        backgroundColor: COLOR_PALETTE.transparent,
+      });
+      API.setElements([text, frame]);
+      API.setSelectedElements([text, frame]);
+
+      act(() => {
+        h.app.actionManager.executeAction(actionChangeBackgroundColor, "ui", {
+          currentItemBackgroundColor: "#ffc9c9",
+        });
+      });
+
+      expect(API.getElement(frame).backgroundColor).toBe("#ffc9c9");
+      expect(API.getElement(text).backgroundColor).toBe(
+        COLOR_PALETTE.transparent,
+      );
+    });
+
+    it("should not update frame stroke width when changing stroke width in mixed selection", () => {
+      const frame = API.createElement({
+        type: "frame",
+      });
+      const rect = API.createElement({
+        type: "rectangle",
+        strokeWidth: STROKE_WIDTH.thin,
+      });
+      API.setElements([rect, frame]);
+      API.setSelectedElements([rect, frame]);
+
+      const originalFrameStrokeWidth = API.getElement(frame).strokeWidth;
+
+      act(() => {
+        h.app.actionManager.executeAction(
+          actionChangeStrokeWidth,
+          "ui",
+          STROKE_WIDTH.extraBold,
+        );
+      });
+
+      expect(API.getElement(rect).strokeWidth).toBe(STROKE_WIDTH.extraBold);
+      expect(API.getElement(frame).strokeWidth).toBe(originalFrameStrokeWidth);
+    });
+
+    it("should not update frame roundness when changing roundness in mixed selection", () => {
+      const frame = API.createElement({
+        type: "frame",
+      });
+      const rect = API.createElement({
+        type: "rectangle",
+        roundness: null,
+      });
+      API.setElements([rect, frame]);
+      API.setSelectedElements([rect, frame]);
+
+      act(() => {
+        h.app.actionManager.executeAction(actionChangeRoundness, "ui", "round");
+      });
+
+      expect(API.getElement(rect).roundness).not.toBe(null);
+      expect(API.getElement(frame).roundness).toBe(null);
     });
   });
 });
