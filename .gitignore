@@ -29,3 +29,4 @@ html
 meta*.json
 .claude
 packages/excalidraw/.npmrc
+*.superpowers/

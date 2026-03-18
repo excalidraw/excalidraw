@@ -20,8 +20,17 @@ What we changed vs upstream (upstream tag: `v0.18.0`):
 - **Russian keyboard ЙЦУКЕН** -- hotkeys work on Russian layout via `getLatinKey()` + Proxy in `App.tsx` (`packages/common/src/keys.ts`, `packages/excalidraw/components/App.tsx`, `packages/excalidraw/components/shapes.tsx`)
 - **Preferences in hamburger menu** -- grid toggle and other settings (`packages/excalidraw/components/LayerUI.tsx`)
 - **Render crash protection** -- try-catch wrapper in `_renderInteractiveScene` (`packages/excalidraw/renderer/interactiveScene.ts`)
-- **Selection/Lasso ToolPopover** -- toggle in compact mode (`packages/excalidraw/components/Actions.tsx`)
+- **Selection/Lasso ToolPopover** -- toggle in compact mode, deduplicated with `renderedSelectionPopover` ref (`packages/excalidraw/components/Actions.tsx`)
 - **TS 5.7 fixes** -- ArrayBuffer/BufferSource type assertions across multiple files
+- **Wireframe (3D preset) UX** -- click-through vertex drag on first click, `move` cursor on vertex hover, wider edge grab zone (10px), block double-click group entry for wireframes, vertex priority over resize handles (`packages/excalidraw/components/App.tsx`)
+- **Draggable cone apex** -- shared vertex ID `"APEX"` on cone lateral lines (`packages/excalidraw/shapePresets/solidFactory.ts`)
+- **Two-finger double-tap undo** -- two consecutive two-finger taps on touchscreen triggers undo (`packages/excalidraw/components/App.tsx`)
+- **Mobile toolbar presets** -- all 14 shape presets (7 2D + 7 3D) added to mobile SHAPE_TOOLS, line as default linear tool (`packages/excalidraw/components/MobileToolBar.tsx`)
+- **Mobile dropdown positioning** -- extra tools dropdown opens upward (`side="top"`) to stay within canvas bounds (`packages/excalidraw/components/MobileToolBar.tsx`, `packages/excalidraw/components/dropdownMenu/DropdownMenuContent.tsx`)
+- **Canvas background color picks** -- TopPicks visible in compact mode for canvas background (`packages/excalidraw/components/ColorPicker/ColorPicker.tsx`)
+- **Linear editor safety** -- "Edit line" action requires `selectedLinearElement` in state, prevents crash on non-linear elements (`packages/excalidraw/actions/actionLinearEditor.tsx`, `packages/excalidraw/components/Actions.tsx`)
+- **Confirm dialog compact** -- confirm dialog never goes fullscreen in compact/phone mode (`packages/excalidraw/components/ConfirmDialog.scss`)
+- **Triangular prism edges** -- right lateral and top-left edges rendered solid (not dashed) (`packages/excalidraw/shapePresets/solidFactory.ts`)
 
 ## Development Flow
 
