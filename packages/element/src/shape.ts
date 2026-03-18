@@ -1314,45 +1314,28 @@ export const getFreedrawOutlinePoints = (
   }) as [number, number][];
 };
 
-const average = (a: number, b: number) => (a + b) / 2;
+const med = (A: number[], B: number[]): string =>
+  `${((A[0] + B[0]) / 2).toFixed(2)} ${((A[1] + B[1]) / 2).toFixed(2)}`;
+
+const pt = (P: number[]): string => `${P[0].toFixed(2)} ${P[1].toFixed(2)}`;
 
 const getSvgPathFromStroke = (points: number[][]): string => {
-  const len = points.length;
+  if (!points.length) {
+    return "";
+  }
 
-  // Short strokes: render as a dot
-  if (len < 4) {
-    if (len === 0) {
-      return "";
+  const max = points.length - 1;
+  let d = `M${pt(points[0])} Q`;
+
+  for (let i = 0; i <= max; i++) {
+    if (i === max) {
+      d += `${pt(points[i])} ${med(points[i], points[0])} L${pt(points[0])} Z`;
+    } else {
+      d += `${pt(points[i])} ${med(points[i], points[i + 1])} `;
     }
-    // Single point or very short — draw a tiny circle via SVG arc
-    const [x, y] = points[0];
-    const r = 0.5;
-    return `M${x - r},${y} a${r},${r} 0 1,0 ${r * 2},0 a${r},${r} 0 1,0 -${
-      r * 2
-    },0 Z`;
   }
 
-  let a = points[0];
-  let b = points[1];
-  const c = points[2];
-
-  let result = `M${a[0].toFixed(2)},${a[1].toFixed(2)} Q${b[0].toFixed(
-    2,
-  )},${b[1].toFixed(2)} ${average(b[0], c[0]).toFixed(2)},${average(
-    b[1],
-    c[1],
-  ).toFixed(2)} T`;
-
-  for (let i = 2, max = len - 1; i < max; i++) {
-    a = points[i];
-    b = points[i + 1];
-    result += `${average(a[0], b[0]).toFixed(2)},${average(a[1], b[1]).toFixed(
-      2,
-    )} `;
-  }
-
-  result += "Z";
-  return result;
+  return d;
 };
 
 // -----------------------------------------------------------------------------
