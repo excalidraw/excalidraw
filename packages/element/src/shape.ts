@@ -1307,8 +1307,8 @@ export const getFreedrawOutlinePoints = (
     simulatePressure: element.simulatePressure,
     size: element.strokeWidth * 4.25,
     thinning: 0.6,
-    smoothing: 0.5,
-    streamline: 0.5,
+    smoothing: 0.7,
+    streamline: 0.65,
     easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
     last: true,
   }) as [number, number][];
