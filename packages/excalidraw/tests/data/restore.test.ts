@@ -95,7 +95,7 @@ describe("restoreElements", () => {
       null,
     )[0] as ExcalidrawFrameElement;
 
-    expect(restoredFrame.backgroundColor).toBe("#ffc9c9");
+    expect(restoredFrame.backgroundColor).toBe("transparent");
     expect(restoredFrame.backgroundEnabled).toBe(false);
   });
 

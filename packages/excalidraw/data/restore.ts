@@ -509,9 +509,17 @@ export const restoreElement = (
         name: element.name ?? null,
       });
     case "frame":
+      const hasBackgroundEnabled = Object.prototype.hasOwnProperty.call(
+        element,
+        "backgroundEnabled",
+      );
+      const backgroundEnabled = (element as any).backgroundEnabled ?? false;
       return restoreElementWithProperties(element, {
         name: element.name ?? null,
-        backgroundEnabled: (element as any).backgroundEnabled ?? false,
+        backgroundEnabled,
+        ...(hasBackgroundEnabled
+          ? {}
+          : { backgroundColor: DEFAULT_ELEMENT_PROPS.backgroundColor }),
       });
 
     // Don't use default case so as to catch a missing an element type case.
