@@ -607,10 +607,11 @@ let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
 let firstTapPosition: { x: number; y: number } | null = null;
 // Two-finger double-tap for undo (like Procreate)
-// Detect on touchend: if both fingers lifted quickly and didn't move much → tap
+// Track by touch.identifier so lift-order doesn't matter
 let twoFingerTouchStart: {
   time: number;
-  positions: Array<{ x: number; y: number }>;
+  positions: Map<number, { x: number; y: number }>;
+  liftedOk: Map<number, boolean>; // identifier → true if lifted within distance
 } | null = null;
 let lastTwoFingerTapTime = 0;
 // Three independent settings sets for pencil, highlighter, and shapes
@@ -3663,12 +3664,15 @@ class App extends React.Component<AppProps, AppState> {
 
     if (event.touches.length === 2) {
       // Record two-finger touch start for tap detection on touchend
+      const positions = new Map<number, { x: number; y: number }>();
+      for (let i = 0; i < event.touches.length; i++) {
+        const t = event.touches[i];
+        positions.set(t.identifier, { x: t.clientX, y: t.clientY });
+      }
       twoFingerTouchStart = {
         time: Date.now(),
-        positions: Array.from(event.touches).map((t) => ({
-          x: t.clientX,
-          y: t.clientY,
-        })),
+        positions,
+        liftedOk: new Map(),
       };
 
       this.setState({
@@ -3680,39 +3684,45 @@ class App extends React.Component<AppProps, AppState> {
 
   private onTouchEnd = (event: TouchEvent) => {
     // Two-finger double-tap undo detection
-    if (
-      twoFingerTouchStart &&
-      event.touches.length === 0 // both fingers lifted
-    ) {
+    // Fingers lift separately — track each by identifier
+    if (twoFingerTouchStart) {
       const duration = Date.now() - twoFingerTouchStart.time;
+
       if (duration < TWO_FINGER_TAP_MAX_DURATION) {
-        // Check that fingers didn't move much (not a pinch/swipe)
-        const touches = event.changedTouches;
-        let movedTooMuch = false;
-        for (let i = 0; i < touches.length; i++) {
-          const start = twoFingerTouchStart.positions[i];
+        // Check each lifted finger by its identifier
+        for (let i = 0; i < event.changedTouches.length; i++) {
+          const touch = event.changedTouches[i];
+          const start = twoFingerTouchStart.positions.get(touch.identifier);
           if (start) {
-            const dx = touches[i].clientX - start.x;
-            const dy = touches[i].clientY - start.y;
-            if (Math.hypot(dx, dy) > TWO_FINGER_TAP_MAX_DISTANCE) {
-              movedTooMuch = true;
-              break;
+            const dx = touch.clientX - start.x;
+            const dy = touch.clientY - start.y;
+            const ok = Math.hypot(dx, dy) <= TWO_FINGER_TAP_MAX_DISTANCE;
+            twoFingerTouchStart.liftedOk.set(touch.identifier, ok);
+          }
+        }
+
+        // When both fingers have been lifted
+        if (twoFingerTouchStart.liftedOk.size >= 2) {
+          const allOk = Array.from(twoFingerTouchStart.liftedOk.values()).every(
+            Boolean,
+          );
+          if (allOk) {
+            const now = Date.now();
+            if (now - lastTwoFingerTapTime < TWO_FINGER_DOUBLE_TAP_TIMEOUT) {
+              // Second two-finger tap → undo
+              lastTwoFingerTapTime = 0;
+              twoFingerTouchStart = null;
+              this.actionManager.executeAction(this.undoAction, "ui");
+              return;
             }
+            lastTwoFingerTapTime = now;
           }
+          twoFingerTouchStart = null;
         }
-        if (!movedTooMuch) {
-          const now = Date.now();
-          if (now - lastTwoFingerTapTime < TWO_FINGER_DOUBLE_TAP_TIMEOUT) {
-            // Second two-finger tap → undo
-            lastTwoFingerTapTime = 0;
-            twoFingerTouchStart = null;
-            this.actionManager.executeAction(this.undoAction, "ui");
-            return;
-          }
-          lastTwoFingerTapTime = now;
-        }
+      } else {
+        // Too slow — not a tap
+        twoFingerTouchStart = null;
       }
-      twoFingerTouchStart = null;
     }
 
     this.resetContextMenuTimer();
