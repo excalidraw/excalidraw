@@ -932,8 +932,8 @@ export const renderElement = (
           tempCanvasContext.scale(appState.exportScale, appState.exportScale);
 
           // Shift the canvas to left most point of the arrow
-          shiftX = element.width / 2 - (element.x - x1);
-          shiftY = element.height / 2 - (element.y - y1);
+          shiftX = (x2 - x1) / 2 - (element.x - x1);
+          shiftY = (y2 - y1) / 2 - (element.y - y1);
 
           tempCanvasContext.rotate(element.angle);
           const tempRc = rough.canvas(tempCanvas);
