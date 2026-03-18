@@ -384,14 +384,14 @@ body.excalidraw-cursor-resize * {
 
   .App-menu_bottom {
     position: absolute;
-    bottom: 1rem;
+    bottom: var(--editor-container-padding);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
     box-sizing: border-box;
-    padding: 0 1rem;
+    padding: 0 var(--editor-container-padding);
 
     &--transition-left {
       section {
