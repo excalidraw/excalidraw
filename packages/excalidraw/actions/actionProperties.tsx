@@ -579,9 +579,9 @@ export const actionChangeStrokeWidth = register<
           strokeColor={appState.currentItemStrokeColor}
           opacity={appState.currentItemOpacity}
           onChange={(val) => updateData(val)}
-          min={isHighlighter ? 1 : 0.5}
-          max={isHighlighter ? 16 : 8}
-          step={isHighlighter ? 1 : 0.5}
+          min={isHighlighter ? 8 : 0.5}
+          max={isHighlighter ? 40 : 8}
+          step={isHighlighter ? 2 : 0.5}
         />
       </fieldset>
     );

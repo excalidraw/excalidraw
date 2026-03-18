@@ -623,7 +623,7 @@ type ToolSettings = {
 
 const toolSettings: Record<"pencil" | "highlighter" | "shape", ToolSettings> = {
   pencil: { strokeWidth: 1, opacity: 100, strokeColor: "#000000" },
-  highlighter: { strokeWidth: 6, opacity: 40, strokeColor: "#ffeb3b" },
+  highlighter: { strokeWidth: 12, opacity: 40, strokeColor: "#ffeb3b" },
   shape: { strokeWidth: 1, opacity: 100, strokeColor: "#000000" },
 };
 
