@@ -30,6 +30,14 @@
     background-color: var(--color-warning);
   }
 
+  .App-toolbar__dblclickProgress--repeatKey {
+    background-color: var(--button-gray-3);
+  }
+
+  .App-toolbar__dblclickProgressBar--repeatKey {
+    background-color: var(--color-danger);
+  }
+
   .App-toolbar {
     &.zen-mode {
       .ToolIcon__keybinding,

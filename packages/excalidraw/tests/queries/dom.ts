@@ -17,8 +17,12 @@ export const getTextEditor = async ({
   try {
     const query = () => document.querySelector(selector) as HTMLTextAreaElement;
     if (waitForEditor) {
-      await waitFor(() => expect(query()).not.toBe(null));
-      return query();
+      let editor: HTMLTextAreaElement | null = null;
+      await waitFor(() => {
+        editor = query();
+        expect(editor).not.toBe(null);
+      });
+      return editor!;
     }
     return query();
   } catch (err: any) {

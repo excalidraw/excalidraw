@@ -365,13 +365,29 @@ finished:
 
 
 
+更新移动画布操作方式;
+没有选中任何画布中元素的情况下,使用上下左右键移动画布,一下移动一个网格的距离;(按住不放连续移动,连续移动激发时间50ms)(按住上下左右键某一个按键不放,200ms后自动再次按下这个按键)
+(在Island App-toolbar双击选词三击选行的倒计时下方添加相同样式的红色再次按下倒计时,倒计时结束后再次按下按住的按键)
+在编辑文本时,使用ctrl+上下左右键移动画布,一下移动一个网格距离,(按住不放连续移动,连续移动激发时间50ms)
+取消目前选中元素使用上下左右键移动的功能;
+目前在编辑文本框时,按住ctrl+上下左右键会移动文本框(与编辑时ctrl+上下左右键移动画布冲突);改为移动画布,不移动文本框;
+新增断言：文本编辑态 Ctrl+方向键移动画布时，文本元素坐标不变：
+
+
+yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run -t "should'nt bind text to container when not double clicked on center"
+yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run --bail=1
+yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run
 
 
 
+
+
+yarn test:app --watch=false packages/excalidraw/tests/canvasMoveByArrowKeys.test.tsx packages/excalidraw/tests/move.test.tsx --run
 
 启动:
 yarn --cwd ./excalidraw-app vite --port 3000 --strictPort
 测试:
+yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run -t "Test container-bound text" --reporter=dot
 yarn test:e2e --project=chromium --grep "first click to edit selected multi-line"
 控制台:
 window.EXCALIDRAW_WYSIWYG_DEBUG = true
@@ -382,14 +398,23 @@ yarn test:app --run --reporter=verbose
 yarn vitest packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run -t "same rate" --reporter=verbose
 yarn vitest packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run -t "keep caret visible" --reporter=verbose
 yarn test:typecheck; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; yarn test:code; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-
-
-
-
-
-
 yarn test:app --watch=false
+yarn test:app --watch=false --run --reporter=verbose --bail=1
+yarn test:app --watch=false --bail=1 --reporter=dot
+yarn test:app --watch=false packages/excalidraw/tests/contextmenu.test.tsx --run --reporter=dot
+yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run --reporter=dot
+yarn test:app --watch=false packages/excalidraw/tests/canvasMoveByArrowKeys.test.tsx --run --reporter=dot
+yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run -t "should bind text to container when triggered via context menu" --reporter=dot
+
+
+
+
+
+
+
+
+
+
 yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx
 yarn test:app --watch=false --bail=1
 yarn eslint --max-warnings=0 e2e/text-wrap-consistency.spec.ts; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

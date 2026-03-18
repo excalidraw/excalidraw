@@ -58,6 +58,7 @@ export default defineConfig({
       "**/node_modules/**",
       "**/dist/**",
       "**/packages/element/tests-notuse/**",
+      "**/e2e/**",
     ],
     coverage: {
       reporter: ["text", "json-summary", "json", "html", "lcovonly"],

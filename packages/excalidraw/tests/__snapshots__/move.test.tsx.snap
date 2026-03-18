@@ -162,11 +162,11 @@ exports[`move element > rectangles with binding arrow 6`] = `
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 7,
-  "versionNonce": 735304455,
+  "version": 4,
+  "versionNonce": 908564423,
   "width": 300,
-  "x": 201,
-  "y": 2,
+  "x": 200,
+  "y": 0,
 }
 `;
 
@@ -189,13 +189,12 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "90.01760",
+  "height": "88.01760",
   "id": "id6",
   "index": "a2",
   "isDeleted": false,
   "link": null,
   "locked": false,
-  "moveMidPointsWithElement": false,
   "opacity": 100,
   "points": [
     [
@@ -203,8 +202,8 @@ exports[`move element > rectangles with binding arrow 7`] = `
       0,
     ],
     [
-      89,
-      "90.01760",
+      "88.00000",
+      "88.01760",
     ],
   ],
   "roughness": 1,
@@ -226,10 +225,10 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 13,
-  "versionNonce": 271613161,
-  "width": 89,
-  "x": 106,
+  "version": 10,
+  "versionNonce": 1163661225,
+  "width": "88.00000",
+  "x": "106.00000",
   "y": "56.01120",
 }
 `;

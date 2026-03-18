@@ -93,6 +93,8 @@ const checkpoint = (name: string) => {
   // `selectedLinearElemnt` includes `startBindingElement` containing seed and versionNonce
   const {
     name: _,
+    gridCharTopMeasurement: _gridCharTopMeasurement,
+    preciseMeasurement: _preciseMeasurement,
     scrolledOutside,
     selectedLinearElement,
     ...strippedAppState

@@ -33,7 +33,12 @@ const checkpoint = (name: string) => {
   expect(renderStaticScene.mock.calls.length).toMatchSnapshot(
     `[${name}] number of renders`,
   );
-  expect(h.state).toMatchSnapshot(`[${name}] appState`);
+  const {
+    gridCharTopMeasurement: _gridCharTopMeasurement,
+    preciseMeasurement: _preciseMeasurement,
+    ...appState
+  } = h.state as any;
+  expect(appState).toMatchSnapshot(`[${name}] appState`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
   h.elements.forEach((element, i) =>
     expect(element).toMatchSnapshot(`[${name}] element ${i}`),

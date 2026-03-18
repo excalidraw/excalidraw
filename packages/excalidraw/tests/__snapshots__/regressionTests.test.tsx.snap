@@ -2363,7 +2363,7 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
 
 exports[`regression tests > arrow keys > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > arrow keys > [end of test] number of renders 1`] = `12`;
+exports[`regression tests > arrow keys > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > arrow keys > [end of test] redo stack 1`] = `[]`;
 

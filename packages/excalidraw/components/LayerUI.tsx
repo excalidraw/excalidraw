@@ -138,7 +138,7 @@ const DefaultOverwriteConfirmDialog = () => {
 };
 
 type SelectCountdownDetail = {
-  kind: "word" | "line";
+  kind: "word" | "line" | "repeatKey";
   remainingMs: number;
   durationMs: number;
   active: boolean;
@@ -146,6 +146,7 @@ type SelectCountdownDetail = {
 
 const WORD_COUNTDOWN_EVENT = "excalidraw:selectWordCountdown";
 const LINE_COUNTDOWN_EVENT = "excalidraw:selectLineCountdown";
+const REPEAT_KEY_COUNTDOWN_EVENT = "excalidraw:canvasMoveRepeatCountdown";
 
 const CountdownBar = ({
   kind,
@@ -194,6 +195,7 @@ const CountdownBar = ({
     <div
       className={clsx("App-toolbar__dblclickProgress", {
         "App-toolbar__dblclickProgress--line": state.kind === "line",
+        "App-toolbar__dblclickProgress--repeatKey": state.kind === "repeatKey",
       })}
       role="progressbar"
       aria-label={ariaLabel}
@@ -204,6 +206,8 @@ const CountdownBar = ({
       <div
         className={clsx("App-toolbar__dblclickProgressBar", {
           "App-toolbar__dblclickProgressBar--line": state.kind === "line",
+          "App-toolbar__dblclickProgressBar--repeatKey":
+            state.kind === "repeatKey",
         })}
         style={{ transform: `scaleX(${progress})` }}
       />
@@ -450,6 +454,11 @@ const LayerUI = ({
                             kind="line"
                             eventName={LINE_COUNTDOWN_EVENT}
                             ariaLabel="Triple click remaining time"
+                          />
+                          <CountdownBar
+                            kind="repeatKey"
+                            eventName={REPEAT_KEY_COUNTDOWN_EVENT}
+                            ariaLabel="Repeat key remaining time"
                           />
                         </div>
                         {isCollaborating && (

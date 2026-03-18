@@ -517,7 +517,10 @@ export class UI {
 
     if (type === "text") {
       mouse.reset();
-      mouse.click(x, y);
+      fireEvent.click(GlobalTestState.interactiveCanvas, {
+        clientX: x,
+        clientY: y,
+      });
     } else if ((type === "line" || type === "arrow") && points.length > 2) {
       points.forEach((point) => {
         mouse.reset();
@@ -652,11 +655,11 @@ export class UI {
     });
   }
 
-  static queryContextMenu = () => {
-    return GlobalTestState.renderResult.container.querySelector(
-      ".context-menu",
-    ) as HTMLElement | null;
-  };
+  static queryContextMenu = (): HTMLElement | null =>
+    (document.querySelector(".context-menu") ||
+      GlobalTestState.renderResult.container.querySelector(
+        ".context-menu",
+      )) as HTMLElement | null;
 
   static queryStats = () => {
     return GlobalTestState.renderResult.container.querySelector(

@@ -30,7 +30,6 @@ import {
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
-  ELEMENT_SHIFT_TRANSLATE_AMOUNT,
   ELEMENT_TRANSLATE_AMOUNT,
   EVENT,
   FRAME_STYLE,
@@ -613,6 +612,10 @@ let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
 let PLAIN_PASTE_TOAST_SHOWN = false;
 
+const CANVAS_MOVE_REPEAT_INTERVAL_MS = 200;
+const CANVAS_MOVE_REPEAT_COUNTDOWN_EVENT =
+  "excalidraw:canvasMoveRepeatCountdown";
+
 let lastPointerUp: (() => void) | null = null;
 const gesture: Gesture = {
   pointers: new Map(),
@@ -653,6 +656,13 @@ class App extends React.Component<AppProps, AppState> {
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
   private iFrameRefs = new Map<ExcalidrawElement["id"], HTMLIFrameElement>();
+  private canvasMoveRepeatKey: string | null = null;
+  private canvasMoveRepeatCtrlRequired = false;
+  private canvasMoveRepeatTimeoutId: number | null = null;
+  private canvasMoveRepeatIntervalId: number | null = null;
+  private canvasMoveRepeatCountdownRaf: number | null = null;
+  private canvasMoveRepeatCountdownStartAt = 0;
+  private canvasMoveRepeatCountdownDurationMs = CANVAS_MOVE_REPEAT_INTERVAL_MS;
   private plainTextCopy = null as null | {
     text: string;
     elements: readonly ExcalidrawElement[];
@@ -3114,6 +3124,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public componentWillUnmount() {
     (window as any).launchQueue?.setConsumer(() => {});
+    this.stopCanvasMoveRepeat();
     this.renderer.destroy();
     this.scene.destroy();
     this.scene = new Scene();
@@ -4443,6 +4454,143 @@ class App extends React.Component<AppProps, AppState> {
     this.setState(state);
   };
 
+  private emitCanvasMoveRepeatCountdown = ({
+    remainingMs,
+    durationMs,
+    active,
+  }: {
+    remainingMs: number;
+    durationMs: number;
+    active: boolean;
+  }) => {
+    window.dispatchEvent(
+      new CustomEvent(CANVAS_MOVE_REPEAT_COUNTDOWN_EVENT, {
+        detail: {
+          kind: "repeatKey",
+          remainingMs,
+          durationMs,
+          active,
+        },
+      }),
+    );
+  };
+
+  private startCanvasMoveRepeatCountdownLoop = () => {
+    if (this.canvasMoveRepeatCountdownRaf != null) {
+      return;
+    }
+
+    const tick = () => {
+      if (!this.canvasMoveRepeatKey) {
+        this.canvasMoveRepeatCountdownRaf = null;
+        this.emitCanvasMoveRepeatCountdown({
+          remainingMs: 0,
+          durationMs: this.canvasMoveRepeatCountdownDurationMs,
+          active: false,
+        });
+        return;
+      }
+
+      const elapsed = performance.now() - this.canvasMoveRepeatCountdownStartAt;
+      const remaining = Math.max(
+        0,
+        this.canvasMoveRepeatCountdownDurationMs - elapsed,
+      );
+
+      this.emitCanvasMoveRepeatCountdown({
+        remainingMs: remaining,
+        durationMs: this.canvasMoveRepeatCountdownDurationMs,
+        active: true,
+      });
+
+      this.canvasMoveRepeatCountdownRaf = requestAnimationFrame(tick);
+    };
+
+    tick();
+  };
+
+  private resetCanvasMoveRepeatCountdown = () => {
+    this.canvasMoveRepeatCountdownDurationMs = CANVAS_MOVE_REPEAT_INTERVAL_MS;
+    this.canvasMoveRepeatCountdownStartAt = performance.now();
+    this.startCanvasMoveRepeatCountdownLoop();
+  };
+
+  private stopCanvasMoveRepeat = () => {
+    this.canvasMoveRepeatKey = null;
+    this.canvasMoveRepeatCtrlRequired = false;
+
+    if (this.canvasMoveRepeatTimeoutId != null) {
+      window.clearTimeout(this.canvasMoveRepeatTimeoutId);
+      this.canvasMoveRepeatTimeoutId = null;
+    }
+
+    if (this.canvasMoveRepeatIntervalId != null) {
+      window.clearInterval(this.canvasMoveRepeatIntervalId);
+      this.canvasMoveRepeatIntervalId = null;
+    }
+
+    if (this.canvasMoveRepeatCountdownRaf != null) {
+      cancelAnimationFrame(this.canvasMoveRepeatCountdownRaf);
+      this.canvasMoveRepeatCountdownRaf = null;
+    }
+
+    this.emitCanvasMoveRepeatCountdown({
+      remainingMs: 0,
+      durationMs: this.canvasMoveRepeatCountdownDurationMs,
+      active: false,
+    });
+  };
+
+  private translateCanvasByArrowKey = (key: string) => {
+    const step = this.state.gridSize || ELEMENT_TRANSLATE_AMOUNT;
+    let deltaX = 0;
+    let deltaY = 0;
+
+    if (key === KEYS.ARROW_LEFT) {
+      deltaX = step;
+    } else if (key === KEYS.ARROW_RIGHT) {
+      deltaX = -step;
+    } else if (key === KEYS.ARROW_UP) {
+      deltaY = step;
+    } else if (key === KEYS.ARROW_DOWN) {
+      deltaY = -step;
+    }
+
+    if (!deltaX && !deltaY) {
+      return;
+    }
+
+    this.translateCanvas((state) => ({
+      scrollX: state.scrollX + deltaX,
+      scrollY: state.scrollY + deltaY,
+    }));
+  };
+
+  private startCanvasMoveRepeat = (key: string, ctrlRequired: boolean) => {
+    this.stopCanvasMoveRepeat();
+    this.canvasMoveRepeatKey = key;
+    this.canvasMoveRepeatCtrlRequired = ctrlRequired;
+
+    this.translateCanvasByArrowKey(key);
+    this.resetCanvasMoveRepeatCountdown();
+
+    this.canvasMoveRepeatTimeoutId = window.setTimeout(() => {
+      if (this.canvasMoveRepeatKey !== key) {
+        return;
+      }
+      this.translateCanvasByArrowKey(key);
+      this.resetCanvasMoveRepeatCountdown();
+
+      this.canvasMoveRepeatIntervalId = window.setInterval(() => {
+        if (this.canvasMoveRepeatKey !== key) {
+          return;
+        }
+        this.translateCanvasByArrowKey(key);
+        this.resetCanvasMoveRepeatCountdown();
+      }, CANVAS_MOVE_REPEAT_INTERVAL_MS);
+    }, CANVAS_MOVE_REPEAT_INTERVAL_MS);
+  };
+
   setToast = (toast: AppState["toast"]) => {
     this.setState({ toast });
   };
@@ -4967,13 +5115,18 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       // bail if
+      const allowCtrlArrowCanvasMoveWhileTextEditing =
+        !!this.state.editingTextElement &&
+        event[KEYS.CTRL_OR_CMD] &&
+        isArrowKey(event.key);
       if (
         // inside an input
-        (isWritableElement(event.target) &&
+        ((isWritableElement(event.target) &&
           // unless pressing escape (finalize action)
           event.key !== KEYS.ESCAPE) ||
-        // or unless using arrows (to move between buttons)
-        (isArrowKey(event.key) && isInputLike(event.target))
+          // or unless using arrows (to move between buttons)
+          (isArrowKey(event.key) && isInputLike(event.target))) &&
+        !allowCtrlArrowCanvasMoveWhileTextEditing
       ) {
         return;
       }
@@ -5115,6 +5268,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (isArrowKey(event.key)) {
+        const isTextEditing = !!this.state.editingTextElement;
         let selectedElements = this.scene.getSelectedElements({
           selectedElementIds: this.state.selectedElementIds,
           includeBoundTextElement: true,
@@ -5146,46 +5300,35 @@ class App extends React.Component<AppProps, AppState> {
           (el) => !arrowIdsToRemove.has(el.id),
         );
 
-        const step =
-          (this.getEffectiveGridSize() &&
-            (event.shiftKey
-              ? ELEMENT_TRANSLATE_AMOUNT
-              : this.getEffectiveGridSize())) ||
-          (event.shiftKey
-            ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
-            : ELEMENT_TRANSLATE_AMOUNT);
-
-        let offsetX = 0;
-        let offsetY = 0;
-
-        if (event.key === KEYS.ARROW_LEFT) {
-          offsetX = -step;
-        } else if (event.key === KEYS.ARROW_RIGHT) {
-          offsetX = step;
-        } else if (event.key === KEYS.ARROW_UP) {
-          offsetY = -step;
-        } else if (event.key === KEYS.ARROW_DOWN) {
-          offsetY = step;
+        if (isTextEditing && event[KEYS.CTRL_OR_CMD]) {
+          selectedElements = [];
         }
 
-        selectedElements.forEach((element) => {
-          this.scene.mutateElement(
-            element,
-            {
-              x: element.x + offsetX,
-              y: element.y + offsetY,
-            },
-            { informMutation: false, isDragging: false },
-          );
+        if (selectedElements.length === 0) {
+          const ctrlRequired = isTextEditing;
 
-          updateBoundElements(element, this.scene, {
-            simultaneouslyUpdated: selectedElements,
-          });
-        });
+          if (ctrlRequired && !event[KEYS.CTRL_OR_CMD]) {
+            return;
+          }
 
-        this.scene.triggerUpdate();
+          if (
+            !ctrlRequired &&
+            (event.shiftKey || event.altKey || event[KEYS.CTRL_OR_CMD])
+          ) {
+            event.preventDefault();
+            return;
+          }
+
+          if (!event.repeat) {
+            this.startCanvasMoveRepeat(event.key, ctrlRequired);
+          }
+
+          event.preventDefault();
+          return;
+        }
 
         event.preventDefault();
+        return;
       } else if (event.key === KEYS.ENTER) {
         const selectedElements = this.scene.getSelectedElements(this.state);
         if (selectedElements.length === 1) {
@@ -5321,6 +5464,14 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
+    if (
+      this.canvasMoveRepeatKey &&
+      (event.key === this.canvasMoveRepeatKey ||
+        (this.canvasMoveRepeatCtrlRequired && !event[KEYS.CTRL_OR_CMD]))
+    ) {
+      this.stopCanvasMoveRepeat();
+    }
+
     if (event.key === KEYS.SPACE) {
       if (
         (this.state.viewModeEnabled &&

@@ -119,24 +119,23 @@ describe("move element", () => {
     renderInteractiveScene.mockClear();
     renderStaticScene.mockClear();
 
-    // Move selected rectangle
+    // Arrow keys should not move selected elements
     Keyboard.keyDown(KEYS.ARROW_RIGHT);
     Keyboard.keyDown(KEYS.ARROW_DOWN);
     Keyboard.keyDown(KEYS.ARROW_DOWN);
 
-    // Check that the arrow size has been changed according to moving the rectangle
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`3`);
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`3`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`0`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`0`);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
-    expect([rectB.x, rectB.y]).toEqual([201, 2]);
+    expect([rectB.x, rectB.y]).toEqual([200, 0]);
     expect([[arrow.x, arrow.y]]).toCloselyEqualPoints(
-      [[106, 55.6867741935484]],
+      [[106.00000000000001, 55.6867741935484]],
       0,
     );
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[89, 90]], 0);
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[88, 88]], 0);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
