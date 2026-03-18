@@ -232,6 +232,67 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(1);
     });
 
+    it("should edit selected bound text on single click", async () => {
+      const container = API.createElement({
+        type: "rectangle",
+        width: 160,
+        height: 70,
+        boundElements: [],
+      });
+      const text = API.createElement({
+        type: "text",
+        text: "Hello World!",
+        x: container.x + 20,
+        y: container.y + 20,
+        width: 120,
+        height: 25,
+        containerId: container.id,
+      });
+
+      API.setElements([container, text]);
+      API.updateElement(container, {
+        boundElements: [{ type: "text", id: text.id }],
+      });
+      API.setSelectedElements([container]);
+      UI.clickTool("selection");
+
+      mouse.clickAt(text.x + 26, text.y + 10);
+
+      const editor = await getTextEditor();
+
+      expect(editor).not.toBe(null);
+    });
+
+    it("should not edit selected bound text container when only the container was single-clicked", async () => {
+      const container = API.createElement({
+        type: "rectangle",
+        width: 160,
+        height: 70,
+        boundElements: [],
+      });
+      const text = API.createElement({
+        type: "text",
+        text: "Hello World!",
+        x: container.x + 20,
+        y: container.y + 20,
+        width: 120,
+        height: 25,
+        containerId: container.id,
+      });
+
+      API.setElements([container, text]);
+      API.updateElement(container, {
+        boundElements: [{ type: "text", id: text.id }],
+      });
+      API.setSelectedElements([container]);
+      UI.clickTool("selection");
+
+      mouse.clickAt(container.x + 5, container.y + 10);
+
+      expect(h.state.editingTextElement).toBe(null);
+      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+    });
+
     // FIXME too flaky. No one knows why.
     it.skip("should bump the version of a labeled arrow when the label is updated", async () => {
       const arrow = UI.createElement("arrow", {
