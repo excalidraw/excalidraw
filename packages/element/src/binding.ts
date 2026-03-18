@@ -1,6 +1,7 @@
 import {
   arrayToMap,
   getFeatureFlag,
+  getGridPoint,
   invariant,
   isTransparent,
 } from "@excalidraw/common";
@@ -22,7 +23,7 @@ import {
 } from "@excalidraw/math";
 
 import type { LineSegment, LocalPoint, Radians } from "@excalidraw/math";
-import type { AppState } from "@excalidraw/excalidraw/types";
+import type { AppState, NullableGridSize } from "@excalidraw/excalidraw/types";
 import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
 import type { Bounds } from "@excalidraw/common";
 
@@ -633,6 +634,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     finalize?: boolean;
     initialBinding?: boolean;
     zoom?: AppState["zoom"];
+    gridSize?: NullableGridSize;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
   const startIdx = 0;
@@ -695,7 +697,9 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     elementsMap,
   );
   const hit = getHoveredElementForBinding(
-    globalPoint,
+    opts?.angleLocked || appState.gridModeEnabled
+      ? pointFrom<GlobalPoint>(scenePointerX, scenePointerY)
+      : globalPoint,
     elements,
     elementsMap,
     maxBindingDistance_simple(appState.zoom),
@@ -807,7 +811,15 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           focusPoint:
             projectFixedPointOntoDiagonal(
               arrow,
-              globalPoint,
+              opts?.angleLocked || appState.gridModeEnabled
+                ? snapBoundPointToGrid(
+                    pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+                    hit,
+                    elementsMap,
+                    appState.gridSize as NullableGridSize,
+                    arrow,
+                  )
+                : globalPoint,
               hit,
               startDragged ? "start" : "end",
               elementsMap,
@@ -1741,6 +1753,88 @@ const extractBinding = (
     binding,
     mode: binding.mode,
   };
+};
+
+/**
+ * Snaps a bound arrow endpoint to the grid on the axis parallel to the
+ * bindable element's side, while preserving the binding gap distance on the
+ * perpendicular axis. In other words, the grid axis closest to the side's
+ * perpendicular (normal) is used as the snap axis and the other axis is kept at
+ * the binding gap distance.
+ */
+const snapBoundPointToGrid = (
+  outlinePoint: GlobalPoint,
+  bindableElement: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+  gridSize: NullableGridSize,
+  arrowElement: ExcalidrawArrowElement,
+): GlobalPoint => {
+  if (!gridSize) {
+    return outlinePoint;
+  }
+
+  const aabb = aabbForElement(bindableElement, elementsMap);
+  const heading = headingForPointFromElement(
+    bindableElement,
+    aabb,
+    outlinePoint,
+  );
+
+  const normalLocal = pointFrom<GlobalPoint>(heading[0], heading[1]);
+  const normalGlobal = pointRotateRads(
+    normalLocal,
+    pointFrom<GlobalPoint>(0, 0),
+    bindableElement.angle,
+  );
+
+  const bindingGap = getBindingGap(bindableElement, arrowElement);
+  const extent =
+    Math.max(bindableElement.width, bindableElement.height) + bindingGap * 2;
+  const center = getCenterForBounds(aabb);
+
+  const absNX = Math.abs(normalGlobal[0]);
+  const absNY = Math.abs(normalGlobal[1]);
+  if (absNX >= absNY) {
+    // Global X is closest to the perpendicular → snap Y, intersect horizontal line
+    const [, snappedY] = getGridPoint(
+      outlinePoint[0],
+      outlinePoint[1],
+      gridSize,
+    );
+    const intersector = lineSegment<GlobalPoint>(
+      pointFrom<GlobalPoint>(center[0] - extent, snappedY),
+      pointFrom<GlobalPoint>(center[0] + extent, snappedY),
+    );
+    const intersection = intersectElementWithLineSegment(
+      bindableElement,
+      elementsMap,
+      intersector,
+      bindingGap,
+    ).sort(
+      (a, b) =>
+        pointDistanceSq(a, outlinePoint) - pointDistanceSq(b, outlinePoint),
+    )[0];
+
+    return intersection ?? pointFrom<GlobalPoint>(outlinePoint[0], snappedY);
+  }
+
+  // Global Y is closest to the perpendicular → snap X, intersect vertical line
+  const [snappedX] = getGridPoint(outlinePoint[0], outlinePoint[1], gridSize);
+  const intersector = lineSegment<GlobalPoint>(
+    pointFrom<GlobalPoint>(snappedX, center[1] - extent),
+    pointFrom<GlobalPoint>(snappedX, center[1] + extent),
+  );
+  const intersection = intersectElementWithLineSegment(
+    bindableElement,
+    elementsMap,
+    intersector,
+    bindingGap,
+  ).sort(
+    (a, b) =>
+      pointDistanceSq(a, outlinePoint) - pointDistanceSq(b, outlinePoint),
+  )[0];
+
+  return intersection ?? pointFrom<GlobalPoint>(snappedX, outlinePoint[1]);
 };
 
 const elementArea = (element: ExcalidrawBindableElement) =>
