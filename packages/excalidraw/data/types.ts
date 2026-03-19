@@ -14,6 +14,7 @@ import type {
 export interface ExportedDataState {
   type: string;
   version: number;
+  schemaVersion: number;
   source: string;
   elements: readonly ExcalidrawElement[];
   appState: ReturnType<typeof cleanAppStateForExport>;
@@ -35,6 +36,7 @@ export type LegacyAppState = {
 export interface ImportedDataState {
   type?: string;
   version?: number;
+  schemaVersion?: number;
   source?: string;
   elements?: readonly ExcalidrawElement[] | null;
   appState?: Readonly<

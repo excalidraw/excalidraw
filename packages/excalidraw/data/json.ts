@@ -12,6 +12,7 @@ import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 
 import { isImageFileHandle, loadFromBlob } from "./blob";
 import { fileOpen, fileSave } from "./filesystem";
+import { SCHEMA_VERSIONS } from "./schema";
 
 import type { AppState, BinaryFiles, LibraryItems } from "../types";
 import type {
@@ -51,6 +52,7 @@ export const serializeAsJSON = (
   const data: ExportedDataState = {
     type: EXPORT_DATA_TYPES.excalidraw,
     version: VERSIONS.excalidraw,
+    schemaVersion: SCHEMA_VERSIONS.latest,
     source: getExportSource(),
     elements,
     appState:

@@ -40,9 +40,11 @@ import type { FileSystemHandle } from "./data/filesystem";
 import type { Spreadsheet } from "./charts";
 
 import type { BinaryFiles } from "./types";
+import { SCHEMA_VERSIONS } from "./data/schema";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
+  schemaVersion: number;
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles | undefined;
 };
@@ -53,6 +55,7 @@ export interface ClipboardData {
   spreadsheet?: Spreadsheet;
   elements?: readonly ExcalidrawElement[];
   files?: BinaryFiles;
+  schemaVersion?: number;
   text?: string;
   mixedContent?: PastedMixedContent;
   errorMessage?: string;
@@ -79,7 +82,11 @@ export const probablySupportsClipboardBlob =
 
 const clipboardContainsElements = (
   contents: any,
-): contents is { elements: ExcalidrawElement[]; files?: BinaryFiles } => {
+): contents is {
+  elements: ExcalidrawElement[];
+  files?: BinaryFiles;
+  schemaVersion?: number;
+} => {
   if (
     [
       EXPORT_DATA_TYPES.excalidraw,
@@ -178,6 +185,7 @@ export const serializeAsClipboardJSON = ({
   // select bound text elements when copying
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
+    schemaVersion: SCHEMA_VERSIONS.latest,
     elements: elements.map((element) => {
       if (
         getContainingFrame(element, elementsMap) &&
@@ -572,6 +580,7 @@ export const parseClipboard = async (
       return {
         elements: systemClipboardData.elements,
         files: systemClipboardData.files,
+        schemaVersion: systemClipboardData.schemaVersion,
         text: isPlainPaste
           ? JSON.stringify(systemClipboardData.elements, null, 2)
           : undefined,
