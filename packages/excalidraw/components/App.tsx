@@ -5964,40 +5964,46 @@ class App extends React.Component<AppProps, AppState> {
     return isTextBindableContainer(hitElement, false) ? hitElement : null;
   }
 
-  // A stacked group has overlapping shapes, so a hit-test can land on any
-  // of them. We walk the group back-to-front (highest z-index first) and
-  // return the first shape that can hold text, skipping bound text elements
-  // that may sit above the shape in the array.
-  private getTopmostTextContainerInGroup(
+  // Selects the frontmost text-bindable shape in a stacked group and opens
+  // the text editor on it
+  // A stacked group has overlapping shapes so a
+  // hit-test can land on any of them — we walk back-to-front (highest
+  // z-index first) and pick the first shape that can hold text, skipping
+  // bound text elements that may sit above the shape in the array.
+  private editTopmostInStackGroup(
     groupId: string,
-  ): ExcalidrawElement | null {
+    insertAtParentCenter: boolean,
+  ) {
     const groupElements = getElementsInGroup(
       this.scene.getNonDeletedElements(),
       groupId,
     );
+    let container: ExcalidrawElement | null = null;
     for (let i = groupElements.length - 1; i >= 0; i--) {
       if (isTextBindableContainer(groupElements[i], false)) {
-        return groupElements[i];
+        container = groupElements[i];
+        break;
       }
     }
-    return null;
-  }
-
-  private startTextEditingOnContainer(
-    container: ExcalidrawTextContainer,
-    insertAtParentCenter: boolean,
-  ) {
-    const midPoint = getContainerCenter(
-      container,
-      this.state,
-      this.scene.getNonDeletedElementsMap(),
+    if (!container) {
+      return;
+    }
+    this.setState(
+      { selectedElementIds: { [container.id]: true } },
+      () => {
+        const midPoint = getContainerCenter(
+          container,
+          this.state,
+          this.scene.getNonDeletedElementsMap(),
+        );
+        this.startTextEditing({
+          sceneX: midPoint.x,
+          sceneY: midPoint.y,
+          insertAtParentCenter,
+          container: container as ExcalidrawTextContainer,
+        });
+      },
     );
-    this.startTextEditing({
-      sceneX: midPoint.x,
-      sceneY: midPoint.y,
-      insertAtParentCenter,
-      container,
-    });
   }
 
   private startTextEditing = ({
@@ -6301,33 +6307,22 @@ class App extends React.Component<AppProps, AppState> {
 
       if (selectedGroupId) {
         this.store.scheduleCapture();
-
-        const textContainer = selectedGroupId.startsWith("stack_")
-          ? this.getTopmostTextContainerInGroup(selectedGroupId)
-          : null;
-        const selectedId = textContainer?.id ?? hitElement!.id;
-
         this.setState(
           (prevState) => ({
             ...prevState,
             ...selectGroupsForSelectedElements(
               {
                 editingGroupId: selectedGroupId,
-                selectedElementIds: { [selectedId]: true },
+                selectedElementIds: { [hitElement!.id]: true },
               },
               this.scene.getNonDeletedElements(),
               prevState,
               this,
             ),
           }),
-          () => {
-            if (textContainer) {
-              this.startTextEditingOnContainer(
-                textContainer as ExcalidrawTextContainer,
-                !event.altKey,
-              );
-            }
-          },
+          selectedGroupId.startsWith("stack_")
+            ? () => this.editTopmostInStackGroup(selectedGroupId, !event.altKey)
+            : undefined,
         );
         return;
       }
@@ -6354,23 +6349,10 @@ class App extends React.Component<AppProps, AppState> {
 
         // for stacked groups, prefer the topmost text-bindable container
         // so text always goes on the front element
-        if (
-          this.state.editingGroupId?.startsWith("stack_") &&
-          container
-        ) {
-          const topContainer = this.getTopmostTextContainerInGroup(
+        if (this.state.editingGroupId?.startsWith("stack_") && container) {
+          this.editTopmostInStackGroup(
             this.state.editingGroupId,
-          );
-          if (topContainer) {
-            container = topContainer as typeof container;
-          }
-          this.setState(
-            { selectedElementIds: { [container.id]: true } },
-            () => {
-              if (container) {
-                this.startTextEditingOnContainer(container, !event.altKey);
-              }
-            },
+            !event.altKey,
           );
           return;
         }
