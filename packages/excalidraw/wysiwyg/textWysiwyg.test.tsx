@@ -293,6 +293,39 @@ describe("textWysiwyg", () => {
       expect(await getTextEditor({ waitForEditor: false })).toBe(null);
     });
 
+    it("should ignore double-click when the second click ends away from where it started", async () => {
+      UI.clickTool("selection");
+
+      mouse.downAt(40, 40);
+      mouse.upAt(40, 40);
+      fireEvent.click(GlobalTestState.interactiveCanvas, {
+        button: 0,
+        clientX: 40,
+        clientY: 40,
+      });
+
+      mouse.downAt(40, 40);
+      mouse.moveTo(200, 200);
+      mouse.upAt(200, 200);
+      fireEvent.click(GlobalTestState.interactiveCanvas, {
+        button: 0,
+        clientX: 200,
+        clientY: 200,
+      });
+
+      fireEvent.doubleClick(GlobalTestState.interactiveCanvas, {
+        button: 0,
+        clientX: 200,
+        clientY: 200,
+      });
+
+      const editor = await getTextEditor({ waitForEditor: false });
+
+      expect(editor).toBe(null);
+      expect(h.state.editingTextElement).toBe(null);
+      expect(h.elements.length).toBe(0);
+    });
+
     // FIXME too flaky. No one knows why.
     it.skip("should bump the version of a labeled arrow when the label is updated", async () => {
       const arrow = UI.createElement("arrow", {

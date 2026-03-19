@@ -692,6 +692,7 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerMoveEvent: PointerEvent | null = null;
   /** current frame pointer cords */
   lastPointerMoveCoords: { x: number; y: number } | null = null;
+  private lastCompletedCanvasClicks: { x: number; y: number }[] = [];
   /** previous frame pointer coords */
   previousPointerMoveCoords: { x: number; y: number } | null = null;
   lastViewportPosition = { x: 0, y: 0 };
@@ -2341,6 +2342,7 @@ class App extends React.Component<AppProps, AppState> {
                             }
                             handleCanvasRef={this.handleInteractiveCanvasRef}
                             onContextMenu={this.handleCanvasContextMenu}
+                            onClick={this.handleCanvasClick}
                             onPointerMove={this.handleCanvasPointerMove}
                             onPointerUp={this.handleCanvasPointerUp}
                             onPointerCancel={this.removePointer}
@@ -3594,10 +3596,14 @@ class App extends React.Component<AppProps, AppState> {
         this.lassoTrail.endPath();
         this.deselectElements();
 
-        // @ts-ignore
         this.handleCanvasDoubleClick({
           clientX: touch.clientX,
           clientY: touch.clientY,
+          type: "touch",
+          altKey: false,
+          ctrlKey: false,
+          metaKey: false,
+          shiftKey: false,
         });
       }
       didTapTwice = false;
@@ -6220,10 +6226,46 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private shouldHandleBrowserCanvasDoubleClick = (type: string) => {
+    // TODO remove this once we consolidate double-click logic and handle
+    // ourselves for all event types together
+    if (type === "touch") {
+      return true;
+    }
+    if (this.lastCompletedCanvasClicks.length === 0) {
+      return true;
+    }
+
+    if (this.lastCompletedCanvasClicks.length < 2) {
+      return false;
+    }
+
+    const [firstClick, secondClick] = this.lastCompletedCanvasClicks;
+
+    return (
+      pointDistance(
+        pointFrom(firstClick.x, firstClick.y),
+        pointFrom(secondClick.x, secondClick.y),
+      ) <= DOUBLE_TAP_POSITION_THRESHOLD
+    );
+  };
+
   private handleCanvasDoubleClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
+    event: Pick<
+      React.MouseEvent<HTMLCanvasElement>,
+      | "type"
+      | "clientX"
+      | "clientY"
+      | "altKey"
+      | "ctrlKey"
+      | "metaKey"
+      | "shiftKey"
+    >,
   ) => {
-    if (this.state.editingTextElement) {
+    if (
+      this.state.editingTextElement ||
+      !this.shouldHandleBrowserCanvasDoubleClick(event.type)
+    ) {
       return;
     }
     // case: double-clicking with arrow/line tool selected would both create
@@ -6411,6 +6453,21 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
     }
+  };
+
+  private handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (event.button !== POINTER_BUTTON.MAIN) {
+      this.lastCompletedCanvasClicks = [];
+      return;
+    }
+
+    this.lastCompletedCanvasClicks = [
+      ...this.lastCompletedCanvasClicks.slice(-1),
+      {
+        x: event.clientX,
+        y: event.clientY,
+      },
+    ];
   };
 
   private getElementLinkAtPosition = (
