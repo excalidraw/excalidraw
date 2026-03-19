@@ -8096,6 +8096,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     if (
+      this.props.interactive !== false &&
       this.handleTextAutoResizeHandlePointerDown(
         selectedElements,
         pointerDownState.origin,
