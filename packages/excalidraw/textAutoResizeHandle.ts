@@ -1,13 +1,12 @@
-import {
-  DEFAULT_TRANSFORM_HANDLE_SPACING,
-  EditorInterface,
-} from "@excalidraw/common";
+import { DEFAULT_TRANSFORM_HANDLE_SPACING } from "@excalidraw/common";
 import {
   pointFrom,
   pointRotateRads,
   type GlobalPoint,
   type Radians,
 } from "@excalidraw/math";
+
+import type { EditorInterface } from "@excalidraw/common";
 
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
