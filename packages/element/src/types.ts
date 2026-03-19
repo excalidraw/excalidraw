@@ -163,7 +163,6 @@ export type InitializedExcalidrawImageElement = MarkNonNullable<
 export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
   type: "frame";
   name: string | null;
-  backgroundEnabled: boolean;
 };
 
 export type ExcalidrawMagicFrameElement = _ExcalidrawElementBase & {

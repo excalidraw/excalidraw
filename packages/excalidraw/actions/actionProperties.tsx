@@ -420,7 +420,6 @@ export const actionChangeBackgroundColor = register<
         if (isFrameElement(el)) {
           return newElementWith(el, {
             backgroundColor: value.currentItemBackgroundColor,
-            backgroundEnabled: !isTransparent(value.currentItemBackgroundColor),
           });
         }
         return hasBackground(el.type)

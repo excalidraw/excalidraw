@@ -13,12 +13,14 @@ describe("schema migration", () => {
       type: "frame",
       backgroundColor: "#ffc9c9",
     });
-    frame.backgroundEnabled = true;
+    (frame as any).backgroundEnabled = true;
 
     const migrated = migrateElementsBySchema([frame], SCHEMA_VERSIONS.initial)!;
 
-    expect(migrated[0].backgroundColor).toBe(DEFAULT_ELEMENT_PROPS.backgroundColor);
-    expect((migrated[0] as any).backgroundEnabled).toBe(false);
+    expect(migrated[0].backgroundColor).toBe(
+      DEFAULT_ELEMENT_PROPS.backgroundColor,
+    );
+    expect((migrated[0] as any).backgroundEnabled).toBeUndefined();
   });
 
   it("should keep latest-schema frame backgrounds unchanged", () => {
@@ -26,7 +28,7 @@ describe("schema migration", () => {
       type: "frame",
       backgroundColor: "#ffc9c9",
     });
-    frame.backgroundEnabled = true;
+    (frame as any).backgroundEnabled = true;
 
     const migrated = migrateElementsBySchema(
       [frame],
@@ -34,7 +36,7 @@ describe("schema migration", () => {
     )!;
 
     expect(migrated[0].backgroundColor).toBe("#ffc9c9");
-    expect((migrated[0] as any).backgroundEnabled).toBe(true);
+    expect((migrated[0] as any).backgroundEnabled).toBeUndefined();
   });
 
   it("should resolve invalid schema versions using fallback", () => {
@@ -47,4 +49,3 @@ describe("schema migration", () => {
     expect(resolveSchemaVersion(2, SCHEMA_VERSIONS.initial)).toBe(2);
   });
 });
-

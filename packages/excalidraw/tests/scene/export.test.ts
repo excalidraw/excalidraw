@@ -364,27 +364,6 @@ describe("exporting frames", () => {
       expect(emptyBgSvg.querySelector('rect[fill=""]')).toBeNull();
     });
 
-    it("should not render SVG frame background when background is disabled", async () => {
-      const frame = API.createElement({
-        type: "frame",
-        width: 100,
-        height: 100,
-        x: 0,
-        y: 0,
-        backgroundColor: "#ffc9c9",
-      });
-      frame.backgroundEnabled = false;
-
-      const svg = await exportToSvg({
-        elements: [frame],
-        files: null,
-        exportPadding: 0,
-        exportingFrame: frame,
-      });
-
-      expect(svg.querySelector('rect[fill="#ffc9c9"]')).toBeNull();
-    });
-
     it("should filter non-overlapping elements when exporting a frame", async () => {
       const frame = API.createElement({
         type: "frame",

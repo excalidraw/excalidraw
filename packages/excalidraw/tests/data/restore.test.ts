@@ -11,7 +11,6 @@ import type { LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawElement,
-  ExcalidrawFrameElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -82,72 +81,19 @@ describe("restoreElements", () => {
     ).toEqual([expect.objectContaining({ isDeleted: true })]);
   });
 
-  it("should disable frame background for legacy frames missing backgroundEnabled", () => {
+  it("should restore frame element", () => {
     const frame = API.createElement({
       type: "frame",
       backgroundColor: "#ffc9c9",
     });
-    const legacyFrame = { ...frame } as any;
-    delete legacyFrame.backgroundEnabled;
-
-    const restoredFrame = restore.restoreElements(
-      [legacyFrame],
-      null,
-    )[0] as ExcalidrawFrameElement;
-
-    expect(restoredFrame.backgroundColor).toBe("transparent");
-    expect(restoredFrame.backgroundEnabled).toBe(false);
-  });
-
-  it("should disable frame background when legacy backgroundEnabled is non-boolean", () => {
-    const frame = API.createElement({
-      type: "frame",
-      backgroundColor: "#ffc9c9",
-    });
-    const legacyFrame = {
-      ...frame,
-      backgroundEnabled: undefined,
-    } as any;
-
-    const restoredFrame = restore.restoreElements(
-      [legacyFrame],
-      null,
-    )[0] as ExcalidrawFrameElement;
-
-    expect(restoredFrame.backgroundColor).toBe("transparent");
-    expect(restoredFrame.backgroundEnabled).toBe(false);
-  });
-
-  it("should normalize frame background color when backgroundEnabled is false", () => {
-    const frame = API.createElement({
-      type: "frame",
-      backgroundColor: "#ffc9c9",
-    });
-    frame.backgroundEnabled = false;
 
     const restoredFrame = restore.restoreElements(
       [frame],
       null,
-    )[0] as ExcalidrawFrameElement;
+    )[0] as ExcalidrawElement;
 
-    expect(restoredFrame.backgroundColor).toBe("transparent");
-    expect(restoredFrame.backgroundEnabled).toBe(false);
-  });
-
-  it("should preserve frame backgroundEnabled when present", () => {
-    const frame = API.createElement({
-      type: "frame",
-      backgroundColor: "#ffc9c9",
-    });
-    frame.backgroundEnabled = true;
-
-    const restoredFrame = restore.restoreElements(
-      [frame],
-      null,
-    )[0] as ExcalidrawFrameElement;
-
+    expect(restoredFrame.type).toBe("frame");
     expect(restoredFrame.backgroundColor).toBe("#ffc9c9");
-    expect(restoredFrame.backgroundEnabled).toBe(true);
   });
 
   it("should restore text element correctly passing value for each attribute", () => {

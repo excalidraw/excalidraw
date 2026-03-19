@@ -25,7 +25,7 @@ export const migrateElementsBySchema = (
   elements: readonly ExcalidrawElement[] | null | undefined,
   schemaVersion: number,
 ) => {
-  if (!elements || schemaVersion >= SCHEMA_VERSIONS.frameBackgrounds) {
+  if (!elements) {
     return elements;
   }
 
@@ -34,10 +34,18 @@ export const migrateElementsBySchema = (
       return element;
     }
 
+    const { backgroundEnabled: _, ...frameWithoutBackgroundEnabled } =
+      element as ExcalidrawElement & {
+        backgroundEnabled?: boolean;
+      };
+
+    if (schemaVersion >= SCHEMA_VERSIONS.frameBackgrounds) {
+      return frameWithoutBackgroundEnabled;
+    }
+
     return {
-      ...element,
+      ...frameWithoutBackgroundEnabled,
       backgroundColor: DEFAULT_ELEMENT_PROPS.backgroundColor,
-      backgroundEnabled: false,
     } as ExcalidrawElement;
   });
 };
