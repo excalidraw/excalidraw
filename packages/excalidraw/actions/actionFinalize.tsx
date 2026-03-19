@@ -126,6 +126,7 @@ export const actionFinalize = register<FormData>({
             newArrow,
             altKey: event.altKey,
             angleLocked,
+            gridSize: app.getEffectiveGridSize(),
           },
         );
       } else if (isLineElement(element)) {

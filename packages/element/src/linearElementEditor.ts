@@ -2172,6 +2172,7 @@ const pointDraggingUpdates = (
       newArrow: !!app.state.newElement,
       angleLocked,
       altKey,
+      gridSize: app.getEffectiveGridSize(),
     },
   );
 

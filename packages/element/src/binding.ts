@@ -155,6 +155,7 @@ export const bindOrUnbindBindingElement = (
     altKey?: boolean;
     angleLocked?: boolean;
     initialBinding?: boolean;
+    gridSize?: NullableGridSize;
   },
 ) => {
   const { start, end } = getBindingStrategyForDraggingBindingElementEndpoints(
@@ -594,6 +595,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
     finalize?: boolean;
     initialBinding?: boolean;
     zoom?: AppState["zoom"];
+    gridSize?: NullableGridSize;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
   if (getFeatureFlag("COMPLEX_BINDINGS")) {
@@ -752,7 +754,11 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           ? globalPoint
           : // NOTE: Can only affect the start point because new arrows always drag the end point
           opts?.newArrow
-          ? appState.selectedLinearElement!.initialState.origin!
+          ? getGridPoint(
+              appState.selectedLinearElement!.initialState.origin![0],
+              appState.selectedLinearElement!.initialState.origin![1],
+              opts.gridSize as NullableGridSize,
+            )
           : LinearElementEditor.getPointAtIndexGlobalCoordinates(
               arrow,
               0,
