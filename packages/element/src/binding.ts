@@ -172,12 +172,16 @@ export const bindOrUnbindBindingElement = (
     },
   );
 
+  const isMidpointSnappingEnabled =
+    appState.isMidpointSnappingEnabled && !appState.gridModeEnabled;
+
   bindOrUnbindBindingElementEdge(
     arrow,
     start,
     "start",
     scene,
     appState.isBindingEnabled,
+    isMidpointSnappingEnabled,
   );
   bindOrUnbindBindingElementEdge(
     arrow,
@@ -185,6 +189,7 @@ export const bindOrUnbindBindingElement = (
     "end",
     scene,
     appState.isBindingEnabled,
+    isMidpointSnappingEnabled,
   );
   if (start.focusPoint || end.focusPoint) {
     // If the strategy dictates a focus point override, then
@@ -229,6 +234,7 @@ const bindOrUnbindBindingElementEdge = (
   startOrEnd: "start" | "end",
   scene: Scene,
   shouldSnapToOutline = true,
+  isMidpointSnappingEnabled = true,
 ): void => {
   if (mode === null) {
     // null means break the binding
@@ -242,6 +248,7 @@ const bindOrUnbindBindingElementEdge = (
       scene,
       focusPoint,
       shouldSnapToOutline,
+      isMidpointSnappingEnabled,
     );
   }
 };
@@ -1047,6 +1054,7 @@ export const bindBindingElement = (
   scene: Scene,
   focusPoint?: GlobalPoint,
   shouldSnapToOutline = true,
+  isMidpointSnappingEnabled = true,
 ): void => {
   const elementsMap = scene.getNonDeletedElementsMap();
 
@@ -1062,6 +1070,7 @@ export const bindBindingElement = (
         startOrEnd,
         elementsMap,
         shouldSnapToOutline,
+        isMidpointSnappingEnabled,
       ),
     };
   } else {
@@ -1810,7 +1819,7 @@ const snapBoundPointToGrid = (
   const absNX = Math.abs(normalGlobal[0]);
   const absNY = Math.abs(normalGlobal[1]);
   if (absNX >= absNY) {
-    // Global X is closest to the perpendicular → snap Y, intersect horizontal line
+    // Global X is closest to the perpendicular so snap Y, intersect horizontal line
     const [, snappedY] = getGridPoint(
       outlinePoint[0],
       outlinePoint[1],
@@ -1833,7 +1842,7 @@ const snapBoundPointToGrid = (
     return intersection ?? pointFrom<GlobalPoint>(outlinePoint[0], snappedY);
   }
 
-  // Global Y is closest to the perpendicular → snap X, intersect vertical line
+  // Global Y is closest to the perpendicular so snap X, intersect vertical line
   const [snappedX] = getGridPoint(outlinePoint[0], outlinePoint[1], gridSize);
   const intersector = lineSegment<GlobalPoint>(
     pointFrom<GlobalPoint>(snappedX, center[1] - extent),
