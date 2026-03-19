@@ -1,4 +1,7 @@
-import { DEFAULT_TRANSFORM_HANDLE_SPACING } from "@excalidraw/common";
+import {
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
+  EditorInterface,
+} from "@excalidraw/common";
 import {
   pointFrom,
   pointRotateRads,
@@ -21,10 +24,12 @@ export const getTextBoxPadding = (zoomValue: number) =>
 export const getTextAutoResizeHandle = (
   textElement: ExcalidrawTextElement,
   zoomValue: number,
+  formFactor: EditorInterface["formFactor"],
 ) => {
   if (
+    formFactor !== "desktop" ||
     TEXT_AUTO_RESIZE_HANDLE_LENGTH >
-    textElement.height * zoomValue * MAX_HANDLE_HEIGHT_RATIO
+      textElement.height * zoomValue * MAX_HANDLE_HEIGHT_RATIO
   ) {
     return null;
   }
@@ -63,8 +68,9 @@ export const isPointHittingTextAutoResizeHandle = (
   point: Readonly<{ x: number; y: number }>,
   textElement: ExcalidrawTextElement,
   zoomValue: number,
+  formFactor: EditorInterface["formFactor"],
 ) => {
-  const handle = getTextAutoResizeHandle(textElement, zoomValue);
+  const handle = getTextAutoResizeHandle(textElement, zoomValue, formFactor);
 
   if (!handle) {
     return false;

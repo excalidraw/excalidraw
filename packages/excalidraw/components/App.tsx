@@ -5891,6 +5891,7 @@ class App extends React.Component<AppProps, AppState> {
         point,
         activeTextElement,
         this.state.zoom.value,
+        this.editorInterface.formFactor,
       )
     ) {
       return true;

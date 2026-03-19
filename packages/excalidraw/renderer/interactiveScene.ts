@@ -59,6 +59,8 @@ import {
   isFocusPointVisible,
 } from "@excalidraw/element";
 
+import type { EditorInterface } from "@excalidraw/common";
+
 import type {
   TransformHandles,
   TransformHandleType,
@@ -1516,8 +1518,13 @@ const renderResetAutoResizeHandle = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
+  formFactor: EditorInterface["formFactor"],
 ) => {
-  const autoResizeHandle = getTextAutoResizeHandle(text, appState.zoom.value);
+  const autoResizeHandle = getTextAutoResizeHandle(
+    text,
+    appState.zoom.value,
+    formFactor,
+  );
 
   if (!autoResizeHandle) {
     return;
@@ -1629,6 +1636,7 @@ const _renderInteractiveScene = ({
       context,
       appState,
       renderConfig.selectionColor,
+      editorInterface.formFactor,
     );
   }
 
