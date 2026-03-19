@@ -383,6 +383,21 @@
       box-shadow: 0 0 0 1px var(--color-primary-darkest);
       border-radius: var(--border-radius-lg);
     }
+
+    &--invalid {
+      border-color: var(--color-danger);
+
+      &:focus-within {
+        box-shadow: 0 0 0 1px var(--color-danger);
+      }
+    }
+  }
+
+  .color-picker__input-error {
+    color: var(--color-danger);
+    font-size: 0.75rem;
+    padding: 0 0.75rem;
+    margin: 0 8px 4px;
   }
 
   .color-picker__input-hash {
