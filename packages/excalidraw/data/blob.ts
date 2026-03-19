@@ -24,6 +24,11 @@ import {
   restoreElements,
   restoreLibraryItems,
 } from "./restore";
+import {
+  migrateElementsBySchema,
+  resolveSchemaVersion,
+  SCHEMA_VERSIONS,
+} from "./schema";
 
 import type { AppState, DataURL, LibraryItem } from "../types";
 
@@ -157,10 +162,18 @@ export const loadSceneOrLibraryFromBlob = async (
       throw error;
     }
     if (isValidExcalidrawData(data)) {
+      const schemaVersion = resolveSchemaVersion(
+        data.schemaVersion,
+        SCHEMA_VERSIONS.initial,
+      );
+      const migratedElements = migrateElementsBySchema(
+        data.elements,
+        schemaVersion,
+      );
       return {
         type: MIME_TYPES.excalidraw,
         data: {
-          elements: restoreElements(data.elements, localElements, {
+          elements: restoreElements(migratedElements, localElements, {
             repairBindings: true,
             deleteInvisibleElements: true,
           }),

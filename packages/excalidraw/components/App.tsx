@@ -33,6 +33,7 @@ import {
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
   ELEMENT_TRANSLATE_AMOUNT,
   EVENT,
+  EXPORT_DATA_TYPES,
   FRAME_STYLE,
   IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
@@ -354,6 +355,11 @@ import {
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restoreAppState, restoreElements } from "../data/restore";
+import {
+  migrateElementsBySchema,
+  resolveSchemaVersion,
+  SCHEMA_VERSIONS,
+} from "../data/schema";
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
@@ -2805,10 +2811,21 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-    const restoredElements = restoreElements(initialData?.elements, null, {
-      repairBindings: true,
-      deleteInvisibleElements: true,
-    });
+    const initialDataSchemaFallback =
+      initialData?.type === EXPORT_DATA_TYPES.excalidraw
+        ? SCHEMA_VERSIONS.initial
+        : SCHEMA_VERSIONS.latest;
+    const restoredElements = restoreElements(
+      migrateElementsBySchema(
+        initialData?.elements,
+        resolveSchemaVersion(initialData?.schemaVersion, initialDataSchemaFallback),
+      ),
+      null,
+      {
+        repairBindings: true,
+        deleteInvisibleElements: true,
+      },
+    );
     let restoredAppState = restoreAppState(initialData?.appState, null);
     const activeTool = restoredAppState.activeTool;
 
@@ -3573,6 +3590,9 @@ class App extends React.Component<AppProps, AppState> {
       this.addElementsFromPasteOrLibrary({
         elements,
         files: data.files || null,
+        schemaVersion: data.programmaticAPI
+          ? SCHEMA_VERSIONS.latest
+          : resolveSchemaVersion(data.schemaVersion, SCHEMA_VERSIONS.initial),
         position:
           this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
         retainSeed: isPlainPaste,
@@ -3716,13 +3736,21 @@ class App extends React.Component<AppProps, AppState> {
   addElementsFromPasteOrLibrary = (opts: {
     elements: readonly ExcalidrawElement[];
     files: BinaryFiles | null;
+    schemaVersion?: number;
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
     fitToContent?: boolean;
   }) => {
-    const elements = restoreElements(opts.elements, null, {
-      deleteInvisibleElements: true,
-    });
+    const elements = restoreElements(
+      migrateElementsBySchema(
+        opts.elements,
+        resolveSchemaVersion(opts.schemaVersion, SCHEMA_VERSIONS.latest),
+      ),
+      null,
+      {
+        deleteInvisibleElements: true,
+      },
+    );
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
     const elementsCenterX = distance(minX, maxX) / 2;

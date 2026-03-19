@@ -1,0 +1,50 @@
+import { DEFAULT_ELEMENT_PROPS } from "@excalidraw/common";
+
+import { API } from "../tests/helpers/api";
+import {
+  migrateElementsBySchema,
+  resolveSchemaVersion,
+  SCHEMA_VERSIONS,
+} from "./schema";
+
+describe("schema migration", () => {
+  it("should migrate legacy frame backgrounds to transparent", () => {
+    const frame = API.createElement({
+      type: "frame",
+      backgroundColor: "#ffc9c9",
+    });
+    frame.backgroundEnabled = true;
+
+    const migrated = migrateElementsBySchema([frame], SCHEMA_VERSIONS.initial)!;
+
+    expect(migrated[0].backgroundColor).toBe(DEFAULT_ELEMENT_PROPS.backgroundColor);
+    expect((migrated[0] as any).backgroundEnabled).toBe(false);
+  });
+
+  it("should keep latest-schema frame backgrounds unchanged", () => {
+    const frame = API.createElement({
+      type: "frame",
+      backgroundColor: "#ffc9c9",
+    });
+    frame.backgroundEnabled = true;
+
+    const migrated = migrateElementsBySchema(
+      [frame],
+      SCHEMA_VERSIONS.latest,
+    )!;
+
+    expect(migrated[0].backgroundColor).toBe("#ffc9c9");
+    expect((migrated[0] as any).backgroundEnabled).toBe(true);
+  });
+
+  it("should resolve invalid schema versions using fallback", () => {
+    expect(resolveSchemaVersion(undefined, SCHEMA_VERSIONS.initial)).toBe(
+      SCHEMA_VERSIONS.initial,
+    );
+    expect(resolveSchemaVersion(0, SCHEMA_VERSIONS.latest)).toBe(
+      SCHEMA_VERSIONS.latest,
+    );
+    expect(resolveSchemaVersion(2, SCHEMA_VERSIONS.initial)).toBe(2);
+  });
+});
+

@@ -4,6 +4,7 @@ import {
   parseDataTransferEvent,
   serializeAsClipboardJSON,
 } from "./clipboard";
+import { SCHEMA_VERSIONS } from "./data/schema";
 import { API } from "./tests/helpers/api";
 
 describe("parseClipboard()", () => {
@@ -55,6 +56,7 @@ describe("parseClipboard()", () => {
       ),
     );
     expect(clipboardData.elements).toEqual([rect]);
+    expect(clipboardData.schemaVersion).toBe(SCHEMA_VERSIONS.latest);
   });
 
   it("should parse valid excalidraw JSON if inside text/html", async () => {
