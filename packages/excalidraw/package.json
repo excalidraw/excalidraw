@@ -113,6 +113,7 @@
     "radix-ui": "1.4.3",
     "roughjs": "4.6.4",
     "sass": "1.51.0",
+    "tinycolor2": "1.6.0",
     "tunnel-rat": "0.1.2"
   },
   "devDependencies": {
