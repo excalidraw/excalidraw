@@ -5964,22 +5964,36 @@ class App extends React.Component<AppProps, AppState> {
     return isTextBindableContainer(hitElement, false) ? hitElement : null;
   }
 
-  // Selects the frontmost text-bindable shape in a stacked group and opens
-  // the text editor on it
-  // A stacked group has overlapping shapes so a
-  // hit-test can land on any of them — we walk back-to-front (highest
-  // z-index first) and pick the first shape that can hold text, skipping
-  // bound text elements that may sit above the shape in the array.
+
   private editTopmostInStackGroup(
     groupId: string,
     insertAtParentCenter: boolean,
   ) {
+    /*
+    high level steps
+    1. find the top most element which can "bind" text (text cannot bind text, only shape can)
+    2. find the midpoint of that shape and start editing the text
+    */
+
+    // based on group id, get the elements belonging to this group
+    // getElementsInGroup returns elements in order that they appear in scene
+    // groupElements[0] is the furthest back and groupElements[length - 1] is the front most
     const groupElements = getElementsInGroup(
       this.scene.getNonDeletedElements(),
       groupId,
     );
     let container: ExcalidrawElement | null = null;
     for (let i = groupElements.length - 1; i >= 0; i--) {
+      /*
+      groupElements:
+      [0] back copy (rectangle)
+      [1] middle copy (rectangle)
+      [2] front rectangle -- we want to select this
+      [3] "API Server" (text element bound to front rectangle)
+
+      even if text didn't exist, [2] would be considered the front since it can still bind text
+      in a sense, our frontmost element is always the last or second last (if text present)
+       */
       if (isTextBindableContainer(groupElements[i], false)) {
         container = groupElements[i];
         break;
@@ -5988,6 +6002,8 @@ class App extends React.Component<AppProps, AppState> {
     if (!container) {
       return;
     }
+
+    // select the midpoint and start editing the text
     this.setState(
       { selectedElementIds: { [container.id]: true } },
       () => {
@@ -6320,6 +6336,7 @@ class App extends React.Component<AppProps, AppState> {
               this,
             ),
           }),
+          // if double click on stacked group, edit top most text
           selectedGroupId.startsWith("stack_")
             ? () => this.editTopmostInStackGroup(selectedGroupId, !event.altKey)
             : undefined,
@@ -6342,20 +6359,10 @@ class App extends React.Component<AppProps, AppState> {
       // shouldn't edit/create text when inside line editor (often false positive)
 
       if (!this.state.selectedLinearElement?.isEditing) {
-        let container = this.getTextBindableContainerAtPosition(
+        const container = this.getTextBindableContainerAtPosition(
           sceneX,
           sceneY,
         );
-
-        // for stacked groups, prefer the topmost text-bindable container
-        // so text always goes on the front element
-        if (this.state.editingGroupId?.startsWith("stack_") && container) {
-          this.editTopmostInStackGroup(
-            this.state.editingGroupId,
-            !event.altKey,
-          );
-          return;
-        }
 
         if (container) {
           if (
