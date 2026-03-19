@@ -1087,6 +1087,10 @@ export type ScrollConstraints = {
   overscrollAllowance?: number;
 };
 
+/**
+ * Optional scroll constraint settings derived from the final viewport computed
+ * by `scrollToContent()`.
+ */
 export type ScrollToContentLockOptions = {
   lockZoom?: boolean;
   overscrollAllowance?: number;
