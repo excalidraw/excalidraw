@@ -52,6 +52,8 @@ import { register } from "./register";
 
 import type { AppState, Offsets } from "../types";
 
+const canUseZoomActions = (appState: AppState) => !appState.scrollConstraints;
+
 export const actionChangeViewBackgroundColor = register<Partial<AppState>>({
   name: "changeViewBackgroundColor",
   label: "labels.canvasBackground",
@@ -244,6 +246,7 @@ export const actionResetZoom = register({
         className="reset-zoom-button zoom-button"
         title={t("buttons.resetZoom")}
         aria-label={t("buttons.resetZoom")}
+        disabled={!canUseZoomActions(appState)}
         onClick={() => {
           updateData(null);
         }}
@@ -252,6 +255,7 @@ export const actionResetZoom = register({
       </ToolButton>
     </Tooltip>
   ),
+  predicate: (_elements, appState) => canUseZoomActions(appState),
   keyTest: (event) =>
     (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
@@ -453,6 +457,7 @@ export const actionZoomToFitSelectionInViewport = register({
       canvasOffsets: app.getEditorUIOffsets(),
     });
   },
+  predicate: (_elements, appState) => canUseZoomActions(appState),
   // NOTE shift-2 should have been assigned actionZoomToFitSelection.
   // TBD on how proceed
   keyTest: (event) =>
@@ -479,6 +484,7 @@ export const actionZoomToFitSelection = register({
       canvasOffsets: app.getEditorUIOffsets(),
     });
   },
+  predicate: (_elements, appState) => canUseZoomActions(appState),
   // NOTE this action should use shift-2 per figma, alas
   keyTest: (event) =>
     event.code === CODES.THREE &&
@@ -503,6 +509,7 @@ export const actionZoomToFit = register({
       fitToViewport: false,
       canvasOffsets: app.getEditorUIOffsets(),
     }),
+  predicate: (_elements, appState) => canUseZoomActions(appState),
   keyTest: (event) =>
     event.code === CODES.ONE &&
     event.shiftKey &&
