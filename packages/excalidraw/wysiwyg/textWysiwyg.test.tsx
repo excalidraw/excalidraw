@@ -1,7 +1,10 @@
 import { queryByText } from "@testing-library/react";
 
 import { pointFrom } from "@excalidraw/math";
-import { getOriginalContainerHeightFromCache } from "@excalidraw/element";
+import {
+  getLineHeightInPx,
+  getOriginalContainerHeightFromCache,
+} from "@excalidraw/element";
 
 import {
   CODES,
@@ -208,6 +211,42 @@ describe("textWysiwyg", () => {
       expect(editor).not.toBe(null);
       expect(h.state.editingTextElement?.id).toBe(text.id);
       expect(h.elements.length).toBe(1);
+    });
+
+    it("should vertically center newly created text on the cursor when clicked with text tool", async () => {
+      API.setAppState({
+        currentItemFontFamily: FONT_FAMILY.Cascadia,
+        currentItemFontSize: 40,
+      });
+      UI.clickTool("text");
+
+      mouse.clickAt(120, 80);
+
+      const editor = await getTextEditor();
+      const text = h.elements[0] as ExcalidrawTextElement;
+      const lineHeightPx = getLineHeightInPx(text.fontSize, text.lineHeight);
+
+      expect(editor).not.toBe(null);
+      expect(text.y + lineHeightPx / 2).toBe(80);
+    });
+
+    it("should snap newly created text top-left to the current grid cell when clicked with text tool in grid mode", async () => {
+      API.setAppState({
+        currentItemFontFamily: FONT_FAMILY.Cascadia,
+        currentItemFontSize: 40,
+        gridModeEnabled: true,
+        gridSize: 24,
+      });
+      UI.clickTool("text");
+
+      mouse.clickAt(113, 86);
+
+      const editor = await getTextEditor();
+      const text = h.elements[0] as ExcalidrawTextElement;
+
+      expect(editor).not.toBe(null);
+      expect(text.x).toBe(96);
+      expect(text.y).toBe(72);
     });
 
     it("should edit text under cursor when double-clicked with selection tool", async () => {
@@ -1572,7 +1611,7 @@ describe("textWysiwyg", () => {
           version: 2,
           width: 610,
           x: 15,
-          y: 25,
+          y: 12.5,
         }),
       );
       expect(h.elements[2] as ExcalidrawTextElement).toEqual(

@@ -191,7 +191,7 @@ export const getFormValue = function <T extends Primitive>(
   elements: readonly ExcalidrawElement[],
   app: AppClassProperties,
   getAttribute: (element: ExcalidrawElement) => T,
-  isRelevantElement: true | ((element: ExcalidrawElement) => boolean),
+  elementPredicate: true | ((element: ExcalidrawElement) => boolean),
   defaultValue: T | ((isSomeElementSelected: boolean) => T),
 ): T {
   const editingTextElement = app.state.editingTextElement;
@@ -209,9 +209,9 @@ export const getFormValue = function <T extends Primitive>(
     if (hasSelection) {
       const selectedElements = app.scene.getSelectedElements(app.state);
       const targetElements =
-        isRelevantElement === true
+        elementPredicate === true
           ? selectedElements
-          : selectedElements.filter((el) => isRelevantElement(el));
+          : selectedElements.filter((el) => elementPredicate(el));
 
       ret =
         reduceToCommonValue(targetElements, getAttribute) ??
@@ -730,9 +730,28 @@ export const actionChangeOpacity = register<ExcalidrawElement["opacity"]>({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ app, updateData }) => (
-    <Range updateData={updateData} app={app} testId="opacity" />
-  ),
+  PanelComponent: ({ elements, appState, app, updateData }) => {
+    const opacity = getFormValue(
+      elements,
+      app,
+      (element) => element.opacity,
+      true,
+      (hasSelection) => (hasSelection ? null : appState.currentItemOpacity),
+    );
+
+    return (
+      <Range
+        label={t("labels.opacity")}
+        value={opacity ?? appState.currentItemOpacity}
+        hasCommonValue={opacity !== null}
+        onChange={updateData}
+        min={0}
+        max={100}
+        step={10}
+        testId="opacity"
+      />
+    );
+  },
 });
 
 export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(

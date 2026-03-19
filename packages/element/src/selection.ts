@@ -11,6 +11,7 @@ import {
   isBoundToContainer,
   isFrameLikeElement,
   isLinearElement,
+  isTextElement,
 } from "./typeChecks";
 import {
   elementOverlapsWithFrame,
@@ -25,6 +26,7 @@ import type {
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawElement,
+  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./types";
 
@@ -287,4 +289,20 @@ export const getSelectionStateForElements = (
       null,
     ),
   };
+};
+
+/**
+ * Returns editing or single-selected text element, if any.
+ */
+export const getActiveTextElement = (
+  selectedElements: readonly NonDeleted<ExcalidrawElement>[],
+  appState: Pick<AppState, "editingTextElement">,
+) => {
+  const activeTextElement =
+    appState.editingTextElement ||
+    (selectedElements.length === 1 &&
+      isTextElement(selectedElements[0]) &&
+      selectedElements[0]);
+
+  return activeTextElement || null;
 };
