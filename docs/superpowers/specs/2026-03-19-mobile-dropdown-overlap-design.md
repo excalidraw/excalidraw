@@ -1,7 +1,6 @@
 # Mobile Dropdown Overlap Fix
 
-**Date:** 2026-03-19
-**Status:** Approved
+**Date:** 2026-03-19 **Status:** Approved
 
 ## Problem
 
@@ -48,7 +47,7 @@ This opens the popup upward from the trigger, where there is ample space.
 ## Files to Modify
 
 | File | Change |
-|------|--------|
+| --- | --- |
 | `packages/excalidraw/components/Actions.scss` | Add `:has()` rule to hide `.mobile-shape-actions` when toolbar dropdown open |
 | `packages/excalidraw/components/ToolPopover.scss` | Raise z-index for `.tool-popover-content` on mobile |
 | `packages/excalidraw/components/MobileToolBar.scss` | Raise z-index for extra tools dropdown on mobile |

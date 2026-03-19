@@ -199,6 +199,13 @@
   overflow: none;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  transition: visibility 0s, opacity 0.15s ease-out;
+}
+
+// Hide shape actions when any toolbar dropdown is open
+.App-bottom-bar:has(.App-toolbar [data-state="open"]) > .mobile-shape-actions {
+  visibility: hidden;
+  opacity: 0;
 }
 
 .shape-actions-theme-scope {
