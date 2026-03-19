@@ -2,19 +2,24 @@
 
 exports[`tryParseSpreadsheet > works for numbers with comma in them 1`] = `
 {
-  "spreadsheet": {
+  "data": {
     "labels": [
       "Week 1",
       "Week 2",
       "Week 3",
     ],
-    "title": "Users",
-    "values": [
-      814,
-      10301,
-      4264,
+    "series": [
+      {
+        "title": "Users",
+        "values": [
+          814,
+          10301,
+          4264,
+        ],
+      },
     ],
+    "title": "Users",
   },
-  "type": "VALID_SPREADSHEET",
+  "ok": true,
 }
 `;

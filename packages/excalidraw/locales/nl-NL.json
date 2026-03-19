@@ -2,7 +2,7 @@
   "labels": {
     "paste": "Plakken",
     "pasteAsPlaintext": "Plakken als platte tekst",
-    "pasteCharts": "Plak grafieken",
+    "pasteCharts": "Grafieken plakken",
     "selectAll": "Alles selecteren",
     "multiSelect": "Voeg element toe aan selectie",
     "moveCanvas": "Canvas verplaatsen",
@@ -557,7 +557,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Al je data is lokaal opgeslagen in je browser.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "Wil je in plaats daarvan naar Excalidraw+ gaan?",
       "menuHint": "Exporteren, voorkeuren en meer, ..."
     },
@@ -612,7 +614,55 @@
     "button": "Invoegen",
     "description": "Momenteel worden alleen <flowchartLink>Flowchart</flowchartLink>-, <sequenceLink>Sequence</sequenceLink>- en <classLink>Class</classLink>-diagrammen ondersteund. De andere types worden als afbeelding weergegeven in Excalidraw.",
     "syntax": "Mermaid Syntaxis",
-    "preview": "Voorbeeld"
+    "preview": "Voorbeeld",
+    "label": "Mermaid",
+    "inputPlaceholder": "Noteer Mermaid diagram omschrijving hier..."
+  },
+  "ttd": {
+    "error": "Fout!"
+  },
+  "chat": {
+    "inputPlaceholder": "Begin je diagram idee hier in te typen... ({{shortcut}} voor een nieuwe lijn)",
+    "inputPlaceholderWithMessages": "Ga door met het verfijnen van je diagram...",
+    "generating": "",
+    "rateLimitRemaining": "{{count}} verzoeken over vandaag",
+    "role": {
+      "user": "Jij",
+      "assistant": "AI Assistent",
+      "system": "Systeem"
+    },
+    "aiBeta": "AI Beta",
+    "label": "Chat",
+    "menu": "Menu",
+    "newChat": "Nieuwe Chat",
+    "deleteChat": "Chat verwijderen",
+    "deleteMessage": "Bericht verwijderen",
+    "viewAsMermaid": "Weergeven als Mermaid",
+    "placeholder": {
+      "title": "Laten we jouw diagram ontwerpen",
+      "description": "Beschrijf het diagram dat je wilt aanmaken, en we genereren het voor je.",
+      "hint": "Op dit moment kennen we Flowchart, Sequence, en Class diagrammen."
+    },
+    "preview": "Voorbeeld",
+    "insert": "Invoegen",
+    "retry": "Opnieuw proberen",
+    "errors": {
+      "promptTooShort": "Vraag is te kort (min {{min}} karakters)",
+      "promptTooLong": "Vraag is te kort (max {{max}} karakters)",
+      "generationFailed": "Generatie mislukt",
+      "invalidDiagram": "Een ongeldige diagram gegenereerd :(. Je kunt handmatig bewerken, opnieuw proberen met automatisch repareren of een andere vraag proberen.",
+      "fixInMermaid": "Mermaid handmatig bewerken →",
+      "aiRepair": "Opnieuw genereren (automatisch repareren) →",
+      "requestAborted": "Verzoek gestopt",
+      "requestFailed": "Verzoek mislukt",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "Je hebt je AI limiet bereikt op het gratis abonnement. Probeer Excalidraw+ uit voor meer of kom morgen terug.",
+      "generalRateLimit": "Ho ho, rustig aan, je gaat te snel voor ons! Wacht even voor je het opnieuw probeert.",
+      "messageLimitInputPlaceholder": "Je hebt je berichtenlimiet bereikt"
+    },
+    "upsellBtnLabel": "Upgrade naar Plus"
   },
   "quickSearch": {
     "placeholder": "Snel Zoeken"

@@ -106,6 +106,7 @@ export const CLASSES = {
   CONVERT_ELEMENT_TYPE_POPUP: "ConvertElementTypePopup",
   SHAPE_ACTIONS_THEME_SCOPE: "shape-actions-theme-scope",
   FRAME_NAME: "frame-name",
+  DROPDOWN_MENU_EVENT_WRAPPER: "dropdown-menu-event-wrapper",
 };
 
 export const FONT_SIZES = {
@@ -190,6 +191,8 @@ export const THEME = {
   DARK: "dark",
 } as const;
 
+export const DARK_THEME_FILTER = "invert(93%) hue-rotate(180deg)";
+
 export const FRAME_STYLE = {
   strokeColor: "#bbb" as ExcalidrawElement["strokeColor"],
   strokeWidth: 2 as ExcalidrawElement["strokeWidth"],
@@ -249,6 +252,7 @@ export const STRING_MIME_TYPES = {
   json: "application/json",
   // excalidraw data
   excalidraw: "application/vnd.excalidraw+json",
+  excalidrawClipboard: "application/vnd.excalidraw.clipboard+json",
   // LEGACY: fully-qualified library JSON data
   excalidrawlib: "application/vnd.excalidrawlib+json",
   // list of excalidraw library item ids

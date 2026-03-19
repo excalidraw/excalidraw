@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { useAtom, useSetAtom } from "../../../editor-jotai";
 
@@ -8,81 +8,100 @@ import { useTTDChatStorage } from "../useTTDChatStorage";
 
 import { getLastAssistantMessage } from "../utils/chat";
 
-import type { SavedChat } from "../types";
+import type { SavedChat, TTDPersistenceAdapter } from "../types";
 
-export const useChatManagement = () => {
+interface UseChatManagementProps {
+  persistenceAdapter: TTDPersistenceAdapter;
+}
+
+export const useChatManagement = ({
+  persistenceAdapter,
+}: UseChatManagementProps) => {
   const setError = useSetAtom(errorAtom);
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const { restoreChat, deleteChat, createNewChatId } = useTTDChatStorage();
+  const { restoreChat, deleteChat, createNewChatId } = useTTDChatStorage({
+    persistenceAdapter,
+  });
 
-  const resetChatState = () => {
-    const newSessionId = createNewChatId();
+  const applyChatToState = useCallback(
+    (chat: SavedChat) => {
+      const restoredMessages = chat.messages.map((msg) => ({
+        ...msg,
+        timestamp:
+          msg.timestamp instanceof Date
+            ? msg.timestamp
+            : new Date(msg.timestamp),
+      }));
+
+      const history = {
+        id: chat.id,
+        messages: restoredMessages,
+        currentPrompt: "",
+      };
+
+      const lastAssistantMsg = getLastAssistantMessage(history);
+
+      setError(
+        lastAssistantMsg?.error ? new Error(lastAssistantMsg?.error) : null,
+      );
+      setChatHistory(history);
+    },
+    [setError, setChatHistory],
+  );
+
+  const resetChatState = useCallback(async () => {
+    const newSessionId = await createNewChatId();
     setChatHistory({
       id: newSessionId,
       messages: [],
       currentPrompt: "",
     });
     setError(null);
-  };
+  }, [createNewChatId, setChatHistory, setError]);
 
-  const applyChatToState = (chat: SavedChat) => {
-    const restoredMessages = chat.messages.map((msg) => ({
-      ...msg,
-      timestamp:
-        msg.timestamp instanceof Date ? msg.timestamp : new Date(msg.timestamp),
-    }));
+  const onRestoreChat = useCallback(
+    (chat: SavedChat) => {
+      const restoredChat = restoreChat(chat);
+      applyChatToState(restoredChat);
 
-    const history = {
-      id: chat.id,
-      messages: restoredMessages,
-      currentPrompt: "",
-    };
+      setIsMenuOpen(false);
+    },
+    [restoreChat, applyChatToState],
+  );
 
-    const lastAssistantMsg = getLastAssistantMessage(history);
+  const handleDeleteChat = useCallback(
+    async (chatId: string, event: React.MouseEvent) => {
+      event.stopPropagation();
 
-    setError(
-      lastAssistantMsg?.error ? new Error(lastAssistantMsg?.error) : null,
-    );
-    setChatHistory(history);
-  };
+      const isDeletingActiveChat = chatId === chatHistory.id;
+      const updatedChats = await deleteChat(chatId);
 
-  const onRestoreChat = (chat: SavedChat) => {
-    const restoredChat = restoreChat(chat);
-    applyChatToState(restoredChat);
-
-    setIsMenuOpen(false);
-  };
-
-  const handleDeleteChat = (chatId: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-
-    const isDeletingActiveChat = chatId === chatHistory.id;
-    const updatedChats = deleteChat(chatId);
-
-    if (isDeletingActiveChat) {
-      if (updatedChats.length > 0) {
-        const nextChat = updatedChats[0];
-        applyChatToState(nextChat);
-      } else {
-        resetChatState();
+      if (isDeletingActiveChat) {
+        if (updatedChats.length > 0) {
+          const nextChat = updatedChats[0];
+          applyChatToState(nextChat);
+        } else {
+          await resetChatState();
+        }
       }
-    }
-  };
+    },
+    [chatHistory.id, deleteChat, applyChatToState, resetChatState],
+  );
 
-  const handleNewChat = () => {
-    resetChatState();
+  const handleNewChat = useCallback(async () => {
+    await resetChatState();
     setIsMenuOpen(false);
-  };
+  }, [resetChatState]);
 
-  const handleMenuToggle = () => {
+  const handleMenuToggle = useCallback(() => {
     setIsMenuOpen((prev) => !prev);
-  };
+  }, []);
 
-  const handleMenuClose = () => {
+  const handleMenuClose = useCallback(() => {
     setIsMenuOpen(false);
-  };
+  }, []);
 
   return {
     isMenuOpen,

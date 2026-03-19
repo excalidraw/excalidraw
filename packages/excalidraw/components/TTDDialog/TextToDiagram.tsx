@@ -25,18 +25,27 @@ import { TTDPreviewPanel } from "./TTDPreviewPanel";
 import { getLastAssistantMessage } from "./utils/chat";
 
 import type { BinaryFiles } from "../../types";
-import type { MermaidToExcalidrawLibProps, TChat, TTTDDialog } from "./types";
+import type {
+  MermaidToExcalidrawLibProps,
+  TChat,
+  TTDPersistenceAdapter,
+  TTTDDialog,
+} from "./types";
 
 const TextToDiagramContent = ({
   mermaidToExcalidrawLib,
   onTextSubmit,
+  renderWelcomeScreen,
   renderWarning,
+  persistenceAdapter,
 }: {
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
   onTextSubmit: (
     props: TTTDDialog.OnTextSubmitProps,
   ) => Promise<TTTDDialog.OnTextSubmitRetValue>;
+  renderWelcomeScreen?: TTTDDialog.renderWelcomeScreen;
   renderWarning?: TTTDDialog.renderWarning;
+  persistenceAdapter: TTDPersistenceAdapter;
 }) => {
   const app = useApp();
   const setAppState = useExcalidrawSetAppState();
@@ -46,7 +55,7 @@ const TextToDiagramContent = ({
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom);
   const showPreview = useAtomValue(showPreviewAtom);
 
-  const { savedChats } = useTTDChatStorage();
+  const { savedChats } = useTTDChatStorage({ persistenceAdapter });
 
   const lastAssistantMessage = getLastAssistantMessage(chatHistory);
 
@@ -68,7 +77,7 @@ const TextToDiagramContent = ({
     handleNewChat,
     handleMenuToggle,
     handleMenuClose,
-  } = useChatManagement();
+  } = useChatManagement({ persistenceAdapter });
 
   const onViewAsMermaid = () => {
     if (typeof lastAssistantMessage?.content === "string") {
@@ -213,6 +222,7 @@ const TextToDiagramContent = ({
         onRetry={handleRetry}
         onViewAsMermaid={onViewAsMermaid}
         renderWarning={renderWarning}
+        renderWelcomeScreen={renderWelcomeScreen}
       />
       {showPreview && (
         <TTDPreviewPanel
@@ -230,19 +240,25 @@ const TextToDiagramContent = ({
 export const TextToDiagram = ({
   mermaidToExcalidrawLib,
   onTextSubmit,
+  renderWelcomeScreen,
   renderWarning,
+  persistenceAdapter,
 }: {
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
   onTextSubmit(
     props: TTTDDialog.OnTextSubmitProps,
   ): Promise<TTTDDialog.OnTextSubmitRetValue>;
+  renderWelcomeScreen?: TTTDDialog.renderWelcomeScreen;
   renderWarning?: TTTDDialog.renderWarning;
+  persistenceAdapter: TTDPersistenceAdapter;
 }) => {
   return (
     <TextToDiagramContent
       mermaidToExcalidrawLib={mermaidToExcalidrawLib}
       onTextSubmit={onTextSubmit}
+      renderWelcomeScreen={renderWelcomeScreen}
       renderWarning={renderWarning}
+      persistenceAdapter={persistenceAdapter}
     />
   );
 };

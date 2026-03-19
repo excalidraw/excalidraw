@@ -123,8 +123,13 @@ export const ChatMessage: React.FC<{
           {message.error ? (
             <>
               <div className="chat-message__error">{message.content}</div>
+              {message.errorType !== "parse" && (
+                <div className="chat-message__error_message">
+                  Error: {message.error || t("chat.errors.generationFailed")}
+                </div>
+              )}
               {message.errorType === "parse" && allowFixingParseError && (
-                <>
+                <div className="chat-message__error_message">
                   <p>{t("chat.errors.invalidDiagram")}</p>
                   <div className="chat-message__error-actions">
                     {onMermaidTabClick && (
@@ -147,7 +152,7 @@ export const ChatMessage: React.FC<{
                       </button>
                     )}
                   </div>
-                </>
+                </div>
               )}
             </>
           ) : (

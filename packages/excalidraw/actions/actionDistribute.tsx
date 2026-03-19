@@ -58,6 +58,7 @@ const distributeSelectedElements = (
     app.scene.getNonDeletedElementsMap(),
     distribution,
     appState,
+    app.scene,
   );
 
   const updatedElementsMap = arrayToMap(updatedElements);

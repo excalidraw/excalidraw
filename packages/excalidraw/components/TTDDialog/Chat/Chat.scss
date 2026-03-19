@@ -1,4 +1,4 @@
-@import "../../../css/variables.module.scss";
+@use "../../../css/variables.module.scss" as *;
 
 $verticalBreakpoint: 861px;
 
@@ -48,14 +48,14 @@ $verticalBreakpoint: 861px;
       }
     }
 
-    &__empty-state {
+    &__welcome-screen {
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100%;
       min-height: 200px;
 
-      &-content {
+      &__welcome-message {
         text-align: center;
 
         h3 {
@@ -339,12 +339,21 @@ $verticalBreakpoint: 861px;
       gap: 0.5rem;
     }
 
+    &__error_message {
+      background: var(--color-warning-background);
+      color: var(--color-warning-color);
+
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--border-radius-md);
+      margin-top: 1rem;
+      font-size: 0.875rem;
+    }
+
     &__error-link {
       display: flex;
       align-items: center;
       background: none;
       border: none;
-      color: var(--color-primary);
       cursor: pointer;
       font-size: 0.875rem;
       font-weight: 500;
@@ -352,6 +361,14 @@ $verticalBreakpoint: 861px;
       margin-top: 1rem;
       text-decoration: underline;
       font-family: inherit;
+      color: var(--link-color);
+
+      &:hover {
+        color: var(--link-color-hover);
+      }
+      &:active {
+        color: var(--link-color-active);
+      }
 
       &:disabled {
         cursor: not-allowed;

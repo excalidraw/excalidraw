@@ -27,7 +27,6 @@ import {
 
 import type { AppState, DataURL, LibraryItem } from "../types";
 
-import type { FileSystemHandle } from "browser-fs-access";
 import type { ImportedLibraryData } from "./types";
 
 const parseFileContents = async (blob: Blob | File): Promise<string> => {
@@ -104,7 +103,7 @@ export const getMimeType = (blob: Blob | string): string => {
   return "";
 };
 
-export const getFileHandleType = (handle: FileSystemHandle | null) => {
+export const getFileHandleType = (handle: FileSystemFileHandle | null) => {
   if (!handle) {
     return null;
   }
@@ -118,7 +117,9 @@ export const isImageFileHandleType = (
   return type === "png" || type === "svg";
 };
 
-export const isImageFileHandle = (handle: FileSystemHandle | null) => {
+export const isImageFileHandle = (
+  handle: FileSystemFileHandle | null,
+): handle is FileSystemFileHandle => {
   const type = getFileHandleType(handle);
   return type === "png" || type === "svg";
 };
@@ -139,8 +140,8 @@ export const loadSceneOrLibraryFromBlob = async (
   /** @see restore.localAppState */
   localAppState: AppState | null,
   localElements: readonly ExcalidrawElement[] | null,
-  /** FileSystemHandle. Defaults to `blob.handle` if defined, otherwise null. */
-  fileHandle?: FileSystemHandle | null,
+  /** FileSystemFileHandle. Defaults to `blob.handle` if defined, otherwise null. */
+  fileHandle?: FileSystemFileHandle | null,
 ) => {
   const contents = await parseFileContents(blob);
   let data;
@@ -198,8 +199,8 @@ export const loadFromBlob = async (
   /** @see restore.localAppState */
   localAppState: AppState | null,
   localElements: readonly ExcalidrawElement[] | null,
-  /** FileSystemHandle. Defaults to `blob.handle` if defined, otherwise null. */
-  fileHandle?: FileSystemHandle | null,
+  /** FileSystemFileHandle. Defaults to `blob.handle` if defined, otherwise null. */
+  fileHandle?: FileSystemFileHandle | null,
 ) => {
   const ret = await loadSceneOrLibraryFromBlob(
     blob,
@@ -392,7 +393,7 @@ export const ImageURLToFile = async (
 
 export const getFileHandle = async (
   event: DragEvent | React.DragEvent | DataTransferItem,
-): Promise<FileSystemHandle | null> => {
+): Promise<FileSystemFileHandle | null> => {
   if (nativeFileSystemSupported) {
     try {
       const dataTransferItem =
@@ -400,7 +401,7 @@ export const getFileHandle = async (
           ? event
           : (event as DragEvent).dataTransfer?.items?.[0];
 
-      const handle: FileSystemHandle | null =
+      const handle: FileSystemFileHandle | null =
         (await (dataTransferItem as any).getAsFileSystemHandle()) || null;
 
       return handle;

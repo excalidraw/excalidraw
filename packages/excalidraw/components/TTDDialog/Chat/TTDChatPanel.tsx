@@ -11,7 +11,7 @@ import { rateLimitsAtom } from "../TTDContext";
 
 import { ChatHistoryMenu } from "./ChatHistoryMenu";
 
-import { ChatInterface } from ".";
+import { ChatInterface } from "./ChatInterface";
 
 import type { TTDPanelAction } from "../TTDDialogPanel";
 
@@ -40,6 +40,7 @@ export const TTDChatPanel = ({
   onInsertMessage,
   onRetry,
   onViewAsMermaid,
+  renderWelcomeScreen,
   renderWarning,
 }: {
   chatId: string;
@@ -68,6 +69,7 @@ export const TTDChatPanel = ({
 
   onViewAsMermaid: () => void;
 
+  renderWelcomeScreen?: TTTDDialog.renderWelcomeScreen;
   renderWarning?: TTTDDialog.renderWarning;
 }) => {
   const [rateLimits] = useAtom(rateLimitsAtom);
@@ -151,11 +153,7 @@ export const TTDChatPanel = ({
         onInsertMessage={onInsertMessage}
         onRetry={onRetry}
         rateLimits={rateLimits}
-        placeholder={{
-          title: t("chat.placeholder.title"),
-          description: t("chat.placeholder.description"),
-          hint: t("chat.placeholder.hint"),
-        }}
+        renderWelcomeScreen={renderWelcomeScreen}
         renderWarning={renderWarning}
       />
     </TTDDialogPanel>

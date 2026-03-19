@@ -3,7 +3,7 @@ import clsx from "clsx";
 
 import { capitalizeString } from "@excalidraw/common";
 
-import * as Popover from "@radix-ui/react-popover";
+import { Popover } from "radix-ui";
 
 import { trackEvent } from "../analytics";
 

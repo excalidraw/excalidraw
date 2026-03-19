@@ -46,6 +46,7 @@ export const STORAGE_KEYS = {
   VERSION_FILES: "version-files",
 
   IDB_LIBRARY: "excalidraw-library",
+  IDB_TTD_CHATS: "excalidraw-ttd-chats",
 
   // do not use apart from migrations
   __LEGACY_LOCAL_STORAGE_LIBRARY: "excalidraw-library",

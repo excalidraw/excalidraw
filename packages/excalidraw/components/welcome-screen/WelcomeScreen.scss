@@ -29,7 +29,7 @@
   // ---------------------------------------------------------------------------
 
   .welcome-screen-decor-hint {
-    @media (max-height: 599px) {
+    @media (max-height: 780px) {
       display: none !important;
     }
 
@@ -148,6 +148,7 @@
   .welcome-screen-center__heading {
     font-size: 1.125rem;
     text-align: center;
+    line-height: 1.35rem;
   }
 
   .welcome-screen-menu {

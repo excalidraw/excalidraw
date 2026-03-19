@@ -1,4 +1,4 @@
-import { getEmbedLink } from "../src/embeddable";
+import { embeddableURLValidator, getEmbedLink } from "../src/embeddable";
 
 describe("YouTube timestamp parsing", () => {
   it("should parse YouTube URLs with timestamp in seconds", () => {
@@ -149,5 +149,85 @@ describe("YouTube timestamp parsing", () => {
       expect(result.link).toContain("start=90");
       expect(result.link).toContain("enablejsapi=1");
     }
+  });
+});
+
+describe("Google Drive video embedding", () => {
+  it.each([
+    {
+      url: "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz123456/view?usp=sharing",
+      expectedLink:
+        "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz123456/preview",
+    },
+    {
+      url: "https://drive.google.com/open?id=1AbCdEfGhIjKlMnOpQrStUvWxYz123456",
+      expectedLink:
+        "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz123456/preview",
+    },
+    {
+      url: "https://drive.google.com/uc?export=download&id=1AbCdEfGhIjKlMnOpQrStUvWxYz123456",
+      expectedLink:
+        "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz123456/preview",
+    },
+  ])("should normalize Google Drive link: $url", ({ url, expectedLink }) => {
+    const result = getEmbedLink(url);
+
+    expect(result).toBeTruthy();
+    expect(result?.type).toBe("video");
+    if (result?.type === "video" || result?.type === "generic") {
+      expect(result.link).toBe(expectedLink);
+    }
+    expect(result?.intrinsicSize).toEqual({ w: 560, h: 315 });
+  });
+
+  it("should preserve resourcekey when available", () => {
+    const url =
+      "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz123456/view?resourcekey=0-abcdef123456";
+    const result = getEmbedLink(url);
+
+    expect(result).toBeTruthy();
+    expect(result?.type).toBe("video");
+    if (result?.type === "video" || result?.type === "generic") {
+      expect(result.link).toBe(
+        "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz123456/preview?resourcekey=0-abcdef123456",
+      );
+    }
+  });
+
+  it("should preserve timestamp when available", () => {
+    const url =
+      "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz123456/view?t=9";
+    const result = getEmbedLink(url);
+
+    expect(result).toBeTruthy();
+    expect(result?.type).toBe("video");
+    if (result?.type === "video" || result?.type === "generic") {
+      expect(result.link).toBe(
+        "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz123456/preview?t=9",
+      );
+    }
+  });
+
+  it("should preserve resourcekey and timestamp together", () => {
+    const url =
+      "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz123456/view?resourcekey=0-abcdef123456&t=9";
+    const result = getEmbedLink(url);
+
+    expect(result).toBeTruthy();
+    expect(result?.type).toBe("video");
+    if (result?.type === "video" || result?.type === "generic") {
+      expect(result.link).toBe(
+        "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz123456/preview?resourcekey=0-abcdef123456&t=9",
+      );
+    }
+  });
+
+  it("should validate Google Drive domain by default", () => {
+    expect(
+      embeddableURLValidator(
+        "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz123456/view",
+        undefined,
+      ),
+    ).toBe(true);
   });
 });

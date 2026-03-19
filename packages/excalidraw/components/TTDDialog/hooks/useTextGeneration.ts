@@ -63,31 +63,6 @@ export const useTextGeneration = ({
     return true;
   };
 
-  const getReadableErrorMsg = (msg: string) => {
-    try {
-      const content = JSON.parse(msg);
-
-      const innerMessages = JSON.parse(content.message);
-
-      return innerMessages
-        .map((oneMsg: { message: string }) => oneMsg.message)
-        .join("\n");
-    } catch (err) {
-      return msg;
-    }
-  };
-
-  const handleError = (error: Error, errorType: "parse" | "network") => {
-    if (errorType === "parse") {
-      trackEvent("ai", "mermaid parse failed", "ttd");
-    }
-
-    const msg = getReadableErrorMsg(error.message);
-
-    setAssistantError(msg, errorType);
-    setError(error);
-  };
-
   const onGenerate: TTTDDialog.OnGenerate = async ({
     prompt,
     isRepairFlow = false,
@@ -165,6 +140,34 @@ export const useTextGeneration = ({
         setRateLimits({ rateLimit, rateLimitRemaining });
       }
 
+      if (error?.status === 429 || rateLimitRemaining === 0) {
+        setChatHistory((chatHistory) => {
+          if (error?.status === 429) {
+            chatHistory = removeLastAssistantMessage(chatHistory);
+          }
+
+          chatHistory = {
+            ...chatHistory,
+            messages: chatHistory.messages.filter(
+              (msg) =>
+                msg.type !== "warning" ||
+                msg.warningType === "rateLimitExceeded" ||
+                msg.warningType === "messageLimitExceeded",
+            ),
+          };
+          const messages = addMessages(chatHistory, [
+            {
+              type: "warning",
+              warningType:
+                rateLimitRemaining === 0
+                  ? "messageLimitExceeded"
+                  : "rateLimitExceeded",
+            },
+          ]);
+          return messages;
+        });
+      }
+
       if (error) {
         const isAborted =
           error.name === "AbortError" ||
@@ -176,63 +179,34 @@ export const useTextGeneration = ({
           return;
         }
 
-        if (error.status === 429) {
-          setChatHistory((prev) => {
-            const chatHistory = removeLastAssistantMessage(prev);
-
-            return {
-              ...chatHistory,
-              messages: chatHistory.messages.filter(
-                (msg) =>
-                  msg.type !== "warning" ||
-                  msg.warningType === "rateLimitExceeded" ||
-                  msg.warningType === "messageLimitExceeded",
-              ),
-            };
-          });
-
-          setChatHistory((chatHistory) => {
-            return addMessages(chatHistory, [
-              {
-                type: "warning",
-                warningType:
-                  rateLimitRemaining === 0
-                    ? "messageLimitExceeded"
-                    : "rateLimitExceeded",
-              },
-            ]);
-          });
-
-          return;
-        } else if (rateLimitRemaining === 0) {
-          setChatHistory((chatHistory) => {
-            chatHistory = {
-              ...chatHistory,
-              messages: chatHistory.messages.filter(
-                (msg) =>
-                  msg.type !== "warning" ||
-                  msg.warningType === "rateLimitExceeded" ||
-                  msg.warningType === "messageLimitExceeded",
-              ),
-            };
-            return addMessages(chatHistory, [
-              {
-                type: "warning",
-                warningType: "messageLimitExceeded",
-              },
-            ]);
-          });
+        const _error = new Error(
+          error.message || t("chat.errors.requestFailed"),
+        );
+        if (error.status !== 429) {
+          setAssistantError(_error.message, "network");
         }
+        setError(_error);
 
-        handleError(error as Error, "network");
         return;
       }
 
-      await parseMermaidToExcalidraw(generatedResponse ?? "");
-
-      trackEvent("ai", "mermaid parse success", "ttd");
-    } catch (error: unknown) {
-      handleError(error as Error, "parse");
+      try {
+        await parseMermaidToExcalidraw(generatedResponse ?? "");
+        trackEvent("ai", "mermaid parse success", "ttd");
+      } catch (error: any) {
+        trackEvent("ai", "mermaid parse failed", "ttd");
+        const _error = new Error(
+          error.message || t("chat.errors.mermaidParseError"),
+        );
+        setAssistantError(_error.message, "parse");
+        setError(_error);
+      }
+    } catch (error: any) {
+      const _error = new Error(
+        error.message || t("chat.errors.generationFailed"),
+      );
+      setAssistantError(_error.message, "other");
+      setError(_error);
     } finally {
       streamingAbortControllerRef.current = null;
     }

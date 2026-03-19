@@ -11,8 +11,8 @@
     "copyAsPng": "Vágólapra másolás mint PNG",
     "copyAsSvg": "Vágólapra másolás mint SVG",
     "copyText": "Vágólapra másolás szövegként",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Forrás másolása a vágólapra",
+    "convertToCode": "Kód generálás",
     "bringForward": "Előrébb hozás",
     "sendToBack": "Hátraküldés",
     "bringToFront": "Előrehozás",
@@ -86,7 +86,7 @@
     "layers": "Rétegek",
     "actions": "Műveletek",
     "language": "Nyelv",
-    "liveCollaboration": "",
+    "liveCollaboration": "Élő együttműködés...",
     "duplicateSelection": "Duplikálás",
     "untitled": "Névtelen",
     "name": "Név",
@@ -95,13 +95,13 @@
     "group": "Csoportosítás",
     "ungroup": "Csoportbontás",
     "collaborators": "Közreműködők",
-    "toggleGrid": "",
+    "toggleGrid": "Keresés törlése",
     "addToLibrary": "Hozzáadás a könyvtárhoz",
     "removeFromLibrary": "Eltávólítás a könyvtárból",
     "libraryLoadingMessage": "Könyvtár betöltése…",
     "libraries": "Könyvtárak böngészése",
     "loadingScene": "Jelenet betöltése…",
-    "loadScene": "",
+    "loadScene": "Betöltés fájlból",
     "align": "Igazítás",
     "alignTop": "Felülre igazítás",
     "alignBottom": "Alulra igazítás",
@@ -118,7 +118,7 @@
     "showStroke": "Körvonal színválasztó megjelenítése",
     "showBackground": "Háttérszín-választó megjelenítése",
     "showFonts": "",
-    "toggleTheme": "",
+    "toggleTheme": "Világos/sötét háttér kapcsoló",
     "theme": "Téma",
     "personalLib": "Személyes könyvtár",
     "excalidrawLib": "Excalidraw könyvtár",
@@ -126,7 +126,7 @@
     "increaseFontSize": "Betűméret növelése",
     "unbindText": "Szövegkötés feloldása",
     "bindText": "",
-    "createContainerFromText": "",
+    "createContainerFromText": "Szöveg bekeretezése",
     "link": {
       "edit": "Hivatkozás szerkesztése",
       "editEmbed": "",
@@ -147,34 +147,34 @@
     },
     "elementLock": {
       "lock": "",
-      "unlock": "",
+      "unlock": "Zárolás feloldása",
       "lockAll": "Összes zárolása",
       "unlockAll": "Összes feloldása"
     },
     "statusPublished": "Közzétéve",
-    "sidebarLock": "",
+    "sidebarLock": "Oldalsó sáv nyitva tartása",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "Szövegből diagram",
-    "prompt": "",
+    "prompt": "Egyéb",
     "followUs": "Kövess minket",
     "discordChat": "Discord chat",
     "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": "",
+    "zoomToFitSelection": "Nagyítás a kijelölés méretére",
+    "zoomToFit": "Az összes elem látótérbe hozása",
     "installPWA": "",
     "autoResize": "",
     "imageCropping": "",
     "unCroppedDimension": "",
     "copyElementLink": "",
-    "linkToElement": "",
+    "linkToElement": "Hivatkozás az objektumhoz",
     "wrapSelectionInFrame": "",
-    "tab": "",
+    "tab": "Tab",
     "shapeSwitch": ""
   },
   "elementLink": {
-    "title": "",
+    "title": "Hivatkozás az objektumhoz",
     "desc": "",
     "notFound": ""
   },
@@ -183,31 +183,31 @@
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": "",
     "search": {
-      "inputPlaceholder": "",
+      "inputPlaceholder": "Keresés a könyvtárban",
       "heading": "",
       "noResults": "",
-      "clearSearch": ""
+      "clearSearch": "Keresés törlése"
     }
   },
   "search": {
-    "title": "",
+    "title": "Rajzvászonon használt",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",
     "placeholder": "",
-    "frames": "",
-    "texts": ""
+    "frames": "Keretek",
+    "texts": "Szövegek"
   },
   "buttons": {
     "clearReset": "Vászon törlése",
     "exportJSON": "Exportálás fájlba",
-    "exportImage": "",
-    "export": "",
+    "exportImage": "Kép exportálása...",
+    "export": "Mentés másként...",
     "copyToClipboard": "Vágólapra másolás",
-    "copyLink": "",
+    "copyLink": "Link másolása",
     "save": "Mentés az aktuális fájlba",
     "saveAs": "Mentés másként",
-    "load": "",
+    "load": "Megnyitás",
     "getShareableLink": "Megosztható link létrehozása",
     "close": "Bezárás",
     "selectLanguage": "Nyelv kiválasztása",
@@ -225,19 +225,19 @@
     "fullScreen": "Teljes képernyő",
     "darkMode": "Sötét mód",
     "lightMode": "Világos mód",
-    "systemMode": "",
+    "systemMode": "Rendszer mód",
     "zenMode": "Letisztult mód",
-    "objectsSnapMode": "",
+    "objectsSnapMode": "Objektumhoz illeszt",
     "exitZenMode": "Kilépés a letisztult módból",
     "cancel": "Mégsem",
     "saveLibNames": "",
     "clear": "Kiűrítés",
     "remove": "Eltávolítás",
-    "embed": "",
+    "embed": "Beágyazás be/ki",
     "publishLibrary": "",
     "submit": "Elküldés",
     "confirm": "Megerősítés",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Interakció Kattintással"
   },
   "alerts": {
     "clearReset": "Ez a művelet törli a vászont. Biztos benne?",
@@ -246,7 +246,7 @@
     "couldNotLoadInvalidFile": "Nem sikerült betölteni a helytelen fájlt",
     "importBackendFailed": "Nem sikerült betölteni a szerverről.",
     "cannotExportEmptyCanvas": "Üres vászont nem lehet exportálni.",
-    "couldNotCopyToClipboard": "",
+    "couldNotCopyToClipboard": "Nem lehet a vágólapra másolni.",
     "decryptFailed": "Nem sikerült visszafejteni a titkosított adatot.",
     "uploadedSecurly": "A feltöltést végpontok közötti titkosítással biztosítottuk, ami azt jelenti, hogy egy harmadik fél nem tudja megnézni a tartalmát, beleértve az Excalidraw szervereit is.",
     "loadSceneOverridePrompt": "A betöltött külső rajz felül fogja írnia meglévőt. Szeretnéd folytatni?",
@@ -304,31 +304,31 @@
     "library": "Könyvtár",
     "lock": "Rajzolás után az aktív eszközt tartsa kijelölve",
     "penMode": "",
-    "link": "",
-    "eraser": "",
+    "link": "Hivatkozás hozzáadása/frissítése a kiválasztott alakzathoz",
+    "eraser": "Radír",
     "frame": "",
     "magicframe": "",
     "embeddable": "",
-    "laser": "",
+    "laser": "Lézermutató",
     "hand": "",
-    "extraTools": "",
+    "extraTools": "További eszközök",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
   },
   "element": {
-    "rectangle": "",
-    "diamond": "",
-    "ellipse": "",
-    "arrow": "",
-    "line": "",
+    "rectangle": "Téglalap",
+    "diamond": "Rombusz",
+    "ellipse": "Ellipszis",
+    "arrow": "Nyíl",
+    "line": "Vonal",
     "freedraw": "",
-    "text": "",
-    "image": "",
-    "group": "",
-    "frame": "",
+    "text": "Szöveg",
+    "image": "Kép",
+    "group": "Csoport",
+    "frame": "Keret",
     "magicframe": "",
-    "embeddable": "",
-    "selection": "",
+    "embeddable": "Weblap beágyazása",
+    "selection": "Kijelölés",
     "iframe": ""
   },
   "headings": {
@@ -338,7 +338,7 @@
   },
   "hints": {
     "dismissSearch": "",
-    "canvasPanning": "",
+    "canvasPanning": "A vászon mozgatásához tartsd lenyomva a {{shortcut_1}} vagy {{shortcut_2}} billentyűt húzás közben, vagy használd a kéz eszközt",
     "linearElement": "Kattintással görbe, az eger húzásával pedig egyenes nyilat rajzolhatsz",
     "arrowTool": "",
     "arrowBindModifiers": "",
@@ -380,7 +380,7 @@
     "sceneContent": "Jelenet tartalma:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Vagy"
   },
   "roomDialog": {
     "desc_intro": "",
@@ -420,7 +420,7 @@
     "drag": "vonszolás",
     "editor": "Szerkesztő",
     "editLineArrowPoints": "",
-    "editText": "",
+    "editText": "Szöveg szerkesztése / címke hozzáadása",
     "github": "Hibát találtál? Küld be",
     "howto": "Kövesd az útmutatóinkat",
     "or": "vagy",
@@ -436,7 +436,7 @@
     "toggleElementLock": "",
     "movePageUpDown": "",
     "movePageLeftRight": "",
-    "cropStart": "",
+    "cropStart": "Kép kivágása",
     "cropFinish": ""
   },
   "clearCanvasDialog": {
@@ -481,25 +481,25 @@
   "imageExportDialog": {
     "header": "Kép exportálása",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Háttér",
+      "onlySelected": "Csak a kijelölt",
+      "darkMode": "Sötét mód",
+      "embedScene": "Jelenet beágyazása",
+      "scale": "Nagyítás",
+      "padding": "Eltartás"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "A jelenetet leíró adatok hozzá lesznek adva a PNG/SVG fájlhoz, így a jelenetet vissza lehet majd tölteni belőle. Ez megnöveli a fájl méretét."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exportálás PNG-be",
+      "exportToSvg": "Exportálás SVG-be",
+      "copyPngToClipboard": "PNG másolása a vágólapra"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Vágólapra másolás"
     }
   },
   "encrypted": {
@@ -508,14 +508,14 @@
   },
   "stats": {
     "angle": "Szög",
-    "shapes": "",
+    "shapes": "Alakzatok",
     "height": "Magasság",
     "scene": "Jelenet",
     "selected": "Kijelölt",
     "storage": "Tárhely",
     "fullTitle": "",
-    "title": "",
-    "generalStats": "",
+    "title": "Tulajdonságok",
+    "generalStats": "Általános",
     "elementProperties": "",
     "total": "Összesen",
     "version": "Verzió",
@@ -540,24 +540,26 @@
   },
   "colors": {
     "transparent": "Átlátszó",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Fekete",
+    "white": "Fehér",
+    "red": "Piros",
+    "pink": "Pink",
+    "grape": "Szőlő",
+    "violet": "Lila",
+    "gray": "Szürke",
+    "blue": "Kék",
+    "cyan": "Cián",
+    "teal": "Türkiz",
+    "green": "Zöld",
+    "yellow": "Sárga",
+    "orange": "Narancssárga",
+    "bronze": "Bronz"
   },
   "welcomeScreen": {
     "app": {
       "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "",
       "menuHint": ""
     },
@@ -569,7 +571,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Szín",
     "mostUsedCustomColors": "",
     "colors": "",
     "shades": "",
@@ -612,18 +614,66 @@
     "button": "",
     "description": "",
     "syntax": "",
-    "preview": ""
+    "preview": "",
+    "label": "",
+    "inputPlaceholder": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "Te",
+      "assistant": "AI asszisztens",
+      "system": "Rendszer"
+    },
+    "aiBeta": "",
+    "label": "Csevegés",
+    "menu": "Menü",
+    "newChat": "Új csevegés",
+    "deleteChat": "Csevegés törlése",
+    "deleteMessage": "Üzenet törlése",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "Előnézet",
+    "insert": "Beszúrás",
+    "retry": "Újra",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": "Frissítés Plus csomagra"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Gyorskeresés"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "régi"
     },
     "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "availableFonts": "Elérhető betűtípusok",
+    "empty": "Nem találhatóak betűtípusok"
   },
   "userList": {
     "empty": "",
@@ -636,13 +686,13 @@
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Parancspanel",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Kiválasztás",
+      "confirm": "Megerősítés",
+      "close": "Bezárás"
     },
-    "recents": "",
+    "recents": "Legutóbb használt",
     "search": {
       "placeholder": "",
       "noMatch": ""
@@ -651,8 +701,8 @@
     "shortcutHint": ""
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
+    "ctrl": "Ctrl",
+    "option": "Option",
     "cmd": "",
     "alt": "",
     "escape": "",

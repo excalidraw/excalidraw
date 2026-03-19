@@ -53,6 +53,24 @@ export interface SavedChat {
   timestamp: number;
 }
 
+export type SavedChats = SavedChat[];
+
+/**
+ * Interface for TTD chat persistence. Preferably should be stable
+ * (e.g. static class/singleton)
+ */
+export interface TTDPersistenceAdapter {
+  /**
+   * Load saved chats from storage.
+   */
+  loadChats(): Promise<SavedChats>;
+
+  /**
+   * Save chats to storage.
+   */
+  saveChats(chats: SavedChats): Promise<void>;
+}
+
 export interface MermaidToExcalidrawLibProps {
   loaded: boolean;
   api: Promise<{
@@ -98,4 +116,9 @@ export namespace TTTDDialog {
   export type renderWarning = (
     chatMessage: TChat.ChatMessage,
   ) => React.ReactNode | undefined;
+
+  export type renderWelcomeScreen = (props: {
+    /** null if not rate limit data currently available */
+    rateLimits: RateLimits | null;
+  }) => React.ReactNode | undefined;
 }

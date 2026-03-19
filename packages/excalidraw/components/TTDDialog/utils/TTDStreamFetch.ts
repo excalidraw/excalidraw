@@ -1,9 +1,6 @@
-import { RequestError } from "@excalidraw/excalidraw/errors";
+import { RequestError } from "../../../errors";
 
-import type {
-  LLMMessage,
-  TTTDDialog,
-} from "@excalidraw/excalidraw/components/TTDDialog/types";
+import type { LLMMessage, TTTDDialog } from "../types";
 
 interface RateLimitInfo {
   rateLimit?: number;
@@ -32,7 +29,7 @@ export type StreamChunk =
       type: "error";
       error: {
         message: string;
-        code?: string;
+        status?: number;
       };
     };
 

@@ -6,7 +6,7 @@ import { resolvablePromise } from "@excalidraw/common";
 import { Excalidraw, CaptureUpdateAction } from "../../index";
 import { API } from "../helpers/api";
 import { Pointer } from "../helpers/ui";
-import { render } from "../test-utils";
+import { render, unmountComponent } from "../test-utils";
 
 import type { ExcalidrawImperativeAPI } from "../../types";
 
@@ -21,10 +21,91 @@ describe("event callbacks", () => {
     const excalidrawAPIPromise = resolvablePromise<ExcalidrawImperativeAPI>();
     await render(
       <Excalidraw
-        excalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
+        onExcalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
       />,
     );
     excalidrawAPI = await excalidrawAPIPromise;
+  });
+
+  it("should resolve editor:mount/editor:initialize when subscribed before mount", async () => {
+    unmountComponent();
+
+    const lifecyclePromise = resolvablePromise<{
+      api: ExcalidrawImperativeAPI;
+      mount: Promise<{
+        excalidrawAPI: ExcalidrawImperativeAPI;
+        container: HTMLDivElement | null;
+      }>;
+      initialize: Promise<ExcalidrawImperativeAPI>;
+    }>();
+
+    await render(
+      <Excalidraw
+        onExcalidrawAPI={(api) => {
+          if (api) {
+            lifecyclePromise.resolve({
+              api,
+              mount: api.onEvent("editor:mount"),
+              initialize: api.onEvent("editor:initialize"),
+            });
+          }
+        }}
+      />,
+    );
+
+    const { api, mount, initialize } = await lifecyclePromise;
+    await expect(mount).resolves.toEqual({
+      excalidrawAPI: api,
+      container: expect.any(HTMLDivElement),
+    });
+    await expect(initialize).resolves.toBe(api);
+  });
+
+  it("should replay editor:mount/editor:initialize to late subscribers", async () => {
+    const onMount = vi.fn();
+    const onInitialize = vi.fn();
+
+    excalidrawAPI.onEvent("editor:mount", onMount);
+    excalidrawAPI.onEvent("editor:initialize", onInitialize);
+
+    await Promise.resolve();
+
+    expect(onMount).toHaveBeenCalledTimes(1);
+    expect(onMount).toHaveBeenCalledWith({
+      excalidrawAPI,
+      container: expect.any(HTMLDivElement),
+    });
+    expect(onInitialize).toHaveBeenCalledTimes(1);
+    expect(onInitialize).toHaveBeenCalledWith(excalidrawAPI);
+
+    await expect(excalidrawAPI.onEvent("editor:mount")).resolves.toEqual({
+      excalidrawAPI,
+      container: expect.any(HTMLDivElement),
+    });
+    await expect(excalidrawAPI.onEvent("editor:initialize")).resolves.toBe(
+      excalidrawAPI,
+    );
+  });
+
+  it("should call onMount before onInitialize props", async () => {
+    unmountComponent();
+
+    const calls: string[] = [];
+
+    await render(
+      <Excalidraw
+        onMount={({ excalidrawAPI, container }) => {
+          expect(excalidrawAPI).toBeDefined();
+          expect(container).toBeInstanceOf(HTMLDivElement);
+          calls.push("mount");
+        }}
+        onInitialize={() => {
+          calls.push("initialize");
+        }}
+      />,
+    );
+
+    expect(calls).toEqual(["mount", "initialize"]);
   });
 
   it("should trigger onChange on render", async () => {
