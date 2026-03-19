@@ -39,6 +39,21 @@ describe("schema migration", () => {
     expect((migrated[0] as any).backgroundEnabled).toBeUndefined();
   });
 
+  it("should normalize legacy false-flag frame backgrounds", () => {
+    const frame = API.createElement({
+      type: "frame",
+      backgroundColor: "#a5d8ff",
+    });
+    (frame as any).backgroundEnabled = false;
+
+    const migrated = migrateElementsBySchema([frame], SCHEMA_VERSIONS.initial)!;
+
+    expect(migrated[0].backgroundColor).toBe(
+      DEFAULT_ELEMENT_PROPS.backgroundColor,
+    );
+    expect((migrated[0] as any).backgroundEnabled).toBeUndefined();
+  });
+
   it("should resolve invalid schema versions using fallback", () => {
     expect(resolveSchemaVersion(undefined, SCHEMA_VERSIONS.initial)).toBe(
       SCHEMA_VERSIONS.initial,

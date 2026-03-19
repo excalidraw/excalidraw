@@ -5759,7 +5759,6 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "backgroundEnabled": false,
   "boundElements": null,
   "customData": undefined,
   "fillStyle": "solid",
