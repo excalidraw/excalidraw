@@ -77,7 +77,7 @@ export const actionStackToScale = register({
 
     // create 2 copies of the element with offsets
     // they should have the same group id
-    const groupId = randomId();
+    const groupId = `stack_${randomId()}`;
     const copies: ExcalidrawElement[] = [];
     for (const { dx, dy } of STACK_OFFSETS) {
       const copy = deepCopyElement(el);

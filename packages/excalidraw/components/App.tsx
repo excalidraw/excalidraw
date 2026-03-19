@@ -5964,6 +5964,42 @@ class App extends React.Component<AppProps, AppState> {
     return isTextBindableContainer(hitElement, false) ? hitElement : null;
   }
 
+  // A stacked group has overlapping shapes, so a hit-test can land on any
+  // of them. We walk the group back-to-front (highest z-index first) and
+  // return the first shape that can hold text, skipping bound text elements
+  // that may sit above the shape in the array.
+  private getTopmostTextContainerInGroup(
+    groupId: string,
+  ): ExcalidrawElement | null {
+    const groupElements = getElementsInGroup(
+      this.scene.getNonDeletedElements(),
+      groupId,
+    );
+    for (let i = groupElements.length - 1; i >= 0; i--) {
+      if (isTextBindableContainer(groupElements[i], false)) {
+        return groupElements[i];
+      }
+    }
+    return null;
+  }
+
+  private startTextEditingOnContainer(
+    container: ExcalidrawTextContainer,
+    insertAtParentCenter: boolean,
+  ) {
+    const midPoint = getContainerCenter(
+      container,
+      this.state,
+      this.scene.getNonDeletedElementsMap(),
+    );
+    this.startTextEditing({
+      sceneX: midPoint.x,
+      sceneY: midPoint.y,
+      insertAtParentCenter,
+      container,
+    });
+  }
+
   private startTextEditing = ({
     sceneX,
     sceneY,
@@ -6266,23 +6302,9 @@ class App extends React.Component<AppProps, AppState> {
       if (selectedGroupId) {
         this.store.scheduleCapture();
 
-        // find the topmost text-bindable container in this group rather
-        // than relying on hitElement, which can land on a lower-z copy
-        // when the front element is only hit on its bounding box
-        const groupElements = getElementsInGroup(
-          this.scene.getNonDeletedElements(),
-          selectedGroupId,
-        );
-        let textContainer: ExcalidrawElement | null = null;
-        for (let i = groupElements.length - 1; i >= 0; i--) {
-          if (isTextBindableContainer(groupElements[i], false)) {
-            textContainer = groupElements[i];
-            break;
-          }
-        }
-
-        // select the front container (not hitElement) so startTextEditing
-        // finds the correct bound text via selectedElements[0]
+        const textContainer = selectedGroupId.startsWith("stack_")
+          ? this.getTopmostTextContainerInGroup(selectedGroupId)
+          : null;
         const selectedId = textContainer?.id ?? hitElement!.id;
 
         this.setState(
@@ -6300,17 +6322,10 @@ class App extends React.Component<AppProps, AppState> {
           }),
           () => {
             if (textContainer) {
-              const midPoint = getContainerCenter(
-                textContainer,
-                this.state,
-                this.scene.getNonDeletedElementsMap(),
+              this.startTextEditingOnContainer(
+                textContainer as ExcalidrawTextContainer,
+                !event.altKey,
               );
-              this.startTextEditing({
-                sceneX: midPoint.x,
-                sceneY: midPoint.y,
-                insertAtParentCenter: !event.altKey,
-                container: textContainer as ExcalidrawTextContainer,
-              });
             }
           },
         );
@@ -6337,36 +6352,23 @@ class App extends React.Component<AppProps, AppState> {
           sceneY,
         );
 
-        // when inside a group, prefer the topmost text-bindable container
-        // so text always goes on the front element (e.g. stacked shapes)
-        if (this.state.editingGroupId && container) {
-          const groupElements = getElementsInGroup(
-            this.scene.getNonDeletedElements(),
+        // for stacked groups, prefer the topmost text-bindable container
+        // so text always goes on the front element
+        if (
+          this.state.editingGroupId?.startsWith("stack_") &&
+          container
+        ) {
+          const topContainer = this.getTopmostTextContainerInGroup(
             this.state.editingGroupId,
           );
-          for (let i = groupElements.length - 1; i >= 0; i--) {
-            if (isTextBindableContainer(groupElements[i], false)) {
-              container = groupElements[i] as typeof container;
-              break;
-            }
+          if (topContainer) {
+            container = topContainer as typeof container;
           }
-          // also update selection so startTextEditing resolves the
-          // correct bound text via selectedElements[0]
           this.setState(
             { selectedElementIds: { [container.id]: true } },
             () => {
               if (container) {
-                const midPoint = getContainerCenter(
-                  container,
-                  this.state,
-                  this.scene.getNonDeletedElementsMap(),
-                );
-                this.startTextEditing({
-                  sceneX: midPoint.x,
-                  sceneY: midPoint.y,
-                  insertAtParentCenter: !event.altKey,
-                  container,
-                });
+                this.startTextEditingOnContainer(container, !event.altKey);
               }
             },
           );
