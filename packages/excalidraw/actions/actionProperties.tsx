@@ -140,7 +140,9 @@ import {
 
 import {
   withCaretPositionPreservation,
+  saveCaretPosition,
   restoreCaretPosition,
+  temporarilyDisableTextEditorBlur,
 } from "../hooks/useTextEditorFocus";
 
 import { getShortcutKey } from "../shortcut";
@@ -340,7 +342,7 @@ export const actionChangeStrokeColor = register<
         : CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+  PanelComponent: ({ elements, appState, updateData, app, renderAction }) => {
     const { stylesPanelMode } = getStylesPanelInfo(app);
 
     return (
@@ -365,9 +367,503 @@ export const actionChangeStrokeColor = register<
           elements={elements}
           appState={appState}
           updateData={updateData}
+          belowTrigger={
+            appState.editingTextElement ? (
+              <>
+                <div className="color-picker__below-trigger-row">
+                  {renderAction("changeTextSelectionBackgroundColor")}
+                  {renderAction("applyTextSelectionBackground")}
+                </div>
+                <div className="color-picker__below-trigger-row">
+                  {renderAction("changeTextSelectionUnderlineColor")}
+                  {renderAction("applyTextSelectionUnderline")}
+                </div>
+              </>
+            ) : null
+          }
         />
       </>
     );
+  },
+});
+
+type TextDecorationRange = {
+  start: number;
+  end: number;
+  color: string;
+};
+
+const normalizeDecorationRange = (
+  range: TextDecorationRange,
+  textLength: number,
+): TextDecorationRange | null => {
+  let start = Math.max(0, Math.min(textLength, range.start));
+  let end = Math.max(0, Math.min(textLength, range.end));
+  if (start > end) {
+    [start, end] = [end, start];
+  }
+  if (start === end) {
+    return null;
+  }
+  return { start, end, color: range.color };
+};
+
+const isSameDecoration = (a: TextDecorationRange, b: TextDecorationRange) =>
+  a.start === b.start && a.end === b.end && a.color === b.color;
+
+const getTextDecorations = (
+  element: ExcalidrawTextElement,
+):
+  | {
+      highlights?: readonly TextDecorationRange[];
+      underlines?: readonly TextDecorationRange[];
+    }
+  | undefined => {
+  const v = (element.customData as any)?.textDecorations;
+  return v && typeof v === "object" ? v : undefined;
+};
+
+const addTextDecoration = (
+  element: ExcalidrawTextElement,
+  kind: "highlights" | "underlines",
+  range: TextDecorationRange,
+) => {
+  const textLength = (element.originalText ?? "").replace(
+    /\r\n?/g,
+    "\n",
+  ).length;
+  const normalized = normalizeDecorationRange(range, textLength);
+  if (!normalized) {
+    return element;
+  }
+
+  const current = getTextDecorations(element);
+  const existingList =
+    (current?.[kind] as readonly TextDecorationRange[]) ?? [];
+  if (existingList.some((x) => isSameDecoration(x, normalized))) {
+    return element;
+  }
+
+  const nextCustomData = {
+    ...(element.customData ?? {}),
+    textDecorations: {
+      ...(current ?? {}),
+      [kind]: [...existingList, normalized],
+    },
+  };
+
+  return newElementWith(element, { customData: nextCustomData });
+};
+
+const toggleTextDecoration = (
+  element: ExcalidrawTextElement,
+  kind: "highlights" | "underlines",
+  range: TextDecorationRange,
+) => {
+  const textLength = (element.originalText ?? "").replace(
+    /\r\n?/g,
+    "\n",
+  ).length;
+  const normalized = normalizeDecorationRange(range, textLength);
+  if (!normalized) {
+    return element;
+  }
+
+  const current = getTextDecorations(element);
+  const existingList =
+    (current?.[kind] as readonly TextDecorationRange[]) ?? [];
+
+  const isFullyCovered = existingList.some(
+    (x) => x.start <= normalized.start && normalized.end <= x.end,
+  );
+
+  const nextList: TextDecorationRange[] = [];
+  if (isFullyCovered) {
+    for (const x of existingList) {
+      if (x.end <= normalized.start || x.start >= normalized.end) {
+        nextList.push(x);
+        continue;
+      }
+      if (x.start < normalized.start) {
+        nextList.push({
+          start: x.start,
+          end: normalized.start,
+          color: x.color,
+        });
+      }
+      if (normalized.end < x.end) {
+        nextList.push({
+          start: normalized.end,
+          end: x.end,
+          color: x.color,
+        });
+      }
+    }
+  } else {
+    nextList.push(...existingList, normalized);
+  }
+
+  const nextDecorations = {
+    ...(current ?? {}),
+    ...(nextList.length ? { [kind]: nextList } : {}),
+  } as {
+    highlights?: readonly TextDecorationRange[];
+    underlines?: readonly TextDecorationRange[];
+  };
+
+  if (!nextList.length) {
+    delete (nextDecorations as any)[kind];
+  }
+
+  const hasHighlights = !!nextDecorations.highlights?.length;
+  const hasUnderlines = !!nextDecorations.underlines?.length;
+  if (!hasHighlights && !hasUnderlines) {
+    const { textDecorations, ...rest } = element.customData ?? {};
+    return newElementWith(element, {
+      customData: Object.keys(rest).length ? rest : undefined,
+    });
+  }
+
+  return newElementWith(element, {
+    customData: {
+      ...(element.customData ?? {}),
+      textDecorations: nextDecorations,
+    },
+  });
+};
+
+const TEXT_SELECTION_DECORATION_COLOR_TOP_PICKS = [
+  "#a8a8a8",
+  "#6965db",
+  "#ff5252",
+  "#2ecc71",
+  "#111111",
+] as const;
+
+export const actionChangeTextSelectionBackgroundColor = register<
+  Pick<AppState, "textSelectionBackgroundColor" | "openPopup">
+>({
+  name: "changeTextSelectionBackgroundColor",
+  label: "Text selection background color",
+  trackEvent: false,
+  perform: (_elements, appState, value) => {
+    if (!value) {
+      return false;
+    }
+    return {
+      appState: {
+        ...appState,
+        ...value,
+      },
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    return (
+      <ColorPicker
+        topPicks={TEXT_SELECTION_DECORATION_COLOR_TOP_PICKS}
+        label="选中文本背景色"
+        type="textSelectionBackground"
+        color={appState.textSelectionBackgroundColor}
+        onChange={(color) =>
+          withCaretPositionPreservation(
+            () => {
+              temporarilyDisableTextEditorBlur();
+              const saved = saveCaretPosition();
+              const editor = document.querySelector(
+                ".excalidraw-wysiwyg",
+              ) as HTMLTextAreaElement | null;
+
+              updateData({ textSelectionBackgroundColor: color });
+
+              if (editor) {
+                const start = editor.selectionStart ?? 0;
+                const end = editor.selectionEnd ?? 0;
+                if (start !== end) {
+                  (app as any).actionManager.executeAction(
+                    actionApplyTextSelectionBackground,
+                    "ui",
+                    { start, end, color },
+                  );
+                }
+              }
+
+              restoreCaretPosition(saved);
+            },
+            false,
+            !!appState.editingTextElement,
+          )
+        }
+        elements={elements}
+        appState={appState}
+        updateData={updateData}
+        variant="triggerOnly"
+      />
+    );
+  },
+});
+
+export const actionChangeTextSelectionUnderlineColor = register<
+  Pick<AppState, "textSelectionUnderlineColor" | "openPopup">
+>({
+  name: "changeTextSelectionUnderlineColor",
+  label: "Text selection underline color",
+  trackEvent: false,
+  perform: (_elements, appState, value) => {
+    if (!value) {
+      return false;
+    }
+    return {
+      appState: {
+        ...appState,
+        ...value,
+      },
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    return (
+      <ColorPicker
+        topPicks={TEXT_SELECTION_DECORATION_COLOR_TOP_PICKS}
+        label="选中文本下划线"
+        type="textSelectionUnderline"
+        color={appState.textSelectionUnderlineColor}
+        onChange={(color) =>
+          withCaretPositionPreservation(
+            () => {
+              temporarilyDisableTextEditorBlur();
+              const saved = saveCaretPosition();
+              const editor = document.querySelector(
+                ".excalidraw-wysiwyg",
+              ) as HTMLTextAreaElement | null;
+
+              updateData({ textSelectionUnderlineColor: color });
+
+              if (editor) {
+                const start = editor.selectionStart ?? 0;
+                const end = editor.selectionEnd ?? 0;
+                if (start !== end) {
+                  (app as any).actionManager.executeAction(
+                    actionApplyTextSelectionUnderline,
+                    "ui",
+                    { start, end, color },
+                  );
+                }
+              }
+
+              restoreCaretPosition(saved);
+            },
+            false,
+            !!appState.editingTextElement,
+          )
+        }
+        elements={elements}
+        appState={appState}
+        updateData={updateData}
+        variant="triggerOnly"
+      />
+    );
+  },
+});
+
+export const actionApplyTextSelectionBackground = register<{
+  start: number;
+  end: number;
+  color: string;
+}>({
+  name: "applyTextSelectionBackground",
+  label: "Apply text selection background",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    const editingId = appState.editingTextElement?.id;
+    if (!editingId || !value) {
+      return false;
+    }
+
+    const nextElements = elements.map((el) => {
+      if (el.id !== editingId || !isTextElement(el)) {
+        return el;
+      }
+      return addTextDecoration(el, "highlights", {
+        start: value.start,
+        end: value.end,
+        color: value.color,
+      });
+    });
+
+    return {
+      elements: nextElements,
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => {
+    if (!appState.editingTextElement) {
+      return null;
+    }
+
+    const apply = () => {
+      temporarilyDisableTextEditorBlur();
+      const saved = saveCaretPosition();
+      const editor = document.querySelector(
+        ".excalidraw-wysiwyg",
+      ) as HTMLTextAreaElement | null;
+      if (!editor) {
+        return;
+      }
+
+      const start = editor.selectionStart ?? 0;
+      const end = editor.selectionEnd ?? 0;
+      if (start === end) {
+        restoreCaretPosition(saved);
+        return;
+      }
+
+      updateData({
+        start,
+        end,
+        color: appState.textSelectionBackgroundColor,
+      });
+      restoreCaretPosition(saved);
+    };
+
+    return (
+      <button
+        type="button"
+        className="color-picker__action-button"
+        aria-label="Set selected text background"
+        title="Set selected text background"
+        onPointerDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          apply();
+        }}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M5 4h14v3H5V4Zm2 5h10v2H7V9Zm-2 4h14v7H5v-7Z"
+          />
+        </svg>
+      </button>
+    );
+  },
+});
+
+export const actionApplyTextSelectionUnderline = register<{
+  start: number;
+  end: number;
+  color: string;
+}>({
+  name: "applyTextSelectionUnderline",
+  label: "Apply text selection underline",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    const editingId = appState.editingTextElement?.id;
+    if (!editingId || !value) {
+      return false;
+    }
+
+    const nextElements = elements.map((el) => {
+      if (el.id !== editingId || !isTextElement(el)) {
+        return el;
+      }
+      return addTextDecoration(el, "underlines", {
+        start: value.start,
+        end: value.end,
+        color: value.color,
+      });
+    });
+
+    return {
+      elements: nextElements,
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => {
+    if (!appState.editingTextElement) {
+      return null;
+    }
+
+    const apply = () => {
+      temporarilyDisableTextEditorBlur();
+      const saved = saveCaretPosition();
+      const editor = document.querySelector(
+        ".excalidraw-wysiwyg",
+      ) as HTMLTextAreaElement | null;
+      if (!editor) {
+        return;
+      }
+
+      const start = editor.selectionStart ?? 0;
+      const end = editor.selectionEnd ?? 0;
+      if (start === end) {
+        restoreCaretPosition(saved);
+        return;
+      }
+
+      updateData({
+        start,
+        end,
+        color: appState.textSelectionUnderlineColor,
+      });
+      restoreCaretPosition(saved);
+    };
+
+    return (
+      <button
+        type="button"
+        className="color-picker__action-button"
+        aria-label="Underline selected text"
+        title="Underline selected text"
+        onPointerDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          apply();
+        }}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M7 3h2v7a3 3 0 0 0 6 0V3h2v7a5 5 0 0 1-10 0V3Zm-1 16h12v2H6v-2Z"
+          />
+        </svg>
+      </button>
+    );
+  },
+});
+
+export const actionToggleTextSelectionUnderline = register<{
+  start: number;
+  end: number;
+  color: string;
+}>({
+  name: "toggleTextSelectionUnderline",
+  label: "Toggle text selection underline",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    const editingId = appState.editingTextElement?.id;
+    if (!editingId || !value) {
+      return false;
+    }
+
+    const nextElements = elements.map((el) => {
+      if (el.id !== editingId || !isTextElement(el)) {
+        return el;
+      }
+      return toggleTextDecoration(el, "underlines", {
+        start: value.start,
+        end: value.end,
+        color: value.color,
+      });
+    });
+
+    return {
+      elements: nextElements,
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
   },
 });
 

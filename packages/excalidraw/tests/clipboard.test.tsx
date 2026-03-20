@@ -2,7 +2,7 @@ import React from "react";
 import { act } from "@testing-library/react";
 import { vi } from "vitest";
 
-import { getLineHeightInPx } from "@excalidraw/element";
+import { getLineHeightInPx, getTextFromElements } from "@excalidraw/element";
 
 import { KEYS, arrayToMap, getLineHeight } from "@excalidraw/common";
 
@@ -11,6 +11,7 @@ import { getElementBounds } from "@excalidraw/element";
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 
 import { Excalidraw } from "../index";
+import { copyBatchWithFormat, copyTextBatch } from "../actions";
 
 import { API } from "./helpers/api";
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
@@ -610,6 +611,62 @@ describe("clipboard - copy plain text, paste original elements internally", () =
     expect(pasted.fontSize).toBe(48);
   });
 
+  it("should copy multiple text elements as plain text and paste as elements", async () => {
+    const text1 = API.createElement({
+      type: "text",
+      text: "hello",
+      width: 50,
+      height: 20,
+      fontSize: 24,
+    });
+    const text2 = API.createElement({
+      type: "text",
+      text: "world",
+      width: 50,
+      height: 20,
+      fontSize: 24,
+    });
+
+    API.setElements([text1, text2]);
+    API.setSelectedElements([text1, text2]);
+
+    const expectedText = getTextFromElements([text1, text2]);
+
+    (h.app as any).excalidrawContainerRef.current.contains = () => true;
+    const copyEvent = {
+      clipboardData: new DataTransfer(),
+      target: document.body,
+      preventDefault: () => {},
+      stopPropagation: () => {},
+    } as any as ClipboardEvent;
+    act(() => {
+      (h.app as any).onCopy(copyEvent);
+    });
+    expect(copyEvent.clipboardData?.getData("text/plain")).toBe(expectedText);
+
+    mouse.moveTo(100, 100);
+    const pasteEvent = createPasteEvent({
+      types: {
+        "text/plain": expectedText,
+      },
+    });
+    act(() => {
+      document.dispatchEvent(pasteEvent);
+    });
+
+    await waitFor(() => {
+      expect(h.elements.filter((el) => !el.isDeleted)).toHaveLength(4);
+    });
+
+    const nonDeletedText = h.elements.filter(
+      (el) => !el.isDeleted && el.type === "text",
+    ) as any[];
+    expect(nonDeletedText).toHaveLength(4);
+    const texts = nonDeletedText.map((el) => el.text);
+    expect(texts.filter((t) => t === "hello")).toHaveLength(2);
+    expect(texts.filter((t) => t === "world")).toHaveLength(2);
+  });
+
   it("should copy bound text container as plain text and paste as container", async () => {
     const [container, label] = API.createTextContainer({
       label: { text: "abc" },
@@ -702,6 +759,68 @@ describe("clipboard - cut plain text, paste original elements internally", () =>
     expect(pasted.fontSize).toBe(48);
   });
 
+  it("should cut multiple text elements as plain text and paste as elements", async () => {
+    const text1 = API.createElement({
+      type: "text",
+      text: "hello",
+      width: 50,
+      height: 20,
+      fontSize: 24,
+    });
+    const text2 = API.createElement({
+      type: "text",
+      text: "world",
+      width: 50,
+      height: 20,
+      fontSize: 24,
+    });
+
+    API.setElements([text1, text2]);
+    API.setSelectedElements([text1, text2]);
+
+    const expectedText = getTextFromElements([text1, text2]);
+
+    (h.app as any).excalidrawContainerRef.current.contains = () => true;
+    const cutEvent = {
+      clipboardData: new DataTransfer(),
+      target: document.body,
+      preventDefault: () => {},
+      stopPropagation: () => {},
+    } as any as ClipboardEvent;
+    act(() => {
+      (h.app as any).onCut(cutEvent);
+    });
+    expect(cutEvent.clipboardData?.getData("text/plain")).toBe(expectedText);
+    expect(h.elements).toHaveLength(2);
+    expect(h.elements.every((el) => el.isDeleted)).toBe(true);
+
+    mouse.moveTo(100, 100);
+    const pasteEvent = createPasteEvent({
+      types: {
+        "text/plain": expectedText,
+      },
+    });
+    act(() => {
+      document.dispatchEvent(pasteEvent);
+    });
+
+    await waitFor(() => {
+      expect(h.elements).toHaveLength(4);
+    });
+
+    const pastedText = h.elements.filter((el) => {
+      return (
+        el.type === "text" &&
+        !el.isDeleted &&
+        el.id !== text1.id &&
+        el.id !== text2.id
+      );
+    }) as any[];
+    expect(pastedText).toHaveLength(2);
+    const pastedTexts = pastedText.map((el) => el.text);
+    expect(pastedTexts.sort()).toEqual(["hello", "world"]);
+  });
+
   it("should cut bound text container as plain text and paste as container", async () => {
     const [container, label] = API.createTextContainer({
       label: { text: "abc" },
@@ -752,5 +871,35 @@ describe("clipboard - cut plain text, paste original elements internally", () =>
         !el.isDeleted,
     ) as any;
     expect(pastedLabel.containerId).toBe(pastedContainer.id);
+  });
+});
+
+describe("clipboard - context menu batch copy", () => {
+  it("enables batch copy actions for multiple text elements", () => {
+    const text1 = API.createElement({
+      type: "text",
+      x: 10,
+      y: 10,
+      width: 80,
+      height: 30,
+      text: "hello",
+    });
+    const text2 = API.createElement({
+      type: "text",
+      x: 10,
+      y: 60,
+      width: 80,
+      height: 30,
+      text: "world",
+    });
+    API.setElements([text1, text2]);
+    API.setSelectedElements([text1, text2]);
+
+    expect(
+      copyTextBatch.predicate?.(h.elements, h.state, h.app.props, h.app),
+    ).toBe(true);
+    expect(
+      copyBatchWithFormat.predicate?.(h.elements, h.state, h.app.props, h.app),
+    ).toBe(true);
   });
 });

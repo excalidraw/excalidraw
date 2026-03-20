@@ -9,6 +9,11 @@ export { actionSelectAll } from "./actionSelectAll";
 export { actionDuplicateSelection } from "./actionDuplicateSelection";
 export {
   actionChangeStrokeColor,
+  actionChangeTextSelectionBackgroundColor,
+  actionChangeTextSelectionUnderlineColor,
+  actionApplyTextSelectionBackground,
+  actionApplyTextSelectionUnderline,
+  actionToggleTextSelectionUnderline,
   actionChangeBackgroundColor,
   actionChangeStrokeWidth,
   actionChangeFillStyle,
@@ -77,6 +82,8 @@ export {
   actionCut,
   actionCopyAsPng,
   actionCopyAsSvg,
+  copyBatchWithFormat,
+  copyTextBatch,
   copyText,
 } from "./actionClipboard";
 

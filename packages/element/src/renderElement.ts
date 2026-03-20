@@ -152,6 +152,183 @@ const applyAlphaToColor = (color: string, alpha: number) => {
   return `rgba(168, 168, 168, ${alpha})`;
 };
 
+type TextDecorationRange = {
+  start: number;
+  end: number;
+  color: string;
+};
+
+const getTextDecorations = (
+  element: ExcalidrawTextElement,
+):
+  | {
+      highlights?: readonly TextDecorationRange[];
+      underlines?: readonly TextDecorationRange[];
+    }
+  | undefined => {
+  const v = (element.customData as any)?.textDecorations;
+  return v && typeof v === "object" ? v : undefined;
+};
+
+const drawTextDecorations = ({
+  context,
+  element,
+  lines,
+  explicitNewlineAfterLine,
+  horizontalOffset,
+  lineHeightPx,
+  verticalOffset,
+  theme,
+  mode = "both",
+}: {
+  context: CanvasRenderingContext2D;
+  element: ExcalidrawTextElement;
+  lines: readonly string[];
+  explicitNewlineAfterLine: readonly boolean[];
+  horizontalOffset: number;
+  lineHeightPx: number;
+  verticalOffset: number;
+  theme: typeof THEME[keyof typeof THEME];
+  mode?: "highlights" | "underlines" | "both";
+}) => {
+  const decorations = getTextDecorations(element);
+  if (!decorations) {
+    return;
+  }
+
+  const normalizedText = (element.originalText ?? "").replace(/\r\n?/g, "\n");
+  const textLength = normalizedText.length;
+
+  const lineStartIndices: number[] = [];
+  let currentIndex = 0;
+  for (let i = 0; i < lines.length; i++) {
+    lineStartIndices.push(currentIndex);
+    currentIndex += lines[i]?.length ?? 0;
+    if (explicitNewlineAfterLine[i]) {
+      currentIndex += 1;
+    }
+  }
+
+  const lineWidths = lines.map((line) => context.measureText(line).width);
+  const lineLefts = lineWidths.map((w) =>
+    element.textAlign === "center"
+      ? horizontalOffset - w / 2
+      : element.textAlign === "right"
+      ? horizontalOffset - w
+      : horizontalOffset,
+  );
+
+  const highlights = decorations.highlights ?? [];
+  if ((mode === "highlights" || mode === "both") && highlights.length) {
+    context.save();
+    for (const highlight of highlights) {
+      const start = Math.max(0, Math.min(textLength, highlight.start));
+      const end = Math.max(0, Math.min(textLength, highlight.end));
+      if (start === end) {
+        continue;
+      }
+      const hiStart = Math.min(start, end);
+      const hiEnd = Math.max(start, end);
+
+      const baseColor =
+        theme === THEME.DARK
+          ? applyDarkModeFilter(highlight.color)
+          : highlight.color;
+      context.fillStyle = applyAlphaToColor(baseColor, 0.25);
+
+      for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+        const lineStart = lineStartIndices[lineIndex] ?? 0;
+        const lineText = lines[lineIndex] ?? "";
+        const lineEnd = lineStart + lineText.length;
+        const segStart = Math.max(hiStart, lineStart);
+        const segEnd = Math.min(hiEnd, lineEnd);
+        if (segStart >= segEnd) {
+          continue;
+        }
+        const relStart = segStart - lineStart;
+        const relEnd = segEnd - lineStart;
+        const prefix = lineText.slice(0, relStart);
+        const selection = lineText.slice(relStart, relEnd);
+        const prefixWidth = context.measureText(prefix).width;
+        const selectionWidth = context.measureText(selection).width;
+        const x = (lineLefts[lineIndex] ?? horizontalOffset) + prefixWidth;
+        const y = lineIndex * lineHeightPx;
+        context.fillRect(x, y, selectionWidth, lineHeightPx);
+      }
+    }
+    context.restore();
+  }
+
+  const underlines = decorations.underlines ?? [];
+  if ((mode === "underlines" || mode === "both") && underlines.length) {
+    const thickness = Math.max(1, element.fontSize * 0.07);
+    const gap = Math.max(1, element.fontSize * 0.08);
+    const underlineOffset = Math.max(1, element.fontSize * 0.12);
+    const endDotRadius = Math.max(1, thickness * 0.75);
+
+    context.save();
+    context.lineWidth = thickness;
+    context.lineCap = "round";
+
+    for (const underline of underlines) {
+      const start = Math.max(0, Math.min(textLength, underline.start));
+      const end = Math.max(0, Math.min(textLength, underline.end));
+      if (start === end) {
+        continue;
+      }
+      const uStart = Math.min(start, end);
+      const uEnd = Math.max(start, end);
+
+      const baseColor =
+        theme === THEME.DARK
+          ? applyDarkModeFilter(underline.color)
+          : underline.color;
+      context.strokeStyle = baseColor;
+      context.fillStyle = baseColor;
+
+      for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+        const lineStart = lineStartIndices[lineIndex] ?? 0;
+        const lineText = lines[lineIndex] ?? "";
+        const lineEnd = lineStart + lineText.length;
+        const segStart = Math.max(uStart, lineStart);
+        const segEnd = Math.min(uEnd, lineEnd);
+        if (segStart >= segEnd) {
+          continue;
+        }
+
+        const relStart = segStart - lineStart;
+        const relEnd = segEnd - lineStart;
+        const prefix = lineText.slice(0, relStart);
+        const selection = lineText.slice(relStart, relEnd);
+        const prefixWidth = context.measureText(prefix).width;
+        const selectionWidth = context.measureText(selection).width;
+        const xStart = (lineLefts[lineIndex] ?? horizontalOffset) + prefixWidth;
+        const xEnd = xStart + selectionWidth;
+
+        const usableStart = xStart + gap;
+        const usableEnd = xEnd - gap;
+        if (usableEnd <= usableStart) {
+          continue;
+        }
+
+        const y = lineIndex * lineHeightPx + verticalOffset + underlineOffset;
+
+        context.beginPath();
+        context.moveTo(usableStart, y);
+        context.lineTo(usableEnd, y);
+        context.stroke();
+
+        context.beginPath();
+        context.arc(usableStart, y, endDotRadius, 0, Math.PI * 2);
+        context.arc(usableEnd, y, endDotRadius, 0, Math.PI * 2);
+        context.fill();
+      }
+    }
+
+    context.restore();
+  }
+};
+
 const drawTextWhitespaceMarkers = ({
   context,
   element,
@@ -785,6 +962,18 @@ const drawElementOnCanvas = (
           lineHeightPx,
         );
 
+        drawTextDecorations({
+          context,
+          element,
+          lines,
+          explicitNewlineAfterLine,
+          horizontalOffset,
+          lineHeightPx,
+          verticalOffset,
+          theme: renderConfig.theme,
+          mode: "highlights",
+        });
+
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
             lines[index],
@@ -792,6 +981,18 @@ const drawElementOnCanvas = (
             index * lineHeightPx + verticalOffset,
           );
         }
+
+        drawTextDecorations({
+          context,
+          element,
+          lines,
+          explicitNewlineAfterLine,
+          horizontalOffset,
+          lineHeightPx,
+          verticalOffset,
+          theme: renderConfig.theme,
+          mode: "underlines",
+        });
 
         drawTextWhitespaceMarkers({
           context,

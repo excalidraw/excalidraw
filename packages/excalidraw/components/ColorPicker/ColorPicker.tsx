@@ -1,6 +1,6 @@
 import { Popover } from "radix-ui";
 import clsx from "clsx";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, type ReactNode } from "react";
 
 import {
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
@@ -52,6 +52,8 @@ interface ColorPickerProps {
   palette?: ColorPaletteCustom | null;
   topPicks?: ColorTuple;
   updateData: (formData?: any) => void;
+  belowTrigger?: ReactNode;
+  variant?: "default" | "triggerOnly";
 }
 
 const ColorPickerPopupContent = ({
@@ -289,6 +291,8 @@ export const ColorPicker = ({
   topPicks,
   updateData,
   appState,
+  belowTrigger,
+  variant = "default",
 }: ColorPickerProps) => {
   const openRef = useRef(appState.openPopup);
   useEffect(() => {
@@ -296,6 +300,49 @@ export const ColorPicker = ({
   }, [appState.openPopup]);
   const stylesPanelMode = useStylesPanelMode();
   const isCompactMode = stylesPanelMode !== "full";
+
+  if (variant === "triggerOnly") {
+    return (
+      <Popover.Root
+        open={appState.openPopup === type}
+        onOpenChange={(open) => {
+          if (open) {
+            updateData({ openPopup: type });
+          }
+        }}
+      >
+        <ColorPickerTrigger
+          color={color}
+          label={label}
+          type={type}
+          mode={type === "elementStroke" ? "stroke" : "background"}
+          editingTextElement={!!appState.editingTextElement}
+          onToggle={() => {
+            if (appState.openPopup === type) {
+              updateData({ openPopup: null });
+            } else if (appState.openPopup) {
+              updateData({ openPopup: type });
+            } else {
+              updateData({ openPopup: type });
+            }
+          }}
+        />
+        {appState.openPopup === type && (
+          <ColorPickerPopupContent
+            type={type}
+            color={color}
+            onChange={onChange}
+            label={label}
+            elements={elements}
+            palette={palette}
+            updateData={updateData}
+            getOpenPopup={() => openRef.current}
+            appState={appState}
+          />
+        )}
+      </Popover.Root>
+    );
+  }
 
   return (
     <div>
@@ -358,6 +405,9 @@ export const ColorPicker = ({
             />
           )}
         </Popover.Root>
+        {belowTrigger ? (
+          <div className="color-picker__below-trigger">{belowTrigger}</div>
+        ) : null}
       </div>
     </div>
   );

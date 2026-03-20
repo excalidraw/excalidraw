@@ -297,6 +297,8 @@ import {
   actionCopy,
   actionCopyAsPng,
   actionCopyAsSvg,
+  copyBatchWithFormat,
+  copyTextBatch,
   copyText,
   actionCopyStyles,
   actionCut,
@@ -3523,21 +3525,22 @@ class App extends React.Component<AppProps, AppState> {
       (id) => this.state.selectedElementIds[id as ExcalidrawElement["id"]],
     ) as ExcalidrawElement["id"][];
 
-    if (selectedIds.length === 1) {
+    if (selectedIds.length > 0) {
+      const elementsToCopy = this.scene.getSelectedElements({
+        selectedElementIds: this.state.selectedElementIds,
+        includeBoundTextElement: true,
+        includeElementsInFrames: true,
+      });
       const elementsMap = this.scene.getNonDeletedElementsMap();
-      const selectedElement = elementsMap.get(selectedIds[0]);
+      const selectedElement =
+        selectedIds.length === 1 ? elementsMap.get(selectedIds[0]) : null;
       const boundTextElement =
         selectedElement && getBoundTextElement(selectedElement, elementsMap);
 
       if (
-        selectedElement &&
-        (isTextElement(selectedElement) || boundTextElement)
+        (elementsToCopy.length > 0 && elementsToCopy.every(isTextElement)) ||
+        (selectedElement && boundTextElement)
       ) {
-        const elementsToCopy = this.scene.getSelectedElements({
-          selectedElementIds: this.state.selectedElementIds,
-          includeBoundTextElement: true,
-          includeElementsInFrames: true,
-        });
         const text = getTextFromElements(elementsToCopy);
         this.plainTextCopy = {
           text,
@@ -3569,21 +3572,22 @@ class App extends React.Component<AppProps, AppState> {
       (id) => this.state.selectedElementIds[id as ExcalidrawElement["id"]],
     ) as ExcalidrawElement["id"][];
 
-    if (selectedIds.length === 1) {
+    if (selectedIds.length > 0) {
+      const elementsToCopy = this.scene.getSelectedElements({
+        selectedElementIds: this.state.selectedElementIds,
+        includeBoundTextElement: true,
+        includeElementsInFrames: true,
+      });
       const elementsMap = this.scene.getNonDeletedElementsMap();
-      const selectedElement = elementsMap.get(selectedIds[0]);
+      const selectedElement =
+        selectedIds.length === 1 ? elementsMap.get(selectedIds[0]) : null;
       const boundTextElement =
         selectedElement && getBoundTextElement(selectedElement, elementsMap);
 
       if (
-        selectedElement &&
-        (isTextElement(selectedElement) || boundTextElement)
+        (elementsToCopy.length > 0 && elementsToCopy.every(isTextElement)) ||
+        (selectedElement && boundTextElement)
       ) {
-        const elementsToCopy = this.scene.getSelectedElements({
-          selectedElementIds: this.state.selectedElementIds,
-          includeBoundTextElement: true,
-          includeElementsInFrames: true,
-        });
         const text = getTextFromElements(elementsToCopy);
         this.plainTextCopy = {
           text,
@@ -6066,6 +6070,141 @@ class App extends React.Component<AppProps, AppState> {
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
 
+    const reconcileTextDecorationsOnTextChange = (
+      prevText: string,
+      nextText: string,
+      customData: Record<string, any> | undefined,
+    ) => {
+      const decorations = (customData as any)?.textDecorations as
+        | {
+            highlights?: readonly {
+              start: number;
+              end: number;
+              color: string;
+            }[];
+            underlines?: readonly {
+              start: number;
+              end: number;
+              color: string;
+            }[];
+          }
+        | undefined;
+
+      if (!decorations) {
+        return customData;
+      }
+
+      const prev = (prevText ?? "").replace(/\r\n?/g, "\n");
+      const next = (nextText ?? "").replace(/\r\n?/g, "\n");
+
+      if (prev === next) {
+        return customData;
+      }
+
+      const prevLen = prev.length;
+      const nextLen = next.length;
+      const minLen = Math.min(prevLen, nextLen);
+
+      let prefix = 0;
+      while (prefix < minLen && prev[prefix] === next[prefix]) {
+        prefix++;
+      }
+
+      let suffix = 0;
+      while (
+        suffix < minLen - prefix &&
+        prev[prevLen - 1 - suffix] === next[nextLen - 1 - suffix]
+      ) {
+        suffix++;
+      }
+
+      const a = prefix;
+      const b = prevLen - suffix;
+      const delta = nextLen - prevLen;
+
+      const transformStart = (i: number) => {
+        if (i < a) {
+          return i;
+        }
+        if (i >= b) {
+          return i + delta;
+        }
+        return a;
+      };
+
+      const transformEnd = (i: number) => {
+        if (i <= a) {
+          return i;
+        }
+        if (i >= b) {
+          return i + delta;
+        }
+        return a;
+      };
+
+      const applySplice = (
+        list:
+          | readonly { start: number; end: number; color: string }[]
+          | undefined,
+      ) => {
+        if (!list?.length) {
+          return undefined;
+        }
+
+        const nextList: Array<{ start: number; end: number; color: string }> =
+          [];
+
+        for (const item of list) {
+          let start = item.start;
+          let end = item.end;
+          if (!Number.isFinite(start) || !Number.isFinite(end)) {
+            continue;
+          }
+          if (start > end) {
+            [start, end] = [end, start];
+          }
+          start = Math.max(0, Math.min(prevLen, start));
+          end = Math.max(0, Math.min(prevLen, end));
+          if (start === end) {
+            continue;
+          }
+
+          const nextStart = Math.max(
+            0,
+            Math.min(nextLen, transformStart(start)),
+          );
+          const nextEnd = Math.max(0, Math.min(nextLen, transformEnd(end)));
+          if (nextStart === nextEnd) {
+            continue;
+          }
+
+          if (nextStart < nextEnd) {
+            nextList.push({ ...item, start: nextStart, end: nextEnd });
+          } else {
+            nextList.push({ ...item, start: nextEnd, end: nextStart });
+          }
+        }
+
+        return nextList.length ? nextList : undefined;
+      };
+
+      const nextHighlights = applySplice(decorations.highlights);
+      const nextUnderlines = applySplice(decorations.underlines);
+
+      if (!nextHighlights && !nextUnderlines) {
+        const { textDecorations, ...rest } = customData ?? {};
+        return Object.keys(rest).length ? rest : undefined;
+      }
+
+      return {
+        ...(customData ?? {}),
+        textDecorations: {
+          ...(nextHighlights ? { highlights: nextHighlights } : {}),
+          ...(nextUnderlines ? { underlines: nextUnderlines } : {}),
+        },
+      };
+    };
+
     const updateElement = (
       nextOriginalText: string,
       isDeleted: boolean,
@@ -6106,11 +6245,20 @@ class App extends React.Component<AppProps, AppState> {
               ? newElementWith(_element, widthUpdates)
               : _element;
 
+            const nextCustomData = reconcileTextDecorationsOnTextChange(
+              _element.originalText,
+              nextOriginalText,
+              _element.customData,
+            );
+
             const baseUpdates = {
               originalText: nextOriginalText,
               text: nextOriginalText,
               isDeleted: isDeleted ?? _element.isDeleted,
               ...(widthUpdates ? widthUpdates : {}),
+              ...(nextCustomData !== _element.customData
+                ? { customData: nextCustomData }
+                : {}),
             } as const;
 
             return newElementWith(_element, {
@@ -12894,7 +13042,7 @@ class App extends React.Component<AppProps, AppState> {
     // element contextMenu
     // -------------------------------------------------------------------------
 
-    options.push(copyText);
+    options.push(copyText, copyTextBatch, copyBatchWithFormat);
 
     if (this.state.viewModeEnabled) {
       return [actionCopy, ...options];

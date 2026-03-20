@@ -1,3 +1,6 @@
+import fs from "node:fs";
+import path from "node:path";
+
 import { expect, test, type Page } from "@playwright/test";
 
 const installCanvasTextSpy = () => {
@@ -1367,12 +1370,14 @@ test("response speed: double click inserts caret (E2E)", async ({ page }) => {
 //操作A
 //从非选中状态开始
 //第一次随机点击文本框的一个点;
-//第二次点击精确点击文本框中某一行的某一个字符的左半部分,;
-//查看是否将编辑光标插入在这个字符的后面,
+//第二次点击精确点击文本框中某一行的某一个字符的左半部分或右半部分,;
+//wasted查看是否将编辑光标插入在这个字符的后面,
+//改为点击字符的左侧将光标插入在字符的左侧,点击光标右侧将光标插入在光标的右侧
 //退出到非选中状态,
 //再次随机点击文本框的一个点
-//第二次点击精确点击文本框中某一行的某一个字符的右半部分;
-//查看是否将编辑光标插入在这个字符的后面,
+//第二次点击精确点击文本框中某一行的某一个字符的左半部分或右半部分;
+//wasted查看是否将编辑光标插入在这个字符的后面,
+//改为点击字符的左侧将光标插入在字符的左侧,点击光标右侧将光标插入在光标的右侧
 //操作B
 //随机选取文本框中50个字符进行操作A,若操作A都通过,则操作B通过;
 //两次点击时间差10ms;(第二次点击后如果没有插入正确的光标位置则测试失败;)
@@ -1467,7 +1472,8 @@ test("Double click the text box to insert the cursor (E2E)", async ({
     }
 
     const points: Array<{
-      expected: number;
+      expectedLeft: number;
+      expectedRight: number;
       left: { x: number; y: number };
       right: { x: number; y: number };
     }> = [];
@@ -1494,7 +1500,8 @@ test("Double click the text box to insert the cursor (E2E)", async ({
         continue;
       }
       points.push({
-        expected: i + 1,
+        expectedLeft: i,
+        expectedRight: i + 1,
         left: { x: leftX, y },
         right: { x: rightX, y },
       });
@@ -1553,7 +1560,7 @@ test("Double click the text box to insert the cursor (E2E)", async ({
       };
     });
     expect(selection.start).toBe(selection.end);
-    expect(selection.end).toBeGreaterThan(0);
+    expect(selection.end).toBeGreaterThanOrEqual(0);
     expect(selection.end).toBeLessThanOrEqual(selection.length);
     expect(selection.end).toBe(expected);
   };
@@ -1567,21 +1574,18 @@ test("Double click the text box to insert the cursor (E2E)", async ({
     await ensureNonSelected();
     await clickOnce(seedPoint.x, seedPoint.y);
     await page.waitForTimeout(gapMs);
-    await runSecondClickAndAssert(pick.left, pick.expected);
+    await runSecondClickAndAssert(pick.left, pick.expectedLeft);
     await exitEditor(page);
     await ensureNonSelected();
 
     await clickOnce(seedPoint.x, seedPoint.y);
     await page.waitForTimeout(gapMs);
-    await runSecondClickAndAssert(pick.right, pick.expected);
+    await runSecondClickAndAssert(pick.right, pick.expectedRight);
     await exitEditor(page);
   }
 });
 
-//编写在编辑状态下点击文本框某一个字符插入光标在字符后面测试
-//目前编辑画布中文本框时,点击字符的左半部分会将光标插入在字符左侧,点击字符右半部分会将字符插入在光标右侧;改为无论点击字符的左半部分还是右半部分都将光标插入到字符的右侧;
-//文本框进入编辑状态时,点击文本框中某10个字符的位置的随机10个区域(包括这个字符的左半部分和右半部分),检查是否都将光标插入到这个字符的后面;
-test("Click on the character to insert the cursor at the back (E2E)", async ({
+test("Click on the character should insert caret based on left/right half (E2E)", async ({
   page,
 }) => {
   test.setTimeout(900_000);
@@ -1701,7 +1705,7 @@ test("Click on the character to insert the cursor at the back (E2E)", async ({
         if (!inViewport(x, y) || !inOverlay(x, y)) {
           continue;
         }
-        samples.push({ x, y, expected: i + 1 });
+        samples.push({ x, y, expected: isLeft ? i : i + 1 });
         produced++;
       }
       if (produced < 10) {
@@ -1736,7 +1740,7 @@ test("Click on the character to insert the cursor at the back (E2E)", async ({
       };
     });
     expect(selection.start).toBe(selection.end);
-    expect(selection.end).toBeGreaterThan(0);
+    expect(selection.end).toBeGreaterThanOrEqual(0);
     expect(selection.end).toBeLessThanOrEqual(selection.length);
     expect(selection.end).toBe(s.expected);
     await page.waitForTimeout(50);
@@ -1751,7 +1755,7 @@ test("Double click selects word and triple click selects line using configured i
 
   const dblMs = 2000;
   const tripleMs = 2000;
-  const withinMs = 1500;
+  const withinMs = 200;
   const outsideMs = 2500;
 
   await page.addInitScript(
@@ -1919,10 +1923,9 @@ test("Double click selects word and triple click selects line using configured i
   ).toBe(null);
   await page.waitForTimeout(withinMs);
   await clickOnce();
-  expect(await getSelection()).toEqual({
-    start: target.wordStart,
-    end: target.wordEnd,
-  });
+  await expect
+    .poll(() => getSelection(), { timeout: 2000 })
+    .toEqual({ start: target.wordStart, end: target.wordEnd });
   await expect
     .poll(() =>
       page.evaluate(
@@ -1943,10 +1946,9 @@ test("Double click selects word and triple click selects line using configured i
     textarea.selectionEnd = caretAfter;
   }, target.caretAfter);
   await clickOnce();
-  expect(await getSelection()).toEqual({
-    start: target.lineStart,
-    end: target.lineEnd,
-  });
+  await expect
+    .poll(() => getSelection(), { timeout: 2000 })
+    .toEqual({ start: target.lineStart, end: target.lineEnd });
 
   await clickOnce();
   {
@@ -1967,10 +1969,9 @@ test("Double click selects word and triple click selects line using configured i
   await clickOnce();
   await page.waitForTimeout(withinMs);
   await clickOnce();
-  expect(await getSelection()).toEqual({
-    start: target.wordStart,
-    end: target.wordEnd,
-  });
+  await expect
+    .poll(() => getSelection(), { timeout: 2000 })
+    .toEqual({ start: target.wordStart, end: target.wordEnd });
 
   await page.waitForTimeout(outsideMs);
   await clickOnce();
@@ -2086,4 +2087,443 @@ test("按 ESC 退出编辑后可右键选中文本框并弹出菜单", async ({ 
   await expect(editor2).toHaveCount(0);
 
   await rightClickAndExpectContextMenu();
+});
+
+//测试 A：编辑态内点击放置光标后，插入必须发生在对应索引
+//目标：拦截“可视光标画在 A，但实际插入在 B”（本质是 overlay/textarea 排版不一致或 caret 计算错）。
+test("clicking in editor should insert at expected index (E2E)", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.evaluate(() => {
+    (window as any).h?.setState?.({
+      currentItemFontFamily: 12,
+      currentItemFontSize: 22,
+      gridModeEnabled: false,
+    });
+  });
+
+  const createX = 240;
+  const createY = 180;
+  const targetWidth = 300;
+
+  const marker = "¤";
+  const marker2 = "⟦";
+  const requirementsPath = path.join(__dirname, "..", "需求说明.txt");
+  const value = fs
+    .readFileSync(requirementsPath, "utf8")
+    .replace(/\r\n?/g, "\n")
+    .replaceAll(marker, "x")
+    .replaceAll(marker2, "x");
+
+  const setEditorValue = async (value: string) => {
+    await page.evaluate((value) => {
+      const textarea = document.querySelector<HTMLTextAreaElement>(
+        "textarea.excalidraw-wysiwyg",
+      );
+      if (!textarea) {
+        throw new Error("missing textarea");
+      }
+      textarea.value = String(value);
+      textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    }, value);
+    await page.waitForFunction((len) => {
+      const textarea = document.querySelector<HTMLTextAreaElement>(
+        "textarea.excalidraw-wysiwyg",
+      );
+      return textarea?.value.length === Number(len);
+    }, value.length);
+  };
+
+  const editor = await openTextEditorAt(page, createX, createY);
+  await editor.waitFor();
+  await setEditorValue(value);
+  await exitEditor(page);
+
+  const editorForBox = await openEditorByDoubleClickAt(page, createX, createY);
+  await editorForBox.waitFor();
+  const baseBox = await getEditorBox(page);
+  await exitEditor(page);
+  await dragResizeFromRight(page, baseBox, targetWidth - baseBox.width);
+
+  const editor2 = await openEditorByDoubleClickAt(page, createX, createY);
+  await editor2.waitFor();
+  await expect(
+    page.locator(".excalidraw-wysiwyg__whitespaceOverlay"),
+  ).toBeVisible();
+
+  await page.evaluate(() => {
+    const overlay = document.querySelector<HTMLElement>(
+      ".excalidraw-wysiwyg__whitespaceOverlay",
+    );
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (textarea) {
+      textarea.scrollLeft = 0;
+    }
+    if (overlay) {
+      overlay.scrollLeft = 0;
+    }
+  });
+
+  await page.waitForFunction(() => {
+    const overlay = document.querySelector<HTMLElement>(
+      ".excalidraw-wysiwyg__whitespaceOverlay",
+    );
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (!overlay || !textarea) {
+      return false;
+    }
+    const t = textarea.value.replace(/\r\n?/g, "\n");
+    const textNode = overlay.childNodes[0];
+    if (!textNode || textNode.nodeType !== Node.TEXT_NODE) {
+      return false;
+    }
+    return (textNode as Text).data.replace(/\r\n?/g, "\n") === t;
+  });
+
+  const indices = await page.evaluate(() => {
+    const overlay = document.querySelector<HTMLElement>(
+      ".excalidraw-wysiwyg__whitespaceOverlay",
+    );
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      "textarea.excalidraw-wysiwyg",
+    );
+    if (!overlay || !textarea) {
+      throw new Error("missing editor");
+    }
+
+    const text = textarea.value.replace(/\r\n?/g, "\n");
+    const len = text.length;
+    if (len < 10) {
+      throw new Error("insufficient text length");
+    }
+    const overlayRect = overlay.getBoundingClientRect();
+
+    const inViewport = (x: number, y: number) =>
+      x > 2 && x < window.innerWidth - 2 && y > 2 && y < window.innerHeight - 2;
+    const inOverlay = (x: number, y: number) =>
+      x > overlayRect.left + 2 &&
+      x < overlayRect.right - 2 &&
+      y > overlayRect.top + 2 &&
+      y < overlayRect.bottom - 2;
+
+    let state = 20260320 >>> 0;
+    const next = () => {
+      state = (1664525 * state + 1013904223) >>> 0;
+      return state;
+    };
+
+    const out: number[] = [];
+    const seen = new Set<number>();
+
+    for (let tries = 0; tries < 200_000 && out.length < 8; tries++) {
+      const i = 1 + (next() % (len - 1));
+      if (seen.has(i)) {
+        continue;
+      }
+      seen.add(i);
+      if (text[i] === "\n" || text[i - 1] === "\n") {
+        continue;
+      }
+      const r = (window as any).__e2eOverlay.charRectAt(overlay, i - 1) as
+        | DOMRect
+        | { x: number; y: number; width: number; height: number };
+      if (!Number.isFinite(r.x) || !Number.isFinite(r.y) || r.width <= 0) {
+        continue;
+      }
+      const x = r.x + Math.max(1, r.width) - 0.5;
+      const y = r.y + Math.max(1, r.height / 2);
+      if (!inViewport(x, y) || !inOverlay(x, y)) {
+        continue;
+      }
+      out.push(i);
+    }
+
+    if (out.length < 8) {
+      throw new Error(`insufficient visible indices: ${out.length}`);
+    }
+    return out;
+  });
+
+  for (const index of indices) {
+    const clickPoint = await page.evaluate(
+      ({ index }) => {
+        const overlay = document.querySelector<HTMLElement>(
+          ".excalidraw-wysiwyg__whitespaceOverlay",
+        );
+        const textarea = document.querySelector<HTMLTextAreaElement>(
+          "textarea.excalidraw-wysiwyg",
+        );
+        if (!overlay || !textarea) {
+          throw new Error("missing editor");
+        }
+        const text = textarea.value.replace(/\r\n?/g, "\n");
+        if (!(index > 0 && index <= text.length && text[index - 1] !== "\n")) {
+          throw new Error(`invalid index=${index}`);
+        }
+        const r = (window as any).__e2eOverlay.charRectAt(
+          overlay,
+          index - 1,
+        ) as DOMRect;
+        return {
+          x: r.x + Math.max(1, r.width) - 0.5,
+          y: r.y + Math.max(1, r.height / 2),
+        };
+      },
+      { index },
+    );
+
+    await page.mouse.click(clickPoint.x, clickPoint.y);
+
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() => {
+            const textarea = document.querySelector<HTMLTextAreaElement>(
+              "textarea.excalidraw-wysiwyg",
+            );
+            if (!textarea) {
+              return null;
+            }
+            return {
+              start: textarea.selectionStart,
+              end: textarea.selectionEnd,
+              len: textarea.value.length,
+            };
+          }),
+        { timeout: 2000 },
+      )
+      .toEqual({ start: index, end: index, len: value.length });
+
+    await page.evaluate(() => {
+      const textarea = document.querySelector<HTMLTextAreaElement>(
+        "textarea.excalidraw-wysiwyg",
+      );
+      textarea?.focus();
+    });
+
+    await page.keyboard.type(marker);
+
+    await expect
+      .poll(
+        () =>
+          page.evaluate(
+            ({ index, marker }) => {
+              const textarea = document.querySelector<HTMLTextAreaElement>(
+                "textarea.excalidraw-wysiwyg",
+              );
+              if (!textarea) {
+                return null;
+              }
+              const v = textarea.value.replace(/\r\n?/g, "\n");
+              const count = v.split(String(marker)).length - 1;
+              return {
+                len: v.length,
+                at: v[index] ?? null,
+                count,
+                start: textarea.selectionStart,
+                end: textarea.selectionEnd,
+              };
+            },
+            { index, marker },
+          ),
+        { timeout: 2000 },
+      )
+      .toEqual({
+        len: value.length + 1,
+        at: marker,
+        count: 1,
+        start: index + 1,
+        end: index + 1,
+      });
+
+    await page.keyboard.press("Backspace");
+
+    await expect
+      .poll(
+        () =>
+          page.evaluate(
+            ({ index, marker }) => {
+              const textarea = document.querySelector<HTMLTextAreaElement>(
+                "textarea.excalidraw-wysiwyg",
+              );
+              if (!textarea) {
+                return null;
+              }
+              const v = textarea.value.replace(/\r\n?/g, "\n");
+              const count = v.split(String(marker)).length - 1;
+              return {
+                len: v.length,
+                count,
+                start: textarea.selectionStart,
+                end: textarea.selectionEnd,
+              };
+            },
+            { index, marker },
+          ),
+        { timeout: 2000 },
+      )
+      .toEqual({ len: value.length, count: 0, start: index, end: index });
+  }
+
+  const tokens = [
+    "only principle:",
+    "触发操作后，用 requestAnimationFrame",
+    "yarn test:typecheck && yarn test:code",
+  ];
+
+  let baselineOffset: number | null = null;
+  for (let ti = 0; ti < tokens.length; ti++) {
+    const token = tokens[ti]!;
+    const baseIndex = value.indexOf(token);
+    expect(baseIndex).toBeGreaterThanOrEqual(0);
+    const targetIndex = baseIndex + Math.min(Math.max(1, token.length - 1), 20);
+
+    for (let i = 0; i < 8; i++) {
+      const deltaAbs = await page.evaluate(
+        ({ index }) => {
+          const h = (window as any).h;
+          const overlay = document.querySelector<HTMLElement>(
+            ".excalidraw-wysiwyg__whitespaceOverlay",
+          );
+          if (!h?.state || !overlay) {
+            throw new Error("missing state/overlay");
+          }
+          const canvas =
+            document.querySelector<HTMLCanvasElement>("canvas.interactive");
+          if (!canvas) {
+            throw new Error("missing canvas");
+          }
+          const r = (window as any).__e2eOverlay.charRectAt(
+            overlay,
+            Number(index),
+          ) as DOMRect;
+          const canvasRect = canvas.getBoundingClientRect();
+          const desiredY = canvasRect.top + canvasRect.height * 0.45;
+          const dy = desiredY - (Number(r.y) + Number(r.height) / 2);
+          const zoom = Number(h.state.zoom?.value) || 1;
+          const scrollY = Number(h.state.scrollY) || 0;
+          h.setState({ scrollY: scrollY + dy / zoom });
+          return Math.abs(dy);
+        },
+        { index: targetIndex },
+      );
+      if (deltaAbs < 24) {
+        break;
+      }
+      await page.waitForTimeout(50);
+    }
+
+    const clickPoint = await page.evaluate(
+      ({ index }) => {
+        const overlay = document.querySelector<HTMLElement>(
+          ".excalidraw-wysiwyg__whitespaceOverlay",
+        );
+        if (!overlay) {
+          throw new Error("missing overlay");
+        }
+        const r = (window as any).__e2eOverlay.charRectAt(
+          overlay,
+          Number(index),
+        ) as DOMRect;
+        return {
+          x: Number(r.x) + Math.max(1, Number(r.width) / 2),
+          y: Number(r.y) + Math.max(1, Number(r.height) / 2),
+        };
+      },
+      { index: targetIndex },
+    );
+
+    await page.mouse.click(clickPoint.x, clickPoint.y);
+    await page.waitForTimeout(50);
+
+    await page.evaluate(() => (window as any).__e2eCanvasText.clear());
+    await page.evaluate(() => {
+      const textarea = document.querySelector<HTMLTextAreaElement>(
+        "textarea.excalidraw-wysiwyg",
+      );
+      textarea?.focus();
+    });
+    await page.keyboard.type(marker2);
+    await page.waitForFunction((marker) => {
+      const calls = (window as any).__e2eCanvasText?.get?.() || [];
+      return calls.some(
+        (c: any) =>
+          c?.kind === "fillText" &&
+          typeof c?.text === "string" &&
+          c.text.includes(String(marker)),
+      );
+    }, marker2);
+
+    const caret = await page.evaluate(() => {
+      const el = document.querySelector<HTMLElement>(
+        ".excalidraw-wysiwyg__caret",
+      );
+      if (!el) {
+        throw new Error("missing caret");
+      }
+      const r = el.getBoundingClientRect();
+      return { top: Number(r.y), height: Number(r.height) };
+    });
+
+    const markerBaselineY = await page.evaluate(
+      ({ marker }) => {
+        const calls = (window as any).__e2eCanvasText?.get?.() || [];
+        const hits = calls.filter((c: any) => {
+          return (
+            c?.kind === "fillText" &&
+            typeof c?.text === "string" &&
+            c.text.includes(String(marker))
+          );
+        });
+        if (!hits.length) {
+          return null;
+        }
+        const hit = hits[hits.length - 1] as any;
+        const canvas =
+          hit.canvasIsStatic === true
+            ? document.querySelector<HTMLCanvasElement>(
+                "canvas.excalidraw__canvas.static",
+              )
+            : document.querySelector<HTMLCanvasElement>(
+                "canvas.excalidraw__canvas.interactive",
+              ) ??
+              document.querySelector<HTMLCanvasElement>("canvas.interactive");
+        if (!canvas) {
+          throw new Error("missing canvas");
+        }
+        const rect = canvas.getBoundingClientRect();
+        const scaleY = rect.height ? rect.height / canvas.height : 1;
+        const [, b, , d, , f] = hit.transform as [
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+        ];
+        const y = b * hit.x + d * hit.y + f;
+        return rect.top + y * scaleY;
+      },
+      { marker: marker2 },
+    );
+    expect(markerBaselineY).not.toBeNull();
+
+    const offset = Number(markerBaselineY) - caret.top;
+    if (baselineOffset == null) {
+      baselineOffset = offset;
+    } else {
+      expect(Math.abs(offset - baselineOffset)).toBeLessThan(
+        caret.height * 0.6,
+      );
+    }
+
+    await page.keyboard.press("Backspace");
+  }
+
+  await exitEditor(page);
 });

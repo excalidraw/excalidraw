@@ -15,6 +15,8 @@
     "copyAsPng": "Copy to clipboard as PNG",
     "copyAsSvg": "Copy to clipboard as SVG",
     "copyText": "Copy to clipboard as text",
+    "copyTextBatch": "Batch copy text to clipboard",
+    "copyBatchWithFormat": "Batch copy with formatting",
     "copySource": "Copy source to clipboard",
     "convertToCode": "Convert to code",
     "bringForward": "Bring forward",

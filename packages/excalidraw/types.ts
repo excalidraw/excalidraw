@@ -370,6 +370,8 @@ export interface AppState {
   viewBackgroundColor: string;
   textBoxDecorationsColor: string;
   textEditorCaretColor: string;
+  textSelectionBackgroundColor: string;
+  textSelectionUnderlineColor: string;
   scrollX: number;
   scrollY: number;
   cursorButton: "up" | "down";
@@ -383,6 +385,8 @@ export interface AppState {
     | "canvasBackground"
     | "textBoxDecorations"
     | "textEditorCaret"
+    | "textSelectionBackground"
+    | "textSelectionUnderline"
     | "elementBackground"
     | "elementStroke"
     | "fontFamily"

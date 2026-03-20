@@ -649,6 +649,21 @@ body.excalidraw-cursor-resize * {
 
   --text-box-decorations-color: #a8a8a8;
   --text-box-decorations-opacity: 0.55;
+  --wysiwyg-selection-bg: rgba(124, 202, 255, 0.35);
+
+  @at-root .excalidraw.theme--dark#{&} {
+    --wysiwyg-selection-bg: rgba(124, 202, 255, 0.25);
+  }
+
+  .excalidraw-wysiwyg::selection {
+    background: var(--wysiwyg-selection-bg);
+    color: inherit;
+  }
+
+  .excalidraw-wysiwyg::-moz-selection {
+    background: var(--wysiwyg-selection-bg);
+    color: inherit;
+  }
 
   // 需求说明.txt#L30-33: 空格/换行符可视化（类似 VSCode render whitespace: all）
   //

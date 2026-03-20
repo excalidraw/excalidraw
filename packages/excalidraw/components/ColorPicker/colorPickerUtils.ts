@@ -100,5 +100,7 @@ export type ColorPickerType =
   | "canvasBackground"
   | "textBoxDecorations"
   | "textEditorCaret"
+  | "textSelectionBackground"
+  | "textSelectionUnderline"
   | "elementBackground"
   | "elementStroke";

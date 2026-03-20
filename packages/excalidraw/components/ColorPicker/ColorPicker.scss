@@ -37,10 +37,57 @@
     }
   }
 
+  .color-picker__below-trigger {
+    grid-column: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+  }
+
+  .color-picker__below-trigger-row {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
   .color-picker__top-picks {
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+
+  .color-picker__action-button {
+    --radius: 4px;
+    --size: 1.375rem;
+
+    padding: 0;
+    margin: 0;
+    width: var(--size);
+    height: var(--size);
+    border-radius: var(--radius);
+    border: 1px solid var(--default-border-color);
+    background: var(--island-bg-color);
+    color: var(--text-primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+
+    &:hover {
+      border-color: var(--color-brand-hover);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--focus-highlight-color);
+    }
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
   }
 
   .color-picker__button {

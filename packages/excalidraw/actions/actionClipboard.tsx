@@ -1,5 +1,8 @@
-import { isTextElement } from "@excalidraw/element";
-import { getTextFromElements } from "@excalidraw/element";
+import {
+  deepCopyElement,
+  getTextFromElements,
+  isTextElement,
+} from "@excalidraw/element";
 
 import { CODES, isFirefox } from "@excalidraw/common";
 
@@ -282,4 +285,75 @@ export const copyText = register({
     );
   },
   keywords: ["text", "clipboard", "copy"],
+});
+
+export const copyTextBatch = register({
+  name: "copyTextBatch",
+  label: "labels.copyTextBatch",
+  trackEvent: { category: "element" },
+  perform: async (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: true,
+      includeElementsInFrames: true,
+    });
+    const text = getTextFromElements(selectedElements);
+
+    try {
+      (app as any).plainTextCopy = {
+        text,
+        elements: selectedElements.map((element) => deepCopyElement(element)),
+        files: null,
+      };
+      await copyTextToSystemClipboard(text);
+    } catch (e) {
+      throw new Error(t("errors.copyToSystemClipboardFailed"));
+    }
+
+    return {
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  predicate: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: true,
+      includeElementsInFrames: true,
+    });
+    const selectedIdsCount = Object.values(appState.selectedElementIds).filter(
+      Boolean,
+    ).length;
+    return (
+      selectedIdsCount > 1 &&
+      selectedElements.length > 0 &&
+      selectedElements.every(isTextElement)
+    );
+  },
+  keywords: ["text", "clipboard", "copy"],
+});
+
+export const copyBatchWithFormat = register({
+  name: "copyBatchWithFormat",
+  label: "labels.copyBatchWithFormat",
+  trackEvent: { category: "element" },
+  perform: async (elements, appState, event, app) => {
+    return actionCopy.perform(
+      elements,
+      appState,
+      event as ClipboardEvent | null | undefined,
+      app,
+    );
+  },
+  predicate: (elements, appState, _, app) => {
+    const selectedElements = app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: true,
+      includeElementsInFrames: true,
+    });
+    const selectedIdsCount = Object.values(appState.selectedElementIds).filter(
+      Boolean,
+    ).length;
+    return selectedIdsCount > 1 && selectedElements.every(isTextElement);
+  },
+  keywords: ["clipboard", "copy"],
 });

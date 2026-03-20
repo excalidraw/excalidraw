@@ -60,6 +60,7 @@ import {
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
+  actionToggleTextSelectionUnderline,
 } from "../actions/actionProperties";
 import {
   actionResetZoom,
@@ -255,6 +256,15 @@ export const textWysiwyg = ({
 
   let caretUpdateRaf: number | null = null;
   let keepCaretVisibleWhilePointerDown = false;
+  let measuredCaretCache: {
+    normalizedValue: string;
+    font: string;
+    editorWidth: number;
+    shouldWrap: boolean;
+    lines: readonly string[];
+    explicitNewlineAfterLine: readonly boolean[];
+    lineStartIndices: readonly number[];
+  } | null = null;
   const scheduleCaretUpdate = () => {
     if (caretUpdateRaf != null) {
       cancelAnimationFrame(caretUpdateRaf);
@@ -307,12 +317,31 @@ export const textWysiwyg = ({
       ? Math.abs(matrix.b) > 1e-6 || Math.abs(matrix.c) > 1e-6
       : false;
 
-    if (hasRotationOrSkew) {
+    const shouldUseMeasuredCaret =
+      hasRotationOrSkew || textNodeValue.length > 8000;
+    if (shouldUseMeasuredCaret) {
       const normalizedValue = editable.value.replace(/\r\n?/g, "\n");
       const font = getFontString(updatedTextElement);
-      const { lines, explicitNewlineAfterLine } =
+      const shouldWrap =
         whitespaceOverlay.style.whiteSpace === "pre-wrap" ||
-        whitespaceOverlay.style.whiteSpace === "break-spaces"
+        whitespaceOverlay.style.whiteSpace === "break-spaces";
+
+      let lines: readonly string[];
+      let explicitNewlineAfterLine: readonly boolean[];
+      let lineStartIndices: readonly number[];
+
+      if (
+        measuredCaretCache &&
+        measuredCaretCache.normalizedValue === normalizedValue &&
+        measuredCaretCache.font === font &&
+        measuredCaretCache.editorWidth === editorWidth &&
+        measuredCaretCache.shouldWrap === shouldWrap
+      ) {
+        lines = measuredCaretCache.lines;
+        explicitNewlineAfterLine = measuredCaretCache.explicitNewlineAfterLine;
+        lineStartIndices = measuredCaretCache.lineStartIndices;
+      } else {
+        const res = shouldWrap
           ? wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
               normalizedValue,
               font,
@@ -325,14 +354,27 @@ export const textWysiwyg = ({
                 .map((_line, idx, arr) => idx < arr.length - 1),
             };
 
-      const lineStartIndices: number[] = [];
-      let currentIndex = 0;
-      for (let i = 0; i < lines.length; i++) {
-        lineStartIndices.push(currentIndex);
-        currentIndex += lines[i]?.length ?? 0;
-        if (explicitNewlineAfterLine[i]) {
-          currentIndex += 1;
+        const nextLineStartIndices: number[] = [];
+        let currentIndex = 0;
+        for (let i = 0; i < res.lines.length; i++) {
+          nextLineStartIndices.push(currentIndex);
+          currentIndex += res.lines[i]?.length ?? 0;
+          if (res.explicitNewlineAfterLine[i]) {
+            currentIndex += 1;
+          }
         }
+        lines = res.lines;
+        explicitNewlineAfterLine = res.explicitNewlineAfterLine;
+        lineStartIndices = nextLineStartIndices;
+        measuredCaretCache = {
+          normalizedValue,
+          font,
+          editorWidth,
+          shouldWrap,
+          lines,
+          explicitNewlineAfterLine,
+          lineStartIndices,
+        };
       }
 
       const normalizedCaretIndex = Math.max(
@@ -877,13 +919,21 @@ export const textWysiwyg = ({
         let hi = lineText.length;
         while (lo < hi) {
           const mid = Math.floor((lo + hi) / 2);
-          if (getPrefixWidth(mid) <= xWithinLine) {
+          if (getPrefixWidth(mid) < xWithinLine) {
             lo = mid + 1;
           } else {
             hi = mid;
           }
         }
-        charIndex = Math.max(0, Math.min(lineText.length, lo));
+
+        const right = Math.max(0, Math.min(lineText.length, lo));
+        const left = Math.max(0, right - 1);
+        const leftX = getPrefixWidth(left);
+        const rightX = getPrefixWidth(right);
+        charIndex =
+          xWithinLine - leftX <= rightX - xWithinLine
+            ? left
+            : Math.max(left, right);
       }
 
       const resolved =
@@ -1323,6 +1373,31 @@ export const textWysiwyg = ({
       event.preventDefault();
       app.actionManager.executeAction(actionResetZoom);
       updateWysiwygStyle();
+      scheduleCaretUpdate();
+    } else if (
+      event[KEYS.CTRL_OR_CMD] &&
+      !event.shiftKey &&
+      !event.altKey &&
+      event.key.toLowerCase() === "u"
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const start = editable.selectionStart ?? 0;
+      const end = editable.selectionEnd ?? 0;
+      if (start === end) {
+        return;
+      }
+
+      app.actionManager.executeAction(
+        actionToggleTextSelectionUnderline,
+        "ui",
+        {
+          start,
+          end,
+          color: app.state.textSelectionUnderlineColor,
+        },
+      );
       scheduleCaretUpdate();
     } else if (
       event[KEYS.CTRL_OR_CMD] &&
@@ -1957,6 +2032,7 @@ export const textWysiwyg = ({
         return;
       }
 
+      /*
       const text = whitespaceOverlayTextNode.nodeValue ?? "";
       if (text.length === 0) {
         return;
@@ -2012,6 +2088,7 @@ export const textWysiwyg = ({
           scheduleCaretUpdate();
         }
       }
+      */
 
       if (lastNativeDblClickAt != null) {
         const sinceNative = performance.now() - lastNativeDblClickAt;

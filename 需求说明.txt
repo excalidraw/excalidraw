@@ -1,6 +1,5 @@
 only principle:
 所有的新更能都添加详细注释,不要删除代码,直接注释掉就行了;
-不要运行其他的测试文件,一切功能以这个文件为准;
 principle:
 此文件是开发新功能的需求说明,
 新的功能都要不影响已有的功能,确保已有的功能不会受新功能影响;
@@ -59,6 +58,8 @@ finished:
 优化文本框左键点击:鼠标左键点击文本框后,选中文本框,之后再点击,就是将编辑光标插入鼠标光标所在的位置
 第一次鼠标点击就是选中文本框;第二次鼠标左键点击就是插入光标;默认全选是错误设计;选中逻辑只有插入光标后双击选词,三击选行;
 
+
+
 fixed:
 点击选中文本框之后,
 情况1:如果等待1秒左右之后鼠标左键点击文本框文本区域,则顺利插入编辑光标;
@@ -93,6 +94,7 @@ DOM 文本的字形 hinting、字距、换行规则
 在不同浏览器/系统/字体 fallback下的不同
 不考虑旋转文本框功能
 
+wasted:
 交互不变的要求
 - 现有命中测试/选择/框选/拖拽都以“场景坐标 + 元素几何”为准；如果 DOM 文本节点接管鼠标事件，会干扰 canvas 的输入系统。要保持交互一致，DOM 文本大概率必须 pointer-events: none ，这又限制了非编辑态的 DOM 文本不能参与原生选择/复制等（除非另做一套交互策略）。
 
@@ -101,40 +103,40 @@ wasted:
 将所有文本改为使用DOM渲染,分析保持现有功能,都需要做哪些更改;不修改代码;
 
 
-
+finished:
 为改动路线 B在 tests 编写测试文件
 fixed:
 路线 B（一致性最好，改动最大）：把“测量 + 换行 + 高度计算”整体迁到 DOM（用 hidden div/span 或 textarea 的排版结果），再驱动元素 width/height 与显示。这样能最大化消除“双击进入编辑轻微变化”
-
 在#tests编写一个测试,确保画布中的文本框在大多数位置双击编辑时,编辑时和非编辑时的文字位置不变;
-
 在#tests编写一个测试鼠标拖动文本框边框改变画布中文本框的宽度的测试,测试改变文本框宽度是否会造成文本不可见,改变文本框宽度,是否会自动换行,并调整文本框高度;在这个测试部分注释文本框自动换行高度测试;
 
+
+fixed:
 编辑状态下的自动换行和非编辑状态下的自动换行依然有区别;
 在#tests中编写测试,确保在任何情况下编辑状态的自动换行和非编辑状态下的自动换行都一样;
 完善自动换行非编辑编辑状态差异测试,在文本框输入一段内容
 "自动换行测试Automatic line break test1234567890
-
 自动换行测试Automatic line break test1234567890
 自动换行测试Automatic line break test1234567890"
 然后模拟鼠标修改这个文本框的宽度(逐渐缩小文本框宽度);分析在编辑状态下和非编辑状态下的文本框的自动换行是否一致;如果不一致则返回错误;
 
 
-
+finished:
 分析如何关闭画布在不同分辨率下显示不同的界面;无论分辨率为多少都显示PC端的界面;不修改代码;
 
 
 
-
+finished:
 关闭页面切换为移动端UI的功能;
 在关闭的位置添加注释关闭移动端UI
 使网页始终显示桌面版网页UI;
 
-
+finished:
 在这个按钮菜单的画布背景下div区域下添加设置文本"最大宽度"的功能(默认300),当"最大宽度"设为300时,输入的文本框中某一行长度超过300这一行就自动换行;粘贴的内容某几行超过300自动换行,除非使用鼠标调整才能使其宽度超过300;
 为这个功能编写测试文件;不修改项目其他代码;
 - textMaxWidth.test.tsx
 
+fixed:
 在#tests
 添加文本框在编辑状态下,和非编辑状态下
 检查空格和换行符的显示效果是否一致的测试,
@@ -144,25 +146,28 @@ textWysiwyg.test.tsx:L420-L554
 - textWysiwyg.test.tsx:L739-L752
 - textWysiwyg.test.tsx:L1632-L1697
 
-
+fixed:
 在非编辑情况下换行符不会压到行尾文字,编辑时换行符会压到行尾文字;添加测试编辑时和非编辑时,换行符与行尾文字的相对位置是否一致;的测试
 textWysiwyg.tsx:L163-L231
 
+
+finished:
 当缩放变小时大约缩放小于50%画布上的网格显示的网格会变得更稀,
 取消这一设置,并设置无论什么缩放情况下,都显示最小的网格,(画布上的元素移动时能与这些网格对齐)
 
 
-
+finished:
 选中画布中的某一个元素后
 在右键菜单水平翻转垂直翻转的位置添加"扶正"选项,
 点击此选项后,这个元素将没有旋转角度;
 
-
+fixed:
 目前编辑状态和非编辑状态的文本框有一些样式上的差别;
 如进入编辑状态时,文本框的边框变细;(似乎会造成文本框文字轻微偏移)
 进入编辑状态时不要让文本框的边框变细
 在#tests中编写测试文本框边框在编辑时和非编辑时的粗细是否一致的测试
 
+fixed:
 编辑时不要将文本框的虚线边框改为紫色实线框;
 编辑时的文本虚线边框应该和非编辑时的文本框虚线边框大小在画布中的绝对位置样式都一样;
 添加测试画布中文本框编辑时和非编辑时的绝对位置,样式,在canvas中显示的位图是否一致的测试;
@@ -171,7 +176,7 @@ textWysiwyg.tsx:L163-L231
 
 
 
-
+method:
 分析对于目前的项目有哪些测试与目前的项目功能相矛盾;
 把与当前需求相矛盾的现有测试注释掉,并写入注释"旧的测试与当前需求相矛盾";
 将这些测试注释掉并写入注释
@@ -181,12 +186,12 @@ textWysiwyg.tsx:L163-L231
 
 
 
-
+finished:
 "选中画布中的某一个元素后
 在右键菜单水平翻转垂直翻转的位置添加"扶正"选项,
 点击此选项后,这个元素将没有旋转角度;"
 
-
+finished
 添加更严格的测试条件
 (相对于某一个网格的位置)
 记录这个文本框中每个字符的相对于某一个网格的位置方法:
@@ -216,7 +221,7 @@ textWysiwyg.tsx:L163-L231
 
 
 
-
+finished:
 在"画布距离精确测量工具"按钮下方添加一个测量某一个字符到周围网格的距离的测量工具
 "字符顶部网格线距离测量工具"
 "字符顶部网格线距离":这个字符顶部最近的一个像素到画布中最近的一个网格线的距离
@@ -245,7 +250,7 @@ editing should not change whitespace marker rendering (E2E)
 添加在文本框内按住alt(无需选中)可以上下移动编辑光标所在行的功能;和代码编辑器按住alt移动行一样;
 
 
-
+finished:
 更新response speed测试
 1长文本编辑响应速度,
 2按住alt移动行的速度;
@@ -257,7 +262,7 @@ response speed
 
 
 
-
+wasted:
 分析有什么可以记录在浏览器中每一步操作,直到响应所耗费的时间;的方法;
 在Selenium文件夹更新测试脚本test.py
 检查是否已将已将项目运行在http://localhost:3000/ 不重新启动项目
@@ -364,7 +369,8 @@ finished:
 
 
 
-
+improve:
+finished:
 更新移动画布操作方式;
 没有选中任何画布中元素的情况下,使用上下左右键移动画布,一下移动一个网格的距离;(按住不放连续移动,连续移动激发时间50ms)(按住上下左右键某一个按键不放,200ms后自动再次按下这个按键)
 (在Island App-toolbar双击选词三击选行的倒计时下方添加相同样式的红色再次按下倒计时,倒计时结束后再次按下按住的按键)
@@ -373,7 +379,7 @@ finished:
 目前在编辑文本框时,按住ctrl+上下左右键会移动文本框(与编辑时ctrl+上下左右键移动画布冲突);改为移动画布,不移动文本框;
 新增断言：文本编辑态 Ctrl+方向键移动画布时，文本元素坐标不变：
 
-
+improve:
 分析如何让画布中的文本框在低缩放的情况下更清晰;
 能否彻底阻止画布字体栅格化,是画布中的文本框文字更加清晰;
 如何让画布中的文字在缩小时的清晰度接近,普通网页缩小时的文字清晰度;
@@ -418,23 +424,62 @@ finished:
 在画布背景按钮的下方添加设置文本框虚线边框(自带),文本框换行符,文本框行号,文本框空格符颜色的按钮;(共用一个颜色)
 
 
-
+finished:
 在画布背景按钮的下方添加设置编辑光标颜色的按钮(样式和文本框标记颜色)的样式一样
 光标不随描边颜色设置而变化
 
 
+finished:
+在这个Div下添加设置文本框中选中的文本的背景颜色的按钮;设置文本框中选中的文本的下滑线的按钮(这个下划线最好能区分头尾,不和相邻的带有下划线的词连在一起;)
+添加在下滑线内部添加内容下划线
+为选中的文本的下滑线按钮和选中的文本的背景颜色添加设置颜色按钮,样式和文本框标记颜色一样;
+解决无法直接在调色板内修改选中的文本的下划线和文本背景的颜色的问题;
+将一段文字添加下划线后,将这段文字视为包裹在一个下划线标签内在这个标签内输入新文字,也带有下划线,在这个下划线标签以外的地方输入文字,不带有下划线,为下划线添加快捷键ctrl+u
+文本背景的颜色和下划线也视为标签
+在文本框某一行开头添加下划线后,再在这一行开头的位置输入文本,输入的文本也带有下划线,(正确应该不带下划线)解决这个错误(文本背景颜色也有这个问题)
 
-yarn test:all
 
-yarn test:e2e --project=chromium --grep "text box style"
+finished:
+将选中文本的颜色改为淡蓝色,降低选中颜色(目前是深蓝色)对修改文本背景颜色和下划线颜色的影响;
 
 
 
-yarn vitest run packages/excalidraw/tests/clipboard.test.tsx
+分析目前画布上是否可能出现编辑文本框时光标位置与实际编辑的位置不对应的情况;不修改代码,回答怎么样编写测试避免这个问题;
+测试 A：编辑态内点击放置光标后，插入必须发生在对应索引
+目标：拦截“可视光标画在 A，但实际插入在 B”（本质是 overlay/textarea 排版不一致或 caret 计算错）。
+写法要点（直接复用现有测试基础设施）：
+复用 text-wrap-consistency.spec.ts 里 installOverlayRangeHelpers 暴露的 window.__e2eOverlay.caretRectAt/charRectAt（见 text-wrap-consistency.spec.ts）。
+进入编辑态后，对一组采样索引 i：
+用 caretRectAt(overlay, i) 拿到“理论插入点”的 client 坐标
+page.mouse.click(x, y)
+page.keyboard.type("|")
+断言 textarea.value === value.slice(0,i)+"|"+value.slice(i)
+Backspace 恢复现场继续下一个 i
+覆盖用例组合：wrap/不 wrap、textAlign=left/center/right、包含 \n、前导空行、连续空格、长文本、zoom=0.5/1/3/30。
+这个测试没有覆盖当文本过长时,可能导致点击插入光标,但使用键盘输入,实际输入的位置在编辑光标的上方,完善这个测试;
+
+finished:
+注释掉点击字符将光标插入在右侧的测试,并注释掉此功能;
+- 修复点在 textWysiwyg.tsx ：长文本（>8000 字符）时，光标位置不再依赖 DOM Range 的像素布局结果，而是改用与画布一致的换行/测量逻辑计算 caret；并加入缓存，避免性能回退。
+
+finished:
+当选中画布中的多个文本框时,添加批量复制文本功能;(复制文本框中的文本,可以粘贴到其他应用)复制顺序从上到下从左到右;复制为按顺序排列的文本框内容组合
+为选中多个文本框之后的右键菜单添加批量复制功能(位置在复制文本到剪贴板下)
+批量复制带格式(位置在批量复制下)(批量复制格式和目前按下ctrl+c复制是一样的,复制json格式文本框)
+选中多个文本框按下ctrl+c复制到剪贴板;按下ctrl+x复制文字到剪贴板;
+在其他应用按ctrl+v粘贴的是批量复制的文本,
+在画布内按ctrl+v粘贴的是,批量复制的文本框,
+
+
 
 启动:
 yarn --cwd ./excalidraw-app vite --port 3000 --strictPort
 测试:
+yarn test:all
+yarn test:e2e e2e/text-wrap-consistency.spec.ts --grep "clicking in editor should insert"
+yarn test:e2e e2e/text-wrap-consistency.spec.ts --grep "clicking in editor should insert"
+yarn test:e2e --project=chromium --grep "text box style"
+yarn vitest run packages/excalidraw/tests/clipboard.test.tsx
 yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run -t "should'nt bind text to container when not double clicked on center"
 yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run --bail=1
 yarn test:app --watch=false packages/excalidraw/wysiwyg/textWysiwyg.test.tsx --run
