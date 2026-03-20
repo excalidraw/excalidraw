@@ -55,7 +55,6 @@ import {
 } from "@excalidraw/excalidraw/data/restore";
 import {
   migrateSceneElements,
-  resolveSchemaVersion,
   SCHEMA_VERSIONS,
 } from "@excalidraw/excalidraw/data/schema";
 import { newElementWith } from "@excalidraw/element";
@@ -244,10 +243,10 @@ const initializeScene = async (opts: {
     elements: restoreElements(
       migrateSceneElements(
         localDataState?.elements,
-        resolveSchemaVersion(
-          localDataState?.schemaVersion,
-          SCHEMA_VERSIONS.initial,
-        ),
+        {
+          payloadSchemaVersion: localDataState?.schemaVersion,
+          fallbackVersion: SCHEMA_VERSIONS.initial,
+        },
       ),
       null,
       {
@@ -280,10 +279,10 @@ const initializeScene = async (opts: {
             restoreElements(
               migrateSceneElements(
                 imported.elements,
-                resolveSchemaVersion(
-                  imported.schemaVersion,
-                  SCHEMA_VERSIONS.initial,
-                ),
+                {
+                  payloadSchemaVersion: imported.schemaVersion,
+                  fallbackVersion: SCHEMA_VERSIONS.initial,
+                },
               ),
               null,
               {
@@ -576,10 +575,10 @@ const ExcalidrawWrapper = () => {
           const username = importUsernameFromLocalStorage();
           const migratedElements = migrateSceneElements(
             localDataState?.elements,
-            resolveSchemaVersion(
-              localDataState?.schemaVersion,
-              SCHEMA_VERSIONS.initial,
-            ),
+            {
+              payloadSchemaVersion: localDataState?.schemaVersion,
+              fallbackVersion: SCHEMA_VERSIONS.initial,
+            },
           );
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({

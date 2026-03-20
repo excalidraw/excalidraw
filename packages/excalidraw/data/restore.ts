@@ -81,7 +81,11 @@ import {
   getNormalizedGridStep,
   getNormalizedZoom,
 } from "../scene";
-import { migrateLibraryElements, SCHEMA_VERSIONS } from "./schema";
+import {
+  migrateLibraryElements,
+  type SchemaVersionSource,
+  SCHEMA_VERSIONS,
+} from "./schema";
 
 import type {
   AppState,
@@ -959,12 +963,12 @@ export const restoreAppState = (
 
 const restoreLibraryItem = (
   libraryItem: LibraryItem,
-  schemaVersion: number,
+  schemaVersionSource: SchemaVersionSource,
 ) => {
   const elements = restoreElements(
     migrateLibraryElements(
       getNonDeletedElements(libraryItem.elements),
-      schemaVersion,
+      schemaVersionSource,
     ),
     null,
   );
@@ -974,7 +978,7 @@ const restoreLibraryItem = (
 export const restoreLibraryItems = (
   libraryItems: ImportedDataState["libraryItems"] = [],
   defaultStatus: LibraryItem["status"],
-  schemaVersion: number = SCHEMA_VERSIONS.latest,
+  schemaVersionSource: SchemaVersionSource = SCHEMA_VERSIONS.latest,
 ) => {
   const restoredItems: LibraryItem[] = [];
   for (const item of libraryItems) {
@@ -985,7 +989,7 @@ export const restoreLibraryItems = (
         elements: item,
         id: randomId(),
         created: Date.now(),
-      }, schemaVersion);
+      }, schemaVersionSource);
       if (restoredItem) {
         restoredItems.push(restoredItem);
       }
@@ -999,7 +1003,7 @@ export const restoreLibraryItems = (
         id: _item.id || randomId(),
         status: _item.status || defaultStatus,
         created: _item.created || Date.now(),
-      }, schemaVersion);
+      }, schemaVersionSource);
       if (restoredItem) {
         restoredItems.push(restoredItem);
       }

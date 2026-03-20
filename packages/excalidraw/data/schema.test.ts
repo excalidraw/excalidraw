@@ -160,4 +160,42 @@ describe("schema migration", () => {
       DEFAULT_ELEMENT_PROPS.backgroundColor,
     );
   });
+
+  it("should use per-element schema when payload schema is missing", () => {
+    const frame = API.createElement({
+      type: "frame",
+      backgroundColor: "#ff0000",
+    });
+    const frameFromModernSource = {
+      ...frame,
+      schemaVersion: SCHEMA_VERSIONS.latest,
+    } as typeof frame & { schemaVersion: number };
+
+    const migrated = migrateClipboardElements([frameFromModernSource], {
+      payloadSchemaVersion: undefined,
+      fallbackVersion: SCHEMA_VERSIONS.initial,
+    })!;
+
+    expect(migrated[0].backgroundColor).toBe("#ff0000");
+  });
+
+  it("should prefer payload schema over per-element schema", () => {
+    const frame = API.createElement({
+      type: "frame",
+      backgroundColor: "#ff0000",
+    });
+    const frameFromModernSource = {
+      ...frame,
+      schemaVersion: SCHEMA_VERSIONS.latest,
+    } as typeof frame & { schemaVersion: number };
+
+    const migrated = migrateClipboardElements([frameFromModernSource], {
+      payloadSchemaVersion: SCHEMA_VERSIONS.initial,
+      fallbackVersion: SCHEMA_VERSIONS.latest,
+    })!;
+
+    expect(migrated[0].backgroundColor).toBe(
+      DEFAULT_ELEMENT_PROPS.backgroundColor,
+    );
+  });
 });

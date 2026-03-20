@@ -26,7 +26,6 @@ import {
 } from "./restore";
 import {
   migrateSceneElements,
-  resolveSchemaVersion,
   SCHEMA_VERSIONS,
 } from "./schema";
 
@@ -162,13 +161,12 @@ export const loadSceneOrLibraryFromBlob = async (
       throw error;
     }
     if (isValidExcalidrawData(data)) {
-      const schemaVersion = resolveSchemaVersion(
-        data.schemaVersion,
-        SCHEMA_VERSIONS.initial,
-      );
       const migratedElements = migrateSceneElements(
         data.elements,
-        schemaVersion,
+        {
+          payloadSchemaVersion: data.schemaVersion,
+          fallbackVersion: SCHEMA_VERSIONS.initial,
+        },
       );
       return {
         type: MIME_TYPES.excalidraw,
@@ -238,7 +236,10 @@ export const parseLibraryJSON = (
   return restoreLibraryItems(
     libraryItems,
     defaultStatus,
-    resolveSchemaVersion(data.schemaVersion, SCHEMA_VERSIONS.initial),
+    {
+      payloadSchemaVersion: data.schemaVersion,
+      fallbackVersion: SCHEMA_VERSIONS.initial,
+    },
   );
 };
 

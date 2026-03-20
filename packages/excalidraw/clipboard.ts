@@ -45,7 +45,9 @@ import { SCHEMA_VERSIONS } from "./data/schema";
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
   schemaVersion: number;
-  elements: readonly NonDeletedExcalidrawElement[];
+  elements: readonly (NonDeletedExcalidrawElement & {
+    schemaVersion?: number;
+  })[];
   files: BinaryFiles | undefined;
 };
 
@@ -187,18 +189,22 @@ export const serializeAsClipboardJSON = ({
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
     schemaVersion: SCHEMA_VERSIONS.latest,
     elements: elements.map((element) => {
+      const elementWithSchema = {
+        ...element,
+        schemaVersion: SCHEMA_VERSIONS.latest,
+      };
       if (
         getContainingFrame(element, elementsMap) &&
         !framesToCopy.has(getContainingFrame(element, elementsMap)!)
       ) {
-        const copiedElement = deepCopyElement(element);
+        const copiedElement = deepCopyElement(elementWithSchema);
         mutateElement(copiedElement, elementsMap, {
           frameId: null,
         });
         return copiedElement;
       }
 
-      return element;
+      return elementWithSchema;
     }),
     files: files ? _files : undefined,
   };

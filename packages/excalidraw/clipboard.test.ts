@@ -55,7 +55,13 @@ describe("parseClipboard()", () => {
         }),
       ),
     );
-    expect(clipboardData.elements).toEqual([rect]);
+    expect(clipboardData.elements).toEqual([
+      expect.objectContaining({
+        id: rect.id,
+        type: rect.type,
+        schemaVersion: SCHEMA_VERSIONS.latest,
+      }),
+    ]);
     expect(clipboardData.schemaVersion).toBe(SCHEMA_VERSIONS.latest);
   });
 
@@ -75,7 +81,13 @@ describe("parseClipboard()", () => {
         }),
       ),
     );
-    expect(clipboardData.elements).toEqual([rect]);
+    expect(clipboardData.elements).toEqual([
+      expect.objectContaining({
+        id: rect.id,
+        type: rect.type,
+        schemaVersion: SCHEMA_VERSIONS.latest,
+      }),
+    ]);
     // -------------------------------------------------------------------------
     json = serializeAsClipboardJSON({ elements: [rect], files: null });
     clipboardData = await parseClipboard(
@@ -87,8 +99,40 @@ describe("parseClipboard()", () => {
         }),
       ),
     );
-    expect(clipboardData.elements).toEqual([rect]);
+    expect(clipboardData.elements).toEqual([
+      expect.objectContaining({
+        id: rect.id,
+        type: rect.type,
+        schemaVersion: SCHEMA_VERSIONS.latest,
+      }),
+    ]);
     // -------------------------------------------------------------------------
+  });
+
+  it("should preserve per-element schema when payload schema is missing", async () => {
+    const rect = API.createElement({ type: "rectangle" });
+    const clipboardPayload = JSON.parse(
+      serializeAsClipboardJSON({ elements: [rect], files: null }),
+    );
+    delete clipboardPayload.schemaVersion;
+
+    const clipboardData = await parseClipboard(
+      await parseDataTransferEvent(
+        createPasteEvent({
+          types: {
+            "text/plain": JSON.stringify(clipboardPayload),
+          },
+        }),
+      ),
+    );
+
+    expect(clipboardData.schemaVersion).toBeUndefined();
+    expect(clipboardData.elements?.[0]).toEqual(
+      expect.objectContaining({
+        id: rect.id,
+        schemaVersion: SCHEMA_VERSIONS.latest,
+      }),
+    );
   });
 
   it("should parse <image> `src` urls out of text/html", async () => {

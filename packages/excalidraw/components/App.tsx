@@ -360,8 +360,8 @@ import {
   migrateClipboardElements,
   migrateLibraryElements,
   migrateSceneElements,
-  resolveSchemaVersion,
   SCHEMA_VERSIONS,
+  type SchemaVersionSource,
   type SchemaMigrationScope,
 } from "../data/schema";
 import { getCenter, getDistance } from "../gesture";
@@ -2335,7 +2335,7 @@ class App extends React.Component<AppProps, AppState> {
       elements,
       position: "center",
       files: null,
-      schemaVersion: SCHEMA_VERSIONS.latest,
+      schemaVersionSource: SCHEMA_VERSIONS.latest,
       migrationScope: "api",
     });
   };
@@ -2824,10 +2824,10 @@ class App extends React.Component<AppProps, AppState> {
     const restoredElements = restoreElements(
       migrateSceneElements(
         initialData?.elements,
-        resolveSchemaVersion(
-          initialData?.schemaVersion,
-          initialDataSchemaFallback,
-        ),
+        {
+          payloadSchemaVersion: initialData?.schemaVersion,
+          fallbackVersion: initialDataSchemaFallback,
+        },
       ),
       null,
       {
@@ -3599,9 +3599,12 @@ class App extends React.Component<AppProps, AppState> {
       this.addElementsFromPasteOrLibrary({
         elements,
         files: data.files || null,
-        schemaVersion: data.programmaticAPI
+        schemaVersionSource: data.programmaticAPI
           ? SCHEMA_VERSIONS.latest
-          : resolveSchemaVersion(data.schemaVersion, SCHEMA_VERSIONS.initial),
+          : {
+              payloadSchemaVersion: data.schemaVersion,
+              fallbackVersion: SCHEMA_VERSIONS.initial,
+            },
         migrationScope: data.programmaticAPI ? "api" : "clipboard",
         position:
           this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
@@ -3629,7 +3632,7 @@ class App extends React.Component<AppProps, AppState> {
         this.addElementsFromPasteOrLibrary({
           elements,
           files,
-          schemaVersion: SCHEMA_VERSIONS.latest,
+          schemaVersionSource: SCHEMA_VERSIONS.latest,
           migrationScope: "api",
           position:
             this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
@@ -3748,22 +3751,18 @@ class App extends React.Component<AppProps, AppState> {
   addElementsFromPasteOrLibrary = (opts: {
     elements: readonly ExcalidrawElement[];
     files: BinaryFiles | null;
-    schemaVersion?: number;
+    schemaVersionSource: SchemaVersionSource;
     migrationScope: SchemaMigrationScope;
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
     fitToContent?: boolean;
   }) => {
-    const schemaVersion = resolveSchemaVersion(
-      opts.schemaVersion,
-      SCHEMA_VERSIONS.latest,
-    );
     const migratedElements =
       opts.migrationScope === "clipboard"
-        ? migrateClipboardElements(opts.elements, schemaVersion)
+        ? migrateClipboardElements(opts.elements, opts.schemaVersionSource)
         : opts.migrationScope === "library"
-        ? migrateLibraryElements(opts.elements, schemaVersion)
-        : migrateAPIElements(opts.elements, schemaVersion);
+        ? migrateLibraryElements(opts.elements, opts.schemaVersionSource)
+        : migrateAPIElements(opts.elements, opts.schemaVersionSource);
 
     const elements = restoreElements(
       migratedElements,
@@ -11540,7 +11539,7 @@ class App extends React.Component<AppProps, AppState> {
             elements: distributeLibraryItemsOnSquareGrid(libraryItems),
             position: event,
             files: null,
-            schemaVersion: SCHEMA_VERSIONS.latest,
+            schemaVersionSource: SCHEMA_VERSIONS.latest,
             migrationScope: "library",
           });
         }

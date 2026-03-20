@@ -76,6 +76,15 @@ export const resolveSchemaVersion = (
   return fallbackVersion;
 };
 
+const isValidSchemaVersion = (
+  schemaVersion: number | undefined,
+): schemaVersion is number => {
+  return (
+    Number.isInteger(schemaVersion) &&
+    (schemaVersion as number) >= SCHEMA_VERSIONS.initial
+  );
+};
+
 export const validateSchemaMigrations = (
   migrations: readonly SchemaMigration[],
 ) => {
@@ -171,38 +180,69 @@ export const migrateElementsBySchema = (
   );
 };
 
+export type SchemaVersionSource =
+  | number
+  | {
+      payloadSchemaVersion?: number;
+      fallbackVersion: number;
+    };
+
+const migrateElementsByScope = (
+  elements: readonly ExcalidrawElement[] | null | undefined,
+  scope: SchemaMigrationScope,
+  source: SchemaVersionSource,
+) => {
+  if (!elements) {
+    return elements;
+  }
+
+  if (typeof source === "number") {
+    return migrateElementsBySchema(elements, {
+      schemaVersion: source,
+      scope,
+    });
+  }
+
+  if (isValidSchemaVersion(source.payloadSchemaVersion)) {
+    return migrateElementsBySchema(elements, {
+      schemaVersion: source.payloadSchemaVersion,
+      scope,
+    });
+  }
+
+  return elements.map((element) => {
+    const schemaVersion = resolveSchemaVersion(
+      (element as ExcalidrawElement & { schemaVersion?: number }).schemaVersion,
+      source.fallbackVersion,
+    );
+    const migratedElement = migrateElementsBySchema([element], {
+      schemaVersion,
+      scope,
+    });
+    return migratedElement?.[0] || element;
+  });
+};
+
 export const migrateSceneElements = (
   elements: readonly ExcalidrawElement[] | null | undefined,
-  schemaVersion: number,
+  source: SchemaVersionSource,
 ) =>
-  migrateElementsBySchema(elements, {
-    schemaVersion,
-    scope: "scene",
-  });
+  migrateElementsByScope(elements, "scene", source);
 
 export const migrateLibraryElements = (
   elements: readonly ExcalidrawElement[] | null | undefined,
-  schemaVersion: number,
+  source: SchemaVersionSource,
 ) =>
-  migrateElementsBySchema(elements, {
-    schemaVersion,
-    scope: "library",
-  });
+  migrateElementsByScope(elements, "library", source);
 
 export const migrateClipboardElements = (
   elements: readonly ExcalidrawElement[] | null | undefined,
-  schemaVersion: number,
+  source: SchemaVersionSource,
 ) =>
-  migrateElementsBySchema(elements, {
-    schemaVersion,
-    scope: "clipboard",
-  });
+  migrateElementsByScope(elements, "clipboard", source);
 
 export const migrateAPIElements = (
   elements: readonly ExcalidrawElement[] | null | undefined,
-  schemaVersion: number,
+  source: SchemaVersionSource,
 ) =>
-  migrateElementsBySchema(elements, {
-    schemaVersion,
-    scope: "api",
-  });
+  migrateElementsByScope(elements, "api", source);

@@ -33,7 +33,7 @@ import { t } from "../i18n";
 
 import { loadLibraryFromBlob } from "./blob";
 import { restoreLibraryItems } from "./restore";
-import { resolveSchemaVersion, SCHEMA_VERSIONS } from "./schema";
+import { SCHEMA_VERSIONS } from "./schema";
 
 import type App from "../components/App";
 
@@ -564,7 +564,10 @@ class AdapterTransaction {
             restoreLibraryItems(
               data?.libraryItems || [],
               "published",
-              resolveSchemaVersion(data?.schemaVersion, SCHEMA_VERSIONS.initial),
+              {
+                payloadSchemaVersion: data?.schemaVersion,
+                fallbackVersion: SCHEMA_VERSIONS.initial,
+              },
             ),
           );
         } catch (error: any) {
@@ -877,10 +880,10 @@ export const useHandleLibrary = (
                 restoredData = restoreLibraryItems(
                   libraryData.libraryItems || [],
                   "published",
-                  resolveSchemaVersion(
-                    libraryData.schemaVersion,
-                    SCHEMA_VERSIONS.initial,
-                  ),
+                  {
+                    payloadSchemaVersion: libraryData.schemaVersion,
+                    fallbackVersion: SCHEMA_VERSIONS.initial,
+                  },
                 );
 
                 // we don't queue this operation because it's running inside

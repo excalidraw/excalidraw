@@ -149,7 +149,7 @@ export const insertToEditor = ({
   app.addElementsFromPasteOrLibrary({
     elements: newElements,
     files,
-    schemaVersion: SCHEMA_VERSIONS.latest,
+    schemaVersionSource: SCHEMA_VERSIONS.latest,
     migrationScope: "api",
     position: "center",
     fitToContent: true,
