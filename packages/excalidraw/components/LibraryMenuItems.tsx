@@ -1,5 +1,3 @@
-import { Dialog } from "./Dialog";
-import { TextField } from "./TextField";
 import React, {
   useCallback,
   useEffect,
@@ -20,6 +18,9 @@ import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { useScrollPosition } from "../hooks/useScrollPosition";
 import { t } from "../i18n";
 
+import { TextField } from "./TextField";
+import { Dialog } from "./Dialog";
+
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
 import {
@@ -32,9 +33,7 @@ import Stack from "./Stack";
 
 import "./LibraryMenuItems.scss";
 
-import { TextField } from "./TextField";
-
-import { useEditorInterface } from "./App";
+import { useEditorInterface, useApp } from "./App";
 
 import { Button } from "./Button";
 
@@ -78,6 +77,7 @@ export default function LibraryMenuItems({
   onSelectItems: (id: LibraryItem["id"][]) => void;
 }) {
   const editorInterface = useEditorInterface();
+  const app = useApp();
   const libraryContainerRef = useRef<HTMLDivElement>(null);
   const scrollPosition = useScrollPosition<HTMLDivElement>(libraryContainerRef);
 
@@ -108,15 +108,22 @@ export default function LibraryMenuItems({
 
     return libraryItems.filter((item) => {
       const itemName = item.name || "";
-      if (itemName.trim() && deburr(itemName.toLowerCase()).includes(searchQuery)) {
+      if (
+        itemName.trim() &&
+        deburr(itemName.toLowerCase()).includes(searchQuery)
+      ) {
         return true;
       }
-      
+
       // search by keywords
-      if (item.keywords?.some((keyword) => deburr(keyword.toLowerCase()).includes(searchQuery))) {
+      if (
+        item.keywords?.some((keyword) =>
+          deburr(keyword.toLowerCase()).includes(searchQuery),
+        )
+      ) {
         return true;
       }
-      
+
       // search by text elements
       const hasMatchingText = item.elements.some((el) => {
         if (el.type === "text" && (el as any).text) {
@@ -124,7 +131,7 @@ export default function LibraryMenuItems({
         }
         return false;
       });
-      
+
       return hasMatchingText;
     });
   }, [libraryItems, searchInputValue]);
@@ -139,7 +146,7 @@ export default function LibraryMenuItems({
     [libraryItems],
   );
 
-  const editingItem = libraryItems.find(i => i.id === editingItemId);
+  const editingItem = libraryItems.find((i) => i.id === editingItemId);
   const onItemSelectToggle = useCallback(
     (id: LibraryItem["id"], event: React.MouseEvent) => {
       const shouldSelect = !selectedItems.includes(id);
@@ -308,7 +315,7 @@ export default function LibraryMenuItems({
               onClick={onAddToLibraryClick}
               isItemSelected={isItemSelected}
               svgCache={svgCache}
-            onItemEdit={setEditingItemId}
+              onItemEdit={setEditingItemId}
             />
           )}
           <LibraryMenuSection
@@ -448,36 +455,46 @@ export default function LibraryMenuItems({
           </div>
         )}
 
-        
-      {editingItem && (
-        <Dialog
-          onCloseRequest={() => setEditingItemId(null)}
-          title="Edit Library Item"
-          size="small"
-        >
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            <TextField
-              value={editingItem.name || ""}
-              onChange={(name) => {
-                const newItems = libraryItems.map(i => i.id === editingItemId ? { ...i, name } : i);
-                editorInterface.updateLibrary({ libraryItems: newItems });
-              }}
-              label="Name"
-              placeholder="Asset Name"
-            />
-            <TextField
-              value={editingItem.keywords?.join(", ") || ""}
-              onChange={(kw) => {
-                const keywords = kw.split(",").map(k => k.trim()).filter(Boolean);
-                const newItems = libraryItems.map(i => i.id === editingItemId ? { ...i, keywords } : i);
-                editorInterface.updateLibrary({ libraryItems: newItems });
-              }}
-              label="Keywords (comma separated)"
-              placeholder="tag1, tag2"
-            />
-          </div>
-        </Dialog>
-      )}
+        {editingItem && (
+          <Dialog
+            onCloseRequest={() => setEditingItemId(null)}
+            title="Edit Library Item"
+            size="small"
+          >
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              <TextField
+                key={`name-${editingItemId}`}
+                defaultValue={editingItem.name || ""}
+                onChange={(name) => {
+                  const newItems = libraryItems.map((i) =>
+                    i.id === editingItemId ? { ...i, name } : i,
+                  );
+                  app.library.setLibrary(newItems);
+                }}
+                label="Name"
+                placeholder="Asset Name"
+              />
+              <TextField
+                key={`kw-${editingItemId}`}
+                defaultValue={editingItem.keywords?.join(", ") || ""}
+                onChange={(kw) => {
+                  const keywords = kw
+                    .split(",")
+                    .map((k) => k.trim())
+                    .filter(Boolean);
+                  const newItems = libraryItems.map((i) =>
+                    i.id === editingItemId ? { ...i, keywords } : i,
+                  );
+                  app.library.setLibrary(newItems);
+                }}
+                label="Keywords (comma separated)"
+                placeholder="tag1, tag2"
+              />
+            </div>
+          </Dialog>
+        )}
 
         {JSX_whenNotSearching}
         {JSX_whenSearching}

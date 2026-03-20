@@ -592,7 +592,9 @@ let lastSavedLibraryItemsHash = 0;
 let librarySaveCounter = 0;
 
 const getLibraryItemHash = (item: LibraryItem) => {
-  return `${item.id}:${item.name || ""}:${hashElementsVersion(item.elements)}`;
+  return `${item.id}:${item.name || ""}:${
+    item.keywords?.join(",") || ""
+  }:${hashElementsVersion(item.elements)}`;
 };
 
 export const getLibraryItemsHash = (items: LibraryItems) => {

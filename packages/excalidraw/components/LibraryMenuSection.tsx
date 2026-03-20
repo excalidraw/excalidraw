@@ -45,6 +45,7 @@ export const LibraryMenuSection = memo(
     isItemSelected,
     onClick,
     svgCache,
+    onItemEdit,
     itemsRenderedPerBatch,
   }: Props) => {
     const [, startTransition] = useTransition();
@@ -67,7 +68,7 @@ export const LibraryMenuSection = memo(
               isPending={!item?.id && !!item?.elements}
               onClick={onClick}
               svgCache={svgCache}
-                onEdit={onItemEdit}
+              onEdit={onItemEdit}
               id={item?.id}
               selected={isItemSelected(item.id)}
               onToggle={onItemSelectToggle}

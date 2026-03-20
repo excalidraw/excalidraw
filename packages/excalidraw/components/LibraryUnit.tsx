@@ -32,7 +32,7 @@ export const LibraryUnit = memo(
     onToggle: (id: string, event: React.MouseEvent) => void;
     onDrag: (id: string, event: React.DragEvent) => void;
     svgCache: SvgCache;
-    
+
     onEdit?: (id: string) => void;
   }) => {
     const ref = useRef<HTMLDivElement | null>(null);
@@ -90,7 +90,16 @@ export const LibraryUnit = memo(
               e.stopPropagation();
               onEdit(id);
             }}
-            style={{ position: "absolute", top: 4, right: 4, zIndex: 10, cursor: "pointer", background: "var(--color-surface-lowest)", borderRadius: "4px", padding: "2px" }}
+            style={{
+              position: "absolute",
+              top: 4,
+              right: 4,
+              zIndex: 10,
+              cursor: "pointer",
+              background: "var(--color-surface-lowest)",
+              borderRadius: "4px",
+              padding: "2px",
+            }}
           >
             {pencilIcon}
           </div>
