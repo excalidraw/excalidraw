@@ -527,6 +527,7 @@ export type LibraryItem = {
   created: number;
   name?: string;
   error?: string;
+  keywords?: string[];
 };
 export type LibraryItems = readonly LibraryItem[];
 export type LibraryItems_anyVersion = LibraryItems | LibraryItems_v1;

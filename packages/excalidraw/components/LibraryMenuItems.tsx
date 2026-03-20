@@ -105,9 +105,24 @@ export default function LibraryMenuItems({
 
     return libraryItems.filter((item) => {
       const itemName = item.name || "";
-      return (
-        itemName.trim() && deburr(itemName.toLowerCase()).includes(searchQuery)
-      );
+      if (itemName.trim() && deburr(itemName.toLowerCase()).includes(searchQuery)) {
+        return true;
+      }
+      
+      // search by keywords
+      if (item.keywords?.some((keyword) => deburr(keyword.toLowerCase()).includes(searchQuery))) {
+        return true;
+      }
+      
+      // search by text elements
+      const hasMatchingText = item.elements.some((el) => {
+        if (el.type === "text" && (el as any).text) {
+          return deburr((el as any).text.toLowerCase()).includes(searchQuery);
+        }
+        return false;
+      });
+      
+      return hasMatchingText;
     });
   }, [libraryItems, searchInputValue]);
 
