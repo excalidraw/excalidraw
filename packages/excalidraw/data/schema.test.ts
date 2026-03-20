@@ -2,9 +2,13 @@ import { DEFAULT_ELEMENT_PROPS } from "@excalidraw/common";
 
 import { API } from "../tests/helpers/api";
 import {
+  ALL_SCOPES,
+  type SchemaMigration,
   migrateElementsBySchema,
   resolveSchemaVersion,
+  SCHEMA_MIGRATIONS,
   SCHEMA_VERSIONS,
+  validateSchemaMigrations,
 } from "./schema";
 
 describe("schema migration", () => {
@@ -13,14 +17,15 @@ describe("schema migration", () => {
       type: "frame",
       backgroundColor: "#ffc9c9",
     });
-    (frame as any).backgroundEnabled = true;
 
-    const migrated = migrateElementsBySchema([frame], SCHEMA_VERSIONS.initial)!;
+    const migrated = migrateElementsBySchema([frame], {
+      schemaVersion: SCHEMA_VERSIONS.initial,
+      scope: "scene",
+    })!;
 
     expect(migrated[0].backgroundColor).toBe(
       DEFAULT_ELEMENT_PROPS.backgroundColor,
     );
-    expect((migrated[0] as any).backgroundEnabled).toBeUndefined();
   });
 
   it("should keep latest-schema frame backgrounds unchanged", () => {
@@ -28,30 +33,30 @@ describe("schema migration", () => {
       type: "frame",
       backgroundColor: "#ffc9c9",
     });
-    (frame as any).backgroundEnabled = true;
 
-    const migrated = migrateElementsBySchema(
-      [frame],
-      SCHEMA_VERSIONS.latest,
-    )!;
+    const migrated = migrateElementsBySchema([frame], {
+      schemaVersion: SCHEMA_VERSIONS.latest,
+      scope: "scene",
+    })!;
 
     expect(migrated[0].backgroundColor).toBe("#ffc9c9");
-    expect((migrated[0] as any).backgroundEnabled).toBeUndefined();
   });
 
-  it("should normalize legacy false-flag frame backgrounds", () => {
+  it("should normalize legacy frame backgrounds across all scopes", () => {
     const frame = API.createElement({
       type: "frame",
       backgroundColor: "#a5d8ff",
     });
-    (frame as any).backgroundEnabled = false;
 
-    const migrated = migrateElementsBySchema([frame], SCHEMA_VERSIONS.initial)!;
-
-    expect(migrated[0].backgroundColor).toBe(
-      DEFAULT_ELEMENT_PROPS.backgroundColor,
-    );
-    expect((migrated[0] as any).backgroundEnabled).toBeUndefined();
+    for (const scope of ALL_SCOPES) {
+      const migrated = migrateElementsBySchema([frame], {
+        schemaVersion: SCHEMA_VERSIONS.initial,
+        scope,
+      })!;
+      expect(migrated[0].backgroundColor).toBe(
+        DEFAULT_ELEMENT_PROPS.backgroundColor,
+      );
+    }
   });
 
   it("should resolve invalid schema versions using fallback", () => {
@@ -62,5 +67,35 @@ describe("schema migration", () => {
       SCHEMA_VERSIONS.latest,
     );
     expect(resolveSchemaVersion(2, SCHEMA_VERSIONS.initial)).toBe(2);
+  });
+
+  it("should have a valid migration registry configuration", () => {
+    expect(validateSchemaMigrations(SCHEMA_MIGRATIONS)).toEqual([]);
+  });
+
+  it("should reject invalid migration metadata", () => {
+    const invalidMigrations: SchemaMigration[] = [
+      {
+        version: 2.1,
+        title: "bad migration",
+        description: " ",
+        scope: [],
+        apply: (elements) => elements,
+      },
+      {
+        version: 2.1,
+        title: "duplicate",
+        description: "duplicate version",
+        scope: ["scene"],
+        apply: (elements) => elements,
+      },
+    ];
+
+    const errors = validateSchemaMigrations(invalidMigrations);
+
+    expect(errors.length).toBeGreaterThan(0);
+    expect(errors.join("\n")).toContain("integer version");
+    expect(errors.join("\n")).toContain("non-empty description");
+    expect(errors.join("\n")).toContain("Duplicate schema migration version");
   });
 });
