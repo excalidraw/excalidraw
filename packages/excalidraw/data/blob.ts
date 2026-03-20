@@ -168,7 +168,10 @@ export const loadSceneOrLibraryFromBlob = async (
       );
       const migratedElements = migrateElementsBySchema(
         data.elements,
-        schemaVersion,
+        {
+          schemaVersion,
+          scope: "scene",
+        },
       );
       return {
         type: MIME_TYPES.excalidraw,

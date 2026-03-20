@@ -964,7 +964,10 @@ const restoreLibraryItem = (
   const elements = restoreElements(
     migrateElementsBySchema(
       getNonDeletedElements(libraryItem.elements),
-      schemaVersion,
+      {
+        schemaVersion,
+        scope: "library",
+      },
     ),
     null,
   );

@@ -359,6 +359,7 @@ import {
   migrateElementsBySchema,
   resolveSchemaVersion,
   SCHEMA_VERSIONS,
+  type SchemaMigrationScope,
 } from "../data/schema";
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
@@ -2331,6 +2332,8 @@ class App extends React.Component<AppProps, AppState> {
       elements,
       position: "center",
       files: null,
+      schemaVersion: SCHEMA_VERSIONS.latest,
+      migrationScope: "api",
     });
   };
 
@@ -2818,7 +2821,13 @@ class App extends React.Component<AppProps, AppState> {
     const restoredElements = restoreElements(
       migrateElementsBySchema(
         initialData?.elements,
-        resolveSchemaVersion(initialData?.schemaVersion, initialDataSchemaFallback),
+        {
+          schemaVersion: resolveSchemaVersion(
+            initialData?.schemaVersion,
+            initialDataSchemaFallback,
+          ),
+          scope: "scene",
+        },
       ),
       null,
       {
@@ -3593,6 +3602,7 @@ class App extends React.Component<AppProps, AppState> {
         schemaVersion: data.programmaticAPI
           ? SCHEMA_VERSIONS.latest
           : resolveSchemaVersion(data.schemaVersion, SCHEMA_VERSIONS.initial),
+        migrationScope: data.programmaticAPI ? "api" : "clipboard",
         position:
           this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
         retainSeed: isPlainPaste,
@@ -3619,6 +3629,8 @@ class App extends React.Component<AppProps, AppState> {
         this.addElementsFromPasteOrLibrary({
           elements,
           files,
+          schemaVersion: SCHEMA_VERSIONS.latest,
+          migrationScope: "api",
           position:
             this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
         });
@@ -3737,6 +3749,7 @@ class App extends React.Component<AppProps, AppState> {
     elements: readonly ExcalidrawElement[];
     files: BinaryFiles | null;
     schemaVersion?: number;
+    migrationScope: SchemaMigrationScope;
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
     fitToContent?: boolean;
@@ -3744,7 +3757,13 @@ class App extends React.Component<AppProps, AppState> {
     const elements = restoreElements(
       migrateElementsBySchema(
         opts.elements,
-        resolveSchemaVersion(opts.schemaVersion, SCHEMA_VERSIONS.latest),
+        {
+          schemaVersion: resolveSchemaVersion(
+            opts.schemaVersion,
+            SCHEMA_VERSIONS.latest,
+          ),
+          scope: opts.migrationScope,
+        },
       ),
       null,
       {
@@ -11519,6 +11538,8 @@ class App extends React.Component<AppProps, AppState> {
             elements: distributeLibraryItemsOnSquareGrid(libraryItems),
             position: event,
             files: null,
+            schemaVersion: SCHEMA_VERSIONS.latest,
+            migrationScope: "library",
           });
         }
       } catch (error: any) {

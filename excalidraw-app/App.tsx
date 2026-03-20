@@ -244,10 +244,13 @@ const initializeScene = async (opts: {
     elements: restoreElements(
       migrateElementsBySchema(
         localDataState?.elements,
-        resolveSchemaVersion(
-          localDataState?.schemaVersion,
-          SCHEMA_VERSIONS.initial,
-        ),
+        {
+          schemaVersion: resolveSchemaVersion(
+            localDataState?.schemaVersion,
+            SCHEMA_VERSIONS.initial,
+          ),
+          scope: "scene",
+        },
       ),
       null,
       {
@@ -280,10 +283,13 @@ const initializeScene = async (opts: {
             restoreElements(
               migrateElementsBySchema(
                 imported.elements,
-                resolveSchemaVersion(
-                  imported.schemaVersion,
-                  SCHEMA_VERSIONS.initial,
-                ),
+                {
+                  schemaVersion: resolveSchemaVersion(
+                    imported.schemaVersion,
+                    SCHEMA_VERSIONS.initial,
+                  ),
+                  scope: "scene",
+                },
               ),
               null,
               {
@@ -576,10 +582,13 @@ const ExcalidrawWrapper = () => {
           const username = importUsernameFromLocalStorage();
           const migratedElements = migrateElementsBySchema(
             localDataState?.elements,
-            resolveSchemaVersion(
-              localDataState?.schemaVersion,
-              SCHEMA_VERSIONS.initial,
-            ),
+            {
+              schemaVersion: resolveSchemaVersion(
+                localDataState?.schemaVersion,
+                SCHEMA_VERSIONS.initial,
+              ),
+              scope: "scene",
+            },
           );
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
