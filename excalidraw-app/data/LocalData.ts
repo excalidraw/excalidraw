@@ -87,9 +87,14 @@ const saveDataStateToLocalStorage = (
       _appState.openSidebar = null;
     }
 
+    const persistedElements = getNonDeletedElements(elements).map((element) => ({
+      ...element,
+      schemaVersion: SCHEMA_VERSIONS.latest,
+    }));
+
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(getNonDeletedElements(elements)),
+      JSON.stringify(persistedElements),
     );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,

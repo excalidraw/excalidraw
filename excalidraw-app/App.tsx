@@ -54,6 +54,7 @@ import {
   restoreElements,
 } from "@excalidraw/excalidraw/data/restore";
 import {
+  hasElementSchemaVersion,
   migrateSceneElements,
   SCHEMA_VERSIONS,
 } from "@excalidraw/excalidraw/data/schema";
@@ -231,6 +232,17 @@ const initializeScene = async (opts: {
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const localDataState = importFromLocalStorage();
+  const localStorageSchemaVersionSource = hasElementSchemaVersion(
+    localDataState?.elements,
+  )
+    ? {
+        payloadSchemaVersion: undefined,
+        fallbackVersion: SCHEMA_VERSIONS.initial,
+      }
+    : {
+        payloadSchemaVersion: localDataState?.schemaVersion,
+        fallbackVersion: SCHEMA_VERSIONS.initial,
+      };
 
   let scene: Omit<
     RestoredDataState,
@@ -243,10 +255,7 @@ const initializeScene = async (opts: {
     elements: restoreElements(
       migrateSceneElements(
         localDataState?.elements,
-        {
-          payloadSchemaVersion: localDataState?.schemaVersion,
-          fallbackVersion: SCHEMA_VERSIONS.initial,
-        },
+        localStorageSchemaVersionSource,
       ),
       null,
       {
@@ -573,12 +582,20 @@ const ExcalidrawWrapper = () => {
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
           const localDataState = importFromLocalStorage();
           const username = importUsernameFromLocalStorage();
+          const localStorageSchemaVersionSource = hasElementSchemaVersion(
+            localDataState?.elements,
+          )
+            ? {
+                payloadSchemaVersion: undefined,
+                fallbackVersion: SCHEMA_VERSIONS.initial,
+              }
+            : {
+                payloadSchemaVersion: localDataState?.schemaVersion,
+                fallbackVersion: SCHEMA_VERSIONS.initial,
+              };
           const migratedElements = migrateSceneElements(
             localDataState?.elements,
-            {
-              payloadSchemaVersion: localDataState?.schemaVersion,
-              fallbackVersion: SCHEMA_VERSIONS.initial,
-            },
+            localStorageSchemaVersionSource,
           );
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({

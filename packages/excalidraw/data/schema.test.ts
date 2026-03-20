@@ -3,6 +3,7 @@ import { DEFAULT_ELEMENT_PROPS } from "@excalidraw/common";
 import { API } from "../tests/helpers/api";
 import {
   ALL_SCOPES,
+  hasElementSchemaVersion,
   type SchemaMigration,
   migrateAPIElements,
   migrateClipboardElements,
@@ -179,6 +180,34 @@ describe("schema migration", () => {
     expect(migrated[0].backgroundColor).toBe("#ff0000");
   });
 
+  it("should migrate mixed-hint elements individually when payload schema is missing", () => {
+    const legacyFrame = API.createElement({
+      type: "frame",
+      backgroundColor: "#ff0000",
+    });
+    const modernFrame = API.createElement({
+      type: "frame",
+      backgroundColor: "#00ff00",
+    });
+    const modernFrameWithHint = {
+      ...modernFrame,
+      schemaVersion: SCHEMA_VERSIONS.latest,
+    } as typeof modernFrame & { schemaVersion: number };
+
+    const migrated = migrateSceneElements(
+      [legacyFrame, modernFrameWithHint],
+      {
+        payloadSchemaVersion: undefined,
+        fallbackVersion: SCHEMA_VERSIONS.initial,
+      },
+    )!;
+
+    expect(migrated[0].backgroundColor).toBe(
+      DEFAULT_ELEMENT_PROPS.backgroundColor,
+    );
+    expect(migrated[1].backgroundColor).toBe("#00ff00");
+  });
+
   it("should prefer payload schema over per-element schema", () => {
     const frame = API.createElement({
       type: "frame",
@@ -197,5 +226,16 @@ describe("schema migration", () => {
     expect(migrated[0].backgroundColor).toBe(
       DEFAULT_ELEMENT_PROPS.backgroundColor,
     );
+  });
+
+  it("should detect schema hints on elements", () => {
+    const frame = API.createElement({ type: "frame" });
+    const withHint = {
+      ...frame,
+      schemaVersion: SCHEMA_VERSIONS.latest,
+    } as typeof frame & { schemaVersion: number };
+
+    expect(hasElementSchemaVersion([frame])).toBe(false);
+    expect(hasElementSchemaVersion([withHint])).toBe(true);
   });
 });

@@ -85,6 +85,15 @@ const isValidSchemaVersion = (
   );
 };
 
+export const hasElementSchemaVersion = (
+  elements: readonly ExcalidrawElement[] | null | undefined,
+) =>
+  !!elements?.some((element) =>
+    isValidSchemaVersion(
+      (element as ExcalidrawElement & { schemaVersion?: number }).schemaVersion,
+    ),
+  );
+
 export const validateSchemaMigrations = (
   migrations: readonly SchemaMigration[],
 ) => {
