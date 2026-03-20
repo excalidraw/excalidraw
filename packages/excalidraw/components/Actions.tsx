@@ -82,6 +82,7 @@ import {
   DotsHorizontalIcon,
   SelectionIcon,
   pencilIcon,
+  TrashIcon,
 } from "./icons";
 
 import { Island } from "./Island";
@@ -1241,6 +1242,29 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.laser")}
           </DropdownMenu.Item>
+          <DropdownMenu.ItemCheckbox
+            checked={app.state.laserToolPersistence}
+            onSelect={() => {
+              const next = !app.state.laserToolPersistence;
+              app.setAppState({ laserToolPersistence: next });
+              // When disabling persistence, clear any lingering trails
+              if (!next) {
+                app.laserTrails.clearTrails();
+              }
+            }}
+            data-testid="toolbar-laser-persistence"
+          >
+            {t("toolBar.laserPersist")}
+          </DropdownMenu.ItemCheckbox>
+          {app.state.laserToolPersistence && (
+            <DropdownMenu.Item
+              onSelect={() => app.laserTrails.clearTrails()}
+              icon={TrashIcon}
+              data-testid="toolbar-laser-clear"
+            >
+              {t("toolBar.laserClear")}
+            </DropdownMenu.Item>
+          )}
           {isFullStylesPanel && (
             <DropdownMenu.Item
               onSelect={() => app.setActiveTool({ type: "lasso" })}

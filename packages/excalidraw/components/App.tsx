@@ -4988,6 +4988,18 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      // Clear persistent laser trails with Delete/Backspace when laser tool is
+      // active in persistent mode (issue #9884)
+      if (
+        this.state.activeTool.type === "laser" &&
+        this.state.laserToolPersistence &&
+        (event.key === KEYS.DELETE || event.key === KEYS.BACKSPACE)
+      ) {
+        this.laserTrails.clearTrails();
+        event.preventDefault();
+        return;
+      }
+
       // Handle Alt key for bind mode
       if (event.key === KEYS.ALT) {
         if (getFeatureFlag("COMPLEX_BINDINGS")) {
