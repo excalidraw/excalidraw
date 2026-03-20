@@ -29,21 +29,27 @@ export const ColorInput = ({
 }) => {
   const editorInterface = useEditorInterface();
   const [innerValue, setInnerValue] = useState(color);
+  const [isInvalid, setIsInvalid] = useState(false);
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
 
   useEffect(() => {
     setInnerValue(color);
+    setIsInvalid(false);
   }, [color]);
 
   const changeColor = useCallback(
     (inputValue: string) => {
       const value = inputValue.toLowerCase();
-      const color = normalizeInputColor(value);
+      const normalizedColor = normalizeInputColor(value);
 
-      if (color) {
-        onChange(color);
+      if (normalizedColor) {
+        onChange(normalizedColor);
+        setIsInvalid(false);
+      } else {
+        // Only show invalid state when there is actual input
+        setIsInvalid(value.trim().length > 0);
       }
       setInnerValue(value);
     },
@@ -68,7 +74,12 @@ export const ColorInput = ({
   }, [setEyeDropperState]);
 
   return (
-    <div className="color-picker__input-label">
+    <div
+      className={clsx("color-picker__input-label", {
+        "color-picker__input-label--invalid": isInvalid,
+      })}
+      title={isInvalid ? t("colorPicker.invalidColor") : undefined}
+    >
       <div className="color-picker__input-hash">#</div>
       <input
         ref={activeSection === "hex" ? inputRef : undefined}
@@ -76,12 +87,14 @@ export const ColorInput = ({
         spellCheck={false}
         className="color-picker-input"
         aria-label={label}
+        aria-invalid={isInvalid}
         onChange={(event) => {
           changeColor(event.target.value);
         }}
         value={(innerValue || "").replace(/^#/, "")}
         onBlur={() => {
           setInnerValue(color);
+          setIsInvalid(false);
         }}
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
