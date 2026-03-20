@@ -5,7 +5,7 @@ import { useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
 
 import { useEditorInterface } from "./App";
 import { CheckboxItem } from "./CheckboxItem";
-import { PlusIcon } from "./icons";
+import { PlusIcon, pencilIcon } from "./icons";
 
 import "./LibraryUnit.scss";
 
@@ -22,6 +22,7 @@ export const LibraryUnit = memo(
     onToggle,
     onDrag,
     svgCache,
+    onEdit,
   }: {
     id: LibraryItem["id"] | /** for pending item */ null;
     elements?: LibraryItem["elements"];
@@ -31,6 +32,8 @@ export const LibraryUnit = memo(
     onToggle: (id: string, event: React.MouseEvent) => void;
     onDrag: (id: string, event: React.DragEvent) => void;
     svgCache: SvgCache;
+    
+    onEdit?: (id: string) => void;
   }) => {
     const ref = useRef<HTMLDivElement | null>(null);
     const svg = useLibraryItemSvg(id, elements, svgCache, ref);
@@ -79,6 +82,19 @@ export const LibraryUnit = memo(
           }}
         />
         {adder}
+        {id && elements && (isHovered || isMobile) && onEdit && (
+          <div
+            className="library-unit__edit"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onEdit(id);
+            }}
+            style={{ position: "absolute", top: 4, right: 4, zIndex: 10, cursor: "pointer", background: "var(--color-surface-lowest)", borderRadius: "4px", padding: "2px" }}
+          >
+            {pencilIcon}
+          </div>
+        )}
         {id && elements && (isHovered || isMobile || selected) && (
           <CheckboxItem
             checked={selected}

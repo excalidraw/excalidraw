@@ -1,3 +1,5 @@
+import { Dialog } from "./Dialog";
+import { TextField } from "./TextField";
 import React, {
   useCallback,
   useEffect,
@@ -87,6 +89,7 @@ export default function LibraryMenuItems({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { svgCache } = useLibraryCache();
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [lastSelectedItem, setLastSelectedItem] = useState<
     LibraryItem["id"] | null
   >(null);
@@ -136,6 +139,7 @@ export default function LibraryMenuItems({
     [libraryItems],
   );
 
+  const editingItem = libraryItems.find(i => i.id === editingItemId);
   const onItemSelectToggle = useCallback(
     (id: LibraryItem["id"], event: React.MouseEvent) => {
       const shouldSelect = !selectedItems.includes(id);
@@ -304,6 +308,7 @@ export default function LibraryMenuItems({
               onClick={onAddToLibraryClick}
               isItemSelected={isItemSelected}
               svgCache={svgCache}
+            onItemEdit={setEditingItemId}
             />
           )}
           <LibraryMenuSection
@@ -442,6 +447,37 @@ export default function LibraryMenuItems({
             <Spinner />
           </div>
         )}
+
+        
+      {editingItem && (
+        <Dialog
+          onCloseRequest={() => setEditingItemId(null)}
+          title="Edit Library Item"
+          size="small"
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <TextField
+              value={editingItem.name || ""}
+              onChange={(name) => {
+                const newItems = libraryItems.map(i => i.id === editingItemId ? { ...i, name } : i);
+                editorInterface.updateLibrary({ libraryItems: newItems });
+              }}
+              label="Name"
+              placeholder="Asset Name"
+            />
+            <TextField
+              value={editingItem.keywords?.join(", ") || ""}
+              onChange={(kw) => {
+                const keywords = kw.split(",").map(k => k.trim()).filter(Boolean);
+                const newItems = libraryItems.map(i => i.id === editingItemId ? { ...i, keywords } : i);
+                editorInterface.updateLibrary({ libraryItems: newItems });
+              }}
+              label="Keywords (comma separated)"
+              placeholder="tag1, tag2"
+            />
+          </div>
+        </Dialog>
+      )}
 
         {JSX_whenNotSearching}
         {JSX_whenSearching}

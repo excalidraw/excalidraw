@@ -25,6 +25,7 @@ interface Props {
   onItemDrag: (id: LibraryItem["id"], event: React.DragEvent) => void;
   isItemSelected: (id: LibraryItem["id"] | null) => boolean;
   svgCache: SvgCache;
+  onItemEdit?: (id: string) => void;
   itemsRenderedPerBatch: number;
 }
 
@@ -66,6 +67,7 @@ export const LibraryMenuSection = memo(
               isPending={!item?.id && !!item?.elements}
               onClick={onClick}
               svgCache={svgCache}
+                onEdit={onItemEdit}
               id={item?.id}
               selected={isItemSelected(item.id)}
               onToggle={onItemSelectToggle}
