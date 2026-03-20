@@ -196,7 +196,7 @@ export const getEllipseShape = <Point extends GlobalPoint | LocalPoint>(
 
 export const getCurvePathOps = (shape: Drawable): Op[] => {
   // NOTE (mtolmacs): Temporary fix for extremely large elements
-  if (!shape) {
+  if (!shape || shape.sets.length === 0) {
     return [];
   }
 
@@ -205,6 +205,7 @@ export const getCurvePathOps = (shape: Drawable): Op[] => {
       return set.ops;
     }
   }
+
   return shape.sets[0].ops;
 };
 

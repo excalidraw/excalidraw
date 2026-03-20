@@ -634,60 +634,72 @@ export const generateLinearCollisionShape = (
         });
       }
 
-      return generator
-        .curve(points as unknown as RoughPoint[], options)
-        .sets[0].ops.slice(0, element.points.length)
-        .map((op, i) => {
-          if (i === 0) {
-            const p = pointRotateRads<GlobalPoint>(
-              pointFrom<GlobalPoint>(
-                element.x + op.data[0],
-                element.y + op.data[1],
-              ),
-              center,
-              element.angle,
-            );
+      // Generate collision ops using the same Catmull-Rom → cubic Bézier
+      // algorithm as generateSimpleArrowShape so hit-testing matches rendering.
+      const tension = 0.5;
+      const rotateLocal = (lx: number, ly: number): LocalPoint => {
+        const g = pointRotateRads<GlobalPoint>(
+          pointFrom<GlobalPoint>(element.x + lx, element.y + ly),
+          center,
+          element.angle,
+        );
+        return pointFrom<LocalPoint>(g[0] - element.x, g[1] - element.y);
+      };
 
-            return {
-              op: "move",
-              data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-            };
-          }
+      const collisionOps: Array<{
+        op: string;
+        data: number[] | LocalPoint;
+      }> = [];
+      collisionOps.push({
+        op: "move",
+        data: rotateLocal(points[0][0], points[0][1]),
+      });
 
-          return {
-            op: "bcurveTo",
-            data: [
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[0],
-                  element.y + op.data[1],
-                ),
-                center,
-                element.angle,
-              ),
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[2],
-                  element.y + op.data[3],
-                ),
-                center,
-                element.angle,
-              ),
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[4],
-                  element.y + op.data[5],
-                ),
-                center,
-                element.angle,
-              ),
-            ]
-              .map((p) =>
-                pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-              )
-              .flat(),
-          };
+      if (points.length === 2) {
+        collisionOps.push({
+          op: "lineTo",
+          data: rotateLocal(points[1][0], points[1][1]),
         });
+      } else {
+        const n = points.length;
+        const ptx = new Float64Array(n);
+        const pty = new Float64Array(n);
+        for (let i = 0; i < n; i++) {
+          if (i === 0) {
+            const pbx = 3 * points[0][0] - 3 * points[1][0] + points[2][0];
+            const pby = 3 * points[0][1] - 3 * points[1][1] + points[2][1];
+            ptx[i] = tension * (points[1][0] - pbx);
+            pty[i] = tension * (points[1][1] - pby);
+          } else if (i === n - 1) {
+            const pax =
+              3 * points[n - 1][0] - 3 * points[n - 2][0] + points[n - 3][0];
+            const pay =
+              3 * points[n - 1][1] - 3 * points[n - 2][1] + points[n - 3][1];
+            ptx[i] = tension * (pax - points[n - 2][0]);
+            pty[i] = tension * (pay - points[n - 2][1]);
+          } else {
+            ptx[i] = tension * (points[i + 1][0] - points[i - 1][0]);
+            pty[i] = tension * (points[i + 1][1] - points[i - 1][1]);
+          }
+        }
+
+        for (let i = 0; i < n - 1; i++) {
+          const cp1x = points[i][0] + ptx[i] / 3;
+          const cp1y = points[i][1] + pty[i] / 3;
+          const cp2x = points[i + 1][0] - ptx[i + 1] / 3;
+          const cp2y = points[i + 1][1] - pty[i + 1] / 3;
+
+          const rcp1 = rotateLocal(cp1x, cp1y);
+          const rcp2 = rotateLocal(cp2x, cp2y);
+          const rend = rotateLocal(points[i + 1][0], points[i + 1][1]);
+
+          collisionOps.push({
+            op: "bcurveTo",
+            data: [rcp1[0], rcp1[1], rcp2[0], rcp2[1], rend[0], rend[1]],
+          });
+        }
+      }
+      return collisionOps;
     }
     case "freedraw": {
       if (element.points.length < 2) {
@@ -929,7 +941,12 @@ const _generateElementShape = (
           ];
         }
       } else {
-        shape = [generator.curve(points as unknown as RoughPoint[], options)];
+        shape = [
+          generator.path(
+            generateSimpleArrowShape(points, 0.5),
+            generateRoughOptions(element, true, isDarkMode),
+          ),
+        ];
       }
 
       // add lines only in arrow
@@ -1013,10 +1030,73 @@ const _generateElementShape = (
   }
 };
 
+const generateSimpleArrowShape = (
+  points: readonly LocalPoint[],
+  tension = 0.5,
+): string => {
+  if (points.length < 2) {
+    return "";
+  }
+
+  if (points.length === 2) {
+    return `M ${points[0][0]} ${points[0][1]} L ${points[1][0]} ${points[1][1]}`;
+  }
+
+  // Catmull-Rom spline converted to cubic Bézier segments.
+  // Tangents are computed from neighboring points (one-sided at endpoints),
+  // guaranteeing C1 continuity — smooth tangent direction at every data point
+  // with no pinching at segment joints.
+  //
+  // tension=0 → straight lines; tension=0.5 → standard Catmull-Rom.
+  const n = points.length;
+
+  // Compute tangent vectors at each point.
+  const tx = new Float64Array(n);
+  const ty = new Float64Array(n);
+  // Quadratic-extrapolation phantom points so endpoints use the same
+  // central-difference formula as interior points, preventing degenerate
+  // (chord-parallel) first/last segments.
+  //   phantom_before = 3*P[0]   - 3*P[1]   + P[2]
+  //   phantom_after  = 3*P[n-1] - 3*P[n-2] + P[n-3]
+  for (let i = 0; i < n; i++) {
+    if (i === 0) {
+      const pbx = 3 * points[0][0] - 3 * points[1][0] + points[2][0];
+      const pby = 3 * points[0][1] - 3 * points[1][1] + points[2][1];
+      tx[i] = tension * (points[1][0] - pbx);
+      ty[i] = tension * (points[1][1] - pby);
+    } else if (i === n - 1) {
+      const pax =
+        3 * points[n - 1][0] - 3 * points[n - 2][0] + points[n - 3][0];
+      const pay =
+        3 * points[n - 1][1] - 3 * points[n - 2][1] + points[n - 3][1];
+      tx[i] = tension * (pax - points[n - 2][0]);
+      ty[i] = tension * (pay - points[n - 2][1]);
+    } else {
+      tx[i] = tension * (points[i + 1][0] - points[i - 1][0]);
+      ty[i] = tension * (points[i + 1][1] - points[i - 1][1]);
+    }
+  }
+
+  const path: string[] = [`M ${points[0][0]} ${points[0][1]}`];
+  for (let i = 0; i < n - 1; i++) {
+    const cp1x = points[i][0] + tx[i] / 3;
+    const cp1y = points[i][1] + ty[i] / 3;
+    const cp2x = points[i + 1][0] - tx[i + 1] / 3;
+    const cp2y = points[i + 1][1] - ty[i + 1] / 3;
+    path.push(
+      `C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${points[i + 1][0]} ${
+        points[i + 1][1]
+      }`,
+    );
+  }
+
+  return path.join(" ");
+};
+
 const generateElbowArrowShape = (
   points: readonly LocalPoint[],
   radius: number,
-) => {
+): string => {
   const subpoints = [] as [number, number][];
   for (let i = 1; i < points.length - 1; i += 1) {
     const prev = points[i - 1];
