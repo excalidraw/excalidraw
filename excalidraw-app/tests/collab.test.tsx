@@ -69,6 +69,98 @@ vi.mock("socket.io-client", () => {
  * i.e. multiplayer history tests could be a good first candidate, as we could test both history stacks simultaneously.
  */
 describe("collaboration", () => {
+  it("should preserve future element fields across collab reconciliation", async () => {
+    await render(<ExcalidrawApp />);
+
+    const frame = API.createElement({
+      type: "frame",
+      id: "A",
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+      backgroundColor: "#ff0000",
+    });
+
+    const frameWithFutureFields = {
+      ...frame,
+      schemaVersion: 2,
+      futureField: "keep-me",
+    } as typeof frame & {
+      schemaVersion: number;
+      futureField: string;
+    };
+
+    API.updateScene({
+      elements: [frameWithFutureFields],
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    });
+
+    await waitFor(() => {
+      expect((h.elements[0] as any).futureField).toBe("keep-me");
+      expect((h.elements[0] as any).schemaVersion).toBe(2);
+      expect(h.elements[0].backgroundColor).toBe("#ff0000");
+    });
+
+    const remoteMovedFrame = newElementWith(h.elements[0] as any, {
+      x: 120,
+      y: 80,
+    });
+
+    const reconciled = (window.collab as any)._reconcileElements([
+      remoteMovedFrame,
+    ]);
+
+    expect(reconciled[0]).toEqual(
+      expect.objectContaining({
+        x: 120,
+        y: 80,
+        backgroundColor: "#ff0000",
+      }),
+    );
+    expect((reconciled[0] as any).futureField).toBe("keep-me");
+    expect((reconciled[0] as any).schemaVersion).toBe(2);
+  });
+
+  it("should preserve future element fields on local edits before broadcast", async () => {
+    await render(<ExcalidrawApp />);
+
+    const rect = API.createElement({
+      type: "rectangle",
+      id: "A",
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    });
+
+    const rectWithFutureFields = {
+      ...rect,
+      schemaVersion: 2,
+      futureField: { value: "keep-me" },
+    } as typeof rect & {
+      schemaVersion: number;
+      futureField: { value: string };
+    };
+
+    API.updateScene({
+      elements: [rectWithFutureFields],
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    });
+
+    const locallyEdited = newElementWith(h.elements[0] as any, { x: 200 });
+    API.updateScene({
+      elements: [locallyEdited],
+      captureUpdate: CaptureUpdateAction.NEVER,
+    });
+
+    await waitFor(() => {
+      expect((h.elements[0] as any).futureField).toEqual({ value: "keep-me" });
+      expect((h.elements[0] as any).schemaVersion).toBe(2);
+      expect(h.elements[0]).toEqual(expect.objectContaining({ x: 200 }));
+    });
+  });
+
   it("should emit two ephemeral increments even though updates get batched", async () => {
     const durableIncrements: DurableIncrement[] = [];
     const ephemeralIncrements: EphemeralIncrement[] = [];

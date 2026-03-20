@@ -121,7 +121,8 @@ describe("restoreElements", () => {
     );
 
     expect(
-      (restoredLibraryItems[0].elements[0] as ExcalidrawElement).backgroundColor,
+      (restoredLibraryItems[0].elements[0] as ExcalidrawElement)
+        .backgroundColor,
     ).toBe("#a5d8ff");
   });
 
@@ -145,7 +146,8 @@ describe("restoreElements", () => {
     );
 
     expect(
-      (restoredLibraryItems[0].elements[0] as ExcalidrawElement).backgroundColor,
+      (restoredLibraryItems[0].elements[0] as ExcalidrawElement)
+        .backgroundColor,
     ).toBe(DEFAULT_ELEMENT_PROPS.backgroundColor);
   });
 

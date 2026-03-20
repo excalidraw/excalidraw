@@ -9,6 +9,7 @@ import {
   chunk,
   getExportSource,
 } from "@excalidraw/common";
+
 import { SCHEMA_VERSIONS } from "../data/schema";
 
 import { EditorLocalStorage } from "../data/EditorLocalStorage";

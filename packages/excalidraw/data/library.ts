@@ -91,9 +91,10 @@ export interface LibraryPersistenceAdapter {
      * purposes, in which case host app can implement more aggressive caching.
      */
     source: LibraryAdatapterSource;
-  }): MaybePromise<
-    { libraryItems: LibraryItems_anyVersion; schemaVersion?: number } | null
-  >;
+  }): MaybePromise<{
+    libraryItems: LibraryItems_anyVersion;
+    schemaVersion?: number;
+  } | null>;
   /** Should persist to the database as is (do no change the data structure). */
   save(libraryData: LibraryPersistedData): MaybePromise<void>;
 }
@@ -103,9 +104,10 @@ export interface LibraryMigrationAdapter {
    * loads data from legacy data source. Returns `null` if no data is
    * to be migrated.
    */
-  load(): MaybePromise<
-    { libraryItems: LibraryItems_anyVersion; schemaVersion?: number } | null
-  >;
+  load(): MaybePromise<{
+    libraryItems: LibraryItems_anyVersion;
+    schemaVersion?: number;
+  } | null>;
 
   /** clears entire storage afterwards */
   clear(): MaybePromise<void>;
@@ -561,14 +563,10 @@ class AdapterTransaction {
         try {
           const data = await adapter.load({ source });
           resolve(
-            restoreLibraryItems(
-              data?.libraryItems || [],
-              "published",
-              {
-                payloadSchemaVersion: data?.schemaVersion,
-                fallbackVersion: SCHEMA_VERSIONS.initial,
-              },
-            ),
+            restoreLibraryItems(data?.libraryItems || [], "published", {
+              payloadSchemaVersion: data?.schemaVersion,
+              fallbackVersion: SCHEMA_VERSIONS.initial,
+            }),
           );
         } catch (error: any) {
           reject(error);

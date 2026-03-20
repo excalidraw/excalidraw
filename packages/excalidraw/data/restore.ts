@@ -81,6 +81,7 @@ import {
   getNormalizedGridStep,
   getNormalizedZoom,
 } from "../scene";
+
 import {
   migrateLibraryElements,
   type SchemaVersionSource,
@@ -984,12 +985,15 @@ export const restoreLibraryItems = (
   for (const item of libraryItems) {
     // migrate older libraries
     if (Array.isArray(item)) {
-      const restoredItem = restoreLibraryItem({
-        status: defaultStatus,
-        elements: item,
-        id: randomId(),
-        created: Date.now(),
-      }, schemaVersionSource);
+      const restoredItem = restoreLibraryItem(
+        {
+          status: defaultStatus,
+          elements: item,
+          id: randomId(),
+          created: Date.now(),
+        },
+        schemaVersionSource,
+      );
       if (restoredItem) {
         restoredItems.push(restoredItem);
       }
@@ -998,12 +1002,15 @@ export const restoreLibraryItems = (
         LibraryItem,
         "id" | "status" | "created"
       >;
-      const restoredItem = restoreLibraryItem({
-        ..._item,
-        id: _item.id || randomId(),
-        status: _item.status || defaultStatus,
-        created: _item.created || Date.now(),
-      }, schemaVersionSource);
+      const restoredItem = restoreLibraryItem(
+        {
+          ..._item,
+          id: _item.id || randomId(),
+          status: _item.status || defaultStatus,
+          created: _item.created || Date.now(),
+        },
+        schemaVersionSource,
+      );
       if (restoredItem) {
         restoredItems.push(restoredItem);
       }

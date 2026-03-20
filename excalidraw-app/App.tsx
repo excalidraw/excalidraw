@@ -286,13 +286,10 @@ const initializeScene = async (opts: {
         scene = {
           elements: bumpElementVersions(
             restoreElements(
-              migrateSceneElements(
-                imported.elements,
-                {
-                  payloadSchemaVersion: imported.schemaVersion,
-                  fallbackVersion: SCHEMA_VERSIONS.initial,
-                },
-              ),
+              migrateSceneElements(imported.elements, {
+                payloadSchemaVersion: imported.schemaVersion,
+                fallbackVersion: SCHEMA_VERSIONS.initial,
+              }),
               null,
               {
                 repairBindings: true,

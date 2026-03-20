@@ -2822,13 +2822,10 @@ class App extends React.Component<AppProps, AppState> {
         ? SCHEMA_VERSIONS.initial
         : SCHEMA_VERSIONS.latest;
     const restoredElements = restoreElements(
-      migrateSceneElements(
-        initialData?.elements,
-        {
-          payloadSchemaVersion: initialData?.schemaVersion,
-          fallbackVersion: initialDataSchemaFallback,
-        },
-      ),
+      migrateSceneElements(initialData?.elements, {
+        payloadSchemaVersion: initialData?.schemaVersion,
+        fallbackVersion: initialDataSchemaFallback,
+      }),
       null,
       {
         repairBindings: true,
@@ -3764,13 +3761,9 @@ class App extends React.Component<AppProps, AppState> {
         ? migrateLibraryElements(opts.elements, opts.schemaVersionSource)
         : migrateAPIElements(opts.elements, opts.schemaVersionSource);
 
-    const elements = restoreElements(
-      migratedElements,
-      null,
-      {
-        deleteInvisibleElements: true,
-      },
-    );
+    const elements = restoreElements(migratedElements, null, {
+      deleteInvisibleElements: true,
+    });
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
     const elementsCenterX = distance(minX, maxX) / 2;

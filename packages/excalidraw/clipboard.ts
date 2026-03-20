@@ -35,12 +35,13 @@ import {
 
 import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
 
+import { SCHEMA_VERSIONS } from "./data/schema";
+
 import type { FileSystemHandle } from "./data/filesystem";
 
 import type { Spreadsheet } from "./charts";
 
 import type { BinaryFiles } from "./types";
-import { SCHEMA_VERSIONS } from "./data/schema";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;

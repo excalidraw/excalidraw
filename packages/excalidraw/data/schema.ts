@@ -15,7 +15,7 @@ export const SCHEMA_MIGRATION_SCOPES = [
   "api",
 ] as const;
 
-export type SchemaMigrationScope = (typeof SCHEMA_MIGRATION_SCOPES)[number];
+export type SchemaMigrationScope = typeof SCHEMA_MIGRATION_SCOPES[number];
 
 export const ALL_SCOPES: readonly SchemaMigrationScope[] =
   SCHEMA_MIGRATION_SCOPES;
@@ -135,7 +135,9 @@ export const validateSchemaMigrations = (
       );
     }
     if (!migration.scope.length) {
-      errors.push(`Migration "${migration.title}" must declare at least one scope.`);
+      errors.push(
+        `Migration "${migration.title}" must declare at least one scope.`,
+      );
     }
     for (const scope of migration.scope) {
       if (!SCHEMA_MIGRATION_SCOPES.includes(scope)) {
@@ -155,12 +157,13 @@ export const validateSchemaMigrations = (
   return errors;
 };
 
-const schemaMigrationValidationErrors = validateSchemaMigrations(
-  SCHEMA_MIGRATIONS,
-);
+const schemaMigrationValidationErrors =
+  validateSchemaMigrations(SCHEMA_MIGRATIONS);
 if (schemaMigrationValidationErrors.length) {
   throw new Error(
-    `Invalid schema migration configuration:\n${schemaMigrationValidationErrors.join("\n")}`,
+    `Invalid schema migration configuration:\n${schemaMigrationValidationErrors.join(
+      "\n",
+    )}`,
   );
 }
 
@@ -235,23 +238,19 @@ const migrateElementsByScope = (
 export const migrateSceneElements = (
   elements: readonly ExcalidrawElement[] | null | undefined,
   source: SchemaVersionSource,
-) =>
-  migrateElementsByScope(elements, "scene", source);
+) => migrateElementsByScope(elements, "scene", source);
 
 export const migrateLibraryElements = (
   elements: readonly ExcalidrawElement[] | null | undefined,
   source: SchemaVersionSource,
-) =>
-  migrateElementsByScope(elements, "library", source);
+) => migrateElementsByScope(elements, "library", source);
 
 export const migrateClipboardElements = (
   elements: readonly ExcalidrawElement[] | null | undefined,
   source: SchemaVersionSource,
-) =>
-  migrateElementsByScope(elements, "clipboard", source);
+) => migrateElementsByScope(elements, "clipboard", source);
 
 export const migrateAPIElements = (
   elements: readonly ExcalidrawElement[] | null | undefined,
   source: SchemaVersionSource,
-) =>
-  migrateElementsByScope(elements, "api", source);
+) => migrateElementsByScope(elements, "api", source);

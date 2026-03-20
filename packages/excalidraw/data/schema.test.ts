@@ -1,6 +1,7 @@
 import { DEFAULT_ELEMENT_PROPS } from "@excalidraw/common";
 
 import { API } from "../tests/helpers/api";
+
 import {
   ALL_SCOPES,
   hasElementSchemaVersion,
@@ -194,13 +195,10 @@ describe("schema migration", () => {
       schemaVersion: SCHEMA_VERSIONS.latest,
     } as typeof modernFrame & { schemaVersion: number };
 
-    const migrated = migrateSceneElements(
-      [legacyFrame, modernFrameWithHint],
-      {
-        payloadSchemaVersion: undefined,
-        fallbackVersion: SCHEMA_VERSIONS.initial,
-      },
-    )!;
+    const migrated = migrateSceneElements([legacyFrame, modernFrameWithHint], {
+      payloadSchemaVersion: undefined,
+      fallbackVersion: SCHEMA_VERSIONS.initial,
+    })!;
 
     expect(migrated[0].backgroundColor).toBe(
       DEFAULT_ELEMENT_PROPS.backgroundColor,
