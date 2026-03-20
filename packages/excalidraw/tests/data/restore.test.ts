@@ -1,7 +1,12 @@
 import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
 
-import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "@excalidraw/common";
+import {
+  DEFAULT_ELEMENT_PROPS,
+  DEFAULT_SIDEBAR,
+  FONT_FAMILY,
+  ROUNDNESS,
+} from "@excalidraw/common";
 
 import { newElementWith } from "@excalidraw/element";
 import * as sizeHelpers from "@excalidraw/element";
@@ -19,6 +24,7 @@ import type { NormalizedZoomValue } from "@excalidraw/excalidraw/types";
 
 import { API } from "../helpers/api";
 import * as restore from "../../data/restore";
+import { SCHEMA_VERSIONS } from "../../data/schema";
 import { getDefaultAppState } from "../../appState";
 
 import type { ImportedDataState } from "../../data/types";
@@ -94,6 +100,53 @@ describe("restoreElements", () => {
 
     expect(restoredFrame.type).toBe("frame");
     expect(restoredFrame.backgroundColor).toBe("#ffc9c9");
+  });
+
+  it("should restore library frame backgrounds by default", () => {
+    const frame = API.createElement({
+      type: "frame",
+      backgroundColor: "#a5d8ff",
+    });
+
+    const restoredLibraryItems = restore.restoreLibraryItems(
+      [
+        {
+          id: "library-item-1",
+          status: "published",
+          elements: [frame],
+          created: Date.now(),
+        },
+      ],
+      "published",
+    );
+
+    expect(
+      (restoredLibraryItems[0].elements[0] as ExcalidrawElement).backgroundColor,
+    ).toBe("#a5d8ff");
+  });
+
+  it("should normalize legacy library frame backgrounds when schema is old", () => {
+    const frame = API.createElement({
+      type: "frame",
+      backgroundColor: "#a5d8ff",
+    });
+
+    const restoredLibraryItems = restore.restoreLibraryItems(
+      [
+        {
+          id: "library-item-1",
+          status: "published",
+          elements: [frame],
+          created: Date.now(),
+        },
+      ],
+      "published",
+      SCHEMA_VERSIONS.initial,
+    );
+
+    expect(
+      (restoredLibraryItems[0].elements[0] as ExcalidrawElement).backgroundColor,
+    ).toBe(DEFAULT_ELEMENT_PROPS.backgroundColor);
   });
 
   it("should restore text element correctly passing value for each attribute", () => {

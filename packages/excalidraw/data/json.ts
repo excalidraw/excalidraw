@@ -131,6 +131,7 @@ export const serializeLibraryAsJSON = (libraryItems: LibraryItems) => {
   const data: ExportedLibraryData = {
     type: EXPORT_DATA_TYPES.excalidrawLibrary,
     version: VERSIONS.excalidrawLibrary,
+    schemaVersion: SCHEMA_VERSIONS.latest,
     source: getExportSource(),
     libraryItems,
   };

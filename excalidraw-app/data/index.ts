@@ -196,6 +196,7 @@ const legacy_decodeFromBackend = async ({
   return {
     elements: data.elements || null,
     appState: data.appState || null,
+    schemaVersion: data.schemaVersion,
   };
 };
 
@@ -226,6 +227,7 @@ export const importFromBackend = async (
       return {
         elements: data.elements || null,
         appState: data.appState || null,
+        schemaVersion: data.schemaVersion,
       };
     } catch (error: any) {
       console.warn(

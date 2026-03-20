@@ -54,6 +54,7 @@ export interface ImportedDataState {
 export interface ExportedLibraryData {
   type: string;
   version: typeof VERSIONS.excalidrawLibrary;
+  schemaVersion: number;
   source: string;
   libraryItems: LibraryItems;
 }

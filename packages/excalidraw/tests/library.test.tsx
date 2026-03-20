@@ -11,6 +11,7 @@ import type { ExcalidrawGenericElement } from "@excalidraw/element/types";
 import { parseLibraryJSON } from "../data/blob";
 import { serializeLibraryAsJSON } from "../data/json";
 import { distributeLibraryItemsOnSquareGrid } from "../data/library";
+import { SCHEMA_VERSIONS } from "../data/schema";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
@@ -165,6 +166,13 @@ describe("library", () => {
         },
       ]);
     });
+  });
+
+  it("should include schema version when serializing library", () => {
+    const serialized = serializeLibraryAsJSON([]);
+    const parsed = JSON.parse(serialized);
+
+    expect(parsed.schemaVersion).toBe(SCHEMA_VERSIONS.latest);
   });
 
   // NOTE: mocked to test logic, not actual drag&drop via UI

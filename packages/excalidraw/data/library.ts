@@ -33,6 +33,7 @@ import { t } from "../i18n";
 
 import { loadLibraryFromBlob } from "./blob";
 import { restoreLibraryItems } from "./restore";
+import { resolveSchemaVersion, SCHEMA_VERSIONS } from "./schema";
 
 import type App from "../components/App";
 
@@ -65,9 +66,10 @@ type LibraryUpdate = {
   updatedItems: Map<LibraryItem["id"], LibraryItem>;
 };
 
-// an object so that we can later add more properties to it without breaking,
-// such as schema version
-export type LibraryPersistedData = { libraryItems: LibraryItems };
+export type LibraryPersistedData = {
+  libraryItems: LibraryItems;
+  schemaVersion?: number;
+};
 
 const onLibraryUpdateEmitter = new Emitter<
   [update: LibraryUpdate, libraryItems: LibraryItems]
@@ -89,7 +91,9 @@ export interface LibraryPersistenceAdapter {
      * purposes, in which case host app can implement more aggressive caching.
      */
     source: LibraryAdatapterSource;
-  }): MaybePromise<{ libraryItems: LibraryItems_anyVersion } | null>;
+  }): MaybePromise<
+    { libraryItems: LibraryItems_anyVersion; schemaVersion?: number } | null
+  >;
   /** Should persist to the database as is (do no change the data structure). */
   save(libraryData: LibraryPersistedData): MaybePromise<void>;
 }
@@ -99,7 +103,9 @@ export interface LibraryMigrationAdapter {
    * loads data from legacy data source. Returns `null` if no data is
    * to be migrated.
    */
-  load(): MaybePromise<{ libraryItems: LibraryItems_anyVersion } | null>;
+  load(): MaybePromise<
+    { libraryItems: LibraryItems_anyVersion; schemaVersion?: number } | null
+  >;
 
   /** clears entire storage afterwards */
   clear(): MaybePromise<void>;
@@ -554,7 +560,13 @@ class AdapterTransaction {
       new Promise<LibraryItems>(async (resolve, reject) => {
         try {
           const data = await adapter.load({ source });
-          resolve(restoreLibraryItems(data?.libraryItems || [], "published"));
+          resolve(
+            restoreLibraryItems(
+              data?.libraryItems || [],
+              "published",
+              resolveSchemaVersion(data?.schemaVersion, SCHEMA_VERSIONS.initial),
+            ),
+          );
         } catch (error: any) {
           reject(error);
         }
@@ -662,7 +674,10 @@ const persistLibraryUpdate = async (
       const version = getLibraryItemsHash(nextLibraryItems);
 
       if (version !== lastSavedLibraryItemsHash) {
-        await adapter.save({ libraryItems: nextLibraryItems });
+        await adapter.save({
+          libraryItems: nextLibraryItems,
+          schemaVersion: SCHEMA_VERSIONS.latest,
+        });
       }
 
       lastSavedLibraryItemsHash = version;
@@ -862,6 +877,10 @@ export const useHandleLibrary = (
                 restoredData = restoreLibraryItems(
                   libraryData.libraryItems || [],
                   "published",
+                  resolveSchemaVersion(
+                    libraryData.schemaVersion,
+                    SCHEMA_VERSIONS.initial,
+                  ),
                 );
 
                 // we don't queue this operation because it's running inside

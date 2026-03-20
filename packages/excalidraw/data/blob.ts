@@ -235,7 +235,11 @@ export const parseLibraryJSON = (
     throw new Error("Invalid library");
   }
   const libraryItems = data.libraryItems || data.library;
-  return restoreLibraryItems(libraryItems, defaultStatus);
+  return restoreLibraryItems(
+    libraryItems,
+    defaultStatus,
+    resolveSchemaVersion(data.schemaVersion, SCHEMA_VERSIONS.initial),
+  );
 };
 
 export const loadLibraryFromBlob = async (
