@@ -20,6 +20,19 @@ export type SchemaMigrationScope = (typeof SCHEMA_MIGRATION_SCOPES)[number];
 export const ALL_SCOPES: readonly SchemaMigrationScope[] =
   SCHEMA_MIGRATION_SCOPES;
 
+/**
+ * Schema migration contract:
+ * - `version`: integer schema version, strictly increasing.
+ * - `title`: short human-readable label.
+ * - `description`: required plain-language explanation of the change.
+ * - `scope`: one or more ingestion boundaries (`scene`, `library`, `clipboard`, `api`).
+ * - `apply`: pure element transform.
+ *
+ * Rules:
+ * - Use integer versions only. `SCHEMA_VERSIONS.latest` must match the last migration version.
+ * - Prefer explicit scopes; use `ALL_SCOPES` only when the same transform is required everywhere.
+ * - Migrations should depend only on stable persisted schema fields (not temporary/PR-only fields).
+ */
 export type SchemaMigration = {
   version: number;
   title: string;
@@ -95,6 +108,9 @@ export const validateSchemaMigrations = (
     }
     previousVersion = migration.version;
 
+    if (!migration.title.trim()) {
+      errors.push("Migration title must be non-empty.");
+    }
     if (!migration.description.trim()) {
       errors.push(
         `Migration "${migration.title}" must include a non-empty description.`,

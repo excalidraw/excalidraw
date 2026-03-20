@@ -81,7 +81,7 @@ describe("schema migration", () => {
     const invalidMigrations: SchemaMigration[] = [
       {
         version: 2.1,
-        title: "bad migration",
+        title: "",
         description: " ",
         scope: [],
         apply: (elements) => elements,
@@ -99,7 +99,65 @@ describe("schema migration", () => {
 
     expect(errors.length).toBeGreaterThan(0);
     expect(errors.join("\n")).toContain("integer version");
+    expect(errors.join("\n")).toContain("title must be non-empty");
     expect(errors.join("\n")).toContain("non-empty description");
     expect(errors.join("\n")).toContain("Duplicate schema migration version");
+  });
+
+  it("should reject versions at or below initial", () => {
+    const errors = validateSchemaMigrations([
+      {
+        version: SCHEMA_VERSIONS.initial,
+        title: "invalid start",
+        description: "bad version",
+        scope: ["scene"],
+        apply: (elements) => elements,
+      },
+    ]);
+
+    expect(errors.join("\n")).toContain("greater than schema initial version");
+  });
+
+  it("should reject latest-version mismatch", () => {
+    const errors = validateSchemaMigrations([
+      {
+        version: SCHEMA_VERSIONS.latest + 1,
+        title: "future migration",
+        description: "future migration for test",
+        scope: ["scene"],
+        apply: (elements) => elements,
+      },
+    ]);
+
+    expect(errors.join("\n")).toContain(
+      "SCHEMA_VERSIONS.latest (2) must match last migration version",
+    );
+  });
+
+  it("should not depend on temporary fields during migration", () => {
+    const frame = API.createElement({
+      type: "frame",
+      backgroundColor: "#a5d8ff",
+    });
+    const withTempField = {
+      ...frame,
+      backgroundEnabled: false,
+    } as typeof frame & { backgroundEnabled: boolean };
+
+    const migratedBase = migrateSceneElements(
+      [frame],
+      SCHEMA_VERSIONS.initial,
+    )!;
+    const migratedWithTempField = migrateSceneElements(
+      [withTempField],
+      SCHEMA_VERSIONS.initial,
+    )!;
+
+    expect(migratedBase[0].backgroundColor).toBe(
+      DEFAULT_ELEMENT_PROPS.backgroundColor,
+    );
+    expect(migratedWithTempField[0].backgroundColor).toBe(
+      DEFAULT_ELEMENT_PROPS.backgroundColor,
+    );
   });
 });
