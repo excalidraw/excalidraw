@@ -54,7 +54,7 @@ import {
   restoreElements,
 } from "@excalidraw/excalidraw/data/restore";
 import {
-  migrateElementsBySchema,
+  migrateSceneElements,
   resolveSchemaVersion,
   SCHEMA_VERSIONS,
 } from "@excalidraw/excalidraw/data/schema";
@@ -242,15 +242,12 @@ const initializeScene = async (opts: {
     scrollToContent?: boolean;
   } = {
     elements: restoreElements(
-      migrateElementsBySchema(
+      migrateSceneElements(
         localDataState?.elements,
-        {
-          schemaVersion: resolveSchemaVersion(
-            localDataState?.schemaVersion,
-            SCHEMA_VERSIONS.initial,
-          ),
-          scope: "scene",
-        },
+        resolveSchemaVersion(
+          localDataState?.schemaVersion,
+          SCHEMA_VERSIONS.initial,
+        ),
       ),
       null,
       {
@@ -281,15 +278,12 @@ const initializeScene = async (opts: {
         scene = {
           elements: bumpElementVersions(
             restoreElements(
-              migrateElementsBySchema(
+              migrateSceneElements(
                 imported.elements,
-                {
-                  schemaVersion: resolveSchemaVersion(
-                    imported.schemaVersion,
-                    SCHEMA_VERSIONS.initial,
-                  ),
-                  scope: "scene",
-                },
+                resolveSchemaVersion(
+                  imported.schemaVersion,
+                  SCHEMA_VERSIONS.initial,
+                ),
               ),
               null,
               {
@@ -580,15 +574,12 @@ const ExcalidrawWrapper = () => {
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
           const localDataState = importFromLocalStorage();
           const username = importUsernameFromLocalStorage();
-          const migratedElements = migrateElementsBySchema(
+          const migratedElements = migrateSceneElements(
             localDataState?.elements,
-            {
-              schemaVersion: resolveSchemaVersion(
-                localDataState?.schemaVersion,
-                SCHEMA_VERSIONS.initial,
-              ),
-              scope: "scene",
-            },
+            resolveSchemaVersion(
+              localDataState?.schemaVersion,
+              SCHEMA_VERSIONS.initial,
+            ),
           );
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({

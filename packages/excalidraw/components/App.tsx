@@ -356,7 +356,10 @@ import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restoreAppState, restoreElements } from "../data/restore";
 import {
-  migrateElementsBySchema,
+  migrateAPIElements,
+  migrateClipboardElements,
+  migrateLibraryElements,
+  migrateSceneElements,
   resolveSchemaVersion,
   SCHEMA_VERSIONS,
   type SchemaMigrationScope,
@@ -2819,15 +2822,12 @@ class App extends React.Component<AppProps, AppState> {
         ? SCHEMA_VERSIONS.initial
         : SCHEMA_VERSIONS.latest;
     const restoredElements = restoreElements(
-      migrateElementsBySchema(
+      migrateSceneElements(
         initialData?.elements,
-        {
-          schemaVersion: resolveSchemaVersion(
-            initialData?.schemaVersion,
-            initialDataSchemaFallback,
-          ),
-          scope: "scene",
-        },
+        resolveSchemaVersion(
+          initialData?.schemaVersion,
+          initialDataSchemaFallback,
+        ),
       ),
       null,
       {
@@ -3754,17 +3754,19 @@ class App extends React.Component<AppProps, AppState> {
     retainSeed?: boolean;
     fitToContent?: boolean;
   }) => {
+    const schemaVersion = resolveSchemaVersion(
+      opts.schemaVersion,
+      SCHEMA_VERSIONS.latest,
+    );
+    const migratedElements =
+      opts.migrationScope === "clipboard"
+        ? migrateClipboardElements(opts.elements, schemaVersion)
+        : opts.migrationScope === "library"
+        ? migrateLibraryElements(opts.elements, schemaVersion)
+        : migrateAPIElements(opts.elements, schemaVersion);
+
     const elements = restoreElements(
-      migrateElementsBySchema(
-        opts.elements,
-        {
-          schemaVersion: resolveSchemaVersion(
-            opts.schemaVersion,
-            SCHEMA_VERSIONS.latest,
-          ),
-          scope: opts.migrationScope,
-        },
-      ),
+      migratedElements,
       null,
       {
         deleteInvisibleElements: true,

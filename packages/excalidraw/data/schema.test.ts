@@ -4,7 +4,10 @@ import { API } from "../tests/helpers/api";
 import {
   ALL_SCOPES,
   type SchemaMigration,
-  migrateElementsBySchema,
+  migrateAPIElements,
+  migrateClipboardElements,
+  migrateLibraryElements,
+  migrateSceneElements,
   resolveSchemaVersion,
   SCHEMA_MIGRATIONS,
   SCHEMA_VERSIONS,
@@ -18,10 +21,7 @@ describe("schema migration", () => {
       backgroundColor: "#ffc9c9",
     });
 
-    const migrated = migrateElementsBySchema([frame], {
-      schemaVersion: SCHEMA_VERSIONS.initial,
-      scope: "scene",
-    })!;
+    const migrated = migrateSceneElements([frame], SCHEMA_VERSIONS.initial)!;
 
     expect(migrated[0].backgroundColor).toBe(
       DEFAULT_ELEMENT_PROPS.backgroundColor,
@@ -34,10 +34,7 @@ describe("schema migration", () => {
       backgroundColor: "#ffc9c9",
     });
 
-    const migrated = migrateElementsBySchema([frame], {
-      schemaVersion: SCHEMA_VERSIONS.latest,
-      scope: "scene",
-    })!;
+    const migrated = migrateSceneElements([frame], SCHEMA_VERSIONS.latest)!;
 
     expect(migrated[0].backgroundColor).toBe("#ffc9c9");
   });
@@ -48,11 +45,18 @@ describe("schema migration", () => {
       backgroundColor: "#a5d8ff",
     });
 
+    const migrationsByScope = {
+      scene: migrateSceneElements,
+      library: migrateLibraryElements,
+      clipboard: migrateClipboardElements,
+      api: migrateAPIElements,
+    } as const;
+
     for (const scope of ALL_SCOPES) {
-      const migrated = migrateElementsBySchema([frame], {
-        schemaVersion: SCHEMA_VERSIONS.initial,
-        scope,
-      })!;
+      const migrated = migrationsByScope[scope](
+        [frame],
+        SCHEMA_VERSIONS.initial,
+      )!;
       expect(migrated[0].backgroundColor).toBe(
         DEFAULT_ELEMENT_PROPS.backgroundColor,
       );

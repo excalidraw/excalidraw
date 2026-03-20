@@ -154,3 +154,39 @@ export const migrateElementsBySchema = (
     elements,
   );
 };
+
+export const migrateSceneElements = (
+  elements: readonly ExcalidrawElement[] | null | undefined,
+  schemaVersion: number,
+) =>
+  migrateElementsBySchema(elements, {
+    schemaVersion,
+    scope: "scene",
+  });
+
+export const migrateLibraryElements = (
+  elements: readonly ExcalidrawElement[] | null | undefined,
+  schemaVersion: number,
+) =>
+  migrateElementsBySchema(elements, {
+    schemaVersion,
+    scope: "library",
+  });
+
+export const migrateClipboardElements = (
+  elements: readonly ExcalidrawElement[] | null | undefined,
+  schemaVersion: number,
+) =>
+  migrateElementsBySchema(elements, {
+    schemaVersion,
+    scope: "clipboard",
+  });
+
+export const migrateAPIElements = (
+  elements: readonly ExcalidrawElement[] | null | undefined,
+  schemaVersion: number,
+) =>
+  migrateElementsBySchema(elements, {
+    schemaVersion,
+    scope: "api",
+  });

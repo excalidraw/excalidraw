@@ -25,7 +25,7 @@ import {
   restoreLibraryItems,
 } from "./restore";
 import {
-  migrateElementsBySchema,
+  migrateSceneElements,
   resolveSchemaVersion,
   SCHEMA_VERSIONS,
 } from "./schema";
@@ -166,12 +166,9 @@ export const loadSceneOrLibraryFromBlob = async (
         data.schemaVersion,
         SCHEMA_VERSIONS.initial,
       );
-      const migratedElements = migrateElementsBySchema(
+      const migratedElements = migrateSceneElements(
         data.elements,
-        {
-          schemaVersion,
-          scope: "scene",
-        },
+        schemaVersion,
       );
       return {
         type: MIME_TYPES.excalidraw,

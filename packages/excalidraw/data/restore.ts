@@ -81,7 +81,7 @@ import {
   getNormalizedGridStep,
   getNormalizedZoom,
 } from "../scene";
-import { migrateElementsBySchema, SCHEMA_VERSIONS } from "./schema";
+import { migrateLibraryElements, SCHEMA_VERSIONS } from "./schema";
 
 import type {
   AppState,
@@ -962,12 +962,9 @@ const restoreLibraryItem = (
   schemaVersion: number,
 ) => {
   const elements = restoreElements(
-    migrateElementsBySchema(
+    migrateLibraryElements(
       getNonDeletedElements(libraryItem.elements),
-      {
-        schemaVersion,
-        scope: "library",
-      },
+      schemaVersion,
     ),
     null,
   );
