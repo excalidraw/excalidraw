@@ -1743,6 +1743,7 @@ class App extends React.Component<AppProps, AppState> {
               key={el.id}
               className={clsx("excalidraw__embeddable-container", {
                 "is-hovered": isHovered,
+                "is-active": isActive,
               })}
               style={{
                 transform: isVisible
@@ -1819,7 +1820,7 @@ class App extends React.Component<AppProps, AppState> {
                         src?.type !== "document" ? src?.link ?? "" : undefined
                       }
                       // https://stackoverflow.com/q/18470015
-                      scrolling="no"
+                      scrolling={isActive ? "auto" : "no"}
                       referrerPolicy="no-referrer-when-downgrade"
                       title="Excalidraw Embedded Content"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

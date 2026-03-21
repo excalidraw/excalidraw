@@ -809,6 +809,10 @@ body.excalidraw-cursor-resize * {
     align-items: center;
     justify-content: center;
     border-radius: var(--embeddable-radius);
+
+    .excalidraw__embeddable-container.is-active & {
+      overflow: auto;
+    }
   }
 
   .excalidraw__embeddable__outer {
