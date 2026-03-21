@@ -4,6 +4,8 @@ interface Window {
   EXCALIDRAW_ASSET_PATH: string | string[] | undefined;
   EXCALIDRAW_THROTTLE_RENDER: boolean | undefined;
   DEBUG_FRACTIONAL_INDICES: boolean | undefined;
+  EXCALIDRAW_DEBUG_LINEAR_ARROW_TANGENTS: boolean | undefined;
+  EXCALIDRAW_DEBUG_SELECTED_LINEAR_ARROW: unknown;
   EXCALIDRAW_EXPORT_SOURCE: string;
   gtag: Function;
   sa_event: Function;

@@ -42,6 +42,7 @@ import {
   isTextElement,
   LinearElementEditor,
   getActiveTextElement,
+  getSimpleArrowCurveDebugData,
 } from "@excalidraw/element";
 
 import { renderSelectionElement } from "@excalidraw/element";
@@ -1201,6 +1202,105 @@ const renderLinearPointHandles = (
   context.restore();
 };
 
+const isSimpleArrowTangentDebugEnabled = () =>
+  window.EXCALIDRAW_DEBUG_LINEAR_ARROW_TANGENTS === true;
+
+const renderSimpleArrowTangentOverlay = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  element: NonDeleted<ExcalidrawArrowElement>,
+  elementsMap: RenderableElementsMap,
+) => {
+  const points = LinearElementEditor.getPointsGlobalCoordinates(
+    element,
+    elementsMap,
+  );
+  const debugData = getSimpleArrowCurveDebugData(points);
+
+  window.EXCALIDRAW_DEBUG_SELECTED_LINEAR_ARROW = debugData;
+
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+  context.lineWidth = 1 / appState.zoom.value;
+
+  context.setLineDash([6 / appState.zoom.value, 4 / appState.zoom.value]);
+  context.strokeStyle = "rgba(134, 142, 150, 0.75)";
+
+  for (const segment of debugData.segments) {
+    context.beginPath();
+    context.moveTo(segment.start[0], segment.start[1]);
+    context.lineTo(segment.baseCp1[0], segment.baseCp1[1]);
+    context.lineTo(segment.baseCp2[0], segment.baseCp2[1]);
+    context.lineTo(segment.end[0], segment.end[1]);
+    context.stroke();
+  }
+
+  context.setLineDash([]);
+
+  for (const segment of debugData.segments) {
+    const strokeStyle = segment.overshootsBaseline
+      ? "rgba(245, 159, 0, 0.9)"
+      : "rgba(94, 90, 216, 0.85)";
+
+    context.strokeStyle = strokeStyle;
+    context.fillStyle = "rgba(255, 255, 255, 0.95)";
+
+    context.beginPath();
+    context.moveTo(segment.start[0], segment.start[1]);
+    context.lineTo(segment.cp1[0], segment.cp1[1]);
+    context.lineTo(segment.cp2[0], segment.cp2[1]);
+    context.lineTo(segment.end[0], segment.end[1]);
+    context.stroke();
+
+    fillCircle(
+      context,
+      segment.cp1[0],
+      segment.cp1[1],
+      4 / appState.zoom.value,
+      true,
+      true,
+    );
+    fillCircle(
+      context,
+      segment.cp2[0],
+      segment.cp2[1],
+      4 / appState.zoom.value,
+      true,
+      true,
+    );
+  }
+
+  context.strokeStyle = "rgba(201, 42, 42, 0.85)";
+  context.fillStyle = "rgba(201, 42, 42, 0.95)";
+
+  for (const tangent of debugData.tangents) {
+    if (!tangent.isAdjusted) {
+      continue;
+    }
+
+    const handle = pointFrom<GlobalPoint>(
+      tangent.point[0] + tangent.scaled[0] / 3,
+      tangent.point[1] + tangent.scaled[1] / 3,
+    );
+
+    context.beginPath();
+    context.moveTo(tangent.point[0], tangent.point[1]);
+    context.lineTo(handle[0], handle[1]);
+    context.stroke();
+
+    fillCircle(
+      context,
+      tangent.point[0],
+      tangent.point[1],
+      3 / appState.zoom.value,
+      true,
+      true,
+    );
+  }
+
+  context.restore();
+};
+
 const renderFocusPointConnectionLine = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -1722,6 +1822,13 @@ const _renderInteractiveScene = ({
   const selectedLinearElement =
     linearState &&
     LinearElementEditor.getElement(linearState.elementId, allElementsMap);
+  const selectedRoundedArrow =
+    selectedElements.length === 1 &&
+    isArrowElement(selectedElements[0]) &&
+    !isElbowArrow(selectedElements[0]) &&
+    !!selectedElements[0].roundness
+      ? (selectedElements[0] as NonDeleted<ExcalidrawArrowElement>)
+      : null;
   // Arrows have a different highlight behavior when
   // they are the only selected element
   if (selectedLinearElement) {
@@ -1756,6 +1863,17 @@ const _renderInteractiveScene = ({
         type: "end",
       });
     }
+  }
+
+  if (selectedRoundedArrow && isSimpleArrowTangentDebugEnabled()) {
+    renderSimpleArrowTangentOverlay(
+      context,
+      appState,
+      selectedRoundedArrow,
+      elementsMap,
+    );
+  } else {
+    window.EXCALIDRAW_DEBUG_SELECTED_LINEAR_ARROW = undefined;
   }
 
   // Paint selected elements

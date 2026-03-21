@@ -634,9 +634,8 @@ export const generateLinearCollisionShape = (
         });
       }
 
-      // Generate collision ops using the same Catmull-Rom → cubic Bézier
-      // algorithm as generateSimpleArrowShape so hit-testing matches rendering.
-      const tension = 0.5;
+      // Rotate the same cubic ops used for rendering so hit-testing matches the
+      // visible arrow path.
       const rotateLocal = (lx: number, ly: number): LocalPoint => {
         const g = pointRotateRads<GlobalPoint>(
           pointFrom<GlobalPoint>(element.x + lx, element.y + ly),
@@ -646,60 +645,23 @@ export const generateLinearCollisionShape = (
         return pointFrom<LocalPoint>(g[0] - element.x, g[1] - element.y);
       };
 
-      const collisionOps: Array<{
-        op: string;
-        data: number[] | LocalPoint;
-      }> = [];
-      collisionOps.push({
-        op: "move",
-        data: rotateLocal(points[0][0], points[0][1]),
-      });
+      return generateSimpleArrowPathOps(points, 0.5, element.id).map((op) => {
+        if (op.op === "bcurveTo") {
+          const rcp1 = rotateLocal(op.data[0], op.data[1]);
+          const rcp2 = rotateLocal(op.data[2], op.data[3]);
+          const rend = rotateLocal(op.data[4], op.data[5]);
 
-      if (points.length === 2) {
-        collisionOps.push({
-          op: "lineTo",
-          data: rotateLocal(points[1][0], points[1][1]),
-        });
-      } else {
-        const n = points.length;
-        const ptx = new Float64Array(n);
-        const pty = new Float64Array(n);
-        for (let i = 0; i < n; i++) {
-          if (i === 0) {
-            const pbx = 3 * points[0][0] - 3 * points[1][0] + points[2][0];
-            const pby = 3 * points[0][1] - 3 * points[1][1] + points[2][1];
-            ptx[i] = tension * (points[1][0] - pbx);
-            pty[i] = tension * (points[1][1] - pby);
-          } else if (i === n - 1) {
-            const pax =
-              3 * points[n - 1][0] - 3 * points[n - 2][0] + points[n - 3][0];
-            const pay =
-              3 * points[n - 1][1] - 3 * points[n - 2][1] + points[n - 3][1];
-            ptx[i] = tension * (pax - points[n - 2][0]);
-            pty[i] = tension * (pay - points[n - 2][1]);
-          } else {
-            ptx[i] = tension * (points[i + 1][0] - points[i - 1][0]);
-            pty[i] = tension * (points[i + 1][1] - points[i - 1][1]);
-          }
-        }
-
-        for (let i = 0; i < n - 1; i++) {
-          const cp1x = points[i][0] + ptx[i] / 3;
-          const cp1y = points[i][1] + pty[i] / 3;
-          const cp2x = points[i + 1][0] - ptx[i + 1] / 3;
-          const cp2y = points[i + 1][1] - pty[i + 1] / 3;
-
-          const rcp1 = rotateLocal(cp1x, cp1y);
-          const rcp2 = rotateLocal(cp2x, cp2y);
-          const rend = rotateLocal(points[i + 1][0], points[i + 1][1]);
-
-          collisionOps.push({
+          return {
             op: "bcurveTo",
             data: [rcp1[0], rcp1[1], rcp2[0], rcp2[1], rend[0], rend[1]],
-          });
+          };
         }
-      }
-      return collisionOps;
+
+        return {
+          op: op.op,
+          data: rotateLocal(op.data[0], op.data[1]),
+        };
+      });
     }
     case "freedraw": {
       if (element.points.length < 2) {
@@ -943,7 +905,7 @@ const _generateElementShape = (
       } else {
         shape = [
           generator.path(
-            generateSimpleArrowShape(points, 0.5),
+            generateSimpleArrowShape(points, 0.5, element.id),
             generateRoughOptions(element, true, isDarkMode),
           ),
         ];
@@ -1030,67 +992,748 @@ const _generateElementShape = (
   }
 };
 
-const generateSimpleArrowShape = (
-  points: readonly LocalPoint[],
-  tension = 0.5,
-): string => {
-  if (points.length < 2) {
-    return "";
+type SimpleArrowPathOp =
+  | { op: "move" | "lineTo"; data: LocalPoint }
+  | { op: "bcurveTo"; data: [number, number, number, number, number, number] };
+
+const SIMPLE_ARROW_OVERSHOOT_EPSILON = 0.5;
+const SIMPLE_ARROW_SCALE_EPSILON = 1e-4;
+const SIMPLE_ARROW_SCALE_SEARCH_STEPS = 24;
+const SIMPLE_ARROW_SCALE_PASSES = 8;
+
+type SimpleArrowVector = [number, number];
+
+type SimpleArrowTangentOverrides = Record<
+  string,
+  Record<number, SimpleArrowVector>
+>;
+
+declare global {
+  interface Window {
+    EXCALIDRAW_DEBUG_LINEAR_ARROW_TANGENT_OVERRIDES?:
+      | SimpleArrowTangentOverrides
+      | undefined;
+  }
+}
+
+type SimpleArrowCurveDebugDataOptions = {
+  elementId?: string;
+};
+
+export type SimpleArrowCurveDebugData<
+  Point extends GlobalPoint | LocalPoint = LocalPoint,
+> = {
+  elementId?: string;
+  tangents: Array<{
+    point: Point;
+    base: SimpleArrowVector;
+    autoScaled: SimpleArrowVector;
+    scale: number;
+    autoScale: number;
+    scaled: SimpleArrowVector;
+    isAdjusted: boolean;
+    isOverridden: boolean;
+    normalized: {
+      baseLength: number;
+      autoLength: number;
+      finalLength: number;
+      prevSegmentLength: number | null;
+      nextSegmentLength: number | null;
+      minNeighborLength: number | null;
+      finalLengthVsMinNeighbor: number | null;
+      autoLengthVsMinNeighbor: number | null;
+      angleDelta: number;
+      turnAngle: number | null;
+    };
+  }>;
+  segments: Array<{
+    start: Point;
+    end: Point;
+    baseCp1: Point;
+    baseCp2: Point;
+    cp1: Point;
+    cp2: Point;
+    overshootsBaseline: boolean;
+    overshootsResolved: boolean;
+    metrics: {
+      chordLength: number;
+      baseStartProjection: number;
+      baseEndProjection: number;
+      finalStartProjection: number;
+      finalEndProjection: number;
+    };
+  }>;
+  inference: {
+    overriddenPointIndices: number[];
+  };
+};
+
+const SIMPLE_ARROW_ADJUSTMENT_EPSILON = 1e-3;
+
+const getSimpleArrowTangentOverrideStore = () => {
+  if (typeof window === "undefined") {
+    return null;
   }
 
-  if (points.length === 2) {
-    return `M ${points[0][0]} ${points[0][1]} L ${points[1][0]} ${points[1][1]}`;
+  window.EXCALIDRAW_DEBUG_LINEAR_ARROW_TANGENT_OVERRIDES ??= {};
+  return window.EXCALIDRAW_DEBUG_LINEAR_ARROW_TANGENT_OVERRIDES;
+};
+
+export const setSimpleArrowTangentOverride = (
+  elementId: string,
+  pointIndex: number,
+  tangent: SimpleArrowVector,
+) => {
+  const store = getSimpleArrowTangentOverrideStore();
+
+  if (!store) {
+    return;
   }
 
-  // Catmull-Rom spline converted to cubic Bézier segments.
-  // Tangents are computed from neighboring points (one-sided at endpoints),
-  // guaranteeing C1 continuity — smooth tangent direction at every data point
-  // with no pinching at segment joints.
-  //
-  // tension=0 → straight lines; tension=0.5 → standard Catmull-Rom.
-  const n = points.length;
+  store[elementId] = {
+    ...(store[elementId] ?? {}),
+    [pointIndex]: [tangent[0], tangent[1]],
+  };
+};
 
-  // Compute tangent vectors at each point.
-  const tx = new Float64Array(n);
-  const ty = new Float64Array(n);
-  // Quadratic-extrapolation phantom points so endpoints use the same
-  // central-difference formula as interior points, preventing degenerate
-  // (chord-parallel) first/last segments.
-  //   phantom_before = 3*P[0]   - 3*P[1]   + P[2]
-  //   phantom_after  = 3*P[n-1] - 3*P[n-2] + P[n-3]
-  for (let i = 0; i < n; i++) {
+export const clearSimpleArrowTangentOverride = (
+  elementId: string,
+  pointIndex?: number,
+) => {
+  const store = getSimpleArrowTangentOverrideStore();
+
+  if (!store?.[elementId]) {
+    return;
+  }
+
+  if (typeof pointIndex === "number") {
+    delete store[elementId][pointIndex];
+
+    if (Object.keys(store[elementId]).length === 0) {
+      delete store[elementId];
+    }
+    return;
+  }
+
+  delete store[elementId];
+};
+
+const getSimpleArrowTangentOverrides = (elementId?: string) => {
+  if (!elementId) {
+    return null;
+  }
+
+  return getSimpleArrowTangentOverrideStore()?.[elementId] ?? null;
+};
+
+const getSimpleArrowVectorLength = ([x, y]: SimpleArrowVector) =>
+  Math.hypot(x, y);
+
+const normalizeSimpleArrowAngle = (angle: number) => {
+  let normalized = angle;
+
+  while (normalized <= -Math.PI) {
+    normalized += Math.PI * 2;
+  }
+  while (normalized > Math.PI) {
+    normalized -= Math.PI * 2;
+  }
+
+  return normalized;
+};
+
+const getSimpleArrowBezierValue = (
+  p0: number,
+  p1: number,
+  p2: number,
+  p3: number,
+  t: number,
+) => {
+  const mt = 1 - t;
+
+  return (
+    mt * mt * mt * p0 +
+    3 * mt * mt * t * p1 +
+    3 * mt * t * t * p2 +
+    t * t * t * p3
+  );
+};
+
+const doesSimpleArrowSegmentOvershoot = (
+  startProjection: number,
+  endProjection: number,
+  segmentLength: number,
+) => {
+  const a = -3 * startProjection + 3 * endProjection + segmentLength;
+  const b = 2 * (segmentLength - 2 * endProjection + startProjection);
+  const c = startProjection;
+  const candidateTs = [0, 1];
+
+  if (Math.abs(a) < 1e-8) {
+    if (Math.abs(b) >= 1e-8) {
+      candidateTs.push(-c / b);
+    }
+  } else {
+    const discriminant = b * b - 4 * a * c;
+
+    if (discriminant >= 0) {
+      const discriminantRoot = Math.sqrt(discriminant);
+      candidateTs.push((-b + discriminantRoot) / (2 * a));
+      candidateTs.push((-b - discriminantRoot) / (2 * a));
+    }
+  }
+
+  let minProjection = Infinity;
+  let maxProjection = -Infinity;
+
+  for (const t of candidateTs) {
+    if (t < 0 || t > 1) {
+      continue;
+    }
+
+    const projection = getSimpleArrowBezierValue(
+      0,
+      startProjection,
+      endProjection,
+      segmentLength,
+      t,
+    );
+
+    minProjection = Math.min(minProjection, projection);
+    maxProjection = Math.max(maxProjection, projection);
+  }
+
+  return (
+    minProjection < -SIMPLE_ARROW_OVERSHOOT_EPSILON ||
+    maxProjection > segmentLength + SIMPLE_ARROW_OVERSHOOT_EPSILON
+  );
+};
+
+const getSimpleArrowBaseTangents = <Point extends GlobalPoint | LocalPoint>(
+  points: readonly Point[],
+  tension: number,
+): [Float64Array, Float64Array] => {
+  const tx = new Float64Array(points.length);
+  const ty = new Float64Array(points.length);
+
+  for (let i = 0; i < points.length; i++) {
     if (i === 0) {
       const pbx = 3 * points[0][0] - 3 * points[1][0] + points[2][0];
       const pby = 3 * points[0][1] - 3 * points[1][1] + points[2][1];
       tx[i] = tension * (points[1][0] - pbx);
       ty[i] = tension * (points[1][1] - pby);
-    } else if (i === n - 1) {
+    } else if (i === points.length - 1) {
       const pax =
-        3 * points[n - 1][0] - 3 * points[n - 2][0] + points[n - 3][0];
+        3 * points[points.length - 1][0] -
+        3 * points[points.length - 2][0] +
+        points[points.length - 3][0];
       const pay =
-        3 * points[n - 1][1] - 3 * points[n - 2][1] + points[n - 3][1];
-      tx[i] = tension * (pax - points[n - 2][0]);
-      ty[i] = tension * (pay - points[n - 2][1]);
+        3 * points[points.length - 1][1] -
+        3 * points[points.length - 2][1] +
+        points[points.length - 3][1];
+      tx[i] = tension * (pax - points[points.length - 2][0]);
+      ty[i] = tension * (pay - points[points.length - 2][1]);
     } else {
       tx[i] = tension * (points[i + 1][0] - points[i - 1][0]);
       ty[i] = tension * (points[i + 1][1] - points[i - 1][1]);
     }
   }
 
-  const path: string[] = [`M ${points[0][0]} ${points[0][1]}`];
-  for (let i = 0; i < n - 1; i++) {
-    const cp1x = points[i][0] + tx[i] / 3;
-    const cp1y = points[i][1] + ty[i] / 3;
-    const cp2x = points[i + 1][0] - tx[i + 1] / 3;
-    const cp2y = points[i + 1][1] - ty[i + 1] / 3;
-    path.push(
-      `C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${points[i + 1][0]} ${
-        points[i + 1][1]
-      }`,
-    );
+  return [tx, ty];
+};
+
+const getSimpleArrowSegmentProjections = <
+  Point extends GlobalPoint | LocalPoint,
+>(
+  points: readonly Point[],
+  tangentX: Float64Array,
+  tangentY: Float64Array,
+  scales: Float64Array | undefined,
+  segmentIndex: number,
+  segmentScale = 1,
+) => {
+  const start = points[segmentIndex];
+  const end = points[segmentIndex + 1];
+  const segmentDx = end[0] - start[0];
+  const segmentDy = end[1] - start[1];
+  const segmentLength = Math.hypot(segmentDx, segmentDy);
+
+  if (!segmentLength) {
+    return {
+      segmentLength,
+      startProjection: 0,
+      endProjection: 0,
+    };
   }
 
-  return path.join(" ");
+  const segmentUx = segmentDx / segmentLength;
+  const segmentUy = segmentDy / segmentLength;
+  const startScale = scales?.[segmentIndex] ?? 1;
+  const endScale = scales?.[segmentIndex + 1] ?? 1;
+  const startProjection =
+    startScale *
+    segmentScale *
+    ((tangentX[segmentIndex] * segmentUx + tangentY[segmentIndex] * segmentUy) /
+      3);
+  const endProjection =
+    segmentLength -
+    endScale *
+      segmentScale *
+      ((tangentX[segmentIndex + 1] * segmentUx +
+        tangentY[segmentIndex + 1] * segmentUy) /
+        3);
+
+  return {
+    segmentLength,
+    startProjection,
+    endProjection,
+  };
+};
+
+const isSimpleArrowSegmentOvershooting = <
+  Point extends GlobalPoint | LocalPoint,
+>(
+  points: readonly Point[],
+  tangentX: Float64Array,
+  tangentY: Float64Array,
+  scales: Float64Array | undefined,
+  segmentIndex: number,
+  segmentScale = 1,
+) => {
+  const { segmentLength, startProjection, endProjection } =
+    getSimpleArrowSegmentProjections(
+      points,
+      tangentX,
+      tangentY,
+      scales,
+      segmentIndex,
+      segmentScale,
+    );
+
+  if (!segmentLength) {
+    return false;
+  }
+
+  return doesSimpleArrowSegmentOvershoot(
+    startProjection,
+    endProjection,
+    segmentLength,
+  );
+};
+
+const getSimpleArrowSegmentScale = <Point extends GlobalPoint | LocalPoint>(
+  points: readonly Point[],
+  tx: Float64Array,
+  ty: Float64Array,
+  scales: Float64Array,
+  segmentIndex: number,
+) => {
+  if (
+    !isSimpleArrowSegmentOvershooting(points, tx, ty, scales, segmentIndex, 1)
+  ) {
+    return 1;
+  }
+
+  let low = 0;
+  let high = 1;
+
+  for (let i = 0; i < SIMPLE_ARROW_SCALE_SEARCH_STEPS; i++) {
+    const mid = (low + high) / 2;
+    if (
+      isSimpleArrowSegmentOvershooting(
+        points,
+        tx,
+        ty,
+        scales,
+        segmentIndex,
+        mid,
+      )
+    ) {
+      high = mid;
+    } else {
+      low = mid;
+    }
+  }
+
+  return low;
+};
+
+const getSimpleArrowTangentScales = <Point extends GlobalPoint | LocalPoint>(
+  points: readonly Point[],
+  tx: Float64Array,
+  ty: Float64Array,
+) => {
+  const scales = new Float64Array(points.length);
+  scales.fill(1);
+
+  for (let pass = 0; pass < SIMPLE_ARROW_SCALE_PASSES; pass++) {
+    const nextScales = new Float64Array(scales);
+    let didChange = false;
+
+    for (
+      let segmentIndex = 0;
+      segmentIndex < points.length - 1;
+      segmentIndex++
+    ) {
+      if (
+        !isSimpleArrowSegmentOvershooting(points, tx, ty, scales, segmentIndex)
+      ) {
+        continue;
+      }
+
+      const segmentScale = getSimpleArrowSegmentScale(
+        points,
+        tx,
+        ty,
+        scales,
+        segmentIndex,
+      );
+
+      const nextStartScale = scales[segmentIndex] * segmentScale;
+      const nextEndScale = scales[segmentIndex + 1] * segmentScale;
+
+      if (
+        nextStartScale <
+        nextScales[segmentIndex] - SIMPLE_ARROW_SCALE_EPSILON
+      ) {
+        nextScales[segmentIndex] = nextStartScale;
+        didChange = true;
+      }
+
+      if (
+        nextEndScale <
+        nextScales[segmentIndex + 1] - SIMPLE_ARROW_SCALE_EPSILON
+      ) {
+        nextScales[segmentIndex + 1] = nextEndScale;
+        didChange = true;
+      }
+    }
+
+    if (!didChange) {
+      return scales;
+    }
+
+    scales.set(nextScales);
+  }
+
+  return scales;
+};
+
+const getSimpleArrowFinalTangents = (
+  tx: Float64Array,
+  ty: Float64Array,
+  scales: Float64Array,
+  elementId?: string,
+) => {
+  const finalX = new Float64Array(tx.length);
+  const finalY = new Float64Array(ty.length);
+
+  for (let i = 0; i < tx.length; i++) {
+    finalX[i] = tx[i] * scales[i];
+    finalY[i] = ty[i] * scales[i];
+  }
+
+  const overrides = getSimpleArrowTangentOverrides(elementId);
+
+  if (!overrides) {
+    return {
+      finalX,
+      finalY,
+      overriddenPointIndices: [] as number[],
+    };
+  }
+
+  const overriddenPointIndices: number[] = [];
+
+  for (const [indexKey, tangent] of Object.entries(overrides)) {
+    const index = Number(indexKey);
+
+    if (!Number.isInteger(index) || index < 0 || index >= finalX.length) {
+      continue;
+    }
+
+    finalX[index] = tangent[0];
+    finalY[index] = tangent[1];
+    overriddenPointIndices.push(index);
+  }
+
+  overriddenPointIndices.sort((a, b) => a - b);
+
+  return {
+    finalX,
+    finalY,
+    overriddenPointIndices,
+  };
+};
+
+export const getSimpleArrowCurveDebugData = <
+  Point extends GlobalPoint | LocalPoint,
+>(
+  points: readonly Point[],
+  tension = 0.5,
+  options?: SimpleArrowCurveDebugDataOptions,
+): SimpleArrowCurveDebugData<Point> => {
+  if (points.length < 2) {
+    return {
+      elementId: options?.elementId,
+      tangents: [],
+      segments: [],
+      inference: {
+        overriddenPointIndices: [],
+      },
+    };
+  }
+
+  if (points.length === 2) {
+    return {
+      elementId: options?.elementId,
+      tangents: points.map((point) => ({
+        point,
+        base: [0, 0],
+        autoScaled: [0, 0],
+        scale: 1,
+        autoScale: 1,
+        scaled: [0, 0],
+        isAdjusted: false,
+        isOverridden: false,
+        normalized: {
+          baseLength: 0,
+          autoLength: 0,
+          finalLength: 0,
+          prevSegmentLength: null,
+          nextSegmentLength: null,
+          minNeighborLength: null,
+          finalLengthVsMinNeighbor: null,
+          autoLengthVsMinNeighbor: null,
+          angleDelta: 0,
+          turnAngle: null,
+        },
+      })),
+      segments: [],
+      inference: {
+        overriddenPointIndices: [],
+      },
+    };
+  }
+
+  const [tx, ty] = getSimpleArrowBaseTangents(points, tension);
+  const scales = getSimpleArrowTangentScales(points, tx, ty);
+  const baselineScales = new Float64Array(points.length);
+  baselineScales.fill(1);
+  const { finalX, finalY, overriddenPointIndices } =
+    getSimpleArrowFinalTangents(tx, ty, scales, options?.elementId);
+
+  return {
+    elementId: options?.elementId,
+    tangents: points.map((point, index) => ({
+      point,
+      base: [tx[index], ty[index]],
+      autoScaled: [tx[index] * scales[index], ty[index] * scales[index]],
+      scale:
+        getSimpleArrowVectorLength([tx[index], ty[index]]) > 0
+          ? getSimpleArrowVectorLength([finalX[index], finalY[index]]) /
+            getSimpleArrowVectorLength([tx[index], ty[index]])
+          : 1,
+      autoScale: scales[index],
+      scaled: [finalX[index], finalY[index]],
+      isAdjusted:
+        Math.abs(scales[index] - 1) > SIMPLE_ARROW_ADJUSTMENT_EPSILON ||
+        Math.abs(
+          normalizeSimpleArrowAngle(
+            Math.atan2(finalY[index], finalX[index]) -
+              Math.atan2(ty[index], tx[index]),
+          ),
+        ) > SIMPLE_ARROW_ADJUSTMENT_EPSILON,
+      isOverridden: overriddenPointIndices.includes(index),
+      normalized: (() => {
+        const base = [tx[index], ty[index]] as SimpleArrowVector;
+        const autoScaled = [
+          tx[index] * scales[index],
+          ty[index] * scales[index],
+        ] as SimpleArrowVector;
+        const scaled = [finalX[index], finalY[index]] as SimpleArrowVector;
+        const baseLength = getSimpleArrowVectorLength(base);
+        const autoLength = getSimpleArrowVectorLength(autoScaled);
+        const finalLength = getSimpleArrowVectorLength(scaled);
+        const prevSegmentLength =
+          index > 0 ? pointDistance(points[index - 1], point) : null;
+        const nextSegmentLength =
+          index < points.length - 1
+            ? pointDistance(point, points[index + 1])
+            : null;
+        const minNeighborLength =
+          prevSegmentLength === null
+            ? nextSegmentLength
+            : nextSegmentLength === null
+            ? prevSegmentLength
+            : Math.min(prevSegmentLength, nextSegmentLength);
+        const turnAngle =
+          prevSegmentLength !== null && nextSegmentLength !== null
+            ? normalizeSimpleArrowAngle(
+                Math.atan2(
+                  points[index + 1][1] - point[1],
+                  points[index + 1][0] - point[0],
+                ) -
+                  Math.atan2(
+                    point[1] - points[index - 1][1],
+                    point[0] - points[index - 1][0],
+                  ),
+              )
+            : null;
+
+        return {
+          baseLength,
+          autoLength,
+          finalLength,
+          prevSegmentLength,
+          nextSegmentLength,
+          minNeighborLength,
+          finalLengthVsMinNeighbor:
+            minNeighborLength && minNeighborLength > 0
+              ? finalLength / minNeighborLength
+              : null,
+          autoLengthVsMinNeighbor:
+            minNeighborLength && minNeighborLength > 0
+              ? autoLength / minNeighborLength
+              : null,
+          angleDelta: normalizeSimpleArrowAngle(
+            Math.atan2(finalY[index], finalX[index]) -
+              Math.atan2(ty[index], tx[index]),
+          ),
+          turnAngle,
+        };
+      })(),
+    })),
+    segments: points.slice(0, -1).map((start, index) => {
+      const end = points[index + 1];
+      const {
+        segmentLength: chordLength,
+        startProjection: baseStartProjection,
+        endProjection: baseEndProjection,
+      } = getSimpleArrowSegmentProjections(
+        points,
+        tx,
+        ty,
+        baselineScales,
+        index,
+      );
+      const {
+        startProjection: finalStartProjection,
+        endProjection: finalEndProjection,
+      } = getSimpleArrowSegmentProjections(
+        points,
+        finalX,
+        finalY,
+        undefined,
+        index,
+      );
+      const baseCp1 = pointFrom<Point>(
+        start[0] + tx[index] / 3,
+        start[1] + ty[index] / 3,
+      );
+      const baseCp2 = pointFrom<Point>(
+        end[0] - tx[index + 1] / 3,
+        end[1] - ty[index + 1] / 3,
+      );
+      const cp1 = pointFrom<Point>(
+        start[0] + finalX[index] / 3,
+        start[1] + finalY[index] / 3,
+      );
+      const cp2 = pointFrom<Point>(
+        end[0] - finalX[index + 1] / 3,
+        end[1] - finalY[index + 1] / 3,
+      );
+
+      return {
+        start,
+        end,
+        baseCp1,
+        baseCp2,
+        cp1,
+        cp2,
+        overshootsBaseline: isSimpleArrowSegmentOvershooting(
+          points,
+          tx,
+          ty,
+          baselineScales,
+          index,
+        ),
+        overshootsResolved: isSimpleArrowSegmentOvershooting(
+          points,
+          finalX,
+          finalY,
+          undefined,
+          index,
+        ),
+        metrics: {
+          chordLength,
+          baseStartProjection,
+          baseEndProjection,
+          finalStartProjection,
+          finalEndProjection,
+        },
+      };
+    }),
+    inference: {
+      overriddenPointIndices,
+    },
+  };
+};
+
+const generateSimpleArrowPathOps = (
+  points: readonly LocalPoint[],
+  tension = 0.5,
+  elementId?: string,
+): SimpleArrowPathOp[] => {
+  if (points.length < 2) {
+    return [];
+  }
+
+  const ops: SimpleArrowPathOp[] = [
+    {
+      op: "move",
+      data: pointFrom<LocalPoint>(points[0][0], points[0][1]),
+    },
+  ];
+
+  if (points.length === 2) {
+    ops.push({
+      op: "lineTo",
+      data: pointFrom<LocalPoint>(points[1][0], points[1][1]),
+    });
+
+    return ops;
+  }
+  const debugData = getSimpleArrowCurveDebugData(points, tension, {
+    elementId,
+  });
+
+  for (const segment of debugData.segments) {
+    const { cp1, cp2, end } = segment;
+
+    ops.push({
+      op: "bcurveTo",
+      data: [cp1[0], cp1[1], cp2[0], cp2[1], end[0], end[1]],
+    });
+  }
+
+  return ops;
+};
+
+const generateSimpleArrowShape = (
+  points: readonly LocalPoint[],
+  tension = 0.5,
+  elementId?: string,
+): string => {
+  return generateSimpleArrowPathOps(points, tension, elementId)
+    .map((op) => {
+      if (op.op === "bcurveTo") {
+        return `C ${op.data[0]} ${op.data[1]} ${op.data[2]} ${op.data[3]} ${op.data[4]} ${op.data[5]}`;
+      }
+
+      return `${op.op === "move" ? "M" : "L"} ${op.data[0]} ${op.data[1]}`;
+    })
+    .join(" ");
 };
 
 const generateElbowArrowShape = (
