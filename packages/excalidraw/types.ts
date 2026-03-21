@@ -469,6 +469,8 @@ export interface AppState {
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
   bindMode: BindMode;
+  /** when true, laser trails persist on canvas instead of fading */
+  laserPersistent: boolean;
 }
 
 export type SearchMatch = {
