@@ -1035,10 +1035,10 @@ const generateSimpleArrowShape = (
 
   // Catmull-Rom spline converted to cubic Bézier segments.
   // Tangents are computed from neighboring points (one-sided at endpoints),
-  // guaranteeing C1 continuity — smooth tangent direction at every data point
+  // guaranteeing C1 continuity, smooth tangent direction at every data point
   // with no pinching at segment joints.
   //
-  // tension=0 → straight lines; tension=0.5 → standard Catmull-Rom.
+  // tension=0; straight lines; tension=0.5, standard Catmull-Rom.
   const n = points.length;
 
   // Compute tangent vectors at each point.
@@ -1070,10 +1070,17 @@ const generateSimpleArrowShape = (
 
   const path: string[] = [`M ${points[0][0]} ${points[0][1]}`];
   for (let i = 0; i < n - 1; i++) {
-    const cp1x = points[i][0] + tx[i] / 3;
-    const cp1y = points[i][1] + ty[i] / 3;
-    const cp2x = points[i + 1][0] - tx[i + 1] / 3;
-    const cp2y = points[i + 1][1] - ty[i + 1] / 3;
+    const segLen = pointDistance(points[i], points[i + 1]);
+    // Clamp each control point offset to at most half the segment length so
+    // that curvature decreases linearly to 0 as the two endpoints converge.
+    const tanMag1 = Math.sqrt(tx[i] * tx[i] + ty[i] * ty[i]);
+    const tanMag2 = Math.sqrt(tx[i + 1] * tx[i + 1] + ty[i + 1] * ty[i + 1]);
+    const s1 = tanMag1 > 0 ? Math.min(1, (segLen * 1.5) / tanMag1) : 1;
+    const s2 = tanMag2 > 0 ? Math.min(1, (segLen * 1.5) / tanMag2) : 1;
+    const cp1x = points[i][0] + (tx[i] / 3) * s1;
+    const cp1y = points[i][1] + (ty[i] / 3) * s1;
+    const cp2x = points[i + 1][0] - (tx[i + 1] / 3) * s2;
+    const cp2y = points[i + 1][1] - (ty[i + 1] / 3) * s2;
     path.push(
       `C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${points[i + 1][0]} ${
         points[i + 1][1]
