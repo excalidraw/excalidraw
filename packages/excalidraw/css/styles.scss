@@ -158,7 +158,17 @@ body.excalidraw-cursor-resize * {
     font-weight: 400;
   }
 
+  //解决文本框和行号移动不同步的问题2026.03.21
+  &__textLineNumbersOverlay__content {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
   &__textLineNumbersOverlay__draft {
+    //解决点击行号没有拉出连接线的问题2026.03.21
+    width: 100%;
+    height: 100%;
     position: absolute;
     inset: 0;
     pointer-events: none;

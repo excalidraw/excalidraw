@@ -199,6 +199,8 @@ export type StaticCanvasAppState = Readonly<
     shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
     /** null indicates transparent bg */
     viewBackgroundColor: AppState["viewBackgroundColor"] | null;
+    //连接后不缩放行号连接线不可见的问题2026.03.21
+    textLineLinks: AppState["textLineLinks"];
     exportScale: AppState["exportScale"];
     selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
     gridSize: AppState["gridSize"];
