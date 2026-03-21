@@ -13,6 +13,7 @@ import {
 import {
   arrayToMap,
   BIND_MODE_TIMEOUT,
+  colorWithAlpha,
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
   getFeatureFlag,
@@ -115,6 +116,7 @@ import type {
 const renderElbowArrowMidPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   invariant(appState.selectedLinearElement, "selectedLinearElement is null");
 
@@ -125,7 +127,7 @@ const renderElbowArrowMidPointHighlight = (
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 
-  highlightPoint(segmentMidPointHoveredCoords, context, appState);
+  highlightPoint(segmentMidPointHoveredCoords, context, appState, selectionColor);
 
   context.restore();
 };
@@ -134,6 +136,7 @@ const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   elementsMap: ElementsMap,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   const { elementId, hoverPointIndex } = appState.selectedLinearElement!;
   if (
@@ -160,7 +163,7 @@ const renderLinearElementPointHighlight = (
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 
-  highlightPoint(point, context, appState);
+  highlightPoint(point, context, appState, selectionColor);
   context.restore();
 };
 
@@ -168,8 +171,9 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
-  context.fillStyle = "rgba(105, 101, 219, 0.4)";
+  context.fillStyle = colorWithAlpha(selectionColor, 0.4);
 
   fillCircle(
     context,
@@ -184,11 +188,12 @@ const renderFocusPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   focusPoint: GlobalPoint,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 
-  highlightPoint(focusPoint, context, appState);
+  highlightPoint(focusPoint, context, appState, selectionColor);
 
   context.restore();
 };
@@ -201,14 +206,15 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   isSelected: boolean,
   isPhantomPoint: boolean,
   isOverlappingPoint: boolean,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
-  context.strokeStyle = "#5e5ad8";
+  context.strokeStyle = selectionColor;
   context.setLineDash([]);
   context.fillStyle = "rgba(255, 255, 255, 0.9)";
   if (isSelected) {
-    context.fillStyle = "rgba(134, 131, 226, 0.9)";
+    context.fillStyle = colorWithAlpha(selectionColor, 0.9);
   } else if (isPhantomPoint) {
-    context.fillStyle = "rgba(177, 151, 252, 0.7)";
+    context.fillStyle = colorWithAlpha(selectionColor, 0.7);
   }
 
   fillCircle(
@@ -1082,6 +1088,7 @@ const renderLinearPointHandles = (
   appState: InteractiveCanvasAppState,
   element: NonDeleted<ExcalidrawLinearElement>,
   elementsMap: RenderableElementsMap,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   if (!appState.selectedLinearElement) {
     return;
@@ -1141,6 +1148,7 @@ const renderLinearPointHandles = (
       isSelected,
       false,
       isOverlappingPoint,
+      selectionColor,
     );
   });
 
@@ -1169,6 +1177,7 @@ const renderLinearPointHandles = (
           false,
           !fixedSegments.includes(idx + 1),
           false,
+          selectionColor,
         );
       }
     });
@@ -1193,6 +1202,7 @@ const renderLinearPointHandles = (
           false,
           true,
           false,
+          selectionColor,
         );
       }
     });
@@ -1206,11 +1216,13 @@ const renderFocusPointConnectionLine = (
   appState: InteractiveCanvasAppState,
   fromPoint: GlobalPoint,
   toPoint: GlobalPoint,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 
-  context.strokeStyle = "rgba(134, 131, 226, 0.6)";
+  context.strokeStyle =
+    colorWithAlpha(selectionColor, 0.6);
   context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
 
@@ -1228,14 +1240,16 @@ const renderFocusPointCicle = (
   point: GlobalPoint,
   radius: number,
   isHovered: boolean,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  context.strokeStyle = "rgba(134, 131, 226, 0.6)";
+  context.strokeStyle =
+    colorWithAlpha(selectionColor, 0.6);
   context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([]);
   context.fillStyle = isHovered
-    ? "rgba(134, 131, 226, 0.9)"
+    ? colorWithAlpha(selectionColor, 0.9)
     : "rgba(255, 255, 255, 0.9)";
 
   fillCircle(
@@ -1255,12 +1269,14 @@ const renderFocusPointIndicator = ({
   type,
   context,
   elementsMap,
+  selectionColor,
 }: {
   arrow: NonDeleted<ExcalidrawArrowElement>;
   appState: InteractiveCanvasAppState;
   context: CanvasRenderingContext2D;
   elementsMap: NonDeletedSceneElementsMap;
   type: "start" | "end";
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"];
 }) => {
   const binding = type === "start" ? arrow.startBinding : arrow.endBinding;
   const bindableElement =
@@ -1307,7 +1323,7 @@ const renderFocusPointIndicator = ({
     linearState?.hoveredFocusPointBinding === type &&
     !linearState.draggedFocusPointBinding
   ) {
-    renderFocusPointHighlight(context, appState, focusPoint);
+    renderFocusPointHighlight(context, appState, focusPoint, selectionColor);
   }
 
   // render focus point
@@ -1329,7 +1345,13 @@ const renderFocusPointIndicator = ({
       elementsMap,
     );
 
-    renderFocusPointConnectionLine(context, appState, arrowPoint, focusPoint);
+    renderFocusPointConnectionLine(
+      context,
+      appState,
+      arrowPoint,
+      focusPoint,
+      selectionColor,
+    );
 
     renderFocusPointCicle(
       context,
@@ -1337,6 +1359,7 @@ const renderFocusPointIndicator = ({
       focusPoint,
       FOCUS_POINT_SIZE / 1.5,
       isHovered,
+      selectionColor,
     );
   }
 };
@@ -1611,6 +1634,7 @@ const _renderInteractiveScene = ({
       appState,
       editingLinearElement,
       elementsMap,
+      renderConfig.selectionColor,
     );
   }
 
@@ -1715,6 +1739,7 @@ const _renderInteractiveScene = ({
       appState,
       selectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
       elementsMap,
+      renderConfig.selectionColor,
     );
   }
 
@@ -1727,7 +1752,11 @@ const _renderInteractiveScene = ({
   if (selectedLinearElement) {
     if (!appState.selectedLinearElement.isDragging) {
       if (linearState.segmentMidPointHoveredCoords) {
-        renderElbowArrowMidPointHighlight(context, appState);
+        renderElbowArrowMidPointHighlight(
+          context,
+          appState,
+          renderConfig.selectionColor,
+        );
       } else if (
         isElbowArrow(selectedLinearElement)
           ? linearState.hoverPointIndex === 0 ||
@@ -1735,7 +1764,12 @@ const _renderInteractiveScene = ({
               selectedLinearElement.points.length - 1
           : linearState.hoverPointIndex >= 0
       ) {
-        renderLinearElementPointHighlight(context, appState, elementsMap);
+        renderLinearElementPointHighlight(
+          context,
+          appState,
+          elementsMap,
+          renderConfig.selectionColor,
+        );
       }
     }
 
@@ -1746,6 +1780,7 @@ const _renderInteractiveScene = ({
         appState,
         context,
         type: "start",
+        selectionColor: renderConfig.selectionColor,
       });
 
       renderFocusPointIndicator({
@@ -1754,6 +1789,7 @@ const _renderInteractiveScene = ({
         appState,
         context,
         type: "end",
+        selectionColor: renderConfig.selectionColor,
       });
     }
   }
@@ -1783,6 +1819,7 @@ const _renderInteractiveScene = ({
         appState,
         selectedElements[0] as ExcalidrawLinearElement,
         elementsMap,
+        renderConfig.selectionColor,
       );
     }
     const selectionColor = renderConfig.selectionColor || "#000";
