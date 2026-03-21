@@ -1,10 +1,5 @@
 import { line, linesIntersectAt } from "./line";
-import {
-  isPoint,
-  pointCenter,
-  pointFromVector,
-  pointRotateRads,
-} from "./point";
+import { isPoint, pointFromVector } from "./point";
 import { PRECISION } from "./utils";
 import {
   vectorAdd,
@@ -14,7 +9,7 @@ import {
   vectorSubtract,
 } from "./vector";
 
-import type { GlobalPoint, LineSegment, LocalPoint, Radians } from "./types";
+import type { GlobalPoint, LineSegment, LocalPoint } from "./types";
 
 /**
  * Create a line segment from two points.
@@ -41,26 +36,6 @@ export const isLineSegment = <Point extends GlobalPoint | LocalPoint>(
   segment.length === 2 &&
   isPoint(segment[0]) &&
   isPoint(segment[0]);
-
-/**
- * Return the coordinates resulting from rotating the given line about an origin by an angle in radians
- * note that when the origin is not given, the midpoint of the given line is used as the origin.
- *
- * @param l
- * @param angle
- * @param origin
- * @returns
- */
-export const lineSegmentRotate = <Point extends LocalPoint | GlobalPoint>(
-  l: LineSegment<Point>,
-  angle: Radians,
-  origin?: Point,
-): LineSegment<Point> => {
-  return lineSegment(
-    pointRotateRads(l[0], origin || pointCenter(l[0], l[1]), angle),
-    pointRotateRads(l[1], origin || pointCenter(l[0], l[1]), angle),
-  );
-};
 
 /**
  * Calculates the point two line segments with a definite start and end point
