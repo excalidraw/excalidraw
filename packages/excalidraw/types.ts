@@ -482,6 +482,8 @@ export interface AppState {
   // a drag operation (like pointer position vs bindable element) but needed
   // globally for calculating the binding strategy
   bindMode: BindMode;
+  /** when true, laser trails persist on canvas instead of fading */
+  laserPersistent: boolean;
 }
 
 export type SearchMatch = {

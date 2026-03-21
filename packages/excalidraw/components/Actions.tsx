@@ -29,7 +29,10 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { actionToggleZenMode } from "../actions";
+import {
+  actionToggleZenMode,
+  actionToggleLaserPersistent,
+} from "../actions";
 
 import { alignActionsPredicate } from "../actions/actionAlign";
 import { trackEvent } from "../analytics";
@@ -1240,6 +1243,17 @@ export const ShapesSwitcher = ({
             shortcut={KEYS.K.toLocaleUpperCase()}
           >
             {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => {
+              app.actionManager.executeAction(
+                actionToggleLaserPersistent,
+              );
+            }}
+            data-testid="toolbar-laser-persistent"
+            selected={app.state.laserPersistent}
+          >
+            {t("toolBar.laserPersistent")}
           </DropdownMenu.Item>
           {isFullStylesPanel && (
             <DropdownMenu.Item
