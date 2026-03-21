@@ -4,7 +4,7 @@ import { vi } from "vitest";
 
 import { getLineHeightInPx, getTextFromElements } from "@excalidraw/element";
 
-import { KEYS, arrayToMap, getLineHeight } from "@excalidraw/common";
+import { KEYS, ORIG_ID, arrayToMap, getLineHeight } from "@excalidraw/common";
 
 import { getElementBounds } from "@excalidraw/element";
 
@@ -629,6 +629,15 @@ describe("clipboard - copy plain text, paste original elements internally", () =
 
     API.setElements([text1, text2]);
     API.setSelectedElements([text1, text2]);
+    API.setAppState({
+      textLineLinks: [
+        {
+          id: "link1",
+          from: { elementId: text1.id, lineNumber: 1, side: "left" },
+          to: { elementId: text2.id, lineNumber: 1, side: "left" },
+        },
+      ],
+    });
 
     const expectedText = getTextFromElements([text1, text2]);
 
@@ -665,6 +674,24 @@ describe("clipboard - copy plain text, paste original elements internally", () =
     const texts = nonDeletedText.map((el) => el.text);
     expect(texts.filter((t) => t === "hello")).toHaveLength(2);
     expect(texts.filter((t) => t === "world")).toHaveLength(2);
+
+    const cloned1 = nonDeletedText.find(
+      (el) => (el as any)[ORIG_ID] === text1.id,
+    );
+    const cloned2 = nonDeletedText.find(
+      (el) => (el as any)[ORIG_ID] === text2.id,
+    );
+    expect(cloned1).toBeTruthy();
+    expect(cloned2).toBeTruthy();
+
+    expect(h.state.textLineLinks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          from: { elementId: (cloned1 as any).id, lineNumber: 1, side: "left" },
+          to: { elementId: (cloned2 as any).id, lineNumber: 1, side: "left" },
+        }),
+      ]),
+    );
   });
 
   it("should copy bound text container as plain text and paste as container", async () => {

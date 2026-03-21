@@ -34,11 +34,13 @@ import {
 } from "./data/blob";
 
 import type { BinaryFiles } from "./types";
+import type { TextLineLink } from "./types";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles | undefined;
+  textLineLinks?: readonly TextLineLink[];
 };
 
 export type PastedMixedContent = { type: "text" | "imageUrl"; value: string }[];
@@ -48,6 +50,7 @@ export interface ClipboardData {
   files?: BinaryFiles;
   text?: string;
   mixedContent?: PastedMixedContent;
+  textLineLinks?: readonly TextLineLink[];
   errorMessage?: string;
   programmaticAPI?: boolean;
 }
@@ -72,7 +75,11 @@ export const probablySupportsClipboardBlob =
 
 const clipboardContainsElements = (
   contents: any,
-): contents is { elements: ExcalidrawElement[]; files?: BinaryFiles } => {
+): contents is {
+  elements: ExcalidrawElement[];
+  files?: BinaryFiles;
+  textLineLinks?: readonly TextLineLink[];
+} => {
   if (
     [
       EXPORT_DATA_TYPES.excalidraw,
@@ -142,9 +149,11 @@ export const createPasteEvent = ({
 export const serializeAsClipboardJSON = ({
   elements,
   files,
+  textLineLinks,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles | null;
+  textLineLinks?: readonly TextLineLink[];
 }) => {
   const elementsMap = arrayToMap(elements);
   const framesToCopy = new Set(
@@ -186,6 +195,7 @@ export const serializeAsClipboardJSON = ({
       return element;
     }),
     files: files ? _files : undefined,
+    textLineLinks,
   };
 
   return JSON.stringify(contents);
@@ -196,8 +206,9 @@ export const copyToClipboard = async (
   files: BinaryFiles | null,
   /** supply if available to make the operation more certain to succeed */
   clipboardEvent?: ClipboardEvent | null,
+  textLineLinks?: readonly TextLineLink[],
 ) => {
-  const json = serializeAsClipboardJSON({ elements, files });
+  const json = serializeAsClipboardJSON({ elements, files, textLineLinks });
 
   await copyTextToSystemClipboard(
     {
@@ -542,6 +553,9 @@ export const parseClipboard = async (
       return {
         elements: systemClipboardData.elements,
         files: systemClipboardData.files,
+        textLineLinks: Array.isArray(systemClipboardData.textLineLinks)
+          ? systemClipboardData.textLineLinks
+          : undefined,
         text: isPlainPaste
           ? JSON.stringify(systemClipboardData.elements, null, 2)
           : undefined,

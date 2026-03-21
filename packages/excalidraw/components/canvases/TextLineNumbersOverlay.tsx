@@ -508,6 +508,11 @@ const TextLineNumbersOverlay = ({
               : "excalidraw__textLineNumberButton--right"
           }${isDraft ? " is-draft" : ""}${isHovered ? " is-hovered" : ""}`;
 
+          //点击选中文本框才能点击行号拉出行号连接线;2026.03.22
+          const canInteract =
+            !!appState.textLineLinkDraft ||
+            !!appState.selectedElementIds[item.elementId];
+
           return (
             <button
               key={`${item.elementId}:${item.side}:${item.lineNumber}`}
@@ -525,8 +530,12 @@ const TextLineNumbersOverlay = ({
                 fontFamily: item.fontFamilyScene,
                 height: `${item.lineHeightScene}px`,
                 lineHeight: `${item.lineHeightScene}px`,
+                pointerEvents: canInteract ? "auto" : "none",
               }}
               onPointerDown={(event) => {
+                if (!canInteract) {
+                  return;
+                }
                 event.preventDefault();
                 event.stopPropagation();
                 const root = rootRef.current;

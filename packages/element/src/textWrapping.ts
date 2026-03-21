@@ -8,6 +8,57 @@ let cachedCjkRegex: RegExp | undefined;
 let cachedLineBreakRegex: RegExp | undefined;
 let cachedEmojiRegex: RegExp | undefined;
 
+//对“换行结果”做强缓存,拖动/平移时只读缓存，不做任何测量。提升帧率2026.03.21
+const WRAP_TEXT_CACHE_MAX_ENTRIES = 100000;
+const wrapTextCache = new Map<
+  string,
+  { lines: string[]; explicitNewlineAfterLine: boolean[] }
+>();
+
+const getWrapTextCacheKey = (
+  normalizedText: string,
+  font: FontString,
+  maxWidth: number,
+  variant: "dom" | "algo",
+  extra: string,
+) => {
+  let hash = 2166136261;
+  for (let i = 0; i < normalizedText.length; i++) {
+    hash ^= normalizedText.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return `${variant}|${normalizedText.length}|${
+    hash >>> 0
+  }|${font}|${maxWidth}|${extra}`;
+};
+
+const getFromWrapTextCache = (key: string) => {
+  const cached = wrapTextCache.get(key);
+  if (!cached) {
+    return null;
+  }
+  wrapTextCache.delete(key);
+  wrapTextCache.set(key, cached);
+  return cached;
+};
+
+const setToWrapTextCache = (
+  key: string,
+  value: { lines: string[]; explicitNewlineAfterLine: boolean[] },
+) => {
+  if (wrapTextCache.size >= WRAP_TEXT_CACHE_MAX_ENTRIES) {
+    const oldestKey = wrapTextCache.keys().next().value as string | undefined;
+    if (oldestKey) {
+      wrapTextCache.delete(oldestKey);
+    }
+  }
+  if ((isDevEnv() || isTestEnv()) && !Object.isFrozen(value.lines)) {
+    Object.freeze(value.lines);
+    Object.freeze(value.explicitNewlineAfterLine);
+  }
+  wrapTextCache.set(key, value);
+};
+
 /**
  * Test if a given text contains any CJK characters (including symbols, punctuation, etc,).
  */
@@ -477,12 +528,10 @@ const getDomWrapElement = () => {
 };
 
 const wrapTextPreservingWhitespaceWithExplicitNewlineMarkersUsingDom = (
-  text: string,
+  normalizedText: string,
   font: FontString,
   maxWidth: number,
 ): { lines: string[]; explicitNewlineAfterLine: boolean[] } => {
-  const normalizedText = text.replace(/\r\n?/g, "\n");
-
   if (!Number.isFinite(maxWidth) || maxWidth < 0) {
     const originalLines = normalizedText.split("\n");
     return {
@@ -497,12 +546,7 @@ const wrapTextPreservingWhitespaceWithExplicitNewlineMarkersUsingDom = (
   el.style.font = font;
   el.style.width = `${maxWidth}px`;
 
-  const supportsBreakSpaces =
-    typeof CSS !== "undefined" &&
-    typeof CSS.supports === "function" &&
-    CSS.supports("white-space", "break-spaces");
-
-  el.style.whiteSpace = supportsBreakSpaces ? "break-spaces" : "pre-wrap";
+  el.style.whiteSpace = supportsBreakSpaces() ? "break-spaces" : "pre-wrap";
 
   el.textContent = normalizedText;
 
@@ -563,6 +607,20 @@ const wrapTextPreservingWhitespaceWithExplicitNewlineMarkersUsingDom = (
   return { lines, explicitNewlineAfterLine };
 };
 
+const supportsBreakSpaces = (() => {
+  let cached: boolean | null = null;
+  return () => {
+    if (cached != null) {
+      return cached;
+    }
+    cached =
+      typeof CSS !== "undefined" &&
+      typeof CSS.supports === "function" &&
+      CSS.supports("white-space", "break-spaces");
+    return cached;
+  };
+})();
+
 export const wrapTextPreservingWhitespaceWithExplicitNewlineMarkers = (
   text: string,
   font: FontString,
@@ -580,15 +638,33 @@ export const wrapTextPreservingWhitespaceWithExplicitNewlineMarkers = (
   // - 文本照常自动换行
   // - 仅在用户真实输入的换行处显示 ↵（不会在自动换行处显示）
 
-  if (canUseDomTextWrapping() && text.length <= 5_000) {
-    return wrapTextPreservingWhitespaceWithExplicitNewlineMarkersUsingDom(
-      text,
+  const normalizedText = text.replace(/\r\n?/g, "\n");
+  const canCache = normalizedText.length <= 10_000 && Number.isFinite(maxWidth);
+
+  if (canUseDomTextWrapping() && normalizedText.length <= 5_000) {
+    const cacheKey = canCache
+      ? getWrapTextCacheKey(
+          normalizedText,
+          font,
+          maxWidth,
+          "dom",
+          supportsBreakSpaces() ? "bs1" : "bs0",
+        )
+      : null;
+    const cached = cacheKey ? getFromWrapTextCache(cacheKey) : null;
+    if (cached) {
+      return cached;
+    }
+    const res = wrapTextPreservingWhitespaceWithExplicitNewlineMarkersUsingDom(
+      normalizedText,
       font,
       maxWidth,
     );
+    if (cacheKey) {
+      setToWrapTextCache(cacheKey, res);
+    }
+    return res;
   }
-
-  const normalizedText = text.replace(/\r\n?/g, "\n");
 
   // maxWidth 不可用时，按原文逐行返回，但仍需标记真实换行位置
   if (!Number.isFinite(maxWidth) || maxWidth < 0) {
@@ -599,6 +675,14 @@ export const wrapTextPreservingWhitespaceWithExplicitNewlineMarkers = (
         (_line, index) => index < originalLines.length - 1,
       ),
     };
+  }
+
+  const cacheKey = canCache
+    ? getWrapTextCacheKey(normalizedText, font, maxWidth, "algo", "")
+    : null;
+  const cached = cacheKey ? getFromWrapTextCache(cacheKey) : null;
+  if (cached) {
+    return cached;
   }
 
   const lines: string[] = [];
@@ -630,7 +714,11 @@ export const wrapTextPreservingWhitespaceWithExplicitNewlineMarkers = (
     }
   }
 
-  return { lines, explicitNewlineAfterLine };
+  const res = { lines, explicitNewlineAfterLine };
+  if (cacheKey) {
+    setToWrapTextCache(cacheKey, res);
+  }
+  return res;
 };
 
 /**

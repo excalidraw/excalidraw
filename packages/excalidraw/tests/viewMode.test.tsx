@@ -45,6 +45,7 @@ describe("view mode", () => {
     // move type for mouse and grab for touch & pen
     // then switch to view-mode and cursor should be grabbing type
     UI.createElement("rectangle", { size: 100 });
+    API.setSelectedElements([]);
 
     pointerTypes.forEach((pointerType) => {
       const pointer = pointerType;
@@ -53,7 +54,7 @@ describe("view mode", () => {
       // eslint-disable-next-line dot-notation
       if (pointerType["pointerType"] === "mouse") {
         expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
-          CURSOR_TYPE.MOVE,
+          CURSOR_TYPE.AUTO,
         );
       } else {
         expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(

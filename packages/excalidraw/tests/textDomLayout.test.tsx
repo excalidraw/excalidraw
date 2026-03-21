@@ -15,6 +15,7 @@ import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { getTextEditor, TEXT_EDITOR_SELECTOR } from "./queries/dom";
 import { updateTextEditor } from "./queries/dom";
 import {
+  fireEvent,
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
@@ -629,5 +630,95 @@ describe("text DOM layout (route B)", () => {
         expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
       });
     }
+  });
+
+  it("text line number buttons should only start linking from selected text", async () => {
+    const text1 = API.createElement({
+      type: "text",
+      text: "a\nb\nc",
+      x: 100,
+      y: 60,
+      width: 260,
+      height: 120,
+    });
+    const text2 = API.createElement({
+      type: "text",
+      text: "x\ny\nz",
+      x: 500,
+      y: 60,
+      width: 260,
+      height: 120,
+    });
+    API.setElements([text1, text2]);
+    UI.clickTool("selection");
+    API.setSelectedElements([text1]);
+
+    const button2 = document.querySelector(
+      `button.excalidraw__textLineNumberButton[data-element-id="${text2.id}"][data-side="left"][data-line-number="1"]`,
+    ) as HTMLButtonElement | null;
+    expect(button2).not.toBeNull();
+    expect(button2!.style.pointerEvents).toBe("none");
+
+    fireEvent.pointerDown(button2!, { clientX: 10, clientY: 10 });
+    expect(h.state.textLineLinkDraft).toBe(null);
+
+    const button1 = document.querySelector(
+      `button.excalidraw__textLineNumberButton[data-element-id="${text1.id}"][data-side="left"][data-line-number="1"]`,
+    ) as HTMLButtonElement | null;
+    expect(button1).not.toBeNull();
+    expect(button1!.style.pointerEvents).toBe("auto");
+
+    fireEvent.pointerDown(button1!, { clientX: 10, clientY: 10 });
+    expect(h.state.textLineLinkDraft).toEqual({
+      elementId: text1.id,
+      lineNumber: 1,
+      side: "left",
+    });
+  });
+
+  it("should link to another text line without selecting target text", async () => {
+    const text1 = API.createElement({
+      type: "text",
+      text: "a\nb\nc",
+      x: 100,
+      y: 60,
+      width: 260,
+      height: 120,
+    });
+    const text2 = API.createElement({
+      type: "text",
+      text: "x\ny\nz",
+      x: 500,
+      y: 60,
+      width: 260,
+      height: 120,
+    });
+    API.setElements([text1, text2]);
+    UI.clickTool("selection");
+    API.setSelectedElements([text1]);
+
+    const fromBtn = document.querySelector(
+      `button.excalidraw__textLineNumberButton[data-element-id="${text1.id}"][data-side="left"][data-line-number="1"]`,
+    ) as HTMLButtonElement | null;
+    const toBtn = document.querySelector(
+      `button.excalidraw__textLineNumberButton[data-element-id="${text2.id}"][data-side="left"][data-line-number="1"]`,
+    ) as HTMLButtonElement | null;
+    expect(fromBtn).not.toBeNull();
+    expect(toBtn).not.toBeNull();
+
+    fireEvent.pointerDown(fromBtn!, { clientX: 10, clientY: 10 });
+    expect(h.state.textLineLinkDraft).not.toBe(null);
+
+    expect(toBtn!.style.pointerEvents).toBe("auto");
+    fireEvent.pointerDown(toBtn!, { clientX: 20, clientY: 20 });
+
+    expect(h.state.textLineLinkDraft).toBe(null);
+    expect(h.state.textLineLinks.length).toBe(1);
+    expect(h.state.textLineLinks[0]).toEqual(
+      expect.objectContaining({
+        from: { elementId: text1.id, lineNumber: 1, side: "left" },
+        to: { elementId: text2.id, lineNumber: 1, side: "left" },
+      }),
+    );
   });
 });

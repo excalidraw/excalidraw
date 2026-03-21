@@ -69,6 +69,7 @@ import {
   isInputLike,
   isToolIcon,
   isWritableElement,
+  randomId,
   sceneCoordsToViewportCoords,
   tupleToCoors,
   viewportCoordsToSceneCoords,
@@ -500,6 +501,7 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
+  TextLineLink,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -671,6 +673,7 @@ class App extends React.Component<AppProps, AppState> {
     text: string;
     elements: readonly ExcalidrawElement[];
     files: BinaryFiles | null;
+    textLineLinks?: readonly TextLineLink[];
   };
   /**
    * Indicates whether the embeddable's url has been validated for rendering.
@@ -3550,10 +3553,18 @@ class App extends React.Component<AppProps, AppState> {
         (selectedElement && boundTextElement)
       ) {
         const text = getTextFromElements(elementsToCopy);
+        const selectedTextElementIds = new Set(
+          elementsToCopy.filter(isTextElement).map((el) => el.id),
+        );
         this.plainTextCopy = {
           text,
           elements: elementsToCopy.map((element) => deepCopyElement(element)),
           files: null,
+          textLineLinks: this.state.textLineLinks.filter(
+            (link) =>
+              selectedTextElementIds.has(link.from.elementId) &&
+              selectedTextElementIds.has(link.to.elementId),
+          ),
         };
         copyTextToSystemClipboard(text, event);
         this.actionManager.executeAction(actionDeleteSelected, "keyboard");
@@ -3597,10 +3608,18 @@ class App extends React.Component<AppProps, AppState> {
         (selectedElement && boundTextElement)
       ) {
         const text = getTextFromElements(elementsToCopy);
+        const selectedTextElementIds = new Set(
+          elementsToCopy.filter(isTextElement).map((el) => el.id),
+        );
         this.plainTextCopy = {
           text,
           elements: elementsToCopy.map((element) => deepCopyElement(element)),
           files: null,
+          textLineLinks: this.state.textLineLinks.filter(
+            (link) =>
+              selectedTextElementIds.has(link.from.elementId) &&
+              selectedTextElementIds.has(link.to.elementId),
+          ),
         };
         copyTextToSystemClipboard(text, event);
         event.preventDefault();
@@ -3772,6 +3791,7 @@ class App extends React.Component<AppProps, AppState> {
       this.addElementsFromPasteOrLibrary({
         elements,
         files: data.files || null,
+        textLineLinks: data.textLineLinks,
         position:
           this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
         retainSeed: isPlainPaste,
@@ -3899,6 +3919,7 @@ class App extends React.Component<AppProps, AppState> {
         this.addElementsFromPasteOrLibrary({
           elements: this.plainTextCopy.elements,
           files: this.plainTextCopy.files,
+          textLineLinks: this.plainTextCopy.textLineLinks,
           position: "cursor",
         });
         event.preventDefault();
@@ -3933,6 +3954,7 @@ class App extends React.Component<AppProps, AppState> {
   addElementsFromPasteOrLibrary = (opts: {
     elements: readonly ExcalidrawElement[];
     files: BinaryFiles | null;
+    textLineLinks?: readonly TextLineLink[];
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
     fitToContent?: boolean;
@@ -3968,7 +3990,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const [gridX, gridY] = getGridPoint(dx, dy, this.getEffectiveGridSize());
 
-    const { duplicatedElements } = duplicateElements({
+    const { duplicatedElements, origIdToDuplicateId } = duplicateElements({
       type: "everything",
       elements: elements.map((element) => {
         return newElementWith(element, {
@@ -3978,6 +4000,24 @@ class App extends React.Component<AppProps, AppState> {
       }),
       randomizeSeed: !opts.retainSeed,
     });
+
+    //粘贴在画布时粘贴这几个文本框之间的行号连接2026.03.22
+    const duplicatedTextLineLinks = opts.textLineLinks?.length
+      ? opts.textLineLinks.flatMap((link) => {
+          const fromId = origIdToDuplicateId.get(link.from.elementId);
+          const toId = origIdToDuplicateId.get(link.to.elementId);
+          if (!fromId || !toId) {
+            return [];
+          }
+          return [
+            {
+              id: randomId(),
+              from: { ...link.from, elementId: fromId },
+              to: { ...link.to, elementId: toId },
+            },
+          ];
+        })
+      : [];
 
     const prevElements = this.scene.getElementsIncludingDeleted();
     let nextElements = [...prevElements, ...duplicatedElements];
@@ -4032,6 +4072,11 @@ class App extends React.Component<AppProps, AppState> {
     const nextElementsToSelect =
       excludeElementsInFramesFromSelection(duplicatedElements);
 
+    const nextTextLineLinks =
+      duplicatedTextLineLinks.length > 0
+        ? this.state.textLineLinks.concat(duplicatedTextLineLinks)
+        : this.state.textLineLinks;
+
     this.store.scheduleCapture();
     this.setState(
       {
@@ -4047,6 +4092,7 @@ class App extends React.Component<AppProps, AppState> {
           editorJotaiStore.get(isSidebarDockedAtom)
             ? this.state.openSidebar
             : null,
+        textLineLinks: nextTextLineLinks,
         ...selectGroupsForSelectedElements(
           {
             editingGroupId: null,
@@ -7705,7 +7751,15 @@ class App extends React.Component<AppProps, AppState> {
               this.state.activeTool.type !== "lasso" ||
               selectedElements.length > 0
             ) {
-              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+              if (
+                //未选中元素保持鼠标光标为指针样式;2026.03.22
+                this.state.activeTool.type === "selection" &&
+                selectedElements.length === 0
+              ) {
+                setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+              } else {
+                setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+              }
             }
           }
         }

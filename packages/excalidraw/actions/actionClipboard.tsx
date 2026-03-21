@@ -34,9 +34,22 @@ export const actionCopy = register<ClipboardEvent | null>({
       includeBoundTextElement: true,
       includeElementsInFrames: true,
     });
+    const selectedTextElementIds = new Set(
+      elementsToCopy.filter(isTextElement).map((el) => el.id),
+    );
+    const textLineLinksToCopy = appState.textLineLinks.filter(
+      (link) =>
+        selectedTextElementIds.has(link.from.elementId) &&
+        selectedTextElementIds.has(link.to.elementId),
+    );
 
     try {
-      await copyToClipboard(elementsToCopy, app.files, event);
+      await copyToClipboard(
+        elementsToCopy,
+        app.files,
+        event,
+        textLineLinksToCopy,
+      );
     } catch (error: any) {
       return {
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
@@ -298,12 +311,18 @@ export const copyTextBatch = register({
       includeElementsInFrames: true,
     });
     const text = getTextFromElements(selectedElements);
+    const selectedTextElementIds = new Set(selectedElements.map((el) => el.id));
 
     try {
       (app as any).plainTextCopy = {
         text,
         elements: selectedElements.map((element) => deepCopyElement(element)),
         files: null,
+        textLineLinks: appState.textLineLinks.filter(
+          (link) =>
+            selectedTextElementIds.has(link.from.elementId) &&
+            selectedTextElementIds.has(link.to.elementId),
+        ),
       };
       await copyTextToSystemClipboard(text);
     } catch (e) {
