@@ -37,6 +37,7 @@ import {
   type GlobalPoint,
   type LocalPoint,
   type LineSegment,
+  type Radians,
 } from "@excalidraw/math";
 import { isCurve } from "@excalidraw/math/curve";
 
@@ -52,6 +53,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   FixedPointBinding,
+  Ordered,
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 import type { SimpleArrowCurveDebugData } from "@excalidraw/element";
@@ -133,7 +135,7 @@ const getSimpleArrowTransform = (
       const rotated = pointRotateRads(
         pointFrom<GlobalPoint>(vector[0], vector[1]),
         pointFrom<GlobalPoint>(0, 0),
-        -element.angle,
+        -element.angle as Radians,
       );
 
       return [rotated[0], rotated[1]];
@@ -146,7 +148,7 @@ const getSimpleArrowDebugStateForElement = (
   elementId: string,
 ): SelectedSimpleArrowDebugState | null => {
   const element = elements.find(
-    (candidate): candidate is ExcalidrawArrowElement =>
+    (candidate): candidate is Ordered<ExcalidrawArrowElement> =>
       candidate.id === elementId &&
       !candidate.isDeleted &&
       isArrowElement(candidate) &&
@@ -1059,7 +1061,7 @@ const DebugCanvas = React.forwardRef<HTMLCanvasElement, DebugCanvasProps>(
         const nextElements =
           excalidrawAPI.getSceneElements() as OrderedExcalidrawElement[];
         const element = nextElements.find(
-          (candidate): candidate is ExcalidrawArrowElement =>
+          (candidate): candidate is Ordered<ExcalidrawArrowElement> =>
             candidate.id === handle.elementId &&
             !candidate.isDeleted &&
             isArrowElement(candidate),
