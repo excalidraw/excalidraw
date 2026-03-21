@@ -5521,8 +5521,8 @@ class App extends React.Component<AppProps, AppState> {
     if (!isLinearElementType(nextActiveTool.type)) {
       this.setState({ suggestedBinding: null });
     }
-    // Reset the "no tool selected" toast flag when user picks a drawing tool,
-    // so it can show again the next time they escape back to selection mode.
+    // Reset the "no tool selected" toast flag when user picks any tool other
+    // than selection/hand/eraser, so it can re-show when they return to selection.
     if (
       !isSelectionLikeTool(nextActiveTool.type) &&
       nextActiveTool.type !== "hand" &&
@@ -10136,7 +10136,8 @@ class App extends React.Component<AppProps, AppState> {
         if (
           this.state.activeTool.type === "selection" &&
           !pointerDownState.hit.element &&
-          !this.noToolSelectedToastShown
+          !this.noToolSelectedToastShown &&
+          !event.altKey
         ) {
           this.noToolSelectedToastShown = true;
           this.setToast({
