@@ -775,6 +775,11 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             );
 
             break;
+          case "selectedTextLineLinkIds":
+            if (!isShallowEqual(prevAppState[key], nextAppState[key])) {
+              visibleDifferenceFlag.value = true;
+            }
+            break;
           case "selectedGroupIds":
             nextAppState[key] = AppStateDelta.filterSelectedGroups(
               nextAppState[key],
@@ -934,6 +939,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       editingGroupId,
       selectedGroupIds,
       selectedElementIds,
+      selectedTextLineLinkIds,
       selectedLinearElement,
       croppingElementId,
       lockedMultiSelections,

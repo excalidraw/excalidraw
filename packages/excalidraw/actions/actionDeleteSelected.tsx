@@ -272,8 +272,22 @@ export const actionDeleteSelected = register({
       };
     }
 
+    const selectedTextLineLinkIds = appState.selectedTextLineLinkIds;
+    const hasSelectedTextLineLinks = !!Object.keys(selectedTextLineLinkIds)
+      .length;
+
+    const nextAppStateAfterTextLineLinks = hasSelectedTextLineLinks
+      ? {
+          ...appState,
+          textLineLinks: appState.textLineLinks.filter(
+            (link) => !selectedTextLineLinkIds[link.id],
+          ),
+          selectedTextLineLinkIds: {},
+        }
+      : appState;
+
     let { elements: nextElements, appState: nextAppState } =
-      deleteSelectedElements(elements, appState, app);
+      deleteSelectedElements(elements, nextAppStateAfterTextLineLinks, app);
 
     fixBindingsAfterDeletion(
       nextElements,
@@ -294,12 +308,11 @@ export const actionDeleteSelected = register({
         activeEmbeddable: null,
         selectedLinearElement: null,
       },
-      captureUpdate: isSomeElementSelected(
-        getNonDeletedElements(elements),
-        appState,
-      )
-        ? CaptureUpdateAction.IMMEDIATELY
-        : CaptureUpdateAction.EVENTUALLY,
+      captureUpdate:
+        hasSelectedTextLineLinks ||
+        isSomeElementSelected(getNonDeletedElements(elements), appState)
+          ? CaptureUpdateAction.IMMEDIATELY
+          : CaptureUpdateAction.EVENTUALLY,
     };
   },
   keyTest: (event, appState, elements) =>
@@ -307,6 +320,9 @@ export const actionDeleteSelected = register({
     !event[KEYS.CTRL_OR_CMD],
   PanelComponent: ({ elements, appState, updateData, app }) => {
     const isMobile = useStylesPanelMode() === "mobile";
+    const hasSelection =
+      !!Object.keys(appState.selectedTextLineLinkIds).length ||
+      isSomeElementSelected(getNonDeletedElements(elements), appState);
 
     return (
       <ToolButton
@@ -315,9 +331,7 @@ export const actionDeleteSelected = register({
         title={t("labels.delete")}
         aria-label={t("labels.delete")}
         onClick={() => updateData(null)}
-        disabled={
-          !isSomeElementSelected(getNonDeletedElements(elements), appState)
-        }
+        disabled={!hasSelection}
         style={{
           ...(isMobile && appState.openPopup !== "compactOtherProperties"
             ? MOBILE_ACTION_BUTTON_BG

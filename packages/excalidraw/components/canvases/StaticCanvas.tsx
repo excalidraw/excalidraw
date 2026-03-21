@@ -92,6 +92,7 @@ const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {
     textBoxDecorationsColor: appState.textBoxDecorationsColor,
     //连接后不缩放行号连接线不可见的问题2026.03.21
     textLineLinks: appState.textLineLinks,
+    selectedTextLineLinkIds: appState.selectedTextLineLinkIds,
     exportScale: appState.exportScale,
     selectedElementsAreBeingDragged: appState.selectedElementsAreBeingDragged,
     gridSize: appState.gridSize,

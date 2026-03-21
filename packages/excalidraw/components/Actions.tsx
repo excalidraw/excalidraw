@@ -59,6 +59,7 @@ import {
   useEditorInterface,
   useStylesPanelMode,
   useExcalidrawContainer,
+  useExcalidrawSetAppState,
 } from "./App";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
@@ -66,6 +67,7 @@ import { ToolPopover } from "./ToolPopover";
 import { Tooltip } from "./Tooltip";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { PropertiesPopover } from "./PropertiesPopover";
+import { ColorPicker } from "./ColorPicker/ColorPicker";
 import {
   EmbedIcon,
   extraToolsIcon,
@@ -102,6 +104,15 @@ const PROPERTIES_CLASSES = clsx([
   CLASSES.SHAPE_ACTIONS_THEME_SCOPE,
   "properties-content",
 ]);
+
+//添加按住左键拉框,可以选中文本框的功能2026.03.21
+const TEXT_BOX_DECORATIONS_COLOR_TOP_PICKS = [
+  "#a8a8a8",
+  "#6965db",
+  "#ff5252",
+  "#2ecc71",
+  "#111111",
+] as const;
 
 export const canChangeStrokeColor = (
   appState: UIAppState,
@@ -148,6 +159,69 @@ export const SelectedShapeActions = ({
   app: AppClassProperties;
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
+  const hasSelectedTextLineLinks = !!Object.keys(
+    appState.selectedTextLineLinkIds,
+  ).length;
+  const setAppState = useExcalidrawSetAppState();
+  const editorInterface = useEditorInterface();
+
+  if (hasSelectedTextLineLinks) {
+    //添加按住左键拉框,可以选中文本框的功能2026.03.21
+    return (
+      <div className="selected-shape-actions">
+        <div>
+          <h3 aria-hidden="true">{t("labels.stroke")}</h3>
+          <div>
+            <ColorPicker
+              topPicks={TEXT_BOX_DECORATIONS_COLOR_TOP_PICKS}
+              label={t("labels.stroke")}
+              type="textBoxDecorations"
+              color={appState.textBoxDecorationsColor}
+              onChange={(color) =>
+                setAppState({ textBoxDecorationsColor: color })
+              }
+              elements={targetElements}
+              appState={appState as AppState}
+              updateData={(data?: any) => setAppState(data)}
+            />
+          </div>
+          <h3 aria-hidden="true">{t("labels.textSelectionUnderline")}</h3>
+          <div>
+            <ColorPicker
+              topPicks={TEXT_BOX_DECORATIONS_COLOR_TOP_PICKS}
+              label={t("labels.textSelectionUnderline")}
+              type="textSelectionUnderline"
+              color={appState.textSelectionUnderlineColor}
+              onChange={(color) =>
+                setAppState({ textSelectionUnderlineColor: color })
+              }
+              elements={targetElements}
+              appState={appState as AppState}
+              updateData={(data?: any) => setAppState(data)}
+            />
+          </div>
+          <h3 aria-hidden="true">{t("labels.textSelectionBackground")}</h3>
+          <div>
+            <ColorPicker
+              topPicks={TEXT_BOX_DECORATIONS_COLOR_TOP_PICKS}
+              label={t("labels.textSelectionBackground")}
+              type="textSelectionBackground"
+              color={appState.textSelectionBackgroundColor}
+              onChange={(color) =>
+                setAppState({ textSelectionBackgroundColor: color })
+              }
+              elements={targetElements}
+              appState={appState as AppState}
+              updateData={(data?: any) => setAppState(data)}
+            />
+          </div>
+        </div>
+        <fieldset>{renderAction("changeFontFamily")}</fieldset>
+        {renderAction("changeFontSize")}
+        {renderAction("deleteSelectedElements")}
+      </div>
+    );
+  }
 
   let isSingleElementBoundContainer = false;
   if (
@@ -160,7 +234,6 @@ export const SelectedShapeActions = ({
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
   );
-  const editorInterface = useEditorInterface();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
@@ -523,6 +596,7 @@ const CombinedTextProperties = ({
   targetElements,
   container,
   elementsMap,
+  forceShowTextProperties = false,
 }: {
   appState: UIAppState;
   renderAction: ActionManager["renderAction"];
@@ -530,6 +604,7 @@ const CombinedTextProperties = ({
   targetElements: ExcalidrawElement[];
   container: HTMLDivElement | null;
   elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
+  forceShowTextProperties?: boolean;
 }) => {
   const { saveCaretPosition, restoreCaretPosition } = useTextEditorFocus();
   const isOpen = appState.openPopup === "compactTextProperties";
@@ -591,7 +666,8 @@ const CombinedTextProperties = ({
             }}
           >
             <div className="selected-shape-actions">
-              {(appState.activeTool.type === "text" ||
+              {(forceShowTextProperties ||
+                appState.activeTool.type === "text" ||
                 targetElements.some(isTextElement)) &&
                 renderAction("changeFontSize")}
               {(appState.activeTool.type === "text" ||
@@ -801,6 +877,9 @@ export const CompactShapeActions = ({
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
   const { container } = useExcalidrawContainer();
+  const hasSelectedTextLineLinks = !!Object.keys(
+    appState.selectedTextLineLinkIds,
+  ).length;
 
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
@@ -812,85 +891,141 @@ export const CompactShapeActions = ({
     isLinearElement(targetElements[0]) &&
     !isElbowArrow(targetElements[0]);
 
+  //添加按住左键拉框,可以选中文本框的功能2026.03.21
+  const textLineLinkCompactActions = hasSelectedTextLineLinks ? (
+    <>
+      <div className="compact-action-item">
+        <ColorPicker
+          topPicks={TEXT_BOX_DECORATIONS_COLOR_TOP_PICKS}
+          label={t("labels.stroke")}
+          type="textBoxDecorations"
+          color={appState.textBoxDecorationsColor}
+          onChange={(color) => setAppState({ textBoxDecorationsColor: color })}
+          elements={targetElements}
+          appState={appState as AppState}
+          updateData={(data?: any) => setAppState(data)}
+          variant="triggerOnly"
+        />
+      </div>
+      <div className="compact-action-item">
+        {renderAction("changeTextSelectionUnderlineColor")}
+      </div>
+      <div className="compact-action-item">
+        {renderAction("changeTextSelectionBackgroundColor")}
+      </div>
+      <div className="compact-action-item">
+        {renderAction("changeFontFamily")}
+      </div>
+      <CombinedTextProperties
+        appState={appState}
+        renderAction={renderAction}
+        setAppState={setAppState}
+        targetElements={targetElements}
+        container={container}
+        elementsMap={elementsMap}
+        forceShowTextProperties
+      />
+      {!isEditingTextOrNewElement && (
+        <div className="compact-action-item">
+          {renderAction("deleteSelectedElements")}
+        </div>
+      )}
+    </>
+  ) : null;
+
   return (
     <div className="compact-shape-actions">
+      {textLineLinkCompactActions}
       {/* Stroke Color */}
-      {canChangeStrokeColor(appState, targetElements) && (
-        <div className={clsx("compact-action-item")}>
-          {renderAction("changeStrokeColor")}
-        </div>
-      )}
+      {!hasSelectedTextLineLinks &&
+        canChangeStrokeColor(appState, targetElements) && (
+          <div className={clsx("compact-action-item")}>
+            {renderAction("changeStrokeColor")}
+          </div>
+        )}
 
       {/* Background Color */}
-      {canChangeBackgroundColor(appState, targetElements) && (
-        <div className="compact-action-item">
-          {renderAction("changeBackgroundColor")}
-        </div>
+      {!hasSelectedTextLineLinks &&
+        canChangeBackgroundColor(appState, targetElements) && (
+          <div className="compact-action-item">
+            {renderAction("changeBackgroundColor")}
+          </div>
+        )}
+
+      {!hasSelectedTextLineLinks && (
+        <CombinedShapeProperties
+          appState={appState}
+          renderAction={renderAction}
+          setAppState={setAppState}
+          targetElements={targetElements}
+          container={container}
+        />
       )}
 
-      <CombinedShapeProperties
-        appState={appState}
-        renderAction={renderAction}
-        setAppState={setAppState}
-        targetElements={targetElements}
-        container={container}
-      />
-
-      <CombinedArrowProperties
-        appState={appState}
-        renderAction={renderAction}
-        setAppState={setAppState}
-        targetElements={targetElements}
-        container={container}
-        app={app}
-      />
+      {!hasSelectedTextLineLinks && (
+        <CombinedArrowProperties
+          appState={appState}
+          renderAction={renderAction}
+          setAppState={setAppState}
+          targetElements={targetElements}
+          container={container}
+          app={app}
+        />
+      )}
       {/* Linear Editor */}
-      {showLineEditorAction && (
+      {!hasSelectedTextLineLinks && showLineEditorAction && (
         <div className="compact-action-item">
           {renderAction("toggleLinearEditor")}
         </div>
       )}
 
       {/* Text Properties */}
-      {(appState.activeTool.type === "text" ||
-        targetElements.some(isTextElement)) && (
-        <>
-          <div className="compact-action-item">
-            {renderAction("changeFontFamily")}
-          </div>
-          <CombinedTextProperties
-            appState={appState}
-            renderAction={renderAction}
-            setAppState={setAppState}
-            targetElements={targetElements}
-            container={container}
-            elementsMap={elementsMap}
-          />
-        </>
-      )}
+      {!hasSelectedTextLineLinks &&
+        (appState.activeTool.type === "text" ||
+          targetElements.some(isTextElement)) && (
+          <>
+            <div className="compact-action-item">
+              {renderAction("changeFontFamily")}
+            </div>
+            <CombinedTextProperties
+              appState={appState}
+              renderAction={renderAction}
+              setAppState={setAppState}
+              targetElements={targetElements}
+              container={container}
+              elementsMap={elementsMap}
+            />
+          </>
+        )}
 
       {/* Dedicated Copy Button */}
-      {!isEditingTextOrNewElement && targetElements.length > 0 && (
-        <div className="compact-action-item">
-          {renderAction("duplicateSelection")}
-        </div>
-      )}
+      {!hasSelectedTextLineLinks &&
+        !isEditingTextOrNewElement &&
+        targetElements.length > 0 && (
+          <div className="compact-action-item">
+            {renderAction("duplicateSelection")}
+          </div>
+        )}
 
       {/* Dedicated Delete Button */}
-      {!isEditingTextOrNewElement && targetElements.length > 0 && (
-        <div className="compact-action-item">
-          {renderAction("deleteSelectedElements")}
-        </div>
-      )}
+      {!hasSelectedTextLineLinks &&
+        !isEditingTextOrNewElement &&
+        targetElements.length > 0 && (
+          <div className="compact-action-item">
+            {renderAction("deleteSelectedElements")}
+          </div>
+        )}
 
-      <CombinedExtraActions
-        appState={appState}
-        renderAction={renderAction}
-        targetElements={targetElements}
-        setAppState={setAppState}
-        container={container}
-        app={app}
-      />
+      {!hasSelectedTextLineLinks && (
+        <CombinedExtraActions
+          appState={appState}
+          renderAction={renderAction}
+          targetElements={targetElements}
+          setAppState={setAppState}
+          container={container}
+          app={app}
+        />
+      )}
     </div>
   );
 };
@@ -911,6 +1046,9 @@ export const MobileShapeActions = ({
   const targetElements = getTargetElements(elementsMap, appState);
   const { container } = useExcalidrawContainer();
   const mobileActionsRef = useRef<HTMLDivElement>(null);
+  const hasSelectedTextLineLinks = !!Object.keys(
+    appState.selectedTextLineLinkIds,
+  ).length;
 
   const ACTIONS_WIDTH =
     mobileActionsRef.current?.getBoundingClientRect()?.width ?? 0;
@@ -928,6 +1066,46 @@ export const MobileShapeActions = ({
   const showDeleteOutside = ACTIONS_WIDTH >= MIN_WIDTH + ADDITIONAL_WIDTH;
   const showDuplicateOutside =
     ACTIONS_WIDTH >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
+
+  //添加按住左键拉框,可以选中文本框的功能2026.03.21
+  const textLineLinkMobileActions = hasSelectedTextLineLinks ? (
+    <>
+      <div className={clsx("compact-action-item")}>
+        <ColorPicker
+          topPicks={TEXT_BOX_DECORATIONS_COLOR_TOP_PICKS}
+          label={t("labels.stroke")}
+          type="textBoxDecorations"
+          color={appState.textBoxDecorationsColor}
+          onChange={(color) => setAppState({ textBoxDecorationsColor: color })}
+          elements={targetElements}
+          appState={appState as AppState}
+          updateData={(data?: any) => setAppState(data)}
+          variant="triggerOnly"
+        />
+      </div>
+      <div className={clsx("compact-action-item")}>
+        {renderAction("changeTextSelectionUnderlineColor")}
+      </div>
+      <div className={clsx("compact-action-item")}>
+        {renderAction("changeTextSelectionBackgroundColor")}
+      </div>
+      <div className="compact-action-item">
+        {renderAction("changeFontFamily")}
+      </div>
+      <CombinedTextProperties
+        appState={appState}
+        renderAction={renderAction}
+        setAppState={setAppState}
+        targetElements={targetElements}
+        container={container}
+        elementsMap={elementsMap}
+        forceShowTextProperties
+      />
+      <div className="compact-action-item">
+        {renderAction("deleteSelectedElements")}
+      </div>
+    </>
+  ) : null;
 
   return (
     <Island
@@ -954,32 +1132,39 @@ export const MobileShapeActions = ({
           flex: 1,
         }}
       >
-        {canChangeStrokeColor(appState, targetElements) && (
-          <div className={clsx("compact-action-item")}>
-            {renderAction("changeStrokeColor")}
-          </div>
+        {textLineLinkMobileActions}
+        {!hasSelectedTextLineLinks &&
+          canChangeStrokeColor(appState, targetElements) && (
+            <div className={clsx("compact-action-item")}>
+              {renderAction("changeStrokeColor")}
+            </div>
+          )}
+        {!hasSelectedTextLineLinks &&
+          canChangeBackgroundColor(appState, targetElements) && (
+            <div className="compact-action-item">
+              {renderAction("changeBackgroundColor")}
+            </div>
+          )}
+        {!hasSelectedTextLineLinks && (
+          <CombinedShapeProperties
+            appState={appState}
+            renderAction={renderAction}
+            setAppState={setAppState}
+            targetElements={targetElements}
+            container={container}
+          />
         )}
-        {canChangeBackgroundColor(appState, targetElements) && (
-          <div className="compact-action-item">
-            {renderAction("changeBackgroundColor")}
-          </div>
-        )}
-        <CombinedShapeProperties
-          appState={appState}
-          renderAction={renderAction}
-          setAppState={setAppState}
-          targetElements={targetElements}
-          container={container}
-        />
         {/* Combined Arrow Properties */}
-        <CombinedArrowProperties
-          appState={appState}
-          renderAction={renderAction}
-          setAppState={setAppState}
-          targetElements={targetElements}
-          container={container}
-          app={app}
-        />
+        {!hasSelectedTextLineLinks && (
+          <CombinedArrowProperties
+            appState={appState}
+            renderAction={renderAction}
+            setAppState={setAppState}
+            targetElements={targetElements}
+            container={container}
+            app={app}
+          />
+        )}
         {/* Linear Editor */}
         <LinearEditorAction
           appState={appState}
@@ -987,34 +1172,37 @@ export const MobileShapeActions = ({
           targetElements={targetElements}
         />
         {/* Text Properties */}
-        {(appState.activeTool.type === "text" ||
-          targetElements.some(isTextElement)) && (
-          <>
-            <div className="compact-action-item">
-              {renderAction("changeFontFamily")}
-            </div>
-            <CombinedTextProperties
-              appState={appState}
-              renderAction={renderAction}
-              setAppState={setAppState}
-              targetElements={targetElements}
-              container={container}
-              elementsMap={elementsMap}
-            />
-          </>
-        )}
+        {!hasSelectedTextLineLinks &&
+          (appState.activeTool.type === "text" ||
+            targetElements.some(isTextElement)) && (
+            <>
+              <div className="compact-action-item">
+                {renderAction("changeFontFamily")}
+              </div>
+              <CombinedTextProperties
+                appState={appState}
+                renderAction={renderAction}
+                setAppState={setAppState}
+                targetElements={targetElements}
+                container={container}
+                elementsMap={elementsMap}
+              />
+            </>
+          )}
 
         {/* Combined Other Actions */}
-        <CombinedExtraActions
-          appState={appState}
-          renderAction={renderAction}
-          targetElements={targetElements}
-          setAppState={setAppState}
-          container={container}
-          app={app}
-          showDuplicate={!showDuplicateOutside}
-          showDelete={!showDeleteOutside}
-        />
+        {!hasSelectedTextLineLinks && (
+          <CombinedExtraActions
+            appState={appState}
+            renderAction={renderAction}
+            targetElements={targetElements}
+            setAppState={setAppState}
+            container={container}
+            app={app}
+            showDuplicate={!showDuplicateOutside}
+            showDelete={!showDeleteOutside}
+          />
+        )}
       </div>
       <div
         style={{

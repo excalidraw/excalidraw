@@ -344,6 +344,7 @@ describe("AppStateDelta", () => {
       const commonAppState = {
         viewBackgroundColor: "#ffffff",
         selectedElementIds: {},
+        selectedTextLineLinkIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
         croppingElementId: null,
@@ -393,6 +394,7 @@ describe("AppStateDelta", () => {
         selectedLinearElement: null,
         activeLockedId: null,
         lockedMultiSelections: {},
+        selectedTextLineLinkIds: {},
       };
 
       const prevAppState1: ObservedAppState = {
@@ -439,6 +441,7 @@ describe("AppStateDelta", () => {
         selectedLinearElement: null,
         activeLockedId: null,
         lockedMultiSelections: {},
+        selectedTextLineLinkIds: {},
       };
 
       const prevAppState1: ObservedAppState = {

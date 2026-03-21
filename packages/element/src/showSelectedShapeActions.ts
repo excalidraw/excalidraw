@@ -18,5 +18,7 @@ export const showSelectedShapeActions = (
             appState.activeTool.type !== "eraser" &&
             appState.activeTool.type !== "hand" &&
             appState.activeTool.type !== "laser"))) ||
-        getSelectedElements(elements, appState).length),
+        getSelectedElements(elements, appState).length ||
+        //添加按住左键拉框,可以选中文本框的功能2026.03.21
+        !!Object.keys(appState.selectedTextLineLinkIds).length),
   );

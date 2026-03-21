@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import { getFontString, randomId } from "@excalidraw/common";
+import {
+  getFontFamilyString,
+  getFontString,
+  randomId,
+} from "@excalidraw/common";
 
 import {
   getLineHeightInPx,
@@ -17,9 +21,7 @@ import type {
 } from "../../types";
 
 const SELF_LINK_ARC_ANGLE_RAD = Math.PI / 6;
-const LINE_NUMBER_FONT_FAMILY = 'Cascadia, monospace, "Segoe UI Emoji"';
-const LINE_NUMBER_PADDING_X = 6;
-const LINE_NUMBER_GAP_FACTOR = 0.35;
+const LINE_NUMBER_PADDING_X = 2;
 
 const measureCanvas = document.createElement("canvas");
 const measureContext = measureCanvas.getContext("2d")!;
@@ -34,6 +36,7 @@ type LineNumberButtonItem = {
   anchorXScene: number;
   anchorYScene: number;
   fontSizeScene: number;
+  fontFamilyScene: string;
   lineHeightScene: number;
   label: string;
 };
@@ -115,6 +118,32 @@ const TextLineNumbersOverlay = ({
     >
   >(new Map());
 
+  const borderBoxes = useMemo(() => {
+    if (isDisabled) {
+      return [];
+    }
+    const out: Array<{
+      elementId: string;
+      leftScene: number;
+      topScene: number;
+      widthScene: number;
+      heightScene: number;
+    }> = [];
+    for (const element of visibleElements) {
+      if (!isTextElement(element) || element.angle) {
+        continue;
+      }
+      out.push({
+        elementId: element.id,
+        leftScene: element.x,
+        topScene: element.y,
+        widthScene: element.width,
+        heightScene: element.height,
+      });
+    }
+    return out;
+  }, [isDisabled, visibleElements]);
+
   const items = useMemo(() => {
     if (isDisabled) {
       return [];
@@ -164,9 +193,11 @@ const TextLineNumbersOverlay = ({
         element.lineHeight,
       );
       const fontSizeScene = element.fontSize;
-      const gapScene = Math.max(6, fontSizeScene * LINE_NUMBER_GAP_FACTOR);
-      const anchorXLeftScene = element.x - gapScene;
-      const anchorXRightScene = element.x + element.width + gapScene;
+      const fontFamilyScene = getFontFamilyString({
+        fontFamily: element.fontFamily,
+      });
+      const anchorXLeftScene = element.x;
+      const anchorXRightScene = element.x + element.width;
 
       const map = new Map<string, LineNumberButtonItem>();
 
@@ -174,24 +205,29 @@ const TextLineNumbersOverlay = ({
         const anchorYScene = yCenterScene;
         const topScene = anchorYScene - lineHeightScene / 2;
         const label = String(lineNumber);
-        measureContext.font = `${fontSizeScene}px ${LINE_NUMBER_FONT_FAMILY}`;
+        measureContext.font = `${fontSizeScene}px ${fontFamilyScene}`;
         const widthScene = Math.max(
           1,
           Math.ceil(measureContext.measureText(label).width) +
             LINE_NUMBER_PADDING_X * 2,
         );
+        const leftScene = anchorXLeftScene - widthScene;
+        const rightScene = anchorXRightScene;
+        const anchorXLeftCenterScene = leftScene + widthScene / 2;
+        const anchorXRightCenterScene = rightScene + widthScene / 2;
         const leftKey = `${element.id}:left:${lineNumber}`;
         if (!map.has(leftKey)) {
           map.set(leftKey, {
             elementId: element.id,
             side: "left",
             lineNumber,
-            leftScene: anchorXLeftScene - widthScene,
+            leftScene,
             topScene,
             widthScene,
-            anchorXScene: anchorXLeftScene,
+            anchorXScene: anchorXLeftCenterScene,
             anchorYScene,
             fontSizeScene,
+            fontFamilyScene,
             lineHeightScene,
             label,
           });
@@ -202,12 +238,13 @@ const TextLineNumbersOverlay = ({
             elementId: element.id,
             side: "right",
             lineNumber,
-            leftScene: anchorXRightScene,
+            leftScene: rightScene,
             topScene,
             widthScene,
-            anchorXScene: anchorXRightScene,
+            anchorXScene: anchorXRightCenterScene,
             anchorYScene,
             fontSizeScene,
+            fontFamilyScene,
             lineHeightScene,
             label,
           });
@@ -319,6 +356,15 @@ const TextLineNumbersOverlay = ({
           draft.lineNumber !== endpoint.lineNumber ||
           draft.side !== endpoint.side)
       ) {
+        if (
+          draft.elementId === endpoint.elementId &&
+          draft.lineNumber === endpoint.lineNumber
+        ) {
+          return {
+            textLineLinks: state.textLineLinks,
+            textLineLinkDraft: draft,
+          };
+        }
         return {
           textLineLinks: state.textLineLinks.concat({
             id: randomId(),
@@ -430,6 +476,18 @@ const TextLineNumbersOverlay = ({
           willChange: "transform",
         }}
       >
+        {borderBoxes.map((box) => (
+          <div
+            key={box.elementId}
+            className="excalidraw__textLineNumbersOverlay__textBorder"
+            style={{
+              left: box.leftScene,
+              top: box.topScene,
+              width: `${box.widthScene}px`,
+              height: `${box.heightScene}px`,
+            }}
+          />
+        ))}
         {items.map((item, idx) => {
           const isDraft =
             !!appState.textLineLinkDraft &&
@@ -464,6 +522,7 @@ const TextLineNumbersOverlay = ({
                 top: item.topScene,
                 width: `${item.widthScene}px`,
                 fontSize: item.fontSizeScene,
+                fontFamily: item.fontFamilyScene,
                 height: `${item.lineHeightScene}px`,
                 lineHeight: `${item.lineHeightScene}px`,
               }}

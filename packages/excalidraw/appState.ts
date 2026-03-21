@@ -90,6 +90,7 @@ export const getDefaultAppState = (): Omit<
     scrollX: 0,
     scrollY: 0,
     selectedElementIds: {},
+    selectedTextLineLinkIds: {},
     hoveredElementIds: {},
     selectedGroupIds: {},
     selectedElementsAreBeingDragged: false,
@@ -227,6 +228,7 @@ const APP_STATE_STORAGE_CONF = (<
   scrollX: { browser: true, export: false, server: false },
   scrollY: { browser: true, export: false, server: false },
   selectedElementIds: { browser: true, export: false, server: false },
+  selectedTextLineLinkIds: { browser: true, export: false, server: false },
   hoveredElementIds: { browser: false, export: false, server: false },
   selectedGroupIds: { browser: true, export: false, server: false },
   selectedElementsAreBeingDragged: {

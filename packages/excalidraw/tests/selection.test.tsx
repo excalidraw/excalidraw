@@ -158,6 +158,50 @@ describe("box-selection", () => {
     mouse.up();
     assertSelectedElements([image1.id]);
   });
+
+  it("should box-select text line links when not selecting any elements", async () => {
+    const text1 = API.createElement({
+      type: "text",
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 40,
+      fontSize: 20,
+      text: "hello",
+    });
+    const text2 = API.createElement({
+      type: "text",
+      x: 400,
+      y: 100,
+      width: 200,
+      height: 40,
+      fontSize: 20,
+      text: "world",
+    });
+
+    API.setElements([text1, text2]);
+
+    const link = {
+      id: "link-1",
+      from: { elementId: text1.id, lineNumber: 1, side: "right" as const },
+      to: { elementId: text2.id, lineNumber: 1, side: "left" as const },
+    };
+
+    API.setAppState({
+      textLineLinks: [link],
+      selectedTextLineLinkIds: {},
+      selectedElementIds: {},
+      selectedGroupIds: {},
+    });
+
+    mouse.downAt(320, 90);
+    mouse.move(-1000, -1000);
+    mouse.moveTo(380, 130);
+    mouse.up();
+
+    expect(h.state.selectedElementIds).toEqual({});
+    expect(h.state.selectedTextLineLinkIds).toEqual({ [link.id]: true });
+  });
 });
 
 describe("inner box-selection", () => {

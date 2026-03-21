@@ -201,6 +201,7 @@ export type StaticCanvasAppState = Readonly<
     viewBackgroundColor: AppState["viewBackgroundColor"] | null;
     //连接后不缩放行号连接线不可见的问题2026.03.21
     textLineLinks: AppState["textLineLinks"];
+    selectedTextLineLinkIds: AppState["selectedTextLineLinkIds"];
     exportScale: AppState["exportScale"];
     selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
     gridSize: AppState["gridSize"];
@@ -265,6 +266,7 @@ export type ObservedStandaloneAppState = {
 export type ObservedElementsAppState = {
   editingGroupId: AppState["editingGroupId"];
   selectedElementIds: AppState["selectedElementIds"];
+  selectedTextLineLinkIds: AppState["selectedTextLineLinkIds"];
   selectedGroupIds: AppState["selectedGroupIds"];
   selectedLinearElement: {
     elementId: LinearElementEditor["elementId"];
@@ -434,6 +436,7 @@ export interface AppState {
 
   lastPointerDownWith: PointerType;
   selectedElementIds: Readonly<{ [id: string]: true }>;
+  selectedTextLineLinkIds: Readonly<{ [id: string]: true }>;
   hoveredElementIds: Readonly<{ [id: string]: true }>;
   previousSelectedElementIds: { [id: string]: true };
   selectedElementsAreBeingDragged: boolean;

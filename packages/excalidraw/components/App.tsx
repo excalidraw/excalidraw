@@ -62,6 +62,7 @@ import {
   getLineHeight,
   debounce,
   distance,
+  getFontFamilyString,
   getFontString,
   getVerticalOffset,
   getNearestScrollableContainer,
@@ -285,6 +286,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   SceneElementsMap,
+  NonDeletedSceneElementsMap,
   ExcalidrawBindableElement,
 } from "@excalidraw/element/types";
 
@@ -10936,18 +10938,73 @@ class App extends React.Component<AppProps, AppState> {
         isCropping,
       } = this.state;
 
-      this.setState((prevState) => ({
-        isResizing: false,
-        isRotating: false,
-        isCropping: false,
-        resizingElement: null,
-        selectionElement: null,
-        frameToHighlight: null,
-        elementsToHighlight: null,
-        cursorButton: "up",
-        snapLines: updateStable(prevState.snapLines, []),
-        originSnapOffset: null,
-      }));
+      const selectionElement = this.state.selectionElement;
+      const shouldComputeTextLineLinkSelection =
+        activeTool.type === "selection" &&
+        pointerDownState.boxSelection.hasOccurred &&
+        !!selectionElement;
+      const elementsInSelection = shouldComputeTextLineLinkSelection
+        ? pointerDownState.withCmdOrCtrl
+          ? getElementsWithinSelection(
+              this.scene.getNonDeletedElements(),
+              selectionElement!,
+              elementsMap,
+            )
+          : getElementsOverlappingSelection(
+              this.scene.getNonDeletedElements(),
+              selectionElement!,
+              elementsMap,
+              true,
+            )
+        : [];
+      const nextSelectedTextLineLinkIds = shouldComputeTextLineLinkSelection
+        ? this.getSelectedTextLineLinkIdsInSelection(
+            selectionElement!,
+            elementsMap,
+            pointerDownState.withCmdOrCtrl,
+          )
+        : {};
+      const shouldSelectTextLineLinks =
+        shouldComputeTextLineLinkSelection &&
+        !elementsInSelection.length &&
+        !!Object.keys(nextSelectedTextLineLinkIds).length;
+
+      this.setState((prevState) => {
+        const base = {
+          isResizing: false,
+          isRotating: false,
+          isCropping: false,
+          resizingElement: null,
+          selectionElement: null,
+          frameToHighlight: null,
+          elementsToHighlight: null,
+          cursorButton: "up" as const,
+          snapLines: updateStable(prevState.snapLines, []),
+          originSnapOffset: null,
+          selectedElementIds: prevState.selectedElementIds,
+          selectedGroupIds: prevState.selectedGroupIds,
+          editingGroupId: prevState.editingGroupId,
+          selectedLinearElement: prevState.selectedLinearElement,
+          selectedTextLineLinkIds: shouldComputeTextLineLinkSelection
+            ? makeNextSelectedElementIds(
+                shouldSelectTextLineLinks ? nextSelectedTextLineLinkIds : {},
+                prevState,
+              )
+            : prevState.selectedTextLineLinkIds,
+        };
+
+        if (!shouldSelectTextLineLinks) {
+          return base;
+        }
+
+        return {
+          ...base,
+          selectedElementIds: makeNextSelectedElementIds({}, prevState),
+          selectedGroupIds: {},
+          editingGroupId: null,
+          selectedLinearElement: null,
+        };
+      });
 
       // just in case, tool changes mid drag, always clean up
       this.lassoTrail.endPath();
@@ -12281,6 +12338,7 @@ class App extends React.Component<AppProps, AppState> {
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: makeNextSelectedElementIds({}, prevState),
+      selectedTextLineLinkIds: makeNextSelectedElementIds({}, prevState),
       activeEmbeddable: null,
       selectedGroupIds: {},
       // Continue editing the same group if the user selected a different
@@ -12294,10 +12352,244 @@ class App extends React.Component<AppProps, AppState> {
     }));
     this.setState({
       selectedElementIds: makeNextSelectedElementIds({}, this.state),
+      selectedTextLineLinkIds: makeNextSelectedElementIds({}, this.state),
       activeEmbeddable: null,
       previousSelectedElementIds: this.state.selectedElementIds,
       selectedLinearElement: null,
     });
+  }
+
+  private getSelectedTextLineLinkIdsInSelection(
+    selectionElement: { x: number; y: number; width: number; height: number },
+    elementsMap: NonDeletedSceneElementsMap,
+    shouldSelectWithin: boolean,
+  ): Record<string, true> {
+    const SELF_LINK_ARC_ANGLE_RAD = Math.PI / 6;
+
+    const x1 = Math.min(
+      selectionElement.x,
+      selectionElement.x + selectionElement.width,
+    );
+    const y1 = Math.min(
+      selectionElement.y,
+      selectionElement.y + selectionElement.height,
+    );
+    const x2 = Math.max(
+      selectionElement.x,
+      selectionElement.x + selectionElement.width,
+    );
+    const y2 = Math.max(
+      selectionElement.y,
+      selectionElement.y + selectionElement.height,
+    );
+
+    const isPointInside = (x: number, y: number) =>
+      x >= x1 && x <= x2 && y >= y1 && y <= y2;
+
+    const orientation = (
+      ax: number,
+      ay: number,
+      bx: number,
+      by: number,
+      cx: number,
+      cy: number,
+    ) => {
+      const v = (by - ay) * (cx - bx) - (bx - ax) * (cy - by);
+      if (v === 0) {
+        return 0;
+      }
+      return v > 0 ? 1 : 2;
+    };
+
+    const onSegment = (
+      ax: number,
+      ay: number,
+      bx: number,
+      by: number,
+      cx: number,
+      cy: number,
+    ) => {
+      return (
+        cx <= Math.max(ax, bx) &&
+        cx >= Math.min(ax, bx) &&
+        cy <= Math.max(ay, by) &&
+        cy >= Math.min(ay, by)
+      );
+    };
+
+    const segmentsIntersect = (
+      ax: number,
+      ay: number,
+      bx: number,
+      by: number,
+      cx: number,
+      cy: number,
+      dx: number,
+      dy: number,
+    ) => {
+      const o1 = orientation(ax, ay, bx, by, cx, cy);
+      const o2 = orientation(ax, ay, bx, by, dx, dy);
+      const o3 = orientation(cx, cy, dx, dy, ax, ay);
+      const o4 = orientation(cx, cy, dx, dy, bx, by);
+
+      if (o1 !== o2 && o3 !== o4) {
+        return true;
+      }
+
+      if (o1 === 0 && onSegment(ax, ay, bx, by, cx, cy)) {
+        return true;
+      }
+      if (o2 === 0 && onSegment(ax, ay, bx, by, dx, dy)) {
+        return true;
+      }
+      if (o3 === 0 && onSegment(cx, cy, dx, dy, ax, ay)) {
+        return true;
+      }
+      if (o4 === 0 && onSegment(cx, cy, dx, dy, bx, by)) {
+        return true;
+      }
+      return false;
+    };
+
+    const segmentIntersectsRect = (
+      ax: number,
+      ay: number,
+      bx: number,
+      by: number,
+    ) => {
+      if (isPointInside(ax, ay) || isPointInside(bx, by)) {
+        return true;
+      }
+      return (
+        segmentsIntersect(ax, ay, bx, by, x1, y1, x2, y1) ||
+        segmentsIntersect(ax, ay, bx, by, x2, y1, x2, y2) ||
+        segmentsIntersect(ax, ay, bx, by, x2, y2, x1, y2) ||
+        segmentsIntersect(ax, ay, bx, by, x1, y2, x1, y1)
+      );
+    };
+
+    const getOriginalText = (element: any) =>
+      typeof element?.originalText === "string"
+        ? element.originalText
+        : element.text;
+
+    const resolveAnchor = (
+      endpoint: import("../types").TextLineLinkEndpoint,
+    ): { x: number; y: number } | null => {
+      const element = elementsMap.get(endpoint.elementId);
+      if (!element || !isTextElement(element) || element.angle) {
+        return null;
+      }
+      const originalText = getOriginalText(element);
+      const lineHeightPx = getLineHeightInPx(
+        element.fontSize,
+        element.lineHeight,
+      );
+      const maxLineNumber = Math.max(1, originalText.split("\n").length);
+      const targetLineNumber = Math.min(
+        maxLineNumber,
+        Math.max(1, Math.floor(endpoint.lineNumber)),
+      );
+      const LINE_NUMBER_PADDING_X = 2;
+      const label = String(targetLineNumber);
+      const fontFamilyScene = getFontFamilyString({
+        fontFamily: (element as any).fontFamily,
+      });
+      const ctx = document.createElement("canvas").getContext("2d");
+      const measuredTextWidth = ctx
+        ? (() => {
+            const prevFont = ctx.font;
+            ctx.font = `${element.fontSize}px ${fontFamilyScene}`;
+            const w = ctx.measureText(label).width;
+            ctx.font = prevFont;
+            return w;
+          })()
+        : label.length * element.fontSize * 0.6;
+      const widthScene =
+        Math.ceil(measuredTextWidth) + LINE_NUMBER_PADDING_X * 2;
+      const leftScene =
+        endpoint.side === "left"
+          ? element.x - widthScene
+          : element.x + element.width;
+      const x = leftScene + widthScene / 2;
+
+      if (originalText.length > 8000) {
+        const y =
+          element.y + (targetLineNumber - 1) * lineHeightPx + lineHeightPx / 2;
+        return { x, y };
+      }
+
+      const font = getFontString(element);
+      const { lines, explicitNewlineAfterLine } =
+        wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
+          originalText,
+          font,
+          element.width,
+        );
+      let currentLineNumber = 1;
+      for (let i = 0; i < lines.length; i++) {
+        if (i > 0 && explicitNewlineAfterLine[i - 1]) {
+          currentLineNumber += 1;
+        }
+        const isLogicalLineStart = i === 0 || !!explicitNewlineAfterLine[i - 1];
+        if (isLogicalLineStart && currentLineNumber === targetLineNumber) {
+          const y = element.y + i * lineHeightPx + lineHeightPx / 2;
+          return { x, y };
+        }
+      }
+      return null;
+    };
+
+    const selected: Record<string, true> = {};
+
+    for (const link of this.state.textLineLinks) {
+      const from = resolveAnchor(link.from);
+      const to = resolveAnchor(link.to);
+      if (!from || !to) {
+        continue;
+      }
+
+      if (shouldSelectWithin) {
+        if (isPointInside(from.x, from.y) && isPointInside(to.x, to.y)) {
+          selected[link.id] = true;
+        }
+        continue;
+      }
+
+      if (link.from.elementId === link.to.elementId) {
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        const midX = (from.x + to.x) / 2;
+        const midY = (from.y + to.y) / 2;
+        const perpX = -dy / dist;
+        const perpY = dx / dist;
+        const offset = (dist / 2) * Math.tan(SELF_LINK_ARC_ANGLE_RAD);
+        const c1x = midX + perpX * offset;
+        const c1y = midY + perpY * offset;
+        const c2x = midX - perpX * offset;
+        const c2y = midY - perpY * offset;
+
+        const desiredSide =
+          link.from.side === "right" || link.to.side === "right"
+            ? "right"
+            : "left";
+        const preferFirst = desiredSide === "right" ? c1x >= c2x : c1x <= c2x;
+        const cx = preferFirst ? c1x : c2x;
+        const cy = preferFirst ? c1y : c2y;
+
+        if (
+          segmentIntersectsRect(from.x, from.y, cx, cy) ||
+          segmentIntersectsRect(cx, cy, to.x, to.y)
+        ) {
+          selected[link.id] = true;
+        }
+      } else if (segmentIntersectsRect(from.x, from.y, to.x, to.y)) {
+        selected[link.id] = true;
+      }
+    }
+
+    return selected;
   }
 
   private handleInteractiveCanvasRef = (canvas: HTMLCanvasElement | null) => {

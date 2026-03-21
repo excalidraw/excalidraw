@@ -3,6 +3,7 @@ import {
   FRAME_STYLE,
   THEME,
   throttleRAF,
+  getFontFamilyString,
   getFontString,
 } from "@excalidraw/common";
 import { isElementLink } from "@excalidraw/element";
@@ -227,12 +228,10 @@ const renderTextLineLinks = ({
   allElementsMap: NonDeletedSceneElementsMap;
 }) => {
   const SELF_LINK_ARC_ANGLE_RAD = Math.PI / 6;
-  const LINE_NUMBER_GAP_FACTOR = 0.35;
+  const LINE_NUMBER_PADDING_X = 2;
 
-  const links = (appState as any).textLineLinks as
-    | import("../types").TextLineLink[]
-    | undefined;
-  if (!links?.length) {
+  const links = appState.textLineLinks;
+  if (!links.length) {
     return;
   }
 
@@ -265,6 +264,15 @@ const renderTextLineLinks = ({
       maxLineNumber,
       Math.max(1, Math.floor(endpoint.lineNumber)),
     );
+    const label = String(targetLineNumber);
+    const fontFamilyScene = getFontFamilyString({
+      fontFamily: (element as any).fontFamily,
+    });
+    const prevFont = context.font;
+    context.font = `${element.fontSize}px ${fontFamilyScene}`;
+    const widthScene =
+      Math.ceil(context.measureText(label).width) + LINE_NUMBER_PADDING_X * 2;
+    context.font = prevFont;
 
     let currentLineNumber = 1;
     for (let i = 0; i < lines.length; i++) {
@@ -274,11 +282,11 @@ const renderTextLineLinks = ({
       const isLogicalLineStart = i === 0 || !!explicitNewlineAfterLine[i - 1];
       if (isLogicalLineStart && currentLineNumber === targetLineNumber) {
         const y = element.y + i * lineHeightPx + lineHeightPx / 2;
-        const gapScene = Math.max(6, element.fontSize * LINE_NUMBER_GAP_FACTOR);
-        const x =
+        const leftScene =
           endpoint.side === "left"
-            ? element.x - gapScene
-            : element.x + element.width + gapScene;
+            ? element.x - widthScene
+            : element.x + element.width;
+        const x = leftScene + widthScene / 2;
         return { x, y };
       }
     }
@@ -287,16 +295,19 @@ const renderTextLineLinks = ({
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  context.lineWidth = 1 / appState.zoom.value;
-  context.strokeStyle = appState.textBoxDecorationsColor ?? "#a8a8a8";
   context.setLineDash([]);
 
   for (const link of links) {
+    const isSelected = !!appState.selectedTextLineLinkIds[link.id];
     const from = resolveAnchor(link.from);
     const to = resolveAnchor(link.to);
     if (!from || !to) {
       continue;
     }
+    context.lineWidth = (isSelected ? 2 : 1) / appState.zoom.value;
+    context.strokeStyle = isSelected
+      ? "#6965db"
+      : appState.textBoxDecorationsColor ?? "#a8a8a8";
     context.beginPath();
     context.moveTo(from.x, from.y);
     if (link.from.elementId === link.to.elementId) {

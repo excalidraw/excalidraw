@@ -187,13 +187,12 @@ body.excalidraw-cursor-resize * {
     pointer-events: auto;
     background: transparent;
     border: 0;
-    padding: 0 6px;
+    padding: 0 2px;
     margin: 0;
     color: inherit;
     cursor: crosshair;
     user-select: none;
     box-sizing: border-box;
-    font-family: Cascadia, monospace, "Segoe UI Emoji";
     font-variant-numeric: tabular-nums;
   }
 
@@ -203,6 +202,14 @@ body.excalidraw-cursor-resize * {
 
   &__textLineNumberButton--right {
     text-align: left;
+  }
+
+  &__textLineNumbersOverlay__textBorder {
+    position: absolute;
+    pointer-events: none;
+    box-sizing: border-box;
+    border: 1px dashed var(--text-box-decorations-color);
+    opacity: var(--text-box-decorations-opacity);
   }
 
   &__textLineNumberButton.is-draft {
