@@ -789,27 +789,41 @@ export const getArrowheadPoints = (
     p0 = pointFrom(prevOp.data[4], prevOp.data[5]);
   }
 
-  // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
-  const equation = (t: number, idx: number) =>
-    Math.pow(1 - t, 3) * p3[idx] +
-    3 * t * Math.pow(1 - t, 2) * p2[idx] +
-    3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
-    p0[idx] * Math.pow(t, 3);
-
-  // Ee know the last point of the arrow (or the first, if start arrowhead).
+  // We know the last point of the arrow (or the first, if start arrowhead).
   const [x2, y2] = position === "start" ? p0 : p3;
 
-  // By using cubic bezier equation (B(t)) and the given parameters,
-  // we calculate a point that is closer to the last point.
-  // The value 0.3 is chosen arbitrarily and it works best for all
-  // the tested cases.
-  const [x1, y1] = [equation(0.3, 0), equation(0.3, 1)];
-
-  // Find the normalized direction vector based on the
-  // previously calculated points.
-  const distance = Math.hypot(x2 - x1, y2 - y1);
-  const nx = (x2 - x1) / distance;
-  const ny = (y2 - y1) / distance;
+  // Use the analytic tangent at the Bézier endpoint for a precise arrowhead
+  // direction. For a cubic Bézier B(t) with control points p0p3:
+  //   B'(1): (p3 − p2) tangent at the end
+  //   B'(0): (p1 − p0) for start arrowhead, arrow points away: (p0 − p1)
+  let dx: number;
+  let dy: number;
+  if (position === "end") {
+    dx = p3[0] - p2[0];
+    dy = p3[1] - p2[1];
+    if (Math.hypot(dx, dy) < 1e-6) {
+      dx = p3[0] - p1[0];
+      dy = p3[1] - p1[1];
+    }
+    if (Math.hypot(dx, dy) < 1e-6) {
+      dx = p3[0] - p0[0];
+      dy = p3[1] - p0[1];
+    }
+  } else {
+    dx = p0[0] - p1[0];
+    dy = p0[1] - p1[1];
+    if (Math.hypot(dx, dy) < 1e-6) {
+      dx = p0[0] - p2[0];
+      dy = p0[1] - p2[1];
+    }
+    if (Math.hypot(dx, dy) < 1e-6) {
+      dx = p0[0] - p3[0];
+      dy = p0[1] - p3[1];
+    }
+  }
+  const distance = Math.hypot(dx, dy);
+  const nx = dx / distance;
+  const ny = dy / distance;
 
   const size = getArrowheadSize(arrowhead);
 
