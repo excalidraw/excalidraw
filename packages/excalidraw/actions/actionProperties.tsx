@@ -344,6 +344,82 @@ export const actionChangeStrokeColor = register<
   },
   PanelComponent: ({ elements, appState, updateData, app, renderAction }) => {
     const { stylesPanelMode } = getStylesPanelInfo(app);
+    const applyTextSelectionDecoration = (
+      kind: "background" | "underline",
+      color: string,
+    ) => {
+      if (!appState.editingTextElement) {
+        return;
+      }
+      temporarilyDisableTextEditorBlur();
+      const saved = saveCaretPosition();
+      const editor = document.querySelector(
+        ".excalidraw-wysiwyg",
+      ) as HTMLTextAreaElement | null;
+      if (!editor) {
+        return;
+      }
+      const start = editor.selectionStart ?? 0;
+      const end = editor.selectionEnd ?? 0;
+      if (start === end) {
+        restoreCaretPosition(saved);
+        return;
+      }
+      (app as any).actionManager.executeAction(
+        kind === "background"
+          ? actionApplyTextSelectionBackground
+          : actionApplyTextSelectionUnderline,
+        "ui",
+        { start, end, color },
+      );
+      restoreCaretPosition(saved);
+    };
+
+    const renderTextSelectionDecorationSection = (
+      kind: "background" | "underline",
+    ) => {
+      const label =
+        kind === "background"
+          ? t("labels.textSelectionBackground")
+          : t("labels.textSelectionUnderline");
+      const type =
+        kind === "background"
+          ? "textSelectionBackground"
+          : "textSelectionUnderline";
+      const currentColor =
+        kind === "background"
+          ? appState.textSelectionBackgroundColor
+          : appState.textSelectionUnderlineColor;
+
+      return (
+        <>
+          {stylesPanelMode === "full" && <h3 aria-hidden="true">{label}</h3>}
+          <ColorPicker
+            topPicks={TEXT_SELECTION_DECORATION_COLOR_TOP_PICKS}
+            type={type}
+            label={label}
+            color={currentColor}
+            onChange={(color) =>
+              withCaretPositionPreservation(
+                () => {
+                  updateData(
+                    kind === "background"
+                      ? { textSelectionBackgroundColor: color }
+                      : { textSelectionUnderlineColor: color },
+                  );
+                  applyTextSelectionDecoration(kind, color);
+                },
+                false,
+                !!appState.editingTextElement,
+              )
+            }
+            elements={elements}
+            appState={appState}
+            updateData={updateData}
+          />
+        </>
+      );
+    };
 
     return (
       <>
@@ -367,21 +443,9 @@ export const actionChangeStrokeColor = register<
           elements={elements}
           appState={appState}
           updateData={updateData}
-          belowTrigger={
-            appState.editingTextElement ? (
-              <>
-                <div className="color-picker__below-trigger-row">
-                  {renderAction("changeTextSelectionBackgroundColor")}
-                  {renderAction("applyTextSelectionBackground")}
-                </div>
-                <div className="color-picker__below-trigger-row">
-                  {renderAction("changeTextSelectionUnderlineColor")}
-                  {renderAction("applyTextSelectionUnderline")}
-                </div>
-              </>
-            ) : null
-          }
         />
+        {renderTextSelectionDecorationSection("underline")}
+        {renderTextSelectionDecorationSection("background")}
       </>
     );
   },
@@ -698,9 +762,7 @@ export const actionApplyTextSelectionBackground = register<{
     };
   },
   PanelComponent: ({ appState, updateData }) => {
-    if (!appState.editingTextElement) {
-      return null;
-    }
+    const disabled = !appState.editingTextElement;
 
     const apply = () => {
       temporarilyDisableTextEditorBlur();
@@ -733,10 +795,13 @@ export const actionApplyTextSelectionBackground = register<{
         className="color-picker__action-button"
         aria-label="Set selected text background"
         title="Set selected text background"
+        disabled={disabled}
         onPointerDown={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          apply();
+          if (!disabled) {
+            apply();
+          }
         }}
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -782,9 +847,7 @@ export const actionApplyTextSelectionUnderline = register<{
     };
   },
   PanelComponent: ({ appState, updateData }) => {
-    if (!appState.editingTextElement) {
-      return null;
-    }
+    const disabled = !appState.editingTextElement;
 
     const apply = () => {
       temporarilyDisableTextEditorBlur();
@@ -817,10 +880,13 @@ export const actionApplyTextSelectionUnderline = register<{
         className="color-picker__action-button"
         aria-label="Underline selected text"
         title="Underline selected text"
+        disabled={disabled}
         onPointerDown={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          apply();
+          if (!disabled) {
+            apply();
+          }
         }}
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">

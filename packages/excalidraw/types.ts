@@ -207,6 +207,7 @@ export type StaticCanvasAppState = Readonly<
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
     hoveredElementIds: AppState["hoveredElementIds"];
     suggestedBinding: AppState["suggestedBinding"];
+    editingTextElement: AppState["editingTextElement"];
     // Cropping
     croppingElementId: AppState["croppingElementId"];
   }
@@ -270,6 +271,20 @@ export type ObservedElementsAppState = {
   croppingElementId: AppState["croppingElementId"];
   lockedMultiSelections: AppState["lockedMultiSelections"];
   activeLockedId: AppState["activeLockedId"];
+};
+
+export type TextLineLinkSide = "left" | "right";
+
+export type TextLineLinkEndpoint = {
+  elementId: ExcalidrawElement["id"];
+  lineNumber: number;
+  side: TextLineLinkSide;
+};
+
+export type TextLineLink = {
+  id: string;
+  from: TextLineLinkEndpoint;
+  to: TextLineLinkEndpoint;
 };
 
 export interface AppState {
@@ -372,6 +387,8 @@ export interface AppState {
   textEditorCaretColor: string;
   textSelectionBackgroundColor: string;
   textSelectionUnderlineColor: string;
+  textLineLinks: TextLineLink[];
+  textLineLinkDraft: TextLineLinkEndpoint | null;
   scrollX: number;
   scrollY: number;
   cursorButton: "up" | "down";

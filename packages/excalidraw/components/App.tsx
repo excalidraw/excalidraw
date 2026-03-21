@@ -451,6 +451,7 @@ import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import CanvasTextOverlay from "./canvases/CanvasTextOverlay";
+import TextLineNumbersOverlay from "./canvases/TextLineNumbersOverlay";
 import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
@@ -2329,6 +2330,11 @@ class App extends React.Component<AppProps, AppState> {
                             enabled={false}
                             visibleElements={visibleElements}
                             appState={this.state}
+                          />
+                          <TextLineNumbersOverlay
+                            visibleElements={visibleElements}
+                            appState={this.state}
+                            setAppState={this.setAppState}
                           />
                           <InteractiveCanvas
                             app={this}
@@ -6754,7 +6760,9 @@ class App extends React.Component<AppProps, AppState> {
         }),
       });
     }
-    this.setState({ editingTextElement: element });
+    flushSync(() => {
+      this.setState({ editingTextElement: element });
+    });
 
     if (!existingTextElement) {
       if (container && shouldBindToContainer) {
@@ -11632,7 +11640,9 @@ class App extends React.Component<AppProps, AppState> {
             elementId: hitElement.id,
             at: Date.now(),
           };
-          this.setState({ editingTextElement: hitElement });
+          flushSync(() => {
+            this.setState({ editingTextElement: hitElement });
+          });
           this.handleTextWysiwyg(hitElement, {
             isExistingElement: true,
             autoSelect: false,

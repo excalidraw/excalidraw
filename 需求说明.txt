@@ -470,12 +470,62 @@ finished:
 在其他应用按ctrl+v粘贴的是批量复制的文本,
 在画布内按ctrl+v粘贴的是,批量复制的文本框,
 
+finished:
+将下划线按钮
+Underline selected text
+和文字背景按钮
+Set selected text background
+的样式设为和描边一样,按钮的数量和样式都一样;
+添加文字提示.常驻在描边下边,不只在选择文本之后才出现;
+
+
+添加在两个文本框之间将各自的某一行相连的方法;(可以将文本框A的某一行的左侧或右侧连接到文本框B的某一行左侧或右侧,右侧连接左侧,连接线使用直线)
+将文本框之间的连接信息在.excalidraw文件内单独存储,
+确保在编辑时,使用alt+enter上下移动这个带连接线的行时,连接线也跟着移动,删除这一行不删除连接线,(连接线随alt+上下键跟随"带连接线的行"移动)
+在文本框右边添加和左边一样的行号提示
+点击行号可以拉出两个行之间的行连接线,
+拉出行连接线后点击要连接的行即可连接
+分析能否将将文本框左右的行号全部改为可以点击的数字按钮,实现以上功能;
+添加任意两行连接的功能
+完善行连接线实施细节,当点击某一个文本框的行号时,直接拉出可见的连接线,(从点击的行号到鼠标光标)
+情况1:此时鼠标移动到其他文本框的行号上时,移动到的这个行号高亮提示点击即可将这两行连接,(可以移动到文本框自身的某一行上,这时使用圆弧表示连接线可以设置这段弧线的弧度(默认30度,pi/6),)(自连接的连接线不与文本框相交)
+情况2:点击其他位置就是取消连接,(点击除行号以外的位置,)
+每个行的连接线可以多对多连接
+按住鼠标左键拉框可以选中连接线,并选中某些连接线,可以按下Delete删除,;
+文本框每行的行号必须"平移对称"(忽略文本框内容空格符换行符)(不是文本框整体平移对称,而是每一行平移对称;)(文本框左侧行号右对齐,右侧行号左对齐)
+
+
+
+
+
+
+
+
+
+正确效果应该是这样,没有正确显示,行号应该永久显示,行号不因是否处于编辑状态而变化
+2026.3.20-17.1.9.png111222
+
+
+项目只在3000端口运行
+
+
+yarn test:e2e --workers=1 --grep "Text box line numbers left and right render once"
+
+
+
+
 
 
 启动:
 yarn --cwd ./excalidraw-app vite --port 3000 --strictPort
+http://localhost:3000/
+for /f "tokens=5" %a in ('netstat -ano ^| findstr :3000') do taskkill /F /PID %a
 测试:
 yarn test:all
+yarn test:e2e --workers=2 --grep "^Double click the text box to insert the cursor"
+
+yarn test:e2e --workers=14
+
 yarn test:e2e e2e/text-wrap-consistency.spec.ts --grep "clicking in editor should insert"
 yarn test:e2e e2e/text-wrap-consistency.spec.ts --grep "clicking in editor should insert"
 yarn test:e2e --project=chromium --grep "text box style"

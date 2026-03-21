@@ -408,14 +408,7 @@ const getCanvasPadding = (element: ExcalidrawElement) => {
     case "freedraw":
       return element.strokeWidth * 12;
     case "text": {
-      const text = (element as ExcalidrawTextElement).originalText ?? "";
-      const normalizedText = text.replace(/\r\n?/g, "\n");
-      const logicalLineCount = normalizedText.split("\n").length;
-      const digits = String(Math.max(1, logicalLineCount)).length;
-      const lineNumberFontSize = Math.max(10, element.fontSize * 0.8);
-      const lineNumberGutterWidthEstimate =
-        lineNumberFontSize * (digits * 0.65 + 1.2);
-      return element.fontSize / 2 + lineNumberGutterWidthEstimate;
+      return element.fontSize / 2;
     }
     case "arrow":
       if (element.endArrowhead || element.endArrowhead) {
@@ -1013,38 +1006,6 @@ const drawElementOnCanvas = (
             appState.textBoxDecorationsColor,
             0.55,
           );
-
-          context.save();
-          const lineNumberFontSize = Math.max(10, element.fontSize * 0.8);
-          context.font = getFontString({
-            fontSize: lineNumberFontSize,
-            fontFamily: element.fontFamily,
-          });
-          context.fillStyle = decorationColor;
-          context.textAlign = "right";
-          context.textBaseline = "alphabetic";
-
-          const gutterPadding = Math.max(4, lineNumberFontSize * 0.25);
-          const gutterRightX = -gutterPadding;
-
-          let lineNumber = 1;
-          for (let index = 0; index < lines.length; index++) {
-            const isNewLogicalLine =
-              index === 0 || explicitNewlineAfterLine[index - 1];
-
-            if (isNewLogicalLine) {
-              context.fillText(
-                String(lineNumber),
-                gutterRightX,
-                index * lineHeightPx + verticalOffset,
-              );
-            }
-
-            if (explicitNewlineAfterLine[index]) {
-              lineNumber++;
-            }
-          }
-          context.restore();
 
           context.save();
           context.strokeStyle = decorationColor;

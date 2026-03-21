@@ -111,6 +111,8 @@ export const getDefaultAppState = (): Omit<
     textEditorCaretColor: "#6965db",
     textSelectionBackgroundColor: "#a8a8a8",
     textSelectionUnderlineColor: "#a8a8a8",
+    textLineLinks: [],
+    textLineLinkDraft: null,
     zenModeEnabled: false,
     zoom: {
       value: 1 as NormalizedZoomValue,
@@ -247,6 +249,8 @@ const APP_STATE_STORAGE_CONF = (<
   textEditorCaretColor: { browser: true, export: false, server: false },
   textSelectionBackgroundColor: { browser: true, export: false, server: false },
   textSelectionUnderlineColor: { browser: true, export: false, server: false },
+  textLineLinks: { browser: true, export: true, server: true },
+  textLineLinkDraft: { browser: false, export: false, server: false },
   width: { browser: false, export: false, server: false },
   zenModeEnabled: { browser: true, export: false, server: false },
   zoom: { browser: true, export: false, server: false },

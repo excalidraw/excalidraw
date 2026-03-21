@@ -52,6 +52,20 @@
     gap: 0.25rem;
   }
 
+  .color-picker__below-trigger-row--disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .color-picker__below-trigger-hint {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    text-align: left;
+    color: var(--text-secondary-color);
+    width: 100%;
+    padding: 0 0.5rem;
+  }
+
   .color-picker__top-picks {
     display: flex;
     justify-content: space-between;
@@ -87,6 +101,11 @@
     svg {
       width: 1rem;
       height: 1rem;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
   }
 
@@ -219,6 +238,11 @@
 
     &.mobile-border {
       border: 1px solid var(--mobile-color-border);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
   }
 

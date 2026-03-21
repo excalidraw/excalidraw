@@ -3,6 +3,7 @@ import {
   FRAME_STYLE,
   THEME,
   throttleRAF,
+  getFontString,
 } from "@excalidraw/common";
 import { isElementLink } from "@excalidraw/element";
 import { createPlaceholderEmbeddableLabel } from "@excalidraw/element";
@@ -12,6 +13,8 @@ import {
   isIframeLikeElement,
   isTextElement,
 } from "@excalidraw/element";
+import { wrapTextPreservingWhitespaceWithExplicitNewlineMarkers } from "@excalidraw/element";
+import { getLineHeightInPx } from "@excalidraw/element";
 import {
   elementOverlapsWithFrame,
   getTargetFrame,
@@ -26,6 +29,7 @@ import type {
   ElementsMap,
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
 import {
@@ -212,6 +216,120 @@ const renderLinkIcon = (
     context.restore();
   }
 };
+
+const renderTextLineLinks = ({
+  context,
+  appState,
+  allElementsMap,
+}: {
+  context: CanvasRenderingContext2D;
+  appState: StaticCanvasAppState;
+  allElementsMap: NonDeletedSceneElementsMap;
+}) => {
+  const SELF_LINK_ARC_ANGLE_RAD = Math.PI / 6;
+  const LINE_NUMBER_GAP_FACTOR = 0.35;
+
+  const links = (appState as any).textLineLinks as
+    | import("../types").TextLineLink[]
+    | undefined;
+  if (!links?.length) {
+    return;
+  }
+
+  const getOriginalText = (element: any) =>
+    typeof element?.originalText === "string"
+      ? element.originalText
+      : element.text;
+
+  const resolveAnchor = (
+    endpoint: import("../types").TextLineLinkEndpoint,
+  ): { x: number; y: number } | null => {
+    const element = allElementsMap.get(endpoint.elementId);
+    if (!element || !isTextElement(element) || element.angle) {
+      return null;
+    }
+    const font = getFontString(element);
+    const originalText = getOriginalText(element);
+    const { lines, explicitNewlineAfterLine } =
+      wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
+        originalText,
+        font,
+        element.width,
+      );
+    const lineHeightPx = getLineHeightInPx(
+      element.fontSize,
+      element.lineHeight,
+    );
+    const maxLineNumber = Math.max(1, originalText.split("\n").length);
+    const targetLineNumber = Math.min(
+      maxLineNumber,
+      Math.max(1, Math.floor(endpoint.lineNumber)),
+    );
+
+    let currentLineNumber = 1;
+    for (let i = 0; i < lines.length; i++) {
+      if (i > 0 && explicitNewlineAfterLine[i - 1]) {
+        currentLineNumber += 1;
+      }
+      const isLogicalLineStart = i === 0 || !!explicitNewlineAfterLine[i - 1];
+      if (isLogicalLineStart && currentLineNumber === targetLineNumber) {
+        const y = element.y + i * lineHeightPx + lineHeightPx / 2;
+        const gapScene = Math.max(6, element.fontSize * LINE_NUMBER_GAP_FACTOR);
+        const x =
+          endpoint.side === "left"
+            ? element.x - gapScene
+            : element.x + element.width + gapScene;
+        return { x, y };
+      }
+    }
+    return null;
+  };
+
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+  context.lineWidth = 1 / appState.zoom.value;
+  context.strokeStyle = appState.textBoxDecorationsColor ?? "#a8a8a8";
+  context.setLineDash([]);
+
+  for (const link of links) {
+    const from = resolveAnchor(link.from);
+    const to = resolveAnchor(link.to);
+    if (!from || !to) {
+      continue;
+    }
+    context.beginPath();
+    context.moveTo(from.x, from.y);
+    if (link.from.elementId === link.to.elementId) {
+      const dx = to.x - from.x;
+      const dy = to.y - from.y;
+      const dist = Math.hypot(dx, dy) || 1;
+      const midX = (from.x + to.x) / 2;
+      const midY = (from.y + to.y) / 2;
+      const perpX = -dy / dist;
+      const perpY = dx / dist;
+      const offset = (dist / 2) * Math.tan(SELF_LINK_ARC_ANGLE_RAD);
+      const c1x = midX + perpX * offset;
+      const c1y = midY + perpY * offset;
+      const c2x = midX - perpX * offset;
+      const c2y = midY - perpY * offset;
+
+      const desiredSide =
+        link.from.side === "right" || link.to.side === "right"
+          ? "right"
+          : "left";
+      const preferFirst = desiredSide === "right" ? c1x >= c2x : c1x <= c2x;
+      const cx = preferFirst ? c1x : c2x;
+      const cy = preferFirst ? c1y : c2y;
+      context.quadraticCurveTo(cx, cy, to.x, to.y);
+    } else {
+      context.lineTo(to.x, to.y);
+    }
+    context.stroke();
+  }
+
+  context.restore();
+};
+
 const _renderStaticScene = ({
   canvas,
   rc,
@@ -369,6 +487,8 @@ const _renderStaticScene = ({
         );
       }
     });
+
+  renderTextLineLinks({ context, appState, allElementsMap });
 
   // render embeddables on top
   visibleElements

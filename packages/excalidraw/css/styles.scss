@@ -147,6 +147,64 @@ body.excalidraw-cursor-resize * {
     word-break: break-word;
   }
 
+  &__textLineNumbersOverlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: calc(var(--zIndex-wysiwyg) + 2);
+    color: var(--text-box-decorations-color);
+    opacity: var(--text-box-decorations-opacity);
+    font-family: Cascadia, monospace, "Segoe UI Emoji";
+    font-weight: 400;
+  }
+
+  &__textLineNumbersOverlay__draft {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  &__textLineNumbersOverlay__draft line,
+  &__textLineNumbersOverlay__draft path {
+    stroke: var(--text-box-decorations-color);
+    stroke-width: 2;
+    fill: none;
+    vector-effect: non-scaling-stroke;
+  }
+
+  &__textLineNumberButton {
+    position: absolute;
+    pointer-events: auto;
+    background: transparent;
+    border: 0;
+    padding: 0 6px;
+    margin: 0;
+    color: inherit;
+    cursor: crosshair;
+    user-select: none;
+    box-sizing: border-box;
+    font-family: Cascadia, monospace, "Segoe UI Emoji";
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__textLineNumberButton--left {
+    text-align: right;
+  }
+
+  &__textLineNumberButton--right {
+    text-align: left;
+  }
+
+  &__textLineNumberButton.is-draft {
+    text-decoration: underline;
+  }
+
+  &__textLineNumberButton.is-hovered {
+    text-decoration: underline;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 4px;
+  }
+
   &__embeddable {
     width: 100%;
     height: 100%;
@@ -702,6 +760,36 @@ body.excalidraw-cursor-resize * {
     opacity: var(--text-box-decorations-opacity);
     line-height: 1;
     transform: translate(-50%, -50%);
+  }
+
+  .excalidraw-wysiwyg__lineNumbers {
+    color: var(--text-box-decorations-color);
+    opacity: var(--text-box-decorations-opacity);
+    user-select: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .excalidraw-wysiwyg__lineNumber {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .excalidraw-wysiwyg__lineNumbers--left .excalidraw-wysiwyg__lineNumber {
+    justify-content: flex-end;
+    padding-right: 0;
+  }
+
+  .excalidraw-wysiwyg__lineNumbers--right .excalidraw-wysiwyg__lineNumber {
+    justify-content: flex-start;
+    padding-left: 0;
+  }
+
+  .excalidraw-wysiwyg__lineNumber:hover {
+    opacity: 1;
   }
 
   @media print {

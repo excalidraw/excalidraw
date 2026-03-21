@@ -242,6 +242,14 @@ const ColorPickerTrigger = ({
     onToggle();
   };
 
+  let triggerTitle = t("labels.showBackground");
+  if (type === "elementStroke") {
+    triggerTitle = t("labels.showStroke");
+  }
+  if (type === "textSelectionBackground" || type === "textSelectionUnderline") {
+    triggerTitle = label;
+  }
+
   return (
     <Popover.Trigger
       type="button"
@@ -254,11 +262,7 @@ const ColorPickerTrigger = ({
       })}
       aria-label={label}
       style={color ? { "--swatch-color": color } : undefined}
-      title={
-        type === "elementStroke"
-          ? t("labels.showStroke")
-          : t("labels.showBackground")
-      }
+      title={triggerTitle}
       data-openpopup={type}
       onClick={handleClick}
     >

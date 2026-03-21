@@ -67,7 +67,7 @@ const StaticCanvas = (props: StaticCanvasProps) => {
         appState: props.appState,
         renderConfig: props.renderConfig,
       },
-      isRenderThrottlingEnabled(),
+      isRenderThrottlingEnabled() && !props.appState.editingTextElement,
     );
   });
 
@@ -101,6 +101,7 @@ const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {
     currentHoveredFontFamily: appState.currentHoveredFontFamily,
     croppingElementId: appState.croppingElementId,
     suggestedBinding: appState.suggestedBinding,
+    editingTextElement: appState.editingTextElement,
   };
 
   return relevantAppStateProps;

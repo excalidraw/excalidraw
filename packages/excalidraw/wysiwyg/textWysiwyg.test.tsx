@@ -34,6 +34,7 @@ import {
   render,
   screen,
   unmountComponent,
+  waitFor,
 } from "../tests/test-utils";
 import {
   fireEvent,
@@ -1117,6 +1118,9 @@ describe("textWysiwyg", () => {
     beforeEach(async () => {
       mockBoundingClientRect({ height: 400, width: 800 });
       await render(<Excalidraw handleKeyboardGlobally={true} />);
+      act(() => {
+        h.app.setState({ scrollX: 0, scrollY: 0 });
+      });
       API.setElements([]);
       rectangle = UI.createElement("rectangle", {
         x: 10,
@@ -1144,8 +1148,16 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(rectangle.id);
 
-      mouse.doubleClickAt(rectangle.x + 10, rectangle.y + 10);
-      expect(h.elements.length).toBe(2);
+      UI.clickTool("selection");
+      Keyboard.withModifierKeys({ alt: false, ctrl: false, shift: false }, () =>
+        mouse.doubleClickAt(
+          rectangle.x + rectangle.width / 2,
+          rectangle.y + rectangle.height / 2,
+        ),
+      );
+      await waitFor(() => {
+        expect(h.elements.length).toBe(2);
+      });
 
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.type).toBe("text");
@@ -1172,7 +1184,14 @@ describe("textWysiwyg", () => {
         angle: 45,
       });
       API.setElements([rectangle]);
-      mouse.doubleClickAt(rectangle.x + 10, rectangle.y + 10);
+      UI.clickTool("selection");
+      mouse.doubleClickAt(
+        rectangle.x + rectangle.width / 2,
+        rectangle.y + rectangle.height / 2,
+      );
+      await waitFor(() => {
+        expect(h.elements.length).toBe(2);
+      });
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.type).toBe("text");
       expect(text.containerId).toBe(rectangle.id);

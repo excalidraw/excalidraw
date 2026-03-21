@@ -51,6 +51,28 @@ describe("export", () => {
     await render(<Excalidraw />);
   });
 
+  it("export should include text line links in appState", () => {
+    const appState = {
+      ...getDefaultAppState(),
+      textLineLinks: [
+        {
+          id: "link",
+          from: { elementId: "A", lineNumber: 1, side: "right" },
+          to: { elementId: "B", lineNumber: 2, side: "left" },
+        },
+      ],
+    } as any;
+    const payload = serializeAsJSON(testElements, appState, {}, "local");
+    const decoded = JSON.parse(payload);
+    expect(decoded.appState.textLineLinks).toEqual([
+      {
+        id: "link",
+        from: { elementId: "A", lineNumber: 1, side: "right" },
+        to: { elementId: "B", lineNumber: 2, side: "left" },
+      },
+    ]);
+  });
+
   it("export embedded png and reimport", async () => {
     const pngBlob = await API.loadFile("./fixtures/smiley.png");
     const pngBlobEmbedded = await encodePngMetadata({

@@ -6,6 +6,7 @@ import {
   isWritableElement,
   getFontString,
   getFontFamilyString,
+  randomId,
   isTestEnv,
   isSafari,
   MIME_TYPES,
@@ -1348,7 +1349,15 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
-    if (
+    if (event.altKey && !event[KEYS.CTRL_OR_CMD] && event.key === KEYS.ENTER) {
+      event.preventDefault();
+      event.stopPropagation();
+      const direction = event.shiftKey ? "up" : "down";
+      remapTextLineLinksForMoveLines(direction);
+      moveLines(direction);
+      editable.dispatchEvent(new Event("input"));
+      scheduleCaretUpdate();
+    } else if (
       event.altKey &&
       !event.shiftKey &&
       !event[KEYS.CTRL_OR_CMD] &&
@@ -1356,8 +1365,34 @@ export const textWysiwyg = ({
     ) {
       event.preventDefault();
       event.stopPropagation();
+      remapTextLineLinksForMoveLines(event.key === "ArrowUp" ? "up" : "down");
       moveLines(event.key === "ArrowUp" ? "up" : "down");
       editable.dispatchEvent(new Event("input"));
+      scheduleCaretUpdate();
+    } else if (
+      event.altKey &&
+      !event[KEYS.CTRL_OR_CMD] &&
+      event.key.toLowerCase() === "l"
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      const caretIndex = editable.selectionEnd ?? 0;
+      const lineNumber = editable.value.slice(0, caretIndex).split("\n").length;
+      const side = event.shiftKey ? "left" : "right";
+      const endpoint = { elementId: element.id, lineNumber, side } as const;
+      const draft = app.state.textLineLinkDraft;
+      if (!draft) {
+        app.setState({ textLineLinkDraft: endpoint });
+      } else {
+        app.setState({
+          textLineLinks: app.state.textLineLinks.concat({
+            id: randomId(),
+            from: draft,
+            to: endpoint,
+          }),
+          textLineLinkDraft: null,
+        });
+      }
       scheduleCaretUpdate();
     } else if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
@@ -1604,6 +1639,94 @@ export const textWysiwyg = ({
       : nextLine.length;
     editable.selectionStart = selectionStart + shift;
     editable.selectionEnd = selectionEnd + shift;
+  };
+
+  const remapTextLineLinksForMoveLines = (direction: "up" | "down") => {
+    const hasLinks = app.state.textLineLinks.length > 0;
+    const draft = app.state.textLineLinkDraft;
+    const shouldUpdateDraft = draft?.elementId === element.id;
+    if (!hasLinks && !shouldUpdateDraft) {
+      return;
+    }
+
+    const { selectionStart, selectionEnd } = editable;
+    const value = editable.value;
+    const endForLine =
+      selectionStart === selectionEnd
+        ? selectionEnd
+        : Math.max(selectionStart, selectionEnd - 1);
+
+    const blockStart =
+      value.lastIndexOf("\n", Math.max(0, selectionStart - 1)) + 1;
+    const blockEndNewlineIndex = value.indexOf("\n", endForLine);
+    const blockEnd =
+      blockEndNewlineIndex === -1 ? value.length : blockEndNewlineIndex + 1;
+
+    if (direction === "up" && blockStart === 0) {
+      return;
+    }
+    if (direction === "down" && blockEnd === value.length) {
+      return;
+    }
+
+    const getLineNumberAtIndex = (index: number) => {
+      return value.slice(0, Math.max(0, index)).split("\n").length;
+    };
+
+    const startLineNumber = getLineNumberAtIndex(blockStart);
+    const endLineNumber = getLineNumberAtIndex(
+      Math.max(blockStart, blockEnd - 1),
+    );
+    const blockLineCount = Math.max(1, endLineNumber - startLineNumber + 1);
+
+    const remapLineNumber = (lineNumber: number) => {
+      if (direction === "up") {
+        const prevLineNumber = startLineNumber - 1;
+        if (lineNumber === prevLineNumber) {
+          return prevLineNumber + blockLineCount;
+        }
+        if (lineNumber >= startLineNumber && lineNumber <= endLineNumber) {
+          return lineNumber - 1;
+        }
+        return lineNumber;
+      }
+
+      const nextLineNumber = endLineNumber + 1;
+      if (lineNumber === nextLineNumber) {
+        return nextLineNumber - blockLineCount;
+      }
+      if (lineNumber >= startLineNumber && lineNumber <= endLineNumber) {
+        return lineNumber + 1;
+      }
+      return lineNumber;
+    };
+
+    const remapEndpoint = <T extends { elementId: string; lineNumber: number }>(
+      endpoint: T,
+    ): T => {
+      if (endpoint.elementId !== element.id) {
+        return endpoint;
+      }
+      return {
+        ...endpoint,
+        lineNumber: remapLineNumber(endpoint.lineNumber),
+      };
+    };
+
+    const nextLinks = hasLinks
+      ? app.state.textLineLinks.map((link) => ({
+          ...link,
+          from: remapEndpoint(link.from),
+          to: remapEndpoint(link.to),
+        }))
+      : app.state.textLineLinks;
+
+    const nextDraft = shouldUpdateDraft && draft ? remapEndpoint(draft) : draft;
+
+    app.setState({
+      textLineLinks: nextLinks,
+      textLineLinkDraft: nextDraft ?? null,
+    });
   };
 
   /**
