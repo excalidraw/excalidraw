@@ -17,6 +17,7 @@ import {
   FRAME_STYLE,
   getFeatureFlag,
   invariant,
+  shouldRotateWithDiscreteAngle,
   THEME,
 } from "@excalidraw/common";
 
@@ -229,6 +230,7 @@ const renderBindingHighlightForBindableElement_simple = (
   elementsMap: ElementsMap,
   appState: InteractiveCanvasAppState,
   pointerCoords: GlobalPoint | null,
+  angleLocked = false,
 ) => {
   const enclosingFrame =
     suggestedBinding.element.frameId &&
@@ -415,6 +417,8 @@ const renderBindingHighlightForBindableElement_simple = (
 
   if (
     appState.isMidpointSnappingEnabled &&
+    !appState.gridModeEnabled &&
+    !angleLocked &&
     (isFrameLikeElement(suggestedBinding.element) ||
       isBindableElement(suggestedBinding.element))
   ) {
@@ -807,7 +811,12 @@ const renderBindingHighlightForBindableElement_complex = (
 
     context.restore();
 
-    if (appState.isMidpointSnappingEnabled) {
+    if (
+      appState.isMidpointSnappingEnabled &&
+      !appState.gridModeEnabled &&
+      (!app.lastPointerMoveEvent ||
+        !shouldRotateWithDiscreteAngle(app.lastPointerMoveEvent))
+    ) {
       // Draw midpoint indicators
       context.save();
       context.translate(
@@ -920,12 +929,16 @@ const renderBindingHighlightForBindableElement = (
         app.lastPointerMoveCoords.y,
       )
     : null;
+  const angleLocked =
+    !!app.lastPointerMoveEvent &&
+    shouldRotateWithDiscreteAngle(app.lastPointerMoveEvent);
   renderBindingHighlightForBindableElement_simple(
     context,
     suggestedBinding,
     allElementsMap,
     appState,
     pointerCoords,
+    angleLocked,
   );
   context.restore();
 };

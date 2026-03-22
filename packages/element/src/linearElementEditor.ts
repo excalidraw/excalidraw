@@ -359,6 +359,7 @@ export class LinearElementEditor {
       linearElementEditor,
     );
 
+    const angleLocked = shouldRotateWithDiscreteAngle(event);
     LinearElementEditor.movePoints(
       element,
       app.scene,
@@ -370,7 +371,10 @@ export class LinearElementEditor {
       },
       {
         isBindingEnabled: app.state.isBindingEnabled,
-        isMidpointSnappingEnabled: app.state.isMidpointSnappingEnabled,
+        isMidpointSnappingEnabled:
+          app.state.isMidpointSnappingEnabled &&
+          !angleLocked &&
+          !app.state.gridModeEnabled,
       },
     );
     // Set the suggested binding from the updates if available
@@ -427,7 +431,9 @@ export class LinearElementEditor {
                 "start",
                 elementsMap,
                 app.state.zoom,
-                app.state.isMidpointSnappingEnabled,
+                app.state.isMidpointSnappingEnabled &&
+                  !angleLocked &&
+                  !app.state.gridModeEnabled,
               )
             : linearElementEditor.initialState.altFocusPoint,
       },
@@ -554,6 +560,8 @@ export class LinearElementEditor {
       linearElementEditor,
     );
 
+    const angleLocked =
+      shouldRotateWithDiscreteAngle(event) && singlePointDragged;
     LinearElementEditor.movePoints(
       element,
       app.scene,
@@ -565,7 +573,10 @@ export class LinearElementEditor {
       },
       {
         isBindingEnabled: app.state.isBindingEnabled,
-        isMidpointSnappingEnabled: app.state.isMidpointSnappingEnabled,
+        isMidpointSnappingEnabled:
+          app.state.isMidpointSnappingEnabled &&
+          !angleLocked &&
+          !app.state.gridModeEnabled,
       },
     );
 
@@ -661,7 +672,9 @@ export class LinearElementEditor {
                 "start",
                 elementsMap,
                 app.state.zoom,
-                app.state.isMidpointSnappingEnabled,
+                app.state.isMidpointSnappingEnabled &&
+                  !angleLocked &&
+                  !app.state.gridModeEnabled,
               )
             : linearElementEditor.initialState.altFocusPoint,
       },
@@ -2165,6 +2178,7 @@ const pointDraggingUpdates = (
       newArrow: !!app.state.newElement,
       angleLocked,
       altKey,
+      gridSize: app.getEffectiveGridSize(),
     },
   );
 
