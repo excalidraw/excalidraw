@@ -193,7 +193,7 @@ export class Fonts {
         charsPerFamily[family] = new Set(characters);
 
         // the order between the families and fallbacks is important, as fallbacks need to be defined first and in the reversed order
-        // so that they get overriden with the later defined font faces, i.e. in case they share some codepoints
+        // so that they get overridden with the later defined font faces, i.e. in case they share some codepoints
         families.unshift(FONT_FAMILY_FALLBACKS[CJK_HAND_DRAWN_FALLBACK_FONT]);
       }
     }
