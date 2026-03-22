@@ -893,30 +893,11 @@ export const getArrowheadPoints = (
   );
 
   if (arrowhead === "diamond" || arrowhead === "diamond_outline") {
-    // point opposite to the arrowhead point
-    let ox;
-    let oy;
-
-    if (position === "start") {
-      const [px, py] = element.points.length > 1 ? element.points[1] : [0, 0];
-
-      [ox, oy] = pointRotateRads(
-        pointFrom(tx + minSize * 2, ty),
-        pointFrom(tx, ty),
-        Math.atan2(py - ty, px - tx) as Radians,
-      );
-    } else {
-      const [px, py] =
-        element.points.length > 1
-          ? element.points[element.points.length - 2]
-          : [0, 0];
-
-      [ox, oy] = pointRotateRads(
-        pointFrom(tx - minSize * 2, ty),
-        pointFrom(tx, ty),
-        Math.atan2(ty - py, tx - px) as Radians,
-      );
-    }
+    // point opposite to the arrowhead point — use the same Bezier tangent
+    // direction (nx, ny) as the wings so the diamond isn't distorted on
+    // rounded arrows where the tangent differs from the chord direction.
+    const ox = tx - nx * minSize * 2;
+    const oy = ty - ny * minSize * 2;
 
     return [tx, ty, x3, y3, ox, oy, x4, y4];
   }
