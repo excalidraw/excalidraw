@@ -13,6 +13,7 @@ import {
 import {
   pointFrom,
   pointDistance,
+  lineSegment,
   type LocalPoint,
   pointRotateRads,
 } from "@excalidraw/math";
@@ -43,6 +44,7 @@ import type {
 } from "@excalidraw/excalidraw/scene/types";
 
 import { elementWithCanvasCache } from "./renderElement";
+import { debugDrawLine, debugDrawPoint, debugDrawPolygon } from "./visualdebug";
 
 import {
   canBecomePolygon,
@@ -77,6 +79,9 @@ import type {
 
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
+
+const SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE = 0.3;
+const SIMPLE_ROUNDED_ARROW_CP_LENGTH_RATIO = 1 / 4;
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
@@ -625,9 +630,8 @@ export const generateLinearCollisionShape = (
         });
       }
 
-      // Generate collision ops using the same Catmull-Rom → cubic Bézier
-      // algorithm as generateSimpleArrowShape so hit-testing matches rendering.
-      const tension = 0.5;
+      // Generate collision ops using the same bisector-based cubic Bézier
+      // algorithm as generateRoundedSimpleArrowShape so hit-testing matches rendering.
       const rotateLocal = (lx: number, ly: number): LocalPoint => {
         const g = pointRotateRads<GlobalPoint>(
           pointFrom<GlobalPoint>(element.x + lx, element.y + ly),
@@ -653,32 +657,81 @@ export const generateLinearCollisionShape = (
         });
       } else {
         const n = points.length;
-        const ptx = new Float64Array(n);
-        const pty = new Float64Array(n);
-        for (let i = 0; i < n; i++) {
-          if (i === 0) {
-            const pbx = 3 * points[0][0] - 3 * points[1][0] + points[2][0];
-            const pby = 3 * points[0][1] - 3 * points[1][1] + points[2][1];
-            ptx[i] = tension * (points[1][0] - pbx);
-            pty[i] = tension * (points[1][1] - pby);
-          } else if (i === n - 1) {
-            const pax =
-              3 * points[n - 1][0] - 3 * points[n - 2][0] + points[n - 3][0];
-            const pay =
-              3 * points[n - 1][1] - 3 * points[n - 2][1] + points[n - 3][1];
-            ptx[i] = tension * (pax - points[n - 2][0]);
-            pty[i] = tension * (pay - points[n - 2][1]);
+        const ptxn = new Float64Array(n);
+        const ptyn = new Float64Array(n);
+
+        for (let i = 1; i < n - 1; i++) {
+          const inDx = points[i][0] - points[i - 1][0];
+          const inDy = points[i][1] - points[i - 1][1];
+          const inLen = Math.hypot(inDx, inDy);
+          const inUx = inDx / inLen;
+          const inUy = inDy / inLen;
+          const outDx = points[i + 1][0] - points[i][0];
+          const outDy = points[i + 1][1] - points[i][1];
+          const outLen = Math.hypot(outDx, outDy);
+          const outUx = outDx / outLen;
+          const outUy = outDy / outLen;
+          const bisDx = inUx + outUx;
+          const bisDy = inUy + outUy;
+          const bisLen = Math.hypot(bisDx, bisDy);
+          let bisUx: number;
+          let bisUy: number;
+          if (bisLen > 1e-8) {
+            bisUx = bisDx / bisLen;
+            bisUy = bisDy / bisLen;
           } else {
-            ptx[i] = tension * (points[i + 1][0] - points[i - 1][0]);
-            pty[i] = tension * (points[i + 1][1] - points[i - 1][1]);
+            bisUx = -inUy;
+            bisUy = inUx;
           }
+          ptxn[i] = bisUx;
+          ptyn[i] = bisUy;
+        }
+
+        // Endpoints: reflect the adjacent interior tangent across the
+        // endpoint's chord with specific dampening
+        {
+          const cx = points[1][0] - points[0][0];
+          const cy = points[1][1] - points[0][1];
+          const cLen = Math.hypot(cx, cy);
+          const cux = cx / cLen;
+          const cuy = cy / cLen;
+          const dot = ptxn[1] * cux + ptyn[1] * cuy;
+          const rx =
+            (1 + SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE) * dot * cux -
+            SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE * ptxn[1];
+          const ry =
+            (1 + SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE) * dot * cuy -
+            SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE * ptyn[1];
+          const rLen = Math.hypot(rx, ry);
+          ptxn[0] = rx / rLen;
+          ptyn[0] = ry / rLen;
+        }
+        {
+          const cx = points[n - 1][0] - points[n - 2][0];
+          const cy = points[n - 1][1] - points[n - 2][1];
+          const cLen = Math.hypot(cx, cy);
+          const cux = cx / cLen;
+          const cuy = cy / cLen;
+          const dot = ptxn[n - 2] * cux + ptyn[n - 2] * cuy;
+          const rx =
+            (1 + SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE) * dot * cux -
+            SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE * ptxn[n - 2];
+          const ry =
+            (1 + SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE) * dot * cuy -
+            SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE * ptyn[n - 2];
+          const rLen = Math.hypot(rx, ry);
+          ptxn[n - 1] = rx / rLen;
+          ptyn[n - 1] = ry / rLen;
         }
 
         for (let i = 0; i < n - 1; i++) {
-          const cp1x = points[i][0] + ptx[i] / 3;
-          const cp1y = points[i][1] + pty[i] / 3;
-          const cp2x = points[i + 1][0] - ptx[i + 1] / 3;
-          const cp2y = points[i + 1][1] - pty[i + 1] / 3;
+          const d =
+            pointDistance(points[i], points[i + 1]) *
+            SIMPLE_ROUNDED_ARROW_CP_LENGTH_RATIO;
+          const cp1x = points[i][0] + ptxn[i] * d;
+          const cp1y = points[i][1] + ptyn[i] * d;
+          const cp2x = points[i + 1][0] - ptxn[i + 1] * d;
+          const cp2y = points[i + 1][1] - ptyn[i + 1] * d;
 
           const rcp1 = rotateLocal(cp1x, cp1y);
           const rcp2 = rotateLocal(cp2x, cp2y);
@@ -934,10 +987,13 @@ const _generateElementShape = (
       } else {
         shape = [
           generator.path(
-            generateSimpleArrowShape(points, 0.5),
+            generateRoundedSimpleArrowShape(points),
             generateRoughOptions(element, true, isDarkMode),
           ),
         ];
+        if (window.visualDebug?.data) {
+          debugRoundedArrowControlPoints(element.x, element.y, points);
+        }
       }
 
       // add lines only in arrow
@@ -1021,9 +1077,151 @@ const _generateElementShape = (
   }
 };
 
-const generateSimpleArrowShape = (
+/**
+ * Debug helper to visualise chord and control points.
+ *
+ * Chords are grey, CP1 handles/circles are green, CP2 handles/diamonds are blue,
+ * segment points are red X markers.
+ */
+const debugRoundedArrowControlPoints = (
+  elementX: number,
+  elementY: number,
   points: readonly LocalPoint[],
-  tension = 0.5,
+) => {
+  const n = points.length;
+  if (n < 2) {
+    return;
+  }
+
+  const g = (lx: number, ly: number): GlobalPoint =>
+    pointFrom<GlobalPoint>(elementX + lx, elementY + ly);
+
+  const PERMANENT = { permanent: true } as const;
+  const CP_RADIUS = 5;
+  const DIAMOND_RADIUS = 6;
+
+  const txn = new Float64Array(n);
+  const tyn = new Float64Array(n);
+
+  for (let i = 1; i < n - 1; i++) {
+    const inDx = points[i][0] - points[i - 1][0];
+    const inDy = points[i][1] - points[i - 1][1];
+    const inLen = Math.hypot(inDx, inDy);
+    const inUx = inDx / inLen;
+    const inUy = inDy / inLen;
+
+    const outDx = points[i + 1][0] - points[i][0];
+    const outDy = points[i + 1][1] - points[i][1];
+    const outLen = Math.hypot(outDx, outDy);
+    const outUx = outDx / outLen;
+    const outUy = outDy / outLen;
+
+    const bisDx = inUx + outUx;
+    const bisDy = inUy + outUy;
+    const bisLen = Math.hypot(bisDx, bisDy);
+    let bisUx: number;
+    let bisUy: number;
+    if (bisLen > 1e-8) {
+      bisUx = bisDx / bisLen;
+      bisUy = bisDy / bisLen;
+    } else {
+      bisUx = -inUy;
+      bisUy = inUx;
+    }
+
+    const bx = bisUx;
+    const by = bisUy;
+    const bLen = Math.hypot(bx, by);
+    txn[i] = bx / bLen;
+    tyn[i] = by / bLen;
+  }
+
+  // Endpoints: reflect the adjacent interior tangent across the endpoint's own chord.
+  {
+    const cx = points[1][0] - points[0][0];
+    const cy = points[1][1] - points[0][1];
+    const cLen = Math.hypot(cx, cy);
+    const cux = cx / cLen;
+    const cuy = cy / cLen;
+    const dot = txn[1] * cux + tyn[1] * cuy;
+    const eas = SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE;
+    const rx = (1 + eas) * dot * cux - eas * txn[1];
+    const ry = (1 + eas) * dot * cuy - eas * tyn[1];
+    const rLen = Math.hypot(rx, ry);
+    txn[0] = rx / rLen;
+    tyn[0] = ry / rLen;
+  }
+  {
+    const cx = points[n - 1][0] - points[n - 2][0];
+    const cy = points[n - 1][1] - points[n - 2][1];
+    const cLen = Math.hypot(cx, cy);
+    const cux = cx / cLen;
+    const cuy = cy / cLen;
+    const dot = txn[n - 2] * cux + tyn[n - 2] * cuy;
+    const eas = SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE;
+    const rx = (1 + eas) * dot * cux - eas * txn[n - 2];
+    const ry = (1 + eas) * dot * cuy - eas * tyn[n - 2];
+    const rLen = Math.hypot(rx, ry);
+    txn[n - 1] = rx / rLen;
+    tyn[n - 1] = ry / rLen;
+  }
+
+  for (let i = 0; i < n - 1; i++) {
+    const d =
+      Math.hypot(
+        points[i + 1][0] - points[i][0],
+        points[i + 1][1] - points[i][1],
+      ) * SIMPLE_ROUNDED_ARROW_CP_LENGTH_RATIO;
+    const p0 = g(points[i][0], points[i][1]);
+    const p1 = g(points[i + 1][0], points[i + 1][1]);
+    const cp1 = g(points[i][0] + txn[i] * d, points[i][1] + tyn[i] * d);
+    const cp2 = g(
+      points[i + 1][0] - txn[i + 1] * d,
+      points[i + 1][1] - tyn[i + 1] * d,
+    );
+
+    // chord (grey)
+    debugDrawLine(lineSegment(p0, p1), { color: "#888888", ...PERMANENT });
+
+    // CP1 handle + circle (green = outgoing from p0)
+    debugDrawLine(lineSegment(p0, cp1), {
+      color: "#00cc44",
+      ...PERMANENT,
+    });
+    debugDrawPolygon(
+      Array.from({ length: 9 }, (_, k) =>
+        pointFrom<GlobalPoint>(
+          cp1[0] + Math.cos((k * Math.PI) / 4) * CP_RADIUS,
+          cp1[1] + Math.sin((k * Math.PI) / 4) * CP_RADIUS,
+        ),
+      ),
+      { color: "#00cc44", close: true, ...PERMANENT },
+    );
+
+    // CP2 handle + diamond (blue = incoming to p1)
+    debugDrawLine(lineSegment(p1, cp2), { color: "#0088ff", ...PERMANENT });
+    debugDrawPolygon(
+      [
+        pointFrom<GlobalPoint>(cp2[0], cp2[1] - DIAMOND_RADIUS),
+        pointFrom<GlobalPoint>(cp2[0] + DIAMOND_RADIUS, cp2[1]),
+        pointFrom<GlobalPoint>(cp2[0], cp2[1] + DIAMOND_RADIUS),
+        pointFrom<GlobalPoint>(cp2[0] - DIAMOND_RADIUS, cp2[1]),
+      ],
+      { color: "#0088ff", close: true, ...PERMANENT },
+    );
+  }
+
+  // Segment points: red X
+  for (let i = 0; i < n; i++) {
+    debugDrawPoint(g(points[i][0], points[i][1]), {
+      color: "#ff3333",
+      ...PERMANENT,
+    });
+  }
+};
+
+const generateRoundedSimpleArrowShape = (
+  points: readonly LocalPoint[],
 ): string => {
   if (points.length < 2) {
     return "";
@@ -1033,54 +1231,88 @@ const generateSimpleArrowShape = (
     return `M ${points[0][0]} ${points[0][1]} L ${points[1][0]} ${points[1][1]}`;
   }
 
-  // Catmull-Rom spline converted to cubic Bézier segments.
-  // Tangents are computed from neighboring points (one-sided at endpoints),
-  // guaranteeing C1 continuity, smooth tangent direction at every data point
-  // with no pinching at segment joints.
-  //
-  // tension=0; straight lines; tension=0.5, standard Catmull-Rom.
   const n = points.length;
+  const txn = new Float64Array(n);
+  const tyn = new Float64Array(n);
 
-  // Compute tangent vectors at each point.
-  const tx = new Float64Array(n);
-  const ty = new Float64Array(n);
-  // Quadratic-extrapolation phantom points so endpoints use the same
-  // central-difference formula as interior points, preventing degenerate
-  // (chord-parallel) first/last segments.
-  //   phantom_before = 3*P[0]   - 3*P[1]   + P[2]
-  //   phantom_after  = 3*P[n-1] - 3*P[n-2] + P[n-3]
-  for (let i = 0; i < n; i++) {
-    if (i === 0) {
-      const pbx = 3 * points[0][0] - 3 * points[1][0] + points[2][0];
-      const pby = 3 * points[0][1] - 3 * points[1][1] + points[2][1];
-      tx[i] = tension * (points[1][0] - pbx);
-      ty[i] = tension * (points[1][1] - pby);
-    } else if (i === n - 1) {
-      const pax =
-        3 * points[n - 1][0] - 3 * points[n - 2][0] + points[n - 3][0];
-      const pay =
-        3 * points[n - 1][1] - 3 * points[n - 2][1] + points[n - 3][1];
-      tx[i] = tension * (pax - points[n - 2][0]);
-      ty[i] = tension * (pay - points[n - 2][1]);
+  for (let i = 1; i < n - 1; i++) {
+    const inDx = points[i][0] - points[i - 1][0];
+    const inDy = points[i][1] - points[i - 1][1];
+    const inLen = Math.hypot(inDx, inDy);
+    const inUx = inDx / inLen;
+    const inUy = inDy / inLen;
+
+    const outDx = points[i + 1][0] - points[i][0];
+    const outDy = points[i + 1][1] - points[i][1];
+    const outLen = Math.hypot(outDx, outDy);
+    const outUx = outDx / outLen;
+    const outUy = outDy / outLen;
+
+    // Bisector: average of the two incident unit chord vectors
+    const bisDx = inUx + outUx;
+    const bisDy = inUy + outUy;
+    const bisLen = Math.hypot(bisDx, bisDy);
+    let bisUx: number;
+    let bisUy: number;
+    if (bisLen > 1e-8) {
+      bisUx = bisDx / bisLen;
+      bisUy = bisDy / bisLen;
     } else {
-      tx[i] = tension * (points[i + 1][0] - points[i - 1][0]);
-      ty[i] = tension * (points[i + 1][1] - points[i - 1][1]);
+      // 180° hairpin -> rotate incoming chord 90°
+      bisUx = -inUy;
+      bisUy = inUx;
     }
+
+    const bx = bisUx;
+    const by = bisUy;
+    const bLen = Math.hypot(bx, by);
+    txn[i] = bx / bLen;
+    tyn[i] = by / bLen;
+  }
+
+  // Endpoints: reflect the adjacent interior tangent across the endpoint's own chord.
+  // This mirrors the angle the interior CP makes with the chord, preventing overshoot.
+  // ENDPOINT_ANGLE_SCALE < 1 reduces the perpendicular deviation, making endpoints more taut.
+  {
+    const cx = points[1][0] - points[0][0];
+    const cy = points[1][1] - points[0][1];
+    const cLen = Math.hypot(cx, cy);
+    const cux = cx / cLen;
+    const cuy = cy / cLen;
+    const dot = txn[1] * cux + tyn[1] * cuy;
+    const eas = SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE;
+    const rx = (1 + eas) * dot * cux - eas * txn[1];
+    const ry = (1 + eas) * dot * cuy - eas * tyn[1];
+    const rLen = Math.hypot(rx, ry);
+    txn[0] = rx / rLen;
+    tyn[0] = ry / rLen;
+  }
+  {
+    const cx = points[n - 1][0] - points[n - 2][0];
+    const cy = points[n - 1][1] - points[n - 2][1];
+    const cLen = Math.hypot(cx, cy);
+    const cux = cx / cLen;
+    const cuy = cy / cLen;
+    const dot = txn[n - 2] * cux + tyn[n - 2] * cuy;
+    const eas = SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE;
+    const rx = (1 + eas) * dot * cux - eas * txn[n - 2];
+    const ry = (1 + eas) * dot * cuy - eas * tyn[n - 2];
+    const rLen = Math.hypot(rx, ry);
+    txn[n - 1] = rx / rLen;
+    tyn[n - 1] = ry / rLen;
   }
 
   const path: string[] = [`M ${points[0][0]} ${points[0][1]}`];
   for (let i = 0; i < n - 1; i++) {
-    const segLen = pointDistance(points[i], points[i + 1]);
-    // Clamp each control point offset to at most half the segment length so
-    // that curvature decreases linearly to 0 as the two endpoints converge.
-    const tanMag1 = Math.sqrt(tx[i] * tx[i] + ty[i] * ty[i]);
-    const tanMag2 = Math.sqrt(tx[i + 1] * tx[i + 1] + ty[i + 1] * ty[i + 1]);
-    const s1 = tanMag1 > 0 ? Math.min(1, (segLen * 1.5) / tanMag1) : 1;
-    const s2 = tanMag2 > 0 ? Math.min(1, (segLen * 1.5) / tanMag2) : 1;
-    const cp1x = points[i][0] + (tx[i] / 3) * s1;
-    const cp1y = points[i][1] + (ty[i] / 3) * s1;
-    const cp2x = points[i + 1][0] - (tx[i + 1] / 3) * s2;
-    const cp2y = points[i + 1][1] - (ty[i + 1] / 3) * s2;
+    const d =
+      Math.hypot(
+        points[i + 1][0] - points[i][0],
+        points[i + 1][1] - points[i][1],
+      ) * SIMPLE_ROUNDED_ARROW_CP_LENGTH_RATIO;
+    const cp1x = points[i][0] + txn[i] * d;
+    const cp1y = points[i][1] + tyn[i] * d;
+    const cp2x = points[i + 1][0] - txn[i + 1] * d;
+    const cp2y = points[i + 1][1] - tyn[i + 1] * d;
     path.push(
       `C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${points[i + 1][0]} ${
         points[i + 1][1]

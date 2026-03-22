@@ -434,12 +434,12 @@ describe("Test Linear Elements", () => {
       expect(midPointsWithRoundEdge).toMatchInlineSnapshot(`
         [
           [
-            "53.63967",
-            "47.15774",
+            "47.30521",
+            "57.27340",
           ],
           [
-            "78.65236",
-            "44.31886",
+            "83.70877",
+            "40.46424",
           ],
         ]
       `);
@@ -499,12 +499,12 @@ describe("Test Linear Elements", () => {
       expect(newMidPoints).toMatchInlineSnapshot(`
         [
           [
-            "103.63967",
-            "67.15774",
+            "97.30521",
+            "77.27340",
           ],
           [
-            "128.65236",
-            "64.31886",
+            "133.70877",
+            "60.46424",
           ],
         ]
       `);
@@ -707,14 +707,8 @@ describe("Test Linear Elements", () => {
       // This is the expected midpoint for line with round edge
       // hence hardcoding it so if later some bug is introduced
       // this will fail and we can fix it
-      const firstSegmentMidpoint = pointFrom<GlobalPoint>(
-        55.9697848965255,
-        47.442326230998205,
-      );
-      const lastSegmentMidpoint = pointFrom<GlobalPoint>(
-        76.08587175006699,
-        43.294165939653226,
-      );
+      const firstSegmentMidpoint = pointFrom<GlobalPoint>(47.30521, 57.2734);
+      const lastSegmentMidpoint = pointFrom<GlobalPoint>(83.70877, 40.46424);
       let line: ExcalidrawLinearElement;
 
       beforeEach(() => {
@@ -759,16 +753,16 @@ describe("Test Linear Elements", () => {
                 0,
               ],
               [
-                "85.96978",
-                "77.44233",
+                "77.30521",
+                "87.27340",
               ],
               [
                 70,
                 50,
               ],
               [
-                "106.08587",
-                "73.29417",
+                "113.70877",
+                "70.46424",
               ],
               [
                 40,
@@ -815,12 +809,12 @@ describe("Test Linear Elements", () => {
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
             [
-              "28.64089",
-              "21.69997",
+              "13.73276",
+              "41.73533",
             ],
             [
-              "82.34322",
-              "47.57759",
+              "83.95050",
+              "40.24690",
             ],
           ]
         `);
@@ -904,12 +898,12 @@ describe("Test Linear Elements", () => {
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
             [
-              "53.63967",
-              "47.15774",
+              "47.30521",
+              "57.27340",
             ],
             [
-              "78.65236",
-              "44.31886",
+              "83.70877",
+              "40.46424",
             ],
           ]
         `);
@@ -1071,8 +1065,8 @@ describe("Test Linear Elements", () => {
         );
         expect(position).toMatchInlineSnapshot(`
           {
-            "x": "86.17305",
-            "y": "76.11251",
+            "x": 75,
+            "y": 60,
           }
         `);
       });
@@ -1187,12 +1181,12 @@ describe("Test Linear Elements", () => {
         ),
       ).toMatchInlineSnapshot(`
         [
-          20,
+          "19.99875",
           20,
           105,
           80,
-          "56.00000",
-          45,
+          "56.25357",
+          "46.47665",
         ]
       `);
 
@@ -1202,7 +1196,7 @@ describe("Test Linear Elements", () => {
         .toMatchInlineSnapshot(`
           {
             "height": 130,
-            "width": "367.18528",
+            "width": "367.68709",
           }
         `);
 
@@ -1214,7 +1208,7 @@ describe("Test Linear Elements", () => {
         ),
       ).toMatchInlineSnapshot(`
         {
-          "x": "272.18528",
+          "x": "272.68709",
           "y": 45,
         }
       `);
@@ -1230,11 +1224,11 @@ describe("Test Linear Elements", () => {
       ).toMatchInlineSnapshot(`
         [
           20,
-          35,
-          "502.18528",
-          95,
-          "208.69244",
-          "52.50000",
+          "18.77567",
+          "502.68709",
+          "123.53753",
+          "203.94165",
+          "71.15660",
         ]
       `);
     });
