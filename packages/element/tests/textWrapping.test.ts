@@ -1,4 +1,8 @@
-import { wrapText, parseTokens } from "../src/textWrapping";
+import {
+  getWrappedTextLines,
+  parseTokens,
+  wrapText,
+} from "../src/textWrapping";
 
 import type { FontString } from "../src/types";
 
@@ -100,6 +104,71 @@ describe("Test wrapText", () => {
     const maxWidth2 = 50;
     const res2 = wrapText(text, font, maxWidth2);
     expect(res2).toBe(`\tA)\none\ntab\n- two\ntabs\n- 8\nspace\ns`);
+  });
+
+  it("should retain original text offsets for wrapped lines", () => {
+    expect(getWrappedTextLines("Hello World!", font, 60)).toEqual([
+      {
+        text: "Hello",
+        start: 0,
+        end: 5,
+      },
+      {
+        text: "World!",
+        start: 6,
+        end: 12,
+      },
+    ]);
+  });
+
+  it("should exclude whitespace trimmed away at soft-wrap boundaries from line offsets", () => {
+    expect(getWrappedTextLines("  Hello  World", font, 90)).toEqual([
+      {
+        text: "  Hello",
+        start: 0,
+        end: 7,
+      },
+      {
+        text: "World",
+        start: 9,
+        end: 14,
+      },
+    ]);
+  });
+
+  it("should retain offsets when wrapping a single long token", () => {
+    expect(getWrappedTextLines("Excalidraw", font, 50)).toEqual([
+      {
+        text: "Excal",
+        start: 0,
+        end: 5,
+      },
+      {
+        text: "idraw",
+        start: 5,
+        end: 10,
+      },
+    ]);
+  });
+
+  it("should preserve empty hard lines in metadata", () => {
+    expect(getWrappedTextLines("A\n\nB", font, 100)).toEqual([
+      {
+        text: "A",
+        start: 0,
+        end: 1,
+      },
+      {
+        text: "",
+        start: 2,
+        end: 2,
+      },
+      {
+        text: "B",
+        start: 3,
+        end: 4,
+      },
+    ]);
   });
 
   describe("When text is CJK", () => {

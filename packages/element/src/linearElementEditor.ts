@@ -476,16 +476,22 @@ export class LinearElementEditor {
       });
     }
 
-    invariant(
-      lastClickedPoint > -1 &&
-        selectedPointsIndices.includes(lastClickedPoint) &&
-        element.points[lastClickedPoint],
-      `There must be a valid lastClickedPoint in order to drag it. selectedPointsIndices(${JSON.stringify(
-        selectedPointsIndices,
-      )}) points(0..${
-        element.points.length - 1
-      }) lastClickedPoint(${lastClickedPoint})`,
-    );
+    if (
+      lastClickedPoint < 0 ||
+      !selectedPointsIndices.includes(lastClickedPoint) ||
+      !element.points[lastClickedPoint]
+    ) {
+      console.error(
+        `There must be a valid lastClickedPoint in order to drag it. selectedPointsIndices(${JSON.stringify(
+          selectedPointsIndices,
+        )}) points(0..${
+          element.points.length - 1
+        }) lastClickedPoint(${lastClickedPoint})`,
+      );
+
+      // Fall back to the actual last point as a last resort.
+      lastClickedPoint = element.points.length - 1;
+    }
 
     // point that's being dragged (out of all selected points)
     const draggingPoint = element.points[lastClickedPoint];

@@ -10,7 +10,9 @@ import {
   isTestEnv,
   MIME_TYPES,
   applyDarkModeFilter,
+  isRTL,
 } from "@excalidraw/common";
+import { pointFrom, pointRotateRads, type Radians } from "@excalidraw/math";
 
 import {
   getTextFromElements,
@@ -33,8 +35,11 @@ import {
   getBoundTextElement,
 } from "@excalidraw/element";
 import { getTextWidth } from "@excalidraw/element";
+import { getLineHeightInPx } from "@excalidraw/element";
+import { getLineWidth } from "@excalidraw/element";
 import { normalizeText } from "@excalidraw/element";
 import { wrapText } from "@excalidraw/element";
+import { getWrappedTextLines } from "@excalidraw/element";
 import {
   isArrowElement,
   isBoundToContainer,
@@ -91,6 +96,103 @@ const getTransform = (
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
+const getLineDirection = (text: string, offset: number) => {
+  const hardLineStart = text.lastIndexOf("\n", Math.max(0, offset - 1)) + 1;
+  const hardLineEnd = text.indexOf("\n", offset);
+  const hardLineText = text.slice(
+    hardLineStart,
+    hardLineEnd === -1 ? text.length : hardLineEnd,
+  );
+
+  return isRTL(hardLineText) ? "rtl" : "ltr";
+};
+
+const getCaretBoundaryOffsets = (text: string) => {
+  const offsets = [0];
+  let offset = 0;
+
+  for (const char of Array.from(text)) {
+    offset += char.length;
+    offsets.push(offset);
+  }
+
+  return offsets;
+};
+
+const getLineCaretOffsetFromNativeLayout = ({
+  text,
+  font,
+  lineHeightPx,
+  direction,
+  targetX,
+}: {
+  text: string;
+  font: ReturnType<typeof getFontString>;
+  lineHeightPx: number;
+  direction: "ltr" | "rtl";
+  targetX: number;
+}) => {
+  if (!text || !document.body || typeof document.createRange !== "function") {
+    return null;
+  }
+
+  const offsets = getCaretBoundaryOffsets(text);
+  const mirror = document.createElement("div");
+  const textNode = document.createTextNode(text);
+  const range = document.createRange();
+  const positions: number[] = [];
+
+  mirror.dir = direction;
+  Object.assign(mirror.style, {
+    position: "fixed",
+    top: "0",
+    left: "0",
+    margin: 0,
+    padding: 0,
+    border: 0,
+    opacity: "0",
+    pointerEvents: "none",
+    whiteSpace: "pre",
+    font,
+    lineHeight: `${lineHeightPx}px`,
+  });
+  mirror.append(textNode);
+  document.body.append(mirror);
+
+  try {
+    for (const offset of offsets) {
+      range.setStart(textNode, offset);
+      range.setEnd(textNode, offset);
+      const caretRect = range.getBoundingClientRect();
+
+      if (!Number.isFinite(caretRect.left)) {
+        return null;
+      }
+
+      positions.push(caretRect.left);
+    }
+  } catch {
+    return null;
+  } finally {
+    mirror.remove();
+  }
+
+  const leftEdge = Math.min(...positions);
+  let closestOffset = offsets[0];
+  let closestDistance = Infinity;
+
+  for (let index = 0; index < offsets.length; index++) {
+    const distance = Math.abs(positions[index] - leftEdge - targetX);
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestOffset = offsets[index];
+    }
+  }
+
+  return closestOffset;
+};
+
 type SubmitHandler = () => void;
 
 export const textWysiwyg = ({
@@ -103,6 +205,7 @@ export const textWysiwyg = ({
   excalidrawContainer,
   app,
   autoSelect = true,
+  initialCaretSceneCoords = null,
 }: {
   id: ExcalidrawElement["id"];
   /**
@@ -119,7 +222,19 @@ export const textWysiwyg = ({
   excalidrawContainer: HTMLDivElement | null;
   app: App;
   autoSelect?: boolean;
+  initialCaretSceneCoords?: { x: number; y: number } | null;
 }): SubmitHandler => {
+  let currentTextLayout: {
+    angle: Radians;
+    font: ReturnType<typeof getFontString>;
+    height: number;
+    lineHeightPx: number;
+    textAlign: ExcalidrawTextElement["textAlign"];
+    width: number;
+    x: number;
+    y: number;
+  } | null = null;
+
   const textPropertiesUpdated = (
     updatedTextElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
@@ -254,6 +369,7 @@ export const textWysiwyg = ({
       height *= 1.05;
 
       const font = getFontString(updatedTextElement);
+      const angle = getTextElementAngle(updatedTextElement, container);
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
@@ -269,7 +385,7 @@ export const textWysiwyg = ({
         transform: getTransform(
           width,
           height,
-          getTextElementAngle(updatedTextElement, container),
+          angle,
           appState,
           maxWidth,
           editorMaxHeight,
@@ -283,6 +399,19 @@ export const textWysiwyg = ({
         opacity: updatedTextElement.opacity / 100,
         maxHeight: `${editorMaxHeight}px`,
       });
+      currentTextLayout = {
+        angle: angle as Radians,
+        font,
+        height: updatedTextElement.height,
+        lineHeightPx: getLineHeightInPx(
+          updatedTextElement.fontSize,
+          updatedTextElement.lineHeight,
+        ),
+        textAlign,
+        width: updatedTextElement.width,
+        x: coordX,
+        y: coordY,
+      };
       editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
@@ -332,6 +461,71 @@ export const textWysiwyg = ({
   });
   editable.value = element.originalText;
   updateWysiwygStyle();
+
+  const getCaretIndexFromInitialSceneCoords = () => {
+    if (!initialCaretSceneCoords || !currentTextLayout) {
+      return null;
+    }
+
+    const layout = currentTextLayout;
+    const center = pointFrom(
+      layout.x + layout.width / 2,
+      layout.y + layout.height / 2,
+    );
+    const [unrotatedX, unrotatedY] = pointRotateRads(
+      pointFrom(initialCaretSceneCoords.x, initialCaretSceneCoords.y),
+      center,
+      -layout.angle as Radians,
+    );
+    const localX = unrotatedX - layout.x;
+    const localY = unrotatedY - layout.y;
+    const lines = getWrappedTextLines(
+      editable.value,
+      layout.font,
+      whiteSpace === "pre-wrap" ? layout.width : Infinity,
+    );
+    const lineIndex = Math.max(
+      0,
+      Math.min(lines.length - 1, Math.floor(localY / layout.lineHeightPx)),
+    );
+    const line = lines[lineIndex];
+    const direction = getLineDirection(editable.value, line.start);
+    const lineWidth = getLineWidth(line.text, layout.font);
+    const lineStartX =
+      layout.textAlign === "center"
+        ? (layout.width - lineWidth) / 2
+        : layout.textAlign === "right"
+        ? layout.width - lineWidth
+        : 0;
+    const relativeX = localX - lineStartX;
+
+    if (!line.text) {
+      return line.start;
+    }
+
+    const lineCaretOffset = getLineCaretOffsetFromNativeLayout({
+      text: line.text,
+      font: layout.font,
+      lineHeightPx: layout.lineHeightPx,
+      direction,
+      targetX: relativeX,
+    });
+
+    return line.start + (lineCaretOffset || 0);
+  };
+
+  let pendingInitialSelection = (() => {
+    const caretIndex = getCaretIndexFromInitialSceneCoords();
+
+    if (caretIndex === null) {
+      return null;
+    }
+
+    return {
+      start: caretIndex,
+      end: caretIndex,
+    };
+  })();
 
   if (onChange) {
     editable.onpaste = async (event) => {
@@ -696,6 +890,13 @@ export const textWysiwyg = ({
       // Otherwise, re-enable submit on blur and refocus the editor.
       editable.onblur = handleSubmit;
       editable.focus();
+      if (pendingInitialSelection) {
+        editable.setSelectionRange(
+          pendingInitialSelection.start,
+          pendingInitialSelection.end,
+        );
+        pendingInitialSelection = null;
+      }
     });
   };
 
@@ -786,7 +987,7 @@ export const textWysiwyg = ({
 
   let isDestroyed = false;
 
-  if (autoSelect) {
+  if (autoSelect && !pendingInitialSelection) {
     // select on init (focusing is done separately inside the bindBlurEvent()
     // because we need it to happen *after* the blur event from `pointerdown`)
     editable.select();

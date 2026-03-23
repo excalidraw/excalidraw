@@ -257,6 +257,7 @@ import {
   handleFocusPointPointerUp,
   maybeHandleArrowPointlikeDrag,
   getUncroppedWidthAndHeight,
+  getActiveTextElement,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -416,6 +417,7 @@ import {
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
+import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
 
@@ -517,6 +519,7 @@ EditorInterfaceContext.displayName = "EditorInterfaceContext";
 const editorLifecycleEventBehavior = {
   "editor:mount": { cardinality: "once", replay: "last" },
   "editor:initialize": { cardinality: "once", replay: "last" },
+  "editor:unmount": { cardinality: "once", replay: "last" },
 } as const;
 
 export const ExcalidrawContainerContext = React.createContext<{
@@ -556,7 +559,7 @@ export const ExcalidrawAPIContext =
 ExcalidrawAPIContext.displayName = "ExcalidrawAPIContext";
 
 export const ExcalidrawAPISetContext = React.createContext<
-  ((api: ExcalidrawImperativeAPI) => void) | null
+  ((api: ExcalidrawImperativeAPI | null) => void) | null
 >(null);
 ExcalidrawAPISetContext.displayName = "ExcalidrawAPISetContext";
 
@@ -683,9 +686,15 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
+  // TODO this is a hack and we should ideally unify touch and pointer events
+  // and implement our own double click handling end-to-end (currently we're
+  // using a mix of native browser for click events and manual for touch -
+  // and browser doubleClick sucks to begin with)
+  lastPointerUpIsDoubleClick: boolean = false;
   lastPointerMoveEvent: PointerEvent | null = null;
   /** current frame pointer cords */
   lastPointerMoveCoords: { x: number; y: number } | null = null;
+  private lastCompletedCanvasClicks: { x: number; y: number }[] = [];
   /** previous frame pointer coords */
   previousPointerMoveCoords: { x: number; y: number } | null = null;
   lastViewportPosition = { x: 0, y: 0 };
@@ -730,6 +739,50 @@ class App extends React.Component<AppProps, AppState> {
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
   api: ExcalidrawImperativeAPI;
+
+  private createExcalidrawAPI(): ExcalidrawImperativeAPI {
+    const api: ExcalidrawImperativeAPI = {
+      isDestroyed: false,
+      updateScene: this.updateScene,
+      applyDeltas: this.applyDeltas,
+      mutateElement: this.mutateElement,
+      updateLibrary: this.library.updateLibrary,
+      addFiles: this.addFiles,
+      resetScene: this.resetScene,
+      getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
+      getSceneElementsMapIncludingDeleted:
+        this.getSceneElementsMapIncludingDeleted,
+      history: {
+        clear: this.resetHistory,
+      },
+      scrollToContent: this.scrollToContent,
+      getSceneElements: this.getSceneElements,
+      getAppState: () => this.state,
+      getFiles: () => this.files,
+      getName: this.getName,
+      registerAction: (action: Action) => {
+        this.actionManager.registerAction(action);
+      },
+      refresh: this.refresh,
+      setToast: this.setToast,
+      id: this.id,
+      setActiveTool: this.setActiveTool,
+      setCursor: this.setCursor,
+      resetCursor: this.resetCursor,
+      getEditorInterface: () => this.editorInterface,
+      updateFrameRendering: this.updateFrameRendering,
+      toggleSidebar: this.toggleSidebar,
+      onChange: (cb) => this.onChangeEmitter.on(cb),
+      onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
+      onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
+      onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
+      onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
+      onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
+      onStateChange: this.onStateChange,
+      onEvent: this.onEvent,
+    };
+    return api;
+  }
 
   constructor(props: AppProps) {
     super(props);
@@ -791,47 +844,11 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
 
-    this.api = {
-      updateScene: this.updateScene,
-      applyDeltas: this.applyDeltas,
-      mutateElement: this.mutateElement,
-      updateLibrary: this.library.updateLibrary,
-      addFiles: this.addFiles,
-      resetScene: this.resetScene,
-      getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
-      getSceneElementsMapIncludingDeleted:
-        this.getSceneElementsMapIncludingDeleted,
-      history: {
-        clear: this.resetHistory,
-      },
-      scrollToContent: this.scrollToContent,
-      getSceneElements: this.getSceneElements,
-      getAppState: () => this.state,
-      getFiles: () => this.files,
-      getName: this.getName,
-      registerAction: (action: Action) => {
-        this.actionManager.registerAction(action);
-      },
-      refresh: this.refresh,
-      setToast: this.setToast,
-      id: this.id,
-      setActiveTool: this.setActiveTool,
-      setCursor: this.setCursor,
-      resetCursor: this.resetCursor,
-      getEditorInterface: () => this.editorInterface,
-      updateFrameRendering: this.updateFrameRendering,
-      toggleSidebar: this.toggleSidebar,
-      onChange: (cb) => this.onChangeEmitter.on(cb),
-      onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
-      onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
-      onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
-      onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
-      onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
-      onStateChange: this.onStateChange,
-      onEvent: this.onEvent,
-    } as const;
-
-    props.onExcalidrawAPI?.(this.api);
+    // in case internal editor APIs call this early, otherwise we need
+    // to construct this in componentDidMount because componentWillUnmount
+    // will invalidate it (so in StrictMode, doing this in constructor alone
+    // would be a problem)
+    this.api = this.createExcalidrawAPI();
   }
 
   updateEditorAtom = <Value, Args extends unknown[], Result>(
@@ -1239,6 +1256,26 @@ class App extends React.Component<AppProps, AppState> {
     ) as NullableGridSize;
   };
 
+  private getTextCreationGridPoint = (x: number, y: number) => {
+    const effectiveGridSize = this.getEffectiveGridSize();
+
+    if (effectiveGridSize === null) {
+      return null;
+    }
+
+    const getTextCreationGridCoordinate = (coordinate: number) => {
+      const topLeftGridPoint =
+        Math.floor(coordinate / effectiveGridSize) * effectiveGridSize;
+
+      return topLeftGridPoint;
+    };
+
+    return {
+      x: getTextCreationGridCoordinate(x),
+      y: getTextCreationGridCoordinate(y),
+    };
+  };
+
   private getHTMLIFrameElement(
     element: ExcalidrawIframeLikeElement,
   ): HTMLIFrameElement | undefined {
@@ -1428,6 +1465,21 @@ class App extends React.Component<AppProps, AppState> {
 
     return true;
   }
+
+  private isDoubleClick = (
+    lastPointerEvent:
+      | PointerEvent
+      | React.PointerEvent<HTMLElement>
+      | undefined
+      | null,
+    currentPointerEvent: PointerEvent | React.PointerEvent<HTMLElement>,
+  ) => {
+    return (
+      lastPointerEvent != null &&
+      currentPointerEvent.timeStamp - lastPointerEvent.timeStamp <=
+        TAP_TWICE_TIMEOUT
+    );
+  };
 
   private isIframeLikeElementCenter(
     el: ExcalidrawIframeLikeElement | null,
@@ -2312,6 +2364,7 @@ class App extends React.Component<AppProps, AppState> {
                             }
                             handleCanvasRef={this.handleInteractiveCanvasRef}
                             onContextMenu={this.handleCanvasContextMenu}
+                            onClick={this.handleCanvasClick}
                             onPointerMove={this.handleCanvasPointerMove}
                             onPointerUp={this.handleCanvasPointerUp}
                             onPointerCancel={this.removePointer}
@@ -3003,6 +3056,8 @@ class App extends React.Component<AppProps, AppState> {
 
   public async componentDidMount() {
     this.unmounted = false;
+    this.api = this.createExcalidrawAPI();
+
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
@@ -3089,10 +3144,35 @@ class App extends React.Component<AppProps, AppState> {
 
     this.editorLifecycleEvents.emit("editor:mount", mountPayload);
     this.props.onMount?.(mountPayload);
+    this.props.onExcalidrawAPI?.(this.api);
   }
 
   public componentWillUnmount() {
+    // we're recreating the api object reference so that the
+    // <ExcalidrawAPIContext.Provider/> picks up on it
+    this.api = { ...this.api, isDestroyed: true };
+
+    for (const key of Object.keys(this.api) as (keyof typeof this.api)[]) {
+      if (
+        (key.startsWith("get") ||
+          key === "onStateChange" ||
+          key === "onEvent") &&
+        typeof this.api[key] === "function"
+      ) {
+        (this.api as any)[key] = () => {
+          throw new Error(
+            "ExcalidrawAPI is no longer usable after the editor has been unmounted and will return invalid/empty data. You should check for `ExcalidrawAPI.isDestroyed` before calling get* methods on subscribing to state/event changes.",
+          );
+        };
+      }
+    }
+
+    this.editorLifecycleEvents.emit("editor:unmount");
+    this.props.onUnmount?.();
+    this.props.onExcalidrawAPI?.(null);
+
     (window as any).launchQueue?.setConsumer(() => {});
+
     this.renderer.destroy();
     this.scene.destroy();
     this.scene = new Scene();
@@ -3538,10 +3618,14 @@ class App extends React.Component<AppProps, AppState> {
         this.lassoTrail.endPath();
         this.deselectElements();
 
-        // @ts-ignore
         this.handleCanvasDoubleClick({
           clientX: touch.clientX,
           clientY: touch.clientY,
+          type: "touch",
+          altKey: false,
+          ctrlKey: false,
+          metaKey: false,
+          shiftKey: false,
         });
       }
       didTapTwice = false;
@@ -3667,7 +3751,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!isPlainPaste && isMaybeMermaidDefinition(data.text)) {
       const api = await import("@excalidraw/mermaid-to-excalidraw");
       try {
-        const { elements: skeletonElements, files } =
+        const { elements: skeletonElements, files = {} } =
           await api.parseMermaidToExcalidraw(data.text);
 
         const elements = convertToExcalidrawElements(skeletonElements, {
@@ -5581,8 +5665,14 @@ class App extends React.Component<AppProps, AppState> {
     element: ExcalidrawTextElement,
     {
       isExistingElement = false,
+      initialCaretSceneCoords = null,
     }: {
       isExistingElement?: boolean;
+      /**
+       * supply null if no caret positioning is desired, and instead
+       * text should be auto-selected
+       */
+      initialCaretSceneCoords?: { x: number; y: number } | null;
     },
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
@@ -5685,6 +5775,7 @@ class App extends React.Component<AppProps, AppState> {
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
       app: this,
+      initialCaretSceneCoords,
       // when text is selected, it's hard (at least on iOS) to re-position the
       // caret (i.e. deselect). There's not much use for always selecting
       // the text on edit anyway (and users can select-all from contextmenu
@@ -5708,6 +5799,68 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  private getSelectedTextElement(
+    container?: ExcalidrawTextContainer | null,
+  ): NonDeleted<ExcalidrawTextElement> | null {
+    const selectedElements = this.scene.getSelectedElements(this.state);
+
+    if (selectedElements.length !== 1) {
+      return null;
+    }
+
+    const selectedElement = selectedElements[0]!;
+
+    if (isTextElement(selectedElement)) {
+      return selectedElement;
+    }
+
+    if (!container) {
+      return null;
+    }
+
+    return getBoundTextElement(
+      selectedElement,
+      this.scene.getNonDeletedElementsMap(),
+    );
+  }
+
+  private getSelectedTextEditingContainerAtPosition(
+    hitElement: NonDeletedExcalidrawElement | null,
+    sceneCoords: { x: number; y: number },
+  ): ExcalidrawTextContainer | null | undefined {
+    const selectedElements = this.scene.getSelectedElements(this.state);
+
+    if (
+      selectedElements.length !== 1 ||
+      !hitElement ||
+      hitElement.id !== selectedElements[0]!.id
+    ) {
+      return null;
+    }
+
+    const selectedElement = selectedElements[0]!;
+
+    if (isTextElement(selectedElement)) {
+      return null;
+    }
+
+    if (!isValidTextContainer(selectedElement)) {
+      return undefined;
+    }
+
+    const textElement = this.getSelectedTextElement(selectedElement);
+    const hitTextElement = this.getTextElementAtPosition(
+      sceneCoords.x,
+      sceneCoords.y,
+    );
+
+    if (!textElement || hitTextElement?.id !== textElement.id) {
+      return undefined;
+    }
+
+    return selectedElement;
+  }
+
   private getTextElementAtPosition(
     x: number,
     y: number,
@@ -5720,6 +5873,58 @@ class App extends React.Component<AppProps, AppState> {
     }
     return null;
   }
+
+  private isHittingTextAutoResizeHandle = (
+    selectedElements: NonDeleted<ExcalidrawElement>[],
+    point: Readonly<{ x: number; y: number }>,
+  ): boolean => {
+    const activeTextElement = getActiveTextElement(
+      selectedElements,
+      this.state,
+    );
+
+    if (
+      activeTextElement &&
+      !activeTextElement.isDeleted &&
+      !activeTextElement.autoResize &&
+      isPointHittingTextAutoResizeHandle(
+        point,
+        activeTextElement,
+        this.state.zoom.value,
+        this.editorInterface.formFactor,
+      )
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
+  private handleTextAutoResizeHandlePointerDown = (
+    selectedElements: NonDeleted<ExcalidrawElement>[],
+    point: Readonly<{ x: number; y: number }>,
+  ) => {
+    const activeTextElement = getActiveTextElement(
+      selectedElements,
+      this.state,
+    );
+    if (
+      !activeTextElement ||
+      !this.isHittingTextAutoResizeHandle(selectedElements, point)
+    ) {
+      return false;
+    }
+
+    this.actionManager.executeAction(
+      actionTextAutoResize,
+      "ui",
+      // we need to pass down the element since it may already be deselected
+      // due to the pointerdown
+      activeTextElement,
+    );
+    this.resetCursor();
+    return true;
+  };
 
   // NOTE: Hot path for hit testing, so avoid unnecessary computations
   private getElementAtPosition(
@@ -5933,6 +6138,7 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter = true,
     container,
     autoEdit = true,
+    initialCaretSceneCoords,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -5942,6 +6148,7 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter?: boolean;
     container?: ExcalidrawTextContainer | null;
     autoEdit?: boolean;
+    initialCaretSceneCoords?: { x: number; y: number };
   }) => {
     let shouldBindToContainer = false;
 
@@ -5962,24 +6169,9 @@ class App extends React.Component<AppProps, AppState> {
         shouldBindToContainer = true;
       }
     }
-    let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
-
-    const selectedElements = this.scene.getSelectedElements(this.state);
-
-    if (selectedElements.length === 1) {
-      if (isTextElement(selectedElements[0])) {
-        existingTextElement = selectedElements[0];
-      } else if (container) {
-        existingTextElement = getBoundTextElement(
-          selectedElements[0],
-          this.scene.getNonDeletedElementsMap(),
-        );
-      } else {
-        existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
-      }
-    } else {
-      existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
-    }
+    const existingTextElement =
+      this.getSelectedTextElement(container) ||
+      this.getTextElementAtPosition(sceneX, sceneY);
 
     const fontFamily =
       existingTextElement?.fontFamily || this.state.currentItemFontFamily;
@@ -6026,11 +6218,32 @@ class App extends React.Component<AppProps, AppState> {
       y: sceneY,
     });
 
+    const textCreationGridPoint = this.getTextCreationGridPoint(sceneX, sceneY);
+
+    const newTextElementPosition = parentCenterPosition
+      ? {
+          x: parentCenterPosition.elementCenterX,
+          y: parentCenterPosition.elementCenterY,
+        }
+      : !existingTextElement
+      ? {
+          x: textCreationGridPoint?.x ?? sceneX,
+          y:
+            textCreationGridPoint === null
+              ? // Free text starts from a point cursor, so center the first line box on it.
+                sceneY - getLineHeightInPx(fontSize, lineHeight) / 2
+              : textCreationGridPoint.y,
+        }
+      : {
+          x: sceneX,
+          y: sceneY,
+        };
+
     const element =
       existingTextElement ||
       newTextElement({
-        x: parentCenterPosition ? parentCenterPosition.elementCenterX : sceneX,
-        y: parentCenterPosition ? parentCenterPosition.elementCenterY : sceneY,
+        x: newTextElementPosition.x,
+        y: newTextElementPosition.y,
         strokeColor: this.state.currentItemStrokeColor,
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
@@ -6080,6 +6293,9 @@ class App extends React.Component<AppProps, AppState> {
     if (autoEdit || existingTextElement || container) {
       this.handleTextWysiwyg(element, {
         isExistingElement: !!existingTextElement,
+        initialCaretSceneCoords: existingTextElement
+          ? initialCaretSceneCoords
+          : null,
       });
     } else {
       this.setState({
@@ -6105,9 +6321,48 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private shouldHandleBrowserCanvasDoubleClick = (type: string) => {
+    // TODO remove this once we consolidate double-click logic and handle
+    // ourselves for all event types together
+    if (type === "touch") {
+      return true;
+    }
+    if (this.lastCompletedCanvasClicks.length === 0) {
+      return true;
+    }
+
+    if (this.lastCompletedCanvasClicks.length < 2) {
+      return false;
+    }
+
+    const [firstClick, secondClick] = this.lastCompletedCanvasClicks;
+
+    return (
+      pointDistance(
+        pointFrom(firstClick.x, firstClick.y),
+        pointFrom(secondClick.x, secondClick.y),
+      ) <= DOUBLE_TAP_POSITION_THRESHOLD
+    );
+  };
+
   private handleCanvasDoubleClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
+    event: Pick<
+      React.MouseEvent<HTMLCanvasElement>,
+      | "type"
+      | "clientX"
+      | "clientY"
+      | "altKey"
+      | "ctrlKey"
+      | "metaKey"
+      | "shiftKey"
+    >,
   ) => {
+    if (
+      this.state.editingTextElement ||
+      !this.shouldHandleBrowserCanvasDoubleClick(event.type)
+    ) {
+      return;
+    }
     // case: double-clicking with arrow/line tool selected would both create
     // text and enter multiElement mode
     if (this.state.multiElement) {
@@ -6293,6 +6548,21 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
     }
+  };
+
+  private handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (event.button !== POINTER_BUTTON.MAIN) {
+      this.lastCompletedCanvasClicks = [];
+      return;
+    }
+
+    this.lastCompletedCanvasClicks = [
+      ...this.lastCompletedCanvasClicks.slice(-1),
+      {
+        x: event.clientX,
+        y: event.clientY,
+      },
+    ];
   };
 
   private getElementLinkAtPosition = (
@@ -6725,27 +6995,23 @@ class App extends React.Component<AppProps, AppState> {
           },
           { informMutation: false, isDragging: false },
         );
+        const newLastIdx = multiElement.points.length - 1;
         this.setState({
           selectedLinearElement: {
             ...selectedLinearElement,
-            selectedPointsIndices:
-              selectedLinearElement.selectedPointsIndices?.includes(
-                multiElement.points.length,
-              )
-                ? [
-                    ...selectedLinearElement.selectedPointsIndices.filter(
-                      (idx) =>
-                        idx !== multiElement.points.length &&
-                        idx !== multiElement.points.length - 1,
+            selectedPointsIndices: selectedLinearElement.selectedPointsIndices
+              ? [
+                  ...new Set(
+                    selectedLinearElement.selectedPointsIndices.map((idx) =>
+                      Math.min(idx, newLastIdx),
                     ),
-                    multiElement.points.length - 1,
-                  ]
-                : selectedLinearElement.selectedPointsIndices,
-            lastCommittedPoint:
-              multiElement.points[multiElement.points.length - 1],
+                  ),
+                ]
+              : selectedLinearElement.selectedPointsIndices,
+            lastCommittedPoint: multiElement.points[newLastIdx],
             initialState: {
               ...selectedLinearElement.initialState,
-              lastClickedPoint: multiElement.points.length - 1,
+              lastClickedPoint: newLastIdx,
             },
           },
         });
@@ -6831,6 +7097,12 @@ class App extends React.Component<AppProps, AppState> {
     const elements = this.scene.getNonDeletedElements();
 
     const selectedElements = this.scene.getSelectedElements(this.state);
+
+    if (this.isHittingTextAutoResizeHandle(selectedElements, scenePointer)) {
+      setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+      return;
+    }
+
     if (
       selectedElements.length === 1 &&
       !isOverScrollBar &&
@@ -6975,7 +7247,9 @@ class App extends React.Component<AppProps, AppState> {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
       } else if (
         // if using cmd/ctrl, we're not dragging
-        !event[KEYS.CTRL_OR_CMD]
+        !event[KEYS.CTRL_OR_CMD] &&
+        // editing text -> don't show move cursor when hovering over its bbox
+        hitElement?.id !== this.state.editingTextElement?.id
       ) {
         if (
           (hitElement ||
@@ -7196,6 +7470,8 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    const selectedElements = this.scene.getSelectedElements(this.state);
+
     // If Ctrl is not held, ensure isBindingEnabled reflects the user preference.
     if (!event.ctrlKey) {
       const preferenceEnabled = this.state.bindingPreference === "enabled";
@@ -7418,6 +7694,15 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({
       selectedElementsAreBeingDragged: false,
     });
+
+    if (
+      this.handleTextAutoResizeHandlePointerDown(
+        selectedElements,
+        pointerDownState.origin,
+      )
+    ) {
+      return;
+    }
 
     if (this.handleDraggingScrollBar(event, pointerDownState)) {
       return;
@@ -7644,6 +7929,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.removePointer(event);
+    this.lastPointerUpIsDoubleClick = this.isDoubleClick(
+      this.lastPointerUpEvent,
+      event,
+    );
     this.lastPointerUpEvent = event;
 
     if (!event.ctrlKey) {
@@ -8480,6 +8769,7 @@ class App extends React.Component<AppProps, AppState> {
       insertAtParentCenter: !event.altKey,
       container,
       autoEdit: false,
+      initialCaretSceneCoords: { x: sceneX, y: sceneY },
     });
 
     resetCursor(this.interactiveCanvas);
@@ -10962,6 +11252,35 @@ class App extends React.Component<AppProps, AppState> {
         }
         // reset cursor
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+        return;
+      }
+
+      const selectedTextEditingContainer =
+        this.getSelectedTextEditingContainerAtPosition(hitElement, sceneCoords);
+
+      if (
+        activeTool.type === this.state.preferredSelectionTool.type &&
+        !this.state.editingTextElement &&
+        !pointerDownState.drag.hasOccurred &&
+        !pointerDownState.hit.wasAddedToSelection &&
+        !childEvent.shiftKey &&
+        !childEvent[KEYS.CTRL_OR_CMD] &&
+        !childEvent.altKey &&
+        childEvent.pointerType !== "touch" &&
+        hitElement &&
+        ((isTextElement(hitElement) &&
+          this.state.selectedElementIds[hitElement.id] &&
+          this.scene.getSelectedElements(this.state).length === 1) ||
+          selectedTextEditingContainer)
+      ) {
+        this.startTextEditing({
+          sceneX: sceneCoords.x,
+          sceneY: sceneCoords.y,
+          container: selectedTextEditingContainer,
+          initialCaretSceneCoords: this.lastPointerUpIsDoubleClick
+            ? undefined
+            : sceneCoords,
+        });
         return;
       }
 
