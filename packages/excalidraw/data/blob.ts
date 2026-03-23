@@ -24,7 +24,6 @@ import {
   restoreElements,
   restoreLibraryItems,
 } from "./restore";
-import { migrateSceneElements, SCHEMA_VERSIONS } from "./schema";
 
 import type { AppState, DataURL, LibraryItem } from "../types";
 
@@ -158,14 +157,10 @@ export const loadSceneOrLibraryFromBlob = async (
       throw error;
     }
     if (isValidExcalidrawData(data)) {
-      const migratedElements = migrateSceneElements(data.elements, {
-        payloadSchemaVersion: data.schemaVersion,
-        fallbackVersion: SCHEMA_VERSIONS.initial,
-      });
       return {
         type: MIME_TYPES.excalidraw,
         data: {
-          elements: restoreElements(migratedElements, localElements, {
+          elements: restoreElements(data.elements, localElements, {
             repairBindings: true,
             deleteInvisibleElements: true,
           }),
@@ -227,10 +222,7 @@ export const parseLibraryJSON = (
     throw new Error("Invalid library");
   }
   const libraryItems = data.libraryItems || data.library;
-  return restoreLibraryItems(libraryItems, defaultStatus, {
-    payloadSchemaVersion: data.schemaVersion,
-    fallbackVersion: SCHEMA_VERSIONS.initial,
-  });
+  return restoreLibraryItems(libraryItems, defaultStatus);
 };
 
 export const loadLibraryFromBlob = async (

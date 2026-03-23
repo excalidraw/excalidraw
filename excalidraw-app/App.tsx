@@ -53,11 +53,6 @@ import {
   restoreAppState,
   restoreElements,
 } from "@excalidraw/excalidraw/data/restore";
-import {
-  hasElementSchemaVersion,
-  migrateSceneElements,
-  SCHEMA_VERSIONS,
-} from "@excalidraw/excalidraw/data/schema";
 import { newElementWith } from "@excalidraw/element";
 import { isInitializedImageElement } from "@excalidraw/element";
 import clsx from "clsx";
@@ -232,17 +227,6 @@ const initializeScene = async (opts: {
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const localDataState = importFromLocalStorage();
-  const localStorageSchemaVersionSource = hasElementSchemaVersion(
-    localDataState?.elements,
-  )
-    ? {
-        payloadSchemaVersion: undefined,
-        fallbackVersion: SCHEMA_VERSIONS.initial,
-      }
-    : {
-        payloadSchemaVersion: localDataState?.schemaVersion,
-        fallbackVersion: SCHEMA_VERSIONS.initial,
-      };
 
   let scene: Omit<
     RestoredDataState,
@@ -252,17 +236,10 @@ const initializeScene = async (opts: {
   > & {
     scrollToContent?: boolean;
   } = {
-    elements: restoreElements(
-      migrateSceneElements(
-        localDataState?.elements,
-        localStorageSchemaVersionSource,
-      ),
-      null,
-      {
-        repairBindings: true,
-        deleteInvisibleElements: true,
-      },
-    ),
+    elements: restoreElements(localDataState?.elements, null, {
+      repairBindings: true,
+      deleteInvisibleElements: true,
+    }),
     appState: restoreAppState(localDataState?.appState, null),
   };
 
@@ -285,17 +262,10 @@ const initializeScene = async (opts: {
 
         scene = {
           elements: bumpElementVersions(
-            restoreElements(
-              migrateSceneElements(imported.elements, {
-                payloadSchemaVersion: imported.schemaVersion,
-                fallbackVersion: SCHEMA_VERSIONS.initial,
-              }),
-              null,
-              {
-                repairBindings: true,
-                deleteInvisibleElements: true,
-              },
-            ),
+            restoreElements(imported.elements, null, {
+              repairBindings: true,
+              deleteInvisibleElements: true,
+            }),
             scene.elements,
           ),
           appState: restoreAppState(
@@ -579,24 +549,9 @@ const ExcalidrawWrapper = () => {
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
           const localDataState = importFromLocalStorage();
           const username = importUsernameFromLocalStorage();
-          const localStorageSchemaVersionSource = hasElementSchemaVersion(
-            localDataState?.elements,
-          )
-            ? {
-                payloadSchemaVersion: undefined,
-                fallbackVersion: SCHEMA_VERSIONS.initial,
-              }
-            : {
-                payloadSchemaVersion: localDataState?.schemaVersion,
-                fallbackVersion: SCHEMA_VERSIONS.initial,
-              };
-          const migratedElements = migrateSceneElements(
-            localDataState?.elements,
-            localStorageSchemaVersionSource,
-          );
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
-            elements: restoreElements(migratedElements, null, {
+            elements: restoreElements(localDataState?.elements, null, {
               repairBindings: true,
               deleteInvisibleElements: true,
             }),

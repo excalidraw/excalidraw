@@ -28,7 +28,6 @@ import {
 
 import { appJotaiStore, atom } from "excalidraw-app/app-jotai";
 import { getNonDeletedElements } from "@excalidraw/element";
-import { SCHEMA_VERSIONS } from "@excalidraw/excalidraw/data/schema";
 
 import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
@@ -87,12 +86,7 @@ const saveDataStateToLocalStorage = (
       _appState.openSidebar = null;
     }
 
-    const persistedElements = getNonDeletedElements(elements).map(
-      (element) => ({
-        ...element,
-        schemaVersion: SCHEMA_VERSIONS.latest,
-      }),
-    );
+    const persistedElements = getNonDeletedElements(elements);
 
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
@@ -101,10 +95,6 @@ const saveDataStateToLocalStorage = (
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
       JSON.stringify(_appState),
-    );
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_SCHEMA_VERSION,
-      `${SCHEMA_VERSIONS.latest}`,
     );
     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
     if (localStorageQuotaExceeded) {

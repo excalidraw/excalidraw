@@ -35,8 +35,6 @@ import {
 
 import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
 
-import { SCHEMA_VERSIONS } from "./data/schema";
-
 import type { FileSystemHandle } from "./data/filesystem";
 
 import type { Spreadsheet } from "./charts";
@@ -45,7 +43,6 @@ import type { BinaryFiles } from "./types";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
-  schemaVersion: number;
   elements: readonly (NonDeletedExcalidrawElement & {
     schemaVersion?: number;
   })[];
@@ -58,7 +55,6 @@ export interface ClipboardData {
   spreadsheet?: Spreadsheet;
   elements?: readonly ExcalidrawElement[];
   files?: BinaryFiles;
-  schemaVersion?: number;
   text?: string;
   mixedContent?: PastedMixedContent;
   errorMessage?: string;
@@ -88,7 +84,6 @@ const clipboardContainsElements = (
 ): contents is {
   elements: ExcalidrawElement[];
   files?: BinaryFiles;
-  schemaVersion?: number;
 } => {
   if (
     [
@@ -188,24 +183,19 @@ export const serializeAsClipboardJSON = ({
   // select bound text elements when copying
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
-    schemaVersion: SCHEMA_VERSIONS.latest,
     elements: elements.map((element) => {
-      const elementWithSchema = {
-        ...element,
-        schemaVersion: SCHEMA_VERSIONS.latest,
-      };
       if (
         getContainingFrame(element, elementsMap) &&
         !framesToCopy.has(getContainingFrame(element, elementsMap)!)
       ) {
-        const copiedElement = deepCopyElement(elementWithSchema);
+        const copiedElement = deepCopyElement(element);
         mutateElement(copiedElement, elementsMap, {
           frameId: null,
         });
         return copiedElement;
       }
 
-      return elementWithSchema;
+      return element;
     }),
     files: files ? _files : undefined,
   };
@@ -587,7 +577,6 @@ export const parseClipboard = async (
       return {
         elements: systemClipboardData.elements,
         files: systemClipboardData.files,
-        schemaVersion: systemClipboardData.schemaVersion,
         text: isPlainPaste
           ? JSON.stringify(systemClipboardData.elements, null, 2)
           : undefined,

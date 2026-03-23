@@ -6,7 +6,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
-import { SCHEMA_VERSIONS } from "../../data/schema";
 import {
   convertToExcalidrawElements,
   exportToCanvas,
@@ -149,8 +148,6 @@ export const insertToEditor = ({
   app.addElementsFromPasteOrLibrary({
     elements: newElements,
     files,
-    schemaVersionSource: SCHEMA_VERSIONS.latest,
-    migrationScope: "api",
     position: "center",
     fitToContent: true,
   });

@@ -33,7 +33,6 @@ import {
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
   ELEMENT_TRANSLATE_AMOUNT,
   EVENT,
-  EXPORT_DATA_TYPES,
   FRAME_STYLE,
   IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
@@ -355,15 +354,6 @@ import {
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restoreAppState, restoreElements } from "../data/restore";
-import {
-  migrateAPIElements,
-  migrateClipboardElements,
-  migrateLibraryElements,
-  migrateSceneElements,
-  SCHEMA_VERSIONS,
-  type SchemaVersionSource,
-  type SchemaMigrationScope,
-} from "../data/schema";
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
@@ -2335,8 +2325,6 @@ class App extends React.Component<AppProps, AppState> {
       elements,
       position: "center",
       files: null,
-      schemaVersionSource: SCHEMA_VERSIONS.latest,
-      migrationScope: "api",
     });
   };
 
@@ -2817,21 +2805,10 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-    const initialDataSchemaFallback =
-      initialData?.type === EXPORT_DATA_TYPES.excalidraw
-        ? SCHEMA_VERSIONS.initial
-        : SCHEMA_VERSIONS.latest;
-    const restoredElements = restoreElements(
-      migrateSceneElements(initialData?.elements, {
-        payloadSchemaVersion: initialData?.schemaVersion,
-        fallbackVersion: initialDataSchemaFallback,
-      }),
-      null,
-      {
-        repairBindings: true,
-        deleteInvisibleElements: true,
-      },
-    );
+    const restoredElements = restoreElements(initialData?.elements, null, {
+      repairBindings: true,
+      deleteInvisibleElements: true,
+    });
     let restoredAppState = restoreAppState(initialData?.appState, null);
     const activeTool = restoredAppState.activeTool;
 
@@ -3596,13 +3573,6 @@ class App extends React.Component<AppProps, AppState> {
       this.addElementsFromPasteOrLibrary({
         elements,
         files: data.files || null,
-        schemaVersionSource: data.programmaticAPI
-          ? SCHEMA_VERSIONS.latest
-          : {
-              payloadSchemaVersion: data.schemaVersion,
-              fallbackVersion: SCHEMA_VERSIONS.initial,
-            },
-        migrationScope: data.programmaticAPI ? "api" : "clipboard",
         position:
           this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
         retainSeed: isPlainPaste,
@@ -3629,8 +3599,6 @@ class App extends React.Component<AppProps, AppState> {
         this.addElementsFromPasteOrLibrary({
           elements,
           files,
-          schemaVersionSource: SCHEMA_VERSIONS.latest,
-          migrationScope: "api",
           position:
             this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
         });
@@ -3748,20 +3716,11 @@ class App extends React.Component<AppProps, AppState> {
   addElementsFromPasteOrLibrary = (opts: {
     elements: readonly ExcalidrawElement[];
     files: BinaryFiles | null;
-    schemaVersionSource: SchemaVersionSource;
-    migrationScope: SchemaMigrationScope;
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
     fitToContent?: boolean;
   }) => {
-    const migratedElements =
-      opts.migrationScope === "clipboard"
-        ? migrateClipboardElements(opts.elements, opts.schemaVersionSource)
-        : opts.migrationScope === "library"
-        ? migrateLibraryElements(opts.elements, opts.schemaVersionSource)
-        : migrateAPIElements(opts.elements, opts.schemaVersionSource);
-
-    const elements = restoreElements(migratedElements, null, {
+    const elements = restoreElements(opts.elements, null, {
       deleteInvisibleElements: true,
     });
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
@@ -11532,8 +11491,6 @@ class App extends React.Component<AppProps, AppState> {
             elements: distributeLibraryItemsOnSquareGrid(libraryItems),
             position: event,
             files: null,
-            schemaVersionSource: SCHEMA_VERSIONS.latest,
-            migrationScope: "library",
           });
         }
       } catch (error: any) {

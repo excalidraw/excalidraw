@@ -10,8 +10,6 @@ import {
   getExportSource,
 } from "@excalidraw/common";
 
-import { SCHEMA_VERSIONS } from "../data/schema";
-
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import { canvasToBlob, resizeImageFile } from "../data/blob";
 import { t } from "../i18n";
@@ -282,7 +280,6 @@ const PublishLibrary = ({
     const libContent: ExportedLibraryData = {
       type: EXPORT_DATA_TYPES.excalidrawLibrary,
       version: VERSIONS.excalidrawLibrary,
-      schemaVersion: SCHEMA_VERSIONS.latest,
       source: getExportSource(),
       libraryItems: clonedLibItems,
     };
