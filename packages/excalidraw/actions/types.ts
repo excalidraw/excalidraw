@@ -68,6 +68,8 @@ export type ActionName =
   | "changeTextSelectionBackgroundColor"
   | "changeTextSelectionUnderlineColor"
   | "applyTextSelectionBackground"
+  | "applyTextSelectionColor"
+  | "applyTextSelectionTag"
   | "applyTextSelectionUnderline"
   | "toggleTextSelectionUnderline"
   | "changeBackgroundColor"
@@ -152,7 +154,12 @@ export type ActionName =
   | "wrapSelectionInFrame"
   | "toggleLassoTool"
   | "toggleShapeSwitch"
-  | "togglePolygon";
+  | "togglePolygon"
+  | "summaryToolToggleSummaryRoot"
+  | "summaryToolToggleSummaryBase"
+  | "summaryToolCommentsOff"
+  | "summaryToolCommentsSingle"
+  | "summaryToolCommentsAll";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

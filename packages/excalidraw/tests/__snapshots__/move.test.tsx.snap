@@ -10,7 +10,7 @@ exports[`duplicate element on move when ALT is clicked > rectangle 5`] = `
   "frameId": null,
   "groupIds": [],
   "height": 50,
-  "id": "id0",
+  "id": "id1",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -42,7 +42,7 @@ exports[`duplicate element on move when ALT is clicked > rectangle 6`] = `
   "frameId": null,
   "groupIds": [],
   "height": 50,
-  "id": "id4",
+  "id": "id5",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -74,7 +74,7 @@ exports[`move element > rectangle 5`] = `
   "frameId": null,
   "groupIds": [],
   "height": 50,
-  "id": "id0",
+  "id": "id1",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -102,7 +102,7 @@ exports[`move element > rectangles with binding arrow 5`] = `
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id6",
+      "id": "id7",
       "type": "arrow",
     },
   ],
@@ -111,7 +111,7 @@ exports[`move element > rectangles with binding arrow 5`] = `
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id0",
+  "id": "id1",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -139,7 +139,7 @@ exports[`move element > rectangles with binding arrow 6`] = `
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id6",
+      "id": "id7",
       "type": "arrow",
     },
   ],
@@ -148,7 +148,7 @@ exports[`move element > rectangles with binding arrow 6`] = `
   "frameId": null,
   "groupIds": [],
   "height": 300,
-  "id": "id3",
+  "id": "id4",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -179,7 +179,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id3",
+    "elementId": "id4",
     "fixedPoint": [
       "-0.02000",
       "0.48010",
@@ -190,7 +190,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "frameId": null,
   "groupIds": [],
   "height": "88.01760",
-  "id": "id6",
+  "id": "id7",
   "index": "a2",
   "isDeleted": false,
   "link": null,
@@ -213,7 +213,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "seed": 23633383,
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id0",
+    "elementId": "id1",
     "fixedPoint": [
       "1.06000",
       "0.56011",

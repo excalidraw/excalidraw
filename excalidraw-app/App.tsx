@@ -377,6 +377,10 @@ const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
 
+  useEffect(() => {
+    (window as any).excalidrawAPI = excalidrawAPI;
+  }, [excalidrawAPI]);
+
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
 
   const [langCode, setLangCode] = useAppLangCode();
@@ -917,6 +921,7 @@ const ExcalidrawWrapper = () => {
         UIOptions={{
           canvasActions: {
             toggleTheme: true,
+            changeViewBackgroundColor: true,
             export: {
               onExportToBackend,
               renderCustomUI: excalidrawAPI

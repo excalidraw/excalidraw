@@ -106,6 +106,9 @@ const DefaultMainMenu: React.FC<{
 }> = ({ UIOptions }) => {
   return (
     <MainMenu __fallback>
+      <MainMenu.DefaultItems.NewCanvas />
+      <MainMenu.DefaultItems.ToggleToolbarVisibility />
+      <MainMenu.DefaultItems.ToggleExtraButtonsVisibility />
       <MainMenu.DefaultItems.LoadScene />
       <MainMenu.DefaultItems.SaveToActiveFile />
       {/* FIXME we should to test for this inside the item itself */}
@@ -303,17 +306,77 @@ const LayerUI = ({
     );
   };
 
-  const renderCanvasActions = () => (
-    <div style={{ position: "relative" }}>
-      {/* wrapping to Fragment stops React from occasionally complaining
-                about identical Keys */}
-      <tunnels.MainMenuTunnel.Out />
-      {renderWelcomeScreen && <tunnels.WelcomeScreenMenuHintTunnel.Out />}
-    </div>
-  );
+  const normalizeFileName = (value: string) => {
+    const trimmed = (value ?? "").trim();
+    if (!trimmed) {
+      return null;
+    }
+    return trimmed.replace(/\.excalidraw$/i, "");
+  };
+
+  const FileNameEditor = ({ baseName }: { baseName: string }) => {
+    const [draft, setDraft] = React.useState(baseName);
+    const inputRef = React.useRef<HTMLInputElement>(null);
+
+    React.useEffect(() => {
+      setDraft(baseName);
+    }, [baseName]);
+
+    const commit = () => {
+      const normalized = normalizeFileName(draft);
+      setAppState({ name: normalized });
+    };
+
+    const cancel = () => {
+      setDraft(baseName);
+    };
+
+    return (
+      <input
+        ref={inputRef}
+        className="app-filename-input dropdown-menu-button"
+        value={draft}
+        onChange={(event) => setDraft(event.target.value)}
+        spellCheck={false}
+        autoCorrect="off"
+        autoCapitalize="off"
+        autoComplete="off"
+        onBlur={commit}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            commit();
+          } else if (event.key === "Escape") {
+            event.preventDefault();
+            cancel();
+          }
+        }}
+        aria-label={t("labels.editFileName")}
+      />
+    );
+  };
+
+  const renderCanvasActions = () => {
+    const baseName =
+      appState.name || (app.props as any)?.name || t("labels.untitled");
+
+    return (
+      <div
+        className="App-menu_top__canvas-actions"
+        style={{ position: "relative" }}
+      >
+        <div className="App-menu_top__canvas-actions-row">
+          <tunnels.MainMenuTunnel.Out />
+          <FileNameEditor baseName={baseName} />
+        </div>
+        {renderWelcomeScreen && <tunnels.WelcomeScreenMenuHintTunnel.Out />}
+      </div>
+    );
+  };
 
   const renderSelectedShapeActions = () => {
     const isCompactMode = isCompactStylesPanel;
+    const maxHeight = "100%";
 
     return (
       <Section
@@ -327,9 +390,8 @@ const LayerUI = ({
             className={clsx("compact-shape-actions-island")}
             padding={0}
             style={{
-              // we want to make sure this doesn't overflow so subtracting the
-              // approximate height of hamburgerMenu + footer
-              maxHeight: `${appState.height - 166}px`,
+              height: "100%",
+              maxHeight,
             }}
           >
             <CompactShapeActions
@@ -345,9 +407,8 @@ const LayerUI = ({
             className={CLASSES.SHAPE_ACTIONS_MENU}
             padding={2}
             style={{
-              // we want to make sure this doesn't overflow so subtracting the
-              // approximate height of hamburgerMenu + footer
-              maxHeight: `${appState.height - 166}px`,
+              height: "100%",
+              maxHeight,
             }}
           >
             <SelectedShapeActions
@@ -391,7 +452,8 @@ const LayerUI = ({
               {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
             </div>
           </Stack.Col>
-          {!appState.viewModeEnabled &&
+          {appState.isToolbarVisible &&
+            !appState.viewModeEnabled &&
             appState.openDialog?.name !== "elementLinkSelector" && (
               <Section heading="shapes" className="shapes-section">
                 {(heading: React.ReactNode) => (
@@ -684,7 +746,10 @@ const LayerUI = ({
       {editorInterface.formFactor !== "phone" && (
         <>
           <div
-            className="layer-ui__wrapper"
+            className={clsx("layer-ui__wrapper", {
+              "layer-ui__wrapper--hide-extra-buttons":
+                !appState.areExtraButtonsVisible,
+            })}
             style={
               appState.openSidebar &&
               isSidebarDocked &&

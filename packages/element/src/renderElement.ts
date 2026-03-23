@@ -164,6 +164,8 @@ const getTextDecorations = (
   | {
       highlights?: readonly TextDecorationRange[];
       underlines?: readonly TextDecorationRange[];
+      textColors?: readonly TextDecorationRange[];
+      tags?: readonly TextDecorationRange[];
     }
   | undefined => {
   const v = (element.customData as any)?.textDecorations;
@@ -322,6 +324,78 @@ const drawTextDecorations = ({
         context.arc(usableStart, y, endDotRadius, 0, Math.PI * 2);
         context.arc(usableEnd, y, endDotRadius, 0, Math.PI * 2);
         context.fill();
+      }
+    }
+
+    context.restore();
+  }
+
+  const tags = decorations.tags ?? [];
+  if ((mode === "highlights" || mode === "both") && tags.length) {
+    const strokeWidth = Math.max(1, element.fontSize * 0.08);
+    const paddingX = Math.max(1, element.fontSize * 0.18);
+    const paddingY = Math.max(1, element.fontSize * 0.1);
+    const radius = Math.max(2, element.fontSize * 0.12);
+
+    const roundRectPath = (
+      ctx: CanvasRenderingContext2D,
+      x: number,
+      y: number,
+      w: number,
+      h: number,
+      r: number,
+    ) => {
+      const rr = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+    };
+
+    context.save();
+    context.lineWidth = strokeWidth;
+    context.lineJoin = "round";
+
+    for (const tag of tags) {
+      const start = Math.max(0, Math.min(textLength, tag.start));
+      const end = Math.max(0, Math.min(textLength, tag.end));
+      if (start === end) {
+        continue;
+      }
+      const tStart = Math.min(start, end);
+      const tEnd = Math.max(start, end);
+
+      const baseColor =
+        theme === THEME.DARK ? applyDarkModeFilter(tag.color) : tag.color;
+      context.strokeStyle = baseColor;
+
+      for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+        const lineStart = lineStartIndices[lineIndex] ?? 0;
+        const lineText = lines[lineIndex] ?? "";
+        const lineEnd = lineStart + lineText.length;
+        const segStart = Math.max(tStart, lineStart);
+        const segEnd = Math.min(tEnd, lineEnd);
+        if (segStart >= segEnd) {
+          continue;
+        }
+        const relStart = segStart - lineStart;
+        const relEnd = segEnd - lineStart;
+        const prefix = lineText.slice(0, relStart);
+        const selection = lineText.slice(relStart, relEnd);
+        const prefixWidth = context.measureText(prefix).width;
+        const selectionWidth = context.measureText(selection).width;
+        const x = (lineLefts[lineIndex] ?? horizontalOffset) + prefixWidth;
+        const y = lineIndex * lineHeightPx;
+        const rx = x - paddingX;
+        const ry = y + paddingY;
+        const rw = selectionWidth + paddingX * 2;
+        const rh = Math.max(1, lineHeightPx - paddingY * 2);
+
+        roundRectPath(context, rx, ry, rw, rh, radius);
+        context.stroke();
       }
     }
 
@@ -967,12 +1041,99 @@ const drawElementOnCanvas = (
           mode: "highlights",
         });
 
-        for (let index = 0; index < lines.length; index++) {
-          context.fillText(
-            lines[index],
-            horizontalOffset,
-            index * lineHeightPx + verticalOffset,
+        const decorations = getTextDecorations(element);
+        const textColors = decorations?.textColors ?? [];
+        if (textColors.length) {
+          const normalizedText = (element.originalText ?? "").replace(
+            /\r\n?/g,
+            "\n",
           );
+          const textLength = normalizedText.length;
+
+          const colorByIndex: (string | null)[] = new Array(textLength).fill(
+            null,
+          );
+          for (const range of textColors) {
+            const start = Math.max(0, Math.min(textLength, range.start));
+            const end = Math.max(0, Math.min(textLength, range.end));
+            if (start === end) {
+              continue;
+            }
+            const a = Math.min(start, end);
+            const b = Math.max(start, end);
+            const baseColor =
+              renderConfig.theme === THEME.DARK
+                ? applyDarkModeFilter(range.color)
+                : range.color;
+            for (let i = a; i < b; i++) {
+              colorByIndex[i] = baseColor;
+            }
+          }
+
+          const lineStartIndices: number[] = [];
+          let currentIndex = 0;
+          for (let i = 0; i < lines.length; i++) {
+            lineStartIndices.push(currentIndex);
+            currentIndex += lines[i]?.length ?? 0;
+            if (explicitNewlineAfterLine[i]) {
+              currentIndex += 1;
+            }
+          }
+
+          const lineWidths = lines.map(
+            (line) => context.measureText(line).width,
+          );
+          const lineLefts = lineWidths.map((w) =>
+            element.textAlign === "center"
+              ? horizontalOffset - w / 2
+              : element.textAlign === "right"
+              ? horizontalOffset - w
+              : horizontalOffset,
+          );
+
+          const baseFill =
+            renderConfig.theme === THEME.DARK
+              ? applyDarkModeFilter(element.strokeColor)
+              : element.strokeColor;
+
+          const prevAlign = context.textAlign;
+          const prevFill = context.fillStyle;
+          context.textAlign = "left";
+          for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const lineText = lines[lineIndex] ?? "";
+            const lineStart = lineStartIndices[lineIndex] ?? 0;
+            const y = lineIndex * lineHeightPx + verticalOffset;
+            let x = lineLefts[lineIndex] ?? horizontalOffset;
+            let i = 0;
+            while (i < lineText.length) {
+              const globalIndex = lineStart + i;
+              const color = colorByIndex[globalIndex] ?? baseFill;
+              let j = i + 1;
+              while (j < lineText.length) {
+                const nextGlobal = lineStart + j;
+                const nextColor = colorByIndex[nextGlobal] ?? baseFill;
+                if (nextColor !== color) {
+                  break;
+                }
+                j++;
+              }
+              const segText = lineText.slice(i, j);
+              context.fillStyle = color;
+              context.fillText(segText, x, y);
+              x += context.measureText(segText).width;
+              i = j;
+            }
+          }
+          context.textAlign = prevAlign;
+          context.fillStyle = prevFill;
+        } else {
+          for (let index = 0; index < lines.length; index++) {
+            context.fillText(
+              lines[index],
+              horizontalOffset,
+              index * lineHeightPx + verticalOffset,
+            );
+          }
         }
 
         drawTextDecorations({

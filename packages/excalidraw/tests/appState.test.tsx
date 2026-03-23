@@ -76,7 +76,11 @@ describe("appState", () => {
     UI.clickTool("text");
 
     expect(h.state.currentItemFontSize).toBe(30);
-    fireEvent.click(queryByTestId(container, "fontSize-small")!);
+    const decrease = queryByTestId(container, "fontSize-decrease");
+    expect(decrease).toBeDefined();
+    for (let i = 0; i < 14; i++) {
+      fireEvent.click(decrease!);
+    }
     expect(h.state.currentItemFontSize).toBe(16);
 
     const mouse = new Pointer("mouse");

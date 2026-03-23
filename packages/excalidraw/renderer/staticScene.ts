@@ -293,9 +293,41 @@ const renderTextLineLinks = ({
     return null;
   };
 
+  const textBoxRects = (() => {
+    const rects: Array<{
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }> = [];
+    for (const element of allElementsMap.values()) {
+      if (!isTextElement(element) || element.angle) {
+        continue;
+      }
+      rects.push({
+        x: element.x,
+        y: element.y,
+        width: element.width,
+        height: element.height,
+      });
+    }
+    return rects;
+  })();
+
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
   context.setLineDash([]);
+
+  if (textBoxRects.length) {
+    //行号连接线在文本框的部分设为不显示2026.03.22
+    context.save();
+    context.beginPath();
+    context.rect(-1_000_000_000, -1_000_000_000, 2_000_000_000, 2_000_000_000);
+    for (const rect of textBoxRects) {
+      context.rect(rect.x, rect.y, rect.width, rect.height);
+    }
+    context.clip("evenodd");
+  }
 
   for (const link of links) {
     const isSelected = !!appState.selectedTextLineLinkIds[link.id];
@@ -336,6 +368,71 @@ const renderTextLineLinks = ({
       context.lineTo(to.x, to.y);
     }
     context.stroke();
+  }
+
+  if (textBoxRects.length) {
+    context.restore();
+  }
+  context.restore();
+};
+
+const renderSummaryToolLabels = ({
+  context,
+  appState,
+  allElementsMap,
+}: {
+  context: CanvasRenderingContext2D;
+  appState: StaticCanvasAppState;
+  allElementsMap: NonDeletedSceneElementsMap;
+}) => {
+  const zoom = appState.zoom.value || 1;
+  const fontSize = 12 / zoom;
+  const paddingX = 4 / zoom;
+  const paddingY = 2 / zoom;
+  const margin = 4 / zoom;
+
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
+  for (const element of allElementsMap.values()) {
+    if (!isTextElement(element) || element.angle) {
+      continue;
+    }
+    const data = (element.customData as any)?.summaryTool;
+    if (!data || data.role !== "summaryRoot") {
+      continue;
+    }
+
+    const label = "summary.txt";
+    const color =
+      typeof data.labelColor === "string" ? data.labelColor : "#e03131";
+
+    const prevFont = context.font;
+    context.font = `${fontSize}px ${getFontFamilyString({
+      fontFamily: (element as any).fontFamily,
+    })}`;
+
+    const textWidth = context.measureText(label).width;
+    const w = textWidth + paddingX * 2;
+    const h = fontSize + paddingY * 2;
+
+    const x = element.x;
+    const y = element.y - h - margin;
+
+    context.lineWidth = 1 / zoom;
+    context.strokeStyle = color;
+    context.fillStyle = appState.viewBackgroundColor || "#fff";
+
+    context.beginPath();
+    context.rect(x, y, w, h);
+    context.fill();
+    context.stroke();
+
+    context.fillStyle = color;
+    context.textBaseline = "top";
+    context.fillText(label, x + paddingX, y + paddingY);
+
+    context.font = prevFont;
   }
 
   context.restore();
@@ -500,6 +597,7 @@ const _renderStaticScene = ({
     });
 
   renderTextLineLinks({ context, appState, allElementsMap });
+  renderSummaryToolLabels({ context, appState, allElementsMap });
 
   // render embeddables on top
   visibleElements

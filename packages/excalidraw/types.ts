@@ -239,6 +239,7 @@ export type InteractiveCanvasAppState = Readonly<
     preciseMeasurement: AppState["preciseMeasurement"];
     gridCharTopMeasurement: AppState["gridCharTopMeasurement"];
     zenModeEnabled: AppState["zenModeEnabled"];
+    isToolbarVisible: AppState["isToolbarVisible"];
     editingTextElement: AppState["editingTextElement"];
     // Cropping
     isCropping: AppState["isCropping"];
@@ -391,6 +392,8 @@ export interface AppState {
   textEditorCaretColor: string;
   textSelectionBackgroundColor: string;
   textSelectionUnderlineColor: string;
+  textSelectionColor: string;
+  textSelectionTagColor: string;
   textLineLinks: TextLineLink[];
   textLineLinkDraft: TextLineLinkEndpoint | null;
   scrollX: number;
@@ -408,6 +411,8 @@ export interface AppState {
     | "textEditorCaret"
     | "textSelectionBackground"
     | "textSelectionUnderline"
+    | "textSelectionColor"
+    | "textSelectionTag"
     | "elementBackground"
     | "elementStroke"
     | "fontFamily"
@@ -447,6 +452,9 @@ export interface AppState {
     duration?: number;
   } | null;
   zenModeEnabled: boolean;
+  isToolbarVisible: boolean;
+  areExtraButtonsVisible: boolean;
+  areUselessButtonsHidden: boolean;
   theme: Theme;
   /** grid cell px size */
   gridSize: number;

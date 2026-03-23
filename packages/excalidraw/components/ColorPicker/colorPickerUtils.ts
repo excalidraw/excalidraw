@@ -102,5 +102,7 @@ export type ColorPickerType =
   | "textEditorCaret"
   | "textSelectionBackground"
   | "textSelectionUnderline"
+  | "textSelectionColor"
+  | "textSelectionTag"
   | "elementBackground"
   | "elementStroke";

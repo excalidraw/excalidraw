@@ -32,6 +32,14 @@
       }
     }
 
+    &--hide-extra-buttons {
+      .plus-banner,
+      .collab-button,
+      .default-sidebar-trigger {
+        display: none !important;
+      }
+    }
+
     &__footer {
       width: 100%;
 

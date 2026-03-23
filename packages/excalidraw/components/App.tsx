@@ -198,6 +198,7 @@ import {
   getLinkDirectionFromKey,
   cropElement,
   wrapText,
+  wrapTextPreservingWhitespace,
   wrapTextPreservingWhitespaceWithExplicitNewlineMarkers,
   isElementLink,
   parseElementLinkFromURL,
@@ -329,6 +330,11 @@ import {
   actionToggleArrowBinding,
   actionToggleMidpointSnapping,
   actionToggleCropEditor,
+  actionToggleSummaryRoot,
+  actionToggleSummaryBase,
+  actionSummaryToolCommentsOff,
+  actionSummaryToolCommentsSingle,
+  actionSummaryToolCommentsAll,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
@@ -435,6 +441,12 @@ import { EraserTrail } from "../eraser";
 import { getShortcutKey } from "../shortcut";
 
 import { tryParseSpreadsheet } from "../charts";
+import {
+  applySummaryToolSync,
+  parseSynclists as parseSummaryToolSynclists,
+  getSummaryRootTextElement,
+  getSummaryBaseTextElement,
+} from "../summaryTool/summaryTool";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -2047,6 +2059,103 @@ class App extends React.Component<AppProps, AppState> {
       event.type === "pointerenter" ? "none" : "auto";
   }
 
+  private handleResizeTextElementWidthFromLineNumber = ({
+    elementId,
+    x,
+    width,
+  }: {
+    elementId: string;
+    x: number;
+    width: number;
+  }) => {
+    const cacheBucketPx = 4;
+    const element = this.scene.getNonDeletedElementsMap().get(elementId);
+    if (
+      !element ||
+      !isTextElement(element) ||
+      element.isDeleted ||
+      element.angle
+    ) {
+      return;
+    }
+    if (element.containerId) {
+      return;
+    }
+
+    const fontString = getFontString(element);
+    const minWidth = getMinTextElementWidth(fontString, element.lineHeight);
+    const nextWidth = Math.max(minWidth, Math.round(width));
+    const nextX = Math.round(x);
+    const nextBucket = Math.max(1, Math.round(nextWidth / cacheBucketPx));
+    if (!(this as any).__lineNumberTextResizeCache) {
+      (this as any).__lineNumberTextResizeCache = new Map();
+    }
+    const cache = (this as any).__lineNumberTextResizeCache as Map<
+      string,
+      {
+        originalText: string;
+        fontString: string;
+        lineHeight: number;
+        bucket: number;
+        wrappedText: string;
+        height: number;
+      }
+    >;
+    const cached = cache.get(element.id);
+
+    const wrapWidth = nextBucket * cacheBucketPx;
+    const canReuseWrap =
+      !!cached &&
+      cached.originalText === element.originalText &&
+      cached.fontString === fontString &&
+      cached.lineHeight === element.lineHeight &&
+      cached.bucket === nextBucket;
+    const computedWrappedText = canReuseWrap
+      ? cached.wrappedText
+      : wrapTextPreservingWhitespace(
+          element.originalText,
+          fontString,
+          wrapWidth,
+        );
+    const computedHeight = canReuseWrap
+      ? cached.height
+      : measureText(computedWrappedText, fontString, element.lineHeight).height;
+
+    cache.set(element.id, {
+      originalText: element.originalText,
+      fontString,
+      lineHeight: element.lineHeight,
+      bucket: nextBucket,
+      wrappedText: computedWrappedText,
+      height: computedHeight,
+    });
+
+    if (
+      element.x === nextX &&
+      element.width === nextWidth &&
+      element.height === computedHeight &&
+      element.text === computedWrappedText
+    ) {
+      return;
+    }
+
+    this.scene.mutateElement(
+      element,
+      {
+        x: nextX,
+        width: nextWidth,
+        height: computedHeight,
+        text: computedWrappedText,
+        autoResize: false,
+      },
+      {
+        informMutation: false,
+        isDragging: true,
+      },
+    );
+    this.scene.triggerUpdate();
+  };
+
   public render() {
     const selectedElements = this.scene.getSelectedElements(this.state);
     const { renderTopRightUI, renderTopLeftUI, renderCustomStats } = this.props;
@@ -2340,6 +2449,9 @@ class App extends React.Component<AppProps, AppState> {
                             visibleElements={visibleElements}
                             appState={this.state}
                             setAppState={this.setAppState}
+                            onResizeTextElementWidth={
+                              this.handleResizeTextElementWidthFromLineNumber
+                            }
                           />
                           <InteractiveCanvas
                             app={this}
@@ -6141,6 +6253,16 @@ class App extends React.Component<AppProps, AppState> {
               end: number;
               color: string;
             }[];
+            textColors?: readonly {
+              start: number;
+              end: number;
+              color: string;
+            }[];
+            tags?: readonly {
+              start: number;
+              end: number;
+              color: string;
+            }[];
           }
         | undefined;
 
@@ -6244,8 +6366,10 @@ class App extends React.Component<AppProps, AppState> {
 
       const nextHighlights = applySplice(decorations.highlights);
       const nextUnderlines = applySplice(decorations.underlines);
+      const nextTextColors = applySplice(decorations.textColors);
+      const nextTags = applySplice(decorations.tags);
 
-      if (!nextHighlights && !nextUnderlines) {
+      if (!nextHighlights && !nextUnderlines && !nextTextColors && !nextTags) {
         const { textDecorations, ...rest } = customData ?? {};
         return Object.keys(rest).length ? rest : undefined;
       }
@@ -6255,6 +6379,8 @@ class App extends React.Component<AppProps, AppState> {
         textDecorations: {
           ...(nextHighlights ? { highlights: nextHighlights } : {}),
           ...(nextUnderlines ? { underlines: nextUnderlines } : {}),
+          ...(nextTextColors ? { textColors: nextTextColors } : {}),
+          ...(nextTags ? { tags: nextTags } : {}),
         },
       };
     };
@@ -6343,6 +6469,25 @@ class App extends React.Component<AppProps, AppState> {
       { leading: false },
     );
 
+    const syncSummaryToolThrottled = throttle(
+      () => {
+        const sync = applySummaryToolSync({
+          elements: this.scene.getElementsIncludingDeleted(),
+          appState: this.state,
+          elementsMap: this.scene.getNonDeletedElementsMap(),
+        });
+        if (sync.didUpdate) {
+          this.updateScene({
+            elements: sync.elements,
+            appState: sync.appState,
+            captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+          });
+        }
+      },
+      120,
+      { leading: false },
+    );
+
     textWysiwyg({
       id: element.id,
       canvas: this.canvas,
@@ -6362,6 +6507,7 @@ class App extends React.Component<AppProps, AppState> {
       onChange: withBatchedUpdates((nextOriginalText) => {
         updateElement(nextOriginalText, false, false);
         updateElementDimensionsThrottled(nextOriginalText);
+        syncSummaryToolThrottled();
         const latestElement = this.scene.getElement(element.id);
         if (
           latestElement &&
@@ -6374,7 +6520,21 @@ class App extends React.Component<AppProps, AppState> {
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
         const isDeleted = !nextOriginalText.trim();
         updateElementDimensionsThrottled.cancel();
+        syncSummaryToolThrottled.cancel();
         updateElement(nextOriginalText, isDeleted, true);
+
+        const sync = applySummaryToolSync({
+          elements: this.scene.getElementsIncludingDeleted(),
+          appState: this.state,
+          elementsMap: this.scene.getNonDeletedElementsMap(),
+        });
+        if (sync.didUpdate) {
+          this.updateScene({
+            elements: sync.elements,
+            appState: sync.appState,
+            captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+          });
+        }
 
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
@@ -6440,6 +6600,309 @@ class App extends React.Component<AppProps, AppState> {
     updateElement(element.originalText, false, false);
     updateElementDimensionsThrottled(element.originalText);
   }
+
+  private focusTextEditorAtLine = (lineNumber: number) => {
+    const editor = document.querySelector(
+      ".excalidraw-wysiwyg",
+    ) as HTMLTextAreaElement | null;
+    if (!editor) {
+      return;
+    }
+    const target = Math.max(1, Math.floor(lineNumber));
+    const lines = (editor.value ?? "").replace(/\r\n?/g, "\n").split("\n");
+    let index = 0;
+    for (let i = 1; i < target && i <= lines.length; i++) {
+      index += lines[i - 1].length + 1;
+    }
+    const nextIndex = Math.min(index, editor.value.length);
+    editor.selectionStart = nextIndex;
+    editor.selectionEnd = nextIndex;
+  };
+
+  private jumpToTextElementLine = (
+    elementId: string,
+    lineNumber: number,
+  ): boolean => {
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+    const element = elementsMap.get(elementId);
+    if (!element || !isTextElement(element) || element.isDeleted) {
+      return false;
+    }
+
+    this.scrollToContent(element, {
+      animate: true,
+      duration: 250,
+      fitToContent: true,
+      canvasOffsets: this.getEditorUIOffsets(),
+    });
+
+    flushSync(() => {
+      this.setState({
+        selectedElementIds: makeNextSelectedElementIds(
+          { [element.id]: true },
+          this.state,
+        ),
+        selectedGroupIds: {},
+        editingTextElement: element,
+      });
+    });
+
+    this.handleTextWysiwyg(element, {
+      isExistingElement: true,
+      autoSelect: false,
+    });
+
+    requestAnimationFrame(() => {
+      this.focusTextEditorAtLine(lineNumber);
+    });
+
+    return true;
+  };
+
+  public handleSummaryToolAltEnter = (
+    editingElementId: string,
+    caretIndex: number,
+  ): boolean => {
+    const elements = this.scene.getElementsIncludingDeleted();
+    const summaryRoot = getSummaryRootTextElement(elements);
+    if (!summaryRoot) {
+      return false;
+    }
+    const summaryBase = getSummaryBaseTextElement(elements);
+
+    const editor = document.querySelector(
+      ".excalidraw-wysiwyg",
+    ) as HTMLTextAreaElement | null;
+    if (!editor) {
+      return false;
+    }
+    const value = (editor.value ?? "").replace(/\r\n?/g, "\n");
+    const caret = Math.max(0, Math.min(value.length, caretIndex));
+    const caretLineNumber = value.slice(0, caret).split("\n").length;
+
+    if (editingElementId === summaryRoot.id) {
+      const model = ((summaryRoot.customData as any)?.summaryTool?.model ??
+        null) as any;
+      if (model?.lists) {
+        for (const list of Object.values<any>(model.lists)) {
+          const target =
+            list?.rendered?.commentHeaderTargetBySummaryLineNumber?.[
+              String(caretLineNumber)
+            ];
+          if (target?.elementId && target?.lineNumber) {
+            return this.jumpToTextElementLine(
+              target.elementId,
+              target.lineNumber,
+            );
+          }
+        }
+      }
+      if (summaryBase) {
+        return this.jumpToTextElementLine(summaryBase.id, 1);
+      }
+      return false;
+    }
+
+    const editingElement = this.scene
+      .getNonDeletedElementsMap()
+      .get(editingElementId);
+    if (
+      !editingElement ||
+      !isTextElement(editingElement) ||
+      editingElement.isDeleted
+    ) {
+      return false;
+    }
+
+    const blocks = parseSummaryToolSynclists(editingElement.text);
+    if (!blocks.length) {
+      return this.jumpToTextElementLine(summaryRoot.id, 1);
+    }
+
+    const block = blocks.find(
+      (b) =>
+        caretLineNumber >= b.startLine + 1 && caretLineNumber <= b.endLine + 1,
+    );
+    if (!block) {
+      return this.jumpToTextElementLine(summaryRoot.id, 1);
+    }
+
+    const model = ((summaryRoot.customData as any)?.summaryTool?.model ??
+      null) as any;
+    const list = model?.lists?.[block.name];
+    const renderedMap = list?.rendered?.summaryLineNumberByLineId as
+      | Record<string, number>
+      | undefined;
+    if (!renderedMap) {
+      return this.jumpToTextElementLine(summaryRoot.id, 1);
+    }
+
+    const knownLineTexts = new Set<string>(
+      (list?.lines ?? []).map((l: any) => String(l.text).trim()),
+    );
+
+    const localLineIndex = caretLineNumber - (block.startLine + 2);
+    const upto = Math.max(
+      0,
+      Math.min(block.contentLines.length - 1, localLineIndex),
+    );
+
+    let anchorText: string | null = null;
+    for (let i = upto; i >= 0; i--) {
+      const trimmed = String(block.contentLines[i] ?? "").trim();
+      if (knownLineTexts.has(trimmed)) {
+        anchorText = trimmed;
+        break;
+      }
+    }
+
+    if (!anchorText) {
+      return this.jumpToTextElementLine(summaryRoot.id, 1);
+    }
+
+    const line = (list?.lines ?? []).find(
+      (l: any) => String(l.text).trim() === anchorText,
+    );
+    const summaryLineNumber = line?.id ? renderedMap[String(line.id)] : null;
+    if (!summaryLineNumber) {
+      return this.jumpToTextElementLine(summaryRoot.id, 1);
+    }
+
+    return this.jumpToTextElementLine(summaryRoot.id, summaryLineNumber);
+  };
+
+  public handleSummaryToolCycleComment = (
+    editingElementId: string,
+    caretIndex: number,
+    direction: "prev" | "next",
+  ): boolean => {
+    const elements = this.scene.getElementsIncludingDeleted();
+    const summaryRoot = getSummaryRootTextElement(elements);
+    if (!summaryRoot || summaryRoot.id !== editingElementId) {
+      return false;
+    }
+
+    const editor = document.querySelector(
+      ".excalidraw-wysiwyg",
+    ) as HTMLTextAreaElement | null;
+    if (!editor) {
+      return false;
+    }
+    const value = (editor.value ?? "").replace(/\r\n?/g, "\n");
+    const caret = Math.max(0, Math.min(value.length, caretIndex));
+    const caretLineNumber = value.slice(0, caret).split("\n").length;
+
+    const summaryTool = (summaryRoot.customData as any)?.summaryTool ?? null;
+    const model = summaryTool?.model ?? null;
+    if (!model?.lists) {
+      return false;
+    }
+
+    let chosen: { listName: string; lineId: string } | null = null;
+    let chosenLineNumber = 0;
+    for (const [listName, list] of Object.entries<any>(model.lists)) {
+      const rendered = list?.rendered;
+      const lineMap = rendered?.summaryLineNumberByLineId as
+        | Record<string, number>
+        | undefined;
+      if (!lineMap) {
+        continue;
+      }
+      for (const [lineId, ln] of Object.entries(lineMap)) {
+        if (ln <= caretLineNumber && ln >= chosenLineNumber) {
+          chosenLineNumber = ln;
+          chosen = { listName, lineId };
+        }
+      }
+    }
+
+    if (!chosen) {
+      return false;
+    }
+
+    const list = model.lists[chosen.listName];
+    const rendered = list?.rendered;
+    const counts = rendered?.commentCountByLineId as
+      | Record<string, number>
+      | undefined;
+    const total = counts?.[chosen.lineId] ?? 0;
+    if (total <= 1) {
+      return true;
+    }
+
+    const display = list.display ?? {
+      mode: "single",
+      selectedCommentIndexByLineId: {},
+    };
+    const selected = { ...(display.selectedCommentIndexByLineId ?? {}) };
+    const current = Math.max(
+      0,
+      Math.min(total - 1, selected[chosen.lineId] ?? 0),
+    );
+    const next =
+      direction === "next"
+        ? (current + 1) % total
+        : (current - 1 + total) % total;
+    selected[chosen.lineId] = next;
+
+    const nextModel = {
+      ...model,
+      lists: {
+        ...model.lists,
+        [chosen.listName]: {
+          ...list,
+          display: {
+            ...display,
+            mode: "single",
+            selectedCommentIndexByLineId: selected,
+          },
+        },
+      },
+    };
+
+    const nextElements = elements.map((el) => {
+      if (el.id !== summaryRoot.id) {
+        return el;
+      }
+      const customData = (el.customData ?? {}) as Record<string, any>;
+      return newElementWith(el as any, {
+        customData: {
+          ...customData,
+          summaryTool: {
+            ...(customData.summaryTool ?? {}),
+            commentsDisplayMode: "single",
+            model: nextModel,
+          },
+        },
+      });
+    });
+
+    const elementsMap = new Map(
+      nextElements
+        .filter((el) => !el.isDeleted)
+        .map((el) => [el.id, el] as const),
+    ) as any;
+    const sync = applySummaryToolSync({
+      elements: nextElements,
+      appState: this.state,
+      elementsMap,
+    });
+
+    if (sync.didUpdate) {
+      this.updateScene({
+        elements: sync.elements,
+        appState: sync.appState,
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+      const updatedSummary = sync.elements.find(
+        (el) => el.id === summaryRoot.id,
+      );
+      if (updatedSummary && isTextElement(updatedSummary)) {
+        editor.value = updatedSummary.text;
+      }
+    }
+    return true;
+  };
 
   private deselectElements() {
     this.setState({
@@ -10868,6 +11331,22 @@ class App extends React.Component<AppProps, AppState> {
                 )
             : [];
 
+          const selectionElement = this.state.selectionElement;
+          const elementsMap = this.scene.getNonDeletedElementsMap();
+          const nextSelectedTextLineLinkIds =
+            selectionElement && pointerDownState.boxSelection.hasOccurred
+              ? this.getSelectedTextLineLinkIdsInSelection(
+                  selectionElement,
+                  elementsMap,
+                  pointerDownState.withCmdOrCtrl,
+                )
+              : {};
+          const shouldSelectTextLineLinks =
+            !!selectionElement &&
+            pointerDownState.boxSelection.hasOccurred &&
+            !elementsWithinSelection.length &&
+            !!Object.keys(nextSelectedTextLineLinkIds).length;
+
           this.setState((prevState) => {
             const nextSelectedElementIds = {
               ...(shouldReuseSelection && prevState.selectedElementIds),
@@ -10905,6 +11384,24 @@ class App extends React.Component<AppProps, AppState> {
               ? { ...prevState, selectedGroupIds: {}, editingGroupId: null }
               : prevState;
 
+            const nextSelectedTextLineLinkIdsState = selectionElement
+              ? makeNextSelectedElementIds(
+                  shouldSelectTextLineLinks ? nextSelectedTextLineLinkIds : {},
+                  prevState,
+                )
+              : prevState.selectedTextLineLinkIds;
+
+            if (shouldSelectTextLineLinks) {
+              return {
+                selectedElementIds: makeNextSelectedElementIds({}, prevState),
+                selectedGroupIds: {},
+                editingGroupId: null,
+                selectedLinearElement: null,
+                selectedTextLineLinkIds: nextSelectedTextLineLinkIdsState,
+                showHyperlinkPopup: false,
+              };
+            }
+
             return {
               ...selectGroupsForSelectedElements(
                 {
@@ -10924,6 +11421,7 @@ class App extends React.Component<AppProps, AppState> {
                       this.scene.getNonDeletedElementsMap(),
                     )
                   : null,
+              selectedTextLineLinkIds: nextSelectedTextLineLinkIdsState,
               showHyperlinkPopup:
                 elementsWithinSelection.length === 1 &&
                 (elementsWithinSelection[0].link ||
@@ -13415,6 +13913,28 @@ class App extends React.Component<AppProps, AppState> {
           ]
         : [];
 
+    const selectedElements = this.scene.getSelectedElements(this.state);
+    const isSummaryRootSelected =
+      selectedElements.length === 1 &&
+      isTextElement(selectedElements[0]) &&
+      (selectedElements[0].customData as any)?.summaryTool?.role ===
+        "summaryRoot";
+    const summaryToolActions: ContextMenuItems =
+      selectedElements.length === 1 && isTextElement(selectedElements[0])
+        ? [
+            actionToggleSummaryRoot,
+            actionToggleSummaryBase,
+            ...(isSummaryRootSelected
+              ? ([
+                  CONTEXT_MENU_SEPARATOR,
+                  actionSummaryToolCommentsOff,
+                  actionSummaryToolCommentsSingle,
+                  actionSummaryToolCommentsAll,
+                ] as const)
+              : []),
+          ]
+        : [];
+
     return [
       CONTEXT_MENU_SEPARATOR,
       actionCut,
@@ -13437,6 +13957,7 @@ class App extends React.Component<AppProps, AppState> {
       actionUnbindText,
       actionBindText,
       actionWrapTextInContainer,
+      ...summaryToolActions,
       actionUngroup,
       CONTEXT_MENU_SEPARATOR,
       actionAddToLibrary,

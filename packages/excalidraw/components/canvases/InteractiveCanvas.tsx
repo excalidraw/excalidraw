@@ -261,6 +261,7 @@ const getRelevantAppStateProps = (
   preciseMeasurement: appState.preciseMeasurement,
   gridCharTopMeasurement: appState.gridCharTopMeasurement,
   zenModeEnabled: appState.zenModeEnabled,
+  isToolbarVisible: appState.isToolbarVisible,
   editingTextElement: appState.editingTextElement,
   isCropping: appState.isCropping,
   croppingElementId: appState.croppingElementId,

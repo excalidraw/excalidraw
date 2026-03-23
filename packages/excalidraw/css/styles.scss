@@ -218,8 +218,26 @@ body.excalidraw-cursor-resize * {
 
   &__textLineNumberButton.is-hovered {
     text-decoration: underline;
-    background: rgba(0, 0, 0, 0.06);
+    background: rgba(0, 0, 0, 0.22);
     border-radius: 4px;
+  }
+
+  &__textLineNumberButton.is-alt-ready {
+    background: rgba(0, 0, 0, 0.14);
+    border-radius: 4px;
+  }
+
+  &__summaryToolCommentHint {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+    white-space: pre;
+    z-index: 1;
+  }
+
+  &__summaryToolCommentHint {
+    color: var(--text-box-decorations-color);
+    opacity: var(--text-box-decorations-opacity);
   }
 
   &__embeddable {
@@ -350,6 +368,37 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  .font-size-control {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: fit-content;
+  }
+
+  .font-size-control__input {
+    all: unset;
+    width: 4ch;
+    font: inherit;
+    color: var(--text-primary-color);
+    text-align: center;
+  }
+
+  .font-size-control__buttons {
+    display: flex;
+    gap: 0.5rem;
+    width: fit-content;
+  }
+
+  .font-size-control__button {
+    width: var(--default-button-size);
+    height: var(--default-button-size);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    line-height: 1;
+  }
+
   .App-top-bar {
     z-index: var(--zIndex-ui-top);
     display: flex;
@@ -438,7 +487,7 @@ body.excalidraw-cursor-resize * {
 
   .shapes-section {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     pointer-events: none !important;
 
     & > * {
@@ -447,8 +496,9 @@ body.excalidraw-cursor-resize * {
   }
 
   .App-menu_top {
-    grid-template-columns: 1fr 2fr 1fr;
-    grid-gap: 1rem;
+    position: relative;
+    grid-template-columns: max-content max-content 1fr;
+    grid-gap: 0;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
@@ -458,9 +508,48 @@ body.excalidraw-cursor-resize * {
     }
 
     @media (min-width: 1536px) {
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-gap: 3rem;
+      grid-template-columns: max-content max-content 1fr;
+      grid-gap: 0;
     }
+  }
+
+  .App-menu_top .App-toolbar {
+    height: var(--lg-button-size);
+    padding: 0 !important;
+    align-items: center;
+  }
+
+  .App-menu_top__canvas-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: var(--lg-button-size);
+  }
+
+  .app-filename-trigger,
+  .app-filename-input {
+    height: var(--lg-button-size);
+    display: inline-flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    min-width: 0;
+  }
+
+  .app-filename-trigger {
+    max-width: min(360px, 40vw);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: 500;
+  }
+
+  .app-filename-trigger__ext {
+    opacity: 0.6;
+  }
+
+  .app-filename-input {
+    width: min(360px, 40vw);
+    text-align: left;
   }
 
   .App-menu_top > *:first-child {
@@ -468,11 +557,91 @@ body.excalidraw-cursor-resize * {
   }
 
   .selected-shape-actions-container {
-    width: fit-content;
+    width: var(--lg-button-size);
+    position: fixed;
+    top: 1rem;
+    height: calc(100vh - 2rem);
+    left: 0;
+    pointer-events: var(--ui-pointerEvents);
+    overflow: hidden;
 
     &--compact {
       min-width: 48px;
     }
+
+    .App-menu__left {
+      width: var(--lg-button-size);
+      padding: 0.25rem;
+      height: 100%;
+      max-height: 100%;
+      position: relative;
+    }
+
+    > .selected-shape-actions {
+      height: 100%;
+      max-height: 100%;
+    }
+
+    .selected-shape-actions {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 0.75rem;
+      line-height: 1;
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+    }
+
+    legend {
+      margin: 0;
+      font-size: 0.75rem;
+      line-height: 1;
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+    }
+
+    fieldset {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      min-inline-size: 0;
+    }
+
+    .color-picker-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .color-picker__button.active-color {
+      width: 100%;
+      height: var(--lg-button-size);
+    }
+
+    .font-size-control {
+      width: 100%;
+      align-items: center;
+    }
+
+    .font-size-control__buttons {
+      width: 100%;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .font-size-control__button {
+      width: 100%;
+    }
+  }
+
+  .layer-ui__wrapper__footer-left {
+    margin-left: var(--lg-button-size);
   }
 
   .App-menu_top > *:last-child {

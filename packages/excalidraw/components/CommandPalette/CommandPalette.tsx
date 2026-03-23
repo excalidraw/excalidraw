@@ -51,6 +51,7 @@ import {
   brainIconThin,
   LibraryIcon,
   historyCommandIcon,
+  eyeClosedIcon,
 } from "../icons";
 
 import { SHAPES } from "../shapes";
@@ -375,6 +376,8 @@ function CommandPaletteInner({
         actionManager.actions.toggleShortcuts,
         actionManager.actions.selectAll,
         actionManager.actions.toggleElementLock,
+        actionManager.actions.summaryToolToggleSummaryRoot,
+        actionManager.actions.summaryToolToggleSummaryBase,
         actionManager.actions.unlockAllElements,
         actionManager.actions.stats,
       ].map((action) => actionToCommand(action, DEFAULT_CATEGORIES.editor));
@@ -442,6 +445,18 @@ function CommandPaletteInner({
                 },
               });
             }
+          },
+        },
+        {
+          label: "hide useless button",
+          keywords: ["hide", "useless", "opacity", "text align", "ui"],
+          category: DEFAULT_CATEGORIES.app,
+          icon: eyeClosedIcon,
+          viewMode: true,
+          perform: () => {
+            setAppState((prevState) => ({
+              areUselessButtonsHidden: !prevState.areUselessButtonsHidden,
+            }));
           },
         },
         {

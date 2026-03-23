@@ -16,7 +16,6 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
 import { useExcalidrawContainer, useStylesPanelMode } from "../App";
-import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
 import { slashIcon, strokeIcon } from "../icons";
@@ -29,7 +28,6 @@ import {
 import { ColorInput } from "./ColorInput";
 import { Picker } from "./Picker";
 import PickerHeading from "./PickerHeading";
-import { TopPicks } from "./TopPicks";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 
 import "./ColorPicker.scss";
@@ -216,20 +214,33 @@ const ColorPickerTrigger = ({
   color,
   type,
   mode = "background",
+  onOpen,
   onToggle,
   editingTextElement,
+  onQuickApply,
 }: {
   color: string | null;
   label: string;
   type: ColorPickerType;
   mode?: "background" | "stroke";
+  onOpen: () => void;
   onToggle: () => void;
   editingTextElement?: boolean;
+  onQuickApply?: (color: string) => void;
 }) => {
   const stylesPanelMode = useStylesPanelMode();
   const isCompactMode = stylesPanelMode !== "full";
   const isMobileMode = stylesPanelMode === "mobile";
-  const handleClick = (e: React.MouseEvent) => {
+  const lastPointerButtonRef = useRef<number | null>(null);
+
+  const isQuickApplyType =
+    type === "elementStroke" ||
+    type === "textSelectionBackground" ||
+    type === "textSelectionUnderline" ||
+    type === "textSelectionColor" ||
+    type === "textSelectionTag";
+
+  const openPicker = (e: React.SyntheticEvent) => {
     // use pointerdown so we run before outside-close logic
     e.preventDefault();
     e.stopPropagation();
@@ -242,11 +253,27 @@ const ColorPickerTrigger = ({
     onToggle();
   };
 
+  const forceOpenPicker = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (editingTextElement) {
+      temporarilyDisableTextEditorBlur();
+    }
+
+    onOpen();
+  };
+
   let triggerTitle = t("labels.showBackground");
   if (type === "elementStroke") {
     triggerTitle = t("labels.showStroke");
   }
-  if (type === "textSelectionBackground" || type === "textSelectionUnderline") {
+  if (
+    type === "textSelectionBackground" ||
+    type === "textSelectionUnderline" ||
+    type === "textSelectionColor" ||
+    type === "textSelectionTag"
+  ) {
     triggerTitle = label;
   }
 
@@ -264,7 +291,39 @@ const ColorPickerTrigger = ({
       style={color ? { "--swatch-color": color } : undefined}
       title={triggerTitle}
       data-openpopup={type}
-      onClick={handleClick}
+      onPointerDown={(event) => {
+        lastPointerButtonRef.current = event.button;
+        if (event.button === 2) {
+          return;
+        }
+        if (event.button === 0 && isQuickApplyType) {
+          event.preventDefault();
+          event.stopPropagation();
+          if (color) {
+            onQuickApply?.(color);
+          } else {
+            forceOpenPicker(event);
+          }
+        }
+      }}
+      onContextMenu={(event) => {
+        if (isQuickApplyType) {
+          lastPointerButtonRef.current = 2;
+          forceOpenPicker(event);
+        }
+      }}
+      onClick={(event) => {
+        if (isQuickApplyType) {
+          if (lastPointerButtonRef.current === 0) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+          openPicker(event);
+          return;
+        }
+        openPicker(event);
+      }}
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
       {isCompactMode && color && mode === "stroke" && (
@@ -292,7 +351,6 @@ export const ColorPicker = ({
   label,
   elements,
   palette = COLOR_PALETTE,
-  topPicks,
   updateData,
   appState,
   belowTrigger,
@@ -302,8 +360,12 @@ export const ColorPicker = ({
   useEffect(() => {
     openRef.current = appState.openPopup;
   }, [appState.openPopup]);
-  const stylesPanelMode = useStylesPanelMode();
-  const isCompactMode = stylesPanelMode !== "full";
+  const isQuickApplyType =
+    type === "elementStroke" ||
+    type === "textSelectionBackground" ||
+    type === "textSelectionUnderline" ||
+    type === "textSelectionColor" ||
+    type === "textSelectionTag";
 
   if (variant === "triggerOnly") {
     return (
@@ -321,6 +383,8 @@ export const ColorPicker = ({
           type={type}
           mode={type === "elementStroke" ? "stroke" : "background"}
           editingTextElement={!!appState.editingTextElement}
+          onOpen={() => updateData({ openPopup: type })}
+          onQuickApply={isQuickApplyType ? onChange : undefined}
           onToggle={() => {
             if (appState.openPopup === type) {
               updateData({ openPopup: null });
@@ -353,19 +417,11 @@ export const ColorPicker = ({
       <div
         role="dialog"
         aria-modal="true"
-        className={clsx("color-picker-container", {
-          "color-picker-container--no-top-picks": isCompactMode,
-        })}
-      >
-        {!isCompactMode && (
-          <TopPicks
-            activeColor={color}
-            onChange={onChange}
-            type={type}
-            topPicks={topPicks}
-          />
+        className={clsx(
+          "color-picker-container",
+          "color-picker-container--no-top-picks",
         )}
-        {!isCompactMode && <ButtonSeparator />}
+      >
         <Popover.Root
           open={appState.openPopup === type}
           onOpenChange={(open) => {
@@ -381,6 +437,8 @@ export const ColorPicker = ({
             type={type}
             mode={type === "elementStroke" ? "stroke" : "background"}
             editingTextElement={!!appState.editingTextElement}
+            onOpen={() => updateData({ openPopup: type })}
+            onQuickApply={isQuickApplyType ? onChange : undefined}
             onToggle={() => {
               // atomic switch: if another popup is open, close it first, then open this one next tick
               if (appState.openPopup === type) {

@@ -2,7 +2,7 @@
 
 exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu items if passed from host 1`] = `
 <div
-  aria-labelledby="radix-:r7l:"
+  aria-labelledby="radix-:r8f:"
   aria-orientation="vertical"
   class="dropdown-menu main-menu"
   data-align="start"
@@ -12,7 +12,7 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
   data-state="open"
   data-testid="dropdown-menu"
   dir="ltr"
-  id="radix-:r7m:"
+  id="radix-:r8g:"
   role="menu"
   style="outline: none; --radix-dropdown-menu-content-transform-origin: var(--radix-popper-transform-origin); --radix-dropdown-menu-content-available-width: var(--radix-popper-available-width); --radix-dropdown-menu-content-available-height: var(--radix-popper-available-height); --radix-dropdown-menu-trigger-width: var(--radix-popper-anchor-width); --radix-dropdown-menu-trigger-height: var(--radix-popper-anchor-height); animation: none;"
   tabindex="-1"
@@ -774,6 +774,204 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
                 class="color-picker__button-outline"
               />
             </button>
+          </div>
+        </div>
+      </div>
+      <div
+        style="margin-top: 0.75rem;"
+      >
+        <div
+          style="font-size: 0.875rem; margin-bottom: 0.25rem; margin-left: 0.5rem;"
+        >
+          文本框标记颜色（边框/换行符/行号/空格符）
+        </div>
+        <div
+          style="padding: 0px 0.625rem;"
+        >
+          <div>
+            <div
+              aria-modal="true"
+              class="color-picker-container"
+              role="dialog"
+            >
+              <div
+                class="color-picker__top-picks"
+              >
+                <button
+                  class="color-picker__button active"
+                  data-testid="color-top-pick-#a8a8a8"
+                  style="--swatch-color: #a8a8a8;"
+                  title="#a8a8a8"
+                  type="button"
+                >
+                  <div
+                    class="color-picker__button-outline"
+                  />
+                </button>
+                <button
+                  class="color-picker__button"
+                  data-testid="color-top-pick-#6965db"
+                  style="--swatch-color: #6965db;"
+                  title="#6965db"
+                  type="button"
+                >
+                  <div
+                    class="color-picker__button-outline"
+                  />
+                </button>
+                <button
+                  class="color-picker__button"
+                  data-testid="color-top-pick-#ff5252"
+                  style="--swatch-color: #ff5252;"
+                  title="#ff5252"
+                  type="button"
+                >
+                  <div
+                    class="color-picker__button-outline"
+                  />
+                </button>
+                <button
+                  class="color-picker__button"
+                  data-testid="color-top-pick-#2ecc71"
+                  style="--swatch-color: #2ecc71;"
+                  title="#2ecc71"
+                  type="button"
+                >
+                  <div
+                    class="color-picker__button-outline"
+                  />
+                </button>
+                <button
+                  class="color-picker__button"
+                  data-testid="color-top-pick-#111111"
+                  style="--swatch-color: #111111;"
+                  title="#111111"
+                  type="button"
+                >
+                  <div
+                    class="color-picker__button-outline"
+                  />
+                </button>
+              </div>
+              <div
+                style="width: 1px; height: 1rem; margin: 0px auto;"
+              />
+              <button
+                aria-controls="radix-:rn:"
+                aria-expanded="false"
+                aria-haspopup="dialog"
+                aria-label="文本框标记颜色"
+                class="color-picker__button active-color properties-trigger"
+                data-openpopup="textBoxDecorations"
+                data-state="closed"
+                style="--swatch-color: #a8a8a8;"
+                title="Show background color picker"
+                type="button"
+              >
+                <div
+                  class="color-picker__button-outline"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        style="margin-top: 0.75rem;"
+      >
+        <div
+          style="font-size: 0.875rem; margin-bottom: 0.25rem; margin-left: 0.5rem;"
+        >
+          编辑光标颜色
+        </div>
+        <div
+          style="padding: 0px 0.625rem;"
+        >
+          <div>
+            <div
+              aria-modal="true"
+              class="color-picker-container"
+              role="dialog"
+            >
+              <div
+                class="color-picker__top-picks"
+              >
+                <button
+                  class="color-picker__button"
+                  data-testid="color-top-pick-#a8a8a8"
+                  style="--swatch-color: #a8a8a8;"
+                  title="#a8a8a8"
+                  type="button"
+                >
+                  <div
+                    class="color-picker__button-outline"
+                  />
+                </button>
+                <button
+                  class="color-picker__button active"
+                  data-testid="color-top-pick-#6965db"
+                  style="--swatch-color: #6965db;"
+                  title="#6965db"
+                  type="button"
+                >
+                  <div
+                    class="color-picker__button-outline"
+                  />
+                </button>
+                <button
+                  class="color-picker__button"
+                  data-testid="color-top-pick-#ff5252"
+                  style="--swatch-color: #ff5252;"
+                  title="#ff5252"
+                  type="button"
+                >
+                  <div
+                    class="color-picker__button-outline"
+                  />
+                </button>
+                <button
+                  class="color-picker__button"
+                  data-testid="color-top-pick-#2ecc71"
+                  style="--swatch-color: #2ecc71;"
+                  title="#2ecc71"
+                  type="button"
+                >
+                  <div
+                    class="color-picker__button-outline"
+                  />
+                </button>
+                <button
+                  class="color-picker__button"
+                  data-testid="color-top-pick-#111111"
+                  style="--swatch-color: #111111;"
+                  title="#111111"
+                  type="button"
+                >
+                  <div
+                    class="color-picker__button-outline"
+                  />
+                </button>
+              </div>
+              <div
+                style="width: 1px; height: 1rem; margin: 0px auto;"
+              />
+              <button
+                aria-controls="radix-:ro:"
+                aria-expanded="false"
+                aria-haspopup="dialog"
+                aria-label="编辑光标颜色"
+                class="color-picker__button active-color properties-trigger"
+                data-openpopup="textEditorCaret"
+                data-state="closed"
+                style="--swatch-color: #6965db;"
+                title="Show background color picker"
+                type="button"
+              >
+                <div
+                  class="color-picker__button-outline"
+                />
+              </button>
+            </div>
           </div>
         </div>
       </div>

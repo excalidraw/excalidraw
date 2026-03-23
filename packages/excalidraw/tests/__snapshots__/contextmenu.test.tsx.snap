@@ -94,6 +94,7 @@ exports[`contextMenu element > does not show context menu after right-drag pan >
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": null,
+  "selectedTextLineLinkIds": {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
@@ -105,6 +106,12 @@ exports[`contextMenu element > does not show context menu after right-drag pan >
     "panels": 3,
   },
   "suggestedBinding": null,
+  "textBoxDecorationsColor": "#a8a8a8",
+  "textEditorCaretColor": "#6965db",
+  "textLineLinkDraft": null,
+  "textLineLinks": [],
+  "textSelectionBackgroundColor": "#a8a8a8",
+  "textSelectionUnderlineColor": "#a8a8a8",
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -408,11 +415,12 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "scrolledOutside": true,
   "searchMatches": null,
   "selectedElementIds": {
-    "id0": true,
+    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": null,
+  "selectedTextLineLinkIds": {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
@@ -424,6 +432,12 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
     "panels": 3,
   },
   "suggestedBinding": null,
+  "textBoxDecorationsColor": "#a8a8a8",
+  "textEditorCaretColor": "#6965db",
+  "textLineLinkDraft": null,
+  "textLineLinks": [],
+  "textSelectionBackgroundColor": "#a8a8a8",
+  "textSelectionUnderlineColor": "#a8a8a8",
   "theme": "light",
   "toast": {
     "message": "Added to library",
@@ -449,7 +463,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id0",
+  "id": "id1",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -484,7 +498,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -495,7 +509,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
     "elements": {
       "added": {},
       "removed": {
-        "id0": {
+        "id1": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -529,7 +543,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
       },
       "updated": {},
     },
-    "id": "id2",
+    "id": "id3",
   },
 ]
 `;
@@ -1218,11 +1232,12 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "scrolledOutside": true,
   "searchMatches": null,
   "selectedElementIds": {
-    "id0": true,
+    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": null,
+  "selectedTextLineLinkIds": {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
@@ -1234,6 +1249,12 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
     "panels": 3,
   },
   "suggestedBinding": null,
+  "textBoxDecorationsColor": "#a8a8a8",
+  "textEditorCaretColor": "#6965db",
+  "textLineLinkDraft": null,
+  "textLineLinks": [],
+  "textSelectionBackgroundColor": "#a8a8a8",
+  "textSelectionUnderlineColor": "#a8a8a8",
   "theme": "light",
   "toast": {
     "message": "Copied styles.",
@@ -1259,7 +1280,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id0",
+  "id": "id1",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -1294,7 +1315,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -1305,7 +1326,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
     "elements": {
       "added": {},
       "removed": {
-        "id0": {
+        "id1": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -1339,7 +1360,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
       },
       "updated": {},
     },
-    "id": "id2",
+    "id": "id3",
   },
 ]
 `;
@@ -1435,6 +1456,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": null,
+  "selectedTextLineLinkIds": {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
@@ -1446,6 +1468,12 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
     "panels": 3,
   },
   "suggestedBinding": null,
+  "textBoxDecorationsColor": "#a8a8a8",
+  "textEditorCaretColor": "#6965db",
+  "textLineLinkDraft": null,
+  "textLineLinks": [],
+  "textSelectionBackgroundColor": "#a8a8a8",
+  "textSelectionUnderlineColor": "#a8a8a8",
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -1469,7 +1497,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id0",
+  "id": "id1",
   "index": "a0",
   "isDeleted": true,
   "link": null,
@@ -1504,7 +1532,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -1515,7 +1543,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
     "elements": {
       "added": {},
       "removed": {
-        "id0": {
+        "id1": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -1549,7 +1577,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
       },
       "updated": {},
     },
-    "id": "id2",
+    "id": "id3",
   },
   {
     "appState": AppStateDelta {
@@ -1559,14 +1587,14 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
         },
         "inserted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
       },
     },
     "elements": {
       "added": {
-        "id0": {
+        "id1": {
           "deleted": {
             "isDeleted": true,
             "version": 4,
@@ -1580,7 +1608,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
       "removed": {},
       "updated": {},
     },
-    "id": "id4",
+    "id": "id5",
   },
 ]
 `;
@@ -1673,11 +1701,12 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "scrolledOutside": false,
   "searchMatches": null,
   "selectedElementIds": {
-    "id3": true,
+    "id4": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": null,
+  "selectedTextLineLinkIds": {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
@@ -1689,6 +1718,12 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
     "panels": 3,
   },
   "suggestedBinding": null,
+  "textBoxDecorationsColor": "#a8a8a8",
+  "textEditorCaretColor": "#6965db",
+  "textLineLinkDraft": null,
+  "textLineLinks": [],
+  "textSelectionBackgroundColor": "#a8a8a8",
+  "textSelectionUnderlineColor": "#a8a8a8",
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -1712,7 +1747,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id0",
+  "id": "id1",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -1744,7 +1779,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id3",
+  "id": "id4",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -1779,7 +1814,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -1790,7 +1825,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
     "elements": {
       "added": {},
       "removed": {
-        "id0": {
+        "id1": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -1824,19 +1859,19 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
       },
       "updated": {},
     },
-    "id": "id2",
+    "id": "id3",
   },
   {
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id3": true,
+            "id4": true,
           },
         },
         "inserted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
       },
@@ -1844,7 +1879,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
     "elements": {
       "added": {},
       "removed": {
-        "id3": {
+        "id4": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -1878,7 +1913,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
       },
       "updated": {},
     },
-    "id": "id5",
+    "id": "id6",
   },
 ]
 `;
@@ -2742,11 +2777,12 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "scrolledOutside": false,
   "searchMatches": null,
   "selectedElementIds": {
-    "id3": true,
+    "id4": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": null,
+  "selectedTextLineLinkIds": {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
@@ -2758,6 +2794,12 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
     "panels": 3,
   },
   "suggestedBinding": null,
+  "textBoxDecorationsColor": "#a8a8a8",
+  "textEditorCaretColor": "#6965db",
+  "textLineLinkDraft": null,
+  "textLineLinks": [],
+  "textSelectionBackgroundColor": "#a8a8a8",
+  "textSelectionUnderlineColor": "#a8a8a8",
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -2781,7 +2823,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "frameId": null,
   "groupIds": [],
   "height": 20,
-  "id": "id3",
+  "id": "id4",
   "index": "Zz",
   "isDeleted": false,
   "link": null,
@@ -2813,7 +2855,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "frameId": null,
   "groupIds": [],
   "height": 20,
-  "id": "id0",
+  "id": "id1",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -2848,7 +2890,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -2859,7 +2901,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
     "elements": {
       "added": {},
       "removed": {
-        "id0": {
+        "id1": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -2893,19 +2935,19 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
       },
       "updated": {},
     },
-    "id": "id2",
+    "id": "id3",
   },
   {
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id3": true,
+            "id4": true,
           },
         },
         "inserted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
       },
@@ -2913,7 +2955,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
     "elements": {
       "added": {},
       "removed": {
-        "id3": {
+        "id4": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -2947,7 +2989,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
       },
       "updated": {},
     },
-    "id": "id5",
+    "id": "id6",
   },
   {
     "appState": AppStateDelta {
@@ -2960,7 +3002,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
       "added": {},
       "removed": {},
       "updated": {
-        "id3": {
+        "id4": {
           "deleted": {
             "index": "Zz",
             "version": 4,
@@ -2972,7 +3014,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
         },
       },
     },
-    "id": "id7",
+    "id": "id8",
   },
 ]
 `;
@@ -3065,11 +3107,12 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "scrolledOutside": false,
   "searchMatches": null,
   "selectedElementIds": {
-    "id3": true,
+    "id4": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": null,
+  "selectedTextLineLinkIds": {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
@@ -3081,6 +3124,12 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
     "panels": 3,
   },
   "suggestedBinding": null,
+  "textBoxDecorationsColor": "#a8a8a8",
+  "textEditorCaretColor": "#6965db",
+  "textLineLinkDraft": null,
+  "textLineLinks": [],
+  "textSelectionBackgroundColor": "#a8a8a8",
+  "textSelectionUnderlineColor": "#a8a8a8",
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -3104,7 +3153,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "frameId": null,
   "groupIds": [],
   "height": 20,
-  "id": "id3",
+  "id": "id4",
   "index": "Zz",
   "isDeleted": false,
   "link": null,
@@ -3136,7 +3185,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "frameId": null,
   "groupIds": [],
   "height": 20,
-  "id": "id0",
+  "id": "id1",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -3171,7 +3220,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -3182,7 +3231,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
     "elements": {
       "added": {},
       "removed": {
-        "id0": {
+        "id1": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -3216,19 +3265,19 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
       },
       "updated": {},
     },
-    "id": "id2",
+    "id": "id3",
   },
   {
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id3": true,
+            "id4": true,
           },
         },
         "inserted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
       },
@@ -3236,7 +3285,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
     "elements": {
       "added": {},
       "removed": {
-        "id3": {
+        "id4": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -3270,7 +3319,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
       },
       "updated": {},
     },
-    "id": "id5",
+    "id": "id6",
   },
   {
     "appState": AppStateDelta {
@@ -3283,7 +3332,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
       "added": {},
       "removed": {},
       "updated": {
-        "id3": {
+        "id4": {
           "deleted": {
             "index": "Zz",
             "version": 4,
@@ -3295,7 +3344,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
         },
       },
     },
-    "id": "id7",
+    "id": "id8",
   },
 ]
 `;
@@ -4802,7 +4851,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
             />
           </g>
         </svg>,
-        "keyTest": [Function],
+        "keyTest": undefined,
         "label": "labels.cut",
         "name": "cut",
         "perform": [Function],
@@ -5035,6 +5084,33 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         ],
         "label": "labels.copyText",
         "name": "copyText",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "keywords": [
+          "text",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyTextBatch",
+        "name": "copyTextBatch",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "keywords": [
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyBatchWithFormat",
+        "name": "copyBatchWithFormat",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -5720,11 +5796,12 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "scrolledOutside": true,
   "searchMatches": null,
   "selectedElementIds": {
-    "id0": true,
+    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": null,
+  "selectedTextLineLinkIds": {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
@@ -5736,6 +5813,12 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "panels": 3,
   },
   "suggestedBinding": null,
+  "textBoxDecorationsColor": "#a8a8a8",
+  "textEditorCaretColor": "#6965db",
+  "textLineLinkDraft": null,
+  "textLineLinks": [],
+  "textSelectionBackgroundColor": "#a8a8a8",
+  "textSelectionUnderlineColor": "#a8a8a8",
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -5801,7 +5884,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
             />
           </g>
         </svg>,
-        "keyTest": [Function],
+        "keyTest": undefined,
         "label": "labels.cut",
         "name": "cut",
         "perform": [Function],
@@ -6034,6 +6117,33 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         ],
         "label": "labels.copyText",
         "name": "copyText",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "keywords": [
+          "text",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyTextBatch",
+        "name": "copyTextBatch",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "keywords": [
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyBatchWithFormat",
+        "name": "copyBatchWithFormat",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -6722,11 +6832,12 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "scrolledOutside": false,
   "searchMatches": null,
   "selectedElementIds": {
-    "id1": true,
+    "id2": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": null,
+  "selectedTextLineLinkIds": {},
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
@@ -6738,6 +6849,12 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "panels": 3,
   },
   "suggestedBinding": null,
+  "textBoxDecorationsColor": "#a8a8a8",
+  "textEditorCaretColor": "#6965db",
+  "textLineLinkDraft": null,
+  "textLineLinks": [],
+  "textSelectionBackgroundColor": "#a8a8a8",
+  "textSelectionUnderlineColor": "#a8a8a8",
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -6761,7 +6878,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] el
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id0",
+  "id": "id1",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -6793,7 +6910,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] el
   "frameId": null,
   "groupIds": [],
   "height": 200,
-  "id": "id0",
+  "id": "id1",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -6825,7 +6942,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] el
   "frameId": null,
   "groupIds": [],
   "height": 200,
-  "id": "id1",
+  "id": "id2",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -6866,7 +6983,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] un
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -6877,7 +6994,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] un
     "elements": {
       "added": {},
       "removed": {
-        "id0": {
+        "id1": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -6911,7 +7028,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] un
       },
       "updated": {},
     },
-    "id": "id2",
+    "id": "id3",
   },
 ]
 `;

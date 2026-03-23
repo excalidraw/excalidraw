@@ -1346,10 +1346,86 @@ export const textWysiwyg = ({
       onChange(editable.value);
       scheduleCaretUpdate();
     };
+
+    const preventEditIfSyncedLine = (event: Event) => {
+      const syncTagPrefix = "\u2063\u2063";
+      const selectionStart = editable.selectionStart ?? 0;
+      const selectionEnd = editable.selectionEnd ?? selectionStart;
+      const selectionMin = Math.max(0, Math.min(selectionStart, selectionEnd));
+      const selectionMax = Math.max(0, Math.max(selectionStart, selectionEnd));
+      const value = editable.value;
+      const startLineStart = value.lastIndexOf("\n", selectionMin - 1) + 1;
+      const endLineEndIdx = value.indexOf("\n", selectionMax);
+      const endLineEnd = endLineEndIdx === -1 ? value.length : endLineEndIdx;
+      if (value.slice(startLineStart, endLineEnd).includes(syncTagPrefix)) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+    editable.onpaste = preventEditIfSyncedLine;
+    editable.oncut = preventEditIfSyncedLine;
   }
 
   editable.onkeydown = (event) => {
+    const syncTagPrefix = "\u2063\u2063";
+    const selectionStart = editable.selectionStart ?? 0;
+    const selectionEnd = editable.selectionEnd ?? selectionStart;
+    const selectionMin = Math.max(0, Math.min(selectionStart, selectionEnd));
+    const selectionMax = Math.max(0, Math.max(selectionStart, selectionEnd));
+    const selectionIntersectsSyncedLine = (() => {
+      const value = editable.value;
+      const startLineStart = value.lastIndexOf("\n", selectionMin - 1) + 1;
+      const endLineEndIdx = value.indexOf("\n", selectionMax);
+      const endLineEnd = endLineEndIdx === -1 ? value.length : endLineEndIdx;
+      const slice = value.slice(startLineStart, endLineEnd);
+      return slice.includes(syncTagPrefix);
+    })();
+
+    if (
+      selectionIntersectsSyncedLine &&
+      !(
+        (event.altKey &&
+          !event[KEYS.CTRL_OR_CMD] &&
+          event.key === KEYS.ENTER) ||
+        (event.altKey &&
+          !event.shiftKey &&
+          !event[KEYS.CTRL_OR_CMD] &&
+          (event.key === "ArrowUp" || event.key === "ArrowDown")) ||
+        (event.altKey &&
+          !event[KEYS.CTRL_OR_CMD] &&
+          event.key.toLowerCase() === "l") ||
+        event.key === "ArrowLeft" ||
+        event.key === "ArrowRight" ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown" ||
+        event.key === "Home" ||
+        event.key === "End" ||
+        event.key === "PageUp" ||
+        event.key === "PageDown" ||
+        event.key === "Escape" ||
+        event.key === "Shift" ||
+        event.key === "Alt" ||
+        event.key === "Control" ||
+        event.key === "Meta" ||
+        (event[KEYS.CTRL_OR_CMD] &&
+          ["a", "c", "x"].includes(event.key.toLowerCase()))
+      )
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
     if (event.altKey && !event[KEYS.CTRL_OR_CMD] && event.key === KEYS.ENTER) {
+      const handled = (app as any).handleSummaryToolAltEnter?.(
+        element.id,
+        editable.selectionEnd ?? 0,
+      );
+      if (handled) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
       event.preventDefault();
       event.stopPropagation();
       const direction = event.shiftKey ? "up" : "down";
@@ -1357,6 +1433,21 @@ export const textWysiwyg = ({
       moveLines(direction);
       editable.dispatchEvent(new Event("input"));
       scheduleCaretUpdate();
+    } else if (
+      event.altKey &&
+      event[KEYS.CTRL_OR_CMD] &&
+      !event.shiftKey &&
+      (event.key === "ArrowLeft" || event.key === "ArrowRight")
+    ) {
+      const handled = (app as any).handleSummaryToolCycleComment?.(
+        element.id,
+        editable.selectionEnd ?? 0,
+        event.key === "ArrowRight" ? "next" : "prev",
+      );
+      if (handled) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
     } else if (
       event.altKey &&
       !event.shiftKey &&

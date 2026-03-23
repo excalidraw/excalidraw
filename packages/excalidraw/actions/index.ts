@@ -12,6 +12,8 @@ export {
   actionChangeTextSelectionBackgroundColor,
   actionChangeTextSelectionUnderlineColor,
   actionApplyTextSelectionBackground,
+  actionApplyTextSelectionColor,
+  actionApplyTextSelectionTag,
   actionApplyTextSelectionUnderline,
   actionToggleTextSelectionUnderline,
   actionChangeBackgroundColor,
@@ -102,3 +104,11 @@ export { actionToggleLinearEditor } from "./actionLinearEditor";
 export { actionToggleSearchMenu } from "./actionToggleSearchMenu";
 
 export { actionToggleCropEditor } from "./actionCropEditor";
+
+export {
+  actionToggleSummaryRoot,
+  actionToggleSummaryBase,
+  actionSummaryToolCommentsOff,
+  actionSummaryToolCommentsSingle,
+  actionSummaryToolCommentsAll,
+} from "./actionSummaryTool";

@@ -4,6 +4,7 @@ import { Popover } from "radix-ui";
 
 import {
   CLASSES,
+  DEFAULT_FONT_SIZE,
   KEYS,
   capitalizeString,
   isTransparent,
@@ -14,7 +15,6 @@ import {
   suppportsHorizontalAlign,
   hasBoundTextElement,
   isElbowArrow,
-  isImageElement,
   isLinearElement,
   isTextElement,
   isArrowElement,
@@ -34,11 +34,11 @@ import { actionToggleZenMode } from "../actions";
 import { alignActionsPredicate } from "../actions/actionAlign";
 import { trackEvent } from "../analytics";
 import { useTunnels } from "../context/tunnels";
+import { useUIAppState } from "../context/ui-appState";
 
 import { t } from "../i18n";
 import {
   canChangeRoundness,
-  canHaveArrowheads,
   getTargetElements,
   hasBackground,
   hasStrokeStyle,
@@ -56,7 +56,6 @@ import { getToolbarTools } from "./shapes";
 import "./Actions.scss";
 
 import {
-  useEditorInterface,
   useStylesPanelMode,
   useExcalidrawContainer,
   useExcalidrawSetAppState,
@@ -159,233 +158,136 @@ export const SelectedShapeActions = ({
   app: AppClassProperties;
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
-  const hasSelectedTextLineLinks = !!Object.keys(
-    appState.selectedTextLineLinkIds,
-  ).length;
   const setAppState = useExcalidrawSetAppState();
-  const editorInterface = useEditorInterface();
 
-  if (hasSelectedTextLineLinks) {
-    //添加按住左键拉框,可以选中文本框的功能2026.03.21
-    return (
-      <div className="selected-shape-actions">
+  const strokeColorControl =
+    renderAction("changeStrokeColor") ??
+    (() => (
+      <>
+        <h3 aria-hidden="true">{t("labels.stroke")}</h3>
         <div>
-          <h3 aria-hidden="true">{t("labels.stroke")}</h3>
-          <div>
-            <ColorPicker
-              topPicks={TEXT_BOX_DECORATIONS_COLOR_TOP_PICKS}
-              label={t("labels.stroke")}
-              type="textBoxDecorations"
-              color={appState.textBoxDecorationsColor}
-              onChange={(color) =>
-                setAppState({ textBoxDecorationsColor: color })
-              }
-              elements={targetElements}
-              appState={appState as AppState}
-              updateData={(data?: any) => setAppState(data)}
-            />
-          </div>
-          <h3 aria-hidden="true">{t("labels.textSelectionUnderline")}</h3>
-          <div>
-            <ColorPicker
-              topPicks={TEXT_BOX_DECORATIONS_COLOR_TOP_PICKS}
-              label={t("labels.textSelectionUnderline")}
-              type="textSelectionUnderline"
-              color={appState.textSelectionUnderlineColor}
-              onChange={(color) =>
-                setAppState({ textSelectionUnderlineColor: color })
-              }
-              elements={targetElements}
-              appState={appState as AppState}
-              updateData={(data?: any) => setAppState(data)}
-            />
-          </div>
-          <h3 aria-hidden="true">{t("labels.textSelectionBackground")}</h3>
-          <div>
-            <ColorPicker
-              topPicks={TEXT_BOX_DECORATIONS_COLOR_TOP_PICKS}
-              label={t("labels.textSelectionBackground")}
-              type="textSelectionBackground"
-              color={appState.textSelectionBackgroundColor}
-              onChange={(color) =>
-                setAppState({ textSelectionBackgroundColor: color })
-              }
-              elements={targetElements}
-              appState={appState as AppState}
-              updateData={(data?: any) => setAppState(data)}
-            />
-          </div>
+          <ColorPicker
+            label={t("labels.stroke")}
+            type="elementStroke"
+            color={appState.currentItemStrokeColor}
+            onChange={(color) => setAppState({ currentItemStrokeColor: color })}
+            elements={targetElements}
+            appState={appState as AppState}
+            updateData={(data?: any) => setAppState(data)}
+          />
         </div>
-        <fieldset>{renderAction("changeFontFamily")}</fieldset>
-        {renderAction("changeFontSize")}
-        {renderAction("deleteSelectedElements")}
-      </div>
-    );
-  }
+      </>
+    ))();
 
-  let isSingleElementBoundContainer = false;
-  if (
-    targetElements.length === 2 &&
-    (hasBoundTextElement(targetElements[0]) ||
-      hasBoundTextElement(targetElements[1]))
-  ) {
-    isSingleElementBoundContainer = true;
-  }
-  const isEditingTextOrNewElement = Boolean(
-    appState.editingTextElement || appState.newElement,
-  );
-  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
+  const fontSizeControl =
+    renderAction("changeFontSize") ??
+    (() => {
+      const fontSize = appState.currentItemFontSize || DEFAULT_FONT_SIZE;
+      const MIN_FONT_SIZE = 4;
+      const decreaseValue = Math.max(MIN_FONT_SIZE, Math.round(fontSize) - 1);
+      const increaseValue = Math.max(MIN_FONT_SIZE, Math.round(fontSize) + 1);
 
-  const showFillIcons =
-    (hasBackground(appState.activeTool.type) &&
-      !isTransparent(appState.currentItemBackgroundColor)) ||
-    targetElements.some(
-      (element) =>
-        hasBackground(element.type) && !isTransparent(element.backgroundColor),
-    );
-
-  const showLinkIcon =
-    targetElements.length === 1 || isSingleElementBoundContainer;
-
-  const showLineEditorAction =
-    !appState.selectedLinearElement?.isEditing &&
-    targetElements.length === 1 &&
-    isLinearElement(targetElements[0]) &&
-    !isElbowArrow(targetElements[0]);
-
-  const showCropEditorAction =
-    !appState.croppingElementId &&
-    targetElements.length === 1 &&
-    isImageElement(targetElements[0]);
-
-  const showAlignActions =
-    !isSingleElementBoundContainer && alignActionsPredicate(appState, app);
+      return (
+        <fieldset>
+          <legend>{t("labels.fontSize")}</legend>
+          <div className="buttonList">
+            <div className="font-size-control">
+              <input
+                className="font-size-control__input"
+                type="text"
+                readOnly
+                tabIndex={-1}
+                inputMode="none"
+                value={String(Math.round(fontSize))}
+                size={4}
+                data-testid="fontSize-input"
+              />
+              <div className="font-size-control__buttons">
+                <button
+                  type="button"
+                  className="font-size-control__button"
+                  data-testid="fontSize-decrease"
+                  onClick={() =>
+                    setAppState({ currentItemFontSize: decreaseValue })
+                  }
+                >
+                  -
+                </button>
+                <button
+                  type="button"
+                  className="font-size-control__button"
+                  data-testid="fontSize-increase"
+                  onClick={() =>
+                    setAppState({ currentItemFontSize: increaseValue })
+                  }
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      );
+    })();
 
   return (
     <div className="selected-shape-actions">
       <div>
-        {canChangeStrokeColor(appState, targetElements) &&
-          renderAction("changeStrokeColor")}
-      </div>
-      {canChangeBackgroundColor(appState, targetElements) && (
-        <div>{renderAction("changeBackgroundColor")}</div>
-      )}
-      {showFillIcons && renderAction("changeFillStyle")}
-
-      {(hasStrokeWidth(appState.activeTool.type) ||
-        targetElements.some((element) => hasStrokeWidth(element.type))) &&
-        renderAction("changeStrokeWidth")}
-
-      {(appState.activeTool.type === "freedraw" ||
-        targetElements.some((element) => element.type === "freedraw")) &&
-        renderAction("changeStrokeShape")}
-
-      {(hasStrokeStyle(appState.activeTool.type) ||
-        targetElements.some((element) => hasStrokeStyle(element.type))) && (
-        <>
-          {renderAction("changeStrokeStyle")}
-          {renderAction("changeSloppiness")}
-        </>
-      )}
-
-      {(canChangeRoundness(appState.activeTool.type) ||
-        targetElements.some((element) => canChangeRoundness(element.type))) && (
-        <>{renderAction("changeRoundness")}</>
-      )}
-
-      {(toolIsArrow(appState.activeTool.type) ||
-        targetElements.some((element) => toolIsArrow(element.type))) && (
-        <>{renderAction("changeArrowType")}</>
-      )}
-
-      {(appState.activeTool.type === "text" ||
-        targetElements.some(isTextElement)) && (
-        <>
-          <fieldset>{renderAction("changeFontFamily")}</fieldset>
-          {renderAction("changeFontSize")}
-          {(appState.activeTool.type === "text" ||
-            suppportsHorizontalAlign(targetElements, elementsMap)) &&
-            renderAction("changeTextAlign")}
-        </>
-      )}
-
-      {shouldAllowVerticalAlign(targetElements, elementsMap) &&
-        renderAction("changeVerticalAlign")}
-      {(canHaveArrowheads(appState.activeTool.type) ||
-        targetElements.some((element) => canHaveArrowheads(element.type))) && (
-        <>{renderAction("changeArrowhead")}</>
-      )}
-
-      {renderAction("changeOpacity")}
-
-      <fieldset>
-        <legend>{t("labels.layers")}</legend>
-        <div className="buttonList">
-          {renderAction("sendToBack")}
-          {renderAction("sendBackward")}
-          {renderAction("bringForward")}
-          {renderAction("bringToFront")}
+        {strokeColorControl}
+        <h3 aria-hidden="true">{t("labels.textSelectionColor")}</h3>
+        <div>
+          <ColorPicker
+            label={t("labels.textSelectionColor")}
+            type="textSelectionColor"
+            color={appState.textSelectionColor}
+            onChange={(color) => setAppState({ textSelectionColor: color })}
+            elements={targetElements}
+            appState={appState as AppState}
+            updateData={(data?: any) => setAppState(data)}
+          />
         </div>
-      </fieldset>
-
-      {showAlignActions && !isSingleElementBoundContainer && (
-        <fieldset>
-          <legend>{t("labels.align")}</legend>
-          <div className="buttonList">
-            {
-              // swap this order for RTL so the button positions always match their action
-              // (i.e. the leftmost button aligns left)
+        <h3 aria-hidden="true">{t("labels.textSelectionTag")}</h3>
+        <div>
+          <ColorPicker
+            label={t("labels.textSelectionTag")}
+            type="textSelectionTag"
+            color={appState.textSelectionTagColor}
+            onChange={(color) => setAppState({ textSelectionTagColor: color })}
+            elements={targetElements}
+            appState={appState as AppState}
+            updateData={(data?: any) => setAppState(data)}
+          />
+        </div>
+        <h3 aria-hidden="true">{t("labels.textSelectionUnderline")}</h3>
+        <div>
+          <ColorPicker
+            label={t("labels.textSelectionUnderline")}
+            type="textSelectionUnderline"
+            color={appState.textSelectionUnderlineColor}
+            onChange={(color) =>
+              setAppState({ textSelectionUnderlineColor: color })
             }
-            {isRTL ? (
-              <>
-                {renderAction("alignRight")}
-                {renderAction("alignHorizontallyCentered")}
-                {renderAction("alignLeft")}
-              </>
-            ) : (
-              <>
-                {renderAction("alignLeft")}
-                {renderAction("alignHorizontallyCentered")}
-                {renderAction("alignRight")}
-              </>
-            )}
-            {targetElements.length > 2 &&
-              renderAction("distributeHorizontally")}
-            {/* breaks the row ˇˇ */}
-            <div style={{ flexBasis: "100%", height: 0 }} />
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: ".5rem",
-                marginTop: "-0.5rem",
-              }}
-            >
-              {renderAction("alignTop")}
-              {renderAction("alignVerticallyCentered")}
-              {renderAction("alignBottom")}
-              {targetElements.length > 2 &&
-                renderAction("distributeVertically")}
-            </div>
-          </div>
-        </fieldset>
-      )}
-      {!isEditingTextOrNewElement && targetElements.length > 0 && (
-        <fieldset>
-          <legend>{t("labels.actions")}</legend>
-          <div className="buttonList">
-            {editorInterface.formFactor !== "phone" &&
-              renderAction("duplicateSelection")}
-            {editorInterface.formFactor !== "phone" &&
-              renderAction("deleteSelectedElements")}
-            {renderAction("group")}
-            {renderAction("ungroup")}
-            {showLinkIcon && renderAction("hyperlink")}
-            {showCropEditorAction && renderAction("cropEditor")}
-            {showLineEditorAction && renderAction("toggleLinearEditor")}
-          </div>
-        </fieldset>
-      )}
+            elements={targetElements}
+            appState={appState as AppState}
+            updateData={(data?: any) => setAppState(data)}
+          />
+        </div>
+        <h3 aria-hidden="true">{t("labels.textSelectionBackground")}</h3>
+        <div>
+          <ColorPicker
+            label={t("labels.textSelectionBackground")}
+            type="textSelectionBackground"
+            color={appState.textSelectionBackgroundColor}
+            onChange={(color) =>
+              setAppState({ textSelectionBackgroundColor: color })
+            }
+            elements={targetElements}
+            appState={appState as AppState}
+            updateData={(data?: any) => setAppState(data)}
+          />
+        </div>
+      </div>
+      {fontSizeControl}
     </div>
   );
 };
@@ -483,7 +385,8 @@ const CombinedShapeProperties = ({
                   canChangeRoundness(element.type),
                 )) &&
                 renderAction("changeRoundness")}
-              {renderAction("changeOpacity")}
+              {!appState.areUselessButtonsHidden &&
+                renderAction("changeOpacity")}
             </div>
           </PropertiesPopover>
         )}
@@ -672,6 +575,7 @@ const CombinedTextProperties = ({
                 renderAction("changeFontSize")}
               {(appState.activeTool.type === "text" ||
                 suppportsHorizontalAlign(targetElements, elementsMap)) &&
+                !appState.areUselessButtonsHidden &&
                 renderAction("changeTextAlign")}
               {shouldAllowVerticalAlign(targetElements, elementsMap) &&
                 renderAction("changeVerticalAlign")}
@@ -690,8 +594,6 @@ const CombinedExtraActions = ({
   setAppState,
   container,
   app,
-  showDuplicate,
-  showDelete,
 }: {
   appState: UIAppState;
   targetElements: ExcalidrawElement[];
@@ -699,17 +601,10 @@ const CombinedExtraActions = ({
   setAppState: React.Component<any, AppState>["setState"];
   container: HTMLDivElement | null;
   app: AppClassProperties;
-  showDuplicate?: boolean;
-  showDelete?: boolean;
 }) => {
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
   );
-  const showCropEditorAction =
-    !appState.croppingElementId &&
-    targetElements.length === 1 &&
-    isImageElement(targetElements[0]);
-  const showLinkIcon = targetElements.length === 1;
   const showAlignActions = alignActionsPredicate(appState, app);
   let isSingleElementBoundContainer = false;
   if (
@@ -769,16 +664,6 @@ const CombinedExtraActions = ({
             onClose={() => {}}
           >
             <div className="selected-shape-actions">
-              <fieldset>
-                <legend>{t("labels.layers")}</legend>
-                <div className="buttonList">
-                  {renderAction("sendToBack")}
-                  {renderAction("sendBackward")}
-                  {renderAction("bringForward")}
-                  {renderAction("bringToFront")}
-                </div>
-              </fieldset>
-
               {showAlignActions && !isSingleElementBoundContainer && (
                 <fieldset>
                   <legend>{t("labels.align")}</legend>
@@ -817,17 +702,6 @@ const CombinedExtraActions = ({
                   </div>
                 </fieldset>
               )}
-              <fieldset>
-                <legend>{t("labels.actions")}</legend>
-                <div className="buttonList">
-                  {renderAction("group")}
-                  {renderAction("ungroup")}
-                  {showLinkIcon && renderAction("hyperlink")}
-                  {showCropEditorAction && renderAction("cropEditor")}
-                  {showDuplicate && renderAction("duplicateSelection")}
-                  {showDelete && renderAction("deleteSelectedElements")}
-                </div>
-              </fieldset>
             </div>
           </PropertiesPopover>
         )}
@@ -1199,8 +1073,6 @@ export const MobileShapeActions = ({
             setAppState={setAppState}
             container={container}
             app={app}
-            showDuplicate={!showDuplicateOutside}
-            showDelete={!showDeleteOutside}
           />
         )}
       </div>
@@ -1243,6 +1115,7 @@ export const ShapesSwitcher = ({
   const stylesPanelMode = useStylesPanelMode();
   const isFullStylesPanel = stylesPanelMode === "full";
   const isCompactStylesPanel = stylesPanelMode === "compact";
+  const appState = useUIAppState();
 
   const SELECTION_TOOLS = [
     {
@@ -1296,7 +1169,9 @@ export const ShapesSwitcher = ({
             ? `${letter} ${t("helpDialog.or")} ${numericKey}`
             : `${numericKey}`;
           const keybindingLabel =
-            value === "hand" ? undefined : numericKey || letter;
+            !appState.isToolbarVisible || value === "hand"
+              ? undefined
+              : numericKey || letter;
 
           // when in compact styles panel mode (tablet)
           // use a ToolPopover for selection/lasso toggle as well

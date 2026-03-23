@@ -1,14 +1,11 @@
 import { pointFrom } from "@excalidraw/math";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
   DEFAULT_ELEMENT_STROKE_PICKS,
   ARROW_TYPE,
-  DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
   ROUNDNESS,
@@ -22,7 +19,6 @@ import {
   isTransparent,
   reduceToCommonValue,
   invariant,
-  FONT_SIZES,
 } from "@excalidraw/common";
 
 import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
@@ -83,7 +79,6 @@ import type { CaptureUpdateActionType } from "@excalidraw/element";
 import { trackEvent } from "../analytics";
 import { RadioSelection } from "../components/RadioSelection";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
-import { FontPicker } from "../components/FontPicker/FontPicker";
 import { IconPicker } from "../components/IconPicker";
 import { Range } from "../components/Range";
 import {
@@ -106,10 +101,6 @@ import {
   StrokeWidthBaseIcon,
   StrokeWidthBoldIcon,
   StrokeWidthExtraBoldIcon,
-  FontSizeSmallIcon,
-  FontSizeMediumIcon,
-  FontSizeLargeIcon,
-  FontSizeExtraLargeIcon,
   EdgeSharpIcon,
   EdgeRoundIcon,
   TextAlignLeftIcon,
@@ -137,6 +128,7 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
+import { applySummaryToolSync } from "../summaryTool/summaryTool";
 
 import {
   withCaretPositionPreservation,
@@ -318,21 +310,104 @@ export const actionChangeStrokeColor = register<
   label: "labels.stroke",
   trackEvent: false,
   perform: (elements, appState, value) => {
+    const selected = getSelectedElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
+    const isSummaryRootSelected = selected.some(
+      (el) =>
+        isTextElement(el) &&
+        (el.customData as any)?.summaryTool?.role === "summaryRoot",
+    );
+
+    let nextElements: ExcalidrawElement[] = elements as any;
+    if (value?.currentItemStrokeColor) {
+      nextElements = changeProperty(
+        elements,
+        appState,
+        (el) => {
+          if (!hasStrokeColor(el.type)) {
+            return el;
+          }
+          if (!isTextElement(el)) {
+            return newElementWith(el, {
+              strokeColor: value.currentItemStrokeColor,
+            });
+          }
+
+          const textLength = (el.originalText ?? el.text).replace(
+            /\r\n?/g,
+            "\n",
+          ).length;
+          const prevCustomData = (el.customData ?? {}) as Record<string, any>;
+          const prevDecorations = prevCustomData.textDecorations as
+            | Record<string, any>
+            | undefined;
+
+          const nextDecorations: Record<string, any> = {
+            ...(prevDecorations ?? {}),
+            ...(textLength > 0
+              ? {
+                  textColors: [
+                    {
+                      start: 0,
+                      end: textLength,
+                      color: value.currentItemStrokeColor,
+                    },
+                  ],
+                }
+              : {}),
+          };
+
+          if (textLength <= 0) {
+            delete nextDecorations.textColors;
+          }
+
+          const { textDecorations: _prevTextDecorations, ...restCustomData } =
+            prevCustomData;
+          const nextCustomData =
+            Object.keys(nextDecorations).length > 0
+              ? {
+                  ...restCustomData,
+                  textDecorations: nextDecorations,
+                }
+              : restCustomData;
+
+          return newElementWith(el, {
+            strokeColor: value.currentItemStrokeColor,
+            customData: Object.keys(nextCustomData).length
+              ? nextCustomData
+              : undefined,
+          });
+        },
+        true,
+      ) as any;
+    }
+
+    if (value?.currentItemStrokeColor && isSummaryRootSelected) {
+      const elementsMap = new Map(
+        nextElements
+          .filter((el) => !el.isDeleted)
+          .map((el) => [el.id, el] as const),
+      ) as any;
+      const sync = applySummaryToolSync({
+        elements: nextElements,
+        appState: { ...appState, textLineLinks: appState.textLineLinks } as any,
+        elementsMap,
+      });
+      return {
+        elements: sync.elements,
+        appState: {
+          ...appState,
+          ...value,
+          ...sync.appState,
+        },
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      };
+    }
+
     return {
-      ...(value?.currentItemStrokeColor && {
-        elements: changeProperty(
-          elements,
-          appState,
-          (el) => {
-            return hasStrokeColor(el.type)
-              ? newElementWith(el, {
-                  strokeColor: value.currentItemStrokeColor,
-                })
-              : el;
-          },
-          true,
-        ),
-      }),
+      ...(value?.currentItemStrokeColor && { elements: nextElements }),
       appState: {
         ...appState,
         ...value,
@@ -345,7 +420,7 @@ export const actionChangeStrokeColor = register<
   PanelComponent: ({ elements, appState, updateData, app, renderAction }) => {
     const { stylesPanelMode } = getStylesPanelInfo(app);
     const applyTextSelectionDecoration = (
-      kind: "background" | "underline",
+      kind: "background" | "underline" | "color" | "tag",
       color: string,
     ) => {
       if (!appState.editingTextElement) {
@@ -368,7 +443,11 @@ export const actionChangeStrokeColor = register<
       (app as any).actionManager.executeAction(
         kind === "background"
           ? actionApplyTextSelectionBackground
-          : actionApplyTextSelectionUnderline,
+          : kind === "underline"
+          ? actionApplyTextSelectionUnderline
+          : kind === "color"
+          ? actionApplyTextSelectionColor
+          : actionApplyTextSelectionTag,
         "ui",
         { start, end, color },
       );
@@ -376,20 +455,32 @@ export const actionChangeStrokeColor = register<
     };
 
     const renderTextSelectionDecorationSection = (
-      kind: "background" | "underline",
+      kind: "background" | "underline" | "color" | "tag",
     ) => {
       const label =
         kind === "background"
           ? t("labels.textSelectionBackground")
-          : t("labels.textSelectionUnderline");
+          : kind === "underline"
+          ? t("labels.textSelectionUnderline")
+          : kind === "color"
+          ? t("labels.textSelectionColor")
+          : t("labels.textSelectionTag");
       const type =
         kind === "background"
           ? "textSelectionBackground"
-          : "textSelectionUnderline";
+          : kind === "underline"
+          ? "textSelectionUnderline"
+          : kind === "color"
+          ? "textSelectionColor"
+          : "textSelectionTag";
       const currentColor =
         kind === "background"
           ? appState.textSelectionBackgroundColor
-          : appState.textSelectionUnderlineColor;
+          : kind === "underline"
+          ? appState.textSelectionUnderlineColor
+          : kind === "color"
+          ? appState.textSelectionColor
+          : appState.textSelectionTagColor;
 
       return (
         <>
@@ -405,7 +496,11 @@ export const actionChangeStrokeColor = register<
                   updateData(
                     kind === "background"
                       ? { textSelectionBackgroundColor: color }
-                      : { textSelectionUnderlineColor: color },
+                      : kind === "underline"
+                      ? { textSelectionUnderlineColor: color }
+                      : kind === "color"
+                      ? { textSelectionColor: color }
+                      : { textSelectionTagColor: color },
                   );
                   applyTextSelectionDecoration(kind, color);
                 },
@@ -444,6 +539,8 @@ export const actionChangeStrokeColor = register<
           appState={appState}
           updateData={updateData}
         />
+        {renderTextSelectionDecorationSection("color")}
+        {renderTextSelectionDecorationSection("tag")}
         {renderTextSelectionDecorationSection("underline")}
         {renderTextSelectionDecorationSection("background")}
       </>
@@ -481,6 +578,8 @@ const getTextDecorations = (
   | {
       highlights?: readonly TextDecorationRange[];
       underlines?: readonly TextDecorationRange[];
+      textColors?: readonly TextDecorationRange[];
+      tags?: readonly TextDecorationRange[];
     }
   | undefined => {
   const v = (element.customData as any)?.textDecorations;
@@ -489,7 +588,7 @@ const getTextDecorations = (
 
 const addTextDecoration = (
   element: ExcalidrawTextElement,
-  kind: "highlights" | "underlines",
+  kind: "highlights" | "underlines" | "textColors" | "tags",
   range: TextDecorationRange,
 ) => {
   const textLength = (element.originalText ?? "").replace(
@@ -521,7 +620,7 @@ const addTextDecoration = (
 
 const toggleTextDecoration = (
   element: ExcalidrawTextElement,
-  kind: "highlights" | "underlines",
+  kind: "highlights" | "underlines" | "textColors" | "tags",
   range: TextDecorationRange,
 ) => {
   const textLength = (element.originalText ?? "").replace(
@@ -573,6 +672,8 @@ const toggleTextDecoration = (
   } as {
     highlights?: readonly TextDecorationRange[];
     underlines?: readonly TextDecorationRange[];
+    textColors?: readonly TextDecorationRange[];
+    tags?: readonly TextDecorationRange[];
   };
 
   if (!nextList.length) {
@@ -581,7 +682,9 @@ const toggleTextDecoration = (
 
   const hasHighlights = !!nextDecorations.highlights?.length;
   const hasUnderlines = !!nextDecorations.underlines?.length;
-  if (!hasHighlights && !hasUnderlines) {
+  const hasTextColors = !!nextDecorations.textColors?.length;
+  const hasTags = !!nextDecorations.tags?.length;
+  if (!hasHighlights && !hasUnderlines && !hasTextColors && !hasTags) {
     const { textDecorations, ...rest } = element.customData ?? {};
     return newElementWith(element, {
       customData: Object.keys(rest).length ? rest : undefined,
@@ -812,6 +915,122 @@ export const actionApplyTextSelectionBackground = register<{
         </svg>
       </button>
     );
+  },
+});
+
+export const actionApplyTextSelectionColor = register<{
+  start: number;
+  end: number;
+  color: string;
+}>({
+  name: "applyTextSelectionColor",
+  label: "Apply text selection color",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    const editingId = appState.editingTextElement?.id;
+    if (!editingId || !value) {
+      return false;
+    }
+
+    const nextElements = elements.map((el) => {
+      if (el.id !== editingId || !isTextElement(el)) {
+        return el;
+      }
+      return addTextDecoration(el, "textColors", {
+        start: value.start,
+        end: value.end,
+        color: value.color,
+      });
+    });
+
+    const editingElement = nextElements.find(
+      (el) => el.id === editingId && isTextElement(el),
+    ) as ExcalidrawTextElement | undefined;
+    const hasSyncedLineTag =
+      !!editingElement && editingElement.text.includes("\u2063\u2063");
+    if (
+      editingElement &&
+      (editingElement.customData as any)?.summaryTool?.role === "summaryRoot"
+    ) {
+      const elementsMap = new Map(
+        nextElements
+          .filter((el) => !el.isDeleted)
+          .map((el) => [el.id, el] as const),
+      ) as any;
+      const sync = applySummaryToolSync({
+        elements: nextElements,
+        appState: { ...appState, textLineLinks: appState.textLineLinks } as any,
+        elementsMap,
+      });
+      return {
+        elements: sync.elements,
+        appState: {
+          ...appState,
+          ...sync.appState,
+        },
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      };
+    }
+
+    if (hasSyncedLineTag) {
+      const elementsMap = new Map(
+        nextElements
+          .filter((el) => !el.isDeleted)
+          .map((el) => [el.id, el] as const),
+      ) as any;
+      const sync = applySummaryToolSync({
+        elements: nextElements,
+        appState: { ...appState, textLineLinks: appState.textLineLinks } as any,
+        elementsMap,
+      });
+      return {
+        elements: sync.elements,
+        appState: {
+          ...appState,
+          ...sync.appState,
+        },
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      };
+    }
+
+    return {
+      elements: nextElements,
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+});
+
+export const actionApplyTextSelectionTag = register<{
+  start: number;
+  end: number;
+  color: string;
+}>({
+  name: "applyTextSelectionTag",
+  label: "Apply text selection tag",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    const editingId = appState.editingTextElement?.id;
+    if (!editingId || !value) {
+      return false;
+    }
+
+    const nextElements = elements.map((el) => {
+      if (el.id !== editingId || !isTextElement(el)) {
+        return el;
+      }
+      return addTextDecoration(el, "tags", {
+        start: value.start,
+        end: value.end,
+        color: value.color,
+      });
+    });
+
+    return {
+      elements: nextElements,
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
   },
 });
 
@@ -1312,75 +1531,91 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
     },
     PanelComponent: ({ elements, appState, updateData, app, data }) => {
       const { isCompact } = getStylesPanelInfo(app);
+      const MIN_FONT_SIZE = 4;
+
+      const currentValue = getFormValue(
+        elements,
+        app,
+        (element) => {
+          if (isTextElement(element)) {
+            return element.fontSize;
+          }
+          const boundTextElement = getBoundTextElement(
+            element,
+            app.scene.getNonDeletedElementsMap(),
+          );
+          if (boundTextElement) {
+            return boundTextElement.fontSize;
+          }
+          return null;
+        },
+        (element) =>
+          isTextElement(element) ||
+          getBoundTextElement(element, app.scene.getNonDeletedElementsMap()) !==
+            null,
+        (hasSelection) =>
+          hasSelection
+            ? null
+            : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+      );
+
+      const fontSize =
+        (typeof currentValue === "number" && Number.isFinite(currentValue)
+          ? currentValue
+          : appState.currentItemFontSize || DEFAULT_FONT_SIZE) ??
+        DEFAULT_FONT_SIZE;
+
+      const decreaseValue = Math.max(MIN_FONT_SIZE, Math.round(fontSize) - 1);
+      const increaseValue = Math.max(MIN_FONT_SIZE, Math.round(fontSize) + 1);
 
       return (
         <fieldset>
           <legend>{t("labels.fontSize")}</legend>
           <div className="buttonList">
-            <RadioSelection
-              group="font-size"
-              options={[
-                {
-                  value: FONT_SIZES.sm,
-                  text: t("labels.small"),
-                  icon: FontSizeSmallIcon,
-                  testId: "fontSize-small",
-                },
-                {
-                  value: FONT_SIZES.md,
-                  text: t("labels.medium"),
-                  icon: FontSizeMediumIcon,
-                  testId: "fontSize-medium",
-                },
-                {
-                  value: FONT_SIZES.lg,
-                  text: t("labels.large"),
-                  icon: FontSizeLargeIcon,
-                  testId: "fontSize-large",
-                },
-                {
-                  value: FONT_SIZES.xl,
-                  text: t("labels.veryLarge"),
-                  icon: FontSizeExtraLargeIcon,
-                  testId: "fontSize-veryLarge",
-                },
-              ]}
-              value={getFormValue(
-                elements,
-                app,
-                (element) => {
-                  if (isTextElement(element)) {
-                    return element.fontSize;
-                  }
-                  const boundTextElement = getBoundTextElement(
-                    element,
-                    app.scene.getNonDeletedElementsMap(),
-                  );
-                  if (boundTextElement) {
-                    return boundTextElement.fontSize;
-                  }
-                  return null;
-                },
-                (element) =>
-                  isTextElement(element) ||
-                  getBoundTextElement(
-                    element,
-                    app.scene.getNonDeletedElementsMap(),
-                  ) !== null,
-                (hasSelection) =>
-                  hasSelection
-                    ? null
-                    : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
-              )}
-              onChange={(value) => {
-                withCaretPositionPreservation(
-                  () => updateData(value),
-                  isCompact,
-                  !!appState.editingTextElement,
-                  data?.onPreventClose,
-                );
-              }}
-            />
+            <div className="font-size-control">
+              <input
+                className="font-size-control__input"
+                type="text"
+                readOnly
+                tabIndex={-1}
+                inputMode="none"
+                value={String(Math.round(fontSize))}
+                size={4}
+                data-testid="fontSize-input"
+              />
+              <div className="font-size-control__buttons">
+                <button
+                  type="button"
+                  className="font-size-control__button"
+                  data-testid="fontSize-decrease"
+                  onClick={() => {
+                    withCaretPositionPreservation(
+                      () => updateData(decreaseValue),
+                      isCompact,
+                      !!appState.editingTextElement,
+                      data?.onPreventClose,
+                    );
+                  }}
+                >
+                  -
+                </button>
+                <button
+                  type="button"
+                  className="font-size-control__button"
+                  data-testid="fontSize-increase"
+                  onClick={() => {
+                    withCaretPositionPreservation(
+                      () => updateData(increaseValue),
+                      isCompact,
+                      !!appState.editingTextElement,
+                      data?.onPreventClose,
+                    );
+                  }}
+                >
+                  +
+                </button>
+              </div>
+            </div>
           </div>
         </fieldset>
       );
@@ -1646,188 +1881,7 @@ export const actionChangeFontFamily = register<{
 
     return result;
   },
-  PanelComponent: ({ elements, appState, app, updateData }) => {
-    const cachedElementsRef = useRef<ElementsMap>(new Map());
-    const prevSelectedFontFamilyRef = useRef<number | null>(null);
-    // relying on state batching as multiple `FontPicker` handlers could be called in rapid succession and we want to combine them
-    const [batchedData, setBatchedData] = useState<ChangeFontFamilyData>({});
-    const isUnmounted = useRef(true);
-    const { stylesPanelMode, isCompact } = getStylesPanelInfo(app);
-
-    const selectedFontFamily = useMemo(() => {
-      const getFontFamily = (
-        elementsArray: readonly ExcalidrawElement[],
-        elementsMap: ElementsMap,
-      ) =>
-        getFormValue(
-          elementsArray,
-          app,
-          (element) => {
-            if (isTextElement(element)) {
-              return element.fontFamily;
-            }
-            const boundTextElement = getBoundTextElement(element, elementsMap);
-            if (boundTextElement) {
-              return boundTextElement.fontFamily;
-            }
-            return null;
-          },
-          (element) =>
-            isTextElement(element) ||
-            getBoundTextElement(element, elementsMap) !== null,
-          (hasSelection) =>
-            hasSelection
-              ? null
-              : appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
-        );
-
-      // popup opened, use cached elements
-      if (
-        batchedData.openPopup === "fontFamily" &&
-        appState.openPopup === "fontFamily"
-      ) {
-        return getFontFamily(
-          Array.from(cachedElementsRef.current?.values() ?? []),
-          cachedElementsRef.current,
-        );
-      }
-
-      // popup closed, use all elements
-      if (!batchedData.openPopup && appState.openPopup !== "fontFamily") {
-        return getFontFamily(elements, app.scene.getNonDeletedElementsMap());
-      }
-
-      // popup props are not in sync, hence we are in the middle of an update, so keeping the previous value we've had
-      return prevSelectedFontFamilyRef.current;
-    }, [batchedData.openPopup, appState, elements, app]);
-
-    useEffect(() => {
-      prevSelectedFontFamilyRef.current = selectedFontFamily;
-    }, [selectedFontFamily]);
-
-    useEffect(() => {
-      if (Object.keys(batchedData).length) {
-        updateData(batchedData);
-        // reset the data after we've used the data
-        setBatchedData({});
-      }
-      // call update only on internal state changes
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [batchedData]);
-
-    useEffect(() => {
-      isUnmounted.current = false;
-
-      return () => {
-        isUnmounted.current = true;
-      };
-    }, []);
-
-    return (
-      <>
-        {stylesPanelMode === "full" && (
-          <legend>{t("labels.fontFamily")}</legend>
-        )}
-        <FontPicker
-          isOpened={appState.openPopup === "fontFamily"}
-          selectedFontFamily={selectedFontFamily}
-          hoveredFontFamily={appState.currentHoveredFontFamily}
-          compactMode={stylesPanelMode !== "full"}
-          onSelect={(fontFamily) => {
-            withCaretPositionPreservation(
-              () => {
-                setBatchedData({
-                  openPopup: null,
-                  currentHoveredFontFamily: null,
-                  currentItemFontFamily: fontFamily,
-                });
-                // defensive clear so immediate close won't abuse the cached elements
-                cachedElementsRef.current.clear();
-              },
-              isCompact,
-              !!appState.editingTextElement,
-            );
-          }}
-          onHover={(fontFamily) => {
-            setBatchedData({
-              currentHoveredFontFamily: fontFamily,
-              cachedElements: new Map(cachedElementsRef.current),
-              resetContainers: true,
-            });
-          }}
-          onLeave={() => {
-            setBatchedData({
-              currentHoveredFontFamily: null,
-              cachedElements: new Map(cachedElementsRef.current),
-              resetAll: true,
-            });
-          }}
-          onPopupChange={(open) => {
-            if (open) {
-              // open, populate the cache from scratch
-              cachedElementsRef.current.clear();
-
-              const { editingTextElement } = appState;
-
-              // still check type to be safe
-              if (editingTextElement?.type === "text") {
-                // retrieve the latest version from the scene, as `editingTextElement` isn't mutated
-                const latesteditingTextElement = app.scene.getElement(
-                  editingTextElement.id,
-                );
-
-                // inside the wysiwyg editor
-                cachedElementsRef.current.set(
-                  editingTextElement.id,
-                  newElementWith(
-                    latesteditingTextElement || editingTextElement,
-                    {},
-                    true,
-                  ),
-                );
-              } else {
-                const selectedElements = getSelectedElements(
-                  elements,
-                  appState,
-                  {
-                    includeBoundTextElement: true,
-                  },
-                );
-
-                for (const element of selectedElements) {
-                  cachedElementsRef.current.set(
-                    element.id,
-                    newElementWith(element, {}, true),
-                  );
-                }
-              }
-
-              setBatchedData({
-                ...batchedData,
-                openPopup: "fontFamily",
-              });
-            } else {
-              const fontFamilyData = {
-                currentHoveredFontFamily: null,
-                cachedElements: new Map(cachedElementsRef.current),
-                resetAll: true,
-              } as ChangeFontFamilyData;
-
-              setBatchedData({
-                ...fontFamilyData,
-              });
-              cachedElementsRef.current.clear();
-
-              // Refocus text editor when font picker closes if we were editing text
-              if (isCompact && appState.editingTextElement) {
-                restoreCaretPosition(null); // Just refocus without saved position
-              }
-            }
-          }}
-        />
-      </>
-    );
-  },
+  PanelComponent: () => null,
 });
 
 export const actionChangeTextAlign = register<TextAlign>({
