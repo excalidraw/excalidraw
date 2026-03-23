@@ -80,8 +80,11 @@ import type {
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
 
-const SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE = 0.3;
-const SIMPLE_ROUNDED_ARROW_CP_LENGTH_RATIO = 1 / 4;
+const SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE = 0.25;
+// Lerp weight for interior-point tangents: 1 = pure bisector (smooth, no twist possible),
+// 0 = chord-aligned (flat). Values between dampen the angle at midpoints without flipping.
+const SIMPLE_ROUNDED_ARROW_MIDPOINT_ANGLE_SCALE = 0.9;
+const SIMPLE_ROUNDED_ARROW_CP_LENGTH_RATIO = 1 / 3;
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
@@ -683,8 +686,16 @@ export const generateLinearCollisionShape = (
             bisUx = -inUy;
             bisUy = inUx;
           }
-          ptxn[i] = bisUx;
-          ptyn[i] = bisUy;
+          const dotMid = bisUx * outUx + bisUy * outUy;
+          const mx =
+            (1 - SIMPLE_ROUNDED_ARROW_MIDPOINT_ANGLE_SCALE) * dotMid * outUx +
+            SIMPLE_ROUNDED_ARROW_MIDPOINT_ANGLE_SCALE * bisUx;
+          const my =
+            (1 - SIMPLE_ROUNDED_ARROW_MIDPOINT_ANGLE_SCALE) * dotMid * outUy +
+            SIMPLE_ROUNDED_ARROW_MIDPOINT_ANGLE_SCALE * bisUy;
+          const mLen = Math.hypot(mx, my);
+          ptxn[i] = mx / mLen;
+          ptyn[i] = my / mLen;
         }
 
         // Endpoints: reflect the adjacent interior tangent across the
@@ -1129,11 +1140,16 @@ const debugRoundedArrowControlPoints = (
       bisUy = inUx;
     }
 
-    const bx = bisUx;
-    const by = bisUy;
-    const bLen = Math.hypot(bx, by);
-    txn[i] = bx / bLen;
-    tyn[i] = by / bLen;
+    const dotMid = bisUx * outUx + bisUy * outUy;
+    const mx =
+      (1 - SIMPLE_ROUNDED_ARROW_MIDPOINT_ANGLE_SCALE) * dotMid * outUx +
+      SIMPLE_ROUNDED_ARROW_MIDPOINT_ANGLE_SCALE * bisUx;
+    const my =
+      (1 - SIMPLE_ROUNDED_ARROW_MIDPOINT_ANGLE_SCALE) * dotMid * outUy +
+      SIMPLE_ROUNDED_ARROW_MIDPOINT_ANGLE_SCALE * bisUy;
+    const mLen = Math.hypot(mx, my);
+    txn[i] = mx / mLen;
+    tyn[i] = my / mLen;
   }
 
   // Endpoints: reflect the adjacent interior tangent across the endpoint's own chord.
@@ -1144,9 +1160,12 @@ const debugRoundedArrowControlPoints = (
     const cux = cx / cLen;
     const cuy = cy / cLen;
     const dot = txn[1] * cux + tyn[1] * cuy;
-    const eas = SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE;
-    const rx = (1 + eas) * dot * cux - eas * txn[1];
-    const ry = (1 + eas) * dot * cuy - eas * tyn[1];
+    const rx =
+      (1 + SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE) * dot * cux -
+      SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE * txn[1];
+    const ry =
+      (1 + SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE) * dot * cuy -
+      SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE * tyn[1];
     const rLen = Math.hypot(rx, ry);
     txn[0] = rx / rLen;
     tyn[0] = ry / rLen;
@@ -1158,9 +1177,12 @@ const debugRoundedArrowControlPoints = (
     const cux = cx / cLen;
     const cuy = cy / cLen;
     const dot = txn[n - 2] * cux + tyn[n - 2] * cuy;
-    const eas = SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE;
-    const rx = (1 + eas) * dot * cux - eas * txn[n - 2];
-    const ry = (1 + eas) * dot * cuy - eas * tyn[n - 2];
+    const rx =
+      (1 + SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE) * dot * cux -
+      SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE * txn[n - 2];
+    const ry =
+      (1 + SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE) * dot * cuy -
+      SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE * tyn[n - 2];
     const rLen = Math.hypot(rx, ry);
     txn[n - 1] = rx / rLen;
     tyn[n - 1] = ry / rLen;
@@ -1263,11 +1285,16 @@ const generateRoundedSimpleArrowShape = (
       bisUy = inUx;
     }
 
-    const bx = bisUx;
-    const by = bisUy;
-    const bLen = Math.hypot(bx, by);
-    txn[i] = bx / bLen;
-    tyn[i] = by / bLen;
+    const dotMid = bisUx * outUx + bisUy * outUy;
+    const mx =
+      (1 - SIMPLE_ROUNDED_ARROW_MIDPOINT_ANGLE_SCALE) * dotMid * outUx +
+      SIMPLE_ROUNDED_ARROW_MIDPOINT_ANGLE_SCALE * bisUx;
+    const my =
+      (1 - SIMPLE_ROUNDED_ARROW_MIDPOINT_ANGLE_SCALE) * dotMid * outUy +
+      SIMPLE_ROUNDED_ARROW_MIDPOINT_ANGLE_SCALE * bisUy;
+    const mLen = Math.hypot(mx, my);
+    txn[i] = mx / mLen;
+    tyn[i] = my / mLen;
   }
 
   // Endpoints: reflect the adjacent interior tangent across the endpoint's own chord.
@@ -1280,9 +1307,12 @@ const generateRoundedSimpleArrowShape = (
     const cux = cx / cLen;
     const cuy = cy / cLen;
     const dot = txn[1] * cux + tyn[1] * cuy;
-    const eas = SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE;
-    const rx = (1 + eas) * dot * cux - eas * txn[1];
-    const ry = (1 + eas) * dot * cuy - eas * tyn[1];
+    const rx =
+      (1 + SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE) * dot * cux -
+      SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE * txn[1];
+    const ry =
+      (1 + SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE) * dot * cuy -
+      SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE * tyn[1];
     const rLen = Math.hypot(rx, ry);
     txn[0] = rx / rLen;
     tyn[0] = ry / rLen;
@@ -1294,9 +1324,12 @@ const generateRoundedSimpleArrowShape = (
     const cux = cx / cLen;
     const cuy = cy / cLen;
     const dot = txn[n - 2] * cux + tyn[n - 2] * cuy;
-    const eas = SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE;
-    const rx = (1 + eas) * dot * cux - eas * txn[n - 2];
-    const ry = (1 + eas) * dot * cuy - eas * tyn[n - 2];
+    const rx =
+      (1 + SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE) * dot * cux -
+      SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE * txn[n - 2];
+    const ry =
+      (1 + SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE) * dot * cuy -
+      SIMPLE_ROUNDED_ARROW_ENDPOINT_ANGLE_SCALE * tyn[n - 2];
     const rLen = Math.hypot(rx, ry);
     txn[n - 1] = rx / rLen;
     tyn[n - 1] = ry / rLen;
