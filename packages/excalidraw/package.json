@@ -71,7 +71,7 @@
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
     "gen:types": "rimraf types && tsc",
-    "build:esm": "rimraf dist && node ../../scripts/buildPackage.js && yarn gen:types"
+    "build:esm": "rimraf dist && node ../../scripts/buildPackage.js && pnpm gen:types"
   },
   "peerDependencies": {
     "react": "^17.0.2 || ^18.2.0 || ^19.0.0",
@@ -84,10 +84,10 @@
     "@codemirror/state": "^6.0.0",
     "@codemirror/view": "^6.0.0",
     "@lezer/highlight": "^1.0.0",
-    "@excalidraw/common": "0.18.0",
-    "@excalidraw/element": "0.18.0",
+    "@excalidraw/common": "workspace:*",
+    "@excalidraw/element": "workspace:*",
     "@excalidraw/laser-pointer": "1.3.1",
-    "@excalidraw/math": "0.18.0",
+    "@excalidraw/math": "workspace:*",
     "@excalidraw/mermaid-to-excalidraw": "2.1.1",
     "@excalidraw/random-username": "1.1.0",
     "browser-fs-access": "0.38.0",

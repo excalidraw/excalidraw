@@ -12,7 +12,7 @@ In case you want to pick up something from the roadmap, comment on that issue an
 ### Option 1 - Manual
 
 1. Fork and clone the repo
-1. Run `yarn` to install dependencies
+1. Run `pnpm install` to install dependencies
 1. Create a branch for your PR with `git checkout -b your-branch-name`
 
 > To keep `master` branch pointing to remote repository and make pull requests from branches on your fork, run:
@@ -61,7 +61,7 @@ It's also a good idea to consider if your change should include additional tests
 Finally - always manually test your changes using the convenient staging environment deployed for each pull request. As much as local development attempts to replicate production, there can still be subtle differences in behavior. For larger features consider testing your change in multiple browsers as well.
 
 :::note
-Some checks, such as the `lint` and `test`, require approval from the maintainers to run. 
+Some checks, such as the `lint` and `test`, require approval from the maintainers to run.
 They will appear as `Expected — Waiting for status to be reported` in the PR checks when they are waiting for approval.
 :::
 

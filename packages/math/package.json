@@ -58,9 +58,9 @@
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
     "gen:types": "rimraf types && tsc",
-    "build:esm": "rimraf dist && node ../../scripts/buildBase.js && yarn gen:types"
+    "build:esm": "rimraf dist && node ../../scripts/buildBase.js && pnpm gen:types"
   },
   "dependencies": {
-    "@excalidraw/common": "0.18.0"
+    "@excalidraw/common": "workspace:*"
   }
 }

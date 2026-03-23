@@ -1,4 +1,4 @@
 {
   "outputDirectory": "build",
-  "installCommand": "yarn install"
+  "installCommand": "pnpm install"
 }

@@ -66,5 +66,5 @@
     }
   ],
   "outputDirectory": "excalidraw-app/build",
-  "installCommand": "yarn install"
+  "installCommand": "pnpm install"
 }

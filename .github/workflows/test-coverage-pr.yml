@@ -10,17 +10,18 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: "Install Node"
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version: "20.x"
+          node-version-file: "package.json"
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
       - name: "Install Deps"
-        run: yarn install
+        run: pnpm install
       - name: "Test Coverage"
-        run: yarn test:coverage
+        run: pnpm test:coverage
       - name: "Report Coverage"
         if: always() # Also generate the report if tests are failing
-        uses: davelosert/vitest-coverage-report-action@v2
+        uses: davelosert/vitest-coverage-report-action@2500dafcee7dd64f85ab689c0b83798a8359770e # v2.9.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
