@@ -94,7 +94,7 @@ yarn add react react-dom @excalidraw/excalidraw
 
 Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
 
-## Contributing
+## Contributing to excalidraw
 
 - Missing something or found a bug? [Report here](https://github.com/excalidraw/excalidraw/issues).
 - Want to contribute? Check out our [contribution guide](https://docs.excalidraw.com/docs/introduction/contributing) or let us know on [Discord](https://discord.gg/UexuTaE).
