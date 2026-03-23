@@ -50,6 +50,8 @@ import type {
   ExcalidrawLineElement,
 } from "./types";
 
+const ELEMENT_SCHEMA_VERSION = 2;
+
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
   | "width"
@@ -144,6 +146,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     roundness,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
+    schemaVersion: rest.schemaVersion ?? ELEMENT_SCHEMA_VERSION,
     versionNonce: rest.versionNonce ?? 0,
     isDeleted: false as false,
     boundElements,

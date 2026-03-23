@@ -58,6 +58,8 @@ type _ExcalidrawElementBase = Readonly<{
   /** Integer that is sequentially incremented on each change. Used to reconcile
       elements during collaboration or when saving to server. */
   version: number;
+  /** Schema version hint used for per-element migration on restore. */
+  schemaVersion?: number;
   /** Random integer that is regenerated on each change.
       Used for deterministic reconciliation of updates during collaboration,
       in case the versions (see above) are identical. */

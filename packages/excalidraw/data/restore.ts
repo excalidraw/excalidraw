@@ -82,11 +82,7 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
-import {
-  migrateLibraryElements,
-  type SchemaVersionSource,
-  SCHEMA_VERSIONS,
-} from "./schema";
+import { migrateElements, SCHEMA_VERSIONS } from "./schema";
 
 import type {
   AppState,
@@ -249,7 +245,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
 };
 
 const restoreElementWithProperties = <
-  T extends Required<Omit<ExcalidrawElement, "customData">> & {
+  T extends Omit<ExcalidrawElement, "customData"> & {
     customData?: ExcalidrawElement["customData"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
@@ -291,6 +287,7 @@ const restoreElementWithProperties = <
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,
+    schemaVersion: element.schemaVersion ?? SCHEMA_VERSIONS.latest,
     groupIds: element.groupIds ?? [],
     frameId: element.frameId ?? null,
     roundness: element.roundness
@@ -645,14 +642,18 @@ export const restoreElements = <T extends ExcalidrawElement>(
       }
     | undefined,
 ): CombineBrandsIfNeeded<T, OrderedExcalidrawElement> => {
+  const migratedTargetElements = migrateElements(
+    targetElements as readonly ExcalidrawElement[] | undefined | null,
+  ) as readonly T[] | undefined | null;
+
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
-  const targetElementsMap = arrayToMap(targetElements || []);
+  const targetElementsMap = arrayToMap(migratedTargetElements || []);
   const existingElementsMap = existingElements
     ? arrayToMap(existingElements)
     : null;
   const restoredElements = syncInvalidIndices(
-    (targetElements || []).reduce((elements, element) => {
+    (migratedTargetElements || []).reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained
       if (element.type === "selection") {
@@ -962,15 +963,9 @@ export const restoreAppState = (
   };
 };
 
-const restoreLibraryItem = (
-  libraryItem: LibraryItem,
-  schemaVersionSource: SchemaVersionSource,
-) => {
+const restoreLibraryItem = (libraryItem: LibraryItem) => {
   const elements = restoreElements(
-    migrateLibraryElements(
-      getNonDeletedElements(libraryItem.elements),
-      schemaVersionSource,
-    ),
+    getNonDeletedElements(libraryItem.elements),
     null,
   );
   return elements.length ? { ...libraryItem, elements } : null;
@@ -979,21 +974,17 @@ const restoreLibraryItem = (
 export const restoreLibraryItems = (
   libraryItems: ImportedDataState["libraryItems"] = [],
   defaultStatus: LibraryItem["status"],
-  schemaVersionSource: SchemaVersionSource = SCHEMA_VERSIONS.latest,
 ) => {
   const restoredItems: LibraryItem[] = [];
   for (const item of libraryItems) {
     // migrate older libraries
     if (Array.isArray(item)) {
-      const restoredItem = restoreLibraryItem(
-        {
-          status: defaultStatus,
-          elements: item,
-          id: randomId(),
-          created: Date.now(),
-        },
-        schemaVersionSource,
-      );
+      const restoredItem = restoreLibraryItem({
+        status: defaultStatus,
+        elements: item,
+        id: randomId(),
+        created: Date.now(),
+      });
       if (restoredItem) {
         restoredItems.push(restoredItem);
       }
@@ -1002,15 +993,12 @@ export const restoreLibraryItems = (
         LibraryItem,
         "id" | "status" | "created"
       >;
-      const restoredItem = restoreLibraryItem(
-        {
-          ..._item,
-          id: _item.id || randomId(),
-          status: _item.status || defaultStatus,
-          created: _item.created || Date.now(),
-        },
-        schemaVersionSource,
-      );
+      const restoredItem = restoreLibraryItem({
+        ..._item,
+        id: _item.id || randomId(),
+        status: _item.status || defaultStatus,
+        created: _item.created || Date.now(),
+      });
       if (restoredItem) {
         restoredItems.push(restoredItem);
       }

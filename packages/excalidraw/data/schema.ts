@@ -8,36 +8,21 @@ export const SCHEMA_VERSIONS = {
   latest: 2,
 } as const;
 
-export const SCHEMA_MIGRATION_SCOPES = [
-  "scene",
-  "library",
-  "clipboard",
-  "api",
-] as const;
-
-export type SchemaMigrationScope = typeof SCHEMA_MIGRATION_SCOPES[number];
-
-export const ALL_SCOPES: readonly SchemaMigrationScope[] =
-  SCHEMA_MIGRATION_SCOPES;
-
 /**
  * Schema migration contract:
  * - `version`: integer schema version, strictly increasing.
  * - `title`: short human-readable label.
  * - `description`: required plain-language explanation of the change.
- * - `scope`: one or more ingestion boundaries (`scene`, `library`, `clipboard`, `api`).
  * - `apply`: pure element transform.
  *
  * Rules:
  * - Use integer versions only. `SCHEMA_VERSIONS.latest` must match the last migration version.
- * - Prefer explicit scopes; use `ALL_SCOPES` only when the same transform is required everywhere.
  * - Migrations should depend only on stable persisted schema fields (not temporary/PR-only fields).
  */
 export type SchemaMigration = {
   version: number;
   title: string;
   description: string;
-  scope: readonly SchemaMigrationScope[];
   apply: (
     elements: readonly ExcalidrawElement[],
   ) => readonly ExcalidrawElement[];
@@ -49,7 +34,6 @@ export const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
     title: "Normalize legacy frame backgrounds",
     description:
       "Frames saved before schema v2 must render without visible fill, so normalize their backgroundColor to transparent on restore.",
-    scope: ALL_SCOPES,
     apply: (elements) =>
       elements.map((element) => {
         if (element.type !== "frame") {
@@ -63,36 +47,15 @@ export const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
   },
 ];
 
-export const resolveSchemaVersion = (
-  schemaVersion: number | undefined,
-  fallbackVersion: number,
-) => {
+export const resolveSchemaVersion = (schemaVersion: number | undefined) => {
   if (
     Number.isInteger(schemaVersion) &&
     (schemaVersion as number) >= SCHEMA_VERSIONS.initial
   ) {
     return schemaVersion as number;
   }
-  return fallbackVersion;
+  return SCHEMA_VERSIONS.initial;
 };
-
-const isValidSchemaVersion = (
-  schemaVersion: number | undefined,
-): schemaVersion is number => {
-  return (
-    Number.isInteger(schemaVersion) &&
-    (schemaVersion as number) >= SCHEMA_VERSIONS.initial
-  );
-};
-
-export const hasElementSchemaVersion = (
-  elements: readonly ExcalidrawElement[] | null | undefined,
-) =>
-  !!elements?.some((element) =>
-    isValidSchemaVersion(
-      (element as ExcalidrawElement & { schemaVersion?: number }).schemaVersion,
-    ),
-  );
 
 export const validateSchemaMigrations = (
   migrations: readonly SchemaMigration[],
@@ -134,18 +97,6 @@ export const validateSchemaMigrations = (
         `Migration "${migration.title}" must include a non-empty description.`,
       );
     }
-    if (!migration.scope.length) {
-      errors.push(
-        `Migration "${migration.title}" must declare at least one scope.`,
-      );
-    }
-    for (const scope of migration.scope) {
-      if (!SCHEMA_MIGRATION_SCOPES.includes(scope)) {
-        errors.push(
-          `Migration "${migration.title}" contains unsupported scope "${scope}".`,
-        );
-      }
-    }
   }
 
   if (migrations.length > 0 && previousVersion !== SCHEMA_VERSIONS.latest) {
@@ -171,7 +122,6 @@ export const migrateElementsBySchema = (
   elements: readonly ExcalidrawElement[] | null | undefined,
   opts: {
     schemaVersion: number;
-    scope: SchemaMigrationScope;
   },
 ) => {
   if (!elements) {
@@ -183,74 +133,32 @@ export const migrateElementsBySchema = (
       if (migration.version <= opts.schemaVersion) {
         return acc;
       }
-      if (!migration.scope.includes(opts.scope)) {
-        return acc;
-      }
       return migration.apply(acc);
     },
     elements,
   );
 };
 
-export type SchemaVersionSource =
-  | number
-  | {
-      payloadSchemaVersion?: number;
-      fallbackVersion: number;
-    };
-
-const migrateElementsByScope = (
+export const migrateElements = (
   elements: readonly ExcalidrawElement[] | null | undefined,
-  scope: SchemaMigrationScope,
-  source: SchemaVersionSource,
 ) => {
   if (!elements) {
     return elements;
   }
 
-  if (typeof source === "number") {
-    return migrateElementsBySchema(elements, {
-      schemaVersion: source,
-      scope,
-    });
-  }
-
-  if (isValidSchemaVersion(source.payloadSchemaVersion)) {
-    return migrateElementsBySchema(elements, {
-      schemaVersion: source.payloadSchemaVersion,
-      scope,
-    });
-  }
-
   return elements.map((element) => {
-    const schemaVersion = resolveSchemaVersion(
-      (element as ExcalidrawElement & { schemaVersion?: number }).schemaVersion,
-      source.fallbackVersion,
-    );
-    const migratedElement = migrateElementsBySchema([element], {
-      schemaVersion,
-      scope,
-    });
-    return migratedElement?.[0] || element;
+    const schemaVersion = resolveSchemaVersion(element.schemaVersion);
+    const migratedElement =
+      migrateElementsBySchema([element], {
+        schemaVersion,
+      })?.[0] || element;
+
+    if (
+      resolveSchemaVersion(migratedElement.schemaVersion) <
+      SCHEMA_VERSIONS.latest
+    ) {
+      (migratedElement as any).schemaVersion = SCHEMA_VERSIONS.latest;
+    }
+    return migratedElement;
   });
 };
-
-export const migrateSceneElements = (
-  elements: readonly ExcalidrawElement[] | null | undefined,
-  source: SchemaVersionSource,
-) => migrateElementsByScope(elements, "scene", source);
-
-export const migrateLibraryElements = (
-  elements: readonly ExcalidrawElement[] | null | undefined,
-  source: SchemaVersionSource,
-) => migrateElementsByScope(elements, "library", source);
-
-export const migrateClipboardElements = (
-  elements: readonly ExcalidrawElement[] | null | undefined,
-  source: SchemaVersionSource,
-) => migrateElementsByScope(elements, "clipboard", source);
-
-export const migrateAPIElements = (
-  elements: readonly ExcalidrawElement[] | null | undefined,
-  source: SchemaVersionSource,
-) => migrateElementsByScope(elements, "api", source);
