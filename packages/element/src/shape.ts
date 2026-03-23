@@ -80,12 +80,17 @@ import type {
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
 
-// At sharp corners, scale tangent handle lengths up by this fraction of the
-
 // Controls how handle distance scales with chord length.
 // At 1.0 handles are exactly h/3 (standard Hermite). Values below 1 make
 // short segments curvier and long segments more taut (sub-linear scaling).
 const CP_CHORD_POWER = 1;
+
+// At curved knots the C2 spline tangent can be tilted away from the
+// bisector direction, making one side of the knot tight and the other taut.
+// This factor [0, 1] controls how far the tangent direction is pulled toward
+// the bisector (the chord-bisector normal) linearly with turn sharpness.
+// 0 = pure C2 spline; 1 = tangent fully aligned with the bisector.
+const CP_ANGLE_CORRECTION = 0.5;
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
@@ -1094,13 +1099,13 @@ const debugRoundedArrowControlPoints = (
   const CP_RADIUS = 5;
   const DIAMOND_RADIUS = 6;
 
-  // Segment points: red X
-  for (let i = 0; i < nPts; i++) {
-    debugDrawPoint(g(points[i][0], points[i][1]), {
-      color: "#ff3333",
-      ...PERMANENT,
-    });
-  }
+  // // Segment points: red X
+  // for (let i = 0; i < nPts; i++) {
+  //   debugDrawPoint(g(points[i][0], points[i][1]), {
+  //     color: "#ff3333",
+  //     ...PERMANENT,
+  //   });
+  // }
 
   if (nPts === 2) {
     debugDrawLine(
@@ -1167,6 +1172,89 @@ const debugRoundedArrowControlPoints = (
   const mlen = new Float64Array(n + 1);
   for (let i = 0; i <= n; i++) {
     mlen[i] = Math.max(1e-10, Math.hypot(mx[i], my[i]));
+  }
+
+  // Mirror the angle-correction from generateRoundedSimpleArrowShape.
+  for (let k = 1; k < n; k++) {
+    const d1x = (points[k][0] - points[k - 1][0]) / h[k - 1];
+    const d1y = (points[k][1] - points[k - 1][1]) / h[k - 1];
+    const d2x = (points[k + 1][0] - points[k][0]) / h[k];
+    const d2y = (points[k + 1][1] - points[k][1]) / h[k];
+    const dot = d1x * d2x + d1y * d2y;
+    const t = ((1 - dot) / 2) * CP_ANGLE_CORRECTION;
+    if (t < 1e-6) {
+      continue;
+    }
+    const bx = d1x + d2x;
+    const by = d1y + d2y;
+    const blen = Math.hypot(bx, by);
+    if (blen < 1e-10) {
+      continue;
+    }
+    // Blend target: the bisector direction itself (pick sign aligning with current tangent)
+    let px = bx / blen;
+    let py = by / blen;
+    const tx = mx[k] / mlen[k];
+    const ty = my[k] / mlen[k];
+    if (tx * px + ty * py < 0) {
+      px = -px;
+      py = -py;
+    }
+    const blendX = tx + t * (px - tx);
+    const blendY = ty + t * (py - ty);
+    const blendLen = Math.max(1e-10, Math.hypot(blendX, blendY));
+    mx[k] = (blendX / blendLen) * mlen[k];
+    my[k] = (blendY / blendLen) * mlen[k];
+  }
+
+  // Bisector at interior knots: orange line along bisector, yellow tick for
+  // perpendicular-to-bisector (the ideal symmetric tangent direction).
+  const BISECTOR_HALF_LEN = 20;
+  const PERP_HALF_LEN = 12;
+  for (let k = 1; k < n; k++) {
+    const d1x = (points[k][0] - points[k - 1][0]) / h[k - 1];
+    const d1y = (points[k][1] - points[k - 1][1]) / h[k - 1];
+    const d2x = (points[k + 1][0] - points[k][0]) / h[k];
+    const d2y = (points[k + 1][1] - points[k][1]) / h[k];
+    const bx = d1x + d2x;
+    const by = d1y + d2y;
+    const blen = Math.hypot(bx, by);
+    if (blen < 1e-10) {
+      continue;
+    }
+    const bnx = bx / blen;
+    const bny = by / blen;
+    const pnx = -bny; // perpendicular to bisector = ideal tangent direction
+    const pny = bnx;
+    const pk = g(points[k][0], points[k][1]);
+    // bisector (orange)
+    debugDrawLine(
+      lineSegment(
+        pointFrom<GlobalPoint>(
+          pk[0] - bnx * BISECTOR_HALF_LEN,
+          pk[1] - bny * BISECTOR_HALF_LEN,
+        ),
+        pointFrom<GlobalPoint>(
+          pk[0] + bnx * BISECTOR_HALF_LEN,
+          pk[1] + bny * BISECTOR_HALF_LEN,
+        ),
+      ),
+      { color: "#ff8800", ...PERMANENT },
+    );
+    // perpendicular tick / ideal tangent (yellow)
+    debugDrawLine(
+      lineSegment(
+        pointFrom<GlobalPoint>(
+          pk[0] - pnx * PERP_HALF_LEN,
+          pk[1] - pny * PERP_HALF_LEN,
+        ),
+        pointFrom<GlobalPoint>(
+          pk[0] + pnx * PERP_HALF_LEN,
+          pk[1] + pny * PERP_HALF_LEN,
+        ),
+      ),
+      { color: "#ffdd00", ...PERMANENT },
+    );
   }
 
   for (let i = 0; i < n; i++) {
@@ -1303,6 +1391,47 @@ const generateRoundedSimpleArrowShape = (
   const mlen = new Float64Array(n + 1);
   for (let i = 0; i <= n; i++) {
     mlen[i] = Math.max(1e-10, Math.hypot(mx[i], my[i]));
+  }
+
+  // At interior knots, blend the C2 tangent direction toward the
+  // perpendicular-to-bisector (the perfectly symmetric tangent) by a factor
+  // proportional to turn sharpness × CP_ANGLE_CORRECTION.
+  // Both cp2 (incoming) and cp1 (outgoing) at the knot share the same adjusted
+  // direction, so collinear (aligned) handles are preserved.
+  for (let k = 1; k < n; k++) {
+    const d1x = (points[k][0] - points[k - 1][0]) / h[k - 1];
+    const d1y = (points[k][1] - points[k - 1][1]) / h[k - 1];
+    const d2x = (points[k + 1][0] - points[k][0]) / h[k];
+    const d2y = (points[k + 1][1] - points[k][1]) / h[k];
+    const dot = d1x * d2x + d1y * d2y;
+    // t: 0 = straight, 1 = hairpin
+    const t = ((1 - dot) / 2) * CP_ANGLE_CORRECTION;
+    if (t < 1e-6) {
+      continue;
+    }
+    // Bisector of the two chord directions as the "normal" at the knot.
+    // Its perpendicular is the ideal symmetric tangent direction.
+    const bx = d1x + d2x;
+    const by = d1y + d2y;
+    const blen = Math.hypot(bx, by);
+    if (blen < 1e-10) {
+      continue; // 180° hairpin – bisector undefined, skip
+    }
+    // Blend target: bisector direction (pick sign aligning with current tangent)
+    let px = bx / blen;
+    let py = by / blen;
+    const tx = mx[k] / mlen[k];
+    const ty = my[k] / mlen[k];
+    if (tx * px + ty * py < 0) {
+      px = -px;
+      py = -py;
+    }
+    // Linear blend of unit directions, then renormalize to preserve magnitude.
+    const blendX = tx + t * (px - tx);
+    const blendY = ty + t * (py - ty);
+    const blendLen = Math.max(1e-10, Math.hypot(blendX, blendY));
+    mx[k] = (blendX / blendLen) * mlen[k];
+    my[k] = (blendY / blendLen) * mlen[k];
   }
 
   const path: string[] = [`M ${points[0][0]} ${points[0][1]}`];
