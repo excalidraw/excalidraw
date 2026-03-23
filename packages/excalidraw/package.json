@@ -113,7 +113,7 @@
     "pwacompat": "2.0.17",
     "radix-ui": "1.4.3",
     "roughjs": "4.6.4",
-    "sass": "1.51.0",
+    "sass": "1.98.0",
     "tunnel-rat": "0.1.2"
   },
   "devDependencies": {
