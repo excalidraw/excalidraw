@@ -465,7 +465,12 @@ export const intersectElementWithLineSegment = (
     case "line":
     case "freedraw":
     case "arrow":
-      return intersectLinearOrFreeDrawWithLineSegment(element, line, onlyFirst);
+      return intersectLinearOrFreeDrawWithLineSegment(
+        element,
+        line,
+        elementsMap,
+        onlyFirst,
+      );
   }
 };
 
@@ -532,11 +537,15 @@ const lineIntersections = (
 const intersectLinearOrFreeDrawWithLineSegment = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   segment: LineSegment<GlobalPoint>,
+  elementsMap: ElementsMap,
   onlyFirst = false,
 ): GlobalPoint[] => {
   // NOTE: This is the only one which return the decomposed elements
   // rotated! This is due to taking advantage of roughjs definitions.
-  const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(
+    element,
+    elementsMap,
+  );
   const intersections: GlobalPoint[] = [];
 
   for (const l of lines) {
