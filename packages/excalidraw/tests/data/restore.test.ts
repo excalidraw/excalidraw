@@ -24,7 +24,6 @@ import type { NormalizedZoomValue } from "@excalidraw/excalidraw/types";
 
 import { API } from "../helpers/api";
 import * as restore from "../../data/restore";
-import { SCHEMA_VERSIONS } from "../../data/schema";
 import { getDefaultAppState } from "../../appState";
 
 import type { ImportedDataState } from "../../data/types";
@@ -131,18 +130,21 @@ describe("restoreElements", () => {
       type: "frame",
       backgroundColor: "#a5d8ff",
     });
+    const legacyFrame = {
+      ...frame,
+      schemaVersion: undefined,
+    } as typeof frame & { schemaVersion?: number };
 
     const restoredLibraryItems = restore.restoreLibraryItems(
       [
         {
           id: "library-item-1",
           status: "published",
-          elements: [frame],
+          elements: [legacyFrame],
           created: Date.now(),
         },
       ],
       "published",
-      SCHEMA_VERSIONS.initial,
     );
 
     expect(

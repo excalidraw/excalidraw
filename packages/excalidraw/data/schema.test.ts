@@ -3,13 +3,8 @@ import { DEFAULT_ELEMENT_PROPS } from "@excalidraw/common";
 import { API } from "../tests/helpers/api";
 
 import {
-  ALL_SCOPES,
-  hasElementSchemaVersion,
   type SchemaMigration,
-  migrateAPIElements,
-  migrateClipboardElements,
-  migrateLibraryElements,
-  migrateSceneElements,
+  migrateElements,
   resolveSchemaVersion,
   SCHEMA_MIGRATIONS,
   SCHEMA_VERSIONS,
@@ -18,16 +13,20 @@ import {
 
 describe("schema migration", () => {
   it("should migrate legacy frame backgrounds to transparent", () => {
-    const frame = API.createElement({
-      type: "frame",
-      backgroundColor: "#ffc9c9",
-    });
+    const frame = {
+      ...API.createElement({
+        type: "frame",
+        backgroundColor: "#ffc9c9",
+      }),
+      schemaVersion: undefined,
+    };
 
-    const migrated = migrateSceneElements([frame], SCHEMA_VERSIONS.initial)!;
+    const migrated = migrateElements([frame])!;
 
     expect(migrated[0].backgroundColor).toBe(
       DEFAULT_ELEMENT_PROPS.backgroundColor,
     );
+    expect(migrated[0].schemaVersion).toBe(SCHEMA_VERSIONS.latest);
   });
 
   it("should keep latest-schema frame backgrounds unchanged", () => {
@@ -35,44 +34,36 @@ describe("schema migration", () => {
       type: "frame",
       backgroundColor: "#ffc9c9",
     });
+    const latestFrame = {
+      ...frame,
+      schemaVersion: SCHEMA_VERSIONS.latest,
+    } as typeof frame & { schemaVersion: number };
 
-    const migrated = migrateSceneElements([frame], SCHEMA_VERSIONS.latest)!;
+    const migrated = migrateElements([latestFrame])!;
 
     expect(migrated[0].backgroundColor).toBe("#ffc9c9");
+    expect(migrated[0].schemaVersion).toBe(SCHEMA_VERSIONS.latest);
   });
 
-  it("should normalize legacy frame backgrounds across all scopes", () => {
-    const frame = API.createElement({
-      type: "frame",
-      backgroundColor: "#a5d8ff",
-    });
+  it("should normalize legacy frame backgrounds", () => {
+    const frame = {
+      ...API.createElement({
+        type: "frame",
+        backgroundColor: "#a5d8ff",
+      }),
+      schemaVersion: undefined,
+    };
 
-    const migrationsByScope = {
-      scene: migrateSceneElements,
-      library: migrateLibraryElements,
-      clipboard: migrateClipboardElements,
-      api: migrateAPIElements,
-    } as const;
-
-    for (const scope of ALL_SCOPES) {
-      const migrated = migrationsByScope[scope](
-        [frame],
-        SCHEMA_VERSIONS.initial,
-      )!;
-      expect(migrated[0].backgroundColor).toBe(
-        DEFAULT_ELEMENT_PROPS.backgroundColor,
-      );
-    }
+    const migrated = migrateElements([frame])!;
+    expect(migrated[0].backgroundColor).toBe(
+      DEFAULT_ELEMENT_PROPS.backgroundColor,
+    );
   });
 
-  it("should resolve invalid schema versions using fallback", () => {
-    expect(resolveSchemaVersion(undefined, SCHEMA_VERSIONS.initial)).toBe(
-      SCHEMA_VERSIONS.initial,
-    );
-    expect(resolveSchemaVersion(0, SCHEMA_VERSIONS.latest)).toBe(
-      SCHEMA_VERSIONS.latest,
-    );
-    expect(resolveSchemaVersion(2, SCHEMA_VERSIONS.initial)).toBe(2);
+  it("should resolve invalid schema versions to initial", () => {
+    expect(resolveSchemaVersion(undefined)).toBe(SCHEMA_VERSIONS.initial);
+    expect(resolveSchemaVersion(0)).toBe(SCHEMA_VERSIONS.initial);
+    expect(resolveSchemaVersion(2)).toBe(2);
   });
 
   it("should have a valid migration registry configuration", () => {
@@ -85,14 +76,12 @@ describe("schema migration", () => {
         version: 2.1,
         title: "",
         description: " ",
-        scope: [],
         apply: (elements) => elements,
       },
       {
         version: 2.1,
         title: "duplicate",
         description: "duplicate version",
-        scope: ["scene"],
         apply: (elements) => elements,
       },
     ];
@@ -112,7 +101,6 @@ describe("schema migration", () => {
         version: SCHEMA_VERSIONS.initial,
         title: "invalid start",
         description: "bad version",
-        scope: ["scene"],
         apply: (elements) => elements,
       },
     ]);
@@ -126,7 +114,6 @@ describe("schema migration", () => {
         version: SCHEMA_VERSIONS.latest + 1,
         title: "future migration",
         description: "future migration for test",
-        scope: ["scene"],
         apply: (elements) => elements,
       },
     ]);
@@ -137,23 +124,20 @@ describe("schema migration", () => {
   });
 
   it("should not depend on temporary fields during migration", () => {
-    const frame = API.createElement({
-      type: "frame",
-      backgroundColor: "#a5d8ff",
-    });
+    const frame = {
+      ...API.createElement({
+        type: "frame",
+        backgroundColor: "#a5d8ff",
+      }),
+      schemaVersion: undefined,
+    };
     const withTempField = {
       ...frame,
       backgroundEnabled: false,
     } as typeof frame & { backgroundEnabled: boolean };
 
-    const migratedBase = migrateSceneElements(
-      [frame],
-      SCHEMA_VERSIONS.initial,
-    )!;
-    const migratedWithTempField = migrateSceneElements(
-      [withTempField],
-      SCHEMA_VERSIONS.initial,
-    )!;
+    const migratedBase = migrateElements([frame])!;
+    const migratedWithTempField = migrateElements([withTempField])!;
 
     expect(migratedBase[0].backgroundColor).toBe(
       DEFAULT_ELEMENT_PROPS.backgroundColor,
@@ -163,7 +147,7 @@ describe("schema migration", () => {
     );
   });
 
-  it("should use per-element schema when payload schema is missing", () => {
+  it("should use per-element schema hints", () => {
     const frame = API.createElement({
       type: "frame",
       backgroundColor: "#ff0000",
@@ -173,19 +157,19 @@ describe("schema migration", () => {
       schemaVersion: SCHEMA_VERSIONS.latest,
     } as typeof frame & { schemaVersion: number };
 
-    const migrated = migrateClipboardElements([frameFromModernSource], {
-      payloadSchemaVersion: undefined,
-      fallbackVersion: SCHEMA_VERSIONS.initial,
-    })!;
+    const migrated = migrateElements([frameFromModernSource])!;
 
     expect(migrated[0].backgroundColor).toBe("#ff0000");
   });
 
-  it("should migrate mixed-hint elements individually when payload schema is missing", () => {
-    const legacyFrame = API.createElement({
-      type: "frame",
-      backgroundColor: "#ff0000",
-    });
+  it("should migrate mixed-hint elements individually", () => {
+    const legacyFrame = {
+      ...API.createElement({
+        type: "frame",
+        backgroundColor: "#ff0000",
+      }),
+      schemaVersion: undefined,
+    };
     const modernFrame = API.createElement({
       type: "frame",
       backgroundColor: "#00ff00",
@@ -195,10 +179,7 @@ describe("schema migration", () => {
       schemaVersion: SCHEMA_VERSIONS.latest,
     } as typeof modernFrame & { schemaVersion: number };
 
-    const migrated = migrateSceneElements([legacyFrame, modernFrameWithHint], {
-      payloadSchemaVersion: undefined,
-      fallbackVersion: SCHEMA_VERSIONS.initial,
-    })!;
+    const migrated = migrateElements([legacyFrame, modernFrameWithHint])!;
 
     expect(migrated[0].backgroundColor).toBe(
       DEFAULT_ELEMENT_PROPS.backgroundColor,
@@ -206,34 +187,20 @@ describe("schema migration", () => {
     expect(migrated[1].backgroundColor).toBe("#00ff00");
   });
 
-  it("should prefer payload schema over per-element schema", () => {
-    const frame = API.createElement({
-      type: "frame",
-      backgroundColor: "#ff0000",
-    });
-    const frameFromModernSource = {
-      ...frame,
-      schemaVersion: SCHEMA_VERSIONS.latest,
-    } as typeof frame & { schemaVersion: number };
-
-    const migrated = migrateClipboardElements([frameFromModernSource], {
-      payloadSchemaVersion: SCHEMA_VERSIONS.initial,
-      fallbackVersion: SCHEMA_VERSIONS.latest,
-    })!;
-
-    expect(migrated[0].backgroundColor).toBe(
-      DEFAULT_ELEMENT_PROPS.backgroundColor,
-    );
+  it("should stamp schemaVersion to latest after migration", () => {
+    const rect = API.createElement({ type: "rectangle" });
+    const migrated = migrateElements([rect])!;
+    expect(migrated[0].schemaVersion).toBe(SCHEMA_VERSIONS.latest);
   });
 
-  it("should detect schema hints on elements", () => {
-    const frame = API.createElement({ type: "frame" });
-    const withHint = {
-      ...frame,
-      schemaVersion: SCHEMA_VERSIONS.latest,
-    } as typeof frame & { schemaVersion: number };
+  it("should preserve higher-than-latest schema versions", () => {
+    const rect = API.createElement({ type: "rectangle" });
+    const futureRect = {
+      ...rect,
+      schemaVersion: SCHEMA_VERSIONS.latest + 1,
+    } as typeof rect & { schemaVersion: number };
 
-    expect(hasElementSchemaVersion([frame])).toBe(false);
-    expect(hasElementSchemaVersion([withHint])).toBe(true);
+    const migrated = migrateElements([futureRect])!;
+    expect(migrated[0].schemaVersion).toBe(SCHEMA_VERSIONS.latest + 1);
   });
 });

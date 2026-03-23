@@ -62,7 +62,6 @@ describe("parseClipboard()", () => {
         schemaVersion: SCHEMA_VERSIONS.latest,
       }),
     ]);
-    expect(clipboardData.schemaVersion).toBe(SCHEMA_VERSIONS.latest);
   });
 
   it("should parse valid excalidraw JSON if inside text/html", async () => {
@@ -109,12 +108,11 @@ describe("parseClipboard()", () => {
     // -------------------------------------------------------------------------
   });
 
-  it("should preserve per-element schema when payload schema is missing", async () => {
+  it("should preserve per-element schema on clipboard payload", async () => {
     const rect = API.createElement({ type: "rectangle" });
     const clipboardPayload = JSON.parse(
       serializeAsClipboardJSON({ elements: [rect], files: null }),
     );
-    delete clipboardPayload.schemaVersion;
 
     const clipboardData = await parseClipboard(
       await parseDataTransferEvent(
@@ -126,13 +124,38 @@ describe("parseClipboard()", () => {
       ),
     );
 
-    expect(clipboardData.schemaVersion).toBeUndefined();
     expect(clipboardData.elements?.[0]).toEqual(
       expect.objectContaining({
         id: rect.id,
         schemaVersion: SCHEMA_VERSIONS.latest,
       }),
     );
+  });
+
+  it("should not upcast legacy elements to latest schema on clipboard serialize", async () => {
+    const rect = API.createElement({ type: "rectangle" });
+    const legacyRect = { ...rect } as typeof rect & { schemaVersion?: number };
+    delete legacyRect.schemaVersion;
+
+    const clipboardPayload = JSON.parse(
+      serializeAsClipboardJSON({
+        elements: [legacyRect as typeof rect],
+        files: null,
+      }),
+    );
+    expect(clipboardPayload.elements[0]).not.toHaveProperty("schemaVersion");
+
+    const clipboardData = await parseClipboard(
+      await parseDataTransferEvent(
+        createPasteEvent({
+          types: {
+            "text/plain": JSON.stringify(clipboardPayload),
+          },
+        }),
+      ),
+    );
+
+    expect(clipboardData.elements?.[0]).not.toHaveProperty("schemaVersion");
   });
 
   it("should parse <image> `src` urls out of text/html", async () => {
