@@ -140,6 +140,26 @@ export const isArrowKey = (key: string) =>
   key === KEYS.ARROW_DOWN ||
   key === KEYS.ARROW_UP;
 
+/**
+ * `]` / `}` for z-order shortcuts: `code` stays on the physical key (e.g. `Digit9`
+ * with AltGr on DE layout) while `key` is the produced character.
+ */
+export const isBracketRightKey = (
+  event: KeyboardEvent | React.KeyboardEvent<Element>,
+) =>
+  event.code === CODES.BRACKET_RIGHT ||
+  event.key === "]" ||
+  event.key === "}";
+
+/** `[` / `{` — same layout caveat as {@link isBracketRightKey}. */
+export const isBracketLeftKey = (
+  event: KeyboardEvent | React.KeyboardEvent<Element>,
+) =>
+  event.code === CODES.BRACKET_LEFT ||
+  event.key === "[" ||
+  event.key === "{";
+
+
 export const shouldResizeFromCenter = (event: MouseEvent | KeyboardEvent) =>
   event.altKey;
 

@@ -1,4 +1,8 @@
-import { KEYS, CODES, isDarwin } from "@excalidraw/common";
+import {
+  isBracketLeftKey,
+  isBracketRightKey,
+  isDarwin,
+} from "@excalidraw/common";
 
 import {
   moveOneLeft,
@@ -37,7 +41,7 @@ export const actionSendBackward = register({
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] &&
     !event.shiftKey &&
-    event.code === CODES.BRACKET_LEFT,
+    isBracketLeftKey(event),
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
@@ -67,7 +71,7 @@ export const actionBringForward = register({
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] &&
     !event.shiftKey &&
-    event.code === CODES.BRACKET_RIGHT,
+    isBracketRightKey(event),
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
@@ -97,10 +101,10 @@ export const actionSendToBack = register({
     isDarwin
       ? event[KEYS.CTRL_OR_CMD] &&
         event.altKey &&
-        event.code === CODES.BRACKET_LEFT
+        isBracketLeftKey(event)
       : event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
-        event.code === CODES.BRACKET_LEFT,
+        isBracketLeftKey(event),
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
@@ -135,10 +139,10 @@ export const actionBringToFront = register({
     isDarwin
       ? event[KEYS.CTRL_OR_CMD] &&
         event.altKey &&
-        event.code === CODES.BRACKET_RIGHT
+        isBracketRightKey(event)
       : event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
-        event.code === CODES.BRACKET_RIGHT,
+        isBracketRightKey(event),
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
