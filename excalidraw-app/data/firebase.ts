@@ -1,42 +1,38 @@
-import { reconcileElements } from "@excalidraw/excalidraw";
-import { MIME_TYPES, toBrandedType } from "@excalidraw/common";
-import { decompressData } from "@excalidraw/excalidraw/data/encode";
-import {
-  encryptData,
-  decryptData,
-} from "@excalidraw/excalidraw/data/encryption";
-import { restoreElements } from "@excalidraw/excalidraw/data/restore";
-import { getSceneVersion } from "@excalidraw/element";
 import { initializeApp } from "firebase/app";
 import {
   getFirestore,
+  collection,
   doc,
+  getDocs,
   getDoc,
-  runTransaction,
-  Bytes,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  orderBy,
+  Timestamp,
+  increment,
+  writeBatch,
 } from "firebase/firestore";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getBytes,
+  deleteObject,
+  listAll,
+} from "firebase/storage";
 
-import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
-import type {
-  ExcalidrawElement,
-  FileId,
-  OrderedExcalidrawElement,
-} from "@excalidraw/element/types";
+import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
-  BinaryFileMetadata,
-  DataURL,
+  BinaryFiles,
 } from "@excalidraw/excalidraw/types";
 
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 
-import { getSyncableElements } from ".";
-
-import type { SyncableExcalidrawElement } from ".";
-import type Portal from "../collab/Portal";
-import type { Socket } from "socket.io-client";
+import type { Client, Drawing } from "./types";
 
 // private
 // -----------------------------------------------------------------------------
@@ -54,7 +50,7 @@ try {
 }
 
 let firebaseApp: ReturnType<typeof initializeApp> | null = null;
-let firestore: ReturnType<typeof getFirestore> | null = null;
+let firestoreDb: ReturnType<typeof getFirestore> | null = null;
 let firebaseStorage: ReturnType<typeof getStorage> | null = null;
 
 const _initializeFirebase = () => {
@@ -65,10 +61,10 @@ const _initializeFirebase = () => {
 };
 
 const _getFirestore = () => {
-  if (!firestore) {
-    firestore = getFirestore(_initializeFirebase());
+  if (!firestoreDb) {
+    firestoreDb = getFirestore(_initializeFirebase());
   }
-  return firestore;
+  return firestoreDb;
 };
 
 const _getStorage = () => {
@@ -79,241 +75,273 @@ const _getStorage = () => {
 };
 
 // -----------------------------------------------------------------------------
+// Clients CRUD
+// -----------------------------------------------------------------------------
 
-export const loadFirebaseStorage = async () => {
-  return _getStorage();
+export const getClients = async (): Promise<Client[]> => {
+  const db = _getFirestore();
+  const q = query(collection(db, "clients"), orderBy("name", "asc"));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    name: doc.data().name,
+    createdAt: doc.data().createdAt?.toDate() ?? new Date(),
+    updatedAt: doc.data().updatedAt?.toDate() ?? new Date(),
+    drawingCount: doc.data().drawingCount ?? 0,
+  }));
 };
 
-type FirebaseStoredScene = {
-  sceneVersion: number;
-  iv: Bytes;
-  ciphertext: Bytes;
-};
-
-const encryptElements = async (
-  key: string,
-  elements: readonly ExcalidrawElement[],
-): Promise<{ ciphertext: ArrayBuffer; iv: Uint8Array }> => {
-  const json = JSON.stringify(elements);
-  const encoded = new TextEncoder().encode(json);
-  const { encryptedBuffer, iv } = await encryptData(key, encoded);
-
-  return { ciphertext: encryptedBuffer, iv };
-};
-
-const decryptElements = async (
-  data: FirebaseStoredScene,
-  roomKey: string,
-): Promise<readonly ExcalidrawElement[]> => {
-  const ciphertext = data.ciphertext.toUint8Array() as Uint8Array<ArrayBuffer>;
-  const iv = data.iv.toUint8Array() as Uint8Array<ArrayBuffer>;
-
-  const decrypted = await decryptData(iv, ciphertext, roomKey);
-  const decodedData = new TextDecoder("utf-8").decode(
-    new Uint8Array(decrypted),
-  );
-  return JSON.parse(decodedData);
-};
-
-class FirebaseSceneVersionCache {
-  private static cache = new WeakMap<Socket, number>();
-  static get = (socket: Socket) => {
-    return FirebaseSceneVersionCache.cache.get(socket);
-  };
-  static set = (
-    socket: Socket,
-    elements: readonly SyncableExcalidrawElement[],
-  ) => {
-    FirebaseSceneVersionCache.cache.set(socket, getSceneVersion(elements));
-  };
-}
-
-export const isSavedToFirebase = (
-  portal: Portal,
-  elements: readonly ExcalidrawElement[],
-): boolean => {
-  if (portal.socket && portal.roomId && portal.roomKey) {
-    const sceneVersion = getSceneVersion(elements);
-
-    return FirebaseSceneVersionCache.get(portal.socket) === sceneVersion;
-  }
-  // if no room exists, consider the room saved so that we don't unnecessarily
-  // prevent unload (there's nothing we could do at that point anyway)
-  return true;
-};
-
-export const saveFilesToFirebase = async ({
-  prefix,
-  files,
-}: {
-  prefix: string;
-  files: { id: FileId; buffer: Uint8Array }[];
-}) => {
-  const storage = await loadFirebaseStorage();
-
-  const erroredFiles: FileId[] = [];
-  const savedFiles: FileId[] = [];
-
-  await Promise.all(
-    files.map(async ({ id, buffer }) => {
-      try {
-        const storageRef = ref(storage, `${prefix}/${id}`);
-        await uploadBytes(storageRef, buffer, {
-          cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
-        });
-        savedFiles.push(id);
-      } catch (error: any) {
-        erroredFiles.push(id);
-      }
-    }),
-  );
-
-  return { savedFiles, erroredFiles };
-};
-
-const createFirebaseSceneDocument = async (
-  elements: readonly SyncableExcalidrawElement[],
-  roomKey: string,
-) => {
-  const sceneVersion = getSceneVersion(elements);
-  const { ciphertext, iv } = await encryptElements(roomKey, elements);
+export const createClient = async (name: string): Promise<Client> => {
+  const db = _getFirestore();
+  const now = Timestamp.now();
+  const docRef = await addDoc(collection(db, "clients"), {
+    name,
+    createdAt: now,
+    updatedAt: now,
+    drawingCount: 0,
+  });
   return {
-    sceneVersion,
-    ciphertext: Bytes.fromUint8Array(new Uint8Array(ciphertext)),
-    iv: Bytes.fromUint8Array(iv),
-  } as FirebaseStoredScene;
+    id: docRef.id,
+    name,
+    createdAt: now.toDate(),
+    updatedAt: now.toDate(),
+    drawingCount: 0,
+  };
 };
 
-export const saveToFirebase = async (
-  portal: Portal,
-  elements: readonly SyncableExcalidrawElement[],
-  appState: AppState,
-) => {
-  const { roomId, roomKey, socket } = portal;
-  if (
-    // bail if no room exists as there's nothing we can do at this point
-    !roomId ||
-    !roomKey ||
-    !socket ||
-    isSavedToFirebase(portal, elements)
-  ) {
-    return null;
-  }
+export const updateClient = async (id: string, name: string): Promise<void> => {
+  const db = _getFirestore();
+  await updateDoc(doc(db, "clients", id), {
+    name,
+    updatedAt: Timestamp.now(),
+  });
+};
 
-  const firestore = _getFirestore();
-  const docRef = doc(firestore, "scenes", roomId);
+export const deleteClient = async (id: string): Promise<void> => {
+  const db = _getFirestore();
 
-  const storedScene = await runTransaction(firestore, async (transaction) => {
-    const snapshot = await transaction.get(docRef);
+  // Delete all drawings subcollection docs
+  const drawingsSnapshot = await getDocs(
+    collection(db, "clients", id, "drawings"),
+  );
+  const batch = writeBatch(db);
+  drawingsSnapshot.docs.forEach((drawingDoc) => {
+    batch.delete(drawingDoc.ref);
+  });
+  batch.delete(doc(db, "clients", id));
+  await batch.commit();
 
-    if (!snapshot.exists()) {
-      const storedScene = await createFirebaseSceneDocument(elements, roomKey);
-
-      transaction.set(docRef, storedScene);
-
-      return storedScene;
+  // Clean up storage (best effort)
+  try {
+    const storage = _getStorage();
+    const storageRef = ref(storage, `drawings/${id}`);
+    const listResult = await listAll(storageRef);
+    await Promise.all(listResult.items.map((itemRef) => deleteObject(itemRef)));
+    // Also clean up nested prefixes
+    for (const prefix of listResult.prefixes) {
+      const nestedItems = await listAll(prefix);
+      await Promise.all(
+        nestedItems.items.map((itemRef) => deleteObject(itemRef)),
+      );
     }
+  } catch (error) {
+    console.warn("Error cleaning up storage for client:", error);
+  }
+};
 
-    const prevStoredScene = snapshot.data() as FirebaseStoredScene;
-    const prevStoredElements = getSyncableElements(
-      restoreElements(await decryptElements(prevStoredScene, roomKey), null),
-    );
-    const reconciledElements = getSyncableElements(
-      reconcileElements(
-        elements,
-        prevStoredElements as OrderedExcalidrawElement[] as RemoteExcalidrawElement[],
-        appState,
-      ),
-    );
+// -----------------------------------------------------------------------------
+// Drawings CRUD
+// -----------------------------------------------------------------------------
 
-    const storedScene = await createFirebaseSceneDocument(
-      reconciledElements,
-      roomKey,
-    );
+export const getDrawings = async (clientId: string): Promise<Drawing[]> => {
+  const db = _getFirestore();
+  const q = query(
+    collection(db, "clients", clientId, "drawings"),
+    orderBy("updatedAt", "desc"),
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    name: doc.data().name,
+    createdAt: doc.data().createdAt?.toDate() ?? new Date(),
+    updatedAt: doc.data().updatedAt?.toDate() ?? new Date(),
+  }));
+};
 
-    transaction.update(docRef, storedScene);
-
-    // Return the stored elements as the in memory `reconciledElements` could have mutated in the meantime
-    return storedScene;
+export const createDrawing = async (
+  clientId: string,
+  name: string,
+): Promise<Drawing> => {
+  const db = _getFirestore();
+  const now = Timestamp.now();
+  const docRef = await addDoc(collection(db, "clients", clientId, "drawings"), {
+    name,
+    createdAt: now,
+    updatedAt: now,
   });
 
-  const storedElements = getSyncableElements(
-    restoreElements(await decryptElements(storedScene, roomKey), null),
-  );
+  // Increment client's drawing count
+  await updateDoc(doc(db, "clients", clientId), {
+    drawingCount: increment(1),
+    updatedAt: now,
+  });
 
-  FirebaseSceneVersionCache.set(socket, storedElements);
-
-  return toBrandedType<RemoteExcalidrawElement[]>(storedElements);
+  return {
+    id: docRef.id,
+    name,
+    createdAt: now.toDate(),
+    updatedAt: now.toDate(),
+  };
 };
 
-export const loadFromFirebase = async (
-  roomId: string,
-  roomKey: string,
-  socket: Socket | null,
-): Promise<readonly SyncableExcalidrawElement[] | null> => {
-  const firestore = _getFirestore();
-  const docRef = doc(firestore, "scenes", roomId);
-  const docSnap = await getDoc(docRef);
-  if (!docSnap.exists()) {
+export const updateDrawingMeta = async (
+  clientId: string,
+  drawingId: string,
+  name: string,
+): Promise<void> => {
+  const db = _getFirestore();
+  await updateDoc(doc(db, "clients", clientId, "drawings", drawingId), {
+    name,
+    updatedAt: Timestamp.now(),
+  });
+};
+
+export const deleteDrawing = async (
+  clientId: string,
+  drawingId: string,
+): Promise<void> => {
+  const db = _getFirestore();
+  await deleteDoc(doc(db, "clients", clientId, "drawings", drawingId));
+
+  // Decrement client's drawing count
+  await updateDoc(doc(db, "clients", clientId), {
+    drawingCount: increment(-1),
+    updatedAt: Timestamp.now(),
+  });
+
+  // Clean up storage (best effort)
+  try {
+    const storage = _getStorage();
+    const sceneRef = ref(
+      storage,
+      `drawings/${clientId}/${drawingId}/scene.json`,
+    );
+    await deleteObject(sceneRef);
+
+    const filesRef = ref(storage, `drawings/${clientId}/${drawingId}/files`);
+    const listResult = await listAll(filesRef);
+    await Promise.all(listResult.items.map((itemRef) => deleteObject(itemRef)));
+  } catch (error) {
+    console.warn("Error cleaning up storage for drawing:", error);
+  }
+};
+
+// -----------------------------------------------------------------------------
+// Scene persistence
+// -----------------------------------------------------------------------------
+
+export const saveScene = async (
+  clientId: string,
+  drawingId: string,
+  elements: readonly ExcalidrawElement[],
+  appState: Partial<AppState>,
+  files: BinaryFiles,
+): Promise<void> => {
+  const storage = _getStorage();
+
+  // Serialize scene data as JSON
+  const sceneData = JSON.stringify({
+    elements,
+    appState: {
+      viewBackgroundColor: appState.viewBackgroundColor,
+      name: appState.name,
+    },
+  });
+
+  const sceneRef = ref(storage, `drawings/${clientId}/${drawingId}/scene.json`);
+  const blob = new TextEncoder().encode(sceneData);
+  await uploadBytes(sceneRef, blob, {
+    contentType: "application/json",
+    cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
+  });
+
+  // Save binary files
+  const fileEntries = Object.entries(files);
+  if (fileEntries.length) {
+    await Promise.all(
+      fileEntries.map(async ([fileId, fileData]) => {
+        try {
+          const fileRef = ref(
+            storage,
+            `drawings/${clientId}/${drawingId}/files/${fileId}`,
+          );
+          // Store the file data as JSON (includes dataURL and metadata)
+          const fileBlob = new TextEncoder().encode(JSON.stringify(fileData));
+          await uploadBytes(fileRef, fileBlob, {
+            contentType: "application/json",
+            cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
+          });
+        } catch (error) {
+          console.warn(`Error saving file ${fileId}:`, error);
+        }
+      }),
+    );
+  }
+
+  // Update drawing metadata timestamp
+  const db = _getFirestore();
+  await updateDoc(doc(db, "clients", clientId, "drawings", drawingId), {
+    updatedAt: Timestamp.now(),
+  });
+};
+
+export const loadScene = async (
+  clientId: string,
+  drawingId: string,
+): Promise<{
+  elements: ExcalidrawElement[];
+  appState: Partial<AppState>;
+  files: BinaryFiles;
+} | null> => {
+  const storage = _getStorage();
+
+  try {
+    const sceneRef = ref(
+      storage,
+      `drawings/${clientId}/${drawingId}/scene.json`,
+    );
+    const sceneBytes = await getBytes(sceneRef);
+    const sceneData = JSON.parse(new TextDecoder().decode(sceneBytes));
+
+    // Load binary files
+    const files: BinaryFiles = {};
+    try {
+      const filesRef = ref(storage, `drawings/${clientId}/${drawingId}/files`);
+      const listResult = await listAll(filesRef);
+      await Promise.all(
+        listResult.items.map(async (itemRef) => {
+          try {
+            const fileBytes = await getBytes(itemRef);
+            const fileData = JSON.parse(
+              new TextDecoder().decode(fileBytes),
+            ) as BinaryFileData;
+            files[fileData.id] = fileData;
+          } catch (error) {
+            console.warn(`Error loading file ${itemRef.name}:`, error);
+          }
+        }),
+      );
+    } catch (error) {
+      // No files directory yet — that's fine
+    }
+
+    return {
+      elements: sceneData.elements || [],
+      appState: sceneData.appState || {},
+      files,
+    };
+  } catch (error) {
+    // Scene doesn't exist yet
     return null;
   }
-  const storedScene = docSnap.data() as FirebaseStoredScene;
-  const elements = getSyncableElements(
-    restoreElements(await decryptElements(storedScene, roomKey), null, {
-      deleteInvisibleElements: true,
-    }),
-  );
-
-  if (socket) {
-    FirebaseSceneVersionCache.set(socket, elements);
-  }
-
-  return elements;
-};
-
-export const loadFilesFromFirebase = async (
-  prefix: string,
-  decryptionKey: string,
-  filesIds: readonly FileId[],
-) => {
-  const loadedFiles: BinaryFileData[] = [];
-  const erroredFiles = new Map<FileId, true>();
-
-  await Promise.all(
-    [...new Set(filesIds)].map(async (id) => {
-      try {
-        const url = `https://firebasestorage.googleapis.com/v0/b/${
-          FIREBASE_CONFIG.storageBucket
-        }/o/${encodeURIComponent(prefix.replace(/^\//, ""))}%2F${id}`;
-        const response = await fetch(`${url}?alt=media`);
-        if (response.status < 400) {
-          const arrayBuffer = await response.arrayBuffer();
-
-          const { data, metadata } = await decompressData<BinaryFileMetadata>(
-            new Uint8Array(arrayBuffer),
-            {
-              decryptionKey,
-            },
-          );
-
-          const dataURL = new TextDecoder().decode(data) as DataURL;
-
-          loadedFiles.push({
-            mimeType: metadata.mimeType || MIME_TYPES.binary,
-            id,
-            dataURL,
-            created: metadata?.created || Date.now(),
-            lastRetrieved: metadata?.created || Date.now(),
-          });
-        } else {
-          erroredFiles.set(id, true);
-        }
-      } catch (error: any) {
-        erroredFiles.set(id, true);
-        console.error(error);
-      }
-    }),
-  );
-
-  return { loadedFiles, erroredFiles };
 };
