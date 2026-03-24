@@ -25,6 +25,7 @@ export const useChatAgent = () => {
         {
           type: "assistant",
           content: "",
+          contentFormat: "mermaid",
           isGenerating: true,
         },
       ]),

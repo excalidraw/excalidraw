@@ -7,6 +7,17 @@ import { chatHistoryAtom } from "./TTDContext";
 
 import type { SavedChat, SavedChats, TTDPersistenceAdapter } from "./types";
 
+const normalizePersistedChat = (chat: SavedChat): SavedChat => ({
+  ...chat,
+  messages: chat.messages.map((message) => ({
+    ...message,
+    // Legacy TTD chats predate explicit content format metadata.
+    contentFormat:
+      message.contentFormat ??
+      (message.type === "assistant" ? "mermaid" : undefined),
+  })),
+});
+
 interface UseTTDChatStorageProps {
   persistenceAdapter: TTDPersistenceAdapter;
 }
@@ -56,7 +67,7 @@ export const useTTDChatStorage = ({
     setIsLoading(true);
     try {
       const chats = await persistenceAdapter.loadChats();
-      setSavedChats(chats);
+      setSavedChats(chats.map(normalizePersistedChat));
       setChatsLoaded(true);
     } catch (error) {
       console.warn("Failed to load chats:", error);

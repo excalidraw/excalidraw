@@ -117,6 +117,28 @@ describe("chat utils", () => {
       expect(result.messages[0].errorType).toBe("network");
     });
 
+    it("should update content format when provided", () => {
+      const chatHistory: TChat.ChatHistory = {
+        id: "chat-1",
+        currentPrompt: "",
+        messages: [
+          {
+            id: "1",
+            type: "assistant",
+            content: "graph TD",
+            timestamp: new Date("2024-01-01"),
+            contentFormat: "text",
+          },
+        ],
+      };
+
+      const result = updateAssistantContent(chatHistory, {
+        contentFormat: "mermaid",
+      });
+
+      expect(result.messages[0].contentFormat).toBe("mermaid");
+    });
+
     it("should return unchanged chatHistory if no assistant message exists", () => {
       const chatHistory: TChat.ChatHistory = {
         id: "chat-1",
@@ -357,6 +379,7 @@ describe("chat utils", () => {
         {
           type: "assistant",
           content: "Message",
+          contentFormat: "mermaid",
           isGenerating: true,
           error: "Error text",
           errorType: "parse",
@@ -364,6 +387,7 @@ describe("chat utils", () => {
       ]);
 
       expect(result.messages[0].isGenerating).toBe(true);
+      expect(result.messages[0].contentFormat).toBe("mermaid");
       expect(result.messages[0].error).toBe("Error text");
       expect(result.messages[0].errorType).toBe("parse");
     });

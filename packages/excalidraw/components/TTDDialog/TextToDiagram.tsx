@@ -80,7 +80,10 @@ const TextToDiagramContent = ({
   } = useChatManagement({ persistenceAdapter });
 
   const onViewAsMermaid = () => {
-    if (typeof lastAssistantMessage?.content === "string") {
+    if (
+      lastAssistantMessage?.contentFormat === "mermaid" &&
+      typeof lastAssistantMessage.content === "string"
+    ) {
       saveMermaidDataToStorage(lastAssistantMessage.content);
       setAppState({
         openDialog: { name: "ttd", tab: "mermaid" },
@@ -206,6 +209,7 @@ const TextToDiagramContent = ({
         onGenerate={onGenerate}
         isGenerating={lastAssistantMessage?.isGenerating ?? false}
         generatedResponse={lastAssistantMessage?.content}
+        generatedResponseFormat={lastAssistantMessage?.contentFormat}
         isMenuOpen={isMenuOpen}
         onMenuToggle={handleMenuToggle}
         onMenuClose={handleMenuClose}

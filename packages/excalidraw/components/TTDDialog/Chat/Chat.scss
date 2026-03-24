@@ -3,7 +3,25 @@
 $verticalBreakpoint: 861px;
 
 .excalidraw {
+  --ttd-mermaid-token-keyword: #0000ff;
+  --ttd-mermaid-token-string: #a31515;
+  --ttd-mermaid-token-comment: #008000;
+  --ttd-mermaid-token-number: #098658;
+  --ttd-mermaid-token-operator: #1e1e1e;
+  --ttd-mermaid-token-punctuation: #1e1e1e;
+  --ttd-mermaid-token-variable-name: #001080;
+  --ttd-mermaid-token-bracket: #af00db;
+
   &.theme--dark {
+    --ttd-mermaid-token-keyword: #569cd6;
+    --ttd-mermaid-token-string: #ce9178;
+    --ttd-mermaid-token-comment: #6a9955;
+    --ttd-mermaid-token-number: #b5cea8;
+    --ttd-mermaid-token-operator: #d4d4d4;
+    --ttd-mermaid-token-punctuation: #d4d4d4;
+    --ttd-mermaid-token-variable-name: #9cdcfe;
+    --ttd-mermaid-token-bracket: #ffd700;
+
     .chat-message {
       &--assistant {
         .chat-message__content {
@@ -194,7 +212,7 @@ $verticalBreakpoint: 861px;
       align-items: flex-start;
 
       .chat-message__content {
-        background: var(--color-surface-low);
+        background: #f7f7f7;
         color: var(--color-on-surface);
         border-radius: var(--border-radius-md);
         min-width: 6rem;
@@ -292,6 +310,51 @@ $verticalBreakpoint: 861px;
       word-wrap: break-word;
     }
 
+    &__text--error {
+      color: inherit;
+    }
+
+    &__text--mermaid {
+      overflow-x: auto;
+      font-weight: 400;
+    }
+
+    &__token {
+      white-space: inherit;
+    }
+
+    &__token--keyword {
+      color: var(--ttd-mermaid-token-keyword);
+    }
+
+    &__token--string {
+      color: var(--ttd-mermaid-token-string);
+    }
+
+    &__token--comment {
+      color: var(--ttd-mermaid-token-comment);
+    }
+
+    &__token--number {
+      color: var(--ttd-mermaid-token-number);
+    }
+
+    &__token--operator {
+      color: var(--ttd-mermaid-token-operator);
+    }
+
+    &__token--punctuation {
+      color: var(--ttd-mermaid-token-punctuation);
+    }
+
+    &__token--variableName {
+      color: var(--ttd-mermaid-token-variable-name);
+    }
+
+    &__token--bracket {
+      color: var(--ttd-mermaid-token-bracket);
+    }
+
     &__cursor {
       display: inline-block;
       margin-left: 2px;
@@ -332,11 +395,13 @@ $verticalBreakpoint: 861px;
     &__error {
       color: var(--color-danger);
       font-weight: 500;
-      white-space: pre-wrap;
-      word-wrap: break-word;
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
+
+      .chat-message__text--mermaid {
+        color: var(--color-on-surface);
+      }
     }
 
     &__error_message {

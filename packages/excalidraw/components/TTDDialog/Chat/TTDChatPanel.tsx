@@ -25,6 +25,7 @@ export const TTDChatPanel = ({
   onGenerate,
   isGenerating,
   generatedResponse,
+  generatedResponseFormat,
   isMenuOpen,
   onMenuToggle,
   onMenuClose,
@@ -50,6 +51,7 @@ export const TTDChatPanel = ({
   onGenerate: TTTDDialog.OnGenerate;
   isGenerating: boolean;
   generatedResponse: string | null | undefined;
+  generatedResponseFormat?: TChat.ChatMessage["contentFormat"];
 
   isMenuOpen: boolean;
   onMenuToggle: () => void;
@@ -89,7 +91,7 @@ export const TTDChatPanel = ({
       });
     }
 
-    if (generatedResponse) {
+    if (generatedResponse && generatedResponseFormat === "mermaid") {
       actions.push({
         action: onViewAsMermaid,
         label: t("chat.viewAsMermaid"),

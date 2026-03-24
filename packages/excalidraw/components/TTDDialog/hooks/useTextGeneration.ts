@@ -88,6 +88,7 @@ export const useTextGeneration = ({
         updateAssistantContent(prev, {
           isGenerating: true,
           content: "",
+          contentFormat: "mermaid",
           error: undefined,
           errorType: undefined,
           errorDetails: undefined,

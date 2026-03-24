@@ -18,6 +18,8 @@ export type MermaidData = {
   files: BinaryFiles | null;
 };
 
+export type ChatMessageContentFormat = "text" | "mermaid";
+
 export interface RateLimits {
   rateLimit: number;
   rateLimitRemaining: number;
@@ -33,6 +35,7 @@ export namespace TChat {
     errorType?: "parse" | "network" | "other";
     lastAttemptAt?: number;
     type: "user" | "assistant" | "warning";
+    contentFormat?: ChatMessageContentFormat;
     warningType?: /* daily rate limit */
     "messageLimitExceeded" | /* general 429 */ "rateLimitExceeded";
     content?: string;

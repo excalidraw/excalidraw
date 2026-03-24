@@ -5,7 +5,48 @@ import { t } from "../../../i18n";
 import { FilledButton } from "../../FilledButton";
 import { TrashIcon, codeIcon, stackPushIcon, RetryIcon } from "../../icons";
 
+import { tokenizeMermaid } from "../mermaid-highlighting";
+
 import type { TChat, TTTDDialog } from "../types";
+
+const isMermaidMessage = (message: TChat.ChatMessage) =>
+  message.contentFormat === "mermaid";
+
+const renderMessageContent = (
+  message: TChat.ChatMessage,
+  className: string,
+) => {
+  const content = message.content ?? "";
+
+  console.log("@", message);
+
+  if (!isMermaidMessage(message)) {
+    return (
+      <div className={className}>
+        {content}
+        {message.isGenerating && (
+          <span className="chat-message__cursor">▋</span>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={clsx(className, "chat-message__text--mermaid")}>
+      {tokenizeMermaid(content).map((token, index) => (
+        <span
+          key={`${index}-${token.type ?? "text"}-${token.value}`}
+          className={clsx("chat-message__token", {
+            [`chat-message__token--${token.type}`]: token.type,
+          })}
+        >
+          {token.value}
+        </span>
+      ))}
+      {message.isGenerating && <span className="chat-message__cursor">▋</span>}
+    </div>
+  );
+};
 
 export const ChatMessage: React.FC<{
   message: TChat.ChatMessage;
@@ -122,7 +163,14 @@ export const ChatMessage: React.FC<{
         <div className="chat-message__body">
           {message.error ? (
             <>
-              <div className="chat-message__error">{message.content}</div>
+              <div className="chat-message__error">
+                {renderMessageContent(
+                  message,
+                  clsx("chat-message__text", {
+                    "chat-message__text--error": !isMermaidMessage(message),
+                  }),
+                )}
+              </div>
               {message.errorType !== "parse" && (
                 <div className="chat-message__error_message">
                   Error: {message.error || t("chat.errors.generationFailed")}
@@ -132,7 +180,7 @@ export const ChatMessage: React.FC<{
                 <div className="chat-message__error_message">
                   <p>{t("chat.errors.invalidDiagram")}</p>
                   <div className="chat-message__error-actions">
-                    {onMermaidTabClick && (
+                    {onMermaidTabClick && isMermaidMessage(message) && (
                       <button
                         className="chat-message__error-link"
                         onClick={() => onMermaidTabClick(message)}
@@ -156,18 +204,13 @@ export const ChatMessage: React.FC<{
               )}
             </>
           ) : (
-            <div className="chat-message__text">
-              {message.content}
-              {message.isGenerating && (
-                <span className="chat-message__cursor">▋</span>
-              )}
-            </div>
+            renderMessageContent(message, "chat-message__text")
           )}
         </div>
       </div>
       {message.type === "assistant" && !message.isGenerating && (
         <div className="chat-message__actions">
-          {!message.error && onInsertMessage && (
+          {!message.error && onInsertMessage && isMermaidMessage(message) && (
             <button
               className="chat-message__action"
               onClick={() => onInsertMessage(message)}
@@ -178,7 +221,7 @@ export const ChatMessage: React.FC<{
               {stackPushIcon}
             </button>
           )}
-          {onMermaidTabClick && message.content && (
+          {onMermaidTabClick && isMermaidMessage(message) && message.content && (
             <button
               className="chat-message__action"
               onClick={() => onMermaidTabClick(message)}
