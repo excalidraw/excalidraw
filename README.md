@@ -76,7 +76,7 @@ The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase
 - 🤼&nbsp;Real-time collaboration.
 - 🔒&nbsp;End-to-end encryption.
 - 💾&nbsp;Local-first support (autosaves to the browser).
-- 🔗&nbsp;Shareable links (export to a readonly link you can share with others).
+- 🔗&nbsp;Shareable links (export to a read-only link you can share with others).
 
 We'll be adding these features as drop-in plugins for the npm package in the future.
 
