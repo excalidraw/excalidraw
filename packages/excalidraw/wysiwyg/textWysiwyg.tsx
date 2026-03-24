@@ -198,6 +198,46 @@ export const textWysiwyg = ({
     return false;
   };
 
+  const isSelectionInsideValidSynclist = (
+    value: string,
+    selectionMin: number,
+  ) => {
+    const normalizedValue = value.replace(/\r\n?/g, "\n");
+    const lines = normalizedValue.split("\n");
+    const lineIndex =
+      normalizedValue.slice(0, selectionMin).split("\n").length - 1;
+    const isStart = (line: string) =>
+      /^\s*\/\/synclist\(([^)]+)\)\s*\{\s*$/.test(line);
+    const isEnd = (line: string) => /^\s*\/\/\}\s*$/.test(line);
+    let startIndex = -1;
+    for (let i = lineIndex; i >= 0; i--) {
+      if (isStart(lines[i] ?? "")) {
+        startIndex = i;
+        break;
+      }
+      if (isEnd(lines[i] ?? "")) {
+        break;
+      }
+    }
+    if (startIndex < 0) {
+      return false;
+    }
+    let endIndex = -1;
+    for (let i = lineIndex; i < lines.length; i++) {
+      if (isEnd(lines[i] ?? "")) {
+        endIndex = i;
+        break;
+      }
+      if (i > lineIndex && isStart(lines[i] ?? "")) {
+        break;
+      }
+    }
+    if (endIndex < 0) {
+      return false;
+    }
+    return lineIndex > startIndex && lineIndex < endIndex;
+  };
+
   const whitespaceOverlay = document.createElement("div");
   whitespaceOverlay.classList.add("excalidraw-wysiwyg__whitespaceOverlay");
 
@@ -1454,7 +1494,10 @@ export const textWysiwyg = ({
       const startLineStart = value.lastIndexOf("\n", selectionMin - 1) + 1;
       const endLineEndIdx = value.indexOf("\n", selectionMax);
       const endLineEnd = endLineEndIdx === -1 ? value.length : endLineEndIdx;
-      if (value.slice(startLineStart, endLineEnd).includes(syncTagPrefix)) {
+      if (
+        value.slice(startLineStart, endLineEnd).includes(syncTagPrefix) &&
+        isSelectionInsideValidSynclist(value, selectionMin)
+      ) {
         event.preventDefault();
         event.stopPropagation();
       }
@@ -1476,7 +1519,10 @@ export const textWysiwyg = ({
       const endLineEndIdx = value.indexOf("\n", selectionMax);
       const endLineEnd = endLineEndIdx === -1 ? value.length : endLineEndIdx;
       const slice = value.slice(startLineStart, endLineEnd);
-      return slice.includes(syncTagPrefix);
+      return (
+        slice.includes(syncTagPrefix) &&
+        isSelectionInsideValidSynclist(value, selectionMin)
+      );
     })();
 
     if (
@@ -2213,6 +2259,27 @@ export const textWysiwyg = ({
   // handle updates of textElement properties of editing element
   const unbindUpdate = app.scene.onUpdate(() => {
     updateWysiwygStyle();
+    const updatedElement = app.scene.getElement<ExcalidrawTextElement>(id);
+    if (
+      updatedElement &&
+      isTextElement(updatedElement) &&
+      document.activeElement === editable
+    ) {
+      const nextOriginalText = updatedElement.originalText ?? updatedElement.text;
+      if (
+        nextOriginalText !== editable.value &&
+        nextOriginalText.includes("//synclist(")
+      ) {
+        const selectionStart = editable.selectionStart ?? 0;
+        const selectionEnd = editable.selectionEnd ?? selectionStart;
+        editable.value = nextOriginalText;
+        const maxPos = nextOriginalText.length;
+        editable.selectionStart = Math.min(selectionStart, maxPos);
+        editable.selectionEnd = Math.min(selectionEnd, maxPos);
+        updateWhitespaceOverlayContent();
+        scheduleCaretUpdate();
+      }
+    }
     const isPopupOpened = !!document.activeElement?.closest(
       ".properties-content",
     );

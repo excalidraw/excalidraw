@@ -6424,6 +6424,7 @@ class App extends React.Component<AppProps, AppState> {
       { leading: false },
     );
 
+    let lastSynclistSyncText = "";
     const syncSummaryToolThrottled = throttle(
       () => {
         const sync = applySummaryToolSync({
@@ -6461,7 +6462,41 @@ class App extends React.Component<AppProps, AppState> {
       },
       onChange: withBatchedUpdates((nextOriginalText) => {
         updateElement(nextOriginalText, false, false);
-        updateElementDimensionsThrottled(nextOriginalText);
+        const shouldSyncImmediately =
+          nextOriginalText.includes("//synclist(") &&
+          nextOriginalText.includes("//}");
+        let syncedText: string | null = null;
+        if (
+          shouldSyncImmediately &&
+          nextOriginalText !== lastSynclistSyncText
+        ) {
+          lastSynclistSyncText = nextOriginalText;
+          const sync = applySummaryToolSync({
+            elements: this.scene.getElementsIncludingDeleted(),
+            appState: this.state,
+            elementsMap: this.scene.getNonDeletedElementsMap(),
+          });
+          if (sync.didUpdate) {
+            this.updateScene({
+              elements: sync.elements,
+              appState: sync.appState,
+              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+            });
+            const updatedFromSync = sync.elements.find(
+              (el) => el.id === element.id,
+            );
+            if (updatedFromSync && isTextElement(updatedFromSync)) {
+              syncedText = updatedFromSync.originalText ?? updatedFromSync.text;
+            }
+          }
+        }
+        if (syncedText) {
+          updateElementDimensionsThrottled.cancel();
+          updateElement(syncedText, false, true);
+          updateElementDimensionsThrottled(syncedText);
+        } else {
+          updateElementDimensionsThrottled(nextOriginalText);
+        }
         syncSummaryToolThrottled();
         const latestElement = this.scene.getElement(element.id);
         if (
