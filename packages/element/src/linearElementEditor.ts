@@ -790,7 +790,10 @@ export class LinearElementEditor {
       elementsMap,
     );
 
-    const [lines, segCurves] = deconstructLinearOrFreeDrawElement(element);
+    const [lines, segCurves] = deconstructLinearOrFreeDrawElement(
+      element,
+      elementsMap,
+    );
     const segmentCount = lines.length + segCurves.length;
 
     let index = 0;
