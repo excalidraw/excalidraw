@@ -207,7 +207,6 @@ export const getCurvePathOps = (shape: Drawable): Op[] => {
       return set.ops;
     }
   }
-
   return shape.sets[0].ops;
 };
 
@@ -328,7 +327,7 @@ export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
   for (const operation of ops) {
     if (operation.op === "move") {
       if (fillPathSet) {
-        // fillPath is always a single run — no odd/even skipping needed
+        // fillPath is always a single run, no odd/even skipping needed
         points.push(pointFrom(operation.data[0], operation.data[1]));
       } else {
         odd = !odd;
