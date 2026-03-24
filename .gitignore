@@ -1,6 +1,8 @@
 .DS_Store
+.env.development
 .env.development.local
 .env.local
+.env.production
 .env.production.local
 .env.test.local
 .envrc
