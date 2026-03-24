@@ -1531,10 +1531,10 @@
   resolved "https://registry.yarnpkg.com/@excalidraw/markdown-to-text/-/markdown-to-text-0.1.2.tgz#1703705e7da608cf478f17bfe96fb295f55a23eb"
   integrity sha512-1nDXBNAojfi3oSFwJswKREkFm5wrSjqay81QlyRv2pkITG/XYB5v+oChENVBQLcxQwX4IUATWvXM5BcaNhPiIg==
 
-"@excalidraw/mermaid-to-excalidraw@2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@excalidraw/mermaid-to-excalidraw/-/mermaid-to-excalidraw-2.1.1.tgz#659c934a607dd2cf57f2a69282588ee2b0722959"
-  integrity sha512-jU+frqcxazsY+t5yOBf2mgrQy+WUrbrzA36if3SQB/Vwaf2qOJjnWxucNafgZZk/3+9xGmRotUeOviSOJG+wYA==
+"@excalidraw/mermaid-to-excalidraw@2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@excalidraw/mermaid-to-excalidraw/-/mermaid-to-excalidraw-2.2.2.tgz#ee6b597a0d95b9a76f7ae41ce0e3733a9b96e4a0"
+  integrity sha512-5VKQq5CdRocC82vOIUpQ5ufJOVV9FpBTdHGA+ULqazeIVV+cr299877omQCibsdS3Bpitz2fsnTwnIXEmLVDSg==
   dependencies:
     "@excalidraw/markdown-to-text" "0.1.2"
     "@mermaid-js/parser" "^0.6.3"
