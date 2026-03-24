@@ -148,6 +148,7 @@
       "hint": "Type or paste your link here",
       "goToElement": "Go to target element"
     },
+    "manageTrustedDomains": "Manage trusted domains",
     "lineEditor": {
       "edit": "Edit line",
       "editArrow": "Edit arrow"
@@ -457,6 +458,20 @@
     "movePageLeftRight": "Move page left/right",
     "cropStart": "Crop image",
     "cropFinish": "Finish image cropping"
+  },
+  "trustedDomainsDialog": {
+    "title": "Trusted Embed Domains",
+    "description": "Specify domains to allow as embeds on the canvas. Embeds from these domains will bypass the default domain restrictions.",
+    "sessionNote": "Works for the current session only!",
+    "warningTitle": "Warning!",
+    "warningDescription": "Embedded pages run with the permissions of their origin. Only add domains you control or fully trust.",
+    "add": "Add",
+    "remove": "Remove",
+    "empty": "No custom trusted domains added yet.",
+    "placeholder": "e.g. example.com",
+    "invalidDomain": "Please enter a valid domain (e.g. example.com)",
+    "duplicateDomain": "This domain is already in the trusted list.",
+    "limitReached": "You can only add 10 entries."
   },
   "clearCanvasDialog": {
     "title": "Clear canvas"

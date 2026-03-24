@@ -121,6 +121,7 @@ export type ActionName =
   | "decreaseFontSize"
   | "unbindText"
   | "hyperlink"
+  | "manageTrustedDomains"
   | "bindText"
   | "unlockAllElements"
   | "toggleElementLock"

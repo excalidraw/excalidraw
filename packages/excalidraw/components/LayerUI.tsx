@@ -55,6 +55,7 @@ import { ErrorDialog } from "./ErrorDialog";
 import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { HelpDialog } from "./HelpDialog";
+import { TrustedDomainsDialog } from "./TrustedDomainsDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
@@ -538,6 +539,15 @@ const LayerUI = ({
           onClose={() => {
             setAppState({ openDialog: null });
           }}
+        />
+      )}
+      {appState.openDialog?.name === "trustedDomains" && (
+        <TrustedDomainsDialog
+          onClose={() => setAppState({ openDialog: null })}
+          trustedDomains={appState.trustedEmbedDomains || []}
+          onDomainsChange={(domains) =>
+            setAppState({ trustedEmbedDomains: domains })
+          }
         />
       )}
       <ActiveConfirmDialog />

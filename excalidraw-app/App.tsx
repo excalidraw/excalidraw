@@ -32,6 +32,7 @@ import {
   resolvablePromise,
   isRunningInIframe,
   isDevEnv,
+  toValidURL,
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -914,6 +915,24 @@ const ExcalidrawWrapper = () => {
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
+        validateEmbeddable={(url) => {
+          const trustedUrls =
+            excalidrawAPI?.getAppState()?.trustedEmbedDomains || [];
+          const validUrl = toValidURL(url);
+
+          if (validUrl === "about:blank") {
+            return undefined;
+          }
+
+          const urlObj = new URL(validUrl);
+          const trimmedHost = urlObj.hostname.toLowerCase();
+
+          if (trustedUrls.length > 0 && trustedUrls.includes(trimmedHost)) {
+            return true;
+          }
+
+          return undefined;
+        }}
         UIOptions={{
           canvasActions: {
             toggleTheme: true,

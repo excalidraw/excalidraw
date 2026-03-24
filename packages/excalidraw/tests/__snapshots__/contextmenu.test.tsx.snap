@@ -778,6 +778,15 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
+        "label": "labels.manageTrustedDomains",
+        "name": "manageTrustedDomains",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -986,6 +995,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -1181,6 +1191,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "toast": {
     "message": "Added to library",
   },
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -1393,6 +1404,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -1724,6 +1736,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -2057,6 +2070,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "toast": {
     "message": "Copied styles.",
   },
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -2267,6 +2281,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -2510,6 +2525,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -2813,6 +2829,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -3182,6 +3199,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "toast": {
     "message": "Copied styles.",
   },
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -3673,6 +3691,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -3996,6 +4015,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -4322,6 +4342,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -5402,6 +5423,15 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
+        "label": "labels.manageTrustedDomains",
+        "name": "manageTrustedDomains",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -5607,6 +5637,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -6619,6 +6650,15 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
+        "label": "labels.manageTrustedDomains",
+        "name": "manageTrustedDomains",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -6826,6 +6866,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -7779,6 +7820,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -8576,6 +8618,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
+        "label": "labels.manageTrustedDomains",
+        "name": "manageTrustedDomains",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -8778,6 +8829,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
@@ -9567,6 +9619,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
+        "label": "labels.manageTrustedDomains",
+        "name": "manageTrustedDomains",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -9772,6 +9833,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "trustedEmbedDomains": [],
   "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
