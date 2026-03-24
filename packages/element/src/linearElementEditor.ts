@@ -790,9 +790,6 @@ export class LinearElementEditor {
       elementsMap,
     );
 
-    // For curved (non-elbow) arrows the quadratic spline produces N-2 arcs
-    // for N anchor points. Cap the loop to the actual segment count so we
-    // don't request a midpoint for a segment that doesn't exist.
     const [lines, segCurves] = deconstructLinearOrFreeDrawElement(element);
     const segmentCount = lines.length + segCurves.length;
 

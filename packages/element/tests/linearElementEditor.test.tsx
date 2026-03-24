@@ -434,12 +434,12 @@ describe("Test Linear Elements", () => {
       expect(midPointsWithRoundEdge).toMatchInlineSnapshot(`
         [
           [
-            "42.76190",
-            "62.13334",
+            "51.36383",
+            "54.86323",
           ],
           [
-            "87.23810",
-            "37.65714",
+            "81.64884",
+            "43.04575",
           ],
         ]
       `);
@@ -482,7 +482,7 @@ describe("Test Linear Elements", () => {
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
         `12`,
       );
-      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
       expect([line.x, line.y]).toEqual([
         points[0][0] + deltaX,
@@ -499,12 +499,12 @@ describe("Test Linear Elements", () => {
       expect(newMidPoints).toMatchInlineSnapshot(`
         [
           [
-            "97.30521",
-            "77.27340",
+            "101.36383",
+            "74.86323",
           ],
           [
-            "133.70877",
-            "60.46424",
+            "131.64884",
+            "63.04575",
           ],
         ]
       `);
@@ -809,12 +809,12 @@ describe("Test Linear Elements", () => {
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
             [
-              "5.35122",
-              "49.57854",
+              "22.32088",
+              "37.43003",
             ],
             [
-              "87.32439",
-              "37.60536",
+              "81.55727",
+              "43.21091",
             ],
           ]
         `);
@@ -898,12 +898,12 @@ describe("Test Linear Elements", () => {
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
             [
-              "42.76190",
-              "62.13334",
+              "51.36383",
+              "54.86323",
             ],
             [
-              "87.23810",
-              "37.65714",
+              "81.64884",
+              "43.04575",
             ],
           ]
         `);
@@ -1065,8 +1065,8 @@ describe("Test Linear Elements", () => {
         );
         expect(position).toMatchInlineSnapshot(`
           {
-            "x": 75,
-            "y": 60,
+            "x": "86.53100",
+            "y": "72.83556",
           }
         `);
       });
@@ -1181,12 +1181,12 @@ describe("Test Linear Elements", () => {
         ),
       ).toMatchInlineSnapshot(`
         [
-          "18.54397",
-          "19.35821",
+          20,
+          20,
           105,
           80,
-          "56.33510",
-          "47.11973",
+          "56.68277",
+          "47.27188",
         ]
       `);
 
@@ -1196,7 +1196,7 @@ describe("Test Linear Elements", () => {
         .toMatchInlineSnapshot(`
           {
             "height": 130,
-            "width": "369.28398",
+            "width": "368.53316",
           }
         `);
 
@@ -1208,7 +1208,7 @@ describe("Test Linear Elements", () => {
         ),
       ).toMatchInlineSnapshot(`
         {
-          "x": "274.28398",
+          "x": "273.53316",
           "y": 45,
         }
       `);
@@ -1223,12 +1223,12 @@ describe("Test Linear Elements", () => {
         ),
       ).toMatchInlineSnapshot(`
         [
-          "19.96519",
-          "9.07108",
-          "504.28398",
-          "146.41791",
-          "204.79250",
-          "77.74450",
+          20,
+          35,
+          "503.53316",
+          "119.02540",
+          "204.47758",
+          "77.01270",
         ]
       `);
     });

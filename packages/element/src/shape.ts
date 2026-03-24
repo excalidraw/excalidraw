@@ -44,7 +44,7 @@ import type {
 } from "@excalidraw/excalidraw/scene/types";
 
 import { elementWithCanvasCache } from "./renderElement";
-import { debugDrawLine, debugDrawPoint, debugDrawPolygon } from "./visualdebug";
+import { debugDrawLine, debugDrawPolygon } from "./visualdebug";
 
 import {
   canBecomePolygon,
@@ -90,7 +90,7 @@ const CP_CHORD_POWER = 1;
 // This factor [0, 1] controls how far the tangent direction is pulled toward
 // the bisector (the chord-bisector normal) linearly with turn sharpness.
 // 0 = pure C2 spline; 1 = tangent fully aligned with the bisector.
-const CP_ANGLE_CORRECTION = 0.5;
+const CP_ANGLE_CORRECTION = 1;
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
@@ -665,8 +665,8 @@ export const generateLinearCollisionShape = (
           data: rotateLocal(points[1][0], points[1][1]),
         });
       } else {
-        // Chord-length C2 spline – mirrors generateRoundedSimpleArrowShape exactly
-        // so hit-testing matches rendering.
+        // Chord-length C2 spline. Mirrors generateRoundedSimpleArrowShape
+        // exactly so hit-testing matches rendering.
         const n = points.length - 1;
         const h = new Float64Array(n);
         for (let i = 0; i < n; i++) {
@@ -723,6 +723,40 @@ export const generateLinearCollisionShape = (
         const mlen = new Float64Array(n + 1);
         for (let i = 0; i <= n; i++) {
           mlen[i] = Math.max(1e-10, Math.hypot(mx[i], my[i]));
+        }
+
+        // At interior knots, blend the C2 tangent direction toward the
+        // bisector direction by a factor proportional to turn sharpness *
+        // CP_ANGLE_CORRECTION
+        for (let k = 1; k < n; k++) {
+          const d1x = (points[k][0] - points[k - 1][0]) / h[k - 1];
+          const d1y = (points[k][1] - points[k - 1][1]) / h[k - 1];
+          const d2x = (points[k + 1][0] - points[k][0]) / h[k];
+          const d2y = (points[k + 1][1] - points[k][1]) / h[k];
+          const dot = d1x * d2x + d1y * d2y;
+          const t = ((1 - dot) / 2) * CP_ANGLE_CORRECTION;
+          if (t < 1e-6) {
+            continue;
+          }
+          const bx = d1x + d2x;
+          const by = d1y + d2y;
+          const blen = Math.hypot(bx, by);
+          if (blen < 1e-10) {
+            continue;
+          }
+          let px = bx / blen;
+          let py = by / blen;
+          const tx = mx[k] / mlen[k];
+          const ty = my[k] / mlen[k];
+          if (tx * px + ty * py < 0) {
+            px = -px;
+            py = -py;
+          }
+          const blendX = tx + t * (px - tx);
+          const blendY = ty + t * (py - ty);
+          const blendLen = Math.max(1e-10, Math.hypot(blendX, blendY));
+          mx[k] = (blendX / blendLen) * mlen[k];
+          my[k] = (blendY / blendLen) * mlen[k];
         }
 
         for (let i = 0; i < n; i++) {

@@ -893,9 +893,8 @@ export const getArrowheadPoints = (
   );
 
   if (arrowhead === "diamond" || arrowhead === "diamond_outline") {
-    // point opposite to the arrowhead point — use the same Bezier tangent
-    // direction (nx, ny) as the wings so the diamond isn't distorted on
-    // rounded arrows where the tangent differs from the chord direction.
+    // point opposite to the arrowhead point, just mirrored across the (tx, ty)
+    // point
     const ox = tx - nx * minSize * 2;
     const oy = ty - ny * minSize * 2;
 
