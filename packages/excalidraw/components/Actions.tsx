@@ -1100,8 +1100,7 @@ export const ShapesSwitcher = ({
           const shortcut = letter
             ? `${letter} ${t("helpDialog.or")} ${numericKey}`
             : `${numericKey}`;
-          const keybindingLabel =
-            value === "hand" ? undefined : numericKey || letter;
+          const keybindingLabel = numericKey || letter;
 
           // when in compact styles panel mode (tablet)
           // use a ToolPopover for selection/lasso toggle as well
