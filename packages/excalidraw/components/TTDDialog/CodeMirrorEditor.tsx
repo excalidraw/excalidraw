@@ -1,13 +1,21 @@
 import { useEffect, useRef } from "react";
 import {
   Decoration,
+  type DecorationSet,
   EditorView,
+  ViewPlugin,
+  type ViewUpdate,
   keymap,
   lineNumbers,
   placeholder as cmPlaceholder,
   drawSelection,
 } from "@codemirror/view";
-import { Compartment, EditorState, type Extension } from "@codemirror/state";
+import {
+  Compartment,
+  EditorState,
+  type Extension,
+  type Range,
+} from "@codemirror/state";
 import {
   defaultKeymap,
   history,
@@ -40,6 +48,13 @@ const darkTheme = EditorView.theme(
     },
     ".cm-content": { caretColor: "#fff" },
     ".cm-cursor": { borderLeftColor: "#fff" },
+    ".cm-selectionBackground": {
+      backgroundColor: "rgba(86, 156, 214, 0.3)",
+    },
+    "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground":
+      {
+        backgroundColor: "rgba(86, 156, 214, 0.42)",
+      },
     ".cm-gutters": {
       backgroundColor: "#1e1e1e",
       color: "#858585",
@@ -48,6 +63,10 @@ const darkTheme = EditorView.theme(
     ".cm-activeLineGutter": { backgroundColor: "#2a2a2a" },
     ".cm-activeLine": { backgroundColor: "#2a2a2a" },
     ".cm-errorLine": { backgroundColor: "rgba(255, 0, 0, 0.15)" },
+    ".cm-selectedWordMatch": {
+      backgroundColor: "rgba(255, 209, 102, 0.22)",
+      borderRadius: "2px",
+    },
   },
   { dark: true },
 );
@@ -80,6 +99,10 @@ const lightTheme = EditorView.theme({
   ".cm-activeLineGutter": { backgroundColor: "#e8e8e8" },
   ".cm-activeLine": { backgroundColor: "#e8e8e8" },
   ".cm-errorLine": { backgroundColor: "rgba(255, 0, 0, 0.1)" },
+  ".cm-selectedWordMatch": {
+    backgroundColor: "rgba(255, 209, 102, 0.35)",
+    borderRadius: "2px",
+  },
 });
 
 const lightHighlight = HighlightStyle.define([
@@ -96,6 +119,79 @@ const lightHighlight = HighlightStyle.define([
 // ---- Error line decoration ----
 
 const errorLineDeco = Decoration.line({ class: "cm-errorLine" });
+const selectedWordMatchDeco = Decoration.mark({
+  class: "cm-selectedWordMatch",
+});
+
+const getSelectedWordMatchText = (state: EditorState) => {
+  const mainSelection = state.selection.main;
+  if (state.selection.ranges.length !== 1 || mainSelection.empty) {
+    return null;
+  }
+
+  const selectedWord = state.wordAt(mainSelection.from);
+  if (
+    !selectedWord ||
+    selectedWord.from !== mainSelection.from ||
+    selectedWord.to !== mainSelection.to
+  ) {
+    return null;
+  }
+
+  return state.sliceDoc(mainSelection.from, mainSelection.to);
+};
+
+const getSelectedWordMatchDecorations = (view: EditorView): DecorationSet => {
+  const selectedWord = getSelectedWordMatchText(view.state);
+  if (!selectedWord) {
+    return Decoration.none;
+  }
+
+  const selection = view.state.selection.main;
+  const ranges: Range<Decoration>[] = [];
+  const doc = view.state.doc.toString();
+  let searchFrom = 0;
+
+  while (searchFrom <= doc.length - selectedWord.length) {
+    const matchFrom = doc.indexOf(selectedWord, searchFrom);
+    if (matchFrom === -1) {
+      break;
+    }
+
+    const matchTo = matchFrom + selectedWord.length;
+    const matchWord = view.state.wordAt(matchFrom);
+    if (
+      matchWord?.from === matchFrom &&
+      matchWord.to === matchTo &&
+      (matchFrom !== selection.from || matchTo !== selection.to)
+    ) {
+      ranges.push(selectedWordMatchDeco.range(matchFrom, matchTo));
+    }
+
+    searchFrom = matchTo;
+  }
+
+  return ranges.length ? Decoration.set(ranges) : Decoration.none;
+};
+
+const selectedWordMatchExtension = ViewPlugin.fromClass(
+  class {
+    decorations: DecorationSet;
+
+    constructor(view: EditorView) {
+      this.decorations = getSelectedWordMatchDecorations(view);
+    }
+
+    update(update: ViewUpdate) {
+      if (update.docChanged || update.selectionSet) {
+        this.decorations = getSelectedWordMatchDecorations(update.view);
+      }
+    }
+  },
+  {
+    decorations: (value) => value.decorations,
+  },
+);
 
 const getErrorLineExtension = (
   errorLine: number | null | undefined,
@@ -172,6 +268,7 @@ const CodeMirrorEditor = ({
           errorLineCompartmentRef.current.of([]),
           mermaidLite(),
           drawSelection({ drawRangeCursor: true }),
+          selectedWordMatchExtension,
           ...(placeholder ? [cmPlaceholder(placeholder)] : []),
         ],
       }),
