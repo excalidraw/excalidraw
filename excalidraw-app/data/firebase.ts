@@ -1,4 +1,5 @@
 import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 import {
   getFirestore,
   collection,
@@ -50,12 +51,20 @@ try {
 }
 
 let firebaseApp: ReturnType<typeof initializeApp> | null = null;
+let firebaseAnalytics: ReturnType<typeof getAnalytics> | null = null;
 let firestoreDb: ReturnType<typeof getFirestore> | null = null;
 let firebaseStorage: ReturnType<typeof getStorage> | null = null;
 
 const _initializeFirebase = () => {
   if (!firebaseApp) {
     firebaseApp = initializeApp(FIREBASE_CONFIG);
+    try {
+      if (typeof window !== "undefined") {
+        firebaseAnalytics = getAnalytics(firebaseApp);
+      }
+    } catch (error) {
+      console.warn("Failed to initialize Firebase Analytics", error);
+    }
   }
   return firebaseApp;
 };
