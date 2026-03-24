@@ -107,8 +107,6 @@ const DefaultMainMenu: React.FC<{
   return (
     <MainMenu __fallback>
       <MainMenu.DefaultItems.NewCanvas />
-      <MainMenu.DefaultItems.ToggleToolbarVisibility />
-      <MainMenu.DefaultItems.ToggleExtraButtonsVisibility />
       <MainMenu.DefaultItems.LoadScene />
       <MainMenu.DefaultItems.SaveToActiveFile />
       {/* FIXME we should to test for this inside the item itself */}
@@ -315,44 +313,17 @@ const LayerUI = ({
   };
 
   const FileNameEditor = ({ baseName }: { baseName: string }) => {
-    const [draft, setDraft] = React.useState(baseName);
-    const inputRef = React.useRef<HTMLInputElement>(null);
-
-    React.useEffect(() => {
-      setDraft(baseName);
-    }, [baseName]);
-
-    const commit = () => {
-      const normalized = normalizeFileName(draft);
-      setAppState({ name: normalized });
-    };
-
-    const cancel = () => {
-      setDraft(baseName);
-    };
+    const savedFileName = appState.fileHandle?.name?.replace(/\.excalidraw$/i, "") || "";
 
     return (
-      <input
-        ref={inputRef}
-        className="app-filename-input dropdown-menu-button"
-        value={draft}
-        onChange={(event) => setDraft(event.target.value)}
-        spellCheck={false}
-        autoCorrect="off"
-        autoCapitalize="off"
-        autoComplete="off"
-        onBlur={commit}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            commit();
-          } else if (event.key === "Escape") {
-            event.preventDefault();
-            cancel();
-          }
-        }}
-        aria-label={t("labels.editFileName")}
-      />
+      <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+        <input
+          className="app-filename-input dropdown-menu-button"
+          value={savedFileName || baseName}
+          readOnly
+          aria-label={t("labels.editFileName")}
+        />
+      </div>
     );
   };
 

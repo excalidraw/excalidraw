@@ -45,9 +45,23 @@ import {
   hasStrokeWidth,
 } from "../scene";
 
-import { getFormValue } from "../actions/actionProperties";
+import {
+  getFormValue,
+  actionApplyTextSelectionBackground,
+  actionApplyTextSelectionColor,
+  actionApplyTextSelectionTag,
+  actionApplyTextSelectionUnderline,
+  actionToggleTextSelectionUnderline,
+  actionToggleTextSelectionBackground,
+  actionToggleTextSelectionTag,
+} from "../actions/actionProperties";
 
-import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
+import {
+  temporarilyDisableTextEditorBlur,
+  saveCaretPosition,
+  restoreCaretPosition,
+  useTextEditorFocus,
+} from "../hooks/useTextEditorFocus";
 
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
@@ -160,6 +174,41 @@ export const SelectedShapeActions = ({
   const targetElements = getTargetElements(elementsMap, appState);
   const setAppState = useExcalidrawSetAppState();
 
+  const applyTextSelectionDecoration = (
+    kind: "background" | "underline" | "color" | "tag",
+    color: string,
+  ) => {
+    if (!appState.editingTextElement) {
+      return;
+    }
+    temporarilyDisableTextEditorBlur();
+    const saved = saveCaretPosition();
+    const editor = document.querySelector(
+      ".excalidraw-wysiwyg",
+    ) as HTMLTextAreaElement | null;
+    if (!editor) {
+      return;
+    }
+    const start = editor.selectionStart ?? 0;
+    const end = editor.selectionEnd ?? 0;
+    if (start === end) {
+      restoreCaretPosition(saved);
+      return;
+    }
+    (app as any).actionManager.executeAction(
+      kind === "background"
+        ? actionToggleTextSelectionBackground
+        : kind === "underline"
+        ? actionToggleTextSelectionUnderline
+        : kind === "color"
+        ? actionApplyTextSelectionColor
+        : actionToggleTextSelectionTag,
+      "ui",
+      { start, end, color },
+    );
+    restoreCaretPosition(saved);
+  };
+
   const strokeColorControl =
     renderAction("changeStrokeColor") ??
     (() => (
@@ -189,7 +238,6 @@ export const SelectedShapeActions = ({
 
       return (
         <fieldset>
-          <legend>{t("labels.fontSize")}</legend>
           <div className="buttonList">
             <div className="font-size-control">
               <input
@@ -240,7 +288,10 @@ export const SelectedShapeActions = ({
             label={t("labels.textSelectionColor")}
             type="textSelectionColor"
             color={appState.textSelectionColor}
-            onChange={(color) => setAppState({ textSelectionColor: color })}
+            onChange={(color) => {
+              setAppState({ textSelectionColor: color });
+              applyTextSelectionDecoration("color", color);
+            }}
             elements={targetElements}
             appState={appState as AppState}
             updateData={(data?: any) => setAppState(data)}
@@ -252,7 +303,10 @@ export const SelectedShapeActions = ({
             label={t("labels.textSelectionTag")}
             type="textSelectionTag"
             color={appState.textSelectionTagColor}
-            onChange={(color) => setAppState({ textSelectionTagColor: color })}
+            onChange={(color) => {
+              setAppState({ textSelectionTagColor: color });
+              applyTextSelectionDecoration("tag", color);
+            }}
             elements={targetElements}
             appState={appState as AppState}
             updateData={(data?: any) => setAppState(data)}
@@ -264,9 +318,10 @@ export const SelectedShapeActions = ({
             label={t("labels.textSelectionUnderline")}
             type="textSelectionUnderline"
             color={appState.textSelectionUnderlineColor}
-            onChange={(color) =>
-              setAppState({ textSelectionUnderlineColor: color })
-            }
+            onChange={(color) => {
+              setAppState({ textSelectionUnderlineColor: color });
+              applyTextSelectionDecoration("underline", color);
+            }}
             elements={targetElements}
             appState={appState as AppState}
             updateData={(data?: any) => setAppState(data)}
@@ -278,9 +333,10 @@ export const SelectedShapeActions = ({
             label={t("labels.textSelectionBackground")}
             type="textSelectionBackground"
             color={appState.textSelectionBackgroundColor}
-            onChange={(color) =>
-              setAppState({ textSelectionBackgroundColor: color })
-            }
+            onChange={(color) => {
+              setAppState({ textSelectionBackgroundColor: color });
+              applyTextSelectionDecoration("background", color);
+            }}
             elements={targetElements}
             appState={appState as AppState}
             updateData={(data?: any) => setAppState(data)}

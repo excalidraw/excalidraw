@@ -453,10 +453,15 @@ export const createFile = (
   blob: File | Blob | ArrayBuffer,
   mimeType: string,
   name: string | undefined,
+  handle?: FileSystemFileHandle,
 ) => {
-  return new File([blob], name || "", {
+  const file = new File([blob], name || "", {
     type: mimeType,
   });
+  if (handle) {
+    (file as any).handle = handle;
+  }
+  return file;
 };
 
 const normalizedFileSymbol = Symbol("fileNormalized");
@@ -470,17 +475,16 @@ export const normalizeFile = async (file: File) => {
     return file;
   }
 
+  const handle = (file as any).handle as FileSystemFileHandle | undefined;
+
   if (file?.name?.endsWith(".excalidrawlib")) {
-    file = createFile(file, MIME_TYPES.excalidrawlib, file.name);
+    file = createFile(file, MIME_TYPES.excalidrawlib, file.name, handle);
   } else if (file?.name?.endsWith(".excalidraw")) {
-    file = createFile(file, MIME_TYPES.excalidraw, file.name);
+    file = createFile(file, MIME_TYPES.excalidraw, file.name, handle);
   } else if (!file.type || file.type?.startsWith("image/")) {
-    // when the file is an image, make sure the extension corresponds to the
-    // actual mimeType (this is an edge case, but happens - especially
-    // with AI generated images)
     const mimeType = await getActualMimeTypeFromImage(file);
     if (mimeType && mimeType !== file.type) {
-      file = createFile(file, mimeType, file.name);
+      file = createFile(file, mimeType, file.name, handle);
     }
   }
 

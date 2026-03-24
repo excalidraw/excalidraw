@@ -314,12 +314,6 @@ export const actionChangeStrokeColor = register<
       getNonDeletedElements(elements),
       appState,
     );
-    const isSummaryRootSelected = selected.some(
-      (el) =>
-        isTextElement(el) &&
-        (el.customData as any)?.summaryTool?.role === "summaryRoot",
-    );
-
     let nextElements: ExcalidrawElement[] = elements as any;
     if (value?.currentItemStrokeColor) {
       nextElements = changeProperty(
@@ -343,20 +337,69 @@ export const actionChangeStrokeColor = register<
           const prevDecorations = prevCustomData.textDecorations as
             | Record<string, any>
             | undefined;
+          const summaryTool = (prevCustomData.summaryTool ??
+            {}) as Record<string, any>;
+          const syncedRanges =
+            (summaryTool.syncedTextColorRanges as
+              | TextDecorationRange[]
+              | undefined) ?? [];
+          const normalizedSyncedRanges = syncedRanges
+            .map((r) => normalizeDecorationRange(r, textLength))
+            .filter((r): r is TextDecorationRange => !!r);
+
+          const subtractRanges = (
+            base: TextDecorationRange[],
+            blockers: TextDecorationRange[],
+          ) => {
+            let segments = base.map((r) => ({
+              start: r.start,
+              end: r.end,
+              color: r.color,
+            }));
+            for (const b of blockers) {
+              const next: TextDecorationRange[] = [];
+              const bStart = Math.min(b.start, b.end);
+              const bEnd = Math.max(b.start, b.end);
+              for (const s of segments) {
+                const sStart = Math.min(s.start, s.end);
+                const sEnd = Math.max(s.start, s.end);
+                if (bEnd <= sStart || bStart >= sEnd) {
+                  next.push(s);
+                  continue;
+                }
+                if (sStart < bStart) {
+                  next.push({ start: sStart, end: bStart, color: s.color });
+                }
+                if (bEnd < sEnd) {
+                  next.push({ start: bEnd, end: sEnd, color: s.color });
+                }
+              }
+              segments = next;
+            }
+            return segments;
+          };
+
+          const baseTextColors: TextDecorationRange[] =
+            textLength > 0
+              ? [
+                  {
+                    start: 0,
+                    end: textLength,
+                    color: value.currentItemStrokeColor,
+                  },
+                ]
+              : [];
+          const baseWithoutSynced = normalizedSyncedRanges.length
+            ? subtractRanges(baseTextColors, normalizedSyncedRanges)
+            : baseTextColors;
+          const nextTextColors = [
+            ...baseWithoutSynced,
+            ...normalizedSyncedRanges,
+          ];
 
           const nextDecorations: Record<string, any> = {
             ...(prevDecorations ?? {}),
-            ...(textLength > 0
-              ? {
-                  textColors: [
-                    {
-                      start: 0,
-                      end: textLength,
-                      color: value.currentItemStrokeColor,
-                    },
-                  ],
-                }
-              : {}),
+            ...(nextTextColors.length ? { textColors: nextTextColors } : {}),
           };
 
           if (textLength <= 0) {
@@ -384,7 +427,13 @@ export const actionChangeStrokeColor = register<
       ) as any;
     }
 
-    if (value?.currentItemStrokeColor && isSummaryRootSelected) {
+    const shouldSyncSummaryTool =
+      !!value?.currentItemStrokeColor &&
+      selected.some(
+        (el) => isTextElement(el) && !!(el.customData as any)?.summaryTool,
+      );
+
+    if (shouldSyncSummaryTool) {
       const elementsMap = new Map(
         nextElements
           .filter((el) => !el.isDeleted)
@@ -526,23 +575,12 @@ export const actionChangeStrokeColor = register<
           palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
           type="elementStroke"
           label={t("labels.stroke")}
-          color={getFormValue(
-            elements,
-            app,
-            (element) => element.strokeColor,
-            true,
-            (hasSelection) =>
-              !hasSelection ? appState.currentItemStrokeColor : null,
-          )}
+          color={appState.currentItemStrokeColor}
           onChange={(color) => updateData({ currentItemStrokeColor: color })}
           elements={elements}
           appState={appState}
           updateData={updateData}
         />
-        {renderTextSelectionDecorationSection("color")}
-        {renderTextSelectionDecorationSection("tag")}
-        {renderTextSelectionDecorationSection("underline")}
-        {renderTextSelectionDecorationSection("background")}
       </>
     );
   },
@@ -1152,6 +1190,72 @@ export const actionToggleTextSelectionUnderline = register<{
   },
 });
 
+export const actionToggleTextSelectionBackground = register<{
+  start: number;
+  end: number;
+  color: string;
+}>({
+  name: "toggleTextSelectionBackground",
+  label: "Toggle text selection background",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    const editingId = appState.editingTextElement?.id;
+    if (!editingId || !value) {
+      return false;
+    }
+
+    const nextElements = elements.map((el) => {
+      if (el.id !== editingId || !isTextElement(el)) {
+        return el;
+      }
+      return toggleTextDecoration(el, "highlights", {
+        start: value.start,
+        end: value.end,
+        color: value.color,
+      });
+    });
+
+    return {
+      elements: nextElements,
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+});
+
+export const actionToggleTextSelectionTag = register<{
+  start: number;
+  end: number;
+  color: string;
+}>({
+  name: "toggleTextSelectionTag",
+  label: "Toggle text selection tag",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    const editingId = appState.editingTextElement?.id;
+    if (!editingId || !value) {
+      return false;
+    }
+
+    const nextElements = elements.map((el) => {
+      if (el.id !== editingId || !isTextElement(el)) {
+        return el;
+      }
+      return toggleTextDecoration(el, "tags", {
+        start: value.start,
+        end: value.end,
+        color: value.color,
+      });
+    });
+
+    return {
+      elements: nextElements,
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+});
+
 export const actionChangeBackgroundColor = register<
   Pick<AppState, "currentItemBackgroundColor" | "viewBackgroundColor">
 >({
@@ -1570,7 +1674,6 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
 
       return (
         <fieldset>
-          <legend>{t("labels.fontSize")}</legend>
           <div className="buttonList">
             <div className="font-size-control">
               <input

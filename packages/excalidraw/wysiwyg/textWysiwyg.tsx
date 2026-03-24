@@ -68,6 +68,7 @@ import {
   actionZoomIn,
   actionZoomOut,
 } from "../actions/actionCanvas";
+import { extractSyncLineTagFromLine } from "../summaryTool/summaryTool";
 
 import type { ParsedDataTranferList } from "../clipboard";
 
@@ -257,6 +258,8 @@ export const textWysiwyg = ({
 
   let caretUpdateRaf: number | null = null;
   let keepCaretVisibleWhilePointerDown = false;
+  let lastSummaryLineNumber: number | null = null;
+  let lastSummarySelectionKey = "";
   let measuredCaretCache: {
     normalizedValue: string;
     font: string;
@@ -276,6 +279,71 @@ export const textWysiwyg = ({
     });
   };
 
+  const updateSummaryLineLinkSelection = (
+    updatedTextElement: ExcalidrawTextElement,
+    lineNumber: number,
+  ) => {
+    const summaryTool = (updatedTextElement.customData as any)?.summaryTool;
+    if (summaryTool?.role !== "summaryRoot") {
+      if (lastSummarySelectionKey) {
+        lastSummarySelectionKey = "";
+        lastSummaryLineNumber = null;
+        if (Object.keys(app.state.selectedTextLineLinkIds).length) {
+          app.setState({ selectedTextLineLinkIds: {} });
+        }
+      }
+      return;
+    }
+
+    if (lastSummaryLineNumber === lineNumber && lastSummarySelectionKey) {
+      return;
+    }
+
+    const rawLines = editable.value.replace(/\r\n?/g, "\n").split("\n");
+    const rawLine = rawLines[lineNumber - 1] ?? "";
+    const extracted = extractSyncLineTagFromLine(rawLine);
+    const tag = extracted.tag;
+    if (!tag) {
+      if (lastSummarySelectionKey) {
+        lastSummarySelectionKey = "";
+        lastSummaryLineNumber = null;
+        if (Object.keys(app.state.selectedTextLineLinkIds).length) {
+          app.setState({ selectedTextLineLinkIds: {} });
+        }
+      }
+      return;
+    }
+
+    const prefix = `summaryTool:${tag.listName}:${tag.lineId}:`;
+    const linkIds = app.state.textLineLinks
+      .filter((link) => String(link.id).startsWith(prefix))
+      .map((link) => String(link.id));
+
+    if (!linkIds.length) {
+      if (lastSummarySelectionKey) {
+        lastSummarySelectionKey = "";
+        lastSummaryLineNumber = null;
+        if (Object.keys(app.state.selectedTextLineLinkIds).length) {
+          app.setState({ selectedTextLineLinkIds: {} });
+        }
+      }
+      return;
+    }
+
+    const nextKey = linkIds.join("|");
+    if (nextKey === lastSummarySelectionKey) {
+      lastSummaryLineNumber = lineNumber;
+      return;
+    }
+
+    const selectedTextLineLinkIds = Object.fromEntries(
+      linkIds.map((id) => [id, true as const]),
+    ) as Record<string, true>;
+    lastSummarySelectionKey = nextKey;
+    lastSummaryLineNumber = lineNumber;
+    app.setState({ selectedTextLineLinkIds });
+  };
+
   const updateCaret = () => {
     if (document.activeElement !== editable) {
       if (keepCaretVisibleWhilePointerDown) {
@@ -289,6 +357,27 @@ export const textWysiwyg = ({
     if (!updatedTextElement || !isTextElement(updatedTextElement)) {
       caret.style.display = "none";
       return;
+    }
+
+    const summaryTool = (updatedTextElement.customData as any)?.summaryTool;
+    if (summaryTool?.role === "summaryRoot") {
+      const selectionStart = editable.selectionStart ?? 0;
+      const selectionEnd = editable.selectionEnd ?? selectionStart;
+      if (selectionStart === selectionEnd) {
+        const value = editable.value.replace(/\r\n?/g, "\n");
+        const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
+        const lineEndIdx = value.indexOf("\n", selectionStart);
+        const lineEnd = lineEndIdx === -1 ? value.length : lineEndIdx;
+        const line = value.slice(lineStart, lineEnd);
+        const tagIndex = line.indexOf("\u2063\u2063");
+        if (tagIndex >= 0) {
+          const absoluteTagStart = lineStart + tagIndex;
+          if (selectionStart > absoluteTagStart) {
+            editable.selectionStart = absoluteTagStart;
+            editable.selectionEnd = absoluteTagStart;
+          }
+        }
+      }
     }
 
     const lineHeightPx =
@@ -305,6 +394,10 @@ export const textWysiwyg = ({
       0,
       Math.min(textNodeValue.length, editable.selectionEnd ?? 0),
     );
+    const caretLineNumber = editable.value
+      .slice(0, caretIndex)
+      .split("\n").length;
+    updateSummaryLineLinkSelection(updatedTextElement, caretLineNumber);
 
     const overlayStyle = window.getComputedStyle(whitespaceOverlay);
     const transformStr = overlayStyle.transform;
@@ -1348,6 +1441,10 @@ export const textWysiwyg = ({
     };
 
     const preventEditIfSyncedLine = (event: Event) => {
+      const summaryTool = (element.customData as any)?.summaryTool;
+      if (summaryTool?.role === "summaryRoot") {
+        return;
+      }
       const syncTagPrefix = "\u2063\u2063";
       const selectionStart = editable.selectionStart ?? 0;
       const selectionEnd = editable.selectionEnd ?? selectionStart;
@@ -1367,6 +1464,7 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
+    const summaryTool = (element.customData as any)?.summaryTool;
     const syncTagPrefix = "\u2063\u2063";
     const selectionStart = editable.selectionStart ?? 0;
     const selectionEnd = editable.selectionEnd ?? selectionStart;
@@ -1383,6 +1481,7 @@ export const textWysiwyg = ({
 
     if (
       selectionIntersectsSyncedLine &&
+      summaryTool?.role !== "summaryRoot" &&
       !(
         (event.altKey &&
           !event[KEYS.CTRL_OR_CMD] &&
@@ -1876,6 +1975,14 @@ export const textWysiwyg = ({
     ) as ExcalidrawTextElement;
     if (!updateElement) {
       return;
+    }
+    const summaryTool = (updateElement.customData as any)?.summaryTool;
+    if (summaryTool?.role === "summaryRoot") {
+      lastSummarySelectionKey = "";
+      lastSummaryLineNumber = null;
+      if (Object.keys(app.state.selectedTextLineLinkIds).length) {
+        app.setState({ selectedTextLineLinkIds: {} });
+      }
     }
     const container = getContainerElement(
       updateElement,

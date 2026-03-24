@@ -129,6 +129,7 @@ body.excalidraw-cursor-resize * {
     position: absolute;
     inset: 0;
     pointer-events: none;
+    // 问题的根因是：文本框行号/虚线边框的 overlay 层级（z-index）高于 UI 层，所以即使 UI 背景不透明也会被覆盖显示。
     z-index: var(--zIndex-canvas);
   }
 
@@ -151,7 +152,7 @@ body.excalidraw-cursor-resize * {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    z-index: calc(var(--zIndex-wysiwyg) + 2);
+    z-index: var(--zIndex-wysiwyg);
     color: var(--text-box-decorations-color);
     opacity: var(--text-box-decorations-opacity);
     font-family: Cascadia, monospace, "Segoe UI Emoji";
@@ -580,6 +581,7 @@ body.excalidraw-cursor-resize * {
     > .selected-shape-actions {
       height: 100%;
       max-height: 100%;
+      
     }
 
     .selected-shape-actions {
@@ -694,6 +696,15 @@ body.excalidraw-cursor-resize * {
     width: 12.5rem;
     box-sizing: border-box;
     position: absolute;
+    background-color: var(--island-bg-color);
+    //浏览器支持的最大层级
+    z-index: 2147483647 !important;
+  }
+
+  .dropdown-menu-button,
+  .app-filename-input,
+  .selected-shape-actions {
+    background-color: var(--island-bg-color);
   }
 
   .dropdown-select {

@@ -26,8 +26,6 @@ export const AppMainMenu: React.FC<{
   return (
     <MainMenu>
       <MainMenu.DefaultItems.NewCanvas />
-      <MainMenu.DefaultItems.ToggleToolbarVisibility />
-      <MainMenu.DefaultItems.ToggleExtraButtonsVisibility />
       <MainMenu.DefaultItems.LoadScene />
       <MainMenu.DefaultItems.SaveToActiveFile />
       <MainMenu.DefaultItems.Export />

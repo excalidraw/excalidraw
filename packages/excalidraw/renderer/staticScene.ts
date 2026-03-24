@@ -76,8 +76,11 @@ const strokeGrid = (
 
   context.save();
 
-  const lineWidth = 1 / zoom.value;
-  const lineDash = [2 / zoom.value, 2 / zoom.value];
+  // const lineWidth = 1 / zoom.value; 原来的代码
+  //目前在画布中的网格会在高缩放下显得很细,低缩放下显得很粗,能否让网格按固定尺寸(相对于一个格子的宽度,网格线的宽度成比例)显示;
+  const lineWidth = (gridSize * 0.05);
+  // const lineDash = [2 / zoom.value, 2 / zoom.value];原来的代码
+  const lineDash = [2 , 2 ];
 
   // Offset rendering by 0.5 to ensure that 1px wide lines are crisp.
   // We only do this when zoomed to 100% because otherwise the offset is
@@ -386,11 +389,15 @@ const renderSummaryToolLabels = ({
   allElementsMap: NonDeletedSceneElementsMap;
 }) => {
   const zoom = appState.zoom.value || 1;
-  const fontSize = 12 / zoom;
-  const paddingX = 4 / zoom;
-  const paddingY = 2 / zoom;
-  const margin = 4 / zoom;
-
+  const fontSize = 12  ;
+  // summary.txt的字体大小/zoom
+  //在右键将画布中的某一个文本框设为summary.txt,这个文本框的顶部会出现红色的summary.txt标记;让这个标记为固定大小,不随缩放而改变;
+  const paddingX = 4 ;
+  //水平内边距/ zoom
+  const paddingY = 2 ;
+  //垂直内边距/ zoom
+  const margin = 4 ;
+  //外边距/ zoom
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 

@@ -117,9 +117,9 @@ export const getDefaultAppState = (): Omit<
     textLineLinks: [],
     textLineLinkDraft: null,
     zenModeEnabled: false,
-    isToolbarVisible: true,
-    areExtraButtonsVisible: true,
-    areUselessButtonsHidden: false,
+    isToolbarVisible: false,
+    areExtraButtonsVisible: false,
+    areUselessButtonsHidden: true,
     zoom: {
       value: 1 as NormalizedZoomValue,
     },

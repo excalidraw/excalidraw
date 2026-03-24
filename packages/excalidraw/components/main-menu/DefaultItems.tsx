@@ -131,58 +131,6 @@ export const NewCanvas = () => {
 };
 NewCanvas.displayName = "NewCanvas";
 
-export const ToggleToolbarVisibility = () => {
-  const { t } = useI18n();
-  const appState = useUIAppState();
-  const setAppState = useExcalidrawSetAppState();
-
-  const isVisible = appState.isToolbarVisible;
-
-  return (
-    <DropdownMenuItem
-      icon={isVisible ? eyeClosedIcon : eyeIcon}
-      onSelect={() => setAppState({ isToolbarVisible: !isVisible })}
-      data-testid="toggle-toolbar-visibility"
-      aria-label={
-        isVisible
-          ? t("buttons.hideToolbarShortcuts")
-          : t("buttons.showToolbarShortcuts")
-      }
-    >
-      {isVisible
-        ? t("buttons.hideToolbarShortcuts")
-        : t("buttons.showToolbarShortcuts")}
-    </DropdownMenuItem>
-  );
-};
-ToggleToolbarVisibility.displayName = "ToggleToolbarVisibility";
-
-export const ToggleExtraButtonsVisibility = () => {
-  const { t } = useI18n();
-  const appState = useUIAppState();
-  const setAppState = useExcalidrawSetAppState();
-
-  const areVisible = appState.areExtraButtonsVisible;
-
-  return (
-    <DropdownMenuItem
-      icon={areVisible ? eyeClosedIcon : eyeIcon}
-      onSelect={() => setAppState({ areExtraButtonsVisible: !areVisible })}
-      data-testid="toggle-extra-buttons-visibility"
-      aria-label={
-        areVisible
-          ? t("buttons.hideExtraButtons")
-          : t("buttons.showExtraButtons")
-      }
-    >
-      {areVisible
-        ? t("buttons.hideExtraButtons")
-        : t("buttons.showExtraButtons")}
-    </DropdownMenuItem>
-  );
-};
-ToggleExtraButtonsVisibility.displayName = "ToggleExtraButtonsVisibility";
-
 export const SaveToActiveFile = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();

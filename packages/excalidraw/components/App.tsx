@@ -4324,91 +4324,46 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: textElementProps.fontFamily,
     });
     const lineHeight = getLineHeight(textElementProps.fontFamily);
-    const [x1, , x2] = getVisibleSceneBounds(this.state);
-    // long texts should not go beyond 800 pixels in width nor should it go below 200 px
-    const maxTextWidth = Math.max(Math.min((x2 - x1) * 0.5, 800), 200);
-    const LINE_GAP = 10;
-    let currentY = y;
-
-    const lines = isPlainPaste ? [text] : text.split("\n");
-    const textElements = lines.reduce(
-      (acc: ExcalidrawTextElement[], line, idx) => {
-        const originalText = normalizeText(line).trim();
-        if (originalText.length) {
-          const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
-            x,
-            y: currentY,
-          });
-
-          let metrics = measureText(originalText, fontString, lineHeight);
-          const isTextUnwrapped = metrics.width > maxTextWidth;
-
-          const text = isTextUnwrapped
-            ? wrapText(originalText, fontString, maxTextWidth)
-            : originalText;
-
-          metrics = isTextUnwrapped
-            ? measureText(text, fontString, lineHeight)
-            : metrics;
-
-          const startX = x - metrics.width / 2;
-          const startY = currentY - metrics.height / 2;
-
-          const element = newTextElement({
-            ...textElementProps,
-            x: startX,
-            y: startY,
-            text,
-            originalText,
-            lineHeight,
-            autoResize: !isTextUnwrapped,
-            frameId: topLayerFrame ? topLayerFrame.id : null,
-          });
-          acc.push(element);
-          currentY += element.height + LINE_GAP;
-        } else {
-          const prevLine = lines[idx - 1]?.trim();
-          // add paragraph only if previous line was not empty, IOW don't add
-          // more than one empty line
-          if (prevLine) {
-            currentY +=
-              getLineHeightInPx(textElementProps.fontSize, lineHeight) +
-              LINE_GAP;
-          }
-        }
-
-        return acc;
-      },
-      [],
+    const rawMaxWidth = Number(
+      localStorage.getItem("excalidraw.textMaxWidth"),
     );
+    const textMaxWidth =
+      Number.isFinite(rawMaxWidth) && rawMaxWidth > 0 ? rawMaxWidth : 300;
 
-    if (textElements.length === 0) {
+    const originalText = normalizeText(text).trim();
+    if (!originalText.length) {
       return;
     }
 
-    this.scene.insertElements(textElements);
-    this.store.scheduleCapture();
-    this.setState({
-      selectedElementIds: makeNextSelectedElementIds(
-        Object.fromEntries(textElements.map((el) => [el.id, true])),
-        this.state,
-      ),
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({ x, y });
+
+    let metrics = measureText(originalText, fontString, lineHeight);
+    const isTextUnwrapped = metrics.width > textMaxWidth;
+
+    const wrappedText = isTextUnwrapped
+      ? wrapText(originalText, fontString, textMaxWidth)
+      : originalText;
+
+    metrics = isTextUnwrapped
+      ? measureText(wrappedText, fontString, lineHeight)
+      : metrics;
+
+    const textElement = newTextElement({
+      ...textElementProps,
+      text: wrappedText,
+      originalText,
+      lineHeight,
+      autoResize: !isTextUnwrapped,
+      frameId: topLayerFrame ? topLayerFrame.id : null,
     });
 
-    if (
-      !isPlainPaste &&
-      textElements.length > 1 &&
-      PLAIN_PASTE_TOAST_SHOWN === false &&
-      this.editorInterface.formFactor !== "phone"
-    ) {
-      this.setToast({
-        message: t("toast.pasteAsSingleElement", {
-          shortcut: getShortcutKey("CtrlOrCmd+Shift+V"),
-        }),
-        duration: 5000,
-      });
-      PLAIN_PASTE_TOAST_SHOWN = true;
-    }
+    this.scene.insertElements([textElement]);
+
+    this.handleTextWysiwyg(textElement, {
+      isExistingElement: false,
+    });
+
+    this.store.scheduleCapture();
   }
 
   setAppState: React.Component<any, AppState>["setState"] = (

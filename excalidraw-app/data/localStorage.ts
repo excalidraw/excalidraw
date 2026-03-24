@@ -2,11 +2,31 @@ import {
   clearAppStateForLocalStorage,
   getDefaultAppState,
 } from "@excalidraw/excalidraw/appState";
+import { FONT_FAMILY, DEFAULT_FONT_FAMILY } from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppState } from "@excalidraw/excalidraw/types";
+import type { FontFamilyValues } from "@excalidraw/element/types";
 
 import { STORAGE_KEYS } from "../app_constants";
+
+export const getDefaultFontFamilyFromLocalStorage =
+  (): FontFamilyValues | null => {
+    try {
+      const stored = localStorage.getItem(
+        STORAGE_KEYS.LOCAL_STORAGE_DEFAULT_FONT_FAMILY,
+      );
+      if (stored) {
+        const parsed = parseInt(stored, 10);
+        if (!isNaN(parsed) && parsed in FONT_FAMILY) {
+          return parsed as FontFamilyValues;
+        }
+      }
+    } catch (error) {
+      // ignore
+    }
+    return null;
+  };
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {

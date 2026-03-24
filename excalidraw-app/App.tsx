@@ -56,6 +56,7 @@ import {
 } from "@excalidraw/excalidraw/data/restore";
 import { newElementWith } from "@excalidraw/element";
 import { isInitializedImageElement } from "@excalidraw/element";
+import { FONT_FAMILY } from "@excalidraw/common";
 import clsx from "clsx";
 import {
   parseLibraryTokensFromUrl,
@@ -120,6 +121,7 @@ import { FileStatusStore } from "./data/fileStatusStore";
 import {
   importFromLocalStorage,
   importUsernameFromLocalStorage,
+  getDefaultFontFamilyFromLocalStorage,
 } from "./data/localStorage";
 
 import { loadFilesFromFirebase } from "./data/firebase";
@@ -231,19 +233,10 @@ const initializeScene = async (opts: {
 
   const localDataState = importFromLocalStorage();
 
-  let scene: Omit<
-    RestoredDataState,
-    // we're not storing files in the scene database/localStorage, and instead
-    // fetch them async from a different store
-    "files"
-  > & {
-    scrollToContent?: boolean;
-  } = {
-    elements: restoreElements(localDataState?.elements, null, {
-      repairBindings: true,
-      deleteInvisibleElements: true,
-    }),
-    appState: restoreAppState(localDataState?.appState, null),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let scene: any = localDataState || {
+    elements: [],
+    appState: null,
   };
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
@@ -359,6 +352,14 @@ const initializeScene = async (opts: {
       key: roomLinkData.roomKey,
     };
   } else if (scene) {
+    const defaultFontFamily = getDefaultFontFamilyFromLocalStorage();
+    if (defaultFontFamily !== null && scene.appState) {
+      scene.appState = {
+        ...scene.appState,
+        currentItemFontFamily: defaultFontFamily,
+      };
+    }
+
     return isExternalScene && jsonBackendMatch
       ? {
           scene,
@@ -569,54 +570,14 @@ const ExcalidrawWrapper = () => {
         !document.hidden &&
         ((collabAPI && !collabAPI.isCollaborating()) || isCollabDisabled)
       ) {
-        // don't sync if local state is newer or identical to browser state
-        if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
-          const localDataState = importFromLocalStorage();
-          const username = importUsernameFromLocalStorage();
-          setLangCode(getPreferredLanguage());
-          excalidrawAPI.updateScene({
-            ...localDataState,
-            captureUpdate: CaptureUpdateAction.NEVER,
-          });
-          LibraryIndexedDBAdapter.load().then((data) => {
-            if (data) {
-              excalidrawAPI.updateLibrary({
-                libraryItems: data.libraryItems,
-              });
-            }
-          });
-          collabAPI?.setUsername(username || "");
-        }
-
-        if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_FILES)) {
-          const elements = excalidrawAPI.getSceneElementsIncludingDeleted();
-          const currFiles = excalidrawAPI.getFiles();
-          const fileIds =
-            elements?.reduce((acc, element) => {
-              if (
-                isInitializedImageElement(element) &&
-                // only load and update images that aren't already loaded
-                !currFiles[element.fileId]
-              ) {
-                return acc.concat(element.fileId);
-              }
-              return acc;
-            }, [] as FileId[]) || [];
-          if (fileIds.length) {
-            LocalData.fileStorage
-              .getFiles(fileIds)
-              .then(({ loadedFiles, erroredFiles }) => {
-                if (loadedFiles.length) {
-                  excalidrawAPI.addFiles(loadedFiles);
-                }
-                updateStaleImageStatuses({
-                  excalidrawAPI,
-                  erroredFiles,
-                  elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
-                });
-              });
+        LibraryIndexedDBAdapter.load().then((data) => {
+          if (data) {
+            excalidrawAPI.updateLibrary({
+              libraryItems: data.libraryItems,
+            });
           }
-        }
+        });
+        collabAPI?.setUsername(importUsernameFromLocalStorage() || "");
       }
     }, SYNC_BROWSER_TABS_TIMEOUT);
 
@@ -1240,6 +1201,55 @@ const ExcalidrawWrapper = () => {
                 setAppTheme(
                   editorTheme === THEME.DARK ? THEME.LIGHT : THEME.DARK,
                 );
+              },
+            },
+            {
+              label: "Set default font",
+              category: DEFAULT_CATEGORIES.app,
+              keywords: ["font", "default", "typography", "set"],
+              perform: () => {
+                const setDefaultFont = (fontFamily: number) => {
+                  try {
+                    localStorage.setItem(
+                      STORAGE_KEYS.LOCAL_STORAGE_DEFAULT_FONT_FAMILY,
+                      fontFamily.toString(),
+                    );
+                  } catch (error) {
+                    // ignore
+                  }
+                  if (excalidrawAPI) {
+                    excalidrawAPI.updateScene({
+                      appState: {
+                        currentItemFontFamily: fontFamily,
+                      },
+                    });
+                  }
+                };
+
+                const currentFont = excalidrawAPI?.getAppState().currentItemFontFamily;
+                const fonts = Object.entries(FONT_FAMILY)
+                  .filter(([key]) => isNaN(parseInt(key, 10)))
+                  .map(([name, value]) => ({
+                    name,
+                    value: value as number,
+                    isCurrent: value === currentFont,
+                  }));
+
+                if (typeof window !== "undefined" && (window as any).prompt) {
+                  const fontList = fonts
+                    .map((f) => `${f.name} (${f.isCurrent ? "current" : ""})`)
+                    .join("\n");
+                  const selectedName = (window as any).prompt(
+                    `Select default font:\n${fontList}\n\nEnter font name:`,
+                    fonts.find((f) => f.isCurrent)?.name || "",
+                  );
+                  if (selectedName) {
+                    const selected = fonts.find((f) => f.name === selectedName);
+                    if (selected) {
+                      setDefaultFont(selected.value);
+                    }
+                  }
+                }
               },
             },
             {

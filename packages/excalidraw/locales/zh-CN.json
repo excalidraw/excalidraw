@@ -14,7 +14,7 @@
     "copyTextBatch": "批量复制文本",
     "copyBatchWithFormat": "批量复制带格式",
     "editFileName": "修改文件名",
-    "textSelectionDecorationsHint": "",
+    "textSelectionDecorationsHint": "装饰",
     "textSelectionUnderline": "划线",
     "textSelectionBackground": "背景",
     "textSelectionColor": "字色",

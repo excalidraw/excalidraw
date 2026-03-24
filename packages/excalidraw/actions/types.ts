@@ -72,6 +72,8 @@ export type ActionName =
   | "applyTextSelectionTag"
   | "applyTextSelectionUnderline"
   | "toggleTextSelectionUnderline"
+  | "toggleTextSelectionBackground"
+  | "toggleTextSelectionTag"
   | "changeBackgroundColor"
   | "changeFillStyle"
   | "changeStrokeWidth"

@@ -177,48 +177,95 @@ const replaceBlock = (
   ];
 };
 
-const getEditableSyncLineTextsFromSummaryBlock = (contentLines: string[]) => {
-  const syncLineTexts: string[] = [];
+const getEditableSyncLinesFromSummaryBlock = (
+  listName: string,
+  contentLines: string[],
+) => {
+  const syncLines: Array<{
+    text: string;
+    lineId: string | null;
+    order: number;
+  }> = [];
+  let order = 0;
+  const alphabetSet = new Set(SYNC_LINE_TAG_ALPHABET);
+  const extractTagFromSuffix = (rawLine: string) => {
+    let idx = rawLine.length;
+    while (idx > 0 && alphabetSet.has(rawLine[idx - 1] as any)) {
+      idx -= 1;
+    }
+    if (idx === rawLine.length) {
+      return null;
+    }
+    const suffix = rawLine.slice(idx);
+    if (suffix.length % 4 !== 0) {
+      return null;
+    }
+    const payload = decodeSyncLineTagPayload(suffix);
+    if (!payload) {
+      return null;
+    }
+    const [payloadListName, lineId] = payload.split("|");
+    if (!payloadListName || !lineId || payloadListName !== listName) {
+      return null;
+    }
+    return { lineId, visibleLine: rawLine.slice(0, idx) };
+  };
   for (const raw of contentLines) {
     if (raw.includes("\u2063\u2064")) {
       continue;
     }
-    const idxSync = raw.indexOf("\u2063\u2063");
-    const idxComment = raw.indexOf("\u2063\u2064");
-    const idx =
-      idxSync >= 0 && idxComment >= 0
-        ? Math.min(idxSync, idxComment)
-        : idxSync >= 0
-        ? idxSync
-        : idxComment;
-    const visible = idx >= 0 ? raw.slice(0, idx) : raw;
-    const trimmed = visible.trim();
+    const extracted = extractSyncLineTagFromLine(raw);
+    const fallback = extracted.tag ? null : extractTagFromSuffix(raw);
+    const visibleLine = fallback?.visibleLine ?? extracted.visibleLine;
+    const trimmed = visibleLine.trim();
+    const lineId =
+      extracted.tag && extracted.tag.listName === listName
+        ? extracted.tag.lineId
+        : fallback?.lineId ?? null;
     if (!trimmed) {
+      if (lineId) {
+        syncLines.push({ text: "", lineId, order });
+        order += 1;
+      }
       continue;
     }
     if (trimmed.startsWith("//")) {
       continue;
     }
-    syncLineTexts.push(trimmed);
+    syncLines.push({ text: trimmed, lineId, order });
+    order += 1;
   }
-  return syncLineTexts;
+  return syncLines;
 };
 
 const reconcileListLineIds = (
   prevLines: Array<{ id: string; text: string }> | undefined,
-  nextTexts: string[],
+  nextLines: Array<{ text: string; lineId: string | null; order: number }>,
 ) => {
   const queueByText = new Map<string, string[]>();
+  const prevById = new Map<string, { id: string; text: string }>();
   for (const line of prevLines ?? []) {
     const q = queueByText.get(line.text) ?? [];
     q.push(line.id);
     queueByText.set(line.text, q);
+    prevById.set(line.id, line);
   }
+  const usedIds = new Set<string>();
 
-  return nextTexts.map((text) => {
-    const q = queueByText.get(text);
+  return nextLines.map((line) => {
+    if (line.lineId && prevById.has(line.lineId) && !usedIds.has(line.lineId)) {
+      usedIds.add(line.lineId);
+      return { id: line.lineId, text: line.text };
+    }
+    const prevByOrder = prevLines?.[line.order];
+    if (prevByOrder && !usedIds.has(prevByOrder.id)) {
+      usedIds.add(prevByOrder.id);
+      return { id: prevByOrder.id, text: line.text };
+    }
+    const q = queueByText.get(line.text);
     const id = q && q.length ? q.shift()! : randomId();
-    return { id, text };
+    usedIds.add(id);
+    return { id, text: line.text };
   });
 };
 
@@ -232,11 +279,12 @@ const buildOrUpdateModelOnSummaryRoot = (
   const nextLists: SummaryToolModel["lists"] = { ...prevModel.lists };
 
   for (const block of blocks) {
-    const nextTexts = getEditableSyncLineTextsFromSummaryBlock(
+    const nextLines = getEditableSyncLinesFromSummaryBlock(
+      block.name,
       block.contentLines,
     );
     const prevLines = prevModel.lists[block.name]?.lines;
-    const lines = reconcileListLineIds(prevLines, nextTexts);
+    const lines = reconcileListLineIds(prevLines, nextLines);
     const prevDisplay = prevModel.lists[block.name]?.display;
     nextLists[block.name] = {
       lines,
@@ -364,7 +412,7 @@ const decodeSyncLineTagPayload = (encoded: string) => {
 const decodeCommentLineTagPayload = (encoded: string) =>
   decodeSyncLineTagPayload(encoded);
 
-const extractSyncLineTagFromLine = (rawLine: string) => {
+export const extractSyncLineTagFromLine = (rawLine: string) => {
   const idx = rawLine.indexOf(SYNC_LINE_TAG_PREFIX);
   if (idx < 0) {
     return { visibleLine: rawLine, tag: null } as ExtractedSyncLineTag;
@@ -564,6 +612,16 @@ const setManagedSyncedLineTextColors = ({
   summaryRoot: ExcalidrawTextElement;
   model: SummaryToolModel;
 }) => {
+  console.log('🔍 setManagedSyncedLineTextColors 调试信息');
+  console.log('当前元素ID:', element.id);
+  console.log('Summary根节点ID:', summaryRoot.id);
+  console.log('是否为Summary根节点:', element.id === summaryRoot.id);
+  console.log('元素文本预览:', element.text?.substring(0, 100));
+  console.log('Summary根节点strokeColor:', summaryRoot.strokeColor);
+  
+  const isSummaryRoot = element.id === summaryRoot.id;
+  const summaryBaseFill = summaryRoot.strokeColor;
+  
   const nextText = normalizeKey(element.text);
   const elementLines = nextText.split("\n");
   const elementLineStartIndices: number[] = [];
@@ -591,7 +649,6 @@ const setManagedSyncedLineTextColors = ({
   const summaryDecorations = getTextDecorations(summaryRoot) ?? {};
   const summaryTextColors =
     (summaryDecorations.textColors as TextDecorationRange[] | undefined) ?? [];
-  const summaryBaseFill = summaryRoot.strokeColor;
   const getSummaryColorAtIndex = (index: number) => {
     let color: string | null = null;
     for (const r of summaryTextColors) {
@@ -603,6 +660,119 @@ const setManagedSyncedLineTextColors = ({
     }
     return color ?? summaryBaseFill;
   };
+  
+  if (!isSummaryRoot) {
+    console.log('🔒 强制颜色锁定 - 使用summary根节点颜色:', summaryBaseFill);
+
+    const enforcedSyncedRanges: TextDecorationRange[] = [];
+    const elementBlocks = parseSynclists(nextText);
+    
+    for (const block of elementBlocks) {
+      const list = model.lists[block.name];
+      if (!list) continue;
+      
+      const allowed = new Set(list.lines.map((l) => l.text));
+      const queueByText = buildLineIdQueueByText(list.lines);
+      
+      for (let i = 0; i < block.contentLines.length; i++) {
+        const raw = block.contentLines[i] ?? "";
+        const extracted = extractSyncLineTagFromLine(raw);
+        const visibleTrimmed = extracted.visibleLine.trim();
+        
+        if (!allowed.has(visibleTrimmed) || !visibleTrimmed || visibleTrimmed.startsWith("//")) {
+          continue;
+        }
+        
+        const lineId = extracted.tag && extracted.tag.listName === block.name
+          ? extracted.tag.lineId
+          : (() => {
+              const q = queueByText.get(visibleTrimmed);
+              return q && q.length ? q.shift()! : null;
+            })();
+            
+        if (!lineId) continue;
+        
+        const absLineIndex = block.startLine + 1 + i;
+        const lineStart = elementLineStartIndices[absLineIndex];
+        if (lineStart === undefined) continue;
+        
+        const end = lineStart + extracted.visibleLine.length;
+        if (end <= lineStart) continue;
+        
+        enforcedSyncedRanges.push({
+          start: lineStart,
+          end,
+          color: summaryBaseFill,
+        });
+        
+        console.log(`📍 同步行颜色设置: 行${i}, 颜色:${summaryBaseFill}, 文本:"${visibleTrimmed}"`);
+      }
+    }
+    
+    const prevCustomData = (element.customData ?? {}) as Record<string, any>;
+    const prevDecorations = getTextDecorations(element) ?? {};
+    const prevTextColors =
+      (prevDecorations.textColors as TextDecorationRange[] | undefined) ?? [];
+    const prevSummaryTool = (prevCustomData.summaryTool ??
+      {}) as SummaryToolCustomData;
+    const prevManaged = prevSummaryTool.syncedTextColorRanges ?? [];
+
+    const rangesOverlap = (
+      a: { start: number; end: number },
+      b: { start: number; end: number },
+    ) => {
+      const aStart = Math.min(a.start, a.end);
+      const aEnd = Math.max(a.start, a.end);
+      const bStart = Math.min(b.start, b.end);
+      const bEnd = Math.max(b.start, b.end);
+      return aStart < bEnd && bStart < aEnd;
+    };
+
+    const filteredTextColors = prevTextColors.filter(
+      (r) =>
+        !prevManaged.some(
+          (m) => m.start === r.start && m.end === r.end && m.color === r.color,
+        ),
+    );
+
+    const filteredTextColorsWithoutSynced = enforcedSyncedRanges.length
+      ? filteredTextColors.filter(
+          (r) => !enforcedSyncedRanges.some((s) => rangesOverlap(r, s)),
+        )
+      : filteredTextColors;
+
+    const nextTextColors = [
+      ...filteredTextColorsWithoutSynced,
+      ...enforcedSyncedRanges,
+    ];
+    const nextDecorations = {
+      ...prevDecorations,
+      ...(nextTextColors.length ? { textColors: nextTextColors } : {}),
+    } as Record<string, any>;
+    
+    if (!nextTextColors.length) {
+      delete nextDecorations.textColors;
+    }
+    
+    const nextSummaryTool: SummaryToolCustomData = {
+      ...prevSummaryTool,
+      syncedTextColorRanges: enforcedSyncedRanges,
+      lastStableSyncedTextColorAt: Date.now(),
+      syncedLineColorByKey: {},
+    };
+    
+    console.log('✅ 颜色锁定完成 - 应用了', enforcedSyncedRanges.length, '个颜色范围');
+    
+    return newElementWith(element, {
+      customData: {
+        ...prevCustomData,
+        textDecorations: Object.keys(nextDecorations).length ? nextDecorations : undefined,
+        summaryTool: nextSummaryTool,
+      },
+    }) as ExcalidrawTextElement;
+  }
+  
+  console.log('📋 处理summary根节点 - 保持原有逻辑');
 
   const summaryColorByListAndLineId = new Map<string, Map<string, string>>();
   const summaryBlocks = parseSynclists(summaryRoot.text);
@@ -880,6 +1050,17 @@ const rebuildSynclistBlockInTarget = ({
   const presentIds = new Set(presentIdsInOrder);
   const missingIds = modelIdsInOrder.filter((id) => !presentIds.has(id));
 
+  for (const anchor of anchors) {
+    const line = modelById.get(anchor.lineId);
+    if (!line) {
+      continue;
+    }
+    nextContentLines[anchor.index] = `${line.text}${encodeSyncLineTag(
+      listName,
+      line.id,
+    )}`;
+  }
+
   if (!presentIdsInOrder.length) {
     nextContentLines = [
       ...modelLines.map((l) => `${l.text}${encodeSyncLineTag(listName, l.id)}`),
@@ -959,7 +1140,7 @@ const rebuildSynclistBlockInSummaryRoot = ({
   };
 
   for (const line of modelLines) {
-    nextContentLines.push(line.text);
+    nextContentLines.push(`${line.text}${encodeSyncLineTag(listName, line.id)}`);
     summaryLineNumberByLineId[line.id] = bumpLine();
 
     const groups = commentGroupsByLineId[line.id] ?? [];
