@@ -8202,6 +8202,7 @@ class App extends React.Component<AppProps, AppState> {
         allHitElements: [],
         wasAddedToSelection: false,
         hasBeenDuplicated: false,
+        altKeyDragStarted: false,
         hasHitCommonBoundingBoxOfSelectedElements:
           this.isHittingCommonBoundingBoxOfSelectedElements(
             origin,
@@ -9759,6 +9760,9 @@ class App extends React.Component<AppProps, AppState> {
 
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
+        if (!pointerDownState.drag.hasOccurred && event.altKey) {
+          pointerDownState.hit.altKeyDragStarted = true;
+        }
         pointerDownState.drag.hasOccurred = true;
 
         // prevent immediate dragging during lasso selection to avoid element displacement
@@ -9958,7 +9962,13 @@ class App extends React.Component<AppProps, AppState> {
           });
 
           // We duplicate the selected element if alt is pressed on pointer move
-          if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
+          // Only allow duplication if alt was held when dragging first started,
+          // to prevent accidental duplication when using Alt+Tab to switch windows (#8508)
+          if (
+            event.altKey &&
+            !pointerDownState.hit.hasBeenDuplicated &&
+            pointerDownState.hit.altKeyDragStarted
+          ) {
             // Move the currently selected elements to the top of the z index stack, and
             // put the duplicates where the selected elements used to be.
             // (the origin point where the dragging started)

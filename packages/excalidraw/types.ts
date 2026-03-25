@@ -866,6 +866,9 @@ export type PointerDownState = Readonly<{
     // Whether selected element(s) were duplicated, might change during the
     // pointer interaction
     hasBeenDuplicated: boolean;
+    // Whether alt key was held when drag first started, used to prevent
+    // accidental duplication when using Alt+Tab to switch windows (#8508)
+    altKeyDragStarted: boolean;
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
   };
   withCmdOrCtrl: boolean;
