@@ -28,6 +28,7 @@ import {
 import type { AppState, DataURL, LibraryItem } from "../types";
 
 import type { FileSystemHandle } from "browser-fs-access";
+import type { SchemaMigrationRegistry } from "./schema";
 import type { ImportedLibraryData } from "./types";
 
 const parseFileContents = async (blob: Blob | File): Promise<string> => {
@@ -141,6 +142,7 @@ export const loadSceneOrLibraryFromBlob = async (
   localElements: readonly ExcalidrawElement[] | null,
   /** FileSystemHandle. Defaults to `blob.handle` if defined, otherwise null. */
   fileHandle?: FileSystemHandle | null,
+  schemaMigrationRegistry?: SchemaMigrationRegistry,
 ) => {
   const contents = await parseFileContents(blob);
   let data;
@@ -163,6 +165,7 @@ export const loadSceneOrLibraryFromBlob = async (
           elements: restoreElements(data.elements, localElements, {
             repairBindings: true,
             deleteInvisibleElements: true,
+            schemaMigrationRegistry,
           }),
           appState: restoreAppState(
             {
@@ -200,12 +203,14 @@ export const loadFromBlob = async (
   localElements: readonly ExcalidrawElement[] | null,
   /** FileSystemHandle. Defaults to `blob.handle` if defined, otherwise null. */
   fileHandle?: FileSystemHandle | null,
+  schemaMigrationRegistry?: SchemaMigrationRegistry,
 ) => {
   const ret = await loadSceneOrLibraryFromBlob(
     blob,
     localAppState,
     localElements,
     fileHandle,
+    schemaMigrationRegistry,
   );
   if (ret.type !== MIME_TYPES.excalidraw) {
     throw new Error("Error: invalid file");
@@ -216,20 +221,28 @@ export const loadFromBlob = async (
 export const parseLibraryJSON = (
   json: string,
   defaultStatus: LibraryItem["status"] = "unpublished",
+  schemaMigrationRegistry?: SchemaMigrationRegistry,
 ) => {
   const data: ImportedLibraryData | undefined = JSON.parse(json);
   if (!isValidLibrary(data)) {
     throw new Error("Invalid library");
   }
   const libraryItems = data.libraryItems || data.library;
-  return restoreLibraryItems(libraryItems, defaultStatus);
+  return restoreLibraryItems(libraryItems, defaultStatus, {
+    schemaMigrationRegistry,
+  });
 };
 
 export const loadLibraryFromBlob = async (
   blob: Blob,
   defaultStatus: LibraryItem["status"] = "unpublished",
+  schemaMigrationRegistry?: SchemaMigrationRegistry,
 ) => {
-  return parseLibraryJSON(await parseFileContents(blob), defaultStatus);
+  return parseLibraryJSON(
+    await parseFileContents(blob),
+    defaultStatus,
+    schemaMigrationRegistry,
+  );
 };
 
 export const canvasToBlob = async (

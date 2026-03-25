@@ -4,6 +4,8 @@ import { API } from "../tests/helpers/api";
 
 import {
   CORE_FRAME_SCHEMA_TRACK,
+  createSchemaMigrationRegistry,
+  type SchemaPlugin,
   type SchemaMigration,
   CORE_SUPPORTED_TRACKS,
   migrateElements,
@@ -11,6 +13,7 @@ import {
   SCHEMA_INITIAL_TRACK_VERSION,
   SCHEMA_MIGRATIONS,
   validateSchemaMigrations,
+  validateSchemaPlugins,
 } from "./schema";
 
 describe("schema migration", () => {
@@ -183,6 +186,42 @@ describe("schema migration", () => {
     );
   });
 
+  it("should reject invalid plugin metadata", () => {
+    const errors = validateSchemaPlugins([
+      {
+        id: "",
+        migrations: [],
+      },
+      {
+        id: "dup",
+        migrations: [],
+      },
+      {
+        id: "dup",
+        migrations: [],
+      },
+      {
+        id: "core-overwrite",
+        migrations: [
+          {
+            id: "bad.core.migration",
+            namespace: "core",
+            track: CORE_FRAME_SCHEMA_TRACK,
+            toVersion: 2,
+            title: "bad",
+            description: "bad",
+            targetTypes: ["frame"],
+            apply: (element) => element,
+          },
+        ],
+      },
+    ]);
+
+    expect(errors.join("\n")).toContain("Schema plugin id must be non-empty");
+    expect(errors.join("\n")).toContain("Duplicate schema plugin id found");
+    expect(errors.join("\n")).toContain("cannot declare core migrations");
+  });
+
   it("should not depend on temporary fields during migration", () => {
     const frame = {
       ...API.createElement({
@@ -295,5 +334,44 @@ describe("schema migration", () => {
       SCHEMA_INITIAL_TRACK_VERSION,
     );
     expect(migrated[0].schemaState.tracks["host.myapp.card"]).toBe(4);
+  });
+
+  it("should not run plugin migrations unless plugins are provided", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      backgroundColor: "#ffd8a8",
+    });
+    const plugin: SchemaPlugin = {
+      id: "myapp",
+      migrations: [
+        {
+          id: "host.myapp.rect.normalize.v2",
+          namespace: "host.myapp",
+          track: "host.myapp.rectangle",
+          toVersion: 2,
+          title: "normalize rect background",
+          description: "plugin migration for testing",
+          targetTypes: ["rectangle"],
+          apply: (element) =>
+            element.type === "rectangle"
+              ? { ...element, backgroundColor: "#12b886" }
+              : element,
+        },
+      ],
+    };
+
+    const migratedWithoutPlugin = migrateElements([rect])!;
+    const migratedWithPlugin = migrateElements([rect], {
+      schemaMigrationRegistry: createSchemaMigrationRegistry([plugin]),
+    })!;
+
+    expect(migratedWithoutPlugin[0].backgroundColor).toBe("#ffd8a8");
+    expect(
+      migratedWithoutPlugin[0].schemaState.tracks["host.myapp.rectangle"],
+    ).toBe(undefined);
+    expect(migratedWithPlugin[0].backgroundColor).toBe("#12b886");
+    expect(
+      migratedWithPlugin[0].schemaState.tracks["host.myapp.rectangle"],
+    ).toBe(2);
   });
 });

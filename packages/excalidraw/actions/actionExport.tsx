@@ -271,7 +271,11 @@ export const actionLoadScene = register({
         elements: loadedElements,
         appState: loadedAppState,
         files,
-      } = await loadFromJSON(appState, elements);
+      } = await loadFromJSON(
+        appState,
+        elements,
+        app.getSchemaMigrationRegistry(),
+      );
       return {
         elements: loadedElements,
         appState: loadedAppState,

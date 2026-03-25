@@ -17,11 +17,16 @@ export {
 export type { SchemaNamespace, SchemaTrack };
 
 /**
- * Schema migration flow (per element):
+ * Schema migration flow:
+ * 0) Compile schema config from core migrations + optional host plugins.
+ *    - validate plugin metadata
+ *    - validate migration ordering/metadata
+ *    - derive per-track supported versions for this registry
  * 1) Normalize element.schemaState.tracks (invalid/missing -> initial track version).
- * 2) Iterate declared migrations in order.
- * 3) For matching element types, apply only forward migrations supported by current app.
- * 4) Persist migrated track versions back onto the element.
+ * 2) Iterate compiled migrations in declaration order.
+ * 3) For matching element types, apply only forward migrations that are
+ *    supported by the current registry config (never re-run, never downgrade).
+ * 4) Stamp migrated track versions back onto each element.
  */
 /** One migration step for a single track version bump. */
 export type SchemaMigration = {
@@ -41,6 +46,27 @@ export type SchemaMigration = {
   /** Pure transform for a single element. */
   apply: (element: ExcalidrawElement) => ExcalidrawElement;
 };
+
+/**
+ * Optional host-provided migration bundle.
+ * Plugins are additive and may only declare host namespace migrations.
+ */
+export type SchemaPlugin = {
+  /** Stable plugin id for diagnostics. */
+  id: string;
+  /** Host migration steps merged with core migrations into one registry. */
+  migrations: readonly SchemaMigration[];
+};
+
+/** Default plugin registry (intentionally empty in core). */
+export const SCHEMA_PLUGINS: readonly SchemaPlugin[] = [];
+
+export type SchemaMigrationRegistry = Readonly<{
+  /** Fully validated core + host migrations used for this run. */
+  migrations: readonly SchemaMigration[];
+  /** Latest supported version for each known track in this run. */
+  supportedTrackVersions: Readonly<Record<string, number>>;
+}>;
 
 export const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
   {
@@ -265,25 +291,104 @@ export const validateSchemaMigrations = (
   return errors;
 };
 
-const schemaMigrationValidationErrors =
-  validateSchemaMigrations(SCHEMA_MIGRATIONS);
-if (schemaMigrationValidationErrors.length) {
-  throw new Error(
-    `Invalid schema migration configuration:\n${schemaMigrationValidationErrors.join(
-      "\n",
-    )}`,
-  );
-}
+export const validateSchemaPlugins = (plugins: readonly SchemaPlugin[]) => {
+  const errors: string[] = [];
+  const seenIds = new Set<string>();
 
-const migrateElement = (element: ExcalidrawElement) => {
-  // Always migrate from a normalized per-element schema state.
-  let migratedElement = ensureElementSchemaState(element);
+  for (const plugin of plugins) {
+    if (!plugin.id.trim()) {
+      errors.push("Schema plugin id must be non-empty.");
+    }
+    if (seenIds.has(plugin.id)) {
+      errors.push(`Duplicate schema plugin id found: ${plugin.id}.`);
+    }
+    seenIds.add(plugin.id);
 
-  for (const migration of SCHEMA_MIGRATIONS) {
-    if (migration.namespace !== SCHEMA_CORE_NAMESPACE) {
+    for (const migration of plugin.migrations) {
+      if (migration.namespace === SCHEMA_CORE_NAMESPACE) {
+        errors.push(
+          `Schema plugin "${plugin.id}" cannot declare core migrations ("${migration.id}").`,
+        );
+      }
+    }
+  }
+
+  return errors;
+};
+
+const collectPluginMigrations = (plugins: readonly SchemaPlugin[]) =>
+  plugins.flatMap((plugin) => plugin.migrations);
+
+/**
+ * Builds the registry "latest version" map:
+ * - core tracks come from CORE_SUPPORTED_TRACKS
+ * - host tracks are inferred from provided plugin migrations
+ */
+const getSupportedTrackVersions = (
+  migrations: readonly SchemaMigration[],
+): Readonly<Record<string, number>> => {
+  const supportedTrackVersions: Record<string, number> = {
+    ...CORE_SUPPORTED_TRACKS,
+  };
+
+  for (const migration of migrations) {
+    if (migration.namespace === SCHEMA_CORE_NAMESPACE) {
       continue;
     }
 
+    const currentSupportedVersion =
+      supportedTrackVersions[migration.track] ?? SCHEMA_INITIAL_TRACK_VERSION;
+    if (migration.toVersion > currentSupportedVersion) {
+      supportedTrackVersions[migration.track] = migration.toVersion;
+    }
+  }
+
+  return supportedTrackVersions;
+};
+
+export const createSchemaMigrationRegistry = (
+  plugins: readonly SchemaPlugin[] = SCHEMA_PLUGINS,
+): SchemaMigrationRegistry => {
+  const pluginErrors = validateSchemaPlugins(plugins);
+  if (pluginErrors.length) {
+    throw new Error(
+      `Invalid schema plugin configuration:\n${pluginErrors.join("\n")}`,
+    );
+  }
+
+  const migrations = [
+    ...SCHEMA_MIGRATIONS,
+    ...collectPluginMigrations(plugins),
+  ] as const;
+
+  const migrationErrors = validateSchemaMigrations(migrations);
+  if (migrationErrors.length) {
+    throw new Error(
+      `Invalid schema migration configuration:\n${migrationErrors.join("\n")}`,
+    );
+  }
+
+  return {
+    migrations,
+    supportedTrackVersions: getSupportedTrackVersions(migrations),
+  };
+};
+
+const CORE_SCHEMA_MIGRATION_REGISTRY = createSchemaMigrationRegistry();
+
+/** Uses cached core config by default, recompiles when plugins are provided. */
+const resolveSchemaMigrationRegistry = (
+  schemaMigrationRegistry: SchemaMigrationRegistry | undefined,
+) => schemaMigrationRegistry || CORE_SCHEMA_MIGRATION_REGISTRY;
+
+const migrateElement = (
+  element: ExcalidrawElement,
+  schemaMigrationRegistry: SchemaMigrationRegistry,
+) => {
+  // Always migrate from a normalized per-element schema state.
+  let migratedElement = ensureElementSchemaState(element);
+
+  for (const migration of schemaMigrationRegistry.migrations) {
     if (!migrationMatchesElementType(migration, migratedElement)) {
       continue;
     }
@@ -293,9 +398,8 @@ const migrateElement = (element: ExcalidrawElement) => {
       migration.track,
     );
     const supportedTrackVersion =
-      CORE_SUPPORTED_TRACKS[
-        migration.track as keyof typeof CORE_SUPPORTED_TRACKS
-      ] ?? currentTrackVersion;
+      schemaMigrationRegistry.supportedTrackVersions[migration.track] ??
+      currentTrackVersion;
 
     // Never re-run or downgrade.
     if (currentTrackVersion >= migration.toVersion) {
@@ -320,10 +424,19 @@ const migrateElement = (element: ExcalidrawElement) => {
 
 export const migrateElements = (
   elements: readonly ExcalidrawElement[] | null | undefined,
+  opts?: {
+    schemaMigrationRegistry?: SchemaMigrationRegistry;
+  },
 ) => {
   if (!elements) {
     return elements;
   }
 
-  return elements.map((element) => migrateElement(element));
+  const schemaMigrationRegistry = resolveSchemaMigrationRegistry(
+    opts?.schemaMigrationRegistry,
+  );
+
+  return elements.map((element) =>
+    migrateElement(element, schemaMigrationRegistry),
+  );
 };

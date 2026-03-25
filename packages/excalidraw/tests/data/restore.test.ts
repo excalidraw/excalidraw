@@ -24,8 +24,10 @@ import type { NormalizedZoomValue } from "@excalidraw/excalidraw/types";
 
 import { API } from "../helpers/api";
 import * as restore from "../../data/restore";
+import { createSchemaMigrationRegistry } from "../../data/schema";
 import { getDefaultAppState } from "../../appState";
 
+import type { SchemaPlugin } from "../../data/schema";
 import type { ImportedDataState } from "../../data/types";
 
 describe("restoreElements", () => {
@@ -151,6 +153,42 @@ describe("restoreElements", () => {
       (restoredLibraryItems[0].elements[0] as ExcalidrawElement)
         .backgroundColor,
     ).toBe(DEFAULT_ELEMENT_PROPS.backgroundColor);
+  });
+
+  it("should apply schema plugins on restore boundaries when provided", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      backgroundColor: "#ffd8a8",
+    });
+    const plugin: SchemaPlugin = {
+      id: "myapp",
+      migrations: [
+        {
+          id: "host.myapp.rect.normalize.v2",
+          namespace: "host.myapp",
+          track: "host.myapp.rectangle",
+          toVersion: 2,
+          title: "normalize rectangle background",
+          description: "plugin migration for restore test",
+          targetTypes: ["rectangle"],
+          apply: (element) =>
+            element.type === "rectangle"
+              ? { ...element, backgroundColor: "#12b886" }
+              : element,
+        },
+      ],
+    };
+
+    const restoredWithoutPlugin = restore.restoreElements([rect], null);
+    const restoredWithPlugin = restore.restoreElements([rect], null, {
+      schemaMigrationRegistry: createSchemaMigrationRegistry([plugin]),
+    });
+
+    expect(restoredWithoutPlugin[0].backgroundColor).toBe("#ffd8a8");
+    expect(restoredWithPlugin[0].backgroundColor).toBe("#12b886");
+    expect(
+      restoredWithPlugin[0].schemaState.tracks["host.myapp.rectangle"],
+    ).toBe(2);
   });
 
   it("should restore text element correctly passing value for each attribute", () => {

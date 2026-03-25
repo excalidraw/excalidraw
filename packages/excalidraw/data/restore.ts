@@ -84,6 +84,8 @@ import {
 
 import { migrateElements } from "./schema";
 
+import type { SchemaMigrationRegistry } from "./schema";
+
 import type {
   AppState,
   BinaryFiles,
@@ -642,11 +644,15 @@ export const restoreElements = <T extends ExcalidrawElement>(
         refreshDimensions?: boolean;
         repairBindings?: boolean;
         deleteInvisibleElements?: boolean;
+        schemaMigrationRegistry?: SchemaMigrationRegistry;
       }
     | undefined,
 ): CombineBrandsIfNeeded<T, OrderedExcalidrawElement> => {
   const migratedTargetElements = migrateElements(
     targetElements as readonly ExcalidrawElement[] | undefined | null,
+    {
+      schemaMigrationRegistry: opts?.schemaMigrationRegistry,
+    },
   ) as readonly T[] | undefined | null;
 
   // used to detect duplicate top-level element ids
@@ -966,10 +972,14 @@ export const restoreAppState = (
   };
 };
 
-const restoreLibraryItem = (libraryItem: LibraryItem) => {
+const restoreLibraryItem = (
+  libraryItem: LibraryItem,
+  opts?: { schemaMigrationRegistry?: SchemaMigrationRegistry },
+) => {
   const elements = restoreElements(
     getNonDeletedElements(libraryItem.elements),
     null,
+    { schemaMigrationRegistry: opts?.schemaMigrationRegistry },
   );
   return elements.length ? { ...libraryItem, elements } : null;
 };
@@ -977,17 +987,21 @@ const restoreLibraryItem = (libraryItem: LibraryItem) => {
 export const restoreLibraryItems = (
   libraryItems: ImportedDataState["libraryItems"] = [],
   defaultStatus: LibraryItem["status"],
+  opts?: { schemaMigrationRegistry?: SchemaMigrationRegistry },
 ) => {
   const restoredItems: LibraryItem[] = [];
   for (const item of libraryItems) {
     // migrate older libraries
     if (Array.isArray(item)) {
-      const restoredItem = restoreLibraryItem({
-        status: defaultStatus,
-        elements: item,
-        id: randomId(),
-        created: Date.now(),
-      });
+      const restoredItem = restoreLibraryItem(
+        {
+          status: defaultStatus,
+          elements: item,
+          id: randomId(),
+          created: Date.now(),
+        },
+        opts,
+      );
       if (restoredItem) {
         restoredItems.push(restoredItem);
       }
@@ -996,12 +1010,15 @@ export const restoreLibraryItems = (
         LibraryItem,
         "id" | "status" | "created"
       >;
-      const restoredItem = restoreLibraryItem({
-        ..._item,
-        id: _item.id || randomId(),
-        status: _item.status || defaultStatus,
-        created: _item.created || Date.now(),
-      });
+      const restoredItem = restoreLibraryItem(
+        {
+          ..._item,
+          id: _item.id || randomId(),
+          status: _item.status || defaultStatus,
+          created: _item.created || Date.now(),
+        },
+        opts,
+      );
       if (restoredItem) {
         restoredItems.push(restoredItem);
       }

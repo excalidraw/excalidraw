@@ -354,6 +354,7 @@ import {
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restoreAppState, restoreElements } from "../data/restore";
+import { createSchemaMigrationRegistry } from "../data/schema";
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
@@ -460,6 +461,7 @@ import type {
 
 import type { ClipboardData, PastedMixedContent } from "../clipboard";
 import type { ExportedElements } from "../data";
+import type { SchemaMigrationRegistry } from "../data/schema";
 import type { ContextMenuItems } from "./ContextMenu";
 import type { FileSystemHandle } from "../data/filesystem";
 
@@ -606,6 +608,7 @@ class App extends React.Component<AppProps, AppState> {
   public fonts: Fonts;
   public renderer: Renderer;
   public visibleElements: readonly NonDeletedExcalidrawElement[];
+  private schemaMigrationRegistry: SchemaMigrationRegistry;
   private resizeObserver: ResizeObserver | undefined;
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
@@ -722,6 +725,9 @@ class App extends React.Component<AppProps, AppState> {
     this.stylesPanelMode = deriveStylesPanelMode(this.editorInterface);
 
     this.id = nanoid();
+    this.schemaMigrationRegistry = createSchemaMigrationRegistry(
+      props.schemaPlugins,
+    );
     this.library = new Library(this);
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -768,6 +774,7 @@ class App extends React.Component<AppProps, AppState> {
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
         getEditorInterface: () => this.editorInterface,
+        getSchemaMigrationRegistry: this.getSchemaMigrationRegistry,
         updateFrameRendering: this.updateFrameRendering,
         toggleSidebar: this.toggleSidebar,
         onChange: (cb) => this.onChangeEmitter.on(cb),
@@ -2320,6 +2327,10 @@ class App extends React.Component<AppProps, AppState> {
     return this.scene.getNonDeletedElements();
   };
 
+  public getSchemaMigrationRegistry = () => {
+    return this.schemaMigrationRegistry;
+  };
+
   public onInsertElements = (elements: readonly ExcalidrawElement[]) => {
     this.addElementsFromPasteOrLibrary({
       elements,
@@ -2808,6 +2819,7 @@ class App extends React.Component<AppProps, AppState> {
     const restoredElements = restoreElements(initialData?.elements, null, {
       repairBindings: true,
       deleteInvisibleElements: true,
+      schemaMigrationRegistry: this.schemaMigrationRegistry,
     });
     let restoredAppState = restoreAppState(initialData?.appState, null);
     const activeTool = restoredAppState.activeTool;
@@ -3219,6 +3231,12 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    if (prevProps.schemaPlugins !== this.props.schemaPlugins) {
+      this.schemaMigrationRegistry = createSchemaMigrationRegistry(
+        this.props.schemaPlugins,
+      );
+    }
+
     this.updateEmbeddables();
     const elements = this.scene.getElementsIncludingDeleted();
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
@@ -3722,6 +3740,7 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     const elements = restoreElements(opts.elements, null, {
       deleteInvisibleElements: true,
+      schemaMigrationRegistry: this.schemaMigrationRegistry,
     });
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
@@ -11428,6 +11447,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
             this.scene.getElementsIncludingDeleted(),
             fileHandle,
+            this.schemaMigrationRegistry,
           );
           this.syncActionResult({
             ...scene,
@@ -11474,7 +11494,11 @@ class App extends React.Component<AppProps, AppState> {
           );
           // legacy library dataTransfer format
         } else if (excalidrawLibrary_data) {
-          libraryItems = parseLibraryJSON(excalidrawLibrary_data);
+          libraryItems = parseLibraryJSON(
+            excalidrawLibrary_data,
+            "unpublished",
+            this.schemaMigrationRegistry,
+          );
         }
         if (libraryItems?.length) {
           libraryItems = libraryItems.map((item) => ({
@@ -11544,6 +11568,7 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
           elements,
           fileHandle,
+          this.schemaMigrationRegistry,
         );
       } catch (error: any) {
         const imageSceneDataError = error instanceof ImageSceneDataError;

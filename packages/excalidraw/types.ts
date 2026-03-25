@@ -58,6 +58,7 @@ import type { FileSystemHandle } from "./data/filesystem";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
+import type { SchemaMigrationRegistry, SchemaPlugin } from "./data/schema";
 
 import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
@@ -640,6 +641,11 @@ export interface ExcalidrawProps {
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
+  /**
+   * Optional host-provided schema migration plugins.
+   * Applied on restore/import boundaries when provided.
+   */
+  schemaPlugins?: readonly SchemaPlugin[];
 }
 
 export type SceneData = {
@@ -758,6 +764,7 @@ export type AppClassProperties = {
   getEditorUIOffsets: App["getEditorUIOffsets"];
   visibleElements: App["visibleElements"];
   excalidrawContainerValue: App["excalidrawContainerValue"];
+  getSchemaMigrationRegistry: () => SchemaMigrationRegistry;
 
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
@@ -867,6 +874,7 @@ export interface ExcalidrawImperativeAPI {
   resetCursor: InstanceType<typeof App>["resetCursor"];
   toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
   getEditorInterface: () => EditorInterface;
+  getSchemaMigrationRegistry: () => SchemaMigrationRegistry;
   /**
    * Disables rendering of frames (including element clipping), but currently
    * the frames are still interactive in edit mode. As such, this API should be

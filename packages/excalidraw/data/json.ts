@@ -14,6 +14,7 @@ import { isImageFileHandle, loadFromBlob } from "./blob";
 import { fileOpen, fileSave } from "./filesystem";
 
 import type { AppState, BinaryFiles, LibraryItems } from "../types";
+import type { SchemaMigrationRegistry } from "./schema";
 import type {
   ExportedDataState,
   ImportedDataState,
@@ -93,6 +94,7 @@ export const saveAsJSON = async (
 export const loadFromJSON = async (
   localAppState: AppState,
   localElements: readonly ExcalidrawElement[] | null,
+  schemaMigrationRegistry?: SchemaMigrationRegistry,
 ) => {
   const file = await fileOpen({
     description: "Excalidraw files",
@@ -100,7 +102,13 @@ export const loadFromJSON = async (
     // gets resolved. Else, iOS users cannot open `.excalidraw` files.
     // extensions: ["json", "excalidraw", "png", "svg"],
   });
-  return loadFromBlob(file, localAppState, localElements, file.handle);
+  return loadFromBlob(
+    file,
+    localAppState,
+    localElements,
+    file.handle,
+    schemaMigrationRegistry,
+  );
 };
 
 export const isValidExcalidrawData = (data?: {
