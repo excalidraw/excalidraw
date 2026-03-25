@@ -326,7 +326,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
-    expect(renderStaticScene).toHaveBeenCalledTimes(6);
+    expect(renderStaticScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -359,7 +359,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
-    expect(renderStaticScene).toHaveBeenCalledTimes(6);
+    expect(renderStaticScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -392,7 +392,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
-    expect(renderStaticScene).toHaveBeenCalledTimes(6);
+    expect(renderStaticScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -438,7 +438,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(10);
-    expect(renderStaticScene).toHaveBeenCalledTimes(8);
+    expect(renderStaticScene).toHaveBeenCalledTimes(9);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -483,7 +483,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(10);
-    expect(renderStaticScene).toHaveBeenCalledTimes(8);
+    expect(renderStaticScene).toHaveBeenCalledTimes(9);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -556,5 +556,60 @@ describe("selectedElementIds stability", () => {
     mouse.up();
 
     expect(h.state.selectedElementIds).toBe(selectedElementIds_2);
+  });
+});
+
+describe("deselecting", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it("esc unwinds nested group editing before deselecting", () => {
+    const rectA = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      groupIds: ["inner", "outer"],
+    });
+    const rectB = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 0,
+      groupIds: ["outer"],
+    });
+    const rectC = API.createElement({
+      type: "rectangle",
+      x: 200,
+      y: 0,
+      groupIds: ["inner", "outer"],
+    });
+
+    API.setElements([rectA, rectB, rectC]);
+
+    mouse.select(rectA);
+    assertSelectedElements(rectA, rectB, rectC);
+    expect(h.state.editingGroupId).toBeNull();
+
+    mouse.doubleClickOn(rectA);
+    assertSelectedElements(rectA, rectC);
+    expect(h.state.editingGroupId).toBe("outer");
+
+    mouse.doubleClickOn(rectA);
+    assertSelectedElements(rectA);
+    expect(h.state.editingGroupId).toBe("inner");
+
+    Keyboard.keyPress(KEYS.ESCAPE);
+    assertSelectedElements(rectA, rectC);
+    expect(h.state.editingGroupId).toBe("outer");
+
+    Keyboard.keyPress(KEYS.ESCAPE);
+    assertSelectedElements(rectA, rectB, rectC);
+    expect(h.state.editingGroupId).toBeNull();
+    expect(h.state.selectedGroupIds).toEqual({ outer: true });
+
+    Keyboard.keyPress(KEYS.ESCAPE);
+    expect(API.getSelectedElements()).toEqual([]);
+    expect(h.state.editingGroupId).toBeNull();
+    expect(h.state.selectedGroupIds).toEqual({});
   });
 });

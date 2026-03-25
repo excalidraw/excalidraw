@@ -2971,6 +2971,82 @@ describe("history", () => {
       expect(h.state.editingGroupId).toBeNull();
     });
 
+    // TODO mark with "noncritical" tag once we migrate to vitest 4
+    it.skip("should support undo and redo when escape unwinds nested group editing", async () => {
+      const rectA = API.createElement({
+        type: "rectangle",
+        groupIds: ["inner", "outer"],
+        x: 0,
+      });
+      const rectB = API.createElement({
+        type: "rectangle",
+        groupIds: ["outer"],
+        x: 100,
+      });
+      const rectC = API.createElement({
+        type: "rectangle",
+        groupIds: ["inner", "outer"],
+        x: 200,
+      });
+
+      API.setElements([rectA, rectB, rectC]);
+      mouse.select(rectA);
+      mouse.doubleClickOn(rectA);
+      mouse.doubleClickOn(rectA);
+
+      assertSelectedElements([rectA]);
+      expect(h.state.editingGroupId).toBe("inner");
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+
+      Keyboard.keyPress(KEYS.ESCAPE);
+      assertSelectedElements([rectA, rectC]);
+      expect(h.state.editingGroupId).toBe("outer");
+      expect(API.getUndoStack().length).toBe(4);
+      expect(API.getRedoStack().length).toBe(0);
+
+      Keyboard.keyPress(KEYS.ESCAPE);
+      assertSelectedElements([rectA, rectB, rectC]);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).toEqual({ outer: true });
+      expect(API.getUndoStack().length).toBe(5);
+      expect(API.getRedoStack().length).toBe(0);
+
+      Keyboard.keyPress(KEYS.ESCAPE);
+      expect(API.getSelectedElements()).toEqual([]);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).toEqual({});
+      expect(API.getUndoStack().length).toBe(6);
+      expect(API.getRedoStack().length).toBe(0);
+
+      Keyboard.undo();
+      assertSelectedElements([rectA, rectB, rectC]);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).toEqual({ outer: true });
+
+      Keyboard.undo();
+      assertSelectedElements([rectA, rectC]);
+      expect(h.state.editingGroupId).toBe("outer");
+
+      Keyboard.undo();
+      assertSelectedElements([rectA]);
+      expect(h.state.editingGroupId).toBe("inner");
+
+      Keyboard.redo();
+      assertSelectedElements([rectA, rectC]);
+      expect(h.state.editingGroupId).toBe("outer");
+
+      Keyboard.redo();
+      assertSelectedElements([rectA, rectB, rectC]);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).toEqual({ outer: true });
+
+      Keyboard.redo();
+      expect(API.getSelectedElements()).toEqual([]);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).toEqual({});
+    });
+
     it("should iterate through the history when selected or editing linear element was remotely deleted", async () => {
       // create three point arrow
       UI.clickTool("arrow");
