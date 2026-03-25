@@ -30,7 +30,7 @@ export class HistoryDelta extends StoreDelta {
       // as we always need to end up with a new version due to collaboration,
       // approaching each undo / redo as a new user action
       {
-        excludedProperties: new Set(["version", "versionNonce"]),
+        excludedProperties: new Set(["version", "versionNonce", "schemaState"]),
       },
     );
 

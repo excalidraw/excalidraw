@@ -43,9 +43,7 @@ import type { BinaryFiles } from "./types";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
-  elements: readonly (NonDeletedExcalidrawElement & {
-    schemaVersion?: number;
-  })[];
+  elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles | undefined;
 };
 

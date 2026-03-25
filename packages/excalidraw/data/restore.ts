@@ -82,7 +82,7 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
-import { migrateElements, SCHEMA_VERSIONS } from "./schema";
+import { migrateElements } from "./schema";
 
 import type {
   AppState,
@@ -287,7 +287,10 @@ const restoreElementWithProperties = <
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,
-    schemaVersion: element.schemaVersion ?? SCHEMA_VERSIONS.latest,
+    schemaState:
+      element.schemaState && typeof element.schemaState === "object"
+        ? element.schemaState
+        : { tracks: {} },
     groupIds: element.groupIds ?? [],
     frameId: element.frameId ?? null,
     roundness: element.roundness
