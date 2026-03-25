@@ -323,6 +323,7 @@ import {
   actionToggleArrowBinding,
   actionToggleMidpointSnapping,
   actionToggleCropEditor,
+  actionToggleLaserPersistent,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
@@ -5501,6 +5502,15 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const nextActiveTool = updateActiveTool(this.state, tool);
+
+    // Clear persistent laser trails when switching away from laser tool
+    if (
+      this.state.activeTool.type === "laser" &&
+      nextActiveTool.type !== "laser"
+    ) {
+      this.laserTrails.localTrail.clearTrails();
+    }
+
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
     } else if (!isHoldingSpace) {
@@ -12486,6 +12496,7 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleObjectsSnapMode,
         actionToggleArrowBinding,
         actionToggleMidpointSnapping,
+        actionToggleLaserPersistent,
         actionToggleZenMode,
         actionToggleViewMode,
         actionToggleStats,

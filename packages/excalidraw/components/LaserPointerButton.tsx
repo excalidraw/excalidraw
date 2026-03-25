@@ -12,6 +12,8 @@ type LaserPointerIconProps = {
   checked: boolean;
   onChange?(): void;
   isMobile?: boolean;
+  persistent?: boolean;
+  onPersistentToggle?(): void;
 };
 
 const DEFAULT_SIZE: ToolButtonSize = "small";
@@ -26,7 +28,7 @@ export const LaserPointerButton = (props: LaserPointerIconProps) => {
           "is-mobile": props.isMobile,
         },
       )}
-      title={`${props.title}`}
+      title={`${props.title}${props.persistent ? " (persistent)" : ""}`}
     >
       <input
         className="ToolIcon_type_checkbox"
@@ -37,7 +39,23 @@ export const LaserPointerButton = (props: LaserPointerIconProps) => {
         aria-label={props.title}
         data-testid="toolbar-LaserPointer"
       />
-      <div className="ToolIcon__icon">{laserPointerToolIcon}</div>
+      <div className="ToolIcon__icon">
+        {laserPointerToolIcon}
+        {props.persistent && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 1,
+              right: 1,
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              backgroundColor: "var(--color-primary)",
+            }}
+            title="Persistent mode on"
+          />
+        )}
+      </div>
     </label>
   );
 };
