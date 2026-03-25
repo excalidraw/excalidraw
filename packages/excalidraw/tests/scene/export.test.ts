@@ -184,6 +184,32 @@ describe("exportToSvg", () => {
     expect(svgElement.innerHTML).toMatchSnapshot();
   });
 
+  it("with title from name", async () => {
+    const svgElement = await exportUtils.exportToSvg(
+      ELEMENTS,
+      {
+        ...DEFAULT_OPTIONS,
+        name: "My Drawing",
+      },
+      null,
+    );
+
+    const titleEl = svgElement.querySelector("title");
+    expect(titleEl).not.toBeNull();
+    expect(titleEl!.textContent).toBe("My Drawing");
+  });
+
+  it("without title when name is not provided", async () => {
+    const svgElement = await exportUtils.exportToSvg(
+      ELEMENTS,
+      DEFAULT_OPTIONS,
+      null,
+    );
+
+    const titleEl = svgElement.querySelector("title");
+    expect(titleEl).toBeNull();
+  });
+
   it("with elements that have a link", async () => {
     const svgElement = await exportUtils.exportToSvg(
       [rectangleWithLinkFixture],
