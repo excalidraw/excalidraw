@@ -74,6 +74,8 @@ export const actionFinalize = register<FormData>({
         sceneCoords,
         "sceneCoords should be defined if actionFinalize is called with event",
       );
+      // Check if ESC was pressed to cancel the arrow creation
+      const isCanceled = event.key === KEYS.ESCAPE;
 
       const linearElementEditor = LinearElementEditor.handlePointerUp(
         event,
@@ -154,7 +156,7 @@ export const actionFinalize = register<FormData>({
 
         return {
           elements:
-            element.points.length < 2 || isInvisiblySmallElement(element)
+            (element.points.length < 2 || isInvisiblySmallElement(element) || isCanceled)
               ? elements.map((el) => {
                   if (el.id === element.id) {
                     return newElementWith(el, { isDeleted: true });
