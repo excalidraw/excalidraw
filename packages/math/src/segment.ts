@@ -40,7 +40,7 @@ export const isLineSegment = <Point extends GlobalPoint | LocalPoint>(
   Array.isArray(segment) &&
   segment.length === 2 &&
   isPoint(segment[0]) &&
-  isPoint(segment[0]);
+  isPoint(segment[1]);
 
 /**
  * Return the coordinates resulting from rotating the given line about an origin by an angle in radians

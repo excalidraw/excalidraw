@@ -661,7 +661,7 @@
     "placeholder": {
       "title": "Let's design your diagram",
       "description": "Describe the diagram you want to create, and we'll generate it for you.",
-      "hint": "At the moment we know Flowchart, Sequence, Class, and Entity Relationship diagrams."
+      "hint": "At the moment we know Flowchart, Sequence, Class, State, and Entity Relationship diagrams."
     },
     "preview": "Preview",
     "insert": "Insert",
