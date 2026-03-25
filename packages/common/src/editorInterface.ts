@@ -53,13 +53,6 @@ export const isIOS =
 export const isBrave = () =>
   (navigator as any).brave?.isBrave?.name === "isBrave";
 
-// export const isMobile =
-//   isIOS ||
-//   /android|webos|ipod|blackberry|iemobile|opera mini/i.test(
-//     navigator.userAgent,
-//   ) ||
-//   /android|ios|ipod|blackberry|windows phone/i.test(navigator.platform);
-
 // utilities
 export const isMobileBreakpoint = (width: number, height: number) => {
   return (
