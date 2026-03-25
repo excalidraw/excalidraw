@@ -13,6 +13,7 @@ import {
 import {
   pointFrom,
   pointDistance,
+  lineSegment,
   type LocalPoint,
   pointRotateRads,
 } from "@excalidraw/math";
@@ -43,6 +44,7 @@ import type {
 } from "@excalidraw/excalidraw/scene/types";
 
 import { elementWithCanvasCache } from "./renderElement";
+import { debugDrawLine, debugDrawPolygon } from "./visualdebug";
 
 import {
   canBecomePolygon,
@@ -77,6 +79,18 @@ import type {
 
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
+
+// Controls how handle distance scales with chord length.
+// At 1.0 handles are exactly h/3 (standard Hermite). Values below 1 make
+// short segments curvier and long segments more taut (sub-linear scaling).
+const CP_CHORD_POWER = 1;
+
+// At curved knots the C2 spline tangent can be tilted away from the
+// bisector direction, making one side of the knot tight and the other taut.
+// This factor [0, 1] controls how far the tangent direction is pulled toward
+// the bisector (the chord-bisector normal) linearly with turn sharpness.
+// 0 = pure C2 spline; 1 = tangent fully aligned with the bisector.
+const CP_ANGLE_CORRECTION = 1;
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
@@ -625,60 +639,144 @@ export const generateLinearCollisionShape = (
         });
       }
 
-      return generator
-        .curve(points as unknown as RoughPoint[], options)
-        .sets[0].ops.slice(0, element.points.length)
-        .map((op, i) => {
-          if (i === 0) {
-            const p = pointRotateRads<GlobalPoint>(
-              pointFrom<GlobalPoint>(
-                element.x + op.data[0],
-                element.y + op.data[1],
-              ),
-              center,
-              element.angle,
-            );
+      // Generate collision ops using the same bisector-based cubic Bézier
+      // algorithm as generateRoundedSimpleArrowShape so hit-testing matches rendering.
+      const rotateLocal = (lx: number, ly: number): LocalPoint => {
+        const g = pointRotateRads<GlobalPoint>(
+          pointFrom<GlobalPoint>(element.x + lx, element.y + ly),
+          center,
+          element.angle,
+        );
+        return pointFrom<LocalPoint>(g[0] - element.x, g[1] - element.y);
+      };
 
-            return {
-              op: "move",
-              data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-            };
-          }
+      const collisionOps: Array<{
+        op: string;
+        data: number[] | LocalPoint;
+      }> = [];
+      collisionOps.push({
+        op: "move",
+        data: rotateLocal(points[0][0], points[0][1]),
+      });
 
-          return {
-            op: "bcurveTo",
-            data: [
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[0],
-                  element.y + op.data[1],
-                ),
-                center,
-                element.angle,
-              ),
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[2],
-                  element.y + op.data[3],
-                ),
-                center,
-                element.angle,
-              ),
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[4],
-                  element.y + op.data[5],
-                ),
-                center,
-                element.angle,
-              ),
-            ]
-              .map((p) =>
-                pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-              )
-              .flat(),
-          };
+      if (points.length === 2) {
+        collisionOps.push({
+          op: "lineTo",
+          data: rotateLocal(points[1][0], points[1][1]),
         });
+      } else {
+        // Chord-length C2 spline. Mirrors generateRoundedSimpleArrowShape
+        // exactly so hit-testing matches rendering.
+        const n = points.length - 1;
+        const h = new Float64Array(n);
+        for (let i = 0; i < n; i++) {
+          h[i] = Math.max(
+            1e-10,
+            Math.hypot(
+              points[i + 1][0] - points[i][0],
+              points[i + 1][1] - points[i][1],
+            ),
+          );
+        }
+
+        const mx = new Float64Array(n + 1);
+        const my = new Float64Array(n + 1);
+        const diag = new Float64Array(n + 1);
+        const rhsX = new Float64Array(n + 1);
+        const rhsY = new Float64Array(n + 1);
+
+        diag[0] = 2;
+        rhsX[0] = (3 * (points[1][0] - points[0][0])) / h[0];
+        rhsY[0] = (3 * (points[1][1] - points[0][1])) / h[0];
+        for (let i = 1; i < n; i++) {
+          diag[i] = 2 * (h[i - 1] + h[i]);
+          rhsX[i] =
+            3 *
+            ((h[i] * (points[i][0] - points[i - 1][0])) / h[i - 1] +
+              (h[i - 1] * (points[i + 1][0] - points[i][0])) / h[i]);
+          rhsY[i] =
+            3 *
+            ((h[i] * (points[i][1] - points[i - 1][1])) / h[i - 1] +
+              (h[i - 1] * (points[i + 1][1] - points[i][1])) / h[i]);
+        }
+        diag[n] = 2;
+        rhsX[n] = (3 * (points[n][0] - points[n - 1][0])) / h[n - 1];
+        rhsY[n] = (3 * (points[n][1] - points[n - 1][1])) / h[n - 1];
+
+        for (let i = 1; i <= n; i++) {
+          const sub = i < n ? h[i] : 1;
+          const supPrev = i === 1 ? 1 : h[i - 2];
+          const w = sub / diag[i - 1];
+          diag[i] -= w * supPrev;
+          rhsX[i] -= w * rhsX[i - 1];
+          rhsY[i] -= w * rhsY[i - 1];
+        }
+        mx[n] = rhsX[n] / diag[n];
+        my[n] = rhsY[n] / diag[n];
+        for (let i = n - 1; i >= 0; i--) {
+          const sup = i === 0 ? 1 : h[i - 1];
+          mx[i] = (rhsX[i] - sup * mx[i + 1]) / diag[i];
+          my[i] = (rhsY[i] - sup * my[i + 1]) / diag[i];
+        }
+
+        // Normalised tangent directions; handle length scales sub-linearly with chord.
+        const mlen = new Float64Array(n + 1);
+        for (let i = 0; i <= n; i++) {
+          mlen[i] = Math.max(1e-10, Math.hypot(mx[i], my[i]));
+        }
+
+        // At interior knots, blend the C2 tangent direction toward the
+        // bisector direction by a factor proportional to turn sharpness *
+        // CP_ANGLE_CORRECTION
+        for (let k = 1; k < n; k++) {
+          const d1x = (points[k][0] - points[k - 1][0]) / h[k - 1];
+          const d1y = (points[k][1] - points[k - 1][1]) / h[k - 1];
+          const d2x = (points[k + 1][0] - points[k][0]) / h[k];
+          const d2y = (points[k + 1][1] - points[k][1]) / h[k];
+          const dot = d1x * d2x + d1y * d2y;
+          const t = ((1 - dot) / 2) * CP_ANGLE_CORRECTION;
+          if (t < 1e-6) {
+            continue;
+          }
+          const bx = d1x + d2x;
+          const by = d1y + d2y;
+          const blen = Math.hypot(bx, by);
+          if (blen < 1e-10) {
+            continue;
+          }
+          let px = bx / blen;
+          let py = by / blen;
+          const tx = mx[k] / mlen[k];
+          const ty = my[k] / mlen[k];
+          if (tx * px + ty * py < 0) {
+            px = -px;
+            py = -py;
+          }
+          const blendX = tx + t * (px - tx);
+          const blendY = ty + t * (py - ty);
+          const blendLen = Math.max(1e-10, Math.hypot(blendX, blendY));
+          mx[k] = (blendX / blendLen) * mlen[k];
+          my[k] = (blendY / blendLen) * mlen[k];
+        }
+
+        for (let i = 0; i < n; i++) {
+          const cpDist = Math.pow(h[i], CP_CHORD_POWER) / 3;
+          const cp1x = points[i][0] + (mx[i] / mlen[i]) * cpDist;
+          const cp1y = points[i][1] + (my[i] / mlen[i]) * cpDist;
+          const cp2x = points[i + 1][0] - (mx[i + 1] / mlen[i + 1]) * cpDist;
+          const cp2y = points[i + 1][1] - (my[i + 1] / mlen[i + 1]) * cpDist;
+
+          const rcp1 = rotateLocal(cp1x, cp1y);
+          const rcp2 = rotateLocal(cp2x, cp2y);
+          const rend = rotateLocal(points[i + 1][0], points[i + 1][1]);
+
+          collisionOps.push({
+            op: "bcurveTo",
+            data: [rcp1[0], rcp1[1], rcp2[0], rcp2[1], rend[0], rend[1]],
+          });
+        }
+      }
+      return collisionOps;
     }
     case "freedraw": {
       if (element.points.length < 2) {
@@ -920,7 +1018,15 @@ const _generateElementShape = (
           ];
         }
       } else {
-        shape = [generator.curve(points as unknown as RoughPoint[], options)];
+        shape = [
+          generator.path(
+            generateRoundedSimpleArrowShape(points),
+            generateRoughOptions(element, true, isDarkMode),
+          ),
+        ];
+        if (window.visualDebug?.data) {
+          debugRoundedArrowControlPoints(element.x, element.y, points);
+        }
       }
 
       // add lines only in arrow
@@ -1004,10 +1110,385 @@ const _generateElementShape = (
   }
 };
 
+/**
+ * Debug helper to visualise C2 spline control points.
+ *
+ * Chords are grey, CP1 handles/circles are green, CP2 handles/diamonds are blue,
+ * segment points are red X markers.
+ */
+const debugRoundedArrowControlPoints = (
+  elementX: number,
+  elementY: number,
+  points: readonly LocalPoint[],
+) => {
+  const nPts = points.length;
+  if (nPts < 2) {
+    return;
+  }
+
+  const g = (lx: number, ly: number): GlobalPoint =>
+    pointFrom<GlobalPoint>(elementX + lx, elementY + ly);
+
+  const PERMANENT = { permanent: true } as const;
+  const CP_RADIUS = 5;
+  const DIAMOND_RADIUS = 6;
+
+  // // Segment points: red X
+  // for (let i = 0; i < nPts; i++) {
+  //   debugDrawPoint(g(points[i][0], points[i][1]), {
+  //     color: "#ff3333",
+  //     ...PERMANENT,
+  //   });
+  // }
+
+  if (nPts === 2) {
+    debugDrawLine(
+      lineSegment(g(points[0][0], points[0][1]), g(points[1][0], points[1][1])),
+      { color: "#888888", ...PERMANENT },
+    );
+    return;
+  }
+
+  // Chord-length C2 spline – same algorithm as generateRoundedSimpleArrowShape
+  const n = nPts - 1;
+  const h = new Float64Array(n);
+  for (let i = 0; i < n; i++) {
+    h[i] = Math.max(
+      1e-10,
+      Math.hypot(
+        points[i + 1][0] - points[i][0],
+        points[i + 1][1] - points[i][1],
+      ),
+    );
+  }
+
+  const mx = new Float64Array(n + 1);
+  const my = new Float64Array(n + 1);
+  const diag = new Float64Array(n + 1);
+  const rhsX = new Float64Array(n + 1);
+  const rhsY = new Float64Array(n + 1);
+
+  diag[0] = 2;
+  rhsX[0] = (3 * (points[1][0] - points[0][0])) / h[0];
+  rhsY[0] = (3 * (points[1][1] - points[0][1])) / h[0];
+  for (let i = 1; i < n; i++) {
+    diag[i] = 2 * (h[i - 1] + h[i]);
+    rhsX[i] =
+      3 *
+      ((h[i] * (points[i][0] - points[i - 1][0])) / h[i - 1] +
+        (h[i - 1] * (points[i + 1][0] - points[i][0])) / h[i]);
+    rhsY[i] =
+      3 *
+      ((h[i] * (points[i][1] - points[i - 1][1])) / h[i - 1] +
+        (h[i - 1] * (points[i + 1][1] - points[i][1])) / h[i]);
+  }
+  diag[n] = 2;
+  rhsX[n] = (3 * (points[n][0] - points[n - 1][0])) / h[n - 1];
+  rhsY[n] = (3 * (points[n][1] - points[n - 1][1])) / h[n - 1];
+
+  for (let i = 1; i <= n; i++) {
+    const sub = i < n ? h[i] : 1;
+    const supPrev = i === 1 ? 1 : h[i - 2];
+    const w = sub / diag[i - 1];
+    diag[i] -= w * supPrev;
+    rhsX[i] -= w * rhsX[i - 1];
+    rhsY[i] -= w * rhsY[i - 1];
+  }
+  mx[n] = rhsX[n] / diag[n];
+  my[n] = rhsY[n] / diag[n];
+  for (let i = n - 1; i >= 0; i--) {
+    const sup = i === 0 ? 1 : h[i - 1];
+    mx[i] = (rhsX[i] - sup * mx[i + 1]) / diag[i];
+    my[i] = (rhsY[i] - sup * my[i + 1]) / diag[i];
+  }
+
+  // Normalised tangent directions; handle length scales sub-linearly with chord.
+  const mlen = new Float64Array(n + 1);
+  for (let i = 0; i <= n; i++) {
+    mlen[i] = Math.max(1e-10, Math.hypot(mx[i], my[i]));
+  }
+
+  // Mirror the angle-correction from generateRoundedSimpleArrowShape.
+  for (let k = 1; k < n; k++) {
+    const d1x = (points[k][0] - points[k - 1][0]) / h[k - 1];
+    const d1y = (points[k][1] - points[k - 1][1]) / h[k - 1];
+    const d2x = (points[k + 1][0] - points[k][0]) / h[k];
+    const d2y = (points[k + 1][1] - points[k][1]) / h[k];
+    const dot = d1x * d2x + d1y * d2y;
+    const t = ((1 - dot) / 2) * CP_ANGLE_CORRECTION;
+    if (t < 1e-6) {
+      continue;
+    }
+    const bx = d1x + d2x;
+    const by = d1y + d2y;
+    const blen = Math.hypot(bx, by);
+    if (blen < 1e-10) {
+      continue;
+    }
+    // Blend target: the bisector direction itself (pick sign aligning with current tangent)
+    let px = bx / blen;
+    let py = by / blen;
+    const tx = mx[k] / mlen[k];
+    const ty = my[k] / mlen[k];
+    if (tx * px + ty * py < 0) {
+      px = -px;
+      py = -py;
+    }
+    const blendX = tx + t * (px - tx);
+    const blendY = ty + t * (py - ty);
+    const blendLen = Math.max(1e-10, Math.hypot(blendX, blendY));
+    mx[k] = (blendX / blendLen) * mlen[k];
+    my[k] = (blendY / blendLen) * mlen[k];
+  }
+
+  // Bisector at interior knots: orange line along bisector, yellow tick for
+  // perpendicular-to-bisector (the ideal symmetric tangent direction).
+  const BISECTOR_HALF_LEN = 20;
+  const PERP_HALF_LEN = 12;
+  for (let k = 1; k < n; k++) {
+    const d1x = (points[k][0] - points[k - 1][0]) / h[k - 1];
+    const d1y = (points[k][1] - points[k - 1][1]) / h[k - 1];
+    const d2x = (points[k + 1][0] - points[k][0]) / h[k];
+    const d2y = (points[k + 1][1] - points[k][1]) / h[k];
+    const bx = d1x + d2x;
+    const by = d1y + d2y;
+    const blen = Math.hypot(bx, by);
+    if (blen < 1e-10) {
+      continue;
+    }
+    const bnx = bx / blen;
+    const bny = by / blen;
+    const pnx = -bny; // perpendicular to bisector = ideal tangent direction
+    const pny = bnx;
+    const pk = g(points[k][0], points[k][1]);
+    // bisector (orange)
+    debugDrawLine(
+      lineSegment(
+        pointFrom<GlobalPoint>(
+          pk[0] - bnx * BISECTOR_HALF_LEN,
+          pk[1] - bny * BISECTOR_HALF_LEN,
+        ),
+        pointFrom<GlobalPoint>(
+          pk[0] + bnx * BISECTOR_HALF_LEN,
+          pk[1] + bny * BISECTOR_HALF_LEN,
+        ),
+      ),
+      { color: "#ff8800", ...PERMANENT },
+    );
+    // perpendicular tick / ideal tangent (yellow)
+    debugDrawLine(
+      lineSegment(
+        pointFrom<GlobalPoint>(
+          pk[0] - pnx * PERP_HALF_LEN,
+          pk[1] - pny * PERP_HALF_LEN,
+        ),
+        pointFrom<GlobalPoint>(
+          pk[0] + pnx * PERP_HALF_LEN,
+          pk[1] + pny * PERP_HALF_LEN,
+        ),
+      ),
+      { color: "#ffdd00", ...PERMANENT },
+    );
+  }
+
+  for (let i = 0; i < n; i++) {
+    const cpDist = Math.pow(h[i], CP_CHORD_POWER) / 3;
+    const p0 = g(points[i][0], points[i][1]);
+    const p1 = g(points[i + 1][0], points[i + 1][1]);
+    const cp1 = g(
+      points[i][0] + (mx[i] / mlen[i]) * cpDist,
+      points[i][1] + (my[i] / mlen[i]) * cpDist,
+    );
+    const cp2 = g(
+      points[i + 1][0] - (mx[i + 1] / mlen[i + 1]) * cpDist,
+      points[i + 1][1] - (my[i + 1] / mlen[i + 1]) * cpDist,
+    );
+
+    // chord (grey)
+    debugDrawLine(lineSegment(p0, p1), { color: "#888888", ...PERMANENT });
+
+    // CP1 handle + circle (green = outgoing from p0)
+    debugDrawLine(lineSegment(p0, cp1), { color: "#00cc44", ...PERMANENT });
+    debugDrawPolygon(
+      Array.from({ length: 9 }, (_, k) =>
+        pointFrom<GlobalPoint>(
+          cp1[0] + Math.cos((k * Math.PI) / 4) * CP_RADIUS,
+          cp1[1] + Math.sin((k * Math.PI) / 4) * CP_RADIUS,
+        ),
+      ),
+      { color: "#00cc44", close: true, ...PERMANENT },
+    );
+
+    // CP2 handle + diamond (blue = incoming to p1)
+    debugDrawLine(lineSegment(p1, cp2), { color: "#0088ff", ...PERMANENT });
+    debugDrawPolygon(
+      [
+        pointFrom<GlobalPoint>(cp2[0], cp2[1] - DIAMOND_RADIUS),
+        pointFrom<GlobalPoint>(cp2[0] + DIAMOND_RADIUS, cp2[1]),
+        pointFrom<GlobalPoint>(cp2[0], cp2[1] + DIAMOND_RADIUS),
+        pointFrom<GlobalPoint>(cp2[0] - DIAMOND_RADIUS, cp2[1]),
+      ],
+      { color: "#0088ff", close: true, ...PERMANENT },
+    );
+  }
+};
+
+const generateRoundedSimpleArrowShape = (
+  points: readonly LocalPoint[],
+): string => {
+  if (points.length < 2) {
+    return "";
+  }
+
+  if (points.length === 2) {
+    return `M ${points[0][0]} ${points[0][1]} L ${points[1][0]} ${points[1][1]}`;
+  }
+
+  // Chord-length parameterised C2 natural cubic spline (Thomas's algorithm).
+  //
+  // Unknowns: tangent vectors m[0..n] at each knot (n = number of segments).
+  // Chord lengths h[i] = |K[i+1] − K[i]| act as the parameter intervals so
+  // that tightly-spaced knots don't over-influence distant ones.
+  //
+  //   Row 0:         2·m₀  +           m₁              = 3·(K₁−K₀)/h₀
+  //   Row i:  h[i]·mᵢ₋₁ + 2·(h[i−1]+h[i])·mᵢ + h[i−1]·mᵢ₊₁
+  //                                   = 3·(h[i]·(Kᵢ−Kᵢ₋₁)/h[i−1]
+  //                                      + h[i−1]·(Kᵢ₊₁−Kᵢ)/h[i])  1≤i≤n−1
+  //   Row n:           mₙ₋₁ +  2·mₙ                    = 3·(Kₙ−Kₙ₋₁)/h[n−1]
+  //
+  // Bézier control points from Hermite→Bézier identity:
+  //   cp1ᵢ = Kᵢ   + mᵢ   · h[i] / 3
+  //   cp2ᵢ = Kᵢ₊₁ − mᵢ₊₁ · h[i] / 3
+  const n = points.length - 1; // number of segments
+  const h = new Float64Array(n);
+  for (let i = 0; i < n; i++) {
+    h[i] = Math.max(
+      1e-10,
+      Math.hypot(
+        points[i + 1][0] - points[i][0],
+        points[i + 1][1] - points[i][1],
+      ),
+    );
+  }
+
+  const mx = new Float64Array(n + 1);
+  const my = new Float64Array(n + 1);
+  const diag = new Float64Array(n + 1);
+  const rhsX = new Float64Array(n + 1);
+  const rhsY = new Float64Array(n + 1);
+
+  // Row 0 – natural BC (zero second derivative at start)
+  diag[0] = 2;
+  rhsX[0] = (3 * (points[1][0] - points[0][0])) / h[0];
+  rhsY[0] = (3 * (points[1][1] - points[0][1])) / h[0];
+
+  // Interior rows
+  for (let i = 1; i < n; i++) {
+    diag[i] = 2 * (h[i - 1] + h[i]);
+    rhsX[i] =
+      3 *
+      ((h[i] * (points[i][0] - points[i - 1][0])) / h[i - 1] +
+        (h[i - 1] * (points[i + 1][0] - points[i][0])) / h[i]);
+    rhsY[i] =
+      3 *
+      ((h[i] * (points[i][1] - points[i - 1][1])) / h[i - 1] +
+        (h[i - 1] * (points[i + 1][1] - points[i][1])) / h[i]);
+  }
+
+  // Row n – natural BC (zero second derivative at end)
+  diag[n] = 2;
+  rhsX[n] = (3 * (points[n][0] - points[n - 1][0])) / h[n - 1];
+  rhsY[n] = (3 * (points[n][1] - points[n - 1][1])) / h[n - 1];
+
+  // Forward sweep
+  // sub[i] = h[i] for i=1..n−1, sub[n] = 1
+  // sup[i] = 1 for i=0, h[i−1] for i=1..n−1  (never modified)
+  for (let i = 1; i <= n; i++) {
+    const sub = i < n ? h[i] : 1;
+    const supPrev = i === 1 ? 1 : h[i - 2];
+    const w = sub / diag[i - 1];
+    diag[i] -= w * supPrev;
+    rhsX[i] -= w * rhsX[i - 1];
+    rhsY[i] -= w * rhsY[i - 1];
+  }
+
+  // Back substitution
+  mx[n] = rhsX[n] / diag[n];
+  my[n] = rhsY[n] / diag[n];
+  for (let i = n - 1; i >= 0; i--) {
+    const sup = i === 0 ? 1 : h[i - 1];
+    mx[i] = (rhsX[i] - sup * mx[i + 1]) / diag[i];
+    my[i] = (rhsY[i] - sup * my[i + 1]) / diag[i];
+  }
+
+  // Normalised tangent directions; handle length scales sub-linearly with chord.
+  const mlen = new Float64Array(n + 1);
+  for (let i = 0; i <= n; i++) {
+    mlen[i] = Math.max(1e-10, Math.hypot(mx[i], my[i]));
+  }
+
+  // At interior knots, blend the C2 tangent direction toward the
+  // perpendicular-to-bisector (the perfectly symmetric tangent) by a factor
+  // proportional to turn sharpness × CP_ANGLE_CORRECTION.
+  // Both cp2 (incoming) and cp1 (outgoing) at the knot share the same adjusted
+  // direction, so collinear (aligned) handles are preserved.
+  for (let k = 1; k < n; k++) {
+    const d1x = (points[k][0] - points[k - 1][0]) / h[k - 1];
+    const d1y = (points[k][1] - points[k - 1][1]) / h[k - 1];
+    const d2x = (points[k + 1][0] - points[k][0]) / h[k];
+    const d2y = (points[k + 1][1] - points[k][1]) / h[k];
+    const dot = d1x * d2x + d1y * d2y;
+    // t: 0 = straight, 1 = hairpin
+    const t = ((1 - dot) / 2) * CP_ANGLE_CORRECTION;
+    if (t < 1e-6) {
+      continue;
+    }
+    // Bisector of the two chord directions as the "normal" at the knot.
+    // Its perpendicular is the ideal symmetric tangent direction.
+    const bx = d1x + d2x;
+    const by = d1y + d2y;
+    const blen = Math.hypot(bx, by);
+    if (blen < 1e-10) {
+      continue; // 180° hairpin – bisector undefined, skip
+    }
+    // Blend target: bisector direction (pick sign aligning with current tangent)
+    let px = bx / blen;
+    let py = by / blen;
+    const tx = mx[k] / mlen[k];
+    const ty = my[k] / mlen[k];
+    if (tx * px + ty * py < 0) {
+      px = -px;
+      py = -py;
+    }
+    // Linear blend of unit directions, then renormalize to preserve magnitude.
+    const blendX = tx + t * (px - tx);
+    const blendY = ty + t * (py - ty);
+    const blendLen = Math.max(1e-10, Math.hypot(blendX, blendY));
+    mx[k] = (blendX / blendLen) * mlen[k];
+    my[k] = (blendY / blendLen) * mlen[k];
+  }
+
+  const path: string[] = [`M ${points[0][0]} ${points[0][1]}`];
+  for (let i = 0; i < n; i++) {
+    const cpDist = Math.pow(h[i], CP_CHORD_POWER) / 3;
+    const cp1x = points[i][0] + (mx[i] / mlen[i]) * cpDist;
+    const cp1y = points[i][1] + (my[i] / mlen[i]) * cpDist;
+    const cp2x = points[i + 1][0] - (mx[i + 1] / mlen[i + 1]) * cpDist;
+    const cp2y = points[i + 1][1] - (my[i + 1] / mlen[i + 1]) * cpDist;
+    path.push(
+      `C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${points[i + 1][0]} ${
+        points[i + 1][1]
+      }`,
+    );
+  }
+
+  return path.join(" ");
+};
+
 const generateElbowArrowShape = (
   points: readonly LocalPoint[],
   radius: number,
-) => {
+): string => {
   const subpoints = [] as [number, number][];
   for (let i = 1; i < points.length - 1; i += 1) {
     const prev = points[i - 1];

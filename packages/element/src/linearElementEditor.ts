@@ -790,9 +790,20 @@ export class LinearElementEditor {
       elementsMap,
     );
 
+    const [lines, segCurves] = deconstructLinearOrFreeDrawElement(
+      element,
+      elementsMap,
+    );
+    const segmentCount = lines.length + segCurves.length;
+
     let index = 0;
     const midpoints: (GlobalPoint | null)[] = [];
     while (index < points.length - 1) {
+      if (segmentCount > 0 && index >= segmentCount) {
+        midpoints.push(null);
+        index++;
+        continue;
+      }
       if (
         LinearElementEditor.isSegmentTooShort(
           element,
