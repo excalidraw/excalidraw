@@ -560,9 +560,14 @@ export const Preferences = ({
   additionalItems?: React.ReactNode;
 }) => {
   const { t } = useI18n();
+  const setAppState = useExcalidrawSetAppState();
   return (
     <DropdownMenuSub>
-      <DropdownMenuSub.Trigger icon={settingsIcon}>
+      <DropdownMenuSub.Trigger
+        icon={settingsIcon}
+        onPointerMove={() => setAppState({ openPopup: null })}
+        onFocus={() => setAppState({ openPopup: null })}
+      >
         {t("labels.preferences")}
       </DropdownMenuSub.Trigger>
       <DropdownMenuSub.Content className="excalidraw-main-menu-preferences-submenu">
