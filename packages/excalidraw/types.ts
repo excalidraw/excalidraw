@@ -469,6 +469,12 @@ export interface AppState {
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
   bindMode: BindMode;
+  /**
+   * When true, laser trails persist on screen until explicitly cleared
+   * instead of fading out automatically. Useful for presentations and teaching.
+   * Related to issue #9884.
+   */
+  laserToolPersistence: boolean;
 }
 
 export type SearchMatch = {
@@ -828,6 +834,7 @@ export type AppClassProperties = {
   bindModeHandler: App["bindModeHandler"];
 
   setAppState: App["setAppState"];
+  laserTrails: App["laserTrails"];
 };
 
 export type PointerDownState = Readonly<{

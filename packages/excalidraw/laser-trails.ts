@@ -33,6 +33,10 @@ export class LaserTrails implements Trail {
       simplify: 0,
       streamline: 0.4,
       sizeMapping: (c) => {
+        // In persistent mode, trails stay at full size without decaying.
+        if (this.app.state.laserToolPersistence) {
+          return 1;
+        }
         const DECAY_TIME = 1000;
         const DECAY_LENGTH = 50;
         const t = Math.max(
@@ -59,6 +63,14 @@ export class LaserTrails implements Trail {
 
   endPath(): void {
     this.localTrail.endPath();
+  }
+
+  /**
+   * Clears all local laser trails from the screen.
+   * Used in persistent mode to explicitly remove accumulated trails.
+   */
+  clearTrails(): void {
+    this.localTrail.clearTrails();
   }
 
   start(container: SVGSVGElement) {
