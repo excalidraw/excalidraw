@@ -20,6 +20,7 @@ import {
   getElementAbsoluteCoords,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
+import { ensureSchemaStateForElementType } from "./schema";
 import { newElementWith } from "./mutateElement";
 import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
@@ -50,8 +51,6 @@ import type {
   ExcalidrawLineElement,
 } from "./types";
 
-const ELEMENT_SCHEMA_VERSION = 2;
-
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
   | "width"
@@ -72,6 +71,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "roughness"
   | "strokeWidth"
   | "roundness"
+  | "schemaState"
   | "locked"
   | "opacity"
   | "customData"
@@ -146,7 +146,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     roundness,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
-    schemaVersion: rest.schemaVersion ?? ELEMENT_SCHEMA_VERSION,
+    schemaState: ensureSchemaStateForElementType(rest.schemaState, type),
     versionNonce: rest.versionNonce ?? 0,
     isDeleted: false as false,
     boundElements,

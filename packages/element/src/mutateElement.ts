@@ -11,6 +11,7 @@ import type { Mutable } from "@excalidraw/common/utility-types";
 import { ShapeCache } from "./shape";
 
 import { updateElbowArrowPoints } from "./elbowArrow";
+import { ensureSchemaStateForElementType } from "./schema";
 
 import { isElbowArrow } from "./typeChecks";
 
@@ -137,6 +138,10 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element.version = updates.version ?? element.version + 1;
   element.versionNonce = updates.versionNonce ?? randomInteger();
   element.updated = getUpdatedTimestamp();
+  element.schemaState = ensureSchemaStateForElementType(
+    element.schemaState,
+    element.type,
+  ) as TElement["schemaState"];
 
   return element;
 };
@@ -166,12 +171,20 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
     return element;
   }
 
-  return {
+  const updatedElement = {
     ...element,
     ...updates,
     version: updates.version ?? element.version + 1,
     versionNonce: updates.versionNonce ?? randomInteger(),
     updated: getUpdatedTimestamp(),
+  };
+
+  return {
+    ...updatedElement,
+    schemaState: ensureSchemaStateForElementType(
+      updatedElement.schemaState,
+      updatedElement.type,
+    ),
   };
 };
 

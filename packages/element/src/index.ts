@@ -83,6 +83,7 @@ export * from "./positionElementsOnGrid";
 export * from "./renderElement";
 export * from "./resizeElements";
 export * from "./resizeTest";
+export * from "./schema";
 export * from "./Scene";
 export * from "./selection";
 export * from "./shape";
