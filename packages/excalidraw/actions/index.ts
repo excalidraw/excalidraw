@@ -34,6 +34,7 @@ export {
 export { actionSetEmbeddableAsActiveTool } from "./actionEmbeddable";
 
 export { actionFinalize } from "./actionFinalize";
+export { actionDeselect } from "./actionDeselect";
 
 export {
   actionChangeProjectName,

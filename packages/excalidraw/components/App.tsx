@@ -5725,13 +5725,13 @@ class App extends React.Component<AppProps, AppState> {
         const isDeleted = !nextOriginalText.trim();
         updateElement(nextOriginalText, isDeleted);
 
-        // select the created text element only if submitting via keyboard
-        // (when submitting via click it should act as signal to deselect)
-        if (!isDeleted && viaKeyboard) {
-          const elementIdToSelect = element.containerId
-            ? element.containerId
-            : element.id;
+        // keyboard-submit keeps focus on the edited object. For bound text, keep
+        // the container selected even if the text becomes empty and is deleted.
+        const elementIdToSelect = viaKeyboard
+          ? element.containerId || (!isDeleted ? element.id : null)
+          : null;
 
+        if (elementIdToSelect) {
           // needed to ensure state is updated before "finalize" action
           // that's invoked on keyboard-submit as well
           // TODO either move this into finalize as well, or handle all state
