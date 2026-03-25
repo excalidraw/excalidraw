@@ -37,7 +37,9 @@ exports[`multi point mode in linear elements > arrow 3`] = `
   "roundness": {
     "type": 2,
   },
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": 1278240551,
   "startArrowhead": null,
   "startBinding": null,
@@ -89,7 +91,9 @@ exports[`multi point mode in linear elements > line 3`] = `
   "polygon": false,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": 1278240551,
   "startArrowhead": null,
   "startBinding": null,

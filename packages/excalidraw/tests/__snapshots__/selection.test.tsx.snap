@@ -33,7 +33,9 @@ exports[`select single element on the scene > arrow 1`] = `
   "roundness": {
     "type": 2,
   },
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": 1278240551,
   "startArrowhead": null,
   "startBinding": null,
@@ -81,7 +83,9 @@ exports[`select single element on the scene > arrow escape 1`] = `
   "polygon": false,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": 1278240551,
   "startArrowhead": null,
   "startBinding": null,
@@ -116,7 +120,9 @@ exports[`select single element on the scene > diamond 1`] = `
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -149,7 +155,9 @@ exports[`select single element on the scene > ellipse 1`] = `
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -182,7 +190,9 @@ exports[`select single element on the scene > rectangle 1`] = `
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",

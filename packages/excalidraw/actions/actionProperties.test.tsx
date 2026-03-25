@@ -6,6 +6,10 @@ import {
   FONT_FAMILY,
   STROKE_WIDTH,
 } from "@excalidraw/common";
+import {
+  CORE_FRAME_SCHEMA_TRACK,
+  CORE_SUPPORTED_TRACKS,
+} from "@excalidraw/element";
 
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
@@ -196,6 +200,7 @@ describe("element locking", () => {
     it("should not update text background when changing background in mixed frame selection", () => {
       const frame = API.createElement({
         type: "frame",
+        schemaState: { tracks: {} },
       });
       const text = API.createElement({
         type: "text",
@@ -215,6 +220,9 @@ describe("element locking", () => {
       expect(API.getElement(text).backgroundColor).toBe(
         COLOR_PALETTE.transparent,
       );
+      expect(
+        API.getElement(frame).schemaState.tracks[CORE_FRAME_SCHEMA_TRACK],
+      ).toBe(CORE_SUPPORTED_TRACKS[CORE_FRAME_SCHEMA_TRACK]);
     });
 
     it("should not update frame stroke width when changing stroke width in mixed selection", () => {

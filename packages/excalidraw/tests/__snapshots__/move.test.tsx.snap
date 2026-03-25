@@ -18,7 +18,9 @@ exports[`duplicate element on move when ALT is clicked > rectangle 5`] = `
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -51,7 +53,9 @@ exports[`duplicate element on move when ALT is clicked > rectangle 6`] = `
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": 1505387817,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -84,7 +88,9 @@ exports[`move element > rectangle 5`] = `
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -122,7 +128,9 @@ exports[`move element > rectangles with binding arrow 5`] = `
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -160,7 +168,9 @@ exports[`move element > rectangles with binding arrow 6`] = `
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": 1116226695,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -216,7 +226,9 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "roundness": {
     "type": 2,
   },
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": 23633383,
   "startArrowhead": null,
   "startBinding": {

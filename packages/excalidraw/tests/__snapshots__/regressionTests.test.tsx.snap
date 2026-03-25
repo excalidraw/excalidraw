@@ -168,7 +168,9 @@ exports[`given element A and group of elements B and given both are selected whe
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -223,7 +225,9 @@ exports[`given element A and group of elements B and given both are selected whe
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -278,7 +282,9 @@ exports[`given element A and group of elements B and given both are selected whe
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -363,11 +369,17 @@ exports[`given element A and group of elements B and given both are selected whe
               "id15",
             ],
             "index": "a2",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [],
             "index": "a0",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -377,11 +389,17 @@ exports[`given element A and group of elements B and given both are selected whe
               "id15",
             ],
             "index": "a3",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [],
             "index": "a2",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -602,7 +620,9 @@ exports[`given element A and group of elements B and given both are selected whe
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -657,7 +677,9 @@ exports[`given element A and group of elements B and given both are selected whe
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -712,7 +734,9 @@ exports[`given element A and group of elements B and given both are selected whe
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -775,11 +799,17 @@ exports[`given element A and group of elements B and given both are selected whe
               "id12",
             ],
             "index": "a2",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [],
             "index": "a0",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -789,11 +819,17 @@ exports[`given element A and group of elements B and given both are selected whe
               "id12",
             ],
             "index": "a3",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [],
             "index": "a2",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -1015,7 +1051,9 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1070,7 +1108,9 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1154,10 +1194,16 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -1166,10 +1212,16 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -1240,7 +1292,9 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1332,12 +1386,18 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
               "id12",
               "id28",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
@@ -1346,10 +1406,16 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "groupIds": [
               "id28",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -1359,12 +1425,18 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
               "id12",
               "id28",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
@@ -1587,7 +1659,9 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1620,11 +1694,17 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
       "updated": {
         "id0": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
             "x": 25,
             "y": 25,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
             "x": 0,
             "y": 0,
@@ -1803,7 +1883,9 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1858,7 +1940,9 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1913,7 +1997,9 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1998,11 +2084,17 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
               "id15",
             ],
             "index": "a2",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [],
             "index": "a0",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -2012,11 +2104,17 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
               "id15",
             ],
             "index": "a3",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [],
             "index": "a2",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -2190,7 +2288,9 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2245,7 +2345,9 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2264,9 +2366,15 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
       "updated": {
         "id0": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -2438,7 +2546,9 @@ exports[`regression tests > arrow keys > [end of test] undo stack 1`] = `
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2624,7 +2734,9 @@ exports[`regression tests > can drag element that covers another element, while 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2679,7 +2791,9 @@ exports[`regression tests > can drag element that covers another element, while 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2734,7 +2848,9 @@ exports[`regression tests > can drag element that covers another element, while 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2775,11 +2891,17 @@ exports[`regression tests > can drag element that covers another element, while 
       "updated": {
         "id3": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
             "x": 300,
             "y": 300,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
             "x": 100,
             "y": 100,
@@ -2953,7 +3075,9 @@ exports[`regression tests > change the properties of a shape > [end of test] und
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2987,10 +3111,16 @@ exports[`regression tests > change the properties of a shape > [end of test] und
         "id0": {
           "deleted": {
             "backgroundColor": "#ffec99",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "backgroundColor": "transparent",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -3012,10 +3142,16 @@ exports[`regression tests > change the properties of a shape > [end of test] und
         "id0": {
           "deleted": {
             "backgroundColor": "#ffc9c9",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "backgroundColor": "#ffec99",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
@@ -3036,10 +3172,16 @@ exports[`regression tests > change the properties of a shape > [end of test] und
       "updated": {
         "id0": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1971c2",
             "version": 6,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "version": 5,
           },
@@ -3191,7 +3333,9 @@ exports[`regression tests > click on an element and drag it > [dragged] element 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -3247,7 +3391,9 @@ exports[`regression tests > click on an element and drag it > [dragged] undo sta
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -3280,11 +3426,17 @@ exports[`regression tests > click on an element and drag it > [dragged] undo sta
       "updated": {
         "id0": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
             "x": 20,
             "y": 20,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
             "x": 10,
             "y": 10,
@@ -3460,7 +3612,9 @@ exports[`regression tests > click on an element and drag it > [end of test] undo
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -3493,11 +3647,17 @@ exports[`regression tests > click on an element and drag it > [end of test] undo
       "updated": {
         "id0": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
             "x": 20,
             "y": 20,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
             "x": 10,
             "y": 10,
@@ -3520,11 +3680,17 @@ exports[`regression tests > click on an element and drag it > [end of test] undo
       "updated": {
         "id0": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
             "x": 10,
             "y": 10,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
             "x": 20,
             "y": 20,
@@ -3700,7 +3866,9 @@ exports[`regression tests > click to select a shape > [end of test] undo stack 1
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -3755,7 +3923,9 @@ exports[`regression tests > click to select a shape > [end of test] undo stack 1
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -3964,7 +4134,9 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -4019,7 +4191,9 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -4074,7 +4248,9 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -4283,7 +4459,9 @@ exports[`regression tests > deleting last but one element in editing group shoul
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -4338,7 +4516,9 @@ exports[`regression tests > deleting last but one element in editing group shoul
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -4422,10 +4602,16 @@ exports[`regression tests > deleting last but one element in editing group shoul
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -4434,10 +4620,16 @@ exports[`regression tests > deleting last but one element in editing group shoul
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -4497,10 +4689,16 @@ exports[`regression tests > deleting last but one element in editing group shoul
         "id0": {
           "deleted": {
             "isDeleted": true,
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "isDeleted": false,
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
@@ -4675,7 +4873,9 @@ exports[`regression tests > deselects group of selected elements on pointer down
     "opacity": 100,
     "roughness": 1,
     "roundness": null,
-    "schemaVersion": 2,
+    "schemaState": {
+      "tracks": {},
+    },
     "seed": 493213705,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
@@ -4752,7 +4952,9 @@ exports[`regression tests > deselects group of selected elements on pointer down
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -4807,7 +5009,9 @@ exports[`regression tests > deselects group of selected elements on pointer down
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5012,7 +5216,9 @@ exports[`regression tests > deselects group of selected elements on pointer up w
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5067,7 +5273,9 @@ exports[`regression tests > deselects group of selected elements on pointer up w
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5244,7 +5452,9 @@ exports[`regression tests > deselects selected element on pointer down when poin
     "opacity": 100,
     "roughness": 1,
     "roundness": null,
-    "schemaVersion": 2,
+    "schemaState": {
+      "tracks": {},
+    },
     "seed": 1116226695,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
@@ -5321,7 +5531,9 @@ exports[`regression tests > deselects selected element on pointer down when poin
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5505,7 +5717,9 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5709,7 +5923,9 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5764,7 +5980,9 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5819,7 +6037,9 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5882,10 +6102,16 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "groupIds": [
               "id11",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -5894,10 +6120,16 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "groupIds": [
               "id11",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -5906,10 +6138,16 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "groupIds": [
               "id11",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -6112,7 +6350,9 @@ exports[`regression tests > drags selected elements from point inside common bou
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6167,7 +6407,9 @@ exports[`regression tests > drags selected elements from point inside common bou
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6220,11 +6462,17 @@ exports[`regression tests > drags selected elements from point inside common bou
       "updated": {
         "id0": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
             "x": 25,
             "y": 25,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
             "x": 0,
             "y": 0,
@@ -6232,11 +6480,17 @@ exports[`regression tests > drags selected elements from point inside common bou
         },
         "id3": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
             "x": 135,
             "y": 135,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
             "x": 110,
             "y": 110,
@@ -6408,7 +6662,9 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6463,7 +6719,9 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6518,7 +6776,9 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6593,7 +6853,9 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -6671,7 +6933,9 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "polygon": false,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -6751,7 +7015,9 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -6801,6 +7067,9 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 20,
               ],
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
             "width": 80,
           },
@@ -6816,6 +7085,9 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 10,
               ],
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
             "width": 50,
           },
@@ -6880,7 +7152,9 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "polygon": false,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -6930,6 +7204,9 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 20,
               ],
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
             "width": 80,
           },
@@ -6945,6 +7222,9 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 10,
               ],
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
             "width": 50,
           },
@@ -7024,7 +7304,9 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             ],
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "simulatePressure": false,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
@@ -7212,7 +7494,9 @@ exports[`regression tests > given a group of selected elements with an element t
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7267,7 +7551,9 @@ exports[`regression tests > given a group of selected elements with an element t
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7322,7 +7608,9 @@ exports[`regression tests > given a group of selected elements with an element t
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7552,7 +7840,9 @@ exports[`regression tests > given a selected element A and a not selected elemen
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7607,7 +7897,9 @@ exports[`regression tests > given a selected element A and a not selected elemen
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7835,7 +8127,9 @@ exports[`regression tests > given selected element A with lower z-index than uns
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7867,7 +8161,9 @@ exports[`regression tests > given selected element A with lower z-index than uns
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8075,7 +8371,9 @@ exports[`regression tests > given selected element A with lower z-index than uns
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8107,7 +8405,9 @@ exports[`regression tests > given selected element A with lower z-index than uns
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8140,11 +8440,17 @@ exports[`regression tests > given selected element A with lower z-index than uns
       "updated": {
         "id0": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
             "x": 100,
             "y": 100,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 2,
             "x": 0,
             "y": 0,
@@ -8318,7 +8624,9 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8502,7 +8810,9 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] undo stac
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8686,7 +8996,9 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] undo stac
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8920,7 +9232,9 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] undo stack 
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -9154,7 +9468,9 @@ exports[`regression tests > key 6 selects line tool > [end of test] undo stack 1
             "polygon": false,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -9351,7 +9667,9 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] undo sta
             ],
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "simulatePressure": false,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
@@ -9586,7 +9904,9 @@ exports[`regression tests > key a selects arrow tool > [end of test] undo stack 
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -9772,7 +10092,9 @@ exports[`regression tests > key d selects diamond tool > [end of test] undo stac
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -10004,7 +10326,9 @@ exports[`regression tests > key l selects line tool > [end of test] undo stack 1
             "polygon": false,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -10190,7 +10514,9 @@ exports[`regression tests > key o selects ellipse tool > [end of test] undo stac
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -10385,7 +10711,9 @@ exports[`regression tests > key p selects freedraw tool > [end of test] undo sta
             ],
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "simulatePressure": false,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
@@ -10570,7 +10898,9 @@ exports[`regression tests > key r selects rectangle tool > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -10762,7 +11092,9 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -10817,7 +11149,9 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -10872,7 +11206,9 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -10935,10 +11271,16 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -10947,10 +11289,16 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -10959,10 +11307,16 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -11017,7 +11371,9 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11051,7 +11407,9 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11085,7 +11443,9 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11104,25 +11464,43 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
       "updated": {
         "id0": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 6,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
         "id3": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 6,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
         "id6": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 6,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
@@ -11296,7 +11674,9 @@ exports[`regression tests > noop interaction after undo shouldn't create history
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11351,7 +11731,9 @@ exports[`regression tests > noop interaction after undo shouldn't create history
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11705,7 +12087,9 @@ exports[`regression tests > shift click on selected element should deselect it o
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11913,7 +12297,9 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11968,7 +12354,9 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12043,11 +12431,17 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
       "updated": {
         "id0": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
             "x": 20,
             "y": 20,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
             "x": 10,
             "y": 10,
@@ -12055,11 +12449,17 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
         },
         "id3": {
           "deleted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
             "x": 40,
             "y": 20,
           },
           "inserted": {
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
             "x": 30,
             "y": 10,
@@ -12239,7 +12639,9 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12294,7 +12696,9 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12349,7 +12753,9 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12412,10 +12818,16 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -12424,10 +12836,16 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -12436,10 +12854,16 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -12467,36 +12891,54 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
         "id0": {
           "deleted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
         "id3": {
           "deleted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
         "id6": {
           "deleted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
@@ -12678,7 +13120,9 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12733,7 +13177,9 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12817,10 +13263,16 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -12829,10 +13281,16 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -12880,7 +13338,9 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12935,7 +13395,9 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -13019,10 +13481,16 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "groupIds": [
               "id27",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -13031,10 +13499,16 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "groupIds": [
               "id27",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -13093,12 +13567,18 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
               "id12",
               "id32",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
@@ -13108,12 +13588,18 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
               "id27",
               "id32",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id27",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
@@ -13123,12 +13609,18 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
               "id27",
               "id32",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id27",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
@@ -13138,12 +13630,18 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
               "id12",
               "id32",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id12",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
@@ -13446,7 +13944,9 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -13501,7 +14001,9 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -13556,7 +14058,9 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -13619,10 +14123,16 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "groupIds": [
               "id11",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -13631,10 +14141,16 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "groupIds": [
               "id11",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -13643,10 +14159,16 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "groupIds": [
               "id11",
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 3,
           },
         },
@@ -13725,6 +14247,9 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
               "id11",
             ],
             "index": "a2",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 6,
           },
           "inserted": {
@@ -13732,6 +14257,9 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
               "id11",
             ],
             "index": "a0",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
@@ -13742,6 +14270,9 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
               "id11",
             ],
             "index": "a3",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 6,
           },
           "inserted": {
@@ -13749,6 +14280,9 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
               "id11",
             ],
             "index": "a2",
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 4,
           },
         },
@@ -14036,7 +14570,9 @@ exports[`regression tests > switches from group of selected elements to another 
     "opacity": 100,
     "roughness": 1,
     "roundness": null,
-    "schemaVersion": 2,
+    "schemaState": {
+      "tracks": {},
+    },
     "seed": 1006504105,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
@@ -14113,7 +14649,9 @@ exports[`regression tests > switches from group of selected elements to another 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -14168,7 +14706,9 @@ exports[`regression tests > switches from group of selected elements to another 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -14223,7 +14763,9 @@ exports[`regression tests > switches from group of selected elements to another 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -14381,7 +14923,9 @@ exports[`regression tests > switches selected element on pointer down > [end of 
     "opacity": 100,
     "roughness": 1,
     "roundness": null,
-    "schemaVersion": 2,
+    "schemaState": {
+      "tracks": {},
+    },
     "seed": 23633383,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
@@ -14458,7 +15002,9 @@ exports[`regression tests > switches selected element on pointer down > [end of 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -14513,7 +15059,9 @@ exports[`regression tests > switches selected element on pointer down > [end of 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -14812,6 +15360,9 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
                 10,
               ],
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 6,
             "width": 60,
           },
@@ -14831,6 +15382,9 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
                 20,
               ],
             ],
+            "schemaState": {
+              "tracks": {},
+            },
             "version": 5,
             "width": 100,
           },
@@ -14897,7 +15451,9 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -14954,7 +15510,9 @@ exports[`regression tests > undo/redo drawing an element > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -15009,7 +15567,9 @@ exports[`regression tests > undo/redo drawing an element > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 2,
+            "schemaState": {
+              "tracks": {},
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,

@@ -31,7 +31,9 @@ exports[`repairing bindings > should strip arrow binding if repair throws 1`] = 
   ],
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": null,
@@ -79,7 +81,9 @@ exports[`restoreElements > should restore arrow element correctly 1`] = `
   ],
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": null,
@@ -120,7 +124,9 @@ exports[`restoreElements > should restore correctly with rectangle, ellipse and 
   "roundness": {
     "type": 3,
   },
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": Any<Number>,
   "strokeColor": "red",
   "strokeStyle": "dashed",
@@ -159,7 +165,9 @@ exports[`restoreElements > should restore correctly with rectangle, ellipse and 
   "roundness": {
     "type": 3,
   },
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": Any<Number>,
   "strokeColor": "red",
   "strokeStyle": "dashed",
@@ -198,7 +206,9 @@ exports[`restoreElements > should restore correctly with rectangle, ellipse and 
   "roundness": {
     "type": 3,
   },
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": Any<Number>,
   "strokeColor": "red",
   "strokeStyle": "dashed",
@@ -242,7 +252,9 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
   "pressures": [],
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": Any<Number>,
   "simulatePressure": true,
   "strokeColor": "#1e1e1e",
@@ -289,7 +301,9 @@ exports[`restoreElements > should restore line and draw elements correctly 1`] =
   "polygon": false,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": null,
@@ -337,7 +351,9 @@ exports[`restoreElements > should restore line and draw elements correctly 2`] =
   "polygon": false,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": null,
@@ -378,7 +394,9 @@ exports[`restoreElements > should restore text element correctly passing value f
   "originalText": "text",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": Any<Number>,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -421,7 +439,9 @@ exports[`restoreElements > should restore text element correctly with unknown fo
   "originalText": "",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 2,
+  "schemaState": {
+    "tracks": {},
+  },
   "seed": Any<Number>,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",

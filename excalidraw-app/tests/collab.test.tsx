@@ -84,10 +84,15 @@ describe("collaboration", () => {
 
     const frameWithFutureFields = {
       ...frame,
-      schemaVersion: 2,
+      schemaState: {
+        tracks: {
+          ...frame.schemaState.tracks,
+          "host.myapp.frame": 1,
+        },
+      },
       futureField: "keep-me",
     } as typeof frame & {
-      schemaVersion: number;
+      schemaState: { tracks: Record<string, number> };
       futureField: string;
     };
 
@@ -98,7 +103,9 @@ describe("collaboration", () => {
 
     await waitFor(() => {
       expect((h.elements[0] as any).futureField).toBe("keep-me");
-      expect((h.elements[0] as any).schemaVersion).toBe(2);
+      expect((h.elements[0] as any).schemaState).toEqual(
+        frameWithFutureFields.schemaState,
+      );
       expect(h.elements[0].backgroundColor).toBe("#ff0000");
     });
 
@@ -119,7 +126,9 @@ describe("collaboration", () => {
       }),
     );
     expect((reconciled[0] as any).futureField).toBe("keep-me");
-    expect((reconciled[0] as any).schemaVersion).toBe(2);
+    expect((reconciled[0] as any).schemaState).toEqual(
+      frameWithFutureFields.schemaState,
+    );
   });
 
   it("should preserve future element fields on local edits before broadcast", async () => {
@@ -136,10 +145,15 @@ describe("collaboration", () => {
 
     const rectWithFutureFields = {
       ...rect,
-      schemaVersion: 2,
+      schemaState: {
+        tracks: {
+          ...rect.schemaState.tracks,
+          "host.myapp.rect": 1,
+        },
+      },
       futureField: { value: "keep-me" },
     } as typeof rect & {
-      schemaVersion: number;
+      schemaState: { tracks: Record<string, number> };
       futureField: { value: string };
     };
 
@@ -156,7 +170,9 @@ describe("collaboration", () => {
 
     await waitFor(() => {
       expect((h.elements[0] as any).futureField).toEqual({ value: "keep-me" });
-      expect((h.elements[0] as any).schemaVersion).toBe(2);
+      expect((h.elements[0] as any).schemaState).toEqual(
+        rectWithFutureFields.schemaState,
+      );
       expect(h.elements[0]).toEqual(expect.objectContaining({ x: 200 }));
     });
   });
@@ -175,14 +191,18 @@ describe("collaboration", () => {
       }
     });
 
-    // eslint-disable-next-line dot-notation
-    expect(h.store["scheduledMicroActions"].length).toBe(0);
-    expect(durableIncrements.length).toBe(0);
-    expect(ephemeralIncrements.length).toBe(0);
+    // Ensure this test starts from a deterministic scene regardless of previous
+    // test state restored from persistence.
+    API.updateScene({
+      elements: [],
+      captureUpdate: CaptureUpdateAction.NEVER,
+    });
+
+    const durableBaseline = durableIncrements.length;
+    const ephemeralBaseline = ephemeralIncrements.length;
 
     const rectProps = {
       type: "rectangle",
-      id: "A",
       height: 200,
       width: 100,
       x: 0,
@@ -197,8 +217,7 @@ describe("collaboration", () => {
     });
 
     await waitFor(() => {
-      // expect(commitSpy).toHaveBeenCalledTimes(1);
-      expect(durableIncrements.length).toBe(1);
+      expect(durableIncrements.length).toBe(durableBaseline + 1);
     });
 
     // simulate two batched remote updates
@@ -222,13 +241,13 @@ describe("collaboration", () => {
       // altough the updates get batched,
       // we expect two ephemeral increments for each update,
       // and each such update should have the expected change
-      expect(ephemeralIncrements.length).toBe(2);
-      expect(ephemeralIncrements[0].change.elements.A).toEqual(
-        expect.objectContaining({ x: 100 }),
-      );
-      expect(ephemeralIncrements[1].change.elements.A).toEqual(
-        expect.objectContaining({ x: 200 }),
-      );
+      expect(ephemeralIncrements.length).toBe(ephemeralBaseline + 2);
+      expect(
+        ephemeralIncrements[ephemeralBaseline].change.elements[rect.id],
+      ).toEqual(expect.objectContaining({ x: 100 }));
+      expect(
+        ephemeralIncrements[ephemeralBaseline + 1].change.elements[rect.id],
+      ).toEqual(expect.objectContaining({ x: 200 }));
       // eslint-disable-next-line dot-notation
       expect(h.store["scheduledMicroActions"].length).toBe(0);
     });

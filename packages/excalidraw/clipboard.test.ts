@@ -4,7 +4,6 @@ import {
   parseDataTransferEvent,
   serializeAsClipboardJSON,
 } from "./clipboard";
-import { SCHEMA_VERSIONS } from "./data/schema";
 import { API } from "./tests/helpers/api";
 
 describe("parseClipboard()", () => {
@@ -59,7 +58,7 @@ describe("parseClipboard()", () => {
       expect.objectContaining({
         id: rect.id,
         type: rect.type,
-        schemaVersion: SCHEMA_VERSIONS.latest,
+        schemaState: rect.schemaState,
       }),
     ]);
   });
@@ -84,7 +83,7 @@ describe("parseClipboard()", () => {
       expect.objectContaining({
         id: rect.id,
         type: rect.type,
-        schemaVersion: SCHEMA_VERSIONS.latest,
+        schemaState: rect.schemaState,
       }),
     ]);
     // -------------------------------------------------------------------------
@@ -102,7 +101,7 @@ describe("parseClipboard()", () => {
       expect.objectContaining({
         id: rect.id,
         type: rect.type,
-        schemaVersion: SCHEMA_VERSIONS.latest,
+        schemaState: rect.schemaState,
       }),
     ]);
     // -------------------------------------------------------------------------
@@ -127,15 +126,15 @@ describe("parseClipboard()", () => {
     expect(clipboardData.elements?.[0]).toEqual(
       expect.objectContaining({
         id: rect.id,
-        schemaVersion: SCHEMA_VERSIONS.latest,
+        schemaState: rect.schemaState,
       }),
     );
   });
 
   it("should not upcast legacy elements to latest schema on clipboard serialize", async () => {
     const rect = API.createElement({ type: "rectangle" });
-    const legacyRect = { ...rect } as typeof rect & { schemaVersion?: number };
-    delete legacyRect.schemaVersion;
+    const legacyRect = { ...(rect as any) };
+    delete legacyRect.schemaState;
 
     const clipboardPayload = JSON.parse(
       serializeAsClipboardJSON({
@@ -143,7 +142,7 @@ describe("parseClipboard()", () => {
         files: null,
       }),
     );
-    expect(clipboardPayload.elements[0]).not.toHaveProperty("schemaVersion");
+    expect(clipboardPayload.elements[0]).not.toHaveProperty("schemaState");
 
     const clipboardData = await parseClipboard(
       await parseDataTransferEvent(
@@ -155,7 +154,7 @@ describe("parseClipboard()", () => {
       ),
     );
 
-    expect(clipboardData.elements?.[0]).not.toHaveProperty("schemaVersion");
+    expect(clipboardData.elements?.[0]).not.toHaveProperty("schemaState");
   });
 
   it("should parse <image> `src` urls out of text/html", async () => {

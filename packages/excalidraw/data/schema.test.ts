@@ -3,11 +3,13 @@ import { DEFAULT_ELEMENT_PROPS } from "@excalidraw/common";
 import { API } from "../tests/helpers/api";
 
 import {
+  CORE_FRAME_SCHEMA_TRACK,
   type SchemaMigration,
+  CORE_SUPPORTED_TRACKS,
   migrateElements,
-  resolveSchemaVersion,
+  resolveTrackVersion,
+  SCHEMA_INITIAL_TRACK_VERSION,
   SCHEMA_MIGRATIONS,
-  SCHEMA_VERSIONS,
   validateSchemaMigrations,
 } from "./schema";
 
@@ -18,7 +20,7 @@ describe("schema migration", () => {
         type: "frame",
         backgroundColor: "#ffc9c9",
       }),
-      schemaVersion: undefined,
+      schemaState: { tracks: {} },
     };
 
     const migrated = migrateElements([frame])!;
@@ -26,23 +28,31 @@ describe("schema migration", () => {
     expect(migrated[0].backgroundColor).toBe(
       DEFAULT_ELEMENT_PROPS.backgroundColor,
     );
-    expect(migrated[0].schemaVersion).toBe(SCHEMA_VERSIONS.latest);
+    expect(migrated[0].schemaState.tracks[CORE_FRAME_SCHEMA_TRACK]).toBe(
+      CORE_SUPPORTED_TRACKS[CORE_FRAME_SCHEMA_TRACK],
+    );
   });
 
-  it("should keep latest-schema frame backgrounds unchanged", () => {
-    const frame = API.createElement({
-      type: "frame",
-      backgroundColor: "#ffc9c9",
-    });
-    const latestFrame = {
-      ...frame,
-      schemaVersion: SCHEMA_VERSIONS.latest,
-    } as typeof frame & { schemaVersion: number };
+  it("should keep latest-track frame backgrounds unchanged", () => {
+    const frame = {
+      ...API.createElement({
+        type: "frame",
+        backgroundColor: "#ffc9c9",
+      }),
+      schemaState: {
+        tracks: {
+          [CORE_FRAME_SCHEMA_TRACK]:
+            CORE_SUPPORTED_TRACKS[CORE_FRAME_SCHEMA_TRACK],
+        },
+      },
+    };
 
-    const migrated = migrateElements([latestFrame])!;
+    const migrated = migrateElements([frame])!;
 
     expect(migrated[0].backgroundColor).toBe("#ffc9c9");
-    expect(migrated[0].schemaVersion).toBe(SCHEMA_VERSIONS.latest);
+    expect(migrated[0].schemaState.tracks[CORE_FRAME_SCHEMA_TRACK]).toBe(
+      CORE_SUPPORTED_TRACKS[CORE_FRAME_SCHEMA_TRACK],
+    );
   });
 
   it("should normalize legacy frame backgrounds", () => {
@@ -51,7 +61,11 @@ describe("schema migration", () => {
         type: "frame",
         backgroundColor: "#a5d8ff",
       }),
-      schemaVersion: undefined,
+      schemaState: {
+        tracks: {
+          [CORE_FRAME_SCHEMA_TRACK]: SCHEMA_INITIAL_TRACK_VERSION,
+        },
+      },
     };
 
     const migrated = migrateElements([frame])!;
@@ -60,10 +74,10 @@ describe("schema migration", () => {
     );
   });
 
-  it("should resolve invalid schema versions to initial", () => {
-    expect(resolveSchemaVersion(undefined)).toBe(SCHEMA_VERSIONS.initial);
-    expect(resolveSchemaVersion(0)).toBe(SCHEMA_VERSIONS.initial);
-    expect(resolveSchemaVersion(2)).toBe(2);
+  it("should resolve invalid track versions to initial", () => {
+    expect(resolveTrackVersion(undefined)).toBe(SCHEMA_INITIAL_TRACK_VERSION);
+    expect(resolveTrackVersion(0)).toBe(SCHEMA_INITIAL_TRACK_VERSION);
+    expect(resolveTrackVersion(2)).toBe(2);
   });
 
   it("should have a valid migration registry configuration", () => {
@@ -73,16 +87,34 @@ describe("schema migration", () => {
   it("should reject invalid migration metadata", () => {
     const invalidMigrations: SchemaMigration[] = [
       {
-        version: 2.1,
+        id: "",
+        namespace: "core",
+        track: CORE_FRAME_SCHEMA_TRACK,
+        toVersion: 2.1,
         title: "",
         description: " ",
-        apply: (elements) => elements,
+        targetTypes: [],
+        apply: (element) => element,
       },
       {
-        version: 2.1,
+        id: "dup",
+        namespace: "core",
+        track: CORE_FRAME_SCHEMA_TRACK,
+        toVersion: 2.1,
         title: "duplicate",
         description: "duplicate version",
-        apply: (elements) => elements,
+        targetTypes: ["frame"],
+        apply: (element) => element,
+      },
+      {
+        id: "dup",
+        namespace: "core",
+        track: CORE_FRAME_SCHEMA_TRACK,
+        toVersion: 3,
+        title: "duplicate id",
+        description: "duplicate id",
+        targetTypes: ["frame"],
+        apply: (element) => element,
       },
     ];
 
@@ -92,34 +124,62 @@ describe("schema migration", () => {
     expect(errors.join("\n")).toContain("integer version");
     expect(errors.join("\n")).toContain("title must be non-empty");
     expect(errors.join("\n")).toContain("non-empty description");
-    expect(errors.join("\n")).toContain("Duplicate schema migration version");
+    expect(errors.join("\n")).toContain("Duplicate schema migration id");
+    expect(errors.join("\n")).toContain("at least one target type");
   });
 
   it("should reject versions at or below initial", () => {
     const errors = validateSchemaMigrations([
       {
-        version: SCHEMA_VERSIONS.initial,
+        id: "invalid-start",
+        namespace: "core",
+        track: CORE_FRAME_SCHEMA_TRACK,
+        toVersion: SCHEMA_INITIAL_TRACK_VERSION,
         title: "invalid start",
         description: "bad version",
-        apply: (elements) => elements,
+        targetTypes: ["frame"],
+        apply: (element) => element,
       },
     ]);
 
-    expect(errors.join("\n")).toContain("greater than schema initial version");
+    expect(errors.join("\n")).toContain("must be greater than 1");
   });
 
-  it("should reject latest-version mismatch", () => {
+  it("should reject core track/version mismatch", () => {
     const errors = validateSchemaMigrations([
       {
-        version: SCHEMA_VERSIONS.latest + 1,
+        id: "frame-v3",
+        namespace: "core",
+        track: CORE_FRAME_SCHEMA_TRACK,
+        toVersion: CORE_SUPPORTED_TRACKS[CORE_FRAME_SCHEMA_TRACK] + 1,
         title: "future migration",
         description: "future migration for test",
-        apply: (elements) => elements,
+        targetTypes: ["frame"],
+        apply: (element) => element,
       },
     ]);
 
     expect(errors.join("\n")).toContain(
-      "SCHEMA_VERSIONS.latest (2) must match last migration version",
+      `Core supported track "${CORE_FRAME_SCHEMA_TRACK}" (${CORE_SUPPORTED_TRACKS[CORE_FRAME_SCHEMA_TRACK]}) must match last migration version`,
+    );
+  });
+
+  it("should reject undeclared core tracks", () => {
+    const errors = validateSchemaMigrations([
+      {
+        id: "unknown-core-track",
+        namespace: "core",
+        track: "excalidraw.shape.unknown",
+        toVersion: 2,
+        title: "unknown core track",
+        description: "should require supported-track declaration",
+        targetTypes: ["rectangle"],
+        apply: (element) => element,
+      },
+    ]);
+
+    expect(errors.join("\n")).toContain(
+      "must be declared in CORE_SUPPORTED_TRACKS",
     );
   });
 
@@ -129,7 +189,7 @@ describe("schema migration", () => {
         type: "frame",
         backgroundColor: "#a5d8ff",
       }),
-      schemaVersion: undefined,
+      schemaState: { tracks: {} },
     };
     const withTempField = {
       ...frame,
@@ -147,15 +207,20 @@ describe("schema migration", () => {
     );
   });
 
-  it("should use per-element schema hints", () => {
+  it("should use per-element track hints", () => {
     const frame = API.createElement({
       type: "frame",
       backgroundColor: "#ff0000",
     });
     const frameFromModernSource = {
       ...frame,
-      schemaVersion: SCHEMA_VERSIONS.latest,
-    } as typeof frame & { schemaVersion: number };
+      schemaState: {
+        tracks: {
+          [CORE_FRAME_SCHEMA_TRACK]:
+            CORE_SUPPORTED_TRACKS[CORE_FRAME_SCHEMA_TRACK],
+        },
+      },
+    };
 
     const migrated = migrateElements([frameFromModernSource])!;
 
@@ -168,18 +233,23 @@ describe("schema migration", () => {
         type: "frame",
         backgroundColor: "#ff0000",
       }),
-      schemaVersion: undefined,
+      schemaState: { tracks: {} },
     };
     const modernFrame = API.createElement({
       type: "frame",
       backgroundColor: "#00ff00",
     });
-    const modernFrameWithHint = {
+    const modernFrameWithTrack = {
       ...modernFrame,
-      schemaVersion: SCHEMA_VERSIONS.latest,
-    } as typeof modernFrame & { schemaVersion: number };
+      schemaState: {
+        tracks: {
+          [CORE_FRAME_SCHEMA_TRACK]:
+            CORE_SUPPORTED_TRACKS[CORE_FRAME_SCHEMA_TRACK],
+        },
+      },
+    };
 
-    const migrated = migrateElements([legacyFrame, modernFrameWithHint])!;
+    const migrated = migrateElements([legacyFrame, modernFrameWithTrack])!;
 
     expect(migrated[0].backgroundColor).toBe(
       DEFAULT_ELEMENT_PROPS.backgroundColor,
@@ -187,20 +257,43 @@ describe("schema migration", () => {
     expect(migrated[1].backgroundColor).toBe("#00ff00");
   });
 
-  it("should stamp schemaVersion to latest after migration", () => {
-    const rect = API.createElement({ type: "rectangle" });
-    const migrated = migrateElements([rect])!;
-    expect(migrated[0].schemaVersion).toBe(SCHEMA_VERSIONS.latest);
+  it("should preserve higher-than-supported track versions", () => {
+    const frame = API.createElement({
+      type: "frame",
+      backgroundColor: "#ff0000",
+    });
+    const futureFrame = {
+      ...frame,
+      schemaState: {
+        tracks: {
+          [CORE_FRAME_SCHEMA_TRACK]:
+            CORE_SUPPORTED_TRACKS[CORE_FRAME_SCHEMA_TRACK] + 1,
+        },
+      },
+    };
+
+    const migrated = migrateElements([futureFrame])!;
+    expect(migrated[0].schemaState.tracks[CORE_FRAME_SCHEMA_TRACK]).toBe(
+      CORE_SUPPORTED_TRACKS[CORE_FRAME_SCHEMA_TRACK] + 1,
+    );
+    expect(migrated[0].backgroundColor).toBe("#ff0000");
   });
 
-  it("should preserve higher-than-latest schema versions", () => {
-    const rect = API.createElement({ type: "rectangle" });
-    const futureRect = {
-      ...rect,
-      schemaVersion: SCHEMA_VERSIONS.latest + 1,
-    } as typeof rect & { schemaVersion: number };
+  it("should normalize invalid schema state and preserve unknown tracks", () => {
+    const rect = {
+      ...API.createElement({ type: "rectangle" }),
+      schemaState: {
+        tracks: {
+          "host.myapp.card": 4,
+          [CORE_FRAME_SCHEMA_TRACK]: 0,
+        },
+      },
+    };
 
-    const migrated = migrateElements([futureRect])!;
-    expect(migrated[0].schemaVersion).toBe(SCHEMA_VERSIONS.latest + 1);
+    const migrated = migrateElements([rect])!;
+    expect(migrated[0].schemaState.tracks[CORE_FRAME_SCHEMA_TRACK]).toBe(
+      SCHEMA_INITIAL_TRACK_VERSION,
+    );
+    expect(migrated[0].schemaState.tracks["host.myapp.card"]).toBe(4);
   });
 });

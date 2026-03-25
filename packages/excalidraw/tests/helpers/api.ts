@@ -188,6 +188,7 @@ export class API {
     roundness?: ExcalidrawGenericElement["roundness"];
     roughness?: ExcalidrawGenericElement["roughness"];
     opacity?: ExcalidrawGenericElement["opacity"];
+    schemaState?: ExcalidrawGenericElement["schemaState"];
     // text props
     text?: T extends "text" ? ExcalidrawTextElement["text"] : never;
     fontSize?: T extends "text" ? ExcalidrawTextElement["fontSize"] : never;
@@ -246,6 +247,7 @@ export class API {
       | "groupIds"
       | "link"
       | "updated"
+      | "schemaState"
     > = {
       seed: 1,
       x,
@@ -276,6 +278,7 @@ export class API {
       opacity: rest.opacity ?? appState.currentItemOpacity,
       boundElements: rest.boundElements ?? null,
       locked: rest.locked ?? false,
+      ...(rest.schemaState ? { schemaState: rest.schemaState } : {}),
     };
     switch (type) {
       case "rectangle":

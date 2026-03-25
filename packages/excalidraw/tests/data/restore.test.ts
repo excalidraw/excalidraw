@@ -132,8 +132,8 @@ describe("restoreElements", () => {
     });
     const legacyFrame = {
       ...frame,
-      schemaVersion: undefined,
-    } as typeof frame & { schemaVersion?: number };
+      schemaState: { tracks: {} },
+    };
 
     const restoredLibraryItems = restore.restoreLibraryItems(
       [
