@@ -46,6 +46,7 @@ export const languages: Language[] = [
     { code: "lt-LT", label: "Lietuvių" },
     { code: "lv-LV", label: "Latviešu" },
     { code: "my-MM", label: "Burmese" },
+    { code: "mn-MN", label: "Монгол" },
     { code: "nb-NO", label: "Norsk bokmål" },
     { code: "nl-NL", label: "Nederlands" },
     { code: "nn-NO", label: "Norsk nynorsk" },
