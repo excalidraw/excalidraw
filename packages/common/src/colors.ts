@@ -291,6 +291,10 @@ export const colorToHex = (color: string): string | null => {
   return rgbToHex(r, g, b, a);
 };
 
+/** Return a CSS color string with the given alpha applied. Accepts any valid CSS color. */
+export const colorWithAlpha = (color: string, alpha: number): string =>
+  tinycolor(color).setAlpha(alpha).toRgbString();
+
 export const isTransparent = (color: string) => {
   return tinycolor(color).getAlpha() === 0;
 };
