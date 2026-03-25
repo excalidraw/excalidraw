@@ -699,6 +699,12 @@ class App extends React.Component<AppProps, AppState> {
   previousPointerMoveCoords: { x: number; y: number } | null = null;
   lastViewportPosition = { x: 0, y: 0 };
 
+  /**
+   * Tracks whether the "no drawing tool selected" toast has been shown since
+   * the last time a drawing tool was active. Resets when user picks a shape tool.
+   */
+  private noToolSelectedToastShown = false;
+
   animationFrameHandler = new AnimationFrameHandler();
 
   laserTrails = new LaserTrails(this.animationFrameHandler, this);
@@ -5515,6 +5521,15 @@ class App extends React.Component<AppProps, AppState> {
     if (!isLinearElementType(nextActiveTool.type)) {
       this.setState({ suggestedBinding: null });
     }
+    // Reset the "no tool selected" toast flag when user picks any tool other
+    // than selection/hand/eraser, so it can re-show when they return to selection.
+    if (
+      !isSelectionLikeTool(nextActiveTool.type) &&
+      nextActiveTool.type !== "hand" &&
+      nextActiveTool.type !== "eraser"
+    ) {
+      this.noToolSelectedToastShown = false;
+    }
     if (nextActiveTool.type === "image") {
       this.onImageToolbarButtonClick();
     }
@@ -10109,6 +10124,23 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.state.selectionElement) {
+        // Show a one-time toast when the user drags on empty canvas with only
+        // the selection tool active — they may be expecting a shape to be drawn.
+        // Only fire when no element was hit (clicking empty canvas) and the
+        // toast hasn't been shown since the last time a drawing tool was active.
+        // Refs: https://github.com/excalidraw/excalidraw/issues/9541
+        if (
+          this.state.activeTool.type === "selection" &&
+          !pointerDownState.hit.element &&
+          !this.noToolSelectedToastShown &&
+          !event.altKey
+        ) {
+          this.noToolSelectedToastShown = true;
+          this.setToast({
+            message: t("toast.noToolSelected"),
+          });
+        }
+
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
         if (event.altKey) {
