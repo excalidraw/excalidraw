@@ -36,6 +36,37 @@ describe("schema migration", () => {
     );
   });
 
+  it("should handle elements without schemaState", () => {
+    const frameWithoutSchemaState = {
+      ...API.createElement({
+        type: "frame",
+        backgroundColor: "#ffc9c9",
+      }),
+      schemaState: undefined,
+    } as any;
+
+    const textWithoutSchemaState = {
+      ...API.createElement({
+        type: "text",
+        text: "",
+      }),
+      schemaState: undefined,
+    } as any;
+
+    const migrated = migrateElements([
+      frameWithoutSchemaState,
+      textWithoutSchemaState,
+    ])!;
+
+    expect(migrated[0].backgroundColor).toBe(
+      DEFAULT_ELEMENT_PROPS.backgroundColor,
+    );
+    expect(migrated[0].schemaState.tracks[CORE_FRAME_SCHEMA_TRACK]).toBe(
+      CORE_SUPPORTED_TRACKS[CORE_FRAME_SCHEMA_TRACK],
+    );
+    expect(migrated[1].schemaState).toEqual({ tracks: {} });
+  });
+
   it("should keep latest-track frame backgrounds unchanged", () => {
     const frame = {
       ...API.createElement({

@@ -141,6 +141,7 @@ const ensureElementSchemaState = (element: ExcalidrawElement) => {
   }
 
   if (
+    element.schemaState &&
     Object.keys(element.schemaState?.tracks || {}).length ===
       Object.keys(normalizedSchemaState.tracks).length &&
     Object.entries(normalizedSchemaState.tracks).every(
