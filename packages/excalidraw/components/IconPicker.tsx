@@ -104,6 +104,7 @@ function Picker<T>({
         ? (allOptions.length + index - 1) % allOptions.length
         : (index + 1) % allOptions.length;
       onChange(allOptions[nextIndex].value);
+      event.preventDefault();
     } else if (isArrowKey(event.key)) {
       // Arrow navigation
       const isRTL = getLanguage().rtl;
