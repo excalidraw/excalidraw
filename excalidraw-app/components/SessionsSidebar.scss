@@ -1,0 +1,129 @@
+.sessions-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0.75rem;
+  gap: 0.75rem;
+}
+
+.sessions-sidebar--loading {
+  align-items: center;
+  justify-content: center;
+  color: var(--color-on-surface);
+  font-size: 0.875rem;
+}
+
+.sessions-sidebar__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sessions-sidebar__btn {
+  flex: 1;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--color-border-outline-variant);
+  border-radius: 0.5rem;
+  background: var(--color-surface-low);
+  color: var(--color-on-surface);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--color-surface-high);
+  }
+}
+
+.sessions-sidebar__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.sessions-sidebar__empty {
+  text-align: center;
+  color: var(--color-on-surface);
+  opacity: 0.6;
+  font-size: 0.8125rem;
+  padding: 2rem 1rem;
+}
+
+.session-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background 0.1s;
+  gap: 0.25rem;
+
+  &:hover {
+    background: var(--color-surface-high);
+  }
+
+  &:hover .session-item__delete {
+    opacity: 1;
+  }
+}
+
+.session-item--active {
+  background: var(--color-primary-light);
+
+  &:hover {
+    background: var(--color-primary-light);
+  }
+}
+
+.session-item__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.session-item__name {
+  font-size: 0.8125rem;
+  color: var(--color-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-item__time {
+  font-size: 0.6875rem;
+  color: var(--color-on-surface);
+  opacity: 0.5;
+}
+
+.session-item__rename-input {
+  padding: 0.125rem 0.25rem;
+  border: 1px solid var(--color-primary);
+  border-radius: 0.25rem;
+  background: var(--color-surface-low);
+  color: var(--color-on-surface);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  outline: none;
+  width: 100%;
+}
+
+.session-item__delete {
+  opacity: 0;
+  border: none;
+  background: none;
+  color: var(--color-on-surface);
+  font-size: 1.125rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  line-height: 1;
+  transition: opacity 0.1s;
+  flex-shrink: 0;
+
+  &:hover {
+    color: var(--color-danger);
+  }
+}
