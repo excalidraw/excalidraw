@@ -4,6 +4,7 @@ export {
   actionBringToFront,
   actionSendBackward,
   actionSendToBack,
+  actionBringToMiddle, // ⬅️ NEW
 } from "./actionZindex";
 export { actionSelectAll } from "./actionSelectAll";
 export { actionDuplicateSelection } from "./actionDuplicateSelection";
