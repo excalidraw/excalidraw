@@ -5,6 +5,7 @@ export const isMaybeMermaidDefinition = (text: string) => {
     "graph",
     "sequenceDiagram",
     "classDiagram",
+    "classDiagram-v2",
     "stateDiagram",
     "stateDiagram-v2",
     "erDiagram",
@@ -15,12 +16,19 @@ export const isMaybeMermaidDefinition = (text: string) => {
     "requirementDiagram",
     "gitGraph",
     "C4Context",
+    "C4Container",
+    "C4Component",
+    "C4Dynamic",
+    "C4Deployment",
     "mindmap",
     "timeline",
     "zenuml",
     "sankey",
     "xychart",
     "block",
+    "packet",
+    "architecture",
+    "kanban",
   ];
 
   const re = new RegExp(
