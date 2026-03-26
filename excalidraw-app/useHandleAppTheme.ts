@@ -1,6 +1,13 @@
 import { THEME } from "@excalidraw/excalidraw";
 import { EVENT, CODES, KEYS } from "@excalidraw/common";
-import { useEffect, useLayoutEffect, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useMemo,
+  useSyncExternalStore,
+  useCallback,
+} from "react";
 
 import type { Theme } from "@excalidraw/element/types";
 
@@ -18,19 +25,21 @@ export const useHandleAppTheme = () => {
         | null) || THEME.LIGHT
     );
   });
-  const [editorTheme, setEditorTheme] = useState<Theme>(THEME.LIGHT);
+
+  const systemTheme = useSyncExternalStore(
+    useCallback((callback: () => void) => {
+      const mediaQuery = getDarkThemeMediaQuery();
+      mediaQuery?.addEventListener("change", callback);
+      return () => mediaQuery?.removeEventListener("change", callback);
+    }, []),
+    () => (getDarkThemeMediaQuery()?.matches ? THEME.DARK : THEME.LIGHT),
+  );
+
+  const editorTheme = useMemo(() => {
+    return appTheme === "system" ? systemTheme : appTheme;
+  }, [appTheme, systemTheme]);
 
   useEffect(() => {
-    const mediaQuery = getDarkThemeMediaQuery();
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setEditorTheme(e.matches ? THEME.DARK : THEME.LIGHT);
-    };
-
-    if (appTheme === "system") {
-      mediaQuery?.addEventListener("change", handleChange);
-    }
-
     const handleKeydown = (event: KeyboardEvent) => {
       if (
         !event[KEYS.CTRL_OR_CMD] &&
@@ -47,23 +56,14 @@ export const useHandleAppTheme = () => {
     document.addEventListener(EVENT.KEYDOWN, handleKeydown, { capture: true });
 
     return () => {
-      mediaQuery?.removeEventListener("change", handleChange);
       document.removeEventListener(EVENT.KEYDOWN, handleKeydown, {
         capture: true,
       });
     };
-  }, [appTheme, editorTheme, setAppTheme]);
+  }, [editorTheme, setAppTheme]);
 
   useLayoutEffect(() => {
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_THEME, appTheme);
-
-    if (appTheme === "system") {
-      setEditorTheme(
-        getDarkThemeMediaQuery()?.matches ? THEME.DARK : THEME.LIGHT,
-      );
-    } else {
-      setEditorTheme(appTheme);
-    }
   }, [appTheme]);
 
   return { editorTheme, appTheme, setAppTheme };
