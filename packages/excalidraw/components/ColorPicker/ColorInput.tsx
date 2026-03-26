@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { KEYS, normalizeInputColor } from "@excalidraw/common";
 
@@ -29,12 +29,15 @@ export const ColorInput = ({
 }) => {
   const editorInterface = useEditorInterface();
   const [innerValue, setInnerValue] = useState(color);
+  const [showValidationError, setShowValidationError] = useState(false);
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
+  const validationMessageId = useId();
 
   useEffect(() => {
     setInnerValue(color);
+    setShowValidationError(false);
   }, [color]);
 
   const changeColor = useCallback(
@@ -44,6 +47,9 @@ export const ColorInput = ({
 
       if (color) {
         onChange(color);
+        setShowValidationError(false);
+      } else if (!value.trim()) {
+        setShowValidationError(false);
       }
       setInnerValue(value);
     },
@@ -68,67 +74,100 @@ export const ColorInput = ({
   }, [setEyeDropperState]);
 
   return (
-    <div className="color-picker__input-label">
-      <div className="color-picker__input-hash">#</div>
-      <input
-        ref={activeSection === "hex" ? inputRef : undefined}
-        style={{ border: 0, padding: 0 }}
-        spellCheck={false}
-        className="color-picker-input"
-        aria-label={label}
-        onChange={(event) => {
-          changeColor(event.target.value);
-        }}
-        value={(innerValue || "").replace(/^#/, "")}
-        onBlur={() => {
-          setInnerValue(color);
-        }}
-        tabIndex={-1}
-        onFocus={() => setActiveColorPickerSection("hex")}
-        onKeyDown={(event) => {
-          if (event.key === KEYS.TAB) {
-            return;
-          } else if (event.key === KEYS.ESCAPE) {
-            eyeDropperTriggerRef.current?.focus();
+    <div>
+      <div
+        className={clsx("color-picker__input-label", {
+          "color-picker__input-label--invalid": showValidationError,
+        })}
+      >
+        <div className="color-picker__input-hash">#</div>
+        <input
+          ref={activeSection === "hex" ? inputRef : undefined}
+          style={{ border: 0, padding: 0 }}
+          spellCheck={false}
+          className="color-picker-input"
+          aria-label={label}
+          aria-invalid={showValidationError}
+          aria-describedby={
+            showValidationError ? validationMessageId : undefined
           }
-          event.stopPropagation();
-        }}
-        placeholder={placeholder}
-      />
-      {/* TODO reenable on mobile with a better UX */}
-      {editorInterface.formFactor !== "phone" && (
-        <>
-          <div
-            style={{
-              width: "1px",
-              height: "1.25rem",
-              backgroundColor: "var(--default-border-color)",
-            }}
-          />
-          <div
-            ref={eyeDropperTriggerRef}
-            className={clsx("excalidraw-eye-dropper-trigger", {
-              selected: eyeDropperState,
-            })}
-            onClick={() =>
-              setEyeDropperState((s) =>
-                s
-                  ? null
-                  : {
-                      keepOpenOnAlt: false,
-                      onSelect: (color) => onChange(color),
-                      colorPickerType,
-                    },
-              )
+          onChange={(event) => {
+            changeColor(event.target.value);
+          }}
+          value={(innerValue || "").replace(/^#/, "")}
+          onBlur={() => {
+            const normalizedColor = normalizeInputColor(innerValue);
+
+            if (!innerValue.trim()) {
+              setShowValidationError(false);
+              setInnerValue(color);
+              return;
             }
-            title={`${t(
-              "labels.eyeDropper",
-            )} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")} `}
-          >
-            {eyeDropperIcon}
-          </div>
-        </>
-      )}
+
+            if (!normalizedColor) {
+              setShowValidationError(true);
+              return;
+            }
+
+            setShowValidationError(false);
+            setInnerValue(normalizedColor);
+          }}
+          tabIndex={-1}
+          onFocus={() => setActiveColorPickerSection("hex")}
+          onKeyDown={(event) => {
+            if (event.key === KEYS.TAB) {
+              return;
+            } else if (event.key === KEYS.ESCAPE) {
+              eyeDropperTriggerRef.current?.focus();
+            }
+            event.stopPropagation();
+          }}
+          placeholder={placeholder}
+        />
+        {/* TODO reenable on mobile with a better UX */}
+        {editorInterface.formFactor !== "phone" && (
+          <>
+            <div
+              style={{
+                width: "1px",
+                height: "1.25rem",
+                backgroundColor: "var(--default-border-color)",
+              }}
+            />
+            <div
+              ref={eyeDropperTriggerRef}
+              className={clsx("excalidraw-eye-dropper-trigger", {
+                selected: eyeDropperState,
+              })}
+              onClick={() =>
+                setEyeDropperState((s) =>
+                  s
+                    ? null
+                    : {
+                        keepOpenOnAlt: false,
+                        onSelect: (color) => onChange(color),
+                        colorPickerType,
+                      },
+                )
+              }
+              title={`${t(
+                "labels.eyeDropper",
+              )} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")} `}
+            >
+              {eyeDropperIcon}
+            </div>
+          </>
+        )}
+      </div>
+      {showValidationError ? (
+        <div
+          id={validationMessageId}
+          className="color-picker__input-error"
+          role="alert"
+        >
+          {t("colorPicker.invalidHexCode")}
+        </div>
+      ) : null}
     </div>
   );
 };
