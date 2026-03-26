@@ -19,6 +19,8 @@ export {
   actionChangeTextAlign,
   actionChangeVerticalAlign,
   actionChangeArrowProperties,
+  actionChangeTextStrokeColor,
+  actionChangeTextStrokeWidth,
 } from "./actionProperties";
 
 export {

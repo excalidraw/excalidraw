@@ -254,6 +254,15 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      *  with font size (using `getLineHeightInPx` helper).
      */
     lineHeight: number & { _brand: "unitlessLineHeight" };
+    /**
+     * The color of the text outline/stroke. If null, no stroke is rendered.
+     */
+    textStrokeColor: string | null;
+    /**
+     * The width of the text outline/stroke in pixels.
+     * @default 0
+     */
+    textStrokeWidth: number;
   }>;
 
 export type ExcalidrawBindableElement =
