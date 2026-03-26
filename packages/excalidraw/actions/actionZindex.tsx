@@ -26,6 +26,7 @@ export const actionSendBackward = register({
   keywords: ["move down", "zindex", "layer"],
   icon: SendBackwardIcon,
   trackEvent: { category: "element" },
+
   perform: (elements, appState, value, app) => {
     return {
       elements: moveOneLeft(elements, appState, app.scene),
@@ -33,12 +34,15 @@ export const actionSendBackward = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
+
   keyPriority: 40,
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] &&
     !event.shiftKey &&
+    !event.altKey &&
     event.code === CODES.BRACKET_LEFT,
-  PanelComponent: ({ updateData, appState }) => (
+
+  PanelComponent: ({ updateData }) => (
     <button
       type="button"
       className="zIndexButton"
@@ -56,6 +60,7 @@ export const actionBringForward = register({
   keywords: ["move up", "zindex", "layer"],
   icon: BringForwardIcon,
   trackEvent: { category: "element" },
+
   perform: (elements, appState, value, app) => {
     return {
       elements: moveOneRight(elements, appState, app.scene),
@@ -63,12 +68,15 @@ export const actionBringForward = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
+
   keyPriority: 40,
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] &&
     !event.shiftKey &&
+    !event.altKey &&
     event.code === CODES.BRACKET_RIGHT,
-  PanelComponent: ({ updateData, appState }) => (
+
+  PanelComponent: ({ updateData }) => (
     <button
       type="button"
       className="zIndexButton"
@@ -101,7 +109,8 @@ export const actionSendToBack = register({
       : event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
         event.code === CODES.BRACKET_LEFT,
-  PanelComponent: ({ updateData, appState }) => (
+
+  PanelComponent: ({ updateData }) => (
     <button
       type="button"
       className="zIndexButton"
@@ -139,11 +148,12 @@ export const actionBringToFront = register({
       : event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
         event.code === CODES.BRACKET_RIGHT,
-  PanelComponent: ({ updateData, appState }) => (
+
+  PanelComponent: ({ updateData }) => (
     <button
       type="button"
       className="zIndexButton"
-      onClick={(event) => updateData(null)}
+      onClick={() => updateData(null)}
       title={`${t("labels.bringToFront")} — ${
         isDarwin
           ? getShortcutKey("CtrlOrCmd+Alt+]")
