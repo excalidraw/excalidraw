@@ -1,7 +1,13 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
-import { EVENT, KEYS, rgbToHex } from "@excalidraw/common";
+import {
+  EVENT,
+  KEYS,
+  removeDarkModeFilter,
+  rgbToHex,
+  THEME,
+} from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -72,6 +78,8 @@ export const EyeDropper: React.FC<{
       return;
     }
 
+    colorPreviewDiv.style.filter = "none";
+
     let isHoldingPointerDown = false;
 
     const ctx = app.canvas.getContext("2d")!;
@@ -107,11 +115,15 @@ export const EyeDropper: React.FC<{
       colorPreviewDiv.style.left = `${clientX + 20}px`;
 
       const currentColor = getCurrentColor({ clientX, clientY });
+      const appliedColor =
+        appState.theme === THEME.DARK
+          ? removeDarkModeFilter(currentColor)
+          : currentColor;
 
       if (isHoldingPointerDown) {
         stableProps.onChange(
           colorPickerType,
-          currentColor,
+          appliedColor,
           stableProps.selectedElements,
           { altKey },
         );
@@ -148,7 +160,13 @@ export const EyeDropper: React.FC<{
       event.stopImmediatePropagation();
       event.preventDefault();
 
-      onSelect(getCurrentColor(event), event);
+      const currentColor = getCurrentColor(event);
+      const appliedColor =
+        appState.theme === THEME.DARK
+          ? removeDarkModeFilter(currentColor)
+          : currentColor;
+
+      onSelect(appliedColor, event);
     };
 
     const keyDownListener = (event: KeyboardEvent) => {
@@ -205,6 +223,7 @@ export const EyeDropper: React.FC<{
     excalidrawContainer,
     appState.offsetLeft,
     appState.offsetTop,
+    appState.theme,
   ]);
 
   const ref = useRef<HTMLDivElement>(null);

@@ -1,6 +1,7 @@
 import {
   applyDarkModeFilter,
   COLOR_PALETTE,
+  removeDarkModeFilter,
   rgbToHex,
 } from "@excalidraw/common";
 
@@ -211,6 +212,32 @@ describe("applyDarkModeFilter", () => {
       const result1 = applyDarkModeFilter("#ff0000");
       const result2 = applyDarkModeFilter("#ff0000");
       expect(result1).toBe(result2);
+    });
+  });
+});
+
+describe("removeDarkModeFilter", () => {
+  it("restores black from transformed dark-mode pixel", () => {
+    expect(removeDarkModeFilter("#ededed")).toBe("#000000");
+  });
+
+  it("restores white from transformed dark-mode pixel", () => {
+    expect(removeDarkModeFilter("#121212")).toBe("#ffffff");
+  });
+
+  it("preserves transformed visual color when reapplied", () => {
+    const colors = [
+      COLOR_PALETTE.black,
+      COLOR_PALETTE.white,
+      COLOR_PALETTE.red[4],
+      COLOR_PALETTE.green[4],
+      COLOR_PALETTE.blue[4],
+    ];
+
+    colors.forEach((color) => {
+      const transformed = applyDarkModeFilter(color);
+      const restored = removeDarkModeFilter(transformed);
+      expect(applyDarkModeFilter(restored)).toBe(transformed);
     });
   });
 });
