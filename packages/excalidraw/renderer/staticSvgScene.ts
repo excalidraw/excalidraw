@@ -745,8 +745,18 @@ export const renderSceneToSvg = (
 
           const boundTextElement = getBoundTextElement(element, elementsMap);
           if (boundTextElement) {
+            // If the container has a link but the bound text doesn't, inherit
+            // the link so clicking the text in exported SVG is also clickable.
+            // We avoid mutating original element by shallow cloning.
+            const container = elementsMap.get(
+              (boundTextElement as any).containerId,
+            );
+            const textForRender =
+              !boundTextElement.link && container?.link
+                ? { ...boundTextElement, link: container.link }
+                : boundTextElement;
             renderElementToSvg(
-              boundTextElement,
+              textForRender,
               elementsMap,
               rsvg,
               svgRoot,
