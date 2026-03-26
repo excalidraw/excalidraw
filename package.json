@@ -69,6 +69,7 @@
     "test:other": "yarn prettier --list-different",
     "test:typecheck": "tsc",
     "test:update": "yarn test:app --update --watch=false",
+    "verify:grind": "bash .cursor/hooks/verify-clean-state.sh",
     "test": "yarn test:app",
     "test:coverage": "vitest --coverage",
     "test:coverage:watch": "vitest --coverage --watch",
