@@ -15,6 +15,9 @@ RUN npm_config_target_arch=${TARGETARCH} yarn build:app:docker
 
 FROM --platform=${TARGETPLATFORM} nginx:1.27-alpine
 
+COPY docker/99-env.sh /docker-entrypoint.d/99-env.sh
+RUN chmod +x /docker-entrypoint.d/99-env.sh
+
 COPY --from=build /opt/node_app/excalidraw-app/build /usr/share/nginx/html
 
 HEALTHCHECK CMD wget -q -O /dev/null http://localhost || exit 1

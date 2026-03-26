@@ -14,8 +14,8 @@ export const trackEvent = (
   try {
     if (
       typeof window === "undefined" ||
-      import.meta.env.VITE_WORKER_ID ||
-      import.meta.env.VITE_APP_ENABLE_TRACKING !== "true"
+      (window.EXCALIDRAW_ENV?.VITE_WORKER_ID || import.meta.env.VITE_WORKER_ID) ||
+      (window.EXCALIDRAW_ENV?.VITE_APP_ENABLE_TRACKING || import.meta.env.VITE_APP_ENABLE_TRACKING) !== "true"
     ) {
       return;
     }

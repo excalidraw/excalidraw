@@ -85,7 +85,7 @@ export const ChatMessage: React.FC<{
                       onClick={() => {
                         window.open(
                           `${
-                            import.meta.env.VITE_APP_PLUS_LP
+                            (window.EXCALIDRAW_ENV?.VITE_APP_PLUS_LP || import.meta.env.VITE_APP_PLUS_LP)
                           }/plus?utm_source=excalidraw&utm_medium=app&utm_content=ttdChatBanner#excalidraw-redirect`,
                           "_blank",
                           "noopener",

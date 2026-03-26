@@ -22,7 +22,7 @@ export const AppWelcomeScreen: React.FC<{
             <a
               style={{ pointerEvents: POINTER_EVENTS.inheritFromUI }}
               href={`${
-                import.meta.env.VITE_APP_PLUS_APP
+                (window.EXCALIDRAW_ENV?.VITE_APP_PLUS_APP || import.meta.env.VITE_APP_PLUS_APP)
               }?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenSignedInUser`}
               key={idx}
             >
@@ -67,7 +67,7 @@ export const AppWelcomeScreen: React.FC<{
           {!isExcalidrawPlusSignedUser && (
             <WelcomeScreen.Center.MenuItemLink
               href={`${
-                import.meta.env.VITE_APP_PLUS_LP
+                (window.EXCALIDRAW_ENV?.VITE_APP_PLUS_LP || import.meta.env.VITE_APP_PLUS_LP)
               }/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest`}
               shortcut={null}
               icon={loginIcon}

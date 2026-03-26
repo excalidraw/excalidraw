@@ -43,11 +43,11 @@ import type { Socket } from "socket.io-client";
 
 let FIREBASE_CONFIG: Record<string, any>;
 try {
-  FIREBASE_CONFIG = JSON.parse(import.meta.env.VITE_APP_FIREBASE_CONFIG);
+  FIREBASE_CONFIG = JSON.parse((window.EXCALIDRAW_ENV?.VITE_APP_FIREBASE_CONFIG || import.meta.env.VITE_APP_FIREBASE_CONFIG));
 } catch (error: any) {
   console.warn(
     `Error JSON parsing firebase config. Supplied value: ${
-      import.meta.env.VITE_APP_FIREBASE_CONFIG
+      (window.EXCALIDRAW_ENV?.VITE_APP_FIREBASE_CONFIG || import.meta.env.VITE_APP_FIREBASE_CONFIG)
     }`,
   );
   FIREBASE_CONFIG = {};
