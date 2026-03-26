@@ -358,17 +358,32 @@ export const textWysiwyg = ({
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
 
+      const font = getFontString(updatedTextElement);
+
+      // Canvas measureText() may return incorrect widths when the primary
+      // font lacks glyphs for certain characters (e.g. CJK text with
+      // Excalidraw font). The canvas and CSS font stacks resolve fallback
+      // fonts differently, so we measure using a DOM element that shares
+      // the same CSS font stack as the textarea for an accurate width.
+      if (editable.value) {
+        const measurer = document.createElement("span");
+        measurer.style.cssText = `position:absolute;visibility:hidden;white-space:pre;font:${font};line-height:${updatedTextElement.lineHeight}`;
+        measurer.textContent = editable.value;
+        document.body.appendChild(measurer);
+        const domWidth = measurer.getBoundingClientRect().width;
+        measurer.remove();
+        width = Math.max(width, domWidth);
+      }
+
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         width = Math.min(width, maxWidth);
       } else {
-        width += 0.5;
+        width = Math.min(width, maxWidth) + 0.5;
       }
 
       // add 5% buffer otherwise it causes wysiwyg to jump
       height *= 1.05;
-
-      const font = getFontString(updatedTextElement);
       const angle = getTextElementAngle(updatedTextElement, container);
 
       // Make sure text editor height doesn't go beyond viewport
@@ -623,6 +638,24 @@ export const textWysiwyg = ({
         editable.selectionEnd = selectionStart;
       }
       onChange(editable.value);
+
+      // Eagerly load font faces for the characters being typed so that
+      // text measurements (which use canvas measureText) match the actual
+      // textarea rendering. Without this, typing characters not covered
+      // by the primary font (e.g. CJK characters with Excalidraw/Virgil
+      // font) causes incorrect width measurements because the fallback
+      // font used by canvas differs from the one used by the textarea.
+      const font = getFontString(element);
+      if (!window.document.fonts.check(font, editable.value)) {
+        window.document.fonts.load(font, editable.value).then((fontFaces) => {
+          if (fontFaces.length > 0) {
+            app.fonts.onLoaded(fontFaces);
+            // Re-trigger text measurement with the now-loaded font so
+            // that element dimensions are recalculated correctly.
+            onChange(editable.value);
+          }
+        });
+      }
     };
   }
 
