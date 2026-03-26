@@ -872,6 +872,19 @@ export const shouldApplyFrameClip = (
     return true;
   }
 
+  // Elements that belong to a frame should still render through that frame's
+  // clip, even when fully outside the frame bounds (e.g. generated content).
+  if (
+    !appState.selectedElementsAreBeingDragged &&
+    element.frameId === frame.id
+  ) {
+    for (const groupId of element.groupIds) {
+      checkedGroups?.set(groupId, true);
+    }
+
+    return true;
+  }
+
   // if an element is outside the frame, but is part of a group that has some elements
   // "in" the frame, we should clip the element
   if (
