@@ -224,7 +224,7 @@ body.excalidraw-cursor-resize * {
     box-shadow: 0 0 0 1px var(--color-brand-hover);
   }
 
-  // radix doesn't allow differntiating between hover and keyboard active
+  // radix doesn't allow differentiating between hover and keyboard active
   // states (it's forcing :focus on both).
   //
   // proper handling would be to disable :focus-visible by default, and enable

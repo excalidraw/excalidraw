@@ -95,7 +95,7 @@ export const ColorInput = ({
         }}
         placeholder={placeholder}
       />
-      {/* TODO reenable on mobile with a better UX */}
+      {/* TODO re-enable on mobile with a better UX */}
       {editorInterface.formFactor !== "phone" && (
         <>
           <div

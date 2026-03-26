@@ -97,7 +97,7 @@ export const actionToggleElementLock = register({
 
       return newElementWith(element, {
         locked: nextLockState,
-        // do not recreate the array unncessarily
+        // do not recreate the array unnecessarily
         groupIds:
           nextGroupIds.length !== element.groupIds.length
             ? nextGroupIds
@@ -178,7 +178,7 @@ export const actionUnlockAllElements = register({
         return newElementWith(element, {
           locked: false,
           groupIds:
-            // do not recreate the array unncessarily
+            // do not recreate the array unnecessarily
             element.groupIds.length !== nextGroupIds.length
               ? nextGroupIds
               : element.groupIds,

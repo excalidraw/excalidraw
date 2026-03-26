@@ -156,7 +156,7 @@ export const dragSelectedElements = (
       const shouldUnbindEnd = element.endBinding && !isEndBoundElementSelected;
       if (shouldUnbindStart || shouldUnbindEnd) {
         // NOTE: Moving the bound arrow should unbind it, otherwise we would
-        // have weird situations, like 0 lenght arrow when the user moves
+        // have weird situations, like 0 length arrow when the user moves
         // the arrow outside a filled shape suddenly forcing the arrow start
         // and end point to jump "outside" the shape.
         if (shouldUnbindStart) {

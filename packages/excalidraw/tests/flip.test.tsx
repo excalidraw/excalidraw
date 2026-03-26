@@ -855,7 +855,7 @@ describe("image", () => {
   });
 });
 
-describe("mutliple elements", () => {
+describe("multiple elements", () => {
   it("with bound text flip correctly", async () => {
     UI.clickTool("arrow");
     fireEvent.click(screen.getByTitle("Architect"));

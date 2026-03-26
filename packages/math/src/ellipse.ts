@@ -137,7 +137,7 @@ export const ellipseDistanceFromPoint = <
 };
 
 /**
- * Calculate a maximum of two intercept points for a line going throug an
+ * Calculate a maximum of two intercept points for a line going through an
  * ellipse.
  */
 export function ellipseSegmentInterceptPoints<

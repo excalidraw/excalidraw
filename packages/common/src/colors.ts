@@ -225,7 +225,7 @@ export const DEFAULT_ELEMENT_STROKE_COLOR_PALETTE = {
   ...COMMON_ELEMENT_SHADES,
 } as const;
 
-// ORDER matters for positioning in pallete (5x3 grid)s
+// ORDER matters for positioning in palette (5x3 grid)s
 export const DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE = {
   transparent: COLOR_PALETTE.transparent,
   white: COLOR_PALETTE.white,
@@ -343,7 +343,7 @@ export const normalizeInputColor = (color: string): string | null => {
 
   const tc = tinycolor(color);
   if (tc.isValid()) {
-    // testing for `#` first fixes a bug on Electron (more specfically, an
+    // testing for `#` first fixes a bug on Electron (more specifically, an
     // Obsidian popout window), where a hex color without `#` is considered valid
     if (["hex", "hex8"].includes(tc.getFormat()) && !color.startsWith("#")) {
       return `#${color}`;

@@ -46,7 +46,7 @@ const executeHistoryAction = (
 
     const [nextElementsMap, nextAppState] = result;
 
-    // order by fractional indices in case the map was accidently modified in the meantime
+    // order by fractional indices in case the map was accidentally modified in the meantime
     const nextElements = orderByFractionalIndex(
       Array.from(nextElementsMap.values()),
     );

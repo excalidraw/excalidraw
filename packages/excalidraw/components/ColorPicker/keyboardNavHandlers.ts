@@ -146,7 +146,7 @@ export const colorPickerKeyNavHandler = ({
     return true;
   }
 
-  // checkt using `key` to ignore combos with Alt modifier
+  // checked using `key` to ignore combos with Alt modifier
   if (event.key === KEYS.ALT) {
     onEyeDropperToggle(true);
     return true;

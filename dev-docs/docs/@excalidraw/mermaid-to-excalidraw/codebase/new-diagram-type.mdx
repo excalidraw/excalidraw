@@ -36,19 +36,19 @@ Once the parser is ready, lets start using it.
 
 Add the diagram type in switch case in [`parseMermaid`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parseMermaid.ts#L97) and call the parser for the same.
 
-## Writing the Excalidraw Skeleton Convertor
+## Writing the Excalidraw Skeleton Converter
 
 With the completion of previous step, we have all the data, now we need to transform it so to [ExcalidrawElementSkeleton](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/transform.ts#L133) format.
 
 Similar to [`FlowChartToExcalidrawSkeletonConverter`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/converter/types/flowchart.ts#L24), you have to write the `{{diagramType}}ToExcalidrawSkeletonConverter` which parses the data received in previous step and returns the [ExcalidrawElementSkeleton](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/transform.ts#L133).
 
-Thats it, you have added the new diagram type 🥳, now lets test it out!
+That's it, you have added the new diagram type 🥳, now lets test it out!
 
 ## Updating the Playground
 
 1. Create a file named `{{diagramType}}.ts` in [`playround/testcases/`](https://github.com/excalidraw/mermaid-to-excalidraw/tree/master/playground/testcases). For reference you can check [`flowchart.ts`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/playground/testcases/flowchart.ts).
 
-2. Incase the new diagram type added is present in [`unsupported.ts`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/playground/testcases/unsupported.ts) then remove it from there.
+2. In case the new diagram type added is present in [`unsupported.ts`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/playground/testcases/unsupported.ts) then remove it from there.
 
 3. Verify if the test cases are running fine in playground.
 

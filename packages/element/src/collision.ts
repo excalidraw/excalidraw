@@ -174,7 +174,7 @@ export const hitElementItself = ({
   const hitElement = (
     overrideShouldTestInside ? true : shouldTestInside(element)
   )
-    ? // Since `inShape` tests STRICTLY againt the insides of a shape
+    ? // Since `inShape` tests STRICTLY against the insides of a shape
       // we would need `onShape` as well to include the "borders"
       isPointInElement(point, element, elementsMap) ||
       isPointOnElementOutline(point, element, elementsMap, threshold)

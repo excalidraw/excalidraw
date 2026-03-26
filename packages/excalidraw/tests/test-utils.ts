@@ -45,7 +45,7 @@ type TestRenderFn = (
 
 const renderApp: TestRenderFn = async (ui, options) => {
   // when tests reuse Pointer instances let's reset the last
-  // pointer poisitions so there's no leak between tests
+  // pointer positions so there's no leak between tests
   Pointer.resetAll();
 
   if (options?.localStorageData) {

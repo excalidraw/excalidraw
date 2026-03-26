@@ -46,7 +46,7 @@ export const subsetToBinary = async (
   codePoints: Array<number>,
 ): Promise<ArrayBuffer> => {
   // lazy loaded wasm modules to avoid multiple initializations in case of concurrent triggers
-  // IMPORTANT: could be expensive, as each new worker instance lazy loads these to their own memory ~ keep the # of workes small!
+  // IMPORTANT: could be expensive, as each new worker instance lazy loads these to their own memory ~ keep the # of workers small!
   const { compress, decompress } = await loadWoff2();
   const { subset } = await loadHbSubset();
 

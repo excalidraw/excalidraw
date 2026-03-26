@@ -107,7 +107,7 @@ export const duplicateElements = (
         /**
          * Duplicates all elements in array.
          *
-         * Use this when programmaticaly duplicating elements, without direct
+         * Use this when programmatically duplicating elements, without direct
          * user interaction.
          */
         type: "everything";

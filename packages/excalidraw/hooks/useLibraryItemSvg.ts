@@ -56,7 +56,7 @@ export const useLibraryItemSvg = (
           })();
         }
       } else {
-        // When we have no id (usualy selected items from canvas) just export the svg
+        // When we have no id (usually selected items from canvas) just export the svg
         (async () => {
           const exportedSvg = await exportLibraryItemToSvg(elements);
           setSvg(exportedSvg);

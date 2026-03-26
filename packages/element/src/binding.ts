@@ -574,7 +574,7 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
   }
 
   // Must return as only one endpoint is dragged, therefore
-  // the end binding strategy might accidentally gets overriden
+  // the end binding strategy might accidentally gets overridden
   return { current, other: isMultiPoint ? { mode: undefined } : other };
 };
 
@@ -1137,7 +1137,7 @@ export const updateBoundElements = (
       return;
     }
 
-    // Check for intersections before updating bound elements incase connected elements overlap
+    // Check for intersections before updating bound elements in case connected elements overlap
     const startBindingElement = element.startBinding
       ? elementsMap.get(element.startBinding.elementId)
       : null;

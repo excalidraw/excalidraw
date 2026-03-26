@@ -20,7 +20,7 @@ export const updateBrowserStateVersion = (type: BrowserStateTypes) => {
     localStorage.setItem(type, JSON.stringify(timestamp));
     LOCAL_STATE_VERSIONS[type] = timestamp;
   } catch (error) {
-    console.error("error while updating browser state verison", error);
+    console.error("error while updating browser state version", error);
   }
 };
 
@@ -34,6 +34,6 @@ export const resetBrowserStateVersions = () => {
       LOCAL_STATE_VERSIONS[key] = timestamp;
     }
   } catch (error) {
-    console.error("error while resetting browser state verison", error);
+    console.error("error while resetting browser state version", error);
   }
 };
