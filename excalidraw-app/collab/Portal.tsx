@@ -148,7 +148,7 @@ class Portal {
       throw new Error("syncAll must be true when sending SCENE.INIT");
     }
 
-    // sync out only the elements we think we need to to save bandwidth.
+    // sync out only the elements we think we need to save bandwidth.
     // periodically we'll resync the whole thing to make sure no one diverges
     // due to a dropped message (server goes down etc).
     const syncableElements = elements.reduce((acc, element) => {
