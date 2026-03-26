@@ -42,6 +42,7 @@ import { LilitaFontFaces } from "./Lilita";
 import { NunitoFontFaces } from "./Nunito";
 import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
+import { VazirFontFaces } from "./Vazir";
 
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use
@@ -396,6 +397,7 @@ export class Fonts {
     // fallback font faces
     init(CJK_HAND_DRAWN_FALLBACK_FONT, ...XiaolaiFontFaces);
     init(WINDOWS_EMOJI_FALLBACK_FONT, ...EmojiFontFaces);
+    init("Vazir", ...VazirFontFaces);
 
     Fonts._initialized = true;
 
