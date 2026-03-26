@@ -544,6 +544,7 @@
   },
   "toast": {
     "addedToLibrary": "Added to library",
+    "markdownLinkDetected": "Markdown link detected — label set as text, URL attached as link",
     "copyStyles": "Copied styles.",
     "copyToClipboard": "Copied to clipboard.",
     "copyToClipboardAsPng": "Copied {{exportSelection}} to clipboard as PNG\n({{exportColorScheme}})",
