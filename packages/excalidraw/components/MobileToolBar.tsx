@@ -15,9 +15,9 @@ import { HandButton } from "./HandButton";
 import { ToolButton } from "./ToolButton";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { ToolPopover } from "./ToolPopover";
+import { getSelectionToolOptions } from "./shapes";
 
 import {
-  SelectionIcon,
   FreedrawIcon,
   EraserIcon,
   RectangleIcon,
@@ -31,7 +31,6 @@ import {
   frameToolIcon,
   EmbedIcon,
   laserPointerToolIcon,
-  LassoIcon,
   mermaidLogoIcon,
   MagicIcon,
 } from "./icons";
@@ -59,19 +58,6 @@ const SHAPE_TOOLS = [
   },
 ] as const;
 
-const SELECTION_TOOLS = [
-  {
-    type: "selection",
-    icon: SelectionIcon,
-    title: capitalizeString(t("toolBar.selection")),
-  },
-  {
-    type: "lasso",
-    icon: LassoIcon,
-    title: capitalizeString(t("toolBar.lasso")),
-  },
-] as const;
-
 const LINEAR_ELEMENT_TOOLS = [
   {
     type: "arrow",
@@ -93,6 +79,7 @@ export const MobileToolBar = ({
   setAppState,
 }: MobileToolBarProps) => {
   const activeTool = app.state.activeTool;
+  const SELECTION_TOOLS = getSelectionToolOptions();
   const [isOtherShapesMenuOpen, setIsOtherShapesMenuOpen] = useState(false);
   const [lastActiveGenericShape, setLastActiveGenericShape] = useState<
     "rectangle" | "diamond" | "ellipse"
