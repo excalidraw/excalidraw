@@ -171,7 +171,7 @@ const focusPointUpdate = (
       // Same shape bound on both ends
       const boundToSameElementAfterUpdate =
         bindableElement && adjacentBinding.elementId === bindableElement.id;
-      if (switchToInsideBinding || boundToSameElementAfterUpdate) {
+      if (boundToSameElementAfterUpdate) {
         adjacentBinding = {
           ...adjacentBinding,
           mode: "inside",
