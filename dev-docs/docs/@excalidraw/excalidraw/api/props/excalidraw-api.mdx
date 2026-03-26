@@ -281,10 +281,11 @@ This is the history API. history.clear() will clear the history.
 
 ```tsx
 (
-  target?: ExcalidrawElement | ExcalidrawElement[],
+  target?: string | ExcalidrawElement | ExcalidrawElement[],
   opts?:
       | {
           fitToContent?: boolean;
+          viewportZoomFactor?: number;
           animate?: boolean;
           duration?: number;
         }
@@ -294,6 +295,11 @@ This is the history API. history.clear() will clear the history.
           animate?: boolean;
           duration?: number;
         }
+    & {
+      minZoom?: number;
+      maxZoom?: number;
+      canvasOffsets?: Offsets;
+    }
 ) => void
 ```
 
@@ -301,12 +307,15 @@ Scroll the nearest element out of the elements supplied to the center of the vie
 
 | Attribute | type | default | Description |
 | --- | --- | --- | --- |
-| target | [ExcalidrawElement](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115) &#124; [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115) | All scene elements | The element(s) to scroll to. |
-| opts.fitToContent | boolean | false | Whether to fit the elements to viewport by automatically changing zoom as needed. Note that the zoom range is between 10%-100%. |
-| opts.fitToViewport | boolean | false | Similar to fitToContent but the zoom range is not limited. If elements are smaller than the viewport, zoom will go above 100%. |
-| opts.viewportZoomFactor | number | 0.7 | when fitToViewport=true, how much screen should the content cover, between 0.1 (10%) and 1 (100%) |
+| target | string &#124; [ExcalidrawElement](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115) &#124; [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115) | All scene elements | The element(s) to scroll to. Can also be an element/group id or a URL containing an element link. |
+| opts.fitToContent | boolean | false | Zooms to fit elements within the viewport, but **will not zoom above 100%**. The zoom range is clamped between 10% and 100%, so if the target elements are smaller than the viewport, the zoom stays at 100% rather than zooming in further. Use `fitToViewport` if you need to zoom beyond 100%. |
+| opts.fitToViewport | boolean | false | Zooms to fit elements within the viewport **without an upper zoom limit**. Unlike `fitToContent`, if elements are smaller than the viewport, zoom will go above 100% to fill the available space. |
+| opts.viewportZoomFactor | number | 0.7 | How much of the viewport the content should cover, between 0.1 (10%) and 1 (100%). Applies to both `fitToContent` and `fitToViewport`. |
 | opts.animate | boolean | false | Whether to animate between starting and ending position. Note that for larger scenes the animation may not be smooth due to performance issues. |
 | opts.duration | number | 500 | Duration of the animation if `opts.animate` is `true`. |
+| opts.minZoom | number | -Infinity | Minimum zoom level to clamp to. |
+| opts.maxZoom | number | Infinity | Maximum zoom level to clamp to. |
+| opts.canvasOffsets | Offsets | - | Custom offsets `{ left, right, top, bottom }` to account for UI elements overlapping the canvas. |
 
 ## refresh
 
