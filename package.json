@@ -9,6 +9,8 @@
   ],
   "devDependencies": {
     "@babel/preset-env": "7.26.9",
+    "@commitlint/cli": "^18.4.0",
+    "@commitlint/config-conventional": "^18.4.0",
     "@excalidraw/eslint-config": "1.0.3",
     "@excalidraw/prettier-config": "1.0.2",
     "@types/chai": "4.3.0",
