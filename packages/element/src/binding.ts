@@ -750,8 +750,16 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           : // NOTE: Can only affect the start point because new arrows always drag the end point
           opts?.newArrow
           ? appState.selectedLinearElement!.initialState.origin!
-          : appState.selectedLinearElement?.initialState.altFocusPoint ||
-            LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          : otherBindableElement &&
+            appState.selectedLinearElement?.initialState
+              ?.arrowOtherEndpointInitialBinding?.fixedPoint
+          ? getGlobalFixedPointForBindableElement(
+              appState.selectedLinearElement?.initialState
+                .arrowOtherEndpointInitialBinding.fixedPoint,
+              otherBindableElement,
+              elementsMap,
+            )
+          : LinearElementEditor.getPointAtIndexGlobalCoordinates(
               arrow,
               0,
               elementsMap,
@@ -762,8 +770,16 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
         element: hit,
         focusPoint: endDragged
           ? globalPoint
-          : appState.selectedLinearElement?.initialState.altFocusPoint ||
-            LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          : otherBindableElement &&
+            appState.selectedLinearElement?.initialState
+              ?.arrowOtherEndpointInitialBinding?.fixedPoint
+          ? getGlobalFixedPointForBindableElement(
+              appState.selectedLinearElement?.initialState
+                .arrowOtherEndpointInitialBinding.fixedPoint,
+              otherBindableElement,
+              elementsMap,
+            )
+          : LinearElementEditor.getPointAtIndexGlobalCoordinates(
               arrow,
               -1,
               elementsMap,
