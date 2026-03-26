@@ -1290,6 +1290,7 @@ export const ZoomActions = ({
       {renderAction("zoomOut")}
       {renderAction("resetZoom")}
       {renderAction("zoomIn")}
+      {renderAction("toggleFullScreen")}
     </Stack.Row>
   </Stack.Col>
 );

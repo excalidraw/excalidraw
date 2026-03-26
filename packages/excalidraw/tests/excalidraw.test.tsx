@@ -1,4 +1,4 @@
-import { queryByText, queryByTestId } from "@testing-library/react";
+import { queryByLabelText, queryByText, queryByTestId } from "@testing-library/react";
 import React from "react";
 import { useMemo } from "react";
 
@@ -456,6 +456,60 @@ describe("<Excalidraw/>", () => {
       expect(
         queryByTestId(container, "toggle-dark-mode")?.textContent,
       ).toContain(t("buttons.lightMode"));
+    });
+  });
+
+  describe("toggleFullScreen action visibility", () => {
+    it("should show fullscreen button when toggleFullScreen is true on Android tablet", async () => {
+      const { container } = await render(
+        <Excalidraw
+          UIOptions={{
+            getFormFactor: () => "tablet",
+            canvasActions: { toggleFullScreen: true },
+          }}
+        />,
+      );
+
+      act(() => {
+        (h.app as any).editorInterface = {
+          ...h.app.editorInterface,
+          formFactor: "tablet",
+          userAgent: {
+            ...h.app.editorInterface.userAgent,
+            platform: "android",
+          },
+        };
+        h.app.refresh();
+      });
+
+      await waitFor(() => {
+        expect(queryByLabelText(container, t("buttons.fullScreen"))).toBeTruthy();
+      });
+    });
+
+    it("should hide fullscreen button when toggleFullScreen is false on Android tablet", async () => {
+      const { container } = await render(
+        <Excalidraw
+          UIOptions={{
+            getFormFactor: () => "tablet",
+            canvasActions: { toggleFullScreen: false },
+          }}
+        />,
+      );
+
+      act(() => {
+        (h.app as any).editorInterface = {
+          ...h.app.editorInterface,
+          formFactor: "tablet",
+          userAgent: {
+            ...h.app.editorInterface.userAgent,
+            platform: "android",
+          },
+        };
+        h.app.refresh();
+      });
+
+      expect(queryByLabelText(container, t("buttons.fullScreen"))).toBeNull();
     });
   });
 });
