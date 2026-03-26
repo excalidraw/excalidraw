@@ -394,14 +394,79 @@ const drawElementOnCanvas = (
     case "rectangle":
     case "iframe":
     case "embeddable":
-    case "diamond":
+    case "diamond":{
+    context.lineJoin = "round";
+    context.lineCap = "round";
+    rc.draw(ShapeCache.get(element)!);
+    break
+    }
     case "ellipse": {
       context.lineJoin = "round";
       context.lineCap = "round";
 
-      rc.draw(ShapeCache.generateElementShape(element, renderConfig));
+      const isArtistic = element.roughness > 0.5;
+      if (!isArtistic) {
+        rc.draw(ShapeCache.get(element)!);
+        break;
+      }
+
+      const steps = 1440;
+      const cx = element.width / 2;
+      const cy = element.height / 2;
+      const rx = element.width / 2;
+      const ry = element.height / 2;
+
+      const sizeFactor = Math.max(element.width, element.height);
+
+    
+      const caricatureBoost =
+        element.roughness > 1.2 ? 4 :
+        element.roughness > 0.8 ? 2 : 
+        1;
+
+      const baseNoise = sizeFactor * 0.00025;
+      const randomNoise = baseNoise * caricatureBoost;
+
+      
+      const strokeOffset = element.strokeWidth * (
+        caricatureBoost > 2 ? 0.5 : 0.4
+      );
+
+    
+      const smoothRandom = (() => {
+        let last = 0;
+        return () => {
+          const v = last * 0.95 + (Math.random() - 0.5) * 0.05;
+          last = v;
+          return v;
+        };
+      })();
+
+      const drawStroke = (offsetShift: number) => {
+        context.beginPath();
+        for (let i = 0; i <= steps; i++) {
+          const angle = (i / steps) * Math.PI * 2;
+
+          const offset = smoothRandom() * randomNoise + offsetShift;
+
+          const x = cx + Math.cos(angle) * (rx + offset);
+          const y = cy + Math.sin(angle) * (ry + offset);
+
+          if (i === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        }
+        context.stroke();
+      };
+
+      context.strokeStyle = element.strokeColor;
+      context.lineWidth = element.strokeWidth;
+
+      drawStroke(-strokeOffset);
+      drawStroke(strokeOffset);
+
       break;
     }
+
     case "arrow":
     case "line": {
       context.lineJoin = "round";
