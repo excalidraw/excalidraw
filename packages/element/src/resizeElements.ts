@@ -1308,7 +1308,7 @@ export const resizeMultipleElements = (
       targetElements.some(
         (item) =>
           item.latest.angle !== 0 ||
-          isTextElement(item.latest) ||
+          (isTextElement(item.latest) && !isBoundToContainer(item.latest)) ||
           isInGroup(item.latest),
       );
 
