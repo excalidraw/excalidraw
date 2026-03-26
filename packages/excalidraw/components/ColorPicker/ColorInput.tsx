@@ -95,6 +95,22 @@ export const ColorInput = ({
         }}
         placeholder={placeholder}
       />
+      <input
+        type="color"
+        aria-label={t("colorPicker.color")}
+        value={color && color !== "transparent" ? color : "#000000"}
+        onChange={(event) => {
+          onChange(event.target.value);
+        }}
+        style={{
+          width: 28,
+          height: 28,
+          padding: 0,
+          border: 0,
+          background: "transparent",
+        }}
+        tabIndex={-1}
+      />
       {/* TODO reenable on mobile with a better UX */}
       {editorInterface.formFactor !== "phone" && (
         <>
