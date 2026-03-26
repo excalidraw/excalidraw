@@ -3,6 +3,10 @@
     "paste": "הדבקה",
     "pasteAsPlaintext": "הדבקה ללא עיצוב",
     "pasteCharts": "הדבקת תרשימים",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "בחירה בהכול",
     "multiSelect": "הוספת רכיב לבחירה",
     "moveCanvas": "הזזת הקנבס",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "רגל עורב (הרבה)",
     "arrowhead_crowfoot_one": "רגל עורב (אחת)",
     "arrowhead_crowfoot_one_or_many": "רגל עורב (אחת או הרבה)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "אפשרויות נוספות",
+    "cardinality": "",
     "arrowtypes": "סוג החץ",
     "arrowtype_sharp": "חץ מחודד",
     "arrowtype_round": "חץ מעוקל",
@@ -171,7 +182,11 @@
     "linkToElement": "קישור לפריט",
     "wrapSelectionInFrame": "לעטוף את הבחירה במסגרת",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "קישור לפריט",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "שגיאה"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "שמור לכונן",
     "disk_details": "ייצא מידע של הקנבאס לקובץ שתוכל לייבא אחר כך.",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Mermaid ל־Excalidraw",
     "button": "הוספה",
-    "description": "לעת עתה נתמכים רק <flowchartLink>תרשימי זרימה</flowchartLink>, <sequenceLink>תהליכים</sequenceLink>, <classLink>ודיאגרמת מחלקה</classLink>. שאר הסוגים ייוצרו כתמונות ב-Excalidraw.",
+    "description": "",
     "syntax": "תחביר Mermaid",
     "preview": "תצוגה מקדימה",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

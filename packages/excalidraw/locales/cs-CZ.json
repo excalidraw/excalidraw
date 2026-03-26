@@ -3,6 +3,10 @@
     "paste": "Vložit",
     "pasteAsPlaintext": "Vložit jako prostý text",
     "pasteCharts": "Vložit grafy",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Vybrat vše",
     "multiSelect": "Přidat prvek do výběru",
     "moveCanvas": "Posunout plátno",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "Typ šipky",
     "arrowtype_sharp": "Ostrá šipka",
     "arrowtype_round": "Zakřivená šipka",
@@ -171,7 +182,11 @@
     "linkToElement": "Odkaz na objekt",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Odkaz na objekt",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Chyba"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Uložit na disk",
     "disk_details": "Exportovat data scény do souboru, ze kterého můžete importovat později.",
@@ -616,7 +635,8 @@
     "syntax": "Mermaid syntaxe",
     "preview": "Náhled",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

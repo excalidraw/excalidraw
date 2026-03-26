@@ -3,6 +3,10 @@
     "paste": "Pegar",
     "pasteAsPlaintext": "Pegar en tèxt brut",
     "pasteCharts": "Pegar los grafics",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Tot seleccionar",
     "multiSelect": "Apondre un element a la seleccion",
     "moveCanvas": "Desplaçar lo canabàs",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "",
     "arrowtype_sharp": "",
     "arrowtype_round": "",
@@ -171,7 +182,11 @@
     "linkToElement": "Ligam cap a l’objècte",
     "wrapSelectionInFrame": "",
     "tab": "Onglet",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Error"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Salvar al disc",
     "disk_details": "Exportar las donadas de la scèna cap a un fichièr que podètz importar mai tard.",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "De Mermaid cap a Excalidraw",
     "button": "Inserir",
-    "description": "Actualament, sonque los diagramas <flowchartLink>logics</flowchartLink>,<sequenceLink> de sequéncia</sequenceLink> e <classLink>de classa </classLink>son preses en carga. Los autres tipes seràn afichats coma imatge dins Excalidraw.",
+    "description": "",
     "syntax": "Sintaxi Mermaid",
     "preview": "Apercebut",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""
