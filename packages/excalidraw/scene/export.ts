@@ -13,6 +13,7 @@ import {
   getFontString,
   toBrandedType,
   applyDarkModeFilter,
+  MAX_ALLOWED_CANVAS_WIDTH_OR_HEIGHT,
 } from "@excalidraw/common";
 
 import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
@@ -61,6 +62,7 @@ import { renderSceneToSvg } from "../renderer/staticSvgScene";
 import type { RenderableElementsMap } from "./types";
 
 import type { AppState, BinaryFiles } from "../types";
+import { aspectFitScale } from "@excalidraw/math";
 
 const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
   if (element.width <= maxWidth) {
@@ -191,7 +193,13 @@ export const exportToCanvas = async (
     const canvas = document.createElement("canvas");
     canvas.width = width * appState.exportScale;
     canvas.height = height * appState.exportScale;
-    return { canvas, scale: appState.exportScale };
+    let scale = appState.exportScale;
+    if(canvas.width > MAX_ALLOWED_CANVAS_WIDTH_OR_HEIGHT || canvas.height > MAX_ALLOWED_CANVAS_WIDTH_OR_HEIGHT) {
+      scale = aspectFitScale(width, height, MAX_ALLOWED_CANVAS_WIDTH_OR_HEIGHT);
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+    }
+    return { canvas, scale: scale };
   },
   loadFonts: () => Promise<void> = async () => {
     await Fonts.loadElementsFonts(elements);
