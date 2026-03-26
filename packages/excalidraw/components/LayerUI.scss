@@ -106,6 +106,26 @@
       }
     }
 
+    .left-menu-toggle {
+      &:hover {
+        background-color: var(--button-hover-bg);
+      }
+
+      &:active {
+        border-color: var(--color-primary);
+      }
+
+      &:focus {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+
+      [dir="rtl"] & {
+        left: 0.5rem;
+        right: auto;
+      }
+    }
+
     .layer-ui__wrapper__footer-left,
     .footer-center,
     .layer-ui__wrapper__footer-right {
