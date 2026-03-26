@@ -94,6 +94,44 @@ yarn add react react-dom @excalidraw/excalidraw
 
 Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
 
+## Codex MCP quickstart
+
+This repository includes a local MCP server for Codex in `tools/mcp-excalidraw`.
+
+1. Build the MCP server:
+
+```bash
+cd /home/diplov/excalidraw
+corepack yarn@1.22.22 --cwd ./tools/mcp-excalidraw build
+```
+
+2. Register it in Codex:
+
+```bash
+codex mcp add excalidraw-local -- node /home/diplov/excalidraw/tools/mcp-excalidraw/dist/index.js
+codex mcp list
+```
+
+3. Optional: pin a custom scene root:
+
+```bash
+codex mcp remove excalidraw-local
+codex mcp add excalidraw-local --env EXCALIDRAW_MCP_ROOT=/home/diplov/excalidraw/excalidraw-app -- node /home/diplov/excalidraw/tools/mcp-excalidraw/dist/index.js
+```
+
+4. First commands to try in Codex:
+
+- `Use scene.list with recursive=true`
+- `Create scenes/demo.excalidraw using scene.create`
+- `Use scene.get on scenes/demo.excalidraw`
+
+### Troubleshooting
+
+- `Server executable missing`: run the build step again.
+- `PATH_NOT_ALLOWED`: keep `path` and `outputPath` under `EXCALIDRAW_MCP_ROOT`.
+- `INVALID_SCENE_JSON` or `INVALID_SCENE`: validate the `.excalidraw` JSON structure.
+- `SVG_EXPORT_FAILED`: verify scene elements are valid and not corrupted.
+
 ## Contributing
 
 - Missing something or found a bug? [Report here](https://github.com/excalidraw/excalidraw/issues).
