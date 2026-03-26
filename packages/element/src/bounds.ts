@@ -628,7 +628,13 @@ export const getCubicBezierCurveBound = (
 };
 
 export const getMinMaxXYFromCurvePathOps = (
-  ops: Op[],
+  ops: Array<
+    | Op
+    | {
+        op: "qcurveTo";
+        data: number[];
+      }
+  >,
   transformXY?: (p: GlobalPoint) => GlobalPoint,
 ): Bounds => {
   let currentP: GlobalPoint = pointFrom(0, 0);
@@ -669,14 +675,72 @@ export const getMinMaxXYFromCurvePathOps = (
         limits.maxX = Math.max(limits.maxX, maxX);
         limits.maxY = Math.max(limits.maxY, maxY);
       } else if (op === "lineTo") {
-        // TODO: Implement this
+        const _p1 = pointFrom<GlobalPoint>(data[0], data[1]);
+
+        const p1 = transformXY ? transformXY(_p1) : _p1;
+        const p0 = transformXY ? transformXY(currentP) : currentP;
+
+        currentP = _p1;
+
+        limits.minX = Math.min(limits.minX, p0[0], p1[0]);
+        limits.minY = Math.min(limits.minY, p0[1], p1[1]);
+        limits.maxX = Math.max(limits.maxX, p0[0], p1[0]);
+        limits.maxY = Math.max(limits.maxY, p0[1], p1[1]);
       } else if (op === "qcurveTo") {
-        // TODO: Implement this
+        const _p1 = pointFrom<GlobalPoint>(data[0], data[1]); // Control Point
+        const _p2 = pointFrom<GlobalPoint>(data[2], data[3]); // End Point
+
+        const p1 = transformXY ? transformXY(_p1) : _p1;
+        const p2 = transformXY ? transformXY(_p2) : _p2;
+        const p0 = transformXY ? transformXY(currentP) : currentP;
+
+        currentP = _p2;
+
+        const [minX, minY, maxX, maxY] = getQuadraticBezierCurveBound(
+          p0,
+          p1,
+          p2,
+        );
+
+        limits.minX = Math.min(limits.minX, minX);
+        limits.minY = Math.min(limits.minY, minY);
+        limits.maxX = Math.max(limits.maxX, maxX);
+        limits.maxY = Math.max(limits.maxY, maxY);
       }
       return limits;
     },
     { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
   );
+  return [minX, minY, maxX, maxY];
+};
+
+const getQuadraticBezierCurveBound = (
+  p0: GlobalPoint,
+  p1: GlobalPoint,
+  p2: GlobalPoint,
+): Bounds => {
+  const calculateBound = (v0: number, v1: number, v2: number) => {
+    let min = Math.min(v0, v2);
+    let max = Math.max(v0, v2);
+
+    const denominator = v0 - 2 * v1 + v2;
+
+    if (denominator !== 0) {
+      const t = (v0 - v1) / denominator;
+      if (t > 0 && t < 1) {
+        const vAtT =
+          Math.pow(1 - t, 2) * v0 + 2 * (1 - t) * t * v1 + Math.pow(t, 2) * v2;
+
+        min = Math.min(min, vAtT);
+        max = Math.max(max, vAtT);
+      }
+    }
+    return [min, max];
+  };
+
+  const [minX, maxX] = calculateBound(p0[0], p1[0], p2[0]);
+  const [minY, maxY] = calculateBound(p0[1], p1[1], p2[1]);
+
   return [minX, minY, maxX, maxY];
 };
 
