@@ -13,8 +13,16 @@ import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
+import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { render, fireEvent, act, unmountComponent } from "./test-utils";
+import {
+  render,
+  fireEvent,
+  act,
+  unmountComponent,
+  mockBoundingClientRect,
+  restoreOriginalGetBoundingClientRect,
+} from "./test-utils";
 
 unmountComponent();
 
@@ -70,6 +78,46 @@ describe("move element", () => {
     expect([h.elements[0].x, h.elements[0].y]).toEqual([0, 40]);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
+  });
+
+  it("auto-pans canvas at viewport edge while dragging selection", async () => {
+    mockBoundingClientRect();
+    try {
+      await render(<Excalidraw />);
+      API.setAppState({
+        width: 400,
+        height: 300,
+        offsetLeft: 0,
+        offsetTop: 0,
+      });
+
+      const rect = UI.createElement("rectangle", {
+        x: 20,
+        y: 20,
+        width: 80,
+        height: 40,
+      });
+      const pointer = new Pointer("mouse");
+      pointer.clickOn(rect);
+
+      const rightEdgeX = h.state.offsetLeft + h.state.width + 20;
+      const dragY = h.state.offsetTop + 40;
+
+      pointer.downAt(60, dragY);
+      pointer.moveTo(rightEdgeX, dragY);
+      const xAfterFirstEdgeMove = rect.x;
+
+      // Repeating pointer moves at the same edge coordinate should keep
+      // advancing drag by panning the viewport.
+      pointer.moveTo(rightEdgeX, dragY);
+      pointer.moveTo(rightEdgeX, dragY);
+      pointer.moveTo(rightEdgeX, dragY);
+      pointer.up();
+
+      expect(rect.x).not.toBe(xAfterFirstEdgeMove);
+    } finally {
+      restoreOriginalGetBoundingClientRect();
+    }
   });
 
   it("rectangles with binding arrow", async () => {
