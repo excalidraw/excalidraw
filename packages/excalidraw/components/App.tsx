@@ -8396,13 +8396,16 @@ class App extends React.Component<AppProps, AppState> {
           ) as any;
 
           if (arrow && isBindingElement(arrow)) {
-            const { hitFocusPoint, pointerOffset } =
-              handleFocusPointPointerDown(
-                arrow,
-                pointerDownState,
-                elementsMap,
-                this.state,
-              );
+            const {
+              hitFocusPoint,
+              pointerOffset,
+              arrowOtherEndpointInitialBinding,
+            } = handleFocusPointPointerDown(
+              arrow,
+              pointerDownState,
+              elementsMap,
+              this.state,
+            );
 
             // If focus point is hit, update state and prevent element selection
             if (hitFocusPoint) {
@@ -8412,6 +8415,10 @@ class App extends React.Component<AppProps, AppState> {
                   hoveredFocusPointBinding: hitFocusPoint,
                   draggedFocusPointBinding: hitFocusPoint,
                   pointerOffset,
+                  initialState: {
+                    ...linearElementEditor.initialState,
+                    arrowOtherEndpointInitialBinding,
+                  },
                 },
               });
               return false;
@@ -10524,14 +10531,19 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (this.state.selectedLinearElement.draggedFocusPointBinding) {
-          handleFocusPointPointerUp(
-            this.state.selectedLinearElement,
-            this.scene,
-          );
+          const { arrowOtherEndpointInitialBinding } =
+            handleFocusPointPointerUp(
+              this.state.selectedLinearElement,
+              this.scene,
+            );
           this.setState({
             selectedLinearElement: {
               ...this.state.selectedLinearElement,
               draggedFocusPointBinding: null,
+              initialState: {
+                ...this.state.selectedLinearElement.initialState,
+                arrowOtherEndpointInitialBinding,
+              },
             },
           });
         } else if (
