@@ -21,6 +21,6 @@ jobs:
         run: yarn test:coverage
       - name: "Report Coverage"
         if: always() # Also generate the report if tests are failing
-        uses: davelosert/vitest-coverage-report-action@v2
+        uses: davelosert/vitest-coverage-report-action@2500dafcee7dd64f85ab689c0b83798a8359770e # v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
