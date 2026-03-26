@@ -10,8 +10,13 @@ import { libraryItemsAtom } from "../data/library";
 import { useAtom } from "../editor-jotai";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { t } from "../i18n";
+import { actionSyncLibraryInstances } from "../actions/actionSyncLibraryInstances";
 
-import { useApp, useExcalidrawSetAppState } from "./App";
+import {
+  useApp,
+  useExcalidrawActionManager,
+  useExcalidrawSetAppState,
+} from "./App";
 import ConfirmDialog from "./ConfirmDialog";
 import { Dialog } from "./Dialog";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
@@ -24,6 +29,7 @@ import {
   ExportIcon,
   LoadIcon,
   publishIcon,
+  syncIcon,
   TrashIcon,
 } from "./icons";
 
@@ -42,6 +48,7 @@ export const LibraryDropdownMenuButton: React.FC<{
   onRemoveFromLibrary: () => void;
   resetLibrary: () => void;
   onSelectItems: (items: LibraryItem["id"][]) => void;
+  onSyncInstances: () => void;
   appState: UIAppState;
   className?: string;
 }> = ({
@@ -51,6 +58,7 @@ export const LibraryDropdownMenuButton: React.FC<{
   onRemoveFromLibrary,
   resetLibrary,
   onSelectItems,
+  onSyncInstances,
   appState,
   className,
 }) => {
@@ -229,6 +237,13 @@ export const LibraryDropdownMenuButton: React.FC<{
               {t("buttons.publishLibrary")}
             </DropdownMenu.Item>
           )}
+          <DropdownMenu.Item
+            onSelect={onSyncInstances}
+            icon={syncIcon}
+            data-testid="lib-dropdown--sync"
+          >
+            {t("labels.syncLibraryInstances")}
+          </DropdownMenu.Item>
           {!!items.length && (
             <DropdownMenu.Item
               onSelect={() => setShowRemoveLibAlert(true)}
@@ -284,6 +299,7 @@ export const LibraryDropdownMenu = ({
   className?: string;
 }) => {
   const { library } = useApp();
+  const actionManager = useExcalidrawActionManager();
   const { clearLibraryCache, deleteItemsFromLibraryCache } = useLibraryCache();
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
@@ -308,6 +324,10 @@ export const LibraryDropdownMenu = ({
     clearLibraryCache();
   };
 
+  const onSyncInstances = useCallback(() => {
+    actionManager.executeAction(actionSyncLibraryInstances);
+  }, [actionManager]);
+
   return (
     <LibraryDropdownMenuButton
       appState={appState}
@@ -319,6 +339,7 @@ export const LibraryDropdownMenu = ({
         removeFromLibrary(libraryItemsData.libraryItems)
       }
       resetLibrary={resetLibrary}
+      onSyncInstances={onSyncInstances}
       className={className}
     />
   );

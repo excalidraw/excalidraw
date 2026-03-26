@@ -186,7 +186,8 @@
     "preferences": "Preferences",
     "preferences_toolLock": "Tool lock",
     "arrowBinding": "Arrow binding",
-    "midpointSnapping": "Snap to midpoints"
+    "midpointSnapping": "Snap to midpoints",
+    "syncLibraryInstances": "Sync library instances"
   },
   "elementLink": {
     "title": "Link to object",
@@ -544,6 +545,8 @@
   },
   "toast": {
     "addedToLibrary": "Added to library",
+    "syncedLibraryInstances": "Synced {{count}} element(s) from library",
+    "noLibraryInstancesToSync": "No linked library instances found on canvas",
     "copyStyles": "Copied styles.",
     "copyToClipboard": "Copied to clipboard.",
     "copyToClipboardAsPng": "Copied {{exportSelection}} to clipboard as PNG\n({{exportColorScheme}})",
