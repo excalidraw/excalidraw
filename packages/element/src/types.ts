@@ -79,6 +79,12 @@ type _ExcalidrawElementBase = Readonly<{
   link: string | null;
   locked: boolean;
   customData?: Record<string, any>;
+  /**
+   * If set, this element was placed from a library item with this ID.
+   * Used to propagate style updates from the library item to all canvas instances.
+   * Null/undefined means the element is not linked to any library item.
+   */
+  libraryItemId?: string | null;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
