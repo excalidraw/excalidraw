@@ -62,8 +62,10 @@ const TEMPLATES = [
 ] as const;
 
 const getTemplateUrl = (id: string) => {
-  const base = typeof window !== "undefined" ? window.location.origin : "";
-  return `${base}/templates/${id}.flexcalidraw`;
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const basePath = import.meta.env.BASE_URL || "/";
+  const base = basePath.endsWith("/") ? basePath : `${basePath}/`;
+  return `${origin}${base}templates/${id}.flexcalidraw`;
 };
 
 type PreviewStatus = "idle" | "loading" | "ready" | "error";

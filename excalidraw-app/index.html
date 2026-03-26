@@ -129,7 +129,9 @@
 
     <% } else { %>
     <script>
-      window.EXCALIDRAW_ASSET_PATH = window.origin;
+      // Asset path is set by Vite's BASE_URL via index.tsx at module load time.
+      // Fallback to origin for any pre-module access.
+      window.EXCALIDRAW_ASSET_PATH = window.EXCALIDRAW_ASSET_PATH || window.origin;
     </script>
     <% } %>
 

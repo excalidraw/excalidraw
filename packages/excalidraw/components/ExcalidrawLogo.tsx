@@ -5,13 +5,9 @@ import { useUIAppState } from "../context/ui-appState";
 import "./ExcalidrawLogo.scss";
 
 const getLuzmoLogoSrc = (isDark: boolean) => {
-  const assetPath =
-    typeof window !== "undefined" && (window as any).EXCALIDRAW_ASSET_PATH
-      ? `${(window as any).EXCALIDRAW_ASSET_PATH}`
-      : "";
-  return (
-    assetPath + (isDark ? "/luzmo_logo_yellow.svg" : "/luzmo_logo_black.svg")
-  );
+  const basePath = import.meta.env.BASE_URL || "/";
+  const base = basePath.endsWith("/") ? basePath : `${basePath}/`;
+  return base + (isDark ? "luzmo_logo_yellow.svg" : "luzmo_logo_black.svg");
 };
 
 /** Luzmo logo — references the SVG file for "Luzmo's Flexcalidraw" branding */
