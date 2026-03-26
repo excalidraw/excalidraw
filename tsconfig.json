@@ -13,11 +13,11 @@
     "noFallthroughCasesInSwitch": true,
     "module": "ESNext",
     "moduleResolution": "node",
+
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": ".",
     "paths": {
       "@excalidraw/common": ["./packages/common/src/index.ts"],
       "@excalidraw/common/*": ["./packages/common/src/*"],
@@ -32,5 +32,5 @@
     }
   },
   "include": ["packages", "excalidraw-app"],
-  "exclude": ["examples", "dist", "types", "tests"]
+  "exclude": ["examples", "dist", "types", "tests", "**/dist/**", "**/types/**", "**/node_modules/**"]
 }
