@@ -63,6 +63,7 @@ export type ActionName =
   | "midpointSnapping"
   | "stats"
   | "changeStrokeColor"
+  | "changeLaserColor"
   | "changeBackgroundColor"
   | "changeFillStyle"
   | "changeStrokeWidth"
