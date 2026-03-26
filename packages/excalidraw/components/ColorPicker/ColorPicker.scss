@@ -385,6 +385,20 @@
     }
   }
 
+  .color-picker__input-label--invalid {
+    border-color: var(--color-danger);
+
+    &:focus-within {
+      box-shadow: 0 0 0 1px var(--color-danger);
+    }
+  }
+
+  .color-picker__input-error {
+    color: var(--color-danger);
+    font-size: 0.75rem;
+    padding: 0 0.75rem 0.25rem;
+  }
+
   .color-picker__input-hash {
     padding: 0 0.25rem;
   }
