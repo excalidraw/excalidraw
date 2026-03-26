@@ -323,6 +323,7 @@ import {
   actionToggleArrowBinding,
   actionToggleMidpointSnapping,
   actionToggleCropEditor,
+  actionStackToScale,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
@@ -6132,6 +6133,64 @@ class App extends React.Component<AppProps, AppState> {
     return isTextBindableContainer(hitElement, false) ? hitElement : null;
   }
 
+
+  private editTopmostInStackGroup(
+    groupId: string,
+    insertAtParentCenter: boolean,
+  ) {
+    /*
+    high level steps
+    1. find the top most element which can "bind" text (text cannot bind text, only shape can)
+    2. find the midpoint of that shape and start editing the text
+    */
+
+    // based on group id, get the elements belonging to this group
+    // getElementsInGroup returns elements in order that they appear in scene
+    // groupElements[0] is the furthest back and groupElements[length - 1] is the front most
+    const groupElements = getElementsInGroup(
+      this.scene.getNonDeletedElements(),
+      groupId,
+    );
+    let container: ExcalidrawElement | null = null;
+    for (let i = groupElements.length - 1; i >= 0; i--) {
+      /*
+      groupElements:
+      [0] back copy (rectangle)
+      [1] middle copy (rectangle)
+      [2] front rectangle -- we want to select this
+      [3] "API Server" (text element bound to front rectangle)
+
+      even if text didn't exist, [2] would be considered the front since it can still bind text
+      in a sense, our frontmost element is always the last or second last (if text present)
+       */
+      if (isTextBindableContainer(groupElements[i], false)) {
+        container = groupElements[i];
+        break;
+      }
+    }
+    if (!container) {
+      return;
+    }
+
+    // select the midpoint and start editing the text
+    this.setState(
+      { selectedElementIds: { [container.id]: true } },
+      () => {
+        const midPoint = getContainerCenter(
+          container,
+          this.state,
+          this.scene.getNonDeletedElementsMap(),
+        );
+        this.startTextEditing({
+          sceneX: midPoint.x,
+          sceneY: midPoint.y,
+          insertAtParentCenter,
+          container: container as ExcalidrawTextContainer,
+        });
+      },
+    );
+  }
+
   private startTextEditing = ({
     sceneX,
     sceneY,
@@ -6483,18 +6542,24 @@ class App extends React.Component<AppProps, AppState> {
 
       if (selectedGroupId) {
         this.store.scheduleCapture();
-        this.setState((prevState) => ({
-          ...prevState,
-          ...selectGroupsForSelectedElements(
-            {
-              editingGroupId: selectedGroupId,
-              selectedElementIds: { [hitElement!.id]: true },
-            },
-            this.scene.getNonDeletedElements(),
-            prevState,
-            this,
-          ),
-        }));
+        this.setState(
+          (prevState) => ({
+            ...prevState,
+            ...selectGroupsForSelectedElements(
+              {
+                editingGroupId: selectedGroupId,
+                selectedElementIds: { [hitElement!.id]: true },
+              },
+              this.scene.getNonDeletedElements(),
+              prevState,
+              this,
+            ),
+          }),
+          // if double click on stacked group, edit top most text
+          selectedGroupId.startsWith("stack_")
+            ? () => this.editTopmostInStackGroup(selectedGroupId, !event.altKey)
+            : undefined,
+        );
         return;
       }
     }
@@ -12530,6 +12595,7 @@ class App extends React.Component<AppProps, AppState> {
       actionPasteStyles,
       CONTEXT_MENU_SEPARATOR,
       actionGroup,
+      actionStackToScale,
       actionTextAutoResize,
       actionUnbindText,
       actionBindText,
