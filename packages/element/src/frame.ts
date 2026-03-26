@@ -780,12 +780,14 @@ export const isElementInFrame = (
   };
 
   if (
+    // to account for unique case when element is aligned where it is selected, and still has a frameId
+    // check if element overlaps first with the frame
+    elementOverlapsWithFrame(_element, frame, allElementsMap) &&
     // if the element is not selected, or it is selected but not being dragged,
     // frame membership won't update, so return true
-    !appState.selectedElementIds[_element.id] ||
-    !appState.selectedElementsAreBeingDragged ||
-    // if both frame and element are selected, won't update membership, so return true
-    (appState.selectedElementIds[_element.id] &&
+    (!appState.selectedElementIds[_element.id] ||
+      !appState.selectedElementsAreBeingDragged ||
+      // if both frame and element are selected, won't update membership, so return true
       appState.selectedElementIds[frame.id])
   ) {
     return true;
