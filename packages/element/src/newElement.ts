@@ -21,7 +21,7 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 import { newElementWith } from "./mutateElement";
-import { getBoundTextMaxWidth } from "./textElement";
+import { getBoundTextMaxWidth, getInitialTextMetrics } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 
@@ -236,27 +236,30 @@ const getTextElementPositionOffsets = (
   };
 };
 
+export type NewTextElementOptions = {
+  text: string;
+  originalText?: string;
+  fontSize?: number;
+  fontFamily?: FontFamilyValues;
+  textAlign?: TextAlign;
+  verticalAlign?: VerticalAlign;
+  containerId?: ExcalidrawTextContainer["id"] | null;
+  lineHeight?: ExcalidrawTextElement["lineHeight"];
+  autoResize?: ExcalidrawTextElement["autoResize"];
+} & ElementConstructorOpts;
+
 export const newTextElement = (
-  opts: {
-    text: string;
-    originalText?: string;
-    fontSize?: number;
-    fontFamily?: FontFamilyValues;
-    textAlign?: TextAlign;
-    verticalAlign?: VerticalAlign;
-    containerId?: ExcalidrawTextContainer["id"] | null;
-    lineHeight?: ExcalidrawTextElement["lineHeight"];
-    autoResize?: ExcalidrawTextElement["autoResize"];
-  } & ElementConstructorOpts,
+  opts: NewTextElementOptions,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
   const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
   const lineHeight = opts.lineHeight || getLineHeight(fontFamily);
-  const text = normalizeText(opts.text);
-  const metrics = measureText(
-    text,
-    getFontString({ fontFamily, fontSize }),
-    lineHeight,
+  const normalizedText = normalizeText(opts.text);
+  const originalText = opts.originalText ?? normalizedText;
+  const metrics = getInitialTextMetrics(
+    { ...opts, text: normalizedText },
+    fontFamily,
+    fontSize,
   );
   const textAlign = opts.textAlign || DEFAULT_TEXT_ALIGN;
   const verticalAlign = opts.verticalAlign || DEFAULT_VERTICAL_ALIGN;
@@ -267,7 +270,7 @@ export const newTextElement = (
 
   const textElementProps: ExcalidrawTextElement = {
     ..._newElementBase<ExcalidrawTextElement>("text", opts),
-    text,
+    text: normalizedText,
     fontSize,
     fontFamily,
     textAlign,
@@ -277,7 +280,7 @@ export const newTextElement = (
     width: metrics.width,
     height: metrics.height,
     containerId: opts.containerId || null,
-    originalText: opts.originalText ?? text,
+    originalText,
     autoResize: opts.autoResize ?? true,
     lineHeight,
   };
