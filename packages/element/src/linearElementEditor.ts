@@ -1088,10 +1088,7 @@ export class LinearElementEditor {
             !!app.state.newElement &&
             (app.state.bindMode === "inside" || app.state.bindMode === "skip"),
           altFocusPoint: null,
-          arrowOtherEndpointInitialBinding:
-            linearElementEditor.selectedPointsIndices?.includes(0)
-              ? element.startBinding
-              : element.endBinding,
+          arrowOtherEndpointInitialBinding: element.startBinding,
         },
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
@@ -1154,10 +1151,9 @@ export class LinearElementEditor {
           !!app.state.newElement &&
           (app.state.bindMode === "inside" || app.state.bindMode === "skip"),
         altFocusPoint: null,
-        arrowOtherEndpointInitialBinding:
-          linearElementEditor.selectedPointsIndices?.includes(0)
-            ? element.startBinding
-            : element.endBinding,
+        arrowOtherEndpointInitialBinding: nextSelectedPointsIndices?.includes(0)
+          ? element.endBinding
+          : element.startBinding,
       },
       selectedPointsIndices: nextSelectedPointsIndices,
       pointerOffset: targetPoint
