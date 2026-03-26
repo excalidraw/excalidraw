@@ -420,6 +420,7 @@ import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
+import { parseMarkdownLink } from "../utils/markdownLink";
 
 import { isMaybeMermaidDefinition } from "../mermaid";
 
@@ -5722,8 +5723,39 @@ class App extends React.Component<AppProps, AppState> {
         }
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
-        const isDeleted = !nextOriginalText.trim();
-        updateElement(nextOriginalText, isDeleted);
+        // ── Markdown link auto-detection ──────────────────────────────────
+        // If the user types a complete markdown link `[label](url)` as the
+        // sole content of a text element, we:
+        //   • display only the label as the element's text
+        //   • attach the URL to element.link (the existing hyperlink field)
+        //
+        // This lets users write `[Open docs](https://example.com)` and get a
+        // labelled, clickable element without touching the hyperlink editor.
+        //
+        // NOTE: Only whole-text matches are handled. Inline partial links such
+        // as "See [here](url) for details" are intentionally left as-is so we
+        // never silently mutate text the user did not intend as a pure link.
+        // For full inline link rendering see the comment block in
+        // packages/excalidraw/utils/markdownLink.ts (Option B).
+        const parsedLink = parseMarkdownLink(nextOriginalText);
+        let resolvedText = nextOriginalText;
+
+        if (parsedLink) {
+          resolvedText = parsedLink.label;
+          // Apply the extracted URL to the element using the existing link API.
+          // We do this inside a micro-task so the element already exists in the
+          // scene when mutateElement is called.
+          const elementId = element.id;
+          Promise.resolve().then(() => {
+            const el = this.scene.getElement(elementId);
+            if (el) {
+              this.scene.mutateElement(el, { link: parsedLink.url });
+            }
+          });
+        }
+
+        const isDeleted = !resolvedText.trim();
+        updateElement(resolvedText, isDeleted);
 
         // keyboard-submit keeps focus on the edited object. For bound text, keep
         // the container selected even if the text becomes empty and is deleted.
