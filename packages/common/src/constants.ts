@@ -23,6 +23,7 @@ export const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 export const ELEMENT_TRANSLATE_AMOUNT = 1;
 export const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
 export const SHIFT_LOCKING_ANGLE = Math.PI / 12;
+export const GRID_LOCKING_ANGLE = Math.PI / 2;
 export const DEFAULT_LASER_COLOR = "red";
 export const CURSOR_TYPE = {
   TEXT: "text",
