@@ -9211,6 +9211,17 @@ class App extends React.Component<AppProps, AppState> {
             angleLocked: shouldRotateWithDiscreteAngle(event.nativeEvent),
           },
         );
+
+        // If the arrow is bound to a frame, it should not be added as a
+        // child of that frame. Otherwise the arrow gets clipped by the
+        // frame and becomes invisible as it extends outside.
+        if (
+          element.startBinding &&
+          element.frameId &&
+          element.startBinding.elementId === element.frameId
+        ) {
+          this.scene.mutateElement(element, { frameId: null });
+        }
       }
 
       // NOTE: We need the flushSync here for the

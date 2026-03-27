@@ -4,13 +4,15 @@ import {
 } from "@excalidraw/excalidraw";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
+import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
   getCloneByOrigId,
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
-import type { ExcalidrawElement } from "../src/types";
+import { ARROW_TYPE } from "@excalidraw/common";
+
+import type { ExcalidrawElement, ExcalidrawArrowElement } from "../src/types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -559,5 +561,51 @@ describe("adding elements to frames", () => {
       dragElementIntoFrame(frame2, rectangle1);
       expect(h.elements.length).toBe(4);
     });
+  });
+});
+
+describe("arrow bound to frame should not be frame child", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("should not add arrow as frame child when arrow is bound to the frame", () => {
+    // Create a frame
+    const frame = API.createElement({
+      type: "frame",
+      x: 100,
+      y: 100,
+      width: 300,
+      height: 200,
+    });
+    API.setElements([frame]);
+
+    // Set arrow tool with elbow type
+    API.setAppState({
+      currentItemArrowType: ARROW_TYPE.elbow,
+    });
+    UI.clickTool("arrow");
+
+    // Click slightly inside the frame border to start arrow (binds to frame)
+    mouse.downAt(105, 200);
+    // Drag outside the frame to extend the arrow
+    mouse.moveTo(50, 200);
+    mouse.upAt(50, 200);
+
+    // Find the arrow element
+    const arrowElement = h.elements.find(
+      (el) => el.type === "arrow",
+    ) as ExcalidrawArrowElement;
+
+    expect(arrowElement).toBeDefined();
+
+    // If the arrow is bound to the frame, its frameId should be null
+    // to prevent it from being clipped by the frame
+    if (
+      arrowElement.startBinding &&
+      arrowElement.startBinding.elementId === frame.id
+    ) {
+      expect(arrowElement.frameId).toBe(null);
+    }
   });
 });
