@@ -635,8 +635,8 @@ export const getMinMaxXYFromCurvePathOps = (
 
   const { minX, minY, maxX, maxY } = ops.reduce(
     (limits, { op, data }) => {
-      // There are only four operation types:
-      // move, bcurveTo, lineTo, and curveTo
+      // There are only three operation types:
+      // move, bcurveTo, and lineTo
       if (op === "move") {
         // change starting point
         const p: GlobalPoint | undefined = pointFromArray(data);
@@ -669,9 +669,15 @@ export const getMinMaxXYFromCurvePathOps = (
         limits.maxX = Math.max(limits.maxX, maxX);
         limits.maxY = Math.max(limits.maxY, maxY);
       } else if (op === "lineTo") {
-        // TODO: Implement this
-      } else if (op === "qcurveTo") {
-        // TODO: Implement this
+        const _p: GlobalPoint = pointFrom(data[0], data[1]);
+        const p = transformXY ? transformXY(_p) : _p;
+        const p0 = transformXY ? transformXY(currentP) : currentP;
+        currentP = _p;
+
+        limits.minX = Math.min(limits.minX, p0[0], p[0]);
+        limits.minY = Math.min(limits.minY, p0[1], p[1]);
+        limits.maxX = Math.max(limits.maxX, p0[0], p[0]);
+        limits.maxY = Math.max(limits.maxY, p0[1], p[1]);
       }
       return limits;
     },
