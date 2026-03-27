@@ -27,6 +27,7 @@ export const actionToggleElementLock = register({
     const selected = app.scene.getSelectedElements({
       selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: false,
+      includeElementsInFrames: true,
     });
 
     return shouldLock(selected)
@@ -34,16 +35,15 @@ export const actionToggleElementLock = register({
       : "labels.elementLock.unlock";
   },
   icon: (appState, elements) => {
-    const selectedElements = getSelectedElements(elements, appState);
+    const selectedElements = getSelectedElements(elements, appState, {
+      includeElementsInFrames: true,
+    });
     return shouldLock(selectedElements) ? LockedIcon : UnlockedIcon;
   },
   trackEvent: { category: "element" },
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
-    return (
-      selectedElements.length > 0 &&
-      !selectedElements.some((element) => element.locked && element.frameId)
-    );
+    return selectedElements.length > 0;
   },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements({
