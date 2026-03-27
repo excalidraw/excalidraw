@@ -1020,7 +1020,7 @@ const ExcalidrawWrapper = () => {
 
         <TTDDialogTrigger />
         {isCollaborating && isOffline && (
-          <div className="alertalert--warning">
+          <div className="alert alert--warning">
             {t("alerts.collabOfflineWarning")}
           </div>
         )}
