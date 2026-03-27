@@ -12582,6 +12582,15 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       const { deltaX, deltaY } = event;
+
+      // Update last viewport position from the wheel event so zoom targets
+      // the actual cursor position, even if the window regained focus without
+      // a preceding pointermove event (see #10549).
+      this.lastViewportPosition = {
+        x: event.clientX,
+        y: event.clientY,
+      };
+
       // note that event.ctrlKey is necessary to handle pinch zooming
       if (event.metaKey || event.ctrlKey) {
         const sign = Math.sign(deltaY);
