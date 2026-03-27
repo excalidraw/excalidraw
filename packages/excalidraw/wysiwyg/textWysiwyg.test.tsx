@@ -394,6 +394,50 @@ describe("textWysiwyg", () => {
 
       expect(arrow.version).toEqual(version + 1);
     });
+
+    it("should retain text editor when switching tabs and returning", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "ola",
+        x: 60,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      API.setElements([text]);
+      API.setSelectedElements([text]);
+      UI.clickTool("selection");
+
+      Keyboard.keyPress(KEYS.ENTER);
+
+      const editor = await getTextEditor();
+
+      expect(editor).not.toBe(null);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+
+      // Simulate switching away from the tab
+      act(() => {
+        fireEvent(window, new Event("blur"));
+      });
+
+      // The editor should still exist and the editing state should persist
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+      expect(
+        document.querySelector(".excalidraw-wysiwyg"),
+      ).not.toBe(null);
+
+      // Simulate returning to the tab
+      act(() => {
+        fireEvent(window, new Event("focus"));
+      });
+
+      // The editor should still be active after returning
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+      expect(
+        document.querySelector(".excalidraw-wysiwyg"),
+      ).not.toBe(null);
+    });
   });
 
   describe("Test text wrapping", () => {
