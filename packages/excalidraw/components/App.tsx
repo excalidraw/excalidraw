@@ -7739,17 +7739,24 @@ class App extends React.Component<AppProps, AppState> {
       const hitSelectedElement =
         pointerDownState.hit.element &&
         this.isASelectedElement(pointerDownState.hit.element);
+      const shouldForceLassoReselect =
+        event.altKey &&
+        event[KEYS.CTRL_OR_CMD] &&
+        !pointerDownState.resize.handleType;
+      const shouldStartLassoSelection =
+        shouldForceLassoReselect ||
+        (!pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
+          !pointerDownState.resize.handleType &&
+          !hitSelectedElement);
 
-      if (
-        !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
-        !pointerDownState.resize.handleType &&
-        !hitSelectedElement
-      ) {
-        this.lassoTrail.startPath(
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-          event.shiftKey,
-        );
+      if (shouldStartLassoSelection) {
+        if (!this.lassoTrail.hasCurrentTrail) {
+          this.lassoTrail.startPath(
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+            event.shiftKey,
+          );
+        }
 
         // block dragging after lasso selection on PCs until the next pointer down
         // (on mobile or tablet, we want to allow user to drag immediately)
