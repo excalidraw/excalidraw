@@ -111,6 +111,7 @@ import {
   setDesktopUIMode,
   isSelectionLikeTool,
   oneOf,
+  Debug,
 } from "@excalidraw/common";
 
 import {
@@ -10279,6 +10280,7 @@ class App extends React.Component<AppProps, AppState> {
               shouldReuseSelection = false;
             }
           }
+          const t0 = performance.now();
           const elementsWithinSelection = this.state.selectionElement
             ? getElementsWithinSelection(
                 elements,
@@ -10288,6 +10290,7 @@ class App extends React.Component<AppProps, AppState> {
                 this.state.boxSelectionMode,
               )
             : [];
+          Debug.logTimeAverage(performance.now() - t0);
 
           this.setState((prevState) => {
             const nextSelectedElementIds = {
