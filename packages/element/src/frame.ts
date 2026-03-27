@@ -99,7 +99,7 @@ export const isElementContainingFrame = (
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
-) => {
+): boolean => {
   return getElementsWithinSelection([frame], element, elementsMap).some(
     (e) => e.id === frame.id,
   );
@@ -140,7 +140,7 @@ export const elementOverlapsWithFrame = (
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
-) => {
+): boolean => {
   return (
     elementsAreInFrameBounds([element], frame, elementsMap) ||
     isElementIntersectingFrame(element, frame, elementsMap) ||
