@@ -154,14 +154,11 @@ export const hitElementItself = ({
 
   // Hit test against the extended, rotated bounding box of the element first
   const bounds = getElementBounds(element, elementsMap, true);
-  const hitBounds = isPointWithinBounds(
-    pointFrom(bounds[0] - threshold, bounds[1] - threshold),
-    pointRotateRads(
-      point,
-      getCenterForBounds(bounds),
-      -element.angle as Radians,
-    ),
-    pointFrom(bounds[2] + threshold, bounds[3] + threshold),
+  const hitBounds = isPointInRotatedBounds(
+    point,
+    bounds,
+    element.angle,
+    threshold,
   );
 
   // PERF: Bail out early if the point is not even in the
@@ -192,18 +189,98 @@ export const hitElementItself = ({
   return result;
 };
 
+const getBoundsCorners = (bounds: Bounds, angle: Radians = 0 as Radians) => {
+  const [x1, y1, x2, y2] = bounds;
+  const center = getCenterForBounds(bounds);
+  const corners = [
+    pointFrom<GlobalPoint>(x1, y1),
+    pointFrom<GlobalPoint>(x2, y1),
+    pointFrom<GlobalPoint>(x2, y2),
+    pointFrom<GlobalPoint>(x1, y2),
+  ] as const;
+
+  if (angle === 0) {
+    return corners;
+  }
+
+  return corners.map((point) => pointRotateRads(point, center, angle)) as [
+    GlobalPoint,
+    GlobalPoint,
+    GlobalPoint,
+    GlobalPoint,
+  ];
+};
+
+const getBoundsEdges = (
+  corners: readonly [GlobalPoint, GlobalPoint, GlobalPoint, GlobalPoint],
+) =>
+  [
+    lineSegment(corners[0], corners[1]),
+    lineSegment(corners[1], corners[2]),
+    lineSegment(corners[2], corners[3]),
+    lineSegment(corners[3], corners[0]),
+  ] as const;
+
+const isPointInRotatedBounds = (
+  point: GlobalPoint,
+  bounds: Bounds,
+  angle: Radians,
+  tolerance = 0,
+) => {
+  const adjustedPoint =
+    angle === 0
+      ? point
+      : pointRotateRads(point, getCenterForBounds(bounds), -angle as Radians);
+
+  return isPointWithinBounds(
+    pointFrom(bounds[0] - tolerance, bounds[1] - tolerance),
+    adjustedPoint,
+    pointFrom(bounds[2] + tolerance, bounds[3] + tolerance),
+  );
+};
+
 export const hitElementBoundingBox = (
   point: GlobalPoint,
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
   tolerance = 0,
 ) => {
-  let [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
-  x1 -= tolerance;
-  y1 -= tolerance;
-  x2 += tolerance;
-  y2 += tolerance;
-  return isPointWithinBounds(pointFrom(x1, y1), point, pointFrom(x2, y2));
+  const bounds = getElementBounds(element, elementsMap, true);
+  return isPointInRotatedBounds(point, bounds, element.angle, tolerance);
+};
+
+export const doBoundsIntersectElementBoundingBox = (
+  intersectorBounds: Bounds,
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+) => {
+  const [x1, y1, x2, y2] = intersectorBounds;
+  const intersectorCorners = [
+    pointFrom<GlobalPoint>(x1, y1),
+    pointFrom<GlobalPoint>(x2, y1),
+    pointFrom<GlobalPoint>(x2, y2),
+    pointFrom<GlobalPoint>(x1, y2),
+  ] as const;
+  const intersectorEdges = getBoundsEdges(intersectorCorners);
+
+  const elementBounds = getElementBounds(element, elementsMap, true);
+  const elementBoundsCorners = getBoundsCorners(elementBounds, element.angle);
+  const elementBoundsEdges = getBoundsEdges(elementBoundsCorners);
+
+  return (
+    elementBoundsCorners.some((point) =>
+      isPointWithinBounds(intersectorCorners[0], point, intersectorCorners[2]),
+    ) ||
+    intersectorCorners.some((point) =>
+      isPointInRotatedBounds(point, elementBounds, element.angle),
+    ) ||
+    intersectorEdges.some((selectionEdge) =>
+      elementBoundsEdges.some(
+        (elementBoundsEdge) =>
+          !!lineSegmentIntersectionPoints(selectionEdge, elementBoundsEdge),
+      ),
+    )
+  );
 };
 
 export const hitElementBoundingBoxOnly = (
