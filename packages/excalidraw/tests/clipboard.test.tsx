@@ -193,6 +193,27 @@ describe("paste text as single lines", () => {
       expect(lastElY).toEqual(firstElY + lineHeightPx * 2);
     });
   });
+
+  it("should not overlap elements when pasting paragraphs of different lengths", async () => {
+    // Short line followed by a long line that will wrap, producing
+    // elements of different heights (regression test for #8690)
+    const shortLine = "Short";
+    const longLine =
+      "This is a very long paragraph that should wrap to multiple lines when pasted producing an element taller than the short line above";
+    const text = `${shortLine}\n${longLine}`;
+    mouse.moveTo(100, 100);
+    pasteWithCtrlCmdV(text);
+
+    await waitFor(async () => {
+      expect(h.elements.length).toEqual(2);
+      const elMap = arrayToMap(h.elements);
+      const [, , , firstElBottom] = getElementBounds(h.elements[0], elMap);
+      const [, secondElTop] = getElementBounds(h.elements[1], elMap);
+      // The second element should start at or below the first element's
+      // bottom edge (no overlap)
+      expect(secondElTop).toBeGreaterThanOrEqual(firstElBottom);
+    });
+  });
 });
 
 describe("paste text as a single element", () => {

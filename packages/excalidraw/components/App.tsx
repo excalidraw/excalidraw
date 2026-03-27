@@ -4139,12 +4139,11 @@ class App extends React.Component<AppProps, AppState> {
             : metrics;
 
           const startX = x - metrics.width / 2;
-          const startY = currentY - metrics.height / 2;
 
           const element = newTextElement({
             ...textElementProps,
             x: startX,
-            y: startY,
+            y: currentY,
             text,
             originalText,
             lineHeight,
@@ -4173,18 +4172,27 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    this.scene.insertElements(textElements);
+    // Center the group of text elements vertically at the paste point.
+    // Elements were placed top-aligned during layout to prevent overlap
+    // when consecutive elements have different heights (#8690).
+    const totalHeight = currentY - y - LINE_GAP;
+    const verticalOffset = totalHeight / 2;
+    const centeredTextElements = textElements.map((el) =>
+      newElementWith(el, { y: el.y - verticalOffset }),
+    );
+
+    this.scene.insertElements(centeredTextElements);
     this.store.scheduleCapture();
     this.setState({
       selectedElementIds: makeNextSelectedElementIds(
-        Object.fromEntries(textElements.map((el) => [el.id, true])),
+        Object.fromEntries(centeredTextElements.map((el) => [el.id, true])),
         this.state,
       ),
     });
 
     if (
       !isPlainPaste &&
-      textElements.length > 1 &&
+      centeredTextElements.length > 1 &&
       PLAIN_PASTE_TOAST_SHOWN === false &&
       this.editorInterface.formFactor !== "phone"
     ) {
