@@ -182,6 +182,8 @@ const drawTextDecorations = ({
   verticalOffset,
   theme,
   mode = "both",
+  visibleLineStart,
+  visibleLineEnd,
 }: {
   context: CanvasRenderingContext2D;
   element: ExcalidrawTextElement;
@@ -192,6 +194,8 @@ const drawTextDecorations = ({
   verticalOffset: number;
   theme: typeof THEME[keyof typeof THEME];
   mode?: "highlights" | "underlines" | "both";
+  visibleLineStart?: number;
+  visibleLineEnd?: number;
 }) => {
   const decorations = getTextDecorations(element);
   if (!decorations) {
@@ -211,13 +215,28 @@ const drawTextDecorations = ({
     }
   }
 
-  const lineWidths = lines.map((line) => context.measureText(line).width);
-  const lineLefts = lineWidths.map((w) =>
-    element.textAlign === "center"
+  const lineWidthCache = new Map<number, number>();
+  const getLineWidth = (lineIndex: number) => {
+    const cached = lineWidthCache.get(lineIndex);
+    if (cached != null) {
+      return cached;
+    }
+    const w = context.measureText(lines[lineIndex] ?? "").width;
+    lineWidthCache.set(lineIndex, w);
+    return w;
+  };
+  const getLineLeft = (lineIndex: number) => {
+    const w = getLineWidth(lineIndex);
+    return element.textAlign === "center"
       ? horizontalOffset - w / 2
       : element.textAlign === "right"
       ? horizontalOffset - w
-      : horizontalOffset,
+      : horizontalOffset;
+  };
+  const startLine = Math.max(0, visibleLineStart ?? 0);
+  const endLine = Math.min(
+    lines.length - 1,
+    visibleLineEnd ?? lines.length - 1,
   );
 
   const highlights = decorations.highlights ?? [];
@@ -238,7 +257,7 @@ const drawTextDecorations = ({
           : highlight.color;
       context.fillStyle = applyAlphaToColor(baseColor, 0.25);
 
-      for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+      for (let lineIndex = startLine; lineIndex <= endLine; lineIndex++) {
         const lineStart = lineStartIndices[lineIndex] ?? 0;
         const lineText = lines[lineIndex] ?? "";
         const lineEnd = lineStart + lineText.length;
@@ -253,7 +272,7 @@ const drawTextDecorations = ({
         const selection = lineText.slice(relStart, relEnd);
         const prefixWidth = context.measureText(prefix).width;
         const selectionWidth = context.measureText(selection).width;
-        const x = (lineLefts[lineIndex] ?? horizontalOffset) + prefixWidth;
+        const x = getLineLeft(lineIndex) + prefixWidth;
         const y = lineIndex * lineHeightPx;
         context.fillRect(x, y, selectionWidth, lineHeightPx);
       }
@@ -288,7 +307,7 @@ const drawTextDecorations = ({
       context.strokeStyle = baseColor;
       context.fillStyle = baseColor;
 
-      for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+      for (let lineIndex = startLine; lineIndex <= endLine; lineIndex++) {
         const lineStart = lineStartIndices[lineIndex] ?? 0;
         const lineText = lines[lineIndex] ?? "";
         const lineEnd = lineStart + lineText.length;
@@ -304,7 +323,7 @@ const drawTextDecorations = ({
         const selection = lineText.slice(relStart, relEnd);
         const prefixWidth = context.measureText(prefix).width;
         const selectionWidth = context.measureText(selection).width;
-        const xStart = (lineLefts[lineIndex] ?? horizontalOffset) + prefixWidth;
+        const xStart = getLineLeft(lineIndex) + prefixWidth;
         const xEnd = xStart + selectionWidth;
 
         const usableStart = xStart + gap;
@@ -372,7 +391,7 @@ const drawTextDecorations = ({
         theme === THEME.DARK ? applyDarkModeFilter(tag.color) : tag.color;
       context.strokeStyle = baseColor;
 
-      for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+      for (let lineIndex = startLine; lineIndex <= endLine; lineIndex++) {
         const lineStart = lineStartIndices[lineIndex] ?? 0;
         const lineText = lines[lineIndex] ?? "";
         const lineEnd = lineStart + lineText.length;
@@ -387,7 +406,7 @@ const drawTextDecorations = ({
         const selection = lineText.slice(relStart, relEnd);
         const prefixWidth = context.measureText(prefix).width;
         const selectionWidth = context.measureText(selection).width;
-        const x = (lineLefts[lineIndex] ?? horizontalOffset) + prefixWidth;
+        const x = getLineLeft(lineIndex) + prefixWidth;
         const y = lineIndex * lineHeightPx;
         const rx = x - paddingX;
         const ry = y + paddingY;
@@ -412,6 +431,8 @@ const drawTextWhitespaceMarkers = ({
   lineHeightPx,
   verticalOffset,
   markerColor,
+  visibleLineStart,
+  visibleLineEnd,
 }: {
   context: CanvasRenderingContext2D;
   element: ExcalidrawTextElement;
@@ -421,6 +442,8 @@ const drawTextWhitespaceMarkers = ({
   lineHeightPx: number;
   verticalOffset: number;
   markerColor: string;
+  visibleLineStart?: number;
+  visibleLineEnd?: number;
 }) => {
   const dotRadius = Math.max(0.5, element.fontSize * 0.09);
   const newlineMarkerPadding = Math.max(dotRadius * 4, element.fontSize * 0.4);
@@ -430,9 +453,25 @@ const drawTextWhitespaceMarkers = ({
   context.textAlign = "left";
   context.textBaseline = "alphabetic";
 
-  for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+  const lineWidthCache = new Map<number, number>();
+  const getLineWidth = (lineIndex: number) => {
+    const cached = lineWidthCache.get(lineIndex);
+    if (cached != null) {
+      return cached;
+    }
+    const w = context.measureText(lines[lineIndex] ?? "").width;
+    lineWidthCache.set(lineIndex, w);
+    return w;
+  };
+  const startLine = Math.max(0, visibleLineStart ?? 0);
+  const endLine = Math.min(
+    lines.length - 1,
+    visibleLineEnd ?? lines.length - 1,
+  );
+
+  for (let lineIndex = startLine; lineIndex <= endLine; lineIndex++) {
     const line = lines[lineIndex];
-    const lineWidth = context.measureText(line).width;
+    const lineWidth = getLineWidth(lineIndex);
     const lineStartX =
       element.textAlign === "center"
         ? horizontalOffset - lineWidth / 2
@@ -598,34 +637,6 @@ const cappedElementCanvasSize = (
   return { width, height, scale };
 };
 //修改建议一：移除或放宽安全限制
-
-//文本框增量换行,逐行渲染2026.3.28
-const shouldBypassCachedTextCanvas = (
-  element: ExcalidrawTextElement,
-  zoom: Zoom,
-) => {
-  const padding = getCanvasPadding(element);
-  const elementWidth = element.width;
-  const elementHeight = element.height;
-  let width = elementWidth * window.devicePixelRatio + padding * 2;
-  let height = elementHeight * window.devicePixelRatio + padding * 2;
-  let scale: number = zoom.value;
-  const targetFontPx = 24;
-  const maxSupersampleFactor = 3;
-  const dpr = window.devicePixelRatio || 1;
-  const minScaleForFont = targetFontPx / (element.fontSize * dpr);
-  const maxScale = Math.min(1, zoom.value * maxSupersampleFactor);
-  scale = Math.min(maxScale, Math.max(zoom.value, minScaleForFont));
-  width = Math.floor(width * scale);
-  height = Math.floor(height * scale);
-  const widthHeightLimit = 16384;
-  const areaLimit = 16384 * 16384;
-  return (
-    width > widthHeightLimit ||
-    height > widthHeightLimit ||
-    width * height > areaLimit
-  );
-};
 
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
@@ -1058,6 +1069,30 @@ const drawElementOnCanvas = (
           lineHeightPx,
         );
 
+        //文本框增量换行,逐行渲染2026.3.28
+        let visibleLineStart = 0;
+        let visibleLineEnd = Math.max(0, lines.length - 1);
+        if (
+          !renderConfig.isExporting &&
+          element.angle === 0 &&
+          lineHeightPx > 0
+        ) {
+          const viewportY1 = -appState.scrollY;
+          const viewportY2 =
+            viewportY1 + appState.height / appState.zoom.value;
+          const bufferLines = 2;
+          const localTop = viewportY1 - element.y;
+          const localBottom = viewportY2 - element.y;
+          visibleLineStart = Math.max(
+            0,
+            Math.floor(localTop / lineHeightPx) - bufferLines,
+          );
+          visibleLineEnd = Math.min(
+            lines.length - 1,
+            Math.ceil(localBottom / lineHeightPx) + bufferLines,
+          );
+        }
+
         drawTextDecorations({
           context,
           element,
@@ -1068,6 +1103,8 @@ const drawElementOnCanvas = (
           verticalOffset,
           theme: renderConfig.theme,
           mode: "highlights",
+          visibleLineStart,
+          visibleLineEnd,
         });
 
         const decorations = getTextDecorations(element);
@@ -1109,16 +1146,24 @@ const drawElementOnCanvas = (
             }
           }
 
-          const lineWidths = lines.map(
-            (line) => context.measureText(line).width,
-          );
-          const lineLefts = lineWidths.map((w) =>
-            element.textAlign === "center"
+          const lineWidthCache = new Map<number, number>();
+          const getLineWidth = (lineIndex: number) => {
+            const cached = lineWidthCache.get(lineIndex);
+            if (cached != null) {
+              return cached;
+            }
+            const w = context.measureText(lines[lineIndex] ?? "").width;
+            lineWidthCache.set(lineIndex, w);
+            return w;
+          };
+          const getLineLeft = (lineIndex: number) => {
+            const w = getLineWidth(lineIndex);
+            return element.textAlign === "center"
               ? horizontalOffset - w / 2
               : element.textAlign === "right"
               ? horizontalOffset - w
-              : horizontalOffset,
-          );
+              : horizontalOffset;
+          };
 
           const baseFill =
             renderConfig.theme === THEME.DARK
@@ -1128,11 +1173,15 @@ const drawElementOnCanvas = (
           const prevAlign = context.textAlign;
           const prevFill = context.fillStyle;
           context.textAlign = "left";
-          for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+          for (
+            let lineIndex = visibleLineStart;
+            lineIndex <= visibleLineEnd;
+            lineIndex++
+          ) {
             const lineText = lines[lineIndex] ?? "";
             const lineStart = lineStartIndices[lineIndex] ?? 0;
             const y = lineIndex * lineHeightPx + verticalOffset;
-            let x = lineLefts[lineIndex] ?? horizontalOffset;
+            let x = getLineLeft(lineIndex);
             let i = 0;
             while (i < lineText.length) {
               const globalIndex = lineStart + i;
@@ -1156,7 +1205,7 @@ const drawElementOnCanvas = (
           context.textAlign = prevAlign;
           context.fillStyle = prevFill;
         } else {
-          for (let index = 0; index < lines.length; index++) {
+          for (let index = visibleLineStart; index <= visibleLineEnd; index++) {
             context.fillText(
               lines[index],
               horizontalOffset,
@@ -1175,6 +1224,8 @@ const drawElementOnCanvas = (
           verticalOffset,
           theme: renderConfig.theme,
           mode: "underlines",
+          visibleLineStart,
+          visibleLineEnd,
         });
 
         drawTextWhitespaceMarkers({
@@ -1189,6 +1240,8 @@ const drawElementOnCanvas = (
             appState.textBoxDecorationsColor,
             0.55,
           ),
+          visibleLineStart,
+          visibleLineEnd,
         });
 
         if (!renderConfig.isExporting) {
@@ -1691,15 +1744,8 @@ export const renderElement = (
         // not exporting → optimized rendering (cache & render from element
         // canvases)
       } else {
-        if (
-          element.type === "text" &&
-          !renderConfig.renderTextViaDOM &&
-          !appState?.shouldCacheIgnoreZoom &&
-          (cappedElementCanvasSize(element, allElementsMap, appState.zoom)
-            .scale < appState.zoom.value ||
-            //文本框增量换行,逐行渲染2026.3.28
-            shouldBypassCachedTextCanvas(element, appState.zoom))
-        ) {
+        //文本框增量换行,逐行渲染2026.3.28
+        if (element.type === "text" && !renderConfig.renderTextViaDOM) {
           const [x1, y1, x2, y2] = getElementAbsoluteCoords(
             element,
             elementsMap,

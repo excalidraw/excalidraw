@@ -1,0 +1,51 @@
+{
+  "name": "excalidraw-desktop",
+  "version": "1.0.0",
+  "description": "Excalidraw Desktop App - Canvas 优化版",
+  "main": "main.js",
+  "author": "Excalidraw Team",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.excalidraw.desktop",
+    "productName": "Excalidraw Desktop",
+    "directories": {
+      "output": "../dist-electron"
+    },
+    "files": [
+      "main.js",
+      "../excalidraw-app/build/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "../excalidraw-app/public/favicon.png"
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "icon": "../excalidraw-app/public/favicon.png",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "icon": "../excalidraw-app/public/favicon.png",
+      "category": "Graphics"
+    }
+  }
+}

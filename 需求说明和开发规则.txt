@@ -1008,13 +1008,21 @@ Canvas 元素未就绪
 
 
 
+.\start-electron-dev.bat
 
 启动:
+yarn electron:build:win
 yarn install
 yarn --cwd ./excalidraw-app vite --port 3000 --strictPort
 http://localhost:3000/
 for /f "tokens=5" %a in ('netstat -ano ^| findstr :3000') do taskkill /F /PID %a
 for /f "tokens=5" %a in ('netstat -ano ^| findstr :3001') do taskkill /F /PID %a
+安装依赖
+yarn install
+yarn electron:install
+start-electron-dev.bat
+yarn electron:dev
+yarn electron:build:win
 测试:
 yarn test:all
 npx playwright test e2e/text-box-manual.ts --ui --config=playwright.config.temp.ts

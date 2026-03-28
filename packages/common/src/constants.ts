@@ -313,7 +313,7 @@ export const TOUCH_CTX_MENU_TIMEOUT = 500;
 export const TITLE_TIMEOUT = 10000;
 export const VERSION_TIMEOUT = 30000;
 export const SCROLL_TIMEOUT = 100;
-export const ZOOM_STEP = 0.05;
+export const ZOOM_STEP = 0.1;
 //修改缩放倍率的位置
 export const MIN_ZOOM = 0.05;
 export const MAX_ZOOM = 30;
