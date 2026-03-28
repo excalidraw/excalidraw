@@ -290,6 +290,13 @@ export const textWysiwyg = ({
   let whitespaceOverlayLineNodes: Text[] = [];
   let whitespaceOverlayLineStarts: number[] = [];
   const whitespaceOverlayNodeToLineIndex = new WeakMap<Text, number>();
+  let lastBeforeInputState: {
+    value: string;
+    selectionStart: number;
+    selectionEnd: number;
+  } | null = null;
+  let pendingInputRaf: number | null = null;
+  let suppressHighlightOnInput = false;
 
   //文本框增量换行,逐行渲染2026.3.28
   const buildOverlayLines = (value: string) => {
@@ -405,22 +412,46 @@ export const textWysiwyg = ({
     const nextLen = nextValue.length;
 
     let prefixLen = 0;
-    while (
-      prefixLen < prevLen &&
-      prefixLen < nextLen &&
-      prevValue[prefixLen] === nextValue[prefixLen]
-    ) {
-      prefixLen += 1;
-    }
-
     let suffixLen = 0;
-    while (
-      suffixLen < prevLen - prefixLen &&
-      suffixLen < nextLen - prefixLen &&
-      prevValue[prevLen - 1 - suffixLen] === nextValue[nextLen - 1 - suffixLen]
-    ) {
-      suffixLen += 1;
+    if (lastBeforeInputState && lastBeforeInputState.value === prevValue) {
+      const selStart = Math.max(
+        0,
+        Math.min(prevLen, lastBeforeInputState.selectionStart),
+      );
+      const selEnd = Math.max(
+        selStart,
+        Math.min(prevLen, lastBeforeInputState.selectionEnd),
+      );
+      const removedLen = selEnd - selStart;
+      const insertedLen = nextLen - (prevLen - removedLen);
+      if (insertedLen >= 0) {
+        prefixLen = selStart;
+        suffixLen = Math.max(0, prevLen - prefixLen - removedLen);
+        const expectedNextLen = prevLen - removedLen + insertedLen;
+        if (expectedNextLen !== nextLen) {
+          prefixLen = 0;
+          suffixLen = 0;
+        }
+      }
     }
+    if (prefixLen === 0 && suffixLen === 0) {
+      while (
+        prefixLen < prevLen &&
+        prefixLen < nextLen &&
+        prevValue[prefixLen] === nextValue[prefixLen]
+      ) {
+        prefixLen += 1;
+      }
+
+      while (
+        suffixLen < prevLen - prefixLen &&
+        suffixLen < nextLen - prefixLen &&
+        prevValue[prevLen - 1 - suffixLen] === nextValue[nextLen - 1 - suffixLen]
+      ) {
+        suffixLen += 1;
+      }
+    }
+    lastBeforeInputState = null;
 
     const prevChangeEnd = prevLen - suffixLen;
     const nextChangeEnd = nextLen - suffixLen;
@@ -1275,8 +1306,23 @@ export const textWysiwyg = ({
   updateHighlightOverlay();
   scheduleCaretUpdate();
 
+  const handleBeforeInput = () => {
+    lastBeforeInputState = {
+      value: editable.value,
+      selectionStart: editable.selectionStart ?? 0,
+      selectionEnd: editable.selectionEnd ?? editable.selectionStart ?? 0,
+    };
+  };
+  const handleInputHighlight = () => {
+    if (suppressHighlightOnInput) {
+      return;
+    }
+    updateHighlightOverlay();
+  };
+
   // 添加事件监听器来触发高亮更新
-  editable.addEventListener("input", updateHighlightOverlay);
+  editable.addEventListener("input", handleInputHighlight);
+  editable.addEventListener("beforeinput", handleBeforeInput);
   editable.addEventListener("selectionchange", updateHighlightOverlay);
 
   // 将highlightOverlay添加到DOM中
@@ -1822,9 +1868,18 @@ export const textWysiwyg = ({
         editable.selectionStart = selectionStart;
         editable.selectionEnd = selectionStart;
       }
-      updateWhitespaceOverlayContent();
-      onChange(editable.value);
-      scheduleCaretUpdate();
+      suppressHighlightOnInput = true;
+      if (pendingInputRaf != null) {
+        cancelAnimationFrame(pendingInputRaf);
+      }
+      //文本框增量换行,逐行渲染2026.3.28
+      pendingInputRaf = requestAnimationFrame(() => {
+        pendingInputRaf = null;
+        updateWhitespaceOverlayContent();
+        onChange(editable.value);
+        scheduleCaretUpdate();
+        suppressHighlightOnInput = false;
+      });
     };
 
     const preventEditIfSyncedLine = (event: Event) => {
@@ -2422,6 +2477,8 @@ export const textWysiwyg = ({
     editable.onblur = null;
     editable.oninput = null;
     editable.onkeydown = null;
+    editable.removeEventListener("beforeinput", handleBeforeInput);
+    editable.removeEventListener("input", handleInputHighlight);
     editable.removeEventListener("keyup", scheduleCaretUpdate);
     editable.removeEventListener("mouseup", scheduleCaretUpdate);
     editable.removeEventListener("focus", scheduleCaretUpdate);

@@ -1005,7 +1005,7 @@ Canvas 元素未就绪
 如果这段代码运行在 Web Worker 中，且使用的是 OffscreenCanvas，某些环境对多上下文的支持可能不一致。
 
 
-
+违反根本原则:所有文本框都不要区别对待;都使用相同的处理策略;
 
 
 .\start-electron-dev.bat
