@@ -11,6 +11,9 @@ import SourceHanSansSCBold from "./SourceHanSansSC-Bold.woff2";
 import SourceCodeProBlack from "./SourceCodePro-Black.ttf.woff2";
 import MapleMonoNormalNLBold from "./MapleMonoNormalNL-Bold.ttf.woff2";
 import SarasaFixedCLBoldNerdFont from "./sarasa-fixed-cl-bold-nerd-font.woff2";
+import SarasaFixedCLRegularNerdFont from "./sarasa-fixed-cl-regular-nerd-font.woff2";
+import JetBrainsMonoRegular from "./JetBrainsMono-Regular.woff2";
+import SarasaFixedSCRegularNerdFont from "./sarasa-fixed-sc-regular-nerd-font.woff2";
 
 export const NunitoFontFaces: ExcalidrawFontFaceDescriptor[] = [
   {
@@ -76,3 +79,32 @@ export const SarasaFixedCLBoldNerdFontFaces: ExcalidrawFontFaceDescriptor[] = [
     },
   },
 ];
+
+export const SarasaFixedCLRegularNerdFontFaces: ExcalidrawFontFaceDescriptor[] =
+  [
+    {
+      uri: SarasaFixedCLRegularNerdFont,
+      descriptors: {
+        weight: "400",
+      },
+    },
+  ];
+
+export const JetBrainsMonoFontFaces: ExcalidrawFontFaceDescriptor[] = [
+  {
+    uri: JetBrainsMonoRegular,
+    descriptors: {
+      weight: "400",
+    },
+  },
+];
+
+export const SarasaFixedSCRegularNerdFontFaces: ExcalidrawFontFaceDescriptor[] =
+  [
+    {
+      uri: SarasaFixedSCRegularNerdFont,
+      descriptors: {
+        weight: "400",
+      },
+    },
+  ];

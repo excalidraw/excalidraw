@@ -514,7 +514,7 @@ export const getBoundTextMaxHeight = (
 /** retrieves text from text elements and concatenates to a single string */
 export const getTextFromElements = (
   elements: readonly ExcalidrawElement[],
-  separator = "\n\n",
+  separator = "\n",
 ) => {
   const text = elements
     .reduce((acc: string[], element) => {

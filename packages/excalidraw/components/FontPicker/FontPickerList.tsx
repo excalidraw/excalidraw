@@ -285,17 +285,17 @@ export const FontPickerList = React.memo(
       const isHovered = font.value === hoveredFont?.value;
       const isSelected = font.value === selectedFontFamily;
 
-      useEffect(() => {
-        if (!isHovered) {
-          return;
-        }
-        if (order === 0) {
-          // scroll into the first item differently, so it's visible what is above (i.e. group title)
-          ref.current?.scrollIntoView?.({ block: "end" });
-        } else {
-          ref.current?.scrollIntoView?.({ block: "nearest" });
-        }
-      }, [isHovered, order]);
+      // useEffect(() => {
+      //   if (!isHovered) {
+      //     return;
+      //   }
+      //   if (order === 0) {
+      //     // scroll into the first item differently, so it's visible what is above (i.e. group title)
+      //     ref.current?.scrollIntoView?.({ block: "end" });
+      //   } else {
+      //     ref.current?.scrollIntoView?.({ block: "nearest" });
+      //   }
+      // }, [isHovered, order]);
 
       return (
         <button

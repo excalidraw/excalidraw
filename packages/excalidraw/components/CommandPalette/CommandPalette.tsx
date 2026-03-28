@@ -19,6 +19,7 @@ import {
   actionClearCanvas,
   actionLink,
   actionToggleSearchMenu,
+  actionToggleHighlightWord,
 } from "../../actions";
 import {
   actionCopyElementLink,
@@ -515,6 +516,19 @@ function CommandPaletteInner({
           },
         },
         {
+          label: "Toggle Highlight Word",
+          keywords: ["highlight", "word"],
+          icon: boltIcon,
+          category: DEFAULT_CATEGORIES.editor,
+          viewMode: false,
+          perform: () => {
+            actionManager.executeAction(
+              actionToggleHighlightWord,
+              "commandPalette",
+            );
+          },
+        },
+        {
           label: t("labels.canvasBackground"),
           keywords: ["color"],
           icon: bucketFillIcon,
@@ -865,15 +879,7 @@ function CommandPaletteInner({
       !commandSearch && lastUsed && isCommandAvailable(lastUsed);
 
     if (!commandSearch) {
-      setCommandsByCategory(
-        getNextCommandsByCategory(
-          showLastUsed
-            ? matchingCommands.filter(
-                (command) => command.label !== lastUsed?.label,
-              )
-            : matchingCommands,
-        ),
-      );
+      setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
       setCurrentCommand(showLastUsed ? lastUsed : matchingCommands[0] || null);
       return;
     }
@@ -1030,13 +1036,13 @@ const CommandItem = ({
         "item-disabled": disabled,
         "command-item-large": size === "large",
       })}
-      ref={(ref) => {
-        if (isSelected && !disabled) {
-          ref?.scrollIntoView?.({
-            block: "nearest",
-          });
-        }
-      }}
+      // ref={(ref) => {
+      //   if (isSelected && !disabled) {
+      //     ref?.scrollIntoView?.({
+      //       block: "nearest",
+      //     });
+      //   }
+      // }}
       onClick={disabled ? noop : onClick}
       onMouseMove={disabled ? noop : onMouseMove}
       title={disabled ? t("commandPalette.itemNotAvailable") : ""}

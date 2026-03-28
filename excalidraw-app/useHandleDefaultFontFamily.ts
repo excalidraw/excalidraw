@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+
 import { FONT_FAMILY, DEFAULT_FONT_FAMILY } from "@excalidraw/common";
 
-import { STORAGE_KEYS } from "./app_constants";
-
 import type { FontFamilyValues } from "@excalidraw/element/types";
+
+import { STORAGE_KEYS } from "./app_constants";
 
 export const useHandleDefaultFontFamily = () => {
   const [defaultFontFamily, setDefaultFontFamily] = useState<FontFamilyValues>(

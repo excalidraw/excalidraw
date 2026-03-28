@@ -168,6 +168,8 @@ const prepareElementsForRender = ({
 
   return nextElements;
 };
+//### 2. 修改 exportToCanvas 函数
+//文件 ： packages/excalidraw/scene/export.ts
 
 export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -189,6 +191,7 @@ export const exportToCanvas = async (
     height: number,
   ) => { canvas: HTMLCanvasElement; scale: number } = (width, height) => {
     const canvas = document.createElement("canvas");
+    // const exportScale = appState.exportScale * 50; // 临时提高缩放因子提高导出为PNG的清晰度;
     canvas.width = width * appState.exportScale;
     canvas.height = height * appState.exportScale;
     return { canvas, scale: appState.exportScale };

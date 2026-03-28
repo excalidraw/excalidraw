@@ -1,9 +1,9 @@
-import { randomId } from "@excalidraw/common";
+import { randomId, arrayToMap } from "@excalidraw/common";
 import {
-  getContainerElement,
-  refreshTextDimensions,
   newElementWith,
   isTextElement,
+  isFrameLikeElement,
+  isElementIntersectingFrame,
 } from "@excalidraw/element";
 
 import type {
@@ -12,7 +12,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type { AppState, TextLineLink } from "../types";
+import type { AppState } from "../types";
 
 type SummaryToolRole = "summaryRoot" | "summaryBase";
 type SummaryToolCommentsDisplayMode = "off" | "single" | "all";
@@ -603,385 +603,6 @@ const getTextDecorations = (element: ExcalidrawTextElement) => {
   return v && typeof v === "object" ? (v as Record<string, any>) : null;
 };
 
-const setManagedSyncedLineTextColors = ({
-  element,
-  summaryRoot,
-  model,
-}: {
-  element: ExcalidrawTextElement;
-  summaryRoot: ExcalidrawTextElement;
-  model: SummaryToolModel;
-}) => {
-  console.log('🔍 setManagedSyncedLineTextColors 调试信息');
-  console.log('当前元素ID:', element.id);
-  console.log('Summary根节点ID:', summaryRoot.id);
-  console.log('是否为Summary根节点:', element.id === summaryRoot.id);
-  console.log('元素文本预览:', element.text?.substring(0, 100));
-  console.log('Summary根节点strokeColor:', summaryRoot.strokeColor);
-  
-  const isSummaryRoot = element.id === summaryRoot.id;
-  const summaryBaseFill = summaryRoot.strokeColor;
-  
-  const nextText = normalizeKey(element.text);
-  const elementLines = nextText.split("\n");
-  const elementLineStartIndices: number[] = [];
-  let cursor = 0;
-  for (let i = 0; i < elementLines.length; i++) {
-    elementLineStartIndices.push(cursor);
-    cursor += elementLines[i]?.length ?? 0;
-    if (i < elementLines.length - 1) {
-      cursor += 1;
-    }
-  }
-
-  const summaryText = normalizeKey(summaryRoot.text);
-  const summaryLines = summaryText.split("\n");
-  const summaryLineStartIndices: number[] = [];
-  let summaryCursor = 0;
-  for (let i = 0; i < summaryLines.length; i++) {
-    summaryLineStartIndices.push(summaryCursor);
-    summaryCursor += summaryLines[i]?.length ?? 0;
-    if (i < summaryLines.length - 1) {
-      summaryCursor += 1;
-    }
-  }
-
-  const summaryDecorations = getTextDecorations(summaryRoot) ?? {};
-  const summaryTextColors =
-    (summaryDecorations.textColors as TextDecorationRange[] | undefined) ?? [];
-  const getSummaryColorAtIndex = (index: number) => {
-    let color: string | null = null;
-    for (const r of summaryTextColors) {
-      const start = Math.min(r.start, r.end);
-      const end = Math.max(r.start, r.end);
-      if (start <= index && index < end) {
-        color = r.color;
-      }
-    }
-    return color ?? summaryBaseFill;
-  };
-  
-  if (!isSummaryRoot) {
-    console.log('🔒 强制颜色锁定 - 使用summary根节点颜色:', summaryBaseFill);
-
-    const enforcedSyncedRanges: TextDecorationRange[] = [];
-    const elementBlocks = parseSynclists(nextText);
-    
-    for (const block of elementBlocks) {
-      const list = model.lists[block.name];
-      if (!list) continue;
-      
-      const allowed = new Set(list.lines.map((l) => l.text));
-      const queueByText = buildLineIdQueueByText(list.lines);
-      
-      for (let i = 0; i < block.contentLines.length; i++) {
-        const raw = block.contentLines[i] ?? "";
-        const extracted = extractSyncLineTagFromLine(raw);
-        const visibleTrimmed = extracted.visibleLine.trim();
-        
-        if (!allowed.has(visibleTrimmed) || !visibleTrimmed || visibleTrimmed.startsWith("//")) {
-          continue;
-        }
-        
-        const lineId = extracted.tag && extracted.tag.listName === block.name
-          ? extracted.tag.lineId
-          : (() => {
-              const q = queueByText.get(visibleTrimmed);
-              return q && q.length ? q.shift()! : null;
-            })();
-            
-        if (!lineId) continue;
-        
-        const absLineIndex = block.startLine + 1 + i;
-        const lineStart = elementLineStartIndices[absLineIndex];
-        if (lineStart === undefined) continue;
-        
-        const end = lineStart + extracted.visibleLine.length;
-        if (end <= lineStart) continue;
-        
-        enforcedSyncedRanges.push({
-          start: lineStart,
-          end,
-          color: summaryBaseFill,
-        });
-        
-        console.log(`📍 同步行颜色设置: 行${i}, 颜色:${summaryBaseFill}, 文本:"${visibleTrimmed}"`);
-      }
-    }
-    
-    const prevCustomData = (element.customData ?? {}) as Record<string, any>;
-    const prevDecorations = getTextDecorations(element) ?? {};
-    const prevTextColors =
-      (prevDecorations.textColors as TextDecorationRange[] | undefined) ?? [];
-    const prevSummaryTool = (prevCustomData.summaryTool ??
-      {}) as SummaryToolCustomData;
-    const prevManaged = prevSummaryTool.syncedTextColorRanges ?? [];
-
-    const rangesOverlap = (
-      a: { start: number; end: number },
-      b: { start: number; end: number },
-    ) => {
-      const aStart = Math.min(a.start, a.end);
-      const aEnd = Math.max(a.start, a.end);
-      const bStart = Math.min(b.start, b.end);
-      const bEnd = Math.max(b.start, b.end);
-      return aStart < bEnd && bStart < aEnd;
-    };
-
-    const filteredTextColors = prevTextColors.filter(
-      (r) =>
-        !prevManaged.some(
-          (m) => m.start === r.start && m.end === r.end && m.color === r.color,
-        ),
-    );
-
-    const filteredTextColorsWithoutSynced = enforcedSyncedRanges.length
-      ? filteredTextColors.filter(
-          (r) => !enforcedSyncedRanges.some((s) => rangesOverlap(r, s)),
-        )
-      : filteredTextColors;
-
-    const nextTextColors = [
-      ...filteredTextColorsWithoutSynced,
-      ...enforcedSyncedRanges,
-    ];
-    const nextDecorations = {
-      ...prevDecorations,
-      ...(nextTextColors.length ? { textColors: nextTextColors } : {}),
-    } as Record<string, any>;
-    
-    if (!nextTextColors.length) {
-      delete nextDecorations.textColors;
-    }
-    
-    const nextSummaryTool: SummaryToolCustomData = {
-      ...prevSummaryTool,
-      syncedTextColorRanges: enforcedSyncedRanges,
-      lastStableSyncedTextColorAt: Date.now(),
-      syncedLineColorByKey: {},
-    };
-    
-    console.log('✅ 颜色锁定完成 - 应用了', enforcedSyncedRanges.length, '个颜色范围');
-    
-    return newElementWith(element, {
-      customData: {
-        ...prevCustomData,
-        textDecorations: Object.keys(nextDecorations).length ? nextDecorations : undefined,
-        summaryTool: nextSummaryTool,
-      },
-    }) as ExcalidrawTextElement;
-  }
-  
-  console.log('📋 处理summary根节点 - 保持原有逻辑');
-
-  const summaryColorByListAndLineId = new Map<string, Map<string, string>>();
-  const summaryBlocks = parseSynclists(summaryRoot.text);
-  for (const block of summaryBlocks) {
-    const list = model.lists[block.name];
-    if (!list) {
-      continue;
-    }
-    const allowed = new Set(list.lines.map((l) => l.text));
-    const queueByText = buildLineIdQueueByText(list.lines);
-    const inner = summaryColorByListAndLineId.get(block.name) ?? new Map();
-    for (let i = 0; i < block.contentLines.length; i++) {
-      const raw = block.contentLines[i] ?? "";
-      const trimmed = raw.trim();
-      if (!allowed.has(trimmed)) {
-        continue;
-      }
-      const q = queueByText.get(trimmed);
-      const lineId = q && q.length ? q.shift()! : null;
-      if (!lineId) {
-        continue;
-      }
-      const absLineIndex = block.startLine + 1 + i;
-      const lineStart = summaryLineStartIndices[absLineIndex] ?? 0;
-      const firstNonSpace = (raw.match(/^\s*/) ?? [""])[0].length;
-      inner.set(lineId, getSummaryColorAtIndex(lineStart + firstNonSpace));
-    }
-    summaryColorByListAndLineId.set(block.name, inner);
-  }
-
-  const newRanges: TextDecorationRange[] = [];
-  const newSyncedLineColorByKey: Record<string, string> = {};
-  const elementBlocks = parseSynclists(nextText);
-  for (const block of elementBlocks) {
-    const list = model.lists[block.name];
-    if (!list) {
-      continue;
-    }
-    const allowed = new Set(list.lines.map((l) => l.text));
-    const queueByText = buildLineIdQueueByText(list.lines);
-    const colorByLineId = summaryColorByListAndLineId.get(block.name);
-    for (let i = 0; i < block.contentLines.length; i++) {
-      const raw = block.contentLines[i] ?? "";
-      const extracted = extractSyncLineTagFromLine(raw);
-      const visibleTrimmed = extracted.visibleLine.trim();
-      if (!allowed.has(visibleTrimmed)) {
-        continue;
-      }
-      if (!visibleTrimmed || visibleTrimmed.startsWith("//")) {
-        continue;
-      }
-      const lineId =
-        extracted.tag && extracted.tag.listName === block.name
-          ? extracted.tag.lineId
-          : (() => {
-              const q = queueByText.get(visibleTrimmed);
-              return q && q.length ? q.shift()! : null;
-            })();
-      if (!lineId) {
-        continue;
-      }
-      const absLineIndex = block.startLine + 1 + i;
-      const lineStart = elementLineStartIndices[absLineIndex];
-      if (lineStart === undefined) {
-        continue;
-      }
-      const end = lineStart + extracted.visibleLine.length;
-      if (end <= lineStart) {
-        continue;
-      }
-      const computedColor = colorByLineId?.get(lineId) ?? summaryBaseFill;
-      newSyncedLineColorByKey[`${block.name}|${lineId}`] = computedColor;
-      newRanges.push({
-        start: lineStart,
-        end,
-        color: computedColor,
-      });
-    }
-  }
-
-  const prevCustomData = (element.customData ?? {}) as Record<string, any>;
-  const prevSummaryTool = (prevCustomData.summaryTool ??
-    {}) as SummaryToolCustomData;
-  const prevManaged = prevSummaryTool.syncedTextColorRanges ?? [];
-  const prevColorByKey = prevSummaryTool.syncedLineColorByKey ?? {};
-
-  const prevDecorations = getTextDecorations(element) ?? {};
-  const prevTextColors =
-    (prevDecorations.textColors as TextDecorationRange[] | undefined) ?? [];
-  const filteredTextColors = prevTextColors.filter(
-    (r) =>
-      !prevManaged.some(
-        (m) => m.start === r.start && m.end === r.end && m.color === r.color,
-      ),
-  );
-
-  const taggedLinesInText: Array<{
-    key: string;
-    listName: string;
-    lineId: string;
-    start: number;
-    end: number;
-  }> = [];
-  for (let i = 0; i < elementLines.length; i++) {
-    const raw = elementLines[i] ?? "";
-    if (!raw.includes(SYNC_LINE_TAG_PREFIX)) {
-      continue;
-    }
-    const extracted = extractSyncLineTagFromLine(raw);
-    if (!extracted.tag) {
-      continue;
-    }
-    const start = elementLineStartIndices[i];
-    if (start === undefined) {
-      continue;
-    }
-    const end = start + extracted.visibleLine.length;
-    if (end <= start) {
-      continue;
-    }
-    taggedLinesInText.push({
-      key: `${extracted.tag.listName}|${extracted.tag.lineId}`,
-      listName: extracted.tag.listName,
-      lineId: extracted.tag.lineId,
-      start,
-      end,
-    });
-  }
-
-  const taggedLineCount = taggedLinesInText.length;
-  const now = Date.now();
-  const graceMs = 350;
-  const lastStableAt = prevSummaryTool.lastStableSyncedTextColorAt ?? 0;
-  const shouldKeepPrevManaged =
-    prevManaged.length > 0 &&
-    ((taggedLineCount > 0 && newRanges.length < taggedLineCount) ||
-      (taggedLineCount === 0 && now - lastStableAt < graceMs));
-
-  const isStable = taggedLineCount > 0 && newRanges.length === taggedLineCount;
-  const stableColorByKey = isStable ? newSyncedLineColorByKey : prevColorByKey;
-
-  const enforcedSyncedRanges: TextDecorationRange[] =
-    taggedLineCount > 0
-      ? taggedLinesInText.map((t) => ({
-          start: t.start,
-          end: t.end,
-          color:
-            summaryColorByListAndLineId.get(t.listName)?.get(t.lineId) ??
-            stableColorByKey[t.key] ??
-            summaryBaseFill,
-        }))
-      : [];
-
-  const rangesOverlap = (
-    a: { start: number; end: number },
-    b: { start: number; end: number },
-  ) => {
-    const aStart = Math.min(a.start, a.end);
-    const aEnd = Math.max(a.start, a.end);
-    const bStart = Math.min(b.start, b.end);
-    const bEnd = Math.max(b.start, b.end);
-    return aStart < bEnd && bStart < aEnd;
-  };
-
-  const filteredTextColorsWithoutSynced = enforcedSyncedRanges.length
-    ? filteredTextColors.filter(
-        (r) => !enforcedSyncedRanges.some((s) => rangesOverlap(r, s)),
-      )
-    : filteredTextColors;
-
-  const nextManagedRanges = shouldKeepPrevManaged
-    ? taggedLineCount > 0
-      ? enforcedSyncedRanges
-      : prevManaged
-    : newRanges;
-
-  const nextTextColors = shouldKeepPrevManaged
-    ? taggedLineCount > 0
-      ? [...filteredTextColorsWithoutSynced, ...enforcedSyncedRanges]
-      : prevTextColors
-    : [...filteredTextColors, ...newRanges];
-  const nextDecorations = {
-    ...prevDecorations,
-    ...(nextTextColors.length ? { textColors: nextTextColors } : {}),
-  } as Record<string, any>;
-  if (!nextTextColors.length) {
-    delete nextDecorations.textColors;
-  }
-
-  const nextSummaryTool: SummaryToolCustomData = {
-    ...prevSummaryTool,
-    syncedTextColorRanges: nextManagedRanges,
-    lastStableSyncedTextColorAt: isStable
-      ? now
-      : prevSummaryTool.lastStableSyncedTextColorAt,
-    syncedLineColorByKey: isStable ? newSyncedLineColorByKey : prevColorByKey,
-  };
-
-  return newElementWith(element, {
-    customData: {
-      ...prevCustomData,
-      textDecorations: Object.keys(nextDecorations).length
-        ? nextDecorations
-        : undefined,
-      summaryTool: nextSummaryTool,
-    },
-  }) as ExcalidrawTextElement;
-};
-
 const rebuildSynclistBlockInTarget = ({
   listName,
   currentBlock,
@@ -1140,7 +761,9 @@ const rebuildSynclistBlockInSummaryRoot = ({
   };
 
   for (const line of modelLines) {
-    nextContentLines.push(`${line.text}${encodeSyncLineTag(listName, line.id)}`);
+    nextContentLines.push(
+      `${line.text}${encodeSyncLineTag(listName, line.id)}`,
+    );
     summaryLineNumberByLineId[line.id] = bumpLine();
 
     const groups = commentGroupsByLineId[line.id] ?? [];
@@ -1244,16 +867,41 @@ export const applySummaryToolSync = ({
     };
   }
 
+  // 检测summary.txt文本框是否在frame里或与frame相交
+  let isInFrameOrIntersecting = summaryRoot.frameId !== null;
+  if (!isInFrameOrIntersecting) {
+    // 检查是否与任何Frame相交
+    const frameElements = elements.filter(isFrameLikeElement);
+    const elementsMap = arrayToMap(elements);
+    for (const frame of frameElements) {
+      if (isElementIntersectingFrame(summaryRoot, frame, elementsMap)) {
+        isInFrameOrIntersecting = true;
+        break;
+      }
+    }
+  }
+
+  if (!isInFrameOrIntersecting) {
+    // 如果不在frame里且不与frame相交，暂停所有summary.txt功能，清除所有连接线
+    const filteredLinks = appState.textLineLinks.filter(
+      (l) => !String(l.id).startsWith("summaryTool:"),
+    );
+    const didUpdate = filteredLinks.length !== appState.textLineLinks.length;
+    return {
+      elements: [...elements],
+      appState: { textLineLinks: filteredLinks },
+      didUpdate,
+    };
+  }
+
+  // 获取summary.txt所在的frame ID（如果在frame里）
+  const summaryRootFrameId = summaryRoot.frameId;
+
   const { nextSummaryRoot, model } =
     buildOrUpdateModelOnSummaryRoot(summaryRoot);
 
-  let nextElements = elements.map((el) =>
-    el.id === summaryRoot.id ? nextSummaryRoot : el,
-  );
-
-  const nextLinksById = new Map<string, TextLineLink>();
-
-  const requiredLinkIds = new Set<string>();
+  // 不修改元素，直接使用原始元素数组
+  const nextElements = [...elements];
 
   const pendingLinkAnchors: Array<{
     listName: string;
@@ -1275,6 +923,12 @@ export const applySummaryToolSync = ({
     if (!isTextElement(el) || el.isDeleted || el.id === summaryRoot.id) {
       continue;
     }
+
+    // 只处理与summary.txt在同一frame里的文本框
+    if (el.frameId !== summaryRootFrameId) {
+      continue;
+    }
+
     const blocks = parseSynclists(el.text);
     if (!blocks.length) {
       continue;
@@ -1374,47 +1028,48 @@ export const applySummaryToolSync = ({
       }
     }
 
-    const nextData: SummaryToolCustomData = {
-      ...prevData,
-      summaryTextColor: summaryRoot.strokeColor,
-      blocks: nextBlocksState as any,
-    };
+    // const nextData: SummaryToolCustomData = {
+    //   ...prevData,
+    //   summaryTextColor: summaryRoot.strokeColor,
+    //   blocks: nextBlocksState as any,
+    // };
 
-    const nextElWithData = setSummaryToolData(
-      el,
-      nextData,
-    ) as ExcalidrawTextElement;
+    // const nextElWithData = setSummaryToolData(
+    //   el,
+    //   nextData,
+    // ) as ExcalidrawTextElement;
 
-    const nextText = elementLines.join("\n");
-    const shouldUpdateText = nextText !== normalizeKey(el.text);
+    // 注释掉修改目标文本框text和originalText的代码
+    // const nextText = elementLines.join("\n");
+    // const shouldUpdateText = nextText !== normalizeKey(el.text);
 
-    const container = getContainerElement(nextElWithData, elementsMap);
-    const updatedBase =
-      shouldUpdateText || nextElWithData.customData !== el.customData
-        ? (newElementWith(nextElWithData, {
-            text: nextText,
-            originalText: nextText,
-            ...refreshTextDimensions(
-              nextElWithData,
-              container,
-              elementsMap,
-              nextText,
-            ),
-          }) as ExcalidrawTextElement)
-        : nextElWithData;
-    const updated = setManagedSyncedLineTextColors({
-      element: updatedBase,
-      summaryRoot,
-      model,
-    });
+    // const container = getContainerElement(nextElWithData, elementsMap);
+    // const updatedBase =
+    //   shouldUpdateText || nextElWithData.customData !== el.customData
+    //     ? (newElementWith(nextElWithData, {
+    //         text: nextText,
+    //         originalText: nextText,
+    //         ...refreshTextDimensions(
+    //           nextElWithData,
+    //           container,
+    //           elementsMap,
+    //           nextText,
+    //         ),
+    //       }) as ExcalidrawTextElement)
+    //     : nextElWithData;
+    // const updated = setManagedSyncedLineTextColors({
+    //   element: updatedBase,
+    //   summaryRoot,
+    //   model,
+    // });
 
-    if (updated !== el) {
-      nextElements = nextElements.map((candidate) =>
-        candidate.id === el.id ? updated : candidate,
-      );
-    }
+    // if (updated !== el) {
+    //   nextElements = nextElements.map((candidate) =>
+    //     candidate.id === el.id ? updated : candidate,
+    //   );
+    // }
 
-    didChangeText = didChangeText || shouldUpdateText;
+    // didChangeText = didChangeText || shouldUpdateText;
   }
 
   const summaryBlocks = parseSynclists(nextSummaryRoot.text);
@@ -1484,13 +1139,13 @@ export const applySummaryToolSync = ({
   }
 
   const nextSummaryText = summaryLines.join("\n");
-  const summaryContainer = getContainerElement(nextSummaryRoot, elementsMap);
+  // const summaryContainer = getContainerElement(nextSummaryRoot, elementsMap);
   const prevSummaryData = getSummaryToolData(nextSummaryRoot) ?? {};
-  const nextSummaryData: SummaryToolCustomData = {
-    ...(getSummaryToolData(nextSummaryRoot) ?? {}),
-    role: "summaryRoot",
-    model: nextModel,
-  };
+  // const nextSummaryData: SummaryToolCustomData = {
+  //   ...(getSummaryToolData(nextSummaryRoot) ?? {}),
+  //   role: "summaryRoot",
+  //   model: nextModel,
+  // };
 
   const normalizedSummaryText = normalizeKey(nextSummaryText);
   const summaryTextLines = normalizedSummaryText.split("\n");
@@ -1624,10 +1279,10 @@ export const applySummaryToolSync = ({
     return aStart < bEnd && bStart < aEnd;
   };
 
-  const prevCustomData = (nextSummaryRoot.customData ?? {}) as Record<
-    string,
-    any
-  >;
+  // const prevCustomData = (nextSummaryRoot.customData ?? {}) as Record<
+  //   string,
+  //   any
+  // >;
   const prevDecorations = getTextDecorations(nextSummaryRoot) ?? {};
   const prevTextColors =
     (prevDecorations.textColors as TextDecorationRange[] | undefined) ?? [];
@@ -1656,84 +1311,71 @@ export const applySummaryToolSync = ({
     delete nextDecorations.textColors;
   }
 
-  const nextSummaryDataWithCommentRanges: SummaryToolCustomData = {
-    ...nextSummaryData,
-    syncedSummaryCommentColorRanges: commentColorRanges,
-  };
+  // const nextSummaryDataWithCommentRanges: SummaryToolCustomData = {
+  //   ...nextSummaryData,
+  //   syncedSummaryCommentColorRanges: commentColorRanges,
+  // };
 
-  const summaryRootWithData = setSummaryToolData(
-    nextSummaryRoot,
-    nextSummaryDataWithCommentRanges,
-  ) as ExcalidrawTextElement;
+  // const summaryRootWithData = setSummaryToolData(
+  //   nextSummaryRoot,
+  //   nextSummaryDataWithCommentRanges,
+  // ) as ExcalidrawTextElement;
 
-  const updatedSummaryRoot = newElementWith(summaryRootWithData, {
-    text: nextSummaryText,
-    originalText: nextSummaryText,
-    customData: {
-      ...prevCustomData,
-      textDecorations: Object.keys(nextDecorations).length
-        ? nextDecorations
-        : undefined,
-      summaryTool: nextSummaryDataWithCommentRanges,
-    },
-    ...refreshTextDimensions(
-      summaryRootWithData,
-      summaryContainer,
-      elementsMap,
-      nextSummaryText,
-    ),
-  }) as ExcalidrawTextElement;
+  // 注释掉修改summaryRoot文本框text和originalText的代码
+  // const updatedSummaryRoot = newElementWith(summaryRootWithData, {
+  //   text: nextSummaryText,
+  //   originalText: nextSummaryText,
+  //   customData: {
+  //     ...prevCustomData,
+  //     textDecorations: Object.keys(nextDecorations).length
+  //       ? nextDecorations
+  //       : undefined,
+  //     summaryTool: nextSummaryDataWithCommentRanges,
+  //   },
+  //   ...refreshTextDimensions(
+  //     summaryRootWithData,
+  //     summaryContainer,
+  //     elementsMap,
+  //     nextSummaryText,
+  //   ),
+  // }) as ExcalidrawTextElement;
 
-  nextElements = nextElements.map((el) =>
-    el.id === summaryRoot.id ? updatedSummaryRoot : el,
-  );
+  // nextElements = nextElements.map((el) =>
+  //   el.id === summaryRoot.id ? updatedSummaryRoot : el,
+  // );
 
-  for (const pending of pendingLinkAnchors) {
-    const list = nextModel.lists[pending.listName];
-    const renderedMap = list?.rendered?.summaryLineNumberByLineId;
-    if (!list || !renderedMap) {
-      continue;
-    }
-    const summaryLineNumber = renderedMap[pending.lineId];
-    if (!summaryLineNumber) {
-      continue;
-    }
-    const linkId = `summaryTool:${pending.listName}:${pending.lineId}:${pending.targetElementId}:${pending.targetLineNumber}`;
-    requiredLinkIds.add(linkId);
-    nextLinksById.set(linkId, {
-      id: linkId,
-      from: {
-        elementId: summaryRoot.id,
-        lineNumber: summaryLineNumber,
-        side: "right",
-      },
-      to: {
-        elementId: pending.targetElementId,
-        lineNumber: pending.targetLineNumber,
-        side: "left",
-      },
-    });
-  }
+  // 注释掉自动行号连接线的处理
+  // for (const pending of pendingLinkAnchors) {
+  //   const list = nextModel.lists[pending.listName];
+  //   const renderedMap = list?.rendered?.summaryLineNumberByLineId;
+  //   if (!list || !renderedMap) {
+  //     continue;
+  //   }
+  //   const summaryLineNumber = renderedMap[pending.lineId];
+  //   if (!summaryLineNumber) {
+  //     continue;
+  //   }
+  //   const linkId = `summaryTool:${pending.listName}:${pending.lineId}:${pending.targetElementId}:${pending.targetLineNumber}`;
+  //   requiredLinkIds.add(linkId);
+  //   nextLinksById.set(linkId, {
+  //     id: linkId,
+  //     from: {
+  //       elementId: summaryRoot.id,
+  //       lineNumber: summaryLineNumber,
+  //       side: "right",
+  //     },
+  //     to: {
+  //       elementId: pending.targetElementId,
+  //       lineNumber: pending.targetLineNumber,
+  //       side: "left",
+  //     },
+  //   });
+  // }
 
-  const preservedManualLinks = appState.textLineLinks.filter(
+  // 只保留手动添加的连接线，移除所有自动生成的连接线
+  const nextTextLineLinks = appState.textLineLinks.filter(
     (l) => !String(l.id).startsWith("summaryTool:"),
   );
-  const existingManaged = appState.textLineLinks.filter((l) =>
-    String(l.id).startsWith("summaryTool:"),
-  );
-  const mergedManaged: TextLineLink[] = [];
-  for (const link of existingManaged) {
-    if (requiredLinkIds.has(String(link.id))) {
-      mergedManaged.push(nextLinksById.get(String(link.id)) ?? link);
-    }
-  }
-  for (const [id, link] of nextLinksById.entries()) {
-    if (!mergedManaged.some((l) => l.id === id)) {
-      mergedManaged.push(link);
-    }
-  }
-
-  const nextTextLineLinks = preservedManualLinks.concat(mergedManaged);
 
   const didUpdate =
     didChangeSummaryText ||

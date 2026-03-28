@@ -681,14 +681,347 @@ fix
 //}中编辑同步行时,这个同步行没有正确的更新到其他文件的同步行;而是插入了一条新的同步行;添加功能,当编辑光标移动到summary.txt的哪一个同步行时,将这个同步行的行号自动连接到其他文件的同一条同步行的行号;(summary.txt的右侧行号连接其他文件的相同同步行的左侧的行号,连接线高亮;)来提示编辑这个同步行,内容将同步到这些位置;
 
 
+finished:
+重写summary tool工具;
+wasted-summary tool详细功能是废弃的功能;
+1:summary tool不修改本地文件
+必须要做到的基本原则
+注释掉以前summary tool工具修改文件的相关代码;
+防止与新开发的summary tool相冲突
+确保不会影响除summary tool以外的功能
+
+
+
+这个项目如何在.excalidraw里存储哪个文本框时summary.txt文件
+
+
+finished:
+更新方法
+添加一个检测summary.txt文本框是否在
+按下f键放出的Frame里或与Frame相交方法;
+如果summary.txt文本框不在某一个frame里,且不与这个frame相交
+将这个文本框的summary.txt标识设置为绿色;
+添加功能如果一个summary.txt文本框不在frame里或不与frame相交,这个summary.txt将暂停所有的summary.txt文本框功能;将不再可以自动放出行号连接线;
+移入frame里或与frame相交恢复功能,但只能连接frame里的文本框
+(就是summary.txt文本框与frame的区域接触即可将summary.txt文本框设为红色)
+当某一个文本框(非summary.txt文本框)与某一个frame相交或在frame内部就在这个文本框的上方标记other.txt样式和summary.txt文本框的summary.txt标记一样,颜色为灰色;改为与frame接触就显示other.txt
+分析要实现将frame区域内
+的summary.txt文本框的
+//synclist(){
+//}
+的同步行
+在编辑时使用api插入都同一个frame里other.txt文本框
+并连接同步行对应的行号;(保持summary同步行的文字颜色)
+要用到哪些api;
+
+
+finished:
+注释掉目前summary tool的自动行号连接线,并注释wasted
+
+finished:
+添加功能,新建画布时自动将文件命名为
+"2026.3.26-09.10.20.excalidraw"
+没有其他多余的字符
+
+finished:
+添加功能,当选中某一个元素时,粘贴新元素,粘贴的新元素将覆盖选中的元素;
+选中一个文本框,粘贴新文本,新文本的文本框将覆盖旧的文本框
+选中一个图片,粘贴图片,粘贴的图片将覆盖选中的图片
+实现以上操作需要做哪些修改;
+
+
+要实现将frame区域内的summary.txt文本框的同步行插入到同一个frame里的other.txt文本框并连接行号，需要用到以下API：
+1. 元素操作API ：
+2. 数据处理API ：
+3. 连接线API ：
+4. 颜色处理API ：
+5. Frame相关API ：
+6. 渲染API ：
+7. 场景操作API ：
+8. 工具函数 ：
+1. 检测summary.txt文本框是否在frame内
+2. 解析summary.txt中的同步行
+3. 找到同一frame内的other.txt文本框
+4. 将同步行插入到other.txt文本框
+5. 创建连接线连接对应的行号
+6. 保持同步行的文字颜色
+能否在控制台完成这样的操作;
+
+
+
+finished:
+分析实现以下功能的难度
+软件Sublime Text	有Highlight Word功能
+开启后。光标停留或选中单词时，自动高亮文档中所有相同的词。
+能否为这个项目添加类似的功能Highlight Word
+开启后。在编辑某一个文本框时,光标停留或选中单词时，自动高亮文本框中所有相同的词。
+在ctrl+shift+p弹出的菜单class="ExcTextField"中添加Highlight Word功能,默认开启;使用灰色作为高亮背景
+
+
+talk:
+分析这个项目是如何储存文本框行号连接线的;
+如何保证行号连接线随着alt+上下键移动;
+如何为这个项目文本框的自身行号连接自身行号的情况下
+添加行号连接线跟随alt+上下键移动;
+在 textWysiwyg.tsx 文件中，有一个 remapTextLineLinksForMoveLines 函数，专门用于处理alt+上下键移动文本行时的连接线更新：
+- 自连接识别 ：在 renderTextLineLinks 函数中，通过检查 link.from.elementId === link.to.elementId 来识别自连接
+
+
+
+
+
+uncertain:
+talk:
+如何修改Excalidraw这个项目,使得可以再浏览器控制台中操作画布;
+要实现通过浏览器控制台操作 Excalidraw 画布，核心思路是将 Excalidraw 的内部状态更新函数暴露到全局作用域（window 对象）。
+Excalidraw 本质上是一个 React 组件，它的状态管理（如元素列表、画笔颜色、选中状态）都在组件内部。默认情况下，控制台无法直接访问这些私有状态。
+你可以通过以下三个步骤来实现这一目标：
+1. 核心代码实现：暴露 API 到 Window
+你需要封装一个自定义的 Excalidraw 组件，利用 React 的 useEffect 钩子，在组件挂载时将操作句柄绑定到 window 上。
+以下是基于 React 的完整实现代码：
+jsx
+import React, { useEffect, useRef, useState } from "react";
+import { Excalidraw } from "@excalidraw/excalidraw";
+
+const DebuggableExcalidraw = () => {
+  const excalidrawRef = useRef(null);
+  const [scene, setScene] = useState({ elements: [], appState: {} });
+
+  useEffect(() => {
+    // 核心步骤：将更新函数挂载到 window 对象
+    // 这样你就可以在控制台输入 window.updateScene(...) 来操作画布
+    window.excalidrawAPI = {
+      updateScene: (newScene) => {
+        if (excalidrawRef.current) {
+          // 调用 Excalidraw 官方的 updateScene 方法
+          excalidrawRef.current.updateScene(newScene);
+          setScene(newScene); // 同步本地 React 状态
+          console.log("✅ 画布已更新:", newScene);
+        }
+      },
+      getScene: () => {
+        return scene;
+      },
+      reset: () => {
+         window.excalidrawAPI.updateScene({ elements: [], appState: {} });
+      }
+    };
+
+    // 组件卸载时清理，防止内存泄漏
+    return () => {
+      delete window.excalidrawAPI;
+    };
+  }, [scene]);
+
+  return (
+    <div style={{ height: "100vh", width: "100%" }}>
+      <Excalidraw
+        ref={excalidrawRef}
+        initialData={scene}
+        onChange={(elements, appState) => {
+          // 保持状态同步
+          setScene({ elements, appState });
+        }}
+      />
+    </div>
+  );
+};
+
+export default DebuggableExcalidraw;
+
+
+
+
+
+将summary tool画布版设置为与summary tool完全一致需要使用
+//两个斜杠来作为同步行标记符并将这两个斜杠标记为红色 
+
+
+
+
+
+
+talk:
+finished:
+"//关闭Frame遮挡文本2026.03.26"
+在Frame中遮挡部分文本框的文字功能(如果这个文本框与Frame相交)
+3. 如何关闭“Frame遮挡文本”功能
+你需要找到实现裁剪（clip）功能的地方，并做如下修改：
+方案一：注释或删除 clip 逻辑
+将涉及 clip 的代码部分注释掉，例如：
+JavaScript
+// ctx.save();
+// ctx.beginPath();
+// ctx.rect(frame.x, frame.y, frame.width, frame.height);
+// ctx.clip();
+// drawText(textElement);
+// ctx.restore();
+改为：
+JavaScript
+drawText(textElement); // 不做裁剪
+方案二：逻辑判断绕过裁剪
+如果框架通过判断“是否需要裁剪”，可以直接让判断为 false：
+JavaScript
+if (shouldClip) {
+  // ctx.clip()...
+}
+// drawText(textElement);
+可以直接去掉或让 shouldClip 恒为 false。
+方案三：SVG/DOM层面
+SVG 形如 <clipPath id="...">，可以去掉 clip-path 属性或者相关 <clipPath> 定义。
+
+
+talk:
+在这个项目中;关闭“Frame遮挡文本”功能之后,如何进一步关闭无法从Frame外部选中部分超出Frame,的文本框的功能,使与Frame相交的文本框都可以从Frame外部点击选中;
+在 excalidraw/excalidraw 项目中，如果已经关闭“Frame 遮挡文本”功能，想进一步实现Frame外也能选中与Frame相交的文本框（从外部点击可以选中跨出Frame区域的文本框），核心要点是：
+修改选区 hit-test（命中检测）逻辑，使其只要点击在文本框的整体区域（不论其是否部分在 Frame 内），都能选中该文本框。
+实现思路
+定位 hit-test 相关代码
+在源码中负责元素选中的逻辑一般在如下文件：
+packages/excalidraw-app/src/scene/ 下的命中检测相关函数。
+或直接在主事件（如 pointer/mouse down）处理流程内，有命中检测的 util 方法如 hitTestElement, isHittingElement, getElementAtPosition。
+调整 Frame 遮挡逻辑
+当前在 Frame 关闭“遮挡文本”功能后，选区 hit-test 依然会对“Frame内的文本框”有部分保护/限制，很可能在如下函数存在分支：
+检测点击时，若Frame开启遮挡：落在Frame内则Frame优先级高于文本框；
+你想要进一步关闭，则需要让文本框（即使部分被Frame包含）都能被外部正确点选。
+代码修改建议,找到与 Frame 相关的“是否允许命中”判断逻辑，通常会有如下伪代码片段：
+TypeScript
+function getElementAtPosition(elements: ExcalidrawElement[], point: Point) {
+  // 有类似Frame遮盖判断
+  for (const element of elements) {
+    if (
+      isFrameElement(element) &&
+      frameOccludesText() && // 你已经关闭了
+      isPointInFrame(element, point)
+    ) {
+      return element; // 现在是Frame优先
+    }
+    if (
+      isTextElement(element) &&
+      isPointInTextBox(element, point)
+    ) {
+      // 这里有可能被Frame判断挡住，不返回
+      return element;
+    }
+  }
+}
+你需要确保：只要命中的文本框（无论其是否跨出Frame），都能直接被选中。具体地，不要因为其部分属于Frame而禁用外部选区。精确定位修改点找到类似如下的判断：
+TypeScript
+// 伪代码示例
+if (
+  frame遮挡文本已关闭 &&
+  isTextElement(element) &&
+  isPointInTextBox(element, pointerPoint)
+) {
+  // 允许命中文本框
+  return element
+}
+如果你发现 isElementWithinFrame(element, frame) 或对“部分在Frame内的文本框”做了特殊处理，需要将该逻辑移除，让文本框正常参与全局点击的命中检测。
+总结去掉“部分在Frame内的文本框不能被Frame外选中”的特殊处理分支，只保留普通文本框的命中逻辑即可。最关键代码大概率在命中检测相关的 util 文件；建议搜索 frame 和 hitTest 相关代码，结合“Frame 遮挡文本”开关变量，移除对文本框的限制。
+修改后建议 yarn test:app 跑通所有测试，如有问题，再具体修 fix。
+
+
+
+talk:
+分析能否进一步提升这个项目的画布在不同缩放下的清晰度:
+🔍 核心方案：适配高分辨率屏幕 (DPR)
+这是解决 Canvas 模糊最常见也最重要的一步。在高分辨率屏幕上，一个 CSS 像素可能对应多个物理像素（例如，devicePixelRatio 为 2 时，1个CSS像素对应2x2个物理像素）。如果 Canvas 的内部绘图缓冲区尺寸与 CSS 显示尺寸不匹配，浏览器就会进行拉伸，导致模糊。
+标准做法是“三步走”：
+获取设备像素比 (DPR)：通过 window.devicePixelRatio 获取。
+放大 Canvas 缓冲区：将 canvas.width 和 canvas.height 设置为 CSS 尺寸乘以 DPR。
+缩放绘图上下文：使用 ctx.scale(dpr, dpr) 缩放绘图上下文，确保你的绘图逻辑坐标（如 ctx.fillRect(10, 10, 50, 50)）仍然基于 CSS 像素，但实际渲染会按 DPR 放大，从而变得清晰。
+不考虑性能影响,需要实现画布高清晰度高帧率;Canvas渲染的节流和防抖先不要设置,测试后出现性能问题之后再设置;解决在不同缩放级别下，可能会出现清晰度不一致的问题;修改的代码必须注释"//解决不同缩放级别下，可能会出现清晰度不一致的问题"
+- 当缩放级别较高时，适当降低DPR以提高性能
+- 
+- 当缩放级别较低时，保持高DPR以确保清晰度
+""
+- 主画布 DPR 固定为 window.devicePixelRatio ：Static/New/Interactive 三个画布都以 width * scale 设置像素尺寸， scale 直接取 DPR（ App.tsx:L2392-L2469 , InteractiveCanvas.tsx:L200-L214 ）。
+- 元素缓存画布的分辨率会随 zoom 变化： scale 初始等于 zoom.value ，并在 元素过大时被限制 以避免超过浏览器 canvas 限制（ renderElement.ts:L538-L599 ）。
+- 文本在低缩放时做了“超采样”：当 zoom < 1 ，会把 scale 抬高（最多 3x）以保持清晰度（ renderElement.ts:L572-L580 ）。
+清晰度参数
+- 渲染节流默认不开启：只有 window.EXCALIDRAW_THROTTLE_RENDER === true 才会启用节流（ reactUtils.ts:L33-L61 ）。
+
+
+talk:
+分析如何提高复制画布中某个元素为png的图片清晰度
+excalidraw 项目用的是 toBlob() 或 toDataURL() 导出图像，可以传入更高的宽高来实现更高分辨率。
+
+
+wasted:
+text-box.ts 在这个文件编写"半自动测试"使用Playwright 的交互式调试工具
+打开浏览器提示"开始测试"
+创建一个文本框后提示测试完成结束测试;
+text-box.ts 在这个文件编写"半自动测试"使用Playwright 的交互式调试工具
+操作1打开浏览器后提示创建一个30000字以上的文本框;
+完成后
+操作2上下移动画布观察这个文本框是否存在不可见的部分;
+不移动画布时检测文本框显示是否正常;进行10次没次都提示
+操作3在文本框的不同位置双击文本框;进行10次没次都提示;观察是否存在因为双击导致文本框文字偏移;
+操作4双击文本框某一位置编辑,记录编辑响应速度;进行10次没次都提示;
+
+
+wasted:
+项目只在3000端口运行
+以下是针对 Glyph Atlas 渲染问题的详细排查步骤：
+1. 检查 WebGL 混合模式 (最常见原因)
+Glyph Atlas 通常使用带透明通道的 PNG 图片。如果 WebGL 的混合模式没有正确设置，透明背景可能会变成黑色，或者直接遮挡了文字，甚至导致整个纹理不可见。
+排查点：确保开启了混合功能。
+2. 检查纹理加载与绑定
+文字不可见往往是因为 GPU 根本没有拿到图片数据。
+排查点 1：图片是否加载完成？
+在生成 Atlas 时，确保 Image 对象已经触发 onload 事件后再进行 texImage2D 操作。如果在图片下载完成前就绘制，Canvas 会是空的。
+排查点 2：纹理参数设置
+WebGL 对非 2 的幂次方（Non-Power-of-Two, NPOT）纹理支持有限。如果你的 Atlas 图片尺寸是 513x513，且未设置正确的 wrapping 参数，纹理可能无法显示。
+3. 检查 UV 坐标计算
+Glyph Atlas 的核心是将字符映射到纹理的特定区域。如果 UV 坐标计算错误，你可能正在绘制纹理的“透明空白区域”。
+4. 检查着色器 (Shader) 逻辑
+如果是使用 WebGL 渲染，片元着色器负责从纹理中取样颜色。
+排查点：
+采样器绑定：确保 JS 中将纹理单元 0 绑定给了着色器中的 uniform sampler2D。
+5. 检查 Canvas 2D 的 drawImage 参数 (非 WebGL 方案)
+如果你是用 Canvas 2D API (ctx.drawImage) 来绘制 Atlas：
+排查点：
+裁剪区域：检查 drawImage 的源坐标 (sx, sy) 是否超出了图片边界。
+绘制尺寸：如果 dw (绘制宽度) 或 dh (绘制高度) 计算为 0 或负数，文字将不可见。
+透明度：检查 ctx.globalAlpha 是否被设置为了 0。
+6. 检查 CSS 与 DOM 层级 (视觉遮挡)
+既然你说“可以选中复制”，说明有一个透明的 DOM 层覆盖在 Canvas 之上（或者是 Canvas 本身作为背景）。
+排查点：
+Z-Index：确保负责渲染的 Canvas 的 z-index 高于或等于文本选择层，或者确保文本选择层确实是 pointer-events: none 且透明的。
+背景色：检查 Canvas 的 CSS background-color 是否是不透明的，遮挡了底下的内容（如果是多层 Canvas 架构）。
+透明度：检查 Canvas 元素的 CSS opacity 是否为 0。
+7. 调试技巧：绘制调试框
+为了快速定位是“没画出来”还是“画错位置了”，可以在绘制文字之前，先用纯色画一个矩形框占位。
+如果灰色色框可见，但字不可见：位置是对的，问题出在纹理/UV/着色器。
+如果灰色色框也不可见：问题出在坐标计算或 Canvas 上下文状态（如被 save/restore 隔离，或被裁剪 clip 掉了）。
+分析是否存在这些问题
+上下文互斥原则（最常见）
+HTML5 规范规定，一个 <canvas> 元素在同一时间只能拥有一个活跃的渲染上下文。
+如果你先获取了 webgl 上下文，再尝试获取 2d 上下文（或者反过来），浏览器通常会返回 null，或者在某些旧浏览器中清除前一个上下文并创建新的。
+现象：canvas.getContext('2d') 返回 null，导致后续调用报错。
+Canvas 元素未就绪
+代码执行时，DOM 中的 <canvas> 元素可能尚未挂载或引用丢失。
+离屏 Canvas 限制
+如果这段代码运行在 Web Worker 中，且使用的是 OffscreenCanvas，某些环境对多上下文的支持可能不一致。
+
+
+
+
 
 
 启动:
+yarn install
 yarn --cwd ./excalidraw-app vite --port 3000 --strictPort
 http://localhost:3000/
 for /f "tokens=5" %a in ('netstat -ano ^| findstr :3000') do taskkill /F /PID %a
+for /f "tokens=5" %a in ('netstat -ano ^| findstr :3001') do taskkill /F /PID %a
 测试:
 yarn test:all
+npx playwright test e2e/text-box-manual.ts --ui --config=playwright.config.temp.ts
+npx playwright test e2e/text-box.sp
+npx playwright test e2e/text-box-manual.spec.ts --ui --config=playwright.config.temp.ts
+ec.ts --ui --config=playwright.config.temp.ts
+
 yarn test:e2e --workers=1 --grep "Text box line numbers left and right render once"
 yarn test:e2e --workers=2 --grep "^Double click the text box to insert the cursor"
 

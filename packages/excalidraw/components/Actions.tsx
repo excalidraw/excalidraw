@@ -47,10 +47,7 @@ import {
 
 import {
   getFormValue,
-  actionApplyTextSelectionBackground,
   actionApplyTextSelectionColor,
-  actionApplyTextSelectionTag,
-  actionApplyTextSelectionUnderline,
   actionToggleTextSelectionUnderline,
   actionToggleTextSelectionBackground,
   actionToggleTextSelectionTag,

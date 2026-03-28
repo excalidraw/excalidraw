@@ -52,8 +52,6 @@ import {
   LoadIcon,
   MoonIcon,
   PlusIcon,
-  eyeClosedIcon,
-  eyeIcon,
   save,
   searchIcon,
   SunIcon,

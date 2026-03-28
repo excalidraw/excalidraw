@@ -14,10 +14,16 @@ import {
 } from "@excalidraw/common";
 
 import type { AppState, NormalizedZoomValue } from "./types";
-
-const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
+//### 1. 默认导出缩放因子定义
+// const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
+// ? devicePixelRatio
+// : 1;
+// 修改后
+const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio * 2)
+  ? devicePixelRatio * 5
+  : EXPORT_SCALES.includes(devicePixelRatio)
   ? devicePixelRatio
-  : 1;
+  : 5; // 默认为5x
 
 export const getDefaultAppState = (): Omit<
   AppState,
@@ -142,6 +148,7 @@ export const getDefaultAppState = (): Omit<
     lockedMultiSelections: {},
     activeLockedId: null,
     bindMode: "orbit",
+    highlightWord: true,
   };
 };
 
@@ -282,6 +289,7 @@ const APP_STATE_STORAGE_CONF = (<
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
   bindMode: { browser: true, export: false, server: false },
+  highlightWord: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

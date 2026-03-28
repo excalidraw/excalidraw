@@ -142,6 +142,9 @@ export const FONT_FAMILY = {
   "Source Code Pro": 12,
   "Maple Mono Normal NL": 13,
   "Sarasa Fixed CL Bold Nerd Font": 14,
+  "Sarasa Fixed CL Regular Nerd Font": 15,
+  "JetBrains Mono": 16,
+  "Sarasa Fixed SC Regular Nerd Font": 17,
 };
 
 // Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
@@ -169,6 +172,9 @@ export function getGenericFontFamilyFallback(
     case FONT_FAMILY["Source Code Pro"]:
     case FONT_FAMILY["Maple Mono Normal NL"]:
     case FONT_FAMILY["Sarasa Fixed CL Bold Nerd Font"]:
+    case FONT_FAMILY["Sarasa Fixed CL Regular Nerd Font"]:
+    case FONT_FAMILY["JetBrains Mono"]:
+    case FONT_FAMILY["Sarasa Fixed SC Regular Nerd Font"]:
       return MONOSPACE_GENERIC_FONT;
 
     default:
@@ -219,7 +225,7 @@ export const FRAME_STYLE = {
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;
 export const DEFAULT_FONT_FAMILY: FontFamilyValues =
-  FONT_FAMILY["Sarasa Fixed CL Bold Nerd Font"];
+  FONT_FAMILY["Sarasa Fixed SC Regular Nerd Font"];
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
@@ -301,14 +307,15 @@ export const getExportSource = () =>
   window.EXCALIDRAW_EXPORT_SOURCE || window.location.origin;
 
 // time in milliseconds
-export const IMAGE_RENDER_TIMEOUT = 500;
+export const IMAGE_RENDER_TIMEOUT = 3000;
 export const TAP_TWICE_TIMEOUT = 300;
 export const TOUCH_CTX_MENU_TIMEOUT = 500;
 export const TITLE_TIMEOUT = 10000;
 export const VERSION_TIMEOUT = 30000;
 export const SCROLL_TIMEOUT = 100;
-export const ZOOM_STEP = 0.1;
-export const MIN_ZOOM = 0.1;
+export const ZOOM_STEP = 0.05;
+//修改缩放倍率的位置
+export const MIN_ZOOM = 0.05;
 export const MAX_ZOOM = 30;
 export const HYPERLINK_TOOLTIP_DELAY = 300;
 
@@ -340,14 +347,16 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
   },
 };
 
-export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
-
-export const EXPORT_SCALES = [1, 2, 3];
+export const MAX_DECIMALS_FOR_SVG_EXPORT = 10;
+//增加更高的缩放选项，例如：
+//提高导出PNG的清晰度
+export const EXPORT_SCALES = [10];
 export const DEFAULT_EXPORT_PADDING = 10; // px
-
-export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
-
-export const MAX_ALLOWED_FILE_BYTES = 4 * 1024 * 1024;
+//修改前1440
+export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 144000;
+//修改前4 * 1024 * 1024
+// 修改文件大小限制（例如改为 1000MB）
+export const MAX_ALLOWED_FILE_BYTES = 1000 * 1024 * 1024;
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 export const SVG_DOCUMENT_PREAMBLE = `<?xml version="1.0" standalone="no"?>

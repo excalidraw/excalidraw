@@ -8,6 +8,7 @@ import {
   arrayToMap,
   capitalizeString,
   isShallowEqual,
+  getDateTime,
 } from "@excalidraw/common";
 
 import { mutateElement } from "@excalidraw/element";
@@ -304,16 +305,17 @@ const LayerUI = ({
     );
   };
 
-  const normalizeFileName = (value: string) => {
-    const trimmed = (value ?? "").trim();
-    if (!trimmed) {
-      return null;
-    }
-    return trimmed.replace(/\.excalidraw$/i, "");
-  };
+  // const normalizeFileName = (value: string) => {
+  //   const trimmed = (value ?? "").trim();
+  //   if (!trimmed) {
+  //     return null;
+  //   }
+  //   return trimmed.replace(/\.excalidraw$/i, "");
+  // };
 
   const FileNameEditor = ({ baseName }: { baseName: string }) => {
-    const savedFileName = appState.fileHandle?.name?.replace(/\.excalidraw$/i, "") || "";
+    const savedFileName =
+      appState.fileHandle?.name?.replace(/\.excalidraw$/i, "") || "";
 
     return (
       <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
@@ -328,8 +330,7 @@ const LayerUI = ({
   };
 
   const renderCanvasActions = () => {
-    const baseName =
-      appState.name || (app.props as any)?.name || t("labels.untitled");
+    const baseName = appState.name || (app.props as any)?.name || getDateTime();
 
     return (
       <div
@@ -338,7 +339,7 @@ const LayerUI = ({
       >
         <div className="App-menu_top__canvas-actions-row">
           <tunnels.MainMenuTunnel.Out />
-          <FileNameEditor baseName={baseName} />
+          {appState.fileHandle && <FileNameEditor baseName={baseName} />}
         </div>
         {renderWelcomeScreen && <tunnels.WelcomeScreenMenuHintTunnel.Out />}
       </div>

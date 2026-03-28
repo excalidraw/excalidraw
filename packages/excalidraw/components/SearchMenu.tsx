@@ -462,11 +462,11 @@ const ListItem = (props: {
         active: props.highlighted,
       })}
       onClick={props.onClick}
-      ref={(ref) => {
-        if (props.highlighted) {
-          ref?.scrollIntoView({ behavior: "auto", block: "nearest" });
-        }
-      }}
+      // ref={(ref) => {
+      //   if (props.highlighted) {
+      //     ref?.scrollIntoView({ behavior: "auto", block: "nearest" });
+      //   }
+      // }}
     >
       <div className="preview-text">
         {preview.flatMap((text, idx) => (

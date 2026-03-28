@@ -112,3 +112,5 @@ export {
   actionSummaryToolCommentsSingle,
   actionSummaryToolCommentsAll,
 } from "./actionSummaryTool";
+
+export { actionToggleHighlightWord } from "./actionToggleHighlightWord";

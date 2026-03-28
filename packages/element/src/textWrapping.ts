@@ -854,6 +854,58 @@ const wrapLinePreservingWhitespace = (
   return lines;
 };
 
+//文本框增量换行,逐行渲染2026.3.28
+export const forEachWrappedLine = (
+  text: string,
+  font: FontString,
+  maxWidth: number,
+  shouldWrap: boolean,
+  onLine: (args: {
+    lineText: string;
+    lineIndex: number;
+    lineStartIndex: number;
+    explicitNewlineAfterLine: boolean;
+  }) => boolean | void,
+) => {
+  const normalizedText = text.replace(/\r\n?/g, "\n");
+  const originalLines = normalizedText.split("\n");
+  const canWrap = shouldWrap && Number.isFinite(maxWidth) && maxWidth >= 0;
+  let lineIndex = 0;
+  let globalIndex = 0;
+
+  for (let originalLineIndex = 0; originalLineIndex < originalLines.length; originalLineIndex++) {
+    const originalLine = originalLines[originalLineIndex] ?? "";
+    const currentLineWidth = canWrap ? getLineWidth(originalLine, font) : 0;
+    const wrappedLines =
+      canWrap && currentLineWidth > maxWidth
+        ? wrapLinePreservingWhitespace(originalLine, font, maxWidth)
+        : [originalLine];
+    let offsetInOriginal = 0;
+    for (let i = 0; i < wrappedLines.length; i++) {
+      const lineText = wrappedLines[i] ?? "";
+      const lineStartIndex = globalIndex + offsetInOriginal;
+      const explicitNewlineAfterLine =
+        i === wrappedLines.length - 1 &&
+        originalLineIndex < originalLines.length - 1;
+      const shouldStop = onLine({
+        lineText,
+        lineIndex,
+        lineStartIndex,
+        explicitNewlineAfterLine,
+      });
+      lineIndex += 1;
+      if (shouldStop) {
+        return;
+      }
+      offsetInOriginal += lineText.length;
+    }
+    globalIndex += originalLine.length;
+    if (originalLineIndex < originalLines.length - 1) {
+      globalIndex += 1;
+    }
+  }
+};
+
 const wrapWhitespace = (
   whitespace: string,
   font: FontString,

@@ -201,6 +201,11 @@ const eraserTest = (
   elementsMap: ElementsMap,
   zoom: number,
 ): boolean => {
+  // Only erase freedraw, line, and arrow elements
+  if (!isFreeDrawElement(element) && !isLineElement(element) && !isArrowElement(element)) {
+    return false;
+  }
+
   const lastPoint = pathSegment[1];
 
   // PERF: Do a quick bounds intersection test first because it's cheap
@@ -288,19 +293,5 @@ const eraserTest = (
     return false;
   }
 
-  return (
-    intersectElementWithLineSegment(element, elementsMap, pathSegment, 0, true)
-      .length > 0 ||
-    (!!boundTextElement &&
-      intersectElementWithLineSegment(
-        {
-          ...boundTextElement,
-          ...computeBoundTextPosition(element, boundTextElement, elementsMap),
-        },
-        elementsMap,
-        pathSegment,
-        0,
-        true,
-      ).length > 0)
-  );
+  return false;
 };

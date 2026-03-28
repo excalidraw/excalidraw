@@ -2,7 +2,7 @@ import {
   clearAppStateForLocalStorage,
   getDefaultAppState,
 } from "@excalidraw/excalidraw/appState";
-import { FONT_FAMILY, DEFAULT_FONT_FAMILY } from "@excalidraw/common";
+import { FONT_FAMILY } from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppState } from "@excalidraw/excalidraw/types";

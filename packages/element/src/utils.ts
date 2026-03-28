@@ -483,25 +483,6 @@ export const isPathALoop = (
 };
 
 export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
-  if (
-    element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS ||
-    element.roundness?.type === ROUNDNESS.LEGACY
-  ) {
-    return x * DEFAULT_PROPORTIONAL_RADIUS;
-  }
-
-  if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
-    const fixedRadiusSize = element.roundness?.value ?? DEFAULT_ADAPTIVE_RADIUS;
-
-    const CUTOFF_SIZE = fixedRadiusSize / DEFAULT_PROPORTIONAL_RADIUS;
-
-    if (x <= CUTOFF_SIZE) {
-      return x * DEFAULT_PROPORTIONAL_RADIUS;
-    }
-
-    return fixedRadiusSize;
-  }
-
   return 0;
 };
 

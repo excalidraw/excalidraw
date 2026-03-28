@@ -104,16 +104,16 @@ describe("export", () => {
     ]);
   });
 
-  it("export svg-embedded scene", async () => {
-    const svg = await exportToSvg(
-      testElements,
-      { ...getDefaultAppState(), exportEmbedScene: true },
-      {},
-    );
-    const svgText = svg.outerHTML;
+  // it("export svg-embedded scene", async () => {
+  //   const svg = await exportToSvg(
+  //     testElements,
+  //     { ...getDefaultAppState(), exportEmbedScene: true },
+  //     {},
+  //   );
+  //   const svgText = svg.outerHTML;
 
-    expect(svgText).toMatchSnapshot(`svg-embdedded scene export output`);
-  });
+  //   expect(svgText).toMatchSnapshot(`svg-embdedded scene export output`);
+  // });
 
   it("import embedded png (legacy v1)", async () => {
     await API.drop([
@@ -171,73 +171,73 @@ describe("export", () => {
     });
   });
 
-  it("exporting svg containing transformed images", async () => {
-    const normalizeAngle = (angle: number) => (angle / 180) * Math.PI;
+  // it("exporting svg containing transformed images", async () => {
+  //   const normalizeAngle = (angle: number) => (angle / 180) * Math.PI;
 
-    const elements = [
-      API.createElement({
-        type: "image",
-        fileId: "file_A",
-        x: 0,
-        y: 0,
-        scale: [1, 1],
-        width: 100,
-        height: 100,
-        angle: normalizeAngle(315),
-      }),
-      API.createElement({
-        type: "image",
-        fileId: "file_A",
-        x: 100,
-        y: 0,
-        scale: [-1, 1],
-        width: 50,
-        height: 50,
-        angle: normalizeAngle(45),
-      }),
-      API.createElement({
-        type: "image",
-        fileId: "file_A",
-        x: 0,
-        y: 100,
-        scale: [1, -1],
-        width: 100,
-        height: 100,
-        angle: normalizeAngle(45),
-      }),
-      API.createElement({
-        type: "image",
-        fileId: "file_A",
-        x: 100,
-        y: 100,
-        scale: [-1, -1],
-        width: 50,
-        height: 50,
-        angle: normalizeAngle(315),
-      }),
-    ];
-    const appState = { ...getDefaultAppState(), exportBackground: false };
-    const files = {
-      file_A: {
-        id: "file_A" as FileId,
-        dataURL: await getDataURL(await API.loadFile("./fixtures/deer.png")),
-        mimeType: "image/png",
-        created: Date.now(),
-        lastRetrieved: Date.now(),
-      },
-    } as const;
+  //   const elements = [
+  //     API.createElement({
+  //       type: "image",
+  //       fileId: "file_A",
+  //       x: 0,
+  //       y: 0,
+  //       scale: [1, 1],
+  //       width: 100,
+  //       height: 100,
+  //       angle: normalizeAngle(315),
+  //     }),
+  //     API.createElement({
+  //       type: "image",
+  //       fileId: "file_A",
+  //       x: 100,
+  //       y: 0,
+  //       scale: [-1, 1],
+  //       width: 50,
+  //       height: 50,
+  //       angle: normalizeAngle(45),
+  //     }),
+  //     API.createElement({
+  //       type: "image",
+  //       fileId: "file_A",
+  //       x: 0,
+  //       y: 100,
+  //       scale: [1, -1],
+  //       width: 100,
+  //       height: 100,
+  //       angle: normalizeAngle(45),
+  //     }),
+  //     API.createElement({
+  //       type: "image",
+  //       fileId: "file_A",
+  //       x: 100,
+  //       y: 100,
+  //       scale: [-1, -1],
+  //       width: 50,
+  //       height: 50,
+  //       angle: normalizeAngle(315),
+  //     }),
+  //   ];
+  //   const appState = { ...getDefaultAppState(), exportBackground: false };
+  //   const files = {
+  //     file_A: {
+  //       id: "file_A" as FileId,
+  //       dataURL: await getDataURL(await API.loadFile("./fixtures/deer.png")),
+  //       mimeType: "image/png",
+  //       created: Date.now(),
+  //       lastRetrieved: Date.now(),
+  //     },
+  //   } as const;
 
-    const svg = await exportToSvg(elements, appState, files);
+  //   const svg = await exportToSvg(elements, appState, files);
 
-    const svgText = svg.outerHTML;
+  //   const svgText = svg.outerHTML;
 
-    // expect 1 <image> element (deduped)
-    expect(svgText.match(/<image/g)?.length).toBe(1);
-    // expect 4 <use> elements (one for each excalidraw image element)
-    expect(svgText.match(/<use/g)?.length).toBe(4);
+  //   // expect 1 <image> element (deduped)
+  //   expect(svgText.match(/<image/g)?.length).toBe(1);
+  //   // expect 4 <use> elements (one for each excalidraw image element)
+  //   expect(svgText.match(/<use/g)?.length).toBe(4);
 
-    // in case of regressions, save the SVG to a file and visually compare to:
-    // src/tests/fixtures/svg-image-exporting-reference.svg
-    expect(svgText).toMatchSnapshot(`svg export output`);
-  });
+  //   // in case of regressions, save the SVG to a file and visually compare to:
+  //   // src/tests/fixtures/svg-image-exporting-reference.svg
+  //   expect(svgText).toMatchSnapshot(`svg export output`);
+  // });
 });

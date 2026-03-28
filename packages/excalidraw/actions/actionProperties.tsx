@@ -337,8 +337,10 @@ export const actionChangeStrokeColor = register<
           const prevDecorations = prevCustomData.textDecorations as
             | Record<string, any>
             | undefined;
-          const summaryTool = (prevCustomData.summaryTool ??
-            {}) as Record<string, any>;
+          const summaryTool = (prevCustomData.summaryTool ?? {}) as Record<
+            string,
+            any
+          >;
           const syncedRanges =
             (summaryTool.syncedTextColorRanges as
               | TextDecorationRange[]
@@ -468,102 +470,102 @@ export const actionChangeStrokeColor = register<
   },
   PanelComponent: ({ elements, appState, updateData, app, renderAction }) => {
     const { stylesPanelMode } = getStylesPanelInfo(app);
-    const applyTextSelectionDecoration = (
-      kind: "background" | "underline" | "color" | "tag",
-      color: string,
-    ) => {
-      if (!appState.editingTextElement) {
-        return;
-      }
-      temporarilyDisableTextEditorBlur();
-      const saved = saveCaretPosition();
-      const editor = document.querySelector(
-        ".excalidraw-wysiwyg",
-      ) as HTMLTextAreaElement | null;
-      if (!editor) {
-        return;
-      }
-      const start = editor.selectionStart ?? 0;
-      const end = editor.selectionEnd ?? 0;
-      if (start === end) {
-        restoreCaretPosition(saved);
-        return;
-      }
-      (app as any).actionManager.executeAction(
-        kind === "background"
-          ? actionApplyTextSelectionBackground
-          : kind === "underline"
-          ? actionApplyTextSelectionUnderline
-          : kind === "color"
-          ? actionApplyTextSelectionColor
-          : actionApplyTextSelectionTag,
-        "ui",
-        { start, end, color },
-      );
-      restoreCaretPosition(saved);
-    };
+    // const applyTextSelectionDecoration = (
+    //   kind: "background" | "underline" | "color" | "tag",
+    //   color: string,
+    // ) => {
+    //   if (!appState.editingTextElement) {
+    //     return;
+    //   }
+    //   temporarilyDisableTextEditorBlur();
+    //   const saved = saveCaretPosition();
+    //   const editor = document.querySelector(
+    //     ".excalidraw-wysiwyg",
+    //   ) as HTMLTextAreaElement | null;
+    //   if (!editor) {
+    //     return;
+    //   }
+    //   const start = editor.selectionStart ?? 0;
+    //   const end = editor.selectionEnd ?? 0;
+    //   if (start === end) {
+    //     restoreCaretPosition(saved);
+    //     return;
+    //   }
+    //   (app as any).actionManager.executeAction(
+    //     kind === "background"
+    //       ? actionApplyTextSelectionBackground
+    //       : kind === "underline"
+    //       ? actionApplyTextSelectionUnderline
+    //       : kind === "color"
+    //       ? actionApplyTextSelectionColor
+    //       : actionApplyTextSelectionTag,
+    //     "ui",
+    //     { start, end, color },
+    //   );
+    //   restoreCaretPosition(saved);
+    // };
 
-    const renderTextSelectionDecorationSection = (
-      kind: "background" | "underline" | "color" | "tag",
-    ) => {
-      const label =
-        kind === "background"
-          ? t("labels.textSelectionBackground")
-          : kind === "underline"
-          ? t("labels.textSelectionUnderline")
-          : kind === "color"
-          ? t("labels.textSelectionColor")
-          : t("labels.textSelectionTag");
-      const type =
-        kind === "background"
-          ? "textSelectionBackground"
-          : kind === "underline"
-          ? "textSelectionUnderline"
-          : kind === "color"
-          ? "textSelectionColor"
-          : "textSelectionTag";
-      const currentColor =
-        kind === "background"
-          ? appState.textSelectionBackgroundColor
-          : kind === "underline"
-          ? appState.textSelectionUnderlineColor
-          : kind === "color"
-          ? appState.textSelectionColor
-          : appState.textSelectionTagColor;
+    // const renderTextSelectionDecorationSection = (
+    //   kind: "background" | "underline" | "color" | "tag",
+    // ) => {
+    //   const label =
+    //     kind === "background"
+    //       ? t("labels.textSelectionBackground")
+    //       : kind === "underline"
+    //       ? t("labels.textSelectionUnderline")
+    //       : kind === "color"
+    //       ? t("labels.textSelectionColor")
+    //       : t("labels.textSelectionTag");
+    //   const type =
+    //     kind === "background"
+    //       ? "textSelectionBackground"
+    //       : kind === "underline"
+    //       ? "textSelectionUnderline"
+    //       : kind === "color"
+    //       ? "textSelectionColor"
+    //       : "textSelectionTag";
+    //   const currentColor =
+    //     kind === "background"
+    //       ? appState.textSelectionBackgroundColor
+    //       : kind === "underline"
+    //       ? appState.textSelectionUnderlineColor
+    //       : kind === "color"
+    //       ? appState.textSelectionColor
+    //       : appState.textSelectionTagColor;
 
-      return (
-        <>
-          {stylesPanelMode === "full" && <h3 aria-hidden="true">{label}</h3>}
-          <ColorPicker
-            topPicks={TEXT_SELECTION_DECORATION_COLOR_TOP_PICKS}
-            type={type}
-            label={label}
-            color={currentColor}
-            onChange={(color) =>
-              withCaretPositionPreservation(
-                () => {
-                  updateData(
-                    kind === "background"
-                      ? { textSelectionBackgroundColor: color }
-                      : kind === "underline"
-                      ? { textSelectionUnderlineColor: color }
-                      : kind === "color"
-                      ? { textSelectionColor: color }
-                      : { textSelectionTagColor: color },
-                  );
-                  applyTextSelectionDecoration(kind, color);
-                },
-                false,
-                !!appState.editingTextElement,
-              )
-            }
-            elements={elements}
-            appState={appState}
-            updateData={updateData}
-          />
-        </>
-      );
-    };
+    //   return (
+    //     <>
+    //       {stylesPanelMode === "full" && <h3 aria-hidden="true">{label}</h3>}
+    //       <ColorPicker
+    //         topPicks={TEXT_SELECTION_DECORATION_COLOR_TOP_PICKS}
+    //         type={type}
+    //         label={label}
+    //         color={currentColor}
+    //         onChange={(color) =>
+    //           withCaretPositionPreservation(
+    //             () => {
+    //               updateData(
+    //                 kind === "background"
+    //                   ? { textSelectionBackgroundColor: color }
+    //                   : kind === "underline"
+    //                   ? { textSelectionUnderlineColor: color }
+    //                   : kind === "color"
+    //                   ? { textSelectionColor: color }
+    //                   : { textSelectionTagColor: color },
+    //               );
+    //               applyTextSelectionDecoration(kind, color);
+    //             },
+    //             false,
+    //             !!appState.editingTextElement,
+    //           )
+    //         }
+    //         elements={elements}
+    //         appState={appState}
+    //         updateData={updateData}
+    //       />
+    //     </>
+    //   );
+    // };
 
     return (
       <>

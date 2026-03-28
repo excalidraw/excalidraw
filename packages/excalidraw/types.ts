@@ -525,6 +525,7 @@ export interface AppState {
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
   bindMode: BindMode;
+  highlightWord: boolean;
 }
 
 export type SearchMatch = {

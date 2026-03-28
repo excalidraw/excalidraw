@@ -9,7 +9,7 @@ import {
 import {
   getLineHeightInPx,
   isTextElement,
-  wrapTextPreservingWhitespaceWithExplicitNewlineMarkers,
+  forEachWrappedLine,
 } from "@excalidraw/element";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
@@ -334,15 +334,6 @@ const TextLineNumbersOverlay = ({
         continue;
       }
 
-      const isHugeText = originalText.length > 8000;
-      const { lines, explicitNewlineAfterLine } = isHugeText
-        ? { lines: [], explicitNewlineAfterLine: [] as boolean[] }
-        : wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
-            originalText,
-            font,
-            element.width,
-          );
-
       const lineHeightScene = getLineHeightInPx(
         element.fontSize,
         element.lineHeight,
@@ -406,31 +397,36 @@ const TextLineNumbersOverlay = ({
         }
       };
 
-      if (isHugeText) {
-        const logicalLineCount = Math.max(1, originalText.split("\n").length);
-        for (let lineNumber = 1; lineNumber <= logicalLineCount; lineNumber++) {
+      //文本框增量换行,逐行渲染2026.3.28
+      const viewTopScene = -appState.scrollY;
+      const viewBottomScene =
+        viewTopScene + appState.height / appState.zoom.value;
+      let logicalLineNumber = 1;
+      let isLogicalLineStart = true;
+      forEachWrappedLine(
+        originalText,
+        font,
+        element.width,
+        true,
+        ({ lineIndex, explicitNewlineAfterLine }) => {
           const yCenterScene =
-            element.y +
-            (lineNumber - 1) * lineHeightScene +
-            lineHeightScene / 2;
-          addLine(lineNumber, yCenterScene);
-        }
-      } else {
-        let currentLineNumber = 1;
-        for (let i = 0; i < lines.length; i++) {
-          const isLogicalLineStart =
-            i === 0 || !!explicitNewlineAfterLine[i - 1];
-          if (!isLogicalLineStart) {
-            continue;
+            element.y + lineIndex * lineHeightScene + lineHeightScene / 2;
+          if (isLogicalLineStart) {
+            if (
+              yCenterScene >= viewTopScene - lineHeightScene &&
+              yCenterScene <= viewBottomScene + lineHeightScene
+            ) {
+              addLine(logicalLineNumber, yCenterScene);
+            }
           }
-          if (i > 0) {
-            currentLineNumber += 1;
+          if (explicitNewlineAfterLine) {
+            logicalLineNumber += 1;
+            isLogicalLineStart = true;
+          } else {
+            isLogicalLineStart = false;
           }
-          const yCenterScene =
-            element.y + i * lineHeightScene + lineHeightScene / 2;
-          addLine(currentLineNumber, yCenterScene);
-        }
-      }
+        },
+      );
 
       const elementItems = Array.from(map.values());
       cache.set(element.id, { signature, items: elementItems });
@@ -444,7 +440,13 @@ const TextLineNumbersOverlay = ({
     }
 
     return out;
-  }, [isDisabled, visibleElements]);
+  }, [
+    isDisabled,
+    visibleElements,
+    appState.scrollY,
+    appState.height,
+    appState.zoom.value,
+  ]);
 
   const itemByKey = useMemo(() => {
     const map = new Map<string, LineNumberButtonItem>();

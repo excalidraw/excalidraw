@@ -13,6 +13,8 @@ import {
   isEmbeddableElement,
   isIframeLikeElement,
   isTextElement,
+  isFrameLikeElement,
+  isElementIntersectingFrame,
 } from "@excalidraw/element";
 import { wrapTextPreservingWhitespaceWithExplicitNewlineMarkers } from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
@@ -78,9 +80,9 @@ const strokeGrid = (
 
   // const lineWidth = 1 / zoom.value; 原来的代码
   //目前在画布中的网格会在高缩放下显得很细,低缩放下显得很粗,能否让网格按固定尺寸(相对于一个格子的宽度,网格线的宽度成比例)显示;
-  const lineWidth = (gridSize * 0.05);
+  const lineWidth = gridSize * 0.05;
   // const lineDash = [2 / zoom.value, 2 / zoom.value];原来的代码
-  const lineDash = [2 , 2 ];
+  const lineDash = [2, 2];
 
   // Offset rendering by 0.5 to ensure that 1px wide lines are crisp.
   // We only do this when zoomed to 100% because otherwise the offset is
@@ -389,57 +391,121 @@ const renderSummaryToolLabels = ({
   allElementsMap: NonDeletedSceneElementsMap;
 }) => {
   const zoom = appState.zoom.value || 1;
-  const fontSize = 12  ;
+  const fontSize = 12;
   // summary.txt的字体大小/zoom
   //在右键将画布中的某一个文本框设为summary.txt,这个文本框的顶部会出现红色的summary.txt标记;让这个标记为固定大小,不随缩放而改变;
-  const paddingX = 4 ;
+  const paddingX = 4;
   //水平内边距/ zoom
-  const paddingY = 2 ;
+  const paddingY = 2;
   //垂直内边距/ zoom
-  const margin = 4 ;
+  const margin = 4;
   //外边距/ zoom
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
+
+  // 收集所有Frame元素
+  const frameElements = Array.from(allElementsMap.values()).filter(
+    isFrameLikeElement,
+  ) as ExcalidrawFrameLikeElement[];
 
   for (const element of allElementsMap.values()) {
     if (!isTextElement(element) || element.angle) {
       continue;
     }
     const data = (element.customData as any)?.summaryTool;
-    if (!data || data.role !== "summaryRoot") {
-      continue;
+    if (data && data.role === "summaryRoot") {
+      // 检测summary.txt文本框是否在Frame里或与Frame相交
+      let isInFrameOrIntersecting = element.frameId !== null;
+      if (!isInFrameOrIntersecting) {
+        // 检查是否与任何Frame相交
+        const elementsMap = allElementsMap;
+        for (const frame of frameElements) {
+          if (isElementIntersectingFrame(element, frame, elementsMap)) {
+            isInFrameOrIntersecting = true;
+            break;
+          }
+        }
+      }
+
+      const label = "summary.txt";
+      const color =
+        typeof data.labelColor === "string"
+          ? data.labelColor
+          : isInFrameOrIntersecting
+          ? "#e03131"
+          : "#28a745";
+
+      const prevFont = context.font;
+      context.font = `${fontSize}px ${getFontFamilyString({
+        fontFamily: (element as any).fontFamily,
+      })}`;
+
+      const textWidth = context.measureText(label).width;
+      const w = textWidth + paddingX * 2;
+      const h = fontSize + paddingY * 2;
+
+      const x = element.x;
+      const y = element.y - h - margin;
+
+      context.lineWidth = 1 / zoom;
+      context.strokeStyle = color;
+      context.fillStyle = appState.viewBackgroundColor || "#fff";
+
+      context.beginPath();
+      context.rect(x, y, w, h);
+      context.fill();
+      context.stroke();
+
+      context.fillStyle = color;
+      context.textBaseline = "top";
+      context.fillText(label, x + paddingX, y + paddingY);
+
+      context.font = prevFont;
+    } else {
+      // 检测非summary.txt文本框是否与Frame相交或在Frame内部
+      let isIntersectingWithFrame = element.frameId !== null;
+      const elementsMap = allElementsMap;
+      if (!isIntersectingWithFrame) {
+        for (const frame of frameElements) {
+          if (isElementIntersectingFrame(element, frame, elementsMap)) {
+            isIntersectingWithFrame = true;
+            break;
+          }
+        }
+      }
+
+      if (isIntersectingWithFrame) {
+        const label = "other.txt";
+        const color = "#6c757d"; // 灰色
+
+        const prevFont = context.font;
+        context.font = `${fontSize}px ${getFontFamilyString({
+          fontFamily: (element as any).fontFamily,
+        })}`;
+
+        const textWidth = context.measureText(label).width;
+        const w = textWidth + paddingX * 2;
+        const h = fontSize + paddingY * 2;
+
+        const x = element.x;
+        const y = element.y - h - margin;
+
+        context.lineWidth = 1 / zoom;
+        context.strokeStyle = color;
+        context.fillStyle = appState.viewBackgroundColor || "#fff";
+
+        context.beginPath();
+        context.rect(x, y, w, h);
+        context.fill();
+        context.stroke();
+
+        context.fillStyle = color;
+        context.textBaseline = "top";
+        context.fillText(label, x + paddingX, y + paddingY);
+
+        context.font = prevFont;
+      }
     }
-
-    const label = "summary.txt";
-    const color =
-      typeof data.labelColor === "string" ? data.labelColor : "#e03131";
-
-    const prevFont = context.font;
-    context.font = `${fontSize}px ${getFontFamilyString({
-      fontFamily: (element as any).fontFamily,
-    })}`;
-
-    const textWidth = context.measureText(label).width;
-    const w = textWidth + paddingX * 2;
-    const h = fontSize + paddingY * 2;
-
-    const x = element.x;
-    const y = element.y - h - margin;
-
-    context.lineWidth = 1 / zoom;
-    context.strokeStyle = color;
-    context.fillStyle = appState.viewBackgroundColor || "#fff";
-
-    context.beginPath();
-    context.rect(x, y, w, h);
-    context.fill();
-    context.stroke();
-
-    context.fillStyle = color;
-    context.textBaseline = "top";
-    context.fillText(label, x + paddingX, y + paddingY);
-
-    context.font = prevFont;
   }
 
   context.restore();
@@ -550,7 +616,8 @@ const _renderStaticScene = ({
               inFrameGroupsMap,
             )
           ) {
-            frameClip(frame, context, renderConfig, appState);
+            // 关闭Frame遮挡文本2026.03.26
+            // frameClip(frame, context, renderConfig, appState);
           }
           renderElement(
             element,

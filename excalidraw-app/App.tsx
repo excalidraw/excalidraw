@@ -64,7 +64,7 @@ import {
 } from "@excalidraw/excalidraw/data/library";
 
 import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
-import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
+
 import type {
   FileId,
   NonDeletedExcalidrawElement,
@@ -131,11 +131,9 @@ import {
   LocalData,
   localStorageQuotaExceededAtom,
 } from "./data/LocalData";
-import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import { useHandleAppTheme } from "./useHandleAppTheme";
-import { getPreferredLanguage } from "./app-language/language-detector";
 import { useAppLangCode } from "./app-language/language-state";
 import DebugCanvas, {
   debugRenderer,
@@ -1208,47 +1206,98 @@ const ExcalidrawWrapper = () => {
               category: DEFAULT_CATEGORIES.app,
               keywords: ["font", "default", "typography", "set"],
               perform: () => {
-                const setDefaultFont = (fontFamily: number) => {
-                  try {
-                    localStorage.setItem(
-                      STORAGE_KEYS.LOCAL_STORAGE_DEFAULT_FONT_FAMILY,
-                      fontFamily.toString(),
-                    );
-                  } catch (error) {
-                    // ignore
-                  }
-                  if (excalidrawAPI) {
+                if (excalidrawAPI) {
+                  const currentFont =
+                    excalidrawAPI.getAppState().currentItemFontFamily;
+
+                  // Create a temporary dropdown element
+                  const dropdown = document.createElement("select");
+                  dropdown.style.position = "fixed";
+                  dropdown.style.top = "50%";
+                  dropdown.style.left = "50%";
+                  dropdown.style.transform = "translate(-50%, -50%)";
+                  dropdown.style.zIndex = "9999";
+                  dropdown.style.padding = "8px";
+                  dropdown.style.fontSize = "16px";
+                  dropdown.style.border = "1px solid #ccc";
+                  dropdown.style.borderRadius = "4px";
+
+                  // Add font options
+                  Object.entries(FONT_FAMILY)
+                    .filter(([key]) => isNaN(parseInt(key, 10)))
+                    .forEach(([name, value]) => {
+                      const option = document.createElement("option");
+                      option.value = value.toString();
+                      option.textContent = name;
+                      if (value === currentFont) {
+                        option.selected = true;
+                      }
+                      dropdown.appendChild(option);
+                    });
+
+                  // Add a label
+                  const label = document.createElement("div");
+                  label.style.position = "fixed";
+                  label.style.top = "45%";
+                  label.style.left = "50%";
+                  label.style.transform = "translate(-50%, -50%)";
+                  label.style.zIndex = "9999";
+                  label.style.padding = "8px";
+                  label.style.fontSize = "16px";
+                  label.style.fontWeight = "bold";
+                  label.textContent = "Select default font:";
+
+                  // Add a backdrop
+                  const backdrop = document.createElement("div");
+                  backdrop.style.position = "fixed";
+                  backdrop.style.top = "0";
+                  backdrop.style.left = "0";
+                  backdrop.style.width = "100%";
+                  backdrop.style.height = "100%";
+                  backdrop.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                  backdrop.style.zIndex = "9998";
+
+                  // Handle backdrop click to close
+                  backdrop.addEventListener("click", () => {
+                    document.body.removeChild(backdrop);
+                    document.body.removeChild(label);
+                    document.body.removeChild(dropdown);
+                  });
+
+                  // Handle dropdown change
+                  dropdown.addEventListener("change", () => {
+                    const selectedFontFamily = parseInt(dropdown.value, 10);
+
+                    // Save to localStorage
+                    try {
+                      localStorage.setItem(
+                        STORAGE_KEYS.LOCAL_STORAGE_DEFAULT_FONT_FAMILY,
+                        selectedFontFamily.toString(),
+                      );
+                    } catch (error) {
+                      // ignore
+                    }
+
+                    // Update app state
                     excalidrawAPI.updateScene({
                       appState: {
-                        currentItemFontFamily: fontFamily,
+                        currentItemFontFamily: selectedFontFamily,
                       },
                     });
-                  }
-                };
 
-                const currentFont = excalidrawAPI?.getAppState().currentItemFontFamily;
-                const fonts = Object.entries(FONT_FAMILY)
-                  .filter(([key]) => isNaN(parseInt(key, 10)))
-                  .map(([name, value]) => ({
-                    name,
-                    value: value as number,
-                    isCurrent: value === currentFont,
-                  }));
+                    // Clean up
+                    document.body.removeChild(backdrop);
+                    document.body.removeChild(label);
+                    document.body.removeChild(dropdown);
+                  });
 
-                if (typeof window !== "undefined" && (window as any).prompt) {
-                  const fontList = fonts
-                    .map((f) => `${f.name} (${f.isCurrent ? "current" : ""})`)
-                    .join("\n");
-                  const selectedName = (window as any).prompt(
-                    `Select default font:\n${fontList}\n\nEnter font name:`,
-                    fonts.find((f) => f.isCurrent)?.name || "",
-                  );
-                  if (selectedName) {
-                    const selected = fonts.find((f) => f.name === selectedName);
-                    if (selected) {
-                      setDefaultFont(selected.value);
-                    }
-                  }
+                  // Add elements to body
+                  document.body.appendChild(backdrop);
+                  document.body.appendChild(label);
+                  document.body.appendChild(dropdown);
+
+                  // Focus the dropdown
+                  dropdown.focus();
                 }
               },
             },

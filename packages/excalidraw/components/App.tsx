@@ -192,7 +192,6 @@ import {
   hitElementBoundText,
   hitElementBoundingBoxOnly,
   hitElementItself,
-  getVisibleSceneBounds,
   FlowChartCreator,
   FlowChartNavigator,
   getLinkDirectionFromKey,
@@ -438,7 +437,7 @@ import { LassoTrail } from "../lasso";
 
 import { EraserTrail } from "../eraser";
 
-import { getShortcutKey } from "../shortcut";
+// import { getShortcutKey } from "../shortcut";
 
 import { tryParseSpreadsheet } from "../charts";
 import {
@@ -628,7 +627,7 @@ const YOUTUBE_VIDEO_STATES = new Map<
 
 let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
-let PLAIN_PASTE_TOAST_SHOWN = false;
+// const PLAIN_PASTE_TOAST_SHOWN = false;
 
 const CANVAS_MOVE_REPEAT_INTERVAL_MS = 200;
 const CANVAS_MOVE_REPEAT_COUNTDOWN_EVENT =
@@ -789,7 +788,7 @@ class App extends React.Component<AppProps, AppState> {
       gridModeEnabled = false,
       objectsSnapModeEnabled = false,
       theme = defaultAppState.theme,
-      name = `${t("labels.untitled")}-${getDateTime()}`,
+      name = getDateTime(),
     } = props;
 
     this.state = {
@@ -3837,6 +3836,18 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
     );
 
+    // 检查是否有选中的元素
+    const hasSelectedElements = Object.values(
+      this.state.selectedElementIds,
+    ).some(Boolean);
+    // const selectedElements = hasSelectedElements
+    //   ? this.scene.getSelectedElements({
+    //       selectedElementIds: this.state.selectedElementIds,
+    //       includeBoundTextElement: true,
+    //       includeElementsInFrames: true,
+    //     })
+    //   : [];
+
     // ------------------- Error -------------------
     if (data.errorMessage) {
       this.setState({ errorMessage: data.errorMessage });
@@ -3884,6 +3895,10 @@ class App extends React.Component<AppProps, AppState> {
     if (imageFiles.length > 0) {
       if (this.isToolSupported("image")) {
         await this.insertImages(imageFiles, sceneX, sceneY);
+        // 如果有选中的元素，删除它们
+        if (hasSelectedElements) {
+          this.actionManager.executeAction(actionDeleteSelected);
+        }
       } else {
         this.setState({ errorMessage: t("errors.imageToolNotSupported") });
       }
@@ -3908,6 +3923,10 @@ class App extends React.Component<AppProps, AppState> {
           this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
         retainSeed: isPlainPaste,
       });
+      // 如果有选中的元素，删除它们
+      if (hasSelectedElements) {
+        this.actionManager.executeAction(actionDeleteSelected);
+      }
       return;
     }
 
@@ -3989,6 +4008,10 @@ class App extends React.Component<AppProps, AppState> {
 
     // ------------------- Text -------------------
     this.addTextFromPaste(data.text, isPlainPaste);
+    // 如果有选中的元素，删除它们
+    if (hasSelectedElements) {
+      this.actionManager.executeAction(actionDeleteSelected);
+    }
   }
 
   public pasteFromClipboard = withBatchedUpdates(
@@ -4324,9 +4347,7 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: textElementProps.fontFamily,
     });
     const lineHeight = getLineHeight(textElementProps.fontFamily);
-    const rawMaxWidth = Number(
-      localStorage.getItem("excalidraw.textMaxWidth"),
-    );
+    const rawMaxWidth = Number(localStorage.getItem("excalidraw.textMaxWidth"));
     const textMaxWidth =
       Number.isFinite(rawMaxWidth) && rawMaxWidth > 0 ? rawMaxWidth : 300;
 
@@ -6103,11 +6124,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public getName = () => {
-    return (
-      this.state.name ||
-      this.props.name ||
-      `${t("labels.untitled")}-${getDateTime()}`
-    );
+    return this.state.name || this.props.name || getDateTime();
   };
 
   // fires only on Safari
@@ -6987,7 +7004,7 @@ class App extends React.Component<AppProps, AppState> {
   ): NonDeleted<ExcalidrawElement>[] {
     const iframeLikes: Ordered<ExcalidrawIframeElement>[] = [];
 
-    const elementsMap = this.scene.getNonDeletedElementsMap();
+    // const elementsMap = this.scene.getNonDeletedElementsMap();
 
     const elements = (
       opts?.includeBoundTextElement && opts?.includeLockedElements
@@ -7003,13 +7020,15 @@ class App extends React.Component<AppProps, AppState> {
     )
       .filter((el) => this.hitElement(x, y, el))
       .filter((element) => {
+        // 关闭阻止选中跨出Frame区域的文本框2026.03.26
         // hitting a frame's element from outside the frame is not considered a hit
-        const containingFrame = getContainingFrame(element, elementsMap);
-        return containingFrame &&
-          this.state.frameRendering.enabled &&
-          this.state.frameRendering.clip
-          ? isCursorInFrame({ x, y }, containingFrame, elementsMap)
-          : true;
+        // const containingFrame = getContainingFrame(element, elementsMap);
+        // return containingFrame &&
+        //   this.state.frameRendering.enabled &&
+        //   this.state.frameRendering.clip
+        //   ? isCursorInFrame({ x, y }, containingFrame, elementsMap)
+        //   : true;
+        return true;
       })
       .filter((el) => {
         // The parameter elements comes ordered from lower z-index to higher.
@@ -14012,12 +14031,8 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         let newZoom = this.state.zoom.value - delta / 100;
-        // increase zoom steps the more zoomed-in we are (applies to >100% only)
-        newZoom +=
-          Math.log10(Math.max(1, this.state.zoom.value)) *
-          -sign *
-          // reduced amplification for small deltas (small movements on a trackpad)
-          Math.min(1, absDelta / 20);
+        // 将所有倍率下的缩放步长固定为5% 2026.03.27
+        // 删除了根据当前缩放倍率增加额外步长的代码
 
         this.translateCanvas((state) => {
           const nextZoom = getNormalizedZoom(newZoom);

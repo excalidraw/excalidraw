@@ -43,8 +43,11 @@ import {
   MapleMonoNormalNLFontFaces,
   NunitoFontFaces,
   SarasaFixedCLBoldNerdFontFaces,
+  SarasaFixedCLRegularNerdFontFaces,
+  SarasaFixedSCRegularNerdFontFaces,
   SourceCodeProFontFaces,
   SourceHanSansSCFontFaces,
+  JetBrainsMonoFontFaces,
 } from "./Nunito";
 import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
@@ -399,9 +402,18 @@ export class Fonts {
     init("Maple Mono Normal NL", ...MapleMonoNormalNLFontFaces);
     init("Nunito", ...NunitoFontFaces);
     init("Sarasa Fixed CL Bold Nerd Font", ...SarasaFixedCLBoldNerdFontFaces);
+    init(
+      "Sarasa Fixed CL Regular Nerd Font",
+      ...SarasaFixedCLRegularNerdFontFaces,
+    );
+    init(
+      "Sarasa Fixed SC Regular Nerd Font",
+      ...SarasaFixedSCRegularNerdFontFaces,
+    );
     init("Source Code Pro", ...SourceCodeProFontFaces);
     init("Source Han Sans SC", ...SourceHanSansSCFontFaces);
     init("Virgil", ...VirgilFontFaces);
+    init("JetBrains Mono", ...JetBrainsMonoFontFaces);
 
     // fallback font faces
     init(CJK_HAND_DRAWN_FALLBACK_FONT, ...XiaolaiFontFaces);

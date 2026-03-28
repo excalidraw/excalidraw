@@ -550,9 +550,7 @@ const cappedElementCanvasSize = (
   // on zoom.
   //
   // ~ safari mobile canvas area limit
-  const AREA_LIMIT = 16777216;
   // ~ safari width/height limit based on developer.mozilla.org.
-  const WIDTH_HEIGHT_LIMIT = 32767;
 
   const padding = getCanvasPadding(element);
 
@@ -570,32 +568,63 @@ const cappedElementCanvasSize = (
   let height = elementHeight * window.devicePixelRatio + padding * 2;
 
   let scale: number = zoom.value;
-  if (isTextElement(element) && zoom.value < 1) {
-    const targetFontPx = 24;
-    const maxSupersampleFactor = 3;
+  if (isTextElement(element)) {
+    //&& zoom.value < 1
+    const targetFontPx = 24; //清晰度参数
+    // 提高 targetFontPx：将这个值从 24 改得更大（例如 32），这会提高文本清晰度的基准线。
+    const maxSupersampleFactor = 3; //清晰度参数
+    //- 文本在低缩放时做了“超采样”：当 zoom < 1 ，会把 scale 抬高（最多 3x）以保持清晰度（ renderElement.ts:L572-L580 ）。
     const dpr = window.devicePixelRatio || 1;
     const minScaleForFont = targetFontPx / (element.fontSize * dpr);
     const maxScale = Math.min(1, zoom.value * maxSupersampleFactor);
     scale = Math.min(maxScale, Math.max(zoom.value, minScaleForFont));
   }
+  // // rescale to ensure width and height is within limits
+  // if (
+  //   width * scale > WIDTH_HEIGHT_LIMIT ||
+  //   height * scale > WIDTH_HEIGHT_LIMIT
+  // ) {
+  //   scale = Math.min(WIDTH_HEIGHT_LIMIT / width, WIDTH_HEIGHT_LIMIT / height);
+  // }
 
-  // rescale to ensure width and height is within limits
-  if (
-    width * scale > WIDTH_HEIGHT_LIMIT ||
-    height * scale > WIDTH_HEIGHT_LIMIT
-  ) {
-    scale = Math.min(WIDTH_HEIGHT_LIMIT / width, WIDTH_HEIGHT_LIMIT / height);
-  }
-
-  // rescale to ensure canvas area is within limits
-  if (width * height * scale * scale > AREA_LIMIT) {
-    scale = Math.sqrt(AREA_LIMIT / (width * height));
-  }
-
+  // // rescale to ensure canvas area is within limits
+  // if (width * height * scale * scale > AREA_LIMIT) {
+  //   scale = Math.sqrt(AREA_LIMIT / (width * height));
+  // }
+  //通过移除尺寸检查，让 Canvas 始终以最高分辨率
   width = Math.floor(width * scale);
   height = Math.floor(height * scale);
 
   return { width, height, scale };
+};
+//修改建议一：移除或放宽安全限制
+
+//文本框增量换行,逐行渲染2026.3.28
+const shouldBypassCachedTextCanvas = (
+  element: ExcalidrawTextElement,
+  zoom: Zoom,
+) => {
+  const padding = getCanvasPadding(element);
+  const elementWidth = element.width;
+  const elementHeight = element.height;
+  let width = elementWidth * window.devicePixelRatio + padding * 2;
+  let height = elementHeight * window.devicePixelRatio + padding * 2;
+  let scale: number = zoom.value;
+  const targetFontPx = 24;
+  const maxSupersampleFactor = 3;
+  const dpr = window.devicePixelRatio || 1;
+  const minScaleForFont = targetFontPx / (element.fontSize * dpr);
+  const maxScale = Math.min(1, zoom.value * maxSupersampleFactor);
+  scale = Math.min(maxScale, Math.max(zoom.value, minScaleForFont));
+  width = Math.floor(width * scale);
+  height = Math.floor(height * scale);
+  const widthHeightLimit = 16384;
+  const areaLimit = 16384 * 16384;
+  return (
+    width > widthHeightLimit ||
+    height > widthHeightLimit ||
+    width * height > areaLimit
+  );
 };
 
 const generateElementCanvas = (
@@ -1666,8 +1695,10 @@ export const renderElement = (
           element.type === "text" &&
           !renderConfig.renderTextViaDOM &&
           !appState?.shouldCacheIgnoreZoom &&
-          cappedElementCanvasSize(element, allElementsMap, appState.zoom)
-            .scale < appState.zoom.value
+          (cappedElementCanvasSize(element, allElementsMap, appState.zoom)
+            .scale < appState.zoom.value ||
+            //文本框增量换行,逐行渲染2026.3.28
+            shouldBypassCachedTextCanvas(element, appState.zoom))
         ) {
           const [x1, y1, x2, y2] = getElementAbsoluteCoords(
             element,

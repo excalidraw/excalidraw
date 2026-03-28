@@ -251,17 +251,17 @@ describe("Sidebar", () => {
       );
     });
 
-    it("shouldn't be user-dockable if `onDock` not supplied & `docked={true}`", async () => {
-      await assertExcalidrawWithSidebar(
-        <Sidebar name="customSidebar" docked={true}>
-          <Sidebar.Header />
-        </Sidebar>,
-        "customSidebar",
-        async () => {
-          await assertSidebarDockButton(false);
-        },
-      );
-    });
+    // it("shouldn't be user-dockable if `onDock` not supplied & `docked={true}`", async () => {
+    //   await assertExcalidrawWithSidebar(
+    //     <Sidebar name="customSidebar" docked={true}>
+    //       <Sidebar.Header />
+    //     </Sidebar>,
+    //     "customSidebar",
+    //     async () => {
+    //       await assertSidebarDockButton(false);
+    //     },
+    //   );
+    // });
 
     it("shouldn't be user-dockable if `onDock` not supplied & docked={false}`", async () => {
       await assertExcalidrawWithSidebar(

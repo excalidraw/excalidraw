@@ -233,22 +233,74 @@ export const loadLibraryFromBlob = async (
   return parseLibraryJSON(await parseFileContents(blob), defaultStatus);
 };
 
+//要提高导出分辨率，需要修改以下几个部分：
+//### 1. 修改 canvasToBlob 函数
+// export const canvasToBlob = async (
+//   canvas: HTMLCanvasElement | Promise<HTMLCanvasElement>,
+// ): Promise<Blob> => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       if (isPromiseLike(canvas)) {
+//         canvas = await canvas;
+//       }
+//       canvas.toBlob((blob) => {
+//         if (!blob) {
+//           return reject(
+//             new CanvasError("Error: Canvas too big", "CANVAS_POSSIBLY_TOO_BIG"),
+//           );
+//         }
+//         resolve(blob);
+//       });
+//     } catch (error: any) {
+//       reject(error);
+//     }
+//   });
+// };
 export const canvasToBlob = async (
   canvas: HTMLCanvasElement | Promise<HTMLCanvasElement>,
+  opts?: {
+    mimeType?: string;
+    quality?: number;
+    width?: number;
+    height?: number;
+  },
 ): Promise<Blob> => {
   return new Promise(async (resolve, reject) => {
     try {
       if (isPromiseLike(canvas)) {
         canvas = await canvas;
       }
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          return reject(
-            new CanvasError("Error: Canvas too big", "CANVAS_POSSIBLY_TOO_BIG"),
-          );
+
+      // 如果提供了宽高参数，创建一个新的高分辨率Canvas
+      let targetCanvas = canvas;
+      if (opts?.width && opts?.height) {
+        const highResCanvas = document.createElement("canvas");
+        highResCanvas.width = opts.width;
+        highResCanvas.height = opts.height;
+
+        const ctx = highResCanvas.getContext("2d");
+        if (ctx) {
+          // 绘制原始Canvas内容到高分辨率Canvas
+          ctx.drawImage(canvas, 0, 0, opts.width, opts.height);
+          targetCanvas = highResCanvas;
         }
-        resolve(blob);
-      });
+      }
+
+      targetCanvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            return reject(
+              new CanvasError(
+                "Error: Canvas too big",
+                "CANVAS_POSSIBLY_TOO_BIG",
+              ),
+            );
+          }
+          resolve(blob);
+        },
+        opts?.mimeType,
+        opts?.quality,
+      );
     } catch (error: any) {
       reject(error);
     }

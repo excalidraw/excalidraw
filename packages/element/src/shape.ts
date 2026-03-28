@@ -217,7 +217,7 @@ export const generateRoughOptions = (
     // calculate them (and we don't want the fills to be modified)
     fillWeight: element.strokeWidth / 2,
     hachureGap: element.strokeWidth * 4,
-    roughness: adjustRoughness(element),
+    roughness: 0,
     stroke: isDarkMode
       ? applyDarkModeFilter(element.strokeColor)
       : element.strokeColor,
@@ -1063,7 +1063,7 @@ export const getFreedrawOutlinePoints = (
   return getStroke(inputPoints as number[][], {
     simulatePressure: element.simulatePressure,
     size: element.strokeWidth * 4.25,
-    thinning: 0.6,
+    thinning: 0, // 将书写线宽设为一致 2026.03.27
     smoothing: 0.5,
     streamline: 0.5,
     easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine

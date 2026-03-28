@@ -55,7 +55,7 @@ export const isRenderThrottlingEnabled = (() => {
         }
         return false;
       }
-      return true;
+      return false;
     }
     return false;
   };
