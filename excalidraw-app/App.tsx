@@ -982,6 +982,7 @@ const ExcalidrawWrapper = () => {
             excalidrawAPI?.scrollToContent(element.link, { animate: true });
           }
         }}
+        validateEmbeddable={true}
       >
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}
