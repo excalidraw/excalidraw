@@ -5201,6 +5201,7 @@ class App extends React.Component<AppProps, AppState> {
                 "right",
                 this.scene,
               );
+<<<<<<< HEAD
             }
           } else if (isFrameLikeElement(selectedElement)) {
             this.setState({
@@ -5238,6 +5239,79 @@ class App extends React.Component<AppProps, AppState> {
             return;
           }
         }
+=======
+            }
+          } else if (isFrameLikeElement(selectedElement)) {
+            this.setState({
+              editingFrame: selectedElement.id,
+            });
+          }
+        }
+      } else if (
+        !event.ctrlKey &&
+        !event.altKey &&
+        !event.metaKey &&
+        !this.state.newElement &&
+        !this.state.selectionElement &&
+        !this.state.selectedElementsAreBeingDragged
+      ) {
+        const shape = findShapeByKey(event.key, this);
+        if (shape) {
+          if (this.state.activeTool.type !== shape) {
+            trackEvent(
+              "toolbar",
+              shape,
+              `keyboard (${
+                this.device.editor.isMobile ? "mobile" : "desktop"
+              })`,
+            );
+          }
+          if (shape === "arrow" && this.state.activeTool.type === "arrow") {
+            this.setState((prevState) => ({
+              currentItemArrowType:
+                prevState.currentItemArrowType === ARROW_TYPE.sharp
+                  ? ARROW_TYPE.round
+                  : prevState.currentItemArrowType === ARROW_TYPE.round
+                  ? ARROW_TYPE.elbow
+                  : ARROW_TYPE.sharp,
+            }));
+          }
+          this.setActiveTool({ type: shape });
+          event.stopPropagation();
+        } else if (event.key === KEYS.Q) {
+          this.toggleLock("keyboard");
+          event.stopPropagation();
+        }
+      }
+      if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
+        const selectedElements = this.scene.getSelectedElements(this.state);
+        if (selectedElements.length === 1) {
+          const selectedElement = selectedElements[0];
+          if (
+            isTextElement(selectedElement) ||
+            isValidTextContainer(selectedElement)
+          ) {
+            let container;
+            if (!isTextElement(selectedElement)) {
+              container = selectedElement as ExcalidrawTextContainer;
+            }
+            const midPoint = getContainerCenter(
+              selectedElement,
+              this.state,
+              this.scene.getNonDeletedElementsMap(),
+            );
+            const sceneX = midPoint.x;
+            const sceneY = midPoint.y;
+            this.startTextEditing({
+              sceneX,
+              sceneY,
+              container,
+            });
+            event.preventDefault();
+            return;
+          }
+        }
+>>>>>>> 5d9e4cb036832db2880fb3d1e2a2246398ac6c1a
         isHoldingSpace = true;
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
         event.preventDefault();
@@ -5811,7 +5885,11 @@ class App extends React.Component<AppProps, AppState> {
       // caret (i.e. deselect). There's not much use for always selecting
       // the text on edit anyway (and users can select-all from contextmenu
       // if needed)
+<<<<<<< HEAD
       autoSelect: !this.editorInterface.isTouchScreen,
+=======
+      autoSelect: false,
+>>>>>>> 5d9e4cb036832db2880fb3d1e2a2246398ac6c1a
     });
     // deselect all other elements when inserting text
     this.deselectElements();
