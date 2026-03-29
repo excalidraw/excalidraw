@@ -6,7 +6,6 @@ import {
   sceneCoordsToViewportCoords,
   type EditorInterface,
 } from "@excalidraw/common";
-import { AnimationController } from "@excalidraw/excalidraw/renderer/animation";
 
 import type {
   InteractiveCanvasRenderConfig,
@@ -23,6 +22,8 @@ import type {
 
 import { t } from "../../i18n";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
+
+import { AnimationController } from "../../renderer/animation";
 
 import type {
   AppClassProperties,
@@ -53,6 +54,7 @@ type InteractiveCanvasProps = {
     DOMAttributes<HTMLCanvasElement | HTMLDivElement>["onContextMenu"],
     undefined
   >;
+  onClick: Exclude<DOMAttributes<HTMLCanvasElement>["onClick"], undefined>;
   onPointerMove: Exclude<
     DOMAttributes<HTMLCanvasElement>["onPointerMove"],
     undefined
@@ -212,6 +214,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       height={props.appState.height * props.scale}
       ref={props.handleCanvasRef}
       onContextMenu={props.onContextMenu}
+      onClick={props.onClick}
       onPointerMove={props.onPointerMove}
       onPointerUp={props.onPointerUp}
       onPointerCancel={props.onPointerCancel}

@@ -22,6 +22,7 @@ import {
 import {
   calculateFixedPointForNonElbowArrowBinding,
   getNonDeletedElements,
+  normalizeArrowhead,
   isPointInElement,
   isValidPolygon,
   projectFixedPointOntoDiagonal,
@@ -250,7 +251,9 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
       };
     }
 
-    console.error(`could not repair binding for element`);
+    console.error(
+      `Could not repair binding for element "${boundElement?.id}" out of (${elementsMap?.size}) elements`,
+    );
   } catch (error) {
     console.error("Error repairing binding:", error);
   }
@@ -426,7 +429,8 @@ export const restoreElement = (
     // @ts-ignore LEGACY type
     // eslint-disable-next-line no-fallthrough
     case "draw":
-      const { startArrowhead = null, endArrowhead = null } = element;
+      const startArrowhead = normalizeArrowhead(element.startArrowhead);
+      const endArrowhead = normalizeArrowhead(element.endArrowhead);
       let x = element.x;
       let y = element.y;
       let points = // migrate old arrow model to new one
@@ -458,7 +462,11 @@ export const restoreElement = (
         ...getSizeFromPoints(points),
       });
     case "arrow": {
-      const { startArrowhead = null, endArrowhead = "arrow" } = element;
+      const startArrowhead = normalizeArrowhead(element.startArrowhead);
+      const endArrowhead =
+        element.endArrowhead === undefined
+          ? "arrow"
+          : normalizeArrowhead(element.endArrowhead);
       const x: number | undefined = element.x;
       const y: number | undefined = element.y;
       const points: readonly LocalPoint[] | undefined = // migrate old arrow model to new one

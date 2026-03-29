@@ -36,6 +36,7 @@ import {
 import { LinearElementEditor } from "@excalidraw/element";
 
 import { newElementWith } from "@excalidraw/element";
+import { getArrowheadForPicker } from "@excalidraw/element";
 
 import {
   getBoundTextElement,
@@ -124,9 +125,12 @@ import {
   sharpArrowIcon,
   roundArrowIcon,
   elbowArrowIcon,
-  ArrowheadCrowfootIcon,
-  ArrowheadCrowfootOneIcon,
-  ArrowheadCrowfootOneOrManyIcon,
+  ArrowheadCardinalityExactlyOneIcon,
+  ArrowheadCardinalityManyIcon,
+  ArrowheadCardinalityOneIcon,
+  ArrowheadCardinalityOneOrManyIcon,
+  ArrowheadCardinalityZeroOrManyIcon,
+  ArrowheadCardinalityZeroOrOneIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -187,7 +191,7 @@ export const getFormValue = function <T extends Primitive>(
   elements: readonly ExcalidrawElement[],
   app: AppClassProperties,
   getAttribute: (element: ExcalidrawElement) => T,
-  isRelevantElement: true | ((element: ExcalidrawElement) => boolean),
+  elementPredicate: true | ((element: ExcalidrawElement) => boolean),
   defaultValue: T | ((isSomeElementSelected: boolean) => T),
 ): T {
   const editingTextElement = app.state.editingTextElement;
@@ -205,9 +209,9 @@ export const getFormValue = function <T extends Primitive>(
     if (hasSelection) {
       const selectedElements = app.scene.getSelectedElements(app.state);
       const targetElements =
-        isRelevantElement === true
+        elementPredicate === true
           ? selectedElements
-          : selectedElements.filter((el) => isRelevantElement(el));
+          : selectedElements.filter((el) => elementPredicate(el));
 
       ret =
         reduceToCommonValue(targetElements, getAttribute) ??
@@ -726,9 +730,28 @@ export const actionChangeOpacity = register<ExcalidrawElement["opacity"]>({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ app, updateData }) => (
-    <Range updateData={updateData} app={app} testId="opacity" />
-  ),
+  PanelComponent: ({ elements, appState, app, updateData }) => {
+    const opacity = getFormValue(
+      elements,
+      app,
+      (element) => element.opacity,
+      true,
+      (hasSelection) => (hasSelection ? null : appState.currentItemOpacity),
+    );
+
+    return (
+      <Range
+        label={t("labels.opacity")}
+        value={opacity ?? appState.currentItemOpacity}
+        hasCommonValue={opacity !== null}
+        onChange={updateData}
+        min={0}
+        max={100}
+        step={10}
+        testId="opacity"
+      />
+    );
+  },
 });
 
 export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
@@ -1550,80 +1573,117 @@ export const actionChangeRoundness = register<"sharp" | "round">({
 });
 
 const getArrowheadOptions = (flip: boolean) => {
-  return [
-    {
-      value: null,
-      text: t("labels.arrowhead_none"),
-      keyBinding: "q",
-      icon: <ArrowheadNoneIcon flip={flip} />,
-    },
-    {
-      value: "arrow",
-      text: t("labels.arrowhead_arrow"),
-      keyBinding: "w",
-      icon: <ArrowheadArrowIcon flip={flip} />,
-    },
-    {
-      value: "triangle",
-      text: t("labels.arrowhead_triangle"),
-      icon: <ArrowheadTriangleIcon flip={flip} />,
-      keyBinding: "e",
-    },
-    {
-      value: "triangle_outline",
-      text: t("labels.arrowhead_triangle_outline"),
-      icon: <ArrowheadTriangleOutlineIcon flip={flip} />,
-      keyBinding: "r",
-    },
-    {
-      value: "circle",
-      text: t("labels.arrowhead_circle"),
-      keyBinding: "a",
-      icon: <ArrowheadCircleIcon flip={flip} />,
-    },
-    {
-      value: "circle_outline",
-      text: t("labels.arrowhead_circle_outline"),
-      keyBinding: "s",
-      icon: <ArrowheadCircleOutlineIcon flip={flip} />,
-    },
-    {
-      value: "diamond",
-      text: t("labels.arrowhead_diamond"),
-      icon: <ArrowheadDiamondIcon flip={flip} />,
-      keyBinding: "d",
-    },
-    {
-      value: "diamond_outline",
-      text: t("labels.arrowhead_diamond_outline"),
-      icon: <ArrowheadDiamondOutlineIcon flip={flip} />,
-      keyBinding: "f",
-    },
-    {
-      value: "bar",
-      text: t("labels.arrowhead_bar"),
-      keyBinding: "z",
-      icon: <ArrowheadBarIcon flip={flip} />,
-    },
-    {
-      value: "crowfoot_one",
-      text: t("labels.arrowhead_crowfoot_one"),
-      icon: <ArrowheadCrowfootOneIcon flip={flip} />,
-      keyBinding: "x",
-    },
-    {
-      value: "crowfoot_many",
-      text: t("labels.arrowhead_crowfoot_many"),
-      icon: <ArrowheadCrowfootIcon flip={flip} />,
-      keyBinding: "c",
-    },
-    {
-      value: "crowfoot_one_or_many",
-      text: t("labels.arrowhead_crowfoot_one_or_many"),
-      icon: <ArrowheadCrowfootOneOrManyIcon flip={flip} />,
-      keyBinding: "v",
-    },
-  ] as const;
+  return {
+    visibleSections: [
+      {
+        name: "default",
+        options: [
+          {
+            value: null,
+            text: t("labels.arrowhead_none"),
+            keyBinding: "q",
+            icon: <ArrowheadNoneIcon flip={flip} />,
+          },
+          {
+            value: "arrow",
+            text: t("labels.arrowhead_arrow"),
+            keyBinding: "w",
+            icon: <ArrowheadArrowIcon flip={flip} />,
+          },
+          {
+            value: "triangle",
+            text: t("labels.arrowhead_triangle"),
+            icon: <ArrowheadTriangleIcon flip={flip} />,
+            keyBinding: "e",
+          },
+          {
+            value: "triangle_outline",
+            text: t("labels.arrowhead_triangle_outline"),
+            icon: <ArrowheadTriangleOutlineIcon flip={flip} />,
+            keyBinding: "r",
+          },
+        ],
+      },
+    ],
+    hiddenSections: [
+      {
+        name: "default",
+        options: [
+          {
+            value: "circle",
+            text: t("labels.arrowhead_circle"),
+            keyBinding: "a",
+            icon: <ArrowheadCircleIcon flip={flip} />,
+          },
+          {
+            value: "circle_outline",
+            text: t("labels.arrowhead_circle_outline"),
+            keyBinding: "s",
+            icon: <ArrowheadCircleOutlineIcon flip={flip} />,
+          },
+          {
+            value: "diamond",
+            text: t("labels.arrowhead_diamond"),
+            icon: <ArrowheadDiamondIcon flip={flip} />,
+            keyBinding: "d",
+          },
+          {
+            value: "diamond_outline",
+            text: t("labels.arrowhead_diamond_outline"),
+            icon: <ArrowheadDiamondOutlineIcon flip={flip} />,
+            keyBinding: "f",
+          },
+          {
+            value: "bar",
+            text: t("labels.arrowhead_bar"),
+            keyBinding: "z",
+            icon: <ArrowheadBarIcon flip={flip} />,
+          },
+        ],
+      },
+      {
+        name: t("labels.cardinality"),
+        options: [
+          {
+            value: "cardinality_one",
+            text: t("labels.arrowhead_cardinality_one"),
+            icon: <ArrowheadCardinalityOneIcon flip={flip} />,
+            keyBinding: "x",
+          },
+          {
+            value: "cardinality_many",
+            text: t("labels.arrowhead_cardinality_many"),
+            icon: <ArrowheadCardinalityManyIcon flip={flip} />,
+            keyBinding: "c",
+          },
+          {
+            value: "cardinality_one_or_many",
+            text: t("labels.arrowhead_cardinality_one_or_many"),
+            icon: <ArrowheadCardinalityOneOrManyIcon flip={flip} />,
+            keyBinding: "v",
+          },
+          {
+            value: "cardinality_exactly_one",
+            text: t("labels.arrowhead_cardinality_exactly_one"),
+            icon: <ArrowheadCardinalityExactlyOneIcon flip={flip} />,
+            keyBinding: null,
+          },
+          {
+            value: "cardinality_zero_or_one",
+            text: t("labels.arrowhead_cardinality_zero_or_one"),
+            icon: <ArrowheadCardinalityZeroOrOneIcon flip={flip} />,
+            keyBinding: null,
+          },
+          {
+            value: "cardinality_zero_or_many",
+            text: t("labels.arrowhead_cardinality_zero_or_many"),
+            icon: <ArrowheadCardinalityZeroOrManyIcon flip={flip} />,
+            keyBinding: null,
+          },
+        ],
+      },
+    ],
+  } as const;
 };
 
 export const actionChangeArrowhead = register<{
@@ -1667,45 +1727,52 @@ export const actionChangeArrowhead = register<{
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
     const isRTL = getLanguage().rtl;
+    const startArrowheadOptions = useMemo(
+      () => getArrowheadOptions(!isRTL),
+      [isRTL],
+    );
+    const endArrowheadOptions = useMemo(
+      () => getArrowheadOptions(!!isRTL),
+      [isRTL],
+    );
 
     return (
       <fieldset>
         <legend>{t("labels.arrowheads")}</legend>
         <div className="iconSelectList buttonList">
           <IconPicker
+            visibleSections={startArrowheadOptions.visibleSections}
+            hiddenSections={startArrowheadOptions.hiddenSections}
             label="arrowhead_start"
-            options={getArrowheadOptions(!isRTL)}
             value={getFormValue<Arrowhead | null>(
               elements,
               app,
               (element) =>
                 isLinearElement(element) && canHaveArrowheads(element.type)
-                  ? element.startArrowhead
+                  ? getArrowheadForPicker(element.startArrowhead)
                   : appState.currentItemStartArrowhead,
               true,
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemStartArrowhead,
             )}
             onChange={(value) => updateData({ position: "start", type: value })}
-            numberOfOptionsToAlwaysShow={4}
           />
           <IconPicker
+            visibleSections={endArrowheadOptions.visibleSections}
+            hiddenSections={endArrowheadOptions.hiddenSections}
             label="arrowhead_end"
-            group="arrowheads"
-            options={getArrowheadOptions(!!isRTL)}
             value={getFormValue<Arrowhead | null>(
               elements,
               app,
               (element) =>
                 isLinearElement(element) && canHaveArrowheads(element.type)
-                  ? element.endArrowhead
+                  ? getArrowheadForPicker(element.endArrowhead)
                   : appState.currentItemEndArrowhead,
               true,
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemEndArrowhead,
             )}
             onChange={(value) => updateData({ position: "end", type: value })}
-            numberOfOptionsToAlwaysShow={4}
           />
         </div>
       </fieldset>

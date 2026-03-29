@@ -1,7 +1,10 @@
 import { queryByText } from "@testing-library/react";
 
 import { pointFrom } from "@excalidraw/math";
-import { getOriginalContainerHeightFromCache } from "@excalidraw/element";
+import {
+  getLineHeightInPx,
+  getOriginalContainerHeightFromCache,
+} from "@excalidraw/element";
 
 import {
   CODES,
@@ -41,6 +44,28 @@ unmountComponent();
 
 const tab = "    ";
 const mouse = new Pointer("mouse");
+
+const exitTextEditorAndAssertSelection = async ({
+  editor,
+  selectedIds,
+  nextText,
+}: {
+  editor: HTMLTextAreaElement;
+  selectedIds: string[];
+  nextText?: string;
+}) => {
+  if (nextText !== undefined) {
+    updateTextEditor(editor, nextText);
+  }
+
+  Keyboard.exitTextEditor(editor);
+
+  expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+  expect(window.h.state.editingTextElement).toBeNull();
+  expect(API.getSelectedElements().map((element) => element.id)).toEqual(
+    selectedIds,
+  );
+};
 
 describe("textWysiwyg", () => {
   describe("start text editing", () => {
@@ -210,6 +235,42 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(1);
     });
 
+    it("should vertically center newly created text on the cursor when clicked with text tool", async () => {
+      API.setAppState({
+        currentItemFontFamily: FONT_FAMILY.Cascadia,
+        currentItemFontSize: 40,
+      });
+      UI.clickTool("text");
+
+      mouse.clickAt(120, 80);
+
+      const editor = await getTextEditor();
+      const text = h.elements[0] as ExcalidrawTextElement;
+      const lineHeightPx = getLineHeightInPx(text.fontSize, text.lineHeight);
+
+      expect(editor).not.toBe(null);
+      expect(text.y + lineHeightPx / 2).toBe(80);
+    });
+
+    it("should snap newly created text top-left to the current grid cell when clicked with text tool in grid mode", async () => {
+      API.setAppState({
+        currentItemFontFamily: FONT_FAMILY.Cascadia,
+        currentItemFontSize: 40,
+        gridModeEnabled: true,
+        gridSize: 24,
+      });
+      UI.clickTool("text");
+
+      mouse.clickAt(113, 86);
+
+      const editor = await getTextEditor();
+      const text = h.elements[0] as ExcalidrawTextElement;
+
+      expect(editor).not.toBe(null);
+      expect(text.x).toBe(96);
+      expect(text.y).toBe(72);
+    });
+
     it("should edit text under cursor when double-clicked with selection tool", async () => {
       const text = API.createElement({
         type: "text",
@@ -230,6 +291,94 @@ describe("textWysiwyg", () => {
       expect(editor).not.toBe(null);
       expect(h.state.editingTextElement?.id).toBe(text.id);
       expect(h.elements.length).toBe(1);
+    });
+
+    it("should reselect text after exiting wysiwyg with escape", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "ola",
+        x: 60,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      API.setElements([text]);
+      API.setSelectedElements([text]);
+      UI.clickTool("selection");
+
+      Keyboard.keyPress(KEYS.ENTER);
+
+      const editor = await getTextEditor();
+
+      expect(editor).not.toBe(null);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+
+      await exitTextEditorAndAssertSelection({
+        editor,
+        selectedIds: [text.id],
+      });
+    });
+
+    it("should edit selected bound text on single click", async () => {
+      const container = API.createElement({
+        type: "rectangle",
+        width: 160,
+        height: 70,
+        boundElements: [],
+      });
+      const text = API.createElement({
+        type: "text",
+        text: "Hello World!",
+        x: container.x + 20,
+        y: container.y + 20,
+        width: 120,
+        height: 25,
+        containerId: container.id,
+      });
+
+      API.setElements([container, text]);
+      API.updateElement(container, {
+        boundElements: [{ type: "text", id: text.id }],
+      });
+      API.setSelectedElements([container]);
+      UI.clickTool("selection");
+
+      mouse.clickAt(text.x + 26, text.y + 10);
+
+      const editor = await getTextEditor();
+
+      expect(editor).not.toBe(null);
+    });
+
+    it("should not edit selected bound text container when only the container was single-clicked", async () => {
+      const container = API.createElement({
+        type: "rectangle",
+        width: 160,
+        height: 70,
+        boundElements: [],
+      });
+      const text = API.createElement({
+        type: "text",
+        text: "Hello World!",
+        x: container.x + 20,
+        y: container.y + 20,
+        width: 120,
+        height: 25,
+        containerId: container.id,
+      });
+
+      API.setElements([container, text]);
+      API.updateElement(container, {
+        boundElements: [{ type: "text", id: text.id }],
+      });
+      API.setSelectedElements([container]);
+      UI.clickTool("selection");
+
+      mouse.clickAt(container.x + 5, container.y + 10);
+
+      expect(h.state.editingTextElement).toBe(null);
+      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
     });
 
     // FIXME too flaky. No one knows why.
@@ -1205,6 +1354,40 @@ describe("textWysiwyg", () => {
       );
     });
 
+    it.each([
+      {
+        label: "container",
+        createElements: () => API.createTextContainer(),
+      },
+      {
+        label: "arrow",
+        createElements: () => API.createLabeledArrow(),
+      },
+    ])(
+      "should reselect $label after deleting bound text with escape",
+      async ({ createElements }) => {
+        const [selectedElement, text] = createElements();
+        API.setElements([selectedElement, text]);
+        API.setSelectedElements([selectedElement]);
+
+        Keyboard.keyPress(KEYS.ENTER);
+        const editor = await getTextEditor();
+
+        await exitTextEditorAndAssertSelection({
+          editor,
+          nextText: "",
+          selectedIds: [selectedElement.id],
+        });
+
+        expect(selectedElement.boundElements).toStrictEqual([]);
+        expect(h.elements[1]).toEqual(
+          expect.objectContaining({
+            isDeleted: true,
+          }),
+        );
+      },
+    );
+
     it("should restore original container height and clear cache once text is unbind", async () => {
       const container = API.createElement({
         type: "rectangle",
@@ -1511,7 +1694,7 @@ describe("textWysiwyg", () => {
           version: 2,
           width: 610,
           x: 15,
-          y: 25,
+          y: 12.5,
         }),
       );
       expect(h.elements[2] as ExcalidrawTextElement).toEqual(
