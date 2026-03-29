@@ -297,6 +297,9 @@ export const textWysiwyg = ({
   } | null = null;
   let pendingInputRaf: number | null = null;
   let suppressHighlightOnInput = false;
+  //文本框增量换行,逐行渲染2026.3.28
+  const highlightTextThreshold = 20000;
+  let highlightUpdateRaf: number | null = null;
 
   //文本框增量换行,逐行渲染2026.3.28
   const buildOverlayLines = (value: string) => {
@@ -523,6 +526,10 @@ export const textWysiwyg = ({
     }
 
     const value = editable.value;
+    if (value.length > highlightTextThreshold) {
+      highlightOverlay.innerHTML = "";
+      return;
+    }
     const selectionStart = editable.selectionStart;
     const selectionEnd = editable.selectionEnd;
 
@@ -1313,17 +1320,26 @@ export const textWysiwyg = ({
       selectionEnd: editable.selectionEnd ?? editable.selectionStart ?? 0,
     };
   };
+  const scheduleHighlightUpdate = () => {
+    if (highlightUpdateRaf != null) {
+      return;
+    }
+    highlightUpdateRaf = requestAnimationFrame(() => {
+      highlightUpdateRaf = null;
+      updateHighlightOverlay();
+    });
+  };
   const handleInputHighlight = () => {
     if (suppressHighlightOnInput) {
       return;
     }
-    updateHighlightOverlay();
+    scheduleHighlightUpdate();
   };
 
   // 添加事件监听器来触发高亮更新
   editable.addEventListener("input", handleInputHighlight);
   editable.addEventListener("beforeinput", handleBeforeInput);
-  editable.addEventListener("selectionchange", updateHighlightOverlay);
+  editable.addEventListener("selectionchange", scheduleHighlightUpdate);
 
   // 将highlightOverlay添加到DOM中
   if (excalidrawContainer) {
@@ -2479,6 +2495,7 @@ export const textWysiwyg = ({
     editable.onkeydown = null;
     editable.removeEventListener("beforeinput", handleBeforeInput);
     editable.removeEventListener("input", handleInputHighlight);
+    editable.removeEventListener("selectionchange", scheduleHighlightUpdate);
     editable.removeEventListener("keyup", scheduleCaretUpdate);
     editable.removeEventListener("mouseup", scheduleCaretUpdate);
     editable.removeEventListener("focus", scheduleCaretUpdate);
@@ -2486,6 +2503,10 @@ export const textWysiwyg = ({
     if (caretUpdateRaf != null) {
       cancelAnimationFrame(caretUpdateRaf);
       caretUpdateRaf = null;
+    }
+    if (highlightUpdateRaf != null) {
+      cancelAnimationFrame(highlightUpdateRaf);
+      highlightUpdateRaf = null;
     }
 
     if (dblClickCountdownRaf != null) {
