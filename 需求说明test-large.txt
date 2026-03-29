@@ -1,0 +1,140 @@
+## ext-large 数据结构设计方案
+### 一、设计背景
+根据需求，text-large 需要：
+
+- 支持 10 万字以上长文本
+- 使用最简单的换行算法（字符超宽就软换行）
+- 编辑时只关注当前行的处理
+- 行号必须与文本内容同步渲染
+- 快速的编辑响应速度
+### 二、数据结构设计
+```
+// text-large 元素类型
+type ExcalidrawTextLargeElement = _ExcalidrawElementBase & 
+{
+  type: "text-large";
+  
+  // 字体与布局（与现有 text 元素兼容）
+  fontSize: number;
+  fontFamily: FontFamilyValues;
+  textAlign: "left" | "center" | "right";
+  lineHeight: number; // 单位：像素
+  
+  // 尺寸信息
+  width: number;  // 文本框最大宽度
+  height: number; // 文本框最大高度
+  
+  // 核心存储结构：段落数组
+  // 每个段落是一个独立的小文本框，支持独立编辑
+  paragraphs: readonly {
+    text: string;        // 段落原始文本（包含 \n）
+    lineCount: number;    // 该段落包含的行数
+    charStartIndex: number;  // 该段落在整个文本中的字符起始索引
+  }[];
+  
+  // 文本总长度
+  totalCharCount: number;
+  
+  // 渲染版本号（用于增量渲染优化）
+  renderVersion: number;
+  
+  // 增量更新标记
+  lastEditedParagraphIndex: number;  // 最后编辑的段落索引
+  lastEditedAt: number;             // 最后编辑时间戳
+};
+```
+### 三、JSON 存储格式示例
+```
+{
+  "id": "text-large-uuid-123",
+  "type": "text-large",
+  "x": 100,
+  "y": 100,
+  "width": 800,
+  "height": 600,
+  "fontSize": 16,
+  "fontFamily": 17,
+  "textAlign": "left",
+  "lineHeight": 24,
+  "paragraphs": [
+    {
+      "text": "这是第一段的内容。\n第二段的内容在这里。",
+      "lineCount": 2,
+      "charStartIndex": 0
+    },
+    {
+      "text": "这是第二段的内容。",
+      "lineCount": 1,
+      "charStartIndex": 25
+    }
+  ],
+  "totalCharCount": 45,
+  "renderVersion": 1,
+  "lastEditedParagraphIndex": 0,
+  "lastEditedAt": 1701234567890
+}
+```
+### 四、设计理由 1. 为什么使用段落数组而不是纯文本数组
+方案 优点 缺点 段落数组 编辑时只刷新改变的段落 需要维护段落边界 纯行数组 实现简单 每次编辑都要重建所有行数据 单个大文本 完全兼容现有结构 编辑性能差，全量处理
+
+选择段落数组 ：因为它能在编辑性能和存储效率之间取得平衡。
+ 2. 段落划分的原则
+- 段落是用户按 Enter 键创建的逻辑单位
+- 每个段落内部使用"最简单的软换行"：字符超宽就换行
+- 编辑时只影响当前段落，不影响其他段落 3. 关键字段说明
+字段 用途 charStartIndex 快速定位段落在整个文本中的位置 lineCount 快速计算渲染区域和滚动条 renderVersion 检测是否需要完全重绘 lastEditedParagraphIndex 增量渲染的关键索引
+
+### 五、与其他元素的兼容性
+```
+// 在现有类型系统中添加
+export type ExcalidrawElementType = 
+  | "selection" 
+  | "rectangle" 
+  | "diamond" 
+  | "ellipse" 
+  | "line" 
+  | "arrow" 
+  | "freedraw" 
+  | "text" 
+  | "text-large"  // 新增
+  | "image" 
+  | "iframe" 
+  | "frame";
+```
+### 六、版本兼容考虑
+```
+// 向前兼容：旧版本读取新版本数据
+const readTextLargeElement = (element: any): 
+ExcalidrawTextLargeElement => {
+  // 如果是旧版本格式（纯文本），转换为新格式
+  if (typeof element.text === "string" && !element.
+  paragraphs) {
+    return {
+      ...element,
+      type: "text-large",
+      paragraphs: [{
+        text: element.text,
+        lineCount: (element.text.match(/\n/g) || []).
+        length + 1,
+        charStartIndex: 0
+      }],
+      totalCharCount: element.text.length,
+      renderVersion: 1,
+      lastEditedParagraphIndex: 0,
+      lastEditedAt: Date.now()
+    };
+  }
+  return element as ExcalidrawTextLargeElement;
+};
+```
+### 七、性能优化设计
+1. 字符索引缓存 ：利用 charStartIndex 快速定位
+2. 增量渲染 ：通过 lastEditedParagraphIndex 只渲染变化的段落
+3. 懒加载 ：对于超长文本，可以按需加载可见区域的段落
+### 八、总结
+这个数据结构的核心思想是：
+
+- 分段存储 ：将长文本按段落组织，每个段落独立管理
+- 轻量换行 ：使用最简单的软换行算法，减少计算复杂度
+- 增量编辑 ：编辑时只处理当前段落，不影响其他段落
+- 兼容扩展 ：可以在不破坏现有格式的情况下向后兼容

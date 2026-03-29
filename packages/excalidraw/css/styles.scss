@@ -911,12 +911,12 @@ body.excalidraw-cursor-resize * {
   }
 
   .excalidraw-wysiwyg::selection {
-    background: var(--wysiwyg-selection-bg);
+    background: rgba(124, 202, 255, 0.35) !important;
     color: inherit;
   }
 
   .excalidraw-wysiwyg::-moz-selection {
-    background: var(--wysiwyg-selection-bg);
+    background: rgba(124, 202, 255, 0.35) !important;
     color: inherit;
   }
 

@@ -316,6 +316,7 @@ const LayerUI = ({
   const FileNameEditor = ({ baseName }: { baseName: string }) => {
     const savedFileName =
       appState.fileHandle?.name?.replace(/\.excalidraw$/i, "") || "";
+    console.log("[DEBUG] FileNameEditor: appState.fileHandle=", appState.fileHandle, "savedFileName=", savedFileName);
 
     return (
       <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>

@@ -295,6 +295,9 @@ export const textWysiwyg = ({
     selectionStart: number;
     selectionEnd: number;
   } | null = null;
+  //文本框增量换行,逐行渲染2026.3.28
+  let lastSelectionStart: number | null = null;
+  let lastSelectionEnd: number | null = null;
   let pendingInputRaf: number | null = null;
   let suppressHighlightOnInput = false;
   //文本框增量换行,逐行渲染2026.3.28
@@ -1225,12 +1228,8 @@ export const textWysiwyg = ({
         maxHeight: editable.style.maxHeight,
       });
       editable.scrollTop = 0;
-      // For some reason updating font attribute doesn't set font family
-      // hence updating font family explicitly for test environment
-      if (isTestEnv()) {
-        editable.style.fontFamily = getFontFamilyString(updatedTextElement);
-        whitespaceOverlay.style.fontFamily = editable.style.fontFamily;
-      }
+      editable.style.fontFamily = getFontFamilyString(updatedTextElement);
+      whitespaceOverlay.style.fontFamily = editable.style.fontFamily;
 
       app.scene.mutateElement(updatedTextElement, { x: coordX, y: coordY });
       scheduleCaretUpdate();
@@ -1241,6 +1240,7 @@ export const textWysiwyg = ({
 
   editable.dir = "auto";
   editable.tabIndex = 0;
+  editable.spellcheck = false;
   editable.dataset.type = "wysiwyg";
   editable.classList.add("excalidraw-wysiwyg");
 
@@ -1329,8 +1329,31 @@ export const textWysiwyg = ({
       updateHighlightOverlay();
     });
   };
+  //文本框增量换行,逐行渲染2026.3.28
+  const shouldHandleSelectionChange = () => {
+    if (document.activeElement !== editable) {
+      return false;
+    }
+    const selectionStart = editable.selectionStart ?? 0;
+    const selectionEnd = editable.selectionEnd ?? selectionStart;
+    if (
+      lastSelectionStart === selectionStart &&
+      lastSelectionEnd === selectionEnd
+    ) {
+      return false;
+    }
+    lastSelectionStart = selectionStart;
+    lastSelectionEnd = selectionEnd;
+    return true;
+  };
   const handleInputHighlight = () => {
     if (suppressHighlightOnInput) {
+      return;
+    }
+    scheduleHighlightUpdate();
+  };
+  const handleSelectionHighlight = () => {
+    if (!shouldHandleSelectionChange()) {
       return;
     }
     scheduleHighlightUpdate();
@@ -1339,7 +1362,7 @@ export const textWysiwyg = ({
   // 添加事件监听器来触发高亮更新
   editable.addEventListener("input", handleInputHighlight);
   editable.addEventListener("beforeinput", handleBeforeInput);
-  editable.addEventListener("selectionchange", scheduleHighlightUpdate);
+  editable.addEventListener("selectionchange", handleSelectionHighlight);
 
   // 将highlightOverlay添加到DOM中
   if (excalidrawContainer) {
@@ -2117,7 +2140,7 @@ export const textWysiwyg = ({
       event.stopPropagation();
       submittedViaKeyboard = true;
       handleSubmit();
-    } else if (actionSaveToActiveFile.keyTest(event)) {
+    } else if (event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey) {
       event.preventDefault();
       handleSubmit();
       app.actionManager.executeAction(actionSaveToActiveFile);
@@ -2152,9 +2175,10 @@ export const textWysiwyg = ({
   editable.addEventListener("focus", scheduleCaretUpdate);
 
   const onSelectionChange = () => {
-    if (document.activeElement === editable) {
-      scheduleCaretUpdate();
+    if (!shouldHandleSelectionChange()) {
+      return;
     }
+    scheduleCaretUpdate();
   };
   document.addEventListener("selectionchange", onSelectionChange);
 
@@ -2495,7 +2519,7 @@ export const textWysiwyg = ({
     editable.onkeydown = null;
     editable.removeEventListener("beforeinput", handleBeforeInput);
     editable.removeEventListener("input", handleInputHighlight);
-    editable.removeEventListener("selectionchange", scheduleHighlightUpdate);
+    editable.removeEventListener("selectionchange", handleSelectionHighlight);
     editable.removeEventListener("keyup", scheduleCaretUpdate);
     editable.removeEventListener("mouseup", scheduleCaretUpdate);
     editable.removeEventListener("focus", scheduleCaretUpdate);

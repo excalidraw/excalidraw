@@ -102,6 +102,7 @@ export const AllowedExcalidrawActiveTools: Record<
   selection: true,
   lasso: true,
   text: true,
+  "text-large": true,
   rectangle: true,
   diamond: true,
   ellipse: true,
@@ -408,6 +409,18 @@ export const restoreElement = (
       }
 
       return element;
+    case "text-large":
+      return restoreElementWithProperties(element, {
+        fontSize: element.fontSize,
+        fontFamily: element.fontFamily,
+        textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
+        lineHeight: element.lineHeight || getLineHeight(element.fontFamily),
+        paragraphs: element.paragraphs || [],
+        totalCharCount: element.totalCharCount || 0,
+        renderVersion: element.renderVersion || 0,
+        lastEditedParagraphIndex: element.lastEditedParagraphIndex || 0,
+        lastEditedAt: element.lastEditedAt || Date.now(),
+      });
     case "freedraw": {
       return restoreElementWithProperties(element, {
         points: element.points,

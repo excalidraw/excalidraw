@@ -1215,7 +1215,8 @@ export const ShapesSwitcher = ({
             return null;
           }
 
-          const label = t(`toolBar.${value}`);
+          const labelKey = value === "text-large" ? "textLarge" : value;
+          const label = t(`toolBar.${labelKey}`);
           const letter =
             key && capitalizeString(typeof key === "string" ? key : key[0]);
           const shortcut = letter

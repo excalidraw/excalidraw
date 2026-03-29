@@ -148,7 +148,7 @@ export const getDefaultAppState = (): Omit<
     lockedMultiSelections: {},
     activeLockedId: null,
     bindMode: "orbit",
-    highlightWord: true,
+    highlightWord: false,
   };
 };
 

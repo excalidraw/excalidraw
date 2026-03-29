@@ -76,6 +76,7 @@ export enum EVENT {
   HASHCHANGE = "hashchange",
   VISIBILITY_CHANGE = "visibilitychange",
   SCROLL = "scroll",
+  CONTEXT_MENU = "contextmenu",
   // custom events
   EXCALIDRAW_LINK = "excalidraw-link",
   MENU_ITEM_SELECT = "menu.itemSelect",
@@ -471,6 +472,7 @@ export const TOOL_TYPE = {
   line: "line",
   freedraw: "freedraw",
   text: "text",
+  "text-large": "text-large",
   image: "image",
   eraser: "eraser",
   hand: "hand",

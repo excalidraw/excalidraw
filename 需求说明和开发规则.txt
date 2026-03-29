@@ -1008,18 +1008,31 @@ Canvas 元素未就绪
 违反根本原则:所有文本框都不要区别对待;都使用相同的处理策略;
 
 
-.\start-electron-dev.bat
+
+
+
+开发一种新的文本框,这个文本框不需要旋转,就是为了显示十万字以上的长文本
+在这个文本框中使用"最简单的"换行算法某个字符的长度超过文本框的宽度就把这个字符软换行到下一行;
+这个文本框的行号一行内容必须同时渲染,防止出现行号渲染比文本内容出现快的情况;(行号具有目前的文本框的行号的功能)
+这个文本框编辑响应速度一定要够快
+将这个文本框视为由一行一行旧文本框拼出来的大文本框,编辑时,只关注编辑的这一行内容的处理,确保编辑速度;
+在命令面板(ctrl+shift+p)使用text-large来调出这个文本框
+在excalidraw文件中使用text-large标签来存储这个文本框;
+
+
+
 
 启动:
+.\start-electron-dev.bat
 yarn electron:build:win
-yarn install
 yarn --cwd ./excalidraw-app vite --port 3000 --strictPort
 http://localhost:3000/
 for /f "tokens=5" %a in ('netstat -ano ^| findstr :3000') do taskkill /F /PID %a
 for /f "tokens=5" %a in ('netstat -ano ^| findstr :3001') do taskkill /F /PID %a
+yarn install
 安装依赖
 yarn install
-yarn electron:install
+yarn electron:install 
 start-electron-dev.bat
 yarn electron:dev
 yarn electron:build:win

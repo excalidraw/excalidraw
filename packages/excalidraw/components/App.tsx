@@ -133,6 +133,7 @@ import {
   newImageElement,
   newLinearElement,
   newTextElement,
+  newTextLargeElement,
   refreshTextDimensions,
   deepCopyElement,
   duplicateElements,
@@ -156,6 +157,7 @@ import {
   isFlowchartNodeElement,
   isBindableElement,
   isTextElement,
+  isTextLargeElement,
   getNormalizedDimensions,
   isElementCompletelyInViewport,
   isElementInViewport,
@@ -270,6 +272,7 @@ import type {
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  ExcalidrawTextLargeElement,
   NonDeleted,
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
@@ -395,6 +398,8 @@ import {
   parseLibraryJSON,
   SVGStringToFile,
 } from "../data/blob";
+
+import { serializeAsJSON } from "../data/json";
 
 import { fileOpen } from "../data/filesystem";
 import {
@@ -2990,6 +2995,13 @@ class App extends React.Component<AppProps, AppState> {
     if (!this.state.isLoading) {
       this.setState({ isLoading: true });
     }
+
+    const lastFile = await this.loadFileFromLocalStorage();
+    if (lastFile) {
+      await this.loadFileToCanvas(lastFile.file, null);
+      return;
+    }
+
     let initialData = null;
     try {
       if (typeof this.props.initialData === "function") {
@@ -3337,6 +3349,9 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(document, EVENT.POINTER_UP, this.removePointer, {
         passive: false,
       }), // #3553
+      addEventListener(document, EVENT.CONTEXT_MENU, (event) => {
+        event.preventDefault();
+      }, false),
       addEventListener(document, EVENT.COPY, this.onCopy, { passive: false }),
       addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
       addEventListener(
@@ -6608,6 +6623,122 @@ class App extends React.Component<AppProps, AppState> {
     updateElementDimensionsThrottled(element.originalText);
   }
 
+  private async handleTextLargeWysiwyg(
+    element: ExcalidrawTextLargeElement,
+    { isExistingElement = false }: { isExistingElement?: boolean },
+  ) {
+    console.log("[DEBUG] handleTextLargeWysiwyg called", { element, isExistingElement });
+    const { textLargeWysiwyg } = await import("../wysiwyg/textLargeWysiwyg");
+
+    const updateElement = (nextText: string, isDeleted: boolean) => {
+      this.scene.replaceAllElements([
+        ...this.scene.getElementsIncludingDeleted().map((_element) => {
+          if (_element.id === element.id && isTextLargeElement(_element)) {
+            const font = getFontString(_element);
+            const lineHeightPx = getLineHeightInPx(
+              _element.fontSize,
+              _element.lineHeight as ExcalidrawTextElement["lineHeight"],
+            );
+
+            let maxWidth = 0;
+            let totalHeight = 0;
+            const paragraphs = nextText.split("\n").map((text) => {
+              if (!text) {
+                totalHeight += lineHeightPx;
+                return { text, lineCount: 1, charStartIndex: 0 };
+              }
+              const wrapped = wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
+                text,
+                font,
+                _element.width,
+              );
+              const lineCount = wrapped.lines.length;
+              totalHeight += lineCount * lineHeightPx;
+              wrapped.lines.forEach((line) => {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                if (ctx) {
+                  ctx.font = font;
+                  const lineWidth = ctx.measureText(line).width;
+                  if (lineWidth > maxWidth) {
+                    maxWidth = lineWidth;
+                  }
+                }
+              });
+              return { text, lineCount, charStartIndex: 0 };
+            });
+
+            const MIN_WIDTH = 100;
+            const MIN_HEIGHT = lineHeightPx;
+            const newWidth = Math.max(MIN_WIDTH, maxWidth);
+            const newHeight = Math.max(MIN_HEIGHT, totalHeight);
+
+            return newElementWith(_element, {
+              paragraphs,
+              width: newWidth,
+              height: newHeight,
+              totalCharCount: nextText.length,
+              renderVersion: _element.renderVersion + 1,
+              lastEditedParagraphIndex: paragraphs.length - 1,
+              lastEditedAt: Date.now(),
+            });
+          }
+          return _element;
+        }),
+      ]);
+    };
+
+    const getViewportCoords = (x: number, y: number): [number, number] => {
+      const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
+        { sceneX: x, sceneY: y },
+        this.state,
+      );
+      return [
+        viewportX - this.state.offsetLeft,
+        viewportY - this.state.offsetTop,
+      ] as [number, number];
+    };
+
+    const getTextFromElement = (el: ExcalidrawTextLargeElement) => {
+      return el.paragraphs.map((p) => p.text).join("\n");
+    };
+
+    const submitFn = textLargeWysiwyg({
+      id: element.id,
+      element,
+      getText: () => getTextFromElement(element),
+      onChange: withBatchedUpdates((nextText) => {
+        updateElement(nextText, false);
+      }),
+      onSubmit: withBatchedUpdates(({ viaKeyboard, nextText }) => {
+        const isDeleted = !nextText.trim();
+        updateElement(nextText, isDeleted);
+
+        this.setState((prevState) => ({
+          selectedElementIds: makeNextSelectedElementIds(
+            { [element.id]: !isDeleted as true },
+            prevState,
+          ),
+          editingTextElement: null,
+        }));
+
+        if (!this.state.activeTool.locked) {
+          this.setState({
+            activeTool: updateActiveTool(this.state, {
+              type: this.state.preferredSelectionTool.type,
+            }),
+          });
+        }
+
+        this.focusContainer();
+      }),
+      getViewportCoords,
+      canvas: this.canvas,
+      excalidrawContainer: this.excalidrawContainerRef.current,
+      app: this,
+    });
+  };
+
   private focusTextEditorAtLine = (lineNumber: number) => {
     const editor = document.querySelector(
       ".excalidraw-wysiwyg",
@@ -7324,6 +7455,10 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasDoubleClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
   ) => {
+    console.log("[DEBUG] handleCanvasDoubleClick called", {
+      activeTool: this.state.activeTool.type,
+      preferredSelectionTool: this.state.preferredSelectionTool.type,
+    });
     const { elementId, at } = this.suppressNextSelectedTextDoubleClick;
     if (elementId && Date.now() - at < 800) {
       const { x, y } = viewportCoordsToSceneCoords(event, this.state);
@@ -7475,11 +7610,26 @@ class App extends React.Component<AppProps, AppState> {
     resetCursor(this.interactiveCanvas);
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
       const hitElement = this.getElementAtPosition(sceneX, sceneY);
+      console.log("[DEBUG] handleCanvasDoubleClick hitElement:", hitElement?.type, hitElement?.id);
 
       if (isIframeLikeElement(hitElement)) {
         this.setState({
           activeEmbeddable: { element: hitElement, state: "active" },
         });
+        return;
+      }
+
+      if (hitElement && isTextLargeElement(hitElement)) {
+        console.log("[DEBUG] hitElement is text-large, opening editor");
+        this.setState({
+          selectedElementIds: makeNextSelectedElementIds(
+            { [hitElement.id]: true },
+            this.state,
+          ),
+          selectedGroupIds: {},
+          editingTextElement: hitElement,
+        });
+        this.handleTextLargeWysiwyg(hitElement, { isExistingElement: true });
         return;
       }
 
@@ -8432,6 +8582,10 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    console.log("[DEBUG] handleCanvasPointerDown", {
+      activeTool: this.state.activeTool.type,
+      pointerType: event.pointerType,
+    });
     suppressNextContextMenuFromRightPan = false;
     // If Ctrl is not held, ensure isBindingEnabled reflects the user preference.
     if (!event.ctrlKey) {
@@ -8791,7 +8945,7 @@ class App extends React.Component<AppProps, AppState> {
         });
         pointerDownState.hit.wasAddedToSelection = true;
       }
-    } else if (this.state.activeTool.type === "text") {
+    } else if (this.state.activeTool.type === "text" || this.state.activeTool.type === "text-large") {
       this.handleTextOnPointerDown(event, pointerDownState);
     } else if (
       this.state.activeTool.type === "arrow" ||
@@ -9142,7 +9296,7 @@ class App extends React.Component<AppProps, AppState> {
         isPanning = false;
         isRightClickPanning = false;
         rightClickAnchorScene = null;
-        if (didRightClickDragPan || didRightClickZoom) {
+        if (didRightClickDragPan || didRightClickZoom || isRightClickPanning) {
           suppressNextContextMenuFromRightPan = true;
           suppressNextContextMenuFromRightPanAt = Date.now();
         }
@@ -9790,6 +9944,19 @@ class App extends React.Component<AppProps, AppState> {
       includeBoundTextElement: true,
     });
 
+    if (element && isTextLargeElement(element)) {
+      this.setState({
+        selectedElementIds: makeNextSelectedElementIds(
+          { [element.id]: true },
+          this.state,
+        ),
+        selectedGroupIds: {},
+        editingTextElement: element,
+      });
+      this.handleTextLargeWysiwyg(element, { isExistingElement: true });
+      return;
+    }
+
     // FIXME
     let container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
 
@@ -9805,6 +9972,70 @@ class App extends React.Component<AppProps, AppState> {
       container,
       autoEdit: false,
     });
+
+    resetCursor(this.interactiveCanvas);
+    if (!this.state.activeTool.locked) {
+      this.setState({
+        activeTool: updateActiveTool(this.state, {
+          type: this.state.preferredSelectionTool.type,
+        }),
+      });
+    }
+  };
+
+  private handleTextLargeOnPointerDown = (
+    event: React.PointerEvent<HTMLElement>,
+    pointerDownState: PointerDownState,
+  ): void => {
+    if (this.state.editingTextElement) {
+      return;
+    }
+
+    const sceneX = pointerDownState.origin.x;
+    const sceneY = pointerDownState.origin.y;
+
+    const existingElement = this.getElementAtPosition(sceneX, sceneY, {
+      includeBoundTextElement: true,
+    });
+
+    if (existingElement && isTextLargeElement(existingElement)) {
+      this.setState({
+        selectedElementIds: makeNextSelectedElementIds(
+          { [existingElement.id]: true },
+          this.state,
+        ),
+        selectedGroupIds: {},
+        editingTextElement: existingElement,
+      });
+
+      this.handleTextLargeWysiwyg(existingElement, {
+        isExistingElement: true,
+      });
+    } else {
+      const textLargeElement = newTextLargeElement({
+        x: sceneX,
+        y: sceneY,
+        width: 800,
+        height: 600,
+        strokeColor: this.state.currentItemStrokeColor,
+        backgroundColor: "transparent",
+      });
+
+      this.scene.insertElements([textLargeElement]);
+
+      this.setState({
+        selectedElementIds: makeNextSelectedElementIds(
+          { [textLargeElement.id]: true },
+          this.state,
+        ),
+        selectedGroupIds: {},
+        editingTextElement: textLargeElement,
+      });
+
+      this.handleTextLargeWysiwyg(textLargeElement, {
+        isExistingElement: false,
+      });
+    }
 
     resetCursor(this.interactiveCanvas);
     if (!this.state.activeTool.locked) {
@@ -13368,11 +13599,52 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private saveFileToLocalStorage = (
+    file: File,
+    data: { elements: ExcalidrawElement[]; appState?: any },
+  ) => {
+    try {
+      const fileName = file.name?.replace(/\.excalidraw$/i, "") || "Untitled";
+      const json = serializeAsJSON(
+        data.elements || [],
+        data.appState || {},
+        {},
+        "local",
+      );
+      localStorage.setItem("excalidraw.lastFileName", fileName);
+      localStorage.setItem("excalidraw.lastFileContent", json);
+      console.log("[DEBUG] File saved to localStorage:", fileName);
+    } catch (error) {
+      console.error("[DEBUG] Failed to save file to localStorage:", error);
+    }
+  };
+
+  private loadFileFromLocalStorage = async () => {
+    try {
+      const fileName = localStorage.getItem("excalidraw.lastFileName");
+      const fileContent = localStorage.getItem("excalidraw.lastFileContent");
+      console.log("[DEBUG] loadFileFromLocalStorage: fileName=", fileName, "hasContent=", !!fileContent);
+      if (fileName && fileContent) {
+        console.log("[DEBUG] Loading file from localStorage:", fileName);
+        const blob = new Blob([fileContent], { type: MIME_TYPES.excalidraw });
+        const file = new File([blob], `${fileName}.excalidraw`, {
+          type: MIME_TYPES.excalidraw,
+        });
+        console.log("[DEBUG] Created file object with name:", file.name);
+        return { file, fileName };
+      }
+    } catch (error) {
+      console.error("[DEBUG] Failed to load file from localStorage:", error);
+    }
+    return null;
+  };
+
   loadFileToCanvas = async (
     file: File,
     fileHandle: FileSystemFileHandle | null,
   ) => {
     file = await normalizeFile(file);
+    console.log("[DEBUG] loadFileToCanvas called:", file.name, "fileHandle:", fileHandle);
     try {
       const elements = this.scene.getElementsIncludingDeleted();
       let ret;
@@ -13383,6 +13655,11 @@ class App extends React.Component<AppProps, AppState> {
           elements,
           fileHandle,
         );
+
+        console.log("[DEBUG] loadSceneOrLibraryFromBlob returned:", ret?.type);
+        if (ret?.type === MIME_TYPES.excalidraw) {
+          this.saveFileToLocalStorage(file, ret.data);
+        }
       } catch (error: any) {
         const imageSceneDataError = error instanceof ImageSceneDataError;
         if (
@@ -13420,16 +13697,30 @@ class App extends React.Component<AppProps, AppState> {
           appState: undefined,
         });
 
+        const fileName = file.name?.replace(/\.excalidraw$/i, "") || "";
+        const mockFileHandle = fileName
+          ? ({ name: fileName } as FileSystemFileHandle)
+          : null;
+
+        console.log("[DEBUG] About to set fileHandle:", mockFileHandle, "name:", fileName);
+
         this.setState({ isLoading: true });
+
+        const finalAppState = {
+          ...(ret.data.appState || this.state),
+          isLoading: false,
+          fileHandle: mockFileHandle || ret.data.appState?.fileHandle || null,
+          name: fileName || this.state.name,
+        };
+        console.log("[DEBUG] finalAppState.fileHandle:", finalAppState.fileHandle);
+
         this.syncActionResult({
           ...ret.data,
-          appState: {
-            ...(ret.data.appState || this.state),
-            isLoading: false,
-          },
+          appState: finalAppState,
           replaceFiles: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
+        console.log("[DEBUG] syncActionResult called with fileHandle:", mockFileHandle);
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library
           .updateLibrary({

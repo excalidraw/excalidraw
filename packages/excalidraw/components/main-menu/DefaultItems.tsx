@@ -71,23 +71,7 @@ export const LoadScene = () => {
   }
 
   const handleSelect = async () => {
-    if (
-      !elements.length ||
-      (await openConfirmModal({
-        title: t("overwriteConfirm.modal.loadFromFile.title"),
-        actionLabel: t("overwriteConfirm.modal.loadFromFile.button"),
-        color: "warning",
-        description: (
-          <Trans
-            i18nKey="overwriteConfirm.modal.loadFromFile.description"
-            bold={(text) => <strong>{text}</strong>}
-            br={() => <br />}
-          />
-        ),
-      }))
-    ) {
-      actionManager.executeAction(actionLoadScene);
-    }
+    actionManager.executeAction(actionLoadScene);
   };
 
   return (

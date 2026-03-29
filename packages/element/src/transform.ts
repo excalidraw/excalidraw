@@ -294,8 +294,8 @@ const bindLinearElementToElement = (
           x: startX,
           y: startY,
           type: "text",
-          ...existingElement,
-          ...start,
+          ...(existingElement?.type === "text" ? existingElement : {}),
+          ...(start.type === "text" ? start : {}),
           text,
         });
         // to position the text correctly when coordinates not provided
@@ -303,6 +303,8 @@ const bindLinearElementToElement = (
           x: start.x || linearElement.x - startBoundElement.width,
           y: start.y || linearElement.y - startBoundElement.height / 2,
         });
+      } else if (startType === "text-large") {
+        // text-large does not support binding
       } else {
         switch (startType) {
           case "rectangle":
@@ -322,7 +324,7 @@ const bindLinearElementToElement = (
           default: {
             assertNever(
               linearElement as never,
-              `Unhandled element start type "${start.type}"`,
+              `Unhandled element start type "${startType}"`,
               true,
             );
           }
@@ -371,14 +373,16 @@ const bindLinearElementToElement = (
           x: endX,
           y: endY,
           type: "text",
-          ...existingElement,
-          ...end,
+          ...(existingElement?.type === "text" ? existingElement : {}),
+          ...(end.type === "text" ? end : {}),
           text,
         });
         // to position the text correctly when coordinates not provided
         Object.assign(endBoundElement, {
           y: end.y || linearElement.y - endBoundElement.height / 2,
         });
+      } else if (endType === "text-large") {
+        // text-large does not support binding
       } else {
         switch (endType) {
           case "rectangle":

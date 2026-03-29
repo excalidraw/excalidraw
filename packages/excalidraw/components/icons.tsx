@@ -439,11 +439,24 @@ export const TextSizeIcon = createIcon(
   <g stroke="currentColor" strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M3 7v-2h13v2" />
-    <path d="M10 5v14" />
-    <path d="M12 19h-4" />
-    <path d="M15 13v-1h6v1" />
-    <path d="M18 12v7" />
-    <path d="M17 19h2" />
+    <line x1="10" y1="5" x2="10" y2="14" />
+    <line x1="12" y1="19" x2="8" y2="19" />
+    <line x1="15" y1="13" x2="15" y2="12" />
+    <line x1="18" y1="12" x2="21" y2="12" />
+    <line x1="18" y1="7" x2="18" y2="19" />
+    <line x1="21" y1="19" x2="17" y2="19" />
+  </g>,
+  tablerIconProps,
+);
+
+export const TextLargeIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="4" y1="22" x2="8" y2="22" />
+    <line x1="16" y1="22" x2="22" y2="22" />
+    <line x1="6.9" y1="14" x2="13.8" y2="14" />
+    <line x1="10.2" y1="5" x2="16" y2="22" />
+    <polyline points="5 22 12 2 15 2 22 22"></polyline>
   </g>,
   tablerIconProps,
 );

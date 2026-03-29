@@ -21,6 +21,7 @@ import { Tooltip } from "../components/Tooltip";
 import { ExportIcon, questionCircle, saveAs } from "../components/icons";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { isImageFileHandle } from "../data/blob";
+import { serializeAsJSON } from "../data/json";
 import { nativeFileSystemSupported } from "../data/filesystem";
 
 import { resaveAsImageWithScene } from "../data/resave";
@@ -303,9 +304,13 @@ export const actionSaveToActiveFile = register({
   icon: ExportIcon,
   trackEvent: { category: "export" },
   predicate: (elements, appState, props, app) => {
-    return (
-      !!app.props.UIOptions.canvasActions.saveToActiveFile &&
-      !!appState.fileHandle &&
+    const previousFileHandle = appState.fileHandle;
+    const isMockFileHandle =
+      previousFileHandle &&
+      !("getFile" in previousFileHandle && typeof previousFileHandle.getFile === "function");
+    return !!(
+      app.props.UIOptions.canvasActions.saveToActiveFile &&
+      (!!appState.fileHandle || isMockFileHandle) &&
       !appState.viewModeEnabled
     );
   },
@@ -322,17 +327,31 @@ export const actionSaveToActiveFile = register({
       prepareDataForJSONExport(elements, appState, app.files, app);
 
     try {
-      const { fileHandle } = isImageFileHandle(previousFileHandle)
-        ? await resaveAsImageWithScene(
-            exportedDataPromise,
-            previousFileHandle,
-            filename,
-          )
-        : await saveAsJSON({
-            data: exportedDataPromise,
-            filename,
-            fileHandle: previousFileHandle,
-          });
+      let fileHandle = previousFileHandle;
+      const isMockFileHandle =
+        previousFileHandle &&
+        !("getFile" in previousFileHandle && typeof previousFileHandle.getFile === "function");
+
+      if (isMockFileHandle) {
+        const data = await exportedDataPromise;
+        const json = serializeAsJSON(data.elements, data.appState || {}, data.files || {}, "local");
+        localStorage.setItem("excalidraw.lastFileName", filename);
+        localStorage.setItem("excalidraw.lastFileContent", json);
+        console.log("[DEBUG] Saved to localStorage:", filename);
+      } else {
+        const result = isImageFileHandle(previousFileHandle)
+          ? await resaveAsImageWithScene(
+              exportedDataPromise,
+              previousFileHandle,
+              filename,
+            )
+          : await saveAsJSON({
+              data: exportedDataPromise,
+              filename,
+              fileHandle: previousFileHandle,
+            });
+        fileHandle = result.fileHandle;
+      }
 
       return {
         captureUpdate: CaptureUpdateAction.NEVER,
@@ -453,9 +472,22 @@ export const actionLoadScene = register({
         appState: loadedAppState,
         files,
       } = await loadFromJSON(appState, elements);
+
+      const fileName = loadedAppState?.name || "Untitled";
+      const mockFileHandle = { name: fileName } as FileSystemFileHandle;
+
+      try {
+        const json = serializeAsJSON(loadedElements, loadedAppState || {}, files || {}, "local");
+        localStorage.setItem("excalidraw.lastFileName", fileName);
+        localStorage.setItem("excalidraw.lastFileContent", json);
+        console.log("[DEBUG] loadScene saved to localStorage:", fileName);
+      } catch (e) {
+        console.error("[DEBUG] Failed to save to localStorage:", e);
+      }
+
       return {
         elements: loadedElements,
-        appState: loadedAppState,
+        appState: { ...loadedAppState, fileHandle: mockFileHandle },
         files,
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };

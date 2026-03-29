@@ -363,6 +363,8 @@ export class API {
       case "magicframe":
         element = newMagicFrameElement({ ...base, width, height });
         break;
+      case "text-large":
+        break;
       default:
         assertNever(
           type,

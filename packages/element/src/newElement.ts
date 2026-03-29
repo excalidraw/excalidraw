@@ -31,6 +31,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ExcalidrawTextElement,
+  ExcalidrawTextLargeElement,
   ExcalidrawLinearElement,
   ExcalidrawGenericElement,
   NonDeleted,
@@ -48,6 +49,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
+  ExcalidrawTextLargeParagraph,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -549,4 +551,50 @@ export const newImageElement = (
     scale: opts.scale ?? [1, 1],
     crop: opts.crop ?? null,
   };
+};
+
+export const newTextLargeElement = (
+  opts: {
+    text?: string;
+    fontSize?: number;
+    fontFamily?: FontFamilyValues;
+    textAlign?: TextAlign;
+    lineHeight?: number;
+    width?: number;
+    height?: number;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawTextLargeElement> => {
+  const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
+  const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
+  const lineHeight = opts.lineHeight || getLineHeight(fontFamily);
+  const text = opts.text || "";
+  const textAlign = opts.textAlign || DEFAULT_TEXT_ALIGN;
+
+  const paragraphs: ExcalidrawTextLargeParagraph[] = [
+    {
+      text,
+      lineCount: 1,
+      charStartIndex: 0,
+    },
+  ];
+
+  const textLargeElementProps: ExcalidrawTextLargeElement = {
+    ..._newElementBase<ExcalidrawTextLargeElement>("text-large", opts),
+    fontSize,
+    fontFamily,
+    textAlign,
+    lineHeight,
+    paragraphs,
+    totalCharCount: text.length,
+    renderVersion: 1,
+    lastEditedParagraphIndex: 0,
+    lastEditedAt: getUpdatedTimestamp(),
+  };
+
+  const textLargeElement: NonDeleted<ExcalidrawTextLargeElement> = newElementWith(
+    textLargeElementProps,
+    {},
+  );
+
+  return textLargeElement;
 };

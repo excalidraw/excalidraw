@@ -192,6 +192,7 @@ export type ExcalidrawRectanguloidElement =
   | ExcalidrawRectangleElement
   | ExcalidrawImageElement
   | ExcalidrawTextElement
+  | ExcalidrawTextLargeElement
   | ExcalidrawFreeDrawElement
   | ExcalidrawIframeLikeElement
   | ExcalidrawFrameLikeElement
@@ -206,6 +207,7 @@ export type ExcalidrawRectanguloidElement =
 export type ExcalidrawElement =
   | ExcalidrawGenericElement
   | ExcalidrawTextElement
+  | ExcalidrawTextLargeElement
   | ExcalidrawLinearElement
   | ExcalidrawArrowElement
   | ExcalidrawFreeDrawElement
@@ -254,6 +256,26 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      *  with font size (using `getLineHeightInPx` helper).
      */
     lineHeight: number & { _brand: "unitlessLineHeight" };
+  }>;
+
+export type ExcalidrawTextLargeParagraph = Readonly<{
+  text: string;
+  lineCount: number;
+  charStartIndex: number;
+}>;
+
+export type ExcalidrawTextLargeElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "text-large";
+    fontSize: number;
+    fontFamily: FontFamilyValues;
+    textAlign: TextAlign;
+    lineHeight: number;
+    paragraphs: readonly ExcalidrawTextLargeParagraph[];
+    totalCharCount: number;
+    renderVersion: number;
+    lastEditedParagraphIndex: number;
+    lastEditedAt: number;
   }>;
 
 export type ExcalidrawBindableElement =

@@ -56,6 +56,7 @@ import { getLineHeightInPx } from "./textMeasurements";
 import { wrapTextPreservingWhitespaceWithExplicitNewlineMarkers } from "./textWrapping";
 import {
   isTextElement,
+  isTextLargeElement,
   isLinearElement,
   isFreeDrawElement,
   isInitializedImageElement,
@@ -72,6 +73,7 @@ import { ShapeCache } from "./shape";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
+  ExcalidrawTextLargeElement,
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
@@ -520,7 +522,8 @@ const getCanvasPadding = (element: ExcalidrawElement) => {
   switch (element.type) {
     case "freedraw":
       return element.strokeWidth * 12;
-    case "text": {
+    case "text":
+    case "text-large": {
       return element.fontSize / 2;
     }
     case "arrow":
@@ -1266,6 +1269,74 @@ const drawElementOnCanvas = (
         if (shouldTemporarilyAttach) {
           context.canvas.remove();
         }
+      } else if (isTextLargeElement(element)) {
+        const textLargeElement = element as ExcalidrawTextLargeElement;
+        const font = getFontString(textLargeElement);
+        const lineHeightPx = getLineHeightInPx(
+          textLargeElement.fontSize,
+          textLargeElement.lineHeight as ExcalidrawTextElement["lineHeight"],
+        );
+
+        const horizontalOffset =
+          textLargeElement.textAlign === "center"
+            ? textLargeElement.width / 2
+            : textLargeElement.textAlign === "right"
+            ? textLargeElement.width
+            : 0;
+
+        const verticalOffset = getVerticalOffset(
+          textLargeElement.fontFamily,
+          textLargeElement.fontSize,
+          lineHeightPx,
+        );
+
+        context.save();
+        context.font = font;
+        context.fillStyle =
+          renderConfig.theme === THEME.DARK
+            ? applyDarkModeFilter(textLargeElement.strokeColor)
+            : textLargeElement.strokeColor;
+        context.textAlign = textLargeElement.textAlign as CanvasTextAlign;
+
+        let currentY = verticalOffset;
+
+        for (const paragraph of textLargeElement.paragraphs) {
+          if (!paragraph || !paragraph.text) {
+            currentY += lineHeightPx;
+            continue;
+          }
+
+          const lines = wrapTextPreservingWhitespaceWithExplicitNewlineMarkers(
+            paragraph.text,
+            font,
+            textLargeElement.width,
+          ).lines;
+
+          for (const line of lines) {
+            context.fillText(line, horizontalOffset, currentY);
+            currentY += lineHeightPx;
+          }
+        }
+
+        if (!renderConfig.isExporting) {
+          const decorationColor = applyAlphaToColor(
+            appState.textBoxDecorationsColor,
+            0.55,
+          );
+
+          context.save();
+          context.strokeStyle = decorationColor;
+          context.lineWidth = 1;
+          context.setLineDash([4, 2]);
+          context.strokeRect(
+            0.5,
+            0.5,
+            Math.max(0, textLargeElement.width - 1),
+            Math.max(0, textLargeElement.height - 1),
+          );
+          context.restore();
+        }
+        context.restore();
       } else {
         throw new Error(`Unimplemented type ${element.type}`);
       }
@@ -1629,6 +1700,7 @@ export const renderElement = (
     case "arrow":
     case "image":
     case "text":
+    case "text-large":
     case "iframe":
     case "embeddable": {
       if (renderConfig.isExporting) {

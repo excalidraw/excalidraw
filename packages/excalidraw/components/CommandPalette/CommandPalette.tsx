@@ -559,8 +559,9 @@ function CommandPaletteInner({
             key && capitalizeString(typeof key === "string" ? key : key[0]);
           const shortcut = letter || numericKey;
 
+          const labelKey = value === "text-large" ? "textLarge" : value;
           const command: CommandPaletteItem = {
-            label: t(`toolBar.${value}`),
+            label: t(`toolBar.${labelKey}`),
             category: DEFAULT_CATEGORIES.tools,
             shortcut,
             icon,

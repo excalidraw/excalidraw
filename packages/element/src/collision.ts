@@ -435,13 +435,14 @@ export const intersectElementWithLineSegment = (
     case "rectangle":
     case "image":
     case "text":
+    case "text-large":
     case "iframe":
     case "embeddable":
     case "frame":
     case "selection":
     case "magicframe":
       return intersectRectanguloidWithLineSegment(
-        element,
+        element as ExcalidrawRectanguloidElement,
         elementsMap,
         line,
         offset,
