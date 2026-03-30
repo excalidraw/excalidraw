@@ -1317,6 +1317,59 @@ export const resizeMultipleElements = (
       scaleY = scale;
     }
 
+    let minScaleX = 0;
+    let minScaleY = 0;
+
+    for (const { orig } of targetElements) {
+      // Standalone text elements: only constrain width (matching
+      // resizeSingleTextElement which has no height minimum)
+      if (isTextElement(orig) && !isBoundToContainer(orig)) {
+        const minTextWidth = getMinTextElementWidth(
+          getFontString(orig),
+          orig.lineHeight,
+        );
+        minScaleX = Math.max(minScaleX, minTextWidth / Math.max(orig.width, 1));
+        continue;
+      }
+
+      // Skip linear elements (arrows/lines) — their bound text is positioned
+      // alongside, not inside, so the element dimensions don't constrain it.
+      // This matches resizeSingleElement which only enforces min size for
+      // non-linear containers.
+      if (isLinearElement(orig)) {
+        continue;
+      }
+
+      const boundTextElement = originalElementsMap.get(
+        getBoundTextElementId(orig) ?? "",
+      ) as ExcalidrawTextElementWithContainer | undefined;
+
+      if (!boundTextElement) {
+        continue;
+      }
+
+      const minWidth = getApproxMinLineWidth(
+        getFontString(boundTextElement),
+        boundTextElement.lineHeight,
+      );
+      const minHeight = getApproxMinLineHeight(
+        boundTextElement.fontSize,
+        boundTextElement.lineHeight,
+      );
+
+      minScaleX = Math.max(minScaleX, minWidth / Math.max(orig.width, 1));
+      minScaleY = Math.max(minScaleY, minHeight / Math.max(orig.height, 1));
+    }
+
+    scaleX = Math.max(scaleX, minScaleX);
+    scaleY = Math.max(scaleY, minScaleY);
+
+    if (keepAspectRatio) {
+      const minScale = Math.max(scaleX, scaleY);
+      scaleX = minScale;
+      scaleY = minScale;
+    }
+
     /**
      * to flip an element:
      * 1. determine over which axis is the element being flipped

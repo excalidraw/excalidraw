@@ -5,6 +5,7 @@ import {
   type Bounds,
   KEYS,
   getSizeFromPoints,
+  getFontString,
   reseed,
   arrayToMap,
 } from "@excalidraw/common";
@@ -22,6 +23,7 @@ import { isLinearElement } from "../src/typeChecks";
 import { resizeSingleElement } from "../src/resizeElements";
 import { LinearElementEditor } from "../src/linearElementEditor";
 import { getElementPointsCoords } from "../src/bounds";
+import { getMinTextElementWidth } from "../src/textMeasurements";
 
 import type {
   ExcalidrawElbowArrowElement,
@@ -1254,6 +1256,38 @@ describe("multiple selection", () => {
     expect(ellipse.width).toBeCloseTo(140 * scale);
     expect(ellipse.height).toBeCloseTo(80 * scale);
     expect(ellipse.angle).toEqual(0);
+  });
+
+  // Regression test for https://github.com/excalidraw/excalidraw/issues/6363
+  it("does not resize multi-selection below text element min width", async () => {
+    const rectangle = UI.createElement("rectangle", {
+      position: 0,
+      width: 200,
+      height: 100,
+    });
+
+    const text = UI.createElement("text", {
+      x: 20,
+      y: 30,
+    });
+    await UI.editText(text, "hello world");
+
+    const minTextWidth = getMinTextElementWidth(
+      getFontString(text),
+      text.lineHeight,
+    );
+
+    // Attempt to shrink the selection far below the text's minimum width.
+    // Move SE handle left by 190px (nearly collapsing a 200px-wide selection).
+    UI.resize([rectangle, text], "se", [-190, -90], { shift: true });
+
+    // The text element's width must never go below its minimum
+    expect(text.width).toBeGreaterThanOrEqual(minTextWidth - 0.5);
+
+    // The rectangle should also be constrained (uniform scaling means the
+    // entire selection stops shrinking together)
+    expect(rectangle.width).toBeGreaterThan(0);
+    expect(rectangle.height).toBeGreaterThan(0);
   });
 
   it("flips while resizing", async () => {
