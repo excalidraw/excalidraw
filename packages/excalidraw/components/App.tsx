@@ -2153,6 +2153,9 @@ class App extends React.Component<AppProps, AppState> {
                             onLockToggle={this.toggleLock}
                             onPenModeToggle={this.togglePenMode}
                             onHandToolToggle={this.onHandToolToggle}
+                            onCollaboratorsCursorsHiddenToggle={
+                              this.toggleCollaboratorsCursors
+                            }
                             langCode={getLanguage().code}
                             renderTopLeftUI={renderTopLeftUI}
                             renderTopRightUI={renderTopRightUI}
@@ -4271,6 +4274,12 @@ class App extends React.Component<AppProps, AppState> {
 
   onHandToolToggle = () => {
     this.actionManager.executeAction(actionToggleHandTool);
+  };
+
+  toggleCollaboratorsCursors = () => {
+    this.setState((prevState) => ({
+      collaboratorsCursorsHidden: !prevState.collaboratorsCursorsHidden,
+    }));
   };
 
   /**

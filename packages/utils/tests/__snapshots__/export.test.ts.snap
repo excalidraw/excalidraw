@@ -14,6 +14,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "bindMode": "orbit",
   "bindingPreference": "enabled",
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": null,
   "croppingElementId": null,
   "currentHoveredFontFamily": null,
