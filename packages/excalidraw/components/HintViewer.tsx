@@ -84,8 +84,17 @@ const getHints = ({
       });
     }
     if (activeTool.type === "arrow") {
+      if (appState.isArrowMultiSelectEnabled) {
+        return t("hints.arrowMultiSelect", {
+          shortcut_1: getTaggedShortcutKey("Ctrl"),
+          shortcut_2: getTaggedShortcutKey("Shift"),
+          shortcut_3: getTaggedShortcutKey("Enter"),
+          shortcut_4: getTaggedShortcutKey("Escape"),
+        });
+      }
       return t("hints.arrowTool", {
         shortcut: getTaggedShortcutKey("A"),
+        shortcut_2: getTaggedShortcutKey("Ctrl + M"),
       });
     }
     return t("hints.linearElement");

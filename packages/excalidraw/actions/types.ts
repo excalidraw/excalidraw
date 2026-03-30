@@ -71,6 +71,7 @@ export type ActionName =
   | "changeStrokeStyle"
   | "changeArrowhead"
   | "changeArrowType"
+  | "toggleArrowMultiSelect"
   | "changeArrowProperties"
   | "changeOpacity"
   | "changeFontSize"
