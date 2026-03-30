@@ -58,8 +58,8 @@ export const excludeElementsInFramesFromSelection = <
 };
 
 export const getElementsWithinSelection = (
-  elements: readonly NonDeletedExcalidrawElement[],
-  selection: NonDeletedExcalidrawElement,
+  elements: readonly ExcalidrawElement[],
+  selection: ExcalidrawElement,
   elementsMap: ElementsMap,
   excludeElementsInFrames: boolean = true,
 ) => {
@@ -137,12 +137,12 @@ export const getVisibleAndNonSelectedElements = (
 
 // FIXME move this into the editor instance to keep utility methods stateless
 export const isSomeElementSelected = (function () {
-  let lastElements: readonly NonDeletedExcalidrawElement[] | null = null;
+  let lastElements: readonly ExcalidrawElement[] | null = null;
   let lastSelectedElementIds: AppState["selectedElementIds"] | null = null;
   let isSelected: boolean | null = null;
 
   const ret = (
-    elements: readonly NonDeletedExcalidrawElement[],
+    elements: readonly ExcalidrawElement[],
     appState: Pick<AppState, "selectedElementIds">,
   ): boolean => {
     if (

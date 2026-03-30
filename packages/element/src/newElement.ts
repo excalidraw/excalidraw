@@ -123,7 +123,9 @@ const _newElementBase = <T extends ExcalidrawElement>(
   }
 
   // assign type to guard against excess properties
-  const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> = {
+  const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> & {
+    isDeleted: false;
+  } = {
     id: rest.id || randomId(),
     type,
     x,
@@ -160,14 +162,20 @@ export const newElement = (
     type: ExcalidrawGenericElement["type"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawGenericElement> =>
-  _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
+  _newElementBase<ExcalidrawGenericElement>(
+    opts.type,
+    opts,
+  ) as NonDeleted<ExcalidrawGenericElement>;
 
 export const newEmbeddableElement = (
   opts: {
     type: "embeddable";
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawEmbeddableElement> => {
-  return _newElementBase<ExcalidrawEmbeddableElement>("embeddable", opts);
+  return _newElementBase<ExcalidrawEmbeddableElement>(
+    "embeddable",
+    opts,
+  ) as NonDeleted<ExcalidrawEmbeddableElement>;
 };
 
 export const newIframeElement = (
@@ -177,7 +185,7 @@ export const newIframeElement = (
 ): NonDeleted<ExcalidrawIframeElement> => {
   return {
     ..._newElementBase<ExcalidrawIframeElement>("iframe", opts),
-  };
+  } as NonDeleted<ExcalidrawIframeElement>;
 };
 
 export const newFrameElement = (
@@ -188,9 +196,9 @@ export const newFrameElement = (
   const frameElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawFrameElement>("frame", opts),
-      type: "frame",
+      type: "frame" as const,
       name: opts?.name || null,
-    },
+    } as NonDeleted<ExcalidrawFrameElement>,
     {},
   );
 
@@ -205,9 +213,9 @@ export const newMagicFrameElement = (
   const frameElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawMagicFrameElement>("magicframe", opts),
-      type: "magicframe",
+      type: "magicframe" as const,
       name: opts?.name || null,
-    },
+    } as NonDeleted<ExcalidrawMagicFrameElement>,
     {},
   );
 
@@ -265,7 +273,7 @@ export const newTextElement = (
     metrics,
   );
 
-  const textElementProps: ExcalidrawTextElement = {
+  const textElementProps: NonDeleted<ExcalidrawTextElement> = {
     ..._newElementBase<ExcalidrawTextElement>("text", opts),
     text,
     fontSize,
@@ -282,10 +290,7 @@ export const newTextElement = (
     lineHeight,
   };
 
-  const textElement: ExcalidrawTextElement = newElementWith(
-    textElementProps,
-    {},
-  );
+  const textElement = newElementWith(textElementProps, {});
 
   return textElement;
 };
@@ -452,7 +457,7 @@ export const newFreeDrawElement = (
     points: opts.points || [],
     pressures: opts.pressures || [],
     simulatePressure: opts.simulatePressure,
-  };
+  } as NonDeleted<ExcalidrawFreeDrawElement>;
 };
 
 export const newLinearElement = (
@@ -470,7 +475,7 @@ export const newLinearElement = (
     endBinding: null,
     startArrowhead: null,
     endArrowhead: null,
-  };
+  } as NonDeleted<ExcalidrawLinearElement>;
 
   if (isLineElement(element)) {
     const lineElement: NonDeleted<ExcalidrawLineElement> = {
@@ -542,5 +547,5 @@ export const newImageElement = (
     fileId: opts.fileId ?? null,
     scale: opts.scale ?? [1, 1],
     crop: opts.crop ?? null,
-  };
+  } as NonDeleted<ExcalidrawImageElement>;
 };

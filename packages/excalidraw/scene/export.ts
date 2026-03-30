@@ -47,6 +47,7 @@ import type {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
+  Ordered,
 } from "@excalidraw/element/types";
 
 import { getDefaultAppState } from "../appState";
@@ -100,10 +101,10 @@ const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
  * proper canvas rendering, even within editor (instead of DOM).
  */
 const addFrameLabelsAsTextElements = (
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   opts: Pick<AppState, "exportWithDarkMode">,
 ) => {
-  const nextElements: NonDeletedExcalidrawElement[] = [];
+  const nextElements: ExcalidrawElement[] = [];
   for (const element of elements) {
     if (isFrameLikeElement(element)) {
       let textElement: Mutable<ExcalidrawTextElement> = newTextElement({
@@ -122,7 +123,7 @@ const addFrameLabelsAsTextElements = (
 
       textElement = truncateText(textElement, element.width);
 
-      nextElements.push(textElement);
+      nextElements.push(textElement as ExcalidrawElement);
     }
     nextElements.push(element);
   }
@@ -153,24 +154,23 @@ const prepareElementsForRender = ({
   exportingFrame: ExcalidrawFrameLikeElement | null | undefined;
   frameRendering: AppState["frameRendering"];
   exportWithDarkMode: AppState["exportWithDarkMode"];
-}) => {
-  let nextElements: readonly ExcalidrawElement[];
-
+}): readonly ExcalidrawElement[] => {
   if (exportingFrame) {
-    nextElements = getElementsOverlappingFrame(elements, exportingFrame);
+    return getElementsOverlappingFrame(
+      elements,
+      exportingFrame,
+    ) as ExcalidrawElement[];
   } else if (frameRendering.enabled && frameRendering.name) {
-    nextElements = addFrameLabelsAsTextElements(elements, {
+    return addFrameLabelsAsTextElements(elements, {
       exportWithDarkMode,
     });
-  } else {
-    nextElements = elements;
   }
 
-  return nextElements;
+  return elements;
 };
 
 export const exportToCanvas = async (
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   appState: AppState,
   files: BinaryFiles,
   {
@@ -242,10 +242,12 @@ export const exportToCanvas = async (
     canvas,
     rc: rough.canvas(canvas),
     elementsMap: toBrandedType<RenderableElementsMap>(
-      arrayToMap(elementsForRender),
+      arrayToMap(elementsForRender) as Map<string, NonDeletedExcalidrawElement>,
     ),
     allElementsMap: toBrandedType<NonDeletedSceneElementsMap>(
-      arrayToMap(syncInvalidIndices(elements)),
+      arrayToMap(
+        syncInvalidIndices(elements) as readonly Ordered<ExcalidrawElement>[],
+      ) as any,
     ),
     visibleElements: elementsForRender,
     scale,
@@ -283,7 +285,7 @@ const createHTMLComment = (text: string) => {
 };
 
 export const exportToSvg = async (
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   appState: {
     exportBackground: boolean;
     exportPadding?: number;
@@ -471,8 +473,10 @@ export const exportToSvg = async (
   const renderEmbeddables = opts?.renderEmbeddables ?? false;
 
   renderSceneToSvg(
-    elementsForRender,
-    toBrandedType<RenderableElementsMap>(arrayToMap(elementsForRender)),
+    elementsForRender as readonly NonDeletedExcalidrawElement[],
+    toBrandedType<RenderableElementsMap>(
+      arrayToMap(elementsForRender) as Map<string, NonDeletedExcalidrawElement>,
+    ),
     rsvg,
     svgRoot,
     files || {},
@@ -558,7 +562,7 @@ export const decodeSvgBase64Payload = ({ svg }: { svg: string }) => {
 
 // calculate smallest area to fit the contents in
 const getCanvasSize = (
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   exportPadding: number,
 ): Bounds => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
@@ -569,7 +573,7 @@ const getCanvasSize = (
 };
 
 export const getExportSize = (
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   exportPadding: number,
   scale: number,
 ): [number, number] => {

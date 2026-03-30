@@ -31,7 +31,6 @@ import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
-  NonDeleted,
   PointsPositionUpdates,
 } from "@excalidraw/element/types";
 
@@ -191,7 +190,7 @@ export const actionFinalize = register<FormData>({
       focusContainer();
     }
 
-    let element: NonDeleted<ExcalidrawElement> | null = null;
+    let element: ExcalidrawElement | null = null;
     if (appState.multiElement) {
       element = appState.multiElement;
     } else if (
@@ -202,7 +201,7 @@ export const actionFinalize = register<FormData>({
     } else if (Object.keys(appState.selectedElementIds).length === 1) {
       const candidate = elementsMap.get(
         Object.keys(appState.selectedElementIds)[0],
-      ) as NonDeleted<ExcalidrawLinearElement> | undefined;
+      ) as ExcalidrawLinearElement | undefined;
       if (candidate) {
         element = candidate;
       }
@@ -216,14 +215,15 @@ export const actionFinalize = register<FormData>({
         element.type !== "freedraw" &&
         appState.lastPointerDownWith !== "touch"
       ) {
-        const { points } = element;
+        const linearElement = element as ExcalidrawLinearElement;
+        const { points } = linearElement;
         const { lastCommittedPoint } = appState.selectedLinearElement;
         if (
           !lastCommittedPoint ||
           points[points.length - 1] !== lastCommittedPoint
         ) {
-          scene.mutateElement(element, {
-            points: element.points.slice(0, -1),
+          scene.mutateElement(linearElement, {
+            points: linearElement.points.slice(0, -1),
           });
         }
       }

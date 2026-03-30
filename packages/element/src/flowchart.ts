@@ -1,4 +1,4 @@
-import { KEYS, invariant, toBrandedType } from "@excalidraw/common";
+import { KEYS, invariant } from "@excalidraw/common";
 
 import { type GlobalPoint, pointFrom, type LocalPoint } from "@excalidraw/math";
 
@@ -35,7 +35,6 @@ import {
   type ExcalidrawElement,
   type ExcalidrawFlowchartNodeElement,
   type NonDeletedSceneElementsMap,
-  type Ordered,
   type OrderedExcalidrawElement,
 } from "./types";
 
@@ -482,16 +481,15 @@ const createBindingArrow = (
     ]),
   );
 
+  const tempMap = new Map([
+    ...elementsMap.entries(),
+    [startBindingElement.id, startBindingElement],
+    [endBindingElement.id, endBindingElement],
+    [bindingArrow.id, bindingArrow],
+  ] as [string, ExcalidrawElement][]);
   const update = updateElbowArrowPoints(
     bindingArrow,
-    toBrandedType<NonDeletedSceneElementsMap>(
-      new Map([
-        ...elementsMap.entries(),
-        [startBindingElement.id, startBindingElement],
-        [endBindingElement.id, endBindingElement],
-        [bindingArrow.id, bindingArrow],
-      ] as [string, Ordered<ExcalidrawElement>][]),
-    ),
+    tempMap as unknown as NonDeletedSceneElementsMap,
     { points: bindingArrow.points },
   );
 

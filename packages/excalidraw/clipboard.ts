@@ -37,7 +37,7 @@ import type { BinaryFiles } from "./types";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
-  elements: readonly NonDeletedExcalidrawElement[];
+  elements: readonly ExcalidrawElement[];
   files: BinaryFiles | undefined;
 };
 
@@ -143,7 +143,7 @@ export const serializeAsClipboardJSON = ({
   elements,
   files,
 }: {
-  elements: readonly NonDeletedExcalidrawElement[];
+  elements: readonly ExcalidrawElement[];
   files: BinaryFiles | null;
 }) => {
   const elementsMap = arrayToMap(elements);

@@ -24,8 +24,8 @@ import { getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
   ElementsMap,
+  ExcalidrawElement,
   ExcalidrawFrameLikeElement,
-  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import {
@@ -166,7 +166,7 @@ const linkIconCanvasCache: {
 };
 
 const renderLinkIcon = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   context: CanvasRenderingContext2D,
   appState: StaticCanvasAppState,
   elementsMap: ElementsMap,

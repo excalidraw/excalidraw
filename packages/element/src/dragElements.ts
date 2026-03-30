@@ -203,7 +203,7 @@ const calculateOffset = (
 
 const updateElementCoords = (
   pointerDownState: PointerDownState,
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   scene: Scene,
   dragOffset: { x: number; y: number },
 ) => {
@@ -245,7 +245,7 @@ export const dragNewElement = ({
   originOffset = null,
   informMutation = true,
 }: {
-  newElement: NonDeletedExcalidrawElement;
+  newElement: ExcalidrawElement;
   elementType: AppState["activeTool"]["type"];
   originX: number;
   originY: number;

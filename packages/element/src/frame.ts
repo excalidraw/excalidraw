@@ -153,7 +153,7 @@ export const isCursorInFrame = (
     x: number;
     y: number;
   },
-  frame: NonDeleted<ExcalidrawFrameLikeElement>,
+  frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
 ) => {
   const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(frame, elementsMap);
@@ -343,7 +343,7 @@ export const getElementsInResizingFrame = (
   ).filter((element) => element.groupIds.length > 0);
 
   const groupIds = selectGroupsFromGivenElements(
-    newGroupElementsCompletelyInFrame,
+    newGroupElementsCompletelyInFrame as NonDeleted<ExcalidrawElement>[],
     appState,
   );
 
@@ -497,7 +497,7 @@ export const filterElementsEligibleAsFrameChildren = (
  */
 export const addElementsToFrame = <T extends ElementsMapOrArray>(
   allElements: T,
-  elementsToAdd: NonDeletedExcalidrawElement[],
+  elementsToAdd: ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
   appState: AppState,
 ): T => {
@@ -570,7 +570,7 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
 };
 
 export const removeElementsFromFrame = (
-  elementsToRemove: ReadonlySetLike<NonDeletedExcalidrawElement>,
+  elementsToRemove: ReadonlySetLike<ExcalidrawElement>,
   elementsMap: ElementsMap,
 ) => {
   const _elementsToRemove = new Map<
@@ -923,7 +923,7 @@ export const getElementsOverlappingFrame = (
 ) => {
   return (
     elementsOverlappingBBox({
-      elements,
+      elements: elements as readonly NonDeletedExcalidrawElement[],
       bounds: frame,
       type: "overlap",
     })

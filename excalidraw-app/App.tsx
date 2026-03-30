@@ -65,8 +65,8 @@ import {
 import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
 import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
 import type {
+  ExcalidrawElement,
   FileId,
-  NonDeletedExcalidrawElement,
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 import type {
@@ -732,7 +732,7 @@ const ExcalidrawWrapper = () => {
   );
 
   const onExportToBackend = async (
-    exportedElements: readonly NonDeletedExcalidrawElement[],
+    exportedElements: readonly ExcalidrawElement[],
     appState: Partial<AppState>,
     files: BinaryFiles,
   ) => {
@@ -772,7 +772,7 @@ const ExcalidrawWrapper = () => {
   };
 
   const renderCustomStats = (
-    elements: readonly NonDeletedExcalidrawElement[],
+    elements: readonly ExcalidrawElement[],
     appState: UIAppState,
   ) => {
     return (

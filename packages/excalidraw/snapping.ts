@@ -166,7 +166,7 @@ export const isSnappingEnabled = ({
 }: {
   app: AppClassProperties;
   event: KeyboardModifiersObject;
-  selectedElements: NonDeletedExcalidrawElement[];
+  selectedElements: ExcalidrawElement[];
 }) => {
   if (event) {
     // Allow snapping for lasso tool when dragging selected elements
@@ -314,13 +314,13 @@ export const getElementsCorners = (
 
 const getReferenceElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  selectedElements: NonDeletedExcalidrawElement[],
+  selectedElements: ExcalidrawElement[],
   appState: AppState,
   elementsMap: ElementsMap,
 ) =>
   getVisibleAndNonSelectedElements(
     elements,
-    selectedElements,
+    selectedElements as NonDeletedExcalidrawElement[],
     appState,
     elementsMap,
   );
@@ -1330,7 +1330,7 @@ export const getSnapLinesAtPointer = (
   }
 
   const referenceElements = getVisibleAndNonSelectedElements(
-    elements,
+    elements as readonly NonDeletedExcalidrawElement[],
     [],
     app.state,
     elementsMap,

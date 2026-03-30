@@ -497,7 +497,7 @@ class ElementStore {
 
   getElementsMap = () => {
     return toBrandedType<NonDeletedSceneElementsMap>(
-      arrayToMap(this.getElements()),
+      arrayToMap(this.getElements()) as any,
     );
   };
 

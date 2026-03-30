@@ -1002,7 +1002,7 @@ const renderSelectionBorder = (
 const renderFrameHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  frame: NonDeleted<ExcalidrawFrameLikeElement>,
+  frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame, elementsMap);
@@ -1032,7 +1032,7 @@ const renderFrameHighlight = (
 const renderElementsBoxHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  elements: NonDeleted<ExcalidrawElement>[],
+  elements: ExcalidrawElement[],
   config?: { colors?: string[]; dashed?: boolean },
 ) => {
   const { colors = ["rgb(0,118,255)"], dashed = false } = config || {};
@@ -1080,7 +1080,7 @@ const renderElementsBoxHighlight = (
 const renderLinearPointHandles = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  element: NonDeleted<ExcalidrawLinearElement>,
+  element: ExcalidrawLinearElement,
   elementsMap: RenderableElementsMap,
 ) => {
   if (!appState.selectedLinearElement) {
@@ -1257,7 +1257,7 @@ const renderFocusPointIndicator = ({
   context,
   elementsMap,
 }: {
-  arrow: NonDeleted<ExcalidrawArrowElement>;
+  arrow: ExcalidrawArrowElement;
   appState: InteractiveCanvasAppState;
   context: CanvasRenderingContext2D;
   elementsMap: NonDeletedSceneElementsMap;
@@ -1491,7 +1491,7 @@ const renderCropHandles = (
 };
 
 const renderTextBox = (
-  text: NonDeleted<ExcalidrawTextElement>,
+  text: ExcalidrawTextElement,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
@@ -1515,7 +1515,7 @@ const renderTextBox = (
 };
 
 const renderResetAutoResizeHandle = (
-  text: NonDeleted<ExcalidrawTextElement>,
+  text: ExcalidrawTextElement,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   selectionColor: InteractiveCanvasRenderConfig["selectionColor"],

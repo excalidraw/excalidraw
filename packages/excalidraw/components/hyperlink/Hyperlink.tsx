@@ -32,6 +32,7 @@ import type { Scene } from "@excalidraw/element";
 
 import type {
   ElementsMap,
+  ExcalidrawElement,
   ExcalidrawEmbeddableElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -369,7 +370,7 @@ const getCoordsForPopover = (
 };
 
 export const getContextMenuLabel = (
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   appState: UIAppState,
 ) => {
   const selectedElements = getSelectedElements(elements, appState);
@@ -383,7 +384,7 @@ export const getContextMenuLabel = (
 
 let HYPERLINK_TOOLTIP_TIMEOUT_ID: number | null = null;
 export const showHyperlinkTooltip = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   appState: AppState,
   elementsMap: ElementsMap,
 ) => {
@@ -397,7 +398,7 @@ export const showHyperlinkTooltip = (
 };
 
 const renderTooltip = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   appState: AppState,
   elementsMap: ElementsMap,
 ) => {
