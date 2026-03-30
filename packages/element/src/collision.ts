@@ -189,43 +189,6 @@ export const hitElementItself = ({
   return result;
 };
 
-// export const deconstructBounds = (
-//   bounds: Bounds,
-//   center?: GlobalPoint,
-//   angle?: Radians,
-// ): {
-//   corners: readonly [GlobalPoint, GlobalPoint, GlobalPoint, GlobalPoint];
-//   edges: readonly [
-//     LineSegment<GlobalPoint>,
-//     LineSegment<GlobalPoint>,
-//     LineSegment<GlobalPoint>,
-//     LineSegment<GlobalPoint>,
-//   ];
-// } => {
-//   const [x1, y1, x2, y2] = bounds;
-//   let corners = [
-//     pointFrom<GlobalPoint>(x1, y1),
-//     pointFrom<GlobalPoint>(x2, y1),
-//     pointFrom<GlobalPoint>(x2, y2),
-//     pointFrom<GlobalPoint>(x1, y2),
-//   ] as const;
-
-//   if (angle && center) {
-//     corners = corners.map((corner) =>
-//       pointRotateRads(corner, center, angle),
-//     ) as [GlobalPoint, GlobalPoint, GlobalPoint, GlobalPoint];
-//   }
-
-//   const edges = [
-//     lineSegment(corners[0], corners[1]),
-//     lineSegment(corners[1], corners[2]),
-//     lineSegment(corners[2], corners[3]),
-//     lineSegment(corners[3], corners[0]),
-//   ] as const;
-
-//   return { corners, edges };
-// };
-
 const isPointInRotatedBounds = (
   point: GlobalPoint,
   bounds: Bounds,

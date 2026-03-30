@@ -39,6 +39,7 @@ import type {
   ElementsMapOrArray,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
+  ExcalidrawLinearElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./types";
@@ -138,16 +139,16 @@ export const getElementsWithinSelection = (
     // Whether the element bounds should include the bound text element bounds
     const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
-      const boundTextElementBounds = getElementBounds(
+      const { x, y } = LinearElementEditor.getBoundTextElementPosition(
+        element as ExcalidrawLinearElement,
         boundTextElement,
         elementsMap,
       );
-
       elementBounds = [
-        Math.min(elementBounds[0], boundTextElementBounds[0]),
-        Math.min(elementBounds[1], boundTextElementBounds[1]),
-        Math.max(elementBounds[2], boundTextElementBounds[2]),
-        Math.max(elementBounds[3], boundTextElementBounds[3]),
+        Math.min(elementBounds[0], x),
+        Math.min(elementBounds[1], y),
+        Math.max(elementBounds[2], x + boundTextElement.width),
+        Math.max(elementBounds[3], y + boundTextElement.height),
       ];
     }
 
