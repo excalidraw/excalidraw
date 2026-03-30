@@ -13,8 +13,6 @@ import type { MaybeTransformHandleType } from "@excalidraw/element";
 import type {
   PointerType,
   ExcalidrawLinearElement,
-  NonDeletedExcalidrawElement,
-  NonDeleted,
   TextAlign,
   ExcalidrawElement,
   GroupId,
@@ -279,29 +277,29 @@ export interface AppState {
   isLoading: boolean;
   errorMessage: React.ReactNode;
   activeEmbeddable: {
-    element: NonDeletedExcalidrawElement;
+    element: ExcalidrawElement;
     state: "hover" | "active";
   } | null;
   /**
    * for a newly created element
    * - set on pointer down, updated during pointer move, used on pointer up
    */
-  newElement: NonDeleted<ExcalidrawNonSelectionElement> | null;
+  newElement: ExcalidrawNonSelectionElement | null;
   /**
    * for a single element that's being resized
    * - set on pointer down when it's selected and the active tool is selection
    */
-  resizingElement: NonDeletedExcalidrawElement | null;
+  resizingElement: ExcalidrawElement | null;
   /**
    * multiElement is for multi-point linear element that's created by clicking as opposed to dragging
    * - when set and present, the editor will handle linear element creation logic accordingly
    */
-  multiElement: NonDeleted<ExcalidrawLinearElement> | null;
+  multiElement: ExcalidrawLinearElement | null;
   /**
    * decoupled from newElement, dragging selection only creates selectionElement
    * - set on pointer down, updated during pointer move
    */
-  selectionElement: NonDeletedExcalidrawElement | null;
+  selectionElement: ExcalidrawElement | null;
   /**
    * tracking current arrow binding editor state (takes into account
    * `bindingPreference` and keyboard modifiers (ctrl/alt)
@@ -311,12 +309,12 @@ export interface AppState {
   bindingPreference: "enabled" | "disabled";
   /** user preference whether arrow snap to midpoints while binding */
   isMidpointSnappingEnabled: boolean;
-  startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
+  startBoundElement: ExcalidrawBindableElement | null;
   suggestedBinding: {
-    element: NonDeleted<ExcalidrawBindableElement>;
+    element: ExcalidrawBindableElement;
     midPoint?: GlobalPoint;
   } | null;
-  frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
+  frameToHighlight: ExcalidrawFrameLikeElement | null;
   frameRendering: {
     enabled: boolean;
     name: boolean;
@@ -324,7 +322,7 @@ export interface AppState {
     clip: boolean;
   };
   editingFrame: string | null;
-  elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
+  elementsToHighlight: ExcalidrawElement[] | null;
   /**
    * set when a new text is created or when an existing text is being edited
    */
@@ -514,7 +512,7 @@ export declare class GestureEvent extends UIEvent {
 // libraries
 // -----------------------------------------------------------------------------
 /** @deprecated legacy: do not use outside of migration paths */
-export type LibraryItem_v1 = readonly NonDeleted<ExcalidrawElement>[];
+export type LibraryItem_v1 = readonly ExcalidrawElement[];
 /** @deprecated legacy: do not use outside of migration paths */
 type LibraryItems_v1 = readonly LibraryItem_v1[];
 
@@ -522,7 +520,7 @@ type LibraryItems_v1 = readonly LibraryItem_v1[];
 export type LibraryItem = {
   id: string;
   status: "published" | "unpublished";
-  elements: readonly NonDeleted<ExcalidrawElement>[];
+  elements: readonly ExcalidrawElement[];
   /** timestamp in epoch (ms) */
   created: number;
   name?: string;
@@ -631,7 +629,7 @@ export interface ExcalidrawProps {
   // @TODO come with better API before v0.18.0
   name?: string;
   renderCustomStats?: (
-    elements: readonly NonDeletedExcalidrawElement[],
+    elements: readonly ExcalidrawElement[],
     appState: UIAppState,
   ) => JSX.Element;
   UIOptions?: Partial<UIOptions>;
@@ -642,7 +640,7 @@ export interface ExcalidrawProps {
   generateIdForFile?: (file: File) => string | Promise<string>;
   generateLinkForSelection?: (id: string, type: "element" | "group") => string;
   onLinkOpen?: (
-    element: NonDeletedExcalidrawElement,
+    element: ExcalidrawElement,
     event: CustomEvent<{
       nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
     }>,
@@ -665,7 +663,7 @@ export interface ExcalidrawProps {
     | RegExp[]
     | ((link: string) => boolean | undefined);
   renderEmbeddable?: (
-    element: NonDeleted<ExcalidrawEmbeddableElement>,
+    element: ExcalidrawEmbeddableElement,
     appState: AppState,
   ) => JSX.Element | null;
   aiEnabled?: boolean;
@@ -709,12 +707,12 @@ export type SceneData = {
 export type ExportOpts = {
   saveFileToDisk?: boolean;
   onExportToBackend?: (
-    exportedElements: readonly NonDeletedExcalidrawElement[],
+    exportedElements: readonly ExcalidrawElement[],
     appState: UIAppState,
     files: BinaryFiles,
   ) => void;
   renderCustomUI?: (
-    exportedElements: readonly NonDeletedExcalidrawElement[],
+    exportedElements: readonly ExcalidrawElement[],
     appState: UIAppState,
     files: BinaryFiles,
     canvas: HTMLCanvasElement,
@@ -841,7 +839,7 @@ export type PointerDownState = Readonly<{
   lastCoords: { x: number; y: number };
   // original element frozen snapshots so we can access the original
   // element attribute values at time of pointerdown
-  originalElements: Map<string, NonDeleted<ExcalidrawElement>>;
+  originalElements: Map<string, ExcalidrawElement>;
   resize: {
     // Handle when resizing, might change during the pointer interaction
     handleType: MaybeTransformHandleType;
@@ -857,10 +855,10 @@ export type PointerDownState = Readonly<{
   hit: {
     // The element the pointer is "hitting", is determined on the initial
     // pointer down event
-    element: NonDeleted<ExcalidrawElement> | null;
+    element: ExcalidrawElement | null;
     // The elements the pointer is "hitting", is determined on the initial
     // pointer down event
-    allHitElements: NonDeleted<ExcalidrawElement>[];
+    allHitElements: ExcalidrawElement[];
     // This is determined on the initial pointer down event
     wasAddedToSelection: boolean;
     // Whether selected element(s) were duplicated, might change during the

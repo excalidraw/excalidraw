@@ -15,10 +15,7 @@ import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import { isInitializedImageElement } from "@excalidraw/element";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
 
-import type {
-  FileId,
-  NonDeletedExcalidrawElement,
-} from "@excalidraw/element/types";
+import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
@@ -30,7 +27,7 @@ import { encodeFilesForUpload } from "../data/FileManager";
 import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
 
 export const exportToExcalidrawPlus = async (
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   appState: Partial<AppState>,
   files: BinaryFiles,
   name: string,
@@ -88,7 +85,7 @@ export const exportToExcalidrawPlus = async (
 };
 
 export const ExportToExcalidrawPlus: React.FC<{
-  elements: readonly NonDeletedExcalidrawElement[];
+  elements: readonly ExcalidrawElement[];
   appState: Partial<AppState>;
   files: BinaryFiles;
   name: string;

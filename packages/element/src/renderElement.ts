@@ -71,7 +71,6 @@ import { ShapeCache } from "./shape";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
-  NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
@@ -147,7 +146,7 @@ export interface ExcalidrawElementWithCanvas {
 }
 
 const cappedElementCanvasSize = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   elementsMap: ElementsMap,
   zoom: Zoom,
 ): {
@@ -202,7 +201,7 @@ const cappedElementCanvasSize = (
 };
 
 const generateElementCanvas = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
@@ -385,7 +384,7 @@ const drawImagePlaceholder = (
 };
 
 const drawElementOnCanvas = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
@@ -606,7 +605,7 @@ export const elementWithCanvasCache = new WeakMap<
 >();
 
 const generateElementWithCanvas = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
@@ -754,7 +753,7 @@ const drawElementFromCanvas = (
 };
 
 export const renderSelectionElement = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
@@ -778,7 +777,7 @@ export const renderSelectionElement = (
 };
 
 export const renderElement = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   elementsMap: RenderableElementsMap,
   allElementsMap: NonDeletedSceneElementsMap,
   rc: RoughCanvas,

@@ -29,72 +29,133 @@ import type {
   ExcalidrawLineElement,
   ExcalidrawFlowchartNodeElement,
   ExcalidrawLinearElementSubType,
+  NonDeleted,
 } from "./types";
 
-export const isInitializedImageElement = (
+export function isInitializedImageElement(
+  element: NonDeleted<ExcalidrawElement> | null,
+): element is NonDeleted<InitializedExcalidrawImageElement>;
+export function isInitializedImageElement(
   element: ExcalidrawElement | null,
-): element is InitializedExcalidrawImageElement => {
+): element is InitializedExcalidrawImageElement;
+export function isInitializedImageElement(
+  element: ExcalidrawElement | null,
+): element is InitializedExcalidrawImageElement {
   return !!element && element.type === "image" && !!element.fileId;
-};
+}
 
-export const isImageElement = (
+export function isImageElement(
+  element: NonDeleted<ExcalidrawElement> | null,
+): element is NonDeleted<ExcalidrawImageElement>;
+export function isImageElement(
   element: ExcalidrawElement | null,
-): element is ExcalidrawImageElement => {
+): element is ExcalidrawImageElement;
+export function isImageElement(
+  element: ExcalidrawElement | null,
+): element is ExcalidrawImageElement {
   return !!element && element.type === "image";
-};
+}
 
-export const isEmbeddableElement = (
+export function isEmbeddableElement(
+  element: NonDeleted<ExcalidrawElement> | null | undefined,
+): element is NonDeleted<ExcalidrawEmbeddableElement>;
+export function isEmbeddableElement(
   element: ExcalidrawElement | null | undefined,
-): element is ExcalidrawEmbeddableElement => {
+): element is ExcalidrawEmbeddableElement;
+export function isEmbeddableElement(
+  element: ExcalidrawElement | null | undefined,
+): element is ExcalidrawEmbeddableElement {
   return !!element && element.type === "embeddable";
-};
+}
 
-export const isIframeElement = (
+export function isIframeElement(
+  element: NonDeleted<ExcalidrawElement> | null,
+): element is NonDeleted<ExcalidrawIframeElement>;
+export function isIframeElement(
   element: ExcalidrawElement | null,
-): element is ExcalidrawIframeElement => {
+): element is ExcalidrawIframeElement;
+export function isIframeElement(
+  element: ExcalidrawElement | null,
+): element is ExcalidrawIframeElement {
   return !!element && element.type === "iframe";
-};
+}
 
-export const isIframeLikeElement = (
+export function isIframeLikeElement(
+  element: NonDeleted<ExcalidrawElement> | null,
+): element is NonDeleted<ExcalidrawIframeLikeElement>;
+export function isIframeLikeElement(
   element: ExcalidrawElement | null,
-): element is ExcalidrawIframeLikeElement => {
+): element is ExcalidrawIframeLikeElement;
+export function isIframeLikeElement(
+  element: ExcalidrawElement | null,
+): element is ExcalidrawIframeLikeElement {
   return (
     !!element && (element.type === "iframe" || element.type === "embeddable")
   );
-};
+}
 
-export const isTextElement = (
+export function isTextElement(
+  element: NonDeleted<ExcalidrawElement> | null,
+): element is NonDeleted<ExcalidrawTextElement>;
+export function isTextElement(
   element: ExcalidrawElement | null,
-): element is ExcalidrawTextElement => {
+): element is ExcalidrawTextElement;
+export function isTextElement(
+  element: ExcalidrawElement | null,
+): element is ExcalidrawTextElement {
   return element != null && element.type === "text";
-};
+}
 
-export const isFrameElement = (
+export function isFrameElement(
+  element: NonDeleted<ExcalidrawElement> | null,
+): element is NonDeleted<ExcalidrawFrameElement>;
+export function isFrameElement(
   element: ExcalidrawElement | null,
-): element is ExcalidrawFrameElement => {
+): element is ExcalidrawFrameElement;
+export function isFrameElement(
+  element: ExcalidrawElement | null,
+): element is ExcalidrawFrameElement {
   return element != null && element.type === "frame";
-};
+}
 
-export const isMagicFrameElement = (
+export function isMagicFrameElement(
+  element: NonDeleted<ExcalidrawElement> | null,
+): element is NonDeleted<ExcalidrawMagicFrameElement>;
+export function isMagicFrameElement(
   element: ExcalidrawElement | null,
-): element is ExcalidrawMagicFrameElement => {
+): element is ExcalidrawMagicFrameElement;
+export function isMagicFrameElement(
+  element: ExcalidrawElement | null,
+): element is ExcalidrawMagicFrameElement {
   return element != null && element.type === "magicframe";
-};
+}
 
-export const isFrameLikeElement = (
+export function isFrameLikeElement(
+  element: NonDeleted<ExcalidrawElement> | null,
+): element is NonDeleted<ExcalidrawFrameLikeElement>;
+export function isFrameLikeElement(
   element: ExcalidrawElement | null,
-): element is ExcalidrawFrameLikeElement => {
+): element is ExcalidrawFrameLikeElement;
+export function isFrameLikeElement(
+  element: ExcalidrawElement | null,
+): element is ExcalidrawFrameLikeElement {
   return (
     element != null &&
     (element.type === "frame" || element.type === "magicframe")
   );
-};
+}
 
-export const isFreeDrawElement = (
+export function isFreeDrawElement(
+  element?: NonDeleted<ExcalidrawElement> | null,
+): element is NonDeleted<ExcalidrawFreeDrawElement>;
+export function isFreeDrawElement(
   element?: ExcalidrawElement | null,
-): element is ExcalidrawFreeDrawElement => {
+): element is ExcalidrawFreeDrawElement;
+export function isFreeDrawElement(
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawFreeDrawElement {
   return element != null && isFreeDrawElementType(element.type);
-};
+}
 
 export const isFreeDrawElementType = (
   elementType: ExcalidrawElementType,
@@ -102,52 +163,94 @@ export const isFreeDrawElementType = (
   return elementType === "freedraw";
 };
 
-export const isLinearElement = (
+export function isLinearElement(
+  element?: NonDeleted<ExcalidrawElement> | null,
+): element is NonDeleted<ExcalidrawLinearElement>;
+export function isLinearElement(
   element?: ExcalidrawElement | null,
-): element is ExcalidrawLinearElement => {
+): element is ExcalidrawLinearElement;
+export function isLinearElement(
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawLinearElement {
   return element != null && isLinearElementType(element.type);
-};
+}
 
-export const isLineElement = (
+export function isLineElement(
+  element?: NonDeleted<ExcalidrawElement> | null,
+): element is NonDeleted<ExcalidrawLineElement>;
+export function isLineElement(
   element?: ExcalidrawElement | null,
-): element is ExcalidrawLineElement => {
+): element is ExcalidrawLineElement;
+export function isLineElement(
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawLineElement {
   return element != null && element.type === "line";
-};
+}
 
-export const isArrowElement = (
+export function isArrowElement(
+  element?: NonDeleted<ExcalidrawElement> | null,
+): element is NonDeleted<ExcalidrawArrowElement>;
+export function isArrowElement(
   element?: ExcalidrawElement | null,
-): element is ExcalidrawArrowElement => {
+): element is ExcalidrawArrowElement;
+export function isArrowElement(
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawArrowElement {
   return element != null && element.type === "arrow";
-};
+}
 
-export const isElbowArrow = (
+export function isElbowArrow(
+  element?: NonDeleted<ExcalidrawElement>,
+): element is NonDeleted<ExcalidrawElbowArrowElement>;
+export function isElbowArrow(
   element?: ExcalidrawElement,
-): element is ExcalidrawElbowArrowElement => {
+): element is ExcalidrawElbowArrowElement;
+export function isElbowArrow(
+  element?: ExcalidrawElement,
+): element is ExcalidrawElbowArrowElement {
   return isArrowElement(element) && element.elbowed;
-};
+}
 
 /**
  * sharp or curved arrow, but not elbow
  */
-export const isSimpleArrow = (
+export function isSimpleArrow(
+  element?: NonDeleted<ExcalidrawElement>,
+): element is NonDeleted<ExcalidrawArrowElement>;
+export function isSimpleArrow(
   element?: ExcalidrawElement,
-): element is ExcalidrawArrowElement => {
+): element is ExcalidrawArrowElement;
+export function isSimpleArrow(
+  element?: ExcalidrawElement,
+): element is ExcalidrawArrowElement {
   return isArrowElement(element) && !element.elbowed;
-};
+}
 
-export const isSharpArrow = (
+export function isSharpArrow(
+  element?: NonDeleted<ExcalidrawElement>,
+): element is NonDeleted<ExcalidrawArrowElement>;
+export function isSharpArrow(
   element?: ExcalidrawElement,
-): element is ExcalidrawArrowElement => {
+): element is ExcalidrawArrowElement;
+export function isSharpArrow(
+  element?: ExcalidrawElement,
+): element is ExcalidrawArrowElement {
   return isArrowElement(element) && !element.elbowed && !element.roundness;
-};
+}
 
-export const isCurvedArrow = (
+export function isCurvedArrow(
+  element?: NonDeleted<ExcalidrawElement>,
+): element is NonDeleted<ExcalidrawArrowElement>;
+export function isCurvedArrow(
   element?: ExcalidrawElement,
-): element is ExcalidrawArrowElement => {
+): element is ExcalidrawArrowElement;
+export function isCurvedArrow(
+  element?: ExcalidrawElement,
+): element is ExcalidrawArrowElement {
   return (
     isArrowElement(element) && !element.elbowed && element.roundness !== null
   );
-};
+}
 
 export const isLinearElementType = (
   elementType: ElementOrToolType,
@@ -157,16 +260,24 @@ export const isLinearElementType = (
   );
 };
 
-export const isBindingElement = (
+export function isBindingElement(
+  element?: NonDeleted<ExcalidrawElement> | null,
+  includeLocked?: boolean,
+): element is NonDeleted<ExcalidrawArrowElement>;
+export function isBindingElement(
+  element?: ExcalidrawElement | null,
+  includeLocked?: boolean,
+): element is ExcalidrawArrowElement;
+export function isBindingElement(
   element?: ExcalidrawElement | null,
   includeLocked = true,
-): element is ExcalidrawArrowElement => {
+): element is ExcalidrawArrowElement {
   return (
     element != null &&
     (!element.locked || includeLocked === true) &&
     isBindingElementType(element.type)
   );
-};
+}
 
 export const isBindingElementType = (
   elementType: ElementOrToolType,
@@ -174,10 +285,18 @@ export const isBindingElementType = (
   return elementType === "arrow";
 };
 
-export const isBindableElement = (
+export function isBindableElement(
+  element: NonDeleted<ExcalidrawElement> | null | undefined,
+  includeLocked?: boolean,
+): element is NonDeleted<ExcalidrawBindableElement>;
+export function isBindableElement(
+  element: ExcalidrawElement | null | undefined,
+  includeLocked?: boolean,
+): element is ExcalidrawBindableElement;
+export function isBindableElement(
   element: ExcalidrawElement | null | undefined,
   includeLocked = true,
-): element is ExcalidrawBindableElement => {
+): element is ExcalidrawBindableElement {
   return (
     element != null &&
     (!element.locked || includeLocked === true) &&
@@ -191,7 +310,7 @@ export const isBindableElement = (
       element.type === "magicframe" ||
       (element.type === "text" && !element.containerId))
   );
-};
+}
 
 export const isRectanguloidElement = (
   element?: ExcalidrawElement | null,

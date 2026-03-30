@@ -14,7 +14,6 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawElement,
-  NonDeleted,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
@@ -108,7 +107,7 @@ const flipSelectedElements = (
 };
 
 const flipElements = (
-  selectedElements: NonDeleted<ExcalidrawElement>[],
+  selectedElements: ExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   flipDirection: "horizontal" | "vertical",
   app: AppClassProperties,

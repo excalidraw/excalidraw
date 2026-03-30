@@ -9,7 +9,7 @@ import {
 import { t } from "@excalidraw/excalidraw/i18n";
 import { useEffect, useState } from "react";
 
-import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { UIAppState } from "@excalidraw/excalidraw/types";
 
 import {
@@ -30,7 +30,7 @@ const getStorageSizes = debounce((cb: (sizes: StorageSizes) => void) => {
 
 type Props = {
   setToast: (message: string) => void;
-  elements: readonly NonDeletedExcalidrawElement[];
+  elements: readonly ExcalidrawElement[];
   appState: UIAppState;
 };
 const CustomStats = (props: Props) => {

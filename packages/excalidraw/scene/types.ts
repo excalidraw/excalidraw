@@ -84,7 +84,7 @@ export type StaticSceneRenderConfig = {
   rc: RoughCanvas;
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
-  visibleElements: readonly NonDeletedExcalidrawElement[];
+  visibleElements: readonly ExcalidrawElement[];
   scale: number;
   appState: StaticCanvasAppState;
   renderConfig: StaticCanvasRenderConfig;
@@ -98,7 +98,7 @@ export type InteractiveSceneRenderConfig = {
   app: AppClassProperties;
   canvas: HTMLCanvasElement | null;
   elementsMap: RenderableElementsMap;
-  visibleElements: readonly NonDeletedExcalidrawElement[];
+  visibleElements: readonly ExcalidrawElement[];
   selectedElements: readonly NonDeletedExcalidrawElement[];
   allElementsMap: NonDeletedSceneElementsMap;
   scale: number;

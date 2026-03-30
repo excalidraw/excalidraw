@@ -73,6 +73,8 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   FontFamilyValues,
+  NonDeletedExcalidrawElement,
+  NonDeleted,
   TextAlign,
   VerticalAlign,
 } from "@excalidraw/element/types";
@@ -292,7 +294,7 @@ const changeFontSize = (
     includeBoundTextElement: true,
   }).forEach((element) => {
     if (isTextElement(element)) {
-      updateBoundElements(element, app.scene);
+      updateBoundElements(element as NonDeletedExcalidrawElement, app.scene);
     }
   });
 
@@ -1893,7 +1895,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                 // @ts-ignore TS cannot discern check above
                 ...newElement.startBinding!,
                 ...calculateFixedPointForElbowArrowBinding(
-                  newElement,
+                  newElement as NonDeleted<typeof newElement>,
                   startElement,
                   "start",
                   elementsMap,
@@ -1907,7 +1909,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                 // @ts-ignore TS cannot discern check above
                 ...newElement.endBinding,
                 ...calculateFixedPointForElbowArrowBinding(
-                  newElement,
+                  newElement as NonDeleted<typeof newElement>,
                   endElement,
                   "end",
                   elementsMap,
@@ -1938,7 +1940,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
           ) as ExcalidrawBindableElement;
           if (startElement) {
             bindBindingElement(
-              newElement,
+              newElement as NonDeleted<typeof newElement>,
               startElement,
               appState.bindMode === "inside" ? "inside" : "orbit",
               "start",
@@ -1952,7 +1954,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
           ) as ExcalidrawBindableElement;
           if (endElement) {
             bindBindingElement(
-              newElement,
+              newElement as NonDeleted<typeof newElement>,
               endElement,
               appState.bindMode === "inside" ? "inside" : "orbit",
               "end",

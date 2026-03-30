@@ -26,7 +26,7 @@ import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
 export { MIME_TYPES };
 
 type ExportOpts = {
-  elements: readonly NonDeleted<ExcalidrawElement>[];
+  elements: readonly ExcalidrawElement[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
   files: BinaryFiles | null;
   maxWidthOrHeight?: number;
@@ -209,7 +209,10 @@ export const exportToClipboard = async (
   } else if (opts.type === "png") {
     await copyBlobToClipboardAsPng(exportToBlob(opts));
   } else if (opts.type === "json") {
-    await copyToClipboard(opts.elements, opts.files);
+    await copyToClipboard(
+      opts.elements as readonly NonDeleted<ExcalidrawElement>[],
+      opts.files,
+    );
   } else {
     throw new Error("Invalid export type");
   }

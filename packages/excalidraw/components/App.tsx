@@ -682,7 +682,7 @@ class App extends React.Component<AppProps, AppState> {
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
 
-  hitLinkElement?: NonDeletedExcalidrawElement;
+  hitLinkElement?: ExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
@@ -1027,12 +1027,11 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private previousHoveredBindableElement: NonDeletedExcalidrawElement | null =
-    null;
+  private previousHoveredBindableElement: ExcalidrawElement | null = null;
 
   private handleDelayedBindModeChange(
     arrow: ExcalidrawArrowElement,
-    hoveredElement: NonDeletedExcalidrawElement | null,
+    hoveredElement: ExcalidrawElement | null,
   ) {
     if (arrow.isDeleted || isElbowArrow(arrow)) {
       return;
@@ -1287,7 +1286,7 @@ class App extends React.Component<AppProps, AppState> {
     scenePointer,
     moveEvent,
   }: {
-    hitElement: NonDeleted<ExcalidrawElement> | null;
+    hitElement: ExcalidrawElement | null;
     scenePointer: { x: number; y: number };
     moveEvent: React.PointerEvent<HTMLCanvasElement>;
   }): boolean => {
@@ -5368,51 +5367,54 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (isArrowKey(event.key)) {
       bindOrUnbindBindingElements(
-        this.scene.getSelectedElements(this.state).filter(isArrowElement),
+        this.scene
+          .getSelectedElements(this.state)
+          .filter(isArrowElement) as ExcalidrawArrowElement[],
         this.scene,
         this.state,
       );
 
       const elementsMap = this.scene.getNonDeletedElementsMap();
 
-      this.scene
-        .getSelectedElements(this.state)
-        .filter(isSimpleArrow)
-        .forEach((element) => {
-          // Update the fixed point bindings for non-elbow arrows
-          // when the pointer is released, so that they are correctly positioned
-          // after the drag.
-          if (element.startBinding) {
-            this.scene.mutateElement(element, {
-              startBinding: {
-                ...element.startBinding,
-                ...calculateFixedPointForNonElbowArrowBinding(
-                  element,
-                  elementsMap.get(
-                    element.startBinding.elementId,
-                  ) as ExcalidrawBindableElement,
-                  "start",
-                  elementsMap,
-                ),
-              },
-            });
-          }
-          if (element.endBinding) {
-            this.scene.mutateElement(element, {
-              endBinding: {
-                ...element.endBinding,
-                ...calculateFixedPointForNonElbowArrowBinding(
-                  element,
-                  elementsMap.get(
-                    element.endBinding.elementId,
-                  ) as ExcalidrawBindableElement,
-                  "end",
-                  elementsMap,
-                ),
-              },
-            });
-          }
-        });
+      (
+        this.scene
+          .getSelectedElements(this.state)
+          .filter(isSimpleArrow) as NonDeleted<ExcalidrawArrowElement>[]
+      ).forEach((element) => {
+        // Update the fixed point bindings for non-elbow arrows
+        // when the pointer is released, so that they are correctly positioned
+        // after the drag.
+        if (element.startBinding) {
+          this.scene.mutateElement(element, {
+            startBinding: {
+              ...element.startBinding,
+              ...calculateFixedPointForNonElbowArrowBinding(
+                element,
+                elementsMap.get(
+                  element.startBinding.elementId,
+                ) as ExcalidrawBindableElement,
+                "start",
+                elementsMap,
+              ),
+            },
+          });
+        }
+        if (element.endBinding) {
+          this.scene.mutateElement(element, {
+            endBinding: {
+              ...element.endBinding,
+              ...calculateFixedPointForNonElbowArrowBinding(
+                element,
+                elementsMap.get(
+                  element.endBinding.elementId,
+                ) as ExcalidrawBindableElement,
+                "end",
+                elementsMap,
+              ),
+            },
+          });
+        }
+      });
 
       this.setState({ suggestedBinding: null });
     }
@@ -5801,7 +5803,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private getSelectedTextElement(
     container?: ExcalidrawTextContainer | null,
-  ): NonDeleted<ExcalidrawTextElement> | null {
+  ): ExcalidrawTextElement | null {
     const selectedElements = this.scene.getSelectedElements(this.state);
 
     if (selectedElements.length !== 1) {
@@ -5825,7 +5827,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private getSelectedTextEditingContainerAtPosition(
-    hitElement: NonDeletedExcalidrawElement | null,
+    hitElement: ExcalidrawElement | null,
     sceneCoords: { x: number; y: number },
   ): ExcalidrawTextContainer | null | undefined {
     const selectedElements = this.scene.getSelectedElements(this.state);
@@ -5864,7 +5866,7 @@ class App extends React.Component<AppProps, AppState> {
   private getTextElementAtPosition(
     x: number,
     y: number,
-  ): NonDeleted<ExcalidrawTextElement> | null {
+  ): ExcalidrawTextElement | null {
     const element = this.getElementAtPosition(x, y, {
       includeBoundTextElement: true,
     });
@@ -5936,13 +5938,13 @@ class App extends React.Component<AppProps, AppState> {
           includeLockedElements?: boolean;
         }
       | {
-          allHitElements: NonDeleted<ExcalidrawElement>[];
+          allHitElements: ExcalidrawElement[];
         }
     ) & {
       preferSelected?: boolean;
     },
-  ): NonDeleted<ExcalidrawElement> | null {
-    let allHitElements: NonDeleted<ExcalidrawElement>[] = [];
+  ): ExcalidrawElement | null {
+    let allHitElements: ExcalidrawElement[] = [];
     if (opts && "allHitElements" in opts) {
       allHitElements = opts?.allHitElements || [];
     } else {
@@ -5995,11 +5997,11 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements?: boolean;
     },
   ): NonDeleted<ExcalidrawElement>[] {
-    const iframeLikes: Ordered<ExcalidrawIframeElement>[] = [];
+    const iframeLikes: ExcalidrawElement[] = [];
 
     const elementsMap = this.scene.getNonDeletedElementsMap();
 
-    const elements = (
+    const filteredElements = (
       opts?.includeBoundTextElement && opts?.includeLockedElements
         ? this.scene.getNonDeletedElements()
         : this.scene
@@ -6027,12 +6029,16 @@ class App extends React.Component<AppProps, AppState> {
         // Exception being embeddables which should be on top of everything else in
         // terms of hit testing.
         if (isIframeElement(el)) {
-          iframeLikes.push(el);
+          iframeLikes.push(el as NonDeleted<ExcalidrawElement>);
           return false;
         }
         return true;
-      })
-      .concat(iframeLikes) as NonDeleted<ExcalidrawElement>[];
+      });
+
+    const elements = [
+      ...filteredElements,
+      ...iframeLikes,
+    ] as NonDeleted<ExcalidrawElement>[];
 
     return elements;
   }
@@ -6567,7 +6573,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private getElementLinkAtPosition = (
     scenePointer: Readonly<{ x: number; y: number }>,
-    hitElementMightBeLocked: NonDeletedExcalidrawElement | null,
+    hitElementMightBeLocked: ExcalidrawElement | null,
   ): ExcalidrawElement | undefined => {
     if (hitElementMightBeLocked && hitElementMightBeLocked.locked) {
       return undefined;
@@ -6676,7 +6682,7 @@ class App extends React.Component<AppProps, AppState> {
     const frames = this.scene
       .getNonDeletedFramesLikes()
       .filter(
-        (frame): frame is ExcalidrawFrameLikeElement =>
+        (frame): frame is NonDeleted<ExcalidrawFrameLikeElement> =>
           !frame.locked && isCursorInFrame(sceneCoords, frame, elementsMap),
       );
 
@@ -8759,7 +8765,7 @@ class App extends React.Component<AppProps, AppState> {
     let container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
 
     if (hasBoundTextElement(element)) {
-      container = element as ExcalidrawTextContainer;
+      container = element as unknown as typeof container;
       sceneX = element.x + element.width / 2;
       sceneY = element.y + element.height / 2;
     }
@@ -9980,7 +9986,9 @@ class App extends React.Component<AppProps, AppState> {
               pointerDownState.hit.wasAddedToSelection &&
               !selectedElements.find((el) => el.id === hitElement.id)
             ) {
-              selectedElements.push(hitElement);
+              selectedElements.push(
+                hitElement as NonDeleted<ExcalidrawElement>,
+              );
             }
 
             const idsOfElementsToDuplicate = new Map(
@@ -10956,8 +10964,9 @@ class App extends React.Component<AppProps, AppState> {
 
         const selectedFrames = this.scene
           .getSelectedElements(this.state)
-          .filter((element): element is ExcalidrawFrameLikeElement =>
-            isFrameLikeElement(element),
+          .filter(
+            (element): element is NonDeleted<ExcalidrawFrameLikeElement> =>
+              isFrameLikeElement(element),
           );
 
         for (const frame of selectedFrames) {
@@ -10965,11 +10974,11 @@ class App extends React.Component<AppProps, AppState> {
             nextElements,
             getElementsInResizingFrame(
               this.scene.getElementsIncludingDeleted(),
-              frame,
+              frame as ExcalidrawFrameLikeElement,
               this.state,
               elementsMap,
             ),
-            frame,
+            frame as ExcalidrawFrameLikeElement,
             this,
           );
         }
@@ -11322,9 +11331,15 @@ class App extends React.Component<AppProps, AppState> {
         // the endpoints ("start" or "end").
         const linearElements = this.scene
           .getSelectedElements(this.state)
-          .filter(isArrowElement);
+          .filter((el): el is NonDeleted<ExcalidrawArrowElement> =>
+            isArrowElement(el),
+          );
 
-        bindOrUnbindBindingElements(linearElements, this.scene, this.state);
+        bindOrUnbindBindingElements(
+          linearElements as ExcalidrawArrowElement[],
+          this.scene,
+          this.state,
+        );
       }
 
       if (activeTool.type === "laser") {
@@ -11508,7 +11523,7 @@ class App extends React.Component<AppProps, AppState> {
     const dataURL =
       this.files[fileId]?.dataURL || (await getDataURL(imageFile));
 
-    return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
+    return new Promise<InitializedExcalidrawImageElement>(
       async (resolve, reject) => {
         try {
           let initializedImageElement = this.getLatestInitializedImageElement(
@@ -11800,7 +11815,9 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({
             errorMessage: error.message || t("errors.imageInsertError"),
           });
-          return newElementWith(placeholder, { isDeleted: true });
+          return newElementWith(placeholder, {
+            isDeleted: true,
+          } as any) as unknown as InitializedExcalidrawImageElement;
         }
       }),
     );
@@ -12326,7 +12343,7 @@ class App extends React.Component<AppProps, AppState> {
   ): boolean => {
     const selectedElements = this.scene.getSelectedElements(this.state);
     const selectedFrames = selectedElements.filter(
-      (element): element is ExcalidrawFrameLikeElement =>
+      (element): element is NonDeleted<ExcalidrawFrameLikeElement> =>
         isFrameLikeElement(element),
     );
 
@@ -12436,7 +12453,7 @@ class App extends React.Component<AppProps, AppState> {
       selectedFrames.forEach((frame) => {
         getElementsInResizingFrame(
           this.scene.getNonDeletedElements(),
-          frame,
+          frame as ExcalidrawFrameLikeElement,
           this.state,
           this.scene.getNonDeletedElementsMap(),
         ).forEach((element) => elementsToHighlight.add(element));

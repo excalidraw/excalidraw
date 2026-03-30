@@ -39,6 +39,7 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
   FixedSegment,
+  NonDeleted,
 } from "@excalidraw/element/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
@@ -220,18 +221,18 @@ export class API {
     elbowed?: boolean;
     fixedSegments?: FixedSegment[] | null;
   }): T extends "arrow" | "line"
-    ? ExcalidrawLinearElement
+    ? NonDeleted<ExcalidrawLinearElement>
     : T extends "freedraw"
-    ? ExcalidrawFreeDrawElement
+    ? NonDeleted<ExcalidrawFreeDrawElement>
     : T extends "text"
-    ? ExcalidrawTextElement
+    ? NonDeleted<ExcalidrawTextElement>
     : T extends "image"
-    ? ExcalidrawImageElement
+    ? NonDeleted<ExcalidrawImageElement>
     : T extends "frame"
-    ? ExcalidrawFrameElement
+    ? NonDeleted<ExcalidrawFrameElement>
     : T extends "magicframe"
-    ? ExcalidrawMagicFrameElement
-    : ExcalidrawGenericElement => {
+    ? NonDeleted<ExcalidrawMagicFrameElement>
+    : NonDeleted<ExcalidrawGenericElement> => {
     let element: Mutable<ExcalidrawElement> = null!;
 
     const appState = h?.state || getDefaultAppState();

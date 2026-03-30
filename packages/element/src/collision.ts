@@ -72,7 +72,6 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
   NonDeleted,
-  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
   Ordered,
 } from "./types";
@@ -242,7 +241,7 @@ export const hitElementBoundText = (
 };
 
 const bindingBorderTest = (
-  element: NonDeleted<ExcalidrawBindableElement>,
+  element: ExcalidrawBindableElement,
   [x, y]: Readonly<GlobalPoint>,
   elementsMap: NonDeletedSceneElementsMap,
   tolerance: number = 0,
@@ -291,11 +290,11 @@ const bindingBorderTest = (
 
 export const getAllHoveredElementAtPoint = (
   point: Readonly<GlobalPoint>,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly Ordered<ExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
   tolerance?: number,
-): NonDeleted<ExcalidrawBindableElement>[] => {
-  const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
+): ExcalidrawBindableElement[] => {
+  const candidateElements: ExcalidrawBindableElement[] = [];
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
   // because array is ordered from lower z-index to highest and we want element z-index
   // with higher z-index
@@ -324,10 +323,10 @@ export const getAllHoveredElementAtPoint = (
 
 export const getHoveredElementForBinding = (
   point: Readonly<GlobalPoint>,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly Ordered<ExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
   tolerance?: number,
-): NonDeleted<ExcalidrawBindableElement> | null => {
+): ExcalidrawBindableElement | null => {
   const candidateElements = getAllHoveredElementAtPoint(
     point,
     elements,
@@ -354,11 +353,11 @@ export const getHoveredElementForBinding = (
 export const getHoveredElementForFocusPoint = (
   point: GlobalPoint,
   arrow: ExcalidrawArrowElement,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly Ordered<ExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
   tolerance?: number,
 ): ExcalidrawBindableElement | null => {
-  const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
+  const candidateElements: ExcalidrawBindableElement[] = [];
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
   // because array is ordered from lower z-index to highest and we want element z-index
   // with higher z-index

@@ -51,7 +51,7 @@ const getNonDeletedElements = <T extends ExcalidrawElement>(
   allElements: readonly T[],
 ) => {
   const elementsMap = new Map() as NonDeletedSceneElementsMap;
-  const elements: T[] = [];
+  const elements: NonDeleted<T>[] = [];
   for (const element of allElements) {
     if (!element.isDeleted) {
       elements.push(element as NonDeleted<T>);
@@ -209,16 +209,19 @@ export class Scene {
       elements,
       { selectedElementIds: opts.selectedElementIds },
       opts,
-    );
+    ) as NonDeleted<ExcalidrawElement>[];
 
     // cache only if we're not using custom elements
     if (opts?.elements == null) {
       this.selectedElementsCache.selectedElementIds = opts.selectedElementIds;
       this.selectedElementsCache.elements = this.nonDeletedElements;
-      this.selectedElementsCache.cache.set(hash, selectedElements);
+      this.selectedElementsCache.cache.set(
+        hash,
+        selectedElements as NonDeletedExcalidrawElement[],
+      );
     }
 
-    return selectedElements;
+    return selectedElements as NonDeleted<ExcalidrawElement>[];
   }
 
   getNonDeletedFramesLikes(): readonly NonDeleted<ExcalidrawFrameLikeElement>[] {
@@ -291,11 +294,13 @@ export class Scene {
       this.elementsMap.set(element.id, element);
     });
     const nonDeletedElements = getNonDeletedElements(this.elements);
-    this.nonDeletedElements = nonDeletedElements.elements;
+    this.nonDeletedElements =
+      nonDeletedElements.elements as unknown as readonly Ordered<NonDeletedExcalidrawElement>[];
     this.nonDeletedElementsMap = nonDeletedElements.elementsMap;
 
     this.frames = nextFrameLikes;
-    this.nonDeletedFramesLikes = getNonDeletedElements(this.frames).elements;
+    this.nonDeletedFramesLikes = getNonDeletedElements(this.frames)
+      .elements as readonly NonDeleted<ExcalidrawFrameLikeElement>[];
 
     this.triggerUpdate();
   }

@@ -39,7 +39,6 @@ import { getElementAbsoluteCoords } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElementWithContainer,
-  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
@@ -64,7 +63,7 @@ const roughSVGDrawWithPrecision = (
 };
 
 const maybeWrapNodesInFrameClipPath = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   root: SVGElement,
   nodes: SVGElement[],
   frameRendering: AppState["frameRendering"],
@@ -85,7 +84,7 @@ const maybeWrapNodesInFrameClipPath = (
 };
 
 const renderElementToSvg = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   elementsMap: RenderableElementsMap,
   rsvg: RoughSVG,
   svgRoot: SVGElement,
@@ -706,7 +705,7 @@ const renderElementToSvg = (
 };
 
 export const renderSceneToSvg = (
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   elementsMap: RenderableElementsMap,
   rsvg: RoughSVG,
   svgRoot: SVGElement,

@@ -9,6 +9,7 @@ import { convertToExcalidrawElements } from "@excalidraw/element";
 import { exportToCanvas } from "@excalidraw/utils";
 
 import type {
+  ExcalidrawElement,
   NonDeletedExcalidrawElement,
   Theme,
 } from "@excalidraw/element/types";
@@ -53,7 +54,7 @@ export const convertMermaidToExcalidraw = async ({
   mermaidDefinition: string;
   setError: (error: Error | null) => void;
   data: React.MutableRefObject<{
-    elements: readonly NonDeletedExcalidrawElement[];
+    elements: readonly ExcalidrawElement[];
     files: BinaryFiles | null;
   }>;
   theme: Theme;

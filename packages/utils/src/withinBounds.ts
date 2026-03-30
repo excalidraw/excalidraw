@@ -18,12 +18,11 @@ import type {
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
-  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 import type { LocalPoint } from "@excalidraw/math";
 
-type Element = NonDeletedExcalidrawElement;
-type Elements = readonly NonDeletedExcalidrawElement[];
+type Element = ExcalidrawElement;
+type Elements = readonly ExcalidrawElement[];
 
 type Points = readonly LocalPoint[];
 

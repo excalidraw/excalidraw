@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useState } from "react";
 
-import type { ExcalidrawElement, NonDeleted } from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { useTransition } from "../hooks/useTransition";
 
@@ -14,7 +14,7 @@ type LibraryOrPendingItem = readonly (
   | LibraryItem
   | /* pending library item */ {
       id: null;
-      elements: readonly NonDeleted<ExcalidrawElement>[];
+      elements: readonly ExcalidrawElement[];
     }
 )[];
 
