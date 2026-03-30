@@ -5,7 +5,7 @@
  * an ellipse is defined by its center, angle, semi major axis and semi minor axis
  * (but in semi-width and semi-height so it's more relevant to Excalidraw)
  *
- * the idea with pure shapes is so that we can provide collision and other geoemtric methods not depending on
+ * the idea with pure shapes is so that we can provide collision and other geometric methods not depending on
  * the specifics of roughjs or elements in Excalidraw; instead, we can focus on the pure shapes themselves
  *
  * also included in this file are methods for converting an Excalidraw element or a Drawable from roughjs

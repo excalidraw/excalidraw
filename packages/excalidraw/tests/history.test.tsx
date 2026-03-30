@@ -2366,7 +2366,7 @@ describe("history", () => {
       ]);
     });
 
-    // TODO: #7348 ideally we should not override, but since the order of groupIds matters, right now we cannot ensure that with postprocssed groupIds the order will be consistent after series or undos/redos, we don't postprocess them at all
+    // TODO: #7348 ideally we should not override, but since the order of groupIds matters, right now we cannot ensure that with postprocessed groupIds the order will be consistent after series or undos/redos, we don't postprocess them at all
     //       in other words, if we would postprocess groupIds, the groupIds order on "redo" below would be ["B", "A"] instead of ["A", "B"]
     it("should override remotely added groups on undo, but restore them on redo", async () => {
       const rect1 = API.createElement({ type: "rectangle" });
