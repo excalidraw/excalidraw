@@ -260,7 +260,14 @@ const ColorPickerTrigger = ({
       data-openpopup={type}
       onClick={handleClick}
     >
-      <div className="color-picker__button-outline">{!color && slashIcon}</div>
+      <div className="color-picker__button-outline">
+        {color ? (
+          slashIcon
+        ) : (
+          <span className="mixed-color-placeholder">/</span>
+        )}
+      </div>
+
       {isCompactMode && color && mode === "stroke" && (
         <div className="color-picker__button-background">
           <span
