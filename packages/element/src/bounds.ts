@@ -680,8 +680,9 @@ export const getMinMaxXYFromCurvePathOps = (
   return [minX, minY, maxX, maxY];
 };
 
-export const getBoundsFromPoints = (
-  points: ExcalidrawFreeDrawElement["points"],
+export const getBoundsFromPoints = <P extends GlobalPoint | LocalPoint>(
+  points: readonly P[],
+  padding: number = 0,
 ): Bounds => {
   let minX = Infinity;
   let minY = Infinity;
@@ -695,7 +696,7 @@ export const getBoundsFromPoints = (
     maxY = Math.max(maxY, y);
   }
 
-  return [minX, minY, maxX, maxY];
+  return [minX - padding, minY - padding, maxX + padding, maxY + padding];
 };
 
 const getFreeDrawElementAbsoluteCoords = (
@@ -1274,6 +1275,14 @@ export const doBoundsIntersect = (
 
   return minX1 < maxX2 && maxX1 > minX2 && minY1 < maxY2 && maxY1 > minY2;
 };
+
+export const boundsContainBounds = (outerBounds: Bounds, innerBounds: Bounds) =>
+  [
+    pointFrom<GlobalPoint>(innerBounds[0], innerBounds[1]),
+    pointFrom<GlobalPoint>(innerBounds[0], innerBounds[3]),
+    pointFrom<GlobalPoint>(innerBounds[2], innerBounds[1]),
+    pointFrom<GlobalPoint>(innerBounds[2], innerBounds[3]),
+  ].every((point) => pointInsideBounds(point, outerBounds));
 
 export const elementCenterPoint = (
   element: ExcalidrawElement,

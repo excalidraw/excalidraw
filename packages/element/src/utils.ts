@@ -54,6 +54,7 @@ import type {
   ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
+  ExcalidrawEllipseElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
@@ -114,6 +115,135 @@ const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
   }
 
   shapes.set(offset, shape);
+};
+
+export const approximateElementWithPoints = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+): GlobalPoint[] => {
+  const [segments, curves] = deconstructElement(element, elementsMap);
+  const center = elementCenterPoint(element, elementsMap);
+
+  return [
+    ...segments.flatMap((segment) => [segment[0], segment[1]]),
+    ...curves.flatMap((curve) =>
+      ["line", "arrow", "freedraw"].includes(element.type)
+        ? [
+            bezierEquation(curve, 0),
+            bezierEquation(curve, 0.5),
+            bezierEquation(curve, 1),
+          ]
+        : [bezierEquation(curve, 0.5)],
+    ),
+  ].map((point) =>
+    ["line", "arrow", "freedraw"].includes(element.type)
+      ? point
+      : pointRotateRads(point, center, element.angle),
+  );
+};
+
+export const deconstructElement = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] => {
+  switch (element.type) {
+    case "ellipse":
+      return deconstructEllipseElement(element);
+    case "selection":
+    case "rectangle":
+    case "image":
+    case "text":
+    case "iframe":
+    case "embeddable":
+    case "frame":
+    case "magicframe":
+      return deconstructRectanguloidElement(element);
+    case "diamond":
+      return deconstructDiamondElement(element);
+    case "line":
+    case "arrow":
+    case "freedraw":
+      return deconstructLinearOrFreeDrawElement(element, elementsMap);
+  }
+};
+
+export const deconstructEllipseElement = (
+  element: ExcalidrawEllipseElement,
+): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] => {
+  const cachedShape = getElementShapesCacheEntry(element, 0);
+
+  if (cachedShape) {
+    return cachedShape;
+  }
+
+  // Cubic bezier approximation of a quarter ellipse
+  // kappa = 4 * (sqrt(2) - 1) / 3
+  const KAPPA = 0.5522847498;
+
+  const cx = element.x + element.width / 2;
+  const cy = element.y + element.height / 2;
+  const rx = element.width / 2;
+  const ry = element.height / 2;
+
+  const kx = KAPPA * rx;
+  const ky = KAPPA * ry;
+
+  const top = pointRotateRads(
+    pointFrom<GlobalPoint>(cx, cy - ry),
+    pointFrom<GlobalPoint>(cx, cy),
+    element.angle,
+  );
+  const right = pointRotateRads(
+    pointFrom<GlobalPoint>(cx + rx, cy),
+    pointFrom<GlobalPoint>(cx, cy),
+    element.angle,
+  );
+  const bottom = pointRotateRads(
+    pointFrom<GlobalPoint>(cx, cy + ry),
+    pointFrom<GlobalPoint>(cx, cy),
+    element.angle,
+  );
+  const left = pointRotateRads(
+    pointFrom<GlobalPoint>(cx - rx, cy),
+    pointFrom<GlobalPoint>(cx, cy),
+    element.angle,
+  );
+
+  const curves: Curve<GlobalPoint>[] = [
+    // Top → Right
+    curve<GlobalPoint>(
+      top,
+      pointFrom<GlobalPoint>(cx + kx, cy - ry),
+      pointFrom<GlobalPoint>(cx + rx, cy - ky),
+      right,
+    ),
+    // Right → Bottom
+    curve<GlobalPoint>(
+      right,
+      pointFrom<GlobalPoint>(cx + rx, cy + ky),
+      pointFrom<GlobalPoint>(cx + kx, cy + ry),
+      bottom,
+    ),
+    // Bottom → Left
+    curve<GlobalPoint>(
+      bottom,
+      pointFrom<GlobalPoint>(cx - kx, cy + ry),
+      pointFrom<GlobalPoint>(cx - rx, cy + ky),
+      left,
+    ),
+    // Left → Top
+    curve<GlobalPoint>(
+      left,
+      pointFrom<GlobalPoint>(cx - rx, cy - ky),
+      pointFrom<GlobalPoint>(cx - kx, cy - ry),
+      top,
+    ),
+  ];
+
+  const shape = [[], curves] as ElementShape;
+  setElementShapesCacheEntry(element, shape, 0);
+
+  return shape;
 };
 
 /**

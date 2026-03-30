@@ -1,7 +1,6 @@
 import { arrayToMap } from "@excalidraw/common";
 import { isPointWithinBounds, pointFrom } from "@excalidraw/math";
 import { doLineSegmentsIntersect } from "@excalidraw/utils/bbox";
-import { elementsOverlappingBBox } from "@excalidraw/utils/withinBounds";
 
 import type {
   AppClassProperties,
@@ -18,6 +17,8 @@ import {
   getElementLineSegments,
   getCommonBounds,
   getElementAbsoluteCoords,
+  doBoundsIntersect,
+  getElementBounds,
 } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, getContainerElement } from "./textElement";
@@ -99,7 +100,7 @@ export const isElementContainingFrame = (
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
-): boolean => {
+) => {
   return getElementsWithinSelection([frame], element, elementsMap).some(
     (e) => e.id === frame.id,
   );
@@ -140,7 +141,7 @@ export const elementOverlapsWithFrame = (
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
-): boolean => {
+) => {
   return (
     elementsAreInFrameBounds([element], frame, elementsMap) ||
     isElementIntersectingFrame(element, frame, elementsMap) ||
@@ -920,16 +921,17 @@ export const getFrameLikeTitle = (element: ExcalidrawFrameLikeElement) => {
 export const getElementsOverlappingFrame = (
   elements: readonly ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
+  elementsMap: ElementsMap,
 ) => {
-  return (
-    elementsOverlappingBBox({
-      elements,
-      bounds: frame,
-      type: "overlap",
-    })
+  return elements.filter(
+    (el) =>
+      doBoundsIntersect(
+        getElementBounds(el, elementsMap),
+        getElementBounds(frame, elementsMap),
+      ) &&
       // removes elements who are overlapping, but are in a different frame,
       // and thus invisible in target frame
-      .filter((el) => !el.frameId || el.frameId === frame.id)
+      (!el.frameId || el.frameId === frame.id),
   );
 };
 

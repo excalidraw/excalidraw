@@ -1,10 +1,5 @@
 import { arrayToMap, isShallowEqual, type Bounds } from "@excalidraw/common";
-import {
-  lineSegment,
-  pointFrom,
-  type GlobalPoint,
-  type LineSegment,
-} from "@excalidraw/math";
+import { lineSegment, pointFrom, type GlobalPoint } from "@excalidraw/math";
 
 import type {
   AppState,
@@ -13,23 +8,17 @@ import type {
 } from "@excalidraw/excalidraw/types";
 
 import {
+  boundsContainBounds,
+  doBoundsIntersect,
+  getBoundsFromPoints,
   getElementAbsoluteCoords,
   getElementBounds,
-  getElementLineSegments,
 } from "./bounds";
-import {
-  doBoundsIntersectElementBoundingBox,
-  getBoundsCorners,
-  getBoundsEdges,
-  intersectElementWithLineSegment,
-  isPointInElement,
-  shouldTestInside,
-} from "./collision";
+import { intersectElementWithLineSegment } from "./collision";
 import { isElementInViewport } from "./sizeHelpers";
 import {
   isBoundToContainer,
   isFrameLikeElement,
-  isFreeDrawElement,
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
@@ -37,216 +26,38 @@ import {
   elementOverlapsWithFrame,
   getContainingFrame,
   getFrameChildren,
+  isElementIntersectingFrame,
 } from "./frame";
 
 import { LinearElementEditor } from "./linearElementEditor";
 import { selectGroupsForSelectedElements } from "./groups";
+import { approximateElementWithPoints } from "./utils";
+import { getBoundTextElement } from "./textElement";
 
 import type {
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./types";
 
-// Broad-phase only for overlap mode. Rotated closed shapes should not select
-// from the empty corners of their axis-aligned bounds. Linear elements and
-// freedraw already rely on the outline-specific path below, so exclude them.
-const shouldUseRotatedOverlapBroadPhase = (
+const shouldIgnoreElementFromSelection = (
   element: NonDeletedExcalidrawElement,
 ) =>
-  element.angle !== 0 &&
-  !isLinearElement(element) &&
-  !isFreeDrawElement(element);
-
-const clipLineSegmentToBounds = (
-  segment: LineSegment<GlobalPoint>,
-  bounds: Bounds,
-): LineSegment<GlobalPoint> | null => {
-  const [minX, minY, maxX, maxY] = bounds;
-  const [[x1, y1], [x2, y2]] = segment;
-  const deltaX = x2 - x1;
-  const deltaY = y2 - y1;
-  let tMin = 0;
-  let tMax = 1;
-
-  const clip = (p: number, q: number) => {
-    if (p === 0) {
-      return q >= 0;
-    }
-
-    const ratio = q / p;
-
-    if (p < 0) {
-      if (ratio > tMax) {
-        return false;
-      }
-      tMin = Math.max(tMin, ratio);
-      return true;
-    }
-
-    if (ratio < tMin) {
-      return false;
-    }
-    tMax = Math.min(tMax, ratio);
-    return true;
-  };
-
-  if (
-    !clip(-deltaX, x1 - minX) ||
-    !clip(deltaX, maxX - x1) ||
-    !clip(-deltaY, y1 - minY) ||
-    !clip(deltaY, maxY - y1)
-  ) {
-    return null;
-  }
-
-  return lineSegment(
-    pointFrom<GlobalPoint>(x1 + tMin * deltaX, y1 + tMin * deltaY),
-    pointFrom<GlobalPoint>(x1 + tMax * deltaX, y1 + tMax * deltaY),
-  );
-};
-
-const isPointWithinAabb = (point: GlobalPoint, bounds: Bounds) =>
-  point[0] >= bounds[0] &&
-  point[0] <= bounds[2] &&
-  point[1] >= bounds[1] &&
-  point[1] <= bounds[3];
-
-const shouldUsePreciseFilledOverlap = (element: NonDeletedExcalidrawElement) =>
-  element.type === "ellipse" ||
-  element.type === "diamond" ||
-  (element.type === "rectangle" && !!element.roundness);
-
-const shouldSkipElementFromSelection = (element: NonDeletedExcalidrawElement) =>
   element.locked || element.type === "selection" || isBoundToContainer(element);
 
-const getFrameBoundsForSelection = (
-  element: NonDeletedExcalidrawElement,
-  elementsMap: ElementsMap,
-): Bounds | null => {
-  if (!element.frameId) {
-    return null;
-  }
-
-  const containingFrame = getContainingFrame(element, elementsMap);
-  return containingFrame
-    ? (getElementBounds(containingFrame, elementsMap) as Bounds)
-    : null;
-};
-
-const finalizeElementsInSelection = (
-  elementsInSelection: NonDeletedExcalidrawElement[],
-  excludeElementsInFrames: boolean,
-  elementsMap: ElementsMap,
-): NonDeletedExcalidrawElement[] => {
-  elementsInSelection = excludeElementsInFrames
-    ? excludeElementsInFramesFromSelection(elementsInSelection)
-    : elementsInSelection;
-
-  return elementsInSelection.filter((element) => {
-    const containingFrame = getContainingFrame(element, elementsMap);
-
-    if (containingFrame) {
-      return elementOverlapsWithFrame(element, containingFrame, elementsMap);
+const excludeElementsFromFrames = <T extends ExcalidrawElement>(
+  selectedElements: readonly T[],
+  framesInSelection: Set<ExcalidrawFrameLikeElement["id"]>,
+) => {
+  return selectedElements.filter((element) => {
+    if (element.frameId && framesInSelection.has(element.frameId)) {
+      return false;
     }
-
     return true;
   });
-};
-
-const getVisibleElementOutlineSegments = (
-  element: NonDeletedExcalidrawElement,
-  frameBounds: Bounds | null,
-  elementsMap: ElementsMap,
-) =>
-  frameBounds
-    ? getElementLineSegments(element, elementsMap).flatMap((segment) => {
-        const clippedSegment = clipLineSegmentToBounds(segment, frameBounds);
-        return clippedSegment ? [clippedSegment] : [];
-      })
-    : getElementLineSegments(element, elementsMap);
-
-const doesSelectionIntersectElementOutline = (
-  element: NonDeletedExcalidrawElement,
-  frameBounds: Bounds | null,
-  selectionEdges: readonly LineSegment<GlobalPoint>[],
-  elementsMap: ElementsMap,
-) =>
-  selectionEdges.some((selectionEdge) =>
-    intersectElementWithLineSegment(
-      element,
-      elementsMap,
-      selectionEdge,
-      0,
-      true,
-    ).some((point) => !frameBounds || isPointWithinAabb(point, frameBounds)),
-  );
-
-const doesSelectionContainElementOutline = (
-  outlineSegments: readonly LineSegment<GlobalPoint>[],
-  selectionBounds: Bounds,
-) =>
-  outlineSegments.length > 0 &&
-  outlineSegments.every(
-    (outlineSegment) =>
-      isPointWithinAabb(outlineSegment[0], selectionBounds) &&
-      isPointWithinAabb(outlineSegment[1], selectionBounds),
-  );
-
-const doesSelectionContainElementInterior = (
-  element: NonDeletedExcalidrawElement,
-  frameBounds: Bounds | null,
-  selectionCorners: readonly GlobalPoint[],
-  elementsMap: ElementsMap,
-) =>
-  selectionCorners.some(
-    (selectionCorner) =>
-      (!frameBounds || isPointWithinAabb(selectionCorner, frameBounds)) &&
-      isPointInElement(selectionCorner, element, elementsMap),
-  );
-
-const doesSelectionOverlapFilledElement = (
-  element: NonDeletedExcalidrawElement,
-  frameBounds: Bounds | null,
-  selectionBounds: Bounds,
-  selectionCorners: readonly GlobalPoint[],
-  selectionEdges: readonly LineSegment<GlobalPoint>[],
-  elementsMap: ElementsMap,
-) => {
-  if (
-    doesSelectionContainElementInterior(
-      element,
-      frameBounds,
-      selectionCorners,
-      elementsMap,
-    )
-  ) {
-    return true;
-  }
-
-  if (
-    doesSelectionIntersectElementOutline(
-      element,
-      frameBounds,
-      selectionEdges,
-      elementsMap,
-    )
-  ) {
-    return true;
-  }
-
-  const outlineSegments = getVisibleElementOutlineSegments(
-    element,
-    frameBounds,
-    elementsMap,
-  );
-
-  return (
-    outlineSegments.length > 0 &&
-    doesSelectionContainElementOutline(outlineSegments, selectionBounds)
-  );
 };
 
 /**
@@ -268,12 +79,7 @@ export const excludeElementsInFramesFromSelection = <
     }
   });
 
-  return selectedElements.filter((element) => {
-    if (element.frameId && framesInSelection.has(element.frameId)) {
-      return false;
-    }
-    return true;
-  });
+  return excludeElementsFromFrames(selectedElements, framesInSelection);
 };
 
 export const getElementsWithinSelection = (
@@ -295,152 +101,153 @@ export const getElementsWithinSelection = (
     selectionX2,
     selectionY2,
   ] as Bounds;
+  const selectionEdges = [
+    lineSegment<GlobalPoint>(
+      pointFrom(selectionX1, selectionY1),
+      pointFrom(selectionX2, selectionY1),
+    ),
+    lineSegment<GlobalPoint>(
+      pointFrom(selectionX2, selectionY1),
+      pointFrom(selectionX2, selectionY2),
+    ),
+    lineSegment<GlobalPoint>(
+      pointFrom(selectionX2, selectionY2),
+      pointFrom(selectionX1, selectionY2),
+    ),
+    lineSegment<GlobalPoint>(
+      pointFrom(selectionX1, selectionY2),
+      pointFrom(selectionX1, selectionY1),
+    ),
+  ];
 
-  if (boxSelectionMode !== "overlap") {
-    const elementsInSelection: NonDeletedExcalidrawElement[] = [];
-
-    for (const element of elements) {
-      if (shouldSkipElementFromSelection(element)) {
-        continue;
-      }
-
-      const elementBounds = getElementBounds(element, elementsMap) as Bounds;
-      const frameBounds = getFrameBoundsForSelection(element, elementsMap);
-      let elementX1 = elementBounds[0];
-      let elementY1 = elementBounds[1];
-      let elementX2 = elementBounds[2];
-      let elementY2 = elementBounds[3];
-
-      if (frameBounds) {
-        elementX1 = Math.max(frameBounds[0], elementX1);
-        elementY1 = Math.max(frameBounds[1], elementY1);
-        elementX2 = Math.min(frameBounds[2], elementX2);
-        elementY2 = Math.min(frameBounds[3], elementY2);
-      }
-
-      if (
-        selectionX1 <= elementX1 &&
-        selectionY1 <= elementY1 &&
-        selectionX2 >= elementX2 &&
-        selectionY2 >= elementY2
-      ) {
-        elementsInSelection.push(element);
-      }
-    }
-
-    return finalizeElementsInSelection(
-      elementsInSelection,
-      excludeElementsInFrames,
-      elementsMap,
-    );
-  }
-
-  const selectionCorners = getBoundsCorners(selectionBounds);
-  const selectionEdges = getBoundsEdges(selectionCorners);
-  const elementsInSelection: NonDeletedExcalidrawElement[] = [];
+  const framesInSelection = excludeElementsInFrames
+    ? new Set<NonDeletedExcalidrawElement["id"]>()
+    : null;
+  let elementsInSelection: NonDeletedExcalidrawElement[] = [];
 
   for (const element of elements) {
-    if (shouldSkipElementFromSelection(element)) {
+    if (shouldIgnoreElementFromSelection(element)) {
       continue;
     }
 
-    const elementBounds = getElementBounds(element, elementsMap) as Bounds;
-    const frameBounds = getFrameBoundsForSelection(element, elementsMap);
-    let elementX1 = elementBounds[0];
-    let elementY1 = elementBounds[1];
-    let elementX2 = elementBounds[2];
-    let elementY2 = elementBounds[3];
-
-    if (frameBounds) {
-      elementX1 = Math.max(frameBounds[0], elementX1);
-      elementY1 = Math.max(frameBounds[1], elementY1);
-      elementX2 = Math.min(frameBounds[2], elementX2);
-      elementY2 = Math.min(frameBounds[3], elementY2);
-    }
-
-    const isSelectionContainingElement =
-      selectionX1 <= elementX1 &&
-      selectionY1 <= elementY1 &&
-      selectionX2 >= elementX2 &&
-      selectionY2 >= elementY2;
-
-    const isSelectionOverlappingElementAabb =
-      selectionX1 <= elementX2 &&
-      selectionY1 <= elementY2 &&
-      selectionX2 >= elementX1 &&
-      selectionY2 >= elementY1;
-    const isSelectionOverlappingElement = shouldUseRotatedOverlapBroadPhase(
-      element,
-    )
-      ? isSelectionOverlappingElementAabb &&
-        doBoundsIntersectElementBoundingBox(
-          selectionBounds,
-          element,
-          elementsMap,
-        )
-      : isSelectionOverlappingElementAabb;
-
-    const shouldSelectFromInside = shouldTestInside(element);
-
-    if (shouldSelectFromInside) {
-      if (
-        isSelectionOverlappingElement &&
-        (!shouldUsePreciseFilledOverlap(element) ||
-          isSelectionContainingElement ||
-          doesSelectionOverlapFilledElement(
-            element,
-            frameBounds,
-            selectionBounds,
-            selectionCorners,
-            selectionEdges,
-            elementsMap,
-          ))
-      ) {
-        elementsInSelection.push(element);
-      }
-      continue;
-    }
-
-    if (!isSelectionOverlappingElement) {
-      continue;
-    }
-
-    if (isSelectionContainingElement) {
-      elementsInSelection.push(element);
-      continue;
-    }
-
-    if (
-      doesSelectionIntersectElementOutline(
-        element,
-        frameBounds,
-        selectionEdges,
-        elementsMap,
-      )
-    ) {
-      elementsInSelection.push(element);
-      continue;
-    }
-
-    const outlineSegments = getVisibleElementOutlineSegments(
-      element,
-      frameBounds,
-      elementsMap,
+    let elementBounds = getBoundsFromPoints(
+      approximateElementWithPoints(element, elementsMap),
+      -element.strokeWidth / 2,
     );
 
-    if (
-      outlineSegments.length > 0 &&
-      doesSelectionContainElementOutline(outlineSegments, selectionBounds)
-    ) {
-      elementsInSelection.push(element);
+    // Whether the element bounds should include the bound text element bounds
+    const boundTextElement = getBoundTextElement(element, elementsMap);
+    if (boundTextElement) {
+      const boundTextElementBounds = getElementBounds(
+        boundTextElement,
+        elementsMap,
+      );
+
+      elementBounds = [
+        Math.min(elementBounds[0], boundTextElementBounds[0]),
+        Math.min(elementBounds[1], boundTextElementBounds[1]),
+        Math.max(elementBounds[2], boundTextElementBounds[2]),
+        Math.max(elementBounds[3], boundTextElementBounds[3]),
+      ];
     }
+
+    // Clip element bounds by its containing frame (if any), since only the
+    // visible (frame-clipped) portion of the element is relevant for selection.
+    const associatedFrame = getContainingFrame(element, elementsMap);
+    if (
+      associatedFrame &&
+      isElementIntersectingFrame(element, associatedFrame, elementsMap)
+    ) {
+      const frameBounds = getElementBounds(associatedFrame, elementsMap);
+      elementBounds = [
+        Math.max(elementBounds[0], frameBounds[0]),
+        Math.max(elementBounds[1], frameBounds[1]),
+        Math.min(elementBounds[2], frameBounds[2]),
+        Math.min(elementBounds[3], frameBounds[3]),
+      ] as Bounds;
+
+      if (boundsContainBounds(selectionBounds, elementBounds)) {
+        elementsInSelection.push(element);
+        continue;
+      }
+    }
+
+    // ============== Evaluation ==============
+
+    // 1. If the selection box WRAPs the element's bounds, then add it to the
+    //    selection and move on, regardless of the selection mode.
+    //
+    //    PERF: This trick only works with axis-aligned box selection and the
+    //          current convex element shapes!
+    if (boundsContainBounds(selectionBounds, elementBounds)) {
+      if (framesInSelection && isFrameLikeElement(element)) {
+        framesInSelection.add(element.id);
+      } else {
+        elementsInSelection.push(element);
+        continue;
+      }
+    }
+
+    // 2. Handle the case where the selection is not wrapping the element, but
+    //    it does intersect the element's outline.
+    if (
+      boxSelectionMode === "overlap" &&
+      doBoundsIntersect(selectionBounds, elementBounds)
+    ) {
+      const selectionEdgeIntersects = selectionEdges.some((selectionEdge) => {
+        const labelIntersection = boundTextElement
+          ? intersectElementWithLineSegment(
+              boundTextElement,
+              elementsMap,
+              selectionEdge,
+              0,
+              true, // Stop at first hit for better performance
+            )
+          : [];
+        if (labelIntersection.length > 0) {
+          return true;
+        }
+
+        const intersection = intersectElementWithLineSegment(
+          element,
+          elementsMap,
+          selectionEdge,
+          0,
+          true, // Stop at first hit for better performance
+        );
+
+        return intersection.length > 0;
+      });
+
+      if (selectionEdgeIntersects) {
+        if (framesInSelection && isFrameLikeElement(element)) {
+          framesInSelection.add(element.id);
+        }
+
+        elementsInSelection.push(element);
+        continue;
+      }
+    }
+
+    // 3. We don't need to handle when the selection is inside the element
+    //    as it is separately handled in App.
   }
 
-  return finalizeElementsInSelection(
-    elementsInSelection,
-    excludeElementsInFrames,
-    elementsMap,
-  );
+  elementsInSelection = framesInSelection
+    ? excludeElementsFromFrames(elementsInSelection, framesInSelection)
+    : elementsInSelection;
+
+  elementsInSelection = elementsInSelection.filter((element) => {
+    const containingFrame = getContainingFrame(element, elementsMap);
+
+    if (containingFrame) {
+      return elementOverlapsWithFrame(element, containingFrame, elementsMap);
+    }
+
+    return true;
+  });
+
+  return elementsInSelection;
 };
 
 export const getVisibleAndNonSelectedElements = (
