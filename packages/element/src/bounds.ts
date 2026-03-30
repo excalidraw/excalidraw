@@ -27,7 +27,6 @@ import type {
   GlobalPoint,
   LineSegment,
   LocalPoint,
-  NonRotated,
   Radians,
 } from "@excalidraw/math";
 
@@ -1001,12 +1000,8 @@ export const getElementBounds = <T extends boolean = false>(
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
   nonRotated: T = false as T,
-): T extends true ? NonRotated<Bounds> : Bounds => {
-  return ElementBounds.getBounds(
-    element,
-    elementsMap,
-    nonRotated,
-  ) as T extends true ? NonRotated<Bounds> : Bounds;
+): Bounds => {
+  return ElementBounds.getBounds(element, elementsMap, nonRotated);
 };
 
 export const getCommonBounds = (

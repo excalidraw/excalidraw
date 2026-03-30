@@ -23,12 +23,6 @@ export type Degrees = number & { _brand: "excalimath_degree" };
  */
 export type InclusiveRange = [number, number] & { _brand: "excalimath_degree" };
 
-/**
- * Can be used for any type of point-likes that are non-rotated, such as
- * non-AABB Bounds, or non-rotated Point.
- */
-export type NonRotated<T> = T & { _brand_nonrotated: "excalimath_nonrotated" };
-
 //
 // Point
 //
