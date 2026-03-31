@@ -17,6 +17,7 @@ import {
 import { intersectElementWithLineSegment } from "./collision";
 import { isElementInViewport } from "./sizeHelpers";
 import {
+  isArrowElement,
   isBoundToContainer,
   isFrameLikeElement,
   isLinearElement,
@@ -39,7 +40,6 @@ import type {
   ElementsMapOrArray,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
-  ExcalidrawLinearElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./types";
@@ -137,10 +137,11 @@ export const getElementsWithinSelection = (
     );
 
     // Whether the element bounds should include the bound text element bounds
-    const boundTextElement = getBoundTextElement(element, elementsMap);
+    const boundTextElement =
+      isArrowElement(element) && getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
       const { x, y } = LinearElementEditor.getBoundTextElementPosition(
-        element as ExcalidrawLinearElement,
+        element,
         boundTextElement,
         elementsMap,
       );
