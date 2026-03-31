@@ -129,8 +129,16 @@ export const getElementsWithinSelection = (
       continue;
     }
 
-    let elementBounds = getElementBounds(element, elementsMap);
+    const strokeWidth = element.strokeWidth;
     let labelBounds: Bounds | null = null;
+    let elementBounds = getElementBounds(element, elementsMap);
+
+    elementBounds = [
+      elementBounds[0] - strokeWidth,
+      elementBounds[1] - strokeWidth,
+      elementBounds[2] + strokeWidth,
+      elementBounds[3] + strokeWidth,
+    ] as Bounds;
 
     // Whether the element bounds should include the bound text element bounds
     const boundTextElement =
@@ -221,7 +229,7 @@ export const getElementsWithinSelection = (
             element,
             elementsMap,
             selectionEdge,
-            0,
+            strokeWidth / 2,
             true, // Stop at first hit for better performance
           ).length > 0,
       );
