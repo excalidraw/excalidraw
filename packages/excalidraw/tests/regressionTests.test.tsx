@@ -525,7 +525,7 @@ describe("regression tests", () => {
     for (const element of h.elements) {
       expect(element.groupIds.length).toBe(0);
     }
-    console.log(JSON.stringify(h.state.selectedElementIds));
+
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.G);
     });
