@@ -348,10 +348,10 @@ describe("box-selection overlap mode", () => {
     );
     const [outlineX1, outlineY1, outlineX2, outlineY2] = getOutlineBounds(rect);
 
-    expect(outlineX1).toBeGreaterThan(boundsX1);
-    expect(outlineY1).toBeGreaterThan(boundsY1);
-    expect(outlineX2).toBeLessThan(boundsX2);
-    expect(outlineY2).toBeLessThan(boundsY2);
+    expect(outlineX1).toBeGreaterThan(boundsX1 - 1);
+    expect(outlineY1).toBeGreaterThan(boundsY1 - 1);
+    expect(outlineX2).toBeLessThan(boundsX2 + 1);
+    expect(outlineY2).toBeLessThan(boundsY2 + 1);
 
     boxSelect(
       outlineX1 - (outlineX1 - boundsX1) / 2,

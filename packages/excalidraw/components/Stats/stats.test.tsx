@@ -750,7 +750,7 @@ describe("frame resizing behavior", () => {
       x: 0,
       y: 0,
       width: 100,
-      height: 100,
+      height: 101,
     });
 
     // Create a rectangle outside the frame

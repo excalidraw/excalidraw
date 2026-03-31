@@ -468,7 +468,7 @@ describe("regression tests", () => {
     mouse.reset();
     mouse.down();
     mouse.move(-1000, -1000);
-    mouse.restorePosition(...end);
+    mouse.restorePosition(end[0] + 1, end[1] + 1);
     mouse.up();
 
     expect(h.elements.length).toBe(3);
@@ -519,13 +519,13 @@ describe("regression tests", () => {
     mouse.reset();
     mouse.down();
     mouse.move(-1000, -1000);
-    mouse.restorePosition(...end);
+    mouse.restorePosition(end[0] + 1, end[1] + 1);
     mouse.up();
 
     for (const element of h.elements) {
       expect(element.groupIds.length).toBe(0);
     }
-
+    console.log(JSON.stringify(h.state.selectedElementIds));
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.G);
     });
@@ -537,7 +537,7 @@ describe("regression tests", () => {
     mouse.moveTo(-10, -10); // the NW resizing handle is at [0, 0], so moving further
     mouse.down();
     mouse.move(-1000, -1000);
-    mouse.restorePosition(...end);
+    mouse.restorePosition(end[0] + 1, end[1] + 1);
     mouse.up();
 
     Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {

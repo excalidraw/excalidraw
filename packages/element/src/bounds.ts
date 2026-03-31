@@ -44,6 +44,7 @@ import {
   isFreeDrawElement,
   isLinearElement,
   isLineElement,
+  isRectanguloidElement,
   isTextElement,
 } from "./typeChecks";
 
@@ -52,6 +53,7 @@ import { getElementShape } from "./shape";
 import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
+  getCornerRadius,
 } from "./utils";
 
 import type { Drawable, Op } from "roughjs/bin/core";
@@ -178,31 +180,108 @@ export class ElementBounds {
     } else if (isLinearElement(element)) {
       bounds = getLinearElementRotatedBounds(element, cx, cy, elementsMap);
     } else if (element.type === "diamond") {
-      const [x11, y11] = pointRotateRads(
-        pointFrom(cx, y1),
-        pointFrom(cx, cy),
-        element.angle,
-      );
-      const [x12, y12] = pointRotateRads(
-        pointFrom(cx, y2),
-        pointFrom(cx, cy),
-        element.angle,
-      );
-      const [x22, y22] = pointRotateRads(
-        pointFrom(x1, cy),
-        pointFrom(cx, cy),
-        element.angle,
-      );
-      const [x21, y21] = pointRotateRads(
-        pointFrom(x2, cy),
-        pointFrom(cx, cy),
-        element.angle,
-      );
-      const minX = Math.min(x11, x12, x22, x21);
-      const minY = Math.min(y11, y12, y22, y21);
-      const maxX = Math.max(x11, x12, x22, x21);
-      const maxY = Math.max(y11, y12, y22, y21);
-      bounds = [minX, minY, maxX, maxY];
+      if (element.roundness) {
+        // Rounded diamond: compute the tight AABB by rotating each corner's
+        // cubic bezier control points and applying the exact bezier AABB
+        // formula. Straight-side endpoints coincide with corner bezier
+        // endpoints so no additional points are needed.
+        const a = (x2 - x1) / 2;
+        const b = (y2 - y1) / 2;
+        const rv = getCornerRadius(a, element); // horizontal inset at x-axis tips
+        const rh = getCornerRadius(b, element); // vertical inset at y-axis tips
+        const center = pointFrom<GlobalPoint>(cx, cy);
+        const rot = element.angle;
+
+        // Control points for each degenerate (P1=P2=tip) cubic bezier corner.
+        // Ordering: [P0, P1, P2, P3] going clockwise around the tip.
+        const cornerControlPoints: [
+          GlobalPoint,
+          GlobalPoint,
+          GlobalPoint,
+          GlobalPoint,
+        ][] = [
+          // Right tip
+          [
+            pointFrom(x2 - rv, cy - rh),
+            pointFrom(x2, cy),
+            pointFrom(x2, cy),
+            pointFrom(x2 - rv, cy + rh),
+          ],
+          // Bottom tip
+          [
+            pointFrom(cx + rv, y2 - rh),
+            pointFrom(cx, y2),
+            pointFrom(cx, y2),
+            pointFrom(cx - rv, y2 - rh),
+          ],
+          // Left tip
+          [
+            pointFrom(x1 + rv, cy + rh),
+            pointFrom(x1, cy),
+            pointFrom(x1, cy),
+            pointFrom(x1 + rv, cy - rh),
+          ],
+          // Top tip
+          [
+            pointFrom(cx - rv, y1 + rh),
+            pointFrom(cx, y1),
+            pointFrom(cx, y1),
+            pointFrom(cx + rv, y1 + rh),
+          ],
+        ];
+
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+
+        for (const [p0r, p1r, p2r, p3r] of cornerControlPoints) {
+          const p0 = pointRotateRads<GlobalPoint>(p0r, center, rot);
+          const p1 = pointRotateRads<GlobalPoint>(p1r, center, rot);
+          const p2 = pointRotateRads<GlobalPoint>(p2r, center, rot);
+          const p3 = pointRotateRads<GlobalPoint>(p3r, center, rot);
+          const [bx1, by1, bx2, by2] = getCubicBezierCurveBound(p0, p1, p2, p3);
+          if (bx1 < minX) {
+            minX = bx1;
+          }
+          if (by1 < minY) {
+            minY = by1;
+          }
+          if (bx2 > maxX) {
+            maxX = bx2;
+          }
+          if (by2 > maxY) {
+            maxY = by2;
+          }
+        }
+        bounds = [minX, minY, maxX, maxY];
+      } else {
+        const [x11, y11] = pointRotateRads(
+          pointFrom(cx, y1),
+          pointFrom(cx, cy),
+          element.angle,
+        );
+        const [x12, y12] = pointRotateRads(
+          pointFrom(cx, y2),
+          pointFrom(cx, cy),
+          element.angle,
+        );
+        const [x22, y22] = pointRotateRads(
+          pointFrom(x1, cy),
+          pointFrom(cx, cy),
+          element.angle,
+        );
+        const [x21, y21] = pointRotateRads(
+          pointFrom(x2, cy),
+          pointFrom(cx, cy),
+          element.angle,
+        );
+        const minX = Math.min(x11, x12, x22, x21);
+        const minY = Math.min(y11, y12, y22, y21);
+        const maxX = Math.max(x11, x12, x22, x21);
+        const maxY = Math.max(y11, y12, y22, y21);
+        bounds = [minX, minY, maxX, maxY];
+      }
     } else if (element.type === "ellipse") {
       const w = (x2 - x1) / 2;
       const h = (y2 - y1) / 2;
@@ -212,31 +291,23 @@ export class ElementBounds {
       const hh = Math.hypot(h * cos, w * sin);
       bounds = [cx - ww, cy - hh, cx + ww, cy + hh];
     } else {
-      const [x11, y11] = pointRotateRads(
-        pointFrom(x1, y1),
-        pointFrom(cx, cy),
-        element.angle,
-      );
-      const [x12, y12] = pointRotateRads(
-        pointFrom(x1, y2),
-        pointFrom(cx, cy),
-        element.angle,
-      );
-      const [x22, y22] = pointRotateRads(
-        pointFrom(x2, y2),
-        pointFrom(cx, cy),
-        element.angle,
-      );
-      const [x21, y21] = pointRotateRads(
-        pointFrom(x2, y1),
-        pointFrom(cx, cy),
-        element.angle,
-      );
-      const minX = Math.min(x11, x12, x22, x21);
-      const minY = Math.min(y11, y12, y22, y21);
-      const maxX = Math.max(x11, x12, x22, x21);
-      const maxY = Math.max(y11, y12, y22, y21);
-      bounds = [minX, minY, maxX, maxY];
+      // For rounded rectanguloids the tight AABB uses the Minkowski sum
+      // identity: rounded_rect = inner_rect ⊕ circle(r).
+      //
+      // The AABB of the Minkowski sum is simply the AABB of the rotated inner
+      // rect expanded by r on every side, giving exact (snug) bounds for any
+      // rotation angle. When r = 0 this reduces to the standard rotated-rect
+      // AABB formula.
+      const r = isRectanguloidElement(element)
+        ? getCornerRadius(Math.min(element.width, element.height), element)
+        : 0;
+      const a = (x2 - x1) / 2; // half-width
+      const b = (y2 - y1) / 2; // half-height
+      const cos = Math.abs(Math.cos(element.angle));
+      const sin = Math.abs(Math.sin(element.angle));
+      const hw = (a - r) * cos + (b - r) * sin + r;
+      const hh = (a - r) * sin + (b - r) * cos + r;
+      bounds = [cx - hw, cy - hh, cx + hw, cy + hh];
     }
 
     return bounds;

@@ -10,7 +10,6 @@ import type {
 import {
   boundsContainBounds,
   doBoundsIntersect,
-  getBoundsFromPoints,
   getElementAbsoluteCoords,
   getElementBounds,
 } from "./bounds";
@@ -32,7 +31,6 @@ import {
 
 import { LinearElementEditor } from "./linearElementEditor";
 import { selectGroupsForSelectedElements } from "./groups";
-import { approximateElementWithPoints } from "./utils";
 import { getBoundTextElement } from "./textElement";
 
 import type {
@@ -131,10 +129,7 @@ export const getElementsWithinSelection = (
       continue;
     }
 
-    let elementBounds = getBoundsFromPoints(
-      approximateElementWithPoints(element, elementsMap),
-      -element.strokeWidth / 2,
-    );
+    let elementBounds = getElementBounds(element, elementsMap);
 
     // Whether the element bounds should include the bound text element bounds
     const boundTextElement =
