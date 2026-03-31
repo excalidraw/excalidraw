@@ -130,6 +130,7 @@ export const getElementsWithinSelection = (
     }
 
     let elementBounds = getElementBounds(element, elementsMap);
+    let labelBounds: Bounds | null = null;
 
     // Whether the element bounds should include the bound text element bounds
     const boundTextElement =
@@ -140,12 +141,12 @@ export const getElementsWithinSelection = (
         boundTextElement,
         elementsMap,
       );
-      elementBounds = [
-        Math.min(elementBounds[0], x),
-        Math.min(elementBounds[1], y),
-        Math.max(elementBounds[2], x + boundTextElement.width),
-        Math.max(elementBounds[3], y + boundTextElement.height),
-      ];
+      labelBounds = [
+        x,
+        y,
+        x + boundTextElement.width,
+        y + boundTextElement.height,
+      ] as Bounds;
     }
 
     // Clip element bounds by its containing frame (if any), since only the
@@ -163,11 +164,24 @@ export const getElementsWithinSelection = (
         Math.min(elementBounds[3], frameBounds[3]),
       ] as Bounds;
 
-      if (boundsContainBounds(selectionBounds, elementBounds)) {
-        elementsInSelection.push(element);
-        continue;
-      }
+      labelBounds = labelBounds
+        ? ([
+            Math.max(labelBounds[0], frameBounds[0]),
+            Math.max(labelBounds[1], frameBounds[1]),
+            Math.min(labelBounds[2], frameBounds[2]),
+            Math.min(labelBounds[3], frameBounds[3]),
+          ] as Bounds)
+        : null;
     }
+
+    const commonBounds = labelBounds
+      ? ([
+          Math.min(labelBounds[0], elementBounds[0]),
+          Math.min(labelBounds[1], elementBounds[1]),
+          Math.max(labelBounds[2], elementBounds[2]),
+          Math.max(labelBounds[3], elementBounds[3]),
+        ] as Bounds)
+      : elementBounds;
 
     // ============== Evaluation ==============
 
@@ -176,7 +190,7 @@ export const getElementsWithinSelection = (
     //
     //    PERF: This trick only works with axis-aligned box selection and the
     //          current convex element shapes!
-    if (boundsContainBounds(selectionBounds, elementBounds)) {
+    if (boundsContainBounds(selectionBounds, commonBounds)) {
       if (framesInSelection && isFrameLikeElement(element)) {
         framesInSelection.add(element.id);
       } else {
@@ -185,36 +199,32 @@ export const getElementsWithinSelection = (
       }
     }
 
-    // 2. Handle the case where the selection is not wrapping the element, but
+    // 2. Handle the case where the label is overlapped by the selection box
+    if (
+      boxSelectionMode === "overlap" &&
+      labelBounds &&
+      doBoundsIntersect(selectionBounds, labelBounds)
+    ) {
+      elementsInSelection.push(element);
+      continue;
+    }
+
+    // 3. Handle the case where the selection is not wrapping the element, but
     //    it does intersect the element's outline.
     if (
       boxSelectionMode === "overlap" &&
       doBoundsIntersect(selectionBounds, elementBounds)
     ) {
-      const selectionEdgeIntersects = selectionEdges.some((selectionEdge) => {
-        const labelIntersection = boundTextElement
-          ? intersectElementWithLineSegment(
-              boundTextElement,
-              elementsMap,
-              selectionEdge,
-              0,
-              true, // Stop at first hit for better performance
-            )
-          : [];
-        if (labelIntersection.length > 0) {
-          return true;
-        }
-
-        const intersection = intersectElementWithLineSegment(
-          element,
-          elementsMap,
-          selectionEdge,
-          0,
-          true, // Stop at first hit for better performance
-        );
-
-        return intersection.length > 0;
-      });
+      const selectionEdgeIntersects = selectionEdges.some(
+        (selectionEdge) =>
+          intersectElementWithLineSegment(
+            element,
+            elementsMap,
+            selectionEdge,
+            0,
+            true, // Stop at first hit for better performance
+          ).length > 0,
+      );
 
       if (selectionEdgeIntersects) {
         if (framesInSelection && isFrameLikeElement(element)) {
@@ -226,7 +236,7 @@ export const getElementsWithinSelection = (
       }
     }
 
-    // 3. We don't need to handle when the selection is inside the element
+    // 4. We don't need to handle when the selection is inside the element
     //    as it is separately handled in App.
   }
 
