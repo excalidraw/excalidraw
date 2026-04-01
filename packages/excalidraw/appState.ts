@@ -128,6 +128,7 @@ export const getDefaultAppState = (): Omit<
     lockedMultiSelections: {},
     activeLockedId: null,
     bindMode: "orbit",
+    boxSelectionMode: "contain",
   };
 };
 

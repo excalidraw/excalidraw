@@ -92,6 +92,7 @@ export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
   selection: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
+  // TODO remove (this flag is effectively unused AFAIK)
   excludeElementsInFrames: boolean = true,
   boxSelectionMode: BoxSelectionMode = "contain",
 ): NonDeletedExcalidrawElement[] => {
