@@ -1262,6 +1262,17 @@ export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
 ): boolean =>
   p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
 
+// TODO make pointInsideBounds inclusive and remove this function once we
+// test nothing is breaking
+export const pointInsideBoundsInclusive = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  bounds: Bounds,
+): boolean =>
+  p[0] >= bounds[0] &&
+  p[0] <= bounds[2] &&
+  p[1] >= bounds[1] &&
+  p[1] <= bounds[3];
+
 export const doBoundsIntersect = (
   bounds1: Bounds | null,
   bounds2: Bounds | null,
@@ -1282,7 +1293,7 @@ export const boundsContainBounds = (outerBounds: Bounds, innerBounds: Bounds) =>
     pointFrom<GlobalPoint>(innerBounds[0], innerBounds[3]),
     pointFrom<GlobalPoint>(innerBounds[2], innerBounds[1]),
     pointFrom<GlobalPoint>(innerBounds[2], innerBounds[3]),
-  ].every((point) => pointInsideBounds(point, outerBounds));
+  ].every((point) => pointInsideBoundsInclusive(point, outerBounds));
 
 export const elementCenterPoint = (
   element: ExcalidrawElement,
