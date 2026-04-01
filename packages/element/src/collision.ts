@@ -584,7 +584,9 @@ const intersectLinearOrFreeDrawWithLineSegment = (
       continue;
     }
 
-    const hits = curveIntersectLineSegment(c, segment);
+    const hits = curveIntersectLineSegment(c, segment, {
+      iterLimit: 9,
+    });
 
     if (hits.length > 0) {
       intersections.push(...hits);

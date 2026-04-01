@@ -1,5 +1,10 @@
 import { arrayToMap, isShallowEqual, type Bounds } from "@excalidraw/common";
-import { lineSegment, pointFrom, type GlobalPoint } from "@excalidraw/math";
+import {
+  lineSegment,
+  pointFrom,
+  pointRotateRads,
+  type GlobalPoint,
+} from "@excalidraw/math";
 
 import type {
   AppState,
@@ -10,8 +15,10 @@ import type {
 import {
   boundsContainBounds,
   doBoundsIntersect,
+  elementCenterPoint,
   getElementAbsoluteCoords,
   getElementBounds,
+  pointInsideBounds,
 } from "./bounds";
 import { intersectElementWithLineSegment } from "./collision";
 import { isElementInViewport } from "./sizeHelpers";
@@ -19,6 +26,7 @@ import {
   isArrowElement,
   isBoundToContainer,
   isFrameLikeElement,
+  isFreeDrawElement,
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
@@ -223,18 +231,37 @@ export const getElementsWithinSelection = (
       boxSelectionMode === "overlap" &&
       doBoundsIntersect(selectionBounds, elementBounds)
     ) {
-      const selectionEdgeIntersects = selectionEdges.some(
-        (selectionEdge) =>
-          intersectElementWithLineSegment(
-            element,
-            elementsMap,
-            selectionEdge,
-            strokeWidth / 2,
-            true, // Stop at first hit for better performance
-          ).length > 0,
-      );
+      let hasIntersection = false;
 
-      if (selectionEdgeIntersects) {
+      if (isFreeDrawElement(element)) {
+        const center = elementCenterPoint(element, elementsMap);
+        hasIntersection = element.points.some((point) =>
+          pointInsideBounds(
+            pointRotateRads(
+              pointFrom<GlobalPoint>(
+                element.x + point[0],
+                element.y + point[1],
+              ),
+              center,
+              element.angle,
+            ),
+            selectionBounds,
+          ),
+        );
+      } else {
+        hasIntersection = selectionEdges.some(
+          (selectionEdge) =>
+            intersectElementWithLineSegment(
+              element,
+              elementsMap,
+              selectionEdge,
+              strokeWidth / 2,
+              true, // Stop at first hit for better performance
+            ).length > 0,
+        );
+      }
+
+      if (hasIntersection) {
         if (framesInSelection && isFrameLikeElement(element)) {
           framesInSelection.add(element.id);
         }
