@@ -437,16 +437,15 @@ const PreferencesBoxSelectionModeItem = () => {
   const { t } = useI18n();
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
-  const boxSelectionMode = appState.boxSelectionMode ?? "contain";
 
   return (
     <DropdownMenuItemContentRadio<"contain" | "overlap">
       name="boxSelectionMode"
       icon={emptyIcon}
-      value={boxSelectionMode}
+      value={appState.boxSelectionMode}
       onChange={(value) => {
         setAppState({
-          boxSelectionMode: value === "contain" ? undefined : value,
+          boxSelectionMode: value,
         });
       }}
       choices={[
