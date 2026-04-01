@@ -925,13 +925,13 @@ export const getElementsOverlappingFrame = (
 ) => {
   return elements.filter(
     (el) =>
+      // exclude elements which are overlapping, but are in a different frame,
+      // and thus invisible in target frame
+      (!el.frameId || el.frameId === frame.id) &&
       doBoundsIntersect(
         getElementBounds(el, elementsMap),
         getElementBounds(frame, elementsMap),
-      ) &&
-      // removes elements who are overlapping, but are in a different frame,
-      // and thus invisible in target frame
-      (!el.frameId || el.frameId === frame.id),
+      ),
   );
 };
 
