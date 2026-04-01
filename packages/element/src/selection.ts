@@ -16,7 +16,6 @@ import {
   boundsContainBounds,
   doBoundsIntersect,
   elementCenterPoint,
-  getCenterForBounds,
   getElementAbsoluteCoords,
   getElementBounds,
   pointInsideBounds,
@@ -245,6 +244,31 @@ export const getElementsWithinSelection = (
           );
 
           return pointInsideBounds(rotatedPoint, selectionBounds);
+        });
+      } else {
+        const center = elementCenterPoint(element, elementsMap);
+        hasIntersection = [
+          pointFrom<GlobalPoint>(
+            (elementBounds[0] + elementBounds[2]) / 2,
+            elementBounds[1],
+          ),
+          pointFrom<GlobalPoint>(
+            elementBounds[2],
+            (elementBounds[1] + elementBounds[3]) / 2,
+          ),
+          pointFrom<GlobalPoint>(
+            (elementBounds[0] + elementBounds[2]) / 2,
+            elementBounds[3],
+          ),
+          pointFrom<GlobalPoint>(
+            elementBounds[0],
+            (elementBounds[1] + elementBounds[3]) / 2,
+          ),
+        ].some((point) => {
+          return pointInsideBounds(
+            pointRotateRads(point, center, element.angle),
+            selectionBounds,
+          );
         });
       }
 
