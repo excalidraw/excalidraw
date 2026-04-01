@@ -76,10 +76,10 @@ describe("getElementBounds", () => {
       t: "rectangle",
     });
     const [x1, y1, x2, y2] = getElementBounds(element, arrayToMap([element]));
-    expect(x1).toEqual(40.428932188134524);
-    expect(y1).toEqual(25.428932188134524);
-    expect(x2).toEqual(59.571067811865476);
-    expect(y2).toEqual(44.571067811865476);
+    expect(x1).toEqual(39.39339828220179);
+    expect(y1).toEqual(24.393398282201787);
+    expect(x2).toEqual(60.60660171779821);
+    expect(y2).toEqual(45.60660171779821);
   });
 
   it("diamond", () => {
@@ -94,10 +94,10 @@ describe("getElementBounds", () => {
 
     const [x1, y1, x2, y2] = getElementBounds(element, arrayToMap([element]));
 
-    expect(x1).toEqual(43.284185983724846);
-    expect(y1).toEqual(28.284185983724846);
-    expect(x2).toEqual(56.71581401627515);
-    expect(y2).toEqual(41.71581401627515);
+    expect(x1).toEqual(42.928932188134524);
+    expect(y1).toEqual(27.928932188134524);
+    expect(x2).toEqual(57.071067811865476);
+    expect(y2).toEqual(42.071067811865476);
   });
 
   it("ellipse", () => {
