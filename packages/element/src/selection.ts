@@ -16,6 +16,7 @@ import {
   boundsContainBounds,
   doBoundsIntersect,
   elementCenterPoint,
+  getCenterForBounds,
   getElementAbsoluteCoords,
   getElementBounds,
   pointInsideBounds,
@@ -142,10 +143,10 @@ export const getElementsWithinSelection = (
     let elementBounds = getElementBounds(element, elementsMap);
 
     elementBounds = [
-      elementBounds[0] - strokeWidth,
-      elementBounds[1] - strokeWidth,
-      elementBounds[2] + strokeWidth,
-      elementBounds[3] + strokeWidth,
+      elementBounds[0] - strokeWidth / 2,
+      elementBounds[1] - strokeWidth / 2,
+      elementBounds[2] + strokeWidth / 2,
+      elementBounds[3] + strokeWidth / 2,
     ] as Bounds;
 
     // Whether the element bounds should include the bound text element bounds
@@ -233,8 +234,7 @@ export const getElementsWithinSelection = (
     ) {
       let hasIntersection = false;
 
-      // Preliminary check for linear elements to make up for
-      // intersection imprecision
+      // Preliminary check potential intersection imprecision
       if (isLinearElement(element) || isFreeDrawElement(element)) {
         const center = elementCenterPoint(element, elementsMap);
         hasIntersection = element.points.some((point) => {
