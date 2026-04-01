@@ -27,6 +27,7 @@ import {
   KEYS,
   APP_NAME,
   CURSOR_TYPE,
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
@@ -2524,6 +2525,7 @@ class App extends React.Component<AppProps, AppState> {
     const magicFrameChildren = getElementsOverlappingFrame(
       this.scene.getNonDeletedElements(),
       magicFrame,
+      this.scene.getNonDeletedElementsMap(),
     ).filter((el) => !isMagicFrameElement(el));
 
     if (!magicFrameChildren.length) {
@@ -7239,6 +7241,14 @@ class App extends React.Component<AppProps, AppState> {
           this.interactiveCanvas,
           isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
         );
+      } else if (
+        !event[KEYS.CTRL_OR_CMD] &&
+        this.isHittingCommonBoundingBoxOfSelectedElements(
+          scenePointer,
+          selectedElements,
+        )
+      ) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
       } else if (this.state.viewModeEnabled) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
       } else if (this.state.openDialog?.name === "elementLinkSelector") {
@@ -7730,17 +7740,24 @@ class App extends React.Component<AppProps, AppState> {
       const hitSelectedElement =
         pointerDownState.hit.element &&
         this.isASelectedElement(pointerDownState.hit.element);
+      const shouldForceLassoReselect =
+        event.altKey &&
+        event[KEYS.CTRL_OR_CMD] &&
+        !pointerDownState.resize.handleType;
+      const shouldStartLassoSelection =
+        shouldForceLassoReselect ||
+        (!pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
+          !pointerDownState.resize.handleType &&
+          !hitSelectedElement);
 
-      if (
-        !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
-        !pointerDownState.resize.handleType &&
-        !hitSelectedElement
-      ) {
-        this.lassoTrail.startPath(
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-          event.shiftKey,
-        );
+      if (shouldStartLassoSelection) {
+        if (!this.lassoTrail.hasCurrentTrail) {
+          this.lassoTrail.startPath(
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+            event.shiftKey,
+          );
+        }
 
         // block dragging after lasso selection on PCs until the next pointer down
         // (on mobile or tablet, we want to allow user to drag immediately)
@@ -8729,12 +8746,14 @@ class App extends React.Component<AppProps, AppState> {
       DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value,
       1,
     );
+    const boundsPadding =
+      (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / this.state.zoom.value;
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
     return (
-      point.x > x1 - threshold &&
-      point.x < x2 + threshold &&
-      point.y > y1 - threshold &&
-      point.y < y2 + threshold
+      point.x > x1 - boundsPadding - threshold &&
+      point.x < x2 + boundsPadding + threshold &&
+      point.y > y1 - boundsPadding - threshold &&
+      point.y < y2 + boundsPadding + threshold
     );
   }
 
@@ -10267,6 +10286,7 @@ class App extends React.Component<AppProps, AppState> {
                 this.state.selectionElement,
                 this.scene.getNonDeletedElementsMap(),
                 false,
+                this.state.boxSelectionMode,
               )
             : [];
 

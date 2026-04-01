@@ -680,8 +680,9 @@ export const getMinMaxXYFromCurvePathOps = (
   return [minX, minY, maxX, maxY];
 };
 
-export const getBoundsFromPoints = (
-  points: ExcalidrawFreeDrawElement["points"],
+export const getBoundsFromPoints = <P extends GlobalPoint | LocalPoint>(
+  points: readonly P[],
+  padding: number = 0,
 ): Bounds => {
   let minX = Infinity;
   let minY = Infinity;
@@ -695,7 +696,7 @@ export const getBoundsFromPoints = (
     maxY = Math.max(maxY, y);
   }
 
-  return [minX, minY, maxX, maxY];
+  return [minX - padding, minY - padding, maxX + padding, maxY + padding];
 };
 
 const getFreeDrawElementAbsoluteCoords = (
@@ -1261,6 +1262,17 @@ export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
 ): boolean =>
   p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
 
+// TODO make pointInsideBounds inclusive and remove this function once we
+// test nothing is breaking
+export const pointInsideBoundsInclusive = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  bounds: Bounds,
+): boolean =>
+  p[0] >= bounds[0] &&
+  p[0] <= bounds[2] &&
+  p[1] >= bounds[1] &&
+  p[1] <= bounds[3];
+
 export const doBoundsIntersect = (
   bounds1: Bounds | null,
   bounds2: Bounds | null,
@@ -1275,13 +1287,21 @@ export const doBoundsIntersect = (
   return minX1 < maxX2 && maxX1 > minX2 && minY1 < maxY2 && maxY1 > minY2;
 };
 
+export const boundsContainBounds = (outerBounds: Bounds, innerBounds: Bounds) =>
+  [
+    pointFrom<GlobalPoint>(innerBounds[0], innerBounds[1]),
+    pointFrom<GlobalPoint>(innerBounds[0], innerBounds[3]),
+    pointFrom<GlobalPoint>(innerBounds[2], innerBounds[1]),
+    pointFrom<GlobalPoint>(innerBounds[2], innerBounds[3]),
+  ].every((point) => pointInsideBoundsInclusive(point, outerBounds));
+
 export const elementCenterPoint = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
   xOffset: number = 0,
   yOffset: number = 0,
 ) => {
-  if (isLinearElement(element)) {
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const [x, y] = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
 

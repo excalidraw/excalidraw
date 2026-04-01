@@ -137,8 +137,17 @@ const calculate = <Point extends GlobalPoint | LocalPoint>(
   [t0, s0]: [number, number],
   l: LineSegment<Point>,
   c: Curve<Point>,
+  tolerance: number = 1e-2,
+  iterLimit: number = 4,
 ) => {
-  const solution = solveWithAnalyticalJacobian(c, l, t0, s0, 1e-2, 4);
+  const solution = solveWithAnalyticalJacobian(
+    c,
+    l,
+    t0,
+    s0,
+    tolerance,
+    iterLimit,
+  );
 
   if (!solution) {
     return null;
@@ -158,18 +167,43 @@ const calculate = <Point extends GlobalPoint | LocalPoint>(
  */
 export function curveIntersectLineSegment<
   Point extends GlobalPoint | LocalPoint,
->(c: Curve<Point>, l: LineSegment<Point>): Point[] {
-  let solution = calculate(initial_guesses[0], l, c);
+>(
+  c: Curve<Point>,
+  l: LineSegment<Point>,
+  opts?: {
+    tolerance?: number;
+    iterLimit?: number;
+  },
+): Point[] {
+  let solution = calculate(
+    initial_guesses[0],
+    l,
+    c,
+    opts?.tolerance,
+    opts?.iterLimit,
+  );
   if (solution) {
     return [solution];
   }
 
-  solution = calculate(initial_guesses[1], l, c);
+  solution = calculate(
+    initial_guesses[1],
+    l,
+    c,
+    opts?.tolerance,
+    opts?.iterLimit,
+  );
   if (solution) {
     return [solution];
   }
 
-  solution = calculate(initial_guesses[2], l, c);
+  solution = calculate(
+    initial_guesses[2],
+    l,
+    c,
+    opts?.tolerance,
+    opts?.iterLimit,
+  );
   if (solution) {
     return [solution];
   }
