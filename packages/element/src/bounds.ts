@@ -997,10 +997,10 @@ const getLinearElementRotatedBounds = (
   return coords;
 };
 
-export const getElementBounds = <T extends boolean = false>(
+export const getElementBounds = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-  nonRotated: T = false as T,
+  nonRotated: boolean = false,
 ): Bounds => {
   return ElementBounds.getBounds(element, elementsMap, nonRotated);
 };
