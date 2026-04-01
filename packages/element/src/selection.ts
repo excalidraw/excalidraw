@@ -226,7 +226,7 @@ export const getElementsWithinSelection = (
     }
 
     // 3. Handle the case where the selection is not wrapping the element, but
-    //    it does intersect the element's outlin (Non-AABB)
+    //    it does intersect the element's outline (non-AABB).
     if (
       boxSelectionMode === "overlap" &&
       doBoundsIntersect(selectionBounds, elementAABB)
