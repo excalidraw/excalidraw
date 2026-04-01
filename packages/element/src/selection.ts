@@ -233,22 +233,22 @@ export const getElementsWithinSelection = (
     ) {
       let hasIntersection = false;
 
-      if (isFreeDrawElement(element)) {
+      // Preliminary check for linear elements to make up for
+      // intersection imprecision
+      if (isLinearElement(element) || isFreeDrawElement(element)) {
         const center = elementCenterPoint(element, elementsMap);
-        hasIntersection = element.points.some((point) =>
-          pointInsideBounds(
-            pointRotateRads(
-              pointFrom<GlobalPoint>(
-                element.x + point[0],
-                element.y + point[1],
-              ),
-              center,
-              element.angle,
-            ),
-            selectionBounds,
-          ),
-        );
-      } else {
+        hasIntersection = element.points.some((point) => {
+          const rotatedPoint = pointRotateRads(
+            pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+            center,
+            element.angle,
+          );
+
+          return pointInsideBounds(rotatedPoint, selectionBounds);
+        });
+      }
+
+      if (!hasIntersection) {
         hasIntersection = selectionEdges.some(
           (selectionEdge) =>
             intersectElementWithLineSegment(
