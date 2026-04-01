@@ -246,23 +246,44 @@ export const getElementsWithinSelection = (
           return pointInsideBounds(rotatedPoint, selectionBounds);
         });
       } else {
+        const nonRotatedElementBounds = getElementBounds(
+          element,
+          elementsMap,
+          true,
+        );
         const center = elementCenterPoint(element, elementsMap);
         hasIntersection = [
-          pointFrom<GlobalPoint>(
-            (elementBounds[0] + elementBounds[2]) / 2,
-            elementBounds[1],
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              (nonRotatedElementBounds[0] + nonRotatedElementBounds[2]) / 2,
+              nonRotatedElementBounds[1],
+            ),
+            center,
+            element.angle,
           ),
-          pointFrom<GlobalPoint>(
-            elementBounds[2],
-            (elementBounds[1] + elementBounds[3]) / 2,
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              nonRotatedElementBounds[2],
+              (nonRotatedElementBounds[1] + nonRotatedElementBounds[3]) / 2,
+            ),
+            center,
+            element.angle,
           ),
-          pointFrom<GlobalPoint>(
-            (elementBounds[0] + elementBounds[2]) / 2,
-            elementBounds[3],
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              (nonRotatedElementBounds[0] + nonRotatedElementBounds[2]) / 2,
+              nonRotatedElementBounds[3],
+            ),
+            center,
+            element.angle,
           ),
-          pointFrom<GlobalPoint>(
-            elementBounds[0],
-            (elementBounds[1] + elementBounds[3]) / 2,
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              nonRotatedElementBounds[0],
+              (nonRotatedElementBounds[1] + nonRotatedElementBounds[3]) / 2,
+            ),
+            center,
+            element.angle,
           ),
         ].some((point) => {
           return pointInsideBounds(
