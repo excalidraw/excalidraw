@@ -138,14 +138,14 @@ export const getElementsWithinSelection = (
     }
 
     const strokeWidth = element.strokeWidth;
-    let labelBounds: Bounds | null = null;
-    let elementBounds = getElementBounds(element, elementsMap);
+    let labelAABB: Bounds | null = null;
+    let elementAABB = getElementBounds(element, elementsMap);
 
-    elementBounds = [
-      elementBounds[0] - strokeWidth / 2,
-      elementBounds[1] - strokeWidth / 2,
-      elementBounds[2] + strokeWidth / 2,
-      elementBounds[3] + strokeWidth / 2,
+    elementAABB = [
+      elementAABB[0] - strokeWidth / 2,
+      elementAABB[1] - strokeWidth / 2,
+      elementAABB[2] + strokeWidth / 2,
+      elementAABB[3] + strokeWidth / 2,
     ] as Bounds;
 
     // Whether the element bounds should include the bound text element bounds
@@ -157,7 +157,7 @@ export const getElementsWithinSelection = (
         boundTextElement,
         elementsMap,
       );
-      labelBounds = [
+      labelAABB = [
         x,
         y,
         x + boundTextElement.width,
@@ -172,41 +172,41 @@ export const getElementsWithinSelection = (
       associatedFrame &&
       isElementIntersectingFrame(element, associatedFrame, elementsMap)
     ) {
-      const frameBounds = getElementBounds(associatedFrame, elementsMap);
-      elementBounds = [
-        Math.max(elementBounds[0], frameBounds[0]),
-        Math.max(elementBounds[1], frameBounds[1]),
-        Math.min(elementBounds[2], frameBounds[2]),
-        Math.min(elementBounds[3], frameBounds[3]),
+      const frameAABB = getElementBounds(associatedFrame, elementsMap);
+      elementAABB = [
+        Math.max(elementAABB[0], frameAABB[0]),
+        Math.max(elementAABB[1], frameAABB[1]),
+        Math.min(elementAABB[2], frameAABB[2]),
+        Math.min(elementAABB[3], frameAABB[3]),
       ] as Bounds;
 
-      labelBounds = labelBounds
+      labelAABB = labelAABB
         ? ([
-            Math.max(labelBounds[0], frameBounds[0]),
-            Math.max(labelBounds[1], frameBounds[1]),
-            Math.min(labelBounds[2], frameBounds[2]),
-            Math.min(labelBounds[3], frameBounds[3]),
+            Math.max(labelAABB[0], frameAABB[0]),
+            Math.max(labelAABB[1], frameAABB[1]),
+            Math.min(labelAABB[2], frameAABB[2]),
+            Math.min(labelAABB[3], frameAABB[3]),
           ] as Bounds)
         : null;
     }
 
-    const commonBounds = labelBounds
+    const commonAABB = labelAABB
       ? ([
-          Math.min(labelBounds[0], elementBounds[0]),
-          Math.min(labelBounds[1], elementBounds[1]),
-          Math.max(labelBounds[2], elementBounds[2]),
-          Math.max(labelBounds[3], elementBounds[3]),
+          Math.min(labelAABB[0], elementAABB[0]),
+          Math.min(labelAABB[1], elementAABB[1]),
+          Math.max(labelAABB[2], elementAABB[2]),
+          Math.max(labelAABB[3], elementAABB[3]),
         ] as Bounds)
-      : elementBounds;
+      : elementAABB;
 
     // ============== Evaluation ==============
 
-    // 1. If the selection box WRAPs the element's bounds, then add it to the
+    // 1. If the selection box WRAPs the element's AABB, then add it to the
     //    selection and move on, regardless of the selection mode.
     //
     //    PERF: This trick only works with axis-aligned box selection and the
     //          current convex element shapes!
-    if (boundsContainBounds(selectionBounds, commonBounds)) {
+    if (boundsContainBounds(selectionBounds, commonAABB)) {
       if (framesInSelection && isFrameLikeElement(element)) {
         framesInSelection.add(element.id);
       } else {
@@ -218,18 +218,18 @@ export const getElementsWithinSelection = (
     // 2. Handle the case where the label is overlapped by the selection box
     if (
       boxSelectionMode === "overlap" &&
-      labelBounds &&
-      doBoundsIntersect(selectionBounds, labelBounds)
+      labelAABB &&
+      doBoundsIntersect(selectionBounds, labelAABB)
     ) {
       elementsInSelection.push(element);
       continue;
     }
 
     // 3. Handle the case where the selection is not wrapping the element, but
-    //    it does intersect the element's outline.
+    //    it does intersect the element's outlin (Non-AABB)
     if (
       boxSelectionMode === "overlap" &&
-      doBoundsIntersect(selectionBounds, elementBounds)
+      doBoundsIntersect(selectionBounds, elementAABB)
     ) {
       let hasIntersection = false;
 
