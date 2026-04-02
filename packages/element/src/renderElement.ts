@@ -390,10 +390,61 @@ const drawImagePlaceholder = (
   );
 };
 
+const DEFAULT_FREEDRAW_PRESSURE = 0.5;
+
 /**
- * Draws freedraw points as individual rounded capsule segments.
- * Each segment [points[i-1] → points[i]] is an independent stroke with
- * round lineCap so adjacent caps overlap, producing paint-splat splotches.
+ * Draws a single tapered capsule (variable-width filled stroke segment) from
+ * (x0,y0) with radius r0 to (x1,y1) with radius r1.  The shape is a filled
+ * path consisting of a back semicircle at the start, a straight side on each
+ * side, and a front semicircle at the end, so that adjacent segments sharing
+ * a point use the same radius and produce a seamlessly continuous stroke.
+ */
+const drawTaperedCapsule = (
+  context: CanvasRenderingContext2D,
+  x0: number,
+  y0: number,
+  r0: number,
+  x1: number,
+  y1: number,
+  r1: number,
+) => {
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  const len = Math.sqrt(dx * dx + dy * dy);
+
+  if (len < 0.5) {
+    // Degenerate segment — draw a filled circle at the larger radius
+    const r = Math.max(r0, r1);
+    context.beginPath();
+    context.arc((x0 + x1) / 2, (y0 + y1) / 2, r, 0, Math.PI * 2);
+    context.fill();
+    return;
+  }
+
+  const angle = Math.atan2(dy, dx);
+  const px = -dy / len; // perpendicular unit x = -sin(angle)
+  const py = dx / len; // perpendicular unit y =  cos(angle)
+
+  context.beginPath();
+  // Back semicircle at P0: clockwise from (P0 + perp*r0) through (back of P0) to (P0 - perp*r0)
+  context.arc(x0, y0, r0, angle + Math.PI / 2, angle - Math.PI / 2, false);
+  // Neg-perp side: P0 - perp*r0  →  P1 - perp*r1  (arc endpoint is already P0 - perp*r0)
+  context.lineTo(x1 - px * r1, y1 - py * r1);
+  // Front semicircle at P1: clockwise from (P1 - perp*r1) through (front of P1) to (P1 + perp*r1)
+  context.arc(x1, y1, r1, angle - Math.PI / 2, angle + Math.PI / 2, false);
+  // Perp side: P1 + perp*r1  →  P0 + perp*r0
+  context.lineTo(x0 + px * r0, y0 + py * r0);
+  context.closePath();
+  context.fill();
+};
+
+/**
+ * Draws freedraw points as individual pressure-aware tapered capsule segments.
+ * Each segment [points[i-1] → points[i]] is drawn as a filled tapered capsule
+ * whose start radius is derived from pressures[i-1] and end radius from
+ * pressures[i].  Because adjacent segments share the same radius at their
+ * common junction point, the result is a continuous stroke with naturally
+ * varying pen pressure.
  *
  * @param fromIndex  Draw segments starting from this index (inclusive).
  *                   Segments are from max(fromIndex,1) to points.length-1.
@@ -405,33 +456,50 @@ const drawFreeDrawSegments = (
   renderConfig: StaticCanvasRenderConfig,
   fromIndex: number,
 ) => {
-  const { points } = element;
+  const { points, pressures } = element;
   const strokeColor =
     renderConfig.theme === THEME.DARK
       ? applyDarkModeFilter(element.strokeColor)
       : element.strokeColor;
 
-  context.strokeStyle = strokeColor;
   context.fillStyle = strokeColor;
-  context.lineCap = "round";
-  context.lineJoin = "round";
-  context.lineWidth = element.strokeWidth * 4.25;
+
+  const baseRadius = (element.strokeWidth * 4.25) / 2;
+
+  const getPressure = (i: number): number =>
+    pressures.length > i ? pressures[i] : DEFAULT_FREEDRAW_PRESSURE;
 
   if (fromIndex === 0 && points.length === 1) {
     // Single-point stroke → filled circle (dot)
-    const r = (element.strokeWidth * 4.25) / 2;
+    const r = baseRadius * getPressure(0) * 2;
     context.beginPath();
     context.arc(points[0][0], points[0][1], r, 0, Math.PI * 2);
     context.fill();
     return;
   }
 
+  const FREEDRAW_DEBUG_COLORS = [
+    "#e03131",
+    "#f76707",
+    "#2f9e44",
+    "#1971c2",
+    "#7048e8",
+    "#e64980",
+  ];
   const start = Math.max(fromIndex, 1);
   for (let i = start; i < points.length; i++) {
-    context.beginPath();
-    context.moveTo(points[i - 1][0], points[i - 1][1]);
-    context.lineTo(points[i][0], points[i][1]);
-    context.stroke();
+    context.fillStyle = FREEDRAW_DEBUG_COLORS[i % FREEDRAW_DEBUG_COLORS.length];
+    const r0 = baseRadius * getPressure(i - 1) * 2;
+    const r1 = baseRadius * getPressure(i) * 2;
+    drawTaperedCapsule(
+      context,
+      points[i - 1][0],
+      points[i - 1][1],
+      r0,
+      points[i][0],
+      points[i][1],
+      r1,
+    );
   }
 };
 
