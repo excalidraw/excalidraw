@@ -465,7 +465,7 @@ const _deepCopyElement = (val: any, depth: number = 0) => {
 
 /**
  * Clones ExcalidrawElement data structure. Does not regenerate id, nonce, or
- * any value. The purpose is to to break object references for immutability
+ * any value. The purpose is to break object references for immutability
  * reasons, whenever we want to keep the original element, but ensure it's not
  * mutated.
  *

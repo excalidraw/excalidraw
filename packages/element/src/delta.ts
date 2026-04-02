@@ -929,7 +929,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
   private static stripElementsProps(
     delta: Partial<ObservedAppState>,
   ): Partial<ObservedStandaloneAppState> {
-    // WARN: Do not remove the type-casts as they here to ensure proper type checks
+    // WARN: Do not remove the type-casts as they are here to ensure proper type checks
     const {
       editingGroupId,
       selectedGroupIds,
@@ -950,7 +950,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
   private static stripStandaloneProps(
     delta: Partial<ObservedAppState>,
   ): Partial<ObservedElementsAppState> {
-    // WARN: Do not remove the type-casts as they here to ensure proper type checks
+    // WARN: Do not remove the type-casts as they are here to ensure proper type checks
     const { name, viewBackgroundColor, ...elementsProps } =
       delta as ObservedAppState;
 
@@ -1106,7 +1106,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     inserted,
   }: Delta<ElementPartial>) => !!deleted.isDeleted === !!inserted.isDeleted;
 
-  private static satisfiesCommmonInvariants = ({
+  private static satisfiesCommonInvariants = ({
     deleted,
     inserted,
   }: Delta<ElementPartial>) =>
@@ -1135,13 +1135,13 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   private static validate(
     elementsDelta: ElementsDelta,
     type: "added" | "removed" | "updated",
-    satifiesSpecialInvariants: (delta: Delta<ElementPartial>) => boolean,
+    satisfiesSpecialInvariants: (delta: Delta<ElementPartial>) => boolean,
   ) {
     for (const [id, delta] of Object.entries(elementsDelta[type])) {
       if (
-        !this.satisfiesCommmonInvariants(delta) ||
+        !this.satisfiesCommonInvariants(delta) ||
         !this.satisfiesUniqueInvariants(elementsDelta, id) ||
-        !satifiesSpecialInvariants(delta)
+        !satisfiesSpecialInvariants(delta)
       ) {
         console.error(
           `Broken invariant for "${type}" delta, element "${id}", delta:`,
