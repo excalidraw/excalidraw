@@ -16,7 +16,7 @@ import {
   VERSIONS,
 } from "../constants";
 import type { ExportedLibraryData } from "../data/types";
-import { canvasToBlob, resizeImageFile } from "../data/blob";
+import { canvasToBlob } from "../data/blob";
 import { chunk } from "../utils";
 import DialogActionButton from "./DialogActionButton";
 import { CloseIcon } from "./icons";
@@ -94,13 +94,7 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
     );
   }
 
-  return await resizeImageFile(
-    new File([await canvasToBlob(canvas)], "preview", { type: MIME_TYPES.png }),
-    {
-      outputType: MIME_TYPES.jpg,
-      maxWidthOrHeight: 5000,
-    },
-  );
+  return new File([await canvasToBlob(canvas)], "preview", { type: MIME_TYPES.png });
 };
 
 const SingleLibraryItem = ({

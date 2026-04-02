@@ -20,18 +20,10 @@ const parseFileContents = async (blob: Blob | File): Promise<string> => {
   let contents: string;
 
   if (blob.type === MIME_TYPES.png) {
-    try {
-      return await (await import("./image")).decodePngMetadata(blob);
-    } catch (error: any) {
-      if (error.message === "INVALID") {
-        throw new ImageSceneDataError(
-          "Image doesn't contain scene",
-          "IMAGE_NOT_CONTAINS_SCENE_DATA",
-        );
-      } else {
-        throw new ImageSceneDataError("Error: cannot restore image");
-      }
-    }
+    throw new ImageSceneDataError(
+      "Image doesn't contain scene",
+      "IMAGE_NOT_CONTAINS_SCENE_DATA",
+    );
   } else {
     if ("text" in Blob) {
       contents = await blob.text();
@@ -293,54 +285,6 @@ export const dataURLToString = (dataURL: DataURL) => {
   return base64ToString(dataURL.slice(dataURL.indexOf(",") + 1));
 };
 
-export const resizeImageFile = async (
-  file: File,
-  opts: {
-    /** undefined indicates auto */
-    outputType?: typeof MIME_TYPES["jpg"];
-    maxWidthOrHeight: number;
-  },
-): Promise<File> => {
-  // SVG files shouldn't a can't be resized
-  if (file.type === MIME_TYPES.svg) {
-    return file;
-  }
-
-  const [pica, imageBlobReduce] = await Promise.all([
-    import("pica").then((res) => res.default),
-    // a wrapper for pica for better API
-    import("image-blob-reduce").then((res) => res.default),
-  ]);
-
-  // CRA's minification settings break pica in WebWorkers, so let's disable
-  // them for now
-  // https://github.com/nodeca/image-blob-reduce/issues/21#issuecomment-757365513
-  const reduce = imageBlobReduce({
-    pica: pica({ features: ["js", "wasm"] }),
-  });
-
-  if (opts.outputType) {
-    const { outputType } = opts;
-    reduce._create_blob = function (env) {
-      return this.pica.toBlob(env.out_canvas, outputType, 0.8).then((blob) => {
-        env.out_blob = blob;
-        return env;
-      });
-    };
-  }
-
-  if (!isSupportedImageFile(file)) {
-    throw new Error("Error: unsupported file type", { cause: "UNSUPPORTED" });
-  }
-
-  return new File(
-    [await reduce.toBlob(file, { max: opts.maxWidthOrHeight, alpha: true })],
-    file.name,
-    {
-      type: opts.outputType || file.type,
-    },
-  );
-};
 
 export const SVGStringToFile = (SVGString: string, filename: string = "") => {
   return new File([new TextEncoder().encode(SVGString)], filename, {

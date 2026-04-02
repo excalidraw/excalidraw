@@ -317,7 +317,6 @@ import {
   loadSceneOrLibraryFromBlob,
   normalizeFile,
   parseLibraryJSON,
-  resizeImageFile,
   SVGStringToFile,
 } from "../data/blob";
 import {
@@ -9752,17 +9751,6 @@ class App extends React.Component<AppProps, AppState> {
 
     const existingFileData = this.files[fileId];
     if (!existingFileData?.dataURL) {
-      try {
-        imageFile = await resizeImageFile(imageFile, {
-          maxWidthOrHeight: DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
-        });
-      } catch (error: any) {
-        console.error(
-          "Error trying to resizing image file on insertion",
-          error,
-        );
-      }
-
       if (imageFile.size > MAX_ALLOWED_FILE_BYTES) {
         throw new Error(
           t("errors.fileTooBig", {
@@ -9871,23 +9859,9 @@ class App extends React.Component<AppProps, AppState> {
     // mustn't be larger than 128 px
     // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Basic_User_Interface/Using_URL_values_for_the_cursor_property
     const cursorImageSizePx = 96;
-    let imagePreview;
 
-    try {
-      imagePreview = await resizeImageFile(imageFile, {
-        maxWidthOrHeight: cursorImageSizePx,
-      });
-    } catch (e: any) {
-      if (e.cause === "UNSUPPORTED") {
-        throw new Error(t("errors.unsupportedFileType"));
-      }
-      throw e;
-    }
+    let previewDataURL = await getDataURL(imageFile);
 
-    let previewDataURL = await getDataURL(imagePreview);
-
-    // SVG cannot be resized via `resizeImageFile` so we resize by rendering to
-    // a small canvas
     if (imageFile.type === MIME_TYPES.svg) {
       const img = await loadHTMLImageElement(previewDataURL);
 
