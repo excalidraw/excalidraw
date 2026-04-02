@@ -1,12 +1,20 @@
 import rough from "roughjs/bin/rough";
 
 import {
+  bezierEquation,
+  curve,
   type GlobalPoint,
   isRightAngleRads,
   lineSegment,
+  type LocalPoint,
+  pointDistance,
   pointFrom,
+  pointFromVector,
   pointRotateRads,
   type Radians,
+  vectorFromPoint,
+  vectorNormalize,
+  vectorScale,
 } from "@excalidraw/math";
 
 import {
@@ -464,7 +472,7 @@ const drawFreeDrawSegments = (
 
   context.fillStyle = strokeColor;
 
-  const baseRadius = (element.strokeWidth * 4.25) / 2;
+  const baseRadius = (element.strokeWidth * 1.25) / 2;
 
   const getPressure = (i: number): number =>
     pressures.length > i ? pressures[i] : DEFAULT_FREEDRAW_PRESSURE;
@@ -478,28 +486,61 @@ const drawFreeDrawSegments = (
     return;
   }
 
-  const FREEDRAW_DEBUG_COLORS = [
-    "#e03131",
-    "#f76707",
-    "#2f9e44",
-    "#1971c2",
-    "#7048e8",
-    "#e64980",
-  ];
+  // const FREEDRAW_DEBUG_COLORS = [
+  //   "#e03131",
+  //   "#f76707",
+  //   "#2f9e44",
+  //   "#1971c2",
+  //   "#7048e8",
+  //   "#e64980",
+  // ];
   const start = Math.max(fromIndex, 1);
   for (let i = start; i < points.length; i++) {
-    context.fillStyle = FREEDRAW_DEBUG_COLORS[i % FREEDRAW_DEBUG_COLORS.length];
+    //context.fillStyle = FREEDRAW_DEBUG_COLORS[i % FREEDRAW_DEBUG_COLORS.length];
     const r0 = baseRadius * getPressure(i - 1) * 2;
     const r1 = baseRadius * getPressure(i) * 2;
-    drawTaperedCapsule(
-      context,
-      points[i - 1][0],
-      points[i - 1][1],
-      r0,
-      points[i][0],
-      points[i][1],
-      r1,
-    );
+
+    const synthesizedPressures = [r0];
+    const synthesizedPoints: LocalPoint[] = [points[i - 1]];
+    if (i > 1) {
+      const dist = pointDistance(points[i - 1], points[i]);
+      if (dist > baseRadius / 2) {
+        const c = curve(
+          points[i - 1],
+          pointFromVector(
+            vectorScale(
+              vectorNormalize(vectorFromPoint(points[i - 1], points[i - 2])),
+              dist / 2,
+            ),
+            points[i - 1],
+          ),
+          points[i],
+          points[i],
+        );
+        synthesizedPoints.push(bezierEquation(c, 0.2));
+        synthesizedPressures.push(r0 * 0.8 + r1 * 0.2);
+        synthesizedPoints.push(bezierEquation(c, 0.4));
+        synthesizedPressures.push(r0 * 0.6 + r1 * 0.4);
+        synthesizedPoints.push(bezierEquation(c, 0.6));
+        synthesizedPressures.push(r0 * 0.4 + r1 * 0.6);
+        synthesizedPoints.push(bezierEquation(c, 0.8));
+        synthesizedPressures.push(r0 * 0.2 + r1 * 0.8);
+      }
+    }
+    synthesizedPoints.push(points[i]);
+    synthesizedPressures.push(r1);
+
+    for (let j = 1; j < synthesizedPoints.length; j++) {
+      drawTaperedCapsule(
+        context,
+        synthesizedPoints[j - 1][0],
+        synthesizedPoints[j - 1][1],
+        synthesizedPressures[j - 1],
+        synthesizedPoints[j][0],
+        synthesizedPoints[j][1],
+        synthesizedPressures[j],
+      );
+    }
   }
 };
 
