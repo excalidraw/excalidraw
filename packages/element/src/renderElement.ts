@@ -144,6 +144,12 @@ export interface ExcalidrawElementWithCanvas {
   imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
   boundTextCanvas: HTMLCanvasElement;
+  /**
+   * When set, overrides the canvas origin placement in drawElementFromCanvas.
+   * Used by the incremental freedraw rendering path. Scene coordinates.
+   */
+  canvasOriginSceneX?: number;
+  canvasOriginSceneY?: number;
 }
 
 const cappedElementCanvasSize = (
@@ -384,6 +390,51 @@ const drawImagePlaceholder = (
   );
 };
 
+/**
+ * Draws freedraw points as individual rounded capsule segments.
+ * Each segment [points[i-1] → points[i]] is an independent stroke with
+ * round lineCap so adjacent caps overlap, producing paint-splat splotches.
+ *
+ * @param fromIndex  Draw segments starting from this index (inclusive).
+ *                   Segments are from max(fromIndex,1) to points.length-1.
+ *                   Pass 0 to draw everything.
+ */
+const drawFreeDrawSegments = (
+  element: ExcalidrawFreeDrawElement,
+  context: CanvasRenderingContext2D,
+  renderConfig: StaticCanvasRenderConfig,
+  fromIndex: number,
+) => {
+  const { points } = element;
+  const strokeColor =
+    renderConfig.theme === THEME.DARK
+      ? applyDarkModeFilter(element.strokeColor)
+      : element.strokeColor;
+
+  context.strokeStyle = strokeColor;
+  context.fillStyle = strokeColor;
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  context.lineWidth = element.strokeWidth * 4.25;
+
+  if (fromIndex === 0 && points.length === 1) {
+    // Single-point stroke → filled circle (dot)
+    const r = (element.strokeWidth * 4.25) / 2;
+    context.beginPath();
+    context.arc(points[0][0], points[0][1], r, 0, Math.PI * 2);
+    context.fill();
+    return;
+  }
+
+  const start = Math.max(fromIndex, 1);
+  for (let i = start; i < points.length; i++) {
+    context.beginPath();
+    context.moveTo(points[i - 1][0], points[i - 1][1]);
+    context.lineTo(points[i][0], points[i][1]);
+    context.stroke();
+  }
+};
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -415,23 +466,8 @@ const drawElementOnCanvas = (
       break;
     }
     case "freedraw": {
-      // Draw directly to canvas
       context.save();
-
-      const shapes = ShapeCache.generateElementShape(element, renderConfig);
-
-      for (const shape of shapes) {
-        if (typeof shape === "string") {
-          context.fillStyle = applyDarkModeFilter(
-            element.strokeColor,
-            renderConfig.theme === THEME.DARK,
-          );
-          context.fill(new Path2D(shape));
-        } else {
-          rc.draw(shape);
-        }
-      }
-
+      drawFreeDrawSegments(element, context, renderConfig, 0);
       context.restore();
       break;
     }
@@ -605,6 +641,204 @@ export const elementWithCanvasCache = new WeakMap<
   ExcalidrawElementWithCanvas
 >();
 
+// ─── Incremental freedraw canvas cache ────────────────────────────────────────
+// A separate WeakMap that survives ShapeCache.delete() calls so that the raster
+// accumulates new capsule segments without full regeneration on every added point.
+
+const FREEDRAW_CANVAS_OVERSHOOT_MIN = 200; // scene units — minimum extra space on each side
+const FREEDRAW_CANVAS_OVERSHOOT_FACTOR = 0.5; // allocate current_dimension * factor extra on each side
+
+interface FreeDrawIncrementalCanvas {
+  canvas: HTMLCanvasElement;
+  lastRenderedPointCount: number;
+  canvasOriginSceneX: number;
+  canvasOriginSceneY: number;
+  /** Scene bounds guaranteed to be visible inside this canvas (without padding) */
+  canvasAllocX1: number;
+  canvasAllocY1: number;
+  canvasAllocX2: number;
+  canvasAllocY2: number;
+  scale: number;
+  theme: AppState["theme"];
+}
+
+const freedrawIncrementalCache = new WeakMap<
+  ExcalidrawFreeDrawElement,
+  FreeDrawIncrementalCanvas
+>();
+
+/**
+ * Generates or incrementally updates a raster canvas for a freedraw element
+ * that is being actively drawn. Unlike the standard element canvas cache, this
+ * cache is NOT cleared on each mutateElement call, allowing new segments to be
+ * appended without full regeneration.
+ *
+ * When element bounds grow beyond the over-allocated canvas, the existing raster
+ * is copied into a new larger canvas before appending the next segments.
+ */
+const generateOrUpdateFreeDrawIncrementalCanvas = (
+  element: ExcalidrawFreeDrawElement,
+  elementsMap: NonDeletedSceneElementsMap,
+  zoom: Zoom,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+): ExcalidrawElementWithCanvas | null => {
+  const scale = zoom.value;
+  const dpr = window.devicePixelRatio;
+  const padding = getCanvasPadding(element);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
+  const containingFrameOpacity =
+    getContainingFrame(element, elementsMap)?.opacity || 100;
+
+  const prevInc = freedrawIncrementalCache.get(element);
+
+  const boundsExceeded =
+    prevInc !== undefined &&
+    (x1 < prevInc.canvasAllocX1 ||
+      y1 < prevInc.canvasAllocY1 ||
+      x2 > prevInc.canvasAllocX2 ||
+      y2 > prevInc.canvasAllocY2);
+
+  const needsAlloc =
+    prevInc === undefined ||
+    boundsExceeded ||
+    prevInc.scale !== scale ||
+    prevInc.theme !== appState.theme;
+
+  let canvas: HTMLCanvasElement;
+  let canvasOriginSceneX: number;
+  let canvasOriginSceneY: number;
+  let fromIndex: number;
+  let canvasScale: number;
+
+  if (needsAlloc) {
+    // Over-allocate proportionally to the current bounding box, like std::vector doubling,
+    // so fast large strokes trigger far fewer reallocations. The over-sized canvas is
+    // discarded on stroke finalisation so the memory waste is only transient.
+    const overshootX = Math.max(
+      FREEDRAW_CANVAS_OVERSHOOT_MIN,
+      (x2 - x1) * FREEDRAW_CANVAS_OVERSHOOT_FACTOR,
+    );
+    const overshootY = Math.max(
+      FREEDRAW_CANVAS_OVERSHOOT_MIN,
+      (y2 - y1) * FREEDRAW_CANVAS_OVERSHOOT_FACTOR,
+    );
+    const allocX1 = x1 - overshootX;
+    const allocY1 = y1 - overshootY;
+    const allocX2 = x2 + overshootX;
+    const allocY2 = y2 + overshootY;
+
+    canvasOriginSceneX = allocX1 - padding / dpr;
+    canvasOriginSceneY = allocY1 - padding / dpr;
+
+    // Raw canvas pixels before zoom scale
+    const rawW = (allocX2 - allocX1) * dpr + padding * 2;
+    const rawH = (allocY2 - allocY1) * dpr + padding * 2;
+
+    // Respect browser canvas size limits
+    const AREA_LIMIT = 16777216;
+    const WIDTH_HEIGHT_LIMIT = 32767;
+    canvasScale = scale;
+    if (
+      rawW * canvasScale > WIDTH_HEIGHT_LIMIT ||
+      rawH * canvasScale > WIDTH_HEIGHT_LIMIT
+    ) {
+      canvasScale = Math.min(
+        WIDTH_HEIGHT_LIMIT / rawW,
+        WIDTH_HEIGHT_LIMIT / rawH,
+      );
+    }
+    if (rawW * rawH * canvasScale * canvasScale > AREA_LIMIT) {
+      canvasScale = Math.sqrt(AREA_LIMIT / (rawW * rawH));
+    }
+
+    const canvasWidth = Math.floor(rawW * canvasScale);
+    const canvasHeight = Math.floor(rawH * canvasScale);
+    if (!canvasWidth || !canvasHeight) {
+      return null;
+    }
+
+    canvas = document.createElement("canvas");
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    const context = canvas.getContext("2d")!;
+
+    if (
+      prevInc !== undefined &&
+      boundsExceeded &&
+      prevInc.scale === canvasScale &&
+      prevInc.theme === appState.theme
+    ) {
+      // Copy existing raster to the new canvas at the correct pixel offset.
+      // The shift is determined by how much the canvas origin moved in scene coords.
+      const copyX =
+        (prevInc.canvasOriginSceneX - canvasOriginSceneX) * dpr * canvasScale;
+      const copyY =
+        (prevInc.canvasOriginSceneY - canvasOriginSceneY) * dpr * canvasScale;
+      context.drawImage(prevInc.canvas, copyX, copyY);
+      fromIndex = prevInc.lastRenderedPointCount;
+    } else {
+      // Full regeneration on first canvas, zoom change, or theme change
+      fromIndex = 0;
+    }
+
+    freedrawIncrementalCache.set(element, {
+      canvas,
+      lastRenderedPointCount: fromIndex,
+      canvasOriginSceneX,
+      canvasOriginSceneY,
+      canvasAllocX1: allocX1,
+      canvasAllocY1: allocY1,
+      canvasAllocX2: allocX2,
+      canvasAllocY2: allocY2,
+      scale: canvasScale,
+      theme: appState.theme,
+    });
+  } else {
+    canvas = prevInc.canvas;
+    canvasOriginSceneX = prevInc.canvasOriginSceneX;
+    canvasOriginSceneY = prevInc.canvasOriginSceneY;
+    fromIndex = prevInc.lastRenderedPointCount;
+    canvasScale = prevInc.scale;
+  }
+
+  // Append only the segments added since the last render
+  if (fromIndex < element.points.length) {
+    const ctx = canvas.getContext("2d")!;
+    const canvasElemOffsetX =
+      (element.x - canvasOriginSceneX) * dpr * canvasScale;
+    const canvasElemOffsetY =
+      (element.y - canvasOriginSceneY) * dpr * canvasScale;
+    ctx.save();
+    ctx.translate(canvasElemOffsetX, canvasElemOffsetY);
+    ctx.scale(dpr * canvasScale, dpr * canvasScale);
+    drawFreeDrawSegments(element, ctx, renderConfig, fromIndex);
+    ctx.restore();
+
+    // Update lastRenderedPointCount in the cache entry
+    const inc = freedrawIncrementalCache.get(element)!;
+    inc.lastRenderedPointCount = element.points.length;
+  }
+
+  const inc = freedrawIncrementalCache.get(element)!;
+  return {
+    element,
+    canvas,
+    theme: appState.theme,
+    scale: canvasScale,
+    angle: element.angle,
+    zoomValue: zoom.value,
+    canvasOffsetX: 0,
+    canvasOffsetY: 0,
+    boundTextElementVersion: null,
+    imageCrop: null,
+    containingFrameOpacity,
+    boundTextCanvas: document.createElement("canvas"),
+    canvasOriginSceneX: inc.canvasOriginSceneX,
+    canvasOriginSceneY: inc.canvasOriginSceneY,
+  };
+};
+
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
@@ -616,6 +850,24 @@ const generateElementWithCanvas = (
     : {
         value: 1 as NormalizedZoomValue,
       };
+
+  // Incremental rendering path for freedraw elements being actively drawn.
+  // ShapeCache.delete() clears elementWithCanvasCache on every added point, so
+  // we bypass that cache entirely and use freedrawIncrementalCache instead.
+  if (
+    isFreeDrawElement(element) &&
+    "newElement" in appState &&
+    appState.newElement?.id === element.id
+  ) {
+    return generateOrUpdateFreeDrawIncrementalCanvas(
+      element as ExcalidrawFreeDrawElement,
+      elementsMap,
+      zoom,
+      renderConfig,
+      appState,
+    );
+  }
+
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
@@ -718,12 +970,22 @@ const drawElementFromCanvas = (
     // revert afterwards we don't have account for it during drawing
     context.translate(-cx, -cy);
 
+    // For the incremental freedraw path, the canvas origin is stored explicitly
+    // because the canvas is over-allocated beyond the tight element bounds.
+    const destX =
+      elementWithCanvas.canvasOriginSceneX !== undefined
+        ? (elementWithCanvas.canvasOriginSceneX + appState.scrollX) *
+          window.devicePixelRatio
+        : (x1 + appState.scrollX) * window.devicePixelRatio - padding;
+    const destY =
+      elementWithCanvas.canvasOriginSceneY !== undefined
+        ? (elementWithCanvas.canvasOriginSceneY + appState.scrollY) *
+          window.devicePixelRatio
+        : (y1 + appState.scrollY) * window.devicePixelRatio - padding;
     context.drawImage(
       elementWithCanvas.canvas!,
-      (x1 + appState.scrollX) * window.devicePixelRatio -
-        (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
-      (y1 + appState.scrollY) * window.devicePixelRatio -
-        (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
+      destX,
+      destY,
       elementWithCanvas.canvas!.width / elementWithCanvas.scale,
       elementWithCanvas.canvas!.height / elementWithCanvas.scale,
     );
@@ -751,6 +1013,17 @@ const drawElementFromCanvas = (
   context.restore();
 
   // Clear the nested element we appended to the DOM
+};
+
+/**
+ * Removes the incremental freedraw canvas for the given element.
+ * Call this when a freedraw stroke is finalised so the next render
+ * produces a fresh tight-bounds canvas instead of the over-allocated one.
+ */
+export const invalidateFreeDrawIncrementalCanvas = (
+  element: ExcalidrawFreeDrawElement,
+) => {
+  freedrawIncrementalCache.delete(element);
 };
 
 export const renderSelectionElement = (

@@ -10629,23 +10629,46 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (newElement.type === "freedraw") {
-          const points = newElement.points;
-          const dx = pointerCoords.x - newElement.x;
-          const dy = pointerCoords.y - newElement.y;
+          // Collect all coalesced pointer positions that accumulated between
+          // RAF frames (important for high-frequency Apple Pencil / stylus
+          // input). getCoalescedEvents() returns the intermediate samples that
+          // would otherwise be discarded by throttleRAF, giving a dense stroke
+          // without extra renders.
+          const coalescedEvents: PointerEvent[] =
+            event.getCoalescedEvents?.() ?? [];
+          // The final event is always included; coalesced list may duplicate it
+          const allEvents =
+            coalescedEvents.length > 0 ? coalescedEvents : [event];
 
-          const lastPoint = points.length > 0 && points[points.length - 1];
-          const discardPoint =
-            lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
+          const newPoints: LocalPoint[] = [];
+          const newPressures: number[] = [];
 
-          if (!discardPoint) {
+          let lastPoint =
+            newElement.points.length > 0
+              ? newElement.points[newElement.points.length - 1]
+              : null;
+
+          for (const ev of allEvents) {
+            const coords = viewportCoordsToSceneCoords(ev, this.state);
+            const dx = coords.x - newElement.x;
+            const dy = coords.y - newElement.y;
+            if (!lastPoint || lastPoint[0] !== dx || lastPoint[1] !== dy) {
+              const pt = pointFrom<LocalPoint>(dx, dy);
+              newPoints.push(pt);
+              newPressures.push(ev.pressure);
+              lastPoint = pt;
+            }
+          }
+
+          if (newPoints.length > 0) {
             const pressures = newElement.simulatePressure
               ? newElement.pressures
-              : [...newElement.pressures, event.pressure];
+              : [...newElement.pressures, ...newPressures];
 
             this.scene.mutateElement(
               newElement,
               {
-                points: [...points, pointFrom<LocalPoint>(dx, dy)],
+                points: [...newElement.points, ...newPoints],
                 pressures,
               },
               {

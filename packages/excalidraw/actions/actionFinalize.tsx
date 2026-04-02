@@ -14,6 +14,8 @@ import {
   isLineElement,
 } from "@excalidraw/element";
 
+import { invalidateFreeDrawIncrementalCanvas } from "@excalidraw/element";
+
 import {
   KEYS,
   arrayToMap,
@@ -348,6 +350,10 @@ export const actionFinalize = register<FormData>({
           },
         }
       : selectedLinearElement;
+
+    if (element && isFreeDrawElement(element)) {
+      invalidateFreeDrawIncrementalCanvas(element);
+    }
 
     return {
       elements: newElements,
