@@ -11,8 +11,6 @@ import type {
 } from "@excalidraw/excalidraw/element/types";
 import { restore } from "@excalidraw/excalidraw/data/restore";
 import { MIME_TYPES } from "@excalidraw/excalidraw/constants";
-import { encodePngMetadata } from "@excalidraw/excalidraw/data/image";
-import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
@@ -132,24 +130,6 @@ export const exportToBlob = async (
       async (blob) => {
         if (!blob) {
           return reject(new Error("couldn't export to blob"));
-        }
-        if (
-          blob &&
-          mimeType === MIME_TYPES.png &&
-          opts.appState?.exportEmbedScene
-        ) {
-          blob = await encodePngMetadata({
-            blob,
-            metadata: serializeAsJSON(
-              // NOTE as long as we're using the Scene hack, we need to ensure
-              // we pass the original, uncloned elements when serializing
-              // so that we keep ids stable
-              opts.elements,
-              opts.appState,
-              opts.files || {},
-              "local",
-            ),
-          });
         }
         resolve(blob);
       },
