@@ -1,3 +1,5 @@
+import clsx from "clsx";
+
 import { pointFrom } from "@excalidraw/math";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -2172,44 +2174,70 @@ export const actionChangeStrokeShape = register<boolean>({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
-    <fieldset>
-      <legend>{t("labels.strokeShape")}</legend>
-      <div className="buttonList">
-        <RadioSelection
-          group="stroke-shape"
-          options={[
-            {
-              value: true,
-              text: t("labels.strokeShape_constant"),
-              icon: FreedrawPressureConstantIcon,
-              testId: "strokeShape-constant",
-            },
-            {
-              value: false,
-              text: t("labels.strokeShape_pressure"),
-              icon: FreedrawPressureSensitiveIcon,
-              testId: "strokeShape-pressure",
-            },
-          ]}
-          value={getFormValue(
-            elements,
-            app,
-            (element) => {
-              if (isFreeDrawElement(element)) {
-                return element.simulatePressure;
-              }
-              return null;
-            },
-            (element) => isFreeDrawElement(element),
-            (hasSelection) =>
-              hasSelection
-                ? null
-                : appState.currentItemFreedrawConstantPressure,
-          )}
-          onChange={(value) => updateData(value)}
-        />
-      </div>
-    </fieldset>
-  ),
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const { isCompact } = getStylesPanelInfo(app);
+
+    const currentValue = getFormValue(
+      elements,
+      app,
+      (element) => {
+        if (isFreeDrawElement(element)) {
+          return element.simulatePressure;
+        }
+        return null;
+      },
+      (element) => isFreeDrawElement(element),
+      (hasSelection) =>
+        hasSelection ? null : appState.currentItemFreedrawConstantPressure,
+    );
+
+    if (isCompact) {
+      const isConstantPressure = currentValue !== false;
+      return (
+        <button
+          type="button"
+          className={clsx("compact-action-button", {
+            active: !isConstantPressure,
+          })}
+          title={
+            isConstantPressure
+              ? t("labels.strokeShape_constant")
+              : t("labels.strokeShape_pressure")
+          }
+          onClick={() => updateData(!isConstantPressure)}
+        >
+          {isConstantPressure
+            ? FreedrawPressureConstantIcon
+            : FreedrawPressureSensitiveIcon}
+        </button>
+      );
+    }
+
+    return (
+      <fieldset>
+        <legend>{t("labels.strokeShape")}</legend>
+        <div className="buttonList">
+          <RadioSelection
+            group="stroke-shape"
+            options={[
+              {
+                value: true,
+                text: t("labels.strokeShape_constant"),
+                icon: FreedrawPressureConstantIcon,
+                testId: "strokeShape-constant",
+              },
+              {
+                value: false,
+                text: t("labels.strokeShape_pressure"),
+                icon: FreedrawPressureSensitiveIcon,
+                testId: "strokeShape-pressure",
+              },
+            ]}
+            value={currentValue}
+            onChange={(value) => updateData(value)}
+          />
+        </div>
+      </fieldset>
+    );
+  },
 });
