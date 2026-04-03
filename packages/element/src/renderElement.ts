@@ -1,20 +1,12 @@
 import rough from "roughjs/bin/rough";
 
 import {
-  bezierEquation,
-  curve,
   type GlobalPoint,
   isRightAngleRads,
   lineSegment,
-  type LocalPoint,
-  pointDistance,
   pointFrom,
-  pointFromVector,
   pointRotateRads,
   type Radians,
-  vectorFromPoint,
-  vectorNormalize,
-  vectorScale,
 } from "@excalidraw/math";
 
 import {
@@ -398,6 +390,29 @@ const drawImagePlaceholder = (
   );
 };
 
+// ─── Freedraw predicted-point store ─────────────────────────────────────────
+// Keyed by element ID.  Coordinates are in element-local scene units
+// (i.e. relative to element.x / element.y), matching the format of
+// ExcalidrawFreeDrawElement.points.
+const freedrawPredictedPoints = new Map<string, readonly [number, number]>();
+
+/**
+ * Sets (or clears) the predicted next point for a freedraw element that is
+ * currently being drawn.  Call from the pointer-move handler using the first
+ * entry returned by PointerEvent.getPredictedEvents().  Call with `null` when
+ * the stroke is finalised so the ghost segment is no longer rendered.
+ */
+export const setFreeDrawPredictedPoint = (
+  elementId: string,
+  point: readonly [number, number] | null,
+): void => {
+  if (point !== null) {
+    freedrawPredictedPoints.set(elementId, point);
+  } else {
+    freedrawPredictedPoints.delete(elementId);
+  }
+};
+
 const DEFAULT_FREEDRAW_PRESSURE = 0.5;
 
 /**
@@ -447,24 +462,159 @@ const drawTaperedCapsule = (
 };
 
 /**
- * Draws freedraw points as individual pressure-aware tapered capsule segments.
- * Each segment [points[i-1] → points[i]] is drawn as a filled tapered capsule
- * whose start radius is derived from pressures[i-1] and end radius from
- * pressures[i].  Because adjacent segments share the same radius at their
- * common junction point, the result is a continuous stroke with naturally
- * varying pen pressure.
+ * Target spacing (in scene units) between consecutive capsule sub-segments
+ * produced by the Catmull-Rom bezier subdivision.  Smaller values give
+ * smoother curves at the cost of more draw calls.
+ */
+const BEZIER_SUBDIVIDE_TARGET_SPACING = 3;
+
+/**
+ * Returns the Catmull-Rom tangent vector at points[i], using the neighbouring
+ * points for a uniform parameterisation.  At the first point a one-sided
+ * forward tangent is used.  At the last real point, `predictedPoint` (if
+ * supplied) stands in for the missing next neighbour so the stroke tip curves
+ * smoothly toward the predicted pen position.
+ */
+const getCatmullRomTangent = (
+  points: readonly (readonly [number, number])[],
+  i: number,
+  predictedPoint: readonly [number, number] | undefined,
+): [number, number] => {
+  const N = points.length;
+  const cur = points[i];
+
+  // Determine the "next" point: real neighbour, predicted point, or mirrored.
+  let next: readonly [number, number];
+  if (i < N - 1) {
+    next = points[i + 1];
+  } else if (predictedPoint !== undefined) {
+    next = predictedPoint;
+  } else {
+    // Mirror back across cur to get a forward tangent at the last point.
+    const prev2 = i > 0 ? points[i - 1] : cur;
+    next = [2 * cur[0] - prev2[0], 2 * cur[1] - prev2[1]];
+  }
+
+  let tx: number;
+  let ty: number;
+
+  if (i === 0) {
+    // One-sided tangent at the first point.
+    tx = (next[0] - cur[0]) * 0.5;
+    ty = (next[1] - cur[1]) * 0.5;
+  } else {
+    const prev = points[i - 1];
+    tx = (next[0] - prev[0]) * 0.5;
+    ty = (next[1] - prev[1]) * 0.5;
+  }
+
+  // Chord-length clamping (PCHIP-style): the bezier control point is
+  // p + t/3, so |t| > 3*chord causes the curve to overshoot the segment
+  // bounding box and loop back on itself — exactly the source of jaggedness
+  // when high-frequency input produces densely-packed or noisy points.
+  // Clamp: |t| <= 3 * min(chord_to_prev, chord_to_next).
+  const magSq = tx * tx + ty * ty;
+  if (magSq > 0) {
+    const dNx = next[0] - cur[0];
+    const dNy = next[1] - cur[1];
+    const chordNext = Math.sqrt(dNx * dNx + dNy * dNy);
+    let chordPrev = chordNext;
+    if (i > 0) {
+      const prev = points[i - 1];
+      const dPx = cur[0] - prev[0];
+      const dPy = cur[1] - prev[1];
+      chordPrev = Math.sqrt(dPx * dPx + dPy * dPy);
+    }
+    const maxMag = 3 * Math.min(chordNext, chordPrev);
+    const mag = Math.sqrt(magSq);
+    if (mag > maxMag) {
+      const scale = maxMag / mag;
+      tx *= scale;
+      ty *= scale;
+    }
+  }
+
+  return [tx, ty];
+};
+
+/**
+ * Draws one bezier-subdivided tapered segment from p0 (radius r0) to p1
+ * (radius r1). t0/t1 are the Catmull-Rom tangents at p0 and p1 respectively.
+ * The segment is sampled at BEZIER_SUBDIVIDE_TARGET_SPACING scene-unit
+ * intervals and each sub-interval is drawn as a tapered capsule.
+ */
+const drawSubdividedSegment = (
+  context: CanvasRenderingContext2D,
+  p0x: number,
+  p0y: number,
+  r0: number,
+  p1x: number,
+  p1y: number,
+  r1: number,
+  t0x: number,
+  t0y: number,
+  t1x: number,
+  t1y: number,
+) => {
+  const segLen = Math.sqrt((p1x - p0x) ** 2 + (p1y - p0y) ** 2);
+  const nSubdiv = Math.max(
+    1,
+    Math.ceil(segLen / BEZIER_SUBDIVIDE_TARGET_SPACING),
+  );
+
+  // Cubic Bezier control points derived from Catmull-Rom tangents.
+  const cp1x = p0x + t0x / 3;
+  const cp1y = p0y + t0y / 3;
+  const cp2x = p1x - t1x / 3;
+  const cp2y = p1y - t1y / 3;
+
+  let prevX = p0x;
+  let prevY = p0y;
+  let prevR = r0;
+
+  for (let k = 1; k <= nSubdiv; k++) {
+    const t = k / nSubdiv;
+    const mt = 1 - t;
+    const mt2 = mt * mt;
+    const t2 = t * t;
+    const mt3 = mt2 * mt;
+    const t3 = t2 * t;
+    const mt2t3 = 3 * mt2 * t;
+    const mtt23 = 3 * mt * t2;
+
+    const x = mt3 * p0x + mt2t3 * cp1x + mtt23 * cp2x + t3 * p1x;
+    const y = mt3 * p0y + mt2t3 * cp1y + mtt23 * cp2y + t3 * p1y;
+    const r = r0 + (r1 - r0) * t;
+
+    drawTaperedCapsule(context, prevX, prevY, prevR, x, y, r);
+    prevX = x;
+    prevY = y;
+    prevR = r;
+  }
+};
+
+/**
+ * Draws freedraw points as bezier-subdivided, pressure-aware tapered capsule
+ * segments.  Consecutive real points are connected with Catmull-Rom cubic
+ * bezier curves so the rendered stroke is smooth even when input samples are
+ * sparse.  When `predictedPoint` is supplied it is used as the tangent hint at
+ * the tip of the stroke and an additional ghost segment is drawn toward it,
+ * compensating for pointer-event latency.
  *
  * @param fromIndex  Draw segments starting from this index (inclusive).
- *                   Segments are from max(fromIndex,1) to points.length-1.
  *                   Pass 0 to draw everything.
+ * @param predictedPoint  Element-local scene coords of the first predicted
+ *                        pointer event, used for tangent and ghost rendering.
  */
 const drawFreeDrawSegments = (
   element: ExcalidrawFreeDrawElement,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
   fromIndex: number,
+  predictedPoint?: readonly [number, number],
 ) => {
   const { points, pressures } = element;
+  const N = points.length;
   const strokeColor =
     renderConfig.theme === THEME.DARK
       ? applyDarkModeFilter(element.strokeColor)
@@ -477,70 +627,79 @@ const drawFreeDrawSegments = (
   const getPressure = (i: number): number =>
     pressures.length > i ? pressures[i] : DEFAULT_FREEDRAW_PRESSURE;
 
-  if (fromIndex === 0 && points.length === 1) {
+  if (fromIndex === 0 && N === 1) {
     // Single-point stroke → filled circle (dot)
     const r = baseRadius * getPressure(0) * 2;
     context.beginPath();
     context.arc(points[0][0], points[0][1], r, 0, Math.PI * 2);
     context.fill();
+    // Draw ghost circle at predicted point if available
+    if (predictedPoint !== undefined) {
+      context.beginPath();
+      context.arc(predictedPoint[0], predictedPoint[1], r, 0, Math.PI * 2);
+      context.fill();
+    }
     return;
   }
 
-  // const FREEDRAW_DEBUG_COLORS = [
-  //   "#e03131",
-  //   "#f76707",
-  //   "#2f9e44",
-  //   "#1971c2",
-  //   "#7048e8",
-  //   "#e64980",
-  // ];
   const start = Math.max(fromIndex, 1);
-  for (let i = start; i < points.length; i++) {
-    //context.fillStyle = FREEDRAW_DEBUG_COLORS[i % FREEDRAW_DEBUG_COLORS.length];
+  for (let i = start; i < N; i++) {
+    const p0 = points[i - 1];
+    const p1 = points[i];
     const r0 = baseRadius * getPressure(i - 1) * 2;
     const r1 = baseRadius * getPressure(i) * 2;
 
-    const synthesizedPressures = [r0];
-    const synthesizedPoints: LocalPoint[] = [points[i - 1]];
-    if (i > 1) {
-      const dist = pointDistance(points[i - 1], points[i]);
-      if (dist > baseRadius / 2) {
-        const c = curve(
-          points[i - 1],
-          pointFromVector(
-            vectorScale(
-              vectorNormalize(vectorFromPoint(points[i - 1], points[i - 2])),
-              dist / 2,
-            ),
-            points[i - 1],
-          ),
-          points[i],
-          points[i],
-        );
-        synthesizedPoints.push(bezierEquation(c, 0.2));
-        synthesizedPressures.push(r0 * 0.8 + r1 * 0.2);
-        synthesizedPoints.push(bezierEquation(c, 0.4));
-        synthesizedPressures.push(r0 * 0.6 + r1 * 0.4);
-        synthesizedPoints.push(bezierEquation(c, 0.6));
-        synthesizedPressures.push(r0 * 0.4 + r1 * 0.6);
-        synthesizedPoints.push(bezierEquation(c, 0.8));
-        synthesizedPressures.push(r0 * 0.2 + r1 * 0.8);
-      }
-    }
-    synthesizedPoints.push(points[i]);
-    synthesizedPressures.push(r1);
+    // Catmull-Rom tangents.  At the last real point, use predictedPoint as
+    // the look-ahead so the tip curves smoothly toward the expected position.
+    const isLastPoint = i === N - 1;
+    const t0 = getCatmullRomTangent(points, i - 1, undefined);
+    const t1 = getCatmullRomTangent(
+      points,
+      i,
+      isLastPoint ? predictedPoint : undefined,
+    );
 
-    for (let j = 1; j < synthesizedPoints.length; j++) {
-      drawTaperedCapsule(
-        context,
-        synthesizedPoints[j - 1][0],
-        synthesizedPoints[j - 1][1],
-        synthesizedPressures[j - 1],
-        synthesizedPoints[j][0],
-        synthesizedPoints[j][1],
-        synthesizedPressures[j],
-      );
-    }
+    drawSubdividedSegment(
+      context,
+      p0[0],
+      p0[1],
+      r0,
+      p1[0],
+      p1[1],
+      r1,
+      t0[0],
+      t0[1],
+      t1[0],
+      t1[1],
+    );
+  }
+
+  // Ghost segment: extend the visible stroke toward the predicted point to
+  // compensate for pointer-event latency.  This segment is overwritten when
+  // the next real pointer event arrives.
+  if (predictedPoint !== undefined && N >= 1) {
+    const lastPt = points[N - 1];
+    const r0 = baseRadius * getPressure(N - 1) * 2;
+
+    // Tangent at the last real point (with predicted look-ahead)
+    const t0 = getCatmullRomTangent(points, N - 1, predictedPoint);
+    // Forward tangent at the predicted point itself
+    const fwdX = predictedPoint[0] - lastPt[0];
+    const fwdY = predictedPoint[1] - lastPt[1];
+
+    drawSubdividedSegment(
+      context,
+      lastPt[0],
+      lastPt[1],
+      r0,
+      predictedPoint[0],
+      predictedPoint[1],
+      r0, // hold pressure at the tip
+      t0[0],
+      t0[1],
+      fwdX,
+      fwdY,
+    );
   }
 };
 
@@ -911,8 +1070,19 @@ const generateOrUpdateFreeDrawIncrementalCanvas = (
     canvasScale = prevInc.scale;
   }
 
-  // Append only the segments added since the last render
-  if (fromIndex < element.points.length) {
+  // Fetch predicted point for this element (set by the pointer-move handler).
+  const predictedPoint = freedrawPredictedPoints.get(element.id);
+
+  // When Catmull-Rom tangents are in use the tangent at the last committed
+  // point changes each time a new real point arrives (the new point becomes
+  // the look-ahead for the previous segment).  Roll back two points so that
+  // the revised last-committed segment is always redrawn with the correct
+  // tangent.  Overpainting with an opaque fill is harmless.
+  const drawFrom = Math.max(0, fromIndex - 2);
+
+  // Draw new (and possibly revised) segments plus the ghost toward the
+  // predicted point.
+  if (drawFrom < element.points.length || predictedPoint !== undefined) {
     const ctx = canvas.getContext("2d")!;
     const canvasElemOffsetX =
       (element.x - canvasOriginSceneX) * dpr * canvasScale;
@@ -921,10 +1091,17 @@ const generateOrUpdateFreeDrawIncrementalCanvas = (
     ctx.save();
     ctx.translate(canvasElemOffsetX, canvasElemOffsetY);
     ctx.scale(dpr * canvasScale, dpr * canvasScale);
-    drawFreeDrawSegments(element, ctx, renderConfig, fromIndex);
+    drawFreeDrawSegments(
+      element,
+      ctx,
+      renderConfig,
+      drawFrom,
+      element.points[element.points.length - 1],
+      //predictedPoint,
+    );
     ctx.restore();
 
-    // Update lastRenderedPointCount in the cache entry
+    // Update lastRenderedPointCount in the cache entry.
     const inc = freedrawIncrementalCache.get(element)!;
     inc.lastRenderedPointCount = element.points.length;
   }

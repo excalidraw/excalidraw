@@ -20,6 +20,7 @@ export {
   actionChangeTextAlign,
   actionChangeVerticalAlign,
   actionChangeArrowProperties,
+  actionChangeStrokeShape,
 } from "./actionProperties";
 
 export {
