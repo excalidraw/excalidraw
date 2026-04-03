@@ -17,6 +17,7 @@ import {
   act,
   render,
   fireEvent,
+  GlobalTestState,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
   assertSelectedElements,
@@ -733,6 +734,71 @@ describe("inner box-selection", () => {
       expect(h.state.selectedGroupIds).toEqual({});
       mouse.up();
     });
+  });
+});
+
+describe("group selection outline", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("renders grouped selection border using the selection color", () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+
+    API.setElements([rect1, rect2]);
+
+    const interactiveContext =
+      GlobalTestState.interactiveCanvas.getContext("2d")!;
+    const originalStrokeRect =
+      interactiveContext.strokeRect.bind(interactiveContext);
+    const strokeRectCalls: {
+      strokeStyle: string | CanvasGradient;
+      lineDash: number[];
+    }[] = [];
+
+    interactiveContext.strokeRect = function (...args) {
+      strokeRectCalls.push({
+        strokeStyle: this.strokeStyle,
+        lineDash: this.getLineDash(),
+      });
+      return originalStrokeRect(...args);
+    };
+
+    const selectionColor =
+      getComputedStyle(
+        GlobalTestState.renderResult.container.querySelector(".excalidraw")!,
+      ).getPropertyValue("--color-selection") || "#6965db";
+
+    try {
+      strokeRectCalls.length = 0;
+      mouse.select(rect1);
+    } finally {
+      interactiveContext.strokeRect = originalStrokeRect;
+    }
+
+    expect(h.state.selectedGroupIds).toEqual({ A: true });
+
+    expect(strokeRectCalls).toContainEqual(
+      expect.objectContaining({
+        strokeStyle: selectionColor.trim(),
+        lineDash: [8, 4],
+      }),
+    );
   });
 });
 
