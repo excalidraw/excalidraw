@@ -937,10 +937,12 @@ export const restoreAppState = (
     !(nextAppState.collaborators instanceof Map)
   ) {
     nextAppState.collaborators = new Map(
-      Object.entries(nextAppState.collaborators as Record<string, Collaborator>),
+      Object.entries(
+        nextAppState.collaborators as Record<string, Collaborator>,
+      ),
     ) as Map<SocketId, Collaborator>;
   }
-  
+
   return {
     ...nextAppState,
     cursorButton: localAppState?.cursorButton || "up",
