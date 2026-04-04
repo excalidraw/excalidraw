@@ -383,6 +383,7 @@ export interface AppState {
     | "elementBackground"
     | "elementStroke"
     | "fontFamily"
+    | "fontSize"
     | "compactTextProperties"
     | "compactStrokeStyles"
     | "compactOtherProperties"
