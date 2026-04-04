@@ -1,4 +1,4 @@
-import { inflate } from "pako";
+import { Inflate } from "pako";
 import tEXt from "png-chunk-text";
 import encodePng from "png-chunks-encode";
 import decodePng from "png-chunks-extract";
@@ -15,6 +15,7 @@ type PNGMetadataChunk = {
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
+const MAX_ITXT_DECOMPRESSED_SIZE = 10 * 1024 * 1024;
 
 const readNullTerminatedText = (data: Uint8Array, offset: number) => {
   const index = data.indexOf(0, offset);
@@ -25,6 +26,46 @@ const readNullTerminatedText = (data: Uint8Array, offset: number) => {
     value: textDecoder.decode(data.slice(offset, index)),
     nextOffset: index + 1,
   };
+};
+
+const mergeUint8Arrays = (chunks: Uint8Array[], totalLength: number) => {
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+
+  for (const chunk of chunks) {
+    result.set(chunk, offset);
+    offset += chunk.length;
+  }
+
+  return result;
+};
+
+const inflateWithLimit = (data: Uint8Array) => {
+  const inflator = new Inflate();
+  const chunks: Uint8Array[] = [];
+  let totalLength = 0;
+
+  inflator.onData = (chunk) => {
+    const bytes = chunk instanceof Uint8Array ? chunk : new Uint8Array(chunk);
+
+    totalLength += bytes.length;
+    if (totalLength > MAX_ITXT_DECOMPRESSED_SIZE) {
+      throw new Error("INVALID");
+    }
+    chunks.push(bytes);
+  };
+
+  try {
+    inflator.push(data, true);
+  } catch {
+    throw new Error("INVALID");
+  }
+
+  if (inflator.err) {
+    throw new Error("INVALID");
+  }
+
+  return mergeUint8Arrays(chunks, totalLength);
 };
 
 const decodeITXtChunk = (data: Uint8Array): PNGMetadataChunk => {
@@ -51,7 +92,7 @@ const decodeITXtChunk = (data: Uint8Array): PNGMetadataChunk => {
 
   const textSection = data.slice(offset);
   const inflatedTextSection =
-    compressionFlag === 1 ? inflate(textSection) : textSection;
+    compressionFlag === 1 ? inflateWithLimit(textSection) : textSection;
   const textBytes =
     inflatedTextSection instanceof Uint8Array
       ? inflatedTextSection

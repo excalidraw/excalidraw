@@ -4,6 +4,7 @@ import {
   randomId,
   reseed,
 } from "@excalidraw/common";
+import { deflate } from "pako";
 import tEXt from "png-chunk-text";
 import encodePng from "png-chunks-encode";
 import decodePng from "png-chunks-extract";
@@ -34,14 +35,19 @@ const createITXtChunk = (
   options?: {
     compressionFlag?: 0 | 1;
     compressionMethod?: number;
+    compressedText?: boolean;
   },
 ) => {
   const keywordBytes = new TextEncoder().encode(keyword);
   const textBytes = new TextEncoder().encode(text);
   const compressionFlag = options?.compressionFlag ?? 0;
   const compressionMethod = options?.compressionMethod ?? 0;
+  const payloadBytes =
+    options?.compressedText && compressionFlag === 1
+      ? deflate(textBytes)
+      : textBytes;
   const data = new Uint8Array(
-    keywordBytes.length + 1 + 1 + 1 + 1 + 1 + textBytes.length,
+    keywordBytes.length + 1 + 1 + 1 + 1 + 1 + payloadBytes.length,
   );
 
   let offset = 0;
@@ -52,7 +58,7 @@ const createITXtChunk = (
   data[offset++] = compressionMethod;
   data[offset++] = 0;
   data[offset++] = 0;
-  data.set(textBytes, offset);
+  data.set(payloadBytes, offset);
 
   return { name: "iTXt" as const, data };
 };
@@ -262,6 +268,32 @@ describe("png metadata", () => {
     });
 
     await expect(decodePngMetadata(withInvalidITXt)).resolves.toBe(metadata);
+  });
+
+  it("ignores compressed iTXt chunks that decompress beyond the safety limit", async () => {
+    const pngBlob = await API.loadFile("./fixtures/smiley.png");
+    const metadata = JSON.stringify({
+      type: EXPORT_DATA_TYPES.excalidraw,
+      elements: [{ type: "text", text: "😀" }],
+    });
+
+    const embedded = await encodePngMetadata({
+      blob: pngBlob,
+      metadata,
+    });
+
+    const oversizedPayload = "x".repeat(10 * 1024 * 1024 + 1);
+    const withOversizedITXt = await insertChunkBeforeFirst({
+      blob: embedded,
+      chunk: createITXtChunk(MIME_TYPES.excalidraw, oversizedPayload, {
+        compressionFlag: 1,
+        compressionMethod: 0,
+        compressedText: true,
+      }),
+      targetChunkName: "iTXt",
+    });
+
+    await expect(decodePngMetadata(withOversizedITXt)).resolves.toBe(metadata);
   });
 
   it("ignores unrelated tEXt chunks before the excalidraw metadata", async () => {
