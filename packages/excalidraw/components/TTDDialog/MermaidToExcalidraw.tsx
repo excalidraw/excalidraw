@@ -236,15 +236,40 @@ const MermaidToExcalidraw = ({
         <Trans
           i18nKey="mermaid.description"
           flowchartLink={(el) => (
-            <a href="https://mermaid.js.org/syntax/flowchart.html">{el}</a>
+            <a
+              href="https://mermaid.js.org/syntax/flowchart.html"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {el}
+            </a>
           )}
           sequenceLink={(el) => (
-            <a href="https://mermaid.js.org/syntax/sequenceDiagram.html">
+            <a
+              href="https://mermaid.js.org/syntax/sequenceDiagram.html"
+              target="_blank"
+              rel="noreferrer"
+            >
               {el}
             </a>
           )}
           classLink={(el) => (
-            <a href="https://mermaid.js.org/syntax/classDiagram.html">{el}</a>
+            <a
+              href="https://mermaid.js.org/syntax/classDiagram.html"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {el}
+            </a>
+          )}
+          erdLink={(el) => (
+            <a
+              href="https://mermaid.js.org/syntax/entityRelationshipDiagram.html"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {el}
+            </a>
           )}
         />
       </div>

@@ -123,10 +123,15 @@ export function pointsEqual<Point extends GlobalPoint | LocalPoint>(
  * @returns The rotated point
  */
 export function pointRotateRads<Point extends GlobalPoint | LocalPoint>(
-  [x, y]: Point,
-  [cx, cy]: Point,
+  point: Point,
+  center: Point,
   angle: Radians,
 ): Point {
+  if (!angle) {
+    return point;
+  }
+  const [x, y] = point;
+  const [cx, cy] = center;
   return pointFrom(
     (x - cx) * Math.cos(angle) - (y - cy) * Math.sin(angle) + cx,
     (x - cx) * Math.sin(angle) + (y - cy) * Math.cos(angle) + cy,
