@@ -334,7 +334,9 @@ describe("contextMenu element", () => {
     // Fill style
     fireEvent.click(screen.getByTitle("Cross-hatch"));
     // Stroke width
-    fireEvent.click(screen.getByTitle("Bold"));
+    fireEvent.change(screen.getByTestId("strokeWidth"), {
+      target: { value: "2" },
+    });
     // Stroke style
     fireEvent.click(screen.getByTitle("Dotted"));
     // Roughness
