@@ -645,8 +645,8 @@ const drawFreeDrawSegments = (
     const p1 = points[i];
     // Very first pressure values are often unreliable,
     // so for the first couple of segments use a radius
-    const r0 = i < 2 ? 0 : baseRadius * getPressure(i - 1) * 2;
-    const r1 = baseRadius * getPressure(i) * 2;
+    const r0 = i <= 2 ? 0 : baseRadius * getPressure(i - 1) * 2;
+    const r1 = i < 2 ? 0 : baseRadius * getPressure(i) * 2;
 
     // Catmull-Rom tangents.  At the last real point, use predictedPoint as
     // the look-ahead so the tip curves smoothly toward the expected position.
@@ -678,7 +678,7 @@ const drawFreeDrawSegments = (
   // the next real pointer event arrives.
   if (predictedPoint !== undefined && N >= 1) {
     const lastPt = points[N - 1];
-    const r0 = baseRadius * getPressure(N - 1) * 2;
+    const r0 = N <= 2 ? 0 : baseRadius * getPressure(N - 1) * 2;
 
     // Tangent at the last real point (with predicted look-ahead)
     const t0 = getCatmullRomTangent(points, N - 1, predictedPoint);
