@@ -469,6 +469,15 @@ const drawTaperedCapsule = (
 const BEZIER_SUBDIVIDE_TARGET_SPACING = 3;
 
 /**
+ * Half-width (in samples) of the triangular smoothing kernel applied to raw
+ * pressure values before computing stroke radii.  A radius of R means each
+ * pressure sample is averaged with R neighbours on each side, weighted
+ * linearly so the centre sample has weight R+1 and the outermost weight 1.
+ * Larger values produce a smoother, more uniform stroke width.
+ */
+const PRESSURE_SMOOTHING_RADIUS = 6;
+
+/**
  * Returns the Catmull-Rom tangent vector at points[i], using the neighbouring
  * points for a uniform parameterisation.  At the first point a one-sided
  * forward tangent is used.  At the last real point, `predictedPoint` (if
@@ -621,12 +630,33 @@ const drawFreeDrawSegments = (
 
   const baseRadius = (element.strokeWidth * 1.25) / 2;
 
-  const getPressure = (i: number): number =>
-    pressures.length > i ? pressures[i] : DEFAULT_FREEDRAW_PRESSURE;
+  // Causal (one-sided) triangular-kernel weighted average of past pressure
+  // samples.  Only looks backward [i-R .. i], so a newly-arrived point never
+  // retroactively changes the smoothed pressure of any previously rendered
+  // segment.  This ensures live and final renders are identical at all points.
+  const getSmoothedPressure = (i: number): number => {
+    if (pressures.length === 0) {
+      return DEFAULT_FREEDRAW_PRESSURE;
+    }
+    let sum = 0;
+    let totalWeight = 0;
+    for (let k = -PRESSURE_SMOOTHING_RADIUS; k <= 0; k++) {
+      const idx = i + k;
+      if (idx < 0) {
+        continue;
+      }
+      const p =
+        idx < pressures.length ? pressures[idx] : DEFAULT_FREEDRAW_PRESSURE;
+      const w = PRESSURE_SMOOTHING_RADIUS + 1 + k; // 1 at i-R, R+1 at i
+      sum += p * w;
+      totalWeight += w;
+    }
+    return totalWeight > 0 ? sum / totalWeight : DEFAULT_FREEDRAW_PRESSURE;
+  };
 
   if (fromIndex === 0 && N === 1) {
     // Single-point stroke → filled circle (dot)
-    const r = baseRadius * getPressure(0) * 2;
+    const r = baseRadius * getSmoothedPressure(0) * 2;
     context.beginPath();
     context.arc(points[0][0], points[0][1], r, 0, Math.PI * 2);
     context.fill();
@@ -645,8 +675,8 @@ const drawFreeDrawSegments = (
     const p1 = points[i];
     // Very first pressure values are often unreliable,
     // so for the first couple of segments use a radius
-    const r0 = i <= 2 ? 0 : baseRadius * getPressure(i - 1) * 2;
-    const r1 = i < 2 ? 0 : baseRadius * getPressure(i) * 2;
+    const r0 = baseRadius * getSmoothedPressure(i - 1) * 2;
+    const r1 = baseRadius * getSmoothedPressure(i) * 2;
 
     // Catmull-Rom tangents.  At the last real point, use predictedPoint as
     // the look-ahead so the tip curves smoothly toward the expected position.
@@ -678,7 +708,7 @@ const drawFreeDrawSegments = (
   // the next real pointer event arrives.
   if (predictedPoint !== undefined && N >= 1) {
     const lastPt = points[N - 1];
-    const r0 = N <= 2 ? 0 : baseRadius * getPressure(N - 1) * 2;
+    const r0 = baseRadius * getSmoothedPressure(N - 1) * 2;
 
     // Tangent at the last real point (with predicted look-ahead)
     const t0 = getCatmullRomTangent(points, N - 1, predictedPoint);
@@ -1072,11 +1102,10 @@ const generateOrUpdateFreeDrawIncrementalCanvas = (
   // Fetch predicted point for this element (set by the pointer-move handler).
   const predictedPoint = freedrawPredictedPoints.get(element.id);
 
-  // When Catmull-Rom tangents are in use the tangent at the last committed
-  // point changes each time a new real point arrives (the new point becomes
-  // the look-ahead for the previous segment).  Roll back two points so that
-  // the revised last-committed segment is always redrawn with the correct
-  // tangent.  Overpainting with an opaque fill is harmless.
+  // Roll back 2 points so the Catmull-Rom look-ahead tangent at the last
+  // committed segment is redrawn correctly when a new point arrives.
+  // Pressure smoothing is causal (one-sided) so it requires no extra rollback.
+  // Overpainting with an opaque fill is harmless.
   const drawFrom = Math.max(0, fromIndex - 2);
 
   // Draw new (and possibly revised) segments plus the ghost toward the
