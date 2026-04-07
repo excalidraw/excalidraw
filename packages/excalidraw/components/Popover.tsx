@@ -1,8 +1,11 @@
 import React, { useLayoutEffect, useRef, useEffect } from "react";
-import "./Popover.scss";
 import { unstable_batchedUpdates } from "react-dom";
-import { queryFocusableElements } from "../utils";
-import { KEYS } from "../keys";
+
+import { KEYS, queryFocusableElements } from "@excalidraw/common";
+
+import clsx from "clsx";
+
+import "./Popover.scss";
 
 type Props = {
   top?: number;
@@ -14,6 +17,7 @@ type Props = {
   offsetTop?: number;
   viewportWidth?: number;
   viewportHeight?: number;
+  className?: string;
 };
 
 export const Popover = ({
@@ -26,6 +30,7 @@ export const Popover = ({
   offsetTop = 0,
   viewportWidth = window.innerWidth,
   viewportHeight = window.innerHeight,
+  className,
 }: Props) => {
   const popoverRef = useRef<HTMLDivElement>(null);
 
@@ -145,7 +150,7 @@ export const Popover = ({
   }, [onCloseRequest]);
 
   return (
-    <div className="popover" ref={popoverRef} tabIndex={-1}>
+    <div className={clsx("popover", className)} ref={popoverRef} tabIndex={-1}>
       {children}
     </div>
   );

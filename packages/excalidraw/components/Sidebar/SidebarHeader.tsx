@@ -1,11 +1,13 @@
 import clsx from "clsx";
 import { useContext } from "react";
+
 import { t } from "../../i18n";
-import { useDevice } from "../App";
-import { SidebarPropsContext } from "./common";
-import { CloseIcon, PinIcon } from "../icons";
-import { Tooltip } from "../Tooltip";
+import { useEditorInterface } from "../App";
 import { Button } from "../Button";
+import { Tooltip } from "../Tooltip";
+import { CloseIcon, PinIcon } from "../icons";
+
+import { SidebarPropsContext } from "./common";
 
 export const SidebarHeader = ({
   children,
@@ -14,11 +16,11 @@ export const SidebarHeader = ({
   children?: React.ReactNode;
   className?: string;
 }) => {
-  const device = useDevice();
+  const editorInterface = useEditorInterface();
   const props = useContext(SidebarPropsContext);
 
   const renderDockButton = !!(
-    device.editor.canFitSidebar && props.shouldRenderDockButton
+    editorInterface.canFitSidebar && props.shouldRenderDockButton
   );
 
   return (

@@ -1,6 +1,36 @@
+import { clamp, roundToStep } from "@excalidraw/math";
+
+import {
+  DEFAULT_CANVAS_BACKGROUND_PICKS,
+  CURSOR_TYPE,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  THEME,
+  ZOOM_STEP,
+  updateActiveTool,
+  CODES,
+  KEYS,
+} from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+import { newElementWith } from "@excalidraw/element";
+import { getCommonBounds, type SceneBounds } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import {
+  getDefaultAppState,
+  isEraserActive,
+  isHandToolActive,
+} from "../appState";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
+import { ToolButton } from "../components/ToolButton";
+import { Tooltip } from "../components/Tooltip";
 import {
   handIcon,
+  LassoIcon,
   MoonIcon,
   SunIcon,
   TrashIcon,
@@ -9,41 +39,21 @@ import {
   ZoomOutIcon,
   ZoomResetIcon,
 } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
-import {
-  CURSOR_TYPE,
-  MAX_ZOOM,
-  MIN_ZOOM,
-  THEME,
-  ZOOM_STEP,
-} from "../constants";
-import { getCommonBounds, getNonDeletedElements } from "../element";
-import type { ExcalidrawElement } from "../element/types";
+import { setCursor } from "../cursor";
+
 import { t } from "../i18n";
-import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import type { AppState } from "../types";
-import { getShortcutKey, updateActiveTool } from "../utils";
-import { register } from "./register";
-import { Tooltip } from "../components/Tooltip";
-import { newElementWith } from "../element/mutateElement";
-import {
-  getDefaultAppState,
-  isEraserActive,
-  isHandToolActive,
-} from "../appState";
-import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
-import type { SceneBounds } from "../element/bounds";
-import { setCursor } from "../cursor";
-import { StoreAction } from "../store";
-import { clamp } from "../math";
+import { getShortcutKey } from "../shortcut";
 
-export const actionChangeViewBackgroundColor = register({
+import { register } from "./register";
+
+import type { AppState, Offsets } from "../types";
+
+export const actionChangeViewBackgroundColor = register<Partial<AppState>>({
   name: "changeViewBackgroundColor",
   label: "labels.canvasBackground",
-  paletteName: "Change canvas background color",
   trackEvent: false,
   predicate: (elements, appState, props, app) => {
     return (
@@ -54,12 +64,12 @@ export const actionChangeViewBackgroundColor = register({
   perform: (_, appState, value) => {
     return {
       appState: { ...appState, ...value },
-      storeAction: !!value.viewBackgroundColor
-        ? StoreAction.CAPTURE
-        : StoreAction.NONE,
+      captureUpdate: !!value?.viewBackgroundColor
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, appProps }) => {
+  PanelComponent: ({ elements, appState, updateData, appProps, data }) => {
     // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
       <ColorPicker
@@ -81,13 +91,13 @@ export const actionChangeViewBackgroundColor = register({
 export const actionClearCanvas = register({
   name: "clearCanvas",
   label: "labels.clearCanvas",
-  paletteName: "Clear canvas",
   icon: TrashIcon,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, props, app) => {
     return (
       !!app.props.UIOptions.canvasActions.clearCanvas &&
-      !appState.viewModeEnabled
+      !appState.viewModeEnabled &&
+      appState.openDialog?.name !== "elementLinkSelector"
     );
   },
   perform: (elements, appState, _, app) => {
@@ -108,13 +118,15 @@ export const actionClearCanvas = register({
         gridStep: appState.gridStep,
         gridModeEnabled: appState.gridModeEnabled,
         stats: appState.stats,
-        pasteDialog: appState.pasteDialog,
         activeTool:
           appState.activeTool.type === "image"
-            ? { ...appState.activeTool, type: "selection" }
+            ? {
+                ...appState.activeTool,
+                type: app.state.preferredSelectionTool.type,
+              }
             : appState.activeTool,
       },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
 });
@@ -139,7 +151,7 @@ export const actionZoomIn = register({
         ),
         userToFollow: null,
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ updateData, appState }) => (
@@ -180,7 +192,7 @@ export const actionZoomOut = register({
         ),
         userToFollow: null,
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ updateData, appState }) => (
@@ -221,7 +233,7 @@ export const actionResetZoom = register({
         ),
         userToFollow: null,
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ updateData, appState }) => (
@@ -259,115 +271,120 @@ const zoomValueToFitBoundsOnViewport = (
   const adjustedZoomValue =
     smallestZoomValue * clamp(viewportZoomFactor, 0.1, 1);
 
-  const zoomAdjustedToSteps =
-    Math.floor(adjustedZoomValue / ZOOM_STEP) * ZOOM_STEP;
-
-  return getNormalizedZoom(Math.min(zoomAdjustedToSteps, 1));
+  return Math.min(adjustedZoomValue, 1);
 };
 
 export const zoomToFitBounds = ({
   bounds,
   appState,
+  canvasOffsets,
   fitToViewport = false,
   viewportZoomFactor = 1,
+  minZoom = -Infinity,
+  maxZoom = Infinity,
 }: {
   bounds: SceneBounds;
+  canvasOffsets?: Offsets;
   appState: Readonly<AppState>;
   /** whether to fit content to viewport (beyond >100%) */
   fitToViewport: boolean;
   /** zoom content to cover X of the viewport, when fitToViewport=true */
   viewportZoomFactor?: number;
+  minZoom?: number;
+  maxZoom?: number;
 }) => {
+  viewportZoomFactor = clamp(viewportZoomFactor, MIN_ZOOM, MAX_ZOOM);
+
   const [x1, y1, x2, y2] = bounds;
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
 
-  let newZoomValue;
-  let scrollX;
-  let scrollY;
+  const canvasOffsetLeft = canvasOffsets?.left ?? 0;
+  const canvasOffsetTop = canvasOffsets?.top ?? 0;
+  const canvasOffsetRight = canvasOffsets?.right ?? 0;
+  const canvasOffsetBottom = canvasOffsets?.bottom ?? 0;
+
+  const effectiveCanvasWidth =
+    appState.width - canvasOffsetLeft - canvasOffsetRight;
+  const effectiveCanvasHeight =
+    appState.height - canvasOffsetTop - canvasOffsetBottom;
+
+  let adjustedZoomValue;
 
   if (fitToViewport) {
     const commonBoundsWidth = x2 - x1;
     const commonBoundsHeight = y2 - y1;
 
-    newZoomValue =
+    adjustedZoomValue =
       Math.min(
-        appState.width / commonBoundsWidth,
-        appState.height / commonBoundsHeight,
-      ) * clamp(viewportZoomFactor, 0.1, 1);
-
-    newZoomValue = getNormalizedZoom(newZoomValue);
-
-    let appStateWidth = appState.width;
-
-    if (appState.openSidebar) {
-      const sidebarDOMElem = document.querySelector(
-        ".sidebar",
-      ) as HTMLElement | null;
-      const sidebarWidth = sidebarDOMElem?.offsetWidth ?? 0;
-      const isRTL = document.documentElement.getAttribute("dir") === "rtl";
-
-      appStateWidth = !isRTL
-        ? appState.width - sidebarWidth
-        : appState.width + sidebarWidth;
-    }
-
-    scrollX = (appStateWidth / 2) * (1 / newZoomValue) - centerX;
-    scrollY = (appState.height / 2) * (1 / newZoomValue) - centerY;
+        effectiveCanvasWidth / commonBoundsWidth,
+        effectiveCanvasHeight / commonBoundsHeight,
+      ) * viewportZoomFactor;
   } else {
-    newZoomValue = zoomValueToFitBoundsOnViewport(
+    adjustedZoomValue = zoomValueToFitBoundsOnViewport(
       bounds,
       {
-        width: appState.width,
-        height: appState.height,
+        width: effectiveCanvasWidth,
+        height: effectiveCanvasHeight,
       },
       viewportZoomFactor,
     );
-
-    const centerScroll = centerScrollOn({
-      scenePoint: { x: centerX, y: centerY },
-      viewportDimensions: {
-        width: appState.width,
-        height: appState.height,
-      },
-      zoom: { value: newZoomValue },
-    });
-
-    scrollX = centerScroll.scrollX;
-    scrollY = centerScroll.scrollY;
   }
+
+  const newZoomValue = getNormalizedZoom(
+    clamp(roundToStep(adjustedZoomValue, ZOOM_STEP, "floor"), minZoom, maxZoom),
+  );
+
+  const centerScroll = centerScrollOn({
+    scenePoint: { x: centerX, y: centerY },
+    viewportDimensions: {
+      width: appState.width,
+      height: appState.height,
+    },
+    offsets: canvasOffsets,
+    zoom: { value: newZoomValue },
+  });
 
   return {
     appState: {
       ...appState,
-      scrollX,
-      scrollY,
+      scrollX: centerScroll.scrollX,
+      scrollY: centerScroll.scrollY,
       zoom: { value: newZoomValue },
     },
-    storeAction: StoreAction.NONE,
+    captureUpdate: CaptureUpdateAction.EVENTUALLY,
   };
 };
 
 export const zoomToFit = ({
+  canvasOffsets,
   targetElements,
   appState,
   fitToViewport,
   viewportZoomFactor,
+  minZoom,
+  maxZoom,
 }: {
+  canvasOffsets?: Offsets;
   targetElements: readonly ExcalidrawElement[];
   appState: Readonly<AppState>;
   /** whether to fit content to viewport (beyond >100%) */
   fitToViewport: boolean;
   /** zoom content to cover X of the viewport, when fitToViewport=true */
   viewportZoomFactor?: number;
+  minZoom?: number;
+  maxZoom?: number;
 }) => {
   const commonBounds = getCommonBounds(getNonDeletedElements(targetElements));
 
   return zoomToFitBounds({
+    canvasOffsets,
     bounds: commonBounds,
     appState,
     fitToViewport,
     viewportZoomFactor,
+    minZoom,
+    maxZoom,
   });
 };
 
@@ -388,6 +405,7 @@ export const actionZoomToFitSelectionInViewport = register({
         userToFollow: null,
       },
       fitToViewport: false,
+      canvasOffsets: app.getEditorUIOffsets(),
     });
   },
   // NOTE shift-2 should have been assigned actionZoomToFitSelection.
@@ -413,7 +431,7 @@ export const actionZoomToFitSelection = register({
         userToFollow: null,
       },
       fitToViewport: true,
-      viewportZoomFactor: 0.7,
+      canvasOffsets: app.getEditorUIOffsets(),
     });
   },
   // NOTE this action should use shift-2 per figma, alas
@@ -430,7 +448,7 @@ export const actionZoomToFit = register({
   icon: zoomAreaIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (elements, appState) =>
+  perform: (elements, appState, _, app) =>
     zoomToFit({
       targetElements: elements,
       appState: {
@@ -438,6 +456,7 @@ export const actionZoomToFit = register({
         userToFollow: null,
       },
       fitToViewport: false,
+      canvasOffsets: app.getEditorUIOffsets(),
     }),
   keyTest: (event) =>
     event.code === CODES.ONE &&
@@ -446,7 +465,7 @@ export const actionZoomToFit = register({
     !event[KEYS.CTRL_OR_CMD],
 });
 
-export const actionToggleTheme = register({
+export const actionToggleTheme = register<AppState["theme"]>({
   name: "toggleTheme",
   label: (_, appState) => {
     return appState.theme === THEME.DARK
@@ -454,7 +473,8 @@ export const actionToggleTheme = register({
       : "buttons.darkMode";
   },
   keywords: ["toggle", "dark", "light", "mode", "theme"],
-  icon: (appState) => (appState.theme === THEME.LIGHT ? MoonIcon : SunIcon),
+  icon: (appState, elements) =>
+    appState.theme === THEME.LIGHT ? MoonIcon : SunIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_, appState, value) => {
@@ -464,7 +484,7 @@ export const actionToggleTheme = register({
         theme:
           value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
@@ -477,13 +497,13 @@ export const actionToggleEraserTool = register({
   name: "toggleEraserTool",
   label: "toolBar.eraser",
   trackEvent: { category: "toolbar" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];
 
     if (isEraserActive(appState)) {
       activeTool = updateActiveTool(appState, {
         ...(appState.activeTool.lastActiveTool || {
-          type: "selection",
+          type: app.state.preferredSelectionTool.type,
         }),
         lastActiveToolBeforeEraser: null,
       });
@@ -502,16 +522,51 @@ export const actionToggleEraserTool = register({
         activeEmbeddable: null,
         activeTool,
       },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) => event.key === KEYS.E,
 });
 
+export const actionToggleLassoTool = register({
+  name: "toggleLassoTool",
+  label: "toolBar.lasso",
+  icon: LassoIcon,
+  trackEvent: { category: "toolbar" },
+  predicate: (elements, appState, props, app) => {
+    return app.state.preferredSelectionTool.type !== "lasso";
+  },
+  perform: (elements, appState, _, app) => {
+    let activeTool: AppState["activeTool"];
+
+    if (appState.activeTool.type !== "lasso") {
+      activeTool = updateActiveTool(appState, {
+        type: "lasso",
+        fromSelection: false,
+      });
+      setCursor(app.interactiveCanvas, CURSOR_TYPE.CROSSHAIR);
+    } else {
+      activeTool = updateActiveTool(appState, {
+        type: "selection",
+      });
+    }
+
+    return {
+      appState: {
+        ...appState,
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        activeEmbeddable: null,
+        activeTool,
+      },
+      captureUpdate: CaptureUpdateAction.NEVER,
+    };
+  },
+});
+
 export const actionToggleHandTool = register({
   name: "toggleHandTool",
   label: "toolBar.hand",
-  paletteName: "Toggle hand tool",
   trackEvent: { category: "toolbar" },
   icon: handIcon,
   viewMode: false,
@@ -541,7 +596,7 @@ export const actionToggleHandTool = register({
         activeEmbeddable: null,
         activeTool,
       },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) =>

@@ -1,6 +1,6 @@
 // Import the original mapper
-import MDXComponents from "@theme-original/MDXComponents";
 import Highlight from "@site/src/components/Highlight";
+import MDXComponents from "@theme-original/MDXComponents";
 
 export default {
   // Re-use the default mapping

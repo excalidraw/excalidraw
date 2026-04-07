@@ -1,41 +1,44 @@
 import {
   compressData,
   decompressData,
-} from "../../packages/excalidraw/data/encode";
+} from "@excalidraw/excalidraw/data/encode";
 import {
   decryptData,
   generateEncryptionKey,
   IV_LENGTH_BYTES,
-} from "../../packages/excalidraw/data/encryption";
-import { serializeAsJSON } from "../../packages/excalidraw/data/json";
-import { restore } from "../../packages/excalidraw/data/restore";
-import type { ImportedDataState } from "../../packages/excalidraw/data/types";
-import type { SceneBounds } from "../../packages/excalidraw/element/bounds";
-import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
-import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
+} from "@excalidraw/excalidraw/data/encryption";
+import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
+import { isInvisiblySmallElement } from "@excalidraw/element";
+import { isInitializedImageElement } from "@excalidraw/element";
+import { t } from "@excalidraw/excalidraw/i18n";
+import { bytesToHexString } from "@excalidraw/common";
+
+import type { UserIdleState } from "@excalidraw/common";
+import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
+import type { SceneBounds } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   FileId,
   OrderedExcalidrawElement,
-} from "../../packages/excalidraw/element/types";
-import { t } from "../../packages/excalidraw/i18n";
+} from "@excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
   SocketId,
-  UserIdleState,
-} from "../../packages/excalidraw/types";
-import type { MakeBrand } from "../../packages/excalidraw/utility-types";
-import { bytesToHexString } from "../../packages/excalidraw/utils";
-import type { WS_SUBTYPES } from "../app_constants";
+} from "@excalidraw/excalidraw/types";
+import type { MakeBrand } from "@excalidraw/common/utility-types";
+
 import {
   DELETED_ELEMENT_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
   ROOM_ID_BYTES,
 } from "../app_constants";
+
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
+
+import type { WS_SUBTYPES } from "../app_constants";
 
 export type SyncableExcalidrawElement = OrderedExcalidrawElement &
   MakeBrand<"SyncableExcalidrawElement">;
@@ -80,13 +83,13 @@ export type SocketUpdateDataSource = {
   SCENE_INIT: {
     type: WS_SUBTYPES.INIT;
     payload: {
-      elements: readonly ExcalidrawElement[];
+      elements: readonly OrderedExcalidrawElement[];
     };
   };
   SCENE_UPDATE: {
     type: WS_SUBTYPES.UPDATE;
     payload: {
-      elements: readonly ExcalidrawElement[];
+      elements: readonly OrderedExcalidrawElement[];
     };
   };
   MOUSE_LOCATION: {
@@ -196,7 +199,7 @@ const legacy_decodeFromBackend = async ({
   };
 };
 
-const importFromBackend = async (
+export const importFromBackend = async (
   id: string,
   decryptionKey: string,
 ): Promise<ImportedDataState> => {
@@ -236,40 +239,6 @@ const importFromBackend = async (
     console.error(error);
     return {};
   }
-};
-
-export const loadScene = async (
-  id: string | null,
-  privateKey: string | null,
-  // Supply local state even if importing from backend to ensure we restore
-  // localStorage user settings which we do not persist on server.
-  // Non-optional so we don't forget to pass it even if `undefined`.
-  localDataState: ImportedDataState | undefined | null,
-) => {
-  let data;
-  if (id != null && privateKey != null) {
-    // the private key is used to decrypt the content from the server, take
-    // extra care not to leak it
-    data = restore(
-      await importFromBackend(id, privateKey),
-      localDataState?.appState,
-      localDataState?.elements,
-      { repairBindings: true, refreshDimensions: false },
-    );
-  } else {
-    data = restore(localDataState || null, null, null, {
-      repairBindings: true,
-    });
-  }
-
-  return {
-    elements: data.elements,
-    appState: data.appState,
-    // note: this will always be empty because we're not storing files
-    // in the scene database/localStorage, and instead fetch them async
-    // from a different database
-    files: data.files,
-  };
 };
 
 type ExportToBackendResult =

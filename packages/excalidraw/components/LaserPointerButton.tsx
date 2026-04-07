@@ -1,8 +1,10 @@
+import clsx from "clsx";
+
 import "./ToolIcon.scss";
 
-import clsx from "clsx";
-import type { ToolButtonSize } from "./ToolButton";
 import { laserPointerToolIcon } from "./icons";
+
+import type { ToolButtonSize } from "./ToolButton";
 
 type LaserPointerIconProps = {
   title?: string;

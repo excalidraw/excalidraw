@@ -31,7 +31,7 @@ You can pass `null` / `undefined` if not applicable.
 restoreElements(
   elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ImportedDataState["elements"]</a>,<br/>&nbsp;
   localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a> | null | undefined): <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a>,<br/>&nbsp;
-  opts: &#123; refreshDimensions?: boolean, repairBindings?: boolean }<br/>
+  opts: &#123; refreshDimensions?: boolean, repairBindings?: boolean, normalizeIndices?: boolean }<br/>
 )
 </pre>
 
@@ -51,8 +51,9 @@ The extra optional parameter to configure restored elements. It has the followin
 
 | Prop | Type | Description|
 | --- | --- | ------|
-| `refreshDimensions` | `boolean` | Indicates whether we should also `recalculate` text element dimensions. Since this is a potentially costly operation, you may want to disable it if you restore elements in tight loops, such as during collaboration. |
-| `repairBindings` |`boolean` | Indicates whether the `bindings` for the elements should be repaired. This is to make sure there are no containers with non existent bound text element id and no bound text elements with non existent container id. |
+| `refreshDimensions` | `boolean` | Indicates whether we should also _recalculate_ text element dimensions. Since this is a potentially costly operation, you may want to disable it if you restore elements in tight loops, such as during collaboration. |
+| `repairBindings` |`boolean` | Indicates whether the _bindings_ for the elements should be repaired. This is to make sure there are no containers with non existent bound text element id and no bound text elements with non existent container id. |
+| `normalizeIndices` |`boolean` | Indicates whether _fractional indices_ for the elements should be normalized. This is to prevent possible issues caused by using stale (too old, too long) indices. |
 
 **_How to use_**
 
@@ -73,7 +74,7 @@ restore(
   data: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L34">ImportedDataState</a>,<br/>&nbsp;
   localAppState: Partial&lt;<a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a>> | null | undefined,<br/>&nbsp;
   localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a> | null | undefined<br/>): <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L4">DataState</a><br/>
-  opts: &#123; refreshDimensions?: boolean, repairBindings?: boolean }<br/>
+  opts: &#123; refreshDimensions?: boolean, repairBindings?: boolean, normalizeIndices?: boolean }<br/>
 
 )
 </pre>

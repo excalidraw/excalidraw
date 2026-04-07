@@ -1,10 +1,21 @@
-import React from "react";
-import { fireEvent, GlobalTestState, toggleMenu, render } from "./test-utils";
-import { Excalidraw, Footer, MainMenu } from "../index";
 import { queryByText, queryByTestId } from "@testing-library/react";
-import { THEME } from "../constants";
-import { t } from "../i18n";
+import React from "react";
 import { useMemo } from "react";
+
+import { THEME } from "@excalidraw/common";
+
+import { t } from "../i18n";
+import { Excalidraw, Footer, MainMenu } from "../index";
+import { actionExportWithDarkMode } from "../actions/actionExport";
+
+import {
+  act,
+  fireEvent,
+  GlobalTestState,
+  toggleMenu,
+  render,
+  waitFor,
+} from "./test-utils";
 
 const { h } = window;
 
@@ -300,6 +311,47 @@ describe("<Excalidraw/>", () => {
       toggleMenu(container);
       const darkModeToggle = queryByTestId(container, "toggle-dark-mode");
       expect(darkModeToggle).toBe(null);
+    });
+
+    it("should sync export theme with the UI theme when there is no session override", async () => {
+      await render(<Excalidraw theme={THEME.DARK} />);
+
+      expect(h.state.exportWithDarkMode).toBe(true);
+
+      act(() => {
+        h.setState({ exportWithDarkMode: false });
+      });
+
+      await waitFor(() => {
+        expect(h.state.exportWithDarkMode).toBe(true);
+      });
+    });
+
+    it("should keep the export theme override for the current session", async () => {
+      await render(<Excalidraw theme={THEME.LIGHT} />);
+
+      act(() => {
+        (h.app as any).actionManager.executeAction(
+          actionExportWithDarkMode,
+          "ui",
+          true,
+        );
+      });
+
+      expect(h.app.sessionExportThemeOverride).toBe(THEME.DARK);
+      expect(h.state.exportWithDarkMode).toBe(true);
+
+      act(() => {
+        h.setState({ theme: THEME.DARK });
+      });
+
+      act(() => {
+        h.setState({ theme: THEME.LIGHT });
+      });
+
+      await waitFor(() => {
+        expect(h.state.exportWithDarkMode).toBe(true);
+      });
     });
   });
 

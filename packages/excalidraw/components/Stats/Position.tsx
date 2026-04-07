@@ -1,9 +1,19 @@
-import type { ElementsMap, ExcalidrawElement } from "../../element/types";
-import { rotate } from "../../math";
+import { clamp, pointFrom, pointRotateRads, round } from "@excalidraw/math";
+
+import {
+  getFlipAdjustedCropPosition,
+  getUncroppedWidthAndHeight,
+} from "@excalidraw/element";
+import { isImageElement } from "@excalidraw/element";
+
+import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { Scene } from "@excalidraw/element";
+
 import StatsDragInput from "./DragInput";
+import { getStepSizedValue, moveElement, STEP_SIZE } from "./utils";
+
 import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue, moveElement } from "./utils";
-import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 
 interface PositionProps {
@@ -14,31 +24,105 @@ interface PositionProps {
   appState: AppState;
 }
 
-const STEP_SIZE = 10;
-
 const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
   accumulatedChange,
+  instantChange,
   originalElements,
   originalElementsMap,
   shouldChangeByStepSize,
   nextValue,
   property,
   scene,
+  originalAppState,
+  app,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
-  const elements = scene.getNonDeletedElements();
   const origElement = originalElements[0];
   const [cx, cy] = [
     origElement.x + origElement.width / 2,
     origElement.y + origElement.height / 2,
   ];
-  const [topLeftX, topLeftY] = rotate(
-    origElement.x,
-    origElement.y,
-    cx,
-    cy,
+  const [topLeftX, topLeftY] = pointRotateRads(
+    pointFrom(origElement.x, origElement.y),
+    pointFrom(cx, cy),
     origElement.angle,
   );
+
+  if (originalAppState.croppingElementId === origElement.id) {
+    const element = elementsMap.get(origElement.id);
+
+    if (!element || !isImageElement(element) || !element.crop) {
+      return;
+    }
+
+    const crop = element.crop;
+    let nextCrop = crop;
+    const isFlippedByX = element.scale[0] === -1;
+    const isFlippedByY = element.scale[1] === -1;
+    const { width: uncroppedWidth, height: uncroppedHeight } =
+      getUncroppedWidthAndHeight(element);
+
+    if (nextValue !== undefined) {
+      if (property === "x") {
+        const nextValueInNatural =
+          nextValue * (crop.naturalWidth / uncroppedWidth);
+
+        if (isFlippedByX) {
+          nextCrop = {
+            ...crop,
+            x: clamp(
+              crop.naturalWidth - nextValueInNatural - crop.width,
+              0,
+              crop.naturalWidth - crop.width,
+            ),
+          };
+        } else {
+          nextCrop = {
+            ...crop,
+            x: clamp(
+              nextValue * (crop.naturalWidth / uncroppedWidth),
+              0,
+              crop.naturalWidth - crop.width,
+            ),
+          };
+        }
+      }
+
+      if (property === "y") {
+        nextCrop = {
+          ...crop,
+          y: clamp(
+            nextValue * (crop.naturalHeight / uncroppedHeight),
+            0,
+            crop.naturalHeight - crop.height,
+          ),
+        };
+      }
+
+      scene.mutateElement(element, {
+        crop: nextCrop,
+      });
+
+      return;
+    }
+
+    const changeInX =
+      (property === "x" ? instantChange : 0) * (isFlippedByX ? -1 : 1);
+    const changeInY =
+      (property === "y" ? instantChange : 0) * (isFlippedByY ? -1 : 1);
+
+    nextCrop = {
+      ...crop,
+      x: clamp(crop.x + changeInX, 0, crop.naturalWidth - crop.width),
+      y: clamp(crop.y + changeInY, 0, crop.naturalHeight - crop.height),
+    };
+
+    scene.mutateElement(element, {
+      crop: nextCrop,
+    });
+
+    return;
+  }
 
   if (nextValue !== undefined) {
     const newTopLeftX = property === "x" ? nextValue : topLeftX;
@@ -47,9 +131,8 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
       newTopLeftX,
       newTopLeftY,
       origElement,
-      elementsMap,
-      elements,
       scene,
+      app.state,
       originalElementsMap,
     );
     return;
@@ -80,9 +163,8 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
     newTopLeftX,
     newTopLeftY,
     origElement,
-    elementsMap,
-    elements,
     scene,
+    app.state,
     originalElementsMap,
   );
 };
@@ -94,15 +176,27 @@ const Position = ({
   scene,
   appState,
 }: PositionProps) => {
-  const [topLeftX, topLeftY] = rotate(
-    element.x,
-    element.y,
-    element.x + element.width / 2,
-    element.y + element.height / 2,
+  const [topLeftX, topLeftY] = pointRotateRads(
+    pointFrom(element.x, element.y),
+    pointFrom(element.x + element.width / 2, element.y + element.height / 2),
     element.angle,
   );
-  const value =
-    Math.round((property === "x" ? topLeftX : topLeftY) * 100) / 100;
+  let value = round(property === "x" ? topLeftX : topLeftY, 2);
+
+  if (
+    appState.croppingElementId === element.id &&
+    isImageElement(element) &&
+    element.crop
+  ) {
+    const flipAdjustedPosition = getFlipAdjustedCropPosition(element);
+
+    if (flipAdjustedPosition) {
+      value = round(
+        property === "x" ? flipAdjustedPosition.x : flipAdjustedPosition.y,
+        2,
+      );
+    }
+  }
 
   return (
     <StatsDragInput

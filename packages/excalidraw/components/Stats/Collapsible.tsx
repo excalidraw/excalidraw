@@ -9,6 +9,8 @@ interface CollapsibleProps {
   open: boolean;
   openTrigger: () => void;
   children: React.ReactNode;
+  className?: string;
+  showCollapsedIcon?: boolean;
 }
 
 const Collapsible = ({
@@ -16,6 +18,8 @@ const Collapsible = ({
   open,
   openTrigger,
   children,
+  className,
+  showCollapsedIcon = true,
 }: CollapsibleProps) => {
   return (
     <>
@@ -26,10 +30,13 @@ const Collapsible = ({
           justifyContent: "space-between",
           alignItems: "center",
         }}
+        className={className}
         onClick={openTrigger}
       >
         {label}
-        <InlineIcon icon={open ? collapseUpIcon : collapseDownIcon} />
+        {showCollapsedIcon && (
+          <InlineIcon icon={open ? collapseUpIcon : collapseDownIcon} />
+        )}
       </div>
       {open && (
         <div style={{ display: "flex", flexDirection: "column" }}>

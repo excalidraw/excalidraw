@@ -1,20 +1,23 @@
-import "./UserList.scss";
-
-import React, { useLayoutEffect } from "react";
+import { Popover } from "radix-ui";
 import clsx from "clsx";
-import type { Collaborator, SocketId } from "../types";
-import { Tooltip } from "./Tooltip";
-import { useExcalidrawActionManager } from "./App";
-import type { ActionManager } from "../actions/manager";
+import React, { useLayoutEffect } from "react";
 
-import * as Popover from "@radix-ui/react-popover";
+import { supportsResizeObserver, isShallowEqual } from "@excalidraw/common";
+
+import type { MarkRequired } from "@excalidraw/common/utility-types";
+
+import { t } from "../i18n";
+
+import { useExcalidrawActionManager } from "./App";
 import { Island } from "./Island";
 import { QuickSearch } from "./QuickSearch";
-import { t } from "../i18n";
-import { isShallowEqual } from "../utils";
-import { supportsResizeObserver } from "../constants";
-import type { MarkRequired } from "../utility-types";
 import { ScrollableList } from "./ScrollableList";
+import { Tooltip } from "./Tooltip";
+
+import "./UserList.scss";
+
+import type { ActionManager } from "../actions/manager";
+import type { Collaborator, SocketId } from "../types";
 
 export type GoToCollaboratorComponentProps = {
   socketId: SocketId;

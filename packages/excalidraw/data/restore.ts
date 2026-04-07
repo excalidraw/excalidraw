@@ -1,32 +1,7 @@
-import type {
-  ExcalidrawArrowElement,
-  ExcalidrawElement,
-  ExcalidrawElementType,
-  ExcalidrawLinearElement,
-  ExcalidrawSelectionElement,
-  ExcalidrawTextElement,
-  FontFamilyValues,
-  OrderedExcalidrawElement,
-  PointBinding,
-  StrokeRoundness,
-} from "../element/types";
-import type { AppState, BinaryFiles, LibraryItem } from "../types";
-import type { ImportedDataState, LegacyAppState } from "./types";
+import { isFiniteNumber, pointFrom } from "@excalidraw/math";
+
 import {
-  getNonDeletedElements,
-  getNormalizedDimensions,
-  isInvisiblySmallElement,
-  refreshTextDimensions,
-} from "../element";
-import {
-  isArrowElement,
-  isElbowArrow,
-  isLinearElement,
-  isTextElement,
-  isUsingAdaptiveRadius,
-} from "../element/typeChecks";
-import { randomId } from "../random";
-import {
+  type CombineBrandsIfNeeded,
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
@@ -36,28 +11,85 @@ import {
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_GRID_SIZE,
   DEFAULT_GRID_STEP,
-} from "../constants";
-import { getDefaultAppState } from "../appState";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { bumpVersion } from "../element/mutateElement";
-import {
+  randomId,
   getUpdatedTimestamp,
-  isFiniteNumber,
   updateActiveTool,
-} from "../utils";
-import { arrayToMap } from "../utils";
-import type { MarkOptional, Mutable } from "../utility-types";
-import { detectLineHeight, getContainerElement } from "../element/textElement";
-import { normalizeLink } from "./url";
-import { syncInvalidIndices } from "../fractionalIndex";
-import { getSizeFromPoints } from "../points";
-import { getLineHeight } from "../fonts";
-import { normalizeFixedPoint } from "../element/binding";
+  arrayToMap,
+  getSizeFromPoints,
+  normalizeLink,
+  getLineHeight,
+} from "@excalidraw/common";
+import {
+  calculateFixedPointForNonElbowArrowBinding,
+  getNonDeletedElements,
+  normalizeArrowhead,
+  isPointInElement,
+  isValidPolygon,
+  projectFixedPointOntoDiagonal,
+} from "@excalidraw/element";
+import { normalizeFixedPoint } from "@excalidraw/element";
+import {
+  updateElbowArrowPoints,
+  validateElbowPoints,
+} from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
+import { bumpVersion } from "@excalidraw/element";
+import { getContainerElement } from "@excalidraw/element";
+import { detectLineHeight } from "@excalidraw/element";
+import {
+  isArrowBoundToElement,
+  isArrowElement,
+  isElbowArrow,
+  isLinearElement,
+  isLineElement,
+  isTextElement,
+  isUsingAdaptiveRadius,
+} from "@excalidraw/element";
+
+import { syncInvalidIndices } from "@excalidraw/element";
+
+import { refreshTextDimensions } from "@excalidraw/element";
+
+import { getNormalizedDimensions } from "@excalidraw/element";
+
+import { isInvisiblySmallElement } from "@excalidraw/element";
+
+import type { LocalPoint, Radians } from "@excalidraw/math";
+
+import type {
+  ElementsMap,
+  ElementsMapOrArray,
+  ExcalidrawArrowElement,
+  ExcalidrawBindableElement,
+  ExcalidrawElbowArrowElement,
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawSelectionElement,
+  ExcalidrawTextElement,
+  FixedPointBinding,
+  FontFamilyValues,
+  NonDeletedSceneElementsMap,
+  OrderedExcalidrawElement,
+  StrokeRoundness,
+} from "@excalidraw/element/types";
+
+import type { MarkOptional, Mutable } from "@excalidraw/common/utility-types";
+
+import { getDefaultAppState } from "../appState";
+
 import {
   getNormalizedGridSize,
   getNormalizedGridStep,
   getNormalizedZoom,
 } from "../scene";
+
+import type {
+  AppState,
+  BinaryFiles,
+  LibraryItem,
+  NormalizedZoomValue,
+} from "../types";
+import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
   AppState,
@@ -69,6 +101,7 @@ export const AllowedExcalidrawActiveTools: Record<
   boolean
 > = {
   selection: true,
+  lasso: true,
   text: true,
   rectangle: true,
   diamond: true,
@@ -101,21 +134,131 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   return DEFAULT_FONT_FAMILY;
 };
 
-const repairBinding = (
-  element: ExcalidrawLinearElement,
-  binding: PointBinding | null,
-): PointBinding | null => {
-  if (!binding) {
-    return null;
+const repairBinding = <T extends ExcalidrawArrowElement>(
+  element: T,
+  binding: FixedPointBinding | null,
+  targetElementsMap: Readonly<ElementsMap>,
+  /** used for context (arrow bindings) */
+  existingElementsMap: Readonly<ElementsMap> | null | undefined,
+  startOrEnd: "start" | "end",
+): FixedPointBinding | null => {
+  try {
+    if (!binding) {
+      return null;
+    }
+
+    // ---------------------------------------------------------------------------
+    // elbow arrows
+    // ---------------------------------------------------------------------------
+
+    if (isElbowArrow(element)) {
+      const fixedPointBinding:
+        | ExcalidrawElbowArrowElement["startBinding"]
+        | ExcalidrawElbowArrowElement["endBinding"] = {
+        ...binding,
+        fixedPoint: normalizeFixedPoint(binding.fixedPoint),
+        mode: binding.mode || "orbit",
+      };
+
+      return fixedPointBinding;
+    }
+
+    // ---------------------------------------------------------------------------
+    // simple arrows
+    // ---------------------------------------------------------------------------
+
+    // binding schema v2
+    // ---------------------------------------------------------------------------
+
+    if (binding.mode) {
+      // if latest binding schema, don't check if binding.elementId exists
+      // (it's done in a separate pass)
+      if (binding.elementId) {
+        return {
+          elementId: binding.elementId,
+          mode: binding.mode,
+          fixedPoint: normalizeFixedPoint(binding.fixedPoint),
+        } as FixedPointBinding | null;
+      }
+      return null;
+    }
+
+    // binding schema v1 (legacy) -> attempt to migrate to v2
+    // ---------------------------------------------------------------------------
+
+    const targetBoundElement = targetElementsMap.get(binding.elementId) as
+      | ExcalidrawBindableElement
+      | undefined;
+    const boundElement =
+      targetBoundElement ||
+      (existingElementsMap?.get(binding.elementId) as
+        | ExcalidrawBindableElement
+        | undefined);
+    const elementsMap = targetBoundElement
+      ? targetElementsMap
+      : existingElementsMap;
+
+    // migrating legacy focus point bindings
+    if (boundElement && elementsMap) {
+      const p = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        element,
+        startOrEnd === "start" ? 0 : element.points.length - 1,
+        elementsMap,
+      );
+      const mode = isPointInElement(p, boundElement, elementsMap)
+        ? "inside"
+        : "orbit";
+      const safeElement = {
+        ...element,
+        startBinding: element.startBinding?.elementId
+          ? {
+              ...element.startBinding,
+              mode,
+              fixedPoint: normalizeFixedPoint(element.startBinding.fixedPoint),
+            }
+          : null,
+        endBinding: element.endBinding?.elementId
+          ? {
+              ...element.endBinding,
+              mode,
+              fixedPoint: normalizeFixedPoint(element.endBinding.fixedPoint),
+            }
+          : null,
+      };
+      const focusPoint =
+        mode === "inside"
+          ? p
+          : projectFixedPointOntoDiagonal(
+              safeElement,
+              p,
+              boundElement,
+              startOrEnd,
+              elementsMap,
+              { value: 1 as NormalizedZoomValue },
+            ) || p;
+      const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
+        safeElement,
+        boundElement,
+        startOrEnd,
+        elementsMap,
+        focusPoint,
+      );
+
+      return {
+        mode,
+        elementId: binding.elementId,
+        fixedPoint,
+      };
+    }
+
+    console.error(
+      `Could not repair binding for element "${boundElement?.id}" out of (${elementsMap?.size}) elements`,
+    );
+  } catch (error) {
+    console.error("Error repairing binding:", error);
   }
 
-  return {
-    ...binding,
-    focus: binding.focus || 0,
-    fixedPoint: isElbowArrow(element)
-      ? normalizeFixedPoint(binding.fixedPoint ?? [0, 0])
-      : null,
-  };
+  return null;
 };
 
 const restoreElementWithProperties = <
@@ -152,7 +295,7 @@ const restoreElementWithProperties = <
     roughness: element.roughness ?? DEFAULT_ELEMENT_PROPS.roughness,
     opacity:
       element.opacity == null ? DEFAULT_ELEMENT_PROPS.opacity : element.opacity,
-    angle: element.angle || 0,
+    angle: element.angle || (0 as Radians),
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
     strokeColor: element.strokeColor || DEFAULT_ELEMENT_PROPS.strokeColor,
@@ -187,18 +330,42 @@ const restoreElementWithProperties = <
       "customData" in extra ? extra.customData : element.customData;
   }
 
-  return {
+  const ret = {
+    // spread the original element properties to not lose unknown ones
+    // for forward-compatibility
+    ...element,
+    // normalized properties
     ...base,
     ...getNormalizedDimensions(base),
     ...extra,
   } as unknown as T;
+
+  // strip legacy props (migrated in previous steps)
+  delete ret.strokeSharpness;
+  delete ret.boundElementIds;
+
+  return ret;
 };
 
-const restoreElement = (
+export const restoreElement = (
+  /** element to be restored */
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
+  /** all elements to be restored */
+  targetElementsMap: Readonly<ElementsMap>,
+  /** used for additional context */
+  existingElementsMap: Readonly<ElementsMap> | null | undefined,
+  opts?: {
+    deleteInvisibleElements?: boolean;
+  },
 ): typeof element | null => {
+  element = { ...element };
+
   switch (element.type) {
     case "text":
+      // temp fix: cleanup legacy obsidian-excalidraw attribute else it'll
+      // conflict when porting between the apps
+      delete (element as any).rawText;
+
       let fontSize = element.fontSize;
       let fontFamily = element.fontFamily;
       if ("font" in element) {
@@ -237,7 +404,8 @@ const restoreElement = (
 
       // if empty text, mark as deleted. We keep in array
       // for data integrity purposes (collab etc.)
-      if (!text && !element.isDeleted) {
+      if (opts?.deleteInvisibleElements && !text && !element.isDeleted) {
+        // TODO: we should not do this since it breaks sync / versioning when we exchange / apply just deltas and restore the elements (deletion isn't recorded)
         element = { ...element, originalText: text, isDeleted: true };
         element = bumpVersion(element);
       }
@@ -246,7 +414,6 @@ const restoreElement = (
     case "freedraw": {
       return restoreElementWithProperties(element, {
         points: element.points,
-        lastCommittedPoint: null,
         simulatePressure: element.simulatePressure,
         pressures: element.pressures,
       });
@@ -256,63 +423,73 @@ const restoreElement = (
         status: element.status || "pending",
         fileId: element.fileId,
         scale: element.scale || [1, 1],
+        crop: element.crop ?? null,
       });
     case "line":
     // @ts-ignore LEGACY type
     // eslint-disable-next-line no-fallthrough
     case "draw":
-      const { startArrowhead = null, endArrowhead = null } = element;
+      const startArrowhead = normalizeArrowhead(element.startArrowhead);
+      const endArrowhead = normalizeArrowhead(element.endArrowhead);
       let x = element.x;
       let y = element.y;
       let points = // migrate old arrow model to new one
         !Array.isArray(element.points) || element.points.length < 2
-          ? [
-              [0, 0],
-              [element.width, element.height],
-            ]
+          ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
           : element.points;
 
       if (points[0][0] !== 0 || points[0][1] !== 0) {
-        ({ points, x, y } = LinearElementEditor.getNormalizedPoints(element));
+        ({ points, x, y } =
+          LinearElementEditor.getNormalizeElementPointsAndCoords(element));
       }
 
       return restoreElementWithProperties(element, {
-        type:
-          (element.type as ExcalidrawElementType | "draw") === "draw"
-            ? "line"
-            : element.type,
-        startBinding: repairBinding(element, element.startBinding),
-        endBinding: repairBinding(element, element.endBinding),
-        lastCommittedPoint: null,
+        type: "line",
+        startBinding: null,
+        endBinding: null,
         startArrowhead,
         endArrowhead,
         points,
         x,
         y,
+        ...(isLineElement(element)
+          ? {
+              polygon: isValidPolygon(element.points)
+                ? element.polygon ?? false
+                : false,
+            }
+          : {}),
         ...getSizeFromPoints(points),
       });
     case "arrow": {
-      const { startArrowhead = null, endArrowhead = "arrow" } = element;
-      let x = element.x;
-      let y = element.y;
-      let points = // migrate old arrow model to new one
+      const startArrowhead = normalizeArrowhead(element.startArrowhead);
+      const endArrowhead =
+        element.endArrowhead === undefined
+          ? "arrow"
+          : normalizeArrowhead(element.endArrowhead);
+      const x: number | undefined = element.x;
+      const y: number | undefined = element.y;
+      const points: readonly LocalPoint[] | undefined = // migrate old arrow model to new one
         !Array.isArray(element.points) || element.points.length < 2
-          ? [
-              [0, 0],
-              [element.width, element.height],
-            ]
+          ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
           : element.points;
 
-      if (points[0][0] !== 0 || points[0][1] !== 0) {
-        ({ points, x, y } = LinearElementEditor.getNormalizedPoints(element));
-      }
-
-      // TODO: Separate arrow from linear element
-      return restoreElementWithProperties(element as ExcalidrawArrowElement, {
+      const base = {
         type: element.type,
-        startBinding: repairBinding(element, element.startBinding),
-        endBinding: repairBinding(element, element.endBinding),
-        lastCommittedPoint: null,
+        startBinding: repairBinding(
+          element as ExcalidrawArrowElement,
+          element.startBinding,
+          targetElementsMap,
+          existingElementsMap,
+          "start",
+        ),
+        endBinding: repairBinding(
+          element as ExcalidrawArrowElement,
+          element.endBinding,
+          targetElementsMap,
+          existingElementsMap,
+          "end",
+        ),
         startArrowhead,
         endArrowhead,
         points,
@@ -320,7 +497,28 @@ const restoreElement = (
         y,
         elbowed: (element as ExcalidrawArrowElement).elbowed,
         ...getSizeFromPoints(points),
-      });
+      };
+
+      // TODO: Separate arrow from linear element
+      const restoredElement = isElbowArrow(element)
+        ? restoreElementWithProperties(element as ExcalidrawElbowArrowElement, {
+            ...base,
+            elbowed: true,
+            fixedSegments:
+              element.fixedSegments?.length && base.points.length >= 4
+                ? element.fixedSegments
+                : null,
+            startIsSpecial: element.startIsSpecial,
+            endIsSpecial: element.endIsSpecial,
+          })
+        : restoreElementWithProperties(element as ExcalidrawArrowElement, base);
+
+      return {
+        ...restoredElement,
+        ...LinearElementEditor.getNormalizeElementPointsAndCoords(
+          restoredElement,
+        ),
+      };
     }
 
     // generic elements
@@ -381,7 +579,7 @@ const repairContainerElement = (
             // if defined, lest boundElements is stale
             !boundElement.containerId
           ) {
-            (boundElement as Mutable<ExcalidrawTextElement>).containerId =
+            (boundElement as Mutable<typeof boundElement>).containerId =
               container.id;
           }
         }
@@ -405,6 +603,10 @@ const repairBoundElement = (
   const container = boundElement.containerId
     ? elementsMap.get(boundElement.containerId)
     : null;
+
+  (boundElement as Mutable<typeof boundElement>).angle = (
+    isArrowElement(container) ? 0 : container?.angle ?? 0
+  ) as Radians;
 
   if (!container) {
     boundElement.containerId = null;
@@ -446,43 +648,76 @@ const repairFrameMembership = (
   }
 };
 
-export const restoreElements = (
-  elements: ImportedDataState["elements"],
-  /** NOTE doesn't serve for reconciliation */
-  localElements: readonly ExcalidrawElement[] | null | undefined,
-  opts?: { refreshDimensions?: boolean; repairBindings?: boolean } | undefined,
-): OrderedExcalidrawElement[] => {
+export const restoreElements = <T extends ExcalidrawElement>(
+  targetElements: readonly T[] | undefined | null,
+  /** used for additional context (e.g. repairing arrow bindings) */
+  existingElements: Readonly<ElementsMapOrArray> | null | undefined,
+  opts?:
+    | {
+        refreshDimensions?: boolean;
+        repairBindings?: boolean;
+        deleteInvisibleElements?: boolean;
+      }
+    | undefined,
+): CombineBrandsIfNeeded<T, OrderedExcalidrawElement> => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
-  const localElementsMap = localElements ? arrayToMap(localElements) : null;
+  const targetElementsMap = arrayToMap(targetElements || []);
+  const existingElementsMap = existingElements
+    ? arrayToMap(existingElements)
+    : null;
   const restoredElements = syncInvalidIndices(
-    (elements || []).reduce((elements, element) => {
+    (targetElements || []).reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained
-      if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-        let migratedElement: ExcalidrawElement | null = restoreElement(element);
-        if (migratedElement) {
-          const localElement = localElementsMap?.get(element.id);
-          if (localElement && localElement.version > migratedElement.version) {
-            migratedElement = bumpVersion(
-              migratedElement,
-              localElement.version,
-            );
-          }
-          if (existingIds.has(migratedElement.id)) {
-            migratedElement = { ...migratedElement, id: randomId() };
-          }
-          existingIds.add(migratedElement.id);
-
-          elements.push(migratedElement);
-        }
+      if (element.type === "selection") {
+        return elements;
       }
+      let migratedElement: ExcalidrawElement | null;
+      try {
+        migratedElement = restoreElement(
+          element,
+          targetElementsMap,
+          existingElementsMap,
+          {
+            deleteInvisibleElements: opts?.deleteInvisibleElements,
+          },
+        );
+      } catch (error) {
+        console.error("Error restoring element:", error);
+        migratedElement = null;
+      }
+      if (migratedElement) {
+        const localElement = existingElementsMap?.get(element.id);
+
+        const shouldMarkAsDeleted =
+          opts?.deleteInvisibleElements && isInvisiblySmallElement(element);
+
+        if (shouldMarkAsDeleted) {
+          migratedElement = bumpVersion(migratedElement, localElement?.version);
+        }
+
+        if (shouldMarkAsDeleted) {
+          migratedElement = { ...migratedElement, isDeleted: true };
+        }
+
+        if (existingIds.has(migratedElement.id)) {
+          migratedElement = { ...migratedElement, id: randomId() };
+        }
+        existingIds.add(migratedElement.id);
+
+        elements.push(migratedElement);
+      }
+
       return elements;
     }, [] as ExcalidrawElement[]),
   );
 
   if (!opts?.repairBindings) {
-    return restoredElements;
+    return restoredElements as CombineBrandsIfNeeded<
+      T,
+      OrderedExcalidrawElement
+    >;
   }
 
   // repair binding. Mutates elements.
@@ -527,7 +762,107 @@ export const restoreElements = (
     }
   }
 
-  return restoredElements;
+  // NOTE (mtolmacs): Temporary fix for extremely large arrows
+  // Need to iterate again so we have attached text nodes in elementsMap
+  return restoredElements.map((element) => {
+    if (
+      isElbowArrow(element) &&
+      !isArrowBoundToElement(element) &&
+      !validateElbowPoints(element.points)
+    ) {
+      return {
+        ...element,
+        ...updateElbowArrowPoints(
+          element,
+          restoredElementsMap as NonDeletedSceneElementsMap,
+          {
+            points: [
+              pointFrom<LocalPoint>(0, 0),
+              element.points[element.points.length - 1],
+            ],
+          },
+        ),
+        index: element.index,
+      };
+    }
+
+    if (
+      isElbowArrow(element) &&
+      element.startBinding &&
+      element.endBinding &&
+      element.startBinding.elementId === element.endBinding.elementId &&
+      element.points.length > 1 &&
+      element.points.some(
+        ([rx, ry]) => Math.abs(rx) > 1e6 || Math.abs(ry) > 1e6,
+      )
+    ) {
+      console.error("Fixing self-bound elbow arrow", element.id);
+      const boundElement = restoredElementsMap.get(
+        element.startBinding.elementId,
+      );
+      if (!boundElement) {
+        console.error(
+          "Bound element not found",
+          element.startBinding.elementId,
+        );
+        return element;
+      }
+
+      return {
+        ...element,
+        x: boundElement.x + boundElement.width / 2,
+        y: boundElement.y - 5,
+        width: boundElement.width,
+        height: boundElement.height,
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(0, -10),
+          pointFrom<LocalPoint>(boundElement.width / 2 + 5, -10),
+          pointFrom<LocalPoint>(
+            boundElement.width / 2 + 5,
+            boundElement.height / 2 + 5,
+          ),
+        ],
+      };
+    }
+
+    return element;
+  }) as CombineBrandsIfNeeded<T, OrderedExcalidrawElement>;
+};
+
+/**
+ * When replacing elements that may exist locally, this bumps their versions
+ * to the local version + 1. Mainly for later reconciliation to work properly.
+ *
+ * See https://github.com/excalidraw/excalidraw/issues/3795
+ *
+ * Generally use this on editor boundaries (importing from file etc.), though
+ * it does not apply universally (e.g. we don't want to do this for collab
+ * updates).
+ */
+export const bumpElementVersions = <T extends ExcalidrawElement>(
+  targetElements: readonly T[],
+  localElements: Readonly<ElementsMapOrArray> | null | undefined,
+) => {
+  const localElementsMap = localElements ? arrayToMap(localElements) : null;
+
+  return targetElements.map((element) => {
+    const localElement = localElementsMap?.get(element.id);
+
+    if (
+      localElement &&
+      (localElement.version > element.version ||
+        // same versions but different versionNonce means different edits
+        // (this often means the element was bumped during restore e.g. due
+        // to re-indexing, and the original element was modified elsewhere
+        // and supplied as localElements)
+        (localElement.version === element.version &&
+          localElement.versionNonce !== element.versionNonce))
+    ) {
+      return bumpVersion(element, localElement.version);
+    }
+    return element;
+  });
 };
 
 const coalesceAppStateValue = <
@@ -601,6 +936,12 @@ export const restoreAppState = (
         : defaultValue;
   }
 
+  const boxSelectionMode =
+    appState.boxSelectionMode ?? localAppState?.boxSelectionMode;
+  if (boxSelectionMode !== undefined) {
+    nextAppState.boxSelectionMode = boxSelectionMode;
+  }
+
   return {
     ...nextAppState,
     cursorButton: localAppState?.cursorButton || "up",
@@ -638,25 +979,7 @@ export const restoreAppState = (
     gridStep: getNormalizedGridStep(
       isFiniteNumber(appState.gridStep) ? appState.gridStep : DEFAULT_GRID_STEP,
     ),
-  };
-};
-
-export const restore = (
-  data: Pick<ImportedDataState, "appState" | "elements" | "files"> | null,
-  /**
-   * Local AppState (`this.state` or initial state from localStorage) so that we
-   * don't overwrite local state with default values (when values not
-   * explicitly specified).
-   * Supply `null` if you can't get access to it.
-   */
-  localAppState: Partial<AppState> | null | undefined,
-  localElements: readonly ExcalidrawElement[] | null | undefined,
-  elementsConfig?: { refreshDimensions?: boolean; repairBindings?: boolean },
-): RestoredDataState => {
-  return {
-    elements: restoreElements(data?.elements, localElements, elementsConfig),
-    appState: restoreAppState(data?.appState, localAppState || null),
-    files: data?.files || {},
+    editingFrame: null,
   };
 };
 

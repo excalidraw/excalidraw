@@ -1,25 +1,26 @@
+import { CaptureUpdateAction } from "@excalidraw/excalidraw";
+import { trackEvent } from "@excalidraw/excalidraw/analytics";
+import { encryptData } from "@excalidraw/excalidraw/data/encryption";
+import { newElementWith } from "@excalidraw/element";
+import throttle from "lodash.throttle";
+
+import type { UserIdleState } from "@excalidraw/common";
+import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  OnUserFollowedPayload,
+  SocketId,
+} from "@excalidraw/excalidraw/types";
+
+import { WS_EVENTS, FILE_UPLOAD_TIMEOUT, WS_SUBTYPES } from "../app_constants";
+import { isSyncableElement } from "../data";
+
 import type {
   SocketUpdateData,
   SocketUpdateDataSource,
   SyncableExcalidrawElement,
 } from "../data";
-import { isSyncableElement } from "../data";
-
 import type { TCollabClass } from "./Collab";
-
-import type { OrderedExcalidrawElement } from "../../packages/excalidraw/element/types";
-import { WS_EVENTS, FILE_UPLOAD_TIMEOUT, WS_SUBTYPES } from "../app_constants";
-import type {
-  OnUserFollowedPayload,
-  SocketId,
-  UserIdleState,
-} from "../../packages/excalidraw/types";
-import { trackEvent } from "../../packages/excalidraw/analytics";
-import throttle from "lodash.throttle";
-import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
-import { encryptData } from "../../packages/excalidraw/data/encryption";
 import type { Socket } from "socket.io-client";
-import { StoreAction } from "../../packages/excalidraw";
 
 class Portal {
   collab: TCollabClass;
@@ -116,20 +117,26 @@ class Portal {
       }
     }
 
-    this.collab.excalidrawAPI.updateScene({
-      elements: this.collab.excalidrawAPI
-        .getSceneElementsIncludingDeleted()
-        .map((element) => {
-          if (this.collab.fileManager.shouldUpdateImageElementStatus(element)) {
-            // this will signal collaborators to pull image data from server
-            // (using mutation instead of newElementWith otherwise it'd break
-            // in-progress dragging)
-            return newElementWith(element, { status: "saved" });
-          }
-          return element;
-        }),
-      storeAction: StoreAction.UPDATE,
-    });
+    let isChanged = false;
+    const newElements = this.collab.excalidrawAPI
+      .getSceneElementsIncludingDeleted()
+      .map((element) => {
+        if (this.collab.fileManager.shouldUpdateImageElementStatus(element)) {
+          isChanged = true;
+          // this will signal collaborators to pull image data from server
+          // (using mutation instead of newElementWith otherwise it'd break
+          // in-progress dragging)
+          return newElementWith(element, { status: "saved" });
+        }
+        return element;
+      });
+
+    if (isChanged) {
+      this.collab.excalidrawAPI.updateScene({
+        elements: newElements,
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+    }
   }, FILE_UPLOAD_TIMEOUT);
 
   broadcastScene = async (

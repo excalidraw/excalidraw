@@ -1,9 +1,10 @@
-import { ENCRYPTION_KEY_BITS } from "../constants";
+import { ENCRYPTION_KEY_BITS } from "@excalidraw/common";
+
 import { blobToArrayBuffer } from "./blob";
 
 export const IV_LENGTH_BYTES = 12;
 
-export const createIV = () => {
+export const createIV = (): Uint8Array<ArrayBuffer> => {
   const arr = new Uint8Array(IV_LENGTH_BYTES);
   return window.crypto.getRandomValues(arr);
 };
@@ -48,12 +49,12 @@ export const getCryptoKey = (key: string, usage: KeyUsage) =>
 
 export const encryptData = async (
   key: string | CryptoKey,
-  data: Uint8Array | ArrayBuffer | Blob | File | string,
-): Promise<{ encryptedBuffer: ArrayBuffer; iv: Uint8Array }> => {
+  data: Uint8Array<ArrayBuffer> | ArrayBuffer | Blob | File | string,
+): Promise<{ encryptedBuffer: ArrayBuffer; iv: Uint8Array<ArrayBuffer> }> => {
   const importedKey =
     typeof key === "string" ? await getCryptoKey(key, "encrypt") : key;
   const iv = createIV();
-  const buffer: ArrayBuffer | Uint8Array =
+  const buffer: ArrayBuffer | Uint8Array<ArrayBuffer> =
     typeof data === "string"
       ? new TextEncoder().encode(data)
       : data instanceof Uint8Array
@@ -70,15 +71,15 @@ export const encryptData = async (
       iv,
     },
     importedKey,
-    buffer as ArrayBuffer | Uint8Array,
+    buffer,
   );
 
   return { encryptedBuffer, iv };
 };
 
 export const decryptData = async (
-  iv: Uint8Array,
-  encrypted: Uint8Array | ArrayBuffer,
+  iv: Uint8Array<ArrayBuffer>,
+  encrypted: Uint8Array<ArrayBuffer> | ArrayBuffer,
   privateKey: string,
 ): Promise<ArrayBuffer> => {
   const key = await getCryptoKey(privateKey, "decrypt");

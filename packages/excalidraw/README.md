@@ -1,49 +1,142 @@
 # Excalidraw
 
-**Excalidraw** is exported as a component to directly embed in your projects.
+**Excalidraw** is exported as a React component that you can embed directly in your app.
 
 ## Installation
 
-You can use `npm`
+Install the package together with its React peer dependencies.
 
 ```bash
 npm install react react-dom @excalidraw/excalidraw
-```
-
-or via `yarn`
-
-```bash
+# or
 yarn add react react-dom @excalidraw/excalidraw
 ```
 
-After installation you will see a folder `excalidraw-assets` and `excalidraw-assets-dev` in `dist` directory which contains the assets needed for this app in prod and dev mode respectively.
+> **Note**: If you want to try unreleased changes, use `@excalidraw/excalidraw@next`.
 
-Move the folder `excalidraw-assets` and `excalidraw-assets-dev` to the path where your assets are served.
+## Quick start
 
-By default it will try to load the files from [`https://unpkg.com/@excalidraw/excalidraw/dist/`](https://unpkg.com/@excalidraw/excalidraw/dist)
+The minimum working setup has two easy-to-miss requirements:
 
-If you want to load assets from a different path you can set a variable `window.EXCALIDRAW_ASSET_PATH` depending on environment (for example if you have different URL's for dev and prod) to the url from where you want to load the assets.
+1. Import the package CSS:
 
-#### Note
+```ts
+import "@excalidraw/excalidraw/index.css";
+```
 
-**If you don't want to wait for the next stable release and try out the unreleased changes you can use `@excalidraw/excalidraw@next`.**
+2. Render Excalidraw inside a container with a non-zero height.
 
-## Dimensions of Excalidraw
+```tsx
+import { Excalidraw } from "@excalidraw/excalidraw";
+import "@excalidraw/excalidraw/index.css";
 
-Excalidraw takes _100%_ of `width` and `height` of the containing block so make sure the container in which you render Excalidraw has non zero dimensions.
+export default function App() {
+  return (
+    <div style={{ height: "100vh" }}>
+      <Excalidraw />
+    </div>
+  );
+}
+```
 
-### Demo
+Excalidraw fills `100%` of the width and height of its parent. If the parent has no height, the canvas will not be visible.
 
-[Try here](https://codesandbox.io/s/excalidraw-ehlz3).
+## Next.js / SSR frameworks
+
+Excalidraw should be rendered on the client. In SSR frameworks such as Next.js, use a client component and load it dynamically with SSR disabled.
+
+```tsx
+// app/components/ExcalidrawClient.tsx
+"use client";
+
+import { Excalidraw } from "@excalidraw/excalidraw";
+import "@excalidraw/excalidraw/index.css";
+
+export default function ExcalidrawClient() {
+  return (
+    <div style={{ height: "100vh" }}>
+      <Excalidraw />
+    </div>
+  );
+}
+```
+
+```tsx
+// app/page.tsx
+import dynamic from "next/dynamic";
+
+const ExcalidrawClient = dynamic(
+  () => import("./components/ExcalidrawClient"),
+  { ssr: false },
+);
+
+export default function Page() {
+  return <ExcalidrawClient />;
+}
+```
+
+See the local examples for complete setups:
+
+- [examples/with-nextjs](https://github.com/excalidraw/excalidraw/tree/master/examples/with-nextjs)
+- [examples/with-script-in-browser](https://github.com/excalidraw/excalidraw/tree/master/examples/with-script-in-browser)
+
+## LLM / agent tips
+
+If an LLM or coding agent is setting up Excalidraw, these shortcuts usually save more time than re-prompting:
+
+- Start with a plain `<Excalidraw />` in a `100vh` container. Add refs, `initialData`, persistence, or custom UI only after the base embed works.
+- If the canvas is blank, check the CSS import and parent height first. Those are the two most common integration failures.
+- In Next.js or other SSR frameworks, assume client-only rendering first. Use `"use client"` and `dynamic(..., { ssr: false })` before debugging hydration or `window is not defined` errors.
+- If imports or entrypoints are unclear, inspect `node_modules/@excalidraw/excalidraw/package.json`. The installed package exports are the source of truth.
+- Do not set `window.EXCALIDRAW_ASSET_PATH` unless you are intentionally self-hosting fonts/assets.
+- When docs and generated code drift, copy the nearest working example from this repo, especially `examples/with-nextjs` or `examples/with-script-in-browser`.
+
+## Migrating to `@excalidraw/excalidraw@0.18.x`
+
+Version `0.18.x` removes the old `types/`-prefixed deep import paths. If you were importing types from `@excalidraw/excalidraw/types/...`, switch to the new type-only subpaths below.
+
+| Old path | New path |
+| --- | --- |
+| `@excalidraw/excalidraw/types/data/transform.js` | `@excalidraw/excalidraw/element/transform` |
+| `@excalidraw/excalidraw/types/data/types.js` | `@excalidraw/excalidraw/data/types` |
+| `@excalidraw/excalidraw/types/element/types.js` | `@excalidraw/excalidraw/element/types` |
+| `@excalidraw/excalidraw/types/utility-types.js` | `@excalidraw/excalidraw/common/utility-types` |
+| `@excalidraw/excalidraw/types/types.js` | `@excalidraw/excalidraw/types` |
+
+Drop the `.js` extension. The new package `exports` map resolves these paths without it.
+
+These deep subpaths are for `import type` only. Runtime imports should come from the package root, plus `@excalidraw/excalidraw/index.css` for styles.
+
+For example:
+
+```ts
+import { exportToSvg } from "@excalidraw/excalidraw";
+```
+
+## Self-hosting fonts
+
+By default, Excalidraw downloads the fonts it needs from the [CDN](https://esm.run/@excalidraw/excalidraw/dist/prod).
+
+For self-hosting, copy the contents of `node_modules/@excalidraw/excalidraw/dist/prod/fonts` into the path where your app serves static assets, for example `public/`. Then set `window.EXCALIDRAW_ASSET_PATH` to that same path:
+
+```html
+<script>
+  window.EXCALIDRAW_ASSET_PATH = "/";
+</script>
+```
+
+## Demo
+
+Try the [CodeSandbox example](https://codesandbox.io/p/sandbox/github/excalidraw/excalidraw/tree/master/examples/with-script-in-browser).
 
 ## Integration
 
-Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/integration)
+Read the [integration docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/integration).
 
 ## API
 
-Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api)
+Read the [API docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api).
 
 ## Contributing
 
-Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/contributing)
+Read the [contributing docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/contributing).

@@ -1,11 +1,14 @@
 import React from "react";
-import { DEFAULT_SIDEBAR } from "../constants";
+
+import { DEFAULT_SIDEBAR } from "@excalidraw/common";
+
 import { DefaultSidebar } from "../index";
 import {
   fireEvent,
   waitFor,
   withExcalidrawDimensions,
 } from "../tests/test-utils";
+
 import {
   assertExcalidrawWithSidebar,
   assertSidebarDockButton,

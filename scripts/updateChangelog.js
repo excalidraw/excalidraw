@@ -20,14 +20,16 @@ const headerForType = {
   perf: "Performance",
   build: "Build",
 };
+
 const badCommits = [];
 const getCommitHashForLastVersion = async () => {
   try {
-    const commitMessage = `"release @excalidraw/excalidraw@${lastVersion}"`;
+    const commitMessage = `"release @excalidraw/excalidraw"`;
     const { stdout } = await exec(
       `git log --format=format:"%H" --grep=${commitMessage}`,
     );
-    return stdout;
+    // take commit hash from latest release
+    return stdout.split(/\r?\n/)[0];
   } catch (error) {
     console.error(error);
   }

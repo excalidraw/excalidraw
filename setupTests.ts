@@ -1,11 +1,26 @@
+import fs from "fs";
+
 // vitest.setup.ts
 import "vitest-canvas-mock";
 import "@testing-library/jest-dom";
-import fs from "fs";
 import { vi } from "vitest";
+
 import polyfill from "./packages/excalidraw/polyfill";
-import { testPolyfills } from "./packages/excalidraw/tests/helpers/polyfills";
+import { mockThrottleRAF } from "./packages/excalidraw/tests/helpers/mocks";
 import { yellow } from "./packages/excalidraw/tests/helpers/colorize";
+import { testPolyfills } from "./packages/excalidraw/tests/helpers/polyfills";
+
+vi.mock("@excalidraw/common", async (importOriginal) => {
+  const module = await importOriginal<typeof import("@excalidraw/common")>();
+
+  return {
+    ...module,
+    throttleRAF: mockThrottleRAF,
+  };
+});
+
+// mock for pep.js not working with setPointerCapture()
+HTMLElement.prototype.setPointerCapture = vi.fn();
 
 Object.assign(globalThis, testPolyfills);
 
@@ -34,12 +49,14 @@ Object.defineProperty(window, "FontFace", {
     private source: string;
     private descriptors: any;
     private status: string;
+    private unicodeRange: string;
 
     constructor(family, source, descriptors) {
       this.family = family;
       this.source = source;
       this.descriptors = descriptors;
       this.status = "unloaded";
+      this.unicodeRange = "U+0000-00FF";
     }
 
     load() {
@@ -61,38 +78,32 @@ Object.defineProperty(window, "EXCALIDRAW_ASSET_PATH", {
   value: `file://${__dirname}/`,
 });
 
+// mock the font fetch only, so that everything else, as font subsetting, can run inside of the (snapshot) tests
 vi.mock(
-  "./packages/excalidraw/fonts/ExcalidrawFont",
+  "./packages/excalidraw/fonts/ExcalidrawFontFace",
   async (importOriginal) => {
     const mod = await importOriginal<
-      typeof import("./packages/excalidraw/fonts/ExcalidrawFont")
+      typeof import("./packages/excalidraw/fonts/ExcalidrawFontFace")
     >();
-    const ExcalidrawFontImpl = mod.ExcalidrawFont;
+    const ExcalidrawFontFaceImpl = mod.ExcalidrawFontFace;
 
     return {
       ...mod,
-      ExcalidrawFont: class extends ExcalidrawFontImpl {
-        public async getContent(): Promise<string> {
-          const url = this.urls[0];
-
-          if (url.protocol !== "file:") {
-            return super.getContent();
+      ExcalidrawFontFace: class extends ExcalidrawFontFaceImpl {
+        public async fetchFont(url: URL): Promise<ArrayBuffer> {
+          if (!url.toString().startsWith("file://")) {
+            return super.fetchFont(url);
           }
 
           // read local assets directly, without running a server
           const content = await fs.promises.readFile(url);
-          return `data:font/woff2;base64,${content.toString("base64")}`;
+          return content.buffer;
         }
       },
     };
   },
 );
 
-vi.mock("nanoid", () => {
-  return {
-    nanoid: vi.fn(() => "test-id"),
-  };
-});
 // ReactDOM is located inside index.tsx file
 // as a result, we need a place for it to render into
 const element = document.createElement("div");
@@ -104,7 +115,7 @@ console.error = (...args) => {
   // the react's act() warning usually doesn't contain any useful stack trace
   // so we're catching the log and re-logging the message with the test name,
   // also stripping the actual component stack trace as it's not useful
-  if (args[0]?.includes("act(")) {
+  if (args[0]?.includes?.("act(")) {
     _consoleError(
       yellow(
         `<<< WARNING: test "${

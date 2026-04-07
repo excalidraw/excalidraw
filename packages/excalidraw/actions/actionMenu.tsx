@@ -1,58 +1,10 @@
-import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
-import { t } from "../i18n";
-import { showSelectedShapeActions, getNonDeletedElements } from "../element";
+import { KEYS } from "@excalidraw/common";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import { HelpIconThin } from "../components/icons";
+
 import { register } from "./register";
-import { KEYS } from "../keys";
-import { StoreAction } from "../store";
-
-export const actionToggleCanvasMenu = register({
-  name: "toggleCanvasMenu",
-  label: "buttons.menu",
-  trackEvent: { category: "menu" },
-  perform: (_, appState) => ({
-    appState: {
-      ...appState,
-      openMenu: appState.openMenu === "canvas" ? null : "canvas",
-    },
-    storeAction: StoreAction.NONE,
-  }),
-  PanelComponent: ({ appState, updateData }) => (
-    <ToolButton
-      type="button"
-      icon={HamburgerMenuIcon}
-      aria-label={t("buttons.menu")}
-      onClick={updateData}
-      selected={appState.openMenu === "canvas"}
-    />
-  ),
-});
-
-export const actionToggleEditMenu = register({
-  name: "toggleEditMenu",
-  label: "buttons.edit",
-  trackEvent: { category: "menu" },
-  perform: (_elements, appState) => ({
-    appState: {
-      ...appState,
-      openMenu: appState.openMenu === "shape" ? null : "shape",
-    },
-    storeAction: StoreAction.NONE,
-  }),
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <ToolButton
-      visible={showSelectedShapeActions(
-        appState,
-        getNonDeletedElements(elements),
-      )}
-      type="button"
-      icon={palette}
-      aria-label={t("buttons.edit")}
-      onClick={updateData}
-      selected={appState.openMenu === "shape"}
-    />
-  ),
-});
 
 export const actionShortcuts = register({
   name: "toggleShortcuts",
@@ -73,8 +25,10 @@ export const actionShortcuts = register({
             : {
                 name: "help",
               },
+        openMenu: null,
+        openPopup: null,
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   keyTest: (event) => event.key === KEYS.QUESTION_MARK,

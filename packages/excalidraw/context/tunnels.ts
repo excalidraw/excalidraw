@@ -1,3 +1,4 @@
+import { createIsolation } from "jotai-scope";
 import React from "react";
 import tunnel from "tunnel-rat";
 
@@ -14,12 +15,16 @@ type TunnelsContextValue = {
   DefaultSidebarTabTriggersTunnel: Tunnel;
   OverwriteConfirmDialogTunnel: Tunnel;
   TTDDialogTriggerTunnel: Tunnel;
-  jotaiScope: symbol;
+  // this can be removed once we create jotai stores per each editor
+  // instance
+  tunnelsJotai: ReturnType<typeof createIsolation>;
 };
 
 export const TunnelsContext = React.createContext<TunnelsContextValue>(null!);
 
 export const useTunnels = () => React.useContext(TunnelsContext);
+
+const tunnelsJotai = createIsolation();
 
 export const useInitializeTunnels = () => {
   return React.useMemo((): TunnelsContextValue => {
@@ -34,7 +39,7 @@ export const useInitializeTunnels = () => {
       DefaultSidebarTabTriggersTunnel: tunnel(),
       OverwriteConfirmDialogTunnel: tunnel(),
       TTDDialogTriggerTunnel: tunnel(),
-      jotaiScope: Symbol(),
+      tunnelsJotai,
     };
   }, []);
 };

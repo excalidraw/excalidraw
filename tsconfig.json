@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
+    "rootDir": "./",
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -14,8 +16,21 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@excalidraw/common": ["./packages/common/src/index.ts"],
+      "@excalidraw/common/*": ["./packages/common/src/*"],
+      "@excalidraw/excalidraw": ["./packages/excalidraw/index.tsx"],
+      "@excalidraw/excalidraw/*": ["./packages/excalidraw/*"],
+      "@excalidraw/element": ["./packages/element/src/index.ts"],
+      "@excalidraw/element/*": ["./packages/element/src/*"],
+      "@excalidraw/math": ["./packages/math/src/index.ts"],
+      "@excalidraw/math/*": ["./packages/math/src/*"],
+      "@excalidraw/utils": ["./packages/utils/src/index.ts"],
+      "@excalidraw/utils/*": ["./packages/utils/src/*"]
+    }
   },
   "include": ["packages", "excalidraw-app"],
-  "exclude": ["packages/excalidraw/types", "examples"]
+  "exclude": ["examples", "dist", "types", "tests"]
 }

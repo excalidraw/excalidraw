@@ -1,23 +1,34 @@
+import clsx from "clsx";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import { invariant } from "@excalidraw/common";
+
 import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";
-import type { GoToCollaboratorComponentProps } from "../components/UserList";
 import {
   eyeIcon,
   microphoneIcon,
   microphoneMutedIcon,
 } from "../components/icons";
 import { t } from "../i18n";
-import { StoreAction } from "../store";
-import type { Collaborator } from "../types";
-import { register } from "./register";
-import clsx from "clsx";
 
-export const actionGoToCollaborator = register({
+import { register } from "./register";
+
+import type { GoToCollaboratorComponentProps } from "../components/UserList";
+import type { Collaborator } from "../types";
+
+export const actionGoToCollaborator = register<Collaborator>({
   name: "goToCollaborator",
   label: "Go to a collaborator",
   viewMode: true,
   trackEvent: { category: "collab" },
-  perform: (_elements, appState, collaborator: Collaborator) => {
+  perform: (_elements, appState, collaborator) => {
+    invariant(
+      collaborator,
+      "actionGoToCollaborator: collaborator should be defined when actionGoToCollaborator is called",
+    );
+
     if (
       !collaborator.socketId ||
       appState.userToFollow?.socketId === collaborator.socketId ||
@@ -28,7 +39,7 @@ export const actionGoToCollaborator = register({
           ...appState,
           userToFollow: null,
         },
-        storeAction: StoreAction.NONE,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
 
@@ -42,7 +53,7 @@ export const actionGoToCollaborator = register({
         // Close mobile menu
         openMenu: appState.openMenu === "canvas" ? null : appState.openMenu,
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ updateData, data, appState }) => {

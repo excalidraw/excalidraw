@@ -1,9 +1,17 @@
-import React from "react";
-import { render, waitFor } from "./test-utils";
+import { expect, vi } from "vitest";
+
 import { Excalidraw } from "../index";
-import { expect } from "vitest";
-import { getTextEditor, updateTextEditor } from "./queries/dom";
+
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
+import { getTextEditor, updateTextEditor } from "./queries/dom";
+import { render, waitFor } from "./test-utils";
+
+// Mock CodeMirror deps so the dynamic import of CodeMirrorEditor fails,
+// causing TTDDialogInput to fall back to <textarea> in tests.
+vi.mock("@codemirror/view", () => ({}));
+vi.mock("@codemirror/state", () => ({}));
+vi.mock("@codemirror/language", () => ({}));
+vi.mock("@lezer/highlight", () => ({}));
 
 mockMermaidToExcalidraw({
   mockRef: true,
@@ -100,14 +108,14 @@ describe("Test <MermaidToExcalidraw/>", () => {
     expect(dialog).not.toBeNull();
 
     const selector = ".ttd-dialog-input";
-    let editor = await getTextEditor(selector, true);
+    let editor = await getTextEditor({ selector, waitForEditor: true });
 
     expect(dialog.querySelector('[data-testid="mermaid-error"]')).toBeNull();
 
     expect(editor.textContent).toMatchSnapshot();
 
     updateTextEditor(editor, "flowchart TD1");
-    editor = await getTextEditor(selector, false);
+    editor = await getTextEditor({ selector, waitForEditor: false });
 
     expect(editor.textContent).toBe("flowchart TD1");
     expect(

@@ -1,4 +1,4 @@
-@import "../css/variables.module.scss";
+@use "../css/variables.module.scss" as *;
 
 .excalidraw {
   .Card {
@@ -19,7 +19,7 @@
       padding: 1.4rem;
       border-radius: 50%;
       background: var(--card-color);
-      color: $oc-white;
+      color: #fff;
 
       svg {
         width: 2.8rem;
@@ -46,7 +46,7 @@
         background-color: var(--card-color-darkest);
       }
       .ToolIcon__label {
-        color: $oc-white;
+        color: #fff;
       }
 
       .Spinner {

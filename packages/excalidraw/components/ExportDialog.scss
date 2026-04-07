@@ -1,4 +1,4 @@
-@import "../css/variables.module.scss";
+@use "../css/variables.module" as *;
 
 .excalidraw {
   .ExportDialog__preview {
@@ -112,7 +112,7 @@
 
     font-family: Cascadia;
     font-size: 1.8em;
-    color: $oc-white;
+    color: #fff;
 
     &:hover {
       background-color: var(--button-color-darker);

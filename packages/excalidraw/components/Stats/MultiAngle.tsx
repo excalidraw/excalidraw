@@ -1,14 +1,22 @@
-import { mutateElement } from "../../element/mutateElement";
-import { getBoundTextElement } from "../../element/textElement";
-import { isArrowElement } from "../../element/typeChecks";
-import type { ExcalidrawElement } from "../../element/types";
-import { isInGroup } from "../../groups";
-import { degreeToRadian, radianToDegree } from "../../math";
-import type Scene from "../../scene/Scene";
+import { degreesToRadians, radiansToDegrees } from "@excalidraw/math";
+
+import { getBoundTextElement } from "@excalidraw/element";
+import { isArrowElement } from "@excalidraw/element";
+
+import { isInGroup } from "@excalidraw/element";
+
+import type { Degrees } from "@excalidraw/math";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { Scene } from "@excalidraw/element";
+
 import { angleIcon } from "../icons";
+
 import DragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
+
+import type { DragInputCallbackType } from "./DragInput";
 import type { AppState } from "../../types";
 
 interface MultiAngleProps {
@@ -39,23 +47,19 @@ const handleDegreeChange: DragInputCallbackType<
   );
 
   if (nextValue !== undefined) {
-    const nextAngle = degreeToRadian(nextValue);
+    const nextAngle = degreesToRadians(nextValue as Degrees);
 
     for (const element of editableLatestIndividualElements) {
       if (!element) {
         continue;
       }
-      mutateElement(
-        element,
-        {
-          angle: nextAngle,
-        },
-        false,
-      );
+      scene.mutateElement(element, {
+        angle: nextAngle,
+      });
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement && !isArrowElement(element)) {
-        mutateElement(boundTextElement, { angle: nextAngle }, false);
+        scene.mutateElement(boundTextElement, { angle: nextAngle });
       }
     }
 
@@ -71,7 +75,7 @@ const handleDegreeChange: DragInputCallbackType<
     }
     const originalElement = editableOriginalIndividualElements[i];
     const originalAngleInDegrees =
-      Math.round(radianToDegree(originalElement.angle) * 100) / 100;
+      Math.round(radiansToDegrees(originalElement.angle) * 100) / 100;
     const changeInDegrees = Math.round(accumulatedChange);
     let nextAngleInDegrees = (originalAngleInDegrees + changeInDegrees) % 360;
     if (shouldChangeByStepSize) {
@@ -81,19 +85,15 @@ const handleDegreeChange: DragInputCallbackType<
     nextAngleInDegrees =
       nextAngleInDegrees < 0 ? nextAngleInDegrees + 360 : nextAngleInDegrees;
 
-    const nextAngle = degreeToRadian(nextAngleInDegrees);
+    const nextAngle = degreesToRadians(nextAngleInDegrees as Degrees);
 
-    mutateElement(
-      latestElement,
-      {
-        angle: nextAngle,
-      },
-      false,
-    );
+    scene.mutateElement(latestElement, {
+      angle: nextAngle,
+    });
 
     const boundTextElement = getBoundTextElement(latestElement, elementsMap);
     if (boundTextElement && !isArrowElement(latestElement)) {
-      mutateElement(boundTextElement, { angle: nextAngle }, false);
+      scene.mutateElement(boundTextElement, { angle: nextAngle });
     }
   }
   scene.triggerUpdate();
@@ -109,7 +109,7 @@ const MultiAngle = ({
     (el) => !isInGroup(el) && isPropertyEditable(el, "angle"),
   );
   const angles = editableLatestIndividualElements.map(
-    (el) => Math.round((radianToDegree(el.angle) % 360) * 100) / 100,
+    (el) => Math.round((radiansToDegrees(el.angle) % 360) * 100) / 100,
   );
   const value = new Set(angles).size === 1 ? angles[0] : "Mixed";
 

@@ -1,23 +1,39 @@
 import React, { useEffect, useRef } from "react";
-import { isShallowEqual, sceneCoordsToViewportCoords } from "../../utils";
-import { CURSOR_TYPE } from "../../constants";
-import { t } from "../../i18n";
-import type { DOMAttributes } from "react";
-import type { AppState, Device, InteractiveCanvasAppState } from "../../types";
+
+import {
+  CURSOR_TYPE,
+  isShallowEqual,
+  sceneCoordsToViewportCoords,
+  type EditorInterface,
+} from "@excalidraw/common";
+
 import type {
   InteractiveCanvasRenderConfig,
+  InteractiveSceneRenderAnimationState,
+  InteractiveSceneRenderConfig,
   RenderableElementsMap,
   RenderInteractiveSceneCallback,
-} from "../../scene/types";
+} from "@excalidraw/excalidraw/scene/types";
+
 import type {
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
-} from "../../element/types";
-import { isRenderThrottlingEnabled } from "../../reactUtils";
+} from "@excalidraw/element/types";
+
+import { t } from "../../i18n";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
 
+import { AnimationController } from "../../renderer/animation";
+
+import type {
+  AppClassProperties,
+  AppState,
+  InteractiveCanvasAppState,
+} from "../../types";
+import type { DOMAttributes } from "react";
+
 type InteractiveCanvasProps = {
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
   canvas: HTMLCanvasElement | null;
   elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
@@ -27,7 +43,9 @@ type InteractiveCanvasProps = {
   selectionNonce: number | undefined;
   scale: number;
   appState: InteractiveCanvasAppState;
-  device: Device;
+  renderScrollbars: boolean;
+  editorInterface: EditorInterface;
+  app: AppClassProperties;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
   ) => void;
@@ -36,6 +54,7 @@ type InteractiveCanvasProps = {
     DOMAttributes<HTMLCanvasElement | HTMLDivElement>["onContextMenu"],
     undefined
   >;
+  onClick: Exclude<DOMAttributes<HTMLCanvasElement>["onClick"], undefined>;
   onPointerMove: Exclude<
     DOMAttributes<HTMLCanvasElement>["onPointerMove"],
     undefined
@@ -62,8 +81,11 @@ type InteractiveCanvasProps = {
   >;
 };
 
+export const INTERACTIVE_SCENE_ANIMATION_KEY = "animateInteractiveScene";
+
 const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   const isComponentMounted = useRef(false);
+  const rendererParams = useRef(null as InteractiveSceneRenderConfig | null);
 
   useEffect(() => {
     if (!isComponentMounted.current) {
@@ -120,29 +142,60 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         )) ||
       "#6965db";
 
-    renderInteractiveScene(
-      {
-        canvas: props.canvas,
-        elementsMap: props.elementsMap,
-        visibleElements: props.visibleElements,
-        selectedElements: props.selectedElements,
-        allElementsMap: props.allElementsMap,
-        scale: window.devicePixelRatio,
-        appState: props.appState,
-        renderConfig: {
-          remotePointerViewportCoords,
-          remotePointerButton,
-          remoteSelectedElementIds,
-          remotePointerUsernames,
-          remotePointerUserStates,
-          selectionColor,
-          renderScrollbars: false,
-        },
-        device: props.device,
-        callback: props.renderInteractiveSceneCallback,
+    rendererParams.current = {
+      app: props.app,
+      canvas: props.canvas,
+      elementsMap: props.elementsMap,
+      visibleElements: props.visibleElements,
+      selectedElements: props.selectedElements,
+      allElementsMap: props.allElementsMap,
+      scale: window.devicePixelRatio,
+      appState: props.appState,
+      renderConfig: {
+        remotePointerViewportCoords,
+        remotePointerButton,
+        remoteSelectedElementIds,
+        remotePointerUsernames,
+        remotePointerUserStates,
+        selectionColor,
+        renderScrollbars: props.renderScrollbars,
+        // NOTE not memoized on so we don't rerender on cursor move
+        lastViewportPosition: props.app.lastViewportPosition,
       },
-      isRenderThrottlingEnabled(),
-    );
+      editorInterface: props.editorInterface,
+      callback: props.renderInteractiveSceneCallback,
+      animationState: {
+        bindingHighlight: undefined,
+      },
+      deltaTime: 0,
+    };
+
+    if (!AnimationController.running(INTERACTIVE_SCENE_ANIMATION_KEY)) {
+      AnimationController.start<InteractiveSceneRenderAnimationState>(
+        INTERACTIVE_SCENE_ANIMATION_KEY,
+        ({ deltaTime, state }) => {
+          const nextAnimationState = renderInteractiveScene({
+            ...rendererParams.current!,
+            deltaTime,
+            animationState: state,
+          }).animationState;
+
+          if (nextAnimationState) {
+            for (const key in nextAnimationState) {
+              if (
+                nextAnimationState[
+                  key as keyof InteractiveSceneRenderAnimationState
+                ] !== undefined
+              ) {
+                return nextAnimationState;
+              }
+            }
+          }
+
+          return undefined;
+        },
+      );
+    }
   });
 
   return (
@@ -151,14 +204,17 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       style={{
         width: props.appState.width,
         height: props.appState.height,
-        cursor: props.appState.viewModeEnabled
-          ? CURSOR_TYPE.GRAB
-          : CURSOR_TYPE.AUTO,
+        cursor:
+          props.appState.viewModeEnabled &&
+          props.appState.activeTool.type !== "laser"
+            ? CURSOR_TYPE.GRAB
+            : CURSOR_TYPE.AUTO,
       }}
       width={props.appState.width * props.scale}
       height={props.appState.height * props.scale}
       ref={props.handleCanvasRef}
       onContextMenu={props.onContextMenu}
+      onClick={props.onClick}
       onPointerMove={props.onPointerMove}
       onPointerUp={props.onPointerUp}
       onPointerCancel={props.onPointerCancel}
@@ -182,27 +238,38 @@ const getRelevantAppStateProps = (
   width: appState.width,
   height: appState.height,
   viewModeEnabled: appState.viewModeEnabled,
+  activeTool: appState.activeTool,
+  openDialog: appState.openDialog,
   editingGroupId: appState.editingGroupId,
-  editingLinearElement: appState.editingLinearElement,
   selectedElementIds: appState.selectedElementIds,
   frameToHighlight: appState.frameToHighlight,
   offsetLeft: appState.offsetLeft,
   offsetTop: appState.offsetTop,
   theme: appState.theme,
-  pendingImageElementId: appState.pendingImageElementId,
   selectionElement: appState.selectionElement,
   selectedGroupIds: appState.selectedGroupIds,
   selectedLinearElement: appState.selectedLinearElement,
   multiElement: appState.multiElement,
+  newElement: appState.newElement,
   isBindingEnabled: appState.isBindingEnabled,
-  suggestedBindings: appState.suggestedBindings,
+  isMidpointSnappingEnabled: appState.isMidpointSnappingEnabled,
+  suggestedBinding: appState.suggestedBinding,
   isRotating: appState.isRotating,
   elementsToHighlight: appState.elementsToHighlight,
   collaborators: appState.collaborators, // Necessary for collab. sessions
   activeEmbeddable: appState.activeEmbeddable,
   snapLines: appState.snapLines,
   zenModeEnabled: appState.zenModeEnabled,
-  editingElement: appState.editingElement,
+  editingTextElement: appState.editingTextElement,
+  isCropping: appState.isCropping,
+  croppingElementId: appState.croppingElementId,
+  searchMatches: appState.searchMatches,
+  activeLockedId: appState.activeLockedId,
+  hoveredElementIds: appState.hoveredElementIds,
+  frameRendering: appState.frameRendering,
+  shouldCacheIgnoreZoom: appState.shouldCacheIgnoreZoom,
+  exportScale: appState.exportScale,
+  currentItemArrowType: appState.currentItemArrowType,
 });
 
 const areEqual = (
@@ -219,7 +286,8 @@ const areEqual = (
     // on appState)
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements ||
-    prevProps.selectedElements !== nextProps.selectedElements
+    prevProps.selectedElements !== nextProps.selectedElements ||
+    prevProps.renderScrollbars !== nextProps.renderScrollbars
   ) {
     return false;
   }

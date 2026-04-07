@@ -50,7 +50,11 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
   <div
     class="welcome-screen-center__heading welcome-screen-decor excalifont"
   >
-    All your data is saved locally in your browser.
+    Your drawings are saved in your browser's storage.
+    <br />
+    Browser storage can be cleared unexpectedly.
+    <br />
+    Save your work to a file regularly to avoid losing it.
   </div>
   <div
     class="welcome-screen-menu"
@@ -198,7 +202,7 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
     <a
       class="welcome-screen-menu-item "
       href="undefined/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest"
-      rel="noreferrer"
+      rel="noopener"
       target="_blank"
     >
       <div

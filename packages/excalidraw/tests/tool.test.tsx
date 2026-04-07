@@ -1,9 +1,13 @@
 import React from "react";
+
+import { resolvablePromise } from "@excalidraw/common";
+
 import { Excalidraw } from "../index";
-import type { ExcalidrawImperativeAPI } from "../types";
-import { resolvablePromise } from "../utils";
-import { act, render } from "./test-utils";
+
 import { Pointer } from "./helpers/ui";
+import { act, render } from "./test-utils";
+
+import type { ExcalidrawImperativeAPI } from "../types";
 
 describe("setActiveTool()", () => {
   const h = window.h;
@@ -16,7 +20,7 @@ describe("setActiveTool()", () => {
     const excalidrawAPIPromise = resolvablePromise<ExcalidrawImperativeAPI>();
     await render(
       <Excalidraw
-        excalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
+        onExcalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
       />,
     );
     excalidrawAPI = await excalidrawAPIPromise;

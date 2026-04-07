@@ -1,15 +1,27 @@
 import clsx from "clsx";
-import { DEFAULT_SIDEBAR, LIBRARY_SIDEBAR_TAB } from "../constants";
+
+import {
+  CANVAS_SEARCH_TAB,
+  DEFAULT_SIDEBAR,
+  LIBRARY_SIDEBAR_TAB,
+  composeEventHandlers,
+} from "@excalidraw/common";
+
+import type { MarkOptional, Merge } from "@excalidraw/common/utility-types";
+
 import { useTunnels } from "../context/tunnels";
 import { useUIAppState } from "../context/ui-appState";
-import { t } from "../i18n";
-import type { MarkOptional, Merge } from "../utility-types";
-import { composeEventHandlers } from "../utils";
+
+import "../components/dropdownMenu/DropdownMenu.scss";
+
 import { useExcalidrawSetAppState } from "./App";
-import { withInternalFallback } from "./hoc/withInternalFallback";
 import { LibraryMenu } from "./LibraryMenu";
-import type { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";
+import { SearchMenu } from "./SearchMenu";
 import { Sidebar } from "./Sidebar/Sidebar";
+import { withInternalFallback } from "./hoc/withInternalFallback";
+import { LibraryIcon, searchIcon } from "./icons";
+
+import type { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";
 
 const DefaultSidebarTrigger = withInternalFallback(
   "DefaultSidebarTrigger",
@@ -31,14 +43,11 @@ const DefaultSidebarTrigger = withInternalFallback(
 );
 DefaultSidebarTrigger.displayName = "DefaultSidebarTrigger";
 
-const DefaultTabTriggers = ({
-  children,
-  ...rest
-}: { children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) => {
+const DefaultTabTriggers = ({ children }: { children: React.ReactNode }) => {
   const { DefaultSidebarTabTriggersTunnel } = useTunnels();
   return (
     <DefaultSidebarTabTriggersTunnel.In>
-      <Sidebar.TabTriggers {...rest}>{children}</Sidebar.TabTriggers>
+      {children}
     </DefaultSidebarTabTriggersTunnel.In>
   );
 };
@@ -65,17 +74,21 @@ export const DefaultSidebar = Object.assign(
 
       const { DefaultSidebarTabTriggersTunnel } = useTunnels();
 
+      const isForceDocked = appState.openSidebar?.tab === CANVAS_SEARCH_TAB;
+
       return (
         <Sidebar
           {...rest}
           name="default"
           key="default"
           className={clsx("default-sidebar", className)}
-          docked={docked ?? appState.defaultSidebarDockedPreference}
+          docked={
+            isForceDocked || (docked ?? appState.defaultSidebarDockedPreference)
+          }
           onDock={
             // `onDock=false` disables docking.
             // if `docked` passed, but no onDock passed, disable manual docking.
-            onDock === false || (!onDock && docked != null)
+            isForceDocked || onDock === false || (!onDock && docked != null)
               ? undefined
               : // compose to allow the host app to listen on default behavior
                 composeEventHandlers(onDock, (docked) => {
@@ -85,25 +98,21 @@ export const DefaultSidebar = Object.assign(
         >
           <Sidebar.Tabs>
             <Sidebar.Header>
-              {rest.__fallback && (
-                <div
-                  style={{
-                    color: "var(--color-primary)",
-                    fontSize: "1.2em",
-                    fontWeight: "bold",
-                    textOverflow: "ellipsis",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    paddingRight: "1em",
-                  }}
-                >
-                  {t("toolBar.library")}
-                </div>
-              )}
-              <DefaultSidebarTabTriggersTunnel.Out />
+              <Sidebar.TabTriggers>
+                <Sidebar.TabTrigger tab={CANVAS_SEARCH_TAB}>
+                  {searchIcon}
+                </Sidebar.TabTrigger>
+                <Sidebar.TabTrigger tab={LIBRARY_SIDEBAR_TAB}>
+                  {LibraryIcon}
+                </Sidebar.TabTrigger>
+                <DefaultSidebarTabTriggersTunnel.Out />
+              </Sidebar.TabTriggers>
             </Sidebar.Header>
             <Sidebar.Tab tab={LIBRARY_SIDEBAR_TAB}>
               <LibraryMenu />
+            </Sidebar.Tab>
+            <Sidebar.Tab tab={CANVAS_SEARCH_TAB}>
+              <SearchMenu />
             </Sidebar.Tab>
             {children}
           </Sidebar.Tabs>

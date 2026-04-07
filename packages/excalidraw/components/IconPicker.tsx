@@ -1,13 +1,72 @@
-import React from "react";
-import { Popover } from "./Popover";
+import { Popover } from "radix-ui";
+import clsx from "clsx";
+import React, { useEffect, useMemo } from "react";
+
+import { isArrowKey, KEYS } from "@excalidraw/common";
+
+import { atom, useAtom } from "../editor-jotai";
+import { getLanguage, t } from "../i18n";
+
+import Collapsible from "./Stats/Collapsible";
+import { useExcalidrawContainer } from "./App";
 
 import "./IconPicker.scss";
-import { isArrowKey, KEYS } from "../keys";
-import { getLanguage } from "../i18n";
-import clsx from "clsx";
+
+import type { JSX } from "react";
+
+const moreOptionsAtom = atom(false);
+const PICKER_COLUMNS = 4;
+const DEFAULT_SECTION_NAME = "default";
+
+type Option<T> = {
+  value: T;
+  text: string;
+  icon: JSX.Element;
+  keyBinding: string | null;
+};
+
+type PickerSection<T> = {
+  name: string;
+  options: readonly Option<T>[];
+};
+
+const flattenOptions = <T,>(sections: readonly PickerSection<T>[]) =>
+  sections.flatMap((section) => section.options);
+
+const findOption = <T,>(
+  sections: readonly PickerSection<T>[],
+  predicate: (option: Option<T>) => boolean,
+) => {
+  for (const section of sections) {
+    const option = section.options.find(predicate);
+    if (option) {
+      return option;
+    }
+  }
+
+  return null;
+};
+
+const hasOption = <T,>(
+  sections: readonly PickerSection<T>[],
+  predicate: (option: Option<T>) => boolean,
+) => sections.some((section) => section.options.some(predicate));
+
+const getNavigationRows = <T,>(sections: readonly PickerSection<T>[]) =>
+  sections.flatMap((section) =>
+    Array.from(
+      { length: Math.ceil(section.options.length / PICKER_COLUMNS) },
+      (_, index) =>
+        section.options.slice(
+          index * PICKER_COLUMNS,
+          index * PICKER_COLUMNS + PICKER_COLUMNS,
+        ),
+    ),
+  );
 
 function Picker<T>({
-  options,
+  visibleSections,
+  hiddenSections = [],
   value,
   label,
   onChange,
@@ -15,77 +74,109 @@ function Picker<T>({
 }: {
   label: string;
   value: T;
-  options: {
-    value: T;
-    text: string;
-    icon: JSX.Element;
-    keyBinding: string | null;
-  }[];
+  visibleSections: readonly PickerSection<T>[];
+  hiddenSections?: readonly PickerSection<T>[];
   onChange: (value: T) => void;
   onClose: () => void;
 }) {
-  const rFirstItem = React.useRef<HTMLButtonElement>();
-  const rActiveItem = React.useRef<HTMLButtonElement>();
-  const rGallery = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    // After the component is first mounted focus on first input
-    if (rActiveItem.current) {
-      rActiveItem.current.focus();
-    } else if (rGallery.current) {
-      rGallery.current.focus();
-    }
-  }, []);
+  const { container } = useExcalidrawContainer();
+  const [showMoreOptions, setShowMoreOptions] = useAtom(moreOptionsAtom);
+  const allSections = [...visibleSections, ...hiddenSections];
+  const allOptions = flattenOptions(allSections);
+  const navigationRows = getNavigationRows([
+    ...visibleSections,
+    ...(showMoreOptions ? hiddenSections : []),
+  ]);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    const pressedOption = options.find(
+    const pressedOption = allOptions.find(
       (option) => option.keyBinding === event.key.toLowerCase(),
-    )!;
+    );
 
     if (!(event.metaKey || event.altKey || event.ctrlKey) && pressedOption) {
       // Keybinding navigation
-      const index = options.indexOf(pressedOption);
-      (rGallery!.current!.children![index] as any).focus();
+      onChange(pressedOption.value);
+
       event.preventDefault();
     } else if (event.key === KEYS.TAB) {
-      // Tab navigation cycle through options. If the user tabs
-      // away from the picker, close the picker. We need to use
-      // a timeout here to let the stack clear before checking.
-      setTimeout(() => {
-        const active = rActiveItem.current;
-        const docActive = document.activeElement;
-        if (active !== docActive) {
-          onClose();
-        }
-      }, 0);
+      const index = allOptions.findIndex((option) => option.value === value);
+      const nextIndex = event.shiftKey
+        ? (allOptions.length + index - 1) % allOptions.length
+        : (index + 1) % allOptions.length;
+      onChange(allOptions[nextIndex].value);
     } else if (isArrowKey(event.key)) {
       // Arrow navigation
-      const { activeElement } = document;
       const isRTL = getLanguage().rtl;
-      const index = Array.prototype.indexOf.call(
-        rGallery!.current!.children,
-        activeElement,
-      );
+      const index = allOptions.findIndex((option) => option.value === value);
       if (index !== -1) {
-        const length = options.length;
+        const length = allOptions.length;
         let nextIndex = index;
 
         switch (event.key) {
           // Select the next option
           case isRTL ? KEYS.ARROW_LEFT : KEYS.ARROW_RIGHT:
-          case KEYS.ARROW_DOWN: {
             nextIndex = (index + 1) % length;
             break;
-          }
           // Select the previous option
           case isRTL ? KEYS.ARROW_RIGHT : KEYS.ARROW_LEFT:
-          case KEYS.ARROW_UP: {
             nextIndex = (length + index - 1) % length;
+            break;
+          // Go the next row
+          case KEYS.ARROW_DOWN: {
+            const currentRowIndex = navigationRows.findIndex((row) =>
+              row.some((option) => option.value === value),
+            );
+            const currentRow = navigationRows[currentRowIndex];
+
+            if (currentRowIndex !== -1 && currentRow) {
+              const column = currentRow.findIndex(
+                (option) => option.value === value,
+              );
+              const nextRow =
+                navigationRows[(currentRowIndex + 1) % navigationRows.length];
+              const nextOption =
+                nextRow[Math.min(column, nextRow.length - 1)] ??
+                allOptions[index];
+
+              onChange(nextOption.value);
+              event.preventDefault();
+              event.nativeEvent.stopImmediatePropagation();
+              event.stopPropagation();
+              return;
+            }
+            break;
+          }
+          // Go the previous row
+          case KEYS.ARROW_UP: {
+            const currentRowIndex = navigationRows.findIndex((row) =>
+              row.some((option) => option.value === value),
+            );
+            const currentRow = navigationRows[currentRowIndex];
+
+            if (currentRowIndex !== -1 && currentRow) {
+              const column = currentRow.findIndex(
+                (option) => option.value === value,
+              );
+              const previousRow =
+                navigationRows[
+                  (navigationRows.length + currentRowIndex - 1) %
+                    navigationRows.length
+                ];
+              const previousOption =
+                previousRow[Math.min(column, previousRow.length - 1)] ??
+                allOptions[index];
+
+              onChange(previousOption.value);
+              event.preventDefault();
+              event.nativeEvent.stopImmediatePropagation();
+              event.stopPropagation();
+              return;
+            }
             break;
           }
         }
 
-        (rGallery.current!.children![nextIndex] as any).focus();
+        onChange(allOptions[nextIndex].value);
       }
       event.preventDefault();
     } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
@@ -97,41 +188,39 @@ function Picker<T>({
     event.stopPropagation();
   };
 
-  return (
-    <div
-      className={`picker`}
-      role="dialog"
-      aria-modal="true"
-      aria-label={label}
-      onKeyDown={handleKeyDown}
-    >
-      <div className="picker-content" ref={rGallery}>
-        {options.map((option, i) => (
+  useEffect(() => {
+    if (hasOption(hiddenSections, (option) => option.value === value)) {
+      setShowMoreOptions(true);
+    }
+  }, [value, hiddenSections, setShowMoreOptions]);
+
+  const renderOptions = (options: readonly Option<T>[]) => {
+    return (
+      <div className="picker-content">
+        {options.map((option) => (
           <button
             type="button"
             className={clsx("picker-option", {
               active: value === option.value,
             })}
-            onClick={(event) => {
-              (event.currentTarget as HTMLButtonElement).focus();
+            onClick={() => {
               onChange(option.value);
             }}
-            title={`${option.text} ${
-              option.keyBinding && `— ${option.keyBinding.toUpperCase()}`
-            }`}
+            title={
+              option.keyBinding
+                ? `${option.text} — ${option.keyBinding.toUpperCase()}`
+                : option.text
+            }
             aria-label={option.text || "none"}
             aria-keyshortcuts={option.keyBinding || undefined}
             key={option.text}
-            ref={(el) => {
-              if (el && i === 0) {
-                rFirstItem.current = el;
+            ref={(ref) => {
+              if (value === option.value) {
+                // Use a timeout here to render focus properly
+                setTimeout(() => {
+                  ref?.focus();
+                }, 0);
               }
-              if (el && option.value === value) {
-                rActiveItem.current = el;
-              }
-            }}
-            onFocus={() => {
-              onChange(option.value);
             }}
           >
             {option.icon}
@@ -141,69 +230,104 @@ function Picker<T>({
           </button>
         ))}
       </div>
-    </div>
+    );
+  };
+
+  const renderSections = (sections: readonly PickerSection<T>[]) =>
+    sections.map((section, index) =>
+      section.name === DEFAULT_SECTION_NAME ? (
+        <React.Fragment key={`${section.name}-${index}`}>
+          {renderOptions(section.options)}
+        </React.Fragment>
+      ) : (
+        <div className="picker-section" key={`${section.name}-${index}`}>
+          <div className="picker-section-label">{section.name}</div>
+          {renderOptions(section.options)}
+        </div>
+      ),
+    );
+
+  return (
+    <Popover.Content
+      className="picker"
+      role="dialog"
+      aria-modal="true"
+      aria-label={label}
+      side={"bottom"}
+      align="start"
+      sideOffset={12}
+      alignOffset={12}
+      style={{ zIndex: "var(--zIndex-ui-styles-popup)" }}
+      onKeyDown={handleKeyDown}
+      collisionBoundary={container ?? undefined}
+    >
+      <div className="picker-sections">
+        {renderSections(visibleSections)}
+
+        {hiddenSections.length > 0 && (
+          <Collapsible
+            label={t("labels.more_options")}
+            open={showMoreOptions}
+            openTrigger={() => {
+              setShowMoreOptions((value) => !value);
+            }}
+            className="picker-collapsible"
+          >
+            <div className="picker-sections">
+              {renderSections(hiddenSections)}
+            </div>
+          </Collapsible>
+        )}
+      </div>
+    </Popover.Content>
   );
 }
 
 export function IconPicker<T>({
   value,
   label,
-  options,
+  visibleSections,
+  hiddenSections,
   onChange,
-  group = "",
 }: {
   label: string;
   value: T;
-  options: readonly {
-    value: T;
-    text: string;
-    icon: JSX.Element;
-    keyBinding: string | null;
-    showInPicker?: boolean;
-  }[];
+  visibleSections: readonly PickerSection<T>[];
+  hiddenSections?: readonly PickerSection<T>[];
   onChange: (value: T) => void;
-  group?: string;
 }) {
   const [isActive, setActive] = React.useState(false);
-  const rPickerButton = React.useRef<any>(null);
-  const isRTL = getLanguage().rtl;
+  const selectedOption = useMemo(
+    () =>
+      findOption(visibleSections, (option) => option.value === value) ??
+      findOption(hiddenSections ?? [], (option) => option.value === value),
+    [visibleSections, hiddenSections, value],
+  );
 
   return (
     <div>
-      <button
-        name={group}
-        type="button"
-        className={isActive ? "active" : ""}
-        aria-label={label}
-        onClick={() => setActive(!isActive)}
-        ref={rPickerButton}
-      >
-        {options.find((option) => option.value === value)?.icon}
-      </button>
-      <React.Suspense fallback="">
-        {isActive ? (
-          <>
-            <Popover
-              onCloseRequest={(event) =>
-                event.target !== rPickerButton.current && setActive(false)
-              }
-              {...(isRTL ? { right: 5.5 } : { left: -5.5 })}
-            >
-              <Picker
-                options={options.filter((opt) => opt.showInPicker !== false)}
-                value={value}
-                label={label}
-                onChange={onChange}
-                onClose={() => {
-                  setActive(false);
-                  rPickerButton.current?.focus();
-                }}
-              />
-            </Popover>
-            <div className="picker-triangle" />
-          </>
-        ) : null}
-      </React.Suspense>
+      <Popover.Root open={isActive} onOpenChange={(open) => setActive(open)}>
+        <Popover.Trigger
+          type="button"
+          aria-label={label}
+          onClick={() => setActive(!isActive)}
+          className={isActive ? "active" : ""}
+        >
+          {selectedOption?.icon}
+        </Popover.Trigger>
+        {isActive && (
+          <Picker
+            visibleSections={visibleSections}
+            hiddenSections={hiddenSections}
+            value={value}
+            label={label}
+            onChange={onChange}
+            onClose={() => {
+              setActive(false);
+            }}
+          />
+        )}
+      </Popover.Root>
     </div>
   );
 }
