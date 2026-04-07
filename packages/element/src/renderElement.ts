@@ -434,10 +434,10 @@ const drawTaperedCapsule = (
   const dx = x1 - x0;
   const dy = y1 - y0;
   const len = Math.sqrt(dx * dx + dy * dy);
+  const r = Math.max(r0, r1);
 
-  if (len < 0.5) {
+  if (len < r / 2) {
     // Degenerate segment — draw a filled circle at the larger radius
-    const r = Math.max(r0, r1);
     context.beginPath();
     context.arc((x0 + x1) / 2, (y0 + y1) / 2, r, 0, Math.PI * 2);
     context.fill();
@@ -643,7 +643,9 @@ const drawFreeDrawSegments = (
   for (let i = start; i < N; i++) {
     const p0 = points[i - 1];
     const p1 = points[i];
-    const r0 = baseRadius * getPressure(i - 1) * 2;
+    // Very first pressure values are often unreliable,
+    // so for the first couple of segments use a radius
+    const r0 = i < 2 ? 0 : baseRadius * getPressure(i - 1) * 2;
     const r1 = baseRadius * getPressure(i) * 2;
 
     // Catmull-Rom tangents.  At the last real point, use predictedPoint as
