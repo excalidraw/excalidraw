@@ -508,11 +508,8 @@ const getCatmullRomTangent = (
     ty = (next[1] - prev[1]) * 0.5;
   }
 
-  // Chord-length clamping (PCHIP-style): the bezier control point is
-  // p + t/3, so |t| > 3*chord causes the curve to overshoot the segment
-  // bounding box and loop back on itself — exactly the source of jaggedness
-  // when high-frequency input produces densely-packed or noisy points.
-  // Clamp: |t| <= 3 * min(chord_to_prev, chord_to_next).
+  // Chord-length clamping (PCHIP-style):
+  // |t| <= 3 * min(chord_to_prev, chord_to_next).
   const magSq = tx * tx + ty * ty;
   if (magSq > 0) {
     const dNx = next[0] - cur[0];
@@ -913,7 +910,7 @@ export const elementWithCanvasCache = new WeakMap<
 // A separate WeakMap that survives ShapeCache.delete() calls so that the raster
 // accumulates new capsule segments without full regeneration on every added point.
 
-const FREEDRAW_CANVAS_OVERSHOOT_MIN = 200; // scene units — minimum extra space on each side
+const FREEDRAW_CANVAS_OVERSHOOT_MIN = 200; // screen pixels — minimum extra lookahead space on each side (divided by scale at use)
 const FREEDRAW_CANVAS_OVERSHOOT_FACTOR = 0.5; // allocate current_dimension * factor extra on each side
 
 interface FreeDrawIncrementalCanvas {
@@ -984,11 +981,11 @@ const generateOrUpdateFreeDrawIncrementalCanvas = (
     // so fast large strokes trigger far fewer reallocations. The over-sized canvas is
     // discarded on stroke finalisation so the memory waste is only transient.
     const overshootX = Math.max(
-      FREEDRAW_CANVAS_OVERSHOOT_MIN,
+      FREEDRAW_CANVAS_OVERSHOOT_MIN / scale, // convert screen-pixel budget to scene units
       (x2 - x1) * FREEDRAW_CANVAS_OVERSHOOT_FACTOR,
     );
     const overshootY = Math.max(
-      FREEDRAW_CANVAS_OVERSHOOT_MIN,
+      FREEDRAW_CANVAS_OVERSHOOT_MIN / scale, // convert screen-pixel budget to scene units
       (y2 - y1) * FREEDRAW_CANVAS_OVERSHOOT_FACTOR,
     );
     const allocX1 = x1 - overshootX;
@@ -1426,6 +1423,14 @@ export const renderElement = (
           return;
         }
 
+        const currentImageSmoothingStatus = context.imageSmoothingEnabled;
+        if (
+          !appState?.shouldCacheIgnoreZoom &&
+          (!element.angle || isRightAngleRads(element.angle))
+        ) {
+          context.imageSmoothingEnabled = false;
+        }
+
         drawElementFromCanvas(
           elementWithCanvas,
           context,
@@ -1433,6 +1438,8 @@ export const renderElement = (
           appState,
           allElementsMap,
         );
+
+        context.imageSmoothingEnabled = currentImageSmoothingStatus;
       }
 
       break;
