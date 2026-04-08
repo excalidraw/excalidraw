@@ -17,7 +17,7 @@ import {
 import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
 import { tags } from "@lezer/highlight";
 
-import type { Theme } from "@excalidraw/element/types";
+import type { Theme } from "@nous-excalidraw/element/types";
 
 import { mermaidLite } from "./mermaid-lang-lite";
 

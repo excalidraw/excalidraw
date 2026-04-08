@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useLayoutEffect } from "react";
-import { KEYS } from "@excalidraw/common";
+import { KEYS } from "@nous-excalidraw/common";
 
 import { ArrowRightIcon, stop as StopIcon } from "../../icons";
 import { InlineIcon } from "../../InlineIcon";

@@ -1,4 +1,4 @@
-import { isDevEnv, isTestEnv } from "@excalidraw/common";
+import { isDevEnv, isTestEnv } from "@nous-excalidraw/common";
 
 import { charWidth, getLineWidth } from "./textMeasurements";
 

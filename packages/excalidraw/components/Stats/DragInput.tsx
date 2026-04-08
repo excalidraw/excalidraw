@@ -1,15 +1,15 @@
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 
-import { EVENT, KEYS, cloneJSON } from "@excalidraw/common";
+import { EVENT, KEYS, cloneJSON } from "@nous-excalidraw/common";
 
-import { deepCopyElement } from "@excalidraw/element";
+import { deepCopyElement } from "@nous-excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@nous-excalidraw/element";
 
-import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+import type { ElementsMap, ExcalidrawElement } from "@nous-excalidraw/element/types";
 
-import type { Scene } from "@excalidraw/element";
+import type { Scene } from "@nous-excalidraw/element";
 
 import { useApp, useExcalidrawSetAppState } from "../App";
 import { InlineIcon } from "../InlineIcon";

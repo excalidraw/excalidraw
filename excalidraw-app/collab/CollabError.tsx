@@ -1,5 +1,5 @@
-import { Tooltip } from "@excalidraw/excalidraw/components/Tooltip";
-import { warning } from "@excalidraw/excalidraw/components/icons";
+import { Tooltip } from "@nous-excalidraw/excalidraw/components/Tooltip";
+import { warning } from "@nous-excalidraw/excalidraw/components/icons";
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 

@@ -4,7 +4,7 @@ import {
   supported as nativeFileSystemSupported,
 } from "browser-fs-access";
 
-import { MIME_TYPES } from "@excalidraw/common";
+import { MIME_TYPES } from "@nous-excalidraw/common";
 
 import { normalizeFile } from "./blob";
 

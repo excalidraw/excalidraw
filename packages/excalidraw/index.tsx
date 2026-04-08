@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 
-import { DEFAULT_UI_OPTIONS, isShallowEqual } from "@excalidraw/common";
+import { DEFAULT_UI_OPTIONS, isShallowEqual } from "@nous-excalidraw/common";
 
 import App, {
   ExcalidrawAPIContext,
@@ -284,10 +284,10 @@ export {
   hashElementsVersion,
   hashString,
   getNonDeletedElements,
-} from "@excalidraw/element";
+} from "@nous-excalidraw/element";
 
-export { getTextFromElements } from "@excalidraw/element";
-export { isInvisiblySmallElement } from "@excalidraw/element";
+export { getTextFromElements } from "@nous-excalidraw/element";
+export { isInvisiblySmallElement } from "@nous-excalidraw/element";
 
 export { defaultLang, useI18n, languages } from "./i18n";
 export {
@@ -304,7 +304,7 @@ export {
   exportToBlob,
   exportToSvg,
   exportToClipboard,
-} from "@excalidraw/utils/export";
+} from "@nous-excalidraw/utils/export";
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
 export {
@@ -313,7 +313,7 @@ export {
   loadLibraryFromBlob,
 } from "./data/blob";
 export { mergeLibraryItems, getLibraryItemsHash } from "./data/library";
-export { isLinearElement } from "@excalidraw/element";
+export { isLinearElement } from "@nous-excalidraw/element";
 
 export {
   FONT_FAMILY,
@@ -327,15 +327,15 @@ export {
   viewportCoordsToSceneCoords,
   getFormFactor,
   throttleRAF,
-} from "@excalidraw/common";
+} from "@nous-excalidraw/common";
 
 export {
   mutateElement,
   newElementWith,
   bumpVersion,
-} from "@excalidraw/element";
+} from "@nous-excalidraw/element";
 
-export { CaptureUpdateAction } from "@excalidraw/element";
+export { CaptureUpdateAction } from "@nous-excalidraw/element";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 
@@ -370,21 +370,21 @@ export {
   getCommonBounds,
   getVisibleSceneBounds,
   convertToExcalidrawElements,
-} from "@excalidraw/element";
+} from "@nous-excalidraw/element";
 
 export {
   elementsOverlappingBBox,
   isElementInsideBBox,
   elementPartiallyOverlapsWithOrContainsBBox,
-} from "@excalidraw/utils/withinBounds";
+} from "@nous-excalidraw/utils/withinBounds";
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";
-export { isElementLink } from "@excalidraw/element";
+export { isElementLink } from "@nous-excalidraw/element";
 
 export { Fonts } from "./fonts/Fonts";
 
-export { setCustomTextMetricsProvider } from "@excalidraw/element";
+export { setCustomTextMetricsProvider } from "@nous-excalidraw/element";
 
 export { CommandPalette } from "./components/CommandPalette/CommandPalette";
 

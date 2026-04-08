@@ -1,13 +1,13 @@
 import React from "react";
 import { vi } from "vitest";
-import { KEYS, reseed } from "@excalidraw/common";
-import { bindBindingElement } from "@excalidraw/element";
-import "@excalidraw/utils/test-utils";
+import { KEYS, reseed } from "@nous-excalidraw/common";
+import { bindBindingElement } from "@nous-excalidraw/element";
+import "@nous-excalidraw/utils/test-utils";
 
 import type {
   ExcalidrawArrowElement,
   NonDeleted,
-} from "@excalidraw/element/types";
+} from "@nous-excalidraw/element/types";
 
 import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";

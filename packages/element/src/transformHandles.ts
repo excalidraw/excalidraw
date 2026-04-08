@@ -1,17 +1,17 @@
 import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   type EditorInterface,
-} from "@excalidraw/common";
+} from "@nous-excalidraw/common";
 
-import { pointFrom, pointRotateRads } from "@excalidraw/math";
+import { pointFrom, pointRotateRads } from "@nous-excalidraw/math";
 
-import type { Radians } from "@excalidraw/math";
+import type { Radians } from "@nous-excalidraw/math";
 
 import type {
   InteractiveCanvasAppState,
   Zoom,
-} from "@excalidraw/excalidraw/types";
-import type { Bounds } from "@excalidraw/common";
+} from "@nous-excalidraw/excalidraw/types";
+import type { Bounds } from "@nous-excalidraw/common";
 
 import { getElementAbsoluteCoords } from "./bounds";
 import {

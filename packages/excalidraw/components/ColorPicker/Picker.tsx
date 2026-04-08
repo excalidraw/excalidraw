@@ -1,16 +1,16 @@
 import React, { useEffect, useImperativeHandle, useState } from "react";
 
-import { EVENT } from "@excalidraw/common";
+import { EVENT } from "@nous-excalidraw/common";
 
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
   KEYS,
-} from "@excalidraw/common";
+} from "@nous-excalidraw/common";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@nous-excalidraw/element/types";
 
-import type { ColorPaletteCustom } from "@excalidraw/common";
+import type { ColorPaletteCustom } from "@nous-excalidraw/common";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";

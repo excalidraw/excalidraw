@@ -1,14 +1,11 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 
-import { newTextElement } from "@excalidraw/element";
+import { newTextElement } from "@nous-excalidraw/element";
 
-import type { ChartType } from "@excalidraw/element/types";
+import type { ChartType } from "@nous-excalidraw/element/types";
 
 import { trackEvent } from "../analytics";
 import { isSpreadsheetValidForChartType, renderSpreadsheet } from "../charts";
-import { t } from "../i18n";
-import { exportToSvg } from "../scene/export";
-
 import { useUIAppState } from "../context/ui-appState";
 
 import { useApp } from "./App";
@@ -21,7 +18,6 @@ import { bucketFillIcon } from "./icons";
 import type { ChartElements, Spreadsheet } from "../charts";
 
 type OnPlainTextPaste = (rawText: string) => void;
-
 type OnInsertChart = (chartType: ChartType, elements: ChartElements) => void;
 
 const getChartTypeLabel = (chartType: ChartType) => {

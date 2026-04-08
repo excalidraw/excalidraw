@@ -1,5 +1,5 @@
 {
-  "name": "@excalidraw/common",
+  "name": "@nous-excalidraw/common",
   "version": "0.18.0",
   "type": "module",
   "types": "./dist/types/common/src/index.d.ts",

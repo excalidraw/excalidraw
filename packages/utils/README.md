@@ -1,15 +1,15 @@
-# @excalidraw/utils
+# @nous-excalidraw/utils
 
 ## Install
 
 ```bash
-npm install @excalidraw/utils
+npm install @nous-excalidraw/utils
 ```
 
 If you prefer Yarn over npm, use this command to install the Excalidraw utils package:
 
 ```bash
-yarn add @excalidraw/utils
+yarn add @nous-excalidraw/utils
 ```
 
 ## API
@@ -31,13 +31,13 @@ Export an Excalidraw diagram to a [SVGElement](https://developer.mozilla.org/en-
 Excalidraw utils is published as a UMD (Universal Module Definition). If you are using a module bundler (for instance, Webpack), you can import it as an ES6 module:
 
 ```js
-import { exportToSvg, exportToBlob } from "@excalidraw/utils";
+import { exportToSvg, exportToBlob } from "@nous-excalidraw/utils";
 ```
 
 To use it in a browser directly:
 
 ```html
-<script src="https://unpkg.com/@excalidraw/utils@0.1.0/dist/excalidraw-utils.min.js"></script>
+<script src="https://unpkg.com/@nous-excalidraw/utils@0.1.2/dist/excalidraw-utils.min.js"></script>
 <script>
   // ExcalidrawUtils is a global variable defined by excalidraw.min.js
   const { exportToSvg, exportToBlob } = ExcalidrawUtils;

@@ -3,30 +3,30 @@ import {
   FRAME_STYLE,
   THEME,
   throttleRAF,
-} from "@excalidraw/common";
-import { isElementLink } from "@excalidraw/element";
-import { createPlaceholderEmbeddableLabel } from "@excalidraw/element";
-import { getBoundTextElement } from "@excalidraw/element";
+} from "@nous-excalidraw/common";
+import { isElementLink } from "@nous-excalidraw/element";
+import { createPlaceholderEmbeddableLabel } from "@nous-excalidraw/element";
+import { getBoundTextElement } from "@nous-excalidraw/element";
 import {
   isEmbeddableElement,
   isIframeLikeElement,
   isTextElement,
-} from "@excalidraw/element";
+} from "@nous-excalidraw/element";
 import {
   elementOverlapsWithFrame,
   getTargetFrame,
   shouldApplyFrameClip,
-} from "@excalidraw/element";
+} from "@nous-excalidraw/element";
 
-import { renderElement } from "@excalidraw/element";
+import { renderElement } from "@nous-excalidraw/element";
 
-import { getElementAbsoluteCoords } from "@excalidraw/element";
+import { getElementAbsoluteCoords } from "@nous-excalidraw/element";
 
 import type {
   ElementsMap,
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
-} from "@excalidraw/element/types";
+} from "@nous-excalidraw/element/types";
 
 import {
   EXTERNAL_LINK_IMG,

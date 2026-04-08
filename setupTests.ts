@@ -10,8 +10,8 @@ import { mockThrottleRAF } from "./packages/excalidraw/tests/helpers/mocks";
 import { yellow } from "./packages/excalidraw/tests/helpers/colorize";
 import { testPolyfills } from "./packages/excalidraw/tests/helpers/polyfills";
 
-vi.mock("@excalidraw/common", async (importOriginal) => {
-  const module = await importOriginal<typeof import("@excalidraw/common")>();
+vi.mock("@nous-excalidraw/common", async (importOriginal) => {
+  const module = await importOriginal<typeof import("@nous-excalidraw/common")>();
 
   return {
     ...module,

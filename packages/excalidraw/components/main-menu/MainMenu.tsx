@@ -1,6 +1,6 @@
 import React from "react";
 
-import { composeEventHandlers } from "@excalidraw/common";
+import { composeEventHandlers } from "@nous-excalidraw/common";
 
 import { useTunnels } from "../../context/tunnels";
 import { useUIAppState } from "../../context/ui-appState";

@@ -2,7 +2,7 @@ import React from "react";
 
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
-import { CLASSES } from "@excalidraw/common";
+import { CLASSES } from "@nous-excalidraw/common";
 
 import DropdownMenuContent from "./DropdownMenuContent";
 import DropdownMenuGroup from "./DropdownMenuGroup";

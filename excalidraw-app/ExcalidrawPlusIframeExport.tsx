@@ -1,12 +1,12 @@
-import { base64urlToString } from "@excalidraw/excalidraw/data/encode";
-import { ExcalidrawError } from "@excalidraw/excalidraw/errors";
+import { base64urlToString } from "@nous-excalidraw/excalidraw/data/encode";
+import { ExcalidrawError } from "@nous-excalidraw/excalidraw/errors";
 import { useLayoutEffect, useRef } from "react";
 
 import type {
   FileId,
   OrderedExcalidrawElement,
-} from "@excalidraw/element/types";
-import type { AppState, BinaryFileData } from "@excalidraw/excalidraw/types";
+} from "@nous-excalidraw/element/types";
+import type { AppState, BinaryFileData } from "@nous-excalidraw/excalidraw/types";
 
 import { STORAGE_KEYS } from "./app_constants";
 import { LocalData } from "./data/LocalData";

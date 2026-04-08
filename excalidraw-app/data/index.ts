@@ -1,33 +1,33 @@
 import {
   compressData,
   decompressData,
-} from "@excalidraw/excalidraw/data/encode";
+} from "@nous-excalidraw/excalidraw/data/encode";
 import {
   decryptData,
   generateEncryptionKey,
   IV_LENGTH_BYTES,
-} from "@excalidraw/excalidraw/data/encryption";
-import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
-import { isInvisiblySmallElement } from "@excalidraw/element";
-import { isInitializedImageElement } from "@excalidraw/element";
-import { t } from "@excalidraw/excalidraw/i18n";
-import { bytesToHexString } from "@excalidraw/common";
+} from "@nous-excalidraw/excalidraw/data/encryption";
+import { serializeAsJSON } from "@nous-excalidraw/excalidraw/data/json";
+import { isInvisiblySmallElement } from "@nous-excalidraw/element";
+import { isInitializedImageElement } from "@nous-excalidraw/element";
+import { t } from "@nous-excalidraw/excalidraw/i18n";
+import { bytesToHexString } from "@nous-excalidraw/common";
 
-import type { UserIdleState } from "@excalidraw/common";
-import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
-import type { SceneBounds } from "@excalidraw/element";
+import type { UserIdleState } from "@nous-excalidraw/common";
+import type { ImportedDataState } from "@nous-excalidraw/excalidraw/data/types";
+import type { SceneBounds } from "@nous-excalidraw/element";
 import type {
   ExcalidrawElement,
   FileId,
   OrderedExcalidrawElement,
-} from "@excalidraw/element/types";
+} from "@nous-excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
   SocketId,
-} from "@excalidraw/excalidraw/types";
-import type { MakeBrand } from "@excalidraw/common/utility-types";
+} from "@nous-excalidraw/excalidraw/types";
+import type { MakeBrand } from "@nous-excalidraw/common/utility-types";
 
 import {
   DELETED_ELEMENT_TIMEOUT,

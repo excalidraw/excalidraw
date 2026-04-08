@@ -6,43 +6,43 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: /^@excalidraw\/common$/,
+        find: /^@nous-excalidraw\/common$/,
         replacement: path.resolve(__dirname, "./packages/common/src/index.ts"),
       },
       {
-        find: /^@excalidraw\/common\/(.*?)/,
+        find: /^@nous-excalidraw\/common\/(.*?)/,
         replacement: path.resolve(__dirname, "./packages/common/src/$1"),
       },
       {
-        find: /^@excalidraw\/element$/,
+        find: /^@nous-excalidraw\/element$/,
         replacement: path.resolve(__dirname, "./packages/element/src/index.ts"),
       },
       {
-        find: /^@excalidraw\/element\/(.*?)/,
+        find: /^@nous-excalidraw\/element\/(.*?)/,
         replacement: path.resolve(__dirname, "./packages/element/src/$1"),
       },
       {
-        find: /^@excalidraw\/excalidraw$/,
+        find: /^@nous-excalidraw\/excalidraw$/,
         replacement: path.resolve(__dirname, "./packages/excalidraw/index.tsx"),
       },
       {
-        find: /^@excalidraw\/excalidraw\/(.*?)/,
+        find: /^@nous-excalidraw\/excalidraw\/(.*?)/,
         replacement: path.resolve(__dirname, "./packages/excalidraw/$1"),
       },
       {
-        find: /^@excalidraw\/math$/,
+        find: /^@nous-excalidraw\/math$/,
         replacement: path.resolve(__dirname, "./packages/math/src/index.ts"),
       },
       {
-        find: /^@excalidraw\/math\/(.*?)/,
+        find: /^@nous-excalidraw\/math\/(.*?)/,
         replacement: path.resolve(__dirname, "./packages/math/src/$1"),
       },
       {
-        find: /^@excalidraw\/utils$/,
+        find: /^@nous-excalidraw\/utils$/,
         replacement: path.resolve(__dirname, "./packages/utils/src/index.ts"),
       },
       {
-        find: /^@excalidraw\/utils\/(.*?)/,
+        find: /^@nous-excalidraw\/utils\/(.*?)/,
         replacement: path.resolve(__dirname, "./packages/utils/src/$1"),
       },
     ],

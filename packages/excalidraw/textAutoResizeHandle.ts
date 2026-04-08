@@ -1,14 +1,14 @@
-import { DEFAULT_TRANSFORM_HANDLE_SPACING } from "@excalidraw/common";
+import { DEFAULT_TRANSFORM_HANDLE_SPACING } from "@nous-excalidraw/common";
 import {
   pointFrom,
   pointRotateRads,
   type GlobalPoint,
   type Radians,
-} from "@excalidraw/math";
+} from "@nous-excalidraw/math";
 
-import type { EditorInterface } from "@excalidraw/common";
+import type { EditorInterface } from "@nous-excalidraw/common";
 
-import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+import type { ExcalidrawTextElement } from "@nous-excalidraw/element/types";
 
 const TEXT_AUTO_RESIZE_HANDLE_GAP = 12;
 const TEXT_AUTO_RESIZE_HANDLE_LENGTH = 16;

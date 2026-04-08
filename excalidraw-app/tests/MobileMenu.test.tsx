@@ -1,9 +1,9 @@
-import { UI } from "@excalidraw/excalidraw/tests/helpers/ui";
+import { UI } from "@nous-excalidraw/excalidraw/tests/helpers/ui";
 import {
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
-} from "@excalidraw/excalidraw/tests/test-utils";
+} from "@nous-excalidraw/excalidraw/tests/test-utils";
 
 import ExcalidrawApp from "../App";
 

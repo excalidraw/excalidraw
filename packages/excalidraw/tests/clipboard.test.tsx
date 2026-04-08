@@ -1,11 +1,11 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { getLineHeightInPx } from "@excalidraw/element";
+import { getLineHeightInPx } from "@nous-excalidraw/element";
 
-import { KEYS, arrayToMap, getLineHeight } from "@excalidraw/common";
+import { KEYS, arrayToMap, getLineHeight } from "@nous-excalidraw/common";
 
-import { getElementBounds } from "@excalidraw/element";
+import { getElementBounds } from "@nous-excalidraw/element";
 
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 
@@ -27,8 +27,8 @@ const { h } = window;
 
 const mouse = new Pointer("mouse");
 
-vi.mock("@excalidraw/common", async (importOriginal) => {
-  const module = await importOriginal<typeof import("@excalidraw/common")>();
+vi.mock("@nous-excalidraw/common", async (importOriginal) => {
+  const module = await importOriginal<typeof import("@nous-excalidraw/common")>();
   const { mockThrottleRAF } = await import("./helpers/mocks");
 
   return {

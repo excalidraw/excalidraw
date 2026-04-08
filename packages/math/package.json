@@ -1,5 +1,5 @@
 {
-  "name": "@excalidraw/math",
+  "name": "@nous-excalidraw/math",
   "version": "0.18.0",
   "type": "module",
   "types": "./dist/types/math/src/index.d.ts",
@@ -61,6 +61,6 @@
     "build:esm": "rimraf dist && node ../../scripts/buildBase.js && yarn gen:types"
   },
   "dependencies": {
-    "@excalidraw/common": "0.18.0"
+    "@nous-excalidraw/common": "0.18.0"
   }
 }

@@ -1,4 +1,4 @@
-import { ENCRYPTION_KEY_BITS } from "@excalidraw/common";
+import { ENCRYPTION_KEY_BITS } from "@nous-excalidraw/common";
 
 import { blobToArrayBuffer } from "./blob";
 

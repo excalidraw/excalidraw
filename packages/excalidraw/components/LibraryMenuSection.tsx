@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useState } from "react";
 
-import type { ExcalidrawElement, NonDeleted } from "@excalidraw/element/types";
+import type { ExcalidrawElement, NonDeleted } from "@nous-excalidraw/element/types";
 
 import { useTransition } from "../hooks/useTransition";
 

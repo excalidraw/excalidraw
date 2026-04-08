@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { randomId } from "@excalidraw/common";
+import { randomId } from "@nous-excalidraw/common";
 
 import { atom, useAtom } from "../../editor-jotai";
 

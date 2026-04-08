@@ -1,4 +1,4 @@
-import { exportToCanvas } from "@excalidraw/utils/export";
+import { exportToCanvas } from "@nous-excalidraw/utils/export";
 import React, { useEffect, useRef, useState } from "react";
 
 import {
@@ -7,9 +7,9 @@ import {
   isFirefox,
   EXPORT_SCALES,
   cloneJSON,
-} from "@excalidraw/common";
+} from "@nous-excalidraw/common";
 
-import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+import type { NonDeletedExcalidrawElement } from "@nous-excalidraw/element/types";
 
 import {
   actionExportWithDarkMode,

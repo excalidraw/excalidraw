@@ -1,6 +1,6 @@
 import React from "react";
 
-import { CURSOR_TYPE, KEYS } from "@excalidraw/common";
+import { CURSOR_TYPE, KEYS } from "@nous-excalidraw/common";
 
 import { Excalidraw } from "../index";
 

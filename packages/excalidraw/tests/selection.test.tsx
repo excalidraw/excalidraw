@@ -1,9 +1,9 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { KEYS, ROUNDNESS, reseed } from "@excalidraw/common";
-import { getElementBounds, getElementLineSegments } from "@excalidraw/element";
-import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
+import { KEYS, ROUNDNESS, reseed } from "@nous-excalidraw/common";
+import { getElementBounds, getElementLineSegments } from "@nous-excalidraw/element";
+import { pointFrom, pointRotateRads, type LocalPoint } from "@nous-excalidraw/math";
 
 import { SHAPES } from "../components/shapes";
 

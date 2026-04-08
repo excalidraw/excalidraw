@@ -1,6 +1,6 @@
 import { generateNKeysBetween } from "fractional-indexing";
 
-import { arrayToMap } from "@excalidraw/common";
+import { arrayToMap } from "@nous-excalidraw/common";
 
 import { mutateElement, newElementWith } from "./mutateElement";
 import { getBoundTextElement } from "./textElement";

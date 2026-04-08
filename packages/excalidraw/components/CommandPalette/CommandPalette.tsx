@@ -8,9 +8,9 @@ import {
   KEYS,
   capitalizeString,
   isWritableElement,
-} from "@excalidraw/common";
+} from "@nous-excalidraw/common";
 
-import type { MarkRequired } from "@excalidraw/common/utility-types";
+import type { MarkRequired } from "@nous-excalidraw/common/utility-types";
 
 import { actionToggleShapeSwitch } from "../../actions/actionToggleShapeSwitch";
 import { getShortcutKey } from "../../shortcut";

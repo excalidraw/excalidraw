@@ -15,7 +15,7 @@ import {
   vectorSubtract,
   vectorDot,
   vectorNormalize,
-} from "@excalidraw/math";
+} from "@nous-excalidraw/math";
 
 import {
   COLOR_PALETTE,
@@ -111,7 +111,7 @@ import {
   setDesktopUIMode,
   isSelectionLikeTool,
   oneOf,
-} from "@excalidraw/common";
+} from "@nous-excalidraw/common";
 
 import {
   getObservedAppState,
@@ -259,9 +259,9 @@ import {
   maybeHandleArrowPointlikeDrag,
   getUncroppedWidthAndHeight,
   getActiveTextElement,
-} from "@excalidraw/element";
+} from "@nous-excalidraw/element";
 
-import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint, Radians } from "@nous-excalidraw/math";
 
 import type {
   ExcalidrawElement,
@@ -287,9 +287,9 @@ import type {
   ExcalidrawElbowArrowElement,
   SceneElementsMap,
   ExcalidrawBindableElement,
-} from "@excalidraw/element/types";
+} from "@nous-excalidraw/element/types";
 
-import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
+import type { Mutable, ValueOf } from "@nous-excalidraw/common/utility-types";
 
 import {
   actionAddToLibrary,
@@ -4543,7 +4543,7 @@ class App extends React.Component<AppProps, AppState> {
        *  - `CaptureUpdateAction.NEVER`: Updates never make it to undo/redo stack. Use for remote updates or scene initialization.
        *  - `CaptureUpdateAction.EVENTUALLY`: Updates will be eventually be captured as part of a future increment.
        *
-       * Check [API docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/excalidraw-api#captureUpdate) for more details.
+       * Check [API docs](https://docs.excalidraw.com/docs/@nous-excalidraw/excalidraw/api/props/excalidraw-api#captureUpdate) for more details.
        *
        * @default CaptureUpdateAction.EVENTUALLY
        */

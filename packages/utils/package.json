@@ -1,5 +1,5 @@
 {
-  "name": "@excalidraw/utils",
+  "name": "@nous-excalidraw/utils",
   "version": "0.1.2",
   "type": "module",
   "types": "./dist/types/utils/src/index.d.ts",
@@ -68,7 +68,7 @@
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
-    "gen:types": "rimraf types && tsc",
+    "gen:types": "node -e \"require('fs').rmSync('types',{recursive:true,force:true})\" && npx tsc",
     "build:esm": "rimraf dist && node ../../scripts/buildUtils.js && yarn gen:types"
   }
 }

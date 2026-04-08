@@ -5,7 +5,7 @@ import {
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   FONT_FAMILY,
   STROKE_WIDTH,
-} from "@excalidraw/common";
+} from "@nous-excalidraw/common";
 
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";

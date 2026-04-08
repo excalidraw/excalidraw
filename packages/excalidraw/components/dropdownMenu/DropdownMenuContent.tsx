@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import React, { useCallback, useEffect, useRef } from "react";
 
-import { CLASSES, EVENT, KEYS } from "@excalidraw/common";
+import { CLASSES, EVENT, KEYS } from "@nous-excalidraw/common";
 
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 

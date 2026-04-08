@@ -3,7 +3,7 @@ import {
   isDevEnv,
   isTestEnv,
   type Bounds,
-} from "@excalidraw/common";
+} from "@nous-excalidraw/common";
 
 import {
   pointFrom,
@@ -15,14 +15,14 @@ import {
   vectorCross,
   vectorFromPoint,
   vectorScale,
-} from "@excalidraw/math";
+} from "@nous-excalidraw/math";
 
 import type {
   LocalPoint,
   GlobalPoint,
   Triangle,
   Vector,
-} from "@excalidraw/math";
+} from "@nous-excalidraw/math";
 
 import { getCenterForBounds } from "./bounds";
 

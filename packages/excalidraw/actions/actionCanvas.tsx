@@ -1,4 +1,4 @@
-import { clamp, roundToStep } from "@excalidraw/math";
+import { clamp, roundToStep } from "@nous-excalidraw/math";
 
 import {
   DEFAULT_CANVAS_BACKGROUND_PICKS,
@@ -10,15 +10,15 @@ import {
   updateActiveTool,
   CODES,
   KEYS,
-} from "@excalidraw/common";
+} from "@nous-excalidraw/common";
 
-import { getNonDeletedElements } from "@excalidraw/element";
-import { newElementWith } from "@excalidraw/element";
-import { getCommonBounds, type SceneBounds } from "@excalidraw/element";
+import { getNonDeletedElements } from "@nous-excalidraw/element";
+import { newElementWith } from "@nous-excalidraw/element";
+import { getCommonBounds, type SceneBounds } from "@nous-excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@nous-excalidraw/element";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@nous-excalidraw/element/types";
 
 import {
   getDefaultAppState,

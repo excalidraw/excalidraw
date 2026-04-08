@@ -1,18 +1,18 @@
-import { reseed } from "@excalidraw/common";
+import { reseed } from "@nous-excalidraw/common";
 import {
   isElbowArrow,
   projectFixedPointOntoDiagonal,
-} from "@excalidraw/element";
+} from "@nous-excalidraw/element";
 
-import { pointFrom } from "@excalidraw/math";
+import { pointFrom } from "@nous-excalidraw/math";
 
-import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint } from "@nous-excalidraw/math";
 
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
-} from "@excalidraw/element/types";
+} from "@nous-excalidraw/element/types";
 
 import { actionToggleArrowBinding } from "../actions/actionToggleArrowBinding";
 import { Excalidraw, sceneCoordsToViewportCoords } from "../index";

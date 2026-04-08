@@ -1,4 +1,4 @@
-import { isFiniteNumber, pointFrom } from "@excalidraw/math";
+import { isFiniteNumber, pointFrom } from "@nous-excalidraw/math";
 
 import {
   type CombineBrandsIfNeeded,
@@ -18,7 +18,7 @@ import {
   getSizeFromPoints,
   normalizeLink,
   getLineHeight,
-} from "@excalidraw/common";
+} from "@nous-excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
   getNonDeletedElements,
@@ -26,16 +26,16 @@ import {
   isPointInElement,
   isValidPolygon,
   projectFixedPointOntoDiagonal,
-} from "@excalidraw/element";
-import { normalizeFixedPoint } from "@excalidraw/element";
+} from "@nous-excalidraw/element";
+import { normalizeFixedPoint } from "@nous-excalidraw/element";
 import {
   updateElbowArrowPoints,
   validateElbowPoints,
-} from "@excalidraw/element";
-import { LinearElementEditor } from "@excalidraw/element";
-import { bumpVersion } from "@excalidraw/element";
-import { getContainerElement } from "@excalidraw/element";
-import { detectLineHeight } from "@excalidraw/element";
+} from "@nous-excalidraw/element";
+import { LinearElementEditor } from "@nous-excalidraw/element";
+import { bumpVersion } from "@nous-excalidraw/element";
+import { getContainerElement } from "@nous-excalidraw/element";
+import { detectLineHeight } from "@nous-excalidraw/element";
 import {
   isArrowBoundToElement,
   isArrowElement,
@@ -44,17 +44,17 @@ import {
   isLineElement,
   isTextElement,
   isUsingAdaptiveRadius,
-} from "@excalidraw/element";
+} from "@nous-excalidraw/element";
 
-import { syncInvalidIndices } from "@excalidraw/element";
+import { syncInvalidIndices } from "@nous-excalidraw/element";
 
-import { refreshTextDimensions } from "@excalidraw/element";
+import { refreshTextDimensions } from "@nous-excalidraw/element";
 
-import { getNormalizedDimensions } from "@excalidraw/element";
+import { getNormalizedDimensions } from "@nous-excalidraw/element";
 
-import { isInvisiblySmallElement } from "@excalidraw/element";
+import { isInvisiblySmallElement } from "@nous-excalidraw/element";
 
-import type { LocalPoint, Radians } from "@excalidraw/math";
+import type { LocalPoint, Radians } from "@nous-excalidraw/math";
 
 import type {
   ElementsMap,
@@ -71,9 +71,9 @@ import type {
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   StrokeRoundness,
-} from "@excalidraw/element/types";
+} from "@nous-excalidraw/element/types";
 
-import type { MarkOptional, Mutable } from "@excalidraw/common/utility-types";
+import type { MarkOptional, Mutable } from "@nous-excalidraw/common/utility-types";
 
 import { getDefaultAppState } from "../appState";
 

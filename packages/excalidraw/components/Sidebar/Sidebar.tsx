@@ -15,7 +15,7 @@ import {
   isDevEnv,
   KEYS,
   updateObject,
-} from "@excalidraw/common";
+} from "@nous-excalidraw/common";
 
 import { useUIAppState } from "../../context/ui-appState";
 import { atom, useSetAtom } from "../../editor-jotai";

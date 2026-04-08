@@ -1,4 +1,4 @@
-import type { ChartType } from "@excalidraw/element/types";
+import type { ChartType } from "@nous-excalidraw/element/types";
 
 import { renderBarChart } from "./charts.bar";
 import { renderLineChart } from "./charts.line";

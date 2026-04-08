@@ -1,10 +1,10 @@
-import { arrayToMap, reseed } from "@excalidraw/common";
-import { type GlobalPoint, type LocalPoint, pointFrom } from "@excalidraw/math";
-import { Excalidraw } from "@excalidraw/excalidraw";
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { UI } from "@excalidraw/excalidraw/tests/helpers/ui";
-import "@excalidraw/utils/test-utils";
-import { render } from "@excalidraw/excalidraw/tests/test-utils";
+import { arrayToMap, reseed } from "@nous-excalidraw/common";
+import { type GlobalPoint, type LocalPoint, pointFrom } from "@nous-excalidraw/math";
+import { Excalidraw } from "@nous-excalidraw/excalidraw";
+import { API } from "@nous-excalidraw/excalidraw/tests/helpers/api";
+import { UI } from "@nous-excalidraw/excalidraw/tests/helpers/ui";
+import "@nous-excalidraw/utils/test-utils";
+import { render } from "@nous-excalidraw/excalidraw/tests/test-utils";
 
 import * as distance from "../src/distance";
 import { hitElementItself } from "../src/collision";

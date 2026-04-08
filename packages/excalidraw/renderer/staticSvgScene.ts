@@ -10,37 +10,37 @@ import {
   getVerticalOffset,
   applyDarkModeFilter,
   MIME_TYPES,
-} from "@excalidraw/common";
-import { normalizeLink, toValidURL } from "@excalidraw/common";
-import { hashString } from "@excalidraw/element";
-import { getUncroppedWidthAndHeight } from "@excalidraw/element";
+} from "@nous-excalidraw/common";
+import { normalizeLink, toValidURL } from "@nous-excalidraw/common";
+import { hashString } from "@nous-excalidraw/element";
+import { getUncroppedWidthAndHeight } from "@nous-excalidraw/element";
 import {
   createPlaceholderEmbeddableLabel,
   getEmbedLink,
-} from "@excalidraw/element";
-import { LinearElementEditor } from "@excalidraw/element";
-import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
-import { getLineHeightInPx } from "@excalidraw/element";
+} from "@nous-excalidraw/element";
+import { LinearElementEditor } from "@nous-excalidraw/element";
+import { getBoundTextElement, getContainerElement } from "@nous-excalidraw/element";
+import { getLineHeightInPx } from "@nous-excalidraw/element";
 import {
   isArrowElement,
   isIframeLikeElement,
   isInitializedImageElement,
   isTextElement,
-} from "@excalidraw/element";
+} from "@nous-excalidraw/element";
 
-import { getContainingFrame } from "@excalidraw/element";
+import { getContainingFrame } from "@nous-excalidraw/element";
 
-import { getCornerRadius, isPathALoop } from "@excalidraw/element";
+import { getCornerRadius, isPathALoop } from "@nous-excalidraw/element";
 
-import { ShapeCache } from "@excalidraw/element";
+import { ShapeCache } from "@nous-excalidraw/element";
 
-import { getElementAbsoluteCoords } from "@excalidraw/element";
+import { getElementAbsoluteCoords } from "@nous-excalidraw/element";
 
 import type {
   ExcalidrawElement,
   ExcalidrawTextElementWithContainer,
   NonDeletedExcalidrawElement,
-} from "@excalidraw/element/types";
+} from "@nous-excalidraw/element/types";
 
 import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";

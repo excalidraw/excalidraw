@@ -1,6 +1,6 @@
-import { isDevEnv } from "@excalidraw/common";
+import { isDevEnv } from "@nous-excalidraw/common";
 
-import { newElement } from "@excalidraw/element";
+import { newElement } from "@nous-excalidraw/element";
 
 import { commonProps } from "./charts.constants";
 import {

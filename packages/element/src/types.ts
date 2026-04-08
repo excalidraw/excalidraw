@@ -1,4 +1,4 @@
-import type { LocalPoint, Radians } from "@excalidraw/math";
+import type { LocalPoint, Radians } from "@nous-excalidraw/math";
 
 import type {
   FONT_FAMILY,
@@ -6,14 +6,14 @@ import type {
   TEXT_ALIGN,
   THEME,
   VERTICAL_ALIGN,
-} from "@excalidraw/common";
+} from "@nous-excalidraw/common";
 
 import type {
   MakeBrand,
   MarkNonNullable,
   Merge,
   ValueOf,
-} from "@excalidraw/common/utility-types";
+} from "@nous-excalidraw/common/utility-types";
 
 export type ChartType = "bar" | "line" | "radar";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";

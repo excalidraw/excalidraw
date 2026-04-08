@@ -1,6 +1,6 @@
 import { createStore, get, set } from "idb-keyval";
 
-import type { SavedChats } from "@excalidraw/excalidraw/components/TTDDialog/types";
+import type { SavedChats } from "@nous-excalidraw/excalidraw/components/TTDDialog/types";
 
 import { STORAGE_KEYS } from "../app_constants";
 

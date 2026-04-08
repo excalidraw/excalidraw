@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 
-import { capitalizeString } from "@excalidraw/common";
+import { capitalizeString } from "@nous-excalidraw/common";
 
 import { Popover } from "radix-ui";
 

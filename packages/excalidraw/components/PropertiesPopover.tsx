@@ -2,7 +2,7 @@ import { Popover } from "radix-ui";
 import clsx from "clsx";
 import React, { type ReactNode } from "react";
 
-import { isInteractive } from "@excalidraw/common";
+import { isInteractive } from "@nous-excalidraw/common";
 
 import { useEditorInterface } from "./App";
 import { Island } from "./Island";
