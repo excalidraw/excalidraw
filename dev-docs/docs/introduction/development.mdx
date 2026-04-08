@@ -36,6 +36,26 @@ yarn start
 
 Now you can open [http://localhost:3000](http://localhost:3000) and start coding in your favorite code editor.
 
+_Can't run `yarn` directly?_
+
+If you don't have Yarn installed globally and can't (or don't want to) install it system-wide, you can install it locally via npm and invoke it through npm:
+
+```bash
+npm install yarn
+npx yarn        # equivalent to: yarn
+npx yarn start  # equivalent to: yarn start
+```
+
+This works because `npx` resolves binaries from `node_modules/.bin`, picking up the locally installed Yarn automatically. All commands listed in the [Commands](#commands) section below can be used this way — just replace `yarn <command>` with `npx yarn <command>`.
+
+Alternatively, if you're on Node.js v16 or later, you can use [Corepack](https://nodejs.org/api/corepack.html) (bundled with Node) to enable Yarn globally without any extra install:
+
+```bash
+corepack enable
+```
+
+After this, the `yarn` command will work directly in your terminal.
+
 ## Collaboration
 
 For collaboration, you will need to set up [collab server](https://github.com/excalidraw/excalidraw-room) in local.
