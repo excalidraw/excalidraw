@@ -2,6 +2,7 @@ import {
   loginIcon,
   ExcalLogo,
   eyeIcon,
+  TrashIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
@@ -39,6 +40,16 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
+      {!props.isCollaborating && (
+        <MainMenu.Item
+          icon={TrashIcon}
+          className="highlighted"
+          title="Removes elements marked as deleted to reduce file size"
+          onSelect={() => alert("Purge deleted items")}
+        >
+          Purge deleted items
+        </MainMenu.Item>
+      )}
       <MainMenu.Separator />
       <MainMenu.ItemLink
         icon={ExcalLogo}

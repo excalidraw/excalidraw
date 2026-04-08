@@ -29,6 +29,7 @@ export {
   actionResetZoom,
   actionZoomToFit,
   actionToggleTheme,
+  actionPurgeDeletedElements,
 } from "./actionCanvas";
 
 export { actionSetEmbeddableAsActiveTool } from "./actionEmbeddable";
