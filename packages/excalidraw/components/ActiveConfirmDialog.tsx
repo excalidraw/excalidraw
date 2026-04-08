@@ -40,15 +40,10 @@ export const ActiveConfirmDialog = () => {
           setActiveConfirmDialog(null);
         }}
         onCancel={() => setActiveConfirmDialog(null)}
-        title="Purge deleted items"
-        confirmText="Purge"
+        title={t("purgeDeletedItemsDialog.title")}
+        confirmText={t("purgeDeletedItemsDialog.confirm")}
       >
-        <p>
-          This will permanently remove all deleted elements from the file.
-          <br />
-          <br />
-          <strong>This action cannot be undone:</strong> your undo/redo history will be cleared.
-        </p>
+        <p>{t("purgeDeletedItemsDialog.description")}</p>
       </ConfirmDialog>
     );
   }

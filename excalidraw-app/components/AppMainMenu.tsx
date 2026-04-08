@@ -9,6 +9,12 @@ import React from "react";
 
 import { isDevEnv } from "@excalidraw/common";
 
+import { useI18n } from "@excalidraw/excalidraw/i18n";
+
+import { activeConfirmDialogAtom } from "@excalidraw/excalidraw/components/ActiveConfirmDialog";
+
+import { useSetAtom } from "@excalidraw/excalidraw/editor-jotai";
+
 import type { Theme } from "@excalidraw/element/types";
 
 import { LanguageList } from "../app-language/LanguageList";
@@ -24,6 +30,8 @@ export const AppMainMenu: React.FC<{
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
 }> = React.memo((props) => {
+  const { t } = useI18n();
+  const setActiveConfirmDialog = useSetAtom(activeConfirmDialogAtom);
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
@@ -44,10 +52,10 @@ export const AppMainMenu: React.FC<{
         <MainMenu.Item
           icon={TrashIcon}
           className="highlighted"
-          title="Removes elements marked as deleted to reduce file size"
-          onSelect={() => alert("Purge deleted items")}
+          title={t("labels.purgeDeletedItemsTooltip")}
+          onSelect={() => setActiveConfirmDialog("purgeDeletedElements")}
         >
-          Purge deleted items
+          {t("buttons.purgeDeletedItems")}
         </MainMenu.Item>
       )}
       <MainMenu.Separator />
