@@ -634,8 +634,9 @@ const drawFreeDrawSegments = (
   // samples.  Only looks backward [i-R .. i], so a newly-arrived point never
   // retroactively changes the smoothed pressure of any previously rendered
   // segment.  This ensures live and final renders are identical at all points.
+  // When simulatePressure is true, constant pressure is used for all points.
   const getSmoothedPressure = (i: number): number => {
-    if (pressures.length === 0) {
+    if (element.simulatePressure || pressures.length === 0) {
       return DEFAULT_FREEDRAW_PRESSURE;
     }
     let sum = 0;
