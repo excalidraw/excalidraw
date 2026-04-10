@@ -53,8 +53,5 @@ export const actionToggleSearchMenu = register({
     };
   },
   checked: (appState: AppState) => appState.gridModeEnabled,
-  predicate: (element, appState, props) => {
-    return props.gridModeEnabled === undefined;
-  },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F,
 });
