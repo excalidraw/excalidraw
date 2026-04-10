@@ -262,7 +262,6 @@ import {
   getActiveTextElement,
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
-  setFreeDrawPredictedPoint,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -10630,17 +10629,10 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (newElement.type === "freedraw") {
-          // Collect all coalesced pointer positions that accumulated between
-          // RAF frames (important for high-frequency Apple Pencil / stylus
-          // input). getCoalescedEvents() returns the intermediate samples that
-          // would otherwise be discarded by throttleRAF, giving a dense stroke
-          // without extra renders.
           const coalescedEvents: PointerEvent[] =
             event.getCoalescedEvents?.() ?? [];
-          // The final event is always included; coalesced list may duplicate it
           const allEvents =
             coalescedEvents.length > 0 ? coalescedEvents : [event];
-
           const newPoints: LocalPoint[] = [];
           const newPressures: number[] = [];
 
@@ -10661,32 +10653,8 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
 
-          // Update the predicted next point for smoother stroke rendering.
-          // getPredictedEvents() returns samples predicted by the browser for
-          // the current pointer position, compensating for event-delivery
-          // latency (especially useful with Apple Pencil / high-frequency
-          // stylus input).  We pass the first predicted point to the renderer
-          // so it can (a) use it as a Catmull-Rom look-ahead tangent and
-          // (b) draw a ghost segment toward the predicted position.
-          const predictedEvents: PointerEvent[] =
-            event.getPredictedEvents?.() ?? [];
-          if (predictedEvents.length > 0) {
-            const predCoords = viewportCoordsToSceneCoords(
-              predictedEvents[0],
-              this.state,
-            );
-            setFreeDrawPredictedPoint(newElement.id, [
-              predCoords.x - newElement.x,
-              predCoords.y - newElement.y,
-            ]);
-          } else {
-            setFreeDrawPredictedPoint(newElement.id, null);
-          }
-
           if (newPoints.length > 0) {
-            const pressures = newElement.simulatePressure
-              ? newElement.pressures
-              : [...newElement.pressures, ...newPressures];
+            const pressures = [...newElement.pressures, ...newPressures];
 
             this.scene.mutateElement(
               newElement,
@@ -11174,9 +11142,7 @@ class App extends React.Component<AppProps, AppState> {
           dx += 0.0001;
         }
 
-        const pressures = newElement.simulatePressure
-          ? []
-          : [...newElement.pressures, childEvent.pressure];
+        const pressures = [...newElement.pressures, childEvent.pressure];
 
         this.scene.mutateElement(newElement, {
           points: [...points, pointFrom<LocalPoint>(dx, dy)],

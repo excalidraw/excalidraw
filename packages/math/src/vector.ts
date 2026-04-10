@@ -158,14 +158,3 @@ export const vectorNormalize = (v: Vector): Vector => {
  * Calculate the right-hand normal of the vector.
  */
 export const vectorNormal = (v: Vector): Vector => vector(v[1], -v[0]);
-
-/**
- * Scalar projection of vector v onto normal.
- *
- * @param v
- * @param normal
- * @returns
- */
-export const vectorReflect = (v: Vector, normal: Vector): Vector => {
-  return vectorSubtract(v, vectorScale(normal, 2 * vectorDot(v, normal)));
-};

@@ -144,10 +144,6 @@ export interface ExcalidrawElementWithCanvas {
   imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
   boundTextCanvas: HTMLCanvasElement;
-  /**
-   * When set, overrides the canvas origin placement in drawElementFromCanvas.
-   * Used by the incremental freedraw rendering path. Scene coordinates.
-   */
   canvasOriginSceneX?: number;
   canvasOriginSceneY?: number;
 }
@@ -388,29 +384,6 @@ const drawImagePlaceholder = (
     size,
     size,
   );
-};
-
-// ─── Freedraw predicted-point store ─────────────────────────────────────────
-// Keyed by element ID.  Coordinates are in element-local scene units
-// (i.e. relative to element.x / element.y), matching the format of
-// ExcalidrawFreeDrawElement.points.
-const freedrawPredictedPoints = new Map<string, readonly [number, number]>();
-
-/**
- * Sets (or clears) the predicted next point for a freedraw element that is
- * currently being drawn.  Call from the pointer-move handler using the first
- * entry returned by PointerEvent.getPredictedEvents().  Call with `null` when
- * the stroke is finalised so the ghost segment is no longer rendered.
- */
-export const setFreeDrawPredictedPoint = (
-  elementId: string,
-  point: readonly [number, number] | null,
-): void => {
-  if (point !== null) {
-    freedrawPredictedPoints.set(elementId, point);
-  } else {
-    freedrawPredictedPoints.delete(elementId);
-  }
 };
 
 const DEFAULT_FREEDRAW_PRESSURE = 0.5;
@@ -939,19 +912,23 @@ export const elementWithCanvasCache = new WeakMap<
   ExcalidrawElementWithCanvas
 >();
 
-// ─── Incremental freedraw canvas cache ────────────────────────────────────────
+// ─── Incremental freedraw canvas cache ───────────────────────────────────────
 // A separate WeakMap that survives ShapeCache.delete() calls so that the raster
-// accumulates new capsule segments without full regeneration on every added point.
+// accumulates new capsule segments without full regeneration on every added
+// point.
 
-const FREEDRAW_CANVAS_OVERSHOOT_MIN = 200; // screen pixels — minimum extra lookahead space on each side (divided by scale at use)
-const FREEDRAW_CANVAS_OVERSHOOT_FACTOR = 0.5; // allocate current_dimension * factor extra on each side
+// screen pixels — minimum extra lookahead space on each side
+// (divided by scale at use)
+const FREEDRAW_CANVAS_OVERSHOOT_MIN = 200;
+
+// allocate current_dimension * factor extra on each side
+const FREEDRAW_CANVAS_OVERSHOOT_FACTOR = 0.5;
 
 interface FreeDrawIncrementalCanvas {
   canvas: HTMLCanvasElement;
   lastRenderedPointCount: number;
   canvasOriginSceneX: number;
   canvasOriginSceneY: number;
-  /** Scene bounds guaranteed to be visible inside this canvas (without padding) */
   canvasAllocX1: number;
   canvasAllocY1: number;
   canvasAllocX2: number;
@@ -971,8 +948,8 @@ const freedrawIncrementalCache = new WeakMap<
  * cache is NOT cleared on each mutateElement call, allowing new segments to be
  * appended without full regeneration.
  *
- * When element bounds grow beyond the over-allocated canvas, the existing raster
- * is copied into a new larger canvas before appending the next segments.
+ * When element bounds grow beyond the over-allocated canvas, the existing
+ * raster  is copied into a new larger canvas before appending the next segments
  */
 const generateOrUpdateFreeDrawIncrementalCanvas = (
   element: ExcalidrawFreeDrawElement,
@@ -1100,9 +1077,6 @@ const generateOrUpdateFreeDrawIncrementalCanvas = (
     canvasScale = prevInc.scale;
   }
 
-  // Fetch predicted point for this element (set by the pointer-move handler).
-  const predictedPoint = freedrawPredictedPoints.get(element.id);
-
   // Roll back 2 points so the Catmull-Rom look-ahead tangent at the last
   // committed segment is redrawn correctly when a new point arrives.
   // Pressure smoothing is causal (one-sided) so it requires no extra rollback.
@@ -1111,7 +1085,7 @@ const generateOrUpdateFreeDrawIncrementalCanvas = (
 
   // Draw new (and possibly revised) segments plus the ghost toward the
   // predicted point.
-  if (drawFrom < element.points.length || predictedPoint !== undefined) {
+  if (drawFrom < element.points.length) {
     const ctx = canvas.getContext("2d")!;
     const canvasElemOffsetX =
       (element.x - canvasOriginSceneX) * dpr * canvasScale;

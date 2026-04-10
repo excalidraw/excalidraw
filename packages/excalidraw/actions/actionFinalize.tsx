@@ -14,10 +14,7 @@ import {
   isLineElement,
 } from "@excalidraw/element";
 
-import {
-  invalidateFreeDrawIncrementalCanvas,
-  setFreeDrawPredictedPoint,
-} from "@excalidraw/element";
+import { invalidateFreeDrawIncrementalCanvas } from "@excalidraw/element";
 
 import {
   KEYS,
@@ -356,7 +353,6 @@ export const actionFinalize = register<FormData>({
 
     if (element && isFreeDrawElement(element)) {
       invalidateFreeDrawIncrementalCanvas(element);
-      setFreeDrawPredictedPoint(element.id, null);
     }
 
     return {
