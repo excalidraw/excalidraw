@@ -2492,3 +2492,58 @@ export const settingsIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+// Bullet list icon: three filled circles with horizontal bars
+export const BulletListIcon = React.memo(() =>
+  React.createElement(
+    "svg",
+    {
+      viewBox: "0 0 24 24",
+      xmlns: "http://www.w3.org/2000/svg",
+      fill: "currentColor",
+      width: 16,
+      height: 16,
+    },
+    React.createElement("circle", { cx: "3.5", cy: "6", r: "1.5" }),
+    React.createElement("rect", { x: "7", y: "5", width: "14", height: "2", rx: "1" }),
+    React.createElement("circle", { cx: "3.5", cy: "12", r: "1.5" }),
+    React.createElement("rect", { x: "7", y: "11", width: "14", height: "2", rx: "1" }),
+    React.createElement("circle", { cx: "3.5", cy: "18", r: "1.5" }),
+    React.createElement("rect", { x: "7", y: "17", width: "14", height: "2", rx: "1" }),
+  ),
+);
+
+// Numbered list icon: digits 1, 2, 3 with horizontal bars
+export const NumberedListIcon = React.memo(() =>
+  React.createElement(
+    "svg",
+    {
+      viewBox: "0 0 24 24",
+      xmlns: "http://www.w3.org/2000/svg",
+      fill: "currentColor",
+      width: 16,
+      height: 16,
+    },
+    React.createElement("text", {
+      x: "1", y: "7",
+      fontSize: "6",
+      fontFamily: "sans-serif",
+      fontWeight: "bold",
+    }, "1"),
+    React.createElement("rect", { x: "8", y: "5", width: "13", height: "2", rx: "1" }),
+    React.createElement("text", {
+      x: "1", y: "13",
+      fontSize: "6",
+      fontFamily: "sans-serif",
+      fontWeight: "bold",
+    }, "2"),
+    React.createElement("rect", { x: "8", y: "11", width: "13", height: "2", rx: "1" }),
+    React.createElement("text", {
+      x: "1", y: "19",
+      fontSize: "6",
+      fontFamily: "sans-serif",
+      fontWeight: "bold",
+    }, "3"),
+    React.createElement("rect", { x: "8", y: "17", width: "13", height: "2", rx: "1" }),
+  ),
+);

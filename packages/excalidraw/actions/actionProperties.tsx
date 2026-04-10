@@ -131,6 +131,8 @@ import {
   ArrowheadCardinalityOneOrManyIcon,
   ArrowheadCardinalityZeroOrManyIcon,
   ArrowheadCardinalityZeroOrOneIcon,
+  BulletListIcon, 
+  NumberedListIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -2036,6 +2038,87 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
             )}
             onChange={(value) => updateData(value)}
           />
+        </div>
+      </fieldset>
+    );
+  },
+});
+export const actionToggleBulletList = register({
+  name: "toggleBulletList",
+  label: "Toggle bullet list",
+  trackEvent: false,
+  perform: () => {
+    return false;
+  },
+  PanelComponent: ({ appState }) => {
+    if (!appState.editingTextElement) {
+      return null;
+    }
+
+    return (
+      <fieldset>
+        <legend>List</legend>
+        <div className="buttonList">
+          <button
+            className="ToolIcon_type_button ToolIcon"
+            type="button"
+            title="Toggle bullet list"
+            aria-label="Toggle bullet list"
+            onPointerDown={(e: React.PointerEvent<HTMLButtonElement>) => {
+              e.preventDefault();
+              const editable = document.querySelector(
+                ".excalidraw-wysiwyg",
+              ) as any;
+              if (editable?.__toggleBulletPoints) {
+                editable.__toggleBulletPoints();
+              }
+            }}
+          >
+            <div className="ToolIcon__icon">
+              <BulletListIcon />
+            </div>
+          </button>
+        </div>
+      </fieldset>
+    );
+  },
+});
+
+export const actionToggleNumberedList = register({
+  name: "toggleNumberedList",
+  label: "Toggle numbered list",
+  trackEvent: false,
+  perform: () => {
+    return false;
+  },
+  PanelComponent: ({ appState }) => {
+    if (!appState.editingTextElement) {
+      return null;
+    }
+
+    return (
+      <fieldset>
+        <legend>Numbered list</legend>
+        <div className="buttonList">
+          <button
+            className="ToolIcon_type_button ToolIcon"
+            type="button"
+            title="Toggle numbered list"
+            aria-label="Toggle numbered list"
+            onPointerDown={(e: React.PointerEvent<HTMLButtonElement>) => {
+              e.preventDefault();
+              const editable = document.querySelector(
+                ".excalidraw-wysiwyg",
+              ) as any;
+              if (editable?.__toggleNumberedList) {
+                editable.__toggleNumberedList();
+              }
+            }}
+          >
+            <div className="ToolIcon__icon">
+              <NumberedListIcon />
+            </div>
+          </button>
         </div>
       </fieldset>
     );

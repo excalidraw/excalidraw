@@ -231,6 +231,8 @@ export const SelectedShapeActions = ({
           {(appState.activeTool.type === "text" ||
             suppportsHorizontalAlign(targetElements, elementsMap)) &&
             renderAction("changeTextAlign")}
+           {renderAction("toggleBulletList")}
+           {renderAction("toggleNumberedList")}
         </>
       )}
 
@@ -595,6 +597,8 @@ const CombinedTextProperties = ({
               {(appState.activeTool.type === "text" ||
                 suppportsHorizontalAlign(targetElements, elementsMap)) &&
                 renderAction("changeTextAlign")}
+                {renderAction("toggleBulletList")} 
+                {renderAction("toggleNumberedList")} 
               {shouldAllowVerticalAlign(targetElements, elementsMap) &&
                 renderAction("changeVerticalAlign")}
             </div>
