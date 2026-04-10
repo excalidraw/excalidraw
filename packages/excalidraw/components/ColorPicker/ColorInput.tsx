@@ -14,6 +14,17 @@ import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
+const isValidHexColorInput = (value: string): boolean => {
+  if (value === "") return true;
+  const hex = value.replace(/^#/, "");
+  return (
+    /^[0-9a-fA-F]{3}$/.test(hex) ||
+    /^[0-9a-fA-F]{4}$/.test(hex) ||
+    /^[0-9a-fA-F]{6}$/.test(hex) ||
+    /^[0-9a-fA-F]{8}$/.test(hex)
+  );
+};
+
 export const ColorInput = ({
   color,
   onChange,
@@ -32,6 +43,7 @@ export const ColorInput = ({
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
+  const [hexError, setHexError] = useState<string | null>(null);
 
   useEffect(() => {
     setInnerValue(color);
@@ -40,6 +52,16 @@ export const ColorInput = ({
   const changeColor = useCallback(
     (inputValue: string) => {
       const value = inputValue.toLowerCase();
+
+      // Validate hex format before accepting
+      if (value !== "" && !isValidHexColorInput(value)) {
+        setHexError(t("colorPicker.invalidHex"));
+        setInnerValue(value);
+        return;
+      }
+
+      setHexError(null);
+
       const color = normalizeInputColor(value);
 
       if (color) {
@@ -128,6 +150,11 @@ export const ColorInput = ({
             {eyeDropperIcon}
           </div>
         </>
+      )}
+      {hexError && (
+        <div className="color-picker__hex-error" role="alert">
+          {hexError}
+        </div>
       )}
     </div>
   );
