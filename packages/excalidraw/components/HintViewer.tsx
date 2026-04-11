@@ -85,10 +85,30 @@ const getHints = ({
     }
     if (activeTool.type === "arrow") {
       return t("hints.arrowTool", {
-        shortcut: getTaggedShortcutKey("A"),
+        shortcut_1: getTaggedShortcutKey("A"),
+        shortcut_2: getTaggedShortcutKey(["Shift", "A"]),
       });
     }
-    return t("hints.linearElement");
+    return t("hints.lineTool", {
+      shortcut: getTaggedShortcutKey(["Shift", "L"]),
+    });
+  }
+
+  if (
+    activeTool.type === "rectangle" ||
+    activeTool.type === "diamond" ||
+    activeTool.type === "ellipse"
+  ) {
+    return t("hints.strokeStyleTool", {
+      shortcut: getTaggedShortcutKey([
+        "Shift",
+        activeTool.type === "rectangle"
+          ? "R"
+          : activeTool.type === "diamond"
+          ? "D"
+          : "O",
+      ]),
+    });
   }
 
   if (activeTool.type === "freedraw") {
