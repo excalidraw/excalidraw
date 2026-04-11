@@ -296,6 +296,7 @@
     "image": "प्रतिमा सम्मिलित करें",
     "rectangle": "आयात",
     "diamond": "ईंट",
+    "triangle": "त्रिकोण",
     "ellipse": "दीर्घवृत्त",
     "arrow": "तीर",
     "line": "रेखा",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "आयत",
     "diamond": "ईंट",
+    "triangle": "त्रिकोण",
     "ellipse": "दीर्घवृत्त",
     "arrow": "तीर",
     "line": "रेखा",

@@ -367,6 +367,10 @@ export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
     offsetX += container.width / 4;
     offsetY += container.height / 4;
   }
+  if (container.type === "triangle") {
+    offsetX += container.width / 4;
+    offsetY += container.height / 2;
+  }
   return {
     x: container.x + offsetX,
     y: container.y + offsetY,
@@ -437,6 +441,7 @@ const VALID_CONTAINER_TYPES = new Set([
   "rectangle",
   "ellipse",
   "diamond",
+  "triangle",
   "arrow",
 ]);
 
@@ -459,6 +464,9 @@ export const computeContainerDimensionForBoundText = (
     return dimension + padding * 8;
   }
   if (containerType === "diamond") {
+    return 2 * (dimension + padding);
+  }
+  if (containerType === "triangle") {
     return 2 * (dimension + padding);
   }
   return dimension + padding;
@@ -486,6 +494,11 @@ export const getBoundTextMaxWidth = (
     // Math.round(width / 2) - https://github.com/excalidraw/excalidraw/pull/6265
     return Math.round(width / 2) - BOUND_TEXT_PADDING * 2;
   }
+  if (container.type === "triangle") {
+    // The largest axis-aligned rectangle inside an isosceles triangle
+    // occupies the lower half of the triangle and has width / 2.
+    return Math.round(width / 2) - BOUND_TEXT_PADDING * 2;
+  }
   return width - BOUND_TEXT_PADDING * 2;
 };
 
@@ -510,6 +523,11 @@ export const getBoundTextMaxHeight = (
   if (container.type === "diamond") {
     // The height of the largest rectangle inscribed inside a rhombus is
     // Math.round(height / 2) - https://github.com/excalidraw/excalidraw/pull/6265
+    return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;
+  }
+  if (container.type === "triangle") {
+    // The largest axis-aligned rectangle inside an isosceles triangle
+    // occupies the lower half of the triangle and has height / 2.
     return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;
   }
   return height - BOUND_TEXT_PADDING * 2;

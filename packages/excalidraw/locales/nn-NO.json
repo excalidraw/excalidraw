@@ -296,6 +296,7 @@
     "image": "Sett in bilete",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
+    "triangle": "Trekant",
     "ellipse": "",
     "arrow": "Pil",
     "line": "Linje",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "",
     "diamond": "",
+    "triangle": "Trekant",
     "ellipse": "",
     "arrow": "",
     "line": "",

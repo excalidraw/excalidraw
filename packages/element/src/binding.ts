@@ -26,7 +26,7 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
 import type { Bounds } from "@excalidraw/common";
 
-import { getCenterForBounds } from "./bounds";
+import { getCenterForBounds, getTrianglePoints } from "./bounds";
 import {
   getAllHoveredElementAtPoint,
   getHoveredElementForBinding,
@@ -1703,6 +1703,43 @@ export const snapToMid = (
     ) {
       return pointRotateRads(bottomRight, center, angle);
     }
+  } else if (bindTarget.type === "triangle") {
+    const distance = bindingGap;
+    const top = pointFrom<GlobalPoint>(x + width / 2, y - distance);
+    const bottom = pointFrom<GlobalPoint>(x + width / 2, y + height + distance);
+    const left = pointFrom<GlobalPoint>(
+      x + width / 4 - distance / 2,
+      y + height / 2,
+    );
+    const right = pointFrom<GlobalPoint>(
+      x + (3 * width) / 4 + distance / 2,
+      y + height / 2,
+    );
+
+    if (
+      pointDistance(top, nonRotated) <
+      Math.max(horizontalThreshold, verticalThreshold)
+    ) {
+      return pointRotateRads(top, center, angle);
+    }
+    if (
+      pointDistance(left, nonRotated) <
+      Math.max(horizontalThreshold, verticalThreshold)
+    ) {
+      return pointRotateRads(left, center, angle);
+    }
+    if (
+      pointDistance(right, nonRotated) <
+      Math.max(horizontalThreshold, verticalThreshold)
+    ) {
+      return pointRotateRads(right, center, angle);
+    }
+    if (
+      pointDistance(bottom, nonRotated) <
+      Math.max(horizontalThreshold, verticalThreshold)
+    ) {
+      return pointRotateRads(bottom, center, angle);
+    }
   }
 
   return undefined;
@@ -2517,9 +2554,13 @@ type Side =
   | "bottom-left"
   | "left"
   | "top-left";
-type ShapeType = "rectangle" | "ellipse" | "diamond";
+type ShapeType = "rectangle" | "ellipse" | "diamond" | "triangle";
 const getShapeType = (element: ExcalidrawBindableElement): ShapeType => {
-  if (element.type === "ellipse" || element.type === "diamond") {
+  if (
+    element.type === "ellipse" ||
+    element.type === "diamond" ||
+    element.type === "triangle"
+  ) {
     return element.type;
   }
   return "rectangle";
@@ -2561,6 +2602,19 @@ const SHAPE_CONFIGS: Record<ShapeType, SectorConfig[]> = {
 
   // ellipse: 15° cardinal points, 75° diagonals
   ellipse: [
+    { centerAngle: 0, sectorWidth: 15, side: "right" },
+    { centerAngle: 45, sectorWidth: 75, side: "bottom-right" },
+    { centerAngle: 90, sectorWidth: 15, side: "bottom" },
+    { centerAngle: 135, sectorWidth: 75, side: "bottom-left" },
+    { centerAngle: 180, sectorWidth: 15, side: "left" },
+    { centerAngle: 225, sectorWidth: 75, side: "top-left" },
+    { centerAngle: 270, sectorWidth: 15, side: "top" },
+    { centerAngle: 315, sectorWidth: 75, side: "top-right" },
+  ],
+
+  // triangle: reuse diamond-like sector splits and resolve them to the
+  // triangle's sloped edges / apex / base in getBindingSideMidPoint().
+  triangle: [
     { centerAngle: 0, sectorWidth: 15, side: "right" },
     { centerAngle: 45, sectorWidth: 75, side: "bottom-right" },
     { centerAngle: 90, sectorWidth: 15, side: "bottom" },
@@ -2830,6 +2884,80 @@ export const getBindingSideMidPoint = (
     return pointRotateRads(pointFrom(x, y), center, bindableElement.angle);
   }
 
+  if (bindableElement.type === "triangle") {
+    const [topX, topY, rightX, rightY, leftX, leftY] =
+      getTrianglePoints(bindableElement);
+    const top = pointFrom<GlobalPoint>(
+      bindableElement.x + topX,
+      bindableElement.y + topY,
+    );
+    const right = pointFrom<GlobalPoint>(
+      bindableElement.x + rightX,
+      bindableElement.y + rightY,
+    );
+    const left = pointFrom<GlobalPoint>(
+      bindableElement.x + leftX,
+      bindableElement.y + leftY,
+    );
+    const rightUpper = getPointAt(top, right, 0.25);
+    const rightMid = getPointAt(top, right, 0.5);
+    const rightLower = getPointAt(top, right, 0.75);
+    const leftUpper = getPointAt(top, left, 0.25);
+    const leftMid = getPointAt(top, left, 0.5);
+    const leftLower = getPointAt(top, left, 0.75);
+    const bottom = getMidPoint(left, right);
+
+    let x: number;
+    let y: number;
+    switch (side) {
+      case "top": {
+        x = top[0];
+        y = top[1] - OFFSET;
+        break;
+      }
+      case "right": {
+        x = rightMid[0] + OFFSET;
+        y = rightMid[1];
+        break;
+      }
+      case "bottom": {
+        x = bottom[0];
+        y = bottom[1] + OFFSET;
+        break;
+      }
+      case "left": {
+        x = leftMid[0] - OFFSET;
+        y = leftMid[1];
+        break;
+      }
+      case "top-right": {
+        x = rightUpper[0] + OFFSET * 0.707;
+        y = rightUpper[1] - OFFSET * 0.707;
+        break;
+      }
+      case "bottom-right": {
+        x = rightLower[0] + OFFSET * 0.707;
+        y = rightLower[1] + OFFSET * 0.707;
+        break;
+      }
+      case "bottom-left": {
+        x = leftLower[0] - OFFSET * 0.707;
+        y = leftLower[1] + OFFSET * 0.707;
+        break;
+      }
+      case "top-left": {
+        x = leftUpper[0] - OFFSET * 0.707;
+        y = leftUpper[1] - OFFSET * 0.707;
+        break;
+      }
+      default: {
+        return null;
+      }
+    }
+
+    return pointRotateRads(pointFrom(x, y), center, bindableElement.angle);
+  }
+
   if (isRectangularElement(bindableElement)) {
     const [sides, corners] = deconstructRectanguloidElement(
       bindableElement as ExcalidrawRectanguloidElement,
@@ -2937,4 +3065,15 @@ export const getBindingSideMidPoint = (
 
 const getMidPoint = (p1: GlobalPoint, p2: GlobalPoint): GlobalPoint => {
   return pointFrom((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2);
+};
+
+const getPointAt = (
+  p1: GlobalPoint,
+  p2: GlobalPoint,
+  t: number,
+): GlobalPoint => {
+  return pointFrom(
+    p1[0] + (p2[0] - p1[0]) * t,
+    p1[1] + (p2[1] - p1[1]) * t,
+  );
 };

@@ -296,6 +296,7 @@
     "image": "插入圖片",
     "rectangle": "長方形",
     "diamond": "菱形",
+    "triangle": "三角形",
     "ellipse": "橢圓",
     "arrow": "箭頭",
     "line": "線條",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "矩形",
     "diamond": "菱形",
+    "triangle": "三角形",
     "ellipse": "橢圓形",
     "arrow": "箭頭",
     "line": "線條",

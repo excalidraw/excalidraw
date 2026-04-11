@@ -296,6 +296,7 @@
     "image": "চিত্র সন্নিবেশ",
     "rectangle": "আয়তক্ষেত্র",
     "diamond": "রুহিতন",
+    "triangle": "ত্রিভূজ",
     "ellipse": "উপবৃত্ত",
     "arrow": "তীর",
     "line": "রেখা",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "",
     "diamond": "",
+    "triangle": "ত্রিভূজ",
     "ellipse": "",
     "arrow": "",
     "line": "",

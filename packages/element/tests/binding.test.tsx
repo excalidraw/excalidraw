@@ -114,6 +114,28 @@ describe("binding for simple arrows", () => {
       expect(arrow.y).toBe(70);
     });
 
+    it("should create an `inside` binding for triangle", () => {
+      UI.clickTool("triangle");
+      mouse.reset();
+      mouse.downAt(100, 100);
+      mouse.moveTo(200, 200);
+      mouse.up();
+
+      const triangle = API.getSelectedElement();
+
+      UI.clickTool("arrow");
+      mouse.downAt(150, 150);
+      mouse.moveTo(160, 170);
+      mouse.up();
+
+      const arrow = API.getSelectedElement() as ExcalidrawLinearElement;
+
+      expect(arrow.startBinding?.elementId).toBe(triangle.id);
+      expect(arrow.endBinding?.elementId).toBe(triangle.id);
+      expect(arrow.startBinding?.mode).toBe("inside");
+      expect(arrow.endBinding?.mode).toBe("inside");
+    });
+
     it("3+ point arrow should be dragged along with the bindable", () => {
       // Create two rectangles as binding targets
       const rectLeft = API.createElement({

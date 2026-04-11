@@ -296,6 +296,7 @@
     "image": "이미지 삽입",
     "rectangle": "사각형",
     "diamond": "다이아몬드",
+    "triangle": "삼각형",
     "ellipse": "타원",
     "arrow": "화살표",
     "line": "선",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "직사각형",
     "diamond": "마름모",
+    "triangle": "삼각형",
     "ellipse": "타원",
     "arrow": "화살표",
     "line": "선",

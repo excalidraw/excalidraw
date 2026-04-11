@@ -296,6 +296,7 @@
     "image": "ਤਸਵੀਰ ਸ਼ਾਮਲ ਕਰੋ",
     "rectangle": "ਆਇਤ",
     "diamond": "ਹੀਰਾ",
+    "triangle": "ਤਿਕੋਣ",
     "ellipse": "ਅੰਡਾਕਾਰ",
     "arrow": "ਤੀਰ",
     "line": "ਲਕੀਰ",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "",
     "diamond": "",
+    "triangle": "ਤਿਕੋਣ",
     "ellipse": "",
     "arrow": "",
     "line": "",

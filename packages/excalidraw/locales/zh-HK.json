@@ -296,6 +296,7 @@
     "image": "",
     "rectangle": "",
     "diamond": "",
+    "triangle": "三角箭嘴",
     "ellipse": "",
     "arrow": "",
     "line": "",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "",
     "diamond": "",
+    "triangle": "三角箭嘴",
     "ellipse": "",
     "arrow": "",
     "line": "",

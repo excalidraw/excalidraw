@@ -29,6 +29,7 @@ import type {
   ExcalidrawLineElement,
   ExcalidrawFlowchartNodeElement,
   ExcalidrawLinearElementSubType,
+  ExcalidrawRectanguloidElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -183,6 +184,7 @@ export const isBindableElement = (
     (!element.locked || includeLocked === true) &&
     (element.type === "rectangle" ||
       element.type === "diamond" ||
+      element.type === "triangle" ||
       element.type === "ellipse" ||
       element.type === "image" ||
       element.type === "iframe" ||
@@ -195,7 +197,7 @@ export const isBindableElement = (
 
 export const isRectanguloidElement = (
   element?: ExcalidrawElement | null,
-): element is ExcalidrawBindableElement => {
+): element is ExcalidrawRectanguloidElement => {
   return (
     element != null &&
     (element.type === "rectangle" ||
@@ -236,6 +238,7 @@ export const isTextBindableContainer = (
     (!element.locked || includeLocked === true) &&
     (element.type === "rectangle" ||
       element.type === "diamond" ||
+      element.type === "triangle" ||
       element.type === "ellipse" ||
       isArrowElement(element))
   );
@@ -251,6 +254,7 @@ export const isExcalidrawElement = (
   switch (type) {
     case "text":
     case "diamond":
+    case "triangle":
     case "rectangle":
     case "iframe":
     case "embeddable":

@@ -365,6 +365,17 @@ const renderBindingHighlightForBindableElement_simple = (
           }
 
           break;
+        case "triangle":
+          context.beginPath();
+          context.moveTo(suggestedBinding.element.width / 2, 0);
+          context.lineTo(
+            suggestedBinding.element.width,
+            suggestedBinding.element.height,
+          );
+          context.lineTo(0, suggestedBinding.element.height);
+          context.closePath();
+          context.stroke();
+          break;
         default:
           {
             const [segments, curves] = deconstructRectanguloidElement(
@@ -706,6 +717,14 @@ const renderBindingHighlightForBindableElement_complex = (
             });
           }
 
+          break;
+        case "triangle":
+          context.beginPath();
+          context.moveTo(element.width / 2 + offset, offset);
+          context.lineTo(element.width + offset, element.height + offset);
+          context.lineTo(offset, element.height + offset);
+          context.closePath();
+          context.stroke();
           break;
         default:
           {

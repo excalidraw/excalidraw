@@ -296,6 +296,7 @@
     "image": "داخڵکردنی وێنە",
     "rectangle": "لاکێشە",
     "diamond": "ئەڵماس",
+    "triangle": "سێگۆشە",
     "ellipse": "هێلکەیی",
     "arrow": "تیر",
     "line": "هێڵ",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "",
     "diamond": "",
+    "triangle": "سێگۆشە",
     "ellipse": "",
     "arrow": "",
     "line": "",

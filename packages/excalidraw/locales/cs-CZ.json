@@ -296,6 +296,7 @@
     "image": "Vložit obrázek",
     "rectangle": "Obdélník",
     "diamond": "Diamant",
+    "triangle": "Trojúhelník",
     "ellipse": "Elipsa",
     "arrow": "Šipka",
     "line": "Čára",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Obdélník",
     "diamond": "Kosočtverec",
+    "triangle": "Trojúhelník",
     "ellipse": "Elipsa",
     "arrow": "Šipka",
     "line": "Čára",

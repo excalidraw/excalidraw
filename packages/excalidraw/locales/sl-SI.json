@@ -296,6 +296,7 @@
     "image": "Vstavi sliko",
     "rectangle": "Pravokotnik",
     "diamond": "Diamant",
+    "triangle": "Trikotnik",
     "ellipse": "Elipsa",
     "arrow": "Puščica",
     "line": "Črta",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Pravokotnik",
     "diamond": "Diamant",
+    "triangle": "Trikotnik",
     "ellipse": "Elipsa",
     "arrow": "Puščica",
     "line": "Črta",

@@ -296,6 +296,7 @@
     "image": "Εισαγωγή εικόνας",
     "rectangle": "Ορθογώνιο",
     "diamond": "Ρόμβος",
+    "triangle": "Τρίγωνο",
     "ellipse": "Έλλειψη",
     "arrow": "Βέλος",
     "line": "Γραμμή",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Ορθογώνιο",
     "diamond": "Ρόμβος",
+    "triangle": "Τρίγωνο",
     "ellipse": "Έλλειψη",
     "arrow": "Βέλος",
     "line": "Γραμμή",

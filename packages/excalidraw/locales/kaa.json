@@ -296,6 +296,7 @@
     "image": "Súwret qoyıw",
     "rectangle": "Tórt múyeshlik",
     "diamond": "",
+    "triangle": "",
     "ellipse": "",
     "arrow": "",
     "line": "Sızıq",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "",
     "diamond": "",
+    "triangle": "",
     "ellipse": "",
     "arrow": "",
     "line": "",

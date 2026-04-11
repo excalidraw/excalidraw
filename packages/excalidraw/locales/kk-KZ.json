@@ -296,6 +296,7 @@
     "image": "Суретті қою",
     "rectangle": "",
     "diamond": "",
+    "triangle": "",
     "ellipse": "",
     "arrow": "Нұсқар",
     "line": "",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "",
     "diamond": "",
+    "triangle": "",
     "ellipse": "",
     "arrow": "",
     "line": "",

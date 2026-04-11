@@ -296,6 +296,7 @@
     "image": "Insereix imatge",
     "rectangle": "Rectangle",
     "diamond": "Rombe",
+    "triangle": "Triangle",
     "ellipse": "El·lipse",
     "arrow": "Fletxa",
     "line": "Línia",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Rectangle",
     "diamond": "Rombe",
+    "triangle": "Triangle",
     "ellipse": "El·lipse",
     "arrow": "Fletxa",
     "line": "Línia",

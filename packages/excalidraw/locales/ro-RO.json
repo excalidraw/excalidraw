@@ -296,6 +296,7 @@
     "image": "Introducere imagine",
     "rectangle": "Dreptunghi",
     "diamond": "Romb",
+    "triangle": "Triunghi",
     "ellipse": "Elipsă",
     "arrow": "Săgeată",
     "line": "Linie",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Dreptunghi",
     "diamond": "Romb",
+    "triangle": "Triunghi",
     "ellipse": "Elipsă",
     "arrow": "Săgeată",
     "line": "Linie",

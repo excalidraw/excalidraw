@@ -296,6 +296,7 @@
     "image": "Insertar imagen",
     "rectangle": "Rectángulo",
     "diamond": "Diamante",
+    "triangle": "Triángulo",
     "ellipse": "Elipse",
     "arrow": "Flecha",
     "line": "Línea",
@@ -318,6 +319,7 @@
   "element": {
     "rectangle": "Rectángulo",
     "diamond": "Rombo",
+    "triangle": "Triángulo",
     "ellipse": "Elipse",
     "arrow": "Flecha",
     "line": "Línea",
