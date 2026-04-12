@@ -473,6 +473,11 @@ export interface AppState {
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
   bindMode: BindMode;
+  /**
+   * When true, laser pointer trails persist on the canvas instead of
+   * fading out. Trails can be cleared manually via `clearLaserTrails`.
+   */
+  persistentLaser: boolean;
 }
 
 export type SearchMatch = {
