@@ -909,6 +909,7 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
+        canvasLimit={{ minX: 0, maxX: 2000, minY: 0, maxY: 1000 }}
         onChange={onChange}
         onExport={onExport}
         initialData={initialStatePromiseRef.current.promise}

@@ -42,6 +42,7 @@ export const dragSelectedElements = (
     y: number;
   },
   gridSize: NullableGridSize,
+  canvasLimit?: { minX?: number; minY?: number; maxX?: number; maxY?: number }
 ) => {
   if (
     _selectedElements.length === 1 &&
@@ -96,12 +97,33 @@ export const dragSelectedElements = (
     origElements.push(origElement);
   }
 
-  const adjustedOffset = calculateOffset(
+  let adjustedOffset = calculateOffset(
     getCommonBounds(origElements),
     offset,
     snapOffset,
     gridSize,
   );
+
+  if (canvasLimit) {
+    const defaultMinX = canvasLimit.minX ?? -Infinity;
+    const defaultMaxX = canvasLimit.maxX ?? Infinity;
+    const defaultMinY = canvasLimit.minY ?? -Infinity;
+    const defaultMaxY = canvasLimit.maxY ?? Infinity;
+    const [minX, minY, maxX, maxY] = getCommonBounds(origElements);
+
+    if (minX + adjustedOffset.x < defaultMinX) {
+      adjustedOffset.x = defaultMinX - minX;
+    }
+    if (maxX + adjustedOffset.x > defaultMaxX) {
+      adjustedOffset.x = defaultMaxX - maxX;
+    }
+    if (minY + adjustedOffset.y < defaultMinY) {
+      adjustedOffset.y = defaultMinY - minY;
+    }
+    if (maxY + adjustedOffset.y > defaultMaxY) {
+      adjustedOffset.y = defaultMaxY - maxY;
+    }
+  }
 
   const elementsToUpdateIds = new Set(
     Array.from(elementsToUpdate, (el) => el.id),
@@ -244,6 +266,7 @@ export const dragNewElement = ({
   widthAspectRatio = null,
   originOffset = null,
   informMutation = true,
+  canvasLimit,
 }: {
   newElement: NonDeletedExcalidrawElement;
   elementType: AppState["activeTool"]["type"];
@@ -265,6 +288,7 @@ export const dragNewElement = ({
     y: number;
   } | null;
   informMutation?: boolean;
+  canvasLimit?: { minX?: number; minY?: number; maxX?: number; maxY?: number };
 }) => {
   if (shouldMaintainAspectRatio && newElement.type !== "selection") {
     if (widthAspectRatio) {
@@ -301,6 +325,27 @@ export const dragNewElement = ({
     height += height;
     newX = originX - width / 2;
     newY = originY - height / 2;
+  }
+
+  if (canvasLimit) {
+    const defaultMinX = canvasLimit.minX ?? -Infinity;
+    const defaultMaxX = canvasLimit.maxX ?? Infinity;
+    const defaultMinY = canvasLimit.minY ?? -Infinity;
+    const defaultMaxY = canvasLimit.maxY ?? Infinity;
+    if (newX < defaultMinX) {
+      width -= (defaultMinX - newX);
+      newX = defaultMinX;
+    }
+    if (newX + width > defaultMaxX) {
+      width = defaultMaxX - newX;
+    }
+    if (newY < defaultMinY) {
+      height -= (defaultMinY - newY);
+      newY = defaultMinY;
+    }
+    if (newY + height > defaultMaxY) {
+      height = defaultMaxY - newY;
+    }
   }
 
   let textAutoResize = null;
