@@ -734,5 +734,91 @@
     "spacebar": "Space",
     "delete": "Delete",
     "mmb": "Scroll wheel"
+  },
+  "github": {
+    "card": {
+      "title": "GitHub",
+      "details": "Save to your GitHub repository",
+      "buttonLabel": "Save to GitHub"
+    },
+    "save": {
+      "dialogTitle": "Save to GitHub",
+      "dialogTitleQuick": "Quick Save to GitHub",
+      "token": {
+        "description": "Connect your GitHub account using a Personal Access Token with repo scope.",
+        "step1": "Go to GitHub → Settings → Personal access tokens",
+        "step2": "Generate a new token (classic) with repo scope",
+        "step3": "Paste the token below",
+        "label": "Personal Access Token",
+        "placeholder": "ghp_xxxxxxxxxxxxxxxxxxxx",
+        "connectBtn": "Connect",
+        "connectingBtn": "Connecting…"
+      },
+      "repo": {
+        "description": "Select the repository and branch where the file should be committed.",
+        "repoLabel": "Repository",
+        "repoPlaceholder": "— select a repo —",
+        "branchLabel": "Branch",
+        "loadingRepos": "Loading repositories…",
+        "loadingBranches": "Loading branches…",
+        "disconnectBtn": "Disconnect",
+        "nextBtn": "Next"
+      },
+      "commit": {
+        "description": "Committing to {{owner}}/{{repo}} on branch {{branch}}.",
+        "filePathLabel": "File path in repository",
+        "commitMsgLabel": "Commit message",
+        "commitBtn": "Commit",
+        "committingBtn": "Committing…",
+        "backBtn": "← Back"
+      },
+      "success": {
+        "committed": "✓ Committed to",
+        "doneBtn": "Done"
+      }
+    },
+    "load": {
+      "dialogTitle": "Load from GitHub",
+      "token": {
+        "description": "Connect with a GitHub Personal Access Token (repo scope).",
+        "step1": "Generate a token",
+        "step2": "with repo scope",
+        "step3": "Paste it below",
+        "connectBtn": "Connect",
+        "connectingBtn": "Connecting…"
+      },
+      "repo": {
+        "description": "Select the repository and branch to browse.",
+        "repoLabel": "Repository",
+        "repoPlaceholder": "— select a repo —",
+        "branchLabel": "Branch",
+        "loadingRepos": "Loading repositories…",
+        "loadingBranches": "Loading branches…",
+        "disconnectBtn": "Disconnect",
+        "browseBtn": "Browse files"
+      },
+      "files": {
+        "loadingFiles": "Scanning repository for .excalidraw files…",
+        "noFiles": "No .excalidraw files found in this branch.",
+        "filterLabel": "Filter files",
+        "filterPlaceholder": "Search…",
+        "createNewLabel": "Or create a new file:",
+        "newFilePlaceholder": "new-diagram.excalidraw",
+        "createBtn": "Create",
+        "creatingBtn": "Creating…",
+        "backBtn": "← Back"
+      },
+      "loading": {
+        "message": "Loading file…"
+      }
+    },
+    "errors": {
+      "enterToken": "Please enter a token.",
+      "invalidToken": "Invalid token. Please try again.",
+      "commitFailed": "Commit failed. Please try again.",
+      "loadFailed": "Failed to load file.",
+      "createFailed": "Failed to create file.",
+      "listFailed": "Failed to list files."
+    }
   }
 }

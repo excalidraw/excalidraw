@@ -935,7 +935,8 @@ const ExcalidrawWrapper = () => {
     keywords: ["plus", "cloud", "server"],
     perform: () => {
       window.open(
-        `${import.meta.env.VITE_APP_PLUS_LP
+        `${
+          import.meta.env.VITE_APP_PLUS_LP
         }/plus?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
@@ -957,7 +958,8 @@ const ExcalidrawWrapper = () => {
     ],
     perform: () => {
       window.open(
-        `${import.meta.env.VITE_APP_PLUS_APP
+        `${
+          import.meta.env.VITE_APP_PLUS_APP
         }?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
@@ -985,52 +987,52 @@ const ExcalidrawWrapper = () => {
               onExportToBackend,
               renderCustomUI: excalidrawAPI
                 ? (elements, appState, files) => {
-                  return (
-                    <>
-                      <ExportToExcalidrawPlus
-                        elements={elements}
-                        appState={appState}
-                        files={files}
-                        name={excalidrawAPI.getName()}
-                        onError={(error) => {
-                          excalidrawAPI?.updateScene({
-                            appState: {
-                              errorMessage: error.message,
-                            },
-                          });
-                        }}
-                        onSuccess={() => {
-                          excalidrawAPI.updateScene({
-                            appState: { openDialog: null },
-                          });
-                        }}
-                      />
-                      <Card color="primary">
-                        <div className="Card-icon">
-                          <GitHubIcon />
-                        </div>
-                        <h2>GitHub</h2>
-                        <div className="Card-details">
-                          Save to your GitHub repository
-                        </div>
-                        <ToolButton
-                          className="Card-button"
-                          type="button"
-                          title="Save to GitHub"
-                          aria-label="Save to GitHub"
-                          showAriaLabel={true}
-                          onClick={() => {
-                            setGitHubSaveQuickMode(!!activeGitHubConfig);
-                            setGitHubSaveDialogOpen(true);
+                    return (
+                      <>
+                        <ExportToExcalidrawPlus
+                          elements={elements}
+                          appState={appState}
+                          files={files}
+                          name={excalidrawAPI.getName()}
+                          onError={(error) => {
                             excalidrawAPI?.updateScene({
+                              appState: {
+                                errorMessage: error.message,
+                              },
+                            });
+                          }}
+                          onSuccess={() => {
+                            excalidrawAPI.updateScene({
                               appState: { openDialog: null },
                             });
                           }}
                         />
-                      </Card>
-                    </>
-                  );
-                }
+                        <Card color="primary">
+                          <div className="Card-icon">
+                            <GitHubIcon />
+                          </div>
+                          <h2>GitHub</h2>
+                          <div className="Card-details">
+                            Save to your GitHub repository
+                          </div>
+                          <ToolButton
+                            className="Card-button"
+                            type="button"
+                            title="Save to GitHub"
+                            aria-label="Save to GitHub"
+                            showAriaLabel={true}
+                            onClick={() => {
+                              setGitHubSaveQuickMode(!!activeGitHubConfig);
+                              setGitHubSaveDialogOpen(true);
+                              excalidrawAPI?.updateScene({
+                                appState: { openDialog: null },
+                              });
+                            }}
+                          />
+                        </Card>
+                      </>
+                    );
+                  }
                 : undefined,
             },
           },
@@ -1298,11 +1300,11 @@ const ExcalidrawWrapper = () => {
             },
             ...(isExcalidrawPlusSignedUser
               ? [
-                {
-                  ...ExcalidrawPlusAppCommand,
-                  label: "Sign in / Go to Excalidraw+",
-                },
-              ]
+                  {
+                    ...ExcalidrawPlusAppCommand,
+                    label: "Sign in / Go to Excalidraw+",
+                  },
+                ]
               : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
 
             {

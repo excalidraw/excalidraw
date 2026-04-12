@@ -1,6 +1,7 @@
 import { Dialog } from "@excalidraw/excalidraw/components/Dialog";
 import { FilledButton } from "@excalidraw/excalidraw/components/FilledButton";
 import { TextField } from "@excalidraw/excalidraw/components/TextField";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { atom, useAtom } from "../app-jotai";
@@ -40,6 +41,7 @@ type Props = {
 // Component
 // ---------------------------------------------------------------------------
 export const GitHubLoadDialog: React.FC<Props> = ({ onLoad }) => {
+  const { t } = useI18n();
   const [isOpen, setIsOpen] = useAtom(gitHubLoadDialogOpenAtom);
   const setActiveConfig = useSetAtom(activeGitHubConfigAtom);
 
@@ -157,12 +159,12 @@ export const GitHubLoadDialog: React.FC<Props> = ({ onLoad }) => {
         if (isMounted.current) {
           setFiles(data);
           if (data.length === 0) {
-            setFilesError("No .excalidraw files found in this branch.");
+            setFilesError(t("github.load.files.noFiles"));
           }
         }
       } catch (err: any) {
         if (isMounted.current) {
-          setFilesError(err?.message ?? "Failed to list files.");
+          setFilesError(err?.message ?? t("github.errors.listFailed"));
         }
       } finally {
         if (isMounted.current) {
@@ -170,25 +172,25 @@ export const GitHubLoadDialog: React.FC<Props> = ({ onLoad }) => {
         }
       }
     },
-    [],
+    [t],
   );
 
   // ---- Token step ----
   const handleConnect = async () => {
-    const t = tokenInput.trim();
-    if (!t) {
-      setTokenError("Please enter a token.");
+    const tok = tokenInput.trim();
+    if (!tok) {
+      setTokenError(t("github.errors.enterToken"));
       return;
     }
     setValidating(true);
     setTokenError("");
     try {
-      await GitHubManager.validateToken(t);
-      GitHubManager.setToken(t);
+      await GitHubManager.validateToken(tok);
+      GitHubManager.setToken(tok);
       await fetchRepos();
       setStep("repo");
     } catch (err: any) {
-      setTokenError(err?.message ?? "Invalid token.");
+      setTokenError(err?.message ?? t("github.errors.invalidToken"));
     } finally {
       if (isMounted.current) {
         setValidating(false);
@@ -242,7 +244,7 @@ export const GitHubLoadDialog: React.FC<Props> = ({ onLoad }) => {
       setIsOpen(false);
     } catch (err: any) {
       if (isMounted.current) {
-        setLoadError(err?.message ?? "Failed to load file.");
+        setLoadError(err?.message ?? t("github.errors.loadFailed"));
         setStep("files");
       }
     }
@@ -292,7 +294,7 @@ export const GitHubLoadDialog: React.FC<Props> = ({ onLoad }) => {
       setIsOpen(false);
     } catch (err: any) {
       if (isMounted.current) {
-        setLoadError(err?.message ?? "Failed to create file.");
+        setLoadError(err?.message ?? t("github.errors.createFailed"));
       }
     } finally {
       if (isMounted.current) {
@@ -322,7 +324,7 @@ export const GitHubLoadDialog: React.FC<Props> = ({ onLoad }) => {
   return (
     <Dialog
       onCloseRequest={() => setIsOpen(false)}
-      title="Load from GitHub"
+      title={t("github.load.dialogTitle")}
       size="small"
     >
       <div className="GitHubSaveDialog">
@@ -330,32 +332,38 @@ export const GitHubLoadDialog: React.FC<Props> = ({ onLoad }) => {
         {step === "token" && (
           <div className="GitHubDialog__step">
             <p className="GitHubDialog__description">
-              Connect with a GitHub <strong>Personal Access Token</strong> (
-              <code>repo</code> scope).
+              {t("github.load.token.description")}
             </p>
             <ol className="GitHubDialog__instructions">
               <li>
-                <a className="button button--secondary button--lg"
+                <a
+                  className="button button--secondary button--lg"
                   href="https://github.com/settings/tokens/new?scopes=repo&description=Excalidraw"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Generate a token
+                  {t("github.load.token.step1")}
                 </a>{" "}
-                with <code>repo</code> scope
+                {t("github.load.token.step2")}
               </li>
-              <li>Paste it below</li>
+              <li>{t("github.load.token.step3")}</li>
             </ol>
             <TextField
-              label="Personal Access Token"
-              placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+              label={t("github.save.token.label")}
+              placeholder={t("github.save.token.placeholder")}
               value={tokenInput}
               onChange={setTokenInput}
             />
-            {tokenError && <p className="GitHubDialog__error">{tokenError}</p>}
+            {tokenError && (
+              <p className="GitHubDialog__error">{tokenError}</p>
+            )}
             <div className="GitHubDialog__actions">
               <FilledButton
-                label={validating ? "Connecting…" : "Connect"}
+                label={
+                  validating
+                    ? t("github.load.token.connectingBtn")
+                    : t("github.load.token.connectBtn")
+                }
                 disabled={validating}
                 onClick={handleConnect}
               />
@@ -367,20 +375,24 @@ export const GitHubLoadDialog: React.FC<Props> = ({ onLoad }) => {
         {step === "repo" && (
           <div className="GitHubDialog__step">
             <p className="GitHubDialog__description">
-              Select the repository and branch to browse.
+              {t("github.load.repo.description")}
             </p>
 
             {loadingRepos ? (
-              <p>Loading repositories…</p>
+              <p>{t("github.load.repo.loadingRepos")}</p>
             ) : (
               <div className="GitHubDialog__field">
-                <label className="GitHubDialog__label">Repository</label>
+                <label className="GitHubDialog__label">
+                  {t("github.load.repo.repoLabel")}
+                </label>
                 <select
                   className="GitHubDialog__select"
                   value={owner && repo ? `${owner}/${repo}` : ""}
                   onChange={(e) => handleRepoSelect(e.target.value)}
                 >
-                  <option value="">— select a repo —</option>
+                  <option value="">
+                    {t("github.load.repo.repoPlaceholder")}
+                  </option>
                   {repos.map((r) => (
                     <option key={r.full_name} value={r.full_name}>
                       {r.full_name}
@@ -392,9 +404,11 @@ export const GitHubLoadDialog: React.FC<Props> = ({ onLoad }) => {
 
             {owner && repo && (
               <div className="GitHubDialog__field">
-                <label className="GitHubDialog__label">Branch</label>
+                <label className="GitHubDialog__label">
+                  {t("github.load.repo.branchLabel")}
+                </label>
                 {loadingBranches ? (
-                  <p>Loading branches…</p>
+                  <p>{t("github.load.repo.loadingBranches")}</p>
                 ) : (
                   <select
                     className="GitHubDialog__select"
@@ -416,10 +430,10 @@ export const GitHubLoadDialog: React.FC<Props> = ({ onLoad }) => {
                 className="GitHubDialog__disconnect"
                 onClick={handleDisconnect}
               >
-                Disconnect
+                {t("github.load.repo.disconnectBtn")}
               </button>
               <FilledButton
-                label="Browse files"
+                label={t("github.load.repo.browseBtn")}
                 disabled={!owner || !repo || !branch}
                 onClick={handleBrowseFiles}
               />
@@ -438,15 +452,50 @@ export const GitHubLoadDialog: React.FC<Props> = ({ onLoad }) => {
             </p>
 
             {loadingFiles ? (
-              <p>Scanning repository for .excalidraw files…</p>
+              <p>{t("github.load.files.loadingFiles")}</p>
             ) : filesError ? (
-              <p className="GitHubDialog__error">{filesError}</p>
+              <>
+                <p className="GitHubDialog__error">{filesError}</p>
+
+                <div
+                  style={{
+                    marginTop: "1rem",
+                    paddingTop: "1rem",
+                    borderTop: "1px solid var(--color-gray-30)",
+                  }}
+                >
+                  <p
+                    className="GitHubDialog__description"
+                    style={{ marginBottom: "0.5rem" }}
+                  >
+                    {t("github.load.files.createNewLabel")}
+                  </p>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <div style={{ flex: 1 }}>
+                      <TextField
+                        placeholder={t("github.load.files.newFilePlaceholder")}
+                        value={newFilePath}
+                        onChange={setNewFilePath}
+                      />
+                    </div>
+                    <FilledButton
+                      label={
+                        creatingFile
+                          ? t("github.load.files.creatingBtn")
+                          : t("github.load.files.createBtn")
+                      }
+                      disabled={creatingFile || !newFilePath.trim()}
+                      onClick={handleCreateFile}
+                    />
+                  </div>
+                </div>
+              </>
             ) : (
               <>
                 {files.length > 5 && (
                   <TextField
-                    label="Filter files"
-                    placeholder="Search…"
+                    label={t("github.load.files.filterLabel")}
+                    placeholder={t("github.load.files.filterPlaceholder")}
                     value={filter}
                     onChange={setFilter}
                   />
@@ -475,18 +524,22 @@ export const GitHubLoadDialog: React.FC<Props> = ({ onLoad }) => {
                     className="GitHubDialog__description"
                     style={{ marginBottom: "0.5rem" }}
                   >
-                    Or create a new file:
+                    {t("github.load.files.createNewLabel")}
                   </p>
                   <div style={{ display: "flex", gap: "0.5rem" }}>
                     <div style={{ flex: 1 }}>
                       <TextField
-                        placeholder="new-diagram.excalidraw"
+                        placeholder={t("github.load.files.newFilePlaceholder")}
                         value={newFilePath}
                         onChange={setNewFilePath}
                       />
                     </div>
                     <FilledButton
-                      label={creatingFile ? "Creating…" : "Create"}
+                      label={
+                        creatingFile
+                          ? t("github.load.files.creatingBtn")
+                          : t("github.load.files.createBtn")
+                      }
                       disabled={creatingFile || !newFilePath.trim()}
                       onClick={handleCreateFile}
                     />
@@ -495,14 +548,16 @@ export const GitHubLoadDialog: React.FC<Props> = ({ onLoad }) => {
               </>
             )}
 
-            {loadError && <p className="GitHubDialog__error">{loadError}</p>}
+            {loadError && (
+              <p className="GitHubDialog__error">{loadError}</p>
+            )}
 
             <div className="GitHubDialog__actions">
               <button
                 className="GitHubDialog__back"
                 onClick={() => setStep("repo")}
               >
-                ← Back
+                {t("github.load.files.backBtn")}
               </button>
             </div>
           </div>
@@ -511,10 +566,15 @@ export const GitHubLoadDialog: React.FC<Props> = ({ onLoad }) => {
         {/* ---- Loading ---- */}
         {step === "loading" && (
           <div className="GitHubDialog__step">
-            <p className="GitHubDialog__description">Loading file…</p>
+            <p className="GitHubDialog__description">
+              {t("github.load.loading.message")}
+            </p>
           </div>
         )}
       </div>
     </Dialog>
   );
 };
+
+// Re-export GitHubIcon so callers that only import from this module still work
+export { GitHubIcon };

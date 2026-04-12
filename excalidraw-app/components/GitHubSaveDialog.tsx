@@ -2,6 +2,7 @@ import { Dialog } from "@excalidraw/excalidraw/components/Dialog";
 import { FilledButton } from "@excalidraw/excalidraw/components/FilledButton";
 import { TextField } from "@excalidraw/excalidraw/components/TextField";
 import { serializeAsJSON } from "@excalidraw/excalidraw";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
@@ -66,6 +67,7 @@ function buildCommitMessage(filename: string): string {
 // Dialog component
 // ---------------------------------------------------------------------------
 export const GitHubSaveDialog: React.FC<Props> = ({ excalidrawAPI }) => {
+  const { t } = useI18n();
   const [isOpen, setIsOpen] = useAtom(gitHubSaveDialogOpenAtom);
   const [isQuickMode, setIsQuickMode] = useAtom(gitHubSaveQuickModeAtom);
   const [, setActiveConfig] = useAtom(activeGitHubConfigAtom);
@@ -184,20 +186,20 @@ export const GitHubSaveDialog: React.FC<Props> = ({ excalidrawAPI }) => {
 
   // ---- Step: validate token ----
   const handleConnect = async () => {
-    const t = tokenInput.trim();
-    if (!t) {
-      setTokenError("Please enter a token.");
+    const tok = tokenInput.trim();
+    if (!tok) {
+      setTokenError(t("github.errors.enterToken"));
       return;
     }
     setValidating(true);
     setTokenError("");
     try {
-      await GitHubManager.validateToken(t);
-      GitHubManager.setToken(t);
+      await GitHubManager.validateToken(tok);
+      GitHubManager.setToken(tok);
       await fetchRepos();
       setStep("repo");
     } catch (err: any) {
-      setTokenError(err?.message ?? "Invalid token. Please try again.");
+      setTokenError(err?.message ?? t("github.errors.invalidToken"));
     } finally {
       if (isMounted.current) {
         setValidating(false);
@@ -259,7 +261,7 @@ export const GitHubSaveDialog: React.FC<Props> = ({ excalidrawAPI }) => {
       await GitHubManager.commitFile(token, config, content, commitMsg);
       setStep("success");
     } catch (err: any) {
-      setCommitError(err?.message ?? "Commit failed. Please try again.");
+      setCommitError(err?.message ?? t("github.errors.commitFailed"));
     } finally {
       if (isMounted.current) {
         setCommitting(false);
@@ -289,7 +291,11 @@ export const GitHubSaveDialog: React.FC<Props> = ({ excalidrawAPI }) => {
           setIsQuickMode(false);
         }
       }}
-      title={isQuickMode ? "Quick Save to GitHub" : "Save to GitHub"}
+      title={
+        isQuickMode
+          ? t("github.save.dialogTitleQuick")
+          : t("github.save.dialogTitle")
+      }
       size="small"
     >
       <div className="GitHubDialog">
@@ -299,37 +305,38 @@ export const GitHubSaveDialog: React.FC<Props> = ({ excalidrawAPI }) => {
         {step === "token" && (
           <div className="GitHubDialog__step">
             <p className="GitHubDialog__description">
-              Connect your GitHub account using a{" "}
-              <strong>Personal Access Token</strong> with <code>repo</code>{" "}
-              scope.
+              {t("github.save.token.description")}
             </p>
             <ol className="GitHubDialog__instructions">
               <li>
-                Go to{" "}
                 <a
                   href="https://github.com/settings/tokens/new?scopes=repo&description=Excalidraw"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  GitHub → Settings → Personal access tokens
+                  {t("github.save.token.step1")}
                 </a>
               </li>
-              <li>
-                Generate a new token (classic) with <code>repo</code> scope
-              </li>
-              <li>Paste the token below</li>
+              <li>{t("github.save.token.step2")}</li>
+              <li>{t("github.save.token.step3")}</li>
             </ol>
             <TextField
-              label="Personal Access Token"
-              placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+              label={t("github.save.token.label")}
+              placeholder={t("github.save.token.placeholder")}
               value={tokenInput}
               onChange={setTokenInput}
               isRedacted
             />
-            {tokenError && <p className="GitHubDialog__error">{tokenError}</p>}
+            {tokenError && (
+              <p className="GitHubDialog__error">{tokenError}</p>
+            )}
             <div className="GitHubDialog__actions">
               <FilledButton
-                label={validating ? "Connecting…" : "Connect"}
+                label={
+                  validating
+                    ? t("github.save.token.connectingBtn")
+                    : t("github.save.token.connectBtn")
+                }
                 disabled={validating}
                 onClick={handleConnect}
               />
@@ -343,21 +350,24 @@ export const GitHubSaveDialog: React.FC<Props> = ({ excalidrawAPI }) => {
         {step === "repo" && (
           <div className="GitHubDialog__step">
             <p className="GitHubDialog__description">
-              Select the repository and branch where the file should be
-              committed.
+              {t("github.save.repo.description")}
             </p>
 
             {loadingRepos ? (
-              <p>Loading repositories…</p>
+              <p>{t("github.save.repo.loadingRepos")}</p>
             ) : (
               <div className="GitHubDialog__field">
-                <label className="GitHubDialog__label">Repository</label>
+                <label className="GitHubDialog__label">
+                  {t("github.save.repo.repoLabel")}
+                </label>
                 <select
                   className="GitHubDialog__select"
                   value={owner && repo ? `${owner}/${repo}` : ""}
                   onChange={(e) => handleRepoSelect(e.target.value)}
                 >
-                  <option value="">— select a repo —</option>
+                  <option value="">
+                    {t("github.save.repo.repoPlaceholder")}
+                  </option>
                   {repos.map((r) => (
                     <option key={r.full_name} value={r.full_name}>
                       {r.full_name}
@@ -369,9 +379,11 @@ export const GitHubSaveDialog: React.FC<Props> = ({ excalidrawAPI }) => {
 
             {owner && repo && (
               <div className="GitHubDialog__field">
-                <label className="GitHubDialog__label">Branch</label>
+                <label className="GitHubDialog__label">
+                  {t("github.save.repo.branchLabel")}
+                </label>
                 {loadingBranches ? (
-                  <p>Loading branches…</p>
+                  <p>{t("github.save.repo.loadingBranches")}</p>
                 ) : (
                   <select
                     className="GitHubDialog__select"
@@ -393,10 +405,10 @@ export const GitHubSaveDialog: React.FC<Props> = ({ excalidrawAPI }) => {
                 className="GitHubDialog__disconnect"
                 onClick={handleDisconnect}
               >
-                Disconnect
+                {t("github.save.repo.disconnectBtn")}
               </button>
               <FilledButton
-                label="Next"
+                label={t("github.save.repo.nextBtn")}
                 disabled={!owner || !repo || !branch}
                 onClick={handleProceedToCommit}
               />
@@ -410,17 +422,16 @@ export const GitHubSaveDialog: React.FC<Props> = ({ excalidrawAPI }) => {
         {step === "commit" && (
           <div className="GitHubDialog__step">
             <p className="GitHubDialog__description">
-              Committing to{" "}
-              <strong>
-                {owner}/{repo}
-              </strong>{" "}
-              on branch <strong>{branch}</strong>.
+              {t("github.save.commit.description")
+                .replace("{{owner}}", owner)
+                .replace("{{repo}}", repo)
+                .replace("{{branch}}", branch)}
             </p>
 
             {isQuickMode ? (
               <div className="GitHubDialog__field">
                 <label className="GitHubDialog__label">
-                  File path in repository
+                  {t("github.save.commit.filePathLabel")}
                 </label>
                 <p>
                   <strong>{filePath}</strong>
@@ -428,14 +439,14 @@ export const GitHubSaveDialog: React.FC<Props> = ({ excalidrawAPI }) => {
               </div>
             ) : (
               <TextField
-                label="File path in repository"
+                label={t("github.save.commit.filePathLabel")}
                 value={filePath}
                 onChange={setFilePath}
               />
             )}
 
             <TextField
-              label="Commit message"
+              label={t("github.save.commit.commitMsgLabel")}
               value={commitMsg}
               onChange={setCommitMsg}
             />
@@ -450,11 +461,15 @@ export const GitHubSaveDialog: React.FC<Props> = ({ excalidrawAPI }) => {
                   className="GitHubDialog__back"
                   onClick={() => setStep("repo")}
                 >
-                  ← Back
+                  {t("github.save.commit.backBtn")}
                 </button>
               )}
               <FilledButton
-                label={committing ? "Committing…" : "Commit"}
+                label={
+                  committing
+                    ? t("github.save.commit.committingBtn")
+                    : t("github.save.commit.commitBtn")
+                }
                 disabled={committing || !filePath || !commitMsg}
                 onClick={handleCommit}
               />
@@ -468,7 +483,7 @@ export const GitHubSaveDialog: React.FC<Props> = ({ excalidrawAPI }) => {
         {step === "success" && (
           <div className="GitHubDialog__step GitHubDialog__success">
             <p>
-              ✓ Committed to{" "}
+              {t("github.save.success.committed")}{" "}
               <a
                 href={`https://github.com/${owner}/${repo}/blob/${branch}/${filePath}`}
                 target="_blank"
@@ -479,7 +494,7 @@ export const GitHubSaveDialog: React.FC<Props> = ({ excalidrawAPI }) => {
             </p>
             <div className="GitHubDialog__actions">
               <FilledButton
-                label="Done"
+                label={t("github.save.success.doneBtn")}
                 onClick={() => {
                   setIsOpen(false);
                   if (isQuickMode) {
