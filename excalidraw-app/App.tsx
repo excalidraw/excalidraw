@@ -19,6 +19,8 @@ import { OverwriteConfirmDialog } from "@excalidraw/excalidraw/components/Overwr
 import { openConfirmModal } from "@excalidraw/excalidraw/components/OverwriteConfirm/OverwriteConfirmState";
 import { ShareableLinkDialog } from "@excalidraw/excalidraw/components/ShareableLinkDialog";
 import Trans from "@excalidraw/excalidraw/components/Trans";
+import { Card } from "@excalidraw/excalidraw/components/Card";
+import { ToolButton } from "@excalidraw/excalidraw/components/ToolButton";
 import {
   APP_NAME,
   EVENT,
@@ -81,12 +83,14 @@ import type { ResolutionType } from "@excalidraw/common/utility-types";
 import type { ResolvablePromise } from "@excalidraw/common/utils";
 
 import CustomStats from "./CustomStats";
+
 import {
   Provider,
   useAtom,
   useAtomValue,
   useAtomWithInitialValue,
   appJotaiStore,
+  useSetAtom,
 } from "./app-jotai";
 import {
   FIREBASE_STORAGE_PREFIXES,
@@ -131,6 +135,17 @@ import {
 } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
+import {
+  GitHubSaveDialog,
+  activeGitHubConfigAtom,
+  gitHubSaveQuickModeAtom,
+  gitHubSaveDialogOpenAtom,
+  GitHubIcon,
+} from "./components/GitHubSaveDialog";
+import {
+  GitHubLoadDialog,
+  type LoadedScene,
+} from "./components/GitHubLoadDialog";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import { useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
@@ -361,11 +376,11 @@ const initializeScene = async (opts: {
   } else if (scene) {
     return isExternalScene && jsonBackendMatch
       ? {
-          scene,
-          isExternalScene,
-          id: jsonBackendMatch[1],
-          key: jsonBackendMatch[2],
-        }
+        scene,
+        isExternalScene,
+        id: jsonBackendMatch[1],
+        key: jsonBackendMatch[2],
+      }
       : { scene, isExternalScene: false };
   }
   return { scene: null, isExternalScene: false };
@@ -377,11 +392,46 @@ const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
 
+  const [activeGitHubConfig] = useAtom(activeGitHubConfigAtom);
+  const setGitHubSaveQuickMode = useSetAtom(gitHubSaveQuickModeAtom);
+  const setGitHubSaveDialogOpen = useSetAtom(gitHubSaveDialogOpenAtom);
+
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
 
   const [langCode, setLangCode] = useAppLangCode();
 
   const editorInterface = useEditorInterface();
+
+  const handleGitHubLoad = useCallback(
+    async ({ json }: LoadedScene) => {
+      if (!excalidrawAPI) {
+        return;
+      }
+      try {
+        const blob = new Blob([json], {
+          type: "application/vnd.excalidraw+json",
+        });
+        const data = await loadFromBlob(
+          blob,
+          excalidrawAPI.getAppState(),
+          excalidrawAPI.getSceneElements(),
+        );
+        excalidrawAPI.updateScene({
+          elements: restoreElements(data.elements, null, {
+            repairBindings: true,
+          }),
+          appState: restoreAppState(data.appState, null),
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        });
+        excalidrawAPI.scrollToContent(undefined, {
+          fitToContent: true,
+        });
+      } catch (error: any) {
+        setErrorMessage(error.message);
+      }
+    },
+    [excalidrawAPI],
+  );
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -395,7 +445,6 @@ const ExcalidrawWrapper = () => {
   }
 
   const debugCanvasRef = useRef<HTMLCanvasElement>(null);
-
   useEffect(() => {
     trackEvent("load", "frame", getFrame());
     // Delayed so that the app has a time to load the latest SW
@@ -403,6 +452,22 @@ const ExcalidrawWrapper = () => {
       trackEvent("load", "version", getVersion());
     }, VERSION_TIMEOUT);
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        if (activeGitHubConfig) {
+          e.preventDefault();
+          e.stopPropagation();
+          setGitHubSaveQuickMode(true);
+          setGitHubSaveDialogOpen(true);
+        }
+      }
+    };
+    // Use capture phase to intercept before Excalidraw's built-in shortcuts
+    window.addEventListener("keydown", handleKeyDown, true);
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
+  }, [activeGitHubConfig, setGitHubSaveQuickMode, setGitHubSaveDialogOpen]);
 
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);
@@ -870,8 +935,7 @@ const ExcalidrawWrapper = () => {
     keywords: ["plus", "cloud", "server"],
     perform: () => {
       window.open(
-        `${
-          import.meta.env.VITE_APP_PLUS_LP
+        `${import.meta.env.VITE_APP_PLUS_LP
         }/plus?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
@@ -893,13 +957,13 @@ const ExcalidrawWrapper = () => {
     ],
     perform: () => {
       window.open(
-        `${
-          import.meta.env.VITE_APP_PLUS_APP
+        `${import.meta.env.VITE_APP_PLUS_APP
         }?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
     },
   };
+
 
   return (
     <div
@@ -921,7 +985,8 @@ const ExcalidrawWrapper = () => {
               onExportToBackend,
               renderCustomUI: excalidrawAPI
                 ? (elements, appState, files) => {
-                    return (
+                  return (
+                    <>
                       <ExportToExcalidrawPlus
                         elements={elements}
                         appState={appState}
@@ -940,8 +1005,32 @@ const ExcalidrawWrapper = () => {
                           });
                         }}
                       />
-                    );
-                  }
+                      <Card color="primary">
+                        <div className="Card-icon">
+                          <GitHubIcon />
+                        </div>
+                        <h2>GitHub</h2>
+                        <div className="Card-details">
+                          Save to your GitHub repository
+                        </div>
+                        <ToolButton
+                          className="Card-button"
+                          type="button"
+                          title="Save to GitHub"
+                          aria-label="Save to GitHub"
+                          showAriaLabel={true}
+                          onClick={() => {
+                            setGitHubSaveQuickMode(!!activeGitHubConfig);
+                            setGitHubSaveDialogOpen(true);
+                            excalidrawAPI?.updateScene({
+                              appState: { openDialog: null },
+                            });
+                          }}
+                        />
+                      </Card>
+                    </>
+                  );
+                }
                 : undefined,
             },
           },
@@ -1039,6 +1128,10 @@ const ExcalidrawWrapper = () => {
         {excalidrawAPI && !isCollabDisabled && (
           <Collab excalidrawAPI={excalidrawAPI} />
         )}
+
+        <GitHubLoadDialog onLoad={handleGitHubLoad} />
+
+        <GitHubSaveDialog excalidrawAPI={excalidrawAPI} />
 
         <ShareDialog
           collabAPI={collabAPI}
@@ -1205,11 +1298,11 @@ const ExcalidrawWrapper = () => {
             },
             ...(isExcalidrawPlusSignedUser
               ? [
-                  {
-                    ...ExcalidrawPlusAppCommand,
-                    label: "Sign in / Go to Excalidraw+",
-                  },
-                ]
+                {
+                  ...ExcalidrawPlusAppCommand,
+                  label: "Sign in / Go to Excalidraw+",
+                },
+              ]
               : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
 
             {
