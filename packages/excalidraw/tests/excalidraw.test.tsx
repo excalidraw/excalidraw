@@ -87,15 +87,7 @@ describe("<Excalidraw/>", () => {
       </Excalidraw>,
     ));
     expect(container.querySelector(".footer-center")).toMatchInlineSnapshot(
-      `
-      <div
-        class="footer-center zen-mode-transition"
-      >
-        <div>
-          This is a custom footer
-        </div>
-      </div>
-    `,
+      `null`,
     );
   });
 

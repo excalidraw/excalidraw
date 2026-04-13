@@ -68,6 +68,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
+  ExcalidrawStarElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
   FixedSegment,
@@ -86,6 +87,7 @@ import {
   EllipseIcon,
   LineIcon,
   RectangleIcon,
+  StarIcon,
   roundArrowIcon,
   sharpArrowIcon,
 } from "./icons";
@@ -101,10 +103,11 @@ type ExcalidrawConvertibleElement =
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
+  | ExcalidrawStarElement
   | ExcalidrawLinearElement;
 
 // indicates order of switching
-const GENERIC_TYPES = ["rectangle", "diamond", "ellipse"] as const;
+const GENERIC_TYPES = ["rectangle", "diamond", "ellipse", "star"] as const;
 // indicates order of switching
 const LINEAR_TYPES = [
   "line",
@@ -303,6 +306,7 @@ const Panel = ({
           ["rectangle", RectangleIcon],
           ["diamond", DiamondIcon],
           ["ellipse", EllipseIcon],
+          ["star", StarIcon],
         ]
       : [];
 
@@ -672,6 +676,7 @@ const filterGenericConvetibleElements = (elements: ExcalidrawElement[]) =>
     | ExcalidrawRectangleElement
     | ExcalidrawDiamondElement
     | ExcalidrawEllipseElement
+    | ExcalidrawStarElement
   >;
 
 const filterLinearConvertibleElements = (elements: ExcalidrawElement[]) =>
@@ -832,13 +837,14 @@ const convertElementType = <
         ...element,
         type: targetType,
         roundness:
-          targetType === "diamond" && element.roundness
-            ? {
-                type: isUsingAdaptiveRadius(targetType)
-                  ? ROUNDNESS.ADAPTIVE_RADIUS
-                  : ROUNDNESS.PROPORTIONAL_RADIUS,
-              }
-            : element.roundness,
+          targetType === "star"
+            ? null
+            : targetType === "diamond" && element.roundness ? {
+                  type: isUsingAdaptiveRadius(targetType)
+                    ? ROUNDNESS.ADAPTIVE_RADIUS
+                    : ROUNDNESS.PROPORTIONAL_RADIUS,
+                }
+              : element.roundness,
       }),
     ) as typeof element;
 

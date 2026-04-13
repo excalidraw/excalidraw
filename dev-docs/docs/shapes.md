@@ -10,6 +10,7 @@ Excalidraw provides a set of built-in tools for drawing and annotating on the ca
 | Rectangle | `R` or `2` | Draw rectangular shapes |
 | Diamond | `D` or `3` | Draw diamond (rhombus) shapes |
 | Ellipse | `O` or `4` | Draw ellipses and circles |
+| Star | `B` | Draw five-pointed stars |
 | Arrow | `A` or `5` | Draw arrows that can bind to other shapes |
 | Line | `L` or `6` | Draw multi-point lines and polylines |
 | Draw | `P` or `7` | Freehand pencil drawing |

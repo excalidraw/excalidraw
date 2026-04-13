@@ -36,6 +36,7 @@ import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { generateRoughOptions } from "./shape";
 import { ShapeCache } from "./shape";
+import { getStar5PointsLocal } from "./starPoints";
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import {
@@ -203,6 +204,25 @@ export class ElementBounds {
       const maxX = Math.max(x11, x12, x22, x21);
       const maxY = Math.max(y11, y12, y22, y21);
       bounds = [minX, minY, maxX, maxY];
+    } else if (element.type === "star") {
+      const locals = getStar5PointsLocal(element.width, element.height);
+      const xs: number[] = [];
+      const ys: number[] = [];
+      for (const p of locals) {
+        const [xr, yr] = pointRotateRads(
+          pointFrom(element.x + p[0], element.y + p[1]),
+          pointFrom(cx, cy),
+          element.angle,
+        );
+        xs.push(xr);
+        ys.push(yr);
+      }
+      bounds = [
+        Math.min(...xs),
+        Math.min(...ys),
+        Math.max(...xs),
+        Math.max(...ys),
+      ];
     } else if (element.type === "ellipse") {
       const w = (x2 - x1) / 2;
       const h = (y2 - y1) / 2;

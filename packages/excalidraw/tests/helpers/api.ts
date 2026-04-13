@@ -286,6 +286,13 @@ export class API {
           ...base,
         });
         break;
+      case "star":
+        element = newElement({
+          type: "star",
+          ...base,
+          roundness: null,
+        });
+        break;
       case "embeddable":
         element = newEmbeddableElement({
           type: "embeddable",

@@ -14,6 +14,7 @@ import {
   pointFrom,
   pointFromVector,
   pointRotateRads,
+  pointTranslate,
   pointsEqual,
   vectorFromPoint,
   vectorNormalize,
@@ -60,6 +61,7 @@ import { updateElbowArrowPoints } from "./elbowArrow";
 import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
+  deconstructStarElement,
   projectFixedPointOntoDiagonal,
 } from "./utils";
 
@@ -1660,7 +1662,10 @@ export const snapToMid = (
       center,
       angle,
     );
-  } else if (bindTarget.type === "diamond") {
+  } else if (
+    bindTarget.type === "diamond" ||
+    bindTarget.type === "star"
+  ) {
     const distance = bindingGap;
     const topLeft = pointFrom<GlobalPoint>(
       x + width / 4 - distance,
@@ -2522,6 +2527,9 @@ const getShapeType = (element: ExcalidrawBindableElement): ShapeType => {
   if (element.type === "ellipse" || element.type === "diamond") {
     return element.type;
   }
+  if (element.type === "star") {
+    return "diamond";
+  }
   return "rectangle";
 };
 
@@ -2828,6 +2836,43 @@ export const getBindingSideMidPoint = (
     }
 
     return pointRotateRads(pointFrom(x, y), center, bindableElement.angle);
+  }
+
+  if (bindableElement.type === "star") {
+    const [sides] = deconstructStarElement(bindableElement);
+    const targetAngles: Record<Side, number> = {
+      right: 0,
+      "bottom-right": Math.PI / 4,
+      bottom: Math.PI / 2,
+      "bottom-left": (3 * Math.PI) / 4,
+      left: Math.PI,
+      "top-left": (-3 * Math.PI) / 4,
+      top: -Math.PI / 2,
+      "top-right": -Math.PI / 4,
+    };
+    const target = targetAngles[side];
+    let bestSeg = sides[0];
+    let bestScore = Infinity;
+    for (const seg of sides) {
+      const mid = getMidPoint(seg[0], seg[1]);
+      const ang = Math.atan2(mid[1] - center[1], mid[0] - center[0]);
+      let d = ang - target;
+      while (d > Math.PI) {
+        d -= 2 * Math.PI;
+      }
+      while (d < -Math.PI) {
+        d += 2 * Math.PI;
+      }
+      const score = Math.abs(d);
+      if (score < bestScore) {
+        bestScore = score;
+        bestSeg = seg;
+      }
+    }
+    const mid = getMidPoint(bestSeg[0], bestSeg[1]);
+    const outward = vectorNormalize(vectorFromPoint(mid, center, 1e-8));
+    const pt = pointTranslate(mid, vectorScale(outward, OFFSET));
+    return pointRotateRads(pt, center, bindableElement.angle);
   }
 
   if (isRectangularElement(bindableElement)) {

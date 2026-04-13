@@ -7,6 +7,7 @@ import {
   pointFrom,
   pointFromVector,
   pointRotateRads,
+  pointTranslate,
   pointsEqual,
   vectorFromPoint,
   vectorNormalize,
@@ -51,6 +52,7 @@ import {
   deconstructDiamondElement,
   deconstructLinearOrFreeDrawElement,
   deconstructRectanguloidElement,
+  deconstructStarElement,
 } from "./utils";
 
 import { getBoundTextElement } from "./textElement";
@@ -60,6 +62,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { distanceToElement } from "./distance";
 
 import { getBindingGap } from "./binding";
+import { getStar5PointsLocal } from "./starPoints";
 
 import type {
   ElementsMap,
@@ -68,6 +71,7 @@ import type {
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
+  ExcalidrawStarElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
@@ -466,6 +470,14 @@ export const intersectElementWithLineSegment = (
         offset,
         onlyFirst,
       );
+    case "star":
+      return intersectStarWithLineSegment(
+        element as ExcalidrawStarElement,
+        elementsMap,
+        line,
+        offset,
+        onlyFirst,
+      );
     case "ellipse":
       return intersectEllipseWithLineSegment(
         element,
@@ -702,6 +714,34 @@ const intersectDiamondWithLineSegment = (
   return intersections;
 };
 
+const intersectStarWithLineSegment = (
+  element: ExcalidrawStarElement,
+  elementsMap: ElementsMap,
+  l: LineSegment<GlobalPoint>,
+  offset: number = 0,
+  onlyFirst = false,
+): GlobalPoint[] => {
+  const center = elementCenterPoint(element, elementsMap);
+
+  const rotatedA = pointRotateRads(l[0], center, -element.angle as Radians);
+  const rotatedB = pointRotateRads(l[1], center, -element.angle as Radians);
+  const rotatedIntersector = lineSegment(rotatedA, rotatedB);
+
+  const [sides] = deconstructStarElement(element, offset);
+  const intersections: GlobalPoint[] = [];
+
+  lineIntersections(
+    sides,
+    rotatedIntersector,
+    intersections,
+    center,
+    element.angle,
+    onlyFirst,
+  );
+
+  return intersections;
+};
+
 /**
  *
  * @param element
@@ -809,6 +849,19 @@ export const isBindableElementInsideOtherBindable = (
         pointFrom(x + leftX - offset, y + leftY), // left
       ];
       return corners.map((corner) => pointRotateRads(corner, center, angle));
+    }
+    if (element.type === "star") {
+      const locals = getStar5PointsLocal(width, height);
+      const outerIdx = [0, 2, 4, 6, 8] as const;
+      const corners = outerIdx.map((idx) => {
+        const p = locals[idx];
+        const tip = pointFrom<GlobalPoint>(x + p[0], y + p[1]);
+        const inward = vectorNormalize(vectorFromPoint(center, tip));
+        return pointTranslate(tip, vectorScale(inward, offset));
+      });
+      return corners.map(
+        (corner) => pointRotateRads(corner, center, angle) as GlobalPoint,
+      );
     }
     if (element.type === "ellipse") {
       // For ellipse, test points at the extremes (top, right, bottom, left)

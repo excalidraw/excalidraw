@@ -82,6 +82,15 @@ describe("Test Transform", () => {
         fillStyle: "cross-hatch",
         strokeWidth: 2,
       },
+      {
+        type: "star",
+        x: 100,
+        y: 550,
+        width: 120,
+        height: 100,
+        backgroundColor: "#ffe066",
+        strokeWidth: 2,
+      },
     ];
 
     convertToExcalidrawElements(

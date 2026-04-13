@@ -35,6 +35,7 @@ import type {
 } from "@excalidraw/excalidraw/types";
 
 import { elementCenterPoint, getDiamondPoints } from "./bounds";
+import { getStar5PointsLocal } from "./starPoints";
 
 import { generateLinearCollisionShape } from "./shape";
 
@@ -57,6 +58,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
+  ExcalidrawStarElement,
 } from "./types";
 
 type ElementShape = [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]];
@@ -457,6 +459,50 @@ export function deconstructDiamondElement(
 
   const shape = [sides, corners.flat()] as ElementShape;
 
+  setElementShapesCacheEntry(element, shape, offset);
+
+  return shape;
+}
+
+/**
+ * Unrotated star outline as line segments (curves always empty). `offset`
+ * uniformly scales the star from its center for binding hit inflation.
+ */
+export function deconstructStarElement(
+  element: ExcalidrawStarElement,
+  offset: number = 0,
+): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+  const cachedShape = getElementShapesCacheEntry(element, offset);
+
+  if (cachedShape) {
+    return cachedShape;
+  }
+
+  const maxDim = Math.max(
+    Math.abs(element.width),
+    Math.abs(element.height),
+    1e-6,
+  );
+  const radialScale = offset === 0 ? 1 : 1 + offset / maxDim;
+  const locals = getStar5PointsLocal(
+    element.width,
+    element.height,
+    radialScale,
+  );
+  const globalPoints = locals.map((p) =>
+    pointFrom<GlobalPoint>(element.x + p[0], element.y + p[1]),
+  );
+  const sides: LineSegment<GlobalPoint>[] = [];
+  for (let i = 0; i < globalPoints.length; i++) {
+    sides.push(
+      lineSegment(
+        globalPoints[i],
+        globalPoints[(i + 1) % globalPoints.length],
+      ),
+    );
+  }
+
+  const shape = [sides, []] as ElementShape;
   setElementShapesCacheEntry(element, shape, offset);
 
   return shape;

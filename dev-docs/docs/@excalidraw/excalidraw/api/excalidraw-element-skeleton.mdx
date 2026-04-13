@@ -32,7 +32,7 @@ This function converts the Excalidraw Element Skeleton to excalidraw elements wh
 
 ## Supported Features
 
-### Rectangle, Ellipse, and Diamond
+### Rectangle, Ellipse, Diamond, and Star
 
 To create these shapes you need to pass its `type` and `x` and `y` coordinates for position. The rest of the attributes are optional\_.
 
@@ -54,6 +54,11 @@ function App() {
     {
       type: "diamond",
       x: 380,
+      y: 250,
+    },
+    {
+      type: "star",
+      x: 520,
       y: 250,
     },
   ]);
@@ -111,6 +116,16 @@ convertToExcalidrawElements([
     strokeColor: "#1971c2",
     strokeStyle: "dashed",
     fillStyle: "cross-hatch",
+    strokeWidth: 2,
+  },
+  {
+    type: "star",
+    x: 800,
+    y: 250,
+    width: 120,
+    height: 120,
+    backgroundColor: "#ffe066",
+    strokeColor: "#e67700",
     strokeWidth: 2,
   },
 ]);
@@ -222,6 +237,14 @@ convertToExcalidrawElements([
       text: "DIAMOND\nTEXT CONTAINER",
     },
   },
+  {
+    type: "star",
+    x: 700,
+    y: 100,
+    label: {
+      text: "STAR\nTEXT CONTAINER",
+    },
+  },
 ]);
 ```
 
@@ -266,6 +289,19 @@ convertToExcalidrawElements([
     width: 200,
     label: {
       text: "STYLED ELLIPSE TEXT CONTAINER",
+      strokeColor: "#c2255c",
+    },
+  },
+  {
+    type: "star",
+    x: 640,
+    y: 120,
+    width: 200,
+    height: 200,
+    strokeColor: "#e67700",
+    backgroundColor: "#fff3bf",
+    label: {
+      text: "STYLED STAR TEXT CONTAINER",
       strokeColor: "#c2255c",
     },
   },

@@ -23,6 +23,7 @@ import {
 import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
+  deconstructStarElement,
   elementCenterPoint,
   getDiamondBaseCorners,
   FOCUS_POINT_SIZE,
@@ -365,6 +366,23 @@ const renderBindingHighlightForBindableElement_simple = (
           }
 
           break;
+        case "star":
+          {
+            const [segments] = deconstructStarElement(suggestedBinding.element);
+            segments.forEach((segment) => {
+              context.beginPath();
+              context.moveTo(
+                segment[0][0] - suggestedBinding.element.x,
+                segment[0][1] - suggestedBinding.element.y,
+              );
+              context.lineTo(
+                segment[1][0] - suggestedBinding.element.x,
+                segment[1][1] - suggestedBinding.element.y,
+              );
+              context.stroke();
+            });
+          }
+          break;
         default:
           {
             const [segments, curves] = deconstructRectanguloidElement(
@@ -706,6 +724,23 @@ const renderBindingHighlightForBindableElement_complex = (
             });
           }
 
+          break;
+        case "star":
+          {
+            const [segments] = deconstructStarElement(element, offset);
+            segments.forEach((segment) => {
+              context.beginPath();
+              context.moveTo(
+                segment[0][0] - element.x + offset,
+                segment[0][1] - element.y + offset,
+              );
+              context.lineTo(
+                segment[1][0] - element.x + offset,
+                segment[1][1] - element.y + offset,
+              );
+              context.stroke();
+            });
+          }
           break;
         default:
           {

@@ -15,6 +15,7 @@ import {
   pointDistance,
   type LocalPoint,
   pointRotateRads,
+  polygon,
 } from "@excalidraw/math";
 import {
   ROUGHNESS,
@@ -63,6 +64,7 @@ import {
   getElementAbsoluteCoords,
 } from "./bounds";
 import { shouldTestInside } from "./collision";
+import { getStar5PointsLocal } from "./starPoints";
 
 import type {
   ExcalidrawElement,
@@ -230,7 +232,8 @@ export const generateRoughOptions = (
     case "iframe":
     case "embeddable":
     case "diamond":
-    case "ellipse": {
+    case "ellipse":
+    case "star": {
       options.fillStyle = element.fillStyle;
       options.fill = isTransparent(element.backgroundColor)
         ? undefined
@@ -875,6 +878,15 @@ const _generateElementShape = (
       );
       return shape;
     }
+    case "star": {
+      const shape: ElementShapes[typeof element.type] = generator.polygon(
+        getStar5PointsLocal(element.width, element.height).map(
+          (p) => [p[0], p[1]] as [number, number],
+        ),
+        generateRoughOptions(element, false, isDarkMode),
+      );
+      return shape;
+    }
     case "line":
     case "arrow": {
       let shape: ElementShapes[typeof element.type];
@@ -1111,6 +1123,27 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
 
     case "ellipse":
       return getEllipseShape(element);
+
+    case "star": {
+      const { angle, width, height, x, y } = element;
+      const cx = x + width / 2;
+      const cy = y + height / 2;
+      const center = pointFrom<Point>(cx, cy);
+      const locals = getStar5PointsLocal(width, height);
+      const data = polygon(
+        ...locals.map((p) =>
+          pointRotateRads(
+            pointFrom<Point>(x + p[0], y + p[1]),
+            center,
+            angle,
+          ),
+        ),
+      );
+      return {
+        type: "polygon",
+        data,
+      };
+    }
 
     case "freedraw": {
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
