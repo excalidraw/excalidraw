@@ -3753,8 +3753,9 @@ class App extends React.Component<AppProps, AppState> {
     if (!isPlainPaste && isMaybeMermaidDefinition(data.text)) {
       const api = await import("@excalidraw/mermaid-to-excalidraw");
       try {
+        const { SECURE_MERMAID_CONFIG } = await import("./TTDDialog/common");
         const { elements: skeletonElements, files = {} } =
-          await api.parseMermaidToExcalidraw(data.text);
+          await api.parseMermaidToExcalidraw(data.text, SECURE_MERMAID_CONFIG);
 
         const elements = convertToExcalidrawElements(skeletonElements, {
           regenerateIds: true,

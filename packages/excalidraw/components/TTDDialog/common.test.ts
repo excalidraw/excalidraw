@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { convertMermaidToExcalidraw } from "./common";
+import { convertMermaidToExcalidraw, SECURE_MERMAID_CONFIG } from "./common";
 
 type ConvertMermaidArgs = Parameters<typeof convertMermaidToExcalidraw>[0];
 type ParseMermaidToExcalidraw = Awaited<
@@ -54,10 +54,12 @@ describe("convertMermaidToExcalidraw", () => {
     expect(parseMermaidToExcalidraw).toHaveBeenNthCalledWith(
       1,
       mermaidDefinition,
+      SECURE_MERMAID_CONFIG,
     );
     expect(parseMermaidToExcalidraw).toHaveBeenNthCalledWith(
       2,
       mermaidDefinition.replace(/"/g, "'"),
+      SECURE_MERMAID_CONFIG,
     );
 
     expect(result.success).toBe(false);
@@ -79,7 +81,10 @@ describe("convertMermaidToExcalidraw", () => {
     );
 
     expect(parseMermaidToExcalidraw).toHaveBeenCalledTimes(1);
-    expect(parseMermaidToExcalidraw).toHaveBeenCalledWith(mermaidDefinition);
+    expect(parseMermaidToExcalidraw).toHaveBeenCalledWith(
+      mermaidDefinition,
+      SECURE_MERMAID_CONFIG,
+    );
 
     expect(result.success).toBe(false);
     if (!result.success) {

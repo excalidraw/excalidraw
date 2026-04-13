@@ -13,11 +13,29 @@ import type {
   Theme,
 } from "@excalidraw/element/types";
 
+import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
+
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 
 import type { MermaidToExcalidrawLibProps } from "./types";
 
 import type { AppClassProperties, BinaryFiles } from "../../types";
+
+/**
+ * Secure mermaid config that prevents HTML injection in labels.
+ *
+ * Mermaid's default securityLevel allows raw HTML in diagram labels,
+ * which can lead to XSS when combined with KaTeX math rendering
+ * (e.g. `<img onerror="...">` in participant labels).
+ *
+ * Setting `securityLevel: "strict"` encodes HTML tags in text,
+ * preventing script injection.
+ */
+export const SECURE_MERMAID_CONFIG: MermaidConfig & {
+  securityLevel: string;
+} = {
+  securityLevel: "strict",
+};
 
 export const resetPreview = ({
   canvasRef,
@@ -75,7 +93,10 @@ export const convertMermaidToExcalidraw = async ({
     const api = await mermaidToExcalidrawLib.api;
 
     try {
-      ret = await api.parseMermaidToExcalidraw(mermaidDefinition);
+      ret = await api.parseMermaidToExcalidraw(
+        mermaidDefinition,
+        SECURE_MERMAID_CONFIG,
+      );
     } catch (err: unknown) {
       const originalParseError = err as Error;
 
@@ -86,6 +107,7 @@ export const convertMermaidToExcalidraw = async ({
       try {
         ret = await api.parseMermaidToExcalidraw(
           mermaidDefinition.replace(/"/g, "'"),
+          SECURE_MERMAID_CONFIG,
         );
       } catch {
         // Keep the original error so line/column references stay aligned with

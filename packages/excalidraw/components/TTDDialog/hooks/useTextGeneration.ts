@@ -1,6 +1,9 @@
 import { useRef } from "react";
 import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
+
 import { isFiniteNumber } from "@excalidraw/math";
+
+import { SECURE_MERMAID_CONFIG } from "../common";
 
 import { useAtom } from "../../../editor-jotai";
 
@@ -191,7 +194,10 @@ export const useTextGeneration = ({
       }
 
       try {
-        await parseMermaidToExcalidraw(generatedResponse ?? "");
+        await parseMermaidToExcalidraw(
+          generatedResponse ?? "",
+          SECURE_MERMAID_CONFIG,
+        );
         trackEvent("ai", "mermaid parse success", "ttd");
       } catch (error: any) {
         trackEvent("ai", "mermaid parse failed", "ttd");

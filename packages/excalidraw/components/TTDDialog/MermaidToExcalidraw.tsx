@@ -27,6 +27,7 @@ import {
   insertToEditor,
   saveMermaidDataToStorage,
   resetPreview,
+  SECURE_MERMAID_CONFIG,
 } from "./common";
 
 import "./MermaidToExcalidraw.scss";
@@ -173,7 +174,10 @@ const MermaidToExcalidraw = ({
           triedCandidates += 1;
 
           try {
-            await api.parseMermaidToExcalidraw(current.text);
+            await api.parseMermaidToExcalidraw(
+              current.text,
+              SECURE_MERMAID_CONFIG,
+            );
             if (!cancelled) {
               setAutoFixCandidate(current.text);
             }
