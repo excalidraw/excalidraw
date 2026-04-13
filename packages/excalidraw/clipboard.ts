@@ -26,6 +26,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { ExcalidrawError } from "./errors";
+import { isTabSeparatedData, renderTabularData } from "./tabular";
 import {
   createFile,
   getFileHandle,
@@ -549,6 +550,14 @@ export const parseClipboard = async (
       };
     }
   } catch {}
+
+  // Detect tab-separated (TSV) data and paste it as a rough table grid
+  if (!isPlainPaste && isTabSeparatedData(parsedEventData.value)) {
+    const tableElements = renderTabularData(parsedEventData.value);
+    if (tableElements && tableElements.length > 0) {
+      return { elements: tableElements };
+    }
+  }
 
   return { text: parsedEventData.value };
 };
