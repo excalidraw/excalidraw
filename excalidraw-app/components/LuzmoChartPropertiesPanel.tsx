@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useRef, useEffect } from "react";
 
 import {
-  LuzmoItemDataPickerPanel,
-  LuzmoEditItem,
+  LuzmoItemSlotPickerPanel,
+  LuzmoItemOptionPanel,
 } from "@luzmo/analytics-components-kit/react";
 
 import { Switch } from "@excalidraw/excalidraw/components/Switch";
@@ -157,7 +157,7 @@ export const LuzmoChartPropertiesPanel: React.FC<
         return;
       }
       injectIntoShadowRoot(root);
-      root.querySelectorAll("luzmo-slot-contents-picker").forEach((el) => {
+      root.querySelectorAll("luzmo-item-slot-picker").forEach((el) => {
         const sr = (el as Element & { shadowRoot?: ShadowRoot }).shadowRoot;
         if (sr) {
           injectIntoShadowRoot(sr);
@@ -166,7 +166,7 @@ export const LuzmoChartPropertiesPanel: React.FC<
     };
 
     const tryInject = () => {
-      const picker = container.querySelector("luzmo-item-data-picker-panel");
+      const picker = container.querySelector("luzmo-item-slot-picker-panel");
       if (picker) {
         collectAndInject(picker);
       }
@@ -216,7 +216,7 @@ export const LuzmoChartPropertiesPanel: React.FC<
           ref={dataPickerContainerRef}
           className="luzmo-chart-properties-panel__luzmo-component"
         >
-          <LuzmoItemDataPickerPanel
+          <LuzmoItemSlotPickerPanel
             itemType={chartType}
             language={luzmoLanguage}
             contentLanguage={luzmoLanguage}
@@ -291,7 +291,7 @@ export const LuzmoChartPropertiesPanel: React.FC<
       <div className="luzmo-chart-properties__item">
         <label className="luzmo-chart-properties__label">Chart options</label>
         <div className="luzmo-chart-properties-panel__luzmo-component">
-          <LuzmoEditItem
+          <LuzmoItemOptionPanel
             itemType={chartType}
             language={luzmoLanguage}
             options={options || {}}
