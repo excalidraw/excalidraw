@@ -22,10 +22,17 @@
   font-weight: 500;
   color: #fff;
 
-  display: none;
+  // Use opacity + visibility instead of display so we can animate
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease-out, visibility 0.15s ease-out,
+    transform 0.15s ease-out;
 
   &.excalidraw-tooltip--visible {
-    display: block;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
   }
 }
 

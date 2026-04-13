@@ -2,6 +2,9 @@ import React, { useEffect } from "react";
 
 import "./Tooltip.scss";
 
+// Timer for the hover delay before showing tooltips
+let showTooltipTimer: ReturnType<typeof setTimeout> | null = null;
+
 export const getTooltipDiv = () => {
   const existingDiv = document.querySelector<HTMLDivElement>(
     ".excalidraw-tooltip",
@@ -83,6 +86,8 @@ type TooltipProps = {
   disabled?: boolean;
 };
 
+const TOOLTIP_SHOW_DELAY_MS = 300;
+
 export const Tooltip = ({
   children,
   label,
@@ -91,8 +96,13 @@ export const Tooltip = ({
   disabled,
 }: TooltipProps) => {
   useEffect(() => {
-    return () =>
+    return () => {
+      if (showTooltipTimer) {
+        clearTimeout(showTooltipTimer);
+        showTooltipTimer = null;
+      }
       getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+    };
   }, []);
   if (disabled) {
     return null;
@@ -100,17 +110,28 @@ export const Tooltip = ({
   return (
     <div
       className="excalidraw-tooltip-wrapper"
-      onPointerEnter={(event) =>
-        updateTooltip(
-          event.currentTarget as HTMLDivElement,
-          getTooltipDiv(),
-          label,
-          long,
-        )
-      }
-      onPointerLeave={() =>
-        getTooltipDiv().classList.remove("excalidraw-tooltip--visible")
-      }
+      onPointerEnter={(event) => {
+        // Capture the target element before the async delay
+        const target = event.currentTarget as HTMLDivElement;
+
+        // Clear any existing timer (e.g. quickly moving between buttons)
+        if (showTooltipTimer) {
+          clearTimeout(showTooltipTimer);
+        }
+
+        showTooltipTimer = setTimeout(() => {
+          updateTooltip(target, getTooltipDiv(), label, long);
+          showTooltipTimer = null;
+        }, TOOLTIP_SHOW_DELAY_MS);
+      }}
+      onPointerLeave={() => {
+        // Cancel the pending show if the user leaves before the delay
+        if (showTooltipTimer) {
+          clearTimeout(showTooltipTimer);
+          showTooltipTimer = null;
+        }
+        getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+      }}
       style={style}
     >
       {children}
