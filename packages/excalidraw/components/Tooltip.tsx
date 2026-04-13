@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 import "./Tooltip.scss";
 
@@ -65,6 +65,9 @@ const updateTooltip = (
   label: string,
   long: boolean,
 ) => {
+  // Remove and re-add the visible class to restart the entrance animation
+  tooltip.classList.remove("excalidraw-tooltip--visible");
+  void tooltip.offsetWidth;
   tooltip.classList.add("excalidraw-tooltip--visible");
   tooltip.style.minWidth = long ? "50ch" : "10ch";
   tooltip.style.maxWidth = long ? "50ch" : "15ch";
@@ -81,6 +84,8 @@ type TooltipProps = {
   long?: boolean;
   style?: React.CSSProperties;
   disabled?: boolean;
+  /** Delay in ms before the tooltip appears on hover (default: 0) */
+  delay?: number;
 };
 
 export const Tooltip = ({
@@ -89,28 +94,49 @@ export const Tooltip = ({
   long = false,
   style,
   disabled,
+  delay = 0,
 }: TooltipProps) => {
+  const delayTimerRef = useRef<number | null>(null);
+
   useEffect(() => {
-    return () =>
+    return () => {
+      if (delayTimerRef.current !== null) {
+        window.clearTimeout(delayTimerRef.current);
+      }
       getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+    };
   }, []);
+
   if (disabled) {
     return null;
   }
+
   return (
     <div
       className="excalidraw-tooltip-wrapper"
-      onPointerEnter={(event) =>
-        updateTooltip(
-          event.currentTarget as HTMLDivElement,
-          getTooltipDiv(),
-          label,
-          long,
-        )
-      }
-      onPointerLeave={() =>
-        getTooltipDiv().classList.remove("excalidraw-tooltip--visible")
-      }
+      onPointerEnter={(event) => {
+        const target = event.currentTarget as HTMLDivElement;
+        const tooltipDiv = getTooltipDiv();
+
+        if (delay > 0) {
+          if (delayTimerRef.current !== null) {
+            window.clearTimeout(delayTimerRef.current);
+          }
+          delayTimerRef.current = window.setTimeout(() => {
+            updateTooltip(target, tooltipDiv, label, long);
+            delayTimerRef.current = null;
+          }, delay);
+        } else {
+          updateTooltip(target, tooltipDiv, label, long);
+        }
+      }}
+      onPointerLeave={() => {
+        if (delayTimerRef.current !== null) {
+          window.clearTimeout(delayTimerRef.current);
+          delayTimerRef.current = null;
+        }
+        getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+      }}
       style={style}
     >
       {children}

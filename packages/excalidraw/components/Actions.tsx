@@ -1139,44 +1139,48 @@ export const ShapesSwitcher = ({
           }
 
           return (
-            <ToolButton
-              className={clsx("Shape", { fillable })}
+            <Tooltip
+              label={`${capitalizeString(label)} — ${shortcut}`}
               key={value}
-              type="radio"
-              icon={icon}
-              checked={activeTool.type === value}
-              name="editor-current-shape"
-              title={`${capitalizeString(label)} — ${shortcut}`}
-              keyBindingLabel={keybindingLabel}
-              aria-label={capitalizeString(label)}
-              aria-keyshortcuts={shortcut}
-              data-testid={`toolbar-${value}`}
-              onPointerDown={({ pointerType }) => {
-                if (!app.state.penDetected && pointerType === "pen") {
-                  app.togglePenMode(true);
-                }
-
-                if (value === "selection") {
-                  if (app.state.activeTool.type === "selection") {
-                    app.setActiveTool({ type: "lasso" });
-                  } else {
-                    app.setActiveTool({ type: "selection" });
+              delay={350}
+            >
+              <ToolButton
+                className={clsx("Shape", { fillable })}
+                type="radio"
+                icon={icon}
+                checked={activeTool.type === value}
+                name="editor-current-shape"
+                keyBindingLabel={keybindingLabel}
+                aria-label={capitalizeString(label)}
+                aria-keyshortcuts={shortcut}
+                data-testid={`toolbar-${value}`}
+                onPointerDown={({ pointerType }) => {
+                  if (!app.state.penDetected && pointerType === "pen") {
+                    app.togglePenMode(true);
                   }
-                }
-              }}
-              onChange={({ pointerType }) => {
-                if (app.state.activeTool.type !== value) {
-                  trackEvent("toolbar", value, "ui");
-                }
-                if (value === "image") {
-                  app.setActiveTool({
-                    type: value,
-                  });
-                } else {
-                  app.setActiveTool({ type: value });
-                }
-              }}
-            />
+
+                  if (value === "selection") {
+                    if (app.state.activeTool.type === "selection") {
+                      app.setActiveTool({ type: "lasso" });
+                    } else {
+                      app.setActiveTool({ type: "selection" });
+                    }
+                  }
+                }}
+                onChange={({ pointerType }) => {
+                  if (app.state.activeTool.type !== value) {
+                    trackEvent("toolbar", value, "ui");
+                  }
+                  if (value === "image") {
+                    app.setActiveTool({
+                      type: value,
+                    });
+                  } else {
+                    app.setActiveTool({ type: value });
+                  }
+                }}
+              />
+            </Tooltip>
           );
         },
       )}

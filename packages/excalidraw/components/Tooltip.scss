@@ -26,12 +26,33 @@
 
   &.excalidraw-tooltip--visible {
     display: block;
+    animation: elastic-drop 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 }
 
 // wraps the element we want to apply the tooltip to
 .excalidraw-tooltip-wrapper {
   display: flex;
+}
+
+@keyframes elastic-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scaleY(1.3) scaleX(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(4px) scaleY(0.9) scaleX(1.05);
+  }
+  50% {
+    transform: translateY(-3px) scaleY(1.05) scaleX(0.98);
+  }
+  70% {
+    transform: translateY(1px) scaleY(0.98) scaleX(1.01);
+  }
+  100% {
+    transform: translateY(0) scaleY(1) scaleX(1);
+  }
 }
 
 .excalidraw-tooltip-icon {
