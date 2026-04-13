@@ -97,7 +97,7 @@ const config = {
                 href: "https://discord.gg/UexuTaE",
               },
               {
-                label: "X",
+                label: "𝕏",
                 href: "https://x.com/excalidraw",
               },
               {
