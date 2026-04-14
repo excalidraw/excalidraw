@@ -56,6 +56,11 @@ corepack enable
 
 After this, the `yarn` command will work directly in your terminal.
 
+> **Windows users:** `corepack enable` requires running your terminal as Administrator. Additionally, if you see a script execution policy error when running `yarn`, you can fix it by running the following in PowerShell as Administrator:
+> ```powershell
+> Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+> ```
+
 ## Collaboration
 
 For collaboration, you will need to set up [collab server](https://github.com/excalidraw/excalidraw-room) in local.
