@@ -146,6 +146,13 @@ export interface ExcalidrawElementWithCanvas {
   boundTextCanvas: HTMLCanvasElement;
   canvasOriginSceneX?: number;
   canvasOriginSceneY?: number;
+  /**
+   * Tip canvas for incremental freedraw rendering.  Contains only the last
+   * unfinalised segment (whose Catmull-Rom right-hand tangent changes with
+   * each new point) and is cleared + redrawn every frame.  Composited on top
+   * of `canvas` (the committed accumulation canvas) in drawElementFromCanvas.
+   */
+  tipCanvas?: HTMLCanvasElement;
 }
 
 const cappedElementCanvasSize = (
@@ -410,7 +417,7 @@ const drawTaperedCapsule = (
   const r = Math.max(r0, r1);
 
   if (len < r / 2) {
-    // Degenerate segment — draw a filled circle at the larger radius
+    // Degenerate segment - draw a filled circle at the larger radius
     context.beginPath();
     context.arc((x0 + x1) / 2, (y0 + y1) / 2, r, 0, Math.PI * 2);
     context.fill();
@@ -424,11 +431,11 @@ const drawTaperedCapsule = (
   context.beginPath();
   // Back semicircle at P0: clockwise from (P0 + perp*r0) through (back of P0) to (P0 - perp*r0)
   context.arc(x0, y0, r0, angle + Math.PI / 2, angle - Math.PI / 2, false);
-  // Neg-perp side: P0 - perp*r0  →  P1 - perp*r1  (arc endpoint is already P0 - perp*r0)
+  // Neg-perp side: P0 - perp*r0  ->  P1 - perp*r1  (arc endpoint is already P0 - perp*r0)
   context.lineTo(x1 - px * r1, y1 - py * r1);
   // Front semicircle at P1: clockwise from (P1 - perp*r1) through (front of P1) to (P1 + perp*r1)
   context.arc(x1, y1, r1, angle - Math.PI / 2, angle + Math.PI / 2, false);
-  // Perp side: P1 + perp*r1  →  P0 + perp*r0
+  // Perp side: P1 + perp*r1  ->  P0 + perp*r0
   context.lineTo(x0 + px * r0, y0 + py * r0);
   context.closePath();
   context.fill();
@@ -453,14 +460,11 @@ const PRESSURE_SMOOTHING_RADIUS = 6;
 /**
  * Returns the Catmull-Rom tangent vector at points[i], using the neighbouring
  * points for a uniform parameterisation.  At the first point a one-sided
- * forward tangent is used.  At the last real point, `predictedPoint` (if
- * supplied) stands in for the missing next neighbour so the stroke tip curves
- * smoothly toward the predicted pen position.
+ * forward tangent is used.
  */
 const getCatmullRomTangent = (
   points: readonly (readonly [number, number])[],
   i: number,
-  predictedPoint: readonly [number, number] | undefined,
 ): [number, number] => {
   const N = points.length;
   const cur = points[i];
@@ -469,8 +473,6 @@ const getCatmullRomTangent = (
   let next: readonly [number, number];
   if (i < N - 1) {
     next = points[i + 1];
-  } else if (predictedPoint !== undefined) {
-    next = predictedPoint;
   } else {
     // Mirror back across cur to get a forward tangent at the last point.
     const prev2 = i > 0 ? points[i - 1] : cur;
@@ -576,21 +578,23 @@ const drawSubdividedSegment = (
  * Draws freedraw points as bezier-subdivided, pressure-aware tapered capsule
  * segments.  Consecutive real points are connected with Catmull-Rom cubic
  * bezier curves so the rendered stroke is smooth even when input samples are
- * sparse.  When `predictedPoint` is supplied it is used as the tangent hint at
- * the tip of the stroke and an additional ghost segment is drawn toward it,
- * compensating for pointer-event latency.
+ * sparse.
  *
- * @param fromIndex  Draw segments starting from this index (inclusive).
- *                   Pass 0 to draw everything.
- * @param predictedPoint  Element-local scene coords of the first predicted
- *                        pointer event, used for tangent and ghost rendering.
+ * @param fromIndex   Draw segments starting from this point index (inclusive).
+ *                    Pass 0 to draw from the beginning.
+ * @param upToIndex   Draw segments only up to (but not including) this point
+ *                    index.  Omit or pass `undefined` to draw all remaining
+ *                    points.  Used by the incremental canvas to stop short of
+ *                    the last segment so the committed canvas only contains
+ *                    segments whose Catmull-Rom tangents are fully finalised
+ *                    (i.e.  the right-hand neighbour is known).
  */
 const drawFreeDrawSegments = (
   element: ExcalidrawFreeDrawElement,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
   fromIndex: number,
-  predictedPoint?: readonly [number, number],
+  upToIndex?: number,
 ) => {
   const { points, pressures } = element;
   const N = points.length;
@@ -628,23 +632,23 @@ const drawFreeDrawSegments = (
     return totalWeight > 0 ? sum / totalWeight : DEFAULT_FREEDRAW_PRESSURE;
   };
 
-  if (fromIndex === 0 && N === 1) {
-    // Single-point stroke → filled circle (dot)
+  if (
+    fromIndex === 0 &&
+    N === 1 &&
+    (upToIndex === undefined || upToIndex >= 1)
+  ) {
+    // Single-point stroke -> filled circle (dot)
     const r = baseRadius * getSmoothedPressure(0) * 2;
     context.beginPath();
     context.arc(points[0][0], points[0][1], r, 0, Math.PI * 2);
     context.fill();
-    // Draw ghost circle at predicted point if available
-    if (predictedPoint !== undefined) {
-      context.beginPath();
-      context.arc(predictedPoint[0], predictedPoint[1], r, 0, Math.PI * 2);
-      context.fill();
-    }
+
     return;
   }
 
+  const end = upToIndex !== undefined ? Math.min(upToIndex, N) : N;
   const start = Math.max(fromIndex, 1);
-  for (let i = start; i < N; i++) {
+  for (let i = start; i < end; i++) {
     const p0 = points[i - 1];
     const p1 = points[i];
     // Very first pressure values are often unreliable,
@@ -652,15 +656,8 @@ const drawFreeDrawSegments = (
     const r0 = baseRadius * getSmoothedPressure(i - 1) * 2;
     const r1 = baseRadius * getSmoothedPressure(i) * 2;
 
-    // Catmull-Rom tangents.  At the last real point, use predictedPoint as
-    // the look-ahead so the tip curves smoothly toward the expected position.
-    const isLastPoint = i === N - 1;
-    const t0 = getCatmullRomTangent(points, i - 1, undefined);
-    const t1 = getCatmullRomTangent(
-      points,
-      i,
-      isLastPoint ? predictedPoint : undefined,
-    );
+    const t0 = getCatmullRomTangent(points, i - 1);
+    const t1 = getCatmullRomTangent(points, i);
 
     drawSubdividedSegment(
       context,
@@ -674,34 +671,6 @@ const drawFreeDrawSegments = (
       t0[1],
       t1[0],
       t1[1],
-    );
-  }
-
-  // Ghost segment: extend the visible stroke toward the predicted point to
-  // compensate for pointer-event latency.  This segment is overwritten when
-  // the next real pointer event arrives.
-  if (predictedPoint !== undefined && N >= 1) {
-    const lastPt = points[N - 1];
-    const r0 = baseRadius * getSmoothedPressure(N - 1) * 2;
-
-    // Tangent at the last real point (with predicted look-ahead)
-    const t0 = getCatmullRomTangent(points, N - 1, predictedPoint);
-    // Forward tangent at the predicted point itself
-    const fwdX = predictedPoint[0] - lastPt[0];
-    const fwdY = predictedPoint[1] - lastPt[1];
-
-    drawSubdividedSegment(
-      context,
-      lastPt[0],
-      lastPt[1],
-      r0,
-      predictedPoint[0],
-      predictedPoint[1],
-      r0, // hold pressure at the tip
-      t0[0],
-      t0[1],
-      fwdX,
-      fwdY,
     );
   }
 };
@@ -917,7 +886,7 @@ export const elementWithCanvasCache = new WeakMap<
 // accumulates new capsule segments without full regeneration on every added
 // point.
 
-// screen pixels — minimum extra lookahead space on each side
+// screen pixels - minimum extra lookahead space on each side
 // (divided by scale at use)
 const FREEDRAW_CANVAS_OVERSHOOT_MIN = 200;
 
@@ -925,8 +894,31 @@ const FREEDRAW_CANVAS_OVERSHOOT_MIN = 200;
 const FREEDRAW_CANVAS_OVERSHOOT_FACTOR = 0.5;
 
 interface FreeDrawIncrementalCanvas {
-  canvas: HTMLCanvasElement;
-  lastRenderedPointCount: number;
+  /**
+   * Accumulation canvas - contains all segments whose Catmull-Rom tangents are
+   * fully finalised (right-hand neighbour is known).  With N points the last
+   * finalised segment ends at index `committedPointCount - 1`, meaning segment
+   * `[committedPointCount-2 -> committedPointCount-1]` has been drawn with the
+   * correct tangent at `committedPointCount-1` (since point
+   * `committedPointCount` existed when it was drawn).  Never cleared; only
+   * appended to (or copied when bounds grow).
+   */
+  committedCanvas: HTMLCanvasElement;
+  /**
+   * Tip canvas - same pixel dimensions and scene origin as `committedCanvas`.
+   * Cleared and redrawn every frame to contain only the last segment
+   * `[committedPointCount-1 -> N-1]` whose tangent at `N-1` is still
+   * provisional (no right-hand neighbour yet).  Composited on top of
+   * `committedCanvas` at display time.
+   */
+  tipCanvas: HTMLCanvasElement;
+  /**
+   * Number of points that have been permanently drawn on `committedCanvas`.
+   * The committed canvas contains segments through point index
+   * `committedPointCount - 1` with final tangents.  Always lags the current
+   * point count by 1 (the tip holds the last unfinalisable segment).
+   */
+  committedPointCount: number;
   canvasOriginSceneX: number;
   canvasOriginSceneY: number;
   canvasAllocX1: number;
@@ -943,13 +935,26 @@ const freedrawIncrementalCache = new WeakMap<
 >();
 
 /**
- * Generates or incrementally updates a raster canvas for a freedraw element
- * that is being actively drawn. Unlike the standard element canvas cache, this
- * cache is NOT cleared on each mutateElement call, allowing new segments to be
- * appended without full regeneration.
+ * Generates or incrementally updates the two-canvas (committed + tip) raster
+ * for a freedraw element being actively drawn.
  *
- * When element bounds grow beyond the over-allocated canvas, the existing
- * raster  is copied into a new larger canvas before appending the next segments
+ * ## Two-canvas split
+ *
+ * A Catmull-Rom tangent at point `i` depends on `points[i+1]`.  Until
+ * `points[i+1]` arrives, the tangent at `i` uses a mirrored fallback and is
+ * therefore provisional.  The segment ending at the current tip `[N-2 -> N-1]`
+ * is the only one with a provisional tangent.
+ *
+ * - **`committedCanvas`** - contains all segments whose tangents are final.
+ *   With N points: segments `[0->1, ..., N-3->N-2]` (`committedPointCount =
+ *   N-1`).  This canvas is append-only; its pixels are never invalidated.
+ *   When a new point `N` arrives, the segment `[N-2 -> N-1]` is now
+ *   finalised (tangent at `N-1` uses `N` as the right-hand neighbour) and is
+ *   drawn onto the committed canvas.  `committedPointCount` advances to `N`.
+ *
+ * - **`tipCanvas`** - cleared and redrawn every frame to contain only the
+ *   last provisional segment `[committedPointCount-1 -> N-1]`.  Composited on
+ *   top of `committedCanvas` at display time.
  */
 const generateOrUpdateFreeDrawIncrementalCanvas = (
   element: ExcalidrawFreeDrawElement,
@@ -964,6 +969,7 @@ const generateOrUpdateFreeDrawIncrementalCanvas = (
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   const containingFrameOpacity =
     getContainingFrame(element, elementsMap)?.opacity || 100;
+  const N = element.points.length;
 
   const prevInc = freedrawIncrementalCache.get(element);
 
@@ -980,22 +986,26 @@ const generateOrUpdateFreeDrawIncrementalCanvas = (
     prevInc.scale !== scale ||
     prevInc.theme !== appState.theme;
 
-  let canvas: HTMLCanvasElement;
+  // ── Canvas allocation / reallocation ──────────────────────────────────────
+  let committedCanvas: HTMLCanvasElement;
+  let tipCanvas: HTMLCanvasElement;
   let canvasOriginSceneX: number;
   let canvasOriginSceneY: number;
-  let fromIndex: number;
   let canvasScale: number;
+  // How many points to start the committed-canvas update from.  On a full
+  // regen this is 0; on a bounds-exceeded realloc it is the existing committed
+  // count so we only append the new segments.
+  let committedFromIndex: number;
 
   if (needsAlloc) {
-    // Over-allocate proportionally to the current bounding box, like std::vector doubling,
-    // so fast large strokes trigger far fewer reallocations. The over-sized canvas is
-    // discarded on stroke finalisation so the memory waste is only transient.
+    // Over-allocate proportionally to the current bounding box so fast large
+    // strokes trigger far fewer reallocations.
     const overshootX = Math.max(
-      FREEDRAW_CANVAS_OVERSHOOT_MIN / scale, // convert screen-pixel budget to scene units
+      FREEDRAW_CANVAS_OVERSHOOT_MIN / scale,
       (x2 - x1) * FREEDRAW_CANVAS_OVERSHOOT_FACTOR,
     );
     const overshootY = Math.max(
-      FREEDRAW_CANVAS_OVERSHOOT_MIN / scale, // convert screen-pixel budget to scene units
+      FREEDRAW_CANVAS_OVERSHOOT_MIN / scale,
       (y2 - y1) * FREEDRAW_CANVAS_OVERSHOOT_FACTOR,
     );
     const allocX1 = x1 - overshootX;
@@ -1006,11 +1016,10 @@ const generateOrUpdateFreeDrawIncrementalCanvas = (
     canvasOriginSceneX = allocX1 - padding / dpr;
     canvasOriginSceneY = allocY1 - padding / dpr;
 
-    // Raw canvas pixels before zoom scale
     const rawW = (allocX2 - allocX1) * dpr + padding * 2;
     const rawH = (allocY2 - allocY1) * dpr + padding * 2;
 
-    // Respect browser canvas size limits
+    // Respect browser canvas size limits.
     const AREA_LIMIT = 16777216;
     const WIDTH_HEIGHT_LIMIT = 32767;
     canvasScale = scale;
@@ -1033,10 +1042,13 @@ const generateOrUpdateFreeDrawIncrementalCanvas = (
       return null;
     }
 
-    canvas = document.createElement("canvas");
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    const context = canvas.getContext("2d")!;
+    committedCanvas = document.createElement("canvas");
+    committedCanvas.width = canvasWidth;
+    committedCanvas.height = canvasHeight;
+
+    tipCanvas = document.createElement("canvas");
+    tipCanvas.width = canvasWidth;
+    tipCanvas.height = canvasHeight;
 
     if (
       prevInc !== undefined &&
@@ -1044,22 +1056,25 @@ const generateOrUpdateFreeDrawIncrementalCanvas = (
       prevInc.scale === canvasScale &&
       prevInc.theme === appState.theme
     ) {
-      // Copy existing raster to the new canvas at the correct pixel offset.
-      // The shift is determined by how much the canvas origin moved in scene coords.
+      // Bounds grew: copy committed raster to new canvas at the correct offset
+      // and keep accumulating.  Tip will be redrawn below.
       const copyX =
         (prevInc.canvasOriginSceneX - canvasOriginSceneX) * dpr * canvasScale;
       const copyY =
         (prevInc.canvasOriginSceneY - canvasOriginSceneY) * dpr * canvasScale;
-      context.drawImage(prevInc.canvas, copyX, copyY);
-      fromIndex = prevInc.lastRenderedPointCount;
+      committedCanvas
+        .getContext("2d")!
+        .drawImage(prevInc.committedCanvas, copyX, copyY);
+      committedFromIndex = prevInc.committedPointCount - 1;
     } else {
-      // Full regeneration on first canvas, zoom change, or theme change
-      fromIndex = 0;
+      // Full regeneration: zoom/theme change or first frame.
+      committedFromIndex = 0;
     }
 
     freedrawIncrementalCache.set(element, {
-      canvas,
-      lastRenderedPointCount: fromIndex,
+      committedCanvas,
+      tipCanvas,
+      committedPointCount: committedFromIndex,
       canvasOriginSceneX,
       canvasOriginSceneY,
       canvasAllocX1: allocX1,
@@ -1070,49 +1085,73 @@ const generateOrUpdateFreeDrawIncrementalCanvas = (
       theme: appState.theme,
     });
   } else {
-    canvas = prevInc.canvas;
+    committedCanvas = prevInc.committedCanvas;
+    tipCanvas = prevInc.tipCanvas;
     canvasOriginSceneX = prevInc.canvasOriginSceneX;
     canvasOriginSceneY = prevInc.canvasOriginSceneY;
-    fromIndex = prevInc.lastRenderedPointCount;
     canvasScale = prevInc.scale;
+    committedFromIndex = prevInc.committedPointCount - 1;
   }
 
-  // Roll back 2 points so the Catmull-Rom look-ahead tangent at the last
-  // committed segment is redrawn correctly when a new point arrives.
-  // Pressure smoothing is causal (one-sided) so it requires no extra rollback.
-  // Overpainting with an opaque fill is harmless.
-  const drawFrom = Math.max(0, fromIndex - 2);
+  const inc = freedrawIncrementalCache.get(element)!;
 
-  // Draw new (and possibly revised) segments plus the ghost toward the
-  // predicted point.
-  if (drawFrom < element.points.length) {
-    const ctx = canvas.getContext("2d")!;
-    const canvasElemOffsetX =
-      (element.x - canvasOriginSceneX) * dpr * canvasScale;
-    const canvasElemOffsetY =
-      (element.y - canvasOriginSceneY) * dpr * canvasScale;
+  // ── Helper: draw onto a canvas with the element's scene->pixel transform ──
+  const withElementContext = (
+    target: HTMLCanvasElement,
+    fn: (ctx: CanvasRenderingContext2D) => void,
+  ) => {
+    const ctx = target.getContext("2d")!;
+    const offsetX = (element.x - canvasOriginSceneX) * dpr * canvasScale;
+    const offsetY = (element.y - canvasOriginSceneY) * dpr * canvasScale;
     ctx.save();
-    ctx.translate(canvasElemOffsetX, canvasElemOffsetY);
+    ctx.translate(offsetX, offsetY);
     ctx.scale(dpr * canvasScale, dpr * canvasScale);
+    fn(ctx);
+    ctx.restore();
+  };
+
+  // ── Update committed canvas ───────────────────────────────────────────────
+  // With N points the last finalisable segment ends at N-2 (needs N-1 as
+  // right-hand neighbour for the tangent at N-2, and N-1 is always present).
+  // We draw from `committedFromIndex` up to (but not including) point N-1,
+  // so the committed canvas contains segments [0->1, ..., N-3->N-2].
+  const newCommittedCount = Math.max(1, N - 1);
+  if (committedFromIndex < newCommittedCount) {
+    withElementContext(committedCanvas, (ctx) => {
+      drawFreeDrawSegments(
+        element,
+        ctx,
+        renderConfig,
+        committedFromIndex,
+        newCommittedCount, // upToIndex - stop before the last provisional segment
+      );
+    });
+    inc.committedPointCount = newCommittedCount;
+  }
+
+  // ── Redraw tip canvas ─────────────────────────────────────────────────────
+  // Always cleared and redrawn: contains the single provisional segment
+  // [committedPointCount-1 -> N-1] with a predicted-point ghost if available.
+  withElementContext(tipCanvas, (ctx) => {
+    ctx.clearRect(
+      -(element.x - canvasOriginSceneX),
+      -(element.y - canvasOriginSceneY),
+      tipCanvas.width / (dpr * canvasScale),
+      tipCanvas.height / (dpr * canvasScale),
+    );
     drawFreeDrawSegments(
       element,
       ctx,
       renderConfig,
-      drawFrom,
-      element.points[element.points.length - 1],
-      //predictedPoint,
+      inc.committedPointCount - 1,
+      undefined, // draw to natural end (the tip segment)
     );
-    ctx.restore();
+  });
 
-    // Update lastRenderedPointCount in the cache entry.
-    const inc = freedrawIncrementalCache.get(element)!;
-    inc.lastRenderedPointCount = element.points.length;
-  }
-
-  const inc = freedrawIncrementalCache.get(element)!;
   return {
     element,
-    canvas,
+    canvas: committedCanvas,
+    tipCanvas,
     theme: appState.theme,
     scale: canvasScale,
     angle: element.angle,
@@ -1278,6 +1317,19 @@ const drawElementFromCanvas = (
       elementWithCanvas.canvas!.width / elementWithCanvas.scale,
       elementWithCanvas.canvas!.height / elementWithCanvas.scale,
     );
+
+    // Composite the tip canvas (incremental freedraw path) on top.  It is
+    // the same size and at the same scene origin as the committed canvas, so
+    // it uses identical destX / destY / dimensions.
+    if (elementWithCanvas.tipCanvas) {
+      context.drawImage(
+        elementWithCanvas.tipCanvas,
+        destX,
+        destY,
+        elementWithCanvas.tipCanvas.width / elementWithCanvas.scale,
+        elementWithCanvas.tipCanvas.height / elementWithCanvas.scale,
+      );
+    }
 
     if (
       import.meta.env.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
@@ -1542,7 +1594,7 @@ export const renderElement = (
         }
 
         context.restore();
-        // not exporting → optimized rendering (cache & render from element
+        // not exporting -> optimized rendering (cache & render from element
         // canvases)
       } else {
         const elementWithCanvas = generateElementWithCanvas(
