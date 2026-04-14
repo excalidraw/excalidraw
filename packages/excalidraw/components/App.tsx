@@ -9937,6 +9937,37 @@ class App extends React.Component<AppProps, AppState> {
   private onPointerMoveFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ) {
+    // Per-stroke One Euro Filter state for mouse freedraw smoothing.
+    // Reference: Casiez et al. 2012 "1€ Filter: A Simple Speed-based Low-pass
+    // Filter for Noisy Input in Interactive Systems".
+    //
+    // The filter adapts its EMA alpha to the current speed of the pointer:
+    //   slow movement  → low cutoff → heavy smoothing (removes jitter)
+    //   fast movement  → high cutoff → near-raw tracking (minimal lag)
+    //
+    // State variables (reset at stroke start via null sentinel):
+    let emaX: number | null = null; // smoothed position x
+    let emaY: number | null = null; // smoothed position y
+    let emaDx = 0; // smoothed derivative x
+    let emaDy = 0; // smoothed derivative y
+    let prevRawX: number | null = null; // previous raw x for derivative
+    let prevRawY: number | null = null;
+    let prevTs: number | null = null; // previous event timestamp (ms)
+
+    // Tuning constants:
+    //   MIN_CUTOFF  – cutoff frequency (Hz) when speed ≈ 0; smaller = more smoothing
+    //   BETA        – rate at which cutoff grows with speed; larger = quicker adaptation
+    //   D_CUTOFF    – fixed cutoff for the derivative pre-filter
+    const MIN_CUTOFF = 0.5;
+    const BETA = 0.01;
+    const D_CUTOFF = 2.0;
+
+    /** Compute EMA alpha from cutoff frequency (Hz) and timestep (seconds). */
+    const emaAlpha = (cutoff: number, dt: number): number => {
+      const tau = 1 / (2 * Math.PI * cutoff);
+      return 1 / (1 + tau / dt);
+    };
+
     const handler = (event: PointerEvent) => {
       if (this.state.openDialog?.name === "elementLinkSelector") {
         return;
@@ -10643,8 +10674,38 @@ class App extends React.Component<AppProps, AppState> {
 
           for (const ev of allEvents) {
             const coords = viewportCoordsToSceneCoords(ev, this.state);
-            const dx = coords.x - newElement.x;
-            const dy = coords.y - newElement.y;
+            const rawDx = coords.x - newElement.x;
+            const rawDy = coords.y - newElement.y;
+
+            // One Euro Filter: speed-adaptive low-pass for mouse events.
+            const dt = Math.max(
+              prevTs !== null ? (ev.timeStamp - prevTs) / 1000 : 1 / 60,
+              0.001,
+            ); // seconds
+
+            // 1. Smooth the derivative (fixed D_CUTOFF pre-filter).
+            const alphaD = emaAlpha(D_CUTOFF, dt);
+            const rawDxDt = prevRawX !== null ? (rawDx - prevRawX) / dt : 0;
+            const rawDyDt = prevRawY !== null ? (rawDy - prevRawY) / dt : 0;
+            emaDx = alphaD * rawDxDt + (1 - alphaD) * emaDx;
+            emaDy = alphaD * rawDyDt + (1 - alphaD) * emaDy;
+
+            // 2. Adaptive cutoff: higher speed → higher cutoff → less lag.
+            const speed = Math.sqrt(emaDx * emaDx + emaDy * emaDy);
+            const cutoff = MIN_CUTOFF + BETA * speed;
+            const alphaP = emaAlpha(cutoff, dt);
+
+            // 3. Smooth position with adaptive alpha.
+            emaX = emaX === null ? rawDx : alphaP * rawDx + (1 - alphaP) * emaX;
+            emaY = emaY === null ? rawDy : alphaP * rawDy + (1 - alphaP) * emaY;
+
+            prevRawX = rawDx;
+            prevRawY = rawDy;
+            prevTs = ev.timeStamp;
+
+            const dx = emaX;
+            const dy = emaY;
+
             if (!lastPoint || lastPoint[0] !== dx || lastPoint[1] !== dy) {
               const pt = pointFrom<LocalPoint>(dx, dy);
               newPoints.push(pt);
