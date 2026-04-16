@@ -24,6 +24,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
+  "currentItemFreedrawConstantPressure": true,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
   "currentItemRoundness": "sharp",
