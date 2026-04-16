@@ -9954,6 +9954,15 @@ class App extends React.Component<AppProps, AppState> {
     let prevRawY: number | null = null;
     let prevTs: number | null = null; // previous event timestamp (ms)
 
+    // Pen pressure warmup: the first few samples from a pen digitizer are
+    // unreliable (often spike to ~0.5).  We apply an EMA whose alpha ramps
+    // from PEN_PRESSURE_INITIAL_ALPHA up to 1 over PEN_PRESSURE_WARMUP_SAMPLES
+    // so the stroke gradually eases from heavy smoothing into raw pressure.
+    let penPressureEma: number | null = null;
+    let penPressureSampleCount = 0;
+    const PEN_PRESSURE_WARMUP_SAMPLES = 20;
+    const PEN_PRESSURE_INITIAL_ALPHA = 0.1;
+
     // Tuning constants:
     //   MIN_CUTOFF  – cutoff frequency (Hz) when speed ≈ 0; smaller = more smoothing
     //   BETA        – rate at which cutoff grows with speed; larger = quicker adaptation
@@ -10694,7 +10703,11 @@ class App extends React.Component<AppProps, AppState> {
               emaDy = alphaD * rawDyDt + (1 - alphaD) * emaDy;
 
               // 2. Adaptive cutoff: higher speed → higher cutoff → less lag.
-              const speed = Math.sqrt(emaDx * emaDx + emaDy * emaDy);
+              // Normalize to screen-space pixels/sec so BETA behaves the same
+              // regardless of zoom level (scene units are 1/zoom px at high zoom).
+              const speed =
+                Math.sqrt(emaDx * emaDx + emaDy * emaDy) *
+                this.state.zoom.value;
               const cutoff = MIN_CUTOFF + BETA * speed;
               const alphaP = emaAlpha(cutoff, dt);
 
@@ -10715,7 +10728,27 @@ class App extends React.Component<AppProps, AppState> {
             if (!lastPoint || lastPoint[0] !== dx || lastPoint[1] !== dy) {
               const pt = pointFrom<LocalPoint>(dx, dy);
               newPoints.push(pt);
-              newPressures.push(ev.pressure);
+
+              let pressure = ev.pressure;
+              if (event.pointerType === "pen") {
+                // Gradually ease from aggressive smoothing into raw pressure to
+                // suppress the unreliable spike at the start of a pen stroke.
+                const progress = Math.min(
+                  1,
+                  penPressureSampleCount / PEN_PRESSURE_WARMUP_SAMPLES,
+                );
+                const alpha =
+                  PEN_PRESSURE_INITIAL_ALPHA +
+                  progress * (1 - PEN_PRESSURE_INITIAL_ALPHA);
+                penPressureEma =
+                  penPressureEma === null
+                    ? pressure
+                    : alpha * pressure + (1 - alpha) * penPressureEma;
+                pressure = penPressureEma;
+                penPressureSampleCount++;
+              }
+
+              newPressures.push(pressure);
               lastPoint = pt;
             }
           }

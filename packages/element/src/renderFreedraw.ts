@@ -161,11 +161,13 @@ const drawSubdividedSegment = (
   t0y: number,
   t1x: number,
   t1y: number,
+  scale: number,
 ) => {
   const segLen = Math.sqrt((p1x - p0x) ** 2 + (p1y - p0y) ** 2);
+  // Target spacing is in screen pixels; divide by scale to get scene units.
   const nSubdiv = Math.max(
     1,
-    Math.ceil(segLen / BEZIER_SUBDIVIDE_TARGET_SPACING),
+    Math.ceil((segLen * scale) / BEZIER_SUBDIVIDE_TARGET_SPACING),
   );
 
   // Cubic Bezier control points derived from Catmull-Rom tangents.
@@ -220,6 +222,7 @@ export const drawFreeDrawSegments = (
   renderConfig: StaticCanvasRenderConfig,
   fromIndex: number,
   upToIndex?: number,
+  scale = 1,
 ) => {
   const { points, pressures } = element;
   const N = points.length;
@@ -296,6 +299,7 @@ export const drawFreeDrawSegments = (
       t0[1],
       t1[0],
       t1[1],
+      scale,
     );
   }
 };
@@ -546,6 +550,7 @@ export const generateOrUpdateFreeDrawIncrementalCanvas = (
         renderConfig,
         committedFromIndex,
         newCommittedCount, // upToIndex - stop before the last provisional segment
+        canvasScale,
       );
     });
     inc.committedPointCount = newCommittedCount;
@@ -567,6 +572,7 @@ export const generateOrUpdateFreeDrawIncrementalCanvas = (
       renderConfig,
       inc.committedPointCount - 1,
       undefined, // draw to natural end (the tip segment)
+      canvasScale,
     );
   });
 

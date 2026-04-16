@@ -266,7 +266,7 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  drawElementOnCanvas(element, rc, context, renderConfig);
+  drawElementOnCanvas(element, rc, context, renderConfig, scale);
 
   context.restore();
 
@@ -402,6 +402,7 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
+  scale = 1,
 ) => {
   switch (element.type) {
     case "rectangle":
@@ -429,7 +430,7 @@ const drawElementOnCanvas = (
     }
     case "freedraw": {
       context.save();
-      drawFreeDrawSegments(element, context, renderConfig, 0);
+      drawFreeDrawSegments(element, context, renderConfig, 0, undefined, scale);
       context.restore();
       break;
     }
