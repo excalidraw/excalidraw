@@ -10676,35 +10676,41 @@ class App extends React.Component<AppProps, AppState> {
             const coords = viewportCoordsToSceneCoords(ev, this.state);
             const rawDx = coords.x - newElement.x;
             const rawDy = coords.y - newElement.y;
+            let dx = rawDx;
+            let dy = rawDy;
 
-            // One Euro Filter: speed-adaptive low-pass for mouse events.
-            const dt = Math.max(
-              prevTs !== null ? (ev.timeStamp - prevTs) / 1000 : 1 / 60,
-              0.001,
-            ); // seconds
+            if (event.pointerType === "mouse") {
+              // One Euro Filter: speed-adaptive low-pass for mouse events.
+              const dt = Math.max(
+                prevTs !== null ? (ev.timeStamp - prevTs) / 1000 : 1 / 60,
+                0.001,
+              ); // seconds
 
-            // 1. Smooth the derivative (fixed D_CUTOFF pre-filter).
-            const alphaD = emaAlpha(D_CUTOFF, dt);
-            const rawDxDt = prevRawX !== null ? (rawDx - prevRawX) / dt : 0;
-            const rawDyDt = prevRawY !== null ? (rawDy - prevRawY) / dt : 0;
-            emaDx = alphaD * rawDxDt + (1 - alphaD) * emaDx;
-            emaDy = alphaD * rawDyDt + (1 - alphaD) * emaDy;
+              // 1. Smooth the derivative (fixed D_CUTOFF pre-filter).
+              const alphaD = emaAlpha(D_CUTOFF, dt);
+              const rawDxDt = prevRawX !== null ? (rawDx - prevRawX) / dt : 0;
+              const rawDyDt = prevRawY !== null ? (rawDy - prevRawY) / dt : 0;
+              emaDx = alphaD * rawDxDt + (1 - alphaD) * emaDx;
+              emaDy = alphaD * rawDyDt + (1 - alphaD) * emaDy;
 
-            // 2. Adaptive cutoff: higher speed → higher cutoff → less lag.
-            const speed = Math.sqrt(emaDx * emaDx + emaDy * emaDy);
-            const cutoff = MIN_CUTOFF + BETA * speed;
-            const alphaP = emaAlpha(cutoff, dt);
+              // 2. Adaptive cutoff: higher speed → higher cutoff → less lag.
+              const speed = Math.sqrt(emaDx * emaDx + emaDy * emaDy);
+              const cutoff = MIN_CUTOFF + BETA * speed;
+              const alphaP = emaAlpha(cutoff, dt);
 
-            // 3. Smooth position with adaptive alpha.
-            emaX = emaX === null ? rawDx : alphaP * rawDx + (1 - alphaP) * emaX;
-            emaY = emaY === null ? rawDy : alphaP * rawDy + (1 - alphaP) * emaY;
+              // 3. Smooth position with adaptive alpha.
+              emaX =
+                emaX === null ? rawDx : alphaP * rawDx + (1 - alphaP) * emaX;
+              emaY =
+                emaY === null ? rawDy : alphaP * rawDy + (1 - alphaP) * emaY;
 
-            prevRawX = rawDx;
-            prevRawY = rawDy;
-            prevTs = ev.timeStamp;
+              prevRawX = rawDx;
+              prevRawY = rawDy;
+              prevTs = ev.timeStamp;
 
-            const dx = emaX;
-            const dy = emaY;
+              dx = emaX;
+              dy = emaY;
+            }
 
             if (!lastPoint || lastPoint[0] !== dx || lastPoint[1] !== dy) {
               const pt = pointFrom<LocalPoint>(dx, dy);
