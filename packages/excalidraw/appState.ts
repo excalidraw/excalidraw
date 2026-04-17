@@ -128,6 +128,7 @@ export const getDefaultAppState = (): Omit<
     lockedMultiSelections: {},
     activeLockedId: null,
     bindMode: "orbit",
+    boxSelectionMode: "contain",
   };
 };
 
@@ -193,6 +194,7 @@ const APP_STATE_STORAGE_CONF = (<
   gridModeEnabled: { browser: true, export: true, server: true },
   height: { browser: false, export: false, server: false },
   isBindingEnabled: { browser: true, export: false, server: false },
+  boxSelectionMode: { browser: true, export: false, server: false },
   bindingPreference: { browser: true, export: false, server: false },
   isMidpointSnappingEnabled: { browser: true, export: false, server: false },
   defaultSidebarDockedPreference: {
