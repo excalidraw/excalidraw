@@ -9934,6 +9934,17 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  /**
+   * Returns the timestamp of a pointer event, in milliseconds.
+   * Extracted as a method so tests can spy on it and return a fixed value,
+   * making the One Euro Filter in the freedraw handler deterministic.
+   */
+  protected getPointerEventTimestamp(
+    ev: Pick<PointerEvent, "timeStamp">,
+  ): number {
+    return ev.timeStamp;
+  }
+
   private onPointerMoveFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ) {
@@ -10690,8 +10701,9 @@ class App extends React.Component<AppProps, AppState> {
 
             if (event.pointerType === "mouse") {
               // One Euro Filter: speed-adaptive low-pass for mouse events.
+              const evTs = this.getPointerEventTimestamp(ev);
               const dt = Math.max(
-                prevTs !== null ? (ev.timeStamp - prevTs) / 1000 : 1 / 60,
+                prevTs !== null ? (evTs - prevTs) / 1000 : 1 / 60,
                 0.001,
               ); // seconds
 
@@ -10719,7 +10731,7 @@ class App extends React.Component<AppProps, AppState> {
 
               prevRawX = rawDx;
               prevRawY = rawDy;
-              prevTs = ev.timeStamp;
+              prevTs = evTs;
 
               dx = emaX;
               dy = emaY;

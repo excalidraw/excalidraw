@@ -9112,8 +9112,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
       20,
     ],
     [
-      "23.68762",
-      "23.68762",
+      "21.04874",
+      "21.04874",
     ],
     [
       50,
@@ -9218,8 +9218,8 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
                 20,
               ],
               [
-                "23.68762",
-                "23.68762",
+                "21.04874",
+                "21.04874",
               ],
               [
                 50,

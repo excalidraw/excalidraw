@@ -2120,6 +2120,9 @@ describe("history", () => {
       await render(
         <Excalidraw handleKeyboardGlobally={true} isCollaborating={true} />,
       );
+      // Pin the One Euro Filter clock to a fixed value so the smoothed
+      // intermediate freedraw point is deterministic regardless of system load.
+      vi.spyOn(h.app as any, "getPointerEventTimestamp").mockReturnValue(0);
     });
 
     it("should not override remote changes on different elements", async () => {
