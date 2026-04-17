@@ -491,7 +491,7 @@ export const generateOrUpdateFreeDrawIncrementalCanvas = (
       committedCanvas
         .getContext("2d")!
         .drawImage(prevInc.committedCanvas, copyX, copyY);
-      committedFromIndex = prevInc.committedPointCount - 1;
+      committedFromIndex = prevInc.committedPointCount;
     } else {
       // Full regeneration: zoom/theme change or first frame.
       committedFromIndex = 0;
@@ -516,7 +516,7 @@ export const generateOrUpdateFreeDrawIncrementalCanvas = (
     canvasOriginSceneX = prevInc.canvasOriginSceneX;
     canvasOriginSceneY = prevInc.canvasOriginSceneY;
     canvasScale = prevInc.scale;
-    committedFromIndex = prevInc.committedPointCount - 1;
+    committedFromIndex = prevInc.committedPointCount;
   }
 
   const inc = freedrawIncrementalCache.get(element)!;
@@ -570,7 +570,7 @@ export const generateOrUpdateFreeDrawIncrementalCanvas = (
       element,
       ctx,
       renderConfig,
-      inc.committedPointCount - 1,
+      inc.committedPointCount,
       undefined, // draw to natural end (the tip segment)
       canvasScale,
     );
