@@ -20,6 +20,7 @@ import {
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
   assertSelectedElements,
+  GlobalTestState,
   unmountComponent,
 } from "./test-utils";
 
@@ -733,6 +734,46 @@ describe("inner box-selection", () => {
       expect(h.state.selectedGroupIds).toEqual({});
       mouse.up();
     });
+  });
+
+  it("uses the selection highlight color for grouped outlines", async () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 50,
+      height: 50,
+      strokeColor: "#ff0000",
+      groupIds: ["A"],
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      x: 150,
+      y: 150,
+      width: 50,
+      height: 50,
+      strokeColor: "#00ff00",
+      groupIds: ["A"],
+    });
+
+    API.setElements([rect1, rect2]);
+
+    const interactiveContext = GlobalTestState.interactiveCanvas.getContext(
+      "2d",
+    )!;
+    interactiveContext.__clearEvents();
+
+    API.setSelectedElements([rect1, rect2]);
+
+    expect(h.state.selectedGroupIds).toEqual({ A: true });
+
+    const strokeStyleEvents = interactiveContext
+      .__getEvents()
+      .filter((event) => event.type === "strokeStyle")
+      .map((event) => event.props.value);
+
+    expect(strokeStyleEvents).toContain("#6965db");
+    expect(strokeStyleEvents).not.toContain("#000000");
   });
 });
 
