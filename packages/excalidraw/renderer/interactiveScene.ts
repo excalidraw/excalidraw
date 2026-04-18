@@ -944,6 +944,15 @@ type ElementSelectionBorder = {
   padding?: number;
 };
 
+const getGroupSelectionColors = (
+  groupElements: readonly ExcalidrawElement[],
+  selectionColor: string,
+) => {
+  return groupElements.some((element) => element.locked)
+    ? ["#ced4da"]
+    : [selectionColor];
+};
+
 const renderSelectionBorder = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -1867,9 +1876,10 @@ const _renderInteractiveScene = ({
           x2,
           y1,
           y2,
-          selectionColors: groupElements.some((el) => el.locked)
-            ? ["#ced4da"]
-            : ["#000"],
+          selectionColors: getGroupSelectionColors(
+            groupElements,
+            selectionColor,
+          ),
           dashed: true,
           cx: x1 + (x2 - x1) / 2,
           cy: y1 + (y2 - y1) / 2,
