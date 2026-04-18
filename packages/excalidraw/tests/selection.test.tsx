@@ -1,6 +1,8 @@
 import React from "react";
 import { vi } from "vitest";
 
+import type { CanvasRenderingContext2DEvent } from "jest-canvas-mock";
+
 import { KEYS, ROUNDNESS, reseed } from "@excalidraw/common";
 import { getElementBounds, getElementLineSegments } from "@excalidraw/element";
 import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
@@ -42,6 +44,11 @@ beforeEach(() => {
 const { h } = window;
 
 const mouse = new Pointer("mouse");
+
+type MockedCanvasRenderingContext2D = CanvasRenderingContext2D & {
+  __getEvents(): CanvasRenderingContext2DEvent[];
+  __clearEvents(): void;
+};
 
 const getOutlineBounds = (element: ReturnType<typeof API.createElement>) => {
   const sceneElement = API.getElement(element);
@@ -760,7 +767,7 @@ describe("inner box-selection", () => {
 
     const interactiveContext = GlobalTestState.interactiveCanvas.getContext(
       "2d",
-    )!;
+    )! as MockedCanvasRenderingContext2D;
     interactiveContext.__clearEvents();
 
     API.setSelectedElements([rect1, rect2]);
