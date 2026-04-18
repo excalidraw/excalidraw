@@ -528,6 +528,20 @@ const ExcalidrawWrapper = () => {
     initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve(data.scene);
+
+      // When a shared link is loaded (non-collab external scene), pause
+      // localStorage saves until the user explicitly interacts with the canvas.
+      // Without this, the initial onChange from rendering the shared scene
+      // overwrites localStorage and causes other open tabs to lose their work
+      // when they sync on regaining focus.
+      if (data.isExternalScene && !collabAPI?.isCollaborating()) {
+        LocalData.pauseSave("sharedLink");
+        window.addEventListener(
+          "pointerdown",
+          () => LocalData.resumeSave("sharedLink"),
+          { once: true },
+        );
+      }
     });
 
     const onHashChange = async (event: HashChangeEvent) => {
@@ -647,6 +661,9 @@ const ExcalidrawWrapper = () => {
         visibilityChange,
         false,
       );
+      // Release the sharedLink save lock in case the component unmounts
+      // before the user ever interacts with the canvas.
+      LocalData.resumeSave("sharedLink");
     };
   }, [isCollabDisabled, collabAPI, excalidrawAPI, setLangCode, loadImages]);
 
