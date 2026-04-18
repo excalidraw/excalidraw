@@ -500,6 +500,26 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  .floating-status-stack {
+    position: absolute;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+
+    .scroll-back-to-content {
+      position: static;
+      left: auto;
+      bottom: auto;
+      transform: none;
+      pointer-events: var(--ui-pointerEvents);
+    }
+  }
+
   .help-icon {
     @include outlineButtonStyles;
     @include filledButtonOnCanvas;

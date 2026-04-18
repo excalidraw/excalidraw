@@ -1,14 +1,27 @@
-import React, { useEffect } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { DEFAULT_UI_OPTIONS, isShallowEqual } from "@excalidraw/common";
 
-import App from "./components/App";
+import App, {
+  ExcalidrawAPIContext,
+  ExcalidrawAPISetContext,
+} from "./components/App";
 import { InitializeApp } from "./components/InitializeApp";
 import Footer from "./components/footer/FooterCenter";
 import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
 import { defaultLang } from "./i18n";
+import {
+  useAppStateValue as _useAppStateValue,
+  useOnAppStateChange as _useOnAppStateChange,
+} from "./hooks/useAppStateValue";
 import { EditorJotaiProvider, editorJotaiStore } from "./editor-jotai";
 import polyfill from "./polyfill";
 
@@ -16,16 +29,45 @@ import "./css/app.scss";
 import "./css/styles.scss";
 import "./fonts/fonts.css";
 
-import type { AppProps, ExcalidrawProps } from "./types";
+import type {
+  AppProps,
+  AppState,
+  ExcalidrawImperativeAPI,
+  ExcalidrawProps,
+} from "./types";
 
 polyfill();
 
+/**
+ * Stateless provider that allows `useExcalidrawAPI()` (and hooks built
+ * on it, such as `useAppStateValue()` and `useOnAppStateChange()`) to work
+ * outside the <Excalidraw> component tree.
+ */
+export const ExcalidrawAPIProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const [api, setApi] = useState<ExcalidrawImperativeAPI | null>(null);
+  return (
+    <ExcalidrawAPIContext.Provider value={api}>
+      <ExcalidrawAPISetContext.Provider value={setApi}>
+        {children}
+      </ExcalidrawAPISetContext.Provider>
+    </ExcalidrawAPIContext.Provider>
+  );
+};
+
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
+    onExport,
     onChange,
     onIncrement,
     initialData,
-    excalidrawAPI,
+    onExcalidrawAPI,
+    onMount,
+    onUnmount,
+    onInitialize,
     isCollaborating = false,
     onPointerUpdate,
     renderTopLeftUI,
@@ -86,6 +128,19 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     UIOptions.canvasActions.toggleTheme = true;
   }
 
+  const setExcalidrawAPI = useContext(ExcalidrawAPISetContext);
+
+  const onExcalidrawAPIRef = useRef(onExcalidrawAPI);
+  onExcalidrawAPIRef.current = onExcalidrawAPI;
+
+  const handleExcalidrawAPI = useCallback(
+    (api: ExcalidrawImperativeAPI | null) => {
+      setExcalidrawAPI?.(api);
+      onExcalidrawAPIRef.current?.(api);
+    },
+    [setExcalidrawAPI],
+  );
+
   useEffect(() => {
     const importPolyfill = async () => {
       //@ts-ignore
@@ -115,10 +170,14 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     <EditorJotaiProvider store={editorJotaiStore}>
       <InitializeApp langCode={langCode} theme={theme}>
         <App
+          onExport={onExport}
           onChange={onChange}
           onIncrement={onIncrement}
           initialData={initialData}
-          excalidrawAPI={excalidrawAPI}
+          onExcalidrawAPI={handleExcalidrawAPI}
+          onMount={onMount}
+          onUnmount={onUnmount}
+          onInitialize={onInitialize}
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
           renderTopLeftUI={renderTopLeftUI}
@@ -267,6 +326,7 @@ export {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
   getFormFactor,
+  throttleRAF,
 } from "@excalidraw/common";
 
 export {
@@ -284,7 +344,13 @@ export { Button } from "./components/Button";
 export { Footer };
 export { MainMenu };
 export { Ellipsify } from "./components/Ellipsify";
-export { useEditorInterface, useStylesPanelMode } from "./components/App";
+export {
+  useEditorInterface,
+  useStylesPanelMode,
+  useExcalidrawAPI,
+  ExcalidrawAPIContext,
+} from "./components/App";
+
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
 export { Stats } from "./components/Stats";
@@ -316,6 +382,8 @@ export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToC
 export { getDataURL } from "./data/blob";
 export { isElementLink } from "@excalidraw/element";
 
+export { Fonts } from "./fonts/Fonts";
+
 export { setCustomTextMetricsProvider } from "@excalidraw/element";
 
 export { CommandPalette } from "./components/CommandPalette/CommandPalette";
@@ -325,3 +393,35 @@ export {
   tryParseSpreadsheet,
   isSpreadsheetValidForChartType,
 } from "./charts";
+
+// -----------------------------------------------------------------------------
+// useExcalidrawStateValue() wrapper for host apps for the return type to reflect the
+// the potentially `undefined` value for initial render before the excalidrawAPI
+// is ready.
+//
+/**
+ * hook that subscribes to specific appState prop(s)
+ *
+ * @param prop - appState prop(s) to subscribe to, or a selector function.
+ * NOTE `prop/selector` is memoized and will not change after initial render
+ */
+export function useExcalidrawStateValue<K extends keyof AppState>(
+  prop: K,
+): AppState[K] | undefined;
+export function useExcalidrawStateValue<T extends keyof AppState>(
+  props: T[],
+): AppState | undefined;
+export function useExcalidrawStateValue<T>(
+  selector: (appState: AppState) => T,
+): T | undefined;
+export function useExcalidrawStateValue(
+  selector:
+    | keyof AppState
+    | (keyof AppState)[]
+    | ((appState: AppState) => unknown),
+) {
+  return _useAppStateValue(selector as any, false);
+}
+// -----------------------------------------------------------------------------
+
+export { _useOnAppStateChange as useOnExcalidrawStateChange };
