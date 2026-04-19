@@ -189,7 +189,9 @@
     "boxSelectionContain": "Wrap",
     "boxSelectionOverlap": "Overlap",
     "arrowBinding": "Arrow binding",
-    "midpointSnapping": "Snap to midpoints"
+    "midpointSnapping": "Snap to midpoints",
+    "sharedLinkDeferredNotice": "You're viewing a shared link. Your canvas here stays as-is until you choose what to do.",
+    "sharedLinkDismiss": "Not now"
   },
   "elementLink": {
     "title": "Link to object",
@@ -255,7 +257,8 @@
     "publishLibrary": "Rename or publish",
     "submit": "Submit",
     "confirm": "Confirm",
-    "embeddableInteractionButton": "Click to interact"
+    "embeddableInteractionButton": "Click to interact",
+    "sharedLinkSeeOptions": "See options"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",

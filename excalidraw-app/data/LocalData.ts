@@ -112,7 +112,7 @@ const isQuotaExceededError = (error: any) => {
   return error instanceof DOMException && error.name === "QuotaExceededError";
 };
 
-type SavingLockTypes = "collaboration";
+type SavingLockTypes = "collaboration" | "sharedLink";
 
 export class LocalData {
   private static _save = debounce(
@@ -158,6 +158,11 @@ export class LocalData {
 
   static resumeSave = (lockType: SavingLockTypes) => {
     this.locker.unlock(lockType);
+  };
+
+  /** True while implicit "shared link" gate is holding persistence (see App.tsx). */
+  static isSharedLinkSaveLocked = () => {
+    return this.locker.isLocked("sharedLink");
   };
 
   static isSavePaused = () => {
