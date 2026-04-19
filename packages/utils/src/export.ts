@@ -53,12 +53,12 @@ export const exportToCanvas = ({
   });
   const restoredAppState = restoreAppState(appState, null);
 
-  const { exportBackground, viewBackgroundColor } = restoredAppState;
+  const { exportBackground, viewBackgroundColor, exportGrid } = restoredAppState;
   return _exportToCanvas(
     restoredElements,
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
-    { exportBackground, exportPadding, viewBackgroundColor, exportingFrame },
+    { exportBackground, exportPadding, viewBackgroundColor, exportingFrame, exportGrid },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
 

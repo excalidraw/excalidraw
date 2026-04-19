@@ -85,6 +85,7 @@ const ImageExportModal = ({
     appStateSnapshot.exportEmbedScene,
   );
   const [exportScale, setExportScale] = useState(appStateSnapshot.exportScale);
+  const [exportGrid, setExportGrid] = useState(appStateSnapshot.exportGrid);
 
   const previewRef = useRef<HTMLDivElement>(null);
   const previewRenderRequestIdRef = useRef(0);
@@ -102,6 +103,7 @@ const ImageExportModal = ({
     exportWithDarkMode,
     exportScale,
     embedScene,
+    exportGrid,
     resetCopyStatus,
   ]);
 
@@ -136,6 +138,7 @@ const ImageExportModal = ({
         exportWithDarkMode,
         exportScale,
         exportEmbedScene: embedScene,
+        exportGrid,
       },
       files,
       exportPadding: DEFAULT_EXPORT_PADDING,
@@ -279,6 +282,18 @@ const ImageExportModal = ({
                 "ui",
                 checked,
               );
+            }}
+          />
+        </ExportSetting>
+        <ExportSetting
+          label={t("imageExportDialog.label.withGrid")}
+          name="exportGridSwitch"
+        >
+          <Switch
+            name="exportGridSwitch"
+            checked={exportGrid}
+            onChange={(checked) => {
+              setExportGrid(checked);
             }}
           />
         </ExportSetting>

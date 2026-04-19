@@ -92,6 +92,7 @@
     "colorPicker": "Color picker",
     "canvasColors": "Used on canvas",
     "canvasBackground": "Canvas background",
+    "showGridBackground": "Show grid",
     "drawingCanvas": "Drawing canvas",
     "clearCanvas": "Clear canvas",
     "layers": "Layers",
@@ -507,6 +508,7 @@
       "onlySelected": "Only selected",
       "darkMode": "Dark mode",
       "embedScene": "Embed scene",
+      "withGrid": "Include grid",
       "scale": "Scale",
       "padding": "Padding"
     },

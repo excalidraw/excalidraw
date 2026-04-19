@@ -182,11 +182,13 @@ export const exportToCanvas = async (
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
     exportingFrame,
+    exportGrid = false,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     exportingFrame?: ExcalidrawFrameLikeElement | null;
+    exportGrid?: boolean;
   },
   createCanvas: (
     width: number,
@@ -267,6 +269,7 @@ export const exportToCanvas = async (
       canvasBackgroundColor: viewBackgroundColor,
       imageCache,
       renderGrid: false,
+      renderDotGrid: exportGrid,
       isExporting: true,
       // empty disables embeddable rendering
       embedsValidationStatus: new Map(),

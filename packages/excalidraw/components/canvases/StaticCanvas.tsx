@@ -93,6 +93,7 @@ const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {
     selectedElementsAreBeingDragged: appState.selectedElementsAreBeingDragged,
     gridSize: appState.gridSize,
     gridStep: appState.gridStep,
+    showGridBackground: appState.showGridBackground,
     frameRendering: appState.frameRendering,
     selectedElementIds: appState.selectedElementIds,
     frameToHighlight: appState.frameToHighlight,

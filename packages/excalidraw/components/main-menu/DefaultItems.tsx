@@ -34,6 +34,7 @@ import {
 } from "../App";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
+import { Switch } from "../Switch";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
 import DropdownMenuItemCheckbox from "../dropdownMenu/DropdownMenuItemCheckbox";
 import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
@@ -314,6 +315,7 @@ export const ChangeCanvasBackground = () => {
   const appState = useUIAppState();
   const actionManager = useExcalidrawActionManager();
   const appProps = useAppProps();
+  const setAppState = useExcalidrawSetAppState();
 
   if (
     appState.viewModeEnabled ||
@@ -335,6 +337,30 @@ export const ChangeCanvasBackground = () => {
       </div>
       <div style={{ padding: "0 0.625rem" }}>
         {actionManager.renderAction("changeViewBackgroundColor")}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0.5rem 0.625rem",
+          marginTop: "0.5rem",
+        }}
+      >
+        <span
+          style={{
+            fontSize: "0.875rem",
+          }}
+        >
+          {t("labels.showGridBackground")}
+        </span>
+        <Switch
+          name="showGridBackground"
+          checked={appState.showGridBackground}
+          onChange={(checked) => {
+            setAppState({ showGridBackground: checked });
+          }}
+        />
       </div>
     </div>
   );

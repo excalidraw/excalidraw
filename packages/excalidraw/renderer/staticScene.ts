@@ -53,6 +53,11 @@ const GridLineColor = {
   },
 } as const;
 
+const GridDotColor = {
+  [THEME.LIGHT]: "#c0c0c0",
+  [THEME.DARK]: applyDarkModeFilter("#c0c0c0"),
+} as const;
+
 const strokeGrid = (
   context: CanvasRenderingContext2D,
   /** grid cell pixel size */
@@ -126,6 +131,43 @@ const strokeGrid = (
     context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
     context.stroke();
   }
+  context.restore();
+};
+
+const strokeDotGrid = (
+  context: CanvasRenderingContext2D,
+  gridSize: number,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
+  theme: StaticCanvasRenderConfig["theme"],
+  width: number,
+  height: number,
+) => {
+  const offsetX = (scrollX % gridSize) - gridSize;
+  const offsetY = (scrollY % gridSize) - gridSize;
+
+  const actualGridSize = gridSize * zoom.value;
+
+  if (actualGridSize < 5) {
+    return;
+  }
+
+  context.save();
+
+  const dotRadius = Math.max(1, Math.min(2, actualGridSize / 20));
+
+  context.fillStyle = GridDotColor[theme];
+  context.beginPath();
+
+  for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
+    for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
+      context.moveTo(x + dotRadius, y);
+      context.arc(x, y, dotRadius, 0, Math.PI * 2);
+    }
+  }
+
+  context.fill();
   context.restore();
 };
 
@@ -240,7 +282,7 @@ const _renderStaticScene = ({
     return;
   }
 
-  const { renderGrid = true, isExporting } = renderConfig;
+  const { renderGrid = true, renderDotGrid = false, isExporting } = renderConfig;
 
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
     canvas,
@@ -260,12 +302,30 @@ const _renderStaticScene = ({
   // Apply zoom
   context.scale(appState.zoom.value, appState.zoom.value);
 
-  // Grid
+  // Line Grid (for gridModeEnabled)
   if (renderGrid) {
     strokeGrid(
       context,
       appState.gridSize,
       appState.gridStep,
+      appState.scrollX,
+      appState.scrollY,
+      appState.zoom,
+      renderConfig.theme,
+      normalizedWidth / appState.zoom.value,
+      normalizedHeight / appState.zoom.value,
+    );
+  }
+
+  // Dot Grid (for showGridBackground)
+  const shouldRenderDotGrid = isExporting
+    ? renderDotGrid
+    : appState.showGridBackground;
+
+  if (shouldRenderDotGrid) {
+    strokeDotGrid(
+      context,
+      appState.gridSize,
       appState.scrollX,
       appState.scrollY,
       appState.zoom,

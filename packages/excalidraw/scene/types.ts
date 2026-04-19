@@ -30,6 +30,7 @@ export type StaticCanvasRenderConfig = {
   // ---------------------------------------------------------------------------
   imageCache: AppClassProperties["imageCache"];
   renderGrid: boolean;
+  renderDotGrid: boolean;
   /** when exporting the behavior is slightly different (e.g. we can't use
    CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
