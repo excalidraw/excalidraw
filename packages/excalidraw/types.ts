@@ -349,6 +349,7 @@ export interface AppState {
   };
   penMode: boolean;
   penDetected: boolean;
+  persistentLaser: boolean;
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;

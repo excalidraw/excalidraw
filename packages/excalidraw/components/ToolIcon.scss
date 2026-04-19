@@ -195,4 +195,21 @@
       height: var(--default-button-size);
     }
   }
+
+  .LaserPointerButton__persistentToggle {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    z-index: 1;
+
+    .LaserPointerButton__persistentCheckbox {
+      width: 12px;
+      height: 12px;
+      margin: 0;
+      cursor: pointer;
+      accent-color: var(--color-success);
+    }
+  }
 }
