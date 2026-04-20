@@ -1707,7 +1707,7 @@ describe("textWysiwyg", () => {
       );
     });
 
-    it("shouldn't bind to container if container has bound text not centered and text tool is used", async () => {
+    it("should edit the existing label anywhere inside a labeled container unless ctrl/cmd is held", async () => {
       expect(h.elements.length).toBe(1);
 
       Keyboard.keyPress(KEYS.ENTER);
@@ -1733,12 +1733,28 @@ describe("textWysiwyg", () => {
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).verticalAlign,
       ).toBe(VERTICAL_ALIGN.BOTTOM);
-      // Attempt to Bind 2nd text using text tool
+
+      // Clicking anywhere inside the shape should keep editing the existing label.
       UI.clickTool("text");
-      mouse.clickAt(
-        rectangle.x + rectangle.width / 2,
-        rectangle.y + rectangle.height / 2,
-      );
+      mouse.clickAt(rectangle.x + 10, rectangle.y + 10);
+      editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+      updateTextEditor(editor, "Hello again!");
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements.length).toBe(2);
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: h.elements[1].id, type: "text" },
+      ]);
+      text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.containerId).toBe(rectangle.id);
+      expect(text.originalText).toBe("Hello again!");
+
+      // Holding ctrl/cmd should opt out and create a new free text element instead.
+      UI.clickTool("text");
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        mouse.clickAt(rectangle.x + 10, rectangle.y + 10);
+      });
       editor = await getTextEditor();
       updateTextEditor(editor, "Excalidraw");
       Keyboard.exitTextEditor(editor);
@@ -1747,9 +1763,26 @@ describe("textWysiwyg", () => {
       expect(rectangle.boundElements).toStrictEqual([
         { id: h.elements[1].id, type: "text" },
       ]);
-      text = h.elements[2] as ExcalidrawTextElementWithContainer;
+      const newText = h.elements[2] as ExcalidrawTextElementWithContainer;
+      expect(newText.containerId).toBe(null);
+      expect(newText.text).toBe("Excalidraw");
+    });
+
+    it("should allow dragging a free text box inside a container away from the label center", async () => {
+      UI.clickTool("text");
+      mouse.downAt(rectangle.x + 10, rectangle.y + 10);
+      mouse.moveTo(rectangle.x + 140, rectangle.y + 10);
+      mouse.up();
+
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Excalidraw");
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements.length).toBe(2);
+
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.containerId).toBe(null);
-      expect(text.text).toBe("Excalidraw");
+      expect(text.autoResize).toBe(false);
     });
 
     it("should reset the text element angle to the container's when binding to rotated non-arrow container", async () => {
