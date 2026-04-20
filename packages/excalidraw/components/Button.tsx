@@ -12,7 +12,6 @@ interface ButtonProps
   > {
   type?: "button" | "submit" | "reset";
   onSelect: () => any;
-  /** whether button is in active state */
   selected?: boolean;
   children: React.ReactNode;
   className?: string;
