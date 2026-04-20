@@ -199,6 +199,7 @@
     "texts": "文本"
   },
   "buttons": {
+    "clearAndResetCanvas": "清空并重置画布",
     "clearReset": "重置画布",
     "exportJSON": "导出为文件",
     "exportImage": "导出图片...",

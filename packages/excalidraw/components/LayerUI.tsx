@@ -22,7 +22,7 @@ import { actionToggleStats } from "../actions";
 import { trackEvent } from "../analytics";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { UIAppStateContext } from "../context/ui-appState";
-import { useAtom, useAtomValue } from "../editor-jotai";
+import { useAtom, useAtomValue, useSetAtom } from "../editor-jotai";
 
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
@@ -43,10 +43,12 @@ import { PenModeButton } from "./PenModeButton";
 import Footer from "./footer/Footer";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import MainMenu from "./main-menu/MainMenu";
-import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
+import { ActiveConfirmDialog, activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { useEditorInterface, useStylesPanelMode } from "./App";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
-import { sidebarRightIcon } from "./icons";
+import { sidebarRightIcon, TrashIcon } from "./icons";
+import { ToolButton } from "./ToolButton";
+import { Tooltip } from "./Tooltip";
 import { DefaultSidebar } from "./DefaultSidebar";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
@@ -185,6 +187,7 @@ const LayerUI = ({
   const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
 
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
+  const setActiveConfirmDialog = useSetAtom(activeConfirmDialogAtom);
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -411,6 +414,20 @@ const LayerUI = ({
               editorInterface.formFactor === "phone",
               appState,
             )}
+            {!appState.viewModeEnabled &&
+              appState.openDialog?.name !== "elementLinkSelector" && (
+                <Tooltip label={t("buttons.clearAndResetCanvas")}>
+                  <ToolButton
+                    type="button"
+                    icon={TrashIcon}
+                    aria-label={t("buttons.clearAndResetCanvas")}
+                    onClick={() => {
+                      setActiveConfirmDialog("clearCanvas");
+                    }}
+                    className="clear-canvas-button"
+                  />
+                </Tooltip>
+              )}
             {!appState.viewModeEnabled &&
               appState.openDialog?.name !== "elementLinkSelector" &&
               // hide button when sidebar docked

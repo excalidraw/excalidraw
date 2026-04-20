@@ -217,6 +217,7 @@
     "texts": "Texts"
   },
   "buttons": {
+    "clearAndResetCanvas": "Clear and reset canvas",
     "clearReset": "Reset the canvas",
     "exportJSON": "Export to file",
     "exportImage": "Export image...",
