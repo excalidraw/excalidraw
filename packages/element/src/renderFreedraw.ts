@@ -20,6 +20,9 @@ import type {
 
 const DEFAULT_FREEDRAW_PRESSURE = 0.5;
 
+// Ever-incrementing capsule counter used to produce rotating hue coloring.
+let capsuleIndex = 0;
+
 /**
  * Draws a single tapered capsule (variable-width filled stroke segment) from
  * (x0,y0) with radius r0 to (x1,y1) with radius r1.  The shape is a filled
@@ -49,6 +52,14 @@ const drawTaperedCapsule = (
     return;
   }
 
+  // Debug: rotating hue based on capsule index to visually verify that segments
+  //
+  const strokeColor = `hsl(${(capsuleIndex * 37) % 360} 100% 50%)`;
+  capsuleIndex++;
+  if (false) {
+    context.fillStyle = strokeColor;
+  }
+
   const angle = Math.atan2(dy, dx);
   const px = -dy / len; // perpendicular unit x = -sin(angle)
   const py = dx / len; // perpendicular unit y =  cos(angle)
@@ -67,11 +78,13 @@ const drawTaperedCapsule = (
 };
 
 /**
- * Target spacing (in scene units) between consecutive capsule sub-segments
- * produced by the Catmull-Rom bezier subdivision.  Smaller values give
- * smoother curves at the cost of more draw calls.
+ * Flatness tolerance in screen pixels for adaptive Bezier subdivision.
+ * A cubic segment is considered flat (and drawn as a single capsule) when
+ * both interior control points deviate less than this many pixels from the
+ * p0→p1 chord.  Smaller values give smoother curves at the cost of more draw
+ * calls.
  */
-const BEZIER_SUBDIVIDE_TARGET_SPACING = 3;
+const BEZIER_FLATNESS_TOLERANCE_PX = 0.1;
 
 /**
  * Half-width (in samples) of the triangular smoothing kernel applied to raw
@@ -143,11 +156,31 @@ const getCatmullRomTangent = (
   return [tx, ty];
 };
 
+// Stack entry for adaptive Bezier subdivision.
+// [p0x, p0y, r0, cp1x, cp1y, cp2x, cp2y, p1x, p1y, r1]
+type BezierSegment = [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+];
+
+// Reusable stack to avoid per-frame allocation.
+const subdivStack: BezierSegment[] = [];
+
 /**
- * Draws one bezier-subdivided tapered segment from p0 (radius r0) to p1
+ * Draws one adaptively-subdivided tapered segment from p0 (radius r0) to p1
  * (radius r1). t0/t1 are the Catmull-Rom tangents at p0 and p1 respectively.
- * The segment is sampled at BEZIER_SUBDIVIDE_TARGET_SPACING scene-unit
- * intervals and each sub-interval is drawn as a tapered capsule.
+ *
+ * Uses de Casteljau bisection: a segment is split at t=0.5 until both interior
+ * control points are within BEZIER_FLATNESS_TOLERANCE_PX pixels of the chord,
+ * guaranteeing that each drawn capsule has focus-point distance ≈ chord ≈ arc.
  */
 const drawSubdividedSegment = (
   context: CanvasRenderingContext2D,
@@ -163,41 +196,79 @@ const drawSubdividedSegment = (
   t1y: number,
   scale: number,
 ) => {
-  const segLen = Math.sqrt((p1x - p0x) ** 2 + (p1y - p0y) ** 2);
-  // Target spacing is in screen pixels; divide by scale to get scene units.
-  const nSubdiv = Math.max(
-    1,
-    Math.ceil((segLen * scale) / BEZIER_SUBDIVIDE_TARGET_SPACING),
-  );
-
   // Cubic Bezier control points derived from Catmull-Rom tangents.
   const cp1x = p0x + t0x / 3;
   const cp1y = p0y + t0y / 3;
   const cp2x = p1x - t1x / 3;
   const cp2y = p1y - t1y / 3;
 
-  let prevX = p0x;
-  let prevY = p0y;
-  let prevR = r0;
+  // Tighten the flatness tolerance at high-angle turns to produce 2× more
+  // capsules there.  The turn angle is the angle between the entry tangent t0
+  // and exit tangent t1.  cos θ goes from 1 (straight) to −1 (U-turn).
+  // toleranceFactor = 0.5 + 0.5·max(0, cos θ), so it is 1.0 for straight
+  // segments and 0.5 (half tolerance → 2× resolution) for turns ≥ 90°.
+  const t0Len = Math.sqrt(t0x * t0x + t0y * t0y);
+  const t1Len = Math.sqrt(t1x * t1x + t1y * t1y);
+  const cosTheta =
+    t0Len > 1e-10 && t1Len > 1e-10
+      ? (t0x * t1x + t0y * t1y) / (t0Len * t1Len)
+      : 1;
+  const toleranceFactor = 0.5 + 0.5 * Math.max(0, cosTheta);
 
-  for (let k = 1; k <= nSubdiv; k++) {
-    const t = k / nSubdiv;
-    const mt = 1 - t;
-    const mt2 = mt * mt;
-    const t2 = t * t;
-    const mt3 = mt2 * mt;
-    const t3 = t2 * t;
-    const mt2t3 = 3 * mt2 * t;
-    const mtt23 = 3 * mt * t2;
+  // Flatness tolerance in scene units.
+  const tol = (BEZIER_FLATNESS_TOLERANCE_PX * toleranceFactor) / scale;
+  const tolSq = tol * tol;
 
-    const x = mt3 * p0x + mt2t3 * cp1x + mtt23 * cp2x + t3 * p1x;
-    const y = mt3 * p0y + mt2t3 * cp1y + mtt23 * cp2y + t3 * p1y;
-    const r = r0 + (r1 - r0) * t;
+  let top = 0;
+  subdivStack[top++] = [p0x, p0y, r0, cp1x, cp1y, cp2x, cp2y, p1x, p1y, r1];
 
-    drawTaperedCapsule(context, prevX, prevY, prevR, x, y, r);
-    prevX = x;
-    prevY = y;
-    prevR = r;
+  while (top > 0) {
+    const seg = subdivStack[--top];
+    const [ax, ay, ar, b1x, b1y, b2x, b2y, dx, dy, dr] = seg;
+
+    // Squared distance from a point to the chord (ax,ay)→(dx,dy).
+    const cdx = dx - ax;
+    const cdy = dy - ay;
+    const chordLenSq = cdx * cdx + cdy * cdy;
+
+    let flat: boolean;
+    if (chordLenSq < 1e-10) {
+      // Degenerate chord: check raw distance to endpoints.
+      flat =
+        (b1x - ax) * (b1x - ax) + (b1y - ay) * (b1y - ay) <= tolSq &&
+        (b2x - ax) * (b2x - ax) + (b2y - ay) * (b2y - ay) <= tolSq;
+    } else {
+      // Perpendicular distance² = |cross|² / |chord|²
+      const cross1 = (b1x - ax) * cdy - (b1y - ay) * cdx;
+      const cross2 = (b2x - ax) * cdy - (b2y - ay) * cdx;
+      flat =
+        cross1 * cross1 <= tolSq * chordLenSq &&
+        cross2 * cross2 <= tolSq * chordLenSq;
+    }
+
+    if (flat) {
+      drawTaperedCapsule(context, ax, ay, ar, dx, dy, dr);
+      continue;
+    }
+
+    // De Casteljau bisection at t = 0.5.
+    const m01x = (ax + b1x) * 0.5;
+    const m01y = (ay + b1y) * 0.5;
+    const m12x = (b1x + b2x) * 0.5;
+    const m12y = (b1y + b2y) * 0.5;
+    const m23x = (b2x + dx) * 0.5;
+    const m23y = (b2y + dy) * 0.5;
+    const m012x = (m01x + m12x) * 0.5;
+    const m012y = (m01y + m12y) * 0.5;
+    const m123x = (m12x + m23x) * 0.5;
+    const m123y = (m12y + m23y) * 0.5;
+    const mx = (m012x + m123x) * 0.5;
+    const my = (m012y + m123y) * 0.5;
+    const mr = (ar + dr) * 0.5;
+
+    // Push right half first so left half is processed first (LIFO).
+    subdivStack[top++] = [mx, my, mr, m123x, m123y, m23x, m23y, dx, dy, dr];
+    subdivStack[top++] = [ax, ay, ar, m01x, m01y, m012x, m012y, mx, my, mr];
   }
 };
 
@@ -603,5 +674,6 @@ export const generateOrUpdateFreeDrawIncrementalCanvas = (
 export const invalidateFreeDrawIncrementalCanvas = (
   element: ExcalidrawFreeDrawElement,
 ) => {
+  capsuleIndex = 0;
   freedrawIncrementalCache.delete(element);
 };
