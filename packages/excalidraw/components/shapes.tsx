@@ -112,7 +112,7 @@ export const SHAPES = [
     key: KEYS.K,
     numericKey: null,
     fillable: false,
-    toolbar: false,
+    toolbar: true,
   },
 ] as const;
 

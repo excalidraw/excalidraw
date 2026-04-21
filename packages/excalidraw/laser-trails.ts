@@ -25,6 +25,9 @@ export class LaserTrails implements Trail {
     this.localTrail = new AnimatedTrail(animationFrameHandler, app, {
       ...this.getTrailOptions(),
       fill: () => DEFAULT_LASER_COLOR,
+      glowEffect: true,
+      glowColor: DEFAULT_LASER_COLOR,
+      glowBlur: 6,
     });
   }
 
@@ -33,7 +36,7 @@ export class LaserTrails implements Trail {
       simplify: 0,
       streamline: 0.4,
       sizeMapping: (c) => {
-        const DECAY_TIME = 1000;
+        const DECAY_TIME = 800;
         const DECAY_LENGTH = 50;
         const t = Math.max(
           0,
@@ -91,6 +94,11 @@ export class LaserTrails implements Trail {
           fill: () =>
             collaborator.pointer?.laserColor ||
             getClientColor(key, collaborator),
+          glowEffect: true,
+          glowColor:
+            collaborator.pointer?.laserColor ||
+            getClientColor(key, collaborator),
+          glowBlur: 6,
         });
         trail.start(this.container);
 
