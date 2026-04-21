@@ -325,6 +325,7 @@ import {
   actionToggleMidpointSnapping,
   actionToggleCropEditor,
 } from "../actions";
+import "../actions/actionAISmartConnectorLabels";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
 import { actionPaste } from "../actions/actionClipboard";
@@ -492,6 +493,7 @@ import type {
   EmbedsValidationStatus,
   ElementsPendingErasure,
   ExcalidrawImperativeAPIEventMap,
+  GenerateAISmartConnectorLabels,
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
@@ -2503,6 +2505,9 @@ class App extends React.Component<AppProps, AppState> {
     diagramToCode?: {
       generate: GenerateDiagramToCode;
     };
+    aiSmartConnectorLabels?: {
+      suggest: GenerateAISmartConnectorLabels;
+    };
   } = {};
 
   public setPlugins(plugins: Partial<App["plugins"]>) {
@@ -2614,6 +2619,173 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
   }
+
+  public onAISmartConnectorLabels = async () => {
+    const suggestLabels = this.plugins.aiSmartConnectorLabels?.suggest;
+
+    if (!suggestLabels) {
+      this.setState({
+        errorMessage: "No AI smart connector labels plugin found",
+      });
+      return;
+    }
+
+    const selectedArrows = this.scene
+      .getSelectedElements({
+        selectedElementIds: this.state.selectedElementIds,
+      })
+      .filter(isArrowElement);
+
+    if (!selectedArrows.length) {
+      this.setState({
+        errorMessage: "Select at least one arrow to suggest labels",
+      });
+      return;
+    }
+
+    trackEvent("ai", "smart-connector-labels (start)", "labels");
+
+    try {
+      const { labels } = await suggestLabels({
+        selectedArrows,
+        allElements: this.scene.getNonDeletedElements(),
+        appState: this.state,
+      });
+
+      if (!labels?.length) {
+        this.setState({
+          errorMessage: "AI label suggestions returned no updates",
+        });
+        return;
+      }
+
+      const selectedArrowIdSet = new Set(selectedArrows.map((arrow) => arrow.id));
+      const labelByArrowId = new Map(
+        labels
+          .map((item) => ({
+            arrowId: item.arrowId,
+            text: item.text.trim(),
+          }))
+          .filter(
+            (item) => selectedArrowIdSet.has(item.arrowId) && item.text.length > 0,
+          )
+          .map((item) => [item.arrowId, item.text]),
+      );
+
+      if (!labelByArrowId.size) {
+        this.setState({
+          errorMessage: "AI label suggestions were invalid for selection",
+        });
+        return;
+      }
+
+      const elements = this.scene.getElementsIncludingDeleted();
+      const elementsMap = this.scene.getElementsMapIncludingDeleted();
+      const updatedElementsById = new Map<
+        ExcalidrawElement["id"],
+        ExcalidrawElement
+      >();
+      const newTextByArrowId = new Map<
+        ExcalidrawElement["id"],
+        ExcalidrawTextElement
+      >();
+
+      for (const selectedArrow of selectedArrows) {
+        const labelText = labelByArrowId.get(selectedArrow.id);
+        if (!labelText) {
+          continue;
+        }
+
+        const latestArrow =
+          (updatedElementsById.get(selectedArrow.id) as ExcalidrawArrowElement) ||
+          selectedArrow;
+
+        const boundTextElement =
+          getBoundTextElement(latestArrow, elementsMap) ||
+          (updatedElementsById.get(
+            latestArrow.boundElements?.find((item) => item.type === "text")?.id || "",
+          ) as ExcalidrawTextElement | undefined);
+
+        if (boundTextElement) {
+          const nextBoundText = newElementWith(boundTextElement, {
+            text: labelText,
+            originalText: labelText,
+          });
+          redrawTextBoundingBox(nextBoundText, latestArrow, this.scene);
+          updatedElementsById.set(nextBoundText.id, nextBoundText);
+          continue;
+        }
+
+        const textElement = newTextElement({
+          x: latestArrow.x,
+          y: latestArrow.y,
+          strokeColor: latestArrow.strokeColor,
+          backgroundColor: "transparent",
+          fillStyle: latestArrow.fillStyle,
+          strokeWidth: latestArrow.strokeWidth,
+          strokeStyle: latestArrow.strokeStyle,
+          roughness: latestArrow.roughness,
+          opacity: latestArrow.opacity,
+          text: labelText,
+          originalText: labelText,
+          fontSize: this.state.currentItemFontSize,
+          fontFamily: this.state.currentItemFontFamily,
+          textAlign: "center",
+          verticalAlign: VERTICAL_ALIGN.MIDDLE,
+          autoResize: true,
+          lineHeight: getLineHeight(this.state.currentItemFontFamily),
+          angle: 0 as Radians,
+          containerId: latestArrow.id,
+          groupIds: latestArrow.groupIds,
+          frameId: latestArrow.frameId,
+        });
+
+        const nextArrow = newElementWith(latestArrow, {
+          boundElements: (latestArrow.boundElements || []).concat({
+            type: "text",
+            id: textElement.id,
+          }),
+        });
+
+        redrawTextBoundingBox(textElement, nextArrow, this.scene);
+        updatedElementsById.set(nextArrow.id, nextArrow);
+        newTextByArrowId.set(latestArrow.id, textElement);
+      }
+
+      if (!updatedElementsById.size && !newTextByArrowId.size) {
+        this.setState({
+          errorMessage: "AI label suggestions produced no actionable changes",
+        });
+        return;
+      }
+
+      const nextElements = elements.flatMap((element) => {
+        const maybeUpdated = updatedElementsById.get(element.id) || element;
+        const maybeNewLabel = newTextByArrowId.get(element.id);
+        if (!maybeNewLabel) {
+          return [maybeUpdated];
+        }
+        return [maybeUpdated, maybeNewLabel];
+      });
+
+      this.updateScene({
+        elements: nextElements,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+
+      this.setToast({
+        message: "Connector labels suggested",
+        closable: false,
+        duration: 1500,
+      });
+      trackEvent("ai", "smart-connector-labels (success)", "labels");
+    } catch (error: any) {
+      trackEvent("ai", "smart-connector-labels (failed)", "labels");
+      this.setState({
+        errorMessage: error?.message || "AI smart connector labels failed",
+      });
+    }
+  };
 
   public onMagicframeToolSelect = () => {
     const selectedElements = this.scene.getSelectedElements({

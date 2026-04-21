@@ -812,6 +812,7 @@ export type AppClassProperties = {
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
+  onAISmartConnectorLabels: App["onAISmartConnectorLabels"];
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];
   flowChartCreator: App["flowChartCreator"];
@@ -1047,6 +1048,17 @@ export type GenerateDiagramToCode = (props: {
   frame: ExcalidrawMagicFrameElement;
   children: readonly ExcalidrawElement[];
 }) => MaybePromise<{ html: string }>;
+
+export type GenerateAISmartConnectorLabels = (props: {
+  selectedArrows: readonly ExcalidrawLinearElement[];
+  allElements: readonly NonDeletedExcalidrawElement[];
+  appState: AppState;
+}) => MaybePromise<{
+  labels: readonly {
+    arrowId: ExcalidrawElement["id"];
+    text: string;
+  }[];
+}>;
 
 export type Offsets = Partial<{
   top: number;

@@ -379,6 +379,7 @@ export {
 } from "@excalidraw/utils/withinBounds";
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
+export { AISmartConnectorLabelsPlugin } from "./components/AISmartConnectorLabelsPlugin/AISmartConnectorLabelsPlugin";
 export { getDataURL } from "./data/blob";
 export { isElementLink } from "@excalidraw/element";
 
