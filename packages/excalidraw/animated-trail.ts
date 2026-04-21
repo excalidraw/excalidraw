@@ -25,12 +25,7 @@ export interface AnimatedTrailOptions {
   fill: (trail: AnimatedTrail) => string;
   stroke?: (trail: AnimatedTrail) => string;
   animateTrail?: boolean;
-  glowEffect?: boolean;
-  glowColor?: string;
-  glowBlur?: number;
 }
-
-let nextTrailId = 0;
 
 export class AnimatedTrail implements Trail {
   private currentTrail?: LaserPointer;
@@ -39,8 +34,6 @@ export class AnimatedTrail implements Trail {
   private container?: SVGSVGElement;
   private trailElement: SVGPathElement;
   private trailAnimation?: SVGAnimateElement;
-  private trailId: string;
-  private filterElement?: SVGFilterElement;
 
   constructor(
     private animationFrameHandler: AnimationFrameHandler,
@@ -49,7 +42,6 @@ export class AnimatedTrail implements Trail {
       Partial<AnimatedTrailOptions>,
   ) {
     this.animationFrameHandler.register(this, this.onFrame.bind(this));
-    this.trailId = `animated-trail-${nextTrailId++}`;
 
     this.trailElement = document.createElementNS(SVG_NS, "path");
     if (this.options.animateTrail) {
@@ -63,34 +55,6 @@ export class AnimatedTrail implements Trail {
       this.trailAnimation.setAttribute("dur", "0.3s");
       this.trailElement.appendChild(this.trailAnimation);
     }
-  }
-
-  private createGlowFilter(): SVGFilterElement {
-    const filter = document.createElementNS(SVG_NS, "filter");
-    filter.setAttribute("id", `glow-${this.trailId}`);
-    filter.setAttribute("x", "-50%");
-    filter.setAttribute("y", "-50%");
-    filter.setAttribute("width", "200%");
-    filter.setAttribute("height", "200%");
-
-    const blur = document.createElementNS(SVG_NS, "feGaussianBlur");
-    blur.setAttribute("in", "SourceGraphic");
-    blur.setAttribute("stdDeviation", `${this.options.glowBlur ?? 4}`);
-    blur.setAttribute("result", "coloredBlur");
-
-    const merge = document.createElementNS(SVG_NS, "feMerge");
-    const mergeNode1 = document.createElementNS(SVG_NS, "feMergeNode");
-    mergeNode1.setAttribute("in", "coloredBlur");
-    const mergeNode2 = document.createElementNS(SVG_NS, "feMergeNode");
-    mergeNode2.setAttribute("in", "SourceGraphic");
-
-    merge.appendChild(mergeNode1);
-    merge.appendChild(mergeNode2);
-
-    filter.appendChild(blur);
-    filter.appendChild(merge);
-
-    return filter;
   }
 
   get hasCurrentTrail() {
@@ -118,33 +82,11 @@ export class AnimatedTrail implements Trail {
       this.container.appendChild(this.trailElement);
     }
 
-    if (this.options.glowEffect && this.container && !this.filterElement) {
-      this.filterElement = this.createGlowFilter();
-
-      let defs = this.container.querySelector("defs");
-      if (!defs) {
-        defs = document.createElementNS(SVG_NS, "defs");
-        this.container.insertBefore(defs, this.container.firstChild);
-      }
-      defs.appendChild(this.filterElement);
-
-      this.trailElement.setAttribute(
-        "filter",
-        `url(#glow-${this.trailId})`,
-      );
-    }
-
     this.animationFrameHandler.start(this);
   }
 
   stop() {
     this.animationFrameHandler.stop(this);
-
-    if (this.filterElement) {
-      this.trailElement.removeAttribute("filter");
-      this.filterElement.parentNode?.removeChild(this.filterElement);
-      this.filterElement = undefined;
-    }
 
     if (this.trailElement.parentNode === this.container) {
       this.container?.removeChild(this.trailElement);

@@ -2,7 +2,7 @@ import { DEFAULT_LASER_COLOR, easeOut } from "@excalidraw/common";
 
 import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
 
-import { AnimatedTrail } from "./animated-trail";
+import { CanvasTrail } from "./canvas-trail";
 import { getClientColor } from "./clients";
 
 import type { Trail } from "./animated-trail";
@@ -11,8 +11,8 @@ import type App from "./components/App";
 import type { SocketId } from "./types";
 
 export class LaserTrails implements Trail {
-  public localTrail: AnimatedTrail;
-  private collabTrails = new Map<SocketId, AnimatedTrail>();
+  public localTrail: CanvasTrail;
+  private collabTrails = new Map<SocketId, CanvasTrail>();
 
   private container?: SVGSVGElement;
 
@@ -22,10 +22,9 @@ export class LaserTrails implements Trail {
   ) {
     this.animationFrameHandler.register(this, this.onFrame.bind(this));
 
-    this.localTrail = new AnimatedTrail(animationFrameHandler, app, {
+    this.localTrail = new CanvasTrail(animationFrameHandler, app, {
       ...this.getTrailOptions(),
-      fill: () => DEFAULT_LASER_COLOR,
-      glowEffect: true,
+      fill: DEFAULT_LASER_COLOR,
       glowColor: DEFAULT_LASER_COLOR,
       glowBlur: 6,
     });
@@ -86,18 +85,15 @@ export class LaserTrails implements Trail {
     }
 
     for (const [key, collaborator] of this.app.state.collaborators.entries()) {
-      let trail!: AnimatedTrail;
+      let trail!: CanvasTrail;
 
       if (!this.collabTrails.has(key)) {
-        trail = new AnimatedTrail(this.animationFrameHandler, this.app, {
+        const color =
+          collaborator.pointer?.laserColor || getClientColor(key, collaborator);
+        trail = new CanvasTrail(this.animationFrameHandler, this.app, {
           ...this.getTrailOptions(),
-          fill: () =>
-            collaborator.pointer?.laserColor ||
-            getClientColor(key, collaborator),
-          glowEffect: true,
-          glowColor:
-            collaborator.pointer?.laserColor ||
-            getClientColor(key, collaborator),
+          fill: color,
+          glowColor: color,
           glowBlur: 6,
         });
         trail.start(this.container);
