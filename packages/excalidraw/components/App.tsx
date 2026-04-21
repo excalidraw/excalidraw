@@ -325,6 +325,7 @@ import {
   actionToggleMidpointSnapping,
   actionToggleCropEditor,
 } from "../actions";
+import "../actions/actionAITidySelection";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
 import { actionPaste } from "../actions/actionClipboard";
@@ -492,6 +493,7 @@ import type {
   EmbedsValidationStatus,
   ElementsPendingErasure,
   ExcalidrawImperativeAPIEventMap,
+  GenerateAITidySelection,
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
@@ -2503,6 +2505,9 @@ class App extends React.Component<AppProps, AppState> {
     diagramToCode?: {
       generate: GenerateDiagramToCode;
     };
+    aiTidySelection?: {
+      tidy: GenerateAITidySelection;
+    };
   } = {};
 
   public setPlugins(plugins: Partial<App["plugins"]>) {
@@ -2614,6 +2619,94 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
   }
+
+  public onAITidySelection = async () => {
+    const tidySelection = this.plugins.aiTidySelection?.tidy;
+
+    if (!tidySelection) {
+      this.setState({
+        errorMessage: "No AI tidy selection plugin found",
+      });
+      return;
+    }
+
+    const selectedElements = this.scene.getSelectedElements({
+      selectedElementIds: this.state.selectedElementIds,
+      includeBoundTextElement: true,
+    });
+
+    if (selectedElements.length < 2) {
+      this.setState({
+        errorMessage: "Select at least 2 elements to tidy",
+      });
+      return;
+    }
+
+    const selectedElementIds = new Set(selectedElements.map((el) => el.id));
+    trackEvent("ai", "tidy-selection (start)", "layout");
+
+    try {
+      const { positions } = await tidySelection({
+        selectedElements,
+        allElements: this.scene.getNonDeletedElements(),
+        appState: this.state,
+      });
+
+      if (!positions?.length) {
+        this.setState({
+          errorMessage: "AI tidy didn't return any layout changes",
+        });
+        return;
+      }
+
+      const nextPositionById = new Map(
+        positions
+          .filter(
+            (item) =>
+              selectedElementIds.has(item.id) &&
+              Number.isFinite(item.x) &&
+              Number.isFinite(item.y),
+          )
+          .map((item) => [item.id, item]),
+      );
+
+      if (nextPositionById.size === 0) {
+        this.setState({
+          errorMessage: "AI tidy response is invalid for current selection",
+        });
+        return;
+      }
+
+      this.updateScene({
+        elements: this.scene.getElementsIncludingDeleted().map((element) => {
+          const next = nextPositionById.get(element.id);
+          if (!next) {
+            return element;
+          }
+          if (element.x === next.x && element.y === next.y) {
+            return element;
+          }
+          return newElementWith(element, {
+            x: next.x,
+            y: next.y,
+          });
+        }),
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+
+      this.setToast({
+        message: "Selection tidied",
+        closable: false,
+        duration: 1500,
+      });
+      trackEvent("ai", "tidy-selection (success)", "layout");
+    } catch (error: any) {
+      trackEvent("ai", "tidy-selection (failed)", "layout");
+      this.setState({
+        errorMessage: error?.message || "AI tidy failed",
+      });
+    }
+  };
 
   public onMagicframeToolSelect = () => {
     const selectedElements = this.scene.getSelectedElements({

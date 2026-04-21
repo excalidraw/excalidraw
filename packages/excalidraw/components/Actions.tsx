@@ -73,6 +73,7 @@ import {
   mermaidLogoIcon,
   laserPointerToolIcon,
   MagicIcon,
+  brainIconThin,
   LassoIcon,
   sharpArrowIcon,
   roundArrowIcon,
@@ -1255,6 +1256,18 @@ export const ShapesSwitcher = ({
             Generate
           </div>
           {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
+          {app.props.aiEnabled !== false &&
+            app.plugins.aiTidySelection &&
+            Object.keys(app.state.selectedElementIds).length >= 2 && (
+              <DropdownMenu.Item
+                onSelect={() => app.onAITidySelection()}
+                icon={brainIconThin}
+                data-testid="toolbar-ai-tidy-selection"
+                badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
+              >
+                AI tidy selection
+              </DropdownMenu.Item>
+            )}
           <DropdownMenu.Item
             onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
             icon={mermaidLogoIcon}
