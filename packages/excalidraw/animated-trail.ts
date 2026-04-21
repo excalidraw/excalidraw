@@ -25,6 +25,7 @@ export interface AnimatedTrailOptions {
   fill: (trail: AnimatedTrail) => string;
   stroke?: (trail: AnimatedTrail) => string;
   animateTrail?: boolean;
+  disableSvgRender?: boolean;
 }
 
 export class AnimatedTrail implements Trail {
@@ -57,6 +58,21 @@ export class AnimatedTrail implements Trail {
     }
   }
 
+  getTrailsForRender(): { current: LaserPointer | undefined; past: LaserPointer[] } {
+    return {
+      current: this.currentTrail,
+      past: [...this.pastTrails],
+    };
+  }
+
+  getFillColor(): string {
+    return (this.options.fill ?? (() => "black"))(this);
+  }
+
+  getApp(): App {
+    return this.app;
+  }
+
   get hasCurrentTrail() {
     return !!this.currentTrail;
   }
@@ -78,8 +94,10 @@ export class AnimatedTrail implements Trail {
       this.container = container;
     }
 
-    if (this.trailElement.parentNode !== this.container && this.container) {
-      this.container.appendChild(this.trailElement);
+    if (!this.options.disableSvgRender) {
+      if (this.trailElement.parentNode !== this.container && this.container) {
+        this.container.appendChild(this.trailElement);
+      }
     }
 
     this.animationFrameHandler.start(this);
@@ -88,8 +106,10 @@ export class AnimatedTrail implements Trail {
   stop() {
     this.animationFrameHandler.stop(this);
 
-    if (this.trailElement.parentNode === this.container) {
-      this.container?.removeChild(this.trailElement);
+    if (!this.options.disableSvgRender) {
+      if (this.trailElement.parentNode === this.container) {
+        this.container?.removeChild(this.trailElement);
+      }
     }
   }
 
@@ -140,40 +160,51 @@ export class AnimatedTrail implements Trail {
     const paths: string[] = [];
 
     for (const trail of this.pastTrails) {
-      paths.push(this.drawTrail(trail, this.app.state));
+      if (this.options.disableSvgRender) {
+        trail.getStrokeOutline(trail.options.size / this.app.state.zoom.value);
+      } else {
+        paths.push(this.drawTrail(trail, this.app.state));
+      }
     }
 
     if (this.currentTrail) {
-      const currentPath = this.drawTrail(this.currentTrail, this.app.state);
-
-      paths.push(currentPath);
+      if (this.options.disableSvgRender) {
+        this.currentTrail.getStrokeOutline(this.currentTrail.options.size / this.app.state.zoom.value);
+      } else {
+        const currentPath = this.drawTrail(this.currentTrail, this.app.state);
+        paths.push(currentPath);
+      }
     }
 
     this.pastTrails = this.pastTrails.filter((trail) => {
       return trail.getStrokeOutline().length !== 0;
     });
 
-    if (paths.length === 0) {
+    const hasActiveTrails = this.currentTrail !== undefined || this.pastTrails.length > 0;
+
+    if (!hasActiveTrails) {
       this.stop();
     }
 
-    const svgPaths = paths.join(" ").trim();
+    if (!this.options.disableSvgRender) {
+      const svgPaths = paths.join(" ").trim();
 
-    this.trailElement.setAttribute("d", svgPaths);
-    if (this.trailAnimation) {
-      this.trailElement.setAttribute(
-        "fill",
-        (this.options.fill ?? (() => "black"))(this),
-      );
-      this.trailElement.setAttribute(
-        "stroke",
-        (this.options.stroke ?? (() => "black"))(this),
-      );
-    } else {
-      this.trailElement.setAttribute(
-        "fill",
-        (this.options.fill ?? (() => "black"))(this),
-      );
+      this.trailElement.setAttribute("d", svgPaths);
+      if (this.trailAnimation) {
+        this.trailElement.setAttribute(
+          "fill",
+          (this.options.fill ?? (() => "black"))(this),
+        );
+        this.trailElement.setAttribute(
+          "stroke",
+          (this.options.stroke ?? (() => "black"))(this),
+        );
+      } else {
+        this.trailElement.setAttribute(
+          "fill",
+          (this.options.fill ?? (() => "black"))(this),
+        );
+      }
     }
   }
 

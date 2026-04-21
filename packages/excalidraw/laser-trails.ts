@@ -2,17 +2,16 @@ import { DEFAULT_LASER_COLOR, easeOut } from "@excalidraw/common";
 
 import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
 
-import { CanvasTrail } from "./canvas-trail";
 import { getClientColor } from "./clients";
 
-import type { Trail } from "./animated-trail";
+import { AnimatedTrail, type Trail } from "./animated-trail";
 import type { AnimationFrameHandler } from "./animation-frame-handler";
 import type App from "./components/App";
 import type { SocketId } from "./types";
 
 export class LaserTrails implements Trail {
-  public localTrail: CanvasTrail;
-  private collabTrails = new Map<SocketId, CanvasTrail>();
+  public localTrail: AnimatedTrail;
+  private collabTrails = new Map<SocketId, AnimatedTrail>();
 
   private container?: SVGSVGElement;
 
@@ -22,11 +21,10 @@ export class LaserTrails implements Trail {
   ) {
     this.animationFrameHandler.register(this, this.onFrame.bind(this));
 
-    this.localTrail = new CanvasTrail(animationFrameHandler, app, {
+    this.localTrail = new AnimatedTrail(animationFrameHandler, app, {
       ...this.getTrailOptions(),
       fill: DEFAULT_LASER_COLOR,
-      glowColor: DEFAULT_LASER_COLOR,
-      glowBlur: 6,
+      disableSvgRender: true,
     });
   }
 
@@ -79,22 +77,41 @@ export class LaserTrails implements Trail {
     this.updateCollabTrails();
   }
 
+  getLocalTrail(): AnimatedTrail {
+    return this.localTrail;
+  }
+
+  getCollabTrails(): Map<SocketId, AnimatedTrail> {
+    return this.collabTrails;
+  }
+
+  hasActiveTrails(): boolean {
+    if (this.localTrail.hasCurrentTrail) {
+      return true;
+    }
+    for (const trail of this.collabTrails.values()) {
+      if (trail.hasCurrentTrail) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private updateCollabTrails() {
     if (!this.container || this.app.state.collaborators.size === 0) {
       return;
     }
 
     for (const [key, collaborator] of this.app.state.collaborators.entries()) {
-      let trail!: CanvasTrail;
+      let trail!: AnimatedTrail;
 
       if (!this.collabTrails.has(key)) {
         const color =
           collaborator.pointer?.laserColor || getClientColor(key, collaborator);
-        trail = new CanvasTrail(this.animationFrameHandler, this.app, {
+        trail = new AnimatedTrail(this.animationFrameHandler, this.app, {
           ...this.getTrailOptions(),
           fill: color,
-          glowColor: color,
-          glowBlur: 6,
+          disableSvgRender: true,
         });
         trail.start(this.container);
 
