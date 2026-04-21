@@ -33,6 +33,17 @@ export class LaserTrails implements Trail {
       simplify: 0,
       streamline: 0.4,
       sizeMapping: (c) => {
+        if (this.app.state.persistentLaser) {
+          // In persistent mode, skip time/length decay so
+          // the trail remains fully visible until cleared.
+          const DECAY_LENGTH = 50;
+          const l =
+            (DECAY_LENGTH -
+              Math.min(DECAY_LENGTH, c.totalLength - c.currentIndex)) /
+            DECAY_LENGTH;
+          return easeOut(l);
+        }
+
         const DECAY_TIME = 1000;
         const DECAY_LENGTH = 50;
         const t = Math.max(
@@ -59,6 +70,14 @@ export class LaserTrails implements Trail {
 
   endPath(): void {
     this.localTrail.endPath();
+  }
+
+  /** Clear all persistent laser trails from the canvas. */
+  clearTrails(): void {
+    this.localTrail.clearTrails();
+    for (const trail of this.collabTrails.values()) {
+      trail.clearTrails();
+    }
   }
 
   start(container: SVGSVGElement) {

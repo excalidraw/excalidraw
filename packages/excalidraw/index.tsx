@@ -394,6 +394,8 @@ export {
   isSpreadsheetValidForChartType,
 } from "./charts";
 
+export { isTabSeparatedData, renderTabularData } from "./tabular";
+
 // -----------------------------------------------------------------------------
 // useExcalidrawStateValue() wrapper for host apps for the return type to reflect the
 // the potentially `undefined` value for initial render before the excalidrawAPI
