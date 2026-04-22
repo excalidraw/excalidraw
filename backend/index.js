@@ -15,6 +15,7 @@ const {
   ensureEdgeLists,
   externalResources,
   deleteOrphanedNodes,
+  filterVisualIgnore,
   cleanUpRoleLinks,
 } = require("./pipeline");
 const { mockLanggraphEnrichment, applyEnrichment } = require("./enrichment");
@@ -83,6 +84,8 @@ app.post(
       nodes = ensureEdgeLists(nodes);
       nodes = deleteOrphanedNodes(nodes);
       nodes = cleanUpRoleLinks(nodes);
+      nodes = filterVisualIgnore(nodes);
+      nodes = deleteOrphanedNodes(nodes);
       writeJsonToTemp(nodes, "nodes_final.json");
 
       const enrichment = mockLanggraphEnrichment(nodes);

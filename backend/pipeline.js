@@ -283,6 +283,33 @@ function deleteOrphanedNodes(nodes) {
   return filtered;
 }
 
+function filterVisualIgnore(nodes) {
+  const ignored = new Set();
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    for (const resource of Object.values(node.resources || {})) {
+      const tags = resource.change?.after?.tags ?? resource.values?.tags ?? {};
+      if (tags?.visual === "ignore") {
+        ignored.add(nodePath);
+        break;
+      }
+    }
+  }
+
+  for (const nodePath of ignored) {
+    delete nodes[nodePath];
+  }
+
+  for (const node of Object.values(nodes)) {
+    node.edges_new = (node.edges_new || []).filter((e) => !ignored.has(e));
+    node.edges_existing = (node.edges_existing || []).filter(
+      (e) => !ignored.has(e),
+    );
+  }
+
+  return nodes;
+}
+
 function cleanUpRoleLinks(nodes) {
   for (const [nodePath, node] of Object.entries(nodes)) {
     node.edges_existing ||= [];
@@ -313,5 +340,6 @@ module.exports = {
   ensureEdgeLists,
   externalResources,
   deleteOrphanedNodes,
+  filterVisualIgnore,
   cleanUpRoleLinks,
 };

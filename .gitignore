@@ -2,6 +2,9 @@
 .env
 backend/uploads/
 backend/temp/
+backend/graph.db
+backend/graph.db-shm
+backend/graph.db-wal
 uploads/
 .env.development.local
 .env.local
@@ -31,3 +34,11 @@ dev-dist
 html
 meta*.json
 .claude
+*.iml
+backend/terraform/.terraform.lock.hcl
+backend/terraform/.terraform/
+backend/terraform/builds/
+backend/terraform/newplan.dot
+backend/terraform/newplan.json
+backend/terraform/tfplan
+backend/terraform/newplan
