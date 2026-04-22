@@ -20,72 +20,6 @@ import type {
 
 const DEFAULT_FREEDRAW_PRESSURE = 0.5;
 
-// Ever-incrementing capsule counter used to produce rotating hue coloring.
-let capsuleIndex = 0;
-
-/**
- * Draws a single tapered capsule (variable-width filled stroke segment) from
- * (x0,y0) with radius r0 to (x1,y1) with radius r1.  The shape is a filled
- * path consisting of a back semicircle at the start, a straight side on each
- * side, and a front semicircle at the end, so that adjacent segments sharing
- * a point use the same radius and produce a seamlessly continuous stroke.
- */
-const drawTaperedCapsule = (
-  context: CanvasRenderingContext2D,
-  x0: number,
-  y0: number,
-  r0: number,
-  x1: number,
-  y1: number,
-  r1: number,
-) => {
-  const dx = x1 - x0;
-  const dy = y1 - y0;
-  const len = Math.sqrt(dx * dx + dy * dy);
-  const r = Math.max(r0, r1);
-
-  if (len < r / 2) {
-    // Degenerate segment - draw a filled circle at the larger radius
-    context.beginPath();
-    context.arc((x0 + x1) / 2, (y0 + y1) / 2, r, 0, Math.PI * 2);
-    context.fill();
-    return;
-  }
-
-  // Debug: rotating hue based on capsule index to visually verify that segments
-  //
-  const strokeColor = `hsl(${(capsuleIndex * 37) % 360} 100% 50%)`;
-  capsuleIndex++;
-  if (false) {
-    context.fillStyle = strokeColor;
-  }
-
-  const angle = Math.atan2(dy, dx);
-  const px = -dy / len; // perpendicular unit x = -sin(angle)
-  const py = dx / len; // perpendicular unit y =  cos(angle)
-
-  context.beginPath();
-  // Back semicircle at P0: clockwise from (P0 + perp*r0) through (back of P0) to (P0 - perp*r0)
-  context.arc(x0, y0, r0, angle + Math.PI / 2, angle - Math.PI / 2, false);
-  // Neg-perp side: P0 - perp*r0  ->  P1 - perp*r1  (arc endpoint is already P0 - perp*r0)
-  context.lineTo(x1 - px * r1, y1 - py * r1);
-  // Front semicircle at P1: clockwise from (P1 - perp*r1) through (front of P1) to (P1 + perp*r1)
-  context.arc(x1, y1, r1, angle - Math.PI / 2, angle + Math.PI / 2, false);
-  // Perp side: P1 + perp*r1  ->  P0 + perp*r0
-  context.lineTo(x0 + px * r0, y0 + py * r0);
-  context.closePath();
-  context.fill();
-};
-
-/**
- * Flatness tolerance in screen pixels for adaptive Bezier subdivision.
- * A cubic segment is considered flat (and drawn as a single capsule) when
- * both interior control points deviate less than this many pixels from the
- * p0→p1 chord.  Smaller values give smoother curves at the cost of more draw
- * calls.
- */
-const BEZIER_FLATNESS_TOLERANCE_PX = 0.1;
-
 /**
  * Half-width (in samples) of the triangular smoothing kernel applied to raw
  * pressure values before computing stroke radii.  A radius of R means each
@@ -96,187 +30,114 @@ const BEZIER_FLATNESS_TOLERANCE_PX = 0.1;
 const PRESSURE_SMOOTHING_RADIUS = 6;
 
 /**
- * Returns the Catmull-Rom tangent vector at points[i], using the neighbouring
- * points for a uniform parameterisation.  At the first point a one-sided
- * forward tangent is used.
- */
-const getCatmullRomTangent = (
-  points: readonly (readonly [number, number])[],
-  i: number,
-): [number, number] => {
-  const N = points.length;
-  const cur = points[i];
-
-  // Determine the "next" point: real neighbour, predicted point, or mirrored.
-  let next: readonly [number, number];
-  if (i < N - 1) {
-    next = points[i + 1];
-  } else {
-    // Mirror back across cur to get a forward tangent at the last point.
-    const prev2 = i > 0 ? points[i - 1] : cur;
-    next = [2 * cur[0] - prev2[0], 2 * cur[1] - prev2[1]];
-  }
-
-  let tx: number;
-  let ty: number;
-
-  if (i === 0) {
-    // One-sided tangent at the first point.
-    tx = (next[0] - cur[0]) * 0.5;
-    ty = (next[1] - cur[1]) * 0.5;
-  } else {
-    const prev = points[i - 1];
-    tx = (next[0] - prev[0]) * 0.5;
-    ty = (next[1] - prev[1]) * 0.5;
-  }
-
-  // Chord-length clamping (PCHIP-style):
-  // |t| <= 3 * min(chord_to_prev, chord_to_next).
-  const magSq = tx * tx + ty * ty;
-  if (magSq > 0) {
-    const dNx = next[0] - cur[0];
-    const dNy = next[1] - cur[1];
-    const chordNext = Math.sqrt(dNx * dNx + dNy * dNy);
-    let chordPrev = chordNext;
-    if (i > 0) {
-      const prev = points[i - 1];
-      const dPx = cur[0] - prev[0];
-      const dPy = cur[1] - prev[1];
-      chordPrev = Math.sqrt(dPx * dPx + dPy * dPy);
-    }
-    const maxMag = 3 * Math.min(chordNext, chordPrev);
-    const mag = Math.sqrt(magSq);
-    if (mag > maxMag) {
-      const scale = maxMag / mag;
-      tx *= scale;
-      ty *= scale;
-    }
-  }
-
-  return [tx, ty];
-};
-
-// Stack entry for adaptive Bezier subdivision.
-// [p0x, p0y, r0, cp1x, cp1y, cp2x, cp2y, p1x, p1y, r1]
-type BezierSegment = [
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-];
-
-// Reusable stack to avoid per-frame allocation.
-const subdivStack: BezierSegment[] = [];
-
-/**
- * Draws one adaptively-subdivided tapered segment from p0 (radius r0) to p1
- * (radius r1). t0/t1 are the Catmull-Rom tangents at p0 and p1 respectively.
+ * Draws a single stroke segment primitive for the triplet (pPrev, pCur, pNext).
  *
- * Uses de Casteljau bisection: a segment is split at t=0.5 until both interior
- * control points are within BEZIER_FLATNESS_TOLERANCE_PX pixels of the chord,
- * guaranteeing that each drawn capsule has focus-point distance ≈ chord ≈ arc.
+ * The primitive is a closed quadrilateral with curved top and bottom edges:
+ *   A        = midpoint(pPrev, pCur)  — left junction, shared with the previous primitive
+ *   B        = midpoint(pCur, pNext)  — right junction, shared with the next primitive
+ *   M'1/M'2  at A:    ±rA perpendicular to the pPrev→pCur direction
+ *   M1/M2    at pCur: ±rCur along the bisector normal of the two edge directions
+ *   M''1/M''2 at B:   ±rB perpendicular to the pCur→pNext direction
+ *
+ * Shape boundary (clockwise):
+ *   M'1 →[quadratic Bezier through M1]→ M''1 →[line]→ M''2
+ *       →[quadratic Bezier through M2]→  M'2  →[line]→  M'1
+ *
+ * Adjacent primitives share their junction points so the stroke outline is
+ * geometrically continuous with no gaps or overlaps.
  */
-const drawSubdividedSegment = (
+const drawStrokeSegment = (
   context: CanvasRenderingContext2D,
-  p0x: number,
-  p0y: number,
-  r0: number,
-  p1x: number,
-  p1y: number,
-  r1: number,
-  t0x: number,
-  t0y: number,
-  t1x: number,
-  t1y: number,
-  scale: number,
+  pPrevX: number,
+  pPrevY: number,
+  rPrev: number,
+  pCurX: number,
+  pCurY: number,
+  rCur: number,
+  pNextX: number,
+  pNextY: number,
+  rNext: number,
 ) => {
-  // Cubic Bezier control points derived from Catmull-Rom tangents.
-  const cp1x = p0x + t0x / 3;
-  const cp1y = p0y + t0y / 3;
-  const cp2x = p1x - t1x / 3;
-  const cp2y = p1y - t1y / 3;
+  // A = midpoint(pPrev, pCur), B = midpoint(pCur, pNext)
+  const ax = (pPrevX + pCurX) * 0.5;
+  const ay = (pPrevY + pCurY) * 0.5;
+  const rA = (rPrev + rCur) * 0.5;
+  const bx = (pCurX + pNextX) * 0.5;
+  const by = (pCurY + pNextY) * 0.5;
+  const rB = (rCur + rNext) * 0.5;
 
-  // Tighten the flatness tolerance at high-angle turns to produce 2× more
-  // capsules there.  The turn angle is the angle between the entry tangent t0
-  // and exit tangent t1.  cos θ goes from 1 (straight) to −1 (U-turn).
-  // toleranceFactor = 0.5 + 0.5·max(0, cos θ), so it is 1.0 for straight
-  // segments and 0.5 (half tolerance → 2× resolution) for turns ≥ 90°.
-  const t0Len = Math.sqrt(t0x * t0x + t0y * t0y);
-  const t1Len = Math.sqrt(t1x * t1x + t1y * t1y);
-  const cosTheta =
-    t0Len > 1e-10 && t1Len > 1e-10
-      ? (t0x * t1x + t0y * t1y) / (t0Len * t1Len)
-      : 1;
-  const toleranceFactor = 0.5 + 0.5 * Math.max(0, cosTheta);
+  // Perpendicular unit vector at A (normal to pPrev→pCur)
+  const daX = pCurX - pPrevX;
+  const daY = pCurY - pPrevY;
+  const daLenInv = 1 / (Math.sqrt(daX * daX + daY * daY) || 1e-10);
+  const nAX = -daY * daLenInv;
+  const nAY = daX * daLenInv;
 
-  // Flatness tolerance in scene units.
-  const tol = (BEZIER_FLATNESS_TOLERANCE_PX * toleranceFactor) / scale;
-  const tolSq = tol * tol;
+  // Perpendicular unit vector at B (normal to pCur→pNext)
+  const dbX = pNextX - pCurX;
+  const dbY = pNextY - pCurY;
+  const dbLenInv = 1 / (Math.sqrt(dbX * dbX + dbY * dbY) || 1e-10);
+  const nBX = -dbY * dbLenInv;
+  const nBY = dbX * dbLenInv;
 
-  let top = 0;
-  subdivStack[top++] = [p0x, p0y, r0, cp1x, cp1y, cp2x, cp2y, p1x, p1y, r1];
+  // Bisector normal at pCur: normalised average of nA and nB
+  const bisRawX = nAX + nBX;
+  const bisRawY = nAY + nBY;
+  const bisLen = Math.sqrt(bisRawX * bisRawX + bisRawY * bisRawY);
+  const bisNX = bisLen > 1e-10 ? bisRawX / bisLen : nAX;
+  const bisNY = bisLen > 1e-10 ? bisRawY / bisLen : nAY;
 
-  while (top > 0) {
-    const seg = subdivStack[--top];
-    const [ax, ay, ar, b1x, b1y, b2x, b2y, dx, dy, dr] = seg;
+  // M'1, M'2 at A
+  const mp1x = ax + nAX * rA;
+  const mp1y = ay + nAY * rA;
+  const mp2x = ax - nAX * rA;
+  const mp2y = ay - nAY * rA;
 
-    // Squared distance from a point to the chord (ax,ay)→(dx,dy).
-    const cdx = dx - ax;
-    const cdy = dy - ay;
-    const chordLenSq = cdx * cdx + cdy * cdy;
+  // M1, M2 at pCur — used directly as the quadratic Bézier control points.
+  // The junction points (M'1, M''1, etc.) are midpoints between consecutive
+  // control points, which is the classic midpoint quadratic B-spline scheme.
+  // This guarantees C1 continuity: the shared junction is always the midpoint
+  // of the two flanking CPs, so the tangent is continuous across segments.
+  const m1x = pCurX + bisNX * rCur;
+  const m1y = pCurY + bisNY * rCur;
+  const m2x = pCurX - bisNX * rCur;
+  const m2y = pCurY - bisNY * rCur;
 
-    let flat: boolean;
-    if (chordLenSq < 1e-10) {
-      // Degenerate chord: check raw distance to endpoints.
-      flat =
-        (b1x - ax) * (b1x - ax) + (b1y - ay) * (b1y - ay) <= tolSq &&
-        (b2x - ax) * (b2x - ax) + (b2y - ay) * (b2y - ay) <= tolSq;
-    } else {
-      // Perpendicular distance² = |cross|² / |chord|²
-      const cross1 = (b1x - ax) * cdy - (b1y - ay) * cdx;
-      const cross2 = (b2x - ax) * cdy - (b2y - ay) * cdx;
-      flat =
-        cross1 * cross1 <= tolSq * chordLenSq &&
-        cross2 * cross2 <= tolSq * chordLenSq;
-    }
+  // M''1, M''2 at B
+  const mpp1x = bx + nBX * rB;
+  const mpp1y = by + nBY * rB;
+  const mpp2x = bx - nBX * rB;
+  const mpp2y = by - nBY * rB;
 
-    if (flat) {
-      drawTaperedCapsule(context, ax, ay, ar, dx, dy, dr);
-      continue;
-    }
+  context.beginPath();
+  context.moveTo(mp1x, mp1y);
+  // Top edge: M'1 → M''1, control point = M1 (bisector offset at pCur)
+  context.quadraticCurveTo(m1x, m1y, mpp1x, mpp1y);
+  // Right cap: M''1 → M''2
+  context.lineTo(mpp2x, mpp2y);
+  // Bottom edge: M''2 → M'2, control point = M2
+  context.quadraticCurveTo(m2x, m2y, mp2x, mp2y);
+  // Left cap: M'2 → M'1
+  context.closePath();
+  context.fill();
 
-    // De Casteljau bisection at t = 0.5.
-    const m01x = (ax + b1x) * 0.5;
-    const m01y = (ay + b1y) * 0.5;
-    const m12x = (b1x + b2x) * 0.5;
-    const m12y = (b1y + b2y) * 0.5;
-    const m23x = (b2x + dx) * 0.5;
-    const m23y = (b2y + dy) * 0.5;
-    const m012x = (m01x + m12x) * 0.5;
-    const m012y = (m01y + m12y) * 0.5;
-    const m123x = (m12x + m23x) * 0.5;
-    const m123y = (m12y + m23y) * 0.5;
-    const mx = (m012x + m123x) * 0.5;
-    const my = (m012y + m123y) * 0.5;
-    const mr = (ar + dr) * 0.5;
-
-    // Push right half first so left half is processed first (LIFO).
-    subdivStack[top++] = [mx, my, mr, m123x, m123y, m23x, m23y, dx, dy, dr];
-    subdivStack[top++] = [ax, ay, ar, m01x, m01y, m012x, m012y, mx, my, mr];
-  }
+  // Filled circles at the junction midpoints seal any sub-pixel anti-aliasing
+  // gap where adjacent segment fills share a boundary edge.
+  context.beginPath();
+  context.arc(ax, ay, rA, 0, Math.PI * 2);
+  context.fill();
+  context.beginPath();
+  context.arc(bx, by, rB, 0, Math.PI * 2);
+  context.fill();
 };
 
 /**
- * Draws freedraw points as bezier-subdivided, pressure-aware tapered capsule
- * segments.  Consecutive real points are connected with Catmull-Rom cubic
- * bezier curves so the rendered stroke is smooth even when input samples are
- * sparse.
+ * Draws freedraw points as pressure-aware curved stroke segment primitives.
+ * For each consecutive triplet of points (i-1, i, i+1) a curved quadrilateral
+ * is drawn whose side edges sit at the midpoints of the consecutive point pairs
+ * and whose top/bottom edges are quadratic Bezier curves passing through the
+ * stroke-width offset at the centre point.  Adjacent primitives share their
+ * side-edge positions, so the rendered outline is continuous with no gaps.
  *
  * @param fromIndex   Draw segments starting from this point index (inclusive).
  *                    Pass 0 to draw from the beginning.
@@ -284,8 +145,8 @@ const drawSubdividedSegment = (
  *                    index.  Omit or pass `undefined` to draw all remaining
  *                    points.  Used by the incremental canvas to stop short of
  *                    the last segment so the committed canvas only contains
- *                    segments whose Catmull-Rom tangents are fully finalised
- *                    (i.e.  the right-hand neighbour is known).
+ *                    segments whose geometry is fully determined by immutable
+ *                    points.
  */
 export const drawFreeDrawSegments = (
   element: ExcalidrawFreeDrawElement,
@@ -350,15 +211,24 @@ export const drawFreeDrawSegments = (
   for (let i = start; i < end; i++) {
     const p0 = points[i - 1];
     const p1 = points[i];
-    // Very first pressure values are often unreliable,
-    // so for the first couple of segments use a radius
     const r0 = baseRadius * getSmoothedPressure(i - 1) * 2;
     const r1 = baseRadius * getSmoothedPressure(i) * 2;
 
-    const t0 = getCatmullRomTangent(points, i - 1);
-    const t1 = getCatmullRomTangent(points, i);
+    // Triplet: need i+1; if at the last point, mirror i-1 around i (degenerate tip).
+    let p2x: number;
+    let p2y: number;
+    let r2: number;
+    if (i < N - 1) {
+      p2x = points[i + 1][0];
+      p2y = points[i + 1][1];
+      r2 = baseRadius * getSmoothedPressure(i + 1) * 2;
+    } else {
+      p2x = 2 * p1[0] - p0[0];
+      p2y = 2 * p1[1] - p0[1];
+      r2 = r0;
+    }
 
-    drawSubdividedSegment(
+    drawStrokeSegment(
       context,
       p0[0],
       p0[1],
@@ -366,11 +236,9 @@ export const drawFreeDrawSegments = (
       p1[0],
       p1[1],
       r1,
-      t0[0],
-      t0[1],
-      t1[0],
-      t1[1],
-      scale,
+      p2x,
+      p2y,
+      r2,
     );
   }
 };
@@ -674,6 +542,5 @@ export const generateOrUpdateFreeDrawIncrementalCanvas = (
 export const invalidateFreeDrawIncrementalCanvas = (
   element: ExcalidrawFreeDrawElement,
 ) => {
-  capsuleIndex = 0;
   freedrawIncrementalCache.delete(element);
 };
