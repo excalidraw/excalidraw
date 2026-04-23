@@ -508,6 +508,12 @@ async function nodesToExcalidraw(nodes) {
         roundness: { type: 3 },
         boundElements: [{ id: textId, type: "text" }],
         strokeStyle: action === "external" ? "dashed" : "solid",
+        customData: {
+          terraform: true,
+          resourceType,
+          nodePath,
+          action,
+        },
       }),
     );
 
