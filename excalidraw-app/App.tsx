@@ -402,6 +402,9 @@ const ExcalidrawWrapper = () => {
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
 
+  const [selectedTerraformElement, setSelectedTerraformElement] =
+    useState<OrderedExcalidrawElement | null>(null);
+
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
@@ -661,16 +664,12 @@ const ExcalidrawWrapper = () => {
     files: BinaryFiles,
   ) => {
     const selectedId = Object.keys(appState.selectedElementIds)[0];
-    if (selectedId) {
-      const selected = elements.find((el) => el.id === selectedId);
-      if (selected?.customData?.terraform) {
-        // eslint-disable-next-line no-console
-        console.log("[terraform] selected:", selected.customData);
-      } else {
-        // eslint-disable-next-line no-console
-        console.log("nada");
-      }
-    }
+    const selected = selectedId
+      ? elements.find((el) => el.id === selectedId)
+      : null;
+    setSelectedTerraformElement(
+      selected?.customData?.terraform ? selected : null,
+    );
 
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
@@ -901,6 +900,38 @@ const ExcalidrawWrapper = () => {
 
           return (
             <div className="excalidraw-ui-top-right">
+              {selectedTerraformElement && (
+                <div
+                  style={{
+                    background: "#fff",
+                    border: "1px solid #dee2e6",
+                    borderRadius: 8,
+                    padding: "12px 16px",
+                    minWidth: 220,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                    fontSize: 13,
+                  }}
+                >
+                  <div
+                    style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}
+                  >
+                    Terraform Resource
+                  </div>
+                  {Object.entries(
+                    selectedTerraformElement.customData as Record<
+                      string,
+                      string
+                    >,
+                  )
+                    .filter(([k]) => k !== "terraform")
+                    .map(([k, v]) => (
+                      <div key={k} style={{ marginBottom: 4 }}>
+                        <span style={{ color: "#868e96" }}>{k}: </span>
+                        <span>{String(v)}</span>
+                      </div>
+                    ))}
+                </div>
+              )}
               {excalidrawAPI?.getEditorInterface().formFactor === "desktop" && (
                 <ExcalidrawPlusPromoBanner
                   isSignedIn={isExcalidrawPlusSignedUser}
