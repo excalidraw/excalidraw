@@ -189,19 +189,78 @@ function getResourceType(nodePath) {
   return parts[i] || nodePath;
 }
 
-function getTier(nodePath) {
-  const type = getResourceType(nodePath);
-  if (type === "data") return 3;
-  if (TIER_3_TYPES.has(type)) return 3;
-  if (TIER_1_TYPES.has(type)) return 1;
-  return 2;
+function getModuleDepth(nodePath) {
+  const parts = nodePath.split(".");
+  let depth = 0;
+  let i = 0;
+  while (i < parts.length - 1 && parts[i] === "module") {
+    depth++;
+    i += 2;
+  }
+  return depth;
 }
 
-const TIER_CONFIG = {
-  1: { w: 300, h: 100, fontSize: 16, charge: -3000, collide: 210, strokeWidth: 3, iconSize: 55 },
-  2: { w: 260, h: 70, fontSize: 14, charge: -1200, collide: 160, strokeWidth: 2, iconSize: 40 },
-  3: { w: 220, h: 60, fontSize: 12, charge: -500, collide: 130, strokeWidth: 1, iconSize: 0 },
-};
+function isImportantType(resourceType) {
+  return TIER_1_TYPES.has(resourceType);
+}
+
+function isLowPriorityType(resourceType) {
+  return resourceType === "data" || TIER_3_TYPES.has(resourceType);
+}
+
+// Builds a tier map for all nodes. Tier 0 = most prominent, higher = less prominent.
+// Important services are bumped one tier above their depth peers; low-priority types
+// are pushed one tier below.
+function buildTierMap(nodeKeys) {
+  const depths = nodeKeys.map(getModuleDepth);
+  const maxDepth = Math.max(0, ...depths);
+
+  const tierMap = {};
+  for (const key of nodeKeys) {
+    const depth = getModuleDepth(key);
+    const type = getResourceType(key);
+    let tier = depth; // base tier = nesting depth
+    if (isLowPriorityType(type)) {
+      tier = Math.min(tier + 1, maxDepth + 1);
+    } else if (isImportantType(type)) {
+      tier = Math.max(tier - 1, 0);
+    }
+    tierMap[key] = tier;
+  }
+  return tierMap;
+}
+
+// Interpolates tier visual configs across the actual tier range found in the graph.
+// More nodes → smaller boxes and stronger repulsion to avoid crowding.
+function buildTierConfigs(tierMap, totalNodes) {
+  const tiers = Object.values(tierMap);
+  const minTier = Math.min(...tiers);
+  const maxTier = Math.max(...tiers);
+  const range = maxTier - minTier || 1;
+
+  // Scale down sizes for large graphs
+  const crowdFactor = Math.max(0.5, 1 - (totalNodes - 20) / 200);
+
+  const configs = {};
+  for (let t = minTier; t <= maxTier; t++) {
+    const frac = (t - minTier) / range; // 0 = most prominent, 1 = least
+    configs[t] = {
+      w: Math.round(lerp(300, 180, frac) * crowdFactor),
+      h: Math.round(lerp(100, 50, frac) * crowdFactor),
+      fontSize: Math.round(lerp(16, 10, frac)),
+      charge: Math.round(lerp(-3000, -400, frac) * crowdFactor),
+      collide: Math.round(lerp(210, 100, frac) * crowdFactor),
+      strokeWidth: frac < 0.33 ? 3 : frac < 0.66 ? 2 : 1,
+      iconSize:
+        frac < 0.5 ? Math.round(lerp(55, 35, frac * 2) * crowdFactor) : 0,
+    };
+  }
+  return configs;
+}
+
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
 
 // --- Styling ---
 
@@ -323,8 +382,13 @@ function collectEdgePairs(nodes) {
 
 // --- Force layout ---
 
-async function forceLayout(nodeKeys, edgePairs, tierMap) {
+async function forceLayout(nodeKeys, edgePairs, tierMap, tierConfigs) {
   const d3 = await import("d3-force");
+
+  const tiers = Object.values(tierMap);
+  const minTier = Math.min(...tiers);
+  const maxTier = Math.max(...tiers);
+  const tierRange = maxTier - minTier || 1;
 
   const simNodes = nodeKeys.map((id) => ({
     id,
@@ -340,7 +404,7 @@ async function forceLayout(nodeKeys, edgePairs, tierMap) {
     .forceSimulation(simNodes)
     .force(
       "charge",
-      d3.forceManyBody().strength((d) => TIER_CONFIG[d.tier].charge),
+      d3.forceManyBody().strength((d) => tierConfigs[d.tier].charge),
     )
     .force(
       "link",
@@ -348,21 +412,22 @@ async function forceLayout(nodeKeys, edgePairs, tierMap) {
         .forceLink(simLinks)
         .id((d) => d.id)
         .distance((link) => {
-          const t1 = link.source.tier;
-          const t2 = link.target.tier;
-          if (t1 === 1 && t2 === 1) return 500;
-          if (t1 === 1 || t2 === 1) return 250;
-          return 200;
+          // Prominent nodes (low tier number) push further apart
+          const t1 = (link.source.tier - minTier) / tierRange;
+          const t2 = (link.target.tier - minTier) / tierRange;
+          const avgFrac = (t1 + t2) / 2;
+          return Math.round(lerp(500, 150, avgFrac));
         })
         .strength((link) => {
-          const maxTier = Math.max(link.source.tier, link.target.tier);
-          return maxTier >= 2 ? 1.2 : 0.7;
+          const maxRelTier =
+            Math.max(link.source.tier, link.target.tier) - minTier;
+          return maxRelTier >= 1 ? 1.2 : 0.7;
         }),
     )
     .force("center", d3.forceCenter(0, 0))
     .force(
       "collide",
-      d3.forceCollide().radius((d) => TIER_CONFIG[d.tier].collide),
+      d3.forceCollide().radius((d) => tierConfigs[d.tier].collide),
     )
     .stop();
 
@@ -394,19 +459,22 @@ async function nodesToExcalidraw(nodes) {
   const nodeKeys = Object.keys(nodes);
   const edgePairs = collectEdgePairs(nodes);
 
-  const tierMap = {};
-  for (const key of nodeKeys) {
-    tierMap[key] = getTier(key);
-  }
+  const tierMap = buildTierMap(nodeKeys);
+  const tierConfigs = buildTierConfigs(tierMap, nodeKeys.length);
 
-  const positions = await forceLayout(nodeKeys, edgePairs, tierMap);
+  const positions = await forceLayout(
+    nodeKeys,
+    edgePairs,
+    tierMap,
+    tierConfigs,
+  );
   const posMap = {};
 
   // --- rectangles + labels + icons ---
   for (let i = 0; i < nodeKeys.length; i++) {
     const nodePath = nodeKeys[i];
     const tier = tierMap[nodePath];
-    const cfg = TIER_CONFIG[tier];
+    const cfg = tierConfigs[tier];
     const { x, y } = positions[nodePath];
     const resourceType = getResourceType(nodePath);
 
