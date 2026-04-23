@@ -499,10 +499,7 @@ function shiftElementsAccountingForFrames(
     }),
   );
 
-  const frameAwareContiguousElementsToMove: {
-    regularElements: ExcalidrawElement[];
-    frameChildren: Map<ExcalidrawFrameLikeElement["id"], ExcalidrawElement[]>;
-  } = { regularElements: [], frameChildren: new Map() };
+  const regularElements: ExcalidrawElement[] = [];
 
   const fullySelectedFrames = new Set<ExcalidrawFrameLikeElement["id"]>();
 
@@ -518,46 +515,14 @@ function shiftElementsAccountingForFrames(
         isFrameLikeElement(element) ||
         (element.frameId && fullySelectedFrames.has(element.frameId))
       ) {
-        frameAwareContiguousElementsToMove.regularElements.push(element);
+        regularElements.push(element);
       } else if (!element.frameId) {
-        frameAwareContiguousElementsToMove.regularElements.push(element);
-      } else {
-        const frameChildren =
-          frameAwareContiguousElementsToMove.frameChildren.get(
-            element.frameId,
-          ) || [];
-        frameChildren.push(element);
-        frameAwareContiguousElementsToMove.frameChildren.set(
-          element.frameId,
-          frameChildren,
-        );
+        regularElements.push(element);
       }
     }
   }
 
-  let nextElements = allElements;
-
-  const frameChildrenSets = Array.from(
-    frameAwareContiguousElementsToMove.frameChildren.entries(),
-  );
-
-  for (const [frameId, children] of frameChildrenSets) {
-    nextElements = shiftFunction(
-      allElements,
-      appState,
-      direction,
-      frameId,
-      children,
-    );
-  }
-
-  return shiftFunction(
-    nextElements,
-    appState,
-    direction,
-    null,
-    frameAwareContiguousElementsToMove.regularElements,
-  );
+  return shiftFunction(allElements, appState, direction, null, regularElements);
 }
 
 // public API
