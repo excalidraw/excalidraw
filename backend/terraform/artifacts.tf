@@ -5,7 +5,7 @@ data "archive_file" "lambda_package" {
 }
 
 resource "aws_s3_bucket" "lambda_artifacts" {
-  bucket = "test-lambda-artifacts"
+  bucket = "ts-test-lambda-artifacts"
   tags = {
     visual = "ignore"
   }

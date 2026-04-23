@@ -341,6 +341,7 @@ function makeBaseElement(overrides) {
     locked: false,
     link: null,
     updated: Date.now(),
+    customData: { terraform: true },
     ...overrides,
   };
 }
