@@ -41,6 +41,23 @@ const applyElementUpdate = (
   });
 };
 
+const applyElementUpdatesInSingleAction = (
+  updatesById: Record<string, ElementUpdate<OrderedExcalidrawElement>>,
+  captureUpdate: keyof typeof CaptureUpdateAction,
+) => {
+  const nextElements = h.app.scene
+    .getElementsIncludingDeleted()
+    .map((element) => {
+      const updates = updatesById[element.id];
+      return updates ? newElementWith(element, updates) : element;
+    });
+
+  API.updateScene({
+    elements: nextElements,
+    captureUpdate: CaptureUpdateAction[captureUpdate],
+  });
+};
+
 const setSceneBaseline = (elements: readonly ExcalidrawElement[]) => {
   API.updateScene({
     elements,
@@ -788,15 +805,532 @@ describe("createTransaction live-wins-per-prop behavior", () => {
     expect(live.backgroundColor).toBe("#fff");
   });
 
-  it("undoing regular edit after tx rollback restores pre-edit live value", () => {
+  it("undoing regular edit after tx rollback restores pre-tx baseline value", () => {
     const element = setupSamePropertyConflictScenario();
 
     Keyboard.undo();
     Keyboard.undo();
 
     const live = getElement(element.id)!;
-    expect(live.strokeColor).toBe("#f00");
+    // strokeColor should be #000 (pre-tx baseline), not #f00 (tx intermediate).
+    // The commit-time patching replaces the tx intermediate in the user's
+    // undo entry with the pre-tx baseline.
+    expect(live.strokeColor).toBe("#000");
     expect(live.x).toBe(0);
     expect(live.backgroundColor).toBe("#fff");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Transaction undo semantics markers + effective delta resolution
+// ---------------------------------------------------------------------------
+
+describe("transaction undo semantics markers", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  afterEach(() => {
+    unmountComponent();
+  });
+
+  it("keeps pre-commit undo action-local (override is inactive while tx is active)", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "redo-patch",
+      strokeColor: "#000",
+      x: 0,
+    });
+    setSceneBaseline([element]);
+
+    const tx = h.app.createTransaction();
+
+    // tx sets strokeColor to purple
+    act(() => {
+      tx.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id
+              ? newElementWith(el, { strokeColor: "#800080", x: 200 })
+              : el,
+          ),
+      });
+    });
+
+    // User overrides strokeColor to red
+    applyElementUpdate(element.id, { strokeColor: "#f00" }, "IMMEDIATELY");
+
+    // Undo before tx is ended should still restore tx intermediate (purple).
+    Keyboard.undo();
+    expect(getElement(element.id)!.strokeColor).toBe("#800080");
+
+    // Ending the tx later should not rewrite the already-undone user entry.
+    commitTransaction(tx);
+
+    // strokeColor should stay purple (tx committed value, user undid their change)
+    expect(getElement(element.id)!.strokeColor).toBe("#800080");
+    expect(getElement(element.id)!.x).toBe(200);
+  });
+
+  it("handles multiple user actions during tx correctly", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "multi-action",
+      strokeColor: "#000",
+      x: 0,
+    });
+    setSceneBaseline([element]);
+
+    const tx = h.app.createTransaction();
+
+    // tx sets strokeColor to purple
+    act(() => {
+      tx.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id
+              ? newElementWith(el, { strokeColor: "#800080", x: 200 })
+              : el,
+          ),
+      });
+    });
+
+    // User action 1: change strokeColor to red
+    applyElementUpdate(element.id, { strokeColor: "#f00" }, "IMMEDIATELY");
+    // User action 2: change strokeColor to green
+    applyElementUpdate(element.id, { strokeColor: "#0f0" }, "IMMEDIATELY");
+
+    commitTransaction(tx);
+
+    // Undo tx entry
+    Keyboard.undo();
+    expect(getElement(element.id)!.x).toBe(0);
+
+    // Undo user action 2 (green → red)
+    Keyboard.undo();
+    expect(getElement(element.id)!.strokeColor).toBe("#f00");
+
+    // Undo user action 1 (red → black, NOT purple)
+    Keyboard.undo();
+    expect(getElement(element.id)!.strokeColor).toBe("#000");
+  });
+
+  it("preserves undo/redo roundtrip after applying ended-tx override", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "roundtrip-after-override",
+      strokeColor: "#000",
+      x: 0,
+    });
+    setSceneBaseline([element]);
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id
+              ? newElementWith(el, { strokeColor: "#800080", x: 200 })
+              : el,
+          ),
+      });
+    });
+
+    applyElementUpdate(element.id, { strokeColor: "#f00" }, "IMMEDIATELY");
+    commitTransaction(tx);
+
+    // Undo tx entry
+    Keyboard.undo();
+    expect(getElement(element.id)!.x).toBe(0);
+    expect(getElement(element.id)!.strokeColor).toBe("#f00");
+
+    // Undo user entry (with override)
+    Keyboard.undo();
+    expect(getElement(element.id)!.x).toBe(0);
+    expect(getElement(element.id)!.strokeColor).toBe("#000");
+
+    // Redo user then redo tx should return to committed live state.
+    Keyboard.redo();
+    expect(getElement(element.id)!.x).toBe(0);
+    expect(getElement(element.id)!.strokeColor).toBe("#f00");
+
+    Keyboard.redo();
+    expect(getElement(element.id)!.x).toBe(200);
+    expect(getElement(element.id)!.strokeColor).toBe("#f00");
+  });
+
+  it("does not inject override when user modifies a different property", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "diff-prop",
+      strokeColor: "#000",
+      backgroundColor: "#fff",
+      x: 0,
+    });
+    setSceneBaseline([element]);
+
+    const tx = h.app.createTransaction();
+
+    // tx only changes x
+    act(() => {
+      tx.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id ? newElementWith(el, { x: 200 }) : el,
+          ),
+      });
+    });
+
+    // User changes strokeColor (different property from tx)
+    applyElementUpdate(element.id, { strokeColor: "#f00" }, "IMMEDIATELY");
+
+    commitTransaction(tx);
+
+    // Undo tx
+    Keyboard.undo();
+    expect(getElement(element.id)!.x).toBe(0);
+    expect(getElement(element.id)!.strokeColor).toBe("#f00");
+
+    // Undo user change — should restore to #000 (was never a tx intermediate)
+    Keyboard.undo();
+    expect(getElement(element.id)!.strokeColor).toBe("#000");
+  });
+
+  it("does not inject override for user entry on tx-created element", () => {
+    // Start with an empty scene
+    setSceneBaseline([]);
+
+    const tx = h.app.createTransaction();
+    const created = API.createElement({
+      type: "rectangle",
+      id: "tx-created",
+      strokeColor: "#800080",
+      x: 100,
+    });
+
+    // tx creates the element
+    act(() => {
+      tx.updateScene({
+        elements: [...h.app.scene.getElementsIncludingDeleted(), created],
+      });
+    });
+
+    // User modifies the tx-created element
+    applyElementUpdate("tx-created", { strokeColor: "#f00" }, "IMMEDIATELY");
+
+    commitTransaction(tx);
+
+    // The user's undo entry has inserted.strokeColor = #800080 (tx value).
+    // Since baselineElement is null for a tx-created element, no override
+    // marker is added — #800080 is correct to restore to here.
+    Keyboard.undo();
+    expect(getElement("tx-created")!.strokeColor).toBe("#800080");
+  });
+
+  it("does not over-override later user action that intentionally returns to tx intermediate", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "intentional-intermediate",
+      strokeColor: "#000",
+      x: 0,
+    });
+    setSceneBaseline([element]);
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id
+              ? newElementWith(el, { strokeColor: "#800080", x: 200 })
+              : el,
+          ),
+      });
+    });
+
+    // polluted entry: purple -> red (should override to black on undo baseline)
+    applyElementUpdate(element.id, { strokeColor: "#f00" }, "IMMEDIATELY");
+    // intentional action: red -> purple (should keep red as undo baseline)
+    applyElementUpdate(element.id, { strokeColor: "#800080" }, "IMMEDIATELY");
+
+    commitTransaction(tx);
+
+    // undo tx synthetic entry first
+    Keyboard.undo();
+    expect(getElement(element.id)!.strokeColor).toBe("#000");
+    expect(getElement(element.id)!.x).toBe(0);
+
+    // undo intentional user action: should go back to red, not baseline black
+    Keyboard.undo();
+    expect(getElement(element.id)!.strokeColor).toBe("#f00");
+
+    // undo first polluted user action: should go back to pre-tx black
+    Keyboard.undo();
+    expect(getElement(element.id)!.strokeColor).toBe("#000");
+  });
+
+  it("overrides only polluted props when one user entry updates multiple props", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "single-entry-multi-prop",
+      strokeColor: "#000",
+      x: 0,
+      y: 0,
+    });
+    setSceneBaseline([element]);
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id
+              ? newElementWith(el, { strokeColor: "#800080" })
+              : el,
+          ),
+      });
+    });
+
+    // One user history entry modifies both a polluted prop (strokeColor)
+    // and a non-polluted prop (x).
+    applyElementUpdatesInSingleAction(
+      {
+        [element.id]: {
+          strokeColor: "#f00",
+          x: 120,
+        },
+      },
+      "IMMEDIATELY",
+    );
+
+    commitTransaction(tx);
+
+    // No tx synthetic entry expected in this scenario; undoing once applies the
+    // user entry's baseline. strokeColor should be patched to pre-tx baseline,
+    // while x should remain action-local baseline.
+    Keyboard.undo();
+    const live = getElement(element.id)!;
+    expect(live.strokeColor).toBe("#000");
+    expect(live.x).toBe(0);
+    expect(live.y).toBe(0);
+  });
+
+  it("overrides only polluted elements when one user entry updates multiple elements", () => {
+    const elementA = API.createElement({
+      type: "rectangle",
+      id: "single-entry-multi-element-a",
+      strokeColor: "#000",
+      x: 0,
+    });
+    const elementB = API.createElement({
+      type: "rectangle",
+      id: "single-entry-multi-element-b",
+      strokeColor: "#222",
+      x: 0,
+    });
+    setSceneBaseline([elementA, elementB]);
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === elementA.id
+              ? newElementWith(el, { strokeColor: "#800080" })
+              : el,
+          ),
+      });
+    });
+
+    // One user history entry touches two elements:
+    // - elementA has tx pollution on strokeColor and should be patched.
+    // - elementB is unrelated and should keep action-local baseline.
+    applyElementUpdatesInSingleAction(
+      {
+        [elementA.id]: { strokeColor: "#f00" },
+        [elementB.id]: { x: 240 },
+      },
+      "IMMEDIATELY",
+    );
+
+    commitTransaction(tx);
+
+    Keyboard.undo();
+    const liveA = getElement(elementA.id)!;
+    const liveB = getElement(elementB.id)!;
+    expect(liveA.strokeColor).toBe("#000");
+    expect(liveA.x).toBe(0);
+    expect(liveB.x).toBe(0);
+    expect(liveB.strokeColor).toBe("#222");
+  });
+
+  it("applies pre-tx baseline override after transaction is canceled", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "cancel-no-patch",
+      strokeColor: "#000",
+      x: 0,
+    });
+    setSceneBaseline([element]);
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id
+              ? newElementWith(el, { strokeColor: "#800080", x: 200 })
+              : el,
+          ),
+      });
+    });
+
+    applyElementUpdate(element.id, { strokeColor: "#f00" }, "IMMEDIATELY");
+
+    const summary = tx.cancel();
+    expect(summary.status).toBe("canceled");
+    expect(summary.historyCommitted).toBe(false);
+
+    // Cancel ends the tx without a synthetic history entry. Undo for the
+    // interleaved user action should recover the pre-tx baseline.
+    Keyboard.undo();
+    const live = getElement(element.id)!;
+    expect(live.strokeColor).toBe("#000");
+    expect(live.x).toBe(200);
+  });
+
+  it("keeps semantics markers across undo/redo cycles before commit", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "lifecycle-carry",
+      strokeColor: "#000",
+      x: 0,
+    });
+    setSceneBaseline([element]);
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id
+              ? newElementWith(el, { strokeColor: "#800080", x: 200 })
+              : el,
+          ),
+      });
+    });
+
+    applyElementUpdate(element.id, { strokeColor: "#f00" }, "IMMEDIATELY");
+
+    // move user entry to redo and back to undo before commit
+    Keyboard.undo();
+    Keyboard.redo();
+    expect(getElement(element.id)!.strokeColor).toBe("#f00");
+
+    commitTransaction(tx);
+
+    Keyboard.undo();
+    expect(getElement(element.id)!.x).toBe(0);
+
+    Keyboard.undo();
+    expect(getElement(element.id)!.strokeColor).toBe("#000");
+  });
+
+  it("supports concurrent transactions on different props without cross-override", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "concurrent-different-props",
+      strokeColor: "#000",
+      x: 0,
+    });
+    setSceneBaseline([element]);
+
+    const txStroke = h.app.createTransaction();
+    const txX = h.app.createTransaction();
+
+    act(() => {
+      txStroke.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id
+              ? newElementWith(el, { strokeColor: "#800080" })
+              : el,
+          ),
+      });
+      txX.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id ? newElementWith(el, { x: 200 }) : el,
+          ),
+      });
+    });
+
+    applyElementUpdate(element.id, { strokeColor: "#f00" }, "IMMEDIATELY");
+    applyElementUpdate(element.id, { x: 300 }, "IMMEDIATELY");
+
+    commitTransaction(txStroke);
+    commitTransaction(txX);
+
+    Keyboard.undo();
+    expect(getElement(element.id)!.x).toBe(0);
+    expect(getElement(element.id)!.strokeColor).toBe("#f00");
+
+    Keyboard.undo();
+    expect(getElement(element.id)!.strokeColor).toBe("#000");
+  });
+
+  it("supports concurrent transactions on the same prop with deterministic started-seq priority", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "concurrent-same-prop",
+      strokeColor: "#000",
+      x: 0,
+    });
+    setSceneBaseline([element]);
+
+    const txPurple = h.app.createTransaction();
+    const txBlue = h.app.createTransaction();
+
+    act(() => {
+      txPurple.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id
+              ? newElementWith(el, { strokeColor: "#800080" })
+              : el,
+          ),
+      });
+      txBlue.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id
+              ? newElementWith(el, { strokeColor: "#0000ff" })
+              : el,
+          ),
+      });
+    });
+
+    applyElementUpdate(element.id, { strokeColor: "#f00" }, "IMMEDIATELY");
+
+    commitTransaction(txPurple);
+    commitTransaction(txBlue);
+
+    // For txBlue, baseline was captured from live scene at its first update,
+    // which was already purple due to txPurple.
+    Keyboard.undo();
+    expect(getElement(element.id)!.strokeColor).toBe("#800080");
   });
 });

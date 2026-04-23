@@ -563,6 +563,89 @@ export class EphemeralIncrement extends StoreIncrement {
 }
 
 /**
+ * Serializable semantics marker used to recover pre-tx undo baselines
+ * without rewriting history stack entries.
+ */
+export type TxUndoOverride = {
+  txId: string;
+  elementId: string;
+  prop: string;
+  expectedInsertedValue: unknown;
+  preTxBaselineValue: unknown;
+  consumedKey: string;
+};
+
+export type StoreDeltaSemantics = {
+  txUndoOverrides?: TxUndoOverride[];
+};
+
+const cloneTxUndoOverride = (override: TxUndoOverride): TxUndoOverride => ({
+  ...override,
+});
+
+const cloneStoreDeltaSemantics = (
+  semantics: StoreDeltaSemantics | undefined,
+): StoreDeltaSemantics | undefined =>
+  semantics
+    ? {
+        ...semantics,
+        txUndoOverrides: semantics.txUndoOverrides?.map(cloneTxUndoOverride),
+      }
+    : undefined;
+
+const pruneStoreDeltaSemantics = (delta: StoreDelta) => {
+  const txUndoOverrides = delta.semantics?.txUndoOverrides;
+  if (!txUndoOverrides || txUndoOverrides.length === 0) {
+    return;
+  }
+
+  const updatedEntries = delta.elements.updated as Record<
+    string,
+    Delta<Record<string, unknown>>
+  >;
+  const nextTxUndoOverrides = txUndoOverrides.filter((override) => {
+    const updatedEntry = updatedEntries[override.elementId];
+    return (
+      !!updatedEntry &&
+      Object.prototype.hasOwnProperty.call(updatedEntry.inserted, override.prop)
+    );
+  });
+
+  if (nextTxUndoOverrides.length === txUndoOverrides.length) {
+    return;
+  }
+
+  if (nextTxUndoOverrides.length === 0) {
+    delta.semantics = undefined;
+    return;
+  }
+
+  delta.semantics = {
+    ...delta.semantics,
+    txUndoOverrides: nextTxUndoOverrides.map(cloneTxUndoOverride),
+  };
+};
+
+export const mergeStoreDeltaSemantics = (
+  delta: StoreDelta,
+  semantics: StoreDeltaSemantics,
+) => {
+  const txUndoOverrides = semantics.txUndoOverrides ?? [];
+  if (txUndoOverrides.length === 0) {
+    return;
+  }
+
+  const existing = delta.semantics?.txUndoOverrides ?? [];
+  delta.semantics = {
+    ...delta.semantics,
+    txUndoOverrides: [
+      ...existing.map(cloneTxUndoOverride),
+      ...txUndoOverrides.map(cloneTxUndoOverride),
+    ],
+  };
+};
+
+/**
  * Represents a captured delta by the Store.
  */
 export class StoreDelta {
@@ -570,6 +653,7 @@ export class StoreDelta {
     public readonly id: string,
     public readonly elements: ElementsDelta,
     public readonly appState: AppStateDelta,
+    public semantics?: StoreDeltaSemantics,
   ) {}
 
   /**
@@ -579,12 +663,16 @@ export class StoreDelta {
     elements: ElementsDelta,
     appState: AppStateDelta,
     opts: {
-      id: string;
-    } = {
-      id: randomId(),
-    },
+      id?: string;
+      semantics?: StoreDeltaSemantics;
+    } = {},
   ) {
-    return new this(opts.id, elements, appState);
+    return new this(
+      opts.id ?? randomId(),
+      elements,
+      appState,
+      cloneStoreDeltaSemantics(opts.semantics),
+    );
   }
 
   /**
@@ -609,11 +697,12 @@ export class StoreDelta {
    * Restore a store delta instance from a DTO.
    */
   public static restore(storeDeltaDTO: DTO<StoreDelta>) {
-    const { id, elements, appState } = storeDeltaDTO;
+    const { id, elements, appState, semantics } = storeDeltaDTO;
     return new this(
       id,
       ElementsDelta.restore(elements),
       AppStateDelta.restore(appState),
+      cloneStoreDeltaSemantics(semantics),
     );
   }
 
@@ -624,11 +713,17 @@ export class StoreDelta {
     id,
     elements: { added, removed, updated },
     appState: { delta: appStateDelta },
+    semantics,
   }: DTO<StoreDelta>) {
     const elements = ElementsDelta.create(added, removed, updated);
     const appState = AppStateDelta.create(appStateDelta);
 
-    return new this(id, elements, appState);
+    return new this(
+      id,
+      elements,
+      appState,
+      cloneStoreDeltaSemantics(semantics),
+    );
   }
 
   /**
@@ -649,7 +744,12 @@ export class StoreDelta {
    * Inverse store delta, creates new instance of `StoreDelta`.
    */
   public static inverse(delta: StoreDelta) {
-    return this.create(delta.elements.inverse(), delta.appState.inverse());
+    const inversed = this.create(
+      delta.elements.inverse(),
+      delta.appState.inverse(),
+      { semantics: delta.semantics },
+    );
+    return inversed;
   }
 
   /**
@@ -685,7 +785,7 @@ export class StoreDelta {
     nextElements: SceneElementsMap,
     modifierOptions?: "deleted" | "inserted",
   ): StoreDelta {
-    return this.create(
+    const nextDelta = this.create(
       delta.elements.applyLatestChanges(
         prevElements,
         nextElements,
@@ -694,8 +794,11 @@ export class StoreDelta {
       delta.appState,
       {
         id: delta.id,
+        semantics: delta.semantics,
       },
     );
+    pruneStoreDeltaSemantics(nextDelta);
+    return nextDelta;
   }
 
   public static empty() {

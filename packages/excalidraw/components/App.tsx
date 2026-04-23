@@ -835,6 +835,7 @@ class App extends React.Component<AppProps, AppState> {
     this.store = new Store(this);
     this.history = new History(this.store);
     this.transactionManager = new TransactionManager(this);
+    this.transactionManager.attachHistory(this.history);
 
     this.excalidrawContainerValue = {
       container: this.excalidrawContainerRef.current,
@@ -842,7 +843,6 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.fonts = new Fonts(this.scene);
-    this.history = new History(this.store);
 
     this.actionManager.registerAll(actions);
     this.actionManager.registerAction(createUndoAction(this.history));
