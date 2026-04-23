@@ -1,9 +1,9 @@
 resource "aws_s3_bucket" "data" {
-  bucket = "test-lambda-data"
+  bucket = "ts-test-lambda-data"
 }
 
 resource "aws_sqs_queue" "data" {
-  name = "test-lambda-queue"
+  name = "ts-test-lambda-queue"
 }
 
 # --- Lambda: writer ---
@@ -61,7 +61,8 @@ module "lambda-reader" {
   }
 
   environment_variables = {
-    DATA_BUCKET = aws_s3_bucket.data.id
+    DATA_BUCKET    = aws_s3_bucket.data.id
+    DATA_QUEUE_URL = aws_sqs_queue.data.url
   }
 
   attach_policy_statements = true
@@ -71,5 +72,11 @@ module "lambda-reader" {
       actions   = ["s3:GetObject", "s3:ListBucket"]
       resources = [aws_s3_bucket.data.arn, "${aws_s3_bucket.data.arn}/*"]
     }
+    sqs_receive = {
+      effect    = "Allow"
+      actions   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"]
+      resources = [aws_sqs_queue.data.arn]
+    }
   }
 }
+

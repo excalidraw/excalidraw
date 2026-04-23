@@ -660,6 +660,18 @@ const ExcalidrawWrapper = () => {
     appState: AppState,
     files: BinaryFiles,
   ) => {
+    const selectedId = Object.keys(appState.selectedElementIds)[0];
+    if (selectedId) {
+      const selected = elements.find((el) => el.id === selectedId);
+      if (selected?.customData?.terraform) {
+        // eslint-disable-next-line no-console
+        console.log("[terraform] selected:", selected.customData);
+      } else {
+        // eslint-disable-next-line no-console
+        console.log("nada");
+      }
+    }
+
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
     }
