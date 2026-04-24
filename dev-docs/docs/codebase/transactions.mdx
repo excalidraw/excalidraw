@@ -1,57 +1,106 @@
 # Transactions
 
-## Transaction + Ledger System
+Transactions let many live scene updates render immediately while still committing a single durable history entry.
 
-This system lets many canvas mutations over a time window (for example AI streaming patch/action/create) render immediately, while still producing a single undoable durable history entry.
+Typical use case:
 
-- AI streaming typically emits many `NEVER` updates (for real-time visual feedback).
-- `NEVER` updates advance Store snapshots, but do not write undo/redo history.
-- If we only do a final "one IMMEDIATELY at the end", we often miss the intended delta because snapshots may already be aligned.
-- Transaction + Ledger creates synthetic logical before/after snapshots, then commits one durable increment with correct undo semantics.
+- AI streaming emits many `NEVER` updates for real-time feedback.
+- Those updates advance the live scene and store snapshot, but do not create undo history.
+- A transaction records the intended logical delta separately, then commits one synthetic durable increment at the end.
 
 ## Key Files
 
-### `packages/excalidraw/transaction.ts`
+### `packages/excalidraw/transaction/`
 
-- `TransactionLedger`: keeps net mutation state across steps.
-  - `recordStep()`: folds multiple updates into per-element baseline/target/touchedProps.
-  - `buildSyntheticSnapshots()`: reconciles ledger state with live scene using fixed `live-wins-per-prop` behavior and returns `elementsBefore` / `elementsAfter` for history commit.
-- `TransactionManager`: thin factory holding the app reference. `create()` returns a `Transaction`.
-- `Transaction` (class):
-  - `tx.updateScene(data)`: wraps `app.updateScene` with `captureUpdate: NEVER`. Snapshots elements before/after and records the diff into the ledger. Accumulates appState intent.
-  - `tx.updateElements({ elements })`: convenience API for partial updates (`[{ id, strokeColor }, { id, x, y }]`). It materializes a next elements array and delegates to `tx.updateScene(...)`.
-  - `tx.commit()`: builds synthetic before/after snapshots from the ledger, calls `store.commitSyntheticIncrement()`, returns a summary.
-  - `tx.cancel()`: finalizes without committing history.
+- `transaction.ts`
+  - `Transaction` is the per-tx instance.
+  - `updateScene()` applies live updates with `captureUpdate: NEVER`.
+  - `updateElements()` is a typed partial-patch helper over `updateScene()`.
+  - `commit()` builds synthetic snapshots and commits one durable entry.
+  - `cancel()` ends the tx without committing history.
+- `ledger.ts`
+  - `TransactionLedger` keeps per-element baseline, target, and touched props across tx steps.
+  - `buildSyntheticSnapshots()` reconciles tx intent with the live scene using `live-wins-per-prop`.
+- `undoOverridePlanner.ts`
+  - Tracks tx intermediate values.
+  - Produces undo override candidates for regular user history entries that were recorded while a tx was active.
+- `manager.ts`
+  - Owns tx lifecycle state and active-tx priority.
+  - Injects tx undo markers into durable deltas at record time.
+  - Resolves effective history deltas at undo/redo time.
+- `diff.ts` / `types.ts`
+  - Shared diff helpers and transaction-specific types.
 
 ### `packages/element/src/store.ts`
 
-- `store.commitSyntheticIncrement()`: builds `StoreSnapshot -> StoreChange -> StoreDelta` from logical before/after element maps and optional appState patches. Schedules a micro IMMEDIATELY so the delta is flushed on the next `componentDidUpdate -> store.commit()`.
+- `store.commitSyntheticIncrement()`
+  - Builds `StoreSnapshot -> StoreChange -> StoreDelta` from logical before/after snapshots.
+  - Commits the synthetic durable increment immediately through an isolated path.
+  - Does not flush unrelated pending micro actions.
+- `StoreDelta.markers`
+  - Carries extra history markers such as `txUndoOverrides`.
 
-## How They Work Together
+### `packages/excalidraw/history.ts`
 
-1. Caller creates a transaction (`excalidrawAPI.createTransaction()` or `app.transactionManager.create()`).
-2. `tx.updateScene()` applies mutations with `NEVER` for real-time visual feedback.
-3. Ledger records element diffs on each `updateScene()` call; appState intent is auto-accumulated.
-4. On `tx.commit()`:
-   - Ledger builds `logicalBefore/logicalAfter` reconciled against live scene
-   - `store.commitSyntheticIncrement()` computes change/delta and schedules micro IMMEDIATELY
-5. Next `componentDidUpdate -> store.commit()` flushes the micro and emits a durable increment to the undo stack.
+- `onBeforeRecord()`
+  - Lets the transaction manager attach markers before a durable delta becomes a history entry.
+- `setEffectiveDeltaResolver()`
+  - Lets the transaction manager rewrite a history delta at undo/redo time before it is applied.
+
+## Flow
+
+1. Caller creates a transaction.
+2. `tx.updateScene()` applies live updates with `NEVER`.
+3. The ledger records net element changes; appState intent is accumulated separately.
+4. Regular user durable edits that happen while the tx is active may receive tx undo markers.
+5. `tx.commit()` asks the ledger for logical before/after snapshots and calls `store.commitSyntheticIncrement()`.
+6. Undo/redo later uses the manager's effective-delta resolver to decide whether ended tx markers should patch the baseline of a regular history entry.
 
 Result:
 
-- streaming visuals stay immediate;
-- history remains one entry per transaction;
-- synthetic durable commit is scheduled via micro IMMEDIATELY, flushed naturally by the next commit cycle.
+- live rendering stays immediate;
+- one tx still produces one durable history entry;
+- interleaved regular edits can undo back to the correct pre-tx baseline.
 
-## AppState Strategy
+## Undo Examples
 
-The ledger tracks elements per-id per-property. AppState cannot use the same snapshot approach because `setState` is batched.
+### Interleaved Regular Edit
 
-Instead, the transaction auto-accumulates caller intent: each `tx.updateScene({ appState })` call merges the passed `appState` patch into `accumulatedAppState`. The transaction saves `initialAppState` at creation time. At commit: `appStateBefore = initialAppState`, `appStateAfter = initialAppState + accumulatedAppState`.
+1. Baseline: `rect = (x: 0, stroke: black)`
+2. Tx updates it live to `(x: 200, stroke: red)` with `NEVER`
+3. User makes a regular durable edit: `(x: 200, stroke: purple)`
+4. Tx commits; live stays purple
 
-## Sample Usage
+The user history entry was recorded while the tx was active, so its local baseline is `red`.
+If undo later runs after the tx has ended, restoring `red` is wrong: the correct pre-tx baseline is `black`.
 
-### Short Session
+To fix this:
+
+- record-time attaches a tx undo marker to the user history entry
+- perform-time checks whether the tx has already ended
+- if ended, the effective delta is patched so undo restores `black` instead of `red`
+
+### Active Tx vs Ended Tx
+
+Using the same example:
+
+- if the user undoes while the tx is still active, the marker stays inactive and undo restores the tx intermediate value (`red`)
+- if the user undoes after the tx has ended, the marker becomes active and undo restores the pre-tx baseline (`black`)
+
+So markers are recorded early, but applied conditionally.
+
+## AppState
+
+Elements use ledger snapshots. AppState does not.
+
+The transaction instead keeps:
+
+- `initialAppState`: observed appState at tx start
+- `accumulatedAppState`: merged caller intent from `tx.updateScene({ appState })`
+
+At commit, the transaction computes the final appState patch and passes it into `store.commitSyntheticIncrement()`.
+
+## Example
 
 ```ts
 const tx = app.transactionManager.create();
@@ -59,35 +108,18 @@ const tx = app.transactionManager.create();
 tx.updateScene({ elements: updatedElementsA });
 tx.updateScene({ elements: updatedElementsB });
 tx.updateElements({
-  elements: [{ id: "rect-1", strokeColor: "#f00" }, { id: "rect-2", x: 120 }],
+  elements: [
+    { id: "rect-1", type: "rectangle", updates: { strokeColor: "#f00" } },
+    { id: "rect-2", type: "rectangle", updates: { x: 120 } },
+  ],
 });
 
 tx.commit();
 ```
 
-### Long Session (multi-step with error handling)
-
-```ts
-const tx = app.transactionManager.create();
-
-try {
-  tx.updateScene({ elements: step1Elements });
-  tx.updateScene({ elements: step2Elements });
-  tx.updateScene({
-    elements: step3Elements,
-    appState: { selectedElementIds: nextSelectedIds },
-  });
-
-  tx.commit();
-} catch (error) {
-  tx.cancel();
-  throw error;
-}
-```
-
 ## Notes
 
-- `commit()` and `cancel()` are idempotent (repeated calls return the same summary).
-- `updateScene()` / `updateElements()` throw after `commit()` or `cancel()`.
-- Element conflict handling is fixed to `live-wins-per-prop`.
-- Multi-transaction concurrency works naturally — each tx has its own ledger.
+- `commit()` and `cancel()` are idempotent.
+- `updateScene()` and `updateElements()` throw after the tx has ended.
+- Conflict handling inside synthetic snapshots is fixed to `live-wins-per-prop`.
+- Multi-tx interleaving is supported through manager-owned lifecycle tracking and active-tx priority.
