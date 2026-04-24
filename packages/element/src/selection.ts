@@ -130,9 +130,18 @@ export const getElementsWithinSelection = (
   const framesInSelection = excludeElementsInFrames
     ? new Set<NonDeletedExcalidrawElement["id"]>()
     : null;
+  const groups: Record<string, NonDeletedExcalidrawElement[]> = {};
   let elementsInSelection: NonDeletedExcalidrawElement[] = [];
 
   for (const element of elements) {
+    // Collect all groups in the scene and all containing elements for later
+    (element.groupIds ?? []).forEach((groupId) => {
+      if (!groups[groupId]) {
+        groups[groupId] = [];
+      }
+      groups[groupId].push(element);
+    });
+
     if (shouldIgnoreElementFromSelection(element)) {
       continue;
     }
@@ -329,6 +338,26 @@ export const getElementsWithinSelection = (
 
     if (containingFrame) {
       return elementOverlapsWithFrame(element, containingFrame, elementsMap);
+    }
+
+    // If a group this element is part of already included, then we don't need
+    // to check this element separately again
+    const groupIds = element.groupIds ?? [];
+    const largestGroupId = groupIds.reduce<[string | null, number]>(
+      (acc, groupId) => {
+        const group = groups[groupId];
+        if (!group) {
+          return acc;
+        }
+        return group.length > acc[1] ? [groupId, group.length] : acc;
+      },
+      [null, -Infinity],
+    )[0];
+
+    if (groupIds.length > 0 && largestGroupId) {
+      return groups[largestGroupId].every((groupElement) =>
+        elementsInSelection.includes(groupElement),
+      );
     }
 
     return true;
