@@ -14,6 +14,7 @@ import {
 import type { Mutable } from "@excalidraw/common/utility-types";
 import type {
   ExcalidrawElement,
+  ExcalidrawNonSelectionElement,
   OrderedExcalidrawElement,
   SceneElementsMap,
 } from "@excalidraw/element/types";
@@ -800,9 +801,19 @@ export class TransactionLedger {
 export type TransactionStatus = "active" | "committed" | "canceled";
 
 /** Per-element partial patch used by tx.updateElements(). */
-export type TransactionElementUpdate = {
-  id: ExcalidrawElement["id"];
-} & ElementUpdate<OrderedExcalidrawElement>;
+type TransactionUpdatableElementType = ExcalidrawNonSelectionElement["type"];
+type TransactionElementOfType<TType extends TransactionUpdatableElementType> =
+  Extract<ExcalidrawNonSelectionElement, { type: TType }>;
+
+export type TransactionElementUpdate<
+  TType extends TransactionUpdatableElementType = TransactionUpdatableElementType,
+> = TType extends TransactionUpdatableElementType
+  ? {
+      id: ExcalidrawElement["id"];
+      type: TType;
+      updates: ElementUpdate<TransactionElementOfType<TType>>;
+    }
+  : never;
 
 /** Final summary returned when a transaction is committed or canceled. */
 export type TransactionSummary = {
@@ -972,21 +983,20 @@ export class Transaction {
    *
    * Example:
    * tx.updateElements({
-   *   elements: [{ id: "a", strokeColor: "#f00" }, { id: "b", x: 10, y: 20 }],
+   *   elements: [
+   *     { id: "a", type: "rectangle", updates: { strokeColor: "#f00" } },
+   *     { id: "b", type: "rectangle", updates: { x: 10, y: 20 } },
+   *   ],
    * })
    */
   updateElements<K extends keyof AppState>(data: {
     elements: readonly TransactionElementUpdate[];
     appState?: Pick<AppState, K> | null;
   }): void {
-    const updatesById = new Map<
-      string,
-      ElementUpdate<OrderedExcalidrawElement>
-    >();
+    const updatesById = new Map<string, TransactionElementUpdate>();
 
     for (const update of data.elements) {
-      const { id, ...partialUpdate } = update;
-      updatesById.set(id, partialUpdate);
+      updatesById.set(update.id, update);
     }
 
     if (updatesById.size === 0) {
@@ -997,8 +1007,21 @@ export class Transaction {
     const nextElements = this.app.scene
       .getElementsIncludingDeleted()
       .map((element) => {
-        const partialUpdate = updatesById.get(element.id);
-        return partialUpdate ? newElementWith(element, partialUpdate) : element;
+        const update = updatesById.get(element.id);
+        if (!update) {
+          return element;
+        }
+        if (element.type !== update.type) {
+          throw new Error(
+            `Cannot apply tx.updateElements update for "${update.id}": expected "${update.type}", got "${element.type}".`,
+          );
+        }
+
+        type MatchingElement = TransactionElementOfType<typeof update.type>;
+        return newElementWith(
+          element as MatchingElement,
+          update.updates as ElementUpdate<MatchingElement>,
+        );
       });
 
     this.updateScene({
