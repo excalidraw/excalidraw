@@ -679,7 +679,7 @@ export const restoreElements = <T extends ExcalidrawElement>(
         ...element,
         ...updateElbowArrowPoints(
           element,
-          restoredElementsMap as NonDeletedSceneElementsMap,
+          targetElementsMap as NonDeletedSceneElementsMap,
           {
             points: [
               pointFrom<LocalPoint>(0, 0),
@@ -702,7 +702,7 @@ export const restoreElements = <T extends ExcalidrawElement>(
       )
     ) {
       console.error("Fixing self-bound elbow arrow", element.id);
-      const boundElement = restoredElementsMap.get(
+      const boundElement = targetElementsMap.get(
         candidate.startBinding.elementId,
       );
 
