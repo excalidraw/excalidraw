@@ -449,28 +449,27 @@ const stripProps = (
   }, {} as Record<string, any>);
 
 export const checkpointHistory = (history: History, name: string) => {
-  expect(
-    history.undoStack.map((x) => ({
-      ...x,
+  const normalizeHistoryEntry = (entry: History["undoStack"][number]) => {
+    const { markers, ...rest } = entry;
+
+    return {
+      ...rest,
+      ...(markers ? { markers } : {}),
       elements: {
-        ...x.elements,
-        added: stripProps(x.elements.added, ["seed", "versionNonce"]),
-        removed: stripProps(x.elements.removed, ["seed", "versionNonce"]),
-        updated: stripProps(x.elements.updated, ["seed", "versionNonce"]),
+        ...entry.elements,
+        added: stripProps(entry.elements.added, ["seed", "versionNonce"]),
+        removed: stripProps(entry.elements.removed, ["seed", "versionNonce"]),
+        updated: stripProps(entry.elements.updated, ["seed", "versionNonce"]),
       },
-    })),
+    };
+  };
+
+  expect(
+    history.undoStack.map(normalizeHistoryEntry),
   ).toMatchSnapshot(`[${name}] undo stack`);
 
   expect(
-    history.redoStack.map((x) => ({
-      ...x,
-      elements: {
-        ...x.elements,
-        added: stripProps(x.elements.added, ["seed", "versionNonce"]),
-        removed: stripProps(x.elements.removed, ["seed", "versionNonce"]),
-        updated: stripProps(x.elements.updated, ["seed", "versionNonce"]),
-      },
-    })),
+    history.redoStack.map(normalizeHistoryEntry),
   ).toMatchSnapshot(`[${name}] redo stack`);
 };
 

@@ -1,7 +1,7 @@
 import {
   Delta,
   ElementsDelta,
-  mergeStoreDeltaSemantics,
+  mergeStoreDeltaMarkers,
   type StoreDelta,
   type TxUndoOverride,
 } from "@excalidraw/element";
@@ -62,7 +62,7 @@ export class TransactionManager {
    * Single authoritative lifecycle registry for transactions.
    *
    * We retain ended/canceled metadata after the tx object is released because
-   * history semantics only persist `txId`; undo/redo still needs to resolve
+   * history markers only persist `txId`; undo/redo still needs to resolve
    * whether a tx was active or already ended when applying effective deltas.
    */
   private readonly transactionRecords = new Map<string, TransactionRecord>();
@@ -161,7 +161,7 @@ export class TransactionManager {
       return;
     }
 
-    mergeStoreDeltaSemantics(delta, { txUndoOverrides });
+    mergeStoreDeltaMarkers(delta, { txUndoOverrides });
   }
 
   private collectUndoOverrides(delta: StoreDelta): TxUndoOverride[] {
@@ -196,7 +196,7 @@ export class TransactionManager {
     delta: HistoryDelta,
     _context: HistoryEffectiveDeltaResolverContext,
   ): HistoryDelta {
-    const txUndoOverrides = delta.semantics?.txUndoOverrides;
+    const txUndoOverrides = delta.markers?.txUndoOverrides;
     if (!txUndoOverrides || txUndoOverrides.length === 0) {
       return delta;
     }
@@ -276,7 +276,7 @@ export class TransactionManager {
 
     return HistoryDelta.create(effectiveElements, delta.appState, {
       id: delta.id,
-      semantics: delta.semantics,
+      markers: delta.markers,
     }) as HistoryDelta;
   }
 

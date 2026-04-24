@@ -116,8 +116,8 @@ export class Store {
    *
    * Builds StoreSnapshot → StoreChange → StoreDelta from the provided
    * logical before/after element maps and optional appState patches, then
-   * flushes the resulting durable increment immediately (bypassing the
-   * normal componentDidUpdate → store.commit() cycle).
+   * emits the resulting durable increment immediately through an isolated
+   * path that does not flush pending micro actions.
    *
    * appState patches are merged on top of the current observed appState
    * baseline so only the provided keys participate in the synthetic diff.
@@ -167,16 +167,7 @@ export class Store {
       return false;
     }
 
-    this.scheduleMicroAction({
-      action: CaptureUpdateAction.IMMEDIATELY,
-      change,
-      delta,
-    });
-
-    // Flush immediately so the durable increment is emitted without waiting
-    // for the next componentDidUpdate → store.commit() cycle. This is safe
-    // because commitSyntheticIncrement is never called from within commit().
-    this.flushMicroActions();
+    this.emitIsolatedDurableIncrement(change, delta);
 
     return true;
   }
@@ -313,6 +304,24 @@ export class Store {
 
       this.onDurableIncrementEmitter.trigger(increment);
       this.onStoreIncrementEmitter.trigger(increment);
+    }
+  }
+
+  /**
+   * Emits a synthetic durable increment immediately without draining the
+   * regular micro-action queue.
+   */
+  private emitIsolatedDurableIncrement(change: StoreChange, delta: StoreDelta) {
+    const nextSnapshot = this.applyChangeToSnapshot(change);
+
+    if (!nextSnapshot) {
+      return;
+    }
+
+    try {
+      this.emitDurableIncrement(nextSnapshot, change, delta);
+    } finally {
+      this.snapshot = nextSnapshot;
     }
   }
 
@@ -563,7 +572,7 @@ export class EphemeralIncrement extends StoreIncrement {
 }
 
 /**
- * Serializable semantics marker used to recover pre-tx undo baselines
+ * Serializable delta marker used to recover pre-tx undo baselines
  * without rewriting history stack entries.
  */
 export type TxUndoOverride = {
@@ -575,7 +584,7 @@ export type TxUndoOverride = {
   consumedKey: string;
 };
 
-export type StoreDeltaSemantics = {
+export type StoreDeltaMarkers = {
   txUndoOverrides?: TxUndoOverride[];
 };
 
@@ -583,18 +592,18 @@ const cloneTxUndoOverride = (override: TxUndoOverride): TxUndoOverride => ({
   ...override,
 });
 
-const cloneStoreDeltaSemantics = (
-  semantics: StoreDeltaSemantics | undefined,
-): StoreDeltaSemantics | undefined =>
-  semantics
+const cloneStoreDeltaMarkers = (
+  markers: StoreDeltaMarkers | undefined,
+): StoreDeltaMarkers | undefined =>
+  markers
     ? {
-        ...semantics,
-        txUndoOverrides: semantics.txUndoOverrides?.map(cloneTxUndoOverride),
+        ...markers,
+        txUndoOverrides: markers.txUndoOverrides?.map(cloneTxUndoOverride),
       }
     : undefined;
 
-const pruneStoreDeltaSemantics = (delta: StoreDelta) => {
-  const txUndoOverrides = delta.semantics?.txUndoOverrides;
+const pruneStoreDeltaMarkers = (delta: StoreDelta) => {
+  const txUndoOverrides = delta.markers?.txUndoOverrides;
   if (!txUndoOverrides || txUndoOverrides.length === 0) {
     return;
   }
@@ -616,28 +625,28 @@ const pruneStoreDeltaSemantics = (delta: StoreDelta) => {
   }
 
   if (nextTxUndoOverrides.length === 0) {
-    delta.semantics = undefined;
+    delta.markers = undefined;
     return;
   }
 
-  delta.semantics = {
-    ...delta.semantics,
+  delta.markers = {
+    ...delta.markers,
     txUndoOverrides: nextTxUndoOverrides.map(cloneTxUndoOverride),
   };
 };
 
-export const mergeStoreDeltaSemantics = (
+export const mergeStoreDeltaMarkers = (
   delta: StoreDelta,
-  semantics: StoreDeltaSemantics,
+  markers: StoreDeltaMarkers,
 ) => {
-  const txUndoOverrides = semantics.txUndoOverrides ?? [];
+  const txUndoOverrides = markers.txUndoOverrides ?? [];
   if (txUndoOverrides.length === 0) {
     return;
   }
 
-  const existing = delta.semantics?.txUndoOverrides ?? [];
-  delta.semantics = {
-    ...delta.semantics,
+  const existing = delta.markers?.txUndoOverrides ?? [];
+  delta.markers = {
+    ...delta.markers,
     txUndoOverrides: [
       ...existing.map(cloneTxUndoOverride),
       ...txUndoOverrides.map(cloneTxUndoOverride),
@@ -653,7 +662,7 @@ export class StoreDelta {
     public readonly id: string,
     public readonly elements: ElementsDelta,
     public readonly appState: AppStateDelta,
-    public semantics?: StoreDeltaSemantics,
+    public markers?: StoreDeltaMarkers,
   ) {}
 
   /**
@@ -664,14 +673,14 @@ export class StoreDelta {
     appState: AppStateDelta,
     opts: {
       id?: string;
-      semantics?: StoreDeltaSemantics;
+      markers?: StoreDeltaMarkers;
     } = {},
   ) {
     return new this(
       opts.id ?? randomId(),
       elements,
       appState,
-      cloneStoreDeltaSemantics(opts.semantics),
+      cloneStoreDeltaMarkers(opts.markers),
     );
   }
 
@@ -697,12 +706,12 @@ export class StoreDelta {
    * Restore a store delta instance from a DTO.
    */
   public static restore(storeDeltaDTO: DTO<StoreDelta>) {
-    const { id, elements, appState, semantics } = storeDeltaDTO;
+    const { id, elements, appState, markers } = storeDeltaDTO;
     return new this(
       id,
       ElementsDelta.restore(elements),
       AppStateDelta.restore(appState),
-      cloneStoreDeltaSemantics(semantics),
+      cloneStoreDeltaMarkers(markers),
     );
   }
 
@@ -713,7 +722,7 @@ export class StoreDelta {
     id,
     elements: { added, removed, updated },
     appState: { delta: appStateDelta },
-    semantics,
+    markers,
   }: DTO<StoreDelta>) {
     const elements = ElementsDelta.create(added, removed, updated);
     const appState = AppStateDelta.create(appStateDelta);
@@ -722,7 +731,7 @@ export class StoreDelta {
       id,
       elements,
       appState,
-      cloneStoreDeltaSemantics(semantics),
+      cloneStoreDeltaMarkers(markers),
     );
   }
 
@@ -735,8 +744,10 @@ export class StoreDelta {
     for (const delta of deltas) {
       aggregatedDelta.elements.squash(delta.elements);
       aggregatedDelta.appState.squash(delta.appState);
+      mergeStoreDeltaMarkers(aggregatedDelta, delta.markers ?? {});
     }
 
+    pruneStoreDeltaMarkers(aggregatedDelta);
     return aggregatedDelta;
   }
 
@@ -747,7 +758,7 @@ export class StoreDelta {
     const inversed = this.create(
       delta.elements.inverse(),
       delta.appState.inverse(),
-      { semantics: delta.semantics },
+      { markers: delta.markers },
     );
     return inversed;
   }
@@ -794,10 +805,10 @@ export class StoreDelta {
       delta.appState,
       {
         id: delta.id,
-        semantics: delta.semantics,
+        markers: delta.markers,
       },
     );
-    pruneStoreDeltaSemantics(nextDelta);
+    pruneStoreDeltaMarkers(nextDelta);
     return nextDelta;
   }
 
