@@ -727,12 +727,7 @@ export class StoreDelta {
     const elements = ElementsDelta.create(added, removed, updated);
     const appState = AppStateDelta.create(appStateDelta);
 
-    return new this(
-      id,
-      elements,
-      appState,
-      cloneStoreDeltaMarkers(markers),
-    );
+    return new this(id, elements, appState, cloneStoreDeltaMarkers(markers));
   }
 
   /**
