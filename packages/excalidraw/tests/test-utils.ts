@@ -464,13 +464,13 @@ export const checkpointHistory = (history: History, name: string) => {
     };
   };
 
-  expect(
-    history.undoStack.map(normalizeHistoryEntry),
-  ).toMatchSnapshot(`[${name}] undo stack`);
+  expect(history.undoStack.map(normalizeHistoryEntry)).toMatchSnapshot(
+    `[${name}] undo stack`,
+  );
 
-  expect(
-    history.redoStack.map(normalizeHistoryEntry),
-  ).toMatchSnapshot(`[${name}] redo stack`);
+  expect(history.redoStack.map(normalizeHistoryEntry)).toMatchSnapshot(
+    `[${name}] redo stack`,
+  );
 };
 
 /**

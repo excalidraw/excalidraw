@@ -8,6 +8,7 @@ import type { ElementUpdate } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   OrderedExcalidrawElement,
+  ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
@@ -21,13 +22,28 @@ import type { Transaction, TransactionSummary } from "../transaction";
 
 const { h } = window;
 
-const getElement = (id: string) =>
+type CaptureUpdateKey = keyof typeof CaptureUpdateAction;
+
+const getElement = (id: ExcalidrawElement["id"]): ExcalidrawElement | null =>
   h.app.scene.getNonDeletedElementsMap().get(id) ?? null;
 
+const getElementIncludingDeleted = (
+  id: ExcalidrawElement["id"],
+): ExcalidrawElement | null =>
+  h.app.scene.getElementsMapIncludingDeleted().get(id) ?? null;
+
+const getTextElement = (id: ExcalidrawElement["id"]): ExcalidrawTextElement => {
+  const element = getElement(id);
+  if (!element || element.type !== "text") {
+    throw new Error(`Expected text element: ${id}`);
+  }
+  return element;
+};
+
 const applyElementUpdate = (
-  id: string,
+  id: ExcalidrawElement["id"],
   updates: ElementUpdate<OrderedExcalidrawElement>,
-  captureUpdate: keyof typeof CaptureUpdateAction,
+  captureUpdate: CaptureUpdateKey,
 ) => {
   const nextElements = h.app.scene
     .getElementsIncludingDeleted()
@@ -41,9 +57,30 @@ const applyElementUpdate = (
   });
 };
 
+const applyTextUpdate = (
+  id: ExcalidrawElement["id"],
+  updates: ElementUpdate<ExcalidrawTextElement>,
+  captureUpdate: CaptureUpdateKey,
+) => {
+  const nextElements = h.app.scene
+    .getElementsIncludingDeleted()
+    .map((element) =>
+      element.id === id && element.type === "text"
+        ? newElementWith(element, updates)
+        : element,
+    );
+
+  API.updateScene({
+    elements: nextElements,
+    captureUpdate: CaptureUpdateAction[captureUpdate],
+  });
+};
+
 const applyElementUpdatesInSingleAction = (
-  updatesById: Record<string, ElementUpdate<OrderedExcalidrawElement>>,
-  captureUpdate: keyof typeof CaptureUpdateAction,
+  updatesById: Partial<
+    Record<ExcalidrawElement["id"], ElementUpdate<OrderedExcalidrawElement>>
+  >,
+  captureUpdate: CaptureUpdateKey,
 ) => {
   const nextElements = h.app.scene
     .getElementsIncludingDeleted()
@@ -58,6 +95,25 @@ const applyElementUpdatesInSingleAction = (
   });
 };
 
+const selectElementsByIds = (
+  ids: readonly ExcalidrawElement["id"][],
+  captureUpdate: CaptureUpdateKey = "IMMEDIATELY",
+) => {
+  const selectedElementIds = ids.reduce<Record<ExcalidrawElement["id"], true>>(
+    (acc, id) => {
+      acc[id] = true;
+      return acc;
+    },
+    {},
+  );
+
+  API.updateScene({
+    appState: { selectedElementIds },
+    captureUpdate: CaptureUpdateAction[captureUpdate],
+  });
+};
+
+const getSelectedIds = () => Object.keys(h.state.selectedElementIds).sort();
 const setSceneBaseline = (elements: readonly ExcalidrawElement[]) => {
   API.updateScene({
     elements,
@@ -226,6 +282,104 @@ describe("createTransaction lifecycle", () => {
     expect(commitSpy).not.toHaveBeenCalled();
   });
 
+  it("commits tx history without flushing pending micro actions", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "isolated-commit",
+      x: 0,
+      y: 0,
+    });
+    setSceneBaseline([element]);
+
+    const incrementTypes: Array<"durable" | "ephemeral"> = [];
+    const detach = h.store.onStoreIncrementEmitter.on((increment) => {
+      incrementTypes.push(increment.type);
+    });
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id ? newElementWith(el, { x: 120 }) : el,
+          ),
+      });
+
+      h.store.scheduleMicroAction({
+        action: CaptureUpdateAction.NEVER,
+        elements: undefined,
+        appState: {
+          ...h.state,
+          selectedElementIds: { [element.id]: true },
+        },
+      });
+    });
+
+    const eventsBeforeCommit = incrementTypes.length;
+    const summary = commitTransaction(tx);
+
+    expect(summary.historyCommitted).toBe(true);
+    expect(incrementTypes.slice(eventsBeforeCommit)).toEqual(["durable"]);
+
+    const eventsBeforeStoreCommit = incrementTypes.length;
+    act(() => {
+      h.store.commit(h.app.scene.getElementsMapIncludingDeleted(), h.state);
+    });
+
+    expect(incrementTypes.slice(eventsBeforeStoreCommit)).toEqual([
+      "ephemeral",
+    ]);
+    detach();
+  });
+
+  it("closes the transaction when commitSyntheticIncrement throws", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "commit-throws",
+      x: 0,
+      y: 0,
+    });
+    setSceneBaseline([element]);
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateElements({
+        elements: [
+          {
+            id: element.id,
+            type: "rectangle",
+            updates: { x: 120 },
+          },
+        ],
+      });
+    });
+
+    const expectedError = new Error("synthetic commit failed");
+    vi.spyOn(h.store, "commitSyntheticIncrement").mockImplementation(() => {
+      throw expectedError;
+    });
+
+    let thrownError: unknown;
+    act(() => {
+      try {
+        tx.commit();
+      } catch (error) {
+        thrownError = error;
+      }
+    });
+
+    expect(thrownError).toBe(expectedError);
+    expect(tx.status).toBe("committed");
+    expect(API.getUndoStack().length).toBe(0);
+    expect(() => tx.updateScene({ elements: [] })).toThrow(/already committed/);
+    expect(() =>
+      tx.updateElements({
+        elements: [{ id: element.id, type: "rectangle", updates: { y: 240 } }],
+      }),
+    ).toThrow(/already committed/);
+  });
+
   it("throws on updateScene after commit", () => {
     const tx = h.app.createTransaction();
     commitTransaction(tx);
@@ -245,7 +399,9 @@ describe("createTransaction lifecycle", () => {
     commitTransaction(tx);
 
     expect(() =>
-      tx.updateElements({ elements: [{ id: "missing", x: 10 }] }),
+      tx.updateElements({
+        elements: [{ id: "missing", type: "rectangle", updates: { x: 10 } }],
+      }),
     ).toThrow(/already committed/);
   });
 
@@ -254,7 +410,9 @@ describe("createTransaction lifecycle", () => {
     tx.cancel();
 
     expect(() =>
-      tx.updateElements({ elements: [{ id: "missing", x: 10 }] }),
+      tx.updateElements({
+        elements: [{ id: "missing", type: "rectangle", updates: { x: 10 } }],
+      }),
     ).toThrow(/already canceled/);
   });
 });
@@ -286,8 +444,16 @@ describe("createTransaction updateElements", () => {
     act(() => {
       tx.updateElements({
         elements: [
-          { id: elementA.id, strokeColor: "#f00" },
-          { id: elementB.id, x: 420, y: 180 },
+          {
+            id: elementA.id,
+            type: "rectangle",
+            updates: { strokeColor: "#f00" },
+          },
+          {
+            id: elementB.id,
+            type: "rectangle",
+            updates: { x: 420, y: 180 },
+          },
         ],
       });
     });
@@ -332,7 +498,13 @@ describe("createTransaction updateElements", () => {
     const tx = h.app.createTransaction();
     act(() => {
       tx.updateElements({
-        elements: [{ id: "missing-element-id", x: 999, strokeColor: "#f00" }],
+        elements: [
+          {
+            id: "missing-element-id",
+            type: "rectangle",
+            updates: { x: 999, strokeColor: "#f00" },
+          },
+        ],
       });
     });
 
@@ -344,6 +516,74 @@ describe("createTransaction updateElements", () => {
     expect(live.x).toBe(element.x);
     expect(live.y).toBe(element.y);
     expect(live.strokeColor).toBe(element.strokeColor);
+  });
+
+  it("throws when update type mismatches the live element type", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "type-mismatch",
+      x: 0,
+      y: 0,
+    });
+    setSceneBaseline([element]);
+
+    const tx = h.app.createTransaction();
+    expect(() =>
+      tx.updateElements({
+        elements: [
+          {
+            id: element.id,
+            type: "text",
+            updates: { text: "should-throw" },
+          },
+        ],
+      }),
+    ).toThrow(/expected "text", got "rectangle"/);
+  });
+
+  it("uses last update for duplicate ids within a single updateElements() call", async () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "duplicate-update-id",
+      x: 0,
+      y: 0,
+      strokeColor: "#000",
+    });
+    setSceneBaseline([element]);
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateElements({
+        elements: [
+          {
+            id: element.id,
+            type: "rectangle",
+            updates: { strokeColor: "#f00" },
+          },
+          {
+            id: element.id,
+            type: "rectangle",
+            updates: { x: 240 },
+          },
+        ],
+      });
+    });
+
+    const summary = commitTransaction(tx);
+    expect(summary.historyCommitted).toBe(true);
+
+    let live = getElement(element.id)!;
+    expect(live.x).toBe(240);
+    expect(live.y).toBe(element.y);
+    expect(live.strokeColor).toBe(element.strokeColor);
+
+    Keyboard.undo();
+    await waitFor(() => {
+      live = getElement(element.id)!;
+      expect(live.x).toBe(element.x);
+      expect(live.y).toBe(element.y);
+      expect(live.strokeColor).toBe(element.strokeColor);
+    });
   });
 });
 
@@ -455,6 +695,47 @@ describe("createTransaction appState", () => {
     expect(commitSpy).toHaveBeenCalledTimes(1);
     expect(summary.historyCommitted).toBe(false);
     expect(API.getUndoStack().length).toBe(0);
+  });
+
+  it("closes the transaction when resolveAppState throws", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "resolver-throws",
+    });
+    setSceneBaseline([element]);
+
+    const commitSpy = vi.spyOn(h.store, "commitSyntheticIncrement");
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateScene({
+        appState: { selectedElementIds: { [element.id]: true } },
+      });
+    });
+
+    const expectedError = new Error("resolveAppState failed");
+    let thrownError: unknown;
+    act(() => {
+      try {
+        tx.commit({
+          resolveAppState: () => {
+            throw expectedError;
+          },
+        });
+      } catch (error) {
+        thrownError = error;
+      }
+    });
+
+    expect(thrownError).toBe(expectedError);
+    expect(commitSpy).not.toHaveBeenCalled();
+    expect(tx.status).toBe("committed");
+    expect(API.getUndoStack().length).toBe(0);
+    expect(() =>
+      tx.updateScene({
+        appState: { selectedElementIds: {} },
+      }),
+    ).toThrow(/already committed/);
   });
 
   it("supports appState-only commit via tx.updateElements()", () => {
@@ -642,71 +923,6 @@ describe("createTransaction interleaving and undo ordering", () => {
     });
   });
 
-  it("keeps same-element user edits separated from transaction rollback", async () => {
-    const element = API.createElement({
-      type: "rectangle",
-      id: "shared",
-      x: 0,
-      y: 0,
-      strokeColor: "#1e1e1e",
-      backgroundColor: "#ffe8cc",
-    });
-
-    setSceneBaseline([element]);
-    expect(API.getUndoStack().length).toBe(0);
-
-    const tx = h.app.createTransaction();
-
-    act(() => {
-      tx.updateScene({
-        elements: h.app.scene.getElementsIncludingDeleted().map((el) =>
-          el.id === element.id
-            ? newElementWith(el, {
-                strokeColor: "#ff006e",
-                x: 200,
-              })
-            : el,
-        ),
-      });
-    });
-
-    applyElementUpdate(
-      element.id,
-      { backgroundColor: "#00f5d4" },
-      "IMMEDIATELY",
-    );
-
-    const summary = commitTransaction(tx);
-    expect(summary.historyCommitted).toBe(true);
-
-    await waitFor(() => {
-      expect(API.getUndoStack().length).toBe(2);
-    });
-
-    let live = getElement(element.id)!;
-    expect(live.strokeColor).toBe("#ff006e");
-    expect(live.x).toBe(200);
-    expect(live.backgroundColor).toBe("#00f5d4");
-
-    // Undo transaction
-    Keyboard.undo();
-    await waitFor(() => {
-      live = getElement(element.id)!;
-      expect(live.strokeColor).toBe(element.strokeColor);
-      expect(live.x).toBe(element.x);
-      expect(live.backgroundColor).toBe("#00f5d4");
-    });
-
-    // Undo user edit
-    Keyboard.undo();
-    await waitFor(() => {
-      live = getElement(element.id)!;
-      expect(live.backgroundColor).toBe(element.backgroundColor);
-      expect(live.strokeColor).toBe(element.strokeColor);
-      expect(live.x).toBe(element.x);
-    });
-  });
-
   it("transaction commit time not affected by tx creation time", async () => {
     const element = API.createElement({
       type: "rectangle",
@@ -782,29 +998,6 @@ describe("createTransaction live-wins-per-prop behavior", () => {
     return element;
   };
 
-  it("tx merge strategy for conflicting edits should prefer live values", () => {
-    const element = setupSamePropertyConflictScenario();
-
-    const live = getElement(element.id)!;
-    expect(live.strokeColor).toBe("#f0f");
-    expect(live.x).toBe(200);
-    expect(live.backgroundColor).toBe("#fff");
-  });
-
-  it("undoing transaction should keep conflicting live value while rolling back tx-only props", () => {
-    const element = setupSamePropertyConflictScenario();
-
-    Keyboard.undo();
-
-    const live = getElement(element.id)!;
-    // strokeColor is unchanged because the transaction itself didn't end up
-    // touching it (it kept the current live value)
-    expect(live.strokeColor).toBe("#f0f");
-    // x should be reverted to pre-transaction value
-    expect(live.x).toBe(0);
-    expect(live.backgroundColor).toBe("#fff");
-  });
-
   it("undoing regular edit after tx rollback restores pre-tx baseline value", () => {
     const element = setupSamePropertyConflictScenario();
 
@@ -822,10 +1015,10 @@ describe("createTransaction live-wins-per-prop behavior", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Transaction undo semantics markers + effective delta resolution
+// Transaction undo markers + effective delta resolution
 // ---------------------------------------------------------------------------
 
-describe("transaction undo semantics markers", () => {
+describe("transaction undo markers", () => {
   beforeEach(async () => {
     await render(<Excalidraw handleKeyboardGlobally={true} />);
   });
@@ -960,44 +1153,6 @@ describe("transaction undo semantics markers", () => {
     Keyboard.redo();
     expect(getElement(element.id)!.x).toBe(200);
     expect(getElement(element.id)!.strokeColor).toBe("#f00");
-  });
-
-  it("does not inject override when user modifies a different property", () => {
-    const element = API.createElement({
-      type: "rectangle",
-      id: "diff-prop",
-      strokeColor: "#000",
-      backgroundColor: "#fff",
-      x: 0,
-    });
-    setSceneBaseline([element]);
-
-    const tx = h.app.createTransaction();
-
-    // tx only changes x
-    act(() => {
-      tx.updateScene({
-        elements: h.app.scene
-          .getElementsIncludingDeleted()
-          .map((el) =>
-            el.id === element.id ? newElementWith(el, { x: 200 }) : el,
-          ),
-      });
-    });
-
-    // User changes strokeColor (different property from tx)
-    applyElementUpdate(element.id, { strokeColor: "#f00" }, "IMMEDIATELY");
-
-    commitTransaction(tx);
-
-    // Undo tx
-    Keyboard.undo();
-    expect(getElement(element.id)!.x).toBe(0);
-    expect(getElement(element.id)!.strokeColor).toBe("#f00");
-
-    // Undo user change — should restore to #000 (was never a tx intermediate)
-    Keyboard.undo();
-    expect(getElement(element.id)!.strokeColor).toBe("#000");
   });
 
   it("does not inject override for user entry on tx-created element", () => {
@@ -1207,7 +1362,7 @@ describe("transaction undo semantics markers", () => {
     expect(live.x).toBe(200);
   });
 
-  it("keeps semantics markers across undo/redo cycles before commit", () => {
+  it("keeps undo markers across undo/redo cycles before commit", () => {
     const element = API.createElement({
       type: "rectangle",
       id: "lifecycle-carry",
@@ -1243,6 +1398,413 @@ describe("transaction undo semantics markers", () => {
 
     Keyboard.undo();
     expect(getElement(element.id)!.strokeColor).toBe("#000");
+  });
+
+  it("keeps undo ordering across text+rectangle interleaving with selection entries", async () => {
+    const text = API.createElement({
+      type: "text",
+      id: "interleave-text",
+      text: "alpha",
+      x: 40,
+      y: 40,
+      strokeColor: "#000",
+    });
+    const rectangle = API.createElement({
+      type: "rectangle",
+      id: "interleave-rectangle",
+      x: 300,
+      y: 80,
+      strokeColor: "#111",
+      backgroundColor: "#fff",
+    });
+    setSceneBaseline([text, rectangle]);
+
+    const tx = h.app.createTransaction();
+
+    act(() => {
+      tx.updateElements({
+        elements: [
+          {
+            id: text.id,
+            type: "text",
+            updates: { text: "tx-draft" },
+          },
+        ],
+      });
+    });
+
+    // regular #1: select text
+    selectElementsByIds([text.id]);
+    // regular #2: edit text
+    applyTextUpdate(text.id, { text: "beta" }, "IMMEDIATELY");
+
+    act(() => {
+      tx.updateElements({
+        elements: [
+          {
+            id: rectangle.id,
+            type: "rectangle",
+            updates: { x: 520, strokeColor: "#800080" },
+          },
+        ],
+      });
+    });
+
+    // regular #3: select rectangle
+    selectElementsByIds([rectangle.id]);
+    // regular #4: edit rectangle (conflicting prop + additional prop)
+    applyElementUpdate(
+      rectangle.id,
+      { strokeColor: "#f00", backgroundColor: "#ffd43b" },
+      "IMMEDIATELY",
+    );
+
+    expect(API.getUndoStack().length).toBe(4);
+
+    const summary = commitTransaction(tx);
+    expect(summary.historyCommitted).toBe(true);
+
+    await waitFor(() => {
+      expect(API.getUndoStack().length).toBe(5);
+    });
+
+    let liveText = getTextElement(text.id);
+    let liveRectangle = getElement(rectangle.id)!;
+    expect(liveText.text).toBe("beta");
+    expect(liveRectangle.x).toBe(520);
+    expect(liveRectangle.strokeColor).toBe("#f00");
+    expect(liveRectangle.backgroundColor).toBe("#ffd43b");
+    expect(getSelectedIds()).toEqual([rectangle.id]);
+
+    // 1) undo tx entry
+    Keyboard.undo();
+    await waitFor(() => {
+      liveText = getTextElement(text.id);
+      liveRectangle = getElement(rectangle.id)!;
+      expect(liveText.text).toBe("beta");
+      expect(liveRectangle.x).toBe(300);
+      expect(liveRectangle.strokeColor).toBe("#f00");
+      expect(liveRectangle.backgroundColor).toBe("#ffd43b");
+    });
+    expect(getSelectedIds()).toEqual([rectangle.id]);
+
+    // 2) undo regular rectangle edit
+    Keyboard.undo();
+    await waitFor(() => {
+      liveRectangle = getElement(rectangle.id)!;
+      expect(liveRectangle.strokeColor).toBe("#111");
+      expect(liveRectangle.backgroundColor).toBe("#fff");
+      expect(liveRectangle.x).toBe(300);
+    });
+    expect(getSelectedIds()).toEqual([rectangle.id]);
+
+    // 3) undo rectangle selection
+    Keyboard.undo();
+    await waitFor(() => {
+      expect(getSelectedIds()).toEqual([text.id]);
+    });
+
+    // 4) undo regular text edit
+    Keyboard.undo();
+    await waitFor(() => {
+      liveText = getTextElement(text.id);
+      expect(liveText.text).toBe("alpha");
+    });
+    expect(getSelectedIds()).toEqual([text.id]);
+
+    // 5) undo text selection
+    Keyboard.undo();
+    await waitFor(() => {
+      expect(getSelectedIds()).toEqual([]);
+      liveText = getTextElement(text.id);
+      liveRectangle = getElement(rectangle.id)!;
+      expect(liveText.text).toBe("alpha");
+      expect(liveRectangle.x).toBe(300);
+      expect(liveRectangle.strokeColor).toBe("#111");
+      expect(liveRectangle.backgroundColor).toBe("#fff");
+    });
+  });
+
+  it("keeps bound text + container consistent across interleaved undo chain", () => {
+    const [container, text] = API.createTextContainer({
+      label: { text: "alpha" },
+    });
+    const baselineContainerX = container.x;
+    const baselineContainerBackground = container.backgroundColor;
+    setSceneBaseline([container, text]);
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateElements({
+        elements: [
+          {
+            id: container.id,
+            type: "rectangle",
+            updates: { x: 240, backgroundColor: "#800080" },
+          },
+        ],
+      });
+    });
+
+    applyElementUpdate(
+      container.id,
+      { backgroundColor: "#f00" },
+      "IMMEDIATELY",
+    );
+
+    commitTransaction(tx);
+    expect(API.getUndoStack().length).toBe(2);
+
+    let liveText = getTextElement(text.id);
+    let liveContainer = getElement(container.id)!;
+    expect(liveContainer.x).toBe(240);
+    expect(liveContainer.backgroundColor).toBe("#f00");
+    expect(liveText.containerId).toBe(container.id);
+    expect(liveContainer.boundElements).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: text.id })]),
+    );
+
+    Keyboard.undo();
+    liveText = getTextElement(text.id);
+    liveContainer = getElement(container.id)!;
+    expect(liveContainer.x).toBe(baselineContainerX);
+    expect(liveContainer.backgroundColor).toBe("#f00");
+    expect(liveText.containerId).toBe(container.id);
+
+    Keyboard.undo();
+    liveText = getTextElement(text.id);
+    liveContainer = getElement(container.id)!;
+    expect(liveContainer.backgroundColor).toBe(baselineContainerBackground);
+    expect(liveText.containerId).toBe(container.id);
+    expect(liveContainer.boundElements).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: text.id })]),
+    );
+  });
+
+  it("restores pre-tx baseline for arrow binding conflicts", () => {
+    const start = API.createElement({
+      type: "rectangle",
+      id: "arrow-start",
+      x: 0,
+      y: 0,
+      width: 120,
+      height: 120,
+    });
+    const endBaseline = API.createElement({
+      type: "rectangle",
+      id: "arrow-end-baseline",
+      x: 300,
+      y: 0,
+      width: 120,
+      height: 120,
+    });
+    const endTx = API.createElement({
+      type: "rectangle",
+      id: "arrow-end-tx",
+      x: 600,
+      y: 0,
+      width: 120,
+      height: 120,
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      id: "interleave-arrow",
+      strokeColor: "#000",
+      startBinding: {
+        elementId: start.id,
+        fixedPoint: [1, 0.5],
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: endBaseline.id,
+        fixedPoint: [0, 0.5],
+        mode: "orbit",
+      },
+    });
+    setSceneBaseline([start, endBaseline, endTx, arrow]);
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateElements({
+        elements: [
+          {
+            id: arrow.id,
+            type: "arrow",
+            updates: {
+              strokeColor: "#800080",
+              endBinding: {
+                elementId: endTx.id,
+                fixedPoint: [0, 0.5],
+                mode: "orbit",
+              },
+            },
+          },
+        ],
+      });
+    });
+
+    const nextElements = h.app.scene
+      .getElementsIncludingDeleted()
+      .map((element) =>
+        element.id === arrow.id && element.type === "arrow"
+          ? newElementWith(element, {
+              endBinding: {
+                elementId: start.id,
+                fixedPoint: [1, 0.5],
+                mode: "orbit",
+              },
+            })
+          : element,
+      );
+    API.updateScene({
+      elements: nextElements,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    });
+
+    commitTransaction(tx);
+
+    let liveArrow = getElement(arrow.id);
+    if (!liveArrow || liveArrow.type !== "arrow") {
+      throw new Error(`Expected arrow element: ${arrow.id}`);
+    }
+    expect(liveArrow.strokeColor).toBe("#800080");
+    expect(liveArrow.endBinding?.elementId).toBe(start.id);
+
+    Keyboard.undo();
+    liveArrow = getElement(arrow.id);
+    if (!liveArrow || liveArrow.type !== "arrow") {
+      throw new Error(`Expected arrow element: ${arrow.id}`);
+    }
+    expect(liveArrow.strokeColor).toBe("#000");
+    expect(liveArrow.endBinding?.elementId).toBe(start.id);
+
+    Keyboard.undo();
+    liveArrow = getElement(arrow.id);
+    if (!liveArrow || liveArrow.type !== "arrow") {
+      throw new Error(`Expected arrow element: ${arrow.id}`);
+    }
+    expect(liveArrow.endBinding?.elementId).toBe(endBaseline.id);
+  });
+
+  it("restores pre-tx baseline for frame membership conflicts", () => {
+    const frameA = API.createElement({
+      type: "frame",
+      id: "frame-a",
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 200,
+    });
+    const frameB = API.createElement({
+      type: "frame",
+      id: "frame-b",
+      x: 500,
+      y: 0,
+      width: 300,
+      height: 200,
+    });
+    const child = API.createElement({
+      type: "rectangle",
+      id: "frame-child",
+      x: 80,
+      y: 70,
+      frameId: frameA.id,
+    });
+    setSceneBaseline([frameA, frameB, child]);
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateElements({
+        elements: [
+          {
+            id: child.id,
+            type: "rectangle",
+            updates: { frameId: frameB.id, x: 560 },
+          },
+        ],
+      });
+    });
+
+    applyElementUpdate(child.id, { frameId: null }, "IMMEDIATELY");
+    commitTransaction(tx);
+
+    let liveChild = getElement(child.id)!;
+    expect(liveChild.frameId).toBeNull();
+    expect(liveChild.x).toBe(560);
+
+    Keyboard.undo();
+    liveChild = getElement(child.id)!;
+    expect(liveChild.frameId).toBeNull();
+    expect(liveChild.x).toBe(80);
+
+    Keyboard.undo();
+    liveChild = getElement(child.id)!;
+    expect(liveChild.frameId).toBe(frameA.id);
+    expect(liveChild.x).toBe(80);
+  });
+
+  it("restores deleted element to pre-tx baseline on full undo", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "delete-interleave",
+      x: 0,
+      y: 0,
+      strokeColor: "#000",
+    });
+    const sibling = API.createElement({
+      type: "rectangle",
+      id: "delete-interleave-sibling",
+      x: 40,
+      y: 40,
+      strokeColor: "#111",
+    });
+    setSceneBaseline([element, sibling]);
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateElements({
+        elements: [
+          {
+            id: element.id,
+            type: "rectangle",
+            updates: { x: 200, strokeColor: "#800080" },
+          },
+          {
+            id: sibling.id,
+            type: "rectangle",
+            updates: { x: 300 },
+          },
+        ],
+      });
+    });
+
+    applyElementUpdate(element.id, { strokeColor: "#f00" }, "IMMEDIATELY");
+    applyElementUpdate(element.id, { isDeleted: true }, "IMMEDIATELY");
+    commitTransaction(tx);
+
+    let live = getElementIncludingDeleted(element.id)!;
+    expect(live.isDeleted).toBe(true);
+    expect(live.strokeColor).toBe("#f00");
+    expect(live.x).toBe(200);
+    expect(getElement(sibling.id)!.x).toBe(300);
+
+    expect(API.getUndoStack().length).toBe(3);
+
+    Keyboard.undo();
+    expect(getElement(sibling.id)!.x).toBe(40);
+    live = getElementIncludingDeleted(element.id)!;
+    expect(live.isDeleted).toBe(true);
+
+    Keyboard.undo();
+    live = getElementIncludingDeleted(element.id)!;
+    expect(live.isDeleted).toBe(false);
+    expect(live.strokeColor).toBe("#f00");
+
+    Keyboard.undo();
+    live = getElementIncludingDeleted(element.id)!;
+    expect(live.isDeleted).toBe(false);
+    expect(live.strokeColor).toBe("#000");
+    expect(live.x).toBe(0);
   });
 
   it("supports concurrent transactions on different props without cross-override", () => {
@@ -1290,7 +1852,7 @@ describe("transaction undo semantics markers", () => {
     expect(getElement(element.id)!.strokeColor).toBe("#000");
   });
 
-  it("supports concurrent transactions on the same prop with deterministic started-seq priority", () => {
+  it("supports concurrent transactions on the same prop with deterministic active-priority ordering", () => {
     const element = API.createElement({
       type: "rectangle",
       id: "concurrent-same-prop",
@@ -1332,5 +1894,177 @@ describe("transaction undo semantics markers", () => {
     // which was already purple due to txPurple.
     Keyboard.undo();
     expect(getElement(element.id)!.strokeColor).toBe("#800080");
+  });
+
+  it("keeps active-priority ordering when concurrent txs end in reverse order", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "concurrent-reverse-end-order",
+      strokeColor: "#000",
+      x: 0,
+    });
+    setSceneBaseline([element]);
+
+    const txPurple = h.app.createTransaction();
+    const txBlue = h.app.createTransaction();
+
+    act(() => {
+      txPurple.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id
+              ? newElementWith(el, { strokeColor: "#800080" })
+              : el,
+          ),
+      });
+      txBlue.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id
+              ? newElementWith(el, { strokeColor: "#0000ff" })
+              : el,
+          ),
+      });
+    });
+
+    applyElementUpdate(element.id, { strokeColor: "#f00" }, "IMMEDIATELY");
+
+    const blueSummary = commitTransaction(txBlue);
+    const purpleSummary = commitTransaction(txPurple);
+
+    expect(blueSummary.historyCommitted).toBe(false);
+    expect(purpleSummary.historyCommitted).toBe(false);
+
+    Keyboard.undo();
+    expect(getElement(element.id)!.strokeColor).toBe("#800080");
+  });
+
+  it("keeps canceled concurrent tx markers active against older committed txs", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "concurrent-commit-cancel",
+      strokeColor: "#000",
+      x: 0,
+    });
+    setSceneBaseline([element]);
+
+    const txPurple = h.app.createTransaction();
+    const txBlue = h.app.createTransaction();
+
+    act(() => {
+      txPurple.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id
+              ? newElementWith(el, { strokeColor: "#800080" })
+              : el,
+          ),
+      });
+      txBlue.updateScene({
+        elements: h.app.scene
+          .getElementsIncludingDeleted()
+          .map((el) =>
+            el.id === element.id
+              ? newElementWith(el, { strokeColor: "#0000ff" })
+              : el,
+          ),
+      });
+    });
+
+    applyElementUpdate(element.id, { strokeColor: "#f00" }, "IMMEDIATELY");
+
+    const blueSummary = txBlue.cancel();
+    const purpleSummary = commitTransaction(txPurple);
+
+    expect(blueSummary.status).toBe("canceled");
+    expect(blueSummary.historyCommitted).toBe(false);
+    expect(purpleSummary.historyCommitted).toBe(false);
+
+    Keyboard.undo();
+    expect(getElement(element.id)!.strokeColor).toBe("#800080");
+  });
+
+  it("handles multi-entry interleaving stress with stable undo ordering", () => {
+    const elementA = API.createElement({
+      type: "rectangle",
+      id: "stress-a",
+      x: 0,
+      y: 0,
+      strokeColor: "#000",
+      backgroundColor: "#fff",
+    });
+    const elementB = API.createElement({
+      type: "rectangle",
+      id: "stress-b",
+      x: 400,
+      y: 0,
+      strokeColor: "#222",
+      backgroundColor: "#eee",
+    });
+    setSceneBaseline([elementA, elementB]);
+
+    const tx = h.app.createTransaction();
+    act(() => {
+      tx.updateElements({
+        elements: [
+          {
+            id: elementA.id,
+            type: "rectangle",
+            updates: { x: 200, strokeColor: "#800080" },
+          },
+          {
+            id: elementB.id,
+            type: "rectangle",
+            updates: { y: 100, backgroundColor: "#ffec99" },
+          },
+        ],
+      });
+    });
+
+    applyElementUpdate(elementA.id, { strokeColor: "#f00" }, "IMMEDIATELY");
+    applyElementUpdate(elementB.id, { y: 160 }, "IMMEDIATELY");
+    applyElementUpdate(elementA.id, { x: 260 }, "IMMEDIATELY");
+    applyElementUpdate(elementB.id, { strokeColor: "#3a86ff" }, "IMMEDIATELY");
+
+    commitTransaction(tx);
+    expect(API.getUndoStack().length).toBe(5);
+
+    let liveA = getElement(elementA.id)!;
+    let liveB = getElement(elementB.id)!;
+    expect(liveA.strokeColor).toBe("#f00");
+    expect(liveA.x).toBe(260);
+    expect(liveB.y).toBe(160);
+    expect(liveB.backgroundColor).toBe("#ffec99");
+    expect(liveB.strokeColor).toBe("#3a86ff");
+
+    Keyboard.undo();
+    liveA = getElement(elementA.id)!;
+    liveB = getElement(elementB.id)!;
+    expect(liveA.strokeColor).toBe("#f00");
+    expect(liveA.x).toBe(260);
+    expect(liveB.y).toBe(160);
+    expect(liveB.backgroundColor).toBe("#eee");
+    expect(liveB.strokeColor).toBe("#3a86ff");
+
+    Keyboard.undo();
+    expect(getElement(elementB.id)!.strokeColor).toBe("#222");
+
+    Keyboard.undo();
+    expect(getElement(elementA.id)!.x).toBe(0);
+
+    Keyboard.undo();
+    expect(getElement(elementB.id)!.y).toBe(0);
+
+    Keyboard.undo();
+    liveA = getElement(elementA.id)!;
+    liveB = getElement(elementB.id)!;
+    expect(liveA.strokeColor).toBe("#000");
+    expect(liveA.x).toBe(0);
+    expect(liveB.y).toBe(0);
+    expect(liveB.backgroundColor).toBe("#eee");
+    expect(liveB.strokeColor).toBe("#222");
   });
 });
