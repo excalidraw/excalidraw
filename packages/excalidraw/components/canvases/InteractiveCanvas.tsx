@@ -270,6 +270,7 @@ const getRelevantAppStateProps = (
   shouldCacheIgnoreZoom: appState.shouldCacheIgnoreZoom,
   exportScale: appState.exportScale,
   currentItemArrowType: appState.currentItemArrowType,
+  isFocusMode: appState.isFocusMode,
 });
 
 const areEqual = (

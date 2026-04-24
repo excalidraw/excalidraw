@@ -18,7 +18,7 @@ import { ShapeCache } from "@excalidraw/element";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import { actionToggleStats } from "../actions";
+import { actionToggleStats, actionToggleFocusMode } from "../actions";
 import { trackEvent } from "../analytics";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { UIAppStateContext } from "../context/ui-appState";
@@ -46,7 +46,7 @@ import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { useEditorInterface, useStylesPanelMode } from "./App";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
-import { sidebarRightIcon } from "./icons";
+import { sidebarRightIcon, focusIcon } from "./icons";
 import { DefaultSidebar } from "./DefaultSidebar";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
@@ -294,6 +294,7 @@ const LayerUI = ({
       appState.stats.open &&
       !appState.zenModeEnabled &&
       !appState.viewModeEnabled &&
+      !appState.isFocusMode &&
       appState.openDialog?.name !== "elementLinkSelector";
 
     return (
@@ -310,10 +311,13 @@ const LayerUI = ({
                   isCompactStylesPanel,
               })}
             >
-              {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
+              {shouldRenderSelectedShapeActions &&
+                !appState.isFocusMode &&
+                renderSelectedShapeActions()}
             </div>
           </Stack.Col>
           {!appState.viewModeEnabled &&
+            !appState.isFocusMode &&
             appState.openDialog?.name !== "elementLinkSelector" && (
               <Section heading="shapes" className="shapes-section">
                 {(heading: React.ReactNode) => (
@@ -412,11 +416,36 @@ const LayerUI = ({
               appState,
             )}
             {!appState.viewModeEnabled &&
+              !appState.isFocusMode &&
               appState.openDialog?.name !== "elementLinkSelector" &&
-              // hide button when sidebar docked
               (!isSidebarDocked ||
                 appState.openSidebar?.name !== DEFAULT_SIDEBAR.name) && (
                 <tunnels.DefaultSidebarTriggerTunnel.Out />
+              )}
+            {editorInterface.formFactor !== "phone" &&
+              actionManager.isActionEnabled(actionToggleFocusMode) && (
+                <label
+                  className={clsx(
+                    "ToolIcon",
+                    "ToolIcon_size_medium",
+                    "zen-mode-transition",
+                    {
+                      "transition-right": appState.zenModeEnabled,
+                    },
+                  )}
+                  title={`${t("buttons.focusMode")} — Ctrl+Shift+F`}
+                >
+                  <input
+                    className="ToolIcon_type_checkbox"
+                    type="checkbox"
+                    onChange={() =>
+                      actionManager.executeAction(actionToggleFocusMode)
+                    }
+                    checked={appState.isFocusMode}
+                    aria-label={t("buttons.focusMode")}
+                  />
+                  <div className="ToolIcon__icon">{focusIcon}</div>
+                </label>
               )}
             {shouldShowStats && (
               <Stats
@@ -592,6 +621,7 @@ const LayerUI = ({
             className="layer-ui__wrapper"
             style={
               appState.openSidebar &&
+              !appState.isFocusMode &&
               isSidebarDocked &&
               editorInterface.canFitSidebar
                 ? { width: `calc(100% - var(--right-sidebar-width))` }
@@ -632,7 +662,7 @@ const LayerUI = ({
               </div>
             )}
           </div>
-          {renderSidebars()}
+          {!appState.isFocusMode && renderSidebars()}
         </>
       )}
     </>

@@ -232,6 +232,7 @@ export type InteractiveCanvasAppState = Readonly<
     // SnapLines
     snapLines: AppState["snapLines"];
     zenModeEnabled: AppState["zenModeEnabled"];
+    isFocusMode: AppState["isFocusMode"];
     editingTextElement: AppState["editingTextElement"];
     // Cropping
     isCropping: AppState["isCropping"];
@@ -418,6 +419,7 @@ export interface AppState {
     duration?: number;
   } | null;
   zenModeEnabled: boolean;
+  isFocusMode: boolean;
   theme: Theme;
   /** grid cell px size */
   gridSize: number;
@@ -628,6 +630,7 @@ export interface ExcalidrawProps {
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
+  isFocusMode?: boolean;
   gridModeEnabled?: boolean;
   objectsSnapModeEnabled?: boolean;
   libraryReturnUrl?: string;

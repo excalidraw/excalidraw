@@ -404,7 +404,10 @@
     "link_button": "导出链接",
     "excalidrawplus_description": "将画布保存到您的 Excalidraw+ 工作区。",
     "excalidrawplus_button": "导出",
-    "excalidrawplus_exportError": "暂时无法导出到 Excalidraw+ ..."
+    "excalidrawplus_exportError": "暂时无法导出到 Excalidraw+ ...",
+    "gameNode_title": "导出为游戏节点",
+    "gameNode_details": "将选中的矩形和文本元素导出为游戏节点 JSON 文件。",
+    "gameNode_button": "导出游戏节点"
   },
   "helpDialog": {
     "blog": "浏览我们的博客",

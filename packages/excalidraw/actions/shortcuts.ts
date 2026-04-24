@@ -38,19 +38,20 @@ export type ShortcutName =
       | "flipVertical"
       | "hyperlink"
       | "toggleElementLock"
-      | "resetZoom"
-      | "zoomOut"
-      | "zoomIn"
-      | "zoomToFit"
-      | "zoomToFitSelectionInViewport"
-      | "zoomToFitSelection"
-      | "toggleEraserTool"
-      | "toggleHandTool"
-      | "setFrameAsActiveTool"
-      | "saveFileToDisk"
-      | "saveToActiveFile"
-      | "toggleShortcuts"
-      | "wrapSelectionInFrame"
+  | "resetZoom"
+  | "zoomOut"
+  | "zoomIn"
+  | "zoomToFit"
+  | "zoomToFitSelectionInViewport"
+  | "zoomToFitSelection"
+  | "toggleEraserTool"
+  | "toggleHandTool"
+  | "setFrameAsActiveTool"
+  | "saveFileToDisk"
+  | "saveToActiveFile"
+  | "toggleShortcuts"
+  | "wrapSelectionInFrame"
+  | "focusMode"
     >
   | "saveScene"
   | "imageExport"
@@ -119,6 +120,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   searchMenu: [getShortcutKey("CtrlOrCmd+F")],
   wrapSelectionInFrame: [],
   toolLock: [getShortcutKey("Q")],
+  focusMode: [getShortcutKey("CtrlOrCmd+Shift+F")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName, idx = 0) => {

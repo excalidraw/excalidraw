@@ -245,6 +245,7 @@
     "lightMode": "Light mode",
     "systemMode": "System mode",
     "zenMode": "Zen mode",
+    "focusMode": "Focus mode",
     "objectsSnapMode": "Snap to objects",
     "exitZenMode": "Exit zen mode",
     "cancel": "Cancel",
@@ -426,7 +427,10 @@
     "link_button": "Export to Link",
     "excalidrawplus_description": "Save the scene to your Excalidraw+ workspace.",
     "excalidrawplus_button": "Export",
-    "excalidrawplus_exportError": "Couldn't export to Excalidraw+ at this moment..."
+    "excalidrawplus_exportError": "Couldn't export to Excalidraw+ at this moment...",
+    "gameNode_title": "Export as Game Node",
+    "gameNode_details": "Export selected rectangles and text elements as game nodes JSON file.",
+    "gameNode_button": "Export Game Nodes"
   },
   "helpDialog": {
     "blog": "Read our blog",

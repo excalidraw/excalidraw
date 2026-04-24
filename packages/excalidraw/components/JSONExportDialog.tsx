@@ -1,25 +1,77 @@
 import React from "react";
 
-import { getFrame } from "@excalidraw/common";
+import { getFrame, MIME_TYPES } from "@excalidraw/common";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { actionSaveFileToDisk } from "../actions/actionExport";
 
 import { trackEvent } from "../analytics";
-import { nativeFileSystemSupported } from "../data/filesystem";
+import { fileSave, nativeFileSystemSupported } from "../data/filesystem";
 import { t } from "../i18n";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
 
 import { Card } from "./Card";
 import { Dialog } from "./Dialog";
 import { ToolButton } from "./ToolButton";
-import { exportToFileIcon, LinkIcon } from "./icons";
+import { exportToFileIcon, LinkIcon, polygonIcon } from "./icons";
 
 import "./ExportDialog.scss";
 
 import type { ActionManager } from "../actions/manager";
 
 import type { ExportOpts, BinaryFiles, UIAppState } from "../types";
+
+interface GameNode {
+  type: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  text?: string;
+}
+
+const exportGameNodes = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: UIAppState,
+) => {
+  const selectedElements = isSomeElementSelected(elements, appState)
+    ? getSelectedElements(elements, appState)
+    : [];
+
+  const gameNodes: GameNode[] = selectedElements
+    .filter(
+      (element) => element.type === "rectangle" || element.type === "text",
+    )
+    .map((element) => {
+      const node: GameNode = {
+        type: element.type,
+        x: element.x,
+        y: element.y,
+        width: element.width,
+        height: element.height,
+      };
+
+      if (element.type === "text") {
+        node.text = (element as any).text;
+      }
+
+      return node;
+    });
+
+  return gameNodes;
+};
+
+const saveGameNodes = async (gameNodes: GameNode[]) => {
+  const jsonString = JSON.stringify(gameNodes, null, 2);
+  const blob = new Blob([jsonString], { type: MIME_TYPES.json });
+
+  await fileSave(blob, {
+    name: "game_nodes",
+    extension: "json",
+    description: "Game Nodes JSON",
+  });
+};
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -93,6 +145,29 @@ const JSONExportModal = ({
             />
           </Card>
         )}
+        <Card color="purple">
+          <div className="Card-icon">{polygonIcon}</div>
+          <h2>{t("exportDialog.gameNode_title")}</h2>
+          <div className="Card-details">
+            {t("exportDialog.gameNode_details")}
+          </div>
+          <ToolButton
+            className="Card-button"
+            type="button"
+            title={t("exportDialog.gameNode_button")}
+            aria-label={t("exportDialog.gameNode_button")}
+            showAriaLabel={true}
+            onClick={async () => {
+              try {
+                const gameNodes = exportGameNodes(elements, appState);
+                await saveGameNodes(gameNodes);
+                onCloseRequest();
+              } catch (error: any) {
+                setAppState({ errorMessage: error.message });
+              }
+            }}
+          />
+        </Card>
         {exportOpts.renderCustomUI &&
           exportOpts.renderCustomUI(elements, appState, files, canvas)}
       </div>
