@@ -524,11 +524,10 @@ export const restoreElement = (
 
       // Last resort fix for extremely large arrows
       if (
-        isElbowArrow(normalizedRestoredElement) &&
-        (normalizedRestoredElement.width > MAX_ARROW_PX ||
-          normalizedRestoredElement.height > MAX_ARROW_PX ||
-          Math.abs(normalizedRestoredElement.x) > MAX_ARROW_PX ||
-          Math.abs(normalizedRestoredElement.y) > MAX_ARROW_PX)
+        normalizedRestoredElement.width > MAX_ARROW_PX ||
+        normalizedRestoredElement.height > MAX_ARROW_PX ||
+        Math.abs(normalizedRestoredElement.x) > MAX_ARROW_PX ||
+        Math.abs(normalizedRestoredElement.y) > MAX_ARROW_PX
       ) {
         console.error(
           `Removing extremely large arrow ${
