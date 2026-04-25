@@ -409,8 +409,10 @@ const shiftElementsToEnd = (
   let trailingIndex: number;
   if (direction === "left") {
     if (containingFrame) {
-      leadingIndex = findIndex(elements, (el) =>
-        isOfTargetFrame(el, containingFrame),
+      leadingIndex = findIndex(
+        elements,
+        (el) =>
+          el.id !== containingFrame && isOfTargetFrame(el, containingFrame),
       );
     } else if (appState.editingGroupId) {
       const groupElements = getElementsInGroup(
@@ -428,8 +430,10 @@ const shiftElementsToEnd = (
     trailingIndex = indicesToMove[indicesToMove.length - 1];
   } else {
     if (containingFrame) {
-      trailingIndex = findLastIndex(elements, (el) =>
-        isOfTargetFrame(el, containingFrame),
+      trailingIndex = findLastIndex(
+        elements,
+        (el) =>
+          el.id !== containingFrame && isOfTargetFrame(el, containingFrame),
       );
     } else if (appState.editingGroupId) {
       const groupElements = getElementsInGroup(
@@ -509,6 +513,8 @@ function shiftElementsAccountingForFrames(
     }
   }
 
+  const selectedFrameIds = new Set<ExcalidrawFrameLikeElement["id"]>();
+
   for (const element of allElements) {
     if (elementsToMove.has(element.id)) {
       if (
@@ -518,11 +524,23 @@ function shiftElementsAccountingForFrames(
         regularElements.push(element);
       } else if (!element.frameId) {
         regularElements.push(element);
+      } else if (!selectedFrameIds.has(element.frameId)) {
+        selectedFrameIds.add(element.frameId);
+        regularElements.push(element);
       }
     }
   }
 
-  return shiftFunction(allElements, appState, direction, null, regularElements);
+  const containingFrame =
+    selectedFrameIds.size > 0 ? [...selectedFrameIds][0] : null;
+
+  return shiftFunction(
+    allElements,
+    appState,
+    direction,
+    containingFrame,
+    regularElements,
+  );
 }
 
 // public API
