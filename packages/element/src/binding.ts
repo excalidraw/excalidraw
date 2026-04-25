@@ -1943,9 +1943,9 @@ export const calculateFixedPointForElbowArrowBinding = (
   return {
     fixedPoint: normalizeFixedPoint([
       (nonRotatedSnappedGlobalPoint[0] - hoveredElement.x) /
-        hoveredElement.width,
+        Math.max(hoveredElement.width, PRECISION),
       (nonRotatedSnappedGlobalPoint[1] - hoveredElement.y) /
-        hoveredElement.height,
+        Math.max(hoveredElement.height, PRECISION),
     ]),
   };
 };
@@ -1976,9 +1976,11 @@ export const calculateFixedPointForNonElbowArrowBinding = (
 
   // Calculate the ratio relative to the element's bounds
   const fixedPointX =
-    (nonRotatedPoint[0] - hoveredElement.x) / hoveredElement.width;
+    (nonRotatedPoint[0] - hoveredElement.x) /
+    Math.max(hoveredElement.width, PRECISION);
   const fixedPointY =
-    (nonRotatedPoint[1] - hoveredElement.y) / hoveredElement.height;
+    (nonRotatedPoint[1] - hoveredElement.y) /
+    Math.max(hoveredElement.height, PRECISION);
 
   return {
     fixedPoint: normalizeFixedPoint([fixedPointX, fixedPointY]),
