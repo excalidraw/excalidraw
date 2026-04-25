@@ -690,6 +690,16 @@ describe("inner box-selection", () => {
       mouse.moveTo(rect2.x + rect2.width + 10, rect2.y + rect2.height + 10);
       mouse.up();
 
+      assertSelectedElements([rect1.id]);
+      expect(h.state.selectedGroupIds).toEqual({});
+    });
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.downAt(40, 40);
+      mouse.move(-1000, -1000);
+      mouse.moveTo(rect3.x + rect3.width + 10, rect3.y + rect3.height + 10);
+      mouse.up();
+
       assertSelectedElements([rect2.id, rect3.id]);
       expect(h.state.selectedGroupIds).toEqual({ A: true });
     });
@@ -725,7 +735,7 @@ describe("inner box-selection", () => {
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       mouse.downAt(rect2.x - 20, rect2.y - 20);
       mouse.move(-1000, -1000);
-      mouse.moveTo(rect2.x + rect2.width + 10, rect2.y + rect2.height + 10);
+      mouse.moveTo(rect3.x + rect3.width + 10, rect3.y + rect3.height + 10);
       assertSelectedElements([rect2.id, rect3.id]);
       expect(h.state.selectedGroupIds).toEqual({ A: true });
       mouse.moveTo(rect2.x - 10, rect2.y - 10);
