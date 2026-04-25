@@ -1,8 +1,9 @@
 import React from "react";
 
-import { getFrame, MIME_TYPES } from "@excalidraw/common";
+import { arrayToMap, getFrame, MIME_TYPES } from "@excalidraw/common";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+import { getElementBounds } from "@excalidraw/element/bounds";
 
 import { actionSaveFileToDisk } from "../actions/actionExport";
 
@@ -39,17 +40,21 @@ const exportGameNodes = (
     ? getSelectedElements(elements, appState)
     : [];
 
+  const elementsMap = arrayToMap(elements);
+
   const gameNodes: GameNode[] = selectedElements
     .filter(
       (element) => element.type === "rectangle" || element.type === "text",
     )
     .map((element) => {
+      const [minX, minY, maxX, maxY] = getElementBounds(element, elementsMap);
+      
       const node: GameNode = {
         type: element.type,
-        x: element.x,
-        y: element.y,
-        width: element.width,
-        height: element.height,
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY,
       };
 
       if (element.type === "text") {
