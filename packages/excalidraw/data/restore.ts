@@ -96,6 +96,8 @@ type RestoredAppState = Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 >;
 
+const MAX_ARROW_PX = 75_000;
+
 export const AllowedExcalidrawActiveTools: Record<
   AppState["activeTool"]["type"],
   boolean
@@ -467,8 +469,8 @@ export const restoreElement = (
         element.endArrowhead === undefined
           ? "arrow"
           : normalizeArrowhead(element.endArrowhead);
-      const x: number | undefined = element.x;
-      const y: number | undefined = element.y;
+      const x = element.x as number | undefined;
+      const y = element.y as number | undefined;
       const points: readonly LocalPoint[] | undefined = // migrate old arrow model to new one
         !Array.isArray(element.points) || element.points.length < 2
           ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
@@ -493,8 +495,8 @@ export const restoreElement = (
         startArrowhead,
         endArrowhead,
         points,
-        x,
-        y,
+        x: x ?? 0,
+        y: y ?? 0,
         elbowed: (element as ExcalidrawArrowElement).elbowed,
         ...getSizeFromPoints(points),
       };
@@ -513,12 +515,47 @@ export const restoreElement = (
           })
         : restoreElementWithProperties(element as ExcalidrawArrowElement, base);
 
-      return {
+      const normalizedRestoredElement = {
         ...restoredElement,
         ...LinearElementEditor.getNormalizeElementPointsAndCoords(
           restoredElement,
         ),
       };
+
+      // Last resort fix for extremely large arrows
+      if (
+        isElbowArrow(normalizedRestoredElement) &&
+        (normalizedRestoredElement.width > MAX_ARROW_PX ||
+          normalizedRestoredElement.height > MAX_ARROW_PX ||
+          Math.abs(normalizedRestoredElement.x) > MAX_ARROW_PX ||
+          Math.abs(normalizedRestoredElement.y) > MAX_ARROW_PX)
+      ) {
+        console.error(
+          `Removing extremely large arrow ${
+            normalizedRestoredElement.id
+          } (type: ${
+            isElbowArrow(normalizedRestoredElement) ? "elbow" : "simple"
+          }, width: ${normalizedRestoredElement.width}, height: ${
+            normalizedRestoredElement.height
+          }, x: ${normalizedRestoredElement.x}, y: ${
+            normalizedRestoredElement.y
+          })`,
+        );
+        return {
+          ...normalizedRestoredElement,
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 100,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(100, 100),
+          ],
+          isDeleted: true,
+        };
+      }
+
+      return normalizedRestoredElement;
     }
 
     // generic elements
@@ -667,103 +704,8 @@ export const restoreElements = <T extends ExcalidrawElement>(
     ? arrayToMap(existingElements)
     : null;
 
-  const fixedElements: T[] = (targetElements || []).map((element) => {
-    let candidate = element;
-
-    if (
-      isElbowArrow(element) &&
-      !isArrowBoundToElement(element) &&
-      !validateElbowPoints(element.points)
-    ) {
-      candidate = {
-        ...element,
-        ...updateElbowArrowPoints(
-          element,
-          targetElementsMap as NonDeletedSceneElementsMap,
-          {
-            points: [
-              pointFrom<LocalPoint>(0, 0),
-              element.points[element.points.length - 1],
-            ],
-          },
-        ),
-        index: element.index,
-      };
-    }
-
-    if (
-      isElbowArrow(candidate) &&
-      candidate.startBinding &&
-      candidate.endBinding &&
-      candidate.startBinding.elementId === candidate.endBinding.elementId &&
-      candidate.points.length > 1 &&
-      candidate.points.some(
-        ([rx, ry]) => Math.abs(rx) > 1e6 || Math.abs(ry) > 1e6,
-      )
-    ) {
-      console.error("Fixing self-bound elbow arrow", element.id);
-      const boundElement = targetElementsMap.get(
-        candidate.startBinding.elementId,
-      );
-
-      if (!boundElement) {
-        console.error(
-          "Bound element not found",
-          candidate.startBinding.elementId,
-        );
-      } else {
-        candidate = {
-          ...candidate,
-          x: boundElement.x + boundElement.width / 2,
-          y: boundElement.y - 5,
-          width: boundElement.width,
-          height: boundElement.height,
-          points: [
-            pointFrom<LocalPoint>(0, 0),
-            pointFrom<LocalPoint>(0, -10),
-            pointFrom<LocalPoint>(boundElement.width / 2 + 5, -10),
-            pointFrom<LocalPoint>(
-              boundElement.width / 2 + 5,
-              boundElement.height / 2 + 5,
-            ),
-          ],
-        };
-      }
-    }
-
-    // Last resort fix for extremely large arrows
-    if (
-      isElbowArrow(candidate) &&
-      (candidate.width > 10_000 || candidate.height > 10_000)
-    ) {
-      console.error("Fixing extremely large extent arrow", candidate.id);
-      candidate = {
-        ...candidate,
-        width: 100,
-        height: 100,
-        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 100)],
-        isDeleted: true,
-      };
-    }
-
-    if (
-      isElbowArrow(candidate) &&
-      (Math.abs(candidate.x) > 10_000 || Math.abs(candidate.y) > 10_000)
-    ) {
-      console.error("Fixing extremely offset arrow", candidate.id);
-      candidate = {
-        ...candidate,
-        x: 0,
-        y: 0,
-        isDeleted: true,
-      };
-    }
-
-    return candidate;
-  });
-
   const restoredElements = syncInvalidIndices(
-    fixedElements.reduce((elements, element) => {
+    (targetElements || []).reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained
       if (element.type === "selection") {
@@ -858,9 +800,70 @@ export const restoreElements = <T extends ExcalidrawElement>(
     }
   }
 
-  // NOTE (mtolmacs): Temporary fix for extremely large arrows
+  // NOTE (mtolmacs): Temporary fix for invalid/self-bound elbow arrows
   // Need to iterate again so we have attached text nodes in elementsMap
   return restoredElements.map((element) => {
+    if (
+      isElbowArrow(element) &&
+      !isArrowBoundToElement(element) &&
+      !validateElbowPoints(element.points)
+    ) {
+      return {
+        ...element,
+        ...updateElbowArrowPoints(
+          element,
+          restoredElementsMap as NonDeletedSceneElementsMap,
+          {
+            points: [
+              pointFrom<LocalPoint>(0, 0),
+              element.points[element.points.length - 1],
+            ],
+          },
+        ),
+        index: element.index,
+      };
+    }
+
+    if (
+      isElbowArrow(element) &&
+      element.startBinding &&
+      element.endBinding &&
+      element.startBinding.elementId === element.endBinding.elementId &&
+      element.points.length > 1 &&
+      element.points.some(
+        ([rx, ry]) => Math.abs(rx) > 1e6 || Math.abs(ry) > 1e6,
+      )
+    ) {
+      console.error("Fixing self-bound elbow arrow", element.id);
+      const boundElement = restoredElementsMap.get(
+        element.startBinding.elementId,
+      );
+      if (!boundElement) {
+        console.error(
+          "Bound element not found",
+          element.startBinding.elementId,
+        );
+        return element;
+      }
+
+      return {
+        ...element,
+        x: boundElement.x + boundElement.width / 2,
+        y: boundElement.y - 5,
+        width: boundElement.width,
+        height: boundElement.height,
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(0, -10),
+          pointFrom<LocalPoint>(boundElement.width / 2 + 5, -10),
+          pointFrom<LocalPoint>(
+            boundElement.width / 2 + 5,
+            boundElement.height / 2 + 5,
+          ),
+        ],
+      };
+    }
+
     return element;
   }) as CombineBrandsIfNeeded<T, OrderedExcalidrawElement>;
 };
