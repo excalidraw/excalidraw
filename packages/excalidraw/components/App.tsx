@@ -457,6 +457,8 @@ import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 import { findShapeByKey } from "./shapes";
 
 import UnlockPopup from "./UnlockPopup";
+import ShapeRecognitionPopup from "./ShapeRecognitionPopup";
+import ShapeRecognitionToggle from "./ShapeRecognitionToggle";
 
 import type { ExcalidrawLibraryIds } from "../data/types";
 
@@ -2391,6 +2393,10 @@ class App extends React.Component<AppProps, AppState> {
                           {showShapeSwitchPanel && (
                             <ConvertElementTypePopup app={this} />
                           )}
+                          {this.state.pendingShapeRecognition && (
+                            <ShapeRecognitionPopup app={this} />
+                          )}
+                          <ShapeRecognitionToggle app={this} />
                         </ExcalidrawActionManagerContext.Provider>
                         {this.renderEmbeddables()}
                       </ExcalidrawElementsContext.Provider>
@@ -7480,6 +7486,10 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    if (this.state.pendingShapeRecognition) {
+      this.setState({ pendingShapeRecognition: null });
+    }
+
     const selectedElements = this.scene.getSelectedElements(this.state);
 
     // If Ctrl is not held, ensure isBindingEnabled reflects the user preference.

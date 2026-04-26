@@ -104,6 +104,8 @@ import {
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
+  StrokeWidthMinimumIcon,
+  StrokeWidthExtraThinIcon,
   StrokeWidthBaseIcon,
   StrokeWidthBoldIcon,
   StrokeWidthExtraBoldIcon,
@@ -568,6 +570,18 @@ export const actionChangeStrokeWidth = register<
         <RadioSelection
           group="stroke-width"
           options={[
+            {
+              value: STROKE_WIDTH.minimum,
+              text: t("labels.minimum"),
+              icon: StrokeWidthMinimumIcon,
+              testId: "strokeWidth-minimum",
+            },
+            {
+              value: STROKE_WIDTH.extraThin,
+              text: t("labels.extraThin"),
+              icon: StrokeWidthExtraThinIcon,
+              testId: "strokeWidth-extraThin",
+            },
             {
               value: STROKE_WIDTH.thin,
               text: t("labels.thin"),

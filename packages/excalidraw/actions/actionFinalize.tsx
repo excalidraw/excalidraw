@@ -38,6 +38,7 @@ import type {
 import { t } from "../i18n";
 import { resetCursor } from "../cursor";
 import { done } from "../components/icons";
+import { detectRectangle, detectEllipse } from "../shape-recognition";
 import { ToolButton } from "../components/ToolButton";
 
 import { register } from "./register";
@@ -268,6 +269,46 @@ export const actionFinalize = register<FormData>({
           scene.mutateElement(element, {
             polygon: false,
           });
+        }
+      }
+
+      if (isFreeDrawElement(element) && appState.shapeRecognitionEnabled) {
+        const ellipseBbox = detectEllipse(element.points);
+        const rectBbox = !ellipseBbox ? detectRectangle(element.points) : null;
+        const shapeBbox = ellipseBbox ?? rectBbox;
+
+        if (shapeBbox) {
+          return {
+            elements: newElements,
+            appState: {
+              ...appState,
+              cursorButton: "up",
+              activeTool: updateActiveTool(appState, {
+                type: app.state.preferredSelectionTool.type,
+              }),
+              activeEmbeddable: null,
+              newElement: null,
+              selectionElement: null,
+              multiElement: null,
+              editingTextElement: null,
+              startBoundElement: null,
+              suggestedBinding: null,
+              selectedElementIds: { [element.id]: true },
+              selectedLinearElement: null,
+              pendingShapeRecognition: {
+                freedrawId: element.id,
+                bbox: {
+                  x: element.x + shapeBbox.minX,
+                  y: element.y + shapeBbox.minY,
+                  width: shapeBbox.width,
+                  height: shapeBbox.height,
+                },
+                detectedEllipse: ellipseBbox !== null,
+                detectedRectangle: rectBbox !== null,
+              },
+            },
+            captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+          };
         }
       }
     }

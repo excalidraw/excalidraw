@@ -423,6 +423,14 @@ export interface AppState {
   gridSize: number;
   gridStep: number;
   gridModeEnabled: boolean;
+  shapeRecognitionEnabled: boolean;
+  pendingShapeRecognition: {
+    freedrawId: string;
+    /** Scene coordinates of the recognised shape's bounding box */
+    bbox: { x: number; y: number; width: number; height: number };
+    detectedEllipse: boolean;
+    detectedRectangle: boolean;
+  } | null;
   viewModeEnabled: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
