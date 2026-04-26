@@ -1,0 +1,28 @@
+.excalidraw {
+  .ShapeRecognitionToggle {
+    position: absolute;
+    bottom: 3rem;
+    right: 1rem;
+    z-index: 4;
+    pointer-events: all;
+
+    button {
+      background: var(--island-bg-color);
+      box-shadow: var(--shadow-island);
+      border-radius: 0.5rem;
+      padding: 0.4rem;
+      color: var(--icon-fill-color);
+      opacity: 0.7;
+      transition: opacity 0.15s;
+
+      &:hover {
+        opacity: 1;
+      }
+
+      &.active {
+        opacity: 1;
+        color: var(--color-brand);
+      }
+    }
+  }
+}

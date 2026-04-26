@@ -1,0 +1,22 @@
+.excalidraw {
+  .ShapeRecognitionPopup {
+    position: absolute;
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.4rem;
+    border-radius: 0.5rem;
+    background: var(--island-bg-color);
+    box-shadow: var(--shadow-island);
+    z-index: 5;
+    pointer-events: all;
+
+    .ToolIcon__icon {
+      all: unset !important;
+      display: flex !important;
+    }
+
+    button {
+      background-color: transparent;
+    }
+  }
+}
