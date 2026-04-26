@@ -10210,7 +10210,10 @@ class App extends React.Component<AppProps, AppState> {
           );
 
           let linearElementEditor = this.state.selectedLinearElement;
-          if (!linearElementEditor) {
+          if (
+            !linearElementEditor ||
+            linearElementEditor.initialState.lastClickedPoint < 0
+          ) {
             linearElementEditor = new LinearElementEditor(
               newElement,
               this.scene.getNonDeletedElementsMap(),
