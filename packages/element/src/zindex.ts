@@ -409,10 +409,8 @@ const shiftElementsToEnd = (
   let trailingIndex: number;
   if (direction === "left") {
     if (containingFrame) {
-      leadingIndex = findIndex(
-        elements,
-        (el) =>
-          el.id !== containingFrame && isOfTargetFrame(el, containingFrame),
+      leadingIndex = findIndex(elements, (el) =>
+        isOfTargetFrame(el, containingFrame),
       );
     } else if (appState.editingGroupId) {
       const groupElements = getElementsInGroup(
@@ -430,10 +428,8 @@ const shiftElementsToEnd = (
     trailingIndex = indicesToMove[indicesToMove.length - 1];
   } else {
     if (containingFrame) {
-      trailingIndex = findLastIndex(
-        elements,
-        (el) =>
-          el.id !== containingFrame && isOfTargetFrame(el, containingFrame),
+      trailingIndex = findLastIndex(elements, (el) =>
+        isOfTargetFrame(el, containingFrame),
       );
     } else if (appState.editingGroupId) {
       const groupElements = getElementsInGroup(
@@ -503,7 +499,10 @@ function shiftElementsAccountingForFrames(
     }),
   );
 
-  const regularElements: ExcalidrawElement[] = [];
+  const frameAwareContiguousElementsToMove: {
+    regularElements: ExcalidrawElement[];
+    frameChildren: Map<ExcalidrawFrameLikeElement["id"], ExcalidrawElement[]>;
+  } = { regularElements: [], frameChildren: new Map() };
 
   const fullySelectedFrames = new Set<ExcalidrawFrameLikeElement["id"]>();
 
@@ -513,33 +512,51 @@ function shiftElementsAccountingForFrames(
     }
   }
 
-  const selectedFrameIds = new Set<ExcalidrawFrameLikeElement["id"]>();
-
   for (const element of allElements) {
     if (elementsToMove.has(element.id)) {
       if (
         isFrameLikeElement(element) ||
         (element.frameId && fullySelectedFrames.has(element.frameId))
       ) {
-        regularElements.push(element);
+        frameAwareContiguousElementsToMove.regularElements.push(element);
       } else if (!element.frameId) {
-        regularElements.push(element);
-      } else if (!selectedFrameIds.has(element.frameId)) {
-        selectedFrameIds.add(element.frameId);
-        regularElements.push(element);
+        frameAwareContiguousElementsToMove.regularElements.push(element);
+      } else {
+        const frameChildren =
+          frameAwareContiguousElementsToMove.frameChildren.get(
+            element.frameId,
+          ) || [];
+        frameChildren.push(element);
+        frameAwareContiguousElementsToMove.frameChildren.set(
+          element.frameId,
+          frameChildren,
+        );
       }
     }
   }
 
-  const containingFrame =
-    selectedFrameIds.size > 0 ? [...selectedFrameIds][0] : null;
+  let nextElements = allElements;
+
+  const frameChildrenSets = Array.from(
+    frameAwareContiguousElementsToMove.frameChildren.entries(),
+  );
+
+  for (const [frameId, children] of frameChildrenSets) {
+    nextElements = shiftFunction(
+      allElements,
+      appState,
+      direction,
+      frameId,
+      children,
+    );
+  }
 
   return shiftFunction(
-    allElements,
+    nextElements,
     appState,
     direction,
-    containingFrame,
-    regularElements,
+    null,
+    frameAwareContiguousElementsToMove.regularElements,
   );
 }
 
