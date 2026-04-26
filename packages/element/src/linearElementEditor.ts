@@ -486,7 +486,7 @@ export class LinearElementEditor {
           selectedPointsIndices,
         )}) points(0..${
           element.points.length - 1
-        }) lastClickedPoint(${lastClickedPoint})`,
+        }) lastClickedPoint(${lastClickedPoint}) isElbowArrow: ${elbowed}`,
       );
 
       // Fall back to the actual last point as a last resort.

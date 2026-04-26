@@ -10210,9 +10210,17 @@ class App extends React.Component<AppProps, AppState> {
           );
 
           let linearElementEditor = this.state.selectedLinearElement;
+          const isNewElement =
+            !linearElementEditor ||
+            linearElementEditor.elementId !== newElement.id;
+          const lastClickedPointOutOfBounds =
+            linearElementEditor &&
+            linearElementEditor.initialState.lastClickedPoint >= 0 &&
+            linearElementEditor.initialState.lastClickedPoint >= points.length;
           if (
             !linearElementEditor ||
-            linearElementEditor.initialState.lastClickedPoint < 0
+            isNewElement ||
+            lastClickedPointOutOfBounds
           ) {
             linearElementEditor = new LinearElementEditor(
               newElement,
