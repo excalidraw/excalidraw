@@ -15,10 +15,16 @@ export const useHandleAppTheme = () => {
       (localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_THEME) as
         | Theme
         | "system"
-        | null) || THEME.LIGHT
+        | null) || "system"
     );
   });
-  const [editorTheme, setEditorTheme] = useState<Theme>(THEME.LIGHT);
+
+  const [editorTheme, setEditorTheme] = useState<Theme>(() => {
+    if (appTheme === "system") {
+      return getDarkThemeMediaQuery()?.matches ? THEME.DARK : THEME.LIGHT;
+    }
+    return appTheme as Theme;
+  });
 
   useEffect(() => {
     const mediaQuery = getDarkThemeMediaQuery();
