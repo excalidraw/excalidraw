@@ -352,8 +352,6 @@ export const getElementsWithinSelection = (
     );
   }
 
-  const extraElements: Set<NonDeletedExcalidrawElement> = new Set();
-
   elementsInSelection.forEach((element) => {
     // If a group this element is part of already included, then we don't need
     // to check this element separately again
@@ -371,16 +369,11 @@ export const getElementsWithinSelection = (
 
     if (boxSelectionMode === "overlap") {
       if (largestGroupId) {
-        groups[largestGroupId].forEach(extraElements.add.bind(extraElements));
+        groups[largestGroupId].forEach(
+          elementsInSelection.add.bind(elementsInSelection),
+        );
       }
     } else if (largestGroupId) {
-      // NOTE(mtolmacs): Unsure why this was present in the first place
-      //
-      // const containingFrame = getContainingFrame(element, elementsMap);
-      // if (containingFrame) {
-      //   return elementOverlapsWithFrame(element, containingFrame, elementsMap);
-      // }
-
       if (groupIds.length > 0 && largestGroupId) {
         const shouldInclude = groups[largestGroupId].every((groupElement) =>
           elementsInSelection.has(groupElement),
@@ -394,9 +387,7 @@ export const getElementsWithinSelection = (
     return true;
   });
 
-  return Array.from(
-    new Set([...elementsInSelection, ...extraElements]).values(),
-  );
+  return Array.from(elementsInSelection);
 };
 
 export const getVisibleAndNonSelectedElements = (
