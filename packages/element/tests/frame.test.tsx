@@ -2,6 +2,7 @@ import {
   convertToExcalidrawElements,
   Excalidraw,
 } from "@excalidraw/excalidraw";
+import { arrayToMap } from "@excalidraw/common";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
@@ -9,6 +10,8 @@ import {
   getCloneByOrigId,
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
+
+import { shouldApplyFrameClip } from "../src/frame";
 
 import type { ExcalidrawElement } from "../src/types";
 
@@ -559,5 +562,80 @@ describe("adding elements to frames", () => {
       dragElementIntoFrame(frame2, rectangle1);
       expect(h.elements.length).toBe(4);
     });
+  });
+});
+
+describe("frame clipping", () => {
+  const getAppStateForFrameClip = () =>
+    ({
+      frameRendering: {
+        enabled: true,
+        clip: true,
+      },
+      selectedElementsAreBeingDragged: false,
+      selectedElementIds: {},
+      frameToHighlight: null,
+      editingGroupId: null,
+    } as any);
+
+  it("clips a frame child even when fully outside the frame bounds", () => {
+    const frame = API.createElement({
+      type: "frame",
+      id: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    const outsideChild = API.createElement({
+      type: "rectangle",
+      id: "outside-child",
+      x: 250,
+      y: 250,
+      width: 50,
+      height: 50,
+      frameId: frame.id,
+    });
+
+    const elementsMap = arrayToMap([outsideChild, frame]);
+
+    expect(
+      shouldApplyFrameClip(
+        outsideChild,
+        frame,
+        getAppStateForFrameClip(),
+        elementsMap,
+      ),
+    ).toBe(true);
+  });
+
+  it("does not clip an outside element that does not belong to the frame", () => {
+    const frame = API.createElement({
+      type: "frame",
+      id: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    const outsideElement = API.createElement({
+      type: "rectangle",
+      id: "outside",
+      x: 250,
+      y: 250,
+      width: 50,
+      height: 50,
+    });
+
+    const elementsMap = arrayToMap([outsideElement, frame]);
+
+    expect(
+      shouldApplyFrameClip(
+        outsideElement,
+        frame,
+        getAppStateForFrameClip(),
+        elementsMap,
+      ),
+    ).toBe(false);
   });
 });
