@@ -322,13 +322,16 @@ export class LinearElementEditor {
       LinearElementEditor._getSnappedPointForLinearElement({
         app,
         event,
+        elements,
         elementsMap,
         element,
         pointIndex: idx,
         scenePointerX,
         scenePointerY,
         pointerOffset: linearElementEditor.pointerOffset,
-        referencePoint: shouldRotateWithDiscreteAngle(event) ? pivotPoint : null,
+        referencePoint: shouldRotateWithDiscreteAngle(event)
+          ? pivotPoint
+          : null,
         selectedPointsIndices: [idx],
         customLineAngle,
       });
@@ -510,6 +513,7 @@ export class LinearElementEditor {
       LinearElementEditor._getSnappedPointForLinearElement({
         app,
         event,
+        elements,
         elementsMap,
         element,
         pointIndex: lastClickedPoint,
@@ -1209,10 +1213,12 @@ export class LinearElementEditor {
     }
 
     const anchor = points[points.length - 2];
+    const elements = app.scene.getNonDeletedElements();
     const { point: newPoint, snapLines } =
       LinearElementEditor._getSnappedPointForLinearElement({
         app,
         event,
+        elements,
         elementsMap,
         element,
         pointIndex: points.length - 1,
@@ -1887,6 +1893,7 @@ export class LinearElementEditor {
   private static _getSnappedPointForLinearElement({
     app,
     event,
+    elements,
     elementsMap,
     element,
     pointIndex,
@@ -1899,7 +1906,8 @@ export class LinearElementEditor {
   }: {
     app: AppClassProperties;
     event: PointerEvent | React.PointerEvent<HTMLCanvasElement>;
-    elementsMap: ElementsMap;
+    elements: readonly Ordered<NonDeletedExcalidrawElement>[];
+    elementsMap: NonDeletedSceneElementsMap;
     element: NonDeleted<ExcalidrawLinearElement>;
     pointIndex: number;
     scenePointerX: number;
@@ -1919,12 +1927,17 @@ export class LinearElementEditor {
     );
 
     if (referencePoint) {
-      const referencePointCoords = LinearElementEditor.getPointGlobalCoordinates(
-        element,
-        referencePoint,
-        elementsMap,
+      const referencePointCoords =
+        LinearElementEditor.getPointGlobalCoordinates(
+          element,
+          referencePoint,
+          elementsMap,
+        );
+      const [gridX, gridY] = getGridPoint(
+        scenePointerX,
+        scenePointerY,
+        gridSize,
       );
-      const [gridX, gridY] = getGridPoint(scenePointerX, scenePointerY, gridSize);
 
       let { width: dxFromReference, height: dyFromReference } =
         getLockedLinearCursorAlignSize(
@@ -1942,7 +1955,7 @@ export class LinearElementEditor {
 
       if (!isElbowArrow(element)) {
         const { snapOffset, snapLines: nextSnapLines } = snapLinearElementPoint(
-          app.scene.getNonDeletedElements(),
+          elements,
           element,
           pointFrom<GlobalPoint>(effectiveGridX, effectiveGridY),
           app,
@@ -1972,8 +1985,10 @@ export class LinearElementEditor {
             dyFromReference = result.dyFromReference;
             snapLines = result.snapLines;
           } else {
-            dxFromReference = effectiveGridX + snapOffset.x - referencePointCoords[0];
-            dyFromReference = effectiveGridY + snapOffset.y - referencePointCoords[1];
+            dxFromReference =
+              effectiveGridX + snapOffset.x - referencePointCoords[0];
+            dyFromReference =
+              effectiveGridY + snapOffset.y - referencePointCoords[1];
           }
         }
       }
@@ -1985,7 +2000,10 @@ export class LinearElementEditor {
       );
 
       return {
-        point: pointFrom(referencePoint[0] + rotatedX, referencePoint[1] + rotatedY),
+        point: pointFrom(
+          referencePoint[0] + rotatedX,
+          referencePoint[1] + rotatedY,
+        ),
         snapLines,
       };
     }
@@ -1994,7 +2012,7 @@ export class LinearElementEditor {
     const originalPointerY = scenePointerY - pointerOffset.y;
 
     const { snapOffset, snapLines } = snapLinearElementPoint(
-      app.scene.getNonDeletedElements(),
+      elements,
       element,
       pointFrom(originalPointerX, originalPointerY),
       app,
