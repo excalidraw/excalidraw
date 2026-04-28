@@ -79,18 +79,6 @@ function buildNewEdges(nodes, adjacency) {
     nodes[nodePath].edges_new = [...connectedNodes];
   }
 
-  for (const [nodePath, node] of Object.entries(nodes)) {
-    for (const target of node.edges_new || []) {
-      if (!nodes[target]) {
-        continue;
-      }
-      nodes[target].edges_new ||= [];
-      if (!nodes[target].edges_new.includes(nodePath)) {
-        nodes[target].edges_new.push(nodePath);
-      }
-    }
-  }
-
   for (const node of Object.values(nodes)) {
     node.edges_new = [...new Set(node.edges_new || [])];
   }
@@ -176,7 +164,6 @@ function buildExistingEdges(nodes, plan) {
 
       for (const dependency of resource.depends_on || []) {
         addEdge(resource.address, dependency);
-        addEdge(dependency, resource.address);
       }
     }
 
@@ -223,21 +210,14 @@ function makeExternalNode(edge, backRef) {
         change: { actions: ["external"] },
       },
     },
-    edges_existing: [backRef],
-    edges_new: [backRef],
+    edges_existing: [],
+    edges_new: [],
   };
 }
 
 function addExternalBackRef(externals, edge, backRef) {
   if (!externals[edge]) {
     externals[edge] = makeExternalNode(edge, backRef);
-    return;
-  }
-  if (!externals[edge].edges_existing.includes(backRef)) {
-    externals[edge].edges_existing.push(backRef);
-  }
-  if (!externals[edge].edges_new.includes(backRef)) {
-    externals[edge].edges_new.push(backRef);
   }
 }
 
@@ -272,10 +252,24 @@ function externalResources(nodes) {
 }
 
 function deleteOrphanedNodes(nodes) {
+  const connected = new Set();
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    const edges = [...(node.edges_existing || []), ...(node.edges_new || [])];
+    if (edges.length > 0) {
+      connected.add(nodePath);
+    }
+    for (const edge of edges) {
+      if (nodes[edge]) {
+        connected.add(edge);
+      }
+    }
+  }
+
   const filtered = {};
 
   for (const [nodePath, node] of Object.entries(nodes)) {
-    if ((node.edges_existing || []).length || (node.edges_new || []).length) {
+    if (connected.has(nodePath)) {
       filtered[nodePath] = node;
     }
   }
