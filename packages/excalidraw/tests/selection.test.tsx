@@ -615,6 +615,32 @@ describe("box-selection overlap mode", () => {
 
     assertSelectedElements([]);
   });
+
+  it("should not select a framed element when selection only overlaps its clipped-out outline", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+    });
+    const rect1 = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 200,
+      height: 200,
+      frameId: frame.id,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+
+    API.setElements([frame, rect1]);
+
+    boxSelect(40, 170, 70, 220);
+
+    assertSelectedElements([]);
+  });
 });
 
 describe("inner box-selection", () => {

@@ -19,6 +19,7 @@ import {
   getElementAbsoluteCoords,
   doBoundsIntersect,
   getElementBounds,
+  boundsContainBounds,
 } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, getContainerElement } from "./textElement";
@@ -101,8 +102,9 @@ export const isElementContainingFrame = (
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
 ) => {
-  return getElementsWithinSelection([frame], element, elementsMap).some(
-    (e) => e.id === frame.id,
+  return boundsContainBounds(
+    getElementBounds(element, elementsMap),
+    getElementBounds(frame, elementsMap),
   );
 };
 
