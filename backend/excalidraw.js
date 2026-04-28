@@ -296,6 +296,72 @@ function getPrimaryAction(node) {
   return "existing";
 }
 
+function isDisplayableConfigValue(value) {
+  return (
+    value !== null &&
+    typeof value !== "undefined" &&
+    value !== "" &&
+    !(Array.isArray(value) && value.length === 0) &&
+    !(isPlainObject(value) && Object.keys(value).length === 0)
+  );
+}
+
+function isPlainObject(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function getCurrentResourceConfig(resource) {
+  const change = resource.change || {};
+  if (isPlainObject(change.after)) {
+    return change.after;
+  }
+  if (isPlainObject(resource.values)) {
+    return resource.values;
+  }
+  if (isPlainObject(change.before)) {
+    return change.before;
+  }
+  return {};
+}
+
+function buildTerraformResourceDetails(node) {
+  return Object.entries(node.resources || {}).map(([address, resource]) => {
+    const change = resource.change || {};
+    const config = getCurrentResourceConfig(resource);
+    const diff = change.diff || {};
+    const keys = new Set([...Object.keys(config), ...Object.keys(diff)]);
+
+    const attributes = [...keys]
+      .filter((key) => isDisplayableConfigValue(config[key]) || diff[key])
+      .sort((a, b) => {
+        const aChanged = diff[a] ? 0 : 1;
+        const bChanged = diff[b] ? 0 : 1;
+        return aChanged - bChanged || a.localeCompare(b);
+      })
+      .map((key) => {
+        const fieldDiff = diff[key];
+        return {
+          key,
+          value: Object.prototype.hasOwnProperty.call(config, key)
+            ? config[key]
+            : fieldDiff?.after ?? null,
+          changed: Boolean(fieldDiff),
+          before: fieldDiff?.before,
+          after: fieldDiff?.after,
+        };
+      });
+
+    return {
+      address: resource.address || address,
+      type: resource.type || getResourceType(address),
+      name: resource.name || "",
+      mode: resource.mode || "",
+      actions: change.actions || [],
+      attributes,
+    };
+  });
+}
+
 function getLabel(nodePath) {
   const parts = nodePath.split(".");
   const moduleParts = [];
@@ -487,6 +553,7 @@ async function nodesToExcalidraw(nodes) {
     const bgColor = ACTION_COLORS[action] || ACTION_COLORS.existing;
     const strokeColor = ACTION_STROKE[action] || ACTION_STROKE.existing;
     const label = getLabel(nodePath);
+    const terraformResources = buildTerraformResourceDetails(nodes[nodePath]);
 
     // Check for icon
     const iconElements = cfg.iconSize > 0 ? getIconForType(resourceType) : null;
@@ -513,6 +580,7 @@ async function nodesToExcalidraw(nodes) {
           resourceType,
           nodePath,
           action,
+          terraformResources,
         },
       }),
     );

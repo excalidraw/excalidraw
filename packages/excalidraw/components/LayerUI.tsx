@@ -139,12 +139,22 @@ const DefaultOverwriteConfirmDialog = () => {
   );
 };
 
-const TERRAFORM_CUSTOM_DATA_KEYS = new Set([
-  "terraform",
-  "nodePath",
-  "resourceType",
-  "action",
-]);
+type TerraformAttribute = {
+  key: string;
+  value: unknown;
+  changed?: boolean;
+  before?: unknown;
+  after?: unknown;
+};
+
+type TerraformResourceDetails = {
+  address?: string;
+  type?: string;
+  name?: string;
+  mode?: string;
+  actions?: string[];
+  attributes?: TerraformAttribute[];
+};
 
 const formatTerraformPanelValue = (value: unknown) => {
   if (value === null || typeof value === "undefined" || value === "") {
@@ -153,13 +163,21 @@ const formatTerraformPanelValue = (value: unknown) => {
 
   if (typeof value === "object") {
     try {
-      return JSON.stringify(value);
+      return JSON.stringify(value, null, 2);
     } catch {
       return String(value);
     }
   }
 
   return String(value);
+};
+
+const TerraformConfigValue = ({ value }: { value: unknown }) => {
+  const formatted = formatTerraformPanelValue(value);
+  if (typeof value === "object" && value !== null) {
+    return <pre>{formatted}</pre>;
+  }
+  return <>{formatted}</>;
 };
 
 const getTerraformElementForSelection = (
@@ -202,14 +220,22 @@ const TerraformElementActions = ({
   renderAction: ActionManager["renderAction"];
 }) => {
   const customData = element.customData ?? {};
-  const rows = [
-    ["Resource", customData.nodePath ?? element.id],
-    ["Type", customData.resourceType ?? element.type],
-    ["Action", customData.action ?? "diagram element"],
-    ...Object.entries(customData).filter(
-      ([key]) => !TERRAFORM_CUSTOM_DATA_KEYS.has(key),
-    ),
-  ];
+  const resources: TerraformResourceDetails[] = Array.isArray(
+    customData.terraformResources,
+  )
+    ? customData.terraformResources
+    : [];
+  const changedCount = resources.reduce(
+    (count, resource) =>
+      count +
+      (resource.attributes || []).filter((attribute) => attribute.changed)
+        .length,
+    0,
+  );
+  const attributeCount = resources.reduce(
+    (count, resource) => count + (resource.attributes || []).length,
+    0,
+  );
 
   return (
     <div className="selected-shape-actions terraform-element-actions">
@@ -218,18 +244,107 @@ const TerraformElementActions = ({
         <div className="terraform-element-actions__title">
           {formatTerraformPanelValue(customData.resourceType ?? element.type)}
         </div>
+        <div className="terraform-element-actions__summary">
+          <span>{formatTerraformPanelValue(customData.action)}</span>
+          <span>
+            {changedCount} changed / {attributeCount} shown
+          </span>
+        </div>
       </div>
 
       <div className="terraform-element-actions__meta">
-        {rows.map(([label, value]) => (
-          <div className="terraform-element-actions__row" key={label}>
-            <div className="terraform-element-actions__label">{label}</div>
+        <div className="terraform-element-actions__row">
+          <div className="terraform-element-actions__label">Resource</div>
+          <div className="terraform-element-actions__value">
+            {formatTerraformPanelValue(customData.nodePath ?? element.id)}
+          </div>
+        </div>
+        <div className="terraform-element-actions__row">
+          <div className="terraform-element-actions__label">Type</div>
+          <div className="terraform-element-actions__value">
+            {formatTerraformPanelValue(customData.resourceType ?? element.type)}
+          </div>
+        </div>
+      </div>
+
+      <div className="terraform-element-actions__config">
+        {resources.length > 0 ? (
+          resources.map((resource, resourceIndex) => {
+            const attributes = resource.attributes || [];
+            return (
+              <div
+                className="terraform-element-actions__resource"
+                key={resource.address || resourceIndex}
+              >
+                {resources.length > 1 && (
+                  <div className="terraform-element-actions__resource-title">
+                    {formatTerraformPanelValue(
+                      resource.address || `Resource ${resourceIndex + 1}`,
+                    )}
+                  </div>
+                )}
+                {attributes.length > 0 ? (
+                  attributes.map((attribute) => (
+                    <div
+                      className={clsx("terraform-element-actions__attribute", {
+                        "terraform-element-actions__attribute--changed":
+                          attribute.changed,
+                      })}
+                      key={attribute.key}
+                    >
+                      <div className="terraform-element-actions__attribute-head">
+                        <span>{attribute.key}</span>
+                        {attribute.changed && <strong>changed</strong>}
+                      </div>
+                      {attribute.changed ? (
+                        <div className="terraform-element-actions__diff">
+                          <div>
+                            <span>Before</span>
+                            <TerraformConfigValue value={attribute.before} />
+                          </div>
+                          <div>
+                            <span>After</span>
+                            <TerraformConfigValue
+                              value={
+                                typeof attribute.after === "undefined"
+                                  ? attribute.value
+                                  : attribute.after
+                              }
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="terraform-element-actions__value terraform-element-actions__value--config">
+                          <TerraformConfigValue value={attribute.value} />
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="terraform-element-actions__empty">
+                    No config attributes in this Terraform plan entry.
+                  </div>
+                )}
+              </div>
+            );
+          })
+        ) : (
+          <div className="terraform-element-actions__empty">
+            Re-import this Terraform graph to include config and diff data.
+          </div>
+        )}
+      </div>
+
+      {resources[0]?.address && (
+        <div className="terraform-element-actions__meta">
+          <div className="terraform-element-actions__row">
+            <div className="terraform-element-actions__label">Address</div>
             <div className="terraform-element-actions__value">
-              {formatTerraformPanelValue(value)}
+              {formatTerraformPanelValue(resources[0].address)}
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
 
       <fieldset>
         <legend>{t("labels.actions")}</legend>
