@@ -59,7 +59,7 @@ import { HandButton } from "./HandButton";
 import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
-import { TerraformImportDialog} from "./TerraformImportDialog"
+import { TerraformImportDialog } from "./TerraformImportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
@@ -136,6 +136,110 @@ const DefaultOverwriteConfirmDialog = () => {
       <OverwriteConfirmDialog.Actions.SaveToDisk />
       <OverwriteConfirmDialog.Actions.ExportToImage />
     </OverwriteConfirmDialog>
+  );
+};
+
+const TERRAFORM_CUSTOM_DATA_KEYS = new Set([
+  "terraform",
+  "nodePath",
+  "resourceType",
+  "action",
+]);
+
+const formatTerraformPanelValue = (value: unknown) => {
+  if (value === null || typeof value === "undefined" || value === "") {
+    return "None";
+  }
+
+  if (typeof value === "object") {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return String(value);
+    }
+  }
+
+  return String(value);
+};
+
+const getTerraformElementForSelection = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: UIAppState,
+) => {
+  const selectedIds = Object.keys(appState.selectedElementIds);
+  if (selectedIds.length !== 1) {
+    return null;
+  }
+
+  const selectedElement = elements.find(
+    (element) => element.id === selectedIds[0],
+  );
+  if (!selectedElement?.customData?.terraform) {
+    return null;
+  }
+
+  if (selectedElement.customData.nodePath) {
+    return selectedElement;
+  }
+
+  if ("containerId" in selectedElement && selectedElement.containerId) {
+    const container = elements.find(
+      (element) => element.id === selectedElement.containerId,
+    );
+    if (container?.customData?.terraform) {
+      return container;
+    }
+  }
+
+  return selectedElement;
+};
+
+const TerraformElementActions = ({
+  element,
+  renderAction,
+}: {
+  element: NonDeletedExcalidrawElement;
+  renderAction: ActionManager["renderAction"];
+}) => {
+  const customData = element.customData ?? {};
+  const rows = [
+    ["Resource", customData.nodePath ?? element.id],
+    ["Type", customData.resourceType ?? element.type],
+    ["Action", customData.action ?? "diagram element"],
+    ...Object.entries(customData).filter(
+      ([key]) => !TERRAFORM_CUSTOM_DATA_KEYS.has(key),
+    ),
+  ];
+
+  return (
+    <div className="selected-shape-actions terraform-element-actions">
+      <div className="terraform-element-actions__header">
+        <div className="terraform-element-actions__eyebrow">Terraform</div>
+        <div className="terraform-element-actions__title">
+          {formatTerraformPanelValue(customData.resourceType ?? element.type)}
+        </div>
+      </div>
+
+      <div className="terraform-element-actions__meta">
+        {rows.map(([label, value]) => (
+          <div className="terraform-element-actions__row" key={label}>
+            <div className="terraform-element-actions__label">{label}</div>
+            <div className="terraform-element-actions__value">
+              {formatTerraformPanelValue(value)}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <fieldset>
+        <legend>{t("labels.actions")}</legend>
+        <div className="buttonList">
+          {renderAction("duplicateSelection")}
+          {renderAction("deleteSelectedElements")}
+          {renderAction("hyperlink")}
+        </div>
+      </fieldset>
+    </div>
   );
 };
 
@@ -250,6 +354,10 @@ const LayerUI = ({
 
   const renderSelectedShapeActions = () => {
     const isCompactMode = isCompactStylesPanel;
+    const terraformElement = getTerraformElementForSelection(
+      elements,
+      appState,
+    );
 
     return (
       <Section
@@ -268,13 +376,20 @@ const LayerUI = ({
               maxHeight: `${appState.height - 166}px`,
             }}
           >
-            <CompactShapeActions
-              appState={appState}
-              elementsMap={app.scene.getNonDeletedElementsMap()}
-              renderAction={actionManager.renderAction}
-              app={app}
-              setAppState={setAppState}
-            />
+            {terraformElement ? (
+              <TerraformElementActions
+                element={terraformElement}
+                renderAction={actionManager.renderAction}
+              />
+            ) : (
+              <CompactShapeActions
+                appState={appState}
+                elementsMap={app.scene.getNonDeletedElementsMap()}
+                renderAction={actionManager.renderAction}
+                app={app}
+                setAppState={setAppState}
+              />
+            )}
           </Island>
         ) : (
           <Island
@@ -286,12 +401,19 @@ const LayerUI = ({
               maxHeight: `${appState.height - 166}px`,
             }}
           >
-            <SelectedShapeActions
-              appState={appState}
-              elementsMap={app.scene.getNonDeletedElementsMap()}
-              renderAction={actionManager.renderAction}
-              app={app}
-            />
+            {terraformElement ? (
+              <TerraformElementActions
+                element={terraformElement}
+                renderAction={actionManager.renderAction}
+              />
+            ) : (
+              <SelectedShapeActions
+                appState={appState}
+                elementsMap={app.scene.getNonDeletedElementsMap()}
+                renderAction={actionManager.renderAction}
+                app={app}
+              />
+            )}
           </Island>
         )}
       </Section>
