@@ -208,7 +208,7 @@
 }
 
 .terraform-element-actions {
-  width: min(18rem, calc(100vw - 2rem));
+  width: 100%;
   max-height: calc(100vh - 190px);
   overflow-y: auto;
   color: var(--text-primary-color);
