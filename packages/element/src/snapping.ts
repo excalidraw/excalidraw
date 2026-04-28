@@ -654,19 +654,20 @@ export const getReferenceSnapPoints = (
     .flatMap((elementGroup) => getElementsCorners(elementGroup, elementsMap));
 };
 
+type LinearElementPointReferencePointsOptions = {
+  selfReferencePoints?: {
+    excludedPointIndices?: readonly number[];
+  };
+};
+
 export const getReferenceSnapPointsForLinearElementPoint = (
   elements: readonly NonDeletedExcalidrawElement[],
   editingElement: ExcalidrawLinearElement,
   editingPointIndex: number,
   appState: AppState,
   elementsMap: ElementsMap,
-  options: {
-    includeSelfPoints?: boolean;
-    selectedPointsIndices?: readonly number[];
-  } = {},
+  options: LinearElementPointReferencePointsOptions = {},
 ) => {
-  const { includeSelfPoints = false } = options;
-
   // Get all reference elements (excluding the one being edited)
   const referenceElements = getReferenceElements(
     elements,
@@ -691,12 +692,14 @@ export const getReferenceSnapPointsForLinearElementPoint = (
   }
 
   // Include other points from the same linear element when creating new points or in editing mode
-  if (includeSelfPoints) {
+  if (options.selfReferencePoints) {
+    const excludedPointIndices =
+      options.selfReferencePoints.excludedPointIndices ?? [editingPointIndex];
     const elementPoints = LinearElementEditor.getPointsGlobalCoordinates(
       editingElement as NonDeleted<ExcalidrawLinearElement>,
       elementsMap,
       {
-        excludePointsIndices: options.selectedPointsIndices,
+        excludePointsIndices: excludedPointIndices,
       },
     );
     allSnapPoints.push(...elementPoints);
@@ -713,10 +716,7 @@ export const snapLinearElementPoint = (
   app: AppClassProperties,
   event: KeyboardModifiersObject,
   elementsMap: ElementsMap,
-  options: {
-    includeSelfPoints?: boolean;
-    selectedPointsIndices?: readonly number[];
-  } = {},
+  options: LinearElementPointReferencePointsOptions = {},
 ) => {
   if (
     !isSnappingEnabled({ app, event, selectedElements: [editingElement] }) ||

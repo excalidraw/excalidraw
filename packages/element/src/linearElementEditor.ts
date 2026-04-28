@@ -1913,8 +1913,9 @@ export class LinearElementEditor {
       event,
       elementsMap,
       {
-        includeSelfPoints: true,
-        selectedPointsIndices,
+        selfReferencePoints: {
+          excludedPointIndices: selectedPointsIndices,
+        },
       },
     );
 
