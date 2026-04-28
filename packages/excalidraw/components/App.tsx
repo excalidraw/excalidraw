@@ -784,6 +784,29 @@ class App extends React.Component<AppProps, AppState> {
     return api;
   }
 
+  private withStableSnapLines<T extends { snapLines: AppState["snapLines"] }>(
+    state: T,
+  ): T {
+    const snapLines = updateStable(this.state.snapLines, state.snapLines);
+
+    return snapLines === state.snapLines
+      ? state
+      : {
+          ...state,
+          snapLines,
+        };
+  }
+
+  private shouldUpdateSelectedLinearElementState(
+    selectedLinearElement: AppState["selectedLinearElement"],
+    snapLines: AppState["snapLines"],
+  ) {
+    return (
+      selectedLinearElement !== this.state.selectedLinearElement ||
+      snapLines !== this.state.snapLines
+    );
+  }
+
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -6848,21 +6871,23 @@ class App extends React.Component<AppProps, AppState> {
 
       if (result) {
         const { editingLinearElement, snapLines } = result;
-        const nextSnapLines = updateStable(this.state.snapLines, snapLines);
+        const nextState = this.withStableSnapLines({
+          selectedLinearElement: editingLinearElement,
+          snapLines,
+        });
 
         if (
           editingLinearElement &&
-          (editingLinearElement !== this.state.selectedLinearElement ||
-            nextSnapLines !== this.state.snapLines)
+          this.shouldUpdateSelectedLinearElementState(
+            nextState.selectedLinearElement,
+            nextState.snapLines,
+          )
         ) {
           // Since we are reading from previous state which is not possible with
           // automatic batching in React 18 hence using flush sync to synchronously
           // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
           flushSync(() => {
-            this.setState({
-              selectedLinearElement: editingLinearElement,
-              snapLines: nextSnapLines,
-            });
+            this.setState(nextState);
           });
         }
         if (
@@ -9728,17 +9753,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.lastCoords.x = pointerCoords.x;
             pointerDownState.lastCoords.y = pointerCoords.y;
             pointerDownState.drag.hasOccurred = true;
-            const nextSnapLines = updateStable(
-              this.state.snapLines,
-              newState.snapLines,
-            );
-            const nextState =
-              nextSnapLines === newState.snapLines
-                ? newState
-                : {
-                    ...newState,
-                    snapLines: nextSnapLines,
-                  };
+            const nextState = this.withStableSnapLines(newState);
 
             // NOTE: Optimize setState calls because it
             // affects history and performance
