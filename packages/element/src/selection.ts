@@ -34,7 +34,6 @@ import {
   elementOverlapsWithFrame,
   getContainingFrame,
   getFrameChildren,
-  isElementIntersectingFrame,
 } from "./frame";
 
 import { LinearElementEditor } from "./linearElementEditor";
@@ -170,7 +169,7 @@ export const getElementsWithinSelection = (
     const associatedFrame = getContainingFrame(element, elementsMap);
     if (
       associatedFrame &&
-      isElementIntersectingFrame(element, associatedFrame, elementsMap)
+      elementOverlapsWithFrame(element, associatedFrame, elementsMap)
     ) {
       const frameAABB = getElementBounds(associatedFrame, elementsMap);
       elementAABB = [
@@ -209,10 +208,9 @@ export const getElementsWithinSelection = (
     if (boundsContainBounds(selectionBounds, commonAABB)) {
       if (framesInSelection && isFrameLikeElement(element)) {
         framesInSelection.add(element.id);
-      } else {
-        elementsInSelection.push(element);
-        continue;
       }
+      elementsInSelection.push(element);
+      continue;
     }
 
     // 2. Handle the case where the label is overlapped by the selection box
