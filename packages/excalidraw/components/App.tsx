@@ -5746,6 +5746,10 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
         activeEmbeddable: null,
       });
+    } else if (this.state.activeEmbeddable) {
+      this.setState({
+        activeEmbeddable: null,
+      });
     }
     gesture.initialScale = this.state.zoom.value;
   });

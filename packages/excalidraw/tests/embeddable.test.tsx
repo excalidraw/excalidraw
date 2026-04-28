@@ -1,7 +1,7 @@
 import { Excalidraw } from "../index";
 
 import { Pointer } from "./helpers/ui";
-import { act, fireEvent, render, waitFor } from "./test-utils";
+import { act, fireEvent, GlobalTestState, render, waitFor } from "./test-utils";
 
 import type { ExcalidrawProps } from "../types";
 
@@ -66,6 +66,61 @@ describe("embeddable interactions", () => {
       getIframe,
       src,
     };
+  };
+
+  const renderYouTubeEmbeddable = async (
+    excalidrawProps: Partial<ExcalidrawProps> = {},
+  ) => {
+    const renderResult = await render(<Excalidraw {...excalidrawProps} />);
+    let embeddable!: NonNullable<
+      ReturnType<typeof h.app.insertEmbeddableElement>
+    >;
+
+    act(() => {
+      const insertedEmbeddable = h.app.insertEmbeddableElement({
+        sceneX: 40,
+        sceneY: 40,
+        link: "https://www.youtube.com/watch?v=gkGMXY0wekg",
+      });
+
+      if (!insertedEmbeddable) {
+        throw new Error("YouTube embeddable not inserted");
+      }
+
+      embeddable = insertedEmbeddable;
+    });
+
+    (
+      h.app as unknown as {
+        embedsValidationStatus: Map<string, boolean>;
+      }
+    ).embedsValidationStatus.set(embeddable.id, true);
+
+    act(() => {
+      h.setState({ width: 1000, height: 1000 });
+      h.app.scene.triggerUpdate();
+    });
+
+    await waitFor(() => {
+      expect(
+        renderResult.container.querySelector("iframe.excalidraw__embeddable"),
+      ).not.toBeNull();
+    });
+
+    return {
+      ...renderResult,
+      embeddable,
+    };
+  };
+
+  const setActiveEmbeddable = (
+    embeddable: NonNullable<ReturnType<typeof h.app.insertEmbeddableElement>>,
+  ) => {
+    act(() => {
+      h.setState({
+        activeEmbeddable: { element: embeddable, state: "active" },
+      });
+    });
   };
 
   it("lets the initial Google Drive video click land in the iframe center", async () => {
@@ -174,6 +229,87 @@ describe("embeddable interactions", () => {
     await waitFor(() => {
       expect(h.state.activeEmbeddable).toBeNull();
       expect(h.state.zoom.value).toBeGreaterThan(prevZoom);
+    });
+  });
+
+  it("deactivates a non-Drive interactive embeddable on Ctrl/Cmd keydown", async () => {
+    const { container, embeddable } = await renderYouTubeEmbeddable({
+      handleKeyboardGlobally: true,
+    });
+
+    setActiveEmbeddable(embeddable);
+
+    await waitFor(() => {
+      expect(
+        container.querySelector<HTMLElement>(
+          ".excalidraw__embeddable-container__inner",
+        )?.style.pointerEvents,
+      ).toBe("all");
+      expect(
+        container.querySelectorAll(".excalidraw__embeddable-canvas-guard"),
+      ).toHaveLength(0);
+    });
+
+    fireEvent.keyDown(document, {
+      key: "Control",
+      ctrlKey: true,
+    });
+
+    await waitFor(() => {
+      expect(h.state.activeEmbeddable).toBeNull();
+      expect(
+        container.querySelector<HTMLElement>(
+          ".excalidraw__embeddable-container__inner",
+        )?.style.pointerEvents,
+      ).toBe("none");
+    });
+  });
+
+  it("deactivates a non-Drive interactive embeddable on parent-observed pinch", async () => {
+    const { embeddable } = await renderYouTubeEmbeddable();
+
+    setActiveEmbeddable(embeddable);
+
+    fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+      clientX: embeddable.x + 10,
+      clientY: embeddable.y + 10,
+      pointerId: 1,
+      pointerType: "touch",
+    });
+    fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+      clientX: embeddable.x + 30,
+      clientY: embeddable.y + 30,
+      pointerId: 2,
+      pointerType: "touch",
+    });
+
+    await waitFor(() => {
+      expect(h.state.activeEmbeddable).toBeNull();
+    });
+
+    fireEvent.pointerUp(GlobalTestState.interactiveCanvas, {
+      pointerId: 1,
+      pointerType: "touch",
+    });
+    fireEvent.pointerUp(GlobalTestState.interactiveCanvas, {
+      pointerId: 2,
+      pointerType: "touch",
+    });
+  });
+
+  it("deactivates a non-Drive interactive embeddable on Safari gesturestart", async () => {
+    const { embeddable } = await renderYouTubeEmbeddable();
+
+    setActiveEmbeddable(embeddable);
+
+    act(() => {
+      document.dispatchEvent(
+        new Event("gesturestart", { bubbles: true, cancelable: true }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(h.state.activeEmbeddable).toBeNull();
     });
   });
 });
