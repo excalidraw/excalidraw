@@ -473,6 +473,9 @@ const LayerUI = ({
       elements,
       appState,
     );
+    const terraformMenuWidth = terraformElement
+      ? "min(36rem, calc(100vw - 2rem))"
+      : undefined;
 
     return (
       <Section
@@ -489,6 +492,7 @@ const LayerUI = ({
               // we want to make sure this doesn't overflow so subtracting the
               // approximate height of hamburgerMenu + footer
               maxHeight: `${appState.height - 166}px`,
+              width: terraformMenuWidth,
             }}
           >
             {terraformElement ? (
@@ -514,6 +518,7 @@ const LayerUI = ({
               // we want to make sure this doesn't overflow so subtracting the
               // approximate height of hamburgerMenu + footer
               maxHeight: `${appState.height - 166}px`,
+              width: terraformMenuWidth,
             }}
           >
             {terraformElement ? (
