@@ -603,6 +603,55 @@ const YOUTUBE_VIDEO_STATES = new Map<
   ValueOf<typeof YOUTUBE_STATES>
 >();
 
+const isGoogleDrivePreviewLink = (link: string | null | undefined) => {
+  if (!link) {
+    return false;
+  }
+
+  try {
+    const url = new URL(link);
+    return (
+      url.hostname === "drive.google.com" &&
+      /^\/file\/d\/[^/]+\/preview\/?$/.test(url.pathname)
+    );
+  } catch {
+    return false;
+  }
+};
+
+const isGoogleDriveEmbeddableElement = (
+  element: ExcalidrawElement | null | undefined,
+) => {
+  if (!isEmbeddableElement(element)) {
+    return false;
+  }
+
+  const embedLink = getEmbedLink(toValidURL(element.link || ""));
+  return (
+    embedLink?.type === "video" && isGoogleDrivePreviewLink(embedLink.link)
+  );
+};
+
+const EMBEDDABLE_CANVAS_GUARD_CLASS = "excalidraw__embeddable-canvas-guard";
+const EMBEDDABLE_CANVAS_GUARDS = [
+  {
+    key: "top",
+    style: { top: 0, left: 0, right: 0, height: "33.333%" },
+  },
+  {
+    key: "bottom",
+    style: { bottom: 0, left: 0, right: 0, height: "33.333%" },
+  },
+  {
+    key: "left",
+    style: { top: "33.333%", bottom: "33.333%", left: 0, width: "33.333%" },
+  },
+  {
+    key: "right",
+    style: { top: "33.333%", bottom: "33.333%", right: 0, width: "33.333%" },
+  },
+] as const;
+
 let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
 let PLAIN_PASTE_TOAST_SHOWN = false;
@@ -1283,6 +1332,46 @@ class App extends React.Component<AppProps, AppState> {
     return this.iFrameRefs.get(element.id);
   }
 
+  private deactivateActiveEmbeddable = () => {
+    if (this.state.activeEmbeddable) {
+      flushSync(() => {
+        this.setState({ activeEmbeddable: null });
+      });
+    }
+  };
+
+  private handleEmbeddableCanvasGuardPointerDown = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    this.deactivateActiveEmbeddable();
+    this.handleCanvasPointerDown(event);
+  };
+
+  private handleEmbeddableCanvasGuardPointerMove = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    this.lastViewportPosition.x = event.clientX;
+    this.lastViewportPosition.y = event.clientY;
+    this.deactivateActiveEmbeddable();
+  };
+
+  private handleEmbeddableCanvasGuardTouchStart = (
+    event: React.TouchEvent<HTMLDivElement>,
+  ) => {
+    if (event.touches.length >= 2) {
+      this.deactivateActiveEmbeddable();
+    }
+  };
+
+  private handleEmbeddableCanvasGuardWheel = (
+    event: React.WheelEvent<HTMLDivElement>,
+  ) => {
+    this.lastViewportPosition.x = event.clientX;
+    this.lastViewportPosition.y = event.clientY;
+    this.deactivateActiveEmbeddable();
+    this.handleWheel(event);
+  };
+
   private handleIframeLikeElementHover = ({
     hitElement,
     scenePointer,
@@ -1305,11 +1394,24 @@ class App extends React.Component<AppProps, AppState> {
         ))
     ) {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+      const isDriveEmbedActivating =
+        (this.state.viewModeEnabled ||
+          this.state.activeTool.type === "selection") &&
+        isGoogleDriveEmbeddableElement(hitElement);
       this.setState({
-        activeEmbeddable: { element: hitElement, state: "hover" },
+        activeEmbeddable: {
+          element: hitElement,
+          state: isDriveEmbedActivating ? "active" : "hover",
+        },
       });
       return true;
     } else if (this.state.activeEmbeddable?.state === "hover") {
+      this.setState({ activeEmbeddable: null });
+    } else if (
+      this.state.activeEmbeddable?.state === "active" &&
+      isGoogleDriveEmbeddableElement(this.state.activeEmbeddable.element) &&
+      this.state.activeEmbeddable.element !== hitElement
+    ) {
       this.setState({ activeEmbeddable: null });
     }
     return false;
@@ -1734,6 +1836,8 @@ class App extends React.Component<AppProps, AppState> {
           const isHovered =
             this.state.activeEmbeddable?.element === el &&
             this.state.activeEmbeddable?.state === "hover";
+          const shouldConstrainDriveInteraction =
+            isActive && isGoogleDriveEmbeddableElement(el);
 
           return (
             <div
@@ -1785,6 +1889,7 @@ class App extends React.Component<AppProps, AppState> {
                   width: isVisible ? `${el.width}px` : 0,
                   height: isVisible ? `${el.height}px` : 0,
                   transform: isVisible ? `rotate(${el.angle}rad)` : "none",
+                  position: "relative",
                   pointerEvents: isActive
                     ? POINTER_EVENTS.enabled
                     : POINTER_EVENTS.disabled,
@@ -1827,6 +1932,26 @@ class App extends React.Component<AppProps, AppState> {
                     />
                   )}
                 </div>
+                {shouldConstrainDriveInteraction &&
+                  EMBEDDABLE_CANVAS_GUARDS.map(({ key, style }) => (
+                    <div
+                      key={key}
+                      className={EMBEDDABLE_CANVAS_GUARD_CLASS}
+                      onPointerDown={
+                        this.handleEmbeddableCanvasGuardPointerDown
+                      }
+                      onPointerMove={
+                        this.handleEmbeddableCanvasGuardPointerMove
+                      }
+                      onTouchStart={this.handleEmbeddableCanvasGuardTouchStart}
+                      onWheel={this.handleEmbeddableCanvasGuardWheel}
+                      style={{
+                        position: "absolute",
+                        zIndex: 2,
+                        ...style,
+                      }}
+                    />
+                  ))}
               </div>
             </div>
           );
@@ -4731,6 +4856,16 @@ class App extends React.Component<AppProps, AppState> {
               : value;
           },
         });
+      }
+
+      if (
+        this.state.activeEmbeddable &&
+        (event.ctrlKey ||
+          event.metaKey ||
+          event.key === "Control" ||
+          event.key === "Meta")
+      ) {
+        this.setState({ activeEmbeddable: null });
       }
 
       if (!isInputLike(event.target)) {
@@ -8164,6 +8299,10 @@ class App extends React.Component<AppProps, AppState> {
       x: event.clientX,
       y: event.clientY,
     });
+
+    if (gesture.pointers.size >= 2 && this.state.activeEmbeddable) {
+      this.setState({ activeEmbeddable: null });
+    }
 
     if (gesture.pointers.size === 2) {
       gesture.lastCenter = getCenter(gesture.pointers);
@@ -12584,7 +12723,8 @@ class App extends React.Component<AppProps, AppState> {
           event.target instanceof HTMLTextAreaElement ||
           event.target instanceof HTMLIFrameElement ||
           (event.target instanceof HTMLElement &&
-            event.target.classList.contains(CLASSES.FRAME_NAME))
+            (event.target.classList.contains(CLASSES.FRAME_NAME) ||
+              event.target.classList.contains(EMBEDDABLE_CANVAS_GUARD_CLASS)))
         )
       ) {
         // prevent zooming the browser (but allow scrolling DOM)
