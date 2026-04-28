@@ -114,7 +114,7 @@ describe("binding with linear elements", () => {
     mouse.up(200, 100);
 
     UI.clickTool("arrow");
-    mouse.down(5, 0);
+    mouse.down(-5, 0);
     mouse.up(300, 50);
 
     elementStats = stats?.querySelector("#elementStats");
@@ -135,18 +135,7 @@ describe("binding with linear elements", () => {
     ) as HTMLInputElement;
     expect(linear.startBinding).not.toBe(null);
     expect(inputX).not.toBeNull();
-    UI.updateInput(inputX, String("204"));
-    expect(linear.startBinding).not.toBe(null);
-  });
-
-  it("should remain bound to linear element on small angle change", async () => {
-    const linear = h.elements[1] as ExcalidrawLinearElement;
-    const inputAngle = UI.queryStatsProperty("A")?.querySelector(
-      ".drag-input",
-    ) as HTMLInputElement;
-
-    expect(linear.startBinding).not.toBe(null);
-    UI.updateInput(inputAngle, String("1"));
+    UI.updateInput(inputX, String("184"));
     expect(linear.startBinding).not.toBe(null);
   });
 
@@ -159,17 +148,6 @@ describe("binding with linear elements", () => {
     expect(linear.startBinding).not.toBe(null);
     expect(inputX).not.toBeNull();
     UI.updateInput(inputX, String("254"));
-    expect(linear.startBinding).toBe(null);
-  });
-
-  it("should remain bound to linear element on small angle change", async () => {
-    const linear = h.elements[1] as ExcalidrawLinearElement;
-    const inputAngle = UI.queryStatsProperty("A")?.querySelector(
-      ".drag-input",
-    ) as HTMLInputElement;
-
-    expect(linear.startBinding).not.toBe(null);
-    UI.updateInput(inputAngle, String("45"));
     expect(linear.startBinding).toBe(null);
   });
 });
@@ -383,12 +361,10 @@ describe("stats for a non-generic element", () => {
     mouse.clickAt(20, 30);
     const editor = await getTextEditor();
     updateTextEditor(editor, "Hello!");
-    act(() => {
-      editor.blur();
-    });
+    Keyboard.exitTextEditor(editor);
 
     const text = h.elements[0] as ExcalidrawTextElement;
-    mouse.clickOn(text);
+    API.setSelectedElements([text]);
 
     elementStats = stats?.querySelector("#elementStats");
 
@@ -774,7 +750,7 @@ describe("frame resizing behavior", () => {
       x: 0,
       y: 0,
       width: 100,
-      height: 100,
+      height: 103,
     });
 
     // Create a rectangle outside the frame

@@ -11,15 +11,28 @@ import {
   TextIcon,
   ImageIcon,
   EraserIcon,
+  laserPointerToolIcon,
+  handIcon,
 } from "./icons";
 
+import type { AppClassProperties } from "../types";
+
 export const SHAPES = [
+  {
+    icon: handIcon,
+    value: "hand",
+    key: KEYS.H,
+    numericKey: null,
+    fillable: false,
+    toolbar: true,
+  },
   {
     icon: SelectionIcon,
     value: "selection",
     key: KEYS.V,
     numericKey: KEYS["1"],
     fillable: true,
+    toolbar: true,
   },
   {
     icon: RectangleIcon,
@@ -27,6 +40,7 @@ export const SHAPES = [
     key: KEYS.R,
     numericKey: KEYS["2"],
     fillable: true,
+    toolbar: true,
   },
   {
     icon: DiamondIcon,
@@ -34,6 +48,7 @@ export const SHAPES = [
     key: KEYS.D,
     numericKey: KEYS["3"],
     fillable: true,
+    toolbar: true,
   },
   {
     icon: EllipseIcon,
@@ -41,6 +56,7 @@ export const SHAPES = [
     key: KEYS.O,
     numericKey: KEYS["4"],
     fillable: true,
+    toolbar: true,
   },
   {
     icon: ArrowIcon,
@@ -48,6 +64,7 @@ export const SHAPES = [
     key: KEYS.A,
     numericKey: KEYS["5"],
     fillable: true,
+    toolbar: true,
   },
   {
     icon: LineIcon,
@@ -55,6 +72,7 @@ export const SHAPES = [
     key: KEYS.L,
     numericKey: KEYS["6"],
     fillable: true,
+    toolbar: true,
   },
   {
     icon: FreedrawIcon,
@@ -62,6 +80,7 @@ export const SHAPES = [
     key: [KEYS.P, KEYS.X],
     numericKey: KEYS["7"],
     fillable: false,
+    toolbar: true,
   },
   {
     icon: TextIcon,
@@ -69,6 +88,7 @@ export const SHAPES = [
     key: KEYS.T,
     numericKey: KEYS["8"],
     fillable: false,
+    toolbar: true,
   },
   {
     icon: ImageIcon,
@@ -76,6 +96,7 @@ export const SHAPES = [
     key: null,
     numericKey: KEYS["9"],
     fillable: false,
+    toolbar: true,
   },
   {
     icon: EraserIcon,
@@ -83,11 +104,36 @@ export const SHAPES = [
     key: KEYS.E,
     numericKey: KEYS["0"],
     fillable: false,
+    toolbar: true,
+  },
+  {
+    icon: laserPointerToolIcon,
+    value: "laser",
+    key: KEYS.K,
+    numericKey: null,
+    fillable: false,
+    toolbar: false,
   },
 ] as const;
 
-export const findShapeByKey = (key: string) => {
-  const shape = SHAPES.find((shape, index) => {
+export const getToolbarTools = (app: AppClassProperties) => {
+  return app.state.preferredSelectionTool.type === "lasso"
+    ? ([
+        {
+          value: "lasso",
+          icon: SelectionIcon,
+          key: KEYS.V,
+          numericKey: KEYS["1"],
+          fillable: true,
+          toolbar: true,
+        },
+        ...SHAPES.slice(1),
+      ] as const)
+    : SHAPES;
+};
+
+export const findShapeByKey = (key: string, app: AppClassProperties) => {
+  const shape = getToolbarTools(app).find((shape, index) => {
     return (
       (shape.numericKey != null && key === shape.numericKey.toString()) ||
       (shape.key &&

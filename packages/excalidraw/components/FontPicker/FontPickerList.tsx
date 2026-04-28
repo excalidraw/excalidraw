@@ -20,15 +20,22 @@ import type { ValueOf } from "@excalidraw/common/utility-types";
 
 import { Fonts } from "../../fonts";
 import { t } from "../../i18n";
-import { useApp, useAppProps, useExcalidrawContainer } from "../App";
+import {
+  useApp,
+  useAppProps,
+  useExcalidrawContainer,
+  useStylesPanelMode,
+} from "../App";
 import { PropertiesPopover } from "../PropertiesPopover";
 import { QuickSearch } from "../QuickSearch";
 import { ScrollableList } from "../ScrollableList";
 import DropdownMenuGroup from "../dropdownMenu/DropdownMenuGroup";
-import DropdownMenuItem, {
+import {
   DropDownMenuItemBadgeType,
   DropDownMenuItemBadge,
 } from "../dropdownMenu/DropdownMenuItem";
+import MenuItemContent from "../dropdownMenu/DropdownMenuItemContent";
+import { getDropdownMenuItemClassName } from "../dropdownMenu/common";
 import {
   FontFamilyCodeIcon,
   FontFamilyHeadingIcon,
@@ -39,6 +46,7 @@ import {
 import { fontPickerKeyHandler } from "./keyboardNavHandlers";
 
 import type { JSX } from "react";
+import type { ExcalidrawFontFace } from "../../fonts/ExcalidrawFontFace";
 
 export interface FontDescriptor {
   value: number;
@@ -79,6 +87,15 @@ const getFontFamilyIcon = (fontFamily: FontFamilyValues): JSX.Element => {
   }
 };
 
+const getFontFamilyLabel = (
+  fontFamily: FontFamilyValues,
+  fontFaces: ExcalidrawFontFace[],
+) =>
+  // prefer our config as the browser resolved names may be wrapped in quotes and such
+  Object.entries(FONT_FAMILY).find(([, id]) => id === fontFamily)?.[0] ??
+  fontFaces[0]?.fontFace?.family ??
+  "Unknown";
+
 export const FontPickerList = React.memo(
   ({
     selectedFontFamily,
@@ -90,8 +107,10 @@ export const FontPickerList = React.memo(
     onClose,
   }: FontPickerListProps) => {
     const { container } = useExcalidrawContainer();
-    const { fonts } = useApp();
+    const app = useApp();
+    const { fonts } = app;
     const { showDeprecatedFonts } = useAppProps();
+    const stylesPanelMode = useStylesPanelMode();
 
     const [searchTerm, setSearchTerm] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
@@ -105,7 +124,7 @@ export const FontPickerList = React.memo(
             const fontDescriptor = {
               value: familyId,
               icon: getFontFamilyIcon(familyId),
-              text: fontFaces[0]?.fontFace?.family ?? "Unknown",
+              text: getFontFamilyLabel(familyId, fontFaces),
             };
 
             if (metadata.deprecated) {
@@ -187,6 +206,42 @@ export const FontPickerList = React.memo(
       onLeave,
     ]);
 
+    // Create a wrapped onSelect function that preserves caret position
+    const wrappedOnSelect = useCallback(
+      (fontFamily: FontFamilyValues) => {
+        // Save caret position before font selection if editing text
+        let savedSelection: { start: number; end: number } | null = null;
+        if (app.state.editingTextElement) {
+          const textEditor = document.querySelector(
+            ".excalidraw-wysiwyg",
+          ) as HTMLTextAreaElement;
+          if (textEditor) {
+            savedSelection = {
+              start: textEditor.selectionStart,
+              end: textEditor.selectionEnd,
+            };
+          }
+        }
+
+        onSelect(fontFamily);
+
+        // Restore caret position after font selection if editing text
+        if (app.state.editingTextElement && savedSelection) {
+          setTimeout(() => {
+            const textEditor = document.querySelector(
+              ".excalidraw-wysiwyg",
+            ) as HTMLTextAreaElement;
+            if (textEditor && savedSelection) {
+              textEditor.focus();
+              textEditor.selectionStart = savedSelection.start;
+              textEditor.selectionEnd = savedSelection.end;
+            }
+          }, 0);
+        }
+      },
+      [onSelect, app.state.editingTextElement],
+    );
+
     const onKeyDown = useCallback<KeyboardEventHandler<HTMLDivElement>>(
       (event) => {
         const handled = fontPickerKeyHandler({
@@ -194,7 +249,7 @@ export const FontPickerList = React.memo(
           inputRef,
           hoveredFont,
           filteredFonts,
-          onSelect,
+          onSelect: wrappedOnSelect,
           onHover,
           onClose,
         });
@@ -204,7 +259,7 @@ export const FontPickerList = React.memo(
           event.stopPropagation();
         }
       },
-      [hoveredFont, filteredFonts, onSelect, onHover, onClose],
+      [hoveredFont, filteredFonts, wrappedOnSelect, onHover, onClose],
     );
 
     useEffect(() => {
@@ -226,43 +281,74 @@ export const FontPickerList = React.memo(
       [filteredFonts, sceneFamilies],
     );
 
-    const renderFont = (font: FontDescriptor, index: number) => (
-      <DropdownMenuItem
-        key={font.value}
-        icon={font.icon}
-        value={font.value}
-        order={index}
-        textStyle={{
-          fontFamily: getFontFamilyString({ fontFamily: font.value }),
-        }}
-        hovered={font.value === hoveredFont?.value}
-        selected={font.value === selectedFontFamily}
-        // allow to tab between search and selected font
-        tabIndex={font.value === selectedFontFamily ? 0 : -1}
-        onClick={(e) => {
-          onSelect(Number(e.currentTarget.value));
-        }}
-        onMouseMove={() => {
-          if (hoveredFont?.value !== font.value) {
-            onHover(font.value);
-          }
-        }}
-      >
-        {font.text}
-        {font.badge && (
-          <DropDownMenuItemBadge type={font.badge.type}>
-            {font.badge.placeholder}
-          </DropDownMenuItemBadge>
-        )}
-      </DropdownMenuItem>
-    );
+    const FontPickerListItem = ({
+      font,
+      order,
+    }: {
+      font: FontDescriptor;
+      order: number;
+    }) => {
+      const ref = useRef<HTMLButtonElement>(null);
+      const isHovered = font.value === hoveredFont?.value;
+      const isSelected = font.value === selectedFontFamily;
+
+      useEffect(() => {
+        if (!isHovered) {
+          return;
+        }
+        if (order === 0) {
+          // scroll into the first item differently, so it's visible what is above (i.e. group title)
+          ref.current?.scrollIntoView?.({ block: "end" });
+        } else {
+          ref.current?.scrollIntoView?.({ block: "nearest" });
+        }
+      }, [isHovered, order]);
+
+      return (
+        <button
+          ref={ref}
+          type="button"
+          value={font.value}
+          className={getDropdownMenuItemClassName("", isSelected, isHovered)}
+          title={font.text}
+          // allow to tab between search and selected font
+          tabIndex={isSelected ? 0 : -1}
+          onClick={(e) => {
+            wrappedOnSelect(Number(e.currentTarget.value));
+          }}
+          onMouseMove={() => {
+            if (hoveredFont?.value !== font.value) {
+              onHover(font.value);
+            }
+          }}
+        >
+          <MenuItemContent
+            icon={font.icon}
+            badge={
+              font.badge && (
+                <DropDownMenuItemBadge type={font.badge.type}>
+                  {font.badge.placeholder}
+                </DropDownMenuItemBadge>
+              )
+            }
+            textStyle={{
+              fontFamily: getFontFamilyString({ fontFamily: font.value }),
+            }}
+          >
+            {font.text}
+          </MenuItemContent>
+        </button>
+      );
+    };
 
     const groups = [];
 
     if (sceneFilteredFonts.length) {
       groups.push(
         <DropdownMenuGroup title={t("fontList.sceneFonts")} key="group_1">
-          {sceneFilteredFonts.map(renderFont)}
+          {sceneFilteredFonts.map((font, index) => (
+            <FontPickerListItem key={font.value} font={font} order={index} />
+          ))}
         </DropdownMenuGroup>,
       );
     }
@@ -270,9 +356,13 @@ export const FontPickerList = React.memo(
     if (availableFilteredFonts.length) {
       groups.push(
         <DropdownMenuGroup title={t("fontList.availableFonts")} key="group_2">
-          {availableFilteredFonts.map((font, index) =>
-            renderFont(font, index + sceneFilteredFonts.length),
-          )}
+          {availableFilteredFonts.map((font, index) => (
+            <FontPickerListItem
+              key={font.value}
+              font={font}
+              order={index + sceneFilteredFonts.length}
+            />
+          ))}
         </DropdownMenuGroup>,
       );
     }
@@ -282,15 +372,32 @@ export const FontPickerList = React.memo(
         className="properties-content"
         container={container}
         style={{ width: "15rem" }}
-        onClose={onClose}
+        onClose={() => {
+          onClose();
+
+          // Refocus text editor when font picker closes if we were editing text
+          if (app.state.editingTextElement) {
+            setTimeout(() => {
+              const textEditor = document.querySelector(
+                ".excalidraw-wysiwyg",
+              ) as HTMLTextAreaElement;
+              if (textEditor) {
+                textEditor.focus();
+              }
+            }, 0);
+          }
+        }}
         onPointerLeave={onLeave}
         onKeyDown={onKeyDown}
+        preventAutoFocusOnTouch={!!app.state.editingTextElement}
       >
-        <QuickSearch
-          ref={inputRef}
-          placeholder={t("quickSearch.placeholder")}
-          onChange={debounce(setSearchTerm, 20)}
-        />
+        {stylesPanelMode === "full" && (
+          <QuickSearch
+            ref={inputRef}
+            placeholder={t("quickSearch.placeholder")}
+            onChange={debounce(setSearchTerm, 20)}
+          />
+        )}
         <ScrollableList
           className="dropdown-menu fonts manual-hover"
           placeholder={t("fontList.empty")}

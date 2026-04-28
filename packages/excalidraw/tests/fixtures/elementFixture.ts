@@ -59,6 +59,7 @@ export const textFixture: ExcalidrawElement = {
   type: "text",
   fontSize: 20,
   fontFamily: DEFAULT_FONT_FAMILY,
+  strokeColor: "#1e1e1e",
   text: "original text",
   originalText: "original text",
   textAlign: "left",

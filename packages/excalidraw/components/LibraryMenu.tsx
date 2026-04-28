@@ -11,6 +11,11 @@ import {
   LIBRARY_DISABLED_TYPES,
   randomId,
   isShallowEqual,
+  KEYS,
+  isWritableElement,
+  addEventListener,
+  EVENT,
+  CLASSES,
 } from "@excalidraw/common";
 
 import type {
@@ -266,11 +271,52 @@ export const LibraryMenu = memo(() => {
   const memoizedLibrary = useMemo(() => app.library, [app.library]);
   const pendingElements = usePendingElementsMemo(appState, app);
 
+  useEffect(() => {
+    return addEventListener(
+      document,
+      EVENT.KEYDOWN,
+      (event) => {
+        if (event.key === KEYS.ESCAPE && event.target instanceof HTMLElement) {
+          const target = event.target;
+          if (target.closest(`.${CLASSES.SIDEBAR}`)) {
+            // stop propagation so that we don't prevent it downstream
+            // (default browser behavior is to clear search input on ESC)
+            if (selectedItems.length > 0) {
+              event.stopPropagation();
+              setSelectedItems([]);
+            } else if (
+              isWritableElement(target) &&
+              target instanceof HTMLInputElement &&
+              !target.value
+            ) {
+              event.stopPropagation();
+              // if search input empty -> close library
+              // (maybe not a good idea?)
+              setAppState({ openSidebar: null });
+              app.focusContainer();
+            }
+          } else if (selectedItems.length > 0) {
+            const { x, y } = app.lastViewportPosition;
+            const elementUnderCursor = document.elementFromPoint(x, y);
+            // also deselect elements if sidebar doesn't have focus but the
+            // cursor is over it
+            if (elementUnderCursor?.closest(`.${CLASSES.SIDEBAR}`)) {
+              event.stopPropagation();
+              setSelectedItems([]);
+            }
+          }
+        }
+      },
+      { capture: true },
+    );
+  }, [selectedItems, setAppState, app]);
+
   const onInsertLibraryItems = useCallback(
     (libraryItems: LibraryItems) => {
       onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
+      app.focusContainer();
     },
-    [onInsertElements],
+    [onInsertElements, app],
   );
 
   const deselectItems = useCallback(() => {

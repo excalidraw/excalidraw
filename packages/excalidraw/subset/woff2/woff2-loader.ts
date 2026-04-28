@@ -18,7 +18,7 @@ type Vector = any;
 let loadedWasm: ReturnType<typeof load> | null = null;
 
 // re-map from internal vector into byte array
-function convertFromVecToUint8Array(vector: Vector): Uint8Array {
+function convertFromVecToUint8Array(vector: Vector): Uint8Array<ArrayBuffer> {
   const arr = [];
   for (let i = 0, l = vector.size(); i < l; i++) {
     arr.push(vector.get(i));
@@ -29,8 +29,8 @@ function convertFromVecToUint8Array(vector: Vector): Uint8Array {
 
 // TODO: consider adding support for fetching the wasm from an URL (external CDN, data URL, etc.)
 const load = (): Promise<{
-  compress: (buffer: ArrayBuffer) => Uint8Array;
-  decompress: (buffer: ArrayBuffer) => Uint8Array;
+  compress: (buffer: ArrayBuffer) => Uint8Array<ArrayBuffer>;
+  decompress: (buffer: ArrayBuffer) => Uint8Array<ArrayBuffer>;
 }> => {
   return new Promise((resolve, reject) => {
     try {

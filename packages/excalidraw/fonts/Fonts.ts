@@ -4,6 +4,7 @@ import {
   CJK_HAND_DRAWN_FALLBACK_FONT,
   WINDOWS_EMOJI_FALLBACK_FONT,
   getFontFamilyFallbacks,
+  FONT_SIZES,
 } from "@excalidraw/common";
 import { getContainerElement } from "@excalidraw/element";
 import { charWidth } from "@excalidraw/element";
@@ -240,7 +241,7 @@ export class Fonts {
     for (const [index, fontFamily] of fontFamilies.entries()) {
       const font = getFontString({
         fontFamily,
-        fontSize: 16,
+        fontSize: FONT_SIZES.sm,
       });
 
       // WARN: without "text" param it does not have to mean that all font faces are loaded as it could be just one irrelevant font face!

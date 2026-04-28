@@ -96,63 +96,6 @@ export type ActiveColorPickerSectionAtomType =
 export const activeColorPickerSectionAtom =
   atom<ActiveColorPickerSectionAtomType>(null);
 
-const calculateContrast = (r: number, g: number, b: number): number => {
-  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-  return yiq;
-};
-
-// YIQ algo, inspiration from https://stackoverflow.com/a/11868398
-export const isColorDark = (color: string, threshold = 160): boolean => {
-  // no color ("") -> assume it default to black
-  if (!color) {
-    return true;
-  }
-
-  if (color === "transparent") {
-    return false;
-  }
-
-  // a string color (white etc) or any other format -> convert to rgb by way
-  // of creating a DOM node and retrieving the computeStyle
-  if (!color.startsWith("#")) {
-    const node = document.createElement("div");
-    node.style.color = color;
-
-    if (node.style.color) {
-      // making invisible so document doesn't reflow (hopefully).
-      // display=none works too, but supposedly not in all browsers
-      node.style.position = "absolute";
-      node.style.visibility = "hidden";
-      node.style.width = "0";
-      node.style.height = "0";
-
-      // needs to be in DOM else browser won't compute the style
-      document.body.appendChild(node);
-      const computedColor = getComputedStyle(node).color;
-      document.body.removeChild(node);
-      // computed style is in rgb() format
-      const rgb = computedColor
-        .replace(/^(rgb|rgba)\(/, "")
-        .replace(/\)$/, "")
-        .replace(/\s/g, "")
-        .split(",");
-      const r = parseInt(rgb[0]);
-      const g = parseInt(rgb[1]);
-      const b = parseInt(rgb[2]);
-
-      return calculateContrast(r, g, b) < threshold;
-    }
-    // invalid color -> assume it default to black
-    return true;
-  }
-
-  const r = parseInt(color.slice(1, 3), 16);
-  const g = parseInt(color.slice(3, 5), 16);
-  const b = parseInt(color.slice(5, 7), 16);
-
-  return calculateContrast(r, g, b) < threshold;
-};
-
 export type ColorPickerType =
   | "canvasBackground"
   | "elementBackground"

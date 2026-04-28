@@ -1,5 +1,3 @@
-import OpenColor from "open-color";
-
 import { CURSOR_TYPE, MIME_TYPES, THEME } from "@excalidraw/common";
 
 import { isHandToolActive, isEraserActive } from "./appState";
@@ -60,9 +58,9 @@ export const setEraserCursor = (
       0,
       2 * Math.PI,
     );
-    context.fillStyle = isDarkTheme ? OpenColor.black : OpenColor.white;
+    context.fillStyle = isDarkTheme ? "#000" : "#fff";
     context.fill();
-    context.strokeStyle = isDarkTheme ? OpenColor.white : OpenColor.black;
+    context.strokeStyle = isDarkTheme ? "#fff" : "#000";
     context.stroke();
     previewDataURL = eraserCanvasCache.toDataURL(MIME_TYPES.svg) as DataURL;
   };

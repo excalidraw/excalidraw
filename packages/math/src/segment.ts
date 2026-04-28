@@ -40,7 +40,7 @@ export const isLineSegment = <Point extends GlobalPoint | LocalPoint>(
   Array.isArray(segment) &&
   segment.length === 2 &&
   isPoint(segment[0]) &&
-  isPoint(segment[0]);
+  isPoint(segment[1]);
 
 /**
  * Return the coordinates resulting from rotating the given line about an origin by an angle in radians
@@ -176,4 +176,20 @@ export function lineSegmentIntersectionPoints<
   }
 
   return candidate;
+}
+
+export function lineSegmentsDistance<Point extends GlobalPoint | LocalPoint>(
+  s1: LineSegment<Point>,
+  s2: LineSegment<Point>,
+): number {
+  if (lineSegmentIntersectionPoints(s1, s2)) {
+    return 0;
+  }
+
+  return Math.min(
+    distanceToLineSegment(s1[0], s2),
+    distanceToLineSegment(s1[1], s2),
+    distanceToLineSegment(s2[0], s1),
+    distanceToLineSegment(s2[1], s1),
+  );
 }

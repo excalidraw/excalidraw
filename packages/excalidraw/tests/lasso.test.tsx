@@ -210,7 +210,6 @@ describe("Basic lasso selection tests", () => {
           [0, 0],
           [168.4765625, -153.38671875],
         ],
-        lastCommittedPoint: null,
         startBinding: null,
         endBinding: null,
         startArrowhead: null,
@@ -250,7 +249,6 @@ describe("Basic lasso selection tests", () => {
           [0, 0],
           [206.12890625, 35.4140625],
         ],
-        lastCommittedPoint: null,
         startBinding: null,
         endBinding: null,
         startArrowhead: null,
@@ -354,7 +352,6 @@ describe("Basic lasso selection tests", () => {
         ],
         pressures: [],
         simulatePressure: true,
-        lastCommittedPoint: null,
       },
     ].map(
       (e) =>
@@ -1229,7 +1226,6 @@ describe("Special cases", () => {
           locked: false,
           startBinding: null,
           endBinding: null,
-          lastCommittedPoint: null,
           startArrowhead: null,
           endArrowhead: null,
           points: [
@@ -1271,7 +1267,6 @@ describe("Special cases", () => {
           locked: false,
           startBinding: null,
           endBinding: null,
-          lastCommittedPoint: null,
           startArrowhead: null,
           endArrowhead: null,
           points: [
@@ -1312,7 +1307,6 @@ describe("Special cases", () => {
           locked: false,
           startBinding: null,
           endBinding: null,
-          lastCommittedPoint: null,
           startArrowhead: null,
           endArrowhead: null,
           points: [
@@ -1353,7 +1347,6 @@ describe("Special cases", () => {
           locked: false,
           startBinding: null,
           endBinding: null,
-          lastCommittedPoint: null,
           startArrowhead: null,
           endArrowhead: null,
           points: [
@@ -1692,7 +1685,6 @@ describe("Special cases", () => {
           locked: false,
           startBinding: null,
           endBinding: null,
-          lastCommittedPoint: null,
           startArrowhead: null,
           endArrowhead: null,
           points: [
@@ -1744,7 +1736,6 @@ describe("Special cases", () => {
           locked: false,
           startBinding: null,
           endBinding: null,
-          lastCommittedPoint: null,
           startArrowhead: null,
           endArrowhead: null,
           points: [

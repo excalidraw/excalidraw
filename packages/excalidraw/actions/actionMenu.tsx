@@ -1,64 +1,10 @@
 import { KEYS } from "@excalidraw/common";
 
-import { getNonDeletedElements } from "@excalidraw/element";
-
-import { showSelectedShapeActions } from "@excalidraw/element";
-
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import { ToolButton } from "../components/ToolButton";
-import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
-import { t } from "../i18n";
+import { HelpIconThin } from "../components/icons";
 
 import { register } from "./register";
-
-export const actionToggleCanvasMenu = register({
-  name: "toggleCanvasMenu",
-  label: "buttons.menu",
-  trackEvent: { category: "menu" },
-  perform: (_, appState) => ({
-    appState: {
-      ...appState,
-      openMenu: appState.openMenu === "canvas" ? null : "canvas",
-    },
-    captureUpdate: CaptureUpdateAction.EVENTUALLY,
-  }),
-  PanelComponent: ({ appState, updateData }) => (
-    <ToolButton
-      type="button"
-      icon={HamburgerMenuIcon}
-      aria-label={t("buttons.menu")}
-      onClick={updateData}
-      selected={appState.openMenu === "canvas"}
-    />
-  ),
-});
-
-export const actionToggleEditMenu = register({
-  name: "toggleEditMenu",
-  label: "buttons.edit",
-  trackEvent: { category: "menu" },
-  perform: (_elements, appState) => ({
-    appState: {
-      ...appState,
-      openMenu: appState.openMenu === "shape" ? null : "shape",
-    },
-    captureUpdate: CaptureUpdateAction.EVENTUALLY,
-  }),
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <ToolButton
-      visible={showSelectedShapeActions(
-        appState,
-        getNonDeletedElements(elements),
-      )}
-      type="button"
-      icon={palette}
-      aria-label={t("buttons.edit")}
-      onClick={updateData}
-      selected={appState.openMenu === "shape"}
-    />
-  ),
-});
 
 export const actionShortcuts = register({
   name: "toggleShortcuts",
@@ -79,6 +25,8 @@ export const actionShortcuts = register({
             : {
                 name: "help",
               },
+        openMenu: null,
+        openPopup: null,
       },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };

@@ -79,15 +79,18 @@
   },
   "dependencies": {
     "@braintree/sanitize-url": "6.0.2",
+    "@codemirror/commands": "^6.0.0",
+    "@codemirror/language": "^6.0.0",
+    "@codemirror/state": "^6.0.0",
+    "@codemirror/view": "^6.0.0",
+    "@lezer/highlight": "^1.0.0",
     "@excalidraw/common": "0.18.0",
     "@excalidraw/element": "0.18.0",
-    "@excalidraw/math": "0.18.0",
     "@excalidraw/laser-pointer": "1.3.1",
-    "@excalidraw/mermaid-to-excalidraw": "1.1.2",
+    "@excalidraw/math": "0.18.0",
+    "@excalidraw/mermaid-to-excalidraw": "2.2.2",
     "@excalidraw/random-username": "1.1.0",
-    "@radix-ui/react-popover": "1.1.6",
-    "@radix-ui/react-tabs": "1.1.3",
-    "browser-fs-access": "0.29.1",
+    "browser-fs-access": "0.38.0",
     "canvas-roundrect-polyfill": "0.0.1",
     "clsx": "1.1.1",
     "cross-env": "7.0.3",
@@ -97,10 +100,9 @@
     "image-blob-reduce": "3.0.1",
     "jotai": "2.11.0",
     "jotai-scope": "0.7.2",
-    "lodash.throttle": "4.1.1",
     "lodash.debounce": "4.0.8",
+    "lodash.throttle": "4.1.1",
     "nanoid": "3.3.3",
-    "open-color": "1.9.1",
     "pako": "2.0.3",
     "perfect-freehand": "1.2.0",
     "pica": "7.1.1",
@@ -109,6 +111,7 @@
     "png-chunks-extract": "1.0.0",
     "points-on-curve": "1.0.1",
     "pwacompat": "2.0.17",
+    "radix-ui": "1.4.3",
     "roughjs": "4.6.4",
     "sass": "1.51.0",
     "tunnel-rat": "0.1.2"
@@ -133,6 +136,6 @@
     "fonteditor-core": "2.4.1",
     "harfbuzzjs": "0.3.6",
     "jest-diff": "29.7.0",
-    "typescript": "4.9.4"
+    "typescript": "5.9.3"
   }
 }

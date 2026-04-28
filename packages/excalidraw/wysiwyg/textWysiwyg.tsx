@@ -3,14 +3,21 @@ import {
   KEYS,
   CLASSES,
   POINTER_BUTTON,
+  THEME,
   isWritableElement,
   getFontString,
   getFontFamilyString,
   isTestEnv,
+  MIME_TYPES,
+  applyDarkModeFilter,
+  isRTL,
 } from "@excalidraw/common";
+import { pointFrom, pointRotateRads, type Radians } from "@excalidraw/math";
 
 import {
+  getTextFromElements,
   originalContainerCache,
+  updateBoundElements,
   updateOriginalContainerCache,
 } from "@excalidraw/element";
 
@@ -28,8 +35,11 @@ import {
   getBoundTextElement,
 } from "@excalidraw/element";
 import { getTextWidth } from "@excalidraw/element";
+import { getLineHeightInPx } from "@excalidraw/element";
+import { getLineWidth } from "@excalidraw/element";
 import { normalizeText } from "@excalidraw/element";
 import { wrapText } from "@excalidraw/element";
+import { getWrappedTextLines } from "@excalidraw/element";
 import {
   isArrowElement,
   isBoundToContainer,
@@ -45,7 +55,11 @@ import type {
 
 import { actionSaveToActiveFile } from "../actions";
 
-import { parseClipboard } from "../clipboard";
+import {
+  parseClipboard,
+  parseDataTransferEvent,
+  parseDataTransferEventMimeTypes,
+} from "../clipboard";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
@@ -55,6 +69,8 @@ import {
   actionZoomIn,
   actionZoomOut,
 } from "../actions/actionCanvas";
+
+import type { ParsedDataTranferList } from "../clipboard";
 
 import type App from "../components/App";
 import type { AppState } from "../types";
@@ -80,6 +96,103 @@ const getTransform = (
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
+const getLineDirection = (text: string, offset: number) => {
+  const hardLineStart = text.lastIndexOf("\n", Math.max(0, offset - 1)) + 1;
+  const hardLineEnd = text.indexOf("\n", offset);
+  const hardLineText = text.slice(
+    hardLineStart,
+    hardLineEnd === -1 ? text.length : hardLineEnd,
+  );
+
+  return isRTL(hardLineText) ? "rtl" : "ltr";
+};
+
+const getCaretBoundaryOffsets = (text: string) => {
+  const offsets = [0];
+  let offset = 0;
+
+  for (const char of Array.from(text)) {
+    offset += char.length;
+    offsets.push(offset);
+  }
+
+  return offsets;
+};
+
+const getLineCaretOffsetFromNativeLayout = ({
+  text,
+  font,
+  lineHeightPx,
+  direction,
+  targetX,
+}: {
+  text: string;
+  font: ReturnType<typeof getFontString>;
+  lineHeightPx: number;
+  direction: "ltr" | "rtl";
+  targetX: number;
+}) => {
+  if (!text || !document.body || typeof document.createRange !== "function") {
+    return null;
+  }
+
+  const offsets = getCaretBoundaryOffsets(text);
+  const mirror = document.createElement("div");
+  const textNode = document.createTextNode(text);
+  const range = document.createRange();
+  const positions: number[] = [];
+
+  mirror.dir = direction;
+  Object.assign(mirror.style, {
+    position: "fixed",
+    top: "0",
+    left: "0",
+    margin: 0,
+    padding: 0,
+    border: 0,
+    opacity: "0",
+    pointerEvents: "none",
+    whiteSpace: "pre",
+    font,
+    lineHeight: `${lineHeightPx}px`,
+  });
+  mirror.append(textNode);
+  document.body.append(mirror);
+
+  try {
+    for (const offset of offsets) {
+      range.setStart(textNode, offset);
+      range.setEnd(textNode, offset);
+      const caretRect = range.getBoundingClientRect();
+
+      if (!Number.isFinite(caretRect.left)) {
+        return null;
+      }
+
+      positions.push(caretRect.left);
+    }
+  } catch {
+    return null;
+  } finally {
+    mirror.remove();
+  }
+
+  const leftEdge = Math.min(...positions);
+  let closestOffset = offsets[0];
+  let closestDistance = Infinity;
+
+  for (let index = 0; index < offsets.length; index++) {
+    const distance = Math.abs(positions[index] - leftEdge - targetX);
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestOffset = offsets[index];
+    }
+  }
+
+  return closestOffset;
+};
+
 type SubmitHandler = () => void;
 
 export const textWysiwyg = ({
@@ -92,6 +205,7 @@ export const textWysiwyg = ({
   excalidrawContainer,
   app,
   autoSelect = true,
+  initialCaretSceneCoords = null,
 }: {
   id: ExcalidrawElement["id"];
   /**
@@ -108,7 +222,19 @@ export const textWysiwyg = ({
   excalidrawContainer: HTMLDivElement | null;
   app: App;
   autoSelect?: boolean;
+  initialCaretSceneCoords?: { x: number; y: number } | null;
 }): SubmitHandler => {
+  let currentTextLayout: {
+    angle: Radians;
+    font: ReturnType<typeof getFontString>;
+    height: number;
+    lineHeightPx: number;
+    textAlign: ExcalidrawTextElement["textAlign"];
+    width: number;
+    x: number;
+    y: number;
+  } | null = null;
+
   const textPropertiesUpdated = (
     updatedTextElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
@@ -129,7 +255,11 @@ export const textWysiwyg = ({
     return false;
   };
 
+  let LAST_THEME = app.state.theme;
+
   const updateWysiwygStyle = () => {
+    LAST_THEME = app.state.theme;
+
     const appState = app.state;
     const updatedTextElement = app.scene.getElement<ExcalidrawTextElement>(id);
 
@@ -201,6 +331,7 @@ export const textWysiwyg = ({
           );
 
           app.scene.mutateElement(container, { height: targetContainerHeight });
+          updateBoundElements(container, app.scene);
           return;
         } else if (
           // autoshrink container height until original container height
@@ -214,32 +345,18 @@ export const textWysiwyg = ({
             container.type,
           );
           app.scene.mutateElement(container, { height: targetContainerHeight });
+          updateBoundElements(container, app.scene);
         } else {
-          const { y } = computeBoundTextPosition(
+          const { x, y } = computeBoundTextPosition(
             container,
             updatedTextElement as ExcalidrawTextElementWithContainer,
             elementsMap,
           );
+          coordX = x;
           coordY = y;
         }
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
-      const initialSelectionStart = editable.selectionStart;
-      const initialSelectionEnd = editable.selectionEnd;
-      const initialLength = editable.value.length;
-
-      // restore cursor position after value updated so it doesn't
-      // go to the end of text when container auto expanded
-      if (
-        initialSelectionStart === initialSelectionEnd &&
-        initialSelectionEnd !== initialLength
-      ) {
-        // get diff between length and selection end and shift
-        // the cursor by "diff" times to position correctly
-        const diff = initialLength - initialSelectionEnd;
-        editable.selectionStart = editable.value.length - diff;
-        editable.selectionEnd = editable.value.length - diff;
-      }
 
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
@@ -252,6 +369,7 @@ export const textWysiwyg = ({
       height *= 1.05;
 
       const font = getFontString(updatedTextElement);
+      const angle = getTextElementAngle(updatedTextElement, container);
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
@@ -267,18 +385,33 @@ export const textWysiwyg = ({
         transform: getTransform(
           width,
           height,
-          getTextElementAngle(updatedTextElement, container),
+          angle,
           appState,
           maxWidth,
           editorMaxHeight,
         ),
         textAlign,
         verticalAlign,
-        color: updatedTextElement.strokeColor,
+        color:
+          appState.theme === THEME.DARK
+            ? applyDarkModeFilter(updatedTextElement.strokeColor)
+            : updatedTextElement.strokeColor,
         opacity: updatedTextElement.opacity / 100,
-        filter: "var(--theme-filter)",
         maxHeight: `${editorMaxHeight}px`,
       });
+      currentTextLayout = {
+        angle: angle as Radians,
+        font,
+        height: updatedTextElement.height,
+        lineHeightPx: getLineHeightInPx(
+          updatedTextElement.fontSize,
+          updatedTextElement.lineHeight,
+        ),
+        textAlign,
+        width: updatedTextElement.width,
+        x: coordX,
+        y: coordY,
+      };
       editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
@@ -329,14 +462,130 @@ export const textWysiwyg = ({
   editable.value = element.originalText;
   updateWysiwygStyle();
 
+  const getCaretIndexFromInitialSceneCoords = () => {
+    if (!initialCaretSceneCoords || !currentTextLayout) {
+      return null;
+    }
+
+    const layout = currentTextLayout;
+    const center = pointFrom(
+      layout.x + layout.width / 2,
+      layout.y + layout.height / 2,
+    );
+    const [unrotatedX, unrotatedY] = pointRotateRads(
+      pointFrom(initialCaretSceneCoords.x, initialCaretSceneCoords.y),
+      center,
+      -layout.angle as Radians,
+    );
+    const localX = unrotatedX - layout.x;
+    const localY = unrotatedY - layout.y;
+    const lines = getWrappedTextLines(
+      editable.value,
+      layout.font,
+      whiteSpace === "pre-wrap" ? layout.width : Infinity,
+    );
+    const lineIndex = Math.max(
+      0,
+      Math.min(lines.length - 1, Math.floor(localY / layout.lineHeightPx)),
+    );
+    const line = lines[lineIndex];
+    const direction = getLineDirection(editable.value, line.start);
+    const lineWidth = getLineWidth(line.text, layout.font);
+    const lineStartX =
+      layout.textAlign === "center"
+        ? (layout.width - lineWidth) / 2
+        : layout.textAlign === "right"
+        ? layout.width - lineWidth
+        : 0;
+    const relativeX = localX - lineStartX;
+
+    if (!line.text) {
+      return line.start;
+    }
+
+    const lineCaretOffset = getLineCaretOffsetFromNativeLayout({
+      text: line.text,
+      font: layout.font,
+      lineHeightPx: layout.lineHeightPx,
+      direction,
+      targetX: relativeX,
+    });
+
+    return line.start + (lineCaretOffset || 0);
+  };
+
+  let pendingInitialSelection = (() => {
+    const caretIndex = getCaretIndexFromInitialSceneCoords();
+
+    if (caretIndex === null) {
+      return null;
+    }
+
+    return {
+      start: caretIndex,
+      end: caretIndex,
+    };
+  })();
+
   if (onChange) {
     editable.onpaste = async (event) => {
-      const clipboardData = await parseClipboard(event, true);
-      if (!clipboardData.text) {
+      // we need to synchronously get the MIME types so we can preventDefault()
+      // in the same tick (FF requires that)
+      const mimeTypes = parseDataTransferEventMimeTypes(event);
+
+      let dataList: ParsedDataTranferList | null = null;
+
+      // when copy/pasting excalidraw elements, only paste the text content
+      //
+      // Note that these custom MIME types only work within the same family
+      // of browsers, so won't work e.g. between chrome and firefox. We could
+      // parse the text/plain for existence of excalidraw instead, but this
+      // is an edge case
+      if (
+        mimeTypes.has(MIME_TYPES.excalidrawClipboard) ||
+        mimeTypes.has(MIME_TYPES.excalidraw)
+      ) {
+        // must be called in the same tick
+        event.preventDefault();
+
+        dataList = await parseDataTransferEvent(event);
+
+        try {
+          const parsed = await parseClipboard(dataList);
+
+          if (parsed.elements) {
+            const text = getTextFromElements(parsed.elements);
+            if (text) {
+              const { selectionStart, selectionEnd, value } = editable;
+
+              editable.value =
+                value.slice(0, selectionStart) +
+                text +
+                value.slice(selectionEnd);
+
+              const newPos = selectionStart + text.length;
+              editable.selectionStart = editable.selectionEnd = newPos;
+
+              editable.dispatchEvent(new Event("input"));
+            }
+          }
+
+          // if excalidraw elements don't contain any text elements,
+          // don't paste anything
+          return;
+        } catch {
+          console.warn("failed to parse excalidraw clipboard data");
+        }
+      }
+
+      dataList = dataList || (await parseDataTransferEvent(event));
+
+      const textItem = dataList.findByType(MIME_TYPES.text);
+      if (!textItem) {
         return;
       }
-      const data = normalizeText(clipboardData.text);
-      if (!data) {
+      const text = normalizeText(textItem.value);
+      if (!text) {
         return;
       }
       const container = getContainerElement(
@@ -354,7 +603,7 @@ export const textWysiwyg = ({
           app.scene.getNonDeletedElementsMap(),
         );
         const wrappedText = wrapText(
-          `${editable.value}${data}`,
+          `${editable.value}${text}`,
           font,
           getBoundTextMaxWidth(container, boundTextElement),
         );
@@ -538,6 +787,7 @@ export const textWysiwyg = ({
     if (isDestroyed) {
       return;
     }
+
     isDestroyed = true;
     // cleanup must be run before onSubmit otherwise when app blurs the wysiwyg
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
@@ -605,6 +855,7 @@ export const textWysiwyg = ({
     window.removeEventListener("blur", handleSubmit);
     window.removeEventListener("beforeunload", handleSubmit);
     unbindUpdate();
+    unsubOnChange();
     unbindOnScroll();
 
     editable.remove();
@@ -621,13 +872,30 @@ export const textWysiwyg = ({
     const isPropertiesTrigger =
       target instanceof HTMLElement &&
       target.classList.contains("properties-trigger");
+    const isPropertiesContent =
+      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      !!(target as Element).closest(".properties-content");
+    const inShapeActionsMenu =
+      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      (!!(target as Element).closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
+        !!(target as Element).closest(".compact-shape-actions-island"));
 
     setTimeout(() => {
-      editable.onblur = handleSubmit;
+      // If we interacted within shape actions menu or its popovers/triggers,
+      // keep submit disabled and don't steal focus back to textarea.
+      if (inShapeActionsMenu || isPropertiesTrigger || isPropertiesContent) {
+        return;
+      }
 
-      // case: clicking on the same property → no change → no update → no focus
-      if (!isPropertiesTrigger) {
-        editable.focus();
+      // Otherwise, re-enable submit on blur and refocus the editor.
+      editable.onblur = handleSubmit;
+      editable.focus();
+      if (pendingInitialSelection) {
+        editable.setSelectionRange(
+          pendingInitialSelection.start,
+          pendingInitialSelection.end,
+        );
+        pendingInitialSelection = null;
       }
     });
   };
@@ -651,6 +919,7 @@ export const textWysiwyg = ({
         event.preventDefault();
         app.handleCanvasPanUsingWheelOrSpaceDrag(event);
       }
+
       temporarilyDisableSubmit();
       return;
     }
@@ -658,15 +927,20 @@ export const textWysiwyg = ({
     const isPropertiesTrigger =
       target instanceof HTMLElement &&
       target.classList.contains("properties-trigger");
+    const isPropertiesContent =
+      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      !!(target as Element).closest(".properties-content");
 
     if (
       ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-        event.target.closest(
+        (event.target.closest(
           `.${CLASSES.SHAPE_ACTIONS_MENU}, .${CLASSES.ZOOM_ACTIONS}`,
-        ) &&
+        ) ||
+          event.target.closest(".compact-shape-actions-island")) &&
         !isWritableElement(event.target)) ||
-      isPropertiesTrigger
+      isPropertiesTrigger ||
+      isPropertiesContent
     ) {
       temporarilyDisableSubmit();
     } else if (
@@ -687,6 +961,13 @@ export const textWysiwyg = ({
     }
   };
 
+  // FIXME after we start emitting updates from Store for appState.theme
+  const unsubOnChange = app.onChangeEmitter.on((elements) => {
+    if (app.state.theme !== LAST_THEME) {
+      updateWysiwygStyle();
+    }
+  });
+
   // handle updates of textElement properties of editing element
   const unbindUpdate = app.scene.onUpdate(() => {
     updateWysiwygStyle();
@@ -706,7 +987,7 @@ export const textWysiwyg = ({
 
   let isDestroyed = false;
 
-  if (autoSelect) {
+  if (autoSelect && !pendingInitialSelection) {
     // select on init (focusing is done separately inside the bindBlurEvent()
     // because we need it to happen *after* the blur event from `pointerdown`)
     editable.select();

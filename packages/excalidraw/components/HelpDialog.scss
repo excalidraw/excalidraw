@@ -1,4 +1,4 @@
-@import "../css/variables.module.scss";
+@use "../css/variables.module" as *;
 
 .excalidraw {
   .HelpDialog {
@@ -60,11 +60,12 @@
 
     &__islands-container {
       display: grid;
+      grid-column-gap: 1.5rem;
+      grid-row-gap: 2rem;
+
       @media screen and (min-width: 1024px) {
         grid-template-columns: 1fr 1fr;
       }
-      grid-column-gap: 1.5rem;
-      grid-row-gap: 2rem;
     }
 
     @media screen and (min-width: 1024px) {

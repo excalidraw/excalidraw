@@ -4,6 +4,7 @@ import {
   elementCenterPoint,
   getCommonBounds,
   getElementPointsCoords,
+  getLineHeightInPx,
 } from "@excalidraw/element";
 import { cropElement } from "@excalidraw/element";
 import {
@@ -20,7 +21,7 @@ import {
   isTextElement,
   isFrameLikeElement,
 } from "@excalidraw/element";
-import { KEYS, arrayToMap } from "@excalidraw/common";
+import { KEYS, arrayToMap, getLineHeight } from "@excalidraw/common";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 
@@ -516,8 +517,17 @@ export class UI {
     UI.clickTool(type);
 
     if (type === "text") {
+      const clickY = h.state.gridModeEnabled
+        ? y
+        : y +
+          getLineHeightInPx(
+            h.state.currentItemFontSize,
+            getLineHeight(h.state.currentItemFontFamily),
+          ) /
+            2;
+
       mouse.reset();
-      mouse.click(x, y);
+      mouse.click(x, clickY);
     } else if ((type === "line" || type === "arrow") && points.length > 2) {
       points.forEach((point) => {
         mouse.reset();

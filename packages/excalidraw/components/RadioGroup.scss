@@ -1,4 +1,4 @@
-@import "../css/variables.module.scss";
+@use "../css/variables.module" as *;
 
 .excalidraw {
   --RadioGroup-background: var(--island-bg-color);
@@ -26,13 +26,16 @@
     background: var(--RadioGroup-background);
     border: 1px solid var(--RadioGroup-border);
 
+    gap: 2px;
+
     &__choice {
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
+      min-width: 20px;
       height: 24px;
+      padding: 0 0.375rem;
 
       color: var(--RadioGroup-choice-color-off);
       background: var(--RadioGroup-choice-background-off);

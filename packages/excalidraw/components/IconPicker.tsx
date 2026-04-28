@@ -1,6 +1,6 @@
-import * as Popover from "@radix-ui/react-popover";
+import { Popover } from "radix-ui";
 import clsx from "clsx";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 
 import { isArrowKey, KEYS } from "@excalidraw/common";
 
@@ -8,13 +8,15 @@ import { atom, useAtom } from "../editor-jotai";
 import { getLanguage, t } from "../i18n";
 
 import Collapsible from "./Stats/Collapsible";
-import { useDevice } from "./App";
+import { useExcalidrawContainer } from "./App";
 
 import "./IconPicker.scss";
 
 import type { JSX } from "react";
 
 const moreOptionsAtom = atom(false);
+const PICKER_COLUMNS = 4;
+const DEFAULT_SECTION_NAME = "default";
 
 type Option<T> = {
   value: T;
@@ -23,27 +25,73 @@ type Option<T> = {
   keyBinding: string | null;
 };
 
+type PickerSection<T> = {
+  name: string;
+  options: readonly Option<T>[];
+};
+
+const flattenOptions = <T,>(sections: readonly PickerSection<T>[]) =>
+  sections.flatMap((section) => section.options);
+
+const findOption = <T,>(
+  sections: readonly PickerSection<T>[],
+  predicate: (option: Option<T>) => boolean,
+) => {
+  for (const section of sections) {
+    const option = section.options.find(predicate);
+    if (option) {
+      return option;
+    }
+  }
+
+  return null;
+};
+
+const hasOption = <T,>(
+  sections: readonly PickerSection<T>[],
+  predicate: (option: Option<T>) => boolean,
+) => sections.some((section) => section.options.some(predicate));
+
+const getNavigationRows = <T,>(sections: readonly PickerSection<T>[]) =>
+  sections.flatMap((section) =>
+    Array.from(
+      { length: Math.ceil(section.options.length / PICKER_COLUMNS) },
+      (_, index) =>
+        section.options.slice(
+          index * PICKER_COLUMNS,
+          index * PICKER_COLUMNS + PICKER_COLUMNS,
+        ),
+    ),
+  );
+
 function Picker<T>({
-  options,
+  visibleSections,
+  hiddenSections = [],
   value,
   label,
   onChange,
   onClose,
-  numberOfOptionsToAlwaysShow = options.length,
 }: {
   label: string;
   value: T;
-  options: readonly Option<T>[];
+  visibleSections: readonly PickerSection<T>[];
+  hiddenSections?: readonly PickerSection<T>[];
   onChange: (value: T) => void;
   onClose: () => void;
-  numberOfOptionsToAlwaysShow?: number;
 }) {
-  const device = useDevice();
+  const { container } = useExcalidrawContainer();
+  const [showMoreOptions, setShowMoreOptions] = useAtom(moreOptionsAtom);
+  const allSections = [...visibleSections, ...hiddenSections];
+  const allOptions = flattenOptions(allSections);
+  const navigationRows = getNavigationRows([
+    ...visibleSections,
+    ...(showMoreOptions ? hiddenSections : []),
+  ]);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    const pressedOption = options.find(
+    const pressedOption = allOptions.find(
       (option) => option.keyBinding === event.key.toLowerCase(),
-    )!;
+    );
 
     if (!(event.metaKey || event.altKey || event.ctrlKey) && pressedOption) {
       // Keybinding navigation
@@ -51,17 +99,17 @@ function Picker<T>({
 
       event.preventDefault();
     } else if (event.key === KEYS.TAB) {
-      const index = options.findIndex((option) => option.value === value);
+      const index = allOptions.findIndex((option) => option.value === value);
       const nextIndex = event.shiftKey
-        ? (options.length + index - 1) % options.length
-        : (index + 1) % options.length;
-      onChange(options[nextIndex].value);
+        ? (allOptions.length + index - 1) % allOptions.length
+        : (index + 1) % allOptions.length;
+      onChange(allOptions[nextIndex].value);
     } else if (isArrowKey(event.key)) {
       // Arrow navigation
       const isRTL = getLanguage().rtl;
-      const index = options.findIndex((option) => option.value === value);
+      const index = allOptions.findIndex((option) => option.value === value);
       if (index !== -1) {
-        const length = options.length;
+        const length = allOptions.length;
         let nextIndex = index;
 
         switch (event.key) {
@@ -75,18 +123,60 @@ function Picker<T>({
             break;
           // Go the next row
           case KEYS.ARROW_DOWN: {
-            nextIndex = (index + (numberOfOptionsToAlwaysShow ?? 1)) % length;
+            const currentRowIndex = navigationRows.findIndex((row) =>
+              row.some((option) => option.value === value),
+            );
+            const currentRow = navigationRows[currentRowIndex];
+
+            if (currentRowIndex !== -1 && currentRow) {
+              const column = currentRow.findIndex(
+                (option) => option.value === value,
+              );
+              const nextRow =
+                navigationRows[(currentRowIndex + 1) % navigationRows.length];
+              const nextOption =
+                nextRow[Math.min(column, nextRow.length - 1)] ??
+                allOptions[index];
+
+              onChange(nextOption.value);
+              event.preventDefault();
+              event.nativeEvent.stopImmediatePropagation();
+              event.stopPropagation();
+              return;
+            }
             break;
           }
           // Go the previous row
           case KEYS.ARROW_UP: {
-            nextIndex =
-              (length + index - (numberOfOptionsToAlwaysShow ?? 1)) % length;
+            const currentRowIndex = navigationRows.findIndex((row) =>
+              row.some((option) => option.value === value),
+            );
+            const currentRow = navigationRows[currentRowIndex];
+
+            if (currentRowIndex !== -1 && currentRow) {
+              const column = currentRow.findIndex(
+                (option) => option.value === value,
+              );
+              const previousRow =
+                navigationRows[
+                  (navigationRows.length + currentRowIndex - 1) %
+                    navigationRows.length
+                ];
+              const previousOption =
+                previousRow[Math.min(column, previousRow.length - 1)] ??
+                allOptions[index];
+
+              onChange(previousOption.value);
+              event.preventDefault();
+              event.nativeEvent.stopImmediatePropagation();
+              event.stopPropagation();
+              return;
+            }
             break;
           }
         }
 
-        onChange(options[nextIndex].value);
+        onChange(allOptions[nextIndex].value);
       }
       event.preventDefault();
     } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
@@ -98,38 +188,29 @@ function Picker<T>({
     event.stopPropagation();
   };
 
-  const [showMoreOptions, setShowMoreOptions] = useAtom(moreOptionsAtom);
-
-  const alwaysVisibleOptions = React.useMemo(
-    () => options.slice(0, numberOfOptionsToAlwaysShow),
-    [options, numberOfOptionsToAlwaysShow],
-  );
-  const moreOptions = React.useMemo(
-    () => options.slice(numberOfOptionsToAlwaysShow),
-    [options, numberOfOptionsToAlwaysShow],
-  );
-
   useEffect(() => {
-    if (!alwaysVisibleOptions.some((option) => option.value === value)) {
+    if (hasOption(hiddenSections, (option) => option.value === value)) {
       setShowMoreOptions(true);
     }
-  }, [value, alwaysVisibleOptions, setShowMoreOptions]);
+  }, [value, hiddenSections, setShowMoreOptions]);
 
-  const renderOptions = (options: Option<T>[]) => {
+  const renderOptions = (options: readonly Option<T>[]) => {
     return (
       <div className="picker-content">
-        {options.map((option, i) => (
+        {options.map((option) => (
           <button
             type="button"
             className={clsx("picker-option", {
               active: value === option.value,
             })}
-            onClick={(event) => {
+            onClick={() => {
               onChange(option.value);
             }}
-            title={`${option.text} ${
-              option.keyBinding && `— ${option.keyBinding.toUpperCase()}`
-            }`}
+            title={
+              option.keyBinding
+                ? `${option.text} — ${option.keyBinding.toUpperCase()}`
+                : option.text
+            }
             aria-label={option.text || "none"}
             aria-keyshortcuts={option.keyBinding || undefined}
             key={option.text}
@@ -152,27 +233,38 @@ function Picker<T>({
     );
   };
 
+  const renderSections = (sections: readonly PickerSection<T>[]) =>
+    sections.map((section, index) =>
+      section.name === DEFAULT_SECTION_NAME ? (
+        <React.Fragment key={`${section.name}-${index}`}>
+          {renderOptions(section.options)}
+        </React.Fragment>
+      ) : (
+        <div className="picker-section" key={`${section.name}-${index}`}>
+          <div className="picker-section-label">{section.name}</div>
+          {renderOptions(section.options)}
+        </div>
+      ),
+    );
+
   return (
     <Popover.Content
-      side={
-        device.editor.isMobile && !device.viewport.isLandscape
-          ? "top"
-          : "bottom"
-      }
+      className="picker"
+      role="dialog"
+      aria-modal="true"
+      aria-label={label}
+      side={"bottom"}
       align="start"
       sideOffset={12}
-      style={{ zIndex: "var(--zIndex-popup)" }}
+      alignOffset={12}
+      style={{ zIndex: "var(--zIndex-ui-styles-popup)" }}
       onKeyDown={handleKeyDown}
+      collisionBoundary={container ?? undefined}
     >
-      <div
-        className={`picker`}
-        role="dialog"
-        aria-modal="true"
-        aria-label={label}
-      >
-        {renderOptions(alwaysVisibleOptions)}
+      <div className="picker-sections">
+        {renderSections(visibleSections)}
 
-        {moreOptions.length > 0 && (
+        {hiddenSections.length > 0 && (
           <Collapsible
             label={t("labels.more_options")}
             open={showMoreOptions}
@@ -181,7 +273,9 @@ function Picker<T>({
             }}
             className="picker-collapsible"
           >
-            {renderOptions(moreOptions)}
+            <div className="picker-sections">
+              {renderSections(hiddenSections)}
+            </div>
           </Collapsible>
         )}
       </div>
@@ -192,49 +286,45 @@ function Picker<T>({
 export function IconPicker<T>({
   value,
   label,
-  options,
+  visibleSections,
+  hiddenSections,
   onChange,
-  group = "",
-  numberOfOptionsToAlwaysShow,
 }: {
   label: string;
   value: T;
-  options: readonly {
-    value: T;
-    text: string;
-    icon: JSX.Element;
-    keyBinding: string | null;
-  }[];
+  visibleSections: readonly PickerSection<T>[];
+  hiddenSections?: readonly PickerSection<T>[];
   onChange: (value: T) => void;
-  numberOfOptionsToAlwaysShow?: number;
-  group?: string;
 }) {
   const [isActive, setActive] = React.useState(false);
-  const rPickerButton = React.useRef<any>(null);
+  const selectedOption = useMemo(
+    () =>
+      findOption(visibleSections, (option) => option.value === value) ??
+      findOption(hiddenSections ?? [], (option) => option.value === value),
+    [visibleSections, hiddenSections, value],
+  );
 
   return (
     <div>
       <Popover.Root open={isActive} onOpenChange={(open) => setActive(open)}>
         <Popover.Trigger
-          name={group}
           type="button"
           aria-label={label}
           onClick={() => setActive(!isActive)}
-          ref={rPickerButton}
           className={isActive ? "active" : ""}
         >
-          {options.find((option) => option.value === value)?.icon}
+          {selectedOption?.icon}
         </Popover.Trigger>
         {isActive && (
           <Picker
-            options={options}
+            visibleSections={visibleSections}
+            hiddenSections={hiddenSections}
             value={value}
             label={label}
             onChange={onChange}
             onClose={() => {
               setActive(false);
             }}
-            numberOfOptionsToAlwaysShow={numberOfOptionsToAlwaysShow}
           />
         )}
       </Popover.Root>

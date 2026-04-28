@@ -1,4 +1,4 @@
-import { isDarwin } from "./constants";
+import { isDarwin } from "./editorInterface";
 
 import type { ValueOf } from "./utility-types";
 

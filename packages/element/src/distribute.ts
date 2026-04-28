@@ -1,9 +1,11 @@
 import type { AppState } from "@excalidraw/excalidraw/types";
 
+import { updateBoundElements } from "./binding";
 import { getCommonBoundingBox } from "./bounds";
-import { newElementWith } from "./mutateElement";
 
 import { getSelectedElementsByGroup } from "./groups";
+
+import type { Scene } from "./Scene";
 
 import type { ElementsMap, ExcalidrawElement } from "./types";
 
@@ -17,6 +19,7 @@ export const distributeElements = (
   elementsMap: ElementsMap,
   distribution: Distribution,
   appState: Readonly<AppState>,
+  scene: Scene,
 ): ExcalidrawElement[] => {
   const [start, mid, end, extent] =
     distribution.axis === "x"
@@ -66,12 +69,16 @@ export const distributeElements = (
         translation[distribution.axis] = pos - box[mid];
       }
 
-      return group.map((element) =>
-        newElementWith(element, {
+      return group.map((element) => {
+        const updatedElement = scene.mutateElement(element, {
           x: element.x + translation.x,
           y: element.y + translation.y,
-        }),
-      );
+        });
+        updateBoundElements(element, scene, {
+          simultaneouslyUpdated: group,
+        });
+        return updatedElement;
+      });
     });
   }
 
@@ -90,11 +97,15 @@ export const distributeElements = (
     pos += step;
     pos += box[extent];
 
-    return group.map((element) =>
-      newElementWith(element, {
+    return group.map((element) => {
+      const updatedElement = scene.mutateElement(element, {
         x: element.x + translation.x,
         y: element.y + translation.y,
-      }),
-    );
+      });
+      updateBoundElements(element, scene, {
+        simultaneouslyUpdated: group,
+      });
+      return updatedElement;
+    });
   });
 };

@@ -40,22 +40,21 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   updates: ElementUpdate<TElement>,
   options?: {
     isDragging?: boolean;
+    isBindingEnabled?: boolean;
+    isMidpointSnappingEnabled?: boolean;
   },
 ) => {
   let didChange = false;
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
-  const { points, fixedSegments, startBinding, endBinding, fileId } =
-    updates as any;
+  const { points, fixedSegments, fileId } = updates as any;
 
   if (
     isElbowArrow(element) &&
     (Object.keys(updates).length === 0 || // normalization case
       typeof points !== "undefined" || // repositioning
-      typeof fixedSegments !== "undefined" || // segment fixing
-      typeof startBinding !== "undefined" ||
-      typeof endBinding !== "undefined") // manual binding to element
+      typeof fixedSegments !== "undefined") // segment fixing
   ) {
     updates = {
       ...updates,

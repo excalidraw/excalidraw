@@ -28,7 +28,7 @@ import {
 
 import type { InclusiveRange } from "@excalidraw/math";
 
-import type { Bounds } from "@excalidraw/element";
+import type { Bounds } from "@excalidraw/common";
 import type { MaybeTransformHandleType } from "@excalidraw/element";
 import type {
   ElementsMap,
@@ -177,8 +177,14 @@ export const isSnappingEnabled = ({
   selectedElements: NonDeletedExcalidrawElement[];
 }) => {
   if (event) {
+    // Allow snapping for lasso tool when dragging selected elements
+    // but not during lasso selection phase
+    const isLassoDragging =
+      app.state.activeTool.type === "lasso" &&
+      app.state.selectedElementsAreBeingDragged;
+
     return (
-      app.state.activeTool.type !== "lasso" &&
+      (app.state.activeTool.type !== "lasso" || isLassoDragging) &&
       ((app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
         (!app.state.objectsSnapModeEnabled &&
           event[KEYS.CTRL_OR_CMD] &&

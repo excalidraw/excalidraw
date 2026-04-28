@@ -1,19 +1,29 @@
 import rough from "roughjs/bin/rough";
-import { getStroke } from "perfect-freehand";
 
-import { isRightAngleRads } from "@excalidraw/math";
+import {
+  type GlobalPoint,
+  isRightAngleRads,
+  lineSegment,
+  pointFrom,
+  pointRotateRads,
+  type Radians,
+} from "@excalidraw/math";
 
 import {
   BOUND_TEXT_PADDING,
   DEFAULT_REDUCED_GLOBAL_ALPHA,
   ELEMENT_READY_TO_ERASE_OPACITY,
   FRAME_STYLE,
+  DARK_THEME_FILTER,
   MIME_TYPES,
   THEME,
   distance,
   getFontString,
   isRTL,
   getVerticalOffset,
+  invariant,
+  applyDarkModeFilter,
+  isSafari,
 } from "@excalidraw/common";
 
 import type {
@@ -32,7 +42,7 @@ import type {
   InteractiveCanvasRenderConfig,
 } from "@excalidraw/excalidraw/scene/types";
 
-import { getElementAbsoluteCoords } from "./bounds";
+import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
@@ -70,15 +80,7 @@ import type {
   ElementsMap,
 } from "./types";
 
-import type { StrokeOptions } from "perfect-freehand";
 import type { RoughCanvas } from "roughjs/bin/canvas";
-
-// using a stronger invert (100% vs our regular 93%) and saturate
-// as a temp hack to make images in dark theme look closer to original
-// color scheme (it's still not quite there and the colors look slightly
-// desatured, alas...)
-export const IMAGE_INVERT_FILTER =
-  "invert(100%) hue-rotate(180deg) saturate(1.25)";
 
 const isPendingImageElement = (
   element: ExcalidrawElement,
@@ -86,19 +88,6 @@ const isPendingImageElement = (
 ) =>
   isInitializedImageElement(element) &&
   !renderConfig.imageCache.has(element.fileId);
-
-const shouldResetImageFilter = (
-  element: ExcalidrawElement,
-  renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
-) => {
-  return (
-    appState.theme === THEME.DARK &&
-    isInitializedImageElement(element) &&
-    !isPendingImageElement(element, renderConfig) &&
-    renderConfig.imageCache.get(element.fileId)?.mimeType !== MIME_TYPES.svg
-  );
-};
 
 const getCanvasPadding = (element: ExcalidrawElement) => {
   switch (element.type) {
@@ -217,7 +206,7 @@ const generateElementCanvas = (
   elementsMap: NonDeletedSceneElementsMap,
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ): ExcalidrawElementWithCanvas | null => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -264,12 +253,7 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  // in dark theme, revert the image color filter
-  if (shouldResetImageFilter(element, renderConfig, appState)) {
-    context.filter = IMAGE_INVERT_FILTER;
-  }
-
-  drawElementOnCanvas(element, rc, context, renderConfig, appState);
+  drawElementOnCanvas(element, rc, context, renderConfig);
 
   context.restore();
 
@@ -377,8 +361,9 @@ IMAGE_ERROR_PLACEHOLDER_IMG.src = `data:${MIME_TYPES.svg},${encodeURIComponent(
 const drawImagePlaceholder = (
   element: ExcalidrawImageElement,
   context: CanvasRenderingContext2D,
+  theme: StaticCanvasRenderConfig["theme"],
 ) => {
-  context.fillStyle = "#E7E7E7";
+  context.fillStyle = theme === THEME.DARK ? "#2E2E2E" : "#E7E7E7";
   context.fillRect(0, 0, element.width, element.height);
 
   const imageMinWidthOrHeight = Math.min(element.width, element.height);
@@ -404,7 +389,6 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
 ) => {
   switch (element.type) {
     case "rectangle":
@@ -414,7 +398,8 @@ const drawElementOnCanvas = (
     case "ellipse": {
       context.lineJoin = "round";
       context.lineCap = "round";
-      rc.draw(ShapeCache.get(element)!);
+
+      rc.draw(ShapeCache.generateElementShape(element, renderConfig));
       break;
     }
     case "arrow":
@@ -422,33 +407,44 @@ const drawElementOnCanvas = (
       context.lineJoin = "round";
       context.lineCap = "round";
 
-      ShapeCache.get(element)!.forEach((shape) => {
-        rc.draw(shape);
-      });
+      ShapeCache.generateElementShape(element, renderConfig).forEach(
+        (shape) => {
+          rc.draw(shape);
+        },
+      );
       break;
     }
     case "freedraw": {
       // Draw directly to canvas
       context.save();
-      context.fillStyle = element.strokeColor;
 
-      const path = getFreeDrawPath2D(element) as Path2D;
-      const fillShape = ShapeCache.get(element);
+      const shapes = ShapeCache.generateElementShape(element, renderConfig);
 
-      if (fillShape) {
-        rc.draw(fillShape);
+      for (const shape of shapes) {
+        if (typeof shape === "string") {
+          context.fillStyle =
+            renderConfig.theme === THEME.DARK
+              ? applyDarkModeFilter(element.strokeColor)
+              : element.strokeColor;
+          context.fill(new Path2D(shape));
+        } else {
+          rc.draw(shape);
+        }
       }
-
-      context.fillStyle = element.strokeColor;
-      context.fill(path);
 
       context.restore();
       break;
     }
     case "image": {
+      context.save();
+      const cacheEntry =
+        element.fileId !== null
+          ? renderConfig.imageCache.get(element.fileId)
+          : null;
       const img = isInitializedImageElement(element)
-        ? renderConfig.imageCache.get(element.fileId)?.image
+        ? cacheEntry?.image
         : undefined;
+
       if (img != null && !(img instanceof Promise)) {
         if (element.roundness && context.roundRect) {
           context.beginPath();
@@ -471,20 +467,80 @@ const drawElementOnCanvas = (
               height: img.naturalHeight,
             };
 
-        context.drawImage(
-          img,
-          x,
-          y,
-          width,
-          height,
-          0 /* hardcoded for the selection box*/,
-          0,
-          element.width,
-          element.height,
-        );
+        const shouldInvertImage =
+          renderConfig.theme === THEME.DARK &&
+          cacheEntry?.mimeType === MIME_TYPES.svg;
+
+        if (shouldInvertImage && isSafari) {
+          const devicePixelRatio = window.devicePixelRatio || 1;
+          const tempCanvas = document.createElement("canvas");
+          tempCanvas.width = element.width * devicePixelRatio;
+          tempCanvas.height = element.height * devicePixelRatio;
+          const tempContext = tempCanvas.getContext("2d");
+
+          if (tempContext) {
+            tempContext.scale(devicePixelRatio, devicePixelRatio);
+            tempContext.drawImage(
+              img,
+              x,
+              y,
+              width,
+              height,
+              0,
+              0,
+              element.width,
+              element.height,
+            );
+
+            const imageData = tempContext.getImageData(
+              0,
+              0,
+              tempCanvas.width,
+              tempCanvas.height,
+            );
+
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+              data[i] = 255 - data[i];
+              data[i + 1] = 255 - data[i + 1];
+              data[i + 2] = 255 - data[i + 2];
+            }
+
+            tempContext.putImageData(imageData, 0, 0);
+            context.drawImage(
+              tempCanvas,
+              0,
+              0,
+              tempCanvas.width,
+              tempCanvas.height,
+              0,
+              0,
+              element.width,
+              element.height,
+            );
+          }
+        } else {
+          if (shouldInvertImage) {
+            context.filter = DARK_THEME_FILTER;
+          }
+
+          context.drawImage(
+            img,
+            x,
+            y,
+            width,
+            height,
+            0 /* hardcoded for the selection box*/,
+            0,
+            element.width,
+            element.height,
+          );
+        }
       } else {
-        drawImagePlaceholder(element, context);
+        drawImagePlaceholder(element, context, renderConfig.theme);
       }
+      context.restore();
       break;
     }
     default: {
@@ -499,7 +555,10 @@ const drawElementOnCanvas = (
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
         context.font = getFontString(element);
-        context.fillStyle = element.strokeColor;
+        context.fillStyle =
+          renderConfig.theme === THEME.DARK
+            ? applyDarkModeFilter(element.strokeColor)
+            : element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
 
         // Canvas does not support multiline text by default
@@ -550,7 +609,7 @@ const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
   const zoom: Zoom = renderConfig
     ? appState.zoom
@@ -607,7 +666,7 @@ const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
   allElementsMap: NonDeletedSceneElementsMap,
 ) => {
   const element = elementWithCanvas.element;
@@ -725,7 +784,7 @@ export const renderElement = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
   const reduceAlphaForSelection =
     appState.openDialog?.name === "elementLinkSelector" &&
@@ -752,12 +811,17 @@ export const renderElement = (
         context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
         context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-        context.strokeStyle = FRAME_STYLE.strokeColor;
+        context.strokeStyle =
+          appState.theme === THEME.DARK
+            ? applyDarkModeFilter(FRAME_STYLE.strokeColor)
+            : FRAME_STYLE.strokeColor;
 
         // TODO change later to only affect AI frames
         if (isMagicFrameElement(element)) {
           context.strokeStyle =
-            appState.theme === THEME.LIGHT ? "#7affd7" : "#1d8264";
+            appState.theme === THEME.LIGHT
+              ? "#7affd7"
+              : applyDarkModeFilter("#1d8264");
         }
 
         if (FRAME_STYLE.radius && context.roundRect) {
@@ -780,11 +844,6 @@ export const renderElement = (
       break;
     }
     case "freedraw": {
-      // TODO investigate if we can do this in situ. Right now we need to call
-      // beforehand because math helpers (such as getElementAbsoluteCoords)
-      // rely on existing shapes
-      ShapeCache.generateElementShape(element, null);
-
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const cx = (x1 + x2) / 2 + appState.scrollX;
@@ -795,7 +854,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig, appState);
+        drawElementOnCanvas(element, rc, context, renderConfig);
         context.restore();
       } else {
         const elementWithCanvas = generateElementWithCanvas(
@@ -828,10 +887,6 @@ export const renderElement = (
     case "text":
     case "iframe":
     case "embeddable": {
-      // TODO investigate if we can do this in situ. Right now we need to call
-      // beforehand because math helpers (such as getElementAbsoluteCoords)
-      // rely on existing shapes
-      ShapeCache.generateElementShape(element, renderConfig);
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const cx = (x1 + x2) / 2 + appState.scrollX;
@@ -854,9 +909,6 @@ export const renderElement = (
         context.save();
         context.translate(cx, cy);
 
-        if (shouldResetImageFilter(element, renderConfig, appState)) {
-          context.filter = "none";
-        }
         const boundTextElement = getBoundTextElement(element, elementsMap);
 
         if (isArrowElement(element) && boundTextElement) {
@@ -888,13 +940,7 @@ export const renderElement = (
 
           tempCanvasContext.translate(-shiftX, -shiftY);
 
-          drawElementOnCanvas(
-            element,
-            tempRc,
-            tempCanvasContext,
-            renderConfig,
-            appState,
-          );
+          drawElementOnCanvas(element, tempRc, tempCanvasContext, renderConfig);
 
           tempCanvasContext.translate(shiftX, shiftY);
 
@@ -933,7 +979,7 @@ export const renderElement = (
           }
 
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig, appState);
+          drawElementOnCanvas(element, rc, context, renderConfig);
         }
 
         context.restore();
@@ -1025,69 +1071,58 @@ export const renderElement = (
   context.globalAlpha = 1;
 };
 
-export const pathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>([]);
+export function getFreedrawOutlineAsSegments(
+  element: ExcalidrawFreeDrawElement,
+  points: [number, number][],
+  elementsMap: ElementsMap,
+) {
+  const bounds = getElementBounds(
+    {
+      ...element,
+      angle: 0 as Radians,
+    },
+    elementsMap,
+  );
+  const center = pointFrom<GlobalPoint>(
+    (bounds[0] + bounds[2]) / 2,
+    (bounds[1] + bounds[3]) / 2,
+  );
 
-export function generateFreeDrawShape(element: ExcalidrawFreeDrawElement) {
-  const svgPathData = getFreeDrawSvgPath(element);
-  const path = new Path2D(svgPathData);
-  pathsCache.set(element, path);
-  return path;
-}
+  invariant(points.length >= 2, "Freepath outline must have at least 2 points");
 
-export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement) {
-  return pathsCache.get(element);
-}
-
-export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
-  // If input points are empty (should they ever be?) return a dot
-  const inputPoints = element.simulatePressure
-    ? element.points
-    : element.points.length
-    ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
-    : [[0, 0, 0.5]];
-
-  // Consider changing the options for simulated pressure vs real pressure
-  const options: StrokeOptions = {
-    simulatePressure: element.simulatePressure,
-    size: element.strokeWidth * 4.25,
-    thinning: 0.6,
-    smoothing: 0.5,
-    streamline: 0.5,
-    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
-    last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
-  };
-
-  return getSvgPathFromStroke(getStroke(inputPoints as number[][], options));
-}
-
-function med(A: number[], B: number[]) {
-  return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
-}
-
-// Trim SVG path data so number are each two decimal points. This
-// improves SVG exports, and prevents rendering errors on points
-// with long decimals.
-const TO_FIXED_PRECISION = /(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g;
-
-function getSvgPathFromStroke(points: number[][]): string {
-  if (!points.length) {
-    return "";
-  }
-
-  const max = points.length - 1;
-
-  return points
-    .reduce(
-      (acc, point, i, arr) => {
-        if (i === max) {
-          acc.push(point, med(point, arr[0]), "L", arr[0], "Z");
-        } else {
-          acc.push(point, med(point, arr[i + 1]));
-        }
-        return acc;
-      },
-      ["M", points[0], "Q"],
-    )
-    .join(" ")
-    .replace(TO_FIXED_PRECISION, "$1");
+  return points.slice(2).reduce(
+    (acc, curr) => {
+      acc.push(
+        lineSegment<GlobalPoint>(
+          acc[acc.length - 1][1],
+          pointRotateRads(
+            pointFrom<GlobalPoint>(curr[0] + element.x, curr[1] + element.y),
+            center,
+            element.angle,
+          ),
+        ),
+      );
+      return acc;
+    },
+    [
+      lineSegment<GlobalPoint>(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            points[0][0] + element.x,
+            points[0][1] + element.y,
+          ),
+          center,
+          element.angle,
+        ),
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            points[1][0] + element.x,
+            points[1][1] + element.y,
+          ),
+          center,
+          element.angle,
+        ),
+      ),
+    ],
+  );
 }
