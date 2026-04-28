@@ -66,7 +66,13 @@ function getIconForType(resourceType) {
   return Array.isArray(item) ? item : item.elements || null;
 }
 
-function cloneIconElements(origElements, targetX, targetY, targetSize) {
+function cloneIconElements(
+  origElements,
+  targetX,
+  targetY,
+  targetSize,
+  parentGroupIds = [],
+) {
   let minX = Infinity;
   let minY = Infinity;
   let maxX = -Infinity;
@@ -110,6 +116,7 @@ function cloneIconElements(origElements, targetX, targetY, targetSize) {
       seed: rand(),
       versionNonce: rand(),
       groupIds: [
+        ...parentGroupIds,
         outerGroupId,
         ...(e.groupIds || []).map((gid) => groupIdMap[gid]),
       ],
@@ -432,24 +439,49 @@ function getBindingPoints(posA, posB, wA, hA, wB, hB) {
 
 // --- Edge collection ---
 
-function collectEdgePairs(nodes) {
-  const edgeSet = new Set();
+function collectDirectedEdges(nodes) {
+  const edgeMap = new Map();
+
+  const addEdge = (source, target, kind, origin) => {
+    if (!nodes[source] || !nodes[target]) {
+      return;
+    }
+
+    const key = `${source}|||${target}`;
+    const existing = edgeMap.get(key);
+    if (existing) {
+      existing.kinds.add(kind);
+      existing.origins.add(origin);
+      return;
+    }
+
+    edgeMap.set(key, {
+      source,
+      target,
+      kinds: new Set([kind]),
+      origins: new Set([origin]),
+    });
+  };
+
   for (const [nodePath, node] of Object.entries(nodes)) {
-    const allEdges = [
-      ...new Set([...(node.edges_new || []), ...(node.edges_existing || [])]),
-    ];
-    for (const target of allEdges) {
-      if (!nodes[target]) continue;
-      const pair = [nodePath, target].sort().join("|||");
-      edgeSet.add(pair);
+    for (const target of node.edges_new || []) {
+      addEdge(nodePath, target, "planned_dependency", "dot");
+    }
+    for (const target of node.edges_existing || []) {
+      addEdge(nodePath, target, "existing_dependency", "terraform_state");
     }
   }
-  return edgeSet;
+
+  return [...edgeMap.values()].map((edge) => ({
+    ...edge,
+    kinds: [...edge.kinds],
+    origins: [...edge.origins],
+  }));
 }
 
 // --- Force layout ---
 
-async function forceLayout(nodeKeys, edgePairs, tierMap, tierConfigs) {
+async function forceLayout(nodeKeys, directedEdges, tierMap, tierConfigs) {
   const d3 = await import("d3-force");
 
   const tiers = Object.values(tierMap);
@@ -462,10 +494,7 @@ async function forceLayout(nodeKeys, edgePairs, tierMap, tierConfigs) {
     tier: tierMap[id],
   }));
 
-  const simLinks = [...edgePairs].map((pair) => {
-    const [source, target] = pair.split("|||");
-    return { source, target };
-  });
+  const simLinks = directedEdges.map(({ source, target }) => ({ source, target }));
 
   const simulation = d3
     .forceSimulation(simNodes)
@@ -524,14 +553,14 @@ async function forceLayout(nodeKeys, edgePairs, tierMap, tierConfigs) {
 async function nodesToExcalidraw(nodes) {
   const elements = [];
   const nodeKeys = Object.keys(nodes);
-  const edgePairs = collectEdgePairs(nodes);
+  const directedEdges = collectDirectedEdges(nodes);
 
   const tierMap = buildTierMap(nodeKeys);
   const tierConfigs = buildTierConfigs(tierMap, nodeKeys.length);
 
   const positions = await forceLayout(
     nodeKeys,
-    edgePairs,
+    directedEdges,
     tierMap,
     tierConfigs,
   );
@@ -544,6 +573,7 @@ async function nodesToExcalidraw(nodes) {
     const cfg = tierConfigs[tier];
     const { x, y } = positions[nodePath];
     const resourceType = getResourceType(nodePath);
+    const groupId = `node-${rand()}`;
 
     const rectId = `rect-${i}`;
     const textId = `text-${i}`;
@@ -573,6 +603,7 @@ async function nodesToExcalidraw(nodes) {
         strokeWidth: cfg.strokeWidth,
         backgroundColor: bgColor,
         roundness: { type: 3 },
+        groupIds: [groupId],
         boundElements: [{ id: textId, type: "text" }],
         strokeStyle: action === "external" ? "dashed" : "solid",
         customData: {
@@ -602,6 +633,7 @@ async function nodesToExcalidraw(nodes) {
         fontFamily: 3,
         textAlign: hasIcon ? "left" : "center",
         verticalAlign: "middle",
+        groupIds: [groupId],
         containerId: rectId,
         originalText: label,
         autoResize: false,
@@ -619,6 +651,7 @@ async function nodesToExcalidraw(nodes) {
         iconX,
         iconY,
         cfg.iconSize,
+        [groupId],
       );
       elements.push(...clonedIcons);
     }
@@ -626,10 +659,10 @@ async function nodesToExcalidraw(nodes) {
 
   // --- bidirectional arrows ---
   let arrowIdx = 0;
-  for (const pair of edgePairs) {
-    const [a, b] = pair.split("|||");
-    const posA = posMap[a];
-    const posB = posMap[b];
+  for (const relationship of directedEdges) {
+    const { source, target, kinds, origins } = relationship;
+    const posA = posMap[source];
+    const posB = posMap[target];
     const arrowId = `arrow-${arrowIdx++}`;
 
     const rectA = elements.find((e) => e.id === posA.rectId);
@@ -673,9 +706,19 @@ async function nodesToExcalidraw(nodes) {
           fixedPoint: endFixed,
           mode: "orbit",
         },
-        startArrowhead: "arrow",
+        startArrowhead: null,
         endArrowhead: "arrow",
         roundness: { type: 2 },
+        customData: {
+          terraform: true,
+          relationship: {
+            source,
+            target,
+            kinds,
+            origins,
+            directed: true,
+          },
+        },
       }),
     );
   }
