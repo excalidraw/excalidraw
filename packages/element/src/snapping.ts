@@ -804,6 +804,7 @@ export const snapLinearElementPoint = (
   event: KeyboardModifiersObject,
   elementsMap: ElementsMap,
   options: {
+    includeExternalPoints?: boolean;
     includeSelfPoints?: boolean;
     selectedPointsIndices?: readonly number[];
   } = {},
@@ -827,18 +828,20 @@ export const snapLinearElementPoint = (
   const nearestSnapsX: Snaps = [];
   const nearestSnapsY: Snaps = [];
 
-  collectNearestAxisSnapCandidates(
-    getExternalAxisSnapTargets(
-      elements,
-      editingElement,
-      app.state,
-      elementsMap,
-    ),
-    pointerPosition,
-    nearestSnapsX,
-    nearestSnapsY,
-    minOffset,
-  );
+  if (options.includeExternalPoints !== false) {
+    collectNearestAxisSnapCandidates(
+      getExternalAxisSnapTargets(
+        elements,
+        editingElement,
+        app.state,
+        elementsMap,
+      ),
+      pointerPosition,
+      nearestSnapsX,
+      nearestSnapsY,
+      minOffset,
+    );
+  }
 
   if (options.includeSelfPoints) {
     collectNearestAxisSnapCandidates(

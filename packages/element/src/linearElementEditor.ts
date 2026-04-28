@@ -52,6 +52,7 @@ import {
   calculateFixedPointForNonElbowArrowBinding,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isBindingEnabled,
+  maxBindingDistance_simple,
   snapToMid,
   updateBoundPoint,
 } from "./binding";
@@ -60,6 +61,7 @@ import {
   getElementPointsCoords,
   getMinMaxXYFromCurvePathOps,
 } from "./bounds";
+import { getHoveredElementForBinding } from "./collision";
 
 import { headingIsHorizontal, vectorToHeading } from "./heading";
 import { mutateElement } from "./mutateElement";
@@ -1890,6 +1892,44 @@ export class LinearElementEditor {
       : app.getEffectiveGridSize();
   }
 
+  private static _shouldSkipExternalSnapForBindableTarget({
+    appState,
+    elements,
+    elementsMap,
+    element,
+    pointIndex,
+    scenePoint,
+    selectedPointsIndices,
+  }: {
+    appState: AppState;
+    elements: readonly Ordered<NonDeletedExcalidrawElement>[];
+    elementsMap: NonDeletedSceneElementsMap;
+    element: NonDeleted<ExcalidrawLinearElement>;
+    pointIndex: number;
+    scenePoint: GlobalPoint;
+    selectedPointsIndices?: readonly number[];
+  }) {
+    if (
+      isElbowArrow(element) ||
+      !isBindingElement(element) ||
+      !isBindingEnabled(appState) ||
+      selectedPointsIndices?.length !== 1
+    ) {
+      return false;
+    }
+
+    if (pointIndex !== 0 && pointIndex !== element.points.length - 1) {
+      return false;
+    }
+
+    return !!getHoveredElementForBinding(
+      scenePoint,
+      elements,
+      elementsMap,
+      maxBindingDistance_simple(appState.zoom),
+    );
+  }
+
   private static _getSnappedPointForLinearElement({
     app,
     event,
@@ -1952,6 +1992,16 @@ export class LinearElementEditor {
       const effectiveGridY = referencePointCoords[1] + dyFromReference;
 
       let snapLines: SnapLine[] = [];
+      const shouldSkipExternalSnap =
+        LinearElementEditor._shouldSkipExternalSnapForBindableTarget({
+          appState: app.state,
+          elements,
+          elementsMap,
+          element,
+          pointIndex,
+          scenePoint: pointFrom<GlobalPoint>(effectiveGridX, effectiveGridY),
+          selectedPointsIndices,
+        });
 
       if (!isElbowArrow(element)) {
         const { snapOffset, snapLines: nextSnapLines } = snapLinearElementPoint(
@@ -1962,6 +2012,7 @@ export class LinearElementEditor {
           event,
           elementsMap,
           {
+            includeExternalPoints: !shouldSkipExternalSnap,
             includeSelfPoints: true,
             selectedPointsIndices,
           },
@@ -2010,6 +2061,16 @@ export class LinearElementEditor {
 
     const originalPointerX = scenePointerX - pointerOffset.x;
     const originalPointerY = scenePointerY - pointerOffset.y;
+    const shouldSkipExternalSnap =
+      LinearElementEditor._shouldSkipExternalSnapForBindableTarget({
+        appState: app.state,
+        elements,
+        elementsMap,
+        element,
+        pointIndex,
+        scenePoint: pointFrom<GlobalPoint>(originalPointerX, originalPointerY),
+        selectedPointsIndices,
+      });
 
     const { snapOffset, snapLines } = snapLinearElementPoint(
       elements,
@@ -2019,6 +2080,7 @@ export class LinearElementEditor {
       event,
       elementsMap,
       {
+        includeExternalPoints: !shouldSkipExternalSnap,
         includeSelfPoints: true,
         selectedPointsIndices,
       },

@@ -313,6 +313,36 @@ describe("Test Linear Elements", () => {
     expect(endpoint).toEqual(pointFrom<GlobalPoint>(100, 100));
   });
 
+  it("prefers binding over external snaps when creating an arrow endpoint", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 40,
+      height: 40,
+    });
+    API.setElements([rect]);
+    API.setAppState({ objectsSnapModeEnabled: true });
+
+    UI.clickTool("arrow");
+
+    const startPoint = pointFrom<GlobalPoint>(20, 20);
+    const pointerNearBindable = pointFrom<GlobalPoint>(96, 118);
+
+    dragMove(startPoint, pointerNearBindable);
+
+    expect(h.state.suggestedBinding?.element.id).toBe(rect.id);
+    expect(h.state.snapLines).toEqual([]);
+
+    dragEnd(pointerNearBindable);
+
+    const arrow = h.elements.find(
+      (element): element is ExcalidrawLinearElement => element.type === "arrow",
+    );
+
+    expect(arrow?.endBinding?.elementId).toBe(rect.id);
+  });
+
   it("should enter line editor via enter (line)", () => {
     createTwoPointerLinearElement("line");
     expect(h.state.selectedLinearElement?.isEditing).toBe(false);
@@ -487,6 +517,44 @@ describe("Test Linear Elements", () => {
       expect(API.getElement(line).points[1]).toEqual(
         pointFrom<LocalPoint>(100, 45),
       );
+    });
+
+    it("prefers binding over external snaps when dragging an existing arrow endpoint", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        width: 40,
+        height: 40,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        x: 20,
+        y: 20,
+        width: 40,
+        height: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(40, 0)],
+      });
+
+      API.setElements([rect, arrow]);
+      API.setAppState({ objectsSnapModeEnabled: true });
+      enterLineEditingMode(arrow);
+
+      const endPoint = LinearElementEditor.getPointGlobalCoordinates(
+        arrow,
+        arrow.points[arrow.points.length - 1],
+        h.app.scene.getNonDeletedElementsMap(),
+      );
+      const pointerNearBindable = pointFrom<GlobalPoint>(96, 118);
+
+      dragMove(endPoint, pointerNearBindable);
+
+      expect(h.state.suggestedBinding?.element.id).toBe(rect.id);
+      expect(h.state.snapLines).toEqual([]);
+
+      dragEnd(pointerNearBindable);
+
+      expect(API.getElement(arrow).endBinding?.elementId).toBe(rect.id);
     });
 
     it("should update the midpoints when element roundness changed", async () => {
