@@ -1884,150 +1884,6 @@ export class LinearElementEditor {
       : app.getEffectiveGridSize();
   }
 
-  private static _getSnappedScenePointForLinearElement({
-    app,
-    event,
-    elementsMap,
-    element,
-    pointIndex,
-    scenePoint,
-    selectedPointsIndices,
-  }: {
-    app: AppClassProperties;
-    event: PointerEvent | React.PointerEvent<HTMLCanvasElement>;
-    elementsMap: ElementsMap;
-    element: NonDeleted<ExcalidrawLinearElement>;
-    pointIndex: number;
-    scenePoint: GlobalPoint;
-    selectedPointsIndices?: readonly number[];
-  }): {
-    point: GlobalPoint;
-    snapLines: SnapLine[];
-  } {
-    const { snapOffset, snapLines } = snapLinearElementPoint(
-      app.scene.getNonDeletedElements(),
-      element,
-      pointIndex,
-      scenePoint,
-      app,
-      event,
-      elementsMap,
-      {
-        includeSelfPoints: true,
-        selectedPointsIndices,
-      },
-    );
-
-    return {
-      point: pointFrom<GlobalPoint>(
-        scenePoint[0] + snapOffset.x,
-        scenePoint[1] + snapOffset.y,
-      ),
-      snapLines,
-    };
-  }
-
-  private static _getShiftLockedPointForLinearElement({
-    app,
-    event,
-    elementsMap,
-    element,
-    pointIndex,
-    scenePointerX,
-    scenePointerY,
-    gridSize,
-    referencePoint,
-    selectedPointsIndices,
-    customLineAngle,
-  }: {
-    app: AppClassProperties;
-    event: PointerEvent | React.PointerEvent<HTMLCanvasElement>;
-    elementsMap: ElementsMap;
-    element: NonDeleted<ExcalidrawLinearElement>;
-    pointIndex: number;
-    scenePointerX: number;
-    scenePointerY: number;
-    gridSize: NullableGridSize;
-    referencePoint: LocalPoint;
-    selectedPointsIndices?: readonly number[];
-    customLineAngle?: number | null;
-  }): {
-    point: LocalPoint;
-    snapLines: SnapLine[];
-  } {
-    const referencePointCoords = LinearElementEditor.getPointGlobalCoordinates(
-      element,
-      referencePoint,
-      elementsMap,
-    );
-    const [gridX, gridY] = getGridPoint(scenePointerX, scenePointerY, gridSize);
-
-    let { width: dxFromReference, height: dyFromReference } =
-      getLockedLinearCursorAlignSize(
-        referencePointCoords[0],
-        referencePointCoords[1],
-        gridX,
-        gridY,
-        customLineAngle ?? undefined,
-      );
-
-    const lockedScenePoint = pointFrom<GlobalPoint>(
-      referencePointCoords[0] + dxFromReference,
-      referencePointCoords[1] + dyFromReference,
-    );
-    let snapLines: SnapLine[] = [];
-
-    if (!isElbowArrow(element)) {
-      const snappedScenePoint =
-        LinearElementEditor._getSnappedScenePointForLinearElement({
-          app,
-          event,
-          elementsMap,
-          element,
-          pointIndex,
-          scenePoint: lockedScenePoint,
-          selectedPointsIndices,
-        });
-
-      snapLines = snappedScenePoint.snapLines;
-
-      if (snapLines.length > 0) {
-        const result = snapToDiscreteAngle(
-          snapLines,
-          line(
-            lockedScenePoint,
-            pointFrom(referencePointCoords[0], referencePointCoords[1]),
-          ),
-          pointFrom(gridX, gridY),
-          referencePointCoords,
-        );
-
-        if (result.snapLines.length > 0) {
-          dxFromReference = result.dxFromReference;
-          dyFromReference = result.dyFromReference;
-          snapLines = result.snapLines;
-        } else {
-          dxFromReference = snappedScenePoint.point[0] - referencePointCoords[0];
-          dyFromReference = snappedScenePoint.point[1] - referencePointCoords[1];
-        }
-      }
-    }
-
-    const [rotatedX, rotatedY] = pointRotateRads(
-      pointFrom(dxFromReference, dyFromReference),
-      pointFrom(0, 0),
-      -element.angle as Radians,
-    );
-
-    return {
-      point: pointFrom(
-        referencePoint[0] + rotatedX,
-        referencePoint[1] + rotatedY,
-      ),
-      snapLines,
-    };
-  }
-
   private static _getSnappedPointForLinearElement({
     app,
     event,
@@ -2063,42 +1919,101 @@ export class LinearElementEditor {
     );
 
     if (referencePoint) {
-      return LinearElementEditor._getShiftLockedPointForLinearElement({
-        app,
-        event,
-        elementsMap,
+      const referencePointCoords = LinearElementEditor.getPointGlobalCoordinates(
         element,
-        pointIndex,
-        scenePointerX,
-        scenePointerY,
-        gridSize,
         referencePoint,
-        selectedPointsIndices,
-        customLineAngle,
-      });
+        elementsMap,
+      );
+      const [gridX, gridY] = getGridPoint(scenePointerX, scenePointerY, gridSize);
+
+      let { width: dxFromReference, height: dyFromReference } =
+        getLockedLinearCursorAlignSize(
+          referencePointCoords[0],
+          referencePointCoords[1],
+          gridX,
+          gridY,
+          customLineAngle ?? undefined,
+        );
+
+      const effectiveGridX = referencePointCoords[0] + dxFromReference;
+      const effectiveGridY = referencePointCoords[1] + dyFromReference;
+
+      let snapLines: SnapLine[] = [];
+
+      if (!isElbowArrow(element)) {
+        const { snapOffset, snapLines: nextSnapLines } = snapLinearElementPoint(
+          app.scene.getNonDeletedElements(),
+          element,
+          pointIndex,
+          pointFrom<GlobalPoint>(effectiveGridX, effectiveGridY),
+          app,
+          event,
+          elementsMap,
+          {
+            includeSelfPoints: true,
+            selectedPointsIndices,
+          },
+        );
+
+        snapLines = nextSnapLines;
+
+        if (nextSnapLines.length > 0) {
+          const result = snapToDiscreteAngle(
+            nextSnapLines,
+            line(
+              pointFrom(effectiveGridX, effectiveGridY),
+              pointFrom(referencePointCoords[0], referencePointCoords[1]),
+            ),
+            pointFrom(gridX, gridY),
+            referencePointCoords,
+          );
+
+          if (result.snapLines.length > 0) {
+            dxFromReference = result.dxFromReference;
+            dyFromReference = result.dyFromReference;
+            snapLines = result.snapLines;
+          } else {
+            dxFromReference = effectiveGridX + snapOffset.x - referencePointCoords[0];
+            dyFromReference = effectiveGridY + snapOffset.y - referencePointCoords[1];
+          }
+        }
+      }
+
+      const [rotatedX, rotatedY] = pointRotateRads(
+        pointFrom(dxFromReference, dyFromReference),
+        pointFrom(0, 0),
+        -element.angle as Radians,
+      );
+
+      return {
+        point: pointFrom(referencePoint[0] + rotatedX, referencePoint[1] + rotatedY),
+        snapLines,
+      };
     }
 
-    const originalPointerPoint = pointFrom<GlobalPoint>(
-      scenePointerX - pointerOffset.x,
-      scenePointerY - pointerOffset.y,
-    );
-    const { point: scenePoint, snapLines } =
-      LinearElementEditor._getSnappedScenePointForLinearElement({
-        app,
-        event,
-        elementsMap,
-        element,
-        pointIndex,
-        scenePoint: originalPointerPoint,
+    const originalPointerX = scenePointerX - pointerOffset.x;
+    const originalPointerY = scenePointerY - pointerOffset.y;
+
+    const { snapOffset, snapLines } = snapLinearElementPoint(
+      app.scene.getNonDeletedElements(),
+      element,
+      pointIndex,
+      pointFrom(originalPointerX, originalPointerY),
+      app,
+      event,
+      elementsMap,
+      {
+        includeSelfPoints: true,
         selectedPointsIndices,
-      });
+      },
+    );
 
     return {
       point: LinearElementEditor.createPointAt(
         element,
         elementsMap,
-        scenePoint[0],
-        scenePoint[1],
+        originalPointerX + snapOffset.x,
+        originalPointerY + snapOffset.y,
         gridSize,
       ),
       snapLines,
