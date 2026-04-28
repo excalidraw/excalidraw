@@ -15,7 +15,6 @@ import {
   vectorSubtract,
   vectorDot,
   vectorNormalize,
-  line,
 } from "@excalidraw/math";
 
 import {
