@@ -206,3 +206,55 @@
   --button-hover-bg: #363541;
   --button-bg: var(--color-surface-high);
 }
+
+.terraform-element-actions {
+  width: min(18rem, calc(100vw - 2rem));
+  color: var(--text-primary-color);
+  font-family: var(--ui-font);
+
+  &__header {
+    display: grid;
+    gap: 0.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--default-border-color);
+  }
+
+  &__eyebrow {
+    color: var(--color-primary);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  &__meta {
+    display: grid;
+    gap: 0.625rem;
+  }
+
+  &__row {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  &__label {
+    color: var(--input-label-color);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  &__value {
+    color: var(--text-primary-color);
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+}
