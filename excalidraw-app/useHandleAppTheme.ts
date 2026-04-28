@@ -9,16 +9,31 @@ import { STORAGE_KEYS } from "./app_constants";
 const getDarkThemeMediaQuery = (): MediaQueryList | undefined =>
   window.matchMedia?.("(prefers-color-scheme: dark)");
 
+const readStoredAppTheme = (): Theme | "system" | null => {
+  try {
+    return localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_THEME) as
+      | Theme
+      | "system"
+      | null;
+  } catch {
+    return null;
+  }
+};
+
+const resolveEditorTheme = (stored: Theme | "system"): Theme => {
+  if (stored === "system") {
+    return getDarkThemeMediaQuery()?.matches ? THEME.DARK : THEME.LIGHT;
+  }
+  return stored;
+};
+
 export const useHandleAppTheme = () => {
   const [appTheme, setAppTheme] = useState<Theme | "system">(() => {
-    return (
-      (localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_THEME) as
-        | Theme
-        | "system"
-        | null) || THEME.LIGHT
-    );
+    return readStoredAppTheme() || "system";
   });
-  const [editorTheme, setEditorTheme] = useState<Theme>(THEME.LIGHT);
+  const [editorTheme, setEditorTheme] = useState<Theme>(() =>
+    resolveEditorTheme(readStoredAppTheme() || "system"),
+  );
 
   useEffect(() => {
     const mediaQuery = getDarkThemeMediaQuery();

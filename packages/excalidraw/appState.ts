@@ -19,13 +19,27 @@ const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
   ? devicePixelRatio
   : 1;
 
+/**
+ * Initial editor theme before any user preference is applied.
+ * Follows `prefers-color-scheme` in the browser; tests and non-browser
+ * environments default to light for stable output.
+ */
+export const getDefaultInitialTheme = (): AppState["theme"] => {
+  if (isTestEnv() || typeof window === "undefined") {
+    return THEME.LIGHT;
+  }
+  return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches
+    ? THEME.DARK
+    : THEME.LIGHT;
+};
+
 export const getDefaultAppState = (): Omit<
   AppState,
   "offsetTop" | "offsetLeft" | "width" | "height"
 > => {
   return {
     showWelcomeScreen: false,
-    theme: THEME.LIGHT,
+    theme: getDefaultInitialTheme(),
     collaborators: new Map(),
     currentItemBackgroundColor: DEFAULT_ELEMENT_PROPS.backgroundColor,
     currentItemEndArrowhead: "arrow",

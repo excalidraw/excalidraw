@@ -345,6 +345,7 @@ import { trackEvent } from "../analytics";
 import { AnimationFrameHandler } from "../animation-frame-handler";
 import {
   getDefaultAppState,
+  getDefaultInitialTheme,
   isEraserActive,
   isHandToolActive,
 } from "../appState";
@@ -2758,7 +2759,9 @@ class App extends React.Component<AppProps, AppState> {
       let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
       let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
       const theme =
-        actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
+        actionResult?.appState?.theme ||
+        this.props.theme ||
+        getDefaultInitialTheme();
       const name = actionResult?.appState?.name ?? this.state.name;
       const errorMessage =
         actionResult?.appState?.errorMessage ?? this.state.errorMessage;
