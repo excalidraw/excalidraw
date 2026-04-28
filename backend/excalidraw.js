@@ -479,6 +479,60 @@ function collectDirectedEdges(nodes) {
   }));
 }
 
+function coalesceRelationshipPairs(directedEdges) {
+  const pairMap = new Map();
+
+  for (const edge of directedEdges) {
+    const pairKey = [edge.source, edge.target].sort().join("|||");
+    const existing = pairMap.get(pairKey);
+
+    if (!existing) {
+      pairMap.set(pairKey, {
+        key: pairKey,
+        nodes: [edge.source, edge.target].sort(),
+        directions: [edge],
+      });
+      continue;
+    }
+
+    existing.directions.push(edge);
+  }
+
+  return [...pairMap.values()].map((pair) => {
+    const uniqueDirections = new Map();
+
+    for (const direction of pair.directions) {
+      uniqueDirections.set(
+        `${direction.source}|||${direction.target}`,
+        direction,
+      );
+    }
+
+    const directions = [...uniqueDirections.values()];
+    const isBidirectional = directions.length > 1;
+    const [defaultSource, defaultTarget] = isBidirectional
+      ? pair.nodes
+      : [directions[0].source, directions[0].target];
+
+    return {
+      source: defaultSource,
+      target: defaultTarget,
+      directed: !isBidirectional,
+      bidirectional: isBidirectional,
+      directions: directions.map((direction) => ({
+        source: direction.source,
+        target: direction.target,
+        kinds: direction.kinds,
+        origins: direction.origins,
+      })),
+      kinds: [...new Set(directions.flatMap((direction) => direction.kinds))],
+      origins: [
+        ...new Set(directions.flatMap((direction) => direction.origins)),
+      ],
+    };
+  });
+}
+
 // --- Force layout ---
 
 async function forceLayout(nodeKeys, directedEdges, tierMap, tierConfigs) {
@@ -554,6 +608,7 @@ async function nodesToExcalidraw(nodes) {
   const elements = [];
   const nodeKeys = Object.keys(nodes);
   const directedEdges = collectDirectedEdges(nodes);
+  const relationships = coalesceRelationshipPairs(directedEdges);
 
   const tierMap = buildTierMap(nodeKeys);
   const tierConfigs = buildTierConfigs(tierMap, nodeKeys.length);
@@ -659,8 +714,16 @@ async function nodesToExcalidraw(nodes) {
 
   // --- bidirectional arrows ---
   let arrowIdx = 0;
-  for (const relationship of directedEdges) {
-    const { source, target, kinds, origins } = relationship;
+  for (const relationship of relationships) {
+    const {
+      source,
+      target,
+      directed,
+      bidirectional,
+      directions,
+      kinds,
+      origins,
+    } = relationship;
     const posA = posMap[source];
     const posB = posMap[target];
     const arrowId = `arrow-${arrowIdx++}`;
@@ -706,7 +769,7 @@ async function nodesToExcalidraw(nodes) {
           fixedPoint: endFixed,
           mode: "orbit",
         },
-        startArrowhead: null,
+        startArrowhead: bidirectional ? "arrow" : null,
         endArrowhead: "arrow",
         roundness: { type: 2 },
         customData: {
@@ -714,9 +777,11 @@ async function nodesToExcalidraw(nodes) {
           relationship: {
             source,
             target,
+            directions,
             kinds,
             origins,
-            directed: true,
+            directed,
+            bidirectional,
           },
         },
       }),

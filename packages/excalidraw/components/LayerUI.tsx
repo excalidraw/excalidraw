@@ -185,31 +185,63 @@ const getTerraformElementForSelection = (
   appState: UIAppState,
 ) => {
   const selectedIds = Object.keys(appState.selectedElementIds);
-  if (selectedIds.length !== 1) {
+  if (selectedIds.length === 0) {
     return null;
   }
 
-  const selectedElement = elements.find(
-    (element) => element.id === selectedIds[0],
+  const selectedElements = elements.filter(
+    (element) => appState.selectedElementIds[element.id],
   );
-  if (!selectedElement?.customData?.terraform) {
-    return null;
+
+  const selectedTerraformNode = selectedElements.find(
+    (element) =>
+      element.customData?.terraform && Boolean(element.customData?.nodePath),
+  );
+  if (selectedTerraformNode) {
+    return selectedTerraformNode;
   }
 
-  if (selectedElement.customData.nodePath) {
-    return selectedElement;
-  }
-
-  if ("containerId" in selectedElement && selectedElement.containerId) {
+  const selectedTerraformContainer = selectedElements.find(
+    (element) =>
+      "containerId" in element &&
+      Boolean(element.containerId) &&
+      elements.some(
+        (candidate) =>
+          candidate.id === element.containerId && candidate.customData?.terraform,
+      ),
+  );
+  if (
+    selectedTerraformContainer &&
+    "containerId" in selectedTerraformContainer &&
+    selectedTerraformContainer.containerId
+  ) {
     const container = elements.find(
-      (element) => element.id === selectedElement.containerId,
+      (element) => element.id === selectedTerraformContainer.containerId,
     );
     if (container?.customData?.terraform) {
       return container;
     }
   }
 
-  return selectedElement;
+  const selectedGroupIds = new Set<string>([
+    ...Object.keys(appState.selectedGroupIds),
+    ...selectedElements.flatMap((element) => element.groupIds || []),
+  ]);
+
+  if (selectedGroupIds.size === 0) {
+    return null;
+  }
+
+  const groupedTerraformElements = elements.filter(
+    (element) =>
+      element.customData?.terraform &&
+      Boolean(element.customData?.nodePath) &&
+      (element.groupIds || []).some((groupId) => selectedGroupIds.has(groupId)),
+  );
+
+  return groupedTerraformElements.length === 1
+    ? groupedTerraformElements[0]
+    : null;
 };
 
 const TerraformElementActions = ({
