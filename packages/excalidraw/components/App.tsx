@@ -5018,6 +5018,42 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      // Ctrl/Cmd+S opens the stroke color picker in modifier-key mode so that
+      // styles are applied to the current selection without updating the tool
+      // default.  We intercept here — before the action manager — because
+      // Ctrl+S would otherwise trigger the save action.
+      //
+      // Ctrl/Cmd+G similarly opens the background color picker, but only when
+      // a single element is selected (two or more elements would be grouped by
+      // the normal Ctrl+G shortcut, so we leave that behaviour intact).
+      if (
+        (event.key === KEYS.S || event.key === KEYS.G) &&
+        event[KEYS.CTRL_OR_CMD] &&
+        !event.shiftKey &&
+        !event.altKey
+      ) {
+        const selectedElements = this.scene.getSelectedElements(this.state);
+        if (selectedElements.length > 0) {
+          if (event.key === KEYS.S) {
+            this.setState({ openPopup: "elementStroke" });
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+          if (
+            event.key === KEYS.G &&
+            selectedElements.length < 2 &&
+            (hasBackground(this.state.activeTool.type) ||
+              selectedElements.some((element) => hasBackground(element.type)))
+          ) {
+            this.setState({ openPopup: "elementBackground" });
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+        }
+      }
+
       if (this.actionManager.handleKeyDown(event)) {
         return;
       }

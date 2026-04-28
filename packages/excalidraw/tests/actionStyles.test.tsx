@@ -1,6 +1,6 @@
 import React from "react";
 
-import { CODES } from "@excalidraw/common";
+import { CODES, COLOR_PALETTE } from "@excalidraw/common";
 
 import { copiedStyles } from "../actions/actionStyles";
 import { Excalidraw } from "../index";
@@ -17,6 +17,15 @@ import {
 const { h } = window;
 
 const mouse = new Pointer("mouse");
+
+// Minimal ResizeObserver stub required by Radix UI popovers in jsdom.
+const stubResizeObserver = () => {
+  (global as any).ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+};
 
 describe("actionStyles", () => {
   beforeEach(async () => {
@@ -82,5 +91,72 @@ describe("actionStyles", () => {
     expect(firstRect.strokeStyle).toBe("dotted");
     expect(firstRect.roughness).toBe(2); // Cartoonist: 2
     expect(firstRect.opacity).toBe(60);
+  });
+
+  describe("modifier-key style selection (Ctrl/Cmd held)", () => {
+    it("Ctrl+S opens stroke color picker and color click applies to selection only", async () => {
+      stubResizeObserver();
+
+      UI.clickTool("rectangle");
+      mouse.down(10, 10);
+      mouse.up(20, 20);
+      API.setSelectedElements([h.elements[0]]);
+
+      const defaultStroke = h.state.currentItemStrokeColor;
+
+      // Pressing "Control" sets isModifierKeyHeld; pressing "s" with Ctrl
+      // should open the stroke picker instead of triggering the save action.
+      await act(async () => {
+        fireEvent.keyDown(document, { key: "Control", ctrlKey: true });
+        fireEvent.keyDown(document, { key: "s", ctrlKey: true });
+      });
+
+      expect(h.state.openPopup).toBe("elementStroke");
+
+      // Pick a colour — must update the element but NOT the tool default.
+      UI.clickOnTestId("color-red");
+
+      expect(h.elements[0].strokeColor).toBe(
+        COLOR_PALETTE.red[4], // "#e03131"
+      );
+      expect(h.state.currentItemStrokeColor).toBe(defaultStroke);
+
+      fireEvent.keyUp(document, { key: "Control" });
+    });
+
+    it("keyboard hotkey inside open picker with Ctrl held applies to selection only", async () => {
+      stubResizeObserver();
+
+      UI.clickTool("rectangle");
+      mouse.down(10, 10);
+      mouse.up(20, 20);
+      API.setSelectedElements([h.elements[0]]);
+
+      const defaultStroke = h.state.currentItemStrokeColor;
+
+      // Open the picker normally (no modifier).
+      await act(async () => {
+        fireEvent.keyDown(document, { key: "s" });
+      });
+
+      expect(h.state.openPopup).toBe("elementStroke");
+
+      // Now hold Ctrl and press a colour hotkey inside the picker.
+      // "e" is the 3rd hotkey → maps to "gray" in the stroke palette.
+      const pickerContent = document.querySelector(".color-picker-content");
+      expect(pickerContent).not.toBeNull();
+
+      await act(async () => {
+        fireEvent.keyDown(document, { key: "Control", ctrlKey: true });
+        fireEvent.keyDown(pickerContent!, { key: "e", ctrlKey: true });
+      });
+
+      // Element colour should have changed to gray…
+      expect(h.elements[0].strokeColor).toBe(COLOR_PALETTE.gray[4]);
+      // …but the tool default must remain unchanged.
+      expect(h.state.currentItemStrokeColor).toBe(defaultStroke);
+
+      fireEvent.keyUp(document, { key: "Control" });
+    });
   });
 });

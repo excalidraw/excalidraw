@@ -1,4 +1,4 @@
-import { COLORS_PER_ROW, COLOR_PALETTE, KEYS } from "@excalidraw/common";
+import { COLORS_PER_ROW, COLOR_PALETTE, KEYS, isWritableElement } from "@excalidraw/common";
 
 import type {
   ColorPickerColor,
@@ -138,7 +138,24 @@ export const colorPickerKeyNavHandler = ({
   onEscape,
 }: ColorPickerKeyNavHandlerProps): boolean => {
   if (event[KEYS.CTRL_OR_CMD]) {
-    return false;
+    // When the modifier key is held the user may be in "selection-only" style
+    // mode.  Allow palette hotkeys (q/w/e/… rows) to fire so that keyboard
+    // colour selection still reaches the onChange → updateData → isModifierKeyHeld
+    // check in ActionManager.  Guard against the hex-input field so that
+    // normal Ctrl+Z/C/V text-editing shortcuts still work there.
+    if (isWritableElement(event.target as Element)) {
+      return false;
+    }
+    const colorObj = getColorNameAndShadeFromColor({ color, palette });
+    return hotkeyHandler({
+      e: event,
+      colorObj,
+      onChange,
+      palette,
+      customColors,
+      setActiveColorPickerSection,
+      activeShade,
+    });
   }
 
   if (event.key === KEYS.ESCAPE) {
