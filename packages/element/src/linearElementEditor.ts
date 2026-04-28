@@ -1944,7 +1944,6 @@ export class LinearElementEditor {
         const { snapOffset, snapLines: nextSnapLines } = snapLinearElementPoint(
           app.scene.getNonDeletedElements(),
           element,
-          pointIndex,
           pointFrom<GlobalPoint>(effectiveGridX, effectiveGridY),
           app,
           event,
@@ -1997,7 +1996,6 @@ export class LinearElementEditor {
     const { snapOffset, snapLines } = snapLinearElementPoint(
       app.scene.getNonDeletedElements(),
       element,
-      pointIndex,
       pointFrom(originalPointerX, originalPointerY),
       app,
       event,

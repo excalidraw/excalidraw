@@ -10462,8 +10462,7 @@ class App extends React.Component<AppProps, AppState> {
       this.lassoTrail.endPath();
       this.previousPointerMoveCoords = null;
 
-      SnapCache.setReferenceSnapPoints(null);
-      SnapCache.setVisibleGaps(null);
+      SnapCache.destroy();
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
