@@ -209,8 +209,11 @@
 
 .terraform-element-actions {
   width: min(18rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 190px);
+  overflow-y: auto;
   color: var(--text-primary-color);
   font-family: var(--ui-font);
+  padding-right: 0.125rem;
 
   &__header {
     display: grid;
@@ -232,6 +235,23 @@
     font-weight: 700;
     line-height: 1.25;
     overflow-wrap: anywhere;
+  }
+
+  &__summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+
+    span {
+      width: fit-content;
+      border: 1px solid var(--default-border-color);
+      border-radius: var(--border-radius-lg);
+      padding: 0.1875rem 0.4375rem;
+      color: var(--input-label-color);
+      background: var(--color-surface-low);
+      font-size: 0.6875rem;
+      font-weight: 700;
+    }
   }
 
   &__meta {
@@ -256,5 +276,106 @@
     font-size: 0.8125rem;
     line-height: 1.35;
     overflow-wrap: anywhere;
+  }
+
+  &__config {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  &__resource {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  &__resource-title {
+    color: var(--input-label-color);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  &__attribute {
+    display: grid;
+    gap: 0.375rem;
+    border: 1px solid var(--default-border-color);
+    border-radius: var(--border-radius-lg);
+    padding: 0.5rem;
+    background: var(--color-surface-low);
+  }
+
+  &__attribute--changed {
+    border-color: var(--color-warning-darker);
+    background: var(--color-warning);
+  }
+
+  &__attribute-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+
+    strong {
+      flex: 0 0 auto;
+      border-radius: var(--border-radius-lg);
+      padding: 0.125rem 0.375rem;
+      background: var(--color-warning-dark);
+      color: var(--color-gray-100);
+      font-size: 0.625rem;
+      text-transform: uppercase;
+    }
+  }
+
+  &__diff {
+    display: grid;
+    gap: 0.375rem;
+
+    > div {
+      display: grid;
+      gap: 0.1875rem;
+    }
+
+    span {
+      color: var(--input-label-color);
+      font-size: 0.625rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+  }
+
+  &__value--config,
+  &__diff {
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+
+  pre {
+    max-height: 9rem;
+    margin: 0;
+    overflow: auto;
+    border-radius: var(--border-radius-lg);
+    padding: 0.4375rem;
+    background: var(--island-bg-color);
+    color: var(--text-primary-color);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      "Liberation Mono", monospace;
+    font-size: 0.6875rem;
+    line-height: 1.35;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  &__empty {
+    border: 1px dashed var(--default-border-color);
+    border-radius: var(--border-radius-lg);
+    padding: 0.625rem;
+    color: var(--input-label-color);
+    font-size: 0.75rem;
+    line-height: 1.35;
   }
 }
