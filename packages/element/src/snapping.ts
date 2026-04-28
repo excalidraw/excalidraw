@@ -130,9 +130,9 @@ export type SnapLine = PointSnapLine | GapSnapLine | PointerSnapLine;
 export class SnapCache {
   private static referenceSnapPoints: GlobalPoint[] | null = null;
 
-  private static linearElementPointReferenceSnapPoints: {
+  private static linearElementAxisSnapTargets: {
     editingElementId: ExcalidrawElement["id"];
-    snapPoints: GlobalPoint[];
+    snapTargets: GlobalPoint[];
   } | null = null;
 
   private static visibleGaps: {
@@ -148,24 +148,24 @@ export class SnapCache {
     return SnapCache.referenceSnapPoints;
   };
 
-  public static setLinearElementPointReferenceSnapPoints = (
+  public static setLinearElementAxisSnapTargets = (
     editingElementId: ExcalidrawElement["id"],
-    snapPoints: GlobalPoint[] | null,
+    snapTargets: GlobalPoint[] | null,
   ) => {
-    SnapCache.linearElementPointReferenceSnapPoints = snapPoints
+    SnapCache.linearElementAxisSnapTargets = snapTargets
       ? {
           editingElementId,
-          snapPoints,
+          snapTargets,
         }
       : null;
   };
 
-  public static getLinearElementPointReferenceSnapPoints = (
+  public static getLinearElementAxisSnapTargets = (
     editingElementId: ExcalidrawElement["id"],
   ) => {
-    return SnapCache.linearElementPointReferenceSnapPoints?.editingElementId ===
+    return SnapCache.linearElementAxisSnapTargets?.editingElementId ===
       editingElementId
-      ? SnapCache.linearElementPointReferenceSnapPoints.snapPoints
+      ? SnapCache.linearElementAxisSnapTargets.snapTargets
       : null;
   };
 
@@ -184,7 +184,7 @@ export class SnapCache {
 
   public static destroy = () => {
     SnapCache.referenceSnapPoints = null;
-    SnapCache.linearElementPointReferenceSnapPoints = null;
+    SnapCache.linearElementAxisSnapTargets = null;
     SnapCache.visibleGaps = null;
   };
 }
@@ -681,30 +681,31 @@ export const getReferenceSnapPoints = (
     .flatMap((elementGroup) => getElementsCorners(elementGroup, elementsMap));
 };
 
-const getExternalReferenceSnapPointsForLinearElementPoint = (
+const getExternalAxisSnapTargets = (
   elements: readonly NonDeletedExcalidrawElement[],
   editingElement: ExcalidrawLinearElement,
   appState: AppState,
   elementsMap: ElementsMap,
 ) => {
-  const cachedReferenceSnapPoints =
-    SnapCache.getLinearElementPointReferenceSnapPoints(editingElement.id);
+  const cachedAxisSnapTargets = SnapCache.getLinearElementAxisSnapTargets(
+    editingElement.id,
+  );
 
-  const externalReferenceSnapPoints =
-    cachedReferenceSnapPoints ??
+  const externalAxisSnapTargets =
+    cachedAxisSnapTargets ??
     getReferenceSnapPoints(elements, [editingElement], appState, elementsMap);
 
-  if (!cachedReferenceSnapPoints) {
-    SnapCache.setLinearElementPointReferenceSnapPoints(
+  if (!cachedAxisSnapTargets) {
+    SnapCache.setLinearElementAxisSnapTargets(
       editingElement.id,
-      externalReferenceSnapPoints,
+      externalAxisSnapTargets,
     );
   }
 
-  return externalReferenceSnapPoints;
+  return externalAxisSnapTargets;
 };
 
-const getSelfReferenceSnapPointsForLinearElementPoint = (
+const getOwnAxisSnapTargets = (
   editingElement: ExcalidrawLinearElement,
   elementsMap: ElementsMap,
   selectedPointsIndices?: readonly number[],
@@ -718,7 +719,7 @@ const getSelfReferenceSnapPointsForLinearElementPoint = (
   );
 };
 
-export const getReferenceSnapPointsForLinearElementPoint = (
+export const getAxisSnapTargets = (
   elements: readonly NonDeletedExcalidrawElement[],
   editingElement: ExcalidrawLinearElement,
   appState: AppState,
@@ -728,20 +729,19 @@ export const getReferenceSnapPointsForLinearElementPoint = (
     selectedPointsIndices?: readonly number[];
   } = {},
 ) => {
-  const externalReferenceSnapPoints =
-    getExternalReferenceSnapPointsForLinearElementPoint(
-      elements,
-      editingElement,
-      appState,
-      elementsMap,
-    );
+  const externalAxisSnapTargets = getExternalAxisSnapTargets(
+    elements,
+    editingElement,
+    appState,
+    elementsMap,
+  );
 
   if (!options.includeSelfPoints) {
-    return externalReferenceSnapPoints;
+    return externalAxisSnapTargets;
   }
 
-  return externalReferenceSnapPoints.concat(
-    getSelfReferenceSnapPointsForLinearElementPoint(
+  return externalAxisSnapTargets.concat(
+    getOwnAxisSnapTargets(
       editingElement,
       elementsMap,
       options.selectedPointsIndices,
@@ -749,16 +749,16 @@ export const getReferenceSnapPointsForLinearElementPoint = (
   );
 };
 
-const addNearestPointSnaps = (
-  referenceSnapPoints: readonly GlobalPoint[],
+const collectNearestAxisSnapCandidates = (
+  axisSnapTargets: readonly GlobalPoint[],
   pointerPosition: GlobalPoint,
   nearestSnapsX: Snaps,
   nearestSnapsY: Snaps,
   minOffset: Vector2D,
 ) => {
-  for (const referencePoint of referenceSnapPoints) {
-    const offsetX = referencePoint[0] - pointerPosition[0];
-    const offsetY = referencePoint[1] - pointerPosition[1];
+  for (const snapTarget of axisSnapTargets) {
+    const offsetX = snapTarget[0] - pointerPosition[0];
+    const offsetY = snapTarget[1] - pointerPosition[1];
     const absOffsetX = Math.abs(offsetX);
     const absOffsetY = Math.abs(offsetY);
 
@@ -773,7 +773,7 @@ const addNearestPointSnaps = (
 
       nearestSnapsX.push({
         type: "point",
-        points: [pointerPosition, referencePoint],
+        points: [pointerPosition, snapTarget],
         offset: offsetX,
       });
 
@@ -787,7 +787,7 @@ const addNearestPointSnaps = (
 
       nearestSnapsY.push({
         type: "point",
-        points: [pointerPosition, referencePoint],
+        points: [pointerPosition, snapTarget],
         offset: offsetY,
       });
 
@@ -827,8 +827,8 @@ export const snapLinearElementPoint = (
   const nearestSnapsX: Snaps = [];
   const nearestSnapsY: Snaps = [];
 
-  addNearestPointSnaps(
-    getExternalReferenceSnapPointsForLinearElementPoint(
+  collectNearestAxisSnapCandidates(
+    getExternalAxisSnapTargets(
       elements,
       editingElement,
       app.state,
@@ -841,8 +841,8 @@ export const snapLinearElementPoint = (
   );
 
   if (options.includeSelfPoints) {
-    addNearestPointSnaps(
-      getSelfReferenceSnapPointsForLinearElementPoint(
+    collectNearestAxisSnapCandidates(
+      getOwnAxisSnapTargets(
         editingElement,
         elementsMap,
         options.selectedPointsIndices,
@@ -870,9 +870,7 @@ export const snapLinearElementPoint = (
 
     const snappedSnapsX = nearestSnapsX
       .filter(
-        (
-          snap,
-        ): snap is PointSnap =>
+        (snap): snap is PointSnap =>
           snap.type === "point" && isCloseTo(snap.offset, snapOffset.x, 0.01),
       )
       .map((snap) => ({
@@ -883,9 +881,7 @@ export const snapLinearElementPoint = (
 
     const snappedSnapsY = nearestSnapsY
       .filter(
-        (
-          snap,
-        ): snap is PointSnap =>
+        (snap): snap is PointSnap =>
           snap.type === "point" && isCloseTo(snap.offset, snapOffset.y, 0.01),
       )
       .map((snap) => ({
