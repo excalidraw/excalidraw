@@ -2,6 +2,7 @@
 import { arrayToMap } from "@excalidraw/common";
 
 import {
+  InvalidFractionalIndexError,
   syncInvalidIndices,
   syncMovedIndices,
   validateFractionalIndices,
@@ -11,16 +12,13 @@ import { deepCopyElement } from "@excalidraw/element";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
+import { generateKeyBetween } from "@excalidraw/fractional-indexing";
+
 import type {
   ElementsMap,
   ExcalidrawElement,
   FractionalIndex,
 } from "@excalidraw/element/types";
-
-import {
-  generateKeyBetween,
-  InvalidFractionalIndexError,
-} from "../src/fractionalIndex";
 
 describe("sync invalid indices with array order", () => {
   describe("should NOT sync empty array", () => {
