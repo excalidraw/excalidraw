@@ -6763,7 +6763,7 @@ class App extends React.Component<AppProps, AppState> {
         isFrameLikeElement(hitElement) &&
         // case: we're hitting a locked frame itself (frame's outline
         // or later its bg once implemented)
-        (!hitElement.locked || !isFrameLikeElement(hitElement))
+        !hitElement.locked
       ) {
         return topLayerFrame;
       }
