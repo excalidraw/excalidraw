@@ -329,10 +329,11 @@ export const getElementsWithinSelection = (
   }
 
   if (framesInSelection) {
-    excludeElementsFromFrames(
-      Array.from(elementsInSelection),
-      framesInSelection,
-    );
+    elementsInSelection.forEach((element) => {
+      if (element.frameId && framesInSelection.has(element.frameId)) {
+        elementsInSelection.delete(element);
+      }
+    });
   }
 
   elementsInSelection.forEach((element) => {
