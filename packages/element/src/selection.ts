@@ -53,34 +53,17 @@ const shouldIgnoreElementFromSelection = (
   element: NonDeletedExcalidrawElement,
 ) => element.locked || isBoundToContainer(element);
 
-function excludeElementsFromFrames<T extends ExcalidrawElement>(
+const excludeElementsFromFrames = <T extends ExcalidrawElement>(
   selectedElements: readonly T[],
   framesInSelection: Set<ExcalidrawFrameLikeElement["id"]>,
-): T[];
-function excludeElementsFromFrames<T extends ExcalidrawElement>(
-  selectedElements: Set<T>,
-  framesInSelection: Set<ExcalidrawFrameLikeElement["id"]>,
-): Set<T>;
-function excludeElementsFromFrames<T extends ExcalidrawElement>(
-  selectedElements: readonly T[] | Set<T>,
-  framesInSelection: Set<ExcalidrawFrameLikeElement["id"]>,
-) {
-  if (selectedElements instanceof Set) {
-    selectedElements.forEach((element) => {
-      if (element.frameId && framesInSelection.has(element.frameId)) {
-        selectedElements.delete(element);
-      }
-    });
-    return selectedElements;
-  }
-
+) => {
   return selectedElements.filter((element) => {
     if (element.frameId && framesInSelection.has(element.frameId)) {
       return false;
     }
     return true;
   });
-}
+};
 
 /**
  * Frames and their containing elements are not to be selected at the same time.
