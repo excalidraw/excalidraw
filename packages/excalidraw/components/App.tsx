@@ -6179,7 +6179,6 @@ class App extends React.Component<AppProps, AppState> {
     container,
     autoEdit = true,
     initialCaretSceneCoords,
-    pointerDownState,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -6190,7 +6189,6 @@ class App extends React.Component<AppProps, AppState> {
     container?: ExcalidrawTextContainer | null;
     autoEdit?: boolean;
     initialCaretSceneCoords?: { x: number; y: number };
-    pointerDownState?: PointerDownState;
   }) => {
     let shouldBindToContainer = false;
 
@@ -6336,10 +6334,11 @@ class App extends React.Component<AppProps, AppState> {
       if (container && shouldBindToContainer) {
         const containerIndex = this.scene.getElementIndex(container.id);
         this.scene.insertElementAtIndex(element, containerIndex + 1);
-      } else if (pointerDownState) {
-        this.insertCreatedElement(element, pointerDownState);
       } else {
-        this.scene.insertElement(element);
+        this.insertCreatedElement(element, {
+          x: sceneX,
+          y: sceneY,
+        });
       }
     }
 
@@ -6819,7 +6818,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private getNewFrameChildInsertionIndex = (
     element: ExcalidrawElement,
-    pointerDownState: PointerDownState | null,
+    sceneCoords: { x: number; y: number } | null,
   ): number | null => {
     if (!element.frameId) {
       return null;
@@ -6831,14 +6830,10 @@ class App extends React.Component<AppProps, AppState> {
       return null;
     }
 
-    const hitElementUnderCursor = pointerDownState
-      ? this.getElementsAtPosition(
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-          {
+    const hitElementUnderCursor = sceneCoords
+      ? this.getElementsAtPosition(sceneCoords.x, sceneCoords.y, {
             includeLockedElements: true,
-          },
-        ).findLast((element) => !isFrameLikeElement(element))
+        }).findLast((element) => !isFrameLikeElement(element))
       : null;
 
     if (!hitElementUnderCursor) {
@@ -6856,11 +6851,11 @@ class App extends React.Component<AppProps, AppState> {
 
   private insertCreatedElement = (
     element: ExcalidrawElement,
-    pointerDownState: PointerDownState | null,
+    sceneCoords: { x: number; y: number } | null,
   ) => {
     const insertionIndex = this.getNewFrameChildInsertionIndex(
       element,
-      pointerDownState,
+      sceneCoords,
     );
 
     if (insertionIndex !== null) {
@@ -8973,7 +8968,6 @@ class App extends React.Component<AppProps, AppState> {
       container,
       autoEdit: false,
       initialCaretSceneCoords: { x: sceneX, y: sceneY },
-      pointerDownState,
     });
 
     resetCursor(this.interactiveCanvas);
@@ -9024,7 +9018,7 @@ class App extends React.Component<AppProps, AppState> {
       pressures: simulatePressure ? [] : [event.pressure],
     });
 
-    this.insertCreatedElement(element, pointerDownState);
+    this.insertCreatedElement(element, pointerDownState.origin);
 
     this.setState((prevState) => {
       const nextSelectedElementIds = {
@@ -9379,7 +9373,7 @@ class App extends React.Component<AppProps, AppState> {
         points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(0, 0)],
       });
 
-      this.insertCreatedElement(element, pointerDownState);
+      this.insertCreatedElement(element, pointerDownState.origin);
 
       if (isBindingElement(element)) {
         // Do the initial binding so the binding strategy has the initial state
@@ -9537,7 +9531,7 @@ class App extends React.Component<AppProps, AppState> {
         selectionElement: element,
       });
     } else {
-      this.insertCreatedElement(element, pointerDownState);
+      this.insertCreatedElement(element, pointerDownState.origin);
       this.setState({
         multiElement: null,
         newElement: element,
