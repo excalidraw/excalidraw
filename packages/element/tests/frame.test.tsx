@@ -6,6 +6,7 @@ import { arrayToMap } from "@excalidraw/common";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
+import { getTextEditor } from "@excalidraw/excalidraw/tests/queries/dom";
 import {
   getCloneByOrigId,
   render,
@@ -231,6 +232,35 @@ describe("adding elements to frames", () => {
     mouse.moveTo(200, 200);
 
     expect(h.state.frameToHighlight).toBe(null);
+  });
+
+  it("should not add grid-snapped text outside the frame to the clicked frame", async () => {
+    const offsetFrame = API.createElement({
+      id: "offsetFrame",
+      type: "frame",
+      x: 10,
+      y: 0,
+      width: 150,
+      height: 150,
+    });
+
+    API.setElements([offsetFrame]);
+    API.setAppState({
+      gridModeEnabled: true,
+    });
+
+    UI.clickTool("text");
+    mouse.clickAt(12, 0);
+
+    await getTextEditor();
+
+    const createdText = h.elements.find(
+      (element) => element.id !== offsetFrame.id,
+    );
+
+    expect(createdText?.x).toBe(0);
+    expect(createdText?.y).toBe(0);
+    expect(createdText?.frameId).toBe(null);
   });
 
   it("should add a newly created element to a frame behind another frame", () => {

@@ -2695,7 +2695,7 @@ class App extends React.Component<AppProps, AppState> {
           locked: false,
         });
 
-        this.scene.insertElement(frame);
+        this.insertNewElement(frame);
 
         for (const child of selectedElements) {
           this.scene.mutateElement(child, { frameId: frame.id });
@@ -4208,7 +4208,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    this.scene.insertElements(textElements);
+    this.insertNewElements(textElements);
     this.store.scheduleCapture();
     this.setState({
       selectedElementIds: makeNextSelectedElementIds(
@@ -5464,7 +5464,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!event[KEYS.CTRL_OR_CMD]) {
       if (this.flowChartCreator.isCreatingChart) {
         if (this.flowChartCreator.pendingNodes?.length) {
-          this.scene.insertElements(this.flowChartCreator.pendingNodes);
+          this.insertNewElements(this.flowChartCreator.pendingNodes);
         }
 
         const firstNode = this.flowChartCreator.pendingNodes?.[0];
@@ -6255,20 +6255,6 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
-      x: sceneX,
-      y: sceneY,
-    });
-
-    // container has higher priority. Only add to frame if container is in the same frame.
-    const frameId =
-      topLayerFrame &&
-      (!shouldBindToContainer ||
-        !container ||
-        container.frameId === topLayerFrame.id)
-        ? topLayerFrame.id
-        : null;
-
     const textCreationGridPoint = this.getTextCreationGridPoint(sceneX, sceneY);
 
     const newTextElementPosition = parentCenterPosition
@@ -6289,6 +6275,20 @@ class App extends React.Component<AppProps, AppState> {
           x: sceneX,
           y: sceneY,
         };
+
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+      x: newTextElementPosition.x,
+      y: newTextElementPosition.y,
+    });
+
+    // container has higher priority. Only add to frame if container is in the same frame.
+    const frameId =
+      topLayerFrame &&
+      (!shouldBindToContainer ||
+        !container ||
+        container.frameId === topLayerFrame.id)
+        ? topLayerFrame.id
+        : null;
 
     const element =
       existingTextElement ||
@@ -6335,12 +6335,12 @@ class App extends React.Component<AppProps, AppState> {
     if (!existingTextElement) {
       if (container && shouldBindToContainer) {
         const containerIndex = this.scene.getElementIndex(container.id);
-        this.scene.insertElementAtIndex(element, containerIndex + 1);
+        // TODO should use insertNewElement, after we update it to handle
+        // elements with containerId + frameId at the same time (containerId
+        // should take precedence when it comes to z-index)
+        this.scene.insertElementsAtIndex([element], containerIndex + 1);
       } else {
-        this.insertCreatedElement(element, {
-          x: sceneX,
-          y: sceneY,
-        });
+        this.insertNewElement(element);
       }
     }
 
@@ -6727,6 +6727,10 @@ class App extends React.Component<AppProps, AppState> {
    * inside frames)
    */
   private getTopLayerFrameAtSceneCoords = (
+    /**
+     * should be already grid aligned (basically should be what the call site
+     * sets the element's coords to, if applicable)
+     */
     sceneCoords: {
       x: number;
       y: number;
@@ -6820,7 +6824,6 @@ class App extends React.Component<AppProps, AppState> {
 
   private getNewFrameChildInsertionIndex = (
     element: ExcalidrawElement,
-    sceneCoords: { x: number; y: number } | null,
   ): number | null => {
     if (!element.frameId) {
       return null;
@@ -6832,11 +6835,13 @@ class App extends React.Component<AppProps, AppState> {
       return null;
     }
 
-    const hitElementUnderCursor = sceneCoords
-      ? this.getElementsAtPosition(sceneCoords.x, sceneCoords.y, {
-          includeLockedElements: true,
-        }).findLast((element) => !isFrameLikeElement(element))
-      : null;
+    const hitElementUnderCursor = this.getElementsAtPosition(
+      element.x,
+      element.y,
+      {
+        includeLockedElements: true,
+      },
+    ).findLast((element) => !isFrameLikeElement(element));
 
     if (!hitElementUnderCursor) {
       return frameIndex;
@@ -6884,20 +6889,35 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
-  private insertCreatedElement = (
-    element: ExcalidrawElement,
-    sceneCoords: { x: number; y: number } | null,
-  ) => {
-    const insertionIndex = this.getNewFrameChildInsertionIndex(
-      element,
-      sceneCoords,
-    );
-
-    if (insertionIndex !== null) {
-      this.scene.insertElementAtIndex(element, insertionIndex);
-    } else {
-      this.scene.insertElement(element);
+  private insertNewElements = (elements: readonly ExcalidrawElement[]) => {
+    if (!elements.length) {
+      return;
     }
+
+    const chunkedElements: ExcalidrawElement[][] = [];
+
+    for (const element of elements) {
+      const currentChunk = chunkedElements[chunkedElements.length - 1];
+
+      if (currentChunk?.[0].frameId === element.frameId) {
+        currentChunk.push(element);
+      } else {
+        chunkedElements.push([element]);
+      }
+    }
+
+    for (const chunk of chunkedElements) {
+      const frameId = chunk[0].frameId;
+
+      const insertionIndex = frameId
+        ? this.getNewFrameChildInsertionIndex(chunk[0])
+        : null;
+      this.scene.insertElementsAtIndex(chunk, insertionIndex);
+    }
+  };
+
+  private insertNewElement = (element: ExcalidrawElement) => {
+    this.insertNewElements([element]);
 
     const frame = element.frameId
       ? this.scene.getNonDeletedElement(element.frameId)
@@ -9069,7 +9089,7 @@ class App extends React.Component<AppProps, AppState> {
       pressures: simulatePressure ? [] : [event.pressure],
     });
 
-    this.insertCreatedElement(element, pointerDownState.origin);
+    this.insertNewElement(element);
 
     this.setState((prevState) => {
       const nextSelectedElementIds = {
@@ -9126,7 +9146,7 @@ class App extends React.Component<AppProps, AppState> {
       height,
     });
 
-    this.scene.insertElement(element);
+    this.insertNewElement(element);
 
     return element;
   };
@@ -9180,7 +9200,7 @@ class App extends React.Component<AppProps, AppState> {
       link,
     });
 
-    this.scene.insertElement(element);
+    this.insertNewElement(element);
 
     return element;
   };
@@ -9424,7 +9444,7 @@ class App extends React.Component<AppProps, AppState> {
         points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(0, 0)],
       });
 
-      this.insertCreatedElement(element, pointerDownState.origin);
+      this.insertNewElement(element);
 
       if (isBindingElement(element)) {
         // Do the initial binding so the binding strategy has the initial state
@@ -9582,7 +9602,7 @@ class App extends React.Component<AppProps, AppState> {
         selectionElement: element,
       });
     } else {
-      this.insertCreatedElement(element, pointerDownState.origin);
+      this.insertNewElement(element);
       this.setState({
         multiElement: null,
         newElement: element,
@@ -9615,7 +9635,7 @@ class App extends React.Component<AppProps, AppState> {
         ? newMagicFrameElement(constructorOpts)
         : newFrameElement(constructorOpts);
 
-    this.scene.insertElement(frame);
+    this.insertNewElement(frame);
 
     this.setState({
       multiElement: null,
@@ -12030,7 +12050,7 @@ class App extends React.Component<AppProps, AppState> {
       sceneY,
       gridPadding,
     );
-    placeholders.forEach((el) => this.scene.insertElement(el));
+    this.insertNewElements(placeholders);
 
     // Create, position, insert and select initialized (replacing placeholders)
     const initialized = await Promise.all(
