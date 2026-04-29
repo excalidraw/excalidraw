@@ -5,7 +5,7 @@ import {
 import { arrayToMap } from "@excalidraw/common";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
+import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
   getCloneByOrigId,
   render,
@@ -149,6 +149,162 @@ describe("adding elements to frames", () => {
         arrayToMap(h.elements),
       ),
     ).toBe(true);
+  });
+
+  it("should not add a newly created element to a frame behind a non-frame element", () => {
+    const cover = API.createElement({
+      id: "cover",
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 80,
+      height: 80,
+      backgroundColor: "#ffc9c9",
+    });
+
+    API.setElements([frame, cover]);
+
+    UI.clickTool("rectangle");
+    mouse.downAt(20, 20);
+    mouse.moveTo(40, 40);
+    mouse.upAt(40, 40);
+
+    const createdElement = h.elements.find(
+      (element) => element.id !== frame.id && element.id !== cover.id,
+    );
+
+    expect(createdElement?.frameId).toBe(null);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      frame.id,
+      cover.id,
+      createdElement?.id,
+    ]);
+  });
+
+  it("should add a newly created element to a frame over a non-frame element", () => {
+    const cover = API.createElement({
+      id: "cover",
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 80,
+      height: 80,
+      backgroundColor: "#ffc9c9",
+    });
+
+    API.setElements([cover, frame]);
+
+    UI.clickTool("rectangle");
+    mouse.downAt(20, 20);
+    mouse.moveTo(40, 40);
+    mouse.upAt(40, 40);
+
+    const createdElement = h.elements.find(
+      (element) => element.id !== frame.id && element.id !== cover.id,
+    );
+
+    expect(createdElement?.frameId).toBe(frame.id);
+  });
+
+  it("should add a newly created element to a frame behind another frame", () => {
+    const lockedFrame = API.createElement({
+      id: "lockedFrame",
+      type: "frame",
+      x: 10,
+      y: 10,
+      width: 80,
+      height: 80,
+      locked: true,
+    });
+
+    API.setElements([frame, lockedFrame]);
+
+    UI.clickTool("rectangle");
+    mouse.downAt(20, 20);
+    mouse.moveTo(40, 40);
+    mouse.upAt(40, 40);
+
+    const createdElement = h.elements.find(
+      (element) => element.id !== frame.id && element.id !== lockedFrame.id,
+    );
+
+    expect(createdElement?.frameId).toBe(frame.id);
+  });
+
+  it("should insert a newly created frame child just below its frame", () => {
+    const frameChildUnderCursor = API.createElement({
+      id: "frameChildUnderCursor",
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 80,
+      height: 80,
+      backgroundColor: "#ffc9c9",
+      frameId: frame.id,
+    });
+    const otherFrameChild = API.createElement({
+      id: "otherFrameChild",
+      type: "rectangle",
+      x: 100,
+      y: 20,
+      width: 20,
+      height: 20,
+      frameId: frame.id,
+    });
+
+    API.setElements([frameChildUnderCursor, otherFrameChild, frame]);
+
+    UI.clickTool("rectangle");
+    mouse.downAt(20, 20);
+    mouse.moveTo(40, 40);
+    mouse.upAt(40, 40);
+
+    const createdElement = h.elements.find(
+      (element) =>
+        element.id !== frame.id &&
+        element.id !== frameChildUnderCursor.id &&
+        element.id !== otherFrameChild.id,
+    );
+
+    expect(createdElement?.frameId).toBe(frame.id);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      frameChildUnderCursor.id,
+      otherFrameChild.id,
+      createdElement?.id,
+      frame.id,
+    ]);
+  });
+
+  it("should insert a newly created frame child above the non-frame element under cursor", () => {
+    const frameChildUnderCursor = API.createElement({
+      id: "frameChildUnderCursor",
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 80,
+      height: 80,
+      backgroundColor: "#ffc9c9",
+      frameId: frame.id,
+    });
+
+    API.setElements([frame, frameChildUnderCursor]);
+
+    UI.clickTool("rectangle");
+    mouse.downAt(20, 20);
+    mouse.moveTo(40, 40);
+    mouse.upAt(40, 40);
+
+    const createdElement = h.elements.find(
+      (element) =>
+        element.id !== frame.id && element.id !== frameChildUnderCursor.id,
+    );
+
+    expect(createdElement?.frameId).toBe(frame.id);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      frame.id,
+      frameChildUnderCursor.id,
+      createdElement?.id,
+    ]);
   });
 
   const commonTestCases = async (
@@ -455,6 +611,90 @@ describe("adding elements to frames", () => {
       dragElementIntoFrame(frame, containingRect);
 
       expect(API.getElement(containingRect).frameId).toBe(frame.id);
+    });
+
+    it("should drag an element into a frame", () => {
+      API.setElements([rect2, frame]);
+
+      dragElementIntoFrame(frame, rect2);
+
+      expect(rect2.frameId).toBe(frame.id);
+    });
+
+    it("should not drag an element into a frame behind a non-frame element", () => {
+      const cover = API.createElement({
+        id: "cover",
+        type: "rectangle",
+        x: 10,
+        y: 10,
+        width: 80,
+        height: 80,
+        backgroundColor: "#ffc9c9",
+      });
+      API.setElements([frame, cover, rect2]);
+
+      mouse.clickAt(rect2.x, rect2.y);
+      mouse.downAt(rect2.x + rect2.width / 2, rect2.y + rect2.height / 2);
+      mouse.moveTo(20, 20);
+      mouse.upAt(20, 20);
+
+      expect(rect2.frameId).toBe(null);
+    });
+
+    it("should drag an element into a frame over a non-frame element", () => {
+      const cover = API.createElement({
+        id: "cover",
+        type: "rectangle",
+        x: 10,
+        y: 10,
+        width: 80,
+        height: 80,
+        backgroundColor: "#ffc9c9",
+      });
+      API.setElements([cover, rect2, frame]);
+
+      mouse.clickAt(rect2.x, rect2.y);
+      mouse.downAt(rect2.x + rect2.width / 2, rect2.y + rect2.height / 2);
+      mouse.moveTo(20, 20);
+      mouse.upAt(20, 20);
+
+      expect(rect2.frameId).toBe(frame.id);
+    });
+
+    it("should keep dragging a frame child over a non-frame element above its frame", () => {
+      const cover = API.createElement({
+        id: "cover",
+        type: "rectangle",
+        x: 10,
+        y: 10,
+        width: 80,
+        height: 80,
+        backgroundColor: "#ffc9c9",
+      });
+      const frameChild = API.createElement({
+        id: "frameChild",
+        type: "rectangle",
+        x: 100,
+        y: 20,
+        width: 20,
+        height: 20,
+        frameId: frame.id,
+      });
+
+      API.setElements([frameChild, frame, cover]);
+      API.setSelectedElements([frameChild]);
+
+      mouse.downAt(
+        frameChild.x + frameChild.width / 2,
+        frameChild.y + frameChild.height / 2,
+      );
+      mouse.moveTo(20, 20);
+
+      expect(h.state.frameToHighlight?.id).toBe(frame.id);
+
+      mouse.upAt(20, 20);
+
+      expect(frameChild.frameId).toBe(frame.id);
     });
 
     it.skip("should drag element inside, duplicate it and keep it in frame", () => {

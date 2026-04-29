@@ -3,7 +3,6 @@ import { isElementInViewport } from "@excalidraw/element";
 import { memoize, toBrandedType } from "@excalidraw/common";
 
 import type {
-  ExcalidrawElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -16,6 +15,18 @@ import type { RenderableElementsMap } from "./types";
 
 import type { AppState } from "../types";
 
+type GetRenderableElementsOpts = {
+  zoom: AppState["zoom"];
+  offsetLeft: AppState["offsetLeft"];
+  offsetTop: AppState["offsetTop"];
+  scrollX: AppState["scrollX"];
+  scrollY: AppState["scrollY"];
+  height: AppState["height"];
+  width: AppState["width"];
+  editingTextElement: AppState["editingTextElement"];
+  newElement: AppState["newElement"];
+};
+
 export class Renderer {
   private scene: Scene;
 
@@ -23,9 +34,81 @@ export class Renderer {
     this.scene = scene;
   }
 
-  public getRenderableElements = (() => {
-    const getVisibleCanvasElements = ({
-      elementsMap,
+  private getVisibleCanvasElements({
+    elementsMap,
+    zoom,
+    offsetLeft,
+    offsetTop,
+    scrollX,
+    scrollY,
+    height,
+    width,
+  }: {
+    elementsMap: NonDeletedElementsMap;
+    zoom: AppState["zoom"];
+    offsetLeft: AppState["offsetLeft"];
+    offsetTop: AppState["offsetTop"];
+    scrollX: AppState["scrollX"];
+    scrollY: AppState["scrollY"];
+    height: AppState["height"];
+    width: AppState["width"];
+  }): readonly NonDeletedExcalidrawElement[] {
+    const visibleElements: NonDeletedExcalidrawElement[] = [];
+    for (const element of elementsMap.values()) {
+      if (
+        isElementInViewport(
+          element,
+          width,
+          height,
+          {
+            zoom,
+            offsetLeft,
+            offsetTop,
+            scrollX,
+            scrollY,
+          },
+          elementsMap,
+        )
+      ) {
+        visibleElements.push(element);
+      }
+    }
+    return visibleElements;
+  }
+
+  private getRenderableElementsMap({
+    elements,
+    editingTextElement,
+    newElement,
+  }: {
+    elements: readonly NonDeletedExcalidrawElement[];
+    editingTextElement: AppState["editingTextElement"];
+    newElement: AppState["newElement"];
+  }) {
+    const elementsMap = toBrandedType<RenderableElementsMap>(new Map());
+    const newElementCanvasElement = newElement?.frameId ? null : newElement;
+
+    for (const element of elements) {
+      if (newElementCanvasElement?.id === element.id) {
+        continue;
+      }
+
+      // we don't want to render text element that's being currently edited
+      // (it's rendered on remote only)
+      if (
+        !editingTextElement ||
+        editingTextElement.type !== "text" ||
+        element.id !== editingTextElement.id
+      ) {
+        elementsMap.set(element.id, element);
+      }
+    }
+    return { elementsMap, newElementCanvasElement };
+  }
+
+  private _getRenderableElements = memoize(
+    ({
+      canvasNonce,
       zoom,
       offsetLeft,
       offsetTop,
@@ -33,70 +116,22 @@ export class Renderer {
       scrollY,
       height,
       width,
-    }: {
-      elementsMap: NonDeletedElementsMap;
-      zoom: AppState["zoom"];
-      offsetLeft: AppState["offsetLeft"];
-      offsetTop: AppState["offsetTop"];
-      scrollX: AppState["scrollX"];
-      scrollY: AppState["scrollY"];
-      height: AppState["height"];
-      width: AppState["width"];
-    }): readonly NonDeletedExcalidrawElement[] => {
-      const visibleElements: NonDeletedExcalidrawElement[] = [];
-      for (const element of elementsMap.values()) {
-        if (
-          isElementInViewport(
-            element,
-            width,
-            height,
-            {
-              zoom,
-              offsetLeft,
-              offsetTop,
-              scrollX,
-              scrollY,
-            },
-            elementsMap,
-          )
-        ) {
-          visibleElements.push(element);
-        }
-      }
-      return visibleElements;
-    };
-
-    const getRenderableElements = ({
-      elements,
       editingTextElement,
-      newElementId,
-    }: {
-      elements: readonly NonDeletedExcalidrawElement[];
-      editingTextElement: AppState["editingTextElement"];
-      newElementId: ExcalidrawElement["id"] | undefined;
+      newElement,
+    }: GetRenderableElementsOpts & {
+      canvasNonce: string;
     }) => {
-      const elementsMap = toBrandedType<RenderableElementsMap>(new Map());
+      const elements = this.scene.getNonDeletedElements();
 
-      for (const element of elements) {
-        if (newElementId === element.id) {
-          continue;
-        }
+      const { elementsMap, newElementCanvasElement } =
+        this.getRenderableElementsMap({
+          elements,
+          editingTextElement,
+          newElement,
+        });
 
-        // we don't want to render text element that's being currently edited
-        // (it's rendered on remote only)
-        if (
-          !editingTextElement ||
-          editingTextElement.type !== "text" ||
-          element.id !== editingTextElement.id
-        ) {
-          elementsMap.set(element.id, element);
-        }
-      }
-      return elementsMap;
-    };
-
-    return memoize(
-      ({
+      const visibleElements = this.getVisibleCanvasElements({
+        elementsMap,
         zoom,
         offsetLeft,
         offsetTop,
@@ -104,52 +139,30 @@ export class Renderer {
         scrollY,
         height,
         width,
-        editingTextElement,
-        newElementId,
-        // cache-invalidation nonce
-        sceneNonce: _sceneNonce,
-      }: {
-        zoom: AppState["zoom"];
-        offsetLeft: AppState["offsetLeft"];
-        offsetTop: AppState["offsetTop"];
-        scrollX: AppState["scrollX"];
-        scrollY: AppState["scrollY"];
-        height: AppState["height"];
-        width: AppState["width"];
-        editingTextElement: AppState["editingTextElement"];
-        /** note: first render of newElement will always bust the cache
-         * (we'd have to prefilter elements outside of this function) */
-        newElementId: ExcalidrawElement["id"] | undefined;
-        sceneNonce: ReturnType<InstanceType<typeof Scene>["getSceneNonce"]>;
-      }) => {
-        const elements = this.scene.getNonDeletedElements();
+      });
 
-        const elementsMap = getRenderableElements({
-          elements,
-          editingTextElement,
-          newElementId,
-        });
+      return {
+        elementsMap,
+        visibleElements,
+        newElementCanvasElement,
+        canvasNonce,
+      };
+    },
+  );
 
-        const visibleElements = getVisibleCanvasElements({
-          elementsMap,
-          zoom,
-          offsetLeft,
-          offsetTop,
-          scrollX,
-          scrollY,
-          height,
-          width,
-        });
+  public getRenderableElements = (opts: GetRenderableElementsOpts) => {
+    const { newElement } = opts;
+    const canvasNonce = `${this.scene.getSceneNonce()}${
+      newElement?.frameId ? `:${newElement.versionNonce}` : ""
+    }`;
 
-        return { elementsMap, visibleElements };
-      },
-    );
-  })();
+    return this._getRenderableElements({ ...opts, canvasNonce });
+  };
 
   // NOTE Doesn't destroy everything (scene, rc, etc.) because it may not be
   // safe to break TS contract here (for upstream cases)
   public destroy() {
     renderStaticSceneThrottled.cancel();
-    this.getRenderableElements.clear();
+    this._getRenderableElements.clear();
   }
 }

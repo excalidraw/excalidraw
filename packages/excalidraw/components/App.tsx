@@ -2092,20 +2092,26 @@ class App extends React.Component<AppProps, AppState> {
     const selectedElements = this.scene.getSelectedElements(this.state);
     const { renderTopRightUI, renderTopLeftUI, renderCustomStats } = this.props;
 
-    const sceneNonce = this.scene.getSceneNonce();
-    const { elementsMap, visibleElements } =
-      this.renderer.getRenderableElements({
-        sceneNonce,
-        zoom: this.state.zoom,
-        offsetLeft: this.state.offsetLeft,
-        offsetTop: this.state.offsetTop,
-        scrollX: this.state.scrollX,
-        scrollY: this.state.scrollY,
-        height: this.state.height,
-        width: this.state.width,
-        editingTextElement: this.state.editingTextElement,
-        newElementId: this.state.newElement?.id,
-      });
+    const {
+      elementsMap,
+      visibleElements,
+      canvasNonce,
+      /**
+       * element to draw on the <NewElementCanvas> for optimization purposes.
+       * Can be null even if this.state.newElement defined
+       * (e.g. when its zIndex isn't on top) */
+      newElementCanvasElement,
+    } = this.renderer.getRenderableElements({
+      zoom: this.state.zoom,
+      offsetLeft: this.state.offsetLeft,
+      offsetTop: this.state.offsetTop,
+      scrollX: this.state.scrollX,
+      scrollY: this.state.scrollY,
+      height: this.state.height,
+      width: this.state.width,
+      editingTextElement: this.state.editingTextElement,
+      newElement: this.state.newElement,
+    });
     this.visibleElements = visibleElements;
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
@@ -2324,7 +2330,7 @@ class App extends React.Component<AppProps, AppState> {
                             elementsMap={elementsMap}
                             allElementsMap={allElementsMap}
                             visibleElements={visibleElements}
-                            sceneNonce={sceneNonce}
+                            canvasNonce={canvasNonce}
                             selectionNonce={
                               this.state.selectionElement?.versionNonce
                             }
@@ -2345,9 +2351,10 @@ class App extends React.Component<AppProps, AppState> {
                               theme: this.state.theme,
                             }}
                           />
-                          {this.state.newElement && (
+                          {newElementCanvasElement && (
                             <NewElementCanvas
                               appState={this.state}
+                              newElement={newElementCanvasElement}
                               scale={window.devicePixelRatio}
                               rc={this.rc}
                               elementsMap={elementsMap}
@@ -2375,7 +2382,7 @@ class App extends React.Component<AppProps, AppState> {
                             visibleElements={visibleElements}
                             allElementsMap={allElementsMap}
                             selectedElements={selectedElements}
-                            sceneNonce={sceneNonce}
+                            canvasNonce={canvasNonce}
                             selectionNonce={
                               this.state.selectionElement?.versionNonce
                             }
@@ -6151,6 +6158,12 @@ class App extends React.Component<AppProps, AppState> {
         hitElement = elements[index];
         break;
       } else if (x1 < x && x < x2 && y1 < y && y < y2) {
+        // to allow binding to containers within frames,
+        // ignore frames in hit testing
+        if (isFrameLikeElement(elements[index])) {
+          continue;
+        }
+
         hitElement = elements[index];
         break;
       }
@@ -6166,6 +6179,7 @@ class App extends React.Component<AppProps, AppState> {
     container,
     autoEdit = true,
     initialCaretSceneCoords,
+    pointerDownState,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -6176,6 +6190,7 @@ class App extends React.Component<AppProps, AppState> {
     container?: ExcalidrawTextContainer | null;
     autoEdit?: boolean;
     initialCaretSceneCoords?: { x: number; y: number };
+    pointerDownState?: PointerDownState;
   }) => {
     let shouldBindToContainer = false;
 
@@ -6245,6 +6260,15 @@ class App extends React.Component<AppProps, AppState> {
       y: sceneY,
     });
 
+    // container has higher priority. Only add to frame if container is in the same frame.
+    const frameId =
+      topLayerFrame &&
+      (!shouldBindToContainer ||
+        !container ||
+        container.frameId === topLayerFrame.id)
+        ? topLayerFrame.id
+        : null;
+
     const textCreationGridPoint = this.getTextCreationGridPoint(sceneX, sceneY);
 
     const newTextElementPosition = parentCenterPosition
@@ -6295,7 +6319,7 @@ class App extends React.Component<AppProps, AppState> {
             ? (0 as Radians)
             : container.angle
           : (0 as Radians),
-        frameId: topLayerFrame ? topLayerFrame.id : null,
+        frameId,
       });
 
     if (!existingTextElement && shouldBindToContainer && container) {
@@ -6312,6 +6336,8 @@ class App extends React.Component<AppProps, AppState> {
       if (container && shouldBindToContainer) {
         const containerIndex = this.scene.getElementIndex(container.id);
         this.scene.insertElementAtIndex(element, containerIndex + 1);
+      } else if (pointerDownState) {
+        this.insertCreatedElement(element, pointerDownState);
       } else {
         this.scene.insertElement(element);
       }
@@ -6695,19 +6721,153 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private getTopLayerFrameAtSceneCoords = (sceneCoords: {
-    x: number;
-    y: number;
-  }) => {
+  /**
+   * finds candidate frame under cursor (when dragging frame children/elements
+   * inside frames)
+   */
+  private getTopLayerFrameAtSceneCoords = (
+    sceneCoords: {
+      x: number;
+      y: number;
+    },
+    opts?: {
+      /** to exclude selected elements when dragging, etc. */
+      excludeElementIds?: AppState["selectedElementIds"];
+      currentFrameId?: ExcalidrawElement["frameId"];
+    },
+  ) => {
     const elementsMap = this.scene.getNonDeletedElementsMap();
-    const frames = this.scene
+    const framesUnderCursor = this.scene
       .getNonDeletedFramesLikes()
       .filter(
         (frame): frame is ExcalidrawFrameLikeElement =>
           !frame.locked && isCursorInFrame(sceneCoords, frame, elementsMap),
       );
 
-    return frames.length ? frames[frames.length - 1] : null;
+    if (!framesUnderCursor.length) {
+      return null;
+    }
+
+    const topLayerFrame = framesUnderCursor.at(-1)!;
+
+    const hitElement = this.getElementsAtPosition(
+      sceneCoords.x,
+      sceneCoords.y,
+      {
+        includeLockedElements: true,
+      },
+    ).findLast((element) => !opts?.excludeElementIds?.[element.id]);
+
+    if (hitElement) {
+      if (
+        isFrameLikeElement(hitElement) &&
+        // case: we're hitting a locked frame itself (frame's outline
+        // or later its bg once implemented)
+        (!hitElement.locked || !isFrameLikeElement(hitElement))
+      ) {
+        return topLayerFrame;
+      }
+
+      const hitElementIndex = this.scene.getElementIndex(hitElement.id);
+      const topLayerFrameIndex = this.scene.getElementIndex(topLayerFrame.id);
+
+      if (
+        hitElementIndex !== -1 &&
+        topLayerFrameIndex !== -1 &&
+        hitElementIndex <= topLayerFrameIndex
+      ) {
+        return topLayerFrame;
+      }
+
+      // to support a case of dragging a pre-existing frame child underneath
+      // a non-frame element covering the cursor
+      const currentFrame = opts?.currentFrameId
+        ? framesUnderCursor.find((frame) => frame.id === opts.currentFrameId) ??
+          null
+        : null;
+
+      if (currentFrame) {
+        return currentFrame;
+      }
+
+      return hitElement.frameId
+        ? framesUnderCursor.find((frame) => frame.id === hitElement.frameId) ??
+            null
+        : null;
+    }
+
+    return topLayerFrame;
+  };
+
+  private getCommonFrameId = (elements: readonly ExcalidrawElement[]) => {
+    let commonFrameId: ExcalidrawElement["frameId"] | undefined;
+
+    for (const element of elements) {
+      if (isFrameLikeElement(element) || !element.frameId) {
+        return null;
+      }
+
+      if (commonFrameId === undefined) {
+        commonFrameId = element.frameId;
+      } else if (commonFrameId !== element.frameId) {
+        return null;
+      }
+    }
+
+    return commonFrameId ?? null;
+  };
+
+  private getNewFrameChildInsertionIndex = (
+    element: ExcalidrawElement,
+    pointerDownState: PointerDownState | null,
+  ): number | null => {
+    if (!element.frameId) {
+      return null;
+    }
+
+    const frameIndex = this.scene.getElementIndex(element.frameId);
+
+    if (frameIndex === -1) {
+      return null;
+    }
+
+    const hitElementUnderCursor = pointerDownState
+      ? this.getElementsAtPosition(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+          {
+            includeLockedElements: true,
+          },
+        ).findLast((element) => !isFrameLikeElement(element))
+      : null;
+
+    if (!hitElementUnderCursor) {
+      return frameIndex;
+    }
+
+    const hitElementUnderCursorIndex = this.scene.getElementIndex(
+      hitElementUnderCursor.id,
+    );
+
+    return hitElementUnderCursorIndex === -1
+      ? frameIndex
+      : Math.max(frameIndex, hitElementUnderCursorIndex + 1);
+  };
+
+  private insertCreatedElement = (
+    element: ExcalidrawElement,
+    pointerDownState: PointerDownState | null,
+  ) => {
+    const insertionIndex = this.getNewFrameChildInsertionIndex(
+      element,
+      pointerDownState,
+    );
+
+    if (insertionIndex !== null) {
+      this.scene.insertElementAtIndex(element, insertionIndex);
+    } else {
+      this.scene.insertElement(element);
+    }
   };
 
   private handleCanvasPointerMove = (
@@ -8813,6 +8973,7 @@ class App extends React.Component<AppProps, AppState> {
       container,
       autoEdit: false,
       initialCaretSceneCoords: { x: sceneX, y: sceneY },
+      pointerDownState,
     });
 
     resetCursor(this.interactiveCanvas);
@@ -8863,7 +9024,7 @@ class App extends React.Component<AppProps, AppState> {
       pressures: simulatePressure ? [] : [event.pressure],
     });
 
-    this.scene.insertElement(element);
+    this.insertCreatedElement(element, pointerDownState);
 
     this.setState((prevState) => {
       const nextSelectedElementIds = {
@@ -9218,7 +9379,7 @@ class App extends React.Component<AppProps, AppState> {
         points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(0, 0)],
       });
 
-      this.scene.insertElement(element);
+      this.insertCreatedElement(element, pointerDownState);
 
       if (isBindingElement(element)) {
         // Do the initial binding so the binding strategy has the initial state
@@ -9376,7 +9537,7 @@ class App extends React.Component<AppProps, AppState> {
         selectionElement: element,
       });
     } else {
-      this.scene.insertElement(element);
+      this.insertCreatedElement(element, pointerDownState);
       this.setState({
         multiElement: null,
         newElement: element,
@@ -9780,9 +9941,12 @@ class App extends React.Component<AppProps, AppState> {
         const selectedElementsHasAFrame = selectedElements.find((e) =>
           isFrameLikeElement(e),
         );
-        const topLayerFrame = this.getTopLayerFrameAtSceneCoords(pointerCoords);
-        const frameToHighlight =
-          topLayerFrame && !selectedElementsHasAFrame ? topLayerFrame : null;
+        const frameToHighlight = selectedElementsHasAFrame
+          ? null
+          : this.getTopLayerFrameAtSceneCoords(pointerCoords, {
+              currentFrameId: this.getCommonFrameId(selectedElements),
+              excludeElementIds: this.state.selectedElementIds,
+            });
         // Only update the state if there is a difference
         if (this.state.frameToHighlight !== frameToHighlight) {
           flushSync(() => {
@@ -10877,9 +11041,14 @@ class App extends React.Component<AppProps, AppState> {
           }
         } else {
           // update the relationships between selected elements and frames
-          const topLayerFrame = this.getTopLayerFrameAtSceneCoords(sceneCoords);
-
           const selectedElements = this.scene.getSelectedElements(this.state);
+          const topLayerFrame = this.getTopLayerFrameAtSceneCoords(
+            sceneCoords,
+            {
+              currentFrameId: this.getCommonFrameId(selectedElements),
+              excludeElementIds: this.state.selectedElementIds,
+            },
+          );
           let nextElements = this.scene.getElementsMapIncludingDeleted();
 
           const updateGroupIdsAfterEditingGroup = (
