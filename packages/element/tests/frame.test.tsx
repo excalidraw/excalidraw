@@ -206,6 +206,33 @@ describe("adding elements to frames", () => {
     expect(createdElement?.frameId).toBe(frame.id);
   });
 
+  it("should highlight the target frame while creating a new element", () => {
+    API.setElements([frame]);
+
+    UI.clickTool("rectangle");
+    mouse.downAt(20, 20);
+    mouse.moveTo(40, 40);
+
+    expect(h.state.frameToHighlight?.id).toBe(frame.id);
+
+    mouse.upAt(40, 40);
+
+    expect(h.state.frameToHighlight).toBe(null);
+  });
+
+  it("should highlight the target frame while hovering with a creation tool", () => {
+    API.setElements([frame]);
+
+    UI.clickTool("rectangle");
+    mouse.moveTo(20, 20);
+
+    expect(h.state.frameToHighlight?.id).toBe(frame.id);
+
+    mouse.moveTo(200, 200);
+
+    expect(h.state.frameToHighlight).toBe(null);
+  });
+
   it("should add a newly created element to a frame behind another frame", () => {
     const lockedFrame = API.createElement({
       id: "lockedFrame",

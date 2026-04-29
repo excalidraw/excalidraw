@@ -259,6 +259,7 @@ import {
   maybeHandleArrowPointlikeDrag,
   getUncroppedWidthAndHeight,
   getActiveTextElement,
+  isEligibleFrameChildType,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -5561,6 +5562,7 @@ class App extends React.Component<AppProps, AppState> {
         selectedLinearElement: isSelectionLikeTool(nextActiveTool.type)
           ? prevState.selectedLinearElement
           : null,
+        frameToHighlight: null,
       } as const;
 
       if (nextActiveTool.type === "freedraw") {
@@ -6832,7 +6834,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const hitElementUnderCursor = sceneCoords
       ? this.getElementsAtPosition(sceneCoords.x, sceneCoords.y, {
-            includeLockedElements: true,
+          includeLockedElements: true,
         }).findLast((element) => !isFrameLikeElement(element))
       : null;
 
@@ -6849,6 +6851,39 @@ class App extends React.Component<AppProps, AppState> {
       : Math.max(frameIndex, hitElementUnderCursorIndex + 1);
   };
 
+  private updateFrameToHighlight = (
+    frameToHighlight: AppState["frameToHighlight"],
+  ) => {
+    if (this.state.frameToHighlight !== frameToHighlight) {
+      this.setState({ frameToHighlight });
+    }
+  };
+
+  private maybeUpdateFrameToHighlightOnPointerMove = (
+    sceneCoords: { x: number; y: number },
+    isOverScrollBar: boolean,
+  ) => {
+    // currently this function is being called even during pointerdown so we
+    // need to make sure we don't re-set the state when dragging and similar
+    //
+    // But, we still want to reset on pointermove in case the state is stale
+    // so we updte even for non-eligible tool types
+    if (
+      this.state.newElement ||
+      this.state.multiElement ||
+      this.state.selectionElement ||
+      this.state.selectedElementsAreBeingDragged
+    ) {
+      return;
+    }
+
+    this.updateFrameToHighlight(
+      !isOverScrollBar && isEligibleFrameChildType(this.state.activeTool.type)
+        ? this.getTopLayerFrameAtSceneCoords(sceneCoords)
+        : null,
+    );
+  };
+
   private insertCreatedElement = (
     element: ExcalidrawElement,
     sceneCoords: { x: number; y: number } | null,
@@ -6863,6 +6898,14 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       this.scene.insertElement(element);
     }
+
+    const frame = element.frameId
+      ? this.scene.getNonDeletedElement(element.frameId)
+      : null;
+
+    this.updateFrameToHighlight(
+      frame && isFrameLikeElement(frame) ? frame : null,
+    );
   };
 
   private handleCanvasPointerMove = (
@@ -6963,6 +7006,14 @@ class App extends React.Component<AppProps, AppState> {
         setCursorForShape(this.interactiveCanvas, this.state);
       }
     }
+
+    this.maybeUpdateFrameToHighlightOnPointerMove(
+      {
+        x: scenePointerX,
+        y: scenePointerY,
+      },
+      isOverScrollBar,
+    );
 
     if (
       !this.state.newElement &&
@@ -9942,11 +9993,7 @@ class App extends React.Component<AppProps, AppState> {
               excludeElementIds: this.state.selectedElementIds,
             });
         // Only update the state if there is a difference
-        if (this.state.frameToHighlight !== frameToHighlight) {
-          flushSync(() => {
-            this.setState({ frameToHighlight });
-          });
-        }
+        this.updateFrameToHighlight(frameToHighlight);
 
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
