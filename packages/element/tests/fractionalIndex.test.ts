@@ -1,6 +1,4 @@
 /* eslint-disable no-lone-blocks */
-import { generateKeyBetween } from "fractional-indexing";
-
 import { arrayToMap } from "@excalidraw/common";
 
 import {
@@ -19,7 +17,10 @@ import type {
   FractionalIndex,
 } from "@excalidraw/element/types";
 
-import { InvalidFractionalIndexError } from "../src/fractionalIndex";
+import {
+  generateKeyBetween,
+  InvalidFractionalIndexError,
+} from "../src/fractionalIndex";
 
 describe("sync invalid indices with array order", () => {
   describe("should NOT sync empty array", () => {
@@ -100,6 +101,28 @@ describe("sync invalid indices with array order", () => {
       elements: [{ id: "A" }],
       expect: {
         unchangedElements: [],
+      },
+    });
+  });
+
+  describe("should sync when fractional index is malformed", () => {
+    // "zd0032" has head "z" which requires length 28 per getIntegerLength,
+    // but the string is far too short, so validateOrderKey throws for it
+    testInvalidIndicesSync({
+      elements: [{ id: "A", index: "zd0032" }],
+      expect: {
+        unchangedElements: [],
+      },
+    });
+
+    testInvalidIndicesSync({
+      elements: [
+        { id: "A", index: "a1" },
+        { id: "B", index: "zd0032" },
+        { id: "C", index: "a3" },
+      ],
+      expect: {
+        unchangedElements: ["A", "C"],
       },
     });
   });
