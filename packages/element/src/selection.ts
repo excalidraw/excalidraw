@@ -133,17 +133,18 @@ export const getElementsWithinSelection = (
   const elementsInSelection: Set<NonDeletedExcalidrawElement> = new Set();
 
   for (const element of elements) {
-    // Collect all groups in the scene and all containing elements for later
+    if (shouldIgnoreElementFromSelection(element)) {
+      continue;
+    }
+
+    // Track only selectable group members, so ignored elements such as bound
+    // text and locked elements don't block group completeness checks.
     (element.groupIds ?? []).forEach((groupId) => {
       if (!groups[groupId]) {
         groups[groupId] = [];
       }
       groups[groupId].push(element);
     });
-
-    if (shouldIgnoreElementFromSelection(element)) {
-      continue;
-    }
 
     const strokeWidth = element.strokeWidth;
     let labelAABB: Bounds | null = null;
