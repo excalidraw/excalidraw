@@ -16,9 +16,6 @@ git branch -D text-color-ranges 2>/dev/null || true
 git checkout -b text-color-ranges --quiet
 echo "→ On branch: $(git branch --show-current)"
 
-echo "→ Removing demo artifacts from Desktop…"
-rm -f ~/Desktop/excalidraw-*.{gif,png} ~/Downloads/excalidraw-*.{gif,png} 2>/dev/null || true
-
 echo
 echo "✓ Repo reset to demo-baseline."
 echo

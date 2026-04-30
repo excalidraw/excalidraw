@@ -1,6 +1,6 @@
 ---
 name: verify
-description: Verify a code change by driving the running Excalidraw app in Chrome, capturing a screenshot, and reporting PASS/FAIL.
+description: Verify a code change by driving the running Excalidraw app in Chrome and reporting PASS/FAIL with inline screenshots.
 ---
 
 # Verify a change in the running app
@@ -15,7 +15,7 @@ You're checking that a described change actually works in the live Excalidraw ap
 
 3. **Exercise the change** — Perform the interaction sequence that demonstrates the change. Use the `computer` tool for clicks/keys, and take screenshots between key steps so you can see what's happening.
 
-4. **Capture result** — Take a final screenshot (or `zoom`) of the relevant area with `save_to_disk: true`, and `mv` the saved file to `~/Desktop/` so the user can find it.
+4. **Capture result** — Take a final screenshot (or `zoom`) of the relevant area. The image renders inline in chat — that's the proof; nothing needs saving to disk.
 
 5. **Report** — A short verdict referencing the screenshots above:
    - **PASS** — what you saw that confirms the change works

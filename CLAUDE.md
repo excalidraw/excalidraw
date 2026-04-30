@@ -167,9 +167,7 @@ if (element.colorRanges?.length) {
 }
 ```
 
-Editing `renderElement.ts` triggers a **full page reload** (not HMR), so the canvas will be empty afterward — re-run the `/verify` scenario from step 1. It should now PASS.
-
-**Saving proof:** do **not** use `gif_creator` (it's broken for this tab group). On the passing run, take the step-7 `zoom` screenshot with `save_to_disk: true`, then `mv` the saved file to `~/Desktop/excalidraw-color-ranges.png`.
+Editing `renderElement.ts` triggers a **full page reload** (not HMR), so the canvas will be empty afterward — re-run the `/verify` scenario from step 1. It should now PASS; the inline `zoom` screenshot is the proof. Do **not** use `gif_creator` or save anything to disk.
 
 ### Out of scope
 
