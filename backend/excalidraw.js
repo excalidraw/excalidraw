@@ -392,6 +392,77 @@ function getLabel(nodePath) {
   return lines.join("\n");
 }
 
+function getModulePathChain(nodePath) {
+  const parts = nodePath.split(".");
+  const chain = [];
+  let cursor = "";
+
+  for (let i = 0; i < parts.length - 1; ) {
+    if (parts[i] !== "module" || !parts[i + 1]) {
+      break;
+    }
+    const segment = `module.${parts[i + 1]}`;
+    cursor = cursor ? `${cursor}.${segment}` : segment;
+    chain.push(cursor);
+    i += 2;
+  }
+
+  return chain;
+}
+
+function getModuleDepthFromPath(modulePath) {
+  const parts = modulePath.split(".");
+  let depth = 0;
+
+  for (let i = 0; i < parts.length - 1; ) {
+    if (parts[i] === "module" && parts[i + 1]) {
+      depth += 1;
+      i += 2;
+      continue;
+    }
+    break;
+  }
+
+  return depth;
+}
+
+function getModuleDisplayLabel(modulePath) {
+  const parts = modulePath.split(".");
+  const names = [];
+
+  for (let i = 0; i < parts.length - 1; ) {
+    if (parts[i] === "module" && parts[i + 1]) {
+      names.push(parts[i + 1]);
+      i += 2;
+      continue;
+    }
+    break;
+  }
+
+  return names.join(" / ");
+}
+
+function collectModuleGroups(nodeKeys) {
+  const groups = new Map();
+
+  for (const nodePath of nodeKeys) {
+    const moduleChain = getModulePathChain(nodePath);
+    for (const modulePath of moduleChain) {
+      if (!groups.has(modulePath)) {
+        groups.set(modulePath, {
+          modulePath,
+          moduleLabel: getModuleDisplayLabel(modulePath),
+          depth: getModuleDepthFromPath(modulePath),
+          nodePaths: [],
+        });
+      }
+      groups.get(modulePath).nodePaths.push(nodePath);
+    }
+  }
+
+  return [...groups.values()].sort((a, b) => a.depth - b.depth);
+}
+
 // --- Element builders ---
 
 function makeBaseElement(overrides) {
@@ -605,7 +676,9 @@ async function forceLayout(nodeKeys, directedEdges, tierMap, tierConfigs) {
 // --- Main conversion ---
 
 async function nodesToExcalidraw(nodes) {
-  const elements = [];
+  const nodeElements = [];
+  const moduleElements = [];
+  const arrowElements = [];
   const nodeKeys = Object.keys(nodes);
   const directedEdges = collectDirectedEdges(nodes);
   const relationships = coalesceRelationshipPairs(directedEdges);
@@ -620,6 +693,7 @@ async function nodesToExcalidraw(nodes) {
     tierConfigs,
   );
   const posMap = {};
+  const nodeRectById = new Map();
 
   // --- rectangles + labels + icons ---
   for (let i = 0; i < nodeKeys.length; i++) {
@@ -646,36 +720,36 @@ async function nodesToExcalidraw(nodes) {
     const iconPad = 12;
     const iconArea = hasIcon ? cfg.iconSize + iconPad : 0;
 
-    elements.push(
-      makeBaseElement({
-        type: "rectangle",
-        id: rectId,
-        x,
-        y,
-        width: cfg.w,
-        height: cfg.h,
-        strokeColor,
-        strokeWidth: cfg.strokeWidth,
-        backgroundColor: bgColor,
-        roundness: { type: 3 },
-        groupIds: [groupId],
-        boundElements: [{ id: textId, type: "text" }],
-        strokeStyle: action === "external" ? "dashed" : "solid",
-        customData: {
-          terraform: true,
-          resourceType,
-          nodePath,
-          action,
-          terraformResources,
-        },
-      }),
-    );
+    const rectElement = makeBaseElement({
+      type: "rectangle",
+      id: rectId,
+      x,
+      y,
+      width: cfg.w,
+      height: cfg.h,
+      strokeColor,
+      strokeWidth: cfg.strokeWidth,
+      backgroundColor: bgColor,
+      roundness: { type: 3 },
+      groupIds: [groupId],
+      boundElements: [{ id: textId, type: "text" }],
+      strokeStyle: action === "external" ? "dashed" : "solid",
+      customData: {
+        terraform: true,
+        resourceType,
+        nodePath,
+        action,
+        terraformResources,
+      },
+    });
+    nodeElements.push(rectElement);
+    nodeRectById.set(rectId, rectElement);
 
     // Text: shifted right if icon present
     const textX = x + iconArea + 8;
     const textW = cfg.w - iconArea - 16;
 
-    elements.push(
+    nodeElements.push(
       makeBaseElement({
         type: "text",
         id: textId,
@@ -708,8 +782,104 @@ async function nodesToExcalidraw(nodes) {
         cfg.iconSize,
         [groupId],
       );
-      elements.push(...clonedIcons);
+      nodeElements.push(...clonedIcons);
     }
+  }
+
+  // --- module grouping boxes ---
+  const moduleGroups = collectModuleGroups(nodeKeys);
+  const MODULE_STROKES = ["#5c7cfa", "#339af0", "#22b8cf", "#20c997"];
+  const MODULE_PADDING_X = 28;
+  const MODULE_PADDING_TOP = 42;
+  const MODULE_PADDING_BOTTOM = 20;
+
+  for (let i = 0; i < moduleGroups.length; i++) {
+    const group = moduleGroups[i];
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    for (const nodePath of group.nodePaths) {
+      const pos = posMap[nodePath];
+      if (!pos) {
+        continue;
+      }
+      minX = Math.min(minX, pos.x);
+      minY = Math.min(minY, pos.y);
+      maxX = Math.max(maxX, pos.x + pos.w);
+      maxY = Math.max(maxY, pos.y + pos.h);
+    }
+
+    if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+      continue;
+    }
+
+    const depthInset = Math.max(0, (group.depth - 1) * 6);
+    const padX = Math.max(14, MODULE_PADDING_X - depthInset);
+    const padTop = Math.max(28, MODULE_PADDING_TOP - depthInset);
+    const padBottom = MODULE_PADDING_BOTTOM;
+    const boxX = minX - padX;
+    const boxY = minY - padTop;
+    const boxW = maxX - minX + padX * 2;
+    const boxH = maxY - minY + padTop + padBottom;
+    const groupId = `module-group-${rand()}`;
+    const boxId = `module-box-${i}`;
+    const labelId = `module-label-${i}`;
+    const strokeColor = MODULE_STROKES[(group.depth - 1) % MODULE_STROKES.length];
+
+    moduleElements.push(
+      makeBaseElement({
+        type: "rectangle",
+        id: boxId,
+        x: boxX,
+        y: boxY,
+        width: boxW,
+        height: boxH,
+        strokeColor,
+        strokeWidth: group.depth <= 1 ? 2 : 1,
+        strokeStyle: "dashed",
+        backgroundColor: "transparent",
+        roundness: { type: 3 },
+        groupIds: [groupId],
+        boundElements: [{ id: labelId, type: "text" }],
+        locked: true,
+        customData: {
+          terraform: false,
+          terraformModuleGroup: true,
+          modulePath: group.modulePath,
+          moduleDepth: group.depth,
+        },
+      }),
+    );
+
+    moduleElements.push(
+      makeBaseElement({
+        type: "text",
+        id: labelId,
+        x: boxX + 10,
+        y: boxY + 8,
+        width: Math.max(80, boxW - 20),
+        height: 24,
+        text: `module ${group.moduleLabel}`,
+        fontSize: group.depth <= 1 ? 18 : 16,
+        fontFamily: 3,
+        textAlign: "left",
+        verticalAlign: "top",
+        groupIds: [groupId],
+        containerId: boxId,
+        originalText: `module ${group.moduleLabel}`,
+        autoResize: false,
+        lineHeight: 1.2,
+        strokeColor,
+        locked: true,
+        customData: {
+          terraform: false,
+          terraformModuleGroup: true,
+          modulePath: group.modulePath,
+        },
+      }),
+    );
   }
 
   // --- bidirectional arrows ---
@@ -728,8 +898,11 @@ async function nodesToExcalidraw(nodes) {
     const posB = posMap[target];
     const arrowId = `arrow-${arrowIdx++}`;
 
-    const rectA = elements.find((e) => e.id === posA.rectId);
-    const rectB = elements.find((e) => e.id === posB.rectId);
+    const rectA = nodeRectById.get(posA.rectId);
+    const rectB = nodeRectById.get(posB.rectId);
+    if (!rectA || !rectB) {
+      continue;
+    }
     rectA.boundElements.push({ id: arrowId, type: "arrow" });
     rectB.boundElements.push({ id: arrowId, type: "arrow" });
 
@@ -747,7 +920,7 @@ async function nodesToExcalidraw(nodes) {
     const endX = posB.x + endFixed[0] * posB.w;
     const endY = posB.y + endFixed[1] * posB.h;
 
-    elements.push(
+    arrowElements.push(
       makeBaseElement({
         type: "arrow",
         id: arrowId,
@@ -789,8 +962,9 @@ async function nodesToExcalidraw(nodes) {
   }
 
   const elementsOrdered = [
-    ...elements.filter((element) => element.type === "arrow"),
-    ...elements.filter((element) => element.type !== "arrow"),
+    ...arrowElements,
+    ...moduleElements,
+    ...nodeElements,
   ];
 
   return {

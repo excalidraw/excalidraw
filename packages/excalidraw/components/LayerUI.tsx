@@ -156,9 +156,34 @@ type TerraformResourceDetails = {
   attributes?: TerraformAttribute[];
 };
 
+const tryParseJsonString = (value: string): unknown | null => {
+  const trimmed = value.trim();
+  if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    return null;
+  }
+};
+
 const formatTerraformPanelValue = (value: unknown) => {
   if (value === null || typeof value === "undefined" || value === "") {
     return "None";
+  }
+
+  if (typeof value === "string") {
+    const parsed = tryParseJsonString(value);
+    if (parsed && typeof parsed === "object") {
+      try {
+        return JSON.stringify(parsed, null, 2);
+      } catch {
+        return value;
+      }
+    }
+    return value;
   }
 
   if (typeof value === "object") {
@@ -174,7 +199,11 @@ const formatTerraformPanelValue = (value: unknown) => {
 
 const TerraformConfigValue = ({ value }: { value: unknown }) => {
   const formatted = formatTerraformPanelValue(value);
-  if (typeof value === "object" && value !== null) {
+  const parsed = typeof value === "string" ? tryParseJsonString(value) : null;
+  if (
+    (typeof value === "object" && value !== null) ||
+    (parsed && typeof parsed === "object")
+  ) {
     return <pre>{formatted}</pre>;
   }
   return <>{formatted}</>;
