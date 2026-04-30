@@ -1073,18 +1073,11 @@ async function nodesToExcalidraw(nodes) {
     );
   }
 
-  // --- bidirectional arrows ---
+  // --- dependency lines ---
   let arrowIdx = 0;
   for (const relationship of relationships) {
-    const {
-      source,
-      target,
-      directed,
-      bidirectional,
-      directions,
-      kinds,
-      origins,
-    } = relationship;
+    const { source, target, directed, bidirectional, directions, kinds, origins } =
+      relationship;
     const posA = posMap[source];
     const posB = posMap[target];
     const arrowId = `arrow-${arrowIdx++}`;
@@ -1134,8 +1127,9 @@ async function nodesToExcalidraw(nodes) {
           fixedPoint: endFixed,
           mode: "orbit",
         },
-        startArrowhead: bidirectional ? "arrow" : null,
-        endArrowhead: "arrow",
+        startArrowhead: null,
+        endArrowhead: null,
+        strokeStyle: "solid",
         roundness: { type: 2 },
         customData: {
           terraform: true,
