@@ -22,6 +22,11 @@ Upload your Terraform plan JSON and graph (DOT), and the app builds a canvas of 
   - Accepts plan + DOT file uploads
   - Builds adjacency lists, new vs existing edges, and resource diffs
   - Writes intermediate artifacts to `backend/temp/` and returns the final node graph (e.g. for the frontend to render on the canvas)
+- **Module grouping boxes** — Resources are wrapped by dashed module boxes based on Terraform module paths; nested modules produce nested boxes.
+- **Movable module groups** — Dragging a module box moves its internal resources together.
+- **Cleaner visual layering** — Dependency arrows are rendered behind resource nodes.
+- **Preset Lambda module layout** — Lambda module internals (function, role, policies, log group, packaging resources) are placed in stable relative positions for more consistent diagrams.
+- **Improved Terraform details panel** — JSON strings such as IAM policy documents are pretty-printed; unknown planned values are surfaced as `Known after apply`; volatile IAM role policy fields are filtered to make existing vs new comparisons clearer.
 
 The rest is standard Excalidraw: hand-drawn style, zoom/pan, export to PNG/SVG, and the usual editor tools.
 
@@ -44,6 +49,8 @@ Then use the **Terraform Import** flow in the app (e.g. from the menu or shortcu
 2. **Graph file** — DOT output (e.g. from `terraform graph` or your plan’s graph representation).
 
 The backend processes both and returns the graph; the app can then draw it on the Excalidraw canvas.
+
+Import shortcut: `Ctrl/Cmd + Shift + K`.
 
 ---
 
