@@ -289,6 +289,12 @@ const ACTION_STROKE = {
   "no-op": "#1971c2",
 };
 
+const UNKNOWN_VALUE_PLACEHOLDER = "Known after apply";
+
+const HIDDEN_ATTRIBUTES_BY_TYPE = {
+  aws_iam_role_policy: new Set(["id", "name_prefix"]),
+};
+
 function getPrimaryAction(node) {
   const actions = new Set();
   for (const resource of Object.values(node.resources || {})) {
@@ -331,28 +337,86 @@ function getCurrentResourceConfig(resource) {
   return {};
 }
 
+function hasUnknownAfterMarker(value) {
+  if (value === true) {
+    return true;
+  }
+
+  if (Array.isArray(value)) {
+    return value.some((entry) => hasUnknownAfterMarker(entry));
+  }
+
+  if (value && typeof value === "object") {
+    return Object.values(value).some((entry) => hasUnknownAfterMarker(entry));
+  }
+
+  return false;
+}
+
+function getUnknownTopLevelKeys(afterUnknown) {
+  if (!afterUnknown || typeof afterUnknown !== "object") {
+    return [];
+  }
+
+  return Object.entries(afterUnknown)
+    .filter(([, marker]) => hasUnknownAfterMarker(marker))
+    .map(([key]) => key);
+}
+
+function shouldHideTerraformAttribute(resourceType, key) {
+  const hidden = HIDDEN_ATTRIBUTES_BY_TYPE[resourceType];
+  return Boolean(hidden && hidden.has(key));
+}
+
 function buildTerraformResourceDetails(node) {
   return Object.entries(node.resources || {}).map(([address, resource]) => {
     const change = resource.change || {};
     const config = getCurrentResourceConfig(resource);
     const diff = change.diff || {};
-    const keys = new Set([...Object.keys(config), ...Object.keys(diff)]);
+    const resourceType = resource.type || getResourceType(address);
+    const unknownAfterKeys = getUnknownTopLevelKeys(change.after_unknown || {});
+    const unknownAfterSet = new Set(unknownAfterKeys);
+    const keys = new Set([
+      ...Object.keys(config),
+      ...Object.keys(diff),
+      ...unknownAfterKeys,
+    ]);
 
     const attributes = [...keys]
-      .filter((key) => isDisplayableConfigValue(config[key]) || diff[key])
+      .filter((key) => {
+        if (shouldHideTerraformAttribute(resourceType, key)) {
+          return false;
+        }
+
+        return (
+          isDisplayableConfigValue(config[key]) ||
+          Boolean(diff[key]) ||
+          unknownAfterSet.has(key)
+        );
+      })
       .sort((a, b) => {
+        const aUnknown = unknownAfterSet.has(a) ? 0 : 1;
+        const bUnknown = unknownAfterSet.has(b) ? 0 : 1;
+        if (aUnknown !== bUnknown) {
+          return aUnknown - bUnknown;
+        }
+
         const aChanged = diff[a] ? 0 : 1;
         const bChanged = diff[b] ? 0 : 1;
         return aChanged - bChanged || a.localeCompare(b);
       })
       .map((key) => {
         const fieldDiff = diff[key];
+        const unknownAfter = unknownAfterSet.has(key);
         return {
           key,
           value: Object.prototype.hasOwnProperty.call(config, key)
             ? config[key]
-            : fieldDiff?.after ?? null,
+            : unknownAfter
+              ? UNKNOWN_VALUE_PLACEHOLDER
+              : fieldDiff?.after ?? null,
           changed: Boolean(fieldDiff),
+          unknownAfter,
           before: fieldDiff?.before,
           after: fieldDiff?.after,
         };
@@ -360,7 +424,7 @@ function buildTerraformResourceDetails(node) {
 
     return {
       address: resource.address || address,
-      type: resource.type || getResourceType(address),
+      type: resourceType,
       name: resource.name || "",
       mode: resource.mode || "",
       actions: change.actions || [],
