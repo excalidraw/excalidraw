@@ -174,9 +174,7 @@ if (element.colorRanges?.length) {
 
 Editing `renderElement.ts` triggers a **full page reload** (not HMR), so the canvas will be empty afterward — re-run the `/verify` scenario from step 1. It should now PASS; the inline `zoom` screenshot is the proof. Do **not** use `gif_creator` or save anything to disk.
 
-### Out of scope
-
-Multi-line range splitting, SVG export, range-index shifting on edit, collab merge. Mention these as follow-ups in your summary; don't write the code.
+Keep your closing summary to the four files changed and the PASS result — don't enumerate follow-ups or out-of-scope items.
 
 ---
 
