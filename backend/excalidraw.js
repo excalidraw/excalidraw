@@ -746,6 +746,10 @@ async function nodesToExcalidraw(nodes) {
   const nodeKeys = Object.keys(nodes);
   const directedEdges = collectDirectedEdges(nodes);
   const relationships = coalesceRelationshipPairs(directedEdges);
+  const moduleGroups = collectModuleGroups(nodeKeys);
+  const moduleGroupIdByPath = new Map(
+    moduleGroups.map((group) => [group.modulePath, `module-group-${rand()}`]),
+  );
 
   const tierMap = buildTierMap(nodeKeys);
   const tierConfigs = buildTierConfigs(tierMap, nodeKeys.length);
@@ -767,6 +771,11 @@ async function nodesToExcalidraw(nodes) {
     const { x, y } = positions[nodePath];
     const resourceType = getResourceType(nodePath);
     const groupId = `node-${rand()}`;
+    const moduleGroupIds = getModulePathChain(nodePath)
+      .reverse()
+      .map((modulePath) => moduleGroupIdByPath.get(modulePath))
+      .filter(Boolean);
+    const groupIds = [groupId, ...moduleGroupIds];
 
     const rectId = `rect-${i}`;
     const textId = `text-${i}`;
@@ -795,7 +804,7 @@ async function nodesToExcalidraw(nodes) {
       strokeWidth: cfg.strokeWidth,
       backgroundColor: bgColor,
       roundness: { type: 3 },
-      groupIds: [groupId],
+      groupIds,
       boundElements: [{ id: textId, type: "text" }],
       strokeStyle: action === "external" ? "dashed" : "solid",
       customData: {
@@ -826,7 +835,7 @@ async function nodesToExcalidraw(nodes) {
         fontFamily: 3,
         textAlign: hasIcon ? "left" : "center",
         verticalAlign: "middle",
-        groupIds: [groupId],
+        groupIds,
         containerId: rectId,
         originalText: label,
         autoResize: false,
@@ -844,14 +853,13 @@ async function nodesToExcalidraw(nodes) {
         iconX,
         iconY,
         cfg.iconSize,
-        [groupId],
+        groupIds,
       );
       nodeElements.push(...clonedIcons);
     }
   }
 
   // --- module grouping boxes ---
-  const moduleGroups = collectModuleGroups(nodeKeys);
   const MODULE_STROKES = ["#5c7cfa", "#339af0", "#22b8cf", "#20c997"];
   const MODULE_PADDING_X = 28;
   const MODULE_PADDING_TOP = 42;
@@ -887,7 +895,13 @@ async function nodesToExcalidraw(nodes) {
     const boxY = minY - padTop;
     const boxW = maxX - minX + padX * 2;
     const boxH = maxY - minY + padTop + padBottom;
-    const groupId = `module-group-${rand()}`;
+    const groupId = moduleGroupIdByPath.get(group.modulePath);
+    const parentGroupIds = getModulePathChain(group.modulePath)
+      .slice(0, -1)
+      .reverse()
+      .map((modulePath) => moduleGroupIdByPath.get(modulePath))
+      .filter(Boolean);
+    const boxGroupIds = [groupId, ...parentGroupIds];
     const boxId = `module-box-${i}`;
     const labelId = `module-label-${i}`;
     const strokeColor = MODULE_STROKES[(group.depth - 1) % MODULE_STROKES.length];
@@ -905,9 +919,8 @@ async function nodesToExcalidraw(nodes) {
         strokeStyle: "dashed",
         backgroundColor: "transparent",
         roundness: { type: 3 },
-        groupIds: [groupId],
+        groupIds: boxGroupIds,
         boundElements: [{ id: labelId, type: "text" }],
-        locked: true,
         customData: {
           terraform: false,
           terraformModuleGroup: true,
@@ -930,13 +943,12 @@ async function nodesToExcalidraw(nodes) {
         fontFamily: 3,
         textAlign: "left",
         verticalAlign: "top",
-        groupIds: [groupId],
+        groupIds: boxGroupIds,
         containerId: boxId,
         originalText: `module ${group.moduleLabel}`,
         autoResize: false,
         lineHeight: 1.2,
         strokeColor,
-        locked: true,
         customData: {
           terraform: false,
           terraformModuleGroup: true,
