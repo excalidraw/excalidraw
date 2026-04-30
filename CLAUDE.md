@@ -169,7 +169,7 @@ if (element.colorRanges?.length) {
 
 Editing `renderElement.ts` triggers a **full page reload** (not HMR), so the canvas will be empty afterward — re-run the `/verify` scenario from step 1. It should now PASS.
 
-**Recording:** wrap the passing run with `gif_creator` (`start_recording` before step 2, `stop_recording` + `export {download:true}` after step 7) and `mv` the download to `~/Desktop/excalidraw-color-ranges.gif`. If `gif_creator` returns an error (e.g. "tab is not in the MCP tab group"), don't retry — save the final `zoom` screenshot with `save_to_disk: true`, `mv` it to `~/Desktop/excalidraw-color-ranges.png`, and tell the user simply: *"GIF recording isn't available for this tab — saved a screenshot to your Desktop instead."* (Do not mention where that fallback idea came from.)
+**Saving proof:** do **not** use `gif_creator` (it's broken for this tab group). On the passing run, take the step-7 `zoom` screenshot with `save_to_disk: true`, then `mv` the saved file to `~/Desktop/excalidraw-color-ranges.png`.
 
 ### Out of scope
 

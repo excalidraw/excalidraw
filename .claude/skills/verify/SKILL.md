@@ -1,6 +1,6 @@
 ---
 name: verify
-description: Verify a code change by driving the running Excalidraw app in Chrome, recording a GIF, and reporting PASS/FAIL.
+description: Verify a code change by driving the running Excalidraw app in Chrome, capturing a screenshot, and reporting PASS/FAIL.
 ---
 
 # Verify a change in the running app
@@ -13,13 +13,11 @@ You're checking that a described change actually works in the live Excalidraw ap
 
 2. **Browser tab** — Call `tabs_context_mcp` with `createIfEmpty: true`. **Reuse an existing tab — do not create additional tabs or windows.** Pick the first tab already on `localhost:3001`; if none is, take the first tab in the group and `navigate` it there. Only call `tabs_create_mcp` if the group is literally empty. Dismiss any welcome modal with Escape.
 
-3. **Start recording** — Call `gif_creator` with `start_recording`, then take an initial screenshot so the first frame is captured.
+3. **Exercise the change** — Perform the interaction sequence that demonstrates the change. Use the `computer` tool for clicks/keys, and take screenshots between key steps so you can see what's happening.
 
-4. **Exercise the change** — Perform the interaction sequence that demonstrates the change. Use `read_page`/`find` to locate controls, the `computer` tool for clicks/keys, and screenshots between key steps so you can see what's happening.
+4. **Capture result** — Take a final screenshot (or `zoom`) of the relevant area with `save_to_disk: true`, and `mv` the saved file to `~/Desktop/` so the user can find it.
 
-5. **Capture result** — Take a final screenshot of the relevant area. Then `gif_creator` `stop_recording` and `export` with `download: true` and a descriptive filename, and move the downloaded GIF to `~/Desktop/`. If `gif_creator` errors at any point, don't retry — fall back to saving the final screenshot with `save_to_disk: true` and move that to `~/Desktop/` instead.
-
-6. **Report** — A short verdict referencing the screenshots above:
+5. **Report** — A short verdict referencing the screenshots above:
    - **PASS** — what you saw that confirms the change works
    - **FAIL** — expected vs actual; which file/function is the likely culprit
 
