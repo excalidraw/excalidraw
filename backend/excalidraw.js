@@ -993,7 +993,121 @@ function buildNodeVpcMap(nodes) {
   return nodeVpcMap;
 }
 
-function collectAccountRegionGroups(nodeKeys, nodeLocationMap, nodeVpcMap) {
+function buildNodeSubnetMap(nodes, nodeVpcMap) {
+  const nodeSubnetMap = new Map();
+  const subnetAnchorByNodePath = new Map();
+  const subnetLabelByKey = new Map();
+  const subnetVpcKeyBySubnetKey = new Map();
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    const nodeVpc = nodeVpcMap.get(nodePath) || null;
+
+    for (const resource of Object.values(node.resources || {})) {
+      const config = getCurrentResourceConfig(resource);
+      const explicitVpcIds = extractVpcIdsFromConfig(config);
+      const resourceVpcKey =
+        explicitVpcIds[0] || nodeVpc?.vpcKey || null;
+
+      if (resource.type === "aws_subnet") {
+        const subnetId = normalizeSubnetId(config.id);
+        const subnetKey = subnetId || `node:${nodePath}`;
+        const subnetLabel =
+          subnetId || getLabel(nodePath).split("\n").pop() || nodePath;
+
+        subnetAnchorByNodePath.set(nodePath, { subnetKey, subnetLabel });
+        subnetLabelByKey.set(subnetKey, subnetLabel);
+
+        if (resourceVpcKey) {
+          subnetVpcKeyBySubnetKey.set(subnetKey, resourceVpcKey);
+        }
+      }
+
+      const explicitSubnetIds = extractSubnetIdsFromConfig(config);
+      for (const subnetId of explicitSubnetIds) {
+        if (!subnetLabelByKey.has(subnetId)) {
+          subnetLabelByKey.set(subnetId, subnetId);
+        }
+        if (resourceVpcKey && !subnetVpcKeyBySubnetKey.has(subnetId)) {
+          subnetVpcKeyBySubnetKey.set(subnetId, resourceVpcKey);
+        }
+      }
+    }
+  }
+
+  const adjacency = buildNodeAdjacencyMap(nodes);
+  const fallbackTypes = new Set([
+    "aws_lambda_function",
+    "aws_route_table_association",
+    "aws_network_interface",
+    "aws_nat_gateway",
+    "aws_instance",
+    "aws_db_instance",
+    "aws_db_subnet_group",
+  ]);
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    let subnetKey = null;
+    let subnetLabel = null;
+    let subnetVpcKey = null;
+
+    if (subnetAnchorByNodePath.has(nodePath)) {
+      const anchor = subnetAnchorByNodePath.get(nodePath);
+      subnetKey = anchor.subnetKey;
+      subnetLabel = anchor.subnetLabel;
+      subnetVpcKey = subnetVpcKeyBySubnetKey.get(subnetKey) || null;
+    } else {
+      for (const resource of Object.values(node.resources || {})) {
+        const config = getCurrentResourceConfig(resource);
+        const explicitSubnetIds = extractSubnetIdsFromConfig(config);
+        if (explicitSubnetIds.length > 0) {
+          const subnetId = [...explicitSubnetIds].sort()[0];
+          subnetKey = subnetId;
+          subnetLabel = subnetId;
+          subnetVpcKey = subnetVpcKeyBySubnetKey.get(subnetId) || null;
+          break;
+        }
+      }
+    }
+
+    if (!subnetKey) {
+      const resourceType = getResourceType(nodePath);
+      if (fallbackTypes.has(resourceType)) {
+        const nearestAnchor = findNearestVpcAnchor(
+          nodePath,
+          adjacency,
+          subnetAnchorByNodePath,
+          3,
+        );
+        if (nearestAnchor) {
+          subnetKey = nearestAnchor.subnetKey;
+          subnetLabel = nearestAnchor.subnetLabel;
+          subnetVpcKey = subnetVpcKeyBySubnetKey.get(subnetKey) || null;
+        }
+      }
+    }
+
+    if (!subnetKey) {
+      continue;
+    }
+
+    const label = subnetLabelByKey.get(subnetKey) || subnetLabel || subnetKey;
+    subnetLabelByKey.set(subnetKey, label);
+    nodeSubnetMap.set(nodePath, {
+      subnetKey,
+      subnetLabel: label,
+      vpcKey: subnetVpcKey,
+    });
+  }
+
+  return nodeSubnetMap;
+}
+
+function collectAccountRegionGroups(
+  nodeKeys,
+  nodeLocationMap,
+  nodeVpcMap,
+  nodeSubnetMap,
+) {
   const accountGroups = new Map();
 
   for (const nodePath of nodeKeys) {
@@ -1037,10 +1151,28 @@ function collectAccountRegionGroups(nodeKeys, nodeLocationMap, nodeVpcMap) {
           accountId,
           region,
           nodePaths: [],
+          subnets: new Map(),
         });
       }
 
-      regionGroup.vpcs.get(vpc.vpcKey).nodePaths.push(nodePath);
+      const vpcGroup = regionGroup.vpcs.get(vpc.vpcKey);
+      vpcGroup.nodePaths.push(nodePath);
+
+      const subnet = nodeSubnetMap.get(nodePath);
+      if (subnet && subnet.subnetKey) {
+        if (!vpcGroup.subnets.has(subnet.subnetKey)) {
+          vpcGroup.subnets.set(subnet.subnetKey, {
+            subnetKey: subnet.subnetKey,
+            subnetLabel: subnet.subnetLabel,
+            accountId,
+            region,
+            vpcKey: vpc.vpcKey,
+            nodePaths: [],
+          });
+        }
+
+        vpcGroup.subnets.get(subnet.subnetKey).nodePaths.push(nodePath);
+      }
     }
   }
 
@@ -1056,9 +1188,14 @@ function collectAccountRegionGroups(nodeKeys, nodeLocationMap, nodeVpcMap) {
       ...account,
       regions: account.regions.map((region) => ({
         ...region,
-        vpcs: [...region.vpcs.values()].sort((a, b) =>
-          a.vpcLabel.localeCompare(b.vpcLabel),
-        ),
+        vpcs: [...region.vpcs.values()]
+          .sort((a, b) => a.vpcLabel.localeCompare(b.vpcLabel))
+          .map((vpc) => ({
+            ...vpc,
+            subnets: [...vpc.subnets.values()].sort((a, b) =>
+              a.subnetLabel.localeCompare(b.subnetLabel),
+            ),
+          })),
       })),
     }));
 }
@@ -1314,10 +1451,12 @@ async function nodesToExcalidraw(nodes) {
   const relationships = coalesceRelationshipPairs(directedEdges);
   const nodeLocationMap = buildNodeLocationMap(nodes);
   const nodeVpcMap = buildNodeVpcMap(nodes);
+  const nodeSubnetMap = buildNodeSubnetMap(nodes, nodeVpcMap);
   const accountRegionGroups = collectAccountRegionGroups(
     nodeKeys,
     nodeLocationMap,
     nodeVpcMap,
+    nodeSubnetMap,
   );
   const moduleGroups = collectModuleGroups(nodeKeys);
   const moduleGroupIdByPath = new Map(
@@ -1362,6 +1501,7 @@ async function nodesToExcalidraw(nodes) {
     const terraformResources = buildTerraformResourceDetails(nodes[nodePath]);
     const nodeLocation = nodeLocationMap.get(nodePath) || null;
     const nodeVpc = nodeVpcMap.get(nodePath) || null;
+    const nodeSubnet = nodeSubnetMap.get(nodePath) || null;
 
     // Check for icon
     const iconElements = cfg.iconSize > 0 ? getIconForType(resourceType) : null;
@@ -1392,6 +1532,8 @@ async function nodesToExcalidraw(nodes) {
         accountId: nodeLocation?.accountId || null,
         vpcId: nodeVpc?.vpcKey || null,
         vpcLabel: nodeVpc?.vpcLabel || null,
+        subnetId: nodeSubnet?.subnetKey || null,
+        subnetLabel: nodeSubnet?.subnetLabel || null,
         terraformResources,
       },
     });
@@ -1551,6 +1693,10 @@ async function nodesToExcalidraw(nodes) {
   const VPC_PADDING_X = 14;
   const VPC_PADDING_TOP = 32;
   const VPC_PADDING_BOTTOM = 12;
+  const SUBNET_STROKE = "#099268";
+  const SUBNET_PADDING_X = 10;
+  const SUBNET_PADDING_TOP = 26;
+  const SUBNET_PADDING_BOTTOM = 10;
 
   let accountBoxIndex = 0;
   let regionBoxIndex = 0;
@@ -1808,6 +1954,102 @@ async function nodesToExcalidraw(nodes) {
             },
           }),
         );
+
+        for (const subnetGroup of vpcGroup.subnets || []) {
+          let subnetMinX = Infinity;
+          let subnetMinY = Infinity;
+          let subnetMaxX = -Infinity;
+          let subnetMaxY = -Infinity;
+
+          for (const nodePath of subnetGroup.nodePaths) {
+            const pos = posMap[nodePath];
+            if (!pos) {
+              continue;
+            }
+            subnetMinX = Math.min(subnetMinX, pos.x);
+            subnetMinY = Math.min(subnetMinY, pos.y);
+            subnetMaxX = Math.max(subnetMaxX, pos.x + pos.w);
+            subnetMaxY = Math.max(subnetMaxY, pos.y + pos.h);
+          }
+
+          if (!Number.isFinite(subnetMinX) || !Number.isFinite(subnetMinY)) {
+            continue;
+          }
+
+          const subnetGroupId = `subnet-group-${rand()}`;
+          const subnetBoxX = subnetMinX - SUBNET_PADDING_X;
+          const subnetBoxY = subnetMinY - SUBNET_PADDING_TOP;
+          const subnetBoxW = subnetMaxX - subnetMinX + SUBNET_PADDING_X * 2;
+          const subnetBoxH =
+            subnetMaxY - subnetMinY + SUBNET_PADDING_TOP + SUBNET_PADDING_BOTTOM;
+          const subnetBoxId = `subnet-box-${vpcBoxIndex}-${rand()}`;
+          const subnetLabelId = `subnet-label-${vpcBoxIndex}-${rand()}`;
+
+          const subnetGroupIds = [
+            subnetGroupId,
+            vpcGroupId,
+            regionGroupId,
+            accountGroupId,
+          ];
+
+          locationElements.push(
+            makeBaseElement({
+              type: "rectangle",
+              id: subnetBoxId,
+              x: subnetBoxX,
+              y: subnetBoxY,
+              width: subnetBoxW,
+              height: subnetBoxH,
+              strokeColor: SUBNET_STROKE,
+              strokeWidth: 1,
+              strokeStyle: "dashed",
+              backgroundColor: "transparent",
+              roundness: { type: 3 },
+              groupIds: subnetGroupIds,
+              boundElements: [{ id: subnetLabelId, type: "text" }],
+              customData: {
+                terraform: false,
+                terraformSubnetGroup: true,
+                accountId: subnetGroup.accountId,
+                region: subnetGroup.region,
+                vpcId: subnetGroup.vpcKey,
+                subnetId: subnetGroup.subnetKey,
+                subnetLabel: subnetGroup.subnetLabel,
+              },
+            }),
+          );
+
+          locationElements.push(
+            makeBaseElement({
+              type: "text",
+              id: subnetLabelId,
+              x: subnetBoxX + 8,
+              y: subnetBoxY + 6,
+              width: Math.max(86, subnetBoxW - 16),
+              height: 18,
+              text: `subnet ${subnetGroup.subnetLabel}`,
+              fontSize: 13,
+              fontFamily: 3,
+              textAlign: "left",
+              verticalAlign: "top",
+              groupIds: subnetGroupIds,
+              containerId: subnetBoxId,
+              originalText: `subnet ${subnetGroup.subnetLabel}`,
+              autoResize: false,
+              lineHeight: 1.2,
+              strokeColor: SUBNET_STROKE,
+              customData: {
+                terraform: false,
+                terraformSubnetGroup: true,
+                accountId: subnetGroup.accountId,
+                region: subnetGroup.region,
+                vpcId: subnetGroup.vpcKey,
+                subnetId: subnetGroup.subnetKey,
+                subnetLabel: subnetGroup.subnetLabel,
+              },
+            }),
+          );
+        }
       }
     }
   }
