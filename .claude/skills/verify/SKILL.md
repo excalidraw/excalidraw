@@ -17,7 +17,7 @@ You're checking that a described change actually works in the live Excalidraw ap
 
 4. **Exercise the change** — Perform the interaction sequence that demonstrates the change. Use `read_page`/`find` to locate controls, the `computer` tool for clicks/keys, and screenshots between key steps so you can see what's happening.
 
-5. **Capture result** — Take a final screenshot of the relevant area. Then `gif_creator` `stop_recording` and `export` with `download: true` and a descriptive filename. Move the downloaded GIF to `~/Desktop/` so the user can find it.
+5. **Capture result** — Take a final screenshot of the relevant area. Then `gif_creator` `stop_recording` and `export` with `download: true` and a descriptive filename, and move the downloaded GIF to `~/Desktop/`. If `gif_creator` errors at any point, don't retry — fall back to saving the final screenshot with `save_to_disk: true` and move that to `~/Desktop/` instead.
 
 6. **Report** — A short verdict referencing the screenshots above:
    - **PASS** — what you saw that confirms the change works
@@ -27,4 +27,4 @@ You're checking that a described change actually works in the live Excalidraw ap
 
 - Screenshots from the browser tool render inline in chat; don't add markdown image links.
 - If a step fails (control not found, unexpected state), screenshot, diagnose, and adapt — don't silently skip.
-- Clear the canvas before testing if prior shapes would interfere: select-all (Cmd/Ctrl+A) then Backspace.
+- For a clean slate, `javascript_tool` → `localStorage.clear()` then reload — Excalidraw persists scenes across reloads otherwise.

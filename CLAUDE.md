@@ -128,16 +128,21 @@ Now run `yarn test:typecheck` and immediately `/verify` against the test scenari
 
 ### `/verify` test scenario for this feature
 
-1. Navigate to `http://localhost:3001`, wait ~3s for the bundle.
-2. **Click an empty area of the canvas first** (e.g. lower-left, away from the welcome menu) so the app has keyboard focus.
-3. Press `8` to activate the text tool, then click near canvas centre, type `Hello World`.
+> **Hard rule for this app:** every `left_click` must be a **coordinate** click read from a screenshot you took **immediately before** — coordinates are in screenshot-pixel space, not CSS pixels, so a stale screenshot or a `ref`/`find` click will miss. Never call `resize_window` (it can wedge CDP screenshot capture).
+
+1. Reset state: `javascript_tool` → `localStorage.clear()`, then `navigate` to `http://localhost:3001`, wait ~3s.
+2. Take a **screenshot**. Click an empty canvas area (lower-left, away from the welcome menu) so the app has keyboard focus.
+3. Press `8` to activate the text tool, click again on empty canvas to place the cursor, then `type` `Hello World`.
 4. While still editing, select the last word with key `alt+shift+ArrowLeft`.
-5. Take a screenshot. In the left panel under **Stroke**, click the **red swatch** at its on-screen coordinates (do not use a `ref`/`find` click for this — see browser tips below).
+5. Take a fresh **screenshot**. The left panel should show a **Stroke** label with a row of color swatches (full-width panel — if you only see a vertical strip of icons, the window is too narrow; report that and stop rather than navigating a popover). Click the **red** swatch using coordinates from this screenshot.
 6. Press `Escape` twice (commit text, deselect).
-7. Zoom-screenshot the text. **Expected:** `Hello` black, `World` red.
+7. `zoom`-screenshot the text. **Expected:** `Hello` black, `World` red.
 8. Confirm the data via `javascript_tool`:
    ```js
-   JSON.stringify(window.h.elements?.find(e => e.type === "text")?.colorRanges)
+   JSON.stringify(
+     window.h.elements?.find((e) => e.type === "text" && !e.isDeleted)
+       ?.colorRanges,
+   )
    ```
 
 ### What `/verify` will show at this point
@@ -162,7 +167,9 @@ if (element.colorRanges?.length) {
 }
 ```
 
-Editing `renderElement.ts` triggers a **full page reload** (not HMR), so the canvas will be empty afterward — re-run the `/verify` scenario from step 2. It should now PASS. Export the GIF to `~/Desktop/excalidraw-color-ranges.gif`.
+Editing `renderElement.ts` triggers a **full page reload** (not HMR), so the canvas will be empty afterward — re-run the `/verify` scenario from step 1. It should now PASS.
+
+**Recording:** wrap the passing run with `gif_creator` (`start_recording` before step 2, `stop_recording` + `export {download:true}` after step 7) and `mv` the download to `~/Desktop/excalidraw-color-ranges.gif`. If `gif_creator` returns an error (e.g. "tab is not in the MCP tab group"), don't retry it — instead save the final `zoom` screenshot with `save_to_disk: true` and `mv` that file to `~/Desktop/excalidraw-color-ranges.png`, then carry on.
 
 ### Out of scope
 
@@ -174,16 +181,18 @@ Multi-line range splitting, SVG export, range-index shifting on edit, collab mer
 
 These are not yet in `/verify` — if you rely on them during a session and are later asked to improve `/verify`, fold the relevant ones in.
 
-- **Focus before hotkeys**: tool hotkeys (`8`=text, `r`=rect, `v`/`1`=select) only register when the app has focus. Click an empty canvas area before sending them.
-- **Text editing**: a single click on text only selects the bounding box. **Double-click** to enter edit mode (textarea `.excalidraw-wysiwyg` appears). **Escape** commits.
+- **Screenshot before every coordinate click**: the `computer` tool's `[x,y]` are screenshot pixels, not CSS pixels. DPR/viewport scaling means coordinates from an earlier screenshot will miss after any reload or layout change.
+- **Never use `ref`/`find` clicks here**: they skip `pointerdown`, which Excalidraw relies on for tool activation and for keeping the text editor open through panel interactions. Always coordinate-click.
+- **Never call `resize_window`**: it can wedge `Page.captureScreenshot` for the rest of the tab.
+- **Focus before hotkeys**: tool hotkeys (`8`=text, `r`=rect, `v`/`1`=select) only register when the app has focus. Click an empty canvas area first.
+- **Text editing**: single-click on text only selects the bounding box. **Double-click** enters edit mode (textarea `.excalidraw-wysiwyg`). **Escape** commits.
 - **Word selection in the textarea**: `alt+shift+ArrowLeft` / `ArrowRight` selects by word.
-- **Properties-panel clicks need real pointer events**: the wysiwyg only stays open through panel clicks because of a `pointerdown` capture handler. The browser tool's `ref`-based `left_click` skips pointer events — use **coordinate** `left_click` for color swatches and other panel controls while editing text.
-- **Debug handle**: `window.h.elements` is the live element array — useful for asserting data without pixel-peeping.
-- **Canvas clear**: `Cmd+A` then `Backspace`, then press `1` to return to the selection tool.
+- **Debug handle**: `window.h.elements` is the live element array — filter `!e.isDeleted` since soft-deleted elements linger.
+- **Hard reset between runs**: `localStorage.clear()` then reload — `Cmd+A`+Backspace only soft-deletes.
 
 ## When asked to update `/verify`
 
-Read `.claude/skills/verify/SKILL.md`, then add a short **"Excalidraw interaction tips"** section after the existing "Notes" with the focus/hotkey, text-editing, word-select, coordinate-click-for-panel, and `window.h` items above. Keep the skill generic — these are tips, not feature-specific steps.
+Read `.claude/skills/verify/SKILL.md`, then add a short **"Excalidraw interaction tips"** section after the existing "Notes" covering: screenshot-before-every-coordinate-click, never `ref`-click or `resize_window` here, focus canvas before hotkeys, double-click/Escape for text editing, `alt+shift+Arrow` word select, `window.h.elements` (filter `!isDeleted`), and `localStorage.clear()` for a hard reset. Keep the skill generic — these are tips, not feature-specific steps.
 
 ---
 

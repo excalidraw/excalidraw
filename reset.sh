@@ -2,6 +2,12 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+if [[ "${1:-}" != "--force" ]] && ! git diff --quiet -- packages/; then
+  echo "✗ Uncommitted changes in packages/ — a demo run may be in progress."
+  echo "  Re-run with:  ./reset.sh --force"
+  exit 1
+fi
+
 echo "→ Resetting working tree to demo-baseline…"
 git checkout master --quiet 2>/dev/null || true
 git reset --hard demo-baseline
