@@ -788,11 +788,16 @@ async function nodesToExcalidraw(nodes) {
     );
   }
 
+  const elementsOrdered = [
+    ...elements.filter((element) => element.type === "arrow"),
+    ...elements.filter((element) => element.type !== "arrow"),
+  ];
+
   return {
     type: "excalidraw",
     version: 2,
     source: "terraform-pipeline",
-    elements,
+    elements: elementsOrdered,
     appState: {
       viewBackgroundColor: "#ffffff",
       gridSize: null,
