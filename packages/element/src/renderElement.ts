@@ -589,6 +589,19 @@ const drawElementOnCanvas = (
             index * lineHeightPx + verticalOffset,
           );
         }
+        if (element.colorRanges?.length) {
+          context.textAlign = "left";
+          for (const range of element.colorRanges) {
+            const before = element.text.slice(0, range.start);
+            const segment = element.text.slice(range.start, range.end);
+            const x = context.measureText(before).width;
+            context.fillStyle =
+              renderConfig.theme === THEME.DARK
+                ? applyDarkModeFilter(range.color)
+                : range.color;
+            context.fillText(segment, x, verticalOffset);
+          }
+        }
         context.restore();
         if (shouldTemporarilyAttach) {
           context.canvas.remove();

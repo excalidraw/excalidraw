@@ -195,6 +195,12 @@ const getLineCaretOffsetFromNativeLayout = ({
 
 type SubmitHandler = () => void;
 
+export const activeTextSelection: {
+  elementId: string | null;
+  start: number;
+  end: number;
+} = { elementId: null, start: 0, end: 0 };
+
 export const textWysiwyg = ({
   id,
   onChange,
@@ -431,6 +437,17 @@ export const textWysiwyg = ({
   // prevent line wrapping on Safari
   editable.wrap = "off";
   editable.classList.add("excalidraw-wysiwyg");
+
+  activeTextSelection.elementId = id;
+  activeTextSelection.start = 0;
+  activeTextSelection.end = 0;
+  const trackSelection = () => {
+    activeTextSelection.start = editable.selectionStart;
+    activeTextSelection.end = editable.selectionEnd;
+  };
+  editable.addEventListener("select", trackSelection);
+  editable.addEventListener("keyup", trackSelection);
+  editable.addEventListener("click", trackSelection);
 
   let whiteSpace = "pre";
   let wordBreak = "normal";

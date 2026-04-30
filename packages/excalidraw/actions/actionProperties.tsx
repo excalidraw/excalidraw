@@ -149,6 +149,8 @@ import {
 
 import { getShortcutKey } from "../shortcut";
 
+import { activeTextSelection } from "../wysiwyg/textWysiwyg";
+
 import { register } from "./register";
 
 import type { AppClassProperties, AppState, Primitive } from "../types";
@@ -326,6 +328,21 @@ export const actionChangeStrokeColor = register<
           elements,
           appState,
           (el) => {
+            if (
+              el.type === "text" &&
+              el.id === activeTextSelection.elementId &&
+              activeTextSelection.start !== activeTextSelection.end
+            ) {
+              const range = {
+                start: activeTextSelection.start,
+                end: activeTextSelection.end,
+                color: value.currentItemStrokeColor,
+              };
+              activeTextSelection.start = activeTextSelection.end;
+              return newElementWith(el, {
+                colorRanges: [...(el.colorRanges ?? []), range],
+              });
+            }
             return hasStrokeColor(el.type)
               ? newElementWith(el, {
                   strokeColor: value.currentItemStrokeColor,
