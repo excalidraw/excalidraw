@@ -3,8 +3,12 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 echo "→ Resetting working tree to demo-baseline…"
+git checkout master --quiet 2>/dev/null || true
 git reset --hard demo-baseline
 git clean -fd -- packages/ excalidraw-app/ .claude/ >/dev/null
+git branch -D text-color-ranges 2>/dev/null || true
+git checkout -b text-color-ranges --quiet
+echo "→ On branch: $(git branch --show-current)"
 
 echo "→ Removing demo GIFs from Desktop…"
 rm -f ~/Desktop/excalidraw-*.gif ~/Downloads/excalidraw-*.gif 2>/dev/null || true
