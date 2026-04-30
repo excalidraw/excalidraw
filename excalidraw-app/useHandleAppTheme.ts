@@ -54,17 +54,20 @@ export const useHandleAppTheme = () => {
     };
   }, [appTheme, editorTheme, setAppTheme]);
 
-  useLayoutEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_THEME, appTheme);
+  const resolveTheme = (theme: Theme | "system"): Theme => {
+  if (theme === "system") {
+    return getDarkThemeMediaQuery()?.matches
+      ? THEME.DARK
+      : THEME.LIGHT;
+  }
+  return theme;
+};
 
-    if (appTheme === "system") {
-      setEditorTheme(
-        getDarkThemeMediaQuery()?.matches ? THEME.DARK : THEME.LIGHT,
-      );
-    } else {
-      setEditorTheme(appTheme);
-    }
-  }, [appTheme]);
+useLayoutEffect(() => {
+  localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_THEME, appTheme);
+
+  setEditorTheme(resolveTheme(appTheme));
+}, [appTheme]);
 
   return { editorTheme, appTheme, setAppTheme };
 };
