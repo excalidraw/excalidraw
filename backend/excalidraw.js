@@ -612,6 +612,208 @@ function collectModuleGroups(nodeKeys) {
   return [...groups.values()].sort((a, b) => a.depth - b.depth);
 }
 
+function parseAwsArn(value) {
+  if (typeof value !== "string" || !value.startsWith("arn:")) {
+    return null;
+  }
+
+  const parts = value.split(":");
+  if (parts.length < 6) {
+    return null;
+  }
+
+  return {
+    partition: parts[1] || null,
+    service: parts[2] || null,
+    region: parts[3] || null,
+    accountId: parts[4] || null,
+  };
+}
+
+function normalizeRegion(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function normalizeAccountId(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return /^\d{12}$/.test(trimmed) ? trimmed : null;
+}
+
+function extractLocationFromConfig(config) {
+  let region =
+    normalizeRegion(config.region) || normalizeRegion(config.aws_region);
+  let accountId =
+    normalizeAccountId(config.account_id) ||
+    normalizeAccountId(config.account) ||
+    normalizeAccountId(config.owner_id);
+
+  const arnCandidates = [];
+  if (typeof config.arn === "string") {
+    arnCandidates.push(config.arn);
+  }
+
+  for (const [key, value] of Object.entries(config)) {
+    if (!key.endsWith("_arn")) {
+      continue;
+    }
+
+    if (typeof value === "string") {
+      arnCandidates.push(value);
+      continue;
+    }
+
+    if (Array.isArray(value)) {
+      for (const entry of value) {
+        if (typeof entry === "string") {
+          arnCandidates.push(entry);
+        }
+      }
+    }
+  }
+
+  for (const candidate of arnCandidates) {
+    const parsed = parseAwsArn(candidate);
+    if (!parsed) {
+      continue;
+    }
+
+    if (!region) {
+      region = normalizeRegion(parsed.region);
+    }
+    if (!accountId) {
+      accountId = normalizeAccountId(parsed.accountId);
+    }
+
+    if (region && accountId) {
+      break;
+    }
+  }
+
+  return { region, accountId };
+}
+
+function pickMostCommon(map) {
+  let winner = null;
+  let winnerCount = -1;
+
+  for (const [value, count] of map.entries()) {
+    if (count > winnerCount) {
+      winner = value;
+      winnerCount = count;
+    }
+  }
+
+  return winner;
+}
+
+function buildNodeLocationMap(nodes) {
+  const nodeLocations = new Map();
+  const regionCounts = new Map();
+  const accountCounts = new Map();
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    let hasAwsResource = false;
+    let region = null;
+    let accountId = null;
+
+    for (const resource of Object.values(node.resources || {})) {
+      const type = resource.type || "";
+      if (!type.startsWith("aws_")) {
+        continue;
+      }
+
+      hasAwsResource = true;
+      const config = getCurrentResourceConfig(resource);
+      const location = extractLocationFromConfig(config);
+
+      if (!region && location.region) {
+        region = location.region;
+      }
+      if (!accountId && location.accountId) {
+        accountId = location.accountId;
+      }
+    }
+
+    if (!hasAwsResource) {
+      continue;
+    }
+
+    if (region) {
+      regionCounts.set(region, (regionCounts.get(region) || 0) + 1);
+    }
+    if (accountId) {
+      accountCounts.set(accountId, (accountCounts.get(accountId) || 0) + 1);
+    }
+
+    nodeLocations.set(nodePath, { region, accountId });
+  }
+
+  const defaultRegion = pickMostCommon(regionCounts);
+  const defaultAccountId = pickMostCommon(accountCounts);
+
+  for (const [nodePath, location] of nodeLocations.entries()) {
+    nodeLocations.set(nodePath, {
+      region: location.region || defaultRegion || "unknown-region",
+      accountId: location.accountId || defaultAccountId || "unknown-account",
+    });
+  }
+
+  return nodeLocations;
+}
+
+function collectAccountRegionGroups(nodeKeys, nodeLocationMap) {
+  const accountGroups = new Map();
+
+  for (const nodePath of nodeKeys) {
+    const location = nodeLocationMap.get(nodePath);
+    if (!location) {
+      continue;
+    }
+
+    const accountId = location.accountId;
+    const region = location.region;
+
+    if (!accountGroups.has(accountId)) {
+      accountGroups.set(accountId, {
+        accountId,
+        nodePaths: [],
+        regions: new Map(),
+      });
+    }
+
+    const accountGroup = accountGroups.get(accountId);
+    accountGroup.nodePaths.push(nodePath);
+
+    if (!accountGroup.regions.has(region)) {
+      accountGroup.regions.set(region, {
+        region,
+        accountId,
+        nodePaths: [],
+      });
+    }
+
+    accountGroup.regions.get(region).nodePaths.push(nodePath);
+  }
+
+  return [...accountGroups.values()]
+    .sort((a, b) => a.accountId.localeCompare(b.accountId))
+    .map((account) => ({
+      ...account,
+      regions: [...account.regions.values()].sort((a, b) =>
+        a.region.localeCompare(b.region),
+      ),
+    }));
+}
+
 // --- Element builders ---
 
 function makeBaseElement(overrides) {
@@ -855,11 +1057,17 @@ async function forceLayout(nodeKeys, directedEdges, tierMap, tierConfigs) {
 
 async function nodesToExcalidraw(nodes) {
   const nodeElements = [];
+  const locationElements = [];
   const moduleElements = [];
   const arrowElements = [];
   const nodeKeys = Object.keys(nodes);
   const directedEdges = collectDirectedEdges(nodes);
   const relationships = coalesceRelationshipPairs(directedEdges);
+  const nodeLocationMap = buildNodeLocationMap(nodes);
+  const accountRegionGroups = collectAccountRegionGroups(
+    nodeKeys,
+    nodeLocationMap,
+  );
   const moduleGroups = collectModuleGroups(nodeKeys);
   const moduleGroupIdByPath = new Map(
     moduleGroups.map((group) => [group.modulePath, `module-group-${rand()}`]),
@@ -901,6 +1109,7 @@ async function nodesToExcalidraw(nodes) {
     const strokeColor = ACTION_STROKE[action] || ACTION_STROKE.existing;
     const label = getLabel(nodePath);
     const terraformResources = buildTerraformResourceDetails(nodes[nodePath]);
+    const nodeLocation = nodeLocationMap.get(nodePath) || null;
 
     // Check for icon
     const iconElements = cfg.iconSize > 0 ? getIconForType(resourceType) : null;
@@ -927,6 +1136,8 @@ async function nodesToExcalidraw(nodes) {
         resourceType,
         nodePath,
         action,
+        region: nodeLocation?.region || null,
+        accountId: nodeLocation?.accountId || null,
         terraformResources,
       },
     });
@@ -1073,6 +1284,186 @@ async function nodesToExcalidraw(nodes) {
     );
   }
 
+  // --- account / region grouping boxes ---
+  const ACCOUNT_STROKE = "#0b7285";
+  const REGION_STROKE = "#1864ab";
+  const ACCOUNT_PADDING_X = 44;
+  const ACCOUNT_PADDING_TOP = 56;
+  const ACCOUNT_PADDING_BOTTOM = 28;
+  const REGION_PADDING_X = 24;
+  const REGION_PADDING_TOP = 40;
+  const REGION_PADDING_BOTTOM = 18;
+
+  let accountBoxIndex = 0;
+  let regionBoxIndex = 0;
+  for (const accountGroup of accountRegionGroups) {
+    let accountMinX = Infinity;
+    let accountMinY = Infinity;
+    let accountMaxX = -Infinity;
+    let accountMaxY = -Infinity;
+
+    for (const nodePath of accountGroup.nodePaths) {
+      const pos = posMap[nodePath];
+      if (!pos) {
+        continue;
+      }
+      accountMinX = Math.min(accountMinX, pos.x);
+      accountMinY = Math.min(accountMinY, pos.y);
+      accountMaxX = Math.max(accountMaxX, pos.x + pos.w);
+      accountMaxY = Math.max(accountMaxY, pos.y + pos.h);
+    }
+
+    if (!Number.isFinite(accountMinX) || !Number.isFinite(accountMinY)) {
+      continue;
+    }
+
+    const accountGroupId = `account-group-${rand()}`;
+    const accountBoxX = accountMinX - ACCOUNT_PADDING_X;
+    const accountBoxY = accountMinY - ACCOUNT_PADDING_TOP;
+    const accountBoxW = accountMaxX - accountMinX + ACCOUNT_PADDING_X * 2;
+    const accountBoxH =
+      accountMaxY - accountMinY + ACCOUNT_PADDING_TOP + ACCOUNT_PADDING_BOTTOM;
+    const accountBoxId = `account-box-${accountBoxIndex}`;
+    const accountLabelId = `account-label-${accountBoxIndex}`;
+    accountBoxIndex += 1;
+
+    locationElements.push(
+      makeBaseElement({
+        type: "rectangle",
+        id: accountBoxId,
+        x: accountBoxX,
+        y: accountBoxY,
+        width: accountBoxW,
+        height: accountBoxH,
+        strokeColor: ACCOUNT_STROKE,
+        strokeWidth: 2,
+        strokeStyle: "solid",
+        backgroundColor: "transparent",
+        roundness: { type: 3 },
+        groupIds: [accountGroupId],
+        boundElements: [{ id: accountLabelId, type: "text" }],
+        customData: {
+          terraform: false,
+          terraformAccountGroup: true,
+          accountId: accountGroup.accountId,
+        },
+      }),
+    );
+
+    locationElements.push(
+      makeBaseElement({
+        type: "text",
+        id: accountLabelId,
+        x: accountBoxX + 10,
+        y: accountBoxY + 8,
+        width: Math.max(120, accountBoxW - 20),
+        height: 24,
+        text: `account ${accountGroup.accountId}`,
+        fontSize: 18,
+        fontFamily: 3,
+        textAlign: "left",
+        verticalAlign: "top",
+        groupIds: [accountGroupId],
+        containerId: accountBoxId,
+        originalText: `account ${accountGroup.accountId}`,
+        autoResize: false,
+        lineHeight: 1.2,
+        strokeColor: ACCOUNT_STROKE,
+        customData: {
+          terraform: false,
+          terraformAccountGroup: true,
+          accountId: accountGroup.accountId,
+        },
+      }),
+    );
+
+    for (const regionGroup of accountGroup.regions) {
+      let regionMinX = Infinity;
+      let regionMinY = Infinity;
+      let regionMaxX = -Infinity;
+      let regionMaxY = -Infinity;
+
+      for (const nodePath of regionGroup.nodePaths) {
+        const pos = posMap[nodePath];
+        if (!pos) {
+          continue;
+        }
+        regionMinX = Math.min(regionMinX, pos.x);
+        regionMinY = Math.min(regionMinY, pos.y);
+        regionMaxX = Math.max(regionMaxX, pos.x + pos.w);
+        regionMaxY = Math.max(regionMaxY, pos.y + pos.h);
+      }
+
+      if (!Number.isFinite(regionMinX) || !Number.isFinite(regionMinY)) {
+        continue;
+      }
+
+      const regionGroupId = `region-group-${rand()}`;
+      const regionBoxX = regionMinX - REGION_PADDING_X;
+      const regionBoxY = regionMinY - REGION_PADDING_TOP;
+      const regionBoxW = regionMaxX - regionMinX + REGION_PADDING_X * 2;
+      const regionBoxH =
+        regionMaxY - regionMinY + REGION_PADDING_TOP + REGION_PADDING_BOTTOM;
+      const regionBoxId = `region-box-${regionBoxIndex}`;
+      const regionLabelId = `region-label-${regionBoxIndex}`;
+      regionBoxIndex += 1;
+
+      const regionGroupIds = [regionGroupId, accountGroupId];
+
+      locationElements.push(
+        makeBaseElement({
+          type: "rectangle",
+          id: regionBoxId,
+          x: regionBoxX,
+          y: regionBoxY,
+          width: regionBoxW,
+          height: regionBoxH,
+          strokeColor: REGION_STROKE,
+          strokeWidth: 1,
+          strokeStyle: "dashed",
+          backgroundColor: "transparent",
+          roundness: { type: 3 },
+          groupIds: regionGroupIds,
+          boundElements: [{ id: regionLabelId, type: "text" }],
+          customData: {
+            terraform: false,
+            terraformRegionGroup: true,
+            accountId: regionGroup.accountId,
+            region: regionGroup.region,
+          },
+        }),
+      );
+
+      locationElements.push(
+        makeBaseElement({
+          type: "text",
+          id: regionLabelId,
+          x: regionBoxX + 10,
+          y: regionBoxY + 8,
+          width: Math.max(100, regionBoxW - 20),
+          height: 22,
+          text: `region ${regionGroup.region}`,
+          fontSize: 16,
+          fontFamily: 3,
+          textAlign: "left",
+          verticalAlign: "top",
+          groupIds: regionGroupIds,
+          containerId: regionBoxId,
+          originalText: `region ${regionGroup.region}`,
+          autoResize: false,
+          lineHeight: 1.2,
+          strokeColor: REGION_STROKE,
+          customData: {
+            terraform: false,
+            terraformRegionGroup: true,
+            accountId: regionGroup.accountId,
+            region: regionGroup.region,
+          },
+        }),
+      );
+    }
+  }
+
   // --- dependency lines ---
   let arrowIdx = 0;
   for (const relationship of relationships) {
@@ -1149,6 +1540,7 @@ async function nodesToExcalidraw(nodes) {
 
   const elementsOrdered = [
     ...arrowElements,
+    ...locationElements,
     ...moduleElements,
     ...nodeElements,
   ];
