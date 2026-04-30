@@ -143,6 +143,7 @@ type TerraformAttribute = {
   key: string;
   value: unknown;
   changed?: boolean;
+  unknownAfter?: boolean;
   before?: unknown;
   after?: unknown;
 };
@@ -355,9 +356,17 @@ const TerraformElementActions = ({
                     >
                       <div className="terraform-element-actions__attribute-head">
                         <span>{attribute.key}</span>
-                        {attribute.changed && <strong>changed</strong>}
+                        {attribute.unknownAfter ? (
+                          <strong>after apply</strong>
+                        ) : (
+                          attribute.changed && <strong>changed</strong>
+                        )}
                       </div>
-                      {attribute.changed ? (
+                      {attribute.unknownAfter ? (
+                        <div className="terraform-element-actions__value terraform-element-actions__value--config">
+                          <em>{formatTerraformPanelValue(attribute.value)}</em>
+                        </div>
+                      ) : attribute.changed ? (
                         <div className="terraform-element-actions__diff">
                           <div>
                             <span>Before</span>
