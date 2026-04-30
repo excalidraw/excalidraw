@@ -506,6 +506,91 @@ function getModuleDisplayLabel(modulePath) {
   return names.join(" / ");
 }
 
+function getOwningModulePath(nodePath) {
+  const chain = getModulePathChain(nodePath);
+  return chain.length ? chain[chain.length - 1] : null;
+}
+
+function getModuleRelativeResourcePath(nodePath, modulePath) {
+  const prefix = `${modulePath}.`;
+  if (!nodePath.startsWith(prefix)) {
+    return nodePath;
+  }
+  return nodePath.slice(prefix.length);
+}
+
+// Preset layout for terraform-aws-modules/lambda/aws inferred from resource set.
+// Offsets are relative to the module's aws_lambda_function.this position.
+const LAMBDA_MODULE_PRESET_OFFSETS = {
+  "aws_lambda_function.this": { x: 0, y: 0 },
+  "aws_iam_role.lambda": { x: -360, y: 0 },
+  "aws_iam_role_policy.logs": { x: -360, y: -170 },
+  "aws_iam_role_policy.additional_inline": { x: -360, y: 170 },
+  "aws_cloudwatch_log_group.lambda": { x: 300, y: -170 },
+  "terraform_data.package_filename_for_hash": { x: 300, y: 170 },
+  "data.aws_iam_policy_document.logs": { x: -620, y: -170 },
+  "data.aws_iam_policy_document.additional_inline": { x: -620, y: 170 },
+  "data.aws_iam_policy_document.assume_role": { x: -620, y: 0 },
+  "data.aws_partition.current": { x: 620, y: -130 },
+  "data.aws_region.current": { x: 620, y: 0 },
+  "data.aws_caller_identity.current": { x: 620, y: 130 },
+};
+
+function isLikelyLambdaModule(resourceFragments) {
+  return (
+    resourceFragments.has("aws_lambda_function.this") &&
+    resourceFragments.has("aws_iam_role.lambda")
+  );
+}
+
+function applyModulePresets(positions, nodeKeys) {
+  const moduleMembers = new Map();
+
+  for (const nodePath of nodeKeys) {
+    const modulePath = getOwningModulePath(nodePath);
+    if (!modulePath) {
+      continue;
+    }
+    if (!moduleMembers.has(modulePath)) {
+      moduleMembers.set(modulePath, []);
+    }
+    moduleMembers.get(modulePath).push(nodePath);
+  }
+
+  for (const [modulePath, members] of moduleMembers) {
+    const fragments = new Set(
+      members.map((nodePath) =>
+        getModuleRelativeResourcePath(nodePath, modulePath),
+      ),
+    );
+
+    if (!isLikelyLambdaModule(fragments)) {
+      continue;
+    }
+
+    const anchorPath = `${modulePath}.aws_lambda_function.this`;
+    const fallback = positions[members[0]];
+    const anchor = positions[anchorPath] || fallback;
+    if (!anchor) {
+      continue;
+    }
+
+    for (const nodePath of members) {
+      const fragment = getModuleRelativeResourcePath(nodePath, modulePath);
+      const offset = LAMBDA_MODULE_PRESET_OFFSETS[fragment];
+      if (!offset) {
+        continue;
+      }
+      positions[nodePath] = {
+        x: anchor.x + offset.x,
+        y: anchor.y + offset.y,
+      };
+    }
+  }
+
+  return positions;
+}
+
 function collectModuleGroups(nodeKeys) {
   const groups = new Map();
 
@@ -760,6 +845,7 @@ async function nodesToExcalidraw(nodes) {
     tierMap,
     tierConfigs,
   );
+  applyModulePresets(positions, nodeKeys);
   const posMap = {};
   const nodeRectById = new Map();
 
