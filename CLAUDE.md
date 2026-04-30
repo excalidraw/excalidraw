@@ -128,15 +128,17 @@ Now run `yarn test:typecheck` and immediately `/verify` against the test scenari
 
 ### `/verify` test scenario for this feature
 
-> **Hard rule for this app:** every `left_click` must be a **coordinate** click read from a screenshot you took **immediately before** — coordinates are in screenshot-pixel space, not CSS pixels, so a stale screenshot or a `ref`/`find` click will miss. Never call `resize_window` (it can wedge CDP screenshot capture).
+> Never call `resize_window` (can wedge screenshot capture). Use **coordinate** clicks for the canvas; use `find` + **ref** clicks for panel controls. Don't use `gif_creator`.
 
 1. Reset state: `javascript_tool` → `localStorage.clear()`, then `navigate` to `http://localhost:3001`, wait ~3s.
-2. Take a **screenshot**. Click an empty canvas area (lower-left, away from the welcome menu) so the app has keyboard focus.
-3. Press `8` to activate the text tool, click again on empty canvas to place the cursor, then `type` `Hello World`.
-4. While still editing, select the last word with key `alt+shift+ArrowLeft`.
-5. Take a fresh **screenshot**. The left panel should show a **Stroke** label with a row of color swatches (full-width panel — if you only see a vertical strip of icons, the window is too narrow; report that and stop rather than navigating a popover). Click the **red** swatch using coordinates from this screenshot.
-6. Press `Escape` twice (commit text, deselect).
-7. `zoom`-screenshot the text. **Expected:** `Hello` black, `World` red.
+2. Take a **screenshot**. Coordinate-click an empty canvas area (lower-left, away from the welcome menu) so the app has keyboard focus.
+3. Press `8` to activate the text tool, coordinate-click on empty canvas to place the cursor, then `type` `Hello World`.
+4. Select the last word with key `alt+shift+ArrowLeft`, then immediately press `Escape` to commit. (The selection tracker survives the commit, so the colour action will still target that range.)
+5. Take a fresh **screenshot** to see the left panel:
+   - **Full mode** (you see a "Stroke" label with a row of swatches): `find` query `"stroke color red swatch #e03131"` → ref-click it.
+   - **Compact mode** (narrow viewport — you see a vertical strip of small icons, no labels): `find` query `"Stroke color button"` → ref-click to open the popover → take a screenshot → `find` `"#e03131"` → ref-click it.
+6. Press `Escape` to dismiss any popover and deselect.
+7. `zoom`-screenshot the text element. **Expected:** `Hello` black, `World` red.
 8. Confirm the data via `javascript_tool`:
    ```js
    JSON.stringify(
@@ -179,18 +181,18 @@ Multi-line range splitting, SVG export, range-index shifting on edit, collab mer
 
 These are not yet in `/verify` — if you rely on them during a session and are later asked to improve `/verify`, fold the relevant ones in.
 
-- **Screenshot before every coordinate click**: the `computer` tool's `[x,y]` are screenshot pixels, not CSS pixels. DPR/viewport scaling means coordinates from an earlier screenshot will miss after any reload or layout change.
-- **Never use `ref`/`find` clicks here**: they skip `pointerdown`, which Excalidraw relies on for tool activation and for keeping the text editor open through panel interactions. Always coordinate-click.
+- **Canvas vs panel clicks**: use **coordinate** clicks on the canvas (and always screenshot immediately before — coords are screenshot-pixel space, not CSS). For toolbar/properties-panel buttons, use `find` + **ref** clicks instead — they're position-independent.
 - **Never call `resize_window`**: it can wedge `Page.captureScreenshot` for the rest of the tab.
 - **Focus before hotkeys**: tool hotkeys (`8`=text, `r`=rect, `v`/`1`=select) only register when the app has focus. Click an empty canvas area first.
-- **Text editing**: single-click on text only selects the bounding box. **Double-click** enters edit mode (textarea `.excalidraw-wysiwyg`). **Escape** commits.
+- **Text editing**: single-click on text selects the bounding box; **double-click** enters edit mode (textarea `.excalidraw-wysiwyg`); **Escape** commits.
 - **Word selection in the textarea**: `alt+shift+ArrowLeft` / `ArrowRight` selects by word.
+- **Compact properties panel**: at narrow viewport widths the left panel collapses to an icon strip — click the relevant icon to open a popover, then click the control inside it.
 - **Debug handle**: `window.h.elements` is the live element array — filter `!e.isDeleted` since soft-deleted elements linger.
 - **Hard reset between runs**: `localStorage.clear()` then reload — `Cmd+A`+Backspace only soft-deletes.
 
 ## When asked to update `/verify`
 
-Read `.claude/skills/verify/SKILL.md`, then add a short **"Excalidraw interaction tips"** section after the existing "Notes" covering: screenshot-before-every-coordinate-click, never `ref`-click or `resize_window` here, focus canvas before hotkeys, double-click/Escape for text editing, `alt+shift+Arrow` word select, `window.h.elements` (filter `!isDeleted`), and `localStorage.clear()` for a hard reset. Keep the skill generic — these are tips, not feature-specific steps.
+Read `.claude/skills/verify/SKILL.md`, then add a short **"Excalidraw interaction tips"** section after the existing "Notes" covering: coordinate-clicks for canvas (screenshot first) vs `find`+ref-clicks for panel controls, never `resize_window`, focus canvas before hotkeys, double-click/Escape for text editing, `alt+shift+Arrow` word select, compact-panel popover at narrow widths, `window.h.elements` (filter `!isDeleted`), and `localStorage.clear()` for a hard reset. Keep the skill generic — tips, not feature-specific steps.
 
 ---
 
