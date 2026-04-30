@@ -648,6 +648,61 @@ function normalizeAccountId(value) {
   return /^\d{12}$/.test(trimmed) ? trimmed : null;
 }
 
+function normalizeVpcId(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return /^vpc-[0-9a-f]+$/i.test(trimmed) ? trimmed : null;
+}
+
+function normalizeSubnetId(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return /^subnet-[0-9a-f]+$/i.test(trimmed) ? trimmed : null;
+}
+
+function collectAwsIdsFromValue(value, normalizer, out, depth = 0) {
+  if (depth > 8 || value === null || typeof value === "undefined") {
+    return;
+  }
+
+  const normalized = normalizer(value);
+  if (normalized) {
+    out.add(normalized);
+    return;
+  }
+
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      collectAwsIdsFromValue(entry, normalizer, out, depth + 1);
+    }
+    return;
+  }
+
+  if (typeof value === "object") {
+    for (const entry of Object.values(value)) {
+      collectAwsIdsFromValue(entry, normalizer, out, depth + 1);
+    }
+  }
+}
+
+function extractVpcIdsFromConfig(config) {
+  const ids = new Set();
+  collectAwsIdsFromValue(config, normalizeVpcId, ids);
+  return [...ids];
+}
+
+function extractSubnetIdsFromConfig(config) {
+  const ids = new Set();
+  collectAwsIdsFromValue(config, normalizeSubnetId, ids);
+  return [...ids];
+}
+
 function extractLocationFromConfig(config) {
   let region =
     normalizeRegion(config.region) || normalizeRegion(config.aws_region);
@@ -770,7 +825,175 @@ function buildNodeLocationMap(nodes) {
   return nodeLocations;
 }
 
-function collectAccountRegionGroups(nodeKeys, nodeLocationMap) {
+function buildNodeAdjacencyMap(nodes) {
+  const adjacency = new Map();
+
+  for (const nodePath of Object.keys(nodes)) {
+    adjacency.set(nodePath, new Set());
+  }
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    const neighbors = new Set([...(node.edges_new || []), ...(node.edges_existing || [])]);
+    for (const neighbor of neighbors) {
+      if (!nodes[neighbor] || neighbor === nodePath) {
+        continue;
+      }
+      adjacency.get(nodePath).add(neighbor);
+      adjacency.get(neighbor).add(nodePath);
+    }
+  }
+
+  return adjacency;
+}
+
+function findNearestVpcAnchor(startNodePath, adjacency, anchorByNodePath, maxDepth = 3) {
+  if (!adjacency.has(startNodePath)) {
+    return null;
+  }
+
+  const visited = new Set([startNodePath]);
+  let frontier = [startNodePath];
+
+  for (let depth = 0; depth <= maxDepth; depth++) {
+    const anchors = frontier.filter((nodePath) => anchorByNodePath.has(nodePath));
+    if (anchors.length > 0) {
+      anchors.sort();
+      return anchorByNodePath.get(anchors[0]);
+    }
+
+    const nextFrontier = [];
+    for (const nodePath of frontier) {
+      for (const neighbor of adjacency.get(nodePath) || []) {
+        if (visited.has(neighbor)) {
+          continue;
+        }
+        visited.add(neighbor);
+        nextFrontier.push(neighbor);
+      }
+    }
+    frontier = nextFrontier;
+    if (frontier.length === 0) {
+      break;
+    }
+  }
+
+  return null;
+}
+
+function buildNodeVpcMap(nodes) {
+  const nodeVpcMap = new Map();
+  const anchorByNodePath = new Map();
+  const vpcLabelByKey = new Map();
+  const subnetVpcKeyMap = new Map();
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    for (const resource of Object.values(node.resources || {})) {
+      const config = getCurrentResourceConfig(resource);
+
+      if (resource.type === "aws_vpc") {
+        const vpcId = normalizeVpcId(config.id);
+        const vpcKey = vpcId || `node:${nodePath}`;
+        const vpcLabel = vpcId || getLabel(nodePath).split("\n").pop() || nodePath;
+        const anchor = { vpcKey, vpcLabel };
+        anchorByNodePath.set(nodePath, anchor);
+        vpcLabelByKey.set(vpcKey, vpcLabel);
+      }
+
+      if (resource.type === "aws_subnet") {
+        const vpcIds = extractVpcIdsFromConfig(config);
+        if (vpcIds.length === 0) {
+          continue;
+        }
+        const subnetIds = extractSubnetIdsFromConfig(config);
+        if (subnetIds.length === 0) {
+          continue;
+        }
+
+        const vpcKey = vpcIds[0];
+        for (const subnetId of subnetIds) {
+          subnetVpcKeyMap.set(subnetId, vpcKey);
+        }
+      }
+    }
+  }
+
+  const adjacency = buildNodeAdjacencyMap(nodes);
+  const fallbackTypes = new Set([
+    "aws_subnet",
+    "aws_route_table",
+    "aws_route_table_association",
+    "aws_security_group",
+    "aws_network_acl",
+    "aws_network_interface",
+    "aws_nat_gateway",
+    "aws_internet_gateway",
+    "aws_lambda_function",
+  ]);
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    let vpcKey = null;
+    let vpcLabel = null;
+
+    if (anchorByNodePath.has(nodePath)) {
+      const anchor = anchorByNodePath.get(nodePath);
+      vpcKey = anchor.vpcKey;
+      vpcLabel = anchor.vpcLabel;
+    } else {
+      for (const resource of Object.values(node.resources || {})) {
+        const config = getCurrentResourceConfig(resource);
+
+        const configVpcIds = extractVpcIdsFromConfig(config);
+        if (configVpcIds.length > 0) {
+          vpcKey = configVpcIds[0];
+          vpcLabel = configVpcIds[0];
+          break;
+        }
+
+        const configSubnetIds = extractSubnetIdsFromConfig(config);
+        for (const subnetId of configSubnetIds) {
+          const mappedVpc = subnetVpcKeyMap.get(subnetId);
+          if (!mappedVpc) {
+            continue;
+          }
+          vpcKey = mappedVpc;
+          vpcLabel = mappedVpc;
+          break;
+        }
+        if (vpcKey) {
+          break;
+        }
+      }
+    }
+
+    if (!vpcKey) {
+      const resourceType = getResourceType(nodePath);
+      if (fallbackTypes.has(resourceType)) {
+        const nearestAnchor = findNearestVpcAnchor(
+          nodePath,
+          adjacency,
+          anchorByNodePath,
+          3,
+        );
+        if (nearestAnchor) {
+          vpcKey = nearestAnchor.vpcKey;
+          vpcLabel = nearestAnchor.vpcLabel;
+        }
+      }
+    }
+
+    if (!vpcKey) {
+      continue;
+    }
+
+    const label = vpcLabelByKey.get(vpcKey) || vpcLabel || vpcKey;
+    vpcLabelByKey.set(vpcKey, label);
+    nodeVpcMap.set(nodePath, { vpcKey, vpcLabel: label });
+  }
+
+  return nodeVpcMap;
+}
+
+function collectAccountRegionGroups(nodeKeys, nodeLocationMap, nodeVpcMap) {
   const accountGroups = new Map();
 
   for (const nodePath of nodeKeys) {
@@ -798,10 +1021,27 @@ function collectAccountRegionGroups(nodeKeys, nodeLocationMap) {
         region,
         accountId,
         nodePaths: [],
+        vpcs: new Map(),
       });
     }
 
-    accountGroup.regions.get(region).nodePaths.push(nodePath);
+    const regionGroup = accountGroup.regions.get(region);
+    regionGroup.nodePaths.push(nodePath);
+
+    const vpc = nodeVpcMap.get(nodePath);
+    if (vpc && vpc.vpcKey) {
+      if (!regionGroup.vpcs.has(vpc.vpcKey)) {
+        regionGroup.vpcs.set(vpc.vpcKey, {
+          vpcKey: vpc.vpcKey,
+          vpcLabel: vpc.vpcLabel,
+          accountId,
+          region,
+          nodePaths: [],
+        });
+      }
+
+      regionGroup.vpcs.get(vpc.vpcKey).nodePaths.push(nodePath);
+    }
   }
 
   return [...accountGroups.values()]
@@ -811,6 +1051,15 @@ function collectAccountRegionGroups(nodeKeys, nodeLocationMap) {
       regions: [...account.regions.values()].sort((a, b) =>
         a.region.localeCompare(b.region),
       ),
+    }))
+    .map((account) => ({
+      ...account,
+      regions: account.regions.map((region) => ({
+        ...region,
+        vpcs: [...region.vpcs.values()].sort((a, b) =>
+          a.vpcLabel.localeCompare(b.vpcLabel),
+        ),
+      })),
     }));
 }
 
@@ -1064,9 +1313,11 @@ async function nodesToExcalidraw(nodes) {
   const directedEdges = collectDirectedEdges(nodes);
   const relationships = coalesceRelationshipPairs(directedEdges);
   const nodeLocationMap = buildNodeLocationMap(nodes);
+  const nodeVpcMap = buildNodeVpcMap(nodes);
   const accountRegionGroups = collectAccountRegionGroups(
     nodeKeys,
     nodeLocationMap,
+    nodeVpcMap,
   );
   const moduleGroups = collectModuleGroups(nodeKeys);
   const moduleGroupIdByPath = new Map(
@@ -1110,6 +1361,7 @@ async function nodesToExcalidraw(nodes) {
     const label = getLabel(nodePath);
     const terraformResources = buildTerraformResourceDetails(nodes[nodePath]);
     const nodeLocation = nodeLocationMap.get(nodePath) || null;
+    const nodeVpc = nodeVpcMap.get(nodePath) || null;
 
     // Check for icon
     const iconElements = cfg.iconSize > 0 ? getIconForType(resourceType) : null;
@@ -1138,6 +1390,8 @@ async function nodesToExcalidraw(nodes) {
         action,
         region: nodeLocation?.region || null,
         accountId: nodeLocation?.accountId || null,
+        vpcId: nodeVpc?.vpcKey || null,
+        vpcLabel: nodeVpc?.vpcLabel || null,
         terraformResources,
       },
     });
@@ -1293,9 +1547,14 @@ async function nodesToExcalidraw(nodes) {
   const REGION_PADDING_X = 24;
   const REGION_PADDING_TOP = 40;
   const REGION_PADDING_BOTTOM = 18;
+  const VPC_STROKE = "#2b8a3e";
+  const VPC_PADDING_X = 14;
+  const VPC_PADDING_TOP = 32;
+  const VPC_PADDING_BOTTOM = 12;
 
   let accountBoxIndex = 0;
   let regionBoxIndex = 0;
+  let vpcBoxIndex = 0;
   for (const accountGroup of accountRegionGroups) {
     let accountMinX = Infinity;
     let accountMinY = Infinity;
@@ -1461,6 +1720,95 @@ async function nodesToExcalidraw(nodes) {
           },
         }),
       );
+
+      for (const vpcGroup of regionGroup.vpcs || []) {
+        let vpcMinX = Infinity;
+        let vpcMinY = Infinity;
+        let vpcMaxX = -Infinity;
+        let vpcMaxY = -Infinity;
+
+        for (const nodePath of vpcGroup.nodePaths) {
+          const pos = posMap[nodePath];
+          if (!pos) {
+            continue;
+          }
+          vpcMinX = Math.min(vpcMinX, pos.x);
+          vpcMinY = Math.min(vpcMinY, pos.y);
+          vpcMaxX = Math.max(vpcMaxX, pos.x + pos.w);
+          vpcMaxY = Math.max(vpcMaxY, pos.y + pos.h);
+        }
+
+        if (!Number.isFinite(vpcMinX) || !Number.isFinite(vpcMinY)) {
+          continue;
+        }
+
+        const vpcGroupId = `vpc-group-${rand()}`;
+        const vpcBoxX = vpcMinX - VPC_PADDING_X;
+        const vpcBoxY = vpcMinY - VPC_PADDING_TOP;
+        const vpcBoxW = vpcMaxX - vpcMinX + VPC_PADDING_X * 2;
+        const vpcBoxH = vpcMaxY - vpcMinY + VPC_PADDING_TOP + VPC_PADDING_BOTTOM;
+        const vpcBoxId = `vpc-box-${vpcBoxIndex}`;
+        const vpcLabelId = `vpc-label-${vpcBoxIndex}`;
+        vpcBoxIndex += 1;
+
+        const vpcGroupIds = [vpcGroupId, regionGroupId, accountGroupId];
+
+        locationElements.push(
+          makeBaseElement({
+            type: "rectangle",
+            id: vpcBoxId,
+            x: vpcBoxX,
+            y: vpcBoxY,
+            width: vpcBoxW,
+            height: vpcBoxH,
+            strokeColor: VPC_STROKE,
+            strokeWidth: 1,
+            strokeStyle: "dashed",
+            backgroundColor: "transparent",
+            roundness: { type: 3 },
+            groupIds: vpcGroupIds,
+            boundElements: [{ id: vpcLabelId, type: "text" }],
+            customData: {
+              terraform: false,
+              terraformVpcGroup: true,
+              accountId: vpcGroup.accountId,
+              region: vpcGroup.region,
+              vpcId: vpcGroup.vpcKey,
+              vpcLabel: vpcGroup.vpcLabel,
+            },
+          }),
+        );
+
+        locationElements.push(
+          makeBaseElement({
+            type: "text",
+            id: vpcLabelId,
+            x: vpcBoxX + 10,
+            y: vpcBoxY + 8,
+            width: Math.max(90, vpcBoxW - 20),
+            height: 20,
+            text: `vpc ${vpcGroup.vpcLabel}`,
+            fontSize: 14,
+            fontFamily: 3,
+            textAlign: "left",
+            verticalAlign: "top",
+            groupIds: vpcGroupIds,
+            containerId: vpcBoxId,
+            originalText: `vpc ${vpcGroup.vpcLabel}`,
+            autoResize: false,
+            lineHeight: 1.2,
+            strokeColor: VPC_STROKE,
+            customData: {
+              terraform: false,
+              terraformVpcGroup: true,
+              accountId: vpcGroup.accountId,
+              region: vpcGroup.region,
+              vpcId: vpcGroup.vpcKey,
+              vpcLabel: vpcGroup.vpcLabel,
+            },
+          }),
+        );
+      }
     }
   }
 
