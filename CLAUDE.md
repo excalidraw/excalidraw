@@ -141,7 +141,7 @@ Now run `yarn test:typecheck` and immediately `/verify` against the test scenari
    - take a **screenshot** (popover with the color grid is now visible)
    - press key `b` (the popover's hotkey for `#e03131` red)
 6. Press `Escape` once to close the popover, then `Escape` again to deselect.
-7. `zoom`-screenshot the text element. **Expected:** `Hello` black, `World` red.
+7. `zoom`-screenshot the text element. Use the **same `[x,y]` you clicked in step 3** to place the cursor as the anchor: region `[x-20, y-20, x+180, y+30]` (the text starts at the click point and runs ~160px right). If you're unsure, take a full `screenshot` first and read the coordinates off it — don't guess. **Expected:** `Hello` black, `World` red.
 8. Confirm the data via `javascript_tool`:
    ```js
    JSON.stringify(
