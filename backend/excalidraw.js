@@ -639,22 +639,51 @@ function makeBaseElement(overrides) {
   };
 }
 
-function getBindingPoints(posA, posB, wA, hA, wB, hB) {
-  const cxA = posA.x + wA / 2;
-  const cyA = posA.y + hA / 2;
-  const cxB = posB.x + wB / 2;
-  const cyB = posB.y + hB / 2;
-  const dx = cxB - cxA;
-  const dy = cyB - cyA;
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
 
-  if (Math.abs(dx) >= Math.abs(dy)) {
-    return dx >= 0
-      ? { startFixed: [1, 0.5], endFixed: [0, 0.5] }
-      : { startFixed: [0, 0.5], endFixed: [1, 0.5] };
+function getEdgePointTowardTarget(pos, w, h, target) {
+  const cx = pos.x + w / 2;
+  const cy = pos.y + h / 2;
+  const dx = target.x - cx;
+  const dy = target.y - cy;
+
+  if (Math.abs(dx) < 1e-6 && Math.abs(dy) < 1e-6) {
+    return {
+      x: cx,
+      y: cy,
+      fixedPoint: [0.5, 0.5],
+    };
   }
-  return dy >= 0
-    ? { startFixed: [0.5, 1], endFixed: [0.5, 0] }
-    : { startFixed: [0.5, 0], endFixed: [0.5, 1] };
+
+  const halfW = Math.max(w / 2, 1e-6);
+  const halfH = Math.max(h / 2, 1e-6);
+  const scale = 1 / Math.max(Math.abs(dx) / halfW, Math.abs(dy) / halfH);
+  const x = cx + dx * scale;
+  const y = cy + dy * scale;
+
+  return {
+    x,
+    y,
+    fixedPoint: [clamp((x - pos.x) / w, 0, 1), clamp((y - pos.y) / h, 0, 1)],
+  };
+}
+
+function getCenterClippedBindingPoints(posA, posB, wA, hA, wB, hB) {
+  const centerA = { x: posA.x + wA / 2, y: posA.y + hA / 2 };
+  const centerB = { x: posB.x + wB / 2, y: posB.y + hB / 2 };
+
+  const start = getEdgePointTowardTarget(posA, wA, hA, centerB);
+  const end = getEdgePointTowardTarget(posB, wB, hB, centerA);
+
+  return {
+    startPoint: { x: start.x, y: start.y },
+    endPoint: { x: end.x, y: end.y },
+    // Keep focus points at centroids so bound arrows stay sensible after moves.
+    startFixed: [0.5, 0.5],
+    endFixed: [0.5, 0.5],
+  };
 }
 
 // --- Edge collection ---
@@ -1068,19 +1097,20 @@ async function nodesToExcalidraw(nodes) {
     rectA.boundElements.push({ id: arrowId, type: "arrow" });
     rectB.boundElements.push({ id: arrowId, type: "arrow" });
 
-    const { startFixed, endFixed } = getBindingPoints(
-      posA,
-      posB,
-      posA.w,
-      posA.h,
-      posB.w,
-      posB.h,
-    );
+    const { startFixed, endFixed, startPoint, endPoint } =
+      getCenterClippedBindingPoints(
+        posA,
+        posB,
+        posA.w,
+        posA.h,
+        posB.w,
+        posB.h,
+      );
 
-    const startX = posA.x + startFixed[0] * posA.w;
-    const startY = posA.y + startFixed[1] * posA.h;
-    const endX = posB.x + endFixed[0] * posB.w;
-    const endY = posB.y + endFixed[1] * posB.h;
+    const startX = startPoint.x;
+    const startY = startPoint.y;
+    const endX = endPoint.x;
+    const endY = endPoint.y;
 
     arrowElements.push(
       makeBaseElement({
