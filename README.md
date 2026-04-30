@@ -4,7 +4,7 @@ A **fork of [Excalidraw](https://excalidraw.com)** that imports a **Terraform pl
 
 Upload your Terraform plan JSON and graph (DOT), and the app builds a canvas of nodes (resources) and edges (dependencies) that you can pan, zoom, and edit like any Excalidraw drawing.
 
-![Terraform plan imported into Excalidraw — infrastructure as an editable diagram](docs/terraform-canvas.png)
+![Terraform plan imported into Excalidraw — infrastructure as an editable diagram](docs/terraform-canvas-new.png)
 
 <p align="center">
   <a href="https://github.com/excalidraw/excalidraw/blob/master/LICENSE">
