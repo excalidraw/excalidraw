@@ -11,7 +11,7 @@ You're checking that a described change actually works in the live Excalidraw ap
 
 1. **Dev server** — Check `http://localhost:3001`. If it's not responding, start it in the background with `yarn start` and wait until it returns HTTP 200.
 
-2. **Browser tab** — Use `tabs_context_mcp` (with `createIfEmpty: true`). If a tab is already on `localhost:3001`, reuse it; otherwise create a new tab and navigate there. Dismiss any welcome modal with Escape.
+2. **Browser tab** — Call `tabs_context_mcp` with `createIfEmpty: true`. **Reuse an existing tab — do not create additional tabs or windows.** Pick the first tab already on `localhost:3001`; if none is, take the first tab in the group and `navigate` it there. Only call `tabs_create_mcp` if the group is literally empty. Dismiss any welcome modal with Escape.
 
 3. **Start recording** — Call `gif_creator` with `start_recording`, then take an initial screenshot so the first frame is captured.
 
