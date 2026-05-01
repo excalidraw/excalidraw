@@ -7,59 +7,348 @@ function rand() {
 
 // --- Icon library ---
 
-const ICON_LIB_PATH = path.join(__dirname, "aws-serverless.excalidrawlib");
+const DEFAULT_ICON_LIBRARY = "aws-architecture-icons";
+
+const ICON_LIBRARY_CONFIGS = {
+  "aws-architecture-icons": {
+    filename: "aws-architecture-icons.excalidrawlib",
+    names: {
+      aws_acm_certificate: "Certificate Manager",
+      aws_alb: "ALB",
+      aws_alb_listener: "ALB",
+      aws_alb_listener_rule: "Rule",
+      aws_alb_target_group: "ALB",
+      aws_ami: "AMI",
+      aws_amplify_app: "Amplify",
+      aws_amplify_branch: "Amplify",
+      aws_api_gateway_authorizer: "API Gateway",
+      aws_api_gateway_deployment: "API Gateway",
+      aws_api_gateway_integration: "API Gateway",
+      aws_api_gateway_method: "API Gateway",
+      aws_api_gateway_resource: "API Gateway",
+      aws_api_gateway_rest_api: "API Gateway",
+      aws_apigatewayv2_api: "API Gateway",
+      aws_apigatewayv2_authorizer: "API Gateway",
+      aws_apigatewayv2_deployment: "API Gateway",
+      aws_apigatewayv2_integration: "API Gateway",
+      aws_apigatewayv2_route: "API Gateway",
+      aws_apigatewayv2_stage: "API Gateway",
+      aws_appautoscaling_policy: "Application Auto Scaling",
+      aws_appautoscaling_target: "Application Auto Scaling",
+      aws_appconfig_application: "AppConfig",
+      aws_appconfig_configuration_profile: "AppConfig",
+      aws_appconfig_deployment: "AppConfig",
+      aws_apprunner_service: "App Runner",
+      aws_appsync_datasource: "AppSync",
+      aws_appsync_graphql_api: "AppSync",
+      aws_appsync_resolver: "AppSync",
+      aws_athena_database: "Athena",
+      aws_athena_workgroup: "Athena",
+      aws_autoscaling_attachment: "Auto Scaling group",
+      aws_autoscaling_group: "Auto Scaling group",
+      aws_autoscaling_lifecycle_hook: "Auto Scaling group",
+      aws_autoscaling_policy: "Auto Scaling group",
+      aws_autoscaling_schedule: "Auto Scaling group",
+      aws_backup_plan: "Backup",
+      aws_backup_selection: "Backup",
+      aws_backup_vault: "Backup",
+      aws_batch_compute_environment: "Batch",
+      aws_batch_job_definition: "Batch",
+      aws_batch_job_queue: "Batch",
+      aws_budgets_budget: "Budgets",
+      aws_cloud9_environment_ec2: "Cloud9",
+      aws_cloudformation_stack: "CloudFormation",
+      aws_cloudformation_stack_set: "CloudFormation",
+      aws_cloudfront_cache_policy: "CloudFront",
+      aws_cloudfront_distribution: "CloudFront",
+      aws_cloudfront_function: "CloudFront",
+      aws_cloudfront_origin_access_control: "CloudFront",
+      aws_cloudhsm_v2_cluster: "CloudHSM",
+      aws_cloudhsm_v2_hsm: "CloudHSM",
+      aws_cloudtrail: "CloudTrail",
+      aws_cloudwatch_dashboard: "Dashboard",
+      aws_cloudwatch_event_archive: "EventBridge",
+      aws_cloudwatch_event_bus: "Event bus",
+      aws_cloudwatch_event_rule: "Rule",
+      aws_cloudwatch_event_target: "Event",
+      aws_cloudwatch_log_group: "Logs",
+      aws_cloudwatch_log_metric_filter: "Logs",
+      aws_cloudwatch_metric_alarm: "Alarm",
+      aws_codeartifact_domain: "CodeArtifact",
+      aws_codeartifact_repository: "CodeArtifact",
+      aws_codebuild_project: "CodeBuild",
+      aws_codecommit_repository: "CodeCommit",
+      aws_codedeploy_app: "CodeDeploy",
+      aws_codedeploy_deployment_group: "CodeDeploy",
+      aws_codepipeline: "CodePipeline",
+      aws_cognito_identity_pool: "Cognito",
+      aws_cognito_user_pool: "Cognito",
+      aws_cognito_user_pool_client: "Cognito",
+      aws_config_config_rule: "Config",
+      aws_config_configuration_recorder: "Config",
+      aws_customer_gateway: "VPN gateway",
+      aws_datasync_agent: "DataSync",
+      aws_datasync_location_efs: "DataSync",
+      aws_datasync_location_s3: "DataSync",
+      aws_datasync_task: "DataSync",
+      aws_db_cluster_snapshot: "RDS",
+      aws_db_event_subscription: "RDS",
+      aws_db_instance: "RDS instance",
+      aws_db_option_group: "RDS",
+      aws_db_parameter_group: "RDS",
+      aws_db_proxy: "RDS",
+      aws_db_snapshot: "RDS",
+      aws_db_subnet_group: "RDS",
+      aws_directory_service_directory: "Directory Service",
+      aws_dlm_lifecycle_policy: "EBS",
+      aws_dms_endpoint: "DMS",
+      aws_dms_replication_instance: "DMS",
+      aws_dms_replication_task: "DMS",
+      aws_docdb_cluster: "DocumentDB",
+      aws_docdb_cluster_instance: "DocumentDB",
+      aws_docdb_cluster_parameter_group: "DocumentDB",
+      aws_dynamodb_global_table: "DynamoDB",
+      aws_dynamodb_table: "DynamoDB Table",
+      aws_dynamodb_table_item: "DynamoDB Table",
+      aws_ebs_snapshot: "EBS",
+      aws_ebs_volume: "EBS",
+      aws_ec2_capacity_reservation: "EC2",
+      aws_ec2_client_vpn_endpoint: "Client VPN",
+      aws_ec2_client_vpn_network_association: "Client VPN",
+      aws_ec2_fleet: "Spot Fleet",
+      aws_ec2_instance_state: "Instance",
+      aws_ec2_managed_prefix_list: "VPC",
+      aws_ec2_tag: "EC2",
+      aws_ec2_transit_gateway: "Transit Gateway",
+      aws_ec2_transit_gateway_route: "Transit Gateway",
+      aws_ec2_transit_gateway_route_table: "Transit Gateway",
+      aws_ec2_transit_gateway_vpc_attachment: "Attachment",
+      aws_ecr_lifecycle_policy: "ECR",
+      aws_ecr_repository: "ECR",
+      aws_ecr_repository_policy: "ECR",
+      aws_ecs_cluster: "ECS",
+      aws_ecs_service: "Service",
+      aws_ecs_task_definition: "Task",
+      aws_efs_access_point: "EFS",
+      aws_efs_file_system: "EFS",
+      aws_efs_mount_target: "EFS",
+      aws_egress_only_internet_gateway: "Internet gateway",
+      aws_eip: "EC2",
+      aws_eks_addon: "EKS",
+      aws_eks_cluster: "EKS",
+      aws_eks_fargate_profile: "Fargate",
+      aws_eks_node_group: "EKS",
+      aws_elastic_beanstalk_application: "Elastic Beanstalk",
+      aws_elastic_beanstalk_environment: "Elastic Beanstalk",
+      aws_elasticache_cluster: "ElastiCache",
+      aws_elasticache_parameter_group: "ElastiCache",
+      aws_elasticache_replication_group: "ElastiCache",
+      aws_elasticache_subnet_group: "ElastiCache",
+      aws_elasticsearch_domain: "OpenSearch Service",
+      aws_elb: "ELB",
+      aws_emr_cluster: "EMR",
+      aws_flow_log: "Flow logs",
+      aws_fsx_lustre_file_system: "FSx",
+      aws_fsx_ontap_file_system: "FSx",
+      aws_fsx_openzfs_file_system: "FSx",
+      aws_glacier_vault: "Glacier",
+      aws_globalaccelerator_accelerator: "Global Accelerator",
+      aws_glue_catalog_database: "DataCatalog",
+      aws_glue_catalog_table: "DataCatalog",
+      aws_glue_crawler: "Crawler",
+      aws_glue_job: "Glue",
+      aws_glue_trigger: "Glue",
+      aws_guardduty_detector: "GuardDuty",
+      aws_iam_access_key: "IAM",
+      aws_iam_group: "IAM",
+      aws_iam_group_policy: "Permissions",
+      aws_iam_group_policy_attachment: "Permissions",
+      aws_iam_instance_profile: "IAM",
+      aws_iam_openid_connect_provider: "IAM",
+      aws_iam_policy: "Permissions",
+      aws_iam_policy_attachment: "Permissions",
+      aws_iam_role: "Role",
+      aws_iam_role_policy: "Permissions",
+      aws_iam_role_policy_attachment: "Permissions",
+      aws_iam_saml_provider: "IAM",
+      aws_iam_service_linked_role: "Role",
+      aws_iam_user: "IAM",
+      aws_iam_user_policy: "Permissions",
+      aws_iam_user_policy_attachment: "Permissions",
+      aws_instance: "Instance",
+      aws_internet_gateway: "Internet gateway",
+      aws_iot_certificate: "IoT Core",
+      aws_iot_policy: "IoT Core",
+      aws_iot_policy_attachment: "IoT Core",
+      aws_iot_thing: "IoT Core",
+      aws_iot_topic_rule: "IoT topic",
+      aws_kinesis_firehose_delivery_stream: "Kinesis Data Firehose",
+      aws_kinesis_stream: "Kinesis Data Streams",
+      aws_kinesisanalyticsv2_application: "Kinesis Data Analytics",
+      aws_kms_alias: "KMS",
+      aws_kms_key: "KMS",
+      aws_lambda_alias: "Lambda",
+      aws_lambda_event_source_mapping: "Lambda",
+      aws_lambda_function: "Lambda",
+      aws_lambda_function_event_invoke_config: "Lambda",
+      aws_lambda_layer_version: "Lambda",
+      aws_lambda_permission: "Lambda",
+      aws_lb: "ELB",
+      aws_lb_listener: "ELB",
+      aws_lb_listener_rule: "Rule",
+      aws_lb_target_group: "ELB",
+      aws_launch_configuration: "Auto Scaling",
+      aws_launch_template: "EC2",
+      aws_macie2_account: "Macie",
+      aws_mq_broker: "Amazon MQ",
+      aws_msk_cluster: "Managed Streaming for Apache Kafka",
+      aws_msk_configuration: "Managed Streaming for Apache Kafka",
+      aws_nat_gateway: "NAT gateway",
+      aws_neptune_cluster: "Neptune",
+      aws_neptune_cluster_instance: "Neptune",
+      aws_network_acl: "NACL",
+      aws_network_acl_rule: "NACL",
+      aws_network_interface: "ENI",
+      aws_networkfirewall_firewall: "Network Firewall",
+      aws_networkfirewall_firewall_policy: "Network Firewall",
+      aws_networkfirewall_rule_group: "Network Firewall",
+      aws_opensearch_domain: "OpenSearch Service",
+      aws_organizations_account: "AWS account",
+      aws_organizations_organization: "Organizations",
+      aws_organizations_organizational_unit: "Organizations",
+      aws_organizations_policy: "Organizations",
+      aws_ram_resource_share: "Resource Access Manager",
+      aws_ram_resource_association: "Resource Access Manager",
+      aws_ram_principal_association: "Resource Access Manager",
+      aws_rds_cluster: "Aurora",
+      aws_rds_cluster_endpoint: "Aurora",
+      aws_rds_cluster_instance: "Aurora instance",
+      aws_rds_cluster_parameter_group: "Aurora",
+      aws_redshift_cluster: "Redshift",
+      aws_route: "Route table",
+      aws_route53_record: "Route 53",
+      aws_route53_resolver_endpoint: "Resolver",
+      aws_route53_resolver_rule: "Resolver",
+      aws_route53_zone: "Route 53",
+      aws_route_table: "Route table",
+      aws_route_table_association: "Route table",
+      aws_s3_bucket: "S3",
+      aws_s3_bucket_acl: "S3",
+      aws_s3_bucket_lifecycle_configuration: "S3",
+      aws_s3_bucket_notification: "S3",
+      aws_s3_bucket_object: "S3",
+      aws_s3_bucket_policy: "S3",
+      aws_s3_bucket_public_access_block: "S3",
+      aws_s3_bucket_server_side_encryption_configuration: "S3",
+      aws_s3_bucket_versioning: "S3",
+      aws_s3_object: "S3",
+      aws_sagemaker_domain: "SageMaker",
+      aws_sagemaker_endpoint: "SageMaker",
+      aws_sagemaker_model: "SageMaker",
+      aws_sagemaker_notebook_instance: "Notebook",
+      aws_scheduler_schedule: "Scheduler",
+      aws_scheduler_schedule_group: "Scheduler",
+      aws_secretsmanager_secret: "Secrets Manager",
+      aws_secretsmanager_secret_version: "Secrets Manager",
+      aws_security_group: "Network Firewall",
+      aws_security_group_rule: "Network Firewall",
+      aws_ses_domain_identity: "SES",
+      aws_ses_email_identity: "SES",
+      aws_sfn_state_machine: "Step Functions",
+      aws_shield_protection: "Shield",
+      aws_sns_topic: "SNS",
+      aws_sns_topic_policy: "SNS",
+      aws_sns_topic_subscription: "SNS",
+      aws_spot_fleet_request: "Spot Fleet",
+      aws_spot_instance_request: "Spot instance",
+      aws_sqs_queue: "SQS",
+      aws_sqs_queue_policy: "SQS",
+      aws_ssm_activation: "System Manager",
+      aws_ssm_association: "System Manager",
+      aws_ssm_document: "Documents",
+      aws_ssm_parameter: "Parameter Store",
+      aws_ssm_patch_baseline: "System Manager",
+      aws_subnet: "VPC",
+      aws_transfer_server: "Transfer Family",
+      aws_vpc: "VPC",
+      aws_vpc_endpoint: "Endpoint",
+      aws_vpc_endpoint_service: "PrivateLink",
+      aws_vpc_peering_connection: "Peering connection",
+      aws_vpn_connection: "VPN Connection",
+      aws_vpn_gateway: "VPN gateway",
+      aws_wafv2_web_acl: "WAF",
+      aws_xray_sampling_rule: "X-Ray",
+      data_aws_caller_identity: "AWS account",
+      data_aws_iam_policy_document: "Permissions",
+      data_aws_partition: "AWS Cloud",
+      data_aws_region: "Region",
+    },
+  },
+};
+
+function normalizeIconLibraryName(value) {
+  if (!value) {
+    return DEFAULT_ICON_LIBRARY;
+  }
+
+  return path.basename(value, ".excalidrawlib");
+}
+
+function getIconLibraryConfig() {
+  const requested = normalizeIconLibraryName(
+    process.env.AWS_ICON_LIBRARY || process.env.AWS_ICON_LIB,
+  );
+
+  return (
+    ICON_LIBRARY_CONFIGS[requested] ||
+    ICON_LIBRARY_CONFIGS[DEFAULT_ICON_LIBRARY]
+  );
+}
+
+function getIconLibraryPath(config) {
+  if (process.env.AWS_ICON_LIB_PATH) {
+    return path.resolve(process.env.AWS_ICON_LIB_PATH);
+  }
+
+  return path.join(__dirname, config.filename);
+}
 
 let iconLibItems = null;
+let iconLibCacheKey = null;
+let iconLibNameIndex = {};
 function loadIconLib() {
-  if (iconLibItems) return iconLibItems;
+  const config = getIconLibraryConfig();
+  const iconLibPath = getIconLibraryPath(config);
+  const cacheKey = `${config.filename}:${iconLibPath}`;
+  if (iconLibItems && iconLibCacheKey === cacheKey) return iconLibItems;
+
   try {
-    const raw = JSON.parse(fs.readFileSync(ICON_LIB_PATH, "utf-8"));
+    const raw = JSON.parse(fs.readFileSync(iconLibPath, "utf-8"));
     // v1 format: library is array of element arrays
     // v2 format: libraryItems is array of { elements, name }
     iconLibItems = raw.libraryItems || raw.library || [];
+    iconLibNameIndex = Object.fromEntries(
+      iconLibItems
+        .map((item, index) => [item?.name?.toLowerCase(), index])
+        .filter(([name]) => Boolean(name)),
+    );
+    iconLibCacheKey = cacheKey;
     return iconLibItems;
   } catch {
     iconLibItems = [];
+    iconLibNameIndex = {};
+    iconLibCacheKey = cacheKey;
     return iconLibItems;
   }
 }
 
-// aws-serverless.excalidrawlib item order (from library description):
-// 0:Lambda 1:API Gateway 2:AppSync 3:DynamoDB 4:EventBridge
-// 5:Cognito 6:S3 7:Kinesis 8:SNS 9:SQS 10:SES
-// 11:CloudFront 12:CloudWatch 13:Step Functions 14:Amplify
-const ICON_INDEX = {
-  aws_lambda_function: 0,
-  aws_api_gateway_rest_api: 1,
-  aws_apigatewayv2_api: 1,
-  aws_apigatewayv2_route: 1,
-  aws_appsync_graphql_api: 2,
-  aws_dynamodb_table: 3,
-  aws_dynamodb_global_table: 3,
-  aws_cloudwatch_event_rule: 4,
-  aws_scheduler_schedule: 4,
-  aws_cognito_user_pool: 5,
-  aws_cognito_identity_pool: 5,
-  aws_s3_bucket: 6,
-  aws_s3_bucket_object: 6,
-  aws_s3_object: 6,
-  aws_kinesis_stream: 7,
-  aws_kinesis_firehose_delivery_stream: 7,
-  aws_sns_topic: 8,
-  aws_sqs_queue: 9,
-  aws_ses_domain_identity: 10,
-  aws_ses_email_identity: 10,
-  aws_cloudfront_distribution: 11,
-  aws_cloudwatch_log_group: 12,
-  aws_cloudwatch_metric_alarm: 12,
-  aws_sfn_state_machine: 13,
-  aws_step_functions_state_machine: 13,
-  aws_amplify_app: 14,
-};
-
 function getIconForType(resourceType) {
   const items = loadIconLib();
-  const idx = ICON_INDEX[resourceType];
+  const config = getIconLibraryConfig();
+  const iconName = config.names?.[resourceType];
+  const idx =
+    config.index?.[resourceType] ??
+    (iconName ? iconLibNameIndex[iconName.toLowerCase()] : undefined);
   if (idx === undefined || idx >= items.length) return null;
   const item = items[idx];
   // v1: item is element array; v2: item.elements
@@ -258,8 +547,7 @@ function buildTierConfigs(tierMap, totalNodes) {
       charge: Math.round(lerp(-3000, -400, frac) * crowdFactor),
       collide: Math.round(lerp(210, 100, frac) * crowdFactor),
       strokeWidth: frac < 0.33 ? 3 : frac < 0.66 ? 2 : 1,
-      iconSize:
-        frac < 0.5 ? Math.round(lerp(55, 35, frac * 2) * crowdFactor) : 0,
+      iconSize: Math.max(18, Math.round(lerp(55, 24, frac) * crowdFactor)),
     };
   }
   return configs;
@@ -413,8 +701,8 @@ function buildTerraformResourceDetails(node) {
           value: Object.prototype.hasOwnProperty.call(config, key)
             ? config[key]
             : unknownAfter
-              ? UNKNOWN_VALUE_PLACEHOLDER
-              : fieldDiff?.after ?? null,
+            ? UNKNOWN_VALUE_PLACEHOLDER
+            : fieldDiff?.after ?? null,
           changed: Boolean(fieldDiff),
           unknownAfter,
           before: fieldDiff?.before,
@@ -544,12 +832,16 @@ function isLambdaModuleSource(source) {
 function isLikelyLambdaModule(resourceFragments, moduleGroup = null) {
   return (
     isLambdaModuleSource(moduleGroup?.source) ||
-    resourceFragments.has("aws_lambda_function.this") &&
-    resourceFragments.has("aws_iam_role.lambda")
+    (resourceFragments.has("aws_lambda_function.this") &&
+      resourceFragments.has("aws_iam_role.lambda"))
   );
 }
 
-function applyModulePresets(positions, nodeKeys, moduleGroupByPath = new Map()) {
+function applyModulePresets(
+  positions,
+  nodeKeys,
+  moduleGroupByPath = new Map(),
+) {
   const moduleMembers = new Map();
 
   for (const nodePath of nodeKeys) {
@@ -849,7 +1141,10 @@ function buildNodeAdjacencyMap(nodes) {
   }
 
   for (const [nodePath, node] of Object.entries(nodes)) {
-    const neighbors = new Set([...(node.edges_new || []), ...(node.edges_existing || [])]);
+    const neighbors = new Set([
+      ...(node.edges_new || []),
+      ...(node.edges_existing || []),
+    ]);
     for (const neighbor of neighbors) {
       if (!nodes[neighbor] || neighbor === nodePath) {
         continue;
@@ -862,7 +1157,12 @@ function buildNodeAdjacencyMap(nodes) {
   return adjacency;
 }
 
-function findNearestVpcAnchor(startNodePath, adjacency, anchorByNodePath, maxDepth = 3) {
+function findNearestVpcAnchor(
+  startNodePath,
+  adjacency,
+  anchorByNodePath,
+  maxDepth = 3,
+) {
   if (!adjacency.has(startNodePath)) {
     return null;
   }
@@ -871,7 +1171,9 @@ function findNearestVpcAnchor(startNodePath, adjacency, anchorByNodePath, maxDep
   let frontier = [startNodePath];
 
   for (let depth = 0; depth <= maxDepth; depth++) {
-    const anchors = frontier.filter((nodePath) => anchorByNodePath.has(nodePath));
+    const anchors = frontier.filter((nodePath) =>
+      anchorByNodePath.has(nodePath),
+    );
     if (anchors.length > 0) {
       anchors.sort();
       return anchorByNodePath.get(anchors[0]);
@@ -909,7 +1211,8 @@ function buildNodeVpcMap(nodes) {
       if (resource.type === "aws_vpc") {
         const vpcId = normalizeVpcId(config.id);
         const vpcKey = vpcId || `node:${nodePath}`;
-        const vpcLabel = vpcId || getLabel(nodePath).split("\n").pop() || nodePath;
+        const vpcLabel =
+          vpcId || getLabel(nodePath).split("\n").pop() || nodePath;
         const anchor = { vpcKey, vpcLabel };
         anchorByNodePath.set(nodePath, anchor);
         vpcLabelByKey.set(vpcKey, vpcLabel);
@@ -1021,8 +1324,7 @@ function buildNodeSubnetMap(nodes, nodeVpcMap) {
     for (const resource of Object.values(node.resources || {})) {
       const config = getCurrentResourceConfig(resource);
       const explicitVpcIds = extractVpcIdsFromConfig(config);
-      const resourceVpcKey =
-        explicitVpcIds[0] || nodeVpc?.vpcKey || null;
+      const resourceVpcKey = explicitVpcIds[0] || nodeVpc?.vpcKey || null;
 
       if (resource.type === "aws_subnet") {
         const subnetId = normalizeSubnetId(config.id);
@@ -1388,7 +1690,13 @@ function coalesceRelationshipPairs(directedEdges) {
 
 // --- Force layout ---
 
-async function forceLayout(nodeKeys, directedEdges, tierMap, tierConfigs) {
+async function forceLayout(
+  nodeKeys,
+  directedEdges,
+  tierMap,
+  tierConfigs,
+  layoutSizes = {},
+) {
   const d3 = await import("d3-force");
 
   const tiers = Object.values(tierMap);
@@ -1401,7 +1709,17 @@ async function forceLayout(nodeKeys, directedEdges, tierMap, tierConfigs) {
     tier: tierMap[id],
   }));
 
-  const simLinks = directedEdges.map(({ source, target }) => ({ source, target }));
+  const simLinks = directedEdges.map(({ source, target }) => ({
+    source,
+    target,
+  }));
+  const getCollisionRadius = (node) => {
+    const size = layoutSizes[node.id];
+    if (size) {
+      return Math.max(size.w, size.h) / 2 + 90;
+    }
+    return tierConfigs[node.tier].collide;
+  };
 
   const simulation = d3
     .forceSimulation(simNodes)
@@ -1428,10 +1746,7 @@ async function forceLayout(nodeKeys, directedEdges, tierMap, tierConfigs) {
         }),
     )
     .force("center", d3.forceCenter(0, 0))
-    .force(
-      "collide",
-      d3.forceCollide().radius((d) => tierConfigs[d.tier].collide),
-    )
+    .force("collide", d3.forceCollide().radius(getCollisionRadius))
     .stop();
 
   for (let i = 0; i < 300; i++) {
@@ -1456,11 +1771,26 @@ async function forceLayout(nodeKeys, directedEdges, tierMap, tierConfigs) {
 }
 
 function buildCollapsibleModuleSet(moduleGroups) {
-  return new Set(
-    moduleGroups
-      .filter((group) => isLambdaModuleSource(group.source))
-      .map((group) => group.modulePath),
-  );
+  const collapsibleModules = new Set();
+
+  for (const group of moduleGroups) {
+    if (!group.source) {
+      continue;
+    }
+
+    const parentModulePaths = getModulePathChain(
+      `${group.modulePath}.placeholder`,
+    ).slice(0, -1);
+    if (
+      parentModulePaths.some((modulePath) => collapsibleModules.has(modulePath))
+    ) {
+      continue;
+    }
+
+    collapsibleModules.add(group.modulePath);
+  }
+
+  return collapsibleModules;
 }
 
 function getCollapsedModulePath(nodePath, collapsibleModules) {
@@ -1471,7 +1801,12 @@ function getCollapsedModulePath(nodePath, collapsibleModules) {
   return chain[0] || null;
 }
 
-function buildCollapsedLayoutModel(nodeKeys, directedEdges, tierMap, collapsibleModules) {
+function buildCollapsedLayoutModel(
+  nodeKeys,
+  directedEdges,
+  tierMap,
+  collapsibleModules,
+) {
   const nodeToLayoutId = new Map();
   const moduleMembers = new Map();
   const layoutNodeSet = new Set();
@@ -1520,6 +1855,94 @@ function buildCollapsedLayoutModel(nodeKeys, directedEdges, tierMap, collapsible
   };
 }
 
+function buildModuleInternalOffsets(members, modulePath, moduleGroup = null) {
+  const offsets = {};
+  const fragments = new Set(
+    members.map((nodePath) =>
+      getModuleRelativeResourcePath(nodePath, modulePath),
+    ),
+  );
+  const useLambdaPreset = isLikelyLambdaModule(fragments, moduleGroup);
+  const remaining = [];
+
+  for (const nodePath of members) {
+    const fragment = getModuleRelativeResourcePath(nodePath, modulePath);
+    const offset = useLambdaPreset
+      ? LAMBDA_MODULE_PRESET_OFFSETS[fragment]
+      : null;
+
+    if (offset) {
+      offsets[nodePath] = offset;
+    } else {
+      remaining.push(nodePath);
+    }
+  }
+
+  const columns = Math.min(3, Math.max(1, remaining.length));
+  const rows = Math.ceil(remaining.length / columns);
+  const gapX = 280;
+  const gapY = 160;
+  const startX = -((columns - 1) * gapX) / 2;
+  const startY = useLambdaPreset ? 340 : -((rows - 1) * gapY) / 2;
+
+  for (let index = 0; index < remaining.length; index++) {
+    const row = Math.floor(index / columns);
+    const col = index % columns;
+    offsets[remaining[index]] = {
+      x: startX + col * gapX,
+      y: startY + row * gapY,
+    };
+  }
+
+  return offsets;
+}
+
+function estimateModuleLayoutSizes(
+  moduleMembers,
+  moduleGroupByPath,
+  tierMap,
+  tierConfigs,
+) {
+  const sizes = {};
+
+  for (const [modulePath, members] of moduleMembers.entries()) {
+    const moduleGroup = moduleGroupByPath.get(modulePath);
+    const offsets = buildModuleInternalOffsets(
+      members,
+      modulePath,
+      moduleGroup,
+    );
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    for (const nodePath of members) {
+      const offset = offsets[nodePath];
+      const cfg = tierConfigs[tierMap[nodePath]];
+      if (!offset || !cfg) {
+        continue;
+      }
+
+      minX = Math.min(minX, offset.x);
+      minY = Math.min(minY, offset.y);
+      maxX = Math.max(maxX, offset.x + cfg.w);
+      maxY = Math.max(maxY, offset.y + cfg.h);
+    }
+
+    if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+      continue;
+    }
+
+    sizes[modulePath] = {
+      w: maxX - minX + 120,
+      h: maxY - minY + 120,
+    };
+  }
+
+  return sizes;
+}
+
 function expandCollapsedModulePositions(
   layoutPositions,
   nodeKeys,
@@ -1543,36 +1966,21 @@ function expandCollapsedModulePositions(
       continue;
     }
 
-    const fragments = new Set(
-      members.map((nodePath) =>
-        getModuleRelativeResourcePath(nodePath, modulePath),
-      ),
-    );
     const moduleGroup = moduleGroupByPath.get(modulePath);
-    const useLambdaPreset = isLikelyLambdaModule(fragments, moduleGroup);
-    const remaining = [];
+    const offsets = buildModuleInternalOffsets(
+      members,
+      modulePath,
+      moduleGroup,
+    );
 
     for (const nodePath of members) {
-      const fragment = getModuleRelativeResourcePath(nodePath, modulePath);
-      const offset = useLambdaPreset ? LAMBDA_MODULE_PRESET_OFFSETS[fragment] : null;
-
-      if (offset) {
-        positions[nodePath] = {
-          x: anchor.x + offset.x,
-          y: anchor.y + offset.y,
-        };
-      } else {
-        remaining.push(nodePath);
+      const offset = offsets[nodePath];
+      if (!offset) {
+        continue;
       }
-    }
-
-    const columns = Math.min(3, Math.max(1, remaining.length));
-    for (let index = 0; index < remaining.length; index++) {
-      const row = Math.floor(index / columns);
-      const col = index % columns;
-      positions[remaining[index]] = {
-        x: anchor.x - 260 + col * 260,
-        y: anchor.y + 340 + row * 140,
+      positions[nodePath] = {
+        x: anchor.x + offset.x,
+        y: anchor.y + offset.y,
       };
     }
   }
@@ -1609,25 +2017,31 @@ async function nodesToExcalidraw(nodes) {
 
   const tierMap = buildTierMap(nodeKeys);
   const collapsibleModules = buildCollapsibleModuleSet(moduleGroups);
-  const {
-    layoutNodeKeys,
-    layoutEdges,
-    layoutTierMap,
-    moduleMembers,
-  } = buildCollapsedLayoutModel(
-    nodeKeys,
-    directedEdges,
-    tierMap,
-    collapsibleModules,
-  );
-  const layoutTierConfigs = buildTierConfigs(layoutTierMap, layoutNodeKeys.length);
+  const { layoutNodeKeys, layoutEdges, layoutTierMap, moduleMembers } =
+    buildCollapsedLayoutModel(
+      nodeKeys,
+      directedEdges,
+      tierMap,
+      collapsibleModules,
+    );
   const tierConfigs = buildTierConfigs(tierMap, nodeKeys.length);
+  const layoutTierConfigs = buildTierConfigs(
+    layoutTierMap,
+    layoutNodeKeys.length,
+  );
+  const layoutSizes = estimateModuleLayoutSizes(
+    moduleMembers,
+    moduleGroupByPath,
+    tierMap,
+    tierConfigs,
+  );
 
   const layoutPositions = await forceLayout(
     layoutNodeKeys,
     layoutEdges,
     layoutTierMap,
     layoutTierConfigs,
+    layoutSizes,
   );
   const positions = expandCollapsedModulePositions(
     layoutPositions,
@@ -1749,6 +2163,7 @@ async function nodesToExcalidraw(nodes) {
   const MODULE_PADDING_X = 28;
   const MODULE_PADDING_TOP = 42;
   const MODULE_PADDING_BOTTOM = 20;
+  const moduleBoundsByPath = new Map();
 
   for (let i = 0; i < moduleGroups.length; i++) {
     const group = moduleGroups[i];
@@ -1780,6 +2195,12 @@ async function nodesToExcalidraw(nodes) {
     const boxY = minY - padTop;
     const boxW = maxX - minX + padX * 2;
     const boxH = maxY - minY + padTop + padBottom;
+    moduleBoundsByPath.set(group.modulePath, {
+      x: boxX,
+      y: boxY,
+      w: boxW,
+      h: boxH,
+    });
     const groupId = moduleGroupIdByPath.get(group.modulePath);
     const parentGroupIds = getModulePathChain(group.modulePath)
       .slice(0, -1)
@@ -1789,7 +2210,8 @@ async function nodesToExcalidraw(nodes) {
     const boxGroupIds = [groupId, ...parentGroupIds];
     const boxId = `module-box-${i}`;
     const labelId = `module-label-${i}`;
-    const strokeColor = MODULE_STROKES[(group.depth - 1) % MODULE_STROKES.length];
+    const strokeColor =
+      MODULE_STROKES[(group.depth - 1) % MODULE_STROKES.length];
 
     moduleElements.push(
       makeBaseElement({
@@ -1847,6 +2269,52 @@ async function nodesToExcalidraw(nodes) {
     );
   }
 
+  const getVisualBoundsForNodePath = (nodePath) => {
+    const modulePath = getOwningModulePath(nodePath);
+    if (modulePath && moduleBoundsByPath.has(modulePath)) {
+      return moduleBoundsByPath.get(modulePath);
+    }
+    return posMap[nodePath];
+  };
+
+  const getUniqueVisualBounds = (nodePaths) => {
+    const boundsByKey = new Map();
+
+    for (const nodePath of nodePaths) {
+      const modulePath = getOwningModulePath(nodePath);
+      const key =
+        modulePath && moduleBoundsByPath.has(modulePath)
+          ? modulePath
+          : nodePath;
+      const bounds = getVisualBoundsForNodePath(nodePath);
+      if (bounds && !boundsByKey.has(key)) {
+        boundsByKey.set(key, bounds);
+      }
+    }
+
+    return [...boundsByKey.values()];
+  };
+
+  const measureBounds = (boundsList) => {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    for (const bounds of boundsList) {
+      minX = Math.min(minX, bounds.x);
+      minY = Math.min(minY, bounds.y);
+      maxX = Math.max(maxX, bounds.x + bounds.w);
+      maxY = Math.max(maxY, bounds.y + bounds.h);
+    }
+
+    if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+      return null;
+    }
+
+    return { minX, minY, maxX, maxY };
+  };
+
   // --- account / region grouping boxes ---
   const ACCOUNT_STROKE = "#0b7285";
   const REGION_STROKE = "#1864ab";
@@ -1869,32 +2337,23 @@ async function nodesToExcalidraw(nodes) {
   let regionBoxIndex = 0;
   let vpcBoxIndex = 0;
   for (const accountGroup of accountRegionGroups) {
-    let accountMinX = Infinity;
-    let accountMinY = Infinity;
-    let accountMaxX = -Infinity;
-    let accountMaxY = -Infinity;
-
-    for (const nodePath of accountGroup.nodePaths) {
-      const pos = posMap[nodePath];
-      if (!pos) {
-        continue;
-      }
-      accountMinX = Math.min(accountMinX, pos.x);
-      accountMinY = Math.min(accountMinY, pos.y);
-      accountMaxX = Math.max(accountMaxX, pos.x + pos.w);
-      accountMaxY = Math.max(accountMaxY, pos.y + pos.h);
-    }
-
-    if (!Number.isFinite(accountMinX) || !Number.isFinite(accountMinY)) {
+    const accountBounds = measureBounds(
+      getUniqueVisualBounds(accountGroup.nodePaths),
+    );
+    if (!accountBounds) {
       continue;
     }
 
     const accountGroupId = `account-group-${rand()}`;
-    const accountBoxX = accountMinX - ACCOUNT_PADDING_X;
-    const accountBoxY = accountMinY - ACCOUNT_PADDING_TOP;
-    const accountBoxW = accountMaxX - accountMinX + ACCOUNT_PADDING_X * 2;
+    const accountBoxX = accountBounds.minX - ACCOUNT_PADDING_X;
+    const accountBoxY = accountBounds.minY - ACCOUNT_PADDING_TOP;
+    const accountBoxW =
+      accountBounds.maxX - accountBounds.minX + ACCOUNT_PADDING_X * 2;
     const accountBoxH =
-      accountMaxY - accountMinY + ACCOUNT_PADDING_TOP + ACCOUNT_PADDING_BOTTOM;
+      accountBounds.maxY -
+      accountBounds.minY +
+      ACCOUNT_PADDING_TOP +
+      ACCOUNT_PADDING_BOTTOM;
     const accountBoxId = `account-box-${accountBoxIndex}`;
     const accountLabelId = `account-label-${accountBoxIndex}`;
     accountBoxIndex += 1;
@@ -1950,32 +2409,23 @@ async function nodesToExcalidraw(nodes) {
     );
 
     for (const regionGroup of accountGroup.regions) {
-      let regionMinX = Infinity;
-      let regionMinY = Infinity;
-      let regionMaxX = -Infinity;
-      let regionMaxY = -Infinity;
-
-      for (const nodePath of regionGroup.nodePaths) {
-        const pos = posMap[nodePath];
-        if (!pos) {
-          continue;
-        }
-        regionMinX = Math.min(regionMinX, pos.x);
-        regionMinY = Math.min(regionMinY, pos.y);
-        regionMaxX = Math.max(regionMaxX, pos.x + pos.w);
-        regionMaxY = Math.max(regionMaxY, pos.y + pos.h);
-      }
-
-      if (!Number.isFinite(regionMinX) || !Number.isFinite(regionMinY)) {
+      const regionBounds = measureBounds(
+        getUniqueVisualBounds(regionGroup.nodePaths),
+      );
+      if (!regionBounds) {
         continue;
       }
 
       const regionGroupId = `region-group-${rand()}`;
-      const regionBoxX = regionMinX - REGION_PADDING_X;
-      const regionBoxY = regionMinY - REGION_PADDING_TOP;
-      const regionBoxW = regionMaxX - regionMinX + REGION_PADDING_X * 2;
+      const regionBoxX = regionBounds.minX - REGION_PADDING_X;
+      const regionBoxY = regionBounds.minY - REGION_PADDING_TOP;
+      const regionBoxW =
+        regionBounds.maxX - regionBounds.minX + REGION_PADDING_X * 2;
       const regionBoxH =
-        regionMaxY - regionMinY + REGION_PADDING_TOP + REGION_PADDING_BOTTOM;
+        regionBounds.maxY -
+        regionBounds.minY +
+        REGION_PADDING_TOP +
+        REGION_PADDING_BOTTOM;
       const regionBoxId = `region-box-${regionBoxIndex}`;
       const regionLabelId = `region-label-${regionBoxIndex}`;
       regionBoxIndex += 1;
@@ -2035,31 +2485,22 @@ async function nodesToExcalidraw(nodes) {
       );
 
       for (const vpcGroup of regionGroup.vpcs || []) {
-        let vpcMinX = Infinity;
-        let vpcMinY = Infinity;
-        let vpcMaxX = -Infinity;
-        let vpcMaxY = -Infinity;
-
-        for (const nodePath of vpcGroup.nodePaths) {
-          const pos = posMap[nodePath];
-          if (!pos) {
-            continue;
-          }
-          vpcMinX = Math.min(vpcMinX, pos.x);
-          vpcMinY = Math.min(vpcMinY, pos.y);
-          vpcMaxX = Math.max(vpcMaxX, pos.x + pos.w);
-          vpcMaxY = Math.max(vpcMaxY, pos.y + pos.h);
-        }
-
-        if (!Number.isFinite(vpcMinX) || !Number.isFinite(vpcMinY)) {
+        const vpcBounds = measureBounds(
+          getUniqueVisualBounds(vpcGroup.nodePaths),
+        );
+        if (!vpcBounds) {
           continue;
         }
 
         const vpcGroupId = `vpc-group-${rand()}`;
-        const vpcBoxX = vpcMinX - VPC_PADDING_X;
-        const vpcBoxY = vpcMinY - VPC_PADDING_TOP;
-        const vpcBoxW = vpcMaxX - vpcMinX + VPC_PADDING_X * 2;
-        const vpcBoxH = vpcMaxY - vpcMinY + VPC_PADDING_TOP + VPC_PADDING_BOTTOM;
+        const vpcBoxX = vpcBounds.minX - VPC_PADDING_X;
+        const vpcBoxY = vpcBounds.minY - VPC_PADDING_TOP;
+        const vpcBoxW = vpcBounds.maxX - vpcBounds.minX + VPC_PADDING_X * 2;
+        const vpcBoxH =
+          vpcBounds.maxY -
+          vpcBounds.minY +
+          VPC_PADDING_TOP +
+          VPC_PADDING_BOTTOM;
         const vpcBoxId = `vpc-box-${vpcBoxIndex}`;
         const vpcLabelId = `vpc-label-${vpcBoxIndex}`;
         vpcBoxIndex += 1;
@@ -2123,32 +2564,23 @@ async function nodesToExcalidraw(nodes) {
         );
 
         for (const subnetGroup of vpcGroup.subnets || []) {
-          let subnetMinX = Infinity;
-          let subnetMinY = Infinity;
-          let subnetMaxX = -Infinity;
-          let subnetMaxY = -Infinity;
-
-          for (const nodePath of subnetGroup.nodePaths) {
-            const pos = posMap[nodePath];
-            if (!pos) {
-              continue;
-            }
-            subnetMinX = Math.min(subnetMinX, pos.x);
-            subnetMinY = Math.min(subnetMinY, pos.y);
-            subnetMaxX = Math.max(subnetMaxX, pos.x + pos.w);
-            subnetMaxY = Math.max(subnetMaxY, pos.y + pos.h);
-          }
-
-          if (!Number.isFinite(subnetMinX) || !Number.isFinite(subnetMinY)) {
+          const subnetBounds = measureBounds(
+            getUniqueVisualBounds(subnetGroup.nodePaths),
+          );
+          if (!subnetBounds) {
             continue;
           }
 
           const subnetGroupId = `subnet-group-${rand()}`;
-          const subnetBoxX = subnetMinX - SUBNET_PADDING_X;
-          const subnetBoxY = subnetMinY - SUBNET_PADDING_TOP;
-          const subnetBoxW = subnetMaxX - subnetMinX + SUBNET_PADDING_X * 2;
+          const subnetBoxX = subnetBounds.minX - SUBNET_PADDING_X;
+          const subnetBoxY = subnetBounds.minY - SUBNET_PADDING_TOP;
+          const subnetBoxW =
+            subnetBounds.maxX - subnetBounds.minX + SUBNET_PADDING_X * 2;
           const subnetBoxH =
-            subnetMaxY - subnetMinY + SUBNET_PADDING_TOP + SUBNET_PADDING_BOTTOM;
+            subnetBounds.maxY -
+            subnetBounds.minY +
+            SUBNET_PADDING_TOP +
+            SUBNET_PADDING_BOTTOM;
           const subnetBoxId = `subnet-box-${vpcBoxIndex}-${rand()}`;
           const subnetLabelId = `subnet-label-${vpcBoxIndex}-${rand()}`;
 
@@ -2224,8 +2656,15 @@ async function nodesToExcalidraw(nodes) {
   // --- dependency lines ---
   let arrowIdx = 0;
   for (const relationship of relationships) {
-    const { source, target, directed, bidirectional, directions, kinds, origins } =
-      relationship;
+    const {
+      source,
+      target,
+      directed,
+      bidirectional,
+      directions,
+      kinds,
+      origins,
+    } = relationship;
     const posA = posMap[source];
     const posB = posMap[target];
     const arrowId = `arrow-${arrowIdx++}`;
@@ -2239,14 +2678,7 @@ async function nodesToExcalidraw(nodes) {
     rectB.boundElements.push({ id: arrowId, type: "arrow" });
 
     const { startFixed, endFixed, startPoint, endPoint } =
-      getCenterClippedBindingPoints(
-        posA,
-        posB,
-        posA.w,
-        posA.h,
-        posB.w,
-        posB.h,
-      );
+      getCenterClippedBindingPoints(posA, posB, posA.w, posA.h, posB.w, posB.h);
 
     const startX = startPoint.x;
     const startY = startPoint.y;
