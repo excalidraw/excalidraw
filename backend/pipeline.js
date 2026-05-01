@@ -193,6 +193,61 @@ function buildExistingEdges(nodes, plan) {
   return nodes;
 }
 
+function collectModuleMetadataFromConfig(moduleConfig, modulePath = "", out = {}) {
+  for (const [moduleName, moduleCall] of Object.entries(moduleConfig?.module_calls || {})) {
+    const childModulePath = modulePath
+      ? `${modulePath}.module.${moduleName}`
+      : `module.${moduleName}`;
+
+    out[childModulePath] = {
+      source: moduleCall.source || null,
+      version: moduleCall.version || moduleCall.version_constraint || null,
+    };
+
+    if (moduleCall.module) {
+      collectModuleMetadataFromConfig(moduleCall.module, childModulePath, out);
+    }
+  }
+
+  return out;
+}
+
+function applyModuleMetadata(nodes, plan) {
+  const moduleMetadata = collectModuleMetadataFromConfig(
+    plan?.configuration?.root_module,
+  );
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    const moduleChain = [];
+    const parts = nodePath.split(".");
+    let cursor = "";
+
+    for (let index = 0; index < parts.length - 1; ) {
+      if (parts[index] !== "module" || !parts[index + 1]) {
+        break;
+      }
+
+      const segment = `module.${parts[index + 1]}`;
+      cursor = cursor ? `${cursor}.${segment}` : segment;
+      moduleChain.push(cursor);
+      index += 2;
+    }
+
+    if (moduleChain.length === 0) {
+      continue;
+    }
+
+    node.terraform_module = moduleChain
+      .map((modulePath) => ({
+        modulePath,
+        ...(moduleMetadata[modulePath] || {}),
+      }))
+      .filter((metadata) => metadata.source || metadata.version);
+  }
+
+  return nodes;
+}
+
 function getStateResourceAddress(resource, instance) {
   const parts = [];
   if (resource.module) {
@@ -394,6 +449,7 @@ module.exports = {
   buildNewEdges,
   computeResourceDiffs,
   buildExistingEdges,
+  applyModuleMetadata,
   mergeTerraformState,
   ensureEdgeLists,
   externalResources,

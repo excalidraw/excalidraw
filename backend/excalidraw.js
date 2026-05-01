@@ -521,6 +521,7 @@ function getModuleRelativeResourcePath(nodePath, modulePath) {
 
 // Preset layout for terraform-aws-modules/lambda/aws inferred from resource set.
 // Offsets are relative to the module's aws_lambda_function.this position.
+const LAMBDA_MODULE_SOURCE = "terraform-aws-modules/lambda/aws";
 const LAMBDA_MODULE_PRESET_OFFSETS = {
   "aws_lambda_function.this": { x: 0, y: 0 },
   "aws_iam_role.lambda": { x: -360, y: 0 },
@@ -536,14 +537,19 @@ const LAMBDA_MODULE_PRESET_OFFSETS = {
   "data.aws_caller_identity.current": { x: 620, y: 130 },
 };
 
-function isLikelyLambdaModule(resourceFragments) {
+function isLambdaModuleSource(source) {
+  return source === LAMBDA_MODULE_SOURCE;
+}
+
+function isLikelyLambdaModule(resourceFragments, moduleGroup = null) {
   return (
+    isLambdaModuleSource(moduleGroup?.source) ||
     resourceFragments.has("aws_lambda_function.this") &&
     resourceFragments.has("aws_iam_role.lambda")
   );
 }
 
-function applyModulePresets(positions, nodeKeys) {
+function applyModulePresets(positions, nodeKeys, moduleGroupByPath = new Map()) {
   const moduleMembers = new Map();
 
   for (const nodePath of nodeKeys) {
@@ -564,7 +570,7 @@ function applyModulePresets(positions, nodeKeys) {
       ),
     );
 
-    if (!isLikelyLambdaModule(fragments)) {
+    if (!isLikelyLambdaModule(fragments, moduleGroupByPath.get(modulePath))) {
       continue;
     }
 
@@ -591,7 +597,7 @@ function applyModulePresets(positions, nodeKeys) {
   return positions;
 }
 
-function collectModuleGroups(nodeKeys) {
+function collectModuleGroups(nodeKeys, nodes = {}) {
   const groups = new Map();
 
   for (const nodePath of nodeKeys) {
@@ -602,10 +608,20 @@ function collectModuleGroups(nodeKeys) {
           modulePath,
           moduleLabel: getModuleDisplayLabel(modulePath),
           depth: getModuleDepthFromPath(modulePath),
+          source: null,
+          version: null,
           nodePaths: [],
         });
       }
-      groups.get(modulePath).nodePaths.push(nodePath);
+      const group = groups.get(modulePath);
+      const metadata = (nodes[nodePath]?.terraform_module || []).find(
+        (item) => item.modulePath === modulePath,
+      );
+      if (metadata) {
+        group.source ||= metadata.source || null;
+        group.version ||= metadata.version || null;
+      }
+      group.nodePaths.push(nodePath);
     }
   }
 
@@ -1439,6 +1455,131 @@ async function forceLayout(nodeKeys, directedEdges, tierMap, tierConfigs) {
   return posMap;
 }
 
+function buildCollapsibleModuleSet(moduleGroups) {
+  return new Set(
+    moduleGroups
+      .filter((group) => isLambdaModuleSource(group.source))
+      .map((group) => group.modulePath),
+  );
+}
+
+function getCollapsedModulePath(nodePath, collapsibleModules) {
+  const chain = getModulePathChain(nodePath)
+    .filter((modulePath) => collapsibleModules.has(modulePath))
+    .sort((a, b) => b.length - a.length);
+
+  return chain[0] || null;
+}
+
+function buildCollapsedLayoutModel(nodeKeys, directedEdges, tierMap, collapsibleModules) {
+  const nodeToLayoutId = new Map();
+  const moduleMembers = new Map();
+  const layoutNodeSet = new Set();
+
+  for (const nodePath of nodeKeys) {
+    const modulePath = getCollapsedModulePath(nodePath, collapsibleModules);
+    const layoutId = modulePath || nodePath;
+    nodeToLayoutId.set(nodePath, layoutId);
+    layoutNodeSet.add(layoutId);
+
+    if (modulePath) {
+      if (!moduleMembers.has(modulePath)) {
+        moduleMembers.set(modulePath, []);
+      }
+      moduleMembers.get(modulePath).push(nodePath);
+    }
+  }
+
+  const layoutEdgeMap = new Map();
+  for (const edge of directedEdges) {
+    const source = nodeToLayoutId.get(edge.source);
+    const target = nodeToLayoutId.get(edge.target);
+    if (!source || !target || source === target) {
+      continue;
+    }
+
+    const key = `${source}|||${target}`;
+    if (!layoutEdgeMap.has(key)) {
+      layoutEdgeMap.set(key, { source, target });
+    }
+  }
+
+  const layoutTierMap = {};
+  for (const layoutId of layoutNodeSet) {
+    const members = moduleMembers.get(layoutId);
+    layoutTierMap[layoutId] = members
+      ? Math.min(...members.map((nodePath) => tierMap[nodePath]))
+      : tierMap[layoutId];
+  }
+
+  return {
+    layoutNodeKeys: [...layoutNodeSet],
+    layoutEdges: [...layoutEdgeMap.values()],
+    layoutTierMap,
+    moduleMembers,
+  };
+}
+
+function expandCollapsedModulePositions(
+  layoutPositions,
+  nodeKeys,
+  moduleMembers,
+  moduleGroupByPath,
+) {
+  const positions = {};
+  const collapsedNodeSet = new Set(
+    [...moduleMembers.values()].flatMap((members) => members),
+  );
+
+  for (const nodePath of nodeKeys) {
+    if (!collapsedNodeSet.has(nodePath)) {
+      positions[nodePath] = layoutPositions[nodePath];
+    }
+  }
+
+  for (const [modulePath, members] of moduleMembers.entries()) {
+    const anchor = layoutPositions[modulePath];
+    if (!anchor) {
+      continue;
+    }
+
+    const fragments = new Set(
+      members.map((nodePath) =>
+        getModuleRelativeResourcePath(nodePath, modulePath),
+      ),
+    );
+    const moduleGroup = moduleGroupByPath.get(modulePath);
+    const useLambdaPreset = isLikelyLambdaModule(fragments, moduleGroup);
+    const remaining = [];
+
+    for (const nodePath of members) {
+      const fragment = getModuleRelativeResourcePath(nodePath, modulePath);
+      const offset = useLambdaPreset ? LAMBDA_MODULE_PRESET_OFFSETS[fragment] : null;
+
+      if (offset) {
+        positions[nodePath] = {
+          x: anchor.x + offset.x,
+          y: anchor.y + offset.y,
+        };
+      } else {
+        remaining.push(nodePath);
+      }
+    }
+
+    const columns = Math.min(3, Math.max(1, remaining.length));
+    for (let index = 0; index < remaining.length; index++) {
+      const row = Math.floor(index / columns);
+      const col = index % columns;
+      positions[remaining[index]] = {
+        x: anchor.x - 260 + col * 260,
+        y: anchor.y + 340 + row * 140,
+      };
+    }
+  }
+
+  return positions;
+}
+
 // --- Main conversion ---
 
 async function nodesToExcalidraw(nodes) {
@@ -1458,21 +1599,43 @@ async function nodesToExcalidraw(nodes) {
     nodeVpcMap,
     nodeSubnetMap,
   );
-  const moduleGroups = collectModuleGroups(nodeKeys);
+  const moduleGroups = collectModuleGroups(nodeKeys, nodes);
   const moduleGroupIdByPath = new Map(
     moduleGroups.map((group) => [group.modulePath, `module-group-${rand()}`]),
   );
+  const moduleGroupByPath = new Map(
+    moduleGroups.map((group) => [group.modulePath, group]),
+  );
 
   const tierMap = buildTierMap(nodeKeys);
-  const tierConfigs = buildTierConfigs(tierMap, nodeKeys.length);
-
-  const positions = await forceLayout(
+  const collapsibleModules = buildCollapsibleModuleSet(moduleGroups);
+  const {
+    layoutNodeKeys,
+    layoutEdges,
+    layoutTierMap,
+    moduleMembers,
+  } = buildCollapsedLayoutModel(
     nodeKeys,
     directedEdges,
     tierMap,
-    tierConfigs,
+    collapsibleModules,
   );
-  applyModulePresets(positions, nodeKeys);
+  const layoutTierConfigs = buildTierConfigs(layoutTierMap, layoutNodeKeys.length);
+  const tierConfigs = buildTierConfigs(tierMap, nodeKeys.length);
+
+  const layoutPositions = await forceLayout(
+    layoutNodeKeys,
+    layoutEdges,
+    layoutTierMap,
+    layoutTierConfigs,
+  );
+  const positions = expandCollapsedModulePositions(
+    layoutPositions,
+    nodeKeys,
+    moduleMembers,
+    moduleGroupByPath,
+  );
+  applyModulePresets(positions, nodeKeys, moduleGroupByPath);
   const posMap = {};
   const nodeRectById = new Map();
 
@@ -1648,6 +1811,8 @@ async function nodesToExcalidraw(nodes) {
           terraformModuleGroup: true,
           modulePath: group.modulePath,
           moduleDepth: group.depth,
+          moduleSource: group.source,
+          moduleVersion: group.version,
         },
       }),
     );
@@ -1675,6 +1840,8 @@ async function nodesToExcalidraw(nodes) {
           terraform: false,
           terraformModuleGroup: true,
           modulePath: group.modulePath,
+          moduleSource: group.source,
+          moduleVersion: group.version,
         },
       }),
     );

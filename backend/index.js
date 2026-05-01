@@ -12,6 +12,7 @@ const {
   buildNewEdges,
   computeResourceDiffs,
   buildExistingEdges,
+  applyModuleMetadata,
   mergeTerraformState,
   ensureEdgeLists,
   externalResources,
@@ -96,6 +97,7 @@ app.post(
 
       nodes = computeResourceDiffs(nodes);
       nodes = buildExistingEdges(nodes, plan);
+      nodes = applyModuleMetadata(nodes, plan);
       nodes = mergeTerraformState(nodes, state);
       nodes = ensureEdgeLists(nodes);
       nodes = externalResources(nodes);
