@@ -19,6 +19,7 @@ const TerraformImportModal = ({
 
   const [planFile, setPlanFile] = useState<File | null>(null);
   const [dotFile, setDotFile] = useState<File | null>(null);
+  const [stateFile, setStateFile] = useState<File | null>(null);
   const [savedId, setSavedId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +49,9 @@ const TerraformImportModal = ({
       const formData = new FormData();
       formData.append("planFile", planFile);
       formData.append("dotFile", dotFile);
+      if (stateFile) {
+        formData.append("stateFile", stateFile);
+      }
       const res = await fetch(`${BACKEND_URL}/terraform/upload`, {
         method: "POST",
         body: formData,
@@ -104,6 +108,14 @@ const TerraformImportModal = ({
               onChange={(e) => setDotFile(e.target.files?.[0] ?? null)}
             />
           </label>
+          <label>
+            State file (.tfstate, optional)
+            <input
+              type="file"
+              accept=".tfstate,.json"
+              onChange={(e) => setStateFile(e.target.files?.[0] ?? null)}
+            />
+          </label>
         </div>
         <div className="TerraformImportModal__settings__buttons">
           <FilledButton
@@ -145,9 +157,7 @@ const TerraformImportModal = ({
         </div>
       </div>
 
-      {error && (
-        <div className="TerraformImportModal__error">{error}</div>
-      )}
+      {error && <div className="TerraformImportModal__error">{error}</div>}
     </div>
   );
 };
