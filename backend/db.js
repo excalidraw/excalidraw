@@ -10,6 +10,7 @@ const uploads = sqliteTable("uploads", {
   data: text("data").notNull(),
   planFilename: text("plan_filename"),
   dotFilename: text("dot_filename"),
+  stateFilename: text("state_filename"),
   nodeCount: integer("node_count"),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
@@ -28,9 +29,15 @@ sqlite.exec(`
     data TEXT NOT NULL,
     plan_filename TEXT,
     dot_filename TEXT,
+    state_filename TEXT,
     node_count INTEGER,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   )
 `);
+
+const columns = sqlite.prepare("PRAGMA table_info(uploads)").all();
+if (!columns.some((column) => column.name === "state_filename")) {
+  sqlite.exec("ALTER TABLE uploads ADD COLUMN state_filename TEXT");
+}
 
 module.exports = { db, uploads, eq };

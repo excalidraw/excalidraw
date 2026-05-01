@@ -1,4 +1,4 @@
-const stripIndexes = (address = "") => address.replace(/\[\d+\]/g, "");
+const stripIndexes = (address = "") => address.replace(/\[[^\]]+\]/g, "");
 
 const sanitizeDotNodeId = (nodeId = "") => {
   const parts = String(nodeId).trim().split(" ");
@@ -193,6 +193,69 @@ function buildExistingEdges(nodes, plan) {
   return nodes;
 }
 
+function getStateResourceAddress(resource, instance) {
+  const parts = [];
+  if (resource.module) {
+    parts.push(resource.module);
+  }
+  if (resource.mode === "data") {
+    parts.push("data");
+  }
+  parts.push(resource.type, resource.name);
+
+  let address = parts.join(".");
+  if (Object.prototype.hasOwnProperty.call(instance, "index_key")) {
+    const key = instance.index_key;
+    address += typeof key === "number" ? `[${key}]` : `[${JSON.stringify(key)}]`;
+  }
+  return address;
+}
+
+function mergeTerraformState(nodes, state) {
+  if (!state || !Array.isArray(state.resources)) {
+    return nodes;
+  }
+
+  for (const resource of state.resources) {
+    for (const instance of resource.instances || []) {
+      const address = getStateResourceAddress(resource, instance);
+      const nodePath = stripIndexes(address);
+
+      nodes[nodePath] ||= { resources: {} };
+
+      const existingResource = nodes[nodePath].resources[address] || {};
+      nodes[nodePath].resources[address] = {
+        ...existingResource,
+        address,
+        mode: resource.mode,
+        type: resource.type,
+        name: resource.name,
+        provider_name: resource.provider,
+        values: {
+          ...(instance.attributes || {}),
+          ...(existingResource.values || {}),
+        },
+        change: existingResource.change || { actions: ["existing"] },
+        terraform_state: {
+          schema_version: instance.schema_version,
+          private: Boolean(instance.private),
+          dependencies: instance.dependencies || [],
+        },
+      };
+
+      nodes[nodePath].edges_existing ||= [];
+      for (const dependency of instance.dependencies || []) {
+        const target = stripIndexes(dependency);
+        if (target !== nodePath && !nodes[nodePath].edges_existing.includes(target)) {
+          nodes[nodePath].edges_existing.push(target);
+        }
+      }
+    }
+  }
+
+  return nodes;
+}
+
 function ensureEdgeLists(nodes) {
   for (const node of Object.values(nodes)) {
     node.edges_new ||= [];
@@ -331,6 +394,7 @@ module.exports = {
   buildNewEdges,
   computeResourceDiffs,
   buildExistingEdges,
+  mergeTerraformState,
   ensureEdgeLists,
   externalResources,
   deleteOrphanedNodes,
