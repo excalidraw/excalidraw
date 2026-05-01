@@ -1,10 +1,10 @@
-# Excalidraw (Terraform fork)
+# Excalidraw Terraform
 
-A **fork of [Excalidraw](https://excalidraw.com)** that imports a **Terraform plan** (via `terraform show` / plan JSON and the dependency graph) and **generates an Excalidraw canvas** for you—turning your infrastructure into an editable, hand-drawn style diagram.
+A **Terraform architecture visualizer built on [Excalidraw](https://excalidraw.com)**.
 
-Upload your Terraform plan JSON and graph (DOT), and the app builds a canvas of nodes (resources) and edges (dependencies) that you can pan, zoom, and edit like any Excalidraw drawing.
+Upload a Terraform plan JSON, graph DOT, and optionally `terraform.tfstate`; the backend enriches the graph and generates an editable Excalidraw scene with AWS service icons, dependency arrows, module boxes, and account/region/VPC/subnet boundaries.
 
-![Terraform plan imported into Excalidraw — infrastructure as an editable diagram](docs/terraform-canvas-new.png)
+![Terraform plan imported into Excalidraw — infrastructure as an editable diagram](docs/terraform-canvas-aws-icons.png)
 
 <p align="center">
   <a href="https://github.com/excalidraw/excalidraw/blob/master/LICENSE">
@@ -16,17 +16,14 @@ Upload your Terraform plan JSON and graph (DOT), and the app builds a canvas of 
 
 ## What this fork adds
 
-- **Terraform import** — Upload a Terraform plan (JSON) and its dependency graph (DOT from `terraform graph` or equivalent). The backend parses both and returns a graph of resources and relationships.
-- **Excalidraw canvas from the graph** — The graph is used to create (or populate) an Excalidraw scene: nodes become shapes, edges become arrows, so you get an interactive diagram of your infrastructure.
-- **Backend pipeline** — A small Node/Express server that:
-  - Accepts plan + DOT file uploads
-  - Builds adjacency lists, new vs existing edges, and resource diffs
-  - Writes intermediate artifacts to `backend/temp/` and returns the final node graph (e.g. for the frontend to render on the canvas)
-- **Module grouping boxes** — Resources are wrapped by dashed module boxes based on Terraform module paths; nested modules produce nested boxes.
-- **Movable module groups** — Dragging a module box moves its internal resources together.
-- **Cleaner visual layering** — Dependency arrows are rendered behind resource nodes.
-- **Preset Lambda module layout** — Lambda module internals (function, role, policies, log group, packaging resources) are placed in stable relative positions for more consistent diagrams.
-- **Improved Terraform details panel** — JSON strings such as IAM policy documents are pretty-printed; unknown planned values are surfaced as `Known after apply`; volatile IAM role policy fields are filtered to make existing vs new comparisons clearer.
+- **Terraform plan + graph import** — Upload plan JSON from `terraform show -json` and DOT from `terraform graph`; the backend builds resource nodes and dependency edges.
+- **Optional state enrichment** — Upload `terraform.tfstate` to merge real deployed attributes, existing dependencies, ARNs, regions, accounts, VPC IDs, and subnet IDs into the rendered graph.
+- **AWS architecture icons** — Resource cards use the bundled AWS architecture icon library, including IAM, Lambda, S3, SQS, RDS, VPC, CloudWatch, and many other services.
+- **Module-aware layout** — Terraform modules are placed as layout units so sibling modules have space and module internals stay readable.
+- **Nested infrastructure boundaries** — Account, region, VPC, subnet, and module containers are rendered with staggered padding so the ownership/context hierarchy is visible.
+- **Lambda module preset** — Common Lambda module internals such as function, role, inline policies, log group, and package resources get stable relative placement.
+- **Relationship rendering** — Planned dependencies and state-derived dependencies are drawn as arrows behind the resource cards.
+- **Terraform details panel data** — Resource diffs, known-after-apply values, and selected state/config fields are stored on the Excalidraw elements for inspection.
 
 The rest is standard Excalidraw: hand-drawn style, zoom/pan, export to PNG/SVG, and the usual editor tools.
 
@@ -43,12 +40,13 @@ yarn start          # Excalidraw app (e.g. Vite dev server)
 node backend/index.js   # Backend on http://localhost:3000
 ```
 
-Then use the **Terraform Import** flow in the app (e.g. from the menu or shortcut) to upload:
+Then use the **Terraform Import** flow in the app to upload:
 
 1. **Plan file** — JSON from `terraform show -json <planfile>` (or your plan output saved as JSON).
 2. **Graph file** — DOT output (e.g. from `terraform graph` or your plan’s graph representation).
+3. **State file, optional** — `terraform.tfstate` for deployed-resource enrichment and existing dependency discovery.
 
-The backend processes both and returns the graph; the app can then draw it on the Excalidraw canvas.
+The backend stores the upload, generates the enriched graph, and returns an Excalidraw scene that the app inserts into the canvas.
 
 Import shortcut: `Ctrl/Cmd + Shift + K`.
 
