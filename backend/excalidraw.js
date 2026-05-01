@@ -2167,9 +2167,9 @@ async function nodesToExcalidraw(nodes) {
 
   // --- module grouping boxes ---
   const MODULE_STROKES = ["#5c7cfa", "#339af0", "#22b8cf", "#20c997"];
-  const MODULE_PADDING_X = 28;
-  const MODULE_PADDING_TOP = 42;
-  const MODULE_PADDING_BOTTOM = 20;
+  const MODULE_PADDING_X = 52;
+  const MODULE_PADDING_TOP = 72;
+  const MODULE_PADDING_BOTTOM = 40;
   const moduleBoundsByPath = new Map();
 
   for (let i = 0; i < moduleGroups.length; i++) {
@@ -2194,10 +2194,10 @@ async function nodesToExcalidraw(nodes) {
       continue;
     }
 
-    const depthInset = Math.max(0, (group.depth - 1) * 6);
-    const padX = Math.max(14, MODULE_PADDING_X - depthInset);
-    const padTop = Math.max(28, MODULE_PADDING_TOP - depthInset);
-    const padBottom = MODULE_PADDING_BOTTOM;
+    const depthInset = Math.max(0, (group.depth - 1) * 8);
+    const padX = Math.max(28, MODULE_PADDING_X - depthInset);
+    const padTop = Math.max(48, MODULE_PADDING_TOP - depthInset);
+    const padBottom = Math.max(28, MODULE_PADDING_BOTTOM - depthInset);
     const boxX = minX - padX;
     const boxY = minY - padTop;
     const boxW = maxX - minX + padX * 2;
@@ -2325,20 +2325,20 @@ async function nodesToExcalidraw(nodes) {
   // --- account / region grouping boxes ---
   const ACCOUNT_STROKE = "#0b7285";
   const REGION_STROKE = "#1864ab";
-  const ACCOUNT_PADDING_X = 44;
-  const ACCOUNT_PADDING_TOP = 56;
-  const ACCOUNT_PADDING_BOTTOM = 28;
-  const REGION_PADDING_X = 24;
-  const REGION_PADDING_TOP = 40;
-  const REGION_PADDING_BOTTOM = 18;
+  const ACCOUNT_PADDING_X = 132;
+  const ACCOUNT_PADDING_TOP = 168;
+  const ACCOUNT_PADDING_BOTTOM = 108;
+  const REGION_PADDING_X = 100;
+  const REGION_PADDING_TOP = 132;
+  const REGION_PADDING_BOTTOM = 78;
   const VPC_STROKE = "#2b8a3e";
-  const VPC_PADDING_X = 14;
-  const VPC_PADDING_TOP = 32;
-  const VPC_PADDING_BOTTOM = 12;
+  const VPC_PADDING_X = 68;
+  const VPC_PADDING_TOP = 96;
+  const VPC_PADDING_BOTTOM = 52;
   const SUBNET_STROKE = "#099268";
-  const SUBNET_PADDING_X = 10;
-  const SUBNET_PADDING_TOP = 26;
-  const SUBNET_PADDING_BOTTOM = 10;
+  const SUBNET_PADDING_X = 36;
+  const SUBNET_PADDING_TOP = 58;
+  const SUBNET_PADDING_BOTTOM = 28;
 
   let accountBoxIndex = 0;
   let regionBoxIndex = 0;
