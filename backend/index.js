@@ -12,6 +12,7 @@ const {
   buildNewEdges,
   computeResourceDiffs,
   buildExistingEdges,
+  mergeTerraformState,
   ensureEdgeLists,
   externalResources,
   deleteOrphanedNodes,
@@ -43,11 +44,15 @@ app.post(
   upload.fields([
     { name: "planFile", maxCount: 1 },
     { name: "dotFile", maxCount: 1 },
+    { name: "stateFile", maxCount: 1 },
   ]),
   (req, res) => {
+    const uploadedFiles = [];
     try {
       const planFile = req.files?.planFile?.[0];
       const dotFile = req.files?.dotFile?.[0];
+      const stateFile = req.files?.stateFile?.[0];
+      uploadedFiles.push(...[planFile, dotFile, stateFile].filter(Boolean));
 
       if (!planFile || !dotFile) {
         return res
@@ -57,7 +62,11 @@ app.post(
 
       const planContent = fs.readFileSync(planFile.path, "utf-8");
       const dotContent = fs.readFileSync(dotFile.path, "utf-8");
+      const stateContent = stateFile
+        ? fs.readFileSync(stateFile.path, "utf-8")
+        : null;
       const plan = JSON.parse(planContent);
+      const state = stateContent ? JSON.parse(stateContent) : null;
       const graph = dot.read(dotContent);
 
       console.log(
@@ -67,6 +76,14 @@ app.post(
         "chars",
       );
       console.log("Dot file:", dotFile.originalname, dotContent.length, "chars");
+      if (stateFile) {
+        console.log(
+          "State file:",
+          stateFile.originalname,
+          stateContent.length,
+          "chars",
+        );
+      }
 
       const adjlist = getAdjacencyListFromDot(graph);
       writeJsonToTemp(adjlist, "adjlist.json");
@@ -79,6 +96,7 @@ app.post(
 
       nodes = computeResourceDiffs(nodes);
       nodes = buildExistingEdges(nodes, plan);
+      nodes = mergeTerraformState(nodes, state);
       nodes = ensureEdgeLists(nodes);
       nodes = externalResources(nodes);
       nodes = ensureEdgeLists(nodes);
@@ -95,6 +113,7 @@ app.post(
         data: JSON.stringify(nodes),
         planFilename: planFile.originalname,
         dotFilename: dotFile.originalname,
+        stateFilename: stateFile?.originalname || null,
         nodeCount: Object.keys(nodes).length,
       }).returning({ id: uploads.id }).get();
 
@@ -105,6 +124,14 @@ app.post(
         error: error.message,
         trace: error.stack,
       });
+    } finally {
+      for (const file of uploadedFiles) {
+        try {
+          fs.unlinkSync(file.path);
+        } catch {
+          // Best effort cleanup for multer temp files.
+        }
+      }
     }
   },
 );
@@ -119,6 +146,7 @@ app.get("/terraform/upload/:id", (req, res) => {
     nodes: JSON.parse(row.data),
     plan_filename: row.planFilename,
     dot_filename: row.dotFilename,
+    state_filename: row.stateFilename,
     node_count: row.nodeCount,
     created_at: row.createdAt,
   });

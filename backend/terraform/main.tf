@@ -1,3 +1,4 @@
+
 resource "aws_s3_bucket" "data" {
   bucket = "ts-test-lambda-data"
 }
