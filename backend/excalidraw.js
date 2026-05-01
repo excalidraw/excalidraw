@@ -417,6 +417,12 @@ function cloneIconElements(
       locked: false,
       isDeleted: false,
     };
+    if (typeof e.fontSize === "number") {
+      cloned.fontSize = Math.max(1, e.fontSize * scale);
+    }
+    if (typeof e.strokeWidth === "number") {
+      cloned.strokeWidth = Math.max(1, e.strokeWidth * scale);
+    }
     if (e.points) {
       cloned.points = e.points.map(([px, py]) => [px * scale, py * scale]);
     }
@@ -540,14 +546,15 @@ function buildTierConfigs(tierMap, totalNodes) {
   const configs = {};
   for (let t = minTier; t <= maxTier; t++) {
     const frac = (t - minTier) / range; // 0 = most prominent, 1 = least
+    const nodeScale = 1.25;
     configs[t] = {
-      w: Math.round(lerp(300, 180, frac) * crowdFactor),
-      h: Math.round(lerp(100, 50, frac) * crowdFactor),
-      fontSize: Math.round(lerp(16, 10, frac)),
+      w: Math.round(lerp(300, 180, frac) * crowdFactor * nodeScale),
+      h: Math.round(lerp(100, 50, frac) * crowdFactor * nodeScale),
+      fontSize: Math.round(lerp(16, 10, frac) * 1.08),
       charge: Math.round(lerp(-3000, -400, frac) * crowdFactor),
-      collide: Math.round(lerp(210, 100, frac) * crowdFactor),
+      collide: Math.round(lerp(210, 100, frac) * crowdFactor * nodeScale),
       strokeWidth: frac < 0.33 ? 3 : frac < 0.66 ? 2 : 1,
-      iconSize: Math.max(18, Math.round(lerp(55, 24, frac) * crowdFactor)),
+      iconSize: Math.max(28, Math.round(lerp(72, 36, frac) * crowdFactor)),
     };
   }
   return configs;
