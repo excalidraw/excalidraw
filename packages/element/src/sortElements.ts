@@ -1,4 +1,4 @@
-import { arrayToMapWithIndex } from "@excalidraw/common";
+import { arrayToMap } from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "./types";
 
@@ -65,39 +65,40 @@ const defragmentGroups = (elements: readonly ExcalidrawElement[]) => {
 const normalizeBoundElementsOrder = (
   elements: readonly ExcalidrawElement[],
 ) => {
-  const elementsMap = arrayToMapWithIndex(elements);
+  const elementsMap = arrayToMap(elements);
 
-  const origElements: (ExcalidrawElement | null)[] = elements.slice();
   const sortedElements = new Set<ExcalidrawElement>();
 
-  origElements.forEach((element, idx) => {
-    if (!element) {
-      return;
+  for (const element of elements) {
+    if (sortedElements.has(element)) {
+      continue;
     }
+
     if (element.boundElements?.length) {
       sortedElements.add(element);
-      origElements[idx] = null;
-      element.boundElements.forEach((boundElement) => {
+      for (const boundElement of element.boundElements) {
         const child = elementsMap.get(boundElement.id);
         if (child && boundElement.type === "text") {
-          sortedElements.add(child[0]);
-          origElements[child[1]] = null;
+          sortedElements.add(child);
         }
-      });
-    } else if (element.type === "text" && element.containerId) {
-      const parent = elementsMap.get(element.containerId);
-      if (!parent?.[0].boundElements?.find((x) => x.id === element.id)) {
-        sortedElements.add(element);
-        origElements[idx] = null;
-
-        // if element has a container and container lists it, skip this element
-        // as it'll be taken care of by the container
       }
-    } else {
-      sortedElements.add(element);
-      origElements[idx] = null;
+      continue;
     }
-  });
+
+    // if element has a container and container lists it, skip this element
+    // as it'll be taken care of by the container
+    if (
+      element.type === "text" &&
+      element.containerId &&
+      elementsMap
+        .get(element.containerId)
+        ?.boundElements?.some((el) => el.id === element.id)
+    ) {
+      continue;
+    }
+
+    sortedElements.add(element);
+  }
 
   // if there's a bug which resulted in losing some of the elements, return
   // original instead as that's better than losing data
