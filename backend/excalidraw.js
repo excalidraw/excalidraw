@@ -1722,7 +1722,44 @@ function collectDataFlowEdges(nodes) {
     }
   }
 
-  return [...edgeMap.values()];
+  const pairMap = new Map();
+  for (const edge of edgeMap.values()) {
+    const pairKey = [edge.source, edge.target].sort().join("|||");
+    if (!pairMap.has(pairKey)) {
+      pairMap.set(pairKey, []);
+    }
+    pairMap.get(pairKey).push(edge);
+  }
+
+  const collected = [];
+  for (const edges of pairMap.values()) {
+    const directions = new Set(
+      edges.map((edge) => `${edge.source}|||${edge.target}`),
+    );
+    if (directions.size <= 1) {
+      collected.push(...edges);
+      continue;
+    }
+
+    const [source, target] = [edges[0].source, edges[0].target].sort();
+    const labels = [...new Set(edges.map((edge) => edge.label))];
+    const types = [...new Set(edges.map((edge) => edge.type))];
+    collected.push({
+      source,
+      target,
+      type: types.length === 1 ? types[0] : "bidirectional_data_flow",
+      label: labels.join(" / "),
+      origin: [...new Set(edges.map((edge) => edge.origin))].join(", "),
+      detail: edges
+        .map((edge) => edge.detail)
+        .filter(Boolean)
+        .join(", "),
+      bidirectional: true,
+      directions: edges,
+    });
+  }
+
+  return collected;
 }
 
 function offsetLineSegment(startPoint, endPoint, offset) {
@@ -1740,6 +1777,13 @@ function offsetLineSegment(startPoint, endPoint, offset) {
     startPoint: { x: startPoint.x + offsetX, y: startPoint.y + offsetY },
     endPoint: { x: endPoint.x + offsetX, y: endPoint.y + offsetY },
   };
+}
+
+function fixedPointForAbsolutePoint(pos, point) {
+  return [
+    clamp((point.x - pos.x) / pos.w, 0, 1),
+    clamp((point.y - pos.y) / pos.h, 0, 1),
+  ];
 }
 
 // --- Force layout ---
@@ -2793,7 +2837,16 @@ async function nodesToExcalidraw(nodes) {
 
   // --- data-flow lines ---
   for (const edge of dataFlowEdges) {
-    const { source, target, type, label, origin, detail } = edge;
+    const {
+      source,
+      target,
+      type,
+      label,
+      origin,
+      detail,
+      bidirectional = false,
+      directions = [],
+    } = edge;
     const posA = posMap[source];
     const posB = posMap[target];
     if (!posA || !posB) {
@@ -2828,6 +2881,8 @@ async function nodesToExcalidraw(nodes) {
     const startY = shifted.startPoint.y;
     const endX = shifted.endPoint.x;
     const endY = shifted.endPoint.y;
+    const startFixed = fixedPointForAbsolutePoint(posA, shifted.startPoint);
+    const endFixed = fixedPointForAbsolutePoint(posB, shifted.endPoint);
 
     arrowElements.push(
       makeBaseElement({
@@ -2841,9 +2896,17 @@ async function nodesToExcalidraw(nodes) {
           [0, 0],
           [endX - startX, endY - startY],
         ],
-        startBinding: null,
-        endBinding: null,
-        startArrowhead: null,
+        startBinding: {
+          elementId: posA.rectId,
+          fixedPoint: startFixed,
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: posB.rectId,
+          fixedPoint: endFixed,
+          mode: "orbit",
+        },
+        startArrowhead: bidirectional ? "arrow" : null,
         endArrowhead: "arrow",
         strokeColor: "#0ca678",
         strokeWidth: 3,
@@ -2859,8 +2922,9 @@ async function nodesToExcalidraw(nodes) {
             label,
             origin,
             detail,
-            directed: true,
-            bidirectional: false,
+            directions,
+            directed: !bidirectional,
+            bidirectional,
           },
         },
       }),

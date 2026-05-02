@@ -208,13 +208,11 @@ describe("buildDataFlowEdges", () => {
 
     buildDataFlowEdges(nodes);
 
-    expect(dataFlowTargets(nodes, "aws_lambda_function.reader")).toContainEqual(
-      {
-        target: "aws_s3_bucket.assets",
-        type: "reads",
-        origin: "iam_policy",
-      },
-    );
+    expect(dataFlowTargets(nodes, "aws_s3_bucket.assets")).toContainEqual({
+      target: "aws_lambda_function.reader",
+      type: "reads",
+      origin: "iam_policy",
+    });
   });
 
   it("infers attached IAM policy access to DynamoDB", () => {
@@ -256,12 +254,52 @@ describe("buildDataFlowEdges", () => {
 
     buildDataFlowEdges(nodes);
 
-    expect(dataFlowTargets(nodes, "aws_lambda_function.reader")).toContainEqual(
-      {
-        target: "aws_dynamodb_table.items",
-        type: "reads",
-        origin: "iam_policy",
-      },
-    );
+    expect(dataFlowTargets(nodes, "aws_dynamodb_table.items")).toContainEqual({
+      target: "aws_lambda_function.reader",
+      type: "reads",
+      origin: "iam_policy",
+    });
+  });
+
+  it("keeps read and write IAM permissions in opposite directions", () => {
+    const nodes = buildNodes([
+      resource("aws_iam_role.lambda", "aws_iam_role", "lambda", {
+        name: "lambda-role",
+        arn: "arn:aws:iam::123:role/lambda-role",
+      }),
+      resource("aws_lambda_function.sync", "aws_lambda_function", "sync", {
+        function_name: "sync",
+        role: "arn:aws:iam::123:role/lambda-role",
+      }),
+      resource("aws_s3_bucket.assets", "aws_s3_bucket", "assets", {
+        bucket: "assets",
+        arn: "arn:aws:s3:::assets",
+      }),
+      resource("aws_iam_role_policy.sync", "aws_iam_role_policy", "sync", {
+        role: "lambda-role",
+        policy: JSON.stringify({
+          Statement: [
+            {
+              Effect: "Allow",
+              Action: ["s3:GetObject", "s3:PutObject"],
+              Resource: "arn:aws:s3:::assets/*",
+            },
+          ],
+        }),
+      }),
+    ]);
+
+    buildDataFlowEdges(nodes);
+
+    expect(dataFlowTargets(nodes, "aws_s3_bucket.assets")).toContainEqual({
+      target: "aws_lambda_function.sync",
+      type: "reads",
+      origin: "iam_policy",
+    });
+    expect(dataFlowTargets(nodes, "aws_lambda_function.sync")).toContainEqual({
+      target: "aws_s3_bucket.assets",
+      type: "writes",
+      origin: "iam_policy",
+    });
   });
 });
