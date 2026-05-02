@@ -702,6 +702,13 @@ class App extends React.Component<AppProps, AppState> {
   previousPointerMoveCoords: { x: number; y: number } | null = null;
   lastViewportPosition = { x: 0, y: 0 };
 
+  /**
+   * Tracks whether the Ctrl (Windows/Linux) or Cmd (Mac) modifier key is
+   * currently held. Used to apply style changes only to selected elements
+   * without updating the default style for future shapes.
+   */
+  isModifierKeyHeld = false;
+
   animationFrameHandler = new AnimationFrameHandler();
 
   laserTrails = new LaserTrails(this.animationFrameHandler, this);
@@ -3281,6 +3288,14 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(document, EVENT.COPY, this.onCopy, { passive: false }),
       addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
       addEventListener(
+        window,
+        "blur",
+        () => {
+          this.isModifierKeyHeld = false;
+        },
+        { passive: true },
+      ),
+      addEventListener(
         document,
         EVENT.POINTER_MOVE,
         this.updateCurrentCursorPosition,
@@ -4733,6 +4748,10 @@ class App extends React.Component<AppProps, AppState> {
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
+      if (event.key === "Control" || event.key === "Meta") {
+        this.isModifierKeyHeld = true;
+      }
+
       // normalize `event.key` when CapsLock is pressed #2372
 
       if (
@@ -5321,6 +5340,10 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
+    if (event.key === "Control" || event.key === "Meta") {
+      this.isModifierKeyHeld = false;
+    }
+
     if (event.key === KEYS.SPACE) {
       if (
         (this.state.viewModeEnabled &&

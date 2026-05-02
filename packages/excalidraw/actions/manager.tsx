@@ -163,14 +163,40 @@ export class ActionManager {
       const updateData = (formState?: any) => {
         trackAction(action, "ui", appState, elements, this.app, formState);
 
-        this.updater(
-          action.perform(
-            this.getElementsIncludingDeleted(),
-            this.getAppState(),
-            formState,
-            this.app,
-          ),
+        let actionResult = action.perform(
+          this.getElementsIncludingDeleted(),
+          this.getAppState(),
+          formState,
+          this.app,
         );
+
+        // When Ctrl (Windows) or Cmd (Mac) is held while changing a style,
+        // apply the change only to selected elements without updating the
+        // default style for future shapes.
+        if (this.app.isModifierKeyHeld) {
+          const stripCurrentItemDefaults = (
+            result: ActionResult,
+          ): ActionResult => {
+            if (result && result.appState) {
+              const nextAppState: Record<string, unknown> = {};
+              for (const [key, value] of Object.entries(result.appState)) {
+                if (!key.startsWith("currentItem")) {
+                  nextAppState[key] = value;
+                }
+              }
+              return { ...result, appState: nextAppState };
+            }
+            return result;
+          };
+
+          if (isPromiseLike(actionResult)) {
+            actionResult = actionResult.then(stripCurrentItemDefaults);
+          } else {
+            actionResult = stripCurrentItemDefaults(actionResult);
+          }
+        }
+
+        this.updater(actionResult);
       };
 
       return (
