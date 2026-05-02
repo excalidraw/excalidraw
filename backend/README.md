@@ -1,31 +1,193 @@
 # Backend
 
-Express server for the Terraform-Excalidraw integration.
+Express server for turning Terraform/OpenTofu plans into inspectable Excalidraw diagrams.
 
 ## Setup
 
+Install dependencies from the repo root:
+
+```bash
+yarn install
+```
+
+Or, if you only need the backend dependencies:
+
 ```bash
 cd backend
-npm install express
+npm install express cors multer graphlib-dot better-sqlite3 drizzle-orm
 ```
 
 ## Run
 
 ```bash
+cd backend
 node index.js
 ```
 
-### With auto-reload (nodemon)
+With auto-reload:
 
 ```bash
-npm install -g nodemon
-nodemon index.js
+cd backend
+npx nodemon index.js
 ```
 
-Server starts on `http://localhost:3000`. Nodemon will automatically restart the server when you save changes to any file.
+Server starts on `http://localhost:3000`.
 
 ## Endpoints
 
 | Method | Route | Description |
 |--------|-------|-------------|
-| GET | `/api/hello` | Health check / test endpoint |
+| POST | `/terraform/upload` | Upload a Terraform/OpenTofu plan JSON, DOT graph, and optional state file. Returns an upload id. |
+| GET | `/terraform/upload/:id` | Fetch the processed Terraform graph nodes for an upload. |
+| GET | `/terraform/upload/:id/excalidraw` | Download the processed graph as an `.excalidraw` file. |
+
+`POST /terraform/upload` expects multipart form fields:
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `planFile` | Yes | JSON output from `terraform show -json` or `tofu show -json`. |
+| `dotFile` | Yes | DOT output from `terraform graph` or `tofu graph`. |
+| `stateFile` | No | Terraform/OpenTofu state JSON. Helps preserve existing resources and edges. |
+
+## Generate Terraform Inputs
+
+From the sample Terraform directory:
+
+```bash
+cd backend/terraform
+
+tofu plan -out=newplan
+tofu show -json newplan > newplan.json
+tofu graph -type=plan > newplan.dot
+```
+
+Upload `newplan.json`, `newplan.dot`, and optionally `terraform.tfstate`.
+
+## Pluralith
+
+Pluralith can generate a separate PDF diagram from the same Terraform/OpenTofu plan data.
+
+Use JSON plans with OpenTofu:
+
+```bash
+cd backend/terraform
+
+tofu plan -out=newplan
+tofu show -json newplan > newplan.json
+
+pluralith graph --local-only --plan-file-json newplan.json --out-dir .
+```
+
+This avoids a common failure where Pluralith tries to run `terraform show` against an OpenTofu-generated binary plan:
+
+```text
+Couldn't show local plan
+Plan read error: plan file was created by Terraform 1.11.5, but this is 1.14.7
+```
+
+Do not use `--plan-file newplan` unless the exact `terraform` binary/version Pluralith invokes can read that binary plan.
+
+### Missing Graph Module
+
+If Pluralith fails with:
+
+```text
+GenerateDiagram: fork/exec ~/Pluralith/bin/pluralith-cli-graphing: no such file or directory
+```
+
+install the graphing module manually. The built-in installer may fail with:
+
+```text
+parsing response failed -> GetGitHubRelease: %!w(<nil>)
+```
+
+On macOS, Pluralith currently publishes the graph module as `darwin_amd64`:
+
+```bash
+install -d ~/Pluralith/bin
+curl -L \
+  https://github.com/Pluralith/pluralith-cli-graphing-release/releases/download/v0.2.1/pluralith_cli_graphing_darwin_amd64_0.2.1 \
+  -o ~/Pluralith/bin/pluralith-cli-graphing
+chmod +x ~/Pluralith/bin/pluralith-cli-graphing
+pluralith version
+```
+
+Expected:
+
+```text
+Graph Module Version: 0.2.1
+```
+
+On Apple Silicon, this binary is x86_64 and may require Rosetta.
+
+## Rover
+
+Rover can generate an interactive local Terraform visualization served on port `9000`.
+
+Use the JSON plan path with OpenTofu:
+
+```bash
+cd backend/terraform
+
+tofu plan -out=newplan
+tofu show -json newplan > newplan.json
+
+docker run --rm -p 9000:9000 \
+  -v "$(pwd)/newplan.json:/src/plan.json:ro" \
+  im2nguyen/rover:latest \
+  -planJSONPath=plan.json
+```
+
+Open:
+
+```text
+http://127.0.0.1:9000/
+```
+
+For the checked-in sample plans:
+
+```bash
+docker run --rm -p 9000:9000 \
+  -v "$(pwd)/addplan.json:/src/plan.json:ro" \
+  im2nguyen/rover:latest \
+  -planJSONPath=plan.json
+
+docker run --rm -p 9000:9000 \
+  -v "$(pwd)/delplan.json:/src/plan.json:ro" \
+  im2nguyen/rover:latest \
+  -planJSONPath=plan.json
+```
+
+Avoid `-it` when running Rover from scripts or non-interactive shells:
+
+```text
+the input device is not a TTY
+```
+
+On Apple Silicon, Docker may print:
+
+```text
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8)
+```
+
+The image still runs under emulation. If Docker cannot connect to the OrbStack/Docker socket, start OrbStack or Docker Desktop first.
+
+Rover may also print:
+
+```text
+No submodule configurations found...
+Continuing without loading module from filesystem: lambda-writer
+```
+
+This is expected when running from a JSON plan only. Rover still builds the visualization from the plan data.
+
+## Runtime Files
+
+The backend creates local runtime artifacts:
+
+| Path | Purpose |
+|------|---------|
+| `backend/graph.db` | SQLite upload store. |
+| `backend/uploads/` | Temporary multer uploads. |
+| `backend/temp/` | Debug snapshots of intermediate pipeline JSON. |
+| `backend/terraform/*.json`, `*.dot`, plan files | Sample/generated Terraform artifacts. |

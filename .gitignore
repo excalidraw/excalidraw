@@ -42,3 +42,5 @@ backend/terraform/newplan.dot
 backend/terraform/newplan.json
 backend/terraform/tfplan
 backend/terraform/newplan
+backend/terraform/testplan
+backend/terraform/.pluralith/
