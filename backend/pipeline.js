@@ -108,7 +108,7 @@ const dataFlowRelationshipForAction = (action = "") => {
     normalized.startsWith("kinesis:get") ||
     normalized.startsWith("kinesis:describe")
   ) {
-    return { type: "reads", label: "reads" };
+    return { type: "reads", label: "reads", direction: "target_to_source" };
   }
 
   if (
@@ -119,7 +119,7 @@ const dataFlowRelationshipForAction = (action = "") => {
     normalized.startsWith("dynamodb:delete") ||
     normalized.startsWith("dynamodb:batchwrite")
   ) {
-    return { type: "writes", label: "writes" };
+    return { type: "writes", label: "writes", direction: "source_to_target" };
   }
 
   if (
@@ -129,14 +129,18 @@ const dataFlowRelationshipForAction = (action = "") => {
     normalized.startsWith("eventbridge:put") ||
     normalized.startsWith("kinesis:put")
   ) {
-    return { type: "publishes", label: "publishes" };
+    return {
+      type: "publishes",
+      label: "publishes",
+      direction: "source_to_target",
+    };
   }
 
   if (
     normalized.startsWith("logs:create") ||
     normalized.startsWith("logs:put")
   ) {
-    return { type: "logs", label: "logs" };
+    return { type: "logs", label: "logs", direction: "source_to_target" };
   }
 
   return null;
@@ -894,12 +898,21 @@ function buildDataFlowEdges(nodes) {
               nodes,
             )) {
               for (const source of sourceComputes) {
-                if (explicitKeys.has(`${source}|||${target}`)) {
+                const edgeSource =
+                  relationship.direction === "target_to_source"
+                    ? target
+                    : source;
+                const edgeTarget =
+                  relationship.direction === "target_to_source"
+                    ? source
+                    : target;
+
+                if (explicitKeys.has(`${edgeSource}|||${edgeTarget}`)) {
                   continue;
                 }
                 addEdge(
-                  source,
-                  target,
+                  edgeSource,
+                  edgeTarget,
                   relationship.type,
                   relationship.label,
                   "iam_policy",
