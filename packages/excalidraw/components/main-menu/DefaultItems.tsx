@@ -64,6 +64,18 @@ const getTerraformEdgeLayer = (element: { customData?: Record<string, any> }) =>
     ? element.customData.terraformEdgeLayer
     : null;
 
+const isTerraformDependencyPreviewEdge = (element: {
+  customData?: Record<string, any>;
+}) => element.customData?.terraformDependencyPreview === true;
+
+const clearTerraformDependencyPreviewData = (
+  customData: Record<string, any> | undefined,
+) => {
+  const nextCustomData = { ...(customData ?? {}) };
+  delete nextCustomData.terraformDependencyPreview;
+  return nextCustomData;
+};
+
 export const LoadScene = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -175,7 +187,9 @@ const TerraformLayerItem = ({
     (element) => getTerraformEdgeLayer(element) === layer,
   );
   const checked = elements.some(
-    (element) => getTerraformEdgeLayer(element) === layer,
+    (element) =>
+      getTerraformEdgeLayer(element) === layer &&
+      (layer !== "dependency" || !isTerraformDependencyPreviewEdge(element)),
   );
 
   if (!hasLayer) {
@@ -191,7 +205,17 @@ const TerraformLayerItem = ({
           if (getTerraformEdgeLayer(element) !== layer) {
             return element;
           }
-          return newElementWith(element, { isDeleted: !nextChecked });
+          return newElementWith(element, {
+            isDeleted: !nextChecked,
+            ...(layer === "dependency"
+              ? {
+                  opacity: 100,
+                  customData: clearTerraformDependencyPreviewData(
+                    element.customData,
+                  ),
+                }
+              : null),
+          });
         });
         app.scene.replaceAllElements(nextElements);
         event.preventDefault();

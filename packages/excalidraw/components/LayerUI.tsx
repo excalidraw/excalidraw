@@ -10,13 +10,16 @@ import {
   isShallowEqual,
 } from "@excalidraw/common";
 
-import { mutateElement } from "@excalidraw/element";
+import { mutateElement, newElementWith } from "@excalidraw/element";
 
 import { showSelectedShapeActions } from "@excalidraw/element";
 
 import { ShapeCache } from "@excalidraw/element";
 
-import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import { actionToggleStats } from "../actions";
 import { trackEvent } from "../analytics";
@@ -173,6 +176,41 @@ const isTerraformGroupElement = (element: NonDeletedExcalidrawElement) =>
 
 const isTerraformInspectableElement = (element: NonDeletedExcalidrawElement) =>
   isTerraformResourceElement(element) || isTerraformGroupElement(element);
+
+const TERRAFORM_DEPENDENCY_PREVIEW_OPACITY = 25;
+
+const isTerraformDependencyEdge = (element: ExcalidrawElement) =>
+  element.customData?.terraformEdgeLayer === "dependency";
+
+const isTerraformDependencyPreviewEdge = (element: ExcalidrawElement) =>
+  element.customData?.terraformDependencyPreview === true;
+
+const dependencyEdgeTouchesTerraformNode = (
+  element: ExcalidrawElement,
+  nodePath: string,
+) => {
+  const relationship = element.customData?.relationship;
+
+  if (relationship?.source === nodePath || relationship?.target === nodePath) {
+    return true;
+  }
+
+  return Boolean(
+    Array.isArray(relationship?.directions) &&
+      relationship.directions.some(
+        (direction: { source?: unknown; target?: unknown }) =>
+          direction.source === nodePath || direction.target === nodePath,
+      ),
+  );
+};
+
+const clearTerraformDependencyPreviewData = (
+  customData: ExcalidrawElement["customData"],
+) => {
+  const nextCustomData = { ...(customData ?? {}) };
+  delete nextCustomData.terraformDependencyPreview;
+  return nextCustomData;
+};
 
 const tryParseJsonString = (value: string): unknown | null => {
   const trimmed = value.trim();
@@ -597,6 +635,71 @@ const LayerUI = ({
   const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
 
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
+
+  React.useEffect(() => {
+    const terraformElement = getTerraformElementForSelection(
+      elements,
+      appState,
+    );
+    const selectedNodePath =
+      typeof terraformElement?.customData?.nodePath === "string"
+        ? terraformElement.customData.nodePath
+        : null;
+    const allElements = app.scene.getElementsIncludingDeleted();
+    const dependencyLayerVisible = allElements.some(
+      (element) =>
+        isTerraformDependencyEdge(element) &&
+        !isTerraformDependencyPreviewEdge(element) &&
+        !element.isDeleted,
+    );
+    let didChange = false;
+
+    const nextElements = allElements.map((element) => {
+      if (!isTerraformDependencyEdge(element)) {
+        return element;
+      }
+
+      const isPreview = isTerraformDependencyPreviewEdge(element);
+      const shouldPreview =
+        !dependencyLayerVisible &&
+        selectedNodePath !== null &&
+        dependencyEdgeTouchesTerraformNode(element, selectedNodePath);
+
+      if (shouldPreview) {
+        if (
+          !element.isDeleted &&
+          isPreview &&
+          element.opacity === TERRAFORM_DEPENDENCY_PREVIEW_OPACITY
+        ) {
+          return element;
+        }
+        didChange = true;
+        return newElementWith(element, {
+          isDeleted: false,
+          opacity: TERRAFORM_DEPENDENCY_PREVIEW_OPACITY,
+          customData: {
+            ...(element.customData ?? {}),
+            terraformDependencyPreview: true,
+          },
+        });
+      }
+
+      if (isPreview) {
+        didChange = true;
+        return newElementWith(element, {
+          isDeleted: true,
+          opacity: 100,
+          customData: clearTerraformDependencyPreviewData(element.customData),
+        });
+      }
+
+      return element;
+    });
+
+    if (didChange) {
+      app.scene.replaceAllElements(nextElements);
+    }
+  }, [app, appState, elements]);
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
