@@ -532,6 +532,25 @@ function buildDataFlowIndex(nodes) {
   }
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (getResourceType(nodePath, node) !== "aws_iam_role") {
+      continue;
+    }
+
+    for (const target of [
+      ...(node.edges_new || []),
+      ...(node.edges_existing || []),
+    ]) {
+      if (!COMPUTE_RESOURCE_TYPES.has(getResourceType(target, nodes[target]))) {
+        continue;
+      }
+      if (!index.roleToCompute.has(nodePath)) {
+        index.roleToCompute.set(nodePath, new Set());
+      }
+      index.roleToCompute.get(nodePath).add(target);
+    }
+  }
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
     const type = getResourceType(nodePath, node);
     if (
       type !== "aws_iam_role_policy_attachment" &&

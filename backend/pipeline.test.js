@@ -179,6 +179,44 @@ describe("buildDataFlowEdges", () => {
     );
   });
 
+  it("maps new Lambda roles through Terraform dependency edges", () => {
+    const nodes = buildNodes([
+      resource("aws_iam_role.reader", "aws_iam_role", "reader", {
+        name: "reader-role",
+      }),
+      resource("aws_lambda_function.reader", "aws_lambda_function", "reader", {
+        function_name: "reader",
+      }),
+      resource("aws_s3_bucket.assets", "aws_s3_bucket", "assets", {
+        bucket: "assets",
+        arn: "arn:aws:s3:::assets",
+      }),
+      resource("aws_iam_role_policy.reader", "aws_iam_role_policy", "reader", {
+        role: "reader-role",
+        policy: JSON.stringify({
+          Statement: [
+            {
+              Effect: "Allow",
+              Action: "s3:GetObject",
+              Resource: "arn:aws:s3:::assets/*",
+            },
+          ],
+        }),
+      }),
+    ]);
+    nodes["aws_iam_role.reader"].edges_new = ["aws_lambda_function.reader"];
+
+    buildDataFlowEdges(nodes);
+
+    expect(dataFlowTargets(nodes, "aws_lambda_function.reader")).toContainEqual(
+      {
+        target: "aws_s3_bucket.assets",
+        type: "reads",
+        origin: "iam_policy",
+      },
+    );
+  });
+
   it("infers attached IAM policy access to DynamoDB", () => {
     const nodes = buildNodes([
       resource("aws_iam_role.lambda", "aws_iam_role", "lambda", {
