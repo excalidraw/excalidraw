@@ -2178,6 +2178,7 @@ class App extends React.Component<AppProps, AppState> {
                             elements={this.scene.getNonDeletedElements()}
                             onLockToggle={this.toggleLock}
                             onPenModeToggle={this.togglePenMode}
+                            onPersistentLaserToggle={this.togglePersistentLaser}
                             onHandToolToggle={this.onHandToolToggle}
                             langCode={getLanguage().code}
                             renderTopLeftUI={renderTopLeftUI}
@@ -4292,6 +4293,14 @@ class App extends React.Component<AppProps, AppState> {
       return {
         penMode: force ?? !prevState.penMode,
         penDetected: true,
+      };
+    });
+  };
+
+  togglePersistentLaser = () => {
+    this.setState((prevState) => {
+      return {
+        persistentLaser: !prevState.persistentLaser,
       };
     });
   };

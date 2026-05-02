@@ -87,6 +87,7 @@ interface LayerUIProps {
   onLockToggle: () => void;
   onHandToolToggle: () => void;
   onPenModeToggle: AppClassProperties["togglePenMode"];
+  onPersistentLaserToggle: () => void;
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
   renderTopLeftUI?: ExcalidrawProps["renderTopLeftUI"];
@@ -147,6 +148,7 @@ const LayerUI = ({
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
+  onPersistentLaserToggle,
   showExitZenModeBtn,
   renderTopLeftUI,
   renderTopRightUI,
@@ -383,6 +385,8 @@ const LayerUI = ({
                                 app.setActiveTool({ type: TOOL_TYPE.laser })
                               }
                               isMobile
+                              persistentLaser={appState.persistentLaser}
+                              onPersistentLaserToggle={onPersistentLaserToggle}
                             />
                           </Island>
                         )}
