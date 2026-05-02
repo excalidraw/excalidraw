@@ -28,17 +28,17 @@
     "eslint-plugin-prettier": "3.3.1",
     "http-server": "14.1.1",
     "husky": "7.0.4",
-    "jsdom": "22.1.0",
+    "jsdom": "29.0.2",
     "lint-staged": "12.3.7",
     "pepjs": "0.5.3",
     "prettier": "2.6.2",
     "rewire": "6.0.0",
     "rimraf": "^5.0.0",
     "typescript": "5.9.3",
-    "vite": "5.0.12",
+    "vite": "5.4.21",
     "vite-plugin-checker": "0.7.2",
     "vite-plugin-ejs": "1.7.0",
-    "vite-plugin-pwa": "0.21.1",
+    "vite-plugin-pwa": "0.19.8",
     "vite-plugin-svgr": "4.2.0",
     "vitest": "3.0.6",
     "vitest-canvas-mock": "0.3.3"
@@ -90,5 +90,9 @@
   },
   "resolutions": {
     "strip-ansi": "6.0.1"
+  },
+  "dependencies": {
+    "esbuild": "0.28.0",
+    "next": "14.2.35"
   }
 }

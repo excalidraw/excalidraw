@@ -5,12 +5,14 @@
   "dependencies": {
     "@excalidraw/excalidraw": "*",
     "browser-fs-access": "0.38.0",
+    "esbuild": "0.28.0",
+    "next": "14.2.35",
     "react": "19.0.0",
     "react-dom": "19.0.0"
   },
   "devDependencies": {
     "typescript": "^5",
-    "vite": "5.0.12"
+    "vite": "5.4.21"
   },
   "scripts": {
     "start": "vite",
