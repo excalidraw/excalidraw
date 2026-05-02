@@ -15,6 +15,7 @@ const {
   applyModuleMetadata,
   mergeTerraformState,
   ensureEdgeLists,
+  buildDataFlowEdges,
   externalResources,
   deleteOrphanedNodes,
   filterVisualIgnore,
@@ -101,6 +102,8 @@ app.post(
       nodes = mergeTerraformState(nodes, state);
       nodes = ensureEdgeLists(nodes);
       nodes = externalResources(nodes);
+      nodes = ensureEdgeLists(nodes);
+      nodes = buildDataFlowEdges(nodes);
       nodes = ensureEdgeLists(nodes);
       nodes = deleteOrphanedNodes(nodes);
       nodes = cleanUpRoleLinks(nodes);

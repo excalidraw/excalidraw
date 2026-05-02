@@ -1695,6 +1695,53 @@ function coalesceRelationshipPairs(directedEdges) {
   });
 }
 
+function collectDataFlowEdges(nodes) {
+  const edgeMap = new Map();
+
+  for (const [source, node] of Object.entries(nodes)) {
+    for (const edge of node.edges_data_flow || []) {
+      const target = edge.target;
+      if (!nodes[source] || !nodes[target] || source === target) {
+        continue;
+      }
+
+      const type = edge.type || "data_flow";
+      const label = edge.label || type;
+      const origin = edge.origin || "inferred_reference";
+      const key = `${source}|||${target}|||${type}|||${label}`;
+      if (!edgeMap.has(key)) {
+        edgeMap.set(key, {
+          source,
+          target,
+          type,
+          label,
+          origin,
+          detail: edge.detail || null,
+        });
+      }
+    }
+  }
+
+  return [...edgeMap.values()];
+}
+
+function offsetLineSegment(startPoint, endPoint, offset) {
+  if (!offset) {
+    return { startPoint, endPoint };
+  }
+
+  const dx = endPoint.x - startPoint.x;
+  const dy = endPoint.y - startPoint.y;
+  const length = Math.hypot(dx, dy) || 1;
+  const offsetX = (-dy / length) * offset;
+  const offsetY = (dx / length) * offset;
+
+  return {
+    startPoint: { x: startPoint.x + offsetX, y: startPoint.y + offsetY },
+    endPoint: { x: endPoint.x + offsetX, y: endPoint.y + offsetY },
+  };
+}
+
 // --- Force layout ---
 
 async function forceLayout(
@@ -2005,6 +2052,12 @@ async function nodesToExcalidraw(nodes) {
   const nodeKeys = Object.keys(nodes);
   const directedEdges = collectDirectedEdges(nodes);
   const relationships = coalesceRelationshipPairs(directedEdges);
+  const dataFlowEdges = collectDataFlowEdges(nodes);
+  const dependencyPairKeys = new Set(
+    relationships.map(({ source, target }) =>
+      [source, target].sort().join("|||"),
+    ),
+  );
   const nodeLocationMap = buildNodeLocationMap(nodes);
   const nodeVpcMap = buildNodeVpcMap(nodes);
   const nodeSubnetMap = buildNodeSubnetMap(nodes, nodeVpcMap);
@@ -2720,14 +2773,94 @@ async function nodesToExcalidraw(nodes) {
         roundness: { type: 2 },
         customData: {
           terraform: true,
+          terraformEdgeLayer: "dependency",
           relationship: {
             source,
             target,
+            type: "dependency",
+            label: "depends on",
+            origin: origins.join(", "),
             directions,
             kinds,
             origins,
             directed,
             bidirectional,
+          },
+        },
+      }),
+    );
+  }
+
+  // --- data-flow lines ---
+  for (const edge of dataFlowEdges) {
+    const { source, target, type, label, origin, detail } = edge;
+    const posA = posMap[source];
+    const posB = posMap[target];
+    if (!posA || !posB) {
+      continue;
+    }
+
+    const rectA = nodeRectById.get(posA.rectId);
+    const rectB = nodeRectById.get(posB.rectId);
+    if (!rectA || !rectB) {
+      continue;
+    }
+
+    const arrowId = `data-flow-arrow-${arrowIdx++}`;
+    rectA.boundElements.push({ id: arrowId, type: "arrow" });
+    rectB.boundElements.push({ id: arrowId, type: "arrow" });
+
+    const { startPoint, endPoint } = getCenterClippedBindingPoints(
+      posA,
+      posB,
+      posA.w,
+      posA.h,
+      posB.w,
+      posB.h,
+    );
+    const pairKey = [source, target].sort().join("|||");
+    const shifted = offsetLineSegment(
+      startPoint,
+      endPoint,
+      dependencyPairKeys.has(pairKey) ? 18 : 0,
+    );
+    const startX = shifted.startPoint.x;
+    const startY = shifted.startPoint.y;
+    const endX = shifted.endPoint.x;
+    const endY = shifted.endPoint.y;
+
+    arrowElements.push(
+      makeBaseElement({
+        type: "arrow",
+        id: arrowId,
+        x: startX,
+        y: startY,
+        width: Math.abs(endX - startX),
+        height: Math.abs(endY - startY),
+        points: [
+          [0, 0],
+          [endX - startX, endY - startY],
+        ],
+        startBinding: null,
+        endBinding: null,
+        startArrowhead: null,
+        endArrowhead: "arrow",
+        strokeColor: "#0ca678",
+        strokeWidth: 3,
+        strokeStyle: "solid",
+        roundness: { type: 2 },
+        customData: {
+          terraform: true,
+          terraformEdgeLayer: "dataFlow",
+          relationship: {
+            source,
+            target,
+            type,
+            label,
+            origin,
+            detail,
+            directed: true,
+            bidirectional: false,
           },
         },
       }),

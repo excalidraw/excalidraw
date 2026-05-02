@@ -1,6 +1,7 @@
 import clsx from "clsx";
 
 import { THEME } from "@excalidraw/common";
+import { newElementWith } from "@excalidraw/element";
 
 import type { Theme } from "@excalidraw/element/types";
 
@@ -54,6 +55,14 @@ import {
 } from "../icons";
 
 import "./DefaultItems.scss";
+
+type TerraformEdgeLayer = "dependency" | "dataFlow";
+
+const getTerraformEdgeLayer = (element: { customData?: Record<string, any> }) =>
+  element.customData?.terraformEdgeLayer === "dependency" ||
+  element.customData?.terraformEdgeLayer === "dataFlow"
+    ? element.customData.terraformEdgeLayer
+    : null;
 
 export const LoadScene = () => {
   const { t } = useI18n();
@@ -138,7 +147,6 @@ SaveAsImage.displayName = "SaveAsImage";
 
 export const ImportTerraform = () => {
   const setAppState = useExcalidrawSetAppState();
-  const { t } = useI18n();
   return (
     <DropdownMenuItem
       icon={ExportImageIcon}
@@ -153,6 +161,74 @@ export const ImportTerraform = () => {
 };
 ImportTerraform.displayName = "ImportTerraform";
 
+const TerraformLayerItem = ({
+  layer,
+  children,
+}: {
+  layer: TerraformEdgeLayer;
+  children: React.ReactNode;
+}) => {
+  const app = useApp();
+  const elements = useExcalidrawElements();
+  const allElements = app.scene.getElementsIncludingDeleted();
+  const hasLayer = allElements.some(
+    (element) => getTerraformEdgeLayer(element) === layer,
+  );
+  const checked = elements.some(
+    (element) => getTerraformEdgeLayer(element) === layer,
+  );
+
+  if (!hasLayer) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuItemCheckbox
+      checked={checked}
+      onSelect={(event) => {
+        const nextChecked = !checked;
+        const nextElements = allElements.map((element) => {
+          if (getTerraformEdgeLayer(element) !== layer) {
+            return element;
+          }
+          return newElementWith(element, { isDeleted: !nextChecked });
+        });
+        app.scene.replaceAllElements(nextElements);
+        event.preventDefault();
+      }}
+    >
+      {children}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
+export const TerraformLayers = () => {
+  const app = useApp();
+  const hasTerraformLayers = app.scene
+    .getElementsIncludingDeleted()
+    .some((element) => getTerraformEdgeLayer(element));
+
+  if (!hasTerraformLayers) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuSub>
+      <DropdownMenuSub.Trigger icon={ExportImageIcon}>
+        Terraform layers
+      </DropdownMenuSub.Trigger>
+      <DropdownMenuSub.Content>
+        <TerraformLayerItem layer="dependency">
+          Dependency edges
+        </TerraformLayerItem>
+        <TerraformLayerItem layer="dataFlow">
+          Data flow edges
+        </TerraformLayerItem>
+      </DropdownMenuSub.Content>
+    </DropdownMenuSub>
+  );
+};
+TerraformLayers.displayName = "TerraformLayers";
 
 export const CommandPalette = (opts?: { className?: string }) => {
   const setAppState = useExcalidrawSetAppState();
