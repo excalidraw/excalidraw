@@ -16,6 +16,132 @@ const EDGE_FILTER_RULES = [
   ["aws_lambda_function", "aws_iam_policy_document"],
 ];
 
+const DATA_FLOW_TARGET_TYPES = new Set([
+  "aws_lambda_function",
+  "aws_s3_bucket",
+  "aws_sqs_queue",
+  "aws_sns_topic",
+  "aws_dynamodb_table",
+  "aws_kinesis_stream",
+  "aws_cloudwatch_log_group",
+  "aws_lb_target_group",
+  "aws_alb_target_group",
+]);
+
+const COMPUTE_RESOURCE_TYPES = new Set([
+  "aws_lambda_function",
+  "aws_ecs_task_definition",
+  "aws_ecs_service",
+  "aws_instance",
+]);
+
+const getResourceValues = (resource = {}) => ({
+  ...(resource.values || {}),
+  ...(resource.change?.before || {}),
+  ...(resource.change?.after || {}),
+});
+
+const getPrimaryResource = (node = {}) =>
+  Object.values(node.resources || {}).find((resource) => resource?.type) || {};
+
+const getResourceType = (nodePath, node) =>
+  getPrimaryResource(node)?.type || String(nodePath).split(".").at(-2) || "";
+
+const flattenValues = (value, out = []) => {
+  if (typeof value === "string") {
+    out.push(value);
+  } else if (Array.isArray(value)) {
+    for (const item of value) {
+      flattenValues(item, out);
+    }
+  } else if (isPlainObject(value)) {
+    for (const item of Object.values(value)) {
+      flattenValues(item, out);
+    }
+  }
+  return out;
+};
+
+const normalizePolicyArray = (value) => {
+  if (!value) {
+    return [];
+  }
+  return Array.isArray(value) ? value : [value];
+};
+
+const parsePolicyDocument = (value) => {
+  if (!value) {
+    return null;
+  }
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null;
+    }
+  }
+  if (isPlainObject(value)) {
+    return value;
+  }
+  return null;
+};
+
+const normalizeArnPattern = (value = "") =>
+  String(value)
+    .replace(/\$\{[^}]+\}/g, "")
+    .replace(/\*+$/g, "")
+    .replace(/\/+$/g, "");
+
+const dataFlowRelationshipForAction = (action = "") => {
+  const normalized = String(action).toLowerCase();
+  if (normalized === "*" || normalized.endsWith(":*")) {
+    return null;
+  }
+
+  if (
+    normalized.startsWith("s3:get") ||
+    normalized.startsWith("s3:list") ||
+    normalized.startsWith("dynamodb:get") ||
+    normalized.startsWith("dynamodb:query") ||
+    normalized.startsWith("dynamodb:scan") ||
+    normalized.startsWith("sqs:receive") ||
+    normalized.startsWith("kinesis:get") ||
+    normalized.startsWith("kinesis:describe")
+  ) {
+    return { type: "reads", label: "reads" };
+  }
+
+  if (
+    normalized.startsWith("s3:put") ||
+    normalized.startsWith("s3:delete") ||
+    normalized.startsWith("dynamodb:put") ||
+    normalized.startsWith("dynamodb:update") ||
+    normalized.startsWith("dynamodb:delete") ||
+    normalized.startsWith("dynamodb:batchwrite")
+  ) {
+    return { type: "writes", label: "writes" };
+  }
+
+  if (
+    normalized.startsWith("sqs:send") ||
+    normalized.startsWith("sns:publish") ||
+    normalized.startsWith("events:put") ||
+    normalized.startsWith("eventbridge:put") ||
+    normalized.startsWith("kinesis:put")
+  ) {
+    return { type: "publishes", label: "publishes" };
+  }
+
+  if (
+    normalized.startsWith("logs:create") ||
+    normalized.startsWith("logs:put")
+  ) {
+    return { type: "logs", label: "logs" };
+  }
+
+  return null;
+};
+
 function getAdjacencyListFromDot(graph) {
   const adjacency = {};
 
@@ -315,7 +441,459 @@ function ensureEdgeLists(nodes) {
   for (const node of Object.values(nodes)) {
     node.edges_new ||= [];
     node.edges_existing ||= [];
+    node.edges_data_flow ||= [];
   }
+  return nodes;
+}
+
+function buildDataFlowIndex(nodes) {
+  const index = {
+    byAddress: new Map(),
+    byArn: new Map(),
+    byName: new Map(),
+    byType: new Map(),
+    roleToCompute: new Map(),
+    policyToRoles: new Map(),
+  };
+
+  const addName = (type, name, nodePath) => {
+    if (!type || !name) {
+      return;
+    }
+    const key = `${type}:${name}`;
+    if (!index.byName.has(key)) {
+      index.byName.set(key, new Set());
+    }
+    index.byName.get(key).add(nodePath);
+  };
+
+  const addArn = (arn, nodePath) => {
+    if (typeof arn === "string" && arn.startsWith("arn:")) {
+      index.byArn.set(arn, nodePath);
+    }
+  };
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    const type = getResourceType(nodePath, node);
+    if (!index.byType.has(type)) {
+      index.byType.set(type, new Set());
+    }
+    index.byType.get(type).add(nodePath);
+
+    for (const resource of Object.values(node.resources || {})) {
+      const values = getResourceValues(resource);
+      index.byAddress.set(stripIndexes(resource.address || nodePath), nodePath);
+      addName(resource.type || type, resource.name, nodePath);
+      addName(resource.type || type, values.name, nodePath);
+      addName(resource.type || type, values.id, nodePath);
+      addName(resource.type || type, values.bucket, nodePath);
+      addName(resource.type || type, values.function_name, nodePath);
+      addName(resource.type || type, values.queue_name, nodePath);
+
+      addArn(values.arn, nodePath);
+      addArn(values.invoke_arn, nodePath);
+      addArn(values.execution_arn, nodePath);
+      addArn(values.stream_arn, nodePath);
+
+      if ((resource.type || type) === "aws_s3_bucket") {
+        const bucketName = values.bucket || values.id || resource.name;
+        if (bucketName) {
+          addArn(`arn:aws:s3:::${bucketName}`, nodePath);
+          addArn(`arn:aws:s3:::${bucketName}/*`, nodePath);
+        }
+      }
+    }
+  }
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    const type = getResourceType(nodePath, node);
+    if (!COMPUTE_RESOURCE_TYPES.has(type)) {
+      continue;
+    }
+
+    for (const resource of Object.values(node.resources || {})) {
+      const values = getResourceValues(resource);
+      for (const roleRef of [
+        values.role,
+        values.task_role_arn,
+        values.iam_instance_profile,
+      ]) {
+        for (const roleNodePath of resolveNodeRefs(roleRef, index, nodes, [
+          "aws_iam_role",
+          "aws_iam_instance_profile",
+        ])) {
+          if (!index.roleToCompute.has(roleNodePath)) {
+            index.roleToCompute.set(roleNodePath, new Set());
+          }
+          index.roleToCompute.get(roleNodePath).add(nodePath);
+        }
+      }
+    }
+  }
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    const type = getResourceType(nodePath, node);
+    if (
+      type !== "aws_iam_role_policy_attachment" &&
+      type !== "aws_iam_policy_attachment"
+    ) {
+      continue;
+    }
+
+    for (const resource of Object.values(node.resources || {})) {
+      const values = getResourceValues(resource);
+      const policyNodes = resolveNodeRefs(values.policy_arn, index, nodes, [
+        "aws_iam_policy",
+      ]);
+      const roleNodes = resolveNodeRefs(
+        values.role || values.roles,
+        index,
+        nodes,
+        ["aws_iam_role"],
+      );
+
+      for (const policyNodePath of policyNodes) {
+        if (!index.policyToRoles.has(policyNodePath)) {
+          index.policyToRoles.set(policyNodePath, new Set());
+        }
+        for (const roleNodePath of roleNodes) {
+          index.policyToRoles.get(policyNodePath).add(roleNodePath);
+        }
+      }
+    }
+  }
+
+  return index;
+}
+
+function resolveNodeRefs(value, index, nodes, allowedTypes) {
+  const matches = new Set();
+  const allowed = allowedTypes ? new Set(allowedTypes) : null;
+  const addMatch = (nodePath) => {
+    if (!nodePath || !nodes[nodePath]) {
+      return;
+    }
+    if (allowed && !allowed.has(getResourceType(nodePath, nodes[nodePath]))) {
+      return;
+    }
+    matches.add(nodePath);
+  };
+
+  for (const raw of flattenValues(value)) {
+    const text = String(raw);
+    const stripped = stripIndexes(text);
+
+    addMatch(index.byAddress.get(stripped));
+    addMatch(index.byArn.get(text));
+
+    for (const [address, nodePath] of index.byAddress.entries()) {
+      if (text.includes(address)) {
+        addMatch(nodePath);
+      }
+    }
+
+    for (const [arn, nodePath] of index.byArn.entries()) {
+      if (text === arn || text.includes(arn)) {
+        addMatch(nodePath);
+      }
+    }
+
+    for (const type of allowed || DATA_FLOW_TARGET_TYPES) {
+      const byName = index.byName.get(`${type}:${text}`);
+      if (byName) {
+        for (const nodePath of byName) {
+          addMatch(nodePath);
+        }
+      }
+    }
+  }
+
+  return [...matches];
+}
+
+function resolvePolicyTargets(resourceValue, index, nodes) {
+  const normalized = normalizeArnPattern(resourceValue);
+  if (!normalized || normalized === "*") {
+    return [];
+  }
+
+  const matches = new Set();
+  const direct = index.byArn.get(resourceValue) || index.byArn.get(normalized);
+  if (direct) {
+    matches.add(direct);
+  }
+
+  for (const [arn, nodePath] of index.byArn.entries()) {
+    if (
+      normalized === arn ||
+      arn.startsWith(normalized) ||
+      normalized.startsWith(arn)
+    ) {
+      if (
+        DATA_FLOW_TARGET_TYPES.has(getResourceType(nodePath, nodes[nodePath]))
+      ) {
+        matches.add(nodePath);
+      }
+    }
+  }
+
+  return [...matches];
+}
+
+function buildDataFlowEdges(nodes) {
+  const index = buildDataFlowIndex(nodes);
+  const explicitKeys = new Set();
+  const allKeys = new Set();
+
+  const addEdge = (source, target, type, label, origin, detail) => {
+    if (!nodes[source] || !nodes[target] || source === target) {
+      return;
+    }
+    const key = `${source}|||${target}|||${type}`;
+    if (allKeys.has(key)) {
+      return;
+    }
+    allKeys.add(key);
+    if (origin !== "iam_policy") {
+      explicitKeys.add(`${source}|||${target}`);
+    }
+    nodes[source].edges_data_flow ||= [];
+    nodes[source].edges_data_flow.push({ target, type, label, origin, detail });
+  };
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    for (const resource of Object.values(node.resources || {})) {
+      const values = getResourceValues(resource);
+      const type = resource.type || getResourceType(nodePath, node);
+
+      if (type === "aws_lambda_event_source_mapping") {
+        const sources = resolveNodeRefs(values.event_source_arn, index, nodes);
+        const targets = resolveNodeRefs(values.function_name, index, nodes, [
+          "aws_lambda_function",
+        ]);
+        for (const source of sources) {
+          for (const target of targets) {
+            addEdge(
+              source,
+              target,
+              "triggers",
+              "triggers",
+              "terraform_resource",
+              type,
+            );
+          }
+        }
+      }
+
+      if (type === "aws_s3_bucket_notification") {
+        const sources = resolveNodeRefs(values.bucket, index, nodes, [
+          "aws_s3_bucket",
+        ]);
+        const targets = [
+          ...resolveNodeRefs(values.lambda_function, index, nodes, [
+            "aws_lambda_function",
+          ]),
+          ...resolveNodeRefs(values.queue, index, nodes, ["aws_sqs_queue"]),
+          ...resolveNodeRefs(values.topic, index, nodes, ["aws_sns_topic"]),
+        ];
+        for (const source of sources) {
+          for (const target of targets) {
+            addEdge(
+              source,
+              target,
+              "triggers",
+              "triggers",
+              "terraform_resource",
+              type,
+            );
+          }
+        }
+      }
+
+      if (
+        type === "aws_cloudwatch_event_target" ||
+        type === "aws_eventbridge_target" ||
+        type === "aws_scheduler_schedule"
+      ) {
+        const sourceRefs =
+          type === "aws_scheduler_schedule"
+            ? nodePath
+            : values.rule || values.event_bus_name;
+        const sources = resolveNodeRefs(sourceRefs, index, nodes, [
+          "aws_cloudwatch_event_rule",
+          "aws_cloudwatch_event_bus",
+          "aws_scheduler_schedule",
+        ]);
+        const targets = resolveNodeRefs(
+          values.arn || values.target?.arn,
+          index,
+          nodes,
+        );
+        for (const source of sources.length ? sources : [nodePath]) {
+          for (const target of targets) {
+            addEdge(
+              source,
+              target,
+              "triggers",
+              "triggers",
+              "terraform_resource",
+              type,
+            );
+          }
+        }
+      }
+
+      if (
+        type === "aws_api_gateway_integration" ||
+        type === "aws_apigatewayv2_integration"
+      ) {
+        const sources = resolveNodeRefs(
+          values.rest_api_id || values.api_id,
+          index,
+          nodes,
+          ["aws_api_gateway_rest_api", "aws_apigatewayv2_api"],
+        );
+        const targets = resolveNodeRefs(
+          values.uri || values.integration_uri,
+          index,
+          nodes,
+          ["aws_lambda_function"],
+        );
+        for (const source of sources.length ? sources : [nodePath]) {
+          for (const target of targets) {
+            addEdge(
+              source,
+              target,
+              "invokes",
+              "invokes",
+              "terraform_resource",
+              type,
+            );
+          }
+        }
+      }
+
+      if (
+        type === "aws_lb_listener" ||
+        type === "aws_lb_listener_rule" ||
+        type === "aws_alb_listener" ||
+        type === "aws_alb_listener_rule"
+      ) {
+        const sources = resolveNodeRefs(
+          values.load_balancer_arn || values.listener_arn,
+          index,
+          nodes,
+        );
+        const targets = resolveNodeRefs(
+          values.default_action || values.action,
+          index,
+          nodes,
+          ["aws_lb_target_group", "aws_alb_target_group"],
+        );
+        for (const source of sources.length ? sources : [nodePath]) {
+          for (const target of targets) {
+            addEdge(
+              source,
+              target,
+              "routes",
+              "routes",
+              "terraform_resource",
+              type,
+            );
+          }
+        }
+      }
+
+      if (
+        type === "aws_lb_target_group_attachment" ||
+        type === "aws_alb_target_group_attachment"
+      ) {
+        const sources = resolveNodeRefs(values.target_group_arn, index, nodes, [
+          "aws_lb_target_group",
+          "aws_alb_target_group",
+        ]);
+        const targets = resolveNodeRefs(values.target_id, index, nodes);
+        for (const source of sources) {
+          for (const target of targets) {
+            addEdge(
+              source,
+              target,
+              "routes",
+              "routes",
+              "terraform_resource",
+              type,
+            );
+          }
+        }
+      }
+    }
+  }
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    for (const resource of Object.values(node.resources || {})) {
+      const type = resource.type || getResourceType(nodePath, node);
+      if (type !== "aws_iam_role_policy" && type !== "aws_iam_policy") {
+        continue;
+      }
+
+      const values = getResourceValues(resource);
+      const policy = parsePolicyDocument(values.policy);
+      if (!policy) {
+        continue;
+      }
+
+      const sourceRoles =
+        type === "aws_iam_role_policy"
+          ? resolveNodeRefs(values.role, index, nodes, ["aws_iam_role"])
+          : [...(index.policyToRoles.get(nodePath) || [])];
+      const sourceComputes = new Set();
+      for (const role of sourceRoles) {
+        for (const compute of index.roleToCompute.get(role) || []) {
+          sourceComputes.add(compute);
+        }
+      }
+
+      if (sourceComputes.size === 0) {
+        continue;
+      }
+
+      for (const statement of normalizePolicyArray(policy.Statement)) {
+        if (String(statement.Effect || "Allow").toLowerCase() === "deny") {
+          continue;
+        }
+        for (const action of normalizePolicyArray(statement.Action)) {
+          const relationship = dataFlowRelationshipForAction(action);
+          if (!relationship) {
+            continue;
+          }
+          for (const resourceValue of normalizePolicyArray(
+            statement.Resource,
+          )) {
+            for (const target of resolvePolicyTargets(
+              resourceValue,
+              index,
+              nodes,
+            )) {
+              for (const source of sourceComputes) {
+                if (explicitKeys.has(`${source}|||${target}`)) {
+                  continue;
+                }
+                addEdge(
+                  source,
+                  target,
+                  relationship.type,
+                  relationship.label,
+                  "iam_policy",
+                  action,
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   return nodes;
 }
 
@@ -373,7 +951,11 @@ function deleteOrphanedNodes(nodes) {
   const connected = new Set();
 
   for (const [nodePath, node] of Object.entries(nodes)) {
-    const edges = [...(node.edges_existing || []), ...(node.edges_new || [])];
+    const edges = [
+      ...(node.edges_existing || []),
+      ...(node.edges_new || []),
+      ...(node.edges_data_flow || []).map((edge) => edge.target),
+    ];
     if (edges.length > 0) {
       connected.add(nodePath);
     }
@@ -417,6 +999,9 @@ function filterVisualIgnore(nodes) {
     node.edges_existing = (node.edges_existing || []).filter(
       (e) => !ignored.has(e),
     );
+    node.edges_data_flow = (node.edges_data_flow || []).filter(
+      (edge) => !ignored.has(edge.target),
+    );
   }
 
   return nodes;
@@ -426,6 +1011,7 @@ function cleanUpRoleLinks(nodes) {
   for (const [nodePath, node] of Object.entries(nodes)) {
     node.edges_existing ||= [];
     node.edges_new ||= [];
+    node.edges_data_flow ||= [];
 
     for (const [pathMatch, edgeExclude] of EDGE_FILTER_RULES) {
       if (!nodePath.includes(pathMatch)) {
@@ -436,6 +1022,9 @@ function cleanUpRoleLinks(nodes) {
       );
       node.edges_new = node.edges_new.filter(
         (edge) => !edge.includes(edgeExclude),
+      );
+      node.edges_data_flow = node.edges_data_flow.filter(
+        (edge) => !edge.target.includes(edgeExclude),
       );
     }
   }
@@ -452,6 +1041,7 @@ module.exports = {
   applyModuleMetadata,
   mergeTerraformState,
   ensureEdgeLists,
+  buildDataFlowEdges,
   externalResources,
   deleteOrphanedNodes,
   filterVisualIgnore,
