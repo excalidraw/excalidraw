@@ -157,6 +157,23 @@ type TerraformResourceDetails = {
   attributes?: TerraformAttribute[];
 };
 
+const TERRAFORM_GROUP_FLAGS = [
+  "terraformModuleGroup",
+  "terraformAccountGroup",
+  "terraformRegionGroup",
+  "terraformVpcGroup",
+  "terraformSubnetGroup",
+] as const;
+
+const isTerraformResourceElement = (element: NonDeletedExcalidrawElement) =>
+  element.customData?.terraform && Boolean(element.customData?.nodePath);
+
+const isTerraformGroupElement = (element: NonDeletedExcalidrawElement) =>
+  TERRAFORM_GROUP_FLAGS.some((flag) => Boolean(element.customData?.[flag]));
+
+const isTerraformInspectableElement = (element: NonDeletedExcalidrawElement) =>
+  isTerraformResourceElement(element) || isTerraformGroupElement(element);
+
 const tryParseJsonString = (value: string): unknown | null => {
   const trimmed = value.trim();
   if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
@@ -223,12 +240,18 @@ const getTerraformElementForSelection = (
     (element) => appState.selectedElementIds[element.id],
   );
 
-  const selectedTerraformNode = selectedElements.find(
-    (element) =>
-      element.customData?.terraform && Boolean(element.customData?.nodePath),
+  const selectedTerraformNode = selectedElements.find((element) =>
+    isTerraformResourceElement(element),
   );
   if (selectedTerraformNode) {
     return selectedTerraformNode;
+  }
+
+  const selectedTerraformGroup = selectedElements.find((element) =>
+    isTerraformGroupElement(element),
+  );
+  if (selectedTerraformGroup) {
+    return selectedTerraformGroup;
   }
 
   const selectedTerraformContainer = selectedElements.find(
@@ -237,7 +260,8 @@ const getTerraformElementForSelection = (
       Boolean(element.containerId) &&
       elements.some(
         (candidate) =>
-          candidate.id === element.containerId && candidate.customData?.terraform,
+          candidate.id === element.containerId &&
+          isTerraformInspectableElement(candidate),
       ),
   );
   if (
@@ -248,7 +272,7 @@ const getTerraformElementForSelection = (
     const container = elements.find(
       (element) => element.id === selectedTerraformContainer.containerId,
     );
-    if (container?.customData?.terraform) {
+    if (container && isTerraformInspectableElement(container)) {
       return container;
     }
   }
@@ -264,14 +288,104 @@ const getTerraformElementForSelection = (
 
   const groupedTerraformElements = elements.filter(
     (element) =>
-      element.customData?.terraform &&
-      Boolean(element.customData?.nodePath) &&
+      isTerraformInspectableElement(element) &&
       (element.groupIds || []).some((groupId) => selectedGroupIds.has(groupId)),
   );
 
   return groupedTerraformElements.length === 1
     ? groupedTerraformElements[0]
     : null;
+};
+
+const getTerraformGroupKind = (customData: Record<string, any>) => {
+  if (customData.terraformModuleGroup) {
+    return "Module";
+  }
+  if (customData.terraformSubnetGroup) {
+    return "Subnet";
+  }
+  if (customData.terraformVpcGroup) {
+    return "VPC";
+  }
+  if (customData.terraformRegionGroup) {
+    return "Region";
+  }
+  if (customData.terraformAccountGroup) {
+    return "Account";
+  }
+  return "Group";
+};
+
+const getTerraformGroupTitle = (customData: Record<string, any>) => {
+  if (customData.modulePath) {
+    return customData.modulePath;
+  }
+  if (customData.subnetLabel || customData.subnetId) {
+    return customData.subnetLabel || customData.subnetId;
+  }
+  if (customData.vpcLabel || customData.vpcId) {
+    return customData.vpcLabel || customData.vpcId;
+  }
+  if (customData.region) {
+    return customData.region;
+  }
+  if (customData.accountId) {
+    return customData.accountId;
+  }
+  return "Terraform group";
+};
+
+const TerraformGroupActions = ({
+  element,
+  renderAction,
+}: {
+  element: NonDeletedExcalidrawElement;
+  renderAction: ActionManager["renderAction"];
+}) => {
+  const customData = element.customData ?? {};
+  const rows = [
+    ["Module path", customData.modulePath],
+    ["Source", customData.moduleSource],
+    ["Version", customData.moduleVersion],
+    ["Account", customData.accountId],
+    ["Region", customData.region],
+    ["VPC", customData.vpcLabel || customData.vpcId],
+    ["Subnet", customData.subnetLabel || customData.subnetId],
+  ].filter(([, value]) => value !== null && typeof value !== "undefined");
+
+  return (
+    <div className="selected-shape-actions terraform-element-actions">
+      <div className="terraform-element-actions__header">
+        <div className="terraform-element-actions__eyebrow">Terraform</div>
+        <div className="terraform-element-actions__title">
+          {formatTerraformPanelValue(getTerraformGroupTitle(customData))}
+        </div>
+        <div className="terraform-element-actions__summary">
+          <span>{getTerraformGroupKind(customData)}</span>
+        </div>
+      </div>
+
+      <div className="terraform-element-actions__meta">
+        {rows.map(([label, value]) => (
+          <div className="terraform-element-actions__row" key={label}>
+            <div className="terraform-element-actions__label">{label}</div>
+            <div className="terraform-element-actions__value">
+              {formatTerraformPanelValue(value)}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <fieldset>
+        <legend>{t("labels.actions")}</legend>
+        <div className="buttonList">
+          {renderAction("duplicateSelection")}
+          {renderAction("deleteSelectedElements")}
+          {renderAction("hyperlink")}
+        </div>
+      </fieldset>
+    </div>
+  );
 };
 
 const TerraformElementActions = ({
@@ -282,6 +396,13 @@ const TerraformElementActions = ({
   renderAction: ActionManager["renderAction"];
 }) => {
   const customData = element.customData ?? {};
+
+  if (isTerraformGroupElement(element)) {
+    return (
+      <TerraformGroupActions element={element} renderAction={renderAction} />
+    );
+  }
+
   const resources: TerraformResourceDetails[] = Array.isArray(
     customData.terraformResources,
   )
