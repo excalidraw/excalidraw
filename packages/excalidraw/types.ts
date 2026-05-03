@@ -271,6 +271,15 @@ export type ObservedElementsAppState = {
 
 export type BoxSelectionMode = "contain" | "overlap";
 
+export type ExportFrameMode = "idle" | "selecting" | "selected";
+
+export type ExportCropRegion = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export interface AppState {
   contextMenu: {
     items: ContextMenuItems;
@@ -464,6 +473,11 @@ export interface AppState {
   /** image cropping */
   isCropping: boolean;
   croppingElementId: ExcalidrawElement["id"] | null;
+
+  /** scene-space rectangle drawn for "Export frame"; null when not set */
+  exportCropRegion: ExportCropRegion | null;
+  /** UX mode for exporting a rectangular region of the canvas */
+  exportFrameMode: ExportFrameMode;
 
   /** null if no search matches found / search closed */
   searchMatches: Readonly<{

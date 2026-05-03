@@ -220,6 +220,13 @@ const LayerUI = ({
         actionManager={actionManager}
         onExportImage={onExportImage}
         onCloseRequest={() => setAppState({ openDialog: null })}
+        onStartExportCrop={() =>
+          setAppState({
+            openDialog: null,
+            exportFrameMode: "selecting",
+            exportCropRegion: null,
+          })
+        }
         name={app.getName()}
       />
     );
