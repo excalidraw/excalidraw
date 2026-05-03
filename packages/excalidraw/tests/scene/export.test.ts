@@ -69,6 +69,21 @@ describe("exportToSvg", () => {
     expect(svgElement).toMatchSnapshot();
   });
 
+  it("with crop bounds restricts export viewport", async () => {
+    const svgElement = await exportUtils.exportToSvg(
+      ELEMENTS,
+      DEFAULT_OPTIONS,
+      null,
+      {
+        cropBounds: [10, 20, 110, 90],
+      },
+    );
+
+    expect(svgElement.getAttribute("viewBox")).toBe("0 0 100 70");
+    expect(svgElement.getAttribute("width")).toBe("100");
+    expect(svgElement.getAttribute("height")).toBe("70");
+  });
+
   it("with a CJK font", async () => {
     const svgElement = await exportUtils.exportToSvg(
       [

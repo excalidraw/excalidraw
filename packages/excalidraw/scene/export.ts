@@ -182,11 +182,14 @@ export const exportToCanvas = async (
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
     exportingFrame,
+    cropBounds,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     exportingFrame?: ExcalidrawFrameLikeElement | null;
+    /** minX, minY, maxX, maxY in scene coordinates — export only this viewport */
+    cropBounds?: [number, number, number, number] | null;
   },
   createCanvas: (
     width: number,
@@ -204,31 +207,49 @@ export const exportToCanvas = async (
   // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
   await loadFonts();
 
+  const effectiveExportingFrame = cropBounds ? null : exportingFrame ?? null;
+
   const frameRendering = getFrameRenderingConfig(
-    exportingFrame ?? null,
+    effectiveExportingFrame,
     appState.frameRendering ?? null,
   );
   // for canvas export, don't clip if exporting a specific frame as it would
   // clip the corners of the content
-  if (exportingFrame) {
+  if (effectiveExportingFrame) {
     frameRendering.clip = false;
   }
 
   const elementsForRender = prepareElementsForRender({
     elements,
-    exportingFrame,
+    exportingFrame: effectiveExportingFrame,
     exportWithDarkMode: appState.exportWithDarkMode,
     frameRendering,
   });
 
-  if (exportingFrame) {
-    exportPadding = 0;
-  }
+  let minX: number;
+  let minY: number;
+  let width: number;
+  let height: number;
 
-  const [minX, minY, width, height] = getCanvasSize(
-    exportingFrame ? [exportingFrame] : getRootElements(elementsForRender),
-    exportPadding,
-  );
+  if (cropBounds && cropBounds.length === 4) {
+    exportPadding = 0;
+    const [x1, y1, x2, y2] = cropBounds;
+    minX = Math.min(x1, x2);
+    minY = Math.min(y1, y2);
+    width = Math.abs(x2 - x1);
+    height = Math.abs(y2 - y1);
+  } else if (effectiveExportingFrame) {
+    exportPadding = 0;
+    [minX, minY, width, height] = getCanvasSize(
+      [effectiveExportingFrame],
+      exportPadding,
+    );
+  } else {
+    [minX, minY, width, height] = getCanvasSize(
+      getRootElements(elementsForRender),
+      exportPadding,
+    );
+  }
 
   const { canvas, scale = 1 } = createCanvas(width, height);
 
@@ -304,12 +325,19 @@ export const exportToSvg = async (
      */
     renderEmbeddables?: boolean;
     exportingFrame?: ExcalidrawFrameLikeElement | null;
+    /** minX, minY, maxX, maxY in scene coordinates — export only this viewport */
+    cropBounds?: [number, number, number, number] | null;
     skipInliningFonts?: true;
     reuseImages?: boolean;
   },
 ): Promise<SVGSVGElement> => {
+  const cropBounds = opts?.cropBounds;
+  const { exportingFrame: optsExportingFrame = null } = opts || {};
+
+  const effectiveExportingFrame = cropBounds ? null : optsExportingFrame;
+
   const frameRendering = getFrameRenderingConfig(
-    opts?.exportingFrame ?? null,
+    effectiveExportingFrame,
     appState.frameRendering ?? null,
   );
 
@@ -321,7 +349,7 @@ export const exportToSvg = async (
     exportEmbedScene,
   } = appState;
 
-  const { exportingFrame = null } = opts || {};
+  const exportingFrame = effectiveExportingFrame;
 
   const elementsForRender = prepareElementsForRender({
     elements,
@@ -330,14 +358,30 @@ export const exportToSvg = async (
     frameRendering,
   });
 
-  if (exportingFrame) {
-    exportPadding = 0;
-  }
+  let minX: number;
+  let minY: number;
+  let width: number;
+  let height: number;
 
-  const [minX, minY, width, height] = getCanvasSize(
-    exportingFrame ? [exportingFrame] : getRootElements(elementsForRender),
-    exportPadding,
-  );
+  if (cropBounds && cropBounds.length === 4) {
+    exportPadding = 0;
+    const [x1, y1, x2, y2] = cropBounds;
+    minX = Math.min(x1, x2);
+    minY = Math.min(y1, y2);
+    width = Math.abs(x2 - x1);
+    height = Math.abs(y2 - y1);
+  } else if (exportingFrame) {
+    exportPadding = 0;
+    [minX, minY, width, height] = getCanvasSize(
+      [exportingFrame],
+      exportPadding,
+    );
+  } else {
+    [minX, minY, width, height] = getCanvasSize(
+      getRootElements(elementsForRender),
+      exportPadding,
+    );
+  }
 
   const offsetX = -minX + exportPadding;
   const offsetY = -minY + exportPadding;

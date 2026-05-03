@@ -31,6 +31,7 @@ type ExportOpts = {
   files: BinaryFiles | null;
   maxWidthOrHeight?: number;
   exportingFrame?: ExcalidrawFrameLikeElement | null;
+  cropBounds?: [number, number, number, number] | null;
   getDimensions?: (
     width: number,
     height: number,
@@ -45,6 +46,7 @@ export const exportToCanvas = ({
   getDimensions,
   exportPadding,
   exportingFrame,
+  cropBounds,
 }: ExportOpts & {
   exportPadding?: number;
 }) => {
@@ -58,7 +60,13 @@ export const exportToCanvas = ({
     restoredElements,
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
-    { exportBackground, exportPadding, viewBackgroundColor, exportingFrame },
+    {
+      exportBackground,
+      exportPadding,
+      viewBackgroundColor,
+      exportingFrame,
+      cropBounds: cropBounds ?? undefined,
+    },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
 
@@ -170,6 +178,7 @@ export const exportToSvg = async ({
   exportPadding,
   renderEmbeddables,
   exportingFrame,
+  cropBounds,
   skipInliningFonts,
   reuseImages,
 }: Omit<ExportOpts, "getDimensions"> & {
@@ -190,6 +199,7 @@ export const exportToSvg = async ({
 
   return _exportToSvg(restoredElements, exportAppState, files, {
     exportingFrame,
+    cropBounds: cropBounds ?? undefined,
     renderEmbeddables,
     skipInliningFonts,
     reuseImages,
