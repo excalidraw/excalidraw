@@ -2317,7 +2317,7 @@ async function nodesToExcalidraw(nodes) {
       backgroundColor: bgColor,
       roundness: { type: 3 },
       groupIds,
-      boundElements: [{ id: textId, type: "text" }],
+      boundElements: [],
       strokeStyle: action === "external" ? "dashed" : "solid",
       customData: {
         terraform: true,
@@ -2356,7 +2356,7 @@ async function nodesToExcalidraw(nodes) {
         textAlign: hasIcon ? "left" : "center",
         verticalAlign: "middle",
         groupIds,
-        containerId: rectId,
+        containerId: null,
         originalText: label,
         autoResize: false,
         lineHeight: 1.25,
