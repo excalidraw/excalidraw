@@ -1,6 +1,6 @@
 import { isElementInViewport } from "@excalidraw/element";
 
-import { memoize, toBrandedType } from "@excalidraw/common";
+import { memoize, toBrandedType, viewportCoordsToSceneCoords } from "@excalidraw/common";
 
 import type {
   ExcalidrawElement,
@@ -14,7 +14,7 @@ import { renderStaticSceneThrottled } from "../renderer/staticScene";
 
 import type { RenderableElementsMap } from "./types";
 
-import type { AppState } from "../types";
+import type { AppState, Zoom } from "../types";
 
 export class Renderer {
   private scene: Scene;
@@ -95,6 +95,42 @@ export class Renderer {
       return elementsMap;
     };
 
+    const getViewportBoundsInScene = ({
+  zoom,
+  offsetLeft,
+  offsetTop,
+  scrollX,
+  scrollY,
+  width,
+  height,
+}:{
+  zoom:Zoom,
+  offsetLeft:number,
+  offsetTop:number,
+  scrollX:number,
+  scrollY:number,
+  width:number,
+  height:number,
+}) => {
+  const topLeft = viewportCoordsToSceneCoords(
+    { clientX: offsetLeft, clientY: offsetTop },
+    { zoom, offsetLeft, offsetTop, scrollX, scrollY }
+  );
+
+  const bottomRight = viewportCoordsToSceneCoords(
+    { clientX: offsetLeft + width, clientY: offsetTop + height },
+    { zoom, offsetLeft, offsetTop, scrollX, scrollY }
+  );
+
+  return {
+    x1: topLeft.x,
+    y1: topLeft.y,
+    x2: bottomRight.x,
+    y2: bottomRight.y,
+  };
+}
+
+
     return memoize(
       ({
         zoom,
@@ -122,7 +158,31 @@ export class Renderer {
         newElementId: ExcalidrawElement["id"] | undefined;
         sceneNonce: ReturnType<InstanceType<typeof Scene>["getSceneNonce"]>;
       }) => {
-        const elements = this.scene.getNonDeletedElements();
+
+
+        const viewportBounds = getViewportBoundsInScene({
+            zoom,
+            offsetLeft,
+            offsetTop,
+            scrollX,
+            scrollY,
+            width,
+            height
+          });
+
+          // 👇 ONLY CANDIDATE ELEMENTS
+          const candidateIds =
+            this.scene.getCandidateElementsInViewport(viewportBounds); // returns set of element ids overlapping spartial cell
+
+          console.log("candidates:", candidateIds.size);
+
+          const elements = [];
+          for (const id of candidateIds) {
+            const el = this.scene.getNonDeletedElement(id);
+            if (el) elements.push(el);
+          }
+
+        // const elements = this.scene.getNonDeletedElements();
 
         const elementsMap = getRenderableElements({
           elements,
