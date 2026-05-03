@@ -133,7 +133,7 @@ export const exportCanvas = async (
         exportEmbedScene: appState.exportEmbedScene && type === "svg",
       },
       files,
-      { exportingFrame },
+      { exportingFrame, name },
     );
 
     if (type === "svg") {

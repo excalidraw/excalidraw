@@ -530,5 +530,17 @@ describe("exporting frames", () => {
       expect(svg.getAttribute("width")).toBe(frame1.width.toString());
       expect(svg.getAttribute("height")).toBe(frame1.height.toString());
     });
+
+    it("with title", async () => {
+      const svg = await exportUtils.exportToSvg(ELEMENTS, DEFAULT_OPTIONS, null, {
+        name: "My Excalidraw Drawing",
+      });
+
+      const titleElement = svg.querySelector("title");
+      expect(titleElement).not.toBeNull();
+      expect(titleElement?.textContent).toBe("My Excalidraw Drawing");
+      // title should be first child
+      expect(svg.firstChild).toBe(titleElement);
+    });
   });
 });
