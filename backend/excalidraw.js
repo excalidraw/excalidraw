@@ -481,6 +481,61 @@ const TIER_3_TYPES = new Set([
   "terraform_remote_state",
 ]);
 
+const PRIMARY_COMPUTE_TYPES = new Set([
+  "aws_lambda_function",
+  "aws_ecs_cluster",
+  "aws_ecs_service",
+  "aws_ecs_task_definition",
+  "aws_instance",
+  "aws_ec2_instance_state",
+  "aws_emr_cluster",
+  "aws_glue_job",
+  "aws_glue_crawler",
+  "aws_batch_compute_environment",
+  "aws_batch_job_definition",
+  "aws_eks_cluster",
+]);
+
+const PRIMARY_STORAGE_TYPES = new Set([
+  "aws_s3_bucket",
+  "aws_s3_object",
+  "aws_s3_bucket_object",
+  "aws_dynamodb_table",
+  "aws_rds_cluster",
+  "aws_rds_cluster_instance",
+  "aws_db_instance",
+  "aws_efs_file_system",
+  "aws_elasticache_cluster",
+  "aws_elasticache_replication_group",
+  "aws_redshift_cluster",
+  "aws_opensearch_domain",
+  "aws_elasticsearch_domain",
+]);
+
+const PRIMARY_MESSAGING_TYPES = new Set([
+  "aws_sqs_queue",
+  "aws_sns_topic",
+  "aws_kinesis_stream",
+  "aws_kinesis_firehose_delivery_stream",
+  "aws_cloudwatch_event_bus",
+  "aws_cloudwatch_event_rule",
+  "aws_scheduler_schedule",
+  "aws_msk_cluster",
+]);
+
+const PRIMARY_SPARK_TYPES = new Set();
+
+const PRIMARY_VISIBLE_TYPES = new Set([
+  ...PRIMARY_COMPUTE_TYPES,
+  ...PRIMARY_STORAGE_TYPES,
+  ...PRIMARY_MESSAGING_TYPES,
+  ...PRIMARY_SPARK_TYPES,
+]);
+
+function isPrimaryVisibleResourceType(resourceType) {
+  return PRIMARY_VISIBLE_TYPES.has(resourceType);
+}
+
 function getResourceType(nodePath) {
   const parts = nodePath.split(".");
   let i = 0;
@@ -1762,6 +1817,55 @@ function collectDataFlowEdges(nodes) {
   return collected;
 }
 
+function buildTerraformExplodeParentMap(
+  nodeKeys,
+  directedEdges,
+  dataFlowEdges,
+) {
+  const nodeKeySet = new Set(nodeKeys);
+  const parentMap = new Map(nodeKeys.map((nodeKey) => [nodeKey, new Set()]));
+
+  const addPair = (source, target) => {
+    if (
+      !nodeKeySet.has(source) ||
+      !nodeKeySet.has(target) ||
+      source === target
+    ) {
+      return;
+    }
+    parentMap.get(source).add(target);
+    parentMap.get(target).add(source);
+  };
+
+  for (const edge of directedEdges) {
+    addPair(edge.source, edge.target);
+  }
+
+  for (const edge of dataFlowEdges) {
+    addPair(edge.source, edge.target);
+    for (const direction of edge.directions || []) {
+      addPair(direction.source, direction.target);
+    }
+  }
+
+  return parentMap;
+}
+
+function getVisibilityCustomData(
+  nodePath,
+  initiallyVisible,
+  explodeParentKeys,
+) {
+  return {
+    terraformVisibilityRole: "resource",
+    terraformVisibilityKey: nodePath,
+    terraformNodeKind: "resource",
+    terraformInitiallyVisible: initiallyVisible,
+    terraformExplodeParentKeys: explodeParentKeys,
+    terraformExplodeParent: explodeParentKeys[0] || null,
+  };
+}
+
 function offsetLineSegment(startPoint, endPoint, offset) {
   if (!offset) {
     return { startPoint, endPoint };
@@ -2097,6 +2201,11 @@ async function nodesToExcalidraw(nodes) {
   const directedEdges = collectDirectedEdges(nodes);
   const relationships = coalesceRelationshipPairs(directedEdges);
   const dataFlowEdges = collectDataFlowEdges(nodes);
+  const explodeParentMap = buildTerraformExplodeParentMap(
+    nodeKeys,
+    directedEdges,
+    dataFlowEdges,
+  );
   const dependencyPairKeys = new Set(
     relationships.map(({ source, target }) =>
       [source, target].sort().join("|||"),
@@ -2164,6 +2273,12 @@ async function nodesToExcalidraw(nodes) {
     const cfg = tierConfigs[tier];
     const { x, y } = positions[nodePath];
     const resourceType = getResourceType(nodePath);
+    const initiallyVisible = isPrimaryVisibleResourceType(resourceType);
+    const visibilityCustomData = getVisibilityCustomData(
+      nodePath,
+      initiallyVisible,
+      [...(explodeParentMap.get(nodePath) || [])].sort(),
+    );
     const groupId = `node-${rand()}`;
     const moduleGroupIds = getModulePathChain(nodePath)
       .reverse()
@@ -2206,6 +2321,7 @@ async function nodesToExcalidraw(nodes) {
       strokeStyle: action === "external" ? "dashed" : "solid",
       customData: {
         terraform: true,
+        ...visibilityCustomData,
         resourceType,
         nodePath,
         action,
@@ -2217,6 +2333,7 @@ async function nodesToExcalidraw(nodes) {
         subnetLabel: nodeSubnet?.subnetLabel || null,
         terraformResources,
       },
+      isDeleted: !initiallyVisible,
     });
     nodeElements.push(rectElement);
     nodeRectById.set(rectId, rectElement);
@@ -2244,6 +2361,13 @@ async function nodesToExcalidraw(nodes) {
         autoResize: false,
         lineHeight: 1.25,
         strokeColor: "#1e1e1e",
+        isDeleted: !initiallyVisible,
+        customData: {
+          terraform: true,
+          ...visibilityCustomData,
+          resourceType,
+          nodePath,
+        },
       }),
     );
 
@@ -2257,7 +2381,17 @@ async function nodesToExcalidraw(nodes) {
         iconY,
         cfg.iconSize,
         groupIds,
-      );
+      ).map((element) => ({
+        ...element,
+        isDeleted: !initiallyVisible,
+        customData: {
+          ...(element.customData || {}),
+          terraform: true,
+          ...visibilityCustomData,
+          resourceType,
+          nodePath,
+        },
+      }));
       nodeElements.push(...clonedIcons);
     }
   }
@@ -2316,6 +2450,14 @@ async function nodesToExcalidraw(nodes) {
     const labelId = `module-label-${i}`;
     const strokeColor =
       MODULE_STROKES[(group.depth - 1) % MODULE_STROKES.length];
+    const initiallyVisible = group.nodePaths.some((nodePath) =>
+      isPrimaryVisibleResourceType(getResourceType(nodePath)),
+    );
+    const groupVisibilityCustomData = {
+      terraformVisibilityRole: "group",
+      terraformVisibilityKey: group.modulePath,
+      terraformGroupChildKeys: group.nodePaths,
+    };
 
     moduleElements.push(
       makeBaseElement({
@@ -2332,8 +2474,10 @@ async function nodesToExcalidraw(nodes) {
         roundness: { type: 3 },
         groupIds: boxGroupIds,
         boundElements: [{ id: labelId, type: "text" }],
+        isDeleted: !initiallyVisible,
         customData: {
           terraform: false,
+          ...groupVisibilityCustomData,
           terraformModuleGroup: true,
           modulePath: group.modulePath,
           moduleDepth: group.depth,
@@ -2362,8 +2506,10 @@ async function nodesToExcalidraw(nodes) {
         autoResize: false,
         lineHeight: 1.2,
         strokeColor,
+        isDeleted: !initiallyVisible,
         customData: {
           terraform: false,
+          ...groupVisibilityCustomData,
           terraformModuleGroup: true,
           modulePath: group.modulePath,
           moduleSource: group.source,
@@ -2461,6 +2607,14 @@ async function nodesToExcalidraw(nodes) {
     const accountBoxId = `account-box-${accountBoxIndex}`;
     const accountLabelId = `account-label-${accountBoxIndex}`;
     accountBoxIndex += 1;
+    const accountInitiallyVisible = accountGroup.nodePaths.some((nodePath) =>
+      isPrimaryVisibleResourceType(getResourceType(nodePath)),
+    );
+    const accountVisibilityCustomData = {
+      terraformVisibilityRole: "group",
+      terraformVisibilityKey: `account:${accountGroup.accountId}`,
+      terraformGroupChildKeys: accountGroup.nodePaths,
+    };
 
     locationElements.push(
       makeBaseElement({
@@ -2477,8 +2631,10 @@ async function nodesToExcalidraw(nodes) {
         roundness: { type: 3 },
         groupIds: [accountGroupId],
         boundElements: [{ id: accountLabelId, type: "text" }],
+        isDeleted: !accountInitiallyVisible,
         customData: {
           terraform: false,
+          ...accountVisibilityCustomData,
           terraformAccountGroup: true,
           accountId: accountGroup.accountId,
         },
@@ -2504,8 +2660,10 @@ async function nodesToExcalidraw(nodes) {
         autoResize: false,
         lineHeight: 1.2,
         strokeColor: ACCOUNT_STROKE,
+        isDeleted: !accountInitiallyVisible,
         customData: {
           terraform: false,
+          ...accountVisibilityCustomData,
           terraformAccountGroup: true,
           accountId: accountGroup.accountId,
         },
@@ -2533,6 +2691,14 @@ async function nodesToExcalidraw(nodes) {
       const regionBoxId = `region-box-${regionBoxIndex}`;
       const regionLabelId = `region-label-${regionBoxIndex}`;
       regionBoxIndex += 1;
+      const regionInitiallyVisible = regionGroup.nodePaths.some((nodePath) =>
+        isPrimaryVisibleResourceType(getResourceType(nodePath)),
+      );
+      const regionVisibilityCustomData = {
+        terraformVisibilityRole: "group",
+        terraformVisibilityKey: `region:${regionGroup.accountId}:${regionGroup.region}`,
+        terraformGroupChildKeys: regionGroup.nodePaths,
+      };
 
       const regionGroupIds = [regionGroupId, accountGroupId];
 
@@ -2551,8 +2717,10 @@ async function nodesToExcalidraw(nodes) {
           roundness: { type: 3 },
           groupIds: regionGroupIds,
           boundElements: [{ id: regionLabelId, type: "text" }],
+          isDeleted: !regionInitiallyVisible,
           customData: {
             terraform: false,
+            ...regionVisibilityCustomData,
             terraformRegionGroup: true,
             accountId: regionGroup.accountId,
             region: regionGroup.region,
@@ -2579,8 +2747,10 @@ async function nodesToExcalidraw(nodes) {
           autoResize: false,
           lineHeight: 1.2,
           strokeColor: REGION_STROKE,
+          isDeleted: !regionInitiallyVisible,
           customData: {
             terraform: false,
+            ...regionVisibilityCustomData,
             terraformRegionGroup: true,
             accountId: regionGroup.accountId,
             region: regionGroup.region,
@@ -2608,6 +2778,14 @@ async function nodesToExcalidraw(nodes) {
         const vpcBoxId = `vpc-box-${vpcBoxIndex}`;
         const vpcLabelId = `vpc-label-${vpcBoxIndex}`;
         vpcBoxIndex += 1;
+        const vpcInitiallyVisible = vpcGroup.nodePaths.some((nodePath) =>
+          isPrimaryVisibleResourceType(getResourceType(nodePath)),
+        );
+        const vpcVisibilityCustomData = {
+          terraformVisibilityRole: "group",
+          terraformVisibilityKey: `vpc:${vpcGroup.accountId}:${vpcGroup.region}:${vpcGroup.vpcKey}`,
+          terraformGroupChildKeys: vpcGroup.nodePaths,
+        };
 
         const vpcGroupIds = [vpcGroupId, regionGroupId, accountGroupId];
 
@@ -2626,8 +2804,10 @@ async function nodesToExcalidraw(nodes) {
             roundness: { type: 3 },
             groupIds: vpcGroupIds,
             boundElements: [{ id: vpcLabelId, type: "text" }],
+            isDeleted: !vpcInitiallyVisible,
             customData: {
               terraform: false,
+              ...vpcVisibilityCustomData,
               terraformVpcGroup: true,
               accountId: vpcGroup.accountId,
               region: vpcGroup.region,
@@ -2656,8 +2836,10 @@ async function nodesToExcalidraw(nodes) {
             autoResize: false,
             lineHeight: 1.2,
             strokeColor: VPC_STROKE,
+            isDeleted: !vpcInitiallyVisible,
             customData: {
               terraform: false,
+              ...vpcVisibilityCustomData,
               terraformVpcGroup: true,
               accountId: vpcGroup.accountId,
               region: vpcGroup.region,
@@ -2687,6 +2869,15 @@ async function nodesToExcalidraw(nodes) {
             SUBNET_PADDING_BOTTOM;
           const subnetBoxId = `subnet-box-${vpcBoxIndex}-${rand()}`;
           const subnetLabelId = `subnet-label-${vpcBoxIndex}-${rand()}`;
+          const subnetInitiallyVisible = subnetGroup.nodePaths.some(
+            (nodePath) =>
+              isPrimaryVisibleResourceType(getResourceType(nodePath)),
+          );
+          const subnetVisibilityCustomData = {
+            terraformVisibilityRole: "group",
+            terraformVisibilityKey: `subnet:${subnetGroup.accountId}:${subnetGroup.region}:${subnetGroup.vpcKey}:${subnetGroup.subnetKey}`,
+            terraformGroupChildKeys: subnetGroup.nodePaths,
+          };
 
           const subnetGroupIds = [
             subnetGroupId,
@@ -2710,8 +2901,10 @@ async function nodesToExcalidraw(nodes) {
               roundness: { type: 3 },
               groupIds: subnetGroupIds,
               boundElements: [{ id: subnetLabelId, type: "text" }],
+              isDeleted: !subnetInitiallyVisible,
               customData: {
                 terraform: false,
+                ...subnetVisibilityCustomData,
                 terraformSubnetGroup: true,
                 accountId: subnetGroup.accountId,
                 region: subnetGroup.region,
@@ -2741,8 +2934,10 @@ async function nodesToExcalidraw(nodes) {
               autoResize: false,
               lineHeight: 1.2,
               strokeColor: SUBNET_STROKE,
+              isDeleted: !subnetInitiallyVisible,
               customData: {
                 terraform: false,
+                ...subnetVisibilityCustomData,
                 terraformSubnetGroup: true,
                 accountId: subnetGroup.accountId,
                 region: subnetGroup.region,
@@ -2815,6 +3010,9 @@ async function nodesToExcalidraw(nodes) {
         endArrowhead: null,
         strokeStyle: "solid",
         roundness: { type: 2 },
+        isDeleted:
+          !isPrimaryVisibleResourceType(getResourceType(source)) ||
+          !isPrimaryVisibleResourceType(getResourceType(target)),
         customData: {
           terraform: true,
           terraformEdgeLayer: "dependency",
@@ -2912,6 +3110,9 @@ async function nodesToExcalidraw(nodes) {
         strokeWidth: 3,
         strokeStyle: "solid",
         roundness: { type: 2 },
+        isDeleted:
+          !isPrimaryVisibleResourceType(getResourceType(source)) ||
+          !isPrimaryVisibleResourceType(getResourceType(target)),
         customData: {
           terraform: true,
           terraformEdgeLayer: "dataFlow",
