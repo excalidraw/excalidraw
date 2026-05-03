@@ -500,7 +500,14 @@
       "exportToPng": "PNG",
       "exportToSvg": "SVG",
       "copyPngToClipboard": "Αντιγραφή στο πρόχειρο"
-    }
+    },
+    "exportFrame": "Export frame",
+    "exportFrameButton": "Choose region…",
+    "exportFrameTooltip": "Close this dialog and drag on the canvas to select the rectangular area you want to export.",
+    "exportFrameInstructions": "Drag to draw the export region",
+    "exportFrameConfirm": "Choose how to export the selected region",
+    "exportFrameCancel": "Cancel",
+    "exportFrameTooSmall": "Selection is too small. Drag a larger area."
   },
   "encrypted": {
     "tooltip": "Τα σχέδιά σου είναι κρυπτογραφημένα από άκρο σε άκρο, έτσι δεν θα είναι ποτέ ορατά μέσα από τους διακομιστές του Excalidraw.",
