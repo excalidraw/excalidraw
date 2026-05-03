@@ -13,15 +13,6 @@ export function rangeInclusive(start: number, end: number): InclusiveRange {
   return toBrandedType<InclusiveRange>([start, end]);
 }
 
-/**
- * Turn a number pair into an inclusive range.
- *
- * @param pair The number pair to convert to an inclusive range
- * @returns The new inclusive range
- */
-export function rangeInclusiveFromPair(pair: [start: number, end: number]) {
-  return toBrandedType<InclusiveRange>(pair);
-}
 
 /**
  * Given two ranges, return if the two ranges overlap with each other e.g.

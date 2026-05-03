@@ -1,4 +1,3 @@
-import { degreesToRadians } from "./angle";
 import { PRECISION } from "./utils";
 import { vectorFromPoint, vectorScale } from "./vector";
 
@@ -6,7 +5,6 @@ import type {
   LocalPoint,
   GlobalPoint,
   Radians,
-  Degrees,
   Vector,
   GlobalCoord,
   LocalCoord,
@@ -136,22 +134,6 @@ export function pointRotateRads<Point extends GlobalPoint | LocalPoint>(
     (x - cx) * Math.cos(angle) - (y - cy) * Math.sin(angle) + cx,
     (x - cx) * Math.sin(angle) + (y - cy) * Math.cos(angle) + cy,
   );
-}
-
-/**
- * Rotate a point by [angle] degree.
- *
- * @param point The point to rotate
- * @param center The point to rotate around, the center point
- * @param angle The degree to rotate the point by
- * @returns The rotated point
- */
-export function pointRotateDegs<Point extends GlobalPoint | LocalPoint>(
-  point: Point,
-  center: Point,
-  angle: Degrees,
-): Point {
-  return pointRotateRads(point, center, degreesToRadians(angle));
 }
 
 /**
