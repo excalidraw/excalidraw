@@ -27,6 +27,7 @@ import {
   KEYS,
   APP_NAME,
   CURSOR_TYPE,
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
@@ -601,6 +602,8 @@ const YOUTUBE_VIDEO_STATES = new Map<
   ExcalidrawElement["id"],
   ValueOf<typeof YOUTUBE_STATES>
 >();
+
+const MAX_EMBEDDABLE_VIEWPORT_SCALE = 4;
 
 let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
@@ -1734,6 +1737,18 @@ class App extends React.Component<AppProps, AppState> {
             this.state.activeEmbeddable?.element === el &&
             this.state.activeEmbeddable?.state === "hover";
 
+          // scale video embeds based on zoom (capped) so that smaller embeds
+          // on canvas when zoomed are still of legible quality
+          // (note: for some embed types like gdrive, the quality is poor when
+          // scaling mid playback and works only when you initially start the
+          // playback at the higher zoom level)
+          const shouldScaleEmbeddableViewport = src?.type === "video";
+          const embeddableViewportScale = clamp(
+            shouldScaleEmbeddableViewport ? scale : 1,
+            0.75,
+            MAX_EMBEDDABLE_VIEWPORT_SCALE,
+          );
+
           return (
             <div
               key={el.id}
@@ -1800,31 +1815,42 @@ class App extends React.Component<AppProps, AppState> {
                     padding: `${el.strokeWidth}px`,
                   }}
                 >
-                  {(isEmbeddableElement(el)
-                    ? this.props.renderEmbeddable?.(el, this.state)
-                    : null) ?? (
-                    <iframe
-                      ref={(ref) => this.cacheEmbeddableRef(el, ref)}
-                      className="excalidraw__embeddable"
-                      srcDoc={
-                        src?.type === "document"
-                          ? src.srcdoc(this.state.theme)
-                          : undefined
-                      }
-                      src={
-                        src?.type !== "document" ? src?.link ?? "" : undefined
-                      }
-                      // https://stackoverflow.com/q/18470015
-                      scrolling="no"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="Excalidraw Embedded Content"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen={true}
-                      sandbox={`${
-                        src?.sandbox?.allowSameOrigin ? "allow-same-origin" : ""
-                      } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`}
-                    />
-                  )}
+                  <div
+                    className="excalidraw__embeddable__content"
+                    style={{
+                      width: `${embeddableViewportScale * 100}%`,
+                      height: `${embeddableViewportScale * 100}%`,
+                      transform: `scale(${1 / embeddableViewportScale})`,
+                    }}
+                  >
+                    {(isEmbeddableElement(el)
+                      ? this.props.renderEmbeddable?.(el, this.state)
+                      : null) ?? (
+                      <iframe
+                        ref={(ref) => this.cacheEmbeddableRef(el, ref)}
+                        className="excalidraw__embeddable"
+                        srcDoc={
+                          src?.type === "document"
+                            ? src.srcdoc(this.state.theme)
+                            : undefined
+                        }
+                        src={
+                          src?.type !== "document" ? src?.link ?? "" : undefined
+                        }
+                        // https://stackoverflow.com/q/18470015
+                        scrolling="no"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title="Excalidraw Embedded Content"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen={true}
+                        sandbox={`${
+                          src?.sandbox?.allowSameOrigin
+                            ? "allow-same-origin"
+                            : ""
+                        } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -2524,6 +2550,7 @@ class App extends React.Component<AppProps, AppState> {
     const magicFrameChildren = getElementsOverlappingFrame(
       this.scene.getNonDeletedElements(),
       magicFrame,
+      this.scene.getNonDeletedElementsMap(),
     ).filter((el) => !isMagicFrameElement(el));
 
     if (!magicFrameChildren.length) {
@@ -6938,7 +6965,7 @@ class App extends React.Component<AppProps, AppState> {
               y: scenePointerY,
             },
           });
-          this.setState({ suggestedBinding: null, startBoundElement: null });
+          this.setState({ suggestedBinding: null });
           if (!this.state.activeTool.locked) {
             resetCursor(this.interactiveCanvas);
             this.setState((prevState) => ({
@@ -7257,6 +7284,14 @@ class App extends React.Component<AppProps, AppState> {
           this.interactiveCanvas,
           isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
         );
+      } else if (
+        !event[KEYS.CTRL_OR_CMD] &&
+        this.isHittingCommonBoundingBoxOfSelectedElements(
+          scenePointer,
+          selectedElements,
+        )
+      ) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
       } else if (this.state.viewModeEnabled) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
       } else if (this.state.openDialog?.name === "elementLinkSelector") {
@@ -7574,7 +7609,6 @@ class App extends React.Component<AppProps, AppState> {
         appState: {
           newElement: null,
           editingTextElement: null,
-          startBoundElement: null,
           suggestedBinding: null,
           selectedElementIds: makeNextSelectedElementIds(
             Object.keys(this.state.selectedElementIds)
@@ -7748,17 +7782,24 @@ class App extends React.Component<AppProps, AppState> {
       const hitSelectedElement =
         pointerDownState.hit.element &&
         this.isASelectedElement(pointerDownState.hit.element);
+      const shouldForceLassoReselect =
+        event.altKey &&
+        event[KEYS.CTRL_OR_CMD] &&
+        !pointerDownState.resize.handleType;
+      const shouldStartLassoSelection =
+        shouldForceLassoReselect ||
+        (!pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
+          !pointerDownState.resize.handleType &&
+          !hitSelectedElement);
 
-      if (
-        !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
-        !pointerDownState.resize.handleType &&
-        !hitSelectedElement
-      ) {
-        this.lassoTrail.startPath(
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-          event.shiftKey,
-        );
+      if (shouldStartLassoSelection) {
+        if (!this.lassoTrail.hasCurrentTrail) {
+          this.lassoTrail.startPath(
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+            event.shiftKey,
+          );
+        }
 
         // block dragging after lasso selection on PCs until the next pointer down
         // (on mobile or tablet, we want to allow user to drag immediately)
@@ -8747,12 +8788,14 @@ class App extends React.Component<AppProps, AppState> {
       DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value,
       1,
     );
+    const boundsPadding =
+      (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / this.state.zoom.value;
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
     return (
-      point.x > x1 - threshold &&
-      point.x < x2 + threshold &&
-      point.y > y1 - threshold &&
-      point.y < y2 + threshold
+      point.x > x1 - boundsPadding - threshold &&
+      point.x < x2 + boundsPadding + threshold &&
+      point.y > y1 - boundsPadding - threshold &&
+      point.y < y2 + boundsPadding + threshold
     );
   }
 
@@ -8853,18 +8896,8 @@ class App extends React.Component<AppProps, AppState> {
       };
     });
 
-    const boundElement = getHoveredElementForBinding(
-      pointFrom<GlobalPoint>(
-        pointerDownState.origin.x,
-        pointerDownState.origin.y,
-      ),
-      this.scene.getNonDeletedElements(),
-      this.scene.getNonDeletedElementsMap(),
-    );
-
     this.setState({
       newElement: element,
-      startBoundElement: boundElement,
       suggestedBinding: null,
     });
   };
@@ -10285,6 +10318,7 @@ class App extends React.Component<AppProps, AppState> {
                 this.state.selectionElement,
                 this.scene.getNonDeletedElementsMap(),
                 false,
+                this.state.boxSelectionMode,
               )
             : [];
 
@@ -10716,7 +10750,7 @@ class App extends React.Component<AppProps, AppState> {
               sceneCoords,
             });
           }
-          this.setState({ suggestedBinding: null, startBoundElement: null });
+          this.setState({ suggestedBinding: null });
           if (!activeTool.locked) {
             resetCursor(this.interactiveCanvas);
             this.setState((prevState) => ({
@@ -10737,9 +10771,9 @@ class App extends React.Component<AppProps, AppState> {
               ),
             }));
           } else {
-            this.setState((prevState) => ({
+            this.setState({
               newElement: null,
-            }));
+            });
           }
           // so that the scene gets rendered again to display the newly drawn linear as well
           this.scene.triggerUpdate();

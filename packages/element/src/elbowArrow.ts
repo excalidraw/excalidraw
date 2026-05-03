@@ -2124,8 +2124,8 @@ const normalizeArrowElementUpdate = (
     offsetY < -MAX_POS ||
     offsetY > MAX_POS ||
     offsetX + points[points.length - 1][0] < -MAX_POS ||
-    offsetY + points[points.length - 1][0] > MAX_POS ||
-    offsetX + points[points.length - 1][1] < -MAX_POS ||
+    offsetX + points[points.length - 1][0] > MAX_POS ||
+    offsetY + points[points.length - 1][1] < -MAX_POS ||
     offsetY + points[points.length - 1][1] > MAX_POS
   ) {
     console.error(

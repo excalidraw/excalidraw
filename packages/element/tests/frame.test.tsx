@@ -2,6 +2,7 @@ import {
   convertToExcalidrawElements,
   Excalidraw,
 } from "@excalidraw/excalidraw";
+import { arrayToMap } from "@excalidraw/common";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
@@ -10,7 +11,12 @@ import {
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
-import type { ExcalidrawElement } from "../src/types";
+import { elementOverlapsWithFrame } from "../src/frame";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
+} from "../src/types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -123,6 +129,26 @@ describe("adding elements to frames", () => {
       x: 100,
       boundElements: [{ id: text.id, type: "text" }],
     });
+  });
+
+  it("should treat an element fully containing a frame as overlapping the frame", () => {
+    const containingRect = API.createElement({
+      type: "rectangle",
+      x: -50,
+      y: -50,
+      width: 250,
+      height: 250,
+    });
+
+    API.setElements([containingRect, frame]);
+
+    expect(
+      elementOverlapsWithFrame(
+        containingRect,
+        frame as ExcalidrawFrameLikeElement,
+        arrayToMap(h.elements),
+      ),
+    ).toBe(true);
   });
 
   const commonTestCases = async (
@@ -414,6 +440,22 @@ describe("adding elements to frames", () => {
 
   describe("dragging elements into the frame", async () => {
     await commonTestCases(dragElementIntoFrame);
+
+    it("should add a dragged element fully containing the frame", () => {
+      const containingRect = API.createElement({
+        type: "rectangle",
+        x: 220,
+        y: 20,
+        width: 300,
+        height: 300,
+      });
+
+      API.setElements([frame, containingRect]);
+
+      dragElementIntoFrame(frame, containingRect);
+
+      expect(API.getElement(containingRect).frameId).toBe(frame.id);
+    });
 
     it.skip("should drag element inside, duplicate it and keep it in frame", () => {
       API.setElements([frame, rect2]);
