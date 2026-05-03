@@ -58,6 +58,8 @@ import { Fonts } from "../fonts";
 import { renderStaticScene } from "../renderer/staticScene";
 import { renderSceneToSvg } from "../renderer/staticSvgScene";
 
+import type { NormalizedZoomValue } from "../types";
+
 import type { RenderableElementsMap } from "./types";
 
 import type { AppState, BinaryFiles } from "../types";
@@ -474,6 +476,144 @@ export const exportToSvg = async (
 
   const renderEmbeddables = opts?.renderEmbeddables ?? false;
 
+  // ---------------------------------------------------------------------------
+  // Blur lens support — render the FULL scene (with lens elements) to a
+  // canvas using the existing canvas blur pipeline, then for each lens
+  // extract its bounding-box region from that canvas as a per-lens PNG.
+  // The SVG embeds those PNGs directly (no `feGaussianBlur`). This gives
+  // pixel-identical fidelity to the canvas result — the same blur strength
+  // the user sees on screen and in PNG export, regardless of how the SVG
+  // is later scaled in a viewer.
+  // ---------------------------------------------------------------------------
+  const blurLensSnapshots = new Map<
+    string,
+    { dataUrl: string; x: number; y: number; w: number; h: number }
+  >();
+  const isBlurLens = (el: NonDeletedExcalidrawElement) =>
+    (el.type === "rectangle" ||
+      el.type === "diamond" ||
+      el.type === "ellipse") &&
+    el.blurStyle !== "none" &&
+    el.blurRadius > 0;
+  const elementsWithBlur = elementsForRender.filter(isBlurLens);
+  if (elementsWithBlur.length > 0) {
+    try {
+      // Use the export resolution (exportScale > 1 → sharper PNG).
+      const lensScale = Math.max(1, exportScale);
+      const fullCanvas = document.createElement("canvas");
+      fullCanvas.width = Math.ceil(width * lensScale);
+      fullCanvas.height = Math.ceil(height * lensScale);
+      const filesArg = files || {};
+      const { imageCache: lensImageCache } = await updateImageCache({
+        imageCache: new Map(),
+        fileIds: getInitializedImageElements(elementsForRender).map(
+          (e) => e.fileId,
+        ),
+        files: filesArg,
+      });
+      renderStaticScene({
+        canvas: fullCanvas,
+        rc: rough.canvas(fullCanvas),
+        elementsMap: toBrandedType<RenderableElementsMap>(
+          arrayToMap(elementsForRender),
+        ),
+        allElementsMap: toBrandedType<NonDeletedSceneElementsMap>(
+          arrayToMap(syncInvalidIndices(elementsForRender)),
+        ),
+        visibleElements: elementsForRender,
+        scale: lensScale,
+        appState: {
+          ...getDefaultAppState(),
+          viewBackgroundColor: appState.exportBackground
+            ? viewBackgroundColor
+            : "transparent",
+          scrollX: offsetX,
+          scrollY: offsetY,
+          zoom: { value: 1 as NormalizedZoomValue },
+          width,
+          height,
+          theme: exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+          frameRendering,
+          exportScale: lensScale,
+        } as any,
+        renderConfig: {
+          canvasBackgroundColor: viewBackgroundColor,
+          imageCache: lensImageCache,
+          renderGrid: false,
+          isExporting: true,
+          embedsValidationStatus: new Map(),
+          elementsPendingErasure: new Set(),
+          pendingFlowchartNodes: null,
+          theme: exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+        },
+      });
+
+      for (const lens of elementsWithBlur) {
+        // AABB of the rotated lens shape in scene coords.
+        const cx = lens.x + lens.width / 2;
+        const cy = lens.y + lens.height / 2;
+        const halfW = lens.width / 2;
+        const halfH = lens.height / 2;
+        const corners: [number, number][] = [
+          [-halfW, -halfH],
+          [halfW, -halfH],
+          [halfW, halfH],
+          [-halfW, halfH],
+        ];
+        const c = Math.cos(lens.angle);
+        const s = Math.sin(lens.angle);
+        const rotated = corners.map(([dx, dy]) => [
+          cx + dx * c - dy * s,
+          cy + dx * s + dy * c,
+        ]);
+        const minX = Math.min(...rotated.map((p) => p[0]));
+        const maxX = Math.max(...rotated.map((p) => p[0]));
+        const minY = Math.min(...rotated.map((p) => p[1]));
+        const maxY = Math.max(...rotated.map((p) => p[1]));
+        // include some padding so rounded strokes / blur halos at the
+        // shape outline aren't clipped
+        const pad = Math.max(
+          4,
+          Math.ceil(lens.blurRadius * 0.25 + lens.strokeWidth + 2),
+        );
+        // bbox in canvas (device-pixel) coords
+        const sx = Math.max(0, Math.floor((minX + offsetX - pad) * lensScale));
+        const sy = Math.max(0, Math.floor((minY + offsetY - pad) * lensScale));
+        const ex = Math.min(
+          fullCanvas.width,
+          Math.ceil((maxX + offsetX + pad) * lensScale),
+        );
+        const ey = Math.min(
+          fullCanvas.height,
+          Math.ceil((maxY + offsetY + pad) * lensScale),
+        );
+        const sw = ex - sx;
+        const sh = ey - sy;
+        if (sw <= 0 || sh <= 0) {
+          continue;
+        }
+        const sub = document.createElement("canvas");
+        sub.width = sw;
+        sub.height = sh;
+        const sctx = sub.getContext("2d");
+        if (!sctx) {
+          continue;
+        }
+        sctx.drawImage(fullCanvas, sx, sy, sw, sh, 0, 0, sw, sh);
+        blurLensSnapshots.set(lens.id, {
+          dataUrl: sub.toDataURL("image/png"),
+          // SVG units (not device pixels)
+          x: sx / lensScale - offsetX,
+          y: sy / lensScale - offsetY,
+          w: sw / lensScale,
+          h: sh / lensScale,
+        });
+      }
+    } catch (e) {
+      console.error("Failed to bake blur lens snapshots for SVG export", e);
+    }
+  }
+
   renderSceneToSvg(
     elementsForRender,
     toBrandedType<RenderableElementsMap>(arrayToMap(elementsForRender)),
@@ -497,6 +637,7 @@ export const exportToSvg = async (
         : new Map(),
       reuseImages: opts?.reuseImages ?? true,
       theme: exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+      blurLensSnapshots,
     },
   );
 

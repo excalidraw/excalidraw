@@ -72,6 +72,8 @@ export type ElementConstructorOpts = MarkOptional<
   | "roundness"
   | "locked"
   | "opacity"
+  | "blurStyle"
+  | "blurRadius"
   | "customData"
 >;
 
@@ -87,6 +89,8 @@ const _newElementBase = <T extends ExcalidrawElement>(
     strokeStyle = DEFAULT_ELEMENT_PROPS.strokeStyle,
     roughness = DEFAULT_ELEMENT_PROPS.roughness,
     opacity = DEFAULT_ELEMENT_PROPS.opacity,
+    blurStyle = DEFAULT_ELEMENT_PROPS.blurStyle,
+    blurRadius = DEFAULT_ELEMENT_PROPS.blurRadius,
     width = 0,
     height = 0,
     angle = 0 as Radians,
@@ -138,6 +142,8 @@ const _newElementBase = <T extends ExcalidrawElement>(
     strokeStyle,
     roughness,
     opacity,
+    blurStyle,
+    blurRadius,
     groupIds,
     frameId,
     index,

@@ -82,6 +82,19 @@ import type {
 
 import type { RoughCanvas } from "roughjs/bin/canvas";
 
+/** True for shapes acting as a blur "lens" — these get drawn by the
+ *  post-pass overlay rather than via the normal shape pipeline. */
+export const isBlurLensElement = (element: ExcalidrawElement): boolean => {
+  if (element.blurStyle === "none" || element.blurRadius <= 0) {
+    return false;
+  }
+  return (
+    element.type === "rectangle" ||
+    element.type === "diamond" ||
+    element.type === "ellipse"
+  );
+};
+
 const isPendingImageElement = (
   element: ExcalidrawElement,
   renderConfig: StaticCanvasRenderConfig,
@@ -786,6 +799,15 @@ export const renderElement = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
+  // Blur "lens" shapes are not drawn by the normal pipeline; they are
+  // composited as a post-pass that blurs whatever was drawn underneath them
+  // (see `applyBlurOverlays`), and that pass also paints the shape's stroke
+  // on top so the user keeps a visible outline. The standard selection
+  // layer continues to draw selection handles around the element.
+  if (isBlurLensElement(element) && !renderConfig.isBlurOverlayPass) {
+    return;
+  }
+
   const reduceAlphaForSelection =
     appState.openDialog?.name === "elementLinkSelector" &&
     !appState.selectedElementIds[element.id] &&

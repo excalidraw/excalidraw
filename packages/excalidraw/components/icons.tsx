@@ -1151,6 +1151,56 @@ export const FillSolidIcon = createIcon(
   { ...modifiedTablerIconProps, fill: "currentColor" },
 );
 
+export const BlurNoneIcon = createIcon(
+  <path
+    d="M5.88 2.625h8.24a3.254 3.254 0 0 1 3.255 3.254v8.242a3.254 3.254 0 0 1-3.254 3.254H5.88a3.254 3.254 0 0 1-3.254-3.254V5.88A3.254 3.254 0 0 1 5.88 2.625Z"
+    stroke="currentColor"
+    strokeWidth="1.25"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const BlurGaussianIcon = createIcon(
+  <>
+    <defs>
+      <radialGradient id="BlurGaussianIconGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="currentColor" stopOpacity="0.95" />
+        <stop offset="60%" stopColor="currentColor" stopOpacity="0.4" />
+        <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+      </radialGradient>
+    </defs>
+    <path
+      d="M5.88 2.625h8.24a3.254 3.254 0 0 1 3.255 3.254v8.242a3.254 3.254 0 0 1-3.254 3.254H5.88a3.254 3.254 0 0 1-3.254-3.254V5.88A3.254 3.254 0 0 1 5.88 2.625Z"
+      stroke="currentColor"
+      strokeWidth="1.25"
+    />
+    <circle cx="10" cy="10" r="6" fill="url(#BlurGaussianIconGrad)" />
+  </>,
+  modifiedTablerIconProps,
+);
+
+export const BlurPixelateIcon = createIcon(
+  <>
+    <path
+      d="M5.88 2.625h8.24a3.254 3.254 0 0 1 3.255 3.254v8.242a3.254 3.254 0 0 1-3.254 3.254H5.88a3.254 3.254 0 0 1-3.254-3.254V5.88A3.254 3.254 0 0 1 5.88 2.625Z"
+      stroke="currentColor"
+      strokeWidth="1.25"
+    />
+    <g fill="currentColor">
+      <rect x="5" y="5" width="2.4" height="2.4" />
+      <rect x="9.4" y="5" width="2.4" height="2.4" opacity="0.55" />
+      <rect x="12.8" y="5" width="2.4" height="2.4" opacity="0.3" />
+      <rect x="5" y="8.8" width="2.4" height="2.4" opacity="0.55" />
+      <rect x="9.4" y="8.8" width="2.4" height="2.4" />
+      <rect x="12.8" y="8.8" width="2.4" height="2.4" opacity="0.55" />
+      <rect x="5" y="12.6" width="2.4" height="2.4" opacity="0.3" />
+      <rect x="9.4" y="12.6" width="2.4" height="2.4" opacity="0.55" />
+      <rect x="12.8" y="12.6" width="2.4" height="2.4" />
+    </g>
+  </>,
+  modifiedTablerIconProps,
+);
+
 export const StrokeWidthBaseIcon = createIcon(
   <>
     <path

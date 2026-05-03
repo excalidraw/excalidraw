@@ -148,6 +148,30 @@ const renderElementToSvg = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
+      // Blur lens: embed a per-lens raster snapshot whose blur (and
+      // outline stroke) was already baked in by the canvas pipeline.
+      // Visually identical to the on-screen and PNG-export results, with
+      // no dependence on SVG viewer scaling or filter implementation.
+      if (
+        element.blurStyle !== "none" &&
+        element.blurRadius > 0 &&
+        renderConfig.blurLensSnapshots?.has(element.id)
+      ) {
+        const snap = renderConfig.blurLensSnapshots.get(element.id)!;
+        const image = svgRoot.ownerDocument.createElementNS(SVG_NS, "image");
+        image.setAttribute("href", snap.dataUrl);
+        // snap.x / snap.y are in scene coords. The viewBox offset is on
+        // `renderConfig.offsetX/Y` (the function-param `offsetX/Y` here is
+        // `element.x + renderConfig.offsetX` — not what we want).
+        image.setAttribute("x", `${snap.x + (renderConfig.offsetX || 0)}`);
+        image.setAttribute("y", `${snap.y + (renderConfig.offsetY || 0)}`);
+        image.setAttribute("width", `${snap.w}`);
+        image.setAttribute("height", `${snap.h}`);
+        image.setAttribute("preserveAspectRatio", "none");
+        addToRoot(image, element);
+        break;
+      }
+
       const shape = ShapeCache.generateElementShape(element, renderConfig);
       const node = roughSVGDrawWithPrecision(
         rsvg,

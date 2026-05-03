@@ -26,6 +26,7 @@ export type PointerType = "mouse" | "pen" | "touch";
 export type StrokeRoundness = "round" | "sharp";
 export type RoundnessType = ValueOf<typeof ROUNDNESS>;
 export type StrokeStyle = "solid" | "dashed" | "dotted";
+export type BlurStyle = "none" | "gaussian" | "pixelate";
 export type TextAlign = typeof TEXT_ALIGN[keyof typeof TEXT_ALIGN];
 
 type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
@@ -49,6 +50,11 @@ type _ExcalidrawElementBase = Readonly<{
   roundness: null | { type: RoundnessType; value?: number };
   roughness: number;
   opacity: number;
+  /** Blur effect applied to the shape — turns the shape into a "lens" that
+      obscures everything visually underneath it. Default "none". */
+  blurStyle: BlurStyle;
+  /** Blur radius in (unzoomed) px. 0 disables blur regardless of style. */
+  blurRadius: number;
   width: number;
   height: number;
   angle: Radians;

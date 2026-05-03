@@ -297,6 +297,11 @@ const restoreElementWithProperties = <
     roughness: element.roughness ?? DEFAULT_ELEMENT_PROPS.roughness,
     opacity:
       element.opacity == null ? DEFAULT_ELEMENT_PROPS.opacity : element.opacity,
+    blurStyle: (element as any).blurStyle ?? DEFAULT_ELEMENT_PROPS.blurStyle,
+    blurRadius:
+      (element as any).blurRadius == null
+        ? DEFAULT_ELEMENT_PROPS.blurRadius
+        : (element as any).blurRadius,
     angle: element.angle || (0 as Radians),
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,

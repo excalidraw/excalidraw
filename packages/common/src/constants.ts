@@ -418,6 +418,8 @@ export const DEFAULT_ELEMENT_PROPS: {
   roughness: ExcalidrawElement["roughness"];
   opacity: ExcalidrawElement["opacity"];
   locked: ExcalidrawElement["locked"];
+  blurStyle: ExcalidrawElement["blurStyle"];
+  blurRadius: ExcalidrawElement["blurRadius"];
 } = {
   strokeColor: COLOR_PALETTE.black,
   backgroundColor: COLOR_PALETTE.transparent,
@@ -427,7 +429,13 @@ export const DEFAULT_ELEMENT_PROPS: {
   roughness: ROUGHNESS.artist,
   opacity: 100,
   locked: false,
+  blurStyle: "none",
+  blurRadius: 0,
 };
+
+export const BLUR_RADIUS_MAX = 80;
+export const BLUR_RADIUS_DEFAULT = 12;
+export const PIXELATE_BLOCK_MIN = 2;
 
 export const LIBRARY_SIDEBAR_TAB = "library";
 export const CANVAS_SEARCH_TAB = "search";
