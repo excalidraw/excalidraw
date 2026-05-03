@@ -25,7 +25,7 @@ export const actionToggleSearchMenu = register({
     predicate: (appState) => appState.gridModeEnabled,
   },
   perform(elements, appState, _, app) {
-    if (appState.openDialog) {
+    if (appState.openDialog && appState.openDialog.name !== "help") {
       return false;
     }
 
