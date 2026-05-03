@@ -1,6 +1,63 @@
 const { nodesToExcalidraw } = require("./excalidraw");
 
 describe("nodesToExcalidraw Terraform edge layers", () => {
+  it("renders resource labels as grouped text that can be restored with hidden resources", async () => {
+    const scene = await nodesToExcalidraw({
+      "aws_lambda_function.worker": {
+        resources: {
+          "aws_lambda_function.worker": {
+            address: "aws_lambda_function.worker",
+            type: "aws_lambda_function",
+            name: "worker",
+            change: { actions: ["create"], after: { function_name: "worker" } },
+          },
+        },
+        edges_new: ["aws_iam_role.worker"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_iam_role.worker": {
+        resources: {
+          "aws_iam_role.worker": {
+            address: "aws_iam_role.worker",
+            type: "aws_iam_role",
+            name: "worker",
+            change: { actions: ["create"], after: { name: "worker" } },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    });
+
+    const roleText = scene.elements.find(
+      (element) =>
+        element.type === "text" &&
+        element.customData?.nodePath === "aws_iam_role.worker",
+    );
+    const roleRect = scene.elements.find(
+      (element) =>
+        element.type === "rectangle" &&
+        element.customData?.nodePath === "aws_iam_role.worker",
+    );
+
+    expect(roleRect).toMatchObject({
+      isDeleted: true,
+      boundElements: expect.any(Array),
+    });
+    expect(roleText).toMatchObject({
+      isDeleted: true,
+      containerId: null,
+      text: "aws_iam_role.worker",
+      customData: {
+        terraformVisibilityRole: "resource",
+        terraformVisibilityKey: "aws_iam_role.worker",
+      },
+    });
+    expect(roleText.groupIds[0]).toBe(roleRect.groupIds[0]);
+  });
+
   it("renders dependency and data-flow arrows with layer metadata", async () => {
     const scene = await nodesToExcalidraw({
       "aws_api_gateway_rest_api.api": {
