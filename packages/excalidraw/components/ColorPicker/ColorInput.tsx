@@ -29,6 +29,7 @@ export const ColorInput = ({
 }) => {
   const editorInterface = useEditorInterface();
   const [innerValue, setInnerValue] = useState(color);
+  const [error, setError] = useState<string | null>(null);
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
@@ -40,10 +41,15 @@ export const ColorInput = ({
   const changeColor = useCallback(
     (inputValue: string) => {
       const value = inputValue.toLowerCase();
-      const color = normalizeInputColor(value);
-
-      if (color) {
-        onChange(color);
+      const normalized = normalizeInputColor(value);
+      if (!normalized && value.length > 0) {
+        setError(t("errors.invalidHexColor"));
+        setInnerValue(value);
+        return;
+      }
+      setError(null);
+      if (normalized) {
+        onChange(normalized);
       }
       setInnerValue(value);
     },
@@ -68,13 +74,16 @@ export const ColorInput = ({
   }, [setEyeDropperState]);
 
   return (
+    <>
     <div className="color-picker__input-label">
       <div className="color-picker__input-hash">#</div>
       <input
         ref={activeSection === "hex" ? inputRef : undefined}
         style={{ border: 0, padding: 0 }}
         spellCheck={false}
-        className="color-picker-input"
+        className={clsx("color-picker-input", {
+          "color-picker-input--error": error,
+        })}
         aria-label={label}
         onChange={(event) => {
           changeColor(event.target.value);
@@ -95,6 +104,8 @@ export const ColorInput = ({
         }}
         placeholder={placeholder}
       />
+      
+
       {/* TODO reenable on mobile with a better UX */}
       {editorInterface.formFactor !== "phone" && (
         <>
@@ -115,10 +126,10 @@ export const ColorInput = ({
                 s
                   ? null
                   : {
-                      keepOpenOnAlt: false,
-                      onSelect: (color) => onChange(color),
-                      colorPickerType,
-                    },
+                    keepOpenOnAlt: false,
+                    onSelect: (color) => onChange(color),
+                    colorPickerType,
+                  },
               )
             }
             title={`${t(
@@ -129,6 +140,13 @@ export const ColorInput = ({
           </div>
         </>
       )}
+      
     </div>
+      {error && (
+          <div className="color-picker-input__error">
+            {error}
+          </div>
+      )}
+      </>
   );
 };

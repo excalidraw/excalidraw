@@ -86,6 +86,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+
       svg {
         color: var(--color-gray-60);
         width: 1.25rem;
@@ -97,6 +98,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+
       svg {
         width: 100%;
         height: 100%;
@@ -151,9 +153,11 @@
 
     &--no-focus-visible {
       border: 0;
+
       &::after {
         display: none;
       }
+
       &:focus-visible {
         outline: none !important;
       }
@@ -207,7 +211,7 @@
     column-gap: 0.5rem;
   }
 
-  .color-picker-control-container + .popover {
+  .color-picker-control-container+.popover {
     position: static;
   }
 
@@ -330,8 +334,7 @@
 
   .color-picker-transparent,
   .color-picker-label-swatch {
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
-      left center;
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==") left center;
   }
 
   .color-picker-hash {
@@ -423,6 +426,15 @@
     }
   }
 
+  .color-picker-input__error {
+    display: block;
+    flex: 0 0 100%;
+    font-size: 0.7rem;
+    color: var(--color-danger);
+    margin-left: 1rem;
+  }
+
+
   .color-picker-label-swatch-container {
     border: 1px solid var(--default-border-color);
     border-radius: var(--border-radius-lg);
@@ -489,6 +501,7 @@
     .color-picker-type-elementBackground .color-picker-keybinding {
       color: #000;
     }
+
     .color-picker-swatch[aria-label="transparent"] .color-picker-keybinding {
       color: #000;
     }
