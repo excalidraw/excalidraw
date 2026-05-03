@@ -2,9 +2,12 @@
 .env
 backend/uploads/
 backend/temp/
-backend/graph.db
-backend/graph.db-shm
-backend/graph.db-wal
+graph.db
+graph.db-shm
+graph.db-wal
+*.tfstate
+*.tfstate.backup
+pluralith-*.pdf
 uploads/
 .env.development.local
 .env.local
