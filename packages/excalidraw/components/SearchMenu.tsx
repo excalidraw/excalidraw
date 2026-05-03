@@ -497,9 +497,9 @@ const MatchListBase = (props: MatchListProps) => {
   );
 
   return (
-    <div>
+    <div className="layer-ui__search-result-container">
       {frameNameMatches.length > 0 && (
-        <div className="layer-ui__search-result-container">
+        <div className="layer-ui__search-result-section">
           <div className="layer-ui__search-result-title">
             <div className="title-icon">{frameToolIcon}</div>
             <div>{t("search.frames")}</div>
@@ -519,7 +519,7 @@ const MatchListBase = (props: MatchListProps) => {
       )}
 
       {textMatches.length > 0 && (
-        <div className="layer-ui__search-result-container">
+        <div className="layer-ui__search-result-section">
           <div className="layer-ui__search-result-title">
             <div className="title-icon">{TextIcon}</div>
             <div>{t("search.texts")}</div>

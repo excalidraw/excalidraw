@@ -65,8 +65,13 @@
     display: flex;
     flex-direction: column;
     padding: 0 0.75rem;
-
     gap: 0.125rem;
+    min-height: 0;
+  }
+
+  .layer-ui__search-result-section {
+    display: flex;
+    flex-direction: column;
   }
 
   .layer-ui__search .collapsible-items {
