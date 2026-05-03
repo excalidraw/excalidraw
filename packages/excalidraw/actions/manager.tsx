@@ -95,6 +95,13 @@ export class ActionManager {
           (action.name in canvasActions
             ? canvasActions[action.name as keyof typeof canvasActions]
             : true) &&
+          (!action.predicate ||
+            action.predicate(
+              this.getElementsIncludingDeleted(),
+              this.getAppState(),
+              this.app.props,
+              this.app,
+            )) &&
           action.keyTest &&
           action.keyTest(
             event,

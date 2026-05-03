@@ -460,6 +460,7 @@ export interface AppState {
   userToFollow: UserToFollow | null;
   /** the socket ids of the users following the current user */
   followedBy: Set<SocketId>;
+  scrollConstraints: ScrollConstraints | null;
 
   /** image cropping */
   isCropping: boolean;
@@ -552,6 +553,8 @@ export type ExcalidrawInitialDataState = Merge<
   ImportedDataState,
   {
     libraryItems?: MaybePromise<Required<ImportedDataState>["libraryItems"]>;
+    scrollX?: number;
+    scrollY?: number;
   }
 >;
 
@@ -668,6 +671,7 @@ export interface ExcalidrawProps {
   onScrollChange?: (scrollX: number, scrollY: number, zoom: Zoom) => void;
   onUserFollow?: (payload: OnUserFollowedPayload) => void;
   children?: React.ReactNode;
+  scrollConstraints?: AppState["scrollConstraints"];
   validateEmbeddable?:
     | boolean
     | string[]
@@ -1000,6 +1004,8 @@ export interface ExcalidrawImperativeAPI {
   ) => UnsubscribeCallback;
   onStateChange: InstanceType<typeof App>["onStateChange"];
   onEvent: InstanceType<typeof App>["onEvent"];
+  app: InstanceType<typeof App>;
+  setScrollConstraints: InstanceType<typeof App>["setScrollConstraints"];
 }
 
 export type FrameNameBounds = {
@@ -1066,3 +1072,69 @@ export type Offsets = Partial<{
   bottom: number;
   left: number;
 }>;
+
+export type ScrollConstraints = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  animateOnNextUpdate?: boolean;
+  /**
+   * A factor that determines the minimum zoom level that should fit the
+   * constrained area into the viewport.
+   */
+  viewportZoomFactor?: number;
+  /**
+   * If true, the user will not be able to zoom out beyond the scroll
+   * constraints (taking into account the viewportZoomFactor).
+   */
+  lockZoom?: boolean;
+  /**
+   * <0-1> - how much can you scroll beyond the constrained area within the
+   * timeout window. Note you will still be snapped back to the constrained area
+   * after the timeout.
+   */
+  overscrollAllowance?: number;
+};
+
+/**
+ * Optional scroll constraint settings derived from the final viewport computed
+ * by `scrollToContent()`.
+ */
+export type ScrollToContentLockOptions = {
+  lockZoom?: boolean;
+  overscrollAllowance?: number;
+  viewportZoomFactor?: number;
+};
+
+export type ScrollToContentOptions =
+  | ({
+      fitToContent?: boolean;
+      fitToViewport?: never;
+      viewportZoomFactor?: number;
+      animate?: boolean;
+      duration?: number;
+      scrollLock?: boolean | ScrollToContentLockOptions;
+    } & {
+      minZoom?: number;
+      maxZoom?: number;
+      canvasOffsets?: Offsets;
+    })
+  | ({
+      fitToContent?: never;
+      fitToViewport?: boolean;
+      viewportZoomFactor?: number;
+      animate?: boolean;
+      duration?: number;
+      scrollLock?: boolean | ScrollToContentLockOptions;
+    } & {
+      minZoom?: number;
+      maxZoom?: number;
+      canvasOffsets?: Offsets;
+    });
+
+export type AnimateTranslateCanvasValues = {
+  scrollX: AppState["scrollX"];
+  scrollY: AppState["scrollY"];
+  zoom: AppState["zoom"]["value"];
+};
