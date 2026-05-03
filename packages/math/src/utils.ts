@@ -31,3 +31,11 @@ export const isFiniteNumber = (value: any): value is number => {
 
 export const isCloseTo = (a: number, b: number, precision = PRECISION) =>
   Math.abs(a - b) < precision;
+
+
+export const aspectFitScale = (width: number, height: number, maxSide: number) => {
+  let scaleX = maxSide / width;
+  let scaleY = maxSide / height;
+  let scale = Math.min(scaleX, scaleY);
+  return scale;
+};
