@@ -2,7 +2,13 @@ import { isPoint, pointDistance, pointFrom, pointFromVector } from "./point";
 import { vector, vectorNormal, vectorNormalize, vectorScale } from "./vector";
 import { LegendreGaussN24CValues, LegendreGaussN24TValues } from "./constants";
 
-import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
+import type {
+  Curve,
+  GenericPoint,
+  GlobalPoint,
+  LineSegment,
+  LocalPoint,
+} from "./types";
 
 /**
  *
@@ -12,7 +18,7 @@ import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
  * @param d
  * @returns
  */
-export function curve<Point extends GlobalPoint | LocalPoint>(
+export function curve<Point extends GenericPoint = GlobalPoint | LocalPoint>(
   a: Point,
   b: Point,
   c: Point,
@@ -21,7 +27,7 @@ export function curve<Point extends GlobalPoint | LocalPoint>(
   return [a, b, c, d] as Curve<Point>;
 }
 
-function solveWithAnalyticalJacobian<Point extends GlobalPoint | LocalPoint>(
+function solveWithAnalyticalJacobian<Point extends GenericPoint>(
   curve: Curve<Point>,
   lineSegment: LineSegment<Point>,
   t0: number,
@@ -112,7 +118,7 @@ function solveWithAnalyticalJacobian<Point extends GlobalPoint | LocalPoint>(
   return [t0, s0];
 }
 
-export const bezierEquation = <Point extends GlobalPoint | LocalPoint>(
+export const bezierEquation = <Point extends GenericPoint>(
   c: Curve<Point>,
   t: number,
 ) =>
@@ -133,7 +139,7 @@ const initial_guesses: [number, number][] = [
   [0.8, 0],
 ];
 
-const calculate = <Point extends GlobalPoint | LocalPoint>(
+const calculate = <Point extends GenericPoint>(
   [t0, s0]: [number, number],
   l: LineSegment<Point>,
   c: Curve<Point>,
@@ -165,9 +171,7 @@ const calculate = <Point extends GlobalPoint | LocalPoint>(
 /**
  * Computes the intersection between a cubic spline and a line segment.
  */
-export function curveIntersectLineSegment<
-  Point extends GlobalPoint | LocalPoint,
->(
+export function curveIntersectLineSegment<Point extends GenericPoint>(
   c: Curve<Point>,
   l: LineSegment<Point>,
   opts?: {
@@ -224,7 +228,7 @@ export function curveIntersectLineSegment<
  * @param maxLevel
  * @returns
  */
-export function curveClosestPoint<Point extends GlobalPoint | LocalPoint>(
+export function curveClosestPoint<Point extends GenericPoint>(
   c: Curve<Point>,
   p: Point,
   tolerance: number = 1e-3,
@@ -281,7 +285,7 @@ export function curveClosestPoint<Point extends GlobalPoint | LocalPoint>(
  * @param c The curve to test
  * @param p The point to measure from
  */
-export function curvePointDistance<Point extends GlobalPoint | LocalPoint>(
+export function curvePointDistance<Point extends GenericPoint>(
   c: Curve<Point>,
   p: Point,
 ) {
@@ -297,7 +301,7 @@ export function curvePointDistance<Point extends GlobalPoint | LocalPoint>(
 /**
  * Determines if the parameter is a Curve
  */
-export function isCurve<P extends GlobalPoint | LocalPoint>(
+export function isCurve<P extends GenericPoint = GlobalPoint | LocalPoint>(
   v: unknown,
 ): v is Curve<P> {
   return (
@@ -310,7 +314,7 @@ export function isCurve<P extends GlobalPoint | LocalPoint>(
   );
 }
 
-export function curveTangent<Point extends GlobalPoint | LocalPoint>(
+export function curveTangent<Point extends GenericPoint>(
   [p0, p1, p2, p3]: Curve<Point>,
   t: number,
 ) {
@@ -355,9 +359,10 @@ export function curveCatmullRomQuadraticApproxPoints(
   return pointSets;
 }
 
-export function curveCatmullRomCubicApproxPoints<
-  Point extends GlobalPoint | LocalPoint,
->(points: Point[], tension = 0.5) {
+export function curveCatmullRomCubicApproxPoints<Point extends GenericPoint>(
+  points: Point[],
+  tension = 0.5,
+) {
   if (points.length < 2) {
     return;
   }
@@ -377,10 +382,10 @@ export function curveCatmullRomCubicApproxPoints<
 
     pointSets.push(
       curve(
-        pointFrom(p1[0], p1[1]),
-        pointFrom(cp1x, cp1y),
-        pointFrom(cp2x, cp2y),
-        pointFrom(p2[0], p2[1]),
+        pointFrom<Point>(p1[0], p1[1]),
+        pointFrom<Point>(cp1x, cp1y),
+        pointFrom<Point>(cp2x, cp2y),
+        pointFrom<Point>(p2[0], p2[1]),
       ),
     );
   }
@@ -444,9 +449,7 @@ export function offsetPointsForQuadraticBezier(
  * @param c The curve to calculate the length of
  * @returns The approximated length of the curve
  */
-export function curveLength<P extends GlobalPoint | LocalPoint>(
-  c: Curve<P>,
-): number {
+export function curveLength<P extends GenericPoint>(c: Curve<P>): number {
   const z2 = 0.5;
   let sum = 0;
 
@@ -471,7 +474,7 @@ export function curveLength<P extends GlobalPoint | LocalPoint>(
  * @param t The parameter value (0 to 1) to calculate length up to
  * @returns The length of the curve from beginning to parameter t
  */
-export function curveLengthAtParameter<P extends GlobalPoint | LocalPoint>(
+export function curveLengthAtParameter<P extends GenericPoint>(
   c: Curve<P>,
   t: number,
 ): number {
@@ -510,7 +513,7 @@ export function curveLengthAtParameter<P extends GlobalPoint | LocalPoint>(
  * @param percent A value between 0 and 1 representing the percentage of the curve's length
  * @returns The point at the specified percentage of curve length
  */
-export function curvePointAtLength<P extends GlobalPoint | LocalPoint>(
+export function curvePointAtLength<P extends GenericPoint>(
   c: Curve<P>,
   percent: number,
 ): P {
