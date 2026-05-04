@@ -58,6 +58,7 @@ type ToolButtonProps =
       checked: boolean;
       onChange?(data: { pointerType: PointerType | null }): void;
       onPointerDown?(data: { pointerType: PointerType }): void;
+      onDoubleClick?(): void;
     });
 
 export const ToolButton = React.forwardRef(
@@ -180,6 +181,7 @@ export const ToolButton = React.forwardRef(
             lastPointerTypeRef.current = null;
           });
         }}
+        onDoubleClick={props.onDoubleClick}
       >
         <input
           className={`ToolIcon_type_radio ${sizeCn}`}

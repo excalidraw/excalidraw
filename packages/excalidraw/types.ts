@@ -836,6 +836,7 @@ export type AppClassProperties = {
 
   lastPointerMoveCoords: App["lastPointerMoveCoords"];
   bindModeHandler: App["bindModeHandler"];
+  isModifierKeyHeld: App["isModifierKeyHeld"];
 
   setAppState: App["setAppState"];
 };

@@ -1171,11 +1171,13 @@ export const ShapesSwitcher = ({
                 if (value === "image") {
                   app.setActiveTool({
                     type: value,
+                    locked: false,
                   });
                 } else {
-                  app.setActiveTool({ type: value });
+                  app.setActiveTool({ type: value, locked: false });
                 }
               }}
+              onDoubleClick={() => app.toggleLock("ui")}
             />
           );
         },
