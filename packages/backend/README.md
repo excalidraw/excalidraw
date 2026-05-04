@@ -10,25 +10,18 @@ Install dependencies from the repo root:
 yarn install
 ```
 
-Or, if you only need the backend dependencies:
-
-```bash
-cd backend
-npm install express cors multer graphlib-dot better-sqlite3 drizzle-orm
-```
-
 ## Run
 
+From the repo root:
+
 ```bash
-cd backend
-node index.js
+yarn start:backend
 ```
 
 With auto-reload:
 
 ```bash
-cd backend
-npx nodemon index.js
+yarn dev:backend
 ```
 
 Server starts on `http://localhost:3000`.
@@ -54,7 +47,7 @@ Server starts on `http://localhost:3000`.
 From the sample Terraform directory:
 
 ```bash
-cd backend/terraform
+cd packages/backend/terraform
 
 tofu plan -out=newplan
 tofu show -json newplan > newplan.json
@@ -70,7 +63,7 @@ Pluralith can generate a separate PDF diagram from the same Terraform/OpenTofu p
 Use JSON plans with OpenTofu:
 
 ```bash
-cd backend/terraform
+cd packages/backend/terraform
 
 tofu plan -out=newplan
 tofu show -json newplan > newplan.json
@@ -127,7 +120,7 @@ Rover can generate an interactive local Terraform visualization served on port `
 Use the JSON plan path with OpenTofu:
 
 ```bash
-cd backend/terraform
+cd packages/backend/terraform
 
 tofu plan -out=newplan
 tofu show -json newplan > newplan.json
@@ -187,7 +180,6 @@ The backend creates local runtime artifacts:
 
 | Path | Purpose |
 |------|---------|
-| `backend/graph.db` | SQLite upload store. |
-| `backend/uploads/` | Temporary multer uploads. |
-| `backend/temp/` | Debug snapshots of intermediate pipeline JSON. |
-| `backend/terraform/*.json`, `*.dot`, plan files | Sample/generated Terraform artifacts. |
+| `packages/backend/graph.db` | SQLite upload store. |
+| `packages/backend/uploads/` | Temporary multer uploads. |
+| `packages/backend/terraform/*.json`, `*.dot`, plan files | Sample/generated Terraform artifacts. |
