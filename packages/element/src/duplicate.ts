@@ -250,6 +250,9 @@ export const duplicateElements = (
     elementsWithDuplicates.splice(index + 1, 0, ...castArray(elements));
   };
 
+  // main
+  // ---------------------------------------------------------------------------
+
   const frameIdsToDuplicate = new Set(
     elements
       .filter(

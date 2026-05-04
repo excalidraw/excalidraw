@@ -20,7 +20,7 @@ describe("setActiveTool()", () => {
     const excalidrawAPIPromise = resolvablePromise<ExcalidrawImperativeAPI>();
     await render(
       <Excalidraw
-        excalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
+        onExcalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
       />,
     );
     excalidrawAPI = await excalidrawAPIPromise;

@@ -1,9 +1,3 @@
-declare global {
-  interface Window {
-    debug: typeof Debug;
-  }
-}
-
 const lessPrecise = (num: number, precision = 5) =>
   parseFloat(num.toPrecision(precision));
 
@@ -157,6 +151,70 @@ export class Debug {
       return ret;
     };
   };
+
+  private static CHANGED_CACHE: Record<string, Record<string, unknown>> = {};
+
+  public static logChanged(name: string, obj: Record<string, unknown>) {
+    const prev = Debug.CHANGED_CACHE[name];
+
+    Debug.CHANGED_CACHE[name] = obj;
+
+    if (!prev) {
+      return;
+    }
+
+    const allKeys = new Set([...Object.keys(prev), ...Object.keys(obj)]);
+    const changed: Record<string, { prev: unknown; next: unknown }> = {};
+
+    for (const key of allKeys) {
+      const prevVal = prev[key];
+      const nextVal = obj[key];
+      if (!deepEqual(prevVal, nextVal)) {
+        changed[key] = { prev: prevVal, next: nextVal };
+      }
+    }
+
+    if (Object.keys(changed).length > 0) {
+      console.info(`[${name}] changed:`, changed);
+    }
+  }
 }
-//@ts-ignore
-window.debug = Debug;
+
+function deepEqual(a: unknown, b: unknown): boolean {
+  if (Object.is(a, b)) {
+    return true;
+  }
+
+  if (
+    a === null ||
+    b === null ||
+    typeof a !== "object" ||
+    typeof b !== "object"
+  ) {
+    return false;
+  }
+
+  if (Array.isArray(a) !== Array.isArray(b)) {
+    return false;
+  }
+
+  const keysA = Object.keys(a as Record<string, unknown>);
+  const keysB = Object.keys(b as Record<string, unknown>);
+
+  if (keysA.length !== keysB.length) {
+    return false;
+  }
+
+  for (const key of keysA) {
+    if (
+      !deepEqual(
+        (a as Record<string, unknown>)[key],
+        (b as Record<string, unknown>)[key],
+      )
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}

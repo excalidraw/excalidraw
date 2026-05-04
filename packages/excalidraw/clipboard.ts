@@ -33,12 +33,6 @@ import {
   normalizeFile,
 } from "./data/blob";
 
-import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
-
-import type { FileSystemHandle } from "./data/filesystem";
-
-import type { Spreadsheet } from "./charts";
-
 import type { BinaryFiles } from "./types";
 
 type ElementsClipboard = {
@@ -50,7 +44,6 @@ type ElementsClipboard = {
 export type PastedMixedContent = { type: "text" | "imageUrl"; value: string }[];
 
 export interface ClipboardData {
-  spreadsheet?: Spreadsheet;
   elements?: readonly ExcalidrawElement[];
   files?: BinaryFiles;
   text?: string;
@@ -215,16 +208,6 @@ export const copyToClipboard = async (
   );
 };
 
-const parsePotentialSpreadsheet = (
-  text: string,
-): { spreadsheet: Spreadsheet } | { errorMessage: string } | null => {
-  const result = tryParseSpreadsheet(text);
-  if (result.type === VALID_SPREADSHEET) {
-    return { spreadsheet: result.spreadsheet };
-  }
-  return null;
-};
-
 /** internal, specific to parsing paste events. Do not reuse. */
 function parseHTMLTree(el: ChildNode) {
   let result: PastedMixedContent = [];
@@ -384,7 +367,7 @@ type AllowedParsedDataTransferItem =
       type: ValueOf<typeof IMAGE_MIME_TYPES>;
       kind: "file";
       file: File;
-      fileHandle: FileSystemHandle | null;
+      fileHandle: FileSystemFileHandle | null;
     }
   | { type: ValueOf<typeof STRING_MIME_TYPES>; kind: "string"; value: string };
 
@@ -393,7 +376,7 @@ type ParsedDataTransferItem =
       type: string;
       kind: "file";
       file: File;
-      fileHandle: FileSystemHandle | null;
+      fileHandle: FileSystemFileHandle | null;
     }
   | { type: string; kind: "string"; value: string };
 
@@ -549,19 +532,6 @@ export const parseClipboard = async (
     return {
       mixedContent: parsedEventData.value,
     };
-  }
-
-  try {
-    // if system clipboard contains spreadsheet, use it even though it's
-    // technically possible it's staler than in-app clipboard
-    const spreadsheetResult =
-      !isPlainPaste && parsePotentialSpreadsheet(parsedEventData.value);
-
-    if (spreadsheetResult) {
-      return spreadsheetResult;
-    }
-  } catch (error: any) {
-    console.error(error);
   }
 
   try {

@@ -141,6 +141,7 @@ const focusPointUpdate = (
       currentBinding,
       bindableElement,
       elementsMap,
+      true,
     );
 
     if (newPoint) {
