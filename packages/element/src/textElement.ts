@@ -347,6 +347,7 @@ export const getContainerCenter = (
     midSegmentMidpoint = LinearElementEditor.getSegmentMidPoint(
       container,
       index + 1,
+      elementsMap,
     );
   }
   return { x: midSegmentMidpoint[0], y: midSegmentMidpoint[1] };
@@ -441,7 +442,8 @@ const VALID_CONTAINER_TYPES = new Set([
 
 export const isValidTextContainer = (element: {
   type: ExcalidrawElementType;
-}) => VALID_CONTAINER_TYPES.has(element.type);
+}): element is ExcalidrawTextContainer =>
+  VALID_CONTAINER_TYPES.has(element.type);
 
 export const computeContainerDimensionForBoundText = (
   dimension: number,

@@ -157,7 +157,11 @@ const prepareElementsForRender = ({
   let nextElements: readonly ExcalidrawElement[];
 
   if (exportingFrame) {
-    nextElements = getElementsOverlappingFrame(elements, exportingFrame);
+    nextElements = getElementsOverlappingFrame(
+      elements,
+      exportingFrame,
+      arrayToMap(elements),
+    );
   } else if (frameRendering.enabled && frameRendering.name) {
     nextElements = addFrameLabelsAsTextElements(elements, {
       exportWithDarkMode,

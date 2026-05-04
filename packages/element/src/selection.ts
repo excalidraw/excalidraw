@@ -1,16 +1,34 @@
-import { arrayToMap, isShallowEqual } from "@excalidraw/common";
+import { arrayToMap, isShallowEqual, type Bounds } from "@excalidraw/common";
+import {
+  lineSegment,
+  pointFrom,
+  pointRotateRads,
+  type GlobalPoint,
+} from "@excalidraw/math";
 
 import type {
   AppState,
+  BoxSelectionMode,
   InteractiveCanvasAppState,
 } from "@excalidraw/excalidraw/types";
 
-import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
+import {
+  boundsContainBounds,
+  doBoundsIntersect,
+  elementCenterPoint,
+  getElementAbsoluteCoords,
+  getElementBounds,
+  pointInsideBounds,
+} from "./bounds";
+import { intersectElementWithLineSegment } from "./collision";
 import { isElementInViewport } from "./sizeHelpers";
 import {
+  isArrowElement,
   isBoundToContainer,
   isFrameLikeElement,
+  isFreeDrawElement,
   isLinearElement,
+  isTextElement,
 } from "./typeChecks";
 import {
   elementOverlapsWithFrame,
@@ -20,13 +38,32 @@ import {
 
 import { LinearElementEditor } from "./linearElementEditor";
 import { selectGroupsForSelectedElements } from "./groups";
+import { getBoundTextElement } from "./textElement";
 
 import type {
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
+  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./types";
+
+const shouldIgnoreElementFromSelection = (
+  element: NonDeletedExcalidrawElement,
+) => element.locked || isBoundToContainer(element);
+
+const excludeElementsFromFrames = <T extends ExcalidrawElement>(
+  selectedElements: readonly T[],
+  framesInSelection: Set<ExcalidrawFrameLikeElement["id"]>,
+) => {
+  return selectedElements.filter((element) => {
+    if (element.frameId && framesInSelection.has(element.frameId)) {
+      return false;
+    }
+    return true;
+  });
+};
 
 /**
  * Frames and their containing elements are not to be selected at the same time.
@@ -47,55 +84,242 @@ export const excludeElementsInFramesFromSelection = <
     }
   });
 
-  return selectedElements.filter((element) => {
-    if (element.frameId && framesInSelection.has(element.frameId)) {
-      return false;
-    }
-    return true;
-  });
+  return excludeElementsFromFrames(selectedElements, framesInSelection);
 };
 
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
   selection: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
+  // TODO remove (this flag is effectively unused AFAIK)
   excludeElementsInFrames: boolean = true,
-) => {
-  const [selectionX1, selectionY1, selectionX2, selectionY2] =
+  boxSelectionMode: BoxSelectionMode = "contain",
+): NonDeletedExcalidrawElement[] => {
+  const [selectionStartX, selectionStartY, selectionEndX, selectionEndY] =
     getElementAbsoluteCoords(selection, elementsMap);
+  const selectionX1 = Math.min(selectionStartX, selectionEndX);
+  const selectionY1 = Math.min(selectionStartY, selectionEndY);
+  const selectionX2 = Math.max(selectionStartX, selectionEndX);
+  const selectionY2 = Math.max(selectionStartY, selectionEndY);
+  const selectionBounds = [
+    selectionX1,
+    selectionY1,
+    selectionX2,
+    selectionY2,
+  ] as Bounds;
+  const selectionEdges = [
+    lineSegment<GlobalPoint>(
+      pointFrom(selectionX1, selectionY1),
+      pointFrom(selectionX2, selectionY1),
+    ),
+    lineSegment<GlobalPoint>(
+      pointFrom(selectionX2, selectionY1),
+      pointFrom(selectionX2, selectionY2),
+    ),
+    lineSegment<GlobalPoint>(
+      pointFrom(selectionX2, selectionY2),
+      pointFrom(selectionX1, selectionY2),
+    ),
+    lineSegment<GlobalPoint>(
+      pointFrom(selectionX1, selectionY2),
+      pointFrom(selectionX1, selectionY1),
+    ),
+  ];
 
-  let elementsInSelection = elements.filter((element) => {
-    let [elementX1, elementY1, elementX2, elementY2] = getElementBounds(
-      element,
-      elementsMap,
-    );
+  const framesInSelection = excludeElementsInFrames
+    ? new Set<NonDeletedExcalidrawElement["id"]>()
+    : null;
+  let elementsInSelection: NonDeletedExcalidrawElement[] = [];
 
-    const containingFrame = getContainingFrame(element, elementsMap);
-    if (containingFrame) {
-      const [fx1, fy1, fx2, fy2] = getElementBounds(
-        containingFrame,
-        elementsMap,
-      );
-
-      elementX1 = Math.max(fx1, elementX1);
-      elementY1 = Math.max(fy1, elementY1);
-      elementX2 = Math.min(fx2, elementX2);
-      elementY2 = Math.min(fy2, elementY2);
+  for (const element of elements) {
+    if (shouldIgnoreElementFromSelection(element)) {
+      continue;
     }
 
-    return (
-      element.locked === false &&
-      element.type !== "selection" &&
-      !isBoundToContainer(element) &&
-      selectionX1 <= elementX1 &&
-      selectionY1 <= elementY1 &&
-      selectionX2 >= elementX2 &&
-      selectionY2 >= elementY2
-    );
-  });
+    const strokeWidth = element.strokeWidth;
+    let labelAABB: Bounds | null = null;
+    let elementAABB = getElementBounds(element, elementsMap);
 
-  elementsInSelection = excludeElementsInFrames
-    ? excludeElementsInFramesFromSelection(elementsInSelection)
+    elementAABB = [
+      elementAABB[0] - strokeWidth / 2,
+      elementAABB[1] - strokeWidth / 2,
+      elementAABB[2] + strokeWidth / 2,
+      elementAABB[3] + strokeWidth / 2,
+    ] as Bounds;
+
+    // Whether the element bounds should include the bound text element bounds
+    const boundTextElement =
+      isArrowElement(element) && getBoundTextElement(element, elementsMap);
+    if (boundTextElement) {
+      const { x, y } = LinearElementEditor.getBoundTextElementPosition(
+        element,
+        boundTextElement,
+        elementsMap,
+      );
+      labelAABB = [
+        x,
+        y,
+        x + boundTextElement.width,
+        y + boundTextElement.height,
+      ] as Bounds;
+    }
+
+    // Clip element bounds by its containing frame (if any), since only the
+    // visible (frame-clipped) portion of the element is relevant for selection.
+    const associatedFrame = getContainingFrame(element, elementsMap);
+    if (
+      associatedFrame &&
+      elementOverlapsWithFrame(element, associatedFrame, elementsMap)
+    ) {
+      const frameAABB = getElementBounds(associatedFrame, elementsMap);
+      elementAABB = [
+        Math.max(elementAABB[0], frameAABB[0]),
+        Math.max(elementAABB[1], frameAABB[1]),
+        Math.min(elementAABB[2], frameAABB[2]),
+        Math.min(elementAABB[3], frameAABB[3]),
+      ] as Bounds;
+
+      labelAABB = labelAABB
+        ? ([
+            Math.max(labelAABB[0], frameAABB[0]),
+            Math.max(labelAABB[1], frameAABB[1]),
+            Math.min(labelAABB[2], frameAABB[2]),
+            Math.min(labelAABB[3], frameAABB[3]),
+          ] as Bounds)
+        : null;
+    }
+
+    const commonAABB = labelAABB
+      ? ([
+          Math.min(labelAABB[0], elementAABB[0]),
+          Math.min(labelAABB[1], elementAABB[1]),
+          Math.max(labelAABB[2], elementAABB[2]),
+          Math.max(labelAABB[3], elementAABB[3]),
+        ] as Bounds)
+      : elementAABB;
+
+    // ============== Evaluation ==============
+
+    // 1. If the selection box WRAPs the element's AABB, then add it to the
+    //    selection and move on, regardless of the selection mode.
+    //
+    //    PERF: This trick only works with axis-aligned box selection and the
+    //          current convex element shapes!
+    if (boundsContainBounds(selectionBounds, commonAABB)) {
+      if (framesInSelection && isFrameLikeElement(element)) {
+        framesInSelection.add(element.id);
+      }
+      elementsInSelection.push(element);
+      continue;
+    }
+
+    // 2. Handle the case where the label is overlapped by the selection box
+    if (
+      boxSelectionMode === "overlap" &&
+      labelAABB &&
+      doBoundsIntersect(selectionBounds, labelAABB)
+    ) {
+      elementsInSelection.push(element);
+      continue;
+    }
+
+    // 3. Handle the case where the selection is not wrapping the element, but
+    //    it does intersect the element's outline (non-AABB).
+    if (
+      boxSelectionMode === "overlap" &&
+      doBoundsIntersect(selectionBounds, elementAABB)
+    ) {
+      let hasIntersection = false;
+
+      // Preliminary check potential intersection imprecision
+      if (isLinearElement(element) || isFreeDrawElement(element)) {
+        const center = elementCenterPoint(element, elementsMap);
+        hasIntersection = element.points.some((point) => {
+          const rotatedPoint = pointRotateRads(
+            pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+            center,
+            element.angle,
+          );
+
+          return pointInsideBounds(rotatedPoint, selectionBounds);
+        });
+      } else {
+        const nonRotatedElementBounds = getElementBounds(
+          element,
+          elementsMap,
+          true,
+        );
+        const center = elementCenterPoint(element, elementsMap);
+        hasIntersection = [
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              (nonRotatedElementBounds[0] + nonRotatedElementBounds[2]) / 2,
+              nonRotatedElementBounds[1],
+            ),
+            center,
+            element.angle,
+          ),
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              nonRotatedElementBounds[2],
+              (nonRotatedElementBounds[1] + nonRotatedElementBounds[3]) / 2,
+            ),
+            center,
+            element.angle,
+          ),
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              (nonRotatedElementBounds[0] + nonRotatedElementBounds[2]) / 2,
+              nonRotatedElementBounds[3],
+            ),
+            center,
+            element.angle,
+          ),
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              nonRotatedElementBounds[0],
+              (nonRotatedElementBounds[1] + nonRotatedElementBounds[3]) / 2,
+            ),
+            center,
+            element.angle,
+          ),
+        ].some((point) => {
+          return pointInsideBounds(
+            pointRotateRads(point, center, element.angle),
+            selectionBounds,
+          );
+        });
+      }
+
+      if (!hasIntersection) {
+        hasIntersection = selectionEdges.some(
+          (selectionEdge) =>
+            intersectElementWithLineSegment(
+              element,
+              elementsMap,
+              selectionEdge,
+              strokeWidth / 2,
+              true, // Stop at first hit for better performance
+            ).length > 0,
+        );
+      }
+
+      if (hasIntersection) {
+        if (framesInSelection && isFrameLikeElement(element)) {
+          framesInSelection.add(element.id);
+        }
+
+        elementsInSelection.push(element);
+        continue;
+      }
+    }
+
+    // 4. We don't need to handle when the selection is inside the element
+    //    as it is separately handled in App.
+  }
+
+  elementsInSelection = framesInSelection
+    ? excludeElementsFromFrames(elementsInSelection, framesInSelection)
     : elementsInSelection;
 
   elementsInSelection = elementsInSelection.filter((element) => {
@@ -287,4 +511,20 @@ export const getSelectionStateForElements = (
       null,
     ),
   };
+};
+
+/**
+ * Returns editing or single-selected text element, if any.
+ */
+export const getActiveTextElement = (
+  selectedElements: readonly NonDeleted<ExcalidrawElement>[],
+  appState: Pick<AppState, "editingTextElement">,
+) => {
+  const activeTextElement =
+    appState.editingTextElement ||
+    (selectedElements.length === 1 &&
+      isTextElement(selectedElements[0]) &&
+      selectedElements[0]);
+
+  return activeTextElement || null;
 };
