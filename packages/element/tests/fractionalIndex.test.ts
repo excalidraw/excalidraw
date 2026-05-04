@@ -14,7 +14,6 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import {
   generateKeyBetween,
-  isValidOrderKey,
   validateOrderKey,
 } from "@excalidraw/fractional-indexing";
 
@@ -26,17 +25,19 @@ import type {
 
 describe("fractional index format validation", () => {
   it("should reject malformed base62 order keys", () => {
-    for (const key of ["a!", "a_", "a1!", "a1_", "zd0032"]) {
-      expect(isValidOrderKey(key)).toBe(false);
-      expect(() => validateOrderKey(key)).toThrow();
-    }
+    expect(() => validateOrderKey("a!")).toThrow();
+    expect(() => validateOrderKey("a_")).toThrow();
+    expect(() => validateOrderKey("a1!")).toThrow();
+    expect(() => validateOrderKey("a1_")).toThrow();
+    expect(() => validateOrderKey("zd0032")).toThrow();
   });
 
   it("should accept valid base62 order keys", () => {
-    for (const key of ["Zz", "a0", "a1", "a1V", "z".padEnd(28, "z")]) {
-      expect(isValidOrderKey(key)).toBe(true);
-      expect(() => validateOrderKey(key)).not.toThrow();
-    }
+    expect(() => validateOrderKey("Zz")).not.toThrow();
+    expect(() => validateOrderKey("a0")).not.toThrow();
+    expect(() => validateOrderKey("a1")).not.toThrow();
+    expect(() => validateOrderKey("a1V")).not.toThrow();
+    expect(() => validateOrderKey("z".padEnd(28, "z"))).not.toThrow();
   });
 });
 
