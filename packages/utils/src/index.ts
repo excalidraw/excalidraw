@@ -1,3 +1,3 @@
 export * from "./export";
-export * from "./deprecated";
+export * from "./bounds";
 export { getCommonBounds } from "@excalidraw/element";

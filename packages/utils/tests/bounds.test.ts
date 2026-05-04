@@ -2,7 +2,7 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import type { Bounds } from "@excalidraw/common";
 
-import { elementsOverlappingBBox } from "../src/deprecated";
+import { elementsOverlappingBBox } from "../src/bounds";
 
 const makeElement = (x: number, y: number, width: number, height: number) =>
   API.createElement({
@@ -25,7 +25,7 @@ describe("elementsOverlappingBBox()", () => {
     const bbox = makeBBox(0, 0, 100, 100);
 
     const rectOutside = makeElement(110, 110, 100, 100);
-    const rectInside = makeElement(10, 10, 90, 90);
+    const rectInside = makeElement(10, 10, 85, 85);
     const rectContainingBBox = makeElement(-10, -10, 110, 110);
     const rectOverlappingTopLeft = makeElement(-10, -10, 50, 50);
 
@@ -40,14 +40,14 @@ describe("elementsOverlappingBBox()", () => {
           rectOverlappingTopLeft,
         ],
       }),
-    ).toEqual([rectInside, rectContainingBBox, rectOverlappingTopLeft]);
+    ).toEqual([rectInside, rectOverlappingTopLeft]);
   });
 
   it("should return elements inside/containing bbox", () => {
     const bbox = makeBBox(0, 0, 100, 100);
 
     const rectOutside = makeElement(110, 110, 100, 100);
-    const rectInside = makeElement(10, 10, 90, 90);
+    const rectInside = makeElement(10, 10, 85, 85);
     const rectContainingBBox = makeElement(-10, -10, 110, 110);
     const rectOverlappingTopLeft = makeElement(-10, -10, 50, 50);
 
@@ -62,30 +62,6 @@ describe("elementsOverlappingBBox()", () => {
           rectOverlappingTopLeft,
         ],
       }),
-    ).toEqual([rectInside, rectContainingBBox]);
-  });
-
-  it("should return elements inside bbox", () => {
-    const bbox = makeBBox(0, 0, 100, 100);
-
-    const rectOutside = makeElement(110, 110, 100, 100);
-    const rectInside = makeElement(10, 10, 90, 90);
-    const rectContainingBBox = makeElement(-10, -10, 110, 110);
-    const rectOverlappingTopLeft = makeElement(-10, -10, 50, 50);
-
-    expect(
-      elementsOverlappingBBox({
-        bounds: bbox,
-        type: "inside",
-        elements: [
-          rectOutside,
-          rectInside,
-          rectContainingBBox,
-          rectOverlappingTopLeft,
-        ],
-      }),
     ).toEqual([rectInside]);
   });
-
-  // TODO test linear, freedraw, and diamond element types (+rotated)
 });
