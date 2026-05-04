@@ -307,6 +307,38 @@ describe("pasting & frames", () => {
       expect(h.elements.length).toBe(2);
       expect(h.elements[1].type).toBe(rect.type);
       expect(h.elements[1].frameId).toBe(frame.id);
+
+  it("should preserve denormalized pasted frame child order", async () => {
+    const frame = API.createElement({
+      type: "frame",
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    });
+    const frameChild = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 20,
+      height: 20,
+      frameId: frame.id,
+    });
+
+    const clipboardJSON = await serializeAsClipboardJSON({
+      elements: [frame, frameChild],
+      files: null,
+    });
+
+    mouse.moveTo(200, 200);
+
+    pasteWithCtrlCmdV(clipboardJSON);
+
+    await waitFor(() => {
+      expect(h.elements.length).toBe(2);
+      expect(h.elements[0].type).toBe(frame.type);
+      expect(h.elements[1].type).toBe(frameChild.type);
+      expect(h.elements[1].frameId).toBe(h.elements[0].id);
     });
   });
 
