@@ -35,9 +35,9 @@ The rest is standard Excalidraw: hand-drawn style, zoom/pan, export to PNG/SVG, 
 
 ```bash
 yarn install
-yarn start          # Excalidraw app (e.g. Vite dev server)
+yarn start           # Excalidraw app (e.g. Vite dev server)
 # In another terminal:
-node backend/index.js   # Backend on http://localhost:3000
+yarn start:backend   # Backend on http://localhost:3000
 ```
 
 Then use the **Terraform Import** flow in the app to upload:
@@ -49,6 +49,37 @@ Then use the **Terraform Import** flow in the app to upload:
 The backend stores the upload, generates the enriched graph, and returns an Excalidraw scene that the app inserts into the canvas.
 
 Import shortcut: `Ctrl/Cmd + Shift + K`.
+
+---
+
+## Generating Terraform Inputs
+
+To import your infrastructure, you need to generate a plan JSON and a graph DOT file from your Terraform or OpenTofu project.
+
+### 1. Generate Plan JSON
+This provides the resource details, diffs, and attributes.
+```bash
+# Terraform
+terraform plan -out=tfplan
+terraform show -json tfplan > plan.json
+
+# OpenTofu
+tofu plan -out=tfplan
+tofu show -json tfplan > plan.json
+```
+
+### 2. Generate Graph DOT
+This provides the dependency relationship data.
+```bash
+# Terraform
+terraform graph -type=plan > graph.dot
+
+# OpenTofu
+tofu graph -type=plan > graph.dot
+```
+
+### 3. State File (Optional)
+You can also upload your `terraform.tfstate` file to enrich the diagram with real ARNs, VPC IDs, and existing resource attributes.
 
 ---
 

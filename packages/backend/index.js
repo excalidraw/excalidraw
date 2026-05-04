@@ -27,19 +27,9 @@ const { nodesToExcalidraw } = require("./excalidraw");
 const app = express();
 const PORT = 3000;
 const upload = multer({ dest: "uploads/" });
-const TEMP_DIR = path.join(__dirname, "temp");
 
 app.use(cors());
 app.use(express.json());
-
-function writeJsonToTemp(data, filename) {
-  if (!fs.existsSync(TEMP_DIR)) {
-    fs.mkdirSync(TEMP_DIR, { recursive: true });
-  }
-  const filePath = path.join(TEMP_DIR, filename);
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
-  return filePath;
-}
 
 app.post(
   "/terraform/upload",
@@ -71,30 +61,11 @@ app.post(
       const state = stateContent ? JSON.parse(stateContent) : null;
       const graph = dot.read(dotContent);
 
-      console.log(
-        "Plan file:",
-        planFile.originalname,
-        planContent.length,
-        "chars",
-      );
-      console.log("Dot file:", dotFile.originalname, dotContent.length, "chars");
-      if (stateFile) {
-        console.log(
-          "State file:",
-          stateFile.originalname,
-          stateContent.length,
-          "chars",
-        );
-      }
-
       const adjlist = getAdjacencyListFromDot(graph);
-      writeJsonToTemp(adjlist, "adjlist.json");
 
       let nodes = loadPlanAndNodes(plan);
-      writeJsonToTemp(nodes, "nodes_dict.json");
 
       nodes = buildNewEdges(nodes, adjlist);
-      writeJsonToTemp(nodes, "nodes_new_edges.json");
 
       nodes = computeResourceDiffs(nodes);
       nodes = buildExistingEdges(nodes, plan);
@@ -109,7 +80,6 @@ app.post(
       nodes = cleanUpRoleLinks(nodes);
       nodes = filterVisualIgnore(nodes);
       nodes = deleteOrphanedNodes(nodes);
-      writeJsonToTemp(nodes, "nodes_final.json");
 
       const enrichment = mockLanggraphEnrichment(nodes);
       applyEnrichment(nodes, enrichment);
@@ -127,7 +97,6 @@ app.post(
       console.error(error);
       return res.status(500).json({
         error: error.message,
-        trace: error.stack,
       });
     } finally {
       for (const file of uploadedFiles) {

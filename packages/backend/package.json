@@ -1,0 +1,20 @@
+{
+  "name": "@excalidraw/backend",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@dagrejs/graphlib-dot": "1.0.2",
+    "better-sqlite3": "12.6.2",
+    "cors": "2.8.6",
+    "drizzle-orm": "0.45.1",
+    "express": "5.2.1",
+    "graphlib-dot": "0.6.4",
+    "multer": "2.0.2"
+  }
+}
