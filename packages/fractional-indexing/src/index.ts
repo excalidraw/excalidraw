@@ -78,13 +78,23 @@ function validateInteger(int: string): void {
  */
 
 function getIntegerLength(head: string): number {
+  const length = getIntegerLengthMaybe(head);
+
+  if (length !== undefined) {
+    return length;
+  }
+
+  throw new Error(`invalid order key head: ${head}`);
+}
+
+function getIntegerLengthMaybe(head: string): number | undefined {
   if (head >= "a" && head <= "z") {
     return head.charCodeAt(0) - "a".charCodeAt(0) + 2;
   } else if (head >= "A" && head <= "Z") {
     return "Z".charCodeAt(0) - head.charCodeAt(0) + 2;
   }
 
-  throw new Error(`invalid order key head: ${head}`);
+  return undefined;
 }
 
 /**
@@ -110,17 +120,61 @@ export function validateOrderKey(
   key: string,
   digits: string = BASE_62_DIGITS,
 ): void {
+  if (!isValidOrderKey(key, digits)) {
+    throw new Error(`invalid order key: ${key}`);
+  }
+}
+
+function isBase62Digit(char: string): boolean {
+  const code = char.charCodeAt(0);
+
+  return (
+    (code >= 48 && code <= 57) ||
+    (code >= 65 && code <= 90) ||
+    (code >= 97 && code <= 122)
+  );
+}
+
+function isValidDigit(char: string, digits: string): boolean {
+  if (digits === BASE_62_DIGITS) {
+    return isBase62Digit(char);
+  }
+
+  return digits.includes(char);
+}
+
+/**
+ * @param {string | null | undefined} key
+ * @param {string} digits
+ * @return {boolean}
+ */
+export function isValidOrderKey(
+  key: string | null | undefined,
+  digits: string = BASE_62_DIGITS,
+): key is string {
+  if (!key || !digits) {
+    return false;
+  }
+
+  const integerPartLength = getIntegerLengthMaybe(key[0]);
+
+  if (integerPartLength === undefined || integerPartLength > key.length) {
+    return false;
+  }
+
   if (key === `A${digits[0].repeat(26)}`) {
-    throw new Error(`invalid order key: ${key}`);
+    return false;
   }
-  // getIntegerPart will throw if the first character is bad,
-  // or the key is too short.  we'd call it to check these things
-  // even if we didn't need the result
-  const i = getIntegerPart(key);
-  const f = key.slice(i.length);
-  if (f.slice(-1) === digits[0]) {
-    throw new Error(`invalid order key: ${key}`);
+
+  for (let i = 1; i < key.length; i++) {
+    if (!isValidDigit(key[i], digits)) {
+      return false;
+    }
   }
+
+  const fractionalPart = key.slice(integerPartLength);
+
+  return fractionalPart.slice(-1) !== digits[0];
 }
 
 // note that this may return null, as there is a largest integer

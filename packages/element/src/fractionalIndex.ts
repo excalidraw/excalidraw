@@ -1,7 +1,7 @@
 import { arrayToMap } from "@excalidraw/common";
 
 import {
-  validateOrderKey,
+  isValidOrderKey,
   generateNKeysBetween,
 } from "@excalidraw/fractional-indexing";
 
@@ -65,11 +65,19 @@ export const validateFractionalIndices = (
     `${element?.index}:${element?.id}:${element?.type}:${element?.isDeleted}:${element?.version}:${element?.versionNonce}`;
 
   const indices = elements.map((x) => x.index);
+  const validIndexFormats = indices.map((index) => isValidOrderKey(index));
   for (const [i, index] of indices.entries()) {
     const predecessorIndex = indices[i - 1];
     const successorIndex = indices[i + 1];
 
-    if (!isValidFractionalIndex(index, predecessorIndex, successorIndex)) {
+    if (
+      !isValidFractionalIndex(
+        index,
+        predecessorIndex,
+        successorIndex,
+        validIndexFormats[i],
+      )
+    ) {
       errorMessages.push(
         `Fractional indices invariant has been compromised: "${stringifyElement(
           elements[i - 1],
@@ -278,6 +286,12 @@ const getMovedIndicesGroups = (
  */
 const getInvalidIndicesGroups = (elements: readonly ExcalidrawElement[]) => {
   const indicesGroups: number[][] = [];
+  // Cache format validity once and reuse it for both current-index checks and
+  // bound selection. This keeps malformed keys repairable instead of letting
+  // them reach `generateNKeysBetween`, where invalid bounds would throw.
+  const validIndexFormats = elements.map((element) =>
+    isValidOrderKey(element.index),
+  );
 
   // once we find lowerBound / upperBound, it cannot be lower than that, so we cache it for better perf.
   let lowerBound: ExcalidrawElement["index"] | undefined = undefined;
@@ -285,16 +299,19 @@ const getInvalidIndicesGroups = (elements: readonly ExcalidrawElement[]) => {
   let lowerBoundIndex: number = -1;
   let upperBoundIndex: number = 0;
 
+  // Only format-valid keys can be generation bounds; malformed neighboring
+  // indices are part of the invalid group that needs to be regenerated.
+  const getValidIndex = (index: number) =>
+    validIndexFormats[index] ? elements[index]?.index : undefined;
+
   /** @returns maybe valid lowerBound */
   const getLowerBound = (
     index: number,
   ): [ExcalidrawElement["index"] | undefined, number] => {
-    const lowerBound = elements[lowerBoundIndex]
-      ? elements[lowerBoundIndex].index
-      : undefined;
+    const lowerBound = getValidIndex(lowerBoundIndex);
 
     // we are already iterating left to right, therefore there is no need for additional looping
-    const candidate = elements[index - 1]?.index;
+    const candidate = getValidIndex(index - 1);
 
     if (
       (!lowerBound && candidate) || // first lowerBound
@@ -312,9 +329,7 @@ const getInvalidIndicesGroups = (elements: readonly ExcalidrawElement[]) => {
   const getUpperBound = (
     index: number,
   ): [ExcalidrawElement["index"] | undefined, number] => {
-    const upperBound = elements[upperBoundIndex]
-      ? elements[upperBoundIndex].index
-      : undefined;
+    const upperBound = getValidIndex(upperBoundIndex);
 
     // cache hit! don't let it find the upper bound again
     if (upperBound && index < upperBoundIndex) {
@@ -324,7 +339,7 @@ const getInvalidIndicesGroups = (elements: readonly ExcalidrawElement[]) => {
     // set the current upperBoundIndex as the starting point
     let i = upperBoundIndex;
     while (++i < elements.length) {
-      const candidate = elements[i]?.index;
+      const candidate = getValidIndex(i);
 
       if (
         (!upperBound && candidate) || // first upperBound
@@ -345,7 +360,14 @@ const getInvalidIndicesGroups = (elements: readonly ExcalidrawElement[]) => {
     [lowerBound, lowerBoundIndex] = getLowerBound(i);
     [upperBound, upperBoundIndex] = getUpperBound(i);
 
-    if (!isValidFractionalIndex(current, lowerBound, upperBound)) {
+    if (
+      !isValidFractionalIndex(
+        current,
+        lowerBound,
+        upperBound,
+        validIndexFormats[i],
+      )
+    ) {
       // push the lower bound index as the first item
       const indicesGroup = [lowerBoundIndex, i];
 
@@ -354,7 +376,14 @@ const getInvalidIndicesGroups = (elements: readonly ExcalidrawElement[]) => {
         const [nextLowerBound, nextLowerBoundIndex] = getLowerBound(i);
         const [nextUpperBound, nextUpperBoundIndex] = getUpperBound(i);
 
-        if (isValidFractionalIndex(current, nextLowerBound, nextUpperBound)) {
+        if (
+          isValidFractionalIndex(
+            current,
+            nextLowerBound,
+            nextUpperBound,
+            validIndexFormats[i],
+          )
+        ) {
           break;
         }
 
@@ -380,15 +409,9 @@ const isValidFractionalIndex = (
   index: ExcalidrawElement["index"] | undefined,
   predecessor: ExcalidrawElement["index"] | undefined,
   successor: ExcalidrawElement["index"] | undefined,
+  hasValidFormat = isValidOrderKey(index),
 ) => {
-  if (!index) {
-    return false;
-  }
-
-  try {
-    // Format validation
-    validateOrderKey(index);
-  } catch {
+  if (!hasValidFormat || !index) {
     return false;
   }
 

@@ -12,13 +12,33 @@ import { deepCopyElement } from "@excalidraw/element";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import { generateKeyBetween } from "@excalidraw/fractional-indexing";
+import {
+  generateKeyBetween,
+  isValidOrderKey,
+  validateOrderKey,
+} from "@excalidraw/fractional-indexing";
 
 import type {
   ElementsMap,
   ExcalidrawElement,
   FractionalIndex,
 } from "@excalidraw/element/types";
+
+describe("fractional index format validation", () => {
+  it("should reject malformed base62 order keys", () => {
+    for (const key of ["a!", "a_", "a1!", "a1_", "zd0032"]) {
+      expect(isValidOrderKey(key)).toBe(false);
+      expect(() => validateOrderKey(key)).toThrow();
+    }
+  });
+
+  it("should accept valid base62 order keys", () => {
+    for (const key of ["Zz", "a0", "a1", "a1V", "z".padEnd(28, "z")]) {
+      expect(isValidOrderKey(key)).toBe(true);
+      expect(() => validateOrderKey(key)).not.toThrow();
+    }
+  });
+});
 
 describe("sync invalid indices with array order", () => {
   describe("should NOT sync empty array", () => {
@@ -118,6 +138,24 @@ describe("sync invalid indices with array order", () => {
         { id: "A", index: "a1" },
         { id: "B", index: "zd0032" },
         { id: "C", index: "a3" },
+      ],
+      expect: {
+        unchangedElements: ["A", "C"],
+      },
+    });
+
+    testInvalidIndicesSync({
+      elements: [{ id: "A", index: "a!" }],
+      expect: {
+        unchangedElements: [],
+      },
+    });
+
+    testInvalidIndicesSync({
+      elements: [
+        { id: "A", index: "a1" },
+        { id: "B", index: "a!" },
+        { id: "C", index: "a2" },
       ],
       expect: {
         unchangedElements: ["A", "C"],
