@@ -763,8 +763,8 @@ function buildTerraformResourceDetails(node) {
           value: Object.prototype.hasOwnProperty.call(config, key)
             ? config[key]
             : unknownAfter
-            ? UNKNOWN_VALUE_PLACEHOLDER
-            : fieldDiff?.after ?? null,
+              ? UNKNOWN_VALUE_PLACEHOLDER
+              : fieldDiff?.after ?? null,
           changed: Boolean(fieldDiff),
           unknownAfter,
           before: fieldDiff?.before,
@@ -811,7 +811,7 @@ function getModulePathChain(nodePath) {
   const chain = [];
   let cursor = "";
 
-  for (let i = 0; i < parts.length - 1; ) {
+  for (let i = 0; i < parts.length - 1;) {
     if (parts[i] !== "module" || !parts[i + 1]) {
       break;
     }
@@ -828,7 +828,7 @@ function getModuleDepthFromPath(modulePath) {
   const parts = modulePath.split(".");
   let depth = 0;
 
-  for (let i = 0; i < parts.length - 1; ) {
+  for (let i = 0; i < parts.length - 1;) {
     if (parts[i] === "module" && parts[i + 1]) {
       depth += 1;
       i += 2;
@@ -844,7 +844,7 @@ function getModuleDisplayLabel(modulePath) {
   const parts = modulePath.split(".");
   const names = [];
 
-  for (let i = 0; i < parts.length - 1; ) {
+  for (let i = 0; i < parts.length - 1;) {
     if (parts[i] === "module" && parts[i + 1]) {
       names.push(parts[i + 1]);
       i += 2;
@@ -1655,7 +1655,7 @@ function getCenterClippedBindingPoints(posA, posB, wA, hA, wB, hB) {
 }
 
 // --- Edge collection ---
-
+//each element has outgoing edges, find them and map them nicely
 function collectDirectedEdges(nodes) {
   const edgeMap = new Map();
 
@@ -1696,6 +1696,7 @@ function collectDirectedEdges(nodes) {
   }));
 }
 
+//coalescing edges from A to B and B to A into one
 function coalesceRelationshipPairs(directedEdges) {
   const pairMap = new Map();
 

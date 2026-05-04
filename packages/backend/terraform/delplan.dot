@@ -1,0 +1,30 @@
+digraph {
+	compound = "true"
+	newrank = "true"
+	subgraph "root" {
+		"[root] module.lambda-reader.aws_cloudwatch_log_group.lambda[0] (destroy)" [label = "module.lambda-reader.aws_cloudwatch_log_group.lambda", shape = "box"]
+		"[root] module.lambda-reader.aws_iam_role.lambda[0] (destroy)" [label = "module.lambda-reader.aws_iam_role.lambda", shape = "box"]
+		"[root] module.lambda-reader.aws_iam_role_policy.additional_inline[0] (destroy)" [label = "module.lambda-reader.aws_iam_role_policy.additional_inline", shape = "box"]
+		"[root] module.lambda-reader.aws_iam_role_policy.logs[0] (destroy)" [label = "module.lambda-reader.aws_iam_role_policy.logs", shape = "box"]
+		"[root] module.lambda-reader.aws_lambda_function.this[0] (destroy)" [label = "module.lambda-reader.aws_lambda_function.this", shape = "box"]
+		"[root] module.lambda-reader.terraform_data.package_filename_for_hash[0] (destroy)" [label = "module.lambda-reader.terraform_data.package_filename_for_hash", shape = "box"]
+		"[root] provider[\"registry.opentofu.org/hashicorp/aws\"]" [label = "provider[\"registry.opentofu.org/hashicorp/aws\"]", shape = "diamond"]
+		"[root] provider[\"terraform.io/builtin/terraform\"]" [label = "provider[\"terraform.io/builtin/terraform\"]", shape = "diamond"]
+		"[root] module.lambda-reader.aws_cloudwatch_log_group.lambda[0] (destroy)" -> "[root] module.lambda-reader.aws_iam_role_policy.logs[0] (destroy)"
+		"[root] module.lambda-reader.aws_iam_role.lambda[0] (destroy)" -> "[root] module.lambda-reader.aws_iam_role_policy.additional_inline[0] (destroy)"
+		"[root] module.lambda-reader.aws_iam_role.lambda[0] (destroy)" -> "[root] module.lambda-reader.aws_iam_role_policy.logs[0] (destroy)"
+		"[root] module.lambda-reader.aws_iam_role_policy.additional_inline[0] (destroy)" -> "[root] module.lambda-reader.aws_lambda_function.this[0] (destroy)"
+		"[root] module.lambda-reader.aws_iam_role_policy.logs[0] (destroy)" -> "[root] module.lambda-reader.aws_lambda_function.this[0] (destroy)"
+		"[root] module.lambda-reader.aws_lambda_function.this[0] (destroy)" -> "[root] provider[\"registry.opentofu.org/hashicorp/aws\"]"
+		"[root] module.lambda-reader.terraform_data.package_filename_for_hash[0] (destroy)" -> "[root] module.lambda-reader.aws_lambda_function.this[0] (destroy)"
+		"[root] module.lambda-reader.terraform_data.package_filename_for_hash[0] (destroy)" -> "[root] provider[\"terraform.io/builtin/terraform\"]"
+		"[root] provider[\"registry.opentofu.org/hashicorp/aws\"] (close)" -> "[root] module.lambda-reader.aws_cloudwatch_log_group.lambda[0] (destroy)"
+		"[root] provider[\"registry.opentofu.org/hashicorp/aws\"] (close)" -> "[root] module.lambda-reader.aws_iam_role.lambda[0] (destroy)"
+		"[root] provider[\"terraform.io/builtin/terraform\"] (close)" -> "[root] module.lambda-reader.terraform_data.package_filename_for_hash[0] (destroy)"
+		"[root] root" -> "[root] module.lambda-reader (close)"
+		"[root] root" -> "[root] module.lambda-writer (close)"
+		"[root] root" -> "[root] provider[\"registry.opentofu.org/hashicorp/aws\"] (close)"
+		"[root] root" -> "[root] provider[\"terraform.io/builtin/terraform\"] (close)"
+	}
+}
+
