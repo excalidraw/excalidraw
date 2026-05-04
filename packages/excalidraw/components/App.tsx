@@ -341,6 +341,7 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import { toggleTerraformExplode } from "./terraformVisibility";
 import { trackEvent } from "../analytics";
 import { AnimationFrameHandler } from "../animation-frame-handler";
 import {
@@ -501,6 +502,47 @@ import type { Action, ActionResult } from "../actions/types";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
+
+const getTerraformResourceElementForSelection = (
+  app: AppClassProperties,
+  appState: Readonly<AppState>,
+) =>
+  app.scene
+    .getSelectedElements(appState)
+    .find(
+      (element) => element.customData?.terraformVisibilityRole === "resource",
+    ) || null;
+
+const actionToggleTerraformExplode: Action = {
+  name: "toggleTerraformExplode",
+  label: (_elements, appState, app) => {
+    const terraformElement = getTerraformResourceElementForSelection(
+      app,
+      appState,
+    );
+    return terraformElement?.customData?.terraformExploded === true
+      ? "labels.terraform.collapseDependencies"
+      : "labels.terraform.expandDependencies";
+  },
+  trackEvent: { category: "element", action: "toggleTerraformExplode" },
+  predicate: (_elements, appState, _appProps, app) =>
+    Boolean(getTerraformResourceElementForSelection(app, appState)),
+  perform: (elements, appState, _formData, app) => {
+    const terraformElement = getTerraformResourceElementForSelection(
+      app,
+      appState,
+    );
+    if (!terraformElement) {
+      return false;
+    }
+
+    return {
+      elements: toggleTerraformExplode(elements, terraformElement),
+      appState: null,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+};
 
 const editorInterfaceContextInitialValue: EditorInterface = {
   formFactor: "desktop",
@@ -4990,6 +5032,14 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         event.preventDefault();
         this.setState({ openDialog: { name: "imageExport" } });
+        return;
+      } else if (
+        event.key.toLowerCase() === KEYS.K &&
+        event.shiftKey &&
+        event[KEYS.CTRL_OR_CMD]
+      ) {
+        event.preventDefault();
+        this.setState({ openDialog: { name: "terraformImport" } });
         return;
       }
 
@@ -12555,6 +12605,7 @@ class App extends React.Component<AppProps, AppState> {
       actionSelectAllElementsInFrame,
       actionRemoveAllElementsFromFrame,
       actionWrapSelectionInFrame,
+      actionToggleTerraformExplode,
       CONTEXT_MENU_SEPARATOR,
       actionToggleCropEditor,
       CONTEXT_MENU_SEPARATOR,

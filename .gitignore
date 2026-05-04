@@ -1,4 +1,13 @@
 .DS_Store
+.env
+**/uploads/
+**/temp/
+graph.db
+graph.db-shm
+graph.db-wal
+*.tfstate
+*.tfstate.backup
+pluralith-*.pdf
 .env.development.local
 .env.local
 .env.production.local
@@ -27,3 +36,10 @@ dev-dist
 html
 meta*.json
 .claude
+*.iml
+**/terraform/.terraform.lock.hcl
+**/terraform/.terraform/
+**/terraform/builds/
+**/terraform/*plan*
+**/terraform/*.dot
+**/terraform/.pluralith/

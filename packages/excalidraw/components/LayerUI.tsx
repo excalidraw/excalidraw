@@ -10,13 +10,16 @@ import {
   isShallowEqual,
 } from "@excalidraw/common";
 
-import { mutateElement } from "@excalidraw/element";
+import { mutateElement, newElementWith } from "@excalidraw/element";
 
 import { showSelectedShapeActions } from "@excalidraw/element";
 
 import { ShapeCache } from "@excalidraw/element";
 
-import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import { actionToggleStats } from "../actions";
 import { trackEvent } from "../analytics";
@@ -57,6 +60,7 @@ import { FixedSideContainer } from "./FixedSideContainer";
 import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
+import { TerraformImportDialog } from "./TerraformImportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
@@ -137,6 +141,451 @@ const DefaultOverwriteConfirmDialog = () => {
   );
 };
 
+type TerraformAttribute = {
+  key: string;
+  value: unknown;
+  changed?: boolean;
+  unknownAfter?: boolean;
+  before?: unknown;
+  after?: unknown;
+};
+
+type TerraformResourceDetails = {
+  address?: string;
+  type?: string;
+  name?: string;
+  mode?: string;
+  actions?: string[];
+  attributes?: TerraformAttribute[];
+};
+
+const TERRAFORM_GROUP_FLAGS = [
+  "terraformModuleGroup",
+  "terraformAccountGroup",
+  "terraformRegionGroup",
+  "terraformVpcGroup",
+  "terraformSubnetGroup",
+] as const;
+
+const isTerraformResourceElement = (element: NonDeletedExcalidrawElement) =>
+  element.customData?.terraform && Boolean(element.customData?.nodePath);
+
+const isTerraformGroupElement = (element: NonDeletedExcalidrawElement) =>
+  TERRAFORM_GROUP_FLAGS.some((flag) => Boolean(element.customData?.[flag]));
+
+const isTerraformInspectableElement = (element: NonDeletedExcalidrawElement) =>
+  isTerraformResourceElement(element) || isTerraformGroupElement(element);
+
+const TERRAFORM_DEPENDENCY_PREVIEW_OPACITY = 25;
+
+const isTerraformDependencyEdge = (element: ExcalidrawElement) =>
+  element.customData?.terraformEdgeLayer === "dependency";
+
+const isTerraformDependencyPreviewEdge = (element: ExcalidrawElement) =>
+  element.customData?.terraformDependencyPreview === true;
+
+const dependencyEdgeTouchesTerraformNode = (
+  element: ExcalidrawElement,
+  nodePath: string,
+) => {
+  const relationship = element.customData?.relationship;
+
+  if (relationship?.source === nodePath || relationship?.target === nodePath) {
+    return true;
+  }
+
+  return Boolean(
+    Array.isArray(relationship?.directions) &&
+      relationship.directions.some(
+        (direction: { source?: unknown; target?: unknown }) =>
+          direction.source === nodePath || direction.target === nodePath,
+      ),
+  );
+};
+
+const clearTerraformDependencyPreviewData = (
+  customData: ExcalidrawElement["customData"],
+) => {
+  const nextCustomData = { ...(customData ?? {}) };
+  delete nextCustomData.terraformDependencyPreview;
+  return nextCustomData;
+};
+
+const tryParseJsonString = (value: string): unknown | null => {
+  const trimmed = value.trim();
+  if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    return null;
+  }
+};
+
+const formatTerraformPanelValue = (value: unknown) => {
+  if (value === null || typeof value === "undefined" || value === "") {
+    return "None";
+  }
+
+  if (typeof value === "string") {
+    const parsed = tryParseJsonString(value);
+    if (parsed && typeof parsed === "object") {
+      try {
+        return JSON.stringify(parsed, null, 2);
+      } catch {
+        return value;
+      }
+    }
+    return value;
+  }
+
+  if (typeof value === "object") {
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch {
+      return String(value);
+    }
+  }
+
+  return String(value);
+};
+
+const TerraformConfigValue = ({ value }: { value: unknown }) => {
+  const formatted = formatTerraformPanelValue(value);
+  const parsed = typeof value === "string" ? tryParseJsonString(value) : null;
+  if (
+    (typeof value === "object" && value !== null) ||
+    (parsed && typeof parsed === "object")
+  ) {
+    return <pre>{formatted}</pre>;
+  }
+  return <>{formatted}</>;
+};
+
+const getTerraformElementForSelection = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: UIAppState,
+) => {
+  const selectedIds = Object.keys(appState.selectedElementIds);
+  if (selectedIds.length === 0) {
+    return null;
+  }
+
+  const selectedElements = elements.filter(
+    (element) => appState.selectedElementIds[element.id],
+  );
+
+  const selectedTerraformNode = selectedElements.find((element) =>
+    isTerraformResourceElement(element),
+  );
+  if (selectedTerraformNode) {
+    return selectedTerraformNode;
+  }
+
+  const selectedTerraformGroup = selectedElements.find((element) =>
+    isTerraformGroupElement(element),
+  );
+  if (selectedTerraformGroup) {
+    return selectedTerraformGroup;
+  }
+
+  const selectedTerraformContainer = selectedElements.find(
+    (element) =>
+      "containerId" in element &&
+      Boolean(element.containerId) &&
+      elements.some(
+        (candidate) =>
+          candidate.id === element.containerId &&
+          isTerraformInspectableElement(candidate),
+      ),
+  );
+  if (
+    selectedTerraformContainer &&
+    "containerId" in selectedTerraformContainer &&
+    selectedTerraformContainer.containerId
+  ) {
+    const container = elements.find(
+      (element) => element.id === selectedTerraformContainer.containerId,
+    );
+    if (container && isTerraformInspectableElement(container)) {
+      return container;
+    }
+  }
+
+  const selectedGroupIds = new Set<string>([
+    ...Object.keys(appState.selectedGroupIds),
+    ...selectedElements.flatMap((element) => element.groupIds || []),
+  ]);
+
+  if (selectedGroupIds.size === 0) {
+    return null;
+  }
+
+  const groupedTerraformElements = elements.filter(
+    (element) =>
+      isTerraformInspectableElement(element) &&
+      (element.groupIds || []).some((groupId) => selectedGroupIds.has(groupId)),
+  );
+
+  return groupedTerraformElements.length === 1
+    ? groupedTerraformElements[0]
+    : null;
+};
+
+const getTerraformGroupKind = (customData: Record<string, any>) => {
+  if (customData.terraformModuleGroup) {
+    return "Module";
+  }
+  if (customData.terraformSubnetGroup) {
+    return "Subnet";
+  }
+  if (customData.terraformVpcGroup) {
+    return "VPC";
+  }
+  if (customData.terraformRegionGroup) {
+    return "Region";
+  }
+  if (customData.terraformAccountGroup) {
+    return "Account";
+  }
+  return "Group";
+};
+
+const getTerraformGroupTitle = (customData: Record<string, any>) => {
+  if (customData.modulePath) {
+    return customData.modulePath;
+  }
+  if (customData.subnetLabel || customData.subnetId) {
+    return customData.subnetLabel || customData.subnetId;
+  }
+  if (customData.vpcLabel || customData.vpcId) {
+    return customData.vpcLabel || customData.vpcId;
+  }
+  if (customData.region) {
+    return customData.region;
+  }
+  if (customData.accountId) {
+    return customData.accountId;
+  }
+  return "Terraform group";
+};
+
+const TerraformGroupActions = ({
+  element,
+  renderAction,
+}: {
+  element: NonDeletedExcalidrawElement;
+  renderAction: ActionManager["renderAction"];
+}) => {
+  const customData = element.customData ?? {};
+  const rows = [
+    ["Module path", customData.modulePath],
+    ["Source", customData.moduleSource],
+    ["Version", customData.moduleVersion],
+    ["Account", customData.accountId],
+    ["Region", customData.region],
+    ["VPC", customData.vpcLabel || customData.vpcId],
+    ["Subnet", customData.subnetLabel || customData.subnetId],
+  ].filter(([, value]) => value !== null && typeof value !== "undefined");
+
+  return (
+    <div className="selected-shape-actions terraform-element-actions">
+      <div className="terraform-element-actions__header">
+        <div className="terraform-element-actions__eyebrow">Terraform</div>
+        <div className="terraform-element-actions__title">
+          {formatTerraformPanelValue(getTerraformGroupTitle(customData))}
+        </div>
+        <div className="terraform-element-actions__summary">
+          <span>{getTerraformGroupKind(customData)}</span>
+        </div>
+      </div>
+
+      <div className="terraform-element-actions__meta">
+        {rows.map(([label, value]) => (
+          <div className="terraform-element-actions__row" key={label}>
+            <div className="terraform-element-actions__label">{label}</div>
+            <div className="terraform-element-actions__value">
+              {formatTerraformPanelValue(value)}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <fieldset>
+        <legend>{t("labels.actions")}</legend>
+        <div className="buttonList">
+          {renderAction("duplicateSelection")}
+          {renderAction("deleteSelectedElements")}
+          {renderAction("hyperlink")}
+        </div>
+      </fieldset>
+    </div>
+  );
+};
+
+const TerraformElementActions = ({
+  element,
+  renderAction,
+}: {
+  element: NonDeletedExcalidrawElement;
+  renderAction: ActionManager["renderAction"];
+}) => {
+  const customData = element.customData ?? {};
+
+  if (isTerraformGroupElement(element)) {
+    return (
+      <TerraformGroupActions element={element} renderAction={renderAction} />
+    );
+  }
+
+  const resources: TerraformResourceDetails[] = Array.isArray(
+    customData.terraformResources,
+  )
+    ? customData.terraformResources
+    : [];
+  const changedCount = resources.reduce(
+    (count, resource) =>
+      count +
+      (resource.attributes || []).filter((attribute) => attribute.changed)
+        .length,
+    0,
+  );
+  const attributeCount = resources.reduce(
+    (count, resource) => count + (resource.attributes || []).length,
+    0,
+  );
+
+  return (
+    <div className="selected-shape-actions terraform-element-actions">
+      <div className="terraform-element-actions__header">
+        <div className="terraform-element-actions__eyebrow">Terraform</div>
+        <div className="terraform-element-actions__title">
+          {formatTerraformPanelValue(customData.resourceType ?? element.type)}
+        </div>
+        <div className="terraform-element-actions__summary">
+          <span>{formatTerraformPanelValue(customData.action)}</span>
+          <span>
+            {changedCount} changed / {attributeCount} shown
+          </span>
+        </div>
+      </div>
+
+      <div className="terraform-element-actions__meta">
+        <div className="terraform-element-actions__row">
+          <div className="terraform-element-actions__label">Resource</div>
+          <div className="terraform-element-actions__value">
+            {formatTerraformPanelValue(customData.nodePath ?? element.id)}
+          </div>
+        </div>
+        <div className="terraform-element-actions__row">
+          <div className="terraform-element-actions__label">Type</div>
+          <div className="terraform-element-actions__value">
+            {formatTerraformPanelValue(customData.resourceType ?? element.type)}
+          </div>
+        </div>
+      </div>
+
+      <div className="terraform-element-actions__config">
+        {resources.length > 0 ? (
+          resources.map((resource, resourceIndex) => {
+            const attributes = resource.attributes || [];
+            return (
+              <div
+                className="terraform-element-actions__resource"
+                key={resource.address || resourceIndex}
+              >
+                {resources.length > 1 && (
+                  <div className="terraform-element-actions__resource-title">
+                    {formatTerraformPanelValue(
+                      resource.address || `Resource ${resourceIndex + 1}`,
+                    )}
+                  </div>
+                )}
+                {attributes.length > 0 ? (
+                  attributes.map((attribute) => (
+                    <div
+                      className={clsx("terraform-element-actions__attribute", {
+                        "terraform-element-actions__attribute--changed":
+                          attribute.changed,
+                      })}
+                      key={attribute.key}
+                    >
+                      <div className="terraform-element-actions__attribute-head">
+                        <span>{attribute.key}</span>
+                        {attribute.unknownAfter ? (
+                          <strong>after apply</strong>
+                        ) : (
+                          attribute.changed && <strong>changed</strong>
+                        )}
+                      </div>
+                      {attribute.unknownAfter ? (
+                        <div className="terraform-element-actions__value terraform-element-actions__value--config">
+                          <em>{formatTerraformPanelValue(attribute.value)}</em>
+                        </div>
+                      ) : attribute.changed ? (
+                        <div className="terraform-element-actions__diff">
+                          <div>
+                            <span>Before</span>
+                            <TerraformConfigValue value={attribute.before} />
+                          </div>
+                          <div>
+                            <span>After</span>
+                            <TerraformConfigValue
+                              value={
+                                typeof attribute.after === "undefined"
+                                  ? attribute.value
+                                  : attribute.after
+                              }
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="terraform-element-actions__value terraform-element-actions__value--config">
+                          <TerraformConfigValue value={attribute.value} />
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="terraform-element-actions__empty">
+                    No config attributes in this Terraform plan entry.
+                  </div>
+                )}
+              </div>
+            );
+          })
+        ) : (
+          <div className="terraform-element-actions__empty">
+            Re-import this Terraform graph to include config and diff data.
+          </div>
+        )}
+      </div>
+
+      {resources[0]?.address && (
+        <div className="terraform-element-actions__meta">
+          <div className="terraform-element-actions__row">
+            <div className="terraform-element-actions__label">Address</div>
+            <div className="terraform-element-actions__value">
+              {formatTerraformPanelValue(resources[0].address)}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <fieldset>
+        <legend>{t("labels.actions")}</legend>
+        <div className="buttonList">
+          {renderAction("duplicateSelection")}
+          {renderAction("deleteSelectedElements")}
+          {renderAction("hyperlink")}
+        </div>
+      </fieldset>
+    </div>
+  );
+};
+
 const LayerUI = ({
   actionManager,
   appState,
@@ -186,6 +635,71 @@ const LayerUI = ({
 
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
 
+  React.useEffect(() => {
+    const terraformElement = getTerraformElementForSelection(
+      elements,
+      appState,
+    );
+    const selectedNodePath =
+      typeof terraformElement?.customData?.nodePath === "string"
+        ? terraformElement.customData.nodePath
+        : null;
+    const allElements = app.scene.getElementsIncludingDeleted();
+    const dependencyLayerVisible = allElements.some(
+      (element) =>
+        isTerraformDependencyEdge(element) &&
+        !isTerraformDependencyPreviewEdge(element) &&
+        !element.isDeleted,
+    );
+    let didChange = false;
+
+    const nextElements = allElements.map((element) => {
+      if (!isTerraformDependencyEdge(element)) {
+        return element;
+      }
+
+      const isPreview = isTerraformDependencyPreviewEdge(element);
+      const shouldPreview =
+        !dependencyLayerVisible &&
+        selectedNodePath !== null &&
+        dependencyEdgeTouchesTerraformNode(element, selectedNodePath);
+
+      if (shouldPreview) {
+        if (
+          !element.isDeleted &&
+          isPreview &&
+          element.opacity === TERRAFORM_DEPENDENCY_PREVIEW_OPACITY
+        ) {
+          return element;
+        }
+        didChange = true;
+        return newElementWith(element, {
+          isDeleted: false,
+          opacity: TERRAFORM_DEPENDENCY_PREVIEW_OPACITY,
+          customData: {
+            ...(element.customData ?? {}),
+            terraformDependencyPreview: true,
+          },
+        });
+      }
+
+      if (isPreview) {
+        didChange = true;
+        return newElementWith(element, {
+          isDeleted: true,
+          opacity: 100,
+          customData: clearTerraformDependencyPreviewData(element.customData),
+        });
+      }
+
+      return element;
+    });
+
+    if (didChange) {
+      app.scene.replaceAllElements(nextElements);
+    }
+  }, [app, appState, elements]);
+
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
       return null;
@@ -225,6 +739,18 @@ const LayerUI = ({
     );
   };
 
+  const renderTerraformImportDialog = () => {
+    if (appState.openDialog?.name !== "terraformImport") {
+      return null;
+    }
+
+    return (
+      <TerraformImportDialog
+        onCloseRequest={() => setAppState({ openDialog: null })}
+      />
+    );
+  };
+
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
       {/* wrapping to Fragment stops React from occasionally complaining
@@ -236,6 +762,13 @@ const LayerUI = ({
 
   const renderSelectedShapeActions = () => {
     const isCompactMode = isCompactStylesPanel;
+    const terraformElement = getTerraformElementForSelection(
+      elements,
+      appState,
+    );
+    const terraformMenuWidth = terraformElement
+      ? "min(36rem, calc(100vw - 2rem))"
+      : undefined;
 
     return (
       <Section
@@ -252,15 +785,23 @@ const LayerUI = ({
               // we want to make sure this doesn't overflow so subtracting the
               // approximate height of hamburgerMenu + footer
               maxHeight: `${appState.height - 166}px`,
+              width: terraformMenuWidth,
             }}
           >
-            <CompactShapeActions
-              appState={appState}
-              elementsMap={app.scene.getNonDeletedElementsMap()}
-              renderAction={actionManager.renderAction}
-              app={app}
-              setAppState={setAppState}
-            />
+            {terraformElement ? (
+              <TerraformElementActions
+                element={terraformElement}
+                renderAction={actionManager.renderAction}
+              />
+            ) : (
+              <CompactShapeActions
+                appState={appState}
+                elementsMap={app.scene.getNonDeletedElementsMap()}
+                renderAction={actionManager.renderAction}
+                app={app}
+                setAppState={setAppState}
+              />
+            )}
           </Island>
         ) : (
           <Island
@@ -270,14 +811,22 @@ const LayerUI = ({
               // we want to make sure this doesn't overflow so subtracting the
               // approximate height of hamburgerMenu + footer
               maxHeight: `${appState.height - 166}px`,
+              width: terraformMenuWidth,
             }}
           >
-            <SelectedShapeActions
-              appState={appState}
-              elementsMap={app.scene.getNonDeletedElementsMap()}
-              renderAction={actionManager.renderAction}
-              app={app}
-            />
+            {terraformElement ? (
+              <TerraformElementActions
+                element={terraformElement}
+                renderAction={actionManager.renderAction}
+              />
+            ) : (
+              <SelectedShapeActions
+                appState={appState}
+                elementsMap={app.scene.getNonDeletedElementsMap()}
+                renderAction={actionManager.renderAction}
+                app={app}
+              />
+            )}
           </Island>
         )}
       </Section>
@@ -556,6 +1105,7 @@ const LayerUI = ({
       )}
       <tunnels.OverwriteConfirmDialogTunnel.Out />
       {renderImageExportDialog()}
+      {renderTerraformImportDialog()}
       {renderJSONExportDialog()}
       {appState.openDialog?.name === "charts" && (
         <PasteChartDialog
@@ -576,6 +1126,7 @@ const LayerUI = ({
           actionManager={actionManager}
           renderJSONExportDialog={renderJSONExportDialog}
           renderImageExportDialog={renderImageExportDialog}
+          renderTerraformImportDialog={renderTerraformImportDialog}
           setAppState={setAppState}
           onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}

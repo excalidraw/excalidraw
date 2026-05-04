@@ -1,6 +1,7 @@
 import clsx from "clsx";
 
 import { THEME } from "@excalidraw/common";
+import { newElementWith } from "@excalidraw/element";
 
 import type { Theme } from "@excalidraw/element/types";
 
@@ -63,6 +64,26 @@ import {
 
 import "./DefaultItems.scss";
 
+type TerraformEdgeLayer = "dependency" | "dataFlow";
+
+const getTerraformEdgeLayer = (element: { customData?: Record<string, any> }) =>
+  element.customData?.terraformEdgeLayer === "dependency" ||
+  element.customData?.terraformEdgeLayer === "dataFlow"
+    ? element.customData.terraformEdgeLayer
+    : null;
+
+const isTerraformDependencyPreviewEdge = (element: {
+  customData?: Record<string, any>;
+}) => element.customData?.terraformDependencyPreview === true;
+
+const clearTerraformDependencyPreviewData = (
+  customData: Record<string, any> | undefined,
+) => {
+  const nextCustomData = { ...(customData ?? {}) };
+  delete nextCustomData.terraformDependencyPreview;
+  return nextCustomData;
+};
+
 export const LoadScene = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -106,6 +127,7 @@ export const LoadScene = () => {
 };
 LoadScene.displayName = "LoadScene";
 
+//todo: add button here
 export const SaveToActiveFile = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -142,6 +164,103 @@ export const SaveAsImage = () => {
   );
 };
 SaveAsImage.displayName = "SaveAsImage";
+
+export const ImportTerraform = () => {
+  const setAppState = useExcalidrawSetAppState();
+  return (
+    <DropdownMenuItem
+      icon={ExportImageIcon}
+      data-testid="image-export-button"
+      onSelect={() => setAppState({ openDialog: { name: "terraformImport" } })}
+      shortcut={getShortcutFromShortcutName("terraformImport")}
+      aria-label="Import Terraform"
+    >
+      Import Terraform
+    </DropdownMenuItem>
+  );
+};
+ImportTerraform.displayName = "ImportTerraform";
+
+const TerraformLayerItem = ({
+  layer,
+  children,
+}: {
+  layer: TerraformEdgeLayer;
+  children: React.ReactNode;
+}) => {
+  const app = useApp();
+  const elements = useExcalidrawElements();
+  const allElements = app.scene.getElementsIncludingDeleted();
+  const hasLayer = allElements.some(
+    (element) => getTerraformEdgeLayer(element) === layer,
+  );
+  const checked = elements.some(
+    (element) =>
+      getTerraformEdgeLayer(element) === layer &&
+      (layer !== "dependency" || !isTerraformDependencyPreviewEdge(element)),
+  );
+
+  if (!hasLayer) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuItemCheckbox
+      checked={checked}
+      onSelect={(event) => {
+        const nextChecked = !checked;
+        const nextElements = allElements.map((element) => {
+          if (getTerraformEdgeLayer(element) !== layer) {
+            return element;
+          }
+          return newElementWith(element, {
+            isDeleted: !nextChecked,
+            ...(layer === "dependency"
+              ? {
+                  opacity: 100,
+                  customData: clearTerraformDependencyPreviewData(
+                    element.customData,
+                  ),
+                }
+              : null),
+          });
+        });
+        app.scene.replaceAllElements(nextElements);
+        event.preventDefault();
+      }}
+    >
+      {children}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
+export const TerraformLayers = () => {
+  const app = useApp();
+  const hasTerraformLayers = app.scene
+    .getElementsIncludingDeleted()
+    .some((element) => getTerraformEdgeLayer(element));
+
+  if (!hasTerraformLayers) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuSub>
+      <DropdownMenuSub.Trigger icon={ExportImageIcon}>
+        Terraform layers
+      </DropdownMenuSub.Trigger>
+      <DropdownMenuSub.Content>
+        <TerraformLayerItem layer="dependency">
+          Dependency edges
+        </TerraformLayerItem>
+        <TerraformLayerItem layer="dataFlow">
+          Data flow edges
+        </TerraformLayerItem>
+      </DropdownMenuSub.Content>
+    </DropdownMenuSub>
+  );
+};
+TerraformLayers.displayName = "TerraformLayers";
 
 export const CommandPalette = (opts?: { className?: string }) => {
   const setAppState = useExcalidrawSetAppState();

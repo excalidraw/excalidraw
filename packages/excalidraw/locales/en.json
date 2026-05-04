@@ -162,6 +162,10 @@
       "lockAll": "Lock all",
       "unlockAll": "Unlock all"
     },
+    "terraform": {
+      "expandDependencies": "Expand Terraform dependencies",
+      "collapseDependencies": "Collapse Terraform dependencies"
+    },
     "statusPublished": "Published",
     "sidebarLock": "Keep sidebar open",
     "selectAllElementsInFrame": "Select all elements in frame",

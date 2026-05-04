@@ -30,6 +30,7 @@
     "husky": "7.0.4",
     "jsdom": "22.1.0",
     "lint-staged": "12.3.7",
+    "nodemon": "3.1.14",
     "pepjs": "0.5.3",
     "prettier": "2.6.2",
     "rewire": "6.0.0",
@@ -49,6 +50,9 @@
   "homepage": ".",
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
+    "start:backend": "yarn workspace @excalidraw/backend start",
+    "dev:backend": "yarn workspace @excalidraw/backend dev",
+    "test:backend": "yarn workspace @excalidraw/backend test",
     "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "yarn --cwd ./excalidraw-app build:app:docker",
     "build:app": "yarn --cwd ./excalidraw-app build:app",
@@ -90,5 +94,10 @@
   },
   "resolutions": {
     "strip-ansi": "6.0.1"
+  },
+  "dependencies": {
+    "@excalidraw/excalidraw": "0.18.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
   }
 }

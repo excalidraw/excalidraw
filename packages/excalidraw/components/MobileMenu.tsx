@@ -29,6 +29,7 @@ type MobileMenuProps = {
   actionManager: ActionManager;
   renderJSONExportDialog: () => React.ReactNode;
   renderImageExportDialog: () => React.ReactNode;
+  renderTerraformImportDialog: () => React.ReactNode;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onHandToolToggle: () => void;
