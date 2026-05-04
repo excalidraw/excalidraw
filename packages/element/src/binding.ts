@@ -737,7 +737,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   if (
     otherBinding &&
     otherBinding.elementId === hit?.id &&
-    appState.selectedLinearElement?.initialState.origin
+    (!opts?.newArrow || appState.selectedLinearElement?.initialState.origin)
   ) {
     return {
       start: {
