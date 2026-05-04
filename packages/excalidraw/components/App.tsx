@@ -702,6 +702,13 @@ class App extends React.Component<AppProps, AppState> {
   previousPointerMoveCoords: { x: number; y: number } | null = null;
   lastViewportPosition = { x: 0, y: 0 };
 
+  /**
+   * Tracks whether the Ctrl (Windows/Linux) or Cmd (Mac) modifier key is
+   * currently held. Used to apply style changes only to selected elements
+   * without updating the default style for future shapes.
+   */
+  isModifierKeyHeld = false;
+
   animationFrameHandler = new AnimationFrameHandler();
 
   laserTrails = new LaserTrails(this.animationFrameHandler, this);
@@ -3281,6 +3288,14 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(document, EVENT.COPY, this.onCopy, { passive: false }),
       addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
       addEventListener(
+        window,
+        "blur",
+        () => {
+          this.isModifierKeyHeld = false;
+        },
+        { passive: true },
+      ),
+      addEventListener(
         document,
         EVENT.POINTER_MOVE,
         this.updateCurrentCursorPosition,
@@ -4733,6 +4748,10 @@ class App extends React.Component<AppProps, AppState> {
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
+      if (event.key === "Control" || event.key === "Meta") {
+        this.isModifierKeyHeld = true;
+      }
+
       // normalize `event.key` when CapsLock is pressed #2372
 
       if (
@@ -5021,6 +5040,42 @@ class App extends React.Component<AppProps, AppState> {
           this.handleSkipBindMode();
         } else {
           maybeHandleArrowPointlikeDrag({ app: this, event });
+        }
+      }
+
+      // Ctrl/Cmd+S opens the stroke color picker in modifier-key mode so that
+      // styles are applied to the current selection without updating the tool
+      // default.  We intercept here — before the action manager — because
+      // Ctrl+S would otherwise trigger the save action.
+      //
+      // Ctrl/Cmd+G similarly opens the background color picker, but only when
+      // a single element is selected (two or more elements would be grouped by
+      // the normal Ctrl+G shortcut, so we leave that behaviour intact).
+      if (
+        (event.key === KEYS.S || event.key === KEYS.G) &&
+        event[KEYS.CTRL_OR_CMD] &&
+        !event.shiftKey &&
+        !event.altKey
+      ) {
+        const selectedElements = this.scene.getSelectedElements(this.state);
+        if (selectedElements.length > 0) {
+          if (event.key === KEYS.S) {
+            this.setState({ openPopup: "elementStroke" });
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+          if (
+            event.key === KEYS.G &&
+            selectedElements.length < 2 &&
+            (hasBackground(this.state.activeTool.type) ||
+              selectedElements.some((element) => hasBackground(element.type)))
+          ) {
+            this.setState({ openPopup: "elementBackground" });
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
         }
       }
 
@@ -5321,6 +5376,10 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
+    if (event.key === "Control" || event.key === "Meta") {
+      this.isModifierKeyHeld = false;
+    }
+
     if (event.key === KEYS.SPACE) {
       if (
         (this.state.viewModeEnabled &&

@@ -199,7 +199,11 @@ export default function LibraryMenuItems({
             type: "everything",
             elements: item.elements,
             randomizeSeed: true,
-          }).duplicatedElements,
+          }).duplicatedElements.map((el) => ({
+            ...el,
+            // stamp the source library item ID so instances can be synced later
+            libraryItemId: item.id,
+          })),
         };
       });
     },
