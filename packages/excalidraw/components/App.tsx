@@ -176,7 +176,9 @@ import {
   isValidTextContainer,
   redrawTextBoundingBox,
   hasBoundingBox,
+  getCommonFrameId,
   getFrameChildren,
+  getFrameChildrenInsertionIndex,
   isCursorInFrame,
   addElementsToFrame,
   replaceAllElementsInFrame,
@@ -2112,6 +2114,10 @@ class App extends React.Component<AppProps, AppState> {
       width: this.state.width,
       editingTextElement: this.state.editingTextElement,
       newElement: this.state.newElement,
+      selectedElements,
+      selectedElementsAreBeingDragged:
+        this.state.selectedElementsAreBeingDragged,
+      frameToHighlight: this.state.frameToHighlight,
     });
     this.visibleElements = visibleElements;
 
@@ -3981,11 +3987,10 @@ class App extends React.Component<AppProps, AppState> {
         duplicatedElements,
         topLayerFrame,
       );
-      addElementsToFrame(
+      nextElements = addElementsToFrame(
         nextElements,
         eligibleElements,
         topLayerFrame,
-        this.state,
       );
     }
 
@@ -6807,58 +6812,6 @@ class App extends React.Component<AppProps, AppState> {
     return topLayerFrame;
   };
 
-  private getCommonFrameId = (elements: readonly ExcalidrawElement[]) => {
-    let commonFrameId: ExcalidrawElement["frameId"] | undefined;
-
-    for (const element of elements) {
-      if (isFrameLikeElement(element) || !element.frameId) {
-        return null;
-      }
-
-      if (commonFrameId === undefined) {
-        commonFrameId = element.frameId;
-      } else if (commonFrameId !== element.frameId) {
-        return null;
-      }
-    }
-
-    return commonFrameId ?? null;
-  };
-
-  private getNewFrameChildInsertionIndex = (
-    element: ExcalidrawElement,
-  ): number | null => {
-    if (!element.frameId) {
-      return null;
-    }
-
-    const frameIndex = this.scene.getElementIndex(element.frameId);
-
-    if (frameIndex === -1) {
-      return null;
-    }
-
-    const hitElementUnderCursor = this.getElementsAtPosition(
-      element.x,
-      element.y,
-      {
-        includeLockedElements: true,
-      },
-    ).findLast((element) => !isFrameLikeElement(element));
-
-    if (!hitElementUnderCursor) {
-      return frameIndex;
-    }
-
-    const hitElementUnderCursorIndex = this.scene.getElementIndex(
-      hitElementUnderCursor.id,
-    );
-
-    return hitElementUnderCursorIndex === -1
-      ? frameIndex
-      : Math.max(frameIndex, hitElementUnderCursorIndex + 1);
-  };
-
   private updateFrameToHighlight = (
     frameToHighlight: AppState["frameToHighlight"],
   ) => {
@@ -6913,7 +6866,10 @@ class App extends React.Component<AppProps, AppState> {
       const frameId = chunk[0].frameId;
 
       const insertionIndex = frameId
-        ? this.getNewFrameChildInsertionIndex(chunk[0])
+        ? getFrameChildrenInsertionIndex(
+            this.scene.getElementsIncludingDeleted(),
+            frameId,
+          )
         : null;
       this.scene.insertElementsAtIndex(chunk, insertionIndex);
     }
@@ -10006,13 +9962,13 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        const selectedElementsHasAFrame = selectedElements.find((e) =>
+        const selectedElementsHasAFrame = selectedElements.some((e) =>
           isFrameLikeElement(e),
         );
         const frameToHighlight = selectedElementsHasAFrame
           ? null
           : this.getTopLayerFrameAtSceneCoords(pointerCoords, {
-              currentFrameId: this.getCommonFrameId(selectedElements),
+              currentFrameId: getCommonFrameId(selectedElements),
               excludeElementIds: this.state.selectedElementIds,
             });
         // Only update the state if there is a difference
@@ -11045,7 +11001,6 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getElementsMapIncludingDeleted(),
             elementsInsideFrame,
             newElement,
-            this.state,
           ),
         );
       }
@@ -11109,7 +11064,7 @@ class App extends React.Component<AppProps, AppState> {
           const topLayerFrame = this.getTopLayerFrameAtSceneCoords(
             sceneCoords,
             {
-              currentFrameId: this.getCommonFrameId(selectedElements),
+              currentFrameId: getCommonFrameId(selectedElements),
               excludeElementIds: this.state.selectedElementIds,
             },
           );
@@ -11161,10 +11116,8 @@ class App extends React.Component<AppProps, AppState> {
             topLayerFrame &&
             !this.state.selectedElementIds[topLayerFrame.id]
           ) {
-            const elementsToAdd = selectedElements.filter(
-              (element) =>
-                element.frameId !== topLayerFrame.id &&
-                isElementInFrame(element, nextElements, this.state),
+            const elementsToAdd = selectedElements.filter((element) =>
+              isElementInFrame(element, nextElements, this.state),
             );
 
             if (this.state.editingGroupId) {
@@ -11175,7 +11128,6 @@ class App extends React.Component<AppProps, AppState> {
               nextElements,
               elementsToAdd,
               topLayerFrame,
-              this.state,
             );
           } else if (!topLayerFrame) {
             if (this.state.editingGroupId) {
@@ -11237,7 +11189,6 @@ class App extends React.Component<AppProps, AppState> {
               elementsMap,
             ),
             frame,
-            this,
           );
         }
 

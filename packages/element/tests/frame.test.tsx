@@ -12,6 +12,8 @@ import {
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
+import { getSelectedElements } from "@excalidraw/excalidraw/scene";
+
 import { elementOverlapsWithFrame } from "../src/frame";
 
 import type {
@@ -332,7 +334,7 @@ describe("adding elements to frames", () => {
     ]);
   });
 
-  it("should insert a newly created frame child above the non-frame element under cursor", () => {
+  it("should insert a newly created frame child above the highest frame child", () => {
     const frameChildUnderCursor = API.createElement({
       id: "frameChildUnderCursor",
       type: "rectangle",
@@ -343,8 +345,17 @@ describe("adding elements to frames", () => {
       backgroundColor: "#ffc9c9",
       frameId: frame.id,
     });
+    const otherFrameChild = API.createElement({
+      id: "otherFrameChild",
+      type: "rectangle",
+      x: 100,
+      y: 20,
+      width: 20,
+      height: 20,
+      frameId: frame.id,
+    });
 
-    API.setElements([frame, frameChildUnderCursor]);
+    API.setElements([frame, frameChildUnderCursor, otherFrameChild]);
 
     UI.clickTool("rectangle");
     mouse.downAt(20, 20);
@@ -353,13 +364,16 @@ describe("adding elements to frames", () => {
 
     const createdElement = h.elements.find(
       (element) =>
-        element.id !== frame.id && element.id !== frameChildUnderCursor.id,
+        element.id !== frame.id &&
+        element.id !== frameChildUnderCursor.id &&
+        element.id !== otherFrameChild.id,
     );
 
     expect(createdElement?.frameId).toBe(frame.id);
     expect(h.elements.map((element) => element.id)).toEqual([
       frame.id,
       frameChildUnderCursor.id,
+      otherFrameChild.id,
       createdElement?.id,
     ]);
   });
@@ -676,6 +690,226 @@ describe("adding elements to frames", () => {
       dragElementIntoFrame(frame, rect2);
 
       expect(rect2.frameId).toBe(frame.id);
+    });
+
+    it("should layer a dragged element above the highest frame child", () => {
+      const frameChild = API.createElement({
+        id: "frameChild",
+        type: "rectangle",
+        x: 10,
+        y: 10,
+        width: 20,
+        height: 20,
+        frameId: frame.id,
+      });
+
+      API.setElements([frame, frameChild, rect2]);
+
+      dragElementIntoFrame(frame, rect2);
+
+      expect(rect2.frameId).toBe(frame.id);
+      expect(h.elements.map((element) => element.id)).toEqual([
+        frame.id,
+        frameChild.id,
+        rect2.id,
+      ]);
+      expect(rect2.index! > frameChild.index!).toBe(true);
+      expect(rect2.index! > frame.index!).toBe(true);
+    });
+
+    it("should preview a dragged element above the highest frame child before pointerup", () => {
+      const frameChild = API.createElement({
+        id: "frameChild",
+        type: "rectangle",
+        x: 10,
+        y: 10,
+        width: 20,
+        height: 20,
+        frameId: frame.id,
+      });
+
+      API.setElements([rect2, frame, frameChild]);
+      API.setSelectedElements([rect2]);
+      API.updateElement(rect2, {
+        x: 10,
+        y: 10,
+      });
+
+      const getRenderableElementIds = (
+        selectedElementsAreBeingDragged: boolean,
+      ) => {
+        return h.app.renderer
+          .getRenderableElements({
+            zoom: h.state.zoom,
+            offsetLeft: 0,
+            offsetTop: 0,
+            scrollX: 0,
+            scrollY: 0,
+            height: 1000,
+            width: 1000,
+            editingTextElement: h.state.editingTextElement,
+            newElement: h.state.newElement,
+            selectedElements: getSelectedElements(h.elements, h.state),
+            selectedElementsAreBeingDragged,
+            frameToHighlight: frame as ExcalidrawFrameLikeElement,
+          })
+          .visibleElements.map((element) => element.id);
+      };
+
+      expect(h.elements.map((element) => element.id)).toEqual([
+        rect2.id,
+        frame.id,
+        frameChild.id,
+      ]);
+      expect(getRenderableElementIds(false)).toEqual([
+        rect2.id,
+        frame.id,
+        frameChild.id,
+      ]);
+      expect(getRenderableElementIds(true)).toEqual([
+        frame.id,
+        frameChild.id,
+        rect2.id,
+      ]);
+      expect(h.elements.map((element) => element.id)).toEqual([
+        rect2.id,
+        frame.id,
+        frameChild.id,
+      ]);
+      expect(rect2.frameId).toBe(null);
+    });
+
+    it("should not preview reorder dragged elements already in the highlighted frame", () => {
+      const frameChild = API.createElement({
+        id: "frameChild",
+        type: "rectangle",
+        x: 10,
+        y: 10,
+        width: 20,
+        height: 20,
+        frameId: frame.id,
+      });
+      const otherFrameChild = API.createElement({
+        id: "otherFrameChild",
+        type: "rectangle",
+        x: 40,
+        y: 10,
+        width: 20,
+        height: 20,
+        frameId: frame.id,
+      });
+
+      API.setElements([frameChild, frame, otherFrameChild]);
+      API.setSelectedElements([frameChild]);
+
+      const renderableElementIds = h.app.renderer
+        .getRenderableElements({
+          zoom: h.state.zoom,
+          offsetLeft: 0,
+          offsetTop: 0,
+          scrollX: 0,
+          scrollY: 0,
+          height: 1000,
+          width: 1000,
+          editingTextElement: h.state.editingTextElement,
+          newElement: h.state.newElement,
+          selectedElements: getSelectedElements(h.elements, h.state),
+          selectedElementsAreBeingDragged: true,
+          frameToHighlight: frame as ExcalidrawFrameLikeElement,
+        })
+        .visibleElements.map((element) => element.id);
+
+      expect(renderableElementIds).toEqual([
+        frameChild.id,
+        frame.id,
+        otherFrameChild.id,
+      ]);
+    });
+
+    it("should put a dragged mixed selection above the highest frame child", () => {
+      const frameChild = API.createElement({
+        id: "frameChild",
+        type: "rectangle",
+        x: 50,
+        y: 10,
+        width: 20,
+        height: 20,
+        frameId: frame.id,
+      });
+      const otherFrameChild = API.createElement({
+        id: "otherFrameChild",
+        type: "rectangle",
+        x: 80,
+        y: 10,
+        width: 20,
+        height: 20,
+        frameId: frame.id,
+      });
+      const nonFrameElement = API.createElement({
+        id: "nonFrameElement",
+        type: "rectangle",
+        x: 155,
+        y: 10,
+        width: 20,
+        height: 20,
+      });
+
+      API.setElements([frame, frameChild, otherFrameChild, nonFrameElement]);
+      API.setSelectedElements([frameChild, nonFrameElement]);
+
+      mouse.downAt(
+        nonFrameElement.x + nonFrameElement.width / 2,
+        nonFrameElement.y + nonFrameElement.height / 2,
+      );
+      mouse.moveTo(frame.x + frame.width - 5, nonFrameElement.y + 10);
+      mouse.up();
+
+      expect(frameChild.frameId).toBe(frame.id);
+      expect(nonFrameElement.frameId).toBe(frame.id);
+      expect(h.elements.map((element) => element.id)).toEqual([
+        frame.id,
+        otherFrameChild.id,
+        frameChild.id,
+        nonFrameElement.id,
+      ]);
+    });
+
+    it("should not reorder dragged elements already in the highlighted frame", () => {
+      const frameChild = API.createElement({
+        id: "frameChild",
+        type: "rectangle",
+        x: 50,
+        y: 10,
+        width: 20,
+        height: 20,
+        frameId: frame.id,
+      });
+      const otherFrameChild = API.createElement({
+        id: "otherFrameChild",
+        type: "rectangle",
+        x: 80,
+        y: 10,
+        width: 20,
+        height: 20,
+        frameId: frame.id,
+      });
+
+      API.setElements([frame, frameChild, otherFrameChild]);
+      API.setSelectedElements([frameChild]);
+
+      mouse.downAt(
+        frameChild.x + frameChild.width / 2,
+        frameChild.y + frameChild.height / 2,
+      );
+      mouse.moveTo(frameChild.x + frameChild.width / 2 + 5, frameChild.y + 10);
+      mouse.up();
+
+      expect(frameChild.frameId).toBe(frame.id);
+      expect(h.elements.map((element) => element.id)).toEqual([
+        frame.id,
+        frameChild.id,
+        otherFrameChild.id,
+      ]);
     });
 
     it("should not drag an element into a frame behind a non-frame element", () => {
