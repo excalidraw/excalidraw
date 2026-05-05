@@ -1,3 +1,14 @@
+/**
+ * Terraform processed `nodes` map → Excalidraw v2 scene (elements + minimal `appState`).
+ *
+ * **Pipeline inside `nodesToExcalidraw`:** location/VPC/subnet inference → account/region/VPC
+ * container frames → module groups + resource tiers → collapsed layout graph + `forceLayout`
+ * → expand module positions + Lambda module presets → VPC perimeter snap and appliance tiles
+ * → per-resource rectangles (icons, labels, `customData` for the editor) → dependency and
+ * data-flow arrows with bindings → draw order (edges beneath containers and cards).
+ *
+ * Small shared Terraform helpers: `terraform-graph-utils.js`.
+ */
 const fs = require("fs");
 const path = require("path");
 
@@ -11,12 +22,21 @@ const {
   layoutVpcApplianceRectanglesOnFrame,
   getVpcApplianceKindForNode,
 } = require("./vpc-perimeter");
+const {
+  isPlainObject,
+  getCurrentResourceConfig,
+  normalizeVpcId,
+  normalizeSubnetId,
+  extractVpcIdsFromConfig,
+  extractSubnetIdsFromConfig,
+} = require("./terraform-graph-utils");
 
+/** Integer in [0, 2^31) for stable-enough unique Excalidraw element ids in one export. */
 function rand() {
   return Math.floor(Math.random() * 2147483647);
 }
 
-// --- Icon library ---
+// --- Icon library (AWS Architecture Icons .excalidrawlib) ---
 
 const DEFAULT_ICON_LIBRARY = "aws-architecture-icons";
 
@@ -298,6 +318,7 @@ const ICON_LIBRARY_CONFIGS = {
   },
 };
 
+/** Maps env or basename to a key in `ICON_LIBRARY_CONFIGS`. */
 function normalizeIconLibraryName(value) {
   if (!value) {
     return DEFAULT_ICON_LIBRARY;
@@ -306,6 +327,7 @@ function normalizeIconLibraryName(value) {
   return path.basename(value, ".excalidrawlib");
 }
 
+/** Resolved icon library descriptor (filename + name map), from env or default. */
 function getIconLibraryConfig() {
   const requested = normalizeIconLibraryName(
     process.env.AWS_ICON_LIBRARY || process.env.AWS_ICON_LIB,
@@ -317,6 +339,7 @@ function getIconLibraryConfig() {
   );
 }
 
+/** Absolute path to the `.excalidrawlib` on disk (env override or bundled next to this file). */
 function getIconLibraryPath(config) {
   if (process.env.AWS_ICON_LIB_PATH) {
     return path.resolve(process.env.AWS_ICON_LIB_PATH);
@@ -328,6 +351,7 @@ function getIconLibraryPath(config) {
 let iconLibItems = null;
 let iconLibCacheKey = null;
 let iconLibNameIndex = {};
+/** Loads and caches the icon library JSON; builds a lowercase name → index map. */
 function loadIconLib() {
   const config = getIconLibraryConfig();
   const iconLibPath = getIconLibraryPath(config);
@@ -354,6 +378,7 @@ function loadIconLib() {
   }
 }
 
+/** Returns cloned icon template elements for a Terraform AWS type, or null if missing. */
 function getIconForType(resourceType) {
   const items = loadIconLib();
   const config = getIconLibraryConfig();
@@ -367,6 +392,7 @@ function getIconForType(resourceType) {
   return Array.isArray(item) ? item : item.elements || null;
 }
 
+/** Deep-clones library icon elements, shifted/scaled into a target box and optionally grouped. */
 function cloneIconElements(
   origElements,
   targetX,
@@ -548,10 +574,12 @@ const PRIMARY_VISIBLE_TYPES = new Set([
   ...PRIMARY_MODULE_TYPES,
 ]);
 
+/** True for resource types shown in the default “overview” (compute/storage/messaging/module). */
 function isPrimaryVisibleResourceType(resourceType) {
   return PRIMARY_VISIBLE_TYPES.has(resourceType);
 }
 
+/** Terraform provider type segment parsed from `nodePath` (handles `module.*` prefixes and `data`). */
 function getResourceType(nodePath) {
   const parts = nodePath.split(".");
   let i = 0;
@@ -566,6 +594,7 @@ function getResourceType(nodePath) {
   return parts[i] || nodePath;
 }
 
+/** Counts `module.X` segments in the address (nesting depth). */
 function getModuleDepth(nodePath) {
   const parts = nodePath.split(".");
   let depth = 0;
@@ -577,17 +606,20 @@ function getModuleDepth(nodePath) {
   return depth;
 }
 
+/** Tier-1 types get larger / more prominent layout treatment. */
 function isImportantType(resourceType) {
   return TIER_1_TYPES.has(resourceType);
 }
 
+/** Types that should visually recede (generic `data` reads, tier-3 noise). */
 function isLowPriorityType(resourceType) {
   return resourceType === "data" || TIER_3_TYPES.has(resourceType);
 }
 
-// Builds a tier map for all nodes. Tier 0 = most prominent, higher = less prominent.
-// Important services are bumped one tier above their depth peers; low-priority types
-// are pushed one tier below.
+/**
+ * Maps each node key to a layout tier (0 = most prominent). Starts from module depth;
+ * important types move up, low-priority types move down.
+ */
 function buildTierMap(nodeKeys) {
   const depths = nodeKeys.map(getModuleDepth);
   const maxDepth = Math.max(0, ...depths);
@@ -607,8 +639,10 @@ function buildTierMap(nodeKeys) {
   return tierMap;
 }
 
-// Interpolates tier visual configs across the actual tier range found in the graph.
-// More nodes → smaller boxes and stronger repulsion to avoid crowding.
+/**
+ * Per-tier width/height, font, d3 charge/collide, and icon size derived from `tierMap` spread.
+ * Larger graphs scale dimensions down (`crowdFactor`).
+ */
 function buildTierConfigs(tierMap, totalNodes) {
   const tiers = Object.values(tierMap);
   const minTier = Math.min(...tiers);
@@ -635,6 +669,7 @@ function buildTierConfigs(tierMap, totalNodes) {
   return configs;
 }
 
+/** Linear interpolation helper for tier sizing. */
 function lerp(a, b, t) {
   return a + (b - a) * t;
 }
@@ -665,6 +700,7 @@ const HIDDEN_ATTRIBUTES_BY_TYPE = {
   aws_iam_role_policy: new Set(["id", "name_prefix"]),
 };
 
+/** Dominant plan action across resources on a node (`create` wins over `update`, etc.). */
 function getPrimaryAction(node) {
   const actions = new Set();
   for (const resource of Object.values(node.resources || {})) {
@@ -679,6 +715,7 @@ function getPrimaryAction(node) {
   return "existing";
 }
 
+/** False for null/empty/empty-object values so attribute panels stay readable. */
 function isDisplayableConfigValue(value) {
   return (
     value !== null &&
@@ -689,24 +726,7 @@ function isDisplayableConfigValue(value) {
   );
 }
 
-function isPlainObject(value) {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function getCurrentResourceConfig(resource) {
-  const change = resource.change || {};
-  if (isPlainObject(change.after)) {
-    return change.after;
-  }
-  if (isPlainObject(resource.values)) {
-    return resource.values;
-  }
-  if (isPlainObject(change.before)) {
-    return change.before;
-  }
-  return {};
-}
-
+/** True when Terraform marked a subtree as unknown-after-apply (recursive). */
 function hasUnknownAfterMarker(value) {
   if (value === true) {
     return true;
@@ -723,6 +743,7 @@ function hasUnknownAfterMarker(value) {
   return false;
 }
 
+/** Top-level attribute keys flagged unknown in `after_unknown`. */
 function getUnknownTopLevelKeys(afterUnknown) {
   if (!afterUnknown || typeof afterUnknown !== "object") {
     return [];
@@ -733,11 +754,13 @@ function getUnknownTopLevelKeys(afterUnknown) {
     .map(([key]) => key);
 }
 
+/** Whether to omit an attribute from the details payload for a given resource type. */
 function shouldHideTerraformAttribute(resourceType, key) {
   const hidden = HIDDEN_ATTRIBUTES_BY_TYPE[resourceType];
   return Boolean(hidden && hidden.has(key));
 }
 
+/** Per-resource attribute rows (values, diffs, unknown-after) stored on Excalidraw `customData`. */
 function buildTerraformResourceDetails(node) {
   return Object.entries(node.resources || {}).map(([address, resource]) => {
     const change = resource.change || {};
@@ -803,6 +826,7 @@ function buildTerraformResourceDetails(node) {
   });
 }
 
+/** Multi-line card label: dotted module path then resource tail. */
 function getLabel(nodePath) {
   const parts = nodePath.split(".");
   const moduleParts = [];
@@ -826,6 +850,7 @@ function getLabel(nodePath) {
   return lines.join("\n");
 }
 
+/** Ordered `module.a`, `module.a.module.b`, … prefixes for a resource address. */
 function getModulePathChain(nodePath) {
   const parts = nodePath.split(".");
   const chain = [];
@@ -844,6 +869,7 @@ function getModulePathChain(nodePath) {
   return chain;
 }
 
+/** Number of nested module segments in a standalone module path string. */
 function getModuleDepthFromPath(modulePath) {
   const parts = modulePath.split(".");
   let depth = 0;
@@ -860,6 +886,7 @@ function getModuleDepthFromPath(modulePath) {
   return depth;
 }
 
+/** Human-readable module path: `child / grandchild` from repeated `module.X` segments. */
 function getModuleDisplayLabel(modulePath) {
   const parts = modulePath.split(".");
   const names = [];
@@ -876,11 +903,13 @@ function getModuleDisplayLabel(modulePath) {
   return names.join(" / ");
 }
 
+/** Deepest module prefix for a resource address, or null in the root module. */
 function getOwningModulePath(nodePath) {
   const chain = getModulePathChain(nodePath);
   return chain.length ? chain[chain.length - 1] : null;
 }
 
+/** Resource address with `modulePath.` prefix removed (relative resource tail). */
 function getModuleRelativeResourcePath(nodePath, modulePath) {
   const prefix = `${modulePath}.`;
   if (!nodePath.startsWith(prefix)) {
@@ -907,10 +936,12 @@ const LAMBDA_MODULE_PRESET_OFFSETS = {
   "data.aws_caller_identity.current": { x: 620, y: 130 },
 };
 
+/** True when module metadata source matches the official Lambda module registry string. */
 function isLambdaModuleSource(source) {
   return source === LAMBDA_MODULE_SOURCE;
 }
 
+/** Heuristic: registry Lambda module vs typical `this` + `aws_iam_role.lambda` fragment set. */
 function isLikelyLambdaModule(resourceFragments, moduleGroup = null) {
   return (
     isLambdaModuleSource(moduleGroup?.source) ||
@@ -919,6 +950,7 @@ function isLikelyLambdaModule(resourceFragments, moduleGroup = null) {
   );
 }
 
+/** Nudges known Lambda-module child resources to fixed offsets around `aws_lambda_function.this`. */
 function applyModulePresets(
   positions,
   nodeKeys,
@@ -971,6 +1003,7 @@ function applyModulePresets(
   return positions;
 }
 
+/** Builds module group records (label, depth, source, member node paths) sorted shallow-first. */
 function collectModuleGroups(nodeKeys, nodes = {}) {
   const groups = new Map();
 
@@ -1002,6 +1035,7 @@ function collectModuleGroups(nodeKeys, nodes = {}) {
   return [...groups.values()].sort((a, b) => a.depth - b.depth);
 }
 
+/** Parses a minimal ARN shape (partition, service, region, account) or returns null. */
 function parseAwsArn(value) {
   if (typeof value !== "string" || !value.startsWith("arn:")) {
     return null;
@@ -1020,6 +1054,7 @@ function parseAwsArn(value) {
   };
 }
 
+/** Non-empty trimmed region string or null. */
 function normalizeRegion(value) {
   if (typeof value !== "string") {
     return null;
@@ -1029,6 +1064,7 @@ function normalizeRegion(value) {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+/** 12-digit AWS account id or null. */
 function normalizeAccountId(value) {
   if (typeof value !== "string") {
     return null;
@@ -1038,61 +1074,7 @@ function normalizeAccountId(value) {
   return /^\d{12}$/.test(trimmed) ? trimmed : null;
 }
 
-function normalizeVpcId(value) {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const trimmed = value.trim();
-  return /^vpc-[0-9a-f]+$/i.test(trimmed) ? trimmed : null;
-}
-
-function normalizeSubnetId(value) {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const trimmed = value.trim();
-  return /^subnet-[0-9a-f]+$/i.test(trimmed) ? trimmed : null;
-}
-
-function collectAwsIdsFromValue(value, normalizer, out, depth = 0) {
-  if (depth > 8 || value === null || typeof value === "undefined") {
-    return;
-  }
-
-  const normalized = normalizer(value);
-  if (normalized) {
-    out.add(normalized);
-    return;
-  }
-
-  if (Array.isArray(value)) {
-    for (const entry of value) {
-      collectAwsIdsFromValue(entry, normalizer, out, depth + 1);
-    }
-    return;
-  }
-
-  if (typeof value === "object") {
-    for (const entry of Object.values(value)) {
-      collectAwsIdsFromValue(entry, normalizer, out, depth + 1);
-    }
-  }
-}
-
-function extractVpcIdsFromConfig(config) {
-  const ids = new Set();
-  collectAwsIdsFromValue(config, normalizeVpcId, ids);
-  return [...ids];
-}
-
-function extractSubnetIdsFromConfig(config) {
-  const ids = new Set();
-  collectAwsIdsFromValue(config, normalizeSubnetId, ids);
-  return [...ids];
-}
-
+/** Best-effort region + account from resource config and `*_arn` fields. */
 function extractLocationFromConfig(config) {
   let region =
     normalizeRegion(config.region) || normalizeRegion(config.aws_region);
@@ -1146,6 +1128,7 @@ function extractLocationFromConfig(config) {
   return { region, accountId };
 }
 
+/** Value with highest count in a string→count Map (ties: first encountered wins). */
 function pickMostCommon(map) {
   let winner = null;
   let winnerCount = -1;
@@ -1160,6 +1143,7 @@ function pickMostCommon(map) {
   return winner;
 }
 
+/** Infers region/account per AWS node; fills unknowns with graph-wide mode defaults. */
 function buildNodeLocationMap(nodes) {
   const nodeLocations = new Map();
   const regionCounts = new Map();
@@ -1218,6 +1202,7 @@ function buildNodeLocationMap(nodes) {
   return nodeLocations;
 }
 
+/** Undirected adjacency from merged `edges_new` and `edges_existing` (symmetric sets). */
 function buildNodeAdjacencyMap(nodes) {
   const adjacency = new Map();
 
@@ -1248,6 +1233,7 @@ function buildNodeAdjacencyMap(nodes) {
   return adjacency;
 }
 
+/** BFS up to `maxDepth` for the lexicographically smallest node that maps to a VPC anchor. */
 function findNearestVpcAnchor(
   startNodePath,
   adjacency,
@@ -1289,6 +1275,7 @@ function findNearestVpcAnchor(
   return null;
 }
 
+/** Maps each resource node to a VPC key/label via explicit ids, subnets, or short graph hops. */
 function buildNodeVpcMap(nodes) {
   const nodeVpcMap = new Map();
   const anchorByNodePath = new Map();
@@ -1409,6 +1396,7 @@ function buildNodeVpcMap(nodes) {
   return nodeVpcMap;
 }
 
+/** Subnet membership per node from explicit ids, `aws_subnet` anchors, or BFS fallback types. */
 function buildNodeSubnetMap(nodes, nodeVpcMap) {
   const nodeSubnetMap = new Map();
   const subnetAnchorByNodePath = new Map();
@@ -1527,6 +1515,7 @@ function buildNodeSubnetMap(nodes, nodeVpcMap) {
   return nodeSubnetMap;
 }
 
+/** Registers facet providers (e.g. networking-v2) that attach summaries to VPC/subnet frame groups. */
 function buildContainerFacetContributors(context) {
   const store = context.networkingFacetStore || {
     byVpcKey: {},
@@ -1554,6 +1543,7 @@ function buildContainerFacetContributors(context) {
   return [networkingContributor];
 }
 
+/** Runs all contributors applicable to `group.kind` and returns facet payloads for UI merge. */
 function collectContainerFacets(group, contributors) {
   const facets = [];
   for (const contributor of contributors) {
@@ -1568,6 +1558,7 @@ function collectContainerFacets(group, contributors) {
   return facets;
 }
 
+/** Single-line subtitle for a container from facet summaries (length-capped). */
 function buildContainerFacetSummaryLine(facets) {
   const summaries = facets.map((facet) => facet.summary).filter(Boolean);
   if (summaries.length === 0) {
@@ -1576,6 +1567,7 @@ function buildContainerFacetSummaryLine(facets) {
   return summaries.join(" · ").slice(0, 140);
 }
 
+/** Merges facet payloads into rectangle `customData` for container elements. */
 function buildContainerFacetCustomData(baseCustomData, facets) {
   return {
     ...baseCustomData,
@@ -1583,6 +1575,9 @@ function buildContainerFacetCustomData(baseCustomData, facets) {
   };
 }
 
+/**
+ * Nested hierarchy: account → region → VPC → subnet, each holding member node paths for framing.
+ */
 function collectAccountRegionGroups(
   nodeKeys,
   nodeLocationMap,
@@ -1687,6 +1682,7 @@ function collectAccountRegionGroups(
     }));
 }
 
+/** Appends paths to `group.nodePaths` preserving uniqueness. */
 function pushUniqueNodePaths(group, nodePaths) {
   const existing = new Set(group.nodePaths);
   for (const nodePath of nodePaths) {
@@ -1697,6 +1693,7 @@ function pushUniqueNodePaths(group, nodePaths) {
   }
 }
 
+/** Ensures module members appear in account/region/VPC/subnet container path lists they span. */
 function expandNetworkContainerGroupsWithModuleMembership(
   accountRegionGroups,
   moduleGroups,
@@ -1772,6 +1769,7 @@ function expandNetworkContainerGroupsWithModuleMembership(
 
 // --- Element builders ---
 
+/** Default Excalidraw element fields merged with `overrides` (terraform-tagged `customData`). */
 function makeBaseElement(overrides) {
   return {
     angle: 0,
@@ -1797,10 +1795,12 @@ function makeBaseElement(overrides) {
   };
 }
 
+/** Numeric clamp to `[min, max]`. */
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+/** Intersection of rectangle edge toward `target` center; returns absolute coords + normalized fixedPoint. */
 function getEdgePointTowardTarget(pos, w, h, target) {
   const cx = pos.x + w / 2;
   const cy = pos.y + h / 2;
@@ -1828,6 +1828,7 @@ function getEdgePointTowardTarget(pos, w, h, target) {
   };
 }
 
+/** Arrow endpoints between two rectangles, each aimed from its center toward the peer center. */
 function getCenterClippedBindingPoints(posA, posB, wA, hA, wB, hB) {
   const centerA = { x: posA.x + wA / 2, y: posA.y + hA / 2 };
   const centerB = { x: posB.x + wB / 2, y: posB.y + hB / 2 };
@@ -1845,7 +1846,8 @@ function getCenterClippedBindingPoints(posA, posB, wA, hA, wB, hB) {
 }
 
 // --- Edge collection ---
-//each element has outgoing edges, find them and map them nicely
+
+/** De-duplicates outgoing `edges_new` / `edges_existing` into directed records with kind sets. */
 function collectDirectedEdges(nodes) {
   const edgeMap = new Map();
 
@@ -1889,7 +1891,7 @@ function collectDirectedEdges(nodes) {
   }));
 }
 
-//coalescing edges from A to B and B to A into one
+/** Groups A→B and B→A dependency edges into one undirected pair with direction metadata. */
 function coalesceRelationshipPairs(directedEdges) {
   const pairMap = new Map();
 
@@ -1944,6 +1946,7 @@ function coalesceRelationshipPairs(directedEdges) {
   });
 }
 
+/** Normalizes `edges_data_flow` into drawable pairs, merging true bidirectional duplicates. */
 function collectDataFlowEdges(nodes) {
   const edgeMap = new Map();
 
@@ -2014,6 +2017,7 @@ function collectDataFlowEdges(nodes) {
   return collected;
 }
 
+/** Adjacency of nodes that share a dependency or data-flow edge (for explode UI in the editor). */
 function buildTerraformExplodeParentMap(
   nodeKeys,
   directedEdges,
@@ -2048,6 +2052,7 @@ function buildTerraformExplodeParentMap(
   return parentMap;
 }
 
+/** `customData` keys the frontend uses for Terraform visibility / explode toggles. */
 function getVisibilityCustomData(
   nodePath,
   initiallyVisible,
@@ -2063,6 +2068,7 @@ function getVisibilityCustomData(
   };
 }
 
+/** Parallel offset of a segment along its left normal (used to separate stacked arrows). */
 function offsetLineSegment(startPoint, endPoint, offset) {
   if (!offset) {
     return { startPoint, endPoint };
@@ -2080,6 +2086,7 @@ function offsetLineSegment(startPoint, endPoint, offset) {
   };
 }
 
+/** Normalized binding `[0–1, 0–1]` for a point relative to a positioned rectangle. */
 function fixedPointForAbsolutePoint(pos, point) {
   return [
     clamp((point.x - pos.x) / pos.w, 0, 1),
@@ -2089,6 +2096,7 @@ function fixedPointForAbsolutePoint(pos, point) {
 
 // --- Force layout ---
 
+/** Runs a bounded d3-force simulation from tiered charge/link/collide parameters; returns id→{x,y}. */
 async function forceLayout(
   nodeKeys,
   directedEdges,
@@ -2169,6 +2177,7 @@ async function forceLayout(
   return posMap;
 }
 
+/** Registry-module paths that should collapse to one layout vertex (non-nested under another collapsible). */
 function buildCollapsibleModuleSet(moduleGroups) {
   const collapsibleModules = new Set();
 
@@ -2192,6 +2201,7 @@ function buildCollapsibleModuleSet(moduleGroups) {
   return collapsibleModules;
 }
 
+/** Deepest collapsible module prefix affecting `nodePath`, for layout id assignment. */
 function getCollapsedModulePath(nodePath, collapsibleModules) {
   const chain = getModulePathChain(nodePath)
     .filter((modulePath) => collapsibleModules.has(modulePath))
@@ -2200,6 +2210,10 @@ function getCollapsedModulePath(nodePath, collapsibleModules) {
   return chain[0] || null;
 }
 
+/**
+ * Coalesces module internals to a single simulation node per collapsible module; returns
+ * layout keys, deduped edges, per-layout tier map, and member lists.
+ */
 function buildCollapsedLayoutModel(
   nodeKeys,
   directedEdges,
@@ -2254,6 +2268,7 @@ function buildCollapsedLayoutModel(
   };
 }
 
+/** Relative {x,y} offsets of module members around the collapsed module anchor (Lambda preset or grid). */
 function buildModuleInternalOffsets(members, modulePath, moduleGroup = null) {
   const offsets = {};
   const fragments = new Set(
@@ -2296,6 +2311,7 @@ function buildModuleInternalOffsets(members, modulePath, moduleGroup = null) {
   return offsets;
 }
 
+/** Bounding box size per collapsed module from internal offsets + tier card dimensions. */
 function estimateModuleLayoutSizes(
   moduleMembers,
   moduleGroupByPath,
@@ -2342,6 +2358,7 @@ function estimateModuleLayoutSizes(
   return sizes;
 }
 
+/** Maps simulation positions: standalone nodes keep layout coords; module members fan out from module anchor. */
 function expandCollapsedModulePositions(
   layoutPositions,
   nodeKeys,
@@ -2387,6 +2404,7 @@ function expandCollapsedModulePositions(
   return positions;
 }
 
+/** Axis-aligned bounds of given nodes using their tier width/height (or null if empty). */
 function measureBoundsFromNodePositions(nodePaths, positions, tierMap, tierConfigs) {
   let minX = Infinity;
   let minY = Infinity;
@@ -2503,6 +2521,7 @@ function snapVpcPerimeterResourcePositions(
   return perimeterWallByNodePath;
 }
 
+/** Turns networking-v2 facet sections into small drawable “appliance” tile descriptors on the VPC edge. */
 function collectVpcApplianceTilesFromFacets(vpcFacets) {
   const tiles = [];
   for (const facet of vpcFacets || []) {
@@ -2555,6 +2574,7 @@ function collectVpcApplianceTilesFromFacets(vpcFacets) {
   return tiles;
 }
 
+/** Positions synthetic facet tiles (route tables, gateways, …) along the VPC frame edges. */
 function layoutApplianceTilesOnVpcEdges(
   vpcApplianceTiles,
   vpcBoxX,
@@ -2594,6 +2614,7 @@ function layoutApplianceTilesOnVpcEdges(
   }));
 }
 
+/** Stroke/fill palette for small VPC appliance / facet tile rectangles by semantic kind. */
 function applianceStyleForKind(kind) {
   if (kind === "route_table") {
     return { strokeColor: "#c77d00", backgroundColor: "#fff4cc" };
@@ -2624,6 +2645,10 @@ function applianceStyleForKind(kind) {
 
 // --- Main conversion ---
 
+/**
+ * Converts enriched Terraform `nodes` (post-pipeline) into an Excalidraw document: nested frames,
+ * resource cards, dependency + data-flow arrows, and `customData` consumed by the editor.
+ */
 async function nodesToExcalidraw(nodes) {
   const nodeElements = [];
   const locationElements = [];

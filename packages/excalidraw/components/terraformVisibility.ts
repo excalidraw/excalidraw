@@ -13,6 +13,12 @@ import { pointFrom } from "@excalidraw/math";
 
 import type { LocalPoint } from "@excalidraw/math";
 
+/**
+ * Terraform-import scene helpers: soft-hide (`isDeleted`) for filtered views, explode
+ * expand/collapse for dependency neighborhoods, and arrow rebind after layout changes.
+ * Element `customData` is written by `packages/backend/excalidraw.js`.
+ */
+
 type TerraformLayerState = {
   dependencyLayerEnabled?: boolean;
   dataFlowLayerEnabled?: boolean;
@@ -20,11 +26,15 @@ type TerraformLayerState = {
 
 const getCustomData = (element: ExcalidrawElement) => element.customData ?? {};
 
+/** `"dependency"` | `"dataFlow"` for Terraform arrows, or null for non-terraform edges. */
 export const getTerraformEdgeLayer = (element: ExcalidrawElement) => {
   const layer = getCustomData(element).terraformEdgeLayer;
   return layer === "dependency" || layer === "dataFlow" ? layer : null;
 };
 
+/**
+ * Stable graph id for a Terraform-backed element (`terraformVisibilityKey`, then fallbacks).
+ */
 export const getTerraformVisibilityKey = (element: ExcalidrawElement) => {
   const customData = getCustomData(element);
   return (
@@ -34,6 +44,8 @@ export const getTerraformVisibilityKey = (element: ExcalidrawElement) => {
     null
   );
 };
+
+// --- Element classification (roles written by the backend exporter) ---
 
 const isTerraformGraphElement = (element: ExcalidrawElement) =>
   Boolean(getCustomData(element).terraformVisibilityRole);
@@ -57,6 +69,8 @@ const clearPreviewCustomData = (
   delete nextCustomData.terraformDependencyPreview;
   return nextCustomData;
 };
+
+// --- Explode: parent/child keys for progressive disclosure ---
 
 const getVisibleTerraformKeys = (elements: readonly ExcalidrawElement[]) => {
   const visibleKeys = new Set<string>();
@@ -139,6 +153,8 @@ const getDescendantKeys = (
 
   return descendants;
 };
+
+// --- Edge visibility (endpoints must exist on screen) ---
 
 const edgeEndpointsAreVisible = (
   element: ExcalidrawElement,
@@ -308,6 +324,8 @@ const collectTerraformResourceRects = (
   return rects;
 };
 
+// --- Arrow geometry (mirrors backend binding math for client-side updates) ---
+
 /**
  * Recomputes Terraform dependency / data-flow arrow geometry and orbit bindings from
  * current resource rectangle positions. Call after visibility toggles so edges stay
@@ -440,6 +458,7 @@ export const repairTerraformEdgeBindings = (
   });
 };
 
+/** Applies soft-delete to arrows and group wrappers based on visible resource keys and layer flags. */
 const reconcileTerraformVisibility = (
   elements: readonly ExcalidrawElement[],
   overrides: TerraformLayerState = {},
@@ -483,6 +502,10 @@ const reconcileTerraformVisibility = (
   });
 };
 
+/**
+ * Expands or collapses dependency neighbors of a category/resource card: toggles `terraformExploded`,
+ * soft-hides non-primary children when collapsing, then reconciles visibility and arrow bindings.
+ */
 export const toggleTerraformExplode = (
   elements: readonly ExcalidrawElement[],
   triggerElement: ExcalidrawElement,
@@ -560,6 +583,7 @@ export const toggleTerraformExplode = (
   );
 };
 
+/** Keys that appear as `terraformExplodeParent` on at least one other element (explode triggers). */
 const collectTerraformParentKeysWithChildren = (
   elements: readonly ExcalidrawElement[],
 ) => {

@@ -50,6 +50,10 @@ interface ImportMetaEnv {
   VITE_APP_PLUS_APP: string;
 
   VITE_WORKER_ID: string;
+
+  /** Base URL of `@excalidraw/backend` for Terraform import (`yarn start:backend`). */
+  VITE_TERRAFORM_BACKEND_URL?: string;
+
   MODE: string;
   DEV: string;
   PROD: string;

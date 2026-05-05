@@ -1,4 +1,13 @@
-/** VPC perimeter resources: pinned to VPC frame; excluded from dependency layout/arrows. */
+/**
+ * VPC “perimeter” layout: classifies ALBs, endpoints, VPN, and Direct Connect resources to a
+ * wall of the VPC frame so they pin outside the inner workload layout (`excalidraw.js` uses this
+ * with `filterLayoutSimulationKeys` and `snapVpcPerimeterResourcePositions`).
+ */
+
+const {
+  getCurrentResourceConfig,
+  getPrimaryResourceFromNode,
+} = require("./terraform-graph-utils");
 
 const VPC_PERIMETER_LAYOUT_ENABLED = true;
 
@@ -23,29 +32,18 @@ const VPC_APPLIANCE_CANDIDATE_TYPES = new Set([
   "aws_dx_hosted_public_virtual_interface",
 ]);
 
-function isPlainObject(value) {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
+/** Primary Terraform resource object for a node (first entry with a `type`). */
 function getPrimaryResource(nodePath, node) {
-  return Object.values(node?.resources || {}).find((r) => r?.type) || {};
+  return getPrimaryResourceFromNode(node);
 }
 
+/** Merged config view: `change.after`, else `values`, else `change.before`. */
 function getResourceConfig(resource) {
-  const change = resource.change || {};
-  if (isPlainObject(change.after)) {
-    return change.after;
-  }
-  if (isPlainObject(resource.values)) {
-    return resource.values;
-  }
-  if (isPlainObject(change.before)) {
-    return change.before;
-  }
-  return {};
+  return getCurrentResourceConfig(resource);
 }
 
 /**
+ * Picks left vs bottom wall for a VPC endpoint from service name and endpoint type.
  * @param {object} cfg — aws_vpc_endpoint after config
  * @returns {"leftWall"|"bottomWall"}
  */
@@ -66,6 +64,7 @@ function classifyVpcEndpointWallFromConfig(cfg) {
 }
 
 /**
+ * Maps a supported perimeter resource to a VPC frame wall, or null if not a perimeter appliance.
  * @param {string} nodePath
  * @param {object} node
  * @returns {"leftWall"|"topWall"|"bottomWall"|"rightWall"|null}
@@ -151,14 +150,17 @@ function getVpcApplianceKindForNode(nodePath, node) {
   return "appliance";
 }
 
+/** True when this node is laid out on the VPC frame perimeter (has a wall assignment). */
 function isVpcPerimeterAppliance(nodePath, node) {
   return classifyVpcApplianceWall(nodePath, node) !== null;
 }
 
+/** Alias of `isVpcPerimeterAppliance` for readability at call sites. */
 function isVpcPerimeterNode(nodePath, node) {
   return isVpcPerimeterAppliance(nodePath, node);
 }
 
+/** True if `type` is a candidate for perimeter classification (may still yield null wall). */
 function isVpcPerimeterResourceType(type) {
   return VPC_APPLIANCE_CANDIDATE_TYPES.has(type);
 }
@@ -281,6 +283,10 @@ function layoutVpcApplianceRectanglesOnFrame(frame, buckets, getSize) {
   return placements;
 }
 
+/**
+ * When perimeter layout is on, excludes pure-perimeter module layout ids from force-layout so
+ * their members are positioned by perimeter snapping instead.
+ */
 function filterLayoutSimulationKeys(
   layoutNodeKeys,
   moduleMembers,
@@ -298,6 +304,7 @@ function filterLayoutSimulationKeys(
   });
 }
 
+/** Provider type string for the node's primary resource. */
 function getPrimaryResourceType(nodePath, node) {
   return getPrimaryResource(nodePath, node).type || "";
 }
