@@ -211,3 +211,166 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
     });
   });
 });
+
+describe("nodesToExcalidraw container facets", () => {
+  it("adds generic facet metadata to group boxes and networking summaries for vpc/subnet", async () => {
+    const scene = await nodesToExcalidraw({
+      "aws_vpc.main": {
+        resources: {
+          "aws_vpc.main": {
+            address: "aws_vpc.main",
+            type: "aws_vpc",
+            name: "main",
+            change: { actions: ["create"], after: { id: "vpc-1234abcd" } },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_subnet.private": {
+        resources: {
+          "aws_subnet.private": {
+            address: "aws_subnet.private",
+            type: "aws_subnet",
+            name: "private",
+            change: {
+              actions: ["create"],
+              after: { id: "subnet-1234abcd", vpc_id: "vpc-1234abcd" },
+            },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_route_table.private": {
+        resources: {
+          "aws_route_table.private": {
+            address: "aws_route_table.private",
+            type: "aws_route_table",
+            name: "private",
+            change: {
+              actions: ["create"],
+              after: { id: "rtb-1234abcd", vpc_id: "vpc-1234abcd" },
+            },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_route.private_default": {
+        resources: {
+          "aws_route.private_default": {
+            address: "aws_route.private_default",
+            type: "aws_route",
+            name: "private_default",
+            change: {
+              actions: ["create"],
+              after: {
+                route_table_id: "rtb-1234abcd",
+                nat_gateway_id: "nat-1234abcd",
+              },
+            },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_route_table_association.private": {
+        resources: {
+          "aws_route_table_association.private": {
+            address: "aws_route_table_association.private",
+            type: "aws_route_table_association",
+            name: "private",
+            change: {
+              actions: ["create"],
+              after: {
+                subnet_id: "subnet-1234abcd",
+                route_table_id: "rtb-1234abcd",
+              },
+            },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_security_group.app": {
+        resources: {
+          "aws_security_group.app": {
+            address: "aws_security_group.app",
+            type: "aws_security_group",
+            name: "app",
+            change: {
+              actions: ["create"],
+              after: { id: "sg-abcd1234", vpc_id: "vpc-1234abcd" },
+            },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    });
+
+    const vpcLabel = scene.elements.find(
+      (element) => element.type === "text" && element.customData?.terraformVpcGroup,
+    );
+    const subnetLabel = scene.elements.find(
+      (element) =>
+        element.type === "text" && element.customData?.terraformSubnetGroup,
+    );
+    const accountBox = scene.elements.find(
+      (element) =>
+        element.type === "rectangle" && element.customData?.terraformAccountGroup,
+    );
+    const routeTableRect = scene.elements.find(
+      (element) =>
+        element.type === "rectangle" &&
+        element.customData?.nodePath === "aws_route_table.private",
+    );
+    const sgRect = scene.elements.find(
+      (element) =>
+        element.type === "rectangle" &&
+        element.customData?.nodePath === "aws_security_group.app",
+    );
+
+    expect(vpcLabel.customData.terraformContainerFacets).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "networking-v2",
+          sections: expect.arrayContaining([
+            expect.objectContaining({
+              label: "Route tables",
+              sections: expect.any(Array),
+            }),
+          ]),
+        }),
+      ]),
+    );
+    expect(vpcLabel.text).toContain("rt:1");
+    expect(vpcLabel.text).toContain("assoc:1");
+    expect(vpcLabel.text).toContain("routes:1");
+
+    expect(subnetLabel.customData.terraformContainerFacets).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "networking-v2",
+          sections: expect.arrayContaining([
+            expect.objectContaining({ label: "VPC" }),
+            expect.objectContaining({ label: "Route table associations" }),
+          ]),
+        }),
+      ]),
+    );
+    expect(subnetLabel.text).toContain("rt_assoc:1");
+
+    expect(accountBox.customData.terraformContainerFacets).toEqual([]);
+    expect(routeTableRect.isDeleted).toBe(true);
+    expect(sgRect).toBeDefined();
+    expect(sgRect?.isDeleted).toBe(true);
+  });
+});

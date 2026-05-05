@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { extractVpcNetworkingFacetStore } = require("./vpc-networking-facet");
 
 function rand() {
   return Math.floor(Math.random() * 2147483647);
@@ -1155,6 +1156,9 @@ function buildNodeLocationMap(nodes) {
   const accountCounts = new Map();
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     let hasAwsResource = false;
     let region = null;
     let accountId = null;
@@ -1208,10 +1212,16 @@ function buildNodeAdjacencyMap(nodes) {
   const adjacency = new Map();
 
   for (const nodePath of Object.keys(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     adjacency.set(nodePath, new Set());
   }
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     const neighbors = new Set([
       ...(node.edges_new || []),
       ...(node.edges_existing || []),
@@ -1276,6 +1286,9 @@ function buildNodeVpcMap(nodes) {
   const subnetVpcKeyMap = new Map();
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     for (const resource of Object.values(node.resources || {})) {
       const config = getCurrentResourceConfig(resource);
 
@@ -1321,6 +1334,9 @@ function buildNodeVpcMap(nodes) {
   ]);
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     let vpcKey = null;
     let vpcLabel = null;
 
@@ -1390,6 +1406,9 @@ function buildNodeSubnetMap(nodes, nodeVpcMap) {
   const subnetVpcKeyBySubnetKey = new Map();
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     const nodeVpc = nodeVpcMap.get(nodePath) || null;
 
     for (const resource of Object.values(node.resources || {})) {
@@ -1435,6 +1454,9 @@ function buildNodeSubnetMap(nodes, nodeVpcMap) {
   ]);
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     let subnetKey = null;
     let subnetLabel = null;
     let subnetVpcKey = null;
@@ -1489,6 +1511,62 @@ function buildNodeSubnetMap(nodes, nodeVpcMap) {
   }
 
   return nodeSubnetMap;
+}
+
+function buildContainerFacetContributors(context) {
+  const store = context.networkingFacetStore || {
+    byVpcKey: {},
+    bySubnetKey: {},
+  };
+
+  const networkingContributor = {
+    id: "networking-v2",
+    groupKinds: new Set(["vpc", "subnet"]),
+    compute(group) {
+      if (group.kind === "vpc") {
+        const facet = store.byVpcKey[group.key];
+        return facet ? { ...facet } : null;
+      }
+
+      if (group.kind === "subnet") {
+        const facet = store.bySubnetKey[group.key];
+        return facet ? { ...facet } : null;
+      }
+
+      return null;
+    },
+  };
+
+  return [networkingContributor];
+}
+
+function collectContainerFacets(group, contributors) {
+  const facets = [];
+  for (const contributor of contributors) {
+    if (!contributor.groupKinds.has(group.kind)) {
+      continue;
+    }
+    const facet = contributor.compute(group);
+    if (facet) {
+      facets.push(facet);
+    }
+  }
+  return facets;
+}
+
+function buildContainerFacetSummaryLine(facets) {
+  const summaries = facets.map((facet) => facet.summary).filter(Boolean);
+  if (summaries.length === 0) {
+    return "";
+  }
+  return summaries.join(" · ").slice(0, 140);
+}
+
+function buildContainerFacetCustomData(baseCustomData, facets) {
+  return {
+    ...baseCustomData,
+    terraformContainerFacets: facets,
+  };
 }
 
 function collectAccountRegionGroups(
@@ -1690,6 +1768,9 @@ function collectDirectedEdges(nodes) {
   };
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     for (const target of node.edges_new || []) {
       addEdge(nodePath, target, "planned_dependency", "dot");
     }
@@ -1764,6 +1845,9 @@ function collectDataFlowEdges(nodes) {
   const edgeMap = new Map();
 
   for (const [source, node] of Object.entries(nodes)) {
+    if (source.startsWith("__")) {
+      continue;
+    }
     for (const edge of node.edges_data_flow || []) {
       const target = edge.target;
       if (!nodes[source] || !nodes[target] || source === target) {
@@ -2207,7 +2291,7 @@ async function nodesToExcalidraw(nodes) {
   const locationElements = [];
   const moduleElements = [];
   const arrowElements = [];
-  const nodeKeys = Object.keys(nodes);
+  const nodeKeys = Object.keys(nodes).filter((key) => !key.startsWith("__"));
   const directedEdges = collectDirectedEdges(nodes);
   const relationships = coalesceRelationshipPairs(directedEdges);
   const dataFlowEdges = collectDataFlowEdges(nodes);
@@ -2224,6 +2308,15 @@ async function nodesToExcalidraw(nodes) {
   const nodeLocationMap = buildNodeLocationMap(nodes);
   const nodeVpcMap = buildNodeVpcMap(nodes);
   const nodeSubnetMap = buildNodeSubnetMap(nodes, nodeVpcMap);
+  const networkingFacetStore =
+    nodes.__networkingFacetStore || extractVpcNetworkingFacetStore(nodes);
+  const containerFacetContributors = buildContainerFacetContributors({
+    nodes,
+    nodeLocationMap,
+    nodeVpcMap,
+    nodeSubnetMap,
+    networkingFacetStore,
+  });
   const accountRegionGroups = collectAccountRegionGroups(
     nodeKeys,
     nodeLocationMap,
@@ -2468,6 +2561,19 @@ async function nodesToExcalidraw(nodes) {
       terraformVisibilityKey: group.modulePath,
       terraformGroupChildKeys: group.nodePaths,
     };
+    const moduleFacets = collectContainerFacets(
+      {
+        kind: "module",
+        key: group.modulePath,
+        label: group.moduleLabel,
+        nodePaths: group.nodePaths,
+      },
+      containerFacetContributors,
+    );
+    const moduleFacetSummary = buildContainerFacetSummaryLine(moduleFacets);
+    const moduleLabelText = moduleFacetSummary
+      ? `module ${group.moduleLabel}\n${moduleFacetSummary}`
+      : `module ${group.moduleLabel}`;
 
     moduleElements.push(
       makeBaseElement({
@@ -2486,13 +2592,18 @@ async function nodesToExcalidraw(nodes) {
         boundElements: [{ id: labelId, type: "text" }],
         isDeleted: !initiallyVisible,
         customData: {
-          terraform: false,
-          ...groupVisibilityCustomData,
-          terraformModuleGroup: true,
-          modulePath: group.modulePath,
-          moduleDepth: group.depth,
-          moduleSource: group.source,
-          moduleVersion: group.version,
+          ...buildContainerFacetCustomData(
+            {
+              terraform: false,
+              ...groupVisibilityCustomData,
+              terraformModuleGroup: true,
+              modulePath: group.modulePath,
+              moduleDepth: group.depth,
+              moduleSource: group.source,
+              moduleVersion: group.version,
+            },
+            moduleFacets,
+          ),
         },
       }),
     );
@@ -2505,25 +2616,30 @@ async function nodesToExcalidraw(nodes) {
         y: boxY + 8,
         width: Math.max(80, boxW - 20),
         height: 24,
-        text: `module ${group.moduleLabel}`,
+        text: moduleLabelText,
         fontSize: group.depth <= 1 ? 18 : 16,
         fontFamily: 3,
         textAlign: "left",
         verticalAlign: "top",
         groupIds: boxGroupIds,
         containerId: boxId,
-        originalText: `module ${group.moduleLabel}`,
+        originalText: moduleLabelText,
         autoResize: false,
         lineHeight: 1.2,
         strokeColor,
         isDeleted: !initiallyVisible,
         customData: {
-          terraform: false,
-          ...groupVisibilityCustomData,
-          terraformModuleGroup: true,
-          modulePath: group.modulePath,
-          moduleSource: group.source,
-          moduleVersion: group.version,
+          ...buildContainerFacetCustomData(
+            {
+              terraform: false,
+              ...groupVisibilityCustomData,
+              terraformModuleGroup: true,
+              modulePath: group.modulePath,
+              moduleSource: group.source,
+              moduleVersion: group.version,
+            },
+            moduleFacets,
+          ),
         },
       }),
     );
@@ -2625,6 +2741,19 @@ async function nodesToExcalidraw(nodes) {
       terraformVisibilityKey: `account:${accountGroup.accountId}`,
       terraformGroupChildKeys: accountGroup.nodePaths,
     };
+    const accountFacets = collectContainerFacets(
+      {
+        kind: "account",
+        key: accountGroup.accountId,
+        label: accountGroup.accountId,
+        nodePaths: accountGroup.nodePaths,
+      },
+      containerFacetContributors,
+    );
+    const accountFacetSummary = buildContainerFacetSummaryLine(accountFacets);
+    const accountLabelText = accountFacetSummary
+      ? `account ${accountGroup.accountId}\n${accountFacetSummary}`
+      : `account ${accountGroup.accountId}`;
 
     locationElements.push(
       makeBaseElement({
@@ -2643,10 +2772,15 @@ async function nodesToExcalidraw(nodes) {
         boundElements: [{ id: accountLabelId, type: "text" }],
         isDeleted: !accountInitiallyVisible,
         customData: {
-          terraform: false,
-          ...accountVisibilityCustomData,
-          terraformAccountGroup: true,
-          accountId: accountGroup.accountId,
+          ...buildContainerFacetCustomData(
+            {
+              terraform: false,
+              ...accountVisibilityCustomData,
+              terraformAccountGroup: true,
+              accountId: accountGroup.accountId,
+            },
+            accountFacets,
+          ),
         },
       }),
     );
@@ -2659,23 +2793,28 @@ async function nodesToExcalidraw(nodes) {
         y: accountBoxY + 8,
         width: Math.max(120, accountBoxW - 20),
         height: 24,
-        text: `account ${accountGroup.accountId}`,
+        text: accountLabelText,
         fontSize: 18,
         fontFamily: 3,
         textAlign: "left",
         verticalAlign: "top",
         groupIds: [accountGroupId],
         containerId: accountBoxId,
-        originalText: `account ${accountGroup.accountId}`,
+        originalText: accountLabelText,
         autoResize: false,
         lineHeight: 1.2,
         strokeColor: ACCOUNT_STROKE,
         isDeleted: !accountInitiallyVisible,
         customData: {
-          terraform: false,
-          ...accountVisibilityCustomData,
-          terraformAccountGroup: true,
-          accountId: accountGroup.accountId,
+          ...buildContainerFacetCustomData(
+            {
+              terraform: false,
+              ...accountVisibilityCustomData,
+              terraformAccountGroup: true,
+              accountId: accountGroup.accountId,
+            },
+            accountFacets,
+          ),
         },
       }),
     );
@@ -2709,6 +2848,19 @@ async function nodesToExcalidraw(nodes) {
         terraformVisibilityKey: `region:${regionGroup.accountId}:${regionGroup.region}`,
         terraformGroupChildKeys: regionGroup.nodePaths,
       };
+      const regionFacets = collectContainerFacets(
+        {
+          kind: "region",
+          key: `${regionGroup.accountId}:${regionGroup.region}`,
+          label: regionGroup.region,
+          nodePaths: regionGroup.nodePaths,
+        },
+        containerFacetContributors,
+      );
+      const regionFacetSummary = buildContainerFacetSummaryLine(regionFacets);
+      const regionLabelText = regionFacetSummary
+        ? `region ${regionGroup.region}\n${regionFacetSummary}`
+        : `region ${regionGroup.region}`;
 
       const regionGroupIds = [regionGroupId, accountGroupId];
 
@@ -2729,11 +2881,16 @@ async function nodesToExcalidraw(nodes) {
           boundElements: [{ id: regionLabelId, type: "text" }],
           isDeleted: !regionInitiallyVisible,
           customData: {
-            terraform: false,
-            ...regionVisibilityCustomData,
-            terraformRegionGroup: true,
-            accountId: regionGroup.accountId,
-            region: regionGroup.region,
+            ...buildContainerFacetCustomData(
+              {
+                terraform: false,
+                ...regionVisibilityCustomData,
+                terraformRegionGroup: true,
+                accountId: regionGroup.accountId,
+                region: regionGroup.region,
+              },
+              regionFacets,
+            ),
           },
         }),
       );
@@ -2746,24 +2903,29 @@ async function nodesToExcalidraw(nodes) {
           y: regionBoxY + 8,
           width: Math.max(100, regionBoxW - 20),
           height: 22,
-          text: `region ${regionGroup.region}`,
+          text: regionLabelText,
           fontSize: 16,
           fontFamily: 3,
           textAlign: "left",
           verticalAlign: "top",
           groupIds: regionGroupIds,
           containerId: regionBoxId,
-          originalText: `region ${regionGroup.region}`,
+          originalText: regionLabelText,
           autoResize: false,
           lineHeight: 1.2,
           strokeColor: REGION_STROKE,
           isDeleted: !regionInitiallyVisible,
           customData: {
-            terraform: false,
-            ...regionVisibilityCustomData,
-            terraformRegionGroup: true,
-            accountId: regionGroup.accountId,
-            region: regionGroup.region,
+            ...buildContainerFacetCustomData(
+              {
+                terraform: false,
+                ...regionVisibilityCustomData,
+                terraformRegionGroup: true,
+                accountId: regionGroup.accountId,
+                region: regionGroup.region,
+              },
+              regionFacets,
+            ),
           },
         }),
       );
@@ -2796,6 +2958,19 @@ async function nodesToExcalidraw(nodes) {
           terraformVisibilityKey: `vpc:${vpcGroup.accountId}:${vpcGroup.region}:${vpcGroup.vpcKey}`,
           terraformGroupChildKeys: vpcGroup.nodePaths,
         };
+        const vpcFacets = collectContainerFacets(
+          {
+            kind: "vpc",
+            key: vpcGroup.vpcKey,
+            label: vpcGroup.vpcLabel,
+            nodePaths: vpcGroup.nodePaths,
+          },
+          containerFacetContributors,
+        );
+        const vpcFacetSummary = buildContainerFacetSummaryLine(vpcFacets);
+        const vpcLabelText = vpcFacetSummary
+          ? `vpc ${vpcGroup.vpcLabel}\n${vpcFacetSummary}`
+          : `vpc ${vpcGroup.vpcLabel}`;
 
         const vpcGroupIds = [vpcGroupId, regionGroupId, accountGroupId];
 
@@ -2816,13 +2991,18 @@ async function nodesToExcalidraw(nodes) {
             boundElements: [{ id: vpcLabelId, type: "text" }],
             isDeleted: !vpcInitiallyVisible,
             customData: {
-              terraform: false,
-              ...vpcVisibilityCustomData,
-              terraformVpcGroup: true,
-              accountId: vpcGroup.accountId,
-              region: vpcGroup.region,
-              vpcId: vpcGroup.vpcKey,
-              vpcLabel: vpcGroup.vpcLabel,
+              ...buildContainerFacetCustomData(
+                {
+                  terraform: false,
+                  ...vpcVisibilityCustomData,
+                  terraformVpcGroup: true,
+                  accountId: vpcGroup.accountId,
+                  region: vpcGroup.region,
+                  vpcId: vpcGroup.vpcKey,
+                  vpcLabel: vpcGroup.vpcLabel,
+                },
+                vpcFacets,
+              ),
             },
           }),
         );
@@ -2835,26 +3015,31 @@ async function nodesToExcalidraw(nodes) {
             y: vpcBoxY + 8,
             width: Math.max(90, vpcBoxW - 20),
             height: 20,
-            text: `vpc ${vpcGroup.vpcLabel}`,
+            text: vpcLabelText,
             fontSize: 14,
             fontFamily: 3,
             textAlign: "left",
             verticalAlign: "top",
             groupIds: vpcGroupIds,
             containerId: vpcBoxId,
-            originalText: `vpc ${vpcGroup.vpcLabel}`,
+            originalText: vpcLabelText,
             autoResize: false,
             lineHeight: 1.2,
             strokeColor: VPC_STROKE,
             isDeleted: !vpcInitiallyVisible,
             customData: {
-              terraform: false,
-              ...vpcVisibilityCustomData,
-              terraformVpcGroup: true,
-              accountId: vpcGroup.accountId,
-              region: vpcGroup.region,
-              vpcId: vpcGroup.vpcKey,
-              vpcLabel: vpcGroup.vpcLabel,
+              ...buildContainerFacetCustomData(
+                {
+                  terraform: false,
+                  ...vpcVisibilityCustomData,
+                  terraformVpcGroup: true,
+                  accountId: vpcGroup.accountId,
+                  region: vpcGroup.region,
+                  vpcId: vpcGroup.vpcKey,
+                  vpcLabel: vpcGroup.vpcLabel,
+                },
+                vpcFacets,
+              ),
             },
           }),
         );
@@ -2888,6 +3073,19 @@ async function nodesToExcalidraw(nodes) {
             terraformVisibilityKey: `subnet:${subnetGroup.accountId}:${subnetGroup.region}:${subnetGroup.vpcKey}:${subnetGroup.subnetKey}`,
             terraformGroupChildKeys: subnetGroup.nodePaths,
           };
+          const subnetFacets = collectContainerFacets(
+            {
+              kind: "subnet",
+              key: subnetGroup.subnetKey,
+              label: subnetGroup.subnetLabel,
+              nodePaths: subnetGroup.nodePaths,
+            },
+            containerFacetContributors,
+          );
+          const subnetFacetSummary = buildContainerFacetSummaryLine(subnetFacets);
+          const subnetLabelText = subnetFacetSummary
+            ? `subnet ${subnetGroup.subnetLabel}\n${subnetFacetSummary}`
+            : `subnet ${subnetGroup.subnetLabel}`;
 
           const subnetGroupIds = [
             subnetGroupId,
@@ -2913,14 +3111,19 @@ async function nodesToExcalidraw(nodes) {
               boundElements: [{ id: subnetLabelId, type: "text" }],
               isDeleted: !subnetInitiallyVisible,
               customData: {
-                terraform: false,
-                ...subnetVisibilityCustomData,
-                terraformSubnetGroup: true,
-                accountId: subnetGroup.accountId,
-                region: subnetGroup.region,
-                vpcId: subnetGroup.vpcKey,
-                subnetId: subnetGroup.subnetKey,
-                subnetLabel: subnetGroup.subnetLabel,
+                ...buildContainerFacetCustomData(
+                  {
+                    terraform: false,
+                    ...subnetVisibilityCustomData,
+                    terraformSubnetGroup: true,
+                    accountId: subnetGroup.accountId,
+                    region: subnetGroup.region,
+                    vpcId: subnetGroup.vpcKey,
+                    subnetId: subnetGroup.subnetKey,
+                    subnetLabel: subnetGroup.subnetLabel,
+                  },
+                  subnetFacets,
+                ),
               },
             }),
           );
@@ -2933,27 +3136,32 @@ async function nodesToExcalidraw(nodes) {
               y: subnetBoxY + 6,
               width: Math.max(86, subnetBoxW - 16),
               height: 18,
-              text: `subnet ${subnetGroup.subnetLabel}`,
+              text: subnetLabelText,
               fontSize: 13,
               fontFamily: 3,
               textAlign: "left",
               verticalAlign: "top",
               groupIds: subnetGroupIds,
               containerId: subnetBoxId,
-              originalText: `subnet ${subnetGroup.subnetLabel}`,
+              originalText: subnetLabelText,
               autoResize: false,
               lineHeight: 1.2,
               strokeColor: SUBNET_STROKE,
               isDeleted: !subnetInitiallyVisible,
               customData: {
-                terraform: false,
-                ...subnetVisibilityCustomData,
-                terraformSubnetGroup: true,
-                accountId: subnetGroup.accountId,
-                region: subnetGroup.region,
-                vpcId: subnetGroup.vpcKey,
-                subnetId: subnetGroup.subnetKey,
-                subnetLabel: subnetGroup.subnetLabel,
+                ...buildContainerFacetCustomData(
+                  {
+                    terraform: false,
+                    ...subnetVisibilityCustomData,
+                    terraformSubnetGroup: true,
+                    accountId: subnetGroup.accountId,
+                    region: subnetGroup.region,
+                    vpcId: subnetGroup.vpcKey,
+                    subnetId: subnetGroup.subnetKey,
+                    subnetLabel: subnetGroup.subnetLabel,
+                  },
+                  subnetFacets,
+                ),
               },
             }),
           );

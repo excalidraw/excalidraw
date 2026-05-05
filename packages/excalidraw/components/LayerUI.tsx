@@ -160,6 +160,23 @@ type TerraformResourceDetails = {
   attributes?: TerraformAttribute[];
 };
 
+type TerraformFacetNestedSection = {
+  id?: string;
+  label?: string;
+  summary?: string;
+  data?: Record<string, unknown>;
+  sections?: TerraformFacetNestedSection[];
+};
+
+type TerraformContainerFacet = {
+  id?: string;
+  label?: string;
+  summary?: string;
+  data?: Record<string, unknown>;
+  sections?: TerraformFacetNestedSection[];
+  sources?: string[];
+};
+
 const TERRAFORM_GROUP_FLAGS = [
   "terraformModuleGroup",
   "terraformAccountGroup",
@@ -373,6 +390,86 @@ const getTerraformGroupTitle = (customData: Record<string, any>) => {
   return "Terraform group";
 };
 
+const getTerraformContainerFacets = (
+  customData: Record<string, any>,
+): TerraformContainerFacet[] =>
+  Array.isArray(customData.terraformContainerFacets)
+    ? customData.terraformContainerFacets
+    : [];
+
+const toFacetRows = (facet: TerraformContainerFacet) => {
+  const data = facet?.data;
+  if (!data || typeof data !== "object") {
+    return [];
+  }
+  return Object.entries(data).filter(
+    ([, value]) => value !== null && typeof value !== "undefined",
+  );
+};
+
+const TerraformNestedFacetSections = ({
+  sections,
+  depth = 0,
+}: {
+  sections: TerraformFacetNestedSection[];
+  depth?: number;
+}) => (
+  <>
+    {sections.map((section, secIdx) => {
+      const childSections = Array.isArray(section.sections)
+        ? section.sections
+        : [];
+      const sectionRows =
+        section.data && typeof section.data === "object"
+          ? Object.entries(section.data).filter(
+              ([, value]) =>
+                value !== null && typeof value !== "undefined",
+            )
+          : [];
+      const title = section.label || section.id || `Section ${secIdx + 1}`;
+      const key = section.id || `${title}-${depth}-${secIdx}`;
+      return (
+        <details
+          className="terraform-element-actions__nested-section"
+          key={key}
+          open={depth === 0 && secIdx === 0}
+        >
+          <summary className="terraform-element-actions__resource-title terraform-element-actions__nested-summary">
+            {title}
+            {section.summary ? (
+              <span className="terraform-element-actions__value">
+                {" "}
+                — {section.summary}
+              </span>
+            ) : null}
+          </summary>
+          <div>
+            {sectionRows.map(([rowKey, value]) => (
+              <div
+                className="terraform-element-actions__attribute"
+                key={`${key}-${rowKey}`}
+              >
+                <div className="terraform-element-actions__attribute-head">
+                  <span>{rowKey}</span>
+                </div>
+                <div className="terraform-element-actions__value terraform-element-actions__value--config">
+                  <TerraformConfigValue value={value} />
+                </div>
+              </div>
+            ))}
+            {childSections.length > 0 ? (
+              <TerraformNestedFacetSections
+                sections={childSections}
+                depth={depth + 1}
+              />
+            ) : null}
+          </div>
+        </details>
+      );
+    })}
+  </>
+);
+
 const TerraformGroupActions = ({
   element,
   renderAction,
@@ -381,6 +478,7 @@ const TerraformGroupActions = ({
   renderAction: ActionManager["renderAction"];
 }) => {
   const customData = element.customData ?? {};
+  const facets = getTerraformContainerFacets(customData);
   const rows = [
     ["Module path", customData.modulePath],
     ["Source", customData.moduleSource],
@@ -413,6 +511,66 @@ const TerraformGroupActions = ({
           </div>
         ))}
       </div>
+
+      {facets.length > 0 && (
+        <div className="terraform-element-actions__config">
+          {facets.map((facet, facetIndex) => {
+            const facetRows = toFacetRows(facet);
+            const title =
+              facet.label || facet.id || `Facet ${String(facetIndex + 1)}`;
+            return (
+              <details
+                className="terraform-element-actions__resource"
+                key={facet.id || `${title}-${facetIndex}`}
+                open={facetIndex === 0}
+              >
+                <summary className="terraform-element-actions__resource-title">
+                  {title}
+                  {facet.summary ? (
+                    <span className="terraform-element-actions__value">
+                      {" "}
+                      - {facet.summary}
+                    </span>
+                  ) : null}
+                </summary>
+                <div>
+                  {facet.sections && facet.sections.length > 0 ? (
+                    <TerraformNestedFacetSections sections={facet.sections} />
+                  ) : facetRows.length > 0 ? (
+                    facetRows.map(([key, value]) => (
+                      <div
+                        className="terraform-element-actions__attribute"
+                        key={`${title}-${key}`}
+                      >
+                        <div className="terraform-element-actions__attribute-head">
+                          <span>{key}</span>
+                        </div>
+                        <div className="terraform-element-actions__value terraform-element-actions__value--config">
+                          <TerraformConfigValue value={value} />
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="terraform-element-actions__empty">
+                      No facet data available.
+                    </div>
+                  )}
+                  {Array.isArray(facet.sources) && facet.sources.length > 0 ? (
+                    <div className="terraform-element-actions__attribute">
+                      <div className="terraform-element-actions__attribute-head">
+                        <span>sources</span>
+                      </div>
+                      <div className="terraform-element-actions__value terraform-element-actions__value--config">
+                        <TerraformConfigValue value={facet.sources} />
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </details>
+            );
+          })}
+        </div>
+      )}
 
       <fieldset>
         <legend>{t("labels.actions")}</legend>

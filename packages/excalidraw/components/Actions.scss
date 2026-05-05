@@ -288,6 +288,20 @@
     gap: 0.5rem;
   }
 
+  &__nested-section {
+    margin-top: 0.375rem;
+
+    .terraform-element-actions__nested-section {
+      margin-left: 0.625rem;
+      border-left: 1px solid var(--default-border-color);
+      padding-left: 0.5rem;
+    }
+  }
+
+  &__nested-summary {
+    cursor: pointer;
+  }
+
   &__resource-title {
     color: var(--input-label-color);
     font-size: 0.75rem;

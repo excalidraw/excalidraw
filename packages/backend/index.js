@@ -19,19 +19,26 @@ const {
   buildDataFlowEdges,
   externalResources,
   deleteOrphanedNodes,
+  omitVpcPlumbingNodes,
   filterVisualIgnore,
   cleanUpRoleLinks,
   refineCloudWatchMetricAlarmEdges,
 } = require("./pipeline");
+const { extractVpcNetworkingFacetStore } = require("./vpc-networking-facet");
 const { mockLanggraphEnrichment, applyEnrichment } = require("./enrichment");
 const { nodesToExcalidraw } = require("./excalidraw");
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 const upload = multer({ dest: "uploads/" });
 
 app.use(cors());
 app.use(express.json());
+
+app.get("/terraform/test-client", (_req, res) => {
+  const filePath = path.join(__dirname, "test-client.html");
+  return res.sendFile(filePath);
+});
 
 app.post(
   "/terraform/upload",
@@ -80,6 +87,9 @@ app.post(
       nodes = ensureEdgeLists(nodes);
       nodes = buildDataFlowEdges(nodes);
       nodes = ensureEdgeLists(nodes);
+      // Facets must capture routing plumbing before those nodes are removed.
+      nodes.__networkingFacetStore = extractVpcNetworkingFacetStore(nodes);
+      nodes = omitVpcPlumbingNodes(nodes);
       nodes = deleteOrphanedNodes(nodes);
       nodes = cleanUpRoleLinks(nodes);
       nodes = filterVisualIgnore(nodes);
@@ -93,7 +103,7 @@ app.post(
         planFilename: planFile.originalname,
         dotFilename: dotFile.originalname,
         stateFilename: stateFile?.originalname || null,
-        nodeCount: Object.keys(nodes).length,
+        nodeCount: Object.keys(nodes).filter((k) => !k.startsWith("__")).length,
       }).returning({ id: uploads.id }).get();
 
       return res.json({ id: inserted.id });
