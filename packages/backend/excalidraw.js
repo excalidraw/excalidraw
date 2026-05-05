@@ -1,10 +1,15 @@
 const fs = require("fs");
 const path = require("path");
+
 const { extractVpcNetworkingFacetStore } = require("./vpc-networking-facet");
 const {
   VPC_PERIMETER_LAYOUT_ENABLED,
   isVpcPerimeterNode,
   filterLayoutSimulationKeys,
+  classifyVpcApplianceWall,
+  classifySyntheticVpcTileWall,
+  layoutVpcApplianceRectanglesOnFrame,
+  getVpcApplianceKindForNode,
 } = require("./vpc-perimeter");
 
 function rand() {
@@ -2327,9 +2332,11 @@ function snapVpcPerimeterResourcePositions(
   tierMap,
   tierConfigs,
   perimeterSet,
+  nodes,
 ) {
+  const perimeterWallByNodePath = new Map();
   if (!VPC_PERIMETER_LAYOUT_ENABLED || perimeterSet.size === 0) {
-    return;
+    return perimeterWallByNodePath;
   }
 
   const VPC_PAD_X = 68;
@@ -2364,70 +2371,43 @@ function snapVpcPerimeterResourcePositions(
         const frameMinY = inner.minY - VPC_PAD_TOP;
         const frameMaxY = inner.maxY + VPC_PAD_BOTTOM;
 
-        const sorted = [...perimeterPaths].sort((a, b) =>
-          a.localeCompare(b),
+        const sorted = [...perimeterPaths].sort((a, b) => a.localeCompare(b));
+        const buckets = {
+          leftWall: [],
+          topWall: [],
+          rightWall: [],
+          bottomWall: [],
+        };
+
+        for (const p of sorted) {
+          const wall = classifyVpcApplianceWall(p, nodes[p]);
+          if (wall && buckets[wall]) {
+            buckets[wall].push(p);
+            perimeterWallByNodePath.set(p, wall);
+          }
+        }
+
+        const frame = {
+          minX: frameMinX,
+          maxX: frameMaxX,
+          minY: frameMinY,
+          maxY: frameMaxY,
+        };
+        const placements = layoutVpcApplianceRectanglesOnFrame(
+          frame,
+          buckets,
+          (path) => {
+            const cfg = tierConfigs[tierMap[path]];
+            return { w: cfg?.w ?? 120, h: cfg?.h ?? 80 };
+          },
         );
-        const lanes = [[], [], [], []];
-        sorted.forEach((p, i) => {
-          lanes[i % 4].push(p);
-        });
-        const [top, right, bottom, left] = lanes;
-
-        const spanX = Math.max(0, frameMaxX - frameMinX);
-        const spanY = Math.max(0, frameMaxY - frameMinY);
-
-        top.forEach((p, i) => {
-          const cfg = tierConfigs[tierMap[p]];
-          const w = cfg?.w ?? 120;
-          const n = top.length;
-          const t = n === 1 ? 0.5 : i / (n - 1);
-          const slack = Math.max(0, spanX - w);
-          positions[p] = {
-            x: frameMinX + t * slack,
-            y: frameMinY,
-          };
-        });
-
-        bottom.forEach((p, i) => {
-          const cfg = tierConfigs[tierMap[p]];
-          const w = cfg?.w ?? 120;
-          const h = cfg?.h ?? 80;
-          const n = bottom.length;
-          const t = n === 1 ? 0.5 : i / (n - 1);
-          const slack = Math.max(0, spanX - w);
-          positions[p] = {
-            x: frameMinX + t * slack,
-            y: frameMaxY - h,
-          };
-        });
-
-        right.forEach((p, i) => {
-          const cfg = tierConfigs[tierMap[p]];
-          const w = cfg?.w ?? 120;
-          const h = cfg?.h ?? 80;
-          const n = right.length;
-          const t = n === 1 ? 0.5 : i / (n - 1);
-          const slack = Math.max(0, spanY - h);
-          positions[p] = {
-            x: frameMaxX - w,
-            y: frameMinY + t * slack,
-          };
-        });
-
-        left.forEach((p, i) => {
-          const cfg = tierConfigs[tierMap[p]];
-          const h = cfg?.h ?? 80;
-          const n = left.length;
-          const t = n === 1 ? 0.5 : i / (n - 1);
-          const slack = Math.max(0, spanY - h);
-          positions[p] = {
-            x: frameMinX,
-            y: frameMinY + t * slack,
-          };
-        });
+        for (const pl of placements) {
+          positions[pl.item] = { x: pl.x, y: pl.y };
+        }
       }
     }
   }
+  return perimeterWallByNodePath;
 }
 
 function collectVpcApplianceTilesFromFacets(vpcFacets) {
@@ -2450,10 +2430,22 @@ function collectVpcApplianceTilesFromFacets(vpcFacets) {
         }
       } else if (top.label === "Gateways") {
         for (const child of children) {
+          const label = String(child.label || "").toLowerCase();
+          let gatewayKind = "other";
+          if (label.includes("internet_gateway") || label.includes("igw")) {
+            gatewayKind = "igw";
+          } else if (
+            label.includes("nat_gateway") ||
+            label.includes("nat gateway") ||
+            (label.includes("nat") && label.includes("gateway"))
+          ) {
+            gatewayKind = "nat";
+          }
           tiles.push({
             key: child.id || child.label || `gw-${tiles.length}`,
             label: child.label || "Gateway",
             applianceKind: "gateway",
+            gatewayKind,
           });
         }
       } else if (top.label === "Route table associations (VPC)") {
@@ -2470,6 +2462,45 @@ function collectVpcApplianceTilesFromFacets(vpcFacets) {
   return tiles;
 }
 
+function layoutApplianceTilesOnVpcEdges(
+  vpcApplianceTiles,
+  vpcBoxX,
+  vpcBoxY,
+  vpcBoxW,
+  vpcBoxH,
+) {
+  const tileW = 180;
+  const tileH = 44;
+  const sideBuckets = {
+    topWall: [],
+    rightWall: [],
+    bottomWall: [],
+    leftWall: [],
+  };
+  for (const tile of vpcApplianceTiles) {
+    sideBuckets[classifySyntheticVpcTileWall(tile)].push(tile);
+  }
+
+  const frame = {
+    minX: vpcBoxX,
+    maxX: vpcBoxX + vpcBoxW,
+    minY: vpcBoxY,
+    maxY: vpcBoxY + vpcBoxH,
+  };
+  const raw = layoutVpcApplianceRectanglesOnFrame(frame, sideBuckets, () => ({
+    w: tileW,
+    h: tileH,
+  }));
+  return raw.map((pl) => ({
+    tile: pl.item,
+    x: pl.x,
+    y: pl.y,
+    tileW: pl.w,
+    tileH: pl.h,
+    wall: pl.wall,
+  }));
+}
+
 function applianceStyleForKind(kind) {
   if (kind === "route_table") {
     return { strokeColor: "#c77d00", backgroundColor: "#fff4cc" };
@@ -2482,6 +2513,18 @@ function applianceStyleForKind(kind) {
   }
   if (kind === "endpoint") {
     return { strokeColor: "#2b8a3e", backgroundColor: "#d8f5a2" };
+  }
+  if (kind === "load_balancer") {
+    return { strokeColor: "#1864ab", backgroundColor: "#d0ebff" };
+  }
+  if (kind === "transit_gateway") {
+    return { strokeColor: "#5c940d", backgroundColor: "#ebfbee" };
+  }
+  if (kind === "vpn") {
+    return { strokeColor: "#9c36b5", backgroundColor: "#f3d9fa" };
+  }
+  if (kind === "direct_connect") {
+    return { strokeColor: "#087f5b", backgroundColor: "#c3fae8" };
   }
   return { strokeColor: "#495057", backgroundColor: "#f1f3f5" };
 }
@@ -2587,12 +2630,13 @@ async function nodesToExcalidraw(nodes) {
     moduleGroupByPath,
   );
   applyModulePresets(positions, nodeKeys, moduleGroupByPath);
-  snapVpcPerimeterResourcePositions(
+  const perimeterWallByNodePath = snapVpcPerimeterResourcePositions(
     positions,
     accountRegionGroups,
     tierMap,
     tierConfigs,
     perimeterSet,
+    nodes,
   );
   for (const path of perimeterSet) {
     const pos = positions[path];
@@ -2628,9 +2672,12 @@ async function nodesToExcalidraw(nodes) {
     posMap[nodePath] = { x, y, w: cfg.w, h: cfg.h, rectId, textId };
 
     const action = getPrimaryAction(nodes[nodePath]);
-    const isVpcEndpoint = isVpcPerimeterNode(nodePath, nodes[nodePath]);
-    const applianceStyle = isVpcEndpoint
-      ? applianceStyleForKind("endpoint")
+    const isVpcPerimeter = isVpcPerimeterNode(nodePath, nodes[nodePath]);
+    const vpcApplianceKind = isVpcPerimeter
+      ? getVpcApplianceKindForNode(nodePath, nodes[nodePath])
+      : null;
+    const applianceStyle = isVpcPerimeter
+      ? applianceStyleForKind(vpcApplianceKind)
       : null;
     const bgColor =
       applianceStyle?.backgroundColor || ACTION_COLORS[action] || ACTION_COLORS.existing;
@@ -2661,19 +2708,23 @@ async function nodesToExcalidraw(nodes) {
       roundness: { type: 3 },
       groupIds,
       boundElements: [],
-      strokeStyle: isVpcEndpoint
-        ? "dotted"
-        : action === "external"
-          ? "dashed"
-          : "solid",
+      strokeStyle:
+        isVpcPerimeter && vpcApplianceKind === "endpoint"
+          ? "dotted"
+          : action === "external"
+            ? "dashed"
+            : "solid",
       customData: {
         terraform: true,
         ...visibilityCustomData,
         resourceType,
         nodePath,
         action,
-        terraformVpcAppliance: isVpcEndpoint,
-        terraformVpcApplianceKind: isVpcEndpoint ? "endpoint" : null,
+        terraformVpcAppliance: isVpcPerimeter,
+        terraformVpcApplianceKind: isVpcPerimeter ? vpcApplianceKind : null,
+        terraformVpcApplianceWall: isVpcPerimeter
+          ? perimeterWallByNodePath.get(nodePath) || null
+          : null,
         region: nodeLocation?.region || null,
         accountId: nodeLocation?.accountId || null,
         vpcId: nodeVpc?.vpcKey || null,
@@ -3301,23 +3352,16 @@ async function nodesToExcalidraw(nodes) {
         );
 
         if (vpcApplianceTiles.length > 0) {
-          const tileW = 180;
-          const tileH = 44;
-          const gapX = 10;
-          const gapY = 8;
-          const maxCols = Math.max(
-            1,
-            Math.floor((vpcBoxW - 24 + gapX) / (tileW + gapX)),
+          const placements = layoutApplianceTilesOnVpcEdges(
+            vpcApplianceTiles,
+            vpcBoxX,
+            vpcBoxY,
+            vpcBoxW,
+            vpcBoxH,
           );
-          const baseX = vpcBoxX + 12;
-          const baseY = vpcBoxY + 42;
 
-          for (let tileIndex = 0; tileIndex < vpcApplianceTiles.length; tileIndex++) {
-            const tile = vpcApplianceTiles[tileIndex];
-            const col = tileIndex % maxCols;
-            const row = Math.floor(tileIndex / maxCols);
-            const x = baseX + col * (tileW + gapX);
-            const y = baseY + row * (tileH + gapY);
+          for (const placement of placements) {
+            const { tile, x, y, tileW, tileH, wall } = placement;
             const style = applianceStyleForKind(tile.applianceKind);
             const tileId = `vpc-appliance-${rand()}`;
             const tileTextId = `vpc-appliance-text-${rand()}`;
@@ -3344,6 +3388,7 @@ async function nodesToExcalidraw(nodes) {
                   ...vpcVisibilityCustomData,
                   terraformVpcAppliance: true,
                   terraformVpcApplianceKind: tile.applianceKind,
+                  terraformVpcApplianceWall: wall,
                   vpcId: vpcGroup.vpcKey,
                   applianceLabel: tile.label,
                 },
@@ -3375,6 +3420,7 @@ async function nodesToExcalidraw(nodes) {
                   ...vpcVisibilityCustomData,
                   terraformVpcAppliance: true,
                   terraformVpcApplianceKind: tile.applianceKind,
+                  terraformVpcApplianceWall: wall,
                   vpcId: vpcGroup.vpcKey,
                   applianceLabel: tile.label,
                 },
