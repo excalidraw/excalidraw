@@ -1,3 +1,7 @@
+/**
+ * Modal to upload plan JSON + graph DOT (+ optional state) to the Terraform backend and replace
+ * the canvas with the returned Excalidraw scene, or reload a prior upload by numeric id.
+ */
 import React, { useState } from "react";
 
 import { restoreElements } from "../data/restore";
@@ -8,7 +12,8 @@ import { useApp } from "./App";
 
 import "./TerraformImportDialog.scss";
 
-const BACKEND_URL = "http://localhost:3000";
+const TERRAFORM_BACKEND_URL =
+  import.meta.env.VITE_TERRAFORM_BACKEND_URL || "http://localhost:3000";
 
 const TerraformImportModal = ({
   onCloseRequest,
@@ -24,8 +29,11 @@ const TerraformImportModal = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /** Fetches generated scene JSON from the backend and replaces the editor scene. */
   const loadExcalidrawScene = async (id: string | number) => {
-    const res = await fetch(`${BACKEND_URL}/terraform/upload/${id}/excalidraw`);
+    const res = await fetch(
+      `${TERRAFORM_BACKEND_URL}/terraform/upload/${id}/excalidraw`,
+    );
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
       throw new Error(body.error || `Failed to load (HTTP ${res.status})`);
@@ -39,6 +47,7 @@ const TerraformImportModal = ({
     onCloseRequest();
   };
 
+  /** POST multipart upload then opens the new upload’s Excalidraw document. */
   const handleImport = async () => {
     if (!planFile || !dotFile) {
       return;
@@ -52,7 +61,7 @@ const TerraformImportModal = ({
       if (stateFile) {
         formData.append("stateFile", stateFile);
       }
-      const res = await fetch(`${BACKEND_URL}/terraform/upload`, {
+      const res = await fetch(`${TERRAFORM_BACKEND_URL}/terraform/upload`, {
         method: "POST",
         body: formData,
       });
@@ -69,6 +78,7 @@ const TerraformImportModal = ({
     }
   };
 
+  /** Loads an existing upload row by id from SQLite via the backend. */
   const handleOpen = async () => {
     if (!savedId.trim()) {
       return;
@@ -162,6 +172,7 @@ const TerraformImportModal = ({
   );
 };
 
+/** Dialog shell around `TerraformImportModal` (wide layout, no default title chrome). */
 export const TerraformImportDialog = ({
   onCloseRequest,
 }: {

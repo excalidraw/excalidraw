@@ -1,68 +1,18 @@
-const isPlainObject = (value) =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
+/**
+ * Derives VPC/subnet networking facet payloads from Terraform node configs before
+ * low-level plumbing nodes are stripped (`omitVpcPlumbingNodes` in `pipeline.js`).
+ * Output is stored on the graph as `nodes.__networkingFacetStore` for Excalidraw labels.
+ */
+const {
+  getCurrentResourceConfig,
+  getPrimaryResourceFromNode: getPrimaryResource,
+  normalizeVpcId,
+  normalizeSubnetId,
+  extractVpcIdsFromConfig,
+  extractSubnetIdsFromConfig,
+} = require("./terraform-graph-utils");
 
-function getCurrentResourceConfig(resource) {
-  const change = resource.change || {};
-  if (isPlainObject(change.after)) {
-    return change.after;
-  }
-  if (isPlainObject(resource.values)) {
-    return resource.values;
-  }
-  if (isPlainObject(change.before)) {
-    return change.before;
-  }
-  return {};
-}
-
-const getPrimaryResource = (node = {}) =>
-  Object.values(node.resources || {}).find((r) => r?.type) || {};
-
-function getResourceTypeFromNode(nodePath, node) {
-  return getPrimaryResource(node).type || String(nodePath).split(".").at(-2) || "";
-}
-
-function collectAwsIdsFromValue(value, normalizer, out, depth = 0) {
-  if (depth > 8 || value === null || typeof value === "undefined") {
-    return;
-  }
-
-  const normalized = normalizer(value);
-  if (normalized) {
-    out.add(normalized);
-    return;
-  }
-
-  if (Array.isArray(value)) {
-    for (const entry of value) {
-      collectAwsIdsFromValue(entry, normalizer, out, depth + 1);
-    }
-    return;
-  }
-
-  if (typeof value === "object") {
-    for (const entry of Object.values(value)) {
-      collectAwsIdsFromValue(entry, normalizer, out, depth + 1);
-    }
-  }
-}
-
-function normalizeVpcId(value) {
-  if (typeof value !== "string") {
-    return null;
-  }
-  const trimmed = value.trim();
-  return /^vpc-[0-9a-f]+$/i.test(trimmed) ? trimmed : null;
-}
-
-function normalizeSubnetId(value) {
-  if (typeof value !== "string") {
-    return null;
-  }
-  const trimmed = value.trim();
-  return /^subnet-[0-9a-f]+$/i.test(trimmed) ? trimmed : null;
-}
-
+/** Returns canonical `rtb-…` id or null. */
 function normalizeRouteTableId(value) {
   if (typeof value !== "string") {
     return null;
@@ -71,18 +21,12 @@ function normalizeRouteTableId(value) {
   return /^rtb-[0-9a-f]+$/i.test(trimmed) ? trimmed : null;
 }
 
-function extractVpcIdsFromConfig(config) {
-  const ids = new Set();
-  collectAwsIdsFromValue(config, normalizeVpcId, ids);
-  return [...ids];
+/** Terraform provider type for the node, from the primary resource or address heuristics. */
+function getResourceTypeFromNode(nodePath, node) {
+  return getPrimaryResource(node).type || String(nodePath).split(".").at(-2) || "";
 }
 
-function extractSubnetIdsFromConfig(config) {
-  const ids = new Set();
-  collectAwsIdsFromValue(config, normalizeSubnetId, ids);
-  return [...ids];
-}
-
+/** All non-metadata keys on the nodes map (Terraform addresses). */
 function getTerraformNodePaths(nodes) {
   return Object.keys(nodes || {}).filter((k) => !k.startsWith("__"));
 }
