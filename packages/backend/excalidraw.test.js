@@ -383,7 +383,7 @@ describe("nodesToExcalidraw container facets", () => {
 });
 
 describe("nodesToExcalidraw VPC perimeter layout", () => {
-  it("omits dependency arrows for VPC endpoints and lists endpoints in VPC facets", async () => {
+  it("renders perimeter endpoint arrows and lists endpoints in VPC facets", async () => {
     const scene = await nodesToExcalidraw({
       "aws_vpc.main": {
         resources: {
@@ -464,7 +464,14 @@ describe("nodesToExcalidraw VPC perimeter layout", () => {
         },
         edges_new: ["aws_lambda_function.worker"],
         edges_existing: [],
-        edges_data_flow: [],
+        edges_data_flow: [
+          {
+            target: "aws_lambda_function.worker",
+            type: "writes",
+            label: "writes",
+            origin: "iam_policy",
+          },
+        ],
       },
       "aws_vpc_endpoint.logs": {
         resources: {
@@ -605,7 +612,19 @@ describe("nodesToExcalidraw VPC perimeter layout", () => {
         rel?.target === "aws_vpc_endpoint.s3"
       );
     });
-    expect(endpointDeps).toHaveLength(0);
+    expect(endpointDeps.length).toBeGreaterThan(0);
+
+    const dataFlowArrows = scene.elements.filter(
+      (element) => element.customData?.terraformEdgeLayer === "dataFlow",
+    );
+    const endpointDataFlows = dataFlowArrows.filter((arrow) => {
+      const rel = arrow.customData?.relationship;
+      return (
+        rel?.source === "aws_vpc_endpoint.s3" ||
+        rel?.target === "aws_vpc_endpoint.s3"
+      );
+    });
+    expect(endpointDataFlows.length).toBeGreaterThan(0);
   });
 
   it("classifies load balancers to leftWall or topWall from internal flag", async () => {
