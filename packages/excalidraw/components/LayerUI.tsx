@@ -200,8 +200,8 @@ const TERRAFORM_DIM_EDGE_OPACITY = 28;
 const TERRAFORM_FOCUS_OPACITY = 100;
 const TERRAFORM_HOVER_INITIAL_HOPS = 1;
 const TERRAFORM_HOVER_HOP_BUDGET_BY_TYPE: Record<string, number> = {
-  aws_iam_role: 2,
-  aws_security_group: 2,
+  aws_iam_role: 1,
+  aws_security_group: 1,
 };
 
 const isTerraformDependencyEdge = (element: ExcalidrawElement) =>
@@ -264,6 +264,18 @@ const getHopBudgetForNode = (
   return TERRAFORM_HOVER_INITIAL_HOPS;
 };
 
+/** Parallel Terraform edges between the same node pair: pick one deterministically. */
+const pickCanonicalTerraformEdge = (candidates: ExcalidrawElement[]) => {
+  return [...candidates].sort((a, b) => {
+    const layerA = a.customData?.terraformEdgeLayer === "dependency" ? 0 : 1;
+    const layerB = b.customData?.terraformEdgeLayer === "dependency" ? 0 : 1;
+    if (layerA !== layerB) {
+      return layerA - layerB;
+    }
+    return String(a.id).localeCompare(String(b.id));
+  })[0];
+};
+
 const collectTerraformHoverFocus = (
   allElements: readonly ExcalidrawElement[],
   hoveredNodePath: string | null,
@@ -275,7 +287,22 @@ const collectTerraformHoverFocus = (
   }
 
   const elementByNodePath = new Map<string, ExcalidrawElement>();
-  const adjacency = new Map<string, Set<string>>();
+  /** u -> (v -> parallel edges u–v) */
+  const adjacencyWithEdges = new Map<
+    string,
+    Map<string, ExcalidrawElement[]>
+  >();
+  const addUndirectedEdge = (a: string, b: string, edge: ExcalidrawElement) => {
+    if (!adjacencyWithEdges.has(a)) {
+      adjacencyWithEdges.set(a, new Map());
+    }
+    const ma = adjacencyWithEdges.get(a)!;
+    if (!ma.has(b)) {
+      ma.set(b, []);
+    }
+    ma.get(b)!.push(edge);
+  };
+
   const edges = allElements.filter(
     (element) =>
       isTerraformLayerEdge(element) &&
@@ -295,52 +322,48 @@ const collectTerraformHoverFocus = (
     if (!rel) {
       continue;
     }
-    if (!adjacency.has(rel.source)) {
-      adjacency.set(rel.source, new Set());
-    }
-    if (!adjacency.has(rel.target)) {
-      adjacency.set(rel.target, new Set());
-    }
-    adjacency.get(rel.source)!.add(rel.target);
-    adjacency.get(rel.target)!.add(rel.source);
+    addUndirectedEdge(rel.source, rel.target, edge);
+    addUndirectedEdge(rel.target, rel.source, edge);
   }
 
+  const visited = new Set<string>();
+  /** BFS spanning tree: child nodePath -> edge id from parent (root has no entry). */
+  const treeEdgeIdByChild = new Map<string, string>();
   const queue: Array<{ nodePath: string; depth: number }> = [
     { nodePath: hoveredNodePath, depth: 0 },
   ];
-  const seenDepth = new Map<string, number>();
 
   while (queue.length > 0) {
     const current = queue.shift()!;
-    const prevDepth = seenDepth.get(current.nodePath);
-    if (typeof prevDepth === "number" && prevDepth <= current.depth) {
+    const { nodePath: u, depth: d } = current;
+    if (visited.has(u)) {
       continue;
     }
-    seenDepth.set(current.nodePath, current.depth);
-    focusedNodePaths.add(current.nodePath);
+    visited.add(u);
+    focusedNodePaths.add(u);
 
-    if (
-      current.depth >= getHopBudgetForNode(elementByNodePath, current.nodePath)
-    ) {
+    const treeEdgeId = treeEdgeIdByChild.get(u);
+    if (treeEdgeId) {
+      focusedEdgeIds.add(treeEdgeId);
+    }
+
+    if (d >= getHopBudgetForNode(elementByNodePath, u)) {
       continue;
     }
 
-    const neighbors = adjacency.get(current.nodePath);
-    if (!neighbors) {
+    const neighborMap = adjacencyWithEdges.get(u);
+    if (!neighborMap) {
       continue;
     }
-    for (const neighbor of neighbors) {
-      queue.push({ nodePath: neighbor, depth: current.depth + 1 });
-    }
-  }
 
-  for (const edge of edges) {
-    const rel = getNodePathFromRelationship(edge);
-    if (!rel) {
-      continue;
-    }
-    if (focusedNodePaths.has(rel.source) || focusedNodePaths.has(rel.target)) {
-      focusedEdgeIds.add(edge.id);
+    for (const [v, parallel] of neighborMap) {
+      if (visited.has(v)) {
+        continue;
+      }
+      if (!treeEdgeIdByChild.has(v)) {
+        treeEdgeIdByChild.set(v, pickCanonicalTerraformEdge(parallel).id);
+      }
+      queue.push({ nodePath: v, depth: d + 1 });
     }
   }
 
