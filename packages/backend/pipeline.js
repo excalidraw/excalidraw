@@ -1,3 +1,5 @@
+const { getTerraformNodePaths } = require("./vpc-networking-facet");
+
 const stripIndexes = (address = "") => address.replace(/\[[^\]]+\]/g, "");
 
 const sanitizeDotNodeId = (nodeId = "") => {
@@ -1215,10 +1217,55 @@ function externalResources(nodes) {
   return nodes;
 }
 
+/** Routing plumbing: folded into VPC facet tree; omitted from canvas graph. */
+const VPC_PLUMBING_OMIT_TYPES = new Set([
+  "aws_route_table",
+  "aws_route",
+  "aws_route_table_association",
+  "aws_default_route_table",
+  "aws_main_route_table_association",
+  "aws_internet_gateway",
+  "aws_nat_gateway",
+]);
+
+function stripEdgesReferencingPaths(nodes, omitted) {
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__") || !node) {
+      continue;
+    }
+    node.edges_new = (node.edges_new || []).filter((e) => !omitted.has(e));
+    node.edges_existing = (node.edges_existing || []).filter(
+      (e) => !omitted.has(e),
+    );
+    node.edges_data_flow = (node.edges_data_flow || []).filter(
+      (edge) => !omitted.has(edge.target),
+    );
+  }
+}
+
+function omitVpcPlumbingNodes(nodes) {
+  const omitted = new Set();
+  for (const nodePath of getTerraformNodePaths(nodes)) {
+    const type = getResourceType(nodePath, nodes[nodePath]);
+    if (VPC_PLUMBING_OMIT_TYPES.has(type)) {
+      omitted.add(nodePath);
+    }
+  }
+  stripEdgesReferencingPaths(nodes, omitted);
+  for (const path of omitted) {
+    delete nodes[path];
+  }
+  return nodes;
+}
+
 function deleteOrphanedNodes(nodes) {
+  const metaEntries = Object.entries(nodes).filter(([key]) => key.startsWith("__"));
   const connected = new Set();
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     const edges = [
       ...(node.edges_existing || []),
       ...(node.edges_new || []),
@@ -1237,9 +1284,16 @@ function deleteOrphanedNodes(nodes) {
   const filtered = {};
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     if (connected.has(nodePath)) {
       filtered[nodePath] = node;
     }
+  }
+
+  for (const [metaKey, metaValue] of metaEntries) {
+    filtered[metaKey] = metaValue;
   }
 
   return filtered;
@@ -1249,6 +1303,9 @@ function filterVisualIgnore(nodes) {
   const ignored = new Set();
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     for (const resource of Object.values(node.resources || {})) {
       const tags = resource.change?.after?.tags ?? resource.values?.tags ?? {};
       if (tags?.visual === "ignore") {
@@ -1262,7 +1319,8 @@ function filterVisualIgnore(nodes) {
     delete nodes[nodePath];
   }
 
-  for (const node of Object.values(nodes)) {
+  for (const nodePath of getTerraformNodePaths(nodes)) {
+    const node = nodes[nodePath];
     node.edges_new = (node.edges_new || []).filter((e) => !ignored.has(e));
     node.edges_existing = (node.edges_existing || []).filter(
       (e) => !ignored.has(e),
@@ -1277,6 +1335,9 @@ function filterVisualIgnore(nodes) {
 
 function cleanUpRoleLinks(nodes) {
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     node.edges_existing ||= [];
     node.edges_new ||= [];
     node.edges_data_flow ||= [];
@@ -1315,6 +1376,7 @@ module.exports = {
   buildDataFlowEdges,
   externalResources,
   deleteOrphanedNodes,
+  omitVpcPlumbingNodes,
   filterVisualIgnore,
   cleanUpRoleLinks,
   refineCloudWatchMetricAlarmEdges,

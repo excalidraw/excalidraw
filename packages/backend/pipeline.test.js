@@ -6,6 +6,8 @@ const {
   getModulePathChainFromAddress,
   buildNewEdges,
   refineCloudWatchMetricAlarmEdges,
+  omitVpcPlumbingNodes,
+  deleteOrphanedNodes,
 } = require("./pipeline");
 
 const resource = (address, type, name, values = {}) => ({
@@ -14,6 +16,78 @@ const resource = (address, type, name, values = {}) => ({
   name,
   values,
   change: { actions: ["create"], after: values },
+});
+
+describe("omitVpcPlumbingNodes", () => {
+  it("removes VPC plumbing nodes and strips references while retaining SG / NACL-class nodes", () => {
+    let nodes = ensureEdgeLists({
+      "aws_vpc.main": {
+        resources: {
+          "aws_vpc.main": resource("aws_vpc.main", "aws_vpc", "main", {
+            id: "vpc-aaaa",
+          }),
+        },
+        edges_new: ["aws_route_table.rt", "aws_security_group.sg"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_route_table.rt": {
+        resources: {
+          "aws_route_table.rt": resource("aws_route_table.rt", "aws_route_table", "rt", {
+            id: "rtb-1",
+            vpc_id: "vpc-aaaa",
+          }),
+        },
+        edges_new: ["aws_vpc.main"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_security_group.sg": {
+        resources: {
+          "aws_security_group.sg": resource(
+            "aws_security_group.sg",
+            "aws_security_group",
+            "sg",
+            { vpc_id: "vpc-aaaa" },
+          ),
+        },
+        edges_new: ["aws_vpc.main"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    });
+
+    nodes = omitVpcPlumbingNodes(nodes);
+
+    expect(nodes["aws_route_table.rt"]).toBeUndefined();
+    expect(nodes["aws_security_group.sg"]).toBeDefined();
+    expect(nodes["aws_vpc.main"].edges_new).toEqual(["aws_security_group.sg"]);
+    expect(nodes["aws_security_group.sg"].edges_new).toEqual(["aws_vpc.main"]);
+  });
+});
+
+describe("deleteOrphanedNodes", () => {
+  it("preserves __-prefixed metadata keys on the graph object", () => {
+    const nodes = {
+      __networkingFacetStore: { byVpcKey: {}, bySubnetKey: {} },
+      a: {
+        resources: {},
+        edges_new: ["b"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      b: {
+        resources: {},
+        edges_new: ["a"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    };
+    const out = deleteOrphanedNodes(nodes);
+    expect(out.__networkingFacetStore).toEqual(nodes.__networkingFacetStore);
+    expect(out.a).toBeDefined();
+    expect(out.b).toBeDefined();
+  });
 });
 
 const buildNodes = (resources) => {

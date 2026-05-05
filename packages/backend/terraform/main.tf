@@ -1,3 +1,4 @@
+/*
 resource "aws_kms_key" "s3" {
   description             = "KMS key for S3 bucket encryption"
   deletion_window_in_days = 7
@@ -85,8 +86,25 @@ resource "aws_subnet" "lambda_private" {
   map_public_ip_on_launch = false
 }
 
+resource "aws_internet_gateway" "lambda" {
+  vpc_id = aws_vpc.lambda.id
+}
+
 resource "aws_route_table" "lambda_private" {
   vpc_id = aws_vpc.lambda.id
+
+  # Mock route config for graph/testing UI only.
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.lambda.id
+  }
+
+  tags = {
+    Name          = "ts-test-lambda-private-rt"
+    environment   = "dev"
+    route_profile = "private-egress"
+    owner         = "terraform-graph-demo"
+  }
 }
 
 resource "aws_route_table_association" "lambda_private" {
@@ -94,6 +112,14 @@ resource "aws_route_table_association" "lambda_private" {
 
   subnet_id      = each.value.id
   route_table_id = aws_route_table.lambda_private.id
+}
+
+# Additional standalone route resource to exercise aws_route parsing in the
+# Terraform side panel and container facet summaries.
+resource "aws_route" "lambda_private_service" {
+  route_table_id         = aws_route_table.lambda_private.id
+  destination_cidr_block = "10.99.0.0/16"
+  gateway_id             = aws_internet_gateway.lambda.id
 }
 
 resource "aws_security_group" "lambda" {
@@ -302,3 +328,4 @@ resource "aws_cloudwatch_metric_alarm" "dlq_messages" {
     QueueName = aws_sqs_queue.dlq.name
   }
 }
+*/

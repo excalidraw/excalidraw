@@ -33,6 +33,7 @@ Server starts on `http://localhost:3000`.
 | POST | `/terraform/upload` | Upload a Terraform/OpenTofu plan JSON, DOT graph, and optional state file. Returns an upload id. |
 | GET | `/terraform/upload/:id` | Fetch the processed Terraform graph nodes for an upload. |
 | GET | `/terraform/upload/:id/excalidraw` | Download the processed graph as an `.excalidraw` file. |
+| GET | `/terraform/test-client` | Open a lightweight browser UI to upload plan+dot files and inspect VPC/subnet facet summaries from generated Excalidraw output. |
 
 `POST /terraform/upload` expects multipart form fields:
 

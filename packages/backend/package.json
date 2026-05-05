@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "selftest:upload": "node selftest-upload.js"
   },
   "dependencies": {
     "@dagrejs/graphlib-dot": "1.0.2",
