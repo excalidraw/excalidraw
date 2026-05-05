@@ -3567,12 +3567,6 @@ async function nodesToExcalidraw(nodes) {
       kinds,
       origins,
     } = relationship;
-    if (
-      isVpcPerimeterNode(source, nodes[source]) ||
-      isVpcPerimeterNode(target, nodes[target])
-    ) {
-      continue;
-    }
     const posA = posMap[source];
     const posB = posMap[target];
     const arrowId = `arrow-${arrowIdx++}`;
@@ -3654,12 +3648,6 @@ async function nodesToExcalidraw(nodes) {
       bidirectional = false,
       directions = [],
     } = edge;
-    if (
-      isVpcPerimeterNode(source, nodes[source]) ||
-      isVpcPerimeterNode(target, nodes[target])
-    ) {
-      continue;
-    }
     const posA = posMap[source];
     const posB = posMap[target];
     if (!posA || !posB) {
