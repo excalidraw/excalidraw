@@ -1470,21 +1470,24 @@ function buildNodeSubnetMap(nodes, nodeVpcMap) {
     let subnetKey = null;
     let subnetLabel = null;
     let subnetVpcKey = null;
+    let subnetMemberships = [];
 
     if (subnetAnchorByNodePath.has(nodePath)) {
       const anchor = subnetAnchorByNodePath.get(nodePath);
       subnetKey = anchor.subnetKey;
       subnetLabel = anchor.subnetLabel;
       subnetVpcKey = subnetVpcKeyBySubnetKey.get(subnetKey) || null;
+      subnetMemberships = [subnetKey];
     } else {
       for (const resource of Object.values(node.resources || {})) {
         const config = getCurrentResourceConfig(resource);
-        const explicitSubnetIds = extractSubnetIdsFromConfig(config);
+        const explicitSubnetIds = [...extractSubnetIdsFromConfig(config)].sort();
         if (explicitSubnetIds.length > 0) {
-          const subnetId = [...explicitSubnetIds].sort()[0];
+          const subnetId = explicitSubnetIds[0];
           subnetKey = subnetId;
           subnetLabel = subnetId;
           subnetVpcKey = subnetVpcKeyBySubnetKey.get(subnetId) || null;
+          subnetMemberships = explicitSubnetIds;
           break;
         }
       }
@@ -1517,6 +1520,7 @@ function buildNodeSubnetMap(nodes, nodeVpcMap) {
       subnetKey,
       subnetLabel: label,
       vpcKey: subnetVpcKey,
+      subnetKeys: subnetMemberships.length > 0 ? subnetMemberships : [subnetKey],
     });
   }
 
@@ -1637,18 +1641,24 @@ function collectAccountRegionGroups(
 
       const subnet = nodeSubnetMap.get(nodePath);
       if (subnet && subnet.subnetKey) {
-        if (!vpcGroup.subnets.has(subnet.subnetKey)) {
-          vpcGroup.subnets.set(subnet.subnetKey, {
-            subnetKey: subnet.subnetKey,
-            subnetLabel: subnet.subnetLabel,
-            accountId,
-            region,
-            vpcKey: vpc.vpcKey,
-            nodePaths: [],
-          });
-        }
+        const subnetKeys = subnet.subnetKeys?.length
+          ? subnet.subnetKeys
+          : [subnet.subnetKey];
+        for (const subnetKey of subnetKeys) {
+          if (!vpcGroup.subnets.has(subnetKey)) {
+            vpcGroup.subnets.set(subnetKey, {
+              subnetKey,
+              subnetLabel:
+                subnetKey === subnet.subnetKey ? subnet.subnetLabel : subnetKey,
+              accountId,
+              region,
+              vpcKey: vpc.vpcKey,
+              nodePaths: [],
+            });
+          }
 
-        vpcGroup.subnets.get(subnet.subnetKey).nodePaths.push(nodePath);
+          vpcGroup.subnets.get(subnetKey).nodePaths.push(nodePath);
+        }
       }
     }
   }
@@ -1675,6 +1685,89 @@ function collectAccountRegionGroups(
           })),
       })),
     }));
+}
+
+function pushUniqueNodePaths(group, nodePaths) {
+  const existing = new Set(group.nodePaths);
+  for (const nodePath of nodePaths) {
+    if (!existing.has(nodePath)) {
+      group.nodePaths.push(nodePath);
+      existing.add(nodePath);
+    }
+  }
+}
+
+function expandNetworkContainerGroupsWithModuleMembership(
+  accountRegionGroups,
+  moduleGroups,
+  nodeLocationMap,
+  nodeVpcMap,
+  nodeSubnetMap,
+) {
+  const accountById = new Map(
+    accountRegionGroups.map((account) => [account.accountId, account]),
+  );
+
+  for (const moduleGroup of moduleGroups) {
+    const membershipTargets = new Map();
+
+    for (const nodePath of moduleGroup.nodePaths) {
+      const location = nodeLocationMap.get(nodePath);
+      const vpc = nodeVpcMap.get(nodePath);
+      const subnet = nodeSubnetMap.get(nodePath);
+      if (!location || !vpc?.vpcKey) {
+        continue;
+      }
+
+      const subnetKeys = subnet?.subnetKeys?.length
+        ? subnet.subnetKeys
+        : [subnet?.subnetKey || ""];
+      for (const subnetKey of subnetKeys) {
+        const key = [
+          location.accountId,
+          location.region,
+          vpc.vpcKey,
+          subnetKey,
+        ].join("|||");
+        if (!membershipTargets.has(key)) {
+          membershipTargets.set(key, {
+            accountId: location.accountId,
+            region: location.region,
+            vpcKey: vpc.vpcKey,
+            subnetKey: subnetKey || null,
+          });
+        }
+      }
+    }
+
+    for (const target of membershipTargets.values()) {
+      const accountGroup = accountById.get(target.accountId);
+      const regionGroup = accountGroup?.regions.find(
+        (region) => region.region === target.region,
+      );
+      const vpcGroup = regionGroup?.vpcs.find(
+        (vpc) => vpc.vpcKey === target.vpcKey,
+      );
+      if (!accountGroup || !regionGroup || !vpcGroup) {
+        continue;
+      }
+
+      pushUniqueNodePaths(accountGroup, moduleGroup.nodePaths);
+      pushUniqueNodePaths(regionGroup, moduleGroup.nodePaths);
+      pushUniqueNodePaths(vpcGroup, moduleGroup.nodePaths);
+
+      if (target.subnetKey) {
+        const subnetGroup = vpcGroup.subnets.find(
+          (subnet) => subnet.subnetKey === target.subnetKey,
+        );
+        if (subnetGroup) {
+          pushUniqueNodePaths(subnetGroup, moduleGroup.nodePaths);
+        }
+      }
+    }
+  }
+
+  return accountRegionGroups;
 }
 
 // --- Element builders ---
@@ -2576,13 +2669,19 @@ async function nodesToExcalidraw(nodes) {
     nodeSubnetMap,
     networkingFacetStore,
   });
-  const accountRegionGroups = collectAccountRegionGroups(
-    nodeKeys,
+  const moduleGroups = collectModuleGroups(nodeKeys, nodes);
+  const accountRegionGroups = expandNetworkContainerGroupsWithModuleMembership(
+    collectAccountRegionGroups(
+      nodeKeys,
+      nodeLocationMap,
+      nodeVpcMap,
+      nodeSubnetMap,
+    ),
+    moduleGroups,
     nodeLocationMap,
     nodeVpcMap,
     nodeSubnetMap,
   );
-  const moduleGroups = collectModuleGroups(nodeKeys, nodes);
   const moduleGroupIdByPath = new Map(
     moduleGroups.map((group) => [group.modulePath, `module-group-${rand()}`]),
   );
@@ -3234,12 +3333,13 @@ async function nodesToExcalidraw(nodes) {
         const boundsPaths =
           vpcInteriorPaths.length > 0 ? vpcInteriorPaths : vpcGroup.nodePaths;
         const vpcBounds =
+          measureBounds(getUniqueVisualBounds(boundsPaths)) ||
           measureBoundsFromNodePositions(
             boundsPaths,
             positions,
             tierMap,
             tierConfigs,
-          ) || measureBounds(getUniqueVisualBounds(boundsPaths));
+          );
         if (!vpcBounds) {
           continue;
         }
