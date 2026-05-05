@@ -7,6 +7,8 @@ graph.db-shm
 graph.db-wal
 *.tfstate
 *.tfstate.backup
+# State saved under odd names (e.g. Finder duplicates) still contain secrets — ignore all variants under terraform dirs.
+**/terraform/*tfstate*
 pluralith-*.pdf
 .env.development.local
 .env.local
