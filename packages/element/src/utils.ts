@@ -27,6 +27,7 @@ import {
 } from "@excalidraw/math";
 
 import type { Curve, LineSegment, LocalPoint } from "@excalidraw/math";
+import { doLineSegmentsIntersect } from "@excalidraw/utils";
 
 import type {
   AppState,
@@ -476,6 +477,31 @@ export const isPathALoop = (
     // Adjusting LINE_CONFIRM_THRESHOLD to current zoom so that when zoomed in
     // really close we make the threshold smaller, and vice versa.
     return distance <= LINE_CONFIRM_THRESHOLD / zoomValue;
+  }
+  return false;
+};
+
+// Checks if the path crosses itself to be considered closed
+export const doesPathIntersect = (
+  points: ExcalidrawLinearElement["points"],
+): boolean => {
+  // Detect intersection exist in the loop
+  if (points.length >= 4) {
+    for (let i = 0; i < points.length - 1; i++) {
+      for (let j = i + 2; j < points.length - 1; j++) {
+        // Skip adjacent segments
+        if (i === 0 && j === points.length - 2) continue;
+
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const q1 = points[j];
+        const q2 = points[j + 1];
+
+        if (doLineSegmentsIntersect(lineSegment(q1, q2), lineSegment(p1, p2))) {
+          return true;
+        }
+      }
+    }
   }
   return false;
 };

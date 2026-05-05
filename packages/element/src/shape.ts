@@ -52,7 +52,7 @@ import {
   isIframeLikeElement,
   isLinearElement,
 } from "./typeChecks";
-import { getCornerRadius, isPathALoop } from "./utils";
+import { doesPathIntersect, getCornerRadius, isPathALoop } from "./utils";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
@@ -194,6 +194,7 @@ export const generateRoughOptions = (
   element: ExcalidrawElement,
   continuousPath = false,
   isDarkMode: boolean = false,
+  isElementALoop: boolean = false,
 ): Options => {
   const options: Options = {
     seed: element.seed,
@@ -244,7 +245,7 @@ export const generateRoughOptions = (
     }
     case "line":
     case "freedraw": {
-      if (isPathALoop(element.points)) {
+      if (isElementALoop) {
         options.fillStyle = element.fillStyle;
         options.fill =
           element.backgroundColor === "transparent"
@@ -966,7 +967,8 @@ const _generateElementShape = (
       const shapes: ElementShapes[typeof element.type] = [];
 
       // (1) background fill (rc shape), optional
-      if (isPathALoop(element.points)) {
+      const isLoopFromProximity = isPathALoop(element.points);
+      if (isLoopFromProximity || doesPathIntersect(element.points)) {
         // generate rough polygon to fill freedraw shape
         const simplifiedPoints = simplify(
           element.points as Mutable<LocalPoint[]>,
