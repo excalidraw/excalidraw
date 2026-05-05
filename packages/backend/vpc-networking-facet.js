@@ -104,6 +104,7 @@ function extractVpcNetworkingFacetStore(nodes) {
   const natGateways = [];
   const defaultRouteTables = [];
   const mainRtAssocs = [];
+  const vpcEndpoints = [];
 
   for (const nodePath of getTerraformNodePaths(nodes)) {
     const node = nodes[nodePath];
@@ -151,6 +152,8 @@ function extractVpcNetworkingFacetStore(nodes) {
         defaultRouteTables.push({ address, nodePath, config, type });
       } else if (type === "aws_main_route_table_association") {
         mainRtAssocs.push({ address, nodePath, config, type });
+      } else if (type === "aws_vpc_endpoint") {
+        vpcEndpoints.push({ address, nodePath, config, type });
       }
     }
   }
@@ -203,6 +206,7 @@ function extractVpcNetworkingFacetStore(nodes) {
     ...natGateways.flatMap((nat) => extractVpcIdsFromConfig(nat.config)),
     ...defaultRouteTables.flatMap((d) => extractVpcIdsFromConfig(d.config)),
     ...mainRtAssocs.flatMap((m) => extractVpcIdsFromConfig(m.config)),
+    ...vpcEndpoints.flatMap((ep) => extractVpcIdsFromConfig(ep.config)),
   ]);
 
   for (const rt of routeTables) {
@@ -349,6 +353,26 @@ function extractVpcNetworkingFacetStore(nodes) {
       });
     }
 
+    const endpointSections = [];
+    for (const ep of vpcEndpoints) {
+      const vpcIds = extractVpcIdsFromConfig(ep.config);
+      if (vpcIds[0] !== vpcKey) {
+        continue;
+      }
+      pushSource(vpcKey, ep.address);
+      endpointSections.push({
+        id: ep.address,
+        label: ep.address.split(".").slice(-2).join(".") || ep.address,
+        summary: ep.config.service_name || ep.config.vpc_endpoint_type || "",
+        data: {
+          terraform_address: ep.address,
+          vpc_endpoint_config: ep.config,
+          service_name: ep.config.service_name,
+          vpc_endpoint_type: ep.config.vpc_endpoint_type,
+        },
+      });
+    }
+
     const extraRtSections = [];
     for (const d of defaultRouteTables) {
       const vpcIds = extractVpcIdsFromConfig(d.config);
@@ -397,6 +421,13 @@ function extractVpcNetworkingFacetStore(nodes) {
         id: `${vpcKey}-gateways`,
         label: "Gateways",
         sections: gatewaySections,
+      });
+    }
+    if (endpointSections.length > 0) {
+      topSections.push({
+        id: `${vpcKey}-vpc-endpoints`,
+        label: "VPC endpoints",
+        sections: endpointSections,
       });
     }
     if (extraRtSections.length > 0) {
