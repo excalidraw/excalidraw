@@ -582,9 +582,11 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
     // we don't always need to update the element if it's already in the frame,
     // but we still need to accumulate in finalElementsToAdd so we potentially
     // reorder them if added together
-    mutateElement(element, elementsMap, {
-      frameId: frame.id,
-    });
+    if (element.frameId !== frame.id) {
+      mutateElement(element, elementsMap, {
+        frameId: frame.id,
+      });
+    }
   }
 
   // (re)order elements to be just below the frame,
