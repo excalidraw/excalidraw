@@ -835,6 +835,17 @@ describe("adding elements to frames", () => {
         width: 20,
         height: 20,
         frameId: frame.id,
+        boundElements: [{ id: "boundText", type: "text" }],
+      });
+      const boundText = API.createElement({
+        id: "boundText",
+        type: "text",
+        x: 50,
+        y: 10,
+        width: 20,
+        height: 20,
+        containerId: frameChild.id,
+        frameId: frame.id,
       });
       const otherFrameChild = API.createElement({
         id: "otherFrameChild",
@@ -854,7 +865,13 @@ describe("adding elements to frames", () => {
         height: 20,
       });
 
-      API.setElements([frame, frameChild, otherFrameChild, nonFrameElement]);
+      API.setElements([
+        frame,
+        frameChild,
+        boundText,
+        otherFrameChild,
+        nonFrameElement,
+      ]);
       API.setSelectedElements([frameChild, nonFrameElement]);
 
       mouse.downAt(
@@ -865,11 +882,13 @@ describe("adding elements to frames", () => {
       mouse.up();
 
       expect(frameChild.frameId).toBe(frame.id);
+      expect(boundText.frameId).toBe(frame.id);
       expect(nonFrameElement.frameId).toBe(frame.id);
       expect(h.elements.map((element) => element.id)).toEqual([
         frame.id,
         otherFrameChild.id,
         frameChild.id,
+        boundText.id,
         nonFrameElement.id,
       ]);
     });

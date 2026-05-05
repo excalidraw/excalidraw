@@ -540,12 +540,6 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
 ): T => {
   const elementsMap = arrayToMap(allElements);
   const commonFrameId = getCommonFrameId(elementsToAdd);
-  const currTargetFrameChildrenMap = new Map<ExcalidrawElement["id"], true>();
-  for (const element of allElements.values()) {
-    if (element.frameId === frame.id) {
-      currTargetFrameChildrenMap.set(element.id, true);
-    }
-  }
 
   const finalElementsToAdd = new Set<ExcalidrawElement>();
 
@@ -579,11 +573,7 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
     finalElementsToAdd.add(element);
 
     const boundTextElement = getBoundTextElement(element, elementsMap);
-    if (
-      boundTextElement &&
-      !finalElementsToAdd.has(boundTextElement) &&
-      !currTargetFrameChildrenMap.has(boundTextElement.id)
-    ) {
+    if (boundTextElement && !finalElementsToAdd.has(boundTextElement)) {
       finalElementsToAdd.add(boundTextElement);
     }
   }
