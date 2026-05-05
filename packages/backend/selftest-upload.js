@@ -1,3 +1,7 @@
+/**
+ * One-shot script: builds a tiny plan+dot in a temp dir, POSTs to the backend, prints upload id.
+ * Run from repo root with backend up: `node packages/backend/selftest-upload.js` (optional `BACKEND_URL`).
+ */
 const fs = require("fs");
 const os = require("os");
 const path = require("path");

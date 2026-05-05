@@ -1,4 +1,17 @@
+/**
+ * Terraform graph pipeline: plan JSON + DOT adjacency + optional state → enriched `nodes` map.
+ *
+ * **Node map:** keys are Terraform addresses; values hold `resources`, `edges_new` (DOT BFS),
+ * `edges_existing` (state / depends_on), and `edges_data_flow` (semantic IAM and integration edges).
+ * Keys starting with `__` are pipeline metadata (kept through pruning).
+ *
+ * **Order of transforms** matches `index.js` `POST /terraform/upload`: load plan → state merge →
+ * module nodes → module metadata → data-source filter → DOT edges → diffs → existing edges →
+ * alarm refinement → data-flow edges → VPC facet capture (caller) → plumbing omit → orphans →
+ * role-link cleanup → visual-ignore filter.
+ */
 const { getTerraformNodePaths } = require("./vpc-networking-facet");
+const { isPlainObject } = require("./terraform-graph-utils");
 
 const stripIndexes = (address = "") => address.replace(/\[[^\]]+\]/g, "");
 
@@ -36,6 +49,7 @@ function resolveCanonicalNodePath(nodes, address) {
   return null;
 }
 
+/** Registers a Terraform address key (full or index-stripped) → node path in the data-flow index. */
 function addToAddressIndex(index, key, nodePath) {
   if (!key || !nodePath) {
     return;
@@ -52,9 +66,6 @@ const sanitizeDotNodeId = (nodeId = "") => {
   return raw.replace(/["\\]/g, "");
 };
 
-const isPlainObject = (value) =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
-
 const EDGE_FILTER_RULES = [
   ["aws_iam_role_policy", "aws_lambda_function"],
   ["aws_iam_policy_document", "aws_lambda_function"],
@@ -65,6 +76,7 @@ const EDGE_FILTER_RULES = [
 /** Data sources not on this list are omitted from the graph and act as DOT traversal barriers. */
 const DATA_SOURCE_GRAPH_ALLOWLIST = new Set(["aws_iam_policy_document"]);
 
+/** Returns the Terraform data source type segment from an address, or null if not a data block. */
 function getDataSourceTypeFromAddress(address = "") {
   const parts = stripIndexes(String(address)).split(".");
   const di = parts.indexOf("data");
@@ -74,6 +86,7 @@ function getDataSourceTypeFromAddress(address = "") {
   return parts[di + 1] || null;
 }
 
+/** True when this data source address is not on the graph allowlist (omitted from traversal). */
 function isExcludedDataSourceAddress(address) {
   const sourceType = getDataSourceTypeFromAddress(address);
   if (!sourceType) {
@@ -199,6 +212,7 @@ function collectAllTerraformModulePaths(nodePaths) {
   return out;
 }
 
+/** Last path segment of a module address (the declared module label), for synthetic module node names. */
 function lastModuleNameSegment(modulePath) {
   const parts = modulePath.split(".");
   return parts[parts.length - 1] || modulePath;
@@ -241,6 +255,7 @@ const getResourceValues = (resource = {}) => ({
 const getPrimaryResource = (node = {}) =>
   Object.values(node.resources || {}).find((resource) => resource?.type) || {};
 
+/** True if the node's primary resource is a data source outside `DATA_SOURCE_GRAPH_ALLOWLIST`. */
 function isExcludedDataSourceNode(node, primary = getPrimaryResource(node)) {
   if (!primary || primary.mode !== "data" || !primary.type) {
     return false;
@@ -350,6 +365,7 @@ const dataFlowRelationshipForAction = (action = "") => {
   return null;
 };
 
+/** Builds adjacency lists from a graphlib DOT graph (sanitized node ids → successor lists). */
 function getAdjacencyListFromDot(graph) {
   const adjacency = {};
 
@@ -367,6 +383,7 @@ function getAdjacencyListFromDot(graph) {
   return adjacency;
 }
 
+/** Seeds `nodes` from `plan.resource_changes` (one node per change address, resource keyed by address). */
 function loadPlanAndNodes(plan) {
   const nodes = {};
   const resourceChanges = plan.resource_changes || [];
@@ -383,6 +400,10 @@ function loadPlanAndNodes(plan) {
   return nodes;
 }
 
+/**
+ * For each node, BFS over DOT adjacency to reachable graph nodes; module vertices are barriers
+ * (one hop into the module, no fan-in to all children). Sets `edges_new` per node.
+ */
 function buildNewEdges(nodes, adjacency) {
   const moduleBoundarySet = collectAllTerraformModulePaths(Object.keys(nodes));
 
@@ -440,6 +461,7 @@ function buildNewEdges(nodes, adjacency) {
   return nodes;
 }
 
+/** Attaches `change.diff` per resource from before/after snapshots (skips synthetic module stubs). */
 function computeResourceDiffs(nodes) {
   for (const node of Object.values(nodes)) {
     for (const resource of Object.values(node.resources || {})) {
@@ -490,6 +512,7 @@ function computeResourceDiffs(nodes) {
   return nodes;
 }
 
+/** Walks `prior_state` to add `depends_on` edges into `edges_existing`, merging with plan nodes. */
 function buildExistingEdges(nodes, plan) {
   const rootModule = plan?.prior_state?.values?.root_module;
   if (!rootModule) {
@@ -561,6 +584,7 @@ function buildExistingEdges(nodes, plan) {
   return nodes;
 }
 
+/** Recursively reads `configuration.root_module` module_calls to collect registry source/version per path. */
 function collectModuleMetadataFromConfig(moduleConfig, modulePath = "", out = {}) {
   for (const [moduleName, moduleCall] of Object.entries(moduleConfig?.module_calls || {})) {
     const childModulePath = modulePath
@@ -580,6 +604,7 @@ function collectModuleMetadataFromConfig(moduleConfig, modulePath = "", out = {}
   return out;
 }
 
+/** Annotates each node with `terraform_module` chain entries (source/version) from plan configuration. */
 function applyModuleMetadata(nodes, plan) {
   const moduleMetadata = collectModuleMetadataFromConfig(
     plan?.configuration?.root_module,
@@ -623,6 +648,7 @@ function applyModuleMetadata(nodes, plan) {
   return nodes;
 }
 
+/** Builds the Terraform state address for one resource instance (module prefix, index_key). */
 function getStateResourceAddress(resource, instance) {
   const parts = [];
   if (resource.module) {
@@ -641,6 +667,7 @@ function getStateResourceAddress(resource, instance) {
   return address;
 }
 
+/** Merges tfstate instances into nodes: `values`, `terraform_state`, and `edges_existing` from dependencies. */
 function mergeTerraformState(nodes, state) {
   if (!state || !Array.isArray(state.resources)) {
     return nodes;
@@ -697,6 +724,7 @@ function mergeTerraformState(nodes, state) {
   return nodes;
 }
 
+/** Ensures every node has mutable `edges_new`, `edges_existing`, and `edges_data_flow` arrays. */
 function ensureEdgeLists(nodes) {
   for (const node of Object.values(nodes)) {
     node.edges_new ||= [];
@@ -706,6 +734,10 @@ function ensureEdgeLists(nodes) {
   return nodes;
 }
 
+/**
+ * Indexes nodes by address, ARN, logical name, type, IAM role↔compute, and policy↔role links
+ * for resolving references when synthesizing data-flow edges.
+ */
 function buildDataFlowIndex(nodes) {
   const index = {
     byAddress: new Map(),
@@ -847,6 +879,7 @@ function buildDataFlowIndex(nodes) {
   return index;
 }
 
+/** Resolves a Terraform reference value (string/ARN/interpolation) to matching node paths using `index`. */
 function resolveNodeRefs(value, index, nodes, allowedTypes) {
   const matches = new Set();
   const allowed = allowedTypes ? new Set(allowedTypes) : null;
@@ -899,6 +932,7 @@ function resolveNodeRefs(value, index, nodes, allowedTypes) {
   return [...matches];
 }
 
+/** For a metric alarm node, resolves watched resources from namespace + dimensions via `CLOUDWATCH_ALARM_WATCH_RULES_BY_NAMESPACE`. */
 function resolveCloudWatchAlarmWatchTargets(nodePath, node, index, nodes) {
   if (getResourceType(nodePath, node) !== "aws_cloudwatch_metric_alarm") {
     return [];
@@ -980,6 +1014,7 @@ function refineCloudWatchMetricAlarmEdges(nodes) {
   return nodes;
 }
 
+/** Maps an IAM policy Resource ARN/string to data-flow target nodes (S3, SQS, etc.) using ARN index heuristics. */
 function resolvePolicyTargets(resourceValue, index, nodes) {
   const normalized = normalizeArnPattern(resourceValue);
   if (!normalized || normalized === "*") {
@@ -1009,6 +1044,10 @@ function resolvePolicyTargets(resourceValue, index, nodes) {
   return [...matches];
 }
 
+/**
+ * Adds `edges_data_flow` from integrations, notifications, IAM policy statements, etc.,
+ * using `buildDataFlowIndex` for cross-reference resolution.
+ */
 function buildDataFlowEdges(nodes) {
   const index = buildDataFlowIndex(nodes);
   const explicitKeys = new Set();
@@ -1275,6 +1314,7 @@ function buildDataFlowEdges(nodes) {
   return nodes;
 }
 
+/** Creates a placeholder node for an edge target that exists outside the current plan graph. */
 function makeExternalNode(edge, backRef) {
   return {
     resources: {
@@ -1289,12 +1329,14 @@ function makeExternalNode(edge, backRef) {
   };
 }
 
+/** Ensures `externals` map has an entry for `edge`, creating a stub external node if missing. */
 function addExternalBackRef(externals, edge, backRef) {
   if (!externals[edge]) {
     externals[edge] = makeExternalNode(edge, backRef);
   }
 }
 
+/** Materializes stub nodes for missing edge endpoints so the graph stays connected for layout. */
 function externalResources(nodes) {
   const externalNodes = {};
 
@@ -1336,6 +1378,7 @@ const VPC_PLUMBING_OMIT_TYPES = new Set([
   "aws_nat_gateway",
 ]);
 
+/** Removes any edge whose peer path is in `omitted` from new, existing, and data-flow lists. */
 function stripEdgesReferencingPaths(nodes, omitted) {
   for (const [nodePath, node] of Object.entries(nodes)) {
     if (nodePath.startsWith("__") || !node) {
@@ -1351,6 +1394,7 @@ function stripEdgesReferencingPaths(nodes, omitted) {
   }
 }
 
+/** Deletes non-allowlisted data source nodes and strips all edges pointing at them. */
 function omitNonAllowlistedDataSourceNodes(nodes) {
   const omitted = new Set();
   for (const [nodePath, node] of Object.entries(nodes)) {
@@ -1368,6 +1412,7 @@ function omitNonAllowlistedDataSourceNodes(nodes) {
   return nodes;
 }
 
+/** Removes low-level VPC routing types in `VPC_PLUMBING_OMIT_TYPES` after facets are captured. */
 function omitVpcPlumbingNodes(nodes) {
   const omitted = new Set();
   for (const nodePath of getTerraformNodePaths(nodes)) {
@@ -1383,6 +1428,7 @@ function omitVpcPlumbingNodes(nodes) {
   return nodes;
 }
 
+/** Drops nodes with no incident edges (in any edge list); preserves `__*` metadata keys on the map. */
 function deleteOrphanedNodes(nodes) {
   const metaEntries = Object.entries(nodes).filter(([key]) => key.startsWith("__"));
   const connected = new Set();
@@ -1424,6 +1470,7 @@ function deleteOrphanedNodes(nodes) {
   return filtered;
 }
 
+/** Removes resources tagged `tags.visual === "ignore"` and prunes edges to those paths. */
 function filterVisualIgnore(nodes) {
   const ignored = new Set();
 
@@ -1458,6 +1505,7 @@ function filterVisualIgnore(nodes) {
   return nodes;
 }
 
+/** Applies `EDGE_FILTER_RULES` to drop noisy IAM/Lambda policy edges from dependency lists. */
 function cleanUpRoleLinks(nodes) {
   for (const [nodePath, node] of Object.entries(nodes)) {
     if (nodePath.startsWith("__")) {

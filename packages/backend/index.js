@@ -1,3 +1,7 @@
+/**
+ * Express API for Terraform/OpenTofu uploads: multipart plan + DOT (+ optional state) → SQLite row
+ * and JSON graph; `GET …/excalidraw` runs `nodesToExcalidraw` for the web app import flow.
+ */
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
@@ -36,11 +40,16 @@ const upload = multer({ dest: "uploads/" });
 app.use(cors());
 app.use(express.json());
 
+/** Serves `test-client.html` for manual upload / facet inspection without the full Excalidraw app. */
 app.get("/terraform/test-client", (_req, res) => {
   const filePath = path.join(__dirname, "test-client.html");
   return res.sendFile(filePath);
 });
 
+/**
+ * Accepts `planFile`, `dotFile`, optional `stateFile`; runs the pipeline; stores JSON `nodes` in SQLite.
+ * Temp multer files are always unlinked in `finally`.
+ */
 app.post(
   "/terraform/upload",
   upload.fields([
@@ -73,8 +82,12 @@ app.post(
 
       const adjlist = getAdjacencyListFromDot(graph);
 
+      // Graph transforms (see pipeline.js module banner for semantics):
+      // loadPlan → mergeState → moduleNodes → moduleMeta → filterDataSources → dotEdges →
+      // diffs → existingEdges → filterDataSources → alarmEdges → edgeLists → externals →
+      // edgeLists → dataFlow → edgeLists → facetStore → omitVpcPlumbing → orphans →
+      // roleCleanup → visualIgnore → orphans → enrichment → persist.
       let nodes = loadPlanAndNodes(plan);
-
       nodes = mergeTerraformState(nodes, state);
       nodes = ensureTerraformModuleNodes(nodes);
       nodes = applyModuleMetadata(nodes, plan);
@@ -127,6 +140,7 @@ app.post(
   },
 );
 
+/** Returns stored graph JSON and upload metadata for debugging or alternate clients. */
 app.get("/terraform/upload/:id", (req, res) => {
   const row = db.select().from(uploads).where(eq(uploads.id, Number(req.params.id))).get();
   if (!row) {
@@ -143,6 +157,7 @@ app.get("/terraform/upload/:id", (req, res) => {
   });
 });
 
+/** Materializes an Excalidraw document from stored `nodes` (same shape the React app imports). */
 app.get("/terraform/upload/:id/excalidraw", async (req, res) => {
   try {
     const row = db

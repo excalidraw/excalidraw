@@ -1,3 +1,7 @@
+/**
+ * Placeholder “AI” enrichment keyed by node path: static summaries/issues/recommendations
+ * by resource name heuristics. Swap for a real LangGraph call without changing `applyEnrichment`.
+ */
 function mockLanggraphEnrichment(nodes) {
   const enrichment = {};
 
@@ -75,6 +79,7 @@ function mockLanggraphEnrichment(nodes) {
   return enrichment;
 }
 
+/** Writes `enrichment` and legacy `AI` mirror fields onto each node for the Excalidraw details panel. */
 function applyEnrichment(nodes, enrichment) {
   for (const nodePath of Object.keys(nodes)) {
     if (nodePath.startsWith("__")) {

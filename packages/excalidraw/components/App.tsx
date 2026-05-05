@@ -505,6 +505,7 @@ import type { Action, ActionResult } from "../actions/types";
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
 
+/** First selected element that is a Terraform resource card (explode / dependency UI target). */
 const getTerraformResourceElementForSelection = (
   app: AppClassProperties,
   appState: Readonly<AppState>,
@@ -515,6 +516,7 @@ const getTerraformResourceElementForSelection = (
       (element) => element.customData?.terraformVisibilityRole === "resource",
     ) || null;
 
+/** Context-menu / command action: expand or collapse imported Terraform dependency neighborhood. */
 const actionToggleTerraformExplode: Action = {
   name: "toggleTerraformExplode",
   label: (_elements, appState, app) => {
@@ -5041,6 +5043,7 @@ class App extends React.Component<AppProps, AppState> {
         event[KEYS.CTRL_OR_CMD]
       ) {
         event.preventDefault();
+        // Cmd/Ctrl+Shift+K — Terraform import (plan + DOT + optional state → backend → canvas).
         this.setState({ openDialog: { name: "terraformImport" } });
         return;
       }
@@ -7397,7 +7400,10 @@ class App extends React.Component<AppProps, AppState> {
       this.setState((prevState) => ({
         hoveredElementIds: updateStable(prevState.hoveredElementIds, {}),
       }));
-    } else if (hitElement?.customData?.terraformVisibilityRole === "resource") {
+    } else if (
+      // Terraform cards: keep hover highlight so explode affordance stays discoverable.
+      hitElement?.customData?.terraformVisibilityRole === "resource"
+    ) {
       this.setState((prevState) => ({
         hoveredElementIds: updateStable(prevState.hoveredElementIds, {
           [hitElement.id]: true,
