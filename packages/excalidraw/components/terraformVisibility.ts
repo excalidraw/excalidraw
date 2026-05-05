@@ -559,3 +559,71 @@ export const toggleTerraformExplode = (
     reconcileTerraformVisibility(nextElements),
   );
 };
+
+const collectTerraformParentKeysWithChildren = (
+  elements: readonly ExcalidrawElement[],
+) => {
+  const keysWithChildren = new Set<string>();
+  for (const element of elements) {
+    const key = getTerraformVisibilityKey(element);
+    if (!key || isTerraformGroupElement(element)) {
+      continue;
+    }
+    for (const parentKey of getTerraformParentKeys(element)) {
+      keysWithChildren.add(parentKey);
+    }
+  }
+  return keysWithChildren;
+};
+
+/** Show every Terraform resource rectangle and mark explode triggers expanded. */
+export const expandAllTerraformExplode = (
+  elements: readonly ExcalidrawElement[],
+): ExcalidrawElement[] => {
+  const keysWithChildren = collectTerraformParentKeysWithChildren(elements);
+  const next = elements.map((element) => {
+    const customData = getCustomData(element);
+    if (customData.terraformVisibilityRole !== "resource") {
+      return element;
+    }
+    const key = getTerraformVisibilityKey(element);
+    if (!key) {
+      return element;
+    }
+    return newElementWith(element, {
+      isDeleted: false,
+      opacity: 100,
+      customData: {
+        ...clearPreviewCustomData(element.customData),
+        terraformExploded: keysWithChildren.has(key),
+      },
+    });
+  });
+  return repairTerraformEdgeBindings(reconcileTerraformVisibility(next));
+};
+
+/** Restore default visibility (primary types only) and collapse explode triggers. */
+export const collapseAllTerraformExplode = (
+  elements: readonly ExcalidrawElement[],
+): ExcalidrawElement[] => {
+  const next = elements.map((element) => {
+    const customData = getCustomData(element);
+    if (customData.terraformVisibilityRole !== "resource") {
+      return element;
+    }
+    const key = getTerraformVisibilityKey(element);
+    if (!key) {
+      return element;
+    }
+    const shouldShow = isInitiallyVisibleTerraformElement(element);
+    return newElementWith(element, {
+      isDeleted: !shouldShow,
+      opacity: 100,
+      customData: {
+        ...clearPreviewCustomData(element.customData),
+        terraformExploded: false,
+      },
+    });
+  });
+  return repairTerraformEdgeBindings(reconcileTerraformVisibility(next));
+};
