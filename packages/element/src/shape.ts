@@ -77,6 +77,7 @@ import type {
 
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
+import { getIntersectionPoint } from "@excalidraw/utils";
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
@@ -749,6 +750,53 @@ export const generateLinearCollisionShape = (
   }
 };
 
+const generateFillableLoops = (
+  points: LocalPoint[],
+  isLoopFromProximity: boolean,
+): [number, number][][] => {
+  const simplified = simplify(points, 0.75);
+
+  if (isLoopFromProximity) {
+    return [simplified];
+  }
+
+  let working: [number, number][] = [...simplified];
+  const n = working.length;
+  if (n < 4) return [] as LocalPoint[][];
+
+  type Intersection = {
+    i: number;
+    j: number;
+    point: [number, number];
+  };
+
+  const intersections: Intersection[] = [];
+  const loops: [number, number][][] = [];
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = i + 2; j < n - 1; j++) {
+      if (i === 0 && j === n - 2) continue;
+
+      const inter = getIntersectionPoint(
+        working[i],
+        working[i + 1],
+        working[j],
+        working[j + 1],
+      );
+
+      if (inter) {
+        intersections.push({ i, j, point: inter });
+        loops.push([inter, ...working.slice(i + 1, j), inter]);
+      }
+    }
+  }
+
+  if (intersections.length === 0) {
+    console.log("No intersection found, fallback");
+    return [points] as LocalPoint[][];
+  }
+  return loops;
+};
+
 /**
  * Generates the roughjs shape for given element.
  *
@@ -970,15 +1018,16 @@ const _generateElementShape = (
       const isLoopFromProximity = isPathALoop(element.points);
       if (isLoopFromProximity || doesPathIntersect(element.points)) {
         // generate rough polygon to fill freedraw shape
-        const simplifiedPoints = simplify(
-          element.points as Mutable<LocalPoint[]>,
-          0.75,
-        );
-        shapes.push(
-          generator.curve(simplifiedPoints as [number, number][], {
-            ...generateRoughOptions(element, false, isDarkMode),
-            stroke: "none",
-          }),
+        generateFillableLoops(
+          element.points as LocalPoint[],
+          isLoopFromProximity,
+        ).map((loop) =>
+          shapes.push(
+            generator.curve(loop as [number, number][], {
+              ...generateRoughOptions(element, false, isDarkMode, true),
+              stroke: "none",
+            }),
+          ),
         );
       }
 
