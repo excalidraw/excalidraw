@@ -33,6 +33,11 @@ import {
   useAppProps,
   useApp,
 } from "../App";
+import {
+  collapseAllTerraformExplode,
+  expandAllTerraformExplode,
+  repairTerraformEdgeBindings,
+} from "../terraformVisibility";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
@@ -60,6 +65,8 @@ import {
   SunIcon,
   TrashIcon,
   usersIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
 } from "../icons";
 
 import "./DefaultItems.scss";
@@ -181,6 +188,63 @@ export const ImportTerraform = () => {
 };
 ImportTerraform.displayName = "ImportTerraform";
 
+const hasTerraformResourceNodes = (elements: ReadonlyArray<{ customData?: any }>) =>
+  elements.some(
+    (el) => el.customData?.terraformVisibilityRole === "resource",
+  );
+
+export const TerraformExpandAll = () => {
+  const app = useApp();
+
+  if (
+    !hasTerraformResourceNodes(app.scene.getElementsIncludingDeleted())
+  ) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuItem
+      icon={ZoomInIcon}
+      data-testid="terraform-expand-all"
+      onSelect={() => {
+        app.scene.replaceAllElements(
+          expandAllTerraformExplode(app.scene.getElementsIncludingDeleted()),
+        );
+      }}
+      aria-label="Expand all Terraform nodes"
+    >
+      Expand all Terraform
+    </DropdownMenuItem>
+  );
+};
+TerraformExpandAll.displayName = "TerraformExpandAll";
+
+export const TerraformCollapseAll = () => {
+  const app = useApp();
+
+  if (
+    !hasTerraformResourceNodes(app.scene.getElementsIncludingDeleted())
+  ) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuItem
+      icon={ZoomOutIcon}
+      data-testid="terraform-collapse-all"
+      onSelect={() => {
+        app.scene.replaceAllElements(
+          collapseAllTerraformExplode(app.scene.getElementsIncludingDeleted()),
+        );
+      }}
+      aria-label="Collapse all Terraform nodes"
+    >
+      Collapse all Terraform
+    </DropdownMenuItem>
+  );
+};
+TerraformCollapseAll.displayName = "TerraformCollapseAll";
+
 const TerraformLayerItem = ({
   layer,
   children,
@@ -225,7 +289,9 @@ const TerraformLayerItem = ({
               : null),
           });
         });
-        app.scene.replaceAllElements(nextElements);
+        app.scene.replaceAllElements(
+          repairTerraformEdgeBindings(nextElements),
+        );
         event.preventDefault();
       }}
     >

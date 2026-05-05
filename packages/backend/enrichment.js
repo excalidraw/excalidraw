@@ -2,6 +2,15 @@ function mockLanggraphEnrichment(nodes) {
   const enrichment = {};
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
+    const primaryType =
+      Object.values(node.resources || {}).find((r) => r?.type)?.type || "";
+    if (primaryType === "terraform_module") {
+      continue;
+    }
+
     const actions = [];
     for (const resource of Object.values(node.resources || {})) {
       if (resource.change?.actions) {
@@ -68,6 +77,9 @@ function mockLanggraphEnrichment(nodes) {
 
 function applyEnrichment(nodes, enrichment) {
   for (const nodePath of Object.keys(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     const item = enrichment[nodePath] || {};
     nodes[nodePath].enrichment = {
       summary: item.summary || "",

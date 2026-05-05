@@ -341,7 +341,7 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
-import { toggleTerraformExplode } from "./terraformVisibility";
+
 import { trackEvent } from "../analytics";
 import { AnimationFrameHandler } from "../animation-frame-handler";
 import {
@@ -432,6 +432,8 @@ import { EraserTrail } from "../eraser";
 import { getShortcutKey } from "../shortcut";
 
 import { tryParseSpreadsheet } from "../charts";
+
+import { toggleTerraformExplode } from "./terraformVisibility";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -7392,6 +7394,16 @@ class App extends React.Component<AppProps, AppState> {
       this.state.openDialog?.name === "elementLinkSelector" &&
       !hitElement
     ) {
+      this.setState((prevState) => ({
+        hoveredElementIds: updateStable(prevState.hoveredElementIds, {}),
+      }));
+    } else if (hitElement?.customData?.terraformVisibilityRole === "resource") {
+      this.setState((prevState) => ({
+        hoveredElementIds: updateStable(prevState.hoveredElementIds, {
+          [hitElement.id]: true,
+        }),
+      }));
+    } else if (Object.keys(this.state.hoveredElementIds).length > 0) {
       this.setState((prevState) => ({
         hoveredElementIds: updateStable(prevState.hoveredElementIds, {}),
       }));

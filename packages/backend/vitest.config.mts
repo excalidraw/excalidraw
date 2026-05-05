@@ -1,10 +1,9 @@
 import { defineConfig } from "vitest/config";
-import path from "path";
 
 export default defineConfig({
   test: {
     globals: true,
-    environment: "jsdom",
-    setupFiles: [path.resolve(__dirname, "../../setupTests.ts")],
+    // Backend-only tests; avoid repo setupTests.ts (pulls @excalidraw/* workspace packages).
+    environment: "node",
   },
 });

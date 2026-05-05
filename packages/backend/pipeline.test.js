@@ -1,11 +1,258 @@
-const { buildDataFlowEdges, ensureEdgeLists } = require("./pipeline");
+const {
+  buildDataFlowEdges,
+  ensureEdgeLists,
+  ensureTerraformModuleNodes,
+  collectAllTerraformModulePaths,
+  getModulePathChainFromAddress,
+  buildNewEdges,
+  refineCloudWatchMetricAlarmEdges,
+  omitVpcPlumbingNodes,
+  deleteOrphanedNodes,
+  omitNonAllowlistedDataSourceNodes,
+  getDataSourceTypeFromAddress,
+  isExcludedDataSourceAddress,
+  mergeTerraformState,
+} = require("./pipeline");
 
-const resource = (address, type, name, values = {}) => ({
+const resource = (address, type, name, values = {}, mode = "managed") => ({
   address,
   type,
   name,
+  mode,
   values,
   change: { actions: ["create"], after: values },
+});
+
+describe("data source graph filtering", () => {
+  it("parses data source type from module-qualified addresses", () => {
+    expect(getDataSourceTypeFromAddress("data.aws_region.current")).toBe("aws_region");
+    expect(
+      getDataSourceTypeFromAddress("module.a.module.b.data.aws_iam_policy_document.x"),
+    ).toBe("aws_iam_policy_document");
+    expect(getDataSourceTypeFromAddress("aws_lambda_function.y")).toBeNull();
+  });
+
+  it("treats only non-allowlisted data addresses as excluded", () => {
+    expect(isExcludedDataSourceAddress("data.aws_region.current")).toBe(true);
+    expect(isExcludedDataSourceAddress("data.aws_iam_policy_document.main")).toBe(false);
+  });
+
+  it("omitNonAllowlistedDataSourceNodes removes data sources not on allowlist and strips edges", () => {
+    let nodes = ensureEdgeLists({
+      "aws_lambda_function.fn": {
+        resources: {
+          "aws_lambda_function.fn": resource(
+            "aws_lambda_function.fn",
+            "aws_lambda_function",
+            "fn",
+            {},
+          ),
+        },
+        edges_new: ["data.aws_region.current"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "data.aws_region.current": {
+        resources: {
+          "data.aws_region.current": resource(
+            "data.aws_region.current",
+            "aws_region",
+            "current",
+            {},
+            "data",
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "data.aws_iam_policy_document.pol": {
+        resources: {
+          "data.aws_iam_policy_document.pol": resource(
+            "data.aws_iam_policy_document.pol",
+            "aws_iam_policy_document",
+            "pol",
+            {},
+            "data",
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    });
+
+    nodes = omitNonAllowlistedDataSourceNodes(nodes);
+
+    expect(nodes["data.aws_region.current"]).toBeUndefined();
+    expect(nodes["data.aws_iam_policy_document.pol"]).toBeDefined();
+    expect(nodes["aws_lambda_function.fn"].edges_new).toEqual([]);
+  });
+
+  it("buildNewEdges does not traverse through excluded data vertices in DOT", () => {
+    const adjacency = {
+      "aws_lambda_function.fn": ["data.aws_region.current"],
+      "data.aws_region.current": ["aws_vpc.main"],
+      "aws_vpc.main": [],
+    };
+
+    let nodes = ensureEdgeLists({
+      "aws_lambda_function.fn": { resources: {} },
+      "aws_vpc.main": { resources: {} },
+    });
+    nodes = ensureTerraformModuleNodes(nodes);
+    buildNewEdges(nodes, adjacency);
+
+    expect(nodes["aws_lambda_function.fn"].edges_new).toEqual([]);
+  });
+
+  it("buildNewEdges still connects allowlisted data.aws_iam_policy_document neighbors", () => {
+    const adjacency = {
+      "aws_iam_role.r": ["data.aws_iam_policy_document.assume"],
+      "data.aws_iam_policy_document.assume": [],
+    };
+
+    let nodes = ensureEdgeLists({
+      "aws_iam_role.r": { resources: {} },
+      "data.aws_iam_policy_document.assume": {
+        resources: {
+          "data.aws_iam_policy_document.assume": resource(
+            "data.aws_iam_policy_document.assume",
+            "aws_iam_policy_document",
+            "assume",
+            {},
+            "data",
+          ),
+        },
+      },
+    });
+    nodes = ensureTerraformModuleNodes(nodes);
+    buildNewEdges(nodes, adjacency);
+
+    expect(nodes["aws_iam_role.r"].edges_new).toEqual([
+      "data.aws_iam_policy_document.assume",
+    ]);
+  });
+
+  it("mergeTerraformState skips non-allowlisted data resources and dependency edges to them", () => {
+    let nodes = ensureEdgeLists({
+      "aws_lambda_function.fn": {
+        resources: {
+          "aws_lambda_function.fn": resource(
+            "aws_lambda_function.fn",
+            "aws_lambda_function",
+            "fn",
+            {},
+          ),
+        },
+        edges_existing: [],
+      },
+    });
+
+    mergeTerraformState(nodes, {
+      resources: [
+        {
+          mode: "data",
+          type: "aws_region",
+          name: "current",
+          provider: "provider.aws",
+          instances: [
+            {
+              attributes: {},
+              dependencies: [],
+            },
+          ],
+        },
+        {
+          mode: "managed",
+          type: "aws_lambda_function",
+          name: "fn",
+          provider: "provider.aws",
+          instances: [
+            {
+              attributes: {},
+              dependencies: ["data.aws_region.current"],
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(nodes["data.aws_region.current"]).toBeUndefined();
+    expect(nodes["aws_lambda_function.fn"].edges_existing || []).toEqual([]);
+  });
+});
+
+describe("omitVpcPlumbingNodes", () => {
+  it("removes VPC plumbing nodes and strips references while retaining SG / NACL-class nodes", () => {
+    let nodes = ensureEdgeLists({
+      "aws_vpc.main": {
+        resources: {
+          "aws_vpc.main": resource("aws_vpc.main", "aws_vpc", "main", {
+            id: "vpc-aaaa",
+          }),
+        },
+        edges_new: ["aws_route_table.rt", "aws_security_group.sg"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_route_table.rt": {
+        resources: {
+          "aws_route_table.rt": resource("aws_route_table.rt", "aws_route_table", "rt", {
+            id: "rtb-1",
+            vpc_id: "vpc-aaaa",
+          }),
+        },
+        edges_new: ["aws_vpc.main"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_security_group.sg": {
+        resources: {
+          "aws_security_group.sg": resource(
+            "aws_security_group.sg",
+            "aws_security_group",
+            "sg",
+            { vpc_id: "vpc-aaaa" },
+          ),
+        },
+        edges_new: ["aws_vpc.main"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    });
+
+    nodes = omitVpcPlumbingNodes(nodes);
+
+    expect(nodes["aws_route_table.rt"]).toBeUndefined();
+    expect(nodes["aws_security_group.sg"]).toBeDefined();
+    expect(nodes["aws_vpc.main"].edges_new).toEqual(["aws_security_group.sg"]);
+    expect(nodes["aws_security_group.sg"].edges_new).toEqual(["aws_vpc.main"]);
+  });
+});
+
+describe("deleteOrphanedNodes", () => {
+  it("preserves __-prefixed metadata keys on the graph object", () => {
+    const nodes = {
+      __networkingFacetStore: { byVpcKey: {}, bySubnetKey: {} },
+      a: {
+        resources: {},
+        edges_new: ["b"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      b: {
+        resources: {},
+        edges_new: ["a"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    };
+    const out = deleteOrphanedNodes(nodes);
+    expect(out.__networkingFacetStore).toEqual(nodes.__networkingFacetStore);
+    expect(out.a).toBeDefined();
+    expect(out.b).toBeDefined();
+  });
 });
 
 const buildNodes = (resources) => {
@@ -26,6 +273,120 @@ const dataFlowTargets = (nodes, source) =>
     type: edge.type,
     origin: edge.origin,
   }));
+
+describe("terraform module graph nodes", () => {
+  it("collects nested module prefixes from addresses", () => {
+    expect(
+      getModulePathChainFromAddress("module.a.module.b.aws_lambda_function.this"),
+    ).toEqual(["module.a", "module.a.module.b"]);
+    expect(
+      [...collectAllTerraformModulePaths(["module.x.aws_s3_bucket.y", "aws_vpc.z"])].sort(),
+    ).toEqual(["module.x"]);
+  });
+
+  it("buildNewEdges stops at module boundaries instead of fanning out", () => {
+    const adjacency = {
+      root_alarm: ["module.app"],
+      "module.app": ["module.app.aws_lambda_function.a", "module.app.aws_iam_role.b"],
+      "module.app.aws_lambda_function.a": [],
+      "module.app.aws_iam_role.b": [],
+    };
+
+    let nodes = ensureEdgeLists({
+      root_alarm: { resources: {} },
+      "module.app.aws_lambda_function.a": { resources: {} },
+      "module.app.aws_iam_role.b": { resources: {} },
+    });
+    nodes = ensureTerraformModuleNodes(nodes);
+    buildNewEdges(nodes, adjacency);
+
+    expect(nodes.root_alarm.edges_new.sort()).toEqual(["module.app"]);
+  });
+
+  it("buildNewEdges uses stripped DOT keys for indexed for_each resource addresses", () => {
+    const adjacency = {
+      "module.m.aws_vpc_endpoint.this": ["peer.a", "peer.b"],
+      "peer.a": [],
+      "peer.b": [],
+    };
+
+    let nodes = ensureEdgeLists({
+      'module.m.aws_vpc_endpoint.this["logs"]': { resources: {} },
+      "peer.a": { resources: {} },
+      "peer.b": { resources: {} },
+    });
+    nodes = ensureTerraformModuleNodes(nodes);
+    buildNewEdges(nodes, adjacency);
+
+    expect(nodes['module.m.aws_vpc_endpoint.this["logs"]'].edges_new.sort()).toEqual([
+      "peer.a",
+      "peer.b",
+    ]);
+  });
+
+  it("refineCloudWatchMetricAlarmEdges collapses DOT+state fan-out to the owning module", () => {
+    let nodes = ensureEdgeLists({
+      "aws_cloudwatch_metric_alarm.lambda_errors": {
+        resources: {
+          "aws_cloudwatch_metric_alarm.lambda_errors": {
+            type: "aws_cloudwatch_metric_alarm",
+            address: "aws_cloudwatch_metric_alarm.lambda_errors",
+            change: {
+              actions: ["create"],
+              after: {
+                namespace: "AWS/Lambda",
+                dimensions: { FunctionName: "test-writer" },
+              },
+            },
+          },
+        },
+        edges_new: [
+          "module.lambda-writer.aws_lambda_function.main",
+          "aws_vpc.lambda",
+          "aws_s3_bucket.data",
+        ],
+        edges_existing: ["module.lambda-writer.aws_iam_role.x", "aws_kms_key.s3"],
+      },
+      "module.lambda-writer.aws_lambda_function.main": {
+        resources: {
+          "module.lambda-writer.aws_lambda_function.main": {
+            type: "aws_lambda_function",
+            address: "module.lambda-writer.aws_lambda_function.main",
+            change: { after: { function_name: "test-writer" } },
+          },
+        },
+      },
+      "module.lambda-writer": {
+        resources: {
+          "module.lambda-writer": {
+            type: "terraform_module",
+            address: "module.lambda-writer",
+            change: { actions: ["no-op"] },
+          },
+        },
+      },
+      "aws_vpc.lambda": {
+        resources: {
+          "aws_vpc.lambda": {
+            type: "aws_vpc",
+            address: "aws_vpc.lambda",
+            change: { after: {} },
+          },
+        },
+      },
+    });
+
+    nodes = ensureTerraformModuleNodes(nodes);
+    refineCloudWatchMetricAlarmEdges(nodes);
+
+    expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new).toEqual([
+      "module.lambda-writer",
+    ]);
+    expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_existing).toEqual([
+      "module.lambda-writer",
+    ]);
+  });
+});
 
 describe("buildDataFlowEdges", () => {
   it("infers API Gateway to Lambda invocation", () => {

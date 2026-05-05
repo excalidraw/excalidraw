@@ -1,6 +1,17 @@
 const fs = require("fs");
 const path = require("path");
 
+const { extractVpcNetworkingFacetStore } = require("./vpc-networking-facet");
+const {
+  VPC_PERIMETER_LAYOUT_ENABLED,
+  isVpcPerimeterNode,
+  filterLayoutSimulationKeys,
+  classifyVpcApplianceWall,
+  classifySyntheticVpcTileWall,
+  layoutVpcApplianceRectanglesOnFrame,
+  getVpcApplianceKindForNode,
+} = require("./vpc-perimeter");
+
 function rand() {
   return Math.floor(Math.random() * 2147483647);
 }
@@ -59,6 +70,7 @@ const ICON_LIBRARY_CONFIGS = {
       aws_cloud9_environment_ec2: "Cloud9",
       aws_cloudformation_stack: "CloudFormation",
       aws_cloudformation_stack_set: "CloudFormation",
+      terraform_module: "CloudFormation",
       aws_cloudfront_cache_policy: "CloudFront",
       aws_cloudfront_distribution: "CloudFront",
       aws_cloudfront_function: "CloudFront",
@@ -525,11 +537,15 @@ const PRIMARY_MESSAGING_TYPES = new Set([
 
 const PRIMARY_SPARK_TYPES = new Set();
 
+/** Synthetic Terraform module call nodes (pipeline injects for graph semantics). */
+const PRIMARY_MODULE_TYPES = new Set(["terraform_module"]);
+
 const PRIMARY_VISIBLE_TYPES = new Set([
   ...PRIMARY_COMPUTE_TYPES,
   ...PRIMARY_STORAGE_TYPES,
   ...PRIMARY_MESSAGING_TYPES,
   ...PRIMARY_SPARK_TYPES,
+  ...PRIMARY_MODULE_TYPES,
 ]);
 
 function isPrimaryVisibleResourceType(resourceType) {
@@ -541,6 +557,10 @@ function getResourceType(nodePath) {
   let i = 0;
   while (i < parts.length - 1 && parts[i] === "module") {
     i += 2;
+  }
+  // Address is only module prefixes, e.g. module.a.module.b (no resource type segment).
+  if (i >= parts.length) {
+    return "terraform_module";
   }
   if (parts[i] === "data") return "data";
   return parts[i] || nodePath;
@@ -763,8 +783,8 @@ function buildTerraformResourceDetails(node) {
           value: Object.prototype.hasOwnProperty.call(config, key)
             ? config[key]
             : unknownAfter
-            ? UNKNOWN_VALUE_PLACEHOLDER
-            : fieldDiff?.after ?? null,
+              ? UNKNOWN_VALUE_PLACEHOLDER
+              : fieldDiff?.after ?? null,
           changed: Boolean(fieldDiff),
           unknownAfter,
           before: fieldDiff?.before,
@@ -811,7 +831,7 @@ function getModulePathChain(nodePath) {
   const chain = [];
   let cursor = "";
 
-  for (let i = 0; i < parts.length - 1; ) {
+  for (let i = 0; i < parts.length - 1;) {
     if (parts[i] !== "module" || !parts[i + 1]) {
       break;
     }
@@ -828,7 +848,7 @@ function getModuleDepthFromPath(modulePath) {
   const parts = modulePath.split(".");
   let depth = 0;
 
-  for (let i = 0; i < parts.length - 1; ) {
+  for (let i = 0; i < parts.length - 1;) {
     if (parts[i] === "module" && parts[i + 1]) {
       depth += 1;
       i += 2;
@@ -844,7 +864,7 @@ function getModuleDisplayLabel(modulePath) {
   const parts = modulePath.split(".");
   const names = [];
 
-  for (let i = 0; i < parts.length - 1; ) {
+  for (let i = 0; i < parts.length - 1;) {
     if (parts[i] === "module" && parts[i + 1]) {
       names.push(parts[i + 1]);
       i += 2;
@@ -1146,6 +1166,9 @@ function buildNodeLocationMap(nodes) {
   const accountCounts = new Map();
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     let hasAwsResource = false;
     let region = null;
     let accountId = null;
@@ -1199,10 +1222,16 @@ function buildNodeAdjacencyMap(nodes) {
   const adjacency = new Map();
 
   for (const nodePath of Object.keys(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     adjacency.set(nodePath, new Set());
   }
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     const neighbors = new Set([
       ...(node.edges_new || []),
       ...(node.edges_existing || []),
@@ -1267,6 +1296,9 @@ function buildNodeVpcMap(nodes) {
   const subnetVpcKeyMap = new Map();
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     for (const resource of Object.values(node.resources || {})) {
       const config = getCurrentResourceConfig(resource);
 
@@ -1312,6 +1344,9 @@ function buildNodeVpcMap(nodes) {
   ]);
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     let vpcKey = null;
     let vpcLabel = null;
 
@@ -1381,6 +1416,9 @@ function buildNodeSubnetMap(nodes, nodeVpcMap) {
   const subnetVpcKeyBySubnetKey = new Map();
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     const nodeVpc = nodeVpcMap.get(nodePath) || null;
 
     for (const resource of Object.values(node.resources || {})) {
@@ -1426,24 +1464,30 @@ function buildNodeSubnetMap(nodes, nodeVpcMap) {
   ]);
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     let subnetKey = null;
     let subnetLabel = null;
     let subnetVpcKey = null;
+    let subnetMemberships = [];
 
     if (subnetAnchorByNodePath.has(nodePath)) {
       const anchor = subnetAnchorByNodePath.get(nodePath);
       subnetKey = anchor.subnetKey;
       subnetLabel = anchor.subnetLabel;
       subnetVpcKey = subnetVpcKeyBySubnetKey.get(subnetKey) || null;
+      subnetMemberships = [subnetKey];
     } else {
       for (const resource of Object.values(node.resources || {})) {
         const config = getCurrentResourceConfig(resource);
-        const explicitSubnetIds = extractSubnetIdsFromConfig(config);
+        const explicitSubnetIds = [...extractSubnetIdsFromConfig(config)].sort();
         if (explicitSubnetIds.length > 0) {
-          const subnetId = [...explicitSubnetIds].sort()[0];
+          const subnetId = explicitSubnetIds[0];
           subnetKey = subnetId;
           subnetLabel = subnetId;
           subnetVpcKey = subnetVpcKeyBySubnetKey.get(subnetId) || null;
+          subnetMemberships = explicitSubnetIds;
           break;
         }
       }
@@ -1476,10 +1520,67 @@ function buildNodeSubnetMap(nodes, nodeVpcMap) {
       subnetKey,
       subnetLabel: label,
       vpcKey: subnetVpcKey,
+      subnetKeys: subnetMemberships.length > 0 ? subnetMemberships : [subnetKey],
     });
   }
 
   return nodeSubnetMap;
+}
+
+function buildContainerFacetContributors(context) {
+  const store = context.networkingFacetStore || {
+    byVpcKey: {},
+    bySubnetKey: {},
+  };
+
+  const networkingContributor = {
+    id: "networking-v2",
+    groupKinds: new Set(["vpc", "subnet"]),
+    compute(group) {
+      if (group.kind === "vpc") {
+        const facet = store.byVpcKey[group.key];
+        return facet ? { ...facet } : null;
+      }
+
+      if (group.kind === "subnet") {
+        const facet = store.bySubnetKey[group.key];
+        return facet ? { ...facet } : null;
+      }
+
+      return null;
+    },
+  };
+
+  return [networkingContributor];
+}
+
+function collectContainerFacets(group, contributors) {
+  const facets = [];
+  for (const contributor of contributors) {
+    if (!contributor.groupKinds.has(group.kind)) {
+      continue;
+    }
+    const facet = contributor.compute(group);
+    if (facet) {
+      facets.push(facet);
+    }
+  }
+  return facets;
+}
+
+function buildContainerFacetSummaryLine(facets) {
+  const summaries = facets.map((facet) => facet.summary).filter(Boolean);
+  if (summaries.length === 0) {
+    return "";
+  }
+  return summaries.join(" · ").slice(0, 140);
+}
+
+function buildContainerFacetCustomData(baseCustomData, facets) {
+  return {
+    ...baseCustomData,
+    terraformContainerFacets: facets,
+  };
 }
 
 function collectAccountRegionGroups(
@@ -1540,18 +1641,24 @@ function collectAccountRegionGroups(
 
       const subnet = nodeSubnetMap.get(nodePath);
       if (subnet && subnet.subnetKey) {
-        if (!vpcGroup.subnets.has(subnet.subnetKey)) {
-          vpcGroup.subnets.set(subnet.subnetKey, {
-            subnetKey: subnet.subnetKey,
-            subnetLabel: subnet.subnetLabel,
-            accountId,
-            region,
-            vpcKey: vpc.vpcKey,
-            nodePaths: [],
-          });
-        }
+        const subnetKeys = subnet.subnetKeys?.length
+          ? subnet.subnetKeys
+          : [subnet.subnetKey];
+        for (const subnetKey of subnetKeys) {
+          if (!vpcGroup.subnets.has(subnetKey)) {
+            vpcGroup.subnets.set(subnetKey, {
+              subnetKey,
+              subnetLabel:
+                subnetKey === subnet.subnetKey ? subnet.subnetLabel : subnetKey,
+              accountId,
+              region,
+              vpcKey: vpc.vpcKey,
+              nodePaths: [],
+            });
+          }
 
-        vpcGroup.subnets.get(subnet.subnetKey).nodePaths.push(nodePath);
+          vpcGroup.subnets.get(subnetKey).nodePaths.push(nodePath);
+        }
       }
     }
   }
@@ -1578,6 +1685,89 @@ function collectAccountRegionGroups(
           })),
       })),
     }));
+}
+
+function pushUniqueNodePaths(group, nodePaths) {
+  const existing = new Set(group.nodePaths);
+  for (const nodePath of nodePaths) {
+    if (!existing.has(nodePath)) {
+      group.nodePaths.push(nodePath);
+      existing.add(nodePath);
+    }
+  }
+}
+
+function expandNetworkContainerGroupsWithModuleMembership(
+  accountRegionGroups,
+  moduleGroups,
+  nodeLocationMap,
+  nodeVpcMap,
+  nodeSubnetMap,
+) {
+  const accountById = new Map(
+    accountRegionGroups.map((account) => [account.accountId, account]),
+  );
+
+  for (const moduleGroup of moduleGroups) {
+    const membershipTargets = new Map();
+
+    for (const nodePath of moduleGroup.nodePaths) {
+      const location = nodeLocationMap.get(nodePath);
+      const vpc = nodeVpcMap.get(nodePath);
+      const subnet = nodeSubnetMap.get(nodePath);
+      if (!location || !vpc?.vpcKey) {
+        continue;
+      }
+
+      const subnetKeys = subnet?.subnetKeys?.length
+        ? subnet.subnetKeys
+        : [subnet?.subnetKey || ""];
+      for (const subnetKey of subnetKeys) {
+        const key = [
+          location.accountId,
+          location.region,
+          vpc.vpcKey,
+          subnetKey,
+        ].join("|||");
+        if (!membershipTargets.has(key)) {
+          membershipTargets.set(key, {
+            accountId: location.accountId,
+            region: location.region,
+            vpcKey: vpc.vpcKey,
+            subnetKey: subnetKey || null,
+          });
+        }
+      }
+    }
+
+    for (const target of membershipTargets.values()) {
+      const accountGroup = accountById.get(target.accountId);
+      const regionGroup = accountGroup?.regions.find(
+        (region) => region.region === target.region,
+      );
+      const vpcGroup = regionGroup?.vpcs.find(
+        (vpc) => vpc.vpcKey === target.vpcKey,
+      );
+      if (!accountGroup || !regionGroup || !vpcGroup) {
+        continue;
+      }
+
+      pushUniqueNodePaths(accountGroup, moduleGroup.nodePaths);
+      pushUniqueNodePaths(regionGroup, moduleGroup.nodePaths);
+      pushUniqueNodePaths(vpcGroup, moduleGroup.nodePaths);
+
+      if (target.subnetKey) {
+        const subnetGroup = vpcGroup.subnets.find(
+          (subnet) => subnet.subnetKey === target.subnetKey,
+        );
+        if (subnetGroup) {
+          pushUniqueNodePaths(subnetGroup, moduleGroup.nodePaths);
+        }
+      }
+    }
+  }
+
+  return accountRegionGroups;
 }
 
 // --- Element builders ---
@@ -1655,7 +1845,7 @@ function getCenterClippedBindingPoints(posA, posB, wA, hA, wB, hB) {
 }
 
 // --- Edge collection ---
-
+//each element has outgoing edges, find them and map them nicely
 function collectDirectedEdges(nodes) {
   const edgeMap = new Map();
 
@@ -1681,6 +1871,9 @@ function collectDirectedEdges(nodes) {
   };
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
     for (const target of node.edges_new || []) {
       addEdge(nodePath, target, "planned_dependency", "dot");
     }
@@ -1696,6 +1889,7 @@ function collectDirectedEdges(nodes) {
   }));
 }
 
+//coalescing edges from A to B and B to A into one
 function coalesceRelationshipPairs(directedEdges) {
   const pairMap = new Map();
 
@@ -1754,6 +1948,9 @@ function collectDataFlowEdges(nodes) {
   const edgeMap = new Map();
 
   for (const [source, node] of Object.entries(nodes)) {
+    if (source.startsWith("__")) {
+      continue;
+    }
     for (const edge of node.edges_data_flow || []) {
       const target = edge.target;
       if (!nodes[source] || !nodes[target] || source === target) {
@@ -2190,6 +2387,241 @@ function expandCollapsedModulePositions(
   return positions;
 }
 
+function measureBoundsFromNodePositions(nodePaths, positions, tierMap, tierConfigs) {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const nodePath of nodePaths) {
+    const pos = positions[nodePath];
+    if (!pos || typeof pos.x !== "number" || typeof pos.y !== "number") {
+      continue;
+    }
+    const cfg = tierConfigs[tierMap[nodePath]];
+    if (!cfg) {
+      continue;
+    }
+    minX = Math.min(minX, pos.x);
+    minY = Math.min(minY, pos.y);
+    maxX = Math.max(maxX, pos.x + cfg.w);
+    maxY = Math.max(maxY, pos.y + cfg.h);
+  }
+
+  if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+    return null;
+  }
+
+  return { minX, minY, maxX, maxY };
+}
+
+/**
+ * Pins perimeter nodes (e.g. VPC endpoints) onto the VPC frame derived from
+ * interior member bounds + the same padding used for the dashed VPC rectangle.
+ */
+function snapVpcPerimeterResourcePositions(
+  positions,
+  accountRegionGroups,
+  tierMap,
+  tierConfigs,
+  perimeterSet,
+  nodes,
+) {
+  const perimeterWallByNodePath = new Map();
+  if (!VPC_PERIMETER_LAYOUT_ENABLED || perimeterSet.size === 0) {
+    return perimeterWallByNodePath;
+  }
+
+  const VPC_PAD_X = 68;
+  const VPC_PAD_TOP = 96;
+  const VPC_PAD_BOTTOM = 52;
+
+  for (const accountGroup of accountRegionGroups) {
+    for (const regionGroup of accountGroup.regions || []) {
+      for (const vpcGroup of regionGroup.vpcs || []) {
+        const interiorPaths = vpcGroup.nodePaths.filter(
+          (p) => !perimeterSet.has(p),
+        );
+        const perimeterPaths = vpcGroup.nodePaths.filter((p) =>
+          perimeterSet.has(p),
+        );
+        if (perimeterPaths.length === 0) {
+          continue;
+        }
+
+        const inner = measureBoundsFromNodePositions(
+          interiorPaths,
+          positions,
+          tierMap,
+          tierConfigs,
+        );
+        if (!inner) {
+          continue;
+        }
+
+        const frameMinX = inner.minX - VPC_PAD_X;
+        const frameMaxX = inner.maxX + VPC_PAD_X;
+        const frameMinY = inner.minY - VPC_PAD_TOP;
+        const frameMaxY = inner.maxY + VPC_PAD_BOTTOM;
+
+        const sorted = [...perimeterPaths].sort((a, b) => a.localeCompare(b));
+        const buckets = {
+          leftWall: [],
+          topWall: [],
+          rightWall: [],
+          bottomWall: [],
+        };
+
+        for (const p of sorted) {
+          const wall = classifyVpcApplianceWall(p, nodes[p]);
+          if (wall && buckets[wall]) {
+            buckets[wall].push(p);
+            perimeterWallByNodePath.set(p, wall);
+          }
+        }
+
+        const frame = {
+          minX: frameMinX,
+          maxX: frameMaxX,
+          minY: frameMinY,
+          maxY: frameMaxY,
+        };
+        const placements = layoutVpcApplianceRectanglesOnFrame(
+          frame,
+          buckets,
+          (path) => {
+            const cfg = tierConfigs[tierMap[path]];
+            return { w: cfg?.w ?? 120, h: cfg?.h ?? 80 };
+          },
+        );
+        for (const pl of placements) {
+          positions[pl.item] = { x: pl.x, y: pl.y };
+        }
+      }
+    }
+  }
+  return perimeterWallByNodePath;
+}
+
+function collectVpcApplianceTilesFromFacets(vpcFacets) {
+  const tiles = [];
+  for (const facet of vpcFacets || []) {
+    if (facet?.id !== "networking-v2" || !Array.isArray(facet.sections)) {
+      continue;
+    }
+    for (const top of facet.sections) {
+      const children = Array.isArray(top.sections) ? top.sections : [];
+      if (top.label === "Route tables") {
+        for (const child of children) {
+          tiles.push({
+            key: child.id || child.label || `rt-${tiles.length}`,
+            label: child.summary
+              ? `Route table ${child.summary}`
+              : child.label || "Route table",
+            applianceKind: "route_table",
+          });
+        }
+      } else if (top.label === "Gateways") {
+        for (const child of children) {
+          const label = String(child.label || "").toLowerCase();
+          let gatewayKind = "other";
+          if (label.includes("internet_gateway") || label.includes("igw")) {
+            gatewayKind = "igw";
+          } else if (
+            label.includes("nat_gateway") ||
+            label.includes("nat gateway") ||
+            (label.includes("nat") && label.includes("gateway"))
+          ) {
+            gatewayKind = "nat";
+          }
+          tiles.push({
+            key: child.id || child.label || `gw-${tiles.length}`,
+            label: child.label || "Gateway",
+            applianceKind: "gateway",
+            gatewayKind,
+          });
+        }
+      } else if (top.label === "Route table associations (VPC)") {
+        for (const child of children) {
+          tiles.push({
+            key: child.id || child.label || `assoc-${tiles.length}`,
+            label: child.label || "Route association",
+            applianceKind: "route_assoc",
+          });
+        }
+      }
+    }
+  }
+  return tiles;
+}
+
+function layoutApplianceTilesOnVpcEdges(
+  vpcApplianceTiles,
+  vpcBoxX,
+  vpcBoxY,
+  vpcBoxW,
+  vpcBoxH,
+) {
+  const tileW = 180;
+  const tileH = 44;
+  const sideBuckets = {
+    topWall: [],
+    rightWall: [],
+    bottomWall: [],
+    leftWall: [],
+  };
+  for (const tile of vpcApplianceTiles) {
+    sideBuckets[classifySyntheticVpcTileWall(tile)].push(tile);
+  }
+
+  const frame = {
+    minX: vpcBoxX,
+    maxX: vpcBoxX + vpcBoxW,
+    minY: vpcBoxY,
+    maxY: vpcBoxY + vpcBoxH,
+  };
+  const raw = layoutVpcApplianceRectanglesOnFrame(frame, sideBuckets, () => ({
+    w: tileW,
+    h: tileH,
+  }));
+  return raw.map((pl) => ({
+    tile: pl.item,
+    x: pl.x,
+    y: pl.y,
+    tileW: pl.w,
+    tileH: pl.h,
+    wall: pl.wall,
+  }));
+}
+
+function applianceStyleForKind(kind) {
+  if (kind === "route_table") {
+    return { strokeColor: "#c77d00", backgroundColor: "#fff4cc" };
+  }
+  if (kind === "gateway") {
+    return { strokeColor: "#0c8599", backgroundColor: "#d3f9fa" };
+  }
+  if (kind === "route_assoc") {
+    return { strokeColor: "#5f3dc4", backgroundColor: "#e5dbff" };
+  }
+  if (kind === "endpoint") {
+    return { strokeColor: "#2b8a3e", backgroundColor: "#d8f5a2" };
+  }
+  if (kind === "load_balancer") {
+    return { strokeColor: "#1864ab", backgroundColor: "#d0ebff" };
+  }
+  if (kind === "transit_gateway") {
+    return { strokeColor: "#5c940d", backgroundColor: "#ebfbee" };
+  }
+  if (kind === "vpn") {
+    return { strokeColor: "#9c36b5", backgroundColor: "#f3d9fa" };
+  }
+  if (kind === "direct_connect") {
+    return { strokeColor: "#087f5b", backgroundColor: "#c3fae8" };
+  }
+  return { strokeColor: "#495057", backgroundColor: "#f1f3f5" };
+}
+
 // --- Main conversion ---
 
 async function nodesToExcalidraw(nodes) {
@@ -2197,8 +2629,18 @@ async function nodesToExcalidraw(nodes) {
   const locationElements = [];
   const moduleElements = [];
   const arrowElements = [];
-  const nodeKeys = Object.keys(nodes);
+  const nodeKeys = Object.keys(nodes).filter((key) => !key.startsWith("__"));
+  const perimeterSet = new Set(
+    nodeKeys.filter((p) => isVpcPerimeterNode(p, nodes[p])),
+  );
   const directedEdges = collectDirectedEdges(nodes);
+  const directedEdgesForLayout =
+    VPC_PERIMETER_LAYOUT_ENABLED && perimeterSet.size > 0
+      ? directedEdges.filter(
+          (edge) =>
+            !perimeterSet.has(edge.source) && !perimeterSet.has(edge.target),
+        )
+      : directedEdges;
   const relationships = coalesceRelationshipPairs(directedEdges);
   const dataFlowEdges = collectDataFlowEdges(nodes);
   const explodeParentMap = buildTerraformExplodeParentMap(
@@ -2207,20 +2649,39 @@ async function nodesToExcalidraw(nodes) {
     dataFlowEdges,
   );
   const dependencyPairKeys = new Set(
-    relationships.map(({ source, target }) =>
-      [source, target].sort().join("|||"),
-    ),
+    relationships
+      .filter(
+        ({ source, target }) =>
+          !isVpcPerimeterNode(source, nodes[source]) &&
+          !isVpcPerimeterNode(target, nodes[target]),
+      )
+      .map(({ source, target }) => [source, target].sort().join("|||")),
   );
   const nodeLocationMap = buildNodeLocationMap(nodes);
   const nodeVpcMap = buildNodeVpcMap(nodes);
   const nodeSubnetMap = buildNodeSubnetMap(nodes, nodeVpcMap);
-  const accountRegionGroups = collectAccountRegionGroups(
-    nodeKeys,
+  const networkingFacetStore =
+    nodes.__networkingFacetStore || extractVpcNetworkingFacetStore(nodes);
+  const containerFacetContributors = buildContainerFacetContributors({
+    nodes,
+    nodeLocationMap,
+    nodeVpcMap,
+    nodeSubnetMap,
+    networkingFacetStore,
+  });
+  const moduleGroups = collectModuleGroups(nodeKeys, nodes);
+  const accountRegionGroups = expandNetworkContainerGroupsWithModuleMembership(
+    collectAccountRegionGroups(
+      nodeKeys,
+      nodeLocationMap,
+      nodeVpcMap,
+      nodeSubnetMap,
+    ),
+    moduleGroups,
     nodeLocationMap,
     nodeVpcMap,
     nodeSubnetMap,
   );
-  const moduleGroups = collectModuleGroups(nodeKeys, nodes);
   const moduleGroupIdByPath = new Map(
     moduleGroups.map((group) => [group.modulePath, `module-group-${rand()}`]),
   );
@@ -2233,14 +2694,19 @@ async function nodesToExcalidraw(nodes) {
   const { layoutNodeKeys, layoutEdges, layoutTierMap, moduleMembers } =
     buildCollapsedLayoutModel(
       nodeKeys,
-      directedEdges,
+      directedEdgesForLayout,
       tierMap,
       collapsibleModules,
     );
+  const layoutSimulationKeys = filterLayoutSimulationKeys(
+    layoutNodeKeys,
+    moduleMembers,
+    perimeterSet,
+  );
   const tierConfigs = buildTierConfigs(tierMap, nodeKeys.length);
   const layoutTierConfigs = buildTierConfigs(
     layoutTierMap,
-    layoutNodeKeys.length,
+    layoutSimulationKeys.length,
   );
   const layoutSizes = estimateModuleLayoutSizes(
     moduleMembers,
@@ -2250,7 +2716,7 @@ async function nodesToExcalidraw(nodes) {
   );
 
   const layoutPositions = await forceLayout(
-    layoutNodeKeys,
+    layoutSimulationKeys,
     layoutEdges,
     layoutTierMap,
     layoutTierConfigs,
@@ -2263,6 +2729,20 @@ async function nodesToExcalidraw(nodes) {
     moduleGroupByPath,
   );
   applyModulePresets(positions, nodeKeys, moduleGroupByPath);
+  const perimeterWallByNodePath = snapVpcPerimeterResourcePositions(
+    positions,
+    accountRegionGroups,
+    tierMap,
+    tierConfigs,
+    perimeterSet,
+    nodes,
+  );
+  for (const path of perimeterSet) {
+    const pos = positions[path];
+    if (!pos || typeof pos.x !== "number" || typeof pos.y !== "number") {
+      positions[path] = { x: 120, y: 120 };
+    }
+  }
   const posMap = {};
   const nodeRectById = new Map();
 
@@ -2291,8 +2771,17 @@ async function nodesToExcalidraw(nodes) {
     posMap[nodePath] = { x, y, w: cfg.w, h: cfg.h, rectId, textId };
 
     const action = getPrimaryAction(nodes[nodePath]);
-    const bgColor = ACTION_COLORS[action] || ACTION_COLORS.existing;
-    const strokeColor = ACTION_STROKE[action] || ACTION_STROKE.existing;
+    const isVpcPerimeter = isVpcPerimeterNode(nodePath, nodes[nodePath]);
+    const vpcApplianceKind = isVpcPerimeter
+      ? getVpcApplianceKindForNode(nodePath, nodes[nodePath])
+      : null;
+    const applianceStyle = isVpcPerimeter
+      ? applianceStyleForKind(vpcApplianceKind)
+      : null;
+    const bgColor =
+      applianceStyle?.backgroundColor || ACTION_COLORS[action] || ACTION_COLORS.existing;
+    const strokeColor =
+      applianceStyle?.strokeColor || ACTION_STROKE[action] || ACTION_STROKE.existing;
     const label = getLabel(nodePath);
     const terraformResources = buildTerraformResourceDetails(nodes[nodePath]);
     const nodeLocation = nodeLocationMap.get(nodePath) || null;
@@ -2318,13 +2807,23 @@ async function nodesToExcalidraw(nodes) {
       roundness: { type: 3 },
       groupIds,
       boundElements: [],
-      strokeStyle: action === "external" ? "dashed" : "solid",
+      strokeStyle:
+        isVpcPerimeter && vpcApplianceKind === "endpoint"
+          ? "dotted"
+          : action === "external"
+            ? "dashed"
+            : "solid",
       customData: {
         terraform: true,
         ...visibilityCustomData,
         resourceType,
         nodePath,
         action,
+        terraformVpcAppliance: isVpcPerimeter,
+        terraformVpcApplianceKind: isVpcPerimeter ? vpcApplianceKind : null,
+        terraformVpcApplianceWall: isVpcPerimeter
+          ? perimeterWallByNodePath.get(nodePath) || null
+          : null,
         region: nodeLocation?.region || null,
         accountId: nodeLocation?.accountId || null,
         vpcId: nodeVpc?.vpcKey || null,
@@ -2458,6 +2957,19 @@ async function nodesToExcalidraw(nodes) {
       terraformVisibilityKey: group.modulePath,
       terraformGroupChildKeys: group.nodePaths,
     };
+    const moduleFacets = collectContainerFacets(
+      {
+        kind: "module",
+        key: group.modulePath,
+        label: group.moduleLabel,
+        nodePaths: group.nodePaths,
+      },
+      containerFacetContributors,
+    );
+    const moduleFacetSummary = buildContainerFacetSummaryLine(moduleFacets);
+    const moduleLabelText = moduleFacetSummary
+      ? `module ${group.moduleLabel}\n${moduleFacetSummary}`
+      : `module ${group.moduleLabel}`;
 
     moduleElements.push(
       makeBaseElement({
@@ -2476,13 +2988,18 @@ async function nodesToExcalidraw(nodes) {
         boundElements: [{ id: labelId, type: "text" }],
         isDeleted: !initiallyVisible,
         customData: {
-          terraform: false,
-          ...groupVisibilityCustomData,
-          terraformModuleGroup: true,
-          modulePath: group.modulePath,
-          moduleDepth: group.depth,
-          moduleSource: group.source,
-          moduleVersion: group.version,
+          ...buildContainerFacetCustomData(
+            {
+              terraform: false,
+              ...groupVisibilityCustomData,
+              terraformModuleGroup: true,
+              modulePath: group.modulePath,
+              moduleDepth: group.depth,
+              moduleSource: group.source,
+              moduleVersion: group.version,
+            },
+            moduleFacets,
+          ),
         },
       }),
     );
@@ -2495,25 +3012,30 @@ async function nodesToExcalidraw(nodes) {
         y: boxY + 8,
         width: Math.max(80, boxW - 20),
         height: 24,
-        text: `module ${group.moduleLabel}`,
+        text: moduleLabelText,
         fontSize: group.depth <= 1 ? 18 : 16,
         fontFamily: 3,
         textAlign: "left",
         verticalAlign: "top",
         groupIds: boxGroupIds,
         containerId: boxId,
-        originalText: `module ${group.moduleLabel}`,
+        originalText: moduleLabelText,
         autoResize: false,
         lineHeight: 1.2,
         strokeColor,
         isDeleted: !initiallyVisible,
         customData: {
-          terraform: false,
-          ...groupVisibilityCustomData,
-          terraformModuleGroup: true,
-          modulePath: group.modulePath,
-          moduleSource: group.source,
-          moduleVersion: group.version,
+          ...buildContainerFacetCustomData(
+            {
+              terraform: false,
+              ...groupVisibilityCustomData,
+              terraformModuleGroup: true,
+              modulePath: group.modulePath,
+              moduleSource: group.source,
+              moduleVersion: group.version,
+            },
+            moduleFacets,
+          ),
         },
       }),
     );
@@ -2615,6 +3137,19 @@ async function nodesToExcalidraw(nodes) {
       terraformVisibilityKey: `account:${accountGroup.accountId}`,
       terraformGroupChildKeys: accountGroup.nodePaths,
     };
+    const accountFacets = collectContainerFacets(
+      {
+        kind: "account",
+        key: accountGroup.accountId,
+        label: accountGroup.accountId,
+        nodePaths: accountGroup.nodePaths,
+      },
+      containerFacetContributors,
+    );
+    const accountFacetSummary = buildContainerFacetSummaryLine(accountFacets);
+    const accountLabelText = accountFacetSummary
+      ? `account ${accountGroup.accountId}\n${accountFacetSummary}`
+      : `account ${accountGroup.accountId}`;
 
     locationElements.push(
       makeBaseElement({
@@ -2633,10 +3168,15 @@ async function nodesToExcalidraw(nodes) {
         boundElements: [{ id: accountLabelId, type: "text" }],
         isDeleted: !accountInitiallyVisible,
         customData: {
-          terraform: false,
-          ...accountVisibilityCustomData,
-          terraformAccountGroup: true,
-          accountId: accountGroup.accountId,
+          ...buildContainerFacetCustomData(
+            {
+              terraform: false,
+              ...accountVisibilityCustomData,
+              terraformAccountGroup: true,
+              accountId: accountGroup.accountId,
+            },
+            accountFacets,
+          ),
         },
       }),
     );
@@ -2649,23 +3189,28 @@ async function nodesToExcalidraw(nodes) {
         y: accountBoxY + 8,
         width: Math.max(120, accountBoxW - 20),
         height: 24,
-        text: `account ${accountGroup.accountId}`,
+        text: accountLabelText,
         fontSize: 18,
         fontFamily: 3,
         textAlign: "left",
         verticalAlign: "top",
         groupIds: [accountGroupId],
         containerId: accountBoxId,
-        originalText: `account ${accountGroup.accountId}`,
+        originalText: accountLabelText,
         autoResize: false,
         lineHeight: 1.2,
         strokeColor: ACCOUNT_STROKE,
         isDeleted: !accountInitiallyVisible,
         customData: {
-          terraform: false,
-          ...accountVisibilityCustomData,
-          terraformAccountGroup: true,
-          accountId: accountGroup.accountId,
+          ...buildContainerFacetCustomData(
+            {
+              terraform: false,
+              ...accountVisibilityCustomData,
+              terraformAccountGroup: true,
+              accountId: accountGroup.accountId,
+            },
+            accountFacets,
+          ),
         },
       }),
     );
@@ -2699,6 +3244,19 @@ async function nodesToExcalidraw(nodes) {
         terraformVisibilityKey: `region:${regionGroup.accountId}:${regionGroup.region}`,
         terraformGroupChildKeys: regionGroup.nodePaths,
       };
+      const regionFacets = collectContainerFacets(
+        {
+          kind: "region",
+          key: `${regionGroup.accountId}:${regionGroup.region}`,
+          label: regionGroup.region,
+          nodePaths: regionGroup.nodePaths,
+        },
+        containerFacetContributors,
+      );
+      const regionFacetSummary = buildContainerFacetSummaryLine(regionFacets);
+      const regionLabelText = regionFacetSummary
+        ? `region ${regionGroup.region}\n${regionFacetSummary}`
+        : `region ${regionGroup.region}`;
 
       const regionGroupIds = [regionGroupId, accountGroupId];
 
@@ -2719,11 +3277,16 @@ async function nodesToExcalidraw(nodes) {
           boundElements: [{ id: regionLabelId, type: "text" }],
           isDeleted: !regionInitiallyVisible,
           customData: {
-            terraform: false,
-            ...regionVisibilityCustomData,
-            terraformRegionGroup: true,
-            accountId: regionGroup.accountId,
-            region: regionGroup.region,
+            ...buildContainerFacetCustomData(
+              {
+                terraform: false,
+                ...regionVisibilityCustomData,
+                terraformRegionGroup: true,
+                accountId: regionGroup.accountId,
+                region: regionGroup.region,
+              },
+              regionFacets,
+            ),
           },
         }),
       );
@@ -2736,32 +3299,47 @@ async function nodesToExcalidraw(nodes) {
           y: regionBoxY + 8,
           width: Math.max(100, regionBoxW - 20),
           height: 22,
-          text: `region ${regionGroup.region}`,
+          text: regionLabelText,
           fontSize: 16,
           fontFamily: 3,
           textAlign: "left",
           verticalAlign: "top",
           groupIds: regionGroupIds,
           containerId: regionBoxId,
-          originalText: `region ${regionGroup.region}`,
+          originalText: regionLabelText,
           autoResize: false,
           lineHeight: 1.2,
           strokeColor: REGION_STROKE,
           isDeleted: !regionInitiallyVisible,
           customData: {
-            terraform: false,
-            ...regionVisibilityCustomData,
-            terraformRegionGroup: true,
-            accountId: regionGroup.accountId,
-            region: regionGroup.region,
+            ...buildContainerFacetCustomData(
+              {
+                terraform: false,
+                ...regionVisibilityCustomData,
+                terraformRegionGroup: true,
+                accountId: regionGroup.accountId,
+                region: regionGroup.region,
+              },
+              regionFacets,
+            ),
           },
         }),
       );
 
       for (const vpcGroup of regionGroup.vpcs || []) {
-        const vpcBounds = measureBounds(
-          getUniqueVisualBounds(vpcGroup.nodePaths),
+        const vpcInteriorPaths = vpcGroup.nodePaths.filter(
+          (p) => !perimeterSet.has(p),
         );
+        const boundsPaths =
+          vpcInteriorPaths.length > 0 ? vpcInteriorPaths : vpcGroup.nodePaths;
+        const vpcBounds =
+          measureBounds(getUniqueVisualBounds(boundsPaths)) ||
+          measureBoundsFromNodePositions(
+            boundsPaths,
+            positions,
+            tierMap,
+            tierConfigs,
+          );
         if (!vpcBounds) {
           continue;
         }
@@ -2786,8 +3364,22 @@ async function nodesToExcalidraw(nodes) {
           terraformVisibilityKey: `vpc:${vpcGroup.accountId}:${vpcGroup.region}:${vpcGroup.vpcKey}`,
           terraformGroupChildKeys: vpcGroup.nodePaths,
         };
+        const vpcFacets = collectContainerFacets(
+          {
+            kind: "vpc",
+            key: vpcGroup.vpcKey,
+            label: vpcGroup.vpcLabel,
+            nodePaths: vpcGroup.nodePaths,
+          },
+          containerFacetContributors,
+        );
+        const vpcFacetSummary = buildContainerFacetSummaryLine(vpcFacets);
+        const vpcLabelText = vpcFacetSummary
+          ? `vpc ${vpcGroup.vpcLabel}\n${vpcFacetSummary}`
+          : `vpc ${vpcGroup.vpcLabel}`;
 
         const vpcGroupIds = [vpcGroupId, regionGroupId, accountGroupId];
+        const vpcApplianceTiles = collectVpcApplianceTilesFromFacets(vpcFacets);
 
         locationElements.push(
           makeBaseElement({
@@ -2806,13 +3398,18 @@ async function nodesToExcalidraw(nodes) {
             boundElements: [{ id: vpcLabelId, type: "text" }],
             isDeleted: !vpcInitiallyVisible,
             customData: {
-              terraform: false,
-              ...vpcVisibilityCustomData,
-              terraformVpcGroup: true,
-              accountId: vpcGroup.accountId,
-              region: vpcGroup.region,
-              vpcId: vpcGroup.vpcKey,
-              vpcLabel: vpcGroup.vpcLabel,
+              ...buildContainerFacetCustomData(
+                {
+                  terraform: false,
+                  ...vpcVisibilityCustomData,
+                  terraformVpcGroup: true,
+                  accountId: vpcGroup.accountId,
+                  region: vpcGroup.region,
+                  vpcId: vpcGroup.vpcKey,
+                  vpcLabel: vpcGroup.vpcLabel,
+                },
+                vpcFacets,
+              ),
             },
           }),
         );
@@ -2825,29 +3422,112 @@ async function nodesToExcalidraw(nodes) {
             y: vpcBoxY + 8,
             width: Math.max(90, vpcBoxW - 20),
             height: 20,
-            text: `vpc ${vpcGroup.vpcLabel}`,
+            text: vpcLabelText,
             fontSize: 14,
             fontFamily: 3,
             textAlign: "left",
             verticalAlign: "top",
             groupIds: vpcGroupIds,
             containerId: vpcBoxId,
-            originalText: `vpc ${vpcGroup.vpcLabel}`,
+            originalText: vpcLabelText,
             autoResize: false,
             lineHeight: 1.2,
             strokeColor: VPC_STROKE,
             isDeleted: !vpcInitiallyVisible,
             customData: {
-              terraform: false,
-              ...vpcVisibilityCustomData,
-              terraformVpcGroup: true,
-              accountId: vpcGroup.accountId,
-              region: vpcGroup.region,
-              vpcId: vpcGroup.vpcKey,
-              vpcLabel: vpcGroup.vpcLabel,
+              ...buildContainerFacetCustomData(
+                {
+                  terraform: false,
+                  ...vpcVisibilityCustomData,
+                  terraformVpcGroup: true,
+                  accountId: vpcGroup.accountId,
+                  region: vpcGroup.region,
+                  vpcId: vpcGroup.vpcKey,
+                  vpcLabel: vpcGroup.vpcLabel,
+                },
+                vpcFacets,
+              ),
             },
           }),
         );
+
+        if (vpcApplianceTiles.length > 0) {
+          const placements = layoutApplianceTilesOnVpcEdges(
+            vpcApplianceTiles,
+            vpcBoxX,
+            vpcBoxY,
+            vpcBoxW,
+            vpcBoxH,
+          );
+
+          for (const placement of placements) {
+            const { tile, x, y, tileW, tileH, wall } = placement;
+            const style = applianceStyleForKind(tile.applianceKind);
+            const tileId = `vpc-appliance-${rand()}`;
+            const tileTextId = `vpc-appliance-text-${rand()}`;
+            const tileGroupIds = [`vpc-appliance-group-${rand()}`, ...vpcGroupIds];
+
+            locationElements.push(
+              makeBaseElement({
+                type: "rectangle",
+                id: tileId,
+                x,
+                y,
+                width: tileW,
+                height: tileH,
+                strokeColor: style.strokeColor,
+                strokeWidth: 1,
+                strokeStyle: "solid",
+                backgroundColor: style.backgroundColor,
+                roundness: { type: 3 },
+                groupIds: tileGroupIds,
+                boundElements: [{ id: tileTextId, type: "text" }],
+                isDeleted: !vpcInitiallyVisible,
+                customData: {
+                  terraform: false,
+                  ...vpcVisibilityCustomData,
+                  terraformVpcAppliance: true,
+                  terraformVpcApplianceKind: tile.applianceKind,
+                  terraformVpcApplianceWall: wall,
+                  vpcId: vpcGroup.vpcKey,
+                  applianceLabel: tile.label,
+                },
+              }),
+            );
+
+            locationElements.push(
+              makeBaseElement({
+                type: "text",
+                id: tileTextId,
+                x: x + 8,
+                y: y + 8,
+                width: tileW - 16,
+                height: tileH - 16,
+                text: tile.label,
+                fontSize: 12,
+                fontFamily: 3,
+                textAlign: "left",
+                verticalAlign: "middle",
+                groupIds: tileGroupIds,
+                containerId: tileId,
+                originalText: tile.label,
+                autoResize: false,
+                lineHeight: 1.2,
+                strokeColor: style.strokeColor,
+                isDeleted: !vpcInitiallyVisible,
+                customData: {
+                  terraform: false,
+                  ...vpcVisibilityCustomData,
+                  terraformVpcAppliance: true,
+                  terraformVpcApplianceKind: tile.applianceKind,
+                  terraformVpcApplianceWall: wall,
+                  vpcId: vpcGroup.vpcKey,
+                  applianceLabel: tile.label,
+                },
+              }),
+            );
+          }
+        }
 
         for (const subnetGroup of vpcGroup.subnets || []) {
           const subnetBounds = measureBounds(
@@ -2878,6 +3558,19 @@ async function nodesToExcalidraw(nodes) {
             terraformVisibilityKey: `subnet:${subnetGroup.accountId}:${subnetGroup.region}:${subnetGroup.vpcKey}:${subnetGroup.subnetKey}`,
             terraformGroupChildKeys: subnetGroup.nodePaths,
           };
+          const subnetFacets = collectContainerFacets(
+            {
+              kind: "subnet",
+              key: subnetGroup.subnetKey,
+              label: subnetGroup.subnetLabel,
+              nodePaths: subnetGroup.nodePaths,
+            },
+            containerFacetContributors,
+          );
+          const subnetFacetSummary = buildContainerFacetSummaryLine(subnetFacets);
+          const subnetLabelText = subnetFacetSummary
+            ? `subnet ${subnetGroup.subnetLabel}\n${subnetFacetSummary}`
+            : `subnet ${subnetGroup.subnetLabel}`;
 
           const subnetGroupIds = [
             subnetGroupId,
@@ -2903,14 +3596,19 @@ async function nodesToExcalidraw(nodes) {
               boundElements: [{ id: subnetLabelId, type: "text" }],
               isDeleted: !subnetInitiallyVisible,
               customData: {
-                terraform: false,
-                ...subnetVisibilityCustomData,
-                terraformSubnetGroup: true,
-                accountId: subnetGroup.accountId,
-                region: subnetGroup.region,
-                vpcId: subnetGroup.vpcKey,
-                subnetId: subnetGroup.subnetKey,
-                subnetLabel: subnetGroup.subnetLabel,
+                ...buildContainerFacetCustomData(
+                  {
+                    terraform: false,
+                    ...subnetVisibilityCustomData,
+                    terraformSubnetGroup: true,
+                    accountId: subnetGroup.accountId,
+                    region: subnetGroup.region,
+                    vpcId: subnetGroup.vpcKey,
+                    subnetId: subnetGroup.subnetKey,
+                    subnetLabel: subnetGroup.subnetLabel,
+                  },
+                  subnetFacets,
+                ),
               },
             }),
           );
@@ -2923,27 +3621,32 @@ async function nodesToExcalidraw(nodes) {
               y: subnetBoxY + 6,
               width: Math.max(86, subnetBoxW - 16),
               height: 18,
-              text: `subnet ${subnetGroup.subnetLabel}`,
+              text: subnetLabelText,
               fontSize: 13,
               fontFamily: 3,
               textAlign: "left",
               verticalAlign: "top",
               groupIds: subnetGroupIds,
               containerId: subnetBoxId,
-              originalText: `subnet ${subnetGroup.subnetLabel}`,
+              originalText: subnetLabelText,
               autoResize: false,
               lineHeight: 1.2,
               strokeColor: SUBNET_STROKE,
               isDeleted: !subnetInitiallyVisible,
               customData: {
-                terraform: false,
-                ...subnetVisibilityCustomData,
-                terraformSubnetGroup: true,
-                accountId: subnetGroup.accountId,
-                region: subnetGroup.region,
-                vpcId: subnetGroup.vpcKey,
-                subnetId: subnetGroup.subnetKey,
-                subnetLabel: subnetGroup.subnetLabel,
+                ...buildContainerFacetCustomData(
+                  {
+                    terraform: false,
+                    ...subnetVisibilityCustomData,
+                    terraformSubnetGroup: true,
+                    accountId: subnetGroup.accountId,
+                    region: subnetGroup.region,
+                    vpcId: subnetGroup.vpcKey,
+                    subnetId: subnetGroup.subnetKey,
+                    subnetLabel: subnetGroup.subnetLabel,
+                  },
+                  subnetFacets,
+                ),
               },
             }),
           );

@@ -61,6 +61,7 @@ import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { TerraformImportDialog } from "./TerraformImportDialog";
+import { repairTerraformEdgeBindings } from "./terraformVisibility";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
@@ -159,6 +160,23 @@ type TerraformResourceDetails = {
   attributes?: TerraformAttribute[];
 };
 
+type TerraformFacetNestedSection = {
+  id?: string;
+  label?: string;
+  summary?: string;
+  data?: Record<string, unknown>;
+  sections?: TerraformFacetNestedSection[];
+};
+
+type TerraformContainerFacet = {
+  id?: string;
+  label?: string;
+  summary?: string;
+  data?: Record<string, unknown>;
+  sections?: TerraformFacetNestedSection[];
+  sources?: string[];
+};
+
 const TERRAFORM_GROUP_FLAGS = [
   "terraformModuleGroup",
   "terraformAccountGroup",
@@ -177,6 +195,14 @@ const isTerraformInspectableElement = (element: NonDeletedExcalidrawElement) =>
   isTerraformResourceElement(element) || isTerraformGroupElement(element);
 
 const TERRAFORM_DEPENDENCY_PREVIEW_OPACITY = 25;
+const TERRAFORM_DIM_NODE_OPACITY = 50;
+const TERRAFORM_DIM_EDGE_OPACITY = 28;
+const TERRAFORM_FOCUS_OPACITY = 100;
+const TERRAFORM_HOVER_INITIAL_HOPS = 1;
+const TERRAFORM_HOVER_HOP_BUDGET_BY_TYPE: Record<string, number> = {
+  aws_iam_role: 1,
+  aws_security_group: 1,
+};
 
 const isTerraformDependencyEdge = (element: ExcalidrawElement) =>
   element.customData?.terraformEdgeLayer === "dependency";
@@ -209,6 +235,139 @@ const clearTerraformDependencyPreviewData = (
   const nextCustomData = { ...(customData ?? {}) };
   delete nextCustomData.terraformDependencyPreview;
   return nextCustomData;
+};
+
+const isTerraformLayerEdge = (element: ExcalidrawElement) =>
+  element.customData?.terraformEdgeLayer === "dependency" ||
+  element.customData?.terraformEdgeLayer === "dataFlow";
+
+const getNodePathFromRelationship = (element: ExcalidrawElement) => {
+  const relationship = element.customData?.relationship;
+  const source =
+    typeof relationship?.source === "string" ? relationship.source : null;
+  const target =
+    typeof relationship?.target === "string" ? relationship.target : null;
+  return source && target ? { source, target } : null;
+};
+
+const getHopBudgetForNode = (
+  elementByNodePath: Map<string, ExcalidrawElement>,
+  nodePath: string,
+) => {
+  const resourceType = String(
+    elementByNodePath.get(nodePath)?.customData?.resourceType || "",
+  );
+  const allowedDepthByType = TERRAFORM_HOVER_HOP_BUDGET_BY_TYPE[resourceType];
+  if (typeof allowedDepthByType === "number") {
+    return Math.max(TERRAFORM_HOVER_INITIAL_HOPS, allowedDepthByType);
+  }
+  return TERRAFORM_HOVER_INITIAL_HOPS;
+};
+
+/** Parallel Terraform edges between the same node pair: pick one deterministically. */
+const pickCanonicalTerraformEdge = (candidates: ExcalidrawElement[]) => {
+  return [...candidates].sort((a, b) => {
+    const layerA = a.customData?.terraformEdgeLayer === "dependency" ? 0 : 1;
+    const layerB = b.customData?.terraformEdgeLayer === "dependency" ? 0 : 1;
+    if (layerA !== layerB) {
+      return layerA - layerB;
+    }
+    return String(a.id).localeCompare(String(b.id));
+  })[0];
+};
+
+const collectTerraformHoverFocus = (
+  allElements: readonly ExcalidrawElement[],
+  hoveredNodePath: string | null,
+) => {
+  const focusedNodePaths = new Set<string>();
+  const focusedEdgeIds = new Set<string>();
+  if (!hoveredNodePath) {
+    return { focusedNodePaths, focusedEdgeIds };
+  }
+
+  const elementByNodePath = new Map<string, ExcalidrawElement>();
+  /** u -> (v -> parallel edges u–v) */
+  const adjacencyWithEdges = new Map<
+    string,
+    Map<string, ExcalidrawElement[]>
+  >();
+  const addUndirectedEdge = (a: string, b: string, edge: ExcalidrawElement) => {
+    if (!adjacencyWithEdges.has(a)) {
+      adjacencyWithEdges.set(a, new Map());
+    }
+    const ma = adjacencyWithEdges.get(a)!;
+    if (!ma.has(b)) {
+      ma.set(b, []);
+    }
+    ma.get(b)!.push(edge);
+  };
+
+  const edges = allElements.filter(
+    (element) =>
+      isTerraformLayerEdge(element) &&
+      !isTerraformDependencyPreviewEdge(element),
+  );
+  for (const element of allElements) {
+    const nodePath =
+      typeof element.customData?.nodePath === "string"
+        ? element.customData.nodePath
+        : null;
+    if (nodePath) {
+      elementByNodePath.set(nodePath, element);
+    }
+  }
+  for (const edge of edges) {
+    const rel = getNodePathFromRelationship(edge);
+    if (!rel) {
+      continue;
+    }
+    addUndirectedEdge(rel.source, rel.target, edge);
+    addUndirectedEdge(rel.target, rel.source, edge);
+  }
+
+  const visited = new Set<string>();
+  /** BFS spanning tree: child nodePath -> edge id from parent (root has no entry). */
+  const treeEdgeIdByChild = new Map<string, string>();
+  const queue: Array<{ nodePath: string; depth: number }> = [
+    { nodePath: hoveredNodePath, depth: 0 },
+  ];
+
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    const { nodePath: u, depth: d } = current;
+    if (visited.has(u)) {
+      continue;
+    }
+    visited.add(u);
+    focusedNodePaths.add(u);
+
+    const treeEdgeId = treeEdgeIdByChild.get(u);
+    if (treeEdgeId) {
+      focusedEdgeIds.add(treeEdgeId);
+    }
+
+    if (d >= getHopBudgetForNode(elementByNodePath, u)) {
+      continue;
+    }
+
+    const neighborMap = adjacencyWithEdges.get(u);
+    if (!neighborMap) {
+      continue;
+    }
+
+    for (const [v, parallel] of neighborMap) {
+      if (visited.has(v)) {
+        continue;
+      }
+      if (!treeEdgeIdByChild.has(v)) {
+        treeEdgeIdByChild.set(v, pickCanonicalTerraformEdge(parallel).id);
+      }
+      queue.push({ nodePath: v, depth: d + 1 });
+    }
+  }
+
+  return { focusedNodePaths, focusedEdgeIds };
 };
 
 const tryParseJsonString = (value: string): unknown | null => {
@@ -372,6 +531,85 @@ const getTerraformGroupTitle = (customData: Record<string, any>) => {
   return "Terraform group";
 };
 
+const getTerraformContainerFacets = (
+  customData: Record<string, any>,
+): TerraformContainerFacet[] =>
+  Array.isArray(customData.terraformContainerFacets)
+    ? customData.terraformContainerFacets
+    : [];
+
+const toFacetRows = (facet: TerraformContainerFacet) => {
+  const data = facet?.data;
+  if (!data || typeof data !== "object") {
+    return [];
+  }
+  return Object.entries(data).filter(
+    ([, value]) => value !== null && typeof value !== "undefined",
+  );
+};
+
+const TerraformNestedFacetSections = ({
+  sections,
+  depth = 0,
+}: {
+  sections: TerraformFacetNestedSection[];
+  depth?: number;
+}) => (
+  <>
+    {sections.map((section, secIdx) => {
+      const childSections = Array.isArray(section.sections)
+        ? section.sections
+        : [];
+      const sectionRows =
+        section.data && typeof section.data === "object"
+          ? Object.entries(section.data).filter(
+              ([, value]) => value !== null && typeof value !== "undefined",
+            )
+          : [];
+      const title = section.label || section.id || `Section ${secIdx + 1}`;
+      const key = section.id || `${title}-${depth}-${secIdx}`;
+      return (
+        <details
+          className="terraform-element-actions__nested-section"
+          key={key}
+          open={depth === 0 && secIdx === 0}
+        >
+          <summary className="terraform-element-actions__resource-title terraform-element-actions__nested-summary">
+            {title}
+            {section.summary ? (
+              <span className="terraform-element-actions__value">
+                {" "}
+                — {section.summary}
+              </span>
+            ) : null}
+          </summary>
+          <div>
+            {sectionRows.map(([rowKey, value]) => (
+              <div
+                className="terraform-element-actions__attribute"
+                key={`${key}-${rowKey}`}
+              >
+                <div className="terraform-element-actions__attribute-head">
+                  <span>{rowKey}</span>
+                </div>
+                <div className="terraform-element-actions__value terraform-element-actions__value--config">
+                  <TerraformConfigValue value={value} />
+                </div>
+              </div>
+            ))}
+            {childSections.length > 0 ? (
+              <TerraformNestedFacetSections
+                sections={childSections}
+                depth={depth + 1}
+              />
+            ) : null}
+          </div>
+        </details>
+      );
+    })}
+  </>
+);
+
 const TerraformGroupActions = ({
   element,
   renderAction,
@@ -380,6 +618,7 @@ const TerraformGroupActions = ({
   renderAction: ActionManager["renderAction"];
 }) => {
   const customData = element.customData ?? {};
+  const facets = getTerraformContainerFacets(customData);
   const rows = [
     ["Module path", customData.modulePath],
     ["Source", customData.moduleSource],
@@ -412,6 +651,66 @@ const TerraformGroupActions = ({
           </div>
         ))}
       </div>
+
+      {facets.length > 0 && (
+        <div className="terraform-element-actions__config">
+          {facets.map((facet, facetIndex) => {
+            const facetRows = toFacetRows(facet);
+            const title =
+              facet.label || facet.id || `Facet ${String(facetIndex + 1)}`;
+            return (
+              <details
+                className="terraform-element-actions__resource"
+                key={facet.id || `${title}-${facetIndex}`}
+                open={facetIndex === 0}
+              >
+                <summary className="terraform-element-actions__resource-title">
+                  {title}
+                  {facet.summary ? (
+                    <span className="terraform-element-actions__value">
+                      {" "}
+                      - {facet.summary}
+                    </span>
+                  ) : null}
+                </summary>
+                <div>
+                  {facet.sections && facet.sections.length > 0 ? (
+                    <TerraformNestedFacetSections sections={facet.sections} />
+                  ) : facetRows.length > 0 ? (
+                    facetRows.map(([key, value]) => (
+                      <div
+                        className="terraform-element-actions__attribute"
+                        key={`${title}-${key}`}
+                      >
+                        <div className="terraform-element-actions__attribute-head">
+                          <span>{key}</span>
+                        </div>
+                        <div className="terraform-element-actions__value terraform-element-actions__value--config">
+                          <TerraformConfigValue value={value} />
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="terraform-element-actions__empty">
+                      No facet data available.
+                    </div>
+                  )}
+                  {Array.isArray(facet.sources) && facet.sources.length > 0 ? (
+                    <div className="terraform-element-actions__attribute">
+                      <div className="terraform-element-actions__attribute-head">
+                        <span>sources</span>
+                      </div>
+                      <div className="terraform-element-actions__value terraform-element-actions__value--config">
+                        <TerraformConfigValue value={facet.sources} />
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </details>
+            );
+          })}
+        </div>
+      )}
 
       <fieldset>
         <legend>{t("labels.actions")}</legend>
@@ -696,9 +995,78 @@ const LayerUI = ({
     });
 
     if (didChange) {
-      app.scene.replaceAllElements(nextElements);
+      app.scene.replaceAllElements(repairTerraformEdgeBindings(nextElements));
     }
   }, [app, appState, elements]);
+
+  React.useEffect(() => {
+    const allElements = app.scene.getElementsIncludingDeleted();
+    const hoveredTerraformResource = allElements.find(
+      (element) =>
+        appState.hoveredElementIds[element.id] &&
+        element.customData?.terraformVisibilityRole === "resource" &&
+        typeof element.customData?.nodePath === "string",
+    );
+    const hoveredNodePath =
+      typeof hoveredTerraformResource?.customData?.nodePath === "string"
+        ? hoveredTerraformResource.customData.nodePath
+        : null;
+    const { focusedNodePaths, focusedEdgeIds } = collectTerraformHoverFocus(
+      allElements,
+      hoveredNodePath,
+    );
+
+    let didChange = false;
+    const nextElements = allElements.map((element) => {
+      if (
+        isTerraformLayerEdge(element) &&
+        !isTerraformDependencyPreviewEdge(element)
+      ) {
+        const nextOpacity =
+          hoveredNodePath === null
+            ? TERRAFORM_FOCUS_OPACITY
+            : focusedEdgeIds.has(element.id)
+            ? TERRAFORM_FOCUS_OPACITY
+            : TERRAFORM_DIM_EDGE_OPACITY;
+        if (element.opacity === nextOpacity) {
+          return element;
+        }
+        didChange = true;
+        return newElementWith(element, { opacity: nextOpacity });
+      }
+
+      if (
+        element.customData?.terraformVisibilityRole === "resource" ||
+        isTerraformGroupElement(element as NonDeletedExcalidrawElement)
+      ) {
+        const nodePath =
+          typeof element.customData?.nodePath === "string"
+            ? element.customData.nodePath
+            : null;
+        const isFocused =
+          nodePath !== null &&
+          hoveredNodePath !== null &&
+          focusedNodePaths.has(nodePath);
+        const nextOpacity =
+          hoveredNodePath === null
+            ? TERRAFORM_FOCUS_OPACITY
+            : isFocused
+            ? TERRAFORM_FOCUS_OPACITY
+            : TERRAFORM_DIM_NODE_OPACITY;
+        if (element.opacity === nextOpacity) {
+          return element;
+        }
+        didChange = true;
+        return newElementWith(element, { opacity: nextOpacity });
+      }
+
+      return element;
+    });
+
+    if (didChange) {
+      app.scene.replaceAllElements(nextElements);
+    }
+  }, [app, appState.hoveredElementIds, elements]);
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
