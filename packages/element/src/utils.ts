@@ -27,7 +27,6 @@ import {
 } from "@excalidraw/math";
 
 import type { Curve, LineSegment, LocalPoint } from "@excalidraw/math";
-import { doLineSegmentsIntersect } from "@excalidraw/utils";
 
 import type {
   AppState,
@@ -524,7 +523,7 @@ export const doesPathIntersect = (
         const q1 = points[j];
         const q2 = points[j + 1];
 
-        if (doLineSegmentsIntersect(lineSegment(q1, q2), lineSegment(p1, p2))) {
+        if (getIntersectionPoint(p1, p2, q1, q2)) {
           return true;
         }
       }
