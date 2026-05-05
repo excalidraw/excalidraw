@@ -1,6 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 const { extractVpcNetworkingFacetStore } = require("./vpc-networking-facet");
+const {
+  VPC_PERIMETER_LAYOUT_ENABLED,
+  isVpcPerimeterNode,
+  filterLayoutSimulationKeys,
+} = require("./vpc-perimeter");
 
 function rand() {
   return Math.floor(Math.random() * 2147483647);
@@ -2284,6 +2289,203 @@ function expandCollapsedModulePositions(
   return positions;
 }
 
+function measureBoundsFromNodePositions(nodePaths, positions, tierMap, tierConfigs) {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const nodePath of nodePaths) {
+    const pos = positions[nodePath];
+    if (!pos || typeof pos.x !== "number" || typeof pos.y !== "number") {
+      continue;
+    }
+    const cfg = tierConfigs[tierMap[nodePath]];
+    if (!cfg) {
+      continue;
+    }
+    minX = Math.min(minX, pos.x);
+    minY = Math.min(minY, pos.y);
+    maxX = Math.max(maxX, pos.x + cfg.w);
+    maxY = Math.max(maxY, pos.y + cfg.h);
+  }
+
+  if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+    return null;
+  }
+
+  return { minX, minY, maxX, maxY };
+}
+
+/**
+ * Pins perimeter nodes (e.g. VPC endpoints) onto the VPC frame derived from
+ * interior member bounds + the same padding used for the dashed VPC rectangle.
+ */
+function snapVpcPerimeterResourcePositions(
+  positions,
+  accountRegionGroups,
+  tierMap,
+  tierConfigs,
+  perimeterSet,
+) {
+  if (!VPC_PERIMETER_LAYOUT_ENABLED || perimeterSet.size === 0) {
+    return;
+  }
+
+  const VPC_PAD_X = 68;
+  const VPC_PAD_TOP = 96;
+  const VPC_PAD_BOTTOM = 52;
+
+  for (const accountGroup of accountRegionGroups) {
+    for (const regionGroup of accountGroup.regions || []) {
+      for (const vpcGroup of regionGroup.vpcs || []) {
+        const interiorPaths = vpcGroup.nodePaths.filter(
+          (p) => !perimeterSet.has(p),
+        );
+        const perimeterPaths = vpcGroup.nodePaths.filter((p) =>
+          perimeterSet.has(p),
+        );
+        if (perimeterPaths.length === 0) {
+          continue;
+        }
+
+        const inner = measureBoundsFromNodePositions(
+          interiorPaths,
+          positions,
+          tierMap,
+          tierConfigs,
+        );
+        if (!inner) {
+          continue;
+        }
+
+        const frameMinX = inner.minX - VPC_PAD_X;
+        const frameMaxX = inner.maxX + VPC_PAD_X;
+        const frameMinY = inner.minY - VPC_PAD_TOP;
+        const frameMaxY = inner.maxY + VPC_PAD_BOTTOM;
+
+        const sorted = [...perimeterPaths].sort((a, b) =>
+          a.localeCompare(b),
+        );
+        const lanes = [[], [], [], []];
+        sorted.forEach((p, i) => {
+          lanes[i % 4].push(p);
+        });
+        const [top, right, bottom, left] = lanes;
+
+        const spanX = Math.max(0, frameMaxX - frameMinX);
+        const spanY = Math.max(0, frameMaxY - frameMinY);
+
+        top.forEach((p, i) => {
+          const cfg = tierConfigs[tierMap[p]];
+          const w = cfg?.w ?? 120;
+          const n = top.length;
+          const t = n === 1 ? 0.5 : i / (n - 1);
+          const slack = Math.max(0, spanX - w);
+          positions[p] = {
+            x: frameMinX + t * slack,
+            y: frameMinY,
+          };
+        });
+
+        bottom.forEach((p, i) => {
+          const cfg = tierConfigs[tierMap[p]];
+          const w = cfg?.w ?? 120;
+          const h = cfg?.h ?? 80;
+          const n = bottom.length;
+          const t = n === 1 ? 0.5 : i / (n - 1);
+          const slack = Math.max(0, spanX - w);
+          positions[p] = {
+            x: frameMinX + t * slack,
+            y: frameMaxY - h,
+          };
+        });
+
+        right.forEach((p, i) => {
+          const cfg = tierConfigs[tierMap[p]];
+          const w = cfg?.w ?? 120;
+          const h = cfg?.h ?? 80;
+          const n = right.length;
+          const t = n === 1 ? 0.5 : i / (n - 1);
+          const slack = Math.max(0, spanY - h);
+          positions[p] = {
+            x: frameMaxX - w,
+            y: frameMinY + t * slack,
+          };
+        });
+
+        left.forEach((p, i) => {
+          const cfg = tierConfigs[tierMap[p]];
+          const h = cfg?.h ?? 80;
+          const n = left.length;
+          const t = n === 1 ? 0.5 : i / (n - 1);
+          const slack = Math.max(0, spanY - h);
+          positions[p] = {
+            x: frameMinX,
+            y: frameMinY + t * slack,
+          };
+        });
+      }
+    }
+  }
+}
+
+function collectVpcApplianceTilesFromFacets(vpcFacets) {
+  const tiles = [];
+  for (const facet of vpcFacets || []) {
+    if (facet?.id !== "networking-v2" || !Array.isArray(facet.sections)) {
+      continue;
+    }
+    for (const top of facet.sections) {
+      const children = Array.isArray(top.sections) ? top.sections : [];
+      if (top.label === "Route tables") {
+        for (const child of children) {
+          tiles.push({
+            key: child.id || child.label || `rt-${tiles.length}`,
+            label: child.summary
+              ? `Route table ${child.summary}`
+              : child.label || "Route table",
+            applianceKind: "route_table",
+          });
+        }
+      } else if (top.label === "Gateways") {
+        for (const child of children) {
+          tiles.push({
+            key: child.id || child.label || `gw-${tiles.length}`,
+            label: child.label || "Gateway",
+            applianceKind: "gateway",
+          });
+        }
+      } else if (top.label === "Route table associations (VPC)") {
+        for (const child of children) {
+          tiles.push({
+            key: child.id || child.label || `assoc-${tiles.length}`,
+            label: child.label || "Route association",
+            applianceKind: "route_assoc",
+          });
+        }
+      }
+    }
+  }
+  return tiles;
+}
+
+function applianceStyleForKind(kind) {
+  if (kind === "route_table") {
+    return { strokeColor: "#c77d00", backgroundColor: "#fff4cc" };
+  }
+  if (kind === "gateway") {
+    return { strokeColor: "#0c8599", backgroundColor: "#d3f9fa" };
+  }
+  if (kind === "route_assoc") {
+    return { strokeColor: "#5f3dc4", backgroundColor: "#e5dbff" };
+  }
+  if (kind === "endpoint") {
+    return { strokeColor: "#2b8a3e", backgroundColor: "#d8f5a2" };
+  }
+  return { strokeColor: "#495057", backgroundColor: "#f1f3f5" };
+}
+
 // --- Main conversion ---
 
 async function nodesToExcalidraw(nodes) {
@@ -2292,7 +2494,17 @@ async function nodesToExcalidraw(nodes) {
   const moduleElements = [];
   const arrowElements = [];
   const nodeKeys = Object.keys(nodes).filter((key) => !key.startsWith("__"));
+  const perimeterSet = new Set(
+    nodeKeys.filter((p) => isVpcPerimeterNode(p, nodes[p])),
+  );
   const directedEdges = collectDirectedEdges(nodes);
+  const directedEdgesForLayout =
+    VPC_PERIMETER_LAYOUT_ENABLED && perimeterSet.size > 0
+      ? directedEdges.filter(
+          (edge) =>
+            !perimeterSet.has(edge.source) && !perimeterSet.has(edge.target),
+        )
+      : directedEdges;
   const relationships = coalesceRelationshipPairs(directedEdges);
   const dataFlowEdges = collectDataFlowEdges(nodes);
   const explodeParentMap = buildTerraformExplodeParentMap(
@@ -2301,9 +2513,13 @@ async function nodesToExcalidraw(nodes) {
     dataFlowEdges,
   );
   const dependencyPairKeys = new Set(
-    relationships.map(({ source, target }) =>
-      [source, target].sort().join("|||"),
-    ),
+    relationships
+      .filter(
+        ({ source, target }) =>
+          !isVpcPerimeterNode(source, nodes[source]) &&
+          !isVpcPerimeterNode(target, nodes[target]),
+      )
+      .map(({ source, target }) => [source, target].sort().join("|||")),
   );
   const nodeLocationMap = buildNodeLocationMap(nodes);
   const nodeVpcMap = buildNodeVpcMap(nodes);
@@ -2336,14 +2552,19 @@ async function nodesToExcalidraw(nodes) {
   const { layoutNodeKeys, layoutEdges, layoutTierMap, moduleMembers } =
     buildCollapsedLayoutModel(
       nodeKeys,
-      directedEdges,
+      directedEdgesForLayout,
       tierMap,
       collapsibleModules,
     );
+  const layoutSimulationKeys = filterLayoutSimulationKeys(
+    layoutNodeKeys,
+    moduleMembers,
+    perimeterSet,
+  );
   const tierConfigs = buildTierConfigs(tierMap, nodeKeys.length);
   const layoutTierConfigs = buildTierConfigs(
     layoutTierMap,
-    layoutNodeKeys.length,
+    layoutSimulationKeys.length,
   );
   const layoutSizes = estimateModuleLayoutSizes(
     moduleMembers,
@@ -2353,7 +2574,7 @@ async function nodesToExcalidraw(nodes) {
   );
 
   const layoutPositions = await forceLayout(
-    layoutNodeKeys,
+    layoutSimulationKeys,
     layoutEdges,
     layoutTierMap,
     layoutTierConfigs,
@@ -2366,6 +2587,19 @@ async function nodesToExcalidraw(nodes) {
     moduleGroupByPath,
   );
   applyModulePresets(positions, nodeKeys, moduleGroupByPath);
+  snapVpcPerimeterResourcePositions(
+    positions,
+    accountRegionGroups,
+    tierMap,
+    tierConfigs,
+    perimeterSet,
+  );
+  for (const path of perimeterSet) {
+    const pos = positions[path];
+    if (!pos || typeof pos.x !== "number" || typeof pos.y !== "number") {
+      positions[path] = { x: 120, y: 120 };
+    }
+  }
   const posMap = {};
   const nodeRectById = new Map();
 
@@ -2394,8 +2628,14 @@ async function nodesToExcalidraw(nodes) {
     posMap[nodePath] = { x, y, w: cfg.w, h: cfg.h, rectId, textId };
 
     const action = getPrimaryAction(nodes[nodePath]);
-    const bgColor = ACTION_COLORS[action] || ACTION_COLORS.existing;
-    const strokeColor = ACTION_STROKE[action] || ACTION_STROKE.existing;
+    const isVpcEndpoint = isVpcPerimeterNode(nodePath, nodes[nodePath]);
+    const applianceStyle = isVpcEndpoint
+      ? applianceStyleForKind("endpoint")
+      : null;
+    const bgColor =
+      applianceStyle?.backgroundColor || ACTION_COLORS[action] || ACTION_COLORS.existing;
+    const strokeColor =
+      applianceStyle?.strokeColor || ACTION_STROKE[action] || ACTION_STROKE.existing;
     const label = getLabel(nodePath);
     const terraformResources = buildTerraformResourceDetails(nodes[nodePath]);
     const nodeLocation = nodeLocationMap.get(nodePath) || null;
@@ -2421,13 +2661,19 @@ async function nodesToExcalidraw(nodes) {
       roundness: { type: 3 },
       groupIds,
       boundElements: [],
-      strokeStyle: action === "external" ? "dashed" : "solid",
+      strokeStyle: isVpcEndpoint
+        ? "dotted"
+        : action === "external"
+          ? "dashed"
+          : "solid",
       customData: {
         terraform: true,
         ...visibilityCustomData,
         resourceType,
         nodePath,
         action,
+        terraformVpcAppliance: isVpcEndpoint,
+        terraformVpcApplianceKind: isVpcEndpoint ? "endpoint" : null,
         region: nodeLocation?.region || null,
         accountId: nodeLocation?.accountId || null,
         vpcId: nodeVpc?.vpcKey || null,
@@ -2931,9 +3177,18 @@ async function nodesToExcalidraw(nodes) {
       );
 
       for (const vpcGroup of regionGroup.vpcs || []) {
-        const vpcBounds = measureBounds(
-          getUniqueVisualBounds(vpcGroup.nodePaths),
+        const vpcInteriorPaths = vpcGroup.nodePaths.filter(
+          (p) => !perimeterSet.has(p),
         );
+        const boundsPaths =
+          vpcInteriorPaths.length > 0 ? vpcInteriorPaths : vpcGroup.nodePaths;
+        const vpcBounds =
+          measureBoundsFromNodePositions(
+            boundsPaths,
+            positions,
+            tierMap,
+            tierConfigs,
+          ) || measureBounds(getUniqueVisualBounds(boundsPaths));
         if (!vpcBounds) {
           continue;
         }
@@ -2973,6 +3228,7 @@ async function nodesToExcalidraw(nodes) {
           : `vpc ${vpcGroup.vpcLabel}`;
 
         const vpcGroupIds = [vpcGroupId, regionGroupId, accountGroupId];
+        const vpcApplianceTiles = collectVpcApplianceTilesFromFacets(vpcFacets);
 
         locationElements.push(
           makeBaseElement({
@@ -3043,6 +3299,89 @@ async function nodesToExcalidraw(nodes) {
             },
           }),
         );
+
+        if (vpcApplianceTiles.length > 0) {
+          const tileW = 180;
+          const tileH = 44;
+          const gapX = 10;
+          const gapY = 8;
+          const maxCols = Math.max(
+            1,
+            Math.floor((vpcBoxW - 24 + gapX) / (tileW + gapX)),
+          );
+          const baseX = vpcBoxX + 12;
+          const baseY = vpcBoxY + 42;
+
+          for (let tileIndex = 0; tileIndex < vpcApplianceTiles.length; tileIndex++) {
+            const tile = vpcApplianceTiles[tileIndex];
+            const col = tileIndex % maxCols;
+            const row = Math.floor(tileIndex / maxCols);
+            const x = baseX + col * (tileW + gapX);
+            const y = baseY + row * (tileH + gapY);
+            const style = applianceStyleForKind(tile.applianceKind);
+            const tileId = `vpc-appliance-${rand()}`;
+            const tileTextId = `vpc-appliance-text-${rand()}`;
+            const tileGroupIds = [`vpc-appliance-group-${rand()}`, ...vpcGroupIds];
+
+            locationElements.push(
+              makeBaseElement({
+                type: "rectangle",
+                id: tileId,
+                x,
+                y,
+                width: tileW,
+                height: tileH,
+                strokeColor: style.strokeColor,
+                strokeWidth: 1,
+                strokeStyle: "solid",
+                backgroundColor: style.backgroundColor,
+                roundness: { type: 3 },
+                groupIds: tileGroupIds,
+                boundElements: [{ id: tileTextId, type: "text" }],
+                isDeleted: !vpcInitiallyVisible,
+                customData: {
+                  terraform: false,
+                  ...vpcVisibilityCustomData,
+                  terraformVpcAppliance: true,
+                  terraformVpcApplianceKind: tile.applianceKind,
+                  vpcId: vpcGroup.vpcKey,
+                  applianceLabel: tile.label,
+                },
+              }),
+            );
+
+            locationElements.push(
+              makeBaseElement({
+                type: "text",
+                id: tileTextId,
+                x: x + 8,
+                y: y + 8,
+                width: tileW - 16,
+                height: tileH - 16,
+                text: tile.label,
+                fontSize: 12,
+                fontFamily: 3,
+                textAlign: "left",
+                verticalAlign: "middle",
+                groupIds: tileGroupIds,
+                containerId: tileId,
+                originalText: tile.label,
+                autoResize: false,
+                lineHeight: 1.2,
+                strokeColor: style.strokeColor,
+                isDeleted: !vpcInitiallyVisible,
+                customData: {
+                  terraform: false,
+                  ...vpcVisibilityCustomData,
+                  terraformVpcAppliance: true,
+                  terraformVpcApplianceKind: tile.applianceKind,
+                  vpcId: vpcGroup.vpcKey,
+                  applianceLabel: tile.label,
+                },
+              }),
+            );
+          }
+        }
 
         for (const subnetGroup of vpcGroup.subnets || []) {
           const subnetBounds = measureBounds(
@@ -3182,6 +3521,12 @@ async function nodesToExcalidraw(nodes) {
       kinds,
       origins,
     } = relationship;
+    if (
+      isVpcPerimeterNode(source, nodes[source]) ||
+      isVpcPerimeterNode(target, nodes[target])
+    ) {
+      continue;
+    }
     const posA = posMap[source];
     const posB = posMap[target];
     const arrowId = `arrow-${arrowIdx++}`;
@@ -3263,6 +3608,12 @@ async function nodesToExcalidraw(nodes) {
       bidirectional = false,
       directions = [],
     } = edge;
+    if (
+      isVpcPerimeterNode(source, nodes[source]) ||
+      isVpcPerimeterNode(target, nodes[target])
+    ) {
+      continue;
+    }
     const posA = posMap[source];
     const posB = posMap[target];
     if (!posA || !posB) {

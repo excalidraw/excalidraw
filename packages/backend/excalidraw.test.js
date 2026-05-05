@@ -332,6 +332,12 @@ describe("nodesToExcalidraw container facets", () => {
         element.type === "rectangle" &&
         element.customData?.nodePath === "aws_route_table.private",
     );
+    const routeApplianceRect = scene.elements.find(
+      (element) =>
+        element.type === "rectangle" &&
+        element.customData?.terraformVpcAppliance === true &&
+        element.customData?.terraformVpcApplianceKind === "route_table",
+    );
     const sgRect = scene.elements.find(
       (element) =>
         element.type === "rectangle" &&
@@ -372,5 +378,219 @@ describe("nodesToExcalidraw container facets", () => {
     expect(routeTableRect.isDeleted).toBe(true);
     expect(sgRect).toBeDefined();
     expect(sgRect?.isDeleted).toBe(true);
+    expect(routeApplianceRect).toBeDefined();
+  });
+});
+
+describe("nodesToExcalidraw VPC perimeter layout", () => {
+  it("omits dependency arrows for VPC endpoints and lists endpoints in VPC facets", async () => {
+    const scene = await nodesToExcalidraw({
+      "aws_vpc.main": {
+        resources: {
+          "aws_vpc.main": {
+            address: "aws_vpc.main",
+            type: "aws_vpc",
+            name: "main",
+            change: { actions: ["create"], after: { id: "vpc-1234abcd" } },
+          },
+        },
+        edges_new: ["aws_subnet.private"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_subnet.private": {
+        resources: {
+          "aws_subnet.private": {
+            address: "aws_subnet.private",
+            type: "aws_subnet",
+            name: "private",
+            change: {
+              actions: ["create"],
+              after: { id: "subnet-1234abcd", vpc_id: "vpc-1234abcd" },
+            },
+          },
+        },
+        edges_new: ["aws_vpc.main", "aws_lambda_function.worker"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_lambda_function.worker": {
+        resources: {
+          "aws_lambda_function.worker": {
+            address: "aws_lambda_function.worker",
+            type: "aws_lambda_function",
+            name: "worker",
+            change: {
+              actions: ["create"],
+              after: { function_name: "worker" },
+            },
+          },
+        },
+        edges_new: ["aws_security_group.app"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_security_group.app": {
+        resources: {
+          "aws_security_group.app": {
+            address: "aws_security_group.app",
+            type: "aws_security_group",
+            name: "app",
+            change: {
+              actions: ["create"],
+              after: { vpc_id: "vpc-1234abcd" },
+            },
+          },
+        },
+        edges_new: ["aws_vpc.main"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_vpc_endpoint.s3": {
+        resources: {
+          "aws_vpc_endpoint.s3": {
+            address: "aws_vpc_endpoint.s3",
+            type: "aws_vpc_endpoint",
+            name: "s3",
+            change: {
+              actions: ["create"],
+              after: {
+                vpc_id: "vpc-1234abcd",
+                service_name: "com.amazonaws.s3",
+                vpc_endpoint_type: "Interface",
+              },
+            },
+          },
+        },
+        edges_new: ["aws_lambda_function.worker"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_vpc_endpoint.logs": {
+        resources: {
+          "aws_vpc_endpoint.logs": {
+            address: "aws_vpc_endpoint.logs",
+            type: "aws_vpc_endpoint",
+            name: "logs",
+            change: {
+              actions: ["create"],
+              after: {
+                vpc_id: "vpc-1234abcd",
+                service_name: "com.amazonaws.logs",
+                vpc_endpoint_type: "Interface",
+              },
+            },
+          },
+        },
+        edges_new: ["aws_lambda_function.worker"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_vpc_endpoint.sqs": {
+        resources: {
+          "aws_vpc_endpoint.sqs": {
+            address: "aws_vpc_endpoint.sqs",
+            type: "aws_vpc_endpoint",
+            name: "sqs",
+            change: {
+              actions: ["create"],
+              after: {
+                vpc_id: "vpc-1234abcd",
+                service_name: "com.amazonaws.sqs",
+                vpc_endpoint_type: "Interface",
+              },
+            },
+          },
+        },
+        edges_new: ["aws_lambda_function.worker"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_vpc_endpoint.xray": {
+        resources: {
+          "aws_vpc_endpoint.xray": {
+            address: "aws_vpc_endpoint.xray",
+            type: "aws_vpc_endpoint",
+            name: "xray",
+            change: {
+              actions: ["create"],
+              after: {
+                vpc_id: "vpc-1234abcd",
+                service_name: "com.amazonaws.xray",
+                vpc_endpoint_type: "Interface",
+              },
+            },
+          },
+        },
+        edges_new: ["aws_lambda_function.worker"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    });
+
+    const vpcLabel = scene.elements.find(
+      (element) => element.type === "text" && element.customData?.terraformVpcGroup,
+    );
+    const endpointRect = scene.elements.find(
+      (element) =>
+        element.type === "rectangle" &&
+        element.customData?.nodePath === "aws_vpc_endpoint.s3",
+    );
+    const vpcBox = scene.elements.find(
+      (element) =>
+        element.type === "rectangle" && element.customData?.terraformVpcGroup,
+    );
+
+    expect(vpcLabel?.customData?.terraformContainerFacets).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "networking-v2",
+          sections: expect.arrayContaining([
+            expect.objectContaining({
+              label: "VPC endpoints",
+              sections: expect.arrayContaining([
+                expect.objectContaining({
+                  data: expect.objectContaining({
+                    service_name: "com.amazonaws.s3",
+                  }),
+                }),
+              ]),
+            }),
+          ]),
+        }),
+      ]),
+    );
+
+    expect(endpointRect).toBeDefined();
+    expect(endpointRect?.customData?.terraformVpcAppliance).toBe(true);
+    expect(endpointRect?.customData?.terraformVpcApplianceKind).toBe("endpoint");
+    expect(endpointRect?.strokeStyle).toBe("dotted");
+    expect(vpcBox).toBeDefined();
+    const endpointRects = scene.elements.filter(
+      (element) =>
+        element.type === "rectangle" &&
+        String(element.customData?.nodePath || "").includes("aws_vpc_endpoint."),
+    );
+    expect(endpointRects.length).toBe(4);
+    for (const ep of endpointRects) {
+      const onEdge =
+        Math.abs(ep.x - vpcBox.x) < 1 ||
+        Math.abs(ep.y - vpcBox.y) < 1 ||
+        Math.abs(ep.x + ep.width - (vpcBox.x + vpcBox.width)) < 1 ||
+        Math.abs(ep.y + ep.height - (vpcBox.y + vpcBox.height)) < 1;
+      expect(onEdge).toBe(true);
+    }
+
+    const depArrows = scene.elements.filter(
+      (element) => element.customData?.terraformEdgeLayer === "dependency",
+    );
+    const endpointDeps = depArrows.filter((arrow) => {
+      const rel = arrow.customData?.relationship;
+      return (
+        rel?.source === "aws_vpc_endpoint.s3" ||
+        rel?.target === "aws_vpc_endpoint.s3"
+      );
+    });
+    expect(endpointDeps).toHaveLength(0);
   });
 });
