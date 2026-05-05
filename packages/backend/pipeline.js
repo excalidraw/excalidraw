@@ -35,6 +35,137 @@ const COMPUTE_RESOURCE_TYPES = new Set([
   "aws_instance",
 ]);
 
+/**
+ * Plan-defined watched resources for metric alarms (namespace + dimensions).
+ * Terraform's dependency graph also wires alarms to many nodes directly; we replace
+ * those edges using this map when possible.
+ */
+const CLOUDWATCH_ALARM_WATCH_RULES_BY_NAMESPACE = {
+  "AWS/Lambda": [
+    {
+      dimensions: ["FunctionName", "Resource"],
+      types: ["aws_lambda_function"],
+    },
+  ],
+  "AWS/SQS": [{ dimensions: ["QueueName"], types: ["aws_sqs_queue"] }],
+  "AWS/SNS": [{ dimensions: ["TopicName"], types: ["aws_sns_topic"] }],
+  "AWS/DynamoDB": [{ dimensions: ["TableName"], types: ["aws_dynamodb_table"] }],
+  "AWS/ApiGateway": [
+    {
+      dimensions: ["ApiName", "ApiId"],
+      types: ["aws_api_gateway_rest_api", "aws_apigatewayv2_api"],
+    },
+  ],
+  "AWS/ApplicationELB": [
+    {
+      dimensions: ["LoadBalancer", "TargetGroup"],
+      types: [
+        "aws_lb",
+        "aws_alb",
+        "aws_lb_target_group",
+        "aws_alb_target_group",
+      ],
+    },
+  ],
+  "AWS/NetworkELB": [
+    {
+      dimensions: ["LoadBalancer", "TargetGroup"],
+      types: [
+        "aws_lb",
+        "aws_alb",
+        "aws_lb_target_group",
+        "aws_alb_target_group",
+      ],
+    },
+  ],
+  "AWS/RDS": [
+    { dimensions: ["DBInstanceIdentifier"], types: ["aws_db_instance", "aws_rds_cluster"] },
+  ],
+  "AWS/ElastiCache": [
+    {
+      dimensions: ["CacheClusterId", "ReplicationGroupId"],
+      types: ["aws_elasticache_cluster", "aws_elasticache_replication_group"],
+    },
+  ],
+};
+
+/** Synthetic node: Terraform module call (for edges + grouping). Not an AWS resource. */
+const TERRAFORM_MODULE_RESOURCE_TYPE = "terraform_module";
+
+/**
+ * Returns cumulative module paths for a Terraform resource address, e.g.
+ * `module.a.module.b.aws_x.y` → [`module.a`, `module.a.module.b`].
+ */
+function getModulePathChainFromAddress(nodePath = "") {
+  const parts = nodePath.split(".");
+  const chain = [];
+  let cursor = "";
+
+  for (let index = 0; index < parts.length - 1; ) {
+    if (parts[index] !== "module" || !parts[index + 1]) {
+      break;
+    }
+    const segment = `module.${parts[index + 1]}`;
+    cursor = cursor ? `${cursor}.${segment}` : segment;
+    chain.push(cursor);
+    index += 2;
+  }
+
+  return chain;
+}
+
+/** Deepest Terraform module path containing this resource address, or null if root module. */
+function getTerraformOwningModulePath(resourceNodePath = "") {
+  const chain = getModulePathChainFromAddress(resourceNodePath);
+  return chain.length ? chain[chain.length - 1] : null;
+}
+
+/**
+ * All module path prefixes present under any resource/data node (deduped).
+ */
+function collectAllTerraformModulePaths(nodePaths) {
+  const out = new Set();
+  for (const nodePath of nodePaths) {
+    for (const modulePath of getModulePathChainFromAddress(nodePath)) {
+      out.add(modulePath);
+    }
+  }
+  return out;
+}
+
+function lastModuleNameSegment(modulePath) {
+  const parts = modulePath.split(".");
+  return parts[parts.length - 1] || modulePath;
+}
+
+/**
+ * Inserts one synthetic node per module path so the DOT graph can attach edges to
+ * modules without BFS fan-out through module hubs into every child resource.
+ */
+function ensureTerraformModuleNodes(nodes) {
+  const modulePaths = collectAllTerraformModulePaths(Object.keys(nodes));
+
+  for (const modulePath of modulePaths) {
+    if (nodes[modulePath]) {
+      continue;
+    }
+
+    nodes[modulePath] = {
+      resources: {
+        [modulePath]: {
+          address: modulePath,
+          type: TERRAFORM_MODULE_RESOURCE_TYPE,
+          name: lastModuleNameSegment(modulePath),
+          mode: "managed",
+          change: { actions: ["no-op"] },
+        },
+      },
+    };
+  }
+
+  return nodes;
+}
+
 const getResourceValues = (resource = {}) => ({
   ...(resource.values || {}),
   ...(resource.change?.before || {}),
@@ -180,6 +311,8 @@ function loadPlanAndNodes(plan) {
 }
 
 function buildNewEdges(nodes, adjacency) {
+  const moduleBoundarySet = collectAllTerraformModulePaths(Object.keys(nodes));
+
   for (const nodePath of Object.keys(nodes)) {
     const visited = new Set([nodePath]);
     const queue = [nodePath];
@@ -198,11 +331,23 @@ function buildNewEdges(nodes, adjacency) {
         if (neighbor.startsWith("provider")) {
           continue;
         }
+
+        // Terraform graph uses intermediate module vertex names matching module paths.
+        // Never traverse through them: attach at most one edge to the synthetic module
+        // node so BFS does not pull in every resource under the module.
+        if (moduleBoundarySet.has(neighbor)) {
+          if (nodes[neighbor]) {
+            connectedNodes.add(neighbor);
+          }
+          continue;
+        }
+
         if (nodes[neighbor]) {
           connectedNodes.add(neighbor);
-        } else {
-          queue.push(neighbor);
+          continue;
         }
+
+        queue.push(neighbor);
       }
     }
 
@@ -219,6 +364,9 @@ function buildNewEdges(nodes, adjacency) {
 function computeResourceDiffs(nodes) {
   for (const node of Object.values(nodes)) {
     for (const resource of Object.values(node.resources || {})) {
+      if (resource.type === TERRAFORM_MODULE_RESOURCE_TYPE) {
+        continue;
+      }
       const change = resource.change || {};
       const before = change.before || {};
       const after = change.after || {};
@@ -367,12 +515,19 @@ function applyModuleMetadata(nodes, plan) {
       continue;
     }
 
-    node.terraform_module = moduleChain
-      .map((modulePath) => ({
-        modulePath,
-        ...(moduleMetadata[modulePath] || {}),
-      }))
-      .filter((metadata) => metadata.source || metadata.version);
+    const entries = moduleChain.map((modulePath) => ({
+      modulePath,
+      ...(moduleMetadata[modulePath] || {}),
+    }));
+
+    const primary = getPrimaryResource(node);
+    const isSyntheticModuleRoot =
+      primary.type === TERRAFORM_MODULE_RESOURCE_TYPE &&
+      nodePath === moduleChain[moduleChain.length - 1];
+
+    node.terraform_module = isSyntheticModuleRoot
+      ? entries
+      : entries.filter((metadata) => metadata.source || metadata.version);
   }
 
   return nodes;
@@ -632,6 +787,87 @@ function resolveNodeRefs(value, index, nodes, allowedTypes) {
   }
 
   return [...matches];
+}
+
+function resolveCloudWatchAlarmWatchTargets(nodePath, node, index, nodes) {
+  if (getResourceType(nodePath, node) !== "aws_cloudwatch_metric_alarm") {
+    return [];
+  }
+
+  const targets = new Set();
+
+  for (const resource of Object.values(node.resources || {})) {
+    const values = getResourceValues(resource);
+    const namespace = values.namespace;
+    const dimensions = values.dimensions;
+    if (!namespace || !isPlainObject(dimensions)) {
+      continue;
+    }
+
+    const rules = CLOUDWATCH_ALARM_WATCH_RULES_BY_NAMESPACE[namespace];
+    if (!rules) {
+      continue;
+    }
+
+    for (const rule of rules) {
+      for (const dim of rule.dimensions) {
+        const raw = dimensions[dim];
+        if (raw == null || raw === "") {
+          continue;
+        }
+        for (const t of resolveNodeRefs(raw, index, nodes, rule.types)) {
+          targets.add(t);
+        }
+      }
+    }
+  }
+
+  return [...targets];
+}
+
+/**
+ * Replaces DOT/state dependency fan-out for metric alarms with edges to the owning
+ * module (when the watched resource lives in a module) or the root resource.
+ * Runs after plan + state edges exist.
+ */
+function refineCloudWatchMetricAlarmEdges(nodes) {
+  const index = buildDataFlowIndex(nodes);
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    if (getResourceType(nodePath, node) !== "aws_cloudwatch_metric_alarm") {
+      continue;
+    }
+
+    const watchedResources = resolveCloudWatchAlarmWatchTargets(
+      nodePath,
+      node,
+      index,
+      nodes,
+    );
+    if (watchedResources.length === 0) {
+      continue;
+    }
+
+    const targets = new Set();
+    for (const resourcePath of watchedResources) {
+      const modulePath = getTerraformOwningModulePath(resourcePath);
+      if (modulePath && nodes[modulePath]) {
+        targets.add(modulePath);
+      } else if (nodes[resourcePath]) {
+        targets.add(resourcePath);
+      }
+    }
+
+    if (targets.size === 0) {
+      continue;
+    }
+
+    const list = [...targets];
+    node.edges_new = list;
+    node.edges_existing = list;
+  }
+
+  return nodes;
 }
 
 function resolvePolicyTargets(resourceValue, index, nodes) {
@@ -1072,10 +1308,15 @@ module.exports = {
   buildExistingEdges,
   applyModuleMetadata,
   mergeTerraformState,
+  ensureTerraformModuleNodes,
+  collectAllTerraformModulePaths,
+  getModulePathChainFromAddress,
   ensureEdgeLists,
   buildDataFlowEdges,
   externalResources,
   deleteOrphanedNodes,
   filterVisualIgnore,
   cleanUpRoleLinks,
+  refineCloudWatchMetricAlarmEdges,
+  getTerraformOwningModulePath,
 };

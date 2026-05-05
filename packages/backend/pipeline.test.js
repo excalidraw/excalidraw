@@ -1,4 +1,12 @@
-const { buildDataFlowEdges, ensureEdgeLists } = require("./pipeline");
+const {
+  buildDataFlowEdges,
+  ensureEdgeLists,
+  ensureTerraformModuleNodes,
+  collectAllTerraformModulePaths,
+  getModulePathChainFromAddress,
+  buildNewEdges,
+  refineCloudWatchMetricAlarmEdges,
+} = require("./pipeline");
 
 const resource = (address, type, name, values = {}) => ({
   address,
@@ -26,6 +34,99 @@ const dataFlowTargets = (nodes, source) =>
     type: edge.type,
     origin: edge.origin,
   }));
+
+describe("terraform module graph nodes", () => {
+  it("collects nested module prefixes from addresses", () => {
+    expect(
+      getModulePathChainFromAddress("module.a.module.b.aws_lambda_function.this"),
+    ).toEqual(["module.a", "module.a.module.b"]);
+    expect(
+      [...collectAllTerraformModulePaths(["module.x.aws_s3_bucket.y", "aws_vpc.z"])].sort(),
+    ).toEqual(["module.x"]);
+  });
+
+  it("buildNewEdges stops at module boundaries instead of fanning out", () => {
+    const adjacency = {
+      root_alarm: ["module.app"],
+      "module.app": ["module.app.aws_lambda_function.a", "module.app.aws_iam_role.b"],
+      "module.app.aws_lambda_function.a": [],
+      "module.app.aws_iam_role.b": [],
+    };
+
+    let nodes = ensureEdgeLists({
+      root_alarm: { resources: {} },
+      "module.app.aws_lambda_function.a": { resources: {} },
+      "module.app.aws_iam_role.b": { resources: {} },
+    });
+    nodes = ensureTerraformModuleNodes(nodes);
+    buildNewEdges(nodes, adjacency);
+
+    expect(nodes.root_alarm.edges_new.sort()).toEqual(["module.app"]);
+  });
+
+  it("refineCloudWatchMetricAlarmEdges collapses DOT+state fan-out to the owning module", () => {
+    let nodes = ensureEdgeLists({
+      "aws_cloudwatch_metric_alarm.lambda_errors": {
+        resources: {
+          "aws_cloudwatch_metric_alarm.lambda_errors": {
+            type: "aws_cloudwatch_metric_alarm",
+            address: "aws_cloudwatch_metric_alarm.lambda_errors",
+            change: {
+              actions: ["create"],
+              after: {
+                namespace: "AWS/Lambda",
+                dimensions: { FunctionName: "test-writer" },
+              },
+            },
+          },
+        },
+        edges_new: [
+          "module.lambda-writer.aws_lambda_function.main",
+          "aws_vpc.lambda",
+          "aws_s3_bucket.data",
+        ],
+        edges_existing: ["module.lambda-writer.aws_iam_role.x", "aws_kms_key.s3"],
+      },
+      "module.lambda-writer.aws_lambda_function.main": {
+        resources: {
+          "module.lambda-writer.aws_lambda_function.main": {
+            type: "aws_lambda_function",
+            address: "module.lambda-writer.aws_lambda_function.main",
+            change: { after: { function_name: "test-writer" } },
+          },
+        },
+      },
+      "module.lambda-writer": {
+        resources: {
+          "module.lambda-writer": {
+            type: "terraform_module",
+            address: "module.lambda-writer",
+            change: { actions: ["no-op"] },
+          },
+        },
+      },
+      "aws_vpc.lambda": {
+        resources: {
+          "aws_vpc.lambda": {
+            type: "aws_vpc",
+            address: "aws_vpc.lambda",
+            change: { after: {} },
+          },
+        },
+      },
+    });
+
+    nodes = ensureTerraformModuleNodes(nodes);
+    refineCloudWatchMetricAlarmEdges(nodes);
+
+    expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new).toEqual([
+      "module.lambda-writer",
+    ]);
+    expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_existing).toEqual([
+      "module.lambda-writer",
+    ]);
+  });
+});
 
 describe("buildDataFlowEdges", () => {
   it("infers API Gateway to Lambda invocation", () => {
