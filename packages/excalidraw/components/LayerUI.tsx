@@ -195,6 +195,14 @@ const isTerraformInspectableElement = (element: NonDeletedExcalidrawElement) =>
   isTerraformResourceElement(element) || isTerraformGroupElement(element);
 
 const TERRAFORM_DEPENDENCY_PREVIEW_OPACITY = 25;
+const TERRAFORM_DIM_NODE_OPACITY = 50;
+const TERRAFORM_DIM_EDGE_OPACITY = 28;
+const TERRAFORM_FOCUS_OPACITY = 100;
+const TERRAFORM_HOVER_INITIAL_HOPS = 1;
+const TERRAFORM_HOVER_HOP_BUDGET_BY_TYPE: Record<string, number> = {
+  aws_iam_role: 2,
+  aws_security_group: 2,
+};
 
 const isTerraformDependencyEdge = (element: ExcalidrawElement) =>
   element.customData?.terraformEdgeLayer === "dependency";
@@ -227,6 +235,116 @@ const clearTerraformDependencyPreviewData = (
   const nextCustomData = { ...(customData ?? {}) };
   delete nextCustomData.terraformDependencyPreview;
   return nextCustomData;
+};
+
+const isTerraformLayerEdge = (element: ExcalidrawElement) =>
+  element.customData?.terraformEdgeLayer === "dependency" ||
+  element.customData?.terraformEdgeLayer === "dataFlow";
+
+const getNodePathFromRelationship = (element: ExcalidrawElement) => {
+  const relationship = element.customData?.relationship;
+  const source =
+    typeof relationship?.source === "string" ? relationship.source : null;
+  const target =
+    typeof relationship?.target === "string" ? relationship.target : null;
+  return source && target ? { source, target } : null;
+};
+
+const getHopBudgetForNode = (
+  elementByNodePath: Map<string, ExcalidrawElement>,
+  nodePath: string,
+) => {
+  const resourceType = String(
+    elementByNodePath.get(nodePath)?.customData?.resourceType || "",
+  );
+  const allowedDepthByType = TERRAFORM_HOVER_HOP_BUDGET_BY_TYPE[resourceType];
+  if (typeof allowedDepthByType === "number") {
+    return Math.max(TERRAFORM_HOVER_INITIAL_HOPS, allowedDepthByType);
+  }
+  return TERRAFORM_HOVER_INITIAL_HOPS;
+};
+
+const collectTerraformHoverFocus = (
+  allElements: readonly ExcalidrawElement[],
+  hoveredNodePath: string | null,
+) => {
+  const focusedNodePaths = new Set<string>();
+  const focusedEdgeIds = new Set<string>();
+  if (!hoveredNodePath) {
+    return { focusedNodePaths, focusedEdgeIds };
+  }
+
+  const elementByNodePath = new Map<string, ExcalidrawElement>();
+  const adjacency = new Map<string, Set<string>>();
+  const edges = allElements.filter(
+    (element) =>
+      isTerraformLayerEdge(element) &&
+      !isTerraformDependencyPreviewEdge(element),
+  );
+  for (const element of allElements) {
+    const nodePath =
+      typeof element.customData?.nodePath === "string"
+        ? element.customData.nodePath
+        : null;
+    if (nodePath) {
+      elementByNodePath.set(nodePath, element);
+    }
+  }
+  for (const edge of edges) {
+    const rel = getNodePathFromRelationship(edge);
+    if (!rel) {
+      continue;
+    }
+    if (!adjacency.has(rel.source)) {
+      adjacency.set(rel.source, new Set());
+    }
+    if (!adjacency.has(rel.target)) {
+      adjacency.set(rel.target, new Set());
+    }
+    adjacency.get(rel.source)!.add(rel.target);
+    adjacency.get(rel.target)!.add(rel.source);
+  }
+
+  const queue: Array<{ nodePath: string; depth: number }> = [
+    { nodePath: hoveredNodePath, depth: 0 },
+  ];
+  const seenDepth = new Map<string, number>();
+
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    const prevDepth = seenDepth.get(current.nodePath);
+    if (typeof prevDepth === "number" && prevDepth <= current.depth) {
+      continue;
+    }
+    seenDepth.set(current.nodePath, current.depth);
+    focusedNodePaths.add(current.nodePath);
+
+    if (
+      current.depth >= getHopBudgetForNode(elementByNodePath, current.nodePath)
+    ) {
+      continue;
+    }
+
+    const neighbors = adjacency.get(current.nodePath);
+    if (!neighbors) {
+      continue;
+    }
+    for (const neighbor of neighbors) {
+      queue.push({ nodePath: neighbor, depth: current.depth + 1 });
+    }
+  }
+
+  for (const edge of edges) {
+    const rel = getNodePathFromRelationship(edge);
+    if (!rel) {
+      continue;
+    }
+    if (focusedNodePaths.has(rel.source) || focusedNodePaths.has(rel.target)) {
+      focusedEdgeIds.add(edge.id);
+    }
+  }
+
+  return { focusedNodePaths, focusedEdgeIds };
 };
 
 const tryParseJsonString = (value: string): unknown | null => {
@@ -422,8 +540,7 @@ const TerraformNestedFacetSections = ({
       const sectionRows =
         section.data && typeof section.data === "object"
           ? Object.entries(section.data).filter(
-              ([, value]) =>
-                value !== null && typeof value !== "undefined",
+              ([, value]) => value !== null && typeof value !== "undefined",
             )
           : [];
       const title = section.label || section.id || `Section ${secIdx + 1}`;
@@ -855,11 +972,78 @@ const LayerUI = ({
     });
 
     if (didChange) {
-      app.scene.replaceAllElements(
-        repairTerraformEdgeBindings(nextElements),
-      );
+      app.scene.replaceAllElements(repairTerraformEdgeBindings(nextElements));
     }
   }, [app, appState, elements]);
+
+  React.useEffect(() => {
+    const allElements = app.scene.getElementsIncludingDeleted();
+    const hoveredTerraformResource = allElements.find(
+      (element) =>
+        appState.hoveredElementIds[element.id] &&
+        element.customData?.terraformVisibilityRole === "resource" &&
+        typeof element.customData?.nodePath === "string",
+    );
+    const hoveredNodePath =
+      typeof hoveredTerraformResource?.customData?.nodePath === "string"
+        ? hoveredTerraformResource.customData.nodePath
+        : null;
+    const { focusedNodePaths, focusedEdgeIds } = collectTerraformHoverFocus(
+      allElements,
+      hoveredNodePath,
+    );
+
+    let didChange = false;
+    const nextElements = allElements.map((element) => {
+      if (
+        isTerraformLayerEdge(element) &&
+        !isTerraformDependencyPreviewEdge(element)
+      ) {
+        const nextOpacity =
+          hoveredNodePath === null
+            ? TERRAFORM_FOCUS_OPACITY
+            : focusedEdgeIds.has(element.id)
+            ? TERRAFORM_FOCUS_OPACITY
+            : TERRAFORM_DIM_EDGE_OPACITY;
+        if (element.opacity === nextOpacity) {
+          return element;
+        }
+        didChange = true;
+        return newElementWith(element, { opacity: nextOpacity });
+      }
+
+      if (
+        element.customData?.terraformVisibilityRole === "resource" ||
+        isTerraformGroupElement(element as NonDeletedExcalidrawElement)
+      ) {
+        const nodePath =
+          typeof element.customData?.nodePath === "string"
+            ? element.customData.nodePath
+            : null;
+        const isFocused =
+          nodePath !== null &&
+          hoveredNodePath !== null &&
+          focusedNodePaths.has(nodePath);
+        const nextOpacity =
+          hoveredNodePath === null
+            ? TERRAFORM_FOCUS_OPACITY
+            : isFocused
+            ? TERRAFORM_FOCUS_OPACITY
+            : TERRAFORM_DIM_NODE_OPACITY;
+        if (element.opacity === nextOpacity) {
+          return element;
+        }
+        didChange = true;
+        return newElementWith(element, { opacity: nextOpacity });
+      }
+
+      return element;
+    });
+
+    if (didChange) {
+      app.scene.replaceAllElements(nextElements);
+    }
+  }, [app, appState.hoveredElementIds, elements]);
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
