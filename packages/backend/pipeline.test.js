@@ -8,14 +8,179 @@ const {
   refineCloudWatchMetricAlarmEdges,
   omitVpcPlumbingNodes,
   deleteOrphanedNodes,
+  omitNonAllowlistedDataSourceNodes,
+  getDataSourceTypeFromAddress,
+  isExcludedDataSourceAddress,
+  mergeTerraformState,
 } = require("./pipeline");
 
-const resource = (address, type, name, values = {}) => ({
+const resource = (address, type, name, values = {}, mode = "managed") => ({
   address,
   type,
   name,
+  mode,
   values,
   change: { actions: ["create"], after: values },
+});
+
+describe("data source graph filtering", () => {
+  it("parses data source type from module-qualified addresses", () => {
+    expect(getDataSourceTypeFromAddress("data.aws_region.current")).toBe("aws_region");
+    expect(
+      getDataSourceTypeFromAddress("module.a.module.b.data.aws_iam_policy_document.x"),
+    ).toBe("aws_iam_policy_document");
+    expect(getDataSourceTypeFromAddress("aws_lambda_function.y")).toBeNull();
+  });
+
+  it("treats only non-allowlisted data addresses as excluded", () => {
+    expect(isExcludedDataSourceAddress("data.aws_region.current")).toBe(true);
+    expect(isExcludedDataSourceAddress("data.aws_iam_policy_document.main")).toBe(false);
+  });
+
+  it("omitNonAllowlistedDataSourceNodes removes data sources not on allowlist and strips edges", () => {
+    let nodes = ensureEdgeLists({
+      "aws_lambda_function.fn": {
+        resources: {
+          "aws_lambda_function.fn": resource(
+            "aws_lambda_function.fn",
+            "aws_lambda_function",
+            "fn",
+            {},
+          ),
+        },
+        edges_new: ["data.aws_region.current"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "data.aws_region.current": {
+        resources: {
+          "data.aws_region.current": resource(
+            "data.aws_region.current",
+            "aws_region",
+            "current",
+            {},
+            "data",
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "data.aws_iam_policy_document.pol": {
+        resources: {
+          "data.aws_iam_policy_document.pol": resource(
+            "data.aws_iam_policy_document.pol",
+            "aws_iam_policy_document",
+            "pol",
+            {},
+            "data",
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    });
+
+    nodes = omitNonAllowlistedDataSourceNodes(nodes);
+
+    expect(nodes["data.aws_region.current"]).toBeUndefined();
+    expect(nodes["data.aws_iam_policy_document.pol"]).toBeDefined();
+    expect(nodes["aws_lambda_function.fn"].edges_new).toEqual([]);
+  });
+
+  it("buildNewEdges does not traverse through excluded data vertices in DOT", () => {
+    const adjacency = {
+      "aws_lambda_function.fn": ["data.aws_region.current"],
+      "data.aws_region.current": ["aws_vpc.main"],
+      "aws_vpc.main": [],
+    };
+
+    let nodes = ensureEdgeLists({
+      "aws_lambda_function.fn": { resources: {} },
+      "aws_vpc.main": { resources: {} },
+    });
+    nodes = ensureTerraformModuleNodes(nodes);
+    buildNewEdges(nodes, adjacency);
+
+    expect(nodes["aws_lambda_function.fn"].edges_new).toEqual([]);
+  });
+
+  it("buildNewEdges still connects allowlisted data.aws_iam_policy_document neighbors", () => {
+    const adjacency = {
+      "aws_iam_role.r": ["data.aws_iam_policy_document.assume"],
+      "data.aws_iam_policy_document.assume": [],
+    };
+
+    let nodes = ensureEdgeLists({
+      "aws_iam_role.r": { resources: {} },
+      "data.aws_iam_policy_document.assume": {
+        resources: {
+          "data.aws_iam_policy_document.assume": resource(
+            "data.aws_iam_policy_document.assume",
+            "aws_iam_policy_document",
+            "assume",
+            {},
+            "data",
+          ),
+        },
+      },
+    });
+    nodes = ensureTerraformModuleNodes(nodes);
+    buildNewEdges(nodes, adjacency);
+
+    expect(nodes["aws_iam_role.r"].edges_new).toEqual([
+      "data.aws_iam_policy_document.assume",
+    ]);
+  });
+
+  it("mergeTerraformState skips non-allowlisted data resources and dependency edges to them", () => {
+    let nodes = ensureEdgeLists({
+      "aws_lambda_function.fn": {
+        resources: {
+          "aws_lambda_function.fn": resource(
+            "aws_lambda_function.fn",
+            "aws_lambda_function",
+            "fn",
+            {},
+          ),
+        },
+        edges_existing: [],
+      },
+    });
+
+    mergeTerraformState(nodes, {
+      resources: [
+        {
+          mode: "data",
+          type: "aws_region",
+          name: "current",
+          provider: "provider.aws",
+          instances: [
+            {
+              attributes: {},
+              dependencies: [],
+            },
+          ],
+        },
+        {
+          mode: "managed",
+          type: "aws_lambda_function",
+          name: "fn",
+          provider: "provider.aws",
+          instances: [
+            {
+              attributes: {},
+              dependencies: ["data.aws_region.current"],
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(nodes["data.aws_region.current"]).toBeUndefined();
+    expect(nodes["aws_lambda_function.fn"].edges_existing || []).toEqual([]);
+  });
 });
 
 describe("omitVpcPlumbingNodes", () => {

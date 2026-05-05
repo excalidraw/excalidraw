@@ -62,6 +62,26 @@ const EDGE_FILTER_RULES = [
   ["aws_lambda_function", "aws_iam_policy_document"],
 ];
 
+/** Data sources not on this list are omitted from the graph and act as DOT traversal barriers. */
+const DATA_SOURCE_GRAPH_ALLOWLIST = new Set(["aws_iam_policy_document"]);
+
+function getDataSourceTypeFromAddress(address = "") {
+  const parts = stripIndexes(String(address)).split(".");
+  const di = parts.indexOf("data");
+  if (di === -1 || di >= parts.length - 2) {
+    return null;
+  }
+  return parts[di + 1] || null;
+}
+
+function isExcludedDataSourceAddress(address) {
+  const sourceType = getDataSourceTypeFromAddress(address);
+  if (!sourceType) {
+    return false;
+  }
+  return !DATA_SOURCE_GRAPH_ALLOWLIST.has(sourceType);
+}
+
 const DATA_FLOW_TARGET_TYPES = new Set([
   "aws_lambda_function",
   "aws_s3_bucket",
@@ -220,6 +240,13 @@ const getResourceValues = (resource = {}) => ({
 
 const getPrimaryResource = (node = {}) =>
   Object.values(node.resources || {}).find((resource) => resource?.type) || {};
+
+function isExcludedDataSourceNode(node, primary = getPrimaryResource(node)) {
+  if (!primary || primary.mode !== "data" || !primary.type) {
+    return false;
+  }
+  return !DATA_SOURCE_GRAPH_ALLOWLIST.has(primary.type);
+}
 
 const getResourceType = (nodePath, node) =>
   getPrimaryResource(node)?.type || String(nodePath).split(".").at(-2) || "";
@@ -380,6 +407,10 @@ function buildNewEdges(nodes, adjacency) {
           continue;
         }
 
+        if (isExcludedDataSourceAddress(neighbor)) {
+          continue;
+        }
+
         // Terraform graph uses intermediate module vertex names matching module paths.
         // Never traverse through them: attach at most one edge to the synthetic module
         // node so BFS does not pull in every resource under the module.
@@ -478,6 +509,14 @@ function buildExistingEdges(nodes, plan) {
     const currentModule = stack.pop();
 
     for (const resource of currentModule.resources || []) {
+      if (
+        resource.mode === "data" &&
+        resource.type &&
+        !DATA_SOURCE_GRAPH_ALLOWLIST.has(resource.type)
+      ) {
+        continue;
+      }
+
       const nodePath = resource.address;
       nodes[nodePath] ||= { resources: {} };
 
@@ -489,6 +528,9 @@ function buildExistingEdges(nodes, plan) {
       }
 
       for (const dependency of resource.depends_on || []) {
+        if (isExcludedDataSourceAddress(dependency)) {
+          continue;
+        }
         addEdge(resource.address, dependency);
       }
     }
@@ -605,6 +647,14 @@ function mergeTerraformState(nodes, state) {
   }
 
   for (const resource of state.resources) {
+    if (
+      resource.mode === "data" &&
+      resource.type &&
+      !DATA_SOURCE_GRAPH_ALLOWLIST.has(resource.type)
+    ) {
+      continue;
+    }
+
     for (const instance of resource.instances || []) {
       const address = getStateResourceAddress(resource, instance);
       const nodePath = address;
@@ -633,6 +683,9 @@ function mergeTerraformState(nodes, state) {
 
       nodes[nodePath].edges_existing ||= [];
       for (const dependency of instance.dependencies || []) {
+        if (isExcludedDataSourceAddress(dependency)) {
+          continue;
+        }
         const target = resolveCanonicalNodePath(nodes, dependency);
         if (target && target !== nodePath && !nodes[nodePath].edges_existing.includes(target)) {
           nodes[nodePath].edges_existing.push(target);
@@ -1298,6 +1351,23 @@ function stripEdgesReferencingPaths(nodes, omitted) {
   }
 }
 
+function omitNonAllowlistedDataSourceNodes(nodes) {
+  const omitted = new Set();
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__") || !node) {
+      continue;
+    }
+    if (isExcludedDataSourceNode(node)) {
+      omitted.add(nodePath);
+    }
+  }
+  stripEdgesReferencingPaths(nodes, omitted);
+  for (const path of omitted) {
+    delete nodes[path];
+  }
+  return nodes;
+}
+
 function omitVpcPlumbingNodes(nodes) {
   const omitted = new Set();
   for (const nodePath of getTerraformNodePaths(nodes)) {
@@ -1431,9 +1501,13 @@ module.exports = {
   buildDataFlowEdges,
   externalResources,
   deleteOrphanedNodes,
+  omitNonAllowlistedDataSourceNodes,
   omitVpcPlumbingNodes,
   filterVisualIgnore,
   cleanUpRoleLinks,
   refineCloudWatchMetricAlarmEdges,
   getTerraformOwningModulePath,
+  DATA_SOURCE_GRAPH_ALLOWLIST,
+  getDataSourceTypeFromAddress,
+  isExcludedDataSourceAddress,
 };
