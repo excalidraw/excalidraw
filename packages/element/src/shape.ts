@@ -52,7 +52,12 @@ import {
   isIframeLikeElement,
   isLinearElement,
 } from "./typeChecks";
-import { doesPathIntersect, getCornerRadius, getIntersectionPoint, isPathALoop } from "./utils";
+import {
+  doesPathIntersect,
+  getCornerRadius,
+  getIntersectionPoint,
+  isPathALoop,
+} from "./utils";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
@@ -749,6 +754,8 @@ export const generateLinearCollisionShape = (
   }
 };
 
+// NOTE: This is a simplified loop extraction and does not handle
+// multiple intersections per segment or nested loops yet.
 const generateFillableLoops = (
   points: LocalPoint[],
   isLoopFromProximity: boolean,
@@ -758,40 +765,32 @@ const generateFillableLoops = (
   if (isLoopFromProximity) {
     return [simplified];
   }
-
-  let working: [number, number][] = [...simplified];
-  const n = working.length;
+  const n = simplified.length;
   if (n < 4) return [] as LocalPoint[][];
 
-  type Intersection = {
-    i: number;
-    j: number;
-    point: [number, number];
-  };
-
-  const intersections: Intersection[] = [];
   const loops: [number, number][][] = [];
   for (let i = 0; i < n - 1; i++) {
     for (let j = i + 2; j < n - 1; j++) {
       if (i === 0 && j === n - 2) continue;
 
       const inter = getIntersectionPoint(
-        working[i],
-        working[i + 1],
-        working[j],
-        working[j + 1],
+        simplified[i],
+        simplified[i + 1],
+        simplified[j],
+        simplified[j + 1],
       );
 
       if (inter) {
-        intersections.push({ i, j, point: inter });
-        loops.push([inter, ...working.slice(i + 1, j), inter]);
+        const segment = simplified.slice(i + 1, j);
+        if (segment.length >= 2) {
+          loops.push([inter, ...segment, inter]);
+        }
       }
     }
   }
 
-  if (intersections.length === 0) {
-    console.log("No intersection found, fallback");
-    return [points] as LocalPoint[][];
+  if (loops.length === 0) {
+    return [simplified];
   }
   return loops;
 };
