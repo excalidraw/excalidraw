@@ -52,7 +52,7 @@ import {
   isIframeLikeElement,
   isLinearElement,
 } from "./typeChecks";
-import { doesPathIntersect, getCornerRadius, isPathALoop } from "./utils";
+import { doesPathIntersect, getCornerRadius, getIntersectionPoint, isPathALoop } from "./utils";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
@@ -77,7 +77,6 @@ import type {
 
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
-import { getIntersectionPoint } from "@excalidraw/utils";
 
 export class ShapeCache {
   private static rg = new RoughGenerator();

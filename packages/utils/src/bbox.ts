@@ -72,29 +72,3 @@ export function doLineSegmentsIntersect<P extends GlobalPoint | LocalPoint>(
   );
 }
 
-export function getIntersectionPoint<P extends [number, number]>(
-  p1: P,
-  p2: P,
-  p3: P,
-  p4: P,
-): [number, number] | null {
-  const x1 = p1[0],
-    y1 = p1[1];
-  const x2 = p2[0],
-    y2 = p2[1];
-  const x3 = p3[0],
-    y3 = p3[1];
-  const x4 = p4[0],
-    y4 = p4[1];
-
-  const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-
-  if (Math.abs(denom) < 1e-6) return null;
-
-  const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
-  const u = ((x1 - x3) * (y1 - y2) - (y1 - y3) * (x1 - x2)) / denom;
-  if (t > 0 && t < 1 && u > 0 && u < 1) {
-    return [x1 + t * (x2 - x1), y1 + t * (y2 - y1)];
-  }
-  return null;
-}
