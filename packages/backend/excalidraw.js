@@ -59,6 +59,7 @@ const ICON_LIBRARY_CONFIGS = {
       aws_cloud9_environment_ec2: "Cloud9",
       aws_cloudformation_stack: "CloudFormation",
       aws_cloudformation_stack_set: "CloudFormation",
+      terraform_module: "CloudFormation",
       aws_cloudfront_cache_policy: "CloudFront",
       aws_cloudfront_distribution: "CloudFront",
       aws_cloudfront_function: "CloudFront",
@@ -525,11 +526,15 @@ const PRIMARY_MESSAGING_TYPES = new Set([
 
 const PRIMARY_SPARK_TYPES = new Set();
 
+/** Synthetic Terraform module call nodes (pipeline injects for graph semantics). */
+const PRIMARY_MODULE_TYPES = new Set(["terraform_module"]);
+
 const PRIMARY_VISIBLE_TYPES = new Set([
   ...PRIMARY_COMPUTE_TYPES,
   ...PRIMARY_STORAGE_TYPES,
   ...PRIMARY_MESSAGING_TYPES,
   ...PRIMARY_SPARK_TYPES,
+  ...PRIMARY_MODULE_TYPES,
 ]);
 
 function isPrimaryVisibleResourceType(resourceType) {
@@ -541,6 +546,10 @@ function getResourceType(nodePath) {
   let i = 0;
   while (i < parts.length - 1 && parts[i] === "module") {
     i += 2;
+  }
+  // Address is only module prefixes, e.g. module.a.module.b (no resource type segment).
+  if (i >= parts.length) {
+    return "terraform_module";
   }
   if (parts[i] === "data") return "data";
   return parts[i] || nodePath;

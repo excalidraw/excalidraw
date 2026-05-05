@@ -2,6 +2,12 @@ function mockLanggraphEnrichment(nodes) {
   const enrichment = {};
 
   for (const [nodePath, node] of Object.entries(nodes)) {
+    const primaryType =
+      Object.values(node.resources || {}).find((r) => r?.type)?.type || "";
+    if (primaryType === "terraform_module") {
+      continue;
+    }
+
     const actions = [];
     for (const resource of Object.values(node.resources || {})) {
       if (resource.change?.actions) {

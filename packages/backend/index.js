@@ -14,12 +14,14 @@ const {
   buildExistingEdges,
   applyModuleMetadata,
   mergeTerraformState,
+  ensureTerraformModuleNodes,
   ensureEdgeLists,
   buildDataFlowEdges,
   externalResources,
   deleteOrphanedNodes,
   filterVisualIgnore,
   cleanUpRoleLinks,
+  refineCloudWatchMetricAlarmEdges,
 } = require("./pipeline");
 const { mockLanggraphEnrichment, applyEnrichment } = require("./enrichment");
 const { nodesToExcalidraw } = require("./excalidraw");
@@ -65,12 +67,14 @@ app.post(
 
       let nodes = loadPlanAndNodes(plan);
 
+      nodes = mergeTerraformState(nodes, state);
+      nodes = ensureTerraformModuleNodes(nodes);
+      nodes = applyModuleMetadata(nodes, plan);
       nodes = buildNewEdges(nodes, adjlist);
 
       nodes = computeResourceDiffs(nodes);
       nodes = buildExistingEdges(nodes, plan);
-      nodes = applyModuleMetadata(nodes, plan);
-      nodes = mergeTerraformState(nodes, state);
+      nodes = refineCloudWatchMetricAlarmEdges(nodes);
       nodes = ensureEdgeLists(nodes);
       nodes = externalResources(nodes);
       nodes = ensureEdgeLists(nodes);
