@@ -1,59 +1,63 @@
 /*
-resource "aws_kms_key" "s3" {
+module "s3_kms" {
+  source  = "terraform-aws-modules/kms/aws"
+  version = "4.1.0"
+
   description             = "KMS key for S3 bucket encryption"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+  enable_default_policy   = true
 }
 
-resource "aws_s3_bucket" "data" {
+module "data_bucket" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "5.8.0"
+
   bucket = "ts-test-lambda-data"
-}
 
-resource "aws_s3_bucket_versioning" "data" {
-  bucket = aws_s3_bucket.data.id
-  versioning_configuration {
+  versioning = {
     status = "Enabled"
   }
-}
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "data" {
-  bucket = aws_s3_bucket.data.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.s3.arn
-      sse_algorithm     = "aws:kms"
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        kms_master_key_id = module.s3_kms.key_arn
+        sse_algorithm     = "aws:kms"
+      }
     }
   }
-}
 
-resource "aws_s3_bucket_public_access_block" "data" {
-  bucket                  = aws_s3_bucket.data.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
 
-resource "aws_kms_key" "sqs" {
+module "sqs_kms" {
+  source  = "terraform-aws-modules/kms/aws"
+  version = "4.1.0"
+
   description             = "KMS key for SQS encryption"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+  enable_default_policy   = true
 }
 
-resource "aws_sqs_queue" "dlq" {
-  name              = "ts-test-lambda-dlq"
-  kms_master_key_id = aws_kms_key.sqs.id
-}
+module "data_queue" {
+  source  = "terraform-aws-modules/sqs/aws"
+  version = "5.2.1"
 
-resource "aws_sqs_queue" "data" {
-  name              = "ts-test-lambda-queue"
-  kms_master_key_id = aws_kms_key.sqs.id
+  name     = "ts-test-lambda-queue"
+  dlq_name = "ts-test-lambda-dlq"
 
-  redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.dlq.arn
-    maxReceiveCount     = 3
-  })
+  kms_master_key_id     = module.sqs_kms.key_id
+  dlq_kms_master_key_id = module.sqs_kms.key_id
+
+  create_dlq = true
+  redrive_policy = {
+    maxReceiveCount = 3
+  }
 }
 
 data "aws_region" "current" {}
@@ -64,96 +68,92 @@ data "aws_availability_zones" "available" {
 
 locals {
   lambda_private_subnet_cidrs = ["10.42.1.0/24", "10.42.2.0/24"]
-  lambda_private_subnet_map = {
-    for idx, cidr in local.lambda_private_subnet_cidrs :
-    tostring(idx) => cidr
-    if idx < length(data.aws_availability_zones.available.names)
-  }
+  lambda_azs                  = slice(data.aws_availability_zones.available.names, 0, length(local.lambda_private_subnet_cidrs))
 }
 
-resource "aws_vpc" "lambda" {
-  cidr_block           = "10.42.0.0/16"
+module "lambda_vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "6.5.0"
+
+  name = "ts-test-lambda"
+  cidr = "10.42.0.0/16"
+
+  azs           = local.lambda_azs
+  intra_subnets = local.lambda_private_subnet_cidrs
+
   enable_dns_support   = true
   enable_dns_hostnames = true
-}
-
-resource "aws_subnet" "lambda_private" {
-  for_each = local.lambda_private_subnet_map
-
-  vpc_id                  = aws_vpc.lambda.id
-  cidr_block              = each.value
-  availability_zone       = data.aws_availability_zones.available.names[tonumber(each.key)]
-  map_public_ip_on_launch = false
-}
-
-resource "aws_internet_gateway" "lambda" {
-  vpc_id = aws_vpc.lambda.id
-}
-
-resource "aws_route_table" "lambda_private" {
-  vpc_id = aws_vpc.lambda.id
-
-  # Mock route config for graph/testing UI only.
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.lambda.id
-  }
 
   tags = {
-    Name          = "ts-test-lambda-private-rt"
-    environment   = "dev"
-    route_profile = "private-egress"
-    owner         = "terraform-graph-demo"
+    environment = "dev"
+    owner       = "terraform-graph-demo"
   }
 }
 
-resource "aws_route_table_association" "lambda_private" {
-  for_each = aws_subnet.lambda_private
+module "lambda_writer_security_group" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.3.0"
 
-  subnet_id      = each.value.id
-  route_table_id = aws_route_table.lambda_private.id
+  name        = "ts-test-writer-lambda-sg"
+  description = "Security group for writer Lambda in VPC"
+  vpc_id      = module.lambda_vpc.vpc_id
+
+  ingress_with_cidr_blocks = [
+    {
+      rule        = "https-443-tcp"
+      description = "Mock ingress from VPC"
+      cidr_blocks = module.lambda_vpc.vpc_cidr_block
+    }
+  ]
+
+  egress_rules = ["all-all"]
 }
 
-# Additional standalone route resource to exercise aws_route parsing in the
-# Terraform side panel and container facet summaries.
-resource "aws_route" "lambda_private_service" {
-  route_table_id         = aws_route_table.lambda_private.id
-  destination_cidr_block = "10.99.0.0/16"
-  gateway_id             = aws_internet_gateway.lambda.id
+module "lambda_reader_security_group" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.3.0"
+
+  name        = "ts-test-reader-lambda-sg"
+  description = "Security group for reader Lambda in VPC"
+  vpc_id      = module.lambda_vpc.vpc_id
+
+  ingress_with_cidr_blocks = [
+    {
+      rule        = "https-443-tcp"
+      description = "Mock ingress from VPC"
+      cidr_blocks = module.lambda_vpc.vpc_cidr_block
+    }
+  ]
+
+  egress_rules = ["all-all"]
 }
 
-resource "aws_security_group" "lambda" {
-  name        = "ts-test-lambda-sg"
-  description = "Security group for Lambda functions in VPC"
-  vpc_id      = aws_vpc.lambda.id
+module "vpce_security_group" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.3.0"
 
-  ingress {
-    description = "Mock ingress from VPC"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [aws_vpc.lambda.cidr_block]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_security_group" "vpce" {
   name        = "ts-test-vpce-sg"
   description = "Security group for VPC Endpoints"
-  vpc_id      = aws_vpc.lambda.id
+  vpc_id      = module.lambda_vpc.vpc_id
 
-  ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.lambda.id]
-  }
+  ingress_with_source_security_group_id = [
+    {
+      description              = "Mock ingress from VPC"
+      from_port                = 443
+      to_port                  = 443
+      protocol                 = "tcp"
+      source_security_group_id = module.lambda_writer_security_group.security_group_id
+    },
+    {
+      description              = "HTTPS from reader Lambda"
+      from_port                = 443
+      to_port                  = 443
+      protocol                 = "tcp"
+      source_security_group_id = module.lambda_reader_security_group.security_group_id
+    }
+  ]
+
+  egress_rules = ["all-all"]
 }
 
 # --- Lambda: writer ---
@@ -172,14 +172,14 @@ module "lambda-writer" {
     bucket = aws_s3_bucket.lambda_artifacts.id
     key    = aws_s3_object.lambda_zip.key
   }
-  vpc_subnet_ids         = [for subnet in aws_subnet.lambda_private : subnet.id]
-  vpc_security_group_ids = [aws_security_group.lambda.id]
+  vpc_subnet_ids         = module.lambda_vpc.intra_subnets
+  vpc_security_group_ids = [module.lambda_writer_security_group.security_group_id]
 
   tracing_mode = "Active"
 
   environment_variables = {
-    DATA_BUCKET    = aws_s3_bucket.data.id
-    DATA_QUEUE_URL = aws_sqs_queue.data.url
+    DATA_BUCKET    = module.data_bucket.s3_bucket_id
+    DATA_QUEUE_URL = module.data_queue.queue_url
   }
 
   attach_policy_statements = true
@@ -187,12 +187,12 @@ module "lambda-writer" {
     s3_write = {
       effect    = "Allow"
       actions   = ["s3:PutObject"]
-      resources = ["${aws_s3_bucket.data.arn}/*"]
+      resources = ["${module.data_bucket.s3_bucket_arn}/*"]
     }
     sqs_send = {
       effect    = "Allow"
       actions   = ["sqs:SendMessage"]
-      resources = [aws_sqs_queue.data.arn]
+      resources = [module.data_queue.queue_arn]
     }
     vpc_network = {
       effect = "Allow"
@@ -224,14 +224,14 @@ module "lambda-reader" {
     bucket = aws_s3_bucket.lambda_artifacts.id
     key    = aws_s3_object.lambda_zip.key
   }
-  vpc_subnet_ids         = [for subnet in aws_subnet.lambda_private : subnet.id]
-  vpc_security_group_ids = [aws_security_group.lambda.id]
+  vpc_subnet_ids         = module.lambda_vpc.intra_subnets
+  vpc_security_group_ids = [module.lambda_reader_security_group.security_group_id]
 
   tracing_mode = "Active"
 
   environment_variables = {
-    DATA_BUCKET    = aws_s3_bucket.data.id
-    DATA_QUEUE_URL = aws_sqs_queue.data.url
+    DATA_BUCKET    = module.data_bucket.s3_bucket_id
+    DATA_QUEUE_URL = module.data_queue.queue_url
   }
 
   attach_policy_statements = true
@@ -239,12 +239,12 @@ module "lambda-reader" {
     s3_read = {
       effect    = "Allow"
       actions   = ["s3:GetObject", "s3:ListBucket"]
-      resources = [aws_s3_bucket.data.arn, "${aws_s3_bucket.data.arn}/*"]
+      resources = [module.data_bucket.s3_bucket_arn, "${module.data_bucket.s3_bucket_arn}/*"]
     }
     sqs_receive = {
       effect    = "Allow"
       actions   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"]
-      resources = [aws_sqs_queue.data.arn]
+      resources = [module.data_queue.queue_arn]
     }
     vpc_network = {
       effect = "Allow"
@@ -263,43 +263,42 @@ module "lambda-reader" {
 
 # --- VPC Endpoints ---
 
-resource "aws_vpc_endpoint" "s3" {
-  vpc_id            = aws_vpc.lambda.id
-  service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
-  vpc_endpoint_type = "Gateway"
-  route_table_ids   = [aws_route_table.lambda_private.id]
-}
+module "lambda_vpc_endpoints" {
+  source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+  version = "6.5.0"
 
-resource "aws_vpc_endpoint" "sqs" {
-  vpc_id              = aws_vpc.lambda.id
-  service_name        = "com.amazonaws.${data.aws_region.current.name}.sqs"
-  vpc_endpoint_type   = "Interface"
-  subnet_ids          = [for subnet in aws_subnet.lambda_private : subnet.id]
-  security_group_ids  = [aws_security_group.vpce.id]
-  private_dns_enabled = true
-}
+  vpc_id = module.lambda_vpc.vpc_id
 
-resource "aws_vpc_endpoint" "logs" {
-  vpc_id              = aws_vpc.lambda.id
-  service_name        = "com.amazonaws.${data.aws_region.current.name}.logs"
-  vpc_endpoint_type   = "Interface"
-  subnet_ids          = [for subnet in aws_subnet.lambda_private : subnet.id]
-  security_group_ids  = [aws_security_group.vpce.id]
-  private_dns_enabled = true
-}
-
-resource "aws_vpc_endpoint" "xray" {
-  vpc_id              = aws_vpc.lambda.id
-  service_name        = "com.amazonaws.${data.aws_region.current.name}.xray"
-  vpc_endpoint_type   = "Interface"
-  subnet_ids          = [for subnet in aws_subnet.lambda_private : subnet.id]
-  security_group_ids  = [aws_security_group.vpce.id]
-  private_dns_enabled = true
+  endpoints = {
+    s3 = {
+      service         = "s3"
+      service_type    = "Gateway"
+      route_table_ids = module.lambda_vpc.intra_route_table_ids
+    }
+    sqs = {
+      service             = "sqs"
+      subnet_ids          = module.lambda_vpc.intra_subnets
+      security_group_ids  = [module.vpce_security_group.security_group_id]
+      private_dns_enabled = true
+    }
+    logs = {
+      service             = "logs"
+      subnet_ids          = module.lambda_vpc.intra_subnets
+      security_group_ids  = [module.vpce_security_group.security_group_id]
+      private_dns_enabled = true
+    }
+    xray = {
+      service             = "xray"
+      subnet_ids          = module.lambda_vpc.intra_subnets
+      security_group_ids  = [module.vpce_security_group.security_group_id]
+      private_dns_enabled = true
+    }
+  }
 }
 
 # --- CloudWatch Alarms ---
 
-resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
+resource "aws_cloudwatch_metric_alarm" "lambda_writer_errors" {
   alarm_name          = "test-writer-errors"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
@@ -314,6 +313,36 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   }
 }
 
+resource "aws_cloudwatch_metric_alarm" "lambda_reader_errors" {
+  alarm_name          = "test-reader-errors"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = 60
+  statistic           = "Sum"
+  threshold           = 0
+  alarm_description   = "Alarm when reader Lambda errors occur"
+  dimensions = {
+    FunctionName = module.lambda-reader.lambda_function_name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "queue_messages" {
+  alarm_name          = "ts-test-lambda-queue-messages"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "ApproximateNumberOfMessagesVisible"
+  namespace           = "AWS/SQS"
+  period              = 300
+  statistic           = "Maximum"
+  threshold           = 100
+  alarm_description   = "Alarm when main queue has visible messages"
+  dimensions = {
+    QueueName = module.data_queue.queue_name
+  }
+}
+
 resource "aws_cloudwatch_metric_alarm" "dlq_messages" {
   alarm_name          = "ts-test-lambda-dlq-messages"
   comparison_operator = "GreaterThanThreshold"
@@ -325,7 +354,7 @@ resource "aws_cloudwatch_metric_alarm" "dlq_messages" {
   threshold           = 0
   alarm_description   = "Alarm when DLQ has messages"
   dimensions = {
-    QueueName = aws_sqs_queue.dlq.name
+    QueueName = module.data_queue.dead_letter_queue_name
   }
 }
 */
