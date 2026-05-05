@@ -138,6 +138,27 @@ describe("terraform module graph nodes", () => {
     expect(nodes.root_alarm.edges_new.sort()).toEqual(["module.app"]);
   });
 
+  it("buildNewEdges uses stripped DOT keys for indexed for_each resource addresses", () => {
+    const adjacency = {
+      "module.m.aws_vpc_endpoint.this": ["peer.a", "peer.b"],
+      "peer.a": [],
+      "peer.b": [],
+    };
+
+    let nodes = ensureEdgeLists({
+      'module.m.aws_vpc_endpoint.this["logs"]': { resources: {} },
+      "peer.a": { resources: {} },
+      "peer.b": { resources: {} },
+    });
+    nodes = ensureTerraformModuleNodes(nodes);
+    buildNewEdges(nodes, adjacency);
+
+    expect(nodes['module.m.aws_vpc_endpoint.this["logs"]'].edges_new.sort()).toEqual([
+      "peer.a",
+      "peer.b",
+    ]);
+  });
+
   it("refineCloudWatchMetricAlarmEdges collapses DOT+state fan-out to the owning module", () => {
     let nodes = ensureEdgeLists({
       "aws_cloudwatch_metric_alarm.lambda_errors": {
