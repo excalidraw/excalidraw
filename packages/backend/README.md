@@ -1,6 +1,25 @@
-# Backend
+# Backend (`@excalidraw/backend`)
 
-Express server for turning Terraform/OpenTofu plans into inspectable Excalidraw diagrams.
+Express API that turns a Terraform or OpenTofu **plan JSON**, a **`terraform graph` DOT** file, and an optional **state JSON** into a stored dependency graph you can open as an **Excalidraw** diagram (nodes, edges, and layout hints derived from the plan).
+
+## How it fits together
+
+1. **Plan JSON** (`terraform show -json` / `tofu show -json`) supplies resource metadata, changes, module paths, and references.
+2. **DOT** (`terraform graph -type=plan` / `tofu graph -type=plan`) supplies adjacency; it is parsed with `graphlib-dot`.
+3. **State** (optional) improves fidelity for existing resources and `depends_on` style relationships.
+
+**Indexed resources:** plan addresses often include `[...]` for `count` / `for_each`, while graph DOT typically uses stripped resource ids. The pipeline keeps **full plan addresses** as node keys where needed and reconciles DOT edges by stripping indexes on the fly so instances are not collapsed into a single node.
+
+## Package layout
+
+| File | Role |
+|------|------|
+| `index.js` | HTTP routes, multipart upload, SQLite persistence |
+| `pipeline.js` | Graph build: plan → nodes, DOT adjacency, state merge, IAM/data-flow edges, filtering |
+| `excalidraw.js` | Converts processed nodes into Excalidraw scene JSON |
+| `vpc-networking-facet.js` | VPC/subnet/gateway-style facets before low-level plumbing is trimmed |
+| `enrichment.js` | Hook for optional semantic labels/metadata |
+| `db.js` | Drizzle + better-sqlite3 schema for uploads |
 
 ## Setup
 
@@ -25,6 +44,20 @@ yarn dev:backend
 ```
 
 Server starts on `http://localhost:3000`.
+
+## Tests
+
+From the repo root:
+
+```bash
+yarn test:backend
+```
+
+Or inside this package:
+
+```bash
+yarn workspace @excalidraw/backend test
+```
 
 ## Endpoints
 
