@@ -1,0 +1,582 @@
+/**
+ * d3-force layout, collapsed module coalescing, internal module offsets, VPC perimeter snaps,
+ * and synthetic networking-facet appliance tiles.
+ */
+const {
+  VPC_PERIMETER_LAYOUT_ENABLED,
+  classifyVpcApplianceWall,
+  layoutVpcApplianceRectanglesOnFrame,
+  classifySyntheticVpcTileWall,
+} = require("./vpc-perimeter");
+
+const {
+  lerp,
+  getModulePathChain,
+  getModuleRelativeResourcePath,
+  isLikelyLambdaModule,
+  LAMBDA_MODULE_PRESET_OFFSETS,
+} = require("./excalidraw-elements");
+
+// --- Force layout ---
+
+/** Runs a bounded d3-force simulation from tiered charge/link/collide parameters; returns id→{x,y}. */
+async function forceLayout(
+  nodeKeys,
+  directedEdges,
+  tierMap,
+  tierConfigs,
+  layoutSizes = {},
+) {
+  const d3 = await import("d3-force");
+
+  const tiers = Object.values(tierMap);
+  const minTier = Math.min(...tiers);
+  const maxTier = Math.max(...tiers);
+  const tierRange = maxTier - minTier || 1;
+
+  const simNodes = nodeKeys.map((id) => ({
+    id,
+    tier: tierMap[id],
+  }));
+
+  const simLinks = directedEdges.map(({ source, target }) => ({
+    source,
+    target,
+  }));
+  const getCollisionRadius = (node) => {
+    const size = layoutSizes[node.id];
+    if (size) {
+      return Math.max(size.w, size.h) / 2 + 90;
+    }
+    return tierConfigs[node.tier].collide;
+  };
+
+  const simulation = d3
+    .forceSimulation(simNodes)
+    .force(
+      "charge",
+      d3.forceManyBody().strength((d) => tierConfigs[d.tier].charge),
+    )
+    .force(
+      "link",
+      d3
+        .forceLink(simLinks)
+        .id((d) => d.id)
+        .distance((link) => {
+          // Prominent nodes (low tier number) push further apart
+          const t1 = (link.source.tier - minTier) / tierRange;
+          const t2 = (link.target.tier - minTier) / tierRange;
+          const avgFrac = (t1 + t2) / 2;
+          return Math.round(lerp(500, 150, avgFrac));
+        })
+        .strength((link) => {
+          const maxRelTier =
+            Math.max(link.source.tier, link.target.tier) - minTier;
+          return maxRelTier >= 1 ? 1.2 : 0.7;
+        }),
+    )
+    .force("center", d3.forceCenter(0, 0))
+    .force("collide", d3.forceCollide().radius(getCollisionRadius))
+    .stop();
+
+  for (let i = 0; i < 300; i++) {
+    simulation.tick();
+  }
+
+  let minX = Infinity;
+  let minY = Infinity;
+  for (const n of simNodes) {
+    minX = Math.min(minX, n.x);
+    minY = Math.min(minY, n.y);
+  }
+
+  const posMap = {};
+  for (const n of simNodes) {
+    posMap[n.id] = {
+      x: n.x - minX + 50,
+      y: n.y - minY + 50,
+    };
+  }
+  return posMap;
+}
+
+/** Registry-module paths that should collapse to one layout vertex (non-nested under another collapsible). */
+function buildCollapsibleModuleSet(moduleGroups) {
+  const collapsibleModules = new Set();
+
+  for (const group of moduleGroups) {
+    if (!group.source) {
+      continue;
+    }
+
+    const parentModulePaths = getModulePathChain(
+      `${group.modulePath}.placeholder`,
+    ).slice(0, -1);
+    if (
+      parentModulePaths.some((modulePath) => collapsibleModules.has(modulePath))
+    ) {
+      continue;
+    }
+
+    collapsibleModules.add(group.modulePath);
+  }
+
+  return collapsibleModules;
+}
+
+/** Deepest collapsible module prefix affecting `nodePath`, for layout id assignment. */
+function getCollapsedModulePath(nodePath, collapsibleModules) {
+  const chain = getModulePathChain(nodePath)
+    .filter((modulePath) => collapsibleModules.has(modulePath))
+    .sort((a, b) => b.length - a.length);
+
+  return chain[0] || null;
+}
+
+/**
+ * Coalesces module internals to a single simulation node per collapsible module; returns
+ * layout keys, deduped edges, per-layout tier map, and member lists.
+ */
+function buildCollapsedLayoutModel(
+  nodeKeys,
+  directedEdges,
+  tierMap,
+  collapsibleModules,
+) {
+  const nodeToLayoutId = new Map();
+  const moduleMembers = new Map();
+  const layoutNodeSet = new Set();
+
+  for (const nodePath of nodeKeys) {
+    const modulePath = getCollapsedModulePath(nodePath, collapsibleModules);
+    const layoutId = modulePath || nodePath;
+    nodeToLayoutId.set(nodePath, layoutId);
+    layoutNodeSet.add(layoutId);
+
+    if (modulePath) {
+      if (!moduleMembers.has(modulePath)) {
+        moduleMembers.set(modulePath, []);
+      }
+      moduleMembers.get(modulePath).push(nodePath);
+    }
+  }
+
+  const layoutEdgeMap = new Map();
+  for (const edge of directedEdges) {
+    const source = nodeToLayoutId.get(edge.source);
+    const target = nodeToLayoutId.get(edge.target);
+    if (!source || !target || source === target) {
+      continue;
+    }
+
+    const key = `${source}|||${target}`;
+    if (!layoutEdgeMap.has(key)) {
+      layoutEdgeMap.set(key, { source, target });
+    }
+  }
+
+  const layoutTierMap = {};
+  for (const layoutId of layoutNodeSet) {
+    const members = moduleMembers.get(layoutId);
+    layoutTierMap[layoutId] = members
+      ? Math.min(...members.map((nodePath) => tierMap[nodePath]))
+      : tierMap[layoutId];
+  }
+
+  return {
+    layoutNodeKeys: [...layoutNodeSet],
+    layoutEdges: [...layoutEdgeMap.values()],
+    layoutTierMap,
+    moduleMembers,
+  };
+}
+
+/** Relative {x,y} offsets of module members around the collapsed module anchor (Lambda preset or grid). */
+function buildModuleInternalOffsets(members, modulePath, moduleGroup = null) {
+  const offsets = {};
+  const fragments = new Set(
+    members.map((nodePath) =>
+      getModuleRelativeResourcePath(nodePath, modulePath),
+    ),
+  );
+  const useLambdaPreset = isLikelyLambdaModule(fragments, moduleGroup);
+  const remaining = [];
+
+  for (const nodePath of members) {
+    const fragment = getModuleRelativeResourcePath(nodePath, modulePath);
+    const offset = useLambdaPreset
+      ? LAMBDA_MODULE_PRESET_OFFSETS[fragment]
+      : null;
+
+    if (offset) {
+      offsets[nodePath] = offset;
+    } else {
+      remaining.push(nodePath);
+    }
+  }
+
+  const columns = Math.min(3, Math.max(1, remaining.length));
+  const rows = Math.ceil(remaining.length / columns);
+  const gapX = 280;
+  const gapY = 160;
+  const startX = -((columns - 1) * gapX) / 2;
+  const startY = useLambdaPreset ? 340 : -((rows - 1) * gapY) / 2;
+
+  for (let index = 0; index < remaining.length; index++) {
+    const row = Math.floor(index / columns);
+    const col = index % columns;
+    offsets[remaining[index]] = {
+      x: startX + col * gapX,
+      y: startY + row * gapY,
+    };
+  }
+
+  return offsets;
+}
+
+/** Bounding box size per collapsed module from internal offsets + tier card dimensions. */
+function estimateModuleLayoutSizes(
+  moduleMembers,
+  moduleGroupByPath,
+  tierMap,
+  tierConfigs,
+) {
+  const sizes = {};
+
+  for (const [modulePath, members] of moduleMembers.entries()) {
+    const moduleGroup = moduleGroupByPath.get(modulePath);
+    const offsets = buildModuleInternalOffsets(
+      members,
+      modulePath,
+      moduleGroup,
+    );
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    for (const nodePath of members) {
+      const offset = offsets[nodePath];
+      const cfg = tierConfigs[tierMap[nodePath]];
+      if (!offset || !cfg) {
+        continue;
+      }
+
+      minX = Math.min(minX, offset.x);
+      minY = Math.min(minY, offset.y);
+      maxX = Math.max(maxX, offset.x + cfg.w);
+      maxY = Math.max(maxY, offset.y + cfg.h);
+    }
+
+    if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+      continue;
+    }
+
+    sizes[modulePath] = {
+      w: maxX - minX + 120,
+      h: maxY - minY + 120,
+    };
+  }
+
+  return sizes;
+}
+
+/** Maps simulation positions: standalone nodes keep layout coords; module members fan out from module anchor. */
+function expandCollapsedModulePositions(
+  layoutPositions,
+  nodeKeys,
+  moduleMembers,
+  moduleGroupByPath,
+) {
+  const positions = {};
+  const collapsedNodeSet = new Set(
+    [...moduleMembers.values()].flatMap((members) => members),
+  );
+
+  for (const nodePath of nodeKeys) {
+    if (!collapsedNodeSet.has(nodePath)) {
+      positions[nodePath] = layoutPositions[nodePath];
+    }
+  }
+
+  for (const [modulePath, members] of moduleMembers.entries()) {
+    const anchor = layoutPositions[modulePath];
+    if (!anchor) {
+      continue;
+    }
+
+    const moduleGroup = moduleGroupByPath.get(modulePath);
+    const offsets = buildModuleInternalOffsets(
+      members,
+      modulePath,
+      moduleGroup,
+    );
+
+    for (const nodePath of members) {
+      const offset = offsets[nodePath];
+      if (!offset) {
+        continue;
+      }
+      positions[nodePath] = {
+        x: anchor.x + offset.x,
+        y: anchor.y + offset.y,
+      };
+    }
+  }
+
+  return positions;
+}
+
+/** Axis-aligned bounds of given nodes using their tier width/height (or null if empty). */
+function measureBoundsFromNodePositions(nodePaths, positions, tierMap, tierConfigs) {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const nodePath of nodePaths) {
+    const pos = positions[nodePath];
+    if (!pos || typeof pos.x !== "number" || typeof pos.y !== "number") {
+      continue;
+    }
+    const cfg = tierConfigs[tierMap[nodePath]];
+    if (!cfg) {
+      continue;
+    }
+    minX = Math.min(minX, pos.x);
+    minY = Math.min(minY, pos.y);
+    maxX = Math.max(maxX, pos.x + cfg.w);
+    maxY = Math.max(maxY, pos.y + cfg.h);
+  }
+
+  if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+    return null;
+  }
+
+  return { minX, minY, maxX, maxY };
+}
+
+/**
+ * Pins perimeter nodes (e.g. VPC endpoints) onto the VPC frame derived from
+ * interior member bounds + the same padding used for the dashed VPC rectangle.
+ */
+function snapVpcPerimeterResourcePositions(
+  positions,
+  accountRegionGroups,
+  tierMap,
+  tierConfigs,
+  perimeterSet,
+  nodes,
+) {
+  const perimeterWallByNodePath = new Map();
+  if (!VPC_PERIMETER_LAYOUT_ENABLED || perimeterSet.size === 0) {
+    return perimeterWallByNodePath;
+  }
+
+  const VPC_PAD_X = 68;
+  const VPC_PAD_TOP = 96;
+  const VPC_PAD_BOTTOM = 52;
+
+  for (const accountGroup of accountRegionGroups) {
+    for (const regionGroup of accountGroup.regions || []) {
+      for (const vpcGroup of regionGroup.vpcs || []) {
+        const interiorPaths = vpcGroup.nodePaths.filter(
+          (p) => !perimeterSet.has(p),
+        );
+        const perimeterPaths = vpcGroup.nodePaths.filter((p) =>
+          perimeterSet.has(p),
+        );
+        if (perimeterPaths.length === 0) {
+          continue;
+        }
+
+        const inner = measureBoundsFromNodePositions(
+          interiorPaths,
+          positions,
+          tierMap,
+          tierConfigs,
+        );
+        if (!inner) {
+          continue;
+        }
+
+        const frameMinX = inner.minX - VPC_PAD_X;
+        const frameMaxX = inner.maxX + VPC_PAD_X;
+        const frameMinY = inner.minY - VPC_PAD_TOP;
+        const frameMaxY = inner.maxY + VPC_PAD_BOTTOM;
+
+        const sorted = [...perimeterPaths].sort((a, b) => a.localeCompare(b));
+        const buckets = {
+          leftWall: [],
+          topWall: [],
+          rightWall: [],
+          bottomWall: [],
+        };
+
+        for (const p of sorted) {
+          const wall = classifyVpcApplianceWall(p, nodes[p]);
+          if (wall && buckets[wall]) {
+            buckets[wall].push(p);
+            perimeterWallByNodePath.set(p, wall);
+          }
+        }
+
+        const frame = {
+          minX: frameMinX,
+          maxX: frameMaxX,
+          minY: frameMinY,
+          maxY: frameMaxY,
+        };
+        const placements = layoutVpcApplianceRectanglesOnFrame(
+          frame,
+          buckets,
+          (path) => {
+            const cfg = tierConfigs[tierMap[path]];
+            return { w: cfg?.w ?? 120, h: cfg?.h ?? 80 };
+          },
+        );
+        for (const pl of placements) {
+          positions[pl.item] = { x: pl.x, y: pl.y };
+        }
+      }
+    }
+  }
+  return perimeterWallByNodePath;
+}
+
+/** Turns networking-v2 facet sections into small drawable “appliance” tile descriptors on the VPC edge. */
+function collectVpcApplianceTilesFromFacets(vpcFacets) {
+  const tiles = [];
+  for (const facet of vpcFacets || []) {
+    if (facet?.id !== "networking-v2" || !Array.isArray(facet.sections)) {
+      continue;
+    }
+    for (const top of facet.sections) {
+      const children = Array.isArray(top.sections) ? top.sections : [];
+      if (top.label === "Route tables") {
+        for (const child of children) {
+          tiles.push({
+            key: child.id || child.label || `rt-${tiles.length}`,
+            label: child.summary
+              ? `Route table ${child.summary}`
+              : child.label || "Route table",
+            applianceKind: "route_table",
+          });
+        }
+      } else if (top.label === "Gateways") {
+        for (const child of children) {
+          const label = String(child.label || "").toLowerCase();
+          let gatewayKind = "other";
+          if (label.includes("internet_gateway") || label.includes("igw")) {
+            gatewayKind = "igw";
+          } else if (
+            label.includes("nat_gateway") ||
+            label.includes("nat gateway") ||
+            (label.includes("nat") && label.includes("gateway"))
+          ) {
+            gatewayKind = "nat";
+          }
+          tiles.push({
+            key: child.id || child.label || `gw-${tiles.length}`,
+            label: child.label || "Gateway",
+            applianceKind: "gateway",
+            gatewayKind,
+          });
+        }
+      } else if (top.label === "Route table associations (VPC)") {
+        for (const child of children) {
+          tiles.push({
+            key: child.id || child.label || `assoc-${tiles.length}`,
+            label: child.label || "Route association",
+            applianceKind: "route_assoc",
+          });
+        }
+      }
+    }
+  }
+  return tiles;
+}
+
+/** Positions synthetic facet tiles (route tables, gateways, …) along the VPC frame edges. */
+function layoutApplianceTilesOnVpcEdges(
+  vpcApplianceTiles,
+  vpcBoxX,
+  vpcBoxY,
+  vpcBoxW,
+  vpcBoxH,
+) {
+  const tileW = 180;
+  const tileH = 44;
+  const sideBuckets = {
+    topWall: [],
+    rightWall: [],
+    bottomWall: [],
+    leftWall: [],
+  };
+  for (const tile of vpcApplianceTiles) {
+    sideBuckets[classifySyntheticVpcTileWall(tile)].push(tile);
+  }
+
+  const frame = {
+    minX: vpcBoxX,
+    maxX: vpcBoxX + vpcBoxW,
+    minY: vpcBoxY,
+    maxY: vpcBoxY + vpcBoxH,
+  };
+  const raw = layoutVpcApplianceRectanglesOnFrame(frame, sideBuckets, () => ({
+    w: tileW,
+    h: tileH,
+  }));
+  return raw.map((pl) => ({
+    tile: pl.item,
+    x: pl.x,
+    y: pl.y,
+    tileW: pl.w,
+    tileH: pl.h,
+    wall: pl.wall,
+  }));
+}
+
+/** Stroke/fill palette for small VPC appliance / facet tile rectangles by semantic kind. */
+function applianceStyleForKind(kind) {
+  if (kind === "route_table") {
+    return { strokeColor: "#c77d00", backgroundColor: "#fff4cc" };
+  }
+  if (kind === "gateway") {
+    return { strokeColor: "#0c8599", backgroundColor: "#d3f9fa" };
+  }
+  if (kind === "route_assoc") {
+    return { strokeColor: "#5f3dc4", backgroundColor: "#e5dbff" };
+  }
+  if (kind === "endpoint") {
+    return { strokeColor: "#2b8a3e", backgroundColor: "#d8f5a2" };
+  }
+  if (kind === "load_balancer") {
+    return { strokeColor: "#1864ab", backgroundColor: "#d0ebff" };
+  }
+  if (kind === "transit_gateway") {
+    return { strokeColor: "#5c940d", backgroundColor: "#ebfbee" };
+  }
+  if (kind === "vpn") {
+    return { strokeColor: "#9c36b5", backgroundColor: "#f3d9fa" };
+  }
+  if (kind === "direct_connect") {
+    return { strokeColor: "#087f5b", backgroundColor: "#c3fae8" };
+  }
+  return { strokeColor: "#495057", backgroundColor: "#f1f3f5" };
+}
+
+module.exports = {
+  forceLayout,
+  buildCollapsibleModuleSet,
+  getCollapsedModulePath,
+  buildCollapsedLayoutModel,
+  buildModuleInternalOffsets,
+  estimateModuleLayoutSizes,
+  expandCollapsedModulePositions,
+  measureBoundsFromNodePositions,
+  snapVpcPerimeterResourcePositions,
+  collectVpcApplianceTilesFromFacets,
+  layoutApplianceTilesOnVpcEdges,
+  applianceStyleForKind,
+};
