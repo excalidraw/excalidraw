@@ -2,6 +2,50 @@ const { getTerraformNodePaths } = require("./vpc-networking-facet");
 
 const stripIndexes = (address = "") => address.replace(/\[[^\]]+\]/g, "");
 
+/**
+ * Map a Terraform address (plan/state/depends_on) to a key in `nodes`.
+ * Plan uses indexed addresses (for_each/count) while `terraform graph` DOT
+ * uses stripped resource ids — `stripIndexes` is the shared "graph id".
+ */
+function resolveCanonicalNodePath(nodes, address) {
+  if (!address || typeof address !== "string") {
+    return null;
+  }
+  if (nodes[address]) {
+    return address;
+  }
+  const graphId = stripIndexes(address);
+  if (nodes[graphId]) {
+    return graphId;
+  }
+  const matches = [];
+  for (const k of Object.keys(nodes)) {
+    if (k.startsWith("__")) {
+      continue;
+    }
+    if (stripIndexes(k) === graphId) {
+      matches.push(k);
+    }
+  }
+  if (matches.length === 1) {
+    return matches[0];
+  }
+  if (matches.length > 1 && matches.includes(address)) {
+    return address;
+  }
+  return null;
+}
+
+function addToAddressIndex(index, key, nodePath) {
+  if (!key || !nodePath) {
+    return;
+  }
+  if (!index.byAddress.has(key)) {
+    index.byAddress.set(key, new Set());
+  }
+  index.byAddress.get(key).add(nodePath);
+}
+
 const sanitizeDotNodeId = (nodeId = "") => {
   const parts = String(nodeId).trim().split(" ");
   const raw = parts.length >= 2 ? parts[1] : parts[0] || "";
@@ -302,7 +346,7 @@ function loadPlanAndNodes(plan) {
 
   for (const resourceChange of resourceChanges) {
     const address = resourceChange.address;
-    const nodePath = stripIndexes(address);
+    const nodePath = address;
     if (!nodes[nodePath]) {
       nodes[nodePath] = { resources: {} };
     }
@@ -322,7 +366,9 @@ function buildNewEdges(nodes, adjacency) {
 
     for (let index = 0; index < queue.length; index++) {
       const current = queue[index];
-      const neighbors = adjacency[current] || [];
+      const graphKey = stripIndexes(current);
+      const neighbors =
+        adjacency[graphKey] || adjacency[current] || [];
 
       for (const neighbor of neighbors) {
         if (visited.has(neighbor)) {
@@ -432,7 +478,7 @@ function buildExistingEdges(nodes, plan) {
     const currentModule = stack.pop();
 
     for (const resource of currentModule.resources || []) {
-      const nodePath = stripIndexes(resource.address);
+      const nodePath = resource.address;
       nodes[nodePath] ||= { resources: {} };
 
       if (!nodes[nodePath].resources[resource.address]) {
@@ -453,15 +499,15 @@ function buildExistingEdges(nodes, plan) {
   }
 
   for (const [rawSource, targets] of Object.entries(existingEdges)) {
-    const source = stripIndexes(rawSource);
-    if (!nodes[source]) {
+    const source = resolveCanonicalNodePath(nodes, rawSource);
+    if (!source) {
       continue;
     }
     nodes[source].edges_existing ||= [];
 
     for (const rawTarget of targets) {
-      const target = stripIndexes(rawTarget);
-      if (!nodes[target]) {
+      const target = resolveCanonicalNodePath(nodes, rawTarget);
+      if (!target) {
         continue;
       }
       if (!nodes[source].edges_existing.includes(target)) {
@@ -561,7 +607,7 @@ function mergeTerraformState(nodes, state) {
   for (const resource of state.resources) {
     for (const instance of resource.instances || []) {
       const address = getStateResourceAddress(resource, instance);
-      const nodePath = stripIndexes(address);
+      const nodePath = address;
 
       nodes[nodePath] ||= { resources: {} };
 
@@ -587,8 +633,8 @@ function mergeTerraformState(nodes, state) {
 
       nodes[nodePath].edges_existing ||= [];
       for (const dependency of instance.dependencies || []) {
-        const target = stripIndexes(dependency);
-        if (target !== nodePath && !nodes[nodePath].edges_existing.includes(target)) {
+        const target = resolveCanonicalNodePath(nodes, dependency);
+        if (target && target !== nodePath && !nodes[nodePath].edges_existing.includes(target)) {
           nodes[nodePath].edges_existing.push(target);
         }
       }
@@ -643,7 +689,9 @@ function buildDataFlowIndex(nodes) {
 
     for (const resource of Object.values(node.resources || {})) {
       const values = getResourceValues(resource);
-      index.byAddress.set(stripIndexes(resource.address || nodePath), nodePath);
+      const addr = resource.address || nodePath;
+      addToAddressIndex(index, stripIndexes(addr), nodePath);
+      addToAddressIndex(index, addr, nodePath);
       addName(resource.type || type, resource.name, nodePath);
       addName(resource.type || type, values.name, nodePath);
       addName(resource.type || type, values.id, nodePath);
@@ -763,12 +811,19 @@ function resolveNodeRefs(value, index, nodes, allowedTypes) {
     const text = String(raw);
     const stripped = stripIndexes(text);
 
-    addMatch(index.byAddress.get(stripped));
+    for (const nodePath of index.byAddress.get(stripped) || []) {
+      addMatch(nodePath);
+    }
+    for (const nodePath of index.byAddress.get(text) || []) {
+      addMatch(nodePath);
+    }
     addMatch(index.byArn.get(text));
 
-    for (const [address, nodePath] of index.byAddress.entries()) {
+    for (const [address, nodePaths] of index.byAddress.entries()) {
       if (text.includes(address)) {
-        addMatch(nodePath);
+        for (const nodePath of nodePaths) {
+          addMatch(nodePath);
+        }
       }
     }
 
