@@ -15,6 +15,7 @@ const {
   applyModuleMetadata,
   mergeTerraformState,
   ensureTerraformModuleNodes,
+  omitNonAllowlistedDataSourceNodes,
   ensureEdgeLists,
   buildDataFlowEdges,
   externalResources,
@@ -77,10 +78,12 @@ app.post(
       nodes = mergeTerraformState(nodes, state);
       nodes = ensureTerraformModuleNodes(nodes);
       nodes = applyModuleMetadata(nodes, plan);
+      nodes = omitNonAllowlistedDataSourceNodes(nodes);
       nodes = buildNewEdges(nodes, adjlist);
 
       nodes = computeResourceDiffs(nodes);
       nodes = buildExistingEdges(nodes, plan);
+      nodes = omitNonAllowlistedDataSourceNodes(nodes);
       nodes = refineCloudWatchMetricAlarmEdges(nodes);
       nodes = ensureEdgeLists(nodes);
       nodes = externalResources(nodes);
