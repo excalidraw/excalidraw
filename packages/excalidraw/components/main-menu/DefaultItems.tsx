@@ -33,6 +33,7 @@ import {
   useAppProps,
   useApp,
 } from "../App";
+import { repairTerraformEdgeBindings } from "../terraformVisibility";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
@@ -225,7 +226,9 @@ const TerraformLayerItem = ({
               : null),
           });
         });
-        app.scene.replaceAllElements(nextElements);
+        app.scene.replaceAllElements(
+          repairTerraformEdgeBindings(nextElements),
+        );
         event.preventDefault();
       }}
     >

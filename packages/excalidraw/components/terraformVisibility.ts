@@ -1,6 +1,17 @@
-import { newElementWith } from "@excalidraw/element";
+import {
+  isArrowElement,
+  isBindableElement,
+  newElementWith,
+} from "@excalidraw/element";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawBindableElement,
+  ExcalidrawElement,
+} from "@excalidraw/element/types";
+
+import { pointFrom } from "@excalidraw/math";
+
+import type { LocalPoint } from "@excalidraw/math";
 
 type TerraformLayerState = {
   dependencyLayerEnabled?: boolean;
@@ -165,6 +176,270 @@ const deriveLayerState = (
     elements.some((element) => getTerraformEdgeLayer(element) === "dataFlow"),
 });
 
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
+
+const getEdgePointTowardTarget = (
+  pos: { x: number; y: number },
+  w: number,
+  h: number,
+  target: { x: number; y: number },
+) => {
+  const cx = pos.x + w / 2;
+  const cy = pos.y + h / 2;
+  const dx = target.x - cx;
+  const dy = target.y - cy;
+
+  if (Math.abs(dx) < 1e-6 && Math.abs(dy) < 1e-6) {
+    return {
+      x: cx,
+      y: cy,
+      fixedPoint: [0.5, 0.5] as [number, number],
+    };
+  }
+
+  const halfW = Math.max(w / 2, 1e-6);
+  const halfH = Math.max(h / 2, 1e-6);
+  const scale = 1 / Math.max(Math.abs(dx) / halfW, Math.abs(dy) / halfH);
+  const x = cx + dx * scale;
+  const y = cy + dy * scale;
+
+  return {
+    x,
+    y,
+    fixedPoint: [
+      clamp((x - pos.x) / w, 0, 1),
+      clamp((y - pos.y) / h, 0, 1),
+    ] as [number, number],
+  };
+};
+
+const getCenterClippedBindingPoints = (
+  posA: { x: number; y: number },
+  posB: { x: number; y: number },
+  wA: number,
+  hA: number,
+  wB: number,
+  hB: number,
+) => {
+  const centerA = { x: posA.x + wA / 2, y: posA.y + hA / 2 };
+  const centerB = { x: posB.x + wB / 2, y: posB.y + hB / 2 };
+
+  const start = getEdgePointTowardTarget(posA, wA, hA, centerB);
+  const end = getEdgePointTowardTarget(posB, wB, hB, centerA);
+
+  return {
+    startPoint: { x: start.x, y: start.y },
+    endPoint: { x: end.x, y: end.y },
+    startFixed: [0.5, 0.5] as [number, number],
+    endFixed: [0.5, 0.5] as [number, number],
+  };
+};
+
+const offsetLineSegment = (
+  startPoint: { x: number; y: number },
+  endPoint: { x: number; y: number },
+  offset: number,
+) => {
+  if (!offset) {
+    return { startPoint, endPoint };
+  }
+
+  const dx = endPoint.x - startPoint.x;
+  const dy = endPoint.y - startPoint.y;
+  const length = Math.hypot(dx, dy) || 1;
+  const offsetX = (-dy / length) * offset;
+  const offsetY = (dx / length) * offset;
+
+  return {
+    startPoint: { x: startPoint.x + offsetX, y: startPoint.y + offsetY },
+    endPoint: { x: endPoint.x + offsetX, y: endPoint.y + offsetY },
+  };
+};
+
+const fixedPointForAbsolutePoint = (
+  rect: ExcalidrawBindableElement,
+  point: { x: number; y: number },
+): [number, number] => {
+  const w = rect.width || 1;
+  const h = rect.height || 1;
+  return [
+    clamp((point.x - rect.x) / w, 0, 1),
+    clamp((point.y - rect.y) / h, 0, 1),
+  ];
+};
+
+const collectTerraformDependencyPairKeys = (
+  elements: readonly ExcalidrawElement[],
+) => {
+  const keys = new Set<string>();
+  for (const element of elements) {
+    if (getTerraformEdgeLayer(element) !== "dependency") {
+      continue;
+    }
+    const relationship = getCustomData(element).relationship;
+    if (
+      typeof relationship?.source === "string" &&
+      typeof relationship?.target === "string"
+    ) {
+      keys.add([relationship.source, relationship.target].sort().join("|||"));
+    }
+  }
+  return keys;
+};
+
+const collectTerraformResourceRects = (
+  elements: readonly ExcalidrawElement[],
+) => {
+  const rects = new Map<string, ExcalidrawBindableElement>();
+  for (const element of elements) {
+    if (element.isDeleted || !isBindableElement(element)) {
+      continue;
+    }
+    const customData = getCustomData(element);
+    if (customData.terraformVisibilityRole !== "resource") {
+      continue;
+    }
+    const key = getTerraformVisibilityKey(element);
+    if (key) {
+      rects.set(key, element);
+    }
+  }
+  return rects;
+};
+
+/**
+ * Recomputes Terraform dependency / data-flow arrow geometry and orbit bindings from
+ * current resource rectangle positions. Call after visibility toggles so edges stay
+ * attached when soft-delete temporarily cleared arrow bindings.
+ */
+export const repairTerraformEdgeBindings = (
+  elements: readonly ExcalidrawElement[],
+): ExcalidrawElement[] => {
+  const resourceRects = collectTerraformResourceRects(elements);
+  const dependencyPairKeys = collectTerraformDependencyPairKeys(elements);
+
+  const boundArrowIdsByRect = new Map<string, Set<string>>();
+
+  const addBoundArrow = (rectId: string, arrowId: string) => {
+    let set = boundArrowIdsByRect.get(rectId);
+    if (!set) {
+      set = new Set();
+      boundArrowIdsByRect.set(rectId, set);
+    }
+    set.add(arrowId);
+  };
+
+  const updated = elements.map((element) => {
+    const layer = getTerraformEdgeLayer(element);
+    if (
+      !layer ||
+      !isArrowElement(element) ||
+      element.isDeleted ||
+      element.points.length < 2
+    ) {
+      return element;
+    }
+
+    const relationship = getCustomData(element).relationship;
+    if (
+      typeof relationship?.source !== "string" ||
+      typeof relationship?.target !== "string"
+    ) {
+      return element;
+    }
+
+    const rectA = resourceRects.get(relationship.source);
+    const rectB = resourceRects.get(relationship.target);
+    if (!rectA || !rectB) {
+      return element;
+    }
+
+    const posA = { x: rectA.x, y: rectA.y };
+    const posB = { x: rectB.x, y: rectB.y };
+    const wA = rectA.width;
+    const hA = rectA.height;
+    const wB = rectB.width;
+    const hB = rectB.height;
+
+    let startPoint: { x: number; y: number };
+    let endPoint: { x: number; y: number };
+    let startFixed: [number, number];
+    let endFixed: [number, number];
+
+    if (layer === "dependency") {
+      const pts = getCenterClippedBindingPoints(posA, posB, wA, hA, wB, hB);
+      startPoint = pts.startPoint;
+      endPoint = pts.endPoint;
+      startFixed = pts.startFixed;
+      endFixed = pts.endFixed;
+    } else {
+      const pairKey = [relationship.source, relationship.target]
+        .sort()
+        .join("|||");
+      const offset = dependencyPairKeys.has(pairKey) ? 18 : 0;
+      const raw = getCenterClippedBindingPoints(posA, posB, wA, hA, wB, hB);
+      const shifted = offsetLineSegment(
+        raw.startPoint,
+        raw.endPoint,
+        offset,
+      );
+      startPoint = shifted.startPoint;
+      endPoint = shifted.endPoint;
+      startFixed = fixedPointForAbsolutePoint(rectA, shifted.startPoint);
+      endFixed = fixedPointForAbsolutePoint(rectB, shifted.endPoint);
+    }
+
+    const startX = startPoint.x;
+    const startY = startPoint.y;
+    const endX = endPoint.x;
+    const endY = endPoint.y;
+
+    addBoundArrow(rectA.id, element.id);
+    addBoundArrow(rectB.id, element.id);
+
+    return newElementWith(element, {
+      x: startX,
+      y: startY,
+      width: Math.abs(endX - startX),
+      height: Math.abs(endY - startY),
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(endX - startX, endY - startY),
+      ],
+      startBinding: {
+        elementId: rectA.id,
+        fixedPoint: startFixed,
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: rectB.id,
+        fixedPoint: endFixed,
+        mode: "orbit",
+      },
+    });
+  });
+
+  return updated.map((element) => {
+    const arrowIds = boundArrowIdsByRect.get(element.id);
+    if (!arrowIds || !isBindableElement(element)) {
+      return element;
+    }
+
+    let boundElements = element.boundElements?.slice() ?? [];
+    for (const arrowId of arrowIds) {
+      if (!boundElements.some((entry) => entry.id === arrowId)) {
+        boundElements = boundElements.concat({
+          id: arrowId,
+          type: "arrow",
+        });
+      }
+    }
+
+    return newElementWith(element, { boundElements });
+  });
+};
+
 const reconcileTerraformVisibility = (
   elements: readonly ExcalidrawElement[],
   overrides: TerraformLayerState = {},
@@ -280,5 +555,7 @@ export const toggleTerraformExplode = (
     return element;
   });
 
-  return reconcileTerraformVisibility(nextElements);
+  return repairTerraformEdgeBindings(
+    reconcileTerraformVisibility(nextElements),
+  );
 };

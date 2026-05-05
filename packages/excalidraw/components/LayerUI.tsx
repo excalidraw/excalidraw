@@ -61,6 +61,7 @@ import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { TerraformImportDialog } from "./TerraformImportDialog";
+import { repairTerraformEdgeBindings } from "./terraformVisibility";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
@@ -696,7 +697,9 @@ const LayerUI = ({
     });
 
     if (didChange) {
-      app.scene.replaceAllElements(nextElements);
+      app.scene.replaceAllElements(
+        repairTerraformEdgeBindings(nextElements),
+      );
     }
   }, [app, appState, elements]);
 
