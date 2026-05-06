@@ -132,6 +132,12 @@ const REFERENCE_KEY_TYPE_RULES = {
   role: ["aws_iam_role", "aws_iam_instance_profile"],
 };
 
+/**
+ * Scalar keys that are too collision-prone for generic structural matching.
+ * `id` is frequently provider-generated and can repeat across unrelated resources.
+ */
+const GENERIC_REFERENCE_IGNORED_KEYS = new Set(["id"]);
+
 /** Synthetic node: Terraform module call (for edges + grouping). Not an AWS resource. */
 const TERRAFORM_MODULE_RESOURCE_TYPE = "terraform_module";
 
@@ -917,12 +923,18 @@ function collectReferenceScalars(value, parentKey = "", out = []) {
 }
 
 /** Resolves references with key-aware type narrowing and generic fallback. */
-function resolveNodeRefsAcrossAllResourceTypes(value, index, nodes) {
+function resolveNodeRefsAcrossAllResourceTypes(value, index, nodes, options = {}) {
   const matches = new Set();
   const allTypes = [...index.byType.keys()];
+  const ignoredKeys = new Set(
+    options.ignoredKeys || GENERIC_REFERENCE_IGNORED_KEYS,
+  );
 
   for (const scalar of collectReferenceScalars(value)) {
     const key = String(scalar.key || "").toLowerCase();
+    if (ignoredKeys.has(key)) {
+      continue;
+    }
     const allowedTypes = REFERENCE_KEY_TYPE_RULES[key] || allTypes;
     for (const nodePath of resolveNodeRefs(
       scalar.value,
@@ -941,7 +953,7 @@ function resolveNodeRefsAcrossAllResourceTypes(value, index, nodes) {
  * Generic resolver: derive structural targets by resolving references found in
  * resource values, then include owning module nodes for those targets.
  */
-function createGenericResourceReferenceResolver() {
+function createGenericResourceReferenceResolver(options = {}) {
   return {
     id: "generic-resource-references",
     match() {
@@ -956,6 +968,7 @@ function createGenericResourceReferenceResolver() {
           values,
           context.index,
           context.nodes,
+          { ignoredKeys: options.ignoredReferenceKeys },
         )) {
           if (context.nodes[resourcePath]) {
             targets.add(resourcePath);
@@ -1026,20 +1039,23 @@ function refineEdgesWithResolvers(nodes, resolvers = []) {
  * Generic structural edge refinement via resolver rules.
  * Accepts optional custom resolvers prepended before defaults.
  */
-function refineCloudWatchMetricAlarmEdges(nodes, options = {}) {
+function detectGenericStructuralEdges(nodes, options = {}) {
   const customResolvers = Array.isArray(options.customResolvers)
     ? options.customResolvers
     : [];
   const disabled = new Set(options.disabledDefaultResolverIds || []);
-  const defaultResolvers = [createGenericResourceReferenceResolver()].filter(
+  const defaultResolvers = [createGenericResourceReferenceResolver(options)].filter(
     (resolver) => !disabled.has(resolver.id),
   );
   return refineEdgesWithResolvers(nodes, [...customResolvers, ...defaultResolvers]);
 }
 
-/** Generic structural edge detection/refinement across all resource types. */
-function detectGenericStructuralEdges(nodes, options = {}) {
-  return refineCloudWatchMetricAlarmEdges(nodes, options);
+/**
+ * Backward-compatible alias for legacy call sites/tests.
+ * Name kept for historical reasons; behavior is generic, not alarm-specific.
+ */
+function refineCloudWatchMetricAlarmEdges(nodes, options = {}) {
+  return detectGenericStructuralEdges(nodes, options);
 }
 
 /** Maps an IAM policy Resource ARN/string to data-flow target nodes (S3, SQS, etc.) using ARN index heuristics. */

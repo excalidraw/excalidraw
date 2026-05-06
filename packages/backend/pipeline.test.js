@@ -576,6 +576,44 @@ describe("terraform module graph nodes", () => {
       nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new,
     ).not.toContain("module.lambda-writer.aws_iam_role.lambda");
   });
+
+  it("ignores collision-prone generic id scalars to avoid cross-module policy-doc links", () => {
+    let nodes = ensureEdgeLists({
+      "module.s3_kms.data.aws_iam_policy_document.this[0]": {
+        resources: {
+          "module.s3_kms.data.aws_iam_policy_document.this[0]": {
+            type: "aws_iam_policy_document",
+            address: "module.s3_kms.data.aws_iam_policy_document.this[0]",
+            mode: "data",
+            change: { after: { id: "2681806354" } },
+          },
+        },
+      },
+      "module.sqs_kms.data.aws_iam_policy_document.this[0]": {
+        resources: {
+          "module.sqs_kms.data.aws_iam_policy_document.this[0]": {
+            type: "aws_iam_policy_document",
+            address: "module.sqs_kms.data.aws_iam_policy_document.this[0]",
+            mode: "data",
+            change: { after: { id: "2681806354" } },
+          },
+        },
+      },
+    });
+
+    nodes = ensureTerraformModuleNodes(nodes);
+    refineCloudWatchMetricAlarmEdges(nodes);
+
+    expect(nodes["module.s3_kms.data.aws_iam_policy_document.this[0]"].edges_new).toEqual(
+      [],
+    );
+    expect(
+      nodes["module.s3_kms.data.aws_iam_policy_document.this[0]"].edges_new,
+    ).not.toContain("module.sqs_kms.data.aws_iam_policy_document.this[0]");
+    expect(
+      nodes["module.s3_kms.data.aws_iam_policy_document.this[0]"].edges_new,
+    ).not.toContain("module.sqs_kms");
+  });
 });
 
 describe("buildDataFlowEdges", () => {
