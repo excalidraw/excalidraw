@@ -90,7 +90,7 @@ jobs:
             --arg regressions "$REGRESSIONS" \
             '{
               "model": "claude-sonnet-4-20250514",
-              "max_tokens": 4096,
+              "max_tokens": 8192,
               "tools": [{
                 "name": "submit_score",
                 "description": "Submit the evaluation score for a challenge submission",
@@ -114,6 +114,20 @@ jobs:
                       },
                       "required": ["correctness", "correctness_details", "code_quality", "code_quality_details", "completeness", "completeness_details", "minimality", "minimality_details", "test_quality", "test_quality_details", "total"]
                     },
+                    "code_examples": {
+                      "type": "array",
+                      "description": "2-4 code comparisons showing participant vs reference approach for the most instructive differences",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label": {"type": "string", "description": "What this example illustrates (e.g. Selection Algorithm, Toolbar Integration)"},
+                          "participant_code": {"type": "string", "description": "The participant code snippet (5-15 lines). Use // Not implemented if missing"},
+                          "reference_code": {"type": "string", "description": "The reference approach snippet (5-15 lines)"},
+                          "explanation": {"type": "string", "description": "Why the reference is better and what to learn from it"}
+                        },
+                        "required": ["label", "participant_code", "reference_code", "explanation"]
+                      }
+                    },
                     "comparison": {
                       "type": "object",
                       "properties": {
@@ -125,13 +139,13 @@ jobs:
                     },
                     "summary": {"type": "string", "description": "2-4 sentence overall assessment covering strengths, weaknesses, and key takeaways"}
                   },
-                  "required": ["scores", "comparison", "summary"]
+                  "required": ["scores", "code_examples", "comparison", "summary"]
                 }
               }],
               "tool_choice": {"type": "tool", "name": "submit_score"},
               "messages": [{
                 "role": "user",
-                "content": ("You are an expert code reviewer evaluating a coding challenge submission. Provide DETAILED, SPECIFIC feedback.\n\n## Challenge Spec\n" + $challenge + "\n\n## Scoring Rubric\n" + $rubric + "\n\n## Eval Config\n" + $eval_config + "\n\n## Automated Check Results (ground truth)\n- Typecheck: " + $typecheck + "\n- Lasso tests: " + $lasso + "\n- Regressions: " + $regressions + "\n\n## Golden Diff (one valid reference approach)\n```\n" + $golden + "\n```\n\n## Participant Submission Diff\n```\n" + $submission + "\n```\n\nScore this submission with DETAILED per-dimension feedback. For each score:\n- Explain specifically what was done well\n- Explain specifically what is missing or incorrect\n- Reference specific files, functions, or code patterns\n- Give actionable suggestions\n\nA different but correct approach should score well. Hard gates: If typecheck fails OR regressions exist, cap total at 30.\n\nCall submit_score with your detailed evaluation.")
+                "content": ("You are an expert code reviewer evaluating a coding challenge submission. Provide DETAILED, SPECIFIC feedback with code examples.\n\n## Challenge Spec\n" + $challenge + "\n\n## Scoring Rubric\n" + $rubric + "\n\n## Eval Config\n" + $eval_config + "\n\n## Automated Check Results (ground truth)\n- Typecheck: " + $typecheck + "\n- Lasso tests: " + $lasso + "\n- Regressions: " + $regressions + "\n\n## Golden Diff (one valid reference approach)\n```\n" + $golden + "\n```\n\n## Participant Submission Diff\n```\n" + $submission + "\n```\n\nScore this submission with DETAILED per-dimension feedback. For each score, explain what was done well and what is missing.\n\nINCLUDE 2-4 code_examples comparing the participant code with the reference. Pick the most instructive differences — algorithm choices, missing features, structural gaps. Show short snippets (5-15 lines), not entire files. If the participant did not implement something, use '// Not implemented' as their code.\n\nA different but correct approach should score well. Hard gates: If typecheck fails OR regressions exist, cap total at 30.\n\nCall submit_score with your detailed evaluation including code examples.")
               }]
             }' > /tmp/api-request.json
 
@@ -206,6 +220,16 @@ jobs:
               if (s.completeness_details) body += `**Completeness (${s.completeness}/20):** ${s.completeness_details}\n\n`;
               if (s.minimality_details) body += `**Minimality (${s.minimality}/15):** ${s.minimality_details}\n\n`;
               if (s.test_quality_details) body += `**Test Quality (${s.test_quality}/10):** ${s.test_quality_details}\n\n`;
+
+              if (aiScores.code_examples && aiScores.code_examples.length) {
+                body += `### Code Examples\n\n`;
+                aiScores.code_examples.forEach(ex => {
+                  body += `#### ${ex.label}\n\n`;
+                  body += `<details>\n<summary>Your code</summary>\n\n\`\`\`typescript\n${ex.participant_code}\n\`\`\`\n</details>\n\n`;
+                  body += `<details open>\n<summary>Reference approach</summary>\n\n\`\`\`typescript\n${ex.reference_code}\n\`\`\`\n</details>\n\n`;
+                  body += `> ${ex.explanation}\n\n---\n\n`;
+                });
+              }
 
               if (aiScores.comparison) {
                 const c = aiScores.comparison;
