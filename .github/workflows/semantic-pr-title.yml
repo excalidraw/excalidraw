@@ -12,5 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: amannn/action-semantic-pull-request@e32d7e603df1aa1ba07e981f2a23455dee596825 # v5
+        with:
+          requireScope: true
+          scopes: |
+            app
+            editor
+            packages/excalidraw
+            packages/utils
+            docker
+            repo
+          ignoreLabels: |
+            skip-semantic-title
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
