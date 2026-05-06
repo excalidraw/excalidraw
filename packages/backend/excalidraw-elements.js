@@ -903,6 +903,14 @@ function getModuleRelativeResourcePath(nodePath, modulePath) {
   return nodePath.slice(prefix.length);
 }
 
+/**
+ * Strip Terraform instance indexes (`[0]`, `["x"]`) so indexed module resources match preset keys.
+ * Same rule as `stripIndexes` in pipeline.js (DOT/plan id reconciliation).
+ */
+function stripTerraformInstanceIndexes(address = "") {
+  return String(address).replace(/\[[^\]]+\]/g, "");
+}
+
 // Preset layout for terraform-aws-modules/lambda/aws inferred from resource set.
 // Offsets are relative to the module's aws_lambda_function.this position.
 const LAMBDA_MODULE_SOURCE = "terraform-aws-modules/lambda/aws";
@@ -928,10 +936,15 @@ function isLambdaModuleSource(source) {
 
 /** Heuristic: registry Lambda module vs typical `this` + `aws_iam_role.lambda` fragment set. */
 function isLikelyLambdaModule(resourceFragments, moduleGroup = null) {
+  if (isLambdaModuleSource(moduleGroup?.source)) {
+    return true;
+  }
+  const stripped = new Set(
+    [...resourceFragments].map((f) => stripTerraformInstanceIndexes(f)),
+  );
   return (
-    isLambdaModuleSource(moduleGroup?.source) ||
-    (resourceFragments.has("aws_lambda_function.this") &&
-      resourceFragments.has("aws_iam_role.lambda"))
+    stripped.has("aws_lambda_function.this") &&
+    stripped.has("aws_iam_role.lambda")
   );
 }
 
@@ -965,16 +978,23 @@ function applyModulePresets(
       continue;
     }
 
-    const anchorPath = `${modulePath}.aws_lambda_function.this`;
+    const anchorMember = members.find((nodePath) => {
+      const rel = getModuleRelativeResourcePath(nodePath, modulePath);
+      return stripTerraformInstanceIndexes(rel) === "aws_lambda_function.this";
+    });
     const fallback = positions[members[0]];
-    const anchor = positions[anchorPath] || fallback;
+    const anchor =
+      (anchorMember && positions[anchorMember]) ||
+      positions[`${modulePath}.aws_lambda_function.this`] ||
+      fallback;
     if (!anchor) {
       continue;
     }
 
     for (const nodePath of members) {
       const fragment = getModuleRelativeResourcePath(nodePath, modulePath);
-      const offset = LAMBDA_MODULE_PRESET_OFFSETS[fragment];
+      const presetKey = stripTerraformInstanceIndexes(fragment);
+      const offset = LAMBDA_MODULE_PRESET_OFFSETS[presetKey];
       if (!offset) {
         continue;
       }
@@ -1821,6 +1841,7 @@ module.exports = {
   getModuleDisplayLabel,
   getOwningModulePath,
   getModuleRelativeResourcePath,
+  stripTerraformInstanceIndexes,
   isLambdaModuleSource,
   isLikelyLambdaModule,
   applyModulePresets,
