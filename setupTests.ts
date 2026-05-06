@@ -8,7 +8,13 @@ import { vi } from "vitest";
 import polyfill from "./packages/excalidraw/polyfill";
 import { mockThrottleRAF } from "./packages/excalidraw/tests/helpers/mocks";
 import { yellow } from "./packages/excalidraw/tests/helpers/colorize";
-import { testPolyfills } from "./packages/excalidraw/tests/helpers/polyfills";
+import {
+  PolyfillLocalStorage,
+  testPolyfills,
+} from "./packages/excalidraw/tests/helpers/polyfills";
+
+Object.assign(globalThis, testPolyfills);
+PolyfillLocalStorage();
 
 vi.mock("@excalidraw/common", async (importOriginal) => {
   const module = await importOriginal<typeof import("@excalidraw/common")>();
@@ -21,8 +27,6 @@ vi.mock("@excalidraw/common", async (importOriginal) => {
 
 // mock for pep.js not working with setPointerCapture()
 HTMLElement.prototype.setPointerCapture = vi.fn();
-
-Object.assign(globalThis, testPolyfills);
 
 require("fake-indexeddb/auto");
 
@@ -103,42 +107,6 @@ vi.mock(
     };
   },
 );
-
-// Node.js 25+ provides a native localStorage global that shadows jsdom's,
-// and jsdom's own localStorage also uses the native one — both are broken
-// (empty objects without Storage methods). On older Node versions, jsdom
-// provides a working localStorage. This polyfill replaces localStorage on
-// all supported versions with a standard Storage implementation backed by
-// a Map, ensuring consistent behavior regardless of the Node.js version.
-const storage = new Map<string, string>();
-const storagePolyfill: Storage = {
-  get length() {
-    return storage.size;
-  },
-  clear() {
-    storage.clear();
-  },
-  key(index) {
-    return Array.from(storage.keys())[index] ?? null;
-  },
-  getItem(key) {
-    return storage.get(key) ?? null;
-  },
-  setItem(key, value) {
-    storage.set(key, value);
-  },
-  removeItem(key) {
-    storage.delete(key);
-  },
-  *[Symbol.iterator]() {
-    yield* storage.entries();
-  },
-};
-Object.defineProperty(window, "localStorage", {
-  value: storagePolyfill,
-  writable: true,
-  configurable: true,
-});
 
 // ReactDOM is located inside index.tsx file
 // as a result, we need a place for it to render into
