@@ -14,6 +14,7 @@ const {
   getDataSourceTypeFromAddress,
   isExcludedDataSourceAddress,
   mergeTerraformState,
+  pruneRedundantStructuralEdges,
 } = require("./pipeline");
 
 const resource = (address, type, name, values = {}, mode = "managed") => ({
@@ -1081,5 +1082,126 @@ describe("buildDataFlowEdges", () => {
       type: "writes",
       origin: "iam_policy",
     });
+  });
+});
+
+describe("pruneRedundantStructuralEdges", () => {
+  it("removes a redundant edges_new shortcut when a multi-hop path exists", () => {
+    let nodes = {
+      "module.lambda_writer": {
+        resources: {
+          "module.lambda_writer": resource(
+            "module.lambda_writer",
+            "terraform_module",
+            "lambda_writer",
+          ),
+        },
+        edges_new: ["module.data_queue", "module.sqs_kms"],
+        edges_existing: [],
+      },
+      "module.data_queue": {
+        resources: {
+          "module.data_queue": resource(
+            "module.data_queue",
+            "terraform_module",
+            "data_queue",
+          ),
+        },
+        edges_new: ["module.sqs_kms"],
+        edges_existing: [],
+      },
+      "module.sqs_kms": {
+        resources: {
+          "module.sqs_kms": resource(
+            "module.sqs_kms",
+            "terraform_module",
+            "sqs_kms",
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+      },
+    };
+    nodes = ensureEdgeLists(nodes);
+    pruneRedundantStructuralEdges(nodes);
+
+    expect(nodes["module.lambda_writer"].edges_new.sort()).toEqual([
+      "module.data_queue",
+    ]);
+    expect(nodes["module.data_queue"].edges_new).toEqual(["module.sqs_kms"]);
+  });
+
+  it("keeps a directed edges_new link when it is the only path between endpoints", () => {
+    let nodes = {
+      "module.lambda_writer": {
+        resources: {
+          "module.lambda_writer": resource(
+            "module.lambda_writer",
+            "terraform_module",
+            "lambda_writer",
+          ),
+        },
+        edges_new: ["module.sqs_kms"],
+        edges_existing: [],
+      },
+      "module.sqs_kms": {
+        resources: {
+          "module.sqs_kms": resource(
+            "module.sqs_kms",
+            "terraform_module",
+            "sqs_kms",
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+      },
+    };
+    nodes = ensureEdgeLists(nodes);
+    pruneRedundantStructuralEdges(nodes);
+
+    expect(nodes["module.lambda_writer"].edges_new).toEqual(["module.sqs_kms"]);
+  });
+
+  it("prunes redundant targets listed only on edges_existing", () => {
+    let nodes = {
+      "module.lambda_reader": {
+        resources: {
+          "module.lambda_reader": resource(
+            "module.lambda_reader",
+            "terraform_module",
+            "lambda_reader",
+          ),
+        },
+        edges_new: ["module.data_queue"],
+        edges_existing: ["module.sqs_kms"],
+      },
+      "module.data_queue": {
+        resources: {
+          "module.data_queue": resource(
+            "module.data_queue",
+            "terraform_module",
+            "data_queue",
+          ),
+        },
+        edges_new: [],
+        edges_existing: ["module.sqs_kms"],
+      },
+      "module.sqs_kms": {
+        resources: {
+          "module.sqs_kms": resource(
+            "module.sqs_kms",
+            "terraform_module",
+            "sqs_kms",
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+      },
+    };
+    nodes = ensureEdgeLists(nodes);
+    pruneRedundantStructuralEdges(nodes);
+
+    expect(nodes["module.lambda_reader"].edges_new).toEqual(["module.data_queue"]);
+    expect(nodes["module.lambda_reader"].edges_existing).toEqual([]);
   });
 });

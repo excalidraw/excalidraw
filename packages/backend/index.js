@@ -30,6 +30,7 @@ const {
   filterVisualIgnore,
   cleanUpRoleLinks,
   detectGenericStructuralEdges,
+  pruneRedundantStructuralEdges,
 } = require("./pipeline");
 const { extractVpcNetworkingFacetStore } = require("./vpc-networking-facet");
 const { mockLanggraphEnrichment, applyEnrichment } = require("./enrichment");
@@ -86,8 +87,8 @@ app.post(
 
       // Graph transforms (see pipeline.js module banner for semantics):
       // loadPlan → mergeState → moduleNodes → moduleMeta → filterDataSources → dotEdges →
-      // diffs → existingEdges → filterDataSources → genericEdges → edgeLists → externals →
-      // edgeLists → dataFlow → edgeLists → facetStore → omitVpcPlumbing → orphans →
+      // diffs → existingEdges → filterDataSources → genericEdges → edgeLists → pruneShortcuts →
+      // externals → edgeLists → dataFlow → edgeLists → facetStore → omitVpcPlumbing → orphans →
       // roleCleanup → visualIgnore → orphans → enrichment → persist.
       let nodes = loadPlanAndNodes(plan);
       nodes = mergeTerraformState(nodes, state);
@@ -102,6 +103,7 @@ app.post(
       nodes = omitStateOnlyDataSourceNodes(nodes);
       nodes = detectGenericStructuralEdges(nodes);
       nodes = ensureEdgeLists(nodes);
+      nodes = pruneRedundantStructuralEdges(nodes);
       nodes = externalResources(nodes);
       nodes = ensureEdgeLists(nodes);
       nodes = buildDataFlowEdges(nodes);
