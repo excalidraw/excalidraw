@@ -133,18 +133,20 @@ export const getElementsWithinSelection = (
   const elementsInSelection: Set<NonDeletedExcalidrawElement> = new Set();
 
   for (const element of elements) {
+    // track only selectable group members, so ignored elements such as bound
+    // text and locked elements don't block group completeness checks.
     if (shouldIgnoreElementFromSelection(element)) {
       continue;
     }
 
-    // Track only selectable group members, so ignored elements such as bound
-    // text and locked elements don't block group completeness checks.
-    (element.groupIds ?? []).forEach((groupId) => {
-      if (!groups[groupId]) {
-        groups[groupId] = [];
-      }
-      groups[groupId].push(element);
-    });
+    if (boxSelectionMode === "contain") {
+      (element.groupIds ?? []).forEach((groupId) => {
+        if (!groups[groupId]) {
+          groups[groupId] = [];
+        }
+        groups[groupId].push(element);
+      });
+    }
 
     const strokeWidth = element.strokeWidth;
     let labelAABB: Bounds | null = null;
@@ -336,40 +338,23 @@ export const getElementsWithinSelection = (
     });
   }
 
-  elementsInSelection.forEach((element) => {
-    // If a group this element is part of already included, then we don't need
-    // to check this element separately again
-    const groupIds = element.groupIds ?? [];
-    const largestGroupId = groupIds.reduce<[string | null, number]>(
-      (acc, groupId) => {
-        const group = groups[groupId];
-        if (!group) {
-          return acc;
-        }
-        return group.length > acc[1] ? [groupId, group.length] : acc;
-      },
-      [null, -Infinity],
-    )[0];
+  if (boxSelectionMode === "contain") {
+    elementsInSelection.forEach((element) => {
+      // note: currently we only support top-level group handling since
+      // we don't support box selecting while editing the group/subgroup
+      // see https://github.com/excalidraw/excalidraw/pull/11234#issuecomment-4387654451
+      const groupId = element.groupIds.at(-1);
 
-    if (boxSelectionMode === "overlap") {
-      if (largestGroupId) {
-        groups[largestGroupId].forEach(
-          elementsInSelection.add.bind(elementsInSelection),
-        );
-      }
-    } else if (largestGroupId) {
-      if (groupIds.length > 0 && largestGroupId) {
-        const shouldInclude = groups[largestGroupId].every((groupElement) =>
-          elementsInSelection.has(groupElement),
-        );
-        if (!shouldInclude) {
-          elementsInSelection.delete(element);
-        }
-      }
-    }
+      const group = groupId ? groups[groupId] : null;
 
-    return true;
-  });
+      if (
+        group &&
+        !group.every((groupElement) => elementsInSelection.has(groupElement))
+      ) {
+        elementsInSelection.delete(element);
+      }
+    });
+  }
 
   return Array.from(elementsInSelection);
 };
