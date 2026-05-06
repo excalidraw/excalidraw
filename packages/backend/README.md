@@ -2,6 +2,8 @@
 
 Express API that turns a Terraform or OpenTofu **plan JSON**, a **`terraform graph` DOT** file, and an optional **state JSON** into a stored dependency graph you can open as an **Excalidraw** diagram (nodes, edges, and layout hints derived from the plan).
 
+![Sample Terraform/OpenTofu diagram opened in Excalidraw](../../docs/terraform-canvas-aws-icons.png)
+
 ## How it fits together
 
 1. **Plan JSON** (`terraform show -json` / `tofu show -json`) supplies resource metadata, changes, module paths, and references.
