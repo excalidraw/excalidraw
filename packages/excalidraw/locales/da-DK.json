@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "",
+    "resultsRegion": "Søgeresultater på lærredet",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",

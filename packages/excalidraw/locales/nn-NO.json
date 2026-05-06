@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "",
+    "resultsRegion": "Søkjeresultat på lerretet",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",

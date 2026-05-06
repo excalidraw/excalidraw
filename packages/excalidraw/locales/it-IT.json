@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Trova sulla tela",
+    "resultsRegion": "Risultati di ricerca sulla lavagna",
     "noMatch": "Non è stato trovato nessun risultato...",
     "singleResult": "risultato",
     "multipleResults": "risultati",

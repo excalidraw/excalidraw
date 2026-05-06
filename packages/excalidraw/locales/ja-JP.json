@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "キャンバスで検索",
+    "resultsRegion": "キャンバスの検索結果",
     "noMatch": "一致なし…",
     "singleResult": "結果",
     "multipleResults": "結果数",

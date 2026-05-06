@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "",
+    "resultsRegion": "Kanvas axtarışının nəticələri",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",

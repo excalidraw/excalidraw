@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "",
+    "resultsRegion": "ক্যানভাস অনুসন্ধানের ফলাফল",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",

@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Poišči na platnu",
+    "resultsRegion": "Rezultati iskanja na platnu",
     "noMatch": "Ni zadetkov ...",
     "singleResult": "rezultat",
     "multipleResults": "rezultata/i/ov",

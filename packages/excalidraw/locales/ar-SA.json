@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "البحث على اللوحة",
+    "resultsRegion": "نتائج البحث على اللوحة",
     "noMatch": "لم يتم العثور على تطابقات...",
     "singleResult": "نتيجة",
     "multipleResults": "نتائج",

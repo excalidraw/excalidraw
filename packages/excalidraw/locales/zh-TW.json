@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "在畫布上尋找",
+    "resultsRegion": "畫布搜尋結果",
     "noMatch": "未找到符合項目…",
     "singleResult": "結果",
     "multipleResults": "結果",

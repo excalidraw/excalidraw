@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Знайти на полотні",
+    "resultsRegion": "Результати пошуку на полотні",
     "noMatch": "Збігів не знайдено...",
     "singleResult": "результат",
     "multipleResults": "результати",

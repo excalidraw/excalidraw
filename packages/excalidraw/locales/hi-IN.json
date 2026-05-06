@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "पटल पर धूंडे",
+    "resultsRegion": "कैनवास खोज परिणाम",
     "noMatch": "कोई मिलता जुलता नहीं मिला",
     "singleResult": "परिणाम",
     "multipleResults": "परिणाम",

@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "جستجو در بوم",
+    "resultsRegion": "نتایج جستجو روی بوم",
     "noMatch": "هیچ موردی یافت نشد...",
     "singleResult": "نتیجه",
     "multipleResults": "نتایج",

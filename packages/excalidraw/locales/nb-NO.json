@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Finn på lerretet",
+    "resultsRegion": "Søkeresultater på lerretet",
     "noMatch": "Ingen treff funnet...",
     "singleResult": "resultat",
     "multipleResults": "resultater",

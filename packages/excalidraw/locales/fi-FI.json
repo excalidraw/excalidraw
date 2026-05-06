@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "",
+    "resultsRegion": "Canvaksen hakutulokset",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",

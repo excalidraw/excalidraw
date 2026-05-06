@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "איתור בלוח הציור",
+    "resultsRegion": "תוצאות חיפוש בלוח",
     "noMatch": "לא נמצאו תוצאות…",
     "singleResult": "תוצאה",
     "multipleResults": "תוצאות",

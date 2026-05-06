@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Encontrar en lienzo",
+    "resultsRegion": "Resultados de búsqueda en el lienzo",
     "noMatch": "No hay coincidencias...",
     "singleResult": "resultado",
     "multipleResults": "resultados",

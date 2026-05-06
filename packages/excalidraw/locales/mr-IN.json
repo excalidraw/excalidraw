@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "पटल वर पहा",
+    "resultsRegion": "कॅन्व्हास शोध निकाल",
     "noMatch": "मिळते जुळते काहिही सापडले नाही...",
     "singleResult": "निकाल",
     "multipleResults": "निकाल",

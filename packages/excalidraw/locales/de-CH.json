@@ -191,6 +191,7 @@
   },
   "search": {
     "title": "Auf Zeichenfläche suchen",
+    "resultsRegion": "Suchergebnisse auf der Zeichenfläche",
     "noMatch": "Keine Treffer gefunden...",
     "singleResult": "Ergebnis",
     "multipleResults": "Ergebnisse",
