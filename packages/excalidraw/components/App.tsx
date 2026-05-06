@@ -424,8 +424,6 @@ import { isOverScrollBars } from "../scene/scrollbars";
 
 import { isMaybeMermaidDefinition } from "../mermaid";
 
-import { LassoTrail } from "../lasso";
-
 import { EraserTrail } from "../eraser";
 
 import { getShortcutKey } from "../shortcut";
@@ -706,7 +704,6 @@ class App extends React.Component<AppProps, AppState> {
 
   laserTrails = new LaserTrails(this.animationFrameHandler, this);
   eraserTrail = new EraserTrail(this.animationFrameHandler, this);
-  lassoTrail = new LassoTrail(this.animationFrameHandler, this);
 
   onChangeEmitter = new Emitter<
     [
@@ -1327,7 +1324,7 @@ class App extends React.Component<AppProps, AppState> {
       // panning
       isHoldingSpace ||
       // wrong tool
-      !oneOf(this.state.activeTool.type, ["laser", "selection", "lasso"])
+      !oneOf(this.state.activeTool.type, ["laser", "selection"])
     ) {
       return false;
     }
@@ -2212,7 +2209,6 @@ class App extends React.Component<AppProps, AppState> {
                           <SVGLayer
                             trails={[
                               this.laserTrails,
-                              this.lassoTrail,
                               this.eraserTrail,
                             ]}
                           />
@@ -2943,8 +2939,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if (!restoredAppState.preferredSelectionTool.initialized) {
       restoredAppState.preferredSelectionTool = {
-        type:
-          this.editorInterface.formFactor === "phone" ? "lasso" : "selection",
+        type: "selection",
         initialized: true,
       };
     }
@@ -2959,7 +2954,6 @@ class App extends React.Component<AppProps, AppState> {
       openSidebar: restoredAppState?.openSidebar || this.state.openSidebar,
       activeTool:
         activeTool.type === "image" ||
-        activeTool.type === "lasso" ||
         activeTool.type === "selection"
           ? {
               ...activeTool,
@@ -3641,8 +3635,6 @@ class App extends React.Component<AppProps, AppState> {
       // only create text if the second tap is within the threshold of the first tap
       // this prevents accidental text creation during dragging/selection
       if (distance <= DOUBLE_TAP_POSITION_THRESHOLD) {
-        // end lasso trail and deselect elements just in case
-        this.lassoTrail.endPath();
         this.deselectElements();
 
         this.handleCanvasDoubleClick({
@@ -5078,13 +5070,7 @@ class App extends React.Component<AppProps, AppState> {
             }));
           }
 
-          if (shape === "lasso" && this.state.activeTool.type === "laser") {
-            this.setActiveTool({
-              type: this.state.preferredSelectionTool.type,
-            });
-          } else {
-            this.setActiveTool({ type: shape });
-          }
+          this.setActiveTool({ type: shape });
 
           event.stopPropagation();
 
@@ -5560,21 +5546,7 @@ class App extends React.Component<AppProps, AppState> {
         this.store.scheduleCapture();
       }
 
-      if (nextActiveTool.type === "lasso") {
-        return {
-          ...prevState,
-          ...commonResets,
-          activeTool: nextActiveTool,
-          ...(keepSelection
-            ? {}
-            : {
-                selectedElementIds: makeNextSelectedElementIds({}, prevState),
-                selectedGroupIds: makeNextSelectedElementIds({}, prevState),
-                editingGroupId: null,
-                multiElement: null,
-              }),
-        };
-      } else if (nextActiveTool.type !== "selection") {
+      if (nextActiveTool.type !== "selection") {
         return {
           ...prevState,
           ...commonResets,
@@ -7114,7 +7086,6 @@ class App extends React.Component<AppProps, AppState> {
       // over a link/embeddable, we change the cursor
       (!isLaserTool &&
         this.state.activeTool.type !== "selection" &&
-        this.state.activeTool.type !== "lasso" &&
         this.state.activeTool.type !== "text" &&
         this.state.activeTool.type !== "eraser")
     ) {
@@ -7300,12 +7271,7 @@ class App extends React.Component<AppProps, AppState> {
             !isElbowArrow(hitElement) ||
             !(hitElement.startBinding || hitElement.endBinding)
           ) {
-            if (
-              this.state.activeTool.type !== "lasso" ||
-              selectedElements.length > 0
-            ) {
-              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
-            }
+            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
           }
         }
       } else {
@@ -7419,12 +7385,7 @@ class App extends React.Component<AppProps, AppState> {
             !isElbowArrow(element) ||
             !(element.startBinding || element.endBinding)
           ) {
-            if (
-              this.state.activeTool.type !== "lasso" ||
-              Object.keys(this.state.selectedElementIds).length > 0
-            ) {
-              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
-            }
+            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
           }
         }
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
@@ -7433,12 +7394,7 @@ class App extends React.Component<AppProps, AppState> {
           !isElbowArrow(element) ||
           !(element.startBinding || element.endBinding)
         ) {
-          if (
-            this.state.activeTool.type !== "lasso" ||
-            Object.keys(this.state.selectedElementIds).length > 0
-          ) {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
-          }
+          setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
         }
       }
 
@@ -7752,7 +7708,6 @@ class App extends React.Component<AppProps, AppState> {
       !this.state.penMode ||
       event.pointerType !== "touch" ||
       this.state.activeTool.type === "selection" ||
-      this.state.activeTool.type === "lasso" ||
       this.state.activeTool.type === "text" ||
       this.state.activeTool.type === "image";
 
@@ -7760,127 +7715,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (this.state.activeTool.type === "lasso") {
-      const hitSelectedElement =
-        pointerDownState.hit.element &&
-        this.isASelectedElement(pointerDownState.hit.element);
-      const shouldForceLassoReselect =
-        event.altKey &&
-        event[KEYS.CTRL_OR_CMD] &&
-        !pointerDownState.resize.handleType;
-      const shouldStartLassoSelection =
-        shouldForceLassoReselect ||
-        (!pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
-          !pointerDownState.resize.handleType &&
-          !hitSelectedElement);
-
-      if (shouldStartLassoSelection) {
-        if (!this.lassoTrail.hasCurrentTrail) {
-          this.lassoTrail.startPath(
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-            event.shiftKey,
-          );
-        }
-
-        // block dragging after lasso selection on PCs until the next pointer down
-        // (on mobile or tablet, we want to allow user to drag immediately)
-        pointerDownState.drag.blockDragging =
-          this.editorInterface.formFactor === "desktop";
-      }
-
-      // only for mobile or tablet, if we hit an element, select it immediately like normal selection
-      if (
-        this.editorInterface.formFactor !== "desktop" &&
-        pointerDownState.hit.element &&
-        !hitSelectedElement
-      ) {
-        this.setState((prevState) => {
-          const nextSelectedElementIds: { [id: string]: true } = {
-            ...prevState.selectedElementIds,
-            [pointerDownState.hit.element!.id]: true,
-          };
-
-          const previouslySelectedElements: ExcalidrawElement[] = [];
-
-          Object.keys(prevState.selectedElementIds).forEach((id) => {
-            const element = this.scene.getElement(id);
-            element && previouslySelectedElements.push(element);
-          });
-
-          const hitElement = pointerDownState.hit.element!;
-
-          // if hitElement is frame-like, deselect all of its elements
-          // if they are selected
-          if (isFrameLikeElement(hitElement)) {
-            getFrameChildren(previouslySelectedElements, hitElement.id).forEach(
-              (element) => {
-                delete nextSelectedElementIds[element.id];
-              },
-            );
-          } else if (hitElement.frameId) {
-            // if hitElement is in a frame and its frame has been selected
-            // disable selection for the given element
-            if (nextSelectedElementIds[hitElement.frameId]) {
-              delete nextSelectedElementIds[hitElement.id];
-            }
-          } else {
-            // hitElement is neither a frame nor an element in a frame
-            // but since hitElement could be in a group with some frames
-            // this means selecting hitElement will have the frames selected as well
-            // because we want to keep the invariant:
-            // - frames and their elements are not selected at the same time
-            // we deselect elements in those frames that were previously selected
-
-            const groupIds = hitElement.groupIds;
-            const framesInGroups = new Set(
-              groupIds
-                .flatMap((gid) =>
-                  getElementsInGroup(this.scene.getNonDeletedElements(), gid),
-                )
-                .filter((element) => isFrameLikeElement(element))
-                .map((frame) => frame.id),
-            );
-
-            if (framesInGroups.size > 0) {
-              previouslySelectedElements.forEach((element) => {
-                if (element.frameId && framesInGroups.has(element.frameId)) {
-                  // deselect element and groups containing the element
-                  delete nextSelectedElementIds[element.id];
-                  element.groupIds
-                    .flatMap((gid) =>
-                      getElementsInGroup(
-                        this.scene.getNonDeletedElements(),
-                        gid,
-                      ),
-                    )
-                    .forEach((element) => {
-                      delete nextSelectedElementIds[element.id];
-                    });
-                }
-              });
-            }
-          }
-
-          return {
-            ...selectGroupsForSelectedElements(
-              {
-                editingGroupId: prevState.editingGroupId,
-                selectedElementIds: nextSelectedElementIds,
-              },
-              this.scene.getNonDeletedElements(),
-              prevState,
-              this,
-            ),
-            showHyperlinkPopup:
-              hitElement.link || isEmbeddableElement(hitElement)
-                ? "info"
-                : false,
-          };
-        });
-        pointerDownState.hit.wasAddedToSelection = true;
-      }
-    } else if (this.state.activeTool.type === "text") {
+    if (this.state.activeTool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
     } else if (
       this.state.activeTool.type === "arrow" ||
@@ -8582,21 +8417,6 @@ class App extends React.Component<AppProps, AppState> {
           // == deep selection ==
           // on CMD/CTRL, drill down to hit element regardless of groups etc.
           if (event[KEYS.CTRL_OR_CMD]) {
-            if (event.altKey) {
-              // ctrl + alt means we're lasso selecting - start lasso trail and switch to lasso tool
-
-              // Close any open dialogs that might interfere with lasso selection
-              if (this.state.openDialog?.name === "elementLinkSelector") {
-                this.setOpenDialog(null);
-              }
-              this.lassoTrail.startPath(
-                pointerDownState.origin.x,
-                pointerDownState.origin.y,
-                event.shiftKey,
-              );
-              this.setActiveTool({ type: "lasso", fromSelection: true });
-              return false;
-            }
             if (!this.state.selectedElementIds[hitElement.id]) {
               pointerDownState.hit.wasAddedToSelection = true;
             }
@@ -9794,32 +9614,6 @@ class App extends React.Component<AppProps, AppState> {
         // if elements should be deselected on pointerup
         pointerDownState.drag.hasOccurred = true;
 
-        // prevent immediate dragging during lasso selection to avoid element displacement
-        // only allow dragging if we're not in the middle of lasso selection
-        // (on mobile, allow dragging if we hit an element)
-        if (
-          this.state.activeTool.type === "lasso" &&
-          this.lassoTrail.hasCurrentTrail &&
-          !(
-            this.editorInterface.formFactor !== "desktop" &&
-            pointerDownState.hit.element
-          ) &&
-          !this.state.activeTool.fromSelection
-        ) {
-          return;
-        }
-
-        // Clear lasso trail when starting to drag selected elements with lasso tool
-        // Only clear if we're actually dragging (not during lasso selection)
-        if (
-          this.state.activeTool.type === "lasso" &&
-          selectedElements.length > 0 &&
-          pointerDownState.drag.hasOccurred &&
-          !this.state.activeTool.fromSelection
-        ) {
-          this.lassoTrail.endPath();
-        }
-
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
         // Checking for editingTextElement to avoid jump while editing on mobile #6503
@@ -10144,37 +9938,7 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.selectionElement) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
-        if (event.altKey) {
-          this.setActiveTool(
-            { type: "lasso", fromSelection: true },
-            event.shiftKey,
-          );
-          this.lassoTrail.startPath(
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-            event.shiftKey,
-          );
-          this.setAppState({
-            selectionElement: null,
-          });
-          return;
-        }
         this.maybeDragNewGenericElement(pointerDownState, event);
-      } else if (this.state.activeTool.type === "lasso") {
-        if (!event.altKey && this.state.activeTool.fromSelection) {
-          this.setActiveTool({ type: "selection" });
-          this.createGenericElementOnPointerDown("selection", pointerDownState);
-          pointerDownState.lastCoords.x = pointerCoords.x;
-          pointerDownState.lastCoords.y = pointerCoords.y;
-          this.maybeDragNewGenericElement(pointerDownState, event);
-          this.lassoTrail.endPath();
-        } else {
-          this.lassoTrail.addPointToPath(
-            pointerCoords.x,
-            pointerCoords.y,
-            event.shiftKey,
-          );
-        }
       } else {
         // It is very important to read this.state within each move event,
         // otherwise we would read a stale one!
@@ -10430,8 +10194,6 @@ class App extends React.Component<AppProps, AppState> {
         originSnapOffset: null,
       }));
 
-      // just in case, tool changes mid drag, always clean up
-      this.lassoTrail.endPath();
       this.previousPointerMoveCoords = null;
 
       SnapCache.setReferenceSnapPoints(null);
@@ -11085,10 +10847,7 @@ class App extends React.Component<AppProps, AppState> {
         // if we're editing a line, pointerup shouldn't switch selection if
         // box selected
         (!this.state.selectedLinearElement?.isEditing ||
-          !pointerDownState.boxSelection.hasOccurred) &&
-        // hitElement can be set when alt + ctrl to toggle lasso and we will
-        // just respect the selected elements from lasso instead
-        this.state.activeTool.type !== "lasso"
+          !pointerDownState.boxSelection.hasOccurred)
       ) {
         // when inside line editor, shift selects points instead
         if (
@@ -11244,8 +11003,6 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        // do not clear selection if lasso is active
-        this.state.activeTool.type !== "lasso" &&
         // not elbow midpoint dragged
         !(hitElement && isElbowArrow(hitElement)) &&
         // not dragged
@@ -11368,10 +11125,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (
         !activeTool.locked &&
-        activeTool.type !== "freedraw" &&
-        (activeTool.type !== "lasso" ||
-          // if lasso is turned on but from selection => reset to selection
-          (activeTool.type === "lasso" && activeTool.fromSelection))
+        activeTool.type !== "freedraw"
       ) {
         resetCursor(this.interactiveCanvas);
         this.setState({

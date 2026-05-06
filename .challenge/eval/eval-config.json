@@ -1,0 +1,21 @@
+{
+  "challenge_id": "excalidraw-lasso-selection",
+  "mode": "guided",
+  "install_command": "yarn install --frozen-lockfile",
+  "visible_tests": [],
+  "hidden_tests": [],
+  "build_command": "yarn test:typecheck",
+  "test_command": "yarn vitest run packages/excalidraw/tests/lasso.test.tsx --run",
+  "full_test_command": "yarn test:app --run",
+  "challenge_branch": "challenge/excalidraw-lasso-selection",
+  "difficulty": "Hard",
+  "time_estimate": "2-4 hours",
+  "baseline_failures": 369,
+  "scoring": {
+    "correctness_weight": 35,
+    "quality_weight": 20,
+    "completeness_weight": 20,
+    "minimality_weight": 15,
+    "test_quality_weight": 10
+  }
+}

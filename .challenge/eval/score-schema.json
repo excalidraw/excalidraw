@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "properties": {
+    "automated_checks": {
+      "type": "object",
+      "properties": {
+        "build_passes": {"type": "boolean"},
+        "visible_tests_pass": {"type": "boolean"},
+        "hidden_tests_pass": {"type": "boolean"},
+        "no_regressions": {"type": "boolean"}
+      },
+      "required": ["build_passes", "visible_tests_pass", "no_regressions"]
+    },
+    "scores": {
+      "type": "object",
+      "properties": {
+        "correctness": {"type": "number", "minimum": 0, "maximum": 35},
+        "code_quality": {"type": "number", "minimum": 0, "maximum": 20},
+        "completeness": {"type": "number", "minimum": 0, "maximum": 20},
+        "minimality": {"type": "number", "minimum": 0, "maximum": 15},
+        "test_quality": {"type": "number", "minimum": 0, "maximum": 10},
+        "total": {"type": "number", "minimum": 0, "maximum": 100}
+      },
+      "required": ["correctness", "code_quality", "completeness", "minimality", "test_quality", "total"]
+    },
+    "comparison": {
+      "type": "object",
+      "properties": {
+        "approach_divergence": {"type": "string"},
+        "did_better": {"type": "array", "items": {"type": "string"}},
+        "missed": {"type": "array", "items": {"type": "string"}},
+        "ai_usage_signals": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "summary": {"type": "string"}
+  },
+  "required": ["automated_checks", "scores", "summary"]
+}

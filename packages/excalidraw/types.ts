@@ -142,7 +142,6 @@ export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
 export type ToolType =
   | "selection"
-  | "lasso"
   | "rectangle"
   | "diamond"
   | "ellipse"
@@ -347,7 +346,7 @@ export interface AppState {
     fromSelection: boolean;
   } & ActiveTool;
   preferredSelectionTool: {
-    type: "selection" | "lasso";
+    type: "selection";
     initialized: boolean;
   };
 
@@ -892,8 +891,6 @@ export type PointerDownState = Readonly<{
     // by default same as PointerDownState.origin. On alt-duplication, reset
     // to current pointer position at time of duplication.
     origin: { x: number; y: number };
-    // explicit flag for specific scenarios such as:
-    // - after lasso selection until the next pointer down
     blockDragging: boolean;
   };
   // We need to have these in the state so that we can unsubscribe them

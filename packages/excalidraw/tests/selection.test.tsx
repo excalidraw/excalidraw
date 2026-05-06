@@ -147,53 +147,6 @@ describe("box-selection", () => {
   });
 });
 
-describe("lasso reselection", () => {
-  beforeEach(async () => {
-    await render(<Excalidraw />);
-  });
-
-  it("should allow ctrl+alt lasso reselection when starting inside the active common bounds", () => {
-    const rectA = API.createElement({
-      type: "rectangle",
-      x: 0,
-      y: 0,
-      width: 100,
-      height: 100,
-      backgroundColor: "red",
-      fillStyle: "solid",
-    });
-    const rectB = API.createElement({
-      type: "rectangle",
-      x: 220,
-      y: 0,
-      width: 100,
-      height: 100,
-      backgroundColor: "blue",
-      fillStyle: "solid",
-    });
-
-    API.setElements([rectA, rectB]);
-    mouse.select([rectA, rectB]);
-    act(() => {
-      h.app.setActiveTool({ type: "lasso" });
-    });
-
-    Keyboard.withModifierKeys({ ctrl: true, alt: true }, () => {
-      mouse.downAt(110, 50);
-      mouse.moveTo(50, -20);
-
-      expect(h.app.lassoTrail.hasCurrentTrail).toBe(true);
-
-      mouse.moveTo(-20, 50);
-      mouse.moveTo(50, 120);
-      mouse.moveTo(110, 50);
-      mouse.up();
-    });
-
-    assertSelectedElements([rectA.id]);
-  });
-});
-
 describe("box-selection overlap mode", () => {
   const boxSelect = (
     startX: number,
