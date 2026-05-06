@@ -101,24 +101,29 @@ jobs:
                       "type": "object",
                       "properties": {
                         "correctness": {"type": "number", "minimum": 0, "maximum": 35},
+                        "correctness_details": {"type": "string", "description": "What works and what does not in the implementation logic, with specific examples"},
                         "code_quality": {"type": "number", "minimum": 0, "maximum": 20},
+                        "code_quality_details": {"type": "string", "description": "Code style, conventions, structure, readability assessment"},
                         "completeness": {"type": "number", "minimum": 0, "maximum": 20},
+                        "completeness_details": {"type": "string", "description": "Which requirements were met and missed, with specifics"},
                         "minimality": {"type": "number", "minimum": 0, "maximum": 15},
+                        "minimality_details": {"type": "string", "description": "Whether changes are focused or include unnecessary modifications"},
                         "test_quality": {"type": "number", "minimum": 0, "maximum": 10},
+                        "test_quality_details": {"type": "string", "description": "Test coverage, edge cases, and test design assessment"},
                         "total": {"type": "number", "minimum": 0, "maximum": 100}
                       },
-                      "required": ["correctness", "code_quality", "completeness", "minimality", "test_quality", "total"]
+                      "required": ["correctness", "correctness_details", "code_quality", "code_quality_details", "completeness", "completeness_details", "minimality", "minimality_details", "test_quality", "test_quality_details", "total"]
                     },
                     "comparison": {
                       "type": "object",
                       "properties": {
-                        "approach_divergence": {"type": "string"},
-                        "did_better": {"type": "array", "items": {"type": "string"}},
-                        "missed": {"type": "array", "items": {"type": "string"}},
-                        "ai_usage_signals": {"type": "array", "items": {"type": "string"}}
+                        "approach_divergence": {"type": "string", "description": "How the approach differs from the reference, with specific architectural choices"},
+                        "did_better": {"type": "array", "items": {"type": "string"}, "description": "Specific things done well"},
+                        "missed": {"type": "array", "items": {"type": "string"}, "description": "Specific features or edge cases missed"},
+                        "suggestions": {"type": "array", "items": {"type": "string"}, "description": "Actionable improvement suggestions with file/function references"}
                       }
                     },
-                    "summary": {"type": "string"}
+                    "summary": {"type": "string", "description": "2-4 sentence overall assessment covering strengths, weaknesses, and key takeaways"}
                   },
                   "required": ["scores", "comparison", "summary"]
                 }
@@ -126,7 +131,7 @@ jobs:
               "tool_choice": {"type": "tool", "name": "submit_score"},
               "messages": [{
                 "role": "user",
-                "content": ("You are the submission evaluator for a coding challenge workshop.\n\n## Challenge Spec\n" + $challenge + "\n\n## Scoring Rubric\n" + $rubric + "\n\n## Eval Config\n" + $eval_config + "\n\n## Automated Check Results (ground truth)\n- Typecheck: " + $typecheck + "\n- Lasso tests: " + $lasso + "\n- Regressions: " + $regressions + "\n\n## Golden Diff (reference — NOT scoring target)\n```\n" + $golden + "\n```\n\n## Participant Submission Diff\n```\n" + $submission + "\n```\n\nScore this submission. Automated checks are ground truth for build/test pass/fail. A different but correct approach should score well. The golden diff shows one valid approach for comparison.\n\nHard gates: If typecheck fails OR regressions exist, cap total at 30.\n\nCall submit_score with your evaluation.")
+                "content": ("You are an expert code reviewer evaluating a coding challenge submission. Provide DETAILED, SPECIFIC feedback.\n\n## Challenge Spec\n" + $challenge + "\n\n## Scoring Rubric\n" + $rubric + "\n\n## Eval Config\n" + $eval_config + "\n\n## Automated Check Results (ground truth)\n- Typecheck: " + $typecheck + "\n- Lasso tests: " + $lasso + "\n- Regressions: " + $regressions + "\n\n## Golden Diff (one valid reference approach)\n```\n" + $golden + "\n```\n\n## Participant Submission Diff\n```\n" + $submission + "\n```\n\nScore this submission with DETAILED per-dimension feedback. For each score:\n- Explain specifically what was done well\n- Explain specifically what is missing or incorrect\n- Reference specific files, functions, or code patterns\n- Give actionable suggestions\n\nA different but correct approach should score well. Hard gates: If typecheck fails OR regressions exist, cap total at 30.\n\nCall submit_score with your detailed evaluation.")
               }]
             }' > /tmp/api-request.json
 
@@ -182,7 +187,7 @@ jobs:
               const capped = (!typecheck || regressions) && s.total > 30;
               const finalTotal = capped ? Math.min(s.total, 30) : s.total;
 
-              body += `### AI Judge Scores\n\n`;
+              body += `### Scores\n\n`;
               body += `| Dimension | Score | Max |\n|-----------|-------|-----|\n`;
               body += `| Correctness | ${s.correctness} | 35 |\n`;
               body += `| Code Quality | ${s.code_quality} | 20 |\n`;
@@ -195,14 +200,35 @@ jobs:
                 body += `> ⚠️ Score capped at 30 due to ${!typecheck ? 'build failure' : 'regressions'}\n\n`;
               }
 
+              body += `### Detailed Feedback\n\n`;
+              if (s.correctness_details) body += `**Correctness (${s.correctness}/35):** ${s.correctness_details}\n\n`;
+              if (s.code_quality_details) body += `**Code Quality (${s.code_quality}/20):** ${s.code_quality_details}\n\n`;
+              if (s.completeness_details) body += `**Completeness (${s.completeness}/20):** ${s.completeness_details}\n\n`;
+              if (s.minimality_details) body += `**Minimality (${s.minimality}/15):** ${s.minimality_details}\n\n`;
+              if (s.test_quality_details) body += `**Test Quality (${s.test_quality}/10):** ${s.test_quality_details}\n\n`;
+
               if (aiScores.comparison) {
                 const c = aiScores.comparison;
+                body += `### Comparison & Suggestions\n\n`;
                 if (c.approach_divergence) body += `**Approach:** ${c.approach_divergence}\n\n`;
-                if (c.did_better && c.did_better.length) body += `**Did well:** ${c.did_better.join(', ')}\n\n`;
-                if (c.missed && c.missed.length) body += `**Could improve:** ${c.missed.join(', ')}\n\n`;
+                if (c.did_better && c.did_better.length) {
+                  body += `**What you did well:**\n`;
+                  c.did_better.forEach(item => { body += `- ${item}\n`; });
+                  body += `\n`;
+                }
+                if (c.missed && c.missed.length) {
+                  body += `**What to improve:**\n`;
+                  c.missed.forEach(item => { body += `- ${item}\n`; });
+                  body += `\n`;
+                }
+                if (c.suggestions && c.suggestions.length) {
+                  body += `**Actionable suggestions:**\n`;
+                  c.suggestions.forEach(item => { body += `- ${item}\n`; });
+                  body += `\n`;
+                }
               }
 
-              if (aiScores.summary) body += `**Summary:** ${aiScores.summary}\n\n`;
+              if (aiScores.summary) body += `### Summary\n\n${aiScores.summary}\n\n`;
             } else {
               body += `_AI grading unavailable — configure ANTHROPIC_API_KEY secret to enable._\n\n`;
             }
