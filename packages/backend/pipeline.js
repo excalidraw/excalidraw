@@ -7,8 +7,8 @@
  *
  * **Order of transforms** matches `index.js` `POST /terraform/upload`: load plan → state merge →
  * module nodes → module metadata → data-source filter → DOT edges → diffs → existing edges →
- * alarm refinement → data-flow edges → VPC facet capture (caller) → plumbing omit → orphans →
- * role-link cleanup → visual-ignore filter.
+ * generic structural refinement → redundant-edge pruning → externals → data-flow edges →
+ * VPC facet capture (caller) → plumbing omit → orphans → role-link cleanup → visual-ignore filter.
  */
 const { getTerraformNodePaths } = require("./vpc-networking-facet");
 const { isPlainObject } = require("./terraform-graph-utils");
@@ -701,6 +701,107 @@ function ensureEdgeLists(nodes) {
     node.edges_existing ||= [];
     node.edges_data_flow ||= [];
   }
+  return nodes;
+}
+
+/** Combined outgoing structural targets present in `nodes` (plan-backed graph vertices only). */
+function collectStructuralSuccessors(nodes, sourcePath) {
+  const node = nodes[sourcePath];
+  if (!node) {
+    return [];
+  }
+  const combined = new Set([
+    ...(node.edges_new || []),
+    ...(node.edges_existing || []),
+  ]);
+  return [...combined].filter((target) => nodes[target]);
+}
+
+/**
+ * True if `target` is reachable from `start` using structural edges only, without traversing
+ * the single hop `start` → `forbiddenTarget`.
+ */
+function reachableWithoutDirectEdge(nodes, adjacency, start, forbiddenTarget) {
+  if (start === forbiddenTarget) {
+    return false;
+  }
+  const visited = new Set([start]);
+  const queue = [start];
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    const successors = adjacency.get(current);
+    if (!successors) {
+      continue;
+    }
+    for (const nextVertex of successors) {
+      if (current === start && nextVertex === forbiddenTarget) {
+        continue;
+      }
+      if (nextVertex === forbiddenTarget) {
+        return true;
+      }
+      if (!visited.has(nextVertex)) {
+        visited.add(nextVertex);
+        queue.push(nextVertex);
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Drops redundant shortcut edges from `edges_new` / `edges_existing` when another path exists.
+ * Terraform DOT traversal through vars/outputs can link distant modules directly even though an
+ * intermediate resource/module chain already encodes the dependency — misleading on infra diagrams.
+ */
+function pruneRedundantStructuralEdges(nodes) {
+  const adjacency = new Map();
+
+  for (const nodePath of Object.keys(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
+    const successors = collectStructuralSuccessors(nodes, nodePath);
+    if (successors.length === 0) {
+      continue;
+    }
+    adjacency.set(nodePath, new Set(successors));
+  }
+
+  const pruneFromList = (list, sourcePath) => {
+    const raw = Array.isArray(list) ? list : [];
+    const seen = new Set();
+    const next = [];
+    for (const target of raw) {
+      if (seen.has(target)) {
+        continue;
+      }
+      seen.add(target);
+      if (!nodes[target]) {
+        next.push(target);
+        continue;
+      }
+      const redundant =
+        sourcePath !== target &&
+        reachableWithoutDirectEdge(nodes, adjacency, sourcePath, target);
+      if (!redundant) {
+        next.push(target);
+      }
+    }
+    return next;
+  };
+
+  for (const nodePath of Object.keys(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
+    const node = nodes[nodePath];
+    node.edges_new = pruneFromList(node.edges_new, nodePath);
+    node.edges_existing = pruneFromList(node.edges_existing, nodePath);
+  }
+
   return nodes;
 }
 
@@ -1682,6 +1783,7 @@ module.exports = {
   collectAllTerraformModulePaths,
   getModulePathChainFromAddress,
   ensureEdgeLists,
+  pruneRedundantStructuralEdges,
   buildDataFlowEdges,
   externalResources,
   deleteOrphanedNodes,
