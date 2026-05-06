@@ -10211,10 +10211,10 @@ class App extends React.Component<AppProps, AppState> {
 
           let linearElementEditor = this.state.selectedLinearElement;
 
-          const newLinearEditorNeeded =
+          if (
             !linearElementEditor ||
-            linearElementEditor.elementId !== newElement.id;
-          if (!linearElementEditor || newLinearEditorNeeded) {
+            linearElementEditor.elementId !== newElement.id
+          ) {
             linearElementEditor = new LinearElementEditor(
               newElement,
               this.scene.getNonDeletedElementsMap(),
@@ -10223,8 +10223,9 @@ class App extends React.Component<AppProps, AppState> {
 
           const lastClickedPointOutOfBounds =
             linearElementEditor &&
-            linearElementEditor.initialState.lastClickedPoint >= 0 &&
-            linearElementEditor.initialState.lastClickedPoint < points.length;
+            (linearElementEditor.initialState.lastClickedPoint < 0 ||
+              linearElementEditor.initialState.lastClickedPoint >=
+                points.length);
           if (lastClickedPointOutOfBounds) {
             console.warn(
               "Last clicked point is out of bounds. Attempting to fix it.",

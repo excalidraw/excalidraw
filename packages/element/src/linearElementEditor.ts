@@ -2141,8 +2141,7 @@ const pointDraggingUpdates = (
     selectedPointsIndices.map((pointIndex) => {
       // NOTE: Avoid stale point index issue potentially caused by elbow
       // arrows unpredictably changing the number of points during dragging
-      const point =
-        element.points[pointIndex] ?? element.points[element.points.length - 1];
+      const point = element.points[pointIndex] ?? element.points.at(-1);
       return [
         pointIndex,
         {
