@@ -5,13 +5,14 @@ on:
     branches: [challenge/excalidraw-lasso-selection]
 
 jobs:
-  automated-checks:
+  evaluate:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -21,6 +22,7 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      # --- Phase 1: Automated Checks ---
       - name: Typecheck
         id: typecheck
         run: yarn test:typecheck
@@ -32,12 +34,12 @@ jobs:
           if [ -f "packages/excalidraw/tests/lasso.test.tsx" ]; then
             yarn vitest run packages/excalidraw/tests/lasso.test.tsx --run 2>&1 | tee /tmp/lasso-results.txt
           else
-            echo "No lasso test file found — participant needs to create packages/excalidraw/tests/lasso.test.tsx"
+            echo "No lasso test file found"
             exit 1
           fi
         continue-on-error: true
 
-      - name: Check for regressions (full test suite)
+      - name: Check for regressions
         id: regressions
         run: |
           yarn test:app --run 2>&1 | tee /tmp/full-results.txt || true
@@ -50,27 +52,162 @@ jobs:
           fi
         continue-on-error: true
 
-      - name: Post results comment
+      # --- Phase 2: AI Grading ---
+      - name: Extract submission diff
+        run: |
+          git diff origin/challenge/excalidraw-lasso-selection...${{ github.event.pull_request.head.sha }} > /tmp/submission.patch
+          echo "Submission diff: $(wc -l < /tmp/submission.patch) lines"
+
+      - name: Grade with Claude AI
+        id: ai-grade
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "No ANTHROPIC_API_KEY secret configured — skipping AI grading"
+            echo '{}' > /tmp/ai-scores.json
+            exit 0
+          fi
+
+          CHALLENGE=$(cat .challenge/CHALLENGE.md)
+          RUBRIC=$(cat .challenge/eval/rubric.md)
+          EVAL_CONFIG=$(cat .challenge/eval/eval-config.json)
+          GOLDEN_DIFF=$(head -1000 .challenge/eval/golden-diff.patch)
+          SUBMISSION=$(cat /tmp/submission.patch)
+
+          TYPECHECK_RESULT="${{ steps.typecheck.outcome }}"
+          LASSO_RESULT="${{ steps.lasso-tests.outcome }}"
+          REGRESSIONS="${{ steps.regressions.outputs.regressions }}"
+
+          jq -n \
+            --arg challenge "$CHALLENGE" \
+            --arg rubric "$RUBRIC" \
+            --arg eval_config "$EVAL_CONFIG" \
+            --arg golden "$GOLDEN_DIFF" \
+            --arg submission "$SUBMISSION" \
+            --arg typecheck "$TYPECHECK_RESULT" \
+            --arg lasso "$LASSO_RESULT" \
+            --arg regressions "$REGRESSIONS" \
+            '{
+              "model": "claude-sonnet-4-20250514",
+              "max_tokens": 4096,
+              "tools": [{
+                "name": "submit_score",
+                "description": "Submit the evaluation score for a challenge submission",
+                "input_schema": {
+                  "type": "object",
+                  "properties": {
+                    "scores": {
+                      "type": "object",
+                      "properties": {
+                        "correctness": {"type": "number", "minimum": 0, "maximum": 35},
+                        "code_quality": {"type": "number", "minimum": 0, "maximum": 20},
+                        "completeness": {"type": "number", "minimum": 0, "maximum": 20},
+                        "minimality": {"type": "number", "minimum": 0, "maximum": 15},
+                        "test_quality": {"type": "number", "minimum": 0, "maximum": 10},
+                        "total": {"type": "number", "minimum": 0, "maximum": 100}
+                      },
+                      "required": ["correctness", "code_quality", "completeness", "minimality", "test_quality", "total"]
+                    },
+                    "comparison": {
+                      "type": "object",
+                      "properties": {
+                        "approach_divergence": {"type": "string"},
+                        "did_better": {"type": "array", "items": {"type": "string"}},
+                        "missed": {"type": "array", "items": {"type": "string"}},
+                        "ai_usage_signals": {"type": "array", "items": {"type": "string"}}
+                      }
+                    },
+                    "summary": {"type": "string"}
+                  },
+                  "required": ["scores", "comparison", "summary"]
+                }
+              }],
+              "tool_choice": {"type": "tool", "name": "submit_score"},
+              "messages": [{
+                "role": "user",
+                "content": ("You are the submission evaluator for a coding challenge workshop.\n\n## Challenge Spec\n" + $challenge + "\n\n## Scoring Rubric\n" + $rubric + "\n\n## Eval Config\n" + $eval_config + "\n\n## Automated Check Results (ground truth)\n- Typecheck: " + $typecheck + "\n- Lasso tests: " + $lasso + "\n- Regressions: " + $regressions + "\n\n## Golden Diff (reference — NOT scoring target)\n```\n" + $golden + "\n```\n\n## Participant Submission Diff\n```\n" + $submission + "\n```\n\nScore this submission. Automated checks are ground truth for build/test pass/fail. A different but correct approach should score well. The golden diff shows one valid approach for comparison.\n\nHard gates: If typecheck fails OR regressions exist, cap total at 30.\n\nCall submit_score with your evaluation.")
+              }]
+            }' > /tmp/api-request.json
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -X POST https://api.anthropic.com/v1/messages \
+            -H "x-api-key: $ANTHROPIC_API_KEY" \
+            -H "content-type: application/json" \
+            -H "anthropic-version: 2023-06-01" \
+            -d @/tmp/api-request.json)
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "API error: HTTP $HTTP_CODE"
+            echo "$BODY" | jq . 2>/dev/null || echo "$BODY"
+            echo '{}' > /tmp/ai-scores.json
+            exit 0
+          fi
+
+          echo "$BODY" | jq '.content[] | select(.type == "tool_use") | .input' > /tmp/ai-scores.json
+          cat /tmp/ai-scores.json
+        continue-on-error: true
+
+      # --- Phase 3: Post Comment ---
+      - name: Post evaluation comment
         if: always()
         uses: actions/github-script@v7
         with:
           script: |
+            const fs = require('fs');
             const typecheck = '${{ steps.typecheck.outcome }}' === 'success';
             const lassoTests = '${{ steps.lasso-tests.outcome }}' === 'success';
             const regressions = '${{ steps.regressions.outputs.regressions }}' === 'true';
             const failures = '${{ steps.regressions.outputs.failures }}' || '0';
 
+            let aiScores = null;
+            try {
+              const raw = fs.readFileSync('/tmp/ai-scores.json', 'utf8');
+              aiScores = JSON.parse(raw);
+            } catch (e) {}
+
             let body = `## Challenge Evaluation Results\n\n`;
+            body += `### Automated Checks\n\n`;
             body += `| Check | Result |\n|-------|--------|\n`;
             body += `| Typecheck | ${typecheck ? '✅ Pass' : '❌ Fail'} |\n`;
             body += `| Lasso Tests | ${lassoTests ? '✅ Pass' : '❌ Fail'} |\n`;
-            body += `| Regressions | ${regressions ? '❌ New failures detected' : '✅ No regressions'} |\n`;
+            body += `| Regressions | ${regressions ? '❌ New failures' : '✅ None'} |\n`;
             body += `| Full Suite Failures | ${failures} (baseline: 369) |\n\n`;
 
-            if (!typecheck) body += `> ⚠️ **Build failure** — score capped at 30/100\n\n`;
-            if (regressions) body += `> ⚠️ **Regressions detected** — score capped at 30/100\n\n`;
+            if (aiScores && aiScores.scores) {
+              const s = aiScores.scores;
+              const capped = (!typecheck || regressions) && s.total > 30;
+              const finalTotal = capped ? Math.min(s.total, 30) : s.total;
 
-            body += `_Automated checks only. Final scoring (code quality, completeness, minimality) will be done by the organizer._`;
+              body += `### AI Judge Scores\n\n`;
+              body += `| Dimension | Score | Max |\n|-----------|-------|-----|\n`;
+              body += `| Correctness | ${s.correctness} | 35 |\n`;
+              body += `| Code Quality | ${s.code_quality} | 20 |\n`;
+              body += `| Completeness | ${s.completeness} | 20 |\n`;
+              body += `| Minimality | ${s.minimality} | 15 |\n`;
+              body += `| Test Quality | ${s.test_quality} | 10 |\n`;
+              body += `| **Total** | **${finalTotal}** | **100** |\n\n`;
+
+              if (capped) {
+                body += `> ⚠️ Score capped at 30 due to ${!typecheck ? 'build failure' : 'regressions'}\n\n`;
+              }
+
+              if (aiScores.comparison) {
+                const c = aiScores.comparison;
+                if (c.approach_divergence) body += `**Approach:** ${c.approach_divergence}\n\n`;
+                if (c.did_better && c.did_better.length) body += `**Did well:** ${c.did_better.join(', ')}\n\n`;
+                if (c.missed && c.missed.length) body += `**Could improve:** ${c.missed.join(', ')}\n\n`;
+              }
+
+              if (aiScores.summary) body += `**Summary:** ${aiScores.summary}\n\n`;
+            } else {
+              body += `_AI grading unavailable — configure ANTHROPIC_API_KEY secret to enable._\n\n`;
+            }
+
+            body += `---\n_Evaluated by Challenge Framework_`;
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
