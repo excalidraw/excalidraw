@@ -969,49 +969,114 @@ function resolveCloudWatchAlarmWatchTargets(nodePath, node, index, nodes) {
   return [...targets];
 }
 
+/** Resolves references against all indexed resource types. */
+function resolveNodeRefsAcrossAllResourceTypes(value, index, nodes) {
+  return resolveNodeRefs(value, index, nodes, [...index.byType.keys()]);
+}
+
 /**
- * Replaces DOT/state dependency fan-out for metric alarms with edges to the owning
- * module (when the watched resource lives in a module) or the root resource.
- * Runs after plan + state edges exist.
+ * Generic resolver: derive structural targets by resolving references found in
+ * resource values, then include owning module nodes for those targets.
  */
-function refineCloudWatchMetricAlarmEdges(nodes) {
-  const index = buildDataFlowIndex(nodes);
+function createGenericResourceReferenceResolver() {
+  return {
+    id: "generic-resource-references",
+    match() {
+      return true;
+    },
+    resolve(_nodePath, node, context) {
+      const targets = new Set();
+
+      for (const resource of Object.values(node.resources || {})) {
+        const values = getResourceValues(resource);
+        for (const resourcePath of resolveNodeRefsAcrossAllResourceTypes(
+          values,
+          context.index,
+          context.nodes,
+        )) {
+          if (context.nodes[resourcePath]) {
+            targets.add(resourcePath);
+          }
+          const modulePath = getTerraformOwningModulePath(resourcePath);
+          if (modulePath && context.nodes[modulePath]) {
+            targets.add(modulePath);
+          }
+        }
+      }
+
+      if (targets.size === 0) {
+        return { policy: "ignore", targets: [] };
+      }
+
+      return { policy: "replace", targets: [...targets] };
+    },
+  };
+}
+
+/**
+ * Applies resolver rules to structural edges. Resolvers run in order; first matching
+ * actionable rule (`replace` / `augment`) wins for each node.
+ */
+function refineEdgesWithResolvers(nodes, resolvers = []) {
+  const context = {
+    nodes,
+    index: buildDataFlowIndex(nodes),
+  };
 
   for (const [nodePath, node] of Object.entries(nodes)) {
-    if (getResourceType(nodePath, node) !== "aws_cloudwatch_metric_alarm") {
+    if (nodePath.startsWith("__")) {
       continue;
     }
 
-    const watchedResources = resolveCloudWatchAlarmWatchTargets(
-      nodePath,
-      node,
-      index,
-      nodes,
-    );
-    if (watchedResources.length === 0) {
-      continue;
-    }
+    for (const resolver of resolvers) {
+      if (!resolver?.match?.(nodePath, node, context)) {
+        continue;
+      }
+      const outcome = resolver.resolve(nodePath, node, context) || {};
+      const policy = outcome.policy || "ignore";
+      const targets = [...new Set(outcome.targets || [])].filter(
+        (target) => target && nodes[target] && target !== nodePath,
+      );
 
-    const targets = new Set();
-    for (const resourcePath of watchedResources) {
-      const modulePath = getTerraformOwningModulePath(resourcePath);
-      if (modulePath && nodes[modulePath]) {
-        targets.add(modulePath);
-      } else if (nodes[resourcePath]) {
-        targets.add(resourcePath);
+      if (policy === "replace") {
+        if (targets.length > 0) {
+          node.edges_new = targets;
+          node.edges_existing = targets;
+        }
+        break;
+      }
+
+      if (policy === "augment") {
+        if (targets.length > 0) {
+          node.edges_new = [...new Set([...(node.edges_new || []), ...targets])];
+          node.edges_existing = [...new Set([...(node.edges_existing || []), ...targets])];
+        }
+        break;
       }
     }
-
-    if (targets.size === 0) {
-      continue;
-    }
-
-    const list = [...targets];
-    node.edges_new = list;
-    node.edges_existing = list;
   }
 
   return nodes;
+}
+
+/**
+ * Generic structural edge refinement via resolver rules.
+ * Accepts optional custom resolvers prepended before defaults.
+ */
+function refineCloudWatchMetricAlarmEdges(nodes, options = {}) {
+  const customResolvers = Array.isArray(options.customResolvers)
+    ? options.customResolvers
+    : [];
+  const disabled = new Set(options.disabledDefaultResolverIds || []);
+  const defaultResolvers = [createGenericResourceReferenceResolver()].filter(
+    (resolver) => !disabled.has(resolver.id),
+  );
+  return refineEdgesWithResolvers(nodes, [...customResolvers, ...defaultResolvers]);
+}
+
+/** Generic structural edge detection/refinement across all resource types. */
+function detectGenericStructuralEdges(nodes, options = {}) {
+  return refineCloudWatchMetricAlarmEdges(nodes, options);
 }
 
 /** Maps an IAM policy Resource ARN/string to data-flow target nodes (S3, SQS, etc.) using ARN index heuristics. */
@@ -1553,6 +1618,7 @@ module.exports = {
   omitVpcPlumbingNodes,
   filterVisualIgnore,
   cleanUpRoleLinks,
+  detectGenericStructuralEdges,
   refineCloudWatchMetricAlarmEdges,
   getTerraformOwningModulePath,
   DATA_SOURCE_GRAPH_ALLOWLIST,

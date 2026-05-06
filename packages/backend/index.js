@@ -27,7 +27,7 @@ const {
   omitVpcPlumbingNodes,
   filterVisualIgnore,
   cleanUpRoleLinks,
-  refineCloudWatchMetricAlarmEdges,
+  detectGenericStructuralEdges,
 } = require("./pipeline");
 const { extractVpcNetworkingFacetStore } = require("./vpc-networking-facet");
 const { mockLanggraphEnrichment, applyEnrichment } = require("./enrichment");
@@ -84,7 +84,7 @@ app.post(
 
       // Graph transforms (see pipeline.js module banner for semantics):
       // loadPlan → mergeState → moduleNodes → moduleMeta → filterDataSources → dotEdges →
-      // diffs → existingEdges → filterDataSources → alarmEdges → edgeLists → externals →
+      // diffs → existingEdges → filterDataSources → genericEdges → edgeLists → externals →
       // edgeLists → dataFlow → edgeLists → facetStore → omitVpcPlumbing → orphans →
       // roleCleanup → visualIgnore → orphans → enrichment → persist.
       let nodes = loadPlanAndNodes(plan);
@@ -97,7 +97,7 @@ app.post(
       nodes = computeResourceDiffs(nodes);
       nodes = buildExistingEdges(nodes, plan);
       nodes = omitNonAllowlistedDataSourceNodes(nodes);
-      nodes = refineCloudWatchMetricAlarmEdges(nodes);
+      nodes = detectGenericStructuralEdges(nodes);
       nodes = ensureEdgeLists(nodes);
       nodes = externalResources(nodes);
       nodes = ensureEdgeLists(nodes);
