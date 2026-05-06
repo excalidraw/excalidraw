@@ -20,6 +20,8 @@ const {
   mergeTerraformState,
   ensureTerraformModuleNodes,
   omitNonAllowlistedDataSourceNodes,
+  omitStateOnlyDataSourceNodes,
+  omitGhostIamPolicyDocumentNodes,
   ensureEdgeLists,
   buildDataFlowEdges,
   externalResources,
@@ -97,12 +99,14 @@ app.post(
       nodes = computeResourceDiffs(nodes);
       nodes = buildExistingEdges(nodes, plan);
       nodes = omitNonAllowlistedDataSourceNodes(nodes);
+      nodes = omitStateOnlyDataSourceNodes(nodes);
       nodes = detectGenericStructuralEdges(nodes);
       nodes = ensureEdgeLists(nodes);
       nodes = externalResources(nodes);
       nodes = ensureEdgeLists(nodes);
       nodes = buildDataFlowEdges(nodes);
       nodes = ensureEdgeLists(nodes);
+      nodes = omitGhostIamPolicyDocumentNodes(nodes);
       // Facets must capture routing plumbing before those nodes are removed.
       nodes.__networkingFacetStore = extractVpcNetworkingFacetStore(nodes);
       nodes = omitVpcPlumbingNodes(nodes);

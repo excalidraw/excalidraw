@@ -48,6 +48,7 @@ meta*.json
 packages/backend/terraform/allplan-kms-interesting-edges.json
 packages/backend/terraform/allplan-kms-nodes-stage-snapshots.json
 packages/backend/terraform/allplan-s3kms-debug.json
+packages/backend/terraform/allplan-policydoc-debug.json
 packages/backend/terraform/allplan-s3kms-policy-trace.json
 packages/backend/terraform/allplan-s3kms-stage-snapshots.json
 packages/backend/terraform/allplan-s3kms-withstate-stage-snapshots.json
