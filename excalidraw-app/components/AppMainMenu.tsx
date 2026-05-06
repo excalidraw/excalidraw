@@ -30,6 +30,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.Export />
       <MainMenu.DefaultItems.SaveAsImage />
       <MainMenu.DefaultItems.ImportTerraform />
+      <MainMenu.DefaultItems.PerformanceMonitorToggle />
       <MainMenu.DefaultItems.TerraformExpandAll />
       <MainMenu.DefaultItems.TerraformCollapseAll />
       <MainMenu.DefaultItems.TerraformLayers />

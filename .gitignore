@@ -42,6 +42,7 @@ meta*.json
 **/terraform/.terraform.lock.hcl
 **/terraform/.terraform/
 **/terraform/builds/
-**/terraform/*plan*
-**/terraform/*.dot
+!packages/backend/terraform/allplan
+!packages/backend/terraform/allplan.json
+!packages/backend/terraform/allplan.dot
 **/terraform/.pluralith/
