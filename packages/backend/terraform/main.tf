@@ -180,6 +180,7 @@ module "lambda-writer" {
   environment_variables = {
     DATA_BUCKET    = module.data_bucket.s3_bucket_id
     DATA_QUEUE_URL = module.data_queue.queue_url
+    TEST1 = "test2"
   }
 
   attach_policy_statements = true
@@ -205,6 +206,30 @@ module "lambda-writer" {
       ]
       resources = ["*"]
     }
+  }
+}
+
+# --- Lambda: monitoring (mock/no-op) ---
+
+module "lambda-monitoring" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "8.7.0"
+
+  function_name = "test-monitoring"
+  lambda_role   = "test-monitoring"
+  handler       = "main.monitoring_handler"
+  runtime       = "python3.12"
+
+  create_package = false
+  s3_existing_package = {
+    bucket = aws_s3_bucket.lambda_artifacts.id
+    key    = aws_s3_object.lambda_zip.key
+  }
+
+  tracing_mode = "Active"
+
+  environment_variables = {
+    MOCK_MONITORING = "true"
   }
 }
 

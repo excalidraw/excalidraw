@@ -188,6 +188,27 @@ export const ImportTerraform = () => {
 };
 ImportTerraform.displayName = "ImportTerraform";
 
+export const PerformanceMonitorToggle = () => {
+  const setAppState = useExcalidrawSetAppState();
+  const appState = useUIAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.performanceMonitorEnabled}
+      onSelect={(event) => {
+        setAppState({
+          performanceMonitorEnabled: !appState.performanceMonitorEnabled,
+        });
+        event.preventDefault();
+      }}
+      shortcut={getShortcutFromShortcutName("performanceMonitor")}
+      data-testid="performance-monitor-toggle"
+    >
+      Performance monitor
+    </DropdownMenuItemCheckbox>
+  );
+};
+PerformanceMonitorToggle.displayName = "PerformanceMonitorToggle";
+
 const hasTerraformResourceNodes = (elements: ReadonlyArray<{ customData?: any }>) =>
   elements.some(
     (el) => el.customData?.terraformVisibilityRole === "resource",

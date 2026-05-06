@@ -1490,6 +1490,44 @@ const renderCropHandles = (
   context.restore();
 };
 
+const renderPerformanceMetricsOverlay = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  renderConfig: InteractiveCanvasRenderConfig,
+) => {
+  const metrics = renderConfig.performanceMetrics;
+  if (!appState.performanceMonitorEnabled || !metrics) {
+    return;
+  }
+
+  const rows = [
+    `FPS: ${metrics.fps.toFixed(1)}`,
+    `Frame avg: ${metrics.averageFrameMs.toFixed(2)} ms`,
+    `Frame p95: ${metrics.p95FrameMs.toFixed(2)} ms`,
+    `Interactive: ${metrics.interactiveRenderMs.toFixed(2)} ms`,
+    `Visible: ${metrics.visibleElements}`,
+    `Frames: ${metrics.visibleFrames}`,
+  ];
+
+  const padding = 8;
+  const rowHeight = 16;
+  const width = 210;
+  const height = padding * 2 + rows.length * rowHeight;
+  const x = appState.width - width - 16;
+  const y = 16;
+
+  context.save();
+  context.fillStyle =
+    appState.theme === THEME.DARK ? "rgba(24, 24, 27, 0.9)" : "rgba(0, 0, 0, 0.75)";
+  context.fillRect(x, y, width, height);
+  context.fillStyle = "rgba(255, 255, 255, 0.96)";
+  context.font = "12px monospace";
+  rows.forEach((row, index) => {
+    context.fillText(row, x + padding, y + padding + rowHeight * (index + 1) - 4);
+  });
+  context.restore();
+};
+
 const renderTextBox = (
   text: NonDeleted<ExcalidrawTextElement>,
   context: CanvasRenderingContext2D,
@@ -2066,6 +2104,8 @@ const _renderInteractiveScene = ({
     });
     context.restore();
   }
+
+  renderPerformanceMetricsOverlay(context, appState, renderConfig);
 
   return {
     scrollBars,
