@@ -10210,31 +10210,37 @@ class App extends React.Component<AppProps, AppState> {
           );
 
           let linearElementEditor = this.state.selectedLinearElement;
+
           const newLinearEditorNeeded =
             !linearElementEditor ||
             linearElementEditor.elementId !== newElement.id;
-          const lastClickedPointOutOfBounds =
-            linearElementEditor &&
-            linearElementEditor.initialState.lastClickedPoint < 0 &&
-            linearElementEditor.initialState.lastClickedPoint >= points.length;
-          if (
-            !linearElementEditor ||
-            newLinearEditorNeeded ||
-            lastClickedPointOutOfBounds
-          ) {
+          if (!linearElementEditor || newLinearEditorNeeded) {
             linearElementEditor = new LinearElementEditor(
               newElement,
               this.scene.getNonDeletedElementsMap(),
             );
+          }
+
+          const lastClickedPointOutOfBounds =
+            linearElementEditor &&
+            linearElementEditor.initialState.lastClickedPoint >= 0 &&
+            linearElementEditor.initialState.lastClickedPoint < points.length;
+          if (lastClickedPointOutOfBounds) {
+            console.warn(
+              "Last clicked point is out of bounds. Attempting to fix it.",
+            );
             linearElementEditor = {
               ...linearElementEditor,
-              selectedPointsIndices: [1],
+              selectedPointsIndices: [points.length - 1],
               initialState: {
                 ...linearElementEditor.initialState,
-                lastClickedPoint: 1,
+                prevSelectedPointsIndices: null,
+                lastClickedPoint: points.length - 1,
               },
+              hoverPointIndex: points.length - 1,
             };
           }
+
           this.setState({
             newElement,
             ...LinearElementEditor.handlePointDragging(
