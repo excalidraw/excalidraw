@@ -1008,6 +1008,80 @@ function applyModulePresets(
   return positions;
 }
 
+/** Pipeline-injected module call vertex (`terraform_module` resource at the module address). */
+function isSyntheticTerraformModuleHub(nodePath, node) {
+  const primary = Object.values(node?.resources || {}).find((r) => r?.type);
+  return (
+    primary?.type === "terraform_module" &&
+    primary?.address === nodePath
+  );
+}
+
+/**
+ * After force layout / collapse / optional presets, synthetic `terraform_module` hubs can still
+ * sit at stale grid coordinates while descendants moved — place each hub just above the bbox of
+ * all strict descendant nodes (deepest module paths first so nested hubs are stable).
+ */
+function pinSyntheticTerraformModuleHubs(
+  positions,
+  nodeKeys,
+  nodes,
+  tierMap,
+  tierConfigs,
+) {
+  const hubs = nodeKeys.filter(
+    (path) => nodes[path] && isSyntheticTerraformModuleHub(path, nodes[path]),
+  );
+  hubs.sort((a, b) => b.length - a.length);
+
+  const prefix = (base) => `${base}.`;
+
+  for (const hubPath of hubs) {
+    const px = prefix(hubPath);
+    const descendants = nodeKeys.filter(
+      (path) => path !== hubPath && path.startsWith(px),
+    );
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    for (const path of descendants) {
+      const pos = positions[path];
+      const cfg = tierConfigs[tierMap[path]];
+      if (
+        !pos ||
+        typeof pos.x !== "number" ||
+        typeof pos.y !== "number" ||
+        !cfg
+      ) {
+        continue;
+      }
+      minX = Math.min(minX, pos.x);
+      minY = Math.min(minY, pos.y);
+      maxX = Math.max(maxX, pos.x + cfg.w);
+      maxY = Math.max(maxY, pos.y + cfg.h);
+    }
+
+    if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+      continue;
+    }
+
+    const hubCfg = tierConfigs[tierMap[hubPath]];
+    if (!hubCfg) {
+      continue;
+    }
+
+    const gap = 28;
+    positions[hubPath] = {
+      x: (minX + maxX) / 2 - hubCfg.w / 2,
+      y: minY - gap - hubCfg.h,
+    };
+  }
+
+  return positions;
+}
+
 /** Builds module group records (label, depth, source, member node paths) sorted shallow-first. */
 function collectModuleGroups(nodeKeys, nodes = {}) {
   const groups = new Map();
@@ -1845,6 +1919,7 @@ module.exports = {
   isLambdaModuleSource,
   isLikelyLambdaModule,
   applyModulePresets,
+  pinSyntheticTerraformModuleHubs,
   collectModuleGroups,
   parseAwsArn,
   normalizeRegion,

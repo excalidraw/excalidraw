@@ -25,6 +25,7 @@ const {
   buildTierMap,
   buildTierConfigs,
   applyModulePresets,
+  pinSyntheticTerraformModuleHubs,
   getResourceType,
   isPrimaryVisibleResourceType,
   getVisibilityCustomData,
@@ -188,6 +189,13 @@ async function nodesToExcalidraw(nodes) {
       positions[path] = { x: 120, y: 120 };
     }
   }
+  pinSyntheticTerraformModuleHubs(
+    positions,
+    nodeKeys,
+    nodes,
+    tierMap,
+    tierConfigs,
+  );
   const posMap = {};
   const nodeRectById = new Map();
 
