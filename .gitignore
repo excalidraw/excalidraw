@@ -42,9 +42,17 @@ meta*.json
 **/terraform/.terraform.lock.hcl
 **/terraform/.terraform/
 **/terraform/builds/
-!packages/backend/terraform/allplan
 !packages/backend/terraform/allplan.json
 !packages/backend/terraform/allplan.dot
+# Binary `terraform plan -out=…` / OpenTofu plan zips (keep JSON/DOT text fixtures).
+packages/backend/terraform/tfplan
+packages/backend/terraform/testplan
+packages/backend/terraform/addplan
+packages/backend/terraform/addplan2
+packages/backend/terraform/delplan
+packages/backend/terraform/newplan
+packages/backend/terraform/newplan2
+packages/backend/terraform/allplan
 packages/backend/terraform/allplan-kms-interesting-edges.json
 packages/backend/terraform/allplan-kms-nodes-stage-snapshots.json
 packages/backend/terraform/allplan-s3kms-debug.json
