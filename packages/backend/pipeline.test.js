@@ -324,7 +324,7 @@ describe("terraform module graph nodes", () => {
     ]);
   });
 
-  it("refineCloudWatchMetricAlarmEdges collapses DOT+state fan-out to the owning module", () => {
+  it("refineCloudWatchMetricAlarmEdges replaces fan-out with resolved references and owning modules", () => {
     let nodes = ensureEdgeLists({
       "aws_cloudwatch_metric_alarm.lambda_errors": {
         resources: {
@@ -379,12 +379,202 @@ describe("terraform module graph nodes", () => {
     nodes = ensureTerraformModuleNodes(nodes);
     refineCloudWatchMetricAlarmEdges(nodes);
 
+    expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new.sort()).toEqual([
+      "module.lambda-writer.aws_lambda_function.main",
+      "module.lambda-writer",
+    ].sort());
+    expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_existing.sort()).toEqual([
+      "module.lambda-writer.aws_lambda_function.main",
+      "module.lambda-writer",
+    ].sort());
+  });
+
+  it("supports custom resolvers overriding defaults", () => {
+    let nodes = ensureEdgeLists({
+      "aws_cloudwatch_metric_alarm.lambda_errors": {
+        resources: {
+          "aws_cloudwatch_metric_alarm.lambda_errors": {
+            type: "aws_cloudwatch_metric_alarm",
+            address: "aws_cloudwatch_metric_alarm.lambda_errors",
+            change: {
+              actions: ["create"],
+              after: {
+                namespace: "AWS/Lambda",
+                dimensions: { FunctionName: "test-writer" },
+              },
+            },
+          },
+        },
+        edges_new: ["aws_vpc.lambda"],
+        edges_existing: ["aws_kms_key.s3"],
+      },
+      "module.lambda-writer.aws_lambda_function.main": {
+        resources: {
+          "module.lambda-writer.aws_lambda_function.main": {
+            type: "aws_lambda_function",
+            address: "module.lambda-writer.aws_lambda_function.main",
+            change: { after: { function_name: "test-writer" } },
+          },
+        },
+      },
+      "module.lambda-writer": {
+        resources: {
+          "module.lambda-writer": {
+            type: "terraform_module",
+            address: "module.lambda-writer",
+            change: { actions: ["no-op"] },
+          },
+        },
+      },
+    });
+
+    nodes = ensureTerraformModuleNodes(nodes);
+    refineCloudWatchMetricAlarmEdges(nodes, {
+      customResolvers: [
+        {
+          id: "test-override",
+          match(nodePath) {
+            return nodePath === "aws_cloudwatch_metric_alarm.lambda_errors";
+          },
+          resolve() {
+            return {
+              policy: "replace",
+              targets: ["module.lambda-writer"],
+            };
+          },
+        },
+      ],
+    });
+
     expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new).toEqual([
       "module.lambda-writer",
     ]);
     expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_existing).toEqual([
       "module.lambda-writer",
     ]);
+  });
+
+  it("refines non-alarm resources generically from value references", () => {
+    let nodes = ensureEdgeLists({
+      "aws_lambda_permission.allow_s3": {
+        resources: {
+          "aws_lambda_permission.allow_s3": {
+            type: "aws_lambda_permission",
+            address: "aws_lambda_permission.allow_s3",
+            change: {
+              actions: ["create"],
+              after: {
+                function_name: "processor",
+                source_arn: "arn:aws:s3:::assets",
+              },
+            },
+          },
+        },
+        edges_new: ["aws_kms_key.noisy"],
+        edges_existing: ["aws_iam_policy.noisy"],
+      },
+      "module.lambda.aws_lambda_function.processor": {
+        resources: {
+          "module.lambda.aws_lambda_function.processor": {
+            type: "aws_lambda_function",
+            address: "module.lambda.aws_lambda_function.processor",
+            change: { after: { function_name: "processor" } },
+          },
+        },
+      },
+      "module.lambda": {
+        resources: {
+          "module.lambda": {
+            type: "terraform_module",
+            address: "module.lambda",
+            change: { actions: ["no-op"] },
+          },
+        },
+      },
+      "aws_s3_bucket.assets": {
+        resources: {
+          "aws_s3_bucket.assets": {
+            type: "aws_s3_bucket",
+            address: "aws_s3_bucket.assets",
+            change: { after: { arn: "arn:aws:s3:::assets", bucket: "assets" } },
+          },
+        },
+      },
+    });
+
+    nodes = ensureTerraformModuleNodes(nodes);
+    refineCloudWatchMetricAlarmEdges(nodes);
+
+    expect(nodes["aws_lambda_permission.allow_s3"].edges_new.sort()).toEqual([
+      "module.lambda.aws_lambda_function.processor",
+      "module.lambda",
+      "aws_s3_bucket.assets",
+    ].sort());
+    expect(nodes["aws_lambda_permission.allow_s3"].edges_existing.sort()).toEqual([
+      "module.lambda.aws_lambda_function.processor",
+      "module.lambda",
+      "aws_s3_bucket.assets",
+    ].sort());
+  });
+
+  it("uses key-aware matching so FunctionName does not resolve to IAM role names", () => {
+    let nodes = ensureEdgeLists({
+      "aws_cloudwatch_metric_alarm.lambda_errors": {
+        resources: {
+          "aws_cloudwatch_metric_alarm.lambda_errors": {
+            type: "aws_cloudwatch_metric_alarm",
+            address: "aws_cloudwatch_metric_alarm.lambda_errors",
+            change: {
+              actions: ["create"],
+              after: {
+                namespace: "AWS/Lambda",
+                dimensions: { FunctionName: "test-writer" },
+              },
+            },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+      },
+      "module.lambda-writer.aws_lambda_function.main": {
+        resources: {
+          "module.lambda-writer.aws_lambda_function.main": {
+            type: "aws_lambda_function",
+            address: "module.lambda-writer.aws_lambda_function.main",
+            change: { after: { function_name: "test-writer" } },
+          },
+        },
+      },
+      "module.lambda-writer.aws_iam_role.lambda": {
+        resources: {
+          "module.lambda-writer.aws_iam_role.lambda": {
+            type: "aws_iam_role",
+            address: "module.lambda-writer.aws_iam_role.lambda",
+            change: { after: { name: "test-writer" } },
+          },
+        },
+      },
+      "module.lambda-writer": {
+        resources: {
+          "module.lambda-writer": {
+            type: "terraform_module",
+            address: "module.lambda-writer",
+            change: { actions: ["no-op"] },
+          },
+        },
+      },
+    });
+
+    nodes = ensureTerraformModuleNodes(nodes);
+    refineCloudWatchMetricAlarmEdges(nodes);
+
+    expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new.sort()).toEqual([
+      "module.lambda-writer.aws_lambda_function.main",
+      "module.lambda-writer",
+    ].sort());
+    expect(
+      nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new,
+    ).not.toContain("module.lambda-writer.aws_iam_role.lambda");
   });
 });
 

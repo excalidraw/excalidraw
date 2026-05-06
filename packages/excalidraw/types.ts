@@ -242,6 +242,7 @@ export type InteractiveCanvasAppState = Readonly<
     // Non-used but needed in binding highlight arrow overdraw
     hoveredElementIds: AppState["hoveredElementIds"];
     frameRendering: AppState["frameRendering"];
+    performanceMonitorEnabled: AppState["performanceMonitorEnabled"];
     shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
     exportScale: AppState["exportScale"];
     currentItemArrowType: AppState["currentItemArrowType"];
@@ -330,6 +331,7 @@ export interface AppState {
     outline: boolean;
     clip: boolean;
   };
+  performanceMonitorEnabled: boolean;
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   /**

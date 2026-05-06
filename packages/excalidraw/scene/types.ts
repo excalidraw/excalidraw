@@ -71,6 +71,14 @@ export type InteractiveCanvasRenderConfig = {
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   renderScrollbars?: boolean;
+  performanceMetrics?: {
+    fps: number;
+    averageFrameMs: number;
+    p95FrameMs: number;
+    interactiveRenderMs: number;
+    visibleElements: number;
+    visibleFrames: number;
+  } | null;
 };
 
 export type RenderInteractiveSceneCallback = {
