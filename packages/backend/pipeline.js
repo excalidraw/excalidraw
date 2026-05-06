@@ -7,8 +7,8 @@
  *
  * **Order of transforms** matches `index.js` `POST /terraform/upload`: load plan → state merge →
  * module nodes → module metadata → data-source filter → DOT edges → diffs → existing edges →
- * alarm refinement → data-flow edges → VPC facet capture (caller) → plumbing omit → orphans →
- * role-link cleanup → visual-ignore filter.
+ * generic structural refinement → redundant-edge pruning → externals → data-flow edges →
+ * VPC facet capture (caller) → plumbing omit → orphans → role-link cleanup → visual-ignore filter.
  */
 const { getTerraformNodePaths } = require("./vpc-networking-facet");
 const { isPlainObject } = require("./terraform-graph-utils");
@@ -131,6 +131,12 @@ const REFERENCE_KEY_TYPE_RULES = {
   role_arn: ["aws_iam_role"],
   role: ["aws_iam_role", "aws_iam_instance_profile"],
 };
+
+/**
+ * Scalar keys that are too collision-prone for generic structural matching.
+ * `id` is frequently provider-generated and can repeat across unrelated resources.
+ */
+const GENERIC_REFERENCE_IGNORED_KEYS = new Set(["id"]);
 
 /** Synthetic node: Terraform module call (for edges + grouping). Not an AWS resource. */
 const TERRAFORM_MODULE_RESOURCE_TYPE = "terraform_module";
@@ -698,6 +704,107 @@ function ensureEdgeLists(nodes) {
   return nodes;
 }
 
+/** Combined outgoing structural targets present in `nodes` (plan-backed graph vertices only). */
+function collectStructuralSuccessors(nodes, sourcePath) {
+  const node = nodes[sourcePath];
+  if (!node) {
+    return [];
+  }
+  const combined = new Set([
+    ...(node.edges_new || []),
+    ...(node.edges_existing || []),
+  ]);
+  return [...combined].filter((target) => nodes[target]);
+}
+
+/**
+ * True if `target` is reachable from `start` using structural edges only, without traversing
+ * the single hop `start` → `forbiddenTarget`.
+ */
+function reachableWithoutDirectEdge(nodes, adjacency, start, forbiddenTarget) {
+  if (start === forbiddenTarget) {
+    return false;
+  }
+  const visited = new Set([start]);
+  const queue = [start];
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    const successors = adjacency.get(current);
+    if (!successors) {
+      continue;
+    }
+    for (const nextVertex of successors) {
+      if (current === start && nextVertex === forbiddenTarget) {
+        continue;
+      }
+      if (nextVertex === forbiddenTarget) {
+        return true;
+      }
+      if (!visited.has(nextVertex)) {
+        visited.add(nextVertex);
+        queue.push(nextVertex);
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Drops redundant shortcut edges from `edges_new` / `edges_existing` when another path exists.
+ * Terraform DOT traversal through vars/outputs can link distant modules directly even though an
+ * intermediate resource/module chain already encodes the dependency — misleading on infra diagrams.
+ */
+function pruneRedundantStructuralEdges(nodes) {
+  const adjacency = new Map();
+
+  for (const nodePath of Object.keys(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
+    const successors = collectStructuralSuccessors(nodes, nodePath);
+    if (successors.length === 0) {
+      continue;
+    }
+    adjacency.set(nodePath, new Set(successors));
+  }
+
+  const pruneFromList = (list, sourcePath) => {
+    const raw = Array.isArray(list) ? list : [];
+    const seen = new Set();
+    const next = [];
+    for (const target of raw) {
+      if (seen.has(target)) {
+        continue;
+      }
+      seen.add(target);
+      if (!nodes[target]) {
+        next.push(target);
+        continue;
+      }
+      const redundant =
+        sourcePath !== target &&
+        reachableWithoutDirectEdge(nodes, adjacency, sourcePath, target);
+      if (!redundant) {
+        next.push(target);
+      }
+    }
+    return next;
+  };
+
+  for (const nodePath of Object.keys(nodes)) {
+    if (nodePath.startsWith("__")) {
+      continue;
+    }
+    const node = nodes[nodePath];
+    node.edges_new = pruneFromList(node.edges_new, nodePath);
+    node.edges_existing = pruneFromList(node.edges_existing, nodePath);
+  }
+
+  return nodes;
+}
+
 /**
  * Indexes nodes by address, ARN, logical name, type, IAM role↔compute, and policy↔role links
  * for resolving references when synthesizing data-flow edges.
@@ -917,12 +1024,18 @@ function collectReferenceScalars(value, parentKey = "", out = []) {
 }
 
 /** Resolves references with key-aware type narrowing and generic fallback. */
-function resolveNodeRefsAcrossAllResourceTypes(value, index, nodes) {
+function resolveNodeRefsAcrossAllResourceTypes(value, index, nodes, options = {}) {
   const matches = new Set();
   const allTypes = [...index.byType.keys()];
+  const ignoredKeys = new Set(
+    options.ignoredKeys || GENERIC_REFERENCE_IGNORED_KEYS,
+  );
 
   for (const scalar of collectReferenceScalars(value)) {
     const key = String(scalar.key || "").toLowerCase();
+    if (ignoredKeys.has(key)) {
+      continue;
+    }
     const allowedTypes = REFERENCE_KEY_TYPE_RULES[key] || allTypes;
     for (const nodePath of resolveNodeRefs(
       scalar.value,
@@ -941,7 +1054,7 @@ function resolveNodeRefsAcrossAllResourceTypes(value, index, nodes) {
  * Generic resolver: derive structural targets by resolving references found in
  * resource values, then include owning module nodes for those targets.
  */
-function createGenericResourceReferenceResolver() {
+function createGenericResourceReferenceResolver(options = {}) {
   return {
     id: "generic-resource-references",
     match() {
@@ -956,6 +1069,7 @@ function createGenericResourceReferenceResolver() {
           values,
           context.index,
           context.nodes,
+          { ignoredKeys: options.ignoredReferenceKeys },
         )) {
           if (context.nodes[resourcePath]) {
             targets.add(resourcePath);
@@ -1026,20 +1140,23 @@ function refineEdgesWithResolvers(nodes, resolvers = []) {
  * Generic structural edge refinement via resolver rules.
  * Accepts optional custom resolvers prepended before defaults.
  */
-function refineCloudWatchMetricAlarmEdges(nodes, options = {}) {
+function detectGenericStructuralEdges(nodes, options = {}) {
   const customResolvers = Array.isArray(options.customResolvers)
     ? options.customResolvers
     : [];
   const disabled = new Set(options.disabledDefaultResolverIds || []);
-  const defaultResolvers = [createGenericResourceReferenceResolver()].filter(
+  const defaultResolvers = [createGenericResourceReferenceResolver(options)].filter(
     (resolver) => !disabled.has(resolver.id),
   );
   return refineEdgesWithResolvers(nodes, [...customResolvers, ...defaultResolvers]);
 }
 
-/** Generic structural edge detection/refinement across all resource types. */
-function detectGenericStructuralEdges(nodes, options = {}) {
-  return refineCloudWatchMetricAlarmEdges(nodes, options);
+/**
+ * Backward-compatible alias for legacy call sites/tests.
+ * Name kept for historical reasons; behavior is generic, not alarm-specific.
+ */
+function refineCloudWatchMetricAlarmEdges(nodes, options = {}) {
+  return detectGenericStructuralEdges(nodes, options);
 }
 
 /** Maps an IAM policy Resource ARN/string to data-flow target nodes (S3, SQS, etc.) using ARN index heuristics. */
@@ -1440,6 +1557,98 @@ function omitNonAllowlistedDataSourceNodes(nodes) {
   return nodes;
 }
 
+function isStateOnlyResource(resource = {}) {
+  const actions = resource?.change?.actions;
+  return Array.isArray(actions) && actions.length === 1 && actions[0] === "existing";
+}
+
+/**
+ * Removes data source nodes that come only from tfstate and have no plan-backed
+ * change entry, so stale state does not resurrect config that is being removed.
+ */
+function omitStateOnlyDataSourceNodes(nodes) {
+  const omitted = new Set();
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__") || !node) {
+      continue;
+    }
+    const resources = Object.values(node.resources || {});
+    if (resources.length === 0) {
+      continue;
+    }
+    const dataResources = resources.filter((resource) => resource?.mode === "data");
+    if (dataResources.length === 0) {
+      continue;
+    }
+    const hasPlanBackedDataResource = dataResources.some(
+      (resource) => !isStateOnlyResource(resource),
+    );
+    if (!hasPlanBackedDataResource) {
+      omitted.add(nodePath);
+    }
+  }
+
+  stripEdgesReferencingPaths(nodes, omitted);
+  for (const path of omitted) {
+    delete nodes[path];
+  }
+  return nodes;
+}
+
+function isIamPolicyDocumentDataAddress(address = "") {
+  return /\.data\.aws_iam_policy_document\./.test(stripIndexes(String(address)));
+}
+
+function hasConcreteIamPolicyDocumentInstance(resource = {}, nodePath = "") {
+  if (resource?.type !== "aws_iam_policy_document") {
+    return false;
+  }
+  if (resource?.mode && resource.mode !== "data") {
+    return false;
+  }
+
+  const hasStateValues =
+    isPlainObject(resource.values) && Object.keys(resource.values).length > 0;
+  const hasPlannedValues =
+    isPlainObject(resource.change?.after) &&
+    Object.keys(resource.change.after).length > 0;
+
+  return hasStateValues || hasPlannedValues;
+}
+
+/**
+ * Removes config-only/ghost IAM policy-document nodes that can appear as
+ * dependency placeholders without a concrete instance payload.
+ */
+function omitGhostIamPolicyDocumentNodes(nodes) {
+  const omitted = new Set();
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__") || !node) {
+      continue;
+    }
+    if (!isIamPolicyDocumentDataAddress(nodePath)) {
+      continue;
+    }
+
+    const resources = Object.values(node.resources || {});
+    const hasConcretePolicyDoc = resources.some((resource) =>
+      hasConcreteIamPolicyDocumentInstance(resource, nodePath),
+    );
+
+    if (!hasConcretePolicyDoc) {
+      omitted.add(nodePath);
+    }
+  }
+
+  stripEdgesReferencingPaths(nodes, omitted);
+  for (const path of omitted) {
+    delete nodes[path];
+  }
+  return nodes;
+}
+
 /** Removes low-level VPC routing types in `VPC_PLUMBING_OMIT_TYPES` after facets are captured. */
 function omitVpcPlumbingNodes(nodes) {
   const omitted = new Set();
@@ -1574,10 +1783,13 @@ module.exports = {
   collectAllTerraformModulePaths,
   getModulePathChainFromAddress,
   ensureEdgeLists,
+  pruneRedundantStructuralEdges,
   buildDataFlowEdges,
   externalResources,
   deleteOrphanedNodes,
   omitNonAllowlistedDataSourceNodes,
+  omitStateOnlyDataSourceNodes,
+  omitGhostIamPolicyDocumentNodes,
   omitVpcPlumbingNodes,
   filterVisualIgnore,
   cleanUpRoleLinks,

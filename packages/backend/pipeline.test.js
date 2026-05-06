@@ -9,9 +9,12 @@ const {
   omitVpcPlumbingNodes,
   deleteOrphanedNodes,
   omitNonAllowlistedDataSourceNodes,
+  omitStateOnlyDataSourceNodes,
+  omitGhostIamPolicyDocumentNodes,
   getDataSourceTypeFromAddress,
   isExcludedDataSourceAddress,
   mergeTerraformState,
+  pruneRedundantStructuralEdges,
 } = require("./pipeline");
 
 const resource = (address, type, name, values = {}, mode = "managed") => ({
@@ -180,6 +183,195 @@ describe("data source graph filtering", () => {
 
     expect(nodes["data.aws_region.current"]).toBeUndefined();
     expect(nodes["aws_lambda_function.fn"].edges_existing || []).toEqual([]);
+  });
+});
+
+describe("omitGhostIamPolicyDocumentNodes", () => {
+  it("removes config-only IAM policy-document placeholders and strips references", () => {
+    let nodes = ensureEdgeLists({
+      "module.lambda-monitoring.aws_iam_role_policy.logs[0]": {
+        resources: {
+          "module.lambda-monitoring.aws_iam_role_policy.logs[0]": resource(
+            "module.lambda-monitoring.aws_iam_role_policy.logs[0]",
+            "aws_iam_role_policy",
+            "logs",
+            {},
+          ),
+        },
+        edges_new: ["module.lambda-monitoring.data.aws_iam_policy_document.logs"],
+        edges_existing: ["module.lambda-monitoring.data.aws_iam_policy_document.logs"],
+        edges_data_flow: [
+          {
+            target: "module.lambda-monitoring.data.aws_iam_policy_document.logs",
+            relation: "policy",
+          },
+        ],
+      },
+      "module.lambda-monitoring.data.aws_iam_policy_document.logs": {
+        resources: {
+          "module.lambda-monitoring.data.aws_iam_policy_document.logs": {
+            address: "module.lambda-monitoring.data.aws_iam_policy_document.logs",
+            type: "module.lambda-monitoring.data.aws_iam_policy_document.logs",
+            change: { actions: ["external"] },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    });
+
+    nodes = omitGhostIamPolicyDocumentNodes(nodes);
+
+    expect(nodes["module.lambda-monitoring.data.aws_iam_policy_document.logs"]).toBeUndefined();
+    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_new).toEqual([]);
+    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_existing).toEqual(
+      [],
+    );
+    expect(
+      nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_data_flow,
+    ).toEqual([]);
+  });
+
+  it("keeps concrete IAM policy-document instances", () => {
+    let nodes = ensureEdgeLists({
+      "module.lambda-writer.data.aws_iam_policy_document.logs[0]": {
+        resources: {
+          "module.lambda-writer.data.aws_iam_policy_document.logs[0]": resource(
+            "module.lambda-writer.data.aws_iam_policy_document.logs[0]",
+            "aws_iam_policy_document",
+            "logs",
+            {
+              json: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\"}]}",
+            },
+            "data",
+          ),
+        },
+      },
+    });
+
+    nodes = omitGhostIamPolicyDocumentNodes(nodes);
+
+    expect(nodes["module.lambda-writer.data.aws_iam_policy_document.logs[0]"]).toBeDefined();
+  });
+
+  it("removes indexed IAM policy-document nodes when they have no concrete payload", () => {
+    let nodes = ensureEdgeLists({
+      "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]": {
+        resources: {
+          "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]": {
+            address: "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]",
+            mode: "data",
+            type: "aws_iam_policy_document",
+            name: "logs",
+            values: {},
+            change: { actions: ["read"], after: null },
+          },
+        },
+      },
+      "module.lambda-monitoring.aws_iam_role_policy.logs[0]": {
+        resources: {
+          "module.lambda-monitoring.aws_iam_role_policy.logs[0]": resource(
+            "module.lambda-monitoring.aws_iam_role_policy.logs[0]",
+            "aws_iam_role_policy",
+            "logs",
+            {},
+          ),
+        },
+        edges_new: ["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
+        edges_existing: ["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
+      },
+    });
+
+    nodes = omitGhostIamPolicyDocumentNodes(nodes);
+
+    expect(
+      nodes["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
+    ).toBeUndefined();
+    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_new).toEqual([]);
+    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_existing).toEqual(
+      [],
+    );
+  });
+
+  it("does not remove non policy-document data sources", () => {
+    let nodes = ensureEdgeLists({
+      "data.aws_region.current": {
+        resources: {
+          "data.aws_region.current": resource(
+            "data.aws_region.current",
+            "aws_region",
+            "current",
+            {},
+            "data",
+          ),
+        },
+      },
+    });
+
+    nodes = omitGhostIamPolicyDocumentNodes(nodes);
+
+    expect(nodes["data.aws_region.current"]).toBeDefined();
+  });
+});
+
+describe("omitStateOnlyDataSourceNodes", () => {
+  it("removes data nodes that exist only from tfstate merge", () => {
+    let nodes = ensureEdgeLists({
+      "module.lambda-monitoring.aws_iam_role_policy.logs[0]": {
+        resources: {
+          "module.lambda-monitoring.aws_iam_role_policy.logs[0]": resource(
+            "module.lambda-monitoring.aws_iam_role_policy.logs[0]",
+            "aws_iam_role_policy",
+            "logs",
+            {},
+          ),
+        },
+        edges_existing: ["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
+      },
+      "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]": {
+        resources: {
+          "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]": {
+            address: "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]",
+            mode: "data",
+            type: "aws_iam_policy_document",
+            name: "logs",
+            values: { json: "{\"Version\":\"2012-10-17\"}" },
+            change: { actions: ["existing"] },
+          },
+        },
+      },
+    });
+
+    nodes = omitStateOnlyDataSourceNodes(nodes);
+
+    expect(
+      nodes["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
+    ).toBeUndefined();
+    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_existing).toEqual(
+      [],
+    );
+  });
+
+  it("keeps plan-backed data nodes even if state is also merged", () => {
+    let nodes = ensureEdgeLists({
+      "data.aws_iam_policy_document.assume[0]": {
+        resources: {
+          "data.aws_iam_policy_document.assume[0]": {
+            address: "data.aws_iam_policy_document.assume[0]",
+            mode: "data",
+            type: "aws_iam_policy_document",
+            name: "assume",
+            values: { json: "{\"Version\":\"2012-10-17\"}" },
+            change: { actions: ["read"], after: { statement: [{ effect: "Allow" }] } },
+          },
+        },
+      },
+    });
+
+    nodes = omitStateOnlyDataSourceNodes(nodes);
+
+    expect(nodes["data.aws_iam_policy_document.assume[0]"]).toBeDefined();
   });
 });
 
@@ -576,6 +768,44 @@ describe("terraform module graph nodes", () => {
       nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new,
     ).not.toContain("module.lambda-writer.aws_iam_role.lambda");
   });
+
+  it("ignores collision-prone generic id scalars to avoid cross-module policy-doc links", () => {
+    let nodes = ensureEdgeLists({
+      "module.s3_kms.data.aws_iam_policy_document.this[0]": {
+        resources: {
+          "module.s3_kms.data.aws_iam_policy_document.this[0]": {
+            type: "aws_iam_policy_document",
+            address: "module.s3_kms.data.aws_iam_policy_document.this[0]",
+            mode: "data",
+            change: { after: { id: "2681806354" } },
+          },
+        },
+      },
+      "module.sqs_kms.data.aws_iam_policy_document.this[0]": {
+        resources: {
+          "module.sqs_kms.data.aws_iam_policy_document.this[0]": {
+            type: "aws_iam_policy_document",
+            address: "module.sqs_kms.data.aws_iam_policy_document.this[0]",
+            mode: "data",
+            change: { after: { id: "2681806354" } },
+          },
+        },
+      },
+    });
+
+    nodes = ensureTerraformModuleNodes(nodes);
+    refineCloudWatchMetricAlarmEdges(nodes);
+
+    expect(nodes["module.s3_kms.data.aws_iam_policy_document.this[0]"].edges_new).toEqual(
+      [],
+    );
+    expect(
+      nodes["module.s3_kms.data.aws_iam_policy_document.this[0]"].edges_new,
+    ).not.toContain("module.sqs_kms.data.aws_iam_policy_document.this[0]");
+    expect(
+      nodes["module.s3_kms.data.aws_iam_policy_document.this[0]"].edges_new,
+    ).not.toContain("module.sqs_kms");
+  });
 });
 
 describe("buildDataFlowEdges", () => {
@@ -852,5 +1082,126 @@ describe("buildDataFlowEdges", () => {
       type: "writes",
       origin: "iam_policy",
     });
+  });
+});
+
+describe("pruneRedundantStructuralEdges", () => {
+  it("removes a redundant edges_new shortcut when a multi-hop path exists", () => {
+    let nodes = {
+      "module.lambda_writer": {
+        resources: {
+          "module.lambda_writer": resource(
+            "module.lambda_writer",
+            "terraform_module",
+            "lambda_writer",
+          ),
+        },
+        edges_new: ["module.data_queue", "module.sqs_kms"],
+        edges_existing: [],
+      },
+      "module.data_queue": {
+        resources: {
+          "module.data_queue": resource(
+            "module.data_queue",
+            "terraform_module",
+            "data_queue",
+          ),
+        },
+        edges_new: ["module.sqs_kms"],
+        edges_existing: [],
+      },
+      "module.sqs_kms": {
+        resources: {
+          "module.sqs_kms": resource(
+            "module.sqs_kms",
+            "terraform_module",
+            "sqs_kms",
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+      },
+    };
+    nodes = ensureEdgeLists(nodes);
+    pruneRedundantStructuralEdges(nodes);
+
+    expect(nodes["module.lambda_writer"].edges_new.sort()).toEqual([
+      "module.data_queue",
+    ]);
+    expect(nodes["module.data_queue"].edges_new).toEqual(["module.sqs_kms"]);
+  });
+
+  it("keeps a directed edges_new link when it is the only path between endpoints", () => {
+    let nodes = {
+      "module.lambda_writer": {
+        resources: {
+          "module.lambda_writer": resource(
+            "module.lambda_writer",
+            "terraform_module",
+            "lambda_writer",
+          ),
+        },
+        edges_new: ["module.sqs_kms"],
+        edges_existing: [],
+      },
+      "module.sqs_kms": {
+        resources: {
+          "module.sqs_kms": resource(
+            "module.sqs_kms",
+            "terraform_module",
+            "sqs_kms",
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+      },
+    };
+    nodes = ensureEdgeLists(nodes);
+    pruneRedundantStructuralEdges(nodes);
+
+    expect(nodes["module.lambda_writer"].edges_new).toEqual(["module.sqs_kms"]);
+  });
+
+  it("prunes redundant targets listed only on edges_existing", () => {
+    let nodes = {
+      "module.lambda_reader": {
+        resources: {
+          "module.lambda_reader": resource(
+            "module.lambda_reader",
+            "terraform_module",
+            "lambda_reader",
+          ),
+        },
+        edges_new: ["module.data_queue"],
+        edges_existing: ["module.sqs_kms"],
+      },
+      "module.data_queue": {
+        resources: {
+          "module.data_queue": resource(
+            "module.data_queue",
+            "terraform_module",
+            "data_queue",
+          ),
+        },
+        edges_new: [],
+        edges_existing: ["module.sqs_kms"],
+      },
+      "module.sqs_kms": {
+        resources: {
+          "module.sqs_kms": resource(
+            "module.sqs_kms",
+            "terraform_module",
+            "sqs_kms",
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+      },
+    };
+    nodes = ensureEdgeLists(nodes);
+    pruneRedundantStructuralEdges(nodes);
+
+    expect(nodes["module.lambda_reader"].edges_new).toEqual(["module.data_queue"]);
+    expect(nodes["module.lambda_reader"].edges_existing).toEqual([]);
   });
 });

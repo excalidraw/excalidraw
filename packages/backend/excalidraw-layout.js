@@ -13,9 +13,13 @@ const {
   lerp,
   getModulePathChain,
   getModuleRelativeResourcePath,
+  stripTerraformInstanceIndexes,
   isLikelyLambdaModule,
   LAMBDA_MODULE_PRESET_OFFSETS,
 } = require("./excalidraw-elements");
+
+/** Avoid duplicate stderr lines when offsets are recomputed (e.g. size estimate + expand). */
+const layoutInternalOffsetsDebugLogged = new Set();
 
 // --- Force layout ---
 
@@ -204,8 +208,9 @@ function buildModuleInternalOffsets(members, modulePath, moduleGroup = null) {
 
   for (const nodePath of members) {
     const fragment = getModuleRelativeResourcePath(nodePath, modulePath);
+    const presetKey = stripTerraformInstanceIndexes(fragment);
     const offset = useLambdaPreset
-      ? LAMBDA_MODULE_PRESET_OFFSETS[fragment]
+      ? LAMBDA_MODULE_PRESET_OFFSETS[presetKey]
       : null;
 
     if (offset) {
@@ -213,6 +218,21 @@ function buildModuleInternalOffsets(members, modulePath, moduleGroup = null) {
     } else {
       remaining.push(nodePath);
     }
+  }
+
+  if (
+    process.env.TF_LAYOUT_DEBUG &&
+    modulePath.includes(process.env.TF_LAYOUT_DEBUG) &&
+    !layoutInternalOffsetsDebugLogged.has(modulePath)
+  ) {
+    layoutInternalOffsetsDebugLogged.add(modulePath);
+    console.error("[tf-layout] buildModuleInternalOffsets", {
+      modulePath,
+      useLambdaPreset,
+      memberCount: members.length,
+      remainingGridCount: remaining.length,
+      offsets,
+    });
   }
 
   const columns = Math.min(3, Math.max(1, remaining.length));

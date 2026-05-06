@@ -90,6 +90,7 @@ The exact sequence matches [`index.js`](index.js) `POST /terraform/upload`. In w
 4. **DOT edges** — **`buildNewEdges`** fills **`edges_new`** from the DOT adjacency list.
 5. **Diffs & existing edges** — **`computeResourceDiffs`**, **`buildExistingEdges`** from `prior_state`.
 6. **Refinements** — e.g. **CloudWatch metric alarms** get **`refineCloudWatchMetricAlarmEdges`** so alarms point at meaningful targets instead of noisy DOT fans.
+6b. **Structural shortcut pruning** — **`pruneRedundantStructuralEdges`** removes a directed dependency edge `u → v` when `v` is already reachable from `u` via other structural edges (`edges_new` ∪ `edges_existing`). Terraform’s expanded DOT links distant modules through vars/outputs (e.g. Lambda env → queue URL → KMS key id); pruning drops those misleading shortcuts while keeping the intermediate chain for infra-style diagrams. **`edges_data_flow` is not modified.**
 7. **Semantic data-flow** — **`buildDataFlowEdges`** derives integration/IAM-style edges into **`edges_data_flow`**.
 8. **External stubs** — **`externalResources`** adds placeholder nodes for missing edge endpoints so layout stays connected.
 9. **VPC facets** — **`extractVpcNetworkingFacetStore`** runs on the **full** graph, then **`omitVpcPlumbingNodes`** drops route-table-only noise that would clutter the diagram.

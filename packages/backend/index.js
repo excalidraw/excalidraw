@@ -20,6 +20,8 @@ const {
   mergeTerraformState,
   ensureTerraformModuleNodes,
   omitNonAllowlistedDataSourceNodes,
+  omitStateOnlyDataSourceNodes,
+  omitGhostIamPolicyDocumentNodes,
   ensureEdgeLists,
   buildDataFlowEdges,
   externalResources,
@@ -28,6 +30,7 @@ const {
   filterVisualIgnore,
   cleanUpRoleLinks,
   detectGenericStructuralEdges,
+  pruneRedundantStructuralEdges,
 } = require("./pipeline");
 const { extractVpcNetworkingFacetStore } = require("./vpc-networking-facet");
 const { mockLanggraphEnrichment, applyEnrichment } = require("./enrichment");
@@ -84,8 +87,8 @@ app.post(
 
       // Graph transforms (see pipeline.js module banner for semantics):
       // loadPlan → mergeState → moduleNodes → moduleMeta → filterDataSources → dotEdges →
-      // diffs → existingEdges → filterDataSources → genericEdges → edgeLists → externals →
-      // edgeLists → dataFlow → edgeLists → facetStore → omitVpcPlumbing → orphans →
+      // diffs → existingEdges → filterDataSources → genericEdges → edgeLists → pruneShortcuts →
+      // externals → edgeLists → dataFlow → edgeLists → facetStore → omitVpcPlumbing → orphans →
       // roleCleanup → visualIgnore → orphans → enrichment → persist.
       let nodes = loadPlanAndNodes(plan);
       nodes = mergeTerraformState(nodes, state);
@@ -97,12 +100,15 @@ app.post(
       nodes = computeResourceDiffs(nodes);
       nodes = buildExistingEdges(nodes, plan);
       nodes = omitNonAllowlistedDataSourceNodes(nodes);
+      nodes = omitStateOnlyDataSourceNodes(nodes);
       nodes = detectGenericStructuralEdges(nodes);
       nodes = ensureEdgeLists(nodes);
+      nodes = pruneRedundantStructuralEdges(nodes);
       nodes = externalResources(nodes);
       nodes = ensureEdgeLists(nodes);
       nodes = buildDataFlowEdges(nodes);
       nodes = ensureEdgeLists(nodes);
+      nodes = omitGhostIamPolicyDocumentNodes(nodes);
       // Facets must capture routing plumbing before those nodes are removed.
       nodes.__networkingFacetStore = extractVpcNetworkingFacetStore(nodes);
       nodes = omitVpcPlumbingNodes(nodes);
