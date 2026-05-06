@@ -1,5 +1,4 @@
 import rough from "roughjs/bin/rough";
-
 import {
   arrayToMap,
   type Bounds,
@@ -7,7 +6,6 @@ import {
   rescalePoints,
   sizeOf,
 } from "@excalidraw/common";
-
 import {
   degreesToRadians,
   lineSegment,
@@ -16,9 +14,7 @@ import {
   pointFromArray,
   pointRotateRads,
 } from "@excalidraw/math";
-
 import { getCurvePathOps } from "@excalidraw/utils/shape";
-
 import { pointsOnBezierCurves } from "points-on-curve";
 
 import type {
@@ -29,9 +25,7 @@ import type {
   LocalPoint,
   Radians,
 } from "@excalidraw/math";
-
 import type { AppState } from "@excalidraw/excalidraw/types";
-
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { generateRoughOptions } from "./shape";
@@ -41,20 +35,20 @@ import { getBoundTextElement, getContainerElement } from "./textElement";
 import {
   isArrowElement,
   isBoundToContainer,
+  isFrameLikeElement,
   isFreeDrawElement,
   isLinearElement,
   isLineElement,
   isTextElement,
   isExcalidrawElement,
 } from "./typeChecks";
-import { intersectElementWithLineSegment } from "./collision";
-
 import { getElementShape } from "./shape";
-
 import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
 } from "./utils";
+import { intersectElementWithLineSegment } from "./collision";
+import { elementOverlapsWithFrame, getContainingFrame } from "./frame";
 
 import type { Drawable, Op } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -1298,13 +1292,20 @@ export const boundsContainBounds = (outerBounds: Bounds, innerBounds: Bounds) =>
     pointFrom<GlobalPoint>(innerBounds[2], innerBounds[3]),
   ].every((point) => pointInsideBoundsInclusive(point, outerBounds));
 
+/**
+ * High level helper to get elements overlapping a bounding box.
+ * It can be used to get elements overlapping a selection box, for example.
+ *
+ */
 export const elementsOverlappingBBox = ({
   elements,
-  elementsMap: _elementsMap,
+  elementsMap,
   bounds,
   type,
+  excludeElementsInFrames,
+  shouldIgnoreElementFromSelection,
 }: {
-  elements: NonDeletedExcalidrawElement[];
+  elements: readonly NonDeletedExcalidrawElement[];
   elementsMap?: ElementsMap;
   bounds: Bounds | ExcalidrawElement;
   /**
@@ -1312,9 +1313,14 @@ export const elementsOverlappingBBox = ({
    * - contain: elements inside bounds
    **/
   type: "contain" | "overlap";
+  excludeElementsInFrames?: boolean;
+  shouldIgnoreElementFromSelection?: (
+    element: NonDeletedExcalidrawElement,
+  ) => boolean;
 }) => {
-  const elementsMap = _elementsMap ?? arrayToMap(elements);
-
+  if (!elementsMap) {
+    elementsMap = arrayToMap(elements) as ElementsMap;
+  }
   const selectionBounds = isExcalidrawElement(bounds)
     ? getElementBounds(bounds, elementsMap)
     : bounds;
@@ -1338,9 +1344,27 @@ export const elementsOverlappingBBox = ({
     ),
   ];
 
+  const framesInSelection = excludeElementsInFrames
+    ? new Set<NonDeletedExcalidrawElement["id"]>()
+    : null;
+  const groups: Record<string, NonDeletedExcalidrawElement[]> = {};
   const elementsInSelection: Set<NonDeletedExcalidrawElement> = new Set();
 
   for (const element of elements) {
+    if (shouldIgnoreElementFromSelection?.(element)) {
+      continue;
+    }
+
+    // Track only selectable top-level group members, so ignored elements such
+    // as bound text and locked elements don't affect group selection.
+    const groupId = element.groupIds.at(-1);
+    if (groupId) {
+      if (!groups[groupId]) {
+        groups[groupId] = [];
+      }
+      groups[groupId].push(element);
+    }
+
     const strokeWidth = element.strokeWidth;
     let labelAABB: Bounds | null = null;
     let elementAABB = getElementBounds(element, elementsMap);
@@ -1369,6 +1393,31 @@ export const elementsOverlappingBBox = ({
       ] as Bounds;
     }
 
+    // Clip element bounds by its containing frame (if any), since only the
+    // visible (frame-clipped) portion of the element is relevant for selection.
+    const associatedFrame = getContainingFrame(element, elementsMap);
+    if (
+      associatedFrame &&
+      elementOverlapsWithFrame(element, associatedFrame, elementsMap)
+    ) {
+      const frameAABB = getElementBounds(associatedFrame, elementsMap);
+      elementAABB = [
+        Math.max(elementAABB[0], frameAABB[0]),
+        Math.max(elementAABB[1], frameAABB[1]),
+        Math.min(elementAABB[2], frameAABB[2]),
+        Math.min(elementAABB[3], frameAABB[3]),
+      ] as Bounds;
+
+      labelAABB = labelAABB
+        ? ([
+            Math.max(labelAABB[0], frameAABB[0]),
+            Math.max(labelAABB[1], frameAABB[1]),
+            Math.min(labelAABB[2], frameAABB[2]),
+            Math.min(labelAABB[3], frameAABB[3]),
+          ] as Bounds)
+        : null;
+    }
+
     const commonAABB = labelAABB
       ? ([
           Math.min(labelAABB[0], elementAABB[0]),
@@ -1386,6 +1435,9 @@ export const elementsOverlappingBBox = ({
     //    PERF: This trick only works with axis-aligned box selection and the
     //          current convex element shapes!
     if (boundsContainBounds(selectionBounds, commonAABB)) {
+      if (framesInSelection && isFrameLikeElement(element)) {
+        framesInSelection.add(element.id);
+      }
       elementsInSelection.add(element);
       continue;
     }
@@ -1479,6 +1531,10 @@ export const elementsOverlappingBBox = ({
       }
 
       if (hasIntersection) {
+        if (framesInSelection && isFrameLikeElement(element)) {
+          framesInSelection.add(element.id);
+        }
+
         elementsInSelection.add(element);
         continue;
       }
@@ -1488,7 +1544,41 @@ export const elementsOverlappingBBox = ({
     //    as it is separately handled in App.
   }
 
-  return Array.from(elementsInSelection);
+  if (framesInSelection) {
+    elementsInSelection.forEach((element) => {
+      if (element.frameId && framesInSelection.has(element.frameId)) {
+        elementsInSelection.delete(element);
+      }
+    });
+  }
+
+  if (type === "overlap") {
+    Array.from(elementsInSelection).forEach((element) => {
+      const groupId = element.groupIds.at(-1);
+      const group = groupId ? groups[groupId] : null;
+
+      group?.forEach((groupElement) => elementsInSelection.add(groupElement));
+    });
+  } else if (type === "contain") {
+    elementsInSelection.forEach((element) => {
+      // note: currently we only support top-level group handling since
+      // we don't support box selecting while editing the group/subgroup
+      // see https://github.com/excalidraw/excalidraw/pull/11234#issuecomment-4387654451
+      const groupId = element.groupIds.at(-1);
+
+      const group = groupId ? groups[groupId] : null;
+
+      if (
+        group &&
+        !group.every((groupElement) => elementsInSelection.has(groupElement))
+      ) {
+        elementsInSelection.delete(element);
+      }
+    });
+  }
+
+  // to maintain original order elements (namely for group selection)
+  return elements.filter((element) => elementsInSelection.has(element));
 };
 
 export const elementCenterPoint = (

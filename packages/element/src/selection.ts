@@ -6,13 +6,7 @@ import type {
   InteractiveCanvasAppState,
 } from "@excalidraw/excalidraw/types";
 
-import {
-  boundsContainBounds,
-  doBoundsIntersect,
-  elementsOverlappingBBox,
-  getElementAbsoluteCoords,
-  getElementBounds,
-} from "./bounds";
+import { elementsOverlappingBBox, getElementAbsoluteCoords } from "./bounds";
 import { isElementInViewport } from "./sizeHelpers";
 import {
   isBoundToContainer,
@@ -20,11 +14,7 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
-import {
-  elementOverlapsWithFrame,
-  getContainingFrame,
-  getFrameChildren,
-} from "./frame";
+import { getFrameChildren } from "./frame";
 
 import { LinearElementEditor } from "./linearElementEditor";
 import { selectGroupsForSelectedElements } from "./groups";
@@ -76,37 +66,6 @@ export const excludeElementsInFramesFromSelection = <
   return excludeElementsFromFrames(selectedElements, framesInSelection);
 };
 
-// Correct for frame clipping: elementsOverlappingBBox uses unclipped element
-// bounds, but selection should only consider the visible (frame-clipped)
-// portion of elements in frames.
-const getFrameClippedAABB = (
-  element: NonDeletedExcalidrawElement,
-  elementsMap: ElementsMap,
-): Bounds | null => {
-  const associatedFrame = getContainingFrame(element, elementsMap);
-  if (
-    !associatedFrame ||
-    !elementOverlapsWithFrame(element, associatedFrame, elementsMap)
-  ) {
-    return null;
-  }
-  const strokeWidth = element.strokeWidth;
-  let elementAABB = getElementBounds(element, elementsMap);
-  elementAABB = [
-    elementAABB[0] - strokeWidth / 2,
-    elementAABB[1] - strokeWidth / 2,
-    elementAABB[2] + strokeWidth / 2,
-    elementAABB[3] + strokeWidth / 2,
-  ] as Bounds;
-  const frameAABB = getElementBounds(associatedFrame, elementsMap);
-  return [
-    Math.max(elementAABB[0], frameAABB[0]),
-    Math.max(elementAABB[1], frameAABB[1]),
-    Math.min(elementAABB[2], frameAABB[2]),
-    Math.min(elementAABB[3], frameAABB[3]),
-  ] as Bounds;
-};
-
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
   selection: NonDeletedExcalidrawElement,
@@ -128,116 +87,14 @@ export const getElementsWithinSelection = (
     selectionY2,
   ] as Bounds;
 
-  const groups: Record<string, NonDeletedExcalidrawElement[]> = {};
-
-  // First pass: filter selectable elements and build groups map
-  const selectableElements: NonDeletedExcalidrawElement[] = [];
-  for (const element of elements) {
-    if (shouldIgnoreElementFromSelection(element)) {
-      continue;
-    }
-
-    // Track only selectable top-level group members, so ignored elements such
-    // as bound text and locked elements don't affect group selection.
-    const groupId = element.groupIds.at(-1);
-    if (groupId) {
-      if (!groups[groupId]) {
-        groups[groupId] = [];
-      }
-      groups[groupId].push(element);
-    }
-
-    selectableElements.push(element);
-  }
-
-  // Use elementsOverlappingBBox for bounds checking (without frame clipping)
-  let elementsInSelectionArr = elementsOverlappingBBox({
-    elements: selectableElements,
-    elementsMap,
+  return elementsOverlappingBBox({
+    elements,
     bounds: selectionBounds,
+    elementsMap,
     type: boxSelectionMode,
+    shouldIgnoreElementFromSelection,
+    excludeElementsInFrames,
   });
-
-  if (boxSelectionMode === "overlap") {
-    // Remove elements whose frame-clipped bounds no longer overlap the selection
-    elementsInSelectionArr = elementsInSelectionArr.filter((element) => {
-      const clippedAABB = getFrameClippedAABB(element, elementsMap);
-      if (!clippedAABB) {
-        return true;
-      }
-      return (
-        boundsContainBounds(selectionBounds, clippedAABB) ||
-        doBoundsIntersect(selectionBounds, clippedAABB)
-      );
-    });
-  } else {
-    // "contain" mode: add elements whose clipped bounds fit within the
-    // selection, but whose unclipped bounds did not (so elementsOverlappingBBox
-    // missed them)
-    const inSelectionSet = new Set(elementsInSelectionArr);
-    for (const element of selectableElements) {
-      if (inSelectionSet.has(element)) {
-        continue;
-      }
-      const clippedAABB = getFrameClippedAABB(element, elementsMap);
-      if (clippedAABB && boundsContainBounds(selectionBounds, clippedAABB)) {
-        elementsInSelectionArr.push(element);
-        inSelectionSet.add(element);
-      }
-    }
-  }
-
-  // Track frames in selection and build working set
-  const framesInSelection = excludeElementsInFrames
-    ? new Set<NonDeletedExcalidrawElement["id"]>()
-    : null;
-
-  const elementsInSelection = new Set(elementsInSelectionArr);
-
-  if (framesInSelection) {
-    for (const element of elementsInSelection) {
-      if (isFrameLikeElement(element)) {
-        framesInSelection.add(element.id);
-      }
-    }
-  }
-
-  // Exclude frame children when their frame is also selected
-  if (framesInSelection) {
-    elementsInSelection.forEach((element) => {
-      if (element.frameId && framesInSelection.has(element.frameId)) {
-        elementsInSelection.delete(element);
-      }
-    });
-  }
-
-  if (boxSelectionMode === "overlap") {
-    Array.from(elementsInSelection).forEach((element) => {
-      const groupId = element.groupIds.at(-1);
-      const group = groupId ? groups[groupId] : null;
-
-      group?.forEach((groupElement) => elementsInSelection.add(groupElement));
-    });
-  } else if (boxSelectionMode === "contain") {
-    elementsInSelection.forEach((element) => {
-      // note: currently we only support top-level group handling since
-      // we don't support box selecting while editing the group/subgroup
-      // see https://github.com/excalidraw/excalidraw/pull/11234#issuecomment-4387654451
-      const groupId = element.groupIds.at(-1);
-
-      const group = groupId ? groups[groupId] : null;
-
-      if (
-        group &&
-        !group.every((groupElement) => elementsInSelection.has(groupElement))
-      ) {
-        elementsInSelection.delete(element);
-      }
-    });
-  }
-
-  // to maintain original order elements (namely for group selection)
-  return elements.filter((element) => elementsInSelection.has(element));
 };
 
 export const getVisibleAndNonSelectedElements = (
