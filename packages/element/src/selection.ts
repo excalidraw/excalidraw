@@ -133,19 +133,18 @@ export const getElementsWithinSelection = (
   const elementsInSelection: Set<NonDeletedExcalidrawElement> = new Set();
 
   for (const element of elements) {
-    // track only selectable group members, so ignored elements such as bound
-    // text and locked elements don't block group completeness checks.
     if (shouldIgnoreElementFromSelection(element)) {
       continue;
     }
 
-    if (boxSelectionMode === "contain") {
-      (element.groupIds ?? []).forEach((groupId) => {
-        if (!groups[groupId]) {
-          groups[groupId] = [];
-        }
-        groups[groupId].push(element);
-      });
+    // Track only selectable top-level group members, so ignored elements such
+    // as bound text and locked elements don't affect group selection.
+    const groupId = element.groupIds.at(-1);
+    if (groupId) {
+      if (!groups[groupId]) {
+        groups[groupId] = [];
+      }
+      groups[groupId].push(element);
     }
 
     const strokeWidth = element.strokeWidth;
@@ -338,7 +337,14 @@ export const getElementsWithinSelection = (
     });
   }
 
-  if (boxSelectionMode === "contain") {
+  if (boxSelectionMode === "overlap") {
+    Array.from(elementsInSelection).forEach((element) => {
+      const groupId = element.groupIds.at(-1);
+      const group = groupId ? groups[groupId] : null;
+
+      group?.forEach((groupElement) => elementsInSelection.add(groupElement));
+    });
+  } else if (boxSelectionMode === "contain") {
     elementsInSelection.forEach((element) => {
       // note: currently we only support top-level group handling since
       // we don't support box selecting while editing the group/subgroup
@@ -356,7 +362,8 @@ export const getElementsWithinSelection = (
     });
   }
 
-  return Array.from(elementsInSelection);
+  // to maintain original order elements (namely for group selection)
+  return elements.filter((element) => elementsInSelection.has(element));
 };
 
 export const getVisibleAndNonSelectedElements = (

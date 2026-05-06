@@ -299,6 +299,119 @@ describe("box-selection overlap mode", () => {
     expect(h.state.selectedGroupIds).toEqual({ A: true });
   });
 
+  it("should return all group elements when overlapping one group member", () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      id: "rect1",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      id: "rect2",
+      x: 100,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    const rect3 = API.createElement({
+      type: "rectangle",
+      id: "rect3",
+      x: 200,
+      y: 0,
+      width: 50,
+      height: 50,
+    });
+    const selection = API.createElement({
+      type: "rectangle",
+      x: 125,
+      y: -10,
+      width: 10,
+      height: 70,
+    });
+    const elements = [rect1, rect2, rect3];
+
+    expect(
+      getElementsWithinSelection(
+        elements,
+        selection,
+        arrayToMap([...elements, selection]),
+        false,
+        "overlap",
+      ).map((element) => element.id),
+    ).toEqual([rect1.id, rect2.id]);
+  });
+
+  it("should retain nested and interleaved group element order", () => {
+    const outerNested1 = API.createElement({
+      type: "rectangle",
+      id: "outerNested1",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["inner", "outer"],
+    });
+    const other1 = API.createElement({
+      type: "rectangle",
+      id: "other1",
+      x: 70,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["other"],
+    });
+    const outerOnly = API.createElement({
+      type: "rectangle",
+      id: "outerOnly",
+      x: 140,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["outer"],
+    });
+    const other2 = API.createElement({
+      type: "rectangle",
+      id: "other2",
+      x: 210,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["other"],
+    });
+    const outerNested2 = API.createElement({
+      type: "rectangle",
+      id: "outerNested2",
+      x: 280,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["inner", "outer"],
+    });
+    const selection = API.createElement({
+      type: "rectangle",
+      x: 295,
+      y: -10,
+      width: 10,
+      height: 70,
+    });
+    const elements = [outerNested1, other1, outerOnly, other2, outerNested2];
+
+    expect(
+      getElementsWithinSelection(
+        elements,
+        selection,
+        arrayToMap([...elements, selection]),
+        false,
+        "overlap",
+      ).map((element) => element.id),
+    ).toEqual([outerNested1.id, outerOnly.id, outerNested2.id]);
+  });
+
   it("should not select a transparent rectangle when the selection box stays inside it", () => {
     const rect1 = API.createElement({
       type: "rectangle",
