@@ -1,0 +1,80 @@
+name: Challenge Evaluation
+
+on:
+  pull_request:
+    branches: [challenge/excalidraw-lasso-selection]
+
+jobs:
+  automated-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Typecheck
+        id: typecheck
+        run: yarn test:typecheck
+        continue-on-error: true
+
+      - name: Run lasso tests
+        id: lasso-tests
+        run: |
+          if [ -f "packages/excalidraw/tests/lasso.test.tsx" ]; then
+            yarn vitest run packages/excalidraw/tests/lasso.test.tsx --run 2>&1 | tee /tmp/lasso-results.txt
+          else
+            echo "No lasso test file found — participant needs to create packages/excalidraw/tests/lasso.test.tsx"
+            exit 1
+          fi
+        continue-on-error: true
+
+      - name: Check for regressions (full test suite)
+        id: regressions
+        run: |
+          yarn test:app --run 2>&1 | tee /tmp/full-results.txt || true
+          FAILURES=$(grep -oE '[0-9]+ failed' /tmp/full-results.txt | grep -oE '[0-9]+' | head -1 || echo "0")
+          echo "failures=${FAILURES:-0}" >> $GITHUB_OUTPUT
+          if [ "${FAILURES:-0}" -gt 369 ]; then
+            echo "regressions=true" >> $GITHUB_OUTPUT
+          else
+            echo "regressions=false" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: Post results comment
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const typecheck = '${{ steps.typecheck.outcome }}' === 'success';
+            const lassoTests = '${{ steps.lasso-tests.outcome }}' === 'success';
+            const regressions = '${{ steps.regressions.outputs.regressions }}' === 'true';
+            const failures = '${{ steps.regressions.outputs.failures }}' || '0';
+
+            let body = `## Challenge Evaluation Results\n\n`;
+            body += `| Check | Result |\n|-------|--------|\n`;
+            body += `| Typecheck | ${typecheck ? '✅ Pass' : '❌ Fail'} |\n`;
+            body += `| Lasso Tests | ${lassoTests ? '✅ Pass' : '❌ Fail'} |\n`;
+            body += `| Regressions | ${regressions ? '❌ New failures detected' : '✅ No regressions'} |\n`;
+            body += `| Full Suite Failures | ${failures} (baseline: 369) |\n\n`;
+
+            if (!typecheck) body += `> ⚠️ **Build failure** — score capped at 30/100\n\n`;
+            if (regressions) body += `> ⚠️ **Regressions detected** — score capped at 30/100\n\n`;
+
+            body += `_Automated checks only. Final scoring (code quality, completeness, minimality) will be done by the organizer._`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
