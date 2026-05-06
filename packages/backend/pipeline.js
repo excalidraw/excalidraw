@@ -115,57 +115,21 @@ const COMPUTE_RESOURCE_TYPES = new Set([
 ]);
 
 /**
- * Plan-defined watched resources for metric alarms (namespace + dimensions).
- * Terraform's dependency graph also wires alarms to many nodes directly; we replace
- * those edges using this map when possible.
+ * Generic semantic key hints for narrowing reference resolution by field name.
+ * Unknown keys fall back to all indexed resource types.
  */
-const CLOUDWATCH_ALARM_WATCH_RULES_BY_NAMESPACE = {
-  "AWS/Lambda": [
-    {
-      dimensions: ["FunctionName", "Resource"],
-      types: ["aws_lambda_function"],
-    },
-  ],
-  "AWS/SQS": [{ dimensions: ["QueueName"], types: ["aws_sqs_queue"] }],
-  "AWS/SNS": [{ dimensions: ["TopicName"], types: ["aws_sns_topic"] }],
-  "AWS/DynamoDB": [{ dimensions: ["TableName"], types: ["aws_dynamodb_table"] }],
-  "AWS/ApiGateway": [
-    {
-      dimensions: ["ApiName", "ApiId"],
-      types: ["aws_api_gateway_rest_api", "aws_apigatewayv2_api"],
-    },
-  ],
-  "AWS/ApplicationELB": [
-    {
-      dimensions: ["LoadBalancer", "TargetGroup"],
-      types: [
-        "aws_lb",
-        "aws_alb",
-        "aws_lb_target_group",
-        "aws_alb_target_group",
-      ],
-    },
-  ],
-  "AWS/NetworkELB": [
-    {
-      dimensions: ["LoadBalancer", "TargetGroup"],
-      types: [
-        "aws_lb",
-        "aws_alb",
-        "aws_lb_target_group",
-        "aws_alb_target_group",
-      ],
-    },
-  ],
-  "AWS/RDS": [
-    { dimensions: ["DBInstanceIdentifier"], types: ["aws_db_instance", "aws_rds_cluster"] },
-  ],
-  "AWS/ElastiCache": [
-    {
-      dimensions: ["CacheClusterId", "ReplicationGroupId"],
-      types: ["aws_elasticache_cluster", "aws_elasticache_replication_group"],
-    },
-  ],
+const REFERENCE_KEY_TYPE_RULES = {
+  functionname: ["aws_lambda_function"],
+  function_name: ["aws_lambda_function"],
+  queuename: ["aws_sqs_queue"],
+  queue_name: ["aws_sqs_queue"],
+  topicname: ["aws_sns_topic"],
+  topic_name: ["aws_sns_topic"],
+  bucketname: ["aws_s3_bucket"],
+  bucket: ["aws_s3_bucket"],
+  rolearn: ["aws_iam_role"],
+  role_arn: ["aws_iam_role"],
+  role: ["aws_iam_role", "aws_iam_instance_profile"],
 };
 
 /** Synthetic node: Terraform module call (for edges + grouping). Not an AWS resource. */
@@ -932,46 +896,45 @@ function resolveNodeRefs(value, index, nodes, allowedTypes) {
   return [...matches];
 }
 
-/** For a metric alarm node, resolves watched resources from namespace + dimensions via `CLOUDWATCH_ALARM_WATCH_RULES_BY_NAMESPACE`. */
-function resolveCloudWatchAlarmWatchTargets(nodePath, node, index, nodes) {
-  if (getResourceType(nodePath, node) !== "aws_cloudwatch_metric_alarm") {
-    return [];
+/** Collects scalar references while preserving the nearest parent object key. */
+function collectReferenceScalars(value, parentKey = "", out = []) {
+  if (typeof value === "string") {
+    out.push({ value, key: parentKey });
+    return out;
   }
-
-  const targets = new Set();
-
-  for (const resource of Object.values(node.resources || {})) {
-    const values = getResourceValues(resource);
-    const namespace = values.namespace;
-    const dimensions = values.dimensions;
-    if (!namespace || !isPlainObject(dimensions)) {
-      continue;
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      collectReferenceScalars(item, parentKey, out);
     }
-
-    const rules = CLOUDWATCH_ALARM_WATCH_RULES_BY_NAMESPACE[namespace];
-    if (!rules) {
-      continue;
-    }
-
-    for (const rule of rules) {
-      for (const dim of rule.dimensions) {
-        const raw = dimensions[dim];
-        if (raw == null || raw === "") {
-          continue;
-        }
-        for (const t of resolveNodeRefs(raw, index, nodes, rule.types)) {
-          targets.add(t);
-        }
-      }
+    return out;
+  }
+  if (isPlainObject(value)) {
+    for (const [k, v] of Object.entries(value)) {
+      collectReferenceScalars(v, k, out);
     }
   }
-
-  return [...targets];
+  return out;
 }
 
-/** Resolves references against all indexed resource types. */
+/** Resolves references with key-aware type narrowing and generic fallback. */
 function resolveNodeRefsAcrossAllResourceTypes(value, index, nodes) {
-  return resolveNodeRefs(value, index, nodes, [...index.byType.keys()]);
+  const matches = new Set();
+  const allTypes = [...index.byType.keys()];
+
+  for (const scalar of collectReferenceScalars(value)) {
+    const key = String(scalar.key || "").toLowerCase();
+    const allowedTypes = REFERENCE_KEY_TYPE_RULES[key] || allTypes;
+    for (const nodePath of resolveNodeRefs(
+      scalar.value,
+      index,
+      nodes,
+      allowedTypes,
+    )) {
+      matches.add(nodePath);
+    }
+  }
+
+  return [...matches];
 }
 
 /**

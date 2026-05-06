@@ -516,6 +516,66 @@ describe("terraform module graph nodes", () => {
       "aws_s3_bucket.assets",
     ].sort());
   });
+
+  it("uses key-aware matching so FunctionName does not resolve to IAM role names", () => {
+    let nodes = ensureEdgeLists({
+      "aws_cloudwatch_metric_alarm.lambda_errors": {
+        resources: {
+          "aws_cloudwatch_metric_alarm.lambda_errors": {
+            type: "aws_cloudwatch_metric_alarm",
+            address: "aws_cloudwatch_metric_alarm.lambda_errors",
+            change: {
+              actions: ["create"],
+              after: {
+                namespace: "AWS/Lambda",
+                dimensions: { FunctionName: "test-writer" },
+              },
+            },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+      },
+      "module.lambda-writer.aws_lambda_function.main": {
+        resources: {
+          "module.lambda-writer.aws_lambda_function.main": {
+            type: "aws_lambda_function",
+            address: "module.lambda-writer.aws_lambda_function.main",
+            change: { after: { function_name: "test-writer" } },
+          },
+        },
+      },
+      "module.lambda-writer.aws_iam_role.lambda": {
+        resources: {
+          "module.lambda-writer.aws_iam_role.lambda": {
+            type: "aws_iam_role",
+            address: "module.lambda-writer.aws_iam_role.lambda",
+            change: { after: { name: "test-writer" } },
+          },
+        },
+      },
+      "module.lambda-writer": {
+        resources: {
+          "module.lambda-writer": {
+            type: "terraform_module",
+            address: "module.lambda-writer",
+            change: { actions: ["no-op"] },
+          },
+        },
+      },
+    });
+
+    nodes = ensureTerraformModuleNodes(nodes);
+    refineCloudWatchMetricAlarmEdges(nodes);
+
+    expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new.sort()).toEqual([
+      "module.lambda-writer.aws_lambda_function.main",
+      "module.lambda-writer",
+    ].sort());
+    expect(
+      nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new,
+    ).not.toContain("module.lambda-writer.aws_iam_role.lambda");
+  });
 });
 
 describe("buildDataFlowEdges", () => {
