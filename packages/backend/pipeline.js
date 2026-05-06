@@ -1456,6 +1456,98 @@ function omitNonAllowlistedDataSourceNodes(nodes) {
   return nodes;
 }
 
+function isStateOnlyResource(resource = {}) {
+  const actions = resource?.change?.actions;
+  return Array.isArray(actions) && actions.length === 1 && actions[0] === "existing";
+}
+
+/**
+ * Removes data source nodes that come only from tfstate and have no plan-backed
+ * change entry, so stale state does not resurrect config that is being removed.
+ */
+function omitStateOnlyDataSourceNodes(nodes) {
+  const omitted = new Set();
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__") || !node) {
+      continue;
+    }
+    const resources = Object.values(node.resources || {});
+    if (resources.length === 0) {
+      continue;
+    }
+    const dataResources = resources.filter((resource) => resource?.mode === "data");
+    if (dataResources.length === 0) {
+      continue;
+    }
+    const hasPlanBackedDataResource = dataResources.some(
+      (resource) => !isStateOnlyResource(resource),
+    );
+    if (!hasPlanBackedDataResource) {
+      omitted.add(nodePath);
+    }
+  }
+
+  stripEdgesReferencingPaths(nodes, omitted);
+  for (const path of omitted) {
+    delete nodes[path];
+  }
+  return nodes;
+}
+
+function isIamPolicyDocumentDataAddress(address = "") {
+  return /\.data\.aws_iam_policy_document\./.test(stripIndexes(String(address)));
+}
+
+function hasConcreteIamPolicyDocumentInstance(resource = {}, nodePath = "") {
+  if (resource?.type !== "aws_iam_policy_document") {
+    return false;
+  }
+  if (resource?.mode && resource.mode !== "data") {
+    return false;
+  }
+
+  const hasStateValues =
+    isPlainObject(resource.values) && Object.keys(resource.values).length > 0;
+  const hasPlannedValues =
+    isPlainObject(resource.change?.after) &&
+    Object.keys(resource.change.after).length > 0;
+
+  return hasStateValues || hasPlannedValues;
+}
+
+/**
+ * Removes config-only/ghost IAM policy-document nodes that can appear as
+ * dependency placeholders without a concrete instance payload.
+ */
+function omitGhostIamPolicyDocumentNodes(nodes) {
+  const omitted = new Set();
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath.startsWith("__") || !node) {
+      continue;
+    }
+    if (!isIamPolicyDocumentDataAddress(nodePath)) {
+      continue;
+    }
+
+    const resources = Object.values(node.resources || {});
+    const hasConcretePolicyDoc = resources.some((resource) =>
+      hasConcreteIamPolicyDocumentInstance(resource, nodePath),
+    );
+
+    if (!hasConcretePolicyDoc) {
+      omitted.add(nodePath);
+    }
+  }
+
+  stripEdgesReferencingPaths(nodes, omitted);
+  for (const path of omitted) {
+    delete nodes[path];
+  }
+  return nodes;
+}
+
 /** Removes low-level VPC routing types in `VPC_PLUMBING_OMIT_TYPES` after facets are captured. */
 function omitVpcPlumbingNodes(nodes) {
   const omitted = new Set();
@@ -1594,6 +1686,8 @@ module.exports = {
   externalResources,
   deleteOrphanedNodes,
   omitNonAllowlistedDataSourceNodes,
+  omitStateOnlyDataSourceNodes,
+  omitGhostIamPolicyDocumentNodes,
   omitVpcPlumbingNodes,
   filterVisualIgnore,
   cleanUpRoleLinks,

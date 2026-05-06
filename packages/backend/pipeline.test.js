@@ -9,6 +9,8 @@ const {
   omitVpcPlumbingNodes,
   deleteOrphanedNodes,
   omitNonAllowlistedDataSourceNodes,
+  omitStateOnlyDataSourceNodes,
+  omitGhostIamPolicyDocumentNodes,
   getDataSourceTypeFromAddress,
   isExcludedDataSourceAddress,
   mergeTerraformState,
@@ -180,6 +182,195 @@ describe("data source graph filtering", () => {
 
     expect(nodes["data.aws_region.current"]).toBeUndefined();
     expect(nodes["aws_lambda_function.fn"].edges_existing || []).toEqual([]);
+  });
+});
+
+describe("omitGhostIamPolicyDocumentNodes", () => {
+  it("removes config-only IAM policy-document placeholders and strips references", () => {
+    let nodes = ensureEdgeLists({
+      "module.lambda-monitoring.aws_iam_role_policy.logs[0]": {
+        resources: {
+          "module.lambda-monitoring.aws_iam_role_policy.logs[0]": resource(
+            "module.lambda-monitoring.aws_iam_role_policy.logs[0]",
+            "aws_iam_role_policy",
+            "logs",
+            {},
+          ),
+        },
+        edges_new: ["module.lambda-monitoring.data.aws_iam_policy_document.logs"],
+        edges_existing: ["module.lambda-monitoring.data.aws_iam_policy_document.logs"],
+        edges_data_flow: [
+          {
+            target: "module.lambda-monitoring.data.aws_iam_policy_document.logs",
+            relation: "policy",
+          },
+        ],
+      },
+      "module.lambda-monitoring.data.aws_iam_policy_document.logs": {
+        resources: {
+          "module.lambda-monitoring.data.aws_iam_policy_document.logs": {
+            address: "module.lambda-monitoring.data.aws_iam_policy_document.logs",
+            type: "module.lambda-monitoring.data.aws_iam_policy_document.logs",
+            change: { actions: ["external"] },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    });
+
+    nodes = omitGhostIamPolicyDocumentNodes(nodes);
+
+    expect(nodes["module.lambda-monitoring.data.aws_iam_policy_document.logs"]).toBeUndefined();
+    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_new).toEqual([]);
+    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_existing).toEqual(
+      [],
+    );
+    expect(
+      nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_data_flow,
+    ).toEqual([]);
+  });
+
+  it("keeps concrete IAM policy-document instances", () => {
+    let nodes = ensureEdgeLists({
+      "module.lambda-writer.data.aws_iam_policy_document.logs[0]": {
+        resources: {
+          "module.lambda-writer.data.aws_iam_policy_document.logs[0]": resource(
+            "module.lambda-writer.data.aws_iam_policy_document.logs[0]",
+            "aws_iam_policy_document",
+            "logs",
+            {
+              json: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\"}]}",
+            },
+            "data",
+          ),
+        },
+      },
+    });
+
+    nodes = omitGhostIamPolicyDocumentNodes(nodes);
+
+    expect(nodes["module.lambda-writer.data.aws_iam_policy_document.logs[0]"]).toBeDefined();
+  });
+
+  it("removes indexed IAM policy-document nodes when they have no concrete payload", () => {
+    let nodes = ensureEdgeLists({
+      "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]": {
+        resources: {
+          "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]": {
+            address: "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]",
+            mode: "data",
+            type: "aws_iam_policy_document",
+            name: "logs",
+            values: {},
+            change: { actions: ["read"], after: null },
+          },
+        },
+      },
+      "module.lambda-monitoring.aws_iam_role_policy.logs[0]": {
+        resources: {
+          "module.lambda-monitoring.aws_iam_role_policy.logs[0]": resource(
+            "module.lambda-monitoring.aws_iam_role_policy.logs[0]",
+            "aws_iam_role_policy",
+            "logs",
+            {},
+          ),
+        },
+        edges_new: ["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
+        edges_existing: ["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
+      },
+    });
+
+    nodes = omitGhostIamPolicyDocumentNodes(nodes);
+
+    expect(
+      nodes["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
+    ).toBeUndefined();
+    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_new).toEqual([]);
+    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_existing).toEqual(
+      [],
+    );
+  });
+
+  it("does not remove non policy-document data sources", () => {
+    let nodes = ensureEdgeLists({
+      "data.aws_region.current": {
+        resources: {
+          "data.aws_region.current": resource(
+            "data.aws_region.current",
+            "aws_region",
+            "current",
+            {},
+            "data",
+          ),
+        },
+      },
+    });
+
+    nodes = omitGhostIamPolicyDocumentNodes(nodes);
+
+    expect(nodes["data.aws_region.current"]).toBeDefined();
+  });
+});
+
+describe("omitStateOnlyDataSourceNodes", () => {
+  it("removes data nodes that exist only from tfstate merge", () => {
+    let nodes = ensureEdgeLists({
+      "module.lambda-monitoring.aws_iam_role_policy.logs[0]": {
+        resources: {
+          "module.lambda-monitoring.aws_iam_role_policy.logs[0]": resource(
+            "module.lambda-monitoring.aws_iam_role_policy.logs[0]",
+            "aws_iam_role_policy",
+            "logs",
+            {},
+          ),
+        },
+        edges_existing: ["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
+      },
+      "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]": {
+        resources: {
+          "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]": {
+            address: "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]",
+            mode: "data",
+            type: "aws_iam_policy_document",
+            name: "logs",
+            values: { json: "{\"Version\":\"2012-10-17\"}" },
+            change: { actions: ["existing"] },
+          },
+        },
+      },
+    });
+
+    nodes = omitStateOnlyDataSourceNodes(nodes);
+
+    expect(
+      nodes["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
+    ).toBeUndefined();
+    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_existing).toEqual(
+      [],
+    );
+  });
+
+  it("keeps plan-backed data nodes even if state is also merged", () => {
+    let nodes = ensureEdgeLists({
+      "data.aws_iam_policy_document.assume[0]": {
+        resources: {
+          "data.aws_iam_policy_document.assume[0]": {
+            address: "data.aws_iam_policy_document.assume[0]",
+            mode: "data",
+            type: "aws_iam_policy_document",
+            name: "assume",
+            values: { json: "{\"Version\":\"2012-10-17\"}" },
+            change: { actions: ["read"], after: { statement: [{ effect: "Allow" }] } },
+          },
+        },
+      },
+    });
+
+    nodes = omitStateOnlyDataSourceNodes(nodes);
+
+    expect(nodes["data.aws_iam_policy_document.assume[0]"]).toBeDefined();
   });
 });
 
