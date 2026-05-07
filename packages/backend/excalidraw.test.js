@@ -1,4 +1,63 @@
+const fs = require("fs");
+const path = require("path");
+const dot = require("graphlib-dot");
 const { nodesToExcalidraw } = require("./excalidraw");
+const pipeline = require("./pipeline");
+const { extractVpcNetworkingFacetStore } = require("./vpc-networking-facet");
+
+function rectOf(element) {
+  return {
+    x: element.x,
+    y: element.y,
+    w: element.width,
+    h: element.height,
+  };
+}
+
+function overlaps(a, b) {
+  return !(
+    a.x + a.w <= b.x ||
+    b.x + b.w <= a.x ||
+    a.y + a.h <= b.y ||
+    b.y + b.h <= a.y
+  );
+}
+
+function runAllplanModulesPipeline() {
+  const terraformDir = path.join(__dirname, "terraform");
+  const plan = JSON.parse(
+    fs.readFileSync(path.join(terraformDir, "allplanmodules.json"), "utf8"),
+  );
+  const graph = dot.read(
+    fs.readFileSync(path.join(terraformDir, "allplanmodules.dot"), "utf8"),
+  );
+  const adjlist = pipeline.getAdjacencyListFromDot(graph);
+  let nodes = pipeline.loadPlanAndNodes(plan);
+  nodes = pipeline.mergeTerraformState(nodes, null);
+  nodes = pipeline.ensureTerraformModuleNodes(nodes);
+  nodes = pipeline.applyModuleMetadata(nodes, plan);
+  nodes = pipeline.omitNonAllowlistedDataSourceNodes(nodes);
+  nodes = pipeline.buildNewEdges(nodes, adjlist);
+  nodes = pipeline.computeResourceDiffs(nodes);
+  nodes = pipeline.buildExistingEdges(nodes, plan);
+  nodes = pipeline.omitNonAllowlistedDataSourceNodes(nodes);
+  nodes = pipeline.omitStateOnlyDataSourceNodes(nodes);
+  nodes = pipeline.detectGenericStructuralEdges(nodes);
+  nodes = pipeline.ensureEdgeLists(nodes);
+  nodes = pipeline.pruneRedundantStructuralEdges(nodes);
+  nodes = pipeline.externalResources(nodes);
+  nodes = pipeline.ensureEdgeLists(nodes);
+  nodes = pipeline.buildDataFlowEdges(nodes);
+  nodes = pipeline.ensureEdgeLists(nodes);
+  nodes = pipeline.omitGhostIamPolicyDocumentNodes(nodes);
+  nodes.__networkingFacetStore = extractVpcNetworkingFacetStore(nodes);
+  nodes = pipeline.omitVpcPlumbingNodes(nodes);
+  nodes = pipeline.deleteOrphanedNodes(nodes);
+  nodes = pipeline.cleanUpRoleLinks(nodes);
+  nodes = pipeline.filterVisualIgnore(nodes);
+  nodes = pipeline.deleteOrphanedNodes(nodes);
+  return nodes;
+}
 
 describe("nodesToExcalidraw Terraform edge layers", () => {
   it("renders resource labels as grouped text that can be restored with hidden resources", async () => {
@@ -745,5 +804,45 @@ describe("nodesToExcalidraw VPC perimeter layout", () => {
     expect(publicLb?.customData?.terraformVpcApplianceWall).toBe("leftWall");
     expect(publicLb?.customData?.terraformVpcApplianceKind).toBe("load_balancer");
     expect(internalLb?.customData?.terraformVpcApplianceWall).toBe("topWall");
+  });
+});
+
+describe("nodesToExcalidraw nested module layout", () => {
+  it("keeps allplanmodules workload writer lambda child module boxes disjoint", async () => {
+    const scene = await nodesToExcalidraw(runAllplanModulesPipeline());
+    const parent = "module.workload_writer_lambda";
+    const lambdaModule = `${parent}.module.lambda`;
+    const securityGroupModule = `${parent}.module.security_group[0]`;
+    const moduleRect = (modulePath) => {
+      const element = scene.elements.find(
+        (el) =>
+          el.type === "rectangle" &&
+          el.customData?.terraformModuleGroup &&
+          el.customData?.modulePath === modulePath,
+      );
+      expect(element).toBeTruthy();
+      return rectOf(element);
+    };
+    const resourceRects = (prefix) =>
+      scene.elements
+        .filter(
+          (el) =>
+            el.type === "rectangle" &&
+            el.customData?.nodePath &&
+            (el.customData.nodePath === prefix ||
+              el.customData.nodePath.startsWith(`${prefix}.`)),
+        )
+        .map(rectOf);
+
+    const lambdaBox = moduleRect(lambdaModule);
+    const securityGroupBox = moduleRect(securityGroupModule);
+    expect(overlaps(lambdaBox, securityGroupBox)).toBe(false);
+
+    for (const rect of resourceRects(lambdaModule)) {
+      expect(overlaps(rect, securityGroupBox)).toBe(false);
+    }
+    for (const rect of resourceRects(securityGroupModule)) {
+      expect(overlaps(rect, lambdaBox)).toBe(false);
+    }
   });
 });

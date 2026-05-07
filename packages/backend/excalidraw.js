@@ -173,8 +173,20 @@ async function nodesToExcalidraw(nodes) {
     nodeKeys,
     moduleMembers,
     moduleGroupByPath,
+    tierMap,
+    tierConfigs,
   );
-  applyModulePresets(positions, nodeKeys, moduleGroupByPath);
+  const recursivelyLaidOutModules = new Set();
+  for (const members of moduleMembers.values()) {
+    for (const nodePath of members) {
+      for (const modulePath of getModulePathChain(nodePath)) {
+        recursivelyLaidOutModules.add(modulePath);
+      }
+    }
+  }
+  applyModulePresets(positions, nodeKeys, moduleGroupByPath, {
+    skipModulePaths: recursivelyLaidOutModules,
+  });
   const perimeterWallByNodePath = snapVpcPerimeterResourcePositions(
     positions,
     accountRegionGroups,
