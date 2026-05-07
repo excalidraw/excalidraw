@@ -1162,6 +1162,51 @@ describe("pruneRedundantStructuralEdges", () => {
     expect(nodes["module.lambda_writer"].edges_new).toEqual(["module.sqs_kms"]);
   });
 
+  it("keeps a concrete resource-to-resource shortcut even when a multi-hop path exists", () => {
+    let nodes = {
+      "aws_lambda_function.writer": {
+        resources: {
+          "aws_lambda_function.writer": resource(
+            "aws_lambda_function.writer",
+            "aws_lambda_function",
+            "writer",
+          ),
+        },
+        edges_new: ["aws_s3_bucket.data", "aws_s3_bucket_policy.secure_transport"],
+        edges_existing: [],
+      },
+      "aws_s3_bucket_policy.secure_transport": {
+        resources: {
+          "aws_s3_bucket_policy.secure_transport": resource(
+            "aws_s3_bucket_policy.secure_transport",
+            "aws_s3_bucket_policy",
+            "secure_transport",
+          ),
+        },
+        edges_new: ["aws_s3_bucket.data"],
+        edges_existing: [],
+      },
+      "aws_s3_bucket.data": {
+        resources: {
+          "aws_s3_bucket.data": resource(
+            "aws_s3_bucket.data",
+            "aws_s3_bucket",
+            "data",
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+      },
+    };
+    nodes = ensureEdgeLists(nodes);
+    pruneRedundantStructuralEdges(nodes);
+
+    expect(nodes["aws_lambda_function.writer"].edges_new.sort()).toEqual([
+      "aws_s3_bucket.data",
+      "aws_s3_bucket_policy.secure_transport",
+    ]);
+  });
+
   it("prunes redundant targets listed only on edges_existing", () => {
     let nodes = {
       "module.lambda_reader": {
