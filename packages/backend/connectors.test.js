@@ -119,5 +119,14 @@ describe("Connector registry", () => {
     expect(result.body.type).toBe("tldraw");
     expect(Array.isArray(result.body.shapes)).toBe(true);
     expect(result.body.shapes.length).toBeGreaterThan(0);
+
+    const resource = result.body.shapes.find(
+      (shape) =>
+        shape.type === "geo" &&
+        shape.meta &&
+        shape.meta.terraformVisibilityRole === "resource" &&
+        shape.meta.terraformVisibilityKey,
+    );
+    expect(resource).toBeTruthy();
   });
 });

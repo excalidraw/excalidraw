@@ -72,8 +72,42 @@ function isContainerElement(el) {
   return Boolean(cd && cd.container);
 }
 
+function extractTerraformMeta(el) {
+  const cd = el.customData;
+  if (!cd || typeof cd !== "object") {
+    return undefined;
+  }
+  const keys = [
+    "terraformVisibilityRole",
+    "terraformVisibilityKey",
+    "terraformInitiallyVisible",
+    "terraformNodeKind",
+    "terraformExplodeParent",
+    "terraformExplodeParentKeys",
+    "terraformGroupChildKeys",
+    "terraformExploded",
+    "terraformEdgeLayer",
+    "relationship",
+    "terraformCategoryId",
+    "nodePath",
+  ];
+  const meta = {};
+  for (const key of keys) {
+    if (key in cd) {
+      meta[key] = cd[key];
+    }
+  }
+  return Object.keys(meta).length ? meta : undefined;
+}
+
 function excalidrawSceneToTldrawShapes(scene) {
-  const elements = (scene.elements || []).filter((el) => !el.isDeleted);
+  const elements = (scene.elements || []).filter((el) => {
+    if (!el.isDeleted) return true;
+    // Keep soft-hidden Terraform elements so tldraw can drive explode/collapse
+    // from the same graph semantics Excalidraw uses.
+    const cd = el.customData;
+    return Boolean(cd && (cd.terraformVisibilityRole || cd.terraformVisibilityKey));
+  });
   const idMap = new Map();
   for (const el of elements) {
     idMap.set(el.id, stableShapeId("el", el.id));
@@ -89,6 +123,7 @@ function excalidrawSceneToTldrawShapes(scene) {
     const y = el.y ?? 0;
     const w = Math.max(1, el.width ?? 1);
     const h = Math.max(1, el.height ?? 1);
+    const meta = extractTerraformMeta(el);
 
     switch (el.type) {
       case "rectangle":
@@ -105,6 +140,7 @@ function excalidrawSceneToTldrawShapes(scene) {
           type: "geo",
           x,
           y,
+          meta,
           props: {
             geo,
             w,
@@ -123,6 +159,7 @@ function excalidrawSceneToTldrawShapes(scene) {
           type: "text",
           x,
           y,
+          meta,
           props: {
             richText: toRichText(el.text ?? ""),
             color,
@@ -151,6 +188,7 @@ function excalidrawSceneToTldrawShapes(scene) {
           type: "arrow",
           x,
           y,
+          meta,
           props: {
             kind: "arc",
             start: { x: start[0], y: start[1] },
