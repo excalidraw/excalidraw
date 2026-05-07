@@ -55,7 +55,7 @@ module "workload_writer_lambda" {
   enable_vpc = true
 
   s3_existing_package = {
-    bucket = aws_s3_bucket.lambda_deployment_artifacts.id
+    bucket = module.lambda_deployment_artifacts.s3_bucket_id
     key    = aws_s3_object.lambda_deployment_package.key
   }
 
@@ -67,7 +67,7 @@ module "workload_writer_lambda" {
   errors_alarm_name = "test-writer-errors"
 
   environment_variables = {
-    DATA_BUCKET    = module.application_data_bucket.s3_bucket_id
+    DATA_BUCKET = module.application_data_bucket.s3_bucket_id
     DATA_QUEUE_URL = module.application_job_queue.queue_url
   }
 
@@ -76,7 +76,7 @@ module "workload_writer_lambda" {
     deployment_pkg_read = {
       effect    = "Allow"
       actions   = ["s3:GetObject"]
-      resources = ["${aws_s3_bucket.lambda_deployment_artifacts.arn}/${aws_s3_object.lambda_deployment_package.key}"]
+      resources = ["${module.lambda_deployment_artifacts.s3_bucket_arn}/${aws_s3_object.lambda_deployment_package.key}"]
     }
     s3_write = {
       effect    = "Allow"
@@ -121,7 +121,7 @@ module "workload_monitoring_lambda" {
   handler       = "main.monitoring_handler"
 
   s3_existing_package = {
-    bucket = aws_s3_bucket.lambda_deployment_artifacts.id
+    bucket = module.lambda_deployment_artifacts.s3_bucket_id
     key    = aws_s3_object.lambda_deployment_package.key
   }
 
@@ -136,7 +136,7 @@ module "workload_monitoring_lambda" {
     deployment_pkg_read = {
       effect    = "Allow"
       actions   = ["s3:GetObject"]
-      resources = ["${aws_s3_bucket.lambda_deployment_artifacts.arn}/${aws_s3_object.lambda_deployment_package.key}"]
+      resources = ["${module.lambda_deployment_artifacts.s3_bucket_arn}/${aws_s3_object.lambda_deployment_package.key}"]
     }
   }
 }
@@ -153,7 +153,7 @@ module "workload_reader_lambda" {
   enable_vpc = true
 
   s3_existing_package = {
-    bucket = aws_s3_bucket.lambda_deployment_artifacts.id
+    bucket = module.lambda_deployment_artifacts.s3_bucket_id
     key    = aws_s3_object.lambda_deployment_package.key
   }
 
@@ -174,7 +174,7 @@ module "workload_reader_lambda" {
     deployment_pkg_read = {
       effect    = "Allow"
       actions   = ["s3:GetObject"]
-      resources = ["${aws_s3_bucket.lambda_deployment_artifacts.arn}/${aws_s3_object.lambda_deployment_package.key}"]
+      resources = ["${module.lambda_deployment_artifacts.s3_bucket_arn}/${aws_s3_object.lambda_deployment_package.key}"]
     }
     s3_read = {
       effect    = "Allow"
@@ -201,5 +201,4 @@ module "workload_reader_lambda" {
       resources = [module.application_job_queue.kms_key_arn]
     }
   }
-}
-*/
+}*/

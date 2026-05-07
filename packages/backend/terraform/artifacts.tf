@@ -4,72 +4,39 @@ data "archive_file" "lambda_deployment_package" {
   output_path = "${path.module}/builds/main.zip"
 }
 
-resource "aws_s3_bucket" "lambda_deployment_artifacts" {
-  bucket = "ts-test-lambda-artifacts"
-  tags = {
-    visual = "ignore"
-  }
-}
+module "lambda_deployment_artifacts" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "5.8.0"
 
-resource "aws_s3_bucket_public_access_block" "lambda_deployment_artifacts" {
-  bucket = aws_s3_bucket.lambda_deployment_artifacts.id
+  bucket = "ts-test-lambda-artifacts"
 
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
-}
 
-resource "aws_s3_bucket_versioning" "lambda_deployment_artifacts" {
-  bucket = aws_s3_bucket.lambda_deployment_artifacts.id
-  versioning_configuration {
+  versioning = {
     status = "Enabled"
   }
-}
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "lambda_deployment_artifacts" {
-  bucket = aws_s3_bucket.lambda_deployment_artifacts.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-    bucket_key_enabled = true
-  }
-}
-
-data "aws_iam_policy_document" "lambda_deployment_artifacts_tls_only" {
-  statement {
-    sid    = "DenyInsecureTransport"
-    effect = "Deny"
-
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-
-    actions = ["s3:*"]
-
-    resources = [
-      aws_s3_bucket.lambda_deployment_artifacts.arn,
-      "${aws_s3_bucket.lambda_deployment_artifacts.arn}/*",
-    ]
-
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values   = ["false"]
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm = "AES256"
+      }
+      bucket_key_enabled = true
     }
   }
-}
 
-resource "aws_s3_bucket_policy" "lambda_deployment_artifacts" {
-  bucket = aws_s3_bucket.lambda_deployment_artifacts.id
-  policy = data.aws_iam_policy_document.lambda_deployment_artifacts_tls_only.json
+  attach_deny_insecure_transport_policy = true
+
+  tags = {
+    visual = "ignore"
+  }
 }
 
 resource "aws_s3_object" "lambda_deployment_package" {
-  bucket = aws_s3_bucket.lambda_deployment_artifacts.id
+  bucket = module.lambda_deployment_artifacts.s3_bucket_id
   key    = "main.zip"
   source = data.archive_file.lambda_deployment_package.output_path
   etag   = data.archive_file.lambda_deployment_package.output_md5

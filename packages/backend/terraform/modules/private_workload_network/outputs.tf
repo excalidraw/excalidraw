@@ -27,3 +27,18 @@ output "managed_service_endpoints" {
   description = "Created gateway + interface endpoints (module aws provider objects)."
   value       = module.managed_service_endpoints.endpoints
 }
+
+output "flow_log_id" {
+  description = "VPC Flow Log resource ID."
+  value       = module.vpc_flow_logs.flow_log_id
+}
+
+output "flow_log_group_name" {
+  description = "CloudWatch Logs group receiving VPC Flow Logs."
+  value       = module.vpc_flow_logs.log_group_name
+}
+
+output "flow_log_group_arn" {
+  description = "CloudWatch Logs group ARN for VPC Flow Logs."
+  value       = module.vpc_flow_logs.log_group_arn
+}

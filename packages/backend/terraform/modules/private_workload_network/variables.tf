@@ -25,6 +25,29 @@ variable "interface_endpoint_security_group_description" {
   description = "Description for interface_endpoint_security_group."
 }
 
+variable "flow_logs_log_group_name" {
+  type        = string
+  default     = "/aws/vpc/ts-test-lambda-flow"
+  description = "CloudWatch Logs group receiving VPC Flow Logs."
+}
+
+variable "flow_logs_log_retention_in_days" {
+  type        = number
+  default     = 30
+  description = "Retention period for the VPC Flow Logs CloudWatch log group."
+}
+
+variable "flow_logs_traffic_type" {
+  type        = string
+  default     = "ALL"
+  description = "Traffic type captured by VPC Flow Logs: ACCEPT, REJECT, or ALL."
+
+  validation {
+    condition     = contains(["ACCEPT", "REJECT", "ALL"], var.flow_logs_traffic_type)
+    error_message = "flow_logs_traffic_type must be one of ACCEPT, REJECT, or ALL."
+  }
+}
+
 variable "tags" {
   type        = map(string)
   default     = {}

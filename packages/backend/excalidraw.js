@@ -38,7 +38,6 @@ const {
   collectContainerFacets,
   buildContainerFacetSummaryLine,
   buildContainerFacetCustomData,
-  getOwningModulePath,
   ACTION_COLORS,
   ACTION_STROKE,
 } = require("./excalidraw-elements");
@@ -506,24 +505,49 @@ async function nodesToExcalidraw(nodes) {
     );
   }
 
-  const getVisualBoundsForNodePath = (nodePath) => {
-    const modulePath = getOwningModulePath(nodePath);
-    if (modulePath && moduleBoundsByPath.has(modulePath)) {
+  const moduleMemberSetsByPath = new Map(
+    moduleGroups.map((group) => [group.modulePath, new Set(group.nodePaths)]),
+  );
+
+  const getSemanticModulePathForContainer = (nodePath, containerNodeSet) => {
+    const chain = getModulePathChain(nodePath)
+      .filter((modulePath) => moduleBoundsByPath.has(modulePath))
+      .sort((a, b) => b.length - a.length);
+
+    for (const modulePath of chain) {
+      const memberSet = moduleMemberSetsByPath.get(modulePath);
+      if (
+        memberSet &&
+        [...memberSet].every((memberPath) => containerNodeSet.has(memberPath))
+      ) {
+        return modulePath;
+      }
+    }
+    return null;
+  };
+
+  const getVisualBoundsForNodePath = (nodePath, containerNodeSet) => {
+    const modulePath = getSemanticModulePathForContainer(
+      nodePath,
+      containerNodeSet,
+    );
+    if (modulePath) {
       return moduleBoundsByPath.get(modulePath);
     }
     return posMap[nodePath];
   };
 
-  const getUniqueVisualBounds = (nodePaths) => {
+  const getUniqueVisualBounds = (nodePaths, semanticNodePaths = nodePaths) => {
     const boundsByKey = new Map();
+    const containerNodeSet = new Set(semanticNodePaths);
 
     for (const nodePath of nodePaths) {
-      const modulePath = getOwningModulePath(nodePath);
-      const key =
-        modulePath && moduleBoundsByPath.has(modulePath)
-          ? modulePath
-          : nodePath;
-      const bounds = getVisualBoundsForNodePath(nodePath);
+      const modulePath = getSemanticModulePathForContainer(
+        nodePath,
+        containerNodeSet,
+      );
+      const key = modulePath || nodePath;
+      const bounds = getVisualBoundsForNodePath(nodePath, containerNodeSet);
       if (bounds && !boundsByKey.has(key)) {
         boundsByKey.set(key, bounds);
       }
@@ -798,7 +822,7 @@ async function nodesToExcalidraw(nodes) {
         const boundsPaths =
           vpcInteriorPaths.length > 0 ? vpcInteriorPaths : vpcGroup.nodePaths;
         const vpcBounds =
-          measureBounds(getUniqueVisualBounds(boundsPaths)) ||
+          measureBounds(getUniqueVisualBounds(boundsPaths, vpcGroup.nodePaths)) ||
           measureBoundsFromNodePositions(
             boundsPaths,
             positions,
