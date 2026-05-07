@@ -236,6 +236,9 @@ function isExcludedDataSourceNode(node, primary = getPrimaryResource(node)) {
 const getResourceType = (nodePath, node) =>
   getPrimaryResource(node)?.type || String(nodePath).split(".").at(-2) || "";
 
+const isTerraformModuleNode = (node) =>
+  getPrimaryResource(node)?.type === TERRAFORM_MODULE_RESOURCE_TYPE;
+
 const flattenValues = (value, out = []) => {
   if (typeof value === "string") {
     out.push(value);
@@ -783,7 +786,10 @@ function pruneRedundantStructuralEdges(nodes) {
         next.push(target);
         continue;
       }
+      const canPruneShortcut =
+        isTerraformModuleNode(nodes[sourcePath]) || isTerraformModuleNode(nodes[target]);
       const redundant =
+        canPruneShortcut &&
         sourcePath !== target &&
         reachableWithoutDirectEdge(nodes, adjacency, sourcePath, target);
       if (!redundant) {
