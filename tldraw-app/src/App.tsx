@@ -15,7 +15,7 @@ type TldrawRenderDocument = {
   shapes?: TLShapePartial[];
 };
 
-function sanitizeShapes(input: TLShapePartial[]): TLShapePartial[] {
+export function sanitizeShapes(input: TLShapePartial[]): TLShapePartial[] {
   return input
     .map((shape) => {
       if (!shape || typeof shape !== "object" || !("type" in shape)) {
@@ -29,6 +29,9 @@ function sanitizeShapes(input: TLShapePartial[]): TLShapePartial[] {
           x: shape.x,
           y: shape.y,
           props: {
+            kind:
+              (props.kind as "arc" | "elbow" | "line" | "spline" | undefined) ||
+              "arc",
             start: props.start as { x: number; y: number },
             end: props.end as { x: number; y: number },
             bend: typeof props.bend === "number" ? props.bend : 0,
@@ -94,6 +97,20 @@ function sanitizeShapes(input: TLShapePartial[]): TLShapePartial[] {
     .filter((shape): shape is TLShapePartial => Boolean(shape));
 }
 
+export function orderShapesForRender(input: TLShapePartial[]): TLShapePartial[] {
+  const nonArrows: TLShapePartial[] = [];
+  const arrows: TLShapePartial[] = [];
+  for (const shape of input) {
+    if (shape.type === "arrow") {
+      arrows.push(shape);
+    } else {
+      nonArrows.push(shape);
+    }
+  }
+  // Draw edges on top so large Terraform containers can't hide them.
+  return [...nonArrows, ...arrows];
+}
+
 export default function App() {
   const editorRef = useRef<Editor | null>(null);
   const [allShapes, setAllShapes] = useState<TLShapePartial[]>([]);
@@ -117,6 +134,10 @@ export default function App() {
       }),
     [allShapes, expandedKeys, dependencyLayerEnabled, dataFlowLayerEnabled],
   );
+  const orderedVisibleShapes = useMemo(
+    () => orderShapesForRender(visibleShapes),
+    [visibleShapes],
+  );
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -126,14 +147,14 @@ export default function App() {
       if (existing.length > 0) {
         editor.deleteShapes(existing.map((s) => s.id));
       }
-      if (visibleShapes.length > 0) {
-        editor.createShapes(visibleShapes);
+      if (orderedVisibleShapes.length > 0) {
+        editor.createShapes(orderedVisibleShapes);
       }
       if (allShapes.length > 0) {
         editor.zoomToFit({ animation: { duration: 300 } });
       }
     });
-  }, [visibleShapes, allShapes.length]);
+  }, [orderedVisibleShapes, allShapes.length]);
 
   useEffect(() => {
     const handle = window.setInterval(() => {
