@@ -15,8 +15,6 @@ import type {
 
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 
-import { sanitizeMermaidRenderingError } from "./utils/mermaidError";
-
 import type { MermaidToExcalidrawLibProps } from "./types";
 
 import type { AppClassProperties, BinaryFiles } from "../../types";
@@ -124,11 +122,11 @@ export const convertMermaidToExcalidraw = async ({
   } catch (err: any) {
     parent.style.background = "var(--default-bg-color)";
     if (mermaidDefinition) {
-      setError(sanitizeMermaidRenderingError(err, mermaidDefinition));
+      setError(err);
     }
 
     // Return error so caller can display meaningful error message
-    return { success: false, error: sanitizeMermaidRenderingError(err, mermaidDefinition) };
+    return { success: false, error: err };
   }
 };
 export const saveMermaidDataToStorage = (mermaidDefinition: string) => {

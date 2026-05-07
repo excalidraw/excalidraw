@@ -8,8 +8,6 @@ import {
   isMermaidAutoFixableError,
   isMermaidParseSyntaxError,
   isMermaidCaretLine,
-  isMermaidRenderingError,
-  sanitizeMermaidRenderingError,
 } from "./mermaidError";
 
 describe("formatMermaidParseErrorMessage", () => {
@@ -128,67 +126,6 @@ describe("getMermaidErrorLineNumber", () => {
         sourceText,
       ),
     ).toBe(5);
-  });
-});
-
-describe("isMermaidRenderingError", () => {
-  it("returns true for minified runtime errors containing uppercase bracket access", () => {
-    expect(
-      isMermaidRenderingError(
-        "can't access property \"type\", Z[e].raw.startTime is undefined",
-      ),
-    ).toBe(true);
-  });
-
-  it("returns true for dot-path undefined property errors", () => {
-    expect(
-      isMermaidRenderingError("raw.endTime is undefined"),
-    ).toBe(true);
-  });
-
-  it("returns false for mermaid parse syntax errors", () => {
-    expect(
-      isMermaidRenderingError("Parse error on line 3: some snippet"),
-    ).toBe(false);
-  });
-
-  it("returns false for unrelated error messages", () => {
-    expect(isMermaidRenderingError("Network request failed")).toBe(false);
-  });
-});
-
-describe("sanitizeMermaidRenderingError", () => {
-  it("replaces a minified gantt startTime error with a helpful message", () => {
-    const raw = new Error(
-      "can't access property \"type\", Z[e].raw.startTime is undefined",
-    );
-    const definition = `gantt
-  title Daily Timeline
-  dateFormat HH:mm
-  section Night
-  Overnight :crit, 22:00, 06:00`;
-
-    const result = sanitizeMermaidRenderingError(raw, definition);
-    expect(result.message).toContain("gantt diagram");
-    expect(result.message).toContain("midnight");
-  });
-
-  it("provides gantt guidance when error mentions startTime even without definition", () => {
-    const raw = new Error("Z[e].raw.startTime is undefined");
-    const result = sanitizeMermaidRenderingError(raw);
-    expect(result.message).toContain("gantt diagram");
-  });
-
-  it("returns a generic internal error message for other rendering errors", () => {
-    const raw = new Error("X[i].someOtherProp is null");
-    const result = sanitizeMermaidRenderingError(raw, "flowchart TD\n  A --> B");
-    expect(result.message).toContain("internal rendering error");
-  });
-
-  it("returns the original error unchanged when it is not a rendering error", () => {
-    const raw = new Error("Parse error on line 2: unexpected token");
-    const result = sanitizeMermaidRenderingError(raw, "graph TD");
-    expect(result).toBe(raw);
   });
 });
 

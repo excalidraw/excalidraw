@@ -3,20 +3,6 @@ const MERMAID_INACTIVE_PARTICIPANT_ERROR =
   /Trying to inactivate an inactive participant \((.+)\)/i;
 const MERMAID_CARET_LINE = /^\s*-+\^\s*$/;
 
-/**
- * Matches minified runtime errors thrown by the mermaid renderer, e.g.:
- *   "can't access property \"type\", Z[e].raw.startTime is undefined"
- * These contain uppercase single-letter variables followed by bracket access.
- */
-const MERMAID_MINIFIED_RUNTIME_ERROR = /\b[A-Z]\[/;
-
-/**
- * Matches any "X is undefined/null" message that references a dot-path
- * property, which indicates a mermaid-internal rendering failure.
- */
-const MERMAID_PROPERTY_UNDEFINED_ERROR =
-  /\b\w+(?:\.\w+)+\s+is\s+(?:undefined|null)\b/i;
-
 export const isMermaidParseSyntaxError = (message: string) =>
   MERMAID_SYNTAX_ERROR_LINE.test(message);
 
@@ -144,50 +130,4 @@ export const formatMermaidParseErrorMessage = (message: string) => {
   }
 
   return message.replace(/\n\s*Expecting[\s\S]*$/, "").trimEnd();
-};
-
-/**
- * Returns true when the error originates from mermaid's internal rendering
- * pipeline rather than its parser/lexer. These errors typically contain
- * minified variable names (e.g. "Z[e].raw.startTime is undefined") and are
- * not meaningful to end users.
- */
-export const isMermaidRenderingError = (message: string): boolean => {
-  if (isMermaidParseSyntaxError(message)) {
-    return false;
-  }
-  return (
-    MERMAID_MINIFIED_RUNTIME_ERROR.test(message) ||
-    MERMAID_PROPERTY_UNDEFINED_ERROR.test(message)
-  );
-};
-
-/**
- * Converts a mermaid internal rendering error into a user-friendly Error.
- * Pass the original mermaid definition so that diagram-specific guidance can
- * be included where possible.
- */
-export const sanitizeMermaidRenderingError = (
-  err: Error,
-  mermaidDefinition?: string,
-): Error => {
-  if (!isMermaidRenderingError(err.message)) {
-    return err;
-  }
-
-  const isGantt = /^\s*gantt\b/i.test(mermaidDefinition ?? "");
-  const mentionsTime = /(?:start|end)Time/i.test(err.message);
-
-  if (isGantt || mentionsTime) {
-    return new Error(
-      "Unable to render gantt diagram: one or more tasks have an invalid time " +
-        "range. If a task crosses midnight (e.g. 22:00 → 06:00), split it into " +
-        "two separate tasks ending at 23:59 and starting at 00:00.",
-    );
-  }
-
-  return new Error(
-    "Unable to render diagram: an internal rendering error occurred. The " +
-      "diagram definition may contain unsupported syntax or values.",
-  );
 };
