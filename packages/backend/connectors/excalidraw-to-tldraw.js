@@ -106,7 +106,13 @@ function excalidrawSceneToTldrawShapes(scene) {
     // Keep soft-hidden Terraform elements so tldraw can drive explode/collapse
     // from the same graph semantics Excalidraw uses.
     const cd = el.customData;
-    return Boolean(cd && (cd.terraformVisibilityRole || cd.terraformVisibilityKey));
+    return Boolean(
+      cd &&
+        (cd.terraformVisibilityRole ||
+          cd.terraformVisibilityKey ||
+          cd.terraformEdgeLayer ||
+          cd.relationship),
+    );
   });
   const idMap = new Map();
   for (const el of elements) {

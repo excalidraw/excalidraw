@@ -129,4 +129,42 @@ describe("Connector registry", () => {
     );
     expect(resource).toBeTruthy();
   });
+
+  it("tldraw connector preserves soft-hidden terraform arrows for explode flows", async () => {
+    const hiddenTerraformArrow = {
+      id: "hidden-arrow",
+      type: "arrow",
+      x: 0,
+      y: 0,
+      points: [
+        [0, 0],
+        [80, 0],
+      ],
+      strokeColor: "#1e1e1e",
+      strokeWidth: 2,
+      isDeleted: true,
+      customData: {
+        terraform: true,
+        terraformEdgeLayer: "dependency",
+        relationship: {
+          source: "aws_lambda_function.worker",
+          target: "aws_iam_role.worker",
+          type: "dependency",
+          label: "depends on",
+        },
+      },
+    };
+
+    const {
+      excalidrawSceneToTldrawShapes,
+    } = require("./connectors/excalidraw-to-tldraw");
+    const converted = excalidrawSceneToTldrawShapes({
+      type: "excalidraw",
+      elements: [hiddenTerraformArrow],
+    });
+
+    expect(converted.shapes.length).toBe(1);
+    expect(converted.shapes[0].type).toBe("arrow");
+    expect(converted.shapes[0].meta?.terraformEdgeLayer).toBe("dependency");
+  });
 });
