@@ -13,6 +13,7 @@ const {
   lerp,
   getModulePathChain,
   getModuleRelativeResourcePath,
+  getOwningModulePath,
   stripTerraformInstanceIndexes,
   isLikelyLambdaModule,
   LAMBDA_MODULE_PRESET_OFFSETS,
@@ -20,6 +21,15 @@ const {
 
 /** Avoid duplicate stderr lines when offsets are recomputed (e.g. size estimate + expand). */
 const layoutInternalOffsetsDebugLogged = new Set();
+
+const MODULE_PADDING_X = 52;
+const MODULE_PADDING_TOP = 72;
+const MODULE_PADDING_BOTTOM = 40;
+const MODULE_BLOCK_GAP_X = 120;
+const MODULE_BLOCK_GAP_Y = 96;
+const MODULE_RESOURCE_GAP_X = 280;
+const MODULE_RESOURCE_GAP_Y = 160;
+const DEFAULT_RESOURCE_RECT = { w: 220, h: 100 };
 
 // --- Force layout ---
 
@@ -195,8 +205,104 @@ function buildCollapsedLayoutModel(
   };
 }
 
-/** Relative {x,y} offsets of module members around the collapsed module anchor (Lambda preset or grid). */
-function buildModuleInternalOffsets(members, modulePath, moduleGroup = null) {
+function measureResourceRect(nodePath, tierMap = {}, tierConfigs = {}) {
+  const cfg = tierConfigs[tierMap[nodePath]];
+  return {
+    w: cfg?.w ?? DEFAULT_RESOURCE_RECT.w,
+    h: cfg?.h ?? DEFAULT_RESOURCE_RECT.h,
+  };
+}
+
+function measureOffsetsBounds(offsets, tierMap = {}, tierConfigs = {}) {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const [nodePath, offset] of Object.entries(offsets)) {
+    const rect = measureResourceRect(nodePath, tierMap, tierConfigs);
+    minX = Math.min(minX, offset.x);
+    minY = Math.min(minY, offset.y);
+    maxX = Math.max(maxX, offset.x + rect.w);
+    maxY = Math.max(maxY, offset.y + rect.h);
+  }
+
+  if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+    return null;
+  }
+  return { minX, minY, maxX, maxY, w: maxX - minX, h: maxY - minY };
+}
+
+function normalizeOffsets(
+  offsets,
+  tierMap = {},
+  tierConfigs = {},
+  shiftX = 0,
+  shiftY = 0,
+) {
+  const bounds = measureOffsetsBounds(offsets, tierMap, tierConfigs);
+  if (!bounds) {
+    return {};
+  }
+
+  const normalized = {};
+  for (const [nodePath, offset] of Object.entries(offsets)) {
+    normalized[nodePath] = {
+      x: offset.x - bounds.minX + shiftX,
+      y: offset.y - bounds.minY + shiftY,
+    };
+  }
+  return normalized;
+}
+
+function packBlocks(blocks, options = {}) {
+  const gapX = options.gapX ?? MODULE_BLOCK_GAP_X;
+  const gapY = options.gapY ?? MODULE_BLOCK_GAP_Y;
+  const maxRowWidth = options.maxRowWidth ?? 1600;
+  const placements = [];
+  let x = 0;
+  let y = 0;
+  let rowH = 0;
+
+  for (const block of blocks) {
+    if (x > 0 && x + block.w > maxRowWidth) {
+      x = 0;
+      y += rowH + gapY;
+      rowH = 0;
+    }
+    placements.push({ ...block, x, y });
+    x += block.w + gapX;
+    rowH = Math.max(rowH, block.h);
+  }
+
+  const w = placements.reduce(
+    (max, block) => Math.max(max, block.x + block.w),
+    0,
+  );
+  const h = placements.reduce(
+    (max, block) => Math.max(max, block.y + block.h),
+    0,
+  );
+  return { placements, w, h };
+}
+
+function getImmediateChildModulePaths(members, modulePath) {
+  const children = new Set();
+  for (const nodePath of members) {
+    const chain = getModulePathChain(nodePath);
+    const index = chain.indexOf(modulePath);
+    if (index >= 0 && chain[index + 1]) {
+      children.add(chain[index + 1]);
+    }
+  }
+  return [...children].sort((a, b) => a.localeCompare(b));
+}
+
+function buildFlatModuleInternalOffsets(
+  members,
+  modulePath,
+  moduleGroup = null,
+) {
   const offsets = {};
   const fragments = new Set(
     members.map((nodePath) =>
@@ -254,6 +360,159 @@ function buildModuleInternalOffsets(members, modulePath, moduleGroup = null) {
   return offsets;
 }
 
+function measureResourceSection(resourcePaths, tierMap, tierConfigs) {
+  const blocks = resourcePaths.map((nodePath) => {
+    const rect = measureResourceRect(nodePath, tierMap, tierConfigs);
+    return { id: nodePath, nodePath, w: rect.w, h: rect.h };
+  });
+  const packed = packBlocks(blocks, {
+    gapX: MODULE_RESOURCE_GAP_X,
+    gapY: MODULE_RESOURCE_GAP_Y,
+    maxRowWidth: 1060,
+  });
+  const offsets = {};
+  for (const block of packed.placements) {
+    offsets[block.nodePath] = { x: block.x, y: block.y };
+  }
+  return { w: packed.w, h: packed.h, offsets };
+}
+
+function measureModuleBlock(
+  modulePath,
+  members,
+  moduleGroupByPath = new Map(),
+  tierMap = {},
+  tierConfigs = {},
+) {
+  const childModulePaths = getImmediateChildModulePaths(members, modulePath);
+  const moduleGroup = moduleGroupByPath.get(modulePath) || null;
+
+  if (childModulePaths.length === 0) {
+    const rawOffsets = buildFlatModuleInternalOffsets(
+      members,
+      modulePath,
+      moduleGroup,
+    );
+    const bounds = measureOffsetsBounds(rawOffsets, tierMap, tierConfigs);
+    if (!bounds) {
+      return { w: 0, h: 0, offsets: {} };
+    }
+    return {
+      w: bounds.w + MODULE_PADDING_X * 2,
+      h: bounds.h + MODULE_PADDING_TOP + MODULE_PADDING_BOTTOM,
+      offsets: normalizeOffsets(
+        rawOffsets,
+        tierMap,
+        tierConfigs,
+        MODULE_PADDING_X,
+        MODULE_PADDING_TOP,
+      ),
+    };
+  }
+
+  const directResources = members
+    .filter((nodePath) => getOwningModulePath(nodePath) === modulePath)
+    .sort((a, b) => a.localeCompare(b));
+  const sections = [];
+  const rawOffsets = {};
+
+  if (directResources.length > 0) {
+    const section = measureResourceSection(
+      directResources,
+      tierMap,
+      tierConfigs,
+    );
+    sections.push({
+      id: `${modulePath}::resources`,
+      kind: "resources",
+      w: section.w,
+      h: section.h,
+      offsets: section.offsets,
+    });
+  }
+
+  for (const childModulePath of childModulePaths) {
+    const childMembers = members
+      .filter(
+        (nodePath) =>
+          nodePath === childModulePath ||
+          nodePath.startsWith(`${childModulePath}.`),
+      )
+      .sort((a, b) => a.localeCompare(b));
+    const childBlock = measureModuleBlock(
+      childModulePath,
+      childMembers,
+      moduleGroupByPath,
+      tierMap,
+      tierConfigs,
+    );
+    sections.push({
+      id: childModulePath,
+      kind: "module",
+      w: childBlock.w,
+      h: childBlock.h,
+      offsets: childBlock.offsets,
+    });
+  }
+
+  const packed = packBlocks(sections, {
+    gapX: MODULE_BLOCK_GAP_X,
+    gapY: MODULE_BLOCK_GAP_Y,
+    maxRowWidth: 1800,
+  });
+
+  for (const section of packed.placements) {
+    for (const [nodePath, offset] of Object.entries(section.offsets)) {
+      rawOffsets[nodePath] = {
+        x: section.x + offset.x,
+        y: section.y + offset.y,
+      };
+    }
+  }
+
+  return {
+    w: packed.w + MODULE_PADDING_X * 2,
+    h: packed.h + MODULE_PADDING_TOP + MODULE_PADDING_BOTTOM,
+    offsets: Object.fromEntries(
+      Object.entries(rawOffsets).map(([nodePath, offset]) => [
+        nodePath,
+        {
+          x: offset.x + MODULE_PADDING_X,
+          y: offset.y + MODULE_PADDING_TOP,
+        },
+      ]),
+    ),
+  };
+}
+
+/** Relative {x,y} offsets of module members around the collapsed module anchor. */
+function buildModuleInternalOffsets(
+  members,
+  modulePath,
+  moduleGroup = null,
+  tierMap = {},
+  tierConfigs = {},
+  moduleGroupByPath = null,
+) {
+  const childModulePaths = getImmediateChildModulePaths(members, modulePath);
+  if (childModulePaths.length === 0) {
+    return buildFlatModuleInternalOffsets(members, modulePath, moduleGroup);
+  }
+
+  const groups =
+    moduleGroupByPath ||
+    new Map(
+      [[modulePath, moduleGroup]].filter(([, group]) => Boolean(group)),
+    );
+  return measureModuleBlock(
+    modulePath,
+    members,
+    groups,
+    tierMap,
+    tierConfigs,
+  ).offsets;
+}
+
 /** Bounding box size per collapsed module from internal offsets + tier card dimensions. */
 function estimateModuleLayoutSizes(
   moduleMembers,
@@ -264,38 +523,17 @@ function estimateModuleLayoutSizes(
   const sizes = {};
 
   for (const [modulePath, members] of moduleMembers.entries()) {
-    const moduleGroup = moduleGroupByPath.get(modulePath);
-    const offsets = buildModuleInternalOffsets(
-      members,
+    const block = measureModuleBlock(
       modulePath,
-      moduleGroup,
+      members,
+      moduleGroupByPath,
+      tierMap,
+      tierConfigs,
     );
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-
-    for (const nodePath of members) {
-      const offset = offsets[nodePath];
-      const cfg = tierConfigs[tierMap[nodePath]];
-      if (!offset || !cfg) {
-        continue;
-      }
-
-      minX = Math.min(minX, offset.x);
-      minY = Math.min(minY, offset.y);
-      maxX = Math.max(maxX, offset.x + cfg.w);
-      maxY = Math.max(maxY, offset.y + cfg.h);
-    }
-
-    if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+    if (block.w <= 0 || block.h <= 0) {
       continue;
     }
-
-    sizes[modulePath] = {
-      w: maxX - minX + 120,
-      h: maxY - minY + 120,
-    };
+    sizes[modulePath] = { w: block.w + 120, h: block.h + 120 };
   }
 
   return sizes;
@@ -307,6 +545,8 @@ function expandCollapsedModulePositions(
   nodeKeys,
   moduleMembers,
   moduleGroupByPath,
+  tierMap = {},
+  tierConfigs = {},
 ) {
   const positions = {};
   const collapsedNodeSet = new Set(
@@ -330,6 +570,9 @@ function expandCollapsedModulePositions(
       members,
       modulePath,
       moduleGroup,
+      tierMap,
+      tierConfigs,
+      moduleGroupByPath,
     );
 
     for (const nodePath of members) {
@@ -591,6 +834,10 @@ module.exports = {
   buildCollapsibleModuleSet,
   getCollapsedModulePath,
   buildCollapsedLayoutModel,
+  measureResourceRect,
+  measureModuleBlock,
+  packBlocks,
+  normalizeOffsets,
   buildModuleInternalOffsets,
   estimateModuleLayoutSizes,
   expandCollapsedModulePositions,

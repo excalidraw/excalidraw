@@ -953,8 +953,10 @@ function applyModulePresets(
   positions,
   nodeKeys,
   moduleGroupByPath = new Map(),
+  options = {},
 ) {
   const moduleMembers = new Map();
+  const skipModulePaths = options.skipModulePaths || new Set();
 
   for (const nodePath of nodeKeys) {
     const modulePath = getOwningModulePath(nodePath);
@@ -968,6 +970,10 @@ function applyModulePresets(
   }
 
   for (const [modulePath, members] of moduleMembers) {
+    if (skipModulePaths.has(modulePath)) {
+      continue;
+    }
+
     const fragments = new Set(
       members.map((nodePath) =>
         getModuleRelativeResourcePath(nodePath, modulePath),
