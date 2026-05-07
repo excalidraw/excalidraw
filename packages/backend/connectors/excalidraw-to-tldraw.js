@@ -1,51 +1,30 @@
 /**
- * First-pass converter: Excalidraw scene JSON -> tldraw shape partials.
+ * Excalidraw scene -> tldraw shape partials.
  *
- * This is intentionally lossy. The backend produces an Excalidraw scene with
- * fully-resolved layout, hand-tuned styles, custom data, and AWS icon
- * elements. We map the structurally-meaningful subset (rectangles, ellipses,
- * diamonds, text, arrows, lines) onto tldraw default shapes. Image / icon
- * elements are dropped for now; module/group containers become rectangles.
- *
- * When the backend grows a real `connectors/tldraw.js` renderer, this module
- * goes away and the canvas can load tldraw documents directly.
+ * This mirrors the original frontend converter behavior so backend and frontend
+ * produce parity-compatible shape payloads.
  */
-import {
-  toRichText,
-  type TLShapeId,
-  type TLShapePartial,
-  type TLDefaultColorStyle,
-  createShapeId,
-} from "tldraw";
 
-type ExcalidrawElement = {
-  id: string;
-  type: string;
-  x: number;
-  y: number;
-  width?: number;
-  height?: number;
-  angle?: number;
-  strokeColor?: string;
-  backgroundColor?: string;
-  strokeWidth?: number;
-  text?: string;
-  fontSize?: number;
-  fontFamily?: number;
-  textAlign?: "left" | "center" | "right";
-  points?: Array<[number, number]>;
-  startBinding?: { elementId: string } | null;
-  endBinding?: { elementId: string } | null;
-  isDeleted?: boolean;
-  customData?: Record<string, unknown>;
-};
+function toRichText(text) {
+  return {
+    type: "doc",
+    content: [{ type: "paragraph", content: [{ type: "text", text: text || "" }] }],
+  };
+}
 
-export type ExcalidrawScene = {
-  type?: string;
-  elements?: ExcalidrawElement[];
-};
+function slug(input) {
+  return String(input || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "shape";
+}
 
-const HEX_TO_TLDRAW: Array<{ test: RegExp; color: TLDefaultColorStyle }> = [
+function stableShapeId(kind, sourceId) {
+  return `shape:${kind}-${slug(sourceId)}`;
+}
+
+const HEX_TO_TLDRAW = [
   { test: /^#?(000|111|222|333)/i, color: "black" },
   { test: /^#?(444|555|666|777|888|999|aaa|bbb|ccc)/i, color: "grey" },
   { test: /red|#?(c[0-9a-f]{2}|d[0-9a-f]{2}|e[0-3])/i, color: "red" },
@@ -56,7 +35,7 @@ const HEX_TO_TLDRAW: Array<{ test: RegExp; color: TLDefaultColorStyle }> = [
   { test: /blue|#?(0[0-9a-f]{2}[5-9a-f]|1[0-9a-f][a-f])/i, color: "blue" },
 ];
 
-function mapColor(hex: string | undefined): TLDefaultColorStyle {
+function mapColor(hex) {
   if (!hex) return "black";
   for (const { test, color } of HEX_TO_TLDRAW) {
     if (test.test(hex)) return color;
@@ -64,17 +43,14 @@ function mapColor(hex: string | undefined): TLDefaultColorStyle {
   return "grey";
 }
 
-function mapStrokeSize(strokeWidth: number | undefined): "s" | "m" | "l" | "xl" {
+function mapStrokeSize(strokeWidth) {
   if (!strokeWidth || strokeWidth <= 1) return "s";
   if (strokeWidth <= 2) return "m";
   if (strokeWidth <= 4) return "l";
   return "xl";
 }
 
-/** Excalidraw uses CSS-ish alignment; tldraw text shapes expect start/middle/end. */
-export function mapExcalidrawTextAlignToTldraw(
-  align: ExcalidrawElement["textAlign"] | string | undefined,
-): "start" | "middle" | "end" {
+function mapExcalidrawTextAlignToTldraw(align) {
   switch (align) {
     case "left":
     case "start":
@@ -90,32 +66,23 @@ export function mapExcalidrawTextAlignToTldraw(
   }
 }
 
-function isContainerElement(el: ExcalidrawElement): boolean {
+function isContainerElement(el) {
   if (el.type !== "rectangle") return false;
-  const cd = el.customData as { terraform?: boolean; container?: boolean } | undefined;
-  return Boolean(cd?.container);
+  const cd = el.customData;
+  return Boolean(cd && cd.container);
 }
 
-/**
- * Walks an Excalidraw scene and returns shape partials ready to feed
- * `editor.createShapes(...)`. A second-pass `idMap` is returned so callers can
- * resolve original Excalidraw ids → tldraw shape ids if they need to wire up
- * arrow bindings later.
- */
-export function excalidrawSceneToTldrawShapes(scene: ExcalidrawScene): {
-  shapes: TLShapePartial[];
-  idMap: Map<string, TLShapeId>;
-} {
+function excalidrawSceneToTldrawShapes(scene) {
   const elements = (scene.elements || []).filter((el) => !el.isDeleted);
-  const idMap = new Map<string, TLShapeId>();
+  const idMap = new Map();
   for (const el of elements) {
-    idMap.set(el.id, createShapeId());
+    idMap.set(el.id, stableShapeId("el", el.id));
   }
 
-  const shapes: TLShapePartial[] = [];
+  const shapes = [];
 
   for (const el of elements) {
-    const id = idMap.get(el.id)!;
+    const id = idMap.get(el.id);
     const color = mapColor(el.strokeColor);
     const size = mapStrokeSize(el.strokeWidth);
     const x = el.x ?? 0;
@@ -195,17 +162,11 @@ export function excalidrawSceneToTldrawShapes(scene: ExcalidrawScene): {
             size,
             arrowheadStart: "none",
             arrowheadEnd: el.type === "arrow" ? "arrow" : "none",
-            font: "sans",
-            richText: toRichText(""),
-            labelPosition: 0.5,
-            labelColor: color,
-            scale: 1,
           },
         });
         break;
       }
       default: {
-        // image, freedraw, frame, etc. - drop for now.
         idMap.delete(el.id);
         break;
       }
@@ -214,3 +175,8 @@ export function excalidrawSceneToTldrawShapes(scene: ExcalidrawScene): {
 
   return { shapes, idMap };
 }
+
+module.exports = {
+  excalidrawSceneToTldrawShapes,
+  mapExcalidrawTextAlignToTldraw,
+};

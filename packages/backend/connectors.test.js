@@ -5,7 +5,6 @@ const {
   listRenderers,
 } = require("./connectors");
 const {
-  RendererNotImplementedError,
   UnknownRendererError,
 } = require("./connectors/errors");
 
@@ -110,11 +109,15 @@ describe("Connector registry", () => {
     expect(Array.isArray(result.body.elements)).toBe(true);
   });
 
-  it("tldraw connector throws RendererNotImplementedError (501 signal)", async () => {
-    const ir = buildDiagramIR(makeNodes());
+  it("tldraw connector renders a tldraw shape document", async () => {
+    const nodes = makeNodes();
+    const ir = buildDiagramIR(nodes);
     const renderer = getRenderer("tldraw");
-    await expect(renderer.render({ nodes: {}, ir })).rejects.toBeInstanceOf(
-      RendererNotImplementedError,
-    );
+    const result = await renderer.render({ nodes, ir, options: {} });
+    expect(result.contentType).toBe("application/json");
+    expect(result.fileExtension).toBe("tldr.json");
+    expect(result.body.type).toBe("tldraw");
+    expect(Array.isArray(result.body.shapes)).toBe(true);
+    expect(result.body.shapes.length).toBeGreaterThan(0);
   });
 });

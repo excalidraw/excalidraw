@@ -24,8 +24,8 @@ Upload a Terraform plan JSON, graph DOT, and optionally `terraform.tfstate`; the
 - **Lambda module preset** — Common Lambda module internals such as function, role, inline policies, log group, and package resources get stable relative placement.
 - **Relationship rendering** — Planned dependencies and state-derived dependencies are drawn as arrows behind the resource cards.
 - **Terraform details panel data** — Resource diffs, known-after-apply values, and selected state/config fields are stored on the Excalidraw elements for inspection.
-- **Pluggable frontend connectors** — The backend exposes `GET /terraform/upload/:id/render/:renderer`. Today `:renderer` can be `excalidraw` (stable) or `tldraw` (stub returning HTTP 501); new frontends plug in via `packages/backend/connectors/`. A renderer-neutral `DiagramIR` is built once per request so future connectors don't need to re-derive node/edge/group structure.
-- **Sibling tldraw app** — `tldraw-app/` mounts the same backend output on a [tldraw](https://tldraw.dev) canvas via a client-side Excalidraw→tldraw converter. Useful for exploring an alternate canvas without forking the backend.
+- **Pluggable frontend connectors** — The backend exposes `GET /terraform/upload/:id/render/:renderer`. Today `:renderer` can be `excalidraw` (stable) or `tldraw` (beta); new frontends plug in via `packages/backend/connectors/`. A renderer-neutral `DiagramIR` is built once per request so future connectors don't need to re-derive node/edge/group structure.
+- **Sibling tldraw app** — `tldraw-app/` mounts backend-rendered tldraw documents on a [tldraw](https://tldraw.dev) canvas via the `render/tldraw` connector route.
 
 The rest is standard Excalidraw: hand-drawn style, zoom/pan, export to PNG/SVG, and the usual editor tools.
 

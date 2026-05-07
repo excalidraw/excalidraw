@@ -25,7 +25,7 @@ Output:
 - `diagram-ir.js`: builds a renderer-neutral IR (nodes/edges/groups) from the pipeline `nodes` map. Consumed by frontend connectors.
 - `connectors/index.js`: registry of frontend connectors. New frontend bindings (tldraw, mermaid, …) plug in here.
 - `connectors/excalidraw.js`: Excalidraw renderer. Thin wrapper around `excalidraw.js`'s `nodesToExcalidraw`.
-- `connectors/tldraw.js`: stub renderer; throws `RendererNotImplementedError` until walked.
+- `connectors/tldraw.js`: DiagramIR -> tldraw shape-document renderer (`render/tldraw`).
 - `connectors/errors.js`: typed errors used by connectors and translated to HTTP status codes.
 - `excalidraw.js`: scene compiler. Coordinates layout, containers, modules, arrows, and Excalidraw elements.
 - `excalidraw-elements.js`: AWS icon/card metadata, tiers, labels, grouping details, custom data.
@@ -123,10 +123,9 @@ a stored upload into a frontend-specific scene document.
 
 The neutral `DiagramIR` (see `diagram-ir.js`) is built once per request from the
 post-pipeline `nodes` map and passed to every connector alongside the raw
-`nodes`. Today only the tldraw stub references the IR; the Excalidraw connector
-keeps using `nodes` directly because `excalidraw.js` already does layout +
-scene compilation. The IR is the forward seam: when the Excalidraw renderer is
-refactored to consume IR, both connectors will share the same input contract.
+`nodes`. The tldraw connector currently renders directly from IR into tldraw
+shape partials; the Excalidraw connector still uses `nodes` directly because
+`excalidraw.js` already does layout + scene compilation.
 
 Adding a new frontend connector:
 
@@ -134,7 +133,7 @@ Adding a new frontend connector:
 2. Register it in `connectors/index.js`'s `REGISTRY`.
 3. The `/render/:renderer` route will dispatch to it automatically.
 
-`RendererNotImplementedError` from `connectors/errors.js` translates to HTTP 501 with renderer details in the body.
+`RendererNotImplementedError` from `connectors/errors.js` translates to HTTP 501 with renderer details in the body (kept for future stub connectors).
 
 ## Layout Notes
 

@@ -50,9 +50,7 @@ export function UploadPanel({ onSceneLoaded, onError }: Props) {
       const { id } = (await uploadRes.json()) as { id: number };
 
       setStatus({ kind: "rendering", uploadId: id });
-      const sceneRes = await fetch(
-        `${BACKEND_URL}/terraform/upload/${id}/render/excalidraw`,
-      );
+      const sceneRes = await fetch(`${BACKEND_URL}/terraform/upload/${id}/render/tldraw`);
       if (!sceneRes.ok) {
         throw new Error(`Render failed: ${sceneRes.status}`);
       }
