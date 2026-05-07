@@ -22,6 +22,11 @@ Output:
 
 - `index.js`: Express routes, upload handling, pipeline orchestration, SQLite persistence.
 - `pipeline.js`: plan/DOT/state graph compiler. Produces the `nodes` map and edge channels.
+- `diagram-ir.js`: builds a renderer-neutral IR (nodes/edges/groups) from the pipeline `nodes` map. Consumed by frontend connectors.
+- `connectors/index.js`: registry of frontend connectors. New frontend bindings (tldraw, mermaid, …) plug in here.
+- `connectors/excalidraw.js`: Excalidraw renderer. Thin wrapper around `excalidraw.js`'s `nodesToExcalidraw`.
+- `connectors/tldraw.js`: stub renderer; throws `RendererNotImplementedError` until walked.
+- `connectors/errors.js`: typed errors used by connectors and translated to HTTP status codes.
 - `excalidraw.js`: scene compiler. Coordinates layout, containers, modules, arrows, and Excalidraw elements.
 - `excalidraw-elements.js`: AWS icon/card metadata, tiers, labels, grouping details, custom data.
 - `excalidraw-layout.js`: top-level layout (ELK layered by default, d3-force fallback), module collapsing/expansion, VPC perimeter snapping.
@@ -99,13 +104,37 @@ As inspected on 2026-05-06:
 - Action counts: 56 `no-op`, 14 `create`, 7 `delete`, 1 `read`, 1 `update`.
 - Top resource types include IAM role policies, security group rules, CloudWatch alarms/log groups, Lambda functions, VPC endpoints, S3, SQS, and KMS.
 
-Tests call this fixture through `runAllplanModulesPipeline()` in `excalidraw.test.js`.
+Tests call this fixture through `runAllplanModulesPipeline()` exported from `terraform/allplan-modules-pipeline.js` (used by `excalidraw.test.js` and `tldraw-app`'s Vitest integration test).
 
 Important caveat: fixture artifacts can drift from checked-in Terraform as the demo config changes. Regenerating `allplanmodules` should be done intentionally and followed by backend layout tests.
 
 Update: VPC Flow Logs are modeled as VPC-owned infrastructure. The root flow-log resources were moved into `terraform/modules/vpc_flow_logs`, and `terraform/modules/private_workload_network` owns that module as `module.vpc_flow_logs`. This keeps `aws_flow_log`, its publishing IAM role/policy, and CloudWatch log group under the network module boundary for layout.
 
 Update: Lambda deployment artifacts use `terraform-aws-modules/s3-bucket/aws` as `module.lambda_deployment_artifacts` instead of raw root `aws_s3_bucket` resources. Keep Lambda package references pointed at `module.lambda_deployment_artifacts.s3_bucket_id` / `s3_bucket_arn`.
+
+## Frontend Connectors
+
+The backend is renderer-agnostic at the HTTP boundary. A "connector" turns
+a stored upload into a frontend-specific scene document.
+
+- `GET /terraform/renderers` — lists available connectors and their status (`stable` / `beta` / `stub`).
+- `GET /terraform/upload/:id/render/:renderer` — primary route. `:renderer` ∈ `excalidraw`, `tldraw` (more pluggable).
+- `GET /terraform/upload/:id/excalidraw` — back-compat alias of `…/render/excalidraw`. Sets a `Deprecation: true` header.
+
+The neutral `DiagramIR` (see `diagram-ir.js`) is built once per request from the
+post-pipeline `nodes` map and passed to every connector alongside the raw
+`nodes`. Today only the tldraw stub references the IR; the Excalidraw connector
+keeps using `nodes` directly because `excalidraw.js` already does layout +
+scene compilation. The IR is the forward seam: when the Excalidraw renderer is
+refactored to consume IR, both connectors will share the same input contract.
+
+Adding a new frontend connector:
+
+1. Create `connectors/<id>.js` exporting `{ id, label, contentType, fileExtension, status, render({ nodes, ir, options }) }`.
+2. Register it in `connectors/index.js`'s `REGISTRY`.
+3. The `/render/:renderer` route will dispatch to it automatically.
+
+`RendererNotImplementedError` from `connectors/errors.js` translates to HTTP 501 with renderer details in the body.
 
 ## Layout Notes
 
@@ -131,7 +160,7 @@ Run backend tests from repo root:
 yarn workspace @excalidraw/backend test
 ```
 
-Last observed result on 2026-05-07 (with ELK as default layout engine): 4 test files, 48 tests passed. Node printed a `url.parse()` deprecation warning from dependencies.
+Last observed result on 2026-05-07 (with ELK default layout engine + connector seam): 5 test files, 54 tests passed (48 prior + 6 new in `connectors.test.js`). Node printed a `url.parse()` deprecation warning from dependencies.
 
 ## Maintenance Reminder
 
