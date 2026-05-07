@@ -1032,12 +1032,9 @@ const LayerUI = ({
         isTerraformLayerEdge(element) &&
         !isTerraformDependencyPreviewEdge(element)
       ) {
-        const nextOpacity =
-          hoveredNodePath === null
-            ? TERRAFORM_FOCUS_OPACITY
-            : focusedEdgeIds.has(element.id)
-            ? TERRAFORM_FOCUS_OPACITY
-            : TERRAFORM_DIM_EDGE_OPACITY;
+        const nextOpacity = focusedEdgeIds.has(element.id)
+          ? TERRAFORM_FOCUS_OPACITY
+          : TERRAFORM_DIM_EDGE_OPACITY;
         if (element.opacity === nextOpacity) {
           return element;
         }
