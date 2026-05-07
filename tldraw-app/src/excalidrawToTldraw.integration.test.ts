@@ -35,5 +35,25 @@ describe("allplanmodules → backend tldraw connector parity", () => {
     expect(doc.shapes.length).toBeGreaterThan(0);
     expect(doc.shapes.length).toBe(legacy.shapes.length);
     expect(normalizeShapes(doc.shapes)).toEqual(normalizeShapes(legacy.shapes));
+
+    const terraformResource = doc.shapes.find(
+      (shape: Record<string, unknown>) =>
+        shape.meta &&
+        typeof shape.meta === "object" &&
+        (shape.meta as Record<string, unknown>).terraformVisibilityRole ===
+          "resource",
+    ) as { meta: Record<string, unknown> } | undefined;
+    expect(terraformResource).toBeTruthy();
+    expect(terraformResource?.meta.terraformVisibilityKey).toBeTruthy();
+
+    const terraformEdge = doc.shapes.find(
+      (shape: Record<string, unknown>) =>
+        shape.type === "arrow" &&
+        shape.meta &&
+        typeof shape.meta === "object" &&
+        (shape.meta as Record<string, unknown>).terraformEdgeLayer,
+    ) as { meta: Record<string, unknown> } | undefined;
+    expect(terraformEdge).toBeTruthy();
+    expect(terraformEdge?.meta.relationship).toBeTruthy();
   });
 });

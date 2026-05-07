@@ -13,9 +13,30 @@ type Status =
 type Props = {
   onSceneLoaded: (scene: unknown) => void;
   onError?: (message: string) => void;
+  hasScene: boolean;
+  dependencyLayerEnabled: boolean;
+  dataFlowLayerEnabled: boolean;
+  hasSelectedExplodeTarget: boolean;
+  onToggleDependency: () => void;
+  onToggleDataFlow: () => void;
+  onExplodeSelected: () => void;
+  onExpandAll: () => void;
+  onCollapseAll: () => void;
 };
 
-export function UploadPanel({ onSceneLoaded, onError }: Props) {
+export function UploadPanel({
+  onSceneLoaded,
+  onError,
+  hasScene,
+  dependencyLayerEnabled,
+  dataFlowLayerEnabled,
+  hasSelectedExplodeTarget,
+  onToggleDependency,
+  onToggleDataFlow,
+  onExplodeSelected,
+  onExpandAll,
+  onCollapseAll,
+}: Props) {
   const [planFile, setPlanFile] = useState<File | null>(null);
   const [dotFile, setDotFile] = useState<File | null>(null);
   const [stateFile, setStateFile] = useState<File | null>(null);
@@ -96,6 +117,25 @@ export function UploadPanel({ onSceneLoaded, onError }: Props) {
           : status.kind === "rendering"
             ? "Rendering…"
             : "Import"}
+      </button>
+      <button type="button" disabled={!hasScene} onClick={onToggleDependency}>
+        {dependencyLayerEnabled ? "Hide Dependency" : "Show Dependency"}
+      </button>
+      <button type="button" disabled={!hasScene} onClick={onToggleDataFlow}>
+        {dataFlowLayerEnabled ? "Hide Data Flow" : "Show Data Flow"}
+      </button>
+      <button
+        type="button"
+        disabled={!hasScene || !hasSelectedExplodeTarget}
+        onClick={onExplodeSelected}
+      >
+        Explode Selected
+      </button>
+      <button type="button" disabled={!hasScene} onClick={onExpandAll}>
+        Expand All
+      </button>
+      <button type="button" disabled={!hasScene} onClick={onCollapseAll}>
+        Collapse All
       </button>
       <span
         className={`status${status.kind === "error" ? " error" : ""}`}

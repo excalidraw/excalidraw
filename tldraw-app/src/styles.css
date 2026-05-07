@@ -52,6 +52,16 @@ body,
   cursor: not-allowed;
 }
 
+.upload button[type="button"] {
+  border-color: #6b7280;
+  background: #f8fafc;
+  color: #1f2937;
+}
+
+.upload button[type="button"]:not([disabled]):hover {
+  background: #eef2ff;
+}
+
 .upload .status {
   font-size: 12px;
   color: #555;
