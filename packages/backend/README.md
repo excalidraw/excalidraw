@@ -19,7 +19,7 @@ Express API that turns a Terraform or OpenTofu **plan JSON**, a **`terraform gra
 | `index.js` | HTTP routes, multipart upload, SQLite persistence |
 | `pipeline.js` | Graph build: plan → nodes, DOT adjacency, state merge, IAM/data-flow edges, filtering |
 | `diagram-ir.js` | Renderer-neutral IR (nodes/edges/groups) built from the pipeline `nodes` map |
-| `connectors/` | Frontend connector registry. Excalidraw is `stable`; tldraw is a stub returning HTTP 501 until implemented |
+| `connectors/` | Frontend connector registry. Excalidraw is `stable`; tldraw is `beta` and renders tldraw shape JSON |
 | `excalidraw.js` | Excalidraw renderer: converts processed nodes into Excalidraw scene JSON |
 | `vpc-networking-facet.js` | VPC/subnet/gateway-style facets before low-level plumbing is trimmed |
 | `enrichment.js` | Hook for optional semantic labels/metadata |
@@ -75,7 +75,7 @@ yarn workspace @excalidraw/backend test
 | GET | `/terraform/test-client` | Open a lightweight browser UI to upload plan+dot files and inspect VPC/subnet facet summaries from generated Excalidraw output. |
 
 Unknown renderer ids return HTTP 404 with the available ids in the body. A
-renderer that exists but isn't implemented yet (e.g. `tldraw` today) returns
+renderer that exists but isn't implemented yet returns
 HTTP 501 with `{ renderer, details }`.
 
 `POST /terraform/upload` expects multipart form fields:

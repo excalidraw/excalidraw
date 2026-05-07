@@ -1,45 +1,39 @@
 import { createRequire } from "node:module";
 import { describe, expect, it } from "vitest";
-import {
-  excalidrawSceneToTldrawShapes,
-  mapExcalidrawTextAlignToTldraw,
-} from "./excalidrawToTldraw";
 
 const require = createRequire(import.meta.url);
 
-describe("mapExcalidrawTextAlignToTldraw", () => {
-  it("maps Excalidraw CSS alignment to tldraw text alignment", () => {
-    expect(mapExcalidrawTextAlignToTldraw("left")).toBe("start");
-    expect(mapExcalidrawTextAlignToTldraw("center")).toBe("middle");
-    expect(mapExcalidrawTextAlignToTldraw("right")).toBe("end");
-    expect(mapExcalidrawTextAlignToTldraw(undefined)).toBe("start");
-    expect(mapExcalidrawTextAlignToTldraw("start")).toBe("start");
-    expect(mapExcalidrawTextAlignToTldraw("middle")).toBe("middle");
-    expect(mapExcalidrawTextAlignToTldraw("end")).toBe("end");
+function normalizeShapes(shapes: Array<Record<string, unknown>>) {
+  return shapes.map((shape) => {
+    const copy: Record<string, unknown> = { ...shape };
+    delete copy.id;
+    return copy;
   });
-});
+}
 
-describe("allplanmodules → excalidraw → tldraw shapes", () => {
-  it("converts the fixture scene without invalid textAlign values", async () => {
+describe("allplanmodules → backend tldraw connector parity", () => {
+  it("matches the legacy excalidraw->tldraw conversion output", async () => {
     const { runAllplanModulesPipeline } = require(
       "../../packages/backend/terraform/allplan-modules-pipeline.js",
     );
     const { nodesToExcalidraw } = require("../../packages/backend/excalidraw.js");
+    const {
+      excalidrawSceneToTldrawShapes,
+    } = require("../../packages/backend/connectors/excalidraw-to-tldraw.js");
+    const renderer = require("../../packages/backend/connectors/tldraw.js");
 
     const nodes = runAllplanModulesPipeline();
     const scene = await nodesToExcalidraw(nodes);
-    const { shapes } = excalidrawSceneToTldrawShapes(scene);
+    const legacy = excalidrawSceneToTldrawShapes(scene);
+    const result = await renderer.render({ nodes, options: {} });
+    const doc = result.body;
 
-    expect(shapes.length).toBeGreaterThan(0);
-
-    const allowed = new Set(["start", "middle", "end"]);
-    for (const s of shapes) {
-      if (s.type === "text" && s.props && "textAlign" in s.props) {
-        expect(
-          allowed.has((s.props as { textAlign: string }).textAlign),
-          `bad textAlign: ${JSON.stringify((s.props as { textAlign: string }).textAlign)}`,
-        ).toBe(true);
-      }
-    }
+    expect(result.contentType).toBe("application/json");
+    expect(result.fileExtension).toBe("tldr.json");
+    expect(doc.type).toBe("tldraw");
+    expect(Array.isArray(doc.shapes)).toBe(true);
+    expect(doc.shapes.length).toBeGreaterThan(0);
+    expect(doc.shapes.length).toBe(legacy.shapes.length);
+    expect(normalizeShapes(doc.shapes)).toEqual(normalizeShapes(legacy.shapes));
   });
 });

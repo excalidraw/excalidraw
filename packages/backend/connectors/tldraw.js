@@ -1,31 +1,34 @@
-/**
- * tldraw connector — STUB.
- *
- * tldraw uses its own document model (`TLStore`, shape records, bindings).
- * Implementing a real renderer means walking the DiagramIR and emitting
- * `{ store: { ... }, schema: { ... } }`. That work is not done yet.
- *
- * Until then this connector advertises itself in the registry, but
- * `render()` throws `RendererNotImplementedError`. The Express route in
- * `index.js` translates that into HTTP 501.
- */
-const { RendererNotImplementedError } = require("./errors");
+const { nodesToExcalidraw } = require("../excalidraw");
+const { excalidrawSceneToTldrawShapes } = require("./excalidraw-to-tldraw");
 
-async function render({ ir }) {
-  throw new RendererNotImplementedError("tldraw", {
-    irNodeCount: ir?.nodes?.length ?? 0,
-    irEdgeCount: ir?.edges?.length ?? 0,
-    plan:
-      "Implement walkIR(ir) -> { store, schema } using @tldraw/tldraw 's TLStoreSnapshot format.",
+async function render({ nodes, options = {} }) {
+  const scene = await nodesToExcalidraw(nodes, {
+    layoutEngine: options.layoutEngine,
   });
+  const { shapes } = excalidrawSceneToTldrawShapes(scene);
+  return {
+    contentType: "application/json",
+    fileExtension: "tldr.json",
+    body: {
+      type: "tldraw",
+      version: 1,
+      source: "terraform-pipeline",
+      shapes,
+      meta: {
+        nodeCount: shapes.filter((s) => s.type !== "arrow").length,
+        edgeCount: shapes.filter((s) => s.type === "arrow").length,
+        generatedAt: new Date().toISOString(),
+      },
+    },
+  };
 }
 
 module.exports = {
   id: "tldraw",
   label: "tldraw",
-  description: "tldraw document JSON. Not implemented yet.",
-  status: "stub",
+  description: "tldraw shape JSON rendered from Excalidraw scene output.",
+  status: "beta",
   contentType: "application/json",
-  fileExtension: "tldr",
+  fileExtension: "tldr.json",
   render,
 };
