@@ -106,7 +106,7 @@ The exact sequence matches [`index.js`](index.js) `POST /terraform/upload`. In w
 | Module | Responsibility |
 |--------|----------------|
 | [`excalidraw-elements.js`](excalidraw-elements.js) | Icons (AWS `.excalidrawlib`), **tier map / tier configs** (card size + force parameters), labels, **`customData`**, account/region/VPC/subnet inference, module groups, Terraform detail payloads. |
-| [`excalidraw-layout.js`](excalidraw-layout.js) | **Collapsed module model**, **d3-force** (`forceLayout`), **expand** module members from the collapsed anchor, **VPC perimeter snap**, facet appliance tiles on VPC edges. |
+| [`excalidraw-layout.js`](excalidraw-layout.js) | **Collapsed module model**, top-level placement via **ELK layered** (`elkLayout`, default) or legacy d3-force (`forceLayout`, `TF_LAYOUT_ENGINE=force`), **expand** module members from the collapsed anchor, **VPC perimeter snap**, facet appliance tiles on VPC edges. |
 | [`excalidraw-arrows.js`](excalidraw-arrows.js) | **Dependency** edges from `edges_new` / `edges_existing`, **data-flow** from `edges_data_flow`, **pair coalescing**, binding geometry (`getCenterClippedBindingPoints`, **offset** for stacked lines). |
 
 The sections below are the **core mechanics**: how **x/y** get assigned, and how **two edge channels** become drawable arrows.
@@ -115,7 +115,7 @@ The sections below are the **core mechanics**: how **x/y** get assigned, and how
 
 ### Layout: how node positions are computed
 
-Layout is **not** a single force graph on every Terraform resource key. It mixes **semantic tiers**, **module collapsing**, **d3-force**, **hand-tuned module presets**, and **VPC perimeter correction**.
+Layout is **not** a single force graph on every Terraform resource key. It mixes **semantic tiers**, **module collapsing**, an **ELK layered** top-level pass (with d3-force as a fallback engine), **hand-tuned module presets**, and **VPC perimeter correction**.
 
 #### 1. Tier map and tier configs (`excalidraw-elements.js`)
 
@@ -131,19 +131,37 @@ So: **tier** drives both **how big the rectangle is** and **how strongly it repe
 - **Simulation edges** are **deduped** at the layout level: for each directed dependency edge \(`source` → `target`\), both endpoints are replaced by their **`layoutId`**; self-loops are dropped. So dependencies *between resources in the same collapsed module* disappear from the **link** set—those resources are laid out **relative to the module anchor** instead of pulled by inter-resource links.
 - **`layoutTierMap`** assigns each **`layoutId`** the **minimum** tier among its member resources (the whole blob gets the “most prominent” tier of its contents).
 
-#### 3. Which edges participate in force simulation
+#### 3. Which edges participate in the layout pass
 
 - **`collectDirectedEdges`** builds a **directed** list from **`edges_new`** (DOT/plan) and **`edges_existing`** (state / prior deps), tagged with kinds like `planned_dependency` vs `existing_dependency`.
-- For **force layout only**, `nodesToExcalidraw` may use **`directedEdgesForLayout`**: when VPC perimeter layout is on and there are perimeter nodes, **edges whose source or target is a perimeter appliance** are **removed from the simulation**. Perimeter nodes (endpoints, external LBs, etc.) are positioned by **`snapVpcPerimeterResourcePositions`** instead of the global force graph, so they do not distort the inner mesh.
+- The **top-level layout** uses **`directedEdgesForLayout`**: when VPC perimeter layout is on and there are perimeter nodes, **edges whose source or target is a perimeter appliance** are **removed**. Perimeter nodes (endpoints, external LBs, etc.) are positioned by **`snapVpcPerimeterResourcePositions`** instead of the global graph, so they do not distort the inner mesh.
 - **`relationships = coalesceRelationshipPairs(directedEdges)`** uses the **full** `directedEdges` (not the filtered list) for **drawing dependency arrows** and for pairing logic—see **Edges** below.
 
-#### 4. Force simulation (`forceLayout` in `excalidraw-layout.js`)
+#### 4. Top-level placement (`elkLayout` / `forceLayout` in `excalidraw-layout.js`)
 
-- Nodes passed to d3 are **`layoutSimulationKeys`** — normally the collapsed **`layoutNodeKeys`**, further filtered by **`filterLayoutSimulationKeys`**: if perimeter layout is enabled, a **layout vertex is dropped from the simulation** when it would only contain perimeter members (so pure-perimeter modules do not get a meaningless force vertex).
+The default engine is **ELK layered** (`elkLayout`). Selection is per request:
+
+- **API**: `GET /terraform/upload/:id/excalidraw?layoutEngine=elk|force` (`packages/backend/index.js`).
+- **Programmatic**: `nodesToExcalidraw(nodes, { layoutEngine: "elk" | "force" })`.
+- **Fallback**: when no option is passed, `resolveLayoutEngine` honors the `TF_LAYOUT_ENGINE` env var, then defaults to `"elk"`.
+- **UI**: the React import dialog (`packages/excalidraw/components/TerraformImportDialog.tsx`) has a radio control that drives the query param on both the post-upload fetch and the "Open saved graph" fetch. Same upload id can be re-rendered with either engine.
+
+- Nodes passed to the layout engine are **`layoutSimulationKeys`** — normally the collapsed **`layoutNodeKeys`**, further filtered by **`filterLayoutSimulationKeys`**: if perimeter layout is enabled, a **layout vertex is dropped** when it would only contain perimeter members (so pure-perimeter modules do not get a meaningless layout vertex).
+- Both engines consume the same input shape: `(nodeKeys, directedEdges, tierMap, tierConfigs, layoutSizes)` → `{ id: { x, y } }` where `(x, y)` is each node's **top-left** in a normalized coordinate space (origin shifted off negatives by ~50px). `layoutSizes[id] = { w, h }` comes from **`estimateModuleLayoutSizes`** (collapsed-module bounding box + padding); single nodes fall back to **`tierConfigs[tier]`**.
+
+**ELK layered (default):**
+- Algorithm `layered`, `direction=RIGHT` (left-to-right). Cycle breaking via `GREEDY` (so bidirectional data-flow edges don't fight the layering).
+- Crossing minimization via `LAYER_SWEEP`; node placement via `NETWORK_SIMPLEX` (compact) with `BRANDES_KOEPF` `BALANCED` alignment.
+- Spacing knobs: `nodeNodeBetweenLayers=140`, `nodeNode=120`, `componentComponent=200`, plus 40px frame padding. `separateConnectedComponents=true` keeps disconnected subgraphs as distinct blocks.
+- Each ELK child is given the actual `(w, h)` from `layoutSizes` / tier configs, so the engine reserves real space rather than approximating with a circle.
+- **Compound nesting via `options.nestingGroups`.** `nodesToExcalidraw` builds one synthetic compound per VPC group, listing the layout ids of resources/modules that share that VPC (from `accountRegionGroups`'s `vpcGroup.nodePaths` mapped through the layoutId map). With `elk.hierarchyHandling=INCLUDE_CHILDREN`, ELK lays out each compound's members together while still routing cross-compound edges (e.g. a VPC-bound Lambda → an out-of-VPC bucket). Nodes outside any VPC sit at root level. After layout, `elkLayout` walks the result tree and composes absolute positions; the synthetic group ids (`__elk_group__:vpc:<account>:<region>:<vpcKey>`) are not surfaced. Compounds with `<2` members are skipped (no benefit). The compound layout itself uses `direction=RIGHT` with tighter padding (`top=120, sides=80`).
+- Compound *membership* uses whatever `buildNodeVpcMap` decides — including its BFS fallback that tags lambdas with their nearest VPC anchor when no explicit `vpc_id` is set. So a non-VPC Lambda can still end up in the VPC compound if the existing membership inference says it's there.
+
+**d3-force (legacy fallback):**
 - **`forceLink`** uses edges between **layout ids**. Link **distance** scales with endpoint tiers (more prominent endpoints → longer ideal distance). Link **strength** is higher when endpoints span different relative tiers.
 - **`forceManyBody`** charge comes from **`tierConfigs[tier].charge`** (more negative for prominent tiers → stronger repulsion).
-- **`forceCollide`** radius uses **`estimateModuleLayoutSizes`** for collapsed modules (bounding box of internal offsets + padding) or **`tierConfigs.collide`** for single nodes.
-- The simulation runs a fixed **300 ticks**, then positions are **normalized** so the min x/y is shifted to a margin (~50px). Output is **`layoutPositions`** keyed by **`layoutId`**.
+- **`forceCollide`** radius uses `Math.max(size.w, size.h)/2 + 90` for collapsed modules (an inscribed circle, which is conservative and *under-bounds wide rectangles*) or **`tierConfigs.collide`** for single nodes — the main cause of sibling-module overlap on this engine.
+- The simulation runs a fixed **300 ticks**, then positions are **normalized** so the min x/y is shifted to a margin (~50px).
 
 #### 5. Expanding to real resource coordinates
 

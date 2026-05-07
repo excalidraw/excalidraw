@@ -1,7 +1,8 @@
 /**
- * d3-force layout, collapsed module coalescing, internal module offsets, VPC perimeter snaps,
- * and synthetic networking-facet appliance tiles.
+ * Top-level layout (ELK layered + force fallback), collapsed module coalescing, internal module
+ * offsets, VPC perimeter snaps, and synthetic networking-facet appliance tiles.
  */
+const ELK = require("elkjs");
 const {
   VPC_PERIMETER_LAYOUT_ENABLED,
   classifyVpcApplianceWall,
@@ -13,6 +14,7 @@ const {
   lerp,
   getModulePathChain,
   getModuleRelativeResourcePath,
+  getOwningModulePath,
   stripTerraformInstanceIndexes,
   isLikelyLambdaModule,
   LAMBDA_MODULE_PRESET_OFFSETS,
@@ -20,6 +22,15 @@ const {
 
 /** Avoid duplicate stderr lines when offsets are recomputed (e.g. size estimate + expand). */
 const layoutInternalOffsetsDebugLogged = new Set();
+
+const MODULE_PADDING_X = 52;
+const MODULE_PADDING_TOP = 72;
+const MODULE_PADDING_BOTTOM = 40;
+const MODULE_BLOCK_GAP_X = 120;
+const MODULE_BLOCK_GAP_Y = 96;
+const MODULE_RESOURCE_GAP_X = 280;
+const MODULE_RESOURCE_GAP_Y = 160;
+const DEFAULT_RESOURCE_RECT = { w: 220, h: 100 };
 
 // --- Force layout ---
 
@@ -100,6 +111,205 @@ async function forceLayout(
       x: n.x - minX + 50,
       y: n.y - minY + 50,
     };
+  }
+  return posMap;
+}
+
+const ELK_DEFAULT_LAYOUT_OPTIONS = {
+  "elk.algorithm": "layered",
+  "elk.direction": "RIGHT",
+  "elk.hierarchyHandling": "INCLUDE_CHILDREN",
+  "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
+  "elk.layered.cycleBreaking.strategy": "GREEDY",
+  "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
+  "elk.layered.nodePlacement.bk.fixedAlignment": "BALANCED",
+  "elk.layered.spacing.nodeNodeBetweenLayers": "140",
+  "elk.layered.spacing.edgeNodeBetweenLayers": "60",
+  "elk.layered.spacing.edgeEdgeBetweenLayers": "30",
+  "elk.spacing.nodeNode": "120",
+  "elk.spacing.edgeNode": "40",
+  "elk.spacing.componentComponent": "200",
+  "elk.layered.considerModelOrder.strategy": "NODES_AND_EDGES",
+  "elk.layered.thoroughness": "10",
+  "elk.padding": "[top=40,left=40,bottom=40,right=40]",
+  "elk.separateConnectedComponents": "true",
+};
+
+const ELK_DEFAULT_GROUP_LAYOUT_OPTIONS = {
+  "elk.algorithm": "layered",
+  "elk.direction": "RIGHT",
+  "elk.hierarchyHandling": "INCLUDE_CHILDREN",
+  "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
+  "elk.layered.cycleBreaking.strategy": "GREEDY",
+  "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
+  "elk.layered.spacing.nodeNodeBetweenLayers": "120",
+  "elk.spacing.nodeNode": "100",
+  "elk.padding": "[top=120,left=80,bottom=80,right=80]",
+};
+
+const ELK_GROUP_ID_PREFIX = "__elk_group__:";
+
+/**
+ * Lays out collapsed top-level nodes with ELK's layered algorithm.
+ *
+ * Same contract as `forceLayout`: returns `{ id: { x, y } }` where `(x, y)` is each node's
+ * top-left corner in a normalized coordinate space (no negatives, with a small origin
+ * margin). Module internals are still expanded afterward by `expandCollapsedModulePositions`.
+ *
+ * When `options.nestingGroups` is supplied, ELK lays out each group's members as a
+ * compound node. Synthetic group ids (`__elk_group__:<id>`) are not emitted in the result;
+ * only real layout ids appear, with absolute positions composed from the compound tree.
+ *
+ * `options.nestingGroups`: `Array<{ id: string, members: string[], layoutOptions?: object }>`.
+ * Members must be in `nodeKeys`. Each member belongs to at most one group; the first
+ * group that claims it wins.
+ */
+async function elkLayout(
+  nodeKeys,
+  directedEdges,
+  tierMap,
+  tierConfigs,
+  layoutSizes = {},
+  options = {},
+) {
+  if (nodeKeys.length === 0) {
+    return {};
+  }
+
+  // Back-compat: previous signature passed bare layoutOptions as the 6th arg.
+  const normalizedOptions =
+    options && (options.layoutOptions || options.nestingGroups)
+      ? options
+      : { layoutOptions: options };
+  const layoutOptions = normalizedOptions.layoutOptions || {};
+  const nestingGroups = normalizedOptions.nestingGroups || [];
+
+  const elk = new ELK();
+
+  const nodeSet = new Set(nodeKeys);
+  const sizeFor = (id) => {
+    const size = layoutSizes[id];
+    if (size) {
+      return { width: size.w, height: size.h };
+    }
+    const cfg = tierConfigs[tierMap[id]];
+    return {
+      width: cfg?.w ?? DEFAULT_RESOURCE_RECT.w,
+      height: cfg?.h ?? DEFAULT_RESOURCE_RECT.h,
+    };
+  };
+
+  const memberToGroupId = new Map();
+  const compoundChildrenByGroup = new Map();
+  for (const group of nestingGroups) {
+    if (!group?.id || !Array.isArray(group.members)) {
+      continue;
+    }
+    const groupElkId = `${ELK_GROUP_ID_PREFIX}${group.id}`;
+    const claimedMembers = [];
+    for (const member of group.members) {
+      if (!nodeSet.has(member) || memberToGroupId.has(member)) {
+        continue;
+      }
+      memberToGroupId.set(member, groupElkId);
+      claimedMembers.push(member);
+    }
+    if (claimedMembers.length === 0) {
+      continue;
+    }
+    compoundChildrenByGroup.set(groupElkId, {
+      groupElkId,
+      members: claimedMembers,
+      layoutOptions: group.layoutOptions || {},
+    });
+  }
+
+  const rootChildren = [];
+  for (const [groupElkId, info] of compoundChildrenByGroup) {
+    rootChildren.push({
+      id: groupElkId,
+      layoutOptions: {
+        ...ELK_DEFAULT_GROUP_LAYOUT_OPTIONS,
+        ...info.layoutOptions,
+      },
+      children: info.members.map((id) => ({ id, ...sizeFor(id) })),
+    });
+  }
+  for (const id of nodeKeys) {
+    if (memberToGroupId.has(id)) {
+      continue;
+    }
+    rootChildren.push({ id, ...sizeFor(id) });
+  }
+
+  // ELK requires unique edge ids and edges that reference known nodes.
+  // Collapse antiparallel duplicates; ELK handles direction reversal in cycle breaking.
+  const seenEdges = new Set();
+  const edges = [];
+  for (let i = 0; i < directedEdges.length; i++) {
+    const { source, target } = directedEdges[i];
+    if (!nodeSet.has(source) || !nodeSet.has(target) || source === target) {
+      continue;
+    }
+    const key = `${source}|||${target}`;
+    if (seenEdges.has(key)) {
+      continue;
+    }
+    seenEdges.add(key);
+    edges.push({
+      id: `e-${i}`,
+      sources: [source],
+      targets: [target],
+    });
+  }
+
+  const graph = {
+    id: "root",
+    layoutOptions: { ...ELK_DEFAULT_LAYOUT_OPTIONS, ...layoutOptions },
+    children: rootChildren,
+    edges,
+  };
+
+  const result = await elk.layout(graph);
+
+  // Walk the result tree, composing absolute positions for real (non-group) nodes.
+  const absolutePositions = {};
+  const collect = (node, baseX, baseY) => {
+    const x = (node.x ?? 0) + baseX;
+    const y = (node.y ?? 0) + baseY;
+    if (
+      node.id &&
+      !node.id.startsWith(ELK_GROUP_ID_PREFIX) &&
+      node.id !== "root"
+    ) {
+      if (typeof node.x === "number" && typeof node.y === "number") {
+        absolutePositions[node.id] = { x, y };
+      }
+    }
+    for (const child of node.children || []) {
+      collect(child, x, y);
+    }
+  };
+  for (const child of result.children || []) {
+    collect(child, 0, 0);
+  }
+
+  let minX = Infinity;
+  let minY = Infinity;
+  for (const pos of Object.values(absolutePositions)) {
+    minX = Math.min(minX, pos.x);
+    minY = Math.min(minY, pos.y);
+  }
+  if (!Number.isFinite(minX)) {
+    minX = 0;
+  }
+  if (!Number.isFinite(minY)) {
+    minY = 0;
+  }
+
+  const posMap = {};
+  for (const [id, pos] of Object.entries(absolutePositions)) {
+    posMap[id] = { x: pos.x - minX + 50, y: pos.y - minY + 50 };
   }
   return posMap;
 }
@@ -195,8 +405,104 @@ function buildCollapsedLayoutModel(
   };
 }
 
-/** Relative {x,y} offsets of module members around the collapsed module anchor (Lambda preset or grid). */
-function buildModuleInternalOffsets(members, modulePath, moduleGroup = null) {
+function measureResourceRect(nodePath, tierMap = {}, tierConfigs = {}) {
+  const cfg = tierConfigs[tierMap[nodePath]];
+  return {
+    w: cfg?.w ?? DEFAULT_RESOURCE_RECT.w,
+    h: cfg?.h ?? DEFAULT_RESOURCE_RECT.h,
+  };
+}
+
+function measureOffsetsBounds(offsets, tierMap = {}, tierConfigs = {}) {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const [nodePath, offset] of Object.entries(offsets)) {
+    const rect = measureResourceRect(nodePath, tierMap, tierConfigs);
+    minX = Math.min(minX, offset.x);
+    minY = Math.min(minY, offset.y);
+    maxX = Math.max(maxX, offset.x + rect.w);
+    maxY = Math.max(maxY, offset.y + rect.h);
+  }
+
+  if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+    return null;
+  }
+  return { minX, minY, maxX, maxY, w: maxX - minX, h: maxY - minY };
+}
+
+function normalizeOffsets(
+  offsets,
+  tierMap = {},
+  tierConfigs = {},
+  shiftX = 0,
+  shiftY = 0,
+) {
+  const bounds = measureOffsetsBounds(offsets, tierMap, tierConfigs);
+  if (!bounds) {
+    return {};
+  }
+
+  const normalized = {};
+  for (const [nodePath, offset] of Object.entries(offsets)) {
+    normalized[nodePath] = {
+      x: offset.x - bounds.minX + shiftX,
+      y: offset.y - bounds.minY + shiftY,
+    };
+  }
+  return normalized;
+}
+
+function packBlocks(blocks, options = {}) {
+  const gapX = options.gapX ?? MODULE_BLOCK_GAP_X;
+  const gapY = options.gapY ?? MODULE_BLOCK_GAP_Y;
+  const maxRowWidth = options.maxRowWidth ?? 1600;
+  const placements = [];
+  let x = 0;
+  let y = 0;
+  let rowH = 0;
+
+  for (const block of blocks) {
+    if (x > 0 && x + block.w > maxRowWidth) {
+      x = 0;
+      y += rowH + gapY;
+      rowH = 0;
+    }
+    placements.push({ ...block, x, y });
+    x += block.w + gapX;
+    rowH = Math.max(rowH, block.h);
+  }
+
+  const w = placements.reduce(
+    (max, block) => Math.max(max, block.x + block.w),
+    0,
+  );
+  const h = placements.reduce(
+    (max, block) => Math.max(max, block.y + block.h),
+    0,
+  );
+  return { placements, w, h };
+}
+
+function getImmediateChildModulePaths(members, modulePath) {
+  const children = new Set();
+  for (const nodePath of members) {
+    const chain = getModulePathChain(nodePath);
+    const index = chain.indexOf(modulePath);
+    if (index >= 0 && chain[index + 1]) {
+      children.add(chain[index + 1]);
+    }
+  }
+  return [...children].sort((a, b) => a.localeCompare(b));
+}
+
+function buildFlatModuleInternalOffsets(
+  members,
+  modulePath,
+  moduleGroup = null,
+) {
   const offsets = {};
   const fragments = new Set(
     members.map((nodePath) =>
@@ -254,6 +560,159 @@ function buildModuleInternalOffsets(members, modulePath, moduleGroup = null) {
   return offsets;
 }
 
+function measureResourceSection(resourcePaths, tierMap, tierConfigs) {
+  const blocks = resourcePaths.map((nodePath) => {
+    const rect = measureResourceRect(nodePath, tierMap, tierConfigs);
+    return { id: nodePath, nodePath, w: rect.w, h: rect.h };
+  });
+  const packed = packBlocks(blocks, {
+    gapX: MODULE_RESOURCE_GAP_X,
+    gapY: MODULE_RESOURCE_GAP_Y,
+    maxRowWidth: 1060,
+  });
+  const offsets = {};
+  for (const block of packed.placements) {
+    offsets[block.nodePath] = { x: block.x, y: block.y };
+  }
+  return { w: packed.w, h: packed.h, offsets };
+}
+
+function measureModuleBlock(
+  modulePath,
+  members,
+  moduleGroupByPath = new Map(),
+  tierMap = {},
+  tierConfigs = {},
+) {
+  const childModulePaths = getImmediateChildModulePaths(members, modulePath);
+  const moduleGroup = moduleGroupByPath.get(modulePath) || null;
+
+  if (childModulePaths.length === 0) {
+    const rawOffsets = buildFlatModuleInternalOffsets(
+      members,
+      modulePath,
+      moduleGroup,
+    );
+    const bounds = measureOffsetsBounds(rawOffsets, tierMap, tierConfigs);
+    if (!bounds) {
+      return { w: 0, h: 0, offsets: {} };
+    }
+    return {
+      w: bounds.w + MODULE_PADDING_X * 2,
+      h: bounds.h + MODULE_PADDING_TOP + MODULE_PADDING_BOTTOM,
+      offsets: normalizeOffsets(
+        rawOffsets,
+        tierMap,
+        tierConfigs,
+        MODULE_PADDING_X,
+        MODULE_PADDING_TOP,
+      ),
+    };
+  }
+
+  const directResources = members
+    .filter((nodePath) => getOwningModulePath(nodePath) === modulePath)
+    .sort((a, b) => a.localeCompare(b));
+  const sections = [];
+  const rawOffsets = {};
+
+  if (directResources.length > 0) {
+    const section = measureResourceSection(
+      directResources,
+      tierMap,
+      tierConfigs,
+    );
+    sections.push({
+      id: `${modulePath}::resources`,
+      kind: "resources",
+      w: section.w,
+      h: section.h,
+      offsets: section.offsets,
+    });
+  }
+
+  for (const childModulePath of childModulePaths) {
+    const childMembers = members
+      .filter(
+        (nodePath) =>
+          nodePath === childModulePath ||
+          nodePath.startsWith(`${childModulePath}.`),
+      )
+      .sort((a, b) => a.localeCompare(b));
+    const childBlock = measureModuleBlock(
+      childModulePath,
+      childMembers,
+      moduleGroupByPath,
+      tierMap,
+      tierConfigs,
+    );
+    sections.push({
+      id: childModulePath,
+      kind: "module",
+      w: childBlock.w,
+      h: childBlock.h,
+      offsets: childBlock.offsets,
+    });
+  }
+
+  const packed = packBlocks(sections, {
+    gapX: MODULE_BLOCK_GAP_X,
+    gapY: MODULE_BLOCK_GAP_Y,
+    maxRowWidth: 1800,
+  });
+
+  for (const section of packed.placements) {
+    for (const [nodePath, offset] of Object.entries(section.offsets)) {
+      rawOffsets[nodePath] = {
+        x: section.x + offset.x,
+        y: section.y + offset.y,
+      };
+    }
+  }
+
+  return {
+    w: packed.w + MODULE_PADDING_X * 2,
+    h: packed.h + MODULE_PADDING_TOP + MODULE_PADDING_BOTTOM,
+    offsets: Object.fromEntries(
+      Object.entries(rawOffsets).map(([nodePath, offset]) => [
+        nodePath,
+        {
+          x: offset.x + MODULE_PADDING_X,
+          y: offset.y + MODULE_PADDING_TOP,
+        },
+      ]),
+    ),
+  };
+}
+
+/** Relative {x,y} offsets of module members around the collapsed module anchor. */
+function buildModuleInternalOffsets(
+  members,
+  modulePath,
+  moduleGroup = null,
+  tierMap = {},
+  tierConfigs = {},
+  moduleGroupByPath = null,
+) {
+  const childModulePaths = getImmediateChildModulePaths(members, modulePath);
+  if (childModulePaths.length === 0) {
+    return buildFlatModuleInternalOffsets(members, modulePath, moduleGroup);
+  }
+
+  const groups =
+    moduleGroupByPath ||
+    new Map(
+      [[modulePath, moduleGroup]].filter(([, group]) => Boolean(group)),
+    );
+  return measureModuleBlock(
+    modulePath,
+    members,
+    groups,
+    tierMap,
+    tierConfigs,
+  ).offsets;
+}
+
 /** Bounding box size per collapsed module from internal offsets + tier card dimensions. */
 function estimateModuleLayoutSizes(
   moduleMembers,
@@ -264,38 +723,17 @@ function estimateModuleLayoutSizes(
   const sizes = {};
 
   for (const [modulePath, members] of moduleMembers.entries()) {
-    const moduleGroup = moduleGroupByPath.get(modulePath);
-    const offsets = buildModuleInternalOffsets(
-      members,
+    const block = measureModuleBlock(
       modulePath,
-      moduleGroup,
+      members,
+      moduleGroupByPath,
+      tierMap,
+      tierConfigs,
     );
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-
-    for (const nodePath of members) {
-      const offset = offsets[nodePath];
-      const cfg = tierConfigs[tierMap[nodePath]];
-      if (!offset || !cfg) {
-        continue;
-      }
-
-      minX = Math.min(minX, offset.x);
-      minY = Math.min(minY, offset.y);
-      maxX = Math.max(maxX, offset.x + cfg.w);
-      maxY = Math.max(maxY, offset.y + cfg.h);
-    }
-
-    if (!Number.isFinite(minX) || !Number.isFinite(minY)) {
+    if (block.w <= 0 || block.h <= 0) {
       continue;
     }
-
-    sizes[modulePath] = {
-      w: maxX - minX + 120,
-      h: maxY - minY + 120,
-    };
+    sizes[modulePath] = { w: block.w + 120, h: block.h + 120 };
   }
 
   return sizes;
@@ -307,6 +745,8 @@ function expandCollapsedModulePositions(
   nodeKeys,
   moduleMembers,
   moduleGroupByPath,
+  tierMap = {},
+  tierConfigs = {},
 ) {
   const positions = {};
   const collapsedNodeSet = new Set(
@@ -330,6 +770,9 @@ function expandCollapsedModulePositions(
       members,
       modulePath,
       moduleGroup,
+      tierMap,
+      tierConfigs,
+      moduleGroupByPath,
     );
 
     for (const nodePath of members) {
@@ -588,9 +1031,14 @@ function applianceStyleForKind(kind) {
 
 module.exports = {
   forceLayout,
+  elkLayout,
   buildCollapsibleModuleSet,
   getCollapsedModulePath,
   buildCollapsedLayoutModel,
+  measureResourceRect,
+  measureModuleBlock,
+  packBlocks,
+  normalizeOffsets,
   buildModuleInternalOffsets,
   estimateModuleLayoutSizes,
   expandCollapsedModulePositions,

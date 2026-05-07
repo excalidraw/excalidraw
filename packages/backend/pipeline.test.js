@@ -996,6 +996,93 @@ describe("buildDataFlowEdges", () => {
     });
   });
 
+  it("keeps module policy references visible when generated IAM JSON is unknown", () => {
+    const nodes = buildNodes([
+      resource("module.app.module.queue.aws_sqs_queue.this[0]", "aws_sqs_queue", "this", {
+        name: "jobs",
+      }),
+      resource("module.worker.module.lambda.aws_lambda_function.this[0]", "aws_lambda_function", "this", {
+        function_name: "worker",
+      }),
+      resource("module.worker.module.lambda.aws_iam_role.lambda[0]", "aws_iam_role", "lambda", {
+        name: "worker-role",
+      }),
+      resource("module.worker.module.lambda.aws_iam_role_policy.additional_inline[0]", "aws_iam_role_policy", "additional_inline", {
+        role: "worker-role",
+      }),
+    ]);
+    nodes["module.app"] = {
+      resources: {
+        "module.app": {
+          type: "terraform_module",
+          address: "module.app",
+        },
+      },
+      terraform_config: {
+        outputs: {
+          queue_arn: {
+            expression: {
+              references: ["module.queue.queue_arn"],
+            },
+          },
+        },
+      },
+    };
+    nodes["module.app.module.queue"] = {
+      resources: {
+        "module.app.module.queue": {
+          type: "terraform_module",
+          address: "module.app.module.queue",
+        },
+      },
+      terraform_config: {
+        outputs: {
+          queue_arn: {
+            expression: {
+              references: [
+                "aws_sqs_queue.this[0].arn",
+                "aws_sqs_queue.this[0]",
+              ],
+            },
+          },
+        },
+      },
+    };
+    nodes["module.worker"] = {
+      resources: {
+        "module.worker": {
+          type: "terraform_module",
+          address: "module.worker",
+        },
+      },
+      terraform_config: {
+        expressions: {
+          policy_statements: {
+            references: ["module.app.queue_arn", "module.app"],
+          },
+        },
+      },
+    };
+
+    ensureEdgeLists(nodes);
+    buildDataFlowEdges(nodes);
+
+    expect(
+      dataFlowTargets(nodes, "module.app.module.queue.aws_sqs_queue.this[0]"),
+    ).toContainEqual({
+      target: "module.worker.module.lambda.aws_lambda_function.this[0]",
+      type: "accesses",
+      origin: "module_policy_reference",
+    });
+    expect(
+      dataFlowTargets(nodes, "module.app.module.queue.aws_sqs_queue.this[0]"),
+    ).toContainEqual({
+      target: "module.worker.module.lambda.aws_iam_role.lambda[0]",
+      type: "accesses",
+      origin: "module_policy_reference",
+    });
+  });
+
   it("infers attached IAM policy access to DynamoDB", () => {
     const nodes = buildNodes([
       resource("aws_iam_role.lambda", "aws_iam_role", "lambda", {
@@ -1160,6 +1247,51 @@ describe("pruneRedundantStructuralEdges", () => {
     pruneRedundantStructuralEdges(nodes);
 
     expect(nodes["module.lambda_writer"].edges_new).toEqual(["module.sqs_kms"]);
+  });
+
+  it("keeps a concrete resource-to-resource shortcut even when a multi-hop path exists", () => {
+    let nodes = {
+      "aws_lambda_function.writer": {
+        resources: {
+          "aws_lambda_function.writer": resource(
+            "aws_lambda_function.writer",
+            "aws_lambda_function",
+            "writer",
+          ),
+        },
+        edges_new: ["aws_s3_bucket.data", "aws_s3_bucket_policy.secure_transport"],
+        edges_existing: [],
+      },
+      "aws_s3_bucket_policy.secure_transport": {
+        resources: {
+          "aws_s3_bucket_policy.secure_transport": resource(
+            "aws_s3_bucket_policy.secure_transport",
+            "aws_s3_bucket_policy",
+            "secure_transport",
+          ),
+        },
+        edges_new: ["aws_s3_bucket.data"],
+        edges_existing: [],
+      },
+      "aws_s3_bucket.data": {
+        resources: {
+          "aws_s3_bucket.data": resource(
+            "aws_s3_bucket.data",
+            "aws_s3_bucket",
+            "data",
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+      },
+    };
+    nodes = ensureEdgeLists(nodes);
+    pruneRedundantStructuralEdges(nodes);
+
+    expect(nodes["aws_lambda_function.writer"].edges_new.sort()).toEqual([
+      "aws_s3_bucket.data",
+      "aws_s3_bucket_policy.secure_transport",
+    ]);
   });
 
   it("prunes redundant targets listed only on edges_existing", () => {

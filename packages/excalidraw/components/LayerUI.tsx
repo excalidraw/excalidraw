@@ -191,6 +191,16 @@ const isTerraformResourceElement = (element: NonDeletedExcalidrawElement) =>
 const isTerraformGroupElement = (element: NonDeletedExcalidrawElement) =>
   TERRAFORM_GROUP_FLAGS.some((flag) => Boolean(element.customData?.[flag]));
 
+const isTerraformGroupParentOfNode = (
+  element: ExcalidrawElement,
+  nodePath: string | null,
+) =>
+  Boolean(
+    nodePath &&
+      Array.isArray(element.customData?.terraformGroupChildKeys) &&
+      element.customData.terraformGroupChildKeys.includes(nodePath),
+  );
+
 const isTerraformInspectableElement = (element: NonDeletedExcalidrawElement) =>
   isTerraformResourceElement(element) || isTerraformGroupElement(element);
 
@@ -1022,12 +1032,9 @@ const LayerUI = ({
         isTerraformLayerEdge(element) &&
         !isTerraformDependencyPreviewEdge(element)
       ) {
-        const nextOpacity =
-          hoveredNodePath === null
-            ? TERRAFORM_FOCUS_OPACITY
-            : focusedEdgeIds.has(element.id)
-            ? TERRAFORM_FOCUS_OPACITY
-            : TERRAFORM_DIM_EDGE_OPACITY;
+        const nextOpacity = focusedEdgeIds.has(element.id)
+          ? TERRAFORM_FOCUS_OPACITY
+          : TERRAFORM_DIM_EDGE_OPACITY;
         if (element.opacity === nextOpacity) {
           return element;
         }
@@ -1047,10 +1054,13 @@ const LayerUI = ({
           nodePath !== null &&
           hoveredNodePath !== null &&
           focusedNodePaths.has(nodePath);
+        const isParentOfHoveredNode =
+          isTerraformGroupElement(element as NonDeletedExcalidrawElement) &&
+          isTerraformGroupParentOfNode(element, hoveredNodePath);
         const nextOpacity =
           hoveredNodePath === null
             ? TERRAFORM_FOCUS_OPACITY
-            : isFocused
+            : isFocused || isParentOfHoveredNode
             ? TERRAFORM_FOCUS_OPACITY
             : TERRAFORM_DIM_NODE_OPACITY;
         if (element.opacity === nextOpacity) {

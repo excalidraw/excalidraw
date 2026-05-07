@@ -38,6 +38,64 @@
       background-color: var(--color-gray-20);
     }
 
+    &__layoutEngine {
+      &__options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 8px;
+        width: 100%;
+      }
+
+      &__option {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 0.625rem 0.875rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--color-gray-30);
+        background-color: transparent;
+        font-family: "Assistant";
+        cursor: pointer;
+        user-select: none;
+        transition: border-color 150ms ease-out,
+          background-color 150ms ease-out,
+          color 150ms ease-out;
+
+        input[type="radio"] {
+          position: absolute;
+          opacity: 0;
+          pointer-events: none;
+          width: 0;
+          height: 0;
+        }
+
+        &:hover {
+          border-color: var(--color-brand-hover);
+          background-color: var(--color-primary-light);
+        }
+
+        &--checked,
+        &--checked:hover {
+          border-color: var(--color-primary);
+          background-color: var(--color-primary-light);
+          box-shadow: 0 0 0 1px var(--color-primary) inset;
+        }
+      }
+
+      &__label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--color-on-surface);
+      }
+
+      &__description {
+        font-weight: 400;
+        font-size: 0.75rem;
+        color: var(--color-gray-60);
+      }
+    }
+
     &__error {
       width: 100%;
       padding: 0.75rem 1rem;

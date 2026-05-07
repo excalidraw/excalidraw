@@ -14,6 +14,7 @@
     "better-sqlite3": "12.6.2",
     "cors": "2.8.6",
     "drizzle-orm": "0.45.1",
+    "elkjs": "0.11.1",
     "express": "5.2.1",
     "graphlib-dot": "0.6.4",
     "multer": "2.0.2"
