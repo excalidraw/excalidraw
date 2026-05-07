@@ -15,6 +15,25 @@ import "./TerraformImportDialog.scss";
 const TERRAFORM_BACKEND_URL =
   import.meta.env.VITE_TERRAFORM_BACKEND_URL || "http://localhost:3000";
 
+type LayoutEngine = "elk" | "force";
+
+const LAYOUT_ENGINE_OPTIONS: ReadonlyArray<{
+  value: LayoutEngine;
+  label: string;
+  description: string;
+}> = [
+  {
+    value: "elk",
+    label: "ELK layered",
+    description: "Hierarchical, AWS-architecture style (recommended)",
+  },
+  {
+    value: "force",
+    label: "Force-directed",
+    description: "Legacy d3-force simulation",
+  },
+];
+
 const TerraformImportModal = ({
   onCloseRequest,
 }: {
@@ -26,14 +45,17 @@ const TerraformImportModal = ({
   const [dotFile, setDotFile] = useState<File | null>(null);
   const [stateFile, setStateFile] = useState<File | null>(null);
   const [savedId, setSavedId] = useState("");
+  const [layoutEngine, setLayoutEngine] = useState<LayoutEngine>("elk");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   /** Fetches generated scene JSON from the backend and replaces the editor scene. */
   const loadExcalidrawScene = async (id: string | number) => {
-    const res = await fetch(
+    const sceneUrl = new URL(
       `${TERRAFORM_BACKEND_URL}/terraform/upload/${id}/excalidraw`,
     );
+    sceneUrl.searchParams.set("layoutEngine", layoutEngine);
+    const res = await fetch(sceneUrl.toString());
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
       throw new Error(body.error || `Failed to load (HTTP ${res.status})`);
@@ -98,6 +120,47 @@ const TerraformImportModal = ({
   return (
     <div className="TerraformImportModal">
       <h3>Import Terraform</h3>
+
+      <div
+        className="TerraformImportModal__section TerraformImportModal__layoutEngine"
+        role="radiogroup"
+        aria-label="Layout engine"
+      >
+        <h4>Layout engine</h4>
+        <div className="TerraformImportModal__layoutEngine__options">
+          {LAYOUT_ENGINE_OPTIONS.map((option) => {
+            const checked = layoutEngine === option.value;
+            return (
+              <label
+                key={option.value}
+                className={
+                  "TerraformImportModal__layoutEngine__option" +
+                  (checked
+                    ? " TerraformImportModal__layoutEngine__option--checked"
+                    : "")
+                }
+              >
+                <input
+                  type="radio"
+                  name="terraform-layout-engine"
+                  value={option.value}
+                  checked={checked}
+                  disabled={loading}
+                  onChange={() => setLayoutEngine(option.value)}
+                />
+                <span className="TerraformImportModal__layoutEngine__label">
+                  {option.label}
+                </span>
+                <span className="TerraformImportModal__layoutEngine__description">
+                  {option.description}
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="TerraformImportModal__divider" />
 
       <div className="TerraformImportModal__section">
         <h4>Upload new plan</h4>

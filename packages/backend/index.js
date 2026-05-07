@@ -163,6 +163,8 @@ app.get("/terraform/upload/:id", (req, res) => {
   });
 });
 
+const SUPPORTED_LAYOUT_ENGINES = new Set(["elk", "force"]);
+
 /** Materializes an Excalidraw document from stored `nodes` (same shape the React app imports). */
 app.get("/terraform/upload/:id/excalidraw", async (req, res) => {
   try {
@@ -174,8 +176,16 @@ app.get("/terraform/upload/:id/excalidraw", async (req, res) => {
     if (!row) {
       return res.status(404).json({ error: "Not found" });
     }
+    const requestedEngine =
+      typeof req.query.layoutEngine === "string"
+        ? req.query.layoutEngine.trim().toLowerCase()
+        : null;
+    const layoutEngine =
+      requestedEngine && SUPPORTED_LAYOUT_ENGINES.has(requestedEngine)
+        ? requestedEngine
+        : undefined;
     const nodes = JSON.parse(row.data);
-    const excalidraw = await nodesToExcalidraw(nodes);
+    const excalidraw = await nodesToExcalidraw(nodes, { layoutEngine });
     res.setHeader("Content-Type", "application/json");
     res.setHeader(
       "Content-Disposition",

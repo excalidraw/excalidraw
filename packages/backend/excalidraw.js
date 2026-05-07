@@ -44,6 +44,7 @@ const {
 
 const {
   forceLayout,
+  elkLayout,
   buildCollapsibleModuleSet,
   buildCollapsedLayoutModel,
   estimateModuleLayoutSizes,
@@ -54,6 +55,28 @@ const {
   applianceStyleForKind,
   measureBoundsFromNodePositions,
 } = require("./excalidraw-layout");
+
+const SUPPORTED_LAYOUT_ENGINES = new Set(["elk", "force"]);
+const DEFAULT_LAYOUT_ENGINE = "elk";
+
+/** Picks the layout engine, prioritizing explicit option > env var > default. */
+function resolveLayoutEngine(explicit) {
+  const candidates = [
+    explicit,
+    process.env.TF_LAYOUT_ENGINE,
+    DEFAULT_LAYOUT_ENGINE,
+  ];
+  for (const candidate of candidates) {
+    if (typeof candidate !== "string") {
+      continue;
+    }
+    const normalized = candidate.trim().toLowerCase();
+    if (SUPPORTED_LAYOUT_ENGINES.has(normalized)) {
+      return normalized;
+    }
+  }
+  return DEFAULT_LAYOUT_ENGINE;
+}
 
 const {
   collectDirectedEdges,
@@ -68,8 +91,12 @@ const {
 /**
  * Converts enriched Terraform `nodes` (post-pipeline) into an Excalidraw document: nested frames,
  * resource cards, dependency + data-flow arrows, and `customData` consumed by the editor.
+ *
+ * `options.layoutEngine`: `"elk"` (default, layered) or `"force"` (legacy d3-force). When
+ * unset, falls back to the `TF_LAYOUT_ENGINE` env var, then to `"elk"`.
  */
-async function nodesToExcalidraw(nodes) {
+async function nodesToExcalidraw(nodes, options = {}) {
+  const layoutEngineId = resolveLayoutEngine(options.layoutEngine);
   const nodeElements = [];
   const locationElements = [];
   const moduleElements = [];
@@ -160,12 +187,50 @@ async function nodesToExcalidraw(nodes) {
     tierConfigs,
   );
 
-  const layoutPositions = await forceLayout(
+  const useElk = layoutEngineId !== "force";
+  const layoutEngine = useElk ? elkLayout : forceLayout;
+  const layoutSimulationKeySet = new Set(layoutSimulationKeys);
+  const nodeToLayoutId = new Map();
+  for (const [modulePath, members] of moduleMembers) {
+    for (const member of members) {
+      nodeToLayoutId.set(member, modulePath);
+    }
+  }
+  for (const nodePath of nodeKeys) {
+    if (!nodeToLayoutId.has(nodePath)) {
+      nodeToLayoutId.set(nodePath, nodePath);
+    }
+  }
+  const elkNestingGroups = [];
+  if (useElk) {
+    for (const accountGroup of accountRegionGroups) {
+      for (const regionGroup of accountGroup.regions || []) {
+        for (const vpcGroup of regionGroup.vpcs || []) {
+          const memberLayoutIds = new Set();
+          for (const nodePath of vpcGroup.nodePaths) {
+            const layoutId = nodeToLayoutId.get(nodePath);
+            if (layoutId && layoutSimulationKeySet.has(layoutId)) {
+              memberLayoutIds.add(layoutId);
+            }
+          }
+          if (memberLayoutIds.size < 2) {
+            continue;
+          }
+          elkNestingGroups.push({
+            id: `vpc:${accountGroup.accountId}:${regionGroup.region}:${vpcGroup.vpcKey}`,
+            members: [...memberLayoutIds],
+          });
+        }
+      }
+    }
+  }
+  const layoutPositions = await layoutEngine(
     layoutSimulationKeys,
     layoutEdges,
     layoutTierMap,
     layoutTierConfigs,
     layoutSizes,
+    useElk ? { nestingGroups: elkNestingGroups } : {},
   );
   const positions = expandCollapsedModulePositions(
     layoutPositions,
