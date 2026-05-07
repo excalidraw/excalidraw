@@ -1,7 +1,8 @@
 /**
- * d3-force layout, collapsed module coalescing, internal module offsets, VPC perimeter snaps,
- * and synthetic networking-facet appliance tiles.
+ * Top-level layout (ELK layered + force fallback), collapsed module coalescing, internal module
+ * offsets, VPC perimeter snaps, and synthetic networking-facet appliance tiles.
  */
+const ELK = require("elkjs");
 const {
   VPC_PERIMETER_LAYOUT_ENABLED,
   classifyVpcApplianceWall,
@@ -110,6 +111,205 @@ async function forceLayout(
       x: n.x - minX + 50,
       y: n.y - minY + 50,
     };
+  }
+  return posMap;
+}
+
+const ELK_DEFAULT_LAYOUT_OPTIONS = {
+  "elk.algorithm": "layered",
+  "elk.direction": "RIGHT",
+  "elk.hierarchyHandling": "INCLUDE_CHILDREN",
+  "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
+  "elk.layered.cycleBreaking.strategy": "GREEDY",
+  "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
+  "elk.layered.nodePlacement.bk.fixedAlignment": "BALANCED",
+  "elk.layered.spacing.nodeNodeBetweenLayers": "140",
+  "elk.layered.spacing.edgeNodeBetweenLayers": "60",
+  "elk.layered.spacing.edgeEdgeBetweenLayers": "30",
+  "elk.spacing.nodeNode": "120",
+  "elk.spacing.edgeNode": "40",
+  "elk.spacing.componentComponent": "200",
+  "elk.layered.considerModelOrder.strategy": "NODES_AND_EDGES",
+  "elk.layered.thoroughness": "10",
+  "elk.padding": "[top=40,left=40,bottom=40,right=40]",
+  "elk.separateConnectedComponents": "true",
+};
+
+const ELK_DEFAULT_GROUP_LAYOUT_OPTIONS = {
+  "elk.algorithm": "layered",
+  "elk.direction": "RIGHT",
+  "elk.hierarchyHandling": "INCLUDE_CHILDREN",
+  "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
+  "elk.layered.cycleBreaking.strategy": "GREEDY",
+  "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
+  "elk.layered.spacing.nodeNodeBetweenLayers": "120",
+  "elk.spacing.nodeNode": "100",
+  "elk.padding": "[top=120,left=80,bottom=80,right=80]",
+};
+
+const ELK_GROUP_ID_PREFIX = "__elk_group__:";
+
+/**
+ * Lays out collapsed top-level nodes with ELK's layered algorithm.
+ *
+ * Same contract as `forceLayout`: returns `{ id: { x, y } }` where `(x, y)` is each node's
+ * top-left corner in a normalized coordinate space (no negatives, with a small origin
+ * margin). Module internals are still expanded afterward by `expandCollapsedModulePositions`.
+ *
+ * When `options.nestingGroups` is supplied, ELK lays out each group's members as a
+ * compound node. Synthetic group ids (`__elk_group__:<id>`) are not emitted in the result;
+ * only real layout ids appear, with absolute positions composed from the compound tree.
+ *
+ * `options.nestingGroups`: `Array<{ id: string, members: string[], layoutOptions?: object }>`.
+ * Members must be in `nodeKeys`. Each member belongs to at most one group; the first
+ * group that claims it wins.
+ */
+async function elkLayout(
+  nodeKeys,
+  directedEdges,
+  tierMap,
+  tierConfigs,
+  layoutSizes = {},
+  options = {},
+) {
+  if (nodeKeys.length === 0) {
+    return {};
+  }
+
+  // Back-compat: previous signature passed bare layoutOptions as the 6th arg.
+  const normalizedOptions =
+    options && (options.layoutOptions || options.nestingGroups)
+      ? options
+      : { layoutOptions: options };
+  const layoutOptions = normalizedOptions.layoutOptions || {};
+  const nestingGroups = normalizedOptions.nestingGroups || [];
+
+  const elk = new ELK();
+
+  const nodeSet = new Set(nodeKeys);
+  const sizeFor = (id) => {
+    const size = layoutSizes[id];
+    if (size) {
+      return { width: size.w, height: size.h };
+    }
+    const cfg = tierConfigs[tierMap[id]];
+    return {
+      width: cfg?.w ?? DEFAULT_RESOURCE_RECT.w,
+      height: cfg?.h ?? DEFAULT_RESOURCE_RECT.h,
+    };
+  };
+
+  const memberToGroupId = new Map();
+  const compoundChildrenByGroup = new Map();
+  for (const group of nestingGroups) {
+    if (!group?.id || !Array.isArray(group.members)) {
+      continue;
+    }
+    const groupElkId = `${ELK_GROUP_ID_PREFIX}${group.id}`;
+    const claimedMembers = [];
+    for (const member of group.members) {
+      if (!nodeSet.has(member) || memberToGroupId.has(member)) {
+        continue;
+      }
+      memberToGroupId.set(member, groupElkId);
+      claimedMembers.push(member);
+    }
+    if (claimedMembers.length === 0) {
+      continue;
+    }
+    compoundChildrenByGroup.set(groupElkId, {
+      groupElkId,
+      members: claimedMembers,
+      layoutOptions: group.layoutOptions || {},
+    });
+  }
+
+  const rootChildren = [];
+  for (const [groupElkId, info] of compoundChildrenByGroup) {
+    rootChildren.push({
+      id: groupElkId,
+      layoutOptions: {
+        ...ELK_DEFAULT_GROUP_LAYOUT_OPTIONS,
+        ...info.layoutOptions,
+      },
+      children: info.members.map((id) => ({ id, ...sizeFor(id) })),
+    });
+  }
+  for (const id of nodeKeys) {
+    if (memberToGroupId.has(id)) {
+      continue;
+    }
+    rootChildren.push({ id, ...sizeFor(id) });
+  }
+
+  // ELK requires unique edge ids and edges that reference known nodes.
+  // Collapse antiparallel duplicates; ELK handles direction reversal in cycle breaking.
+  const seenEdges = new Set();
+  const edges = [];
+  for (let i = 0; i < directedEdges.length; i++) {
+    const { source, target } = directedEdges[i];
+    if (!nodeSet.has(source) || !nodeSet.has(target) || source === target) {
+      continue;
+    }
+    const key = `${source}|||${target}`;
+    if (seenEdges.has(key)) {
+      continue;
+    }
+    seenEdges.add(key);
+    edges.push({
+      id: `e-${i}`,
+      sources: [source],
+      targets: [target],
+    });
+  }
+
+  const graph = {
+    id: "root",
+    layoutOptions: { ...ELK_DEFAULT_LAYOUT_OPTIONS, ...layoutOptions },
+    children: rootChildren,
+    edges,
+  };
+
+  const result = await elk.layout(graph);
+
+  // Walk the result tree, composing absolute positions for real (non-group) nodes.
+  const absolutePositions = {};
+  const collect = (node, baseX, baseY) => {
+    const x = (node.x ?? 0) + baseX;
+    const y = (node.y ?? 0) + baseY;
+    if (
+      node.id &&
+      !node.id.startsWith(ELK_GROUP_ID_PREFIX) &&
+      node.id !== "root"
+    ) {
+      if (typeof node.x === "number" && typeof node.y === "number") {
+        absolutePositions[node.id] = { x, y };
+      }
+    }
+    for (const child of node.children || []) {
+      collect(child, x, y);
+    }
+  };
+  for (const child of result.children || []) {
+    collect(child, 0, 0);
+  }
+
+  let minX = Infinity;
+  let minY = Infinity;
+  for (const pos of Object.values(absolutePositions)) {
+    minX = Math.min(minX, pos.x);
+    minY = Math.min(minY, pos.y);
+  }
+  if (!Number.isFinite(minX)) {
+    minX = 0;
+  }
+  if (!Number.isFinite(minY)) {
+    minY = 0;
+  }
+
+  const posMap = {};
+  for (const [id, pos] of Object.entries(absolutePositions)) {
+    posMap[id] = { x: pos.x - minX + 50, y: pos.y - minY + 50 };
   }
   return posMap;
 }
@@ -831,6 +1031,7 @@ function applianceStyleForKind(kind) {
 
 module.exports = {
   forceLayout,
+  elkLayout,
   buildCollapsibleModuleSet,
   getCollapsedModulePath,
   buildCollapsedLayoutModel,

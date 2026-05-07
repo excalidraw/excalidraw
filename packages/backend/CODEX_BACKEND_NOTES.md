@@ -24,7 +24,7 @@ Output:
 - `pipeline.js`: plan/DOT/state graph compiler. Produces the `nodes` map and edge channels.
 - `excalidraw.js`: scene compiler. Coordinates layout, containers, modules, arrows, and Excalidraw elements.
 - `excalidraw-elements.js`: AWS icon/card metadata, tiers, labels, grouping details, custom data.
-- `excalidraw-layout.js`: force layout, module collapsing/expansion, VPC perimeter snapping.
+- `excalidraw-layout.js`: top-level layout (ELK layered by default, d3-force fallback), module collapsing/expansion, VPC perimeter snapping.
 - `excalidraw-arrows.js`: dependency/data-flow arrow collection, coalescing, bindings, offsets.
 - `vpc-networking-facet.js`: captures VPC/subnet/routing facets before low-level plumbing is omitted.
 - `vpc-perimeter.js`: classifies VPC appliance placement on VPC frame walls.
@@ -112,10 +112,13 @@ Update: Lambda deployment artifacts use `terraform-aws-modules/s3-bucket/aws` as
 Scene layout is not a single force graph:
 
 - tiers size and weight resource cards
-- registry modules are collapsed for force simulation
-- collapsed module positions are expanded into resource positions
+- registry modules are collapsed into one layout vertex per module
+- top-level placement uses **ELK layered** by default (`elkLayout`); engine is selected per request via the GET `/terraform/upload/:id/excalidraw?layoutEngine=elk|force` query param (the React import dialog has a radio control), and `nodesToExcalidraw(nodes, { layoutEngine })` accepts the same option directly. Set `TF_LAYOUT_ENGINE=force` (env var) to flip the fallback default for callers that don't pass the option.
+- both engines share the same `(nodeKeys, directedEdges, tierMap, tierConfigs, layoutSizes) -> { id: {x,y} }` contract, returning top-left positions
+- ELK additionally accepts `options.nestingGroups` (a 6th argument). `nodesToExcalidraw` builds one compound per VPC (from `accountRegionGroups[*].regions[*].vpcs[*].nodePaths` mapped to layout ids) so VPC-bound modules are clustered inside the VPC frame and out-of-VPC modules (buckets, queues) are kept on the outside. Compound membership follows `buildNodeVpcMap` (including its BFS fallback for `aws_lambda_function` etc.)
+- collapsed module positions are expanded into resource positions via `expandCollapsedModulePositions`
 - Lambda/security-group module internals have presets
-- VPC perimeter appliances can be removed from force layout and snapped to VPC frame walls
+- VPC perimeter appliances are removed from the top-level layout and snapped to VPC frame walls afterward (`snapVpcPerimeterResourcePositions`)
 - account/region/VPC/subnet boxes measure visual bounds and module boxes, not just raw node rectangles
 
 Nested module behavior is covered by tests near the end of `excalidraw.test.js`.
@@ -128,7 +131,7 @@ Run backend tests from repo root:
 yarn workspace @excalidraw/backend test
 ```
 
-Last observed result on 2026-05-06: 4 test files, 47 tests passed. Node printed a `url.parse()` deprecation warning from dependencies.
+Last observed result on 2026-05-07 (with ELK as default layout engine): 4 test files, 48 tests passed. Node printed a `url.parse()` deprecation warning from dependencies.
 
 ## Maintenance Reminder
 
