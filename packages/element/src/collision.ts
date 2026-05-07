@@ -359,12 +359,18 @@ export const getHoveredElementForBinding = (
     return candidateElements[0];
   }
 
-  // Prefer smaller shapes
+  // Prefer closer shapes
   return candidateElements
     .sort(
-      (a, b) => b.width ** 2 + b.height ** 2 - (a.width ** 2 + a.height ** 2),
+      (a, b) =>
+        (isPointInElement(point, a, elementsMap)
+          ? Infinity
+          : distanceToElement(a, elementsMap, point)) -
+        (isPointInElement(point, b, elementsMap)
+          ? Infinity
+          : distanceToElement(b, elementsMap, point)),
     )
-    .pop() as NonDeleted<ExcalidrawBindableElement>;
+    .shift() as NonDeleted<ExcalidrawBindableElement>;
 };
 
 export const getHoveredElementForFocusPoint = (
