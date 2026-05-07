@@ -314,6 +314,17 @@ export const SelectionIcon = createIcon(
   { fill: "none", width: 22, height: 22, strokeWidth: 1.25 },
 );
 
+// custom: lasso selection tool
+export const LassoIcon = createIcon(
+  <g stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M4.5 11c0-4.418 3.358-8 7.5-8s7.5 3.582 7.5 8c0 3.314-1.79 6.192-4.5 7.5" />
+    <path d="M12 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+    <path d="M12 19v3" />
+  </g>,
+  { fill: "none", width: 22, height: 22, strokeWidth: 1.25 },
+);
+
 // tabler-icons: square
 export const RectangleIcon = createIcon(
   <g strokeWidth="1.5">

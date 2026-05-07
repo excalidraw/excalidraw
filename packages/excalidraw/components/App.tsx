@@ -425,6 +425,7 @@ import { isOverScrollBars } from "../scene/scrollbars";
 import { isMaybeMermaidDefinition } from "../mermaid";
 
 import { EraserTrail } from "../eraser";
+import { LassoTrail } from "../lasso";
 
 import { getShortcutKey } from "../shortcut";
 
@@ -704,6 +705,7 @@ class App extends React.Component<AppProps, AppState> {
 
   laserTrails = new LaserTrails(this.animationFrameHandler, this);
   eraserTrail = new EraserTrail(this.animationFrameHandler, this);
+  lassoTrail = new LassoTrail(this.animationFrameHandler, this);
 
   onChangeEmitter = new Emitter<
     [
@@ -2210,6 +2212,7 @@ class App extends React.Component<AppProps, AppState> {
                             trails={[
                               this.laserTrails,
                               this.eraserTrail,
+                              this.lassoTrail,
                             ]}
                           />
                           {selectedElements.length === 1 &&
@@ -3471,6 +3474,13 @@ class App extends React.Component<AppProps, AppState> {
 
     if (isEraserActive(prevState) && !isEraserActive(this.state)) {
       this.eraserTrail.endPath();
+    }
+
+    if (
+      prevState.activeTool.type === "lasso" &&
+      this.state.activeTool.type !== "lasso"
+    ) {
+      this.lassoTrail.endPath();
     }
 
     if (prevProps.viewModeEnabled !== this.props.viewModeEnabled) {
@@ -4751,6 +4761,19 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (!isInputLike(event.target)) {
+        // Toggle between selection and lasso tools with Ctrl+Alt+L
+        if (
+          event[KEYS.CTRL_OR_CMD] &&
+          event.altKey &&
+          event.key.toLowerCase() === "l"
+        ) {
+          const nextTool =
+            this.state.activeTool.type === "lasso" ? "selection" : "lasso";
+          this.setActiveTool({ type: nextTool });
+          event.preventDefault();
+          return;
+        }
+
         if (
           (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
           this.state.croppingElementId
@@ -7328,6 +7351,36 @@ class App extends React.Component<AppProps, AppState> {
     this.triggerRender();
   };
 
+  private handleLasso = (
+    event: PointerEvent,
+    scenePointer: { x: number; y: number },
+  ) => {
+    const elementsToSelect = this.lassoTrail.addPointToPath(
+      scenePointer.x,
+      scenePointer.y,
+    );
+
+    const nextSelectedElementIds = elementsToSelect.reduce(
+      (acc: Record<string, true>, id) => {
+        acc[id] = true;
+        return acc;
+      },
+      event.shiftKey ? { ...this.state.selectedElementIds } : {},
+    );
+
+    this.setState((prevState) => ({
+      ...selectGroupsForSelectedElements(
+        {
+          editingGroupId: prevState.editingGroupId,
+          selectedElementIds: nextSelectedElementIds,
+        },
+        this.scene.getNonDeletedElements(),
+        prevState,
+        this,
+      ),
+    }));
+  };
+
   // set touch moving for mobile context menu
   private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
     invalidateContextMenu = true;
@@ -7708,6 +7761,7 @@ class App extends React.Component<AppProps, AppState> {
       !this.state.penMode ||
       event.pointerType !== "touch" ||
       this.state.activeTool.type === "selection" ||
+      this.state.activeTool.type === "lasso" ||
       this.state.activeTool.type === "text" ||
       this.state.activeTool.type === "image";
 
@@ -7744,6 +7798,11 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (this.state.activeTool.type === "laser") {
       this.laserTrails.startPath(
+        pointerDownState.lastCoords.x,
+        pointerDownState.lastCoords.y,
+      );
+    } else if (this.state.activeTool.type === "lasso") {
+      this.lassoTrail.startPath(
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
@@ -9407,6 +9466,11 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (this.state.activeTool.type === "lasso") {
+        this.handleLasso(event, pointerCoords);
+        return;
+      }
+
       if (this.state.activeTool.type === "laser") {
         this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
@@ -10812,6 +10876,11 @@ class App extends React.Component<AppProps, AppState> {
 
       if (isEraserActive(this.state) && pointerStart && pointerEnd) {
         this.eraserTrail.endPath();
+      } else if (this.state.activeTool.type === "lasso") {
+        this.lassoTrail.endPath();
+      }
+
+      if (isEraserActive(this.state) && pointerStart && pointerEnd) {
 
         const draggedDistance = pointDistance(
           pointFrom(pointerStart.clientX, pointerStart.clientY),

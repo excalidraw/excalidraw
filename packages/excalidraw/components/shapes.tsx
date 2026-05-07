@@ -2,6 +2,7 @@ import { KEYS } from "@excalidraw/common";
 
 import {
   SelectionIcon,
+  LassoIcon,
   RectangleIcon,
   DiamondIcon,
   EllipseIcon,
@@ -32,6 +33,14 @@ export const SHAPES = [
     key: KEYS.V,
     numericKey: KEYS["1"],
     fillable: true,
+    toolbar: true,
+  },
+  {
+    icon: LassoIcon,
+    value: "lasso",
+    key: null,
+    numericKey: null,
+    fillable: false,
     toolbar: true,
   },
   {
