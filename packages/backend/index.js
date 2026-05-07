@@ -34,7 +34,12 @@ const {
 } = require("./pipeline");
 const { extractVpcNetworkingFacetStore } = require("./vpc-networking-facet");
 const { mockLanggraphEnrichment, applyEnrichment } = require("./enrichment");
-const { nodesToExcalidraw } = require("./excalidraw");
+const { buildDiagramIR } = require("./diagram-ir");
+const { getRenderer, listRenderers } = require("./connectors");
+const {
+  RendererNotImplementedError,
+  UnknownRendererError,
+} = require("./connectors/errors");
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -163,10 +168,37 @@ app.get("/terraform/upload/:id", (req, res) => {
   });
 });
 
-const SUPPORTED_LAYOUT_ENGINES = new Set(["elk", "force"]);
+/** Lists available frontend connectors. */
+app.get("/terraform/renderers", (_req, res) => {
+  return res.json({ renderers: listRenderers() });
+});
 
-/** Materializes an Excalidraw document from stored `nodes` (same shape the React app imports). */
+/**
+ * Materializes a frontend-specific document from stored `nodes`.
+ *
+ * Connectors live in `connectors/`. Each one consumes the post-pipeline
+ * `nodes` map plus a neutral `DiagramIR`. New frontend bindings (tldraw,
+ * mermaid, drawio, ...) plug in by adding a module to that registry.
+ */
+app.get("/terraform/upload/:id/render/:renderer", async (req, res) => {
+  return await renderUploadAs(req.params.renderer, req, res);
+});
+
+/**
+ * Back-compat alias for the legacy Excalidraw endpoint. Kept stable so the
+ * React import dialog and existing fetchers keep working. Sets a
+ * `Deprecation` header pointing callers at `/render/:renderer`.
+ */
 app.get("/terraform/upload/:id/excalidraw", async (req, res) => {
+  res.setHeader("Deprecation", "true");
+  res.setHeader(
+    "Link",
+    '</terraform/upload/:id/render/excalidraw>; rel="successor-version"',
+  );
+  return await renderUploadAs("excalidraw", req, res);
+});
+
+async function renderUploadAs(rendererId, req, res) {
   try {
     const row = db
       .select()
@@ -176,27 +208,45 @@ app.get("/terraform/upload/:id/excalidraw", async (req, res) => {
     if (!row) {
       return res.status(404).json({ error: "Not found" });
     }
-    const requestedEngine =
-      typeof req.query.layoutEngine === "string"
-        ? req.query.layoutEngine.trim().toLowerCase()
-        : null;
-    const layoutEngine =
-      requestedEngine && SUPPORTED_LAYOUT_ENGINES.has(requestedEngine)
-        ? requestedEngine
-        : undefined;
+
+    let renderer;
+    try {
+      renderer = getRenderer(rendererId);
+    } catch (error) {
+      if (error instanceof UnknownRendererError) {
+        return res
+          .status(404)
+          .json({ error: error.message, available: error.available });
+      }
+      throw error;
+    }
+
     const nodes = JSON.parse(row.data);
-    const excalidraw = await nodesToExcalidraw(nodes, { layoutEngine });
-    res.setHeader("Content-Type", "application/json");
+    const ir = buildDiagramIR(nodes);
+    const result = await renderer.render({
+      nodes,
+      ir,
+      options: { layoutEngine: req.query.layoutEngine },
+    });
+
+    res.setHeader("Content-Type", result.contentType || renderer.contentType);
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="terraform-${row.id}.excalidraw"`,
+      `attachment; filename="terraform-${row.id}.${result.fileExtension || renderer.fileExtension}"`,
     );
-    return res.json(excalidraw);
+    return res.json(result.body);
   } catch (error) {
+    if (error instanceof RendererNotImplementedError) {
+      return res.status(501).json({
+        error: error.message,
+        renderer: error.rendererId,
+        details: error.details,
+      });
+    }
     console.error(error);
     return res.status(500).json({ error: error.message });
   }
-});
+}
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
