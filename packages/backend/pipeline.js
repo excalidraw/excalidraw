@@ -577,9 +577,32 @@ function collectModuleMetadataFromConfig(moduleConfig, modulePath = "", out = {}
   return out;
 }
 
+/** Recursively collects module call expressions/outputs keyed by absolute module path. */
+function collectModuleConfigFromPlan(moduleConfig, modulePath = "", out = {}) {
+  for (const [moduleName, moduleCall] of Object.entries(moduleConfig?.module_calls || {})) {
+    const childModulePath = modulePath
+      ? `${modulePath}.module.${moduleName}`
+      : `module.${moduleName}`;
+
+    out[childModulePath] = {
+      expressions: moduleCall.expressions || {},
+      outputs: moduleCall.module?.outputs || {},
+    };
+
+    if (moduleCall.module) {
+      collectModuleConfigFromPlan(moduleCall.module, childModulePath, out);
+    }
+  }
+
+  return out;
+}
+
 /** Annotates each node with `terraform_module` chain entries (source/version) from plan configuration. */
 function applyModuleMetadata(nodes, plan) {
   const moduleMetadata = collectModuleMetadataFromConfig(
+    plan?.configuration?.root_module,
+  );
+  const moduleConfig = collectModuleConfigFromPlan(
     plan?.configuration?.root_module,
   );
 
@@ -616,6 +639,10 @@ function applyModuleMetadata(nodes, plan) {
     node.terraform_module = isSyntheticModuleRoot
       ? entries
       : entries.filter((metadata) => metadata.source || metadata.version);
+
+    if (isSyntheticModuleRoot && moduleConfig[nodePath]) {
+      node.terraform_config = moduleConfig[nodePath];
+    }
   }
 
   return nodes;
@@ -1195,12 +1222,79 @@ function resolvePolicyTargets(resourceValue, index, nodes) {
   return [...matches];
 }
 
+const getExpressionReferences = (expression) =>
+  Array.isArray(expression?.references) ? expression.references : [];
+
+const withoutAttributeSuffix = (reference = "") => {
+  const stripped = stripIndexes(String(reference));
+  const parts = stripped.split(".");
+  const dataIndex = parts.indexOf("data");
+  let resourceStart = dataIndex === -1 ? 0 : dataIndex + 1;
+
+  while (parts[resourceStart] === "module" && parts[resourceStart + 1]) {
+    resourceStart += 2;
+  }
+
+  if (parts.length > resourceStart + 2) {
+    return parts.slice(0, resourceStart + 2).join(".");
+  }
+  return stripped;
+};
+
+function resolveModuleOutputReference(reference, nodes, seen = new Set()) {
+  const ref = stripIndexes(String(reference));
+  if (!ref || seen.has(ref)) {
+    return [];
+  }
+  seen.add(ref);
+
+  const directMatches = new Set();
+  for (const candidate of [ref, withoutAttributeSuffix(ref)]) {
+    for (const nodePath of nodes.__dataFlowIndex?.byAddress?.get(candidate) || []) {
+      if (DATA_FLOW_TARGET_TYPES.has(getResourceType(nodePath, nodes[nodePath]))) {
+        directMatches.add(nodePath);
+      }
+    }
+  }
+  if (directMatches.size > 0) {
+    return [...directMatches];
+  }
+
+  const parts = ref.split(".");
+  const modulePath = parts.slice(0, -1).join(".");
+  const outputName = parts.at(-1);
+  const output = nodes[modulePath]?.terraform_config?.outputs?.[outputName];
+  const outputRefs = getExpressionReferences(output?.expression);
+  if (outputRefs.length) {
+    const matches = new Set();
+    for (const outputRef of outputRefs) {
+      const absoluteRef = `${modulePath}.${outputRef}`;
+      for (const target of resolveModuleOutputReference(absoluteRef, nodes, seen)) {
+        matches.add(target);
+      }
+    }
+    return [...matches];
+  }
+
+  return [];
+}
+
+function collectDescendantNodesByType(nodes, modulePath, types) {
+  const allowed = new Set(types);
+  return Object.keys(nodes).filter(
+    (nodePath) =>
+      nodePath.startsWith(`${modulePath}.`) &&
+      allowed.has(getResourceType(nodePath, nodes[nodePath])),
+  );
+}
+
 /**
  * Adds `edges_data_flow` from integrations, notifications, IAM policy statements, etc.,
  * using `buildDataFlowIndex` for cross-reference resolution.
  */
 function buildDataFlowEdges(nodes) {
   const index = buildDataFlowIndex(nodes);
+  nodes.__dataFlowIndex = index;
   const explicitKeys = new Set();
   const allKeys = new Set();
 
@@ -1461,6 +1555,46 @@ function buildDataFlowEdges(nodes) {
       }
     }
   }
+
+  for (const [modulePath, node] of Object.entries(nodes)) {
+    if (getResourceType(modulePath, node) !== TERRAFORM_MODULE_RESOURCE_TYPE) {
+      continue;
+    }
+
+    const policyRefs = getExpressionReferences(
+      node.terraform_config?.expressions?.policy_statements,
+    );
+    if (!policyRefs.length) {
+      continue;
+    }
+
+    const targets = new Set();
+    for (const ref of policyRefs) {
+      for (const target of resolveModuleOutputReference(ref, nodes)) {
+        targets.add(target);
+      }
+    }
+
+    const principals = [
+      ...collectDescendantNodesByType(nodes, modulePath, ["aws_lambda_function"]),
+      ...collectDescendantNodesByType(nodes, modulePath, ["aws_iam_role"]),
+    ];
+
+    for (const target of targets) {
+      for (const principal of principals) {
+        addEdge(
+          target,
+          principal,
+          "accesses",
+          "accesses",
+          "module_policy_reference",
+          "policy_statements",
+        );
+      }
+    }
+  }
+
+  delete nodes.__dataFlowIndex;
 
   return nodes;
 }

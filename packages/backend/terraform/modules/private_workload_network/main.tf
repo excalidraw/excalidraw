@@ -88,3 +88,15 @@ module "managed_service_endpoints" {
     }
   }
 }
+
+module "vpc_flow_logs" {
+  source = "../vpc_flow_logs"
+
+  name_prefix           = var.vpc_name
+  log_group_name        = var.flow_logs_log_group_name
+  log_retention_in_days = var.flow_logs_log_retention_in_days
+  traffic_type          = var.flow_logs_traffic_type
+  vpc_id                = module.vpc.vpc_id
+
+  tags = var.tags
+}

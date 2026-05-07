@@ -23,6 +23,15 @@ function overlaps(a, b) {
   );
 }
 
+function contains(outer, inner) {
+  return (
+    outer.x <= inner.x &&
+    outer.y <= inner.y &&
+    outer.x + outer.w >= inner.x + inner.w &&
+    outer.y + outer.h >= inner.y + inner.h
+  );
+}
+
 function runAllplanModulesPipeline() {
   const terraformDir = path.join(__dirname, "terraform");
   const plan = JSON.parse(
@@ -844,5 +853,33 @@ describe("nodesToExcalidraw nested module layout", () => {
     for (const rect of resourceRects(securityGroupModule)) {
       expect(overlaps(rect, lambdaBox)).toBe(false);
     }
+  });
+
+  it("keeps nested module boxes inside their semantic account/region/VPC/subnet boxes", async () => {
+    const scene = await nodesToExcalidraw(runAllplanModulesPipeline());
+    const modulePath = "module.workload_writer_lambda";
+    const moduleBox = scene.elements.find(
+      (el) =>
+        el.type === "rectangle" &&
+        el.customData?.terraformModuleGroup &&
+        el.customData?.modulePath === modulePath,
+    );
+    expect(moduleBox).toBeTruthy();
+    const moduleRect = rectOf(moduleBox);
+
+    const containingBoxes = (flag) =>
+      scene.elements
+        .filter(
+          (el) =>
+            el.type === "rectangle" &&
+            el.customData?.[flag] &&
+            contains(rectOf(el), moduleRect),
+        )
+        .map((el) => el.customData);
+
+    expect(containingBoxes("terraformAccountGroup")).toHaveLength(1);
+    expect(containingBoxes("terraformRegionGroup")).toHaveLength(1);
+    expect(containingBoxes("terraformVpcGroup")).toHaveLength(1);
+    expect(containingBoxes("terraformSubnetGroup").length).toBeGreaterThan(0);
   });
 });
