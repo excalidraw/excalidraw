@@ -45,6 +45,13 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 const upload = multer({ dest: "uploads/" });
 
+const STRUCTURAL_PRUNE_MODES = new Set(["module-only", "global", "off"]);
+
+function normalizeStructuralPruneMode(rawMode) {
+  const mode = String(rawMode || "module-only").trim().toLowerCase();
+  return STRUCTURAL_PRUNE_MODES.has(mode) ? mode : "module-only";
+}
+
 app.use(cors());
 app.use(express.json());
 
@@ -87,6 +94,9 @@ app.post(
       const plan = JSON.parse(planContent);
       const state = stateContent ? JSON.parse(stateContent) : null;
       const graph = dot.read(dotContent);
+      const structuralPruneMode = normalizeStructuralPruneMode(
+        req.body?.structuralPruneMode || req.query?.structuralPruneMode,
+      );
 
       const adjlist = getAdjacencyListFromDot(graph);
 
@@ -95,31 +105,54 @@ app.post(
       // diffs → existingEdges → filterDataSources → genericEdges → edgeLists → pruneShortcuts →
       // externals → edgeLists → dataFlow → edgeLists → facetStore → omitVpcPlumbing → orphans →
       // roleCleanup → visualIgnore → orphans → enrichment → persist.
+      // Parse the Terraform plan into the initial node map.
       let nodes = loadPlanAndNodes(plan);
+      // Merge state-only details (if present) into the plan-derived nodes.
       nodes = mergeTerraformState(nodes, state);
+      // Ensure module container nodes exist for nested resources.
       nodes = ensureTerraformModuleNodes(nodes);
+      // Attach module metadata (paths/names) from the raw plan.
       nodes = applyModuleMetadata(nodes, plan);
+      // Drop data source nodes that are not in the allowlist.
       nodes = omitNonAllowlistedDataSourceNodes(nodes);
+      // Build edges discovered from the DOT adjacency list.
       nodes = buildNewEdges(nodes, adjlist);
 
+      // Compute create/update/delete/no-op diff status per resource.
       nodes = computeResourceDiffs(nodes);
+      // Add edges that can be inferred directly from plan references.
       nodes = buildExistingEdges(nodes, plan);
+      // Re-apply allowlist filtering after edge reconstruction.
       nodes = omitNonAllowlistedDataSourceNodes(nodes);
+      // Remove data sources that only exist in state and not in plan.
       nodes = omitStateOnlyDataSourceNodes(nodes);
+      // Detect generic parent/child structural relationships as edges.
       nodes = detectGenericStructuralEdges(nodes);
+      // Normalize edge containers so later passes can safely append.
       nodes = ensureEdgeLists(nodes);
-      nodes = pruneRedundantStructuralEdges(nodes);
+      // Remove duplicate or shortcut structural edges (scope configurable on upload).
+      nodes = pruneRedundantStructuralEdges(nodes, { mode: structuralPruneMode });
+      // Mark or normalize references to external (out-of-graph) resources.
       nodes = externalResources(nodes);
+      // Re-normalize edge lists after external resource adjustments.
       nodes = ensureEdgeLists(nodes);
+      // Infer directed data-flow edges between resources/data sources.
       nodes = buildDataFlowEdges(nodes);
+      // Ensure edge lists are present before final pruning passes.
       nodes = ensureEdgeLists(nodes);
+      // Drop synthetic IAM policy document nodes that should not render.
       nodes = omitGhostIamPolicyDocumentNodes(nodes);
       // Facets must capture routing plumbing before those nodes are removed.
       nodes.__networkingFacetStore = extractVpcNetworkingFacetStore(nodes);
+      // Remove low-level VPC plumbing nodes after facet extraction.
       nodes = omitVpcPlumbingNodes(nodes);
+      // Prune nodes that no longer have valid graph connectivity.
       nodes = deleteOrphanedNodes(nodes);
+      // Clean inconsistent or stale IAM role linkage metadata.
       nodes = cleanUpRoleLinks(nodes);
+      // Remove nodes flagged to be hidden from visual output.
       nodes = filterVisualIgnore(nodes);
+      // Run orphan cleanup again after visibility filtering.
       nodes = deleteOrphanedNodes(nodes);
 
       const enrichment = mockLanggraphEnrichment(nodes);
@@ -226,7 +259,10 @@ async function renderUploadAs(rendererId, req, res) {
     const result = await renderer.render({
       nodes,
       ir,
-      options: { layoutEngine: req.query.layoutEngine },
+      options: {
+        layoutEngine: req.query.layoutEngine,
+        vpcEndpointSnapping: req.query.vpcEndpointSnapping,
+      },
     });
 
     res.setHeader("Content-Type", result.contentType || renderer.contentType);

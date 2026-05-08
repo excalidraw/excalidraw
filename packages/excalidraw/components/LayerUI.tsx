@@ -380,6 +380,21 @@ const collectTerraformHoverFocus = (
   return { focusedNodePaths, focusedEdgeIds };
 };
 
+const getHoveredTerraformNodePath = (
+  allElements: readonly ExcalidrawElement[],
+  hoveredElementIds: AppState["hoveredElementIds"],
+) => {
+  const hoveredTerraformResource = allElements.find(
+    (element) =>
+      hoveredElementIds[element.id] &&
+      element.customData?.terraformVisibilityRole === "resource" &&
+      typeof element.customData?.nodePath === "string",
+  );
+  return typeof hoveredTerraformResource?.customData?.nodePath === "string"
+    ? hoveredTerraformResource.customData.nodePath
+    : null;
+};
+
 const tryParseJsonString = (value: string): unknown | null => {
   const trimmed = value.trim();
   if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
@@ -943,6 +958,45 @@ const LayerUI = ({
   const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
 
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
+  const [lockedTerraformHoverNodePath, setLockedTerraformHoverNodePath] =
+    React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (!lockedTerraformHoverNodePath) {
+      return;
+    }
+    const allElements = app.scene.getElementsIncludingDeleted();
+    const stillExists = allElements.some(
+      (element) =>
+        typeof element.customData?.nodePath === "string" &&
+        element.customData.nodePath === lockedTerraformHoverNodePath,
+    );
+    if (!stillExists) {
+      setLockedTerraformHoverNodePath(null);
+    }
+  }, [app, elements, lockedTerraformHoverNodePath]);
+
+  React.useEffect(() => {
+    const onCanvasDoubleClick = () => {
+      const allElements = app.scene.getElementsIncludingDeleted();
+      const hoveredNodePath = getHoveredTerraformNodePath(
+        allElements,
+        appState.hoveredElementIds,
+      );
+
+      setLockedTerraformHoverNodePath((prev) => {
+        if (!hoveredNodePath) {
+          return null;
+        }
+        return prev === hoveredNodePath ? null : hoveredNodePath;
+      });
+    };
+
+    canvas.addEventListener("dblclick", onCanvasDoubleClick);
+    return () => {
+      canvas.removeEventListener("dblclick", onCanvasDoubleClick);
+    };
+  }, [app, appState.hoveredElementIds, canvas]);
 
   React.useEffect(() => {
     const terraformElement = getTerraformElementForSelection(
@@ -1011,19 +1065,14 @@ const LayerUI = ({
 
   React.useEffect(() => {
     const allElements = app.scene.getElementsIncludingDeleted();
-    const hoveredTerraformResource = allElements.find(
-      (element) =>
-        appState.hoveredElementIds[element.id] &&
-        element.customData?.terraformVisibilityRole === "resource" &&
-        typeof element.customData?.nodePath === "string",
+    const hoveredNodePath = getHoveredTerraformNodePath(
+      allElements,
+      appState.hoveredElementIds,
     );
-    const hoveredNodePath =
-      typeof hoveredTerraformResource?.customData?.nodePath === "string"
-        ? hoveredTerraformResource.customData.nodePath
-        : null;
+    const activeFocusNodePath = hoveredNodePath || lockedTerraformHoverNodePath;
     const { focusedNodePaths, focusedEdgeIds } = collectTerraformHoverFocus(
       allElements,
-      hoveredNodePath,
+      activeFocusNodePath,
     );
 
     let didChange = false;
@@ -1052,13 +1101,13 @@ const LayerUI = ({
             : null;
         const isFocused =
           nodePath !== null &&
-          hoveredNodePath !== null &&
+          activeFocusNodePath !== null &&
           focusedNodePaths.has(nodePath);
         const isParentOfHoveredNode =
           isTerraformGroupElement(element as NonDeletedExcalidrawElement) &&
-          isTerraformGroupParentOfNode(element, hoveredNodePath);
+          isTerraformGroupParentOfNode(element, activeFocusNodePath);
         const nextOpacity =
-          hoveredNodePath === null
+          activeFocusNodePath === null
             ? TERRAFORM_FOCUS_OPACITY
             : isFocused || isParentOfHoveredNode
             ? TERRAFORM_FOCUS_OPACITY
@@ -1076,7 +1125,7 @@ const LayerUI = ({
     if (didChange) {
       app.scene.replaceAllElements(nextElements);
     }
-  }, [app, appState.hoveredElementIds, elements]);
+  }, [app, appState.hoveredElementIds, elements, lockedTerraformHoverNodePath]);
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
