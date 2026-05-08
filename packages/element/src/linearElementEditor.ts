@@ -48,7 +48,6 @@ import {
   calculateFixedPointForNonElbowArrowBinding,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isBindingEnabled,
-  snapToMid,
   updateBoundPoint,
 } from "./binding";
 import {
@@ -2200,13 +2199,15 @@ const pointDraggingUpdates = (
           ? {
               element: suggestedBindingElement,
               midPoint: app.state.isMidpointSnappingEnabled
-                ? snapToMid(
-                    suggestedBindingElement,
-                    elementsMap,
+                ? getSnapOutlineMidPoint(
                     pointFrom<GlobalPoint>(
                       scenePointerX - linearElementEditor.pointerOffset.x,
                       scenePointerY - linearElementEditor.pointerOffset.y,
                     ),
+                    suggestedBindingElement,
+                    elementsMap,
+                    app.state.zoom,
+                    element,
                   )
                 : undefined,
             }
@@ -2313,6 +2314,7 @@ const pointDraggingUpdates = (
               start.element,
               elementsMap,
               app.state.zoom,
+              element,
             ),
           }
         : null;
@@ -2352,6 +2354,7 @@ const pointDraggingUpdates = (
               end.element,
               elementsMap,
               app.state.zoom,
+              element,
             ),
           }
         : null;

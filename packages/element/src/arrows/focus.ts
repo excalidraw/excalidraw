@@ -269,6 +269,7 @@ export const handleFocusPointDrag = (
         newMode || "orbit",
         linearElementEditor.draggedFocusPointBinding,
         scene,
+        appState.zoom,
         point,
       );
     }
