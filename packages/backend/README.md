@@ -86,6 +86,36 @@ HTTP 501 with `{ renderer, details }`.
 | `dotFile` | Yes | DOT output from `terraform graph` or `tofu graph`. |
 | `stateFile` | No | Terraform/OpenTofu state JSON. Helps preserve existing resources and edges. |
 
+## Run the `allplanmodules` fixture through the backend
+
+From the repo root, start the backend:
+
+```bash
+yarn dev:backend
+```
+
+In another terminal, upload the checked-in fixture:
+
+```bash
+curl -sS -X POST "http://localhost:3000/terraform/upload" \
+  -F "planFile=@packages/backend/terraform/allplanmodules.json" \
+  -F "dotFile=@packages/backend/terraform/allplanmodules.dot" \
+  -F "structuralPruneMode=module-only" \
+  -F "debugPipeline=true"
+```
+
+The response includes an `id` (and debug output path when enabled). Render that upload as Excalidraw:
+
+```bash
+curl -sS "http://localhost:3000/terraform/upload/<ID>/excalidraw?layoutEngine=elk&vpcEndpointSnapping=true"
+```
+
+Or via the connector route:
+
+```bash
+curl -sS "http://localhost:3000/terraform/upload/<ID>/render/excalidraw?layoutEngine=elk&vpcEndpointSnapping=true"
+```
+
 ## Generate Terraform Inputs
 
 From the sample Terraform directory:
