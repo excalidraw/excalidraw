@@ -46,10 +46,25 @@ const PORT = Number(process.env.PORT) || 3000;
 const upload = multer({ dest: "uploads/" });
 
 const STRUCTURAL_PRUNE_MODES = new Set(["module-only", "global", "off"]);
+const FALSEY_FLAG_VALUES = new Set(["0", "false", "no", "off", "disabled"]);
 
 function normalizeStructuralPruneMode(rawMode) {
   const mode = String(rawMode || "module-only").trim().toLowerCase();
   return STRUCTURAL_PRUNE_MODES.has(mode) ? mode : "module-only";
+}
+
+function parseBooleanFlag(rawValue, fallback = false) {
+  if (typeof rawValue === "boolean") {
+    return rawValue;
+  }
+  if (rawValue == null) {
+    return fallback;
+  }
+  const normalized = String(rawValue).trim().toLowerCase();
+  if (!normalized) {
+    return fallback;
+  }
+  return !FALSEY_FLAG_VALUES.has(normalized);
 }
 
 app.use(cors());
@@ -97,8 +112,31 @@ app.post(
       const structuralPruneMode = normalizeStructuralPruneMode(
         req.body?.structuralPruneMode || req.query?.structuralPruneMode,
       );
+      const debugPipeline = parseBooleanFlag(
+        req.body?.debugPipeline ?? req.query?.debugPipeline,
+        false,
+      );
+      let debugOutputDir = null;
+      let debugStep = 0;
+      const writeDebugSnapshot = (stepName, value) => {
+        if (!debugPipeline) {
+          return;
+        }
+        if (!debugOutputDir) {
+          const debugRunId = `upload-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+          debugOutputDir = path.join(__dirname, "debug-upload", debugRunId);
+          fs.mkdirSync(debugOutputDir, { recursive: true });
+        }
+        debugStep += 1;
+        const filename = `${String(debugStep).padStart(2, "0")}-${stepName}.json`;
+        fs.writeFileSync(
+          path.join(debugOutputDir, filename),
+          JSON.stringify(value, null, 2),
+        );
+      };
 
       const adjlist = getAdjacencyListFromDot(graph);
+      writeDebugSnapshot("adjacency-list", adjlist);
 
       // Graph transforms (see pipeline.js module banner for semantics):
       // loadPlan → mergeState → moduleNodes → moduleMeta → filterDataSources → dotEdges →
@@ -107,53 +145,77 @@ app.post(
       // roleCleanup → visualIgnore → orphans → enrichment → persist.
       // Parse the Terraform plan into the initial node map.
       let nodes = loadPlanAndNodes(plan);
+      writeDebugSnapshot("load-plan-and-nodes", nodes);
       // Merge state-only details (if present) into the plan-derived nodes.
       nodes = mergeTerraformState(nodes, state);
+      writeDebugSnapshot("merge-terraform-state", nodes);
       // Ensure module container nodes exist for nested resources.
       nodes = ensureTerraformModuleNodes(nodes);
+      writeDebugSnapshot("ensure-terraform-module-nodes", nodes);
       // Attach module metadata (paths/names) from the raw plan.
       nodes = applyModuleMetadata(nodes, plan);
+      writeDebugSnapshot("apply-module-metadata", nodes);
       // Drop data source nodes that are not in the allowlist.
       nodes = omitNonAllowlistedDataSourceNodes(nodes);
+      writeDebugSnapshot("omit-non-allowlisted-data-sources-1", nodes);
       // Build edges discovered from the DOT adjacency list.
       nodes = buildNewEdges(nodes, adjlist);
+      writeDebugSnapshot("build-new-edges", nodes);
 
       // Compute create/update/delete/no-op diff status per resource.
       nodes = computeResourceDiffs(nodes);
+      writeDebugSnapshot("compute-resource-diffs", nodes);
       // Add edges that can be inferred directly from plan references.
       nodes = buildExistingEdges(nodes, plan);
+      writeDebugSnapshot("build-existing-edges", nodes);
       // Re-apply allowlist filtering after edge reconstruction.
       nodes = omitNonAllowlistedDataSourceNodes(nodes);
+      writeDebugSnapshot("omit-non-allowlisted-data-sources-2", nodes);
       // Remove data sources that only exist in state and not in plan.
       nodes = omitStateOnlyDataSourceNodes(nodes);
+      writeDebugSnapshot("omit-state-only-data-sources", nodes);
       // Detect generic parent/child structural relationships as edges.
       nodes = detectGenericStructuralEdges(nodes);
+      writeDebugSnapshot("detect-generic-structural-edges", nodes);
       // Normalize edge containers so later passes can safely append.
       nodes = ensureEdgeLists(nodes);
+      writeDebugSnapshot("ensure-edge-lists-1", nodes);
       // Remove duplicate or shortcut structural edges (scope configurable on upload).
       nodes = pruneRedundantStructuralEdges(nodes, { mode: structuralPruneMode });
+      writeDebugSnapshot("prune-redundant-structural-edges", nodes);
       // Mark or normalize references to external (out-of-graph) resources.
       nodes = externalResources(nodes);
+      writeDebugSnapshot("external-resources", nodes);
       // Re-normalize edge lists after external resource adjustments.
       nodes = ensureEdgeLists(nodes);
+      writeDebugSnapshot("ensure-edge-lists-2", nodes);
       // Infer directed data-flow edges between resources/data sources.
       nodes = buildDataFlowEdges(nodes);
+      writeDebugSnapshot("build-data-flow-edges", nodes);
       // Ensure edge lists are present before final pruning passes.
       nodes = ensureEdgeLists(nodes);
+      writeDebugSnapshot("ensure-edge-lists-3", nodes);
       // Drop synthetic IAM policy document nodes that should not render.
       nodes = omitGhostIamPolicyDocumentNodes(nodes);
+      writeDebugSnapshot("omit-ghost-iam-policy-document-nodes", nodes);
       // Facets must capture routing plumbing before those nodes are removed.
       nodes.__networkingFacetStore = extractVpcNetworkingFacetStore(nodes);
+      writeDebugSnapshot("extract-vpc-networking-facet-store", nodes);
       // Remove low-level VPC plumbing nodes after facet extraction.
       nodes = omitVpcPlumbingNodes(nodes);
+      writeDebugSnapshot("omit-vpc-plumbing-nodes", nodes);
       // Prune nodes that no longer have valid graph connectivity.
       nodes = deleteOrphanedNodes(nodes);
+      writeDebugSnapshot("delete-orphaned-nodes-1", nodes);
       // Clean inconsistent or stale IAM role linkage metadata.
       nodes = cleanUpRoleLinks(nodes);
+      writeDebugSnapshot("clean-up-role-links", nodes);
       // Remove nodes flagged to be hidden from visual output.
       nodes = filterVisualIgnore(nodes);
+      writeDebugSnapshot("filter-visual-ignore", nodes);
       // Run orphan cleanup again after visibility filtering.
       nodes = deleteOrphanedNodes(nodes);
+      writeDebugSnapshot("delete-orphaned-nodes-2", nodes);
 
       const enrichment = mockLanggraphEnrichment(nodes);
       applyEnrichment(nodes, enrichment);
@@ -166,7 +228,12 @@ app.post(
         nodeCount: Object.keys(nodes).filter((k) => !k.startsWith("__")).length,
       }).returning({ id: uploads.id }).get();
 
-      return res.json({ id: inserted.id });
+      return res.json({
+        id: inserted.id,
+        debugPipeline: debugPipeline
+          ? { enabled: true, outputDir: debugOutputDir }
+          : undefined,
+      });
     } catch (error) {
       console.error(error);
       return res.status(500).json({

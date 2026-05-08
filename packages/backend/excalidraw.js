@@ -98,13 +98,19 @@ const {
  * VPC perimeter snapping while keeping other perimeter appliance snapping behavior.
  */
 async function nodesToExcalidraw(nodes, options = {}) {
+  // Choose layout backend (`elk` layered by default, or `force` if requested).
   const layoutEngineId = resolveLayoutEngine(options.layoutEngine);
+  // Feature flag: when false, VPC endpoints are not snapped to perimeter walls.
   const vpcEndpointSnapping = options.vpcEndpointSnapping !== false;
+  // Buckets of emitted Excalidraw elements; concatenated at the end in z-order.
   const nodeElements = [];
   const locationElements = [];
   const moduleElements = [];
   const arrowElements = [];
+  // 1) Build the core graph model and helper indexes from post-pipeline `nodes`.
+  // Real Terraform nodes only (skip metadata keys like `__networkingFacetStore`).
   const nodeKeys = Object.keys(nodes).filter((key) => !key.startsWith("__"));
+  // Nodes considered "perimeter appliances" (LB/endpoint/etc.) for optional wall snapping.
   const perimeterSet = new Set(
     nodeKeys.filter((p) => {
       if (!isVpcPerimeterNode(p, nodes[p])) {
@@ -116,7 +122,9 @@ async function nodesToExcalidraw(nodes, options = {}) {
       return getResourceType(p) !== "aws_vpc_endpoint";
     }),
   );
+  // Structural graph edges merged from pipeline (`edges_new` + `edges_existing`).
   const directedEdges = collectDirectedEdges(nodes);
+  // Perimeter appliances are snapped in a post-pass, so keep them out of solver edges.
   const directedEdgesForLayout =
     VPC_PERIMETER_LAYOUT_ENABLED && perimeterSet.size > 0
       ? directedEdges.filter(
@@ -125,7 +133,9 @@ async function nodesToExcalidraw(nodes, options = {}) {
         )
       : directedEdges;
   const relationships = coalesceRelationshipPairs(directedEdges);
+  // Semantic data-flow edges (API calls, IAM references, integration links, etc.).
   const dataFlowEdges = collectDataFlowEdges(nodes);
+  // Undirected adjacency map used by frontend "explode neighborhood" interactions.
   const explodeParentMap = buildTerraformExplodeParentMap(
     nodeKeys,
     directedEdges,
@@ -140,11 +150,16 @@ async function nodesToExcalidraw(nodes, options = {}) {
       )
       .map(({ source, target }) => [source, target].sort().join("|||")),
   );
+  // Infer geographic/account placement for account/region containers.
   const nodeLocationMap = buildNodeLocationMap(nodes);
+  // Infer VPC membership for each node (explicit refs + heuristics).
   const nodeVpcMap = buildNodeVpcMap(nodes);
+  // Infer subnet membership for each node (handles multi-subnet cases).
   const nodeSubnetMap = buildNodeSubnetMap(nodes, nodeVpcMap);
+  // Preserve networking summaries before routing-plumbing nodes are stripped from graph.
   const networkingFacetStore =
     nodes.__networkingFacetStore || extractVpcNetworkingFacetStore(nodes);
+  // Build per-container (VPC/subnet) facet payloads used for labels/panels/tiles.
   const containerFacetContributors = buildContainerFacetContributors({
     nodes,
     nodeLocationMap,
@@ -152,7 +167,9 @@ async function nodesToExcalidraw(nodes, options = {}) {
     nodeSubnetMap,
     networkingFacetStore,
   });
+  // Module grouping metadata (depth, label, source/version, members).
   const moduleGroups = collectModuleGroups(nodeKeys, nodes);
+  // Hierarchy for large framing rectangles: account -> region -> vpc -> subnet.
   const accountRegionGroups = expandNetworkContainerGroupsWithModuleMembership(
     collectAccountRegionGroups(
       nodeKeys,
@@ -168,12 +185,17 @@ async function nodesToExcalidraw(nodes, options = {}) {
   const moduleGroupIdByPath = new Map(
     moduleGroups.map((group) => [group.modulePath, `module-group-${rand()}`]),
   );
+  // Quick lookup for module metadata when expanding collapsed module layout blocks.
   const moduleGroupByPath = new Map(
     moduleGroups.map((group) => [group.modulePath, group]),
   );
 
+  // 2) Collapse nested modules for the global layout solve.
+  // Tier map gives a coarse "importance/level" rank used by both layout engines.
   const tierMap = buildTierMap(nodeKeys);
+  // Select modules that should collapse into one synthetic layout vertex.
   const collapsibleModules = buildCollapsibleModuleSet(moduleGroups);
+  // Collapsed model: layout ids, reduced edges, per-layout tier, module->member mapping.
   const { layoutNodeKeys, layoutEdges, layoutTierMap, moduleMembers } =
     buildCollapsedLayoutModel(
       nodeKeys,
@@ -181,11 +203,13 @@ async function nodesToExcalidraw(nodes, options = {}) {
       tierMap,
       collapsibleModules,
     );
+  // Nodes that actually participate in the solver (exclude perimeter-snap outliers).
   const layoutSimulationKeys = filterLayoutSimulationKeys(
     layoutNodeKeys,
     moduleMembers,
     perimeterSet,
   );
+  // Visual size/style presets for concrete nodes and collapsed module blocks.
   const tierConfigs = buildTierConfigs(tierMap, nodeKeys.length);
   const layoutTierConfigs = buildTierConfigs(
     layoutTierMap,
@@ -198,9 +222,12 @@ async function nodesToExcalidraw(nodes, options = {}) {
     tierConfigs,
   );
 
+  // Engine dispatch: ELK layered unless user explicitly requests d3-force.
   const useElk = layoutEngineId !== "force";
   const layoutEngine = useElk ? elkLayout : forceLayout;
+  // For fast membership checks while assembling nesting groups.
   const layoutSimulationKeySet = new Set(layoutSimulationKeys);
+  // Map every concrete node to the layout id that represents it in collapsed solve.
   const nodeToLayoutId = new Map();
   for (const [modulePath, members] of moduleMembers) {
     for (const member of members) {
@@ -213,6 +240,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     }
   }
   const elkNestingGroups = [];
+  // ELK-only grouping hint: keep VPC peers spatially cohesive.
   if (useElk) {
     for (const accountGroup of accountRegionGroups) {
       for (const regionGroup of accountGroup.regions || []) {
@@ -224,6 +252,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
               memberLayoutIds.add(layoutId);
             }
           }
+          // Nesting one member gives no value; require at least two.
           if (memberLayoutIds.size < 2) {
             continue;
           }
@@ -243,6 +272,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     layoutSizes,
     useElk ? { nestingGroups: elkNestingGroups } : {},
   );
+  // 3) Expand collapsed module anchors into per-resource coordinates.
   const positions = expandCollapsedModulePositions(
     layoutPositions,
     nodeKeys,
@@ -252,6 +282,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     tierConfigs,
   );
   const recursivelyLaidOutModules = new Set();
+  // Modules already covered by expansion should skip static presets to avoid double-offsetting.
   for (const members of moduleMembers.values()) {
     for (const nodePath of members) {
       for (const modulePath of getModulePathChain(nodePath)) {
@@ -262,6 +293,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
   applyModulePresets(positions, nodeKeys, moduleGroupByPath, {
     skipModulePaths: recursivelyLaidOutModules,
   });
+  // 4) Terraform-specific post-layout passes (perimeter snap + synthetic hub pinning).
   const perimeterWallByNodePath = snapVpcPerimeterResourcePositions(
     positions,
     accountRegionGroups,
@@ -270,6 +302,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     perimeterSet,
     nodes,
   );
+  // Safety net: every perimeter node must have coordinates for downstream element emission.
   for (const path of perimeterSet) {
     const pos = positions[path];
     if (!pos || typeof pos.x !== "number" || typeof pos.y !== "number") {
@@ -283,10 +316,12 @@ async function nodesToExcalidraw(nodes, options = {}) {
     tierMap,
     tierConfigs,
   );
+  // `posMap`: nodePath -> emitted rectangle/text ids + rectangle geometry.
   const posMap = {};
+  // `nodeRectById`: emitted rectangle id -> rectangle element (for arrow bindings).
   const nodeRectById = new Map();
 
-  // --- rectangles + labels + icons ---
+  // 5) Emit resource cards (rectangles + labels + optional service icons).
   for (let i = 0; i < nodeKeys.length; i++) {
     const nodePath = nodeKeys[i];
     const tier = tierMap[nodePath];
@@ -300,6 +335,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
       [...(explodeParentMap.get(nodePath) || [])].sort(),
     );
     const groupId = `node-${rand()}`;
+    // Group stack: node-local group + ancestor module groups (outermost last).
     const moduleGroupIds = getModulePathChain(nodePath)
       .reverse()
       .map((modulePath) => moduleGroupIdByPath.get(modulePath))
@@ -308,6 +344,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
 
     const rectId = `rect-${i}`;
     const textId = `text-${i}`;
+    // Store for arrow routing/binding and later container membership checks.
     posMap[nodePath] = { x, y, w: cfg.w, h: cfg.h, rectId, textId };
 
     const action = getPrimaryAction(nodes[nodePath]);
@@ -354,6 +391,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
             ? "dashed"
             : "solid",
       customData: {
+        // Canonical Terraform metadata consumed by UI panels/filters/hover behavior.
         terraform: true,
         ...visibilityCustomData,
         resourceType,
@@ -377,7 +415,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     nodeElements.push(rectElement);
     nodeRectById.set(rectId, rectElement);
 
-    // Text: shifted right if icon present
+    // Text label: shifted right to reserve icon gutter when an icon is present.
     const textX = x + iconArea + 8;
     const textW = cfg.w - iconArea - 16;
 
@@ -1220,7 +1258,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     }
   }
 
-  // --- dependency lines ---
+  // 6) Emit structural dependency arrows.
   let arrowIdx = 0;
   for (const relationship of relationships) {
     const {
@@ -1238,6 +1276,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
 
     const rectA = nodeRectById.get(posA.rectId);
     const rectB = nodeRectById.get(posB.rectId);
+    // Skip malformed relationships where one endpoint never emitted.
     if (!rectA || !rectB) {
       continue;
     }
@@ -1301,7 +1340,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     );
   }
 
-  // --- data-flow lines ---
+  // 7) Emit data-flow arrows (offset when they overlap dependency pairs).
   for (const edge of dataFlowEdges) {
     const {
       source,
@@ -1338,6 +1377,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
       posB.h,
     );
     const pairKey = [source, target].sort().join("|||");
+    // If a dependency edge exists on same pair, offset data-flow edge for readability.
     const shifted = offsetLineSegment(
       startPoint,
       endPoint,
@@ -1401,12 +1441,14 @@ async function nodesToExcalidraw(nodes, options = {}) {
   }
 
   const elementsOrdered = [
+    // Order matters: arrows at bottom, then framing containers/modules, then resource cards.
     ...arrowElements,
     ...locationElements,
     ...moduleElements,
     ...nodeElements,
   ];
 
+  // 8) Return an Excalidraw v2 scene payload consumed by import/render clients.
   return {
     type: "excalidraw",
     version: 2,

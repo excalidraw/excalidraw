@@ -1,6 +1,7 @@
 .DS_Store
 .env
 **/uploads/
+**/debug-upload/
 **/temp/
 graph.db
 graph.db-shm
