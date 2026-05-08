@@ -588,13 +588,13 @@ const getDiagonalsForBindableElement = (
   return [diagonalOne, diagonalTwo];
 };
 
-export const getSnapOutlineMidPoint = (
+export const getHighlightedMidpointIndex = (
   point: GlobalPoint,
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
   zoom: AppState["zoom"],
   arrow: { elbowed: boolean },
-): GlobalPoint | undefined => {
+): number => {
   const center = elementCenterPoint(element, elementsMap);
   const TOLERANCE = 0.05;
   const maxDistance = maxBindingDistance_simple(zoom) + element.strokeWidth / 2;
@@ -610,9 +610,8 @@ export const getSnapOutlineMidPoint = (
 
     const bindingGap = getBindingGap(element, arrow);
 
-    // Too close to the center makes it hard to resolve direction precisely
     if (pointDistance(center, nonRotated) < bindingGap) {
-      return undefined;
+      return -1;
     }
 
     if (
@@ -620,45 +619,25 @@ export const getSnapOutlineMidPoint = (
       nonRotated[1] > center[1] - verticalThreshold &&
       nonRotated[1] < center[1] + verticalThreshold
     ) {
-      // LEFT
-      return pointRotateRads(
-        pointFrom<GlobalPoint>(x - bindingGap, center[1]),
-        center,
-        angle,
-      );
+      return 2;
     } else if (
       nonRotated[1] <= y + height / 2 &&
       nonRotated[0] > center[0] - horizontalThreshold &&
       nonRotated[0] < center[0] + horizontalThreshold
     ) {
-      // TOP
-      return pointRotateRads(
-        pointFrom<GlobalPoint>(center[0], y - bindingGap),
-        center,
-        angle,
-      );
+      return 3;
     } else if (
       nonRotated[0] >= x + width / 2 &&
       nonRotated[1] > center[1] - verticalThreshold &&
       nonRotated[1] < center[1] + verticalThreshold
     ) {
-      // RIGHT
-      return pointRotateRads(
-        pointFrom<GlobalPoint>(x + width + bindingGap, center[1]),
-        center,
-        angle,
-      );
+      return 0;
     } else if (
       nonRotated[1] >= y + height / 2 &&
       nonRotated[0] > center[0] - horizontalThreshold &&
       nonRotated[0] < center[0] + horizontalThreshold
     ) {
-      // DOWN
-      return pointRotateRads(
-        pointFrom<GlobalPoint>(center[0], y + height + bindingGap),
-        center,
-        angle,
-      );
+      return 1;
     } else if (element.type === "diamond") {
       const distance = bindingGap;
       const topLeft = pointFrom<GlobalPoint>(
@@ -679,99 +658,116 @@ export const getSnapOutlineMidPoint = (
       );
 
       if (
-        pointDistance(topLeft, nonRotated) <
-        Math.max(horizontalThreshold, verticalThreshold)
-      ) {
-        return pointRotateRads(topLeft, center, angle);
-      }
-      if (
-        pointDistance(topRight, nonRotated) <
-        Math.max(horizontalThreshold, verticalThreshold)
-      ) {
-        return pointRotateRads(topRight, center, angle);
-      }
-      if (
         pointDistance(bottomLeft, nonRotated) <
         Math.max(horizontalThreshold, verticalThreshold)
       ) {
-        return pointRotateRads(bottomLeft, center, angle);
+        return 1;
       }
       if (
         pointDistance(bottomRight, nonRotated) <
         Math.max(horizontalThreshold, verticalThreshold)
       ) {
-        return pointRotateRads(bottomRight, center, angle);
+        return 0;
+      }
+      if (
+        pointDistance(topLeft, nonRotated) <
+        Math.max(horizontalThreshold, verticalThreshold)
+      ) {
+        return 2;
+      }
+      if (
+        pointDistance(topRight, nonRotated) <
+        Math.max(horizontalThreshold, verticalThreshold)
+      ) {
+        return 3;
       }
     }
 
-    return undefined;
+    return -1;
   }
+
+  const baseMidpoints = getAllMidpoints(element, elementsMap);
+
+  for (let i = 0; i < baseMidpoints.length; i++) {
+    const threshold = i % 2 === 0 ? horizontalThreshold : verticalThreshold;
+
+    if (
+      pointDistance(baseMidpoints[i], point) <= threshold &&
+      !hitElementItself({
+        point,
+        element,
+        threshold: 0,
+        elementsMap,
+        overrideShouldTestInside: true,
+      })
+    ) {
+      return i;
+    }
+  }
+
+  return -1;
+};
+
+export const getSnapOutlineMidPoint = (
+  point: GlobalPoint,
+  element: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+  zoom: AppState["zoom"],
+  arrow: { elbowed: boolean },
+): GlobalPoint | undefined => {
+  const center = elementCenterPoint(element, elementsMap);
+  const baseMidpoints = getAllMidpoints(element, elementsMap);
 
   const sideMidpoints =
     element.type === "diamond"
-      ? getDiamondBaseCorners(element)
-          .map((curve) => {
-            const point = bezierEquation(curve, 0.5);
-            const rotatedPoint = pointRotateRads(point, center, element.angle);
+      ? baseMidpoints.map((midpoint) => {
+          return pointFrom<GlobalPoint>(
+            midpoint[0] + (midpoint[0] - center[0]) * 0.1,
+            midpoint[1] + (midpoint[1] - center[1]) * 0.1,
+          );
+        })
+      : baseMidpoints;
 
-            return pointFrom<GlobalPoint>(rotatedPoint[0], rotatedPoint[1]);
-          })
-          .map((midpoint) => {
-            return pointFrom<GlobalPoint>(
-              midpoint[0] + (midpoint[0] - center[0]) * 0.1,
-              midpoint[1] + (midpoint[1] - center[1]) * 0.1,
-            );
-          })
-      : [
-          // RIGHT midpoint
-          pointRotateRads(
-            pointFrom<GlobalPoint>(
-              element.x + element.width,
-              element.y + element.height / 2,
-            ),
-            center,
-            element.angle,
-          ),
-          // BOTTOM midpoint
-          pointRotateRads(
-            pointFrom<GlobalPoint>(
-              element.x + element.width / 2,
-              element.y + element.height,
-            ),
-            center,
-            element.angle,
-          ),
-          // LEFT midpoint
-          pointRotateRads(
-            pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
-            center,
-            element.angle,
-          ),
-          // TOP midpoint
-          pointRotateRads(
-            pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
-            center,
-            element.angle,
-          ),
-        ];
+  const idx = getHighlightedMidpointIndex(
+    point,
+    element,
+    elementsMap,
+    zoom,
+    arrow,
+  );
 
-  return sideMidpoints
-    .map((midpoint, i) => {
-      const threshold = i % 2 === 0 ? horizontalThreshold : verticalThreshold;
+  if (idx === -1) {
+    return undefined;
+  }
 
-      return pointDistance(midpoint, point) <= threshold ? midpoint : undefined;
-    })
-    .find(
-      (midpoint) =>
-        midpoint &&
-        !hitElementItself({
-          point,
-          element,
-          threshold: 0,
-          elementsMap,
-          overrideShouldTestInside: true,
-        }),
-    );
+  return sideMidpoints[idx];
+};
+
+export const getAllMidpoints = (
+  element: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+): GlobalPoint[] => {
+  const center = elementCenterPoint(element, elementsMap);
+
+  if (element.type === "diamond") {
+    return getDiamondBaseCorners(element).map((curve) => {
+      const point = bezierEquation(curve, 0.5);
+      return pointRotateRads(point, center, element.angle);
+    });
+  }
+
+  return [
+    pointFrom(element.width, element.height / 2),
+    pointFrom(element.width / 2, element.height),
+    pointFrom(0, element.height / 2),
+    pointFrom(element.width / 2, 0),
+  ].map(([x, y]) =>
+    pointRotateRads(
+      pointFrom<GlobalPoint>(element.x + x, element.y + y),
+      center,
+      element.angle,
+    ),
+  );
 };
 
 export const projectFixedPointOntoDiagonal = (
