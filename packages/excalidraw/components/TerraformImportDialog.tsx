@@ -16,6 +16,7 @@ const TERRAFORM_BACKEND_URL =
   import.meta.env.VITE_TERRAFORM_BACKEND_URL || "http://localhost:3000";
 
 type LayoutEngine = "elk" | "force";
+type StructuralPruneMode = "module-only" | "global" | "off";
 
 const LAYOUT_ENGINE_OPTIONS: ReadonlyArray<{
   value: LayoutEngine;
@@ -46,6 +47,9 @@ const TerraformImportModal = ({
   const [stateFile, setStateFile] = useState<File | null>(null);
   const [savedId, setSavedId] = useState("");
   const [layoutEngine, setLayoutEngine] = useState<LayoutEngine>("elk");
+  const [structuralPruneMode, setStructuralPruneMode] =
+    useState<StructuralPruneMode>("module-only");
+  const [vpcEndpointSnapping, setVpcEndpointSnapping] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,6 +59,10 @@ const TerraformImportModal = ({
       `${TERRAFORM_BACKEND_URL}/terraform/upload/${id}/excalidraw`,
     );
     sceneUrl.searchParams.set("layoutEngine", layoutEngine);
+    sceneUrl.searchParams.set(
+      "vpcEndpointSnapping",
+      vpcEndpointSnapping ? "true" : "false",
+    );
     const res = await fetch(sceneUrl.toString());
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
@@ -83,6 +91,7 @@ const TerraformImportModal = ({
       if (stateFile) {
         formData.append("stateFile", stateFile);
       }
+      formData.append("structuralPruneMode", structuralPruneMode);
       const res = await fetch(`${TERRAFORM_BACKEND_URL}/terraform/upload`, {
         method: "POST",
         body: formData,
@@ -188,6 +197,29 @@ const TerraformImportModal = ({
               accept=".tfstate,.json"
               onChange={(e) => setStateFile(e.target.files?.[0] ?? null)}
             />
+          </label>
+          <label>
+            Structural prune mode
+            <select
+              value={structuralPruneMode}
+              onChange={(e) =>
+                setStructuralPruneMode(e.target.value as StructuralPruneMode)
+              }
+              disabled={loading}
+            >
+              <option value="module-only">Module only (default)</option>
+              <option value="global">Global</option>
+              <option value="off">Off</option>
+            </select>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={vpcEndpointSnapping}
+              disabled={loading}
+              onChange={(e) => setVpcEndpointSnapping(e.target.checked)}
+            />
+            Enable VPC endpoint snapping
           </label>
         </div>
         <div className="TerraformImportModal__settings__buttons">

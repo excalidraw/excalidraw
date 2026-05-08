@@ -94,16 +94,27 @@ const {
  *
  * `options.layoutEngine`: `"elk"` (default, layered) or `"force"` (legacy d3-force). When
  * unset, falls back to the `TF_LAYOUT_ENGINE` env var, then to `"elk"`.
+ * `options.vpcEndpointSnapping`: when `false`, excludes `aws_vpc_endpoint` resources from
+ * VPC perimeter snapping while keeping other perimeter appliance snapping behavior.
  */
 async function nodesToExcalidraw(nodes, options = {}) {
   const layoutEngineId = resolveLayoutEngine(options.layoutEngine);
+  const vpcEndpointSnapping = options.vpcEndpointSnapping !== false;
   const nodeElements = [];
   const locationElements = [];
   const moduleElements = [];
   const arrowElements = [];
   const nodeKeys = Object.keys(nodes).filter((key) => !key.startsWith("__"));
   const perimeterSet = new Set(
-    nodeKeys.filter((p) => isVpcPerimeterNode(p, nodes[p])),
+    nodeKeys.filter((p) => {
+      if (!isVpcPerimeterNode(p, nodes[p])) {
+        return false;
+      }
+      if (vpcEndpointSnapping) {
+        return true;
+      }
+      return getResourceType(p) !== "aws_vpc_endpoint";
+    }),
   );
   const directedEdges = collectDirectedEdges(nodes);
   const directedEdgesForLayout =

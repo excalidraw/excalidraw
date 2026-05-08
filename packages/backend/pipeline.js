@@ -785,8 +785,22 @@ function reachableWithoutDirectEdge(nodes, adjacency, start, forbiddenTarget) {
  * Drops redundant shortcut edges from `edges_new` / `edges_existing` when another path exists.
  * Terraform DOT traversal through vars/outputs can link distant modules directly even though an
  * intermediate resource/module chain already encodes the dependency — misleading on infra diagrams.
+ *
+ * `options.mode` controls pruning scope:
+ * - `module-only` (default): prune only if source/target is a `terraform_module` node.
+ * - `global`: prune any structural shortcut edge.
+ * - `off`: skip pruning.
+ *
+ * Example (`module-only` / `global`):
+ * - before: module.a -> [module.b, module.c], module.b -> [module.c]
+ * - after:  module.a -> [module.b],           module.b -> [module.c]
+ * (`module.a -> module.c` is removed because `a -> b -> c` already exists.)
  */
-function pruneRedundantStructuralEdges(nodes) {
+function pruneRedundantStructuralEdges(nodes, options = {}) {
+  const mode = options.mode || "module-only";
+  if (mode === "off") {
+    return nodes;
+  }
   const adjacency = new Map();
 
   for (const nodePath of Object.keys(nodes)) {
@@ -813,8 +827,9 @@ function pruneRedundantStructuralEdges(nodes) {
         next.push(target);
         continue;
       }
-      const canPruneShortcut =
-        isTerraformModuleNode(nodes[sourcePath]) || isTerraformModuleNode(nodes[target]);
+      const canPruneShortcut = mode === "global"
+        ? true
+        : isTerraformModuleNode(nodes[sourcePath]) || isTerraformModuleNode(nodes[target]);
       const redundant =
         canPruneShortcut &&
         sourcePath !== target &&
