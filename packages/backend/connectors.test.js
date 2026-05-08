@@ -78,11 +78,12 @@ describe("DiagramIR", () => {
 });
 
 describe("Connector registry", () => {
-  it("exposes excalidraw and tldraw with the connector contract", () => {
+  it("exposes excalidraw, tldraw and reactflow with the connector contract", () => {
     const list = listRenderers();
     const ids = list.map((r) => r.id);
     expect(ids).toContain("excalidraw");
     expect(ids).toContain("tldraw");
+    expect(ids).toContain("reactflow");
 
     for (const id of Object.keys(REGISTRY)) {
       const renderer = REGISTRY[id];
@@ -128,6 +129,81 @@ describe("Connector registry", () => {
         shape.meta.terraformVisibilityKey,
     );
     expect(resource).toBeTruthy();
+  });
+
+  it("reactflow connector renders grouped subflow JSON", async () => {
+    const nodes = makeNodes();
+    const ir = buildDiagramIR(nodes);
+    const renderer = getRenderer("reactflow");
+    const result = await renderer.render({ nodes, ir, options: {} });
+    expect(result.contentType).toBe("application/json");
+    expect(result.fileExtension).toBe("reactflow.json");
+    expect(result.body.type).toBe("reactflow");
+    expect(Array.isArray(result.body.nodes)).toBe(true);
+    expect(Array.isArray(result.body.edges)).toBe(true);
+    expect(result.body.meta.edgePolicy).toBe("intra-module-only");
+  });
+
+  it("reactflow connector avoids duplicate ids from module group nodes", async () => {
+    const renderer = getRenderer("reactflow");
+    const ir = {
+      version: 1,
+      source: "test",
+      metadata: { nodeCount: 2, edgeCount: 1, generatedAt: new Date().toISOString() },
+      nodes: [
+        {
+          id: "module.foo",
+          kind: "module",
+          label: "module.foo",
+          resourceType: "terraform_module",
+          provider: null,
+          action: null,
+          modulePath: ["module.foo"],
+        },
+        {
+          id: "module.foo.aws_s3_bucket.bar",
+          kind: "resource",
+          label: "bucket",
+          resourceType: "aws_s3_bucket",
+          provider: "aws",
+          action: "create",
+          modulePath: ["module.foo"],
+        },
+      ],
+      edges: [
+        {
+          id: "dep_0",
+          source: "module.foo.aws_s3_bucket.bar",
+          target: "module.foo",
+          kind: "dependency",
+          directed: true,
+        },
+      ],
+      groups: [
+        {
+          id: "module.foo",
+          type: "module",
+          label: "module.foo",
+          parentId: null,
+          childIds: ["module.foo.aws_s3_bucket.bar"],
+        },
+      ],
+    };
+
+    const result = await renderer.render({ nodes: {}, ir, options: {} });
+    const ids = result.body.nodes.map((node) => node.id);
+    const duplicateIds = ids.filter((id, idx) => ids.indexOf(id) !== idx);
+    expect(duplicateIds).toEqual([]);
+    expect(
+      result.body.nodes.some(
+        (node) => node.id === "module.foo" && node.type === "group",
+      ),
+    ).toBe(true);
+    expect(
+      result.body.nodes.some(
+        (node) => node.id === "module.foo" && node.type !== "group",
+      ),
+    ).toBe(false);
   });
 
   it("tldraw connector preserves soft-hidden terraform arrows for explode flows", async () => {

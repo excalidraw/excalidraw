@@ -24,11 +24,13 @@
  */
 
 const excalidraw = require("./excalidraw");
+const reactflow = require("./reactflow");
 const tldraw = require("./tldraw");
 const { UnknownRendererError } = require("./errors");
 
 const REGISTRY = Object.freeze({
   [excalidraw.id]: excalidraw,
+  [reactflow.id]: reactflow,
   [tldraw.id]: tldraw,
 });
 
