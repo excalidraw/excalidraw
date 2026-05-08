@@ -7,7 +7,6 @@ import {
   type Radians,
   bezierEquation,
   pointRotateRads,
-  pointDistance,
 } from "@excalidraw/math";
 
 import {
@@ -26,7 +25,8 @@ import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
   elementCenterPoint,
-  getDiamondBaseCorners,
+  getAllMidpoints,
+  getHighlightedMidpointIndex,
   FOCUS_POINT_SIZE,
   getOmitSidesForEditorInterface,
   getTransformHandles,
@@ -40,7 +40,6 @@ import {
   isImageElement,
   isLinearElement,
   isLineElement,
-  maxBindingDistance_simple,
   isTextElement,
   LinearElementEditor,
   getActiveTextElement,
@@ -504,94 +503,23 @@ const renderBindingHighlightForBindableElement_simple = (
     if (!cursorIsInsideBindable || isElbow) {
       context.save();
 
-      const center = elementCenterPoint(suggestedBinding.element, elementsMap);
+      const midpoints = getAllMidpoints(suggestedBinding.element, elementsMap);
 
-      let midpoints: GlobalPoint[];
-      if (suggestedBinding.element.type === "diamond") {
-        const center = elementCenterPoint(
-          suggestedBinding.element,
-          elementsMap,
-        );
-        midpoints = getDiamondBaseCorners(suggestedBinding.element).map(
-          (curve) => {
-            const point = bezierEquation(curve, 0.5);
-            const rotatedPoint = pointRotateRads(
-              point,
-              center,
-              suggestedBinding.element.angle,
-            );
-
-            return pointFrom<GlobalPoint>(rotatedPoint[0], rotatedPoint[1]);
-          },
-        );
-      } else {
-        const basePoints = [
-          {
-            x: suggestedBinding.element.width,
-            y: suggestedBinding.element.height / 2,
-          }, // RIGHT
-          {
-            x: suggestedBinding.element.width / 2,
-            y: suggestedBinding.element.height,
-          }, // BOTTOM
-          { x: 0, y: suggestedBinding.element.height / 2 }, // LEFT
-          { x: suggestedBinding.element.width / 2, y: 0 }, // TOP
-        ];
-        midpoints = basePoints.map((point) => {
-          const globalPoint = pointFrom<GlobalPoint>(
-            point.x + suggestedBinding.element.x,
-            point.y + suggestedBinding.element.y,
-          );
-          const rotatedPoint = pointRotateRads(
-            globalPoint,
-            center,
-            suggestedBinding.element.angle,
-          );
-          return pointFrom<GlobalPoint>(rotatedPoint[0], rotatedPoint[1]);
-        });
-      }
-
-      const hoveredMidpoint =
-        pointerCoords &&
-        midpoints.reduce(
-          (
-            closestIdx: {
-              idx: number;
-              distance: number;
-            },
-            point,
-            idx,
-          ) => {
-            const distance = pointDistance(point, pointerCoords);
-            if (idx === -1 || distance < closestIdx.distance) {
-              return { idx, distance };
-            }
-            return closestIdx;
-          },
-          {
-            idx: -1,
-            distance: Infinity,
-          },
-        );
+      const highlightedIdx = pointerCoords
+        ? getHighlightedMidpointIndex(
+            pointerCoords,
+            suggestedBinding.element,
+            elementsMap,
+            appState.zoom,
+            { elbowed: isElbow },
+          )
+        : -1;
 
       const midpointRadius = 4 / appState.zoom.value;
-      const highlightThreshold =
-        maxBindingDistance_simple(appState.zoom) +
-        suggestedBinding.element.strokeWidth / 2;
 
       midpoints.forEach((midpoint, idx) => {
         const isHighlighted =
-          (!cursorIsInsideBindable || isElbow) &&
-          hoveredMidpoint?.idx === idx &&
-          hoveredMidpoint.distance <= highlightThreshold;
-
-        // also render midpoint if cursor close but not highlighted
-        // (for elbows, always show all points)
-        const isShown =
-          !isHighlighted &&
-          (isElbow ||
-            (idx === hoveredMidpoint?.idx &&
-              hoveredMidpoint.distance <= highlightThreshold * 2));
+          highlightedIdx === idx && (!cursorIsInsideBindable || isElbow);
 
         if (isHighlighted) {
           context.fillStyle = `rgba(${
@@ -601,7 +529,7 @@ const renderBindingHighlightForBindableElement_simple = (
           context.beginPath();
           context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
           context.fill();
-        } else if (isShown) {
+        } else {
           context.fillStyle = BINDING_MIDPOINT_COLOR[appState.theme];
           context.beginPath();
           context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
