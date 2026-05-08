@@ -1,8 +1,8 @@
 # Excalidraw Terraform
 
-A **Terraform architecture visualizer built on [Excalidraw](https://excalidraw.com)**.
+A **Terraform architecture visualizer**, originally built on [Excalidraw](https://excalidraw.com) and now with an experimental [tldraw](https://tldraw.dev) frontend as well.
 
-Upload a Terraform plan JSON, graph DOT, and optionally `terraform.tfstate`; the backend enriches the graph and generates an editable Excalidraw scene with AWS service icons, dependency arrows, module boxes, and account/region/VPC/subnet boundaries.
+Upload a Terraform plan JSON, graph DOT, and optionally `terraform.tfstate`; the backend enriches the graph and serves it through any registered frontend connector — today that's a fully-featured Excalidraw scene (AWS service icons, dependency arrows, module boxes, account/region/VPC/subnet boundaries) and a first-pass tldraw renderer.
 
 ![Terraform plan imported into Excalidraw — infrastructure as an editable diagram](docs/terraform-canvas-aws-icons.png)
 
@@ -24,6 +24,8 @@ Upload a Terraform plan JSON, graph DOT, and optionally `terraform.tfstate`; the
 - **Lambda module preset** — Common Lambda module internals such as function, role, inline policies, log group, and package resources get stable relative placement.
 - **Relationship rendering** — Planned dependencies and state-derived dependencies are drawn as arrows behind the resource cards.
 - **Terraform details panel data** — Resource diffs, known-after-apply values, and selected state/config fields are stored on the Excalidraw elements for inspection.
+- **Pluggable frontend connectors** — The backend exposes `GET /terraform/upload/:id/render/:renderer`. Today `:renderer` can be `excalidraw` (stable) or `tldraw` (beta); new frontends plug in via `packages/backend/connectors/`. A renderer-neutral `DiagramIR` is built once per request so future connectors don't need to re-derive node/edge/group structure.
+- **Sibling tldraw app** — `tldraw-app/` mounts backend-rendered tldraw documents on a [tldraw](https://tldraw.dev) canvas via the `render/tldraw` connector route.
 
 The rest is standard Excalidraw: hand-drawn style, zoom/pan, export to PNG/SVG, and the usual editor tools.
 
@@ -31,14 +33,24 @@ The rest is standard Excalidraw: hand-drawn style, zoom/pan, export to PNG/SVG, 
 
 ## Quick start
 
-**Run the app (frontend + backend):**
+**Run the Excalidraw frontend + backend:**
 
 ```bash
 yarn install
-yarn start           # Excalidraw app (e.g. Vite dev server)
+yarn start           # Excalidraw app (Vite dev server)
 # In another terminal:
 yarn start:backend   # Backend on http://localhost:3000
 ```
+
+**Or try the experimental tldraw frontend:**
+
+```bash
+yarn install
+yarn start:backend   # one terminal — :3000
+yarn start:tldraw    # another terminal — :3001
+```
+
+The tldraw app talks to the same backend (`VITE_TERRAFORM_BACKEND_URL`, defaults to `http://localhost:3000`) and converts the Excalidraw scene to tldraw shapes client-side. See [`tldraw-app/README.md`](./tldraw-app/README.md) for details and known limitations of the first-pass converter.
 
 Then use the **Terraform Import** flow in the app to upload:
 
@@ -87,9 +99,12 @@ You can also upload your `terraform.tfstate` file to enrich the diagram with rea
 
 - **Type checking:** `yarn test:typecheck`
 - **Tests:** `yarn test:update`
+- **Backend tests:** `yarn test:backend`
+- **tldraw-app tests** (incl. allplanmodules pipeline smoke): `yarn test:tldraw`
 - **Lint / format:** `yarn fix`
 - **Build packages:** `yarn build:packages`
 - **Build app:** `yarn build:app`
+- **Build tldraw app:** `yarn build:tldraw`
 
 See the main [Excalidraw documentation](https://docs.excalidraw.com) and [development guide](https://docs.excalidraw.com/docs/introduction/development) for the core editor.
 

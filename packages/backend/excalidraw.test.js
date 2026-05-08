@@ -1,9 +1,7 @@
-const fs = require("fs");
-const path = require("path");
-const dot = require("graphlib-dot");
 const { nodesToExcalidraw } = require("./excalidraw");
-const pipeline = require("./pipeline");
-const { extractVpcNetworkingFacetStore } = require("./vpc-networking-facet");
+const {
+  runAllplanModulesPipeline,
+} = require("./terraform/allplan-modules-pipeline");
 
 function rectOf(element) {
   return {
@@ -30,42 +28,6 @@ function contains(outer, inner) {
     outer.x + outer.w >= inner.x + inner.w &&
     outer.y + outer.h >= inner.y + inner.h
   );
-}
-
-function runAllplanModulesPipeline() {
-  const terraformDir = path.join(__dirname, "terraform");
-  const plan = JSON.parse(
-    fs.readFileSync(path.join(terraformDir, "allplanmodules.json"), "utf8"),
-  );
-  const graph = dot.read(
-    fs.readFileSync(path.join(terraformDir, "allplanmodules.dot"), "utf8"),
-  );
-  const adjlist = pipeline.getAdjacencyListFromDot(graph);
-  let nodes = pipeline.loadPlanAndNodes(plan);
-  nodes = pipeline.mergeTerraformState(nodes, null);
-  nodes = pipeline.ensureTerraformModuleNodes(nodes);
-  nodes = pipeline.applyModuleMetadata(nodes, plan);
-  nodes = pipeline.omitNonAllowlistedDataSourceNodes(nodes);
-  nodes = pipeline.buildNewEdges(nodes, adjlist);
-  nodes = pipeline.computeResourceDiffs(nodes);
-  nodes = pipeline.buildExistingEdges(nodes, plan);
-  nodes = pipeline.omitNonAllowlistedDataSourceNodes(nodes);
-  nodes = pipeline.omitStateOnlyDataSourceNodes(nodes);
-  nodes = pipeline.detectGenericStructuralEdges(nodes);
-  nodes = pipeline.ensureEdgeLists(nodes);
-  nodes = pipeline.pruneRedundantStructuralEdges(nodes);
-  nodes = pipeline.externalResources(nodes);
-  nodes = pipeline.ensureEdgeLists(nodes);
-  nodes = pipeline.buildDataFlowEdges(nodes);
-  nodes = pipeline.ensureEdgeLists(nodes);
-  nodes = pipeline.omitGhostIamPolicyDocumentNodes(nodes);
-  nodes.__networkingFacetStore = extractVpcNetworkingFacetStore(nodes);
-  nodes = pipeline.omitVpcPlumbingNodes(nodes);
-  nodes = pipeline.deleteOrphanedNodes(nodes);
-  nodes = pipeline.cleanUpRoleLinks(nodes);
-  nodes = pipeline.filterVisualIgnore(nodes);
-  nodes = pipeline.deleteOrphanedNodes(nodes);
-  return nodes;
 }
 
 describe("nodesToExcalidraw Terraform edge layers", () => {

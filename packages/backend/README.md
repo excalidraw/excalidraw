@@ -18,7 +18,9 @@ Express API that turns a Terraform or OpenTofu **plan JSON**, a **`terraform gra
 |------|------|
 | `index.js` | HTTP routes, multipart upload, SQLite persistence |
 | `pipeline.js` | Graph build: plan → nodes, DOT adjacency, state merge, IAM/data-flow edges, filtering |
-| `excalidraw.js` | Converts processed nodes into Excalidraw scene JSON |
+| `diagram-ir.js` | Renderer-neutral IR (nodes/edges/groups) built from the pipeline `nodes` map |
+| `connectors/` | Frontend connector registry. Excalidraw is `stable`; tldraw is `beta` and renders tldraw shape JSON |
+| `excalidraw.js` | Excalidraw renderer: converts processed nodes into Excalidraw scene JSON |
 | `vpc-networking-facet.js` | VPC/subnet/gateway-style facets before low-level plumbing is trimmed |
 | `enrichment.js` | Hook for optional semantic labels/metadata |
 | `db.js` | Drizzle + better-sqlite3 schema for uploads |
@@ -67,8 +69,14 @@ yarn workspace @excalidraw/backend test
 |--------|-------|-------------|
 | POST | `/terraform/upload` | Upload a Terraform/OpenTofu plan JSON, DOT graph, and optional state file. Returns an upload id. |
 | GET | `/terraform/upload/:id` | Fetch the processed Terraform graph nodes for an upload. |
-| GET | `/terraform/upload/:id/excalidraw` | Download the processed graph as an `.excalidraw` file. |
+| GET | `/terraform/renderers` | Lists available frontend connectors (`excalidraw`, `tldraw`, …) and their status. |
+| GET | `/terraform/upload/:id/render/:renderer` | Render the processed graph through the named connector. `:renderer` is the id from `/terraform/renderers`. |
+| GET | `/terraform/upload/:id/excalidraw` | **Deprecated alias** for `/render/excalidraw`. Sets `Deprecation: true`. |
 | GET | `/terraform/test-client` | Open a lightweight browser UI to upload plan+dot files and inspect VPC/subnet facet summaries from generated Excalidraw output. |
+
+Unknown renderer ids return HTTP 404 with the available ids in the body. A
+renderer that exists but isn't implemented yet returns
+HTTP 501 with `{ renderer, details }`.
 
 `POST /terraform/upload` expects multipart form fields:
 
