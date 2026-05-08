@@ -16,6 +16,7 @@ export type ReactFlowScene = {
   edges?: Edge[];
   meta?: {
     edgePolicy?: string;
+    layoutEngine?: string;
   };
 };
 

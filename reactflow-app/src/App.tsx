@@ -4,10 +4,19 @@ import {
   Background,
   Controls,
   MiniMap,
+  type NodeTypes,
   type Edge,
   type Node,
 } from "@xyflow/react";
 import { UploadPanel, type ReactFlowScene } from "./UploadPanel";
+import { TerraformResourceNode } from "./TerraformResourceNode";
+import { TerraformContainerNode } from "./TerraformContainerNode";
+
+const nodeTypes: NodeTypes = {
+  default: TerraformResourceNode,
+  tfResource: TerraformResourceNode,
+  tfContainer: TerraformContainerNode,
+};
 
 export default function App() {
   const [scene, setScene] = useState<ReactFlowScene | null>(null);
@@ -26,10 +35,14 @@ export default function App() {
         <ReactFlow
           nodes={nodes}
           edges={edges}
+          nodeTypes={nodeTypes}
           fitView
-          nodesDraggable={false}
+          nodesDraggable
           nodesConnectable={false}
           elementsSelectable
+          panOnDrag
+          selectionOnDrag
+          defaultEdgeOptions={{ animated: false }}
         >
           <MiniMap pannable zoomable />
           <Controls />
@@ -38,7 +51,7 @@ export default function App() {
       </div>
       <div className="hint">
         {scene?.meta?.edgePolicy === "intra-module-only"
-          ? "Showing subflows with only intra-module edges for now."
+          ? `Showing subflows with only intra-module edges for now. Layout: ${scene?.meta?.layoutEngine || "elk"}.`
           : "Upload Terraform plan + DOT to render subflows."}
       </div>
     </div>
