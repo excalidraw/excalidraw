@@ -2006,6 +2006,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                   startElement,
                   "start",
                   elementsMap,
+                  appState.zoom,
                   appState.isBindingEnabled,
                 ),
               }
@@ -2020,6 +2021,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                   endElement,
                   "end",
                   elementsMap,
+                  appState.zoom,
                   appState.isBindingEnabled,
                 ),
               }
@@ -2052,6 +2054,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
               appState.bindMode === "inside" ? "inside" : "orbit",
               "start",
               app.scene,
+              appState.zoom,
             );
           }
         }
@@ -2066,6 +2069,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
               appState.bindMode === "inside" ? "inside" : "orbit",
               "end",
               app.scene,
+              appState.zoom,
             );
           }
         }
