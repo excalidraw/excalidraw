@@ -50,6 +50,7 @@ const TerraformImportModal = ({
   const [structuralPruneMode, setStructuralPruneMode] =
     useState<StructuralPruneMode>("module-only");
   const [vpcEndpointSnapping, setVpcEndpointSnapping] = useState(true);
+  const [useBackend, setUseBackend] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -92,10 +93,20 @@ const TerraformImportModal = ({
         formData.append("stateFile", stateFile);
       }
       formData.append("structuralPruneMode", structuralPruneMode);
-      const res = await fetch(`${TERRAFORM_BACKEND_URL}/terraform/upload`, {
+      let res;
+      if (useBackend) {
+      console.log("using backend");
+      res = await fetch(`${TERRAFORM_BACKEND_URL}/terraform/upload`, {
         method: "POST",
         body: formData,
       });
+      } else {
+        console.log("not using backend");
+        res = await fetch(`${TERRAFORM_BACKEND_URL}/terraform/upload`, {
+          method: "POST",
+          body: formData,
+        });
+      }
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "Upload failed");
@@ -220,6 +231,15 @@ const TerraformImportModal = ({
               onChange={(e) => setVpcEndpointSnapping(e.target.checked)}
             />
             Enable VPC endpoint snapping
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={useBackend}
+              disabled={loading}
+              onChange={(e) => setUseBackend(e.target.checked)}
+            />
+            use backend
           </label>
         </div>
         <div className="TerraformImportModal__settings__buttons">
