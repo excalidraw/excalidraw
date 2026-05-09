@@ -246,6 +246,42 @@ export const getFrameChildren = (
   return frameChildren;
 };
 
+export const getFrameDescendants = (
+  allElements: ElementsMapOrArray,
+  frameId: string,
+) => {
+  const frameDescendants: ExcalidrawElement[] = [];
+  const seenElementIds = new Set<ExcalidrawElement["id"]>([frameId]);
+  const visitedFrameIds = new Set<ExcalidrawElement["id"]>();
+  const pendingFrameIds = [frameId];
+
+  while (pendingFrameIds.length > 0) {
+    const currentFrameId = pendingFrameIds.pop()!;
+    if (visitedFrameIds.has(currentFrameId)) {
+      continue;
+    }
+    visitedFrameIds.add(currentFrameId);
+
+    for (const element of allElements.values()) {
+      if (
+        element.frameId !== currentFrameId ||
+        seenElementIds.has(element.id)
+      ) {
+        continue;
+      }
+
+      seenElementIds.add(element.id);
+      frameDescendants.push(element);
+
+      if (isFrameLikeElement(element)) {
+        pendingFrameIds.push(element.id);
+      }
+    }
+  }
+
+  return frameDescendants;
+};
+
 export const getFrameLikeElements = (
   allElements: ExcalidrawElementsIncludingDeleted,
 ): ExcalidrawFrameLikeElement[] => {

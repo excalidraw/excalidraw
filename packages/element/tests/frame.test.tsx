@@ -11,7 +11,8 @@ import {
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
-import { elementOverlapsWithFrame } from "../src/frame";
+import { elementOverlapsWithFrame, getFrameDescendants } from "../src/frame";
+import { dragSelectedElements } from "../src/dragElements";
 
 import type {
   ExcalidrawElement,
@@ -129,6 +130,115 @@ describe("adding elements to frames", () => {
       x: 100,
       boundElements: [{ id: text.id, type: "text" }],
     });
+  });
+
+  it("returns recursive frame descendants", () => {
+    const outerFrame = API.createElement({
+      id: "outer",
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 300,
+    });
+    const innerFrame = API.createElement({
+      id: "inner",
+      type: "frame",
+      x: 50,
+      y: 50,
+      width: 150,
+      height: 150,
+      frameId: outerFrame.id,
+    });
+    const directResource = API.createElement({
+      id: "direct-resource",
+      type: "rectangle",
+      x: 20,
+      y: 20,
+      frameId: outerFrame.id,
+    });
+    const nestedResource = API.createElement({
+      id: "nested-resource",
+      type: "rectangle",
+      x: 70,
+      y: 70,
+      frameId: innerFrame.id,
+    });
+    const outsideResource = API.createElement({
+      id: "outside-resource",
+      type: "rectangle",
+      x: 500,
+      y: 500,
+    });
+
+    const descendants = getFrameDescendants(
+      [outerFrame, innerFrame, directResource, nestedResource, outsideResource],
+      outerFrame.id,
+    );
+
+    expect(descendants.map((element) => element.id)).toEqual([
+      innerFrame.id,
+      directResource.id,
+      nestedResource.id,
+    ]);
+  });
+
+  it("drags nested frame descendants with a selected outer frame", () => {
+    const outerFrame = API.createElement({
+      id: "outer",
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 300,
+    });
+    const innerFrame = API.createElement({
+      id: "inner",
+      type: "frame",
+      x: 50,
+      y: 50,
+      width: 150,
+      height: 150,
+      frameId: outerFrame.id,
+    });
+    const nestedResource = API.createElement({
+      id: "nested-resource",
+      type: "rectangle",
+      x: 70,
+      y: 70,
+      width: 50,
+      height: 50,
+      frameId: innerFrame.id,
+    });
+
+    const elements = [outerFrame, innerFrame, nestedResource];
+    const elementsMap = arrayToMap(elements);
+    const scene = {
+      getNonDeletedElements: () => elements,
+      getNonDeletedElementsMap: () => elementsMap,
+      mutateElement: (
+        element: ExcalidrawElement,
+        updates: Partial<ExcalidrawElement>,
+      ) => {
+        Object.assign(element, updates);
+      },
+    };
+
+    dragSelectedElements(
+      { originalElements: elementsMap } as any,
+      [outerFrame as any],
+      { x: 80, y: 60 },
+      scene as any,
+      { x: 0, y: 0 },
+      null,
+    );
+
+    expect(outerFrame.x).toBe(80);
+    expect(outerFrame.y).toBe(60);
+    expect(innerFrame.x).toBe(130);
+    expect(innerFrame.y).toBe(110);
+    expect(nestedResource.x).toBe(150);
+    expect(nestedResource.y).toBe(130);
   });
 
   it("should treat an element fully containing a frame as overlapping the frame", () => {
