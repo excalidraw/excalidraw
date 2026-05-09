@@ -16,6 +16,22 @@ const EMPTY_TERRAFORM_EXCALIDRAW_SCENE = {
   },
 };
 
+const DEBUG_PREFIX = "[terraform:local-parse]";
+
+/**
+ * Browser-only: logs in dev when local parse runs (`import.meta.env.DEV`).
+ * Look in the **browser** DevTools → **Console** (not the terminal where `yarn start` runs).
+ * Use `console.log` so lines show at default log levels (`console.debug` is often hidden until
+ * you enable “Verbose” in Chrome’s console level filter).
+ */
+function emitLocalParseDebug(payload: Record<string, unknown>) {
+  if (!import.meta.env.DEV) {
+    return;
+  }
+  console.log(DEBUG_PREFIX, payload);
+}
+
+/** Local import path: main menu → “Import Terraform” → uncheck “use backend” → Import & Open. */
 export const terraformPlanParsing = async (
   planFile: File,
   dotFile: File,
@@ -31,9 +47,15 @@ export const terraformPlanParsing = async (
   const graph = graphlibDot.read(dotText);
   const adjacency = getAdjacencyListFromDot(graph);
 
-  console.log("plan", plan);
-  console.log("state", state);
-  console.log("graph", graph);
+  emitLocalParseDebug({
+    phase: "parsed",
+    edgeCount: graph.edges().length,
+    adjacencySourceCount: Object.keys(adjacency).length,
+    adjacencyList: adjacency,
+    plan,
+    state,
+    graph,
+  });
 
   return new Response(JSON.stringify(EMPTY_TERRAFORM_EXCALIDRAW_SCENE), {
     status: 200,
@@ -42,24 +64,24 @@ export const terraformPlanParsing = async (
 };
 
 const sanitizeDotNodeId = (nodeId = "") => {
-    const parts = String(nodeId).trim().split(" ");
-    const raw = parts.length >= 2 ? parts[1] : parts[0] || "";
-    return raw.replace(/["\\]/g, "");
+  const parts = String(nodeId).trim().split(" ");
+  const raw = parts.length >= 2 ? parts[1] : parts[0] || "";
+  return raw.replace(/["\\]/g, "");
 };
 
 function getAdjacencyListFromDot(graph: Graph) {
-    const adjacency: Record<string, string[]> = {};
+  const adjacency: Record<string, string[]> = {};
 
-    for (const { v, w } of graph.edges()) {
-        const source = sanitizeDotNodeId(v);
-        const target = sanitizeDotNodeId(w);
-        if (!adjacency[source]) {
-        adjacency[source] = [];
-        }
-        if (!adjacency[source].includes(target)) {
-        adjacency[source].push(target);
-        }
+  for (const { v, w } of graph.edges()) {
+    const source = sanitizeDotNodeId(v);
+    const target = sanitizeDotNodeId(w);
+    if (!adjacency[source]) {
+      adjacency[source] = [];
     }
+    if (!adjacency[source].includes(target)) {
+      adjacency[source].push(target);
+    }
+  }
 
-    return adjacency;
+  return adjacency;
 }
