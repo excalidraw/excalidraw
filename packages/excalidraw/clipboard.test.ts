@@ -152,7 +152,27 @@ describe("parseClipboard()", () => {
       {
         type: "text",
         value: "my friend!",
+        fontWeight: "bold",
       },
     ]);
+  });
+
+  it("should parse rich text styles out of text/html", async () => {
+    const clipboardData = await parseClipboard(
+      await parseDataTransferEvent(
+        createPasteEvent({
+          types: {
+            "text/html": `<p><strong><em><u>styled text</u></em></strong></p><p style="font-style: italic; text-decoration-line: underline;">more text</p>`,
+          },
+        }),
+      ),
+    );
+
+    expect(clipboardData.text).toBe("styled text\nmore text");
+    expect(clipboardData.textStyle).toEqual({
+      fontWeight: undefined,
+      fontStyle: "italic",
+      textDecoration: "underline",
+    });
   });
 });

@@ -22,6 +22,7 @@ import type { ValueOf } from "@excalidraw/common/utility-types";
 import type { IMAGE_MIME_TYPES, STRING_MIME_TYPES } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
+  ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
@@ -41,12 +42,24 @@ type ElementsClipboard = {
   files: BinaryFiles | undefined;
 };
 
-export type PastedMixedContent = { type: "text" | "imageUrl"; value: string }[];
+export type PastedTextStyle = Partial<
+  Pick<ExcalidrawTextElement, "fontWeight" | "fontStyle" | "textDecoration">
+>;
+
+type PastedTextContent = {
+  type: "text";
+  value: string;
+} & PastedTextStyle;
+
+type PastedImageContent = { type: "imageUrl"; value: string };
+
+export type PastedMixedContent = (PastedTextContent | PastedImageContent)[];
 
 export interface ClipboardData {
   elements?: readonly ExcalidrawElement[];
   files?: BinaryFiles;
   text?: string;
+  textStyle?: PastedTextStyle;
   mixedContent?: PastedMixedContent;
   errorMessage?: string;
   programmaticAPI?: boolean;
@@ -55,7 +68,7 @@ export interface ClipboardData {
 type AllowedPasteMimeTypes = typeof ALLOWED_PASTE_MIME_TYPES[number];
 
 type ParsedClipboardEventTextData =
-  | { type: "text"; value: string }
+  | { type: "text"; value: string; style?: PastedTextStyle }
   | { type: "mixedContent"; value: PastedMixedContent };
 
 export const probablySupportsClipboardReadText =
@@ -208,14 +221,52 @@ export const copyToClipboard = async (
   );
 };
 
+const getHTMLNodeStyle = (
+  node: ChildNode,
+  inheritedStyle: PastedTextStyle,
+): PastedTextStyle => {
+  if (!(node instanceof HTMLElement)) {
+    return inheritedStyle;
+  }
+
+  const tagName = node.tagName.toLowerCase();
+  const fontWeight = node.style.fontWeight;
+  const fontStyle = node.style.fontStyle;
+  const textDecoration =
+    node.style.textDecorationLine || node.style.textDecoration;
+
+  return {
+    fontWeight:
+      tagName === "b" ||
+      tagName === "strong" ||
+      fontWeight === "bold" ||
+      Number(fontWeight) >= 600
+        ? "bold"
+        : inheritedStyle.fontWeight,
+    fontStyle:
+      tagName === "i" ||
+      tagName === "em" ||
+      fontStyle === "italic" ||
+      fontStyle === "oblique"
+        ? "italic"
+        : inheritedStyle.fontStyle,
+    textDecoration:
+      tagName === "u" ||
+      tagName === "ins" ||
+      textDecoration.includes("underline")
+        ? "underline"
+        : inheritedStyle.textDecoration,
+  };
+};
+
 /** internal, specific to parsing paste events. Do not reuse. */
-function parseHTMLTree(el: ChildNode) {
+function parseHTMLTree(el: ChildNode, inheritedStyle: PastedTextStyle = {}) {
   let result: PastedMixedContent = [];
   for (const node of el.childNodes) {
     if (node.nodeType === 3) {
       const text = node.textContent?.trim();
       if (text) {
-        result.push({ type: "text", value: text });
+        result.push({ type: "text", value: text, ...inheritedStyle });
       }
     } else if (node instanceof HTMLImageElement) {
       const url = node.getAttribute("src");
@@ -223,11 +274,27 @@ function parseHTMLTree(el: ChildNode) {
         result.push({ type: "imageUrl", value: url });
       }
     } else {
-      result = result.concat(parseHTMLTree(node));
+      result = result.concat(
+        parseHTMLTree(node, getHTMLNodeStyle(node, inheritedStyle)),
+      );
     }
   }
   return result;
 }
+
+const getCommonPastedTextStyle = (
+  textNodes: Extract<PastedMixedContent[number], { type: "text" }>[],
+): PastedTextStyle => ({
+  fontWeight: textNodes.every((node) => node.fontWeight === "bold")
+    ? "bold"
+    : undefined,
+  fontStyle: textNodes.every((node) => node.fontStyle === "italic")
+    ? "italic"
+    : undefined,
+  textDecoration: textNodes.every((node) => node.textDecoration === "underline")
+    ? "underline"
+    : undefined,
+});
 
 const maybeParseHTMLDataItem = (
   dataItem: ParsedDataTransferItemType<typeof MIME_TYPES["html"]>,
@@ -339,6 +406,10 @@ const parseClipboardEventTextData = async (
 
     if (mixedContent) {
       if (mixedContent.value.every((item) => item.type === "text")) {
+        const textNodes = mixedContent.value.filter(
+          (item) => item.type === "text",
+        );
+
         return {
           type: "text",
           value:
@@ -347,6 +418,7 @@ const parseClipboardEventTextData = async (
               .map((item) => item.value)
               .join("\n")
               .trim(),
+          style: getCommonPastedTextStyle(textNodes),
         };
       }
 
@@ -550,7 +622,7 @@ export const parseClipboard = async (
     }
   } catch {}
 
-  return { text: parsedEventData.value };
+  return { text: parsedEventData.value, textStyle: parsedEventData.style };
 };
 
 export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {

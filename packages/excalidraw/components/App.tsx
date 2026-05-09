@@ -468,7 +468,11 @@ import type {
   ScrollBars,
 } from "../scene/types";
 
-import type { ClipboardData, PastedMixedContent } from "../clipboard";
+import type {
+  ClipboardData,
+  PastedMixedContent,
+  PastedTextStyle,
+} from "../clipboard";
 import type { ExportedElements } from "../data";
 import type { ContextMenuItems } from "./ContextMenu";
 
@@ -3861,7 +3865,11 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // ------------------- Text -------------------
-    this.addTextFromPaste(data.text, isPlainPaste);
+    this.addTextFromPaste(
+      data.text,
+      isPlainPaste,
+      !isPlainPaste ? data.textStyle : undefined,
+    );
   }
 
   public pasteFromClipboard = withBatchedUpdates(
@@ -4117,12 +4125,35 @@ class App extends React.Component<AppProps, AppState> {
         this.addTextFromPaste(
           textNodes.map((node) => node.value).join("\n\n"),
           isPlainPaste,
+          !isPlainPaste
+            ? {
+                fontWeight: textNodes.every(
+                  (node) => node.fontWeight === "bold",
+                )
+                  ? "bold"
+                  : undefined,
+                fontStyle: textNodes.every(
+                  (node) => node.fontStyle === "italic",
+                )
+                  ? "italic"
+                  : undefined,
+                textDecoration: textNodes.every(
+                  (node) => node.textDecoration === "underline",
+                )
+                  ? "underline"
+                  : undefined,
+              }
+            : undefined,
         );
       }
     }
   }
 
-  private addTextFromPaste(text: string, isPlainPaste = false) {
+  private addTextFromPaste(
+    text: string,
+    isPlainPaste = false,
+    styleOverrides?: PastedTextStyle,
+  ) {
     const { x, y } = viewportCoordsToSceneCoords(
       {
         clientX: this.lastViewportPosition.x,
@@ -4145,9 +4176,11 @@ class App extends React.Component<AppProps, AppState> {
       text,
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
-      fontWeight: this.state.currentItemFontWeight,
-      fontStyle: this.state.currentItemFontStyle,
-      textDecoration: this.state.currentItemTextDecoration,
+      fontWeight:
+        styleOverrides?.fontWeight || this.state.currentItemFontWeight,
+      fontStyle: styleOverrides?.fontStyle || this.state.currentItemFontStyle,
+      textDecoration:
+        styleOverrides?.textDecoration || this.state.currentItemTextDecoration,
       textAlign: DEFAULT_TEXT_ALIGN,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
