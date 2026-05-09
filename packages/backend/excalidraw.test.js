@@ -141,7 +141,7 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
     expect(roleText.groupIds[0]).toBe(roleRect.groupIds[0]);
   });
 
-  it("renders dependency and data-flow arrows with layer metadata", async () => {
+  it("renders dependency and data-flow lines with layer metadata", async () => {
     const scene = await nodesToExcalidraw({
       "aws_api_gateway_rest_api.api": {
         resources: {
@@ -181,26 +181,29 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
       },
     });
 
-    const dependencyArrow = scene.elements.find(
+    const dependencyLine = scene.elements.find(
       (element) => element.customData?.terraformEdgeLayer === "dependency",
     );
-    const dataFlowArrow = scene.elements.find(
+    const dataFlowLine = scene.elements.find(
       (element) => element.customData?.terraformEdgeLayer === "dataFlow",
     );
 
-    expect(dependencyArrow).toMatchObject({
-      type: "arrow",
+    expect(dependencyLine).toMatchObject({
+      type: "line",
+      startArrowhead: null,
+      endArrowhead: null,
       customData: {
         relationship: {
           type: "dependency",
         },
       },
     });
-    expect(dataFlowArrow).toMatchObject({
-      type: "arrow",
+    expect(dataFlowLine).toMatchObject({
+      type: "line",
       strokeColor: "#0ca678",
       strokeWidth: 3,
-      endArrowhead: "arrow",
+      startArrowhead: null,
+      endArrowhead: null,
       startBinding: {
         elementId: expect.any(String),
         mode: "orbit",
@@ -217,15 +220,15 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
         },
       },
     });
-    expect(dataFlowArrow.startBinding.fixedPoint).not.toEqual(
-      dependencyArrow.startBinding.fixedPoint,
+    expect(dataFlowLine.startBinding.fixedPoint).not.toEqual(
+      dependencyLine.startBinding.fixedPoint,
     );
-    expect(dataFlowArrow.endBinding.fixedPoint).not.toEqual(
-      dependencyArrow.endBinding.fixedPoint,
+    expect(dataFlowLine.endBinding.fixedPoint).not.toEqual(
+      dependencyLine.endBinding.fixedPoint,
     );
   });
 
-  it("coalesces opposite data-flow directions into a bidirectional arrow", async () => {
+  it("coalesces opposite data-flow directions into a bidirectional line", async () => {
     const scene = await nodesToExcalidraw({
       "aws_lambda_function.sync": {
         resources: {
@@ -275,14 +278,15 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
       },
     });
 
-    const dataFlowArrows = scene.elements.filter(
+    const dataFlowLines = scene.elements.filter(
       (element) => element.customData?.terraformEdgeLayer === "dataFlow",
     );
 
-    expect(dataFlowArrows).toHaveLength(1);
-    expect(dataFlowArrows[0]).toMatchObject({
-      startArrowhead: "arrow",
-      endArrowhead: "arrow",
+    expect(dataFlowLines).toHaveLength(1);
+    expect(dataFlowLines[0]).toMatchObject({
+      type: "line",
+      startArrowhead: null,
+      endArrowhead: null,
       customData: {
         relationship: {
           type: "bidirectional_data_flow",
@@ -466,7 +470,7 @@ describe("nodesToExcalidraw container facets", () => {
 });
 
 describe("nodesToExcalidraw VPC perimeter layout", () => {
-  it("renders perimeter endpoint arrows and lists endpoints in VPC facets", async () => {
+  it("renders perimeter endpoint lines and lists endpoints in VPC facets", async () => {
     const scene = await nodesToExcalidraw({
       "aws_vpc.main": {
         resources: {
@@ -685,11 +689,11 @@ describe("nodesToExcalidraw VPC perimeter layout", () => {
       expect(ep.x + ep.width / 2).toBeLessThanOrEqual(R - cornerMargin + 1);
     }
 
-    const depArrows = scene.elements.filter(
+    const depLines = scene.elements.filter(
       (element) => element.customData?.terraformEdgeLayer === "dependency",
     );
-    const endpointDeps = depArrows.filter((arrow) => {
-      const rel = arrow.customData?.relationship;
+    const endpointDeps = depLines.filter((line) => {
+      const rel = line.customData?.relationship;
       return (
         rel?.source === "aws_vpc_endpoint.s3" ||
         rel?.target === "aws_vpc_endpoint.s3"
@@ -697,11 +701,11 @@ describe("nodesToExcalidraw VPC perimeter layout", () => {
     });
     expect(endpointDeps.length).toBeGreaterThan(0);
 
-    const dataFlowArrows = scene.elements.filter(
+    const dataFlowLines = scene.elements.filter(
       (element) => element.customData?.terraformEdgeLayer === "dataFlow",
     );
-    const endpointDataFlows = dataFlowArrows.filter((arrow) => {
-      const rel = arrow.customData?.relationship;
+    const endpointDataFlows = dataFlowLines.filter((line) => {
+      const rel = line.customData?.relationship;
       return (
         rel?.source === "aws_vpc_endpoint.s3" ||
         rel?.target === "aws_vpc_endpoint.s3"

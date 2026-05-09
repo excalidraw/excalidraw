@@ -80,7 +80,7 @@ async function getTerraformResourceRect(
 }
 
 describe("buildTerraformElkExcalidrawScene", () => {
-  it("lays out a nested module tree and returns rectangles plus arrows", async () => {
+  it("lays out a nested module tree and returns rectangles plus lines", async () => {
     const nodes = {
       "aws_s3_bucket.root": minimalNode({
         "aws_s3_bucket.root": { address: "aws_s3_bucket.root" },
@@ -126,10 +126,10 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(meta.edgeCount).toBe(2);
     expect(elements.length).toBeGreaterThan(0);
     const rects = elements.filter((e) => e.type === "rectangle");
-    const arrows = elements.filter((e) => e.type === "arrow");
+    const lines = elements.filter((e) => e.type === "line");
     const frames = elements.filter((e) => e.type === "frame");
     expect(rects.length).toBe(3);
-    expect(arrows.length).toBeGreaterThanOrEqual(1);
+    expect(lines.length).toBeGreaterThanOrEqual(1);
     expect(frames.length).toBeGreaterThanOrEqual(2);
 
     const rootFrame = frames.find((e) => e.name === "Root module");
@@ -159,7 +159,7 @@ describe("buildTerraformElkExcalidrawScene", () => {
       }),
     ]);
 
-    expect(arrows[0].customData).toMatchObject({
+    expect(lines[0].customData).toMatchObject({
       terraform: true,
       terraformEdgeLayer: "dependency",
       relationship: expect.objectContaining({
@@ -168,6 +168,14 @@ describe("buildTerraformElkExcalidrawScene", () => {
         type: "dependency",
       }),
     });
+    expect((lines[0] as any).startArrowhead).toBe(null);
+    expect((lines[0] as any).endArrowhead).toBe(null);
+    expect(
+      Math.max(...frames.map((frame) => elements.indexOf(frame))),
+    ).toBeLessThan(Math.min(...lines.map((line) => elements.indexOf(line))));
+    expect(
+      Math.max(...lines.map((line) => elements.indexOf(line))),
+    ).toBeLessThan(Math.min(...rects.map((rect) => elements.indexOf(rect))));
   });
 
   it("keeps nested module frame membership nearest-parent only", async () => {
@@ -233,7 +241,7 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(subnet!.frameId).toBe(subnetsFrame!.id);
   });
 
-  it("keeps sibling module frames from expanding over cross-module arrows", async () => {
+  it("keeps sibling module frames from expanding over cross-module lines", async () => {
     const nodes = {
       "module.api.aws_lambda_function.fn": minimalNode({
         "module.api.aws_lambda_function.fn": {
@@ -294,11 +302,11 @@ describe("buildTerraformElkExcalidrawScene", () => {
     const dataFrame = elements.find(
       (e) => e.type === "frame" && e.name === "module.data",
     );
-    const arrows = elements.filter((e) => e.type === "arrow");
+    const lines = elements.filter((e) => e.type === "line");
 
     expect(apiFrame).toBeDefined();
     expect(dataFrame).toBeDefined();
-    expect(arrows.length).toBe(2);
+    expect(lines.length).toBe(2);
     expect(apiFrame).toMatchObject({
       x: expect.any(Number),
       y: expect.any(Number),

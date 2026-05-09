@@ -2,7 +2,7 @@
  * Terraform processed `nodes` map → Excalidraw v2 scene (elements + minimal `appState`).
  *
  * Orchestrates `excalidraw-elements.js`, `excalidraw-layout.js`, and `excalidraw-arrows.js`.
- * See those modules for phase-specific logic (icons/tiers, force layout / VPC snaps, edges/arrows).
+ * See those modules for phase-specific logic (icons/tiers, force layout / VPC snaps, edges/lines).
  */
 const { extractVpcNetworkingFacetStore } = require("./vpc-networking-facet");
 const {
@@ -90,7 +90,7 @@ const {
 
 /**
  * Converts enriched Terraform `nodes` (post-pipeline) into an Excalidraw document: nested frames,
- * resource cards, dependency + data-flow arrows, and `customData` consumed by the editor.
+ * resource cards, dependency + data-flow lines, and `customData` consumed by the editor.
  *
  * `options.layoutEngine`: `"elk"` (default, layered) or `"force"` (legacy d3-force). When
  * unset, falls back to the `TF_LAYOUT_ENGINE` env var, then to `"elk"`.
@@ -106,7 +106,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
   const nodeElements = [];
   const locationElements = [];
   const moduleElements = [];
-  const arrowElements = [];
+  const edgeElements = [];
   // 1) Build the core graph model and helper indexes from post-pipeline `nodes`.
   // Real Terraform nodes only (skip metadata keys like `__networkingFacetStore`).
   const nodeKeys = Object.keys(nodes).filter((key) => !key.startsWith("__"));
@@ -318,7 +318,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
   );
   // `posMap`: nodePath -> emitted rectangle/text ids + rectangle geometry.
   const posMap = {};
-  // `nodeRectById`: emitted rectangle id -> rectangle element (for arrow bindings).
+  // `nodeRectById`: emitted rectangle id -> rectangle element (for edge bindings).
   const nodeRectById = new Map();
 
   // 5) Emit resource cards (rectangles + labels + optional service icons).
@@ -344,7 +344,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
 
     const rectId = `rect-${i}`;
     const textId = `text-${i}`;
-    // Store for arrow routing/binding and later container membership checks.
+    // Store for edge routing/binding and later container membership checks.
     posMap[nodePath] = { x, y, w: cfg.w, h: cfg.h, rectId, textId };
 
     const action = getPrimaryAction(nodes[nodePath]);
@@ -1258,8 +1258,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
     }
   }
 
-  // 6) Emit structural dependency arrows.
-  let arrowIdx = 0;
+  // 6) Emit structural dependency lines.
+  let edgeIdx = 0;
   for (const relationship of relationships) {
     const {
       source,
@@ -1272,7 +1272,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     } = relationship;
     const posA = posMap[source];
     const posB = posMap[target];
-    const arrowId = `arrow-${arrowIdx++}`;
+    const edgeId = `edge-${edgeIdx++}`;
 
     const rectA = nodeRectById.get(posA.rectId);
     const rectB = nodeRectById.get(posB.rectId);
@@ -1280,8 +1280,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
     if (!rectA || !rectB) {
       continue;
     }
-    rectA.boundElements.push({ id: arrowId, type: "arrow" });
-    rectB.boundElements.push({ id: arrowId, type: "arrow" });
+    rectA.boundElements.push({ id: edgeId, type: "arrow" });
+    rectB.boundElements.push({ id: edgeId, type: "arrow" });
 
     const { startFixed, endFixed, startPoint, endPoint } =
       getCenterClippedBindingPoints(posA, posB, posA.w, posA.h, posB.w, posB.h);
@@ -1291,10 +1291,10 @@ async function nodesToExcalidraw(nodes, options = {}) {
     const endX = endPoint.x;
     const endY = endPoint.y;
 
-    arrowElements.push(
+    edgeElements.push(
       makeBaseElement({
-        type: "arrow",
-        id: arrowId,
+        type: "line",
+        id: edgeId,
         x: startX,
         y: startY,
         width: Math.abs(endX - startX),
@@ -1303,6 +1303,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
           [0, 0],
           [endX - startX, endY - startY],
         ],
+        polygon: false,
         startBinding: {
           elementId: posA.rectId,
           fixedPoint: startFixed,
@@ -1340,7 +1341,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     );
   }
 
-  // 7) Emit data-flow arrows (offset when they overlap dependency pairs).
+  // 7) Emit data-flow lines (offset when they overlap dependency pairs).
   for (const edge of dataFlowEdges) {
     const {
       source,
@@ -1364,9 +1365,9 @@ async function nodesToExcalidraw(nodes, options = {}) {
       continue;
     }
 
-    const arrowId = `data-flow-arrow-${arrowIdx++}`;
-    rectA.boundElements.push({ id: arrowId, type: "arrow" });
-    rectB.boundElements.push({ id: arrowId, type: "arrow" });
+    const edgeId = `data-flow-edge-${edgeIdx++}`;
+    rectA.boundElements.push({ id: edgeId, type: "arrow" });
+    rectB.boundElements.push({ id: edgeId, type: "arrow" });
 
     const { startPoint, endPoint } = getCenterClippedBindingPoints(
       posA,
@@ -1390,10 +1391,10 @@ async function nodesToExcalidraw(nodes, options = {}) {
     const startFixed = fixedPointForAbsolutePoint(posA, shifted.startPoint);
     const endFixed = fixedPointForAbsolutePoint(posB, shifted.endPoint);
 
-    arrowElements.push(
+    edgeElements.push(
       makeBaseElement({
-        type: "arrow",
-        id: arrowId,
+        type: "line",
+        id: edgeId,
         x: startX,
         y: startY,
         width: Math.abs(endX - startX),
@@ -1402,6 +1403,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
           [0, 0],
           [endX - startX, endY - startY],
         ],
+        polygon: false,
         startBinding: {
           elementId: posA.rectId,
           fixedPoint: startFixed,
@@ -1412,8 +1414,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
           fixedPoint: endFixed,
           mode: "orbit",
         },
-        startArrowhead: bidirectional ? "arrow" : null,
-        endArrowhead: "arrow",
+        startArrowhead: null,
+        endArrowhead: null,
         strokeColor: "#0ca678",
         strokeWidth: 3,
         strokeStyle: "solid",
@@ -1441,10 +1443,10 @@ async function nodesToExcalidraw(nodes, options = {}) {
   }
 
   const elementsOrdered = [
-    // Order matters: arrows at bottom, then framing containers/modules, then resource cards.
-    ...arrowElements,
+    // Order matters: framing containers/modules at bottom, then relationship lines, then resource cards.
     ...locationElements,
     ...moduleElements,
+    ...edgeElements,
     ...nodeElements,
   ];
 

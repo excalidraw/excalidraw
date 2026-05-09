@@ -1,6 +1,6 @@
 import {
-  isArrowElement,
   isBindableElement,
+  isLinearElement,
   newElementWith,
 } from "@excalidraw/element";
 
@@ -15,7 +15,7 @@ import type { LocalPoint } from "@excalidraw/math";
 
 /**
  * Terraform-import scene helpers: soft-hide (`isDeleted`) for filtered views, explode
- * expand/collapse for dependency neighborhoods, and arrow rebind after layout changes.
+ * expand/collapse for dependency neighborhoods, and edge rebind after layout changes.
  * Element `customData` is written by `packages/backend/excalidraw.js`.
  */
 
@@ -26,7 +26,7 @@ type TerraformLayerState = {
 
 const getCustomData = (element: ExcalidrawElement) => element.customData ?? {};
 
-/** `"dependency"` | `"dataFlow"` for Terraform arrows, or null for non-terraform edges. */
+/** `"dependency"` | `"dataFlow"` for Terraform edges, or null for non-terraform edges. */
 export const getTerraformEdgeLayer = (element: ExcalidrawElement) => {
   const layer = getCustomData(element).terraformEdgeLayer;
   return layer === "dependency" || layer === "dataFlow" ? layer : null;
@@ -327,9 +327,9 @@ const collectTerraformResourceRects = (
 // --- Arrow geometry (mirrors backend binding math for client-side updates) ---
 
 /**
- * Recomputes Terraform dependency / data-flow arrow geometry and orbit bindings from
+ * Recomputes Terraform dependency / data-flow line geometry and orbit bindings from
  * current resource rectangle positions. Call after visibility toggles so edges stay
- * attached when soft-delete temporarily cleared arrow bindings.
+ * attached when soft-delete temporarily cleared edge bindings.
  */
 export const repairTerraformEdgeBindings = (
   elements: readonly ExcalidrawElement[],
@@ -337,22 +337,22 @@ export const repairTerraformEdgeBindings = (
   const resourceRects = collectTerraformResourceRects(elements);
   const dependencyPairKeys = collectTerraformDependencyPairKeys(elements);
 
-  const boundArrowIdsByRect = new Map<string, Set<string>>();
+  const boundEdgeIdsByRect = new Map<string, Set<string>>();
 
-  const addBoundArrow = (rectId: string, arrowId: string) => {
-    let set = boundArrowIdsByRect.get(rectId);
+  const addBoundEdge = (rectId: string, edgeId: string) => {
+    let set = boundEdgeIdsByRect.get(rectId);
     if (!set) {
       set = new Set();
-      boundArrowIdsByRect.set(rectId, set);
+      boundEdgeIdsByRect.set(rectId, set);
     }
-    set.add(arrowId);
+    set.add(edgeId);
   };
 
   const updated = elements.map((element) => {
     const layer = getTerraformEdgeLayer(element);
     if (
       !layer ||
-      !isArrowElement(element) ||
+      !isLinearElement(element) ||
       element.isDeleted ||
       element.points.length < 2
     ) {
@@ -413,8 +413,8 @@ export const repairTerraformEdgeBindings = (
     const endX = endPoint.x;
     const endY = endPoint.y;
 
-    addBoundArrow(rectA.id, element.id);
-    addBoundArrow(rectB.id, element.id);
+    addBoundEdge(rectA.id, element.id);
+    addBoundEdge(rectB.id, element.id);
 
     return newElementWith(element, {
       x: startX,
@@ -439,16 +439,16 @@ export const repairTerraformEdgeBindings = (
   });
 
   return updated.map((element) => {
-    const arrowIds = boundArrowIdsByRect.get(element.id);
-    if (!arrowIds || !isBindableElement(element)) {
+    const edgeIds = boundEdgeIdsByRect.get(element.id);
+    if (!edgeIds || !isBindableElement(element)) {
       return element;
     }
 
     let boundElements = element.boundElements?.slice() ?? [];
-    for (const arrowId of arrowIds) {
-      if (!boundElements.some((entry) => entry.id === arrowId)) {
+    for (const edgeId of edgeIds) {
+      if (!boundElements.some((entry) => entry.id === edgeId)) {
         boundElements = boundElements.concat({
-          id: arrowId,
+          id: edgeId,
           type: "arrow",
         });
       }
@@ -458,7 +458,7 @@ export const repairTerraformEdgeBindings = (
   });
 };
 
-/** Applies soft-delete to arrows and group wrappers based on visible resource keys and layer flags. */
+/** Applies soft-delete to edges and group wrappers based on visible resource keys and layer flags. */
 const reconcileTerraformVisibility = (
   elements: readonly ExcalidrawElement[],
   overrides: TerraformLayerState = {},
@@ -504,7 +504,7 @@ const reconcileTerraformVisibility = (
 
 /**
  * Expands or collapses dependency neighbors of a category/resource card: toggles `terraformExploded`,
- * soft-hides non-primary children when collapsing, then reconciles visibility and arrow bindings.
+ * soft-hides non-primary children when collapsing, then reconciles visibility and edge bindings.
  */
 export const toggleTerraformExplode = (
   elements: readonly ExcalidrawElement[],
