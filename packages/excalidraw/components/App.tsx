@@ -4145,6 +4145,9 @@ class App extends React.Component<AppProps, AppState> {
       text,
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
+      fontWeight: this.state.currentItemFontWeight,
+      fontStyle: this.state.currentItemFontStyle,
+      textDecoration: this.state.currentItemTextDecoration,
       textAlign: DEFAULT_TEXT_ALIGN,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
@@ -4152,6 +4155,8 @@ class App extends React.Component<AppProps, AppState> {
     const fontString = getFontString({
       fontSize: textElementProps.fontSize,
       fontFamily: textElementProps.fontFamily,
+      fontWeight: textElementProps.fontWeight,
+      fontStyle: textElementProps.fontStyle,
     });
     const lineHeight = getLineHeight(textElementProps.fontFamily);
     const [x1, , x2] = getVisibleSceneBounds(this.state);
@@ -6313,6 +6318,9 @@ class App extends React.Component<AppProps, AppState> {
         text: "",
         fontSize,
         fontFamily,
+        fontWeight: this.state.currentItemFontWeight,
+        fontStyle: this.state.currentItemFontStyle,
+        textDecoration: this.state.currentItemTextDecoration,
         textAlign: parentCenterPosition
           ? "center"
           : this.state.currentItemTextAlign,

@@ -675,6 +675,9 @@ const renderElementToSvg = (
           text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
+          text.setAttribute("font-weight", element.fontWeight);
+          text.setAttribute("font-style", element.fontStyle);
+          text.setAttribute("text-decoration", element.textDecoration);
           text.setAttribute(
             "fill",
             renderConfig.theme === THEME.DARK
