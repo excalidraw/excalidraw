@@ -186,6 +186,46 @@ function getAdjacencyListFromDot(graph: Graph) {
   return adjacency;
 }
 
+/** Strip `count` / `for_each` instance keys so graph ids match `terraform graph` / `depends_on` variants. */
+const stripTerraformAddressIndexes = (address = "") => address.replace(/\[[^\]]+\]/g, "");
+
+/**
+ * Map a Terraform address (plan / prior_state / `depends_on`) to a key in `nodes`.
+ * Plan keys often include instance keys (`[0]`, `["a"]`) while `prior_state.depends_on` may omit them;
+ * matches backend `packages/backend/pipeline.js` `resolveCanonicalNodePath`.
+ */
+export function resolveTerraformPlanNodeKey(
+  nodes: Record<string, TerraformPlanGraphNode>,
+  address: string,
+): string | null {
+  if (!address || typeof address !== "string" || address === TERRAFORM_MODULE_TREE_KEY) {
+    return null;
+  }
+  if (nodes[address]) {
+    return address;
+  }
+  const graphId = stripTerraformAddressIndexes(address);
+  if (nodes[graphId]) {
+    return graphId;
+  }
+  const matches: string[] = [];
+  for (const k of Object.keys(nodes)) {
+    if (k === TERRAFORM_MODULE_TREE_KEY || k.startsWith("__")) {
+      continue;
+    }
+    if (stripTerraformAddressIndexes(k) === graphId) {
+      matches.push(k);
+    }
+  }
+  if (matches.length === 1) {
+    return matches[0];
+  }
+  if (matches.length > 1 && matches.includes(address)) {
+    return address;
+  }
+  return null;
+}
+
 const IAM_POLICY_DOCUMENT_DATA_TYPE = "aws_iam_policy_document";
 
 const MEANINGFUL_POLICY_FIELDS = [
@@ -491,7 +531,7 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
   
       for (let index = 0; index < queue.length; index++) {
         const current = queue[index];
-        const graphKey = stripIndexes(current);
+        const graphKey = stripTerraformAddressIndexes(current);
         //due to being a raw parse there is a chance that that entry has no outgoign edges
         const neighbors = adjacency[graphKey] || [];
   
@@ -519,8 +559,6 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
   
     return nodes;
   }
-
-  const stripIndexes = (address = "") => address.replace(/\[[^\]]+\]/g, "");
 
   function ensureEdgeLists(nodes: Record<string, TerraformPlanGraphNode>) {
     for (const [key, node] of Object.entries(nodes)) {
@@ -584,14 +622,14 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
     }
   
     for (const [rawSource, targets] of Object.entries(existingEdges)) {
-      const source = resolveCanonicalNodePath(nodes, rawSource);
+      const source = resolveTerraformPlanNodeKey(nodes, rawSource);
       if (!source) {
         continue;
       }
       nodes[source].edges_existing ||= [];
-  
+
       for (const rawTarget of targets) {
-        const target = resolveCanonicalNodePath(nodes, rawTarget);
+        const target = resolveTerraformPlanNodeKey(nodes, rawTarget);
         if (!target) {
           continue;
         }
@@ -600,20 +638,6 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
         }
       }
     }
-  
-    return nodes;
-  }
 
-  function resolveCanonicalNodePath(nodes: Record<string, TerraformPlanGraphNode>, address: string) {
-    if (address === TERRAFORM_MODULE_TREE_KEY) {
-      return null;
-    }
-    if (nodes[address]) {
-      return address;
-    }
-    const graphId = stripIndexes(address);
-    if (nodes[graphId]) {
-      return graphId;
-    }
-    return null;
+    return nodes;
   }
