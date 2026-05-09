@@ -551,6 +551,8 @@ function applyModuleGridLayout(
   let cursorX = innerLeft;
   let cursorY = innerTop;
   let subRowMaxH = 0;
+  const submoduleCols = Math.max(1, Math.ceil(Math.sqrt(subPaths.length)));
+  let submoduleCol = 0;
 
   for (const p of subPaths) {
     const childCompoundId = moduleCompoundId(p);
@@ -558,16 +560,22 @@ function applyModuleGridLayout(
     if (!cb) {
       continue;
     }
-    if (cursorX + cb.width > innerLeft + innerWidth && cursorX > innerLeft) {
+    if (
+      (submoduleCol >= submoduleCols ||
+        cursorX + cb.width > innerLeft + innerWidth) &&
+      cursorX > innerLeft
+    ) {
       cursorX = innerLeft;
       cursorY += subRowMaxH + SUBMODULE_GAP_Y;
       subRowMaxH = 0;
+      submoduleCol = 0;
     }
     const dx = cursorX - cb.x;
     const dy = cursorY - cb.y;
     translateModuleSubtree(layoutBoxes, mod.modules[p], dx, dy, vertexSet);
     cursorX += cb.width + SUBMODULE_GAP_X;
     subRowMaxH = Math.max(subRowMaxH, cb.height);
+    submoduleCol += 1;
   }
 
   const resourceStartY =
