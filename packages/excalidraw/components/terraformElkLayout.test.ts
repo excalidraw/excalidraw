@@ -2,9 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import { buildTerraformElkExcalidrawScene } from "./terraformElkLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
-import type { TerraformPlanGraphNode, TerraformPlanNodesMap } from "./terraformPlanParsing";
+import type {
+  TerraformPlanGraphNode,
+  TerraformPlanNodesMap,
+} from "./terraformPlanParsing";
 
-function minimalNode(resources: Record<string, unknown>): TerraformPlanGraphNode {
+function minimalNode(
+  resources: Record<string, unknown>,
+): TerraformPlanGraphNode {
   return { resources };
 }
 
@@ -20,6 +25,22 @@ function boxesOverlap(
   );
 }
 
+function getLabeledContainer(
+  elements: Awaited<
+    ReturnType<typeof buildTerraformElkExcalidrawScene>
+  >["elements"],
+  label: string,
+) {
+  const text = elements.find(
+    (element) =>
+      element.type === "text" &&
+      "containerId" in element &&
+      element.containerId &&
+      element.originalText === label,
+  );
+  return text && elements.find((element) => element.id === text.containerId);
+}
+
 describe("buildTerraformElkExcalidrawScene", () => {
   it("lays out a nested module tree and returns rectangles plus arrows", async () => {
     const nodes = {
@@ -27,10 +48,14 @@ describe("buildTerraformElkExcalidrawScene", () => {
         "aws_s3_bucket.root": { address: "aws_s3_bucket.root" },
       }),
       "module.network.aws_vpc.main": minimalNode({
-        "module.network.aws_vpc.main": { address: "module.network.aws_vpc.main" },
+        "module.network.aws_vpc.main": {
+          address: "module.network.aws_vpc.main",
+        },
       }),
       "module.network.aws_subnet.a": minimalNode({
-        "module.network.aws_subnet.a": { address: "module.network.aws_subnet.a" },
+        "module.network.aws_subnet.a": {
+          address: "module.network.aws_subnet.a",
+        },
       }),
       [TERRAFORM_MODULE_TREE_KEY]: {
         path: "root",
@@ -51,9 +76,9 @@ describe("buildTerraformElkExcalidrawScene", () => {
     (nodes["aws_s3_bucket.root"] as { edges_new?: string[] }).edges_new = [
       "module.network.aws_vpc.main",
     ];
-    (nodes["module.network.aws_vpc.main"] as { edges_new?: string[] }).edges_new = [
-      "module.network.aws_subnet.a",
-    ];
+    (
+      nodes["module.network.aws_vpc.main"] as { edges_new?: string[] }
+    ).edges_new = ["module.network.aws_subnet.a"];
 
     const { elements, meta } = await buildTerraformElkExcalidrawScene(nodes);
 
@@ -68,6 +93,80 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(rects.length).toBe(3);
     expect(arrows.length).toBeGreaterThanOrEqual(1);
     expect(frames.length).toBeGreaterThanOrEqual(2);
+
+    const rootFrame = frames.find((e) => e.name === "Root module");
+    const networkFrame = frames.find((e) => e.name === "module.network");
+    const networkVpc = getLabeledContainer(elements, "aws_vpc.main");
+
+    expect(rootFrame).toBeDefined();
+    expect(networkFrame).toBeDefined();
+    expect(networkVpc).toBeDefined();
+    expect(rootFrame!.frameId).toBe(null);
+    expect(networkFrame!.frameId).toBe(rootFrame!.id);
+    expect(networkVpc!.frameId).toBe(networkFrame!.id);
+  });
+
+  it("keeps nested module frame membership nearest-parent only", async () => {
+    const nodes = {
+      "module.network.aws_vpc.main": minimalNode({
+        "module.network.aws_vpc.main": {
+          address: "module.network.aws_vpc.main",
+        },
+      }),
+      "module.network.module.subnets.aws_subnet.a": minimalNode({
+        "module.network.module.subnets.aws_subnet.a": {
+          address: "module.network.module.subnets.aws_subnet.a",
+        },
+      }),
+      [TERRAFORM_MODULE_TREE_KEY]: {
+        path: "root",
+        modules: {
+          "module.network": {
+            path: "module.network",
+            modules: {
+              "module.network.module.subnets": {
+                path: "module.network.module.subnets",
+                modules: {},
+                resourceAddresses: [
+                  "module.network.module.subnets.aws_subnet.a",
+                ],
+              },
+            },
+            resourceAddresses: ["module.network.aws_vpc.main"],
+          },
+        },
+        resourceAddresses: [],
+      },
+    } as unknown as TerraformPlanNodesMap;
+
+    (
+      nodes["module.network.aws_vpc.main"] as { edges_new?: string[] }
+    ).edges_new = ["module.network.module.subnets.aws_subnet.a"];
+
+    const { elements } = await buildTerraformElkExcalidrawScene(nodes);
+
+    const rootFrame = elements.find(
+      (e) => e.type === "frame" && e.name === "Root module",
+    );
+    const networkFrame = elements.find(
+      (e) => e.type === "frame" && e.name === "module.network",
+    );
+    const subnetsFrame = elements.find(
+      (e) => e.type === "frame" && e.name === "module.network.module.subnets",
+    );
+    const vpc = getLabeledContainer(elements, "aws_vpc.main");
+    const subnet = getLabeledContainer(elements, "aws_subnet.a");
+
+    expect(rootFrame).toBeDefined();
+    expect(networkFrame).toBeDefined();
+    expect(subnetsFrame).toBeDefined();
+    expect(vpc).toBeDefined();
+    expect(subnet).toBeDefined();
+    expect(rootFrame!.frameId).toBe(null);
+    expect(networkFrame!.frameId).toBe(rootFrame!.id);
+    expect(subnetsFrame!.frameId).toBe(networkFrame!.id);
+    expect(vpc!.frameId).toBe(networkFrame!.id);
+    expect(subnet!.frameId).toBe(subnetsFrame!.id);
   });
 
   it("keeps sibling module frames from expanding over cross-module arrows", async () => {
@@ -119,9 +218,9 @@ describe("buildTerraformElkExcalidrawScene", () => {
     (
       nodes["module.api.aws_lambda_function.fn"] as { edges_new?: string[] }
     ).edges_new = ["module.data.aws_s3_bucket.bucket"];
-    (nodes["module.data.aws_sqs_queue.queue"] as { edges_new?: string[] }).edges_new = [
-      "module.api.aws_cloudwatch_log_group.logs",
-    ];
+    (
+      nodes["module.data.aws_sqs_queue.queue"] as { edges_new?: string[] }
+    ).edges_new = ["module.api.aws_cloudwatch_log_group.logs"];
 
     const { elements } = await buildTerraformElkExcalidrawScene(nodes);
 
@@ -167,9 +266,9 @@ describe("buildTerraformElkExcalidrawScene", () => {
     for (let i = 0; i < 601; i++) {
       const id = `null_resource.n${i}`;
       many[id] = minimalNode({ [id]: { address: id } });
-      (many[TERRAFORM_MODULE_TREE_KEY] as { resourceAddresses: string[] }).resourceAddresses.push(
-        id,
-      );
+      (
+        many[TERRAFORM_MODULE_TREE_KEY] as { resourceAddresses: string[] }
+      ).resourceAddresses.push(id);
     }
 
     const { elements, meta } = await buildTerraformElkExcalidrawScene(many);
