@@ -18,6 +18,8 @@ const EMPTY_TERRAFORM_EXCALIDRAW_SCENE = {
 
 const DEBUG_PREFIX = "[terraform:local-parse]";
 
+const TERRAFORM_MODULE_RESOURCE_TYPE = "terraform_module";
+
 /**
  * Browser-only: logs in dev when local parse runs (`import.meta.env.DEV`).
  * Look in the **browser** DevTools → **Console** (not the terminal where `yarn start` runs).
@@ -65,6 +67,12 @@ export const terraformPlanParsing = async (
     nodes
   });
 
+  const nodes1 = addModuleNodes(nodes);
+  emitLocalParseDebug({
+    phase: "terraformModuleNodes",
+    nodes1
+  });
+
   return new Response(JSON.stringify(EMPTY_TERRAFORM_EXCALIDRAW_SCENE), {
     status: 200,
     headers: { "Content-Type": "application/json" },
@@ -108,4 +116,61 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
     }
   
     return nodes;
+  }
+
+  function addModuleNodes(nodes: Record<string, { resources: Record<string, unknown> }>) {
+    const modulePaths = collectAllTerraformModulePaths(Object.keys(nodes));
+  
+    for (const modulePath of modulePaths) {
+      if (nodes[modulePath]) {
+        continue;
+      }
+  
+      nodes[modulePath] = {
+        resources: {
+          [modulePath]: {
+            address: modulePath,
+            type: TERRAFORM_MODULE_RESOURCE_TYPE,
+            name: lastModuleNameSegment(modulePath),
+            mode: "managed",
+            change: { actions: ["no-op"] },
+          },
+        },
+      };
+    }
+  
+    return nodes;
+  }
+
+  function collectAllTerraformModulePaths(nodePaths: string[]) {
+    const out = new Set<string>();
+    for (const nodePath of nodePaths) {
+      for (const modulePath of getModulePathChainFromAddress(nodePath)) {
+        out.add(modulePath);
+      }
+    }
+    return out;
+  }
+
+  function getModulePathChainFromAddress(nodePath = "") {
+    const parts = nodePath.split(".");
+    const chain = [];
+    let cursor = "";
+  
+    for (let index = 0; index < parts.length - 1; ) {
+      if (parts[index] !== "module" || !parts[index + 1]) {
+        break;
+      }
+      const segment = `module.${parts[index + 1]}`;
+      cursor = cursor ? `${cursor}.${segment}` : segment;
+      chain.push(cursor);
+      index += 2;
+    }
+  
+    return chain;
+  }
+
+  function lastModuleNameSegment(modulePath: string) {
+    const parts = modulePath.split(".");
+    return parts[parts.length - 1] || modulePath;
   }
