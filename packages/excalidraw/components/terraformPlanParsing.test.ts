@@ -8,6 +8,7 @@ import { buildTerraformElkExcalidrawScene } from "./terraformElkLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import {
   buildTerraformModuleTree,
+  resolveTerraformPlanNodeKey,
   sanitizeTerraformPlanNodes,
   terraformPlanParsing,
   type TerraformPlanGraphNode,
@@ -122,6 +123,30 @@ describe("buildTerraformModuleTree", () => {
 
     const tree = buildTerraformModuleTree(map as Parameters<typeof buildTerraformModuleTree>[0]);
     expect(tree.resourceAddresses).toEqual(["aws_instance.a"]);
+  });
+});
+
+describe("resolveTerraformPlanNodeKey", () => {
+  it("maps prior_state depends_on without instance key to indexed plan node keys", () => {
+    const nodes: Record<string, TerraformPlanGraphNode> = {
+      "module.lambda_deployment_artifacts.aws_s3_bucket.this[0]": {
+        resources: {},
+      },
+    };
+    expect(
+      resolveTerraformPlanNodeKey(
+        nodes,
+        "module.lambda_deployment_artifacts.aws_s3_bucket.this",
+      ),
+    ).toBe("module.lambda_deployment_artifacts.aws_s3_bucket.this[0]");
+  });
+
+  it("returns null when multiple node keys share the same stripped id (ambiguous)", () => {
+    const nodes: Record<string, TerraformPlanGraphNode> = {
+      "aws_instance.a[0]": { resources: {} },
+      "aws_instance.a[1]": { resources: {} },
+    };
+    expect(resolveTerraformPlanNodeKey(nodes, "aws_instance.a")).toBeNull();
   });
 });
 
