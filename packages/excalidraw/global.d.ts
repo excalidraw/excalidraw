@@ -58,6 +58,17 @@ interface Blob {
 
 declare module "*.scss";
 
+declare module "graphlib-dot" {
+  // Minimal surface used by `terraformPlanParsing`. The library is JS-only;
+  // expand this shim if/when more of the API is consumed.
+  const dot: {
+    read(input: string): unknown;
+    readMany(input: string): unknown[];
+    write(graph: unknown): string;
+  };
+  export default dot;
+}
+
 // --------------------------------------------------------------------------—
 // ensure Uint8Array isn't assignable to ArrayBuffer
 // (due to TS structural typing)

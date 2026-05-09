@@ -4,11 +4,14 @@
  */
 import React, { useState } from "react";
 
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { restoreElements } from "../data/restore";
 
 import { Dialog } from "./Dialog";
 import { FilledButton } from "./FilledButton";
 import { useApp } from "./App";
+import { terraformPlanParsing } from "./terraformPlanParsing";
 
 import "./TerraformImportDialog.scss";
 
@@ -54,6 +57,20 @@ const TerraformImportModal = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /** Applies an Excalidraw v2 scene payload (e.g. from GET …/excalidraw or local parse). */
+  const replaceEditorWithExcalidrawScene = (scene: { elements?: unknown }) => {
+    const elements = restoreElements(
+      scene.elements as readonly ExcalidrawElement[] | null | undefined,
+      null,
+      {
+        repairBindings: true,
+      },
+    );
+    app.scene.replaceAllElements(elements);
+    app.scrollToContent();
+    onCloseRequest();
+  };
+
   /** Fetches generated scene JSON from the backend and replaces the editor scene. */
   const loadExcalidrawScene = async (id: string | number) => {
     const sceneUrl = new URL(
@@ -70,12 +87,7 @@ const TerraformImportModal = ({
       throw new Error(body.error || `Failed to load (HTTP ${res.status})`);
     }
     const scene = await res.json();
-    const elements = restoreElements(scene.elements, null, {
-      repairBindings: true,
-    });
-    app.scene.replaceAllElements(elements);
-    app.scrollToContent();
-    onCloseRequest();
+    replaceEditorWithExcalidrawScene(scene);
   };
 
   /** POST multipart upload then opens the new upload’s Excalidraw document. */
@@ -93,25 +105,30 @@ const TerraformImportModal = ({
         formData.append("stateFile", stateFile);
       }
       formData.append("structuralPruneMode", structuralPruneMode);
-      let res;
       if (useBackend) {
-      console.log("using backend");
-      res = await fetch(`${TERRAFORM_BACKEND_URL}/terraform/upload`, {
-        method: "POST",
-        body: formData,
-      });
-      } else {
-        console.log("not using backend");
-        res = await fetch(`${TERRAFORM_BACKEND_URL}/terraform/upload`, {
+        console.log("using backend");
+        const res = await fetch(`${TERRAFORM_BACKEND_URL}/terraform/upload`, {
           method: "POST",
           body: formData,
         });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Upload failed");
+        }
+        await loadExcalidrawScene(data.id);
+      } else {
+        console.log("not using backend");
+        const res = await terraformPlanParsing(planFile, dotFile, stateFile);
+        const scene = await res.json();
+        if (!res.ok) {
+          const err =
+            scene && typeof scene === "object" && "error" in scene
+              ? String((scene as { error?: unknown }).error)
+              : "";
+          throw new Error(err || "Local parse failed");
+        }
+        replaceEditorWithExcalidrawScene(scene);
       }
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Upload failed");
-      }
-      await loadExcalidrawScene(data.id);
     } catch (err) {
       console.error("Import error:", err);
       setError(err instanceof Error ? err.message : "Request failed");
