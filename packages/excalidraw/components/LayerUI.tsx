@@ -61,6 +61,12 @@ import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { TerraformImportDialog } from "./TerraformImportDialog";
+import {
+  isTerraformGroupElement,
+  isTerraformInspectableElement,
+  isTerraformLayerEdge,
+  isTerraformResourceElement,
+} from "./terraformElementMetadata";
 import { repairTerraformEdgeBindings } from "./terraformVisibility";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
@@ -177,20 +183,6 @@ type TerraformContainerFacet = {
   sources?: string[];
 };
 
-const TERRAFORM_GROUP_FLAGS = [
-  "terraformModuleGroup",
-  "terraformAccountGroup",
-  "terraformRegionGroup",
-  "terraformVpcGroup",
-  "terraformSubnetGroup",
-] as const;
-
-const isTerraformResourceElement = (element: NonDeletedExcalidrawElement) =>
-  element.customData?.terraform && Boolean(element.customData?.nodePath);
-
-const isTerraformGroupElement = (element: NonDeletedExcalidrawElement) =>
-  TERRAFORM_GROUP_FLAGS.some((flag) => Boolean(element.customData?.[flag]));
-
 const isTerraformGroupParentOfNode = (
   element: ExcalidrawElement,
   nodePath: string | null,
@@ -200,9 +192,6 @@ const isTerraformGroupParentOfNode = (
       Array.isArray(element.customData?.terraformGroupChildKeys) &&
       element.customData.terraformGroupChildKeys.includes(nodePath),
   );
-
-const isTerraformInspectableElement = (element: NonDeletedExcalidrawElement) =>
-  isTerraformResourceElement(element) || isTerraformGroupElement(element);
 
 const TERRAFORM_DEPENDENCY_PREVIEW_OPACITY = 25;
 const TERRAFORM_DIM_NODE_OPACITY = 50;
@@ -246,10 +235,6 @@ const clearTerraformDependencyPreviewData = (
   delete nextCustomData.terraformDependencyPreview;
   return nextCustomData;
 };
-
-const isTerraformLayerEdge = (element: ExcalidrawElement) =>
-  element.customData?.terraformEdgeLayer === "dependency" ||
-  element.customData?.terraformEdgeLayer === "dataFlow";
 
 const getNodePathFromRelationship = (element: ExcalidrawElement) => {
   const relationship = element.customData?.relationship;
@@ -473,6 +458,13 @@ const getTerraformElementForSelection = (
   );
   if (selectedTerraformGroup) {
     return selectedTerraformGroup;
+  }
+
+  const selectedTerraformEdge = selectedElements.find((element) =>
+    isTerraformLayerEdge(element),
+  );
+  if (selectedTerraformEdge) {
+    return selectedTerraformEdge;
   }
 
   const selectedTerraformContainer = selectedElements.find(
@@ -749,6 +741,57 @@ const TerraformGroupActions = ({
   );
 };
 
+const TerraformEdgeActions = ({
+  element,
+  renderAction,
+}: {
+  element: NonDeletedExcalidrawElement;
+  renderAction: ActionManager["renderAction"];
+}) => {
+  const customData = element.customData ?? {};
+  const relationship =
+    customData.relationship && typeof customData.relationship === "object"
+      ? customData.relationship
+      : {};
+  const rows = [
+    ["Layer", customData.terraformEdgeLayer],
+    ["Type", relationship.type],
+    ["Label", relationship.label],
+    ["Origin", relationship.origin],
+    ["Source", relationship.source],
+    ["Target", relationship.target],
+    ["Detail", relationship.detail],
+  ].filter(([, value]) => value !== null && typeof value !== "undefined");
+
+  return (
+    <div className="selected-shape-actions terraform-element-actions">
+      <div className="terraform-element-actions__header">
+        <div className="terraform-element-actions__eyebrow">Terraform</div>
+        <div className="terraform-element-actions__title">Relationship</div>
+        <div className="terraform-element-actions__summary">
+          <span>{formatTerraformPanelValue(customData.terraformEdgeLayer)}</span>
+        </div>
+      </div>
+
+      <div className="terraform-element-actions__meta">
+        {rows.map(([label, value]) => (
+          <div className="terraform-element-actions__row" key={label}>
+            <div className="terraform-element-actions__label">{label}</div>
+            <div className="terraform-element-actions__value">
+              <TerraformConfigValue value={value} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <fieldset>
+        <legend>{t("labels.actions")}</legend>
+        <div className="buttonList">{renderAction("hyperlink")}</div>
+      </fieldset>
+    </div>
+  );
+};
+
 const TerraformElementActions = ({
   element,
   renderAction,
@@ -761,6 +804,12 @@ const TerraformElementActions = ({
   if (isTerraformGroupElement(element)) {
     return (
       <TerraformGroupActions element={element} renderAction={renderAction} />
+    );
+  }
+
+  if (isTerraformLayerEdge(element)) {
+    return (
+      <TerraformEdgeActions element={element} renderAction={renderAction} />
     );
   }
 

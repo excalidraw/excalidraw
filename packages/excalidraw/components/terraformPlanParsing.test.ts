@@ -10,6 +10,8 @@ import {
   buildTerraformModuleTree,
   sanitizeTerraformPlanNodes,
   terraformPlanParsing,
+  type TerraformPlanGraphNode,
+  type TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -138,6 +140,24 @@ describe("terraformPlanParsing", () => {
       expect(labels.some((label) => label.includes("data.aws_iam_policy_document."))).toBe(
         true,
       );
+
+      const terraformResources = body.elements
+        .flatMap(
+          (element: any) => element.customData?.terraformResources || [],
+        )
+        .filter(Boolean);
+      expect(
+        terraformResources.some(
+          (resource: any) => (resource.attributes || []).length > 0,
+        ),
+      ).toBe(true);
+      expect(
+        terraformResources.some((resource: any) =>
+          (resource.attributes || []).some(
+            (attribute: any) => attribute.changed || attribute.unknownAfter,
+          ),
+        ),
+      ).toBe(true);
     },
     60_000,
   );
@@ -276,7 +296,7 @@ describe("sanitizeTerraformPlanNodes", () => {
         edges_existing: [],
         edges_data_flow: [],
       },
-    });
+    } as Record<string, TerraformPlanGraphNode>) as TerraformPlanNodesMap;
     nodes[TERRAFORM_MODULE_TREE_KEY] = buildTerraformModuleTree(nodes);
 
     const { elements } = await buildTerraformElkExcalidrawScene(nodes);

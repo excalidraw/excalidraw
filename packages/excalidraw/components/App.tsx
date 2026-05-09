@@ -434,6 +434,10 @@ import { getShortcutKey } from "../shortcut";
 import { tryParseSpreadsheet } from "../charts";
 
 import { toggleTerraformExplode } from "./terraformVisibility";
+import {
+  isTerraformInspectableElement,
+  isTerraformResourceElement,
+} from "./terraformElementMetadata";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -513,7 +517,9 @@ const getTerraformResourceElementForSelection = (
   app.scene
     .getSelectedElements(appState)
     .find(
-      (element) => element.customData?.terraformVisibilityRole === "resource",
+      (element) =>
+        element.customData?.terraformVisibilityRole === "resource" ||
+        isTerraformResourceElement(element),
     ) || null;
 
 /** Context-menu / command action: expand or collapse imported Terraform dependency neighborhood. */
@@ -546,6 +552,26 @@ const actionToggleTerraformExplode: Action = {
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
+};
+
+const getTerraformElementForSelection = (
+  app: AppClassProperties,
+  appState: Readonly<AppState>,
+) =>
+  app.scene
+    .getSelectedElements(appState)
+    .find((element) => isTerraformInspectableElement(element)) || null;
+
+const actionTerraformInspect: Action = {
+  name: "terraformInspect",
+  label: "labels.terraform.inspect",
+  trackEvent: { category: "element", action: "terraformInspect" },
+  predicate: (_elements, appState, _appProps, app) =>
+    Boolean(getTerraformElementForSelection(app, appState)),
+  perform: () => ({
+    appState: null,
+    captureUpdate: CaptureUpdateAction.NEVER,
+  }),
 };
 
 const editorInterfaceContextInitialValue: EditorInterface = {
@@ -12172,6 +12198,7 @@ class App extends React.Component<AppProps, AppState> {
       );
 
     const type = element || isHittingCommonBoundBox ? "element" : "canvas";
+    const isTerraformContextTarget = isTerraformInspectableElement(element);
 
     const container = this.excalidrawContainerRef.current!;
     const { top: offsetTop, left: offsetLeft } =
@@ -12183,7 +12210,8 @@ class App extends React.Component<AppProps, AppState> {
 
     this.setState(
       {
-        ...(element && !this.state.selectedElementIds[element.id]
+        ...(element &&
+        (isTerraformContextTarget || !this.state.selectedElementIds[element.id])
           ? {
               ...this.state,
               ...selectGroupsForSelectedElements(
@@ -12207,7 +12235,11 @@ class App extends React.Component<AppProps, AppState> {
       },
       () => {
         this.setState({
-          contextMenu: { top, left, items: this.getContextMenuItems(type) },
+          contextMenu: {
+            top,
+            left,
+            items: this.getContextMenuItems(type, element),
+          },
         });
       },
     );
@@ -12555,6 +12587,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private getContextMenuItems = (
     type: "canvas" | "element",
+    targetElement?: NonDeleted<ExcalidrawElement> | null,
   ): ContextMenuItems => {
     const options: ContextMenuItems = [];
 
@@ -12596,6 +12629,10 @@ class App extends React.Component<AppProps, AppState> {
 
     // element contextMenu
     // -------------------------------------------------------------------------
+
+    if (targetElement && isTerraformInspectableElement(targetElement)) {
+      return [actionTerraformInspect, actionToggleTerraformExplode];
+    }
 
     options.push(copyText);
 
