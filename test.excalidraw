@@ -1,11 +1,105 @@
 {
   "type": "excalidraw",
   "version": 2,
-  "source": "https://excalidraw.com",
-  "elements": [],
+  "source": "http://localhost:3001",
+  "elements": [
+    {
+      "id": "lKHOL2IHfIJYzAuDQtQcf",
+      "type": "rectangle",
+      "x": -309.19921875,
+      "y": -167.23046875,
+      "width": 297.6328125,
+      "height": 213.6875,
+      "angle": 0,
+      "strokeColor": "#e03131",
+      "backgroundColor": "#ffec99",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1472256857,
+      "version": 39,
+      "versionNonce": 1642470423,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1778356874291,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "lB3aSEeyYScT6eAGiqAVF",
+      "type": "ellipse",
+      "x": -159.00390625,
+      "y": -192.30078125,
+      "width": 48.65625,
+      "height": 22.625,
+      "angle": 0,
+      "strokeColor": "#e03131",
+      "backgroundColor": "#ffec99",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a1",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 731156921,
+      "version": 219,
+      "versionNonce": 336556279,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1778356879121,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "3lh_0N1d7JwAmT4lPHwBo",
+      "type": "ellipse",
+      "x": -77.625,
+      "y": -191.4921875,
+      "width": 48.65625,
+      "height": 22.625,
+      "angle": 0,
+      "strokeColor": "#e03131",
+      "backgroundColor": "#ffec99",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a2",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 464511063,
+      "version": 257,
+      "versionNonce": 690302455,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1778356881732,
+      "link": null,
+      "locked": false
+    }
+  ],
   "appState": {
+    "gridSize": 20,
+    "gridStep": 5,
+    "gridModeEnabled": false,
     "viewBackgroundColor": "#ffffff",
-    "gridSize": null
+    "lockedMultiSelections": {}
   },
   "files": {}
 }
