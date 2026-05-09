@@ -20,6 +20,14 @@ const DEBUG_PREFIX = "[terraform:local-parse]";
 
 const TERRAFORM_MODULE_RESOURCE_TYPE = "terraform_module";
 
+/** Matches backend pipeline nodes: resources plus mutable edge buckets (see `ensureEdgeLists`). */
+type TerraformPlanGraphNode = {
+  resources: Record<string, unknown>;
+  edges_new?: string[];
+  edges_existing?: string[];
+  edges_data_flow?: string[];
+};
+
 /**
  * Browser-only: logs in dev when local parse runs (`import.meta.env.DEV`).
  * Look in the **browser** DevTools → **Console** (not the terminal where `yarn start` runs).
@@ -73,6 +81,27 @@ export const terraformPlanParsing = async (
     nodes1
   });
 
+  const nodes2 = ensureEdgeLists(nodes1);
+  emitLocalParseDebug({
+    phase: "ensureEdgeLists",
+    nodes2
+  });
+
+  const nodes3 = buildNewEdges(nodes2, adjacency);
+  emitLocalParseDebug({
+    phase: "buildNewEdges",
+    nodes3
+  });
+
+  //i have a plan that is searchable by address along with nodes for models
+  //i have the adjacency list of the terraform dependency graph
+  //i need to find each nodes relations and make them bidirectional
+  //i need to allow nodes to be searchable by module too
+  // now we know what resources/modules live in what module
+  // all modules have a root provider which describe the modules provider, account and region
+  // we can organize resources by module boxes, root being provider  and use elk or force to direct layout
+  // we can also model by primary resource types, compute, messaging, storage. what they live in (account, region, vpc, subnets, SG) along with their secondar resources (IAM, Networking, observability)
+
   return new Response(JSON.stringify(EMPTY_TERRAFORM_EXCALIDRAW_SCENE), {
     status: 200,
     headers: { "Content-Type": "application/json" },
@@ -103,7 +132,7 @@ function getAdjacencyListFromDot(graph: Graph) {
 }
 
 function loadPlan(plan: { resource_changes: { address: string }[] }) {
-    const nodes: Record<string, { resources: Record<string, unknown> }> = {};
+    const nodes: Record<string, TerraformPlanGraphNode> = {};
     const resourceChanges = plan.resource_changes || [];
   
     for (const resourceChange of resourceChanges) {
@@ -118,7 +147,7 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
     return nodes;
   }
 
-  function addModuleNodes(nodes: Record<string, { resources: Record<string, unknown> }>) {
+  function addModuleNodes(nodes: Record<string, TerraformPlanGraphNode>) {
     const modulePaths = collectAllTerraformModulePaths(Object.keys(nodes));
   
     for (const modulePath of modulePaths) {
@@ -173,4 +202,68 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
   function lastModuleNameSegment(modulePath: string) {
     const parts = modulePath.split(".");
     return parts[parts.length - 1] || modulePath;
+  }
+
+  function buildNewEdges(nodes: Record<string, TerraformPlanGraphNode>, adjacency: Record<string, string[]>) {
+    const moduleBoundarySet = collectAllTerraformModulePaths(Object.keys(nodes));
+  
+    for (const nodePath of Object.keys(nodes)) {
+      const visited = new Set<string>([nodePath]);
+      const queue = [nodePath];
+      const connectedNodes = new Set<string>();
+  
+      for (let index = 0; index < queue.length; index++) {
+        const current = queue[index];
+        const graphKey = stripIndexes(current);
+        const neighbors =
+          adjacency[graphKey] || adjacency[current] || [];
+  
+        for (const neighbor of neighbors) {
+          if (visited.has(neighbor)) {
+            continue;
+          }
+          visited.add(neighbor);
+  
+          if (neighbor.startsWith("provider")) {
+            continue;
+          }
+  
+          // Terraform graph uses intermediate module vertex names matching module paths.
+          // Never traverse through them: attach at most one edge to the synthetic module
+          // node so BFS does not pull in every resource under the module.
+          if (moduleBoundarySet.has(neighbor)) {
+            if (nodes[neighbor]) {
+              connectedNodes.add(neighbor);
+            }
+            continue;
+          }
+  
+          if (nodes[neighbor]) {
+            connectedNodes.add(neighbor);
+            continue;
+          }
+  
+          queue.push(neighbor);
+        }
+      }
+  
+      nodes[nodePath].edges_new = [...connectedNodes];
+    }
+  
+    for (const node of Object.values(nodes)) {
+      node.edges_new = [...new Set<string>(node.edges_new ?? [])];
+    }
+  
+    return nodes;
+  }
+
+  const stripIndexes = (address = "") => address.replace(/\[[^\]]+\]/g, "");
+
+  function ensureEdgeLists(nodes: Record<string, TerraformPlanGraphNode>) {
+    for (const node of Object.values(nodes)) {
+      node.edges_new ||= [];
+      node.edges_existing ||= [];
+      node.edges_data_flow ||= [];
+    }
+    return nodes;
   }
