@@ -88,13 +88,6 @@ export const terraformPlanParsing = async (
     nodes
   });
 
-  /*
-  const nodes1 = addModuleNodes(nodes);
-  emitLocalParseDebug({
-    phase: "terraformModuleNodes",
-    nodes1
-  });*/
-
   const nodes2 = ensureEdgeLists(nodes);
   emitLocalParseDebug({
     phase: "ensureEdgeLists",
@@ -345,30 +338,12 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
   }
 
   function resolveCanonicalNodePath(nodes: Record<string, TerraformPlanGraphNode>, address: string) {
-    if (!address || typeof address !== "string") {
-      return null;
-    }
     if (nodes[address]) {
       return address;
     }
     const graphId = stripIndexes(address);
     if (nodes[graphId]) {
       return graphId;
-    }
-    const matches = [];
-    for (const k of Object.keys(nodes)) {
-      if (k.startsWith("__")) {
-        continue;
-      }
-      if (stripIndexes(k) === graphId) {
-        matches.push(k);
-      }
-    }
-    if (matches.length === 1) {
-      return matches[0];
-    }
-    if (matches.length > 1 && matches.includes(address)) {
-      return address;
     }
     return null;
   }
