@@ -69,6 +69,16 @@ async function getTerraformResourceDetails(
   return rect?.customData?.terraformResources?.[0];
 }
 
+async function getTerraformResourceRect(
+  address: string,
+  resource: Record<string, unknown>,
+) {
+  const { elements } = await buildTerraformElkExcalidrawScene(
+    oneResourceNodes(address, resource),
+  );
+  return getLabeledContainer(elements, address);
+}
+
 describe("buildTerraformElkExcalidrawScene", () => {
   it("lays out a nested module tree and returns rectangles plus arrows", async () => {
     const nodes = {
@@ -330,6 +340,31 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(meta.skipReason).toContain("vertex_count");
     expect(elements.length).toBe(0);
   });
+
+  it.each([
+    ["create", ["create"], "#d3f9d8", "#2b8a3e"],
+    ["update", ["update"], "#fff3bf", "#e67700"],
+    ["delete", ["delete"], "#ffe3e3", "#c92a2a"],
+    ["no-op", ["no-op"], "#e7f5ff", "#1971c2"],
+    ["existing", ["existing"], "#f8f9fa", "#868e96"],
+    ["replace", ["delete", "create"], "#ffe8cc", "#f08c00"],
+  ])(
+    "styles %s resources by Terraform action",
+    async (expectedAction, actions, backgroundColor, strokeColor) => {
+      const rect = await getTerraformResourceRect("aws_s3_bucket.root", {
+        type: "aws_s3_bucket",
+        change: { actions },
+      });
+
+      expect(rect).toMatchObject({
+        backgroundColor,
+        strokeColor,
+        customData: {
+          action: expectedAction,
+        },
+      });
+    },
+  );
 
   it("populates local Terraform resource config from change.after", async () => {
     const details = await getTerraformResourceDetails("aws_s3_bucket.root", {

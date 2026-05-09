@@ -248,9 +248,32 @@ function getResourceTypeFromAddress(address: string) {
 
 function getTerraformAction(resource: Record<string, any>) {
   const actions = resource.change?.actions;
-  return Array.isArray(actions) && actions.length > 0
-    ? actions.join("+")
-    : resource.change?.actions || "existing";
+  if (Array.isArray(actions)) {
+    const actionSet = new Set(actions);
+    if (actionSet.has("delete") && actionSet.has("create")) {
+      return "replace";
+    }
+    return actions[0] || "existing";
+  }
+  return typeof actions === "string" && actions ? actions : "existing";
+}
+
+const TERRAFORM_ACTION_STYLES: Record<
+  string,
+  { backgroundColor: string; strokeColor: string }
+> = {
+  create: { backgroundColor: "#d3f9d8", strokeColor: "#2b8a3e" },
+  delete: { backgroundColor: "#ffe3e3", strokeColor: "#c92a2a" },
+  update: { backgroundColor: "#fff3bf", strokeColor: "#e67700" },
+  replace: { backgroundColor: "#ffe8cc", strokeColor: "#f08c00" },
+  "no-op": { backgroundColor: "#e7f5ff", strokeColor: "#1971c2" },
+  existing: { backgroundColor: "#f8f9fa", strokeColor: "#868e96" },
+  read: { backgroundColor: "#f8f9fa", strokeColor: "#868e96" },
+  external: { backgroundColor: "#f8f9fa", strokeColor: "#868e96" },
+};
+
+function getTerraformActionStyle(action: string) {
+  return TERRAFORM_ACTION_STYLES[action] || TERRAFORM_ACTION_STYLES.existing;
 }
 
 const UNKNOWN_VALUE_PLACEHOLDER = "Known after apply";
@@ -810,6 +833,7 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
     const resource = getPrimaryResource(nodes[id]);
     const resourceType = resource.type || getResourceTypeFromAddress(id);
     const action = getTerraformAction(resource);
+    const actionStyle = getTerraformActionStyle(action);
     skeleton.push({
       type: "rectangle",
       id,
@@ -818,8 +842,8 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
       width: box.width,
       height: box.height,
       strokeWidth: 1.5,
-      strokeColor: "#334155",
-      backgroundColor: "#f8fafc",
+      strokeColor: actionStyle.strokeColor,
+      backgroundColor: actionStyle.backgroundColor,
       roundness: { type: 3, value: 10 },
       label: { text: shortResourceLabel(id), fontSize: 12 },
       customData: {
