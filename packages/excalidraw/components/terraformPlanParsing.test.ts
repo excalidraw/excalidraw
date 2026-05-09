@@ -40,6 +40,38 @@ const renderedLabels = (elements: Array<{ type?: string; originalText?: string }
     .map((element) => element.originalText)
     .filter(Boolean) as string[];
 
+function elementBounds(
+  elements: Array<{
+    type?: string;
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+  }>,
+) {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const element of elements) {
+    if (
+      typeof element.x !== "number" ||
+      typeof element.y !== "number" ||
+      typeof element.width !== "number" ||
+      typeof element.height !== "number"
+    ) {
+      continue;
+    }
+    minX = Math.min(minX, element.x);
+    minY = Math.min(minY, element.y);
+    maxX = Math.max(maxX, element.x + element.width);
+    maxY = Math.max(maxY, element.y + element.height);
+  }
+
+  return { width: maxX - minX, height: maxY - minY };
+}
+
 describe("buildTerraformModuleTree", () => {
   it("places root resources under path root and nests module resources", () => {
     const nodes = {
@@ -127,6 +159,8 @@ describe("terraformPlanParsing", () => {
       expect(body.meta?.skippedLayout).toBeUndefined();
       expect(body.meta?.vertexCount).toBeGreaterThan(0);
       expect(body.elements.length).toBeGreaterThan(0);
+      const bounds = elementBounds(body.elements);
+      expect(bounds.width / bounds.height).toBeLessThan(2);
       expect(body.appState).toMatchObject({
         viewBackgroundColor: "#ffffff",
         gridSize: null,
