@@ -178,6 +178,48 @@ describe("buildTerraformElkExcalidrawScene", () => {
     ).toBeLessThan(Math.min(...rects.map((rect) => elements.indexOf(rect))));
   });
 
+  it.each([
+    ["new-only", { edges_new: ["aws_s3_bucket.b"] }, "#2b8a3e"],
+    ["prior-only", { edges_existing: ["aws_s3_bucket.b"] }, "#1971c2"],
+    [
+      "both",
+      { edges_new: ["aws_s3_bucket.b"], edges_existing: ["aws_s3_bucket.b"] },
+      "#fab005",
+    ],
+  ] as const)(
+    "colors dependency edge by origin (%s)",
+    async (_label, edgeProps, expectedStroke) => {
+      const a = "aws_s3_bucket.a";
+      const b = "aws_s3_bucket.b";
+      const nodes = {
+        [a]: minimalNode({ [a]: { address: a } }),
+        [b]: minimalNode({ [b]: { address: b } }),
+        [TERRAFORM_MODULE_TREE_KEY]: {
+          path: "root",
+          modules: {},
+          resourceAddresses: [a, b],
+        },
+      } as unknown as TerraformPlanNodesMap;
+
+      Object.assign(
+        nodes[a] as TerraformPlanGraphNode & Record<string, unknown>,
+        edgeProps,
+      );
+
+      const { elements } = await buildTerraformElkExcalidrawScene(nodes);
+      const depLine = elements.find(
+        (el) =>
+          el.type === "line" &&
+          (el as { customData?: { terraformEdgeLayer?: string } }).customData
+            ?.terraformEdgeLayer === "dependency",
+      );
+      expect(depLine).toBeDefined();
+      expect((depLine as { strokeColor?: string }).strokeColor).toBe(
+        expectedStroke,
+      );
+    },
+  );
+
   it("keeps nested module frame membership nearest-parent only", async () => {
     const nodes = {
       "module.network.aws_vpc.main": minimalNode({
