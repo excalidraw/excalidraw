@@ -32,13 +32,41 @@ function getLabeledContainer(
   label: string,
 ) {
   const text = elements.find(
-    (element) =>
+    (element: any) =>
       element.type === "text" &&
       "containerId" in element &&
       element.containerId &&
       element.originalText === label,
   );
-  return text && elements.find((element) => element.id === text.containerId);
+  return (
+    text &&
+    elements.find((element) => element.id === (text as any).containerId)
+  );
+}
+
+function oneResourceNodes(
+  address: string,
+  resource: Record<string, unknown>,
+): TerraformPlanNodesMap {
+  return {
+    [address]: minimalNode({ [address]: { address, ...resource } }),
+    [TERRAFORM_MODULE_TREE_KEY]: {
+      path: "root",
+      modules: {},
+      resourceAddresses: [address],
+    },
+  } as unknown as TerraformPlanNodesMap;
+}
+
+async function getTerraformResourceDetails(
+  address: string,
+  resource: Record<string, unknown>,
+) {
+  const { elements } = await buildTerraformElkExcalidrawScene(
+    oneResourceNodes(address, resource),
+  );
+  const rect = getLabeledContainer(elements, address);
+  return rect?.customData?.terraformResources?.[0];
 }
 
 describe("buildTerraformElkExcalidrawScene", () => {
@@ -104,6 +132,32 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(rootFrame!.frameId).toBe(null);
     expect(networkFrame!.frameId).toBe(rootFrame!.id);
     expect(networkVpc!.frameId).toBe(networkFrame!.id);
+
+    const resourceRect = getLabeledContainer(elements, "aws_s3_bucket.root");
+    expect(resourceRect?.customData).toMatchObject({
+      terraform: true,
+      terraformVisibilityRole: "resource",
+      terraformVisibilityKey: "aws_s3_bucket.root",
+      terraformNodeKind: "resource",
+      nodePath: "aws_s3_bucket.root",
+      resourceType: "aws_s3_bucket",
+    });
+    expect(resourceRect?.customData?.terraformResources).toEqual([
+      expect.objectContaining({
+        address: "aws_s3_bucket.root",
+        type: "aws_s3_bucket",
+      }),
+    ]);
+
+    expect(arrows[0].customData).toMatchObject({
+      terraform: true,
+      terraformEdgeLayer: "dependency",
+      relationship: expect.objectContaining({
+        source: expect.any(String),
+        target: expect.any(String),
+        type: "dependency",
+      }),
+    });
   });
 
   it("keeps nested module frame membership nearest-parent only", async () => {
@@ -275,5 +329,148 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(meta.skippedLayout).toBe(true);
     expect(meta.skipReason).toContain("vertex_count");
     expect(elements.length).toBe(0);
+  });
+
+  it("populates local Terraform resource config from change.after", async () => {
+    const details = await getTerraformResourceDetails("aws_s3_bucket.root", {
+      type: "aws_s3_bucket",
+      mode: "managed",
+      name: "root",
+      change: {
+        actions: ["create"],
+        after: {
+          bucket: "example-bucket",
+          force_destroy: false,
+        },
+      },
+    });
+
+    expect(details).toMatchObject({
+      address: "aws_s3_bucket.root",
+      type: "aws_s3_bucket",
+      name: "root",
+      mode: "managed",
+      actions: ["create"],
+      attributes: [
+        expect.objectContaining({
+          key: "bucket",
+          value: "example-bucket",
+          changed: true,
+          before: null,
+          after: "example-bucket",
+        }),
+        expect.objectContaining({
+          key: "force_destroy",
+          value: false,
+          changed: true,
+          before: null,
+          after: false,
+        }),
+      ],
+    });
+  });
+
+  it("marks computed before/after differences as changed", async () => {
+    const details = await getTerraformResourceDetails("aws_instance.web", {
+      type: "aws_instance",
+      change: {
+        actions: ["update"],
+        before: { instance_type: "t3.micro", ami: "ami-1" },
+        after: { instance_type: "t3.small", ami: "ami-1" },
+      },
+    });
+
+    expect(details?.attributes).toEqual([
+      expect.objectContaining({
+        key: "instance_type",
+        value: "t3.small",
+        changed: true,
+        before: "t3.micro",
+        after: "t3.small",
+      }),
+      expect.objectContaining({
+        key: "ami",
+        value: "ami-1",
+        changed: false,
+      }),
+    ]);
+  });
+
+  it("emits unknown-after rows using the placeholder", async () => {
+    const details = await getTerraformResourceDetails("aws_lambda_function.fn", {
+      type: "aws_lambda_function",
+      change: {
+        actions: ["create"],
+        after: { function_name: "fn" },
+        after_unknown: {
+          arn: true,
+          environment: [{ variables: { build_id: true } }],
+        },
+      },
+    });
+
+    expect(details?.attributes?.slice(0, 2)).toEqual([
+      expect.objectContaining({
+        key: "arn",
+        value: "Known after apply",
+        unknownAfter: true,
+      }),
+      expect.objectContaining({
+        key: "environment",
+        value: "Known after apply",
+        unknownAfter: true,
+      }),
+    ]);
+  });
+
+  it("omits empty config values unless changed or unknown-after", async () => {
+    const details = await getTerraformResourceDetails("aws_security_group.sg", {
+      type: "aws_security_group",
+      change: {
+        actions: ["update"],
+        before: {
+          description: "old",
+          name: "sg",
+          tags: { env: "prod" },
+        },
+        after: {
+          description: "",
+          ingress: [],
+          egress: {},
+          name: "sg",
+          tags: {},
+        },
+        after_unknown: {
+          arn: true,
+        },
+      },
+    });
+
+    expect(details?.attributes?.map((attribute: any) => attribute.key)).toEqual([
+      "arn",
+      "description",
+      "tags",
+      "name",
+    ]);
+  });
+
+  it("hides backend-parity fields for aws_iam_role_policy", async () => {
+    const details = await getTerraformResourceDetails("aws_iam_role_policy.inline", {
+      type: "aws_iam_role_policy",
+      change: {
+        actions: ["create"],
+        after: {
+          id: "hidden-id",
+          name_prefix: "hidden-prefix",
+          policy: "{}",
+          role: "app-role",
+        },
+      },
+    });
+
+    expect(details?.attributes?.map((attribute: any) => attribute.key)).toEqual([
+      "policy",
+      "role",
+    ]);
   });
 });

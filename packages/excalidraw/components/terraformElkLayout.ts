@@ -234,6 +234,196 @@ function shortResourceLabel(address: string): string {
     : withoutModules;
 }
 
+function getPrimaryResource(
+  node: TerraformPlanGraphNode | undefined,
+): Record<string, any> {
+  return (Object.values(node?.resources || {})[0] || {}) as Record<string, any>;
+}
+
+function getResourceTypeFromAddress(address: string) {
+  const withoutModules = address.replace(/^(?:module\.[^.]+\.)+/, "");
+  const parts = withoutModules.split(".");
+  return parts[0] || "";
+}
+
+function getTerraformAction(resource: Record<string, any>) {
+  const actions = resource.change?.actions;
+  return Array.isArray(actions) && actions.length > 0
+    ? actions.join("+")
+    : resource.change?.actions || "existing";
+}
+
+const UNKNOWN_VALUE_PLACEHOLDER = "Known after apply";
+
+const HIDDEN_ATTRIBUTES_BY_TYPE: Record<string, Set<string>> = {
+  aws_iam_role_policy: new Set(["id", "name_prefix"]),
+};
+
+function isPlainObject(value: unknown): value is Record<string, any> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function getCurrentResourceConfig(resource: Record<string, any>) {
+  const change = resource.change || {};
+  if (isPlainObject(change.after)) {
+    return change.after;
+  }
+  if (isPlainObject(resource.values)) {
+    return resource.values;
+  }
+  if (isPlainObject(change.before)) {
+    return change.before;
+  }
+  return {};
+}
+
+function isDisplayableConfigValue(value: unknown) {
+  return (
+    value !== null &&
+    typeof value !== "undefined" &&
+    value !== "" &&
+    !(Array.isArray(value) && value.length === 0) &&
+    !(isPlainObject(value) && Object.keys(value).length === 0)
+  );
+}
+
+function hasUnknownAfterMarker(value: unknown): boolean {
+  if (value === true) {
+    return true;
+  }
+  if (Array.isArray(value)) {
+    return value.some((entry) => hasUnknownAfterMarker(entry));
+  }
+  if (isPlainObject(value)) {
+    return Object.values(value).some((entry) => hasUnknownAfterMarker(entry));
+  }
+  return false;
+}
+
+function getUnknownTopLevelKeys(afterUnknown: unknown) {
+  if (!isPlainObject(afterUnknown)) {
+    return [];
+  }
+  return Object.entries(afterUnknown)
+    .filter(([, marker]) => hasUnknownAfterMarker(marker))
+    .map(([key]) => key);
+}
+
+function shouldHideTerraformAttribute(resourceType: string, key: string) {
+  const hidden = HIDDEN_ATTRIBUTES_BY_TYPE[resourceType];
+  return Boolean(hidden && hidden.has(key));
+}
+
+function computeLocalResourceDiff(
+  beforeRaw: unknown,
+  afterRaw: unknown,
+): Record<string, { before: unknown; after: unknown }> {
+  const before = isPlainObject(beforeRaw) ? beforeRaw : {};
+  const after = isPlainObject(afterRaw) ? afterRaw : {};
+  const diff: Record<string, { before: unknown; after: unknown }> = {};
+  const keys = new Set([...Object.keys(before), ...Object.keys(after)]);
+
+  for (const key of keys) {
+    const inBefore = Object.prototype.hasOwnProperty.call(before, key);
+    const inAfter = Object.prototype.hasOwnProperty.call(after, key);
+    const beforeValue = before[key];
+    const afterValue = after[key];
+
+    if (inBefore && !inAfter) {
+      if (beforeValue !== null) {
+        diff[key] = { before: beforeValue, after: null };
+      }
+      continue;
+    }
+
+    if (!inBefore && inAfter) {
+      if (isDisplayableConfigValue(afterValue)) {
+        diff[key] = { before: null, after: afterValue };
+      }
+      continue;
+    }
+
+    if (JSON.stringify(beforeValue) !== JSON.stringify(afterValue)) {
+      diff[key] = { before: beforeValue, after: afterValue };
+    }
+  }
+
+  return diff;
+}
+
+function getLocalResourceDiff(change: Record<string, any>) {
+  if (isPlainObject(change.diff)) {
+    return change.diff as Record<string, { before?: unknown; after?: unknown }>;
+  }
+  return computeLocalResourceDiff(change.before, change.after);
+}
+
+function buildLocalTerraformResourceDetails(
+  address: string,
+  resource: Record<string, any>,
+) {
+  const change = resource.change || {};
+  const config = getCurrentResourceConfig(resource);
+  const diff = getLocalResourceDiff(change);
+  const resourceType = resource.type || getResourceTypeFromAddress(address);
+  const unknownAfterKeys = getUnknownTopLevelKeys(change.after_unknown || {});
+  const unknownAfterSet = new Set(unknownAfterKeys);
+  const keys = new Set([
+    ...Object.keys(config),
+    ...Object.keys(diff),
+    ...unknownAfterKeys,
+  ]);
+  const attributes = [...keys]
+    .filter((key) => {
+      if (shouldHideTerraformAttribute(resourceType, key)) {
+        return false;
+      }
+      return (
+        isDisplayableConfigValue(config[key]) ||
+        Boolean(diff[key]) ||
+        unknownAfterSet.has(key)
+      );
+    })
+    .sort((a, b) => {
+      const aUnknown = unknownAfterSet.has(a) ? 0 : 1;
+      const bUnknown = unknownAfterSet.has(b) ? 0 : 1;
+      if (aUnknown !== bUnknown) {
+        return aUnknown - bUnknown;
+      }
+
+      const aChanged = diff[a] ? 0 : 1;
+      const bChanged = diff[b] ? 0 : 1;
+      return aChanged - bChanged || a.localeCompare(b);
+    })
+    .map((key) => {
+      const fieldDiff = diff[key];
+      const unknownAfter = unknownAfterSet.has(key);
+      return {
+        key,
+        value: Object.prototype.hasOwnProperty.call(config, key)
+          ? config[key]
+          : unknownAfter
+            ? UNKNOWN_VALUE_PLACEHOLDER
+            : fieldDiff?.after ?? null,
+        changed: Boolean(fieldDiff),
+        unknownAfter,
+        before: fieldDiff?.before,
+        after: fieldDiff?.after,
+      };
+    });
+
+  return [
+    {
+      address: resource.address || address,
+      type: resourceType,
+      name: resource.name || "",
+      mode: resource.mode || "",
+      actions: change.actions || [],
+      attributes,
+    },
+  ];
+}
+
 type LayoutBox = { x: number; y: number; width: number; height: number };
 
 /** Collects absolute layout for resource leaves and `__tf_m__:*` module compounds. */
@@ -617,6 +807,9 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
     if (!box) {
       continue;
     }
+    const resource = getPrimaryResource(nodes[id]);
+    const resourceType = resource.type || getResourceTypeFromAddress(id);
+    const action = getTerraformAction(resource);
     skeleton.push({
       type: "rectangle",
       id,
@@ -629,6 +822,17 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
       backgroundColor: "#f8fafc",
       roundness: { type: 3, value: 10 },
       label: { text: shortResourceLabel(id), fontSize: 12 },
+      customData: {
+        terraform: true,
+        terraformVisibilityRole: "resource",
+        terraformVisibilityKey: id,
+        terraformNodeKind: "resource",
+        terraformInitiallyVisible: true,
+        resourceType,
+        nodePath: id,
+        action,
+        terraformResources: buildLocalTerraformResourceDetails(id, resource),
+      },
     });
   }
 
@@ -646,6 +850,18 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
       strokeColor: "#94a3b8",
       start: { id: source },
       end: { id: target },
+      customData: {
+        terraform: true,
+        terraformEdgeLayer: "dependency",
+        relationship: {
+          source,
+          target,
+          type: "dependency",
+          label: null,
+          origin: "terraform_local_parse",
+          detail: null,
+        },
+      },
     });
     arrowIndex += 1;
   }
