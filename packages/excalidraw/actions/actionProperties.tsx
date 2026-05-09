@@ -23,6 +23,7 @@ import {
   reduceToCommonValue,
   invariant,
   FONT_SIZES,
+  matchKey,
 } from "@excalidraw/common";
 
 import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
@@ -111,6 +112,9 @@ import {
   FontSizeMediumIcon,
   FontSizeLargeIcon,
   FontSizeExtraLargeIcon,
+  FontWeightBoldIcon,
+  FontStyleItalicIcon,
+  TextDecorationUnderlineIcon,
   EdgeSharpIcon,
   EdgeRoundIcon,
   TextAlignLeftIcon,
@@ -306,6 +310,106 @@ const changeFontSize = (
         newFontSizes.size === 1
           ? [...newFontSizes][0]
           : fallbackValue ?? appState.currentItemFontSize,
+    },
+    captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+  };
+};
+
+type TextStyleProperty = "fontWeight" | "fontStyle" | "textDecoration";
+type CurrentTextStyleAppStateKey =
+  | "currentItemFontWeight"
+  | "currentItemFontStyle"
+  | "currentItemTextDecoration";
+
+const getTextStyleFormValue = <
+  T extends ExcalidrawTextElement[TextStyleProperty],
+>(
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  app: AppClassProperties,
+  property: TextStyleProperty,
+  defaultValue: T,
+) => {
+  const elementsMap = app.scene.getNonDeletedElementsMap();
+
+  return getFormValue(
+    elements,
+    app,
+    (element) => {
+      if (isTextElement(element)) {
+        return element[property] as T;
+      }
+      const boundTextElement = getBoundTextElement(element, elementsMap);
+      return boundTextElement ? (boundTextElement[property] as T) : null;
+    },
+    (element) =>
+      isTextElement(element) ||
+      getBoundTextElement(element, elementsMap) !== null,
+    (hasSelection) => (hasSelection ? null : defaultValue),
+  );
+};
+
+const changeTextStyleProperty = <
+  T extends ExcalidrawTextElement[TextStyleProperty],
+>(
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  app: AppClassProperties,
+  property: TextStyleProperty,
+  appStateProperty: CurrentTextStyleAppStateKey,
+  value: T,
+) => {
+  const changedValues = new Set<T>();
+  const shouldRemeasure = property !== "textDecoration";
+
+  const updatedElements = changeProperty(
+    elements,
+    appState,
+    (oldElement) => {
+      if (isTextElement(oldElement)) {
+        changedValues.add(value);
+
+        let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
+          [property]: value,
+        } as Partial<ExcalidrawTextElement>);
+
+        if (shouldRemeasure) {
+          redrawTextBoundingBox(
+            newElement,
+            app.scene.getContainerElement(oldElement),
+            app.scene,
+          );
+
+          newElement = offsetElementAfterFontResize(
+            oldElement,
+            newElement,
+            app.scene,
+          );
+        }
+
+        return newElement;
+      }
+      return oldElement;
+    },
+    true,
+  );
+
+  if (shouldRemeasure) {
+    getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+    }).forEach((element) => {
+      if (isTextElement(element)) {
+        updateBoundElements(element, app.scene);
+      }
+    });
+  }
+
+  return {
+    elements: updatedElements,
+    appState: {
+      ...appState,
+      [appStateProperty]:
+        changedValues.size === 1 ? [...changedValues][0] : value,
     },
     captureUpdate: CaptureUpdateAction.IMMEDIATELY,
   };
@@ -889,6 +993,216 @@ export const actionIncreaseFontSize = register({
       event.shiftKey &&
       // KEYS.PERIOD needed for MacOS
       (event.key === KEYS.CHEVRON_RIGHT || event.key === KEYS.PERIOD)
+    );
+  },
+});
+
+export const actionChangeFontWeight = register<
+  ExcalidrawTextElement["fontWeight"]
+>({
+  name: "changeFontWeight",
+  label: "labels.bold",
+  icon: FontWeightBoldIcon,
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    const nextValue =
+      value ??
+      (getTextStyleFormValue(
+        elements,
+        appState,
+        app,
+        "fontWeight",
+        appState.currentItemFontWeight,
+      ) === "bold"
+        ? "normal"
+        : "bold");
+
+    return changeTextStyleProperty(
+      elements,
+      appState,
+      app,
+      "fontWeight",
+      "currentItemFontWeight",
+      nextValue,
+    );
+  },
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    !event.shiftKey &&
+    !event.altKey &&
+    matchKey(event, KEYS.B),
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+    const { isCompact } = getStylesPanelInfo(app);
+    const value = getTextStyleFormValue(
+      elements,
+      appState,
+      app,
+      "fontWeight",
+      appState.currentItemFontWeight,
+    );
+
+    return (
+      <RadioSelection<ExcalidrawTextElement["fontWeight"]>
+        type="button"
+        options={[
+          {
+            value: "bold",
+            text: t("labels.bold"),
+            icon: FontWeightBoldIcon,
+            testId: "font-weight-bold",
+            active: value === "bold",
+          },
+        ]}
+        value={value}
+        onClick={() =>
+          withCaretPositionPreservation(
+            () => updateData(value === "bold" ? "normal" : "bold"),
+            isCompact,
+            !!appState.editingTextElement,
+            data?.onPreventClose,
+          )
+        }
+      />
+    );
+  },
+});
+
+export const actionChangeFontStyle = register<
+  ExcalidrawTextElement["fontStyle"]
+>({
+  name: "changeFontStyle",
+  label: "labels.italic",
+  icon: FontStyleItalicIcon,
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    const nextValue =
+      value ??
+      (getTextStyleFormValue(
+        elements,
+        appState,
+        app,
+        "fontStyle",
+        appState.currentItemFontStyle,
+      ) === "italic"
+        ? "normal"
+        : "italic");
+
+    return changeTextStyleProperty(
+      elements,
+      appState,
+      app,
+      "fontStyle",
+      "currentItemFontStyle",
+      nextValue,
+    );
+  },
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    !event.shiftKey &&
+    !event.altKey &&
+    matchKey(event, KEYS.I),
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+    const { isCompact } = getStylesPanelInfo(app);
+    const value = getTextStyleFormValue(
+      elements,
+      appState,
+      app,
+      "fontStyle",
+      appState.currentItemFontStyle,
+    );
+
+    return (
+      <RadioSelection<ExcalidrawTextElement["fontStyle"]>
+        type="button"
+        options={[
+          {
+            value: "italic",
+            text: t("labels.italic"),
+            icon: FontStyleItalicIcon,
+            testId: "font-style-italic",
+            active: value === "italic",
+          },
+        ]}
+        value={value}
+        onClick={() =>
+          withCaretPositionPreservation(
+            () => updateData(value === "italic" ? "normal" : "italic"),
+            isCompact,
+            !!appState.editingTextElement,
+            data?.onPreventClose,
+          )
+        }
+      />
+    );
+  },
+});
+
+export const actionChangeTextDecoration = register<
+  ExcalidrawTextElement["textDecoration"]
+>({
+  name: "changeTextDecoration",
+  label: "labels.underline",
+  icon: TextDecorationUnderlineIcon,
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    const nextValue =
+      value ??
+      (getTextStyleFormValue(
+        elements,
+        appState,
+        app,
+        "textDecoration",
+        appState.currentItemTextDecoration,
+      ) === "underline"
+        ? "none"
+        : "underline");
+
+    return changeTextStyleProperty(
+      elements,
+      appState,
+      app,
+      "textDecoration",
+      "currentItemTextDecoration",
+      nextValue,
+    );
+  },
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    !event.shiftKey &&
+    !event.altKey &&
+    matchKey(event, KEYS.U),
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+    const { isCompact } = getStylesPanelInfo(app);
+    const value = getTextStyleFormValue(
+      elements,
+      appState,
+      app,
+      "textDecoration",
+      appState.currentItemTextDecoration,
+    );
+
+    return (
+      <RadioSelection<ExcalidrawTextElement["textDecoration"]>
+        type="button"
+        options={[
+          {
+            value: "underline",
+            text: t("labels.underline"),
+            icon: TextDecorationUnderlineIcon,
+            testId: "text-decoration-underline",
+            active: value === "underline",
+          },
+        ]}
+        value={value}
+        onClick={() =>
+          withCaretPositionPreservation(
+            () => updateData(value === "underline" ? "none" : "underline"),
+            isCompact,
+            !!appState.editingTextElement,
+            data?.onPreventClose,
+          )
+        }
+      />
     );
   },
 });
