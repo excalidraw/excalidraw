@@ -283,6 +283,31 @@ function fixedPointForAbsolutePoint(pos, point) {
   ];
 }
 
+/** Same hexes as `packages/excalidraw/components/terraformElkLayout.ts` dependency strokes. */
+const TERRAFORM_DEPENDENCY_EDGE_NEW_ONLY = "#2b8a3e";
+const TERRAFORM_DEPENDENCY_EDGE_EXISTING_ONLY = "#1971c2";
+const TERRAFORM_DEPENDENCY_EDGE_BOTH = "#fab005";
+
+/**
+ * Line stroke for merged dependency `kinds` from `collectDirectedEdges` /
+ * `coalesceRelationshipPairs` (`planned_dependency` = DOT/plan, `existing_dependency` = prior state).
+ */
+function strokeColorForTerraformDependencyKinds(kinds) {
+  const set = new Set(kinds || []);
+  const hasNew = set.has("planned_dependency");
+  const hasExisting = set.has("existing_dependency");
+  if (hasNew && hasExisting) {
+    return TERRAFORM_DEPENDENCY_EDGE_BOTH;
+  }
+  if (hasExisting) {
+    return TERRAFORM_DEPENDENCY_EDGE_EXISTING_ONLY;
+  }
+  if (hasNew) {
+    return TERRAFORM_DEPENDENCY_EDGE_NEW_ONLY;
+  }
+  return "#1e1e1e";
+}
+
 module.exports = {
   clamp,
   getEdgePointTowardTarget,
@@ -293,4 +318,5 @@ module.exports = {
   buildTerraformExplodeParentMap,
   offsetLineSegment,
   fixedPointForAbsolutePoint,
+  strokeColorForTerraformDependencyKinds,
 };

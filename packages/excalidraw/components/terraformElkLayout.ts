@@ -9,9 +9,9 @@
  *    leaf rectangles inside the owning module compound. Child modules nest recursively so ELK’s
  *    `INCLUDE_CHILDREN` layered algorithm matches module containment.
  *
- * 2. **Edges** — Use `edges_new` (DOT-derived) as directed edges. Endpoints are resolved the same
- *    way as `resolveCanonicalNodePath` (exact address, then index-stripped key). Unknown
- *    endpoints are skipped. Antiparallel duplicates are collapsed to one edge.
+ * 2. **Edges** — Merge `edges_new` (DOT-derived) and `edges_existing` (prior-state `depends_on`)
+ *    into one directed edge set per `source|||target`. Endpoints resolve like `resolveCanonicalNodePath`
+ *    (exact address, then index-stripped key). Stroke color: new-only green, prior-only blue, both yellow.
  *
  * 3. **ELK options** — Align with `packages/backend/excalidraw-layout.js`: layered, RIGHT,
  *    `INCLUDE_CHILDREN`, generous spacing, separate components.
@@ -163,35 +163,97 @@ function collectGraphVertexIds(nodes: TerraformPlanNodesMap): Set<string> {
   return out;
 }
 
+/** DOT / plan-only dependency (`edges_new`). Matches backend resource “create” stroke. */
+const TERRAFORM_DEPENDENCY_EDGE_NEW_ONLY = "#2b8a3e";
+/** Prior-state-only dependency (`edges_existing`). Matches backend “no-op” resource stroke. */
+const TERRAFORM_DEPENDENCY_EDGE_EXISTING_ONLY = "#1971c2";
+/** Edge appears in both buckets for the same directed pair. */
+const TERRAFORM_DEPENDENCY_EDGE_BOTH = "#fab005";
+
+/**
+ * Stroke for Terraform dependency lines (browser ELK and backend use the same hexes).
+ * `hasNew` = from `edges_new`; `hasExisting` = from `edges_existing` / prior `depends_on`.
+ */
+export function strokeColorForTerraformDependencyEdge(options: {
+  hasNew: boolean;
+  hasExisting: boolean;
+}): string {
+  const { hasNew, hasExisting } = options;
+  if (hasNew && hasExisting) {
+    return TERRAFORM_DEPENDENCY_EDGE_BOTH;
+  }
+  if (hasExisting) {
+    return TERRAFORM_DEPENDENCY_EDGE_EXISTING_ONLY;
+  }
+  if (hasNew) {
+    return TERRAFORM_DEPENDENCY_EDGE_NEW_ONLY;
+  }
+  return "#94a3b8";
+}
+
+export type TerraformDirectedLayoutEdge = {
+  source: string;
+  target: string;
+  hasNew: boolean;
+  hasExisting: boolean;
+};
+
+/**
+ * De-duplicates `edges_new` and `edges_existing` into directed pairs with origin flags
+ * (same semantics as `packages/backend/excalidraw-arrows.js` `collectDirectedEdges`).
+ */
 function collectDirectedEdges(
   nodes: TerraformPlanNodesMap,
   vertexSet: Set<string>,
-): { source: string; target: string }[] {
-  const edges: { source: string; target: string }[] = [];
-  const seen = new Set<string>();
+): TerraformDirectedLayoutEdge[] {
+  const edgeMap = new Map<string, TerraformDirectedLayoutEdge>();
+
+  const addHalfEdge = (
+    sourceRaw: string,
+    targetRaw: string,
+    fromNew: boolean,
+  ) => {
+    const source = resolveVertexId(nodes, sourceRaw);
+    const target = resolveVertexId(nodes, targetRaw);
+    if (!source || !target || source === target) {
+      return;
+    }
+    if (!vertexSet.has(source) || !vertexSet.has(target)) {
+      return;
+    }
+    const key = `${source}|||${target}`;
+    const existing = edgeMap.get(key);
+    if (existing) {
+      if (fromNew) {
+        existing.hasNew = true;
+      } else {
+        existing.hasExisting = true;
+      }
+      return;
+    }
+    edgeMap.set(key, {
+      source,
+      target,
+      hasNew: fromNew,
+      hasExisting: !fromNew,
+    });
+  };
 
   for (const sourceRaw of vertexSet) {
     const node = nodes[sourceRaw] as TerraformPlanGraphNode | undefined;
-    const outs = node?.edges_new || [];
-    for (const targetRaw of outs) {
-      const source = resolveVertexId(nodes, sourceRaw);
-      const target = resolveVertexId(nodes, targetRaw);
-      if (!source || !target || source === target) {
-        continue;
-      }
-      if (!vertexSet.has(source) || !vertexSet.has(target)) {
-        continue;
-      }
-      const key = `${source}|||${target}`;
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      edges.push({ source, target });
+    for (const targetRaw of node?.edges_new || []) {
+      addHalfEdge(sourceRaw, targetRaw, true);
+    }
+    for (const targetRaw of node?.edges_existing || []) {
+      addHalfEdge(sourceRaw, targetRaw, false);
     }
   }
 
-  return edges;
+  return [...edgeMap.values()].sort((a, b) =>
+    a.source === b.source
+      ? a.target.localeCompare(b.target)
+      : a.source.localeCompare(b.source),
+  );
 }
 
 function buildModuleCompound(
@@ -929,7 +991,7 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
   }
 
   let edgeIndex = 0;
-  for (const { source, target } of directedEdges) {
+  for (const { source, target, hasNew, hasExisting } of directedEdges) {
     const sourceBox = layoutBoxes[source];
     const targetBox = layoutBoxes[target];
     if (!sourceBox || !targetBox) {
@@ -943,6 +1005,10 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
     const startY = startPoint.y;
     const endX = endPoint.x;
     const endY = endPoint.y;
+    const dependencyStrokeColor = strokeColorForTerraformDependencyEdge({
+      hasNew,
+      hasExisting,
+    });
     edgeSkeletons.push({
       type: "line",
       id: `tf-edge-${edgeIndex}`,
@@ -955,7 +1021,7 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
         pointFrom<LocalPoint>(endX - startX, endY - startY),
       ],
       strokeWidth: 1.5,
-      strokeColor: "#94a3b8",
+      strokeColor: dependencyStrokeColor,
       startArrowhead: null,
       endArrowhead: null,
       startBinding: {

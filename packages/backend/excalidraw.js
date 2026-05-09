@@ -86,6 +86,7 @@ const {
   getCenterClippedBindingPoints,
   offsetLineSegment,
   fixedPointForAbsolutePoint,
+  strokeColorForTerraformDependencyKinds,
 } = require("./excalidraw-arrows");
 
 /**
@@ -1291,6 +1292,9 @@ async function nodesToExcalidraw(nodes, options = {}) {
     const endX = endPoint.x;
     const endY = endPoint.y;
 
+    const dependencyStrokeColor =
+      strokeColorForTerraformDependencyKinds(kinds);
+
     edgeElements.push(
       makeBaseElement({
         type: "line",
@@ -1304,6 +1308,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
           [endX - startX, endY - startY],
         ],
         polygon: false,
+        strokeColor: dependencyStrokeColor,
         startBinding: {
           elementId: posA.rectId,
           fixedPoint: startFixed,
