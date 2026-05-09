@@ -12,6 +12,13 @@ import { API } from "../tests/helpers/api";
 import { UI } from "../tests/helpers/ui";
 import { render } from "../tests/test-utils";
 
+import {
+  actionChangeFontStyle,
+  actionChangeFontWeight,
+  actionChangeTextDecoration,
+} from "./actionProperties";
+import { actionCopyStyles, actionPasteStyles } from "./actionStyles";
+
 describe("element locking", () => {
   beforeEach(async () => {
     await render(<Excalidraw />);
@@ -168,6 +175,82 @@ describe("element locking", () => {
       expect(queryByTestId(document.body, `font-family-code`)).toHaveClass(
         "active",
       );
+    });
+
+    it("should toggle whole-text bold, italic, and underline", () => {
+      const text = API.createElement({
+        type: "text",
+        text: "styled text",
+      });
+
+      API.setElements([text]);
+      API.setSelectedElements([text]);
+
+      API.executeAction(actionChangeFontWeight);
+      API.executeAction(actionChangeFontStyle);
+      API.executeAction(actionChangeTextDecoration);
+
+      const updatedText = window.h.elements[0];
+      expect(updatedText).toMatchObject({
+        fontWeight: "bold",
+        fontStyle: "italic",
+        textDecoration: "underline",
+      });
+      expect(Number.isFinite(updatedText.width)).toBe(true);
+      expect(Number.isFinite(updatedText.height)).toBe(true);
+      expect(window.h.state.currentItemFontWeight).toBe("bold");
+      expect(window.h.state.currentItemFontStyle).toBe("italic");
+      expect(window.h.state.currentItemTextDecoration).toBe("underline");
+    });
+
+    it("should update bound text styles through selected container", () => {
+      const [rectangle, text] = API.createTextContainer();
+
+      API.setElements([rectangle, text]);
+      API.setSelectedElements([rectangle]);
+
+      API.executeAction(actionChangeFontWeight);
+      API.executeAction(actionChangeFontStyle);
+      API.executeAction(actionChangeTextDecoration);
+
+      const updatedText = window.h.elements.find(
+        (element) => element.id === text.id,
+      );
+      expect(updatedText).toMatchObject({
+        fontWeight: "bold",
+        fontStyle: "italic",
+        textDecoration: "underline",
+      });
+    });
+
+    it("should copy and paste whole-text styles", () => {
+      const source = API.createElement({
+        type: "text",
+        text: "source",
+        fontWeight: "bold",
+        fontStyle: "italic",
+        textDecoration: "underline",
+      });
+      const target = API.createElement({
+        type: "text",
+        text: "target",
+      });
+
+      API.setElements([source, target]);
+      API.setSelectedElements([source]);
+      API.executeAction(actionCopyStyles);
+
+      API.setSelectedElements([target]);
+      API.executeAction(actionPasteStyles);
+
+      const updatedTarget = window.h.elements.find(
+        (element) => element.id === target.id,
+      );
+      expect(updatedTarget).toMatchObject({
+        fontWeight: "bold",
+        fontStyle: "italic",
+        textDecoration: "underline",
+      });
     });
   });
 });

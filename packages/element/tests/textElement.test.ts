@@ -1,7 +1,12 @@
 import { getLineHeight } from "@excalidraw/common";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "@excalidraw/common";
+import {
+  FONT_FAMILY,
+  TEXT_ALIGN,
+  VERTICAL_ALIGN,
+  getFontString,
+} from "@excalidraw/common";
 
 import {
   computeContainerDimensionForBoundText,
@@ -10,7 +15,11 @@ import {
   getBoundTextMaxHeight,
   computeBoundTextPosition,
 } from "../src/textElement";
-import { detectLineHeight, getLineHeightInPx } from "../src/textMeasurements";
+import {
+  detectLineHeight,
+  getLineHeightInPx,
+  measureText,
+} from "../src/textMeasurements";
 
 import type { ExcalidrawTextElementWithContainer } from "../src/types";
 
@@ -190,6 +199,24 @@ describe("Test getLineHeightInPx", () => {
     expect(
       getLineHeightInPx(textElement.fontSize, textElement.lineHeight),
     ).toBe(25);
+  });
+});
+
+describe("Test measureText", () => {
+  it("should keep finite dimensions for bold and italic font strings", () => {
+    const metrics = measureText(
+      "styled text",
+      getFontString({
+        fontSize: 20,
+        fontFamily: FONT_FAMILY.Excalifont,
+        fontWeight: "bold",
+        fontStyle: "italic",
+      }),
+      textElement.lineHeight,
+    );
+
+    expect(Number.isFinite(metrics.width)).toBe(true);
+    expect(Number.isFinite(metrics.height)).toBe(true);
   });
 });
 
