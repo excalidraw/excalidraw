@@ -235,6 +235,7 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
       for (let index = 0; index < queue.length; index++) {
         const current = queue[index];
         const graphKey = stripIndexes(current);
+        //due to being a raw parse there is a chance that that entry has no outgoign edges
         const neighbors = adjacency[graphKey] || [];
   
         for (const neighbor of neighbors) {
