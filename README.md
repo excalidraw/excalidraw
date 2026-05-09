@@ -97,10 +97,32 @@ You can also upload your `terraform.tfstate` file to enrich the diagram with rea
 
 ## Development
 
+### Tests
+
+Vitest runs from the **repository root** (`vitest.config.mts`, `jsdom`).
+
+```bash
+yarn test                         # watch mode (default)
+yarn test --watch=false           # single run (CI-style)
+yarn test:update                  # all Vitest tests + snapshot updates, no watch
+```
+
+Run a **subset** of tests by passing a filename fragment Vitest treats as a filter:
+
+```bash
+yarn test terraformPlanParsing.test --watch=false
+```
+
+That executes the **local Terraform plan parser** pipeline test ([`packages/excalidraw/components/terraformPlanParsing.test.ts`](./packages/excalidraw/components/terraformPlanParsing.test.ts)): it loads [`packages/backend/terraform/allplanmodules.json`](./packages/backend/terraform/allplanmodules.json) and [`packages/backend/terraform/allplanmodules.dot`](./packages/backend/terraform/allplanmodules.dot), runs `terraformPlanParsing`, and asserts the HTTP-style response and empty Excalidraw scene shape.
+
+Additional suites:
+
+- **Backend:** `yarn test:backend`
+- **tldraw-app** (includes an allplanmodules-related smoke): `yarn test:tldraw`
+
+### Other commands
+
 - **Type checking:** `yarn test:typecheck`
-- **Tests:** `yarn test:update`
-- **Backend tests:** `yarn test:backend`
-- **tldraw-app tests** (incl. allplanmodules pipeline smoke): `yarn test:tldraw`
 - **Lint / format:** `yarn fix`
 - **Build packages:** `yarn build:packages`
 - **Build app:** `yarn build:app`

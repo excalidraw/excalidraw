@@ -28,6 +28,19 @@ type TerraformPlanGraphNode = {
   edges_data_flow?: string[];
 };
 
+/** Subset of `terraform show -json` prior_state.values.root_module shape used by `buildExistingEdges`. */
+type TerraformPriorStateModule = {
+  resources?: TerraformPriorStateResource[];
+  child_modules?: TerraformPriorStateModule[];
+};
+
+type TerraformPriorStateResource = {
+  address?: string;
+  mode?: string;
+  type?: string;
+  depends_on?: string[];
+};
+
 /**
  * Browser-only: logs in dev when local parse runs (`import.meta.env.DEV`).
  * Look in the **browser** DevTools → **Console** (not the terminal where `yarn start` runs).
@@ -75,13 +88,14 @@ export const terraformPlanParsing = async (
     nodes
   });
 
+  /*
   const nodes1 = addModuleNodes(nodes);
   emitLocalParseDebug({
     phase: "terraformModuleNodes",
     nodes1
-  });
+  });*/
 
-  const nodes2 = ensureEdgeLists(nodes1);
+  const nodes2 = ensureEdgeLists(nodes);
   emitLocalParseDebug({
     phase: "ensureEdgeLists",
     nodes2
@@ -91,6 +105,12 @@ export const terraformPlanParsing = async (
   emitLocalParseDebug({
     phase: "buildNewEdges",
     nodes3
+  });
+
+  const nodes4 = buildExistingEdges(nodes3, plan);
+  emitLocalParseDebug({
+    phase: "buildExistingEdges",
+    nodes4
   });
 
   //i have a plan that is searchable by address along with nodes for models
@@ -205,18 +225,17 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
   }
 
   function buildNewEdges(nodes: Record<string, TerraformPlanGraphNode>, adjacency: Record<string, string[]>) {
-    const moduleBoundarySet = collectAllTerraformModulePaths(Object.keys(nodes));
   
+    //iterate over every node
     for (const nodePath of Object.keys(nodes)) {
       const visited = new Set<string>([nodePath]);
       const queue = [nodePath];
-      const connectedNodes = new Set<string>();
+      const connectedNodes: string[] = [];
   
       for (let index = 0; index < queue.length; index++) {
         const current = queue[index];
         const graphKey = stripIndexes(current);
-        const neighbors =
-          adjacency[graphKey] || adjacency[current] || [];
+        const neighbors = adjacency[graphKey] || [];
   
         for (const neighbor of neighbors) {
           if (visited.has(neighbor)) {
@@ -228,18 +247,8 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
             continue;
           }
   
-          // Terraform graph uses intermediate module vertex names matching module paths.
-          // Never traverse through them: attach at most one edge to the synthetic module
-          // node so BFS does not pull in every resource under the module.
-          if (moduleBoundarySet.has(neighbor)) {
-            if (nodes[neighbor]) {
-              connectedNodes.add(neighbor);
-            }
-            continue;
-          }
-  
           if (nodes[neighbor]) {
-            connectedNodes.add(neighbor);
+            connectedNodes.push(neighbor);
             continue;
           }
   
@@ -247,11 +256,7 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
         }
       }
   
-      nodes[nodePath].edges_new = [...connectedNodes];
-    }
-  
-    for (const node of Object.values(nodes)) {
-      node.edges_new = [...new Set<string>(node.edges_new ?? [])];
+      nodes[nodePath].edges_new = connectedNodes;
     }
   
     return nodes;
@@ -266,4 +271,103 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
       node.edges_data_flow ||= [];
     }
     return nodes;
+  }
+
+  function buildExistingEdges(nodes: Record<string, TerraformPlanGraphNode>, plan: { prior_state: { values: { root_module: unknown } } }) {
+    const rootModule = plan?.prior_state?.values?.root_module;
+    if (!rootModule) {
+      return nodes;
+    }
+  
+    const existingEdges: Record<string, Set<string>> = {};
+    const addEdge = (from: string, to: string) => {
+      if (!existingEdges[from]) {
+        existingEdges[from] = new Set();
+      }
+      existingEdges[from].add(to);
+    };
+  
+    const stack: TerraformPriorStateModule[] = [rootModule as TerraformPriorStateModule];
+    while (stack.length) {
+      const currentModule = stack.pop();
+      if (currentModule == null) {
+        continue;
+      }
+
+      for (const resource of currentModule.resources || []) {
+        const address = resource.address;
+        if (!address) {
+          continue;
+        }
+
+        nodes[address] ||= { resources: {} };
+
+        if (!nodes[address].resources[address]) {
+          nodes[address].resources[address] = {
+            ...resource,
+            change: { actions: ["existing"] },
+          };
+        }
+
+        for (const dependency of resource.depends_on || []) {
+          if (!dependency) {
+            continue;
+          }
+          addEdge(address, dependency);
+        }
+      }
+  
+      for (const childModule of currentModule.child_modules || []) {
+        stack.push(childModule);
+      }
+    }
+  
+    for (const [rawSource, targets] of Object.entries(existingEdges)) {
+      const source = resolveCanonicalNodePath(nodes, rawSource);
+      if (!source) {
+        continue;
+      }
+      nodes[source].edges_existing ||= [];
+  
+      for (const rawTarget of targets) {
+        const target = resolveCanonicalNodePath(nodes, rawTarget);
+        if (!target) {
+          continue;
+        }
+        if (!nodes[source].edges_existing.includes(target)) {
+          nodes[source].edges_existing.push(target);
+        }
+      }
+    }
+  
+    return nodes;
+  }
+
+  function resolveCanonicalNodePath(nodes: Record<string, TerraformPlanGraphNode>, address: string) {
+    if (!address || typeof address !== "string") {
+      return null;
+    }
+    if (nodes[address]) {
+      return address;
+    }
+    const graphId = stripIndexes(address);
+    if (nodes[graphId]) {
+      return graphId;
+    }
+    const matches = [];
+    for (const k of Object.keys(nodes)) {
+      if (k.startsWith("__")) {
+        continue;
+      }
+      if (stripIndexes(k) === graphId) {
+        matches.push(k);
+      }
+    }
+    if (matches.length === 1) {
+      return matches[0];
+    }
+    if (matches.length > 1 && matches.includes(address)) {
+      return address;
+    }
+    return null;
   }
