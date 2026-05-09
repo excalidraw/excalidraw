@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
-import { terraformPlanParsing } from "./terraformPlanParsing";
+import { buildTerraformModuleTree, terraformPlanParsing } from "./terraformPlanParsing";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -18,6 +18,59 @@ function textFileLike(contents: string): File {
     text: async () => contents,
   } as File;
 }
+
+describe("buildTerraformModuleTree", () => {
+  it("places root resources under path root and nests module resources", () => {
+    const nodes = {
+      "aws_s3_bucket.root": {
+        resources: {
+          "aws_s3_bucket.root": { address: "aws_s3_bucket.root" },
+        },
+      },
+      "module.network.aws_vpc.main": {
+        resources: {
+          "module.network.aws_vpc.main": { address: "module.network.aws_vpc.main" },
+        },
+      },
+      "module.network.module.sub.aws_subnet.a": {
+        resources: {
+          "module.network.module.sub.aws_subnet.a": {
+            address: "module.network.module.sub.aws_subnet.a",
+          },
+        },
+      },
+    };
+
+    const tree = buildTerraformModuleTree(nodes);
+
+    expect(tree.path).toBe("root");
+    expect(tree.resourceAddresses).toEqual(["aws_s3_bucket.root"]);
+    expect(Object.keys(tree.modules)).toEqual(["module.network"]);
+
+    const net = tree.modules["module.network"];
+    expect(net.resourceAddresses).toEqual(["module.network.aws_vpc.main"]);
+    expect(Object.keys(net.modules)).toEqual(["module.network.module.sub"]);
+
+    const sub = net.modules["module.network.module.sub"];
+    expect(sub.resourceAddresses).toEqual(["module.network.module.sub.aws_subnet.a"]);
+    expect(sub.modules).toEqual({});
+  });
+
+  it("ignores reserved __ keys on the nodes map", () => {
+    const nodes = {
+      "aws_instance.a": {
+        resources: { "aws_instance.a": { address: "aws_instance.a" } },
+      },
+    };
+    const map = { ...nodes } as Record<string, (typeof nodes)["aws_instance.a"]> & {
+      __other__?: unknown;
+    };
+    map.__other__ = { misc: true };
+
+    const tree = buildTerraformModuleTree(map as Parameters<typeof buildTerraformModuleTree>[0]);
+    expect(tree.resourceAddresses).toEqual(["aws_instance.a"]);
+  });
+});
 
 describe("terraformPlanParsing", () => {
   beforeAll(() => {
