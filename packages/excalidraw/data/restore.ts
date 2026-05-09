@@ -395,6 +395,9 @@ export const restoreElement = (
       element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,
+        fontWeight: element.fontWeight || "normal",
+        fontStyle: element.fontStyle || "normal",
+        textDecoration: element.textDecoration || "none",
         text,
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,

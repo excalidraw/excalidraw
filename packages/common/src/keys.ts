@@ -17,9 +17,12 @@ export const CODES = {
   QUOTE: "Quote",
   ZERO: "Digit0",
   SLASH: "Slash",
+  B: "KeyB",
   C: "KeyC",
   D: "KeyD",
   H: "KeyH",
+  I: "KeyI",
+  U: "KeyU",
   V: "KeyV",
   Z: "KeyZ",
   Y: "KeyY",
@@ -51,6 +54,7 @@ export const KEYS = {
   SLASH: "/",
 
   A: "a",
+  B: "b",
   C: "c",
   D: "d",
   E: "e",
@@ -65,6 +69,7 @@ export const KEYS = {
   R: "r",
   S: "s",
   T: "t",
+  U: "u",
   V: "v",
   X: "x",
   Y: "y",
@@ -88,6 +93,9 @@ export type Key = keyof typeof KEYS;
 
 // defines key code mapping for matching codes as fallback to respective keys on non-latin keyboard layouts
 export const KeyCodeMap = new Map<ValueOf<typeof KEYS>, ValueOf<typeof CODES>>([
+  [KEYS.B, CODES.B],
+  [KEYS.I, CODES.I],
+  [KEYS.U, CODES.U],
   [KEYS.Z, CODES.Z],
   [KEYS.Y, CODES.Y],
 ]);

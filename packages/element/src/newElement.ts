@@ -242,6 +242,9 @@ export const newTextElement = (
     originalText?: string;
     fontSize?: number;
     fontFamily?: FontFamilyValues;
+    fontWeight?: ExcalidrawTextElement["fontWeight"];
+    fontStyle?: ExcalidrawTextElement["fontStyle"];
+    textDecoration?: ExcalidrawTextElement["textDecoration"];
     textAlign?: TextAlign;
     verticalAlign?: VerticalAlign;
     containerId?: ExcalidrawTextContainer["id"] | null;
@@ -251,11 +254,14 @@ export const newTextElement = (
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
   const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
+  const fontWeight = opts.fontWeight || "normal";
+  const fontStyle = opts.fontStyle || "normal";
+  const textDecoration = opts.textDecoration || "none";
   const lineHeight = opts.lineHeight || getLineHeight(fontFamily);
   const text = normalizeText(opts.text);
   const metrics = measureText(
     text,
-    getFontString({ fontFamily, fontSize }),
+    getFontString({ fontFamily, fontSize, fontWeight, fontStyle }),
     lineHeight,
   );
   const textAlign = opts.textAlign || DEFAULT_TEXT_ALIGN;
@@ -270,6 +276,9 @@ export const newTextElement = (
     text,
     fontSize,
     fontFamily,
+    fontWeight,
+    fontStyle,
+    textDecoration,
     textAlign,
     verticalAlign,
     x: opts.x - offsets.x,
