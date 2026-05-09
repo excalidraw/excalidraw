@@ -2202,6 +2202,7 @@ class App extends React.Component<AppProps, AppState> {
                             }
                             UIOptions={this.props.UIOptions}
                             onExportImage={this.onExportImage}
+                            canvasLimit={this.props.canvasLimit}
                             renderWelcomeScreen={
                               !this.state.isLoading &&
                               this.state.showWelcomeScreen &&
@@ -4432,6 +4433,13 @@ class App extends React.Component<AppProps, AppState> {
       scrollY = scroll.scrollY;
     }
 
+    const clamped = this.getClampedScroll(scrollX, scrollY, zoom.value, this.state.width, Math.max(this.state.height, 1));
+    scrollX = clamped.scrollX;
+    scrollY = clamped.scrollY;
+    if (clamped.zoom) {
+      zoom = clamped.zoom;
+    }
+
     // when animating, we use RequestAnimationFrame to prevent the animation
     // from slowing down other processes
     if (opts?.animate) {
@@ -4478,7 +4486,7 @@ class App extends React.Component<AppProps, AppState> {
         this.cancelInProgressAnimation = null;
       };
     } else {
-      this.setState({ scrollX, scrollY, zoom });
+      this.translateCanvas({ scrollX, scrollY, zoom });
     }
   };
 
@@ -4488,13 +4496,80 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private getClampedScroll = (
+    scrollX: number,
+    scrollY: number,
+    zoomValue: number,
+    width: number,
+    height: number
+  ) => {
+    let newScrollX = scrollX;
+    let newScrollY = scrollY;
+    let newZoom = zoomValue;
+    const canvasLimit = this.props.canvasLimit;
+
+    if (canvasLimit) {
+      const minX = canvasLimit.minX ?? -Infinity;
+      const maxX = canvasLimit.maxX ?? Infinity;
+      const minY = canvasLimit.minY ?? -Infinity;
+      const maxY = canvasLimit.maxY ?? Infinity;
+
+      if (minX !== -Infinity && maxX !== Infinity && maxX > minX) {
+        newZoom = Math.max(newZoom, width / (maxX - minX));
+      }
+      if (minY !== -Infinity && maxY !== Infinity && maxY > minY) {
+        newZoom = Math.max(newZoom, height / (maxY - minY));
+      }
+
+      if (canvasLimit.minX !== undefined) {
+        newScrollX = Math.min(newScrollX, -canvasLimit.minX);
+      }
+      if (canvasLimit.maxX !== undefined) {
+        newScrollX = Math.max(newScrollX, (width / newZoom) - canvasLimit.maxX);
+      }
+      if (canvasLimit.minY !== undefined) {
+        newScrollY = Math.min(newScrollY, -canvasLimit.minY);
+      }
+      if (canvasLimit.maxY !== undefined) {
+        newScrollY = Math.max(newScrollY, (height / newZoom) - canvasLimit.maxY);
+      }
+    }
+    
+    return { 
+      scrollX: newScrollX, 
+      scrollY: newScrollY,
+      ...(newZoom !== zoomValue ? { zoom: { value: newZoom as any } } : {})
+    };
+  };
+
   /** use when changing scrollX/scrollY/zoom based on user interaction */
   private translateCanvas: React.Component<any, AppState>["setState"] = (
     state,
+    callback,
   ) => {
     this.cancelInProgressAnimation?.();
     this.maybeUnfollowRemoteUser();
-    this.setState(state);
+    
+    if (typeof state === "function") {
+      this.setState((prevState, props) => {
+        const nextState = state(prevState, props) as Partial<AppState> | null;
+        if (!nextState) {
+          return null;
+        }
+        const scrollX = nextState.scrollX ?? prevState.scrollX;
+        const scrollY = nextState.scrollY ?? prevState.scrollY;
+        const zoom = nextState.zoom ?? prevState.zoom;
+        const clamped = this.getClampedScroll(scrollX, scrollY, zoom.value, prevState.width, Math.max(prevState.height, 1));
+        return { ...nextState, ...clamped } as Pick<AppState, keyof AppState>;
+      }, callback);
+    } else {
+      const nextState = state as Partial<AppState> | null;
+      const scrollX = nextState?.scrollX ?? this.state.scrollX;
+      const scrollY = nextState?.scrollY ?? this.state.scrollY;
+      const zoom = nextState?.zoom ?? this.state.zoom;
+      const clamped = this.getClampedScroll(scrollX, scrollY, zoom.value, this.state.width, Math.max(this.state.height, 1));
+      this.setState({ ...(state as any), ...clamped } as Pick<AppState, keyof AppState>, callback);
+    }
   };
 
   setToast = (toast: AppState["toast"]) => {
@@ -10164,6 +10239,7 @@ class App extends React.Component<AppProps, AppState> {
               this.scene,
               snapOffset,
               event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+              this.props.canvasLimit,
             );
           }
 
@@ -12374,6 +12450,7 @@ class App extends React.Component<AppProps, AppState> {
         scene: this.scene,
         zoom: this.state.zoom.value,
         informMutation: false,
+        canvasLimit: this.props.canvasLimit,
       });
       return;
     }
@@ -12442,6 +12519,7 @@ class App extends React.Component<AppProps, AppState> {
         widthAspectRatio: aspectRatio,
         originOffset: this.state.originSnapOffset,
         informMutation,
+        canvasLimit: this.props.canvasLimit,
       });
     }
 

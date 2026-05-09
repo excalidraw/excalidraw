@@ -99,6 +99,7 @@ interface LayerUIProps {
   app: AppClassProperties;
   isCollaborating: boolean;
   generateLinkForSelection?: AppProps["generateLinkForSelection"];
+  canvasLimit?: ExcalidrawProps["canvasLimit"];
 }
 
 const DefaultMainMenu: React.FC<{
@@ -158,6 +159,7 @@ const LayerUI = ({
   app,
   isCollaborating,
   generateLinkForSelection,
+  canvasLimit,
 }: LayerUIProps) => {
   const editorInterface = useEditorInterface();
   const stylesPanelMode = useStylesPanelMode();
@@ -605,6 +607,7 @@ const LayerUI = ({
               actionManager={actionManager}
               showExitZenModeBtn={showExitZenModeBtn}
               renderWelcomeScreen={renderWelcomeScreen}
+              canvasLimit={canvasLimit}
             />
             {(appState.toast || appState.scrolledOutside) && (
               <div className="floating-status-stack">

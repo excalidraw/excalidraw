@@ -15,11 +15,13 @@ const Footer = ({
   actionManager,
   showExitZenModeBtn,
   renderWelcomeScreen,
+  canvasLimit,
 }: {
   appState: UIAppState;
   actionManager: ActionManager;
   showExitZenModeBtn: boolean;
   renderWelcomeScreen: boolean;
+  canvasLimit?: any;
 }) => {
   const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
 
@@ -36,10 +38,12 @@ const Footer = ({
       >
         <Stack.Col gap={2}>
           <Section heading="canvasActions">
-            <ZoomActions
-              renderAction={actionManager.renderAction}
-              zoom={appState.zoom}
-            />
+            {!canvasLimit && (
+              <ZoomActions
+                renderAction={actionManager.renderAction}
+                zoom={appState.zoom}
+              />
+            )}
 
             {!appState.viewModeEnabled && (
               <UndoRedoActions

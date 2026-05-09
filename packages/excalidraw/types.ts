@@ -632,6 +632,15 @@ export interface ExcalidrawProps {
     appState: UIAppState,
   ) => JSX.Element | null;
   langCode?: Language["code"];
+  /**
+   * Constrains the canvas view and panning within the specified boundaries.
+   */
+  canvasLimit?: {
+    minX?: number;
+    minY?: number;
+    maxX?: number;
+    maxY?: number;
+  };
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
