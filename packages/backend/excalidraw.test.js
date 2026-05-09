@@ -31,6 +31,59 @@ function contains(outer, inner) {
 }
 
 describe("nodesToExcalidraw Terraform edge layers", () => {
+  it("styles resource rectangles by Terraform action", async () => {
+    const fixtures = [
+      ["aws_lambda_function.created", ["create"], "create", "#d3f9d8", "#2b8a3e"],
+      ["aws_lambda_function.updated", ["update"], "update", "#fff3bf", "#e67700"],
+      ["aws_lambda_function.deleted", ["delete"], "delete", "#ffe3e3", "#c92a2a"],
+      ["aws_lambda_function.noop", ["no-op"], "no-op", "#e7f5ff", "#1971c2"],
+      ["aws_lambda_function.existing", ["existing"], "existing", "#f8f9fa", "#868e96"],
+      ["aws_lambda_function.replaced", ["delete", "create"], "replace", "#ffe8cc", "#f08c00"],
+    ];
+    const nodes = Object.fromEntries(
+      fixtures.map(([address, actions]) => [
+        address,
+        {
+          resources: {
+            [address]: {
+              address,
+              type: "aws_lambda_function",
+              name: address.split(".").at(-1),
+              change: { actions, after: { function_name: address } },
+            },
+          },
+          edges_new: [],
+          edges_existing: [],
+          edges_data_flow: [],
+        },
+      ]),
+    );
+
+    const scene = await nodesToExcalidraw(nodes);
+
+    for (const [
+      address,
+      ,
+      expectedAction,
+      backgroundColor,
+      strokeColor,
+    ] of fixtures) {
+      const rect = scene.elements.find(
+        (element) =>
+          element.type === "rectangle" &&
+          element.customData?.nodePath === address,
+      );
+
+      expect(rect).toMatchObject({
+        backgroundColor,
+        strokeColor,
+        customData: {
+          action: expectedAction,
+        },
+      });
+    }
+  });
+
   it("renders resource labels as grouped text that can be restored with hidden resources", async () => {
     const scene = await nodesToExcalidraw({
       "aws_lambda_function.worker": {

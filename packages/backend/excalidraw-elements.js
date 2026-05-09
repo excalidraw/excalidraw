@@ -665,18 +665,22 @@ const ACTION_COLORS = {
   create: "#d3f9d8",
   delete: "#ffe3e3",
   update: "#fff3bf",
-  existing: "#e7f5ff",
-  external: "#f8f9fa",
+  replace: "#ffe8cc",
   "no-op": "#e7f5ff",
+  existing: "#f8f9fa",
+  read: "#f8f9fa",
+  external: "#f8f9fa",
 };
 
 const ACTION_STROKE = {
   create: "#2b8a3e",
   delete: "#c92a2a",
   update: "#e67700",
-  existing: "#1971c2",
-  external: "#868e96",
+  replace: "#f08c00",
   "no-op": "#1971c2",
+  existing: "#868e96",
+  read: "#868e96",
+  external: "#868e96",
 };
 
 const UNKNOWN_VALUE_PLACEHOLDER = "Known after apply";
@@ -693,9 +697,12 @@ function getPrimaryAction(node) {
       actions.add(action);
     }
   }
+  if (actions.has("delete") && actions.has("create")) return "replace";
   if (actions.has("create")) return "create";
   if (actions.has("delete")) return "delete";
   if (actions.has("update")) return "update";
+  if (actions.has("no-op")) return "no-op";
+  if (actions.has("read")) return "read";
   if (actions.has("external")) return "external";
   return "existing";
 }
