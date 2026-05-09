@@ -21,7 +21,7 @@
  *    row, lay **resources** in a **grid** under that row, and **shrink-wrap** the compound so
  *    nested boxes stay non-overlapping. Finally normalize the global origin.
  *
- * 5. **Excalidraw** — Emit **frames** per module, resource rectangles, and bound **arrows**
+ * 5. **Excalidraw** — Emit **frames** per module, resource rectangles, and relationship **lines**
  *    (`convertToExcalidrawElements`).
  *
  * 6. **Scale guard** — Very large graphs skip layout so the main thread stays responsive; callers
@@ -31,8 +31,10 @@
 /** Browser / Vite-safe build: default `elkjs` entry pulls optional `web-worker` (see elkjs `lib/main.js`). */
 import ELK from "elkjs/lib/elk.bundled.js";
 import { convertToExcalidrawElements } from "@excalidraw/element";
+import { pointFrom } from "@excalidraw/math";
 
 import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
+import type { LocalPoint } from "@excalidraw/math";
 
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import type {
@@ -737,6 +739,63 @@ function normalizeOrigin(boxes: Record<string, LayoutBox>) {
   }
 }
 
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
+
+const getEdgePointTowardTarget = (
+  pos: { x: number; y: number },
+  w: number,
+  h: number,
+  target: { x: number; y: number },
+) => {
+  const cx = pos.x + w / 2;
+  const cy = pos.y + h / 2;
+  const dx = target.x - cx;
+  const dy = target.y - cy;
+
+  if (Math.abs(dx) < 1e-6 && Math.abs(dy) < 1e-6) {
+    return { x: cx, y: cy };
+  }
+
+  const halfW = Math.max(w / 2, 1e-6);
+  const halfH = Math.max(h / 2, 1e-6);
+  const scale = 1 / Math.max(Math.abs(dx) / halfW, Math.abs(dy) / halfH);
+
+  return {
+    x: cx + dx * scale,
+    y: cy + dy * scale,
+  };
+};
+
+const getCenterClippedLine = (boxA: LayoutBox, boxB: LayoutBox) => {
+  const posA = { x: boxA.x, y: boxA.y };
+  const posB = { x: boxB.x, y: boxB.y };
+  const centerA = { x: boxA.x + boxA.width / 2, y: boxA.y + boxA.height / 2 };
+  const centerB = { x: boxB.x + boxB.width / 2, y: boxB.y + boxB.height / 2 };
+  const startPoint = getEdgePointTowardTarget(
+    posA,
+    boxA.width,
+    boxA.height,
+    centerB,
+  );
+  const endPoint = getEdgePointTowardTarget(
+    posB,
+    boxB.width,
+    boxB.height,
+    centerA,
+  );
+
+  return { startPoint, endPoint };
+};
+
+const fixedPointForLayoutPoint = (
+  box: LayoutBox,
+  point: { x: number; y: number },
+): [number, number] => [
+  clamp((point.x - box.x) / (box.width || 1), 0, 1),
+  clamp((point.y - box.y) / (box.height || 1), 0, 1),
+];
+
 /**
  * Runs ELK on the Terraform graph + module tree and returns Excalidraw elements plus metadata.
  */
@@ -831,7 +890,8 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
   layoutModuleGeometryDeep(tree, vertexSet, layoutBoxes);
   normalizeOrigin(layoutBoxes);
 
-  const skeleton: ExcalidrawElementSkeleton[] = [];
+  const resourceSkeletons: ExcalidrawElementSkeleton[] = [];
+  const edgeSkeletons: ExcalidrawElementSkeleton[] = [];
 
   for (const id of [...vertexSet].sort()) {
     const box = layoutBoxes[id];
@@ -842,7 +902,7 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
     const resourceType = resource.type || getResourceTypeFromAddress(id);
     const action = getTerraformAction(resource);
     const actionStyle = getTerraformActionStyle(action);
-    skeleton.push({
+    resourceSkeletons.push({
       type: "rectangle",
       id,
       x: box.x,
@@ -868,20 +928,46 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
     });
   }
 
-  let arrowIndex = 0;
+  let edgeIndex = 0;
   for (const { source, target } of directedEdges) {
-    if (!layoutBoxes[source] || !layoutBoxes[target]) {
+    const sourceBox = layoutBoxes[source];
+    const targetBox = layoutBoxes[target];
+    if (!sourceBox || !targetBox) {
       continue;
     }
-    skeleton.push({
-      type: "arrow",
-      id: `tf-edge-${arrowIndex}`,
-      x: 0,
-      y: 0,
+    const { startPoint, endPoint } = getCenterClippedLine(
+      sourceBox,
+      targetBox,
+    );
+    const startX = startPoint.x;
+    const startY = startPoint.y;
+    const endX = endPoint.x;
+    const endY = endPoint.y;
+    edgeSkeletons.push({
+      type: "line",
+      id: `tf-edge-${edgeIndex}`,
+      x: startX,
+      y: startY,
+      width: Math.abs(endX - startX),
+      height: Math.abs(endY - startY),
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(endX - startX, endY - startY),
+      ],
       strokeWidth: 1.5,
       strokeColor: "#94a3b8",
-      start: { id: source },
-      end: { id: target },
+      startArrowhead: null,
+      endArrowhead: null,
+      startBinding: {
+        elementId: source,
+        fixedPoint: fixedPointForLayoutPoint(sourceBox, startPoint),
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: target,
+        fixedPoint: fixedPointForLayoutPoint(targetBox, endPoint),
+        mode: "orbit",
+      },
       customData: {
         terraform: true,
         terraformEdgeLayer: "dependency",
@@ -895,12 +981,16 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
         },
       },
     });
-    arrowIndex += 1;
+    edgeIndex += 1;
   }
 
   const frameSkeletons: ExcalidrawElementSkeleton[] = [];
   pushModuleFrameSkeletonsPostOrder(tree, vertexSet, layoutBoxes, frameSkeletons);
-  skeleton.push(...frameSkeletons);
+  const skeleton = [
+    ...frameSkeletons,
+    ...edgeSkeletons,
+    ...resourceSkeletons,
+  ];
 
   const elements = convertToExcalidrawElements(skeleton, { regenerateIds: true });
 
