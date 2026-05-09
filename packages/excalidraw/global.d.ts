@@ -58,15 +58,18 @@ interface Blob {
 
 declare module "*.scss";
 
-declare module "graphlib-dot" {
-  // Minimal surface used by `terraformPlanParsing`. The library is JS-only;
-  // expand this shim if/when more of the API is consumed.
-  const dot: {
-    read(input: string): unknown;
-    readMany(input: string): unknown[];
-    write(graph: unknown): string;
-  };
-  export default dot;
+/** JS-only package; `read` returns a graphlib `Graph` (same as backend `graphlib-dot` / pipeline). */
+declare module "@dagrejs/graphlib-dot" {
+  import type { Graph } from "@dagrejs/graphlib";
+
+  interface GraphlibDot {
+    read(input: string): Graph;
+    readMany(input: string): Graph[];
+    write(graph: Graph): string;
+  }
+
+  const graphlibDot: GraphlibDot;
+  export default graphlibDot;
 }
 
 // --------------------------------------------------------------------------—
