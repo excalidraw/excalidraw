@@ -4,7 +4,13 @@ import { fileURLToPath } from "node:url";
 
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
-import { buildTerraformModuleTree, terraformPlanParsing } from "./terraformPlanParsing";
+import { buildTerraformElkExcalidrawScene } from "./terraformElkLayout";
+import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
+import {
+  buildTerraformModuleTree,
+  sanitizeTerraformPlanNodes,
+  terraformPlanParsing,
+} from "./terraformPlanParsing";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -18,6 +24,19 @@ function textFileLike(contents: string): File {
     text: async () => contents,
   } as File;
 }
+
+const resource = (
+  address: string,
+  mode: "managed" | "data",
+  type: string,
+  extra: Record<string, unknown> = {},
+) => ({ address, mode, type, ...extra });
+
+const renderedLabels = (elements: Array<{ type?: string; originalText?: string }>) =>
+  elements
+    .filter((element) => element.type === "text")
+    .map((element) => element.originalText)
+    .filter(Boolean) as string[];
 
 describe("buildTerraformModuleTree", () => {
   it("places root resources under path root and nests module resources", () => {
@@ -110,7 +129,161 @@ describe("terraformPlanParsing", () => {
         viewBackgroundColor: "#ffffff",
         gridSize: null,
       });
+
+      const labels = renderedLabels(body.elements);
+      expect(labels).not.toContain("data.aws_region.current");
+      expect(labels).not.toContain("data.aws_partition.current");
+      expect(labels).not.toContain("data.aws_caller_identity.current");
+      expect(labels).not.toContain("data.external.archive_prepare[0]");
+      expect(labels.some((label) => label.includes("data.aws_iam_policy_document."))).toBe(
+        true,
+      );
     },
     60_000,
   );
+});
+
+describe("sanitizeTerraformPlanNodes", () => {
+  it("removes non-policy data sources and strips incoming/outgoing references", () => {
+    const nodes = {
+      "aws_lambda_function.fn": {
+        resources: {
+          "aws_lambda_function.fn": resource(
+            "aws_lambda_function.fn",
+            "managed",
+            "aws_lambda_function",
+          ),
+        },
+        edges_new: ["data.aws_region.current"],
+        edges_existing: ["data.aws_region.current"],
+        edges_data_flow: [
+          "data.aws_region.current",
+          { target: "data.aws_region.current", type: "lookup" },
+        ] as unknown as string[],
+      },
+      "data.aws_region.current": {
+        resources: {
+          "data.aws_region.current": resource(
+            "data.aws_region.current",
+            "data",
+            "aws_region",
+          ),
+        },
+        edges_new: ["aws_lambda_function.fn"],
+        edges_existing: ["aws_lambda_function.fn"],
+        edges_data_flow: ["aws_lambda_function.fn"],
+      },
+    };
+
+    const sanitized = sanitizeTerraformPlanNodes(nodes);
+
+    expect(sanitized["data.aws_region.current"]).toBeUndefined();
+    expect(sanitized["aws_lambda_function.fn"].edges_new).toEqual([]);
+    expect(sanitized["aws_lambda_function.fn"].edges_existing).toEqual([]);
+    expect(sanitized["aws_lambda_function.fn"].edges_data_flow).toEqual([]);
+  });
+
+  it("keeps aws_iam_policy_document data sources with non-empty statements", () => {
+    const nodes = {
+      "data.aws_iam_policy_document.assume": {
+        resources: {
+          "data.aws_iam_policy_document.assume": resource(
+            "data.aws_iam_policy_document.assume",
+            "data",
+            "aws_iam_policy_document",
+            {
+              change: {
+                after: {
+                  statement: [{ actions: ["sts:AssumeRole"], resources: ["*"] }],
+                },
+              },
+            },
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    };
+
+    expect(sanitizeTerraformPlanNodes(nodes)["data.aws_iam_policy_document.assume"]).toBe(
+      nodes["data.aws_iam_policy_document.assume"],
+    );
+  });
+
+  it("removes empty aws_iam_policy_document placeholders", () => {
+    const nodes = {
+      "data.aws_iam_policy_document.empty": {
+        resources: {
+          "data.aws_iam_policy_document.empty": resource(
+            "data.aws_iam_policy_document.empty",
+            "data",
+            "aws_iam_policy_document",
+            {
+              change: { after: { statement: [] } },
+            },
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    };
+
+    expect(sanitizeTerraformPlanNodes(nodes)["data.aws_iam_policy_document.empty"]).toBeUndefined();
+  });
+
+  it("sanitizes mixed graphs before ELK renders resource rectangles", async () => {
+    const nodes = sanitizeTerraformPlanNodes({
+      "aws_lambda_function.fn": {
+        resources: {
+          "aws_lambda_function.fn": resource(
+            "aws_lambda_function.fn",
+            "managed",
+            "aws_lambda_function",
+          ),
+        },
+        edges_new: ["data.aws_region.current", "data.aws_iam_policy_document.assume"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "data.aws_region.current": {
+        resources: {
+          "data.aws_region.current": resource(
+            "data.aws_region.current",
+            "data",
+            "aws_region",
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "data.aws_iam_policy_document.assume": {
+        resources: {
+          "data.aws_iam_policy_document.assume": resource(
+            "data.aws_iam_policy_document.assume",
+            "data",
+            "aws_iam_policy_document",
+            {
+              values: {
+                statement: [{ actions: ["sts:AssumeRole"], resources: ["*"] }],
+              },
+            },
+          ),
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    });
+    nodes[TERRAFORM_MODULE_TREE_KEY] = buildTerraformModuleTree(nodes);
+
+    const { elements } = await buildTerraformElkExcalidrawScene(nodes);
+    const labels = renderedLabels(elements);
+
+    expect(labels).toContain("aws_lambda_function.fn");
+    expect(labels).toContain("data.aws_iam_policy_document.assume");
+    expect(labels).not.toContain("data.aws_region.current");
+  });
 });

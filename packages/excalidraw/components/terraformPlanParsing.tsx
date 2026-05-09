@@ -105,9 +105,9 @@ export const terraformPlanParsing = async (
     nodes
   });
 
-  const nodes2 = ensureEdgeLists(nodes);
+  const nodes2 = sanitizeTerraformPlanNodes(ensureEdgeLists(nodes));
   emitLocalParseDebug({
-    phase: "ensureEdgeLists",
+    phase: "sanitizeInitialNodes",
     nodes2
   });
 
@@ -123,7 +123,13 @@ export const terraformPlanParsing = async (
     nodes4
   });
 
-  const nodes5 = attachModuleTree(nodes4);
+  const sanitizedNodes = sanitizeTerraformPlanNodes(nodes4);
+  emitLocalParseDebug({
+    phase: "sanitizePriorStateNodes",
+    sanitizedNodes
+  });
+
+  const nodes5 = attachModuleTree(sanitizedNodes);
   emitLocalParseDebug({
     phase: "moduleTree",
     moduleTree: nodes5[TERRAFORM_MODULE_TREE_KEY],
@@ -178,6 +184,125 @@ function getAdjacencyListFromDot(graph: Graph) {
   }
 
   return adjacency;
+}
+
+const IAM_POLICY_DOCUMENT_DATA_TYPE = "aws_iam_policy_document";
+
+const MEANINGFUL_POLICY_FIELDS = [
+  "json",
+  "minified_json",
+  "policy",
+  "source_json",
+  "override_json",
+  "source_policy_documents",
+  "override_policy_documents",
+] as const;
+
+function primaryTerraformResource(node: TerraformPlanGraphNode) {
+  return Object.values(node.resources || {})[0] as
+    | Record<string, unknown>
+    | undefined;
+}
+
+function isNonEmptyValue(value: unknown) {
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+  if (typeof value === "string") {
+    return value.trim().length > 0;
+  }
+  if (value && typeof value === "object") {
+    return Object.keys(value).length > 0;
+  }
+  return value != null;
+}
+
+function hasMeaningfulIamPolicyDocumentContent(resource: Record<string, unknown>) {
+  const change = resource.change as { after?: Record<string, unknown> } | undefined;
+  const candidates = [
+    resource.values as Record<string, unknown> | undefined,
+    change?.after,
+  ].filter(Boolean) as Record<string, unknown>[];
+
+  for (const values of candidates) {
+    for (const field of MEANINGFUL_POLICY_FIELDS) {
+      if (isNonEmptyValue(values[field])) {
+        return true;
+      }
+    }
+    if (Array.isArray(values.statement) && values.statement.length > 0) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function shouldPruneTerraformDataNode(node: TerraformPlanGraphNode) {
+  const resource = primaryTerraformResource(node);
+  if (!resource || resource.mode !== "data") {
+    return false;
+  }
+
+  if (resource.type !== IAM_POLICY_DOCUMENT_DATA_TYPE) {
+    return true;
+  }
+
+  return !hasMeaningfulIamPolicyDocumentContent(resource);
+}
+
+function pruneEdgeList(edges: string[] | undefined, pruned: Set<string>) {
+  return (edges || []).filter((edge) => !pruned.has(edge));
+}
+
+function pruneDataFlowEdges(edges: unknown, pruned: Set<string>) {
+  if (!Array.isArray(edges)) {
+    return [];
+  }
+  return edges.filter((edge) => {
+    if (typeof edge === "string") {
+      return !pruned.has(edge);
+    }
+    if (edge && typeof edge === "object") {
+      const target = (edge as { target?: unknown }).target;
+      return typeof target !== "string" || !pruned.has(target);
+    }
+    return true;
+  }) as string[];
+}
+
+export function sanitizeTerraformPlanNodes<T extends Record<string, TerraformPlanGraphNode>>(
+  nodes: T,
+): T {
+  const pruned = new Set<string>();
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath === TERRAFORM_MODULE_TREE_KEY || nodePath.startsWith("__")) {
+      continue;
+    }
+    if (shouldPruneTerraformDataNode(node)) {
+      pruned.add(nodePath);
+    }
+  }
+
+  if (pruned.size === 0) {
+    return nodes;
+  }
+
+  for (const nodePath of pruned) {
+    delete nodes[nodePath];
+  }
+
+  for (const [nodePath, node] of Object.entries(nodes)) {
+    if (nodePath === TERRAFORM_MODULE_TREE_KEY || nodePath.startsWith("__")) {
+      continue;
+    }
+    node.edges_new = pruneEdgeList(node.edges_new, pruned);
+    node.edges_existing = pruneEdgeList(node.edges_existing, pruned);
+    node.edges_data_flow = pruneDataFlowEdges(node.edges_data_flow, pruned);
+  }
+
+  return nodes;
 }
 
 function loadPlan(plan: { resource_changes: { address: string }[] }) {
