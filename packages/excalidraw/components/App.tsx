@@ -363,6 +363,7 @@ import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restoreAppState, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
+import { Transaction } from "../transaction";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 
 import {
@@ -467,7 +468,6 @@ import type {
   RenderInteractiveSceneCallback,
   ScrollBars,
 } from "../scene/types";
-
 import type { ClipboardData, PastedMixedContent } from "../clipboard";
 import type { ExportedElements } from "../data";
 import type { ContextMenuItems } from "./ContextMenu";
@@ -644,6 +644,7 @@ class App extends React.Component<AppProps, AppState> {
   public id: string;
   private store: Store;
   private history: History;
+  public transaction: Transaction;
   public excalidrawContainerValue: {
     container: HTMLDivElement | null;
     id: string;
@@ -786,6 +787,7 @@ class App extends React.Component<AppProps, AppState> {
       onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
       onStateChange: this.onStateChange,
       onEvent: this.onEvent,
+      transaction: this.transaction,
     };
     return api;
   }
@@ -845,6 +847,19 @@ class App extends React.Component<AppProps, AppState> {
 
     this.fonts = new Fonts(this.scene);
     this.history = new History(this.store);
+    this.transaction = new Transaction({
+      getSnapshot: () => this.store.snapshot,
+      handleRecord: (delta) => this.history.record(delta),
+      getSceneElements: () =>
+        new Map(
+          this.scene.getElementsMapIncludingDeleted(),
+        ) as SceneElementsMap,
+      handleRestore: (elements) =>
+        this.updateScene({
+          elements,
+          captureUpdate: CaptureUpdateAction.NEVER,
+        }),
+    });
 
     this.actionManager.registerAll(actions);
     this.actionManager.registerAction(createUndoAction(this.history));
@@ -3137,7 +3152,9 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.store.onDurableIncrementEmitter.on((increment) => {
-      this.history.record(increment.delta);
+      if (!this.transaction.isActive) {
+        this.history.record(increment.delta);
+      }
     });
 
     // per. optimmisation, only subscribe if there is the `onIncrement` prop registered, to avoid unnecessary computation

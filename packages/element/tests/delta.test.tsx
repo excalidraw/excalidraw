@@ -279,6 +279,38 @@ describe("ElementsDelta", () => {
       expect(elementsDelta.updated).toEqual({});
     });
 
+    it("should cancel out when element is added then removed", () => {
+      // id1: added -> removed => net zero (neither added nor removed)
+      const elementsDelta1 = ElementsDelta.create(
+        {
+          id1: Delta.create(
+            { x: 100, version: 1, versionNonce: 1, isDeleted: true },
+            { x: 101, version: 2, versionNonce: 2, isDeleted: false },
+          ),
+        },
+        {},
+        {},
+      );
+
+      const elementsDelta2 = ElementsDelta.create(
+        {},
+        {
+          id1: Delta.create(
+            { x: 101, version: 2, versionNonce: 2, isDeleted: false },
+            { x: 101, version: 3, versionNonce: 3, isDeleted: true },
+          ),
+        },
+        {},
+      );
+
+      const elementsDelta = elementsDelta1.squash(elementsDelta2);
+
+      expect(elementsDelta.added).toEqual({});
+      expect(elementsDelta.removed).toEqual({});
+      expect(elementsDelta.updated).toEqual({});
+      expect(elementsDelta.isEmpty()).toBeTruthy();
+    });
+
     it("should squash bound elements", () => {
       const elementsDelta1 = ElementsDelta.create(
         {},

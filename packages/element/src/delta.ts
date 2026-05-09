@@ -1527,9 +1527,11 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
       if (!prevDelta) {
         this.removed[id] = nextDelta;
+      } else if (this.added[id]) {
+        // element was added then removed within the same squash = net zero, cancel out
+        delete this.added[id];
       } else {
         const mergedDelta = mergeBoundElements(prevDelta, nextDelta);
-        delete this.added[id];
         delete this.updated[id];
 
         this.removed[id] = Delta.merge(prevDelta, nextDelta, mergedDelta);
