@@ -45,16 +45,24 @@ export const terraformPlanParsing = async (
   const plan = JSON.parse(planText);
   const state = stateText ? JSON.parse(stateText) : null;
   const graph = graphlibDot.read(dotText);
-  const adjacency = getAdjacencyListFromDot(graph);
 
   emitLocalParseDebug({
-    phase: "parsed",
-    edgeCount: graph.edges().length,
-    adjacencySourceCount: Object.keys(adjacency).length,
-    adjacencyList: adjacency,
+    phase: "init",
     plan,
     state,
     graph,
+  });
+
+  const adjacency = getAdjacencyListFromDot(graph);
+  emitLocalParseDebug({
+    phase: "parsedDot",
+    adjacency
+  });
+
+  const nodes = loadPlan(plan);
+  emitLocalParseDebug({
+    phase: "planParsed",
+    nodes
   });
 
   return new Response(JSON.stringify(EMPTY_TERRAFORM_EXCALIDRAW_SCENE), {
@@ -85,3 +93,19 @@ function getAdjacencyListFromDot(graph: Graph) {
 
   return adjacency;
 }
+
+function loadPlan(plan: { resource_changes: { address: string }[] }) {
+    const nodes: Record<string, { resources: Record<string, unknown> }> = {};
+    const resourceChanges = plan.resource_changes || [];
+  
+    for (const resourceChange of resourceChanges) {
+      const address = resourceChange.address;
+      const nodePath = address;
+      if (!nodes[nodePath]) {
+        nodes[nodePath] = { resources: {} };
+      }
+      nodes[nodePath].resources[address] = resourceChange;
+    }
+  
+    return nodes;
+  }
