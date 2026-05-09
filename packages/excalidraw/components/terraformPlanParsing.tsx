@@ -20,6 +20,24 @@ const DEBUG_PREFIX = "[terraform:local-parse]";
 
 const TERRAFORM_MODULE_RESOURCE_TYPE = "terraform_module";
 
+/**
+ * Reserved key on the nodes map holding the module hierarchy (not a graph vertex).
+ * Root path is `"root"`; nested keys match Terraform module paths (`module.a`, …).
+ */
+export const TERRAFORM_MODULE_TREE_KEY = "__terraform_module_tree__";
+
+/** One node in the module tree: child modules + resource addresses declared in this module. */
+export type TerraformModuleTreeNode = {
+  path: string;
+  modules: Record<string, TerraformModuleTreeNode>;
+  resourceAddresses: string[];
+};
+
+/** Nodes map may include {@link TERRAFORM_MODULE_TREE_KEY} alongside per-address graph nodes. */
+export type TerraformPlanNodesMap = Record<string, TerraformPlanGraphNode> & {
+  [TERRAFORM_MODULE_TREE_KEY]?: TerraformModuleTreeNode;
+};
+
 /** Matches backend pipeline nodes: resources plus mutable edge buckets (see `ensureEdgeLists`). */
 type TerraformPlanGraphNode = {
   resources: Record<string, unknown>;
@@ -104,6 +122,12 @@ export const terraformPlanParsing = async (
   emitLocalParseDebug({
     phase: "buildExistingEdges",
     nodes4
+  });
+
+  const nodes5 = attachModuleTree(nodes4);
+  emitLocalParseDebug({
+    phase: "moduleTree",
+    moduleTree: nodes5[TERRAFORM_MODULE_TREE_KEY],
   });
 
   //i have a plan that is searchable by address along with nodes for models
@@ -217,10 +241,113 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
     return parts[parts.length - 1] || modulePath;
   }
 
+  function emptyModuleTreeNode(path: string): TerraformModuleTreeNode {
+    return { path, modules: {}, resourceAddresses: [] };
+  }
+
+  /**
+   * Deepest Terraform module path that owns this address, or `"root"` for the root module.
+   * Example: `module.vpc.aws_subnet.a` → `module.vpc`; `aws_instance.x` → `root`.
+   */
+  function getContainingModulePathForAddress(address: string): string {
+    const parts = address.split(".");
+    let index = 0;
+    let modulePath = "";
+    while (index < parts.length && parts[index] === "module" && parts[index + 1]) {
+      const segment = `module.${parts[index + 1]}`;
+      modulePath = modulePath ? `${modulePath}.${segment}` : segment;
+      index += 2;
+    }
+    return modulePath || "root";
+  }
+
+  /**
+   * Walks/creates `module.a` → `module.a.module.b` under `root` and returns the deepest node.
+   * `fullModulePath` is a Terraform module path (no resource suffix), e.g. `module.network`.
+   */
+  function ensureModulePathInTree(
+    root: TerraformModuleTreeNode,
+    fullModulePath: string,
+  ): TerraformModuleTreeNode {
+    if (!fullModulePath || fullModulePath === "root") {
+      return root;
+    }
+    const sentinel = `${fullModulePath}.aws_instance.__module_tree__`;
+    const chain = getModulePathChainFromAddress(sentinel);
+    let cursor = root;
+    for (const segment of chain) {
+      if (!cursor.modules[segment]) {
+        cursor.modules[segment] = emptyModuleTreeNode(segment);
+      }
+      cursor = cursor.modules[segment];
+    }
+    return cursor;
+  }
+
+  function isTerraformModuleStubNode(
+    nodes: Record<string, TerraformPlanGraphNode>,
+    key: string,
+  ): boolean {
+    const resource = nodes[key]?.resources?.[key] as { type?: string } | undefined;
+    return Boolean(resource && resource.type === TERRAFORM_MODULE_RESOURCE_TYPE);
+  }
+
+  /**
+   * Builds a module → children / resources tree and stores it on the nodes map under
+   * {@link TERRAFORM_MODULE_TREE_KEY}. Root is `{ path: "root", … }`.
+   */
+  export function buildTerraformModuleTree(
+    nodes: Record<string, TerraformPlanGraphNode>,
+  ): TerraformModuleTreeNode {
+    const root = emptyModuleTreeNode("root");
+
+    const keys = Object.keys(nodes).filter((k) => !k.startsWith("__"));
+    for (const key of keys) {
+      if (isTerraformModuleStubNode(nodes, key)) {
+        ensureModulePathInTree(root, key);
+        continue;
+      }
+
+      const parentPath = getContainingModulePathForAddress(key);
+      const parent =
+        parentPath === "root" ? root : ensureModulePathInTree(root, parentPath);
+      if (!parent.resourceAddresses.includes(key)) {
+        parent.resourceAddresses.push(key);
+      }
+    }
+
+    const sortRecursive = (node: TerraformModuleTreeNode) => {
+      node.resourceAddresses.sort();
+      for (const child of Object.values(node.modules)) {
+        sortRecursive(child);
+      }
+      const sortedKeys = Object.keys(node.modules).sort();
+      const next: Record<string, TerraformModuleTreeNode> = {};
+      for (const k of sortedKeys) {
+        next[k] = node.modules[k];
+      }
+      node.modules = next;
+    };
+    sortRecursive(root);
+
+    return root;
+  }
+
+  function attachModuleTree(
+    nodes: Record<string, TerraformPlanGraphNode>,
+  ): TerraformPlanNodesMap {
+    const map = nodes as TerraformPlanNodesMap;
+    map[TERRAFORM_MODULE_TREE_KEY] = buildTerraformModuleTree(nodes);
+    return map;
+  }
+
   function buildNewEdges(nodes: Record<string, TerraformPlanGraphNode>, adjacency: Record<string, string[]>) {
   
     //iterate over every node
     for (const nodePath of Object.keys(nodes)) {
+      if (nodePath === TERRAFORM_MODULE_TREE_KEY) {
+        continue;
+      }
       const visited = new Set<string>([nodePath]);
       const queue = [nodePath];
       const connectedNodes: string[] = [];
@@ -259,7 +386,10 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
   const stripIndexes = (address = "") => address.replace(/\[[^\]]+\]/g, "");
 
   function ensureEdgeLists(nodes: Record<string, TerraformPlanGraphNode>) {
-    for (const node of Object.values(nodes)) {
+    for (const [key, node] of Object.entries(nodes)) {
+      if (key === TERRAFORM_MODULE_TREE_KEY) {
+        continue;
+      }
       node.edges_new ||= [];
       node.edges_existing ||= [];
       node.edges_data_flow ||= [];
@@ -338,6 +468,9 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
   }
 
   function resolveCanonicalNodePath(nodes: Record<string, TerraformPlanGraphNode>, address: string) {
+    if (address === TERRAFORM_MODULE_TREE_KEY) {
+      return null;
+    }
     if (nodes[address]) {
       return address;
     }
