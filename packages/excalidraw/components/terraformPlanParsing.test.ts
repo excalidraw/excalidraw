@@ -102,6 +102,10 @@ describe("terraformPlanParsing", () => {
       expect(body.version).toBe(2);
       expect(body.source).toBe("terraform-local-parse");
       expect(Array.isArray(body.elements)).toBe(true);
+      expect(body.meta?.layoutEngine).toBe("elk");
+      expect(body.meta?.skippedLayout).toBeUndefined();
+      expect(body.meta?.vertexCount).toBeGreaterThan(0);
+      expect(body.elements.length).toBeGreaterThan(0);
       expect(body.appState).toMatchObject({
         viewBackgroundColor: "#ffffff",
         gridSize: null,

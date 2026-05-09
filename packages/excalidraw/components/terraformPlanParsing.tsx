@@ -1,6 +1,11 @@
 import graphlibDot from "@dagrejs/graphlib-dot";
 import type { Graph } from "@dagrejs/graphlib";
 
+import { buildTerraformElkExcalidrawScene } from "./terraformElkLayout";
+import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
+
+export { TERRAFORM_MODULE_TREE_KEY };
+
 /**
  * Empty Excalidraw v2 scene — same shape as backend `GET …/upload/:id/excalidraw`
  * (`renderUploadAs` → `result.body` from `packages/backend/connectors/excalidraw.js`).
@@ -20,12 +25,6 @@ const DEBUG_PREFIX = "[terraform:local-parse]";
 
 const TERRAFORM_MODULE_RESOURCE_TYPE = "terraform_module";
 
-/**
- * Reserved key on the nodes map holding the module hierarchy (not a graph vertex).
- * Root path is `"root"`; nested keys match Terraform module paths (`module.a`, …).
- */
-export const TERRAFORM_MODULE_TREE_KEY = "__terraform_module_tree__";
-
 /** One node in the module tree: child modules + resource addresses declared in this module. */
 export type TerraformModuleTreeNode = {
   path: string;
@@ -39,7 +38,7 @@ export type TerraformPlanNodesMap = Record<string, TerraformPlanGraphNode> & {
 };
 
 /** Matches backend pipeline nodes: resources plus mutable edge buckets (see `ensureEdgeLists`). */
-type TerraformPlanGraphNode = {
+export type TerraformPlanGraphNode = {
   resources: Record<string, unknown>;
   edges_new?: string[];
   edges_existing?: string[];
@@ -130,6 +129,13 @@ export const terraformPlanParsing = async (
     moduleTree: nodes5[TERRAFORM_MODULE_TREE_KEY],
   });
 
+  const elkScene = await buildTerraformElkExcalidrawScene(nodes5);
+  emitLocalParseDebug({
+    phase: "elkLayout",
+    meta: elkScene.meta,
+    elementCount: elkScene.elements.length,
+  });
+
   //i have a plan that is searchable by address along with nodes for models
   //i have the adjacency list of the terraform dependency graph
   //i need to find each nodes relations and make them bidirectional
@@ -139,7 +145,13 @@ export const terraformPlanParsing = async (
   // we can organize resources by module boxes, root being provider  and use elk or force to direct layout
   // we can also model by primary resource types, compute, messaging, storage. what they live in (account, region, vpc, subnets, SG) along with their secondar resources (IAM, Networking, observability)
 
-  return new Response(JSON.stringify(EMPTY_TERRAFORM_EXCALIDRAW_SCENE), {
+  const sceneBody = {
+    ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
+    elements: elkScene.elements,
+    meta: elkScene.meta,
+  };
+
+  return new Response(JSON.stringify(sceneBody), {
     status: 200,
     headers: { "Content-Type": "application/json" },
   });
