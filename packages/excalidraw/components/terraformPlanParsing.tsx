@@ -1,4 +1,5 @@
-import dot from "graphlib-dot";
+import graphlibDot from "@dagrejs/graphlib-dot";
+import type { Graph } from "@dagrejs/graphlib";
 
 /**
  * Empty Excalidraw v2 scene — same shape as backend `GET …/upload/:id/excalidraw`
@@ -27,7 +28,8 @@ export const terraformPlanParsing = async (
   ]);
   const plan = JSON.parse(planText);
   const state = stateText ? JSON.parse(stateText) : null;
-  const graph = dot.read(dotText);
+  const graph = graphlibDot.read(dotText);
+  const adjacency = getAdjacencyListFromDot(graph);
 
   console.log("plan", plan);
   console.log("state", state);
@@ -38,3 +40,26 @@ export const terraformPlanParsing = async (
     headers: { "Content-Type": "application/json" },
   });
 };
+
+const sanitizeDotNodeId = (nodeId = "") => {
+    const parts = String(nodeId).trim().split(" ");
+    const raw = parts.length >= 2 ? parts[1] : parts[0] || "";
+    return raw.replace(/["\\]/g, "");
+};
+
+function getAdjacencyListFromDot(graph: Graph) {
+    const adjacency: Record<string, string[]> = {};
+
+    for (const { v, w } of graph.edges()) {
+        const source = sanitizeDotNodeId(v);
+        const target = sanitizeDotNodeId(w);
+        if (!adjacency[source]) {
+        adjacency[source] = [];
+        }
+        if (!adjacency[source].includes(target)) {
+        adjacency[source].push(target);
+        }
+    }
+
+    return adjacency;
+}
