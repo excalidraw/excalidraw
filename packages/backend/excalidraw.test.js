@@ -84,7 +84,7 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
     }
   });
 
-  it("renders resource labels as grouped text that can be restored with hidden resources", async () => {
+  it("renders resource labels as grouped text for default visibility restore", async () => {
     const scene = await nodesToExcalidraw({
       "aws_lambda_function.worker": {
         resources: {
@@ -126,11 +126,11 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
     );
 
     expect(roleRect).toMatchObject({
-      isDeleted: true,
+      isDeleted: false,
       boundElements: expect.any(Array),
     });
     expect(roleText).toMatchObject({
-      isDeleted: true,
+      isDeleted: false,
       containerId: null,
       text: "aws_iam_role.worker",
       customData: {
@@ -139,6 +139,82 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
       },
     });
     expect(roleText.groupIds[0]).toBe(roleRect.groupIds[0]);
+  });
+
+  it("shows changed non-primary resources and keeps unchanged non-primary resources hidden", async () => {
+    const fixtures = [
+      ["aws_iam_role_policy.created", ["create"], false],
+      ["aws_iam_role_policy.updated", ["update"], false],
+      ["aws_iam_role_policy.deleted", ["delete"], false],
+      ["aws_iam_role_policy.replaced", ["delete", "create"], false],
+      ["aws_iam_role_policy.noop", ["no-op"], true],
+      ["aws_iam_role_policy.existing", ["existing"], true],
+      ["aws_iam_role_policy.read", ["read"], true],
+      ["aws_iam_role_policy.external", ["external"], true],
+    ];
+    const nodes = Object.fromEntries(
+      fixtures.map(([address, actions]) => [
+        address,
+        {
+          resources: {
+            [address]: {
+              address,
+              type: "aws_iam_role_policy",
+              name: address.split(".").at(-1),
+              change: { actions, after: { policy: "{}" } },
+            },
+          },
+          edges_new: [],
+          edges_existing: [],
+          edges_data_flow: [],
+        },
+      ]),
+    );
+
+    const scene = await nodesToExcalidraw(nodes);
+
+    for (const [address, , expectedDeleted] of fixtures) {
+      const rect = scene.elements.find(
+        (element) =>
+          element.type === "rectangle" &&
+          element.customData?.nodePath === address,
+      );
+      const text = scene.elements.find(
+        (element) =>
+          element.type === "text" && element.customData?.nodePath === address,
+      );
+      expect(rect?.isDeleted).toBe(expectedDeleted);
+      expect(text?.isDeleted).toBe(expectedDeleted);
+      expect(rect?.customData?.terraformInitiallyVisible).toBe(!expectedDeleted);
+    }
+  });
+
+  it("shows module containers that only contain changed non-primary resources", async () => {
+    const address = "module.security.aws_iam_role_policy.inline";
+    const scene = await nodesToExcalidraw({
+      [address]: {
+        resources: {
+          [address]: {
+            address,
+            type: "aws_iam_role_policy",
+            name: "inline",
+            change: { actions: ["update"], after: { policy: "{}" } },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    });
+
+    const moduleBox = scene.elements.find(
+      (element) =>
+        element.type === "rectangle" &&
+        element.customData?.terraformModuleGroup === true &&
+        element.customData?.modulePath === "module.security",
+    );
+    expect(moduleBox).toBeDefined();
+    expect(moduleBox?.isDeleted).toBe(false);
   });
 
   it("renders dependency and data-flow lines with layer metadata", async () => {
@@ -497,9 +573,9 @@ describe("nodesToExcalidraw container facets", () => {
     expect(subnetLabel.text).toContain("rt_assoc:1");
 
     expect(accountBox.customData.terraformContainerFacets).toEqual([]);
-    expect(routeTableRect.isDeleted).toBe(true);
+    expect(routeTableRect.isDeleted).toBe(false);
     expect(sgRect).toBeDefined();
-    expect(sgRect?.isDeleted).toBe(true);
+    expect(sgRect?.isDeleted).toBe(false);
     expect(routeApplianceRect).toBeDefined();
   });
 });

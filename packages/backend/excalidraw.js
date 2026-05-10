@@ -27,7 +27,7 @@ const {
   applyModulePresets,
   pinSyntheticTerraformModuleHubs,
   getResourceType,
-  isPrimaryVisibleResourceType,
+  isInitiallyVisibleTerraformNode,
   getVisibilityCustomData,
   getModulePathChain,
   getPrimaryAction,
@@ -329,7 +329,10 @@ async function nodesToExcalidraw(nodes, options = {}) {
     const cfg = tierConfigs[tier];
     const { x, y } = positions[nodePath];
     const resourceType = getResourceType(nodePath);
-    const initiallyVisible = isPrimaryVisibleResourceType(resourceType);
+    const initiallyVisible = isInitiallyVisibleTerraformNode(
+      nodePath,
+      nodes[nodePath],
+    );
     const visibilityCustomData = getVisibilityCustomData(
       nodePath,
       initiallyVisible,
@@ -529,7 +532,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     const strokeColor =
       MODULE_STROKES[(group.depth - 1) % MODULE_STROKES.length];
     const initiallyVisible = group.nodePaths.some((nodePath) =>
-      isPrimaryVisibleResourceType(getResourceType(nodePath)),
+      isInitiallyVisibleTerraformNode(nodePath, nodes[nodePath]),
     );
     const groupVisibilityCustomData = {
       terraformVisibilityRole: "group",
@@ -734,7 +737,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     const accountLabelId = `account-label-${accountBoxIndex}`;
     accountBoxIndex += 1;
     const accountInitiallyVisible = accountGroup.nodePaths.some((nodePath) =>
-      isPrimaryVisibleResourceType(getResourceType(nodePath)),
+      isInitiallyVisibleTerraformNode(nodePath, nodes[nodePath]),
     );
     const accountVisibilityCustomData = {
       terraformVisibilityRole: "group",
@@ -841,7 +844,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
       const regionLabelId = `region-label-${regionBoxIndex}`;
       regionBoxIndex += 1;
       const regionInitiallyVisible = regionGroup.nodePaths.some((nodePath) =>
-        isPrimaryVisibleResourceType(getResourceType(nodePath)),
+        isInitiallyVisibleTerraformNode(nodePath, nodes[nodePath]),
       );
       const regionVisibilityCustomData = {
         terraformVisibilityRole: "group",
@@ -961,7 +964,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
         const vpcLabelId = `vpc-label-${vpcBoxIndex}`;
         vpcBoxIndex += 1;
         const vpcInitiallyVisible = vpcGroup.nodePaths.some((nodePath) =>
-          isPrimaryVisibleResourceType(getResourceType(nodePath)),
+          isInitiallyVisibleTerraformNode(nodePath, nodes[nodePath]),
         );
         const vpcVisibilityCustomData = {
           terraformVisibilityRole: "group",
@@ -1153,9 +1156,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
             SUBNET_PADDING_BOTTOM;
           const subnetBoxId = `subnet-box-${vpcBoxIndex}-${rand()}`;
           const subnetLabelId = `subnet-label-${vpcBoxIndex}-${rand()}`;
-          const subnetInitiallyVisible = subnetGroup.nodePaths.some(
-            (nodePath) =>
-              isPrimaryVisibleResourceType(getResourceType(nodePath)),
+          const subnetInitiallyVisible = subnetGroup.nodePaths.some((nodePath) =>
+            isInitiallyVisibleTerraformNode(nodePath, nodes[nodePath]),
           );
           const subnetVisibilityCustomData = {
             terraformVisibilityRole: "group",
@@ -1339,8 +1341,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
         strokeStyle: "solid",
         roundness: { type: 2 },
         isDeleted:
-          !isPrimaryVisibleResourceType(getResourceType(source)) ||
-          !isPrimaryVisibleResourceType(getResourceType(target)),
+          !isInitiallyVisibleTerraformNode(source, nodes[source]) ||
+          !isInitiallyVisibleTerraformNode(target, nodes[target]),
         customData: {
           terraform: true,
           terraformEdgeLayer: "dependency",
@@ -1444,8 +1446,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
         strokeStyle: "solid",
         roundness: { type: 2 },
         isDeleted:
-          !isPrimaryVisibleResourceType(getResourceType(source)) ||
-          !isPrimaryVisibleResourceType(getResourceType(target)),
+          !isInitiallyVisibleTerraformNode(source, nodes[source]) ||
+          !isInitiallyVisibleTerraformNode(target, nodes[target]),
         customData: {
           terraform: true,
           terraformEdgeLayer: "dataFlow",

@@ -90,6 +90,8 @@ function extractTerraformMeta(el) {
     "relationship",
     "terraformCategoryId",
     "nodePath",
+    "resourceType",
+    "action",
   ];
   const meta = {};
   for (const key of keys) {

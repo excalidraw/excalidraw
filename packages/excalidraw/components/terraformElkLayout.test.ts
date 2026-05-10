@@ -5,6 +5,7 @@ import {
   strokeColorForTerraformDependencyEdge,
 } from "./terraformElkLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
+import { collapseAllTerraformExplode } from "./terraformVisibility";
 import type {
   TerraformPlanGraphNode,
   TerraformPlanNodesMap,
@@ -77,7 +78,8 @@ function getLabeledContainer(
     elements.find(
       (element) =>
         element.type === "rectangle" &&
-        (element as { customData?: { nodePath?: string } }).customData?.nodePath ===
+        (element as { customData?: { nodePath?: string } }).customData
+          ?.nodePath ===
           (text as { customData?: { nodePath?: string } }).customData?.nodePath,
     )
   );
@@ -202,7 +204,9 @@ describe("buildTerraformElkExcalidrawScene", () => {
           resourceRect?.customData?.nodePath,
     );
     expect((labelEl as { strokeColor?: string })?.strokeColor).toBe("#1e1e1e");
-    expect((labelEl as { containerId?: string | null })?.containerId).toBe(null);
+    expect((labelEl as { containerId?: string | null })?.containerId).toBe(
+      null,
+    );
     expect(resourceRect?.customData?.terraformResources).toEqual([
       expect.objectContaining({
         address: "aws_s3_bucket.root",
@@ -533,17 +537,20 @@ describe("buildTerraformElkExcalidrawScene", () => {
   });
 
   it("emits unknown-after rows using the placeholder", async () => {
-    const details = await getTerraformResourceDetails("aws_lambda_function.fn", {
-      type: "aws_lambda_function",
-      change: {
-        actions: ["create"],
-        after: { function_name: "fn" },
-        after_unknown: {
-          arn: true,
-          environment: [{ variables: { build_id: true } }],
+    const details = await getTerraformResourceDetails(
+      "aws_lambda_function.fn",
+      {
+        type: "aws_lambda_function",
+        change: {
+          actions: ["create"],
+          after: { function_name: "fn" },
+          after_unknown: {
+            arn: true,
+            environment: [{ variables: { build_id: true } }],
+          },
         },
       },
-    });
+    );
 
     expect(details?.attributes?.slice(0, 2)).toEqual([
       expect.objectContaining({
@@ -582,32 +589,31 @@ describe("buildTerraformElkExcalidrawScene", () => {
       },
     });
 
-    expect(details?.attributes?.map((attribute: any) => attribute.key)).toEqual([
-      "arn",
-      "description",
-      "tags",
-      "name",
-    ]);
+    expect(details?.attributes?.map((attribute: any) => attribute.key)).toEqual(
+      ["arn", "description", "tags", "name"],
+    );
   });
 
   it("hides backend-parity fields for aws_iam_role_policy", async () => {
-    const details = await getTerraformResourceDetails("aws_iam_role_policy.inline", {
-      type: "aws_iam_role_policy",
-      change: {
-        actions: ["create"],
-        after: {
-          id: "hidden-id",
-          name_prefix: "hidden-prefix",
-          policy: "{}",
-          role: "app-role",
+    const details = await getTerraformResourceDetails(
+      "aws_iam_role_policy.inline",
+      {
+        type: "aws_iam_role_policy",
+        change: {
+          actions: ["create"],
+          after: {
+            id: "hidden-id",
+            name_prefix: "hidden-prefix",
+            policy: "{}",
+            role: "app-role",
+          },
         },
       },
-    });
+    );
 
-    expect(details?.attributes?.map((attribute: any) => attribute.key)).toEqual([
-      "policy",
-      "role",
-    ]);
+    expect(details?.attributes?.map((attribute: any) => attribute.key)).toEqual(
+      ["policy", "role"],
+    );
   });
 
   it("sets terraformExplodeParentKeys from dependency edges (undirected)", async () => {
@@ -638,12 +644,12 @@ describe("buildTerraformElkExcalidrawScene", () => {
           ?.terraformVisibilityKey === b,
     );
     expect(
-      (rectA as { customData?: { terraformExplodeParentKeys?: string[] } }).customData
-        ?.terraformExplodeParentKeys,
+      (rectA as { customData?: { terraformExplodeParentKeys?: string[] } })
+        .customData?.terraformExplodeParentKeys,
     ).toEqual([b]);
     expect(
-      (rectB as { customData?: { terraformExplodeParentKeys?: string[] } }).customData
-        ?.terraformExplodeParentKeys,
+      (rectB as { customData?: { terraformExplodeParentKeys?: string[] } })
+        .customData?.terraformExplodeParentKeys,
     ).toEqual([a]);
   });
 
@@ -662,9 +668,12 @@ describe("buildTerraformElkExcalidrawScene", () => {
       },
     } as unknown as TerraformPlanNodesMap;
     (nodes[a] as TerraformPlanGraphNode).edges_new = [b];
-    Object.assign(nodes[b] as TerraformPlanGraphNode, {
-      edges_data_flow: [{ target: c, type: "invoke", label: "q" }],
-    } as Record<string, unknown>);
+    Object.assign(
+      nodes[b] as TerraformPlanGraphNode,
+      {
+        edges_data_flow: [{ target: c, type: "invoke", label: "q" }],
+      } as Record<string, unknown>,
+    );
 
     const { elements } = await buildTerraformElkExcalidrawScene(nodes);
     const rectB = elements.find(
@@ -674,8 +683,8 @@ describe("buildTerraformElkExcalidrawScene", () => {
           ?.terraformVisibilityKey === b,
     );
     const parents =
-      (rectB as { customData?: { terraformExplodeParentKeys?: string[] } }).customData
-        ?.terraformExplodeParentKeys ?? [];
+      (rectB as { customData?: { terraformExplodeParentKeys?: string[] } })
+        .customData?.terraformExplodeParentKeys ?? [];
     expect(parents.sort()).toEqual([a, c].sort());
   });
 
@@ -696,8 +705,8 @@ describe("buildTerraformElkExcalidrawScene", () => {
     );
     expect(rect?.isDeleted).toBe(true);
     expect(
-      (rect as { customData?: { terraformInitiallyVisible?: boolean } }).customData
-        ?.terraformInitiallyVisible,
+      (rect as { customData?: { terraformInitiallyVisible?: boolean } })
+        .customData?.terraformInitiallyVisible,
     ).toBe(false);
     const label = elements.find(
       (e) =>
@@ -708,8 +717,83 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(label?.isDeleted).toBe(true);
     expect((label as { containerId?: string | null })?.containerId).toBe(null);
     expect(
-      (label as { customData?: { terraformExplodeParentKeys?: string[] } }).customData
-        ?.terraformExplodeParentKeys,
+      (label as { customData?: { terraformExplodeParentKeys?: string[] } })
+        .customData?.terraformExplodeParentKeys,
     ).toEqual([]);
+  });
+
+  it("shows changed non-primary resources and labels by default", async () => {
+    const fixtures = [
+      ["aws_iam_role_policy.created", ["create"], false],
+      ["aws_iam_role_policy.updated", ["update"], false],
+      ["aws_iam_role_policy.deleted", ["delete"], false],
+      ["aws_iam_role_policy.replaced", ["delete", "create"], false],
+      ["aws_iam_role_policy.noop", ["no-op"], true],
+      ["aws_iam_role_policy.existing", ["existing"], true],
+      ["aws_iam_role_policy.read", ["read"], true],
+      ["aws_iam_role_policy.external", ["external"], true],
+    ] as const;
+
+    for (const [address, actions, expectedDeleted] of fixtures) {
+      const { elements } = await buildTerraformElkExcalidrawScene(
+        oneResourceNodes(address, {
+          address,
+          type: "aws_iam_role_policy",
+          change: { actions, after: { policy: "{}" } },
+        }),
+      );
+      const rect = elements.find(
+        (e) =>
+          e.type === "rectangle" &&
+          (e as { customData?: { terraformVisibilityKey?: string } }).customData
+            ?.terraformVisibilityKey === address,
+      );
+      const label = elements.find(
+        (e) =>
+          e.type === "text" &&
+          (e as { customData?: { terraformVisibilityKey?: string } }).customData
+            ?.terraformVisibilityKey === address,
+      );
+
+      expect(rect?.isDeleted).toBe(expectedDeleted);
+      expect(label?.isDeleted).toBe(expectedDeleted);
+      expect(
+        (rect as { customData?: { terraformInitiallyVisible?: boolean } })
+          .customData?.terraformInitiallyVisible,
+      ).toBe(!expectedDeleted);
+    }
+  });
+
+  it("restores changed non-primary resources when collapsing to default visibility", async () => {
+    const address = "aws_iam_role_policy.updated";
+    const { elements } = await buildTerraformElkExcalidrawScene(
+      oneResourceNodes(address, {
+        address,
+        type: "aws_iam_role_policy",
+        change: { actions: ["update"], after: { policy: "{}" } },
+      }),
+    );
+    const hidden = elements.map((element) =>
+      element.customData?.terraformVisibilityKey === address
+        ? { ...element, isDeleted: true }
+        : element,
+    );
+
+    const collapsed = collapseAllTerraformExplode(hidden);
+    const rect = collapsed.find(
+      (e) =>
+        e.type === "rectangle" &&
+        (e as { customData?: { terraformVisibilityKey?: string } }).customData
+          ?.terraformVisibilityKey === address,
+    );
+    const label = collapsed.find(
+      (e) =>
+        e.type === "text" &&
+        (e as { customData?: { terraformVisibilityKey?: string } }).customData
+          ?.terraformVisibilityKey === address,
+    );
+
+    expect(rect?.isDeleted).toBe(false);
+    expect(label?.isDeleted).toBe(false);
   });
 });
