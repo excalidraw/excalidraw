@@ -94,6 +94,50 @@ const group = (
   );
 
 describe("terraform relationship focus", () => {
+  it("reveals bound label when it lacks nodePath but its container is a related resource", () => {
+    const rectSg = resource("aws_security_group.sg", {
+      id: "rect:sg",
+      isDeleted: true,
+    });
+    const labelText = baseElement(
+      "text:sg",
+      { terraform: true, terraformVisibilityRole: "resource" },
+      {
+        type: "text",
+        containerId: "rect:sg",
+        isDeleted: true,
+        width: 80,
+        height: 20,
+        fontSize: 12,
+        originalText: "aws_security_group.sg",
+        text: "aws_security_group.sg",
+      },
+    );
+
+    const elements = [
+      resource("aws_instance.web"),
+      rectSg,
+      labelText,
+      edge(
+        "edge:web-sg",
+        "dependency",
+        "aws_instance.web",
+        "aws_security_group.sg",
+        { isDeleted: true },
+      ),
+    ];
+
+    const result = applyTerraformRelationshipFocus(
+      elements,
+      "aws_instance.web",
+    );
+    const byId = new Map(result.elements.map((e) => [e.id, e]));
+
+    expect(byId.get("rect:sg")?.isDeleted).toBe(false);
+    expect(byId.get("text:sg")?.isDeleted).toBe(false);
+    expect(byId.get("text:sg")?.opacity).toBe(100);
+  });
+
   it("reveals direct dependency edges and direct neighbor nodes", () => {
     const elements = [
       resource("aws_instance.web"),
@@ -161,6 +205,49 @@ describe("terraform relationship focus", () => {
     expect(byId.get("node:aws_cloudwatch_log_group.logs")?.isDeleted).toBe(
       false,
     );
+  });
+
+  it("keeps bound label text at full opacity when the resource rectangle is dimmed", () => {
+    const rectS3 = resource("aws_s3_bucket.logs", { id: "rect:s3" });
+    const labelText = baseElement(
+      "text:s3",
+      {
+        terraform: true,
+        nodePath: "aws_s3_bucket.logs",
+        terraformVisibilityRole: "resource",
+      },
+      {
+        type: "text",
+        containerId: "rect:s3",
+        width: 80,
+        height: 20,
+        fontSize: 12,
+        originalText: "aws_s3_bucket.logs",
+        text: "aws_s3_bucket.logs",
+      },
+    );
+
+    const elements = [
+      resource("aws_instance.web"),
+      resource("aws_security_group.sg"),
+      rectS3,
+      labelText,
+      edge(
+        "edge:link",
+        "dependency",
+        "aws_instance.web",
+        "aws_security_group.sg",
+      ),
+    ];
+
+    const result = applyTerraformRelationshipFocus(
+      elements,
+      "aws_instance.web",
+    );
+    const byId = new Map(result.elements.map((e) => [e.id, e]));
+
+    expect(byId.get("rect:s3")?.opacity).toBe(25);
+    expect(byId.get("text:s3")?.opacity).toBe(100);
   });
 
   it("dims unrelated Terraform resources, groups, and edges", () => {

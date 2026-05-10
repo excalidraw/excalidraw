@@ -69,13 +69,17 @@ function getLabeledContainer(
   const text = elements.find(
     (element: any) =>
       element.type === "text" &&
-      "containerId" in element &&
-      element.containerId &&
+      (!("containerId" in element) || !element.containerId) &&
       element.originalText === label,
   );
   return (
     text &&
-    elements.find((element) => element.id === (text as any).containerId)
+    elements.find(
+      (element) =>
+        element.type === "rectangle" &&
+        (element as { customData?: { nodePath?: string } }).customData?.nodePath ===
+          (text as { customData?: { nodePath?: string } }).customData?.nodePath,
+    )
   );
 }
 
@@ -184,9 +188,21 @@ describe("buildTerraformElkExcalidrawScene", () => {
       terraformVisibilityRole: "resource",
       terraformVisibilityKey: "aws_s3_bucket.root",
       terraformNodeKind: "resource",
+      terraformInitiallyVisible: true,
+      terraformExplodeParentKeys: expect.arrayContaining([
+        "module.network.aws_vpc.main",
+      ]),
       nodePath: "aws_s3_bucket.root",
       resourceType: "aws_s3_bucket",
     });
+    const labelEl = elements.find(
+      (e) =>
+        e.type === "text" &&
+        (e as { customData?: { nodePath?: string } }).customData?.nodePath ===
+          resourceRect?.customData?.nodePath,
+    );
+    expect((labelEl as { strokeColor?: string })?.strokeColor).toBe("#1e1e1e");
+    expect((labelEl as { containerId?: string | null })?.containerId).toBe(null);
     expect(resourceRect?.customData?.terraformResources).toEqual([
       expect.objectContaining({
         address: "aws_s3_bucket.root",
@@ -592,5 +608,108 @@ describe("buildTerraformElkExcalidrawScene", () => {
       "policy",
       "role",
     ]);
+  });
+
+  it("sets terraformExplodeParentKeys from dependency edges (undirected)", async () => {
+    const a = "aws_s3_bucket.a";
+    const b = "aws_s3_bucket.b";
+    const nodes = {
+      [a]: minimalNode({ [a]: { address: a, type: "aws_s3_bucket" } }),
+      [b]: minimalNode({ [b]: { address: b, type: "aws_s3_bucket" } }),
+      [TERRAFORM_MODULE_TREE_KEY]: {
+        path: "root",
+        modules: {},
+        resourceAddresses: [a, b],
+      },
+    } as unknown as TerraformPlanNodesMap;
+    (nodes[a] as TerraformPlanGraphNode).edges_new = [b];
+
+    const { elements } = await buildTerraformElkExcalidrawScene(nodes);
+    const rectA = elements.find(
+      (e) =>
+        e.type === "rectangle" &&
+        (e as { customData?: { terraformVisibilityKey?: string } }).customData
+          ?.terraformVisibilityKey === a,
+    );
+    const rectB = elements.find(
+      (e) =>
+        e.type === "rectangle" &&
+        (e as { customData?: { terraformVisibilityKey?: string } }).customData
+          ?.terraformVisibilityKey === b,
+    );
+    expect(
+      (rectA as { customData?: { terraformExplodeParentKeys?: string[] } }).customData
+        ?.terraformExplodeParentKeys,
+    ).toEqual([b]);
+    expect(
+      (rectB as { customData?: { terraformExplodeParentKeys?: string[] } }).customData
+        ?.terraformExplodeParentKeys,
+    ).toEqual([a]);
+  });
+
+  it("extends explode neighbors with data-flow edges when present", async () => {
+    const a = "aws_s3_bucket.a";
+    const b = "aws_lambda_function.b";
+    const c = "aws_sqs_queue.c";
+    const nodes = {
+      [a]: minimalNode({ [a]: { address: a, type: "aws_s3_bucket" } }),
+      [b]: minimalNode({ [b]: { address: b, type: "aws_lambda_function" } }),
+      [c]: minimalNode({ [c]: { address: c, type: "aws_sqs_queue" } }),
+      [TERRAFORM_MODULE_TREE_KEY]: {
+        path: "root",
+        modules: {},
+        resourceAddresses: [a, b, c],
+      },
+    } as unknown as TerraformPlanNodesMap;
+    (nodes[a] as TerraformPlanGraphNode).edges_new = [b];
+    Object.assign(nodes[b] as TerraformPlanGraphNode, {
+      edges_data_flow: [{ target: c, type: "invoke", label: "q" }],
+    } as Record<string, unknown>);
+
+    const { elements } = await buildTerraformElkExcalidrawScene(nodes);
+    const rectB = elements.find(
+      (e) =>
+        e.type === "rectangle" &&
+        (e as { customData?: { terraformVisibilityKey?: string } }).customData
+          ?.terraformVisibilityKey === b,
+    );
+    const parents =
+      (rectB as { customData?: { terraformExplodeParentKeys?: string[] } }).customData
+        ?.terraformExplodeParentKeys ?? [];
+    expect(parents.sort()).toEqual([a, c].sort());
+  });
+
+  it("soft-hides non-primary resource rectangles and bound labels", async () => {
+    const address = "null_resource.dummy";
+    const { elements } = await buildTerraformElkExcalidrawScene(
+      oneResourceNodes(address, {
+        address,
+        type: "null_resource",
+        change: { actions: ["no-op"] },
+      }),
+    );
+    const rect = elements.find(
+      (e) =>
+        e.type === "rectangle" &&
+        (e as { customData?: { terraformVisibilityKey?: string } }).customData
+          ?.terraformVisibilityKey === address,
+    );
+    expect(rect?.isDeleted).toBe(true);
+    expect(
+      (rect as { customData?: { terraformInitiallyVisible?: boolean } }).customData
+        ?.terraformInitiallyVisible,
+    ).toBe(false);
+    const label = elements.find(
+      (e) =>
+        e.type === "text" &&
+        (e as { customData?: { terraformVisibilityKey?: string } }).customData
+          ?.terraformVisibilityKey === address,
+    );
+    expect(label?.isDeleted).toBe(true);
+    expect((label as { containerId?: string | null })?.containerId).toBe(null);
+    expect(
+      (label as { customData?: { terraformExplodeParentKeys?: string[] } }).customData
+        ?.terraformExplodeParentKeys,
+    ).toEqual([]);
   });
 });

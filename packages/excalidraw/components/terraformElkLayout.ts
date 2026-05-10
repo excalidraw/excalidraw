@@ -30,11 +30,25 @@
 
 /** Browser / Vite-safe build: default `elkjs` entry pulls optional `web-worker` (see elkjs `lib/main.js`). */
 import ELK from "elkjs/lib/elk.bundled.js";
-import { convertToExcalidrawElements } from "@excalidraw/element";
+import { convertToExcalidrawElements, newElementWith } from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
 
 import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { LocalPoint } from "@excalidraw/math";
+
+import {
+  buildTerraformExplodeParentMap,
+  collectDataFlowEdges,
+} from "./terraformExplodeGraph";
+import {
+  getTerraformResourceTypeFromNodePath,
+  isPrimaryVisibleResourceType,
+} from "./terraformPrimaryVisibility";
+import {
+  reconcileTerraformVisibility,
+  repairTerraformEdgeBindings,
+} from "./terraformVisibility";
 
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import type {
@@ -95,6 +109,9 @@ function moduleFrameSkeletonId(modulePath: string) {
 
 /** Above this many graph vertices, skip ELK to avoid long main-thread stalls. */
 export const TERRAFORM_ELK_MAX_VERTICES = 600;
+
+/** Bound label fill uses `strokeColor`; must stay dark (backend `excalidraw.js` uses `#1e1e1e`). */
+const TERRAFORM_RESOURCE_LABEL_STROKE = "#1e1e1e";
 
 export type TerraformElkSceneMeta = {
   layoutEngine: "elk";
@@ -311,12 +328,6 @@ function getPrimaryResource(
   return (Object.values(node?.resources || {})[0] || {}) as Record<string, any>;
 }
 
-function getResourceTypeFromAddress(address: string) {
-  const withoutModules = address.replace(/^(?:module\.[^.]+\.)+/, "");
-  const parts = withoutModules.split(".");
-  return parts[0] || "";
-}
-
 /** Mirrors backend `getPrimaryAction` in `packages/backend/excalidraw-elements.js`. */
 function getTerraformAction(resource: Record<string, any>) {
   const actions = resource.change?.actions;
@@ -478,7 +489,9 @@ function buildLocalTerraformResourceDetails(
   const change = resource.change || {};
   const config = getCurrentResourceConfig(resource);
   const diff = getLocalResourceDiff(change);
-  const resourceType = resource.type || getResourceTypeFromAddress(address);
+  const resourceType =
+    (typeof resource.type === "string" && resource.type) ||
+    getTerraformResourceTypeFromNodePath(address);
   const unknownAfterKeys = getUnknownTopLevelKeys(change.after_unknown || {});
   const unknownAfterSet = new Set(unknownAfterKeys);
   const keys = new Set([
@@ -884,6 +897,77 @@ const fixedPointForLayoutPoint = (
   clamp((point.y - box.y) / (box.height || 1), 0, 1),
 ];
 
+/** Skeleton rectangles cannot set `isDeleted`; apply from `terraformInitiallyVisible` after convert. */
+function applyTerraformResourceRectangleSoftDelete(
+  elements: readonly ExcalidrawElement[],
+): ExcalidrawElement[] {
+  return elements.map((el) => {
+    if (el.type !== "rectangle") {
+      return el;
+    }
+    const cd = el.customData ?? {};
+    if (cd.terraformVisibilityRole !== "resource") {
+      return el;
+    }
+    const initiallyVisible = cd.terraformInitiallyVisible === true;
+    return newElementWith(el, { isDeleted: !initiallyVisible });
+  });
+}
+
+/**
+ * `convertToExcalidrawElements` creates rectangle `label` text as bound text. The backend exporter
+ * emits labels as independent grouped text (`containerId: null`), which works better with the
+ * Terraform soft-delete / hover focus code. Mirror metadata from the resource rectangle, then
+ * detach the label so visibility is controlled by our Terraform customData instead of Excalidraw's
+ * container-bound text behavior.
+ */
+function mirrorAndDetachTerraformResourceLabels(
+  elements: readonly ExcalidrawElement[],
+): ExcalidrawElement[] {
+  const byId = new Map(elements.map((e) => [e.id, e]));
+  return elements.map((el) => {
+    if (el.type === "rectangle" && el.customData?.terraformVisibilityRole === "resource") {
+      const boundElements = el.boundElements?.filter((bound) => bound.type !== "text");
+      if (boundElements?.length !== el.boundElements?.length) {
+        return newElementWith(el, { boundElements });
+      }
+      return el;
+    }
+
+    if (el.type !== "text") {
+      return el;
+    }
+    if (!("containerId" in el) || !el.containerId) {
+      return el;
+    }
+    const parent = byId.get(el.containerId);
+    if (!parent || parent.type !== "rectangle") {
+      return el;
+    }
+    const pcd = parent.customData ?? {};
+    if (pcd.terraformVisibilityRole !== "resource") {
+      return el;
+    }
+    return newElementWith(el, {
+      isDeleted: parent.isDeleted,
+      strokeColor: TERRAFORM_RESOURCE_LABEL_STROKE,
+      containerId: null,
+      customData: {
+        ...(el.customData ?? {}),
+        terraform: true,
+        terraformVisibilityRole: pcd.terraformVisibilityRole,
+        terraformVisibilityKey: pcd.terraformVisibilityKey,
+        terraformNodeKind: pcd.terraformNodeKind,
+        terraformInitiallyVisible: pcd.terraformInitiallyVisible,
+        terraformExplodeParentKeys: pcd.terraformExplodeParentKeys,
+        terraformExplodeParent: pcd.terraformExplodeParent,
+        resourceType: pcd.resourceType,
+        nodePath: pcd.nodePath,
+      },
+    });
+  });
+}
+
 /**
  * Runs ELK on the Terraform graph + module tree and returns Excalidraw elements plus metadata.
  */
@@ -935,6 +1019,15 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
   }
 
   const directedEdges = collectDirectedEdges(nodes, vertexSet);
+  const dataFlowEdges = collectDataFlowEdges(
+    nodes as Record<string, { edges_data_flow?: unknown }>,
+  );
+  const explodeParentMap = buildTerraformExplodeParentMap(
+    [...vertexSet],
+    directedEdges,
+    dataFlowEdges,
+  );
+
   const moduleRoot = buildModuleCompound(tree, vertexSet);
   if (!moduleRoot) {
     return {
@@ -987,7 +1080,10 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
       continue;
     }
     const resource = getPrimaryResource(nodes[id]);
-    const resourceType = resource.type || getResourceTypeFromAddress(id);
+    const resourceType = getTerraformResourceTypeFromNodePath(id);
+    const initiallyVisible = isPrimaryVisibleResourceType(resourceType);
+    const explodeKeys = [...(explodeParentMap.get(id) || [])].sort();
+    const explodeParent = explodeKeys[0] ?? null;
     const action = getTerraformAction(resource);
     const actionStyle = getTerraformActionStyle(action);
     resourceSkeletons.push({
@@ -1001,13 +1097,19 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
       strokeColor: actionStyle.strokeColor,
       backgroundColor: actionStyle.backgroundColor,
       roundness: { type: 3, value: 10 },
-      label: { text: shortResourceLabel(id), fontSize: 12 },
+      label: {
+        text: shortResourceLabel(id),
+        fontSize: 12,
+        strokeColor: TERRAFORM_RESOURCE_LABEL_STROKE,
+      },
       customData: {
         terraform: true,
         terraformVisibilityRole: "resource",
         terraformVisibilityKey: id,
         terraformNodeKind: "resource",
-        terraformInitiallyVisible: true,
+        terraformInitiallyVisible: initiallyVisible,
+        terraformExplodeParentKeys: explodeKeys,
+        terraformExplodeParent: explodeParent,
         resourceType,
         nodePath: id,
         action,
@@ -1088,10 +1190,15 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
     ...resourceSkeletons,
   ];
 
-  const elements = convertToExcalidrawElements(skeleton, { regenerateIds: true });
+  let elements = convertToExcalidrawElements(skeleton, {
+    regenerateIds: true,
+  }) as ExcalidrawElement[];
+  elements = applyTerraformResourceRectangleSoftDelete(elements);
+  elements = mirrorAndDetachTerraformResourceLabels(elements);
+  elements = repairTerraformEdgeBindings(reconcileTerraformVisibility(elements));
 
   return {
-    elements,
+    elements: elements as ReturnType<typeof convertToExcalidrawElements>,
     meta: {
       layoutEngine: "elk",
       vertexCount,
