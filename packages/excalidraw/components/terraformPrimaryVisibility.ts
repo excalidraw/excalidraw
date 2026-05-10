@@ -65,6 +65,25 @@ export function isPrimaryVisibleResourceType(resourceType: string): boolean {
   return PRIMARY_VISIBLE_TYPES.has(resourceType);
 }
 
+export function isChangedTerraformAction(action: string): boolean {
+  return (
+    action === "create" ||
+    action === "update" ||
+    action === "delete" ||
+    action === "replace"
+  );
+}
+
+export function isInitiallyVisibleTerraformResource(
+  resourceType: string,
+  action: string,
+): boolean {
+  return (
+    isPrimaryVisibleResourceType(resourceType) ||
+    isChangedTerraformAction(action)
+  );
+}
+
 /**
  * Terraform provider type segment parsed from `nodePath` (handles `module.*` prefixes and `data`).
  */

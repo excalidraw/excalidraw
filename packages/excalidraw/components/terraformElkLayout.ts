@@ -30,7 +30,10 @@
 
 /** Browser / Vite-safe build: default `elkjs` entry pulls optional `web-worker` (see elkjs `lib/main.js`). */
 import ELK from "elkjs/lib/elk.bundled.js";
-import { convertToExcalidrawElements, newElementWith } from "@excalidraw/element";
+import {
+  convertToExcalidrawElements,
+  newElementWith,
+} from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
 
 import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
@@ -43,7 +46,7 @@ import {
 } from "./terraformExplodeGraph";
 import {
   getTerraformResourceTypeFromNodePath,
-  isPrimaryVisibleResourceType,
+  isInitiallyVisibleTerraformResource,
 } from "./terraformPrimaryVisibility";
 import {
   reconcileTerraformVisibility,
@@ -328,35 +331,52 @@ function getPrimaryResource(
   return (Object.values(node?.resources || {})[0] || {}) as Record<string, any>;
 }
 
-/** Mirrors backend `getPrimaryAction` in `packages/backend/excalidraw-elements.js`. */
-function getTerraformAction(resource: Record<string, any>) {
-  const actions = resource.change?.actions;
-  if (Array.isArray(actions)) {
-    const actionSet = new Set(actions);
-    if (actionSet.has("delete") && actionSet.has("create")) {
-      return "replace";
-    }
-    if (actionSet.has("create")) {
-      return "create";
-    }
-    if (actionSet.has("delete")) {
-      return "delete";
-    }
-    if (actionSet.has("update")) {
-      return "update";
-    }
-    if (actionSet.has("no-op")) {
-      return "no-op";
-    }
-    if (actionSet.has("read")) {
-      return "read";
-    }
-    if (actionSet.has("external")) {
-      return "external";
-    }
-    return actions[0] || "existing";
+function getDominantTerraformAction(actions: Iterable<unknown>) {
+  const actionSet = new Set(actions);
+  if (actionSet.has("delete") && actionSet.has("create")) {
+    return "replace";
   }
-  return typeof actions === "string" && actions ? actions : "existing";
+  if (actionSet.has("create")) {
+    return "create";
+  }
+  if (actionSet.has("delete")) {
+    return "delete";
+  }
+  if (actionSet.has("update")) {
+    return "update";
+  }
+  if (actionSet.has("no-op")) {
+    return "no-op";
+  }
+  if (actionSet.has("read")) {
+    return "read";
+  }
+  if (actionSet.has("external")) {
+    return "external";
+  }
+  for (const action of actionSet) {
+    if (typeof action === "string" && action) {
+      return action;
+    }
+  }
+  return "existing";
+}
+
+/** Mirrors backend `getPrimaryAction` in `packages/backend/excalidraw-elements.js`. */
+function getTerraformNodeAction(node: TerraformPlanGraphNode | undefined) {
+  const actions: unknown[] = [];
+  for (const resource of Object.values(node?.resources || {})) {
+    const resourceActions = (resource as Record<string, any>).change?.actions;
+    if (Array.isArray(resourceActions)) {
+      actions.push(...resourceActions);
+    } else if (typeof resourceActions === "string" && resourceActions) {
+      actions.push(resourceActions);
+    }
+  }
+  if (actions.length > 0) {
+    return getDominantTerraformAction(actions);
+  }
+  return "existing";
 }
 
 const TERRAFORM_ACTION_STYLES: Record<
@@ -529,8 +549,8 @@ function buildLocalTerraformResourceDetails(
         value: Object.prototype.hasOwnProperty.call(config, key)
           ? config[key]
           : unknownAfter
-            ? UNKNOWN_VALUE_PLACEHOLDER
-            : fieldDiff?.after ?? null,
+          ? UNKNOWN_VALUE_PLACEHOLDER
+          : fieldDiff?.after ?? null,
         changed: Boolean(fieldDiff),
         unknownAfter,
         before: fieldDiff?.before,
@@ -649,7 +669,9 @@ function applyModuleGridLayout(
   const innerWidth = Math.max(0, innerRight - innerLeft);
 
   const subPaths = Object.keys(mod.modules).sort();
-  const resourceAddrs = mod.resourceAddresses.filter((a) => vertexSet.has(a)).sort();
+  const resourceAddrs = mod.resourceAddresses
+    .filter((a) => vertexSet.has(a))
+    .sort();
 
   let cursorX = innerLeft;
   let cursorY = innerTop;
@@ -777,7 +799,10 @@ function frameTitleForModulePath(modulePath: string): string {
 }
 
 /** Direct frame children: resources in this module, then nested module frames (sorted). */
-function moduleFrameChildIds(mod: TerraformModuleTreeNode, vertexSet: Set<string>): string[] {
+function moduleFrameChildIds(
+  mod: TerraformModuleTreeNode,
+  vertexSet: Set<string>,
+): string[] {
   const ids: string[] = [];
   for (const addr of [...mod.resourceAddresses].sort()) {
     if (vertexSet.has(addr)) {
@@ -798,7 +823,12 @@ function pushModuleFrameSkeletonsPostOrder(
   out: ExcalidrawElementSkeleton[],
 ) {
   for (const path of Object.keys(mod.modules).sort()) {
-    pushModuleFrameSkeletonsPostOrder(mod.modules[path], vertexSet, layoutBoxes, out);
+    pushModuleFrameSkeletonsPostOrder(
+      mod.modules[path],
+      vertexSet,
+      layoutBoxes,
+      out,
+    );
   }
   const children = moduleFrameChildIds(mod, vertexSet);
   if (children.length === 0) {
@@ -926,8 +956,13 @@ function mirrorAndDetachTerraformResourceLabels(
 ): ExcalidrawElement[] {
   const byId = new Map(elements.map((e) => [e.id, e]));
   return elements.map((el) => {
-    if (el.type === "rectangle" && el.customData?.terraformVisibilityRole === "resource") {
-      const boundElements = el.boundElements?.filter((bound) => bound.type !== "text");
+    if (
+      el.type === "rectangle" &&
+      el.customData?.terraformVisibilityRole === "resource"
+    ) {
+      const boundElements = el.boundElements?.filter(
+        (bound) => bound.type !== "text",
+      );
       if (boundElements?.length !== el.boundElements?.length) {
         return newElementWith(el, { boundElements });
       }
@@ -971,7 +1006,9 @@ function mirrorAndDetachTerraformResourceLabels(
 /**
  * Runs ELK on the Terraform graph + module tree and returns Excalidraw elements plus metadata.
  */
-export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodesMap): Promise<{
+export async function buildTerraformElkExcalidrawScene(
+  nodes: TerraformPlanNodesMap,
+): Promise<{
   elements: ReturnType<typeof convertToExcalidrawElements>;
   meta: TerraformElkSceneMeta;
 }> {
@@ -1081,10 +1118,13 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
     }
     const resource = getPrimaryResource(nodes[id]);
     const resourceType = getTerraformResourceTypeFromNodePath(id);
-    const initiallyVisible = isPrimaryVisibleResourceType(resourceType);
     const explodeKeys = [...(explodeParentMap.get(id) || [])].sort();
     const explodeParent = explodeKeys[0] ?? null;
-    const action = getTerraformAction(resource);
+    const action = getTerraformNodeAction(nodes[id]);
+    const initiallyVisible = isInitiallyVisibleTerraformResource(
+      resourceType,
+      action,
+    );
     const actionStyle = getTerraformActionStyle(action);
     resourceSkeletons.push({
       type: "rectangle",
@@ -1125,21 +1165,16 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
     if (!sourceBox || !targetBox) {
       continue;
     }
-    const { startPoint, endPoint } = getCenterClippedLine(
-      sourceBox,
-      targetBox,
-    );
+    const { startPoint, endPoint } = getCenterClippedLine(sourceBox, targetBox);
     const startX = startPoint.x;
     const startY = startPoint.y;
     const endX = endPoint.x;
     const endY = endPoint.y;
-    const sourceResource = getPrimaryResource(nodes[source]);
-    const targetResource = getPrimaryResource(nodes[target]);
     const dependencyStrokeColor = strokeColorForTerraformDependencyEdge({
       hasNew,
       hasExisting,
-      sourceAction: getTerraformAction(sourceResource),
-      targetAction: getTerraformAction(targetResource),
+      sourceAction: getTerraformNodeAction(nodes[source]),
+      targetAction: getTerraformNodeAction(nodes[target]),
     });
     edgeSkeletons.push({
       type: "line",
@@ -1183,19 +1218,22 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
   }
 
   const frameSkeletons: ExcalidrawElementSkeleton[] = [];
-  pushModuleFrameSkeletonsPostOrder(tree, vertexSet, layoutBoxes, frameSkeletons);
-  const skeleton = [
-    ...frameSkeletons,
-    ...edgeSkeletons,
-    ...resourceSkeletons,
-  ];
+  pushModuleFrameSkeletonsPostOrder(
+    tree,
+    vertexSet,
+    layoutBoxes,
+    frameSkeletons,
+  );
+  const skeleton = [...frameSkeletons, ...edgeSkeletons, ...resourceSkeletons];
 
   let elements = convertToExcalidrawElements(skeleton, {
     regenerateIds: true,
   }) as ExcalidrawElement[];
   elements = applyTerraformResourceRectangleSoftDelete(elements);
   elements = mirrorAndDetachTerraformResourceLabels(elements);
-  elements = repairTerraformEdgeBindings(reconcileTerraformVisibility(elements));
+  elements = repairTerraformEdgeBindings(
+    reconcileTerraformVisibility(elements),
+  );
 
   return {
     elements: elements as ReturnType<typeof convertToExcalidrawElements>,

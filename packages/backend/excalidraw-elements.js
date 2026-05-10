@@ -564,6 +564,22 @@ function isPrimaryVisibleResourceType(resourceType) {
   return PRIMARY_VISIBLE_TYPES.has(resourceType);
 }
 
+function isChangedTerraformAction(action) {
+  return (
+    action === "create" ||
+    action === "update" ||
+    action === "delete" ||
+    action === "replace"
+  );
+}
+
+function isInitiallyVisibleTerraformNode(nodePath, node) {
+  return (
+    isPrimaryVisibleResourceType(getResourceType(nodePath)) ||
+    isChangedTerraformAction(getPrimaryAction(node || {}))
+  );
+}
+
 /** Terraform provider type segment parsed from `nodePath` (handles `module.*` prefixes and `data`). */
 function getResourceType(nodePath) {
   const parts = nodePath.split(".");
@@ -692,9 +708,26 @@ const HIDDEN_ATTRIBUTES_BY_TYPE = {
 /** Dominant plan action across resources on a node (`create` wins over `update`, etc.). */
 function getPrimaryAction(node) {
   const actions = new Set();
-  for (const resource of Object.values(node.resources || {})) {
-    for (const action of resource.change?.actions || []) {
+  const pushAction = (action) => {
+    if (typeof action === "string" && action) {
       actions.add(action);
+    }
+  };
+  if (Array.isArray(node?.change?.actions)) {
+    for (const action of node.change.actions) {
+      pushAction(action);
+    }
+  } else {
+    pushAction(node?.change?.actions);
+  }
+  for (const resource of Object.values(node.resources || {})) {
+    const resourceActions = resource.change?.actions;
+    if (Array.isArray(resourceActions)) {
+      for (const action of resourceActions) {
+        pushAction(action);
+      }
+    } else {
+      pushAction(resourceActions);
     }
   }
   if (actions.has("delete") && actions.has("create")) return "replace";
@@ -1910,6 +1943,8 @@ module.exports = {
   getIconForType,
   cloneIconElements,
   isPrimaryVisibleResourceType,
+  isChangedTerraformAction,
+  isInitiallyVisibleTerraformNode,
   getResourceType,
   getModuleDepth,
   isImportantType,

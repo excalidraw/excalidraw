@@ -68,7 +68,7 @@ const {
   getModulePathChain,
   getPrimaryAction,
   getIconForType,
-  isPrimaryVisibleResourceType,
+  isInitiallyVisibleTerraformNode,
 } = require("./excalidraw-elements");
 
 const {
@@ -153,7 +153,7 @@ function buildDiagramIR(nodes, options = {}) {
       modulePath,
       icon,
       data: {
-        primaryVisible: isPrimaryVisibleResourceType(resourceType),
+        primaryVisible: isInitiallyVisibleTerraformNode(nodePath, node),
       },
     });
 

@@ -154,6 +154,68 @@ describe("Connector registry", () => {
     ).toBe(true);
   });
 
+  it("connectors expose changed non-primary resources as initially visible", async () => {
+    const address = "aws_iam_role_policy.updated";
+    const nodes = {
+      [address]: {
+        resources: {
+          [address]: {
+            address,
+            type: "aws_iam_role_policy",
+            name: "updated",
+            change: { actions: "update" },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    };
+
+    const excalidrawResult = await getRenderer("excalidraw").render({
+      nodes,
+      ir: buildDiagramIR(nodes),
+      options: {},
+    });
+    const excalidrawRect = excalidrawResult.body.elements.find(
+      (element) =>
+        element.type === "rectangle" &&
+        element.customData?.nodePath === address,
+    );
+    expect(excalidrawRect).toMatchObject({
+      isDeleted: false,
+      customData: {
+        action: "update",
+        terraformInitiallyVisible: true,
+      },
+    });
+
+    const tldrawResult = await getRenderer("tldraw").render({
+      nodes,
+      ir: buildDiagramIR(nodes),
+      options: {},
+    });
+    const tldrawShape = tldrawResult.body.shapes.find(
+      (shape) => shape.meta?.terraformVisibilityKey === address,
+    );
+    expect(tldrawShape?.meta).toMatchObject({
+      action: "update",
+      terraformInitiallyVisible: true,
+      terraformVisibilityRole: "resource",
+    });
+
+    const reactflowResult = await getRenderer("reactflow").render({
+      nodes,
+      ir: buildDiagramIR(nodes),
+      options: {},
+    });
+    expect(
+      reactflowResult.body.nodes.some(
+        (node) => node.data?.action === "update" && node.data?.resourceType === "aws_iam_role_policy",
+      ),
+    ).toBe(true);
+  });
+
   it("tldraw connector preserves soft-hidden terraform arrows for explode flows", async () => {
     const hiddenTerraformArrow = {
       id: "hidden-arrow",
