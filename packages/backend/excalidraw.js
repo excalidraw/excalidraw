@@ -1307,6 +1307,9 @@ async function nodesToExcalidraw(nodes, options = {}) {
       },
     );
 
+    const dependencyStartArrowhead = bidirectional ? "arrow" : null;
+    const dependencyEndArrowhead = "arrow";
+
     edgeElements.push(
       makeBaseElement({
         type: "line",
@@ -1331,8 +1334,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
           fixedPoint: endFixed,
           mode: "orbit",
         },
-        startArrowhead: null,
-        endArrowhead: null,
+        startArrowhead: dependencyStartArrowhead,
+        endArrowhead: dependencyEndArrowhead,
         strokeStyle: "solid",
         roundness: { type: 2 },
         isDeleted:
@@ -1408,6 +1411,9 @@ async function nodesToExcalidraw(nodes, options = {}) {
     const startFixed = fixedPointForAbsolutePoint(posA, shifted.startPoint);
     const endFixed = fixedPointForAbsolutePoint(posB, shifted.endPoint);
 
+    const dataFlowStartArrowhead = bidirectional ? "arrow" : null;
+    const dataFlowEndArrowhead = "arrow";
+
     edgeElements.push(
       makeBaseElement({
         type: "line",
@@ -1431,8 +1437,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
           fixedPoint: endFixed,
           mode: "orbit",
         },
-        startArrowhead: null,
-        endArrowhead: null,
+        startArrowhead: dataFlowStartArrowhead,
+        endArrowhead: dataFlowEndArrowhead,
         strokeColor: "#0ca678",
         strokeWidth: 3,
         strokeStyle: "solid",

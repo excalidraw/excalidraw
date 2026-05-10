@@ -260,4 +260,31 @@ describe("terraform relationship focus", () => {
     expect(focus.focusedEdgeIds.has("edge:coalesced")).toBe(true);
     expect(focus.relatedNodePaths.has("aws_security_group.sg")).toBe(true);
   });
+
+  it("detects coalesced data-flow edges using direction endpoint hints", () => {
+    const elements = [
+      resource("aws_instance.web"),
+      resource("aws_security_group.sg"),
+      edge(
+        "edge:coalesced-df",
+        "dataFlow",
+        "module.network",
+        "module.compute",
+        {},
+        {
+          directions: [
+            {
+              source: "aws_security_group.sg",
+              target: "aws_instance.web",
+            },
+          ],
+        },
+      ),
+    ];
+
+    const focus = getTerraformRelationshipFocus(elements, "aws_instance.web");
+
+    expect(focus.focusedEdgeIds.has("edge:coalesced-df")).toBe(true);
+    expect(focus.relatedNodePaths.has("aws_security_group.sg")).toBe(true);
+  });
 });

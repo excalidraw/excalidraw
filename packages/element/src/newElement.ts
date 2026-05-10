@@ -460,6 +460,8 @@ export const newLinearElement = (
     type: ExcalidrawLinearElement["type"];
     points?: ExcalidrawLinearElement["points"];
     polygon?: ExcalidrawLineElement["polygon"];
+    startArrowhead?: ExcalidrawLinearElement["startArrowhead"];
+    endArrowhead?: ExcalidrawLinearElement["endArrowhead"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
   const element = {
@@ -468,8 +470,8 @@ export const newLinearElement = (
 
     startBinding: null,
     endBinding: null,
-    startArrowhead: null,
-    endArrowhead: null,
+    startArrowhead: opts.startArrowhead ?? null,
+    endArrowhead: opts.endArrowhead ?? null,
   };
 
   if (isLineElement(element)) {

@@ -77,10 +77,6 @@ const getRelatedNodePathsForEdge = (
     return relatedNodePaths;
   }
 
-  if (element.customData?.terraformEdgeLayer !== "dependency") {
-    return relatedNodePaths;
-  }
-
   for (const direction of getDirectionEndpointHints(element)) {
     if (direction.source === focusNodePath) {
       relatedNodePaths.add(direction.target);
