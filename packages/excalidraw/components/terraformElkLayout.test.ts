@@ -204,7 +204,7 @@ describe("buildTerraformElkExcalidrawScene", () => {
       }),
     });
     expect((lines[0] as any).startArrowhead).toBe(null);
-    expect((lines[0] as any).endArrowhead).toBe(null);
+    expect((lines[0] as any).endArrowhead).toBe("arrow");
     expect(
       Math.max(...frames.map((frame) => elements.indexOf(frame))),
     ).toBeLessThan(Math.min(...lines.map((line) => elements.indexOf(line))));

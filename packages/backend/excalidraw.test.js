@@ -191,7 +191,7 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
     expect(dependencyLine).toMatchObject({
       type: "line",
       startArrowhead: null,
-      endArrowhead: null,
+      endArrowhead: "arrow",
       customData: {
         relationship: {
           type: "dependency",
@@ -203,7 +203,7 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
       strokeColor: "#0ca678",
       strokeWidth: 3,
       startArrowhead: null,
-      endArrowhead: null,
+      endArrowhead: "arrow",
       startBinding: {
         elementId: expect.any(String),
         mode: "orbit",
@@ -320,8 +320,8 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
     expect(dataFlowLines).toHaveLength(1);
     expect(dataFlowLines[0]).toMatchObject({
       type: "line",
-      startArrowhead: null,
-      endArrowhead: null,
+      startArrowhead: "arrow",
+      endArrowhead: "arrow",
       customData: {
         relationship: {
           type: "bidirectional_data_flow",

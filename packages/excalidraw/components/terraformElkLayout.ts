@@ -1053,7 +1053,7 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
       strokeWidth: 1.5,
       strokeColor: dependencyStrokeColor,
       startArrowhead: null,
-      endArrowhead: null,
+      endArrowhead: "arrow",
       startBinding: {
         elementId: source,
         fixedPoint: fixedPointForLayoutPoint(sourceBox, startPoint),
