@@ -24,13 +24,11 @@ import {
   deconstructRectanguloidElement,
   elementCenterPoint,
   getAllMidpoints,
-  getHighlightedMidpointIndex,
   FOCUS_POINT_SIZE,
   getOmitSidesForEditorInterface,
   getTransformHandles,
   getTransformHandlesFromCoords,
   hasBoundingBox,
-  hitElementItself,
   isArrowElement,
   isBindableElement,
   isElbowArrow,
@@ -412,74 +410,42 @@ const renderBindingHighlightForBindableElement_simple = (
       break;
   }
 
+  // Draw midpoint indicators
   if (
     appState.isMidpointSnappingEnabled &&
     (isFrameLikeElement(suggestedBinding.element) ||
       isBindableElement(suggestedBinding.element))
   ) {
-    // Draw midpoint indicators
-    const linearElement = appState.selectedLinearElement;
-    const arrow =
-      linearElement?.elementId &&
-      LinearElementEditor.getElement(linearElement?.elementId, elementsMap);
-    const cursorIsInsideBindable =
-      pointerCoords &&
-      hitElementItself({
-        point: pointerCoords,
-        element: suggestedBinding.element,
-        elementsMap,
-        threshold: 0,
-        overrideShouldTestInside: true,
-      });
+    context.save();
 
-    const isElbow =
-      (arrow && isElbowArrow(arrow)) ||
-      (appState.activeTool.type === "arrow" &&
-        appState.currentItemArrowType === "elbow");
+    const midpointRadius = 4 / appState.zoom.value;
 
-    if (!cursorIsInsideBindable || isElbow) {
-      context.save();
-
-      const midpoints = getAllMidpoints(suggestedBinding.element, elementsMap);
-
-      const highlightedIdx = pointerCoords
-        ? getHighlightedMidpointIndex(
-            pointerCoords,
-            suggestedBinding.element,
-            elementsMap,
-            appState.zoom,
-            { elbowed: isElbow },
-          )
-        : -1;
-
-      const midpointRadius = 4 / appState.zoom.value;
-
-      midpoints.forEach((midpoint, idx) => {
-        const isHighlighted =
-          highlightedIdx === idx && (!cursorIsInsideBindable || isElbow);
-
-        if (isHighlighted) {
-          context.fillStyle =
-            appState.theme === THEME.DARK
-              ? `rgba(3, 93, 161, 1)`
-              : `rgba(106, 189, 252, 1)`;
-
-          context.beginPath();
-          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
-          context.fill();
-        } else {
-          context.fillStyle =
-            appState.theme === THEME.DARK
-              ? `rgba(0, 0, 0, 0.8)`
-              : `rgba(65, 65, 65, 0.5)`;
-          context.beginPath();
-          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
-          context.fill();
-        }
-      });
-
-      context.restore();
+    // Render base midpoints
+    const midpoints = getAllMidpoints(suggestedBinding.element, elementsMap);
+    for (const midpoint of midpoints) {
+      context.fillStyle =
+        appState.theme === THEME.DARK
+          ? `rgba(0, 0, 0, 0.8)`
+          : `rgba(65, 65, 65, 0.5)`;
+      context.beginPath();
+      context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+      context.fill();
     }
+
+    // Render the highlighted midpoint if any
+    const midpoint = appState.suggestedBinding?.midPoint;
+    if (midpoint) {
+      context.fillStyle =
+        appState.theme === THEME.DARK
+          ? `rgba(3, 93, 161, 1)`
+          : `rgba(106, 189, 252, 1)`;
+
+      context.beginPath();
+      context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+      context.fill();
+    }
+
+    context.restore();
   }
 };
 

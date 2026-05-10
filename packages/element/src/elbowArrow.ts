@@ -30,7 +30,7 @@ import {
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
   getBindingGap,
-  BASE_BINDING_GAP_ELBOW,
+  BASE_BINDING_GAP,
 } from "./binding";
 import { distanceToElement } from "./distance";
 import {
@@ -1311,8 +1311,8 @@ const getElbowArrowData = (
         offsetFromHeading(
           startHeading,
           arrow.startArrowhead
-            ? getBindingGap(hoveredStartElement, { elbowed: true }) * 6
-            : getBindingGap(hoveredStartElement, { elbowed: true }) * 2,
+            ? getBindingGap(hoveredStartElement) * 6
+            : getBindingGap(hoveredStartElement) * 2,
           1,
         ),
       )
@@ -1324,8 +1324,8 @@ const getElbowArrowData = (
         offsetFromHeading(
           endHeading,
           arrow.endArrowhead
-            ? getBindingGap(hoveredEndElement, { elbowed: true }) * 6
-            : getBindingGap(hoveredEndElement, { elbowed: true }) * 2,
+            ? getBindingGap(hoveredEndElement) * 6
+            : getBindingGap(hoveredEndElement) * 2,
           1,
         ),
       )
@@ -1372,8 +1372,8 @@ const getElbowArrowData = (
             ? 0
             : BASE_PADDING -
                 (arrow.startArrowhead
-                  ? BASE_BINDING_GAP_ELBOW * 6
-                  : BASE_BINDING_GAP_ELBOW * 2),
+                  ? BASE_BINDING_GAP * 6
+                  : BASE_BINDING_GAP * 2),
           BASE_PADDING,
         ),
     boundsOverlap
@@ -1388,8 +1388,8 @@ const getElbowArrowData = (
             ? 0
             : BASE_PADDING -
                 (arrow.endArrowhead
-                  ? BASE_BINDING_GAP_ELBOW * 6
-                  : BASE_BINDING_GAP_ELBOW * 2),
+                  ? BASE_BINDING_GAP * 6
+                  : BASE_BINDING_GAP * 2),
           BASE_PADDING,
         ),
     boundsOverlap,
