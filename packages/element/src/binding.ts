@@ -115,7 +115,6 @@ export type BindingStrategy =
  * IMPORTANT: currently must be > 0 (this also applies to the computed gap)
  */
 export const BASE_BINDING_GAP = 5;
-export const BASE_BINDING_GAP_ELBOW = 5;
 export const BASE_ARROW_MIN_LENGTH = 10;
 export const FOCUS_POINT_SIZE = 10 / 1.5;
 
@@ -127,12 +126,8 @@ export const getBindingGap = (
   // only the stroke width is needed, so the gap can also be computed for a
   // bind target that doesn't exist yet (see `getTextBindingForArrowEndpoint`)
   bindTarget: Pick<ExcalidrawBindableElement, "strokeWidth">,
-  opts: Pick<ExcalidrawArrowElement, "elbowed">,
 ): number => {
-  return (
-    (opts.elbowed ? BASE_BINDING_GAP_ELBOW : BASE_BINDING_GAP) +
-    bindTarget.strokeWidth / 2
-  );
+  return BASE_BINDING_GAP + bindTarget.strokeWidth / 2;
 };
 
 export const maxBindingDistance_simple = (zoom?: AppState["zoom"]): number => {
@@ -1528,7 +1523,7 @@ export const bindPointToSnapToElementOutline = (
           startOrEnd === "start" ? 1 : -2,
           elementsMap,
         );
-  const bindingGap = getBindingGap(bindableElement, arrowElement);
+  const bindingGap = getBindingGap(bindableElement);
   const aabb = aabbForElement(bindableElement, elementsMap);
   const bindableCenter = getCenterForBounds(aabb);
 
@@ -1589,7 +1584,7 @@ export const bindPointToSnapToElementOutline = (
         bindableElement,
         elementsMap,
         anotherIntersector,
-        BASE_BINDING_GAP_ELBOW,
+        BASE_BINDING_GAP,
       ).sort(pointDistanceSq)[0];
     }
   } else {
@@ -1648,7 +1643,7 @@ export const avoidRectangularCorner = (
     -bindTarget.angle as Radians,
   );
 
-  const bindingGap = getBindingGap(bindTarget, arrowElement);
+  const bindingGap = getBindingGap(bindTarget);
 
   if (nonRotatedPoint[0] < bindTarget.x && nonRotatedPoint[1] < bindTarget.y) {
     // Top left
@@ -1906,7 +1901,7 @@ export const updateBoundPoint = (
       otherBindable,
       elementsMap,
       intersector,
-      getBindingGap(otherBindable, arrow),
+      getBindingGap(otherBindable),
     ).sort(
       (a, b) => pointDistanceSq(a, focusPoint) - pointDistanceSq(b, focusPoint),
     )[0];
@@ -1916,7 +1911,7 @@ export const updateBoundPoint = (
       bindableElement,
       elementsMap,
       intersector,
-      getBindingGap(bindableElement, arrow),
+      getBindingGap(bindableElement),
     ).sort(
       (a, b) =>
         pointDistanceSq(a, otherFocusPointOrArrowPoint) -
@@ -1944,7 +1939,7 @@ export const updateBoundPoint = (
       element: otherBindable,
       point: outlinePoint,
       elementsMap,
-      threshold: getBindingGap(otherBindable, arrow),
+      threshold: getBindingGap(otherBindable),
       overrideShouldTestInside: true,
     })
   ) {

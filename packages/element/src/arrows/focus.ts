@@ -93,7 +93,7 @@ export const isFocusPointVisible = (
       element: bindableElement,
       elementsMap,
       point: focusPoint,
-      threshold: getBindingGap(bindableElement, arrow),
+      threshold: getBindingGap(bindableElement),
       overrideShouldTestInside: true,
     })
   );

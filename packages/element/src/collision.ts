@@ -334,7 +334,7 @@ export const getAllHoveredElementAtPoint = (
         element,
         point,
         elementsMap,
-        threshold: tolerance ?? getBindingGap(element, arrow),
+        threshold: tolerance ?? getBindingGap(element),
         overrideShouldTestInside: true,
       })
     ) {

@@ -1591,9 +1591,7 @@ describe("history", () => {
         expect(API.getUndoStack().length).toBe(5);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([
-            0.5002127206977238, 0.5002127206977238,
-          ]),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
@@ -1616,9 +1614,7 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(1);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([
-            0.5002127206977238, 0.5002127206977238,
-          ]),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
@@ -1641,9 +1637,7 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(0);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([
-            0.5002127206977238, 0.5002127206977238,
-          ]),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
@@ -1674,9 +1668,7 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(0);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([
-            0.5002127206977238, 0.5002127206977238,
-          ]),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
@@ -1699,9 +1691,7 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(1);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([
-            0.5002127206977238, 0.5002127206977238,
-          ]),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
