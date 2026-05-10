@@ -286,19 +286,82 @@ function fixedPointForAbsolutePoint(pos, point) {
 /** Same hexes as `packages/excalidraw/components/terraformElkLayout.ts` dependency strokes. */
 const TERRAFORM_DEPENDENCY_EDGE_NEW_ONLY = "#2b8a3e";
 const TERRAFORM_DEPENDENCY_EDGE_EXISTING_ONLY = "#1971c2";
-const TERRAFORM_DEPENDENCY_EDGE_BOTH = "#fab005";
+const TERRAFORM_DEPENDENCY_EDGE_DELETE = "#c92a2a";
+const TERRAFORM_DEPENDENCY_EDGE_REPLACE = "#f08c00";
+
+const PLANNED_DEPENDENCY_KIND = "planned_dependency";
+const EXISTING_DEPENDENCY_KIND = "existing_dependency";
+
+/**
+ * Coerces `kinds` / `origins` into canonical dependency kind tokens for coloring.
+ * Never passes a string into `new Set(kinds)` (that would iterate characters).
+ */
+function normalizeTerraformDependencyKindTokens(kinds, origins) {
+  const tokens = [];
+
+  const pushKind = (k) => {
+    if (k === PLANNED_DEPENDENCY_KIND || k === EXISTING_DEPENDENCY_KIND) {
+      tokens.push(k);
+    }
+  };
+
+  if (Array.isArray(kinds)) {
+    for (const k of kinds) {
+      if (typeof k === "string") {
+        pushKind(k);
+      }
+    }
+  } else if (typeof kinds === "string") {
+    pushKind(kinds);
+  } else if (kinds && typeof kinds === "object") {
+    for (const v of Object.values(kinds)) {
+      if (typeof v === "string") {
+        pushKind(v);
+      }
+    }
+  }
+
+  if (tokens.length === 0) {
+    const originList = Array.isArray(origins)
+      ? origins
+      : typeof origins === "string"
+        ? [origins]
+        : [];
+    for (const o of originList) {
+      if (o === "dot") {
+        tokens.push(PLANNED_DEPENDENCY_KIND);
+      }
+      if (o === "terraform_state") {
+        tokens.push(EXISTING_DEPENDENCY_KIND);
+      }
+    }
+  }
+
+  return tokens;
+}
 
 /**
  * Line stroke for merged dependency `kinds` from `collectDirectedEdges` /
  * `coalesceRelationshipPairs` (`planned_dependency` = DOT/plan, `existing_dependency` = prior state).
+ *
+ * @param {unknown} kinds - Array of kind strings, or a single kind string, or empty / malformed.
+ * @param {{ origins?: unknown, sourceAction?: string|null, targetAction?: string|null }} [options]
  */
-function strokeColorForTerraformDependencyKinds(kinds) {
-  const set = new Set(kinds || []);
-  const hasNew = set.has("planned_dependency");
-  const hasExisting = set.has("existing_dependency");
-  if (hasNew && hasExisting) {
-    return TERRAFORM_DEPENDENCY_EDGE_BOTH;
+function strokeColorForTerraformDependencyKinds(kinds, options = {}) {
+  const { origins, sourceAction, targetAction } = options || {};
+
+  if (sourceAction === "delete" || targetAction === "delete") {
+    return TERRAFORM_DEPENDENCY_EDGE_DELETE;
   }
+  if (sourceAction === "replace" || targetAction === "replace") {
+    return TERRAFORM_DEPENDENCY_EDGE_REPLACE;
+  }
+
+  const tokens = normalizeTerraformDependencyKindTokens(kinds, origins);
+  const set = new Set(tokens);
+  const hasNew = set.has(PLANNED_DEPENDENCY_KIND);
+  const hasExisting = set.has(EXISTING_DEPENDENCY_KIND);
+  // Prior-state / depends_on wins over DOT adjacency: existing (alone or with new) → blue.
   if (hasExisting) {
     return TERRAFORM_DEPENDENCY_EDGE_EXISTING_ONLY;
   }
@@ -318,5 +381,6 @@ module.exports = {
   buildTerraformExplodeParentMap,
   offsetLineSegment,
   fixedPointForAbsolutePoint,
+  normalizeTerraformDependencyKindTokens,
   strokeColorForTerraformDependencyKinds,
 };

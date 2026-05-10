@@ -1292,8 +1292,20 @@ async function nodesToExcalidraw(nodes, options = {}) {
     const endX = endPoint.x;
     const endY = endPoint.y;
 
-    const dependencyStrokeColor =
-      strokeColorForTerraformDependencyKinds(kinds);
+    const sourceAction = nodes[source]
+      ? getPrimaryAction(nodes[source])
+      : null;
+    const targetAction = nodes[target]
+      ? getPrimaryAction(nodes[target])
+      : null;
+    const dependencyStrokeColor = strokeColorForTerraformDependencyKinds(
+      kinds,
+      {
+        origins,
+        sourceAction,
+        targetAction,
+      },
+    );
 
     edgeElements.push(
       makeBaseElement({

@@ -66,6 +66,7 @@ describe("DiagramIR", () => {
       source: "aws_lambda_function.worker",
       target: "aws_iam_role.worker",
       directed: true,
+      style: { stroke: "#2b8a3e" },
     });
   });
 

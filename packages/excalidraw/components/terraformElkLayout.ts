@@ -165,10 +165,11 @@ function collectGraphVertexIds(nodes: TerraformPlanNodesMap): Set<string> {
 
 /** DOT / plan-only dependency (`edges_new`). Matches backend resource “create” stroke. */
 const TERRAFORM_DEPENDENCY_EDGE_NEW_ONLY = "#2b8a3e";
-/** Prior-state-only dependency (`edges_existing`). Matches backend “no-op” resource stroke. */
+/** Prior-state / `depends_on` (`edges_existing`); wins over DOT when also in `edges_new`. */
 const TERRAFORM_DEPENDENCY_EDGE_EXISTING_ONLY = "#1971c2";
-/** Edge appears in both buckets for the same directed pair. */
-const TERRAFORM_DEPENDENCY_EDGE_BOTH = "#fab005";
+/** Matches backend `strokeColorForTerraformDependencyKinds` delete / replace precedence. */
+const TERRAFORM_DEPENDENCY_EDGE_DELETE = "#c92a2a";
+const TERRAFORM_DEPENDENCY_EDGE_REPLACE = "#f08c00";
 
 /**
  * Stroke for Terraform dependency lines (browser ELK and backend use the same hexes).
@@ -177,11 +178,17 @@ const TERRAFORM_DEPENDENCY_EDGE_BOTH = "#fab005";
 export function strokeColorForTerraformDependencyEdge(options: {
   hasNew: boolean;
   hasExisting: boolean;
+  sourceAction?: string | null;
+  targetAction?: string | null;
 }): string {
-  const { hasNew, hasExisting } = options;
-  if (hasNew && hasExisting) {
-    return TERRAFORM_DEPENDENCY_EDGE_BOTH;
+  const { hasNew, hasExisting, sourceAction, targetAction } = options;
+  if (sourceAction === "delete" || targetAction === "delete") {
+    return TERRAFORM_DEPENDENCY_EDGE_DELETE;
   }
+  if (sourceAction === "replace" || targetAction === "replace") {
+    return TERRAFORM_DEPENDENCY_EDGE_REPLACE;
+  }
+  // Prior-state / depends_on wins over DOT: existing (alone or with new) → blue.
   if (hasExisting) {
     return TERRAFORM_DEPENDENCY_EDGE_EXISTING_ONLY;
   }
@@ -310,12 +317,31 @@ function getResourceTypeFromAddress(address: string) {
   return parts[0] || "";
 }
 
+/** Mirrors backend `getPrimaryAction` in `packages/backend/excalidraw-elements.js`. */
 function getTerraformAction(resource: Record<string, any>) {
   const actions = resource.change?.actions;
   if (Array.isArray(actions)) {
     const actionSet = new Set(actions);
     if (actionSet.has("delete") && actionSet.has("create")) {
       return "replace";
+    }
+    if (actionSet.has("create")) {
+      return "create";
+    }
+    if (actionSet.has("delete")) {
+      return "delete";
+    }
+    if (actionSet.has("update")) {
+      return "update";
+    }
+    if (actionSet.has("no-op")) {
+      return "no-op";
+    }
+    if (actionSet.has("read")) {
+      return "read";
+    }
+    if (actionSet.has("external")) {
+      return "external";
     }
     return actions[0] || "existing";
   }
@@ -1005,9 +1031,13 @@ export async function buildTerraformElkExcalidrawScene(nodes: TerraformPlanNodes
     const startY = startPoint.y;
     const endX = endPoint.x;
     const endY = endPoint.y;
+    const sourceResource = getPrimaryResource(nodes[source]);
+    const targetResource = getPrimaryResource(nodes[target]);
     const dependencyStrokeColor = strokeColorForTerraformDependencyEdge({
       hasNew,
       hasExisting,
+      sourceAction: getTerraformAction(sourceResource),
+      targetAction: getTerraformAction(targetResource),
     });
     edgeSkeletons.push({
       type: "line",
