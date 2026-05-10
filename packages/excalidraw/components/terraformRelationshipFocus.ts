@@ -94,13 +94,83 @@ const getTerraformNodePath = (element: ExcalidrawElement) =>
     ? element.customData.nodePath
     : null;
 
-const isTerraformResourceLikeElement = (element: ExcalidrawElement) =>
-  element.customData?.terraformVisibilityRole === "resource" ||
-  isTerraformResourceElement(element);
+/** Graph address for focus / edges (`nodePath`, else `terraformVisibilityKey`). */
+const readTerraformGraphAddress = (
+  element: ExcalidrawElement | undefined,
+): string | null => {
+  if (!element?.customData) {
+    return null;
+  }
+  const cd = element.customData;
+  if (typeof cd.nodePath === "string" && cd.nodePath.length > 0) {
+    return cd.nodePath;
+  }
+  if (
+    typeof cd.terraformVisibilityKey === "string" &&
+    cd.terraformVisibilityKey.length > 0
+  ) {
+    return cd.terraformVisibilityKey;
+  }
+  return null;
+};
 
-const isTerraformFocusManagedElement = (element: ExcalidrawElement) =>
+/**
+ * Bound label text may omit `nodePath` while its container card has it. Without the
+ * same address as the rectangle, related-node reveal leaves the label soft-deleted and
+ * it never renders (`getBoundTextElement` only sees non-deleted elements).
+ */
+const resolveTerraformFocusNodePath = (
+  element: ExcalidrawElement,
+  elementById: ReadonlyMap<string, ExcalidrawElement>,
+): string | null => {
+  const own = readTerraformGraphAddress(element);
+  if (own) {
+    return own;
+  }
+  if (
+    element.type === "text" &&
+    "containerId" in element &&
+    typeof element.containerId === "string" &&
+    element.containerId
+  ) {
+    return readTerraformGraphAddress(elementById.get(element.containerId));
+  }
+  return null;
+};
+
+const isTerraformResourceLikeElement = (
+  element: ExcalidrawElement,
+  elementById?: ReadonlyMap<string, ExcalidrawElement>,
+) => {
+  if (
+    element.customData?.terraformVisibilityRole === "resource" ||
+    isTerraformResourceElement(element)
+  ) {
+    return true;
+  }
+  if (
+    elementById &&
+    element.type === "text" &&
+    "containerId" in element &&
+    typeof element.containerId === "string" &&
+    element.containerId
+  ) {
+    const container = elementById.get(element.containerId);
+    return Boolean(
+      container &&
+        (container.customData?.terraformVisibilityRole === "resource" ||
+          isTerraformResourceElement(container)),
+    );
+  }
+  return false;
+};
+
+const isTerraformFocusManagedElement = (
+  element: ExcalidrawElement,
+  elementById?: ReadonlyMap<string, ExcalidrawElement>,
+) =>
   isTerraformLayerEdge(element) ||
-  isTerraformResourceLikeElement(element) ||
+  isTerraformResourceLikeElement(element, elementById) ||
   isTerraformGroupElement(element);
 
 const isParentGroupOfFocusedNode = (
@@ -176,6 +246,7 @@ export const applyTerraformRelationshipFocus = (
 ) => {
   const { focusedNodePaths, relatedNodePaths, focusedEdgeIds } =
     getTerraformRelationshipFocus(allElements, focusNodePath);
+  const elementById = new Map(allElements.map((e) => [e.id, e]));
   let didChange = false;
 
   const nextElements = allElements.map((element) => {
@@ -185,7 +256,8 @@ export const applyTerraformRelationshipFocus = (
     if (!isFocusActive) {
       if (
         isPreview ||
-        (isTerraformFocusManagedElement(element) && element.opacity !== 100)
+        (isTerraformFocusManagedElement(element, elementById) &&
+          element.opacity !== 100)
       ) {
         didChange = true;
         return newElementWith(element, {
@@ -232,15 +304,24 @@ export const applyTerraformRelationshipFocus = (
       });
     }
 
-    if (isTerraformResourceLikeElement(element)) {
-      const nodePath = getTerraformNodePath(element);
+    if (isTerraformResourceLikeElement(element, elementById)) {
+      const nodePath = resolveTerraformFocusNodePath(element, elementById);
       const isFocusNode = nodePath === focusNodePath;
       const isRelatedNode = Boolean(nodePath && relatedNodePaths.has(nodePath));
-      const nextOpacity = isFocusNode
+      const cardOpacity = isFocusNode
         ? TERRAFORM_FOCUS_NODE_OPACITY
         : isRelatedNode
-        ? TERRAFORM_RELATED_OPACITY
-        : TERRAFORM_DIM_NODE_OPACITY;
+          ? TERRAFORM_RELATED_OPACITY
+          : TERRAFORM_DIM_NODE_OPACITY;
+      // Bound labels share the same dimming as their card and become unreadable at 25%.
+      // Keep label text at full opacity so resource names stay visible during hover focus.
+      const isBoundTerraformLabel =
+        element.type === "text" &&
+        "containerId" in element &&
+        Boolean(element.containerId);
+      const nextOpacity = isBoundTerraformLabel
+        ? TERRAFORM_FOCUS_NODE_OPACITY
+        : cardOpacity;
       const shouldReveal = (isFocusNode || isRelatedNode) && element.isDeleted;
       const shouldHideExpiredPreview =
         !isFocusNode && !isRelatedNode && isPreview;

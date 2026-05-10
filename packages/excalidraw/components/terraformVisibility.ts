@@ -459,7 +459,7 @@ export const repairTerraformEdgeBindings = (
 };
 
 /** Applies soft-delete to edges and group wrappers based on visible resource keys and layer flags. */
-const reconcileTerraformVisibility = (
+export const reconcileTerraformVisibility = (
   elements: readonly ExcalidrawElement[],
   overrides: TerraformLayerState = {},
 ) => {
