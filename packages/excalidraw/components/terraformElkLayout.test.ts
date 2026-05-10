@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { buildTerraformElkExcalidrawScene } from "./terraformElkLayout";
+import {
+  buildTerraformElkExcalidrawScene,
+  strokeColorForTerraformDependencyEdge,
+} from "./terraformElkLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import type {
   TerraformPlanGraphNode,
@@ -12,6 +15,38 @@ function minimalNode(
 ): TerraformPlanGraphNode {
   return { resources };
 }
+
+describe("strokeColorForTerraformDependencyEdge", () => {
+  it("prefers delete over new/existing hues", () => {
+    expect(
+      strokeColorForTerraformDependencyEdge({
+        hasNew: true,
+        hasExisting: false,
+        sourceAction: "delete",
+      }),
+    ).toBe("#c92a2a");
+  });
+
+  it("uses replace orange when no delete on endpoints (even if existing+new)", () => {
+    expect(
+      strokeColorForTerraformDependencyEdge({
+        hasNew: true,
+        hasExisting: true,
+        sourceAction: "replace",
+        targetAction: "create",
+      }),
+    ).toBe("#f08c00");
+  });
+
+  it("treats existing+new as blue when no delete/replace", () => {
+    expect(
+      strokeColorForTerraformDependencyEdge({
+        hasNew: true,
+        hasExisting: true,
+      }),
+    ).toBe("#1971c2");
+  });
+});
 
 function boxesOverlap(
   a: { x: number; y: number; width: number; height: number },
@@ -182,9 +217,9 @@ describe("buildTerraformElkExcalidrawScene", () => {
     ["new-only", { edges_new: ["aws_s3_bucket.b"] }, "#2b8a3e"],
     ["prior-only", { edges_existing: ["aws_s3_bucket.b"] }, "#1971c2"],
     [
-      "both",
+      "existing-over-new",
       { edges_new: ["aws_s3_bucket.b"], edges_existing: ["aws_s3_bucket.b"] },
-      "#fab005",
+      "#1971c2",
     ],
   ] as const)(
     "colors dependency edge by origin (%s)",

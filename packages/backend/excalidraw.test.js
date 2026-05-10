@@ -228,6 +228,41 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
     );
   });
 
+  it("colors dependency edge red when an endpoint resource is delete", async () => {
+    const scene = await nodesToExcalidraw({
+      "aws_s3_bucket.to_delete": {
+        resources: {
+          "aws_s3_bucket.to_delete": {
+            address: "aws_s3_bucket.to_delete",
+            type: "aws_s3_bucket",
+            name: "to_delete",
+            change: { actions: ["delete"], before: { bucket: "x" } },
+          },
+        },
+        edges_new: ["aws_s3_bucket.keeps"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_s3_bucket.keeps": {
+        resources: {
+          "aws_s3_bucket.keeps": {
+            address: "aws_s3_bucket.keeps",
+            type: "aws_s3_bucket",
+            name: "keeps",
+            change: { actions: ["no-op"], after: { bucket: "y" } },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    });
+    const dependencyLine = scene.elements.find(
+      (element) => element.customData?.terraformEdgeLayer === "dependency",
+    );
+    expect(dependencyLine?.strokeColor).toBe("#c92a2a");
+  });
+
   it("coalesces opposite data-flow directions into a bidirectional line", async () => {
     const scene = await nodesToExcalidraw({
       "aws_lambda_function.sync": {
