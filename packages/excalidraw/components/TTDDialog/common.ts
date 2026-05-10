@@ -17,7 +17,7 @@ import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 
 import type { MermaidToExcalidrawLibProps } from "./types";
 
-import type { AppClassProperties, BinaryFiles, Zoom } from "../../types";
+import type { AppClassProperties, BinaryFiles } from "../../types";
 
 export const resetPreview = ({
   canvasRef,
