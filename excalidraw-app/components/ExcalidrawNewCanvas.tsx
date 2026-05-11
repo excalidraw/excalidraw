@@ -6,7 +6,7 @@ export const ExcalidrawNewCanvas = () => {
       rel="noopener"
       className="plus-canvas"
     >
-      Canvas +
+      Canvas+
     </a>
   );
 };
