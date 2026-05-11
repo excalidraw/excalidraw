@@ -146,14 +146,24 @@ const REGIONAL_TO_VPC_GAP = 28;
 const VPC_ENDPOINT_TILE_W = 160;
 const VPC_ENDPOINT_TILE_H = 56;
 const VPC_ENDPOINT_TILE_GAP = 10;
-/** Half-tile protrusion below VPC bottom + slack so the next VPC row does not overlap. */
-const VPC_ENDPOINT_EGRESS_OVERFLOW_PAD = Math.ceil(VPC_ENDPOINT_TILE_H / 2) + 8;
 /** Route table tiles on subnet zone / VPC bottom edge (same footprint as endpoint tiles). */
 const ROUTE_TABLE_TILE_W = VPC_ENDPOINT_TILE_W;
 const ROUTE_TABLE_TILE_H = VPC_ENDPOINT_TILE_H;
 const ROUTE_TABLE_TILE_GAP = VPC_ENDPOINT_TILE_GAP;
-/** Half-tile protrusion below the owning frame when route tables straddle a bottom edge. */
-const REGION_ROUTE_TABLE_EDGE_OVERFLOW_PAD = Math.ceil(ROUTE_TABLE_TILE_H / 2) + 8;
+
+/** Extra frame height so bottom-edge VPC tiles sit fully inside the VPC frame (tile mid stays on the body bottom line). */
+function vpcBottomStripInsetPx(epCount: number, vpcBottomRtCount: number): number {
+  if (epCount === 0 && vpcBottomRtCount === 0) {
+    return 0;
+  }
+  return Math.ceil(VPC_ENDPOINT_TILE_H / 2);
+}
+
+function zoneBottomRouteTableInsetPx(anySubnetZoneHasRouteTable: boolean): number {
+  return anySubnetZoneHasRouteTable
+    ? Math.ceil(ROUTE_TABLE_TILE_H / 2)
+    : 0;
+}
 
 export type TerraformTopologyRole =
   | "account"
@@ -458,7 +468,15 @@ function vpcFrameDimensionsForZones(
   plan?: unknown,
   routeTableCountByZoneSignature?: ReadonlyMap<string, number>,
   vpcInfrastructureTopPadPx = 0,
-): { w: number; h: number; perZoneW: number; perZoneH: number; znCols: number; znRows: number } {
+): {
+  w: number;
+  h: number;
+  perZoneW: number;
+  perZoneH: number;
+  perZoneBodyH: number;
+  znCols: number;
+  znRows: number;
+} {
   if (vpcZs.length === 0) {
     const e = vpcEmptyShellSize();
     return {
@@ -466,13 +484,15 @@ function vpcFrameDimensionsForZones(
       h: e.h + vpcInfrastructureTopPadPx,
       perZoneW: 0,
       perZoneH: 0,
+      perZoneBodyH: 0,
       znCols: 0,
       znRows: 0,
     };
   }
   const { cols: znCols, rows: znRows } = gridColsRows(vpcZs.length);
   let perZoneW = 0;
-  let perZoneH = 0;
+  let perZoneBodyH = 0;
+  let anyZoneRouteTable = false;
   for (const z of vpcZs) {
     const sortedZ = [...z.addresses].sort();
     const d = zoneFrameSizeForTopologyAddresses(sortedZ, nodes, arnIndex, plan);
@@ -484,8 +504,13 @@ function vpcFrameDimensionsForZones(
           routeTableBottomRowMinInnerWidth(rtN)
         : 0;
     perZoneW = Math.max(perZoneW, d.w, rtMinW);
-    perZoneH = Math.max(perZoneH, d.h);
+    perZoneBodyH = Math.max(perZoneBodyH, d.h);
+    if (rtN > 0) {
+      anyZoneRouteTable = true;
+    }
   }
+  const zoneRtInset = zoneBottomRouteTableInsetPx(anyZoneRouteTable);
+  const perZoneH = perZoneBodyH + zoneRtInset;
   const innerW =
     znCols * perZoneW + (znCols > 0 ? znCols - 1 : 0) * ZONE_CELL_GAP;
   const innerH =
@@ -502,7 +527,7 @@ function vpcFrameDimensionsForZones(
       innerH +
       FRAME_CONTENT_SLACK_Y,
   );
-  return { w, h, perZoneW, perZoneH, znCols, znRows };
+  return { w, h, perZoneW, perZoneH, perZoneBodyH, znCols, znRows };
 }
 
 function countTopology(model: TerraformTopologyModel): {
@@ -631,8 +656,8 @@ function buildRouteTableZoneCountMapForVpc(
 }
 
 /**
- * `aws_route_table` rectangles straddling the bottom of a subnet zone frame or the VPC frame
- * (region-frame siblings), one horizontal row.
+ * `aws_route_table` rectangles along the bottom of a subnet zone or VPC frame (tile mid on the
+ * logical body bottom line; frame height includes bottom-strip inset).
  */
 function appendRouteTableBottomEdgeRectangles(
   skeleton: ExcalidrawElementSkeleton[],
@@ -716,8 +741,7 @@ function vpcEndpointSingleRowMinInnerWidth(addrCount: number): number {
 }
 
 /**
- * `aws_vpc_endpoint` rectangles straddling the VPC frame bottom (region-frame siblings),
- * distributed across the VPC width.
+ * `aws_vpc_endpoint` rectangles along the VPC frame bottom (tile mid on the VPC body bottom line).
  */
 function appendVpcEndpointEgressRectangles(
   skeleton: ExcalidrawElementSkeleton[],
@@ -1746,7 +1770,8 @@ export async function buildTerraformTopologyExcalidrawScene(
       regionFrameIds.push(regionSkId);
 
       let vpcCellW = MIN_VPC_W + FRAME_CONTENT_SLACK_X;
-      let vpcCellH = MIN_VPC_H + FRAME_CONTENT_SLACK_Y;
+      let vpcCellBodyH = MIN_VPC_H + FRAME_CONTENT_SLACK_Y;
+      let maxVpcBottomStripInset = 0;
       if (hasVpc) {
         for (const [vpcId] of vpcEntries) {
           const vpcZs = zonesForVpc(zones, accountId, regionName, vpcId);
@@ -1822,9 +1847,26 @@ export async function buildTerraformTopologyExcalidrawScene(
             rtZoneCounts,
             infraTop,
           );
-          vpcCellH = Math.max(vpcCellH, vd.h);
+          const epAddrs = endpointsForVpc(
+            vpcEndpointBuckets,
+            accountId,
+            regionName,
+            vpcId,
+          );
+          const vpcBottomRt = routeTablesVpcBottomFor(
+            routeTableBottomPlacements,
+            accountId,
+            regionName,
+            vpcId,
+          );
+          vpcCellBodyH = Math.max(vpcCellBodyH, vd.h);
+          maxVpcBottomStripInset = Math.max(
+            maxVpcBottomStripInset,
+            vpcBottomStripInsetPx(epAddrs.length, vpcBottomRt.length),
+          );
         }
       }
+      const vpcCellFrameH = vpcCellBodyH + maxVpcBottomStripInset;
 
       const { cols: vpcCols, rows: vpcRows } = hasVpc
         ? gridColsRows(vpcEntries.length)
@@ -1839,73 +1881,12 @@ export async function buildTerraformTopologyExcalidrawScene(
           )
         : { w: 0, h: 0 };
 
-      const regionHasVpcEndpoints =
-        hasVpc &&
-        vpcEntries.some(([vpcId]) => {
-          const ep = endpointsForVpc(
-            vpcEndpointBuckets,
-            accountId,
-            regionName,
-            vpcId,
-          );
-          return ep.length > 0;
-        });
-
-      const regionHasRouteTableEdges =
-        hasVpc &&
-        vpcEntries.some(([vpcId]) => {
-          const hasZoneRt = routeTableBottomPlacements.zoneBottom.some(
-            (z) =>
-              z.accountId === accountId &&
-              z.region === regionName &&
-              z.vpcId === vpcId,
-          );
-          const hasVpcRt = routeTableBottomPlacements.vpcBottom.some(
-            (z) =>
-              z.accountId === accountId &&
-              z.region === regionName &&
-              z.vpcId === vpcId,
-          );
-          return hasZoneRt || hasVpcRt;
-        });
-
-      const regionHasStackedVpcBottomEgressAndRt =
-        hasVpc &&
-        vpcEntries.some(([vpcId]) => {
-          const ep = endpointsForVpc(
-            vpcEndpointBuckets,
-            accountId,
-            regionName,
-            vpcId,
-          );
-          const vbrt = routeTablesVpcBottomFor(
-            routeTableBottomPlacements,
-            accountId,
-            regionName,
-            vpcId,
-          );
-          return ep.length > 0 && vbrt.length > 0;
-        });
-
       let vpcGridW = 0;
       let vpcGridH = 0;
       if (hasVpc && vpcCols > 0 && vpcRows > 0) {
         vpcGridW = vpcCols * (vpcCellW + VPC_GAP) - VPC_GAP;
-        const egressPad = regionHasVpcEndpoints
-          ? VPC_ENDPOINT_EGRESS_OVERFLOW_PAD
-          : 0;
-        const rtPad = regionHasRouteTableEdges
-          ? REGION_ROUTE_TABLE_EDGE_OVERFLOW_PAD
-          : 0;
-        const stackedPad = regionHasStackedVpcBottomEgressAndRt
-          ? ROUTE_TABLE_TILE_H + 8
-          : 0;
         vpcGridH =
-          vpcRows * (vpcCellH + VPC_GAP) -
-          VPC_GAP +
-          egressPad +
-          rtPad +
-          stackedPad;
+          vpcRows * (vpcCellFrameH + VPC_GAP) - VPC_GAP;
       }
 
       const innerTop = regionRowY + VPC_TOP_PAD;
@@ -1961,15 +1942,13 @@ export async function buildTerraformTopologyExcalidrawScene(
       }
 
       const vpcFrameIds: string[] = [];
-      const regionVpcEgressRectIds: string[] = [];
-      const regionRouteTableRectIds: string[] = [];
 
       for (let vi = 0; hasVpc && vi < vpcEntries.length; vi++) {
         const [vpcId] = vpcEntries[vi]!;
         const col = vi % vpcCols;
         const row = Math.floor(vi / vpcCols);
         const vpcX = vpcGridOriginX + col * (vpcCellW + VPC_GAP);
-        const vpcY = vpcGridOriginY + row * (vpcCellH + VPC_GAP);
+        const vpcY = vpcGridOriginY + row * (vpcCellFrameH + VPC_GAP);
         const vpcSkId = skeletonId("vpc", accountId, regionName, vpcId);
         vpcFrameIds.push(vpcSkId);
 
@@ -2038,41 +2017,38 @@ export async function buildTerraformTopologyExcalidrawScene(
         );
 
         if (vpcZs.length === 0) {
-          if (vpcBottomRtAddrs.length > 0) {
-            regionRouteTableRectIds.push(
-              ...appendRouteTableBottomEdgeRectangles(
-                skeleton,
-                accountId,
-                regionName,
-                vpcId,
-                vpcBottomRtAddrs,
-                vpcX,
-                vpcY,
-                vpcCellW,
-                vpcCellH,
-                nodes,
-                undefined,
-                rtStackAboveVpcBottomPx,
-              ),
-            );
-          }
-
-          if (epAddrs.length > 0) {
-            regionVpcEgressRectIds.push(
-              ...appendVpcEndpointEgressRectangles(
-                skeleton,
-                accountId,
-                regionName,
-                vpcId,
-                epAddrs,
-                vpcX,
-                vpcY,
-                vpcCellW,
-                vpcCellH,
-                nodes,
-              ),
-            );
-          }
+          const vpcBottomRtRectIdsEmpty =
+            vpcBottomRtAddrs.length > 0
+              ? appendRouteTableBottomEdgeRectangles(
+                  skeleton,
+                  accountId,
+                  regionName,
+                  vpcId,
+                  vpcBottomRtAddrs,
+                  vpcX,
+                  vpcY,
+                  vpcCellW,
+                  vpcCellBodyH,
+                  nodes,
+                  undefined,
+                  rtStackAboveVpcBottomPx,
+                )
+              : [];
+          const vpcEpRectIdsEmpty =
+            epAddrs.length > 0
+              ? appendVpcEndpointEgressRectangles(
+                  skeleton,
+                  accountId,
+                  regionName,
+                  vpcId,
+                  epAddrs,
+                  vpcX,
+                  vpcY,
+                  vpcCellW,
+                  vpcCellBodyH,
+                  nodes,
+                )
+              : [];
 
           skeleton.push({
             type: "frame",
@@ -2081,8 +2057,12 @@ export async function buildTerraformTopologyExcalidrawScene(
             x: vpcX,
             y: vpcY,
             width: vpcCellW,
-            height: vpcCellH,
-            children: vpcInfraIds as readonly string[],
+            height: vpcCellFrameH,
+            children: [
+              ...vpcInfraIds,
+              ...vpcBottomRtRectIdsEmpty,
+              ...vpcEpRectIdsEmpty,
+            ] as readonly string[],
             customData: frameCustomData(
               "vpc",
               accountId,
@@ -2147,6 +2127,31 @@ export async function buildTerraformTopologyExcalidrawScene(
             plan,
           );
 
+          const zoneRtAddrs = routeTablesZoneBottomFor(
+            routeTableBottomPlacements,
+            accountId,
+            regionName,
+            vpcId,
+            z.subnetSignature,
+          );
+          const zoneRtRectIds =
+            zoneRtAddrs.length > 0
+              ? appendRouteTableBottomEdgeRectangles(
+                  skeleton,
+                  accountId,
+                  regionName,
+                  vpcId,
+                  zoneRtAddrs,
+                  zoneX,
+                  zoneY,
+                  vd.perZoneW,
+                  vd.perZoneBodyH,
+                  nodes,
+                  z.subnetSignature,
+                  0,
+                )
+              : [];
+
           skeleton.push({
             type: "frame",
             id: zoneSkId,
@@ -2155,7 +2160,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             y: zoneY,
             width: vd.perZoneW,
             height: vd.perZoneH,
-            children: rectIds as readonly string[],
+            children: [...rectIds, ...zoneRtRectIds] as readonly string[],
             customData: frameCustomData(
               "subnetZone",
               accountId,
@@ -2165,69 +2170,41 @@ export async function buildTerraformTopologyExcalidrawScene(
               { terraformSubnetIds: z.subnetIds },
             ),
           });
+        }
 
-          const zoneRtAddrs = routeTablesZoneBottomFor(
-            routeTableBottomPlacements,
-            accountId,
-            regionName,
-            vpcId,
-            z.subnetSignature,
-          );
-          if (zoneRtAddrs.length > 0) {
-            regionRouteTableRectIds.push(
-              ...appendRouteTableBottomEdgeRectangles(
+        const vpcBottomRtRectIds =
+          vpcBottomRtAddrs.length > 0
+            ? appendRouteTableBottomEdgeRectangles(
                 skeleton,
                 accountId,
                 regionName,
                 vpcId,
-                zoneRtAddrs,
-                zoneX,
-                zoneY,
-                vd.perZoneW,
-                vd.perZoneH,
+                vpcBottomRtAddrs,
+                vpcX,
+                vpcY,
+                vpcCellW,
+                vpcCellBodyH,
                 nodes,
-                z.subnetSignature,
-                0,
-              ),
-            );
-          }
-        }
+                undefined,
+                rtStackAboveVpcBottomPx,
+              )
+            : [];
 
-        if (vpcBottomRtAddrs.length > 0) {
-          regionRouteTableRectIds.push(
-            ...appendRouteTableBottomEdgeRectangles(
-              skeleton,
-              accountId,
-              regionName,
-              vpcId,
-              vpcBottomRtAddrs,
-              vpcX,
-              vpcY,
-              vpcCellW,
-              vpcCellH,
-              nodes,
-              undefined,
-              rtStackAboveVpcBottomPx,
-            ),
-          );
-        }
-
-        if (epAddrs.length > 0) {
-          regionVpcEgressRectIds.push(
-            ...appendVpcEndpointEgressRectangles(
-              skeleton,
-              accountId,
-              regionName,
-              vpcId,
-              epAddrs,
-              vpcX,
-              vpcY,
-              vpcCellW,
-              vpcCellH,
-              nodes,
-            ),
-          );
-        }
+        const vpcEpRectIds =
+          epAddrs.length > 0
+            ? appendVpcEndpointEgressRectangles(
+                skeleton,
+                accountId,
+                regionName,
+                vpcId,
+                epAddrs,
+                vpcX,
+                vpcY,
+                vpcCellW,
+                vpcCellBodyH,
+                nodes,
+              )
+            : [];
 
         skeleton.push({
           type: "frame",
@@ -2236,8 +2213,13 @@ export async function buildTerraformTopologyExcalidrawScene(
           x: vpcX,
           y: vpcY,
           width: vpcCellW,
-          height: vpcCellH,
-          children: [...vpcInfraIds, ...zoneFrameIds] as readonly string[],
+          height: vpcCellFrameH,
+          children: [
+            ...vpcInfraIds,
+            ...zoneFrameIds,
+            ...vpcBottomRtRectIds,
+            ...vpcEpRectIds,
+          ] as readonly string[],
           customData: frameCustomData(
             "vpc",
             accountId,
@@ -2248,11 +2230,7 @@ export async function buildTerraformTopologyExcalidrawScene(
         });
       }
 
-      regionChildIds.push(
-        ...vpcFrameIds,
-        ...regionVpcEgressRectIds,
-        ...regionRouteTableRectIds,
-      );
+      regionChildIds.push(...vpcFrameIds);
 
       const innerContentW =
         (hasReg ? regDims.w : 0) +

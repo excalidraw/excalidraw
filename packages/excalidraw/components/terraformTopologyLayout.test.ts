@@ -12,6 +12,9 @@ import type {
   TopologyVpcEndpointBucket,
 } from "./terraformTopologyPlacement";
 
+/** Matches compact egress / route-table tile half-height in terraformTopologyLayout (56px tiles). */
+const TOPOLOGY_EDGE_TILE_HALF_H = Math.ceil(56 / 2);
+
 function axisBounds(el: ExcalidrawElement): {
   minX: number;
   minY: number;
@@ -355,7 +358,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     expect(rel?.target).toBe("aws_s3_bucket.b");
   });
 
-  it("renders aws_vpc_endpoint egress tiles straddling VPC bottom with meta count", async () => {
+  it("renders aws_vpc_endpoint egress tiles on VPC body bottom with meta count", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,
       accounts: new Map([
@@ -493,21 +496,23 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     );
     expect(vpc).toBeDefined();
     const vpcEl = vpc!;
-    const vpcBottom = vpcEl.y + (vpcEl.height ?? 0);
+    const vpcBodyBottom =
+      vpcEl.y + (vpcEl.height ?? 0) - TOPOLOGY_EDGE_TILE_HALF_H;
     const eps = 6;
     for (const r of egressRects) {
       const h = r.height ?? 0;
       const midY = r.y + h / 2;
       expect(
-        Math.abs(midY - vpcBottom),
-        "egress tile vertical center on VPC bottom edge",
+        Math.abs(midY - vpcBodyBottom),
+        "egress tile vertical center on VPC body bottom line",
       ).toBeLessThanOrEqual(eps);
+      expect(r.frameId).toBe(vpcEl.id);
     }
 
     assertTopologyFramesContainChildren(elements);
   });
 
-  it("places unassociated route table tiles straddling the VPC bottom edge", async () => {
+  it("places unassociated route table tiles on the VPC body bottom edge", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,
       accounts: new Map([
@@ -627,15 +632,17 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     )!;
     expect(vpc).toBeDefined();
     const vpcEl = vpc!;
-    const vpcBottom = vpcEl.y + (vpcEl.height ?? 0);
+    const vpcBodyBottom =
+      vpcEl.y + (vpcEl.height ?? 0) - TOPOLOGY_EDGE_TILE_HALF_H;
     const eps = 6;
     const rt = rtRects[0]!;
     const h = rt.height ?? 0;
     const midY = rt.y + h / 2;
     expect(
-      Math.abs(midY - vpcBottom),
-      "route table tile vertical center on VPC bottom edge",
+      Math.abs(midY - vpcBodyBottom),
+      "route table tile vertical center on VPC body bottom line",
     ).toBeLessThanOrEqual(eps);
+    expect(rt.frameId).toBe(vpcEl.id);
 
     assertTopologyFramesContainChildren(elements);
   });
