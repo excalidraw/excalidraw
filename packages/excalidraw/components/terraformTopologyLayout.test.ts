@@ -803,6 +803,108 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     assertTopologyFramesContainChildren(elements);
   });
 
+  it("places aws_kms_key_policy satellites under a regional KMS key with topology_kms edges", async () => {
+    const keyId = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
+    const keyArn = `arn:aws:kms:us-east-1:111111111111:key/${keyId}`;
+
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map(),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const regionalBuckets: TopologyRegionalPrimaryBucket[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        addresses: ["aws_kms_key.main"],
+      },
+    ];
+
+    const nodes: TerraformPlanNodesMap = {
+      "aws_kms_key.main": {
+        resources: {
+          "aws_kms_key.main": {
+            address: "aws_kms_key.main",
+            mode: "managed",
+            type: "aws_kms_key",
+            change: {
+              after: { id: keyId, arn: keyArn },
+            },
+          },
+        },
+      },
+      "aws_kms_key_policy.main": {
+        resources: {
+          "aws_kms_key_policy.main": {
+            address: "aws_kms_key_policy.main",
+            mode: "managed",
+            type: "aws_kms_key_policy",
+            change: {
+              after: { key_id: keyId, policy: "{}" },
+            },
+          },
+        },
+      },
+    };
+
+    const { elements, meta } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      [],
+      regionalBuckets,
+      nodes,
+    );
+
+    expect(meta.regionalPrimaryCount).toBe(1);
+    expect(meta.primaryResourceCount).toBe(1);
+
+    const rectByPath = (path: string) =>
+      elements.find(
+        (e) =>
+          e.type === "rectangle" &&
+          (e.customData as { nodePath?: string } | undefined)?.nodePath === path,
+      );
+
+    const keyRect = rectByPath("aws_kms_key.main");
+    const policyRect = rectByPath("aws_kms_key_policy.main");
+    expect(keyRect && policyRect).toBeTruthy();
+    expect(policyRect!.y).toBeGreaterThanOrEqual(keyRect!.y);
+
+    const kmsEdge = elements
+      .filter(
+        (e) =>
+          e.type === "line" &&
+          (e.customData as { terraformEdgeLayer?: string } | undefined)
+            ?.terraformEdgeLayer === "dataFlow",
+      )
+      .map((e) => e.customData?.relationship as Record<string, unknown> | undefined)
+      .find(
+        (r) =>
+          r?.origin === "topology_kms" &&
+          r?.type === "kms_key_policy" &&
+          r?.source === "aws_kms_key.main" &&
+          r?.target === "aws_kms_key_policy.main",
+      );
+    expect(kmsEdge).toBeTruthy();
+
+    assertTopologyFramesContainChildren(elements);
+  });
+
   it("lays out Regional services beside VPC grid in the same region", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,

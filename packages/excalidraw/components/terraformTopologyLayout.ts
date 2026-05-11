@@ -44,6 +44,10 @@ import {
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
 import {
+  buildKmsKeyPolicyCluster,
+  kmsPolicySatelliteStackHeightPx,
+} from "./terraformTopologyKmsLinks";
+import {
   buildLambdaSgCluster,
   sgSatelliteStackHeightPx,
   TOPOLOGY_SG_BETWEEN_GROUPS_GAP_PX,
@@ -87,6 +91,7 @@ const IAM_SATELLITE_H = 52;
 const IAM_SATELLITE_GAP = 8;
 const IAM_SATELLITE_X_PAD = 6;
 const IAM_DATAFLOW_STROKE = "#0ca678";
+const KMS_POLICY_DATAFLOW_STROKE = "#845ef7";
 /** Security group + rule tiles (right column). */
 const SG_SATELLITE_W = 176;
 const SG_SATELLITE_H = 52;
@@ -277,6 +282,13 @@ function zoneFrameSizeForTopologyAddresses(
       IAM_SATELLITE_H,
       IAM_SATELLITE_GAP,
     );
+    const kmsPolicyExtra = kmsPolicySatelliteStackHeightPx(
+      nodes,
+      addr,
+      arnIndex,
+      IAM_SATELLITE_H,
+      IAM_SATELLITE_GAP,
+    );
     const sgExtra = sgSatelliteStackHeightPx(
       nodes,
       addr,
@@ -287,7 +299,12 @@ function zoneFrameSizeForTopologyAddresses(
       plan,
     );
     rowTopBase[r] = Math.max(rowTopBase[r]!, cloudWatchExtra);
-    rowBottomBase[r] = Math.max(rowBottomBase[r]!, iamExtra, sgExtra);
+    rowBottomBase[r] = Math.max(
+      rowBottomBase[r]!,
+      iamExtra,
+      kmsPolicyExtra,
+      sgExtra,
+    );
   }
   let innerBodyH = 0;
   for (let r = 0; r < rows; r++) {
@@ -486,7 +503,7 @@ function pushResourceRectangleSkeleton(
 
 type TopologySatelliteLineSpec = {
   edge: TopologyIamEdge;
-  origin: "topology_iam" | "topology_sg" | "topology_cloudwatch";
+  origin: "topology_iam" | "topology_sg" | "topology_cloudwatch" | "topology_kms";
   strokeColor: string;
 };
 
@@ -539,7 +556,7 @@ function buildTopologySatelliteLineSkeletons(
   return out;
 }
 
-/** Primary grid + top CloudWatch, bottom IAM (left) / SG (right) satellites and data-flow edges. */
+/** Primary grid + top CloudWatch, bottom IAM / KMS policy (left) / SG (right) satellites and data-flow edges. */
 function appendTopologyResourceRectangles(
   skeleton: ExcalidrawElementSkeleton[],
   addrs: readonly string[],
@@ -548,6 +565,7 @@ function appendTopologyResourceRectangles(
   nodes: TerraformPlanNodesMap,
   arnIndex: Map<string, string>,
   globalPlacedIamSatellites: Set<string>,
+  globalPlacedKmsPolicySatellites: Set<string>,
   globalPlacedSgSatellites: Set<string>,
   globalPlacedCloudWatchSatellites: Set<string>,
   satelliteLineSpecs: TopologySatelliteLineSpec[],
@@ -575,6 +593,13 @@ function appendTopologyResourceRectangles(
       IAM_SATELLITE_H,
       IAM_SATELLITE_GAP,
     );
+    const kmsPolicyExtra = kmsPolicySatelliteStackHeightPx(
+      nodes,
+      addr,
+      arnIndex,
+      IAM_SATELLITE_H,
+      IAM_SATELLITE_GAP,
+    );
     const sgExtra = sgSatelliteStackHeightPx(
       nodes,
       addr,
@@ -585,7 +610,12 @@ function appendTopologyResourceRectangles(
       plan,
     );
     rowTopBase[rr] = Math.max(rowTopBase[rr]!, cloudWatchExtra);
-    rowBottomBase[rr] = Math.max(rowBottomBase[rr]!, iamExtra, sgExtra);
+    rowBottomBase[rr] = Math.max(
+      rowBottomBase[rr]!,
+      iamExtra,
+      kmsPolicyExtra,
+      sgExtra,
+    );
   }
 
   const rowOriginY: number[] = [];
@@ -627,9 +657,13 @@ function appendTopologyResourceRectangles(
     );
 
     const { cluster, edges } = buildLambdaIamCluster(nodes, addr, arnIndex);
+    const kmsBuild = buildKmsKeyPolicyCluster(nodes, addr, arnIndex);
     const sgBuild = buildLambdaSgCluster(nodes, addr, arnIndex, plan);
     const cloudWatchBuild = buildResourceCloudWatchCluster(nodes, addr);
-    const { iamW, sgW } = satelliteColumnWidths(Boolean(cluster), Boolean(sgBuild.cluster));
+    const { iamW, sgW } = satelliteColumnWidths(
+      Boolean(cluster) || Boolean(kmsBuild.cluster),
+      Boolean(sgBuild.cluster),
+    );
     const { alarmW, logGroupW } = cloudWatchColumnWidths(
       Boolean(cloudWatchBuild.cluster?.alarms.length),
       Boolean(cloudWatchBuild.cluster?.logGroups.length),
@@ -640,6 +674,13 @@ function appendTopologyResourceRectangles(
         edge: e,
         origin: "topology_iam",
         strokeColor: IAM_DATAFLOW_STROKE,
+      });
+    }
+    for (const e of kmsBuild.edges) {
+      satelliteLineSpecs.push({
+        edge: e,
+        origin: "topology_kms",
+        strokeColor: KMS_POLICY_DATAFLOW_STROKE,
       });
     }
     for (const e of sgBuild.edges) {
@@ -739,6 +780,33 @@ function appendTopologyResourceRectangles(
           },
         );
         ySat += IAM_SATELLITE_H + IAM_SATELLITE_GAP;
+      }
+    }
+
+    if (kmsBuild.cluster) {
+      let yKms = ry + RESOURCE_RECT_H + IAM_SATELLITE_GAP;
+      const satXKms = rx + IAM_SATELLITE_X_PAD;
+      for (const policyPath of kmsBuild.cluster.policies) {
+        if (globalPlacedKmsPolicySatellites.has(policyPath)) {
+          yKms += IAM_SATELLITE_H + IAM_SATELLITE_GAP;
+          continue;
+        }
+        globalPlacedKmsPolicySatellites.add(policyPath);
+        rectIds.push(policyPath);
+        pushResourceRectangleSkeleton(
+          skeleton,
+          policyPath,
+          satXKms,
+          yKms,
+          iamW,
+          IAM_SATELLITE_H,
+          nodes,
+          {
+            initiallyVisible: false,
+            explodeParentKeys: [addr],
+          },
+        );
+        yKms += IAM_SATELLITE_H + IAM_SATELLITE_GAP;
       }
     }
 
@@ -861,6 +929,7 @@ export async function buildTerraformTopologyExcalidrawScene(
   const arnIndex = buildArnIndexForTopology(nodes);
   const satelliteLineSpecs: TopologySatelliteLineSpec[] = [];
   const globalPlacedIamSatellites = new Set<string>();
+  const globalPlacedKmsPolicySatellites = new Set<string>();
   const globalPlacedSgSatellites = new Set<string>();
   const globalPlacedCloudWatchSatellites = new Set<string>();
 
@@ -958,6 +1027,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           nodes,
           arnIndex,
           globalPlacedIamSatellites,
+          globalPlacedKmsPolicySatellites,
           globalPlacedSgSatellites,
           globalPlacedCloudWatchSatellites,
           satelliteLineSpecs,
@@ -1051,6 +1121,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             nodes,
             arnIndex,
             globalPlacedIamSatellites,
+            globalPlacedKmsPolicySatellites,
             globalPlacedSgSatellites,
             globalPlacedCloudWatchSatellites,
             satelliteLineSpecs,
