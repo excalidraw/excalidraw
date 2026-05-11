@@ -1,11 +1,17 @@
 import { arrayToMap } from "@excalidraw/common";
-import { pointFrom, type GlobalPoint, type Radians } from "@excalidraw/math";
+import {
+  pointFrom,
+  rangeInclusive,
+  type GlobalPoint,
+  type Radians,
+} from "@excalidraw/math";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { getDefaultAppState } from "../appState";
 import {
   getElementsCorners,
+  getVisibleGaps,
   getReferenceSnapPoints,
   SnapCache,
   snapDraggedElements,
@@ -56,6 +62,22 @@ const getHorizontalPointSnapLineCoordinates = (
     .sort((a, b) => a - b);
 };
 
+const getVerticalPointSnapLineCoordinates = (
+  snapLines: ReturnType<typeof snapDraggedElements>["snapLines"],
+) => {
+  return snapLines
+    .filter((snapLine) => snapLine.type === "points")
+    .filter((snapLine) => {
+      const [firstPoint, lastPoint] = snapLine.points;
+
+      return firstPoint[0] === lastPoint[0];
+    })
+    .map((snapLine) => {
+      return snapLine.points[0][0];
+    })
+    .sort((a, b) => a - b);
+};
+
 const getHorizontalPointSnapLineMaxX = (
   snapLines: ReturnType<typeof snapDraggedElements>["snapLines"],
 ) => {
@@ -72,6 +94,23 @@ const getHorizontalPointSnapLineMaxX = (
   }
 
   return horizontalSnapLine.points[horizontalSnapLine.points.length - 1][0];
+};
+
+const getHorizontalGapSnapLines = (
+  snapLines: ReturnType<typeof snapDraggedElements>["snapLines"],
+) => {
+  return snapLines.filter(
+    (snapLine) =>
+      snapLine.type === "gap" && snapLine.direction === "horizontal",
+  );
+};
+
+const getVerticalGapSnapLines = (
+  snapLines: ReturnType<typeof snapDraggedElements>["snapLines"],
+) => {
+  return snapLines.filter(
+    (snapLine) => snapLine.type === "gap" && snapLine.direction === "vertical",
+  );
 };
 
 const getPointKeys = (points: ReturnType<typeof getElementsCorners>) => {
@@ -111,7 +150,7 @@ const primeReferenceSnapPoints = (
         return corners.map((point, index) => ({
           point,
           type: index === corners.length - 1 ? "center" : "outer",
-          sourceId: element.id,
+          snapSourceId: element.id,
         }));
       }) as Parameters<typeof SnapCache.setReferenceSnapPoints>[0],
   );
@@ -254,6 +293,57 @@ describe("snapping", () => {
     ).toBe(false);
   });
 
+  it("does not use frame children as visible gap references when snapping outside elements", () => {
+    const frame = API.createElement({
+      type: "frame",
+      id: "frame",
+      x: 0,
+      y: 0,
+      width: 500,
+      height: 300,
+    });
+    const frameChildA = API.createElement({
+      type: "rectangle",
+      id: "frameChildA",
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+      frameId: frame.id,
+    });
+    const frameChildB = API.createElement({
+      type: "rectangle",
+      id: "frameChildB",
+      x: 250,
+      y: 50,
+      width: 100,
+      height: 100,
+      frameId: frame.id,
+    });
+    const selected = API.createElement({
+      type: "rectangle",
+      id: "selected",
+      x: 700,
+      y: 50,
+      width: 100,
+      height: 100,
+    });
+    const elements = [frame, frameChildA, frameChildB, selected];
+    const app = createSnappingApp({
+      selectedElementIds: { [selected.id]: true },
+    });
+
+    const visibleGaps = getVisibleGaps(
+      elements,
+      [selected],
+      app.state,
+      arrayToMap(elements),
+    );
+
+    expect(visibleGaps.horizontalGaps).toHaveLength(0);
+    expect(visibleGaps.verticalGaps).toHaveLength(0);
+  });
+
   it("filters center and inner outer point snaplines for the same reference", () => {
     const angle = 0.68 as Radians;
     const reference = API.createElement({
@@ -319,7 +409,7 @@ describe("snapping", () => {
       ...outerSnapPoints.map((point) => ({
         point: pointFrom<GlobalPoint>(point[0] - 200, point[1]),
         type: "outer" as const,
-        sourceId: "referenceA",
+        snapSourceId: "referenceA",
       })),
       {
         point: pointFrom<GlobalPoint>(
@@ -327,7 +417,7 @@ describe("snapping", () => {
           centerSnapPoint[1],
         ),
         type: "center" as const,
-        sourceId: "referenceA",
+        snapSourceId: "referenceA",
       },
       {
         point: pointFrom<GlobalPoint>(
@@ -335,7 +425,7 @@ describe("snapping", () => {
           innerOuterSnapPoint[1],
         ),
         type: "outer" as const,
-        sourceId: "referenceB",
+        snapSourceId: "referenceB",
       },
     ];
 
@@ -387,6 +477,90 @@ describe("snapping", () => {
     expect(getHorizontalPointSnapLineCoordinates(snapLines)).toEqual([50]);
   });
 
+  it("filters center snaplines when matching outer offsets differ by rounding precision", () => {
+    const selected = API.createElement({
+      type: "rectangle",
+      id: "selected",
+      x: 2532.227563984471,
+      y: -1553.9657067952232,
+      width: 140.1015625,
+      height: 140.1015625,
+    });
+    const reference = API.createElement({
+      type: "rectangle",
+      id: "reference",
+      x: 2532.2275640966914,
+      y: -1299.4323092037737,
+      width: 140.1015625,
+      height: 140.1015625,
+    });
+    const elements = [reference, selected];
+    const app = createSnappingApp({
+      selectedElementIds: { [selected.id]: true },
+    });
+
+    primeReferenceSnapPoints(elements, [selected]);
+
+    const { snapLines } = snapDraggedElements(
+      elements,
+      { x: 0, y: 0 },
+      app,
+      NO_MODIFIER_KEYS,
+      arrayToMap(elements),
+    );
+
+    expect(getVerticalPointSnapLineCoordinates(snapLines)).toEqual([
+      2532.227564, 2672.329126,
+    ]);
+  });
+
+  it("keeps outer snaplines stable while dragging a snapped element through rounding-equivalent offsets", () => {
+    const referenceMiddle = API.createElement({
+      type: "rectangle",
+      id: "referenceMiddle",
+      x: 2532.22756398447,
+      y: -1553.9657067952237,
+      width: 140.1015625,
+      height: 140.1015625,
+    });
+    const referenceAbove = API.createElement({
+      type: "rectangle",
+      id: "referenceAbove",
+      x: 2532.2275637826165,
+      y: -1779.7363232531268,
+      width: 140.1015625,
+      height: 140.1015625,
+    });
+    const selected = API.createElement({
+      type: "rectangle",
+      id: "selected",
+      x: 2532.227563096691,
+      y: -1328.1950902037736,
+      width: 140.1015625,
+      height: 140.1015625,
+    });
+    const elements = [referenceAbove, referenceMiddle, selected];
+    const app = createSnappingApp({
+      selectedElementIds: { [selected.id]: true },
+    });
+
+    primeReferenceSnapPoints(elements, [selected]);
+
+    for (const dragOffsetX of [-4, -1, -0.1, 0, 0.1, 1, 4]) {
+      const { snapLines } = snapDraggedElements(
+        elements,
+        { x: dragOffsetX, y: 0 },
+        app,
+        NO_MODIFIER_KEYS,
+        arrayToMap(elements),
+      );
+      const coordinates = getVerticalPointSnapLineCoordinates(snapLines);
+
+      expect(coordinates).toHaveLength(2);
+      expect(coordinates[1] - coordinates[0]).toBeCloseTo(selected.width, 5);
+    }
+  });
+
   it("prefers the nearest visual cluster for same-offset point snaps", () => {
     const selected = API.createElement({
       type: "rectangle",
@@ -405,12 +579,12 @@ describe("snapping", () => {
       {
         point: pointFrom<GlobalPoint>(220, 50),
         type: "center",
-        sourceId: "near",
+        snapSourceId: "near",
       },
       {
         point: pointFrom<GlobalPoint>(900, 50),
         type: "center",
-        sourceId: "far",
+        snapSourceId: "far",
       },
     ]);
 
@@ -443,12 +617,12 @@ describe("snapping", () => {
       {
         point: pointFrom<GlobalPoint>(220, 54),
         type: "center",
-        sourceId: "near",
+        snapSourceId: "near",
       },
       {
         point: pointFrom<GlobalPoint>(900, 50),
         type: "center",
-        sourceId: "far",
+        snapSourceId: "far",
       },
     ]);
 
@@ -482,17 +656,17 @@ describe("snapping", () => {
       {
         point: pointFrom<GlobalPoint>(200, 50),
         type: "center",
-        sourceId: "referenceA",
+        snapSourceId: "referenceA",
       },
       {
         point: pointFrom<GlobalPoint>(350, 50),
         type: "center",
-        sourceId: "referenceB",
+        snapSourceId: "referenceB",
       },
       {
         point: pointFrom<GlobalPoint>(500, 50),
         type: "center",
-        sourceId: "referenceC",
+        snapSourceId: "referenceC",
       },
     ]);
 
@@ -505,5 +679,90 @@ describe("snapping", () => {
     );
 
     expect(getHorizontalPointSnapLineMaxX(snapLines)).toBe(500);
+  });
+
+  it("renders gap snaplines when rounded bounds touch the reference gap overlap", () => {
+    const selected = API.createElement({
+      type: "rectangle",
+      id: "selected",
+      x: 0,
+      y: 0.0000004,
+      width: 100,
+      height: 100,
+    });
+    const elements = [selected];
+    const app = createSnappingApp({
+      selectedElementIds: { [selected.id]: true },
+    });
+
+    SnapCache.setVisibleGaps({
+      horizontalGaps: [
+        {
+          startBounds: [200, -100, 300, 0],
+          endBounds: [400, -100, 500, 0],
+          startSide: [pointFrom(300, -100), pointFrom(300, 0)],
+          endSide: [pointFrom(400, -100), pointFrom(400, 0)],
+          overlap: rangeInclusive(-100, 0),
+          length: 100,
+        },
+      ],
+      verticalGaps: [],
+    });
+
+    const { snapLines } = snapDraggedElements(
+      elements,
+      { x: 0, y: 0 },
+      app,
+      NO_MODIFIER_KEYS,
+      arrayToMap(elements),
+    );
+
+    expect(getHorizontalGapSnapLines(snapLines)).toHaveLength(2);
+  });
+
+  it("renders gap snaplines when the winning gap offset only differs by rounding precision", () => {
+    const selected = API.createElement({
+      type: "rectangle",
+      id: "selected",
+      x: 0,
+      y: 399.999999,
+      width: 100,
+      height: 100,
+    });
+    const elements = [selected];
+    const app = createSnappingApp({
+      selectedElementIds: { [selected.id]: true },
+    });
+
+    SnapCache.setReferenceSnapPoints([
+      {
+        point: pointFrom<GlobalPoint>(0, 399.999999),
+        type: "outer",
+        snapSourceId: "reference",
+      },
+    ]);
+    SnapCache.setVisibleGaps({
+      horizontalGaps: [],
+      verticalGaps: [
+        {
+          startBounds: [0, 100, 100, 200],
+          endBounds: [0, 250, 100, 350],
+          startSide: [pointFrom(0, 200), pointFrom(100, 200)],
+          endSide: [pointFrom(0, 250), pointFrom(100, 250)],
+          overlap: rangeInclusive(0, 100),
+          length: 50,
+        },
+      ],
+    });
+
+    const { snapLines } = snapDraggedElements(
+      elements,
+      { x: 0, y: 0 },
+      app,
+      NO_MODIFIER_KEYS,
+      arrayToMap(elements),
+    );
+
+    expect(getVerticalGapSnapLines(snapLines)).toHaveLength(2);
   });
 });
