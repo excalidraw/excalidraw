@@ -8,6 +8,7 @@ import type { InteractiveCanvasAppState } from "../types";
 const SNAP_COLOR_LIGHT = "#ff6b6b";
 const SNAP_COLOR_DARK = "#ff0000";
 const SNAP_WIDTH = 1;
+const SNAP_CROSS_SIZE = 2;
 
 export const renderSnaps = (
   context: CanvasRenderingContext2D,
@@ -35,7 +36,7 @@ export const renderSnaps = (
       context.lineWidth = snapWidth;
       context.strokeStyle = snapColor;
 
-      drawPointerSnapLine(snapLine, context);
+      drawPointerSnapLine(snapLine, context, appState);
     } else if (snapLine.type === "gap") {
       context.lineWidth = snapWidth;
       context.strokeStyle = snapColor;
@@ -50,7 +51,7 @@ export const renderSnaps = (
     } else if (snapLine.type === "points") {
       context.lineWidth = snapWidth;
       context.strokeStyle = snapColor;
-      drawPointsSnapLine(snapLine, context);
+      drawPointsSnapLine(snapLine, context, appState);
     }
   }
 
@@ -60,18 +61,50 @@ export const renderSnaps = (
 const drawPointsSnapLine = (
   pointSnapLine: PointSnapLine,
   context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
 ) => {
-  const firstPoint = pointSnapLine.points[0];
-  const lastPoint = pointSnapLine.points[pointSnapLine.points.length - 1];
+  if (!appState.zenModeEnabled) {
+    const firstPoint = pointSnapLine.points[0];
+    const lastPoint = pointSnapLine.points[pointSnapLine.points.length - 1];
 
-  drawLine(firstPoint, lastPoint, context);
+    drawLine(firstPoint, lastPoint, context);
+  }
+
+  for (const point of pointSnapLine.points) {
+    drawCross(point, appState, context);
+  }
 };
 
 const drawPointerSnapLine = (
   pointerSnapLine: PointerSnapLine,
   context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
 ) => {
-  drawLine(pointerSnapLine.points[0], pointerSnapLine.points[1], context);
+  drawCross(pointerSnapLine.points[0], appState, context);
+  if (!appState.zenModeEnabled) {
+    drawLine(pointerSnapLine.points[0], pointerSnapLine.points[1], context);
+  }
+};
+
+const drawCross = <Point extends LocalPoint | GlobalPoint>(
+  [x, y]: Point,
+  appState: InteractiveCanvasAppState,
+  context: CanvasRenderingContext2D,
+) => {
+  context.save();
+  const size =
+    (appState.zenModeEnabled ? SNAP_CROSS_SIZE * 1.5 : SNAP_CROSS_SIZE) /
+    appState.zoom.value;
+  context.beginPath();
+
+  context.moveTo(x - size, y - size);
+  context.lineTo(x + size, y + size);
+
+  context.moveTo(x + size, y - size);
+  context.lineTo(x - size, y + size);
+
+  context.stroke();
+  context.restore();
 };
 
 const drawLine = <Point extends LocalPoint | GlobalPoint>(
