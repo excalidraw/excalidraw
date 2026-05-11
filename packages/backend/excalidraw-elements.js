@@ -548,6 +548,8 @@ const PRIMARY_MESSAGING_TYPES = new Set([
 
 const PRIMARY_SPARK_TYPES = new Set();
 
+const PRIMARY_CRYPTO_TYPES = new Set(["aws_kms_key"]);
+
 /** Synthetic Terraform module call nodes (pipeline injects for graph semantics). */
 const PRIMARY_MODULE_TYPES = new Set(["terraform_module"]);
 
@@ -556,6 +558,7 @@ const PRIMARY_VISIBLE_TYPES = new Set([
   ...PRIMARY_STORAGE_TYPES,
   ...PRIMARY_MESSAGING_TYPES,
   ...PRIMARY_SPARK_TYPES,
+  ...PRIMARY_CRYPTO_TYPES,
   ...PRIMARY_MODULE_TYPES,
 ]);
 
