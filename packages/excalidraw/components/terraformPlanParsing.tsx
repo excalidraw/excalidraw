@@ -2,7 +2,15 @@ import graphlibDot from "@dagrejs/graphlib-dot";
 import type { Graph } from "@dagrejs/graphlib";
 
 import { buildTerraformElkExcalidrawScene } from "./terraformElkLayout";
-import { extractTerraformTopologyFromPlan } from "./terraformTopologyExtract";
+import {
+  extractTerraformTopologyFromPlan,
+  mergeTopologyModelWithPlacementZones,
+  mergeTopologyModelWithRegionalBuckets,
+} from "./terraformTopologyExtract";
+import {
+  extractPrimaryTopologyZones,
+  extractRegionalTopologyPrimaries,
+} from "./terraformTopologyPlacement";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 
@@ -148,7 +156,16 @@ export const terraformPlanParsing = async (
 
   if (semanticLayout) {
     const topoModel = extractTerraformTopologyFromPlan(plan);
-    const topoScene = await buildTerraformTopologyExcalidrawScene(topoModel);
+    const zones = extractPrimaryTopologyZones(plan);
+    const regionalBuckets = extractRegionalTopologyPrimaries(plan);
+    mergeTopologyModelWithPlacementZones(topoModel, zones);
+    mergeTopologyModelWithRegionalBuckets(topoModel, regionalBuckets);
+    const topoScene = await buildTerraformTopologyExcalidrawScene(
+      topoModel,
+      zones,
+      regionalBuckets,
+      nodes5,
+    );
     emitLocalParseDebug({
       phase: "topologyLayout",
       meta: topoScene.meta,

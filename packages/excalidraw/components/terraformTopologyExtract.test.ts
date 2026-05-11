@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import {
   extractTerraformTopologyFromPlan,
+  mergeTerraformTopologyAccountRegionFromSameRegionSubnets,
   parseAwsArnLocation,
   pickResourceChangeValues,
+  pickResourceValuesForTopologyPlacement,
   TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT,
+  TERRAFORM_TOPOLOGY_UNKNOWN_REGION,
 } from "./terraformTopologyExtract";
 
 describe("parseAwsArnLocation", () => {
@@ -28,6 +31,104 @@ describe("pickResourceChangeValues", () => {
     expect(pickResourceChangeValues(rc)).toEqual({
       id: "subnet-1",
       vpc_id: "vpc-1",
+    });
+  });
+});
+
+describe("mergeTerraformTopologyAccountRegionFromSameRegionSubnets", () => {
+  it("fills unknown account when region matches a subnet hint", () => {
+    const subnetOwners = new Map([
+      ["subnet-a", { account: "111122223333", region: "eu-west-1" }],
+    ]);
+    expect(
+      mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
+        { account: TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT, region: "eu-west-1" },
+        subnetOwners,
+      ),
+    ).toEqual({ account: "111122223333", region: "eu-west-1" });
+  });
+
+  it("leaves unknown account when no subnet hint shares the region", () => {
+    const subnetOwners = new Map([
+      ["subnet-a", { account: "111122223333", region: "eu-west-1" }],
+    ]);
+    expect(
+      mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
+        {
+          account: TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT,
+          region: "us-east-1",
+        },
+        subnetOwners,
+      ).account,
+    ).toBe(TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT);
+  });
+
+  it("does not override an explicit account", () => {
+    const subnetOwners = new Map([
+      ["subnet-a", { account: "111122223333", region: "eu-west-1" }],
+    ]);
+    expect(
+      mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
+        { account: "999988887777", region: "eu-west-1" },
+        subnetOwners,
+      ),
+    ).toEqual({ account: "999988887777", region: "eu-west-1" });
+  });
+
+  it("does nothing when region is unknown", () => {
+    expect(
+      mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
+        {
+          account: TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT,
+          region: TERRAFORM_TOPOLOGY_UNKNOWN_REGION,
+        },
+        new Map([["subnet-a", { account: "111122223333", region: "eu-west-1" }]]),
+      ).account,
+    ).toBe(TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT);
+  });
+});
+
+describe("pickResourceValuesForTopologyPlacement", () => {
+  it("uses before on delete when after is null", () => {
+    const rc = {
+      change: {
+        actions: ["delete"],
+        before: { vpc_id: "vpc-x", region: "us-east-1" },
+        after: null,
+      },
+    };
+    expect(pickResourceValuesForTopologyPlacement(rc)).toEqual({
+      vpc_id: "vpc-x",
+      region: "us-east-1",
+    });
+  });
+
+  it("merges non-empty after onto before for delete", () => {
+    const rc = {
+      change: {
+        actions: ["delete"],
+        before: { vpc_id: "vpc-a", region: "us-east-1" },
+        after: { tags: { a: "b" } },
+      },
+    };
+    expect(pickResourceValuesForTopologyPlacement(rc)).toEqual({
+      vpc_id: "vpc-a",
+      region: "us-east-1",
+      tags: { a: "b" },
+    });
+  });
+
+  it("uses before when after is empty object", () => {
+    const rc = {
+      change: {
+        actions: ["update"],
+        before: { subnet_ids: ["subnet-1"], region: "eu-west-1" },
+        after: {},
+      },
+    };
+    expect(pickResourceValuesForTopologyPlacement(rc)).toEqual({
+      subnet_ids: ["subnet-1"],
+      region: "eu-west-1",
     });
   });
 });

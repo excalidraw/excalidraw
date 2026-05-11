@@ -114,7 +114,7 @@ function moduleFrameSkeletonId(modulePath: string) {
 export const TERRAFORM_ELK_MAX_VERTICES = 600;
 
 /** Bound label fill uses `strokeColor`; must stay dark (backend `excalidraw.js` uses `#1e1e1e`). */
-const TERRAFORM_RESOURCE_LABEL_STROKE = "#1e1e1e";
+export const TERRAFORM_RESOURCE_LABEL_STROKE = "#1e1e1e";
 
 export type TerraformElkSceneMeta = {
   layoutEngine: "elk";
@@ -318,7 +318,7 @@ function buildModuleCompound(
   };
 }
 
-function shortResourceLabel(address: string): string {
+export function shortTerraformResourceLabel(address: string): string {
   const withoutModules = address.replace(/^(?:module\.[^.]+\.)+/, "");
   return withoutModules.length > 52
     ? `${withoutModules.slice(0, 49)}…`
@@ -363,7 +363,7 @@ function getDominantTerraformAction(actions: Iterable<unknown>) {
 }
 
 /** Mirrors backend `getPrimaryAction` in `packages/backend/excalidraw-elements.js`. */
-function getTerraformNodeAction(node: TerraformPlanGraphNode | undefined) {
+export function getTerraformPlanNodeAction(node: TerraformPlanGraphNode | undefined) {
   const actions: unknown[] = [];
   for (const resource of Object.values(node?.resources || {})) {
     const resourceActions = (resource as Record<string, any>).change?.actions;
@@ -393,7 +393,7 @@ const TERRAFORM_ACTION_STYLES: Record<
   external: { backgroundColor: "#f8f9fa", strokeColor: "#868e96" },
 };
 
-function getTerraformActionStyle(action: string) {
+export function getTerraformActionStyle(action: string) {
   return TERRAFORM_ACTION_STYLES[action] || TERRAFORM_ACTION_STYLES.existing;
 }
 
@@ -502,7 +502,7 @@ function getLocalResourceDiff(change: Record<string, any>) {
   return computeLocalResourceDiff(change.before, change.after);
 }
 
-function buildLocalTerraformResourceDetails(
+export function buildTerraformResourcePanelDetails(
   address: string,
   resource: Record<string, any>,
 ) {
@@ -928,7 +928,7 @@ const fixedPointForLayoutPoint = (
 ];
 
 /** Skeleton rectangles cannot set `isDeleted`; apply from `terraformInitiallyVisible` after convert. */
-function applyTerraformResourceRectangleSoftDelete(
+export function applyTerraformResourceRectangleSoftDelete(
   elements: readonly ExcalidrawElement[],
 ): ExcalidrawElement[] {
   return elements.map((el) => {
@@ -951,7 +951,7 @@ function applyTerraformResourceRectangleSoftDelete(
  * detach the label so visibility is controlled by our Terraform customData instead of Excalidraw's
  * container-bound text behavior.
  */
-function mirrorAndDetachTerraformResourceLabels(
+export function mirrorAndDetachTerraformResourceLabels(
   elements: readonly ExcalidrawElement[],
 ): ExcalidrawElement[] {
   const byId = new Map(elements.map((e) => [e.id, e]));
@@ -1120,7 +1120,7 @@ export async function buildTerraformElkExcalidrawScene(
     const resourceType = getTerraformResourceTypeFromNodePath(id);
     const explodeKeys = [...(explodeParentMap.get(id) || [])].sort();
     const explodeParent = explodeKeys[0] ?? null;
-    const action = getTerraformNodeAction(nodes[id]);
+    const action = getTerraformPlanNodeAction(nodes[id]);
     const initiallyVisible = isInitiallyVisibleTerraformResource(
       resourceType,
       action,
@@ -1138,7 +1138,7 @@ export async function buildTerraformElkExcalidrawScene(
       backgroundColor: actionStyle.backgroundColor,
       roundness: { type: 3, value: 10 },
       label: {
-        text: shortResourceLabel(id),
+        text: shortTerraformResourceLabel(id),
         fontSize: 12,
         strokeColor: TERRAFORM_RESOURCE_LABEL_STROKE,
       },
@@ -1153,7 +1153,7 @@ export async function buildTerraformElkExcalidrawScene(
         resourceType,
         nodePath: id,
         action,
-        terraformResources: buildLocalTerraformResourceDetails(id, resource),
+        terraformResources: buildTerraformResourcePanelDetails(id, resource),
       },
     });
   }
@@ -1173,8 +1173,8 @@ export async function buildTerraformElkExcalidrawScene(
     const dependencyStrokeColor = strokeColorForTerraformDependencyEdge({
       hasNew,
       hasExisting,
-      sourceAction: getTerraformNodeAction(nodes[source]),
-      targetAction: getTerraformNodeAction(nodes[target]),
+      sourceAction: getTerraformPlanNodeAction(nodes[source]),
+      targetAction: getTerraformPlanNodeAction(nodes[target]),
     });
     edgeSkeletons.push({
       type: "line",
