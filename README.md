@@ -70,6 +70,8 @@ The Excalidraw editor (npm package) supports:
 
 ## Excalidraw.com
 
+The collaboration sync uses an encrypted WebSocket relay. Only the clients can decrypt the data, and the server cannot access its contents.
+
 The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase of what you can build with Excalidraw. Its [source code](https://github.com/excalidraw/excalidraw/tree/master/excalidraw-app) is part of this repository as well, and the app features:
 
 - 📡&nbsp;PWA support (works offline).
