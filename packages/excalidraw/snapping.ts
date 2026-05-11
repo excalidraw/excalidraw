@@ -39,6 +39,10 @@ import type {
 } from "./types";
 
 const SNAP_DISTANCE = 8;
+// Point snaps can come from both nearby and distant references within snap
+// distance. If their visual distances have a large break, prefer the nearest
+// cluster before comparing offsets.
+const SNAP_REFERENCE_CLUSTER_BREAK_DISTANCE = 200;
 
 // do not comput more gaps per axis than this limit
 // TODO increase or remove once we optimize
@@ -47,6 +51,13 @@ const VISIBLE_GAPS_LIMIT_PER_AXIS = 99999;
 // snap distance with zoom value taken into consideration
 export const getSnapDistance = (zoomValue: number) => {
   return SNAP_DISTANCE / zoomValue;
+};
+
+/**
+ * Keeps the cluster threshold visually stable across zoom levels.
+ */
+const getSnapReferenceClusterBreakDistance = (zoomValue: number) => {
+  return SNAP_REFERENCE_CLUSTER_BREAK_DISTANCE / zoomValue;
 };
 
 type Vector2D = {
@@ -84,6 +95,9 @@ export type PointSnap = {
   points: PointPair;
   pointTypes: [SnapPointType, SnapPointType];
   sourceIds: [SnapPointSourceId, SnapPointSourceId];
+  // Distance along the rendered snapline, used to group visually nearby
+  // references before choosing which point snaps should win.
+  visualDistance: number;
   offset: number;
 };
 
@@ -361,18 +375,37 @@ const getSnapPointSourceId = (elements: ExcalidrawElement[]) => {
     .join(",");
 };
 
+const getSelectedFrameIdsForSnapping = (
+  selectedElements: readonly ExcalidrawElement[],
+) => {
+  const selectedFrameIds = new Set<ExcalidrawElement["id"]>();
+
+  for (const element of selectedElements) {
+    if (element.frameId) {
+      selectedFrameIds.add(element.frameId);
+    }
+  }
+
+  return selectedFrameIds;
+};
+
 const getReferenceElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: NonDeletedExcalidrawElement[],
   appState: AppState,
   elementsMap: ElementsMap,
-) =>
-  getVisibleAndNonSelectedElements(
+) => {
+  const selectedFrameIds = getSelectedFrameIdsForSnapping(selectedElements);
+
+  return getVisibleAndNonSelectedElements(
     elements,
     selectedElements,
     appState,
     elementsMap,
-  );
+  ).filter((element) => {
+    return !element.frameId || selectedFrameIds.has(element.frameId);
+  });
+};
 
 export const getVisibleGaps = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -662,6 +695,119 @@ const getGapSnaps = (
   }
 };
 
+/**
+ * Narrows point snaps to the nearest visual cluster, then keeps the best offset
+ * inside that cluster. If all references look continuous, this preserves the
+ * old smallest-offset behavior.
+ */
+const filterPointSnapsToNearestCluster = (
+  snaps: Snaps,
+  clusterBreakDistance: number,
+) => {
+  const pointSnaps = snaps.filter(
+    (snap): snap is PointSnap => snap.type === "point",
+  );
+
+  if (pointSnaps.length < 2) {
+    return;
+  }
+
+  const snapsByOffset = new Map<number, PointSnap[]>();
+
+  for (const snap of pointSnaps) {
+    const offset = round(snap.offset);
+    const offsetSnaps = snapsByOffset.get(offset) ?? [];
+    offsetSnaps.push(snap);
+    snapsByOffset.set(offset, offsetSnaps);
+  }
+
+  const keptPointSnaps = new Set<PointSnap>();
+  const offsetGroups = Array.from(snapsByOffset.entries()).map(
+    ([offset, offsetSnaps]) => ({
+      offset,
+      snaps: offsetSnaps,
+      visualDistance: Math.min(
+        ...offsetSnaps.map((snap) => snap.visualDistance),
+      ),
+    }),
+  );
+  const sortedOffsetGroups = offsetGroups
+    .slice()
+    .sort((a, b) => a.visualDistance - b.visualDistance);
+  let keepOffsetGroupsUntil = sortedOffsetGroups.length;
+
+  // Prefer a nearby reference cluster before comparing offset. If there is no
+  // clear distance break, this keeps all offsets and falls back to the old
+  // smallest-offset behavior.
+  for (let i = 1; i < sortedOffsetGroups.length; i++) {
+    const distanceGap =
+      sortedOffsetGroups[i].visualDistance -
+      sortedOffsetGroups[i - 1].visualDistance;
+
+    if (distanceGap > clusterBreakDistance) {
+      keepOffsetGroupsUntil = i;
+      break;
+    }
+  }
+
+  const nearestOffsetGroups = sortedOffsetGroups.slice(
+    0,
+    keepOffsetGroupsUntil,
+  );
+  const minOffset = Math.min(
+    ...nearestOffsetGroups.map(({ offset }) => Math.abs(offset)),
+  );
+  const selectedOffsets = new Set(
+    nearestOffsetGroups
+      .filter(({ offset }) => Math.abs(offset) === minOffset)
+      .map(({ offset }) => offset),
+  );
+
+  for (const offsetSnaps of snapsByOffset.values()) {
+    if (!selectedOffsets.has(round(offsetSnaps[0].offset))) {
+      continue;
+    }
+
+    if (offsetSnaps.length < 2) {
+      offsetSnaps.forEach((snap) => keptPointSnaps.add(snap));
+      continue;
+    }
+
+    const sortedSnaps = offsetSnaps
+      .slice()
+      .sort((a, b) => a.visualDistance - b.visualDistance);
+
+    let keepUntil = sortedSnaps.length;
+
+    // This runs after the winning snap offset is known. A big visual-distance
+    // gap means references after it belong to a separate, farther cluster.
+    for (let i = 1; i < sortedSnaps.length; i++) {
+      const distanceGap =
+        sortedSnaps[i].visualDistance - sortedSnaps[i - 1].visualDistance;
+
+      if (distanceGap > clusterBreakDistance) {
+        keepUntil = i;
+        break;
+      }
+    }
+
+    for (let i = 0; i < keepUntil; i++) {
+      keptPointSnaps.add(sortedSnaps[i]);
+    }
+  }
+
+  let writeIndex = 0;
+
+  for (const snap of snaps) {
+    if (snap.type !== "point" || keptPointSnaps.has(snap)) {
+      snaps[writeIndex] = snap;
+      writeIndex++;
+    }
+  }
+
+  snaps.length = writeIndex;
+};
+
 export const getReferenceSnapPoints = (
   elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: ExcalidrawElement[],
@@ -689,6 +835,11 @@ export const getReferenceSnapPoints = (
     );
 };
 
+/**
+ * Collects point snaps within snap distance. Unlike gap snaps, point snaps first
+ * go through visual-cluster filtering so a nearby reference can beat a slightly
+ * better offset from a far-away reference.
+ */
 const getPointSnaps = (
   selectedElements: ExcalidrawElement[],
   selectionSnapPoints: SnapPoint[],
@@ -714,38 +865,51 @@ const getPointSnaps = (
         const offsetY = otherSnapPoint.point[1] - thisSnapPoint.point[1];
 
         if (Math.abs(offsetX) <= minOffset.x) {
-          if (Math.abs(offsetX) < minOffset.x) {
-            nearestSnapsX.length = 0;
-          }
-
           nearestSnapsX.push({
             type: "point",
             points: [thisSnapPoint.point, otherSnapPoint.point],
             pointTypes: [thisSnapPoint.type, otherSnapPoint.type],
             sourceIds: [thisSnapPoint.sourceId, otherSnapPoint.sourceId],
+            visualDistance: Math.abs(
+              otherSnapPoint.point[1] - thisSnapPoint.point[1],
+            ),
             offset: offsetX,
           });
-
-          minOffset.x = Math.abs(offsetX);
         }
 
         if (Math.abs(offsetY) <= minOffset.y) {
-          if (Math.abs(offsetY) < minOffset.y) {
-            nearestSnapsY.length = 0;
-          }
-
           nearestSnapsY.push({
             type: "point",
             points: [thisSnapPoint.point, otherSnapPoint.point],
             pointTypes: [thisSnapPoint.type, otherSnapPoint.type],
             sourceIds: [thisSnapPoint.sourceId, otherSnapPoint.sourceId],
+            visualDistance: Math.abs(
+              otherSnapPoint.point[0] - thisSnapPoint.point[0],
+            ),
             offset: offsetY,
           });
-
-          minOffset.y = Math.abs(offsetY);
         }
       }
     }
+  }
+
+  const clusterBreakDistance = getSnapReferenceClusterBreakDistance(
+    app.state.zoom.value,
+  );
+
+  filterPointSnapsToNearestCluster(nearestSnapsX, clusterBreakDistance);
+  filterPointSnapsToNearestCluster(nearestSnapsY, clusterBreakDistance);
+
+  if (nearestSnapsX.length > 0) {
+    minOffset.x = Math.min(
+      ...nearestSnapsX.map((snap) => Math.abs(snap.offset)),
+    );
+  }
+
+  if (nearestSnapsY.length > 0) {
+    minOffset.y = Math.min(
+      ...nearestSnapsY.map((snap) => Math.abs(snap.offset)),
+    );
   }
 };
 
@@ -899,6 +1063,10 @@ type PointSnapLineBucket = {
   matches: PointSnapLineMatch[];
 };
 
+/**
+ * Describes which source pair produced a rendered point snapline, so later
+ * filtering can reason about redundancy without mixing unrelated references.
+ */
 const getPointSnapLineMatch = (snap: PointSnap): PointSnapLineMatch => {
   return {
     sourceKey: snap.sourceIds.join("->"),
@@ -908,6 +1076,10 @@ const getPointSnapLineMatch = (snap: PointSnap): PointSnapLineMatch => {
   };
 };
 
+/**
+ * Builds the outer snapline coordinates by source pair. Center snaplines use
+ * this map to decide whether the surrounding outer lines already explain them.
+ */
 const getOuterCoordinatesBySourceKey = (
   snapLines: PointSnapLineCandidate[],
   getCoordinate: (snapLine: PointSnapLine) => number,
@@ -963,6 +1135,10 @@ const isRedundantOuterSnapLine = (
   return coordinate !== minCoordinate && coordinate !== maxCoordinate;
 };
 
+/**
+ * Removes point snaplines that are visually redundant, while preserving any line
+ * that is still needed by at least one source pair represented on that line.
+ */
 const filterRedundantPointSnapLines = (
   snapLines: PointSnapLineCandidate[],
   getCoordinate: (snapLine: PointSnapLine) => number,
