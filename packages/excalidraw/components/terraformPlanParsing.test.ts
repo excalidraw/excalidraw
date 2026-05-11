@@ -169,6 +169,7 @@ describe("terraformPlanParsing", () => {
         textFileLike(planText),
         textFileLike(dotText),
         null,
+        {},
       );
 
       expect(res.ok).toBe(true);
@@ -217,6 +218,30 @@ describe("terraformPlanParsing", () => {
           ),
         ),
       ).toBe(true);
+    },
+    60_000,
+  );
+
+  it(
+    "semanticLayout returns topology frames and topology meta",
+    async () => {
+      const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
+      const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+
+      const res = await terraformPlanParsing(
+        textFileLike(planText),
+        textFileLike(dotText),
+        null,
+        { semanticLayout: true },
+      );
+
+      expect(res.ok).toBe(true);
+      const body = await res.json();
+      expect(body.meta?.layoutEngine).toBe("topology");
+      expect(body.meta?.accountCount).toBeGreaterThan(0);
+      expect(Array.isArray(body.elements)).toBe(true);
+      const frames = body.elements.filter((e: any) => e.type === "frame");
+      expect(frames.length).toBeGreaterThan(0);
     },
     60_000,
   );
