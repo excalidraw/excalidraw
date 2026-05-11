@@ -938,7 +938,7 @@ function buildTopologySatelliteLineSkeletons(
     }
     seen.add(dedupe);
     out.push({
-      type: "line",
+      type: "arrow",
       id: `tf-topo-sat-edge-${edgeSeq}`,
       x: 0,
       y: 0,
@@ -1605,9 +1605,10 @@ function collectTopologyRectangleLayoutFromSkeleton(
 }
 
 /**
- * Excalidraw paints later elements on top. Put topology **frames** under graph **lines**,
- * and lines under **resource** rectangles / labels so arrows sit on the frame chrome but
- * stay behind cards (matches ELK scene: frames → edges → resources).
+ * Excalidraw paints later elements on top. Put topology **frames** under graph **edges**
+ * (arrows/lines with terraform edge layers), and those edges under **resource** rectangles /
+ * labels so connectors sit on the frame chrome but stay behind cards (matches ELK scene:
+ * frames → edges → resources).
  */
 function reorderTopologyElementsZStack(
   elements: readonly ExcalidrawElement[],
@@ -1619,19 +1620,23 @@ function reorderTopologyElementsZStack(
         ?.terraformTopologyRole,
     );
 
-  const isTerraformTopologyLine = (el: ExcalidrawElement) => {
-    if (el.type !== "line") {
+  const isTerraformTopologyEdge = (el: ExcalidrawElement) => {
+    if (el.type !== "line" && el.type !== "arrow") {
       return false;
     }
     const layer = getTerraformEdgeLayer(el);
-    return layer === "dependency" || layer === "dataFlow";
+    return (
+      layer === "dependency" ||
+      layer === "dataFlow" ||
+      layer === "networking"
+    );
   };
 
   const withIndex = elements.map((el, index) => ({ el, index }));
   const frames = withIndex.filter(({ el }) => isTopologyFrame(el));
-  const lines = withIndex.filter(({ el }) => isTerraformTopologyLine(el));
+  const lines = withIndex.filter(({ el }) => isTerraformTopologyEdge(el));
   const rest = withIndex.filter(
-    ({ el }) => !isTopologyFrame(el) && !isTerraformTopologyLine(el),
+    ({ el }) => !isTopologyFrame(el) && !isTerraformTopologyEdge(el),
   );
 
   return [...frames, ...lines, ...rest].map(({ el }) => el);

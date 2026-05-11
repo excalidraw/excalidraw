@@ -167,10 +167,15 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(meta.edgeCount).toBe(2);
     expect(elements.length).toBeGreaterThan(0);
     const rects = elements.filter((e) => e.type === "rectangle");
-    const lines = elements.filter((e) => e.type === "line");
+    const tfEdges = elements.filter(
+      (e) =>
+        e.type === "arrow" &&
+        (e as { customData?: { terraformEdgeLayer?: string } }).customData
+          ?.terraformEdgeLayer,
+    );
     const frames = elements.filter((e) => e.type === "frame");
     expect(rects.length).toBe(3);
-    expect(lines.length).toBeGreaterThanOrEqual(1);
+    expect(tfEdges.length).toBeGreaterThanOrEqual(1);
     expect(frames.length).toBeGreaterThanOrEqual(2);
 
     const rootFrame = frames.find((e) => e.name === "Root module");
@@ -214,7 +219,7 @@ describe("buildTerraformElkExcalidrawScene", () => {
       }),
     ]);
 
-    expect(lines[0].customData).toMatchObject({
+    expect(tfEdges[0].customData).toMatchObject({
       terraform: true,
       terraformEdgeLayer: "dependency",
       relationship: expect.objectContaining({
@@ -223,13 +228,13 @@ describe("buildTerraformElkExcalidrawScene", () => {
         type: "dependency",
       }),
     });
-    expect((lines[0] as any).startArrowhead).toBe(null);
-    expect((lines[0] as any).endArrowhead).toBe("arrow");
+    expect((tfEdges[0] as any).startArrowhead).toBe(null);
+    expect((tfEdges[0] as any).endArrowhead).toBe("arrow");
     expect(
       Math.max(...frames.map((frame) => elements.indexOf(frame))),
-    ).toBeLessThan(Math.min(...lines.map((line) => elements.indexOf(line))));
+    ).toBeLessThan(Math.min(...tfEdges.map((edge) => elements.indexOf(edge))));
     expect(
-      Math.max(...lines.map((line) => elements.indexOf(line))),
+      Math.max(...tfEdges.map((edge) => elements.indexOf(edge))),
     ).toBeLessThan(Math.min(...rects.map((rect) => elements.indexOf(rect))));
   });
 
@@ -286,7 +291,7 @@ describe("buildTerraformElkExcalidrawScene", () => {
     const { elements } = await buildTerraformElkExcalidrawScene(nodes);
     const dataFlowLines = elements.filter(
       (el) =>
-        el.type === "line" &&
+        el.type === "arrow" &&
         (el as { customData?: { terraformEdgeLayer?: string } }).customData
           ?.terraformEdgeLayer === "dataFlow",
     );
@@ -327,7 +332,7 @@ describe("buildTerraformElkExcalidrawScene", () => {
       const { elements } = await buildTerraformElkExcalidrawScene(nodes);
       const depLine = elements.find(
         (el) =>
-          el.type === "line" &&
+          el.type === "arrow" &&
           (el as { customData?: { terraformEdgeLayer?: string } }).customData
             ?.terraformEdgeLayer === "dependency",
       );
@@ -371,7 +376,7 @@ describe("buildTerraformElkExcalidrawScene", () => {
     const { elements } = await buildTerraformElkExcalidrawScene(nodes);
     const netLine = elements.find(
       (el) =>
-        el.type === "line" &&
+        el.type === "arrow" &&
         (el as { customData?: { terraformEdgeLayer?: string } }).customData
           ?.terraformEdgeLayer === "networking" &&
         (el as { customData?: { relationship?: { type?: string } } }).customData
@@ -382,7 +387,7 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(
       elements.some(
         (el) =>
-          el.type === "line" &&
+          el.type === "arrow" &&
           (el as { customData?: { terraformEdgeLayer?: string } }).customData
             ?.terraformEdgeLayer === "dependency",
       ),
@@ -513,11 +518,16 @@ describe("buildTerraformElkExcalidrawScene", () => {
     const dataFrame = elements.find(
       (e) => e.type === "frame" && e.name === "module.data",
     );
-    const lines = elements.filter((e) => e.type === "line");
+    const tfEdges = elements.filter(
+      (e) =>
+        e.type === "arrow" &&
+        (e as { customData?: { terraformEdgeLayer?: string } }).customData
+          ?.terraformEdgeLayer,
+    );
 
     expect(apiFrame).toBeDefined();
     expect(dataFrame).toBeDefined();
-    expect(lines.length).toBe(2);
+    expect(tfEdges.length).toBe(2);
     expect(apiFrame).toMatchObject({
       x: expect.any(Number),
       y: expect.any(Number),

@@ -967,7 +967,7 @@ export function buildTerraformDependencyLineSkeletons(
       targetAction: getTerraformPlanNodeAction(nodes[target]),
     });
     edgeSkeletons.push({
-      type: "line",
+      type: "arrow",
       id: `tf-edge-${edgeIndex}`,
       x: startX,
       y: startY,
@@ -1036,7 +1036,7 @@ export function buildTerraformNetworkingDependencyLineSkeletons(
     const endX = endPoint.x;
     const endY = endPoint.y;
     edgeSkeletons.push({
-      type: "line",
+      type: "arrow",
       id: `tf-netdep-${edgeIndex}`,
       x: startX,
       y: startY,
@@ -1148,7 +1148,7 @@ export function buildTerraformDataFlowLineSkeletons(
     const bidirectional = Boolean(edge.bidirectional);
 
     out.push({
-      type: "line",
+      type: "arrow",
       id: `tf-dataflow-${edgeIndex}`,
       x: startX,
       y: startY,
@@ -1239,7 +1239,7 @@ export function buildTerraformNetworkingRecordLineSkeletons(
     const bidirectional = Boolean(edge.bidirectional);
 
     out.push({
-      type: "line",
+      type: "arrow",
       id: `tf-net-rec-${edgeIndex}`,
       x: startX,
       y: startY,
