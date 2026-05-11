@@ -1,8 +1,12 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { KEYS, ROUNDNESS, reseed } from "@excalidraw/common";
-import { getElementBounds, getElementLineSegments } from "@excalidraw/element";
+import { KEYS, ROUNDNESS, arrayToMap, reseed } from "@excalidraw/common";
+import {
+  getElementBounds,
+  getElementLineSegments,
+  getElementsWithinSelection,
+} from "@excalidraw/element";
 import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
 
 import { SHAPES } from "../components/shapes";
@@ -267,6 +271,145 @@ describe("box-selection overlap mode", () => {
     boxSelect(25, -20, 75, 70);
 
     assertSelectedElements([rect1.id]);
+  });
+
+  it("should select the whole group when overlapping one group member", () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+
+    API.setElements([rect1, rect2]);
+
+    boxSelect(25, -20, 75, 70);
+
+    assertSelectedElements([rect1.id, rect2.id]);
+    expect(h.state.selectedGroupIds).toEqual({ A: true });
+  });
+
+  it("should return all group elements when overlapping one group member", () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      id: "rect1",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      id: "rect2",
+      x: 100,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    const rect3 = API.createElement({
+      type: "rectangle",
+      id: "rect3",
+      x: 200,
+      y: 0,
+      width: 50,
+      height: 50,
+    });
+    const selection = API.createElement({
+      type: "rectangle",
+      x: 125,
+      y: -10,
+      width: 10,
+      height: 70,
+    });
+    const elements = [rect1, rect2, rect3];
+
+    expect(
+      getElementsWithinSelection(
+        elements,
+        selection,
+        arrayToMap([...elements, selection]),
+        false,
+        "overlap",
+      ).map((element) => element.id),
+    ).toEqual([rect1.id, rect2.id]);
+  });
+
+  it("should retain nested and interleaved group element order", () => {
+    const outerNested1 = API.createElement({
+      type: "rectangle",
+      id: "outerNested1",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["inner", "outer"],
+    });
+    const other1 = API.createElement({
+      type: "rectangle",
+      id: "other1",
+      x: 70,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["other"],
+    });
+    const outerOnly = API.createElement({
+      type: "rectangle",
+      id: "outerOnly",
+      x: 140,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["outer"],
+    });
+    const other2 = API.createElement({
+      type: "rectangle",
+      id: "other2",
+      x: 210,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["other"],
+    });
+    const outerNested2 = API.createElement({
+      type: "rectangle",
+      id: "outerNested2",
+      x: 280,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["inner", "outer"],
+    });
+    const selection = API.createElement({
+      type: "rectangle",
+      x: 295,
+      y: -10,
+      width: 10,
+      height: 70,
+    });
+    const elements = [outerNested1, other1, outerOnly, other2, outerNested2];
+
+    expect(
+      getElementsWithinSelection(
+        elements,
+        selection,
+        arrayToMap([...elements, selection]),
+        false,
+        "overlap",
+      ).map((element) => element.id),
+    ).toEqual([outerNested1.id, outerOnly.id, outerNested2.id]);
   });
 
   it("should not select a transparent rectangle when the selection box stays inside it", () => {
@@ -716,7 +859,171 @@ describe("inner box-selection", () => {
       mouse.moveTo(rect2.x + rect2.width + 10, rect2.y + rect2.height + 10);
       mouse.up();
 
+      assertSelectedElements([rect1.id]);
+      expect(h.state.selectedGroupIds).toEqual({});
+    });
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.downAt(40, 40);
+      mouse.move(-1000, -1000);
+      mouse.moveTo(rect3.x + rect3.width + 10, rect3.y + rect3.height + 10);
+      mouse.up();
+
       assertSelectedElements([rect2.id, rect3.id]);
+      expect(h.state.selectedGroupIds).toEqual({ A: true });
+    });
+  });
+
+  it("does not select a nested outer group until all members are contained", async () => {
+    const innerRect1 = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 50,
+      height: 50,
+      groupIds: ["inner", "outer"],
+    });
+    const innerRect2 = API.createElement({
+      type: "rectangle",
+      x: 120,
+      y: 50,
+      width: 50,
+      height: 50,
+      groupIds: ["inner", "outer"],
+    });
+    const outerRect = API.createElement({
+      type: "rectangle",
+      x: 190,
+      y: 50,
+      width: 50,
+      height: 50,
+      groupIds: ["outer"],
+    });
+    API.setElements([innerRect1, innerRect2, outerRect]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.downAt(0, 0);
+      mouse.move(-1000, -1000);
+      mouse.moveTo(
+        innerRect2.x + innerRect2.width + 10,
+        innerRect2.y + innerRect2.height + 10,
+      );
+      mouse.up();
+
+      assertSelectedElements([]);
+      expect(h.state.selectedGroupIds).toEqual({});
+    });
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.downAt(0, 0);
+      mouse.move(-1000, -1000);
+      mouse.moveTo(
+        outerRect.x + outerRect.width + 10,
+        outerRect.y + outerRect.height + 10,
+      );
+      mouse.up();
+
+      assertSelectedElements([innerRect1.id, innerRect2.id, outerRect.id]);
+      expect(h.state.selectedGroupIds).toEqual({ outer: true });
+    });
+  });
+
+  it.skip("checks nested containment against the current editing depth", async () => {
+    const innerRect1 = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 50,
+      height: 50,
+      groupIds: ["inner", "outer"],
+    });
+    const innerRect2 = API.createElement({
+      type: "rectangle",
+      x: 120,
+      y: 50,
+      width: 50,
+      height: 50,
+      groupIds: ["inner", "outer"],
+    });
+    const outerRect = API.createElement({
+      type: "rectangle",
+      x: 190,
+      y: 50,
+      width: 50,
+      height: 50,
+      groupIds: ["outer"],
+    });
+    const selection = API.createElement({
+      type: "rectangle",
+      x: 40,
+      y: 40,
+      width: 140,
+      height: 70,
+    });
+    const elements = [innerRect1, innerRect2, outerRect];
+    const elementsMap = arrayToMap([...elements, selection]);
+
+    expect(
+      getElementsWithinSelection(
+        elements,
+        selection,
+        elementsMap,
+        false,
+        "contain",
+      ).map((element) => element.id),
+    ).toEqual([]);
+
+    expect(
+      getElementsWithinSelection(
+        elements,
+        selection,
+        elementsMap,
+        false,
+        "contain",
+        // "outer", /* editingGroupId - add as param once we implement nested group handling */
+      ).map((element) => element.id),
+    ).toEqual([innerRect1.id, innerRect2.id]);
+  });
+
+  it("ignores grouped bound text when checking box-selection containment", async () => {
+    const container = API.createElement({
+      type: "rectangle",
+      id: "container",
+      x: 50,
+      y: 50,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+      boundElements: [{ type: "text", id: "bound-text" }],
+    });
+    const boundText = API.createElement({
+      type: "text",
+      id: "bound-text",
+      x: 50,
+      y: 50,
+      width: 50,
+      height: 20,
+      containerId: container.id,
+      groupIds: ["A"],
+    });
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 150,
+      y: 150,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    API.setElements([container, boundText, rect]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.downAt(40, 40);
+      mouse.move(-1000, -1000);
+      mouse.moveTo(rect.x + rect.width + 10, rect.y + rect.height + 10);
+      mouse.up();
+
+      expect(h.state.selectedElementIds[container.id]).toBe(true);
+      expect(h.state.selectedElementIds[rect.id]).toBe(true);
       expect(h.state.selectedGroupIds).toEqual({ A: true });
     });
   });
@@ -751,7 +1058,7 @@ describe("inner box-selection", () => {
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       mouse.downAt(rect2.x - 20, rect2.y - 20);
       mouse.move(-1000, -1000);
-      mouse.moveTo(rect2.x + rect2.width + 10, rect2.y + rect2.height + 10);
+      mouse.moveTo(rect3.x + rect3.width + 10, rect3.y + rect3.height + 10);
       assertSelectedElements([rect2.id, rect3.id]);
       expect(h.state.selectedGroupIds).toEqual({ A: true });
       mouse.moveTo(rect2.x - 10, rect2.y - 10);

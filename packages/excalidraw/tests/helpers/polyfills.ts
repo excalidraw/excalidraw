@@ -94,3 +94,42 @@ export const testPolyfills = {
   // https://github.com/vitest-dev/vitest/pull/4164#issuecomment-2172729965
   URL,
 };
+
+export const PolyfillLocalStorage = () => {
+  // Node.js 25+ provides a native localStorage global that shadows jsdom's,
+  // and jsdom's own localStorage also uses the native one -- both are broken
+  // (empty objects without Storage methods). On older Node versions, jsdom
+  // provides a working localStorage. This polyfill replaces localStorage on
+  // all supported versions with a standard Storage implementation backed by
+  // a Map, ensuring consistent behavior regardless of the Node.js version.
+  const storage = new Map<string, string>();
+  const storagePolyfill: Storage = {
+    get length() {
+      return storage.size;
+    },
+    clear() {
+      storage.clear();
+    },
+    key(index) {
+      return Array.from(storage.keys())[index] ?? null;
+    },
+    getItem(key) {
+      return storage.get(key) ?? null;
+    },
+    setItem(key, value) {
+      storage.set(key, value);
+    },
+    removeItem(key) {
+      storage.delete(key);
+    },
+    *[Symbol.iterator]() {
+      yield* storage.entries();
+    },
+  };
+
+  Object.defineProperty(window, "localStorage", {
+    value: storagePolyfill,
+    writable: true,
+    configurable: true,
+  });
+};
