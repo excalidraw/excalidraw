@@ -13,7 +13,12 @@ import {
   terraformModulePrefixForAddress,
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
-import { collectLambdaVpcSecurityGroupRefsFromPlanConfiguration } from "./terraformTopologyLambdaSgPlanConfig";
+import {
+  collectLambdaVpcSecurityGroupRefsFromPlanConfiguration,
+  qualifyConfigurationReference,
+  shouldUsePlanReference,
+} from "./terraformTopologyLambdaSgPlanConfig";
+import { collectSgRuleSecurityGroupIdRefsFromPlanConfiguration } from "./terraformTopologySgRulePlanConfig";
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
 
@@ -95,6 +100,38 @@ export function stripLastTerraformModuleSegment(modulePrefix: string): string {
   return parts.slice(0, -2).join(".");
 }
 
+/** Strip `.id` / `.arn` / `.security_group_id` suffixes for Terraform resource reference strings. */
+function terraformSecurityGroupAddressLookupCandidates(address: string): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  const add = (s: string) => {
+    const t = s.trim();
+    if (!t || seen.has(t)) {
+      return;
+    }
+    seen.add(t);
+    out.push(t);
+  };
+  let cur = address.trim();
+  for (let guard = 0; guard < 12 && cur; guard += 1) {
+    add(cur);
+    add(stripIndexes(cur));
+    const lower = cur.toLowerCase();
+    let stripped = false;
+    for (const suf of [".security_group_id", ".id", ".arn"]) {
+      if (lower.endsWith(suf)) {
+        cur = cur.slice(0, -suf.length);
+        stripped = true;
+        break;
+      }
+    }
+    if (!stripped) {
+      break;
+    }
+  }
+  return out;
+}
+
 function listAwsSecurityGroupPathsUnderPrefix(
   nodes: TerraformPlanNodesMap,
   prefixWithDot: string,
@@ -169,6 +206,51 @@ function inferLambdaVpcSecurityGroupRefs(
   return [];
 }
 
+/** When a rule omits `security_group_id` in `change.after`, the lone SG in the same module is the target. */
+function inferSoleSecurityGroupPathForRuleModule(
+  nodes: TerraformPlanNodesMap,
+  rulePath: string,
+): string | null {
+  const modPref = terraformModulePrefixForAddress(rulePath);
+  if (!modPref) {
+    return null;
+  }
+  const paths = listAwsSecurityGroupPathsUnderPrefix(nodes, `${modPref}.`);
+  const ranked = rankInferredSecurityGroupPaths(paths);
+  return ranked.length === 1 ? ranked[0]! : null;
+}
+
+function ruleHasExplicitSecurityGroupIdField(merged: Record<string, unknown>): boolean {
+  const flat: string[] = [];
+  flattenStringish(merged.security_group_id, flat);
+  return flat.some((s) => s.trim().length > 0);
+}
+
+function resolveSecurityGroupIdFieldFromPlanConfiguration(
+  plan: unknown,
+  rulePath: string,
+  nodes: TerraformPlanNodesMap,
+  arnIndex: Map<string, string>,
+  idToPath: Map<string, string>,
+): string | null {
+  const rawList = collectSgRuleSecurityGroupIdRefsFromPlanConfiguration(plan, rulePath);
+  if (rawList === null) {
+    return null;
+  }
+  const caller = terraformModulePrefixForAddress(rulePath);
+  for (const ref of rawList) {
+    if (!shouldUsePlanReference(ref)) {
+      continue;
+    }
+    const qualified = qualifyConfigurationReference(caller, ref);
+    const p = resolveSecurityGroupRefToPath(nodes, rulePath, qualified, arnIndex, idToPath);
+    if (p) {
+      return p;
+    }
+  }
+  return null;
+}
+
 /** Map `sg-…` (and optional normalized forms) to Terraform `aws_security_group` node path. */
 export function buildSecurityGroupIdToPathIndex(
   nodes: TerraformPlanNodesMap,
@@ -207,13 +289,11 @@ function resolveSecurityGroupRefToPath(
   }
 
   const graph = nodes as Record<string, TerraformPlanGraphNode>;
-  const byStrip = resolveTerraformPlanNodeKey(graph, stripIndexes(text));
-  if (byStrip && getResourceTypeFromPath(byStrip, nodes[byStrip]) === "aws_security_group") {
-    return byStrip;
-  }
-  const byFull = resolveTerraformPlanNodeKey(graph, text);
-  if (byFull && getResourceTypeFromPath(byFull, nodes[byFull]) === "aws_security_group") {
-    return byFull;
+  for (const cand of terraformSecurityGroupAddressLookupCandidates(text)) {
+    const k = resolveTerraformPlanNodeKey(graph, cand);
+    if (k && getResourceTypeFromPath(k, nodes[k]) === "aws_security_group") {
+      return k;
+    }
   }
 
   const ctxMod = terraformModulePrefixForAddress(contextAddress);
@@ -224,8 +304,8 @@ function resolveSecurityGroupRefToPath(
     text.includes(".")
   ) {
     const qualified = `${ctxMod}.${text}`;
-    for (const candidate of [qualified, stripIndexes(qualified)]) {
-      const k = resolveTerraformPlanNodeKey(graph, candidate);
+    for (const qc of terraformSecurityGroupAddressLookupCandidates(qualified)) {
+      const k = resolveTerraformPlanNodeKey(graph, qc);
       if (k && getResourceTypeFromPath(k, nodes[k]) === "aws_security_group") {
         return k;
       }
@@ -329,6 +409,7 @@ export function collectSecurityGroupRulesForSg(
   sgPath: string,
   arnIndex: Map<string, string>,
   idToPath: Map<string, string>,
+  plan?: unknown,
 ): string[] {
   const sgNode = nodes[sgPath] as TerraformPlanGraphNode | undefined;
   const sgPrimary = getPrimaryResource(sgNode);
@@ -351,13 +432,34 @@ export function collectSecurityGroupRulesForSg(
       continue;
     }
     const merged = mergeTerraformPlanResourceValues(primary);
-    const resolved = resolveSecurityGroupIdFieldToPath(
+    let resolved = resolveSecurityGroupIdFieldToPath(
       nodes,
       path,
       merged.security_group_id,
       arnIndex,
       idToPath,
     );
+    if (resolved !== sgPath && plan !== undefined) {
+      const fromCfg = resolveSecurityGroupIdFieldFromPlanConfiguration(
+        plan,
+        path,
+        nodes,
+        arnIndex,
+        idToPath,
+      );
+      if (fromCfg) {
+        resolved = fromCfg;
+      }
+    }
+    if (
+      resolved !== sgPath &&
+      !ruleHasExplicitSecurityGroupIdField(merged)
+    ) {
+      const inferred = inferSoleSecurityGroupPathForRuleModule(nodes, path);
+      if (inferred === sgPath) {
+        resolved = inferred;
+      }
+    }
     if (resolved !== sgPath) {
       continue;
     }
@@ -412,7 +514,7 @@ export function buildLambdaSgCluster(
       continue;
     }
     seenSg.add(sgPath);
-    const rules = collectSecurityGroupRulesForSg(nodes, sgPath, arnIndex, idToPath);
+    const rules = collectSecurityGroupRulesForSg(nodes, sgPath, arnIndex, idToPath, plan);
     groups.push({ sgPath, rules });
     edges.push({
       source: lambdaAddress,
