@@ -86,34 +86,31 @@ const MIN_VPC_W = 480;
 const MIN_VPC_H = 360;
 const CANVAS_EDGE_PAD = MARGIN;
 
-/** Match ELK module resource leaf size. */
-const RESOURCE_RECT_W = 200;
-const RESOURCE_RECT_H = 88;
+/** Tier 0: primary resources (matches ELK module resource leaf). */
+const TOPOLOGY_TIER0_W = 200;
+const TOPOLOGY_TIER0_H = 88;
+/** Tier 1: direct satellites of a primary (role, SG body, CW tiles, KMS policies). */
+const TOPOLOGY_TIER1_W = 176;
+const TOPOLOGY_TIER1_H = 52;
+/** Tier 2: satellites of a satellite (IAM policies, SG rules). */
+const TOPOLOGY_TIER2_W = 154;
+const TOPOLOGY_TIER2_H = 44;
+const TOPOLOGY_SATELLITE_GAP_PX = 8;
+
+/** Match ELK module resource leaf size (tier 0). */
+const RESOURCE_RECT_W = TOPOLOGY_TIER0_W;
+const RESOURCE_RECT_H = TOPOLOGY_TIER0_H;
 const RESOURCE_GAP = 16;
-/** IAM role / policy tiles under a Lambda in semantic topology (left column). */
-const IAM_SATELLITE_W = 176;
-const IAM_SATELLITE_H = 52;
-const IAM_SATELLITE_GAP = 8;
-const IAM_SATELLITE_X_PAD = 6;
 const IAM_DATAFLOW_STROKE = "#0ca678";
 const KMS_POLICY_DATAFLOW_STROKE = "#845ef7";
-/** Security group + rule tiles (right column). */
-const SG_SATELLITE_W = 176;
-const SG_SATELLITE_H = 52;
-const SG_RULE_TILE_H = 52;
 const SG_RIGHT_PAD = 6;
 const SG_DATAFLOW_STROKE = "#228be6";
-/** CloudWatch alarm / log group tiles above a resource. */
-const CLOUDWATCH_SATELLITE_W = 176;
-const CLOUDWATCH_SATELLITE_H = 52;
-const CLOUDWATCH_SATELLITE_GAP = 8;
 const CLOUDWATCH_LEFT_PAD = 6;
 const CLOUDWATCH_RIGHT_PAD = 6;
 const CLOUDWATCH_DATAFLOW_STROKE = "#f08c00";
-/** When both IAM and SG satellites exist, split tile width so columns do not overlap (cell is {@link RESOURCE_RECT_W}). */
+/** Horizontal gap between IAM/KMS-left column and SG column (tier-1 widths). */
 const IAM_SG_COLUMN_GAP_PX = 8;
 const CLOUDWATCH_COLUMN_GAP_PX = 8;
-const MIN_SPLIT_SATELLITE_W = 86;
 /** Gap between subnet-zone frames inside one VPC. */
 const ZONE_CELL_GAP = 20;
 /** Gap between regional-services column and VPC grid inside one region frame. */
@@ -214,39 +211,61 @@ function frameCustomData(
   };
 }
 
-function satelliteColumnWidths(
-  hasIamCluster: boolean,
-  hasSgCluster: boolean,
-): { iamW: number; sgW: number } {
-  if (hasIamCluster && hasSgCluster) {
-    const inner =
-      RESOURCE_RECT_W -
-      IAM_SATELLITE_X_PAD -
-      SG_RIGHT_PAD -
-      IAM_SG_COLUMN_GAP_PX;
-    const w = Math.max(MIN_SPLIT_SATELLITE_W, Math.floor(inner / 2));
-    return { iamW: w, sgW: w };
-  }
-  return { iamW: IAM_SATELLITE_W, sgW: SG_SATELLITE_W };
+function satelliteColumnWidths(): { iamW: number; sgW: number } {
+  return { iamW: TOPOLOGY_TIER1_W, sgW: TOPOLOGY_TIER1_W };
 }
 
-function cloudWatchColumnWidths(
-  hasAlarms: boolean,
-  hasLogGroups: boolean,
-): { alarmW: number; logGroupW: number } {
-  if (hasAlarms && hasLogGroups) {
-    const inner =
-      RESOURCE_RECT_W -
-      CLOUDWATCH_LEFT_PAD -
-      CLOUDWATCH_RIGHT_PAD -
-      CLOUDWATCH_COLUMN_GAP_PX;
-    const w = Math.max(MIN_SPLIT_SATELLITE_W, Math.floor(inner / 2));
-    return { alarmW: w, logGroupW: w };
+function cloudWatchColumnWidths(): { alarmW: number; logGroupW: number } {
+  return { alarmW: TOPOLOGY_TIER1_W, logGroupW: TOPOLOGY_TIER1_W };
+}
+
+/** Minimum horizontal span for one primary cell so satellites are not clipped. */
+function topologyPrimaryCellFootprintPx(
+  nodes: TerraformPlanNodesMap,
+  address: string,
+  arnIndex: Map<string, string>,
+  plan?: unknown,
+): number {
+  const { cluster: iamCluster } = buildLambdaIamCluster(nodes, address, arnIndex);
+  const kmsBuild = buildKmsKeyPolicyCluster(nodes, address, arnIndex);
+  const sgBuild = buildLambdaSgCluster(nodes, address, arnIndex, plan);
+  const cwBuild = buildResourceCloudWatchCluster(nodes, address);
+
+  const hasLeft = Boolean(iamCluster) || Boolean(kmsBuild.cluster);
+  const hasSg = Boolean(sgBuild.cluster);
+  let w = TOPOLOGY_TIER0_W;
+  if (hasLeft && hasSg) {
+    w = Math.max(w, TOPOLOGY_TIER1_W * 2 + IAM_SG_COLUMN_GAP_PX);
   }
-  return {
-    alarmW: CLOUDWATCH_SATELLITE_W,
-    logGroupW: CLOUDWATCH_SATELLITE_W,
-  };
+
+  const hasAlarm = Boolean(cwBuild.cluster?.alarms.length);
+  const hasLog = Boolean(cwBuild.cluster?.logGroups.length);
+  if (hasAlarm && hasLog) {
+    const cwSpan =
+      CLOUDWATCH_LEFT_PAD +
+      TOPOLOGY_TIER1_W +
+      CLOUDWATCH_COLUMN_GAP_PX +
+      TOPOLOGY_TIER1_W +
+      CLOUDWATCH_RIGHT_PAD;
+    w = Math.max(w, cwSpan);
+  }
+  return w;
+}
+
+function maxTopologyCellFootprintPx(
+  sortedAddresses: readonly string[],
+  nodes: TerraformPlanNodesMap,
+  arnIndex: Map<string, string>,
+  plan?: unknown,
+): number {
+  let maxW = TOPOLOGY_TIER0_W;
+  for (const addr of sortedAddresses) {
+    maxW = Math.max(
+      maxW,
+      topologyPrimaryCellFootprintPx(nodes, addr, arnIndex, plan),
+    );
+  }
+  return maxW;
 }
 
 function gridColsRows(count: number): { cols: number; rows: number } {
@@ -281,6 +300,7 @@ function zoneFrameSizeForTopologyAddresses(
     };
   }
   const { cols, rows } = gridColsRows(n);
+  const cellW = maxTopologyCellFootprintPx(sortedAddresses, nodes, arnIndex, plan);
   const rowTopBase: number[] = new Array(rows).fill(0);
   const rowBottomBase: number[] = new Array(rows).fill(0);
   for (let i = 0; i < sortedAddresses.length; i++) {
@@ -289,30 +309,31 @@ function zoneFrameSizeForTopologyAddresses(
     const cloudWatchExtra = cloudWatchSatelliteStackHeightPx(
       nodes,
       addr,
-      CLOUDWATCH_SATELLITE_H,
-      CLOUDWATCH_SATELLITE_GAP,
+      TOPOLOGY_TIER1_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
     );
     const iamExtra = iamSatelliteStackHeightPx(
       nodes,
       addr,
       arnIndex,
-      IAM_SATELLITE_H,
-      IAM_SATELLITE_GAP,
+      TOPOLOGY_TIER1_H,
+      TOPOLOGY_TIER2_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
     );
     const kmsPolicyExtra = kmsPolicySatelliteStackHeightPx(
       nodes,
       addr,
       arnIndex,
-      IAM_SATELLITE_H,
-      IAM_SATELLITE_GAP,
+      TOPOLOGY_TIER1_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
     );
     const sgExtra = sgSatelliteStackHeightPx(
       nodes,
       addr,
       arnIndex,
-      SG_SATELLITE_H,
-      SG_RULE_TILE_H,
-      IAM_SATELLITE_GAP,
+      TOPOLOGY_TIER1_H,
+      TOPOLOGY_TIER2_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
       plan,
     );
     rowTopBase[r] = Math.max(rowTopBase[r]!, cloudWatchExtra);
@@ -333,7 +354,7 @@ function zoneFrameSizeForTopologyAddresses(
   }
   const w =
     2 * INNER_PAD +
-    cols * (RESOURCE_RECT_W + RESOURCE_GAP) -
+    cols * (cellW + RESOURCE_GAP) -
     RESOURCE_GAP +
     FRAME_CONTENT_SLACK_X;
   const h =
@@ -696,6 +717,8 @@ function pushResourceRectangleSkeleton(
   options: {
     initiallyVisible: boolean;
     explodeParentKeys: string[];
+    /** Semantic topology: smaller typography for satellite tiers. */
+    satelliteTier?: 1 | 2;
     egress?: { accountId: string; region: string; vpcId: string };
     vpcRouteTable?: {
       accountId: string;
@@ -716,6 +739,8 @@ function pushResourceRectangleSkeleton(
   const egress = options.egress;
   const vpcRouteTable = options.vpcRouteTable;
   const rtZoneSig = vpcRouteTable?.zoneSubnetSignature;
+  const labelFontSize =
+    options.satelliteTier === 2 ? 10 : options.satelliteTier === 1 ? 11 : 12;
 
   skeleton.push({
     type: "rectangle",
@@ -731,7 +756,7 @@ function pushResourceRectangleSkeleton(
     roundness: { type: 3, value: 10 },
     label: {
       text: shortTerraformResourceLabel(addr),
-      fontSize: 12,
+      fontSize: labelFontSize,
       strokeColor: TERRAFORM_RESOURCE_LABEL_STROKE,
     },
     customData: {
@@ -857,6 +882,7 @@ function appendTopologyResourceRectangles(
   const rectIds: string[] = [];
   const sorted = [...addrs].sort();
   const { cols: rcCols, rows: rcRows } = gridColsRows(sorted.length);
+  const cellW = maxTopologyCellFootprintPx(sorted, nodes, arnIndex, plan);
 
   const rowTopBase: number[] = new Array(rcRows).fill(0);
   const rowBottomBase: number[] = new Array(rcRows).fill(0);
@@ -866,30 +892,31 @@ function appendTopologyResourceRectangles(
     const cloudWatchExtra = cloudWatchSatelliteStackHeightPx(
       nodes,
       addr,
-      CLOUDWATCH_SATELLITE_H,
-      CLOUDWATCH_SATELLITE_GAP,
+      TOPOLOGY_TIER1_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
     );
     const iamExtra = iamSatelliteStackHeightPx(
       nodes,
       addr,
       arnIndex,
-      IAM_SATELLITE_H,
-      IAM_SATELLITE_GAP,
+      TOPOLOGY_TIER1_H,
+      TOPOLOGY_TIER2_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
     );
     const kmsPolicyExtra = kmsPolicySatelliteStackHeightPx(
       nodes,
       addr,
       arnIndex,
-      IAM_SATELLITE_H,
-      IAM_SATELLITE_GAP,
+      TOPOLOGY_TIER1_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
     );
     const sgExtra = sgSatelliteStackHeightPx(
       nodes,
       addr,
       arnIndex,
-      SG_SATELLITE_H,
-      SG_RULE_TILE_H,
-      IAM_SATELLITE_GAP,
+      TOPOLOGY_TIER1_H,
+      TOPOLOGY_TIER2_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
       plan,
     );
     rowTopBase[rr] = Math.max(rowTopBase[rr]!, cloudWatchExtra);
@@ -916,7 +943,7 @@ function appendTopologyResourceRectangles(
     const addr = sorted[ri]!;
     const rc = ri % rcCols;
     const rr = Math.floor(ri / rcCols);
-    const rx = contentOriginX + rc * (RESOURCE_RECT_W + RESOURCE_GAP);
+    const rx = contentOriginX + rc * (cellW + RESOURCE_GAP);
     const ry = rowOriginY[rr]! + rowTopBase[rr]!;
 
     const node = nodes[addr] as TerraformPlanGraphNode | undefined;
@@ -943,14 +970,8 @@ function appendTopologyResourceRectangles(
     const kmsBuild = buildKmsKeyPolicyCluster(nodes, addr, arnIndex);
     const sgBuild = buildLambdaSgCluster(nodes, addr, arnIndex, plan);
     const cloudWatchBuild = buildResourceCloudWatchCluster(nodes, addr);
-    const { iamW, sgW } = satelliteColumnWidths(
-      Boolean(cluster) || Boolean(kmsBuild.cluster),
-      Boolean(sgBuild.cluster),
-    );
-    const { alarmW, logGroupW } = cloudWatchColumnWidths(
-      Boolean(cloudWatchBuild.cluster?.alarms.length),
-      Boolean(cloudWatchBuild.cluster?.logGroups.length),
-    );
+    const { iamW, sgW } = satelliteColumnWidths();
+    const { alarmW, logGroupW } = cloudWatchColumnWidths();
 
     for (const e of edges) {
       satelliteLineSpecs.push({
@@ -981,16 +1002,28 @@ function appendTopologyResourceRectangles(
       });
     }
 
+    const hasLeft = Boolean(cluster) || Boolean(kmsBuild.cluster);
+    const hasSg = Boolean(sgBuild.cluster);
+    const cwHasAlarm = Boolean(cloudWatchBuild.cluster?.alarms.length);
+    const cwHasLog = Boolean(cloudWatchBuild.cluster?.logGroups.length);
+    const logGroupX =
+      cwHasAlarm && cwHasLog
+        ? rx +
+          CLOUDWATCH_LEFT_PAD +
+          TOPOLOGY_TIER1_W +
+          CLOUDWATCH_COLUMN_GAP_PX
+        : rx + TOPOLOGY_TIER0_W - logGroupW - CLOUDWATCH_RIGHT_PAD;
+
     if (cloudWatchBuild.cluster) {
       const cloudWatchTop =
         ry -
         cloudWatchSatelliteStackHeightPx(
           nodes,
           addr,
-          CLOUDWATCH_SATELLITE_H,
-          CLOUDWATCH_SATELLITE_GAP,
+          TOPOLOGY_TIER1_H,
+          TOPOLOGY_SATELLITE_GAP_PX,
         ) +
-        CLOUDWATCH_SATELLITE_GAP;
+        TOPOLOGY_SATELLITE_GAP_PX;
 
       let yAlarm = cloudWatchTop;
       const alarmX = rx + CLOUDWATCH_LEFT_PAD;
@@ -1004,19 +1037,19 @@ function appendTopologyResourceRectangles(
             alarmX,
             yAlarm,
             alarmW,
-            CLOUDWATCH_SATELLITE_H,
+            TOPOLOGY_TIER1_H,
             nodes,
             {
               initiallyVisible: false,
               explodeParentKeys: [addr],
+              satelliteTier: 1,
             },
           );
         }
-        yAlarm += CLOUDWATCH_SATELLITE_H + CLOUDWATCH_SATELLITE_GAP;
+        yAlarm += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
       }
 
       let yLogGroup = cloudWatchTop;
-      const logGroupX = rx + RESOURCE_RECT_W - logGroupW - CLOUDWATCH_RIGHT_PAD;
       for (const logGroupPath of cloudWatchBuild.cluster.logGroups) {
         if (!globalPlacedCloudWatchSatellites.has(logGroupPath)) {
           globalPlacedCloudWatchSatellites.add(logGroupPath);
@@ -1027,24 +1060,32 @@ function appendTopologyResourceRectangles(
             logGroupX,
             yLogGroup,
             logGroupW,
-            CLOUDWATCH_SATELLITE_H,
+            TOPOLOGY_TIER1_H,
             nodes,
             {
               initiallyVisible: false,
               explodeParentKeys: [addr],
+              satelliteTier: 1,
             },
           );
         }
-        yLogGroup += CLOUDWATCH_SATELLITE_H + CLOUDWATCH_SATELLITE_GAP;
+        yLogGroup += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
       }
     }
 
     if (cluster) {
-      let ySat = ry + RESOURCE_RECT_H + IAM_SATELLITE_GAP;
-      const satXIam = rx + IAM_SATELLITE_X_PAD;
-      for (const satAddr of cluster.stack) {
+      let ySat = ry + RESOURCE_RECT_H + TOPOLOGY_SATELLITE_GAP_PX;
+      const satXIam = rx;
+      for (let si = 0; si < cluster.stack.length; si++) {
+        const satAddr = cluster.stack[si]!;
+        const isRoleTile = si === 0;
+        const tileH = isRoleTile ? TOPOLOGY_TIER1_H : TOPOLOGY_TIER2_H;
+        const tileW = isRoleTile ? iamW : TOPOLOGY_TIER2_W;
+        const tileX = isRoleTile
+          ? satXIam
+          : satXIam + Math.floor((iamW - TOPOLOGY_TIER2_W) / 2);
         if (globalPlacedIamSatellites.has(satAddr)) {
-          ySat += IAM_SATELLITE_H + IAM_SATELLITE_GAP;
+          ySat += tileH + TOPOLOGY_SATELLITE_GAP_PX;
           continue;
         }
         globalPlacedIamSatellites.add(satAddr);
@@ -1052,26 +1093,27 @@ function appendTopologyResourceRectangles(
         pushResourceRectangleSkeleton(
           skeleton,
           satAddr,
-          satXIam,
+          tileX,
           ySat,
-          iamW,
-          IAM_SATELLITE_H,
+          tileW,
+          tileH,
           nodes,
           {
             initiallyVisible: false,
             explodeParentKeys: [addr],
+            satelliteTier: isRoleTile ? 1 : 2,
           },
         );
-        ySat += IAM_SATELLITE_H + IAM_SATELLITE_GAP;
+        ySat += tileH + TOPOLOGY_SATELLITE_GAP_PX;
       }
     }
 
     if (kmsBuild.cluster) {
-      let yKms = ry + RESOURCE_RECT_H + IAM_SATELLITE_GAP;
-      const satXKms = rx + IAM_SATELLITE_X_PAD;
+      let yKms = ry + RESOURCE_RECT_H + TOPOLOGY_SATELLITE_GAP_PX;
+      const satXKms = rx;
       for (const policyPath of kmsBuild.cluster.policies) {
         if (globalPlacedKmsPolicySatellites.has(policyPath)) {
-          yKms += IAM_SATELLITE_H + IAM_SATELLITE_GAP;
+          yKms += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
           continue;
         }
         globalPlacedKmsPolicySatellites.add(policyPath);
@@ -1082,20 +1124,25 @@ function appendTopologyResourceRectangles(
           satXKms,
           yKms,
           iamW,
-          IAM_SATELLITE_H,
+          TOPOLOGY_TIER1_H,
           nodes,
           {
             initiallyVisible: false,
             explodeParentKeys: [addr],
+            satelliteTier: 1,
           },
         );
-        yKms += IAM_SATELLITE_H + IAM_SATELLITE_GAP;
+        yKms += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
       }
     }
 
     if (sgBuild.cluster) {
-      const satXSg = rx + RESOURCE_RECT_W - sgW - SG_RIGHT_PAD;
-      let ySg = ry + RESOURCE_RECT_H + IAM_SATELLITE_GAP;
+      const satXSg =
+        hasLeft && hasSg
+          ? rx + TOPOLOGY_TIER1_W + IAM_SG_COLUMN_GAP_PX
+          : rx + TOPOLOGY_TIER0_W - sgW - SG_RIGHT_PAD;
+      const ruleTileX = satXSg + Math.floor((sgW - TOPOLOGY_TIER2_W) / 2);
+      let ySg = ry + RESOURCE_RECT_H + TOPOLOGY_SATELLITE_GAP_PX;
       for (let gi = 0; gi < sgBuild.cluster.groups.length; gi++) {
         const group = sgBuild.cluster.groups[gi]!;
 
@@ -1108,15 +1155,16 @@ function appendTopologyResourceRectangles(
             satXSg,
             ySg,
             sgW,
-            SG_SATELLITE_H,
+            TOPOLOGY_TIER1_H,
             nodes,
             {
               initiallyVisible: false,
               explodeParentKeys: [addr],
+              satelliteTier: 1,
             },
           );
         }
-        ySg += SG_SATELLITE_H + IAM_SATELLITE_GAP;
+        ySg += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
 
         for (const rulePath of group.rules) {
           if (!globalPlacedSgSatellites.has(rulePath)) {
@@ -1125,18 +1173,19 @@ function appendTopologyResourceRectangles(
             pushResourceRectangleSkeleton(
               skeleton,
               rulePath,
-              satXSg,
+              ruleTileX,
               ySg,
-              sgW,
-              SG_RULE_TILE_H,
+              TOPOLOGY_TIER2_W,
+              TOPOLOGY_TIER2_H,
               nodes,
               {
                 initiallyVisible: false,
                 explodeParentKeys: [addr],
+                satelliteTier: 2,
               },
             );
           }
-          ySg += SG_RULE_TILE_H + IAM_SATELLITE_GAP;
+          ySg += TOPOLOGY_TIER2_H + TOPOLOGY_SATELLITE_GAP_PX;
         }
 
         if (gi < sgBuild.cluster.groups.length - 1) {

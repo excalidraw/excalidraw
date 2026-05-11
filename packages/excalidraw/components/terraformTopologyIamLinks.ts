@@ -442,19 +442,26 @@ export function buildLambdaIamCluster(
 
 /**
  * Per-primary-address IAM stack height in pixels (0 when no IAM cluster).
+ * First stack entry is the execution role (tier-1 height); remaining entries are policies (tier-2 height).
  */
 export function iamSatelliteStackHeightPx(
   nodes: TerraformPlanNodesMap,
   address: string,
   arnIndex: Map<string, string>,
-  satelliteH: number,
+  tier1SatelliteH: number,
+  tier2SatelliteH: number,
   satelliteGap: number,
 ): number {
   const { cluster } = buildLambdaIamCluster(nodes, address, arnIndex);
   if (!cluster || cluster.stack.length === 0) {
     return 0;
   }
-  return satelliteGap + cluster.stack.length * (satelliteH + satelliteGap);
+  let h = satelliteGap;
+  for (let i = 0; i < cluster.stack.length; i++) {
+    const tileH = i === 0 ? tier1SatelliteH : tier2SatelliteH;
+    h += tileH + satelliteGap;
+  }
+  return h;
 }
 
 export function buildArnIndexForTopology(nodes: TerraformPlanNodesMap): Map<string, string> {
