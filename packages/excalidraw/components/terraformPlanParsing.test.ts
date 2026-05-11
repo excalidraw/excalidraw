@@ -239,6 +239,10 @@ describe("terraformPlanParsing", () => {
       const body = await res.json();
       expect(body.meta?.layoutEngine).toBe("topology");
       expect(body.meta?.accountCount).toBeGreaterThan(0);
+      expect(typeof body.meta?.primaryResourceCount).toBe("number");
+      expect(body.meta?.primaryResourceCount).toBeGreaterThanOrEqual(0);
+      expect(typeof body.meta?.regionalPrimaryCount).toBe("number");
+      expect(body.meta?.regionalPrimaryCount).toBeGreaterThanOrEqual(0);
       expect(Array.isArray(body.elements)).toBe(true);
       const frames = body.elements.filter((e: any) => e.type === "frame");
       expect(frames.length).toBeGreaterThan(0);

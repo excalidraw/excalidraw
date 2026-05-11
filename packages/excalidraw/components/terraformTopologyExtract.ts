@@ -38,6 +38,7 @@ type ResourceChange = {
   type?: string;
   provider_name?: string;
   change?: {
+    actions?: string[];
     before?: unknown;
     after?: unknown;
   };
@@ -50,6 +51,14 @@ function isAwsResourceChange(rc: ResourceChange): boolean {
   }
   const p = rc.provider_name;
   return typeof p === "string" && p.includes("hashicorp/aws");
+}
+
+function isPlainValuesObject(v: unknown): v is Record<string, unknown> {
+  return Boolean(v && typeof v === "object" && !Array.isArray(v));
+}
+
+function isEmptyPlainObject(rec: Record<string, unknown>): boolean {
+  return Object.keys(rec).length === 0;
 }
 
 /** Prefer `after`, then `before`, for merged attribute object. */
@@ -69,6 +78,37 @@ export function pickResourceChangeValues(
     return before as Record<string, unknown>;
   }
   return null;
+}
+
+/**
+ * Attribute snapshot for VPC/regional topology placement. Prefer `before` on destroy and when
+ * `after` is `{}` so subnet / VPC hints are not lost.
+ */
+export function pickResourceValuesForTopologyPlacement(
+  rc: ResourceChange,
+): Record<string, unknown> | null {
+  const change = rc.change;
+  if (!change || typeof change !== "object") {
+    return null;
+  }
+  const actions = Array.isArray(change.actions) ? change.actions : [];
+  const beforeRaw = change.before;
+  const afterRaw = change.after;
+  const before = isPlainValuesObject(beforeRaw) ? beforeRaw : null;
+  const after = isPlainValuesObject(afterRaw) ? afterRaw : null;
+
+  if (actions.includes("delete") && before) {
+    if (after && !isEmptyPlainObject(after)) {
+      return { ...before, ...after };
+    }
+    return before;
+  }
+
+  if (after && isEmptyPlainObject(after) && before) {
+    return before;
+  }
+
+  return pickResourceChangeValues(rc);
 }
 
 /**
@@ -220,7 +260,9 @@ function resolveAccountRegion(
   return { account: TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT, region };
 }
 
-type SubnetOwnerHint = { account: string; region: string };
+export type TerraformSubnetOwnerHint = { account: string; region: string };
+
+type SubnetOwnerHint = TerraformSubnetOwnerHint;
 
 /** Emit frames only when account and region are resolved (omit placeholder buckets). */
 export function shouldEmitTopologyPlacement(account: string, region: string): boolean {
@@ -301,6 +343,110 @@ function buildSubnetToVpcMap(changes: ResourceChange[]): Map<string, string> {
     }
   }
   return map;
+}
+
+/** Shared with placement extraction (`terraformTopologyPlacement.ts`). */
+export function buildSubnetToVpcMapFromPlan(plan: {
+  resource_changes?: ResourceChange[];
+}): Map<string, string> {
+  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  return buildSubnetToVpcMap(changes);
+}
+
+export function buildSubnetOwnerHintsFromPlan(plan: {
+  resource_changes?: ResourceChange[];
+}): Map<string, TerraformSubnetOwnerHint> {
+  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  return buildSubnetOwnerHintMap(changes);
+}
+
+export function resolveTerraformTopologyAccountRegion(
+  values: Record<string, unknown>,
+): { account: string; region: string } {
+  return resolveAccountRegion(values);
+}
+
+export function mergeTerraformTopologyAccountRegionFromSubnets(
+  base: { account: string; region: string },
+  subnetIds: string[],
+  subnetOwners: Map<string, TerraformSubnetOwnerHint>,
+): { account: string; region: string } {
+  return mergeAccountRegionFromSubnets(base, subnetIds, subnetOwners);
+}
+
+/**
+ * When a resource has no ARN/owner yet (e.g. create-only `aws_sqs_queue`) but lists a concrete
+ * region, inherit account from any `aws_subnet` row in the plan with that region — matches real
+ * single-account modules.
+ */
+export function mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
+  base: { account: string; region: string },
+  subnetOwners: Map<string, TerraformSubnetOwnerHint>,
+): { account: string; region: string } {
+  if (base.account !== TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT) {
+    return base;
+  }
+  if (base.region === TERRAFORM_TOPOLOGY_UNKNOWN_REGION) {
+    return base;
+  }
+  const orderedSubnetIds = [...subnetOwners.keys()].sort();
+  for (const sid of orderedSubnetIds) {
+    const hint = subnetOwners.get(sid);
+    if (
+      hint &&
+      hint.region === base.region &&
+      hint.account !== TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT
+    ) {
+      return { account: hint.account, region: base.region };
+    }
+  }
+  return base;
+}
+
+export function isAwsTerraformResourceChange(rc: {
+  type?: string;
+  provider_name?: string;
+}): boolean {
+  return isAwsResourceChange(rc as ResourceChange);
+}
+
+export type TopologyPlacementZoneSeed = {
+  accountId: string;
+  region: string;
+  vpcId: string;
+  subnetIds: string[];
+};
+
+/** Ensures VPC/subnet keys exist for zones-only primaries (union with graph-derived topology). */
+export function mergeTopologyModelWithPlacementZones(
+  model: TerraformTopologyModel,
+  zones: readonly TopologyPlacementZoneSeed[],
+): void {
+  for (const z of zones) {
+    if (!shouldEmitTopologyPlacement(z.accountId, z.region)) {
+      continue;
+    }
+    const acc = ensureAccount(model, z.accountId);
+    const reg = ensureRegion(acc, z.region);
+    const vpc = ensureVpc(reg, z.vpcId);
+    for (const sid of z.subnetIds) {
+      ensureSubnet(vpc, sid);
+    }
+  }
+}
+
+/** Ensures account/region shells exist for VPC-less regional primaries (empty `vpcs` map). */
+export function mergeTopologyModelWithRegionalBuckets(
+  model: TerraformTopologyModel,
+  buckets: readonly { accountId: string; region: string }[],
+): void {
+  for (const b of buckets) {
+    if (!shouldEmitTopologyPlacement(b.accountId, b.region)) {
+      continue;
+    }
+    const acc = ensureAccount(model, b.accountId);
+    ensureRegion(acc, b.region);
+  }
 }
 
 function ingestVpcSubnetPair(

@@ -2,8 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
 import type { TerraformTopologyModel } from "./terraformTopologyExtract";
+import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
+import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
+import type {
+  TopologyPlacementZone,
+  TopologyRegionalPrimaryBucket,
+} from "./terraformTopologyPlacement";
 
 function axisBounds(el: ExcalidrawElement): {
   minX: number;
@@ -103,9 +108,277 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
       ]),
     };
 
-    const { elements, meta } = await buildTerraformTopologyExcalidrawScene(model);
+    const { elements, meta } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      [],
+      [],
+      {},
+    );
     expect(meta.layoutEngine).toBe("topology");
+    expect(meta.regionalPrimaryCount).toBe(0);
     expect(elements.length).toBeGreaterThan(0);
+    assertTopologyFramesContainChildren(elements);
+  });
+
+  it("places primary resource rectangles inside subnet zone frames", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-test",
+                      {
+                        vpcId: "vpc-test",
+                        subnets: new Map([
+                          ["subnet-a", { subnetId: "subnet-a" }],
+                          ["subnet-b", { subnetId: "subnet-b" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-test",
+        subnetSignature: "subnet-a|subnet-b",
+        subnetIds: ["subnet-a", "subnet-b"],
+        addresses: ["aws_lambda_function.fn"],
+      },
+    ];
+
+    const nodes: TerraformPlanNodesMap = {
+      "aws_lambda_function.fn": {
+        resources: {
+          "aws_lambda_function.fn": {
+            address: "aws_lambda_function.fn",
+            mode: "managed",
+            type: "aws_lambda_function",
+          },
+        },
+      },
+    };
+
+    const { elements, meta } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      nodes,
+    );
+
+    expect(meta.primaryResourceCount).toBe(1);
+    expect(meta.regionalPrimaryCount).toBe(0);
+
+    const zoneFrames = elements.filter(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "subnetZone",
+    );
+    expect(zoneFrames.length).toBeGreaterThan(0);
+
+    const rects = elements.filter(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { terraformVisibilityRole?: string } | undefined)
+          ?.terraformVisibilityRole === "resource",
+    );
+    expect(rects.length).toBeGreaterThan(0);
+    expect(
+      rects.some((r) => zoneFrames.some((zf) => zf.id === r.frameId)),
+    ).toBe(true);
+
+    assertTopologyFramesContainChildren(elements);
+  });
+
+  it("places regional primaries in Regional services frame when region has no VPCs", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map(),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const regionalBuckets: TopologyRegionalPrimaryBucket[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        addresses: ["aws_s3_bucket.data"],
+      },
+    ];
+
+    const nodes: TerraformPlanNodesMap = {
+      "aws_s3_bucket.data": {
+        resources: {
+          "aws_s3_bucket.data": {
+            address: "aws_s3_bucket.data",
+            mode: "managed",
+            type: "aws_s3_bucket",
+          },
+        },
+      },
+    };
+
+    const { elements, meta } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      [],
+      regionalBuckets,
+      nodes,
+    );
+
+    expect(meta.regionalPrimaryCount).toBe(1);
+    expect(meta.primaryResourceCount).toBe(1);
+
+    const regionalFrames = elements.filter(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "regionalServices",
+    );
+    expect(regionalFrames.length).toBe(1);
+
+    const rects = elements.filter(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { terraformVisibilityRole?: string } | undefined)
+          ?.terraformVisibilityRole === "resource",
+    );
+    expect(rects.length).toBe(1);
+    expect(rects[0]!.frameId).toBe(regionalFrames[0]!.id);
+
+    assertTopologyFramesContainChildren(elements);
+  });
+
+  it("lays out Regional services beside VPC grid in the same region", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-test",
+                      {
+                        vpcId: "vpc-test",
+                        subnets: new Map([
+                          ["subnet-a", { subnetId: "subnet-a" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-test",
+        subnetSignature: "subnet-a",
+        subnetIds: ["subnet-a"],
+        addresses: ["aws_lambda_function.fn"],
+      },
+    ];
+
+    const regionalBuckets: TopologyRegionalPrimaryBucket[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        addresses: ["aws_sqs_queue.jobs"],
+      },
+    ];
+
+    const nodes: TerraformPlanNodesMap = {
+      "aws_lambda_function.fn": {
+        resources: {
+          "aws_lambda_function.fn": {
+            address: "aws_lambda_function.fn",
+            mode: "managed",
+            type: "aws_lambda_function",
+          },
+        },
+      },
+      "aws_sqs_queue.jobs": {
+        resources: {
+          "aws_sqs_queue.jobs": {
+            address: "aws_sqs_queue.jobs",
+            mode: "managed",
+            type: "aws_sqs_queue",
+          },
+        },
+      },
+    };
+
+    const { elements, meta } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      regionalBuckets,
+      nodes,
+    );
+
+    expect(meta.primaryResourceCount).toBe(2);
+    expect(meta.regionalPrimaryCount).toBe(1);
+
+    expect(
+      elements.some(
+        (e) =>
+          e.type === "frame" &&
+          (e.customData as { terraformTopologyRole?: string } | undefined)
+            ?.terraformTopologyRole === "regionalServices",
+      ),
+    ).toBe(true);
+    expect(
+      elements.some(
+        (e) =>
+          e.type === "frame" &&
+          (e.customData as { terraformTopologyRole?: string } | undefined)
+            ?.terraformTopologyRole === "subnetZone",
+      ),
+    ).toBe(true);
+
     assertTopologyFramesContainChildren(elements);
   });
 });
