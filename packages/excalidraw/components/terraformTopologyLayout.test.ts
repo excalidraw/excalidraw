@@ -622,6 +622,115 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     assertTopologyFramesContainChildren(elements);
   });
 
+  it("places CloudWatch alarms above non-Lambda resources", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map(),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const regionalBuckets: TopologyRegionalPrimaryBucket[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        addresses: ["aws_s3_bucket.data"],
+      },
+    ];
+
+    const nodes: TerraformPlanNodesMap = {
+      "aws_s3_bucket.data": {
+        resources: {
+          "aws_s3_bucket.data": {
+            address: "aws_s3_bucket.data",
+            mode: "managed",
+            type: "aws_s3_bucket",
+            change: {
+              actions: ["no-op"],
+              after: {
+                bucket: "ts-test-lambda-data",
+                id: "ts-test-lambda-data",
+              },
+            },
+          },
+        },
+      },
+      "aws_cloudwatch_metric_alarm.bucket_size": {
+        resources: {
+          "aws_cloudwatch_metric_alarm.bucket_size": {
+            address: "aws_cloudwatch_metric_alarm.bucket_size",
+            mode: "managed",
+            type: "aws_cloudwatch_metric_alarm",
+            change: {
+              actions: ["no-op"],
+              after: {
+                namespace: "AWS/S3",
+                dimensions: {
+                  BucketName: "ts-test-lambda-data",
+                  StorageType: "StandardStorage",
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const { elements } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      [],
+      regionalBuckets,
+      nodes,
+    );
+
+    const rectByPath = (path: string) =>
+      elements.find(
+        (e) =>
+          e.type === "rectangle" &&
+          (e.customData as { nodePath?: string } | undefined)?.nodePath === path,
+      );
+
+    const bucket = rectByPath("aws_s3_bucket.data");
+    const alarm = rectByPath("aws_cloudwatch_metric_alarm.bucket_size");
+    expect(bucket && alarm).toBeTruthy();
+    expect(alarm!.y + (alarm!.height ?? 0)).toBeLessThanOrEqual(bucket!.y);
+
+    const rels = elements
+      .filter(
+        (e) =>
+          e.type === "line" &&
+          (e.customData as { terraformEdgeLayer?: string } | undefined)
+            ?.terraformEdgeLayer === "dataFlow",
+      )
+      .map((e) => e.customData?.relationship as Record<string, unknown> | undefined);
+
+    expect(
+      rels.some(
+        (r) =>
+          r?.origin === "topology_cloudwatch" &&
+          r?.type === "cloudwatch_alarm" &&
+          r?.source === "aws_cloudwatch_metric_alarm.bucket_size" &&
+          r?.target === "aws_s3_bucket.data",
+      ),
+    ).toBe(true);
+
+    assertTopologyFramesContainChildren(elements);
+  });
+
   it("places regional primaries in Regional services frame when region has no VPCs", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,

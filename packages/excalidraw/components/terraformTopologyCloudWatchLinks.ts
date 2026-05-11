@@ -1,5 +1,5 @@
 /**
- * Semantic topology: resolve Lambda CloudWatch alarms and log groups from the
+ * Semantic topology: resolve CloudWatch alarms and Lambda log groups from the
  * Terraform plan-shaped `nodes` map.
  */
 
@@ -68,21 +68,34 @@ function collectStringish(value: unknown, out: string[]): void {
   }
 }
 
-function addUnique(map: Map<string, string>, key: string, path: string): void {
+function addUnique(map: Map<string, Set<string>>, key: string, path: string): void {
   const k = key.trim();
-  if (!k || map.has(k)) {
+  if (!k) {
     return;
   }
-  map.set(k, path);
+  if (!map.has(k)) {
+    map.set(k, new Set());
+  }
+  map.get(k)!.add(path);
 }
 
-function buildLambdaNameIndex(nodes: TerraformPlanNodesMap): Map<string, string> {
-  const map = new Map<string, string>();
+function isCloudWatchSatelliteType(type: string): boolean {
+  return (
+    type === "aws_cloudwatch_metric_alarm" ||
+    type === "aws_cloudwatch_log_group"
+  );
+}
+
+function buildResourceIdentityIndex(
+  nodes: TerraformPlanNodesMap,
+): Map<string, Set<string>> {
+  const map = new Map<string, Set<string>>();
   for (const [path, node] of Object.entries(nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
-    if (getResourceTypeFromPath(path, node as TerraformPlanGraphNode) !== "aws_lambda_function") {
+    const type = getResourceTypeFromPath(path, node as TerraformPlanGraphNode);
+    if (isCloudWatchSatelliteType(type)) {
       continue;
     }
     const primary = getPrimaryResource(node as TerraformPlanGraphNode);
@@ -90,31 +103,60 @@ function buildLambdaNameIndex(nodes: TerraformPlanNodesMap): Map<string, string>
       continue;
     }
     const values = mergeTerraformPlanResourceValues(primary);
-    if (typeof values.function_name === "string") {
-      addUnique(map, values.function_name, path);
-    }
-    if (typeof values.id === "string") {
-      addUnique(map, values.id, path);
-    }
-    if (typeof primary.name === "string") {
-      addUnique(map, primary.name, path);
-    }
     addUnique(map, path, path);
     addUnique(map, stripIndexes(path), path);
+    for (const field of [
+      "arn",
+      "id",
+      "name",
+      "bucket",
+      "function_name",
+      "queue_name",
+      "table_name",
+      "identifier",
+      "cluster_identifier",
+    ]) {
+      const value = values[field];
+      if (typeof value === "string") {
+        addUnique(map, value, path);
+      }
+    }
   }
   return map;
 }
 
-function lambdaPathFromText(
-  nodes: TerraformPlanNodesMap,
-  lambdaIndex: Map<string, string>,
+function uniquePathForIdentity(
+  identityIndex: Map<string, Set<string>>,
   text: string,
+  nodes: TerraformPlanNodesMap,
+  expectedType?: string,
+): string | null {
+  const paths = identityIndex.get(text);
+  if (!paths) {
+    return null;
+  }
+  const candidates = expectedType
+    ? [...paths].filter((path) => getResourceTypeFromPath(path, nodes[path]) === expectedType)
+    : [...paths];
+  return candidates.length === 1 ? candidates[0]! : null;
+}
+
+function resourcePathFromText(
+  nodes: TerraformPlanNodesMap,
+  identityIndex: Map<string, Set<string>>,
+  text: string,
+  expectedType?: string,
 ): string | null {
   const trimmed = text.trim();
   if (!trimmed) {
     return null;
   }
-  const directName = lambdaIndex.get(trimmed);
+  const directName = uniquePathForIdentity(
+    identityIndex,
+    trimmed,
+    nodes,
+    expectedType,
+  );
   if (directName) {
     return directName;
   }
@@ -123,8 +165,8 @@ function lambdaPathFromText(
     const key = resolveTerraformPlanNodeKey(graph, candidate);
     if (
       key &&
-      getResourceTypeFromPath(key, nodes[key] as TerraformPlanGraphNode) ===
-        "aws_lambda_function"
+      !isCloudWatchSatelliteType(getResourceTypeFromPath(key, nodes[key])) &&
+      (!expectedType || getResourceTypeFromPath(key, nodes[key]) === expectedType)
     ) {
       return key;
     }
@@ -132,9 +174,10 @@ function lambdaPathFromText(
   return null;
 }
 
-function inferSoleLambdaInModuleFamily(
+function inferSoleResourceInModuleFamily(
   nodes: TerraformPlanNodesMap,
   sourceAddress: string,
+  expectedType?: string,
 ): string | null {
   const sourcePrefix = terraformModulePrefixForAddress(sourceAddress);
   if (!sourcePrefix) {
@@ -146,14 +189,15 @@ function inferSoleLambdaInModuleFamily(
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
-    if (getResourceTypeFromPath(path, node as TerraformPlanGraphNode) !== "aws_lambda_function") {
+    const type = getResourceTypeFromPath(path, node as TerraformPlanGraphNode);
+    if (isCloudWatchSatelliteType(type) || (expectedType && type !== expectedType)) {
       continue;
     }
-    const lambdaPrefix = terraformModulePrefixForAddress(path);
+    const resourcePrefix = terraformModulePrefixForAddress(path);
     if (
-      lambdaPrefix === sourcePrefix ||
-      lambdaPrefix.startsWith(`${sourcePrefix}.`) ||
-      sourcePrefix.startsWith(`${lambdaPrefix}.`)
+      resourcePrefix === sourcePrefix ||
+      resourcePrefix.startsWith(`${sourcePrefix}.`) ||
+      sourcePrefix.startsWith(`${resourcePrefix}.`)
     ) {
       matches.push(path);
     }
@@ -167,7 +211,7 @@ function resolveMetricAlarmLambdaPath(
   nodes: TerraformPlanNodesMap,
   alarmPath: string,
   values: Record<string, unknown>,
-  lambdaIndex: Map<string, string>,
+  identityIndex: Map<string, Set<string>>,
 ): string | null {
   if (values.namespace !== "AWS/Lambda") {
     return null;
@@ -176,19 +220,89 @@ function resolveMetricAlarmLambdaPath(
   const candidates: string[] = [];
   collectStringish(dimensions.FunctionName, candidates);
   for (const candidate of candidates) {
-    const path = lambdaPathFromText(nodes, lambdaIndex, candidate);
+    const path = resourcePathFromText(
+      nodes,
+      identityIndex,
+      candidate,
+      "aws_lambda_function",
+    );
     if (path) {
       return path;
     }
   }
-  return inferSoleLambdaInModuleFamily(nodes, alarmPath);
+  return inferSoleResourceInModuleFamily(nodes, alarmPath, "aws_lambda_function");
+}
+
+function expectedResourceTypesForCloudWatchNamespace(namespace: unknown): string[] {
+  if (namespace === "AWS/Lambda") {
+    return ["aws_lambda_function"];
+  }
+  if (namespace === "AWS/S3") {
+    return ["aws_s3_bucket"];
+  }
+  if (namespace === "AWS/SQS") {
+    return ["aws_sqs_queue"];
+  }
+  if (namespace === "AWS/DynamoDB") {
+    return ["aws_dynamodb_table"];
+  }
+  if (namespace === "AWS/SNS") {
+    return ["aws_sns_topic"];
+  }
+  if (namespace === "AWS/Kinesis") {
+    return ["aws_kinesis_stream"];
+  }
+  if (namespace === "AWS/RDS") {
+    return ["aws_db_instance", "aws_rds_cluster"];
+  }
+  if (namespace === "AWS/ECS") {
+    return ["aws_ecs_cluster", "aws_ecs_service"];
+  }
+  return [];
+}
+
+function resolveMetricAlarmResourcePath(
+  nodes: TerraformPlanNodesMap,
+  values: Record<string, unknown>,
+  identityIndex: Map<string, Set<string>>,
+): string | null {
+  const dimensions = isPlainObject(values.dimensions) ? values.dimensions : {};
+  const matches = new Set<string>();
+  const expectedTypes = expectedResourceTypesForCloudWatchNamespace(values.namespace);
+
+  for (const value of Object.values(dimensions)) {
+    const candidates: string[] = [];
+    collectStringish(value, candidates);
+    for (const candidate of candidates) {
+      if (expectedTypes.length > 0) {
+        for (const expectedType of expectedTypes) {
+          const path = resourcePathFromText(
+            nodes,
+            identityIndex,
+            candidate,
+            expectedType,
+          );
+          if (path) {
+            matches.add(path);
+          }
+        }
+      } else {
+        const path = resourcePathFromText(nodes, identityIndex, candidate);
+        if (path) {
+          matches.add(path);
+        }
+      }
+    }
+  }
+
+  return matches.size === 1 ? [...matches][0]! : null;
 }
 
 function resolveLogGroupLambdaPath(
   nodes: TerraformPlanNodesMap,
   logGroupPath: string,
   values: Record<string, unknown>,
-  lambdaIndex: Map<string, string>,
+  identityIndex: Map<string, Set<string>>,
 ): string | null {
   const names: string[] = [];
   collectStringish(values.name, names);
@@ -200,34 +314,53 @@ function resolveLogGroupLambdaPath(
       continue;
     }
     const lambdaName = text.slice("/aws/lambda/".length).replace(/[:*]+$/g, "");
-    const path = lambdaPathFromText(nodes, lambdaIndex, lambdaName);
+    const path = resourcePathFromText(
+      nodes,
+      identityIndex,
+      lambdaName,
+      "aws_lambda_function",
+    );
     if (path) {
       return path;
     }
   }
 
-  return inferSoleLambdaInModuleFamily(nodes, logGroupPath);
+  return inferSoleResourceInModuleFamily(nodes, logGroupPath, "aws_lambda_function");
 }
 
-export type LambdaCloudWatchCluster = {
-  lambda: string;
+export type ResourceCloudWatchCluster = {
+  resource: string;
   alarms: string[];
   logGroups: string[];
 };
 
-export function buildLambdaCloudWatchCluster(
-  nodes: TerraformPlanNodesMap,
-  lambdaAddress: string,
-): { cluster: LambdaCloudWatchCluster | null; edges: TopologyIamEdge[] } {
-  const node = nodes[lambdaAddress] as TerraformPlanGraphNode | undefined;
-  const primary = getPrimaryResource(node);
-  if (!primary || primary.type !== "aws_lambda_function") {
-    return { cluster: null, edges: [] };
-  }
+type CloudWatchAttachmentIndex = Map<
+  string,
+  { alarms: Set<string>; logGroups: Set<string> }
+>;
 
-  const lambdaIndex = buildLambdaNameIndex(nodes);
-  const alarms = new Set<string>();
-  const logGroups = new Set<string>();
+const cloudWatchAttachmentIndexCache = new WeakMap<
+  TerraformPlanNodesMap,
+  CloudWatchAttachmentIndex
+>();
+
+function addAttachment(
+  index: CloudWatchAttachmentIndex,
+  targetPath: string,
+  kind: "alarms" | "logGroups",
+  sourcePath: string,
+): void {
+  if (!index.has(targetPath)) {
+    index.set(targetPath, { alarms: new Set(), logGroups: new Set() });
+  }
+  index.get(targetPath)![kind].add(sourcePath);
+}
+
+function buildCloudWatchAttachmentIndex(
+  nodes: TerraformPlanNodesMap,
+): CloudWatchAttachmentIndex {
+  const identityIndex = buildResourceIdentityIndex(nodes);
+  const attachmentIndex: CloudWatchAttachmentIndex = new Map();
 
   for (const [path, candidateNode] of Object.entries(nodes)) {
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
@@ -239,21 +372,59 @@ export function buildLambdaCloudWatchCluster(
     }
     const type = typeof candidatePrimary.type === "string" ? candidatePrimary.type : "";
     const values = mergeTerraformPlanResourceValues(candidatePrimary);
-    if (
-      type === "aws_cloudwatch_metric_alarm" &&
-      resolveMetricAlarmLambdaPath(nodes, path, values, lambdaIndex) === lambdaAddress
-    ) {
-      alarms.add(path);
+    const target =
+      type === "aws_cloudwatch_metric_alarm"
+        ? values.namespace === "AWS/Lambda"
+          ? resolveMetricAlarmLambdaPath(nodes, path, values, identityIndex) ??
+            resolveMetricAlarmResourcePath(nodes, values, identityIndex)
+          : resolveMetricAlarmResourcePath(nodes, values, identityIndex)
+        : null;
+    if (type === "aws_cloudwatch_metric_alarm" && target) {
+      addAttachment(attachmentIndex, target, "alarms", path);
     } else if (
-      type === "aws_cloudwatch_log_group" &&
-      resolveLogGroupLambdaPath(nodes, path, values, lambdaIndex) === lambdaAddress
+      type === "aws_cloudwatch_log_group"
     ) {
-      logGroups.add(path);
+      const logGroupTarget = resolveLogGroupLambdaPath(
+        nodes,
+        path,
+        values,
+        identityIndex,
+      );
+      if (logGroupTarget) {
+        addAttachment(attachmentIndex, logGroupTarget, "logGroups", path);
+      }
     }
   }
 
-  const sortedAlarms = [...alarms].sort();
-  const sortedLogGroups = [...logGroups].sort();
+  return attachmentIndex;
+}
+
+function getCloudWatchAttachmentIndex(
+  nodes: TerraformPlanNodesMap,
+): CloudWatchAttachmentIndex {
+  const cached = cloudWatchAttachmentIndexCache.get(nodes);
+  if (cached) {
+    return cached;
+  }
+  const built = buildCloudWatchAttachmentIndex(nodes);
+  cloudWatchAttachmentIndexCache.set(nodes, built);
+  return built;
+}
+
+export function buildResourceCloudWatchCluster(
+  nodes: TerraformPlanNodesMap,
+  resourceAddress: string,
+): { cluster: ResourceCloudWatchCluster | null; edges: TopologyIamEdge[] } {
+  const node = nodes[resourceAddress] as TerraformPlanGraphNode | undefined;
+  const primary = getPrimaryResource(node);
+  const resourceType = typeof primary?.type === "string" ? primary.type : "";
+  if (!primary || isCloudWatchSatelliteType(resourceType)) {
+    return { cluster: null, edges: [] };
+  }
+
+  const attachment = getCloudWatchAttachmentIndex(nodes).get(resourceAddress);
+  const sortedAlarms = [...(attachment?.alarms ?? [])].sort();
+  const sortedLogGroups = [...(attachment?.logGroups ?? [])].sort();
   if (sortedAlarms.length === 0 && sortedLogGroups.length === 0) {
     return { cluster: null, edges: [] };
   }
@@ -261,13 +432,13 @@ export function buildLambdaCloudWatchCluster(
   const edges: TopologyIamEdge[] = [
     ...sortedAlarms.map((alarmPath) => ({
       source: alarmPath,
-      target: lambdaAddress,
+      target: resourceAddress,
       type: "cloudwatch_alarm",
       label: "alarm",
     })),
     ...sortedLogGroups.map((logGroupPath) => ({
       source: logGroupPath,
-      target: lambdaAddress,
+      target: resourceAddress,
       type: "cloudwatch_log_group",
       label: "log group",
     })),
@@ -275,7 +446,7 @@ export function buildLambdaCloudWatchCluster(
 
   return {
     cluster: {
-      lambda: lambdaAddress,
+      resource: resourceAddress,
       alarms: sortedAlarms,
       logGroups: sortedLogGroups,
     },
@@ -283,13 +454,15 @@ export function buildLambdaCloudWatchCluster(
   };
 }
 
+export const buildLambdaCloudWatchCluster = buildResourceCloudWatchCluster;
+
 export function cloudWatchSatelliteStackHeightPx(
   nodes: TerraformPlanNodesMap,
   address: string,
   satelliteH: number,
   satelliteGap: number,
 ): number {
-  const { cluster } = buildLambdaCloudWatchCluster(nodes, address);
+  const { cluster } = buildResourceCloudWatchCluster(nodes, address);
   if (!cluster) {
     return 0;
   }

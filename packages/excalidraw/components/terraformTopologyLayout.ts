@@ -34,7 +34,7 @@ import type {
 } from "./terraformTopologyPlacement";
 import type { TerraformTopologyModel } from "./terraformTopologyExtract";
 import {
-  buildLambdaCloudWatchCluster,
+  buildResourceCloudWatchCluster,
   cloudWatchSatelliteStackHeightPx,
 } from "./terraformTopologyCloudWatchLinks";
 import {
@@ -93,7 +93,7 @@ const SG_SATELLITE_H = 52;
 const SG_RULE_TILE_H = 52;
 const SG_RIGHT_PAD = 6;
 const SG_DATAFLOW_STROKE = "#228be6";
-/** CloudWatch alarm / log group tiles above a Lambda. */
+/** CloudWatch alarm / log group tiles above a resource. */
 const CLOUDWATCH_SATELLITE_W = 176;
 const CLOUDWATCH_SATELLITE_H = 52;
 const CLOUDWATCH_SATELLITE_GAP = 8;
@@ -539,7 +539,7 @@ function buildTopologySatelliteLineSkeletons(
   return out;
 }
 
-/** Primary grid + IAM (left) / SG (right) satellites and data-flow edges. */
+/** Primary grid + top CloudWatch, bottom IAM (left) / SG (right) satellites and data-flow edges. */
 function appendTopologyResourceRectangles(
   skeleton: ExcalidrawElementSkeleton[],
   addrs: readonly string[],
@@ -628,7 +628,7 @@ function appendTopologyResourceRectangles(
 
     const { cluster, edges } = buildLambdaIamCluster(nodes, addr, arnIndex);
     const sgBuild = buildLambdaSgCluster(nodes, addr, arnIndex, plan);
-    const cloudWatchBuild = buildLambdaCloudWatchCluster(nodes, addr);
+    const cloudWatchBuild = buildResourceCloudWatchCluster(nodes, addr);
     const { iamW, sgW } = satelliteColumnWidths(Boolean(cluster), Boolean(sgBuild.cluster));
     const { alarmW, logGroupW } = cloudWatchColumnWidths(
       Boolean(cloudWatchBuild.cluster?.alarms.length),
