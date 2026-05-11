@@ -229,7 +229,7 @@ export type TerraformDirectedLayoutEdge = {
  * De-duplicates `edges_new` and `edges_existing` into directed pairs with origin flags
  * (same semantics as `packages/backend/excalidraw-arrows.js` `collectDirectedEdges`).
  */
-function collectDirectedEdges(
+export function collectDirectedEdges(
   nodes: TerraformPlanNodesMap,
   vertexSet: Set<string>,
 ): TerraformDirectedLayoutEdge[] {
@@ -927,6 +927,84 @@ const fixedPointForLayoutPoint = (
   clamp((point.y - box.y) / (box.height || 1), 0, 1),
 ];
 
+/** Layout box keyed by Terraform resource address (same shape as ELK `LayoutBox`). */
+export type TerraformDependencyLayoutBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+/**
+ * Dependency `line` skeletons for Terraform graph edges (ELK and topology layout share this).
+ */
+export function buildTerraformDependencyLineSkeletons(
+  nodes: TerraformPlanNodesMap,
+  layoutBoxes: Record<string, TerraformDependencyLayoutBox>,
+  directedEdges: TerraformDirectedLayoutEdge[],
+): ExcalidrawElementSkeleton[] {
+  const edgeSkeletons: ExcalidrawElementSkeleton[] = [];
+  let edgeIndex = 0;
+  for (const { source, target, hasNew, hasExisting } of directedEdges) {
+    const sourceBox = layoutBoxes[source] as LayoutBox | undefined;
+    const targetBox = layoutBoxes[target] as LayoutBox | undefined;
+    if (!sourceBox || !targetBox) {
+      continue;
+    }
+    const { startPoint, endPoint } = getCenterClippedLine(sourceBox, targetBox);
+    const startX = startPoint.x;
+    const startY = startPoint.y;
+    const endX = endPoint.x;
+    const endY = endPoint.y;
+    const dependencyStrokeColor = strokeColorForTerraformDependencyEdge({
+      hasNew,
+      hasExisting,
+      sourceAction: getTerraformPlanNodeAction(nodes[source]),
+      targetAction: getTerraformPlanNodeAction(nodes[target]),
+    });
+    edgeSkeletons.push({
+      type: "line",
+      id: `tf-edge-${edgeIndex}`,
+      x: startX,
+      y: startY,
+      width: Math.abs(endX - startX),
+      height: Math.abs(endY - startY),
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(endX - startX, endY - startY),
+      ],
+      strokeWidth: 1.5,
+      strokeColor: dependencyStrokeColor,
+      startArrowhead: null,
+      endArrowhead: "arrow",
+      startBinding: {
+        elementId: source,
+        fixedPoint: fixedPointForLayoutPoint(sourceBox, startPoint),
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: target,
+        fixedPoint: fixedPointForLayoutPoint(targetBox, endPoint),
+        mode: "orbit",
+      },
+      customData: {
+        terraform: true,
+        terraformEdgeLayer: "dependency",
+        relationship: {
+          source,
+          target,
+          type: "dependency",
+          label: null,
+          origin: "terraform_local_parse",
+          detail: null,
+        },
+      },
+    });
+    edgeIndex += 1;
+  }
+  return edgeSkeletons;
+}
+
 /** Skeleton rectangles cannot set `isDeleted`; apply from `terraformInitiallyVisible` after convert. */
 export function applyTerraformResourceRectangleSoftDelete(
   elements: readonly ExcalidrawElement[],
@@ -1158,64 +1236,9 @@ export async function buildTerraformElkExcalidrawScene(
     });
   }
 
-  let edgeIndex = 0;
-  for (const { source, target, hasNew, hasExisting } of directedEdges) {
-    const sourceBox = layoutBoxes[source];
-    const targetBox = layoutBoxes[target];
-    if (!sourceBox || !targetBox) {
-      continue;
-    }
-    const { startPoint, endPoint } = getCenterClippedLine(sourceBox, targetBox);
-    const startX = startPoint.x;
-    const startY = startPoint.y;
-    const endX = endPoint.x;
-    const endY = endPoint.y;
-    const dependencyStrokeColor = strokeColorForTerraformDependencyEdge({
-      hasNew,
-      hasExisting,
-      sourceAction: getTerraformPlanNodeAction(nodes[source]),
-      targetAction: getTerraformPlanNodeAction(nodes[target]),
-    });
-    edgeSkeletons.push({
-      type: "line",
-      id: `tf-edge-${edgeIndex}`,
-      x: startX,
-      y: startY,
-      width: Math.abs(endX - startX),
-      height: Math.abs(endY - startY),
-      points: [
-        pointFrom<LocalPoint>(0, 0),
-        pointFrom<LocalPoint>(endX - startX, endY - startY),
-      ],
-      strokeWidth: 1.5,
-      strokeColor: dependencyStrokeColor,
-      startArrowhead: null,
-      endArrowhead: "arrow",
-      startBinding: {
-        elementId: source,
-        fixedPoint: fixedPointForLayoutPoint(sourceBox, startPoint),
-        mode: "orbit",
-      },
-      endBinding: {
-        elementId: target,
-        fixedPoint: fixedPointForLayoutPoint(targetBox, endPoint),
-        mode: "orbit",
-      },
-      customData: {
-        terraform: true,
-        terraformEdgeLayer: "dependency",
-        relationship: {
-          source,
-          target,
-          type: "dependency",
-          label: null,
-          origin: "terraform_local_parse",
-          detail: null,
-        },
-      },
-    });
-    edgeIndex += 1;
-  }
+  edgeSkeletons.push(
+    ...buildTerraformDependencyLineSkeletons(nodes, layoutBoxes, directedEdges),
+  );
 
   const frameSkeletons: ExcalidrawElementSkeleton[] = [];
   pushModuleFrameSkeletonsPostOrder(

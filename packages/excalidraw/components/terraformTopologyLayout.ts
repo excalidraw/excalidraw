@@ -13,12 +13,15 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import {
   applyTerraformResourceRectangleSoftDelete,
+  buildTerraformDependencyLineSkeletons,
   buildTerraformResourcePanelDetails,
+  collectDirectedEdges,
   getTerraformActionStyle,
   getTerraformPlanNodeAction,
   mirrorAndDetachTerraformResourceLabels,
   shortTerraformResourceLabel,
   TERRAFORM_RESOURCE_LABEL_STROKE,
+  type TerraformDependencyLayoutBox,
 } from "./terraformElkLayout";
 import {
   getTerraformResourceTypeFromNodePath,
@@ -56,6 +59,7 @@ import {
   TOPOLOGY_SG_BETWEEN_GROUPS_GAP_PX,
 } from "./terraformTopologySgLinks";
 import {
+  getTerraformEdgeLayer,
   reconcileTerraformVisibility,
   repairTerraformEdgeBindings,
 } from "./terraformVisibility";
@@ -70,6 +74,8 @@ export type TerraformTopologySceneMeta = {
   regionalPrimaryCount: number;
   vpcEndpointCount: number;
   routeTableCount: number;
+  /** Count of merged `edges_new` / `edges_existing` dependency lines placed between on-canvas resources. */
+  dependencyEdgeCount: number;
   skippedLayout?: boolean;
   skipReason?: string;
 };
@@ -1198,6 +1204,70 @@ function appendTopologyResourceRectangles(
   return rectIds;
 }
 
+/**
+ * Terraform topology rectangles use skeleton `id` = resource address. Used to scope dependency
+ * edges to resources that received a layout box (same filter idea as ELK `vertexSet`).
+ */
+function collectTopologyRectangleLayoutFromSkeleton(
+  skeleton: readonly ExcalidrawElementSkeleton[],
+): {
+  placedVertexSet: Set<string>;
+  layoutBoxes: Record<string, TerraformDependencyLayoutBox>;
+} {
+  const placedVertexSet = new Set<string>();
+  const layoutBoxes: Record<string, TerraformDependencyLayoutBox> = {};
+  for (const el of skeleton) {
+    if (el.type !== "rectangle" || typeof el.id !== "string") {
+      continue;
+    }
+    const id = el.id;
+    if (!id || id.startsWith("__")) {
+      continue;
+    }
+    placedVertexSet.add(id);
+    layoutBoxes[id] = {
+      x: typeof el.x === "number" ? el.x : 0,
+      y: typeof el.y === "number" ? el.y : 0,
+      width: typeof el.width === "number" ? el.width : 0,
+      height: typeof el.height === "number" ? el.height : 0,
+    };
+  }
+  return { placedVertexSet, layoutBoxes };
+}
+
+/**
+ * Excalidraw paints later elements on top. Put topology **frames** under graph **lines**,
+ * and lines under **resource** rectangles / labels so arrows sit on the frame chrome but
+ * stay behind cards (matches ELK scene: frames → edges → resources).
+ */
+function reorderTopologyElementsZStack(
+  elements: readonly ExcalidrawElement[],
+): ExcalidrawElement[] {
+  const isTopologyFrame = (el: ExcalidrawElement) =>
+    el.type === "frame" &&
+    Boolean(
+      (el.customData as { terraformTopologyRole?: string } | undefined)
+        ?.terraformTopologyRole,
+    );
+
+  const isTerraformTopologyLine = (el: ExcalidrawElement) => {
+    if (el.type !== "line") {
+      return false;
+    }
+    const layer = getTerraformEdgeLayer(el);
+    return layer === "dependency" || layer === "dataFlow";
+  };
+
+  const withIndex = elements.map((el, index) => ({ el, index }));
+  const frames = withIndex.filter(({ el }) => isTopologyFrame(el));
+  const lines = withIndex.filter(({ el }) => isTerraformTopologyLine(el));
+  const rest = withIndex.filter(
+    ({ el }) => !isTopologyFrame(el) && !isTerraformTopologyLine(el),
+  );
+
+  return [...frames, ...lines, ...rest].map(({ el }) => el);
+}
+
 function normalizeTopologyOrigin(elements: readonly ExcalidrawElement[]) {
   let minX = Infinity;
   let minY = Infinity;
@@ -1271,6 +1341,7 @@ export async function buildTerraformTopologyExcalidrawScene(
         regionalPrimaryCount: 0,
         vpcEndpointCount: 0,
         routeTableCount: 0,
+        dependencyEdgeCount: 0,
         skippedLayout: true,
         skipReason: "empty_topology",
       },
@@ -1847,6 +1918,17 @@ export async function buildTerraformTopologyExcalidrawScene(
 
   skeleton.unshift(...buildTopologySatelliteLineSkeletons(satelliteLineSpecs));
 
+  const { placedVertexSet, layoutBoxes: topologyLayoutBoxes } =
+    collectTopologyRectangleLayoutFromSkeleton(skeleton);
+  const topologyDirectedEdges = collectDirectedEdges(nodes, placedVertexSet);
+  skeleton.push(
+    ...buildTerraformDependencyLineSkeletons(
+      nodes,
+      topologyLayoutBoxes,
+      topologyDirectedEdges,
+    ),
+  );
+
   let elements = convertToExcalidrawElements(skeleton, {
     regenerateIds: true,
   }) as ExcalidrawElement[];
@@ -1854,6 +1936,7 @@ export async function buildTerraformTopologyExcalidrawScene(
   elements = applyTerraformResourceRectangleSoftDelete(elements);
   elements = mirrorAndDetachTerraformResourceLabels(elements);
   elements = repairTerraformEdgeBindings(reconcileTerraformVisibility(elements));
+  elements = reorderTopologyElementsZStack(elements);
 
   normalizeTopologyOrigin(elements);
 
@@ -1869,6 +1952,7 @@ export async function buildTerraformTopologyExcalidrawScene(
       regionalPrimaryCount,
       vpcEndpointCount,
       routeTableCount,
+      dependencyEdgeCount: topologyDirectedEdges.length,
     },
   };
 }
