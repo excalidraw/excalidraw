@@ -338,6 +338,51 @@ function resolveRoleReferenceOnPolicyNode(
  * Inline `aws_iam_role_policy` and managed `aws_iam_policy` (via `aws_iam_role_policy_attachment`)
  * attached to `rolePath`.
  */
+/** `data.aws_iam_policy_document` addresses referenced from merged IAM role policy blobs. */
+export function collectDataIamPolicyDocumentsForRole(
+  nodes: TerraformPlanNodesMap,
+  rolePath: string,
+): string[] {
+  const node = nodes[rolePath] as TerraformPlanGraphNode | undefined;
+  const primary = getPrimaryResource(node);
+  if (!primary || primary.type !== "aws_iam_role") {
+    return [];
+  }
+  const modPrefix = terraformModulePrefixForAddress(rolePath);
+  const v = mergeTerraformPlanResourceValues(primary);
+  const blobs: unknown[] = [
+    v.assume_role_policy,
+    v.inline_policy,
+    v.permissions_boundary,
+  ];
+  const strings: string[] = [];
+  for (const b of blobs) {
+    flattenStringish(b, strings);
+  }
+  const out = new Set<string>();
+  const graphNodes = nodes as Record<string, TerraformPlanGraphNode>;
+  for (const chunk of strings) {
+    const re =
+      /\b((?:module\.[a-zA-Z0-9_.-]+\.)*data\.aws_iam_policy_document\.[a-zA-Z0-9_.-]+(?:\[[^\]]+\])?)/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(chunk)) !== null) {
+      let raw = m[1]!;
+      const qualified = raw.startsWith("module.") || raw.startsWith("data.")
+        ? raw
+        : modPrefix
+          ? `${modPrefix}.${raw}`
+          : raw;
+      const key =
+        resolveTerraformPlanNodeKey(graphNodes, qualified) ||
+        resolveTerraformPlanNodeKey(graphNodes, stripIndexes(qualified));
+      if (key && getResourceTypeFromPath(key, nodes[key]) === "aws_iam_policy_document") {
+        out.add(key);
+      }
+    }
+  }
+  return [...out].sort();
+}
+
 export function collectPoliciesForIamRole(
   nodes: TerraformPlanNodesMap,
   rolePath: string,
@@ -419,7 +464,8 @@ export function buildLambdaIamCluster(
   }
 
   const policies = collectPoliciesForIamRole(nodes, rolePath, arnIndex);
-  const stack = [rolePath, ...policies];
+  const policyDocs = collectDataIamPolicyDocumentsForRole(nodes, rolePath);
+  const stack = [rolePath, ...policies, ...policyDocs];
   const edges: TopologyIamEdge[] = [
     {
       source: lambdaAddress,
@@ -434,6 +480,14 @@ export function buildLambdaIamCluster(
       target: p,
       type: "iam_policy",
       label: "policy",
+    });
+  }
+  for (const d of policyDocs) {
+    edges.push({
+      source: rolePath,
+      target: d,
+      type: "iam_policy_document",
+      label: "policy document",
     });
   }
 
