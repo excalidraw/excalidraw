@@ -464,4 +464,143 @@ describe("terraformTopologySgLinks", () => {
     expect(cluster?.groups).toHaveLength(1);
     expect(cluster?.groups[0]?.sgPath).toBe(sgAddr);
   });
+
+  it("links SG rules on create when security_group_id is known-after-apply (sole SG in same module)", () => {
+    const sgPath = "module.stack.aws_security_group.this[0]";
+    const rulePath = "module.stack.aws_security_group_rule.egress[0]";
+    const nodes: TerraformPlanNodesMap = {
+      [sgPath]: {
+        resources: {
+          [sgPath]: {
+            address: sgPath,
+            mode: "managed",
+            type: "aws_security_group",
+            change: {
+              actions: ["create"],
+              before: null,
+              after: { description: "Lambda SG" },
+            },
+          },
+        },
+      },
+      [rulePath]: {
+        resources: {
+          [rulePath]: {
+            address: rulePath,
+            mode: "managed",
+            type: "aws_security_group_rule",
+            change: {
+              actions: ["create"],
+              before: null,
+              after: {
+                cidr_blocks: ["0.0.0.0/0"],
+                type: "egress",
+                from_port: 443,
+                to_port: 443,
+                protocol: "tcp",
+              },
+              after_unknown: { security_group_id: true },
+            },
+          },
+        },
+      },
+    };
+    const arnIndex = buildArnIndexForTopology(nodes);
+    const idIndex = buildSecurityGroupIdToPathIndex(nodes);
+    expect(collectSecurityGroupRulesForSg(nodes, sgPath, arnIndex, idIndex, undefined)).toEqual([
+      rulePath,
+    ]);
+  });
+
+  it("resolves rule security_group_id with .id suffix to the SG resource path", () => {
+    const sgPath = "module.app.aws_security_group.main[0]";
+    const rulePath = "module.app.aws_vpc_security_group_egress_rule.out[0]";
+    const nodes: TerraformPlanNodesMap = {
+      [sgPath]: {
+        resources: {
+          [sgPath]: {
+            address: sgPath,
+            mode: "managed",
+            type: "aws_security_group",
+            change: { after: { id: "sg-resolvedsuffix" } },
+          },
+        },
+      },
+      [rulePath]: {
+        resources: {
+          [rulePath]: {
+            address: rulePath,
+            mode: "managed",
+            type: "aws_vpc_security_group_egress_rule",
+            change: {
+              after: { security_group_id: "aws_security_group.main[0].id" },
+            },
+          },
+        },
+      },
+    };
+    const arnIndex = buildArnIndexForTopology(nodes);
+    const idIndex = buildSecurityGroupIdToPathIndex(nodes);
+    expect(collectSecurityGroupRulesForSg(nodes, sgPath, arnIndex, idIndex)).toEqual([rulePath]);
+  });
+
+  it("links rules via plan configuration security_group_id.references when change omits id", () => {
+    const sgPath = "module.m.aws_security_group.this[0]";
+    const rulePath = "module.m.aws_security_group_rule.egress[0]";
+    const nodes: TerraformPlanNodesMap = {
+      [sgPath]: {
+        resources: {
+          [sgPath]: {
+            address: sgPath,
+            mode: "managed",
+            type: "aws_security_group",
+            change: { actions: ["create"], after: {} },
+          },
+        },
+      },
+      [rulePath]: {
+        resources: {
+          [rulePath]: {
+            address: rulePath,
+            mode: "managed",
+            type: "aws_security_group_rule",
+            change: {
+              actions: ["create"],
+              after: { type: "egress", protocol: "tcp", from_port: 443, to_port: 443 },
+              after_unknown: { security_group_id: true },
+            },
+          },
+        },
+      },
+    };
+    const plan = {
+      configuration: {
+        root_module: {
+          module_calls: {
+            m: {
+              module: {
+                resources: [
+                  {
+                    address: "aws_security_group_rule.egress[0]",
+                    mode: "managed",
+                    type: "aws_security_group_rule",
+                    name: "egress",
+                    expressions: {
+                      security_group_id: {
+                        references: ["aws_security_group.this[0].id", "aws_security_group.this[0]"],
+                      },
+                    },
+                    schema_version: 2,
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    };
+    const arnIndex = buildArnIndexForTopology(nodes);
+    const idIndex = buildSecurityGroupIdToPathIndex(nodes);
+    expect(collectSecurityGroupRulesForSg(nodes, sgPath, arnIndex, idIndex, plan)).toEqual([rulePath]);
+  });
 });

@@ -108,7 +108,7 @@ function stripTrailingPlanRefSuffix(addr: string): string {
 }
 
 /** Prefix `caller` (`module.stack`) + relative ref (`module.sg[0].x`). */
-function qualifyConfigurationReference(callerPrefix: string, ref: string): string {
+export function qualifyConfigurationReference(callerPrefix: string, ref: string): string {
   const r = ref.trim();
   if (!r) {
     return r;
@@ -122,7 +122,7 @@ function qualifyConfigurationReference(callerPrefix: string, ref: string): strin
   return r;
 }
 
-function shouldUsePlanReference(ref: string): boolean {
+export function shouldUsePlanReference(ref: string): boolean {
   if (!ref || ref.startsWith("var.") || ref.startsWith("local.") || ref.startsWith("each.")) {
     return false;
   }
