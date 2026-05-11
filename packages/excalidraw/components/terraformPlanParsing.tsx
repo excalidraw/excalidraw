@@ -91,6 +91,30 @@ export type TerraformPlanParsingOptions = {
   semanticLayout?: boolean;
 };
 
+/**
+ * Builds the same `nodes` map as local import (`loadPlan` → edges → `attachModuleTree`), for
+ * tooling/tests that need vertex keys without rendering a scene.
+ */
+export function buildTerraformLocalImportNodesMap(
+  plan: unknown,
+  graph: Graph,
+): TerraformPlanNodesMap {
+  const adjacency = getAdjacencyListFromDot(graph);
+  const planTyped = plan as {
+    resource_changes: { address: string }[];
+    prior_state?: { values: { root_module: unknown } };
+  };
+  const nodes = loadPlan(planTyped);
+  const nodes2 = sanitizeTerraformPlanNodes(ensureEdgeLists(nodes));
+  const nodes3 = buildNewEdges(nodes2, adjacency);
+  const nodes4 = buildExistingEdges(
+    nodes3,
+    planTyped as { prior_state: { values: { root_module: unknown } } },
+  );
+  const sanitizedNodes = sanitizeTerraformPlanNodes(nodes4);
+  return attachModuleTree(sanitizedNodes);
+}
+
 /** Local import path: main menu → “Import Terraform” → uncheck “use backend” → Import & Open. */
 export const terraformPlanParsing = async (
   planFile: File,
@@ -121,39 +145,10 @@ export const terraformPlanParsing = async (
     adjacency
   });
 
-  const nodes = loadPlan(plan);
+  const nodes5 = buildTerraformLocalImportNodesMap(plan, graph);
   emitLocalParseDebug({
-    phase: "planParsed",
-    nodes
-  });
-
-  const nodes2 = sanitizeTerraformPlanNodes(ensureEdgeLists(nodes));
-  emitLocalParseDebug({
-    phase: "sanitizeInitialNodes",
-    nodes2
-  });
-
-  const nodes3 = buildNewEdges(nodes2, adjacency);
-  emitLocalParseDebug({
-    phase: "buildNewEdges",
-    nodes3
-  });
-
-  const nodes4 = buildExistingEdges(nodes3, plan);
-  emitLocalParseDebug({
-    phase: "buildExistingEdges",
-    nodes4
-  });
-
-  const sanitizedNodes = sanitizeTerraformPlanNodes(nodes4);
-  emitLocalParseDebug({
-    phase: "sanitizePriorStateNodes",
-    sanitizedNodes
-  });
-
-  const nodes5 = attachModuleTree(sanitizedNodes);
-  emitLocalParseDebug({
-    phase: "moduleTree",
+    phase: "planParsed_through_moduleTree",
+    nodes: nodes5,
     moduleTree: nodes5[TERRAFORM_MODULE_TREE_KEY],
   });
 
