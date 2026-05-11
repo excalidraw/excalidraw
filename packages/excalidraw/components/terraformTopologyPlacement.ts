@@ -9,7 +9,9 @@ import {
   isAwsTerraformResourceChange,
   mergeTerraformTopologyAccountRegionFromSameRegionSubnets,
   mergeTerraformTopologyAccountRegionFromSubnets,
+  mergeWithDefaultAwsProviderAccountRegion,
   pickResourceValuesForTopologyPlacement,
+  type TerraformPlanProviderContext,
   resolveTerraformTopologyAccountRegion,
   shouldEmitTopologyPlacement,
 } from "./terraformTopologyExtract";
@@ -90,9 +92,11 @@ function zoneMapKey(
  * One zone per distinct `(vpc, subnet multiset)` for primary resource types.
  * Resources without a resolvable VPC are omitted (regional-only layout is non-goal v1).
  */
-export function extractPrimaryTopologyZones(plan: {
-  resource_changes?: ResourceChange[];
-}): TopologyPlacementZone[] {
+export function extractPrimaryTopologyZones(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): TopologyPlacementZone[] {
   const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
   const subnetToVpc = buildSubnetToVpcMapFromPlan(plan);
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
@@ -128,13 +132,16 @@ export function extractPrimaryTopologyZones(plan: {
     }
 
     const subnetIds = collectPlacementSubnetIds(values);
-    const merged = mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
-      mergeTerraformTopologyAccountRegionFromSubnets(
-        resolveTerraformTopologyAccountRegion(values),
-        subnetIds,
+    const merged = mergeWithDefaultAwsProviderAccountRegion(
+      plan,
+      mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
+        mergeTerraformTopologyAccountRegionFromSubnets(
+          resolveTerraformTopologyAccountRegion(values),
+          subnetIds,
+          subnetOwners,
+        ),
         subnetOwners,
       ),
-      subnetOwners,
     );
     const { account: accountId, region } = merged;
     if (!shouldEmitTopologyPlacement(accountId, region)) {
@@ -198,9 +205,11 @@ function bucketMapKey(accountId: string, region: string): string {
 /**
  * Primaries that belong in account/region but not inside a VPC frame (no `vpc_id`/subnet map).
  */
-export function extractRegionalTopologyPrimaries(plan: {
-  resource_changes?: ResourceChange[];
-}): TopologyRegionalPrimaryBucket[] {
+export function extractRegionalTopologyPrimaries(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): TopologyRegionalPrimaryBucket[] {
   const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
   const subnetToVpc = buildSubnetToVpcMapFromPlan(plan);
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
@@ -229,13 +238,16 @@ export function extractRegionalTopologyPrimaries(plan: {
     }
 
     const subnetIds = collectPlacementSubnetIds(values);
-    const merged = mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
-      mergeTerraformTopologyAccountRegionFromSubnets(
-        resolveTerraformTopologyAccountRegion(values),
-        subnetIds,
+    const merged = mergeWithDefaultAwsProviderAccountRegion(
+      plan,
+      mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
+        mergeTerraformTopologyAccountRegionFromSubnets(
+          resolveTerraformTopologyAccountRegion(values),
+          subnetIds,
+          subnetOwners,
+        ),
         subnetOwners,
       ),
-      subnetOwners,
     );
     const { account: accountId, region } = merged;
     if (!shouldEmitTopologyPlacement(accountId, region)) {

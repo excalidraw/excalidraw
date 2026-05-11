@@ -244,4 +244,51 @@ describe("extractRegionalTopologyPrimaries", () => {
       ["aws_s3_bucket.logs", "aws_sqs_queue.jobs"].sort(),
     );
   });
+
+  it("fills account and region from default aws provider when SQS create has no subnet hints", () => {
+    const plan = {
+      configuration: {
+        provider_config: {
+          aws: {
+            name: "aws",
+            expressions: {
+              region: { references: ["var.aws_region"] },
+              assume_role: [
+                {
+                  role_arn: { references: ["local.terraform_deploy_role_arn"] },
+                  session_name: { constant_value: "terraform-excalidraw-tf" },
+                },
+              ],
+            },
+          },
+        },
+      },
+      variables: {
+        aws_region: { value: "us-west-2" },
+        aws_account_id: { value: "888888888888" },
+        terraform_deploy_role_arn: { value: "" },
+        terraform_deploy_role_name: { value: "TerraformDeploy" },
+      },
+      resource_changes: [
+        {
+          address: "module.queue.aws_sqs_queue.this[0]",
+          type: "aws_sqs_queue",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            before: null,
+            after: {
+              name: "jobs",
+            },
+          },
+        },
+      ],
+    };
+
+    const buckets = extractRegionalTopologyPrimaries(plan);
+    expect(buckets).toHaveLength(1);
+    expect(buckets[0]!.accountId).toBe("888888888888");
+    expect(buckets[0]!.region).toBe("us-west-2");
+    expect(buckets[0]!.addresses).toEqual(["module.queue.aws_sqs_queue.this[0]"]);
+  });
 });
