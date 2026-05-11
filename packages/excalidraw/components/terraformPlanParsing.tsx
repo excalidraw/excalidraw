@@ -165,6 +165,7 @@ export const terraformPlanParsing = async (
       zones,
       regionalBuckets,
       nodes5,
+      plan,
     );
     emitLocalParseDebug({
       phase: "topologyLayout",

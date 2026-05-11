@@ -184,8 +184,7 @@ body,
 }
 
 .tf-node--selected {
-  box-shadow:
-    0 0 0 2px rgba(59, 130, 246, 0.5),
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5),
     0 1px 3px rgba(15, 23, 42, 0.18);
 }
 
