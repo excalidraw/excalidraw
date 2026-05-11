@@ -39,11 +39,18 @@ const OverwriteConfirmDialog = Object.assign(
         setState((state) => ({ ...state, active: false }));
       };
 
+      const handleViewOnly = () => {
+        overwriteConfirmState.onViewOnly?.();
+        setState((state) => ({ ...state, active: false }));
+      };
+
+      const dialogTitle = (overwriteConfirmState as any).title;
+
       return (
         <OverwriteConfirmDialogTunnel.In>
           <Dialog onCloseRequest={handleClose} title={false} size={916}>
             <div className="OverwriteConfirm">
-              <h3>{overwriteConfirmState.title}</h3>
+              <h3>{dialogTitle}</h3>
               <div
                 className={`OverwriteConfirm__Description OverwriteConfirm__Description--color-${overwriteConfirmState.color}`}
               >
@@ -52,12 +59,24 @@ const OverwriteConfirmDialog = Object.assign(
                 </div>
                 <div>{overwriteConfirmState.description}</div>
                 <div className="OverwriteConfirm__Description__spacer"></div>
-                <FilledButton
-                  color={overwriteConfirmState.color}
-                  size="large"
-                  label={overwriteConfirmState.actionLabel}
-                  onClick={handleConfirm}
-                />
+                <div className="OverwriteConfirm__Description__buttons">
+                  {overwriteConfirmState.viewOnlyLabel &&
+                    overwriteConfirmState.onViewOnly && (
+                      <FilledButton
+                        variant="outlined"
+                        color="muted"
+                        size="large"
+                        label={overwriteConfirmState.viewOnlyLabel}
+                        onClick={handleViewOnly}
+                      />
+                    )}
+                  <FilledButton
+                    color={overwriteConfirmState.color}
+                    size="large"
+                    label={overwriteConfirmState.actionLabel}
+                    onClick={handleConfirm}
+                  />
+                </div>
               </div>
               <Actions>{children}</Actions>
             </div>

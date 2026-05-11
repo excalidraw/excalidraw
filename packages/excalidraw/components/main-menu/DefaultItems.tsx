@@ -86,7 +86,7 @@ export const LoadScene = () => {
             br={() => <br />}
           />
         ),
-      }))
+      })) === "confirm"
     ) {
       actionManager.executeAction(actionLoadScene);
     }

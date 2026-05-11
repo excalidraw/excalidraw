@@ -77,6 +77,16 @@
       background-color: var(--color-danger-dark);
       color: var(--color-danger-text);
     }
+
+    &.view-only-banner {
+      pointer-events: auto;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+
+      &:hover {
+        opacity: 0.85;
+      }
+    }
   }
 }
 

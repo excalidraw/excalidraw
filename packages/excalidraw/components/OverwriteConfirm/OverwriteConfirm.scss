@@ -50,6 +50,16 @@
         flex-grow: 1;
       }
 
+      &__buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        flex-shrink: 0;
+        border: 1px solid #cccccc;
+        padding: 4px;
+        border-radius: 4px;
+      }
+
       &__icon {
         box-sizing: border-box;
         display: flex;

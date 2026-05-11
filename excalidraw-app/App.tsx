@@ -34,7 +34,7 @@ import {
   isDevEnv,
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { t } from "@excalidraw/excalidraw/i18n";
 
@@ -211,13 +211,14 @@ const shareableLinkConfirmDialog = {
   ),
   actionLabel: t("overwriteConfirm.modal.shareableLink.button"),
   color: "danger",
+  viewOnlyLabel: t("overwriteConfirm.modal.shareableLink.viewOnly"),
 } as const;
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;
   excalidrawAPI: ExcalidrawImperativeAPI;
 }): Promise<
-  { scene: ExcalidrawInitialDataState | null } & (
+  { scene: ExcalidrawInitialDataState | null; viewOnly?: boolean } & (
     | { isExternalScene: true; id: string; key: string }
     | { isExternalScene: false; id?: null; key?: null }
   )
@@ -248,15 +249,23 @@ const initializeScene = async (opts: {
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
   const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
+  let viewOnly = false;
   if (isExternalScene) {
+    // Determine whether to load, view-only, or cancel
+    let action: "confirm" | "viewOnly" | "cancel" = "confirm";
     if (
       // don't prompt if scene is empty
       !scene.elements.length ||
       // don't prompt for collab scenes because we don't override local storage
-      roomLinkData ||
-      // otherwise, prompt whether user wants to override current scene
-      (await openConfirmModal(shareableLinkConfirmDialog))
+      roomLinkData
     ) {
+      action = "confirm";
+    } else {
+      // prompt whether user wants to override current scene or view only
+      action = await openConfirmModal(shareableLinkConfirmDialog);
+    }
+
+    if (action === "confirm" || action === "viewOnly") {
       if (jsonBackendMatch) {
         const imported = await importFromBackend(
           jsonBackendMatch[1],
@@ -280,6 +289,7 @@ const initializeScene = async (opts: {
         };
       }
       scene.scrollToContent = true;
+      viewOnly = action === "viewOnly";
       if (!roomLinkData) {
         window.history.replaceState({}, APP_NAME, window.location.origin);
       }
@@ -307,11 +317,28 @@ const initializeScene = async (opts: {
     try {
       const request = await fetch(window.decodeURIComponent(url));
       const data = await loadFromBlob(await request.blob(), null, null);
-      if (
-        !scene.elements.length ||
-        (await openConfirmModal(shareableLinkConfirmDialog))
-      ) {
-        return { scene: data, isExternalScene };
+      let extAction: "confirm" | "viewOnly" | "cancel" = "confirm";
+      if (scene.elements.length) {
+        extAction = await openConfirmModal({
+          title: t("overwriteConfirm.modal.shareableLink.title"),
+          description: (
+            <Trans
+              i18nKey="overwriteConfirm.modal.shareableLink.description"
+              bold={(text) => <strong>{text}</strong>}
+              br={() => <br />}
+            />
+          ),
+          actionLabel: t("overwriteConfirm.modal.shareableLink.button"),
+          color: "danger" as const,
+          viewOnlyLabel: t("overwriteConfirm.modal.shareableLink.viewOnly"),
+        });
+      }
+      if (extAction === "confirm" || extAction === "viewOnly") {
+        return {
+          scene: data,
+          isExternalScene,
+          viewOnly: extAction === "viewOnly",
+        };
       }
     } catch (error: any) {
       return {
@@ -365,8 +392,9 @@ const initializeScene = async (opts: {
           isExternalScene,
           id: jsonBackendMatch[1],
           key: jsonBackendMatch[2],
+          viewOnly,
         }
-      : { scene, isExternalScene: false };
+      : { scene, isExternalScene: false, viewOnly };
   }
   return { scene: null, isExternalScene: false };
 };
@@ -419,6 +447,10 @@ const ExcalidrawWrapper = () => {
   });
 
   const [, forceRefresh] = useState(false);
+  const [isViewOnlyMode, setIsViewOnlyMode] = useState(false);
+
+  // Pre-load local state so it's ready for view-only exit
+  const localDataForRestore = importFromLocalStorage();
 
   useEffect(() => {
     if (isDevEnv()) {
@@ -527,6 +559,20 @@ const ExcalidrawWrapper = () => {
 
     initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
+
+      if (data.viewOnly && data.scene) {
+        // Enter view-only mode: pause saving and enable viewMode
+        LocalData.pauseSave("viewOnly");
+        setIsViewOnlyMode(true);
+        data.scene = {
+          ...data.scene,
+          appState: {
+            ...data.scene.appState,
+            viewModeEnabled: true,
+          },
+        };
+      }
+
       initialStatePromiseRef.current.promise.resolve(data.scene);
     });
 
@@ -545,11 +591,18 @@ const ExcalidrawWrapper = () => {
         initializeScene({ collabAPI, excalidrawAPI }).then((data) => {
           loadImages(data);
           if (data.scene) {
+            if (data.viewOnly) {
+              LocalData.pauseSave("viewOnly");
+              setIsViewOnlyMode(true);
+            }
             excalidrawAPI.updateScene({
               elements: restoreElements(data.scene.elements, null, {
                 repairBindings: true,
               }),
-              appState: restoreAppState(data.scene.appState, null),
+              appState: {
+                ...restoreAppState(data.scene.appState, null),
+                ...(data.viewOnly ? { viewModeEnabled: true } : {}),
+              },
               captureUpdate: CaptureUpdateAction.IMMEDIATELY,
             });
           }
@@ -843,6 +896,29 @@ const ExcalidrawWrapper = () => {
   //   // console.log("onExport");
   // };
 
+  // ---------------------------------------------------------------------------
+  // View-only mode: exit and restore local drawing
+  // ---------------------------------------------------------------------------
+  const exitViewOnlyMode = useCallback(() => {
+    if (!excalidrawAPI) {
+      return;
+    }
+    // Resume saving and restore the local scene
+    LocalData.resumeSave("viewOnly");
+    setIsViewOnlyMode(false);
+
+    const raw = localStorage.getItem("excalidraw");
+    const localDataState = raw ? JSON.parse(raw) : {} as any;
+    excalidrawAPI.updateScene({
+      elements: localDataState?.elements || [],
+      appState: {
+        ...localDataState?.appState,
+        viewModeEnabled: false,
+      },
+      captureUpdate: CaptureUpdateAction.NEVER,
+    });
+  }, [excalidrawAPI]);
+
   // browsers generally prevent infinite self-embedding, there are
   // cases where it still happens, and while we disallow self-embedding
   // by not whitelisting our own origin, this serves as an additional guard
@@ -1028,6 +1104,27 @@ const ExcalidrawWrapper = () => {
           <div className="alert alert--danger">
             {t("alerts.localStorageQuotaExceeded")}
           </div>
+        )}
+        {isViewOnlyMode && (
+          <div
+            className="view-only-banner"
+            onClick={exitViewOnlyMode}
+            style={{
+              cursor: "pointer",
+              position: "absolute",
+              top: "104px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              padding: "8px 16px",
+              backgroundColor: "#e08a09",
+              color: "#000000",
+              borderRadius: "4px",
+              fontSize: "14px",
+              zIndex: 9999,
+              textAlign: "center",
+            }}
+            dangerouslySetInnerHTML={{ __html: t("alerts.viewOnlyBanner") }}
+          />
         )}
         {latestShareableLink && (
           <ShareableLinkDialog
