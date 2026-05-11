@@ -44,6 +44,51 @@ export type TopologyVpcEndpointBucket = {
   addresses: string[];
 };
 
+/** Managed `aws_route_table` addresses grouped by VPC (`vpc_id` on the table). */
+export type TopologyRouteTableBucket = {
+  accountId: string;
+  region: string;
+  vpcId: string;
+  addresses: string[];
+};
+
+/** Route tables drawn straddling the bottom edge of a subnet zone frame (association subnets ⊆ zone). */
+export type RouteTableBottomZonePlacement = {
+  accountId: string;
+  region: string;
+  vpcId: string;
+  subnetSignature: string;
+  addresses: string[];
+};
+
+/** Route tables drawn straddling the VPC bottom (no subnet-only association, or subnets span multiple zones). */
+export type RouteTableBottomVpcPlacement = {
+  accountId: string;
+  region: string;
+  vpcId: string;
+  addresses: string[];
+};
+
+/** Semantic bottom-edge route table layout (subnet zone vs VPC). */
+export type TopologyRouteTableBottomPlacements = {
+  zoneBottom: RouteTableBottomZonePlacement[];
+  vpcBottom: RouteTableBottomVpcPlacement[];
+};
+
+const ROUTE_TABLE_SEMANTIC_TILE_W = 160;
+const ROUTE_TABLE_SEMANTIC_GAP = 10;
+
+/** Minimum inner width for one horizontal row of route table tiles (matches layout constants). */
+export function routeTableBottomRowMinInnerWidth(addrCount: number): number {
+  if (addrCount <= 0) {
+    return 0;
+  }
+  return (
+    addrCount * ROUTE_TABLE_SEMANTIC_TILE_W +
+    (addrCount - 1) * ROUTE_TABLE_SEMANTIC_GAP
+  );
+}
+
 type ResourceChange = {
   address?: string;
   mode?: string;
@@ -311,6 +356,352 @@ export function extractVpcEndpointsByVpc(
   });
 
   return out;
+}
+
+function routeTableSortLabel(values: Record<string, unknown>): string {
+  const tags = values.tags;
+  if (tags && typeof tags === "object" && !Array.isArray(tags)) {
+    const name = (tags as Record<string, unknown>).Name;
+    if (typeof name === "string" && name.length > 0) {
+      return name;
+    }
+  }
+  return stringField(values.id) ?? "";
+}
+
+/**
+ * Managed `aws_route_table` resources keyed by (account, region, vpc_id).
+ * Subnets use route tables via associations; tables themselves are VPC-scoped.
+ */
+export function extractRouteTablesByVpc(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): TopologyRouteTableBucket[] {
+  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
+
+  const accum = new Map<
+    string,
+    {
+      accountId: string;
+      region: string;
+      vpcId: string;
+      rows: { address: string; sortLabel: string }[];
+    }
+  >();
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_route_table") {
+      continue;
+    }
+    const address = rc.address;
+    if (!address || typeof address !== "string") {
+      continue;
+    }
+
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+
+    const vpcIdRaw = stringField(values.vpc_id);
+    if (!vpcIdRaw) {
+      continue;
+    }
+
+    const subnetIds = collectPlacementSubnetIds(values);
+    const merged = mergeWithDefaultAwsProviderAccountRegion(
+      plan,
+      mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
+        mergeTerraformTopologyAccountRegionFromSubnets(
+          resolveTerraformTopologyAccountRegion(values),
+          subnetIds,
+          subnetOwners,
+        ),
+        subnetOwners,
+      ),
+    );
+    const { account: accountId, region } = merged;
+    if (!shouldEmitTopologyPlacement(accountId, region)) {
+      continue;
+    }
+
+    const sortLabel = routeTableSortLabel(values);
+    const key = vpcEndpointBucketKey(accountId, region, vpcIdRaw);
+    let row = accum.get(key);
+    if (!row) {
+      row = { accountId, region, vpcId: vpcIdRaw, rows: [] };
+      accum.set(key, row);
+    }
+    if (!row.rows.some((x) => x.address === address)) {
+      row.rows.push({ address, sortLabel });
+    }
+  }
+
+  const out: TopologyRouteTableBucket[] = [...accum.values()].map((row) => ({
+    accountId: row.accountId,
+    region: row.region,
+    vpcId: row.vpcId,
+    addresses: [...row.rows]
+      .sort((a, b) => {
+        const c = a.sortLabel.localeCompare(b.sortLabel);
+        return c !== 0 ? c : a.address.localeCompare(b.address);
+      })
+      .map((x) => x.address),
+  }));
+
+  out.sort((a, b) => {
+    if (a.accountId !== b.accountId) {
+      return a.accountId.localeCompare(b.accountId);
+    }
+    if (a.region !== b.region) {
+      return a.region.localeCompare(b.region);
+    }
+    return a.vpcId.localeCompare(b.vpcId);
+  });
+
+  return out;
+}
+
+type RouteTableAddressMeta = {
+  rtbId: string;
+  accountId: string;
+  region: string;
+  vpcId: string;
+};
+
+function buildRouteTableIdToSubnetIdsFromPlan(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): Map<string, Set<string>> {
+  const out = new Map<string, Set<string>>();
+  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_route_table_association") {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    const rtid = stringField(values.route_table_id);
+    const sid = stringField(values.subnet_id);
+    if (!rtid || !sid || !rtid.startsWith("rtb-")) {
+      continue;
+    }
+    if (!out.has(rtid)) {
+      out.set(rtid, new Set());
+    }
+    out.get(rtid)!.add(sid);
+  }
+  return out;
+}
+
+function buildRouteTableAddressToMeta(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): Map<string, RouteTableAddressMeta> {
+  const out = new Map<string, RouteTableAddressMeta>();
+  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_route_table") {
+      continue;
+    }
+    const address = rc.address;
+    if (!address || typeof address !== "string") {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    const vpcIdRaw = stringField(values.vpc_id);
+    const rtbId = stringField(values.id);
+    if (!vpcIdRaw || !rtbId || !rtbId.startsWith("rtb-")) {
+      continue;
+    }
+    const subnetIds = collectPlacementSubnetIds(values);
+    const merged = mergeWithDefaultAwsProviderAccountRegion(
+      plan,
+      mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
+        mergeTerraformTopologyAccountRegionFromSubnets(
+          resolveTerraformTopologyAccountRegion(values),
+          subnetIds,
+          subnetOwners,
+        ),
+        subnetOwners,
+      ),
+    );
+    const { account: accountId, region } = merged;
+    if (!shouldEmitTopologyPlacement(accountId, region)) {
+      continue;
+    }
+    out.set(address, {
+      rtbId,
+      accountId,
+      region,
+      vpcId: vpcIdRaw,
+    });
+  }
+  return out;
+}
+
+function pickNarrowestZoneContainingSubnets(
+  zones: readonly TopologyPlacementZone[],
+  accountId: string,
+  region: string,
+  vpcId: string,
+  subnetIds: readonly string[],
+): TopologyPlacementZone | null {
+  if (subnetIds.length === 0) {
+    return null;
+  }
+  const candidates = zones.filter(
+    (z) =>
+      z.accountId === accountId &&
+      z.region === region &&
+      z.vpcId === vpcId &&
+      subnetIds.every((sid) => z.subnetIds.includes(sid)),
+  );
+  if (candidates.length === 0) {
+    return null;
+  }
+  candidates.sort((a, b) => a.subnetIds.length - b.subnetIds.length);
+  return candidates[0] ?? null;
+}
+
+function routeTableVpcAccumKey(accountId: string, region: string, vpcId: string): string {
+  return `${accountId}\0${region}\0${vpcId}`;
+}
+
+/**
+ * Split route tables between **subnet zone bottom** (when association subnets fit a single
+ * placement zone — narrowest match) vs **VPC bottom** (no associations, unknown subnets, or
+ * subnets spanning multiple zones).
+ */
+export function computeRouteTableBottomEdgePlacements(
+  zones: readonly TopologyPlacementZone[],
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): TopologyRouteTableBottomPlacements {
+  const buckets = extractRouteTablesByVpc(plan);
+  const rtidToSubnets = buildRouteTableIdToSubnetIdsFromPlan(plan);
+  const addrToMeta = buildRouteTableAddressToMeta(plan);
+
+  const zoneAccum = new Map<string, string[]>();
+  const vpcAccum = new Map<string, string[]>();
+
+  for (const bucket of buckets) {
+    for (const addr of bucket.addresses) {
+      const meta = addrToMeta.get(addr);
+      if (!meta) {
+        const vk = routeTableVpcAccumKey(
+          bucket.accountId,
+          bucket.region,
+          bucket.vpcId,
+        );
+        if (!vpcAccum.has(vk)) {
+          vpcAccum.set(vk, []);
+        }
+        vpcAccum.get(vk)!.push(addr);
+        continue;
+      }
+      const subnetSet = rtidToSubnets.get(meta.rtbId);
+      const subnetList = subnetSet ? [...subnetSet] : [];
+
+      let zonePick: TopologyPlacementZone | null = null;
+      if (subnetList.length > 0) {
+        zonePick = pickNarrowestZoneContainingSubnets(
+          zones,
+          meta.accountId,
+          meta.region,
+          meta.vpcId,
+          subnetList,
+        );
+      }
+
+      if (zonePick) {
+        const zk = `${meta.accountId}\0${meta.region}\0${meta.vpcId}\0${zonePick.subnetSignature}`;
+        if (!zoneAccum.has(zk)) {
+          zoneAccum.set(zk, []);
+        }
+        zoneAccum.get(zk)!.push(addr);
+      } else {
+        const vk = routeTableVpcAccumKey(meta.accountId, meta.region, meta.vpcId);
+        if (!vpcAccum.has(vk)) {
+          vpcAccum.set(vk, []);
+        }
+        vpcAccum.get(vk)!.push(addr);
+      }
+    }
+  }
+
+  const zoneBottom: RouteTableBottomZonePlacement[] = [];
+  for (const [key, addresses] of zoneAccum.entries()) {
+    const [accountId, region, vpcId, subnetSignature] = key.split("\0");
+    if (!accountId || !region || !vpcId) {
+      continue;
+    }
+    zoneBottom.push({
+      accountId,
+      region,
+      vpcId,
+      subnetSignature,
+      addresses: [...addresses].sort(),
+    });
+  }
+  zoneBottom.sort((a, b) => {
+    if (a.accountId !== b.accountId) {
+      return a.accountId.localeCompare(b.accountId);
+    }
+    if (a.region !== b.region) {
+      return a.region.localeCompare(b.region);
+    }
+    if (a.vpcId !== b.vpcId) {
+      return a.vpcId.localeCompare(b.vpcId);
+    }
+    return a.subnetSignature.localeCompare(b.subnetSignature);
+  });
+
+  const vpcBottom: RouteTableBottomVpcPlacement[] = [];
+  for (const [key, addresses] of vpcAccum.entries()) {
+    const [accountId, region, vpcId] = key.split("\0");
+    if (!accountId || !region || !vpcId) {
+      continue;
+    }
+    vpcBottom.push({
+      accountId,
+      region,
+      vpcId,
+      addresses: [...addresses].sort(),
+    });
+  }
+  vpcBottom.sort((a, b) => {
+    if (a.accountId !== b.accountId) {
+      return a.accountId.localeCompare(b.accountId);
+    }
+    if (a.region !== b.region) {
+      return a.region.localeCompare(b.region);
+    }
+    return a.vpcId.localeCompare(b.vpcId);
+  });
+
+  return { zoneBottom, vpcBottom };
 }
 
 function bucketMapKey(accountId: string, region: string): string {

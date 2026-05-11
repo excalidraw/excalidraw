@@ -8,6 +8,7 @@ import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout
 import type {
   TopologyPlacementZone,
   TopologyRegionalPrimaryBucket,
+  TopologyRouteTableBottomPlacements,
   TopologyVpcEndpointBucket,
 } from "./terraformTopologyPlacement";
 
@@ -118,6 +119,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     expect(meta.layoutEngine).toBe("topology");
     expect(meta.regionalPrimaryCount).toBe(0);
     expect(meta.vpcEndpointCount).toBe(0);
+    expect(meta.routeTableCount).toBe(0);
     expect(elements.length).toBeGreaterThan(0);
     assertTopologyFramesContainChildren(elements);
   });
@@ -404,6 +406,139 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
         "egress tile vertical center on VPC bottom edge",
       ).toBeLessThanOrEqual(eps);
     }
+
+    assertTopologyFramesContainChildren(elements);
+  });
+
+  it("places unassociated route table tiles straddling the VPC bottom edge", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-test",
+                      {
+                        vpcId: "vpc-test",
+                        subnets: new Map([
+                          ["subnet-a", { subnetId: "subnet-a" }],
+                          ["subnet-b", { subnetId: "subnet-b" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-test",
+        subnetSignature: "subnet-a|subnet-b",
+        subnetIds: ["subnet-a", "subnet-b"],
+        addresses: ["aws_lambda_function.fn"],
+      },
+    ];
+
+    const routeTableBottomPlacements: TopologyRouteTableBottomPlacements = {
+      zoneBottom: [],
+      vpcBottom: [
+        {
+          accountId: "111111111111",
+          region: "us-east-1",
+          vpcId: "vpc-test",
+          addresses: ["module.vpc.aws_route_table.main"],
+        },
+      ],
+    };
+
+    const nodes: TerraformPlanNodesMap = {
+      "aws_lambda_function.fn": {
+        resources: {
+          "aws_lambda_function.fn": {
+            address: "aws_lambda_function.fn",
+            mode: "managed",
+            type: "aws_lambda_function",
+            change: { actions: ["no-op"], after: {} },
+          },
+        },
+      },
+      "module.vpc.aws_route_table.main": {
+        resources: {
+          "module.vpc.aws_route_table.main": {
+            address: "module.vpc.aws_route_table.main",
+            mode: "managed",
+            type: "aws_route_table",
+            change: {
+              actions: ["no-op"],
+              after: {
+                arn: "arn:aws:ec2:us-east-1:111111111111:route-table/rtb-1",
+                vpc_id: "vpc-test",
+                id: "rtb-1",
+                tags: { Name: "main" },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const { elements, meta } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      nodes,
+      undefined,
+      [],
+      routeTableBottomPlacements,
+    );
+
+    expect(meta.routeTableCount).toBe(1);
+
+    const rtRects = elements.filter(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "vpcRouteTable",
+    );
+    expect(rtRects.length).toBe(1);
+
+    const vpcFrames = elements.filter(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "vpc",
+    );
+    const vpc = vpcFrames.find(
+      (f) =>
+        (f.customData as { terraformTopologyPath?: string[] } | undefined)
+          ?.terraformTopologyPath?.[2] === "vpc-test",
+    )!;
+    expect(vpc).toBeDefined();
+    const vpcEl = vpc!;
+    const vpcBottom = vpcEl.y + (vpcEl.height ?? 0);
+    const eps = 6;
+    const rt = rtRects[0]!;
+    const h = rt.height ?? 0;
+    const midY = rt.y + h / 2;
+    expect(
+      Math.abs(midY - vpcBottom),
+      "route table tile vertical center on VPC bottom edge",
+    ).toBeLessThanOrEqual(eps);
 
     assertTopologyFramesContainChildren(elements);
   });
