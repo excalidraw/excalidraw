@@ -24,14 +24,19 @@ import { isTerraformSemanticOverviewScene } from "./terraformElementMetadata";
 type TerraformLayerState = {
   dependencyLayerEnabled?: boolean;
   dataFlowLayerEnabled?: boolean;
+  networkingLayerEnabled?: boolean;
 };
 
 const getCustomData = (element: ExcalidrawElement) => element.customData ?? {};
 
-/** `"dependency"` | `"dataFlow"` for Terraform edges, or null for non-terraform edges. */
+/** `"dependency"` | `"dataFlow"` | `"networking"` for Terraform edges, or null for non-terraform edges. */
 export const getTerraformEdgeLayer = (element: ExcalidrawElement) => {
   const layer = getCustomData(element).terraformEdgeLayer;
-  return layer === "dependency" || layer === "dataFlow" ? layer : null;
+  return layer === "dependency" ||
+    layer === "dataFlow" ||
+    layer === "networking"
+    ? layer
+    : null;
 };
 
 /**
@@ -192,6 +197,9 @@ const deriveLayerState = (
   dataFlowLayerEnabled:
     overrides.dataFlowLayerEnabled ??
     elements.some((element) => getTerraformEdgeLayer(element) === "dataFlow"),
+  networkingLayerEnabled:
+    overrides.networkingLayerEnabled ??
+    elements.some((element) => getTerraformEdgeLayer(element) === "networking"),
 });
 
 const clamp = (value: number, min: number, max: number) =>
@@ -287,12 +295,26 @@ const fixedPointForAbsolutePoint = (
   ];
 };
 
-const collectTerraformDependencyPairKeys = (
+const isTerraformNetworkingDependencyEdge = (
+  element: ExcalidrawElement,
+) =>
+  getTerraformEdgeLayer(element) === "networking" &&
+  getCustomData(element).relationship &&
+  typeof getCustomData(element).relationship === "object" &&
+  (getCustomData(element).relationship as { type?: string }).type ===
+    "networking_dependency";
+
+/** Unordered pairs that have a DOT structural dependency line (generic or networking-primitive subset). */
+const collectTerraformStructuralDependencyPairKeys = (
   elements: readonly ExcalidrawElement[],
 ) => {
   const keys = new Set<string>();
   for (const element of elements) {
-    if (getTerraformEdgeLayer(element) !== "dependency") {
+    const layer = getTerraformEdgeLayer(element);
+    if (
+      layer !== "dependency" &&
+      !(layer === "networking" && isTerraformNetworkingDependencyEdge(element))
+    ) {
       continue;
     }
     const relationship = getCustomData(element).relationship;
@@ -337,7 +359,8 @@ export const repairTerraformEdgeBindings = (
   elements: readonly ExcalidrawElement[],
 ): ExcalidrawElement[] => {
   const resourceRects = collectTerraformResourceRects(elements);
-  const dependencyPairKeys = collectTerraformDependencyPairKeys(elements);
+  const structuralDependencyPairKeys =
+    collectTerraformStructuralDependencyPairKeys(elements);
 
   const boundEdgeIdsByRect = new Map<string, Set<string>>();
 
@@ -387,7 +410,7 @@ export const repairTerraformEdgeBindings = (
     let startFixed: [number, number];
     let endFixed: [number, number];
 
-    if (layer === "dependency") {
+    if (layer === "dependency" || isTerraformNetworkingDependencyEdge(element)) {
       const pts = getCenterClippedBindingPoints(posA, posB, wA, hA, wB, hB);
       startPoint = pts.startPoint;
       endPoint = pts.endPoint;
@@ -397,7 +420,7 @@ export const repairTerraformEdgeBindings = (
       const pairKey = [relationship.source, relationship.target]
         .sort()
         .join("|||");
-      const offset = dependencyPairKeys.has(pairKey) ? 18 : 0;
+      const offset = structuralDependencyPairKeys.has(pairKey) ? 18 : 0;
       const raw = getCenterClippedBindingPoints(posA, posB, wA, hA, wB, hB);
       const shifted = offsetLineSegment(
         raw.startPoint,
@@ -490,11 +513,14 @@ export const reconcileTerraformVisibility = (
       return element;
     }
 
-    const shouldShow =
-      (layer === "dependency"
+    const layerEnabled =
+      layer === "dependency"
         ? layerState.dependencyLayerEnabled
-        : layerState.dataFlowLayerEnabled) &&
-      edgeEndpointsAreVisible(element, visibleKeys);
+        : layer === "dataFlow"
+          ? layerState.dataFlowLayerEnabled
+          : layerState.networkingLayerEnabled;
+    const shouldShow =
+      layerEnabled && edgeEndpointsAreVisible(element, visibleKeys);
 
     if (
       element.isDeleted === !shouldShow &&

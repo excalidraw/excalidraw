@@ -70,7 +70,8 @@ After [`pipeline.js`](pipeline.js) finishes, **`nodes`** is a plain object:
   - **`resources`** — Plan/state resource payloads keyed by address.
   - **`edges_new`** — Strings: other node keys reachable from DOT adjacency (BFS with module boundaries as **stop points** so the graph does not explode through every child resource).
   - **`edges_existing`** — Strings: prior-state / `depends_on` style edges.
-  - **`edges_data_flow`** — Objects `{ target, type, label, origin, detail }` for **semantic** edges (IAM policy reads/writes, integrations, Lambda triggers, etc.), synthesized from resource attributes—not only from DOT.
+  - **`edges_data_flow`** — Objects `{ target, type, label, origin, detail }` for **IAM policy–inferred** semantic edges only (`origin: iam_policy`), synthesized from inline/attached policies—not integrations or triggers.
+  - **`edges_networking`** — Same object shape as **`edges_data_flow`**, for **security-group peer** references (`ingress`/`egress` / rule resources), from **`buildNetworkingEdges`**.
   - **`terraform_module`** — Optional module chain metadata (source/version) from plan configuration.
   - Optional enrichment fields from [`enrichment.js`](enrichment.js).
 
@@ -90,7 +91,7 @@ The exact sequence matches [`index.js`](index.js) `POST /terraform/upload`. In w
 4. **DOT edges** — **`buildNewEdges`** fills **`edges_new`** from the DOT adjacency list.
 5. **Diffs & existing edges** — **`computeResourceDiffs`**, **`buildExistingEdges`** from `prior_state`.
 6. **Refinements** — e.g. **CloudWatch metric alarms** get **`refineCloudWatchMetricAlarmEdges`** so alarms point at meaningful targets instead of noisy DOT fans. 6b. **Structural shortcut pruning** — **`pruneRedundantStructuralEdges`** removes a directed dependency edge `u → v` when `v` is already reachable from `u` via other structural edges (`edges_new` ∪ `edges_existing`). Terraform’s expanded DOT links distant modules through vars/outputs (e.g. Lambda env → queue URL → KMS key id); pruning drops those misleading shortcuts while keeping the intermediate chain for infra-style diagrams. **`edges_data_flow` is not modified.**
-7. **Semantic data-flow** — **`buildDataFlowEdges`** derives integration/IAM-style edges into **`edges_data_flow`**.
+7. **Semantic edges** — **`buildDataFlowEdges`** fills **`edges_data_flow`** (IAM only). **`buildNetworkingEdges`** fills **`edges_networking`** (SG peers, standalone rules, and **`aws_vpc_endpoint` → `aws_security_group`** links from `security_group_ids`). Reference resolution indexes **`sg-…`** identifiers via **`buildDataFlowIndex.bySecurityGroupId`** (from each SG’s `id` and ARN) so plan/state strings on **`aws_security_group_rule`** match graph nodes like **`allplanmodules.json`** exports.
 8. **External stubs** — **`externalResources`** adds placeholder nodes for missing edge endpoints so layout stays connected.
 9. **VPC facets** — **`extractVpcNetworkingFacetStore`** runs on the **full** graph, then **`omitVpcPlumbingNodes`** drops route-table-only noise that would clutter the diagram.
 10. **Cleanup** — Orphans, IAM noise filters (`cleanUpRoleLinks`), optional **`filterVisualIgnore`**.
@@ -106,7 +107,7 @@ The exact sequence matches [`index.js`](index.js) `POST /terraform/upload`. In w
 | --- | --- |
 | [`excalidraw-elements.js`](excalidraw-elements.js) | Icons (AWS `.excalidrawlib`), **tier map / tier configs** (card size + force parameters), labels, **`customData`**, account/region/VPC/subnet inference, module groups, Terraform detail payloads. |
 | [`excalidraw-layout.js`](excalidraw-layout.js) | **Collapsed module model**, top-level placement via **ELK layered** (`elkLayout`, default) or legacy d3-force (`forceLayout`, `TF_LAYOUT_ENGINE=force`), **expand** module members from the collapsed anchor, **VPC perimeter snap**, facet appliance tiles on VPC edges. |
-| [`excalidraw-arrows.js`](excalidraw-arrows.js) | **Dependency** edges from `edges_new` / `edges_existing`, **data-flow** from `edges_data_flow`, **pair coalescing**, binding geometry (`getCenterClippedBindingPoints`, **offset** for stacked lines). |
+| [`excalidraw-arrows.js`](excalidraw-arrows.js) | **Dependency** edges from `edges_new` / `edges_existing` (partitioned: generic dependency vs **networking-primitive** endpoints), **`edges_networking`** collection, **data-flow** from `edges_data_flow`, **pair coalescing**, binding geometry (`getCenterClippedBindingPoints`, **offset** for stacked lines). See [`terraform-networking-vertex.js`](terraform-networking-vertex.js). |
 
 The sections below are the **core mechanics**: how **x/y** get assigned, and how **two edge channels** become drawable arrows.
 
@@ -186,7 +187,7 @@ After `positions` is final, each resource gets a **`posMap`** entry: **x, y, w, 
 
 ### Edges: how dependency and data-flow lines are built
 
-The pipeline stores **three** edge mechanisms on each node; the exporter turns them into **two** visual layers plus metadata for the app.
+The pipeline stores **three** edge mechanisms on each node; the exporter turns them into **three** Terraform edge layers (**dependency**, **networking**, **dataFlow**) plus metadata for the app.
 
 #### Pipeline → exporter bridge
 
@@ -194,29 +195,37 @@ The pipeline stores **three** edge mechanisms on each node; the exporter turns t
 | --- | --- |
 | **`edges_new`** | Outgoing DOT reachability (planned graph). |
 | **`edges_existing`** | State / `prior_state` / `depends_on` style deps. |
-| **`edges_data_flow`** | Rich objects: semantic edges (IAM, integrations, triggers, …). |
+| **`edges_data_flow`** | IAM policy–derived semantic edges (`iam_policy`). |
+| **`edges_networking`** | Security-group peer / rule semantic edges. |
 
-#### Dependency arrows (Terraform “graph” deps)
+#### Dependency arrows (non–network-pair DOT / state deps)
 
 1. **`collectDirectedEdges(nodes)`** walks every node and emits **one directed edge per unique (source, target)** from **`edges_new`** and **`edges_existing`**, tagging kinds (`planned_dependency`, `existing_dependency`) and origins (`dot`, `terraform_state`). Same logical edge can appear in both lists; kinds/origins are **unioned** on the dedupe key **`source|||target`**.
-2. **`coalesceRelationshipPairs(directedEdges)`** groups by **unordered pair** \(\{A,B\}\). If both **A→B** and **B→A** exist, the pair is **bidirectional**; otherwise a default direction is chosen for drawing. Each **relationship** carries **`directions`**, **`kinds`**, **`origins`**, **`directed`**, **`bidirectional`** for **`customData.relationship`** (used by tooling and the React **explode** logic).
+2. **`partitionDirectedEdgesByNetworking(nodes, directedEdges)`** splits edges whose **both** endpoints are networking primitives (VPC, subnet, SG, …) into a separate list (see **`terraform-networking-vertex.js`**).
+3. **`coalesceRelationshipPairs(...)`** runs separately on **generic** dependency edges and on **networking-only** dependency edges. Coalescing groups by **unordered pair** \(\{A,B\}\); bidirectional pairs merge.
 
 These arrows are **not** the same as d3 links: coalescing is for **visualization** (one line per unordered pair when possible).
 
-#### Data-flow arrows (semantic / architecture)
+#### Networking arrows (two sources)
 
-1. **`collectDataFlowEdges(nodes)`** walks **`edges_data_flow`** on each source node, dedupes by **source + target + type + label**, then **merges** opposing directions on the same unordered pair into one **bidirectional_data_flow** record with combined labels/types when needed.
+1. **DOT subset** — Networking-primitive dependency edges are drawn with **`terraformEdgeLayer: "networking"`**, uniform blue stroke (`#228be6`), **`strokeWidth: 2`** (matches browser ELK).
+2. **`edges_networking`** — **`collectNetworkingEdges(nodes)`** mirrors **`collectDataFlowEdges`** merge rules for **`edges_networking`**. Lines use **`terraformEdgeLayer: "networking"`**, blue stroke, **`strokeWidth: 3`**. If an unordered pair already has a **networking dependency** line from (1), the **record** line for that pair is skipped to avoid duplicate geometry.
+
+#### IAM data-flow arrows
+
+1. **`collectDataFlowEdges(nodes)`** walks **`edges_data_flow`** on each source node, dedupes by **source + target + type + label**, then **merges** opposing directions on the same unordered pair into one **bidirectional_data_flow** record when needed.
 
 #### Explode graph (editor affordance)
 
-- **`buildTerraformExplodeParentMap`** builds an **undirected adjacency**: two nodes are linked if they share **any** dependency edge or **any** data-flow edge (including internal directions on merged data-flow records). That map feeds **`customData.terraformExplodeParentKeys`** on rectangles so the client can **expand/collapse** related nodes.
+- **`buildTerraformExplodeParentMap`** builds an **undirected adjacency**: two nodes are linked if they share **any** dependency edge, **any** IAM data-flow edge, or **any** merged **`edges_networking`** record (including internal directions). That map feeds **`customData.terraformExplodeParentKeys`** on rectangles so the client can **expand/collapse** related nodes.
 
 #### Geometry and styling (`excalidraw.js` + `excalidraw-arrows.js`)
 
 - **`posMap`** maps Terraform address → **rectangle position and size** (`x`, `y`, `w`, `h`, `rectId`).
-- For **each dependency relationship**, the code looks up **`rectA` / `rectB`**, then **`getCenterClippedBindingPoints`**: from each card’s center, shoot a ray toward the **other card’s center** and clip to the **near side** of the rectangle; that yields **start/end** in scene coordinates and **fixedPoint** \([0–1]\) on each edge for Excalidraw **orbit** bindings.
-- **Dependency** arrows use **`terraformEdgeLayer: "dependency"`**, default stroke, **no arrowheads** on the ends in the generator (relationship metadata still describes direction vs bidirectional).
-- **Data-flow** arrows use **`terraformEdgeLayer: "dataFlow"`**, green stroke (`#0ca678`), thicker stroke, **arrowhead** on the end (and start if bidirectional). If the **same unordered pair** already has a **dependency** line, the data-flow segment is **offset perpendicularly** by **`offsetLineSegment(..., 18)`** so both lines remain visible; bindings use **shifted** endpoints via **`fixedPointForAbsolutePoint`**.
+- For **each relationship** (dependency, networking dependency, IAM data-flow, networking record), the code looks up **`rectA` / `rectB`**, then **`getCenterClippedBindingPoints`**: from each card’s center, shoot a ray toward the **other card’s center** and clip to the **near side** of the rectangle; that yields **start/end** in scene coordinates and **fixedPoint** \([0–1]\) on each edge for Excalidraw **orbit** bindings.
+- **Dependency** arrows use **`terraformEdgeLayer: "dependency"`**, colored by planned vs existing kinds (green / blue / …).
+- **Networking** arrows (both DOT subset and **`edges_networking`**) use **`terraformEdgeLayer: "networking"`**, blue stroke **`#228be6`**.
+- **IAM data-flow** arrows use **`terraformEdgeLayer: "dataFlow"`**, grey stroke (`#868e96`), thicker stroke. If the **same unordered pair** already has a **structural** dependency line (generic or networking-primitive), the IAM segment is **offset perpendicularly** by **`offsetLineSegment(..., 18)`**; **`edges_networking`** lines offset the same way when a structural dependency exists on the pair.
 - **`isDeleted`** on arrows can be set when **either endpoint** is not a “primary visible” resource type—matching the overview cards’ default visibility.
 
 #### Z-order
@@ -244,9 +253,9 @@ Final scene array is **`[ ...arrowElements, ...locationElements, ...moduleElemen
 
 Think of the backend as two layers:
 
-1. **Graph compiler** — Plan + DOT (+ state) → **typed, pruned dependency graph** (`nodes` + three edge channels).
+1. **Graph compiler** — Plan + DOT (+ state) → **typed, pruned dependency graph** (`nodes` + `edges_new` / `edges_existing` / `edges_data_flow` / `edges_networking`).
 2. **Scene compiler** — `nodes` → **2D layout + Excalidraw elements** (cards, frames, arrows, `customData` for the fork’s UI).
 
 The Terraform **graph** drives _both_ structural edges and (via resource configs) _inferred_ architecture edges; the **layout** layer adds geography (account/region/VPC) and **force-directed** placement tuned by tiers and modules.
 
-**Layout recap:** positions come from **tier-sized** cards, **d3-force on a collapsed module graph** (with optional perimeter nodes stripped from the simulation), then **expand + presets + VPC wall snap**. **Edge recap:** **dependency** lines = DOT ∪ state, **coalesced** by unordered pair; **data-flow** lines = **`edges_data_flow`**, green and **offset** when they share a pair with a dependency edge; both use **orbit bindings** to rectangles.
+**Layout recap:** positions come from **tier-sized** cards, **d3-force on a collapsed module graph** (with optional perimeter nodes stripped from the simulation), then **expand + presets + VPC wall snap**. **Edge recap:** **dependency** lines = DOT ∪ state (minus pairs drawn as **networking** deps); **networking** lines = networking DOT subset + **`edges_networking`**; **data-flow** = IAM **`edges_data_flow`**, **offset** when they share an unordered pair with structural deps; all use **orbit bindings** to rectangles.

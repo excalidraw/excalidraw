@@ -276,7 +276,7 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
     });
     expect(dataFlowLine).toMatchObject({
       type: "line",
-      strokeColor: "#0ca678",
+      strokeColor: "#868e96",
       strokeWidth: 3,
       startArrowhead: null,
       endArrowhead: "arrow",

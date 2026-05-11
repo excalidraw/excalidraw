@@ -2,7 +2,8 @@
  * Terraform graph pipeline: plan JSON + DOT adjacency + optional state → enriched `nodes` map.
  *
  * **Node map:** keys are Terraform addresses; values hold `resources`, `edges_new` (DOT BFS),
- * `edges_existing` (state / depends_on), and `edges_data_flow` (semantic IAM and integration edges).
+ * `edges_existing` (state / depends_on), `edges_data_flow` (IAM policy semantics only),
+ * and `edges_networking` (SG peer edges).
  * Keys starting with `__` are pipeline metadata (kept through pruning).
  *
  * **Order of transforms** matches `index.js` `POST /terraform/upload`: load plan → state merge →
@@ -12,6 +13,13 @@
  */
 const { getTerraformNodePaths } = require("./vpc-networking-facet");
 const { isPlainObject } = require("./terraform-graph-utils");
+const {
+  buildDataFlowEdges,
+  buildNetworkingEdges,
+  buildDataFlowIndex,
+  resolveNodeRefsAcrossAllResourceTypes,
+} = require("./terraform-data-flow-edges");
+
 
 const stripIndexes = (address = "") => address.replace(/\[[^\]]+\]/g, "");
 
@@ -47,17 +55,6 @@ function resolveCanonicalNodePath(nodes, address) {
     return address;
   }
   return null;
-}
-
-/** Registers a Terraform address key (full or index-stripped) → node path in the data-flow index. */
-function addToAddressIndex(index, key, nodePath) {
-  if (!key || !nodePath) {
-    return;
-  }
-  if (!index.byAddress.has(key)) {
-    index.byAddress.set(key, new Set());
-  }
-  index.byAddress.get(key).add(nodePath);
 }
 
 const sanitizeDotNodeId = (nodeId = "") => {
@@ -127,6 +124,8 @@ const REFERENCE_KEY_TYPE_RULES = {
   topic_name: ["aws_sns_topic"],
   bucketname: ["aws_s3_bucket"],
   bucket: ["aws_s3_bucket"],
+  data_bucket: ["aws_s3_bucket"],
+  data_queue_url: ["aws_sqs_queue"],
   rolearn: ["aws_iam_role"],
   role_arn: ["aws_iam_role"],
   role: ["aws_iam_role", "aws_iam_instance_profile"],
@@ -724,12 +723,13 @@ function mergeTerraformState(nodes, state) {
   return nodes;
 }
 
-/** Ensures every node has mutable `edges_new`, `edges_existing`, and `edges_data_flow` arrays. */
+/** Ensures every node has mutable edge list arrays. */
 function ensureEdgeLists(nodes) {
   for (const node of Object.values(nodes)) {
     node.edges_new ||= [];
     node.edges_existing ||= [];
     node.edges_data_flow ||= [];
+    node.edges_networking ||= [];
   }
   return nodes;
 }
@@ -854,251 +854,6 @@ function pruneRedundantStructuralEdges(nodes, options = {}) {
 }
 
 /**
- * Indexes nodes by address, ARN, logical name, type, IAM role↔compute, and policy↔role links
- * for resolving references when synthesizing data-flow edges.
- */
-function buildDataFlowIndex(nodes) {
-  const index = {
-    byAddress: new Map(),
-    byArn: new Map(),
-    byName: new Map(),
-    byType: new Map(),
-    roleToCompute: new Map(),
-    policyToRoles: new Map(),
-  };
-
-  const addName = (type, name, nodePath) => {
-    if (!type || !name) {
-      return;
-    }
-    const key = `${type}:${name}`;
-    if (!index.byName.has(key)) {
-      index.byName.set(key, new Set());
-    }
-    index.byName.get(key).add(nodePath);
-  };
-
-  const addArn = (arn, nodePath) => {
-    if (typeof arn === "string" && arn.startsWith("arn:")) {
-      index.byArn.set(arn, nodePath);
-    }
-  };
-
-  for (const [nodePath, node] of Object.entries(nodes)) {
-    const type = getResourceType(nodePath, node);
-    if (!index.byType.has(type)) {
-      index.byType.set(type, new Set());
-    }
-    index.byType.get(type).add(nodePath);
-
-    for (const resource of Object.values(node.resources || {})) {
-      const values = getResourceValues(resource);
-      const addr = resource.address || nodePath;
-      addToAddressIndex(index, stripIndexes(addr), nodePath);
-      addToAddressIndex(index, addr, nodePath);
-      addName(resource.type || type, resource.name, nodePath);
-      addName(resource.type || type, values.name, nodePath);
-      addName(resource.type || type, values.id, nodePath);
-      addName(resource.type || type, values.bucket, nodePath);
-      addName(resource.type || type, values.function_name, nodePath);
-      addName(resource.type || type, values.queue_name, nodePath);
-
-      addArn(values.arn, nodePath);
-      addArn(values.invoke_arn, nodePath);
-      addArn(values.execution_arn, nodePath);
-      addArn(values.stream_arn, nodePath);
-
-      if ((resource.type || type) === "aws_s3_bucket") {
-        const bucketName = values.bucket || values.id || resource.name;
-        if (bucketName) {
-          addArn(`arn:aws:s3:::${bucketName}`, nodePath);
-          addArn(`arn:aws:s3:::${bucketName}/*`, nodePath);
-        }
-      }
-    }
-  }
-
-  for (const [nodePath, node] of Object.entries(nodes)) {
-    const type = getResourceType(nodePath, node);
-    if (!COMPUTE_RESOURCE_TYPES.has(type)) {
-      continue;
-    }
-
-    for (const resource of Object.values(node.resources || {})) {
-      const values = getResourceValues(resource);
-      for (const roleRef of [
-        values.role,
-        values.task_role_arn,
-        values.iam_instance_profile,
-      ]) {
-        for (const roleNodePath of resolveNodeRefs(roleRef, index, nodes, [
-          "aws_iam_role",
-          "aws_iam_instance_profile",
-        ])) {
-          if (!index.roleToCompute.has(roleNodePath)) {
-            index.roleToCompute.set(roleNodePath, new Set());
-          }
-          index.roleToCompute.get(roleNodePath).add(nodePath);
-        }
-      }
-    }
-  }
-
-  for (const [nodePath, node] of Object.entries(nodes)) {
-    if (getResourceType(nodePath, node) !== "aws_iam_role") {
-      continue;
-    }
-
-    for (const target of [
-      ...(node.edges_new || []),
-      ...(node.edges_existing || []),
-    ]) {
-      if (!COMPUTE_RESOURCE_TYPES.has(getResourceType(target, nodes[target]))) {
-        continue;
-      }
-      if (!index.roleToCompute.has(nodePath)) {
-        index.roleToCompute.set(nodePath, new Set());
-      }
-      index.roleToCompute.get(nodePath).add(target);
-    }
-  }
-
-  for (const [nodePath, node] of Object.entries(nodes)) {
-    const type = getResourceType(nodePath, node);
-    if (
-      type !== "aws_iam_role_policy_attachment" &&
-      type !== "aws_iam_policy_attachment"
-    ) {
-      continue;
-    }
-
-    for (const resource of Object.values(node.resources || {})) {
-      const values = getResourceValues(resource);
-      const policyNodes = resolveNodeRefs(values.policy_arn, index, nodes, [
-        "aws_iam_policy",
-      ]);
-      const roleNodes = resolveNodeRefs(
-        values.role || values.roles,
-        index,
-        nodes,
-        ["aws_iam_role"],
-      );
-
-      for (const policyNodePath of policyNodes) {
-        if (!index.policyToRoles.has(policyNodePath)) {
-          index.policyToRoles.set(policyNodePath, new Set());
-        }
-        for (const roleNodePath of roleNodes) {
-          index.policyToRoles.get(policyNodePath).add(roleNodePath);
-        }
-      }
-    }
-  }
-
-  return index;
-}
-
-/** Resolves a Terraform reference value (string/ARN/interpolation) to matching node paths using `index`. */
-function resolveNodeRefs(value, index, nodes, allowedTypes) {
-  const matches = new Set();
-  const allowed = allowedTypes ? new Set(allowedTypes) : null;
-  const addMatch = (nodePath) => {
-    if (!nodePath || !nodes[nodePath]) {
-      return;
-    }
-    if (allowed && !allowed.has(getResourceType(nodePath, nodes[nodePath]))) {
-      return;
-    }
-    matches.add(nodePath);
-  };
-
-  for (const raw of flattenValues(value)) {
-    const text = String(raw);
-    const stripped = stripIndexes(text);
-
-    for (const nodePath of index.byAddress.get(stripped) || []) {
-      addMatch(nodePath);
-    }
-    for (const nodePath of index.byAddress.get(text) || []) {
-      addMatch(nodePath);
-    }
-    addMatch(index.byArn.get(text));
-
-    for (const [address, nodePaths] of index.byAddress.entries()) {
-      if (text.includes(address)) {
-        for (const nodePath of nodePaths) {
-          addMatch(nodePath);
-        }
-      }
-    }
-
-    for (const [arn, nodePath] of index.byArn.entries()) {
-      if (text === arn || text.includes(arn)) {
-        addMatch(nodePath);
-      }
-    }
-
-    for (const type of allowed || DATA_FLOW_TARGET_TYPES) {
-      const byName = index.byName.get(`${type}:${text}`);
-      if (byName) {
-        for (const nodePath of byName) {
-          addMatch(nodePath);
-        }
-      }
-    }
-  }
-
-  return [...matches];
-}
-
-/** Collects scalar references while preserving the nearest parent object key. */
-function collectReferenceScalars(value, parentKey = "", out = []) {
-  if (typeof value === "string") {
-    out.push({ value, key: parentKey });
-    return out;
-  }
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      collectReferenceScalars(item, parentKey, out);
-    }
-    return out;
-  }
-  if (isPlainObject(value)) {
-    for (const [k, v] of Object.entries(value)) {
-      collectReferenceScalars(v, k, out);
-    }
-  }
-  return out;
-}
-
-/** Resolves references with key-aware type narrowing and generic fallback. */
-function resolveNodeRefsAcrossAllResourceTypes(value, index, nodes, options = {}) {
-  const matches = new Set();
-  const allTypes = [...index.byType.keys()];
-  const ignoredKeys = new Set(
-    options.ignoredKeys || GENERIC_REFERENCE_IGNORED_KEYS,
-  );
-
-  for (const scalar of collectReferenceScalars(value)) {
-    const key = String(scalar.key || "").toLowerCase();
-    if (ignoredKeys.has(key)) {
-      continue;
-    }
-    const allowedTypes = REFERENCE_KEY_TYPE_RULES[key] || allTypes;
-    for (const nodePath of resolveNodeRefs(
-      scalar.value,
-      index,
-      nodes,
-      allowedTypes,
-    )) {
-      matches.add(nodePath);
-    }
-  }
-
-  return [...matches];
-}
-
-/**
  * Generic resolver: derive structural targets by resolving references found in
  * resource values, then include owning module nodes for those targets.
  */
@@ -1207,413 +962,6 @@ function refineCloudWatchMetricAlarmEdges(nodes, options = {}) {
   return detectGenericStructuralEdges(nodes, options);
 }
 
-/** Maps an IAM policy Resource ARN/string to data-flow target nodes (S3, SQS, etc.) using ARN index heuristics. */
-function resolvePolicyTargets(resourceValue, index, nodes) {
-  const normalized = normalizeArnPattern(resourceValue);
-  if (!normalized || normalized === "*") {
-    return [];
-  }
-
-  const matches = new Set();
-  const direct = index.byArn.get(resourceValue) || index.byArn.get(normalized);
-  if (direct) {
-    matches.add(direct);
-  }
-
-  for (const [arn, nodePath] of index.byArn.entries()) {
-    if (
-      normalized === arn ||
-      arn.startsWith(normalized) ||
-      normalized.startsWith(arn)
-    ) {
-      if (
-        DATA_FLOW_TARGET_TYPES.has(getResourceType(nodePath, nodes[nodePath]))
-      ) {
-        matches.add(nodePath);
-      }
-    }
-  }
-
-  return [...matches];
-}
-
-const getExpressionReferences = (expression) =>
-  Array.isArray(expression?.references) ? expression.references : [];
-
-const withoutAttributeSuffix = (reference = "") => {
-  const stripped = stripIndexes(String(reference));
-  const parts = stripped.split(".");
-  const dataIndex = parts.indexOf("data");
-  let resourceStart = dataIndex === -1 ? 0 : dataIndex + 1;
-
-  while (parts[resourceStart] === "module" && parts[resourceStart + 1]) {
-    resourceStart += 2;
-  }
-
-  if (parts.length > resourceStart + 2) {
-    return parts.slice(0, resourceStart + 2).join(".");
-  }
-  return stripped;
-};
-
-function resolveModuleOutputReference(reference, nodes, seen = new Set()) {
-  const ref = stripIndexes(String(reference));
-  if (!ref || seen.has(ref)) {
-    return [];
-  }
-  seen.add(ref);
-
-  const directMatches = new Set();
-  for (const candidate of [ref, withoutAttributeSuffix(ref)]) {
-    for (const nodePath of nodes.__dataFlowIndex?.byAddress?.get(candidate) || []) {
-      if (DATA_FLOW_TARGET_TYPES.has(getResourceType(nodePath, nodes[nodePath]))) {
-        directMatches.add(nodePath);
-      }
-    }
-  }
-  if (directMatches.size > 0) {
-    return [...directMatches];
-  }
-
-  const parts = ref.split(".");
-  const modulePath = parts.slice(0, -1).join(".");
-  const outputName = parts.at(-1);
-  const output = nodes[modulePath]?.terraform_config?.outputs?.[outputName];
-  const outputRefs = getExpressionReferences(output?.expression);
-  if (outputRefs.length) {
-    const matches = new Set();
-    for (const outputRef of outputRefs) {
-      const absoluteRef = `${modulePath}.${outputRef}`;
-      for (const target of resolveModuleOutputReference(absoluteRef, nodes, seen)) {
-        matches.add(target);
-      }
-    }
-    return [...matches];
-  }
-
-  return [];
-}
-
-function collectDescendantNodesByType(nodes, modulePath, types) {
-  const allowed = new Set(types);
-  return Object.keys(nodes).filter(
-    (nodePath) =>
-      nodePath.startsWith(`${modulePath}.`) &&
-      allowed.has(getResourceType(nodePath, nodes[nodePath])),
-  );
-}
-
-/**
- * Adds `edges_data_flow` from integrations, notifications, IAM policy statements, etc.,
- * using `buildDataFlowIndex` for cross-reference resolution.
- */
-function buildDataFlowEdges(nodes) {
-  const index = buildDataFlowIndex(nodes);
-  nodes.__dataFlowIndex = index;
-  const explicitKeys = new Set();
-  const allKeys = new Set();
-
-  const addEdge = (source, target, type, label, origin, detail) => {
-    if (!nodes[source] || !nodes[target] || source === target) {
-      return;
-    }
-    const key = `${source}|||${target}|||${type}`;
-    if (allKeys.has(key)) {
-      return;
-    }
-    allKeys.add(key);
-    if (origin !== "iam_policy") {
-      explicitKeys.add(`${source}|||${target}`);
-    }
-    nodes[source].edges_data_flow ||= [];
-    nodes[source].edges_data_flow.push({ target, type, label, origin, detail });
-  };
-
-  for (const [nodePath, node] of Object.entries(nodes)) {
-    for (const resource of Object.values(node.resources || {})) {
-      const values = getResourceValues(resource);
-      const type = resource.type || getResourceType(nodePath, node);
-
-      if (type === "aws_lambda_event_source_mapping") {
-        const sources = resolveNodeRefs(values.event_source_arn, index, nodes);
-        const targets = resolveNodeRefs(values.function_name, index, nodes, [
-          "aws_lambda_function",
-        ]);
-        for (const source of sources) {
-          for (const target of targets) {
-            addEdge(
-              source,
-              target,
-              "triggers",
-              "triggers",
-              "terraform_resource",
-              type,
-            );
-          }
-        }
-      }
-
-      if (type === "aws_s3_bucket_notification") {
-        const sources = resolveNodeRefs(values.bucket, index, nodes, [
-          "aws_s3_bucket",
-        ]);
-        const targets = [
-          ...resolveNodeRefs(values.lambda_function, index, nodes, [
-            "aws_lambda_function",
-          ]),
-          ...resolveNodeRefs(values.queue, index, nodes, ["aws_sqs_queue"]),
-          ...resolveNodeRefs(values.topic, index, nodes, ["aws_sns_topic"]),
-        ];
-        for (const source of sources) {
-          for (const target of targets) {
-            addEdge(
-              source,
-              target,
-              "triggers",
-              "triggers",
-              "terraform_resource",
-              type,
-            );
-          }
-        }
-      }
-
-      if (
-        type === "aws_cloudwatch_event_target" ||
-        type === "aws_eventbridge_target" ||
-        type === "aws_scheduler_schedule"
-      ) {
-        const sourceRefs =
-          type === "aws_scheduler_schedule"
-            ? nodePath
-            : values.rule || values.event_bus_name;
-        const sources = resolveNodeRefs(sourceRefs, index, nodes, [
-          "aws_cloudwatch_event_rule",
-          "aws_cloudwatch_event_bus",
-          "aws_scheduler_schedule",
-        ]);
-        const targets = resolveNodeRefs(
-          values.arn || values.target?.arn,
-          index,
-          nodes,
-        );
-        for (const source of sources.length ? sources : [nodePath]) {
-          for (const target of targets) {
-            addEdge(
-              source,
-              target,
-              "triggers",
-              "triggers",
-              "terraform_resource",
-              type,
-            );
-          }
-        }
-      }
-
-      if (
-        type === "aws_api_gateway_integration" ||
-        type === "aws_apigatewayv2_integration"
-      ) {
-        const sources = resolveNodeRefs(
-          values.rest_api_id || values.api_id,
-          index,
-          nodes,
-          ["aws_api_gateway_rest_api", "aws_apigatewayv2_api"],
-        );
-        const targets = resolveNodeRefs(
-          values.uri || values.integration_uri,
-          index,
-          nodes,
-          ["aws_lambda_function"],
-        );
-        for (const source of sources.length ? sources : [nodePath]) {
-          for (const target of targets) {
-            addEdge(
-              source,
-              target,
-              "invokes",
-              "invokes",
-              "terraform_resource",
-              type,
-            );
-          }
-        }
-      }
-
-      if (
-        type === "aws_lb_listener" ||
-        type === "aws_lb_listener_rule" ||
-        type === "aws_alb_listener" ||
-        type === "aws_alb_listener_rule"
-      ) {
-        const sources = resolveNodeRefs(
-          values.load_balancer_arn || values.listener_arn,
-          index,
-          nodes,
-        );
-        const targets = resolveNodeRefs(
-          values.default_action || values.action,
-          index,
-          nodes,
-          ["aws_lb_target_group", "aws_alb_target_group"],
-        );
-        for (const source of sources.length ? sources : [nodePath]) {
-          for (const target of targets) {
-            addEdge(
-              source,
-              target,
-              "routes",
-              "routes",
-              "terraform_resource",
-              type,
-            );
-          }
-        }
-      }
-
-      if (
-        type === "aws_lb_target_group_attachment" ||
-        type === "aws_alb_target_group_attachment"
-      ) {
-        const sources = resolveNodeRefs(values.target_group_arn, index, nodes, [
-          "aws_lb_target_group",
-          "aws_alb_target_group",
-        ]);
-        const targets = resolveNodeRefs(values.target_id, index, nodes);
-        for (const source of sources) {
-          for (const target of targets) {
-            addEdge(
-              source,
-              target,
-              "routes",
-              "routes",
-              "terraform_resource",
-              type,
-            );
-          }
-        }
-      }
-    }
-  }
-
-  for (const [nodePath, node] of Object.entries(nodes)) {
-    for (const resource of Object.values(node.resources || {})) {
-      const type = resource.type || getResourceType(nodePath, node);
-      if (type !== "aws_iam_role_policy" && type !== "aws_iam_policy") {
-        continue;
-      }
-
-      const values = getResourceValues(resource);
-      const policy = parsePolicyDocument(values.policy);
-      if (!policy) {
-        continue;
-      }
-
-      const sourceRoles =
-        type === "aws_iam_role_policy"
-          ? resolveNodeRefs(values.role, index, nodes, ["aws_iam_role"])
-          : [...(index.policyToRoles.get(nodePath) || [])];
-      const sourceComputes = new Set();
-      for (const role of sourceRoles) {
-        for (const compute of index.roleToCompute.get(role) || []) {
-          sourceComputes.add(compute);
-        }
-      }
-
-      if (sourceComputes.size === 0) {
-        continue;
-      }
-
-      for (const statement of normalizePolicyArray(policy.Statement)) {
-        if (String(statement.Effect || "Allow").toLowerCase() === "deny") {
-          continue;
-        }
-        for (const action of normalizePolicyArray(statement.Action)) {
-          const relationship = dataFlowRelationshipForAction(action);
-          if (!relationship) {
-            continue;
-          }
-          for (const resourceValue of normalizePolicyArray(
-            statement.Resource,
-          )) {
-            for (const target of resolvePolicyTargets(
-              resourceValue,
-              index,
-              nodes,
-            )) {
-              for (const source of sourceComputes) {
-                const edgeSource =
-                  relationship.direction === "target_to_source"
-                    ? target
-                    : source;
-                const edgeTarget =
-                  relationship.direction === "target_to_source"
-                    ? source
-                    : target;
-
-                if (explicitKeys.has(`${edgeSource}|||${edgeTarget}`)) {
-                  continue;
-                }
-                addEdge(
-                  edgeSource,
-                  edgeTarget,
-                  relationship.type,
-                  relationship.label,
-                  "iam_policy",
-                  action,
-                );
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  for (const [modulePath, node] of Object.entries(nodes)) {
-    if (getResourceType(modulePath, node) !== TERRAFORM_MODULE_RESOURCE_TYPE) {
-      continue;
-    }
-
-    const policyRefs = getExpressionReferences(
-      node.terraform_config?.expressions?.policy_statements,
-    );
-    if (!policyRefs.length) {
-      continue;
-    }
-
-    const targets = new Set();
-    for (const ref of policyRefs) {
-      for (const target of resolveModuleOutputReference(ref, nodes)) {
-        targets.add(target);
-      }
-    }
-
-    const principals = [
-      ...collectDescendantNodesByType(nodes, modulePath, ["aws_lambda_function"]),
-      ...collectDescendantNodesByType(nodes, modulePath, ["aws_iam_role"]),
-    ];
-
-    for (const target of targets) {
-      for (const principal of principals) {
-        addEdge(
-          target,
-          principal,
-          "accesses",
-          "accesses",
-          "module_policy_reference",
-          "policy_statements",
-        );
-      }
-    }
-  }
-
-  delete nodes.__dataFlowIndex;
-
-  return nodes;
-}
-
 /** Creates a placeholder node for an edge target that exists outside the current plan graph. */
 function makeExternalNode(edge, backRef) {
   return {
@@ -1689,6 +1037,9 @@ function stripEdgesReferencingPaths(nodes, omitted) {
       (e) => !omitted.has(e),
     );
     node.edges_data_flow = (node.edges_data_flow || []).filter(
+      (edge) => !omitted.has(edge.target),
+    );
+    node.edges_networking = (node.edges_networking || []).filter(
       (edge) => !omitted.has(edge.target),
     );
   }
@@ -1833,6 +1184,7 @@ function deleteOrphanedNodes(nodes) {
       ...(node.edges_existing || []),
       ...(node.edges_new || []),
       ...(node.edges_data_flow || []).map((edge) => edge.target),
+      ...(node.edges_networking || []).map((edge) => edge.target),
     ];
     if (edges.length > 0) {
       connected.add(nodePath);
@@ -1892,6 +1244,9 @@ function filterVisualIgnore(nodes) {
     node.edges_data_flow = (node.edges_data_flow || []).filter(
       (edge) => !ignored.has(edge.target),
     );
+    node.edges_networking = (node.edges_networking || []).filter(
+      (edge) => !ignored.has(edge.target),
+    );
   }
 
   return nodes;
@@ -1906,6 +1261,7 @@ function cleanUpRoleLinks(nodes) {
     node.edges_existing ||= [];
     node.edges_new ||= [];
     node.edges_data_flow ||= [];
+    node.edges_networking ||= [];
 
     for (const [pathMatch, edgeExclude] of EDGE_FILTER_RULES) {
       if (!nodePath.includes(pathMatch)) {
@@ -1918,6 +1274,9 @@ function cleanUpRoleLinks(nodes) {
         (edge) => !edge.includes(edgeExclude),
       );
       node.edges_data_flow = node.edges_data_flow.filter(
+        (edge) => !edge.target.includes(edgeExclude),
+      );
+      node.edges_networking = node.edges_networking.filter(
         (edge) => !edge.target.includes(edgeExclude),
       );
     }
@@ -1940,6 +1299,7 @@ module.exports = {
   ensureEdgeLists,
   pruneRedundantStructuralEdges,
   buildDataFlowEdges,
+  buildNetworkingEdges,
   externalResources,
   deleteOrphanedNodes,
   omitNonAllowlistedDataSourceNodes,

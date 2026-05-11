@@ -24,6 +24,7 @@ const {
   omitGhostIamPolicyDocumentNodes,
   ensureEdgeLists,
   buildDataFlowEdges,
+  buildNetworkingEdges,
   externalResources,
   deleteOrphanedNodes,
   omitVpcPlumbingNodes,
@@ -189,9 +190,11 @@ app.post(
       // Re-normalize edge lists after external resource adjustments.
       nodes = ensureEdgeLists(nodes);
       writeDebugSnapshot("ensure-edge-lists-2", nodes);
-      // Infer directed data-flow edges between resources/data sources.
+      // Infer IAM semantic data-flow edges and SG networking edges.
       nodes = buildDataFlowEdges(nodes);
       writeDebugSnapshot("build-data-flow-edges", nodes);
+      nodes = buildNetworkingEdges(nodes);
+      writeDebugSnapshot("build-networking-edges", nodes);
       // Ensure edge lists are present before final pruning passes.
       nodes = ensureEdgeLists(nodes);
       writeDebugSnapshot("ensure-edge-lists-3", nodes);

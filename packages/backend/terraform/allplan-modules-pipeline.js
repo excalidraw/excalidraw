@@ -33,6 +33,7 @@ function runAllplanModulesPipeline() {
   nodes = pipeline.externalResources(nodes);
   nodes = pipeline.ensureEdgeLists(nodes);
   nodes = pipeline.buildDataFlowEdges(nodes);
+  nodes = pipeline.buildNetworkingEdges(nodes);
   nodes = pipeline.ensureEdgeLists(nodes);
   nodes = pipeline.omitGhostIamPolicyDocumentNodes(nodes);
   nodes.__networkingFacetStore = extractVpcNetworkingFacetStore(nodes);

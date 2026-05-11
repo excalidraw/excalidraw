@@ -71,11 +71,12 @@ import {
 
 import "./DefaultItems.scss";
 
-type TerraformEdgeLayer = "dependency" | "dataFlow";
+type TerraformEdgeLayer = "dependency" | "dataFlow" | "networking";
 
 const getTerraformEdgeLayer = (element: { customData?: Record<string, any> }) =>
   element.customData?.terraformEdgeLayer === "dependency" ||
-  element.customData?.terraformEdgeLayer === "dataFlow"
+  element.customData?.terraformEdgeLayer === "dataFlow" ||
+  element.customData?.terraformEdgeLayer === "networking"
     ? element.customData.terraformEdgeLayer
     : null;
 
@@ -339,6 +340,9 @@ export const TerraformLayers = () => {
       <DropdownMenuSub.Content>
         <TerraformLayerItem layer="dependency">
           Dependency edges
+        </TerraformLayerItem>
+        <TerraformLayerItem layer="networking">
+          Networking edges
         </TerraformLayerItem>
         <TerraformLayerItem layer="dataFlow">
           Data flow edges

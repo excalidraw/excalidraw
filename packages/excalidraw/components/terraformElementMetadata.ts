@@ -23,7 +23,8 @@ export const isTerraformLayerEdge = (
   element: ExcalidrawElement | NonDeletedExcalidrawElement,
 ) =>
   element.customData?.terraformEdgeLayer === "dependency" ||
-  element.customData?.terraformEdgeLayer === "dataFlow";
+  element.customData?.terraformEdgeLayer === "dataFlow" ||
+  element.customData?.terraformEdgeLayer === "networking";
 
 export const isTerraformInspectableElement = (
   element: ExcalidrawElement | NonDeletedExcalidrawElement | null,
