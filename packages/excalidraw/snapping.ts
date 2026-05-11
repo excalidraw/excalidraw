@@ -817,32 +817,7 @@ const filterPointSnapsToNearestCluster = (
       continue;
     }
 
-    if (offsetSnaps.length < 2) {
-      offsetSnaps.forEach((snap) => keptPointSnaps.add(snap));
-      continue;
-    }
-
-    const sortedSnaps = offsetSnaps
-      .slice()
-      .sort((a, b) => a.visualDistance - b.visualDistance);
-
-    let keepUntil = sortedSnaps.length;
-
-    // This runs after the winning snap offset is known. A big visual-distance
-    // gap means references after it belong to a separate, farther cluster.
-    for (let i = 1; i < sortedSnaps.length; i++) {
-      const distanceGap =
-        sortedSnaps[i].visualDistance - sortedSnaps[i - 1].visualDistance;
-
-      if (distanceGap > clusterBreakDistance) {
-        keepUntil = i;
-        break;
-      }
-    }
-
-    for (let i = 0; i < keepUntil; i++) {
-      keptPointSnaps.add(sortedSnaps[i]);
-    }
+    offsetSnaps.forEach((snap) => keptPointSnaps.add(snap));
   }
 
   let writeIndex = 0;
@@ -1128,23 +1103,19 @@ type OuterSnapLineCoordinateRange = {
 };
 
 /**
- * Only center-to-center snaps count as center snaplines for redundancy. A
- * center-to-outer snap still explains an outer edge or midpoint alignment.
- */
-const isCenterToCenterSnap = (snap: PointSnap) => {
-  return snap.pointTypes.every((pointType) => pointType === "center");
-};
-
-/**
  * Describes which snap source pair produced a rendered point snapline, so later
  * filtering can reason about redundancy without mixing unrelated references.
+ * Only center-to-center snaps count as center snaplines; a center-to-outer snap
+ * still explains an outer edge or midpoint alignment.
  */
 const getPointSnapLineSourcePair = (
   snap: PointSnap,
 ): PointSnapLineSourcePair => {
   return {
     snapSourcePairKey: snap.snapSourceIds.join("->"),
-    pointType: isCenterToCenterSnap(snap) ? "center" : "outer",
+    pointType: snap.pointTypes.every((pointType) => pointType === "center")
+      ? "center"
+      : "outer",
   };
 };
 

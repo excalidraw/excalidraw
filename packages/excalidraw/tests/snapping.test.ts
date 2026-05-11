@@ -19,7 +19,11 @@ import {
 
 import { API } from "./helpers/api";
 
-import type { AppClassProperties, AppState } from "../types";
+import type {
+  AppClassProperties,
+  AppState,
+  NormalizedZoomValue,
+} from "../types";
 
 type ReferenceSnapPoints = NonNullable<
   ReturnType<typeof SnapCache.getReferenceSnapPoints>
@@ -94,6 +98,27 @@ const getHorizontalPointSnapLineMaxX = (
   }
 
   return horizontalSnapLine.points[horizontalSnapLine.points.length - 1][0];
+};
+
+const getHorizontalPointSnapLineXRange = (
+  snapLines: ReturnType<typeof snapDraggedElements>["snapLines"],
+) => {
+  const horizontalSnapLine = snapLines
+    .filter((snapLine) => snapLine.type === "points")
+    .find((snapLine) => {
+      const [firstPoint, lastPoint] = snapLine.points;
+
+      return firstPoint[1] === lastPoint[1];
+    });
+
+  if (!horizontalSnapLine) {
+    return null;
+  }
+
+  return [
+    horizontalSnapLine.points[0][0],
+    horizontalSnapLine.points[horizontalSnapLine.points.length - 1][0],
+  ] as const;
 };
 
 const getHorizontalGapSnapLines = (
@@ -561,7 +586,7 @@ describe("snapping", () => {
     }
   });
 
-  it("prefers the nearest visual cluster for same-offset point snaps", () => {
+  it("keeps same-offset point snaps even across distant references", () => {
     const selected = API.createElement({
       type: "rectangle",
       id: "selected",
@@ -596,7 +621,7 @@ describe("snapping", () => {
       arrayToMap(elements),
     );
 
-    expect(getHorizontalPointSnapLineMaxX(snapLines)).toBe(220);
+    expect(getHorizontalPointSnapLineMaxX(snapLines)).toBe(900);
   });
 
   it("prefers a nearby point snap over a slightly better far offset", () => {
@@ -679,6 +704,46 @@ describe("snapping", () => {
     );
 
     expect(getHorizontalPointSnapLineMaxX(snapLines)).toBe(500);
+  });
+
+  it("keeps same-source same-offset point snaps across zoom-scaled cluster breaks", () => {
+    const reference = API.createElement({
+      type: "rectangle",
+      id: "reference",
+      x: 0,
+      y: 0,
+      width: 140.1015625,
+      height: 140.1015625,
+    });
+    const selected = API.createElement({
+      type: "rectangle",
+      id: "selected",
+      x: 338.608871112217,
+      y: 0,
+      width: 140.1015625,
+      height: 140.1015625,
+    });
+    const elements = [reference, selected];
+    const app = createSnappingApp({
+      selectedElementIds: { [selected.id]: true },
+      zoom: { value: 1.5 as NormalizedZoomValue },
+    });
+
+    primeReferenceSnapPoints(elements, [selected]);
+
+    const { snapLines } = snapDraggedElements(
+      elements,
+      { x: 0, y: 0 },
+      app,
+      NO_MODIFIER_KEYS,
+      arrayToMap(elements),
+    );
+
+    const range = getHorizontalPointSnapLineXRange(snapLines);
+
+    expect(range).not.toBe(null);
+    expect(range![0]).toBeCloseTo(reference.x, 6);
+    expect(range![1]).toBeCloseTo(selected.x + selected.width, 6);
   });
 
   it("renders gap snaplines when rounded bounds touch the reference gap overlap", () => {
