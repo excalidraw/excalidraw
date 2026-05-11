@@ -543,7 +543,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     assertTopologyFramesContainChildren(elements);
   });
 
-  it("places Lambda IAM satellites left of center and SG column right, with rules under SG", async () => {
+  it("places Lambda IAM stack (tier-1 role, tier-2 policies) and SG column with tier-2 rules", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,
       accounts: new Map([
@@ -687,19 +687,34 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
 
     const lambda = rectByPath("aws_lambda_function.fn");
     const role = rectByPath("aws_iam_role.fn_role");
+    const policy = rectByPath("aws_iam_role_policy.logs");
     const sg = rectByPath("aws_security_group.app");
     const rule = rectByPath("aws_vpc_security_group_ingress_rule.ssh");
-    expect(lambda && role && sg && rule).toBeTruthy();
+    expect(lambda && role && policy && sg && rule).toBeTruthy();
+
+    expect(lambda!.width).toBe(200);
+    expect(lambda!.height).toBe(88);
+
+    expect(role!.x).toBe(lambda!.x);
+    expect(role!.width).toBe(176);
+    expect(role!.height).toBe(52);
+
+    expect(policy!.width).toBe(154);
+    expect(policy!.height).toBeLessThanOrEqual((role!.height ?? 0));
+    expect(policy!.y).toBeGreaterThanOrEqual(role!.y + (role!.height ?? 0) - 2);
 
     const lambdaMid = lambda!.x + (lambda!.width ?? 0) / 2;
-    const roleMid = role!.x + (role!.width ?? 0) / 2;
     const sgMid = sg!.x + (sg!.width ?? 0) / 2;
-    expect(roleMid).toBeLessThan(lambdaMid);
     expect(sgMid).toBeGreaterThan(lambdaMid);
 
     const roleRight = role!.x + (role!.width ?? 0);
-    expect(sg!.x - roleRight).toBeGreaterThanOrEqual(6);
+    expect(sg!.x - roleRight).toBe(8);
 
+    expect(sg!.width).toBe(176);
+    expect(sg!.height).toBe(52);
+
+    expect(rule!.width).toBe(154);
+    expect(rule!.height).toBeLessThanOrEqual((sg!.height ?? 0));
     expect(rule!.y).toBeGreaterThanOrEqual(sg!.y + (sg!.height ?? 0) - 2);
 
     const rels = elements
