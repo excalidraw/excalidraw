@@ -120,6 +120,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     expect(meta.regionalPrimaryCount).toBe(0);
     expect(meta.vpcEndpointCount).toBe(0);
     expect(meta.routeTableCount).toBe(0);
+    expect(meta.dependencyEdgeCount).toBe(0);
     expect(elements.length).toBeGreaterThan(0);
     assertTopologyFramesContainChildren(elements);
   });
@@ -256,6 +257,102 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     ).toBe(true);
 
     assertTopologyFramesContainChildren(elements);
+  });
+
+  it("emits dependency edges between placed primaries using merged edges_new", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-test",
+                      {
+                        vpcId: "vpc-test",
+                        subnets: new Map([
+                          ["subnet-a", { subnetId: "subnet-a" }],
+                          ["subnet-b", { subnetId: "subnet-b" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-test",
+        subnetSignature: "subnet-a|subnet-b",
+        subnetIds: ["subnet-a", "subnet-b"],
+        addresses: ["aws_s3_bucket.a", "aws_s3_bucket.b"],
+      },
+    ];
+
+    const nodes: TerraformPlanNodesMap = {
+      "aws_s3_bucket.a": {
+        resources: {
+          "aws_s3_bucket.a": {
+            address: "aws_s3_bucket.a",
+            mode: "managed",
+            type: "aws_s3_bucket",
+            change: { actions: ["no-op"] },
+          },
+        },
+        edges_new: ["aws_s3_bucket.b"],
+        edges_existing: [],
+      },
+      "aws_s3_bucket.b": {
+        resources: {
+          "aws_s3_bucket.b": {
+            address: "aws_s3_bucket.b",
+            mode: "managed",
+            type: "aws_s3_bucket",
+            change: { actions: ["no-op"] },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+      },
+    };
+
+    const { elements, meta } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      nodes,
+    );
+
+    expect(meta.dependencyEdgeCount).toBe(1);
+    expect(meta.primaryResourceCount).toBe(2);
+
+    const dependencyLines = elements.filter(
+      (e) =>
+        e.type === "line" &&
+        (e.customData as { terraformEdgeLayer?: string } | undefined)
+          ?.terraformEdgeLayer === "dependency",
+    );
+    expect(dependencyLines.length).toBeGreaterThanOrEqual(1);
+    const rel = dependencyLines[0]!.customData?.relationship as {
+      source?: string;
+      target?: string;
+    };
+    expect(rel?.source).toBe("aws_s3_bucket.a");
+    expect(rel?.target).toBe("aws_s3_bucket.b");
   });
 
   it("renders aws_vpc_endpoint egress tiles straddling VPC bottom with meta count", async () => {
