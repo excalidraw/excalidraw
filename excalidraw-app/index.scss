@@ -157,6 +157,11 @@
 }
 
 .theme--dark {
+  .plus-canvas {
+    &:hover {
+      color: black !important;
+    }
+  }
   .plus-banner {
     &:hover {
       color: black !important;
