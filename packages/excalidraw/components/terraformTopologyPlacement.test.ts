@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { extractVpcEndpointsByVpc } from "./terraformTopologyPlacement";
+import {
+  computeRouteTableBottomEdgePlacements,
+  extractRouteTablesByVpc,
+  extractVpcEndpointsByVpc,
+} from "./terraformTopologyPlacement";
+import type { TopologyPlacementZone } from "./terraformTopologyPlacement";
 
 describe("extractVpcEndpointsByVpc", () => {
   it("groups managed aws_vpc_endpoint by account, region, vpc_id and sorts by service_name then address", () => {
@@ -103,5 +108,211 @@ describe("extractVpcEndpointsByVpc", () => {
       ],
     };
     expect(extractVpcEndpointsByVpc(plan)).toHaveLength(0);
+  });
+});
+
+describe("extractRouteTablesByVpc", () => {
+  it("groups managed aws_route_table by vpc_id and sorts by tag Name then address", () => {
+    const plan = {
+      resource_changes: [
+        {
+          address: "module.vpc.aws_route_table.private",
+          mode: "managed",
+          type: "aws_route_table",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              arn: "arn:aws:ec2:us-east-1:111111111111:route-table/rtb-private",
+              vpc_id: "vpc-aaa",
+              region: "us-east-1",
+              id: "rtb-private",
+              tags: { Name: "private-rt" },
+            },
+          },
+        },
+        {
+          address: "module.vpc.aws_route_table.public",
+          mode: "managed",
+          type: "aws_route_table",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              arn: "arn:aws:ec2:us-east-1:111111111111:route-table/rtb-public",
+              vpc_id: "vpc-aaa",
+              region: "us-east-1",
+              id: "rtb-public",
+              tags: { Name: "public-rt" },
+            },
+          },
+        },
+        {
+          address: "module.vpc.aws_route_table_association.a",
+          mode: "managed",
+          type: "aws_route_table_association",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              subnet_id: "subnet-1",
+              route_table_id: "rtb-private",
+            },
+          },
+        },
+      ],
+    };
+
+    const buckets = extractRouteTablesByVpc(plan);
+    expect(buckets).toHaveLength(1);
+    expect(buckets[0]!.vpcId).toBe("vpc-aaa");
+    expect(buckets[0]!.addresses).toEqual([
+      "module.vpc.aws_route_table.private",
+      "module.vpc.aws_route_table.public",
+    ]);
+  });
+});
+
+describe("computeRouteTableBottomEdgePlacements", () => {
+  const baseZones = (
+    extra: TopologyPlacementZone[],
+  ): readonly TopologyPlacementZone[] => [
+    {
+      accountId: "111111111111",
+      region: "us-east-1",
+      vpcId: "vpc-aaa",
+      subnetSignature: "subnet-a",
+      subnetIds: ["subnet-a"],
+      addresses: ["aws_lambda_function.a"],
+    },
+    ...extra,
+  ];
+
+  it("places route table on the narrowest subnet zone when association subnets fit one zone", () => {
+    const zones = baseZones([
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-aaa",
+        subnetSignature: "subnet-a|subnet-b",
+        subnetIds: ["subnet-a", "subnet-b"],
+        addresses: ["aws_lambda_function.b"],
+      },
+    ]);
+    const plan = {
+      resource_changes: [
+        {
+          address: "aws_route_table.rt",
+          mode: "managed",
+          type: "aws_route_table",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              arn: "arn:aws:ec2:us-east-1:111111111111:route-table/rtb-1",
+              vpc_id: "vpc-aaa",
+              region: "us-east-1",
+              id: "rtb-1",
+            },
+          },
+        },
+        {
+          address: "aws_route_table_association.assoc",
+          mode: "managed",
+          type: "aws_route_table_association",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              subnet_id: "subnet-a",
+              route_table_id: "rtb-1",
+            },
+          },
+        },
+      ],
+    };
+
+    const { zoneBottom, vpcBottom } = computeRouteTableBottomEdgePlacements(
+      zones,
+      plan,
+    );
+    expect(vpcBottom).toHaveLength(0);
+    expect(zoneBottom).toHaveLength(1);
+    expect(zoneBottom[0]!.subnetSignature).toBe("subnet-a");
+    expect(zoneBottom[0]!.addresses).toEqual(["aws_route_table.rt"]);
+  });
+
+  it("falls back to VPC bottom when associated subnets are not contained in a single zone", () => {
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-aaa",
+        subnetSignature: "subnet-a",
+        subnetIds: ["subnet-a"],
+        addresses: ["aws_lambda_function.a"],
+      },
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-aaa",
+        subnetSignature: "subnet-b",
+        subnetIds: ["subnet-b"],
+        addresses: ["aws_lambda_function.b"],
+      },
+    ];
+    const plan = {
+      resource_changes: [
+        {
+          address: "aws_route_table.rt",
+          mode: "managed",
+          type: "aws_route_table",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              arn: "arn:aws:ec2:us-east-1:111111111111:route-table/rtb-1",
+              vpc_id: "vpc-aaa",
+              region: "us-east-1",
+              id: "rtb-1",
+            },
+          },
+        },
+        {
+          address: "aws_route_table_association.assoc",
+          mode: "managed",
+          type: "aws_route_table_association",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              subnet_id: "subnet-a",
+              route_table_id: "rtb-1",
+            },
+          },
+        },
+        {
+          address: "aws_route_table_association.assoc2",
+          mode: "managed",
+          type: "aws_route_table_association",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              subnet_id: "subnet-b",
+              route_table_id: "rtb-1",
+            },
+          },
+        },
+      ],
+    };
+
+    const { zoneBottom, vpcBottom } = computeRouteTableBottomEdgePlacements(
+      zones,
+      plan,
+    );
+    expect(zoneBottom).toHaveLength(0);
+    expect(vpcBottom).toHaveLength(1);
+    expect(vpcBottom[0]!.addresses).toEqual(["aws_route_table.rt"]);
   });
 });

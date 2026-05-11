@@ -47,7 +47,7 @@ locals {
     owner       = "terraform-graph-demo"
   }
 }
-
+/*
 module "application_data_bucket" {
   source = "./modules/encrypted_s3_bucket"
 
@@ -150,7 +150,7 @@ module "workload_writer_lambda" {
 }
 
 # --- Lambda: monitoring (mock/no-op) ---
-/*
+
 module "workload_monitoring_lambda" {
   source = "./modules/lambda_service"
 
@@ -177,7 +177,7 @@ module "workload_monitoring_lambda" {
       resources = ["${module.lambda_deployment_artifacts.s3_bucket_arn}/${aws_s3_object.lambda_deployment_package.key}"]
     }
   }
-}*/
+}
 
 # --- Lambda: reader ---
 
@@ -239,4 +239,4 @@ module "workload_reader_lambda" {
       resources = [module.application_job_queue.kms_key_arn]
     }
   }
-}
+}*/

@@ -615,6 +615,21 @@ export function mergeTopologyModelWithVpcEndpoints(
   }
 }
 
+/** Ensures VPC shells exist for `aws_route_table` buckets. */
+export function mergeTopologyModelWithRouteTables(
+  model: TerraformTopologyModel,
+  buckets: readonly { accountId: string; region: string; vpcId: string }[],
+): void {
+  for (const b of buckets) {
+    if (!shouldEmitTopologyPlacement(b.accountId, b.region)) {
+      continue;
+    }
+    const acc = ensureAccount(model, b.accountId);
+    const reg = ensureRegion(acc, b.region);
+    ensureVpc(reg, b.vpcId);
+  }
+}
+
 function ingestVpcSubnetPair(
   model: TerraformTopologyModel,
   subnetToVpc: Map<string, string>,
