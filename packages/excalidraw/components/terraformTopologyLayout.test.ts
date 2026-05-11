@@ -254,10 +254,31 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
         (e.customData as { terraformVisibilityRole?: string } | undefined)
           ?.terraformVisibilityRole === "resource",
     );
-    expect(rects.length).toBeGreaterThan(0);
-    expect(
-      rects.some((r) => zoneFrames.some((zf) => zf.id === r.frameId)),
-    ).toBe(true);
+    const primaryClusterFrames = elements.filter(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "primaryCluster",
+    );
+    expect(primaryClusterFrames.length).toBeGreaterThan(0);
+    const zoneFrameIds = new Set(zoneFrames.map((z) => z.id));
+    for (const cf of primaryClusterFrames) {
+      expect(zoneFrameIds.has(cf.frameId ?? "")).toBe(true);
+    }
+    const clusterIds = new Set(primaryClusterFrames.map((c) => c.id));
+    for (const r of rects) {
+      const topoRole = (
+        r.customData as { terraformTopologyRole?: string } | undefined
+      )?.terraformTopologyRole;
+      if (
+        topoRole === "vpcRouteTable" ||
+        topoRole === "subnetZoneRouteTable" ||
+        topoRole === "vpcEgressEndpoint"
+      ) {
+        continue;
+      }
+      expect(r.frameId && clusterIds.has(r.frameId)).toBe(true);
+    }
 
     assertTopologyFramesContainChildren(elements);
   });
@@ -814,6 +835,18 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     const rule = rectByPath("aws_vpc_security_group_ingress_rule.ssh");
     expect(lambda && role && policy && sg && rule).toBeTruthy();
 
+    const clusterId = lambda!.frameId;
+    expect(clusterId).toBeTruthy();
+    expect(role!.frameId).toBe(clusterId);
+    expect(policy!.frameId).toBe(clusterId);
+    expect(sg!.frameId).toBe(clusterId);
+    expect(rule!.frameId).toBe(clusterId);
+    const clusterFrame = elements.find((e) => e.type === "frame" && e.id === clusterId);
+    expect(
+      (clusterFrame?.customData as { terraformTopologyRole?: string } | undefined)
+        ?.terraformTopologyRole,
+    ).toBe("primaryCluster");
+
     expect(lambda!.width).toBe(200);
     expect(lambda!.height).toBe(88);
 
@@ -1224,7 +1257,16 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
           ?.terraformVisibilityRole === "resource",
     );
     expect(rects.length).toBe(1);
-    expect(rects[0]!.frameId).toBe(regionalFrames[0]!.id);
+
+    const primaryClusterFrames = elements.filter(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "primaryCluster",
+    );
+    expect(primaryClusterFrames.length).toBe(1);
+    expect(rects[0]!.frameId).toBe(primaryClusterFrames[0]!.id);
+    expect(primaryClusterFrames[0]!.frameId).toBe(regionalFrames[0]!.id);
 
     assertTopologyFramesContainChildren(elements);
   });
@@ -1310,6 +1352,14 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     const policyRect = rectByPath("aws_kms_key_policy.main");
     expect(keyRect && policyRect).toBeTruthy();
     expect(policyRect!.y).toBeGreaterThanOrEqual(keyRect!.y);
+    expect(keyRect!.frameId).toBe(policyRect!.frameId);
+    const kmsCluster = elements.find(
+      (e) => e.type === "frame" && e.id === keyRect!.frameId,
+    );
+    expect(
+      (kmsCluster?.customData as { terraformTopologyRole?: string } | undefined)
+        ?.terraformTopologyRole,
+    ).toBe("primaryCluster");
 
     const kmsEdge = elements
       .filter(

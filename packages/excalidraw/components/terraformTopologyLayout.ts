@@ -170,10 +170,14 @@ export type TerraformTopologyRole =
   | "region"
   | "vpc"
   | "subnetZone"
-  | "regionalServices";
+  | "regionalServices"
+  | "primaryCluster";
 
 function skeletonId(
-  role: Exclude<TerraformTopologyRole, "subnetZone" | "regionalServices">,
+  role: Exclude<
+    TerraformTopologyRole,
+    "subnetZone" | "regionalServices" | "primaryCluster"
+  >,
   accountId: string,
   region: string,
   vpcId: string | null,
@@ -205,12 +209,24 @@ function regionalServicesSkeletonId(accountId: string, region: string): string {
   return `${skeletonId("region", accountId, region, null)}:regional`;
 }
 
+/** Stable id for nested “primary + satellites” drag frame (must not equal a resource address). */
+function primaryClusterSkeletonId(primaryAddress: string): string {
+  return `tf-topo:primary-cluster:${encodeURIComponent(primaryAddress)}`;
+}
+
+const TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX = 10;
+
 function topologyPathFrame(
   role: TerraformTopologyRole,
   accountId: string,
   region: string,
   vpcId: string | null,
+  primaryAddress?: string | null,
 ): string[] {
+  if (role === "primaryCluster") {
+    const p = primaryAddress || "";
+    return vpcId ? [accountId, region, vpcId, p] : [accountId, region, p];
+  }
   if (role === "account") {
     return [accountId];
   }
@@ -235,14 +251,23 @@ function frameCustomData(
   region: string,
   vpcId: string | null,
   key: string,
-  extras?: { terraformSubnetIds?: string[] },
+  extras?: {
+    terraformSubnetIds?: string[];
+    terraformPrimaryAddress?: string;
+  },
 ) {
   return {
     terraform: true as const,
     terraformSemanticOverview: true as const,
     terraformTopologyRole: role,
     terraformTopologyKey: key,
-    terraformTopologyPath: topologyPathFrame(role, accountId, region, vpcId),
+    terraformTopologyPath: topologyPathFrame(
+      role,
+      accountId,
+      region,
+      vpcId,
+      extras?.terraformPrimaryAddress,
+    ),
     ...(extras?.terraformSubnetIds
       ? { terraformSubnetIds: extras.terraformSubnetIds }
       : {}),
@@ -1127,9 +1152,36 @@ function companionStackTileMetrics(
   };
 }
 
+function growClusterBounds(
+  prev: { minX: number; minY: number; maxX: number; maxY: number } | null,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): { minX: number; minY: number; maxX: number; maxY: number } {
+  const maxX = x + w;
+  const maxY = y + h;
+  if (!prev) {
+    return { minX: x, minY: y, maxX, maxY };
+  }
+  return {
+    minX: Math.min(prev.minX, x),
+    minY: Math.min(prev.minY, y),
+    maxX: Math.max(prev.maxX, maxX),
+    maxY: Math.max(prev.maxY, maxY),
+  };
+}
+
+type TopologyPrimaryClusterPlacement = {
+  accountId: string;
+  region: string;
+  vpcId: string | null;
+};
+
 /** Primary grid + top CloudWatch, bottom IAM / KMS policy (left) / SG (right) satellites and data-flow edges. */
 function appendTopologyResourceRectangles(
   skeleton: ExcalidrawElementSkeleton[],
+  placement: TopologyPrimaryClusterPlacement,
   addrs: readonly string[],
   contentOriginX: number,
   contentOriginY: number,
@@ -1144,7 +1196,7 @@ function appendTopologyResourceRectangles(
   satelliteLineSpecs: TopologySatelliteLineSpec[],
   plan?: unknown,
 ): string[] {
-  const rectIds: string[] = [];
+  const clusterFrameIds: string[] = [];
   const sorted = [...addrs].sort();
   const { cols: rcCols, rows: rcRows } = gridColsRows(sorted.length);
   const cellW = maxTopologyCellFootprintPx(sorted, nodes, arnIndex, plan);
@@ -1234,6 +1286,20 @@ function appendTopologyResourceRectangles(
     const rx = contentOriginX + rc * (cellW + RESOURCE_GAP);
     const ry = rowOriginY[rr]! + rowTopBase[rr]!;
 
+    const clusterChildIds: string[] = [];
+    let clusterBounds: { minX: number; minY: number; maxX: number; maxY: number } | null =
+      null;
+    const addClusterMember = (
+      id: string,
+      boxX: number,
+      boxY: number,
+      boxW: number,
+      boxH: number,
+    ) => {
+      clusterChildIds.push(id);
+      clusterBounds = growClusterBounds(clusterBounds, boxX, boxY, boxW, boxH);
+    };
+
     const node = nodes[addr] as TerraformPlanGraphNode | undefined;
     const resourceType = getTerraformResourceTypeFromNodePath(addr);
     const action = getTerraformPlanNodeAction(node);
@@ -1242,7 +1308,7 @@ function appendTopologyResourceRectangles(
       action,
     );
 
-    rectIds.push(addr);
+    addClusterMember(addr, rx, ry, RESOURCE_RECT_W, RESOURCE_RECT_H);
     pushResourceRectangleSkeleton(
       skeleton,
       addr,
@@ -1336,7 +1402,7 @@ function appendTopologyResourceRectangles(
       for (const alarmPath of cloudWatchBuild.cluster.alarms) {
         if (!globalPlacedCloudWatchSatellites.has(alarmPath)) {
           globalPlacedCloudWatchSatellites.add(alarmPath);
-          rectIds.push(alarmPath);
+          addClusterMember(alarmPath, alarmX, yAlarm, alarmW, TOPOLOGY_TIER1_H);
           pushResourceRectangleSkeleton(
             skeleton,
             alarmPath,
@@ -1359,7 +1425,13 @@ function appendTopologyResourceRectangles(
       for (const logGroupPath of cloudWatchBuild.cluster.logGroups) {
         if (!globalPlacedCloudWatchSatellites.has(logGroupPath)) {
           globalPlacedCloudWatchSatellites.add(logGroupPath);
-          rectIds.push(logGroupPath);
+          addClusterMember(
+            logGroupPath,
+            logGroupX,
+            yLogGroup,
+            logGroupW,
+            TOPOLOGY_TIER1_H,
+          );
           pushResourceRectangleSkeleton(
             skeleton,
             logGroupPath,
@@ -1398,7 +1470,7 @@ function appendTopologyResourceRectangles(
           continue;
         }
         globalPlacedIamSatellites.add(satAddr);
-        rectIds.push(satAddr);
+        addClusterMember(satAddr, tileX, yLeft, tileW, tileH);
         pushResourceRectangleSkeleton(
           skeleton,
           satAddr,
@@ -1428,7 +1500,7 @@ function appendTopologyResourceRectangles(
           continue;
         }
         globalPlacedKmsPolicySatellites.add(policyPath);
-        rectIds.push(policyPath);
+        addClusterMember(policyPath, satXKms, yLeft, iamW, TOPOLOGY_TIER1_H);
         pushResourceRectangleSkeleton(
           skeleton,
           policyPath,
@@ -1459,7 +1531,13 @@ function appendTopologyResourceRectangles(
           continue;
         }
         globalPlacedS3Satellites.add(satAddr);
-        rectIds.push(satAddr);
+        addClusterMember(
+          satAddr,
+          satXS3 + m.tileXOffset,
+          yLeft,
+          m.tileW,
+          m.tileH,
+        );
         pushResourceRectangleSkeleton(
           skeleton,
           satAddr,
@@ -1493,7 +1571,7 @@ function appendTopologyResourceRectangles(
 
         if (!globalPlacedSgSatellites.has(group.sgPath)) {
           globalPlacedSgSatellites.add(group.sgPath);
-          rectIds.push(group.sgPath);
+          addClusterMember(group.sgPath, satXRight, yRight, sgW, TOPOLOGY_TIER1_H);
           pushResourceRectangleSkeleton(
             skeleton,
             group.sgPath,
@@ -1514,7 +1592,13 @@ function appendTopologyResourceRectangles(
         for (const rulePath of group.rules) {
           if (!globalPlacedSgSatellites.has(rulePath)) {
             globalPlacedSgSatellites.add(rulePath);
-            rectIds.push(rulePath);
+            addClusterMember(
+              rulePath,
+              ruleTileX,
+              yRight,
+              TOPOLOGY_TIER2_W,
+              TOPOLOGY_TIER2_H,
+            );
             pushResourceRectangleSkeleton(
               skeleton,
               rulePath,
@@ -1550,7 +1634,13 @@ function appendTopologyResourceRectangles(
           continue;
         }
         globalPlacedSqsSatellites.add(satAddr);
-        rectIds.push(satAddr);
+        addClusterMember(
+          satAddr,
+          satXRight + m.tileXOffset,
+          yRight,
+          m.tileW,
+          m.tileH,
+        );
         pushResourceRectangleSkeleton(
           skeleton,
           satAddr,
@@ -1568,9 +1658,32 @@ function appendTopologyResourceRectangles(
         yRight += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
       }
     }
+
+    const pad = TOPOLOGY_PRIMARY_CLUSTER_FRAME_PAD_PX;
+    const b = clusterBounds!;
+    const clusterSkId = primaryClusterSkeletonId(addr);
+    skeleton.push({
+      type: "frame",
+      id: clusterSkId,
+      name: shortTerraformResourceLabel(addr).slice(0, 48),
+      x: b.minX - pad,
+      y: b.minY - pad,
+      width: b.maxX - b.minX + 2 * pad,
+      height: b.maxY - b.minY + 2 * pad,
+      children: clusterChildIds as readonly string[],
+      customData: frameCustomData(
+        "primaryCluster",
+        placement.accountId,
+        placement.region,
+        placement.vpcId,
+        clusterSkId,
+        { terraformPrimaryAddress: addr },
+      ),
+    });
+    clusterFrameIds.push(clusterSkId);
   }
 
-  return rectIds;
+  return clusterFrameIds;
 }
 
 /**
@@ -1912,6 +2025,7 @@ export async function buildTerraformTopologyExcalidrawScene(
 
         const regionalRectIds = appendTopologyResourceRectangles(
           skeleton,
+          { accountId, region: regionName, vpcId: null },
           regionalAddrs,
           regX + INNER_PAD,
           regY + VPC_TOP_PAD,
@@ -2117,6 +2231,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           const addrs = [...z.addresses].sort();
           const rectIds = appendTopologyResourceRectangles(
             skeleton,
+            { accountId, region: regionName, vpcId },
             addrs,
             zoneX + INNER_PAD,
             zoneY + VPC_TOP_PAD,
