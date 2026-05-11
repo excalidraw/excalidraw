@@ -164,6 +164,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
       },
     ];
 
+    const roleArn = "arn:aws:iam::111111111111:role/tf-topo-test-role";
     const nodes: TerraformPlanNodesMap = {
       "aws_lambda_function.fn": {
         resources: {
@@ -171,6 +172,37 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
             address: "aws_lambda_function.fn",
             mode: "managed",
             type: "aws_lambda_function",
+            change: {
+              actions: ["update"],
+              after: { role: roleArn },
+            },
+          },
+        },
+      },
+      "aws_iam_role.fn_role": {
+        resources: {
+          "aws_iam_role.fn_role": {
+            address: "aws_iam_role.fn_role",
+            mode: "managed",
+            type: "aws_iam_role",
+            name: "fn_role",
+            change: {
+              actions: ["no-op"],
+              after: { arn: roleArn, name: "fn_role" },
+            },
+          },
+        },
+      },
+      "aws_iam_role_policy.logs": {
+        resources: {
+          "aws_iam_role_policy.logs": {
+            address: "aws_iam_role_policy.logs",
+            mode: "managed",
+            type: "aws_iam_role_policy",
+            change: {
+              actions: ["no-op"],
+              after: { role: "fn_role", name: "logs" },
+            },
           },
         },
       },
@@ -185,6 +217,20 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
 
     expect(meta.primaryResourceCount).toBe(1);
     expect(meta.regionalPrimaryCount).toBe(0);
+
+    const dataFlowEdges = elements.filter(
+      (e) =>
+        e.type === "line" &&
+        (e.customData as { terraformEdgeLayer?: string } | undefined)
+          ?.terraformEdgeLayer === "dataFlow",
+    );
+    expect(dataFlowEdges.length).toBeGreaterThan(0);
+    const rel = dataFlowEdges[0]!.customData?.relationship as {
+      source?: string;
+      target?: string;
+    };
+    expect(rel?.source).toBe("aws_lambda_function.fn");
+    expect(rel?.target).toBe("aws_iam_role.fn_role");
 
     const zoneFrames = elements.filter(
       (e) =>
