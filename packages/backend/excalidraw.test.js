@@ -265,7 +265,7 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
     );
 
     expect(dependencyLine).toMatchObject({
-      type: "line",
+      type: "arrow",
       startArrowhead: null,
       endArrowhead: "arrow",
       customData: {
@@ -275,7 +275,7 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
       },
     });
     expect(dataFlowLine).toMatchObject({
-      type: "line",
+      type: "arrow",
       strokeColor: "#868e96",
       strokeWidth: 3,
       startArrowhead: null,
@@ -395,7 +395,7 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
 
     expect(dataFlowLines).toHaveLength(1);
     expect(dataFlowLines[0]).toMatchObject({
-      type: "line",
+      type: "arrow",
       startArrowhead: "arrow",
       endArrowhead: "arrow",
       customData: {

@@ -340,6 +340,13 @@ const collectTerraformResourceRects = (
     if (customData.terraformVisibilityRole !== "resource") {
       continue;
     }
+    // Detached card labels mirror `terraformVisibilityKey` / role from the rectangle
+    // (`mirrorAndDetachTerraformResourceLabels`). Only **card** shapes may anchor edges;
+    // otherwise the map keeps the last matching element (often text) and bindings
+    // miss drags on the rectangle.
+    if (element.type !== "rectangle") {
+      continue;
+    }
     const key = getTerraformVisibilityKey(element);
     if (key) {
       rects.set(key, element);
@@ -351,16 +358,29 @@ const collectTerraformResourceRects = (
 // --- Arrow geometry (mirrors backend binding math for client-side updates) ---
 
 /**
- * Recomputes Terraform dependency / data-flow line geometry and orbit bindings from
- * current resource rectangle positions. Call after visibility toggles so edges stay
- * attached when soft-delete temporarily cleared edge bindings.
+ * Recomputes Terraform dependency / data-flow / networking edge geometry and orbit
+ * bindings from current resource rectangle positions. Call after visibility toggles
+ * so edges stay attached when soft-delete temporarily cleared edge bindings.
  */
 export const repairTerraformEdgeBindings = (
   elements: readonly ExcalidrawElement[],
 ): ExcalidrawElement[] => {
-  const resourceRects = collectTerraformResourceRects(elements);
+  /** Legacy scenes used `line`; Excalidraw binding updates only run for `arrow`. */
+  const normalizedElements = elements.map((element) => {
+    if (
+      getTerraformEdgeLayer(element) &&
+      isLinearElement(element) &&
+      element.type === "line" &&
+      (element.startBinding ?? element.endBinding)
+    ) {
+      return newElementWith(element, { type: "arrow" });
+    }
+    return element;
+  });
+
+  const resourceRects = collectTerraformResourceRects(normalizedElements);
   const structuralDependencyPairKeys =
-    collectTerraformStructuralDependencyPairKeys(elements);
+    collectTerraformStructuralDependencyPairKeys(normalizedElements);
 
   const boundEdgeIdsByRect = new Map<string, Set<string>>();
 
@@ -373,7 +393,7 @@ export const repairTerraformEdgeBindings = (
     set.add(edgeId);
   };
 
-  const updated = elements.map((element) => {
+  const updated = normalizedElements.map((element) => {
     const layer = getTerraformEdgeLayer(element);
     if (
       !layer ||

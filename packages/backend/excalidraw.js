@@ -1334,7 +1334,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
 
     edgeElements.push(
       makeBaseElement({
-        type: "line",
+        type: "arrow",
         id: edgeId,
         x: startX,
         y: startY,
@@ -1419,7 +1419,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
 
     edgeElements.push(
       makeBaseElement({
-        type: "line",
+        type: "arrow",
         id: edgeId,
         x: startX,
         y: startY,
@@ -1523,7 +1523,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
 
     edgeElements.push(
       makeBaseElement({
-        type: "line",
+        type: "arrow",
         id: edgeId,
         x: startX,
         y: startY,
@@ -1627,7 +1627,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
 
     edgeElements.push(
       makeBaseElement({
-        type: "line",
+        type: "arrow",
         id: edgeId,
         x: startX,
         y: startY,

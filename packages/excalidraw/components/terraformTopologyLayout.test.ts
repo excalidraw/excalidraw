@@ -228,7 +228,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
 
     const dataFlowEdges = elements.filter(
       (e) =>
-        e.type === "line" &&
+        e.type === "arrow" &&
         (e.customData as { terraformEdgeLayer?: string } | undefined)
           ?.terraformEdgeLayer === "dataFlow",
     );
@@ -345,7 +345,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
 
     const dependencyLines = elements.filter(
       (e) =>
-        e.type === "line" &&
+        e.type === "arrow" &&
         (e.customData as { terraformEdgeLayer?: string } | undefined)
           ?.terraformEdgeLayer === "dependency",
     );
@@ -356,6 +356,24 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     };
     expect(rel?.source).toBe("aws_s3_bucket.a");
     expect(rel?.target).toBe("aws_s3_bucket.b");
+
+    const sourceRect = elements.find(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { terraformVisibilityKey?: string } | undefined)
+          ?.terraformVisibilityKey === rel?.source,
+    );
+    const targetRect = elements.find(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { terraformVisibilityKey?: string } | undefined)
+          ?.terraformVisibilityKey === rel?.target,
+    );
+    const edge = dependencyLines[0]!;
+    expect(sourceRect).toBeDefined();
+    expect(targetRect).toBeDefined();
+    expect(edge.startBinding?.elementId).toBe(sourceRect!.id);
+    expect(edge.endBinding?.elementId).toBe(targetRect!.id);
   });
 
   it("renders aws_vpc_endpoint egress tiles on VPC body bottom with meta count", async () => {
@@ -824,7 +842,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     const rels = elements
       .filter(
         (e) =>
-          e.type === "line" &&
+          e.type === "arrow" &&
           (e.customData as { terraformEdgeLayer?: string } | undefined)
             ?.terraformEdgeLayer === "dataFlow",
       )
@@ -1002,7 +1020,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     const rels = elements
       .filter(
         (e) =>
-          e.type === "line" &&
+          e.type === "arrow" &&
           (e.customData as { terraformEdgeLayer?: string } | undefined)
             ?.terraformEdgeLayer === "dataFlow",
       )
@@ -1120,7 +1138,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     const rels = elements
       .filter(
         (e) =>
-          e.type === "line" &&
+          e.type === "arrow" &&
           (e.customData as { terraformEdgeLayer?: string } | undefined)
             ?.terraformEdgeLayer === "dataFlow",
       )
@@ -1296,7 +1314,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     const kmsEdge = elements
       .filter(
         (e) =>
-          e.type === "line" &&
+          e.type === "arrow" &&
           (e.customData as { terraformEdgeLayer?: string } | undefined)
             ?.terraformEdgeLayer === "dataFlow",
       )
