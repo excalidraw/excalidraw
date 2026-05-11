@@ -1,294 +1,107 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  collectPlacementSubnetIds,
-  extractPrimaryTopologyZones,
-  extractRegionalTopologyPrimaries,
-} from "./terraformTopologyPlacement";
+import { extractVpcEndpointsByVpc } from "./terraformTopologyPlacement";
 
-describe("collectPlacementSubnetIds", () => {
-  it("merges vpc_config subnet_ids with top-level fields and sorts uniquely", () => {
-    const values = {
-      vpc_config: [
-        {
-          subnet_ids: ["subnet-z", "subnet-a"],
-        },
-      ],
-      subnet_ids: ["subnet-a"],
-      subnet_id: "subnet-m",
-    };
-    expect(collectPlacementSubnetIds(values)).toEqual([
-      "subnet-a",
-      "subnet-m",
-      "subnet-z",
-    ]);
-  });
-});
-
-describe("extractPrimaryTopologyZones", () => {
-  it("groups one Lambda with two vpc_config subnets into a single zone", () => {
+describe("extractVpcEndpointsByVpc", () => {
+  it("groups managed aws_vpc_endpoint by account, region, vpc_id and sorts by service_name then address", () => {
     const plan = {
       resource_changes: [
         {
-          address: "aws_subnet.one",
-          type: "aws_subnet",
+          address: 'aws_vpc_endpoint.a["z"]',
+          mode: "managed",
+          type: "aws_vpc_endpoint",
           provider_name: "registry.terraform.io/hashicorp/aws",
-          change: {
-            after: {
-              id: "subnet-a",
-              vpc_id: "vpc-shared",
-              owner_id: "111111111111",
-              region: "us-east-1",
-            },
-          },
-        },
-        {
-          address: "aws_subnet.two",
-          type: "aws_subnet",
-          provider_name: "registry.terraform.io/hashicorp/aws",
-          change: {
-            after: {
-              id: "subnet-b",
-              vpc_id: "vpc-shared",
-              owner_id: "111111111111",
-              region: "us-east-1",
-            },
-          },
-        },
-        {
-          address: "aws_lambda_function.shared",
-          type: "aws_lambda_function",
-          provider_name: "registry.terraform.io/hashicorp/aws",
-          change: {
-            after: {
-              region: "us-east-1",
-              vpc_config: [
-                {
-                  subnet_ids: ["subnet-b", "subnet-a"],
-                },
-              ],
-            },
-          },
-        },
-      ],
-    };
-
-    const zones = extractPrimaryTopologyZones(plan);
-    expect(zones).toHaveLength(1);
-    const z = zones[0]!;
-    expect(z.accountId).toBe("111111111111");
-    expect(z.region).toBe("us-east-1");
-    expect(z.vpcId).toBe("vpc-shared");
-    expect(z.subnetIds).toEqual(["subnet-a", "subnet-b"]);
-    expect(z.subnetSignature).toBe("subnet-a|subnet-b");
-    expect(z.addresses).toEqual(["aws_lambda_function.shared"]);
-  });
-
-  it("uses before-state vpc_config for a deleted Lambda", () => {
-    const plan = {
-      resource_changes: [
-        {
-          address: "aws_subnet.one",
-          type: "aws_subnet",
-          provider_name: "registry.terraform.io/hashicorp/aws",
-          change: {
-            after: {
-              id: "subnet-a",
-              vpc_id: "vpc-shared",
-              owner_id: "111111111111",
-              region: "us-east-1",
-            },
-          },
-        },
-        {
-          address: "aws_lambda_function.old",
-          type: "aws_lambda_function",
-          provider_name: "registry.terraform.io/hashicorp/aws",
-          change: {
-            actions: ["delete"],
-            before: {
-              region: "us-east-1",
-              arn: "arn:aws:lambda:us-east-1:111111111111:function:old",
-              vpc_config: [
-                {
-                  subnet_ids: ["subnet-a"],
-                },
-              ],
-            },
-            after: null,
-          },
-        },
-      ],
-    };
-
-    const zones = extractPrimaryTopologyZones(plan);
-    expect(zones).toHaveLength(1);
-    expect(zones[0]!.addresses).toEqual(["aws_lambda_function.old"]);
-  });
-
-  it("falls back to before when after is an empty object", () => {
-    const plan = {
-      resource_changes: [
-        {
-          address: "aws_subnet.one",
-          type: "aws_subnet",
-          provider_name: "registry.terraform.io/hashicorp/aws",
-          change: {
-            after: {
-              id: "subnet-x",
-              vpc_id: "vpc-z",
-              owner_id: "222222222222",
-              region: "eu-west-1",
-            },
-          },
-        },
-        {
-          address: "aws_lambda_function.x",
-          type: "aws_lambda_function",
-          provider_name: "registry.terraform.io/hashicorp/aws",
-          change: {
-            actions: ["update"],
-            before: {
-              region: "eu-west-1",
-              owner_id: "222222222222",
-              vpc_config: [{ subnet_ids: ["subnet-x"] }],
-            },
-            after: {},
-          },
-        },
-      ],
-    };
-
-    const zones = extractPrimaryTopologyZones(plan);
-    expect(zones).toHaveLength(1);
-    expect(zones[0]!.vpcId).toBe("vpc-z");
-  });
-});
-
-describe("extractRegionalTopologyPrimaries", () => {
-  it("infers account from aws_subnet owner_id when SQS create has region but no ARN yet", () => {
-    const plan = {
-      resource_changes: [
-        {
-          address: "module.vpc.aws_subnet.private",
-          type: "aws_subnet",
-          provider_name: "registry.opentofu.org/hashicorp/aws",
           change: {
             actions: ["no-op"],
             after: {
-              id: "subnet-aaa",
-              vpc_id: "vpc-xx",
-              owner_id: "992382747916",
+              arn: "arn:aws:ec2:us-east-1:111111111111:vpc-endpoint/vpce-aaa",
+              vpc_id: "vpc-aaa",
+              service_name: "com.amazonaws.us-east-1.logs",
               region: "us-east-1",
-              arn: "arn:aws:ec2:us-east-1:992382747916:subnet/subnet-aaa",
             },
           },
         },
         {
-          address: "module.queue.aws_sqs_queue.this[0]",
-          type: "aws_sqs_queue",
-          provider_name: "registry.opentofu.org/hashicorp/aws",
+          address: 'aws_vpc_endpoint.a["y"]',
+          mode: "managed",
+          type: "aws_vpc_endpoint",
+          provider_name: "registry.terraform.io/hashicorp/aws",
           change: {
-            actions: ["create"],
-            before: null,
+            actions: ["no-op"],
             after: {
-              name: "jobs",
+              arn: "arn:aws:ec2:us-east-1:111111111111:vpc-endpoint/vpce-bbb",
+              vpc_id: "vpc-aaa",
+              service_name: "com.amazonaws.us-east-1.s3",
               region: "us-east-1",
             },
           },
         },
+        {
+          address: "aws_vpc_endpoint.other",
+          mode: "managed",
+          type: "aws_vpc_endpoint",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              arn: "arn:aws:ec2:eu-west-1:222222222222:vpc-endpoint/vpce-ccc",
+              vpc_id: "vpc-bbb",
+              service_name: "com.amazonaws.eu-west-1.ec2",
+              region: "eu-west-1",
+            },
+          },
+        },
+        {
+          address: "data.aws_vpc_endpoint_service.svc",
+          mode: "data",
+          type: "aws_vpc_endpoint_service",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: { actions: ["read"], after: {} },
+        },
       ],
     };
 
-    const buckets = extractRegionalTopologyPrimaries(plan);
-    expect(buckets).toHaveLength(1);
-    expect(buckets[0]!.accountId).toBe("992382747916");
-    expect(buckets[0]!.region).toBe("us-east-1");
-    expect(buckets[0]!.addresses).toEqual(["module.queue.aws_sqs_queue.this[0]"]);
+    const buckets = extractVpcEndpointsByVpc(plan);
+    expect(buckets).toHaveLength(2);
+
+    const us = buckets.find((b) => b.region === "us-east-1");
+    expect(us).toBeDefined();
+    expect(us!.vpcId).toBe("vpc-aaa");
+    expect(us!.accountId).toBe("111111111111");
+    expect(us!.addresses).toEqual([
+      'aws_vpc_endpoint.a["z"]',
+      'aws_vpc_endpoint.a["y"]',
+    ]);
+
+    const eu = buckets.find((b) => b.region === "eu-west-1");
+    expect(eu?.addresses).toEqual(["aws_vpc_endpoint.other"]);
   });
 
-  it("groups S3 and SQS without VPC into one bucket per account and region", () => {
+  it("skips non-managed and rows without vpc_id", () => {
     const plan = {
       resource_changes: [
         {
-          address: "aws_s3_bucket.logs",
-          type: "aws_s3_bucket",
+          address: "aws_vpc_endpoint.x",
+          mode: "data",
+          type: "aws_vpc_endpoint",
           provider_name: "registry.terraform.io/hashicorp/aws",
           change: {
-            after: {
-              region: "us-east-1",
-              owner_id: "111111111111",
-            },
+            actions: ["read"],
+            after: { arn: "arn:aws:ec2:us-east-1:111111111111:vpc-endpoint/x" },
           },
         },
         {
-          address: "aws_sqs_queue.jobs",
-          type: "aws_sqs_queue",
-          provider_name: "registry.terraform.io/hashicorp/aws",
-          change: {
-            after: {
-              region: "us-east-1",
-              name: "jobs.fifo",
-              arn: "arn:aws:sqs:us-east-1:111111111111:jobs.fifo",
-            },
-          },
-        },
-      ],
-    };
-
-    const buckets = extractRegionalTopologyPrimaries(plan);
-    expect(buckets).toHaveLength(1);
-    expect(buckets[0]!.accountId).toBe("111111111111");
-    expect(buckets[0]!.region).toBe("us-east-1");
-    expect([...buckets[0]!.addresses].sort()).toEqual(
-      ["aws_s3_bucket.logs", "aws_sqs_queue.jobs"].sort(),
-    );
-  });
-
-  it("fills account and region from default aws provider when SQS create has no subnet hints", () => {
-    const plan = {
-      configuration: {
-        provider_config: {
-          aws: {
-            name: "aws",
-            expressions: {
-              region: { references: ["var.aws_region"] },
-              assume_role: [
-                {
-                  role_arn: { references: ["local.terraform_deploy_role_arn"] },
-                  session_name: { constant_value: "terraform-excalidraw-tf" },
-                },
-              ],
-            },
-          },
-        },
-      },
-      variables: {
-        aws_region: { value: "us-west-2" },
-        aws_account_id: { value: "888888888888" },
-        terraform_deploy_role_arn: { value: "" },
-        terraform_deploy_role_name: { value: "TerraformDeploy" },
-      },
-      resource_changes: [
-        {
-          address: "module.queue.aws_sqs_queue.this[0]",
-          type: "aws_sqs_queue",
+          address: "aws_vpc_endpoint.y",
+          mode: "managed",
+          type: "aws_vpc_endpoint",
           provider_name: "registry.terraform.io/hashicorp/aws",
           change: {
             actions: ["create"],
-            before: null,
-            after: {
-              name: "jobs",
-            },
+            after: { arn: "arn:aws:ec2:us-east-1:111111111111:vpc-endpoint/y" },
           },
         },
       ],
     };
-
-    const buckets = extractRegionalTopologyPrimaries(plan);
-    expect(buckets).toHaveLength(1);
-    expect(buckets[0]!.accountId).toBe("888888888888");
-    expect(buckets[0]!.region).toBe("us-west-2");
-    expect(buckets[0]!.addresses).toEqual(["module.queue.aws_sqs_queue.this[0]"]);
+    expect(extractVpcEndpointsByVpc(plan)).toHaveLength(0);
   });
 });

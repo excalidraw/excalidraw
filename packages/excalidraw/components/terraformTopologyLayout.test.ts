@@ -8,6 +8,7 @@ import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout
 import type {
   TopologyPlacementZone,
   TopologyRegionalPrimaryBucket,
+  TopologyVpcEndpointBucket,
 } from "./terraformTopologyPlacement";
 
 function axisBounds(el: ExcalidrawElement): {
@@ -116,6 +117,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     );
     expect(meta.layoutEngine).toBe("topology");
     expect(meta.regionalPrimaryCount).toBe(0);
+    expect(meta.vpcEndpointCount).toBe(0);
     expect(elements.length).toBeGreaterThan(0);
     assertTopologyFramesContainChildren(elements);
   });
@@ -250,6 +252,158 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     expect(
       rects.some((r) => zoneFrames.some((zf) => zf.id === r.frameId)),
     ).toBe(true);
+
+    assertTopologyFramesContainChildren(elements);
+  });
+
+  it("renders aws_vpc_endpoint egress tiles straddling VPC bottom with meta count", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-test",
+                      {
+                        vpcId: "vpc-test",
+                        subnets: new Map([
+                          ["subnet-a", { subnetId: "subnet-a" }],
+                          ["subnet-b", { subnetId: "subnet-b" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-test",
+        subnetSignature: "subnet-a|subnet-b",
+        subnetIds: ["subnet-a", "subnet-b"],
+        addresses: ["aws_lambda_function.fn"],
+      },
+    ];
+
+    const vpcEndpointBuckets: TopologyVpcEndpointBucket[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-test",
+        addresses: [
+          'aws_vpc_endpoint.ep["logs"]',
+          'aws_vpc_endpoint.ep["s3"]',
+        ],
+      },
+    ];
+
+    const nodes: TerraformPlanNodesMap = {
+      "aws_lambda_function.fn": {
+        resources: {
+          "aws_lambda_function.fn": {
+            address: "aws_lambda_function.fn",
+            mode: "managed",
+            type: "aws_lambda_function",
+            change: { actions: ["no-op"], after: {} },
+          },
+        },
+      },
+      'aws_vpc_endpoint.ep["logs"]': {
+        resources: {
+          'aws_vpc_endpoint.ep["logs"]': {
+            address: 'aws_vpc_endpoint.ep["logs"]',
+            mode: "managed",
+            type: "aws_vpc_endpoint",
+            change: {
+              actions: ["no-op"],
+              after: {
+                arn: "arn:aws:ec2:us-east-1:111111111111:vpc-endpoint/vpce-logs",
+                vpc_id: "vpc-test",
+                service_name: "com.amazonaws.us-east-1.logs",
+              },
+            },
+          },
+        },
+      },
+      'aws_vpc_endpoint.ep["s3"]': {
+        resources: {
+          'aws_vpc_endpoint.ep["s3"]': {
+            address: 'aws_vpc_endpoint.ep["s3"]',
+            mode: "managed",
+            type: "aws_vpc_endpoint",
+            change: {
+              actions: ["no-op"],
+              after: {
+                arn: "arn:aws:ec2:us-east-1:111111111111:vpc-endpoint/vpce-s3",
+                vpc_id: "vpc-test",
+                service_name: "com.amazonaws.us-east-1.s3",
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const { elements, meta } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      nodes,
+      undefined,
+      vpcEndpointBuckets,
+    );
+
+    expect(meta.vpcEndpointCount).toBe(2);
+
+    const egressRects = elements.filter(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "vpcEgressEndpoint",
+    );
+    expect(egressRects.length).toBe(2);
+    for (const r of egressRects) {
+      expect((r as { strokeStyle?: string }).strokeStyle).toBe("dashed");
+    }
+
+    const vpcFrames = elements.filter(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "vpc",
+    );
+    const vpc = vpcFrames.find(
+      (f) =>
+        (f.customData as { terraformTopologyPath?: string[] } | undefined)
+          ?.terraformTopologyPath?.[2] === "vpc-test",
+    );
+    expect(vpc).toBeDefined();
+    const vpcEl = vpc!;
+    const vpcBottom = vpcEl.y + (vpcEl.height ?? 0);
+    const eps = 6;
+    for (const r of egressRects) {
+      const h = r.height ?? 0;
+      const midY = r.y + h / 2;
+      expect(
+        Math.abs(midY - vpcBottom),
+        "egress tile vertical center on VPC bottom edge",
+      ).toBeLessThanOrEqual(eps);
+    }
 
     assertTopologyFramesContainChildren(elements);
   });

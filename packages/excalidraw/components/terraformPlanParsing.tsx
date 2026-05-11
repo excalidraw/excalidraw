@@ -6,10 +6,12 @@ import {
   extractTerraformTopologyFromPlan,
   mergeTopologyModelWithPlacementZones,
   mergeTopologyModelWithRegionalBuckets,
+  mergeTopologyModelWithVpcEndpoints,
 } from "./terraformTopologyExtract";
 import {
   extractPrimaryTopologyZones,
   extractRegionalTopologyPrimaries,
+  extractVpcEndpointsByVpc,
 } from "./terraformTopologyPlacement";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
@@ -158,14 +160,17 @@ export const terraformPlanParsing = async (
     const topoModel = extractTerraformTopologyFromPlan(plan);
     const zones = extractPrimaryTopologyZones(plan);
     const regionalBuckets = extractRegionalTopologyPrimaries(plan);
+    const vpcEndpointBuckets = extractVpcEndpointsByVpc(plan);
     mergeTopologyModelWithPlacementZones(topoModel, zones);
     mergeTopologyModelWithRegionalBuckets(topoModel, regionalBuckets);
+    mergeTopologyModelWithVpcEndpoints(topoModel, vpcEndpointBuckets);
     const topoScene = await buildTerraformTopologyExcalidrawScene(
       topoModel,
       zones,
       regionalBuckets,
       nodes5,
       plan,
+      vpcEndpointBuckets,
     );
     emitLocalParseDebug({
       phase: "topologyLayout",

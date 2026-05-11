@@ -31,6 +31,7 @@ import type {
 import type {
   TopologyPlacementZone,
   TopologyRegionalPrimaryBucket,
+  TopologyVpcEndpointBucket,
 } from "./terraformTopologyPlacement";
 import type { TerraformTopologyModel } from "./terraformTopologyExtract";
 import {
@@ -65,6 +66,7 @@ export type TerraformTopologySceneMeta = {
   subnetCount: number;
   primaryResourceCount: number;
   regionalPrimaryCount: number;
+  vpcEndpointCount: number;
   skippedLayout?: boolean;
   skipReason?: string;
 };
@@ -113,6 +115,12 @@ const MIN_SPLIT_SATELLITE_W = 86;
 const ZONE_CELL_GAP = 20;
 /** Gap between regional-services column and VPC grid inside one region frame. */
 const REGIONAL_TO_VPC_GAP = 28;
+/** Compact tiles for `aws_vpc_endpoint` egress on the VPC bottom edge. */
+const VPC_ENDPOINT_TILE_W = 160;
+const VPC_ENDPOINT_TILE_H = 56;
+const VPC_ENDPOINT_TILE_GAP = 10;
+/** Half-tile protrusion below VPC bottom + slack so the next VPC row does not overlap. */
+const VPC_ENDPOINT_EGRESS_OVERFLOW_PAD = Math.ceil(VPC_ENDPOINT_TILE_H / 2) + 8;
 
 export type TerraformTopologyRole =
   | "account"
@@ -443,6 +451,101 @@ function regionalAddressesFor(
   return b?.addresses ?? [];
 }
 
+function endpointsForVpc(
+  buckets: readonly TopologyVpcEndpointBucket[],
+  accountId: string,
+  regionName: string,
+  vpcId: string,
+): readonly string[] {
+  const b = buckets.find(
+    (x) =>
+      x.accountId === accountId &&
+      x.region === regionName &&
+      x.vpcId === vpcId,
+  );
+  return b?.addresses ?? [];
+}
+
+/**
+ * Minimum inner width (between VPC side padding) to place all endpoints on **one row**
+ * (widen the VPC frame rather than wrapping to a second row).
+ */
+function vpcEndpointSingleRowMinInnerWidth(addrCount: number): number {
+  if (addrCount <= 0) {
+    return 0;
+  }
+  return (
+    addrCount * VPC_ENDPOINT_TILE_W +
+    (addrCount - 1) * VPC_ENDPOINT_TILE_GAP
+  );
+}
+
+/**
+ * `aws_vpc_endpoint` rectangles straddling the VPC frame bottom (region-frame siblings),
+ * distributed across the VPC width.
+ */
+function appendVpcEndpointEgressRectangles(
+  skeleton: ExcalidrawElementSkeleton[],
+  accountId: string,
+  regionName: string,
+  vpcId: string,
+  addrs: readonly string[],
+  vpcX: number,
+  vpcY: number,
+  vpcCellW: number,
+  vpcCellH: number,
+  nodes: TerraformPlanNodesMap,
+): string[] {
+  if (addrs.length === 0) {
+    return [];
+  }
+  const sorted = [...addrs].sort();
+  const innerLeft = vpcX + INNER_PAD;
+  const innerW = Math.max(0, vpcCellW - 2 * INNER_PAD);
+  const cols = sorted.length;
+  const rowW = vpcEndpointSingleRowMinInnerWidth(cols);
+  const startX = innerLeft + Math.max(0, (innerW - rowW) / 2);
+
+  const bottomRowTop =
+    vpcY + vpcCellH - Math.round(VPC_ENDPOINT_TILE_H / 2);
+  const rectIds: string[] = [];
+
+  for (let i = 0; i < sorted.length; i++) {
+    const addr = sorted[i]!;
+    const col = i;
+    const rx = startX + col * (VPC_ENDPOINT_TILE_W + VPC_ENDPOINT_TILE_GAP);
+    const ry = bottomRowTop;
+    const node = nodes[addr] as TerraformPlanGraphNode | undefined;
+    const resourceType = getTerraformResourceTypeFromNodePath(addr);
+    const action = getTerraformPlanNodeAction(node);
+    const initiallyVisible = isInitiallyVisibleTerraformResource(
+      resourceType,
+      action,
+    );
+    rectIds.push(addr);
+    pushResourceRectangleSkeleton(
+      skeleton,
+      addr,
+      rx,
+      ry,
+      VPC_ENDPOINT_TILE_W,
+      VPC_ENDPOINT_TILE_H,
+      nodes,
+      {
+        initiallyVisible,
+        explodeParentKeys: [],
+        egress: {
+          accountId,
+          region: regionName,
+          vpcId,
+        },
+      },
+    );
+  }
+
+  return rectIds;
+}
+
 function pushResourceRectangleSkeleton(
   skeleton: ExcalidrawElementSkeleton[],
   addr: string,
@@ -454,6 +557,7 @@ function pushResourceRectangleSkeleton(
   options: {
     initiallyVisible: boolean;
     explodeParentKeys: string[];
+    egress?: { accountId: string; region: string; vpcId: string };
   },
 ): void {
   const node = nodes[addr] as TerraformPlanGraphNode | undefined;
@@ -463,6 +567,7 @@ function pushResourceRectangleSkeleton(
   const actionStyle = getTerraformActionStyle(action);
   const explodeKeys = [...options.explodeParentKeys].sort();
   const explodeParent = explodeKeys[0] ?? null;
+  const egress = options.egress;
 
   skeleton.push({
     type: "rectangle",
@@ -474,6 +579,7 @@ function pushResourceRectangleSkeleton(
     strokeWidth: 1.5,
     strokeColor: actionStyle.strokeColor,
     backgroundColor: actionStyle.backgroundColor,
+    strokeStyle: egress ? "dashed" : "solid",
     roundness: { type: 3, value: 10 },
     label: {
       text: shortTerraformResourceLabel(addr),
@@ -491,6 +597,16 @@ function pushResourceRectangleSkeleton(
       resourceType,
       nodePath: addr,
       action,
+      ...(egress
+        ? {
+            terraformTopologyRole: "vpcEgressEndpoint" as const,
+            terraformTopologyPath: [
+              egress.accountId,
+              egress.region,
+              egress.vpcId,
+            ],
+          }
+        : {}),
       terraformResources:
         resource &&
         buildTerraformResourcePanelDetails(
@@ -896,12 +1012,17 @@ export async function buildTerraformTopologyExcalidrawScene(
   regionalBuckets: readonly TopologyRegionalPrimaryBucket[],
   nodes: TerraformPlanNodesMap,
   plan?: unknown,
+  vpcEndpointBuckets: readonly TopologyVpcEndpointBucket[] = [],
 ): Promise<{
   elements: ExcalidrawElement[];
   meta: TerraformTopologySceneMeta;
 }> {
   const counts = countTopology(model);
   const regionalPrimaryCount = regionalBuckets.reduce(
+    (n, b) => n + b.addresses.length,
+    0,
+  );
+  const vpcEndpointCount = vpcEndpointBuckets.reduce(
     (n, b) => n + b.addresses.length,
     0,
   );
@@ -919,6 +1040,7 @@ export async function buildTerraformTopologyExcalidrawScene(
         subnetCount: 0,
         primaryResourceCount: 0,
         regionalPrimaryCount: 0,
+        vpcEndpointCount: 0,
         skippedLayout: true,
         skipReason: "empty_topology",
       },
@@ -978,7 +1100,23 @@ export async function buildTerraformTopologyExcalidrawScene(
         for (const [vpcId] of vpcEntries) {
           const vpcZs = zonesForVpc(zones, accountId, regionName, vpcId);
           const vd = vpcFrameDimensionsForZones(vpcZs, nodes, arnIndex, plan);
-          vpcCellW = Math.max(vpcCellW, vd.w);
+          const epAddrs = endpointsForVpc(
+            vpcEndpointBuckets,
+            accountId,
+            regionName,
+            vpcId,
+          );
+          const epMinOuter =
+            epAddrs.length > 0
+              ? 2 * INNER_PAD +
+                FRAME_CONTENT_SLACK_X +
+                vpcEndpointSingleRowMinInnerWidth(epAddrs.length)
+              : 0;
+          vpcCellW = Math.max(vpcCellW, vd.w, epMinOuter);
+        }
+        for (const [vpcId] of vpcEntries) {
+          const vpcZs = zonesForVpc(zones, accountId, regionName, vpcId);
+          const vd = vpcFrameDimensionsForZones(vpcZs, nodes, arnIndex, plan);
           vpcCellH = Math.max(vpcCellH, vd.h);
         }
       }
@@ -996,11 +1134,26 @@ export async function buildTerraformTopologyExcalidrawScene(
           )
         : { w: 0, h: 0 };
 
+      const regionHasVpcEndpoints =
+        hasVpc &&
+        vpcEntries.some(([vpcId]) => {
+          const ep = endpointsForVpc(
+            vpcEndpointBuckets,
+            accountId,
+            regionName,
+            vpcId,
+          );
+          return ep.length > 0;
+        });
+
       let vpcGridW = 0;
       let vpcGridH = 0;
       if (hasVpc && vpcCols > 0 && vpcRows > 0) {
         vpcGridW = vpcCols * (vpcCellW + VPC_GAP) - VPC_GAP;
-        vpcGridH = vpcRows * (vpcCellH + VPC_GAP) - VPC_GAP;
+        vpcGridH =
+          vpcRows * (vpcCellH + VPC_GAP) -
+          VPC_GAP +
+          (regionHasVpcEndpoints ? VPC_ENDPOINT_EGRESS_OVERFLOW_PAD : 0);
       }
 
       const innerTop = regionRowY + VPC_TOP_PAD;
@@ -1054,7 +1207,7 @@ export async function buildTerraformTopologyExcalidrawScene(
       }
 
       const vpcFrameIds: string[] = [];
-      const emptyVpcShell = vpcEmptyShellSize();
+      const regionVpcEgressRectIds: string[] = [];
 
       for (let vi = 0; hasVpc && vi < vpcEntries.length; vi++) {
         const [vpcId] = vpcEntries[vi]!;
@@ -1069,15 +1222,39 @@ export async function buildTerraformTopologyExcalidrawScene(
           (a, b) => a.subnetSignature.localeCompare(b.subnetSignature),
         );
 
+        const epAddrs = endpointsForVpc(
+          vpcEndpointBuckets,
+          accountId,
+          regionName,
+          vpcId,
+        );
+
         if (vpcZs.length === 0) {
+          if (epAddrs.length > 0) {
+            regionVpcEgressRectIds.push(
+              ...appendVpcEndpointEgressRectangles(
+                skeleton,
+                accountId,
+                regionName,
+                vpcId,
+                epAddrs,
+                vpcX,
+                vpcY,
+                vpcCellW,
+                vpcCellH,
+                nodes,
+              ),
+            );
+          }
+
           skeleton.push({
             type: "frame",
             id: vpcSkId,
             name: shortLabel("VPC", vpcId),
             x: vpcX,
             y: vpcY,
-            width: emptyVpcShell.w,
-            height: emptyVpcShell.h,
+            width: vpcCellW,
+            height: vpcCellH,
             children: [],
             customData: frameCustomData(
               "vpc",
@@ -1148,6 +1325,23 @@ export async function buildTerraformTopologyExcalidrawScene(
           });
         }
 
+        if (epAddrs.length > 0) {
+          regionVpcEgressRectIds.push(
+            ...appendVpcEndpointEgressRectangles(
+              skeleton,
+              accountId,
+              regionName,
+              vpcId,
+              epAddrs,
+              vpcX,
+              vpcY,
+              vpcCellW,
+              vpcCellH,
+              nodes,
+            ),
+          );
+        }
+
         skeleton.push({
           type: "frame",
           id: vpcSkId,
@@ -1167,7 +1361,7 @@ export async function buildTerraformTopologyExcalidrawScene(
         });
       }
 
-      regionChildIds.push(...vpcFrameIds);
+      regionChildIds.push(...vpcFrameIds, ...regionVpcEgressRectIds);
 
       const innerContentW =
         (hasReg ? regDims.w : 0) +
@@ -1271,6 +1465,7 @@ export async function buildTerraformTopologyExcalidrawScene(
       subnetCount: counts.subnets,
       primaryResourceCount,
       regionalPrimaryCount,
+      vpcEndpointCount,
     },
   };
 }

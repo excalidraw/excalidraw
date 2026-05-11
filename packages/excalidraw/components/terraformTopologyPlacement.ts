@@ -36,8 +36,17 @@ export type TopologyRegionalPrimaryBucket = {
   addresses: string[];
 };
 
+/** Managed `aws_vpc_endpoint` addresses grouped by placement VPC (semantic layout strip). */
+export type TopologyVpcEndpointBucket = {
+  accountId: string;
+  region: string;
+  vpcId: string;
+  addresses: string[];
+};
+
 type ResourceChange = {
   address?: string;
+  mode?: string;
   type?: string;
   provider_name?: string;
   change?: { actions?: string[]; before?: unknown; after?: unknown };
@@ -193,6 +202,112 @@ export function extractPrimaryTopologyZones(
       return a.vpcId.localeCompare(b.vpcId);
     }
     return a.subnetSignature.localeCompare(b.subnetSignature);
+  });
+
+  return out;
+}
+
+function stringField(v: unknown): string | null {
+  return typeof v === "string" && v.length > 0 ? v : null;
+}
+
+function vpcEndpointBucketKey(accountId: string, region: string, vpcId: string): string {
+  return `${accountId}\0${region}\0${vpcId}`;
+}
+
+/**
+ * Managed `aws_vpc_endpoint` resources keyed by (account, region, vpc_id).
+ * Excludes `aws_vpc_endpoint_service` and other modes. Addresses sorted by `service_name` then address.
+ */
+export function extractVpcEndpointsByVpc(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): TopologyVpcEndpointBucket[] {
+  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
+
+  const accum = new Map<
+    string,
+    {
+      accountId: string;
+      region: string;
+      vpcId: string;
+      rows: { address: string; serviceName: string }[];
+    }
+  >();
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_vpc_endpoint") {
+      continue;
+    }
+    const address = rc.address;
+    if (!address || typeof address !== "string") {
+      continue;
+    }
+
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+
+    const vpcIdRaw = stringField(values.vpc_id);
+    if (!vpcIdRaw) {
+      continue;
+    }
+
+    const subnetIds = collectPlacementSubnetIds(values);
+    const merged = mergeWithDefaultAwsProviderAccountRegion(
+      plan,
+      mergeTerraformTopologyAccountRegionFromSameRegionSubnets(
+        mergeTerraformTopologyAccountRegionFromSubnets(
+          resolveTerraformTopologyAccountRegion(values),
+          subnetIds,
+          subnetOwners,
+        ),
+        subnetOwners,
+      ),
+    );
+    const { account: accountId, region } = merged;
+    if (!shouldEmitTopologyPlacement(accountId, region)) {
+      continue;
+    }
+
+    const serviceName = stringField(values.service_name) ?? "";
+    const key = vpcEndpointBucketKey(accountId, region, vpcIdRaw);
+    let row = accum.get(key);
+    if (!row) {
+      row = { accountId, region, vpcId: vpcIdRaw, rows: [] };
+      accum.set(key, row);
+    }
+    if (!row.rows.some((x) => x.address === address)) {
+      row.rows.push({ address, serviceName });
+    }
+  }
+
+  const out: TopologyVpcEndpointBucket[] = [...accum.values()].map((row) => ({
+    accountId: row.accountId,
+    region: row.region,
+    vpcId: row.vpcId,
+    addresses: [...row.rows]
+      .sort((a, b) => {
+        const c = a.serviceName.localeCompare(b.serviceName);
+        return c !== 0 ? c : a.address.localeCompare(b.address);
+      })
+      .map((x) => x.address),
+  }));
+
+  out.sort((a, b) => {
+    if (a.accountId !== b.accountId) {
+      return a.accountId.localeCompare(b.accountId);
+    }
+    if (a.region !== b.region) {
+      return a.region.localeCompare(b.region);
+    }
+    return a.vpcId.localeCompare(b.vpcId);
   });
 
   return out;

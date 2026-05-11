@@ -600,6 +600,21 @@ export function mergeTopologyModelWithRegionalBuckets(
   }
 }
 
+/** Ensures VPC shells exist for `aws_vpc_endpoint` buckets (VPC may have no subnets in model). */
+export function mergeTopologyModelWithVpcEndpoints(
+  model: TerraformTopologyModel,
+  buckets: readonly { accountId: string; region: string; vpcId: string }[],
+): void {
+  for (const b of buckets) {
+    if (!shouldEmitTopologyPlacement(b.accountId, b.region)) {
+      continue;
+    }
+    const acc = ensureAccount(model, b.accountId);
+    const reg = ensureRegion(acc, b.region);
+    ensureVpc(reg, b.vpcId);
+  }
+}
+
 function ingestVpcSubnetPair(
   model: TerraformTopologyModel,
   subnetToVpc: Map<string, string>,
