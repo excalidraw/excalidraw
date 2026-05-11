@@ -4,10 +4,15 @@ import {
   newElementWith,
 } from "@excalidraw/element";
 
+import type { Scene } from "@excalidraw/element";
+
 import type {
   ExcalidrawBindableElement,
   ExcalidrawElement,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
+
+import type { PointerDownState } from "../types";
 
 import { pointFrom } from "@excalidraw/math";
 
@@ -50,6 +55,76 @@ export const getTerraformVisibilityKey = (element: ExcalidrawElement) => {
     customData.nodePath ||
     null
   );
+};
+
+/**
+ * After {@link mirrorAndDetachTerraformResourceLabels}, card titles are plain text with
+ * `containerId: null`, so {@link dragSelectedElements} does not move them with the rectangle.
+ * Call once per drag step (after `dragSelectedElements`) so labels track the same delta as
+ * their card (including snap), using `pointerDownState.originalElements` for baselines.
+ */
+export const syncTerraformDetachedResourceLabelsWithDraggedCards = (
+  scene: Scene,
+  pointerDownState: PointerDownState,
+  selectedElements: readonly NonDeletedExcalidrawElement[],
+): void => {
+  const labelByVisibilityKey = new Map<string, NonDeletedExcalidrawElement>();
+  for (const el of scene.getNonDeletedElements()) {
+    if (el.type !== "text" || el.isDeleted) {
+      continue;
+    }
+    if ("containerId" in el && el.containerId) {
+      continue;
+    }
+    const cd = getCustomData(el);
+    if (
+      !cd.terraform ||
+      cd.terraformVisibilityRole !== "resource" ||
+      typeof cd.nodePath !== "string"
+    ) {
+      continue;
+    }
+    const key = getTerraformVisibilityKey(el);
+    if (!key) {
+      continue;
+    }
+    labelByVisibilityKey.set(key, el);
+  }
+
+  for (const element of selectedElements) {
+    if (element.isDeleted || element.type !== "rectangle") {
+      continue;
+    }
+    const cd = getCustomData(element);
+    if (cd.terraformVisibilityRole !== "resource") {
+      continue;
+    }
+    const key = getTerraformVisibilityKey(element);
+    if (!key) {
+      continue;
+    }
+    const origRect = pointerDownState.originalElements.get(element.id);
+    if (!origRect) {
+      continue;
+    }
+    const dx = element.x - origRect.x;
+    const dy = element.y - origRect.y;
+    if (dx === 0 && dy === 0) {
+      continue;
+    }
+    const label = labelByVisibilityKey.get(key);
+    if (!label || label.id === element.id) {
+      continue;
+    }
+    const origLabel = pointerDownState.originalElements.get(label.id);
+    if (!origLabel) {
+      continue;
+    }
+    scene.mutateElement(label, {
+      x: origLabel.x + dx,
+      y: origLabel.y + dy,
+    });
+  }
 };
 
 // --- Element classification (roles written by the backend exporter) ---

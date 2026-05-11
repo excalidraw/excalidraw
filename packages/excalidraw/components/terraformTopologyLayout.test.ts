@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawArrowElement, ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { TerraformTopologyModel } from "./terraformTopologyExtract";
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
@@ -369,7 +369,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
         (e.customData as { terraformVisibilityKey?: string } | undefined)
           ?.terraformVisibilityKey === rel?.target,
     );
-    const edge = dependencyLines[0]!;
+    const edge = dependencyLines[0] as ExcalidrawArrowElement;
     expect(sourceRect).toBeDefined();
     expect(targetRect).toBeDefined();
     expect(edge.startBinding?.elementId).toBe(sourceRect!.id);

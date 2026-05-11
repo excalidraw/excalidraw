@@ -433,7 +433,10 @@ import { getShortcutKey } from "../shortcut";
 
 import { tryParseSpreadsheet } from "../charts";
 
-import { toggleTerraformExplode } from "./terraformVisibility";
+import {
+  syncTerraformDetachedResourceLabelsWithDraggedCards,
+  toggleTerraformExplode,
+} from "./terraformVisibility";
 import {
   isTerraformInspectableElement,
   isTerraformResourceElement,
@@ -10074,6 +10077,11 @@ class App extends React.Component<AppProps, AppState> {
               this.scene,
               snapOffset,
               event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+            );
+            syncTerraformDetachedResourceLabelsWithDraggedCards(
+              this.scene,
+              pointerDownState,
+              selectedElements,
             );
           }
 
