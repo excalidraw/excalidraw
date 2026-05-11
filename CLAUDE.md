@@ -59,6 +59,7 @@ yarn build:app        # Build excalidraw-app with Vite
 ### Element System (`packages/element/`)
 
 Everything on the canvas is an `ExcalidrawElement` — a plain immutable-style object:
+
 - Position (`x`, `y`), `width`, `height`, `angle` (rotation)
 - Styling: `strokeColor`, `backgroundColor`, `fillStyle`, `strokeWidth`, `opacity`, `roundness`
 - `version` (sequential) + `versionNonce` (random) — used for conflict-free sync/reconciliation
@@ -68,6 +69,7 @@ Everything on the canvas is an `ExcalidrawElement` — a plain immutable-style o
 **Element types**: `rectangle`, `diamond`, `ellipse`, `arrow`, `line`, `freedraw`, `text`, `image`, `frame`, `embeddable`, `iframe`, `magic_frame`, `selection`
 
 **Key modules in `packages/element/`:**
+
 - `binding.ts` — arrow-to-element binding and automatic routing
 - `bounds.ts` — bounding box calculations
 - `elbowArrow.ts` — elbow/orthogonal arrow routing
@@ -105,6 +107,7 @@ Everything on the canvas is an `ExcalidrawElement` — a plain immutable-style o
 The `Excalidraw` React component (entry: `packages/excalidraw/index.tsx`) accepts:
 
 **Key props:**
+
 - `initialData` — starting scene (elements + appState + files)
 - `onChange(elements, appState, files)` — fired on every change
 - `excalidrawAPI` — ref callback that receives the imperative API
@@ -120,6 +123,7 @@ The `Excalidraw` React component (entry: `packages/excalidraw/index.tsx`) accept
 ### App Layer (`excalidraw-app/`)
 
 Builds on top of the library and adds:
+
 - Real-time collaboration via **Socket.io** + **Firebase**
 - Scene persistence (localStorage + cloud)
 - PWA with service worker and caching

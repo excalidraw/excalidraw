@@ -40,6 +40,11 @@ import {
   type TopologyIamEdge,
 } from "./terraformTopologyIamLinks";
 import {
+  buildLambdaSgCluster,
+  sgSatelliteStackHeightPx,
+  TOPOLOGY_SG_BETWEEN_GROUPS_GAP_PX,
+} from "./terraformTopologySgLinks";
+import {
   reconcileTerraformVisibility,
   repairTerraformEdgeBindings,
 } from "./terraformVisibility";
@@ -72,10 +77,21 @@ const CANVAS_EDGE_PAD = MARGIN;
 const RESOURCE_RECT_W = 200;
 const RESOURCE_RECT_H = 88;
 const RESOURCE_GAP = 16;
-/** IAM role / policy tiles under a Lambda in semantic topology. */
+/** IAM role / policy tiles under a Lambda in semantic topology (left column). */
 const IAM_SATELLITE_W = 176;
 const IAM_SATELLITE_H = 52;
 const IAM_SATELLITE_GAP = 8;
+const IAM_SATELLITE_X_PAD = 6;
+const IAM_DATAFLOW_STROKE = "#0ca678";
+/** Security group + rule tiles (right column). */
+const SG_SATELLITE_W = 176;
+const SG_SATELLITE_H = 52;
+const SG_RULE_TILE_H = 52;
+const SG_RIGHT_PAD = 6;
+const SG_DATAFLOW_STROKE = "#228be6";
+/** When both IAM and SG satellites exist, split tile width so columns do not overlap (cell is {@link RESOURCE_RECT_W}). */
+const IAM_SG_COLUMN_GAP_PX = 8;
+const MIN_SPLIT_SATELLITE_W = 86;
 /** Gap between subnet-zone frames inside one VPC. */
 const ZONE_CELL_GAP = 20;
 /** Gap between regional-services column and VPC grid inside one region frame. */
@@ -164,6 +180,22 @@ function frameCustomData(
   };
 }
 
+function satelliteColumnWidths(
+  hasIamCluster: boolean,
+  hasSgCluster: boolean,
+): { iamW: number; sgW: number } {
+  if (hasIamCluster && hasSgCluster) {
+    const inner =
+      RESOURCE_RECT_W -
+      IAM_SATELLITE_X_PAD -
+      SG_RIGHT_PAD -
+      IAM_SG_COLUMN_GAP_PX;
+    const w = Math.max(MIN_SPLIT_SATELLITE_W, Math.floor(inner / 2));
+    return { iamW: w, sgW: w };
+  }
+  return { iamW: IAM_SATELLITE_W, sgW: SG_SATELLITE_W };
+}
+
 function gridColsRows(count: number): { cols: number; rows: number } {
   if (count <= 0) {
     return { cols: 1, rows: 1 };
@@ -186,6 +218,7 @@ function zoneFrameSizeForTopologyAddresses(
   sortedAddresses: readonly string[],
   nodes: TerraformPlanNodesMap,
   arnIndex: Map<string, string>,
+  plan?: unknown,
 ): { w: number; h: number } {
   const n = sortedAddresses.length;
   if (n <= 0) {
@@ -205,7 +238,16 @@ function zoneFrameSizeForTopologyAddresses(
       IAM_SATELLITE_H,
       IAM_SATELLITE_GAP,
     );
-    cellHeights.push(RESOURCE_RECT_H + iamExtra);
+    const sgExtra = sgSatelliteStackHeightPx(
+      nodes,
+      addr,
+      arnIndex,
+      SG_SATELLITE_H,
+      SG_RULE_TILE_H,
+      IAM_SATELLITE_GAP,
+      plan,
+    );
+    cellHeights.push(RESOURCE_RECT_H + Math.max(iamExtra, sgExtra));
   }
   const rowBase: number[] = new Array(rows).fill(RESOURCE_RECT_H);
   for (let i = 0; i < sortedAddresses.length; i++) {
@@ -249,6 +291,7 @@ function vpcFrameDimensionsForZones(
   vpcZs: readonly TopologyPlacementZone[],
   nodes: TerraformPlanNodesMap,
   arnIndex: Map<string, string>,
+  plan?: unknown,
 ): { w: number; h: number; perZoneW: number; perZoneH: number; znCols: number; znRows: number } {
   if (vpcZs.length === 0) {
     const e = vpcEmptyShellSize();
@@ -266,7 +309,7 @@ function vpcFrameDimensionsForZones(
   let perZoneH = 0;
   for (const z of vpcZs) {
     const sortedZ = [...z.addresses].sort();
-    const d = zoneFrameSizeForTopologyAddresses(sortedZ, nodes, arnIndex);
+    const d = zoneFrameSizeForTopologyAddresses(sortedZ, nodes, arnIndex, plan);
     perZoneW = Math.max(perZoneW, d.w);
     perZoneH = Math.max(perZoneH, d.h);
   }
@@ -402,13 +445,19 @@ function pushResourceRectangleSkeleton(
   });
 }
 
-function buildTopologyIamLineSkeletons(
-  edges: readonly TopologyIamEdge[],
+type TopologySatelliteLineSpec = {
+  edge: TopologyIamEdge;
+  origin: "topology_iam" | "topology_sg";
+  strokeColor: string;
+};
+
+function buildTopologySatelliteLineSkeletons(
+  specs: readonly TopologySatelliteLineSpec[],
 ): ExcalidrawElementSkeleton[] {
   const seen = new Set<string>();
   const out: ExcalidrawElementSkeleton[] = [];
   let edgeSeq = 0;
-  for (const e of edges) {
+  for (const { edge: e, origin, strokeColor } of specs) {
     const dedupe = `${e.source}|||${e.target}|||${e.type}`;
     if (seen.has(dedupe)) {
       continue;
@@ -416,7 +465,7 @@ function buildTopologyIamLineSkeletons(
     seen.add(dedupe);
     out.push({
       type: "line",
-      id: `tf-topo-iam-edge-${edgeSeq}`,
+      id: `tf-topo-sat-edge-${edgeSeq}`,
       x: 0,
       y: 0,
       width: 1,
@@ -426,7 +475,7 @@ function buildTopologyIamLineSkeletons(
         pointFrom<LocalPoint>(1, 1),
       ],
       strokeWidth: 3,
-      strokeColor: "#0ca678",
+      strokeColor,
       strokeStyle: "solid",
       roundness: { type: 2 },
       endArrowhead: "arrow",
@@ -438,7 +487,7 @@ function buildTopologyIamLineSkeletons(
           target: e.target,
           type: e.type,
           label: e.label,
-          origin: "topology_iam",
+          origin,
           detail: null,
           directed: true,
           bidirectional: false,
@@ -451,7 +500,7 @@ function buildTopologyIamLineSkeletons(
   return out;
 }
 
-/** Primary grid + optional IAM satellites (role / policies) and collector edges for semantic topology. */
+/** Primary grid + IAM (left) / SG (right) satellites and data-flow edges. */
 function appendTopologyResourceRectangles(
   skeleton: ExcalidrawElementSkeleton[],
   addrs: readonly string[],
@@ -460,7 +509,9 @@ function appendTopologyResourceRectangles(
   nodes: TerraformPlanNodesMap,
   arnIndex: Map<string, string>,
   globalPlacedIamSatellites: Set<string>,
-  iamEdgeCollector: TopologyIamEdge[],
+  globalPlacedSgSatellites: Set<string>,
+  satelliteLineSpecs: TopologySatelliteLineSpec[],
+  plan?: unknown,
 ): string[] {
   const rectIds: string[] = [];
   const sorted = [...addrs].sort();
@@ -477,7 +528,16 @@ function appendTopologyResourceRectangles(
       IAM_SATELLITE_H,
       IAM_SATELLITE_GAP,
     );
-    rowBase[rr] = Math.max(rowBase[rr]!, RESOURCE_RECT_H + iamExtra);
+    const sgExtra = sgSatelliteStackHeightPx(
+      nodes,
+      addr,
+      arnIndex,
+      SG_SATELLITE_H,
+      SG_RULE_TILE_H,
+      IAM_SATELLITE_GAP,
+      plan,
+    );
+    rowBase[rr] = Math.max(rowBase[rr]!, RESOURCE_RECT_H + Math.max(iamExtra, sgExtra));
   }
 
   const rowOriginY: number[] = [];
@@ -515,36 +575,101 @@ function appendTopologyResourceRectangles(
     );
 
     const { cluster, edges } = buildLambdaIamCluster(nodes, addr, arnIndex);
+    const sgBuild = buildLambdaSgCluster(nodes, addr, arnIndex, plan);
+    const { iamW, sgW } = satelliteColumnWidths(Boolean(cluster), Boolean(sgBuild.cluster));
+
     for (const e of edges) {
-      iamEdgeCollector.push(e);
+      satelliteLineSpecs.push({
+        edge: e,
+        origin: "topology_iam",
+        strokeColor: IAM_DATAFLOW_STROKE,
+      });
     }
-    if (!cluster) {
-      continue;
+    for (const e of sgBuild.edges) {
+      satelliteLineSpecs.push({
+        edge: e,
+        origin: "topology_sg",
+        strokeColor: SG_DATAFLOW_STROKE,
+      });
     }
 
-    let ySat = ry + RESOURCE_RECT_H + IAM_SATELLITE_GAP;
-    const satX = rx + (RESOURCE_RECT_W - IAM_SATELLITE_W) / 2;
-    for (const satAddr of cluster.stack) {
-      if (globalPlacedIamSatellites.has(satAddr)) {
+    if (cluster) {
+      let ySat = ry + RESOURCE_RECT_H + IAM_SATELLITE_GAP;
+      const satXIam = rx + IAM_SATELLITE_X_PAD;
+      for (const satAddr of cluster.stack) {
+        if (globalPlacedIamSatellites.has(satAddr)) {
+          ySat += IAM_SATELLITE_H + IAM_SATELLITE_GAP;
+          continue;
+        }
+        globalPlacedIamSatellites.add(satAddr);
+        rectIds.push(satAddr);
+        pushResourceRectangleSkeleton(
+          skeleton,
+          satAddr,
+          satXIam,
+          ySat,
+          iamW,
+          IAM_SATELLITE_H,
+          nodes,
+          {
+            initiallyVisible: false,
+            explodeParentKeys: [addr],
+          },
+        );
         ySat += IAM_SATELLITE_H + IAM_SATELLITE_GAP;
-        continue;
       }
-      globalPlacedIamSatellites.add(satAddr);
-      rectIds.push(satAddr);
-      pushResourceRectangleSkeleton(
-        skeleton,
-        satAddr,
-        satX,
-        ySat,
-        IAM_SATELLITE_W,
-        IAM_SATELLITE_H,
-        nodes,
-        {
-          initiallyVisible: false,
-          explodeParentKeys: [addr],
-        },
-      );
-      ySat += IAM_SATELLITE_H + IAM_SATELLITE_GAP;
+    }
+
+    if (sgBuild.cluster) {
+      const satXSg = rx + RESOURCE_RECT_W - sgW - SG_RIGHT_PAD;
+      let ySg = ry + RESOURCE_RECT_H + IAM_SATELLITE_GAP;
+      for (let gi = 0; gi < sgBuild.cluster.groups.length; gi++) {
+        const group = sgBuild.cluster.groups[gi]!;
+
+        if (!globalPlacedSgSatellites.has(group.sgPath)) {
+          globalPlacedSgSatellites.add(group.sgPath);
+          rectIds.push(group.sgPath);
+          pushResourceRectangleSkeleton(
+            skeleton,
+            group.sgPath,
+            satXSg,
+            ySg,
+            sgW,
+            SG_SATELLITE_H,
+            nodes,
+            {
+              initiallyVisible: false,
+              explodeParentKeys: [addr],
+            },
+          );
+        }
+        ySg += SG_SATELLITE_H + IAM_SATELLITE_GAP;
+
+        for (const rulePath of group.rules) {
+          if (!globalPlacedSgSatellites.has(rulePath)) {
+            globalPlacedSgSatellites.add(rulePath);
+            rectIds.push(rulePath);
+            pushResourceRectangleSkeleton(
+              skeleton,
+              rulePath,
+              satXSg,
+              ySg,
+              sgW,
+              SG_RULE_TILE_H,
+              nodes,
+              {
+                initiallyVisible: false,
+                explodeParentKeys: [addr],
+              },
+            );
+          }
+          ySg += SG_RULE_TILE_H + IAM_SATELLITE_GAP;
+        }
+
+        if (gi < sgBuild.cluster.groups.length - 1) {
+          ySg += TOPOLOGY_SG_BETWEEN_GROUPS_GAP_PX;
+        }
+      }
     }
   }
 
@@ -580,6 +705,7 @@ export async function buildTerraformTopologyExcalidrawScene(
   zones: readonly TopologyPlacementZone[],
   regionalBuckets: readonly TopologyRegionalPrimaryBucket[],
   nodes: TerraformPlanNodesMap,
+  plan?: unknown,
 ): Promise<{
   elements: ExcalidrawElement[];
   meta: TerraformTopologySceneMeta;
@@ -611,8 +737,9 @@ export async function buildTerraformTopologyExcalidrawScene(
 
   const skeleton: ExcalidrawElementSkeleton[] = [];
   const arnIndex = buildArnIndexForTopology(nodes);
-  const iamEdgeCollector: TopologyIamEdge[] = [];
+  const satelliteLineSpecs: TopologySatelliteLineSpec[] = [];
   const globalPlacedIamSatellites = new Set<string>();
+  const globalPlacedSgSatellites = new Set<string>();
 
   let accountCursorX = MARGIN;
   const accountCursorY = MARGIN;
@@ -658,7 +785,7 @@ export async function buildTerraformTopologyExcalidrawScene(
       if (hasVpc) {
         for (const [vpcId] of vpcEntries) {
           const vpcZs = zonesForVpc(zones, accountId, regionName, vpcId);
-          const vd = vpcFrameDimensionsForZones(vpcZs, nodes, arnIndex);
+          const vd = vpcFrameDimensionsForZones(vpcZs, nodes, arnIndex, plan);
           vpcCellW = Math.max(vpcCellW, vd.w);
           vpcCellH = Math.max(vpcCellH, vd.h);
         }
@@ -669,7 +796,12 @@ export async function buildTerraformTopologyExcalidrawScene(
         : { cols: 0, rows: 0 };
 
       const regDims = hasReg
-        ? zoneFrameSizeForTopologyAddresses([...regionalAddrs].sort(), nodes, arnIndex)
+        ? zoneFrameSizeForTopologyAddresses(
+            [...regionalAddrs].sort(),
+            nodes,
+            arnIndex,
+            plan,
+          )
         : { w: 0, h: 0 };
 
       let vpcGridW = 0;
@@ -703,7 +835,9 @@ export async function buildTerraformTopologyExcalidrawScene(
           nodes,
           arnIndex,
           globalPlacedIamSatellites,
-          iamEdgeCollector,
+          globalPlacedSgSatellites,
+          satelliteLineSpecs,
+          plan,
         );
 
         skeleton.push({
@@ -762,7 +896,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           continue;
         }
 
-        const vd = vpcFrameDimensionsForZones(vpcZs, nodes, arnIndex);
+        const vd = vpcFrameDimensionsForZones(vpcZs, nodes, arnIndex, plan);
         const zoneGridOriginX = vpcX + INNER_PAD;
         const zoneGridOriginY = vpcY + VPC_TOP_PAD;
         const zoneFrameIds: string[] = [];
@@ -793,7 +927,9 @@ export async function buildTerraformTopologyExcalidrawScene(
             nodes,
             arnIndex,
             globalPlacedIamSatellites,
-            iamEdgeCollector,
+            globalPlacedSgSatellites,
+            satelliteLineSpecs,
+            plan,
           );
 
           skeleton.push({
@@ -917,7 +1053,7 @@ export async function buildTerraformTopologyExcalidrawScene(
     accountCursorX += accountWidth + ACCOUNT_GAP;
   }
 
-  skeleton.unshift(...buildTopologyIamLineSkeletons(iamEdgeCollector));
+  skeleton.unshift(...buildTopologySatelliteLineSkeletons(satelliteLineSpecs));
 
   let elements = convertToExcalidrawElements(skeleton, {
     regenerateIds: true,

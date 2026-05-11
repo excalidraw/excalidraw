@@ -1,7 +1,6 @@
 # Codex Backend Notes
 
-Purpose: quick orientation for future Codex sessions working on `packages/backend`.
-Update this file whenever the backend architecture, Terraform fixture workflow, pipeline order, or layout model changes.
+Purpose: quick orientation for future Codex sessions working on `packages/backend`. Update this file whenever the backend architecture, Terraform fixture workflow, pipeline order, or layout model changes.
 
 ## Package Role
 
@@ -83,10 +82,7 @@ Important fields:
 
 Keys starting with `__` are metadata, such as `__networkingFacetStore`.
 
-`terraform_config` on synthetic module nodes stores selected plan configuration metadata
-needed by semantic edge inference. In particular, module `policy_statements` expression
-references can be resolved through module outputs to concrete resources when generated IAM
-policy JSON is unknown in `resource_changes`.
+`terraform_config` on synthetic module nodes stores selected plan configuration metadata needed by semantic edge inference. In particular, module `policy_statements` expression references can be resolved through module outputs to concrete resources when generated IAM policy JSON is unknown in `resource_changes`.
 
 ## allplanmodules Fixture
 
@@ -114,18 +110,13 @@ Update: Lambda deployment artifacts use `terraform-aws-modules/s3-bucket/aws` as
 
 ## Frontend Connectors
 
-The backend is renderer-agnostic at the HTTP boundary. A "connector" turns
-a stored upload into a frontend-specific scene document.
+The backend is renderer-agnostic at the HTTP boundary. A "connector" turns a stored upload into a frontend-specific scene document.
 
 - `GET /terraform/renderers` — lists available connectors and their status (`stable` / `beta` / `stub`).
 - `GET /terraform/upload/:id/render/:renderer` — primary route. `:renderer` ∈ `excalidraw`, `tldraw` (more pluggable).
 - `GET /terraform/upload/:id/excalidraw` — back-compat alias of `…/render/excalidraw`. Sets a `Deprecation: true` header.
 
-The neutral `DiagramIR` (see `diagram-ir.js`) is built once per request from the
-post-pipeline `nodes` map and passed to every connector alongside the raw
-`nodes`. The tldraw connector currently renders directly from IR into tldraw
-shape partials; the Excalidraw connector still uses `nodes` directly because
-`excalidraw.js` already does layout + scene compilation.
+The neutral `DiagramIR` (see `diagram-ir.js`) is built once per request from the post-pipeline `nodes` map and passed to every connector alongside the raw `nodes`. The tldraw connector currently renders directly from IR into tldraw shape partials; the Excalidraw connector still uses `nodes` directly because `excalidraw.js` already does layout + scene compilation.
 
 Adding a new frontend connector:
 

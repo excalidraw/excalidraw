@@ -254,6 +254,196 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     assertTopologyFramesContainChildren(elements);
   });
 
+  it("places Lambda IAM satellites left of center and SG column right, with rules under SG", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-test",
+                      {
+                        vpcId: "vpc-test",
+                        subnets: new Map([
+                          ["subnet-a", { subnetId: "subnet-a" }],
+                          ["subnet-b", { subnetId: "subnet-b" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-test",
+        subnetSignature: "subnet-a|subnet-b",
+        subnetIds: ["subnet-a", "subnet-b"],
+        addresses: ["aws_lambda_function.fn"],
+      },
+    ];
+
+    const roleArn = "arn:aws:iam::111111111111:role/tf-topo-test-role";
+    const sgArn =
+      "arn:aws:ec2:us-east-1:111111111111:security-group/sg-0layouttest";
+    const nodes: TerraformPlanNodesMap = {
+      "aws_lambda_function.fn": {
+        resources: {
+          "aws_lambda_function.fn": {
+            address: "aws_lambda_function.fn",
+            mode: "managed",
+            type: "aws_lambda_function",
+            change: {
+              actions: ["update"],
+              after: {
+                role: roleArn,
+                vpc_config: [
+                  {
+                    subnet_ids: ["subnet-a", "subnet-b"],
+                    security_group_ids: ["sg-0layouttest"],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      "aws_iam_role.fn_role": {
+        resources: {
+          "aws_iam_role.fn_role": {
+            address: "aws_iam_role.fn_role",
+            mode: "managed",
+            type: "aws_iam_role",
+            name: "fn_role",
+            change: {
+              actions: ["no-op"],
+              after: { arn: roleArn, name: "fn_role" },
+            },
+          },
+        },
+      },
+      "aws_iam_role_policy.logs": {
+        resources: {
+          "aws_iam_role_policy.logs": {
+            address: "aws_iam_role_policy.logs",
+            mode: "managed",
+            type: "aws_iam_role_policy",
+            change: {
+              actions: ["no-op"],
+              after: { role: "fn_role", name: "logs" },
+            },
+          },
+        },
+      },
+      "aws_security_group.app": {
+        resources: {
+          "aws_security_group.app": {
+            address: "aws_security_group.app",
+            mode: "managed",
+            type: "aws_security_group",
+            change: {
+              actions: ["no-op"],
+              after: {
+                id: "sg-0layouttest",
+                arn: sgArn,
+                vpc_id: "vpc-test",
+              },
+            },
+          },
+        },
+      },
+      "aws_vpc_security_group_ingress_rule.ssh": {
+        resources: {
+          "aws_vpc_security_group_ingress_rule.ssh": {
+            address: "aws_vpc_security_group_ingress_rule.ssh",
+            mode: "managed",
+            type: "aws_vpc_security_group_ingress_rule",
+            change: {
+              actions: ["no-op"],
+              after: { security_group_id: "sg-0layouttest" },
+            },
+          },
+        },
+      },
+    };
+
+    const { elements } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      nodes,
+    );
+
+    const rectByPath = (path: string) =>
+      elements.find(
+        (e) =>
+          e.type === "rectangle" &&
+          (e.customData as { nodePath?: string } | undefined)?.nodePath === path,
+      );
+
+    const lambda = rectByPath("aws_lambda_function.fn");
+    const role = rectByPath("aws_iam_role.fn_role");
+    const sg = rectByPath("aws_security_group.app");
+    const rule = rectByPath("aws_vpc_security_group_ingress_rule.ssh");
+    expect(lambda && role && sg && rule).toBeTruthy();
+
+    const lambdaMid = lambda!.x + (lambda!.width ?? 0) / 2;
+    const roleMid = role!.x + (role!.width ?? 0) / 2;
+    const sgMid = sg!.x + (sg!.width ?? 0) / 2;
+    expect(roleMid).toBeLessThan(lambdaMid);
+    expect(sgMid).toBeGreaterThan(lambdaMid);
+
+    const roleRight = role!.x + (role!.width ?? 0);
+    expect(sg!.x - roleRight).toBeGreaterThanOrEqual(6);
+
+    expect(rule!.y).toBeGreaterThanOrEqual(sg!.y + (sg!.height ?? 0) - 2);
+
+    const rels = elements
+      .filter(
+        (e) =>
+          e.type === "line" &&
+          (e.customData as { terraformEdgeLayer?: string } | undefined)
+            ?.terraformEdgeLayer === "dataFlow",
+      )
+      .map((e) => e.customData?.relationship as Record<string, unknown> | undefined);
+
+    expect(
+      rels.some(
+        (r) =>
+          r?.origin === "topology_sg" &&
+          r?.type === "security_group" &&
+          r?.source === "aws_lambda_function.fn" &&
+          r?.target === "aws_security_group.app",
+      ),
+    ).toBe(true);
+    expect(
+      rels.some(
+        (r) =>
+          r?.origin === "topology_sg" &&
+          r?.type === "sg_rule" &&
+          r?.source === "aws_security_group.app" &&
+          r?.target === "aws_vpc_security_group_ingress_rule.ssh",
+      ),
+    ).toBe(true);
+
+    assertTopologyFramesContainChildren(elements);
+  });
+
   it("places regional primaries in Regional services frame when region has no VPCs", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,

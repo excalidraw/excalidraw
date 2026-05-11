@@ -69,7 +69,9 @@ Import shortcut: `Ctrl/Cmd + Shift + K`.
 To import your infrastructure, you need to generate a plan JSON and a graph DOT file from your Terraform or OpenTofu project.
 
 ### 1. Generate Plan JSON
+
 This provides the resource details, diffs, and attributes.
+
 ```bash
 # Terraform
 terraform plan -out=tfplan
@@ -81,7 +83,9 @@ tofu show -json tfplan > plan.json
 ```
 
 ### 2. Generate Graph DOT
+
 This provides the dependency relationship data.
+
 ```bash
 # Terraform
 terraform graph -type=plan > graph.dot
@@ -91,6 +95,7 @@ tofu graph -type=plan > graph.dot
 ```
 
 ### 3. State File (Optional)
+
 You can also upload your `terraform.tfstate` file to enrich the diagram with real ARNs, VPC IDs, and existing resource attributes.
 
 ---

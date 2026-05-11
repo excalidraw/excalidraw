@@ -9,7 +9,7 @@ Root Terraform for this repo lives in [`packages/backend/terraform/`](../).
 ## Concepts
 
 | Piece | Role |
-|--------|------|
+| --- | --- |
 | **Base credentials** | Who you are when Terraform starts: SSO session, `AWS_PROFILE`, env vars, etc. |
 | **`assume_role` (provider)** | Terraform calls **STS AssumeRole** into a **role in the target account** and uses temporary credentials for all AWS API calls. |
 | **Deploy role** | IAM role in the **workload** account; trust policy lists who may assume it; permission policy grants what Terraform needs. |
@@ -186,7 +186,7 @@ Modules must opt in with **`providers = { aws = aws.workloads }`** (and modules 
 ## 6. Troubleshooting
 
 | Symptom | Likely cause |
-|--------|----------------|
+| --- | --- |
 | `AccessDenied` on `AssumeRole` | Trust policy Principal wrong or missing `sts:AssumeRole` on base identity. |
 | `AccessDenied` on `ec2:*` / `lambda:*` after assume | Deploy role permissions too narrow. |
 | SSO token expired | Run `aws sso login` again. |

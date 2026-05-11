@@ -58,8 +58,7 @@
         font-family: "Assistant";
         cursor: pointer;
         user-select: none;
-        transition: border-color 150ms ease-out,
-          background-color 150ms ease-out,
+        transition: border-color 150ms ease-out, background-color 150ms ease-out,
           color 150ms ease-out;
 
         input[type="radio"] {

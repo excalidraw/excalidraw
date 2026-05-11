@@ -15,7 +15,7 @@ Express API that turns a Terraform or OpenTofu **plan JSON**, a **`terraform gra
 ## Package layout
 
 | File | Role |
-|------|------|
+| --- | --- |
 | `index.js` | HTTP routes, multipart upload, SQLite persistence |
 | `pipeline.js` | Graph build: plan → nodes, DOT adjacency, state merge, IAM/data-flow edges, filtering |
 | `diagram-ir.js` | Renderer-neutral IR (nodes/edges/groups) built from the pipeline `nodes` map |
@@ -66,7 +66,7 @@ yarn workspace @excalidraw/backend test
 ## Endpoints
 
 | Method | Route | Description |
-|--------|-------|-------------|
+| --- | --- | --- |
 | POST | `/terraform/upload` | Upload a Terraform/OpenTofu plan JSON, DOT graph, and optional state file. Returns an upload id. |
 | GET | `/terraform/upload/:id` | Fetch the processed Terraform graph nodes for an upload. |
 | GET | `/terraform/renderers` | Lists available frontend connectors (`excalidraw`, `tldraw`, …) and their status. |
@@ -74,14 +74,12 @@ yarn workspace @excalidraw/backend test
 | GET | `/terraform/upload/:id/excalidraw` | **Deprecated alias** for `/render/excalidraw`. Sets `Deprecation: true`. |
 | GET | `/terraform/test-client` | Open a lightweight browser UI to upload plan+dot files and inspect VPC/subnet facet summaries from generated Excalidraw output. |
 
-Unknown renderer ids return HTTP 404 with the available ids in the body. A
-renderer that exists but isn't implemented yet returns
-HTTP 501 with `{ renderer, details }`.
+Unknown renderer ids return HTTP 404 with the available ids in the body. A renderer that exists but isn't implemented yet returns HTTP 501 with `{ renderer, details }`.
 
 `POST /terraform/upload` expects multipart form fields:
 
 | Field | Required | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | `planFile` | Yes | JSON output from `terraform show -json` or `tofu show -json`. |
 | `dotFile` | Yes | DOT output from `terraform graph` or `tofu graph`. |
 | `stateFile` | No | Terraform/OpenTofu state JSON. Helps preserve existing resources and edges. |
@@ -253,7 +251,7 @@ This is expected when running from a JSON plan only. Rover still builds the visu
 The backend creates local runtime artifacts:
 
 | Path | Purpose |
-|------|---------|
+| --- | --- |
 | `packages/backend/graph.db` | SQLite upload store. |
 | `packages/backend/uploads/` | Temporary multer uploads. |
 | `packages/backend/terraform/*.json`, `*.dot`, plan files | Sample/generated Terraform artifacts. |
