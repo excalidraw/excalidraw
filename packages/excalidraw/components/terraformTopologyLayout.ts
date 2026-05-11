@@ -34,6 +34,10 @@ import type {
 } from "./terraformTopologyPlacement";
 import type { TerraformTopologyModel } from "./terraformTopologyExtract";
 import {
+  buildLambdaCloudWatchCluster,
+  cloudWatchSatelliteStackHeightPx,
+} from "./terraformTopologyCloudWatchLinks";
+import {
   buildArnIndexForTopology,
   buildLambdaIamCluster,
   iamSatelliteStackHeightPx,
@@ -89,8 +93,16 @@ const SG_SATELLITE_H = 52;
 const SG_RULE_TILE_H = 52;
 const SG_RIGHT_PAD = 6;
 const SG_DATAFLOW_STROKE = "#228be6";
+/** CloudWatch alarm / log group tiles above a Lambda. */
+const CLOUDWATCH_SATELLITE_W = 176;
+const CLOUDWATCH_SATELLITE_H = 52;
+const CLOUDWATCH_SATELLITE_GAP = 8;
+const CLOUDWATCH_LEFT_PAD = 6;
+const CLOUDWATCH_RIGHT_PAD = 6;
+const CLOUDWATCH_DATAFLOW_STROKE = "#f08c00";
 /** When both IAM and SG satellites exist, split tile width so columns do not overlap (cell is {@link RESOURCE_RECT_W}). */
 const IAM_SG_COLUMN_GAP_PX = 8;
+const CLOUDWATCH_COLUMN_GAP_PX = 8;
 const MIN_SPLIT_SATELLITE_W = 86;
 /** Gap between subnet-zone frames inside one VPC. */
 const ZONE_CELL_GAP = 20;
@@ -196,6 +208,25 @@ function satelliteColumnWidths(
   return { iamW: IAM_SATELLITE_W, sgW: SG_SATELLITE_W };
 }
 
+function cloudWatchColumnWidths(
+  hasAlarms: boolean,
+  hasLogGroups: boolean,
+): { alarmW: number; logGroupW: number } {
+  if (hasAlarms && hasLogGroups) {
+    const inner =
+      RESOURCE_RECT_W -
+      CLOUDWATCH_LEFT_PAD -
+      CLOUDWATCH_RIGHT_PAD -
+      CLOUDWATCH_COLUMN_GAP_PX;
+    const w = Math.max(MIN_SPLIT_SATELLITE_W, Math.floor(inner / 2));
+    return { alarmW: w, logGroupW: w };
+  }
+  return {
+    alarmW: CLOUDWATCH_SATELLITE_W,
+    logGroupW: CLOUDWATCH_SATELLITE_W,
+  };
+}
+
 function gridColsRows(count: number): { cols: number; rows: number } {
   if (count <= 0) {
     return { cols: 1, rows: 1 };
@@ -228,9 +259,17 @@ function zoneFrameSizeForTopologyAddresses(
     };
   }
   const { cols, rows } = gridColsRows(n);
-  const cellHeights: number[] = [];
+  const rowTopBase: number[] = new Array(rows).fill(0);
+  const rowBottomBase: number[] = new Array(rows).fill(0);
   for (let i = 0; i < sortedAddresses.length; i++) {
     const addr = sortedAddresses[i]!;
+    const r = Math.floor(i / cols);
+    const cloudWatchExtra = cloudWatchSatelliteStackHeightPx(
+      nodes,
+      addr,
+      CLOUDWATCH_SATELLITE_H,
+      CLOUDWATCH_SATELLITE_GAP,
+    );
     const iamExtra = iamSatelliteStackHeightPx(
       nodes,
       addr,
@@ -247,16 +286,16 @@ function zoneFrameSizeForTopologyAddresses(
       IAM_SATELLITE_GAP,
       plan,
     );
-    cellHeights.push(RESOURCE_RECT_H + Math.max(iamExtra, sgExtra));
-  }
-  const rowBase: number[] = new Array(rows).fill(RESOURCE_RECT_H);
-  for (let i = 0; i < sortedAddresses.length; i++) {
-    const r = Math.floor(i / cols);
-    rowBase[r] = Math.max(rowBase[r]!, cellHeights[i]!);
+    rowTopBase[r] = Math.max(rowTopBase[r]!, cloudWatchExtra);
+    rowBottomBase[r] = Math.max(rowBottomBase[r]!, iamExtra, sgExtra);
   }
   let innerBodyH = 0;
   for (let r = 0; r < rows; r++) {
-    innerBodyH += rowBase[r]! + (r < rows - 1 ? RESOURCE_GAP : 0);
+    innerBodyH +=
+      rowTopBase[r]! +
+      RESOURCE_RECT_H +
+      rowBottomBase[r]! +
+      (r < rows - 1 ? RESOURCE_GAP : 0);
   }
   const w =
     2 * INNER_PAD +
@@ -447,7 +486,7 @@ function pushResourceRectangleSkeleton(
 
 type TopologySatelliteLineSpec = {
   edge: TopologyIamEdge;
-  origin: "topology_iam" | "topology_sg";
+  origin: "topology_iam" | "topology_sg" | "topology_cloudwatch";
   strokeColor: string;
 };
 
@@ -510,6 +549,7 @@ function appendTopologyResourceRectangles(
   arnIndex: Map<string, string>,
   globalPlacedIamSatellites: Set<string>,
   globalPlacedSgSatellites: Set<string>,
+  globalPlacedCloudWatchSatellites: Set<string>,
   satelliteLineSpecs: TopologySatelliteLineSpec[],
   plan?: unknown,
 ): string[] {
@@ -517,10 +557,17 @@ function appendTopologyResourceRectangles(
   const sorted = [...addrs].sort();
   const { cols: rcCols, rows: rcRows } = gridColsRows(sorted.length);
 
-  const rowBase: number[] = new Array(rcRows).fill(RESOURCE_RECT_H);
+  const rowTopBase: number[] = new Array(rcRows).fill(0);
+  const rowBottomBase: number[] = new Array(rcRows).fill(0);
   for (let ri = 0; ri < sorted.length; ri++) {
     const addr = sorted[ri]!;
     const rr = Math.floor(ri / rcCols);
+    const cloudWatchExtra = cloudWatchSatelliteStackHeightPx(
+      nodes,
+      addr,
+      CLOUDWATCH_SATELLITE_H,
+      CLOUDWATCH_SATELLITE_GAP,
+    );
     const iamExtra = iamSatelliteStackHeightPx(
       nodes,
       addr,
@@ -537,14 +584,19 @@ function appendTopologyResourceRectangles(
       IAM_SATELLITE_GAP,
       plan,
     );
-    rowBase[rr] = Math.max(rowBase[rr]!, RESOURCE_RECT_H + Math.max(iamExtra, sgExtra));
+    rowTopBase[rr] = Math.max(rowTopBase[rr]!, cloudWatchExtra);
+    rowBottomBase[rr] = Math.max(rowBottomBase[rr]!, iamExtra, sgExtra);
   }
 
   const rowOriginY: number[] = [];
   let yAcc = contentOriginY;
   for (let r = 0; r < rcRows; r++) {
     rowOriginY.push(yAcc);
-    yAcc += rowBase[r]! + (r < rcRows - 1 ? RESOURCE_GAP : 0);
+    yAcc +=
+      rowTopBase[r]! +
+      RESOURCE_RECT_H +
+      rowBottomBase[r]! +
+      (r < rcRows - 1 ? RESOURCE_GAP : 0);
   }
 
   for (let ri = 0; ri < sorted.length; ri++) {
@@ -552,7 +604,7 @@ function appendTopologyResourceRectangles(
     const rc = ri % rcCols;
     const rr = Math.floor(ri / rcCols);
     const rx = contentOriginX + rc * (RESOURCE_RECT_W + RESOURCE_GAP);
-    const ry = rowOriginY[rr]!;
+    const ry = rowOriginY[rr]! + rowTopBase[rr]!;
 
     const node = nodes[addr] as TerraformPlanGraphNode | undefined;
     const resourceType = getTerraformResourceTypeFromNodePath(addr);
@@ -576,7 +628,12 @@ function appendTopologyResourceRectangles(
 
     const { cluster, edges } = buildLambdaIamCluster(nodes, addr, arnIndex);
     const sgBuild = buildLambdaSgCluster(nodes, addr, arnIndex, plan);
+    const cloudWatchBuild = buildLambdaCloudWatchCluster(nodes, addr);
     const { iamW, sgW } = satelliteColumnWidths(Boolean(cluster), Boolean(sgBuild.cluster));
+    const { alarmW, logGroupW } = cloudWatchColumnWidths(
+      Boolean(cloudWatchBuild.cluster?.alarms.length),
+      Boolean(cloudWatchBuild.cluster?.logGroups.length),
+    );
 
     for (const e of edges) {
       satelliteLineSpecs.push({
@@ -591,6 +648,71 @@ function appendTopologyResourceRectangles(
         origin: "topology_sg",
         strokeColor: SG_DATAFLOW_STROKE,
       });
+    }
+    for (const e of cloudWatchBuild.edges) {
+      satelliteLineSpecs.push({
+        edge: e,
+        origin: "topology_cloudwatch",
+        strokeColor: CLOUDWATCH_DATAFLOW_STROKE,
+      });
+    }
+
+    if (cloudWatchBuild.cluster) {
+      const cloudWatchTop =
+        ry -
+        cloudWatchSatelliteStackHeightPx(
+          nodes,
+          addr,
+          CLOUDWATCH_SATELLITE_H,
+          CLOUDWATCH_SATELLITE_GAP,
+        ) +
+        CLOUDWATCH_SATELLITE_GAP;
+
+      let yAlarm = cloudWatchTop;
+      const alarmX = rx + CLOUDWATCH_LEFT_PAD;
+      for (const alarmPath of cloudWatchBuild.cluster.alarms) {
+        if (!globalPlacedCloudWatchSatellites.has(alarmPath)) {
+          globalPlacedCloudWatchSatellites.add(alarmPath);
+          rectIds.push(alarmPath);
+          pushResourceRectangleSkeleton(
+            skeleton,
+            alarmPath,
+            alarmX,
+            yAlarm,
+            alarmW,
+            CLOUDWATCH_SATELLITE_H,
+            nodes,
+            {
+              initiallyVisible: false,
+              explodeParentKeys: [addr],
+            },
+          );
+        }
+        yAlarm += CLOUDWATCH_SATELLITE_H + CLOUDWATCH_SATELLITE_GAP;
+      }
+
+      let yLogGroup = cloudWatchTop;
+      const logGroupX = rx + RESOURCE_RECT_W - logGroupW - CLOUDWATCH_RIGHT_PAD;
+      for (const logGroupPath of cloudWatchBuild.cluster.logGroups) {
+        if (!globalPlacedCloudWatchSatellites.has(logGroupPath)) {
+          globalPlacedCloudWatchSatellites.add(logGroupPath);
+          rectIds.push(logGroupPath);
+          pushResourceRectangleSkeleton(
+            skeleton,
+            logGroupPath,
+            logGroupX,
+            yLogGroup,
+            logGroupW,
+            CLOUDWATCH_SATELLITE_H,
+            nodes,
+            {
+              initiallyVisible: false,
+              explodeParentKeys: [addr],
+            },
+          );
+        }
+        yLogGroup += CLOUDWATCH_SATELLITE_H + CLOUDWATCH_SATELLITE_GAP;
+      }
     }
 
     if (cluster) {
@@ -740,6 +862,7 @@ export async function buildTerraformTopologyExcalidrawScene(
   const satelliteLineSpecs: TopologySatelliteLineSpec[] = [];
   const globalPlacedIamSatellites = new Set<string>();
   const globalPlacedSgSatellites = new Set<string>();
+  const globalPlacedCloudWatchSatellites = new Set<string>();
 
   let accountCursorX = MARGIN;
   const accountCursorY = MARGIN;
@@ -836,6 +959,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           arnIndex,
           globalPlacedIamSatellites,
           globalPlacedSgSatellites,
+          globalPlacedCloudWatchSatellites,
           satelliteLineSpecs,
           plan,
         );
@@ -928,6 +1052,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             arnIndex,
             globalPlacedIamSatellites,
             globalPlacedSgSatellites,
+            globalPlacedCloudWatchSatellites,
             satelliteLineSpecs,
             plan,
           );

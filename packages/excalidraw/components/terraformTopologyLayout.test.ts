@@ -444,6 +444,184 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     assertTopologyFramesContainChildren(elements);
   });
 
+  it("places Lambda CloudWatch alarms above-left and log groups above-right", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-test",
+                      {
+                        vpcId: "vpc-test",
+                        subnets: new Map([["subnet-a", { subnetId: "subnet-a" }]]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-test",
+        subnetSignature: "subnet-a",
+        subnetIds: ["subnet-a"],
+        addresses: ["aws_lambda_function.fn"],
+      },
+    ];
+
+    const roleArn = "arn:aws:iam::111111111111:role/tf-topo-test-role";
+    const nodes: TerraformPlanNodesMap = {
+      "aws_lambda_function.fn": {
+        resources: {
+          "aws_lambda_function.fn": {
+            address: "aws_lambda_function.fn",
+            mode: "managed",
+            type: "aws_lambda_function",
+            change: {
+              actions: ["update"],
+              after: {
+                function_name: "test-reader",
+                role: roleArn,
+              },
+            },
+          },
+        },
+      },
+      "aws_cloudwatch_metric_alarm.errors": {
+        resources: {
+          "aws_cloudwatch_metric_alarm.errors": {
+            address: "aws_cloudwatch_metric_alarm.errors",
+            mode: "managed",
+            type: "aws_cloudwatch_metric_alarm",
+            change: {
+              actions: ["no-op"],
+              after: {
+                namespace: "AWS/Lambda",
+                metric_name: "Errors",
+                dimensions: { FunctionName: "test-reader" },
+              },
+            },
+          },
+        },
+      },
+      "aws_cloudwatch_log_group.lambda": {
+        resources: {
+          "aws_cloudwatch_log_group.lambda": {
+            address: "aws_cloudwatch_log_group.lambda",
+            mode: "managed",
+            type: "aws_cloudwatch_log_group",
+            change: {
+              actions: ["no-op"],
+              after: { name: "/aws/lambda/test-reader" },
+            },
+          },
+        },
+      },
+      "aws_iam_role.fn_role": {
+        resources: {
+          "aws_iam_role.fn_role": {
+            address: "aws_iam_role.fn_role",
+            mode: "managed",
+            type: "aws_iam_role",
+            name: "fn_role",
+            change: {
+              actions: ["no-op"],
+              after: { arn: roleArn, name: "fn_role" },
+            },
+          },
+        },
+      },
+      "aws_iam_role_policy.logs": {
+        resources: {
+          "aws_iam_role_policy.logs": {
+            address: "aws_iam_role_policy.logs",
+            mode: "managed",
+            type: "aws_iam_role_policy",
+            change: {
+              actions: ["no-op"],
+              after: { role: "fn_role", name: "logs" },
+            },
+          },
+        },
+      },
+    };
+
+    const { elements } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      nodes,
+    );
+
+    const rectByPath = (path: string) =>
+      elements.find(
+        (e) =>
+          e.type === "rectangle" &&
+          (e.customData as { nodePath?: string } | undefined)?.nodePath === path,
+      );
+
+    const lambda = rectByPath("aws_lambda_function.fn");
+    const alarm = rectByPath("aws_cloudwatch_metric_alarm.errors");
+    const logGroup = rectByPath("aws_cloudwatch_log_group.lambda");
+    const role = rectByPath("aws_iam_role.fn_role");
+    expect(lambda && alarm && logGroup && role).toBeTruthy();
+
+    const lambdaMid = lambda!.x + (lambda!.width ?? 0) / 2;
+    const alarmMid = alarm!.x + (alarm!.width ?? 0) / 2;
+    const logGroupMid = logGroup!.x + (logGroup!.width ?? 0) / 2;
+    expect(alarmMid).toBeLessThan(lambdaMid);
+    expect(logGroupMid).toBeGreaterThan(lambdaMid);
+    expect(alarm!.y + (alarm!.height ?? 0)).toBeLessThanOrEqual(lambda!.y);
+    expect(logGroup!.y + (logGroup!.height ?? 0)).toBeLessThanOrEqual(lambda!.y);
+    expect(role!.y).toBeGreaterThanOrEqual(lambda!.y + (lambda!.height ?? 0));
+
+    const rels = elements
+      .filter(
+        (e) =>
+          e.type === "line" &&
+          (e.customData as { terraformEdgeLayer?: string } | undefined)
+            ?.terraformEdgeLayer === "dataFlow",
+      )
+      .map((e) => e.customData?.relationship as Record<string, unknown> | undefined);
+
+    expect(
+      rels.some(
+        (r) =>
+          r?.origin === "topology_cloudwatch" &&
+          r?.type === "cloudwatch_alarm" &&
+          r?.source === "aws_cloudwatch_metric_alarm.errors" &&
+          r?.target === "aws_lambda_function.fn",
+      ),
+    ).toBe(true);
+    expect(
+      rels.some(
+        (r) =>
+          r?.origin === "topology_cloudwatch" &&
+          r?.type === "cloudwatch_log_group" &&
+          r?.source === "aws_cloudwatch_log_group.lambda" &&
+          r?.target === "aws_lambda_function.fn",
+      ),
+    ).toBe(true);
+
+    assertTopologyFramesContainChildren(elements);
+  });
+
   it("places regional primaries in Regional services frame when region has no VPCs", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,
