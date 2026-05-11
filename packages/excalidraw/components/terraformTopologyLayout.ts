@@ -6,6 +6,9 @@
 import { convertToExcalidrawElements } from "@excalidraw/element";
 
 import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
+import { pointFrom } from "@excalidraw/math";
+
+import type { LocalPoint } from "@excalidraw/math";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import {
@@ -30,6 +33,16 @@ import type {
   TopologyRegionalPrimaryBucket,
 } from "./terraformTopologyPlacement";
 import type { TerraformTopologyModel } from "./terraformTopologyExtract";
+import {
+  buildArnIndexForTopology,
+  buildLambdaIamCluster,
+  iamSatelliteStackHeightPx,
+  type TopologyIamEdge,
+} from "./terraformTopologyIamLinks";
+import {
+  reconcileTerraformVisibility,
+  repairTerraformEdgeBindings,
+} from "./terraformVisibility";
 
 export type TerraformTopologySceneMeta = {
   layoutEngine: "topology";
@@ -59,6 +72,10 @@ const CANVAS_EDGE_PAD = MARGIN;
 const RESOURCE_RECT_W = 200;
 const RESOURCE_RECT_H = 88;
 const RESOURCE_GAP = 16;
+/** IAM role / policy tiles under a Lambda in semantic topology. */
+const IAM_SATELLITE_W = 176;
+const IAM_SATELLITE_H = 52;
+const IAM_SATELLITE_GAP = 8;
 /** Gap between subnet-zone frames inside one VPC. */
 const ZONE_CELL_GAP = 20;
 /** Gap between regional-services column and VPC grid inside one region frame. */
@@ -164,15 +181,41 @@ function vpcEmptyShellSize(): { w: number; h: number } {
   };
 }
 
-/** Bounding box for one subnet-zone frame from primary resource count. */
-function zoneFrameSize(resourceCount: number): { w: number; h: number } {
-  if (resourceCount <= 0) {
+/** Bounding box for one subnet-zone or regional frame from primary addresses + IAM stacks. */
+function zoneFrameSizeForTopologyAddresses(
+  sortedAddresses: readonly string[],
+  nodes: TerraformPlanNodesMap,
+  arnIndex: Map<string, string>,
+): { w: number; h: number } {
+  const n = sortedAddresses.length;
+  if (n <= 0) {
     return {
       w: MIN_VPC_W + FRAME_CONTENT_SLACK_X,
       h: 180 + FRAME_CONTENT_SLACK_Y,
     };
   }
-  const { cols, rows } = gridColsRows(resourceCount);
+  const { cols, rows } = gridColsRows(n);
+  const cellHeights: number[] = [];
+  for (let i = 0; i < sortedAddresses.length; i++) {
+    const addr = sortedAddresses[i]!;
+    const iamExtra = iamSatelliteStackHeightPx(
+      nodes,
+      addr,
+      arnIndex,
+      IAM_SATELLITE_H,
+      IAM_SATELLITE_GAP,
+    );
+    cellHeights.push(RESOURCE_RECT_H + iamExtra);
+  }
+  const rowBase: number[] = new Array(rows).fill(RESOURCE_RECT_H);
+  for (let i = 0; i < sortedAddresses.length; i++) {
+    const r = Math.floor(i / cols);
+    rowBase[r] = Math.max(rowBase[r]!, cellHeights[i]!);
+  }
+  let innerBodyH = 0;
+  for (let r = 0; r < rows; r++) {
+    innerBodyH += rowBase[r]! + (r < rows - 1 ? RESOURCE_GAP : 0);
+  }
   const w =
     2 * INNER_PAD +
     cols * (RESOURCE_RECT_W + RESOURCE_GAP) -
@@ -181,8 +224,7 @@ function zoneFrameSize(resourceCount: number): { w: number; h: number } {
   const h =
     VPC_TOP_PAD +
     2 * INNER_PAD +
-    rows * (RESOURCE_RECT_H + RESOURCE_GAP) -
-    RESOURCE_GAP +
+    innerBodyH +
     FRAME_CONTENT_SLACK_Y;
   return {
     w: Math.max(MIN_VPC_W * 0.55 + FRAME_CONTENT_SLACK_X, w),
@@ -205,6 +247,8 @@ function zonesForVpc(
 /** VPC frame size that fits all subnet-zone cells for this VPC. */
 function vpcFrameDimensionsForZones(
   vpcZs: readonly TopologyPlacementZone[],
+  nodes: TerraformPlanNodesMap,
+  arnIndex: Map<string, string>,
 ): { w: number; h: number; perZoneW: number; perZoneH: number; znCols: number; znRows: number } {
   if (vpcZs.length === 0) {
     const e = vpcEmptyShellSize();
@@ -221,7 +265,8 @@ function vpcFrameDimensionsForZones(
   let perZoneW = 0;
   let perZoneH = 0;
   for (const z of vpcZs) {
-    const d = zoneFrameSize(z.addresses.length);
+    const sortedZ = [...z.addresses].sort();
+    const d = zoneFrameSizeForTopologyAddresses(sortedZ, nodes, arnIndex);
     perZoneW = Math.max(perZoneW, d.w);
     perZoneH = Math.max(perZoneH, d.h);
   }
@@ -299,70 +344,208 @@ function regionalAddressesFor(
   return b?.addresses ?? [];
 }
 
-function appendTopologyPrimaryRectangles(
+function pushResourceRectangleSkeleton(
+  skeleton: ExcalidrawElementSkeleton[],
+  addr: string,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  nodes: TerraformPlanNodesMap,
+  options: {
+    initiallyVisible: boolean;
+    explodeParentKeys: string[];
+  },
+): void {
+  const node = nodes[addr] as TerraformPlanGraphNode | undefined;
+  const resource = getPrimaryResource(node);
+  const resourceType = getTerraformResourceTypeFromNodePath(addr);
+  const action = getTerraformPlanNodeAction(node);
+  const actionStyle = getTerraformActionStyle(action);
+  const explodeKeys = [...options.explodeParentKeys].sort();
+  const explodeParent = explodeKeys[0] ?? null;
+
+  skeleton.push({
+    type: "rectangle",
+    id: addr,
+    x,
+    y,
+    width,
+    height,
+    strokeWidth: 1.5,
+    strokeColor: actionStyle.strokeColor,
+    backgroundColor: actionStyle.backgroundColor,
+    roundness: { type: 3, value: 10 },
+    label: {
+      text: shortTerraformResourceLabel(addr),
+      fontSize: 12,
+      strokeColor: TERRAFORM_RESOURCE_LABEL_STROKE,
+    },
+    customData: {
+      terraform: true,
+      terraformVisibilityRole: "resource",
+      terraformVisibilityKey: addr,
+      terraformNodeKind: "resource",
+      terraformInitiallyVisible: options.initiallyVisible,
+      terraformExplodeParentKeys: explodeKeys,
+      terraformExplodeParent: explodeParent,
+      resourceType,
+      nodePath: addr,
+      action,
+      terraformResources:
+        resource &&
+        buildTerraformResourcePanelDetails(
+          addr,
+          resource as Record<string, unknown>,
+        ),
+    },
+  });
+}
+
+function buildTopologyIamLineSkeletons(
+  edges: readonly TopologyIamEdge[],
+): ExcalidrawElementSkeleton[] {
+  const seen = new Set<string>();
+  const out: ExcalidrawElementSkeleton[] = [];
+  let edgeSeq = 0;
+  for (const e of edges) {
+    const dedupe = `${e.source}|||${e.target}|||${e.type}`;
+    if (seen.has(dedupe)) {
+      continue;
+    }
+    seen.add(dedupe);
+    out.push({
+      type: "line",
+      id: `tf-topo-iam-edge-${edgeSeq}`,
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1,
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(1, 1),
+      ],
+      strokeWidth: 3,
+      strokeColor: "#0ca678",
+      strokeStyle: "solid",
+      roundness: { type: 2 },
+      endArrowhead: "arrow",
+      customData: {
+        terraform: true,
+        terraformEdgeLayer: "dataFlow",
+        relationship: {
+          source: e.source,
+          target: e.target,
+          type: e.type,
+          label: e.label,
+          origin: "topology_iam",
+          detail: null,
+          directed: true,
+          bidirectional: false,
+          directions: [],
+        },
+      },
+    });
+    edgeSeq += 1;
+  }
+  return out;
+}
+
+/** Primary grid + optional IAM satellites (role / policies) and collector edges for semantic topology. */
+function appendTopologyResourceRectangles(
   skeleton: ExcalidrawElementSkeleton[],
   addrs: readonly string[],
   contentOriginX: number,
   contentOriginY: number,
   nodes: TerraformPlanNodesMap,
+  arnIndex: Map<string, string>,
+  globalPlacedIamSatellites: Set<string>,
+  iamEdgeCollector: TopologyIamEdge[],
 ): string[] {
   const rectIds: string[] = [];
   const sorted = [...addrs].sort();
-  const { cols: rcCols } = gridColsRows(sorted.length);
+  const { cols: rcCols, rows: rcRows } = gridColsRows(sorted.length);
+
+  const rowBase: number[] = new Array(rcRows).fill(RESOURCE_RECT_H);
+  for (let ri = 0; ri < sorted.length; ri++) {
+    const addr = sorted[ri]!;
+    const rr = Math.floor(ri / rcCols);
+    const iamExtra = iamSatelliteStackHeightPx(
+      nodes,
+      addr,
+      arnIndex,
+      IAM_SATELLITE_H,
+      IAM_SATELLITE_GAP,
+    );
+    rowBase[rr] = Math.max(rowBase[rr]!, RESOURCE_RECT_H + iamExtra);
+  }
+
+  const rowOriginY: number[] = [];
+  let yAcc = contentOriginY;
+  for (let r = 0; r < rcRows; r++) {
+    rowOriginY.push(yAcc);
+    yAcc += rowBase[r]! + (r < rcRows - 1 ? RESOURCE_GAP : 0);
+  }
 
   for (let ri = 0; ri < sorted.length; ri++) {
     const addr = sorted[ri]!;
     const rc = ri % rcCols;
     const rr = Math.floor(ri / rcCols);
     const rx = contentOriginX + rc * (RESOURCE_RECT_W + RESOURCE_GAP);
-    const ry = contentOriginY + rr * (RESOURCE_RECT_H + RESOURCE_GAP);
+    const ry = rowOriginY[rr]!;
 
     const node = nodes[addr] as TerraformPlanGraphNode | undefined;
-    const resource = getPrimaryResource(node);
     const resourceType = getTerraformResourceTypeFromNodePath(addr);
     const action = getTerraformPlanNodeAction(node);
     const initiallyVisible = isInitiallyVisibleTerraformResource(
       resourceType,
       action,
     );
-    const actionStyle = getTerraformActionStyle(action);
 
     rectIds.push(addr);
-    skeleton.push({
-      type: "rectangle",
-      id: addr,
-      x: rx,
-      y: ry,
-      width: RESOURCE_RECT_W,
-      height: RESOURCE_RECT_H,
-      strokeWidth: 1.5,
-      strokeColor: actionStyle.strokeColor,
-      backgroundColor: actionStyle.backgroundColor,
-      roundness: { type: 3, value: 10 },
-      label: {
-        text: shortTerraformResourceLabel(addr),
-        fontSize: 12,
-        strokeColor: TERRAFORM_RESOURCE_LABEL_STROKE,
-      },
-      customData: {
-        terraform: true,
-        terraformVisibilityRole: "resource",
-        terraformVisibilityKey: addr,
-        terraformNodeKind: "resource",
-        terraformInitiallyVisible: initiallyVisible,
-        terraformExplodeParentKeys: [],
-        terraformExplodeParent: null,
-        resourceType,
-        nodePath: addr,
-        action,
-        terraformResources:
-          resource &&
-          buildTerraformResourcePanelDetails(
-            addr,
-            resource as Record<string, unknown>,
-          ),
-      },
-    });
+    pushResourceRectangleSkeleton(
+      skeleton,
+      addr,
+      rx,
+      ry,
+      RESOURCE_RECT_W,
+      RESOURCE_RECT_H,
+      nodes,
+      { initiallyVisible, explodeParentKeys: [] },
+    );
+
+    const { cluster, edges } = buildLambdaIamCluster(nodes, addr, arnIndex);
+    for (const e of edges) {
+      iamEdgeCollector.push(e);
+    }
+    if (!cluster) {
+      continue;
+    }
+
+    let ySat = ry + RESOURCE_RECT_H + IAM_SATELLITE_GAP;
+    const satX = rx + (RESOURCE_RECT_W - IAM_SATELLITE_W) / 2;
+    for (const satAddr of cluster.stack) {
+      if (globalPlacedIamSatellites.has(satAddr)) {
+        ySat += IAM_SATELLITE_H + IAM_SATELLITE_GAP;
+        continue;
+      }
+      globalPlacedIamSatellites.add(satAddr);
+      rectIds.push(satAddr);
+      pushResourceRectangleSkeleton(
+        skeleton,
+        satAddr,
+        satX,
+        ySat,
+        IAM_SATELLITE_W,
+        IAM_SATELLITE_H,
+        nodes,
+        {
+          initiallyVisible: false,
+          explodeParentKeys: [addr],
+        },
+      );
+      ySat += IAM_SATELLITE_H + IAM_SATELLITE_GAP;
+    }
   }
 
   return rectIds;
@@ -427,6 +610,9 @@ export async function buildTerraformTopologyExcalidrawScene(
   }
 
   const skeleton: ExcalidrawElementSkeleton[] = [];
+  const arnIndex = buildArnIndexForTopology(nodes);
+  const iamEdgeCollector: TopologyIamEdge[] = [];
+  const globalPlacedIamSatellites = new Set<string>();
 
   let accountCursorX = MARGIN;
   const accountCursorY = MARGIN;
@@ -472,7 +658,7 @@ export async function buildTerraformTopologyExcalidrawScene(
       if (hasVpc) {
         for (const [vpcId] of vpcEntries) {
           const vpcZs = zonesForVpc(zones, accountId, regionName, vpcId);
-          const vd = vpcFrameDimensionsForZones(vpcZs);
+          const vd = vpcFrameDimensionsForZones(vpcZs, nodes, arnIndex);
           vpcCellW = Math.max(vpcCellW, vd.w);
           vpcCellH = Math.max(vpcCellH, vd.h);
         }
@@ -482,7 +668,9 @@ export async function buildTerraformTopologyExcalidrawScene(
         ? gridColsRows(vpcEntries.length)
         : { cols: 0, rows: 0 };
 
-      const regDims = hasReg ? zoneFrameSize(regionalAddrs.length) : { w: 0, h: 0 };
+      const regDims = hasReg
+        ? zoneFrameSizeForTopologyAddresses([...regionalAddrs].sort(), nodes, arnIndex)
+        : { w: 0, h: 0 };
 
       let vpcGridW = 0;
       let vpcGridH = 0;
@@ -507,12 +695,15 @@ export async function buildTerraformTopologyExcalidrawScene(
         vpcGridOriginX =
           regX + regDims.w + (hasVpc ? REGIONAL_TO_VPC_GAP : 0);
 
-        const regionalRectIds = appendTopologyPrimaryRectangles(
+        const regionalRectIds = appendTopologyResourceRectangles(
           skeleton,
           regionalAddrs,
           regX + INNER_PAD,
           regY + VPC_TOP_PAD,
           nodes,
+          arnIndex,
+          globalPlacedIamSatellites,
+          iamEdgeCollector,
         );
 
         skeleton.push({
@@ -571,7 +762,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           continue;
         }
 
-        const vd = vpcFrameDimensionsForZones(vpcZs);
+        const vd = vpcFrameDimensionsForZones(vpcZs, nodes, arnIndex);
         const zoneGridOriginX = vpcX + INNER_PAD;
         const zoneGridOriginY = vpcY + VPC_TOP_PAD;
         const zoneFrameIds: string[] = [];
@@ -594,12 +785,15 @@ export async function buildTerraformTopologyExcalidrawScene(
           zoneFrameIds.push(zoneSkId);
 
           const addrs = [...z.addresses].sort();
-          const rectIds = appendTopologyPrimaryRectangles(
+          const rectIds = appendTopologyResourceRectangles(
             skeleton,
             addrs,
             zoneX + INNER_PAD,
             zoneY + VPC_TOP_PAD,
             nodes,
+            arnIndex,
+            globalPlacedIamSatellites,
+            iamEdgeCollector,
           );
 
           skeleton.push({
@@ -723,12 +917,15 @@ export async function buildTerraformTopologyExcalidrawScene(
     accountCursorX += accountWidth + ACCOUNT_GAP;
   }
 
+  skeleton.unshift(...buildTopologyIamLineSkeletons(iamEdgeCollector));
+
   let elements = convertToExcalidrawElements(skeleton, {
     regenerateIds: true,
   }) as ExcalidrawElement[];
 
   elements = applyTerraformResourceRectangleSoftDelete(elements);
   elements = mirrorAndDetachTerraformResourceLabels(elements);
+  elements = repairTerraformEdgeBindings(reconcileTerraformVisibility(elements));
 
   normalizeTopologyOrigin(elements);
 
