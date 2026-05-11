@@ -233,6 +233,69 @@ describe("buildTerraformElkExcalidrawScene", () => {
     ).toBeLessThan(Math.min(...rects.map((rect) => elements.indexOf(rect))));
   });
 
+  it("emits data-flow lines when edges_data_flow is populated", async () => {
+    const q = "aws_sqs_queue.jobs";
+    const fn = "aws_lambda_function.fn";
+    const nodes = {
+      [q]: {
+        resources: {
+          [q]: {
+            address: q,
+            type: "aws_sqs_queue",
+            name: "jobs",
+            mode: "managed",
+            change: {
+              actions: ["create"],
+              after: { name: "jobs", arn: "arn:aws:sqs:us-east-1:123:jobs" },
+            },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      [fn]: {
+        resources: {
+          [fn]: {
+            address: fn,
+            type: "aws_lambda_function",
+            name: "fn",
+            mode: "managed",
+            change: { actions: ["create"], after: { function_name: "fn" } },
+          },
+        },
+        edges_new: [q],
+        edges_existing: [],
+        edges_data_flow: [
+          {
+            target: q,
+            type: "triggers",
+            label: "triggers",
+            origin: "terraform_resource",
+            detail: "aws_lambda_event_source_mapping",
+          },
+        ],
+      },
+      [TERRAFORM_MODULE_TREE_KEY]: {
+        path: "root",
+        modules: {},
+        resourceAddresses: [fn, q].sort(),
+      },
+    } as unknown as TerraformPlanNodesMap;
+
+    const { elements } = await buildTerraformElkExcalidrawScene(nodes);
+    const dataFlowLines = elements.filter(
+      (el) =>
+        el.type === "line" &&
+        (el as { customData?: { terraformEdgeLayer?: string } }).customData
+          ?.terraformEdgeLayer === "dataFlow",
+    );
+    expect(dataFlowLines.length).toBeGreaterThan(0);
+    expect(
+      (dataFlowLines[0] as { strokeColor?: string }).strokeColor,
+    ).toBe("#868e96");
+  });
+
   it.each([
     ["new-only", { edges_new: ["aws_s3_bucket.b"] }, "#2b8a3e"],
     ["prior-only", { edges_existing: ["aws_s3_bucket.b"] }, "#1971c2"],
@@ -274,6 +337,57 @@ describe("buildTerraformElkExcalidrawScene", () => {
       );
     },
   );
+
+  it("draws DOT edges between networking primitives as terraformEdgeLayer networking", async () => {
+    const vpc = "aws_vpc.main";
+    const igw = "aws_internet_gateway.main";
+    const nodes = {
+      [vpc]: minimalNode({
+        [vpc]: {
+          address: vpc,
+          type: "aws_vpc",
+          name: "main",
+          mode: "managed",
+        },
+      }),
+      [igw]: minimalNode({
+        [igw]: {
+          address: igw,
+          type: "aws_internet_gateway",
+          name: "main",
+          mode: "managed",
+        },
+      }),
+      [TERRAFORM_MODULE_TREE_KEY]: {
+        path: "root",
+        modules: {},
+        resourceAddresses: [vpc, igw],
+      },
+    } as unknown as TerraformPlanNodesMap;
+
+    (nodes[vpc] as TerraformPlanGraphNode & { edges_new?: string[] }).edges_new =
+      [igw];
+
+    const { elements } = await buildTerraformElkExcalidrawScene(nodes);
+    const netLine = elements.find(
+      (el) =>
+        el.type === "line" &&
+        (el as { customData?: { terraformEdgeLayer?: string } }).customData
+          ?.terraformEdgeLayer === "networking" &&
+        (el as { customData?: { relationship?: { type?: string } } }).customData
+          ?.relationship?.type === "networking_dependency",
+    );
+    expect(netLine).toBeDefined();
+    expect((netLine as { strokeColor?: string }).strokeColor).toBe("#228be6");
+    expect(
+      elements.some(
+        (el) =>
+          el.type === "line" &&
+          (el as { customData?: { terraformEdgeLayer?: string } }).customData
+            ?.terraformEdgeLayer === "dependency",
+      ),
+    ).toBe(false);
+  });
 
   it("keeps nested module frame membership nearest-parent only", async () => {
     const nodes = {

@@ -1,5 +1,6 @@
 const {
   buildDataFlowEdges,
+  buildNetworkingEdges,
   ensureEdgeLists,
   ensureTerraformModuleNodes,
   collectAllTerraformModulePaths,
@@ -466,6 +467,13 @@ const dataFlowTargets = (nodes, source) =>
     origin: edge.origin,
   }));
 
+const networkingTargets = (nodes, source) =>
+  (nodes[source].edges_networking || []).map((edge) => ({
+    target: edge.target,
+    type: edge.type,
+    origin: edge.origin,
+  }));
+
 describe("terraform module graph nodes", () => {
   it("collects nested module prefixes from addresses", () => {
     expect(
@@ -809,119 +817,7 @@ describe("terraform module graph nodes", () => {
 });
 
 describe("buildDataFlowEdges", () => {
-  it("infers API Gateway to Lambda invocation", () => {
-    const nodes = buildNodes([
-      resource(
-        "aws_api_gateway_rest_api.api",
-        "aws_api_gateway_rest_api",
-        "api",
-        {
-          id: "api-id",
-        },
-      ),
-      resource(
-        "aws_lambda_function.handler",
-        "aws_lambda_function",
-        "handler",
-        {
-          function_name: "handler",
-          invoke_arn:
-            "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:123:function:handler/invocations",
-          arn: "arn:aws:lambda:us-east-1:123:function:handler",
-        },
-      ),
-      resource(
-        "aws_api_gateway_integration.integration",
-        "aws_api_gateway_integration",
-        "integration",
-        {
-          rest_api_id: "api-id",
-          uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:123:function:handler/invocations",
-        },
-      ),
-    ]);
-
-    buildDataFlowEdges(nodes);
-
-    expect(
-      dataFlowTargets(nodes, "aws_api_gateway_rest_api.api"),
-    ).toContainEqual({
-      target: "aws_lambda_function.handler",
-      type: "invokes",
-      origin: "terraform_resource",
-    });
-  });
-
-  it("infers S3 notification targets", () => {
-    const nodes = buildNodes([
-      resource("aws_s3_bucket.assets", "aws_s3_bucket", "assets", {
-        bucket: "assets",
-        arn: "arn:aws:s3:::assets",
-      }),
-      resource(
-        "aws_lambda_function.processor",
-        "aws_lambda_function",
-        "processor",
-        {
-          function_name: "processor",
-          arn: "arn:aws:lambda:us-east-1:123:function:processor",
-        },
-      ),
-      resource(
-        "aws_s3_bucket_notification.assets",
-        "aws_s3_bucket_notification",
-        "assets",
-        {
-          bucket: "assets",
-          lambda_function: [
-            {
-              lambda_function_arn:
-                "arn:aws:lambda:us-east-1:123:function:processor",
-            },
-          ],
-        },
-      ),
-    ]);
-
-    buildDataFlowEdges(nodes);
-
-    expect(dataFlowTargets(nodes, "aws_s3_bucket.assets")).toContainEqual({
-      target: "aws_lambda_function.processor",
-      type: "triggers",
-      origin: "terraform_resource",
-    });
-  });
-
-  it("infers SQS event source mappings to Lambda", () => {
-    const nodes = buildNodes([
-      resource("aws_sqs_queue.jobs", "aws_sqs_queue", "jobs", {
-        name: "jobs",
-        arn: "arn:aws:sqs:us-east-1:123:jobs",
-      }),
-      resource("aws_lambda_function.worker", "aws_lambda_function", "worker", {
-        function_name: "worker",
-      }),
-      resource(
-        "aws_lambda_event_source_mapping.jobs",
-        "aws_lambda_event_source_mapping",
-        "jobs",
-        {
-          event_source_arn: "arn:aws:sqs:us-east-1:123:jobs",
-          function_name: "worker",
-        },
-      ),
-    ]);
-
-    buildDataFlowEdges(nodes);
-
-    expect(dataFlowTargets(nodes, "aws_sqs_queue.jobs")).toContainEqual({
-      target: "aws_lambda_function.worker",
-      type: "triggers",
-      origin: "terraform_resource",
-    });
-  });
-
-  it("infers Lambda IAM access to S3", () => {
+  it("infers Lambda IAM access to S3 from inline role policy", () => {
     const nodes = buildNodes([
       resource("aws_iam_role.lambda", "aws_iam_role", "lambda", {
         name: "lambda-role",
@@ -993,93 +889,6 @@ describe("buildDataFlowEdges", () => {
       target: "aws_lambda_function.reader",
       type: "reads",
       origin: "iam_policy",
-    });
-  });
-
-  it("keeps module policy references visible when generated IAM JSON is unknown", () => {
-    const nodes = buildNodes([
-      resource("module.app.module.queue.aws_sqs_queue.this[0]", "aws_sqs_queue", "this", {
-        name: "jobs",
-      }),
-      resource("module.worker.module.lambda.aws_lambda_function.this[0]", "aws_lambda_function", "this", {
-        function_name: "worker",
-      }),
-      resource("module.worker.module.lambda.aws_iam_role.lambda[0]", "aws_iam_role", "lambda", {
-        name: "worker-role",
-      }),
-      resource("module.worker.module.lambda.aws_iam_role_policy.additional_inline[0]", "aws_iam_role_policy", "additional_inline", {
-        role: "worker-role",
-      }),
-    ]);
-    nodes["module.app"] = {
-      resources: {
-        "module.app": {
-          type: "terraform_module",
-          address: "module.app",
-        },
-      },
-      terraform_config: {
-        outputs: {
-          queue_arn: {
-            expression: {
-              references: ["module.queue.queue_arn"],
-            },
-          },
-        },
-      },
-    };
-    nodes["module.app.module.queue"] = {
-      resources: {
-        "module.app.module.queue": {
-          type: "terraform_module",
-          address: "module.app.module.queue",
-        },
-      },
-      terraform_config: {
-        outputs: {
-          queue_arn: {
-            expression: {
-              references: [
-                "aws_sqs_queue.this[0].arn",
-                "aws_sqs_queue.this[0]",
-              ],
-            },
-          },
-        },
-      },
-    };
-    nodes["module.worker"] = {
-      resources: {
-        "module.worker": {
-          type: "terraform_module",
-          address: "module.worker",
-        },
-      },
-      terraform_config: {
-        expressions: {
-          policy_statements: {
-            references: ["module.app.queue_arn", "module.app"],
-          },
-        },
-      },
-    };
-
-    ensureEdgeLists(nodes);
-    buildDataFlowEdges(nodes);
-
-    expect(
-      dataFlowTargets(nodes, "module.app.module.queue.aws_sqs_queue.this[0]"),
-    ).toContainEqual({
-      target: "module.worker.module.lambda.aws_lambda_function.this[0]",
-      type: "accesses",
-      origin: "module_policy_reference",
-    });
-    expect(
-      dataFlowTargets(nodes, "module.app.module.queue.aws_sqs_queue.this[0]"),
-    ).toContainEqual({
-      target: "module.worker.module.lambda.aws_iam_role.lambda[0]",
-      type: "accesses",
-      origin: "module_policy_reference",
     });
   });
 
@@ -1168,6 +977,127 @@ describe("buildDataFlowEdges", () => {
       target: "aws_s3_bucket.assets",
       type: "writes",
       origin: "iam_policy",
+    });
+  });
+
+  it("does not populate edges_data_flow for non-IAM integrations", () => {
+    const nodes = buildNodes([
+      resource(
+        "aws_api_gateway_rest_api.api",
+        "aws_api_gateway_rest_api",
+        "api",
+        {
+          id: "api-id",
+        },
+      ),
+      resource(
+        "aws_lambda_function.handler",
+        "aws_lambda_function",
+        "handler",
+        {
+          function_name: "handler",
+          invoke_arn:
+            "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:123:function:handler/invocations",
+          arn: "arn:aws:lambda:us-east-1:123:function:handler",
+        },
+      ),
+      resource(
+        "aws_api_gateway_integration.integration",
+        "aws_api_gateway_integration",
+        "integration",
+        {
+          rest_api_id: "api-id",
+          uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:123:function:handler/invocations",
+        },
+      ),
+    ]);
+
+    buildDataFlowEdges(nodes);
+
+    expect(nodes["aws_api_gateway_rest_api.api"].edges_data_flow || []).toEqual([]);
+  });
+});
+
+describe("buildNetworkingEdges", () => {
+  it("infers security group egress peer link to another SG by id", () => {
+    const nodes = buildNodes([
+      resource("aws_security_group.peer", "aws_security_group", "peer", {
+        id: "sg-peer111",
+        vpc_id: "vpc-1",
+      }),
+      resource("aws_security_group.main", "aws_security_group", "main", {
+        id: "sg-main222",
+        vpc_id: "vpc-1",
+        egress: [
+          {
+            from_port: 0,
+            to_port: 0,
+            protocol: "-1",
+            cidr_blocks: [],
+            security_groups: ["sg-peer111"],
+          },
+        ],
+      }),
+    ]);
+
+    buildNetworkingEdges(nodes);
+
+    expect(networkingTargets(nodes, "aws_security_group.main")).toContainEqual({
+      target: "aws_security_group.peer",
+      type: "peer_rule",
+      origin: "security_group_rule",
+    });
+  });
+
+  it("resolves standalone SG rules when security_group_id and peer are raw sg- identifiers", () => {
+    const nodes = buildNodes([
+      resource("aws_security_group.main", "aws_security_group", "main", {
+        id: "sg-049f0ff2bd862ed73",
+        vpc_id: "vpc-1",
+      }),
+      resource("aws_security_group.peer", "aws_security_group", "peer", {
+        id: "sg-0123456789abcdef0",
+        vpc_id: "vpc-1",
+      }),
+      resource(
+        "aws_security_group_rule.ingress",
+        "aws_security_group_rule",
+        "ingress",
+        {
+          type: "ingress",
+          security_group_id: "sg-049f0ff2bd862ed73",
+          source_security_group_id: "sg-0123456789abcdef0",
+        },
+      ),
+    ]);
+
+    buildNetworkingEdges(nodes);
+
+    expect(networkingTargets(nodes, "aws_security_group.main")).toContainEqual({
+      target: "aws_security_group.peer",
+      type: "peer_rule",
+      origin: "security_group_rule",
+    });
+  });
+
+  it("links interface VPC endpoints to security groups from security_group_ids", () => {
+    const nodes = buildNodes([
+      resource("aws_security_group.endpoint", "aws_security_group", "endpoint", {
+        id: "sg-049f0ff2bd862ed73",
+        vpc_id: "vpc-1",
+      }),
+      resource("aws_vpc_endpoint.logs", "aws_vpc_endpoint", "logs", {
+        service_name: "com.amazonaws.us-east-1.logs",
+        security_group_ids: ["sg-049f0ff2bd862ed73"],
+      }),
+    ]);
+
+    buildNetworkingEdges(nodes);
+
+    expect(networkingTargets(nodes, "aws_vpc_endpoint.logs")).toContainEqual({
+      target: "aws_security_group.endpoint",
+      type: "endpoint_attachment",
+      origin: "vpc_endpoint_security_group",
     });
   });
 });

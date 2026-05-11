@@ -43,7 +43,10 @@ import type { LocalPoint } from "@excalidraw/math";
 import {
   buildTerraformExplodeParentMap,
   collectDataFlowEdges,
+  collectNetworkingEdges,
+  type TerraformDataFlowEdgeRecord,
 } from "./terraformExplodeGraph";
+import { partitionDirectedEdgesByNetworking } from "./terraformNetworkingVertex";
 import {
   getTerraformResourceTypeFromNodePath,
   isInitiallyVisibleTerraformResource,
@@ -151,7 +154,7 @@ function stripIndexes(address: string) {
   return address.replace(/\[[^\]]+\]/g, "");
 }
 
-function resolveVertexId(
+export function resolveTerraformPlanVertexId(
   nodes: TerraformPlanNodesMap,
   address: string,
 ): string | null {
@@ -240,8 +243,8 @@ export function collectDirectedEdges(
     targetRaw: string,
     fromNew: boolean,
   ) => {
-    const source = resolveVertexId(nodes, sourceRaw);
-    const target = resolveVertexId(nodes, targetRaw);
+    const source = resolveTerraformPlanVertexId(nodes, sourceRaw);
+    const target = resolveTerraformPlanVertexId(nodes, targetRaw);
     if (!source || !target || source === target) {
       return;
     }
@@ -1009,6 +1012,283 @@ export function buildTerraformDependencyLineSkeletons(
   return edgeSkeletons;
 }
 
+/** SG / DOT networking dependency stroke (blue). */
+export const TERRAFORM_NETWORKING_EDGE_STROKE = "#228be6";
+
+/** DOT dependency edges whose endpoints are both networking primitives (VPC, subnet, SG, …). */
+export function buildTerraformNetworkingDependencyLineSkeletons(
+  nodes: TerraformPlanNodesMap,
+  layoutBoxes: Record<string, TerraformDependencyLayoutBox>,
+  directedEdges: TerraformDirectedLayoutEdge[],
+  options?: { terraformSemanticOverview?: boolean },
+): ExcalidrawElementSkeleton[] {
+  const edgeSkeletons: ExcalidrawElementSkeleton[] = [];
+  let edgeIndex = 0;
+  for (const { source, target, hasNew, hasExisting } of directedEdges) {
+    const sourceBox = layoutBoxes[source] as LayoutBox | undefined;
+    const targetBox = layoutBoxes[target] as LayoutBox | undefined;
+    if (!sourceBox || !targetBox) {
+      continue;
+    }
+    const { startPoint, endPoint } = getCenterClippedLine(sourceBox, targetBox);
+    const startX = startPoint.x;
+    const startY = startPoint.y;
+    const endX = endPoint.x;
+    const endY = endPoint.y;
+    edgeSkeletons.push({
+      type: "line",
+      id: `tf-netdep-${edgeIndex}`,
+      x: startX,
+      y: startY,
+      width: Math.abs(endX - startX),
+      height: Math.abs(endY - startY),
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(endX - startX, endY - startY),
+      ],
+      strokeWidth: 2,
+      strokeColor: TERRAFORM_NETWORKING_EDGE_STROKE,
+      strokeStyle: "solid",
+      startArrowhead: null,
+      endArrowhead: "arrow",
+      startBinding: {
+        elementId: source,
+        fixedPoint: fixedPointForLayoutPoint(sourceBox, startPoint),
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: target,
+        fixedPoint: fixedPointForLayoutPoint(targetBox, endPoint),
+        mode: "orbit",
+      },
+      customData: {
+        terraform: true,
+        terraformEdgeLayer: "networking",
+        relationship: {
+          source,
+          target,
+          type: "networking_dependency",
+          label: "depends on",
+          origin: "terraform_graph",
+          detail: null,
+        },
+        ...(options?.terraformSemanticOverview
+          ? { terraformSemanticOverview: true as const }
+          : {}),
+      },
+    });
+    edgeIndex += 1;
+  }
+  return edgeSkeletons;
+}
+
+/** Semantic data-flow layer — IAM policy semantics only (grey). */
+export const TERRAFORM_DATAFLOW_EDGE_STROKE = "#868e96";
+const TERRAFORM_DATAFLOW_OFFSET_PX = 18;
+
+function offsetTerraformLineSegment(
+  startPoint: { x: number; y: number },
+  endPoint: { x: number; y: number },
+  offset: number,
+) {
+  if (!offset) {
+    return { startPoint, endPoint };
+  }
+  const dx = endPoint.x - startPoint.x;
+  const dy = endPoint.y - startPoint.y;
+  const length = Math.hypot(dx, dy) || 1;
+  const offsetX = (-dy / length) * offset;
+  const offsetY = (dx / length) * offset;
+  return {
+    startPoint: { x: startPoint.x + offsetX, y: startPoint.y + offsetY },
+    endPoint: { x: endPoint.x + offsetX, y: endPoint.y + offsetY },
+  };
+}
+
+/**
+ * Semantic data-flow `line` skeletons ({@link TERRAFORM_DATAFLOW_EDGE_STROKE}), aligned with backend `excalidraw.js`.
+ */
+export function buildTerraformDataFlowLineSkeletons(
+  nodes: TerraformPlanNodesMap,
+  layoutBoxes: Record<string, TerraformDependencyLayoutBox>,
+  dataFlowEdges: TerraformDataFlowEdgeRecord[],
+  dependencyUndirectedPairs: Set<string>,
+  options?: { terraformSemanticOverview?: boolean },
+): ExcalidrawElementSkeleton[] {
+  const out: ExcalidrawElementSkeleton[] = [];
+  let edgeIndex = 0;
+  for (const edge of dataFlowEdges) {
+    const source = resolveTerraformPlanVertexId(nodes, edge.source);
+    const target = resolveTerraformPlanVertexId(nodes, edge.target);
+    if (!source || !target || source === target) {
+      continue;
+    }
+    const sourceBox = layoutBoxes[source] as LayoutBox | undefined;
+    const targetBox = layoutBoxes[target] as LayoutBox | undefined;
+    if (!sourceBox || !targetBox) {
+      continue;
+    }
+
+    let { startPoint, endPoint } = getCenterClippedLine(sourceBox, targetBox);
+    const pairKey = [source, target].sort().join("|||");
+    if (dependencyUndirectedPairs.has(pairKey)) {
+      const shifted = offsetTerraformLineSegment(
+        startPoint,
+        endPoint,
+        TERRAFORM_DATAFLOW_OFFSET_PX,
+      );
+      startPoint = shifted.startPoint;
+      endPoint = shifted.endPoint;
+    }
+
+    const startX = startPoint.x;
+    const startY = startPoint.y;
+    const endX = endPoint.x;
+    const endY = endPoint.y;
+    const bidirectional = Boolean(edge.bidirectional);
+
+    out.push({
+      type: "line",
+      id: `tf-dataflow-${edgeIndex}`,
+      x: startX,
+      y: startY,
+      width: Math.abs(endX - startX),
+      height: Math.abs(endY - startY),
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(endX - startX, endY - startY),
+      ],
+      strokeWidth: 3,
+      strokeColor: TERRAFORM_DATAFLOW_EDGE_STROKE,
+      strokeStyle: "solid",
+      startArrowhead: bidirectional ? "arrow" : null,
+      endArrowhead: "arrow",
+      roundness: { type: 2 },
+      startBinding: {
+        elementId: source,
+        fixedPoint: fixedPointForLayoutPoint(sourceBox, startPoint),
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: target,
+        fixedPoint: fixedPointForLayoutPoint(targetBox, endPoint),
+        mode: "orbit",
+      },
+      customData: {
+        terraform: true,
+        terraformEdgeLayer: "dataFlow",
+        relationship: {
+          source,
+          target,
+          type: edge.type,
+          label: edge.label,
+          origin: edge.origin,
+          detail: edge.detail,
+          directions: edge.directions ?? [],
+          directed: !bidirectional,
+          bidirectional,
+        },
+        ...(options?.terraformSemanticOverview
+          ? { terraformSemanticOverview: true as const }
+          : {}),
+      },
+    });
+    edgeIndex += 1;
+  }
+  return out;
+}
+
+/** `edges_networking` semantic lines (SG peers); blue {@link TERRAFORM_NETWORKING_EDGE_STROKE}. */
+export function buildTerraformNetworkingRecordLineSkeletons(
+  nodes: TerraformPlanNodesMap,
+  layoutBoxes: Record<string, TerraformDependencyLayoutBox>,
+  networkingEdges: TerraformDataFlowEdgeRecord[],
+  structuralUndirectedPairs: Set<string>,
+  options?: { terraformSemanticOverview?: boolean },
+): ExcalidrawElementSkeleton[] {
+  const out: ExcalidrawElementSkeleton[] = [];
+  let edgeIndex = 0;
+  for (const edge of networkingEdges) {
+    const source = resolveTerraformPlanVertexId(nodes, edge.source);
+    const target = resolveTerraformPlanVertexId(nodes, edge.target);
+    if (!source || !target || source === target) {
+      continue;
+    }
+    const sourceBox = layoutBoxes[source] as LayoutBox | undefined;
+    const targetBox = layoutBoxes[target] as LayoutBox | undefined;
+    if (!sourceBox || !targetBox) {
+      continue;
+    }
+
+    let { startPoint, endPoint } = getCenterClippedLine(sourceBox, targetBox);
+    const pairKey = [source, target].sort().join("|||");
+    if (structuralUndirectedPairs.has(pairKey)) {
+      const shifted = offsetTerraformLineSegment(
+        startPoint,
+        endPoint,
+        TERRAFORM_DATAFLOW_OFFSET_PX,
+      );
+      startPoint = shifted.startPoint;
+      endPoint = shifted.endPoint;
+    }
+
+    const startX = startPoint.x;
+    const startY = startPoint.y;
+    const endX = endPoint.x;
+    const endY = endPoint.y;
+    const bidirectional = Boolean(edge.bidirectional);
+
+    out.push({
+      type: "line",
+      id: `tf-net-rec-${edgeIndex}`,
+      x: startX,
+      y: startY,
+      width: Math.abs(endX - startX),
+      height: Math.abs(endY - startY),
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(endX - startX, endY - startY),
+      ],
+      strokeWidth: 3,
+      strokeColor: TERRAFORM_NETWORKING_EDGE_STROKE,
+      strokeStyle: "solid",
+      startArrowhead: bidirectional ? "arrow" : null,
+      endArrowhead: "arrow",
+      roundness: { type: 2 },
+      startBinding: {
+        elementId: source,
+        fixedPoint: fixedPointForLayoutPoint(sourceBox, startPoint),
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: target,
+        fixedPoint: fixedPointForLayoutPoint(targetBox, endPoint),
+        mode: "orbit",
+      },
+      customData: {
+        terraform: true,
+        terraformEdgeLayer: "networking",
+        relationship: {
+          source,
+          target,
+          type: edge.type,
+          label: edge.label,
+          origin: edge.origin,
+          detail: edge.detail,
+          directions: edge.directions ?? [],
+          directed: !bidirectional,
+          bidirectional,
+        },
+        ...(options?.terraformSemanticOverview
+          ? { terraformSemanticOverview: true as const }
+          : {}),
+      },
+    });
+    edgeIndex += 1;
+  }
+  return out;
+}
+
 /** Skeleton rectangles cannot set `isDeleted`; apply from `terraformInitiallyVisible` after convert. */
 export function applyTerraformResourceRectangleSoftDelete(
   elements: readonly ExcalidrawElement[],
@@ -1148,13 +1428,32 @@ export async function buildTerraformElkExcalidrawScene(
   }
 
   const directedEdges = collectDirectedEdges(nodes, vertexSet);
+  const { dependencyEdges, networkingDependencyEdges } =
+    partitionDirectedEdgesByNetworking(nodes, directedEdges);
   const dataFlowEdges = collectDataFlowEdges(
     nodes as Record<string, { edges_data_flow?: unknown }>,
   );
+  const networkingRecordEdges = collectNetworkingEdges(
+    nodes as Record<string, { edges_data_flow?: unknown; edges_networking?: unknown }>,
+  );
+  const netDepPairKeys = new Set(
+    networkingDependencyEdges.map((e) =>
+      [e.source, e.target].sort().join("|||"),
+    ),
+  );
+  const networkingRecordEdgesFiltered = networkingRecordEdges.filter((r) => {
+    const s = resolveTerraformPlanVertexId(nodes, r.source);
+    const t = resolveTerraformPlanVertexId(nodes, r.target);
+    if (!s || !t) {
+      return false;
+    }
+    return !netDepPairKeys.has([s, t].sort().join("|||"));
+  });
   const explodeParentMap = buildTerraformExplodeParentMap(
     [...vertexSet],
     directedEdges,
     dataFlowEdges,
+    networkingRecordEdges,
   );
 
   const moduleRoot = buildModuleCompound(tree, vertexSet);
@@ -1250,8 +1549,37 @@ export async function buildTerraformElkExcalidrawScene(
     });
   }
 
+  const structuralUndirectedPairs = new Set(
+    [...dependencyEdges, ...networkingDependencyEdges].map((e) =>
+      [e.source, e.target].sort().join("|||"),
+    ),
+  );
+
   edgeSkeletons.push(
-    ...buildTerraformDependencyLineSkeletons(nodes, layoutBoxes, directedEdges),
+    ...buildTerraformDependencyLineSkeletons(nodes, layoutBoxes, dependencyEdges),
+  );
+  edgeSkeletons.push(
+    ...buildTerraformNetworkingDependencyLineSkeletons(
+      nodes,
+      layoutBoxes,
+      networkingDependencyEdges,
+    ),
+  );
+  edgeSkeletons.push(
+    ...buildTerraformNetworkingRecordLineSkeletons(
+      nodes,
+      layoutBoxes,
+      networkingRecordEdgesFiltered,
+      structuralUndirectedPairs,
+    ),
+  );
+  edgeSkeletons.push(
+    ...buildTerraformDataFlowLineSkeletons(
+      nodes,
+      layoutBoxes,
+      dataFlowEdges,
+      structuralUndirectedPairs,
+    ),
   );
 
   const frameSkeletons: ExcalidrawElementSkeleton[] = [];

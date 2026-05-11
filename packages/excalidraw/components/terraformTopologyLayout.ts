@@ -13,23 +13,34 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import {
   applyTerraformResourceRectangleSoftDelete,
+  buildTerraformDataFlowLineSkeletons,
   buildTerraformDependencyLineSkeletons,
+  buildTerraformNetworkingDependencyLineSkeletons,
+  buildTerraformNetworkingRecordLineSkeletons,
+  TERRAFORM_DATAFLOW_EDGE_STROKE,
   buildTerraformResourcePanelDetails,
   collectDirectedEdges,
   getTerraformActionStyle,
   getTerraformPlanNodeAction,
   mirrorAndDetachTerraformResourceLabels,
+  resolveTerraformPlanVertexId,
   shortTerraformResourceLabel,
   TERRAFORM_RESOURCE_LABEL_STROKE,
   type TerraformDependencyLayoutBox,
 } from "./terraformElkLayout";
 import {
+  collectDataFlowEdges,
+  collectNetworkingEdges,
+} from "./terraformExplodeGraph";
+import { partitionDirectedEdgesByNetworking } from "./terraformNetworkingVertex";
+import {
   getTerraformResourceTypeFromNodePath,
   isInitiallyVisibleTerraformTopologyTile,
 } from "./terraformPrimaryVisibility";
-import type {
-  TerraformPlanGraphNode,
-  TerraformPlanNodesMap,
+import {
+  TERRAFORM_MODULE_TREE_KEY,
+  type TerraformPlanGraphNode,
+  type TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
 import type {
   TopologyEndpointSecurityGroupBucket,
@@ -120,18 +131,10 @@ const TOPOLOGY_SATELLITE_GAP_PX = 8;
 const RESOURCE_RECT_W = TOPOLOGY_TIER0_W;
 const RESOURCE_RECT_H = TOPOLOGY_TIER0_H;
 const RESOURCE_GAP = 16;
-const IAM_DATAFLOW_STROKE = "#0ca678";
-const KMS_POLICY_DATAFLOW_STROKE = "#845ef7";
+const TOPOLOGY_DATAFLOW_STROKE = TERRAFORM_DATAFLOW_EDGE_STROKE;
 const SG_RIGHT_PAD = 6;
-const SG_DATAFLOW_STROKE = "#228be6";
 const CLOUDWATCH_LEFT_PAD = 6;
 const CLOUDWATCH_RIGHT_PAD = 6;
-const CLOUDWATCH_DATAFLOW_STROKE = "#f08c00";
-const S3_DATAFLOW_STROKE = "#e67700";
-const SQS_DATAFLOW_STROKE = "#c2255c";
-const VPC_FLOWLOG_DATAFLOW_STROKE = "#1098ad";
-const VPC_DEFAULTS_DATAFLOW_STROKE = "#5c940d";
-const ENDPOINT_SG_DATAFLOW_STROKE = "#7950f2";
 /** Horizontal gap between IAM/KMS-left column and SG column (tier-1 widths). */
 const IAM_SG_COLUMN_GAP_PX = 8;
 const CLOUDWATCH_COLUMN_GAP_PX = 8;
@@ -1010,7 +1013,7 @@ function appendVpcFlowLogBundleSatelliteEdges(
         label: "VPC flow log",
       },
       origin: "topology_vpc_flow",
-      strokeColor: VPC_FLOWLOG_DATAFLOW_STROKE,
+      strokeColor: TOPOLOGY_DATAFLOW_STROKE,
     });
   }
 }
@@ -1240,42 +1243,42 @@ function appendTopologyResourceRectangles(
       satelliteLineSpecs.push({
         edge: e,
         origin: "topology_iam",
-        strokeColor: IAM_DATAFLOW_STROKE,
+        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
       });
     }
     for (const e of kmsBuild.edges) {
       satelliteLineSpecs.push({
         edge: e,
         origin: "topology_kms",
-        strokeColor: KMS_POLICY_DATAFLOW_STROKE,
+        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
       });
     }
     for (const e of sgBuild.edges) {
       satelliteLineSpecs.push({
         edge: e,
         origin: "topology_sg",
-        strokeColor: SG_DATAFLOW_STROKE,
+        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
       });
     }
     for (const e of s3Build.edges) {
       satelliteLineSpecs.push({
         edge: e,
         origin: "topology_s3",
-        strokeColor: S3_DATAFLOW_STROKE,
+        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
       });
     }
     for (const e of sqsBuild.edges) {
       satelliteLineSpecs.push({
         edge: e,
         origin: "topology_sqs",
-        strokeColor: SQS_DATAFLOW_STROKE,
+        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
       });
     }
     for (const e of cloudWatchBuild.edges) {
       satelliteLineSpecs.push({
         edge: e,
         origin: "topology_cloudwatch",
-        strokeColor: CLOUDWATCH_DATAFLOW_STROKE,
+        strokeColor: TOPOLOGY_DATAFLOW_STROKE,
       });
     }
 
@@ -2331,16 +2334,118 @@ export async function buildTerraformTopologyExcalidrawScene(
     accountCursorX += accountWidth + ACCOUNT_GAP;
   }
 
-  skeleton.unshift(...buildTopologySatelliteLineSkeletons(satelliteLineSpecs));
+  const wideVertexSet = new Set(
+    Object.keys(nodes).filter(
+      (k) => k !== TERRAFORM_MODULE_TREE_KEY && !k.startsWith("__"),
+    ),
+  );
+  const wideDirectedEdges = collectDirectedEdges(nodes, wideVertexSet);
+  const { networkingDependencyEdges: wideNetworkingDependencyEdges } =
+    partitionDirectedEdgesByNetworking(nodes, wideDirectedEdges);
+  const wideNetDepPairKeys = new Set(
+    wideNetworkingDependencyEdges.map((e) =>
+      [e.source, e.target].sort().join("|||"),
+    ),
+  );
+  const allNetworkingRecordEdges = collectNetworkingEdges(
+    nodes as Record<string, { edges_data_flow?: unknown; edges_networking?: unknown }>,
+  );
+  const wideNetworkingRecordEdges = allNetworkingRecordEdges.filter((r) => {
+    const s = resolveTerraformPlanVertexId(nodes, r.source);
+    const t = resolveTerraformPlanVertexId(nodes, r.target);
+    if (!s || !t) {
+      return false;
+    }
+    return !wideNetDepPairKeys.has([s, t].sort().join("|||"));
+  });
+  const networkingStructuralPairKeys = new Set<string>([
+    ...wideNetworkingDependencyEdges.map((e) =>
+      [e.source, e.target].sort().join("|||"),
+    ),
+    ...wideNetworkingRecordEdges.map((r) => {
+      const s = resolveTerraformPlanVertexId(nodes, r.source)!;
+      const t = resolveTerraformPlanVertexId(nodes, r.target)!;
+      return [s, t].sort().join("|||");
+    }),
+  ]);
+
+  const dataFlowEdgeRecords = collectDataFlowEdges(
+    nodes as Record<string, { edges_data_flow?: unknown }>,
+  );
+  const dataFlowUndirectedPairKeys = new Set(
+    dataFlowEdgeRecords.map((e) => [e.source, e.target].sort().join("|||")),
+  );
+  const filteredSatelliteLineSpecs = satelliteLineSpecs.filter((s) => {
+    const satKey = [
+      resolveTerraformPlanVertexId(nodes, s.edge.source) ?? s.edge.source,
+      resolveTerraformPlanVertexId(nodes, s.edge.target) ?? s.edge.target,
+    ]
+      .sort()
+      .join("|||");
+    return (
+      !dataFlowUndirectedPairKeys.has(satKey) &&
+      !networkingStructuralPairKeys.has(satKey)
+    );
+  });
+
+  skeleton.unshift(
+    ...buildTopologySatelliteLineSkeletons(filteredSatelliteLineSpecs),
+  );
 
   const { placedVertexSet, layoutBoxes: topologyLayoutBoxes } =
     collectTopologyRectangleLayoutFromSkeleton(skeleton);
   const topologyDirectedEdges = collectDirectedEdges(nodes, placedVertexSet);
+  const { dependencyEdges, networkingDependencyEdges } =
+    partitionDirectedEdgesByNetworking(nodes, topologyDirectedEdges);
+  const structuralUndirectedPairs = new Set(
+    [...dependencyEdges, ...networkingDependencyEdges].map((e) =>
+      [e.source, e.target].sort().join("|||"),
+    ),
+  );
+  const netDepPairKeys = new Set(
+    networkingDependencyEdges.map((e) =>
+      [e.source, e.target].sort().join("|||"),
+    ),
+  );
+  const networkingRecordEdgesFiltered = allNetworkingRecordEdges.filter((r) => {
+    const s = resolveTerraformPlanVertexId(nodes, r.source);
+    const t = resolveTerraformPlanVertexId(nodes, r.target);
+    if (!s || !t || !placedVertexSet.has(s) || !placedVertexSet.has(t)) {
+      return false;
+    }
+    return !netDepPairKeys.has([s, t].sort().join("|||"));
+  });
   skeleton.push(
     ...buildTerraformDependencyLineSkeletons(
       nodes,
       topologyLayoutBoxes,
-      topologyDirectedEdges,
+      dependencyEdges,
+      { terraformSemanticOverview: true },
+    ),
+  );
+  skeleton.push(
+    ...buildTerraformNetworkingDependencyLineSkeletons(
+      nodes,
+      topologyLayoutBoxes,
+      networkingDependencyEdges,
+      { terraformSemanticOverview: true },
+    ),
+  );
+  skeleton.push(
+    ...buildTerraformNetworkingRecordLineSkeletons(
+      nodes,
+      topologyLayoutBoxes,
+      networkingRecordEdgesFiltered,
+      structuralUndirectedPairs,
+      { terraformSemanticOverview: true },
+    ),
+  );
+  skeleton.push(
+    ...buildTerraformDataFlowLineSkeletons(
+      nodes,
+      topologyLayoutBoxes,
+      dataFlowEdgeRecords,
+      structuralUndirectedPairs,
       { terraformSemanticOverview: true },
     ),
   );

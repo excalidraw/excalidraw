@@ -82,12 +82,17 @@ const {
   collectDirectedEdges,
   coalesceRelationshipPairs,
   collectDataFlowEdges,
+  collectNetworkingEdges,
   buildTerraformExplodeParentMap,
   getCenterClippedBindingPoints,
   offsetLineSegment,
   fixedPointForAbsolutePoint,
   strokeColorForTerraformDependencyKinds,
 } = require("./excalidraw-arrows");
+const { partitionDirectedEdgesByNetworking } = require("./terraform-networking-vertex");
+
+/** Matches browser ELK `TERRAFORM_NETWORKING_EDGE_STROKE`. */
+const TERRAFORM_NETWORKING_EDGE_STROKE = "#228be6";
 
 /**
  * Converts enriched Terraform `nodes` (post-pipeline) into an Excalidraw document: nested frames,
@@ -125,6 +130,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
   );
   // Structural graph edges merged from pipeline (`edges_new` + `edges_existing`).
   const directedEdges = collectDirectedEdges(nodes);
+  const { dependencyEdges, networkingDependencyEdges } =
+    partitionDirectedEdgesByNetworking(nodes, directedEdges);
   // Perimeter appliances are snapped in a post-pass, so keep them out of solver edges.
   const directedEdgesForLayout =
     VPC_PERIMETER_LAYOUT_ENABLED && perimeterSet.size > 0
@@ -133,17 +140,30 @@ async function nodesToExcalidraw(nodes, options = {}) {
             !perimeterSet.has(edge.source) && !perimeterSet.has(edge.target),
         )
       : directedEdges;
-  const relationships = coalesceRelationshipPairs(directedEdges);
-  // Semantic data-flow edges (API calls, IAM references, integration links, etc.).
+  const relationships = coalesceRelationshipPairs(dependencyEdges);
+  const networkingRelationships =
+    coalesceRelationshipPairs(networkingDependencyEdges);
+  const networkingRecordEdgesAll = collectNetworkingEdges(nodes);
+  const netDepPairKeys = new Set(
+    networkingDependencyEdges.map((e) =>
+      [e.source, e.target].sort().join("|||"),
+    ),
+  );
+  const networkingRecordEdgesFiltered = networkingRecordEdgesAll.filter(
+    (r) => !netDepPairKeys.has([r.source, r.target].sort().join("|||")),
+  );
+  // Semantic data-flow edges (IAM policy semantics only); networking SG peers are separate.
   const dataFlowEdges = collectDataFlowEdges(nodes);
   // Undirected adjacency map used by frontend "explode neighborhood" interactions.
   const explodeParentMap = buildTerraformExplodeParentMap(
     nodeKeys,
     directedEdges,
     dataFlowEdges,
+    networkingRecordEdgesAll,
   );
-  const dependencyPairKeys = new Set(
-    relationships
+  /** Dependency + networking-dependency pairs (non-perimeter): offsets IAM data-flow / SG record lines. */
+  const structuralPairKeys = new Set(
+    [...relationships, ...networkingRelationships]
       .filter(
         ({ source, target }) =>
           !isVpcPerimeterNode(source, nodes[source]) &&
@@ -1363,7 +1383,196 @@ async function nodesToExcalidraw(nodes, options = {}) {
     );
   }
 
-  // 7) Emit data-flow lines (offset when they overlap dependency pairs).
+  // 6b) DOT dependency edges between networking primitives (distinct stroke / layer).
+  for (const relationship of networkingRelationships) {
+    const {
+      source,
+      target,
+      directed,
+      bidirectional,
+      directions,
+      kinds,
+      origins,
+    } = relationship;
+    const posA = posMap[source];
+    const posB = posMap[target];
+    const edgeId = `edge-netdep-${edgeIdx++}`;
+
+    const rectA = nodeRectById.get(posA.rectId);
+    const rectB = nodeRectById.get(posB.rectId);
+    if (!rectA || !rectB) {
+      continue;
+    }
+    rectA.boundElements.push({ id: edgeId, type: "arrow" });
+    rectB.boundElements.push({ id: edgeId, type: "arrow" });
+
+    const { startFixed, endFixed, startPoint, endPoint } =
+      getCenterClippedBindingPoints(posA, posB, posA.w, posA.h, posB.w, posB.h);
+
+    const startX = startPoint.x;
+    const startY = startPoint.y;
+    const endX = endPoint.x;
+    const endY = endPoint.y;
+
+    const dependencyStartArrowhead = bidirectional ? "arrow" : null;
+    const dependencyEndArrowhead = "arrow";
+
+    edgeElements.push(
+      makeBaseElement({
+        type: "line",
+        id: edgeId,
+        x: startX,
+        y: startY,
+        width: Math.abs(endX - startX),
+        height: Math.abs(endY - startY),
+        points: [
+          [0, 0],
+          [endX - startX, endY - startY],
+        ],
+        polygon: false,
+        strokeColor: TERRAFORM_NETWORKING_EDGE_STROKE,
+        strokeWidth: 2,
+        startBinding: {
+          elementId: posA.rectId,
+          fixedPoint: startFixed,
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: posB.rectId,
+          fixedPoint: endFixed,
+          mode: "orbit",
+        },
+        startArrowhead: dependencyStartArrowhead,
+        endArrowhead: dependencyEndArrowhead,
+        strokeStyle: "solid",
+        roundness: { type: 2 },
+        isDeleted:
+          !isInitiallyVisibleTerraformNode(source, nodes[source]) ||
+          !isInitiallyVisibleTerraformNode(target, nodes[target]),
+        customData: {
+          terraform: true,
+          terraformEdgeLayer: "networking",
+          relationship: {
+            source,
+            target,
+            type: "networking_dependency",
+            label: "depends on",
+            origin: "terraform_graph",
+            directions,
+            kinds,
+            origins,
+            directed,
+            bidirectional,
+          },
+        },
+      }),
+    );
+  }
+
+  // 6c) `edges_networking` security-group peer lines (offset when structural deps exist).
+  for (const edge of networkingRecordEdgesFiltered) {
+    const {
+      source,
+      target,
+      type,
+      label,
+      origin,
+      detail,
+      bidirectional = false,
+      directions = [],
+    } = edge;
+    const posA = posMap[source];
+    const posB = posMap[target];
+    if (!posA || !posB) {
+      continue;
+    }
+
+    const rectA = nodeRectById.get(posA.rectId);
+    const rectB = nodeRectById.get(posB.rectId);
+    if (!rectA || !rectB) {
+      continue;
+    }
+
+    const edgeId = `networking-rec-edge-${edgeIdx++}`;
+    rectA.boundElements.push({ id: edgeId, type: "arrow" });
+    rectB.boundElements.push({ id: edgeId, type: "arrow" });
+
+    const { startPoint, endPoint } = getCenterClippedBindingPoints(
+      posA,
+      posB,
+      posA.w,
+      posA.h,
+      posB.w,
+      posB.h,
+    );
+    const pairKey = [source, target].sort().join("|||");
+    const shifted = offsetLineSegment(
+      startPoint,
+      endPoint,
+      structuralPairKeys.has(pairKey) ? 18 : 0,
+    );
+    const startX = shifted.startPoint.x;
+    const startY = shifted.startPoint.y;
+    const endX = shifted.endPoint.x;
+    const endY = shifted.endPoint.y;
+    const startFixed = fixedPointForAbsolutePoint(posA, shifted.startPoint);
+    const endFixed = fixedPointForAbsolutePoint(posB, shifted.endPoint);
+
+    const netStartArrowhead = bidirectional ? "arrow" : null;
+    const netEndArrowhead = "arrow";
+
+    edgeElements.push(
+      makeBaseElement({
+        type: "line",
+        id: edgeId,
+        x: startX,
+        y: startY,
+        width: Math.abs(endX - startX),
+        height: Math.abs(endY - startY),
+        points: [
+          [0, 0],
+          [endX - startX, endY - startY],
+        ],
+        polygon: false,
+        startBinding: {
+          elementId: posA.rectId,
+          fixedPoint: startFixed,
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: posB.rectId,
+          fixedPoint: endFixed,
+          mode: "orbit",
+        },
+        startArrowhead: netStartArrowhead,
+        endArrowhead: netEndArrowhead,
+        strokeColor: TERRAFORM_NETWORKING_EDGE_STROKE,
+        strokeWidth: 3,
+        strokeStyle: "solid",
+        roundness: { type: 2 },
+        isDeleted:
+          !isInitiallyVisibleTerraformNode(source, nodes[source]) ||
+          !isInitiallyVisibleTerraformNode(target, nodes[target]),
+        customData: {
+          terraform: true,
+          terraformEdgeLayer: "networking",
+          relationship: {
+            source,
+            target,
+            type,
+            label,
+            origin,
+            detail,
+            directions,
+            directed: !bidirectional,
+            bidirectional,
+          },
+        },
+      }),
+    );
+  }
+
+  // 7) Emit IAM data-flow lines (offset when they overlap structural dependency pairs).
   for (const edge of dataFlowEdges) {
     const {
       source,
@@ -1404,7 +1613,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     const shifted = offsetLineSegment(
       startPoint,
       endPoint,
-      dependencyPairKeys.has(pairKey) ? 18 : 0,
+      structuralPairKeys.has(pairKey) ? 18 : 0,
     );
     const startX = shifted.startPoint.x;
     const startY = shifted.startPoint.y;
@@ -1441,7 +1650,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
         },
         startArrowhead: dataFlowStartArrowhead,
         endArrowhead: dataFlowEndArrowhead,
-        strokeColor: "#0ca678",
+        strokeColor: "#868e96",
         strokeWidth: 3,
         strokeStyle: "solid",
         roundness: { type: 2 },

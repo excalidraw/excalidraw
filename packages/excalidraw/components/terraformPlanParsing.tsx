@@ -23,6 +23,7 @@ import {
 } from "./terraformTopologyPlacement";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
+import { buildDataFlowEdges, buildNetworkingEdges } from "./terraformDataFlowEdges";
 
 export { TERRAFORM_MODULE_TREE_KEY };
 
@@ -57,12 +58,22 @@ export type TerraformPlanNodesMap = Record<string, TerraformPlanGraphNode> & {
   [TERRAFORM_MODULE_TREE_KEY]?: TerraformModuleTreeNode;
 };
 
+/** One semantic data-flow edge (mirrors backend `edges_data_flow` object shape). */
+export type TerraformPlanDataFlowEdge = {
+  target: string;
+  type?: string;
+  label?: string;
+  origin?: string;
+  detail?: string | null;
+};
+
 /** Matches backend pipeline nodes: resources plus mutable edge buckets (see `ensureEdgeLists`). */
 export type TerraformPlanGraphNode = {
   resources: Record<string, unknown>;
   edges_new?: string[];
   edges_existing?: string[];
-  edges_data_flow?: string[];
+  edges_data_flow?: Array<string | TerraformPlanDataFlowEdge>;
+  edges_networking?: Array<string | TerraformPlanDataFlowEdge>;
 };
 
 /** Subset of `terraform show -json` prior_state.values.root_module shape used by `buildExistingEdges`. */
@@ -117,7 +128,10 @@ export function buildTerraformLocalImportNodesMap(
     planTyped as { prior_state: { values: { root_module: unknown } } },
   );
   const sanitizedNodes = sanitizeTerraformPlanNodes(nodes4);
-  return attachModuleTree(sanitizedNodes);
+  const withTree = attachModuleTree(sanitizedNodes);
+  buildDataFlowEdges(withTree as Record<string, unknown>);
+  buildNetworkingEdges(withTree as Record<string, unknown>);
+  return withTree;
 }
 
 /** Local import path: main menu → “Import Terraform” → uncheck “use backend” → Import & Open. */
