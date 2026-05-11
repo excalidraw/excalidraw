@@ -2,10 +2,34 @@ import { describe, expect, it } from "vitest";
 
 import {
   computeRouteTableBottomEdgePlacements,
+  extractInterfaceEndpointSecurityGroupBuckets,
   extractRouteTablesByVpc,
+  extractSupplementarySubnetZones,
+  extractVpcDefaultPlumbingBuckets,
   extractVpcEndpointsByVpc,
+  extractVpcFlowLogBundles,
 } from "./terraformTopologyPlacement";
 import type { TopologyPlacementZone } from "./terraformTopologyPlacement";
+
+const planWithDefaultAwsAccountRegion = {
+  configuration: {
+    provider_config: {
+      aws: {
+        name: "aws",
+        expressions: {
+          region: { constant_value: "us-east-1" },
+          assume_role: [
+            {
+              role_arn: {
+                constant_value: "arn:aws:iam::111111111111:role/Deploy",
+              },
+            },
+          ],
+        },
+      },
+    },
+  },
+};
 
 describe("extractVpcEndpointsByVpc", () => {
   it("groups managed aws_vpc_endpoint by account, region, vpc_id and sorts by service_name then address", () => {
@@ -314,5 +338,171 @@ describe("computeRouteTableBottomEdgePlacements", () => {
     expect(zoneBottom).toHaveLength(0);
     expect(vpcBottom).toHaveLength(1);
     expect(vpcBottom[0]!.addresses).toEqual(["aws_route_table.rt"]);
+  });
+});
+
+describe("extractVpcDefaultPlumbingBuckets", () => {
+  it("groups default VPC resources by vpc id", () => {
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address: "aws_default_security_group.this",
+          mode: "managed",
+          type: "aws_default_security_group",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              vpc_id: "vpc-aaa",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "aws_default_network_acl.this",
+          mode: "managed",
+          type: "aws_default_network_acl",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              vpc_id: "vpc-aaa",
+              region: "us-east-1",
+            },
+          },
+        },
+      ],
+    };
+    const buckets = extractVpcDefaultPlumbingBuckets(plan);
+    expect(buckets).toHaveLength(1);
+    expect(buckets[0]!.vpcId).toBe("vpc-aaa");
+    expect(buckets[0]!.addresses.sort()).toEqual(
+      ["aws_default_network_acl.this", "aws_default_security_group.this"].sort(),
+    );
+  });
+});
+
+describe("extractSupplementarySubnetZones", () => {
+  it("emits a zone for aws_subnet ids not covered by primary zones", () => {
+    const primaryZones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-aaa",
+        subnetSignature: "subnet-a",
+        subnetIds: ["subnet-a"],
+        addresses: ["aws_lambda_function.x"],
+      },
+    ];
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address: "aws_subnet.intra",
+          mode: "managed",
+          type: "aws_subnet",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              id: "subnet-b",
+              vpc_id: "vpc-aaa",
+              region: "us-east-1",
+            },
+          },
+        },
+      ],
+    };
+    const sup = extractSupplementarySubnetZones(plan, primaryZones);
+    expect(sup).toHaveLength(1);
+    expect(sup[0]!.subnetIds).toEqual(["subnet-b"]);
+    expect(sup[0]!.addresses).toEqual(["aws_subnet.intra"]);
+  });
+});
+
+describe("extractVpcFlowLogBundles", () => {
+  it("merges same-module companions into the VPC flow log bucket", () => {
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address: "module.vpc.aws_flow_log.this",
+          mode: "managed",
+          type: "aws_flow_log",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              vpc_id: "vpc-aaa",
+              region: "us-east-1",
+            },
+          },
+        },
+        {
+          address: "module.vpc.aws_cloudwatch_log_group.flow",
+          mode: "managed",
+          type: "aws_cloudwatch_log_group",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: { region: "us-east-1" },
+          },
+        },
+      ],
+    };
+    const buckets = extractVpcFlowLogBundles(plan);
+    expect(buckets).toHaveLength(1);
+    expect(buckets[0]!.vpcId).toBe("vpc-aaa");
+    expect(buckets[0]!.addresses).toContain("module.vpc.aws_flow_log.this");
+    expect(buckets[0]!.addresses).toContain(
+      "module.vpc.aws_cloudwatch_log_group.flow",
+    );
+  });
+});
+
+describe("extractInterfaceEndpointSecurityGroupBuckets", () => {
+  it("maps endpoint security_group_ids to aws_security_group addresses", () => {
+    const plan = {
+      ...planWithDefaultAwsAccountRegion,
+      resource_changes: [
+        {
+          address: "aws_vpc_endpoint.int",
+          mode: "managed",
+          type: "aws_vpc_endpoint",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              arn: "arn:aws:ec2:us-east-1:111111111111:vpc-endpoint/vpce-int",
+              vpc_id: "vpc-aaa",
+              region: "us-east-1",
+              security_group_ids: ["sg-endpoint123"],
+            },
+          },
+        },
+        {
+          address: "aws_security_group.endpoint",
+          mode: "managed",
+          type: "aws_security_group",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["no-op"],
+            after: {
+              vpc_id: "vpc-aaa",
+              region: "us-east-1",
+              id: "sg-endpoint123",
+            },
+          },
+        },
+      ],
+    };
+    const epBuckets = extractVpcEndpointsByVpc(plan);
+    const sgBuckets = extractInterfaceEndpointSecurityGroupBuckets(
+      plan,
+      epBuckets,
+    );
+    expect(sgBuckets).toHaveLength(1);
+    expect(sgBuckets[0]!.addresses).toEqual(["aws_security_group.endpoint"]);
   });
 });

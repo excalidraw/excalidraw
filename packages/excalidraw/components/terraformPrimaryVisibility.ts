@@ -87,6 +87,26 @@ export function isInitiallyVisibleTerraformResource(
   );
 }
 
+/** Subnet / default-VPC / flow-log tiles in semantic topology (not ELK “primary” overview types). */
+const TOPOLOGY_SEMANTIC_INFRA_TYPES = new Set([
+  "aws_subnet",
+  "aws_default_network_acl",
+  "aws_default_route_table",
+  "aws_default_security_group",
+  "aws_flow_log",
+]);
+
+/** Visibility for topology resource rectangles (includes semantic-only infra types). */
+export function isInitiallyVisibleTerraformTopologyTile(
+  resourceType: string,
+  action: string,
+): boolean {
+  if (TOPOLOGY_SEMANTIC_INFRA_TYPES.has(resourceType)) {
+    return true;
+  }
+  return isInitiallyVisibleTerraformResource(resourceType, action);
+}
+
 /**
  * Terraform provider type segment parsed from `nodePath` (handles `module.*` prefixes and `data`).
  */

@@ -25,19 +25,24 @@ import {
 } from "./terraformElkLayout";
 import {
   getTerraformResourceTypeFromNodePath,
-  isInitiallyVisibleTerraformResource,
+  isInitiallyVisibleTerraformTopologyTile,
 } from "./terraformPrimaryVisibility";
 import type {
   TerraformPlanGraphNode,
   TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
 import type {
+  TopologyEndpointSecurityGroupBucket,
   TopologyPlacementZone,
   TopologyRegionalPrimaryBucket,
   TopologyRouteTableBottomPlacements,
+  TopologyVpcDefaultPlumbingBucket,
   TopologyVpcEndpointBucket,
+  TopologyVpcFlowLogBucket,
 } from "./terraformTopologyPlacement";
-import { routeTableBottomRowMinInnerWidth } from "./terraformTopologyPlacement";
+import {
+  routeTableBottomRowMinInnerWidth,
+} from "./terraformTopologyPlacement";
 import type { TerraformTopologyModel } from "./terraformTopologyExtract";
 import {
   buildResourceCloudWatchCluster,
@@ -58,6 +63,14 @@ import {
   sgSatelliteStackHeightPx,
   TOPOLOGY_SG_BETWEEN_GROUPS_GAP_PX,
 } from "./terraformTopologySgLinks";
+import {
+  buildS3CompanionCluster,
+  s3SatelliteStackHeightPx,
+} from "./terraformTopologyS3Links";
+import {
+  buildSqsCompanionCluster,
+  sqsSatelliteStackHeightPx,
+} from "./terraformTopologySqsLinks";
 import {
   getTerraformEdgeLayer,
   reconcileTerraformVisibility,
@@ -114,6 +127,11 @@ const SG_DATAFLOW_STROKE = "#228be6";
 const CLOUDWATCH_LEFT_PAD = 6;
 const CLOUDWATCH_RIGHT_PAD = 6;
 const CLOUDWATCH_DATAFLOW_STROKE = "#f08c00";
+const S3_DATAFLOW_STROKE = "#e67700";
+const SQS_DATAFLOW_STROKE = "#c2255c";
+const VPC_FLOWLOG_DATAFLOW_STROKE = "#1098ad";
+const VPC_DEFAULTS_DATAFLOW_STROKE = "#5c940d";
+const ENDPOINT_SG_DATAFLOW_STROKE = "#7950f2";
 /** Horizontal gap between IAM/KMS-left column and SG column (tier-1 widths). */
 const IAM_SG_COLUMN_GAP_PX = 8;
 const CLOUDWATCH_COLUMN_GAP_PX = 8;
@@ -223,6 +241,25 @@ function satelliteColumnWidths(): { iamW: number; sgW: number } {
 
 function cloudWatchColumnWidths(): { alarmW: number; logGroupW: number } {
   return { alarmW: TOPOLOGY_TIER1_W, logGroupW: TOPOLOGY_TIER1_W };
+}
+
+/**
+ * Sum vertical space for satellite stacks drawn one after another below a primary, without
+ * double-counting the gap between stacks (each stack’s height already includes a leading gap).
+ */
+function stackSequentialSatelliteHeightsPx(
+  satelliteGap: number,
+  heights: readonly number[],
+): number {
+  const positive = heights.filter((h) => h > 0);
+  if (positive.length === 0) {
+    return 0;
+  }
+  let sum = positive[0]!;
+  for (let i = 1; i < positive.length; i++) {
+    sum += positive[i]! - satelliteGap;
+  }
+  return sum;
 }
 
 /** Minimum horizontal span for one primary cell so satellites are not clipped. */
@@ -342,12 +379,35 @@ function zoneFrameSizeForTopologyAddresses(
       TOPOLOGY_SATELLITE_GAP_PX,
       plan,
     );
+    const s3Extra = s3SatelliteStackHeightPx(
+      nodes,
+      addr,
+      arnIndex,
+      TOPOLOGY_TIER1_H,
+      TOPOLOGY_TIER2_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
+    );
+    const sqsExtra = sqsSatelliteStackHeightPx(
+      nodes,
+      addr,
+      arnIndex,
+      TOPOLOGY_TIER1_H,
+      TOPOLOGY_TIER2_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
+    );
+    const leftColumnBottom = stackSequentialSatelliteHeightsPx(
+      TOPOLOGY_SATELLITE_GAP_PX,
+      [iamExtra, kmsPolicyExtra, s3Extra],
+    );
+    const rightColumnBottom = stackSequentialSatelliteHeightsPx(
+      TOPOLOGY_SATELLITE_GAP_PX,
+      [sgExtra, sqsExtra],
+    );
     rowTopBase[r] = Math.max(rowTopBase[r]!, cloudWatchExtra);
     rowBottomBase[r] = Math.max(
       rowBottomBase[r]!,
-      iamExtra,
-      kmsPolicyExtra,
-      sgExtra,
+      leftColumnBottom,
+      rightColumnBottom,
     );
   }
   let innerBodyH = 0;
@@ -393,12 +453,13 @@ function vpcFrameDimensionsForZones(
   arnIndex: Map<string, string>,
   plan?: unknown,
   routeTableCountByZoneSignature?: ReadonlyMap<string, number>,
+  vpcInfrastructureTopPadPx = 0,
 ): { w: number; h: number; perZoneW: number; perZoneH: number; znCols: number; znRows: number } {
   if (vpcZs.length === 0) {
     const e = vpcEmptyShellSize();
     return {
       w: e.w,
-      h: e.h,
+      h: e.h + vpcInfrastructureTopPadPx,
       perZoneW: 0,
       perZoneH: 0,
       znCols: 0,
@@ -431,7 +492,11 @@ function vpcFrameDimensionsForZones(
   );
   const h = Math.max(
     MIN_VPC_H + FRAME_CONTENT_SLACK_Y,
-    VPC_TOP_PAD + 2 * INNER_PAD + innerH + FRAME_CONTENT_SLACK_Y,
+    VPC_TOP_PAD +
+      vpcInfrastructureTopPadPx +
+      2 * INNER_PAD +
+      innerH +
+      FRAME_CONTENT_SLACK_Y,
   );
   return { w, h, perZoneW, perZoneH, znCols, znRows };
 }
@@ -601,7 +666,7 @@ function appendRouteTableBottomEdgeRectangles(
     const node = nodes[addr] as TerraformPlanGraphNode | undefined;
     const resourceType = getTerraformResourceTypeFromNodePath(addr);
     const action = getTerraformPlanNodeAction(node);
-    const initiallyVisible = isInitiallyVisibleTerraformResource(
+    const initiallyVisible = isInitiallyVisibleTerraformTopologyTile(
       resourceType,
       action,
     );
@@ -684,7 +749,7 @@ function appendVpcEndpointEgressRectangles(
     const node = nodes[addr] as TerraformPlanGraphNode | undefined;
     const resourceType = getTerraformResourceTypeFromNodePath(addr);
     const action = getTerraformPlanNodeAction(node);
-    const initiallyVisible = isInitiallyVisibleTerraformResource(
+    const initiallyVisible = isInitiallyVisibleTerraformTopologyTile(
       resourceType,
       action,
     );
@@ -817,7 +882,16 @@ function pushResourceRectangleSkeleton(
 
 type TopologySatelliteLineSpec = {
   edge: TopologyIamEdge;
-  origin: "topology_iam" | "topology_sg" | "topology_cloudwatch" | "topology_kms";
+  origin:
+    | "topology_iam"
+    | "topology_sg"
+    | "topology_cloudwatch"
+    | "topology_kms"
+    | "topology_s3"
+    | "topology_sqs"
+    | "topology_vpc_flow"
+    | "topology_vpc_defaults"
+    | "topology_endpoint_sg";
   strokeColor: string;
 };
 
@@ -870,6 +944,158 @@ function buildTopologySatelliteLineSkeletons(
   return out;
 }
 
+function bucketAddressesForVpc<T extends { accountId: string; region: string; vpcId: string; addresses: readonly string[] }>(
+  buckets: readonly T[],
+  accountId: string,
+  regionName: string,
+  vpcId: string,
+): string[] {
+  for (const b of buckets) {
+    if (b.accountId === accountId && b.region === regionName && b.vpcId === vpcId) {
+      return [...b.addresses];
+    }
+  }
+  return [];
+}
+
+function vpcInfrastructureTopPadPx(
+  accountId: string,
+  regionName: string,
+  vpcId: string,
+  vpcDefaultPlumbing: readonly TopologyVpcDefaultPlumbingBucket[],
+  vpcFlowLogs: readonly TopologyVpcFlowLogBucket[],
+  endpointSgs: readonly TopologyEndpointSecurityGroupBucket[],
+): number {
+  let rows = 0;
+  if (bucketAddressesForVpc(vpcDefaultPlumbing, accountId, regionName, vpcId).length) {
+    rows++;
+  }
+  if (bucketAddressesForVpc(vpcFlowLogs, accountId, regionName, vpcId).length) {
+    rows++;
+  }
+  if (bucketAddressesForVpc(endpointSgs, accountId, regionName, vpcId).length) {
+    rows++;
+  }
+  if (rows === 0) {
+    return 0;
+  }
+  return rows * (TOPOLOGY_TIER2_H + TOPOLOGY_SATELLITE_GAP_PX) + TOPOLOGY_SATELLITE_GAP_PX;
+}
+
+function appendVpcFlowLogBundleSatelliteEdges(
+  satelliteLineSpecs: TopologySatelliteLineSpec[],
+  flowAddrs: readonly string[],
+  nodes: TerraformPlanNodesMap,
+): void {
+  const flowAddr = flowAddrs.find((a) => {
+    const pr = getPrimaryResource(nodes[a] as TerraformPlanGraphNode);
+    return pr?.type === "aws_flow_log";
+  });
+  if (!flowAddr) {
+    return;
+  }
+  for (const addr of flowAddrs) {
+    if (addr === flowAddr) {
+      continue;
+    }
+    satelliteLineSpecs.push({
+      edge: {
+        source: flowAddr,
+        target: addr,
+        type: "vpc_flow_module",
+        label: "VPC flow log",
+      },
+      origin: "topology_vpc_flow",
+      strokeColor: VPC_FLOWLOG_DATAFLOW_STROKE,
+    });
+  }
+}
+
+/** Default VPC, flow-log, and endpoint-SG tiles at the top inside a VPC frame. */
+function appendVpcInfrastructureStrips(
+  skeleton: ExcalidrawElementSkeleton[],
+  accountId: string,
+  regionName: string,
+  vpcId: string,
+  vpcX: number,
+  vpcY: number,
+  vpcCellW: number,
+  nodes: TerraformPlanNodesMap,
+  defaultAddrs: readonly string[],
+  flowAddrs: readonly string[],
+  endpointSgAddrs: readonly string[],
+): string[] {
+  const out: string[] = [];
+  const innerLeft = vpcX + INNER_PAD;
+  const innerW = Math.max(0, vpcCellW - 2 * INNER_PAD);
+  let rowY = vpcY + VPC_TOP_PAD;
+  const tileGap = TOPOLOGY_SATELLITE_GAP_PX;
+
+  const placeRow = (addrs: readonly string[]) => {
+    if (addrs.length === 0) {
+      return;
+    }
+    const rowW =
+      addrs.length * TOPOLOGY_TIER2_W + Math.max(0, addrs.length - 1) * tileGap;
+    let x = innerLeft + Math.max(0, (innerW - rowW) / 2);
+    for (const addr of addrs) {
+      out.push(addr);
+      const node = nodes[addr] as TerraformPlanGraphNode | undefined;
+      const resourceType = getTerraformResourceTypeFromNodePath(addr);
+      const action = getTerraformPlanNodeAction(node);
+      pushResourceRectangleSkeleton(
+        skeleton,
+        addr,
+        x,
+        rowY,
+        TOPOLOGY_TIER2_W,
+        TOPOLOGY_TIER2_H,
+        nodes,
+        {
+          initiallyVisible: isInitiallyVisibleTerraformTopologyTile(
+            resourceType,
+            action,
+          ),
+          explodeParentKeys: [],
+          satelliteTier: 2,
+        },
+      );
+      x += TOPOLOGY_TIER2_W + tileGap;
+    }
+    rowY += TOPOLOGY_TIER2_H + tileGap;
+  };
+
+  placeRow(defaultAddrs);
+  placeRow(flowAddrs);
+  placeRow(endpointSgAddrs);
+
+  return out;
+}
+
+function companionStackTileMetrics(
+  nodes: TerraformPlanNodesMap,
+  satAddr: string,
+  tier1W: number,
+): { tileH: number; tileW: number; tileXOffset: number; tier: 1 | 2 } {
+  const n = nodes[satAddr] as TerraformPlanGraphNode | undefined;
+  const pr = getPrimaryResource(n);
+  const t = typeof pr?.type === "string" ? pr.type : "";
+  if (t === "aws_iam_policy_document") {
+    return {
+      tileH: TOPOLOGY_TIER2_H,
+      tileW: TOPOLOGY_TIER2_W,
+      tileXOffset: Math.floor((tier1W - TOPOLOGY_TIER2_W) / 2),
+      tier: 2,
+    };
+  }
+  return {
+    tileH: TOPOLOGY_TIER1_H,
+    tileW: tier1W,
+    tileXOffset: 0,
+    tier: 1,
+  };
+}
+
 /** Primary grid + top CloudWatch, bottom IAM / KMS policy (left) / SG (right) satellites and data-flow edges. */
 function appendTopologyResourceRectangles(
   skeleton: ExcalidrawElementSkeleton[],
@@ -882,6 +1108,8 @@ function appendTopologyResourceRectangles(
   globalPlacedKmsPolicySatellites: Set<string>,
   globalPlacedSgSatellites: Set<string>,
   globalPlacedCloudWatchSatellites: Set<string>,
+  globalPlacedS3Satellites: Set<string>,
+  globalPlacedSqsSatellites: Set<string>,
   satelliteLineSpecs: TopologySatelliteLineSpec[],
   plan?: unknown,
 ): string[] {
@@ -925,12 +1153,35 @@ function appendTopologyResourceRectangles(
       TOPOLOGY_SATELLITE_GAP_PX,
       plan,
     );
+    const s3Extra = s3SatelliteStackHeightPx(
+      nodes,
+      addr,
+      arnIndex,
+      TOPOLOGY_TIER1_H,
+      TOPOLOGY_TIER2_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
+    );
+    const sqsExtra = sqsSatelliteStackHeightPx(
+      nodes,
+      addr,
+      arnIndex,
+      TOPOLOGY_TIER1_H,
+      TOPOLOGY_TIER2_H,
+      TOPOLOGY_SATELLITE_GAP_PX,
+    );
+    const leftColumnBottom = stackSequentialSatelliteHeightsPx(
+      TOPOLOGY_SATELLITE_GAP_PX,
+      [iamExtra, kmsPolicyExtra, s3Extra],
+    );
+    const rightColumnBottom = stackSequentialSatelliteHeightsPx(
+      TOPOLOGY_SATELLITE_GAP_PX,
+      [sgExtra, sqsExtra],
+    );
     rowTopBase[rr] = Math.max(rowTopBase[rr]!, cloudWatchExtra);
     rowBottomBase[rr] = Math.max(
       rowBottomBase[rr]!,
-      iamExtra,
-      kmsPolicyExtra,
-      sgExtra,
+      leftColumnBottom,
+      rightColumnBottom,
     );
   }
 
@@ -955,7 +1206,7 @@ function appendTopologyResourceRectangles(
     const node = nodes[addr] as TerraformPlanGraphNode | undefined;
     const resourceType = getTerraformResourceTypeFromNodePath(addr);
     const action = getTerraformPlanNodeAction(node);
-    const initiallyVisible = isInitiallyVisibleTerraformResource(
+    const initiallyVisible = isInitiallyVisibleTerraformTopologyTile(
       resourceType,
       action,
     );
@@ -975,6 +1226,8 @@ function appendTopologyResourceRectangles(
     const { cluster, edges } = buildLambdaIamCluster(nodes, addr, arnIndex);
     const kmsBuild = buildKmsKeyPolicyCluster(nodes, addr, arnIndex);
     const sgBuild = buildLambdaSgCluster(nodes, addr, arnIndex, plan);
+    const s3Build = buildS3CompanionCluster(nodes, addr, arnIndex);
+    const sqsBuild = buildSqsCompanionCluster(nodes, addr, arnIndex);
     const cloudWatchBuild = buildResourceCloudWatchCluster(nodes, addr);
     const { iamW, sgW } = satelliteColumnWidths();
     const { alarmW, logGroupW } = cloudWatchColumnWidths();
@@ -1000,6 +1253,20 @@ function appendTopologyResourceRectangles(
         strokeColor: SG_DATAFLOW_STROKE,
       });
     }
+    for (const e of s3Build.edges) {
+      satelliteLineSpecs.push({
+        edge: e,
+        origin: "topology_s3",
+        strokeColor: S3_DATAFLOW_STROKE,
+      });
+    }
+    for (const e of sqsBuild.edges) {
+      satelliteLineSpecs.push({
+        edge: e,
+        origin: "topology_sqs",
+        strokeColor: SQS_DATAFLOW_STROKE,
+      });
+    }
     for (const e of cloudWatchBuild.edges) {
       satelliteLineSpecs.push({
         edge: e,
@@ -1008,8 +1275,10 @@ function appendTopologyResourceRectangles(
       });
     }
 
-    const hasLeft = Boolean(cluster) || Boolean(kmsBuild.cluster);
+    const hasLeft =
+      Boolean(cluster) || Boolean(kmsBuild.cluster) || Boolean(s3Build.cluster);
     const hasSg = Boolean(sgBuild.cluster);
+    const hasSqs = Boolean(sqsBuild.cluster);
     const cwHasAlarm = Boolean(cloudWatchBuild.cluster?.alarms.length);
     const cwHasLog = Boolean(cloudWatchBuild.cluster?.logGroups.length);
     const logGroupX =
@@ -1079,8 +1348,11 @@ function appendTopologyResourceRectangles(
       }
     }
 
+    const yAfterPrimary = ry + RESOURCE_RECT_H;
+    let yLeft = yAfterPrimary;
+
     if (cluster) {
-      let ySat = ry + RESOURCE_RECT_H + TOPOLOGY_SATELLITE_GAP_PX;
+      yLeft += TOPOLOGY_SATELLITE_GAP_PX;
       const satXIam = rx;
       for (let si = 0; si < cluster.stack.length; si++) {
         const satAddr = cluster.stack[si]!;
@@ -1091,7 +1363,7 @@ function appendTopologyResourceRectangles(
           ? satXIam
           : satXIam + Math.floor((iamW - TOPOLOGY_TIER2_W) / 2);
         if (globalPlacedIamSatellites.has(satAddr)) {
-          ySat += tileH + TOPOLOGY_SATELLITE_GAP_PX;
+          yLeft += tileH + TOPOLOGY_SATELLITE_GAP_PX;
           continue;
         }
         globalPlacedIamSatellites.add(satAddr);
@@ -1100,7 +1372,7 @@ function appendTopologyResourceRectangles(
           skeleton,
           satAddr,
           tileX,
-          ySat,
+          yLeft,
           tileW,
           tileH,
           nodes,
@@ -1110,16 +1382,18 @@ function appendTopologyResourceRectangles(
             satelliteTier: isRoleTile ? 1 : 2,
           },
         );
-        ySat += tileH + TOPOLOGY_SATELLITE_GAP_PX;
+        yLeft += tileH + TOPOLOGY_SATELLITE_GAP_PX;
       }
     }
 
     if (kmsBuild.cluster) {
-      let yKms = ry + RESOURCE_RECT_H + TOPOLOGY_SATELLITE_GAP_PX;
+      if (!cluster) {
+        yLeft += TOPOLOGY_SATELLITE_GAP_PX;
+      }
       const satXKms = rx;
       for (const policyPath of kmsBuild.cluster.policies) {
         if (globalPlacedKmsPolicySatellites.has(policyPath)) {
-          yKms += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
+          yLeft += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
           continue;
         }
         globalPlacedKmsPolicySatellites.add(policyPath);
@@ -1128,7 +1402,7 @@ function appendTopologyResourceRectangles(
           skeleton,
           policyPath,
           satXKms,
-          yKms,
+          yLeft,
           iamW,
           TOPOLOGY_TIER1_H,
           nodes,
@@ -1138,17 +1412,51 @@ function appendTopologyResourceRectangles(
             satelliteTier: 1,
           },
         );
-        yKms += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
+        yLeft += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
       }
     }
 
+    if (s3Build.cluster) {
+      if (!cluster && !kmsBuild.cluster) {
+        yLeft += TOPOLOGY_SATELLITE_GAP_PX;
+      }
+      const satXS3 = rx;
+      for (const satAddr of s3Build.cluster.stack) {
+        const m = companionStackTileMetrics(nodes, satAddr, iamW);
+        if (globalPlacedS3Satellites.has(satAddr)) {
+          yLeft += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
+          continue;
+        }
+        globalPlacedS3Satellites.add(satAddr);
+        rectIds.push(satAddr);
+        pushResourceRectangleSkeleton(
+          skeleton,
+          satAddr,
+          satXS3 + m.tileXOffset,
+          yLeft,
+          m.tileW,
+          m.tileH,
+          nodes,
+          {
+            initiallyVisible: false,
+            explodeParentKeys: [addr],
+            satelliteTier: m.tier,
+          },
+        );
+        yLeft += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
+      }
+    }
+
+    const hasRight = hasSg || hasSqs;
+    const satXRight =
+      hasLeft && hasRight
+        ? rx + TOPOLOGY_TIER1_W + IAM_SG_COLUMN_GAP_PX
+        : rx + TOPOLOGY_TIER0_W - sgW - SG_RIGHT_PAD;
+    const ruleTileX = satXRight + Math.floor((sgW - TOPOLOGY_TIER2_W) / 2);
+    let yRight = yAfterPrimary;
+
     if (sgBuild.cluster) {
-      const satXSg =
-        hasLeft && hasSg
-          ? rx + TOPOLOGY_TIER1_W + IAM_SG_COLUMN_GAP_PX
-          : rx + TOPOLOGY_TIER0_W - sgW - SG_RIGHT_PAD;
-      const ruleTileX = satXSg + Math.floor((sgW - TOPOLOGY_TIER2_W) / 2);
-      let ySg = ry + RESOURCE_RECT_H + TOPOLOGY_SATELLITE_GAP_PX;
+      yRight += TOPOLOGY_SATELLITE_GAP_PX;
       for (let gi = 0; gi < sgBuild.cluster.groups.length; gi++) {
         const group = sgBuild.cluster.groups[gi]!;
 
@@ -1158,8 +1466,8 @@ function appendTopologyResourceRectangles(
           pushResourceRectangleSkeleton(
             skeleton,
             group.sgPath,
-            satXSg,
-            ySg,
+            satXRight,
+            yRight,
             sgW,
             TOPOLOGY_TIER1_H,
             nodes,
@@ -1170,7 +1478,7 @@ function appendTopologyResourceRectangles(
             },
           );
         }
-        ySg += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
+        yRight += TOPOLOGY_TIER1_H + TOPOLOGY_SATELLITE_GAP_PX;
 
         for (const rulePath of group.rules) {
           if (!globalPlacedSgSatellites.has(rulePath)) {
@@ -1180,7 +1488,7 @@ function appendTopologyResourceRectangles(
               skeleton,
               rulePath,
               ruleTileX,
-              ySg,
+              yRight,
               TOPOLOGY_TIER2_W,
               TOPOLOGY_TIER2_H,
               nodes,
@@ -1191,12 +1499,42 @@ function appendTopologyResourceRectangles(
               },
             );
           }
-          ySg += TOPOLOGY_TIER2_H + TOPOLOGY_SATELLITE_GAP_PX;
+          yRight += TOPOLOGY_TIER2_H + TOPOLOGY_SATELLITE_GAP_PX;
         }
 
         if (gi < sgBuild.cluster.groups.length - 1) {
-          ySg += TOPOLOGY_SG_BETWEEN_GROUPS_GAP_PX;
+          yRight += TOPOLOGY_SG_BETWEEN_GROUPS_GAP_PX;
         }
+      }
+    }
+
+    if (sqsBuild.cluster) {
+      if (!sgBuild.cluster) {
+        yRight += TOPOLOGY_SATELLITE_GAP_PX;
+      }
+      for (const satAddr of sqsBuild.cluster.stack) {
+        const m = companionStackTileMetrics(nodes, satAddr, sgW);
+        if (globalPlacedSqsSatellites.has(satAddr)) {
+          yRight += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
+          continue;
+        }
+        globalPlacedSqsSatellites.add(satAddr);
+        rectIds.push(satAddr);
+        pushResourceRectangleSkeleton(
+          skeleton,
+          satAddr,
+          satXRight + m.tileXOffset,
+          yRight,
+          m.tileW,
+          m.tileH,
+          nodes,
+          {
+            initiallyVisible: false,
+            explodeParentKeys: [addr],
+            satelliteTier: m.tier,
+          },
+        );
+        yRight += m.tileH + TOPOLOGY_SATELLITE_GAP_PX;
       }
     }
   }
@@ -1303,6 +1641,9 @@ export async function buildTerraformTopologyExcalidrawScene(
     zoneBottom: [],
     vpcBottom: [],
   },
+  vpcDefaultPlumbingBuckets: readonly TopologyVpcDefaultPlumbingBucket[] = [],
+  vpcFlowLogBuckets: readonly TopologyVpcFlowLogBucket[] = [],
+  endpointSecurityGroupBuckets: readonly TopologyEndpointSecurityGroupBucket[] = [],
 ): Promise<{
   elements: ExcalidrawElement[];
   meta: TerraformTopologySceneMeta;
@@ -1355,6 +1696,8 @@ export async function buildTerraformTopologyExcalidrawScene(
   const globalPlacedKmsPolicySatellites = new Set<string>();
   const globalPlacedSgSatellites = new Set<string>();
   const globalPlacedCloudWatchSatellites = new Set<string>();
+  const globalPlacedS3Satellites = new Set<string>();
+  const globalPlacedSqsSatellites = new Set<string>();
 
   let accountCursorX = MARGIN;
   const accountCursorY = MARGIN;
@@ -1406,12 +1749,21 @@ export async function buildTerraformTopologyExcalidrawScene(
             regionName,
             vpcId,
           );
+          const infraTop = vpcInfrastructureTopPadPx(
+            accountId,
+            regionName,
+            vpcId,
+            vpcDefaultPlumbingBuckets,
+            vpcFlowLogBuckets,
+            endpointSecurityGroupBuckets,
+          );
           const vd = vpcFrameDimensionsForZones(
             vpcZs,
             nodes,
             arnIndex,
             plan,
             rtZoneCounts,
+            infraTop,
           );
           const epAddrs = endpointsForVpc(
             vpcEndpointBuckets,
@@ -1447,12 +1799,21 @@ export async function buildTerraformTopologyExcalidrawScene(
             regionName,
             vpcId,
           );
+          const infraTop = vpcInfrastructureTopPadPx(
+            accountId,
+            regionName,
+            vpcId,
+            vpcDefaultPlumbingBuckets,
+            vpcFlowLogBuckets,
+            endpointSecurityGroupBuckets,
+          );
           const vd = vpcFrameDimensionsForZones(
             vpcZs,
             nodes,
             arnIndex,
             plan,
             rtZoneCounts,
+            infraTop,
           );
           vpcCellH = Math.max(vpcCellH, vd.h);
         }
@@ -1567,6 +1928,8 @@ export async function buildTerraformTopologyExcalidrawScene(
           globalPlacedKmsPolicySatellites,
           globalPlacedSgSatellites,
           globalPlacedCloudWatchSatellites,
+          globalPlacedS3Satellites,
+          globalPlacedSqsSatellites,
           satelliteLineSpecs,
           plan,
         );
@@ -1622,6 +1985,51 @@ export async function buildTerraformTopologyExcalidrawScene(
         const rtStackAboveVpcBottomPx =
           epAddrs.length > 0 ? ROUTE_TABLE_TILE_H + 8 : 0;
 
+        const defaultPlumbingAddrs = bucketAddressesForVpc(
+          vpcDefaultPlumbingBuckets,
+          accountId,
+          regionName,
+          vpcId,
+        );
+        const flowLogAddrs = bucketAddressesForVpc(
+          vpcFlowLogBuckets,
+          accountId,
+          regionName,
+          vpcId,
+        );
+        const endpointSgAddrs = bucketAddressesForVpc(
+          endpointSecurityGroupBuckets,
+          accountId,
+          regionName,
+          vpcId,
+        );
+        const infraTop = vpcInfrastructureTopPadPx(
+          accountId,
+          regionName,
+          vpcId,
+          vpcDefaultPlumbingBuckets,
+          vpcFlowLogBuckets,
+          endpointSecurityGroupBuckets,
+        );
+        const vpcInfraIds = appendVpcInfrastructureStrips(
+          skeleton,
+          accountId,
+          regionName,
+          vpcId,
+          vpcX,
+          vpcY,
+          vpcCellW,
+          nodes,
+          defaultPlumbingAddrs,
+          flowLogAddrs,
+          endpointSgAddrs,
+        );
+        appendVpcFlowLogBundleSatelliteEdges(
+          satelliteLineSpecs,
+          flowLogAddrs,
+          nodes,
+        );
+
         if (vpcZs.length === 0) {
           if (vpcBottomRtAddrs.length > 0) {
             regionRouteTableRectIds.push(
@@ -1667,7 +2075,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             y: vpcY,
             width: vpcCellW,
             height: vpcCellH,
-            children: [] as readonly string[],
+            children: vpcInfraIds as readonly string[],
             customData: frameCustomData(
               "vpc",
               accountId,
@@ -1691,9 +2099,10 @@ export async function buildTerraformTopologyExcalidrawScene(
           arnIndex,
           plan,
           rtZoneCounts,
+          infraTop,
         );
         const zoneGridOriginX = vpcX + INNER_PAD;
-        const zoneGridOriginY = vpcY + VPC_TOP_PAD;
+        const zoneGridOriginY = vpcY + VPC_TOP_PAD + infraTop;
         const zoneFrameIds: string[] = [];
 
         for (let zi = 0; zi < vpcZs.length; zi++) {
@@ -1725,6 +2134,8 @@ export async function buildTerraformTopologyExcalidrawScene(
             globalPlacedKmsPolicySatellites,
             globalPlacedSgSatellites,
             globalPlacedCloudWatchSatellites,
+            globalPlacedS3Satellites,
+            globalPlacedSqsSatellites,
             satelliteLineSpecs,
             plan,
           );
@@ -1819,7 +2230,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           y: vpcY,
           width: vpcCellW,
           height: vpcCellH,
-          children: zoneFrameIds as readonly string[],
+          children: [...vpcInfraIds, ...zoneFrameIds] as readonly string[],
           customData: frameCustomData(
             "vpc",
             accountId,

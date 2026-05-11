@@ -630,6 +630,14 @@ export function mergeTopologyModelWithRouteTables(
   }
 }
 
+/** Ensures VPC shells exist for default VPC plumbing buckets (NACL / default RT / default SG). */
+export function mergeTopologyModelWithVpcDefaults(
+  model: TerraformTopologyModel,
+  buckets: readonly { accountId: string; region: string; vpcId: string }[],
+): void {
+  mergeTopologyModelWithRouteTables(model, buckets);
+}
+
 function ingestVpcSubnetPair(
   model: TerraformTopologyModel,
   subnetToVpc: Map<string, string>,

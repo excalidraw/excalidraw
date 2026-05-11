@@ -8,13 +8,18 @@ import {
   mergeTopologyModelWithRegionalBuckets,
   mergeTopologyModelWithVpcEndpoints,
   mergeTopologyModelWithRouteTables,
+  mergeTopologyModelWithVpcDefaults,
 } from "./terraformTopologyExtract";
 import {
   computeRouteTableBottomEdgePlacements,
+  extractInterfaceEndpointSecurityGroupBuckets,
   extractPrimaryTopologyZones,
   extractRegionalTopologyPrimaries,
-  extractVpcEndpointsByVpc,
   extractRouteTablesByVpc,
+  extractSupplementarySubnetZones,
+  extractVpcDefaultPlumbingBuckets,
+  extractVpcEndpointsByVpc,
+  extractVpcFlowLogBundles,
 } from "./terraformTopologyPlacement";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
@@ -156,16 +161,39 @@ export const terraformPlanParsing = async (
 
   if (semanticLayout) {
     const topoModel = extractTerraformTopologyFromPlan(plan);
-    const zones = extractPrimaryTopologyZones(plan);
+    const primaryZones = extractPrimaryTopologyZones(plan);
+    const supplementaryZones = extractSupplementarySubnetZones(
+      plan,
+      primaryZones,
+    );
+    const zones = [...primaryZones, ...supplementaryZones].sort((a, b) => {
+      if (a.accountId !== b.accountId) {
+        return a.accountId.localeCompare(b.accountId);
+      }
+      if (a.region !== b.region) {
+        return a.region.localeCompare(b.region);
+      }
+      if (a.vpcId !== b.vpcId) {
+        return a.vpcId.localeCompare(b.vpcId);
+      }
+      return a.subnetSignature.localeCompare(b.subnetSignature);
+    });
     const regionalBuckets = extractRegionalTopologyPrimaries(plan);
     const vpcEndpointBuckets = extractVpcEndpointsByVpc(plan);
     const routeTableBuckets = extractRouteTablesByVpc(plan);
+    const vpcDefaultPlumbingBuckets = extractVpcDefaultPlumbingBuckets(plan);
+    const vpcFlowLogBuckets = extractVpcFlowLogBundles(plan);
+    const endpointSecurityGroupBuckets =
+      extractInterfaceEndpointSecurityGroupBuckets(plan, vpcEndpointBuckets);
     const routeTableBottomPlacements =
       computeRouteTableBottomEdgePlacements(zones, plan);
     mergeTopologyModelWithPlacementZones(topoModel, zones);
     mergeTopologyModelWithRegionalBuckets(topoModel, regionalBuckets);
     mergeTopologyModelWithVpcEndpoints(topoModel, vpcEndpointBuckets);
     mergeTopologyModelWithRouteTables(topoModel, routeTableBuckets);
+    mergeTopologyModelWithVpcDefaults(topoModel, vpcDefaultPlumbingBuckets);
+    mergeTopologyModelWithRouteTables(topoModel, vpcFlowLogBuckets);
+    mergeTopologyModelWithRouteTables(topoModel, endpointSecurityGroupBuckets);
     const topoScene = await buildTerraformTopologyExcalidrawScene(
       topoModel,
       zones,
@@ -174,6 +202,9 @@ export const terraformPlanParsing = async (
       plan,
       vpcEndpointBuckets,
       routeTableBottomPlacements,
+      vpcDefaultPlumbingBuckets,
+      vpcFlowLogBuckets,
+      endpointSecurityGroupBuckets,
     );
     emitLocalParseDebug({
       phase: "topologyLayout",
