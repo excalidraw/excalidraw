@@ -1,14 +1,127 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  extractDefaultAwsProviderAccountRegion,
   extractTerraformTopologyFromPlan,
   mergeTerraformTopologyAccountRegionFromSameRegionSubnets,
+  mergeWithDefaultAwsProviderAccountRegion,
   parseAwsArnLocation,
   pickResourceChangeValues,
   pickResourceValuesForTopologyPlacement,
+  resolveTerraformDeployRoleIamArnFromPlan,
   TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT,
   TERRAFORM_TOPOLOGY_UNKNOWN_REGION,
 } from "./terraformTopologyExtract";
+
+describe("resolveTerraformDeployRoleIamArnFromPlan", () => {
+  it("prefers explicit terraform_deploy_role_arn variable", () => {
+    const arn = resolveTerraformDeployRoleIamArnFromPlan({
+      variables: {
+        terraform_deploy_role_arn: { value: " arn:aws:iam::111111111111:role/Custom " },
+        aws_account_id: { value: "222222222222" },
+      },
+    });
+    expect(arn).toBe("arn:aws:iam::111111111111:role/Custom");
+  });
+
+  it("builds IAM role ARN from aws_account_id and terraform_deploy_role_name", () => {
+    expect(
+      resolveTerraformDeployRoleIamArnFromPlan({
+        variables: {
+          terraform_deploy_role_arn: { value: "" },
+          aws_account_id: { value: "992382747916" },
+          terraform_deploy_role_name: { value: "TerraformDeploy" },
+        },
+      }),
+    ).toBe("arn:aws:iam::992382747916:role/TerraformDeploy");
+  });
+});
+
+describe("extractDefaultAwsProviderAccountRegion", () => {
+  const providerAws = {
+    name: "aws",
+    expressions: {
+      region: { references: ["var.aws_region"] },
+      assume_role: [
+        {
+          role_arn: { references: ["local.terraform_deploy_role_arn"] },
+          session_name: { constant_value: "terraform-excalidraw-tf" },
+        },
+      ],
+    },
+  };
+
+  it("resolves region and account from variables and assume_role local reference", () => {
+    const hint = extractDefaultAwsProviderAccountRegion({
+      configuration: { provider_config: { aws: providerAws } },
+      variables: {
+        aws_region: { value: "us-east-1" },
+        aws_account_id: { value: "992382747916" },
+        terraform_deploy_role_arn: { value: "" },
+        terraform_deploy_role_name: { value: "TerraformDeploy" },
+      },
+    });
+    expect(hint).toEqual({ account: "992382747916", region: "us-east-1" });
+  });
+
+  it("resolves account from constant IAM role ARN on provider", () => {
+    const hint = extractDefaultAwsProviderAccountRegion({
+      configuration: {
+        provider_config: {
+          aws: {
+            name: "aws",
+            expressions: {
+              region: { constant_value: "eu-west-1" },
+              assume_role: [
+                {
+                  role_arn: {
+                    constant_value: "arn:aws:iam::444444444444:role/Deploy",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    });
+    expect(hint).toEqual({ account: "444444444444", region: "eu-west-1" });
+  });
+
+  it("returns null when default aws provider block is absent", () => {
+    expect(extractDefaultAwsProviderAccountRegion({ configuration: {} })).toBeNull();
+  });
+});
+
+describe("mergeWithDefaultAwsProviderAccountRegion", () => {
+  it("fills only unknown placeholders", () => {
+    const plan = {
+      configuration: {
+        provider_config: {
+          aws: {
+            expressions: {
+              region: { constant_value: "ap-south-1" },
+              assume_role: [
+                { role_arn: { constant_value: "arn:aws:iam::121212121212:role/R" } },
+              ],
+            },
+          },
+        },
+      },
+    };
+    expect(
+      mergeWithDefaultAwsProviderAccountRegion(plan, {
+        account: TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT,
+        region: TERRAFORM_TOPOLOGY_UNKNOWN_REGION,
+      }),
+    ).toEqual({ account: "121212121212", region: "ap-south-1" });
+    expect(
+      mergeWithDefaultAwsProviderAccountRegion(plan, {
+        account: "999999999999",
+        region: "us-east-1",
+      }),
+    ).toEqual({ account: "999999999999", region: "us-east-1" });
+  });
+});
 
 describe("parseAwsArnLocation", () => {
   it("parses regional ARN", () => {
@@ -275,5 +388,44 @@ describe("extractTerraformTopologyFromPlan", () => {
     const model = extractTerraformTopologyFromPlan(plan);
     expect(model.accounts.size).toBe(0);
     expect(model.accounts.get(TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT)).toBeUndefined();
+  });
+
+  it("uses default aws provider account for standalone VPC placement when resource lacks ARN", () => {
+    const plan = {
+      configuration: {
+        provider_config: {
+          aws: {
+            expressions: {
+              region: { constant_value: "us-east-1" },
+              assume_role: [
+                {
+                  role_arn: {
+                    constant_value: "arn:aws:iam::777777777777:role/Deploy",
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+      resource_changes: [
+        {
+          address: "aws_security_group.app",
+          type: "aws_security_group",
+          mode: "managed",
+          provider_name: "registry.terraform.io/hashicorp/aws",
+          change: {
+            actions: ["create"],
+            after: {
+              name: "app",
+              vpc_id: "vpc-standalone",
+              region: "us-east-1",
+            },
+          },
+        },
+      ],
+    };
+    const model = extractTerraformTopologyFromPlan(plan);
+    expect(model.accounts.get("777777777777")?.regions.get("us-east-1")?.vpcs.get("vpc-standalone")).toBeDefined();
   });
 });

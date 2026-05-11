@@ -1,4 +1,42 @@
-/*
+terraform {
+  required_version = ">= 1.5"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.5"
+    }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.4"
+    }
+  }
+}
+
+locals {
+  terraform_deploy_role_arn = trimspace(var.terraform_deploy_role_arn) != "" ? trimspace(var.terraform_deploy_role_arn) : "arn:aws:iam::${var.aws_account_id}:role/${var.terraform_deploy_role_name}"
+}
+
+provider "aws" {
+  region  = var.aws_region
+  profile = var.aws_profile
+
+  assume_role {
+    role_arn     = local.terraform_deploy_role_arn
+    session_name = "terraform-excalidraw-tf"
+  }
+}
+
+data "aws_caller_identity" "current" {}
+
+check "assume_role_configured" {
+  assert {
+    condition     = trimspace(var.terraform_deploy_role_arn) != "" || can(regex("^[0-9]{12}$", var.aws_account_id))
+    error_message = "Set terraform_deploy_role_arn or a 12-digit aws_account_id (see terraform.tfvars.example)."
+  }
+}
+
+
 locals {
   workload_private_subnet_cidrs = ["10.42.1.0/24", "10.42.2.0/24"]
   # Literal — must match private_workload_network.vpc_cidr (lambda_service SG planning).
@@ -112,7 +150,7 @@ module "workload_writer_lambda" {
 }
 
 # --- Lambda: monitoring (mock/no-op) ---
-
+/*
 module "workload_monitoring_lambda" {
   source = "./modules/lambda_service"
 
@@ -139,7 +177,7 @@ module "workload_monitoring_lambda" {
       resources = ["${module.lambda_deployment_artifacts.s3_bucket_arn}/${aws_s3_object.lambda_deployment_package.key}"]
     }
   }
-}
+}*/
 
 # --- Lambda: reader ---
 
@@ -201,4 +239,4 @@ module "workload_reader_lambda" {
       resources = [module.application_job_queue.kms_key_arn]
     }
   }
-}*/
+}

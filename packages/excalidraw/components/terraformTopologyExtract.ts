@@ -6,6 +6,25 @@
 export const TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT = "unknown-account";
 export const TERRAFORM_TOPOLOGY_UNKNOWN_REGION = "unknown-region";
 
+/** Subset of `terraform show -json` used to read default `aws` provider region / account. */
+export type TerraformPlanProviderContext = {
+  configuration?: {
+    provider_config?: Record<
+      string,
+      {
+        name?: string;
+        expressions?: Record<string, unknown>;
+      }
+    >;
+  };
+  variables?: Record<string, { value?: unknown }>;
+};
+
+export type TerraformProviderAccountRegionHint = {
+  account: string | null;
+  region: string | null;
+};
+
 export type TerraformTopologySubnet = {
   /** Terraform subnet id, e.g. subnet-0abc */
   subnetId: string;
@@ -260,6 +279,138 @@ function resolveAccountRegion(
   return { account: TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT, region };
 }
 
+function planVariableTrimmed(
+  plan: TerraformPlanProviderContext | undefined,
+  key: string,
+): string | null {
+  const raw = plan?.variables?.[key]?.value;
+  if (typeof raw !== "string") {
+    return null;
+  }
+  const t = raw.trim();
+  return t.length ? t : null;
+}
+
+/**
+ * Resolves `local.terraform_deploy_role_arn` when the plan only has root variable values
+ * (same idea as root Terraform `coalesce(var.terraform_deploy_role_arn, …)`).
+ */
+export function resolveTerraformDeployRoleIamArnFromPlan(
+  plan: TerraformPlanProviderContext | undefined,
+): string | null {
+  const direct = planVariableTrimmed(plan, "terraform_deploy_role_arn");
+  if (direct) {
+    return direct;
+  }
+  const accountId = planVariableTrimmed(plan, "aws_account_id");
+  if (!accountId || !/^\d{12}$/.test(accountId)) {
+    return null;
+  }
+  const roleName =
+    planVariableTrimmed(plan, "terraform_deploy_role_name") ?? "TerraformDeploy";
+  return `arn:aws:iam::${accountId}:role/${roleName}`;
+}
+
+function resolveProviderRegionFromExpressions(
+  plan: TerraformPlanProviderContext | undefined,
+  regionExpr: unknown,
+): string | null {
+  if (!regionExpr || typeof regionExpr !== "object" || Array.isArray(regionExpr)) {
+    return null;
+  }
+  const rec = regionExpr as Record<string, unknown>;
+  const constant = rec.constant_value;
+  if (typeof constant === "string" && constant.trim()) {
+    return constant.trim();
+  }
+  const refs = Array.isArray(rec.references) ? rec.references : [];
+  if (refs.includes("var.aws_region")) {
+    return planVariableTrimmed(plan, "aws_region");
+  }
+  return null;
+}
+
+function resolveProviderAssumeRoleAccount(
+  plan: TerraformPlanProviderContext | undefined,
+  assumeRoleExpr: unknown,
+): string | null {
+  if (!Array.isArray(assumeRoleExpr) || assumeRoleExpr.length === 0) {
+    return null;
+  }
+  const block = assumeRoleExpr[0];
+  if (!block || typeof block !== "object" || Array.isArray(block)) {
+    return null;
+  }
+  const roleArnRaw = (block as Record<string, unknown>).role_arn;
+  if (!roleArnRaw || typeof roleArnRaw !== "object" || Array.isArray(roleArnRaw)) {
+    return null;
+  }
+  const arnExpr = roleArnRaw as Record<string, unknown>;
+  const constantArn = arnExpr.constant_value;
+  if (typeof constantArn === "string" && constantArn.startsWith("arn:aws:iam::")) {
+    const loc = parseAwsArnLocation(constantArn);
+    return loc?.account && /^\d{12}$/.test(loc.account) ? loc.account : null;
+  }
+  const refs = Array.isArray(arnExpr.references) ? arnExpr.references : [];
+  if (refs.includes("local.terraform_deploy_role_arn")) {
+    const arn = resolveTerraformDeployRoleIamArnFromPlan(plan);
+    if (!arn) {
+      return null;
+    }
+    const loc = parseAwsArnLocation(arn);
+    return loc?.account && /^\d{12}$/.test(loc.account) ? loc.account : null;
+  }
+  return null;
+}
+
+/**
+ * Default (non-aliased) `aws` provider account/region from `configuration.provider_config.aws`
+ * and root `variables` (for `var.aws_region` and assume-role IAM ARN resolution).
+ */
+export function extractDefaultAwsProviderAccountRegion(
+  plan: TerraformPlanProviderContext | undefined,
+): TerraformProviderAccountRegionHint | null {
+  const pc = plan?.configuration?.provider_config?.aws;
+  if (!pc || typeof pc !== "object") {
+    return null;
+  }
+  const expressions = (pc as { expressions?: Record<string, unknown> }).expressions;
+  if (!expressions || typeof expressions !== "object") {
+    return { account: null, region: null };
+  }
+  return {
+    account: resolveProviderAssumeRoleAccount(plan, expressions.assume_role),
+    region: resolveProviderRegionFromExpressions(plan, expressions.region),
+  };
+}
+
+/** Fill unknown-account / unknown-region from default `aws` provider (plan JSON only). */
+export function mergeWithDefaultAwsProviderAccountRegion(
+  plan: TerraformPlanProviderContext | undefined,
+  merged: { account: string; region: string },
+): { account: string; region: string } {
+  const hint = extractDefaultAwsProviderAccountRegion(plan);
+  if (!hint) {
+    return merged;
+  }
+  let account = merged.account;
+  let region = merged.region;
+  if (account === TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT && hint.account) {
+    account = hint.account;
+  }
+  if (region === TERRAFORM_TOPOLOGY_UNKNOWN_REGION && hint.region) {
+    region = hint.region;
+  }
+  return { account, region };
+}
+
+function resolveAccountRegionWithProviderDefaults(
+  plan: TerraformPlanProviderContext | undefined,
+  values: Record<string, unknown>,
+): { account: string; region: string } {
+  return mergeWithDefaultAwsProviderAccountRegion(plan, resolveAccountRegion(values));
+}
+
 export type TerraformSubnetOwnerHint = { account: string; region: string };
 
 type SubnetOwnerHint = TerraformSubnetOwnerHint;
@@ -456,9 +607,10 @@ function ingestVpcSubnetPair(
   values: Record<string, unknown>,
   vpcId: string | null,
   subnetIds: string[],
+  plan: TerraformPlanProviderContext | undefined,
 ): void {
   const merged = mergeAccountRegionFromSubnets(
-    resolveAccountRegion(values),
+    resolveAccountRegionWithProviderDefaults(plan, values),
     subnetIds,
     subnetOwners,
   );
@@ -484,10 +636,11 @@ function ingestStandaloneVpc(
   subnetOwners: Map<string, SubnetOwnerHint>,
   values: Record<string, unknown>,
   vpcId: string,
+  plan: TerraformPlanProviderContext | undefined,
 ): void {
   const sid = stringField(values.subnet_id);
   const merged = mergeAccountRegionFromSubnets(
-    resolveAccountRegion(values),
+    resolveAccountRegionWithProviderDefaults(plan, values),
     sid ? [sid] : [],
     subnetOwners,
   );
@@ -516,9 +669,11 @@ function pruneEmptyTopology(model: TerraformTopologyModel): void {
 /**
  * Walk `plan.resource_changes` and merge AWS VPC/subnet/account/region signals.
  */
-export function extractTerraformTopologyFromPlan(plan: {
-  resource_changes?: ResourceChange[];
-}): TerraformTopologyModel {
+export function extractTerraformTopologyFromPlan(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): TerraformTopologyModel {
   const model: TerraformTopologyModel = {
     accounts: new Map(),
     sawAwsResourceChanges: false,
@@ -551,7 +706,7 @@ export function extractTerraformTopologyFromPlan(plan: {
       const sid = stringField(values.id);
       const vid = stringField(values.vpc_id);
       if (sid && vid) {
-        ingestVpcSubnetPair(model, subnetToVpc, subnetOwners, values, vid, [sid]);
+        ingestVpcSubnetPair(model, subnetToVpc, subnetOwners, values, vid, [sid], plan);
       }
       continue;
     }
@@ -563,7 +718,7 @@ export function extractTerraformTopologyFromPlan(plan: {
     for (const block of vpcConfigBlocks(values)) {
       const sids = stringArrayField(block.subnet_ids);
       if (sids.length) {
-        ingestVpcSubnetPair(model, subnetToVpc, subnetOwners, values, vidDirect, sids);
+        ingestVpcSubnetPair(model, subnetToVpc, subnetOwners, values, vidDirect, sids, plan);
       }
     }
 
@@ -571,12 +726,12 @@ export function extractTerraformTopologyFromPlan(plan: {
       ingestVpcSubnetPair(model, subnetToVpc, subnetOwners, values, vidDirect, [
         ...(subnetSingle ? [subnetSingle] : []),
         ...subnetMulti,
-      ]);
+      ], plan);
     } else if (!vidDirect && (subnetSingle || subnetMulti.length)) {
       ingestVpcSubnetPair(model, subnetToVpc, subnetOwners, values, null, [
         ...(subnetSingle ? [subnetSingle] : []),
         ...subnetMulti,
-      ]);
+      ], plan);
     }
 
     if (vidDirect && !subnetSingle && subnetMulti.length === 0) {
@@ -584,7 +739,7 @@ export function extractTerraformTopologyFromPlan(plan: {
         (b) => stringArrayField(b.subnet_ids).length > 0,
       );
       if (!hasVpcConfigSubnets) {
-        ingestStandaloneVpc(model, subnetOwners, values, vidDirect);
+        ingestStandaloneVpc(model, subnetOwners, values, vidDirect, plan);
       }
     }
   }
