@@ -226,6 +226,7 @@ function frameCustomData(
 ) {
   return {
     terraform: true as const,
+    terraformSemanticOverview: true as const,
     terraformTopologyRole: role,
     terraformTopologyKey: key,
     terraformTopologyPath: topologyPathFrame(role, accountId, region, vpcId),
@@ -832,12 +833,14 @@ function pushResourceRectangleSkeleton(
     },
     customData: {
       terraform: true,
+      terraformSemanticOverview: true,
       terraformVisibilityRole: "resource",
       terraformVisibilityKey: addr,
       terraformNodeKind: "resource",
       terraformInitiallyVisible: options.initiallyVisible,
       terraformExplodeParentKeys: explodeKeys,
       terraformExplodeParent: explodeParent,
+      terraformExpandAllView: false,
       resourceType,
       nodePath: addr,
       action,
@@ -925,6 +928,7 @@ function buildTopologySatelliteLineSkeletons(
       endArrowhead: "arrow",
       customData: {
         terraform: true,
+        terraformSemanticOverview: true,
         terraformEdgeLayer: "dataFlow",
         relationship: {
           source: e.source,
@@ -2337,6 +2341,7 @@ export async function buildTerraformTopologyExcalidrawScene(
       nodes,
       topologyLayoutBoxes,
       topologyDirectedEdges,
+      { terraformSemanticOverview: true },
     ),
   );
 
@@ -2344,7 +2349,9 @@ export async function buildTerraformTopologyExcalidrawScene(
     regenerateIds: true,
   }) as ExcalidrawElement[];
 
-  elements = applyTerraformResourceRectangleSoftDelete(elements);
+  elements = applyTerraformResourceRectangleSoftDelete(elements, {
+    semanticAllVisible: true,
+  });
   elements = mirrorAndDetachTerraformResourceLabels(elements);
   elements = repairTerraformEdgeBindings(reconcileTerraformVisibility(elements));
   elements = reorderTopologyElementsZStack(elements);

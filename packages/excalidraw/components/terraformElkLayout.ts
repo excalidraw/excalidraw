@@ -942,6 +942,7 @@ export function buildTerraformDependencyLineSkeletons(
   nodes: TerraformPlanNodesMap,
   layoutBoxes: Record<string, TerraformDependencyLayoutBox>,
   directedEdges: TerraformDirectedLayoutEdge[],
+  options?: { terraformSemanticOverview?: boolean },
 ): ExcalidrawElementSkeleton[] {
   const edgeSkeletons: ExcalidrawElementSkeleton[] = [];
   let edgeIndex = 0;
@@ -998,6 +999,9 @@ export function buildTerraformDependencyLineSkeletons(
           origin: "terraform_local_parse",
           detail: null,
         },
+        ...(options?.terraformSemanticOverview
+          ? { terraformSemanticOverview: true as const }
+          : {}),
       },
     });
     edgeIndex += 1;
@@ -1008,6 +1012,7 @@ export function buildTerraformDependencyLineSkeletons(
 /** Skeleton rectangles cannot set `isDeleted`; apply from `terraformInitiallyVisible` after convert. */
 export function applyTerraformResourceRectangleSoftDelete(
   elements: readonly ExcalidrawElement[],
+  options?: { semanticAllVisible?: boolean },
 ): ExcalidrawElement[] {
   return elements.map((el) => {
     if (el.type !== "rectangle") {
@@ -1016,6 +1021,9 @@ export function applyTerraformResourceRectangleSoftDelete(
     const cd = el.customData ?? {};
     if (cd.terraformVisibilityRole !== "resource") {
       return el;
+    }
+    if (options?.semanticAllVisible) {
+      return newElementWith(el, { isDeleted: false });
     }
     const initiallyVisible = cd.terraformInitiallyVisible === true;
     return newElementWith(el, { isDeleted: !initiallyVisible });
@@ -1076,6 +1084,12 @@ export function mirrorAndDetachTerraformResourceLabels(
         terraformExplodeParent: pcd.terraformExplodeParent,
         resourceType: pcd.resourceType,
         nodePath: pcd.nodePath,
+        ...(pcd.terraformSemanticOverview === true
+          ? { terraformSemanticOverview: true as const }
+          : {}),
+        ...(pcd.terraformExpandAllView === true
+          ? { terraformExpandAllView: true as const }
+          : {}),
       },
     });
   });

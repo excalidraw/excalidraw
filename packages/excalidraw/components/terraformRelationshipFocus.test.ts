@@ -44,6 +44,7 @@ const baseElement = (
 const resource = (
   nodePath: string,
   overrides: Partial<ExcalidrawElement> = {},
+  opts?: { semantic?: boolean; primary?: boolean; expandAllView?: boolean },
 ) =>
   baseElement(
     `node:${nodePath}`,
@@ -51,6 +52,14 @@ const resource = (
       terraform: true,
       terraformVisibilityRole: "resource",
       nodePath,
+      ...(opts?.semantic
+        ? {
+            terraformSemanticOverview: true,
+            terraformExpandAllView: opts.expandAllView === true,
+          }
+        : {}),
+      ...(opts?.primary === true ? { terraformInitiallyVisible: true } : {}),
+      ...(opts?.primary === false ? { terraformInitiallyVisible: false } : {}),
     },
     overrides,
   );
@@ -83,14 +92,42 @@ const group = (
   id: string,
   childKeys: string[],
   overrides: Partial<ExcalidrawElement> = {},
+  semantic = false,
 ) =>
   baseElement(
     id,
     {
       terraformModuleGroup: true,
       terraformGroupChildKeys: childKeys,
+      ...(semantic ? { terraformSemanticOverview: true } : {}),
     },
     overrides,
+  );
+
+const semanticEdge = (
+  id: string,
+  layer: "dependency" | "dataFlow",
+  source: string,
+  target: string,
+  overrides: Partial<ExcalidrawElement> = {},
+  relationshipOverrides: Record<string, any> = {},
+) =>
+  baseElement(
+    id,
+    {
+      terraform: true,
+      terraformSemanticOverview: true,
+      terraformEdgeLayer: layer,
+      relationship: {
+        source,
+        target,
+        ...relationshipOverrides,
+      },
+    },
+    {
+      type: "arrow",
+      ...overrides,
+    },
   );
 
 describe("terraform relationship focus", () => {
@@ -373,5 +410,73 @@ describe("terraform relationship focus", () => {
 
     expect(focus.focusedEdgeIds.has("edge:coalesced-df")).toBe(true);
     expect(focus.relatedNodePaths.has("aws_security_group.sg")).toBe(true);
+  });
+
+  describe("semantic overview (topology) ambient opacities", () => {
+    it("applies dim edges and primary vs non-primary nodes when focus clears", () => {
+      const focused = applyTerraformRelationshipFocus(
+        [
+          resource("aws_instance.web", {}, { semantic: true, primary: true }),
+          resource("aws_vpc.main", {}, { semantic: true, primary: false }),
+          semanticEdge(
+            "edge:web-vpc",
+            "dependency",
+            "aws_instance.web",
+            "aws_vpc.main",
+          ),
+        ],
+        "aws_instance.web",
+      ).elements;
+
+      const cleared = applyTerraformRelationshipFocus(focused, null);
+      const byId = new Map(cleared.elements.map((e) => [e.id, e]));
+
+      expect(byId.get("node:aws_instance.web")?.opacity).toBe(100);
+      expect(byId.get("node:aws_vpc.main")?.opacity).toBe(35);
+      expect(byId.get("edge:web-vpc")?.opacity).toBe(22);
+    });
+
+    it("with expand-all view, non-primary resources return to full opacity when focus clears", () => {
+      const focused = applyTerraformRelationshipFocus(
+        [
+          resource("aws_instance.web", {}, {
+            semantic: true,
+            primary: true,
+            expandAllView: true,
+          }),
+          resource("aws_vpc.main", {}, {
+            semantic: true,
+            primary: false,
+            expandAllView: true,
+          }),
+          semanticEdge(
+            "edge:web-vpc",
+            "dependency",
+            "aws_instance.web",
+            "aws_vpc.main",
+          ),
+        ],
+        "aws_instance.web",
+      ).elements;
+
+      const cleared = applyTerraformRelationshipFocus(focused, null);
+      const byId = new Map(cleared.elements.map((e) => [e.id, e]));
+
+      expect(byId.get("node:aws_instance.web")?.opacity).toBe(100);
+      expect(byId.get("node:aws_vpc.main")?.opacity).toBe(100);
+      expect(byId.get("edge:web-vpc")?.opacity).toBe(22);
+    });
+
+    it("dims terraform module groups when focus clears", () => {
+      const clearedElements = applyTerraformRelationshipFocus(
+        [
+          resource("aws_instance.web", {}, { semantic: true, primary: true }),
+          group("group:a", ["aws_instance.web"], {}, true),
+        ],
+        null,
+      ).elements;
+      const byId = new Map(clearedElements.map((e) => [e.id, e]));
+      expect(byId.get("group:a")?.opacity).toBe(68);
+    });
   });
 });

@@ -6,6 +6,7 @@ import {
   isTerraformGroupElement,
   isTerraformLayerEdge,
   isTerraformResourceElement,
+  isTerraformSemanticOverviewScene,
 } from "./terraformElementMetadata";
 
 const TERRAFORM_FOCUS_NODE_OPACITY = 100;
@@ -13,6 +14,25 @@ const TERRAFORM_RELATED_OPACITY = 85;
 const TERRAFORM_CONTAINER_OPACITY = 60;
 const TERRAFORM_DIM_NODE_OPACITY = 25;
 const TERRAFORM_DIM_EDGE_OPACITY = 15;
+
+/** Greyed dependency / data-flow edges when no node is focused. */
+const TERRAFORM_AMBIENT_EDGE_OPACITY = 22;
+/** Collapsed overview: non-primary resource cards. */
+const TERRAFORM_AMBIENT_NON_PRIMARY_NODE_OPACITY = 35;
+/** Collapsed overview: primary resource cards (see `terraformInitiallyVisible`). */
+const TERRAFORM_AMBIENT_PRIMARY_NODE_OPACITY = 100;
+/** Collapsed overview: account/region/VPC/module frame rectangles. */
+const TERRAFORM_AMBIENT_GROUP_OPACITY = 68;
+
+const readTerraformExpandAllViewActive = (
+  allElements: readonly ExcalidrawElement[],
+): boolean =>
+  isTerraformSemanticOverviewScene(allElements) &&
+  allElements.some(
+    (e) =>
+      e.customData?.terraformVisibilityRole === "resource" &&
+      e.customData?.terraformExpandAllView === true,
+  );
 
 const clearTerraformFocusPreviewData = (
   customData: ExcalidrawElement["customData"],
@@ -254,18 +274,85 @@ export const applyTerraformRelationshipFocus = (
     const isPreview = element.customData?.terraformFocusPreview === true;
 
     if (!isFocusActive) {
-      if (
-        isPreview ||
-        (isTerraformFocusManagedElement(element, elementById) &&
-          element.opacity !== 100)
-      ) {
+      if (isPreview) {
         didChange = true;
         return newElementWith(element, {
-          isDeleted: isPreview ? true : element.isDeleted,
+          isDeleted: true,
           opacity: 100,
           customData: clearTerraformFocusPreviewData(element.customData),
         });
       }
+
+      if (!isTerraformFocusManagedElement(element, elementById)) {
+        return element;
+      }
+
+      if (!isTerraformSemanticOverviewScene(allElements)) {
+        if (element.opacity !== 100) {
+          didChange = true;
+          return newElementWith(element, {
+            opacity: 100,
+            customData: clearTerraformFocusPreviewData(element.customData),
+          });
+        }
+        return element;
+      }
+
+      if (element.isDeleted) {
+        return element;
+      }
+
+      const expandAllView = readTerraformExpandAllViewActive(allElements);
+      const clearedCustomData = clearTerraformFocusPreviewData(
+        element.customData,
+      );
+
+      if (isTerraformLayerEdge(element)) {
+        const nextOpacity = TERRAFORM_AMBIENT_EDGE_OPACITY;
+        if (element.opacity === nextOpacity) {
+          return element;
+        }
+        didChange = true;
+        return newElementWith(element, {
+          opacity: nextOpacity,
+          customData: clearedCustomData,
+        });
+      }
+
+      if (isTerraformResourceLikeElement(element, elementById)) {
+        const isPrimary =
+          element.customData?.terraformInitiallyVisible === true;
+        const isBoundTerraformLabel =
+          element.type === "text" &&
+          "containerId" in element &&
+          Boolean(element.containerId);
+        const nextOpacity = isBoundTerraformLabel
+          ? TERRAFORM_FOCUS_NODE_OPACITY
+          : expandAllView || isPrimary
+            ? TERRAFORM_AMBIENT_PRIMARY_NODE_OPACITY
+            : TERRAFORM_AMBIENT_NON_PRIMARY_NODE_OPACITY;
+        if (element.opacity === nextOpacity) {
+          return element;
+        }
+        didChange = true;
+        return newElementWith(element, {
+          opacity: nextOpacity,
+          customData: clearedCustomData,
+        });
+      }
+
+      if (isTerraformGroupElement(element)) {
+        const nextOpacity = TERRAFORM_AMBIENT_GROUP_OPACITY;
+        if (element.opacity === nextOpacity) {
+          return element;
+        }
+        didChange = true;
+        return newElementWith(element, {
+          opacity: nextOpacity,
+          customData: clearedCustomData,
+        });
+      }
+
       return element;
     }
 

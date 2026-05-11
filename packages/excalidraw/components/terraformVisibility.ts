@@ -13,6 +13,8 @@ import { pointFrom } from "@excalidraw/math";
 
 import type { LocalPoint } from "@excalidraw/math";
 
+import { isTerraformSemanticOverviewScene } from "./terraformElementMetadata";
+
 /**
  * Terraform-import scene helpers: soft-hide (`isDeleted`) for filtered views, explode
  * expand/collapse for dependency neighborhoods, and edge rebind after layout changes.
@@ -465,16 +467,20 @@ export const reconcileTerraformVisibility = (
 ) => {
   const visibleKeys = getVisibleTerraformKeys(elements);
   const layerState = deriveLayerState(elements, overrides);
+  const semanticScene = isTerraformSemanticOverviewScene(elements);
 
   return elements.map((element) => {
     if (isTerraformGroupElement(element)) {
       const shouldShow = groupHasVisibleChild(element, visibleKeys);
-      if (element.isDeleted === !shouldShow && element.opacity === 100) {
+      if (
+        element.isDeleted === !shouldShow &&
+        (semanticScene || element.opacity === 100)
+      ) {
         return element;
       }
       return newElementWith(element, {
         isDeleted: !shouldShow,
-        opacity: 100,
+        ...(semanticScene ? {} : { opacity: 100 }),
         customData: clearPreviewCustomData(element.customData),
       });
     }
@@ -490,13 +496,16 @@ export const reconcileTerraformVisibility = (
         : layerState.dataFlowLayerEnabled) &&
       edgeEndpointsAreVisible(element, visibleKeys);
 
-    if (element.isDeleted === !shouldShow && element.opacity === 100) {
+    if (
+      element.isDeleted === !shouldShow &&
+      (semanticScene || element.opacity === 100)
+    ) {
       return element;
     }
 
     return newElementWith(element, {
       isDeleted: !shouldShow,
-      opacity: 100,
+      ...(semanticScene ? {} : { opacity: 100 }),
       customData: clearPreviewCustomData(element.customData),
     });
   });
@@ -604,6 +613,7 @@ const collectTerraformParentKeysWithChildren = (
 export const expandAllTerraformExplode = (
   elements: readonly ExcalidrawElement[],
 ): ExcalidrawElement[] => {
+  const semanticScene = isTerraformSemanticOverviewScene(elements);
   const keysWithChildren = collectTerraformParentKeysWithChildren(elements);
   const next = elements.map((element) => {
     const customData = getCustomData(element);
@@ -620,6 +630,7 @@ export const expandAllTerraformExplode = (
       customData: {
         ...clearPreviewCustomData(element.customData),
         terraformExploded: keysWithChildren.has(key),
+        ...(semanticScene ? { terraformExpandAllView: true as const } : {}),
       },
     });
   });
@@ -630,6 +641,7 @@ export const expandAllTerraformExplode = (
 export const collapseAllTerraformExplode = (
   elements: readonly ExcalidrawElement[],
 ): ExcalidrawElement[] => {
+  const semanticScene = isTerraformSemanticOverviewScene(elements);
   const next = elements.map((element) => {
     const customData = getCustomData(element);
     if (customData.terraformVisibilityRole !== "resource") {
@@ -640,6 +652,17 @@ export const collapseAllTerraformExplode = (
       return element;
     }
     const shouldShow = isInitiallyVisibleTerraformElement(element);
+    if (semanticScene) {
+      return newElementWith(element, {
+        isDeleted: false,
+        opacity: 100,
+        customData: {
+          ...clearPreviewCustomData(element.customData),
+          terraformExploded: false,
+          terraformExpandAllView: false,
+        },
+      });
+    }
     return newElementWith(element, {
       isDeleted: !shouldShow,
       opacity: 100,
