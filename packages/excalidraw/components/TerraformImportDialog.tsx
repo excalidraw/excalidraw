@@ -54,6 +54,7 @@ const TerraformImportModal = ({
     useState<StructuralPruneMode>("module-only");
   const [vpcEndpointSnapping, setVpcEndpointSnapping] = useState(true);
   const [useBackend, setUseBackend] = useState(true);
+  const [semanticLayout, setSemanticLayout] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -118,7 +119,9 @@ const TerraformImportModal = ({
         await loadExcalidrawScene(data.id);
       } else {
         console.log("not using backend");
-        const res = await terraformPlanParsing(planFile, dotFile, stateFile);
+        const res = await terraformPlanParsing(planFile, dotFile, stateFile, {
+          semanticLayout,
+        });
         const scene = await res.json();
         if (!res.ok) {
           const err =
@@ -257,6 +260,21 @@ const TerraformImportModal = ({
               onChange={(e) => setUseBackend(e.target.checked)}
             />
             use backend
+          </label>
+          <label
+            title={
+              useBackend
+                ? "Semantic layout applies to local import only (uncheck use backend)."
+                : "Nested AWS account / region / VPC / subnet frames from the plan JSON."
+            }
+          >
+            <input
+              type="checkbox"
+              checked={semanticLayout}
+              disabled={loading || useBackend}
+              onChange={(e) => setSemanticLayout(e.target.checked)}
+            />
+            Use semantic layout
           </label>
         </div>
         <div className="TerraformImportModal__settings__buttons">

@@ -2,6 +2,8 @@ import graphlibDot from "@dagrejs/graphlib-dot";
 import type { Graph } from "@dagrejs/graphlib";
 
 import { buildTerraformElkExcalidrawScene } from "./terraformElkLayout";
+import { extractTerraformTopologyFromPlan } from "./terraformTopologyExtract";
+import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 
 export { TERRAFORM_MODULE_TREE_KEY };
@@ -71,12 +73,19 @@ function emitLocalParseDebug(payload: Record<string, unknown>) {
   console.log(DEBUG_PREFIX, payload);
 }
 
+export type TerraformPlanParsingOptions = {
+  /** When true, emit nested AWS topology frames (local import only); otherwise ELK module graph. */
+  semanticLayout?: boolean;
+};
+
 /** Local import path: main menu → “Import Terraform” → uncheck “use backend” → Import & Open. */
 export const terraformPlanParsing = async (
   planFile: File,
   dotFile: File,
   stateFile: File | null,
+  options?: TerraformPlanParsingOptions,
 ) => {
+  const semanticLayout = options?.semanticLayout === true;
   const [planText, dotText, stateText] = await Promise.all([
     planFile.text(),
     dotFile.text(),
@@ -135,27 +144,34 @@ export const terraformPlanParsing = async (
     moduleTree: nodes5[TERRAFORM_MODULE_TREE_KEY],
   });
 
-  const elkScene = await buildTerraformElkExcalidrawScene(nodes5);
-  emitLocalParseDebug({
-    phase: "elkLayout",
-    meta: elkScene.meta,
-    elementCount: elkScene.elements.length,
-  });
+  let sceneBody: Record<string, unknown>;
 
-  //i have a plan that is searchable by address along with nodes for models
-  //i have the adjacency list of the terraform dependency graph
-  //i need to find each nodes relations and make them bidirectional
-  //i need to allow nodes to be searchable by module too
-  // now we know what resources/modules live in what module
-  // all modules have a root provider which describe the modules provider, account and region
-  // we can organize resources by module boxes, root being provider  and use elk or force to direct layout
-  // we can also model by primary resource types, compute, messaging, storage. what they live in (account, region, vpc, subnets, SG) along with their secondar resources (IAM, Networking, observability)
-
-  const sceneBody = {
-    ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
-    elements: elkScene.elements,
-    meta: elkScene.meta,
-  };
+  if (semanticLayout) {
+    const topoModel = extractTerraformTopologyFromPlan(plan);
+    const topoScene = await buildTerraformTopologyExcalidrawScene(topoModel);
+    emitLocalParseDebug({
+      phase: "topologyLayout",
+      meta: topoScene.meta,
+      elementCount: topoScene.elements.length,
+    });
+    sceneBody = {
+      ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
+      elements: topoScene.elements,
+      meta: topoScene.meta,
+    };
+  } else {
+    const elkScene = await buildTerraformElkExcalidrawScene(nodes5);
+    emitLocalParseDebug({
+      phase: "elkLayout",
+      meta: elkScene.meta,
+      elementCount: elkScene.elements.length,
+    });
+    sceneBody = {
+      ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
+      elements: elkScene.elements,
+      meta: elkScene.meta,
+    };
+  }
 
   return new Response(JSON.stringify(sceneBody), {
     status: 200,
