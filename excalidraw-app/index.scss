@@ -570,6 +570,42 @@ body.terraform-canvas-landing #root {
   margin: 0 auto 0.95rem;
 }
 
+.landing-canvas-instructions {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+  max-width: 1560px;
+  margin: 0 auto 1rem;
+}
+
+.landing-canvas-instructions article {
+  min-width: 0;
+  border: 2px solid var(--landing-ink);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  padding: 0.85rem;
+  box-shadow: 4px 5px 0 rgba(22, 33, 29, 0.13);
+}
+
+.landing-canvas-instructions strong {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--landing-ink);
+  font-size: 0.95rem;
+}
+
+.landing-canvas-instructions code {
+  display: block;
+  overflow-x: auto;
+  border-radius: 6px;
+  background: #19231f;
+  color: #f7f1e4;
+  padding: 0.65rem;
+  font: 700 0.78rem/1.35 "Assistant", "Segoe UI", sans-serif;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .landing-canvas-shell {
   height: clamp(620px, 78vh, 820px);
   min-height: 620px;
@@ -640,6 +676,10 @@ body.terraform-canvas-landing #root {
     height: 640px;
     min-height: 640px;
   }
+
+  .landing-canvas-instructions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 520px) {
@@ -677,5 +717,9 @@ body.terraform-canvas-landing #root {
 
   .landing-canvas-section {
     padding-inline: 0.75rem;
+  }
+
+  .landing-canvas-instructions {
+    grid-template-columns: 1fr;
   }
 }

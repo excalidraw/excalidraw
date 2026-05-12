@@ -1388,6 +1388,34 @@ const LandingPage = () => {
           <p>Live architecture view</p>
           <h2>See what is built. See what will change.</h2>
         </div>
+        <div
+          className="landing-canvas-instructions"
+          aria-label="Terraform input instructions"
+        >
+          <article>
+            <strong>1. Save a plan</strong>
+            <code>terraform plan -out=tfplan.bin</code>
+          </article>
+          <article>
+            <strong>2. Export plan JSON</strong>
+            <code>terraform show -json tfplan.bin &gt; tfplan.json</code>
+          </article>
+          <article>
+            <strong>3. Export state JSON</strong>
+            <code>terraform show -json &gt; tfstate.json</code>
+          </article>
+          <article>
+            <strong>4. Export graph DOT</strong>
+            <code>terraform graph -plan=tfplan.bin &gt; graph.dot</code>
+          </article>
+          <article>
+            <strong>5. Redact before upload</strong>
+            <code>
+              jq 'walk(if type == "object" and .sensitive == true then .value =
+              "[redacted]" else . end)' tfplan.json &gt; tfplan.redacted.json
+            </code>
+          </article>
+        </div>
         <div className="landing-canvas-shell">
           <TopErrorBoundary>
             <Provider store={appJotaiStore}>
