@@ -67,8 +67,11 @@ import type {
   TerraformPlanGraphNode,
   TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
+import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
 
-/** Align with backend `packages/backend/excalidraw-layout.js` defaults. */
+const px = tfComfortPx;
+
+/** Align with backend `packages/backend/excalidraw-layout.js` defaults (pixel values scaled). */
 const ELK_ROOT_LAYOUT_OPTIONS: Record<string, string> = {
   "elk.algorithm": "layered",
   "elk.direction": "RIGHT",
@@ -77,15 +80,15 @@ const ELK_ROOT_LAYOUT_OPTIONS: Record<string, string> = {
   "elk.layered.cycleBreaking.strategy": "GREEDY",
   "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
   "elk.layered.nodePlacement.bk.fixedAlignment": "BALANCED",
-  "elk.layered.spacing.nodeNodeBetweenLayers": "140",
-  "elk.layered.spacing.edgeNodeBetweenLayers": "60",
-  "elk.layered.spacing.edgeEdgeBetweenLayers": "30",
-  "elk.spacing.nodeNode": "120",
-  "elk.spacing.edgeNode": "40",
-  "elk.spacing.componentComponent": "200",
+  "elk.layered.spacing.nodeNodeBetweenLayers": String(px(140)),
+  "elk.layered.spacing.edgeNodeBetweenLayers": String(px(60)),
+  "elk.layered.spacing.edgeEdgeBetweenLayers": String(px(30)),
+  "elk.spacing.nodeNode": String(px(120)),
+  "elk.spacing.edgeNode": String(px(40)),
+  "elk.spacing.componentComponent": String(px(200)),
   "elk.layered.considerModelOrder.strategy": "NODES_AND_EDGES",
   "elk.layered.thoroughness": "10",
-  "elk.padding": "[top=40,left=40,bottom=40,right=40]",
+  "elk.padding": `[top=${px(40)},left=${px(40)},bottom=${px(40)},right=${px(40)}]`,
   "elk.separateConnectedComponents": "true",
 };
 
@@ -96,22 +99,22 @@ const ELK_MODULE_COMPOUND_OPTIONS: Record<string, string> = {
   "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
   "elk.layered.cycleBreaking.strategy": "GREEDY",
   "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
-  "elk.layered.spacing.nodeNodeBetweenLayers": "140",
-  "elk.spacing.nodeNode": "120",
-  "elk.padding": "[top=140,left=100,bottom=100,right=100]",
+  "elk.layered.spacing.nodeNodeBetweenLayers": String(px(140)),
+  "elk.spacing.nodeNode": String(px(120)),
+  "elk.padding": `[top=${px(140)},left=${px(100)},bottom=${px(100)},right=${px(100)}]`,
 };
 
 const MODULE_COMPOUND_PREFIX = "__tf_m__:";
 
-const DEFAULT_RESOURCE_RECT = { w: 200, h: 88 };
+const DEFAULT_RESOURCE_RECT = { w: px(200), h: px(88) };
 
-const GRID_GAP_X = 20;
-const GRID_GAP_Y = 20;
-const SUBMODULE_GAP_X = 32;
-const SUBMODULE_GAP_Y = 32;
-const MODULE_CONTENT_PAD_L = 28;
-const MODULE_CONTENT_PAD_T = 40;
-const MODULE_SHRINK_WRAP_PAD = 24;
+const GRID_GAP_X = px(20);
+const GRID_GAP_Y = px(20);
+const SUBMODULE_GAP_X = px(32);
+const SUBMODULE_GAP_Y = px(32);
+const MODULE_CONTENT_PAD_L = px(28);
+const MODULE_CONTENT_PAD_T = px(40);
+const MODULE_SHRINK_WRAP_PAD = px(24);
 
 /** Excalidraw frame id for a Terraform module path (`root`, `module.a`, …). */
 function moduleFrameSkeletonId(modulePath: string) {
@@ -871,7 +874,7 @@ function normalizeOrigin(boxes: Record<string, LayoutBox>) {
   if (!Number.isFinite(minY)) {
     minY = 0;
   }
-  const margin = 50;
+  const margin = px(50);
   for (const b of Object.values(boxes)) {
     b.x = b.x - minX + margin;
     b.y = b.y - minY + margin;
@@ -1532,10 +1535,10 @@ export async function buildTerraformElkExcalidrawScene(
       strokeWidth: 1.5,
       strokeColor: actionStyle.strokeColor,
       backgroundColor: actionStyle.backgroundColor,
-      roundness: { type: 3, value: 10 },
+      roundness: { type: 3, value: px(10) },
       label: {
         text: terraformResourceCardLabel(id, resource),
-        fontSize: 12,
+        fontSize: tfComfortFontSize(12),
         strokeColor: TERRAFORM_RESOURCE_LABEL_STROKE,
       },
       customData: {

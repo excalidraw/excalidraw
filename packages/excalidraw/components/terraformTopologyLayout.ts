@@ -91,6 +91,9 @@ import {
   reconcileTerraformVisibility,
   repairTerraformEdgeBindings,
 } from "./terraformVisibility";
+import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
+
+const px = tfComfortPx;
 
 export type TerraformTopologySceneMeta = {
   layoutEngine: "topology";
@@ -108,48 +111,48 @@ export type TerraformTopologySceneMeta = {
   skipReason?: string;
 };
 
-const MARGIN = 50;
-const ACCOUNT_GAP = 48;
-const REGION_GAP = 32;
-const VPC_GAP = 28;
-const VPC_TOP_PAD = 44;
-const INNER_PAD = 28;
-const FRAME_CONTENT_SLACK_X = 24;
-const FRAME_CONTENT_SLACK_Y = 28;
-const MIN_VPC_W = 480;
-const MIN_VPC_H = 360;
+const MARGIN = px(50);
+const ACCOUNT_GAP = px(48);
+const REGION_GAP = px(32);
+const VPC_GAP = px(28);
+const VPC_TOP_PAD = px(44);
+const INNER_PAD = px(28);
+const FRAME_CONTENT_SLACK_X = px(24);
+const FRAME_CONTENT_SLACK_Y = px(28);
+const MIN_VPC_W = px(480);
+const MIN_VPC_H = px(360);
 const CANVAS_EDGE_PAD = MARGIN;
 
 /** Tier 0: primary resources (matches ELK module resource leaf). */
-const TOPOLOGY_TIER0_W = 200;
-const TOPOLOGY_TIER0_H = 88;
+const TOPOLOGY_TIER0_W = px(200);
+const TOPOLOGY_TIER0_H = px(88);
 /** Tier 1: direct satellites of a primary (role, SG body, CW tiles, KMS policies). */
-const TOPOLOGY_TIER1_W = 176;
-const TOPOLOGY_TIER1_H = 52;
+const TOPOLOGY_TIER1_W = px(176);
+const TOPOLOGY_TIER1_H = px(52);
 /** Tier 2: satellites of a satellite (IAM policies, SG rules). */
-const TOPOLOGY_TIER2_W = 154;
-const TOPOLOGY_TIER2_H = 44;
-const TOPOLOGY_SATELLITE_GAP_PX = 8;
+const TOPOLOGY_TIER2_W = px(154);
+const TOPOLOGY_TIER2_H = px(44);
+const TOPOLOGY_SATELLITE_GAP_PX = px(8);
 
 /** Match ELK module resource leaf size (tier 0). */
 const RESOURCE_RECT_W = TOPOLOGY_TIER0_W;
 const RESOURCE_RECT_H = TOPOLOGY_TIER0_H;
-const RESOURCE_GAP = 16;
+const RESOURCE_GAP = px(16);
 const TOPOLOGY_DATAFLOW_STROKE = TERRAFORM_DATAFLOW_EDGE_STROKE;
-const SG_RIGHT_PAD = 6;
-const CLOUDWATCH_LEFT_PAD = 6;
-const CLOUDWATCH_RIGHT_PAD = 6;
+const SG_RIGHT_PAD = px(6);
+const CLOUDWATCH_LEFT_PAD = px(6);
+const CLOUDWATCH_RIGHT_PAD = px(6);
 /** Horizontal gap between IAM/KMS-left column and SG column (tier-1 widths). */
-const IAM_SG_COLUMN_GAP_PX = 8;
-const CLOUDWATCH_COLUMN_GAP_PX = 8;
+const IAM_SG_COLUMN_GAP_PX = px(8);
+const CLOUDWATCH_COLUMN_GAP_PX = px(8);
 /** Gap between subnet-zone frames inside one VPC. */
-const ZONE_CELL_GAP = 20;
+const ZONE_CELL_GAP = px(20);
 /** Gap between regional-services column and VPC grid inside one region frame. */
-const REGIONAL_TO_VPC_GAP = 28;
+const REGIONAL_TO_VPC_GAP = px(28);
 /** Compact tiles for `aws_vpc_endpoint` egress on the VPC bottom edge. */
-const VPC_ENDPOINT_TILE_W = 160;
-const VPC_ENDPOINT_TILE_H = 56;
-const VPC_ENDPOINT_TILE_GAP = 10;
+const VPC_ENDPOINT_TILE_W = px(160);
+const VPC_ENDPOINT_TILE_H = px(56);
+const VPC_ENDPOINT_TILE_GAP = px(10);
 /** Route table tiles on subnet zone / VPC bottom edge (same footprint as endpoint tiles). */
 const ROUTE_TABLE_TILE_W = VPC_ENDPOINT_TILE_W;
 const ROUTE_TABLE_TILE_H = VPC_ENDPOINT_TILE_H;
@@ -877,7 +880,11 @@ function pushResourceRectangleSkeleton(
   const vpcRouteTable = options.vpcRouteTable;
   const rtZoneSig = vpcRouteTable?.zoneSubnetSignature;
   const labelFontSize =
-    options.satelliteTier === 2 ? 10 : options.satelliteTier === 1 ? 11 : 12;
+    options.satelliteTier === 2
+      ? tfComfortFontSize(10)
+      : options.satelliteTier === 1
+        ? tfComfortFontSize(11)
+        : tfComfortFontSize(12);
 
   skeleton.push({
     type: "rectangle",
@@ -890,7 +897,7 @@ function pushResourceRectangleSkeleton(
     strokeColor: actionStyle.strokeColor,
     backgroundColor: actionStyle.backgroundColor,
     strokeStyle: egress ? "dashed" : "solid",
-    roundness: { type: 3, value: 10 },
+    roundness: { type: 3, value: px(10) },
     label: {
       text: terraformResourceCardLabel(
         addr,

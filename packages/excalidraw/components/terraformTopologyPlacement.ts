@@ -25,6 +25,7 @@ import {
 import {
   isPrimaryVisibleResourceType,
 } from "./terraformPrimaryVisibility";
+import { tfComfortPx } from "./terraformLayoutComfort";
 import { terraformModulePrefixForAddress } from "./terraformTopologyIamLinks";
 
 export type TopologyPlacementZone = {
@@ -83,8 +84,8 @@ export type TopologyRouteTableBottomPlacements = {
   vpcBottom: RouteTableBottomVpcPlacement[];
 };
 
-const ROUTE_TABLE_SEMANTIC_TILE_W = 160;
-const ROUTE_TABLE_SEMANTIC_GAP = 10;
+const ROUTE_TABLE_SEMANTIC_TILE_W = tfComfortPx(160);
+const ROUTE_TABLE_SEMANTIC_GAP = tfComfortPx(10);
 
 /** Minimum inner width for one horizontal row of route table tiles (matches layout constants). */
 export function routeTableBottomRowMinInnerWidth(addrCount: number): number {

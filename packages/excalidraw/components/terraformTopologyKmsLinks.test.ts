@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { tfComfortPx } from "./terraformLayoutComfort";
 import { buildArnIndexForTopology } from "./terraformTopologyIamLinks";
 import {
   buildKmsKeyPolicyCluster,
@@ -138,7 +139,13 @@ describe("kmsPolicySatelliteStackHeightPx", () => {
     };
     const arnIndex = buildArnIndexForTopology(nodes);
     expect(
-      kmsPolicySatelliteStackHeightPx(nodes, "aws_kms_key.main", arnIndex, 52, 8),
+      kmsPolicySatelliteStackHeightPx(
+        nodes,
+        "aws_kms_key.main",
+        arnIndex,
+        tfComfortPx(52),
+        tfComfortPx(8),
+      ),
     ).toBe(0);
   });
 
@@ -172,8 +179,10 @@ describe("kmsPolicySatelliteStackHeightPx", () => {
       },
     };
     const arnIndex = buildArnIndexForTopology(nodes);
+    const tier1 = tfComfortPx(52);
+    const gap = tfComfortPx(8);
     expect(
-      kmsPolicySatelliteStackHeightPx(nodes, "aws_kms_key.main", arnIndex, 52, 8),
-    ).toBe(8 + 52 + 8);
+      kmsPolicySatelliteStackHeightPx(nodes, "aws_kms_key.main", arnIndex, tier1, gap),
+    ).toBe(gap + tier1 + gap);
   });
 });

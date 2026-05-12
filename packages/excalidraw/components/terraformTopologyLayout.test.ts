@@ -5,6 +5,7 @@ import type { ExcalidrawArrowElement, ExcalidrawElement } from "@excalidraw/elem
 import type { TerraformTopologyModel } from "./terraformTopologyExtract";
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
+import { tfComfortPx } from "./terraformLayoutComfort";
 import type {
   TopologyPlacementZone,
   TopologyRegionalPrimaryBucket,
@@ -12,8 +13,10 @@ import type {
   TopologyVpcEndpointBucket,
 } from "./terraformTopologyPlacement";
 
-/** Matches compact egress / route-table tile half-height in terraformTopologyLayout (56px tiles). */
-const TOPOLOGY_EDGE_TILE_HALF_H = Math.ceil(56 / 2);
+const px = tfComfortPx;
+
+/** Matches compact egress / route-table tile half-height in terraformTopologyLayout. */
+const TOPOLOGY_EDGE_TILE_HALF_H = Math.ceil(px(56) / 2);
 
 function axisBounds(el: ExcalidrawElement): {
   minX: number;
@@ -847,14 +850,14 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
         ?.terraformTopologyRole,
     ).toBe("primaryCluster");
 
-    expect(lambda!.width).toBe(200);
-    expect(lambda!.height).toBe(88);
+    expect(lambda!.width).toBe(px(200));
+    expect(lambda!.height).toBe(px(88));
 
     expect(role!.x).toBe(lambda!.x);
-    expect(role!.width).toBe(176);
-    expect(role!.height).toBe(52);
+    expect(role!.width).toBe(px(176));
+    expect(role!.height).toBe(px(52));
 
-    expect(policy!.width).toBe(154);
+    expect(policy!.width).toBe(px(154));
     expect(policy!.height).toBeLessThanOrEqual((role!.height ?? 0));
     expect(policy!.y).toBeGreaterThanOrEqual(role!.y + (role!.height ?? 0) - 2);
 
@@ -863,12 +866,12 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     expect(sgMid).toBeGreaterThan(lambdaMid);
 
     const roleRight = role!.x + (role!.width ?? 0);
-    expect(sg!.x - roleRight).toBe(8);
+    expect(sg!.x - roleRight).toBe(px(8));
 
-    expect(sg!.width).toBe(176);
-    expect(sg!.height).toBe(52);
+    expect(sg!.width).toBe(px(176));
+    expect(sg!.height).toBe(px(52));
 
-    expect(rule!.width).toBe(154);
+    expect(rule!.width).toBe(px(154));
     expect(rule!.height).toBeLessThanOrEqual((sg!.height ?? 0));
     expect(rule!.y).toBeGreaterThanOrEqual(sg!.y + (sg!.height ?? 0) - 2);
 
