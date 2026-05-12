@@ -63,6 +63,7 @@
     "test:reactflow": "yarn workspace reactflow-app test",
     "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "yarn --cwd ./excalidraw-app build:app:docker",
+    "build:pages": "yarn --cwd ./excalidraw-app build:pages",
     "build:app": "yarn --cwd ./excalidraw-app build:app",
     "build:common": "yarn --cwd ./packages/common build:esm",
     "build:element": "yarn --cwd ./packages/element build:esm",
