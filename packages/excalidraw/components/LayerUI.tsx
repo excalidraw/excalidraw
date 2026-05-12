@@ -10,7 +10,7 @@ import {
   isShallowEqual,
 } from "@excalidraw/common";
 
-import { mutateElement, newElementWith } from "@excalidraw/element";
+import { mutateElement } from "@excalidraw/element";
 
 import { showSelectedShapeActions } from "@excalidraw/element";
 
@@ -61,6 +61,13 @@ import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { TerraformImportDialog } from "./TerraformImportDialog";
+import {
+  isTerraformGroupElement,
+  isTerraformInspectableElement,
+  isTerraformLayerEdge,
+  isTerraformResourceElement,
+} from "./terraformElementMetadata";
+import { applyTerraformRelationshipFocus } from "./terraformRelationshipFocus";
 import { repairTerraformEdgeBindings } from "./terraformVisibility";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
@@ -177,207 +184,19 @@ type TerraformContainerFacet = {
   sources?: string[];
 };
 
-const TERRAFORM_GROUP_FLAGS = [
-  "terraformModuleGroup",
-  "terraformAccountGroup",
-  "terraformRegionGroup",
-  "terraformVpcGroup",
-  "terraformSubnetGroup",
-] as const;
-
-const isTerraformResourceElement = (element: NonDeletedExcalidrawElement) =>
-  element.customData?.terraform && Boolean(element.customData?.nodePath);
-
-const isTerraformGroupElement = (element: NonDeletedExcalidrawElement) =>
-  TERRAFORM_GROUP_FLAGS.some((flag) => Boolean(element.customData?.[flag]));
-
-const isTerraformGroupParentOfNode = (
-  element: ExcalidrawElement,
-  nodePath: string | null,
-) =>
-  Boolean(
-    nodePath &&
-      Array.isArray(element.customData?.terraformGroupChildKeys) &&
-      element.customData.terraformGroupChildKeys.includes(nodePath),
-  );
-
-const isTerraformInspectableElement = (element: NonDeletedExcalidrawElement) =>
-  isTerraformResourceElement(element) || isTerraformGroupElement(element);
-
-const TERRAFORM_DEPENDENCY_PREVIEW_OPACITY = 25;
-const TERRAFORM_DIM_NODE_OPACITY = 50;
-const TERRAFORM_DIM_EDGE_OPACITY = 28;
-const TERRAFORM_FOCUS_OPACITY = 100;
-const TERRAFORM_HOVER_INITIAL_HOPS = 1;
-const TERRAFORM_HOVER_HOP_BUDGET_BY_TYPE: Record<string, number> = {
-  aws_iam_role: 1,
-  aws_security_group: 1,
-};
-
-const isTerraformDependencyEdge = (element: ExcalidrawElement) =>
-  element.customData?.terraformEdgeLayer === "dependency";
-
-const isTerraformDependencyPreviewEdge = (element: ExcalidrawElement) =>
-  element.customData?.terraformDependencyPreview === true;
-
-const dependencyEdgeTouchesTerraformNode = (
-  element: ExcalidrawElement,
-  nodePath: string,
-) => {
-  const relationship = element.customData?.relationship;
-
-  if (relationship?.source === nodePath || relationship?.target === nodePath) {
-    return true;
-  }
-
-  return Boolean(
-    Array.isArray(relationship?.directions) &&
-      relationship.directions.some(
-        (direction: { source?: unknown; target?: unknown }) =>
-          direction.source === nodePath || direction.target === nodePath,
-      ),
-  );
-};
-
-const clearTerraformDependencyPreviewData = (
-  customData: ExcalidrawElement["customData"],
-) => {
-  const nextCustomData = { ...(customData ?? {}) };
-  delete nextCustomData.terraformDependencyPreview;
-  return nextCustomData;
-};
-
-const isTerraformLayerEdge = (element: ExcalidrawElement) =>
-  element.customData?.terraformEdgeLayer === "dependency" ||
-  element.customData?.terraformEdgeLayer === "dataFlow";
-
-const getNodePathFromRelationship = (element: ExcalidrawElement) => {
-  const relationship = element.customData?.relationship;
-  const source =
-    typeof relationship?.source === "string" ? relationship.source : null;
-  const target =
-    typeof relationship?.target === "string" ? relationship.target : null;
-  return source && target ? { source, target } : null;
-};
-
-const getHopBudgetForNode = (
-  elementByNodePath: Map<string, ExcalidrawElement>,
-  nodePath: string,
-) => {
-  const resourceType = String(
-    elementByNodePath.get(nodePath)?.customData?.resourceType || "",
-  );
-  const allowedDepthByType = TERRAFORM_HOVER_HOP_BUDGET_BY_TYPE[resourceType];
-  if (typeof allowedDepthByType === "number") {
-    return Math.max(TERRAFORM_HOVER_INITIAL_HOPS, allowedDepthByType);
-  }
-  return TERRAFORM_HOVER_INITIAL_HOPS;
-};
-
-/** Parallel Terraform edges between the same node pair: pick one deterministically. */
-const pickCanonicalTerraformEdge = (candidates: ExcalidrawElement[]) => {
-  return [...candidates].sort((a, b) => {
-    const layerA = a.customData?.terraformEdgeLayer === "dependency" ? 0 : 1;
-    const layerB = b.customData?.terraformEdgeLayer === "dependency" ? 0 : 1;
-    if (layerA !== layerB) {
-      return layerA - layerB;
-    }
-    return String(a.id).localeCompare(String(b.id));
-  })[0];
-};
-
-const collectTerraformHoverFocus = (
+const getHoveredTerraformNodePath = (
   allElements: readonly ExcalidrawElement[],
-  hoveredNodePath: string | null,
+  hoveredElementIds: AppState["hoveredElementIds"],
 ) => {
-  const focusedNodePaths = new Set<string>();
-  const focusedEdgeIds = new Set<string>();
-  if (!hoveredNodePath) {
-    return { focusedNodePaths, focusedEdgeIds };
-  }
-
-  const elementByNodePath = new Map<string, ExcalidrawElement>();
-  /** u -> (v -> parallel edges u–v) */
-  const adjacencyWithEdges = new Map<
-    string,
-    Map<string, ExcalidrawElement[]>
-  >();
-  const addUndirectedEdge = (a: string, b: string, edge: ExcalidrawElement) => {
-    if (!adjacencyWithEdges.has(a)) {
-      adjacencyWithEdges.set(a, new Map());
-    }
-    const ma = adjacencyWithEdges.get(a)!;
-    if (!ma.has(b)) {
-      ma.set(b, []);
-    }
-    ma.get(b)!.push(edge);
-  };
-
-  const edges = allElements.filter(
+  const hoveredTerraformResource = allElements.find(
     (element) =>
-      isTerraformLayerEdge(element) &&
-      !isTerraformDependencyPreviewEdge(element),
+      hoveredElementIds[element.id] &&
+      element.customData?.terraformVisibilityRole === "resource" &&
+      typeof element.customData?.nodePath === "string",
   );
-  for (const element of allElements) {
-    const nodePath =
-      typeof element.customData?.nodePath === "string"
-        ? element.customData.nodePath
-        : null;
-    if (nodePath) {
-      elementByNodePath.set(nodePath, element);
-    }
-  }
-  for (const edge of edges) {
-    const rel = getNodePathFromRelationship(edge);
-    if (!rel) {
-      continue;
-    }
-    addUndirectedEdge(rel.source, rel.target, edge);
-    addUndirectedEdge(rel.target, rel.source, edge);
-  }
-
-  const visited = new Set<string>();
-  /** BFS spanning tree: child nodePath -> edge id from parent (root has no entry). */
-  const treeEdgeIdByChild = new Map<string, string>();
-  const queue: Array<{ nodePath: string; depth: number }> = [
-    { nodePath: hoveredNodePath, depth: 0 },
-  ];
-
-  while (queue.length > 0) {
-    const current = queue.shift()!;
-    const { nodePath: u, depth: d } = current;
-    if (visited.has(u)) {
-      continue;
-    }
-    visited.add(u);
-    focusedNodePaths.add(u);
-
-    const treeEdgeId = treeEdgeIdByChild.get(u);
-    if (treeEdgeId) {
-      focusedEdgeIds.add(treeEdgeId);
-    }
-
-    if (d >= getHopBudgetForNode(elementByNodePath, u)) {
-      continue;
-    }
-
-    const neighborMap = adjacencyWithEdges.get(u);
-    if (!neighborMap) {
-      continue;
-    }
-
-    for (const [v, parallel] of neighborMap) {
-      if (visited.has(v)) {
-        continue;
-      }
-      if (!treeEdgeIdByChild.has(v)) {
-        treeEdgeIdByChild.set(v, pickCanonicalTerraformEdge(parallel).id);
-      }
-      queue.push({ nodePath: v, depth: d + 1 });
-    }
-  }
-
-  return { focusedNodePaths, focusedEdgeIds };
+  return typeof hoveredTerraformResource?.customData?.nodePath === "string"
+    ? hoveredTerraformResource.customData.nodePath
+    : null;
 };
 
 const tryParseJsonString = (value: string): unknown | null => {
@@ -458,6 +277,13 @@ const getTerraformElementForSelection = (
   );
   if (selectedTerraformGroup) {
     return selectedTerraformGroup;
+  }
+
+  const selectedTerraformEdge = selectedElements.find((element) =>
+    isTerraformLayerEdge(element),
+  );
+  if (selectedTerraformEdge) {
+    return selectedTerraformEdge;
   }
 
   const selectedTerraformContainer = selectedElements.find(
@@ -734,6 +560,59 @@ const TerraformGroupActions = ({
   );
 };
 
+const TerraformEdgeActions = ({
+  element,
+  renderAction,
+}: {
+  element: NonDeletedExcalidrawElement;
+  renderAction: ActionManager["renderAction"];
+}) => {
+  const customData = element.customData ?? {};
+  const relationship =
+    customData.relationship && typeof customData.relationship === "object"
+      ? customData.relationship
+      : {};
+  const rows = [
+    ["Layer", customData.terraformEdgeLayer],
+    ["Type", relationship.type],
+    ["Label", relationship.label],
+    ["Origin", relationship.origin],
+    ["Source", relationship.source],
+    ["Target", relationship.target],
+    ["Detail", relationship.detail],
+  ].filter(([, value]) => value !== null && typeof value !== "undefined");
+
+  return (
+    <div className="selected-shape-actions terraform-element-actions">
+      <div className="terraform-element-actions__header">
+        <div className="terraform-element-actions__eyebrow">Terraform</div>
+        <div className="terraform-element-actions__title">Relationship</div>
+        <div className="terraform-element-actions__summary">
+          <span>
+            {formatTerraformPanelValue(customData.terraformEdgeLayer)}
+          </span>
+        </div>
+      </div>
+
+      <div className="terraform-element-actions__meta">
+        {rows.map(([label, value]) => (
+          <div className="terraform-element-actions__row" key={label}>
+            <div className="terraform-element-actions__label">{label}</div>
+            <div className="terraform-element-actions__value">
+              <TerraformConfigValue value={value} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <fieldset>
+        <legend>{t("labels.actions")}</legend>
+        <div className="buttonList">{renderAction("hyperlink")}</div>
+      </fieldset>
+    </div>
+  );
+};
+
 const TerraformElementActions = ({
   element,
   renderAction,
@@ -746,6 +625,12 @@ const TerraformElementActions = ({
   if (isTerraformGroupElement(element)) {
     return (
       <TerraformGroupActions element={element} renderAction={renderAction} />
+    );
+  }
+
+  if (isTerraformLayerEdge(element)) {
+    return (
+      <TerraformEdgeActions element={element} renderAction={renderAction} />
     );
   }
 
@@ -945,138 +830,42 @@ const LayerUI = ({
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
 
   React.useEffect(() => {
+    const allElements = app.scene.getElementsIncludingDeleted();
+    const hoveredNodePath = getHoveredTerraformNodePath(
+      allElements,
+      appState.hoveredElementIds,
+    );
     const terraformElement = getTerraformElementForSelection(
       elements,
       appState,
     );
     const selectedNodePath =
-      typeof terraformElement?.customData?.nodePath === "string"
+      terraformElement &&
+      isTerraformResourceElement(terraformElement) &&
+      typeof terraformElement.customData?.nodePath === "string"
         ? terraformElement.customData.nodePath
         : null;
-    const allElements = app.scene.getElementsIncludingDeleted();
-    const dependencyLayerVisible = allElements.some(
-      (element) =>
-        isTerraformDependencyEdge(element) &&
-        !isTerraformDependencyPreviewEdge(element) &&
-        !element.isDeleted,
-    );
-    let didChange = false;
-
-    const nextElements = allElements.map((element) => {
-      if (!isTerraformDependencyEdge(element)) {
-        return element;
-      }
-
-      const isPreview = isTerraformDependencyPreviewEdge(element);
-      const shouldPreview =
-        !dependencyLayerVisible &&
-        selectedNodePath !== null &&
-        dependencyEdgeTouchesTerraformNode(element, selectedNodePath);
-
-      if (shouldPreview) {
-        if (
-          !element.isDeleted &&
-          isPreview &&
-          element.opacity === TERRAFORM_DEPENDENCY_PREVIEW_OPACITY
-        ) {
-          return element;
-        }
-        didChange = true;
-        return newElementWith(element, {
-          isDeleted: false,
-          opacity: TERRAFORM_DEPENDENCY_PREVIEW_OPACITY,
-          customData: {
-            ...(element.customData ?? {}),
-            terraformDependencyPreview: true,
-          },
-        });
-      }
-
-      if (isPreview) {
-        didChange = true;
-        return newElementWith(element, {
-          isDeleted: true,
-          opacity: 100,
-          customData: clearTerraformDependencyPreviewData(element.customData),
-        });
-      }
-
-      return element;
-    });
-
-    if (didChange) {
-      app.scene.replaceAllElements(repairTerraformEdgeBindings(nextElements));
-    }
-  }, [app, appState, elements]);
-
-  React.useEffect(() => {
-    const allElements = app.scene.getElementsIncludingDeleted();
-    const hoveredTerraformResource = allElements.find(
-      (element) =>
-        appState.hoveredElementIds[element.id] &&
-        element.customData?.terraformVisibilityRole === "resource" &&
-        typeof element.customData?.nodePath === "string",
-    );
-    const hoveredNodePath =
-      typeof hoveredTerraformResource?.customData?.nodePath === "string"
-        ? hoveredTerraformResource.customData.nodePath
-        : null;
-    const { focusedNodePaths, focusedEdgeIds } = collectTerraformHoverFocus(
+    const activeFocusNodePath = hoveredNodePath || selectedNodePath;
+    const result = applyTerraformRelationshipFocus(
       allElements,
-      hoveredNodePath,
+      activeFocusNodePath,
+      appState.viewBackgroundColor,
     );
 
-    let didChange = false;
-    const nextElements = allElements.map((element) => {
-      if (
-        isTerraformLayerEdge(element) &&
-        !isTerraformDependencyPreviewEdge(element)
-      ) {
-        const nextOpacity = focusedEdgeIds.has(element.id)
-          ? TERRAFORM_FOCUS_OPACITY
-          : TERRAFORM_DIM_EDGE_OPACITY;
-        if (element.opacity === nextOpacity) {
-          return element;
-        }
-        didChange = true;
-        return newElementWith(element, { opacity: nextOpacity });
-      }
-
-      if (
-        element.customData?.terraformVisibilityRole === "resource" ||
-        isTerraformGroupElement(element as NonDeletedExcalidrawElement)
-      ) {
-        const nodePath =
-          typeof element.customData?.nodePath === "string"
-            ? element.customData.nodePath
-            : null;
-        const isFocused =
-          nodePath !== null &&
-          hoveredNodePath !== null &&
-          focusedNodePaths.has(nodePath);
-        const isParentOfHoveredNode =
-          isTerraformGroupElement(element as NonDeletedExcalidrawElement) &&
-          isTerraformGroupParentOfNode(element, hoveredNodePath);
-        const nextOpacity =
-          hoveredNodePath === null
-            ? TERRAFORM_FOCUS_OPACITY
-            : isFocused || isParentOfHoveredNode
-            ? TERRAFORM_FOCUS_OPACITY
-            : TERRAFORM_DIM_NODE_OPACITY;
-        if (element.opacity === nextOpacity) {
-          return element;
-        }
-        didChange = true;
-        return newElementWith(element, { opacity: nextOpacity });
-      }
-
-      return element;
-    });
-
-    if (didChange) {
-      app.scene.replaceAllElements(nextElements);
+    if (result.didChange) {
+      app.scene.replaceAllElements(
+        result.shouldRepairBindings
+          ? repairTerraformEdgeBindings(result.elements)
+          : result.elements,
+      );
     }
-  }, [app, appState.hoveredElementIds, elements]);
+  }, [
+    app,
+    appState,
+    appState.hoveredElementIds,
+    appState.viewBackgroundColor,
+    elements,
+  ]);
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {

@@ -58,6 +58,20 @@ interface Blob {
 
 declare module "*.scss";
 
+/** JS-only package; `read` returns a graphlib `Graph` (same as backend `graphlib-dot` / pipeline). */
+declare module "@dagrejs/graphlib-dot" {
+  import type { Graph } from "@dagrejs/graphlib";
+
+  interface GraphlibDot {
+    read(input: string): Graph;
+    readMany(input: string): Graph[];
+    write(graph: Graph): string;
+  }
+
+  const graphlibDot: GraphlibDot;
+  export default graphlibDot;
+}
+
 // --------------------------------------------------------------------------—
 // ensure Uint8Array isn't assignable to ArrayBuffer
 // (due to TS structural typing)

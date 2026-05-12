@@ -31,7 +31,60 @@ function contains(outer, inner) {
 }
 
 describe("nodesToExcalidraw Terraform edge layers", () => {
-  it("renders resource labels as grouped text that can be restored with hidden resources", async () => {
+  it("styles resource rectangles by Terraform action", async () => {
+    const fixtures = [
+      ["aws_lambda_function.created", ["create"], "create", "#d3f9d8", "#2b8a3e"],
+      ["aws_lambda_function.updated", ["update"], "update", "#fff3bf", "#e67700"],
+      ["aws_lambda_function.deleted", ["delete"], "delete", "#ffe3e3", "#c92a2a"],
+      ["aws_lambda_function.noop", ["no-op"], "no-op", "#e7f5ff", "#1971c2"],
+      ["aws_lambda_function.existing", ["existing"], "existing", "#f8f9fa", "#868e96"],
+      ["aws_lambda_function.replaced", ["delete", "create"], "replace", "#ffe8cc", "#f08c00"],
+    ];
+    const nodes = Object.fromEntries(
+      fixtures.map(([address, actions]) => [
+        address,
+        {
+          resources: {
+            [address]: {
+              address,
+              type: "aws_lambda_function",
+              name: address.split(".").at(-1),
+              change: { actions, after: { function_name: address } },
+            },
+          },
+          edges_new: [],
+          edges_existing: [],
+          edges_data_flow: [],
+        },
+      ]),
+    );
+
+    const scene = await nodesToExcalidraw(nodes);
+
+    for (const [
+      address,
+      ,
+      expectedAction,
+      backgroundColor,
+      strokeColor,
+    ] of fixtures) {
+      const rect = scene.elements.find(
+        (element) =>
+          element.type === "rectangle" &&
+          element.customData?.nodePath === address,
+      );
+
+      expect(rect).toMatchObject({
+        backgroundColor,
+        strokeColor,
+        customData: {
+          action: expectedAction,
+        },
+      });
+    }
+  });
+
+  it("renders resource labels as grouped text for default visibility restore", async () => {
     const scene = await nodesToExcalidraw({
       "aws_lambda_function.worker": {
         resources: {
@@ -73,11 +126,11 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
     );
 
     expect(roleRect).toMatchObject({
-      isDeleted: true,
+      isDeleted: false,
       boundElements: expect.any(Array),
     });
     expect(roleText).toMatchObject({
-      isDeleted: true,
+      isDeleted: false,
       containerId: null,
       text: "aws_iam_role.worker",
       customData: {
@@ -88,7 +141,83 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
     expect(roleText.groupIds[0]).toBe(roleRect.groupIds[0]);
   });
 
-  it("renders dependency and data-flow arrows with layer metadata", async () => {
+  it("shows changed non-primary resources and keeps unchanged non-primary resources hidden", async () => {
+    const fixtures = [
+      ["aws_iam_role_policy.created", ["create"], false],
+      ["aws_iam_role_policy.updated", ["update"], false],
+      ["aws_iam_role_policy.deleted", ["delete"], false],
+      ["aws_iam_role_policy.replaced", ["delete", "create"], false],
+      ["aws_iam_role_policy.noop", ["no-op"], true],
+      ["aws_iam_role_policy.existing", ["existing"], true],
+      ["aws_iam_role_policy.read", ["read"], true],
+      ["aws_iam_role_policy.external", ["external"], true],
+    ];
+    const nodes = Object.fromEntries(
+      fixtures.map(([address, actions]) => [
+        address,
+        {
+          resources: {
+            [address]: {
+              address,
+              type: "aws_iam_role_policy",
+              name: address.split(".").at(-1),
+              change: { actions, after: { policy: "{}" } },
+            },
+          },
+          edges_new: [],
+          edges_existing: [],
+          edges_data_flow: [],
+        },
+      ]),
+    );
+
+    const scene = await nodesToExcalidraw(nodes);
+
+    for (const [address, , expectedDeleted] of fixtures) {
+      const rect = scene.elements.find(
+        (element) =>
+          element.type === "rectangle" &&
+          element.customData?.nodePath === address,
+      );
+      const text = scene.elements.find(
+        (element) =>
+          element.type === "text" && element.customData?.nodePath === address,
+      );
+      expect(rect?.isDeleted).toBe(expectedDeleted);
+      expect(text?.isDeleted).toBe(expectedDeleted);
+      expect(rect?.customData?.terraformInitiallyVisible).toBe(!expectedDeleted);
+    }
+  });
+
+  it("shows module containers that only contain changed non-primary resources", async () => {
+    const address = "module.security.aws_iam_role_policy.inline";
+    const scene = await nodesToExcalidraw({
+      [address]: {
+        resources: {
+          [address]: {
+            address,
+            type: "aws_iam_role_policy",
+            name: "inline",
+            change: { actions: ["update"], after: { policy: "{}" } },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    });
+
+    const moduleBox = scene.elements.find(
+      (element) =>
+        element.type === "rectangle" &&
+        element.customData?.terraformModuleGroup === true &&
+        element.customData?.modulePath === "module.security",
+    );
+    expect(moduleBox).toBeDefined();
+    expect(moduleBox?.isDeleted).toBe(false);
+  });
+
+  it("renders dependency and data-flow lines with layer metadata", async () => {
     const scene = await nodesToExcalidraw({
       "aws_api_gateway_rest_api.api": {
         resources: {
@@ -128,25 +257,28 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
       },
     });
 
-    const dependencyArrow = scene.elements.find(
+    const dependencyLine = scene.elements.find(
       (element) => element.customData?.terraformEdgeLayer === "dependency",
     );
-    const dataFlowArrow = scene.elements.find(
+    const dataFlowLine = scene.elements.find(
       (element) => element.customData?.terraformEdgeLayer === "dataFlow",
     );
 
-    expect(dependencyArrow).toMatchObject({
+    expect(dependencyLine).toMatchObject({
       type: "arrow",
+      startArrowhead: null,
+      endArrowhead: "arrow",
       customData: {
         relationship: {
           type: "dependency",
         },
       },
     });
-    expect(dataFlowArrow).toMatchObject({
+    expect(dataFlowLine).toMatchObject({
       type: "arrow",
-      strokeColor: "#0ca678",
+      strokeColor: "#868e96",
       strokeWidth: 3,
+      startArrowhead: null,
       endArrowhead: "arrow",
       startBinding: {
         elementId: expect.any(String),
@@ -164,15 +296,50 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
         },
       },
     });
-    expect(dataFlowArrow.startBinding.fixedPoint).not.toEqual(
-      dependencyArrow.startBinding.fixedPoint,
+    expect(dataFlowLine.startBinding.fixedPoint).not.toEqual(
+      dependencyLine.startBinding.fixedPoint,
     );
-    expect(dataFlowArrow.endBinding.fixedPoint).not.toEqual(
-      dependencyArrow.endBinding.fixedPoint,
+    expect(dataFlowLine.endBinding.fixedPoint).not.toEqual(
+      dependencyLine.endBinding.fixedPoint,
     );
   });
 
-  it("coalesces opposite data-flow directions into a bidirectional arrow", async () => {
+  it("colors dependency edge red when an endpoint resource is delete", async () => {
+    const scene = await nodesToExcalidraw({
+      "aws_s3_bucket.to_delete": {
+        resources: {
+          "aws_s3_bucket.to_delete": {
+            address: "aws_s3_bucket.to_delete",
+            type: "aws_s3_bucket",
+            name: "to_delete",
+            change: { actions: ["delete"], before: { bucket: "x" } },
+          },
+        },
+        edges_new: ["aws_s3_bucket.keeps"],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+      "aws_s3_bucket.keeps": {
+        resources: {
+          "aws_s3_bucket.keeps": {
+            address: "aws_s3_bucket.keeps",
+            type: "aws_s3_bucket",
+            name: "keeps",
+            change: { actions: ["no-op"], after: { bucket: "y" } },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    });
+    const dependencyLine = scene.elements.find(
+      (element) => element.customData?.terraformEdgeLayer === "dependency",
+    );
+    expect(dependencyLine?.strokeColor).toBe("#c92a2a");
+  });
+
+  it("coalesces opposite data-flow directions into a bidirectional line", async () => {
     const scene = await nodesToExcalidraw({
       "aws_lambda_function.sync": {
         resources: {
@@ -222,12 +389,13 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
       },
     });
 
-    const dataFlowArrows = scene.elements.filter(
+    const dataFlowLines = scene.elements.filter(
       (element) => element.customData?.terraformEdgeLayer === "dataFlow",
     );
 
-    expect(dataFlowArrows).toHaveLength(1);
-    expect(dataFlowArrows[0]).toMatchObject({
+    expect(dataFlowLines).toHaveLength(1);
+    expect(dataFlowLines[0]).toMatchObject({
+      type: "arrow",
       startArrowhead: "arrow",
       endArrowhead: "arrow",
       customData: {
@@ -405,15 +573,15 @@ describe("nodesToExcalidraw container facets", () => {
     expect(subnetLabel.text).toContain("rt_assoc:1");
 
     expect(accountBox.customData.terraformContainerFacets).toEqual([]);
-    expect(routeTableRect.isDeleted).toBe(true);
+    expect(routeTableRect.isDeleted).toBe(false);
     expect(sgRect).toBeDefined();
-    expect(sgRect?.isDeleted).toBe(true);
+    expect(sgRect?.isDeleted).toBe(false);
     expect(routeApplianceRect).toBeDefined();
   });
 });
 
 describe("nodesToExcalidraw VPC perimeter layout", () => {
-  it("renders perimeter endpoint arrows and lists endpoints in VPC facets", async () => {
+  it("renders perimeter endpoint lines and lists endpoints in VPC facets", async () => {
     const scene = await nodesToExcalidraw({
       "aws_vpc.main": {
         resources: {
@@ -632,11 +800,11 @@ describe("nodesToExcalidraw VPC perimeter layout", () => {
       expect(ep.x + ep.width / 2).toBeLessThanOrEqual(R - cornerMargin + 1);
     }
 
-    const depArrows = scene.elements.filter(
+    const depLines = scene.elements.filter(
       (element) => element.customData?.terraformEdgeLayer === "dependency",
     );
-    const endpointDeps = depArrows.filter((arrow) => {
-      const rel = arrow.customData?.relationship;
+    const endpointDeps = depLines.filter((line) => {
+      const rel = line.customData?.relationship;
       return (
         rel?.source === "aws_vpc_endpoint.s3" ||
         rel?.target === "aws_vpc_endpoint.s3"
@@ -644,11 +812,11 @@ describe("nodesToExcalidraw VPC perimeter layout", () => {
     });
     expect(endpointDeps.length).toBeGreaterThan(0);
 
-    const dataFlowArrows = scene.elements.filter(
+    const dataFlowLines = scene.elements.filter(
       (element) => element.customData?.terraformEdgeLayer === "dataFlow",
     );
-    const endpointDataFlows = dataFlowArrows.filter((arrow) => {
-      const rel = arrow.customData?.relationship;
+    const endpointDataFlows = dataFlowLines.filter((line) => {
+      const rel = line.customData?.relationship;
       return (
         rel?.source === "aws_vpc_endpoint.s3" ||
         rel?.target === "aws_vpc_endpoint.s3"

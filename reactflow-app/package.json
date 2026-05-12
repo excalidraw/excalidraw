@@ -1,0 +1,26 @@
+{
+  "name": "reactflow-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --port 3102",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@xyflow/react": "^12.8.4",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "22.13.10",
+    "@types/react": "19.0.10",
+    "@types/react-dom": "19.0.4",
+    "@vitejs/plugin-react": "3.1.0",
+    "typescript": "5.9.3",
+    "vite": "5.0.12",
+    "vitest": "3.0.6"
+  }
+}

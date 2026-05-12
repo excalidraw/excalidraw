@@ -13,6 +13,21 @@ output "intra_subnets" {
   value       = module.vpc.intra_subnets
 }
 
+output "private_subnets" {
+  description = "Private subnet IDs with default route through NAT (for workloads needing outbound internet)."
+  value       = module.vpc.private_subnets
+}
+
+output "public_subnets" {
+  description = "Public subnet IDs for internet-facing load balancers and NAT gateways."
+  value       = module.vpc.public_subnets
+}
+
+output "nat_gateway_public_ips" {
+  description = "Elastic IP addresses associated with NAT gateways (one per NAT created)."
+  value       = module.vpc.nat_public_ips
+}
+
 output "intra_route_table_ids" {
   description = "Route tables associated with intra subnets (S3 gateway endpoint)."
   value       = module.vpc.intra_route_table_ids

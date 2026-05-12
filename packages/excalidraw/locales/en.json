@@ -163,6 +163,7 @@
       "unlockAll": "Unlock all"
     },
     "terraform": {
+      "inspect": "Inspect Terraform object",
       "expandDependencies": "Expand Terraform dependencies",
       "collapseDependencies": "Collapse Terraform dependencies"
     },

@@ -65,6 +65,12 @@ variable "vpc_cidr_for_restricted_egress" {
   description = "Known VPC CIDR (same as workload VPC) for restricted SG egress: HTTPS+DNS in-VPC plus S3 via regional prefix list."
 }
 
+variable "allow_internet_https_egress" {
+  type        = bool
+  default     = false
+  description = "When true and restricted VPC egress is enabled, allow HTTPS (443) to 0.0.0.0/0 (use with NAT gateway in private subnets)."
+}
+
 variable "environment_variables" {
   type    = map(string)
   default = {}

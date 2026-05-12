@@ -216,6 +216,7 @@ const shareableLinkConfirmDialog = {
 const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;
   excalidrawAPI: ExcalidrawImperativeAPI;
+  frontendOnly?: boolean;
 }): Promise<
   { scene: ExcalidrawInitialDataState | null } & (
     | { isExternalScene: true; id: string; key: string }
@@ -223,10 +224,10 @@ const initializeScene = async (opts: {
   )
 > => {
   const searchParams = new URLSearchParams(window.location.search);
-  const id = searchParams.get("id");
-  const jsonBackendMatch = window.location.hash.match(
-    /^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/,
-  );
+  const id = opts.frontendOnly ? null : searchParams.get("id");
+  const jsonBackendMatch = opts.frontendOnly
+    ? null
+    : window.location.hash.match(/^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const localDataState = importFromLocalStorage();
@@ -246,7 +247,9 @@ const initializeScene = async (opts: {
     appState: restoreAppState(localDataState?.appState, null),
   };
 
-  let roomLinkData = getCollaborationLinkData(window.location.href);
+  let roomLinkData = opts.frontendOnly
+    ? null
+    : getCollaborationLinkData(window.location.href);
   const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
   if (isExternalScene) {
     if (
@@ -371,11 +374,15 @@ const initializeScene = async (opts: {
   return { scene: null, isExternalScene: false };
 };
 
-const ExcalidrawWrapper = () => {
+const ExcalidrawWrapper = ({
+  frontendOnly = false,
+}: {
+  frontendOnly?: boolean;
+}) => {
   const excalidrawAPI = useExcalidrawAPI();
 
   const [errorMessage, setErrorMessage] = useState("");
-  const isCollabDisabled = isRunningInIframe();
+  const isCollabDisabled = frontendOnly || isRunningInIframe();
 
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
 
@@ -525,7 +532,11 @@ const ExcalidrawWrapper = () => {
       return;
     }
 
-    initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
+    initializeScene({
+      collabAPI: frontendOnly ? null : collabAPI,
+      excalidrawAPI,
+      frontendOnly,
+    }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve(data.scene);
     });
@@ -542,7 +553,11 @@ const ExcalidrawWrapper = () => {
         }
         excalidrawAPI.updateScene({ appState: { isLoading: true } });
 
-        initializeScene({ collabAPI, excalidrawAPI }).then((data) => {
+        initializeScene({
+          collabAPI: frontendOnly ? null : collabAPI,
+          excalidrawAPI,
+          frontendOnly,
+        }).then((data) => {
           loadImages(data);
           if (data.scene) {
             excalidrawAPI.updateScene({
@@ -648,7 +663,14 @@ const ExcalidrawWrapper = () => {
         false,
       );
     };
-  }, [isCollabDisabled, collabAPI, excalidrawAPI, setLangCode, loadImages]);
+  }, [
+    isCollabDisabled,
+    collabAPI,
+    excalidrawAPI,
+    setLangCode,
+    loadImages,
+    frontendOnly,
+  ]);
 
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
@@ -917,33 +939,35 @@ const ExcalidrawWrapper = () => {
         UIOptions={{
           canvasActions: {
             toggleTheme: true,
-            export: {
-              onExportToBackend,
-              renderCustomUI: excalidrawAPI
-                ? (elements, appState, files) => {
-                    return (
-                      <ExportToExcalidrawPlus
-                        elements={elements}
-                        appState={appState}
-                        files={files}
-                        name={excalidrawAPI.getName()}
-                        onError={(error) => {
-                          excalidrawAPI?.updateScene({
-                            appState: {
-                              errorMessage: error.message,
-                            },
-                          });
-                        }}
-                        onSuccess={() => {
-                          excalidrawAPI.updateScene({
-                            appState: { openDialog: null },
-                          });
-                        }}
-                      />
-                    );
-                  }
-                : undefined,
-            },
+            export: frontendOnly
+              ? { onExportToBackend: undefined, renderCustomUI: undefined }
+              : {
+                  onExportToBackend,
+                  renderCustomUI: excalidrawAPI
+                    ? (elements, appState, files) => {
+                        return (
+                          <ExportToExcalidrawPlus
+                            elements={elements}
+                            appState={appState}
+                            files={files}
+                            name={excalidrawAPI.getName()}
+                            onError={(error) => {
+                              excalidrawAPI?.updateScene({
+                                appState: {
+                                  errorMessage: error.message,
+                                },
+                              });
+                            }}
+                            onSuccess={() => {
+                              excalidrawAPI.updateScene({
+                                appState: { openDialog: null },
+                              });
+                            }}
+                          />
+                        );
+                      }
+                    : undefined,
+                },
           },
         }}
         langCode={langCode}
@@ -953,7 +977,7 @@ const ExcalidrawWrapper = () => {
         autoFocus={true}
         theme={editorTheme}
         renderTopRightUI={(isMobile) => {
-          if (isMobile || !collabAPI || isCollabDisabled) {
+          if (frontendOnly || isMobile || !collabAPI || isCollabDisabled) {
             return null;
           }
 
@@ -987,6 +1011,7 @@ const ExcalidrawWrapper = () => {
           onCollabDialogOpen={onCollabDialogOpen}
           isCollaborating={isCollaborating}
           isCollabEnabled={!isCollabDisabled}
+          frontendOnly={frontendOnly}
           theme={appTheme}
           setTheme={(theme) => setAppTheme(theme)}
           refresh={() => forceRefresh((prev) => !prev)}
@@ -994,11 +1019,12 @@ const ExcalidrawWrapper = () => {
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}
           isCollabEnabled={!isCollabDisabled}
+          frontendOnly={frontendOnly}
         />
         <OverwriteConfirmDialog>
           <OverwriteConfirmDialog.Actions.ExportToImage />
           <OverwriteConfirmDialog.Actions.SaveToDisk />
-          {excalidrawAPI && (
+          {excalidrawAPI && !frontendOnly && (
             <OverwriteConfirmDialog.Action
               title={t("overwriteConfirm.action.excalidrawPlus.title")}
               actionLabel={t("overwriteConfirm.action.excalidrawPlus.button")}
@@ -1018,7 +1044,7 @@ const ExcalidrawWrapper = () => {
         <AppFooter onChange={() => excalidrawAPI?.refresh()} />
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
 
-        <TTDDialogTrigger />
+        {!frontendOnly && <TTDDialogTrigger />}
         {isCollaborating && isOffline && (
           <div className="alertalert--warning">
             {t("alerts.collabOfflineWarning")}
@@ -1029,35 +1055,37 @@ const ExcalidrawWrapper = () => {
             {t("alerts.localStorageQuotaExceeded")}
           </div>
         )}
-        {latestShareableLink && (
+        {latestShareableLink && !frontendOnly && (
           <ShareableLinkDialog
             link={latestShareableLink}
             onCloseRequest={() => setLatestShareableLink(null)}
             setErrorMessage={setErrorMessage}
           />
         )}
-        {excalidrawAPI && !isCollabDisabled && (
+        {excalidrawAPI && !isCollabDisabled && !frontendOnly && (
           <Collab excalidrawAPI={excalidrawAPI} />
         )}
 
-        <ShareDialog
-          collabAPI={collabAPI}
-          onExportToBackend={async () => {
-            if (excalidrawAPI) {
-              try {
-                await onExportToBackend(
-                  excalidrawAPI.getSceneElements(),
-                  excalidrawAPI.getAppState(),
-                  excalidrawAPI.getFiles(),
-                );
-              } catch (error: any) {
-                setErrorMessage(error.message);
+        {!frontendOnly && (
+          <ShareDialog
+            collabAPI={collabAPI}
+            onExportToBackend={async () => {
+              if (excalidrawAPI) {
+                try {
+                  await onExportToBackend(
+                    excalidrawAPI.getSceneElements(),
+                    excalidrawAPI.getAppState(),
+                    excalidrawAPI.getFiles(),
+                  );
+                } catch (error: any) {
+                  setErrorMessage(error.message);
+                }
               }
-            }
-          }}
-        />
+            }}
+          />
+        )}
 
-        <AppSidebar />
+        {!frontendOnly && <AppSidebar />}
 
         {errorMessage && (
           <ErrorDialog onClose={() => setErrorMessage("")}>
@@ -1067,67 +1095,71 @@ const ExcalidrawWrapper = () => {
 
         <CommandPalette
           customCommandPaletteItems={[
-            {
-              label: t("labels.liveCollaboration"),
-              category: DEFAULT_CATEGORIES.app,
-              keywords: [
-                "team",
-                "multiplayer",
-                "share",
-                "public",
-                "session",
-                "invite",
-              ],
-              icon: usersIcon,
-              perform: () => {
-                setShareDialogState({
-                  isOpen: true,
-                  type: "collaborationOnly",
-                });
-              },
-            },
-            {
-              label: t("roomDialog.button_stopSession"),
-              category: DEFAULT_CATEGORIES.app,
-              predicate: () => !!collabAPI?.isCollaborating(),
-              keywords: [
-                "stop",
-                "session",
-                "end",
-                "leave",
-                "close",
-                "exit",
-                "collaboration",
-              ],
-              perform: () => {
-                if (collabAPI) {
-                  collabAPI.stopCollaboration();
-                  if (!collabAPI.isCollaborating()) {
-                    setShareDialogState({ isOpen: false });
-                  }
-                }
-              },
-            },
-            {
-              label: t("labels.share"),
-              category: DEFAULT_CATEGORIES.app,
-              predicate: true,
-              icon: share,
-              keywords: [
-                "link",
-                "shareable",
-                "readonly",
-                "export",
-                "publish",
-                "snapshot",
-                "url",
-                "collaborate",
-                "invite",
-              ],
-              perform: async () => {
-                setShareDialogState({ isOpen: true, type: "share" });
-              },
-            },
+            ...(frontendOnly
+              ? []
+              : [
+                  {
+                    label: t("labels.liveCollaboration"),
+                    category: DEFAULT_CATEGORIES.app,
+                    keywords: [
+                      "team",
+                      "multiplayer",
+                      "share",
+                      "public",
+                      "session",
+                      "invite",
+                    ],
+                    icon: usersIcon,
+                    perform: () => {
+                      setShareDialogState({
+                        isOpen: true,
+                        type: "collaborationOnly",
+                      });
+                    },
+                  },
+                  {
+                    label: t("roomDialog.button_stopSession"),
+                    category: DEFAULT_CATEGORIES.app,
+                    predicate: () => !!collabAPI?.isCollaborating(),
+                    keywords: [
+                      "stop",
+                      "session",
+                      "end",
+                      "leave",
+                      "close",
+                      "exit",
+                      "collaboration",
+                    ],
+                    perform: () => {
+                      if (collabAPI) {
+                        collabAPI.stopCollaboration();
+                        if (!collabAPI.isCollaborating()) {
+                          setShareDialogState({ isOpen: false });
+                        }
+                      }
+                    },
+                  },
+                  {
+                    label: t("labels.share"),
+                    category: DEFAULT_CATEGORIES.app,
+                    predicate: true,
+                    icon: share,
+                    keywords: [
+                      "link",
+                      "shareable",
+                      "readonly",
+                      "export",
+                      "publish",
+                      "snapshot",
+                      "url",
+                      "collaborate",
+                      "invite",
+                    ],
+                    perform: async () => {
+                      setShareDialogState({ isOpen: true, type: "share" });
+                    },
+                  },
+                ]),
             {
               label: "GitHub",
               icon: GithubIcon,
@@ -1203,7 +1235,9 @@ const ExcalidrawWrapper = () => {
                 );
               },
             },
-            ...(isExcalidrawPlusSignedUser
+            ...(frontendOnly
+              ? []
+              : isExcalidrawPlusSignedUser
               ? [
                   {
                     ...ExcalidrawPlusAppCommand,
@@ -1212,23 +1246,27 @@ const ExcalidrawWrapper = () => {
                 ]
               : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
 
-            {
-              label: t("overwriteConfirm.action.excalidrawPlus.button"),
-              category: DEFAULT_CATEGORIES.export,
-              icon: exportToPlus,
-              predicate: true,
-              keywords: ["plus", "export", "save", "backup"],
-              perform: () => {
-                if (excalidrawAPI) {
-                  exportToExcalidrawPlus(
-                    excalidrawAPI.getSceneElements(),
-                    excalidrawAPI.getAppState(),
-                    excalidrawAPI.getFiles(),
-                    excalidrawAPI.getName(),
-                  );
-                }
-              },
-            },
+            ...(frontendOnly
+              ? []
+              : [
+                  {
+                    label: t("overwriteConfirm.action.excalidrawPlus.button"),
+                    category: DEFAULT_CATEGORIES.export,
+                    icon: exportToPlus,
+                    predicate: true,
+                    keywords: ["plus", "export", "save", "backup"],
+                    perform: () => {
+                      if (excalidrawAPI) {
+                        exportToExcalidrawPlus(
+                          excalidrawAPI.getSceneElements(),
+                          excalidrawAPI.getAppState(),
+                          excalidrawAPI.getFiles(),
+                          excalidrawAPI.getName(),
+                        );
+                      }
+                    },
+                  },
+                ]),
             {
               ...CommandPalette.defaultItems.toggleTheme,
               perform: () => {
@@ -1266,6 +1304,244 @@ const ExcalidrawWrapper = () => {
   );
 };
 
+const LandingPage = () => {
+  useEffect(() => {
+    document.documentElement.classList.add("terraform-canvas-landing");
+    document.body.classList.add("terraform-canvas-landing");
+
+    return () => {
+      document.documentElement.classList.remove("terraform-canvas-landing");
+      document.body.classList.remove("terraform-canvas-landing");
+    };
+  }, []);
+
+  const scrollToCanvas = () => {
+    document
+      .getElementById("terraform-canvas")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <main id="top" className="landing-page">
+      <nav className="landing-nav" aria-label="Ainur.draw">
+        <a className="landing-nav__brand" href="#top">
+          Ainur.draw
+        </a>
+        <div className="landing-nav__links">
+          <a href="#workflow">Workflow</a>
+          <a href="#use-cases">Use cases</a>
+          <button type="button" onClick={scrollToCanvas}>
+            View changes
+          </button>
+        </div>
+      </nav>
+      <section className="landing-hero" aria-labelledby="landing-title">
+        <div className="landing-hero__copy">
+          <p className="landing-hero__eyebrow">
+            Your Terraform, made visible
+          </p>
+          <h1 id="landing-title">Your architecture diagram is your state.</h1>
+          <p className="landing-hero__lede">
+            Ainur.draw maps Terraform state and plans into a living
+            architecture canvas, so teams can understand what exists and what is
+            changing without reading raw plan noise.
+          </p>
+          <div className="landing-hero__actions">
+            <button type="button" onClick={scrollToCanvas}>
+              Visualize a plan
+            </button>
+            <button type="button" onClick={scrollToCanvas}>
+              Open the canvas
+            </button>
+          </div>
+          <div className="landing-proof" aria-label="Ainur.draw values">
+            <span>State-backed architecture view</span>
+            <span>Visual plan diffs</span>
+            <span>Custom annotations</span>
+            <span>Shareable review canvas</span>
+          </div>
+        </div>
+        <div className="landing-hero__sketch" aria-hidden="true">
+          <span className="landing-note landing-note--top">
+            plan diff lands here
+          </span>
+          <span className="landing-node landing-node--vpc">vpc</span>
+          <span className="landing-node landing-node--alb">alb</span>
+          <span className="landing-node landing-node--lambda">lambda</span>
+          <span className="landing-node landing-node--queue">sqs</span>
+          <span className="landing-node landing-node--state">tfstate</span>
+          <span className="landing-link landing-link--a" />
+          <span className="landing-link landing-link--b" />
+          <span className="landing-link landing-link--c" />
+          <span className="landing-note landing-note--bottom">
+            annotate the source-backed view
+          </span>
+        </div>
+      </section>
+
+      <section
+        id="terraform-canvas"
+        className="landing-canvas-section"
+        aria-label="Embedded Terraform architecture canvas"
+      >
+        <div className="landing-canvas-section__header">
+          <p>Live architecture view</p>
+          <h2>See what is built. See what will change.</h2>
+        </div>
+        <div
+          className="landing-canvas-instructions"
+          aria-label="Terraform input instructions"
+        >
+          <article>
+            <strong>1. Save a plan</strong>
+            <code>terraform plan -out=tfplan.bin</code>
+          </article>
+          <article>
+            <strong>2. Export plan JSON</strong>
+            <code>terraform show -json tfplan.bin &gt; tfplan.json</code>
+          </article>
+          <article>
+            <strong>3. Export state JSON</strong>
+            <code>terraform show -json &gt; tfstate.json</code>
+          </article>
+          <article>
+            <strong>4. Export graph DOT</strong>
+            <code>terraform graph -plan=tfplan.bin &gt; graph.dot</code>
+          </article>
+          <article>
+            <strong>5. Redact before upload</strong>
+            <code>
+              jq 'walk(if type == "object" and .sensitive == true then .value =
+              "[redacted]" else . end)' tfplan.json &gt; tfplan.redacted.json
+            </code>
+          </article>
+        </div>
+        <div className="landing-canvas-shell">
+          <TopErrorBoundary>
+            <Provider store={appJotaiStore}>
+              <ExcalidrawAPIProvider>
+                <ExcalidrawWrapper frontendOnly />
+              </ExcalidrawAPIProvider>
+            </Provider>
+          </TopErrorBoundary>
+        </div>
+      </section>
+
+      <section className="landing-strip" aria-label="Product highlights">
+        <p>
+          For platform teams turning state, plans, and reviews into one
+          source-backed architecture view.
+        </p>
+        <div>
+          <span>Terraform state</span>
+          <span>Plan semantics</span>
+          <span>Dependency impact</span>
+          <span>Hosted review ready</span>
+        </div>
+      </section>
+
+      <section
+        id="workflow"
+        className="landing-workflow"
+        aria-labelledby="workflow-title"
+      >
+        <div className="landing-section-heading">
+          <p>Workflow</p>
+          <h2 id="workflow-title">
+            From Terraform truth to a readable canvas.
+          </h2>
+        </div>
+        <ol className="landing-steps">
+          <li>
+            <strong>Load state and plan</strong>
+            <span>
+              Map actual Terraform state and tfplan output into the visual
+              model.
+            </span>
+          </li>
+          <li>
+            <strong>Read the change</strong>
+            <span>
+              See creates, deletes, replacements, and dependency impact in the
+              architecture view.
+            </span>
+          </li>
+          <li>
+            <strong>Annotate the truth</strong>
+            <span>
+              Customize and annotate the view without forking it from the
+              underlying infrastructure model.
+            </span>
+          </li>
+        </ol>
+      </section>
+
+      <section className="landing-features" aria-label="Feature highlights">
+        <article>
+          <span>01</span>
+          <h3>The diagram is the source-backed view</h3>
+          <p>
+            There is no separate architecture diagram to keep in sync with what
+            Terraform actually manages.
+          </p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>Plan semantics at a glance</h3>
+          <p>
+            Replace Terraform plan noise with visual architecture changes your
+            team can scan and discuss.
+          </p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Ready for shared reviews</h3>
+          <p>
+            Hosted review mode can synchronize the actual built and changing
+            view for multiple users.
+          </p>
+        </article>
+      </section>
+
+      <section
+        id="use-cases"
+        className="landing-use-cases"
+        aria-labelledby="use-cases-title"
+      >
+        <div className="landing-section-heading">
+          <p>Use cases</p>
+          <h2 id="use-cases-title">
+            Review the real infrastructure model together.
+          </h2>
+        </div>
+        <div className="landing-use-case-grid">
+          <span>Plan reviews</span>
+          <span>Drift investigations</span>
+          <span>Architecture reviews</span>
+          <span>Change approvals</span>
+        </div>
+      </section>
+
+      <section className="landing-final" aria-labelledby="final-title">
+        <h2 id="final-title">Bring the next Terraform review to Ainur.draw.</h2>
+        <button type="button" onClick={scrollToCanvas}>
+          Visualize Terraform changes
+        </button>
+      </section>
+    </main>
+  );
+};
+
+const EditorApp = () => (
+  <TopErrorBoundary>
+    <Provider store={appJotaiStore}>
+      <ExcalidrawAPIProvider>
+        <ExcalidrawWrapper />
+      </ExcalidrawAPIProvider>
+    </Provider>
+  </TopErrorBoundary>
+);
+
 const ExcalidrawApp = () => {
   const isCloudExportWindow =
     window.location.pathname === "/excalidraw-plus-export";
@@ -1273,15 +1549,11 @@ const ExcalidrawApp = () => {
     return <ExcalidrawPlusIframeExport />;
   }
 
-  return (
-    <TopErrorBoundary>
-      <Provider store={appJotaiStore}>
-        <ExcalidrawAPIProvider>
-          <ExcalidrawWrapper />
-        </ExcalidrawAPIProvider>
-      </Provider>
-    </TopErrorBoundary>
-  );
+  if (import.meta.env.DEV || isTestEnv()) {
+    return <EditorApp />;
+  }
+
+  return <LandingPage />;
 };
 
 export default ExcalidrawApp;

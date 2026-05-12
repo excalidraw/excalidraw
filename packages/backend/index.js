@@ -1,5 +1,5 @@
 /**
- * Express API for Terraform/OpenTofu uploads: multipart plan + DOT (+ optional state) → SQLite row
+ * Express API for Terraform/OpenTofu uploads: multipart plan+DOT and/or raw state → SQLite row
  * and JSON graph; `GET …/excalidraw` runs `nodesToExcalidraw` for the web app import flow.
  */
 const express = require("express");
@@ -24,6 +24,7 @@ const {
   omitGhostIamPolicyDocumentNodes,
   ensureEdgeLists,
   buildDataFlowEdges,
+  buildNetworkingEdges,
   externalResources,
   deleteOrphanedNodes,
   omitVpcPlumbingNodes,
@@ -45,6 +46,28 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 const upload = multer({ dest: "uploads/" });
 
+const STRUCTURAL_PRUNE_MODES = new Set(["module-only", "global", "off"]);
+const FALSEY_FLAG_VALUES = new Set(["0", "false", "no", "off", "disabled"]);
+
+function normalizeStructuralPruneMode(rawMode) {
+  const mode = String(rawMode || "module-only").trim().toLowerCase();
+  return STRUCTURAL_PRUNE_MODES.has(mode) ? mode : "module-only";
+}
+
+function parseBooleanFlag(rawValue, fallback = false) {
+  if (typeof rawValue === "boolean") {
+    return rawValue;
+  }
+  if (rawValue == null) {
+    return fallback;
+  }
+  const normalized = String(rawValue).trim().toLowerCase();
+  if (!normalized) {
+    return fallback;
+  }
+  return !FALSEY_FLAG_VALUES.has(normalized);
+}
+
 app.use(cors());
 app.use(express.json());
 
@@ -55,7 +78,8 @@ app.get("/terraform/test-client", (_req, res) => {
 });
 
 /**
- * Accepts `planFile`, `dotFile`, optional `stateFile`; runs the pipeline; stores JSON `nodes` in SQLite.
+ * Accepts `planFile`+`dotFile` together, and/or `stateFile`.
+ * State-only: raw Terraform state JSON (`resources` array, e.g. `terraform state pull`).
  * Temp multer files are always unlinked in `finally`.
  */
 app.post(
@@ -73,67 +97,191 @@ app.post(
       const stateFile = req.files?.stateFile?.[0];
       uploadedFiles.push(...[planFile, dotFile, stateFile].filter(Boolean));
 
-      if (!planFile || !dotFile) {
-        return res
-          .status(400)
-          .json({ error: "Both planFile and dotFile are required" });
+      const hasPlan = Boolean(planFile);
+      const hasDot = Boolean(dotFile);
+      const hasState = Boolean(stateFile);
+
+      if ((hasPlan && !hasDot) || (!hasPlan && hasDot)) {
+        return res.status(400).json({
+          error:
+            "planFile and dotFile must be supplied together, or omit both and upload stateFile only (raw Terraform state JSON with a top-level \"resources\" array).",
+        });
       }
 
-      const planContent = fs.readFileSync(planFile.path, "utf-8");
-      const dotContent = fs.readFileSync(dotFile.path, "utf-8");
-      const stateContent = stateFile
-        ? fs.readFileSync(stateFile.path, "utf-8")
-        : null;
-      const plan = JSON.parse(planContent);
-      const state = stateContent ? JSON.parse(stateContent) : null;
+      if (!hasPlan && !hasDot && !hasState) {
+        return res.status(400).json({
+          error:
+            "Upload planFile+dotFile (optional stateFile), or stateFile alone.",
+        });
+      }
+
+      let plan;
+      let state = null;
+      let dotContent;
+
+      if (hasPlan && hasDot) {
+        const planContent = fs.readFileSync(planFile.path, "utf-8");
+        dotContent = fs.readFileSync(dotFile.path, "utf-8");
+        try {
+          plan = JSON.parse(planContent);
+        } catch {
+          return res.status(400).json({ error: "planFile must be valid JSON." });
+        }
+        if (stateFile) {
+          const stateContent = fs.readFileSync(stateFile.path, "utf-8");
+          try {
+            state = JSON.parse(stateContent);
+          } catch {
+            return res.status(400).json({ error: "stateFile must be valid JSON." });
+          }
+        }
+      } else {
+        const stateContent = fs.readFileSync(stateFile.path, "utf-8");
+        let parsedState;
+        try {
+          parsedState = JSON.parse(stateContent);
+        } catch {
+          return res.status(400).json({ error: "stateFile must be valid JSON." });
+        }
+        if (!Array.isArray(parsedState.resources)) {
+          return res.status(400).json({
+            error:
+              "state-only uploads require raw Terraform state JSON (top-level \"resources\" array), e.g. output of terraform state pull.",
+          });
+        }
+        state = parsedState;
+        plan = { resource_changes: [] };
+        dotContent = "digraph G {}\n";
+      }
+
       const graph = dot.read(dotContent);
+      const structuralPruneMode = normalizeStructuralPruneMode(
+        req.body?.structuralPruneMode || req.query?.structuralPruneMode,
+      );
+      const debugPipeline = parseBooleanFlag(
+        req.body?.debugPipeline ?? req.query?.debugPipeline,
+        false,
+      );
+      let debugOutputDir = null;
+      let debugStep = 0;
+      const writeDebugSnapshot = (stepName, value) => {
+        if (!debugPipeline) {
+          return;
+        }
+        if (!debugOutputDir) {
+          const debugRunId = `upload-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+          debugOutputDir = path.join(__dirname, "debug-upload", debugRunId);
+          fs.mkdirSync(debugOutputDir, { recursive: true });
+        }
+        debugStep += 1;
+        const filename = `${String(debugStep).padStart(2, "0")}-${stepName}.json`;
+        fs.writeFileSync(
+          path.join(debugOutputDir, filename),
+          JSON.stringify(value, null, 2),
+        );
+      };
 
       const adjlist = getAdjacencyListFromDot(graph);
+      writeDebugSnapshot("adjacency-list", adjlist);
 
       // Graph transforms (see pipeline.js module banner for semantics):
       // loadPlan → mergeState → moduleNodes → moduleMeta → filterDataSources → dotEdges →
       // diffs → existingEdges → filterDataSources → genericEdges → edgeLists → pruneShortcuts →
       // externals → edgeLists → dataFlow → edgeLists → facetStore → omitVpcPlumbing → orphans →
       // roleCleanup → visualIgnore → orphans → enrichment → persist.
+      // Parse the Terraform plan into the initial node map.
       let nodes = loadPlanAndNodes(plan);
+      writeDebugSnapshot("load-plan-and-nodes", nodes);
+      // Merge state-only details (if present) into the plan-derived nodes.
       nodes = mergeTerraformState(nodes, state);
+      writeDebugSnapshot("merge-terraform-state", nodes);
+      // Ensure module container nodes exist for nested resources.
       nodes = ensureTerraformModuleNodes(nodes);
+      writeDebugSnapshot("ensure-terraform-module-nodes", nodes);
+      // Attach module metadata (paths/names) from the raw plan.
       nodes = applyModuleMetadata(nodes, plan);
+      writeDebugSnapshot("apply-module-metadata", nodes);
+      // Drop data source nodes that are not in the allowlist.
       nodes = omitNonAllowlistedDataSourceNodes(nodes);
+      writeDebugSnapshot("omit-non-allowlisted-data-sources-1", nodes);
+      // Build edges discovered from the DOT adjacency list.
       nodes = buildNewEdges(nodes, adjlist);
+      writeDebugSnapshot("build-new-edges", nodes);
 
+      // Compute create/update/delete/no-op diff status per resource.
       nodes = computeResourceDiffs(nodes);
+      writeDebugSnapshot("compute-resource-diffs", nodes);
+      // Add edges that can be inferred directly from plan references.
       nodes = buildExistingEdges(nodes, plan);
+      writeDebugSnapshot("build-existing-edges", nodes);
+      // Re-apply allowlist filtering after edge reconstruction.
       nodes = omitNonAllowlistedDataSourceNodes(nodes);
+      writeDebugSnapshot("omit-non-allowlisted-data-sources-2", nodes);
+      // Remove data sources that only exist in state and not in plan.
       nodes = omitStateOnlyDataSourceNodes(nodes);
+      writeDebugSnapshot("omit-state-only-data-sources", nodes);
+      // Detect generic parent/child structural relationships as edges.
       nodes = detectGenericStructuralEdges(nodes);
+      writeDebugSnapshot("detect-generic-structural-edges", nodes);
+      // Normalize edge containers so later passes can safely append.
       nodes = ensureEdgeLists(nodes);
-      nodes = pruneRedundantStructuralEdges(nodes);
+      writeDebugSnapshot("ensure-edge-lists-1", nodes);
+      // Remove duplicate or shortcut structural edges (scope configurable on upload).
+      nodes = pruneRedundantStructuralEdges(nodes, { mode: structuralPruneMode });
+      writeDebugSnapshot("prune-redundant-structural-edges", nodes);
+      // Mark or normalize references to external (out-of-graph) resources.
       nodes = externalResources(nodes);
+      writeDebugSnapshot("external-resources", nodes);
+      // Re-normalize edge lists after external resource adjustments.
       nodes = ensureEdgeLists(nodes);
+      writeDebugSnapshot("ensure-edge-lists-2", nodes);
+      // Infer IAM semantic data-flow edges and SG networking edges.
       nodes = buildDataFlowEdges(nodes);
+      writeDebugSnapshot("build-data-flow-edges", nodes);
+      nodes = buildNetworkingEdges(nodes);
+      writeDebugSnapshot("build-networking-edges", nodes);
+      // Ensure edge lists are present before final pruning passes.
       nodes = ensureEdgeLists(nodes);
+      writeDebugSnapshot("ensure-edge-lists-3", nodes);
+      // Drop synthetic IAM policy document nodes that should not render.
       nodes = omitGhostIamPolicyDocumentNodes(nodes);
+      writeDebugSnapshot("omit-ghost-iam-policy-document-nodes", nodes);
       // Facets must capture routing plumbing before those nodes are removed.
       nodes.__networkingFacetStore = extractVpcNetworkingFacetStore(nodes);
+      writeDebugSnapshot("extract-vpc-networking-facet-store", nodes);
+      // Remove low-level VPC plumbing nodes after facet extraction.
       nodes = omitVpcPlumbingNodes(nodes);
+      writeDebugSnapshot("omit-vpc-plumbing-nodes", nodes);
+      // Prune nodes that no longer have valid graph connectivity.
       nodes = deleteOrphanedNodes(nodes);
+      writeDebugSnapshot("delete-orphaned-nodes-1", nodes);
+      // Clean inconsistent or stale IAM role linkage metadata.
       nodes = cleanUpRoleLinks(nodes);
+      writeDebugSnapshot("clean-up-role-links", nodes);
+      // Remove nodes flagged to be hidden from visual output.
       nodes = filterVisualIgnore(nodes);
+      writeDebugSnapshot("filter-visual-ignore", nodes);
+      // Run orphan cleanup again after visibility filtering.
       nodes = deleteOrphanedNodes(nodes);
+      writeDebugSnapshot("delete-orphaned-nodes-2", nodes);
 
       const enrichment = mockLanggraphEnrichment(nodes);
       applyEnrichment(nodes, enrichment);
 
       const inserted = db.insert(uploads).values({
         data: JSON.stringify(nodes),
-        planFilename: planFile.originalname,
-        dotFilename: dotFile.originalname,
+        planFilename: planFile?.originalname ?? null,
+        dotFilename: dotFile?.originalname ?? null,
         stateFilename: stateFile?.originalname || null,
         nodeCount: Object.keys(nodes).filter((k) => !k.startsWith("__")).length,
       }).returning({ id: uploads.id }).get();
 
-      return res.json({ id: inserted.id });
+      return res.json({
+        id: inserted.id,
+        debugPipeline: debugPipeline
+          ? { enabled: true, outputDir: debugOutputDir }
+          : undefined,
+      });
     } catch (error) {
       console.error(error);
       return res.status(500).json({
@@ -226,7 +374,10 @@ async function renderUploadAs(rendererId, req, res) {
     const result = await renderer.render({
       nodes,
       ir,
-      options: { layoutEngine: req.query.layoutEngine },
+      options: {
+        layoutEngine: req.query.layoutEngine,
+        vpcEndpointSnapping: req.query.vpcEndpointSnapping,
+      },
     });
 
     res.setHeader("Content-Type", result.contentType || renderer.contentType);

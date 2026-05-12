@@ -13,9 +13,13 @@ module "vpc" {
   name = var.vpc_name
   cidr = var.vpc_cidr
 
-  azs           = local.azs
-  intra_subnets = var.intra_subnet_cidrs
+  azs             = local.azs
+  public_subnets  = var.public_subnet_cidrs
+  private_subnets = var.private_subnet_cidrs
+  intra_subnets   = var.intra_subnet_cidrs
 
+  enable_nat_gateway   = true
+  single_nat_gateway   = var.single_nat_gateway
   enable_dns_support   = true
   enable_dns_hostnames = true
 
@@ -64,9 +68,12 @@ module "managed_service_endpoints" {
 
   endpoints = {
     s3 = {
-      service         = "s3"
-      service_type    = "Gateway"
-      route_table_ids = module.vpc.intra_route_table_ids
+      service      = "s3"
+      service_type = "Gateway"
+      route_table_ids = distinct(concat(
+        module.vpc.intra_route_table_ids,
+        module.vpc.private_route_table_ids,
+      ))
     }
     sqs = {
       service             = "sqs"

@@ -12,6 +12,24 @@
 const { nodesToExcalidraw } = require("../excalidraw");
 
 const SUPPORTED_LAYOUT_ENGINES = new Set(["elk", "force"]);
+const FALSEY_OPTION_VALUES = new Set(["0", "false", "no", "off", "disabled"]);
+
+const parseBooleanOption = (value, fallback = true) => {
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (value == null) {
+    return fallback;
+  }
+  const normalized = String(value).trim().toLowerCase();
+  if (!normalized) {
+    return fallback;
+  }
+  if (FALSEY_OPTION_VALUES.has(normalized)) {
+    return false;
+  }
+  return true;
+};
 
 /**
  * @param {{ nodes: object, ir: import("../diagram-ir").DiagramIR, options: object }} input
@@ -25,8 +43,15 @@ async function render({ nodes, options = {} }) {
   const layoutEngine = SUPPORTED_LAYOUT_ENGINES.has(requestedEngine)
     ? requestedEngine
     : undefined;
+  const vpcEndpointSnapping = parseBooleanOption(
+    options.vpcEndpointSnapping,
+    true,
+  );
 
-  const scene = await nodesToExcalidraw(nodes, { layoutEngine });
+  const scene = await nodesToExcalidraw(nodes, {
+    layoutEngine,
+    vpcEndpointSnapping,
+  });
   return {
     contentType: "application/json",
     fileExtension: "excalidraw",

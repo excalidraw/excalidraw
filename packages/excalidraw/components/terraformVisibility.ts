@@ -1,35 +1,47 @@
 import {
-  isArrowElement,
   isBindableElement,
+  isLinearElement,
   newElementWith,
 } from "@excalidraw/element";
+
+import type { Scene } from "@excalidraw/element";
 
 import type {
   ExcalidrawBindableElement,
   ExcalidrawElement,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
+
+import type { PointerDownState } from "../types";
 
 import { pointFrom } from "@excalidraw/math";
 
 import type { LocalPoint } from "@excalidraw/math";
 
+import { isTerraformSemanticOverviewScene } from "./terraformElementMetadata";
+
 /**
  * Terraform-import scene helpers: soft-hide (`isDeleted`) for filtered views, explode
- * expand/collapse for dependency neighborhoods, and arrow rebind after layout changes.
+ * expand/collapse for dependency neighborhoods, and edge rebind after layout changes.
  * Element `customData` is written by `packages/backend/excalidraw.js`.
  */
 
 type TerraformLayerState = {
   dependencyLayerEnabled?: boolean;
   dataFlowLayerEnabled?: boolean;
+  networkingLayerEnabled?: boolean;
 };
 
 const getCustomData = (element: ExcalidrawElement) => element.customData ?? {};
 
-/** `"dependency"` | `"dataFlow"` for Terraform arrows, or null for non-terraform edges. */
+/** `"dependency"` | `"dataFlow"` | `"networking"` for Terraform edges, or null for non-terraform edges. */
 export const getTerraformEdgeLayer = (element: ExcalidrawElement) => {
   const layer = getCustomData(element).terraformEdgeLayer;
-  return layer === "dependency" || layer === "dataFlow" ? layer : null;
+  return layer === "dependency" ||
+    layer === "dataFlow" ||
+    layer === "networking"
+    ? layer
+    : null;
 };
 
 /**
@@ -43,6 +55,76 @@ export const getTerraformVisibilityKey = (element: ExcalidrawElement) => {
     customData.nodePath ||
     null
   );
+};
+
+/**
+ * After {@link mirrorAndDetachTerraformResourceLabels}, card titles are plain text with
+ * `containerId: null`, so {@link dragSelectedElements} does not move them with the rectangle.
+ * Call once per drag step (after `dragSelectedElements`) so labels track the same delta as
+ * their card (including snap), using `pointerDownState.originalElements` for baselines.
+ */
+export const syncTerraformDetachedResourceLabelsWithDraggedCards = (
+  scene: Scene,
+  pointerDownState: PointerDownState,
+  selectedElements: readonly NonDeletedExcalidrawElement[],
+): void => {
+  const labelByVisibilityKey = new Map<string, NonDeletedExcalidrawElement>();
+  for (const el of scene.getNonDeletedElements()) {
+    if (el.type !== "text" || el.isDeleted) {
+      continue;
+    }
+    if ("containerId" in el && el.containerId) {
+      continue;
+    }
+    const cd = getCustomData(el);
+    if (
+      !cd.terraform ||
+      cd.terraformVisibilityRole !== "resource" ||
+      typeof cd.nodePath !== "string"
+    ) {
+      continue;
+    }
+    const key = getTerraformVisibilityKey(el);
+    if (!key) {
+      continue;
+    }
+    labelByVisibilityKey.set(key, el);
+  }
+
+  for (const element of selectedElements) {
+    if (element.isDeleted || element.type !== "rectangle") {
+      continue;
+    }
+    const cd = getCustomData(element);
+    if (cd.terraformVisibilityRole !== "resource") {
+      continue;
+    }
+    const key = getTerraformVisibilityKey(element);
+    if (!key) {
+      continue;
+    }
+    const origRect = pointerDownState.originalElements.get(element.id);
+    if (!origRect) {
+      continue;
+    }
+    const dx = element.x - origRect.x;
+    const dy = element.y - origRect.y;
+    if (dx === 0 && dy === 0) {
+      continue;
+    }
+    const label = labelByVisibilityKey.get(key);
+    if (!label || label.id === element.id) {
+      continue;
+    }
+    const origLabel = pointerDownState.originalElements.get(label.id);
+    if (!origLabel) {
+      continue;
+    }
+    scene.mutateElement(label, {
+      x: origLabel.x + dx,
+      y: origLabel.y + dy,
+    });
+  }
 };
 
 // --- Element classification (roles written by the backend exporter) ---
@@ -190,6 +272,9 @@ const deriveLayerState = (
   dataFlowLayerEnabled:
     overrides.dataFlowLayerEnabled ??
     elements.some((element) => getTerraformEdgeLayer(element) === "dataFlow"),
+  networkingLayerEnabled:
+    overrides.networkingLayerEnabled ??
+    elements.some((element) => getTerraformEdgeLayer(element) === "networking"),
 });
 
 const clamp = (value: number, min: number, max: number) =>
@@ -285,12 +370,26 @@ const fixedPointForAbsolutePoint = (
   ];
 };
 
-const collectTerraformDependencyPairKeys = (
+const isTerraformNetworkingDependencyEdge = (
+  element: ExcalidrawElement,
+) =>
+  getTerraformEdgeLayer(element) === "networking" &&
+  getCustomData(element).relationship &&
+  typeof getCustomData(element).relationship === "object" &&
+  (getCustomData(element).relationship as { type?: string }).type ===
+    "networking_dependency";
+
+/** Unordered pairs that have a DOT structural dependency line (generic or networking-primitive subset). */
+const collectTerraformStructuralDependencyPairKeys = (
   elements: readonly ExcalidrawElement[],
 ) => {
   const keys = new Set<string>();
   for (const element of elements) {
-    if (getTerraformEdgeLayer(element) !== "dependency") {
+    const layer = getTerraformEdgeLayer(element);
+    if (
+      layer !== "dependency" &&
+      !(layer === "networking" && isTerraformNetworkingDependencyEdge(element))
+    ) {
       continue;
     }
     const relationship = getCustomData(element).relationship;
@@ -313,7 +412,17 @@ const collectTerraformResourceRects = (
       continue;
     }
     const customData = getCustomData(element);
+    if (customData.terraformAwsIconGlyph === true) {
+      continue;
+    }
     if (customData.terraformVisibilityRole !== "resource") {
+      continue;
+    }
+    // Detached card labels mirror `terraformVisibilityKey` / role from the rectangle
+    // (`mirrorAndDetachTerraformResourceLabels`). Only **card** shapes may anchor edges;
+    // otherwise the map keeps the last matching element (often text) and bindings
+    // miss drags on the rectangle.
+    if (element.type !== "rectangle") {
       continue;
     }
     const key = getTerraformVisibilityKey(element);
@@ -327,32 +436,46 @@ const collectTerraformResourceRects = (
 // --- Arrow geometry (mirrors backend binding math for client-side updates) ---
 
 /**
- * Recomputes Terraform dependency / data-flow arrow geometry and orbit bindings from
- * current resource rectangle positions. Call after visibility toggles so edges stay
- * attached when soft-delete temporarily cleared arrow bindings.
+ * Recomputes Terraform dependency / data-flow / networking edge geometry and orbit
+ * bindings from current resource rectangle positions. Call after visibility toggles
+ * so edges stay attached when soft-delete temporarily cleared edge bindings.
  */
 export const repairTerraformEdgeBindings = (
   elements: readonly ExcalidrawElement[],
 ): ExcalidrawElement[] => {
-  const resourceRects = collectTerraformResourceRects(elements);
-  const dependencyPairKeys = collectTerraformDependencyPairKeys(elements);
+  /** Legacy scenes used `line`; Excalidraw binding updates only run for `arrow`. */
+  const normalizedElements = elements.map((element) => {
+    if (
+      getTerraformEdgeLayer(element) &&
+      isLinearElement(element) &&
+      element.type === "line" &&
+      (element.startBinding ?? element.endBinding)
+    ) {
+      return newElementWith(element, { type: "arrow" });
+    }
+    return element;
+  });
 
-  const boundArrowIdsByRect = new Map<string, Set<string>>();
+  const resourceRects = collectTerraformResourceRects(normalizedElements);
+  const structuralDependencyPairKeys =
+    collectTerraformStructuralDependencyPairKeys(normalizedElements);
 
-  const addBoundArrow = (rectId: string, arrowId: string) => {
-    let set = boundArrowIdsByRect.get(rectId);
+  const boundEdgeIdsByRect = new Map<string, Set<string>>();
+
+  const addBoundEdge = (rectId: string, edgeId: string) => {
+    let set = boundEdgeIdsByRect.get(rectId);
     if (!set) {
       set = new Set();
-      boundArrowIdsByRect.set(rectId, set);
+      boundEdgeIdsByRect.set(rectId, set);
     }
-    set.add(arrowId);
+    set.add(edgeId);
   };
 
-  const updated = elements.map((element) => {
+  const updated = normalizedElements.map((element) => {
     const layer = getTerraformEdgeLayer(element);
     if (
       !layer ||
-      !isArrowElement(element) ||
+      !isLinearElement(element) ||
       element.isDeleted ||
       element.points.length < 2
     ) {
@@ -385,7 +508,7 @@ export const repairTerraformEdgeBindings = (
     let startFixed: [number, number];
     let endFixed: [number, number];
 
-    if (layer === "dependency") {
+    if (layer === "dependency" || isTerraformNetworkingDependencyEdge(element)) {
       const pts = getCenterClippedBindingPoints(posA, posB, wA, hA, wB, hB);
       startPoint = pts.startPoint;
       endPoint = pts.endPoint;
@@ -395,7 +518,7 @@ export const repairTerraformEdgeBindings = (
       const pairKey = [relationship.source, relationship.target]
         .sort()
         .join("|||");
-      const offset = dependencyPairKeys.has(pairKey) ? 18 : 0;
+      const offset = structuralDependencyPairKeys.has(pairKey) ? 18 : 0;
       const raw = getCenterClippedBindingPoints(posA, posB, wA, hA, wB, hB);
       const shifted = offsetLineSegment(
         raw.startPoint,
@@ -413,8 +536,8 @@ export const repairTerraformEdgeBindings = (
     const endX = endPoint.x;
     const endY = endPoint.y;
 
-    addBoundArrow(rectA.id, element.id);
-    addBoundArrow(rectB.id, element.id);
+    addBoundEdge(rectA.id, element.id);
+    addBoundEdge(rectB.id, element.id);
 
     return newElementWith(element, {
       x: startX,
@@ -439,16 +562,16 @@ export const repairTerraformEdgeBindings = (
   });
 
   return updated.map((element) => {
-    const arrowIds = boundArrowIdsByRect.get(element.id);
-    if (!arrowIds || !isBindableElement(element)) {
+    const edgeIds = boundEdgeIdsByRect.get(element.id);
+    if (!edgeIds || !isBindableElement(element)) {
       return element;
     }
 
     let boundElements = element.boundElements?.slice() ?? [];
-    for (const arrowId of arrowIds) {
-      if (!boundElements.some((entry) => entry.id === arrowId)) {
+    for (const edgeId of edgeIds) {
+      if (!boundElements.some((entry) => entry.id === edgeId)) {
         boundElements = boundElements.concat({
-          id: arrowId,
+          id: edgeId,
           type: "arrow",
         });
       }
@@ -458,23 +581,27 @@ export const repairTerraformEdgeBindings = (
   });
 };
 
-/** Applies soft-delete to arrows and group wrappers based on visible resource keys and layer flags. */
-const reconcileTerraformVisibility = (
+/** Applies soft-delete to edges and group wrappers based on visible resource keys and layer flags. */
+export const reconcileTerraformVisibility = (
   elements: readonly ExcalidrawElement[],
   overrides: TerraformLayerState = {},
 ) => {
   const visibleKeys = getVisibleTerraformKeys(elements);
   const layerState = deriveLayerState(elements, overrides);
+  const semanticScene = isTerraformSemanticOverviewScene(elements);
 
   return elements.map((element) => {
     if (isTerraformGroupElement(element)) {
       const shouldShow = groupHasVisibleChild(element, visibleKeys);
-      if (element.isDeleted === !shouldShow && element.opacity === 100) {
+      if (
+        element.isDeleted === !shouldShow &&
+        (semanticScene || element.opacity === 100)
+      ) {
         return element;
       }
       return newElementWith(element, {
         isDeleted: !shouldShow,
-        opacity: 100,
+        ...(semanticScene ? {} : { opacity: 100 }),
         customData: clearPreviewCustomData(element.customData),
       });
     }
@@ -484,19 +611,25 @@ const reconcileTerraformVisibility = (
       return element;
     }
 
-    const shouldShow =
-      (layer === "dependency"
+    const layerEnabled =
+      layer === "dependency"
         ? layerState.dependencyLayerEnabled
-        : layerState.dataFlowLayerEnabled) &&
-      edgeEndpointsAreVisible(element, visibleKeys);
+        : layer === "dataFlow"
+          ? layerState.dataFlowLayerEnabled
+          : layerState.networkingLayerEnabled;
+    const shouldShow =
+      layerEnabled && edgeEndpointsAreVisible(element, visibleKeys);
 
-    if (element.isDeleted === !shouldShow && element.opacity === 100) {
+    if (
+      element.isDeleted === !shouldShow &&
+      (semanticScene || element.opacity === 100)
+    ) {
       return element;
     }
 
     return newElementWith(element, {
       isDeleted: !shouldShow,
-      opacity: 100,
+      ...(semanticScene ? {} : { opacity: 100 }),
       customData: clearPreviewCustomData(element.customData),
     });
   });
@@ -504,7 +637,7 @@ const reconcileTerraformVisibility = (
 
 /**
  * Expands or collapses dependency neighbors of a category/resource card: toggles `terraformExploded`,
- * soft-hides non-primary children when collapsing, then reconciles visibility and arrow bindings.
+ * soft-hides non-primary children when collapsing, then reconciles visibility and edge bindings.
  */
 export const toggleTerraformExplode = (
   elements: readonly ExcalidrawElement[],
@@ -604,6 +737,7 @@ const collectTerraformParentKeysWithChildren = (
 export const expandAllTerraformExplode = (
   elements: readonly ExcalidrawElement[],
 ): ExcalidrawElement[] => {
+  const semanticScene = isTerraformSemanticOverviewScene(elements);
   const keysWithChildren = collectTerraformParentKeysWithChildren(elements);
   const next = elements.map((element) => {
     const customData = getCustomData(element);
@@ -620,6 +754,7 @@ export const expandAllTerraformExplode = (
       customData: {
         ...clearPreviewCustomData(element.customData),
         terraformExploded: keysWithChildren.has(key),
+        ...(semanticScene ? { terraformExpandAllView: true as const } : {}),
       },
     });
   });
@@ -630,6 +765,7 @@ export const expandAllTerraformExplode = (
 export const collapseAllTerraformExplode = (
   elements: readonly ExcalidrawElement[],
 ): ExcalidrawElement[] => {
+  const semanticScene = isTerraformSemanticOverviewScene(elements);
   const next = elements.map((element) => {
     const customData = getCustomData(element);
     if (customData.terraformVisibilityRole !== "resource") {
@@ -640,6 +776,17 @@ export const collapseAllTerraformExplode = (
       return element;
     }
     const shouldShow = isInitiallyVisibleTerraformElement(element);
+    if (semanticScene) {
+      return newElementWith(element, {
+        isDeleted: false,
+        opacity: 100,
+        customData: {
+          ...clearPreviewCustomData(element.customData),
+          terraformExploded: false,
+          terraformExpandAllView: false,
+        },
+      });
+    }
     return newElementWith(element, {
       isDeleted: !shouldShow,
       opacity: 100,

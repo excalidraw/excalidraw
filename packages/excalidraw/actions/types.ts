@@ -146,6 +146,7 @@ export type ActionName =
   | "toggleLassoTool"
   | "toggleShapeSwitch"
   | "togglePolygon"
+  | "terraformInspect"
   | "toggleTerraformExplode";
 
 export type PanelComponentProps = {

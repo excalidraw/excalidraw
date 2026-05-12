@@ -2,7 +2,7 @@
  * Terraform processed `nodes` map → Excalidraw v2 scene (elements + minimal `appState`).
  *
  * Orchestrates `excalidraw-elements.js`, `excalidraw-layout.js`, and `excalidraw-arrows.js`.
- * See those modules for phase-specific logic (icons/tiers, force layout / VPC snaps, edges/arrows).
+ * See those modules for phase-specific logic (icons/tiers, force layout / VPC snaps, edges/lines).
  */
 const { extractVpcNetworkingFacetStore } = require("./vpc-networking-facet");
 const {
@@ -27,7 +27,7 @@ const {
   applyModulePresets,
   pinSyntheticTerraformModuleHubs,
   getResourceType,
-  isPrimaryVisibleResourceType,
+  isInitiallyVisibleTerraformNode,
   getVisibilityCustomData,
   getModulePathChain,
   getPrimaryAction,
@@ -82,30 +82,57 @@ const {
   collectDirectedEdges,
   coalesceRelationshipPairs,
   collectDataFlowEdges,
+  collectNetworkingEdges,
   buildTerraformExplodeParentMap,
   getCenterClippedBindingPoints,
   offsetLineSegment,
   fixedPointForAbsolutePoint,
+  strokeColorForTerraformDependencyKinds,
 } = require("./excalidraw-arrows");
+const { partitionDirectedEdgesByNetworking } = require("./terraform-networking-vertex");
+
+/** Matches browser ELK `TERRAFORM_NETWORKING_EDGE_STROKE`. */
+const TERRAFORM_NETWORKING_EDGE_STROKE = "#228be6";
 
 /**
  * Converts enriched Terraform `nodes` (post-pipeline) into an Excalidraw document: nested frames,
- * resource cards, dependency + data-flow arrows, and `customData` consumed by the editor.
+ * resource cards, dependency + data-flow lines, and `customData` consumed by the editor.
  *
  * `options.layoutEngine`: `"elk"` (default, layered) or `"force"` (legacy d3-force). When
  * unset, falls back to the `TF_LAYOUT_ENGINE` env var, then to `"elk"`.
+ * `options.vpcEndpointSnapping`: when `false`, excludes `aws_vpc_endpoint` resources from
+ * VPC perimeter snapping while keeping other perimeter appliance snapping behavior.
  */
 async function nodesToExcalidraw(nodes, options = {}) {
+  // Choose layout backend (`elk` layered by default, or `force` if requested).
   const layoutEngineId = resolveLayoutEngine(options.layoutEngine);
+  // Feature flag: when false, VPC endpoints are not snapped to perimeter walls.
+  const vpcEndpointSnapping = options.vpcEndpointSnapping !== false;
+  // Buckets of emitted Excalidraw elements; concatenated at the end in z-order.
   const nodeElements = [];
   const locationElements = [];
   const moduleElements = [];
-  const arrowElements = [];
+  const edgeElements = [];
+  // 1) Build the core graph model and helper indexes from post-pipeline `nodes`.
+  // Real Terraform nodes only (skip metadata keys like `__networkingFacetStore`).
   const nodeKeys = Object.keys(nodes).filter((key) => !key.startsWith("__"));
+  // Nodes considered "perimeter appliances" (LB/endpoint/etc.) for optional wall snapping.
   const perimeterSet = new Set(
-    nodeKeys.filter((p) => isVpcPerimeterNode(p, nodes[p])),
+    nodeKeys.filter((p) => {
+      if (!isVpcPerimeterNode(p, nodes[p])) {
+        return false;
+      }
+      if (vpcEndpointSnapping) {
+        return true;
+      }
+      return getResourceType(p) !== "aws_vpc_endpoint";
+    }),
   );
+  // Structural graph edges merged from pipeline (`edges_new` + `edges_existing`).
   const directedEdges = collectDirectedEdges(nodes);
+  const { dependencyEdges, networkingDependencyEdges } =
+    partitionDirectedEdgesByNetworking(nodes, directedEdges);
+  // Perimeter appliances are snapped in a post-pass, so keep them out of solver edges.
   const directedEdgesForLayout =
     VPC_PERIMETER_LAYOUT_ENABLED && perimeterSet.size > 0
       ? directedEdges.filter(
@@ -113,15 +140,30 @@ async function nodesToExcalidraw(nodes, options = {}) {
             !perimeterSet.has(edge.source) && !perimeterSet.has(edge.target),
         )
       : directedEdges;
-  const relationships = coalesceRelationshipPairs(directedEdges);
+  const relationships = coalesceRelationshipPairs(dependencyEdges);
+  const networkingRelationships =
+    coalesceRelationshipPairs(networkingDependencyEdges);
+  const networkingRecordEdgesAll = collectNetworkingEdges(nodes);
+  const netDepPairKeys = new Set(
+    networkingDependencyEdges.map((e) =>
+      [e.source, e.target].sort().join("|||"),
+    ),
+  );
+  const networkingRecordEdgesFiltered = networkingRecordEdgesAll.filter(
+    (r) => !netDepPairKeys.has([r.source, r.target].sort().join("|||")),
+  );
+  // Semantic data-flow edges (IAM policy semantics only); networking SG peers are separate.
   const dataFlowEdges = collectDataFlowEdges(nodes);
+  // Undirected adjacency map used by frontend "explode neighborhood" interactions.
   const explodeParentMap = buildTerraformExplodeParentMap(
     nodeKeys,
     directedEdges,
     dataFlowEdges,
+    networkingRecordEdgesAll,
   );
-  const dependencyPairKeys = new Set(
-    relationships
+  /** Dependency + networking-dependency pairs (non-perimeter): offsets IAM data-flow / SG record lines. */
+  const structuralPairKeys = new Set(
+    [...relationships, ...networkingRelationships]
       .filter(
         ({ source, target }) =>
           !isVpcPerimeterNode(source, nodes[source]) &&
@@ -129,11 +171,16 @@ async function nodesToExcalidraw(nodes, options = {}) {
       )
       .map(({ source, target }) => [source, target].sort().join("|||")),
   );
+  // Infer geographic/account placement for account/region containers.
   const nodeLocationMap = buildNodeLocationMap(nodes);
+  // Infer VPC membership for each node (explicit refs + heuristics).
   const nodeVpcMap = buildNodeVpcMap(nodes);
+  // Infer subnet membership for each node (handles multi-subnet cases).
   const nodeSubnetMap = buildNodeSubnetMap(nodes, nodeVpcMap);
+  // Preserve networking summaries before routing-plumbing nodes are stripped from graph.
   const networkingFacetStore =
     nodes.__networkingFacetStore || extractVpcNetworkingFacetStore(nodes);
+  // Build per-container (VPC/subnet) facet payloads used for labels/panels/tiles.
   const containerFacetContributors = buildContainerFacetContributors({
     nodes,
     nodeLocationMap,
@@ -141,7 +188,9 @@ async function nodesToExcalidraw(nodes, options = {}) {
     nodeSubnetMap,
     networkingFacetStore,
   });
+  // Module grouping metadata (depth, label, source/version, members).
   const moduleGroups = collectModuleGroups(nodeKeys, nodes);
+  // Hierarchy for large framing rectangles: account -> region -> vpc -> subnet.
   const accountRegionGroups = expandNetworkContainerGroupsWithModuleMembership(
     collectAccountRegionGroups(
       nodeKeys,
@@ -157,12 +206,17 @@ async function nodesToExcalidraw(nodes, options = {}) {
   const moduleGroupIdByPath = new Map(
     moduleGroups.map((group) => [group.modulePath, `module-group-${rand()}`]),
   );
+  // Quick lookup for module metadata when expanding collapsed module layout blocks.
   const moduleGroupByPath = new Map(
     moduleGroups.map((group) => [group.modulePath, group]),
   );
 
+  // 2) Collapse nested modules for the global layout solve.
+  // Tier map gives a coarse "importance/level" rank used by both layout engines.
   const tierMap = buildTierMap(nodeKeys);
+  // Select modules that should collapse into one synthetic layout vertex.
   const collapsibleModules = buildCollapsibleModuleSet(moduleGroups);
+  // Collapsed model: layout ids, reduced edges, per-layout tier, module->member mapping.
   const { layoutNodeKeys, layoutEdges, layoutTierMap, moduleMembers } =
     buildCollapsedLayoutModel(
       nodeKeys,
@@ -170,11 +224,13 @@ async function nodesToExcalidraw(nodes, options = {}) {
       tierMap,
       collapsibleModules,
     );
+  // Nodes that actually participate in the solver (exclude perimeter-snap outliers).
   const layoutSimulationKeys = filterLayoutSimulationKeys(
     layoutNodeKeys,
     moduleMembers,
     perimeterSet,
   );
+  // Visual size/style presets for concrete nodes and collapsed module blocks.
   const tierConfigs = buildTierConfigs(tierMap, nodeKeys.length);
   const layoutTierConfigs = buildTierConfigs(
     layoutTierMap,
@@ -187,9 +243,12 @@ async function nodesToExcalidraw(nodes, options = {}) {
     tierConfigs,
   );
 
+  // Engine dispatch: ELK layered unless user explicitly requests d3-force.
   const useElk = layoutEngineId !== "force";
   const layoutEngine = useElk ? elkLayout : forceLayout;
+  // For fast membership checks while assembling nesting groups.
   const layoutSimulationKeySet = new Set(layoutSimulationKeys);
+  // Map every concrete node to the layout id that represents it in collapsed solve.
   const nodeToLayoutId = new Map();
   for (const [modulePath, members] of moduleMembers) {
     for (const member of members) {
@@ -202,6 +261,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     }
   }
   const elkNestingGroups = [];
+  // ELK-only grouping hint: keep VPC peers spatially cohesive.
   if (useElk) {
     for (const accountGroup of accountRegionGroups) {
       for (const regionGroup of accountGroup.regions || []) {
@@ -213,6 +273,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
               memberLayoutIds.add(layoutId);
             }
           }
+          // Nesting one member gives no value; require at least two.
           if (memberLayoutIds.size < 2) {
             continue;
           }
@@ -232,6 +293,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     layoutSizes,
     useElk ? { nestingGroups: elkNestingGroups } : {},
   );
+  // 3) Expand collapsed module anchors into per-resource coordinates.
   const positions = expandCollapsedModulePositions(
     layoutPositions,
     nodeKeys,
@@ -241,6 +303,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     tierConfigs,
   );
   const recursivelyLaidOutModules = new Set();
+  // Modules already covered by expansion should skip static presets to avoid double-offsetting.
   for (const members of moduleMembers.values()) {
     for (const nodePath of members) {
       for (const modulePath of getModulePathChain(nodePath)) {
@@ -251,6 +314,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
   applyModulePresets(positions, nodeKeys, moduleGroupByPath, {
     skipModulePaths: recursivelyLaidOutModules,
   });
+  // 4) Terraform-specific post-layout passes (perimeter snap + synthetic hub pinning).
   const perimeterWallByNodePath = snapVpcPerimeterResourcePositions(
     positions,
     accountRegionGroups,
@@ -259,6 +323,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     perimeterSet,
     nodes,
   );
+  // Safety net: every perimeter node must have coordinates for downstream element emission.
   for (const path of perimeterSet) {
     const pos = positions[path];
     if (!pos || typeof pos.x !== "number" || typeof pos.y !== "number") {
@@ -272,23 +337,29 @@ async function nodesToExcalidraw(nodes, options = {}) {
     tierMap,
     tierConfigs,
   );
+  // `posMap`: nodePath -> emitted rectangle/text ids + rectangle geometry.
   const posMap = {};
+  // `nodeRectById`: emitted rectangle id -> rectangle element (for edge bindings).
   const nodeRectById = new Map();
 
-  // --- rectangles + labels + icons ---
+  // 5) Emit resource cards (rectangles + labels + optional service icons).
   for (let i = 0; i < nodeKeys.length; i++) {
     const nodePath = nodeKeys[i];
     const tier = tierMap[nodePath];
     const cfg = tierConfigs[tier];
     const { x, y } = positions[nodePath];
     const resourceType = getResourceType(nodePath);
-    const initiallyVisible = isPrimaryVisibleResourceType(resourceType);
+    const initiallyVisible = isInitiallyVisibleTerraformNode(
+      nodePath,
+      nodes[nodePath],
+    );
     const visibilityCustomData = getVisibilityCustomData(
       nodePath,
       initiallyVisible,
       [...(explodeParentMap.get(nodePath) || [])].sort(),
     );
     const groupId = `node-${rand()}`;
+    // Group stack: node-local group + ancestor module groups (outermost last).
     const moduleGroupIds = getModulePathChain(nodePath)
       .reverse()
       .map((modulePath) => moduleGroupIdByPath.get(modulePath))
@@ -297,6 +368,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
 
     const rectId = `rect-${i}`;
     const textId = `text-${i}`;
+    // Store for edge routing/binding and later container membership checks.
     posMap[nodePath] = { x, y, w: cfg.w, h: cfg.h, rectId, textId };
 
     const action = getPrimaryAction(nodes[nodePath]);
@@ -343,6 +415,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
             ? "dashed"
             : "solid",
       customData: {
+        // Canonical Terraform metadata consumed by UI panels/filters/hover behavior.
         terraform: true,
         ...visibilityCustomData,
         resourceType,
@@ -366,7 +439,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     nodeElements.push(rectElement);
     nodeRectById.set(rectId, rectElement);
 
-    // Text: shifted right if icon present
+    // Text label: shifted right to reserve icon gutter when an icon is present.
     const textX = x + iconArea + 8;
     const textW = cfg.w - iconArea - 16;
 
@@ -479,7 +552,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     const strokeColor =
       MODULE_STROKES[(group.depth - 1) % MODULE_STROKES.length];
     const initiallyVisible = group.nodePaths.some((nodePath) =>
-      isPrimaryVisibleResourceType(getResourceType(nodePath)),
+      isInitiallyVisibleTerraformNode(nodePath, nodes[nodePath]),
     );
     const groupVisibilityCustomData = {
       terraformVisibilityRole: "group",
@@ -684,7 +757,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
     const accountLabelId = `account-label-${accountBoxIndex}`;
     accountBoxIndex += 1;
     const accountInitiallyVisible = accountGroup.nodePaths.some((nodePath) =>
-      isPrimaryVisibleResourceType(getResourceType(nodePath)),
+      isInitiallyVisibleTerraformNode(nodePath, nodes[nodePath]),
     );
     const accountVisibilityCustomData = {
       terraformVisibilityRole: "group",
@@ -791,7 +864,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
       const regionLabelId = `region-label-${regionBoxIndex}`;
       regionBoxIndex += 1;
       const regionInitiallyVisible = regionGroup.nodePaths.some((nodePath) =>
-        isPrimaryVisibleResourceType(getResourceType(nodePath)),
+        isInitiallyVisibleTerraformNode(nodePath, nodes[nodePath]),
       );
       const regionVisibilityCustomData = {
         terraformVisibilityRole: "group",
@@ -911,7 +984,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
         const vpcLabelId = `vpc-label-${vpcBoxIndex}`;
         vpcBoxIndex += 1;
         const vpcInitiallyVisible = vpcGroup.nodePaths.some((nodePath) =>
-          isPrimaryVisibleResourceType(getResourceType(nodePath)),
+          isInitiallyVisibleTerraformNode(nodePath, nodes[nodePath]),
         );
         const vpcVisibilityCustomData = {
           terraformVisibilityRole: "group",
@@ -1103,9 +1176,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
             SUBNET_PADDING_BOTTOM;
           const subnetBoxId = `subnet-box-${vpcBoxIndex}-${rand()}`;
           const subnetLabelId = `subnet-label-${vpcBoxIndex}-${rand()}`;
-          const subnetInitiallyVisible = subnetGroup.nodePaths.some(
-            (nodePath) =>
-              isPrimaryVisibleResourceType(getResourceType(nodePath)),
+          const subnetInitiallyVisible = subnetGroup.nodePaths.some((nodePath) =>
+            isInitiallyVisibleTerraformNode(nodePath, nodes[nodePath]),
           );
           const subnetVisibilityCustomData = {
             terraformVisibilityRole: "group",
@@ -1209,8 +1281,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
     }
   }
 
-  // --- dependency lines ---
-  let arrowIdx = 0;
+  // 6) Emit structural dependency lines.
+  let edgeIdx = 0;
   for (const relationship of relationships) {
     const {
       source,
@@ -1223,15 +1295,16 @@ async function nodesToExcalidraw(nodes, options = {}) {
     } = relationship;
     const posA = posMap[source];
     const posB = posMap[target];
-    const arrowId = `arrow-${arrowIdx++}`;
+    const edgeId = `edge-${edgeIdx++}`;
 
     const rectA = nodeRectById.get(posA.rectId);
     const rectB = nodeRectById.get(posB.rectId);
+    // Skip malformed relationships where one endpoint never emitted.
     if (!rectA || !rectB) {
       continue;
     }
-    rectA.boundElements.push({ id: arrowId, type: "arrow" });
-    rectB.boundElements.push({ id: arrowId, type: "arrow" });
+    rectA.boundElements.push({ id: edgeId, type: "arrow" });
+    rectB.boundElements.push({ id: edgeId, type: "arrow" });
 
     const { startFixed, endFixed, startPoint, endPoint } =
       getCenterClippedBindingPoints(posA, posB, posA.w, posA.h, posB.w, posB.h);
@@ -1241,10 +1314,28 @@ async function nodesToExcalidraw(nodes, options = {}) {
     const endX = endPoint.x;
     const endY = endPoint.y;
 
-    arrowElements.push(
+    const sourceAction = nodes[source]
+      ? getPrimaryAction(nodes[source])
+      : null;
+    const targetAction = nodes[target]
+      ? getPrimaryAction(nodes[target])
+      : null;
+    const dependencyStrokeColor = strokeColorForTerraformDependencyKinds(
+      kinds,
+      {
+        origins,
+        sourceAction,
+        targetAction,
+      },
+    );
+
+    const dependencyStartArrowhead = bidirectional ? "arrow" : null;
+    const dependencyEndArrowhead = "arrow";
+
+    edgeElements.push(
       makeBaseElement({
         type: "arrow",
-        id: arrowId,
+        id: edgeId,
         x: startX,
         y: startY,
         width: Math.abs(endX - startX),
@@ -1253,6 +1344,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
           [0, 0],
           [endX - startX, endY - startY],
         ],
+        polygon: false,
+        strokeColor: dependencyStrokeColor,
         startBinding: {
           elementId: posA.rectId,
           fixedPoint: startFixed,
@@ -1263,13 +1356,13 @@ async function nodesToExcalidraw(nodes, options = {}) {
           fixedPoint: endFixed,
           mode: "orbit",
         },
-        startArrowhead: null,
-        endArrowhead: null,
+        startArrowhead: dependencyStartArrowhead,
+        endArrowhead: dependencyEndArrowhead,
         strokeStyle: "solid",
         roundness: { type: 2 },
         isDeleted:
-          !isPrimaryVisibleResourceType(getResourceType(source)) ||
-          !isPrimaryVisibleResourceType(getResourceType(target)),
+          !isInitiallyVisibleTerraformNode(source, nodes[source]) ||
+          !isInitiallyVisibleTerraformNode(target, nodes[target]),
         customData: {
           terraform: true,
           terraformEdgeLayer: "dependency",
@@ -1290,7 +1383,196 @@ async function nodesToExcalidraw(nodes, options = {}) {
     );
   }
 
-  // --- data-flow lines ---
+  // 6b) DOT dependency edges between networking primitives (distinct stroke / layer).
+  for (const relationship of networkingRelationships) {
+    const {
+      source,
+      target,
+      directed,
+      bidirectional,
+      directions,
+      kinds,
+      origins,
+    } = relationship;
+    const posA = posMap[source];
+    const posB = posMap[target];
+    const edgeId = `edge-netdep-${edgeIdx++}`;
+
+    const rectA = nodeRectById.get(posA.rectId);
+    const rectB = nodeRectById.get(posB.rectId);
+    if (!rectA || !rectB) {
+      continue;
+    }
+    rectA.boundElements.push({ id: edgeId, type: "arrow" });
+    rectB.boundElements.push({ id: edgeId, type: "arrow" });
+
+    const { startFixed, endFixed, startPoint, endPoint } =
+      getCenterClippedBindingPoints(posA, posB, posA.w, posA.h, posB.w, posB.h);
+
+    const startX = startPoint.x;
+    const startY = startPoint.y;
+    const endX = endPoint.x;
+    const endY = endPoint.y;
+
+    const dependencyStartArrowhead = bidirectional ? "arrow" : null;
+    const dependencyEndArrowhead = "arrow";
+
+    edgeElements.push(
+      makeBaseElement({
+        type: "arrow",
+        id: edgeId,
+        x: startX,
+        y: startY,
+        width: Math.abs(endX - startX),
+        height: Math.abs(endY - startY),
+        points: [
+          [0, 0],
+          [endX - startX, endY - startY],
+        ],
+        polygon: false,
+        strokeColor: TERRAFORM_NETWORKING_EDGE_STROKE,
+        strokeWidth: 2,
+        startBinding: {
+          elementId: posA.rectId,
+          fixedPoint: startFixed,
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: posB.rectId,
+          fixedPoint: endFixed,
+          mode: "orbit",
+        },
+        startArrowhead: dependencyStartArrowhead,
+        endArrowhead: dependencyEndArrowhead,
+        strokeStyle: "solid",
+        roundness: { type: 2 },
+        isDeleted:
+          !isInitiallyVisibleTerraformNode(source, nodes[source]) ||
+          !isInitiallyVisibleTerraformNode(target, nodes[target]),
+        customData: {
+          terraform: true,
+          terraformEdgeLayer: "networking",
+          relationship: {
+            source,
+            target,
+            type: "networking_dependency",
+            label: "depends on",
+            origin: "terraform_graph",
+            directions,
+            kinds,
+            origins,
+            directed,
+            bidirectional,
+          },
+        },
+      }),
+    );
+  }
+
+  // 6c) `edges_networking` security-group peer lines (offset when structural deps exist).
+  for (const edge of networkingRecordEdgesFiltered) {
+    const {
+      source,
+      target,
+      type,
+      label,
+      origin,
+      detail,
+      bidirectional = false,
+      directions = [],
+    } = edge;
+    const posA = posMap[source];
+    const posB = posMap[target];
+    if (!posA || !posB) {
+      continue;
+    }
+
+    const rectA = nodeRectById.get(posA.rectId);
+    const rectB = nodeRectById.get(posB.rectId);
+    if (!rectA || !rectB) {
+      continue;
+    }
+
+    const edgeId = `networking-rec-edge-${edgeIdx++}`;
+    rectA.boundElements.push({ id: edgeId, type: "arrow" });
+    rectB.boundElements.push({ id: edgeId, type: "arrow" });
+
+    const { startPoint, endPoint } = getCenterClippedBindingPoints(
+      posA,
+      posB,
+      posA.w,
+      posA.h,
+      posB.w,
+      posB.h,
+    );
+    const pairKey = [source, target].sort().join("|||");
+    const shifted = offsetLineSegment(
+      startPoint,
+      endPoint,
+      structuralPairKeys.has(pairKey) ? 18 : 0,
+    );
+    const startX = shifted.startPoint.x;
+    const startY = shifted.startPoint.y;
+    const endX = shifted.endPoint.x;
+    const endY = shifted.endPoint.y;
+    const startFixed = fixedPointForAbsolutePoint(posA, shifted.startPoint);
+    const endFixed = fixedPointForAbsolutePoint(posB, shifted.endPoint);
+
+    const netStartArrowhead = bidirectional ? "arrow" : null;
+    const netEndArrowhead = "arrow";
+
+    edgeElements.push(
+      makeBaseElement({
+        type: "arrow",
+        id: edgeId,
+        x: startX,
+        y: startY,
+        width: Math.abs(endX - startX),
+        height: Math.abs(endY - startY),
+        points: [
+          [0, 0],
+          [endX - startX, endY - startY],
+        ],
+        polygon: false,
+        startBinding: {
+          elementId: posA.rectId,
+          fixedPoint: startFixed,
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: posB.rectId,
+          fixedPoint: endFixed,
+          mode: "orbit",
+        },
+        startArrowhead: netStartArrowhead,
+        endArrowhead: netEndArrowhead,
+        strokeColor: TERRAFORM_NETWORKING_EDGE_STROKE,
+        strokeWidth: 3,
+        strokeStyle: "solid",
+        roundness: { type: 2 },
+        isDeleted:
+          !isInitiallyVisibleTerraformNode(source, nodes[source]) ||
+          !isInitiallyVisibleTerraformNode(target, nodes[target]),
+        customData: {
+          terraform: true,
+          terraformEdgeLayer: "networking",
+          relationship: {
+            source,
+            target,
+            type,
+            label,
+            origin,
+            detail,
+            directions,
+            directed: !bidirectional,
+            bidirectional,
+          },
+        },
+      }),
+    );
+  }
+
+  // 7) Emit IAM data-flow lines (offset when they overlap structural dependency pairs).
   for (const edge of dataFlowEdges) {
     const {
       source,
@@ -1314,9 +1596,9 @@ async function nodesToExcalidraw(nodes, options = {}) {
       continue;
     }
 
-    const arrowId = `data-flow-arrow-${arrowIdx++}`;
-    rectA.boundElements.push({ id: arrowId, type: "arrow" });
-    rectB.boundElements.push({ id: arrowId, type: "arrow" });
+    const edgeId = `data-flow-edge-${edgeIdx++}`;
+    rectA.boundElements.push({ id: edgeId, type: "arrow" });
+    rectB.boundElements.push({ id: edgeId, type: "arrow" });
 
     const { startPoint, endPoint } = getCenterClippedBindingPoints(
       posA,
@@ -1327,10 +1609,11 @@ async function nodesToExcalidraw(nodes, options = {}) {
       posB.h,
     );
     const pairKey = [source, target].sort().join("|||");
+    // If a dependency edge exists on same pair, offset data-flow edge for readability.
     const shifted = offsetLineSegment(
       startPoint,
       endPoint,
-      dependencyPairKeys.has(pairKey) ? 18 : 0,
+      structuralPairKeys.has(pairKey) ? 18 : 0,
     );
     const startX = shifted.startPoint.x;
     const startY = shifted.startPoint.y;
@@ -1339,10 +1622,13 @@ async function nodesToExcalidraw(nodes, options = {}) {
     const startFixed = fixedPointForAbsolutePoint(posA, shifted.startPoint);
     const endFixed = fixedPointForAbsolutePoint(posB, shifted.endPoint);
 
-    arrowElements.push(
+    const dataFlowStartArrowhead = bidirectional ? "arrow" : null;
+    const dataFlowEndArrowhead = "arrow";
+
+    edgeElements.push(
       makeBaseElement({
         type: "arrow",
-        id: arrowId,
+        id: edgeId,
         x: startX,
         y: startY,
         width: Math.abs(endX - startX),
@@ -1351,6 +1637,7 @@ async function nodesToExcalidraw(nodes, options = {}) {
           [0, 0],
           [endX - startX, endY - startY],
         ],
+        polygon: false,
         startBinding: {
           elementId: posA.rectId,
           fixedPoint: startFixed,
@@ -1361,15 +1648,15 @@ async function nodesToExcalidraw(nodes, options = {}) {
           fixedPoint: endFixed,
           mode: "orbit",
         },
-        startArrowhead: bidirectional ? "arrow" : null,
-        endArrowhead: "arrow",
-        strokeColor: "#0ca678",
+        startArrowhead: dataFlowStartArrowhead,
+        endArrowhead: dataFlowEndArrowhead,
+        strokeColor: "#868e96",
         strokeWidth: 3,
         strokeStyle: "solid",
         roundness: { type: 2 },
         isDeleted:
-          !isPrimaryVisibleResourceType(getResourceType(source)) ||
-          !isPrimaryVisibleResourceType(getResourceType(target)),
+          !isInitiallyVisibleTerraformNode(source, nodes[source]) ||
+          !isInitiallyVisibleTerraformNode(target, nodes[target]),
         customData: {
           terraform: true,
           terraformEdgeLayer: "dataFlow",
@@ -1390,12 +1677,14 @@ async function nodesToExcalidraw(nodes, options = {}) {
   }
 
   const elementsOrdered = [
-    ...arrowElements,
+    // Order matters: framing containers/modules at bottom, then relationship lines, then resource cards.
     ...locationElements,
     ...moduleElements,
+    ...edgeElements,
     ...nodeElements,
   ];
 
+  // 8) Return an Excalidraw v2 scene payload consumed by import/render clients.
   return {
     type: "excalidraw",
     version: 2,

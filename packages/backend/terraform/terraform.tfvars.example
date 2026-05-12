@@ -1,0 +1,19 @@
+# Copy to terraform.tfvars (gitignored) and adjust.
+aws_profile    = "admin"
+aws_region     = "us-east-1"
+aws_account_id = "123456789012"
+
+# Optional: full ARN instead of aws_account_id + terraform_deploy_role_name
+# terraform_deploy_role_arn = "arn:aws:iam::123456789012:role/TerraformDeploy"
+
+# Bootstrap the deploy role (before Terraform can assume it) with:
+#   ./scripts/bootstrap-terraform-deploy-role.sh
+
+# NAT: false = one NAT per AZ (recommended for prod); true = single NAT (cheaper).
+# single_nat_gateway = true
+
+# Optional: same-region ACM cert ARN for HTTPS on the writer ALB (HTTP 80 redirects to 443).
+# alb_acm_certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# ALB deletion protection (default true). Set false only for disposable sandboxes.
+# alb_deletion_protection = false

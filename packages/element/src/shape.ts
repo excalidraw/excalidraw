@@ -50,6 +50,7 @@ import {
   isEmbeddableElement,
   isIframeElement,
   isIframeLikeElement,
+  isLineElement,
   isLinearElement,
 } from "./typeChecks";
 import { getCornerRadius, isPathALoop } from "./utils";
@@ -72,6 +73,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ElementsMap,
   ExcalidrawLineElement,
+  ExcalidrawArrowElement,
   Arrowhead,
 } from "./types";
 
@@ -923,9 +925,25 @@ const _generateElementShape = (
         shape = [generator.curve(points as unknown as RoughPoint[], options)];
       }
 
-      // add lines only in arrow
-      if (element.type === "arrow") {
-        const { startArrowhead = null, endArrowhead = "arrow" } = element;
+      // Arrowheads: type "arrow" always runs legacy defaults; type "line" only when heads are set
+      // (e.g. Terraform dependency edges emitted as lines with endArrowhead).
+      const lineWithArrowheads =
+        isLineElement(element) &&
+        (element.startArrowhead != null || element.endArrowhead != null);
+
+      if (element.type === "arrow" || lineWithArrowheads) {
+        let startArrowhead: Arrowhead | null;
+        let endArrowhead: Arrowhead | null;
+        if (element.type === "arrow") {
+          const arrowEl = element as ExcalidrawArrowElement;
+          startArrowhead = arrowEl.startArrowhead ?? null;
+          endArrowhead =
+            arrowEl.endArrowhead === undefined ? "arrow" : arrowEl.endArrowhead;
+        } else {
+          const lineEl = element as ExcalidrawLineElement;
+          startArrowhead = lineEl.startArrowhead ?? null;
+          endArrowhead = lineEl.endArrowhead ?? null;
+        }
 
         if (startArrowhead !== null) {
           const shapes = getArrowheadShapes(
@@ -942,10 +960,6 @@ const _generateElementShape = (
         }
 
         if (endArrowhead !== null) {
-          if (endArrowhead === undefined) {
-            // Hey, we have an old arrow here!
-          }
-
           const shapes = getArrowheadShapes(
             element,
             shape,

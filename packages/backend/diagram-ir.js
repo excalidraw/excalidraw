@@ -68,12 +68,13 @@ const {
   getModulePathChain,
   getPrimaryAction,
   getIconForType,
-  isPrimaryVisibleResourceType,
+  isInitiallyVisibleTerraformNode,
 } = require("./excalidraw-elements");
 
 const {
   collectDirectedEdges,
   collectDataFlowEdges,
+  strokeColorForTerraformDependencyKinds,
 } = require("./excalidraw-arrows");
 
 /**
@@ -152,7 +153,7 @@ function buildDiagramIR(nodes, options = {}) {
       modulePath,
       icon,
       data: {
-        primaryVisible: isPrimaryVisibleResourceType(resourceType),
+        primaryVisible: isInitiallyVisibleTerraformNode(nodePath, node),
       },
     });
 
@@ -183,6 +184,15 @@ function buildDiagramIR(nodes, options = {}) {
   const irEdges = [];
   let edgeIdx = 0;
   for (const edge of directed) {
+    const sourceNode = nodes[edge.source];
+    const targetNode = nodes[edge.target];
+    const sourceAction = sourceNode ? getPrimaryAction(sourceNode) : null;
+    const targetAction = targetNode ? getPrimaryAction(targetNode) : null;
+    const stroke = strokeColorForTerraformDependencyKinds(edge.kinds, {
+      origins: edge.origins,
+      sourceAction,
+      targetAction,
+    });
     irEdges.push({
       id: `dep_${edgeIdx++}`,
       source: edge.source,
@@ -190,6 +200,7 @@ function buildDiagramIR(nodes, options = {}) {
       kind: "dependency",
       directed: true,
       label: edge.label || null,
+      style: { stroke },
       data: edge.data ? { ...edge.data } : undefined,
     });
   }

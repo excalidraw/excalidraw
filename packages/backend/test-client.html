@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -45,21 +45,27 @@
   <body>
     <h1>Terraform Upload Tester</h1>
     <p class="muted">
-      Upload a plan JSON + DOT file. This tool will call backend upload endpoints,
-      fetch generated Excalidraw JSON, and print VPC/subnet container facets.
+      Upload <strong>plan JSON + DOT</strong> together (optional state to enrich), or
+      <strong>raw Terraform state alone</strong> (<code>terraform state pull</code> JSON with a
+      top-level <code>resources</code> array). This page calls the backend upload endpoint, fetches
+      Excalidraw JSON, and prints VPC/subnet container facets when present.
     </p>
     <form id="upload-form">
       <label>
-        Plan file (required)
-        <input id="plan-file" type="file" accept=".json,application/json" required />
+        Plan file (with DOT)
+        <input
+          id="plan-file"
+          type="file"
+          accept=".json,application/json"
+        />
       </label>
       <label>
-        DOT file (required)
-        <input id="dot-file" type="file" accept=".dot,text/plain" required />
+        DOT file (with plan)
+        <input id="dot-file" type="file" accept=".dot,text/plain" />
       </label>
       <label>
-        State file (optional)
-        <input id="state-file" type="file" accept=".json,application/json" />
+        State file (optional with plan+DOT, or alone)
+        <input id="state-file" type="file" accept=".tfstate,.json,application/json" />
       </label>
       <button type="submit">Upload + Validate Facets</button>
     </form>
@@ -110,13 +116,22 @@
           const dotFile = document.getElementById("dot-file").files[0];
           const stateFile = document.getElementById("state-file").files[0];
 
-          if (!planFile || !dotFile) {
-            throw new Error("Both plan and dot files are required.");
+          if ((planFile && !dotFile) || (!planFile && dotFile)) {
+            throw new Error(
+              "Select both plan and DOT, or clear both and upload a raw state file alone.",
+            );
+          }
+          if (!(planFile && dotFile) && !stateFile) {
+            throw new Error(
+              "Upload plan+DOT (optional state), or a raw Terraform state JSON file alone.",
+            );
           }
 
           const formData = new FormData();
-          formData.append("planFile", planFile);
-          formData.append("dotFile", dotFile);
+          if (planFile && dotFile) {
+            formData.append("planFile", planFile);
+            formData.append("dotFile", dotFile);
+          }
           if (stateFile) {
             formData.append("stateFile", stateFile);
           }
@@ -133,7 +148,9 @@
 
           statusEl.textContent = `Upload ok (id=${uploadBody.id}). Fetching Excalidraw scene...`;
 
-          const sceneResponse = await fetch(`/terraform/upload/${uploadBody.id}/excalidraw`);
+          const sceneResponse = await fetch(
+            `/terraform/upload/${uploadBody.id}/excalidraw`,
+          );
           const scene = await sceneResponse.json();
           if (!sceneResponse.ok) {
             throw new Error(scene.error || "Failed to fetch Excalidraw scene");

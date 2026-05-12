@@ -20,6 +20,7 @@ import { getCommonBounds } from "./bounds";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { getBoundTextElement } from "./textElement";
 import { getMinTextElementWidth } from "./textMeasurements";
+import { getFrameDescendants } from "./frame";
 import {
   isArrowElement,
   isElbowArrow,
@@ -77,8 +78,11 @@ export const dragSelectedElements = (
     .map((f) => f.id);
 
   if (frames.length > 0) {
-    for (const element of scene.getNonDeletedElements()) {
-      if (element.frameId !== null && frames.includes(element.frameId)) {
+    for (const frameId of frames) {
+      for (const element of getFrameDescendants(
+        scene.getNonDeletedElements(),
+        frameId,
+      )) {
         elementsToUpdate.add(element);
       }
     }

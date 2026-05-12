@@ -66,6 +66,7 @@ describe("DiagramIR", () => {
       source: "aws_lambda_function.worker",
       target: "aws_iam_role.worker",
       directed: true,
+      style: { stroke: "#2b8a3e" },
     });
   });
 
@@ -78,11 +79,12 @@ describe("DiagramIR", () => {
 });
 
 describe("Connector registry", () => {
-  it("exposes excalidraw and tldraw with the connector contract", () => {
+  it("exposes excalidraw, tldraw and reactflow with the connector contract", () => {
     const list = listRenderers();
     const ids = list.map((r) => r.id);
     expect(ids).toContain("excalidraw");
     expect(ids).toContain("tldraw");
+    expect(ids).toContain("reactflow");
 
     for (const id of Object.keys(REGISTRY)) {
       const renderer = REGISTRY[id];
@@ -128,6 +130,90 @@ describe("Connector registry", () => {
         shape.meta.terraformVisibilityKey,
     );
     expect(resource).toBeTruthy();
+  });
+
+  it("reactflow connector renders grouped subflow JSON", async () => {
+    const nodes = makeNodes();
+    const ir = buildDiagramIR(nodes);
+    const renderer = getRenderer("reactflow");
+    const result = await renderer.render({ nodes, ir, options: {} });
+    expect(result.contentType).toBe("application/json");
+    expect(result.fileExtension).toBe("reactflow.json");
+    expect(result.body.type).toBe("reactflow");
+    expect(Array.isArray(result.body.nodes)).toBe(true);
+    expect(Array.isArray(result.body.edges)).toBe(true);
+    expect(result.body.meta.paritySource).toBe("excalidraw-scene");
+    const duplicateIds = result.body.nodes
+      .map((node) => node.id)
+      .filter((id, idx, arr) => arr.indexOf(id) !== idx);
+    expect(duplicateIds).toEqual([]);
+    expect(
+      result.body.nodes.some(
+        (node) => node.type === "tfResource" || node.type === "tfContainer",
+      ),
+    ).toBe(true);
+  });
+
+  it("connectors expose changed non-primary resources as initially visible", async () => {
+    const address = "aws_iam_role_policy.updated";
+    const nodes = {
+      [address]: {
+        resources: {
+          [address]: {
+            address,
+            type: "aws_iam_role_policy",
+            name: "updated",
+            change: { actions: "update" },
+          },
+        },
+        edges_new: [],
+        edges_existing: [],
+        edges_data_flow: [],
+      },
+    };
+
+    const excalidrawResult = await getRenderer("excalidraw").render({
+      nodes,
+      ir: buildDiagramIR(nodes),
+      options: {},
+    });
+    const excalidrawRect = excalidrawResult.body.elements.find(
+      (element) =>
+        element.type === "rectangle" &&
+        element.customData?.nodePath === address,
+    );
+    expect(excalidrawRect).toMatchObject({
+      isDeleted: false,
+      customData: {
+        action: "update",
+        terraformInitiallyVisible: true,
+      },
+    });
+
+    const tldrawResult = await getRenderer("tldraw").render({
+      nodes,
+      ir: buildDiagramIR(nodes),
+      options: {},
+    });
+    const tldrawShape = tldrawResult.body.shapes.find(
+      (shape) => shape.meta?.terraformVisibilityKey === address,
+    );
+    expect(tldrawShape?.meta).toMatchObject({
+      action: "update",
+      terraformInitiallyVisible: true,
+      terraformVisibilityRole: "resource",
+    });
+
+    const reactflowResult = await getRenderer("reactflow").render({
+      nodes,
+      ir: buildDiagramIR(nodes),
+      options: {},
+    });
+    expect(
+      reactflowResult.body.nodes.some(
+        (node) => node.data?.action === "update" && node.data?.resourceType === "aws_iam_role_policy",
+      ),
+    ).toBe(true);
   });
 
   it("tldraw connector preserves soft-hidden terraform arrows for explode flows", async () => {

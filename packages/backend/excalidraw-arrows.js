@@ -223,11 +223,83 @@ function collectDataFlowEdges(nodes) {
   return collected;
 }
 
-/** Adjacency of nodes that share a dependency or data-flow edge (for explode UI in the editor). */
+/** Normalizes `edges_networking` into drawable pairs (SG peers), merging bidirectional duplicates. */
+function collectNetworkingEdges(nodes) {
+  const edgeMap = new Map();
+
+  for (const [source, node] of Object.entries(nodes)) {
+    if (source.startsWith("__")) {
+      continue;
+    }
+    for (const edge of node.edges_networking || []) {
+      const target = edge.target;
+      if (!nodes[source] || !nodes[target] || source === target) {
+        continue;
+      }
+
+      const type = edge.type || "networking";
+      const label = edge.label || type;
+      const origin = edge.origin || "networking_inferred";
+      const key = `${source}|||${target}|||${type}|||${label}`;
+      if (!edgeMap.has(key)) {
+        edgeMap.set(key, {
+          source,
+          target,
+          type,
+          label,
+          origin,
+          detail: edge.detail || null,
+        });
+      }
+    }
+  }
+
+  const pairMap = new Map();
+  for (const edge of edgeMap.values()) {
+    const pairKey = [edge.source, edge.target].sort().join("|||");
+    if (!pairMap.has(pairKey)) {
+      pairMap.set(pairKey, []);
+    }
+    pairMap.get(pairKey).push(edge);
+  }
+
+  const collected = [];
+  for (const edges of pairMap.values()) {
+    const directions = new Set(
+      edges.map((edge) => `${edge.source}|||${edge.target}`),
+    );
+    if (directions.size <= 1) {
+      collected.push(...edges);
+      continue;
+    }
+
+    const [source, target] = [edges[0].source, edges[0].target].sort();
+    const labels = [...new Set(edges.map((edge) => edge.label))];
+    const types = [...new Set(edges.map((edge) => edge.type))];
+    collected.push({
+      source,
+      target,
+      type: types.length === 1 ? types[0] : "bidirectional_networking",
+      label: labels.join(" / "),
+      origin: [...new Set(edges.map((edge) => edge.origin))].join(", "),
+      detail: edges
+        .map((edge) => edge.detail)
+        .filter(Boolean)
+        .join(", "),
+      bidirectional: true,
+      directions: edges,
+    });
+  }
+
+  return collected;
+}
+
+/** Adjacency of nodes that share a dependency, data-flow, or networking-record edge (explode UI). */
 function buildTerraformExplodeParentMap(
   nodeKeys,
   directedEdges,
   dataFlowEdges,
+  networkingEdges,
 ) {
   const nodeKeySet = new Set(nodeKeys);
   const parentMap = new Map(nodeKeys.map((nodeKey) => [nodeKey, new Set()]));
@@ -252,6 +324,15 @@ function buildTerraformExplodeParentMap(
     addPair(edge.source, edge.target);
     for (const direction of edge.directions || []) {
       addPair(direction.source, direction.target);
+    }
+  }
+
+  if (networkingEdges) {
+    for (const edge of networkingEdges) {
+      addPair(edge.source, edge.target);
+      for (const direction of edge.directions || []) {
+        addPair(direction.source, direction.target);
+      }
     }
   }
 
@@ -283,6 +364,94 @@ function fixedPointForAbsolutePoint(pos, point) {
   ];
 }
 
+/** Same hexes as `packages/excalidraw/components/terraformElkLayout.ts` dependency strokes. */
+const TERRAFORM_DEPENDENCY_EDGE_NEW_ONLY = "#2b8a3e";
+const TERRAFORM_DEPENDENCY_EDGE_EXISTING_ONLY = "#1971c2";
+const TERRAFORM_DEPENDENCY_EDGE_DELETE = "#c92a2a";
+const TERRAFORM_DEPENDENCY_EDGE_REPLACE = "#f08c00";
+
+const PLANNED_DEPENDENCY_KIND = "planned_dependency";
+const EXISTING_DEPENDENCY_KIND = "existing_dependency";
+
+/**
+ * Coerces `kinds` / `origins` into canonical dependency kind tokens for coloring.
+ * Never passes a string into `new Set(kinds)` (that would iterate characters).
+ */
+function normalizeTerraformDependencyKindTokens(kinds, origins) {
+  const tokens = [];
+
+  const pushKind = (k) => {
+    if (k === PLANNED_DEPENDENCY_KIND || k === EXISTING_DEPENDENCY_KIND) {
+      tokens.push(k);
+    }
+  };
+
+  if (Array.isArray(kinds)) {
+    for (const k of kinds) {
+      if (typeof k === "string") {
+        pushKind(k);
+      }
+    }
+  } else if (typeof kinds === "string") {
+    pushKind(kinds);
+  } else if (kinds && typeof kinds === "object") {
+    for (const v of Object.values(kinds)) {
+      if (typeof v === "string") {
+        pushKind(v);
+      }
+    }
+  }
+
+  if (tokens.length === 0) {
+    const originList = Array.isArray(origins)
+      ? origins
+      : typeof origins === "string"
+        ? [origins]
+        : [];
+    for (const o of originList) {
+      if (o === "dot") {
+        tokens.push(PLANNED_DEPENDENCY_KIND);
+      }
+      if (o === "terraform_state") {
+        tokens.push(EXISTING_DEPENDENCY_KIND);
+      }
+    }
+  }
+
+  return tokens;
+}
+
+/**
+ * Line stroke for merged dependency `kinds` from `collectDirectedEdges` /
+ * `coalesceRelationshipPairs` (`planned_dependency` = DOT/plan, `existing_dependency` = prior state).
+ *
+ * @param {unknown} kinds - Array of kind strings, or a single kind string, or empty / malformed.
+ * @param {{ origins?: unknown, sourceAction?: string|null, targetAction?: string|null }} [options]
+ */
+function strokeColorForTerraformDependencyKinds(kinds, options = {}) {
+  const { origins, sourceAction, targetAction } = options || {};
+
+  if (sourceAction === "delete" || targetAction === "delete") {
+    return TERRAFORM_DEPENDENCY_EDGE_DELETE;
+  }
+  if (sourceAction === "replace" || targetAction === "replace") {
+    return TERRAFORM_DEPENDENCY_EDGE_REPLACE;
+  }
+
+  const tokens = normalizeTerraformDependencyKindTokens(kinds, origins);
+  const set = new Set(tokens);
+  const hasNew = set.has(PLANNED_DEPENDENCY_KIND);
+  const hasExisting = set.has(EXISTING_DEPENDENCY_KIND);
+  // Prior-state / depends_on wins over DOT adjacency: existing (alone or with new) → blue.
+  if (hasExisting) {
+    return TERRAFORM_DEPENDENCY_EDGE_EXISTING_ONLY;
+  }
+  if (hasNew) {
+    return TERRAFORM_DEPENDENCY_EDGE_NEW_ONLY;
+  }
+  return "#1e1e1e";
+}
+
 module.exports = {
   clamp,
   getEdgePointTowardTarget,
@@ -290,7 +459,10 @@ module.exports = {
   collectDirectedEdges,
   coalesceRelationshipPairs,
   collectDataFlowEdges,
+  collectNetworkingEdges,
   buildTerraformExplodeParentMap,
   offsetLineSegment,
   fixedPointForAbsolutePoint,
+  normalizeTerraformDependencyKindTokens,
+  strokeColorForTerraformDependencyKinds,
 };

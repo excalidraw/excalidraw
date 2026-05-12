@@ -1,21 +1,21 @@
 # Backend (`@excalidraw/backend`)
 
-Express API that turns a Terraform or OpenTofu **plan JSON**, a **`terraform graph` DOT** file, and an optional **state JSON** into a stored dependency graph you can open as an **Excalidraw** diagram (nodes, edges, and layout hints derived from the plan).
+Express API that turns Terraform or OpenTofu **plan JSON** + **`terraform graph` DOT** together, and/or a **raw state JSON** (`terraform state pull` shape with a top-level `resources` array), into a stored dependency graph you can open as an **Excalidraw** diagram (nodes, edges, and layout hints derived from the plan and/or state).
 
 ![Sample Terraform/OpenTofu diagram opened in Excalidraw](../../docs/terraform-canvas-aws-icons.png)
 
 ## How it fits together
 
-1. **Plan JSON** (`terraform show -json` / `tofu show -json`) supplies resource metadata, changes, module paths, and references.
-2. **DOT** (`terraform graph -type=plan` / `tofu graph -type=plan`) supplies adjacency; it is parsed with `graphlib-dot`.
-3. **State** (optional) improves fidelity for existing resources and `depends_on` style relationships.
+1. **Plan JSON** (`terraform show -json` / `tofu show -json`) supplies resource metadata, changes, module paths, and references (when uploaded with DOT).
+2. **DOT** (`terraform graph -type=plan` / `tofu graph -type=plan`) supplies adjacency; it is parsed with `graphlib-dot` (when uploaded with plan).
+3. **State** — optional **with** plan+DOT to merge live `tfstate` instances into nodes; or upload **state alone** to build a graph from current state only (no DOT structural edges from Terraform graph).
 
 **Indexed resources:** plan addresses often include `[...]` for `count` / `for_each`, while graph DOT typically uses stripped resource ids. The pipeline keeps **full plan addresses** as node keys where needed and reconciles DOT edges by stripping indexes on the fly so instances are not collapsed into a single node.
 
 ## Package layout
 
 | File | Role |
-|------|------|
+| --- | --- |
 | `index.js` | HTTP routes, multipart upload, SQLite persistence |
 | `pipeline.js` | Graph build: plan → nodes, DOT adjacency, state merge, IAM/data-flow edges, filtering |
 | `diagram-ir.js` | Renderer-neutral IR (nodes/edges/groups) built from the pipeline `nodes` map |
@@ -66,25 +66,53 @@ yarn workspace @excalidraw/backend test
 ## Endpoints
 
 | Method | Route | Description |
-|--------|-------|-------------|
-| POST | `/terraform/upload` | Upload a Terraform/OpenTofu plan JSON, DOT graph, and optional state file. Returns an upload id. |
+| --- | --- | --- |
+| POST | `/terraform/upload` | Upload plan JSON + DOT together, and/or a raw state file. Returns an upload id. |
 | GET | `/terraform/upload/:id` | Fetch the processed Terraform graph nodes for an upload. |
 | GET | `/terraform/renderers` | Lists available frontend connectors (`excalidraw`, `tldraw`, …) and their status. |
 | GET | `/terraform/upload/:id/render/:renderer` | Render the processed graph through the named connector. `:renderer` is the id from `/terraform/renderers`. |
 | GET | `/terraform/upload/:id/excalidraw` | **Deprecated alias** for `/render/excalidraw`. Sets `Deprecation: true`. |
-| GET | `/terraform/test-client` | Open a lightweight browser UI to upload plan+dot files and inspect VPC/subnet facet summaries from generated Excalidraw output. |
+| GET | `/terraform/test-client` | Open a lightweight browser UI to upload plan+DOT, plan+DOT+state, or state-only, and inspect facet summaries from generated Excalidraw output. |
 
-Unknown renderer ids return HTTP 404 with the available ids in the body. A
-renderer that exists but isn't implemented yet returns
-HTTP 501 with `{ renderer, details }`.
+Unknown renderer ids return HTTP 404 with the available ids in the body. A renderer that exists but isn't implemented yet returns HTTP 501 with `{ renderer, details }`.
 
 `POST /terraform/upload` expects multipart form fields:
 
 | Field | Required | Description |
-|-------|----------|-------------|
-| `planFile` | Yes | JSON output from `terraform show -json` or `tofu show -json`. |
-| `dotFile` | Yes | DOT output from `terraform graph` or `tofu graph`. |
-| `stateFile` | No | Terraform/OpenTofu state JSON. Helps preserve existing resources and edges. |
+| --- | --- | --- |
+| `planFile` | With `dotFile` | JSON output from `terraform show -json` or `tofu show -json`. Omit when uploading state-only. |
+| `dotFile` | With `planFile` | DOT output from `terraform graph` / `tofu graph`. Omit when uploading state-only. |
+| `stateFile` | Alternative to plan+DOT | Raw Terraform state JSON (top-level `resources` array), e.g. `terraform state pull`. Optional extra field when `planFile` and `dotFile` are both supplied (merges into plan-derived nodes). |
+
+## Run the `allplanmodules` fixture through the backend
+
+From the repo root, start the backend:
+
+```bash
+yarn dev:backend
+```
+
+In another terminal, upload the checked-in fixture:
+
+```bash
+curl -sS -X POST "http://localhost:3000/terraform/upload" \
+  -F "planFile=@packages/backend/terraform/allplanmodules.json" \
+  -F "dotFile=@packages/backend/terraform/allplanmodules.dot" \
+  -F "structuralPruneMode=module-only" \
+  -F "debugPipeline=true"
+```
+
+The response includes an `id` (and debug output path when enabled). Render that upload as Excalidraw:
+
+```bash
+curl -sS "http://localhost:3000/terraform/upload/<ID>/excalidraw?layoutEngine=elk&vpcEndpointSnapping=true"
+```
+
+Or via the connector route:
+
+```bash
+curl -sS "http://localhost:3000/terraform/upload/<ID>/render/excalidraw?layoutEngine=elk&vpcEndpointSnapping=true"
+```
 
 ## Generate Terraform Inputs
 
@@ -223,7 +251,7 @@ This is expected when running from a JSON plan only. Rover still builds the visu
 The backend creates local runtime artifacts:
 
 | Path | Purpose |
-|------|---------|
+| --- | --- |
 | `packages/backend/graph.db` | SQLite upload store. |
 | `packages/backend/uploads/` | Temporary multer uploads. |
 | `packages/backend/terraform/*.json`, `*.dot`, plan files | Sample/generated Terraform artifacts. |
