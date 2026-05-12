@@ -59,7 +59,10 @@ export function isTerraformNetworkingVertex(
 /** Split DOT dependency edges: both endpoints networking → networking layer; else dependency layer. */
 export function partitionDirectedEdgesByNetworking<
   T extends { source: string; target: string },
->(nodes: TerraformPlanNodesMap, edges: readonly T[]): {
+>(
+  nodes: TerraformPlanNodesMap,
+  edges: readonly T[],
+): {
   dependencyEdges: T[];
   networkingDependencyEdges: T[];
 } {

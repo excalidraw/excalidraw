@@ -97,30 +97,6 @@ function collectSecurityGroupRulePeerRefs(rule) {
   return out;
 }
 
-function getModulePathChainFromAddress(nodePath = "") {
-  const parts = nodePath.split(".");
-  const chain = [];
-  let cursor = "";
-
-  for (let index = 0; index < parts.length - 1; ) {
-    if (parts[index] !== "module" || !parts[index + 1]) {
-      break;
-    }
-    const segment = `module.${parts[index + 1]}`;
-    cursor = cursor ? `${cursor}.${segment}` : segment;
-    chain.push(cursor);
-    index += 2;
-  }
-
-  return chain;
-}
-
-/** Deepest Terraform module path containing this resource address, or null if root module. */
-function getTerraformOwningModulePath(resourceNodePath = "") {
-  const chain = getModulePathChainFromAddress(resourceNodePath);
-  return chain.length ? chain[chain.length - 1] : null;
-}
-
 /** Registers a Terraform address key (full or index-stripped) → node path in the data-flow index. */
 function addToAddressIndex(index, key, nodePath) {
   if (!key || !nodePath) {
@@ -495,7 +471,12 @@ function collectReferenceScalars(value, parentKey = "", out = []) {
 }
 
 /** Resolves references with key-aware type narrowing and generic fallback. */
-export function resolveNodeRefsAcrossAllResourceTypes(value, index, nodes, options = {}) {
+export function resolveNodeRefsAcrossAllResourceTypes(
+  value,
+  index,
+  nodes,
+  options = {},
+) {
   const matches = new Set();
   const allTypes = [...index.byType.keys()];
   const ignoredKeys = new Set(
@@ -519,115 +500,6 @@ export function resolveNodeRefsAcrossAllResourceTypes(value, index, nodes, optio
   }
 
   return [...matches];
-}
-
-/**
- * Generic resolver: derive structural targets by resolving references found in
- * resource values, then include owning module nodes for those targets.
- */
-function createGenericResourceReferenceResolver(options = {}) {
-  return {
-    id: "generic-resource-references",
-    match() {
-      return true;
-    },
-    resolve(_nodePath, node, context) {
-      const targets = new Set();
-
-      for (const resource of Object.values(node.resources || {})) {
-        const values = getResourceValues(resource);
-        for (const resourcePath of resolveNodeRefsAcrossAllResourceTypes(
-          values,
-          context.index,
-          context.nodes,
-          { ignoredKeys: options.ignoredReferenceKeys },
-        )) {
-          if (context.nodes[resourcePath]) {
-            targets.add(resourcePath);
-          }
-          const modulePath = getTerraformOwningModulePath(resourcePath);
-          if (modulePath && context.nodes[modulePath]) {
-            targets.add(modulePath);
-          }
-        }
-      }
-
-      if (targets.size === 0) {
-        return { policy: "ignore", targets: [] };
-      }
-
-      return { policy: "replace", targets: [...targets] };
-    },
-  };
-}
-
-/**
- * Applies resolver rules to structural edges. Resolvers run in order; first matching
- * actionable rule (`replace` / `augment`) wins for each node.
- */
-function refineEdgesWithResolvers(nodes, resolvers = []) {
-  const context = {
-    nodes,
-    index: buildDataFlowIndex(nodes),
-  };
-
-  for (const [nodePath, node] of Object.entries(nodes)) {
-    if (nodePath.startsWith("__")) {
-      continue;
-    }
-
-    for (const resolver of resolvers) {
-      if (!resolver?.match?.(nodePath, node, context)) {
-        continue;
-      }
-      const outcome = resolver.resolve(nodePath, node, context) || {};
-      const policy = outcome.policy || "ignore";
-      const targets = [...new Set(outcome.targets || [])].filter(
-        (target) => target && nodes[target] && target !== nodePath,
-      );
-
-      if (policy === "replace") {
-        if (targets.length > 0) {
-          node.edges_new = targets;
-          node.edges_existing = targets;
-        }
-        break;
-      }
-
-      if (policy === "augment") {
-        if (targets.length > 0) {
-          node.edges_new = [...new Set([...(node.edges_new || []), ...targets])];
-          node.edges_existing = [...new Set([...(node.edges_existing || []), ...targets])];
-        }
-        break;
-      }
-    }
-  }
-
-  return nodes;
-}
-
-/**
- * Generic structural edge refinement via resolver rules.
- * Accepts optional custom resolvers prepended before defaults.
- */
-function detectGenericStructuralEdges(nodes, options = {}) {
-  const customResolvers = Array.isArray(options.customResolvers)
-    ? options.customResolvers
-    : [];
-  const disabled = new Set(options.disabledDefaultResolverIds || []);
-  const defaultResolvers = [createGenericResourceReferenceResolver(options)].filter(
-    (resolver) => !disabled.has(resolver.id),
-  );
-  return refineEdgesWithResolvers(nodes, [...customResolvers, ...defaultResolvers]);
-}
-
-/**
- * Backward-compatible alias for legacy call sites/tests.
- * Name kept for historical reasons; behavior is generic, not alarm-specific.
- */
-function refineCloudWatchMetricAlarmEdges(nodes, options = {}) {
-  return detectGenericStructuralEdges(nodes, options);
 }
 
 /** Maps an IAM policy Resource ARN/string to data-flow target nodes (S3, SQS, etc.) using ARN index heuristics. */
@@ -776,7 +648,13 @@ export function buildNetworkingEdges(nodes) {
     }
     allKeys.add(key);
     nodes[source].edges_networking ||= [];
-    nodes[source].edges_networking.push({ target, type, label, origin, detail });
+    nodes[source].edges_networking.push({
+      target,
+      type,
+      label,
+      origin,
+      detail,
+    });
   };
 
   for (const [nodePath, node] of Object.entries(nodes)) {
@@ -831,7 +709,9 @@ export function buildNetworkingEdges(nodes) {
         ];
         const peers = new Set();
         for (const pr of peerPool) {
-          for (const p of resolveNodeRefs(pr, index, nodes, ["aws_security_group"])) {
+          for (const p of resolveNodeRefs(pr, index, nodes, [
+            "aws_security_group",
+          ])) {
             peers.add(p);
           }
         }
@@ -855,7 +735,10 @@ export function buildNetworkingEdges(nodes) {
       if (type === "aws_vpc_endpoint") {
         const svc =
           typeof values.service_name === "string" ? values.service_name : "";
-        for (const ref of [values.security_group_ids, values.security_group_id]) {
+        for (const ref of [
+          values.security_group_ids,
+          values.security_group_id,
+        ]) {
           for (const sg of resolveNodeRefs(ref, index, nodes, [
             "aws_security_group",
           ])) {

@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 import { buildResourceCloudWatchCluster } from "./terraformTopologyCloudWatchLinks";
+
+import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
 describe("terraformTopologyCloudWatchLinks", () => {
   it("attaches Lambda metric alarms by AWS/Lambda FunctionName dimension", () => {
@@ -172,10 +173,12 @@ describe("terraformTopologyCloudWatchLinks", () => {
     };
 
     expect(
-      buildResourceCloudWatchCluster(nodes, "aws_s3_bucket.data").cluster?.alarms,
+      buildResourceCloudWatchCluster(nodes, "aws_s3_bucket.data").cluster
+        ?.alarms,
     ).toEqual(["aws_cloudwatch_metric_alarm.bucket_size"]);
     expect(
-      buildResourceCloudWatchCluster(nodes, "aws_sqs_queue.jobs").cluster?.alarms,
+      buildResourceCloudWatchCluster(nodes, "aws_sqs_queue.jobs").cluster
+        ?.alarms,
     ).toEqual(["aws_cloudwatch_metric_alarm.queue_depth"]);
   });
 
@@ -223,7 +226,8 @@ describe("terraformTopologyCloudWatchLinks", () => {
       "module.bucket.aws_cloudwatch_metric_alarm.object_count[0]": {
         resources: {
           "module.bucket.aws_cloudwatch_metric_alarm.object_count[0]": {
-            address: "module.bucket.aws_cloudwatch_metric_alarm.object_count[0]",
+            address:
+              "module.bucket.aws_cloudwatch_metric_alarm.object_count[0]",
             mode: "managed",
             type: "aws_cloudwatch_metric_alarm",
             values: {

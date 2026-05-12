@@ -15,7 +15,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 20.x
+          node-version: 22.x
       - name: Set up publish access
         run: |
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}

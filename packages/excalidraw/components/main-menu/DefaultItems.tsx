@@ -210,17 +210,15 @@ export const PerformanceMonitorToggle = () => {
 };
 PerformanceMonitorToggle.displayName = "PerformanceMonitorToggle";
 
-const hasTerraformResourceNodes = (elements: ReadonlyArray<{ customData?: any }>) =>
-  elements.some(
-    (el) => el.customData?.terraformVisibilityRole === "resource",
-  );
+const hasTerraformResourceNodes = (
+  elements: ReadonlyArray<{ customData?: any }>,
+) =>
+  elements.some((el) => el.customData?.terraformVisibilityRole === "resource");
 
 export const TerraformExpandAll = () => {
   const app = useApp();
 
-  if (
-    !hasTerraformResourceNodes(app.scene.getElementsIncludingDeleted())
-  ) {
+  if (!hasTerraformResourceNodes(app.scene.getElementsIncludingDeleted())) {
     return null;
   }
 
@@ -244,9 +242,7 @@ TerraformExpandAll.displayName = "TerraformExpandAll";
 export const TerraformCollapseAll = () => {
   const app = useApp();
 
-  if (
-    !hasTerraformResourceNodes(app.scene.getElementsIncludingDeleted())
-  ) {
+  if (!hasTerraformResourceNodes(app.scene.getElementsIncludingDeleted())) {
     return null;
   }
 
@@ -311,9 +307,7 @@ const TerraformLayerItem = ({
               : null),
           });
         });
-        app.scene.replaceAllElements(
-          repairTerraformEdgeBindings(nextElements),
-        );
+        app.scene.replaceAllElements(repairTerraformEdgeBindings(nextElements));
         event.preventDefault();
       }}
     >

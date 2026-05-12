@@ -69,7 +69,10 @@ function getPrimaryResource(
     : undefined;
 }
 
-function getResourceTypeFromPath(nodePath: string, node?: TerraformPlanGraphNode): string {
+function getResourceTypeFromPath(
+  nodePath: string,
+  node?: TerraformPlanGraphNode,
+): string {
   const primary = getPrimaryResource(node);
   const t = primary?.type;
   if (typeof t === "string") {
@@ -169,10 +172,7 @@ function findIamRoleInModuleByRoleField(
     const merged = mergeTerraformPlanResourceValues(primary);
     const awsRoleName = typeof merged.name === "string" ? merged.name : null;
     const tfBlockName = typeof primary.name === "string" ? primary.name : null;
-    if (
-      roleIdentifier === awsRoleName ||
-      roleIdentifier === tfBlockName
-    ) {
+    if (roleIdentifier === awsRoleName || roleIdentifier === tfBlockName) {
       return path;
     }
   }
@@ -366,16 +366,20 @@ export function collectDataIamPolicyDocumentsForRole(
       /\b((?:module\.[a-zA-Z0-9_.-]+\.)*data\.aws_iam_policy_document\.[a-zA-Z0-9_.-]+(?:\[[^\]]+\])?)/g;
     let m: RegExpExecArray | null;
     while ((m = re.exec(chunk)) !== null) {
-      let raw = m[1]!;
-      const qualified = raw.startsWith("module.") || raw.startsWith("data.")
-        ? raw
-        : modPrefix
+      const raw = m[1]!;
+      const qualified =
+        raw.startsWith("module.") || raw.startsWith("data.")
+          ? raw
+          : modPrefix
           ? `${modPrefix}.${raw}`
           : raw;
       const key =
         resolveTerraformPlanNodeKey(graphNodes, qualified) ||
         resolveTerraformPlanNodeKey(graphNodes, stripIndexes(qualified));
-      if (key && getResourceTypeFromPath(key, nodes[key]) === "aws_iam_policy_document") {
+      if (
+        key &&
+        getResourceTypeFromPath(key, nodes[key]) === "aws_iam_policy_document"
+      ) {
         out.add(key);
       }
     }
@@ -403,12 +407,22 @@ export function collectPoliciesForIamRole(
     const values = mergeTerraformPlanResourceValues(primary);
 
     if (type === "aws_iam_role_policy") {
-      const resolved = resolveRoleReferenceOnPolicyNode(nodes, path, values.role, arnIndex);
+      const resolved = resolveRoleReferenceOnPolicyNode(
+        nodes,
+        path,
+        values.role,
+        arnIndex,
+      );
       if (resolved === rolePath) {
         out.add(path);
       }
     } else if (type === "aws_iam_role_policy_attachment") {
-      const resolved = resolveRoleReferenceOnPolicyNode(nodes, path, values.role, arnIndex);
+      const resolved = resolveRoleReferenceOnPolicyNode(
+        nodes,
+        path,
+        values.role,
+        arnIndex,
+      );
       if (resolved !== rolePath) {
         continue;
       }
@@ -518,6 +532,8 @@ export function iamSatelliteStackHeightPx(
   return h;
 }
 
-export function buildArnIndexForTopology(nodes: TerraformPlanNodesMap): Map<string, string> {
+export function buildArnIndexForTopology(
+  nodes: TerraformPlanNodesMap,
+): Map<string, string> {
   return buildArnToNodePath(nodes);
 }

@@ -1337,14 +1337,12 @@ const LandingPage = () => {
       </nav>
       <section className="landing-hero" aria-labelledby="landing-title">
         <div className="landing-hero__copy">
-          <p className="landing-hero__eyebrow">
-            Your Terraform, made visible
-          </p>
+          <p className="landing-hero__eyebrow">Your Terraform, made visible</p>
           <h1 id="landing-title">Your architecture diagram is your state.</h1>
           <p className="landing-hero__lede">
-            Ainur.draw maps Terraform state and plans into a living
-            architecture canvas, so teams can understand what exists and what is
-            changing without reading raw plan noise.
+            Ainur.draw maps Terraform state and plans into a living architecture
+            canvas, so teams can understand what exists and what is changing
+            without reading raw plan noise.
           </p>
           <div className="landing-hero__actions">
             <button type="button" onClick={scrollToCanvas}>

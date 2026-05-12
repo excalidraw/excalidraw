@@ -120,7 +120,6 @@ const TerraformImportModal = ({
       }
       formData.append("structuralPruneMode", structuralPruneMode);
       if (useBackend) {
-        console.log("using backend");
         const res = await fetch(`${TERRAFORM_BACKEND_URL}/terraform/upload`, {
           method: "POST",
           body: formData,
@@ -131,7 +130,6 @@ const TerraformImportModal = ({
         }
         await loadExcalidrawScene(data.id);
       } else {
-        console.log("not using backend");
         const res = await terraformPlanParsing(
           hasPlanAndDot ? planFile : null,
           hasPlanAndDot ? dotFile : null,
@@ -191,12 +189,11 @@ const TerraformImportModal = ({
             return (
               <label
                 key={option.value}
-                className={
-                  "TerraformImportModal__layoutEngine__option" +
-                  (checked
+                className={`TerraformImportModal__layoutEngine__option${
+                  checked
                     ? " TerraformImportModal__layoutEngine__option--checked"
-                    : "")
-                }
+                    : ""
+                }`}
               >
                 <input
                   type="radio"
@@ -242,8 +239,9 @@ const TerraformImportModal = ({
           <label>
             State file (.tfstate / state pull JSON)
             <span className="TerraformImportModal__muted">
-              Optional with plan+dot to enrich nodes; or upload alone for a state-only graph (raw
-              state with a top-level <code>resources</code> array).
+              Optional with plan+dot to enrich nodes; or upload alone for a
+              state-only graph (raw state with a top-level{" "}
+              <code>resources</code> array).
             </span>
             <input
               type="file"
@@ -288,8 +286,8 @@ const TerraformImportModal = ({
               useBackend
                 ? "Semantic layout applies to local import only (uncheck use backend)."
                 : hasPlanAndDot
-                  ? "Nested AWS account / region / VPC / subnet frames from the plan JSON."
-                  : "Semantic layout requires plan JSON with resource_changes. Select plan+dot or use ELK for state-only imports."
+                ? "Nested AWS account / region / VPC / subnet frames from the plan JSON."
+                : "Semantic layout requires plan JSON with resource_changes. Select plan+dot or use ELK for state-only imports."
             }
           >
             <input
@@ -302,10 +300,7 @@ const TerraformImportModal = ({
           </label>
         </div>
         <div className="TerraformImportModal__settings__buttons">
-          <FilledButton
-            onClick={handleImport}
-            disabled={!canImport || loading}
-          >
+          <FilledButton onClick={handleImport} disabled={!canImport || loading}>
             {loading ? "Importing..." : "Import & Open"}
           </FilledButton>
         </div>

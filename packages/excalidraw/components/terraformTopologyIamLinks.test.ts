@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 import {
   buildArnIndexForTopology,
   buildLambdaIamCluster,
@@ -8,6 +7,8 @@ import {
   mergeTerraformPlanResourceValues,
   resolveLambdaExecutionRolePath,
 } from "./terraformTopologyIamLinks";
+
+import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
 describe("terraformTopologyIamLinks", () => {
   it("matches aws_iam_role_policy.role to IAM role by AWS name, not Terraform block name", () => {
@@ -47,7 +48,9 @@ describe("terraformTopologyIamLinks", () => {
       "module.m.module.lambda.aws_iam_role.lambda[0]",
       arnIndex,
     );
-    expect(policies).toEqual(["module.m.module.lambda.aws_iam_role_policy.logs[0]"]);
+    expect(policies).toEqual([
+      "module.m.module.lambda.aws_iam_role_policy.logs[0]",
+    ]);
   });
 
   it("mergeTerraformPlanResourceValues prefers before on delete", () => {

@@ -74,7 +74,9 @@ function getResourceTypeFromPath(
 }
 
 /** Every `vpc_config` object block (plan JSON is usually a single-element array). */
-function vpcConfigBlocks(values: Record<string, unknown>): Record<string, unknown>[] {
+function vpcConfigBlocks(
+  values: Record<string, unknown>,
+): Record<string, unknown>[] {
   const raw = values.vpc_config;
   if (!Array.isArray(raw) || raw.length === 0) {
     return [];
@@ -101,7 +103,9 @@ export function stripLastTerraformModuleSegment(modulePrefix: string): string {
 }
 
 /** Strip `.id` / `.arn` / `.security_group_id` suffixes for Terraform resource reference strings. */
-function terraformSecurityGroupAddressLookupCandidates(address: string): string[] {
+function terraformSecurityGroupAddressLookupCandidates(
+  address: string,
+): string[] {
   const out: string[] = [];
   const seen = new Set<string>();
   const add = (s: string) => {
@@ -144,7 +148,10 @@ function listAwsSecurityGroupPathsUnderPrefix(
     if (!key.startsWith(prefixWithDot)) {
       continue;
     }
-    if (getResourceTypeFromPath(key, nodes[key] as TerraformPlanGraphNode) !== "aws_security_group") {
+    if (
+      getResourceTypeFromPath(key, nodes[key] as TerraformPlanGraphNode) !==
+      "aws_security_group"
+    ) {
       continue;
     }
     out.push(key);
@@ -220,7 +227,9 @@ function inferSoleSecurityGroupPathForRuleModule(
   return ranked.length === 1 ? ranked[0]! : null;
 }
 
-function ruleHasExplicitSecurityGroupIdField(merged: Record<string, unknown>): boolean {
+function ruleHasExplicitSecurityGroupIdField(
+  merged: Record<string, unknown>,
+): boolean {
   const flat: string[] = [];
   flattenStringish(merged.security_group_id, flat);
   return flat.some((s) => s.trim().length > 0);
@@ -233,7 +242,10 @@ function resolveSecurityGroupIdFieldFromPlanConfiguration(
   arnIndex: Map<string, string>,
   idToPath: Map<string, string>,
 ): string | null {
-  const rawList = collectSgRuleSecurityGroupIdRefsFromPlanConfiguration(plan, rulePath);
+  const rawList = collectSgRuleSecurityGroupIdRefsFromPlanConfiguration(
+    plan,
+    rulePath,
+  );
   if (rawList === null) {
     return null;
   }
@@ -243,7 +255,13 @@ function resolveSecurityGroupIdFieldFromPlanConfiguration(
       continue;
     }
     const qualified = qualifyConfigurationReference(caller, ref);
-    const p = resolveSecurityGroupRefToPath(nodes, rulePath, qualified, arnIndex, idToPath);
+    const p = resolveSecurityGroupRefToPath(
+      nodes,
+      rulePath,
+      qualified,
+      arnIndex,
+      idToPath,
+    );
     if (p) {
       return p;
     }
@@ -260,7 +278,10 @@ export function buildSecurityGroupIdToPathIndex(
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
-    if (getResourceTypeFromPath(path, node as TerraformPlanGraphNode) !== "aws_security_group") {
+    if (
+      getResourceTypeFromPath(path, node as TerraformPlanGraphNode) !==
+      "aws_security_group"
+    ) {
       continue;
     }
     const primary = getPrimaryResource(node as TerraformPlanGraphNode);
@@ -393,7 +414,13 @@ function resolveSecurityGroupIdFieldToPath(
   const strings: string[] = [];
   flattenStringish(sgIdValue, strings);
   for (const s of strings) {
-    const p = resolveSecurityGroupRefToPath(nodes, contextAddress, s, arnIndex, idToPath);
+    const p = resolveSecurityGroupRefToPath(
+      nodes,
+      contextAddress,
+      s,
+      arnIndex,
+      idToPath,
+    );
     if (p) {
       return p;
     }
@@ -423,7 +450,10 @@ export function collectSecurityGroupRulesForSg(
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
-    const t = getResourceTypeFromPath(path, nodes[path] as TerraformPlanGraphNode);
+    const t = getResourceTypeFromPath(
+      path,
+      nodes[path] as TerraformPlanGraphNode,
+    );
     if (!SG_RULE_TYPES.has(t)) {
       continue;
     }
@@ -451,10 +481,7 @@ export function collectSecurityGroupRulesForSg(
         resolved = fromCfg;
       }
     }
-    if (
-      resolved !== sgPath &&
-      !ruleHasExplicitSecurityGroupIdField(merged)
-    ) {
+    if (resolved !== sgPath && !ruleHasExplicitSecurityGroupIdField(merged)) {
       const inferred = inferSoleSecurityGroupPathForRuleModule(nodes, path);
       if (inferred === sgPath) {
         resolved = inferred;
@@ -514,7 +541,13 @@ export function buildLambdaSgCluster(
       continue;
     }
     seenSg.add(sgPath);
-    const rules = collectSecurityGroupRulesForSg(nodes, sgPath, arnIndex, idToPath, plan);
+    const rules = collectSecurityGroupRulesForSg(
+      nodes,
+      sgPath,
+      arnIndex,
+      idToPath,
+      plan,
+    );
     groups.push({ sgPath, rules });
     edges.push({
       source: lambdaAddress,

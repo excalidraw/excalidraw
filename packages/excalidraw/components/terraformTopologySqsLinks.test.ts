@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 import { buildArnIndexForTopology } from "./terraformTopologyIamLinks";
 import { buildSqsCompanionCluster } from "./terraformTopologySqsLinks";
+
+import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
 describe("terraformTopologySqsLinks", () => {
   it("buildSqsCompanionCluster collects queue policy attached by queue URL ref", () => {

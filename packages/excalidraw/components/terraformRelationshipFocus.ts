@@ -398,8 +398,8 @@ export const applyTerraformRelationshipFocus = (
         const nextLevel = isBoundTerraformLabel
           ? TERRAFORM_FOCUS_NODE_LEVEL
           : expandAllView || isPrimary
-            ? TERRAFORM_AMBIENT_PRIMARY_NODE_LEVEL
-            : TERRAFORM_AMBIENT_NON_PRIMARY_NODE_LEVEL;
+          ? TERRAFORM_AMBIENT_PRIMARY_NODE_LEVEL
+          : TERRAFORM_AMBIENT_NON_PRIMARY_NODE_LEVEL;
         return trackChange(
           element,
           buildTerraformFocusUpdate(
@@ -443,8 +443,8 @@ export const applyTerraformRelationshipFocus = (
       const previewAction: PreviewAction = shouldHideExpiredPreview
         ? "clear"
         : shouldReveal
-          ? "set"
-          : "leave";
+        ? "set"
+        : "leave";
 
       return trackChange(
         element,
@@ -465,8 +465,8 @@ export const applyTerraformRelationshipFocus = (
       const cardLevel = isFocusNode
         ? TERRAFORM_FOCUS_NODE_LEVEL
         : isRelatedNode
-          ? TERRAFORM_RELATED_LEVEL
-          : TERRAFORM_DIM_NODE_LEVEL;
+        ? TERRAFORM_RELATED_LEVEL
+        : TERRAFORM_DIM_NODE_LEVEL;
       // Bound labels share the same dimming as their card and become unreadable when
       // washed toward white. Keep label text at full color so resource names stay
       // visible during hover focus.
@@ -488,8 +488,8 @@ export const applyTerraformRelationshipFocus = (
       const previewAction: PreviewAction = shouldHideExpiredPreview
         ? "clear"
         : shouldReveal
-          ? "set"
-          : "leave";
+        ? "set"
+        : "leave";
 
       return trackChange(
         element,
@@ -521,8 +521,8 @@ export const applyTerraformRelationshipFocus = (
       const previewAction: PreviewAction = shouldHideExpiredPreview
         ? "clear"
         : shouldReveal
-          ? "set"
-          : "leave";
+        ? "set"
+        : "leave";
 
       return trackChange(
         element,

@@ -57,7 +57,16 @@ export default defineConfig({
     setupFiles: ["./setupTests.ts"],
     globals: true,
     environment: "jsdom",
+    poolOptions: {
+      forks: {
+        // Node 22+ can enable a broken global `localStorage` stub that shadows jsdom;
+        // disabling experimental web storage lets jsdom install real Storage.
+        execArgv: ["--no-experimental-webstorage"],
+      },
+    },
     coverage: {
+      /** Ensures CI / vitest-coverage-report-action still get json-summary when tests or thresholds fail */
+      reportOnFailure: true,
       reporter: ["text", "json-summary", "json", "html", "lcovonly"],
       // Since v2, it ignores empty lines by default and we need to disable it as it affects the coverage
       // Additionally the thresholds also needs to be updated slightly as a result of this change

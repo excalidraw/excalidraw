@@ -13,7 +13,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 20.x
+          node-version: 22.x
       - name: Install and build
         run: |
           yarn --frozen-lockfile

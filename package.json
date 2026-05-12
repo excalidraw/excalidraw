@@ -2,13 +2,7 @@
   "private": true,
   "name": "excalidraw-monorepo",
   "packageManager": "yarn@1.22.22",
-  "workspaces": [
-    "excalidraw-app",
-    "reactflow-app",
-    "tldraw-app",
-    "packages/*",
-    "examples/*"
-  ],
+  "workspaces": ["excalidraw-app", "packages/*", "examples/*"],
   "devDependencies": {
     "@babel/preset-env": "7.26.9",
     "@excalidraw/eslint-config": "1.0.3",
@@ -47,22 +41,14 @@
     "vitest-canvas-mock": "0.3.3"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "homepage": ".",
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
-    "start:backend": "yarn workspace @excalidraw/backend start",
-    "dev:backend": "yarn workspace @excalidraw/backend dev",
-    "test:backend": "yarn workspace @excalidraw/backend test",
-    "start:tldraw": "yarn workspace tldraw-app start",
-    "start:reactflow": "yarn workspace reactflow-app start",
-    "build:tldraw": "yarn workspace tldraw-app build",
-    "build:reactflow": "yarn workspace reactflow-app build",
-    "test:tldraw": "yarn workspace tldraw-app test",
-    "test:reactflow": "yarn workspace reactflow-app test",
     "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "yarn --cwd ./excalidraw-app build:app:docker",
+    "build:pages": "yarn --cwd ./excalidraw-app build:pages",
     "build:app": "yarn --cwd ./excalidraw-app build:app",
     "build:common": "yarn --cwd ./packages/common build:esm",
     "build:element": "yarn --cwd ./packages/element build:esm",
@@ -82,7 +68,7 @@
     "test:typecheck": "tsc",
     "test:update": "yarn test:app --update --watch=false",
     "test": "yarn test:app",
-    "test:coverage": "vitest --coverage",
+    "test:coverage": "vitest run --coverage",
     "test:coverage:watch": "vitest --coverage --watch",
     "test:ui": "yarn test --ui --coverage.enabled=true",
     "fix:code": "yarn test:code --fix",

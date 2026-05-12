@@ -48,7 +48,9 @@ function configurationResourceFullAddress(
 
 const stripIndexes = (address: string) => address.replace(/\[[^\]]+\]/g, "");
 
-function readSecurityGroupIdExpressionRefs(expressions: UnknownRecord): string[] {
+function readSecurityGroupIdExpressionRefs(
+  expressions: UnknownRecord,
+): string[] {
   const sgId = expressions.security_group_id;
   if (!sgId || typeof sgId !== "object" || Array.isArray(sgId)) {
     return [];
@@ -59,7 +61,11 @@ function readSecurityGroupIdExpressionRefs(expressions: UnknownRecord): string[]
   return out;
 }
 
-function appendRefs(map: Map<string, string[]>, key: string, refs: readonly string[]): void {
+function appendRefs(
+  map: Map<string, string[]>,
+  key: string,
+  refs: readonly string[],
+): void {
   if (refs.length === 0) {
     return;
   }
@@ -91,23 +97,37 @@ function walkModuleForSgRuleRefs(
         continue;
       }
       const expressions = res.expressions;
-      if (!expressions || typeof expressions !== "object" || Array.isArray(expressions)) {
+      if (
+        !expressions ||
+        typeof expressions !== "object" ||
+        Array.isArray(expressions)
+      ) {
         continue;
       }
       const full = configurationResourceFullAddress(modulePrefix, addr);
       const norm = stripIndexes(full);
-      appendRefs(out, norm, readSecurityGroupIdExpressionRefs(expressions as UnknownRecord));
+      appendRefs(
+        out,
+        norm,
+        readSecurityGroupIdExpressionRefs(expressions as UnknownRecord),
+      );
     }
   }
 
   const moduleCalls = mod.module_calls as UnknownRecord | undefined;
-  if (moduleCalls && typeof moduleCalls === "object" && !Array.isArray(moduleCalls)) {
+  if (
+    moduleCalls &&
+    typeof moduleCalls === "object" &&
+    !Array.isArray(moduleCalls)
+  ) {
     for (const name of Object.keys(moduleCalls)) {
       const call = moduleCalls[name] as UnknownRecord | undefined;
       if (!call || typeof call !== "object" || Array.isArray(call)) {
         continue;
       }
-      const childPrefix = modulePrefix ? `${modulePrefix}.module.${name}` : `module.${name}`;
+      const childPrefix = modulePrefix
+        ? `${modulePrefix}.module.${name}`
+        : `module.${name}`;
       const inner = call.module as UnknownRecord | undefined;
       if (inner && typeof inner === "object" && !Array.isArray(inner)) {
         walkModuleForSgRuleRefs(inner, childPrefix, out);
@@ -116,7 +136,9 @@ function walkModuleForSgRuleRefs(
   }
 }
 
-function buildSgRuleSecurityGroupIdRefIndex(plan: unknown): Map<string, string[]> | null {
+function buildSgRuleSecurityGroupIdRefIndex(
+  plan: unknown,
+): Map<string, string[]> | null {
   if (!hasTerraformPlanConfiguration(plan)) {
     return null;
   }
@@ -132,7 +154,9 @@ function buildSgRuleSecurityGroupIdRefIndex(plan: unknown): Map<string, string[]
 
 const ruleSgRefIndexCache = new WeakMap<object, Map<string, string[]>>();
 
-export function getSgRuleSecurityGroupIdRefIndex(plan: unknown): Map<string, string[]> | null {
+export function getSgRuleSecurityGroupIdRefIndex(
+  plan: unknown,
+): Map<string, string[]> | null {
   if (!plan || typeof plan !== "object") {
     return null;
   }

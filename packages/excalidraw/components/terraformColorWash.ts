@@ -177,7 +177,8 @@ export const dimmedTerraformElementOverrides = (
 
   const stashed = readStashedOriginals(element);
   const originalStroke = stashed?.strokeColor ?? element.strokeColor;
-  const originalBackground = stashed?.backgroundColor ?? element.backgroundColor;
+  const originalBackground =
+    stashed?.backgroundColor ?? element.backgroundColor;
   const originalFillStyle = stashed?.fillStyle ?? element.fillStyle;
 
   const nextStroke = washHexColor(
@@ -191,13 +192,14 @@ export const dimmedTerraformElementOverrides = (
     : washHexColor(originalBackground, washFactor, viewBackgroundColor);
   const nextFillStyle = transparentBackground ? "solid" : originalFillStyle;
 
+  const dimmedOriginals: TerraformDimmedOriginals = {
+    strokeColor: originalStroke,
+    backgroundColor: originalBackground,
+    fillStyle: originalFillStyle,
+  };
   const nextCustomData = {
     ...(element.customData ?? {}),
-    [TERRAFORM_DIMMED_ORIGINALS_KEY]: {
-      strokeColor: originalStroke,
-      backgroundColor: originalBackground,
-      fillStyle: originalFillStyle,
-    } satisfies TerraformDimmedOriginals,
+    [TERRAFORM_DIMMED_ORIGINALS_KEY]: dimmedOriginals,
   };
 
   if (

@@ -4,7 +4,9 @@
  */
 const fs = require("fs");
 const path = require("path");
+
 const dot = require("graphlib-dot");
+
 const pipeline = require("../pipeline");
 const { extractVpcNetworkingFacetStore } = require("../vpc-networking-facet");
 

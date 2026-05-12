@@ -1,22 +1,6 @@
 {
-  "name": "@excalidraw/backend",
-  "version": "1.0.0",
+  "name": "@excalidraw/terraform-dev",
   "private": true,
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "test": "vitest run",
-    "selftest:upload": "node selftest-upload.js"
-  },
-  "dependencies": {
-    "@dagrejs/graphlib-dot": "1.0.2",
-    "better-sqlite3": "12.6.2",
-    "cors": "2.8.6",
-    "drizzle-orm": "0.45.1",
-    "elkjs": "0.11.1",
-    "express": "5.2.1",
-    "graphlib-dot": "0.6.4",
-    "multer": "2.0.2"
-  }
+  "version": "0.0.0",
+  "description": "Terraform modules and plan fixtures for local dev. The Node HTTP backend was removed; use client-side import in packages/excalidraw."
 }

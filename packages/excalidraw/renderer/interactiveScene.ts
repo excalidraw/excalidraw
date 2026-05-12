@@ -1518,12 +1518,18 @@ const renderPerformanceMetricsOverlay = (
 
   context.save();
   context.fillStyle =
-    appState.theme === THEME.DARK ? "rgba(24, 24, 27, 0.9)" : "rgba(0, 0, 0, 0.75)";
+    appState.theme === THEME.DARK
+      ? "rgba(24, 24, 27, 0.9)"
+      : "rgba(0, 0, 0, 0.75)";
   context.fillRect(x, y, width, height);
   context.fillStyle = "rgba(255, 255, 255, 0.96)";
   context.font = "12px monospace";
   rows.forEach((row, index) => {
-    context.fillText(row, x + padding, y + padding + rowHeight * (index + 1) - 4);
+    context.fillText(
+      row,
+      x + padding,
+      y + padding + rowHeight * (index + 1) - 4,
+    );
   });
   context.restore();
 };

@@ -1,8 +1,6 @@
 import { getTerraformResourceTypeFromNodePath } from "./terraformPrimaryVisibility";
 
-import {
-  terraformHumanNameFromPlanResource,
-} from "./terraformResourceHumanName";
+import { terraformHumanNameFromPlanResource } from "./terraformResourceHumanName";
 
 const MAX_CARD_LINE_LEN = 52;
 
@@ -106,8 +104,7 @@ export function terraformResourceCardLabel(
 
   const fromAddress = terraformInstanceNameFromAddress(address, resourceType);
 
-  const label =
-    fromPlanHuman ?? planName ?? fromAddress;
+  const label = fromPlanHuman ?? planName ?? fromAddress;
 
   if (!label.trim()) {
     const typeOnly = resourceType.includes(".")
