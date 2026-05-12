@@ -412,6 +412,9 @@ const collectTerraformResourceRects = (
       continue;
     }
     const customData = getCustomData(element);
+    if (customData.terraformAwsIconGlyph === true) {
+      continue;
+    }
     if (customData.terraformVisibilityRole !== "resource") {
       continue;
     }

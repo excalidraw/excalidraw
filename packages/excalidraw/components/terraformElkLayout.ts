@@ -56,6 +56,11 @@ import {
   repairTerraformEdgeBindings,
 } from "./terraformVisibility";
 
+import { injectTerraformAwsIconsIntoElements } from "./terraformAwsIcons";
+import {
+  getTerraformCardResourceType,
+  terraformResourceCardLabel,
+} from "./terraformResourceCardLabel";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import type {
   TerraformModuleTreeNode,
@@ -1508,7 +1513,7 @@ export async function buildTerraformElkExcalidrawScene(
       continue;
     }
     const resource = getPrimaryResource(nodes[id]);
-    const resourceType = getTerraformResourceTypeFromNodePath(id);
+    const resourceType = getTerraformCardResourceType(id, resource);
     const explodeKeys = [...(explodeParentMap.get(id) || [])].sort();
     const explodeParent = explodeKeys[0] ?? null;
     const action = getTerraformPlanNodeAction(nodes[id]);
@@ -1529,7 +1534,7 @@ export async function buildTerraformElkExcalidrawScene(
       backgroundColor: actionStyle.backgroundColor,
       roundness: { type: 3, value: 10 },
       label: {
-        text: shortTerraformResourceLabel(id),
+        text: terraformResourceCardLabel(id, resource),
         fontSize: 12,
         strokeColor: TERRAFORM_RESOURCE_LABEL_STROKE,
       },
@@ -1596,6 +1601,7 @@ export async function buildTerraformElkExcalidrawScene(
   }) as ExcalidrawElement[];
   elements = applyTerraformResourceRectangleSoftDelete(elements);
   elements = mirrorAndDetachTerraformResourceLabels(elements);
+  elements = await injectTerraformAwsIconsIntoElements(elements);
   elements = repairTerraformEdgeBindings(
     reconcileTerraformVisibility(elements),
   );

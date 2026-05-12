@@ -65,23 +65,17 @@ function getLabeledContainer(
   elements: Awaited<
     ReturnType<typeof buildTerraformElkExcalidrawScene>
   >["elements"],
-  label: string,
+  addressOrSuffix: string,
 ) {
-  const text = elements.find(
+  return elements.find(
     (element: any) =>
-      element.type === "text" &&
-      (!("containerId" in element) || !element.containerId) &&
-      element.originalText === label,
-  );
-  return (
-    text &&
-    elements.find(
-      (element) =>
-        element.type === "rectangle" &&
-        (element as { customData?: { nodePath?: string } }).customData
-          ?.nodePath ===
-          (text as { customData?: { nodePath?: string } }).customData?.nodePath,
-    )
+      element.type === "rectangle" &&
+      element.customData?.terraformVisibilityRole === "resource" &&
+      (element.customData?.terraformVisibilityKey === addressOrSuffix ||
+        (typeof element.customData?.terraformVisibilityKey === "string" &&
+          element.customData.terraformVisibilityKey.endsWith(
+            `.${addressOrSuffix}`,
+          ))),
   );
 }
 
@@ -166,7 +160,12 @@ describe("buildTerraformElkExcalidrawScene", () => {
     expect(meta.vertexCount).toBe(3);
     expect(meta.edgeCount).toBe(2);
     expect(elements.length).toBeGreaterThan(0);
-    const rects = elements.filter((e) => e.type === "rectangle");
+    const rects = elements.filter(
+      (e) =>
+        e.type === "rectangle" &&
+        (e as { customData?: { terraformVisibilityRole?: string } }).customData
+          ?.terraformVisibilityRole === "resource",
+    );
     const tfEdges = elements.filter(
       (e) =>
         e.type === "arrow" &&
