@@ -1,12 +1,6 @@
 const { buildDiagramIR } = require("./diagram-ir");
-const {
-  REGISTRY,
-  getRenderer,
-  listRenderers,
-} = require("./connectors");
-const {
-  UnknownRendererError,
-} = require("./connectors/errors");
+const { REGISTRY, getRenderer, listRenderers } = require("./connectors");
+const { UnknownRendererError } = require("./connectors/errors");
 
 function makeNodes() {
   return {
@@ -50,9 +44,7 @@ describe("DiagramIR", () => {
       "aws_lambda_function.worker",
     ]);
 
-    const lambda = ir.nodes.find(
-      (n) => n.id === "aws_lambda_function.worker",
-    );
+    const lambda = ir.nodes.find((n) => n.id === "aws_lambda_function.worker");
     expect(lambda).toMatchObject({
       kind: "resource",
       provider: "aws",
@@ -211,7 +203,9 @@ describe("Connector registry", () => {
     });
     expect(
       reactflowResult.body.nodes.some(
-        (node) => node.data?.action === "update" && node.data?.resourceType === "aws_iam_role_policy",
+        (node) =>
+          node.data?.action === "update" &&
+          node.data?.resourceType === "aws_iam_role_policy",
       ),
     ).toBe(true);
   });

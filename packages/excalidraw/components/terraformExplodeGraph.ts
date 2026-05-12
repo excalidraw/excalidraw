@@ -61,7 +61,12 @@ export function collectDataFlowEdges(
         continue;
       }
       const target = edge.target;
-      if (typeof target !== "string" || !nodes[source] || !nodes[target] || source === target) {
+      if (
+        typeof target !== "string" ||
+        !nodes[source] ||
+        !nodes[target] ||
+        source === target
+      ) {
         continue;
       }
 
@@ -142,7 +147,12 @@ export function collectNetworkingEdges(
         continue;
       }
       const target = edge.target;
-      if (typeof target !== "string" || !nodes[source] || !nodes[target] || source === target) {
+      if (
+        typeof target !== "string" ||
+        !nodes[source] ||
+        !nodes[target] ||
+        source === target
+      ) {
         continue;
       }
 
@@ -217,7 +227,11 @@ export function buildTerraformExplodeParentMap(
   );
 
   const addPair = (source: string, target: string) => {
-    if (!nodeKeySet.has(source) || !nodeKeySet.has(target) || source === target) {
+    if (
+      !nodeKeySet.has(source) ||
+      !nodeKeySet.has(target) ||
+      source === target
+    ) {
       return;
     }
     parentMap.get(source)!.add(target);

@@ -29,16 +29,22 @@ const resource = (address, type, name, values = {}, mode = "managed") => ({
 
 describe("data source graph filtering", () => {
   it("parses data source type from module-qualified addresses", () => {
-    expect(getDataSourceTypeFromAddress("data.aws_region.current")).toBe("aws_region");
+    expect(getDataSourceTypeFromAddress("data.aws_region.current")).toBe(
+      "aws_region",
+    );
     expect(
-      getDataSourceTypeFromAddress("module.a.module.b.data.aws_iam_policy_document.x"),
+      getDataSourceTypeFromAddress(
+        "module.a.module.b.data.aws_iam_policy_document.x",
+      ),
     ).toBe("aws_iam_policy_document");
     expect(getDataSourceTypeFromAddress("aws_lambda_function.y")).toBeNull();
   });
 
   it("treats only non-allowlisted data addresses as excluded", () => {
     expect(isExcludedDataSourceAddress("data.aws_region.current")).toBe(true);
-    expect(isExcludedDataSourceAddress("data.aws_iam_policy_document.main")).toBe(false);
+    expect(
+      isExcludedDataSourceAddress("data.aws_iam_policy_document.main"),
+    ).toBe(false);
   });
 
   it("omitNonAllowlistedDataSourceNodes removes data sources not on allowlist and strips edges", () => {
@@ -139,7 +145,7 @@ describe("data source graph filtering", () => {
   });
 
   it("mergeTerraformState skips non-allowlisted data resources and dependency edges to them", () => {
-    let nodes = ensureEdgeLists({
+    const nodes = ensureEdgeLists({
       "aws_lambda_function.fn": {
         resources: {
           "aws_lambda_function.fn": resource(
@@ -199,11 +205,16 @@ describe("omitGhostIamPolicyDocumentNodes", () => {
             {},
           ),
         },
-        edges_new: ["module.lambda-monitoring.data.aws_iam_policy_document.logs"],
-        edges_existing: ["module.lambda-monitoring.data.aws_iam_policy_document.logs"],
+        edges_new: [
+          "module.lambda-monitoring.data.aws_iam_policy_document.logs",
+        ],
+        edges_existing: [
+          "module.lambda-monitoring.data.aws_iam_policy_document.logs",
+        ],
         edges_data_flow: [
           {
-            target: "module.lambda-monitoring.data.aws_iam_policy_document.logs",
+            target:
+              "module.lambda-monitoring.data.aws_iam_policy_document.logs",
             relation: "policy",
           },
         ],
@@ -211,7 +222,8 @@ describe("omitGhostIamPolicyDocumentNodes", () => {
       "module.lambda-monitoring.data.aws_iam_policy_document.logs": {
         resources: {
           "module.lambda-monitoring.data.aws_iam_policy_document.logs": {
-            address: "module.lambda-monitoring.data.aws_iam_policy_document.logs",
+            address:
+              "module.lambda-monitoring.data.aws_iam_policy_document.logs",
             type: "module.lambda-monitoring.data.aws_iam_policy_document.logs",
             change: { actions: ["external"] },
           },
@@ -224,13 +236,19 @@ describe("omitGhostIamPolicyDocumentNodes", () => {
 
     nodes = omitGhostIamPolicyDocumentNodes(nodes);
 
-    expect(nodes["module.lambda-monitoring.data.aws_iam_policy_document.logs"]).toBeUndefined();
-    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_new).toEqual([]);
-    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_existing).toEqual(
-      [],
-    );
     expect(
-      nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_data_flow,
+      nodes["module.lambda-monitoring.data.aws_iam_policy_document.logs"],
+    ).toBeUndefined();
+    expect(
+      nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_new,
+    ).toEqual([]);
+    expect(
+      nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"]
+        .edges_existing,
+    ).toEqual([]);
+    expect(
+      nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"]
+        .edges_data_flow,
     ).toEqual([]);
   });
 
@@ -243,7 +261,7 @@ describe("omitGhostIamPolicyDocumentNodes", () => {
             "aws_iam_policy_document",
             "logs",
             {
-              json: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\"}]}",
+              json: '{"Version":"2012-10-17","Statement":[{"Effect":"Allow"}]}',
             },
             "data",
           ),
@@ -253,7 +271,9 @@ describe("omitGhostIamPolicyDocumentNodes", () => {
 
     nodes = omitGhostIamPolicyDocumentNodes(nodes);
 
-    expect(nodes["module.lambda-writer.data.aws_iam_policy_document.logs[0]"]).toBeDefined();
+    expect(
+      nodes["module.lambda-writer.data.aws_iam_policy_document.logs[0]"],
+    ).toBeDefined();
   });
 
   it("removes indexed IAM policy-document nodes when they have no concrete payload", () => {
@@ -261,7 +281,8 @@ describe("omitGhostIamPolicyDocumentNodes", () => {
       "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]": {
         resources: {
           "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]": {
-            address: "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]",
+            address:
+              "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]",
             mode: "data",
             type: "aws_iam_policy_document",
             name: "logs",
@@ -279,8 +300,12 @@ describe("omitGhostIamPolicyDocumentNodes", () => {
             {},
           ),
         },
-        edges_new: ["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
-        edges_existing: ["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
+        edges_new: [
+          "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]",
+        ],
+        edges_existing: [
+          "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]",
+        ],
       },
     });
 
@@ -289,10 +314,13 @@ describe("omitGhostIamPolicyDocumentNodes", () => {
     expect(
       nodes["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
     ).toBeUndefined();
-    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_new).toEqual([]);
-    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_existing).toEqual(
-      [],
-    );
+    expect(
+      nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_new,
+    ).toEqual([]);
+    expect(
+      nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"]
+        .edges_existing,
+    ).toEqual([]);
   });
 
   it("does not remove non policy-document data sources", () => {
@@ -328,16 +356,19 @@ describe("omitStateOnlyDataSourceNodes", () => {
             {},
           ),
         },
-        edges_existing: ["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
+        edges_existing: [
+          "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]",
+        ],
       },
       "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]": {
         resources: {
           "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]": {
-            address: "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]",
+            address:
+              "module.lambda-monitoring.data.aws_iam_policy_document.logs[0]",
             mode: "data",
             type: "aws_iam_policy_document",
             name: "logs",
-            values: { json: "{\"Version\":\"2012-10-17\"}" },
+            values: { json: '{"Version":"2012-10-17"}' },
             change: { actions: ["existing"] },
           },
         },
@@ -349,9 +380,10 @@ describe("omitStateOnlyDataSourceNodes", () => {
     expect(
       nodes["module.lambda-monitoring.data.aws_iam_policy_document.logs[0]"],
     ).toBeUndefined();
-    expect(nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"].edges_existing).toEqual(
-      [],
-    );
+    expect(
+      nodes["module.lambda-monitoring.aws_iam_role_policy.logs[0]"]
+        .edges_existing,
+    ).toEqual([]);
   });
 
   it("keeps plan-backed data nodes even if state is also merged", () => {
@@ -363,8 +395,11 @@ describe("omitStateOnlyDataSourceNodes", () => {
             mode: "data",
             type: "aws_iam_policy_document",
             name: "assume",
-            values: { json: "{\"Version\":\"2012-10-17\"}" },
-            change: { actions: ["read"], after: { statement: [{ effect: "Allow" }] } },
+            values: { json: '{"Version":"2012-10-17"}' },
+            change: {
+              actions: ["read"],
+              after: { statement: [{ effect: "Allow" }] },
+            },
           },
         },
       },
@@ -391,10 +426,15 @@ describe("omitVpcPlumbingNodes", () => {
       },
       "aws_route_table.rt": {
         resources: {
-          "aws_route_table.rt": resource("aws_route_table.rt", "aws_route_table", "rt", {
-            id: "rtb-1",
-            vpc_id: "vpc-aaaa",
-          }),
+          "aws_route_table.rt": resource(
+            "aws_route_table.rt",
+            "aws_route_table",
+            "rt",
+            {
+              id: "rtb-1",
+              vpc_id: "vpc-aaaa",
+            },
+          ),
         },
         edges_new: ["aws_vpc.main"],
         edges_existing: [],
@@ -477,17 +517,27 @@ const networkingTargets = (nodes, source) =>
 describe("terraform module graph nodes", () => {
   it("collects nested module prefixes from addresses", () => {
     expect(
-      getModulePathChainFromAddress("module.a.module.b.aws_lambda_function.this"),
+      getModulePathChainFromAddress(
+        "module.a.module.b.aws_lambda_function.this",
+      ),
     ).toEqual(["module.a", "module.a.module.b"]);
     expect(
-      [...collectAllTerraformModulePaths(["module.x.aws_s3_bucket.y", "aws_vpc.z"])].sort(),
+      [
+        ...collectAllTerraformModulePaths([
+          "module.x.aws_s3_bucket.y",
+          "aws_vpc.z",
+        ]),
+      ].sort(),
     ).toEqual(["module.x"]);
   });
 
   it("buildNewEdges stops at module boundaries instead of fanning out", () => {
     const adjacency = {
       root_alarm: ["module.app"],
-      "module.app": ["module.app.aws_lambda_function.a", "module.app.aws_iam_role.b"],
+      "module.app": [
+        "module.app.aws_lambda_function.a",
+        "module.app.aws_iam_role.b",
+      ],
       "module.app.aws_lambda_function.a": [],
       "module.app.aws_iam_role.b": [],
     };
@@ -518,10 +568,9 @@ describe("terraform module graph nodes", () => {
     nodes = ensureTerraformModuleNodes(nodes);
     buildNewEdges(nodes, adjacency);
 
-    expect(nodes['module.m.aws_vpc_endpoint.this["logs"]'].edges_new.sort()).toEqual([
-      "peer.a",
-      "peer.b",
-    ]);
+    expect(
+      nodes['module.m.aws_vpc_endpoint.this["logs"]'].edges_new.sort(),
+    ).toEqual(["peer.a", "peer.b"]);
   });
 
   it("refineCloudWatchMetricAlarmEdges replaces fan-out with resolved references and owning modules", () => {
@@ -545,7 +594,10 @@ describe("terraform module graph nodes", () => {
           "aws_vpc.lambda",
           "aws_s3_bucket.data",
         ],
-        edges_existing: ["module.lambda-writer.aws_iam_role.x", "aws_kms_key.s3"],
+        edges_existing: [
+          "module.lambda-writer.aws_iam_role.x",
+          "aws_kms_key.s3",
+        ],
       },
       "module.lambda-writer.aws_lambda_function.main": {
         resources: {
@@ -579,14 +631,22 @@ describe("terraform module graph nodes", () => {
     nodes = ensureTerraformModuleNodes(nodes);
     refineCloudWatchMetricAlarmEdges(nodes);
 
-    expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new.sort()).toEqual([
-      "module.lambda-writer.aws_lambda_function.main",
-      "module.lambda-writer",
-    ].sort());
-    expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_existing.sort()).toEqual([
-      "module.lambda-writer.aws_lambda_function.main",
-      "module.lambda-writer",
-    ].sort());
+    expect(
+      nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new.sort(),
+    ).toEqual(
+      [
+        "module.lambda-writer.aws_lambda_function.main",
+        "module.lambda-writer",
+      ].sort(),
+    );
+    expect(
+      nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_existing.sort(),
+    ).toEqual(
+      [
+        "module.lambda-writer.aws_lambda_function.main",
+        "module.lambda-writer",
+      ].sort(),
+    );
   });
 
   it("supports custom resolvers overriding defaults", () => {
@@ -646,12 +706,12 @@ describe("terraform module graph nodes", () => {
       ],
     });
 
-    expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new).toEqual([
-      "module.lambda-writer",
-    ]);
-    expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_existing).toEqual([
-      "module.lambda-writer",
-    ]);
+    expect(
+      nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new,
+    ).toEqual(["module.lambda-writer"]);
+    expect(
+      nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_existing,
+    ).toEqual(["module.lambda-writer"]);
   });
 
   it("refines non-alarm resources generically from value references", () => {
@@ -705,16 +765,22 @@ describe("terraform module graph nodes", () => {
     nodes = ensureTerraformModuleNodes(nodes);
     refineCloudWatchMetricAlarmEdges(nodes);
 
-    expect(nodes["aws_lambda_permission.allow_s3"].edges_new.sort()).toEqual([
-      "module.lambda.aws_lambda_function.processor",
-      "module.lambda",
-      "aws_s3_bucket.assets",
-    ].sort());
-    expect(nodes["aws_lambda_permission.allow_s3"].edges_existing.sort()).toEqual([
-      "module.lambda.aws_lambda_function.processor",
-      "module.lambda",
-      "aws_s3_bucket.assets",
-    ].sort());
+    expect(nodes["aws_lambda_permission.allow_s3"].edges_new.sort()).toEqual(
+      [
+        "module.lambda.aws_lambda_function.processor",
+        "module.lambda",
+        "aws_s3_bucket.assets",
+      ].sort(),
+    );
+    expect(
+      nodes["aws_lambda_permission.allow_s3"].edges_existing.sort(),
+    ).toEqual(
+      [
+        "module.lambda.aws_lambda_function.processor",
+        "module.lambda",
+        "aws_s3_bucket.assets",
+      ].sort(),
+    );
   });
 
   it("uses key-aware matching so FunctionName does not resolve to IAM role names", () => {
@@ -768,10 +834,14 @@ describe("terraform module graph nodes", () => {
     nodes = ensureTerraformModuleNodes(nodes);
     refineCloudWatchMetricAlarmEdges(nodes);
 
-    expect(nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new.sort()).toEqual([
-      "module.lambda-writer.aws_lambda_function.main",
-      "module.lambda-writer",
-    ].sort());
+    expect(
+      nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new.sort(),
+    ).toEqual(
+      [
+        "module.lambda-writer.aws_lambda_function.main",
+        "module.lambda-writer",
+      ].sort(),
+    );
     expect(
       nodes["aws_cloudwatch_metric_alarm.lambda_errors"].edges_new,
     ).not.toContain("module.lambda-writer.aws_iam_role.lambda");
@@ -804,9 +874,9 @@ describe("terraform module graph nodes", () => {
     nodes = ensureTerraformModuleNodes(nodes);
     refineCloudWatchMetricAlarmEdges(nodes);
 
-    expect(nodes["module.s3_kms.data.aws_iam_policy_document.this[0]"].edges_new).toEqual(
-      [],
-    );
+    expect(
+      nodes["module.s3_kms.data.aws_iam_policy_document.this[0]"].edges_new,
+    ).toEqual([]);
     expect(
       nodes["module.s3_kms.data.aws_iam_policy_document.this[0]"].edges_new,
     ).not.toContain("module.sqs_kms.data.aws_iam_policy_document.this[0]");
@@ -1014,7 +1084,9 @@ describe("buildDataFlowEdges", () => {
 
     buildDataFlowEdges(nodes);
 
-    expect(nodes["aws_api_gateway_rest_api.api"].edges_data_flow || []).toEqual([]);
+    expect(nodes["aws_api_gateway_rest_api.api"].edges_data_flow || []).toEqual(
+      [],
+    );
   });
 });
 
@@ -1082,10 +1154,15 @@ describe("buildNetworkingEdges", () => {
 
   it("links interface VPC endpoints to security groups from security_group_ids", () => {
     const nodes = buildNodes([
-      resource("aws_security_group.endpoint", "aws_security_group", "endpoint", {
-        id: "sg-049f0ff2bd862ed73",
-        vpc_id: "vpc-1",
-      }),
+      resource(
+        "aws_security_group.endpoint",
+        "aws_security_group",
+        "endpoint",
+        {
+          id: "sg-049f0ff2bd862ed73",
+          vpc_id: "vpc-1",
+        },
+      ),
       resource("aws_vpc_endpoint.logs", "aws_vpc_endpoint", "logs", {
         service_name: "com.amazonaws.us-east-1.logs",
         security_group_ids: ["sg-049f0ff2bd862ed73"],
@@ -1189,7 +1266,10 @@ describe("pruneRedundantStructuralEdges", () => {
             "writer",
           ),
         },
-        edges_new: ["aws_s3_bucket.data", "aws_s3_bucket_policy.secure_transport"],
+        edges_new: [
+          "aws_s3_bucket.data",
+          "aws_s3_bucket_policy.secure_transport",
+        ],
         edges_existing: [],
       },
       "aws_s3_bucket_policy.secure_transport": {
@@ -1263,7 +1343,9 @@ describe("pruneRedundantStructuralEdges", () => {
     nodes = ensureEdgeLists(nodes);
     pruneRedundantStructuralEdges(nodes);
 
-    expect(nodes["module.lambda_reader"].edges_new).toEqual(["module.data_queue"]);
+    expect(nodes["module.lambda_reader"].edges_new).toEqual([
+      "module.data_queue",
+    ]);
     expect(nodes["module.lambda_reader"].edges_existing).toEqual([]);
   });
 });

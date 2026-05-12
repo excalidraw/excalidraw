@@ -6,10 +6,13 @@ import type {
   ExcalidrawFrameElement,
 } from "@excalidraw/element/types";
 
+import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
+
+import { tfComfortPx } from "./terraformLayoutComfort";
+
 import type { TerraformTopologyModel } from "./terraformTopologyExtract";
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
-import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
-import { tfComfortPx } from "./terraformLayoutComfort";
+
 import type {
   TopologyPlacementZone,
   TopologyRegionalPrimaryBucket,

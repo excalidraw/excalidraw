@@ -68,7 +68,11 @@ function collectStringish(value: unknown, out: string[]): void {
   }
 }
 
-function addUnique(map: Map<string, Set<string>>, key: string, path: string): void {
+function addUnique(
+  map: Map<string, Set<string>>,
+  key: string,
+  path: string,
+): void {
   const k = key.trim();
   if (!k) {
     return;
@@ -136,7 +140,9 @@ function uniquePathForIdentity(
     return null;
   }
   const candidates = expectedType
-    ? [...paths].filter((path) => getResourceTypeFromPath(path, nodes[path]) === expectedType)
+    ? [...paths].filter(
+        (path) => getResourceTypeFromPath(path, nodes[path]) === expectedType,
+      )
     : [...paths];
   return candidates.length === 1 ? candidates[0]! : null;
 }
@@ -166,7 +172,8 @@ function resourcePathFromText(
     if (
       key &&
       !isCloudWatchSatelliteType(getResourceTypeFromPath(key, nodes[key])) &&
-      (!expectedType || getResourceTypeFromPath(key, nodes[key]) === expectedType)
+      (!expectedType ||
+        getResourceTypeFromPath(key, nodes[key]) === expectedType)
     ) {
       return key;
     }
@@ -190,7 +197,10 @@ function inferSoleResourceInModuleFamily(
       continue;
     }
     const type = getResourceTypeFromPath(path, node as TerraformPlanGraphNode);
-    if (isCloudWatchSatelliteType(type) || (expectedType && type !== expectedType)) {
+    if (
+      isCloudWatchSatelliteType(type) ||
+      (expectedType && type !== expectedType)
+    ) {
       continue;
     }
     const resourcePrefix = terraformModulePrefixForAddress(path);
@@ -230,10 +240,16 @@ function resolveMetricAlarmLambdaPath(
       return path;
     }
   }
-  return inferSoleResourceInModuleFamily(nodes, alarmPath, "aws_lambda_function");
+  return inferSoleResourceInModuleFamily(
+    nodes,
+    alarmPath,
+    "aws_lambda_function",
+  );
 }
 
-function expectedResourceTypesForCloudWatchNamespace(namespace: unknown): string[] {
+function expectedResourceTypesForCloudWatchNamespace(
+  namespace: unknown,
+): string[] {
   if (namespace === "AWS/Lambda") {
     return ["aws_lambda_function"];
   }
@@ -268,7 +284,9 @@ function resolveMetricAlarmResourcePath(
 ): string | null {
   const dimensions = isPlainObject(values.dimensions) ? values.dimensions : {};
   const matches = new Set<string>();
-  const expectedTypes = expectedResourceTypesForCloudWatchNamespace(values.namespace);
+  const expectedTypes = expectedResourceTypesForCloudWatchNamespace(
+    values.namespace,
+  );
 
   for (const value of Object.values(dimensions)) {
     const candidates: string[] = [];
@@ -325,7 +343,11 @@ function resolveLogGroupLambdaPath(
     }
   }
 
-  return inferSoleResourceInModuleFamily(nodes, logGroupPath, "aws_lambda_function");
+  return inferSoleResourceInModuleFamily(
+    nodes,
+    logGroupPath,
+    "aws_lambda_function",
+  );
 }
 
 export type ResourceCloudWatchCluster = {
@@ -366,11 +388,14 @@ function buildCloudWatchAttachmentIndex(
     if (path === TERRAFORM_MODULE_TREE_KEY || path.startsWith("__")) {
       continue;
     }
-    const candidatePrimary = getPrimaryResource(candidateNode as TerraformPlanGraphNode);
+    const candidatePrimary = getPrimaryResource(
+      candidateNode as TerraformPlanGraphNode,
+    );
     if (!candidatePrimary) {
       continue;
     }
-    const type = typeof candidatePrimary.type === "string" ? candidatePrimary.type : "";
+    const type =
+      typeof candidatePrimary.type === "string" ? candidatePrimary.type : "";
     const values = mergeTerraformPlanResourceValues(candidatePrimary);
     const target =
       type === "aws_cloudwatch_metric_alarm"
@@ -381,9 +406,7 @@ function buildCloudWatchAttachmentIndex(
         : null;
     if (type === "aws_cloudwatch_metric_alarm" && target) {
       addAttachment(attachmentIndex, target, "alarms", path);
-    } else if (
-      type === "aws_cloudwatch_log_group"
-    ) {
+    } else if (type === "aws_cloudwatch_log_group") {
       const logGroupTarget = resolveLogGroupLambdaPath(
         nodes,
         path,

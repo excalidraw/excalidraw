@@ -1,5 +1,4 @@
 import graphlibDot from "@dagrejs/graphlib-dot";
-import type { Graph } from "@dagrejs/graphlib";
 
 import { buildTerraformElkExcalidrawScene } from "./terraformElkLayout";
 import {
@@ -24,7 +23,12 @@ import {
 } from "./terraformTopologyPlacement";
 import { buildTerraformTopologyExcalidrawScene } from "./terraformTopologyLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
-import { buildDataFlowEdges, buildNetworkingEdges } from "./terraformDataFlowEdges";
+import {
+  buildDataFlowEdges,
+  buildNetworkingEdges,
+} from "./terraformDataFlowEdges";
+
+import type { Graph } from "@dagrejs/graphlib";
 
 export { TERRAFORM_MODULE_TREE_KEY };
 
@@ -154,7 +158,10 @@ function collectSemanticRepresentedResourceAddresses(
         represented.add(rc.address);
       }
     }
-    if (rc.type === "aws_iam_policy_document" && typeof rc.address === "string") {
+    if (
+      rc.type === "aws_iam_policy_document" &&
+      typeof rc.address === "string"
+    ) {
       represented.add(rc.address);
     }
   }
@@ -330,10 +337,13 @@ export const terraformPlanParsing = async (
     try {
       plan = JSON.parse(planText);
     } catch {
-      return new Response(JSON.stringify({ error: "planFile must be valid JSON." }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ error: "planFile must be valid JSON." }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
     if (stateText) {
       try {
@@ -342,10 +352,13 @@ export const terraformPlanParsing = async (
           tfstateForMerge = parsed;
         }
       } catch {
-        return new Response(JSON.stringify({ error: "stateFile must be valid JSON." }), {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        });
+        return new Response(
+          JSON.stringify({ error: "stateFile must be valid JSON." }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
       }
     }
   } else if (stateFile) {
@@ -354,10 +367,13 @@ export const terraformPlanParsing = async (
     try {
       parsed = JSON.parse(stateText);
     } catch {
-      return new Response(JSON.stringify({ error: "stateFile must be valid JSON." }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ error: "stateFile must be valid JSON." }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
     if (
       !parsed ||
@@ -422,7 +438,11 @@ export const terraformPlanParsing = async (
     adjacency,
   });
 
-  const nodes5 = buildTerraformLocalImportNodesMap(plan, graph, tfstateForMerge);
+  const nodes5 = buildTerraformLocalImportNodesMap(
+    plan,
+    graph,
+    tfstateForMerge,
+  );
   emitLocalParseDebug({
     phase: "planParsed_through_moduleTree",
     nodes: nodes5,
@@ -459,8 +479,10 @@ export const terraformPlanParsing = async (
     const vpcFlowLogBuckets = extractVpcFlowLogBundles(semPlan);
     const endpointSecurityGroupBuckets =
       extractInterfaceEndpointSecurityGroupBuckets(semPlan, vpcEndpointBuckets);
-    const routeTableBottomPlacements =
-      computeRouteTableBottomEdgePlacements(zones, semPlan);
+    const routeTableBottomPlacements = computeRouteTableBottomEdgePlacements(
+      zones,
+      semPlan,
+    );
     mergeTopologyModelWithPlacementZones(topoModel, zones);
     mergeTopologyModelWithRegionalBuckets(topoModel, regionalBuckets);
     mergeTopologyModelWithVpcEndpoints(topoModel, vpcEndpointBuckets);
@@ -482,7 +504,9 @@ export const terraformPlanParsing = async (
     );
     const represented = collectSemanticRepresentedResourceAddresses(
       topoScene.elements as Array<{ customData?: Record<string, any> }>,
-      semPlan as { resource_changes?: Array<{ address?: string; type?: string }> },
+      semPlan as {
+        resource_changes?: Array<{ address?: string; type?: string }>;
+      },
     );
     const omittedSemanticResources = (semPlan.resource_changes || []).filter(
       (rc: { address?: string; type?: string }) =>
@@ -556,7 +580,11 @@ export function resolveTerraformPlanNodeKey(
   nodes: Record<string, TerraformPlanGraphNode>,
   address: string,
 ): string | null {
-  if (!address || typeof address !== "string" || address === TERRAFORM_MODULE_TREE_KEY) {
+  if (
+    !address ||
+    typeof address !== "string" ||
+    address === TERRAFORM_MODULE_TREE_KEY
+  ) {
     return null;
   }
   if (nodes[address]) {
@@ -615,8 +643,12 @@ function isNonEmptyValue(value: unknown) {
   return value != null;
 }
 
-function hasMeaningfulIamPolicyDocumentContent(resource: Record<string, unknown>) {
-  const change = resource.change as { after?: Record<string, unknown> } | undefined;
+function hasMeaningfulIamPolicyDocumentContent(
+  resource: Record<string, unknown>,
+) {
+  const change = resource.change as
+    | { after?: Record<string, unknown> }
+    | undefined;
   const candidates = [
     resource.values as Record<string, unknown> | undefined,
     change?.after,
@@ -669,9 +701,9 @@ function pruneDataFlowEdges(edges: unknown, pruned: Set<string>) {
   }) as string[];
 }
 
-export function sanitizeTerraformPlanNodes<T extends Record<string, TerraformPlanGraphNode>>(
-  nodes: T,
-): T {
+export function sanitizeTerraformPlanNodes<
+  T extends Record<string, TerraformPlanGraphNode>,
+>(nodes: T): T {
   const pruned = new Set<string>();
 
   for (const [nodePath, node] of Object.entries(nodes)) {
@@ -704,298 +736,311 @@ export function sanitizeTerraformPlanNodes<T extends Record<string, TerraformPla
 }
 
 function loadPlan(plan: { resource_changes: { address: string }[] }) {
-    const nodes: Record<string, TerraformPlanGraphNode> = {};
-    const resourceChanges = plan.resource_changes || [];
-  
-    for (const resourceChange of resourceChanges) {
-      const address = resourceChange.address;
-      const nodePath = address;
-      if (!nodes[nodePath]) {
-        nodes[nodePath] = { resources: {} };
-      }
-      nodes[nodePath].resources[address] = resourceChange;
+  const nodes: Record<string, TerraformPlanGraphNode> = {};
+  const resourceChanges = plan.resource_changes || [];
+
+  for (const resourceChange of resourceChanges) {
+    const address = resourceChange.address;
+    const nodePath = address;
+    if (!nodes[nodePath]) {
+      nodes[nodePath] = { resources: {} };
     }
-  
-    return nodes;
+    nodes[nodePath].resources[address] = resourceChange;
   }
 
-  function addModuleNodes(nodes: Record<string, TerraformPlanGraphNode>) {
-    const modulePaths = collectAllTerraformModulePaths(Object.keys(nodes));
-  
-    for (const modulePath of modulePaths) {
-      if (nodes[modulePath]) {
-        continue;
-      }
-  
-      nodes[modulePath] = {
-        resources: {
-          [modulePath]: {
-            address: modulePath,
-            type: TERRAFORM_MODULE_RESOURCE_TYPE,
-            name: lastModuleNameSegment(modulePath),
-            mode: "managed",
-            change: { actions: ["no-op"] },
-          },
+  return nodes;
+}
+
+function addModuleNodes(nodes: Record<string, TerraformPlanGraphNode>) {
+  const modulePaths = collectAllTerraformModulePaths(Object.keys(nodes));
+
+  for (const modulePath of modulePaths) {
+    if (nodes[modulePath]) {
+      continue;
+    }
+
+    nodes[modulePath] = {
+      resources: {
+        [modulePath]: {
+          address: modulePath,
+          type: TERRAFORM_MODULE_RESOURCE_TYPE,
+          name: lastModuleNameSegment(modulePath),
+          mode: "managed",
+          change: { actions: ["no-op"] },
         },
-      };
-    }
-  
-    return nodes;
-  }
-
-  function collectAllTerraformModulePaths(nodePaths: string[]) {
-    const out = new Set<string>();
-    for (const nodePath of nodePaths) {
-      for (const modulePath of getModulePathChainFromAddress(nodePath)) {
-        out.add(modulePath);
-      }
-    }
-    return out;
-  }
-
-  function getModulePathChainFromAddress(nodePath = "") {
-    const parts = nodePath.split(".");
-    const chain = [];
-    let cursor = "";
-  
-    for (let index = 0; index < parts.length - 1; ) {
-      if (parts[index] !== "module" || !parts[index + 1]) {
-        break;
-      }
-      const segment = `module.${parts[index + 1]}`;
-      cursor = cursor ? `${cursor}.${segment}` : segment;
-      chain.push(cursor);
-      index += 2;
-    }
-  
-    return chain;
-  }
-
-  function lastModuleNameSegment(modulePath: string) {
-    const parts = modulePath.split(".");
-    return parts[parts.length - 1] || modulePath;
-  }
-
-  function emptyModuleTreeNode(path: string): TerraformModuleTreeNode {
-    return { path, modules: {}, resourceAddresses: [] };
-  }
-
-  /**
-   * Deepest Terraform module path that owns this address, or `"root"` for the root module.
-   * Example: `module.vpc.aws_subnet.a` → `module.vpc`; `aws_instance.x` → `root`.
-   */
-  function getContainingModulePathForAddress(address: string): string {
-    const parts = address.split(".");
-    let index = 0;
-    let modulePath = "";
-    while (index < parts.length && parts[index] === "module" && parts[index + 1]) {
-      const segment = `module.${parts[index + 1]}`;
-      modulePath = modulePath ? `${modulePath}.${segment}` : segment;
-      index += 2;
-    }
-    return modulePath || "root";
-  }
-
-  /**
-   * Walks/creates `module.a` → `module.a.module.b` under `root` and returns the deepest node.
-   * `fullModulePath` is a Terraform module path (no resource suffix), e.g. `module.network`.
-   */
-  function ensureModulePathInTree(
-    root: TerraformModuleTreeNode,
-    fullModulePath: string,
-  ): TerraformModuleTreeNode {
-    if (!fullModulePath || fullModulePath === "root") {
-      return root;
-    }
-    const sentinel = `${fullModulePath}.aws_instance.__module_tree__`;
-    const chain = getModulePathChainFromAddress(sentinel);
-    let cursor = root;
-    for (const segment of chain) {
-      if (!cursor.modules[segment]) {
-        cursor.modules[segment] = emptyModuleTreeNode(segment);
-      }
-      cursor = cursor.modules[segment];
-    }
-    return cursor;
-  }
-
-  function isTerraformModuleStubNode(
-    nodes: Record<string, TerraformPlanGraphNode>,
-    key: string,
-  ): boolean {
-    const resource = nodes[key]?.resources?.[key] as { type?: string } | undefined;
-    return Boolean(resource && resource.type === TERRAFORM_MODULE_RESOURCE_TYPE);
-  }
-
-  /**
-   * Builds a module → children / resources tree and stores it on the nodes map under
-   * {@link TERRAFORM_MODULE_TREE_KEY}. Root is `{ path: "root", … }`.
-   */
-  export function buildTerraformModuleTree(
-    nodes: Record<string, TerraformPlanGraphNode>,
-  ): TerraformModuleTreeNode {
-    const root = emptyModuleTreeNode("root");
-
-    const keys = Object.keys(nodes).filter((k) => !k.startsWith("__"));
-    for (const key of keys) {
-      if (isTerraformModuleStubNode(nodes, key)) {
-        ensureModulePathInTree(root, key);
-        continue;
-      }
-
-      const parentPath = getContainingModulePathForAddress(key);
-      const parent =
-        parentPath === "root" ? root : ensureModulePathInTree(root, parentPath);
-      if (!parent.resourceAddresses.includes(key)) {
-        parent.resourceAddresses.push(key);
-      }
-    }
-
-    const sortRecursive = (node: TerraformModuleTreeNode) => {
-      node.resourceAddresses.sort();
-      for (const child of Object.values(node.modules)) {
-        sortRecursive(child);
-      }
-      const sortedKeys = Object.keys(node.modules).sort();
-      const next: Record<string, TerraformModuleTreeNode> = {};
-      for (const k of sortedKeys) {
-        next[k] = node.modules[k];
-      }
-      node.modules = next;
+      },
     };
-    sortRecursive(root);
+  }
 
+  return nodes;
+}
+
+function collectAllTerraformModulePaths(nodePaths: string[]) {
+  const out = new Set<string>();
+  for (const nodePath of nodePaths) {
+    for (const modulePath of getModulePathChainFromAddress(nodePath)) {
+      out.add(modulePath);
+    }
+  }
+  return out;
+}
+
+function getModulePathChainFromAddress(nodePath = "") {
+  const parts = nodePath.split(".");
+  const chain = [];
+  let cursor = "";
+
+  for (let index = 0; index < parts.length - 1; ) {
+    if (parts[index] !== "module" || !parts[index + 1]) {
+      break;
+    }
+    const segment = `module.${parts[index + 1]}`;
+    cursor = cursor ? `${cursor}.${segment}` : segment;
+    chain.push(cursor);
+    index += 2;
+  }
+
+  return chain;
+}
+
+function lastModuleNameSegment(modulePath: string) {
+  const parts = modulePath.split(".");
+  return parts[parts.length - 1] || modulePath;
+}
+
+function emptyModuleTreeNode(path: string): TerraformModuleTreeNode {
+  return { path, modules: {}, resourceAddresses: [] };
+}
+
+/**
+ * Deepest Terraform module path that owns this address, or `"root"` for the root module.
+ * Example: `module.vpc.aws_subnet.a` → `module.vpc`; `aws_instance.x` → `root`.
+ */
+function getContainingModulePathForAddress(address: string): string {
+  const parts = address.split(".");
+  let index = 0;
+  let modulePath = "";
+  while (
+    index < parts.length &&
+    parts[index] === "module" &&
+    parts[index + 1]
+  ) {
+    const segment = `module.${parts[index + 1]}`;
+    modulePath = modulePath ? `${modulePath}.${segment}` : segment;
+    index += 2;
+  }
+  return modulePath || "root";
+}
+
+/**
+ * Walks/creates `module.a` → `module.a.module.b` under `root` and returns the deepest node.
+ * `fullModulePath` is a Terraform module path (no resource suffix), e.g. `module.network`.
+ */
+function ensureModulePathInTree(
+  root: TerraformModuleTreeNode,
+  fullModulePath: string,
+): TerraformModuleTreeNode {
+  if (!fullModulePath || fullModulePath === "root") {
     return root;
   }
+  const sentinel = `${fullModulePath}.aws_instance.__module_tree__`;
+  const chain = getModulePathChainFromAddress(sentinel);
+  let cursor = root;
+  for (const segment of chain) {
+    if (!cursor.modules[segment]) {
+      cursor.modules[segment] = emptyModuleTreeNode(segment);
+    }
+    cursor = cursor.modules[segment];
+  }
+  return cursor;
+}
 
-  function attachModuleTree(
-    nodes: Record<string, TerraformPlanGraphNode>,
-  ): TerraformPlanNodesMap {
-    const map = nodes as TerraformPlanNodesMap;
-    map[TERRAFORM_MODULE_TREE_KEY] = buildTerraformModuleTree(nodes);
-    return map;
+function isTerraformModuleStubNode(
+  nodes: Record<string, TerraformPlanGraphNode>,
+  key: string,
+): boolean {
+  const resource = nodes[key]?.resources?.[key] as
+    | { type?: string }
+    | undefined;
+  return Boolean(resource && resource.type === TERRAFORM_MODULE_RESOURCE_TYPE);
+}
+
+/**
+ * Builds a module → children / resources tree and stores it on the nodes map under
+ * {@link TERRAFORM_MODULE_TREE_KEY}. Root is `{ path: "root", … }`.
+ */
+export function buildTerraformModuleTree(
+  nodes: Record<string, TerraformPlanGraphNode>,
+): TerraformModuleTreeNode {
+  const root = emptyModuleTreeNode("root");
+
+  const keys = Object.keys(nodes).filter((k) => !k.startsWith("__"));
+  for (const key of keys) {
+    if (isTerraformModuleStubNode(nodes, key)) {
+      ensureModulePathInTree(root, key);
+      continue;
+    }
+
+    const parentPath = getContainingModulePathForAddress(key);
+    const parent =
+      parentPath === "root" ? root : ensureModulePathInTree(root, parentPath);
+    if (!parent.resourceAddresses.includes(key)) {
+      parent.resourceAddresses.push(key);
+    }
   }
 
-  function buildNewEdges(nodes: Record<string, TerraformPlanGraphNode>, adjacency: Record<string, string[]>) {
-  
-    //iterate over every node
-    for (const nodePath of Object.keys(nodes)) {
-      if (nodePath === TERRAFORM_MODULE_TREE_KEY) {
-        continue;
-      }
-      const visited = new Set<string>([nodePath]);
-      const queue = [nodePath];
-      const connectedNodes: string[] = [];
-  
-      for (let index = 0; index < queue.length; index++) {
-        const current = queue[index];
-        const graphKey = stripTerraformAddressIndexes(current);
-        //due to being a raw parse there is a chance that that entry has no outgoign edges
-        const neighbors = adjacency[graphKey] || [];
-  
-        for (const neighbor of neighbors) {
-          if (visited.has(neighbor)) {
-            continue;
-          }
-          visited.add(neighbor);
-  
-          if (neighbor.startsWith("provider")) {
-            continue;
-          }
-  
-          if (nodes[neighbor]) {
-            connectedNodes.push(neighbor);
-            continue;
-          }
-  
-          queue.push(neighbor);
+  const sortRecursive = (node: TerraformModuleTreeNode) => {
+    node.resourceAddresses.sort();
+    for (const child of Object.values(node.modules)) {
+      sortRecursive(child);
+    }
+    const sortedKeys = Object.keys(node.modules).sort();
+    const next: Record<string, TerraformModuleTreeNode> = {};
+    for (const k of sortedKeys) {
+      next[k] = node.modules[k];
+    }
+    node.modules = next;
+  };
+  sortRecursive(root);
+
+  return root;
+}
+
+function attachModuleTree(
+  nodes: Record<string, TerraformPlanGraphNode>,
+): TerraformPlanNodesMap {
+  const map = nodes as TerraformPlanNodesMap;
+  map[TERRAFORM_MODULE_TREE_KEY] = buildTerraformModuleTree(nodes);
+  return map;
+}
+
+function buildNewEdges(
+  nodes: Record<string, TerraformPlanGraphNode>,
+  adjacency: Record<string, string[]>,
+) {
+  //iterate over every node
+  for (const nodePath of Object.keys(nodes)) {
+    if (nodePath === TERRAFORM_MODULE_TREE_KEY) {
+      continue;
+    }
+    const visited = new Set<string>([nodePath]);
+    const queue = [nodePath];
+    const connectedNodes: string[] = [];
+
+    for (let index = 0; index < queue.length; index++) {
+      const current = queue[index];
+      const graphKey = stripTerraformAddressIndexes(current);
+      //due to being a raw parse there is a chance that that entry has no outgoign edges
+      const neighbors = adjacency[graphKey] || [];
+
+      for (const neighbor of neighbors) {
+        if (visited.has(neighbor)) {
+          continue;
         }
-      }
-  
-      nodes[nodePath].edges_new = connectedNodes;
-    }
-  
-    return nodes;
-  }
+        visited.add(neighbor);
 
-  function ensureEdgeLists(nodes: Record<string, TerraformPlanGraphNode>) {
-    for (const [key, node] of Object.entries(nodes)) {
-      if (key === TERRAFORM_MODULE_TREE_KEY) {
-        continue;
-      }
-      node.edges_new ||= [];
-      node.edges_existing ||= [];
-      node.edges_data_flow ||= [];
-    }
-    return nodes;
-  }
-
-  function buildExistingEdges(nodes: Record<string, TerraformPlanGraphNode>, plan: { prior_state: { values: { root_module: unknown } } }) {
-    const rootModule = plan?.prior_state?.values?.root_module;
-    if (!rootModule) {
-      return nodes;
-    }
-  
-    const existingEdges: Record<string, Set<string>> = {};
-    const addEdge = (from: string, to: string) => {
-      if (!existingEdges[from]) {
-        existingEdges[from] = new Set();
-      }
-      existingEdges[from].add(to);
-    };
-  
-    const stack: TerraformPriorStateModule[] = [rootModule as TerraformPriorStateModule];
-    while (stack.length) {
-      const currentModule = stack.pop();
-      if (currentModule == null) {
-        continue;
-      }
-
-      for (const resource of currentModule.resources || []) {
-        const address = resource.address;
-        if (!address) {
+        if (neighbor.startsWith("provider")) {
           continue;
         }
 
-        nodes[address] ||= { resources: {} };
-
-        if (!nodes[address].resources[address]) {
-          nodes[address].resources[address] = {
-            ...resource,
-            change: { actions: ["existing"] },
-          };
-        }
-
-        for (const dependency of resource.depends_on || []) {
-          if (!dependency) {
-            continue;
-          }
-          addEdge(address, dependency);
-        }
-      }
-  
-      for (const childModule of currentModule.child_modules || []) {
-        stack.push(childModule);
-      }
-    }
-  
-    for (const [rawSource, targets] of Object.entries(existingEdges)) {
-      const source = resolveTerraformPlanNodeKey(nodes, rawSource);
-      if (!source) {
-        continue;
-      }
-      nodes[source].edges_existing ||= [];
-
-      for (const rawTarget of targets) {
-        const target = resolveTerraformPlanNodeKey(nodes, rawTarget);
-        if (!target) {
+        if (nodes[neighbor]) {
+          connectedNodes.push(neighbor);
           continue;
         }
-        if (!nodes[source].edges_existing.includes(target)) {
-          nodes[source].edges_existing.push(target);
-        }
+
+        queue.push(neighbor);
       }
     }
 
+    nodes[nodePath].edges_new = connectedNodes;
+  }
+
+  return nodes;
+}
+
+function ensureEdgeLists(nodes: Record<string, TerraformPlanGraphNode>) {
+  for (const [key, node] of Object.entries(nodes)) {
+    if (key === TERRAFORM_MODULE_TREE_KEY) {
+      continue;
+    }
+    node.edges_new ||= [];
+    node.edges_existing ||= [];
+    node.edges_data_flow ||= [];
+  }
+  return nodes;
+}
+
+function buildExistingEdges(
+  nodes: Record<string, TerraformPlanGraphNode>,
+  plan: { prior_state: { values: { root_module: unknown } } },
+) {
+  const rootModule = plan?.prior_state?.values?.root_module;
+  if (!rootModule) {
     return nodes;
   }
+
+  const existingEdges: Record<string, Set<string>> = {};
+  const addEdge = (from: string, to: string) => {
+    if (!existingEdges[from]) {
+      existingEdges[from] = new Set();
+    }
+    existingEdges[from].add(to);
+  };
+
+  const stack: TerraformPriorStateModule[] = [
+    rootModule as TerraformPriorStateModule,
+  ];
+  while (stack.length) {
+    const currentModule = stack.pop();
+    if (currentModule == null) {
+      continue;
+    }
+
+    for (const resource of currentModule.resources || []) {
+      const address = resource.address;
+      if (!address) {
+        continue;
+      }
+
+      nodes[address] ||= { resources: {} };
+
+      if (!nodes[address].resources[address]) {
+        nodes[address].resources[address] = {
+          ...resource,
+          change: { actions: ["existing"] },
+        };
+      }
+
+      for (const dependency of resource.depends_on || []) {
+        if (!dependency) {
+          continue;
+        }
+        addEdge(address, dependency);
+      }
+    }
+
+    for (const childModule of currentModule.child_modules || []) {
+      stack.push(childModule);
+    }
+  }
+
+  for (const [rawSource, targets] of Object.entries(existingEdges)) {
+    const source = resolveTerraformPlanNodeKey(nodes, rawSource);
+    if (!source) {
+      continue;
+    }
+    nodes[source].edges_existing ||= [];
+
+    for (const rawTarget of targets) {
+      const target = resolveTerraformPlanNodeKey(nodes, rawTarget);
+      if (!target) {
+        continue;
+      }
+      if (!nodes[source].edges_existing.includes(target)) {
+        nodes[source].edges_existing.push(target);
+      }
+    }
+  }
+
+  return nodes;
+}

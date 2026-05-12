@@ -137,7 +137,9 @@ function buildDiagramIR(nodes, options = {}) {
     const icon = (() => {
       try {
         const found = getIconForType(resourceType);
-        return found ? { library: "aws-architecture-icons", id: found.id || resourceType } : null;
+        return found
+          ? { library: "aws-architecture-icons", id: found.id || resourceType }
+          : null;
       } catch {
         return null;
       }
@@ -171,7 +173,9 @@ function buildDiagramIR(nodes, options = {}) {
       }
     }
 
-    const owningModule = modulePath.length ? modulePath[modulePath.length - 1] : null;
+    const owningModule = modulePath.length
+      ? modulePath[modulePath.length - 1]
+      : null;
     if (owningModule) {
       groupMap.get(owningModule).childIds.push(nodePath);
     }

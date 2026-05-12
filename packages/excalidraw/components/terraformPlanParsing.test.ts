@@ -62,7 +62,9 @@ const resource = (
   extra: Record<string, unknown> = {},
 ) => ({ address, mode, type, ...extra });
 
-const renderedLabels = (elements: Array<{ type?: string; originalText?: string }>) =>
+const renderedLabels = (
+  elements: Array<{ type?: string; originalText?: string }>,
+) =>
   elements
     .filter((element) => element.type === "text")
     .map((element) => element.originalText)
@@ -110,7 +112,9 @@ describe("buildTerraformModuleTree", () => {
       },
       "module.network.aws_vpc.main": {
         resources: {
-          "module.network.aws_vpc.main": { address: "module.network.aws_vpc.main" },
+          "module.network.aws_vpc.main": {
+            address: "module.network.aws_vpc.main",
+          },
         },
       },
       "module.network.module.sub.aws_subnet.a": {
@@ -133,7 +137,9 @@ describe("buildTerraformModuleTree", () => {
     expect(Object.keys(net.modules)).toEqual(["module.network.module.sub"]);
 
     const sub = net.modules["module.network.module.sub"];
-    expect(sub.resourceAddresses).toEqual(["module.network.module.sub.aws_subnet.a"]);
+    expect(sub.resourceAddresses).toEqual([
+      "module.network.module.sub.aws_subnet.a",
+    ]);
     expect(sub.modules).toEqual({});
   });
 
@@ -143,12 +149,17 @@ describe("buildTerraformModuleTree", () => {
         resources: { "aws_instance.a": { address: "aws_instance.a" } },
       },
     };
-    const map = { ...nodes } as Record<string, (typeof nodes)["aws_instance.a"]> & {
+    const map = { ...nodes } as Record<
+      string,
+      typeof nodes["aws_instance.a"]
+    > & {
       __other__?: unknown;
     };
     map.__other__ = { misc: true };
 
-    const tree = buildTerraformModuleTree(map as Parameters<typeof buildTerraformModuleTree>[0]);
+    const tree = buildTerraformModuleTree(
+      map as Parameters<typeof buildTerraformModuleTree>[0],
+    );
     expect(tree.resourceAddresses).toEqual(["aws_instance.a"]);
   });
 });
@@ -186,172 +197,163 @@ describe("terraformPlanParsing", () => {
     vi.restoreAllMocks();
   });
 
-  it(
-    "state-only import runs ELK pipeline without plan or dot",
-    async () => {
-      const res = await terraformPlanParsing(
-        null,
-        null,
-        textFileLike(MINIMAL_TFSTATE),
-        {},
-      );
+  it("state-only import runs ELK pipeline without plan or dot", async () => {
+    const res = await terraformPlanParsing(
+      null,
+      null,
+      textFileLike(MINIMAL_TFSTATE),
+      {},
+    );
 
-      expect(res.ok).toBe(true);
-      expect(res.status).toBe(200);
-      const body = await res.json();
-      expect(body.meta?.layoutEngine).toBe("elk");
-      expect(Array.isArray(body.elements)).toBe(true);
-      expect(body.elements.length).toBeGreaterThan(0);
-      const labels = renderedLabels(body.elements);
-      expect(
-        labels.some(
-          (label) =>
-            label.includes("fixture_bucket") ||
-            label.includes("aws_s3_bucket") ||
-            label.includes("demo-fixture-bucket"),
-        ),
-      ).toBe(true);
-    },
-    60_000,
-  );
+    expect(res.ok).toBe(true);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.meta?.layoutEngine).toBe("elk");
+    expect(Array.isArray(body.elements)).toBe(true);
+    expect(body.elements.length).toBeGreaterThan(0);
+    const labels = renderedLabels(body.elements);
+    expect(
+      labels.some(
+        (label) =>
+          label.includes("fixture_bucket") ||
+          label.includes("aws_s3_bucket") ||
+          label.includes("demo-fixture-bucket"),
+      ),
+    ).toBe(true);
+  }, 60_000);
 
   it("state-only with semanticLayout returns 400", async () => {
-    const res = await terraformPlanParsing(null, null, textFileLike(MINIMAL_TFSTATE), {
-      semanticLayout: true,
-    });
+    const res = await terraformPlanParsing(
+      null,
+      null,
+      textFileLike(MINIMAL_TFSTATE),
+      {
+        semanticLayout: true,
+      },
+    );
     expect(res.ok).toBe(false);
     expect(res.status).toBe(400);
     const body = await res.json();
     expect(body.error).toMatch(/Semantic layout requires/i);
   });
 
-  it(
-    "runs full local pipeline on allplanmodules fixtures without throwing",
-    async () => {
-      const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
-      const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+  it("runs full local pipeline on allplanmodules fixtures without throwing", async () => {
+    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
+    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
 
-      const res = await terraformPlanParsing(
-        textFileLike(planText),
-        textFileLike(dotText),
-        null,
-        {},
-      );
+    const res = await terraformPlanParsing(
+      textFileLike(planText),
+      textFileLike(dotText),
+      null,
+      {},
+    );
 
-      expect(res.ok).toBe(true);
-      expect(res.status).toBe(200);
-      expect(res.headers.get("Content-Type")).toContain("application/json");
+    expect(res.ok).toBe(true);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Content-Type")).toContain("application/json");
 
-      const body = await res.json();
-      expect(body.type).toBe("excalidraw");
-      expect(body.version).toBe(2);
-      expect(body.source).toBe("terraform-local-parse");
-      expect(Array.isArray(body.elements)).toBe(true);
-      expect(body.meta?.layoutEngine).toBe("elk");
-      expect(body.meta?.skippedLayout).toBeUndefined();
-      expect(body.meta?.vertexCount).toBeGreaterThan(0);
-      expect(body.elements.length).toBeGreaterThan(0);
-      const bounds = elementBounds(body.elements);
-      expect(bounds.width / bounds.height).toBeLessThan(2);
-      expect(body.appState).toMatchObject({
-        viewBackgroundColor: "#ffffff",
-        gridSize: null,
-      });
+    const body = await res.json();
+    expect(body.type).toBe("excalidraw");
+    expect(body.version).toBe(2);
+    expect(body.source).toBe("terraform-local-parse");
+    expect(Array.isArray(body.elements)).toBe(true);
+    expect(body.meta?.layoutEngine).toBe("elk");
+    expect(body.meta?.skippedLayout).toBeUndefined();
+    expect(body.meta?.vertexCount).toBeGreaterThan(0);
+    expect(body.elements.length).toBeGreaterThan(0);
+    const bounds = elementBounds(body.elements);
+    expect(bounds.width / bounds.height).toBeLessThan(2);
+    expect(body.appState).toMatchObject({
+      viewBackgroundColor: "#ffffff",
+      gridSize: null,
+    });
 
-      const labels = renderedLabels(body.elements);
-      expect(labels).not.toContain("data.aws_region.current");
-      expect(labels).not.toContain("data.aws_partition.current");
-      expect(labels).not.toContain("data.aws_caller_identity.current");
-      expect(labels).not.toContain("data.external.archive_prepare[0]");
-      expect(labels.some((label) => label === "logs")).toBe(true);
+    const labels = renderedLabels(body.elements);
+    expect(labels).not.toContain("data.aws_region.current");
+    expect(labels).not.toContain("data.aws_partition.current");
+    expect(labels).not.toContain("data.aws_caller_identity.current");
+    expect(labels).not.toContain("data.external.archive_prepare[0]");
+    expect(labels.some((label) => label === "logs")).toBe(true);
 
-      const terraformResources = body.elements
-        .flatMap(
-          (element: any) => element.customData?.terraformResources || [],
-        )
-        .filter(Boolean);
-      expect(
-        terraformResources.some(
-          (resource: any) => (resource.attributes || []).length > 0,
+    const terraformResources = body.elements
+      .flatMap((element: any) => element.customData?.terraformResources || [])
+      .filter(Boolean);
+    expect(
+      terraformResources.some(
+        (resource: any) => (resource.attributes || []).length > 0,
+      ),
+    ).toBe(true);
+    expect(
+      terraformResources.some((resource: any) =>
+        (resource.attributes || []).some(
+          (attribute: any) => attribute.changed || attribute.unknownAfter,
         ),
-      ).toBe(true);
-      expect(
-        terraformResources.some((resource: any) =>
-          (resource.attributes || []).some(
-            (attribute: any) => attribute.changed || attribute.unknownAfter,
-          ),
-        ),
-      ).toBe(true);
-    },
-    60_000,
-  );
+      ),
+    ).toBe(true);
+  }, 60_000);
 
-  it(
-    "semanticLayout returns topology frames and topology meta",
-    async () => {
-      const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
-      const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
+  it("semanticLayout returns topology frames and topology meta", async () => {
+    const planText = fs.readFileSync(PLAN_FIXTURE, "utf8");
+    const dotText = fs.readFileSync(DOT_FIXTURE, "utf8");
 
-      const res = await terraformPlanParsing(
-        textFileLike(planText),
-        textFileLike(dotText),
-        null,
-        { semanticLayout: true },
-      );
+    const res = await terraformPlanParsing(
+      textFileLike(planText),
+      textFileLike(dotText),
+      null,
+      { semanticLayout: true },
+    );
 
-      expect(res.ok).toBe(true);
-      const body = await res.json();
-      const plan = JSON.parse(planText);
-      expect(body.meta?.layoutEngine).toBe("topology");
-      expect(body.meta?.accountCount).toBeGreaterThan(0);
-      expect(typeof body.meta?.primaryResourceCount).toBe("number");
-      expect(body.meta?.primaryResourceCount).toBeGreaterThanOrEqual(0);
-      expect(typeof body.meta?.regionalPrimaryCount).toBe("number");
-      expect(body.meta?.regionalPrimaryCount).toBeGreaterThanOrEqual(0);
-      expect(Array.isArray(body.elements)).toBe(true);
-      const frames = body.elements.filter((e: any) => e.type === "frame");
-      expect(frames.length).toBeGreaterThan(0);
+    expect(res.ok).toBe(true);
+    const body = await res.json();
+    const plan = JSON.parse(planText);
+    expect(body.meta?.layoutEngine).toBe("topology");
+    expect(body.meta?.accountCount).toBeGreaterThan(0);
+    expect(typeof body.meta?.primaryResourceCount).toBe("number");
+    expect(body.meta?.primaryResourceCount).toBeGreaterThanOrEqual(0);
+    expect(typeof body.meta?.regionalPrimaryCount).toBe("number");
+    expect(body.meta?.regionalPrimaryCount).toBeGreaterThanOrEqual(0);
+    expect(Array.isArray(body.elements)).toBe(true);
+    const frames = body.elements.filter((e: any) => e.type === "frame");
+    expect(frames.length).toBeGreaterThan(0);
 
-      const represented = new Set<string>();
-      const representedSubnetIds = new Set<string>();
-      for (const element of body.elements as any[]) {
-        if (typeof element.customData?.nodePath === "string") {
-          represented.add(element.customData.nodePath);
-        }
-        for (const subnetId of element.customData?.terraformSubnetIds || []) {
-          representedSubnetIds.add(subnetId);
-        }
-        for (const resource of element.customData?.terraformResources || []) {
-          if (typeof resource.address === "string") {
-            represented.add(resource.address);
-          }
+    const represented = new Set<string>();
+    const representedSubnetIds = new Set<string>();
+    for (const element of body.elements as any[]) {
+      if (typeof element.customData?.nodePath === "string") {
+        represented.add(element.customData.nodePath);
+      }
+      for (const subnetId of element.customData?.terraformSubnetIds || []) {
+        representedSubnetIds.add(subnetId);
+      }
+      for (const resource of element.customData?.terraformResources || []) {
+        if (typeof resource.address === "string") {
+          represented.add(resource.address);
         }
       }
-      for (const rc of plan.resource_changes || []) {
-        if (rc.type === "aws_vpc") {
-          represented.add(rc.address);
-        }
-        const after = rc.change?.after || rc.change?.before || {};
-        if (rc.type === "aws_subnet" && representedSubnetIds.has(after.id)) {
-          represented.add(rc.address);
-        }
-        if (rc.type === "aws_iam_policy_document") {
-          represented.add(rc.address);
-        }
+    }
+    for (const rc of plan.resource_changes || []) {
+      if (rc.type === "aws_vpc") {
+        represented.add(rc.address);
       }
-      const omitted = (plan.resource_changes || []).filter(
-        (rc: any) => !represented.has(rc.address),
-      );
-      expect(omitted.map((rc: any) => rc.type)).toEqual([
-        "terraform_data",
-        "terraform_data",
-        "terraform_data",
-      ]);
-      expect(body.meta?.representedResourceCount).toBe(102);
-      expect(body.meta?.omittedResourceCount).toBe(3);
-    },
-    60_000,
-  );
+      const after = rc.change?.after || rc.change?.before || {};
+      if (rc.type === "aws_subnet" && representedSubnetIds.has(after.id)) {
+        represented.add(rc.address);
+      }
+      if (rc.type === "aws_iam_policy_document") {
+        represented.add(rc.address);
+      }
+    }
+    const omitted = (plan.resource_changes || []).filter(
+      (rc: any) => !represented.has(rc.address),
+    );
+    expect(omitted.map((rc: any) => rc.type)).toEqual([
+      "terraform_data",
+      "terraform_data",
+      "terraform_data",
+    ]);
+    expect(body.meta?.representedResourceCount).toBe(102);
+    expect(body.meta?.omittedResourceCount).toBe(3);
+  }, 60_000);
 });
 
 describe("sanitizeTerraformPlanNodes", () => {
@@ -405,7 +407,9 @@ describe("sanitizeTerraformPlanNodes", () => {
             {
               change: {
                 after: {
-                  statement: [{ actions: ["sts:AssumeRole"], resources: ["*"] }],
+                  statement: [
+                    { actions: ["sts:AssumeRole"], resources: ["*"] },
+                  ],
                 },
               },
             },
@@ -417,9 +421,9 @@ describe("sanitizeTerraformPlanNodes", () => {
       },
     };
 
-    expect(sanitizeTerraformPlanNodes(nodes)["data.aws_iam_policy_document.assume"]).toBe(
-      nodes["data.aws_iam_policy_document.assume"],
-    );
+    expect(
+      sanitizeTerraformPlanNodes(nodes)["data.aws_iam_policy_document.assume"],
+    ).toBe(nodes["data.aws_iam_policy_document.assume"]);
   });
 
   it("removes empty aws_iam_policy_document placeholders", () => {
@@ -441,7 +445,9 @@ describe("sanitizeTerraformPlanNodes", () => {
       },
     };
 
-    expect(sanitizeTerraformPlanNodes(nodes)["data.aws_iam_policy_document.empty"]).toBeUndefined();
+    expect(
+      sanitizeTerraformPlanNodes(nodes)["data.aws_iam_policy_document.empty"],
+    ).toBeUndefined();
   });
 
   it("sanitizes mixed graphs before ELK renders resource rectangles", async () => {
@@ -454,7 +460,10 @@ describe("sanitizeTerraformPlanNodes", () => {
             "aws_lambda_function",
           ),
         },
-        edges_new: ["data.aws_region.current", "data.aws_iam_policy_document.assume"],
+        edges_new: [
+          "data.aws_region.current",
+          "data.aws_iam_policy_document.assume",
+        ],
         edges_existing: [],
         edges_data_flow: [],
       },

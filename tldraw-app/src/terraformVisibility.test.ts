@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { TLShapePartial } from "tldraw";
+
 import {
   collapseAllKeys,
   expandAllKeys,
@@ -8,6 +8,8 @@ import {
   getSelectedExplodeTriggerKeys,
   toggleExpandedKey,
 } from "./terraformVisibility";
+
+import type { TLShapePartial } from "tldraw";
 
 function resourceShape(
   id: string,
@@ -72,7 +74,9 @@ describe("terraformVisibility", () => {
   it("expands and collapses children and filters edge layers", () => {
     const root = resourceShape("root", "root", true);
     const child = resourceShape("child", "child", false, ["root"]);
-    const grandchild = resourceShape("grandchild", "grandchild", false, ["child"]);
+    const grandchild = resourceShape("grandchild", "grandchild", false, [
+      "child",
+    ]);
     const dependency = edgeShape("dep", "dependency", "root", "child");
     const dataFlow = edgeShape("flow", "dataFlow", "root", "child");
     const shapes = [root, child, grandchild, dependency, dataFlow];

@@ -22,9 +22,7 @@ import {
   resolveTerraformTopologyAccountRegion,
   shouldEmitTopologyPlacement,
 } from "./terraformTopologyExtract";
-import {
-  isPrimaryVisibleResourceType,
-} from "./terraformPrimaryVisibility";
+import { isPrimaryVisibleResourceType } from "./terraformPrimaryVisibility";
 import { tfComfortPx } from "./terraformLayoutComfort";
 import { terraformModulePrefixForAddress } from "./terraformTopologyIamLinks";
 
@@ -121,7 +119,9 @@ function stringArrayField(v: unknown): string[] {
   return v.filter((x): x is string => typeof x === "string" && x.length > 0);
 }
 
-function vpcConfigBlocks(values: Record<string, unknown>): Record<string, unknown>[] {
+function vpcConfigBlocks(
+  values: Record<string, unknown>,
+): Record<string, unknown>[] {
   const raw = values.vpc_config;
   if (!Array.isArray(raw) || raw.length === 0) {
     return [];
@@ -133,7 +133,9 @@ function vpcConfigBlocks(values: Record<string, unknown>): Record<string, unknow
 }
 
 /** Unique sorted subnet ids referenced by the resource shape. */
-export function collectPlacementSubnetIds(values: Record<string, unknown>): string[] {
+export function collectPlacementSubnetIds(
+  values: Record<string, unknown>,
+): string[] {
   const ids = new Set<string>();
   for (const block of vpcConfigBlocks(values)) {
     for (const sid of stringArrayField(block.subnet_ids)) {
@@ -168,7 +170,9 @@ export function extractPrimaryTopologyZones(
     resource_changes?: ResourceChange[];
   },
 ): TopologyPlacementZone[] {
-  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
   const subnetToVpc = buildSubnetToVpcMapFromPlan(plan);
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
   const albModulePrefixes: Array<{ prefix: string; key: string }> = [];
@@ -220,7 +224,8 @@ export function extractPrimaryTopologyZones(
       continue;
     }
 
-    let vpcId = typeof values.vpc_id === "string" && values.vpc_id ? values.vpc_id : null;
+    let vpcId =
+      typeof values.vpc_id === "string" && values.vpc_id ? values.vpc_id : null;
     if (!vpcId && subnetIds.length > 0) {
       vpcId = subnetToVpc.get(subnetIds[0]!) ?? null;
     }
@@ -255,7 +260,11 @@ export function extractPrimaryTopologyZones(
     if (!isAwsTerraformResourceChange(rc)) {
       continue;
     }
-    if (rc.mode !== "managed" || !rc.type || !ALB_COMPANION_TYPES.has(rc.type)) {
+    if (
+      rc.mode !== "managed" ||
+      !rc.type ||
+      !ALB_COMPANION_TYPES.has(rc.type)
+    ) {
       continue;
     }
     const address = rc.address;
@@ -299,7 +308,11 @@ function stringField(v: unknown): string | null {
   return typeof v === "string" && v.length > 0 ? v : null;
 }
 
-function vpcEndpointBucketKey(accountId: string, region: string, vpcId: string): string {
+function vpcEndpointBucketKey(
+  accountId: string,
+  region: string,
+  vpcId: string,
+): string {
   return `${accountId}\0${region}\0${vpcId}`;
 }
 
@@ -312,7 +325,9 @@ export function extractVpcEndpointsByVpc(
     resource_changes?: ResourceChange[];
   },
 ): TopologyVpcEndpointBucket[] {
-  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
 
   const accum = new Map<
@@ -421,7 +436,9 @@ export function extractRouteTablesByVpc(
     resource_changes?: ResourceChange[];
   },
 ): TopologyRouteTableBucket[] {
-  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
 
   const accum = new Map<
@@ -523,7 +540,9 @@ function buildRouteTableIdToSubnetIdsFromPlan(
   },
 ): Map<string, Set<string>> {
   const out = new Map<string, Set<string>>();
-  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
   for (const rc of changes) {
     if (!isAwsTerraformResourceChange(rc)) {
       continue;
@@ -554,7 +573,9 @@ function buildRouteTableIdToCompanionAddressesFromPlan(
   },
 ): Map<string, Set<string>> {
   const out = new Map<string, Set<string>>();
-  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
   for (const rc of changes) {
     if (!isAwsTerraformResourceChange(rc)) {
       continue;
@@ -591,7 +612,9 @@ function buildRouteTableAddressToMeta(
   },
 ): Map<string, RouteTableAddressMeta> {
   const out = new Map<string, RouteTableAddressMeta>();
-  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
 
   for (const rc of changes) {
@@ -664,7 +687,11 @@ function pickNarrowestZoneContainingSubnets(
   return candidates[0] ?? null;
 }
 
-function routeTableVpcAccumKey(accountId: string, region: string, vpcId: string): string {
+function routeTableVpcAccumKey(
+  accountId: string,
+  region: string,
+  vpcId: string,
+): string {
   return `${accountId}\0${region}\0${vpcId}`;
 }
 
@@ -728,7 +755,11 @@ export function computeRouteTableBottomEdgePlacements(
         }
         zoneAccum.get(zk)!.push(...addressesForPlacement);
       } else {
-        const vk = routeTableVpcAccumKey(meta.accountId, meta.region, meta.vpcId);
+        const vk = routeTableVpcAccumKey(
+          meta.accountId,
+          meta.region,
+          meta.vpcId,
+        );
         if (!vpcAccum.has(vk)) {
           vpcAccum.set(vk, []);
         }
@@ -802,7 +833,9 @@ export function extractRegionalTopologyPrimaries(
     resource_changes?: ResourceChange[];
   },
 ): TopologyRegionalPrimaryBucket[] {
-  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
   const subnetToVpc = buildSubnetToVpcMapFromPlan(plan);
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
 
@@ -846,7 +879,8 @@ export function extractRegionalTopologyPrimaries(
       continue;
     }
 
-    let vpcId = typeof values.vpc_id === "string" && values.vpc_id ? values.vpc_id : null;
+    let vpcId =
+      typeof values.vpc_id === "string" && values.vpc_id ? values.vpc_id : null;
     if (!vpcId && subnetIds.length > 0) {
       vpcId = subnetToVpc.get(subnetIds[0]!) ?? null;
     }
@@ -863,11 +897,13 @@ export function extractRegionalTopologyPrimaries(
     row.addresses.add(address);
   }
 
-  const out: TopologyRegionalPrimaryBucket[] = [...accum.values()].map((row) => ({
-    accountId: row.accountId,
-    region: row.region,
-    addresses: [...row.addresses].sort(),
-  }));
+  const out: TopologyRegionalPrimaryBucket[] = [...accum.values()].map(
+    (row) => ({
+      accountId: row.accountId,
+      region: row.region,
+      addresses: [...row.addresses].sort(),
+    }),
+  );
 
   out.sort((a, b) => {
     if (a.accountId !== b.accountId) {
@@ -904,7 +940,9 @@ export function extractVpcDefaultPlumbingBuckets(
     resource_changes?: ResourceChange[];
   },
 ): TopologyVpcDefaultPlumbingBucket[] {
-  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
   const subnetToVpc = buildSubnetToVpcMapFromPlan(plan);
   const natAllocationToVpc = new Map<string, string>();
@@ -986,12 +1024,14 @@ export function extractVpcDefaultPlumbingBuckets(
     row.addresses.add(address);
   }
 
-  const out: TopologyVpcDefaultPlumbingBucket[] = [...accum.values()].map((row) => ({
-    accountId: row.accountId,
-    region: row.region,
-    vpcId: row.vpcId,
-    addresses: [...row.addresses].sort(),
-  }));
+  const out: TopologyVpcDefaultPlumbingBucket[] = [...accum.values()].map(
+    (row) => ({
+      accountId: row.accountId,
+      region: row.region,
+      vpcId: row.vpcId,
+      addresses: [...row.addresses].sort(),
+    }),
+  );
 
   out.sort((a, b) => {
     if (a.accountId !== b.accountId) {
@@ -1015,7 +1055,9 @@ export function extractSupplementarySubnetZones(
   },
   primaryZones: readonly TopologyPlacementZone[],
 ): TopologyPlacementZone[] {
-  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
 
   const covered = new Set<string>();
@@ -1137,7 +1179,9 @@ export function extractVpcFlowLogBundles(
     resource_changes?: ResourceChange[];
   },
 ): TopologyVpcFlowLogBucket[] {
-  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
 
   type FlowRow = {
@@ -1308,7 +1352,9 @@ export function extractInterfaceEndpointSecurityGroupBuckets(
   },
   vpcEndpointBuckets: readonly TopologyVpcEndpointBucket[],
 ): TopologyEndpointSecurityGroupBucket[] {
-  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
 
   const sgIdsByVpc = new Map<
@@ -1417,7 +1463,8 @@ export function extractInterfaceEndpointSecurityGroupBuckets(
       sgId && sgId.startsWith("sg-")
         ? sgId
         : [...sgModulePrefixById.entries()].find(
-            ([, prefix]) => prefix && prefix === terraformModulePrefixForAddress(addr),
+            ([, prefix]) =>
+              prefix && prefix === terraformModulePrefixForAddress(addr),
           )?.[0] ?? null;
     if (!matchingSgId) {
       continue;

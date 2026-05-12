@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 import { buildArnIndexForTopology } from "./terraformTopologyIamLinks";
 import {
   buildLambdaSgCluster,
@@ -10,12 +9,18 @@ import {
   stripLastTerraformModuleSegment,
 } from "./terraformTopologySgLinks";
 
+import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
+
 describe("terraformTopologySgLinks", () => {
   it("stripLastTerraformModuleSegment peels one module level", () => {
     expect(
-      stripLastTerraformModuleSegment("module.workload_reader_lambda.module.lambda"),
+      stripLastTerraformModuleSegment(
+        "module.workload_reader_lambda.module.lambda",
+      ),
     ).toBe("module.workload_reader_lambda");
-    expect(stripLastTerraformModuleSegment("module.workload_reader_lambda")).toBe("");
+    expect(
+      stripLastTerraformModuleSegment("module.workload_reader_lambda"),
+    ).toBe("");
     expect(stripLastTerraformModuleSegment("")).toBe("");
   });
 
@@ -41,10 +46,9 @@ describe("terraformTopologySgLinks", () => {
         },
       },
     };
-    expect(collectLambdaVpcSecurityGroupRefs(nodes, "aws_lambda_function.fn")).toEqual([
-      "sg-aaa",
-      "sg-bbb",
-    ]);
+    expect(
+      collectLambdaVpcSecurityGroupRefs(nodes, "aws_lambda_function.fn"),
+    ).toEqual(["sg-aaa", "sg-bbb"]);
   });
 
   it("maps sg id to aws_security_group path and collects VPC ingress/egress rules", () => {
@@ -136,9 +140,12 @@ describe("terraformTopologySgLinks", () => {
     expect(cluster?.groups[0]?.sgPath).toBe("aws_security_group.app");
     expect(cluster?.groups[0]?.rules).toEqual(rules);
 
-    expect(edges.some((e) => e.type === "security_group" && e.target === "aws_security_group.app")).toBe(
-      true,
-    );
+    expect(
+      edges.some(
+        (e) =>
+          e.type === "security_group" && e.target === "aws_security_group.app",
+      ),
+    ).toBe(true);
     expect(edges.filter((e) => e.type === "sg_rule").length).toBe(2);
   });
 
@@ -154,7 +161,9 @@ describe("terraformTopologySgLinks", () => {
             type: "aws_lambda_function",
             change: {
               after: {
-                vpc_config: [{ subnet_ids: ["s1"], security_group_ids: [sgArn] }],
+                vpc_config: [
+                  { subnet_ids: ["s1"], security_group_ids: [sgArn] },
+                ],
               },
             },
           },
@@ -174,7 +183,11 @@ describe("terraformTopologySgLinks", () => {
       },
     };
     const arnIndex = buildArnIndexForTopology(nodes);
-    const { cluster } = buildLambdaSgCluster(nodes, "aws_lambda_function.fn", arnIndex);
+    const { cluster } = buildLambdaSgCluster(
+      nodes,
+      "aws_lambda_function.fn",
+      arnIndex,
+    );
     expect(cluster?.groups[0]?.sgPath).toBe("aws_security_group.main");
   });
 
@@ -202,9 +215,9 @@ describe("terraformTopologySgLinks", () => {
         },
       },
     };
-    expect(collectLambdaVpcSecurityGroupRefs(nodes, "aws_lambda_function.fn")).toEqual([
-      "aws_security_group.lambda",
-    ]);
+    expect(
+      collectLambdaVpcSecurityGroupRefs(nodes, "aws_lambda_function.fn"),
+    ).toEqual(["aws_security_group.lambda"]);
   });
 
   it("resolves module-relative aws_security_group.* refs on Lambdas in child modules", () => {
@@ -247,7 +260,9 @@ describe("terraformTopologySgLinks", () => {
       "module.app.aws_lambda_function.reader",
       arnIndex,
     );
-    expect(cluster?.groups[0]?.sgPath).toBe("module.app.aws_security_group.reader_sg");
+    expect(cluster?.groups[0]?.sgPath).toBe(
+      "module.app.aws_security_group.reader_sg",
+    );
   });
 
   it("infers sibling aws_security_group when create plan omits security_group_ids", () => {
@@ -268,7 +283,10 @@ describe("terraformTopologySgLinks", () => {
               after: {
                 vpc_config: [
                   {
-                    subnet_ids: ["subnet-053dd576128a8aa57", "subnet-0a342e3606f8ce4e8"],
+                    subnet_ids: [
+                      "subnet-053dd576128a8aa57",
+                      "subnet-0a342e3606f8ce4e8",
+                    ],
                   },
                 ],
               },
@@ -292,13 +310,21 @@ describe("terraformTopologySgLinks", () => {
       },
     };
 
-    expect(collectLambdaVpcSecurityGroupRefs(nodes, lambdaAddr)).toEqual([sgAddr]);
+    expect(collectLambdaVpcSecurityGroupRefs(nodes, lambdaAddr)).toEqual([
+      sgAddr,
+    ]);
 
     const arnIndex = buildArnIndexForTopology(nodes);
-    const { cluster, edges } = buildLambdaSgCluster(nodes, lambdaAddr, arnIndex);
+    const { cluster, edges } = buildLambdaSgCluster(
+      nodes,
+      lambdaAddr,
+      arnIndex,
+    );
     expect(cluster?.groups).toHaveLength(1);
     expect(cluster?.groups[0]?.sgPath).toBe(sgAddr);
-    expect(edges.some((e) => e.source === lambdaAddr && e.target === sgAddr)).toBe(true);
+    expect(
+      edges.some((e) => e.source === lambdaAddr && e.target === sgAddr),
+    ).toBe(true);
   });
 
   it("skips ancestor inference when plan configuration is present but yields no resolvable SG refs", () => {
@@ -321,7 +347,10 @@ describe("terraformTopologySgLinks", () => {
               after: {
                 vpc_config: [
                   {
-                    subnet_ids: ["subnet-053dd576128a8aa57", "subnet-0a342e3606f8ce4e8"],
+                    subnet_ids: [
+                      "subnet-053dd576128a8aa57",
+                      "subnet-0a342e3606f8ce4e8",
+                    ],
                   },
                 ],
               },
@@ -377,7 +406,9 @@ describe("terraformTopologySgLinks", () => {
         },
       },
     };
-    expect(collectLambdaVpcSecurityGroupRefs(nodes, lambdaAddr, plan)).toEqual([]);
+    expect(collectLambdaVpcSecurityGroupRefs(nodes, lambdaAddr, plan)).toEqual(
+      [],
+    );
   });
 
   it("uses plan configuration references instead of inferring when security_group_ids are omitted", () => {
@@ -400,7 +431,10 @@ describe("terraformTopologySgLinks", () => {
               after: {
                 vpc_config: [
                   {
-                    subnet_ids: ["subnet-053dd576128a8aa57", "subnet-0a342e3606f8ce4e8"],
+                    subnet_ids: [
+                      "subnet-053dd576128a8aa57",
+                      "subnet-0a342e3606f8ce4e8",
+                    ],
                   },
                 ],
               },
@@ -447,7 +481,9 @@ describe("terraformTopologySgLinks", () => {
                   lambda: {
                     expressions: {
                       vpc_security_group_ids: {
-                        references: ["module.security_group[0].security_group_id"],
+                        references: [
+                          "module.security_group[0].security_group_id",
+                        ],
                       },
                     },
                   },
@@ -458,7 +494,9 @@ describe("terraformTopologySgLinks", () => {
         },
       },
     };
-    expect(collectLambdaVpcSecurityGroupRefs(nodes, lambdaAddr, plan)).toEqual([sgAddr]);
+    expect(collectLambdaVpcSecurityGroupRefs(nodes, lambdaAddr, plan)).toEqual([
+      sgAddr,
+    ]);
     const arnIndex = buildArnIndexForTopology(nodes);
     const { cluster } = buildLambdaSgCluster(nodes, lambdaAddr, arnIndex, plan);
     expect(cluster?.groups).toHaveLength(1);
@@ -507,9 +545,15 @@ describe("terraformTopologySgLinks", () => {
     };
     const arnIndex = buildArnIndexForTopology(nodes);
     const idIndex = buildSecurityGroupIdToPathIndex(nodes);
-    expect(collectSecurityGroupRulesForSg(nodes, sgPath, arnIndex, idIndex, undefined)).toEqual([
-      rulePath,
-    ]);
+    expect(
+      collectSecurityGroupRulesForSg(
+        nodes,
+        sgPath,
+        arnIndex,
+        idIndex,
+        undefined,
+      ),
+    ).toEqual([rulePath]);
   });
 
   it("resolves rule security_group_id with .id suffix to the SG resource path", () => {
@@ -541,7 +585,9 @@ describe("terraformTopologySgLinks", () => {
     };
     const arnIndex = buildArnIndexForTopology(nodes);
     const idIndex = buildSecurityGroupIdToPathIndex(nodes);
-    expect(collectSecurityGroupRulesForSg(nodes, sgPath, arnIndex, idIndex)).toEqual([rulePath]);
+    expect(
+      collectSecurityGroupRulesForSg(nodes, sgPath, arnIndex, idIndex),
+    ).toEqual([rulePath]);
   });
 
   it("links rules via plan configuration security_group_id.references when change omits id", () => {
@@ -566,7 +612,12 @@ describe("terraformTopologySgLinks", () => {
             type: "aws_security_group_rule",
             change: {
               actions: ["create"],
-              after: { type: "egress", protocol: "tcp", from_port: 443, to_port: 443 },
+              after: {
+                type: "egress",
+                protocol: "tcp",
+                from_port: 443,
+                to_port: 443,
+              },
               after_unknown: { security_group_id: true },
             },
           },
@@ -587,7 +638,10 @@ describe("terraformTopologySgLinks", () => {
                     name: "egress",
                     expressions: {
                       security_group_id: {
-                        references: ["aws_security_group.this[0].id", "aws_security_group.this[0]"],
+                        references: [
+                          "aws_security_group.this[0].id",
+                          "aws_security_group.this[0]",
+                        ],
                       },
                     },
                     schema_version: 2,
@@ -601,6 +655,8 @@ describe("terraformTopologySgLinks", () => {
     };
     const arnIndex = buildArnIndexForTopology(nodes);
     const idIndex = buildSecurityGroupIdToPathIndex(nodes);
-    expect(collectSecurityGroupRulesForSg(nodes, sgPath, arnIndex, idIndex, plan)).toEqual([rulePath]);
+    expect(
+      collectSecurityGroupRulesForSg(nodes, sgPath, arnIndex, idIndex, plan),
+    ).toEqual([rulePath]);
   });
 });

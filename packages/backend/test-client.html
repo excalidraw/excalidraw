@@ -45,19 +45,18 @@
   <body>
     <h1>Terraform Upload Tester</h1>
     <p class="muted">
-      Upload <strong>plan JSON + DOT</strong> together (optional state to enrich), or
-      <strong>raw Terraform state alone</strong> (<code>terraform state pull</code> JSON with a
-      top-level <code>resources</code> array). This page calls the backend upload endpoint, fetches
-      Excalidraw JSON, and prints VPC/subnet container facets when present.
+      Upload <strong>plan JSON + DOT</strong> together (optional state to
+      enrich), or <strong>raw Terraform state alone</strong> (<code
+        >terraform state pull</code
+      >
+      JSON with a top-level <code>resources</code> array). This page calls the
+      backend upload endpoint, fetches Excalidraw JSON, and prints VPC/subnet
+      container facets when present.
     </p>
     <form id="upload-form">
       <label>
         Plan file (with DOT)
-        <input
-          id="plan-file"
-          type="file"
-          accept=".json,application/json"
-        />
+        <input id="plan-file" type="file" accept=".json,application/json" />
       </label>
       <label>
         DOT file (with plan)
@@ -65,7 +64,11 @@
       </label>
       <label>
         State file (optional with plan+DOT, or alone)
-        <input id="state-file" type="file" accept=".tfstate,.json,application/json" />
+        <input
+          id="state-file"
+          type="file"
+          accept=".tfstate,.json,application/json"
+        />
       </label>
       <button type="submit">Upload + Validate Facets</button>
     </form>

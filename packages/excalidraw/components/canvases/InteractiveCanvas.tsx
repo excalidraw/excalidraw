@@ -219,7 +219,8 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
                 sorted.length - 1,
                 Math.max(0, Math.ceil(sorted.length * 0.95) - 1),
               );
-              const visibleElements = rendererParams.current?.visibleElements.length || 0;
+              const visibleElements =
+                rendererParams.current?.visibleElements.length || 0;
               const visibleFrames =
                 rendererParams.current?.visibleElements.filter(
                   (element) =>

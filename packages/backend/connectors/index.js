@@ -41,7 +41,10 @@ const REGISTRY = Object.freeze({
 function getRenderer(id) {
   const renderer = REGISTRY[id];
   if (!renderer) {
-    throw new UnknownRendererError(id, listRenderers().map((r) => r.id));
+    throw new UnknownRendererError(
+      id,
+      listRenderers().map((r) => r.id),
+    );
   }
   return renderer;
 }

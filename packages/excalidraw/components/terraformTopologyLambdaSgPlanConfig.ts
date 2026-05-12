@@ -92,13 +92,7 @@ export function lastModuleCallSegmentFromPrefix(modulePrefix: string): string {
 
 function stripTrailingPlanRefSuffix(addr: string): string {
   let s = addr.trim();
-  const suffixes = [
-    ".security_group_id",
-    ".id",
-    ".arn",
-    ".vpc_id",
-    ".name",
-  ];
+  const suffixes = [".security_group_id", ".id", ".arn", ".vpc_id", ".name"];
   for (const suf of suffixes) {
     if (s.endsWith(suf)) {
       s = s.slice(0, -suf.length);
@@ -108,7 +102,10 @@ function stripTrailingPlanRefSuffix(addr: string): string {
 }
 
 /** Prefix `caller` (`module.stack`) + relative ref (`module.sg[0].x`). */
-export function qualifyConfigurationReference(callerPrefix: string, ref: string): string {
+export function qualifyConfigurationReference(
+  callerPrefix: string,
+  ref: string,
+): string {
   const r = ref.trim();
   if (!r) {
     return r;
@@ -123,13 +120,26 @@ export function qualifyConfigurationReference(callerPrefix: string, ref: string)
 }
 
 export function shouldUsePlanReference(ref: string): boolean {
-  if (!ref || ref.startsWith("var.") || ref.startsWith("local.") || ref.startsWith("each.")) {
+  if (
+    !ref ||
+    ref.startsWith("var.") ||
+    ref.startsWith("local.") ||
+    ref.startsWith("each.")
+  ) {
     return false;
   }
-  if (ref.startsWith("count.") || ref === "terraform.workspace" || ref.startsWith("path.")) {
+  if (
+    ref.startsWith("count.") ||
+    ref === "terraform.workspace" ||
+    ref.startsWith("path.")
+  ) {
     return false;
   }
-  return ref.startsWith("module.") || ref.startsWith("aws_") || ref.startsWith("data.");
+  return (
+    ref.startsWith("module.") ||
+    ref.startsWith("aws_") ||
+    ref.startsWith("data.")
+  );
 }
 
 function getResourceTypeFromNodePath(
@@ -137,7 +147,9 @@ function getResourceTypeFromNodePath(
   path: string,
 ): string {
   const node = nodes[path] as TerraformPlanGraphNode | undefined;
-  const first = Object.values(node?.resources || {})[0] as { type?: string } | undefined;
+  const first = Object.values(node?.resources || {})[0] as
+    | { type?: string }
+    | undefined;
   if (first && typeof first.type === "string") {
     return first.type;
   }
@@ -209,10 +221,16 @@ function configurationResourceFullAddress(
  * Collect `references` strings from `aws_lambda_function` expressions only under
  * `vpc_security_group_ids` or `vpc_config` → `security_group_ids`.
  */
-function collectVpcSgRefsFromLambdaExpressions(expressions: UnknownRecord): string[] {
+function collectVpcSgRefsFromLambdaExpressions(
+  expressions: UnknownRecord,
+): string[] {
   const out: string[] = [];
 
-  function walk(node: unknown, parentKey: string | null, inVpcConfig: boolean): void {
+  function walk(
+    node: unknown,
+    parentKey: string | null,
+    inVpcConfig: boolean,
+  ): void {
     if (Array.isArray(node)) {
       for (const item of node) {
         walk(item, parentKey, inVpcConfig);
@@ -246,7 +264,9 @@ function collectVpcSgRefsFromLambdaExpressions(expressions: UnknownRecord): stri
 }
 
 /** Top-level module-call inputs only (not a deep walk of the whole call object). */
-function readModuleCallVpcSecurityGroupInputRefs(call: UnknownRecord): string[] {
+function readModuleCallVpcSecurityGroupInputRefs(
+  call: UnknownRecord,
+): string[] {
   const expressions = call.expressions as UnknownRecord | undefined;
   if (!expressions || typeof expressions !== "object") {
     return [];
@@ -269,7 +289,11 @@ export type LambdaSgPlanConfigIndexes = {
   moduleCallVpcSgRefs: Map<string, string[]>;
 };
 
-function appendRefs(map: Map<string, string[]>, key: string, refs: readonly string[]): void {
+function appendRefs(
+  map: Map<string, string[]>,
+  key: string,
+  refs: readonly string[],
+): void {
   if (refs.length === 0) {
     return;
   }
@@ -302,36 +326,55 @@ function walkConfigurationModule(
         continue;
       }
       const expressions = res.expressions;
-      if (!expressions || typeof expressions !== "object" || Array.isArray(expressions)) {
+      if (
+        !expressions ||
+        typeof expressions !== "object" ||
+        Array.isArray(expressions)
+      ) {
         continue;
       }
       const full = configurationResourceFullAddress(modulePrefix, addr);
       const norm = stripIndexes(full);
-      const refs = collectVpcSgRefsFromLambdaExpressions(expressions as UnknownRecord);
+      const refs = collectVpcSgRefsFromLambdaExpressions(
+        expressions as UnknownRecord,
+      );
       appendRefs(lambdaResourceRefs, norm, refs);
     }
   }
 
   const moduleCalls = mod.module_calls as UnknownRecord | undefined;
-  if (moduleCalls && typeof moduleCalls === "object" && !Array.isArray(moduleCalls)) {
+  if (
+    moduleCalls &&
+    typeof moduleCalls === "object" &&
+    !Array.isArray(moduleCalls)
+  ) {
     for (const name of Object.keys(moduleCalls)) {
       const call = moduleCalls[name] as UnknownRecord | undefined;
       if (!call || typeof call !== "object" || Array.isArray(call)) {
         continue;
       }
-      const childPrefix = modulePrefix ? `${modulePrefix}.module.${name}` : `module.${name}`;
+      const childPrefix = modulePrefix
+        ? `${modulePrefix}.module.${name}`
+        : `module.${name}`;
       const callRefs = readModuleCallVpcSecurityGroupInputRefs(call);
       appendRefs(moduleCallVpcSgRefs, childPrefix, callRefs);
 
       const inner = call.module as UnknownRecord | undefined;
       if (inner && typeof inner === "object" && !Array.isArray(inner)) {
-        walkConfigurationModule(inner, childPrefix, lambdaResourceRefs, moduleCallVpcSgRefs);
+        walkConfigurationModule(
+          inner,
+          childPrefix,
+          lambdaResourceRefs,
+          moduleCallVpcSgRefs,
+        );
       }
     }
   }
 }
 
-function buildLambdaSgPlanConfigIndexes(plan: unknown): LambdaSgPlanConfigIndexes | null {
+function buildLambdaSgPlanConfigIndexes(
+  plan: unknown,
+): LambdaSgPlanConfigIndexes | null {
   if (!hasTerraformPlanConfiguration(plan)) {
     return null;
   }
@@ -348,7 +391,9 @@ function buildLambdaSgPlanConfigIndexes(plan: unknown): LambdaSgPlanConfigIndexe
 
 const planConfigIndexCache = new WeakMap<object, LambdaSgPlanConfigIndexes>();
 
-function getLambdaSgPlanConfigIndexes(plan: unknown): LambdaSgPlanConfigIndexes | null {
+function getLambdaSgPlanConfigIndexes(
+  plan: unknown,
+): LambdaSgPlanConfigIndexes | null {
   if (!plan || typeof plan !== "object") {
     return null;
   }
@@ -386,7 +431,9 @@ export function collectLambdaVpcSecurityGroupRefsFromPlanConfiguration(
 
   const fromResource = idx.lambdaResourceRefs.get(normLambda) ?? [];
   const fromModuleCall =
-    fromResource.length === 0 ? idx.moduleCallVpcSgRefs.get(lambdaMod) ?? [] : [];
+    fromResource.length === 0
+      ? idx.moduleCallVpcSgRefs.get(lambdaMod) ?? []
+      : [];
 
   const seen = new Set<string>();
   const out: string[] = [];

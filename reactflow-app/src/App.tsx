@@ -8,6 +8,7 @@ import {
   type Edge,
   type Node,
 } from "@xyflow/react";
+
 import { UploadPanel, type ReactFlowScene } from "./UploadPanel";
 import { TerraformResourceNode } from "./TerraformResourceNode";
 import { TerraformContainerNode } from "./TerraformContainerNode";
@@ -51,7 +52,9 @@ export default function App() {
       </div>
       <div className="hint">
         {scene?.meta?.edgePolicy === "intra-module-only"
-          ? `Showing subflows with only intra-module edges for now. Layout: ${scene?.meta?.layoutEngine || "elk"}.`
+          ? `Showing subflows with only intra-module edges for now. Layout: ${
+              scene?.meta?.layoutEngine || "elk"
+            }.`
           : "Upload Terraform plan + DOT to render subflows."}
       </div>
     </div>

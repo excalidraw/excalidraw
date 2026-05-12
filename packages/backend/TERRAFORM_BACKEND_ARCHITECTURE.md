@@ -191,12 +191,12 @@ The pipeline stores **three** edge mechanisms on each node; the exporter turns t
 
 #### Pipeline → exporter bridge
 
-| Pipeline field | Meaning |
-| --- | --- |
-| **`edges_new`** | Outgoing DOT reachability (planned graph). |
-| **`edges_existing`** | State / `prior_state` / `depends_on` style deps. |
-| **`edges_data_flow`** | IAM policy–derived semantic edges (`iam_policy`). |
-| **`edges_networking`** | Security-group peer / rule semantic edges. |
+| Pipeline field         | Meaning                                           |
+| ---------------------- | ------------------------------------------------- |
+| **`edges_new`**        | Outgoing DOT reachability (planned graph).        |
+| **`edges_existing`**   | State / `prior_state` / `depends_on` style deps.  |
+| **`edges_data_flow`**  | IAM policy–derived semantic edges (`iam_policy`). |
+| **`edges_networking`** | Security-group peer / rule semantic edges.        |
 
 #### Dependency arrows (non–network-pair DOT / state deps)
 

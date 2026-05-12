@@ -28,7 +28,10 @@ function getPrimaryResource(
     : undefined;
 }
 
-function getResourceTypeFromPath(nodePath: string, node?: TerraformPlanGraphNode): string {
+function getResourceTypeFromPath(
+  nodePath: string,
+  node?: TerraformPlanGraphNode,
+): string {
   const primary = getPrimaryResource(node);
   const t = primary?.type;
   if (typeof t === "string") {

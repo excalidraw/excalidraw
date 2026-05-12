@@ -16,9 +16,10 @@ const {
   extractSubnetIdsFromConfig,
 } = require("./terraform-graph-utils");
 
-const TERRAFORM_AWS_ICON_TYPE_NAMES = require(
-  path.join(__dirname, "../excalidraw/assets/terraform-aws-icon-type-names.json"),
-);
+const TERRAFORM_AWS_ICON_TYPE_NAMES = require(path.join(
+  __dirname,
+  "../excalidraw/assets/terraform-aws-icon-type-names.json",
+));
 
 /** Integer in [0, 2^31) for stable-enough unique Excalidraw element ids in one export. */
 function rand() {
@@ -77,7 +78,9 @@ function loadIconLib() {
   const config = getIconLibraryConfig();
   const iconLibPath = getIconLibraryPath(config);
   const cacheKey = `${config.filename}:${iconLibPath}`;
-  if (iconLibItems && iconLibCacheKey === cacheKey) return iconLibItems;
+  if (iconLibItems && iconLibCacheKey === cacheKey) {
+    return iconLibItems;
+  }
 
   try {
     const raw = JSON.parse(fs.readFileSync(iconLibPath, "utf-8"));
@@ -107,7 +110,9 @@ function getIconForType(resourceType) {
   const idx =
     config.index?.[resourceType] ??
     (iconName ? iconLibNameIndex[iconName.toLowerCase()] : undefined);
-  if (idx === undefined || idx >= items.length) return null;
+  if (idx === undefined || idx >= items.length) {
+    return null;
+  }
   const item = items[idx];
   // v1: item is element array; v2: item.elements
   return Array.isArray(item) ? item : item.elements || null;
@@ -330,7 +335,9 @@ function getResourceType(nodePath) {
   if (i >= parts.length) {
     return "terraform_module";
   }
-  if (parts[i] === "data") return "data";
+  if (parts[i] === "data") {
+    return "data";
+  }
   return parts[i] || nodePath;
 }
 
@@ -469,13 +476,27 @@ function getPrimaryAction(node) {
       pushAction(resourceActions);
     }
   }
-  if (actions.has("delete") && actions.has("create")) return "replace";
-  if (actions.has("create")) return "create";
-  if (actions.has("delete")) return "delete";
-  if (actions.has("update")) return "update";
-  if (actions.has("no-op")) return "no-op";
-  if (actions.has("read")) return "read";
-  if (actions.has("external")) return "external";
+  if (actions.has("delete") && actions.has("create")) {
+    return "replace";
+  }
+  if (actions.has("create")) {
+    return "create";
+  }
+  if (actions.has("delete")) {
+    return "delete";
+  }
+  if (actions.has("update")) {
+    return "update";
+  }
+  if (actions.has("no-op")) {
+    return "no-op";
+  }
+  if (actions.has("read")) {
+    return "read";
+  }
+  if (actions.has("external")) {
+    return "external";
+  }
   return "existing";
 }
 
@@ -570,8 +591,8 @@ function buildTerraformResourceDetails(node) {
           value: Object.prototype.hasOwnProperty.call(config, key)
             ? config[key]
             : unknownAfter
-              ? UNKNOWN_VALUE_PLACEHOLDER
-              : fieldDiff?.after ?? null,
+            ? UNKNOWN_VALUE_PLACEHOLDER
+            : fieldDiff?.after ?? null,
           changed: Boolean(fieldDiff),
           unknownAfter,
           before: fieldDiff?.before,
@@ -620,7 +641,7 @@ function getModulePathChain(nodePath) {
   const chain = [];
   let cursor = "";
 
-  for (let i = 0; i < parts.length - 1;) {
+  for (let i = 0; i < parts.length - 1; ) {
     if (parts[i] !== "module" || !parts[i + 1]) {
       break;
     }
@@ -638,7 +659,7 @@ function getModuleDepthFromPath(modulePath) {
   const parts = modulePath.split(".");
   let depth = 0;
 
-  for (let i = 0; i < parts.length - 1;) {
+  for (let i = 0; i < parts.length - 1; ) {
     if (parts[i] === "module" && parts[i + 1]) {
       depth += 1;
       i += 2;
@@ -655,7 +676,7 @@ function getModuleDisplayLabel(modulePath) {
   const parts = modulePath.split(".");
   const names = [];
 
-  for (let i = 0; i < parts.length - 1;) {
+  for (let i = 0; i < parts.length - 1; ) {
     if (parts[i] === "module" && parts[i + 1]) {
       names.push(parts[i + 1]);
       i += 2;
@@ -796,10 +817,7 @@ function applyModulePresets(
 /** Pipeline-injected module call vertex (`terraform_module` resource at the module address). */
 function isSyntheticTerraformModuleHub(nodePath, node) {
   const primary = Object.values(node?.resources || {}).find((r) => r?.type);
-  return (
-    primary?.type === "terraform_module" &&
-    primary?.address === nodePath
-  );
+  return primary?.type === "terraform_module" && primary?.address === nodePath;
 }
 
 /**
@@ -1333,7 +1351,9 @@ function buildNodeSubnetMap(nodes, nodeVpcMap) {
     } else {
       for (const resource of Object.values(node.resources || {})) {
         const config = getCurrentResourceConfig(resource);
-        const explicitSubnetIds = [...extractSubnetIdsFromConfig(config)].sort();
+        const explicitSubnetIds = [
+          ...extractSubnetIdsFromConfig(config),
+        ].sort();
         if (explicitSubnetIds.length > 0) {
           const subnetId = explicitSubnetIds[0];
           subnetKey = subnetId;
@@ -1372,7 +1392,8 @@ function buildNodeSubnetMap(nodes, nodeVpcMap) {
       subnetKey,
       subnetLabel: label,
       vpcKey: subnetVpcKey,
-      subnetKeys: subnetMemberships.length > 0 ? subnetMemberships : [subnetKey],
+      subnetKeys:
+        subnetMemberships.length > 0 ? subnetMemberships : [subnetKey],
     });
   }
 

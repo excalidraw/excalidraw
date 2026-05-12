@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 import { buildArnIndexForTopology } from "./terraformTopologyIamLinks";
 import { buildS3CompanionCluster } from "./terraformTopologyS3Links";
+
+import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
 describe("terraformTopologyS3Links", () => {
   it("buildS3CompanionCluster collects bucket policy and edges from bucket", () => {

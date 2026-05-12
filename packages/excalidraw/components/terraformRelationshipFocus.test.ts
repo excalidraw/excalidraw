@@ -359,18 +359,12 @@ describe("terraform relationship focus", () => {
       expectedWashedStroke(85),
     );
     expect(byId.get("edge:web-sg")?.strokeColor).toBe(expectedWashedStroke(85));
-    expect(byId.get("group:focus")?.strokeColor).toBe(
-      expectedWashedStroke(60),
-    );
+    expect(byId.get("group:focus")?.strokeColor).toBe(expectedWashedStroke(60));
     expect(byId.get("node:aws_vpc.main")?.strokeColor).toBe(
       expectedWashedStroke(25),
     );
-    expect(byId.get("group:other")?.strokeColor).toBe(
-      expectedWashedStroke(25),
-    );
-    expect(byId.get("edge:other")?.strokeColor).toBe(
-      expectedWashedStroke(15),
-    );
+    expect(byId.get("group:other")?.strokeColor).toBe(expectedWashedStroke(25));
+    expect(byId.get("edge:other")?.strokeColor).toBe(expectedWashedStroke(15));
   });
 
   it("turns transparent backgrounds opaque so dimmed elements fully hide what's behind", () => {
@@ -609,16 +603,24 @@ describe("terraform relationship focus", () => {
     it("with expand-all view, non-primary resources return to full color when focus clears", () => {
       const focused = applyTerraformRelationshipFocus(
         [
-          resource("aws_instance.web", {}, {
-            semantic: true,
-            primary: true,
-            expandAllView: true,
-          }),
-          resource("aws_vpc.main", {}, {
-            semantic: true,
-            primary: false,
-            expandAllView: true,
-          }),
+          resource(
+            "aws_instance.web",
+            {},
+            {
+              semantic: true,
+              primary: true,
+              expandAllView: true,
+            },
+          ),
+          resource(
+            "aws_vpc.main",
+            {},
+            {
+              semantic: true,
+              primary: false,
+              expandAllView: true,
+            },
+          ),
           semanticEdge(
             "edge:web-vpc",
             "dependency",

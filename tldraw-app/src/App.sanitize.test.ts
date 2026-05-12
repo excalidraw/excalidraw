@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { TLShapePartial } from "tldraw";
+
 import { orderShapesForRender, sanitizeShapes } from "./App";
+
+import type { TLShapePartial } from "tldraw";
 
 describe("sanitizeShapes", () => {
   it("preserves arrow kind so edges remain renderable", () => {

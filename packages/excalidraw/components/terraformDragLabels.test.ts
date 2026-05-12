@@ -1,11 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { deepCopyElement, newElement, newTextElement } from "@excalidraw/element";
+import {
+  deepCopyElement,
+  newElement,
+  newTextElement,
+} from "@excalidraw/element";
 import { Scene } from "@excalidraw/element";
 
-import type { PointerDownState } from "../types";
-
 import { syncTerraformDetachedResourceLabelsWithDraggedCards } from "./terraformVisibility";
+
+import type { PointerDownState } from "../types";
 
 describe("syncTerraformDetachedResourceLabelsWithDraggedCards", () => {
   it("moves detached Terraform label by the same delta as its resource rectangle", () => {
@@ -48,9 +52,11 @@ describe("syncTerraformDetachedResourceLabelsWithDraggedCards", () => {
 
     scene.mutateElement(rect, { x: 40, y: 25 });
 
-    syncTerraformDetachedResourceLabelsWithDraggedCards(scene, pointerDownState, [
-      rect,
-    ]);
+    syncTerraformDetachedResourceLabelsWithDraggedCards(
+      scene,
+      pointerDownState,
+      [rect],
+    );
 
     const origRect = originalElements.get(rect.id)!;
     const origLabel = originalElements.get(label.id)!;

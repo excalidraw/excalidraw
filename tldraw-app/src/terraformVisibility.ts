@@ -83,7 +83,9 @@ const computeVisibleResourceKeys = (
 
   for (const shape of resources) {
     const key = getVisibilityKey(shape);
-    if (!key) continue;
+    if (!key) {
+      continue;
+    }
     if (getMeta(shape).terraformInitiallyVisible === true) {
       visible.add(key);
     }
@@ -94,7 +96,9 @@ const computeVisibleResourceKeys = (
     changed = false;
     for (const shape of resources) {
       const key = getVisibilityKey(shape);
-      if (!key || visible.has(key)) continue;
+      if (!key || visible.has(key)) {
+        continue;
+      }
       const parents = getParentKeys(shape);
       for (const parent of parents) {
         if (expandedKeys.has(parent) && visible.has(parent)) {
@@ -112,7 +116,9 @@ const computeVisibleResourceKeys = (
 const computeParentKeysWithChildren = (shapes: readonly TLShapePartial[]) => {
   const out = new Set<string>();
   for (const shape of shapes) {
-    if (!isResourceRole(shape)) continue;
+    if (!isResourceRole(shape)) {
+      continue;
+    }
     for (const parent of getParentKeys(shape)) {
       out.add(parent);
     }
@@ -130,7 +136,9 @@ export const getSelectedExplodeTriggerKey = (
 ) => {
   for (const shape of selectedShapes) {
     const key = getVisibilityKey(shape);
-    if (key && hasChildren(allShapes, key)) return key;
+    if (key && hasChildren(allShapes, key)) {
+      return key;
+    }
   }
   return null;
 };
@@ -158,8 +166,11 @@ export const toggleExpandedKey = (
     return expandedKeys;
   }
   const next = new Set(expandedKeys);
-  if (next.has(key)) next.delete(key);
-  else next.add(key);
+  if (next.has(key)) {
+    next.delete(key);
+  } else {
+    next.add(key);
+  }
   return next;
 };
 

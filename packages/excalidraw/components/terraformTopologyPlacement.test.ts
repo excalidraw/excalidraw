@@ -9,6 +9,7 @@ import {
   extractVpcEndpointsByVpc,
   extractVpcFlowLogBundles,
 } from "./terraformTopologyPlacement";
+
 import type { TopologyPlacementZone } from "./terraformTopologyPlacement";
 
 const planWithDefaultAwsAccountRegion = {
@@ -385,7 +386,10 @@ describe("extractVpcDefaultPlumbingBuckets", () => {
     expect(buckets).toHaveLength(1);
     expect(buckets[0]!.vpcId).toBe("vpc-aaa");
     expect(buckets[0]!.addresses.sort()).toEqual(
-      ["aws_default_network_acl.this", "aws_default_security_group.this"].sort(),
+      [
+        "aws_default_network_acl.this",
+        "aws_default_security_group.this",
+      ].sort(),
     );
   });
 });

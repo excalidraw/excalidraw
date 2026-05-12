@@ -15,7 +15,9 @@ describe("collectDataFlowEdges", () => {
         ],
       },
       b: {
-        edges_data_flow: [{ target: "a", type: "ref", label: "y", origin: "o2" }],
+        edges_data_flow: [
+          { target: "a", type: "ref", label: "y", origin: "o2" },
+        ],
       },
     };
     const edges = collectDataFlowEdges(nodes);
@@ -36,7 +38,11 @@ describe("buildTerraformExplodeParentMap", () => {
       a: { edges_data_flow: [{ target: "c", type: "t", label: "l" }] },
       c: {},
     });
-    const map = buildTerraformExplodeParentMap(nodeKeys, directedEdges, dataFlowEdges);
+    const map = buildTerraformExplodeParentMap(
+      nodeKeys,
+      directedEdges,
+      dataFlowEdges,
+    );
     expect([...(map.get("a") || [])].sort()).toEqual(["b", "c"]);
     expect([...(map.get("b") || [])].sort()).toEqual(["a", "c"]);
     expect([...(map.get("c") || [])].sort()).toEqual(["a", "b"]);

@@ -17,7 +17,9 @@ describe("resolveTerraformDeployRoleIamArnFromPlan", () => {
   it("prefers explicit terraform_deploy_role_arn variable", () => {
     const arn = resolveTerraformDeployRoleIamArnFromPlan({
       variables: {
-        terraform_deploy_role_arn: { value: " arn:aws:iam::111111111111:role/Custom " },
+        terraform_deploy_role_arn: {
+          value: " arn:aws:iam::111111111111:role/Custom ",
+        },
         aws_account_id: { value: "222222222222" },
       },
     });
@@ -88,7 +90,9 @@ describe("extractDefaultAwsProviderAccountRegion", () => {
   });
 
   it("returns null when default aws provider block is absent", () => {
-    expect(extractDefaultAwsProviderAccountRegion({ configuration: {} })).toBeNull();
+    expect(
+      extractDefaultAwsProviderAccountRegion({ configuration: {} }),
+    ).toBeNull();
   });
 });
 
@@ -101,7 +105,11 @@ describe("mergeWithDefaultAwsProviderAccountRegion", () => {
             expressions: {
               region: { constant_value: "ap-south-1" },
               assume_role: [
-                { role_arn: { constant_value: "arn:aws:iam::121212121212:role/R" } },
+                {
+                  role_arn: {
+                    constant_value: "arn:aws:iam::121212121212:role/R",
+                  },
+                },
               ],
             },
           },
@@ -195,7 +203,9 @@ describe("mergeTerraformTopologyAccountRegionFromSameRegionSubnets", () => {
           account: TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT,
           region: TERRAFORM_TOPOLOGY_UNKNOWN_REGION,
         },
-        new Map([["subnet-a", { account: "111122223333", region: "eu-west-1" }]]),
+        new Map([
+          ["subnet-a", { account: "111122223333", region: "eu-west-1" }],
+        ]),
       ).account,
     ).toBe(TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT);
   });
@@ -313,7 +323,9 @@ describe("extractTerraformTopologyFromPlan", () => {
       ],
     };
     const model = extractTerraformTopologyFromPlan(plan);
-    const vpc = model.accounts.get("222222222222")?.regions.get("eu-west-1")
+    const vpc = model.accounts
+      .get("222222222222")
+      ?.regions.get("eu-west-1")
       ?.vpcs.get("vpc-v1");
     expect(vpc?.subnets.has("subnet-s1")).toBe(true);
   });
@@ -369,7 +381,12 @@ describe("extractTerraformTopologyFromPlan", () => {
     };
     const model = extractTerraformTopologyFromPlan(plan);
     expect(model.accounts.has(TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT)).toBe(false);
-    expect(model.accounts.get("333333333333")?.regions.get("eu-west-1")?.vpcs.get("vpc-same")).toBeDefined();
+    expect(
+      model.accounts
+        .get("333333333333")
+        ?.regions.get("eu-west-1")
+        ?.vpcs.get("vpc-same"),
+    ).toBeDefined();
   });
 
   it("does not emit placeholder topology when plan has AWS but no VPC/subnet signals", () => {
@@ -387,7 +404,9 @@ describe("extractTerraformTopologyFromPlan", () => {
     };
     const model = extractTerraformTopologyFromPlan(plan);
     expect(model.accounts.size).toBe(0);
-    expect(model.accounts.get(TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT)).toBeUndefined();
+    expect(
+      model.accounts.get(TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT),
+    ).toBeUndefined();
   });
 
   it("uses default aws provider account for standalone VPC placement when resource lacks ARN", () => {
@@ -426,6 +445,11 @@ describe("extractTerraformTopologyFromPlan", () => {
       ],
     };
     const model = extractTerraformTopologyFromPlan(plan);
-    expect(model.accounts.get("777777777777")?.regions.get("us-east-1")?.vpcs.get("vpc-standalone")).toBeDefined();
+    expect(
+      model.accounts
+        .get("777777777777")
+        ?.regions.get("us-east-1")
+        ?.vpcs.get("vpc-standalone"),
+    ).toBeDefined();
   });
 });

@@ -40,5 +40,4 @@ export const isTerraformInspectableElement = (
 /** True when the scene was built as semantic AWS topology (not ELK module graph). */
 export const isTerraformSemanticOverviewScene = (
   elements: readonly ExcalidrawElement[],
-) =>
-  elements.some((e) => e.customData?.terraformSemanticOverview === true);
+) => elements.some((e) => e.customData?.terraformSemanticOverview === true);

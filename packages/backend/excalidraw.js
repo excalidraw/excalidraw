@@ -89,7 +89,9 @@ const {
   fixedPointForAbsolutePoint,
   strokeColorForTerraformDependencyKinds,
 } = require("./excalidraw-arrows");
-const { partitionDirectedEdgesByNetworking } = require("./terraform-networking-vertex");
+const {
+  partitionDirectedEdgesByNetworking,
+} = require("./terraform-networking-vertex");
 
 /** Matches browser ELK `TERRAFORM_NETWORKING_EDGE_STROKE`. */
 const TERRAFORM_NETWORKING_EDGE_STROKE = "#228be6";
@@ -141,8 +143,9 @@ async function nodesToExcalidraw(nodes, options = {}) {
         )
       : directedEdges;
   const relationships = coalesceRelationshipPairs(dependencyEdges);
-  const networkingRelationships =
-    coalesceRelationshipPairs(networkingDependencyEdges);
+  const networkingRelationships = coalesceRelationshipPairs(
+    networkingDependencyEdges,
+  );
   const networkingRecordEdgesAll = collectNetworkingEdges(nodes);
   const netDepPairKeys = new Set(
     networkingDependencyEdges.map((e) =>
@@ -380,9 +383,13 @@ async function nodesToExcalidraw(nodes, options = {}) {
       ? applianceStyleForKind(vpcApplianceKind)
       : null;
     const bgColor =
-      applianceStyle?.backgroundColor || ACTION_COLORS[action] || ACTION_COLORS.existing;
+      applianceStyle?.backgroundColor ||
+      ACTION_COLORS[action] ||
+      ACTION_COLORS.existing;
     const strokeColor =
-      applianceStyle?.strokeColor || ACTION_STROKE[action] || ACTION_STROKE.existing;
+      applianceStyle?.strokeColor ||
+      ACTION_STROKE[action] ||
+      ACTION_STROKE.existing;
     const label = getLabel(nodePath);
     const terraformResources = buildTerraformResourceDetails(nodes[nodePath]);
     const nodeLocation = nodeLocationMap.get(nodePath) || null;
@@ -412,8 +419,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
         isVpcPerimeter && vpcApplianceKind === "endpoint"
           ? "dotted"
           : action === "external"
-            ? "dashed"
-            : "solid",
+          ? "dashed"
+          : "solid",
       customData: {
         // Canonical Terraform metadata consumed by UI panels/filters/hover behavior.
         terraform: true,
@@ -960,7 +967,9 @@ async function nodesToExcalidraw(nodes, options = {}) {
         const boundsPaths =
           vpcInteriorPaths.length > 0 ? vpcInteriorPaths : vpcGroup.nodePaths;
         const vpcBounds =
-          measureBounds(getUniqueVisualBounds(boundsPaths, vpcGroup.nodePaths)) ||
+          measureBounds(
+            getUniqueVisualBounds(boundsPaths, vpcGroup.nodePaths),
+          ) ||
           measureBoundsFromNodePositions(
             boundsPaths,
             positions,
@@ -1092,7 +1101,10 @@ async function nodesToExcalidraw(nodes, options = {}) {
             const style = applianceStyleForKind(tile.applianceKind);
             const tileId = `vpc-appliance-${rand()}`;
             const tileTextId = `vpc-appliance-text-${rand()}`;
-            const tileGroupIds = [`vpc-appliance-group-${rand()}`, ...vpcGroupIds];
+            const tileGroupIds = [
+              `vpc-appliance-group-${rand()}`,
+              ...vpcGroupIds,
+            ];
 
             locationElements.push(
               makeBaseElement({
@@ -1176,8 +1188,9 @@ async function nodesToExcalidraw(nodes, options = {}) {
             SUBNET_PADDING_BOTTOM;
           const subnetBoxId = `subnet-box-${vpcBoxIndex}-${rand()}`;
           const subnetLabelId = `subnet-label-${vpcBoxIndex}-${rand()}`;
-          const subnetInitiallyVisible = subnetGroup.nodePaths.some((nodePath) =>
-            isInitiallyVisibleTerraformNode(nodePath, nodes[nodePath]),
+          const subnetInitiallyVisible = subnetGroup.nodePaths.some(
+            (nodePath) =>
+              isInitiallyVisibleTerraformNode(nodePath, nodes[nodePath]),
           );
           const subnetVisibilityCustomData = {
             terraformVisibilityRole: "group",
@@ -1193,7 +1206,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
             },
             containerFacetContributors,
           );
-          const subnetFacetSummary = buildContainerFacetSummaryLine(subnetFacets);
+          const subnetFacetSummary =
+            buildContainerFacetSummaryLine(subnetFacets);
           const subnetLabelText = subnetFacetSummary
             ? `subnet ${subnetGroup.subnetLabel}\n${subnetFacetSummary}`
             : `subnet ${subnetGroup.subnetLabel}`;
@@ -1314,12 +1328,8 @@ async function nodesToExcalidraw(nodes, options = {}) {
     const endX = endPoint.x;
     const endY = endPoint.y;
 
-    const sourceAction = nodes[source]
-      ? getPrimaryAction(nodes[source])
-      : null;
-    const targetAction = nodes[target]
-      ? getPrimaryAction(nodes[target])
-      : null;
+    const sourceAction = nodes[source] ? getPrimaryAction(nodes[source]) : null;
+    const targetAction = nodes[target] ? getPrimaryAction(nodes[target]) : null;
     const dependencyStrokeColor = strokeColorForTerraformDependencyKinds(
       kinds,
       {

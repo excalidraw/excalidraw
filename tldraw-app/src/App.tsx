@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Tldraw, type Editor, type TLShapePartial } from "tldraw";
+
 import { UploadPanel } from "./UploadPanel";
 import {
   collapseAllKeys,
@@ -35,28 +36,47 @@ export function sanitizeShapes(input: TLShapePartial[]): TLShapePartial[] {
             start: props.start as { x: number; y: number },
             end: props.end as { x: number; y: number },
             bend: typeof props.bend === "number" ? props.bend : 0,
-            color: (props.color as
-              | "black"
-              | "grey"
-              | "light-violet"
-              | "violet"
-              | "blue"
-              | "light-blue"
-              | "yellow"
-              | "orange"
-              | "green"
-              | "light-green"
-              | "light-red"
-              | "red") || "grey",
-            fill: (props.fill as "none" | "semi" | "solid" | "pattern") || "none",
-            dash: (props.dash as "draw" | "solid" | "dashed" | "dotted") || "solid",
+            color:
+              (props.color as
+                | "black"
+                | "grey"
+                | "light-violet"
+                | "violet"
+                | "blue"
+                | "light-blue"
+                | "yellow"
+                | "orange"
+                | "green"
+                | "light-green"
+                | "light-red"
+                | "red") || "grey",
+            fill:
+              (props.fill as "none" | "semi" | "solid" | "pattern") || "none",
+            dash:
+              (props.dash as "draw" | "solid" | "dashed" | "dotted") || "solid",
             size: (props.size as "s" | "m" | "l" | "xl") || "m",
             arrowheadStart:
-              (props.arrowheadStart as "none" | "arrow" | "triangle" | "square" | "dot" | "pipe" | "diamond" | "inverted" | "bar") ||
-              "none",
+              (props.arrowheadStart as
+                | "none"
+                | "arrow"
+                | "triangle"
+                | "square"
+                | "dot"
+                | "pipe"
+                | "diamond"
+                | "inverted"
+                | "bar") || "none",
             arrowheadEnd:
-              (props.arrowheadEnd as "none" | "arrow" | "triangle" | "square" | "dot" | "pipe" | "diamond" | "inverted" | "bar") ||
-              "arrow",
+              (props.arrowheadEnd as
+                | "none"
+                | "arrow"
+                | "triangle"
+                | "square"
+                | "dot"
+                | "pipe"
+                | "diamond"
+                | "inverted"
+                | "bar") || "arrow",
           },
           meta: shape.meta,
         } as TLShapePartial;
@@ -69,24 +89,47 @@ export function sanitizeShapes(input: TLShapePartial[]): TLShapePartial[] {
           x: shape.x,
           y: shape.y,
           props: {
-            geo: (props.geo as "rectangle" | "ellipse" | "triangle" | "diamond" | "cloud" | "pentagon" | "hexagon" | "octagon" | "star" | "rhombus" | "rhombus-2" | "oval" | "trapezoid" | "arrow-right" | "arrow-left" | "arrow-up" | "arrow-down" | "x-box" | "check-box") || "rectangle",
+            geo:
+              (props.geo as
+                | "rectangle"
+                | "ellipse"
+                | "triangle"
+                | "diamond"
+                | "cloud"
+                | "pentagon"
+                | "hexagon"
+                | "octagon"
+                | "star"
+                | "rhombus"
+                | "rhombus-2"
+                | "oval"
+                | "trapezoid"
+                | "arrow-right"
+                | "arrow-left"
+                | "arrow-up"
+                | "arrow-down"
+                | "x-box"
+                | "check-box") || "rectangle",
             w: typeof props.w === "number" ? props.w : 1,
             h: typeof props.h === "number" ? props.h : 1,
-            color: (props.color as
-              | "black"
-              | "grey"
-              | "light-violet"
-              | "violet"
-              | "blue"
-              | "light-blue"
-              | "yellow"
-              | "orange"
-              | "green"
-              | "light-green"
-              | "light-red"
-              | "red") || "grey",
-            fill: (props.fill as "none" | "semi" | "solid" | "pattern") || "none",
-            dash: (props.dash as "draw" | "solid" | "dashed" | "dotted") || "solid",
+            color:
+              (props.color as
+                | "black"
+                | "grey"
+                | "light-violet"
+                | "violet"
+                | "blue"
+                | "light-blue"
+                | "yellow"
+                | "orange"
+                | "green"
+                | "light-green"
+                | "light-red"
+                | "red") || "grey",
+            fill:
+              (props.fill as "none" | "semi" | "solid" | "pattern") || "none",
+            dash:
+              (props.dash as "draw" | "solid" | "dashed" | "dotted") || "solid",
             size: (props.size as "s" | "m" | "l" | "xl") || "m",
           },
           meta: shape.meta,
@@ -97,7 +140,9 @@ export function sanitizeShapes(input: TLShapePartial[]): TLShapePartial[] {
     .filter((shape): shape is TLShapePartial => Boolean(shape));
 }
 
-export function orderShapesForRender(input: TLShapePartial[]): TLShapePartial[] {
+export function orderShapesForRender(
+  input: TLShapePartial[],
+): TLShapePartial[] {
   const nonArrows: TLShapePartial[] = [];
   const arrows: TLShapePartial[] = [];
   for (const shape of input) {
@@ -141,7 +186,9 @@ export default function App() {
 
   useEffect(() => {
     const editor = editorRef.current;
-    if (!editor) return;
+    if (!editor) {
+      return;
+    }
     editor.run(() => {
       const existing = editor.getCurrentPageShapes();
       if (existing.length > 0) {
@@ -159,10 +206,14 @@ export default function App() {
   useEffect(() => {
     const handle = window.setInterval(() => {
       const editor = editorRef.current;
-      if (!editor) return;
+      if (!editor) {
+        return;
+      }
       const selected = editor.getSelectedShapes() as TLShapePartial[];
       setSelectedTriggerKey(getSelectedExplodeTriggerKey(selected, allShapes));
-      setSelectedTriggerKeys(getSelectedExplodeTriggerKeys(selected, allShapes));
+      setSelectedTriggerKeys(
+        getSelectedExplodeTriggerKeys(selected, allShapes),
+      );
     }, 200);
     return () => window.clearInterval(handle);
   }, [allShapes]);

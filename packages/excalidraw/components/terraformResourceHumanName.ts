@@ -7,7 +7,10 @@
  */
 
 /** Built-in per-type field precedence (first non-empty string wins). */
-export const TERRAFORM_RESOURCE_HUMAN_NAME_FIELDS: Record<string, readonly string[]> = {
+export const TERRAFORM_RESOURCE_HUMAN_NAME_FIELDS: Record<
+  string,
+  readonly string[]
+> = {
   aws_lambda_function: ["function_name", "name"],
   aws_lambda_layer_version: ["layer_name", "description", "name"],
   aws_iam_role: ["name"],
@@ -176,39 +179,40 @@ export const TERRAFORM_RESOURCE_HUMAN_NAME_FIELDS: Record<string, readonly strin
  * When no per-type entry exists, try these attribute keys in order on `values` / `change.after`.
  * Keep human-oriented fields before opaque ids.
  */
-export const TERRAFORM_RESOURCE_HUMAN_NAME_FIELD_FALLBACKS: readonly string[] = [
-  "function_name",
-  "bucket",
-  "queue_name",
-  "repository_name",
-  "table_name",
-  "cluster_identifier",
-  "cluster_id",
-  "replication_group_id",
-  "db_name",
-  "identifier",
-  "domain_name",
-  "secret_name",
-  "alarm_name",
-  "log_group_name",
-  "family",
-  "stage_name",
-  "service_name",
-  "user_name",
-  "broker_name",
-  "database_name",
-  "compute_environment_name",
-  "graphql_url",
-  "name",
-  "name_prefix",
-  "title",
-  "description",
-  "key",
-  "endpoint",
-  "url",
-  "cidr_block",
-  "id",
-];
+export const TERRAFORM_RESOURCE_HUMAN_NAME_FIELD_FALLBACKS: readonly string[] =
+  [
+    "function_name",
+    "bucket",
+    "queue_name",
+    "repository_name",
+    "table_name",
+    "cluster_identifier",
+    "cluster_id",
+    "replication_group_id",
+    "db_name",
+    "identifier",
+    "domain_name",
+    "secret_name",
+    "alarm_name",
+    "log_group_name",
+    "family",
+    "stage_name",
+    "service_name",
+    "user_name",
+    "broker_name",
+    "database_name",
+    "compute_environment_name",
+    "graphql_url",
+    "name",
+    "name_prefix",
+    "title",
+    "description",
+    "key",
+    "endpoint",
+    "url",
+    "cidr_block",
+    "id",
+  ];
 
 let humanNameFieldOverrides: Record<string, readonly string[]> = {};
 
@@ -226,7 +230,9 @@ export function terraformResetHumanNameFieldOverrides(): void {
   humanNameFieldOverrides = {};
 }
 
-function resourceTypeKey(resource: Record<string, unknown> | null | undefined): string {
+function resourceTypeKey(
+  resource: Record<string, unknown> | null | undefined,
+): string {
   const t = typeof resource?.type === "string" ? resource.type : "";
   const mode = typeof resource?.mode === "string" ? resource.mode : "";
   if (!t) {
@@ -238,15 +244,16 @@ function resourceTypeKey(resource: Record<string, unknown> | null | undefined): 
   return t;
 }
 
-function collectValueBags(resource: Record<string, unknown> | null | undefined): Record<
-  string,
-  unknown
->[] {
+function collectValueBags(
+  resource: Record<string, unknown> | null | undefined,
+): Record<string, unknown>[] {
   if (!resource || typeof resource !== "object") {
     return [];
   }
   const out: Record<string, unknown>[] = [];
-  const change = resource.change as { after?: unknown; before?: unknown } | undefined;
+  const change = resource.change as
+    | { after?: unknown; before?: unknown }
+    | undefined;
   const after = change?.after;
   const before = change?.before;
   const values = resource.values;

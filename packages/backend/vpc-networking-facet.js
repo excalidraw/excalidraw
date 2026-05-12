@@ -23,7 +23,9 @@ function normalizeRouteTableId(value) {
 
 /** Terraform provider type for the node, from the primary resource or address heuristics. */
 function getResourceTypeFromNode(nodePath, node) {
-  return getPrimaryResource(node).type || String(nodePath).split(".").at(-2) || "";
+  return (
+    getPrimaryResource(node).type || String(nodePath).split(".").at(-2) || ""
+  );
 }
 
 /** All non-metadata keys on the nodes map (Terraform addresses). */
@@ -188,7 +190,9 @@ function extractVpcNetworkingFacetStore(nodes) {
         continue;
       }
       const rtId = normalizeRouteTableId(rt.config.id);
-      const inlineRoutes = Array.isArray(rt.config.route) ? rt.config.route : [];
+      const inlineRoutes = Array.isArray(rt.config.route)
+        ? rt.config.route
+        : [];
       const standalone = rtId ? routesByRtId.get(rtId) || [] : [];
       const assocList = rtId ? assocsByRtId.get(rtId) || [] : [];
 
@@ -216,7 +220,8 @@ function extractVpcNetworkingFacetStore(nodes) {
               terraform_address: sr.address,
               route_config: sr.config,
               destination_cidr_block: sr.config.destination_cidr_block,
-              destination_ipv6_cidr_block: sr.config.destination_ipv6_cidr_block,
+              destination_ipv6_cidr_block:
+                sr.config.destination_ipv6_cidr_block,
               gateway_id: sr.config.gateway_id,
               nat_gateway_id: sr.config.nat_gateway_id,
               egress_only_gateway_id: sr.config.egress_only_gateway_id,
@@ -417,7 +422,10 @@ function extractVpcNetworkingFacetStore(nodes) {
       if (r.config.nat_gateway_id) {
         natFlag = true;
       }
-      if (typeof r.config.gateway_id === "string" && /^igw-/i.test(r.config.gateway_id)) {
+      if (
+        typeof r.config.gateway_id === "string" &&
+        /^igw-/i.test(r.config.gateway_id)
+      ) {
         igwFlag = true;
       }
     }

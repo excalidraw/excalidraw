@@ -8,16 +8,20 @@
 function toRichText(text) {
   return {
     type: "doc",
-    content: [{ type: "paragraph", content: [{ type: "text", text: text || "" }] }],
+    content: [
+      { type: "paragraph", content: [{ type: "text", text: text || "" }] },
+    ],
   };
 }
 
 function slug(input) {
-  return String(input || "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 80) || "shape";
+  return (
+    String(input || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80) || "shape"
+  );
 }
 
 function stableShapeId(kind, sourceId) {
@@ -36,17 +40,27 @@ const HEX_TO_TLDRAW = [
 ];
 
 function mapColor(hex) {
-  if (!hex) return "black";
+  if (!hex) {
+    return "black";
+  }
   for (const { test, color } of HEX_TO_TLDRAW) {
-    if (test.test(hex)) return color;
+    if (test.test(hex)) {
+      return color;
+    }
   }
   return "grey";
 }
 
 function mapStrokeSize(strokeWidth) {
-  if (!strokeWidth || strokeWidth <= 1) return "s";
-  if (strokeWidth <= 2) return "m";
-  if (strokeWidth <= 4) return "l";
+  if (!strokeWidth || strokeWidth <= 1) {
+    return "s";
+  }
+  if (strokeWidth <= 2) {
+    return "m";
+  }
+  if (strokeWidth <= 4) {
+    return "l";
+  }
   return "xl";
 }
 
@@ -67,7 +81,9 @@ function mapExcalidrawTextAlignToTldraw(align) {
 }
 
 function isContainerElement(el) {
-  if (el.type !== "rectangle") return false;
+  if (el.type !== "rectangle") {
+    return false;
+  }
   const cd = el.customData;
   return Boolean(cd && cd.container);
 }
@@ -104,7 +120,9 @@ function extractTerraformMeta(el) {
 
 function excalidrawSceneToTldrawShapes(scene) {
   const elements = (scene.elements || []).filter((el) => {
-    if (!el.isDeleted) return true;
+    if (!el.isDeleted) {
+      return true;
+    }
     // Keep soft-hidden Terraform elements so tldraw can drive explode/collapse
     // from the same graph semantics Excalidraw uses.
     const cd = el.customData;
@@ -141,8 +159,8 @@ function excalidrawSceneToTldrawShapes(scene) {
           el.type === "ellipse"
             ? "ellipse"
             : el.type === "diamond"
-              ? "diamond"
-              : "rectangle";
+            ? "diamond"
+            : "rectangle";
         shapes.push({
           id,
           type: "geo",
@@ -175,10 +193,10 @@ function excalidrawSceneToTldrawShapes(scene) {
               !el.fontSize || el.fontSize <= 14
                 ? "s"
                 : el.fontSize <= 20
-                  ? "m"
-                  : el.fontSize <= 32
-                    ? "l"
-                    : "xl",
+                ? "m"
+                : el.fontSize <= 32
+                ? "l"
+                : "xl",
             font: "sans",
             textAlign: mapExcalidrawTextAlignToTldraw(el.textAlign),
             autoSize: true,
