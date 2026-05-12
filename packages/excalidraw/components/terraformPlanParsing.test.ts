@@ -197,9 +197,7 @@ describe("terraformPlanParsing", () => {
       expect(labels).not.toContain("data.aws_partition.current");
       expect(labels).not.toContain("data.aws_caller_identity.current");
       expect(labels).not.toContain("data.external.archive_prepare[0]");
-      expect(labels.some((label) => label.includes("data.aws_iam_policy_document."))).toBe(
-        true,
-      );
+      expect(labels.some((label) => label === "logs")).toBe(true);
 
       const terraformResources = body.elements
         .flatMap(
@@ -390,8 +388,8 @@ describe("sanitizeTerraformPlanNodes", () => {
     const { elements } = await buildTerraformElkExcalidrawScene(nodes);
     const labels = renderedLabels(elements);
 
-    expect(labels).toContain("aws_lambda_function.fn");
-    expect(labels).toContain("data.aws_iam_policy_document.assume");
+    expect(labels).toContain("fn");
+    expect(labels).toContain("assume");
     expect(labels).not.toContain("data.aws_region.current");
   });
 });

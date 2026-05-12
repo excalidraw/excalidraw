@@ -3,9 +3,12 @@ import { newElementWith } from "@excalidraw/element";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import terraformAwsIconTypeNames from "../assets/terraform-aws-icon-type-names.json";
+import { tfComfortPx } from "./terraformLayoutComfort";
 
-const TERRAFORM_AWS_ICON_PAD = 12;
-const TERRAFORM_AWS_ICON_SIZE = 36;
+const px = tfComfortPx;
+
+const TERRAFORM_AWS_ICON_PAD = px(12);
+const TERRAFORM_AWS_ICON_SIZE = px(36);
 /** Matches `TERRAFORM_RESOURCE_LABEL_STROKE` in `terraformElkLayout.ts`. */
 const TERRAFORM_RESOURCE_LABEL_STROKE = "#1e1e1e";
 
@@ -269,10 +272,10 @@ export async function injectTerraformAwsIconsIntoElements(
       continue;
     }
     out[textIdx + icons.length] = newElementWith(textEl, {
-      x: rect.x + iconArea + 8,
-      y: rect.y + 10,
-      width: rect.width - iconArea - 16,
-      height: rect.height - 20,
+      x: rect.x + iconArea + px(8),
+      y: rect.y + px(10),
+      width: rect.width - iconArea - px(16),
+      height: rect.height - px(20),
       textAlign: "left",
       verticalAlign: "middle",
       strokeColor: TERRAFORM_RESOURCE_LABEL_STROKE,
