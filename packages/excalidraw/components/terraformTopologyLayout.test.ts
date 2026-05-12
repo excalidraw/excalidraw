@@ -1193,7 +1193,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     assertTopologyFramesContainChildren(elements);
   });
 
-  it("places regional primaries in Regional services frame when region has no VPCs", async () => {
+  it("places regional primaries directly under region frame when region has no VPCs", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,
       accounts: new Map([
@@ -1245,13 +1245,22 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     expect(meta.regionalPrimaryCount).toBe(1);
     expect(meta.primaryResourceCount).toBe(1);
 
-    const regionalFrames = elements.filter(
+    expect(
+      elements.filter(
+        (e) =>
+          e.type === "frame" &&
+          (e.customData as { terraformTopologyRole?: string } | undefined)
+            ?.terraformTopologyRole === "regionalServices",
+      ).length,
+    ).toBe(0);
+
+    const regionFrames = elements.filter(
       (e) =>
         e.type === "frame" &&
         (e.customData as { terraformTopologyRole?: string } | undefined)
-          ?.terraformTopologyRole === "regionalServices",
+          ?.terraformTopologyRole === "region",
     );
-    expect(regionalFrames.length).toBe(1);
+    expect(regionFrames.length).toBe(1);
 
     const rects = elements.filter(
       (e) =>
@@ -1269,7 +1278,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     );
     expect(primaryClusterFrames.length).toBe(1);
     expect(rects[0]!.frameId).toBe(primaryClusterFrames[0]!.id);
-    expect(primaryClusterFrames[0]!.frameId).toBe(regionalFrames[0]!.id);
+    expect(primaryClusterFrames[0]!.frameId).toBe(regionFrames[0]!.id);
 
     assertTopologyFramesContainChildren(elements);
   });
@@ -1384,7 +1393,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     assertTopologyFramesContainChildren(elements);
   });
 
-  it("lays out Regional services beside VPC grid in the same region", async () => {
+  it("lays out regional primaries beside VPC grid in the same region", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,
       accounts: new Map([
@@ -1473,7 +1482,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
           (e.customData as { terraformTopologyRole?: string } | undefined)
             ?.terraformTopologyRole === "regionalServices",
       ),
-    ).toBe(true);
+    ).toBe(false);
     expect(
       elements.some(
         (e) =>

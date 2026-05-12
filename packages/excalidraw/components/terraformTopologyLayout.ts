@@ -147,7 +147,7 @@ const IAM_SG_COLUMN_GAP_PX = px(8);
 const CLOUDWATCH_COLUMN_GAP_PX = px(8);
 /** Gap between subnet-zone frames inside one VPC. */
 const ZONE_CELL_GAP = px(20);
-/** Gap between regional-services column and VPC grid inside one region frame. */
+/** Gap between regional-primary column and VPC grid inside one region frame. */
 const REGIONAL_TO_VPC_GAP = px(28);
 /** Compact tiles for `aws_vpc_endpoint` egress on the VPC bottom edge. */
 const VPC_ENDPOINT_TILE_W = px(160);
@@ -177,14 +177,10 @@ export type TerraformTopologyRole =
   | "region"
   | "vpc"
   | "subnetZone"
-  | "regionalServices"
   | "primaryCluster";
 
 function skeletonId(
-  role: Exclude<
-    TerraformTopologyRole,
-    "subnetZone" | "regionalServices" | "primaryCluster"
-  >,
+  role: Exclude<TerraformTopologyRole, "subnetZone" | "primaryCluster">,
   accountId: string,
   region: string,
   vpcId: string | null,
@@ -212,10 +208,6 @@ function zoneSkeletonId(
   return `${skeletonId("vpc", accountId, region, vpcId)}:zone=${encodeURIComponent(sig)}`;
 }
 
-function regionalServicesSkeletonId(accountId: string, region: string): string {
-  return `${skeletonId("region", accountId, region, null)}:regional`;
-}
-
 /** Stable id for nested “primary + satellites” drag frame (must not equal a resource address). */
 function primaryClusterSkeletonId(primaryAddress: string): string {
   return `tf-topo:primary-cluster:${encodeURIComponent(primaryAddress)}`;
@@ -238,9 +230,6 @@ function topologyPathFrame(
     return [accountId];
   }
   if (role === "region") {
-    return [accountId, region];
-  }
-  if (role === "regionalServices") {
     return [accountId, region];
   }
   if (role === "subnetZone" && vpcId) {
@@ -374,7 +363,7 @@ function vpcEmptyShellSize(): { w: number; h: number } {
   };
 }
 
-/** Bounding box for one subnet-zone or regional frame from primary addresses + IAM stacks. */
+/** Bounding box for one subnet-zone or regional-primary column from primary addresses + IAM stacks. */
 function zoneFrameSizeForTopologyAddresses(
   sortedAddresses: readonly string[],
   nodes: TerraformPlanNodesMap,
@@ -2046,8 +2035,6 @@ export async function buildTerraformTopologyExcalidrawScene(
       const regionChildIds: string[] = [];
 
       if (hasReg) {
-        const regionalSkId = regionalServicesSkeletonId(accountId, regionName);
-        regionChildIds.push(regionalSkId);
         const regX = contentInnerX;
         const regY = innerTop;
         vpcGridOriginX =
@@ -2070,24 +2057,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           satelliteLineSpecs,
           plan,
         );
-
-        skeleton.push({
-          type: "frame",
-          id: regionalSkId,
-          name: "Regional services",
-          x: regX,
-          y: regY,
-          width: regDims.w,
-          height: regDims.h,
-          children: regionalRectIds as readonly string[],
-          customData: frameCustomData(
-            "regionalServices",
-            accountId,
-            regionName,
-            null,
-            regionalSkId,
-          ),
-        });
+        regionChildIds.push(...regionalRectIds);
       }
 
       const vpcFrameIds: string[] = [];
