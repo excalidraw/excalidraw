@@ -1040,7 +1040,7 @@ export function buildTerraformNetworkingDependencyLineSkeletons(
 ): ExcalidrawElementSkeleton[] {
   const edgeSkeletons: ExcalidrawElementSkeleton[] = [];
   let edgeIndex = 0;
-  for (const { source, target, hasNew, hasExisting } of directedEdges) {
+  for (const { source, target } of directedEdges) {
     const sourceBox = layoutBoxes[source] as LayoutBox | undefined;
     const targetBox = layoutBoxes[target] as LayoutBox | undefined;
     if (!sourceBox || !targetBox) {

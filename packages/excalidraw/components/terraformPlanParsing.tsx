@@ -104,6 +104,7 @@ function emitLocalParseDebug(payload: Record<string, unknown>) {
   if (!import.meta.env.DEV) {
     return;
   }
+  // eslint-disable-next-line no-console -- intentional dev-only parse tracing
   console.log(DEBUG_PREFIX, payload);
 }
 
@@ -751,40 +752,6 @@ function loadPlan(plan: { resource_changes: { address: string }[] }) {
   return nodes;
 }
 
-function addModuleNodes(nodes: Record<string, TerraformPlanGraphNode>) {
-  const modulePaths = collectAllTerraformModulePaths(Object.keys(nodes));
-
-  for (const modulePath of modulePaths) {
-    if (nodes[modulePath]) {
-      continue;
-    }
-
-    nodes[modulePath] = {
-      resources: {
-        [modulePath]: {
-          address: modulePath,
-          type: TERRAFORM_MODULE_RESOURCE_TYPE,
-          name: lastModuleNameSegment(modulePath),
-          mode: "managed",
-          change: { actions: ["no-op"] },
-        },
-      },
-    };
-  }
-
-  return nodes;
-}
-
-function collectAllTerraformModulePaths(nodePaths: string[]) {
-  const out = new Set<string>();
-  for (const nodePath of nodePaths) {
-    for (const modulePath of getModulePathChainFromAddress(nodePath)) {
-      out.add(modulePath);
-    }
-  }
-  return out;
-}
-
 function getModulePathChainFromAddress(nodePath = "") {
   const parts = nodePath.split(".");
   const chain = [];
@@ -801,11 +768,6 @@ function getModulePathChainFromAddress(nodePath = "") {
   }
 
   return chain;
-}
-
-function lastModuleNameSegment(modulePath: string) {
-  const parts = modulePath.split(".");
-  return parts[parts.length - 1] || modulePath;
 }
 
 function emptyModuleTreeNode(path: string): TerraformModuleTreeNode {
