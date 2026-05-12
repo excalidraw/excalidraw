@@ -10,17 +10,28 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/checkout@v2
-      - name: "Install Node"
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
-      - name: "Install Deps"
-        run: yarn install
-      - name: "Test Coverage"
+          node-version: 22.x
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Install Deps
+        run: yarn install --frozen-lockfile
+
+      - name: Test Coverage
+        id: test_coverage
         run: yarn test:coverage
-      - name: "Report Coverage"
-        if: always() # Also generate the report if tests are failing
+
+      - name: Report Coverage
+        if: always() && hashFiles('coverage/coverage-summary.json') != ''
         uses: davelosert/vitest-coverage-report-action@2500dafcee7dd64f85ab689c0b83798a8359770e # v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Coverage summary missing
+        if: always() && hashFiles('coverage/coverage-summary.json') == ''
+        run: echo "::warning::coverage/coverage-summary.json was not generated (install or vitest may have failed before coverage was written)."

@@ -47,7 +47,7 @@
     "vitest-canvas-mock": "0.3.3"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "homepage": ".",
   "prettier": "@excalidraw/prettier-config",
@@ -83,7 +83,7 @@
     "test:typecheck": "tsc",
     "test:update": "yarn test:app --update --watch=false",
     "test": "yarn test:app",
-    "test:coverage": "vitest --coverage",
+    "test:coverage": "vitest run --coverage",
     "test:coverage:watch": "vitest --coverage --watch",
     "test:ui": "yarn test --ui --coverage.enabled=true",
     "fix:code": "yarn test:code --fix",
