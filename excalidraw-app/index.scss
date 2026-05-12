@@ -168,10 +168,13 @@ body.terraform-canvas-landing #root {
   box-sizing: border-box;
 }
 
-.landing-nav {
+.landing-nav-wrap {
   position: sticky;
   top: 0;
   z-index: 20;
+}
+
+.landing-nav {
   display: flex;
   gap: 1rem;
   align-items: center;
@@ -514,12 +517,14 @@ body.terraform-canvas-landing #root {
 .landing-features,
 .landing-use-cases,
 .landing-canvas-section,
-.landing-final {
+.landing-final,
+.landing-faq {
   padding-inline: clamp(1rem, 5vw, 5.5rem);
 }
 
 .landing-strip {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   justify-content: space-between;
   align-items: center;
@@ -528,11 +533,24 @@ body.terraform-canvas-landing #root {
   background: rgba(255, 255, 255, 0.62);
 }
 
+.landing-strip__heading {
+  flex: 1 1 100%;
+  margin: 0 0 0.25rem;
+  color: var(--landing-ink);
+  font-family: "Virgil", "Segoe Print", cursive;
+  font-size: clamp(1.35rem, 2.4vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
 .landing-strip p {
+  flex: 1 1 280px;
   max-width: 620px;
   margin: 0;
-  font-size: 1.05rem;
-  font-weight: 800;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(22, 33, 29, 0.88);
+  line-height: 1.45;
 }
 
 .landing-strip div,
@@ -567,7 +585,7 @@ body.terraform-canvas-landing #root {
 }
 
 .landing-steps li,
-.landing-features article {
+.landing-features__grid article {
   border: 2px solid var(--landing-ink);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.76);
@@ -576,39 +594,54 @@ body.terraform-canvas-landing #root {
 }
 
 .landing-steps strong,
-.landing-features h3 {
+.landing-features__grid h3 {
   display: block;
   margin: 0 0 0.5rem;
   font-size: 1.22rem;
 }
 
 .landing-steps span,
-.landing-features p {
+.landing-features__grid p {
   color: rgba(22, 33, 29, 0.78);
   line-height: 1.45;
 }
 
 .landing-features {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
   padding-block: clamp(2rem, 5vw, 4rem);
   background: #19231f;
   color: #f7f1e4;
 }
 
-.landing-features article {
+.landing-features .landing-section-heading {
+  max-width: 1180px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.landing-features__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  max-width: 1180px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.landing-features__grid article {
   border-color: rgba(247, 241, 228, 0.72);
   background: rgba(247, 241, 228, 0.08);
   box-shadow: none;
 }
 
-.landing-features article span {
+.landing-features__grid article span {
   color: #81d6ad;
   font-weight: 800;
 }
 
-.landing-features p {
+.landing-features__grid p {
   color: rgba(247, 241, 228, 0.78);
 }
 
@@ -696,10 +729,50 @@ body.terraform-canvas-landing #root {
   max-width: 820px;
 }
 
+.landing-faq {
+  padding-block: clamp(2.5rem, 5vw, 4rem);
+  border-top: 2px solid var(--landing-ink);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.landing-faq__list {
+  max-width: 820px;
+  margin: 1.25rem 0 0;
+}
+
+.landing-faq__item {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--landing-line);
+}
+
+.landing-faq__item:last-child {
+  border-bottom: none;
+}
+
+.landing-faq dt {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--landing-ink);
+}
+
+.landing-faq dd {
+  margin: 0.55rem 0 0;
+  color: rgba(22, 33, 29, 0.82);
+  line-height: 1.55;
+}
+
+.landing-faq code {
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(22, 33, 29, 0.08);
+  font-size: 0.88rem;
+}
+
 @media (max-width: 900px) {
   .landing-hero,
   .landing-steps,
-  .landing-features {
+  .landing-features__grid {
     grid-template-columns: 1fr;
   }
 
@@ -819,6 +892,7 @@ body.terraform-canvas-landing .landing-hero,
 body.terraform-canvas-landing .landing-strip,
 body.terraform-canvas-landing .landing-workflow,
 body.terraform-canvas-landing .landing-features,
+body.terraform-canvas-landing .landing-faq,
 body.terraform-canvas-landing .landing-use-cases,
 body.terraform-canvas-landing .landing-final,
 body.terraform-canvas-landing .landing-canvas-section__header,
@@ -853,7 +927,7 @@ body.terraform-canvas-landing .landing-steps li {
   border-radius: 8px;
 }
 
-body.terraform-canvas-landing .landing-features article {
+body.terraform-canvas-landing .landing-features__grid article {
   border-radius: 8px;
   box-shadow: none;
 }

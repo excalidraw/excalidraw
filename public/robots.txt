@@ -1,13 +1,13 @@
+# tfdraw.io — allow indexing of the public app and static assets.
+# Thin or utility routes use noindex in the app where appropriate.
+
 User-agent: Twitterbot
-Disallow:
+Allow: /
 
 User-agent: facebookexternalhit
-Disallow:
+Allow: /
 
 User-agent: *
-Allow: /$
 Allow: /
-Allow: /sitemap.xml
-Disallow: /
 
 Sitemap: https://tfdraw.io/sitemap.xml
