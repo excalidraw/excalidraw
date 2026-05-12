@@ -580,12 +580,93 @@ function shortLabel(kind: string, value: string): string {
   return value.length > max ? `${kind}: ${value.slice(0, max - 3)}…` : `${kind}: ${value}`;
 }
 
-function zoneDisplayName(z: TopologyPlacementZone): string {
+type TopologyPlanResourceChange = {
+  type?: string;
+  change?: { before?: unknown; after?: unknown };
+};
+
+function topologyPlanValues(rc: TopologyPlanResourceChange): Record<string, unknown> | null {
+  const after = rc.change?.after;
+  if (after && typeof after === "object" && !Array.isArray(after)) {
+    return after as Record<string, unknown>;
+  }
+  const before = rc.change?.before;
+  if (before && typeof before === "object" && !Array.isArray(before)) {
+    return before as Record<string, unknown>;
+  }
+  return null;
+}
+
+function resourceNameFromValues(values: Record<string, unknown>): string | null {
+  const tags = values.tags;
+  if (tags && typeof tags === "object" && !Array.isArray(tags)) {
+    const name = (tags as Record<string, unknown>).Name;
+    if (typeof name === "string" && name.trim()) {
+      return name.trim();
+    }
+  }
+  const name = values.name;
+  return typeof name === "string" && name.trim() ? name.trim() : null;
+}
+
+function buildTopologyVpcNameMap(plan?: unknown): Map<string, string> {
+  const out = new Map<string, string>();
+  const changes = (plan as { resource_changes?: TopologyPlanResourceChange[] } | undefined)
+    ?.resource_changes;
+  if (!Array.isArray(changes)) {
+    return out;
+  }
+  for (const rc of changes) {
+    if (rc.type !== "aws_vpc") {
+      continue;
+    }
+    const values = topologyPlanValues(rc);
+    if (!values) {
+      continue;
+    }
+    const id = typeof values.id === "string" ? values.id : null;
+    const name = resourceNameFromValues(values);
+    if (id && name) {
+      out.set(id, name);
+    }
+  }
+  return out;
+}
+
+function buildTopologySubnetNameMap(plan?: unknown): Map<string, string> {
+  const out = new Map<string, string>();
+  const changes = (plan as { resource_changes?: TopologyPlanResourceChange[] } | undefined)
+    ?.resource_changes;
+  if (!Array.isArray(changes)) {
+    return out;
+  }
+  for (const rc of changes) {
+    if (rc.type !== "aws_subnet") {
+      continue;
+    }
+    const values = topologyPlanValues(rc);
+    if (!values) {
+      continue;
+    }
+    const id = typeof values.id === "string" ? values.id : null;
+    const name = resourceNameFromValues(values);
+    if (id && name) {
+      out.set(id, name);
+    }
+  }
+  return out;
+}
+
+function zoneDisplayName(
+  z: TopologyPlacementZone,
+  subnetNameById: ReadonlyMap<string, string>,
+): string {
   if (z.subnetIds.length === 0) {
     return "VPC-only placement";
   }
+  const labels = z.subnetIds.map((sid) => subnetNameById.get(sid) ?? sid);
   if (z.subnetIds.length <= 2) {
-    return `Subnets: ${z.subnetIds.join(", ")}`;
+    return `Subnets: ${labels.join(", ")}`;
   }
   return `Subnets (${z.subnetIds.length})`;
 }
@@ -1859,6 +1940,8 @@ export async function buildTerraformTopologyExcalidrawScene(
 
   const skeleton: ExcalidrawElementSkeleton[] = [];
   const arnIndex = buildArnIndexForTopology(nodes);
+  const vpcNameById = buildTopologyVpcNameMap(plan);
+  const subnetNameById = buildTopologySubnetNameMap(plan);
   const satelliteLineSpecs: TopologySatelliteLineSpec[] = [];
   const globalPlacedIamSatellites = new Set<string>();
   const globalPlacedKmsPolicySatellites = new Set<string>();
@@ -2172,7 +2255,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           skeleton.push({
             type: "frame",
             id: vpcSkId,
-            name: shortLabel("VPC", vpcId),
+            name: shortLabel("VPC", vpcNameById.get(vpcId) ?? vpcId),
             x: vpcX,
             y: vpcY,
             width: vpcCellW,
@@ -2275,7 +2358,7 @@ export async function buildTerraformTopologyExcalidrawScene(
           skeleton.push({
             type: "frame",
             id: zoneSkId,
-            name: zoneDisplayName(z),
+            name: zoneDisplayName(z, subnetNameById),
             x: zoneX,
             y: zoneY,
             width: vd.perZoneW,
@@ -2329,7 +2412,7 @@ export async function buildTerraformTopologyExcalidrawScene(
         skeleton.push({
           type: "frame",
           id: vpcSkId,
-          name: shortLabel("VPC", vpcId),
+          name: shortLabel("VPC", vpcNameById.get(vpcId) ?? vpcId),
           x: vpcX,
           y: vpcY,
           width: vpcCellW,

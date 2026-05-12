@@ -86,6 +86,14 @@ export type TopologyRouteTableBottomPlacements = {
 
 const ROUTE_TABLE_SEMANTIC_TILE_W = tfComfortPx(160);
 const ROUTE_TABLE_SEMANTIC_GAP = tfComfortPx(10);
+const ALB_COMPANION_TYPES = new Set([
+  "aws_lb_listener",
+  "aws_lb_target_group",
+  "aws_lb_target_group_attachment",
+  "aws_lambda_permission",
+  "aws_security_group",
+  "aws_security_group_rule",
+]);
 
 /** Minimum inner width for one horizontal row of route table tiles (matches layout constants). */
 export function routeTableBottomRowMinInnerWidth(addrCount: number): number {
@@ -163,6 +171,7 @@ export function extractPrimaryTopologyZones(
   const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
   const subnetToVpc = buildSubnetToVpcMapFromPlan(plan);
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
+  const albModulePrefixes: Array<{ prefix: string; key: string }> = [];
 
   const accum = new Map<
     string,
@@ -234,6 +243,31 @@ export function extractPrimaryTopologyZones(
       accum.set(key, row);
     }
     row.addresses.add(address);
+    if (t === "aws_lb") {
+      albModulePrefixes.push({
+        prefix: terraformModulePrefixForAddress(address),
+        key,
+      });
+    }
+  }
+
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || !rc.type || !ALB_COMPANION_TYPES.has(rc.type)) {
+      continue;
+    }
+    const address = rc.address;
+    if (!address || typeof address !== "string") {
+      continue;
+    }
+    const prefix = terraformModulePrefixForAddress(address);
+    const owner = albModulePrefixes.find((x) => x.prefix === prefix);
+    if (!owner) {
+      continue;
+    }
+    accum.get(owner.key)?.addresses.add(address);
   }
 
   const out: TopologyPlacementZone[] = [...accum.values()].map((row) => ({
@@ -514,6 +548,43 @@ function buildRouteTableIdToSubnetIdsFromPlan(
   return out;
 }
 
+function buildRouteTableIdToCompanionAddressesFromPlan(
+  plan: TerraformPlanProviderContext & {
+    resource_changes?: ResourceChange[];
+  },
+): Map<string, Set<string>> {
+  const out = new Map<string, Set<string>>();
+  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (
+      rc.mode !== "managed" ||
+      (rc.type !== "aws_route" && rc.type !== "aws_route_table_association")
+    ) {
+      continue;
+    }
+    const address = rc.address;
+    if (!address || typeof address !== "string") {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    const rtid = stringField(values.route_table_id);
+    if (!rtid || !rtid.startsWith("rtb-")) {
+      continue;
+    }
+    if (!out.has(rtid)) {
+      out.set(rtid, new Set());
+    }
+    out.get(rtid)!.add(address);
+  }
+  return out;
+}
+
 function buildRouteTableAddressToMeta(
   plan: TerraformPlanProviderContext & {
     resource_changes?: ResourceChange[];
@@ -610,6 +681,7 @@ export function computeRouteTableBottomEdgePlacements(
 ): TopologyRouteTableBottomPlacements {
   const buckets = extractRouteTablesByVpc(plan);
   const rtidToSubnets = buildRouteTableIdToSubnetIdsFromPlan(plan);
+  const rtidToCompanions = buildRouteTableIdToCompanionAddressesFromPlan(plan);
   const addrToMeta = buildRouteTableAddressToMeta(plan);
 
   const zoneAccum = new Map<string, string[]>();
@@ -644,18 +716,23 @@ export function computeRouteTableBottomEdgePlacements(
         );
       }
 
+      const addressesForPlacement = [
+        addr,
+        ...[...(rtidToCompanions.get(meta.rtbId) ?? new Set<string>())].sort(),
+      ];
+
       if (zonePick) {
         const zk = `${meta.accountId}\0${meta.region}\0${meta.vpcId}\0${zonePick.subnetSignature}`;
         if (!zoneAccum.has(zk)) {
           zoneAccum.set(zk, []);
         }
-        zoneAccum.get(zk)!.push(addr);
+        zoneAccum.get(zk)!.push(...addressesForPlacement);
       } else {
         const vk = routeTableVpcAccumKey(meta.accountId, meta.region, meta.vpcId);
         if (!vpcAccum.has(vk)) {
           vpcAccum.set(vk, []);
         }
-        vpcAccum.get(vk)!.push(addr);
+        vpcAccum.get(vk)!.push(...addressesForPlacement);
       }
     }
   }
@@ -671,7 +748,7 @@ export function computeRouteTableBottomEdgePlacements(
       region,
       vpcId,
       subnetSignature,
-      addresses: [...addresses].sort(),
+      addresses: [...new Set(addresses)].sort(),
     });
   }
   zoneBottom.sort((a, b) => {
@@ -697,7 +774,7 @@ export function computeRouteTableBottomEdgePlacements(
       accountId,
       region,
       vpcId,
-      addresses: [...addresses].sort(),
+      addresses: [...new Set(addresses)].sort(),
     });
   }
   vpcBottom.sort((a, b) => {
@@ -814,6 +891,9 @@ const VPC_DEFAULT_TYPES = new Set([
   "aws_default_network_acl",
   "aws_default_route_table",
   "aws_default_security_group",
+  "aws_eip",
+  "aws_internet_gateway",
+  "aws_nat_gateway",
 ]);
 
 /**
@@ -826,6 +906,28 @@ export function extractVpcDefaultPlumbingBuckets(
 ): TopologyVpcDefaultPlumbingBucket[] {
   const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
   const subnetOwners = buildSubnetOwnerHintsFromPlan(plan);
+  const subnetToVpc = buildSubnetToVpcMapFromPlan(plan);
+  const natAllocationToVpc = new Map<string, string>();
+
+  for (const rc of changes) {
+    if (
+      !isAwsTerraformResourceChange(rc) ||
+      rc.mode !== "managed" ||
+      rc.type !== "aws_nat_gateway"
+    ) {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    const allocationId = stringField(values.allocation_id);
+    const subnetId = stringField(values.subnet_id);
+    const vpcId = subnetId ? subnetToVpc.get(subnetId) : null;
+    if (allocationId && vpcId) {
+      natAllocationToVpc.set(allocationId, vpcId);
+    }
+  }
 
   const accum = new Map<
     string,
@@ -847,7 +949,15 @@ export function extractVpcDefaultPlumbingBuckets(
     if (!values) {
       continue;
     }
-    const vpcIdRaw = stringField(values.vpc_id);
+    let vpcIdRaw = stringField(values.vpc_id);
+    if (!vpcIdRaw && rc.type === "aws_nat_gateway") {
+      const subnetId = stringField(values.subnet_id);
+      vpcIdRaw = subnetId ? subnetToVpc.get(subnetId) ?? null : null;
+    }
+    if (!vpcIdRaw && rc.type === "aws_eip") {
+      const id = stringField(values.id) ?? stringField(values.allocation_id);
+      vpcIdRaw = id ? natAllocationToVpc.get(id) ?? null : null;
+    }
     if (!vpcIdRaw) {
       continue;
     }
@@ -1263,6 +1373,7 @@ export function extractInterfaceEndpointSecurityGroupBuckets(
   }
 
   const sgAddressById = new Map<string, string>();
+  const sgModulePrefixById = new Map<string, string>();
   for (const rc of changes) {
     if (!isAwsTerraformResourceChange(rc)) {
       continue;
@@ -1281,7 +1392,40 @@ export function extractInterfaceEndpointSecurityGroupBuckets(
     const id = stringField(values.id);
     if (id && id.startsWith("sg-")) {
       sgAddressById.set(id, addr);
+      sgModulePrefixById.set(id, terraformModulePrefixForAddress(addr));
     }
+  }
+
+  const sgRuleAddressesBySgId = new Map<string, Set<string>>();
+  for (const rc of changes) {
+    if (!isAwsTerraformResourceChange(rc)) {
+      continue;
+    }
+    if (rc.mode !== "managed" || rc.type !== "aws_security_group_rule") {
+      continue;
+    }
+    const addr = rc.address;
+    if (!addr || typeof addr !== "string") {
+      continue;
+    }
+    const values = pickResourceValuesForTopologyPlacement(rc as ResourceChange);
+    if (!values) {
+      continue;
+    }
+    const sgId = stringField(values.security_group_id);
+    const matchingSgId =
+      sgId && sgId.startsWith("sg-")
+        ? sgId
+        : [...sgModulePrefixById.entries()].find(
+            ([, prefix]) => prefix && prefix === terraformModulePrefixForAddress(addr),
+          )?.[0] ?? null;
+    if (!matchingSgId) {
+      continue;
+    }
+    if (!sgRuleAddressesBySgId.has(matchingSgId)) {
+      sgRuleAddressesBySgId.set(matchingSgId, new Set());
+    }
+    sgRuleAddressesBySgId.get(matchingSgId)!.add(addr);
   }
 
   const out: TopologyEndpointSecurityGroupBucket[] = [];
@@ -1291,6 +1435,9 @@ export function extractInterfaceEndpointSecurityGroupBuckets(
       const a = sgAddressById.get(sgId);
       if (a) {
         addresses.push(a);
+      }
+      for (const ruleAddr of sgRuleAddressesBySgId.get(sgId) ?? []) {
+        addresses.push(ruleAddr);
       }
     }
     if (addresses.length === 0) {

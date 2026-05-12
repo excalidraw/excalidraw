@@ -9,6 +9,7 @@ import {
   mergeTopologyModelWithVpcEndpoints,
   mergeTopologyModelWithRouteTables,
   mergeTopologyModelWithVpcDefaults,
+  pickResourceValuesForTopologyPlacement,
 } from "./terraformTopologyExtract";
 import {
   computeRouteTableBottomEdgePlacements,
@@ -112,6 +113,53 @@ export type TerraformPlanParsingOptions = {
 };
 
 const DATA_SOURCE_GRAPH_ALLOWLIST = new Set(["aws_iam_policy_document"]);
+const SEMANTIC_LAYOUT_OMITTED_TYPES = new Set(["terraform_data"]);
+
+function collectSemanticRepresentedResourceAddresses(
+  elements: Array<{ customData?: Record<string, any> }>,
+  plan: { resource_changes?: Array<{ address?: string; type?: string }> },
+): Set<string> {
+  const represented = new Set<string>();
+  const representedSubnetIds = new Set<string>();
+  for (const element of elements) {
+    const cd = element.customData || {};
+    if (typeof cd.nodePath === "string") {
+      represented.add(cd.nodePath);
+    }
+    if (Array.isArray(cd.terraformSubnetIds)) {
+      for (const subnetId of cd.terraformSubnetIds) {
+        if (typeof subnetId === "string") {
+          representedSubnetIds.add(subnetId);
+        }
+      }
+    }
+    if (Array.isArray(cd.terraformResources)) {
+      for (const resource of cd.terraformResources) {
+        const address = resource?.address;
+        if (typeof address === "string") {
+          represented.add(address);
+        }
+      }
+    }
+  }
+  for (const rc of plan.resource_changes || []) {
+    if (rc.type === "aws_vpc" && typeof rc.address === "string") {
+      represented.add(rc.address);
+    }
+    if (rc.type === "aws_subnet" && typeof rc.address === "string") {
+      const values = pickResourceValuesForTopologyPlacement(rc as any);
+      const subnetId =
+        values && typeof values.id === "string" ? values.id : null;
+      if (subnetId && representedSubnetIds.has(subnetId)) {
+        represented.add(rc.address);
+      }
+    }
+    if (rc.type === "aws_iam_policy_document" && typeof rc.address === "string") {
+      represented.add(rc.address);
+    }
+  }
+  return represented;
+}
 
 function isExcludedDataSourceAddressForGraph(address: string): boolean {
   const parts = stripTerraformAddressIndexes(address).split(".");
@@ -432,6 +480,16 @@ export const terraformPlanParsing = async (
       vpcFlowLogBuckets,
       endpointSecurityGroupBuckets,
     );
+    const represented = collectSemanticRepresentedResourceAddresses(
+      topoScene.elements as Array<{ customData?: Record<string, any> }>,
+      semPlan as { resource_changes?: Array<{ address?: string; type?: string }> },
+    );
+    const omittedSemanticResources = (semPlan.resource_changes || []).filter(
+      (rc: { address?: string; type?: string }) =>
+        typeof rc.address === "string" &&
+        !represented.has(rc.address) &&
+        SEMANTIC_LAYOUT_OMITTED_TYPES.has(rc.type || ""),
+    );
     emitLocalParseDebug({
       phase: "topologyLayout",
       meta: topoScene.meta,
@@ -440,7 +498,11 @@ export const terraformPlanParsing = async (
     sceneBody = {
       ...EMPTY_TERRAFORM_EXCALIDRAW_SCENE,
       elements: topoScene.elements,
-      meta: topoScene.meta,
+      meta: {
+        ...topoScene.meta,
+        representedResourceCount: represented.size,
+        omittedResourceCount: omittedSemanticResources.length,
+      },
     };
   } else {
     const elkScene = await buildTerraformElkExcalidrawScene(nodes5);

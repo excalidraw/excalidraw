@@ -6,6 +6,7 @@
  */
 
 const PRIMARY_COMPUTE_TYPES = new Set([
+  "aws_lb",
   "aws_lambda_function",
   "aws_ecs_cluster",
   "aws_ecs_service",
@@ -89,6 +90,16 @@ export function isInitiallyVisibleTerraformResource(
 
 /** Subnet / default-VPC / flow-log tiles in semantic topology (not ELK “primary” overview types). */
 const TOPOLOGY_SEMANTIC_INFRA_TYPES = new Set([
+  "aws_eip",
+  "aws_internet_gateway",
+  "aws_lambda_permission",
+  "aws_lb",
+  "aws_lb_listener",
+  "aws_lb_target_group",
+  "aws_lb_target_group_attachment",
+  "aws_nat_gateway",
+  "aws_route",
+  "aws_route_table_association",
   "aws_subnet",
   "aws_default_network_acl",
   "aws_default_route_table",

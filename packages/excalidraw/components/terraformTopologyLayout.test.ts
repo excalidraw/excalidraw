@@ -554,6 +554,90 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     assertTopologyFramesContainChildren(elements);
   });
 
+  it("uses VPC and subnet names from plan tags for topology frame labels", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-123",
+                      {
+                        vpcId: "vpc-123",
+                        subnets: new Map([
+                          ["subnet-aaa", { subnetId: "subnet-aaa" }],
+                          ["subnet-bbb", { subnetId: "subnet-bbb" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-123",
+        subnetSignature: "subnet-aaa|subnet-bbb",
+        subnetIds: ["subnet-aaa", "subnet-bbb"],
+        addresses: [],
+      },
+    ];
+    const plan = {
+      resource_changes: [
+        {
+          type: "aws_vpc",
+          change: { after: { id: "vpc-123", tags: { Name: "workload-vpc" } } },
+        },
+        {
+          type: "aws_subnet",
+          change: { after: { id: "subnet-aaa", tags: { Name: "public-a" } } },
+        },
+        {
+          type: "aws_subnet",
+          change: { after: { id: "subnet-bbb", tags: { Name: "public-b" } } },
+        },
+      ],
+    };
+
+    const { elements } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      {},
+      plan,
+    );
+
+    const vpcFrame = elements.find(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "vpc",
+    );
+    const subnetFrame = elements.find(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "subnetZone",
+    );
+
+    expect(vpcFrame?.name).toBe("VPC: workload-vpc");
+    expect(subnetFrame?.name).toBe("Subnets: public-a, public-b");
+  });
+
   it("places unassociated route table tiles on the VPC body bottom edge", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,

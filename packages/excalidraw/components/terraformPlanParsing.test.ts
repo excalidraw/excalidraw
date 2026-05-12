@@ -301,6 +301,7 @@ describe("terraformPlanParsing", () => {
 
       expect(res.ok).toBe(true);
       const body = await res.json();
+      const plan = JSON.parse(planText);
       expect(body.meta?.layoutEngine).toBe("topology");
       expect(body.meta?.accountCount).toBeGreaterThan(0);
       expect(typeof body.meta?.primaryResourceCount).toBe("number");
@@ -310,6 +311,44 @@ describe("terraformPlanParsing", () => {
       expect(Array.isArray(body.elements)).toBe(true);
       const frames = body.elements.filter((e: any) => e.type === "frame");
       expect(frames.length).toBeGreaterThan(0);
+
+      const represented = new Set<string>();
+      const representedSubnetIds = new Set<string>();
+      for (const element of body.elements as any[]) {
+        if (typeof element.customData?.nodePath === "string") {
+          represented.add(element.customData.nodePath);
+        }
+        for (const subnetId of element.customData?.terraformSubnetIds || []) {
+          representedSubnetIds.add(subnetId);
+        }
+        for (const resource of element.customData?.terraformResources || []) {
+          if (typeof resource.address === "string") {
+            represented.add(resource.address);
+          }
+        }
+      }
+      for (const rc of plan.resource_changes || []) {
+        if (rc.type === "aws_vpc") {
+          represented.add(rc.address);
+        }
+        const after = rc.change?.after || rc.change?.before || {};
+        if (rc.type === "aws_subnet" && representedSubnetIds.has(after.id)) {
+          represented.add(rc.address);
+        }
+        if (rc.type === "aws_iam_policy_document") {
+          represented.add(rc.address);
+        }
+      }
+      const omitted = (plan.resource_changes || []).filter(
+        (rc: any) => !represented.has(rc.address),
+      );
+      expect(omitted.map((rc: any) => rc.type)).toEqual([
+        "terraform_data",
+        "terraform_data",
+        "terraform_data",
+      ]);
+      expect(body.meta?.representedResourceCount).toBe(102);
+      expect(body.meta?.omittedResourceCount).toBe(3);
     },
     60_000,
   );

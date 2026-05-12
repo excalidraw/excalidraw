@@ -263,7 +263,10 @@ describe("computeRouteTableBottomEdgePlacements", () => {
     expect(vpcBottom).toHaveLength(0);
     expect(zoneBottom).toHaveLength(1);
     expect(zoneBottom[0]!.subnetSignature).toBe("subnet-a");
-    expect(zoneBottom[0]!.addresses).toEqual(["aws_route_table.rt"]);
+    expect(zoneBottom[0]!.addresses).toEqual([
+      "aws_route_table.rt",
+      "aws_route_table_association.assoc",
+    ]);
   });
 
   it("falls back to VPC bottom when associated subnets are not contained in a single zone", () => {
@@ -337,7 +340,11 @@ describe("computeRouteTableBottomEdgePlacements", () => {
     );
     expect(zoneBottom).toHaveLength(0);
     expect(vpcBottom).toHaveLength(1);
-    expect(vpcBottom[0]!.addresses).toEqual(["aws_route_table.rt"]);
+    expect(vpcBottom[0]!.addresses).toEqual([
+      "aws_route_table.rt",
+      "aws_route_table_association.assoc",
+      "aws_route_table_association.assoc2",
+    ]);
   });
 });
 
