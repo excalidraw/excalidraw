@@ -348,8 +348,10 @@ export {
   useEditorInterface,
   useStylesPanelMode,
   useExcalidrawAPI,
+  useExcalidrawSetAppState,
   ExcalidrawAPIContext,
 } from "./components/App";
+export { getShortcutFromShortcutName } from "./actions/shortcuts";
 
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
