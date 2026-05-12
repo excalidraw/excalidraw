@@ -638,6 +638,114 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     expect(subnetFrame?.name).toBe("Subnets: public-a, public-b");
   });
 
+  it("orders VPC-only, public, intra, and private zones from left to right", async () => {
+    const model: TerraformTopologyModel = {
+      sawAwsResourceChanges: true,
+      accounts: new Map([
+        [
+          "111111111111",
+          {
+            accountId: "111111111111",
+            regions: new Map([
+              [
+                "us-east-1",
+                {
+                  region: "us-east-1",
+                  vpcs: new Map([
+                    [
+                      "vpc-123",
+                      {
+                        vpcId: "vpc-123",
+                        subnets: new Map([
+                          ["subnet-pub-a", { subnetId: "subnet-pub-a" }],
+                          ["subnet-intra-a", { subnetId: "subnet-intra-a" }],
+                          ["subnet-priv-a", { subnetId: "subnet-priv-a" }],
+                        ]),
+                      },
+                    ],
+                  ]),
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+    const zones: TopologyPlacementZone[] = [
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-123",
+        subnetSignature: "subnet-priv-a",
+        subnetIds: ["subnet-priv-a"],
+        addresses: [],
+      },
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-123",
+        subnetSignature: "",
+        subnetIds: [],
+        addresses: [],
+      },
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-123",
+        subnetSignature: "subnet-intra-a",
+        subnetIds: ["subnet-intra-a"],
+        addresses: [],
+      },
+      {
+        accountId: "111111111111",
+        region: "us-east-1",
+        vpcId: "vpc-123",
+        subnetSignature: "subnet-pub-a",
+        subnetIds: ["subnet-pub-a"],
+        addresses: [],
+      },
+    ];
+    const plan = {
+      resource_changes: [
+        {
+          type: "aws_subnet",
+          change: { after: { id: "subnet-pub-a", tags: { Name: "app-public-a" } } },
+        },
+        {
+          type: "aws_subnet",
+          change: { after: { id: "subnet-intra-a", tags: { Name: "app-intra-a" } } },
+        },
+        {
+          type: "aws_subnet",
+          change: { after: { id: "subnet-priv-a", tags: { Name: "app-private-a" } } },
+        },
+      ],
+    };
+
+    const { elements } = await buildTerraformTopologyExcalidrawScene(
+      model,
+      zones,
+      [],
+      {},
+      plan,
+    );
+    const subnetFrames = elements
+      .filter(
+        (e) =>
+          e.type === "frame" &&
+          (e.customData as { terraformTopologyRole?: string } | undefined)
+            ?.terraformTopologyRole === "subnetZone",
+      )
+      .sort((a, b) => a.x - b.x);
+
+    expect(subnetFrames.map((f) => f.name)).toEqual([
+      "VPC-only placement",
+      "Subnets: app-public-a",
+      "Subnets: app-intra-a",
+      "Subnets: app-private-a",
+    ]);
+  });
+
   it("places unassociated route table tiles on the VPC body bottom edge", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,

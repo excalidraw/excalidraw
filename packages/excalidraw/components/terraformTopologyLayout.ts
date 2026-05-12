@@ -481,6 +481,77 @@ function zonesForVpc(
   );
 }
 
+type TopologySubnetTier = "vpcOnly" | "public" | "intra" | "private" | "other";
+
+const SUBNET_TIER_ORDER: Record<TopologySubnetTier, number> = {
+  vpcOnly: 0,
+  public: 1,
+  intra: 2,
+  private: 3,
+  other: 4,
+};
+
+function topologySubnetTierFromZone(
+  z: TopologyPlacementZone,
+  subnetNameById: ReadonlyMap<string, string>,
+): TopologySubnetTier {
+  if (z.subnetIds.length === 0) {
+    return "vpcOnly";
+  }
+  const labels = z.subnetIds
+    .map((sid) => `${subnetNameById.get(sid) ?? ""} ${sid}`.toLowerCase())
+    .join(" ");
+  if (/\bpublic\b/.test(labels) || labels.includes("-public-")) {
+    return "public";
+  }
+  if (/\bintra\b/.test(labels) || labels.includes("-intra-")) {
+    return "intra";
+  }
+  if (/\bprivate\b/.test(labels) || labels.includes("-private-")) {
+    return "private";
+  }
+  return "other";
+}
+
+function compareTopologyZonesByTier(
+  subnetNameById: ReadonlyMap<string, string>,
+): (a: TopologyPlacementZone, b: TopologyPlacementZone) => number {
+  return (a, b) => {
+    const at = topologySubnetTierFromZone(a, subnetNameById);
+    const bt = topologySubnetTierFromZone(b, subnetNameById);
+    if (at !== bt) {
+      return SUBNET_TIER_ORDER[at] - SUBNET_TIER_ORDER[bt];
+    }
+    const an = zoneDisplayName(a, subnetNameById);
+    const bn = zoneDisplayName(b, subnetNameById);
+    const c = an.localeCompare(bn);
+    return c !== 0 ? c : a.subnetSignature.localeCompare(b.subnetSignature);
+  };
+}
+
+function topologyZoneColumns(
+  vpcZs: readonly TopologyPlacementZone[],
+  subnetNameById: ReadonlyMap<string, string>,
+): TopologyPlacementZone[][] {
+  const byTier = new Map<TopologySubnetTier, TopologyPlacementZone[]>();
+  for (const z of vpcZs) {
+    const tier = topologySubnetTierFromZone(z, subnetNameById);
+    if (!byTier.has(tier)) {
+      byTier.set(tier, []);
+    }
+    byTier.get(tier)!.push(z);
+  }
+  const columns: TopologyPlacementZone[][] = [];
+  for (const tier of Object.keys(SUBNET_TIER_ORDER) as TopologySubnetTier[]) {
+    const zs = byTier.get(tier);
+    if (!zs || zs.length === 0) {
+      continue;
+    }
+    columns.push([...zs].sort(compareTopologyZonesByTier(subnetNameById)));
+  }
+  return columns;
+}
+
 /** VPC frame size that fits all subnet-zone cells for this VPC. */
 function vpcFrameDimensionsForZones(
   vpcZs: readonly TopologyPlacementZone[],
@@ -489,6 +560,7 @@ function vpcFrameDimensionsForZones(
   plan?: unknown,
   routeTableCountByZoneSignature?: ReadonlyMap<string, number>,
   vpcInfrastructureTopPadPx = 0,
+  subnetNameById: ReadonlyMap<string, string> = new Map(),
 ): {
   w: number;
   h: number;
@@ -510,7 +582,9 @@ function vpcFrameDimensionsForZones(
       znRows: 0,
     };
   }
-  const { cols: znCols, rows: znRows } = gridColsRows(vpcZs.length);
+  const zoneColumns = topologyZoneColumns(vpcZs, subnetNameById);
+  const znCols = Math.max(1, zoneColumns.length);
+  const znRows = Math.max(1, ...zoneColumns.map((col) => col.length));
   let perZoneW = 0;
   let perZoneBodyH = 0;
   let anyZoneRouteTable = false;
@@ -2016,6 +2090,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             plan,
             rtZoneCounts,
             infraTop,
+            subnetNameById,
           );
           const epAddrs = endpointsForVpc(
             vpcEndpointBuckets,
@@ -2066,6 +2141,7 @@ export async function buildTerraformTopologyExcalidrawScene(
             plan,
             rtZoneCounts,
             infraTop,
+            subnetNameById,
           );
           const epAddrs = endpointsForVpc(
             vpcEndpointBuckets,
@@ -2155,7 +2231,7 @@ export async function buildTerraformTopologyExcalidrawScene(
         vpcFrameIds.push(vpcSkId);
 
         const vpcZs = zonesForVpc(zones, accountId, regionName, vpcId).sort(
-          (a, b) => a.subnetSignature.localeCompare(b.subnetSignature),
+          compareTopologyZonesByTier(subnetNameById),
         );
 
         const epAddrs = endpointsForVpc(
@@ -2289,90 +2365,93 @@ export async function buildTerraformTopologyExcalidrawScene(
           plan,
           rtZoneCounts,
           infraTop,
+          subnetNameById,
         );
         const zoneGridOriginX = vpcX + INNER_PAD;
         const zoneGridOriginY = vpcY + VPC_TOP_PAD + infraTop;
         const zoneFrameIds: string[] = [];
+        const zoneColumns = topologyZoneColumns(vpcZs, subnetNameById);
 
-        for (let zi = 0; zi < vpcZs.length; zi++) {
-          const z = vpcZs[zi]!;
-          const zcol = zi % vd.znCols;
-          const zrow = Math.floor(zi / vd.znCols);
-          const zoneX =
-            zoneGridOriginX + zcol * (vd.perZoneW + ZONE_CELL_GAP);
-          const zoneY =
-            zoneGridOriginY + zrow * (vd.perZoneH + ZONE_CELL_GAP);
+        for (let zcol = 0; zcol < zoneColumns.length; zcol++) {
+          const column = zoneColumns[zcol]!;
+          for (let zrow = 0; zrow < column.length; zrow++) {
+            const z = column[zrow]!;
+            const zoneX =
+              zoneGridOriginX + zcol * (vd.perZoneW + ZONE_CELL_GAP);
+            const zoneY =
+              zoneGridOriginY + zrow * (vd.perZoneH + ZONE_CELL_GAP);
 
-          const zoneSkId = zoneSkeletonId(
-            accountId,
-            regionName,
-            vpcId,
-            z.subnetSignature,
-          );
-          zoneFrameIds.push(zoneSkId);
-
-          const addrs = [...z.addresses].sort();
-          const rectIds = appendTopologyResourceRectangles(
-            skeleton,
-            { accountId, region: regionName, vpcId },
-            addrs,
-            zoneX + INNER_PAD,
-            zoneY + VPC_TOP_PAD,
-            nodes,
-            arnIndex,
-            globalPlacedIamSatellites,
-            globalPlacedKmsPolicySatellites,
-            globalPlacedSgSatellites,
-            globalPlacedCloudWatchSatellites,
-            globalPlacedS3Satellites,
-            globalPlacedSqsSatellites,
-            satelliteLineSpecs,
-            plan,
-          );
-
-          const zoneRtAddrs = routeTablesZoneBottomFor(
-            routeTableBottomPlacements,
-            accountId,
-            regionName,
-            vpcId,
-            z.subnetSignature,
-          );
-          const zoneRtRectIds =
-            zoneRtAddrs.length > 0
-              ? appendRouteTableBottomEdgeRectangles(
-                  skeleton,
-                  accountId,
-                  regionName,
-                  vpcId,
-                  zoneRtAddrs,
-                  zoneX,
-                  zoneY,
-                  vd.perZoneW,
-                  vd.perZoneBodyH,
-                  nodes,
-                  z.subnetSignature,
-                  0,
-                )
-              : [];
-
-          skeleton.push({
-            type: "frame",
-            id: zoneSkId,
-            name: zoneDisplayName(z, subnetNameById),
-            x: zoneX,
-            y: zoneY,
-            width: vd.perZoneW,
-            height: vd.perZoneH,
-            children: [...rectIds, ...zoneRtRectIds] as readonly string[],
-            customData: frameCustomData(
-              "subnetZone",
+            const zoneSkId = zoneSkeletonId(
               accountId,
               regionName,
               vpcId,
-              zoneSkId,
-              { terraformSubnetIds: z.subnetIds },
-            ),
-          });
+              z.subnetSignature,
+            );
+            zoneFrameIds.push(zoneSkId);
+
+            const addrs = [...z.addresses].sort();
+            const rectIds = appendTopologyResourceRectangles(
+              skeleton,
+              { accountId, region: regionName, vpcId },
+              addrs,
+              zoneX + INNER_PAD,
+              zoneY + VPC_TOP_PAD,
+              nodes,
+              arnIndex,
+              globalPlacedIamSatellites,
+              globalPlacedKmsPolicySatellites,
+              globalPlacedSgSatellites,
+              globalPlacedCloudWatchSatellites,
+              globalPlacedS3Satellites,
+              globalPlacedSqsSatellites,
+              satelliteLineSpecs,
+              plan,
+            );
+
+            const zoneRtAddrs = routeTablesZoneBottomFor(
+              routeTableBottomPlacements,
+              accountId,
+              regionName,
+              vpcId,
+              z.subnetSignature,
+            );
+            const zoneRtRectIds =
+              zoneRtAddrs.length > 0
+                ? appendRouteTableBottomEdgeRectangles(
+                    skeleton,
+                    accountId,
+                    regionName,
+                    vpcId,
+                    zoneRtAddrs,
+                    zoneX,
+                    zoneY,
+                    vd.perZoneW,
+                    vd.perZoneBodyH,
+                    nodes,
+                    z.subnetSignature,
+                    0,
+                  )
+                : [];
+
+            skeleton.push({
+              type: "frame",
+              id: zoneSkId,
+              name: zoneDisplayName(z, subnetNameById),
+              x: zoneX,
+              y: zoneY,
+              width: vd.perZoneW,
+              height: vd.perZoneH,
+              children: [...rectIds, ...zoneRtRectIds] as readonly string[],
+              customData: frameCustomData(
+                "subnetZone",
+                accountId,
+                regionName,
+                vpcId,
+                zoneSkId,
+                { terraformSubnetIds: z.subnetIds },
+              ),
+            });
+          }
         }
 
         const vpcBottomRtRectIds =
