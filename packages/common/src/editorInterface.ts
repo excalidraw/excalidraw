@@ -16,14 +16,15 @@ export type EditorInterface = Readonly<{
 const DESKTOP_UI_MODE_STORAGE_KEY = "excalidraw.desktopUIMode";
 
 // breakpoints
-export const MQ_MAX_MOBILE = 599;
+export const MQ_MAX_MOBILE = 699;
 
 export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
 export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
 
 // tablets
-export const MQ_MIN_TABLET = MQ_MAX_MOBILE + 1; // lower bound (excludes phones)
+export const MQ_MIN_TABLET = 600;
 export const MQ_MAX_TABLET = 1180; // ipad air
+export const MQ_MAX_HEIGHT_COMPACT_LANDSCAPE = 600;
 
 // desktop/laptop (NOTE: not used for form factor detection)
 export const MQ_MIN_WIDTH_DESKTOP = 1440;
@@ -75,7 +76,14 @@ export const isTabletBreakpoint = (
   const minSide = Math.min(editorWidth, editorHeight);
   const maxSide = Math.max(editorWidth, editorHeight);
 
-  return minSide >= MQ_MIN_TABLET && maxSide <= MQ_MAX_TABLET;
+  return (
+    (minSide >= MQ_MIN_TABLET && maxSide <= MQ_MAX_TABLET) ||
+    (
+      editorHeight >= MQ_MAX_HEIGHT_LANDSCAPE &&
+      editorHeight <= MQ_MAX_HEIGHT_COMPACT_LANDSCAPE &&
+      editorWidth < MQ_MAX_WIDTH_LANDSCAPE
+    )
+  );
 };
 
 const isMobileOrTablet = (): boolean => {
