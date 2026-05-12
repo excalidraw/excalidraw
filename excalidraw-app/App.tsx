@@ -1323,9 +1323,9 @@ const LandingPage = () => {
 
   return (
     <main id="top" className="landing-page">
-      <nav className="landing-nav" aria-label="Ainur.draw">
+      <nav className="landing-nav" aria-label="tfdraw.io">
         <a className="landing-nav__brand" href="#top">
-          Ainur.draw
+          tfdraw.io
         </a>
         <div className="landing-nav__links">
           <a href="#workflow">Workflow</a>
@@ -1337,12 +1337,11 @@ const LandingPage = () => {
       </nav>
       <section className="landing-hero" aria-labelledby="landing-title">
         <div className="landing-hero__copy">
-          <p className="landing-hero__eyebrow">Your Terraform, made visible</p>
-          <h1 id="landing-title">Your architecture diagram is your state.</h1>
+          <p className="landing-hero__eyebrow">Keep your architecture diagram in sync with your terraform.</p>
+          <h1 id="landing-title">Your terraform is your architecture diagram .</h1>
           <p className="landing-hero__lede">
-            Ainur.draw maps Terraform state and plans into a living architecture
-            canvas, so teams can understand what exists and what is changing
-            without reading raw plan noise.
+            tfdraw.io maps Terraform state and plans into a living architecture
+            canvas, so teams can coordinate faster.
           </p>
           <div className="landing-hero__actions">
             <button type="button" onClick={scrollToCanvas}>
@@ -1352,7 +1351,7 @@ const LandingPage = () => {
               Open the canvas
             </button>
           </div>
-          <div className="landing-proof" aria-label="Ainur.draw values">
+          <div className="landing-proof" aria-label="tfdraw.io values">
             <span>State-backed architecture view</span>
             <span>Visual plan diffs</span>
             <span>Custom annotations</span>
@@ -1521,7 +1520,7 @@ const LandingPage = () => {
       </section>
 
       <section className="landing-final" aria-labelledby="final-title">
-        <h2 id="final-title">Bring the next Terraform review to Ainur.draw.</h2>
+        <h2 id="final-title">Bring the next Terraform review to tfdraw.io.</h2>
         <button type="button" onClick={scrollToCanvas}>
           Visualize Terraform changes
         </button>

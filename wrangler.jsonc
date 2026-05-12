@@ -13,7 +13,7 @@
  * Static assets on Workers: https://developers.cloudflare.com/workers/static-assets/binding/
  */
 {
-  "name": "ainur",
+  "name": "tfdraw-io",
   "compatibility_date": "2025-05-12",
   "pages_build_output_dir": "./excalidraw-app/build",
   "assets": {
