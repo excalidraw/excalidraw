@@ -22,6 +22,7 @@ export const AppMainMenu: React.FC<{
   theme: Theme | "system";
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
+  frontendOnly?: boolean;
 }> = React.memo((props) => {
   return (
     <MainMenu>
@@ -34,7 +35,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.TerraformExpandAll />
       <MainMenu.DefaultItems.TerraformCollapseAll />
       <MainMenu.DefaultItems.TerraformLayers />
-      {props.isCollabEnabled && (
+      {props.isCollabEnabled && !props.frontendOnly && (
         <MainMenu.DefaultItems.LiveCollaborationTrigger
           isCollaborating={props.isCollaborating}
           onSelect={() => props.onCollabDialogOpen()}
@@ -44,26 +45,30 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
-      <MainMenu.Separator />
-      <MainMenu.ItemLink
-        icon={ExcalLogo}
-        href={`${
-          import.meta.env.VITE_APP_PLUS_LP
-        }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}
-        className=""
-      >
-        Excalidraw+
-      </MainMenu.ItemLink>
-      <MainMenu.DefaultItems.Socials />
-      <MainMenu.ItemLink
-        icon={loginIcon}
-        href={`${import.meta.env.VITE_APP_PLUS_APP}${
-          isExcalidrawPlusSignedUser ? "" : "/sign-up"
-        }?utm_source=signin&utm_medium=app&utm_content=hamburger`}
-        className="highlighted"
-      >
-        {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
-      </MainMenu.ItemLink>
+      {!props.frontendOnly && (
+        <>
+          <MainMenu.Separator />
+          <MainMenu.ItemLink
+            icon={ExcalLogo}
+            href={`${
+              import.meta.env.VITE_APP_PLUS_LP
+            }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}
+            className=""
+          >
+            Excalidraw+
+          </MainMenu.ItemLink>
+          <MainMenu.DefaultItems.Socials />
+          <MainMenu.ItemLink
+            icon={loginIcon}
+            href={`${import.meta.env.VITE_APP_PLUS_APP}${
+              isExcalidrawPlusSignedUser ? "" : "/sign-up"
+            }?utm_source=signin&utm_medium=app&utm_content=hamburger`}
+            className="highlighted"
+          >
+            {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
+          </MainMenu.ItemLink>
+        </>
+      )}
       {isDevEnv() && (
         <MainMenu.Item
           icon={eyeIcon}

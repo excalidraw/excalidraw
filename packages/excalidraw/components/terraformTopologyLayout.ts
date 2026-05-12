@@ -2328,16 +2328,15 @@ export async function buildTerraformTopologyExcalidrawScene(
       const innerTop = regionRowY + VPC_TOP_PAD;
       const contentInnerX = regionRowX + INNER_PAD;
 
-      let vpcGridOriginX = contentInnerX;
+      const vpcGridOriginX = contentInnerX;
       const vpcGridOriginY = innerTop;
 
       const regionChildIds: string[] = [];
 
       if (hasReg) {
         const regX = contentInnerX;
-        const regY = innerTop;
-        vpcGridOriginX =
-          regX + regDims.w + (hasVpc ? REGIONAL_TO_VPC_GAP : 0);
+        const regY =
+          innerTop + (hasVpc ? vpcGridH + REGIONAL_TO_VPC_GAP : 0);
 
         const regionalRectIds = appendTopologyResourceRectangles(
           skeleton,
@@ -2675,14 +2674,11 @@ export async function buildTerraformTopologyExcalidrawScene(
 
       regionChildIds.push(...vpcFrameIds);
 
-      const innerContentW =
-        (hasReg ? regDims.w : 0) +
+      const innerContentW = Math.max(hasReg ? regDims.w : 0, vpcGridW);
+      const innerContentH =
+        vpcGridH +
         (hasReg && hasVpc ? REGIONAL_TO_VPC_GAP : 0) +
-        vpcGridW;
-      const innerContentH = Math.max(
-        hasReg ? regDims.h : 0,
-        vpcGridH,
-      );
+        (hasReg ? regDims.h : 0);
 
       const regionWidth =
         innerContentW + 2 * INNER_PAD + FRAME_CONTENT_SLACK_X;
