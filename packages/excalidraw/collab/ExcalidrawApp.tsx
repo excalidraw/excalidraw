@@ -330,7 +330,7 @@ export const initializeScene = async (opts: {
 
 const ExcalidrawWrapper = (props : ExcalidrawAppProps) => {
   const [errorMessage, setErrorMessage] = useState("");
-  const isCollabDisabled = isRunningInIframe();
+  const isCollabDisabled = isRunningInIframe() && !props.collabDetails;
 
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
 
