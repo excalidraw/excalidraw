@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import type { ExcalidrawArrowElement, ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawArrowElement,
+  ExcalidrawElement,
+  ExcalidrawFrameElement,
+} from "@excalidraw/element/types";
 
 import type { TerraformTopologyModel } from "./terraformTopologyExtract";
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
@@ -17,6 +21,19 @@ const px = tfComfortPx;
 
 /** Matches compact egress / route-table tile half-height in terraformTopologyLayout. */
 const TOPOLOGY_EDGE_TILE_HALF_H = Math.ceil(px(56) / 2);
+
+function isTopologyFrame(
+  element: ExcalidrawElement,
+  role?: string,
+): element is ExcalidrawFrameElement {
+  if (element.type !== "frame") {
+    return false;
+  }
+  const topologyRole = (
+    element.customData as { terraformTopologyRole?: string } | undefined
+  )?.terraformTopologyRole;
+  return role ? topologyRole === role : !!topologyRole;
+}
 
 function axisBounds(el: ExcalidrawElement): {
   minX: number;
@@ -35,19 +52,14 @@ function axisBounds(el: ExcalidrawElement): {
 }
 
 /** Topology frames must visually contain direct child frames (Excalidraw contract when x/y + explicit w/h set). */
-function assertTopologyFramesContainChildren(elements: readonly ExcalidrawElement[]) {
+function assertTopologyFramesContainChildren(
+  elements: readonly ExcalidrawElement[],
+) {
   const eps = 4;
-  const frames = elements.filter(
-    (e) =>
-      e.type === "frame" &&
-      (e.customData as { terraformTopologyRole?: string } | undefined)
-        ?.terraformTopologyRole,
-  );
+  const frames = elements.filter((e) => isTopologyFrame(e));
 
   for (const frame of frames) {
-    const kids = elements.filter(
-      (e) => e.frameId === frame.id && !e.isDeleted,
-    );
+    const kids = elements.filter((e) => e.frameId === frame.id && !e.isDeleted);
     if (kids.length === 0) {
       continue;
     }
@@ -63,14 +75,12 @@ function assertTopologyFramesContainChildren(elements: readonly ExcalidrawElemen
       maxY = Math.max(maxY, b.maxY);
     }
     const fb = axisBounds(frame);
-    expect(
-      fb.minX,
-      `frame ${frame.id} left vs children`,
-    ).toBeLessThanOrEqual(minX + eps);
-    expect(
-      fb.minY,
-      `frame ${frame.id} top vs children`,
-    ).toBeLessThanOrEqual(minY + eps);
+    expect(fb.minX, `frame ${frame.id} left vs children`).toBeLessThanOrEqual(
+      minX + eps,
+    );
+    expect(fb.minY, `frame ${frame.id} top vs children`).toBeLessThanOrEqual(
+      minY + eps,
+    );
     expect(
       fb.maxX,
       `frame ${frame.id} right vs children`,
@@ -449,10 +459,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
         accountId: "111111111111",
         region: "us-east-1",
         vpcId: "vpc-test",
-        addresses: [
-          'aws_vpc_endpoint.ep["logs"]',
-          'aws_vpc_endpoint.ep["s3"]',
-        ],
+        addresses: ['aws_vpc_endpoint.ep["logs"]', 'aws_vpc_endpoint.ep["s3"]'],
       },
     ];
 
@@ -621,18 +628,8 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
       plan,
     );
 
-    const vpcFrame = elements.find(
-      (e) =>
-        e.type === "frame" &&
-        (e.customData as { terraformTopologyRole?: string } | undefined)
-          ?.terraformTopologyRole === "vpc",
-    );
-    const subnetFrame = elements.find(
-      (e) =>
-        e.type === "frame" &&
-        (e.customData as { terraformTopologyRole?: string } | undefined)
-          ?.terraformTopologyRole === "subnetZone",
-    );
+    const vpcFrame = elements.find((e) => isTopologyFrame(e, "vpc"));
+    const subnetFrame = elements.find((e) => isTopologyFrame(e, "subnetZone"));
 
     expect(vpcFrame?.name).toBe("VPC: workload-vpc");
     expect(subnetFrame?.name).toBe("Subnets: public-a, public-b");
@@ -709,15 +706,21 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
       resource_changes: [
         {
           type: "aws_subnet",
-          change: { after: { id: "subnet-pub-a", tags: { Name: "app-public-a" } } },
+          change: {
+            after: { id: "subnet-pub-a", tags: { Name: "app-public-a" } },
+          },
         },
         {
           type: "aws_subnet",
-          change: { after: { id: "subnet-intra-a", tags: { Name: "app-intra-a" } } },
+          change: {
+            after: { id: "subnet-intra-a", tags: { Name: "app-intra-a" } },
+          },
         },
         {
           type: "aws_subnet",
-          change: { after: { id: "subnet-priv-a", tags: { Name: "app-private-a" } } },
+          change: {
+            after: { id: "subnet-priv-a", tags: { Name: "app-private-a" } },
+          },
         },
       ],
     };
@@ -730,12 +733,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
       plan,
     );
     const subnetFrames = elements
-      .filter(
-        (e) =>
-          e.type === "frame" &&
-          (e.customData as { terraformTopologyRole?: string } | undefined)
-            ?.terraformTopologyRole === "subnetZone",
-      )
+      .filter((e) => isTopologyFrame(e, "subnetZone"))
       .sort((a, b) => a.x - b.x);
 
     expect(subnetFrames.map((f) => f.name)).toEqual([
@@ -764,7 +762,9 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
                       "vpc-test",
                       {
                         vpcId: "vpc-test",
-                        subnets: new Map([["subnet-public", { subnetId: "subnet-public" }]]),
+                        subnets: new Map([
+                          ["subnet-public", { subnetId: "subnet-public" }],
+                        ]),
                       },
                     ],
                   ]),
@@ -802,7 +802,10 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
             address: "aws_nat_gateway.nat",
             mode: "managed",
             type: "aws_nat_gateway",
-            change: { actions: ["no-op"], after: { subnet_id: "subnet-public" } },
+            change: {
+              actions: ["no-op"],
+              after: { subnet_id: "subnet-public" },
+            },
           },
         },
       },
@@ -845,7 +848,8 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
       elements.find(
         (e) =>
           e.type === "rectangle" &&
-          (e.customData as { nodePath?: string } | undefined)?.nodePath === path,
+          (e.customData as { nodePath?: string } | undefined)?.nodePath ===
+            path,
       );
     const vpc = elements.find(
       (e) =>
@@ -1140,7 +1144,8 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
       elements.find(
         (e) =>
           e.type === "rectangle" &&
-          (e.customData as { nodePath?: string } | undefined)?.nodePath === path,
+          (e.customData as { nodePath?: string } | undefined)?.nodePath ===
+            path,
       );
 
     const lambda = rectByPath("aws_lambda_function.fn");
@@ -1156,10 +1161,15 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     expect(policy!.frameId).toBe(clusterId);
     expect(sg!.frameId).toBe(clusterId);
     expect(rule!.frameId).toBe(clusterId);
-    const clusterFrame = elements.find((e) => e.type === "frame" && e.id === clusterId);
+    const clusterFrame = elements.find(
+      (e) => e.type === "frame" && e.id === clusterId,
+    );
     expect(
-      (clusterFrame?.customData as { terraformTopologyRole?: string } | undefined)
-        ?.terraformTopologyRole,
+      (
+        clusterFrame?.customData as
+          | { terraformTopologyRole?: string }
+          | undefined
+      )?.terraformTopologyRole,
     ).toBe("primaryCluster");
 
     expect(lambda!.width).toBe(px(200));
@@ -1170,7 +1180,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     expect(role!.height).toBe(px(52));
 
     expect(policy!.width).toBe(px(154));
-    expect(policy!.height).toBeLessThanOrEqual((role!.height ?? 0));
+    expect(policy!.height).toBeLessThanOrEqual(role!.height ?? 0);
     expect(policy!.y).toBeGreaterThanOrEqual(role!.y + (role!.height ?? 0) - 2);
 
     const lambdaMid = lambda!.x + (lambda!.width ?? 0) / 2;
@@ -1184,7 +1194,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     expect(sg!.height).toBe(px(52));
 
     expect(rule!.width).toBe(px(154));
-    expect(rule!.height).toBeLessThanOrEqual((sg!.height ?? 0));
+    expect(rule!.height).toBeLessThanOrEqual(sg!.height ?? 0);
     expect(rule!.y).toBeGreaterThanOrEqual(sg!.y + (sg!.height ?? 0) - 2);
 
     const rels = elements
@@ -1194,7 +1204,10 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
           (e.customData as { terraformEdgeLayer?: string } | undefined)
             ?.terraformEdgeLayer === "dataFlow",
       )
-      .map((e) => e.customData?.relationship as Record<string, unknown> | undefined);
+      .map(
+        (e) =>
+          e.customData?.relationship as Record<string, unknown> | undefined,
+      );
 
     expect(
       rels.some(
@@ -1236,7 +1249,9 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
                       "vpc-test",
                       {
                         vpcId: "vpc-test",
-                        subnets: new Map([["subnet-a", { subnetId: "subnet-a" }]]),
+                        subnets: new Map([
+                          ["subnet-a", { subnetId: "subnet-a" }],
+                        ]),
                       },
                     ],
                   ]),
@@ -1347,7 +1362,8 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
       elements.find(
         (e) =>
           e.type === "rectangle" &&
-          (e.customData as { nodePath?: string } | undefined)?.nodePath === path,
+          (e.customData as { nodePath?: string } | undefined)?.nodePath ===
+            path,
       );
 
     const lambda = rectByPath("aws_lambda_function.fn");
@@ -1362,7 +1378,9 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     expect(alarmMid).toBeLessThan(lambdaMid);
     expect(logGroupMid).toBeGreaterThan(lambdaMid);
     expect(alarm!.y + (alarm!.height ?? 0)).toBeLessThanOrEqual(lambda!.y);
-    expect(logGroup!.y + (logGroup!.height ?? 0)).toBeLessThanOrEqual(lambda!.y);
+    expect(logGroup!.y + (logGroup!.height ?? 0)).toBeLessThanOrEqual(
+      lambda!.y,
+    );
     expect(role!.y).toBeGreaterThanOrEqual(lambda!.y + (lambda!.height ?? 0));
 
     const rels = elements
@@ -1372,7 +1390,10 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
           (e.customData as { terraformEdgeLayer?: string } | undefined)
             ?.terraformEdgeLayer === "dataFlow",
       )
-      .map((e) => e.customData?.relationship as Record<string, unknown> | undefined);
+      .map(
+        (e) =>
+          e.customData?.relationship as Record<string, unknown> | undefined,
+      );
 
     expect(
       rels.some(
@@ -1475,7 +1496,8 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
       elements.find(
         (e) =>
           e.type === "rectangle" &&
-          (e.customData as { nodePath?: string } | undefined)?.nodePath === path,
+          (e.customData as { nodePath?: string } | undefined)?.nodePath ===
+            path,
       );
 
     const bucket = rectByPath("aws_s3_bucket.data");
@@ -1490,7 +1512,10 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
           (e.customData as { terraformEdgeLayer?: string } | undefined)
             ?.terraformEdgeLayer === "dataFlow",
       )
-      .map((e) => e.customData?.relationship as Record<string, unknown> | undefined);
+      .map(
+        (e) =>
+          e.customData?.relationship as Record<string, unknown> | undefined,
+      );
 
     expect(
       rels.some(
@@ -1669,7 +1694,8 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
       elements.find(
         (e) =>
           e.type === "rectangle" &&
-          (e.customData as { nodePath?: string } | undefined)?.nodePath === path,
+          (e.customData as { nodePath?: string } | undefined)?.nodePath ===
+            path,
       );
 
     const keyRect = rectByPath("aws_kms_key.main");
@@ -1692,7 +1718,10 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
           (e.customData as { terraformEdgeLayer?: string } | undefined)
             ?.terraformEdgeLayer === "dataFlow",
       )
-      .map((e) => e.customData?.relationship as Record<string, unknown> | undefined)
+      .map(
+        (e) =>
+          e.customData?.relationship as Record<string, unknown> | undefined,
+      )
       .find(
         (r) =>
           r?.origin === "topology_kms" &&
@@ -1705,7 +1734,7 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
     assertTopologyFramesContainChildren(elements);
   });
 
-  it("lays out regional primaries beside VPC grid in the same region", async () => {
+  it("lays out regional primaries below the VPC grid in the same region", async () => {
     const model: TerraformTopologyModel = {
       sawAwsResourceChanges: true,
       accounts: new Map([
@@ -1803,6 +1832,24 @@ describe("buildTerraformTopologyExcalidrawScene", () => {
             ?.terraformTopologyRole === "subnetZone",
       ),
     ).toBe(true);
+
+    const vpcFrame = elements.find(
+      (e) =>
+        e.type === "frame" &&
+        (e.customData as { terraformTopologyRole?: string } | undefined)
+          ?.terraformTopologyRole === "vpc",
+    );
+    const regionalRect = elements.find(
+      (e) =>
+        e.type === "rectangle" &&
+        (e.customData as { nodePath?: string } | undefined)?.nodePath ===
+          "aws_sqs_queue.jobs",
+    );
+    expect(vpcFrame).toBeTruthy();
+    expect(regionalRect).toBeTruthy();
+    expect(regionalRect!.y).toBeGreaterThan(
+      vpcFrame!.y + (vpcFrame!.height ?? 0),
+    );
 
     assertTopologyFramesContainChildren(elements);
   });
