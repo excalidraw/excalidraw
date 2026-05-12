@@ -60,7 +60,10 @@ describe("terraformResourceCardLabel", () => {
 describe("terraformInstanceNameFromAddress", () => {
   it("returns last module call for module-only addresses", () => {
     expect(
-      terraformInstanceNameFromAddress("module.network.module.db", "terraform_module"),
+      terraformInstanceNameFromAddress(
+        "module.network.module.db",
+        "terraform_module",
+      ),
     ).toBe("db");
   });
 });

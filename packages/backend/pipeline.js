@@ -20,7 +20,6 @@ const {
   resolveNodeRefsAcrossAllResourceTypes,
 } = require("./terraform-data-flow-edges");
 
-
 const stripIndexes = (address = "") => address.replace(/\[[^\]]+\]/g, "");
 
 /**
@@ -387,8 +386,7 @@ function buildNewEdges(nodes, adjacency) {
     for (let index = 0; index < queue.length; index++) {
       const current = queue[index];
       const graphKey = stripIndexes(current);
-      const neighbors =
-        adjacency[graphKey] || adjacency[current] || [];
+      const neighbors = adjacency[graphKey] || adjacency[current] || [];
 
       for (const neighbor of neighbors) {
         if (visited.has(neighbor)) {
@@ -464,7 +462,9 @@ function computeResourceDiffs(nodes) {
             afterValue !== null &&
             afterValue !== "" &&
             !(Array.isArray(afterValue) && afterValue.length === 0) &&
-            !(isPlainObject(afterValue) && Object.keys(afterValue).length === 0);
+            !(
+              isPlainObject(afterValue) && Object.keys(afterValue).length === 0
+            );
 
           if (isMeaningfulAddedValue) {
             diff[key] = { before: null, after: afterValue };
@@ -557,8 +557,14 @@ function buildExistingEdges(nodes, plan) {
 }
 
 /** Recursively reads `configuration.root_module` module_calls to collect registry source/version per path. */
-function collectModuleMetadataFromConfig(moduleConfig, modulePath = "", out = {}) {
-  for (const [moduleName, moduleCall] of Object.entries(moduleConfig?.module_calls || {})) {
+function collectModuleMetadataFromConfig(
+  moduleConfig,
+  modulePath = "",
+  out = {},
+) {
+  for (const [moduleName, moduleCall] of Object.entries(
+    moduleConfig?.module_calls || {},
+  )) {
     const childModulePath = modulePath
       ? `${modulePath}.module.${moduleName}`
       : `module.${moduleName}`;
@@ -578,7 +584,9 @@ function collectModuleMetadataFromConfig(moduleConfig, modulePath = "", out = {}
 
 /** Recursively collects module call expressions/outputs keyed by absolute module path. */
 function collectModuleConfigFromPlan(moduleConfig, modulePath = "", out = {}) {
-  for (const [moduleName, moduleCall] of Object.entries(moduleConfig?.module_calls || {})) {
+  for (const [moduleName, moduleCall] of Object.entries(
+    moduleConfig?.module_calls || {},
+  )) {
     const childModulePath = modulePath
       ? `${modulePath}.module.${moduleName}`
       : `module.${moduleName}`;
@@ -661,7 +669,8 @@ function getStateResourceAddress(resource, instance) {
   let address = parts.join(".");
   if (Object.prototype.hasOwnProperty.call(instance, "index_key")) {
     const key = instance.index_key;
-    address += typeof key === "number" ? `[${key}]` : `[${JSON.stringify(key)}]`;
+    address +=
+      typeof key === "number" ? `[${key}]` : `[${JSON.stringify(key)}]`;
   }
   return address;
 }
@@ -716,7 +725,11 @@ function mergeTerraformState(nodes, state) {
           continue;
         }
         const target = resolveCanonicalNodePath(nodes, dependency);
-        if (target && target !== nodePath && !nodes[nodePath].edges_existing.includes(target)) {
+        if (
+          target &&
+          target !== nodePath &&
+          !nodes[nodePath].edges_existing.includes(target)
+        ) {
           nodes[nodePath].edges_existing.push(target);
         }
       }
@@ -830,9 +843,11 @@ function pruneRedundantStructuralEdges(nodes, options = {}) {
         next.push(target);
         continue;
       }
-      const canPruneShortcut = mode === "global"
-        ? true
-        : isTerraformModuleNode(nodes[sourcePath]) || isTerraformModuleNode(nodes[target]);
+      const canPruneShortcut =
+        mode === "global"
+          ? true
+          : isTerraformModuleNode(nodes[sourcePath]) ||
+            isTerraformModuleNode(nodes[target]);
       const redundant =
         canPruneShortcut &&
         sourcePath !== target &&
@@ -931,8 +946,12 @@ function refineEdgesWithResolvers(nodes, resolvers = []) {
 
       if (policy === "augment") {
         if (targets.length > 0) {
-          node.edges_new = [...new Set([...(node.edges_new || []), ...targets])];
-          node.edges_existing = [...new Set([...(node.edges_existing || []), ...targets])];
+          node.edges_new = [
+            ...new Set([...(node.edges_new || []), ...targets]),
+          ];
+          node.edges_existing = [
+            ...new Set([...(node.edges_existing || []), ...targets]),
+          ];
         }
         break;
       }
@@ -951,10 +970,13 @@ function detectGenericStructuralEdges(nodes, options = {}) {
     ? options.customResolvers
     : [];
   const disabled = new Set(options.disabledDefaultResolverIds || []);
-  const defaultResolvers = [createGenericResourceReferenceResolver(options)].filter(
-    (resolver) => !disabled.has(resolver.id),
-  );
-  return refineEdgesWithResolvers(nodes, [...customResolvers, ...defaultResolvers]);
+  const defaultResolvers = [
+    createGenericResourceReferenceResolver(options),
+  ].filter((resolver) => !disabled.has(resolver.id));
+  return refineEdgesWithResolvers(nodes, [
+    ...customResolvers,
+    ...defaultResolvers,
+  ]);
 }
 
 /**
@@ -1068,7 +1090,9 @@ function omitNonAllowlistedDataSourceNodes(nodes) {
 
 function isStateOnlyResource(resource = {}) {
   const actions = resource?.change?.actions;
-  return Array.isArray(actions) && actions.length === 1 && actions[0] === "existing";
+  return (
+    Array.isArray(actions) && actions.length === 1 && actions[0] === "existing"
+  );
 }
 
 /**
@@ -1086,7 +1110,9 @@ function omitStateOnlyDataSourceNodes(nodes) {
     if (resources.length === 0) {
       continue;
     }
-    const dataResources = resources.filter((resource) => resource?.mode === "data");
+    const dataResources = resources.filter(
+      (resource) => resource?.mode === "data",
+    );
     if (dataResources.length === 0) {
       continue;
     }
@@ -1106,7 +1132,9 @@ function omitStateOnlyDataSourceNodes(nodes) {
 }
 
 function isIamPolicyDocumentDataAddress(address = "") {
-  return /\.data\.aws_iam_policy_document\./.test(stripIndexes(String(address)));
+  return /\.data\.aws_iam_policy_document\./.test(
+    stripIndexes(String(address)),
+  );
 }
 
 function hasConcreteIamPolicyDocumentInstance(resource = {}, nodePath = "") {
@@ -1176,7 +1204,9 @@ function omitVpcPlumbingNodes(nodes) {
 
 /** Drops nodes with no incident edges (in any edge list); preserves `__*` metadata keys on the map. */
 function deleteOrphanedNodes(nodes) {
-  const metaEntries = Object.entries(nodes).filter(([key]) => key.startsWith("__"));
+  const metaEntries = Object.entries(nodes).filter(([key]) =>
+    key.startsWith("__"),
+  );
   const connected = new Set();
 
   for (const [nodePath, node] of Object.entries(nodes)) {

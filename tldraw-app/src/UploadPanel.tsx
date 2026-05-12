@@ -43,7 +43,8 @@ export function UploadPanel({
   const [status, setStatus] = useState<Status>({ kind: "idle" });
 
   const hasPlanAndDot = Boolean(planFile && dotFile);
-  const canImport = hasPlanAndDot || Boolean(stateFile && !planFile && !dotFile);
+  const canImport =
+    hasPlanAndDot || Boolean(stateFile && !planFile && !dotFile);
 
   const setError = (message: string) => {
     setStatus({ kind: "error", message });
@@ -59,7 +60,9 @@ export function UploadPanel({
       return;
     }
     if (!canImport) {
-      setError("Upload plan+DOT (optional state), or a raw state JSON file alone.");
+      setError(
+        "Upload plan+DOT (optional state), or a raw state JSON file alone.",
+      );
       return;
     }
 
@@ -83,7 +86,9 @@ export function UploadPanel({
         id?: number;
       };
       if (!uploadRes.ok) {
-        throw new Error(uploadBody.error || `Upload failed: ${uploadRes.status}`);
+        throw new Error(
+          uploadBody.error || `Upload failed: ${uploadRes.status}`,
+        );
       }
       const { id } = uploadBody;
       if (typeof id !== "number") {
@@ -91,7 +96,9 @@ export function UploadPanel({
       }
 
       setStatus({ kind: "rendering", uploadId: id });
-      const sceneRes = await fetch(`${BACKEND_URL}/terraform/upload/${id}/render/tldraw`);
+      const sceneRes = await fetch(
+        `${BACKEND_URL}/terraform/upload/${id}/render/tldraw`,
+      );
       if (!sceneRes.ok) {
         throw new Error(`Render failed: ${sceneRes.status}`);
       }
@@ -135,8 +142,8 @@ export function UploadPanel({
         {status.kind === "uploading"
           ? "Uploading…"
           : status.kind === "rendering"
-            ? "Rendering…"
-            : "Import"}
+          ? "Rendering…"
+          : "Import"}
       </button>
       <button type="button" disabled={!hasScene} onClick={onToggleDependency}>
         {dependencyLayerEnabled ? "Hide Dependency" : "Show Dependency"}

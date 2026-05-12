@@ -4,6 +4,8 @@ import {
   newElementWith,
 } from "@excalidraw/element";
 
+import { pointFrom } from "@excalidraw/math";
+
 import type { Scene } from "@excalidraw/element";
 
 import type {
@@ -12,13 +14,11 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import type { PointerDownState } from "../types";
-
-import { pointFrom } from "@excalidraw/math";
-
 import type { LocalPoint } from "@excalidraw/math";
 
 import { isTerraformSemanticOverviewScene } from "./terraformElementMetadata";
+
+import type { PointerDownState } from "../types";
 
 /**
  * Terraform-import scene helpers: soft-hide (`isDeleted`) for filtered views, explode
@@ -370,9 +370,7 @@ const fixedPointForAbsolutePoint = (
   ];
 };
 
-const isTerraformNetworkingDependencyEdge = (
-  element: ExcalidrawElement,
-) =>
+const isTerraformNetworkingDependencyEdge = (element: ExcalidrawElement) =>
   getTerraformEdgeLayer(element) === "networking" &&
   getCustomData(element).relationship &&
   typeof getCustomData(element).relationship === "object" &&
@@ -508,7 +506,10 @@ export const repairTerraformEdgeBindings = (
     let startFixed: [number, number];
     let endFixed: [number, number];
 
-    if (layer === "dependency" || isTerraformNetworkingDependencyEdge(element)) {
+    if (
+      layer === "dependency" ||
+      isTerraformNetworkingDependencyEdge(element)
+    ) {
       const pts = getCenterClippedBindingPoints(posA, posB, wA, hA, wB, hB);
       startPoint = pts.startPoint;
       endPoint = pts.endPoint;
@@ -520,11 +521,7 @@ export const repairTerraformEdgeBindings = (
         .join("|||");
       const offset = structuralDependencyPairKeys.has(pairKey) ? 18 : 0;
       const raw = getCenterClippedBindingPoints(posA, posB, wA, hA, wB, hB);
-      const shifted = offsetLineSegment(
-        raw.startPoint,
-        raw.endPoint,
-        offset,
-      );
+      const shifted = offsetLineSegment(raw.startPoint, raw.endPoint, offset);
       startPoint = shifted.startPoint;
       endPoint = shifted.endPoint;
       startFixed = fixedPointForAbsolutePoint(rectA, shifted.startPoint);
@@ -615,8 +612,8 @@ export const reconcileTerraformVisibility = (
       layer === "dependency"
         ? layerState.dependencyLayerEnabled
         : layer === "dataFlow"
-          ? layerState.dataFlowLayerEnabled
-          : layerState.networkingLayerEnabled;
+        ? layerState.dataFlowLayerEnabled
+        : layerState.networkingLayerEnabled;
     const shouldShow =
       layerEnabled && edgeEndpointsAreVisible(element, visibleKeys);
 

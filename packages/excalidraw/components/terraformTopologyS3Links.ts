@@ -99,7 +99,10 @@ export function resolveS3BucketFieldToBucketPath(
   return null;
 }
 
-function isAwsS3BucketNode(nodes: TerraformPlanNodesMap, path: string): boolean {
+function isAwsS3BucketNode(
+  nodes: TerraformPlanNodesMap,
+  path: string,
+): boolean {
   const primary = getPrimaryResource(nodes[path] as TerraformPlanGraphNode);
   return primary?.type === "aws_s3_bucket";
 }
@@ -151,16 +154,20 @@ function collectIamPolicyDocumentRefsFromPolicyField(
     while ((m = re.exec(chunk)) !== null) {
       candidates.push(m[1]!);
     }
-    for (let raw of candidates) {
-      const qualified = raw.startsWith("module.") || raw.startsWith("data.")
-        ? raw
-        : modPrefix
+    for (const raw of candidates) {
+      const qualified =
+        raw.startsWith("module.") || raw.startsWith("data.")
+          ? raw
+          : modPrefix
           ? `${modPrefix}.${raw}`
           : raw;
       const key =
         resolveTerraformPlanNodeKey(graphNodes, qualified) ||
         resolveTerraformPlanNodeKey(graphNodes, stripIndexes(qualified));
-      if (key && getResourceType(key, nodes[key]) === "aws_iam_policy_document") {
+      if (
+        key &&
+        getResourceType(key, nodes[key]) === "aws_iam_policy_document"
+      ) {
         out.add(key);
       }
     }
@@ -205,7 +212,11 @@ export function buildS3CompanionCluster(
       continue;
     }
     const values = mergeTerraformPlanResourceValues(p);
-    const resolved = resolveS3BucketFieldToBucketPath(nodes, values.bucket, arnIndex);
+    const resolved = resolveS3BucketFieldToBucketPath(
+      nodes,
+      values.bucket,
+      arnIndex,
+    );
     if (resolved !== bucketAddress) {
       continue;
     }

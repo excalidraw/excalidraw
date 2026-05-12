@@ -8,9 +8,9 @@ describe("strokeColorForTerraformDependencyKinds", () => {
     expect(strokeColorForTerraformDependencyKinds("planned_dependency")).toBe(
       "#2b8a3e",
     );
-    expect(
-      strokeColorForTerraformDependencyKinds("existing_dependency"),
-    ).toBe("#1971c2");
+    expect(strokeColorForTerraformDependencyKinds("existing_dependency")).toBe(
+      "#1971c2",
+    );
   });
 
   it("falls back to origins when kinds is empty", () => {
@@ -31,9 +31,10 @@ describe("strokeColorForTerraformDependencyKinds", () => {
 
   it("colors existing+planned as blue (existing wins over adjacency)", () => {
     expect(
-      strokeColorForTerraformDependencyKinds(
-        ["planned_dependency", "existing_dependency"],
-      ),
+      strokeColorForTerraformDependencyKinds([
+        "planned_dependency",
+        "existing_dependency",
+      ]),
     ).toBe("#1971c2");
   });
 

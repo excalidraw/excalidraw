@@ -2,11 +2,14 @@
  * Express API for Terraform/OpenTofu uploads: multipart plan+DOT and/or raw state → SQLite row
  * and JSON graph; `GET …/excalidraw` runs `nodesToExcalidraw` for the web app import flow.
  */
+const fs = require("fs");
+
+const path = require("path");
+
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
+
 const dot = require("graphlib-dot");
 
 const { db, uploads, eq } = require("./db");
@@ -50,7 +53,9 @@ const STRUCTURAL_PRUNE_MODES = new Set(["module-only", "global", "off"]);
 const FALSEY_FLAG_VALUES = new Set(["0", "false", "no", "off", "disabled"]);
 
 function normalizeStructuralPruneMode(rawMode) {
-  const mode = String(rawMode || "module-only").trim().toLowerCase();
+  const mode = String(rawMode || "module-only")
+    .trim()
+    .toLowerCase();
   return STRUCTURAL_PRUNE_MODES.has(mode) ? mode : "module-only";
 }
 
@@ -104,7 +109,7 @@ app.post(
       if ((hasPlan && !hasDot) || (!hasPlan && hasDot)) {
         return res.status(400).json({
           error:
-            "planFile and dotFile must be supplied together, or omit both and upload stateFile only (raw Terraform state JSON with a top-level \"resources\" array).",
+            'planFile and dotFile must be supplied together, or omit both and upload stateFile only (raw Terraform state JSON with a top-level "resources" array).',
         });
       }
 
@@ -125,14 +130,18 @@ app.post(
         try {
           plan = JSON.parse(planContent);
         } catch {
-          return res.status(400).json({ error: "planFile must be valid JSON." });
+          return res
+            .status(400)
+            .json({ error: "planFile must be valid JSON." });
         }
         if (stateFile) {
           const stateContent = fs.readFileSync(stateFile.path, "utf-8");
           try {
             state = JSON.parse(stateContent);
           } catch {
-            return res.status(400).json({ error: "stateFile must be valid JSON." });
+            return res
+              .status(400)
+              .json({ error: "stateFile must be valid JSON." });
           }
         }
       } else {
@@ -141,12 +150,14 @@ app.post(
         try {
           parsedState = JSON.parse(stateContent);
         } catch {
-          return res.status(400).json({ error: "stateFile must be valid JSON." });
+          return res
+            .status(400)
+            .json({ error: "stateFile must be valid JSON." });
         }
         if (!Array.isArray(parsedState.resources)) {
           return res.status(400).json({
             error:
-              "state-only uploads require raw Terraform state JSON (top-level \"resources\" array), e.g. output of terraform state pull.",
+              'state-only uploads require raw Terraform state JSON (top-level "resources" array), e.g. output of terraform state pull.',
           });
         }
         state = parsedState;
@@ -169,12 +180,17 @@ app.post(
           return;
         }
         if (!debugOutputDir) {
-          const debugRunId = `upload-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+          const debugRunId = `upload-${Date.now()}-${Math.random()
+            .toString(36)
+            .slice(2, 8)}`;
           debugOutputDir = path.join(__dirname, "debug-upload", debugRunId);
           fs.mkdirSync(debugOutputDir, { recursive: true });
         }
         debugStep += 1;
-        const filename = `${String(debugStep).padStart(2, "0")}-${stepName}.json`;
+        const filename = `${String(debugStep).padStart(
+          2,
+          "0",
+        )}-${stepName}.json`;
         fs.writeFileSync(
           path.join(debugOutputDir, filename),
           JSON.stringify(value, null, 2),
@@ -227,7 +243,9 @@ app.post(
       nodes = ensureEdgeLists(nodes);
       writeDebugSnapshot("ensure-edge-lists-1", nodes);
       // Remove duplicate or shortcut structural edges (scope configurable on upload).
-      nodes = pruneRedundantStructuralEdges(nodes, { mode: structuralPruneMode });
+      nodes = pruneRedundantStructuralEdges(nodes, {
+        mode: structuralPruneMode,
+      });
       writeDebugSnapshot("prune-redundant-structural-edges", nodes);
       // Mark or normalize references to external (out-of-graph) resources.
       nodes = externalResources(nodes);
@@ -268,13 +286,18 @@ app.post(
       const enrichment = mockLanggraphEnrichment(nodes);
       applyEnrichment(nodes, enrichment);
 
-      const inserted = db.insert(uploads).values({
-        data: JSON.stringify(nodes),
-        planFilename: planFile?.originalname ?? null,
-        dotFilename: dotFile?.originalname ?? null,
-        stateFilename: stateFile?.originalname || null,
-        nodeCount: Object.keys(nodes).filter((k) => !k.startsWith("__")).length,
-      }).returning({ id: uploads.id }).get();
+      const inserted = db
+        .insert(uploads)
+        .values({
+          data: JSON.stringify(nodes),
+          planFilename: planFile?.originalname ?? null,
+          dotFilename: dotFile?.originalname ?? null,
+          stateFilename: stateFile?.originalname || null,
+          nodeCount: Object.keys(nodes).filter((k) => !k.startsWith("__"))
+            .length,
+        })
+        .returning({ id: uploads.id })
+        .get();
 
       return res.json({
         id: inserted.id,
@@ -301,7 +324,11 @@ app.post(
 
 /** Returns stored graph JSON and upload metadata for debugging or alternate clients. */
 app.get("/terraform/upload/:id", (req, res) => {
-  const row = db.select().from(uploads).where(eq(uploads.id, Number(req.params.id))).get();
+  const row = db
+    .select()
+    .from(uploads)
+    .where(eq(uploads.id, Number(req.params.id)))
+    .get();
   if (!row) {
     return res.status(404).json({ error: "Not found" });
   }
@@ -383,7 +410,9 @@ async function renderUploadAs(rendererId, req, res) {
     res.setHeader("Content-Type", result.contentType || renderer.contentType);
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="terraform-${row.id}.${result.fileExtension || renderer.fileExtension}"`,
+      `attachment; filename="terraform-${row.id}.${
+        result.fileExtension || renderer.fileExtension
+      }"`,
     );
     return res.json(result.body);
   } catch (error) {

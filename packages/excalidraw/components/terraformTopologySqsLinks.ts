@@ -118,7 +118,10 @@ export function resolveSqsQueueFieldToQueuePath(
   return null;
 }
 
-function isAwsSqsQueueNode(nodes: TerraformPlanNodesMap, path: string): boolean {
+function isAwsSqsQueueNode(
+  nodes: TerraformPlanNodesMap,
+  path: string,
+): boolean {
   const primary = getPrimaryResource(nodes[path] as TerraformPlanGraphNode);
   return primary?.type === "aws_sqs_queue";
 }
@@ -145,16 +148,20 @@ function collectIamPolicyDocumentRefsFromSqsPolicy(
       /\b((?:module\.[a-zA-Z0-9_.-]+\.)*data\.aws_iam_policy_document\.[a-zA-Z0-9_.-]+(?:\[[^\]]+\])?)/g;
     let m: RegExpExecArray | null;
     while ((m = re.exec(chunk)) !== null) {
-      let raw = m[1]!;
-      const qualified = raw.startsWith("module.") || raw.startsWith("data.")
-        ? raw
-        : modPrefix
+      const raw = m[1]!;
+      const qualified =
+        raw.startsWith("module.") || raw.startsWith("data.")
+          ? raw
+          : modPrefix
           ? `${modPrefix}.${raw}`
           : raw;
       const key =
         resolveTerraformPlanNodeKey(graphNodes, qualified) ||
         resolveTerraformPlanNodeKey(graphNodes, stripIndexes(qualified));
-      if (key && getResourceType(key, nodes[key]) === "aws_iam_policy_document") {
+      if (
+        key &&
+        getResourceType(key, nodes[key]) === "aws_iam_policy_document"
+      ) {
         out.add(key);
       }
     }

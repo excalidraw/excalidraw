@@ -33,12 +33,42 @@ function contains(outer, inner) {
 describe("nodesToExcalidraw Terraform edge layers", () => {
   it("styles resource rectangles by Terraform action", async () => {
     const fixtures = [
-      ["aws_lambda_function.created", ["create"], "create", "#d3f9d8", "#2b8a3e"],
-      ["aws_lambda_function.updated", ["update"], "update", "#fff3bf", "#e67700"],
-      ["aws_lambda_function.deleted", ["delete"], "delete", "#ffe3e3", "#c92a2a"],
+      [
+        "aws_lambda_function.created",
+        ["create"],
+        "create",
+        "#d3f9d8",
+        "#2b8a3e",
+      ],
+      [
+        "aws_lambda_function.updated",
+        ["update"],
+        "update",
+        "#fff3bf",
+        "#e67700",
+      ],
+      [
+        "aws_lambda_function.deleted",
+        ["delete"],
+        "delete",
+        "#ffe3e3",
+        "#c92a2a",
+      ],
       ["aws_lambda_function.noop", ["no-op"], "no-op", "#e7f5ff", "#1971c2"],
-      ["aws_lambda_function.existing", ["existing"], "existing", "#f8f9fa", "#868e96"],
-      ["aws_lambda_function.replaced", ["delete", "create"], "replace", "#ffe8cc", "#f08c00"],
+      [
+        "aws_lambda_function.existing",
+        ["existing"],
+        "existing",
+        "#f8f9fa",
+        "#868e96",
+      ],
+      [
+        "aws_lambda_function.replaced",
+        ["delete", "create"],
+        "replace",
+        "#ffe8cc",
+        "#f08c00",
+      ],
     ];
     const nodes = Object.fromEntries(
       fixtures.map(([address, actions]) => [
@@ -185,7 +215,9 @@ describe("nodesToExcalidraw Terraform edge layers", () => {
       );
       expect(rect?.isDeleted).toBe(expectedDeleted);
       expect(text?.isDeleted).toBe(expectedDeleted);
-      expect(rect?.customData?.terraformInitiallyVisible).toBe(!expectedDeleted);
+      expect(rect?.customData?.terraformInitiallyVisible).toBe(
+        !expectedDeleted,
+      );
     }
   });
 
@@ -515,7 +547,8 @@ describe("nodesToExcalidraw container facets", () => {
     });
 
     const vpcLabel = scene.elements.find(
-      (element) => element.type === "text" && element.customData?.terraformVpcGroup,
+      (element) =>
+        element.type === "text" && element.customData?.terraformVpcGroup,
     );
     const subnetLabel = scene.elements.find(
       (element) =>
@@ -523,7 +556,8 @@ describe("nodesToExcalidraw container facets", () => {
     );
     const accountBox = scene.elements.find(
       (element) =>
-        element.type === "rectangle" && element.customData?.terraformAccountGroup,
+        element.type === "rectangle" &&
+        element.customData?.terraformAccountGroup,
     );
     const routeTableRect = scene.elements.find(
       (element) =>
@@ -734,7 +768,8 @@ describe("nodesToExcalidraw VPC perimeter layout", () => {
     });
 
     const vpcLabel = scene.elements.find(
-      (element) => element.type === "text" && element.customData?.terraformVpcGroup,
+      (element) =>
+        element.type === "text" && element.customData?.terraformVpcGroup,
     );
     const endpointRect = scene.elements.find(
       (element) =>
@@ -768,14 +803,20 @@ describe("nodesToExcalidraw VPC perimeter layout", () => {
 
     expect(endpointRect).toBeDefined();
     expect(endpointRect?.customData?.terraformVpcAppliance).toBe(true);
-    expect(endpointRect?.customData?.terraformVpcApplianceKind).toBe("endpoint");
-    expect(endpointRect?.customData?.terraformVpcApplianceWall).toBe("bottomWall");
+    expect(endpointRect?.customData?.terraformVpcApplianceKind).toBe(
+      "endpoint",
+    );
+    expect(endpointRect?.customData?.terraformVpcApplianceWall).toBe(
+      "bottomWall",
+    );
     expect(endpointRect?.strokeStyle).toBe("dotted");
     expect(vpcBox).toBeDefined();
     const endpointRects = scene.elements.filter(
       (element) =>
         element.type === "rectangle" &&
-        String(element.customData?.nodePath || "").includes("aws_vpc_endpoint."),
+        String(element.customData?.nodePath || "").includes(
+          "aws_vpc_endpoint.",
+        ),
     );
     expect(endpointRects.length).toBe(4);
     const L = vpcBox.x;
@@ -785,10 +826,7 @@ describe("nodesToExcalidraw VPC perimeter layout", () => {
     const tol = 3;
     for (const ep of endpointRects) {
       const overlapsInterior =
-        ep.x + ep.width > L &&
-        ep.x < R &&
-        ep.y + ep.height > T &&
-        ep.y < B;
+        ep.x + ep.width > L && ep.x < R && ep.y + ep.height > T && ep.y < B;
       const extendsOutside =
         ep.x < L - tol ||
         ep.x + ep.width > R + tol ||
@@ -941,7 +979,9 @@ describe("nodesToExcalidraw VPC perimeter layout", () => {
         e.type === "rectangle" && e.customData?.nodePath === "aws_lb.internal",
     );
     expect(publicLb?.customData?.terraformVpcApplianceWall).toBe("leftWall");
-    expect(publicLb?.customData?.terraformVpcApplianceKind).toBe("load_balancer");
+    expect(publicLb?.customData?.terraformVpcApplianceKind).toBe(
+      "load_balancer",
+    );
     expect(internalLb?.customData?.terraformVpcApplianceWall).toBe("topWall");
   });
 });

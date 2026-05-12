@@ -10,7 +10,9 @@ const CONTAINER_KEY_BY_FLAG = [
 
 function getContainerKey(customData = {}) {
   for (const key of CONTAINER_KEY_BY_FLAG) {
-    if (customData[key]) return key;
+    if (customData[key]) {
+      return key;
+    }
   }
   return null;
 }
@@ -62,14 +64,18 @@ async function buildReactFlowDocument(nodes, options = {}) {
         width: Math.max(1, el.width || 1),
         height: Math.max(1, el.height || 1),
         border: `${Math.max(1, el.strokeWidth || 1)}px ${
-          el.strokeStyle === "dashed" ? "dashed" : el.strokeStyle === "dotted" ? "dotted" : "solid"
+          el.strokeStyle === "dashed"
+            ? "dashed"
+            : el.strokeStyle === "dotted"
+            ? "dotted"
+            : "solid"
         } ${el.strokeColor || "#64748b"}`,
         background:
           el.backgroundColor && el.backgroundColor !== "transparent"
             ? el.backgroundColor
             : isContainer
-              ? "rgba(148, 163, 184, 0.04)"
-              : "#ffffff",
+            ? "rgba(148, 163, 184, 0.04)"
+            : "#ffffff",
         borderRadius: 10,
         zIndex: isContainer ? 1 : 10,
         boxShadow: isContainer ? "none" : "0 1px 3px rgba(15,23,42,0.12)",

@@ -2,10 +2,7 @@
   "mcpServers": {
     "chrome-devtools-custom": {
       "command": "/bin/zsh",
-      "args": [
-        "-lc",
-        "export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin; /opt/homebrew/bin/npx -y chrome-devtools-mcp@latest"
-      ],
+      "args": ["-lc", "export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin; /opt/homebrew/bin/npx -y chrome-devtools-mcp@latest"],
       "env": {
         "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
       }

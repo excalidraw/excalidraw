@@ -3,6 +3,7 @@ import { newElementWith } from "@excalidraw/element";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import terraformAwsIconTypeNames from "../assets/terraform-aws-icon-type-names.json";
+
 import { tfComfortPx } from "./terraformLayoutComfort";
 
 const px = tfComfortPx;

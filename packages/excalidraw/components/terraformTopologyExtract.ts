@@ -211,7 +211,9 @@ function stringArrayField(v: unknown): string[] {
   return v.filter((x): x is string => typeof x === "string" && x.length > 0);
 }
 
-function vpcConfigBlocks(values: Record<string, unknown>): Record<string, unknown>[] {
+function vpcConfigBlocks(
+  values: Record<string, unknown>,
+): Record<string, unknown>[] {
   const raw = values.vpc_config;
   if (!Array.isArray(raw) || raw.length === 0) {
     return [];
@@ -222,7 +224,10 @@ function vpcConfigBlocks(values: Record<string, unknown>): Record<string, unknow
     : [];
 }
 
-function ensureAccount(model: TerraformTopologyModel, accountId: string): TerraformTopologyAccount {
+function ensureAccount(
+  model: TerraformTopologyModel,
+  accountId: string,
+): TerraformTopologyAccount {
   let acc = model.accounts.get(accountId);
   if (!acc) {
     acc = { accountId, regions: new Map() };
@@ -243,7 +248,10 @@ function ensureRegion(
   return reg;
 }
 
-function ensureVpc(region: TerraformTopologyRegion, vpcId: string): TerraformTopologyVpc {
+function ensureVpc(
+  region: TerraformTopologyRegion,
+  vpcId: string,
+): TerraformTopologyVpc {
   let vpc = region.vpcs.get(vpcId);
   if (!vpc) {
     vpc = { vpcId, subnets: new Map() };
@@ -258,9 +266,10 @@ function ensureSubnet(vpc: TerraformTopologyVpc, subnetId: string): void {
   }
 }
 
-function resolveAccountRegion(
-  values: Record<string, unknown>,
-): { account: string; region: string } {
+function resolveAccountRegion(values: Record<string, unknown>): {
+  account: string;
+  region: string;
+} {
   const loc = bestAwsArnLocationFromValues(values);
   if (loc) {
     const region =
@@ -275,7 +284,8 @@ function resolveAccountRegion(
       stringField(values.region) || TERRAFORM_TOPOLOGY_UNKNOWN_REGION;
     return { account: owner, region };
   }
-  const region = stringField(values.region) || TERRAFORM_TOPOLOGY_UNKNOWN_REGION;
+  const region =
+    stringField(values.region) || TERRAFORM_TOPOLOGY_UNKNOWN_REGION;
   return { account: TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT, region };
 }
 
@@ -307,7 +317,8 @@ export function resolveTerraformDeployRoleIamArnFromPlan(
     return null;
   }
   const roleName =
-    planVariableTrimmed(plan, "terraform_deploy_role_name") ?? "TerraformDeploy";
+    planVariableTrimmed(plan, "terraform_deploy_role_name") ??
+    "TerraformDeploy";
   return `arn:aws:iam::${accountId}:role/${roleName}`;
 }
 
@@ -315,7 +326,11 @@ function resolveProviderRegionFromExpressions(
   plan: TerraformPlanProviderContext | undefined,
   regionExpr: unknown,
 ): string | null {
-  if (!regionExpr || typeof regionExpr !== "object" || Array.isArray(regionExpr)) {
+  if (
+    !regionExpr ||
+    typeof regionExpr !== "object" ||
+    Array.isArray(regionExpr)
+  ) {
     return null;
   }
   const rec = regionExpr as Record<string, unknown>;
@@ -342,12 +357,19 @@ function resolveProviderAssumeRoleAccount(
     return null;
   }
   const roleArnRaw = (block as Record<string, unknown>).role_arn;
-  if (!roleArnRaw || typeof roleArnRaw !== "object" || Array.isArray(roleArnRaw)) {
+  if (
+    !roleArnRaw ||
+    typeof roleArnRaw !== "object" ||
+    Array.isArray(roleArnRaw)
+  ) {
     return null;
   }
   const arnExpr = roleArnRaw as Record<string, unknown>;
   const constantArn = arnExpr.constant_value;
-  if (typeof constantArn === "string" && constantArn.startsWith("arn:aws:iam::")) {
+  if (
+    typeof constantArn === "string" &&
+    constantArn.startsWith("arn:aws:iam::")
+  ) {
     const loc = parseAwsArnLocation(constantArn);
     return loc?.account && /^\d{12}$/.test(loc.account) ? loc.account : null;
   }
@@ -374,7 +396,8 @@ export function extractDefaultAwsProviderAccountRegion(
   if (!pc || typeof pc !== "object") {
     return null;
   }
-  const expressions = (pc as { expressions?: Record<string, unknown> }).expressions;
+  const expressions = (pc as { expressions?: Record<string, unknown> })
+    .expressions;
   if (!expressions || typeof expressions !== "object") {
     return { account: null, region: null };
   }
@@ -408,7 +431,10 @@ function resolveAccountRegionWithProviderDefaults(
   plan: TerraformPlanProviderContext | undefined,
   values: Record<string, unknown>,
 ): { account: string; region: string } {
-  return mergeWithDefaultAwsProviderAccountRegion(plan, resolveAccountRegion(values));
+  return mergeWithDefaultAwsProviderAccountRegion(
+    plan,
+    resolveAccountRegion(values),
+  );
 }
 
 export type TerraformSubnetOwnerHint = { account: string; region: string };
@@ -416,7 +442,10 @@ export type TerraformSubnetOwnerHint = { account: string; region: string };
 type SubnetOwnerHint = TerraformSubnetOwnerHint;
 
 /** Emit frames only when account and region are resolved (omit placeholder buckets). */
-export function shouldEmitTopologyPlacement(account: string, region: string): boolean {
+export function shouldEmitTopologyPlacement(
+  account: string,
+  region: string,
+): boolean {
   return (
     account !== TERRAFORM_TOPOLOGY_UNKNOWN_ACCOUNT &&
     region !== TERRAFORM_TOPOLOGY_UNKNOWN_REGION
@@ -424,7 +453,9 @@ export function shouldEmitTopologyPlacement(account: string, region: string): bo
 }
 
 /** Built from `aws_subnet` rows so association/route resources can inherit account/region. */
-function buildSubnetOwnerHintMap(changes: ResourceChange[]): Map<string, SubnetOwnerHint> {
+function buildSubnetOwnerHintMap(
+  changes: ResourceChange[],
+): Map<string, SubnetOwnerHint> {
   const map = new Map<string, SubnetOwnerHint>();
   for (const rc of changes) {
     if (!isAwsResourceChange(rc) || rc.type !== "aws_subnet") {
@@ -500,14 +531,18 @@ function buildSubnetToVpcMap(changes: ResourceChange[]): Map<string, string> {
 export function buildSubnetToVpcMapFromPlan(plan: {
   resource_changes?: ResourceChange[];
 }): Map<string, string> {
-  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
   return buildSubnetToVpcMap(changes);
 }
 
 export function buildSubnetOwnerHintsFromPlan(plan: {
   resource_changes?: ResourceChange[];
 }): Map<string, TerraformSubnetOwnerHint> {
-  const changes = Array.isArray(plan.resource_changes) ? plan.resource_changes : [];
+  const changes = Array.isArray(plan.resource_changes)
+    ? plan.resource_changes
+    : [];
   return buildSubnetOwnerHintMap(changes);
 }
 
@@ -744,7 +779,15 @@ export function extractTerraformTopologyFromPlan(
       const sid = stringField(values.id);
       const vid = stringField(values.vpc_id);
       if (sid && vid) {
-        ingestVpcSubnetPair(model, subnetToVpc, subnetOwners, values, vid, [sid], plan);
+        ingestVpcSubnetPair(
+          model,
+          subnetToVpc,
+          subnetOwners,
+          values,
+          vid,
+          [sid],
+          plan,
+        );
       }
       continue;
     }
@@ -756,20 +799,38 @@ export function extractTerraformTopologyFromPlan(
     for (const block of vpcConfigBlocks(values)) {
       const sids = stringArrayField(block.subnet_ids);
       if (sids.length) {
-        ingestVpcSubnetPair(model, subnetToVpc, subnetOwners, values, vidDirect, sids, plan);
+        ingestVpcSubnetPair(
+          model,
+          subnetToVpc,
+          subnetOwners,
+          values,
+          vidDirect,
+          sids,
+          plan,
+        );
       }
     }
 
     if (vidDirect && (subnetSingle || subnetMulti.length)) {
-      ingestVpcSubnetPair(model, subnetToVpc, subnetOwners, values, vidDirect, [
-        ...(subnetSingle ? [subnetSingle] : []),
-        ...subnetMulti,
-      ], plan);
+      ingestVpcSubnetPair(
+        model,
+        subnetToVpc,
+        subnetOwners,
+        values,
+        vidDirect,
+        [...(subnetSingle ? [subnetSingle] : []), ...subnetMulti],
+        plan,
+      );
     } else if (!vidDirect && (subnetSingle || subnetMulti.length)) {
-      ingestVpcSubnetPair(model, subnetToVpc, subnetOwners, values, null, [
-        ...(subnetSingle ? [subnetSingle] : []),
-        ...subnetMulti,
-      ], plan);
+      ingestVpcSubnetPair(
+        model,
+        subnetToVpc,
+        subnetOwners,
+        values,
+        null,
+        [...(subnetSingle ? [subnetSingle] : []), ...subnetMulti],
+        plan,
+      );
     }
 
     if (vidDirect && !subnetSingle && subnetMulti.length === 0) {
@@ -786,4 +847,3 @@ export function extractTerraformTopologyFromPlan(
 
   return model;
 }
-

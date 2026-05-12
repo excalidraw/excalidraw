@@ -1,4 +1,5 @@
 import { createRequire } from "node:module";
+
 import { describe, expect, it } from "vitest";
 
 const require = createRequire(import.meta.url);
@@ -13,10 +14,12 @@ function normalizeShapes(shapes: Array<Record<string, unknown>>) {
 
 describe("allplanmodules → backend tldraw connector parity", () => {
   it("matches the legacy excalidraw->tldraw conversion output", async () => {
-    const { runAllplanModulesPipeline } = require(
-      "../../packages/backend/terraform/allplan-modules-pipeline.js",
-    );
-    const { nodesToExcalidraw } = require("../../packages/backend/excalidraw.js");
+    const {
+      runAllplanModulesPipeline,
+    } = require("../../packages/backend/terraform/allplan-modules-pipeline.js");
+    const {
+      nodesToExcalidraw,
+    } = require("../../packages/backend/excalidraw.js");
     const {
       excalidrawSceneToTldrawShapes,
     } = require("../../packages/backend/connectors/excalidraw-to-tldraw.js");

@@ -2,6 +2,7 @@
  * Drizzle + better-sqlite3 handle for `graph.db` (`uploads` table). Export `db`, `uploads`, `eq`.
  */
 const path = require("path");
+
 const Database = require("better-sqlite3");
 const { drizzle } = require("drizzle-orm/better-sqlite3");
 const { sqliteTable, integer, text } = require("drizzle-orm/sqlite-core");

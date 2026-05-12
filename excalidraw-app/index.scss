@@ -556,11 +556,7 @@ body.terraform-canvas-landing #root {
   scroll-margin-top: 82px;
   padding-block: clamp(2rem, 5vw, 4.5rem);
   border-top: 2px solid var(--landing-ink);
-  background: linear-gradient(
-      115deg,
-      rgba(49, 95, 153, 0.13),
-      transparent 36%
-    ),
+  background: linear-gradient(115deg, rgba(49, 95, 153, 0.13), transparent 36%),
     linear-gradient(280deg, rgba(217, 164, 47, 0.2), transparent 34%),
     rgba(255, 255, 255, 0.42);
 }

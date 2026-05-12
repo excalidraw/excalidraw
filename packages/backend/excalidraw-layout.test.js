@@ -63,7 +63,11 @@ describe("Lambda module internal layout (indexed terraform-aws-modules/lambda)",
       `${modulePath}.aws_iam_role_policy.logs[0]`,
     ];
 
-    const offsets = buildModuleInternalOffsets(members, modulePath, moduleGroup);
+    const offsets = buildModuleInternalOffsets(
+      members,
+      modulePath,
+      moduleGroup,
+    );
 
     expect(offsets[`${modulePath}.aws_lambda_function.this[0]`]).toEqual({
       x: 0,
@@ -84,9 +88,9 @@ describe("Lambda module internal layout (indexed terraform-aws-modules/lambda)",
     expect(stripTerraformInstanceIndexes("aws_lambda_function.this[0]")).toBe(
       "aws_lambda_function.this",
     );
-    expect(
-      stripTerraformInstanceIndexes('aws_resource.foo["a"].bar[1]'),
-    ).toBe("aws_resource.foo.bar");
+    expect(stripTerraformInstanceIndexes('aws_resource.foo["a"].bar[1]')).toBe(
+      "aws_resource.foo.bar",
+    );
   });
 });
 
@@ -131,11 +135,15 @@ describe("recursive collapsed module internal layout", () => {
 
     const lambdaBox = moduleRect(
       offsets,
-      members.filter((path) => path === childA || path.startsWith(`${childA}.`)),
+      members.filter(
+        (path) => path === childA || path.startsWith(`${childA}.`),
+      ),
     );
     const securityGroupBox = moduleRect(
       offsets,
-      members.filter((path) => path === childB || path.startsWith(`${childB}.`)),
+      members.filter(
+        (path) => path === childB || path.startsWith(`${childB}.`),
+      ),
     );
 
     expect(overlaps(lambdaBox, securityGroupBox)).toBe(false);
@@ -171,7 +179,9 @@ describe("recursive collapsed module internal layout", () => {
       members.filter((path) => path === child || path.startsWith(`${child}.`)),
     );
 
-    expect(overlaps(resourceRect(offsets, directResource), childBox)).toBe(false);
+    expect(overlaps(resourceRect(offsets, directResource), childBox)).toBe(
+      false,
+    );
   });
 
   it("measures nested child modules bottom-up for collapsed module collision size", () => {

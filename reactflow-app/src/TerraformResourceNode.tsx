@@ -28,7 +28,11 @@ export function TerraformResourceNode({ data, selected }: NodeProps) {
   const resourceType = d.resourceType || "unknown";
 
   return (
-    <div className={`tf-node ${actionClass(d.action)}${selected ? " tf-node--selected" : ""}`}>
+    <div
+      className={`tf-node ${actionClass(d.action)}${
+        selected ? " tf-node--selected" : ""
+      }`}
+    >
       <Handle type="target" position={Position.Left} className="tf-handle" />
       <Handle type="source" position={Position.Right} className="tf-handle" />
       <div className="tf-node__header">

@@ -498,7 +498,12 @@ function collectReferenceScalars(value, parentKey = "", out = []) {
 }
 
 /** Resolves references with key-aware type narrowing and generic fallback. */
-function resolveNodeRefsAcrossAllResourceTypes(value, index, nodes, options = {}) {
+function resolveNodeRefsAcrossAllResourceTypes(
+  value,
+  index,
+  nodes,
+  options = {},
+) {
   const matches = new Set();
   const allTypes = [...index.byType.keys()];
   const ignoredKeys = new Set(
@@ -599,8 +604,12 @@ function refineEdgesWithResolvers(nodes, resolvers = []) {
 
       if (policy === "augment") {
         if (targets.length > 0) {
-          node.edges_new = [...new Set([...(node.edges_new || []), ...targets])];
-          node.edges_existing = [...new Set([...(node.edges_existing || []), ...targets])];
+          node.edges_new = [
+            ...new Set([...(node.edges_new || []), ...targets]),
+          ];
+          node.edges_existing = [
+            ...new Set([...(node.edges_existing || []), ...targets]),
+          ];
         }
         break;
       }
@@ -619,10 +628,13 @@ function detectGenericStructuralEdges(nodes, options = {}) {
     ? options.customResolvers
     : [];
   const disabled = new Set(options.disabledDefaultResolverIds || []);
-  const defaultResolvers = [createGenericResourceReferenceResolver(options)].filter(
-    (resolver) => !disabled.has(resolver.id),
-  );
-  return refineEdgesWithResolvers(nodes, [...customResolvers, ...defaultResolvers]);
+  const defaultResolvers = [
+    createGenericResourceReferenceResolver(options),
+  ].filter((resolver) => !disabled.has(resolver.id));
+  return refineEdgesWithResolvers(nodes, [
+    ...customResolvers,
+    ...defaultResolvers,
+  ]);
 }
 
 /**
@@ -691,8 +703,11 @@ function resolveModuleOutputReference(reference, nodes, seen = new Set()) {
 
   const directMatches = new Set();
   for (const candidate of [ref, withoutAttributeSuffix(ref)]) {
-    for (const nodePath of nodes.__dataFlowIndex?.byAddress?.get(candidate) || []) {
-      if (DATA_FLOW_TARGET_TYPES.has(getResourceType(nodePath, nodes[nodePath]))) {
+    for (const nodePath of nodes.__dataFlowIndex?.byAddress?.get(candidate) ||
+      []) {
+      if (
+        DATA_FLOW_TARGET_TYPES.has(getResourceType(nodePath, nodes[nodePath]))
+      ) {
         directMatches.add(nodePath);
       }
     }
@@ -710,7 +725,11 @@ function resolveModuleOutputReference(reference, nodes, seen = new Set()) {
     const matches = new Set();
     for (const outputRef of outputRefs) {
       const absoluteRef = `${modulePath}.${outputRef}`;
-      for (const target of resolveModuleOutputReference(absoluteRef, nodes, seen)) {
+      for (const target of resolveModuleOutputReference(
+        absoluteRef,
+        nodes,
+        seen,
+      )) {
         matches.add(target);
       }
     }
@@ -845,7 +864,13 @@ function buildNetworkingEdges(nodes) {
     }
     allKeys.add(key);
     nodes[source].edges_networking ||= [];
-    nodes[source].edges_networking.push({ target, type, label, origin, detail });
+    nodes[source].edges_networking.push({
+      target,
+      type,
+      label,
+      origin,
+      detail,
+    });
   };
 
   for (const [nodePath, node] of Object.entries(nodes)) {
@@ -900,7 +925,9 @@ function buildNetworkingEdges(nodes) {
         ];
         const peers = new Set();
         for (const pr of peerPool) {
-          for (const p of resolveNodeRefs(pr, index, nodes, ["aws_security_group"])) {
+          for (const p of resolveNodeRefs(pr, index, nodes, [
+            "aws_security_group",
+          ])) {
             peers.add(p);
           }
         }
@@ -925,7 +952,10 @@ function buildNetworkingEdges(nodes) {
       if (type === "aws_vpc_endpoint") {
         const svc =
           typeof values.service_name === "string" ? values.service_name : "";
-        for (const ref of [values.security_group_ids, values.security_group_id]) {
+        for (const ref of [
+          values.security_group_ids,
+          values.security_group_id,
+        ]) {
           for (const sg of resolveNodeRefs(ref, index, nodes, [
             "aws_security_group",
           ])) {
@@ -947,7 +977,6 @@ function buildNetworkingEdges(nodes) {
 
   return nodes;
 }
-
 
 module.exports = {
   buildDataFlowEdges,

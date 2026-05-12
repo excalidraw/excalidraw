@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 import {
   buildLambdaSgPlanConfigIndexesForTests,
   collectLambdaVpcSecurityGroupRefsFromPlanConfiguration,
@@ -8,6 +7,8 @@ import {
   lastModuleCallSegmentFromPrefix,
   moduleCallSegmentsFromPrefix,
 } from "./terraformTopologyLambdaSgPlanConfig";
+
+import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
 describe("terraformTopologyLambdaSgPlanConfig", () => {
   it("hasTerraformPlanConfiguration detects configuration.root_module", () => {
@@ -21,17 +22,22 @@ describe("terraformTopologyLambdaSgPlanConfig", () => {
   });
 
   it("moduleCallSegmentsFromPrefix splits nested module path", () => {
-    expect(moduleCallSegmentsFromPrefix("module.a.module.b")).toEqual(["a", "b"]);
+    expect(moduleCallSegmentsFromPrefix("module.a.module.b")).toEqual([
+      "a",
+      "b",
+    ]);
     expect(moduleCallSegmentsFromPrefix("module.a")).toEqual(["a"]);
   });
 
   it("lastModuleCallSegmentFromPrefix returns innermost module name", () => {
-    expect(lastModuleCallSegmentFromPrefix("module.workload_reader_lambda.module.lambda")).toBe(
-      "lambda",
-    );
-    expect(lastModuleCallSegmentFromPrefix("module.workload_reader_lambda")).toBe(
-      "workload_reader_lambda",
-    );
+    expect(
+      lastModuleCallSegmentFromPrefix(
+        "module.workload_reader_lambda.module.lambda",
+      ),
+    ).toBe("lambda");
+    expect(
+      lastModuleCallSegmentFromPrefix("module.workload_reader_lambda"),
+    ).toBe("workload_reader_lambda");
   });
 
   it("resolves vpc_security_group_ids.references to aws_security_group node paths", () => {
@@ -106,14 +112,17 @@ describe("terraformTopologyLambdaSgPlanConfig", () => {
       },
     };
 
-    expect(collectLambdaVpcSecurityGroupRefsFromPlanConfiguration(plan, lambdaAddr, nodes)).toEqual([
-      sgAddr,
-    ]);
+    expect(
+      collectLambdaVpcSecurityGroupRefsFromPlanConfiguration(
+        plan,
+        lambdaAddr,
+        nodes,
+      ),
+    ).toEqual([sgAddr]);
   });
 
   it("returns empty list when references are only locals (no SG resolution)", () => {
-    const lambdaAddr =
-      "module.stack.module.lambda.aws_lambda_function.this[0]";
+    const lambdaAddr = "module.stack.module.lambda.aws_lambda_function.this[0]";
     const sgAddr = "module.stack.module.sg.aws_security_group.this[0]";
     const nodes: TerraformPlanNodesMap = {
       [lambdaAddr]: {
@@ -159,7 +168,11 @@ describe("terraformTopologyLambdaSgPlanConfig", () => {
       },
     };
     expect(
-      collectLambdaVpcSecurityGroupRefsFromPlanConfiguration(plan, lambdaAddr, nodes),
+      collectLambdaVpcSecurityGroupRefsFromPlanConfiguration(
+        plan,
+        lambdaAddr,
+        nodes,
+      ),
     ).toEqual([]);
   });
 
@@ -215,9 +228,13 @@ describe("terraformTopologyLambdaSgPlanConfig", () => {
         },
       },
     };
-    expect(collectLambdaVpcSecurityGroupRefsFromPlanConfiguration(plan, lambdaAddr, nodes)).toEqual([
-      sgAddr,
-    ]);
+    expect(
+      collectLambdaVpcSecurityGroupRefsFromPlanConfiguration(
+        plan,
+        lambdaAddr,
+        nodes,
+      ),
+    ).toEqual([sgAddr]);
   });
 
   it("indexes module_calls vpc_security_group_ids under child module prefix", () => {
@@ -230,7 +247,9 @@ describe("terraformTopologyLambdaSgPlanConfig", () => {
                 module_calls: {
                   lambda: {
                     expressions: {
-                      vpc_security_group_ids: { references: ["module.sg.aws_security_group.this"] },
+                      vpc_security_group_ids: {
+                        references: ["module.sg.aws_security_group.this"],
+                      },
                     },
                     module: {},
                   },

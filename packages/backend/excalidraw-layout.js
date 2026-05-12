@@ -3,6 +3,7 @@
  * offsets, VPC perimeter snaps, and synthetic networking-facet appliance tiles.
  */
 const ELK = require("elkjs");
+
 const {
   VPC_PERIMETER_LAYOUT_ENABLED,
   classifyVpcApplianceWall,
@@ -701,16 +702,9 @@ function buildModuleInternalOffsets(
 
   const groups =
     moduleGroupByPath ||
-    new Map(
-      [[modulePath, moduleGroup]].filter(([, group]) => Boolean(group)),
-    );
-  return measureModuleBlock(
-    modulePath,
-    members,
-    groups,
-    tierMap,
-    tierConfigs,
-  ).offsets;
+    new Map([[modulePath, moduleGroup]].filter(([, group]) => Boolean(group)));
+  return measureModuleBlock(modulePath, members, groups, tierMap, tierConfigs)
+    .offsets;
 }
 
 /** Bounding box size per collapsed module from internal offsets + tier card dimensions. */
@@ -791,7 +785,12 @@ function expandCollapsedModulePositions(
 }
 
 /** Axis-aligned bounds of given nodes using their tier width/height (or null if empty). */
-function measureBoundsFromNodePositions(nodePaths, positions, tierMap, tierConfigs) {
+function measureBoundsFromNodePositions(
+  nodePaths,
+  positions,
+  tierMap,
+  tierConfigs,
+) {
   let minX = Infinity;
   let minY = Infinity;
   let maxX = -Infinity;

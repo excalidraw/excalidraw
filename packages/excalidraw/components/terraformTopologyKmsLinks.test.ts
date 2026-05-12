@@ -8,6 +8,7 @@ import {
   kmsPolicySatelliteStackHeightPx,
   resolveKmsKeyIdToNodePath,
 } from "./terraformTopologyKmsLinks";
+
 import type { TerraformPlanNodesMap } from "./terraformPlanParsing";
 
 describe("resolveKmsKeyIdToNodePath", () => {
@@ -31,7 +32,9 @@ describe("resolveKmsKeyIdToNodePath", () => {
       },
     };
     const arnIndex = buildArnIndexForTopology(nodes);
-    expect(resolveKmsKeyIdToNodePath(nodes, keyId, arnIndex)).toBe("aws_kms_key.main");
+    expect(resolveKmsKeyIdToNodePath(nodes, keyId, arnIndex)).toBe(
+      "aws_kms_key.main",
+    );
   });
 
   it("resolves full key ARN via arn index", () => {
@@ -49,7 +52,9 @@ describe("resolveKmsKeyIdToNodePath", () => {
       },
     };
     const arnIndex = buildArnIndexForTopology(nodes);
-    expect(resolveKmsKeyIdToNodePath(nodes, arn, arnIndex)).toBe("aws_kms_key.main");
+    expect(resolveKmsKeyIdToNodePath(nodes, arn, arnIndex)).toBe(
+      "aws_kms_key.main",
+    );
   });
 });
 
@@ -86,11 +91,15 @@ describe("collectKmsKeyPoliciesForKey / buildKmsKeyPolicyCluster", () => {
       },
     };
     const arnIndex = buildArnIndexForTopology(nodes);
-    expect(collectKmsKeyPoliciesForKey(nodes, "aws_kms_key.main", arnIndex)).toEqual([
-      "aws_kms_key_policy.main",
-    ]);
+    expect(
+      collectKmsKeyPoliciesForKey(nodes, "aws_kms_key.main", arnIndex),
+    ).toEqual(["aws_kms_key_policy.main"]);
 
-    const { cluster, edges } = buildKmsKeyPolicyCluster(nodes, "aws_kms_key.main", arnIndex);
+    const { cluster, edges } = buildKmsKeyPolicyCluster(
+      nodes,
+      "aws_kms_key.main",
+      arnIndex,
+    );
     expect(cluster).toEqual({
       kms: "aws_kms_key.main",
       policies: ["aws_kms_key_policy.main"],
@@ -119,7 +128,9 @@ describe("collectKmsKeyPoliciesForKey / buildKmsKeyPolicyCluster", () => {
       },
     };
     const arnIndex = buildArnIndexForTopology(nodes);
-    expect(buildKmsKeyPolicyCluster(nodes, "aws_s3_bucket.x", arnIndex).cluster).toBeNull();
+    expect(
+      buildKmsKeyPolicyCluster(nodes, "aws_s3_bucket.x", arnIndex).cluster,
+    ).toBeNull();
   });
 });
 
@@ -132,7 +143,9 @@ describe("kmsPolicySatelliteStackHeightPx", () => {
             address: "aws_kms_key.main",
             type: "aws_kms_key",
             mode: "managed",
-            change: { after: { id: "k1", arn: "arn:aws:kms:us-east-1:1:key/k1" } },
+            change: {
+              after: { id: "k1", arn: "arn:aws:kms:us-east-1:1:key/k1" },
+            },
           },
         },
       },
@@ -182,7 +195,13 @@ describe("kmsPolicySatelliteStackHeightPx", () => {
     const tier1 = tfComfortPx(52);
     const gap = tfComfortPx(8);
     expect(
-      kmsPolicySatelliteStackHeightPx(nodes, "aws_kms_key.main", arnIndex, tier1, gap),
+      kmsPolicySatelliteStackHeightPx(
+        nodes,
+        "aws_kms_key.main",
+        arnIndex,
+        tier1,
+        gap,
+      ),
     ).toBe(gap + tier1 + gap);
   });
 });

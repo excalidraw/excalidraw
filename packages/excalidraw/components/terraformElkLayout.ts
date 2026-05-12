@@ -62,12 +62,14 @@ import {
   terraformResourceCardLabel,
 } from "./terraformResourceCardLabel";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
+
+import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
+
 import type {
   TerraformModuleTreeNode,
   TerraformPlanGraphNode,
   TerraformPlanNodesMap,
 } from "./terraformPlanParsing";
-import { tfComfortFontSize, tfComfortPx } from "./terraformLayoutComfort";
 
 const px = tfComfortPx;
 
@@ -88,7 +90,9 @@ const ELK_ROOT_LAYOUT_OPTIONS: Record<string, string> = {
   "elk.spacing.componentComponent": String(px(200)),
   "elk.layered.considerModelOrder.strategy": "NODES_AND_EDGES",
   "elk.layered.thoroughness": "10",
-  "elk.padding": `[top=${px(40)},left=${px(40)},bottom=${px(40)},right=${px(40)}]`,
+  "elk.padding": `[top=${px(40)},left=${px(40)},bottom=${px(40)},right=${px(
+    40,
+  )}]`,
   "elk.separateConnectedComponents": "true",
 };
 
@@ -101,7 +105,9 @@ const ELK_MODULE_COMPOUND_OPTIONS: Record<string, string> = {
   "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
   "elk.layered.spacing.nodeNodeBetweenLayers": String(px(140)),
   "elk.spacing.nodeNode": String(px(120)),
-  "elk.padding": `[top=${px(140)},left=${px(100)},bottom=${px(100)},right=${px(100)}]`,
+  "elk.padding": `[top=${px(140)},left=${px(100)},bottom=${px(100)},right=${px(
+    100,
+  )}]`,
 };
 
 const MODULE_COMPOUND_PREFIX = "__tf_m__:";
@@ -374,7 +380,9 @@ function getDominantTerraformAction(actions: Iterable<unknown>) {
 }
 
 /** Mirrors backend `getPrimaryAction` in `packages/backend/excalidraw-elements.js`. */
-export function getTerraformPlanNodeAction(node: TerraformPlanGraphNode | undefined) {
+export function getTerraformPlanNodeAction(
+  node: TerraformPlanGraphNode | undefined,
+) {
   const actions: unknown[] = [];
   for (const resource of Object.values(node?.resources || {})) {
     const resourceActions = (resource as Record<string, any>).change?.actions;
@@ -1442,7 +1450,10 @@ export async function buildTerraformElkExcalidrawScene(
     nodes as Record<string, { edges_data_flow?: unknown }>,
   );
   const networkingRecordEdges = collectNetworkingEdges(
-    nodes as Record<string, { edges_data_flow?: unknown; edges_networking?: unknown }>,
+    nodes as Record<
+      string,
+      { edges_data_flow?: unknown; edges_networking?: unknown }
+    >,
   );
   const netDepPairKeys = new Set(
     networkingDependencyEdges.map((e) =>
@@ -1564,7 +1575,11 @@ export async function buildTerraformElkExcalidrawScene(
   );
 
   edgeSkeletons.push(
-    ...buildTerraformDependencyLineSkeletons(nodes, layoutBoxes, dependencyEdges),
+    ...buildTerraformDependencyLineSkeletons(
+      nodes,
+      layoutBoxes,
+      dependencyEdges,
+    ),
   );
   edgeSkeletons.push(
     ...buildTerraformNetworkingDependencyLineSkeletons(

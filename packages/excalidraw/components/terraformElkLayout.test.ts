@@ -6,6 +6,7 @@ import {
 } from "./terraformElkLayout";
 import { TERRAFORM_MODULE_TREE_KEY } from "./terraformPlanMeta";
 import { collapseAllTerraformExplode } from "./terraformVisibility";
+
 import type {
   TerraformPlanGraphNode,
   TerraformPlanNodesMap,
@@ -296,9 +297,9 @@ describe("buildTerraformElkExcalidrawScene", () => {
           ?.terraformEdgeLayer === "dataFlow",
     );
     expect(dataFlowLines.length).toBeGreaterThan(0);
-    expect(
-      (dataFlowLines[0] as { strokeColor?: string }).strokeColor,
-    ).toBe("#868e96");
+    expect((dataFlowLines[0] as { strokeColor?: string }).strokeColor).toBe(
+      "#868e96",
+    );
   });
 
   it.each([
@@ -370,8 +371,9 @@ describe("buildTerraformElkExcalidrawScene", () => {
       },
     } as unknown as TerraformPlanNodesMap;
 
-    (nodes[vpc] as TerraformPlanGraphNode & { edges_new?: string[] }).edges_new =
-      [igw];
+    (
+      nodes[vpc] as TerraformPlanGraphNode & { edges_new?: string[] }
+    ).edges_new = [igw];
 
     const { elements } = await buildTerraformElkExcalidrawScene(nodes);
     const netLine = elements.find(

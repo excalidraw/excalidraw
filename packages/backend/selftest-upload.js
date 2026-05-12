@@ -94,8 +94,16 @@ async function main() {
 
   try {
     const form = new FormData();
-    form.append("planFile", new Blob([fs.readFileSync(planPath)]), "selftest-plan.json");
-    form.append("dotFile", new Blob([fs.readFileSync(dotPath)]), "selftest.dot");
+    form.append(
+      "planFile",
+      new Blob([fs.readFileSync(planPath)]),
+      "selftest-plan.json",
+    );
+    form.append(
+      "dotFile",
+      new Blob([fs.readFileSync(dotPath)]),
+      "selftest.dot",
+    );
 
     const uploadResp = await fetch(`${baseUrl}/terraform/upload`, {
       method: "POST",
@@ -133,7 +141,9 @@ async function main() {
     );
 
     if (!vpcText || !subnetText) {
-      throw new Error("Facet summary text not found in rendered VPC/subnet labels");
+      throw new Error(
+        "Facet summary text not found in rendered VPC/subnet labels",
+      );
     }
 
     console.log("SELFTEST_PASS", {

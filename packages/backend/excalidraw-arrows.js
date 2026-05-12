@@ -406,8 +406,8 @@ function normalizeTerraformDependencyKindTokens(kinds, origins) {
     const originList = Array.isArray(origins)
       ? origins
       : typeof origins === "string"
-        ? [origins]
-        : [];
+      ? [origins]
+      : [];
     for (const o of originList) {
       if (o === "dot") {
         tokens.push(PLANNED_DEPENDENCY_KIND);

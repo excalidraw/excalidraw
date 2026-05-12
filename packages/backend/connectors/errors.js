@@ -25,7 +25,9 @@ class UnknownRendererError extends Error {
    */
   constructor(rendererId, available) {
     super(
-      `Unknown renderer "${rendererId}". Available: ${available.join(", ") || "(none)"}.`,
+      `Unknown renderer "${rendererId}". Available: ${
+        available.join(", ") || "(none)"
+      }.`,
     );
     this.name = "UnknownRendererError";
     this.rendererId = rendererId;
