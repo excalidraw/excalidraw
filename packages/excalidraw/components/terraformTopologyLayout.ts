@@ -11,6 +11,7 @@ import { pointFrom } from "@excalidraw/math";
 import type { LocalPoint } from "@excalidraw/math";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
+import { injectTerraformAwsIconsIntoElements } from "./terraformAwsIcons";
 import {
   applyTerraformResourceRectangleSoftDelete,
   buildTerraformDataFlowLineSkeletons,
@@ -29,12 +30,15 @@ import {
   type TerraformDependencyLayoutBox,
 } from "./terraformElkLayout";
 import {
+  terraformResourceCardLabel,
+  getTerraformCardResourceType,
+} from "./terraformResourceCardLabel";
+import {
   collectDataFlowEdges,
   collectNetworkingEdges,
 } from "./terraformExplodeGraph";
 import { partitionDirectedEdgesByNetworking } from "./terraformNetworkingVertex";
 import {
-  getTerraformResourceTypeFromNodePath,
   isInitiallyVisibleTerraformTopologyTile,
 } from "./terraformPrimaryVisibility";
 import {
@@ -718,7 +722,10 @@ function appendRouteTableBottomEdgeRectangles(
     const rx = startX + i * (ROUTE_TABLE_TILE_W + ROUTE_TABLE_TILE_GAP);
     const ry = bottomRowTop;
     const node = nodes[addr] as TerraformPlanGraphNode | undefined;
-    const resourceType = getTerraformResourceTypeFromNodePath(addr);
+    const resourceType = getTerraformCardResourceType(
+      addr,
+      getPrimaryResource(node) as Record<string, unknown> | null,
+    );
     const action = getTerraformPlanNodeAction(node);
     const initiallyVisible = isInitiallyVisibleTerraformTopologyTile(
       resourceType,
@@ -800,7 +807,10 @@ function appendVpcEndpointEgressRectangles(
     const rx = startX + col * (VPC_ENDPOINT_TILE_W + VPC_ENDPOINT_TILE_GAP);
     const ry = bottomRowTop;
     const node = nodes[addr] as TerraformPlanGraphNode | undefined;
-    const resourceType = getTerraformResourceTypeFromNodePath(addr);
+    const resourceType = getTerraformCardResourceType(
+      addr,
+      getPrimaryResource(node) as Record<string, unknown> | null,
+    );
     const action = getTerraformPlanNodeAction(node);
     const initiallyVisible = isInitiallyVisibleTerraformTopologyTile(
       resourceType,
@@ -855,7 +865,10 @@ function pushResourceRectangleSkeleton(
 ): void {
   const node = nodes[addr] as TerraformPlanGraphNode | undefined;
   const resource = getPrimaryResource(node);
-  const resourceType = getTerraformResourceTypeFromNodePath(addr);
+  const resourceType = getTerraformCardResourceType(
+    addr,
+    resource as Record<string, unknown> | null,
+  );
   const action = getTerraformPlanNodeAction(node);
   const actionStyle = getTerraformActionStyle(action);
   const explodeKeys = [...options.explodeParentKeys].sort();
@@ -879,7 +892,10 @@ function pushResourceRectangleSkeleton(
     strokeStyle: egress ? "dashed" : "solid",
     roundness: { type: 3, value: 10 },
     label: {
-      text: shortTerraformResourceLabel(addr),
+      text: terraformResourceCardLabel(
+        addr,
+        resource as Record<string, unknown> | null,
+      ),
       fontSize: labelFontSize,
       strokeColor: TERRAFORM_RESOURCE_LABEL_STROKE,
     },
@@ -1097,7 +1113,10 @@ function appendVpcInfrastructureStrips(
     for (const addr of addrs) {
       out.push(addr);
       const node = nodes[addr] as TerraformPlanGraphNode | undefined;
-      const resourceType = getTerraformResourceTypeFromNodePath(addr);
+      const resourceType = getTerraformCardResourceType(
+        addr,
+        getPrimaryResource(node) as Record<string, unknown> | null,
+      );
       const action = getTerraformPlanNodeAction(node);
       pushResourceRectangleSkeleton(
         skeleton,
@@ -1301,7 +1320,10 @@ function appendTopologyResourceRectangles(
     };
 
     const node = nodes[addr] as TerraformPlanGraphNode | undefined;
-    const resourceType = getTerraformResourceTypeFromNodePath(addr);
+    const resourceType = getTerraformCardResourceType(
+      addr,
+      getPrimaryResource(node) as Record<string, unknown> | null,
+    );
     const action = getTerraformPlanNodeAction(node);
     const initiallyVisible = isInitiallyVisibleTerraformTopologyTile(
       resourceType,
@@ -2556,6 +2578,7 @@ export async function buildTerraformTopologyExcalidrawScene(
     semanticAllVisible: true,
   });
   elements = mirrorAndDetachTerraformResourceLabels(elements);
+  elements = await injectTerraformAwsIconsIntoElements(elements);
   elements = repairTerraformEdgeBindings(reconcileTerraformVisibility(elements));
   elements = reorderTopologyElementsZStack(elements);
 
