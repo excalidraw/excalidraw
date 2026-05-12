@@ -120,7 +120,6 @@ const TerraformImportModal = ({
       }
       formData.append("structuralPruneMode", structuralPruneMode);
       if (useBackend) {
-        console.log("using backend");
         const res = await fetch(`${TERRAFORM_BACKEND_URL}/terraform/upload`, {
           method: "POST",
           body: formData,
@@ -131,7 +130,6 @@ const TerraformImportModal = ({
         }
         await loadExcalidrawScene(data.id);
       } else {
-        console.log("not using backend");
         const res = await terraformPlanParsing(
           hasPlanAndDot ? planFile : null,
           hasPlanAndDot ? dotFile : null,
