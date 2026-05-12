@@ -195,6 +195,8 @@ const hasTerraformResourceNodes = (
 
 export const TerraformExpandAllToggle = () => {
   const app = useApp();
+  // Subscribe to scene updates so the checkbox re-renders while the menu stays open.
+  useExcalidrawElements();
   const elements = app.scene.getElementsIncludingDeleted();
 
   if (!hasTerraformResourceNodes(elements)) {
